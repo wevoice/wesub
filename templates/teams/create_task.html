@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% load i18n teams_tags widget media_compressor form_helpers %}
+
+{% block body_attrs %}id="teams" class="v1"{% endblock %}
+
+{% block title %}
+    {% trans "Create a Task" %} | Universal Subtitles
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    {% include_bundle "widget-css"%}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/chosen.css">
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    {% include_bundle "unisubs-onsite-compiled" %}
+    <script src="{{ STATIC_URL }}js/libs/chosen.jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            jQuery("select", ".chosen").chosen();
+        });
+    </script>
+{% endblock %}
+
+{% block main_content %}
+
+    {% if team.logo %}
+        <img class="logo" alt="{{ team }} logo" src="{{ MEDIA_URL }}{{ team.logo }}"/>
+    {% else %}
+        <h2 id="team_title">{{ team }}</h2>
+    {% endif %}
+
+    {% with "tasks" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        <form method="post" action="." class="create-task">
+            <h3>{% trans "New Task" %}</h3>
+
+            <div class="grid_4 alpha">
+                <fieldset>
+                    {{ form.type }}
+                    <div class="chosen">
+                        {{ form.language }}
+                        {{ form.assignee }}
+                    </div>
+                    {# {% include "_form_field.html" with field=form.usernames %} #}
+                    {# {% include "_form_field.html" with field=form.youtube_user_url %} #}
+                </fieldset>
+            </div>
+
+            <div class="grid_4 omega">
+                <p>Video: {{ team_video.video }}</p>
+                <fieldset>
+                    {{ form.public }}
+                    <label for="id_public">Public</label>
+                    {# {% smart_field_render form.feed_url %} #}
+                    {# {% smart_field_render form.save_feed%} #}
+                </fieldset>
+            </div>
+            <div class="grid_9 submit">
+                <button><span>{% trans "Save" %}</span></button>
+            </div>
+
+            {% csrf_token %}
+        </form>
+    </div>
+    <div class="controls grid_3 omega">
+        <ul>
+            {# <li> #}
+            {#     <a href="{% url teams:add_video slug=team.slug %}">{% trans "Add a Video" %}</a> #}
+            {# </li> #}
+            {# <li class="current"> #}
+            {#     <a href="{% url teams:add_videos slug=team.slug %}">{% trans "Add Multiple Videos" %}</a> #}
+            {# </li> #}
+            {# <li> #}
+            {#     <a href="{{ team.get_absolute_url }}">← {% trans "Back to Videos" %}</a> #}
+            {# </li> #}
+        </ul>
+    </div>
+{% endblock %}

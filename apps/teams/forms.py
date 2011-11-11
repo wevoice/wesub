@@ -366,6 +366,78 @@ class EditTeamFormAdmin(EditTeamForm):
                   'page_content')
 
 
+def form_error(msg):
+    raise forms.ValidationError(msg)
+
+class CreateTaskForm(forms.Form):
+    type = forms.ChoiceField(choices=Task.TYPE_CHOICES)
+    language = forms.ChoiceField(choices=(), required=False)
+    assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
+    public = forms.BooleanField(required=False)
+
+    def __init__(self, team, team_video, *args, **kwargs):
+        super(CreateTaskForm, self).__init__(*args, **kwargs)
+
+        self.team_video = team_video
+
+        self.fields['language'].choices = get_languages_list(True)
+        self.fields['assignee'].queryset = team.members.all()
+
+    def _check_task_creation_subtitle(self, tasks, sl):
+        if self.subtitles_finished:
+            form_error(_(u"This video has already been subtitled."))
+
+        if self.subtitles_started:
+            form_error(_(u"Subtitling of this video is already in progress."))
+
+    def _check_task_creation_translate(self, tasks, sl):
+        if not self.subtitles_finished:
+            form_error(_(u"No one has subtitled this video yet, so it can't be translated."))
+
+    def _check_task_creation_review(self, tasks, sl):
+        if not sl or not sl.completed:
+            form_error(_(u"Subtitles in that language have not been completed yet, so they can't be reviewed."))
+
+    def _check_task_creation_approve(self, tasks, sl):
+        if not sl or not sl.completed:
+            form_error(_(u"Subtitles in that language have not been completed yet, so they can't be approved."))
+
+        workflow = Workflow.get_for_team_video(self.team_video)
+
+        if workflow.review_enabled:
+            review_tasks = [t for t in tasks if t.type == Task.TYPE_IDS['Review']]
+
+            if not review_tasks:
+                form_error(_(u"These subtitles must be reviewed before being approved."))
+
+    def clean(self):
+        cd = self.cleaned_data
+        type = cd['type']
+        lang = cd['language']
+
+        existing_tasks = list(Task.objects.filter(deleted=False, type=type, language=lang))
+
+        if any(not t.completed for t in existing_tasks):
+            form_error(_(u"There is already a task in progress for that video/language."))
+
+        type_name = Task.TYPE_NAMES[type]
+
+        sl = (self.team_video.video.subtitle_language(lang)
+              if type_name in ('Review', 'Approve') else None)
+
+        self.subtitles_started = self.team_video.video.has_original_language()
+        self.subtitles_finished = (self.subtitles_started and
+                                   self.team_video.video.standard_language.completed)
+
+        {'Subtitle': self._check_task_creation_subtitle,
+         'Translate': self._check_task_creation_translate,
+         'Review': self._check_task_creation_review,
+         'Approve': self._check_task_creation_approve,
+        }[type_name](existing_tasks, sl)
+
+        return cd
+
+
 class TaskAssignForm(forms.Form):
     task = forms.ModelChoiceField(queryset=Task.objects.all())
     assignee = forms.ModelChoiceField(queryset=User.objects.all())

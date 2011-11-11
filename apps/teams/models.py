@@ -1469,4 +1469,4 @@ class TeamLanguagePreference(models.Model):
     def __unicode__(self):
         return u"%s preference for team %s" % (self.language_code, self.team)
 
-post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePreference)        
+post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePreference)

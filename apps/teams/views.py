@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from utils import render_to, render_to_json
-from teams.forms import CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm, EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm
+from teams.forms import CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm, EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, CreateTaskForm
 from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.contrib.auth.decorators import login_required
@@ -728,6 +728,20 @@ def leave_team(request, slug):
     return redirect(request.META.get('HTTP_REFERER') or team)
 
 
+@render_to('teams/create_task.html')
+def create_task(request, slug, team_video_pk):
+    team = get_object_or_404(Team, slug=slug)
+    team_video = get_object_or_404(TeamVideo, pk=team_video_pk, team=team)
+
+    if request.POST:
+        form = CreateTaskForm(team, team_video, request.POST)
+    else:
+        form = CreateTaskForm(team, team_video)
+
+    return { 'form': form, 'team': team, 'team_video': team_video, }
+
+
+
 @login_required
 def perform_task(request):
     task = Task.objects.get(pk=request.POST.get('task_id'))
@@ -740,6 +754,7 @@ def perform_task(request):
 
     # ... perform task ...
     return HttpResponseRedirect(task.get_perform_url())
+
 
 def project_list(request, slug):
     team = get_object_or_404(Team, slug=slug)

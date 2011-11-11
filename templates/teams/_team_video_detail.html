@@ -38,6 +38,9 @@
         <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}">Edit</a>
       </li>
       <li>
+          <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}">Create Task</a>
+      </li>
+      <li>
         <a href="">Remove</a>
       </li>
     </ul>
