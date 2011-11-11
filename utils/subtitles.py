@@ -91,7 +91,6 @@ def save_subtitle(video, language, parser, user=None, update_video=True):
             caption.save()
             
             if metadata:
-                print metadata
                 for name, value in metadata.items():
                     SubtitleMetadata(
                         subtitle=caption,
