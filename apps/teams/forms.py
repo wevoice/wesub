@@ -426,7 +426,7 @@ class CreateTaskForm(ErrorableModelForm):
         lang = cd['language']
 
         existing_tasks = list(Task.objects.filter(deleted=False, type=type,
-                                                  language=lang))
+                                                  language=lang, team_video=self.team_video))
 
         if any(not t.completed for t in existing_tasks):
             self.add_error(_(u"There is already a task in progress for that video/language."))
