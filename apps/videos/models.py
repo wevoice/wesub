@@ -81,13 +81,21 @@ VIDEO_TYPE = (
     (VIDEO_TYPE_MP3, 'MP3'),
 )
 VIDEO_META_CHOICES = (
-    (1, 'Author'),
-    (2, 'Creation Date'),
+    (1, 'Author',),
+    (2, 'Creation Date',),
+    (100, 'ted_id',),
 )
-VIDEO_META_TYPE_NAMES = dict(VIDEO_META_CHOICES)
-VIDEO_META_TYPE_VARS = dict((k, name.lower().replace(' ', '_'))
-                            for k, name in VIDEO_META_CHOICES)
-VIDEO_META_TYPE_IDS = dict([choice[::-1] for choice in VIDEO_META_CHOICES])
+VIDEO_META_TYPE_NAMES = {}
+VIDEO_META_TYPE_VARS = {}
+VIDEO_META_TYPE_IDS = {}
+def update_metadata_choices():
+    global VIDEO_META_TYPE_NAMES, VIDEO_META_TYPE_VARS , VIDEO_META_TYPE_IDS 
+    VIDEO_META_TYPE_NAMES = dict(VIDEO_META_CHOICES)
+    VIDEO_META_TYPE_VARS = dict((k, name.lower().replace(' ', '_'))
+                                for k, name in VIDEO_META_CHOICES)
+    VIDEO_META_TYPE_IDS = dict([choice[::-1] for choice in VIDEO_META_CHOICES])
+update_metadata_choices()    
+
 WRITELOCK_EXPIRATION = 30 # 30 seconds
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
@@ -566,6 +574,27 @@ class VideoMetadata(models.Model):
     created = models.DateTimeField(editable=False, auto_now_add=True)
     modified = models.DateTimeField(editable=False, auto_now=True)
 
+    @classmethod
+    def add_metadata_type(cls, num, readable_name):
+        """
+        Adds a new metadata choice. These can't be added at class
+        creation time because some of those types live on the integration
+        repo and therefore can't be referenced from here.
+        This makes sure that if code is trying to do this dinamically
+        we'll never allow it to overwrite a key with a different name
+        """
+        field = VideoMetadata._meta.get_field_by_name("metadata_type")[0]
+        choices = field.choices
+        for x in choices:
+            if x[0] == num and x[1] != readable_name:
+                raise ValueError(
+                    "Cannot add a metadata value twice, tried %s -> %s which clashes with %s -> %s" %
+                    (num, readable_name, x[0], x[1]))
+        choices = choices + (num, readable_name,)
+        # public attr is read only
+        VIDEO_META_CHOICES = field._choices = choices
+        update_metadata_choices()
+        
     class Meta:
         ordering = ('created',)
         verbose_name_plural = 'video metadata'
@@ -613,6 +642,9 @@ class SubtitleLanguage(models.Model):
 
     subtitles_fetched_counter = RedisSimpleField()
 
+    description = models.TextField(blank=True, null=True)
+
+    
     class Meta:
         unique_together = (('video', 'language', 'standard_language'),)
     
@@ -631,6 +663,15 @@ class SubtitleLanguage(models.Model):
         
         return self.title
     
+    def get_description(self):
+        """
+        Returns either the description for this
+        language or for the original one
+        """
+        if self.is_original:
+            return self.video.description
+        return self.description
+        
     def is_dependent(self):
         return not self.is_original and not self.is_forked
 
@@ -675,7 +716,7 @@ class SubtitleLanguage(models.Model):
         else:
             return self.is_complete
 
-    def get_widget_url(self, mode=None, task_id=None):
+    def get_widget_url(self, mode=None):
         # duplicates unisubs.widget.SubtitleDialogOpener.prototype.openDialogOrRedirect_
         video = self.video
         video_url = video.get_video_url()
@@ -686,8 +727,7 @@ class SubtitleLanguage(models.Model):
             "languageCode": self.language,
             "subLanguagePK": self.pk,
             "originalLanguageCode": video.language,
-            "mode": mode,
-            "task": task_id, }
+            "mode": mode, }
         if self.is_dependent():
             config['baseLanguagePK'] = self.standard_language and self.standard_language.pk
         return reverse('onsite_widget')+'?config='+urlquote_plus(json.dumps(config))
@@ -1581,4 +1621,3 @@ class VideoFeed(models.Model):
             checked_entries += 1
         
         return checked_entries
-
