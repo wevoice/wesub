@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-06 01:31-0600\n"
+"POT-Creation-Date: 2011-11-13 01:31-0600\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,335 +17,335 @@ msgstr ""
 "Language: da\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: settings.py:31
+#: settings.py:32
 msgid "Spanish, Argentinian"
 msgstr ""
 
-#: settings.py:32 utils/translation_names.py:50
+#: settings.py:33 utils/translation_names.py:50
 msgid "English, British"
 msgstr ""
 
-#: settings.py:33
+#: settings.py:34
 msgid "Portuguese, Brazilian"
 msgstr ""
 
-#: settings.py:34
+#: settings.py:35
 msgid "Serbian, Latin"
 msgstr ""
 
-#: settings.py:35 utils/translation_names.py:38
+#: settings.py:36 utils/translation_names.py:38
 msgid "Chinese, Simplified"
 msgstr ""
 
-#: settings.py:36 utils/translation_names.py:39
+#: settings.py:37 utils/translation_names.py:39
 msgid "Chinese, Traditional"
 msgstr ""
 
-#: settings.py:37 utils/translation_names.py:51
+#: settings.py:38 utils/translation_names.py:51
 msgid "Esperanto"
 msgstr ""
 
-#: settings.py:49 utils/translation_names.py:74
+#: settings.py:50 utils/translation_names.py:74
 msgid "Inuktitut"
 msgstr ""
 
-#: settings.py:50
+#: settings.py:51
 msgid "Mohawk"
 msgstr ""
 
-#: settings.py:51
+#: settings.py:52
 msgid "Anishinaabe"
 msgstr ""
 
-#: settings.py:52 utils/translation_names.py:42
+#: settings.py:53 utils/translation_names.py:42
 msgid "Cree"
 msgstr ""
 
-#: settings.py:53
+#: settings.py:54
 msgid "Haida"
 msgstr ""
 
-#: settings.py:54
+#: settings.py:55
 msgid "American Sign Language"
 msgstr ""
 
-#: settings.py:55 utils/translation_names.py:175
+#: settings.py:56 utils/translation_names.py:175
 msgid "Wolof"
 msgstr ""
 
-#: settings.py:56 utils/translation_names.py:124
+#: settings.py:57 utils/translation_names.py:124
 msgid "Quechua"
 msgstr ""
 
-#: settings.py:57 utils/translation_names.py:148
+#: settings.py:58 utils/translation_names.py:148
 msgid "Swahili"
 msgstr ""
 
-#: settings.py:58 utils/translation_names.py:30
+#: settings.py:59 utils/translation_names.py:30
 msgid "Breton"
 msgstr ""
 
-#: settings.py:59 utils/translation_names.py:25
+#: settings.py:60 utils/translation_names.py:25
 msgid "Belarusian"
 msgstr ""
 
-#: settings.py:60
+#: settings.py:61
 msgid "Berber"
 msgstr ""
 
-#: settings.py:61 utils/translation_names.py:64
+#: settings.py:62 utils/translation_names.py:64
 msgid "Hausa"
 msgstr ""
 
-#: settings.py:62 utils/translation_names.py:117
+#: settings.py:63 utils/translation_names.py:117
 msgid "Oromo"
 msgstr ""
 
-#: settings.py:63 utils/translation_names.py:180
+#: settings.py:64 utils/translation_names.py:180
 msgid "Zulu"
 msgstr ""
 
-#: settings.py:64 utils/translation_names.py:144
+#: settings.py:65 utils/translation_names.py:144
 msgid "Somali"
 msgstr ""
 
-#: settings.py:65 utils/translation_names.py:178
+#: settings.py:66 utils/translation_names.py:178
 msgid "Yoruba"
 msgstr ""
 
-#: settings.py:66
+#: settings.py:67
 msgid "Igbo"
 msgstr ""
 
-#: settings.py:67 utils/translation_names.py:7
+#: settings.py:68 utils/translation_names.py:7
 msgid "Afrikaans"
 msgstr ""
 
-#: settings.py:68
+#: settings.py:69
 msgid "Kinyarwanda"
 msgstr ""
 
-#: settings.py:69 utils/translation_names.py:11
+#: settings.py:70 utils/translation_names.py:11
 msgid "Amharic"
 msgstr ""
 
-#: settings.py:70 utils/translation_names.py:137
+#: settings.py:71 utils/translation_names.py:137
 msgid "Shona"
 msgstr ""
 
-#: settings.py:71 utils/translation_names.py:22
+#: settings.py:72 utils/translation_names.py:22
 msgid "Bambara"
 msgstr ""
 
-#: settings.py:72 utils/translation_names.py:8
+#: settings.py:73 utils/translation_names.py:8
 msgid "Akan"
 msgstr ""
 
-#: settings.py:73
+#: settings.py:74
 msgid "Ibibio"
 msgstr ""
 
-#: settings.py:74
+#: settings.py:75
 msgid "Fula"
 msgstr ""
 
-#: settings.py:75 utils/translation_names.py:99
+#: settings.py:76 utils/translation_names.py:99
 msgid "Malagasy"
 msgstr ""
 
-#: settings.py:76 utils/translation_names.py:93
+#: settings.py:77 utils/translation_names.py:93
 msgid "Lingala"
 msgstr ""
 
-#: settings.py:77
+#: settings.py:78
 msgid "Chewa"
 msgstr ""
 
-#: settings.py:78
+#: settings.py:79
 msgid "Xhosa"
 msgstr ""
 
-#: settings.py:79
+#: settings.py:80
 msgid "Kongo"
 msgstr ""
 
-#: settings.py:80 utils/translation_names.py:158
+#: settings.py:81 utils/translation_names.py:158
 msgid "Tigrinya"
 msgstr ""
 
-#: settings.py:81
+#: settings.py:82
 msgid "Luo"
 msgstr ""
 
-#: settings.py:82
+#: settings.py:83
 msgid "Luba-Kasai"
 msgstr ""
 
-#: settings.py:83
+#: settings.py:84
 msgid "Gikuyu"
 msgstr ""
 
-#: settings.py:84
+#: settings.py:85
 msgid "Mossi"
 msgstr ""
 
-#: settings.py:85
+#: settings.py:86
 msgid "Sotho"
 msgstr ""
 
-#: settings.py:86
+#: settings.py:87
 msgid "Luhya"
 msgstr ""
 
-#: settings.py:87
+#: settings.py:88
 msgid "Tswana"
 msgstr ""
 
-#: settings.py:88
+#: settings.py:89
 msgid "Kanuri"
 msgstr ""
 
-#: settings.py:89
+#: settings.py:90
 msgid "Umbundu"
 msgstr ""
 
-#: settings.py:90
+#: settings.py:91
 msgid "Northern Sotho"
 msgstr ""
 
-#: settings.py:91
+#: settings.py:92
 msgid "Mandinka"
 msgstr ""
 
-#: settings.py:92
+#: settings.py:93
 msgid "Kyrgyz"
 msgstr ""
 
-#: settings.py:93 utils/translation_names.py:105
+#: settings.py:94 utils/translation_names.py:105
 msgid "Marathi"
 msgstr ""
 
-#: settings.py:94 utils/translation_names.py:101
+#: settings.py:95 utils/translation_names.py:101
 msgid "Malayalam"
 msgstr ""
 
-#: settings.py:95 utils/translation_names.py:116
+#: settings.py:96 utils/translation_names.py:116
 msgid "Oriya"
 msgstr ""
 
-#: settings.py:96 utils/translation_names.py:63
+#: settings.py:97 utils/translation_names.py:63
 msgid "Gujarati"
 msgstr ""
 
-#: settings.py:97 utils/translation_names.py:17
+#: settings.py:98 utils/translation_names.py:17
 msgid "Assamese"
 msgstr ""
 
-#: settings.py:98
+#: settings.py:99
 msgid "Filipino"
 msgstr ""
 
-#: settings.py:99
+#: settings.py:100
 msgid "Sinhala"
 msgstr ""
 
-#: settings.py:100
+#: settings.py:101
 msgid "Chinese, Yue"
 msgstr ""
 
-#: settings.py:101 utils/translation_names.py:115
+#: settings.py:102 utils/translation_names.py:115
 msgid "Occitan"
 msgstr ""
 
-#: settings.py:102
+#: settings.py:103
 msgid "Creole, Haitian"
 msgstr ""
 
-#: settings.py:103 utils/translation_names.py:112
+#: settings.py:104 utils/translation_names.py:112
 msgid "Nepali"
 msgstr ""
 
-#: settings.py:104
+#: settings.py:105
 msgid "Ewe"
 msgstr ""
 
-#: settings.py:105 utils/translation_names.py:100
+#: settings.py:106 utils/translation_names.py:100
 msgid "Malay"
 msgstr ""
 
-#: settings.py:106 utils/translation_names.py:177
+#: settings.py:107 utils/translation_names.py:177
 msgid "Yiddish"
 msgstr ""
 
-#: settings.py:107 utils/translation_names.py:32
+#: settings.py:108 utils/translation_names.py:32
 msgid "Burmese"
 msgstr ""
 
-#: settings.py:108 utils/translation_names.py:157
+#: settings.py:109 utils/translation_names.py:157
 msgid "Tibetan"
 msgstr ""
 
-#: settings.py:109 utils/translation_names.py:18
+#: settings.py:110 utils/translation_names.py:18
 msgid "Asturian"
 msgstr ""
 
-#: settings.py:110 utils/translation_names.py:20
+#: settings.py:111 utils/translation_names.py:20
 msgid "Aymara"
 msgstr ""
 
-#: settings.py:111 utils/translation_names.py:119
+#: settings.py:112 utils/translation_names.py:119
 msgid "Pashto"
 msgstr ""
 
-#: settings.py:112
+#: settings.py:113
 msgid "Lakota"
 msgstr ""
 
-#: settings.py:113 utils/translation_names.py:40
+#: settings.py:114 utils/translation_names.py:40
 msgid "Cornish"
 msgstr ""
 
-#: settings.py:114 utils/translation_names.py:86
+#: settings.py:115 utils/translation_names.py:86
 msgid "Klingon"
 msgstr ""
 
-#: settings.py:115 utils/translation_names.py:102
+#: settings.py:116 utils/translation_names.py:102
 msgid "Maltese"
 msgstr ""
 
-#: settings.py:116 utils/translation_names.py:15
+#: settings.py:117 utils/translation_names.py:15
 msgid "Armenian"
 msgstr ""
 
-#: settings.py:117 utils/translation_names.py:28
+#: settings.py:118 utils/translation_names.py:28
 msgid "Bislama"
 msgstr ""
 
-#: settings.py:118
-msgid "French (Canadian)"
+#: settings.py:119
+msgid "French, Canadian"
 msgstr ""
 
-#: settings.py:119 utils/translation_names.py:135
+#: settings.py:120 utils/translation_names.py:135
 msgid "Serbo-Croatian"
 msgstr ""
 
-#: settings.py:120 utils/translation_names.py:89
+#: settings.py:121 utils/translation_names.py:89
 msgid "Lao"
 msgstr ""
 
-#: settings.py:121
+#: settings.py:122
 msgid "Macedo (Aromanian) Romanian"
 msgstr ""
 
-#: settings.py:122 utils/translation_names.py:151
+#: settings.py:123 utils/translation_names.py:151
 msgid "Tagalog"
 msgstr ""
 
-#: settings.py:123 utils/translation_names.py:169
+#: settings.py:124 utils/translation_names.py:169
 msgid "Uzbek"
 msgstr ""
 
-#: settings.py:124 utils/translation_names.py:83
+#: settings.py:125 utils/translation_names.py:83
 msgid "Kazakh"
 msgstr ""
 
@@ -747,14 +747,14 @@ msgstr ""
 msgid "Set original language for this video."
 msgstr ""
 
-#: apps/teams/forms.py:253
+#: apps/teams/forms.py:255
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
 "appear."
 msgstr ""
 
-#: apps/teams/forms.py:256
+#: apps/teams/forms.py:258
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
@@ -762,18 +762,18 @@ msgid ""
 "and make sure to check \"Save feed\" box."
 msgstr ""
 
-#: apps/teams/forms.py:275 apps/teams/forms.py:311
+#: apps/teams/forms.py:277 apps/teams/forms.py:313
 msgid "Team intro video URL"
 msgstr ""
 
-#: apps/teams/forms.py:277 apps/teams/forms.py:313
+#: apps/teams/forms.py:279 apps/teams/forms.py:315
 msgid ""
 "You can put an optional video \n"
 "on your team homepage that explains what your team is about, to attract volunteers. \n"
 "Enter a link to any compatible video, or to any video page on our site."
 msgstr ""
 
-#: apps/teams/forms.py:282
+#: apps/teams/forms.py:284
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr ""
 
@@ -1238,163 +1238,163 @@ msgstr ""
 msgid "Views"
 msgstr ""
 
-#: apps/videos/models.py:798
+#: apps/videos/models.py:799
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
 msgstr ""
 
-#: apps/videos/models.py:1237
+#: apps/videos/models.py:1238
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1242
+#: apps/videos/models.py:1243
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1247
+#: apps/videos/models.py:1248
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1249
+#: apps/videos/models.py:1250
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr ""
 
-#: apps/videos/models.py:1255
+#: apps/videos/models.py:1256
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1257
+#: apps/videos/models.py:1258
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1272
+#: apps/videos/models.py:1273
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1274
+#: apps/videos/models.py:1275
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1277
+#: apps/videos/models.py:1278
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1279
+#: apps/videos/models.py:1280
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1287
+#: apps/videos/models.py:1288
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1289
+#: apps/videos/models.py:1290
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1300
+#: apps/videos/models.py:1301
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1302
+#: apps/videos/models.py:1303
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1308
+#: apps/videos/models.py:1309
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1310
+#: apps/videos/models.py:1311
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1324
+#: apps/videos/models.py:1325
 #, python-format
 msgid ""
 "requested subtitles for <a href=\"%(video_url)s\">%(video_name)s</a> in "
 "%(language)s. %(description)s"
 msgstr ""
 
-#: apps/videos/models.py:1326
+#: apps/videos/models.py:1327
 #, python-format
 msgid ""
 "New subtitles requested  for <a href=\"%(video_url)s\">%(video_name)s</a> in"
 " %(language)s. %(language_info)s%(description)s"
 msgstr ""
 
-#: apps/videos/models.py:1342
+#: apps/videos/models.py:1343
 msgid "add video"
 msgstr ""
 
-#: apps/videos/models.py:1343
+#: apps/videos/models.py:1344
 msgid "change title"
 msgstr ""
 
-#: apps/videos/models.py:1344
+#: apps/videos/models.py:1345
 msgid "comment"
 msgstr ""
 
-#: apps/videos/models.py:1345
+#: apps/videos/models.py:1346
 msgid "add version"
 msgstr ""
 
-#: apps/videos/models.py:1346
+#: apps/videos/models.py:1347
 msgid "add translation"
 msgstr ""
 
-#: apps/videos/models.py:1347
+#: apps/videos/models.py:1348
 msgid "add video url"
 msgstr ""
 
-#: apps/videos/models.py:1348
+#: apps/videos/models.py:1349
 msgid "request subtitles"
 msgstr ""
 
-#: apps/videos/models.py:1349
+#: apps/videos/models.py:1350
 msgid "approve version"
 msgstr ""
 
-#: apps/videos/models.py:1350
+#: apps/videos/models.py:1351
 msgid "add contributor"
 msgstr ""
 
-#: apps/videos/models.py:1351
+#: apps/videos/models.py:1352
 msgid "reject version"
 msgstr ""
 
-#: apps/videos/models.py:1539
+#: apps/videos/models.py:1540
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
