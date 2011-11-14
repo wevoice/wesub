@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block view_content %}
-    
+
     {% with "videos" as active %}
         {% include 'teams/_tabs.html' %}
     {% endwith %}
@@ -23,7 +23,7 @@
     <div class="view grid_9 alpha">
         <form method='post' action="." enctype="multipart/form-data">
 
-            <h3>{% trans 'Edit video' %}: <em>{{ team_video.title }}</em></h3>
+            <h3>{% trans 'Edit video' %}: <em>{% firstof team_video.title team_video.video.title %}</em></h3>
             <div class="grid_4 alpha">
                 <fieldset>
                     {% include "_form_field.html" with field=form.video_url %}
@@ -38,7 +38,7 @@
                     {% include "_form_field.html" with field=form.thumbnail %}
                 </fieldset>
             </div>
-                 
+
             {% if form.is_moderated_by_other_team %}
                 {% blocktrans %} This video is being moderated by team {% endblocktrans %} <a href="{% url teams:detail slug=form.is_moderated_by_other_team.slug %}">{{form.is_moderated_by_other_team}}</a>.
             {% endif %}
@@ -46,10 +46,10 @@
             <div class="grid_9 submit">
                 <button>{% trans 'Save' %}</button>
             </div>
-            {% csrf_token %} 
+            {% csrf_token %}
         </form>
     </div>
-    <script type="text/javascript"> 
+    <script type="text/javascript">
       {% include "teams/team_video.js" %}
     </script>
 

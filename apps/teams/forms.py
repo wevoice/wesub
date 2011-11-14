@@ -398,13 +398,13 @@ class CreateTaskForm(ErrorableModelForm):
             return
 
     def _check_task_creation_review(self, tasks, cleaned_data):
-        if not self.subtitle_language or not self.subtitle_language.completed:
+        if not self.subtitle_language or not self.subtitle_language.is_complete_and_synced():
             self.add_error(_(u"Subtitles in that language have not been completed yet, so they can't be reviewed."),
                            'type', cleaned_data)
             return
 
     def _check_task_creation_approve(self, tasks, cleaned_data):
-        if not self.subtitle_language or not self.subtitle_language.completed:
+        if not self.subtitle_language or not self.subtitle_language.is_complete_and_synced():
             self.add_error(_(u"Subtitles in that language have not been completed yet, so they can't be approved."),
                            'type', cleaned_data)
             return
@@ -425,8 +425,8 @@ class CreateTaskForm(ErrorableModelForm):
         type = cd['type']
         lang = cd['language']
 
-        existing_tasks = list(Task.objects.filter(deleted=False, type=type,
-                                                  language=lang, team_video=self.team_video))
+        existing_tasks = list(Task.objects.filter(deleted=False, language=lang,
+                                                  team_video=self.team_video))
 
         if any(not t.completed for t in existing_tasks):
             self.add_error(_(u"There is already a task in progress for that video/language."))

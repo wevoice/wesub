@@ -819,7 +819,7 @@ MEDIA_BUNDLES = {
     "js-teams-settings-panel":{
         "type":"js",
         "optimizations": "WHITESPACE_ONLY",
-    "closure_deps": "",
+        "closure_deps": "",
         "files": (
             "js/libs/ICanHaz.js",
             "js/libs/classy.js",

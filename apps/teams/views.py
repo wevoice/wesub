@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from utils import render_to, render_to_json
+from utils.translation import get_languages_list
 from teams.forms import CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm, EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, CreateTaskForm
 from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
 from django.shortcuts import get_object_or_404, redirect, render_to_response
@@ -753,7 +754,19 @@ def create_task(request, slug, team_video_pk):
     else:
         form = CreateTaskForm(team, team_video)
 
-    return { 'form': form, 'team': team, 'team_video': team_video, }
+    translatable_languages = json.dumps(list(team_video.task_translatable_languages()))
+    reviewable_languages = json.dumps(list(team_video.task_reviewable_languages()))
+    approvable_languages = json.dumps(list(team_video.task_approvable_languages()))
+    subtitlable = json.dumps(team_video.task_subtitlable())
+
+    language_choices = json.dumps(get_languages_list(True))
+
+    return { 'form': form, 'team': team, 'team_video': team_video,
+             'translatable_languages': translatable_languages,
+             'reviewable_languages': reviewable_languages,
+             'approvable_languages': approvable_languages,
+             'language_choices': language_choices,
+             'subtitlable': subtitlable, }
 
 
 @login_required

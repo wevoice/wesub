@@ -16,14 +16,18 @@
 
 {% block scripts %}
     {{ block.super }}
-    {% include_bundle "unisubs-onsite-compiled" %}
+    {% include_bundle "js-teams-tasks-panel" %}
     <script src="{{ STATIC_URL }}js/libs/chosen.jquery.min.js" type="text/javascript"></script>
-    <script type="text/javascript">
 
-        $(document).ready(function(){
-            jQuery("select", ".chosen").chosen();
-        });
+    <script type="text/javascript">
+        var languageChoices = {{ language_choices|safe }};
+        var translatableLanguages = {{ translatable_languages|safe }};
+        var reviewableLanguages = {{ reviewable_languages|safe }};
+        var approvableLanguages = {{ approvable_languages|safe }};
+        var subtitlable = {{ subtitlable|safe }};
     </script>
+
+    <script src="{{ STATIC_URL }}js/teams/create-task.js" type="text/javascript"></script>
 {% endblock %}
 
 {% block main_content %}
@@ -45,9 +49,9 @@
 
             <div class="grid_4 alpha">
                 <fieldset>
-                    {{ form.errors.type }} {{ form.type }}
+                    <div class="type-selector">{{ form.errors.type }} {{ form.type }}</div>
                     <div class="chosen">
-                        {{ form.errors.language }} {{ form.language }}
+                        <div class="language-selector">{{ form.errors.language }} {{ form.language }}</div>
                         {{ form.errors.assignee }} {{ form.assignee }}
                     </div>
                 </fieldset>

@@ -485,7 +485,6 @@ class TeamVideo(models.Model):
 
     project = models.ForeignKey(Project)
 
-    
     class Meta:
         unique_together = (('team', 'video'),)
     
@@ -683,6 +682,71 @@ class TeamVideo(models.Model):
             tasks = tasks.exclude(assignee=ignore_user)
 
         return tasks.exists()
+
+
+    def task_translation_started_languages(self):
+        """Return languages for which this video has translations or translation tasks."""
+
+        finished_langs = set(self.video.subtitle_language_dict().keys())
+
+        translation_tasks = self.task_set.filter(deleted=False, type=Task.TYPE_IDS['Translate'])
+        task_langs = set([t.language for t in translation_tasks])
+
+        return finished_langs.union(task_langs)
+
+    def task_reviewable_languages(self):
+        """Return languages for which a review task can be created."""
+
+        workflow = Workflow.get_for_team_video(self)
+        if not workflow.review_enabled:
+            return set()
+
+        translated_langs = set(sl.language for sl in self.video.completed_subtitle_languages())
+
+        reviews = self.task_set.filter(deleted=False, type=Task.TYPE_IDS['Review'])
+        reviewed_langs = set(t.language for t in reviews)
+
+        return translated_langs.difference(reviewed_langs)
+
+    def task_approvable_languages(self):
+        """Return languages for which an approve task can be created."""
+
+        workflow = Workflow.get_for_team_video(self)
+        if not workflow.approve_enabled:
+            return set()
+
+        if workflow.review_enabled:
+            reviews = self.task_set.filter(deleted=False, type=Task.TYPE_IDS['Review'],
+                                           completed__isnull=False, approved=Task.APPROVED_IDS['Approved'])
+            candidate_langs = set(t.language for t in reviews)
+        else:
+            candidate_langs = self.task_translation_started_languages()
+
+        approves = self.task_set.filter(deleted=False, type=Task.TYPE_IDS['Approve'])
+        approved_langs = set(t.language for t in approves)
+
+        return candidate_langs.difference(approved_langs)
+
+    def task_translatable_languages(self):
+        """Return languages for which a translate task can be created."""
+
+        subtitles_finished = (self.video.has_original_language() and
+                              self.video.subtitle_language().is_complete_and_synced())
+        if not subtitles_finished:
+            return []
+
+        done = self.task_translation_started_languages()
+        return [lang for lang in SUPPORTED_LANGUAGES_DICT.keys()
+                if lang not in done]
+
+    def task_subtitlable(self):
+        """Return True if this video can have a subtitling task created for it, False otherwise."""
+        subtitles_started = self.video.has_original_language()
+        subtitle_tasks = list(self.task_set.filter(
+                                deleted=False, type=Task.TYPE_IDS['Subtitle'])[:1])
+
+        return not subtitles_started and not subtitle_tasks
+
 
 def team_video_save(sender, instance, created, **kwargs):
     update_one_team_video.delay(instance.id)
