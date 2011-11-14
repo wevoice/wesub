@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2011 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from auth.models import CustomUser as User
@@ -25,7 +25,7 @@ from django.conf import settings
 from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS
 from videos.forms import AddFromFeedForm
 from django.utils.safestring import mark_safe
-from utils.forms import AjaxForm
+from utils.forms import AjaxForm, ErrorableModelForm
 import re
 from utils.translation import get_languages_list
 from utils.forms.unisub_video_form import UniSubBoundVideoField
@@ -38,7 +38,7 @@ from doorman import feature_is_on
 class EditLogoForm(forms.ModelForm, AjaxForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
 
-    
+
     class Meta:
         model = Team
         fields = ('logo',)
@@ -53,7 +53,7 @@ class EditTeamVideoForm(forms.ModelForm):
     creation_date = forms.DateField(required=False, input_formats=['%Y-%m-%d'],
                                     help_text="Format: YYYY-MM-DD")
 
-    
+
     project = forms.ModelChoiceField(
         label=_(u'Project'),
         queryset = Project.objects.none(),
@@ -61,14 +61,14 @@ class EditTeamVideoForm(forms.ModelForm):
         empty_label=None,
         help_text=_(u"Let's keep things tidy, shall we?")
     )
-                                             
+
     class Meta:
         model = TeamVideo
         fields = ('title', 'description', 'thumbnail', 'project',)
-    
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user")
-        
+
         super(EditTeamVideoForm, self).__init__(*args, **kwargs)
 
 
@@ -172,14 +172,14 @@ class EditTeamVideoForm(forms.ModelForm):
                               content=content).save()
 
 class BaseVideoBoundForm(forms.ModelForm):
-    video_url = UniSubBoundVideoField(label=_('Video URL'), verify_exists=True, 
+    video_url = UniSubBoundVideoField(label=_('Video URL'), verify_exists=True,
         help_text=_("Enter the URL of any compatible video or any video on our site. You can also browse the site and use the 'Add Video to Team' menu."))
-    
+
     def __init__(self, *args, **kwargs):
         super(BaseVideoBoundForm, self).__init__(*args, **kwargs)
         if hasattr(self, 'user'):
             self.fields['video_url'].user = self.user
-    
+
 class AddTeamVideoForm(BaseVideoBoundForm):
     language = forms.ChoiceField(label=_(u'Video language'), choices=settings.ALL_LANGUAGES,
                                  required=False,
@@ -196,7 +196,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
     class Meta:
         model = TeamVideo
         fields = ('video_url', 'language', 'title', 'description', 'thumbnail', 'project',)
-        
+
     def __init__(self, team, user, *args, **kwargs):
         self.team = team
         self.user = user
@@ -212,9 +212,9 @@ class AddTeamVideoForm(BaseVideoBoundForm):
             raise forms.ValidationError(mark_safe(u'Team has this <a href="%s">video</a>' % tv.get_absolute_url()))
         except TeamVideo.DoesNotExist:
             pass
-        
+
         return video_url
-    
+
     def clean(self):
         language = self.cleaned_data['language']
         video = self.fields['video_url'].video
@@ -223,9 +223,9 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         if video and (original_sl and not original_sl.language) and not language:
             msg = _(u'Set original language for this video.')
             self._errors['language'] = self.error_class([msg])
-            
+
         return self.cleaned_data
-    
+
     def save(self, commit=True):
         video_language = self.cleaned_data['language']
         video = self.fields['video_url'].video
@@ -235,7 +235,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
                 not video.subtitlelanguage_set.filter(language=video_language).exists():
                 original_language.language = video_language
                 original_language.save()
-            
+
         obj = super(AddTeamVideoForm, self).save(False)
         obj.video = video
         obj.team = self.team
@@ -281,33 +281,32 @@ class AddTeamVideosFromFeedForm(AddFromFeedForm):
                      u'check "Save feed" box.')
 
 
-
 class CreateTeamForm(BaseVideoBoundForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
-    
+
     class Meta:
         model = Team
-        fields = ('name', 'slug', 'description', 'logo', 'membership_policy', 'is_moderated', 'video_policy', 
+        fields = ('name', 'slug', 'description', 'logo', 'membership_policy', 'is_moderated', 'video_policy',
                   'is_visible', 'video_url')
-    
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(CreateTeamForm, self).__init__(*args, **kwargs)
         self.fields['video_url'].label = _(u'Team intro video URL')
         self.fields['video_url'].required = False
-        self.fields['video_url'].help_text = _(u'''You can put an optional video 
-on your team homepage that explains what your team is about, to attract volunteers. 
+        self.fields['video_url'].help_text = _(u'''You can put an optional video
+on your team homepage that explains what your team is about, to attract volunteers.
 Enter a link to any compatible video, or to any video page on our site.''')
         self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
         self.fields['is_moderated'].widget.attrs['class'] = 'checkbox'
         self.fields['slug'].label = _(u'Team URL: http://universalsubtitles.org/teams/')
-    
+
     def clean_slug(self):
         slug = self.cleaned_data['slug']
         if re.match('^\d+$', slug):
             raise forms.ValidationError('Field can\'t contains only numbers')
         return slug
-            
+
     def save(self, user):
         team = super(CreateTeamForm, self).save(False)
         video = self.fields['video_url'].video
@@ -316,33 +315,33 @@ Enter a link to any compatible video, or to any video page on our site.''')
         team.save()
         TeamMember.objects.create_first_member(team=team, user=user)
         return team
-    
+
 class EditTeamForm(BaseVideoBoundForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
 
     class Meta:
         model = Team
-        fields = ('name', 'description', 'logo', 
-                  'membership_policy', 'is_moderated', 'video_policy', 
-                  'is_visible', 'video_url', 'application_text', 
+        fields = ('name', 'description', 'logo',
+                  'membership_policy', 'is_moderated', 'video_policy',
+                  'is_visible', 'video_url', 'application_text',
                   'page_content')
 
     def __init__(self, *args, **kwargs):
         super(EditTeamForm, self).__init__(*args, **kwargs)
         self.fields['video_url'].label = _(u'Team intro video URL')
         self.fields['video_url'].required = False
-        self.fields['video_url'].help_text = _(u'''You can put an optional video 
-on your team homepage that explains what your team is about, to attract volunteers. 
+        self.fields['video_url'].help_text = _(u'''You can put an optional video
+on your team homepage that explains what your team is about, to attract volunteers.
 Enter a link to any compatible video, or to any video page on our site.''')
         self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
         self.fields['is_moderated'].widget.attrs['class'] = 'checkbox'
-        
+
     def clean(self):
         if 'logo' in self.cleaned_data:
             #It is saved with edit_logo view
             del self.cleaned_data['logo']
         return self.cleaned_data
-    
+
     def save(self):
         team = super(EditTeamForm, self).save(False)
         video = self.fields['video_url'].video
@@ -353,24 +352,21 @@ Enter a link to any compatible video, or to any video page on our site.''')
         if team.is_open():
             for item in team.applications.all():
                 item.approve()
-        return team    
+        return team
 
 class EditTeamFormAdmin(EditTeamForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
 
     class Meta:
         model = Team
-        fields = ('name', 'header_html_text', 'description', 'logo', 
-                  'membership_policy', 'is_moderated', 'video_policy', 
-                  'is_visible', 'video_url', 'application_text', 
+        fields = ('name', 'header_html_text', 'description', 'logo',
+                  'membership_policy', 'is_moderated', 'video_policy',
+                  'is_visible', 'video_url', 'application_text',
                   'page_content')
 
 
-def form_error(msg):
-    raise forms.ValidationError(msg)
-
-class CreateTaskForm(forms.Form):
-    type = forms.ChoiceField(choices=Task.TYPE_CHOICES)
+class CreateTaskForm(ErrorableModelForm):
+    type = forms.TypedChoiceField(choices=Task.TYPE_CHOICES, coerce=int)
     language = forms.ChoiceField(choices=(), required=False)
     assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
     public = forms.BooleanField(required=False)
@@ -380,62 +376,82 @@ class CreateTaskForm(forms.Form):
 
         self.team_video = team_video
 
+        team_user_ids = team.members.values_list('user', flat=True)
         self.fields['language'].choices = get_languages_list(True)
-        self.fields['assignee'].queryset = team.members.all()
+        self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
-    def _check_task_creation_subtitle(self, tasks, sl):
+    def _check_task_creation_subtitle(self, tasks, cleaned_data):
         if self.subtitles_finished:
-            form_error(_(u"This video has already been subtitled."))
+            self.add_error(_(u"This video has already been subtitled."),
+                           'type', cleaned_data)
+            return
 
         if self.subtitles_started:
-            form_error(_(u"Subtitling of this video is already in progress."))
+            self.add_error(_(u"Subtitling of this video is already in progress."),
+                           'type', cleaned_data)
+            return
 
-    def _check_task_creation_translate(self, tasks, sl):
+    def _check_task_creation_translate(self, tasks, cleaned_data):
         if not self.subtitles_finished:
-            form_error(_(u"No one has subtitled this video yet, so it can't be translated."))
+            self.add_error(_(u"No one has subtitled this video yet, so it can't be translated."),
+                           'type', cleaned_data)
+            return
 
-    def _check_task_creation_review(self, tasks, sl):
-        if not sl or not sl.completed:
-            form_error(_(u"Subtitles in that language have not been completed yet, so they can't be reviewed."))
+    def _check_task_creation_review(self, tasks, cleaned_data):
+        if not self.subtitle_language or not self.subtitle_language.completed:
+            self.add_error(_(u"Subtitles in that language have not been completed yet, so they can't be reviewed."),
+                           'type', cleaned_data)
+            return
 
-    def _check_task_creation_approve(self, tasks, sl):
-        if not sl or not sl.completed:
-            form_error(_(u"Subtitles in that language have not been completed yet, so they can't be approved."))
+    def _check_task_creation_approve(self, tasks, cleaned_data):
+        if not self.subtitle_language or not self.subtitle_language.completed:
+            self.add_error(_(u"Subtitles in that language have not been completed yet, so they can't be approved."),
+                           'type', cleaned_data)
+            return
 
         workflow = Workflow.get_for_team_video(self.team_video)
 
         if workflow.review_enabled:
-            review_tasks = [t for t in tasks if t.type == Task.TYPE_IDS['Review']]
+            review_tasks = [t for t in tasks if t.type == Task.TYPE_IDS['Review']
+                                                and t.completed]
 
             if not review_tasks:
-                form_error(_(u"These subtitles must be reviewed before being approved."))
+                self.add_error(_(u"These subtitles must be reviewed before being approved."),
+                               'type', cleaned_data)
+                return
 
     def clean(self):
         cd = self.cleaned_data
         type = cd['type']
         lang = cd['language']
 
-        existing_tasks = list(Task.objects.filter(deleted=False, type=type, language=lang))
+        existing_tasks = list(Task.objects.filter(deleted=False, type=type,
+                                                  language=lang))
 
         if any(not t.completed for t in existing_tasks):
-            form_error(_(u"There is already a task in progress for that video/language."))
+            self.add_error(_(u"There is already a task in progress for that video/language."))
 
         type_name = Task.TYPE_NAMES[type]
 
-        sl = (self.team_video.video.subtitle_language(lang)
-              if type_name in ('Review', 'Approve') else None)
+        self.subtitle_language = (self.team_video.video.subtitle_language(lang)
+                                  if type_name in ('Review', 'Approve') else None)
 
         self.subtitles_started = self.team_video.video.has_original_language()
         self.subtitles_finished = (self.subtitles_started and
-                                   self.team_video.video.standard_language.completed)
+                                   self.team_video.video.subtitle_language().is_complete_and_synced())
 
         {'Subtitle': self._check_task_creation_subtitle,
          'Translate': self._check_task_creation_translate,
          'Review': self._check_task_creation_review,
          'Approve': self._check_task_creation_approve,
-        }[type_name](existing_tasks, sl)
+        }[type_name](existing_tasks, cd)
 
         return cd
+
+
+    class Meta:
+        model = Task
+        fields = ('type', 'language', 'assignee', 'public')
 
 
 class TaskAssignForm(forms.Form):

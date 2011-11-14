@@ -735,11 +735,25 @@ def create_task(request, slug, team_video_pk):
 
     if request.POST:
         form = CreateTaskForm(team, team_video, request.POST)
+
+        if form.is_valid():
+            task = form.save(commit=False)
+
+            task.subtitle_language = form.subtitle_language
+            task.team = team
+            task.team_video = team_video
+
+            if task.type in [Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']]:
+                task.approved = Task.APPROVED_IDS['In Progress']
+
+            task.save()
+
+            return HttpResponseRedirect(reverse('teams:team_tasks', args=[],
+                                                kwargs={'slug': team.slug}))
     else:
         form = CreateTaskForm(team, team_video)
 
     return { 'form': form, 'team': team, 'team_video': team_video, }
-
 
 
 @login_required

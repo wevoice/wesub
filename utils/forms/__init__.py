@@ -85,6 +85,41 @@ class UsernameListField(ListField):
     pattern = username_list_re
 
 
+class ErrorableModelForm(forms.ModelForm):
+    """This class simply adds a single method to the standard one: add_error.
+
+    When performing validation in a clean() method you may want to add an error
+    message to a single field, instead of to non_field_errors.  There's a lot of
+    silly stuff you need to do to make that happen, so add_error() takes care of
+    it for you.
+
+    """
+    def add_error(self, message, field_name=None, cleaned_data=None):
+        """Add the given error message to the given field.
+
+        If no field is given, a standard forms.ValidationError will be raised.
+
+        If a field is given, the cleaned_data dictionary must also be given to
+        keep Django happy.
+
+        If a field is given an exception will NOT be raised, so it's up to you
+        to stop processing if appropriate.
+
+        """
+        if not field_name:
+            raise forms.ValidationError(message)
+
+        if field_name not in self._errors:
+            self._errors[field_name] = self.error_class()
+
+        self._errors[field_name].append(message)
+
+        try:
+            del cleaned_data[field_name]
+        except KeyError:
+            pass
+
+
 def flatten_errorlists(errorlists):
     '''Return a list of the errors (just the text) in any field.'''
     errors = []

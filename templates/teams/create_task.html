@@ -40,27 +40,25 @@
 
     <div class="view grid_9 alpha">
         <form method="post" action="." class="create-task">
+            {{ form.non_field_errors }}
             <h3>{% trans "New Task" %}</h3>
 
             <div class="grid_4 alpha">
                 <fieldset>
-                    {{ form.type }}
+                    {{ form.errors.type }} {{ form.type }}
                     <div class="chosen">
-                        {{ form.language }}
-                        {{ form.assignee }}
+                        {{ form.errors.language }} {{ form.language }}
+                        {{ form.errors.assignee }} {{ form.assignee }}
                     </div>
-                    {# {% include "_form_field.html" with field=form.usernames %} #}
-                    {# {% include "_form_field.html" with field=form.youtube_user_url %} #}
                 </fieldset>
             </div>
 
             <div class="grid_4 omega">
                 <p>Video: {{ team_video.video }}</p>
                 <fieldset>
+                    {{ form.errors.public }}
                     {{ form.public }}
                     <label for="id_public">Public</label>
-                    {# {% smart_field_render form.feed_url %} #}
-                    {# {% smart_field_render form.save_feed%} #}
                 </fieldset>
             </div>
             <div class="grid_9 submit">
