@@ -1233,6 +1233,8 @@ class Task(models.Model):
 
     deleted = models.BooleanField(default=False)
 
+    public = models.BooleanField(default=False)
+
     created = models.DateTimeField(auto_now_add=True, editable=False)
     modified = models.DateTimeField(auto_now=True, editable=False)
     completed = models.DateTimeField(blank=True, null=True)
@@ -1258,6 +1260,7 @@ class Task(models.Model):
                  'team_video_display': unicode(self.team_video) if self.team_video else None,
                  'team_video_url': self.team_video.get_absolute_url() if self.team_video else None,
                  'type': Task.TYPE_NAMES[self.type],
+                 'public': self.public,
                  'assignee': self.assignee.id if self.assignee else None,
                  'assignee_display': unicode(self.assignee) if self.assignee else None,
                  'language': self.language if self.language else None,
