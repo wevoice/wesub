@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,18 +16,16 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-
-
 from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import  wraps
 
-from teams.permissions_const import TEAM_PERMISSIONS, PROJECT_PERMISSIONS, \
-      LANG_PERMISSIONS,   EDIT_TEAM_SETTINGS_PERM , \
-EDIT_PROJECT_SETTINGS_PERM , ASSIGN_ROLE_PERM , ASSIGN_TASKS_PERM , \
-ADD_VIDEOS_PERM , EDIT_VIDEO_SETTINGS_PERM , MESSAGE_ALL_MEMBERS_PERM  , \
-ACCEPT_ASSIGNMENT_PERM , PERFORM_MANAGER_REVIEW_PERM , \
-PERFORM_PEER_REVIEW_PERM  , EDIT_SUBS_PERM, RULES,\
-ROLES_ORDER, ROLE_OWNER, ROLE_MANAGER, ROLE_CONTRIBUTOR, ROLE_ADMIN
+from teams.permissions_const import (
+    EDIT_TEAM_SETTINGS_PERM, EDIT_PROJECT_SETTINGS_PERM, ASSIGN_ROLE_PERM,
+    CREATE_TASKS_PERM, ASSIGN_TASKS_PERM, ADD_VIDEOS_PERM,
+    EDIT_VIDEO_SETTINGS_PERM, MESSAGE_ALL_MEMBERS_PERM, ACCEPT_ASSIGNMENT_PERM,
+    PERFORM_MANAGER_REVIEW_PERM, PERFORM_PEER_REVIEW_PERM, EDIT_SUBS_PERM,
+    RULES, ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN
+)
 
 from teams.models import MembershipNarrowing, Team
 
@@ -49,7 +47,7 @@ def _passes_test(team, user, project, lang, perm_name):
     for model in [x for x in (team, project, lang) if x]:
         if model_has_permission(member, perm_name, model) is False:
             continue 
-        from teams.models import MembershipNarrowing
+
         if MembershipNarrowing.objects.for_type(model).filter(member=member).exists():
             return True
     
@@ -106,6 +104,10 @@ def can_assign_roles(team, user, project=None, lang=None,  role=None):
         return role in roles_assignable_to(team, user,project, lang)
     return False
 
+
+@_check_perms(CREATE_TASKS_PERM)
+def can_create_tasks(team, user, project=None):
+    pass
 
 @_check_perms(ASSIGN_TASKS_PERM)
 def can_assign_tasks(team, user, project=None, lang=None):

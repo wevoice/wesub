@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,6 +21,7 @@ RENAME_TEAM_PERM =  ("rename_team", "Rename team",)
 EDIT_TEAM_SETTINGS_PERM = ("edit_team_settings", "Edit team settings",)
 EDIT_PROJECT_SETTINGS_PERM = ("edit_project_settings", "Edit project settings",)
 ASSIGN_ROLE_PERM = ("assign_roles", "Assign Roles",)
+CREATE_TASKS_PERM = ("create_tasks", "Create Tasks",)
 ASSIGN_TASKS_PERM = ("assign_tasks", "Assign Tasks",)
 ADD_VIDEOS_PERM = ("add_videos", "Add videos",)
 EDIT_VIDEO_SETTINGS_PERM = ("edit_video_settings", "Edit video settings",)
@@ -43,6 +44,7 @@ TEAM_PERMISSIONS = (
     EDIT_PROJECT_SETTINGS_PERM,
     ASSIGN_ROLE_PERM, 
     ASSIGN_TASKS_PERM ,
+    CREATE_TASKS_PERM,
     ADD_VIDEOS_PERM ,
     EDIT_VIDEO_SETTINGS_PERM ,
     MESSAGE_ALL_MEMBERS_PERM , 
@@ -55,6 +57,7 @@ TEAM_PERMISSIONS = (
 PROJECT_PERMISSIONS = (
     ASSIGN_ROLE_PERM, 
     ASSIGN_TASKS_PERM ,
+    CREATE_TASKS_PERM,
     ADD_VIDEOS_PERM ,
     EDIT_PROJECT_SETTINGS_PERM,
     EDIT_VIDEO_SETTINGS_PERM ,
@@ -84,6 +87,7 @@ RULES[ROLE_ADMIN] = set((
     EDIT_PROJECT_SETTINGS_PERM ,
     ASSIGN_ROLE_PERM,
     ASSIGN_TASKS_PERM,
+    CREATE_TASKS_PERM,
     ADD_VIDEOS_PERM ,
     EDIT_VIDEO_SETTINGS_PERM,
     MESSAGE_ALL_MEMBERS_PERM , 
@@ -95,6 +99,7 @@ RULES[ROLE_ADMIN] = set((
 
 RULES[ROLE_MANAGER] = set((
     ASSIGN_TASKS_PERM,
+    CREATE_TASKS_PERM,
     ADD_VIDEOS_PERM ,
     EDIT_VIDEO_SETTINGS_PERM,
     PERFORM_MANAGER_REVIEW_PERM ,
