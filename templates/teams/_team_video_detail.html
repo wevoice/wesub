@@ -2,7 +2,7 @@
 
 <li>
   <h3>
-    <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}">{{ search_record.title|truncatewords:9 }}</a>
+    <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.title|truncatewords:9 }}</a>
     {% if search_record.project_name != "_root" %}
         <span class="descriptor">{{ search_record.project_name }}</span>
     {% endif %}
@@ -18,7 +18,7 @@
       <li>
           <h4>
               {% if search_record.video_completed_langs %}
-                <a href="{{ search_record.absolute_url }}">{{ search_record.video_completed_langs|length }} language{{ search_record.video_completed_langs|length|pluralize }}</a>
+                  <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.video_completed_langs|length }} language{{ search_record.video_completed_langs|length|pluralize }}</a>
               {% else %}
                 {% trans "No subtitles yet" %}
               {% endif %}
