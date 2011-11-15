@@ -520,8 +520,7 @@ class SettingsForm(forms.ModelForm):
     # TODO: Handle slug change.
     class Meta:
         model = Team
-        fields = ('name', 'membership_policy', 'video_policy', 'description',
-                  'workflow_enabled')
+        fields = ('name', 'description', 'workflow_enabled')
 
 class WorkflowForm(forms.ModelForm):
     class Meta:

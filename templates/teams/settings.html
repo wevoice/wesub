@@ -68,11 +68,11 @@ This is needed, since it's for the js templating
             <fieldset>
               <legend> Change project {{name}}</legend>
               <label for="name">Name</label>
-              <input type="text" name="name" class="clearfix" value="{{name}}"/>
+              <input id="basic_name" type="text" name="name" class="clearfix" value="{{name}}"/>
 
               <label for="name">Description</label>
 
-              <textarea  name="description" class="clearfix" >{{description}}</textarea>
+              <textarea id="basic_description" name="description" class="clearfix" >{{description}}</textarea>
               <input type="hidden" value='{{pk}}' name="pk"/>
               <input type="hidden" value='{{order}}' name="order"/>
               <input type="hidden" value='{{slug}}' name="slug"/>
@@ -82,7 +82,7 @@ This is needed, since it's for the js templating
             <fieldset>
               <legend>Workflows</legend>
               <p class="notation">Moderate this project's subtitles. Will override the team's workflow if exists.</p>
-              <label for="workflow_enabled"><input type="checkbox"  name="workflow_enabled" {{#workflow_enabled}}checked="checked"{{/workflow_enabled}}/> Enable workflows</label>
+              <label for="workflow_enabled"><input id="basic_workflows_enabled" type="checkbox"  name="workflow_enabled" {{#workflow_enabled}}checked="checked"{{/workflow_enabled}}/> Enable workflows</label>
             </fieldset>
         </div>
 
