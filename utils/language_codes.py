@@ -37,7 +37,17 @@ INTERNAL_NAMES = {}
 TO_INTERNAL = {}
 FROM_INTERNAL = {}
 
-
+def get_language_list(standard):
+    """
+    Returns a mapping of language codes -> verbose name
+    This is used in the api, so that users can query the list of
+    available languages
+    """
+    langs = {}
+    for name in TO_INTERNAL.get(standard):
+        langs[name] = INTERNAL_NAMES[LanguageCode(name, standard).encode("unisubs")]
+    return langs
+    
 def add_standard(standard, mapping, base=None, exclude=None):
     """Add a new standard to the list of supported standards.
 
@@ -516,6 +526,7 @@ def _generate_initial_data():
         'fa': 'fa',
         'fi': 'fi',
         'fr': 'fr',
+        'fr-ca': 'fr-ca',
         'fy-nl': 'fy-nl',
         'ga': 'ga',
         'gl': 'gl',
@@ -655,7 +666,11 @@ _generate_initial_data()
 
 class LanguageCode(object):
     def __init__(self, language_code, standard):
-        self._code = TO_INTERNAL[standard.lower()][language_code]
+        try:
+            standard_dict = TO_INTERNAL[standard.lower()]
+        except KeyError:
+            raise Exception("Standard '%s' is not registred" % standard)
+        self._code = standard_dict[language_code]
 
     def encode(self, standard, fuzzy=False):
         """Return the code for this language in the given standard."""
