@@ -112,7 +112,7 @@ def can_create_tasks(team, user, project=None):
 @_check_perms(ASSIGN_TASKS_PERM)
 def can_assign_tasks(team, user, project=None, lang=None):
     pass
-    
+
 def can_add_video(team, user, project=None, lang=None):
     if not team.video_policy :
         return True

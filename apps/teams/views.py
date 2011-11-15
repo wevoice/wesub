@@ -40,11 +40,10 @@ from django.utils import simplejson as json
 from utils.amazon import S3StorageError
 from utils.translation import get_user_languages_from_request
 from teams.search_indexes import TeamVideoLanguagesIndex
-from teams.permissions import can_view_settings_tab
 from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
 
-from teams.permissions import can_add_video, can_assign_roles
+from teams.permissions import can_add_video, can_assign_roles, can_view_settings_tab, can_assign_tasks
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 12)
 HIGHTLIGHTED_TEAMS_ON_PAGE = getattr(settings, 'HIGHTLIGHTED_TEAMS_ON_PAGE', 10)
@@ -733,6 +732,7 @@ def leave_team(request, slug):
 def create_task(request, slug, team_video_pk):
     team = get_object_or_404(Team, slug=slug)
     team_video = get_object_or_404(TeamVideo, pk=team_video_pk, team=team)
+    can_assign = can_assign_tasks(team, request.user, team_video.project)
 
     if request.POST:
         form = CreateTaskForm(team, team_video, request.POST)
@@ -766,7 +766,8 @@ def create_task(request, slug, team_video_pk):
              'reviewable_languages': reviewable_languages,
              'approvable_languages': approvable_languages,
              'language_choices': language_choices,
-             'subtitlable': subtitlable, }
+             'subtitlable': subtitlable,
+             'can_assign': can_assign, }
 
 
 @login_required

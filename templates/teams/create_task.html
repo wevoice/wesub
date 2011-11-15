@@ -52,7 +52,12 @@
                     <div class="type-selector">{{ form.errors.type }} {{ form.type }}</div>
                     <div class="chosen">
                         <div class="language-selector">{{ form.errors.language }} {{ form.language }}</div>
-                        {{ form.errors.assignee }} {{ form.assignee }}
+                        {{ can_assign }}
+                        {% if can_assign %}
+                            <div class="assignee-selector">
+                                {{ form.errors.assignee }} {{ form.assignee }}
+                            </div>
+                        {% endif %}
                     </div>
                 </fieldset>
             </div>

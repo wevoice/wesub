@@ -684,15 +684,25 @@ class TeamVideo(models.Model):
         return tasks.exists()
 
 
+    # Convenience functions
+    def subtitles_started(self):
+        """Return True if subtitles have been started for this video, otherwise False."""
+        return self.video.has_original_language()
+
+    def subtitles_finished(self):
+        """Return True if at least one set of subtitles has been finished for this video."""
+        return (self.subtitles_started() and
+                self.video.subtitle_language().is_complete_and_synced())
+
+
+    # Task creation checks
     def task_translation_started_languages(self):
         """Return languages for which this video has translations or translation tasks."""
 
-        finished_langs = set(self.video.subtitle_language_dict().keys())
+        langs_with_subtitles = set(self.video.subtitle_language_dict().keys())
+        task_langs = set(t.language for t in self.task_set.all_translation())
 
-        translation_tasks = self.task_set.filter(deleted=False, type=Task.TYPE_IDS['Translate'])
-        task_langs = set([t.language for t in translation_tasks])
-
-        return finished_langs.union(task_langs)
+        return langs_with_subtitles.union(task_langs)
 
     def task_reviewable_languages(self):
         """Return languages for which a review task can be created."""
@@ -702,9 +712,7 @@ class TeamVideo(models.Model):
             return set()
 
         translated_langs = set(sl.language for sl in self.video.completed_subtitle_languages())
-
-        reviews = self.task_set.filter(deleted=False, type=Task.TYPE_IDS['Review'])
-        reviewed_langs = set(t.language for t in reviews)
+        reviewed_langs = set(t.language for t in self.task_set.all_review())
 
         return translated_langs.difference(reviewed_langs)
 
@@ -716,23 +724,19 @@ class TeamVideo(models.Model):
             return set()
 
         if workflow.review_enabled:
-            reviews = self.task_set.filter(deleted=False, type=Task.TYPE_IDS['Review'],
-                                           completed__isnull=False, approved=Task.APPROVED_IDS['Approved'])
+            reviews = self.task_set.complete_review('Approved')
             candidate_langs = set(t.language for t in reviews)
         else:
             candidate_langs = self.task_translation_started_languages()
 
-        approves = self.task_set.filter(deleted=False, type=Task.TYPE_IDS['Approve'])
-        approved_langs = set(t.language for t in approves)
+        approved_langs = set(t.language for t in self.task_set.all_approve())
 
         return candidate_langs.difference(approved_langs)
 
     def task_translatable_languages(self):
         """Return languages for which a translate task can be created."""
 
-        subtitles_finished = (self.video.has_original_language() and
-                              self.video.subtitle_language().is_complete_and_synced())
-        if not subtitles_finished:
+        if not self.subtitles_finished():
             return []
 
         done = self.task_translation_started_languages()
@@ -741,11 +745,9 @@ class TeamVideo(models.Model):
 
     def task_subtitlable(self):
         """Return True if this video can have a subtitling task created for it, False otherwise."""
-        subtitles_started = self.video.has_original_language()
-        subtitle_tasks = list(self.task_set.filter(
-                                deleted=False, type=Task.TYPE_IDS['Subtitle'])[:1])
+        subtitle_tasks = list(self.task_set.all_subtitle()[:1])
 
-        return not subtitles_started and not subtitle_tasks
+        return not self.subtitles_started() and not subtitle_tasks
 
 
 def team_video_save(sender, instance, created, **kwargs):
@@ -1267,6 +1269,70 @@ class Workflow(models.Model):
                  'perm_approve': self.perm_approve, }
 
 
+class TaskManager(models.Manager):
+    def not_deleted(self):
+        return self.get_query_set().filter(deleted=False)
+
+
+    def incomplete(self):
+        return self.not_deleted().filter(completed=None)
+
+    def complete(self):
+        return self.not_deleted().filter(completed__isnull=False)
+
+
+    def _type(self, type, completed, approved=None):
+        qs = self.not_deleted().filter(type=Task.TYPE_IDS[type])
+
+        if completed == False:
+            qs = qs.filter(completed=None)
+        elif completed == True:
+            qs = qs.filter(completed__isnull=False)
+
+        if approved:
+            qs = qs.filter(approved=Task.APPROVED_IDS[approved])
+
+        return qs
+
+
+    def incomplete_subtitle(self):
+        return self._type('Subtitle', False)
+
+    def incomplete_translate(self):
+        return self._type('Translate', False)
+
+    def incomplete_review(self):
+        return self._type('Review', False)
+
+    def incomplete_approve(self):
+        return self._type('Approve', False)
+
+
+    def complete_subtitle(self):
+        return self._type('Subtitle', True)
+
+    def complete_translate(self):
+        return self._type('Translate', True)
+
+    def complete_review(self, approved=None):
+        return self._type('Review', True, approved)
+
+    def complete_approve(self, approved=None):
+        return self._type('Approve', True, approved)
+
+
+    def all_subtitle(self):
+        return self._type('Subtitle', None)
+
+    def all_translate(self):
+        return self._type('Translate', None)
+
+    def all_review(self):
+        return self._type('Review', None)
+
+    def all_approve(self):
+        return self._type('Approve', None)
+
 class Task(models.Model):
     TYPE_CHOICES = (
         (10, 'Subtitle'),
@@ -1307,6 +1373,8 @@ class Task(models.Model):
     approved = models.PositiveIntegerField(choices=APPROVED_CHOICES,
                                            null=True, blank=True)
     body = models.TextField(blank=True, default="")
+
+    objects = TaskManager()
 
     def __unicode__(self):
         return u'%d' % self.id

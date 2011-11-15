@@ -29,6 +29,7 @@ from utils.forms import AjaxForm, ErrorableModelForm
 import re
 from utils.translation import get_languages_list
 from utils.forms.unisub_video_form import UniSubBoundVideoField
+from teams.permissions import can_assign_tasks
 
 from apps.teams.moderation import add_moderation, remove_moderation
 
@@ -380,19 +381,20 @@ class CreateTaskForm(ErrorableModelForm):
         self.fields['language'].choices = get_languages_list(True)
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
+
     def _check_task_creation_subtitle(self, tasks, cleaned_data):
-        if self.subtitles_finished:
+        if self.team_video.subtitles_finished():
             self.add_error(_(u"This video has already been subtitled."),
                            'type', cleaned_data)
             return
 
-        if self.subtitles_started:
+        if self.team_video.subtitles_started():
             self.add_error(_(u"Subtitling of this video is already in progress."),
                            'type', cleaned_data)
             return
 
     def _check_task_creation_translate(self, tasks, cleaned_data):
-        if not self.subtitles_finished:
+        if not self.team_video.subtitles_finished():
             self.add_error(_(u"No one has subtitled this video yet, so it can't be translated."),
                            'type', cleaned_data)
             return
@@ -420,25 +422,32 @@ class CreateTaskForm(ErrorableModelForm):
                                'type', cleaned_data)
                 return
 
+
     def clean(self):
         cd = self.cleaned_data
+
         type = cd['type']
         lang = cd['language']
+        assignee = cd['language']
+
+        team_video = self.team_video
+        project, team = team_video.project, team_video.team
 
         existing_tasks = list(Task.objects.filter(deleted=False, language=lang,
-                                                  team_video=self.team_video))
+                                                  team_video=team_video))
 
         if any(not t.completed for t in existing_tasks):
             self.add_error(_(u"There is already a task in progress for that video/language."))
 
+        if assignee:
+            if not can_assign_tasks(team, project, lang):
+                self.add_error(_(u"You are not allowed to assign this task."),
+                               'assignee', cd)
+
         type_name = Task.TYPE_NAMES[type]
 
-        self.subtitle_language = (self.team_video.video.subtitle_language(lang)
+        self.subtitle_language = (team_video.video.subtitle_language(lang)
                                   if type_name in ('Review', 'Approve') else None)
-
-        self.subtitles_started = self.team_video.video.has_original_language()
-        self.subtitles_finished = (self.subtitles_started and
-                                   self.team_video.video.subtitle_language().is_complete_and_synced())
 
         {'Subtitle': self._check_task_creation_subtitle,
          'Translate': self._check_task_creation_translate,
