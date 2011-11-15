@@ -98,6 +98,7 @@ class TestRules(BaseTestPermission):
         print 
         self.assertItemsEqual(_perms_for(TeamMember.ROLE_MANAGER, Team), (
             ASSIGN_TASKS_PERM[0],
+            CREATE_TASKS_PERM[0],
             ADD_VIDEOS_PERM[0] ,
             EDIT_VIDEO_SETTINGS_PERM[0],
             PERFORM_MANAGER_REVIEW_PERM[0] ,
