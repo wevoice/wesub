@@ -123,7 +123,7 @@ class ErrorableModelForm(forms.ModelForm):
 def flatten_errorlists(errorlists):
     '''Return a list of the errors (just the text) in any field.'''
     errors = []
-    for el in errorlists.values():
-        errors += el
+    for field, errorlist in errorlists.items():
+        errors += ['%s: %s' % (field, error) for error in errorlist]
 
     return errors
