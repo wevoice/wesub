@@ -516,6 +516,7 @@ def _generate_initial_data():
         'fa': 'fa',
         'fi': 'fi',
         'fr': 'fr',
+        'fr-ca': 'fr-ca',
         'fy-nl': 'fy-nl',
         'ga': 'ga',
         'gl': 'gl',
