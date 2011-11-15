@@ -656,7 +656,11 @@ _generate_initial_data()
 
 class LanguageCode(object):
     def __init__(self, language_code, standard):
-        self._code = TO_INTERNAL[standard.lower()][language_code]
+        try:
+            standard_dict = TO_INTERNAL[standard.lower()]
+        except KeyError:
+            raise Exception("Standard '%s' is not registred" % standard)
+        self._code = standard_dict[language_code]
 
     def encode(self, standard, fuzzy=False):
         """Return the code for this language in the given standard."""
