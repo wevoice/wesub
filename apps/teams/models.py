@@ -700,7 +700,7 @@ class TeamVideo(models.Model):
         """Return languages for which this video has translations or translation tasks."""
 
         langs_with_subtitles = set(self.video.subtitle_language_dict().keys())
-        task_langs = set(t.language for t in self.task_set.all_translation())
+        task_langs = set(t.language for t in self.task_set.all_translate())
 
         return langs_with_subtitles.union(task_langs)
 

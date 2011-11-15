@@ -52,7 +52,6 @@
                     <div class="type-selector">{{ form.errors.type }} {{ form.type }}</div>
                     <div class="chosen">
                         <div class="language-selector">{{ form.errors.language }} {{ form.language }}</div>
-                        {{ can_assign }}
                         {% if can_assign %}
                             <div class="assignee-selector">
                                 {{ form.errors.assignee }} {{ form.assignee }}
