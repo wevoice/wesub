@@ -37,7 +37,17 @@ INTERNAL_NAMES = {}
 TO_INTERNAL = {}
 FROM_INTERNAL = {}
 
-
+def get_language_list(standard):
+    """
+    Returns a mapping of language codes -> verbose name
+    This is used in the api, so that users can query the list of
+    available languages
+    """
+    langs = {}
+    for name in TO_INTERNAL.get(standard):
+        langs[name] = INTERNAL_NAMES[LanguageCode(name, standard).encode("unisubs")]
+    return langs
+    
 def add_standard(standard, mapping, base=None, exclude=None):
     """Add a new standard to the list of supported standards.
 
