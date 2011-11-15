@@ -86,6 +86,7 @@ def save_subtitle(video, language, parser, user=None, update_video=True):
 
             caption = Subtitle(**item)
             caption.version = version
+            caption.datetime_started = datetime.now()
             caption.subtitle_id = str(id)
             caption.subtitle_order = i+1
             caption.save()
