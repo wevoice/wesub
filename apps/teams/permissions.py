@@ -18,6 +18,7 @@
 
 from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import  wraps
+from utils.translation import SUPPORTED_LANGUAGES_DICT
 
 from teams.permissions_const import (
     EDIT_TEAM_SETTINGS_PERM, EDIT_PROJECT_SETTINGS_PERM, ASSIGN_ROLE_PERM,
@@ -27,7 +28,7 @@ from teams.permissions_const import (
     RULES, ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN
 )
 
-from teams.models import MembershipNarrowing, Team
+from teams.models import MembershipNarrowing, Team, Workflow
 
 def can_rename_team(team, user):
     return team.is_owner(user)
@@ -205,4 +206,148 @@ def list_narrowings(team, user, models, lists=False):
        data[model._meta.object_name] = items if not lists else list(items)
    return data    
     
+
+
+# Task creation checks
+def _user_can_create_task_subtitle(user, team_video):
+    return True
+
+def _user_can_create_task_translate(user, team_video):
+    return True
+
+def _user_can_create_task_review(user, team_video):
+    return True
+
+def _user_can_create_task_approve(user, team_video):
+    return True
+
+
+def can_create_task_subtitle(team_video, user=None):
+    """Return whether the given video can have a subtitle task created for it.
+
+    If a user is given, return whether *that user* can create the task.
+
+    A subtitle task can be created iff:
+
+    * There are no subtitles for the video already.
+    * There are no subtitle tasks for it already.
+    * The user has permission to create subtitle tasks.
+
+    """
+    if user and not _user_can_create_task_subtitle(user, team_video):
+        return False
+
+    if team_video.subtitles_started():
+        return False
+
+    if list(team_video.task_set.all_subtitle()[:1]):
+        return False
+
+    return True
+
+def can_create_task_translate(team_video, user=None):
+    """Return a list of languages for which a translate task can be created for the given video.
+
+    If a user is given, filter that list to contain only languages the user can
+    create tasks for.
+
+    A translation task can be created for a given language iff:
+
+    * There is at least one set of complete subtitles for another language (to
+      translate from).
+    * There are no translation tasks for that language.
+    * The user has permission to create the translation task.
+
+    Note: you *can* create translation tasks if subtitles for that language
+    already exist.  The task will simply "take over" that language from that
+    point forward.
+
+    """
+    if user and not _user_can_create_task_translate(user, team_video):
+        return []
+
+    if not team_video.subtitles_finished():
+        return []
+
+    candidate_languages = set(SUPPORTED_LANGUAGES_DICT.keys())
+
+    existing_translate_tasks = team_video.task_set.all_translate()
+    existing_translate_languages = set(t.language for t in existing_translate_tasks)
+
+    # TODO: Order this for individual users?
+    return list(candidate_languages - existing_translate_languages)
+
+def can_create_task_review(team_video, user=None):
+    """Return a list of languages for which a review task can be created for the given video.
+
+    If a user is given, filter that list to contain only languages the user can
+    create tasks for.
+
+    A review task can be created for a given language iff:
+
+    * There is a set of complete subtitles for that language.
+    * There are no open translation tasks for that language.
+    * There are no review tasks for that language.
+    * There are no approve tasks for that language.
+    * The user has permission to create the review task.
+
+    """
+    if user and not _user_can_create_task_review(user, team_video):
+        return []
+
+    tasks = team_video.task_set
+
+    # Find all languages that have a complete set of subtitles.
+    # These are the ones we *might* be able to create a review task for.
+    candidate_langs = set(sl.language for sl in team_video.video.completed_subtitle_languages())
+
+    # Find all the languages that have a task which prevents a review task creation.
+    # TODO: Make this an OR'ed Q query for performance.
+    existing_task_langs = (
+            set(t.language for t in tasks.incomplete_translate())
+          | set(t.language for t in tasks.all_review())
+          | set(t.language for t in tasks.all_approve())
+    )
+
+    # Return the candidate languages that don't have a review-preventing task.
+    return list(candidate_langs - existing_task_langs)
+
+def can_create_task_approve(team_video, user=None):
+    """Return a list of languages for which an approve task can be created for the given video.
+
+    If a user is given, filter that list to contain only languages the user can
+    create tasks for.
+
+    An approve task can be created for a given language iff:
+
+    * If reviewing is enabled in the workflow:
+        * There is a review task marked as accepted for that language.
+    * If reviewing is NOT enabled in the workflow:
+        * There is a set of complete subtitles for that language.
+    * There are no open translation tasks for that language.
+    * There are no approve tasks for that language.
+    * The user has permission to create the approve task.
+
+    """
+    if user and not _user_can_create_task_review(user, team_video):
+        return []
+
+    tasks = team_video.task_set
+
+    # Find all languages we *might* be able to create an approve task for.
+    workflow = Workflow.get_for_team_video(team_video)
+    if workflow.review_enabled:
+        candidate_langs = set(t.language for t in tasks.complete_review('Approved'))
+    else:
+        candidate_langs = set(sl.language for sl in team_video.video.completed_subtitle_languages())
+
+    # Find all the languages that have a task which prevents an approve task creation.
+    # TODO: Make this an OR'ed Q query for performance.
+    existing_task_langs = (
+            set(t.language for t in tasks.incomplete_translate())
+          | set(t.language for t in tasks.all_approve())
+    )
+
+    # Return the candidate languages that don't have a review-preventing task.
+    return list(candidate_langs - existing_task_langs)
 

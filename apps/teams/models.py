@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -505,6 +505,7 @@ class Project(models.Model):
         permissions = PROJECT_PERMISSIONS
         
 
+
 class TeamVideo(models.Model):
     team = models.ForeignKey(Team)
     video = models.ForeignKey(Video)
@@ -730,60 +731,6 @@ class TeamVideo(models.Model):
         return (self.subtitles_started() and
                 self.video.subtitle_language().is_complete_and_synced())
 
-
-    # Task creation checks
-    def task_translation_started_languages(self):
-        """Return languages for which this video has translations or translation tasks."""
-
-        langs_with_subtitles = set(self.video.subtitle_language_dict().keys())
-        task_langs = set(t.language for t in self.task_set.all_translate())
-
-        return langs_with_subtitles.union(task_langs)
-
-    def task_reviewable_languages(self):
-        """Return languages for which a review task can be created."""
-
-        workflow = Workflow.get_for_team_video(self)
-        if not workflow.review_enabled:
-            return set()
-
-        translated_langs = set(sl.language for sl in self.video.completed_subtitle_languages())
-        reviewed_langs = set(t.language for t in self.task_set.all_review())
-
-        return translated_langs.difference(reviewed_langs)
-
-    def task_approvable_languages(self):
-        """Return languages for which an approve task can be created."""
-
-        workflow = Workflow.get_for_team_video(self)
-        if not workflow.approve_enabled:
-            return set()
-
-        if workflow.review_enabled:
-            reviews = self.task_set.complete_review('Approved')
-            candidate_langs = set(t.language for t in reviews)
-        else:
-            candidate_langs = self.task_translation_started_languages()
-
-        approved_langs = set(t.language for t in self.task_set.all_approve())
-
-        return candidate_langs.difference(approved_langs)
-
-    def task_translatable_languages(self):
-        """Return languages for which a translate task can be created."""
-
-        if not self.subtitles_finished():
-            return []
-
-        done = self.task_translation_started_languages()
-        return [lang for lang in SUPPORTED_LANGUAGES_DICT.keys()
-                if lang not in done]
-
-    def task_subtitlable(self):
-        """Return True if this video can have a subtitling task created for it, False otherwise."""
-        subtitle_tasks = list(self.task_set.all_subtitle()[:1])
-
-        return not self.subtitles_started() and not subtitle_tasks
 
 
 def team_video_save(sender, instance, created, **kwargs):
@@ -1513,11 +1460,7 @@ class Task(models.Model):
     def get_perform_url(self):
         '''Return the URL that will open whichever dialog necessary to perform this task.'''
         mode = Task.TYPE_NAMES[self.type].lower()
-        if mode in ['approve', 'review']:
-            return self.subtitle_language.get_widget_url(mode=mode, task_id=self.pk)
-        else:
-            # TODO
-            return None
+        return self.subtitle_language.get_widget_url(mode=mode, task_id=self.pk)
 
 
 class SettingManager(models.Manager):

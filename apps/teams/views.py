@@ -18,7 +18,11 @@
 
 from utils import render_to, render_to_json
 from utils.translation import get_languages_list
-from teams.forms import CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm, EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, CreateTaskForm, PermissionsForm
+from teams.forms import (
+    CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
+    EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
+    SettingsForm, CreateTaskForm, PermissionsForm
+)
 from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.contrib.auth.decorators import login_required
@@ -43,7 +47,11 @@ from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
 
-from teams.permissions import can_add_video, can_assign_roles, can_view_settings_tab, can_assign_tasks
+from teams.permissions import (
+    can_add_video, can_assign_roles, can_view_settings_tab, can_assign_tasks,
+    can_create_task_subtitle, can_create_task_translate, can_create_task_review,
+    can_create_task_approve
+)
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 12)
 HIGHTLIGHTED_TEAMS_ON_PAGE = getattr(settings, 'HIGHTLIGHTED_TEAMS_ON_PAGE', 10)
@@ -755,10 +763,10 @@ def create_task(request, slug, team_video_pk):
     else:
         form = CreateTaskForm(team, team_video)
 
-    translatable_languages = json.dumps(list(team_video.task_translatable_languages()))
-    reviewable_languages = json.dumps(list(team_video.task_reviewable_languages()))
-    approvable_languages = json.dumps(list(team_video.task_approvable_languages()))
-    subtitlable = json.dumps(team_video.task_subtitlable())
+    subtitlable = json.dumps(can_create_task_subtitle(team_video, request.user))
+    translatable_languages = json.dumps(can_create_task_translate(team_video, request.user))
+    reviewable_languages = json.dumps(can_create_task_review(team_video, request.user))
+    approvable_languages = json.dumps(can_create_task_approve(team_video, request.user))
 
     language_choices = json.dumps(get_languages_list(True))
 
