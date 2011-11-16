@@ -370,7 +370,6 @@ class CreateTaskForm(ErrorableModelForm):
     type = forms.TypedChoiceField(choices=Task.TYPE_CHOICES, coerce=int)
     language = forms.ChoiceField(choices=(), required=False)
     assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
-    public = forms.BooleanField(required=False)
 
     def __init__(self, team, team_video, *args, **kwargs):
         super(CreateTaskForm, self).__init__(*args, **kwargs)
@@ -460,7 +459,7 @@ class CreateTaskForm(ErrorableModelForm):
 
     class Meta:
         model = Task
-        fields = ('type', 'language', 'assignee', 'public')
+        fields = ('type', 'language', 'assignee')
 
 
 class TaskAssignForm(forms.Form):
