@@ -77,14 +77,29 @@ class Team(models.Model):
         (MANAGER_REMOVE, _(u'Managers can add and remove video')),    #only managers can add/remove video
         (MEMBER_ADD, _(u'Members can only add videos'))  #members can only add video
     )
+
+    TASK_ASSIGN_CHOICES = (
+        (10, 'Any team member'),
+        (20, 'Managers and admins'),
+        (30, 'Admins only'),
+    )
+    TASK_ASSIGN_NAMES = dict(TASK_ASSIGN_CHOICES)
+    TASK_ASSIGN_IDS = dict([choice[::-1] for choice in TASK_ASSIGN_CHOICES])
+
+    SUBTITLE_CHOICES = (
+        (10, 'Anyone'),
+        (20, 'Any team member'),
+        (30, 'Only managers and admins'),
+        (40, 'Ony admins'),
+    )
+    SUBTITLE_NAMES = dict(SUBTITLE_CHOICES)
+    SUBTITLE_IDS = dict([choice[::-1] for choice in SUBTITLE_CHOICES])
     
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
     description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links.'))
     
     logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True, upload_to='teams/logo/')
-    membership_policy = models.IntegerField(_(u'membership policy'), choices=MEMBERSHIP_POLICY_CHOICES, default=OPEN)
-    video_policy = models.IntegerField(_(u'video policy'), choices=VIDEO_POLICY_CHOICES, default=MEMBER_REMOVE)
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
@@ -99,11 +114,29 @@ class Team(models.Model):
     header_html_text = models.TextField(blank=True, default='', help_text=_(u"HTML that appears at the top of the teams page."))
     last_notification_time = models.DateTimeField(editable=False, default=datetime.datetime.now)
 
+    # Enabling Features
     projects_enabled = models.BooleanField(default=False)
     workflow_enabled = models.BooleanField(default=False)
-    
+
+    # Policies and Permissions
+    membership_policy = models.IntegerField(_(u'membership policy'),
+                                            choices=MEMBERSHIP_POLICY_CHOICES,
+                                            default=OPEN)
+    video_policy = models.IntegerField(_(u'video policy'),
+                                       choices=VIDEO_POLICY_CHOICES,
+                                       default=MEMBER_REMOVE)
+    task_assign_policy = models.IntegerField(_(u'task assignment policy'),
+                                             choices=TASK_ASSIGN_CHOICES,
+                                             default=TASK_ASSIGN_IDS['Any team member'])
+    subtitle_policy = models.IntegerField(_(u'subtitling policy'),
+                                          choices=SUBTITLE_CHOICES,
+                                          default=SUBTITLE_IDS['Anyone'])
+    translate_policy = models.IntegerField(_(u'translation policy'),
+                                           choices=SUBTITLE_CHOICES,
+                                           default=SUBTITLE_IDS['Anyone'])
+
     objects = TeamManager()
-    
+
     class Meta:
         ordering = ['-name']
         verbose_name = _(u'Team')
@@ -113,7 +146,6 @@ class Team(models.Model):
        
 
 
-    
     def __unicode__(self):
         return self.name
  
@@ -220,6 +252,7 @@ class Team(models.Model):
             return self.is_manager(user)
         
         return self.is_member(user)
+
 
     # moderation
     
@@ -408,6 +441,9 @@ class Team(models.Model):
                  'description': self.description,
                  'membership_policy': self.membership_policy,
                  'video_policy': self.video_policy,
+                 'task_assign_policy': self.task_assign_policy,
+                 'subtitle_policy': self.subtitle_policy,
+                 'translate_policy': self.translate_policy,
                  'logo': self.logo_thumbnail() if self.logo else None,
                  'workflow_enabled': self.workflow_enabled, }
 # this needs to be constructed after the model definition since we need a

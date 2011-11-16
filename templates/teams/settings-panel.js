@@ -323,6 +323,9 @@ var TeamModel = Class.$extend({
         this.description = data.description;
         this.membership_policy = data.membership_policy;
         this.video_policy = data.video_policy;
+        this.task_assign_policy = data.task_assign_policy;
+        this.subtitle_policy = data.subtitle_policy;
+        this.translate_policy = data.translate_policy;
         this.logo = data.logo;
         this.workflowEnabled = data.workflow_enabled;
     }
@@ -488,6 +491,9 @@ var PermissionsPanel = AsyncPanel.$extend({
         var data = {
             membership_policy: $('#id_membership_policy', this.el).val(),
             video_policy: $('#id_video_policy', this.el).val(),
+            task_assign_policy: $('#id_task_assign_policy', this.el).val(),
+            subtitle_policy: $('#id_subtitle_policy', this.el).val(),
+            translate_policy: $('#id_translate_policy', this.el).val(),
             workflow_enabled: $('#permissions_workflows_enabled', this.el).attr('checked')
         };
 
@@ -498,6 +504,9 @@ var PermissionsPanel = AsyncPanel.$extend({
     fillFromModel: function() {
         $('#id_membership_policy', this.el).val(this.team.membership_policy);
         $('#id_video_policy', this.el).val(this.team.video_policy);
+        $('#id_task_assign_policy', this.el).val(this.team.task_assign_policy);
+        $('#id_subtitle_policy', this.el).val(this.team.subtitle_policy);
+        $('#id_translate_policy', this.el).val(this.team.translate_policy);
 
         if (this.team.workflowEnabled) {
             $('#permissions_workflows_enabled', this.el).attr('checked', 'checked');

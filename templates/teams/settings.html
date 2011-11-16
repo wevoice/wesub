@@ -246,12 +246,8 @@ This is needed, since it's for the js templating
                     <label for="id_video_policy">Who can add/remove videos?</label>
                     {% endverbatim %}{{ permissions_form.video_policy }}{% verbatim %}
 
-                    <label>Who can assign tasks?</label>
-                    <select>
-                        <option>Any team member</option>
-                        <option>Managers and admins</option>
-                        <option>Admins only</option>
-                    </select>
+                    <label for="id_task_assign_policy">Who can assign tasks?</label>
+                    {% endverbatim %}{{ permissions_form.task_assign_policy }}{% verbatim %}
 
                 </fieldset>
                 <fieldset>
@@ -260,21 +256,11 @@ This is needed, since it's for the js templating
 
                     <label for="id_subtitle_policy">Who can create subtitles?</label>
                     <p class="notation">i.e. transcribe from video and perform time-alignment</p>
-                    <select>
-                        <option>Anyone</option>
-                        <option>Any team member</option>
-                        <option>Only managers and admins</option>
-                        <option>Only admins</option>
-                    </select>
+                    {% endverbatim %}{{ permissions_form.subtitle_policy }}{% verbatim %}
 
                     <label for="id_translate_policy">Who can translate subtitles?</label>
                     <p class="notation">i.e. translate text from an original subtitle into a new language</p>
-                    <select>
-                        <option>Anyone</option>
-                        <option>Any team member</option>
-                        <option>Only managers and admins</option>
-                        <option>Only admins</option>
-                    </select>
+                    {% endverbatim %}{{ permissions_form.translate_policy }}{% verbatim %}
 
                 </fieldset>
             </div>

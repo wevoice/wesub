@@ -530,5 +530,6 @@ class WorkflowForm(forms.ModelForm):
 class PermissionsForm(forms.ModelForm):
     class Meta:
         model = Team
-        fields = ('membership_policy', 'video_policy')
+        fields = ('membership_policy', 'video_policy', 'subtitle_policy',
+                  'translate_policy', 'task_assign_policy')
 
