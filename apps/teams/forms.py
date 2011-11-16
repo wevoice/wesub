@@ -526,3 +526,9 @@ class WorkflowForm(forms.ModelForm):
     class Meta:
         model = Workflow
         fields = ('perm_subtitle', 'perm_translate', 'perm_review', 'perm_approve')
+
+class PermissionsForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ('membership_policy', 'video_policy')
+

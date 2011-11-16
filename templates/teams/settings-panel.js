@@ -384,8 +384,6 @@ var BasicPanel  = AsyncPanel.$extend({
     fillFromModel: function() {
         $('#basic_name', this.el).val(this.team.name);
         $('#basic_description', this.el).val(this.team.description);
-        $('#id_membership_policy', this.el).val(this.team.membership_policy);
-        $('#id_video_policy', this.el).val(this.team.video_policy);
 
         if (this.team.logo) {
             $('#current_logo', this.el).attr('src', this.team.logo);
@@ -447,12 +445,16 @@ var PermissionsPanel = AsyncPanel.$extend({
         this.onWorkflowLoaded = _.bind(this.onWorkflowLoaded, this);
         this.showWorkflow = _.bind(this.showWorkflow, this);
         this.hideWorkflow = _.bind(this.hideWorkflow, this);
+        this.onLoaded = _.bind(this.onLoaded, this);
+        this.onSubmit = _.bind(this.onSubmit, this);
+        this.fillFromModel = _.bind(this.fillFromModel, this);
 
         // Render template
         this.el = ich.permissionsPanel();
 
         // Bind events
-        $('#basic_workflows_enabled', this.el).change(this.onWorkflowStatusChange);
+        $('#permissions_workflows_enabled', this.el).change(this.onWorkflowStatusChange);
+        $('form.permissions', this.el).submit(this.onSubmit);
 
         // Load initial data
         this.workflow = null;
@@ -460,7 +462,7 @@ var PermissionsPanel = AsyncPanel.$extend({
         TeamsApiV2.team_get(TEAM_SLUG, this.onLoaded);
     },
     onWorkflowStatusChange: function(e) {
-        if ($('#basic_workflows_enabled', this.el).attr('checked')) {
+        if ($('#permissions_workflows_enabled', this.el).attr('checked')) {
             this.showWorkflow();
         } else {
             this.hideWorkflow();
@@ -476,23 +478,33 @@ var PermissionsPanel = AsyncPanel.$extend({
     hideWorkflow: function(e) {
         $('.workflow', this.el).html('');
     },
+    onLoaded: function(data) {
+        this.team = new TeamModel(data);
+        this.fillFromModel();
+    },
     onSubmit: function(e) {
         e.preventDefault();
 
         var data = {
-            // TODO Fill in...
-
-            workflow_enabled: $('#basic_workflows_enabled', this.el).attr('checked')
+            membership_policy: $('#id_membership_policy', this.el).val(),
+            video_policy: $('#id_video_policy', this.el).val(),
+            workflow_enabled: $('#permissions_workflows_enabled', this.el).attr('checked')
         };
+
+        TeamsApiV2.permissions_set(TEAM_SLUG, data, this.onLoaded);
 
         this.workflow && this.workflow.onSubmit();
     },
     fillFromModel: function() {
+        $('#id_membership_policy', this.el).val(this.team.membership_policy);
+        $('#id_video_policy', this.el).val(this.team.video_policy);
+
         if (this.team.workflowEnabled) {
-            $('#basic_workflows_enabled', this.el).attr('checked', 'checked');
+            $('#permissions_workflows_enabled', this.el).attr('checked', 'checked');
         } else {
-            $('#basic_workflows_enabled', this.el).attr('checked', '');
+            $('#permissions_workflows_enabled', this.el).attr('checked', '');
         }
+
         this.onWorkflowStatusChange();
     }
 });

@@ -241,10 +241,10 @@ This is needed, since it's for the js templating
                     <legend>Team Management</legend>
 
                     <label for="id_membership_policy">How can users join your team?</label>
-                    {% endverbatim %}{{ settings_form.membership_policy }}{% verbatim %}
+                    {% endverbatim %}{{ permissions_form.membership_policy }}{% verbatim %}
 
                     <label for="id_video_policy">Who can add/remove videos?</label>
-                    {% endverbatim %}{{ settings_form.video_policy }}{% verbatim %}
+                    {% endverbatim %}{{ permissions_form.video_policy }}{% verbatim %}
 
                     <label>Who can assign tasks?</label>
                     <select>
@@ -282,10 +282,10 @@ This is needed, since it's for the js templating
                 <fieldset>
                     <legend>Workflows</legend>
                     <p class="notation">Add moderation steps and automate tasks</p>
-                    <label for="basic_workflows_enabled"><input type="checkbox" name="workflows_enabled" id="basic_workflows_enabled"/> Enable workflows</label>
+                    <label for="permissions_workflows_enabled"><input type="checkbox" name="workflows_enabled" id="permissions_workflows_enabled"/> Enable workflows</label>
                 </fieldset>
 
-                <form action="" class="workflow" method="post"></form>
+                <div class="workflow"></form>
             </div>
 
             <div class="grid_9 submit">

@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -34,9 +34,10 @@ from utils.translation import SUPPORTED_LANGUAGES_DICT
 
 from icanhaz.projects_decorators import raise_forbidden_project
 from teams.permissions import can_edit_project
-from teams.forms import TaskAssignForm, TaskDeleteForm, GuidelinesMessagesForm, SettingsForm, WorkflowForm
+from teams.forms import TaskAssignForm, TaskDeleteForm, GuidelinesMessagesForm, SettingsForm, WorkflowForm, PermissionsForm
 from teams.project_forms import ProjectForm
 from teams.permissions import list_narrowings, roles_assignable_to, can_assign_roles
+
 
 class TeamsApiClass(object):
 
@@ -93,7 +94,6 @@ class TeamsApiClass(object):
         return Msg(_(u'Team member role changed.'))
 
 TeamsApi = TeamsApiClass()
-
 
 
 def _project_to_dict(p):
@@ -240,6 +240,18 @@ class TeamsApiV2Class(object):
         team = Team.objects.get(slug=team_slug)
 
         form = SettingsForm(data, instance=team)
+        if form.is_valid():
+            form.save()
+            return team.to_dict()
+        else:
+            return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
+
+
+    # Permissions
+    def permissions_set(self, team_slug, data, user):
+        team = Team.objects.get(slug=team_slug)
+
+        form = PermissionsForm(data, instance=team)
         if form.is_valid():
             form.save()
             return team.to_dict()

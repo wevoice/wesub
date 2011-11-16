@@ -18,7 +18,7 @@
 
 from utils import render_to, render_to_json
 from utils.translation import get_languages_list
-from teams.forms import CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm, EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, CreateTaskForm
+from teams.forms import CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm, EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, CreateTaskForm, PermissionsForm
 from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.contrib.auth.decorators import login_required
@@ -330,6 +330,7 @@ def team_settings(request, slug):
         'user_can_assign_tasks': member.can_assign_tasks(),
         'assign_form': TaskAssignForm(team, member),
         'settings_form': SettingsForm(),
+        'permissions_form': PermissionsForm(),
     }
 
 @render_to('teams/tasks.html')
