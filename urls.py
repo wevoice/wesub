@@ -154,12 +154,12 @@ except ImportError:
     pass
 
 try:
-    from apiv2 import urls
+    from apiv2 import urls as api2urls
     urlpatterns += patterns('',
-        url(r'^api2/', include('apiv2.urls', 'api2')),
+        url(r'^api2/', include('apiv2.urls', namespace=api2urls.URL_NAMESPACE),),
     )
 except ImportError:
-    pass
+    print "could not import the apiv2 module "
     
 if feature_is_on('MODERATION'):
     urlpatterns += patterns("",
