@@ -159,7 +159,7 @@ try:
         url(r'^api2/', include('apiv2.urls', namespace=api2urls.URL_NAMESPACE),),
     )
 except ImportError:
-    print "could not import the apiv2 module "
+    pass
     
 if feature_is_on('MODERATION'):
     urlpatterns += patterns("",
