@@ -51,7 +51,7 @@ def is_version_same(version, parser):
             
     return True
 
-def save_subtitle(video, language, parser, user=None, update_video=True):
+def save_subtitle(video, language, parser, user=None, update_video=True, forks=True):
     from videos.models import SubtitleVersion, Subtitle, SubtitleMetadata
     from videos.tasks import video_changed_tasks
 
@@ -105,8 +105,9 @@ def save_subtitle(video, language, parser, user=None, update_video=True):
         version.save()
     language.video.release_writelock()
     language.video.save()
-    translations = video.subtitlelanguage_set.filter(standard_language=language)
-    [t.fork(from_version=old_version, user=user) for t in translations]
+    if forks:
+        translations = video.subtitlelanguage_set.filter(standard_language=language)
+        [t.fork(from_version=old_version, user=user) for t in translations]
     if update_video:
         video_changed_tasks.delay(video.id, None if version is None else version.id)
         
