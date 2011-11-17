@@ -43,7 +43,7 @@ def is_version_same(version, parser):
     if version.subtitle_set.count() != len(subtitles):
         return False
     
-    for item in zip(subtitles, version.subtitle_set.all()):
+    for item in zip(subtitles, list(version.subtitle_set.all())):
         if item[0]['subtitle_text'] != item[1].subtitle_text or \
             item[0]['start_time'] != item[1].start_time or \
             item[0]['end_time'] != item[1].end_time:
