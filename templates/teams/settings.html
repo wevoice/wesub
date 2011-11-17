@@ -12,7 +12,6 @@
 {% endblock %}
 
 {% block view_content %}
-
     {% with "settings" as current %}
         {% include "teams/_tabs.html" %}
     {% endwith %}
@@ -21,32 +20,29 @@
       <div class="tab panel-projects" style="display:none">
       </div>
       {% include "teams/_basic_settings.html" %}
-
     </div>
 
     <div class="controls grid_3 omega ">
-        
-      <ul class="sub-settings-panel">
-      </ul>
+      <ul class="sub-settings-panel"></ul>
     </div>
 
-
-<script type="text/javascript">
-$(window).load(function(){
-    //findme
-    {% include "teams/panel-base.js" %}
-    {% include "teams/settings-panel.js" %}
-});
-</script>
+    <script type="text/javascript">
+        $(window).load(function(){
+            {% include "teams/panel-base.js" %}
+            {% include "teams/settings-panel.js" %}
+        });
+    </script>
 
 <!-- templates -->
 <script id="IMAGE_PRELOADER" type="text/html">
   <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
 </script>
+
 {% comment %}  Whatever is inside the verbatim tag does not run through
 django's var subtitution, so the final template is render as it's written bellow.
 This is needed, since it's for the js templating
 {% endcomment %}
+
 {% verbatim %}
 
 <script id="subMenuItem" type="text/html">
@@ -371,33 +367,22 @@ This is needed, since it's for the js templating
 </script>
 
 <script id="workflow" type="text/html">
-    <fieldset>
-        <label>Subtitle creation</label>
-        <select name="perm_subtitle">
-            <option>Don't request</option>
-            <option>Request transcription</option>
-        </select>
+    <fieldset class="workflow">
+        <label for="id_autocreate_subtitle">
+            {% endverbatim %}{{ workflow_form.autocreate_subtitle }}{% verbatim %}
+            Automatically create subtitle tasks
+        </label>
 
-        <label>Translation</label>
-        <select name="perm_translate">
-            <option>Don't request</option>
-            <option>Request translation</option>
-        </select>
+        <label for="id_autocreate_translate">
+            {% endverbatim %}{{ workflow_form.autocreate_translate }}{% verbatim %}
+            Automatically create translation tasks
+        </label>
 
-        <label>Review</label>
-        <select name="perm_review">
-            <option>Don't require review</option>
-            <option>Request peer review</option>
-            <option>Manager must review</option>
-            <option>Admin must review</option>
-        </select>
+        <label for="id_review_allowed">Review</label>
+        {% endverbatim %}{{ workflow_form.review_allowed }}{% verbatim %}
 
-        <label>Approval</label>
-        <select name="perm_approve">
-            <option>Don't require approval</option>
-            <option>Manager must approve</option>
-            <option>Admin must approve</option>
-        </select>
+        <label for="id_approve_allowed">Approval</label>
+        {% endverbatim %}{{ workflow_form.approve_allowed }}{% verbatim %}
 
         <input type="submit" class="button submit" value="Save Workflow Changes" name="save" />
     </fieldset>

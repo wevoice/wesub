@@ -408,22 +408,22 @@ class TeamsApiV2Class(object):
 
         return Workflow.get_for_target(target_id, target_type).to_dict()
 
-    def workflow_set_step(self, team_slug, project_id, team_video_id, step, perm, user):
-        workflow = _get_or_create_workflow(team_slug, project_id, team_video_id)
-        setattr(workflow, 'perm_%s' % step, Workflow.PERM_IDS[perm])
-        workflow.save()
-
-        return workflow.to_dict()
-
     def workflow_set(self, team_slug, project_id, team_video_id, data, user):
         workflow = _get_or_create_workflow(team_slug, project_id, team_video_id)
 
         form = WorkflowForm(data, instance=workflow)
         if form.is_valid():
             form.save()
+
+            # If we're setting a workflow, the workflow's target obviously must
+            # have workflows enabled.
+            team = get_object_or_404(Team, slug=team_slug)
+            if team and (not project_id) and (not team_video_id):
+                team.workflow_enabled = True
+                team.save()
+
             return workflow.to_dict()
         else:
-            print form.errors
             return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
 
 

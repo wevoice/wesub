@@ -21,7 +21,7 @@ from utils.translation import get_languages_list
 from teams.forms import (
     CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
     EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
-    SettingsForm, CreateTaskForm, PermissionsForm
+    SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm
 )
 from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
 from django.shortcuts import get_object_or_404, redirect, render_to_response
@@ -339,6 +339,7 @@ def team_settings(request, slug):
         'assign_form': TaskAssignForm(team, member),
         'settings_form': SettingsForm(),
         'permissions_form': PermissionsForm(),
+        'workflow_form': WorkflowForm(),
     }
 
 @render_to('teams/tasks.html')

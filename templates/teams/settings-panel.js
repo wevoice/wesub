@@ -262,10 +262,11 @@ var WorkflowModel = Class.$extend({
         this.team = data.team;
         this.project = data.project;
         this.team_video = data.team_video;
-        this.perm_subtitle = data.perm_subtitle;
-        this.perm_translate = data.perm_translate;
-        this.perm_review = data.perm_review;
-        this.perm_approve = data.perm_approve;
+
+        this.autocreate_subtitle = data.autocreate_subtitle;
+        this.autocreate_translate = data.autocreate_translate;
+        this.review_allowed = data.review_allowed;
+        this.approve_allowed = data.approve_allowed;
     }
 });
 var WorkflowItem = Class.$extend({
@@ -287,22 +288,22 @@ var WorkflowItem = Class.$extend({
         $(this.el).html(ich.workflow(this.model));
 
         // Fill values
-        $('[name=perm_subtitle]', this.el).val(this.model.perm_subtitle);
-        $('[name=perm_translate]', this.el).val(this.model.perm_translate);
-        $('[name=perm_review]', this.el).val(this.model.perm_review);
-        $('[name=perm_approve]', this.el).val(this.model.perm_approve);
+        $('[name=autocreate_subtitle]', this.el).attr('checked', this.model.autocreate_subtitle);
+        $('[name=autocreate_translate]', this.el).attr('checked', this.model.autocreate_translate);
+        $('[name=review_allowed]', this.el).val(this.model.review_allowed);
+        $('[name=approve_allowed]', this.el).val(this.model.approve_allowed);
 
         // Bind events
-        $("form", this.el).submit(this.onSubmit);
+        $(".submit", this.el).click(this.onSubmit);
     },
     onSubmit: function(e) {
         e && e.preventDefault();
 
         TeamsApiV2.workflow_set(this.model.team, this.model.project, this.model.team_video, {
-            perm_subtitle: $('[name=perm_subtitle]', this.el).val(),
-            perm_translate: $('[name=perm_translate]', this.el).val(),
-            perm_review: $('[name=perm_review]', this.el).val(),
-            perm_approve: $('[name=perm_approve]', this.el).val()
+            autocreate_subtitle: $('[name=autocreate_subtitle]', this.el).attr('checked'),
+            autocreate_translate: $('[name=autocreate_translate]', this.el).attr('checked'),
+            review_allowed: $('[name=review_allowed]', this.el).val(),
+            approve_allowed: $('[name=approve_allowed]', this.el).val()
         }, this.onSaved);
     },
     onSaved: function(data) {
@@ -466,7 +467,9 @@ var PermissionsPanel = AsyncPanel.$extend({
     },
     onWorkflowStatusChange: function(e) {
         if ($('#permissions_workflows_enabled', this.el).attr('checked')) {
-            this.showWorkflow();
+            if (!this.workflow) {
+                this.showWorkflow();
+            }
         } else {
             this.hideWorkflow();
         }
@@ -480,6 +483,7 @@ var PermissionsPanel = AsyncPanel.$extend({
     },
     hideWorkflow: function(e) {
         $('.workflow', this.el).html('');
+        this.workflow = null;
     },
     onLoaded: function(data) {
         this.team = new TeamModel(data);

@@ -1076,30 +1076,36 @@ post_save.connect(invite_send_message, Invite, dispatch_uid="teams.invite.send_i
 
 
 class Workflow(models.Model):
-    PERM_CHOICES = (
-        (10, 'Disabled'),
-        (20, 'Public'),
-        (30, 'Team Members'),
-        (40, 'Managers'),
-        (50, 'Admins'),
-        (60, 'Owner'),
+    REVIEW_CHOICES = (
+        (00, "Don't require review"),
+        (10, 'Peer must review'),
+        (20, 'Manager must review'),
+        (30, 'Admin must review'),
     )
-    PERM_NAMES = dict(PERM_CHOICES)
-    PERM_IDS = dict([choice[::-1] for choice in PERM_CHOICES])
+    REVIEW_NAMES = dict(REVIEW_CHOICES)
+    REVIEW_IDS = dict([choice[::-1] for choice in REVIEW_CHOICES])
+
+    APPROVE_CHOICES = (
+        (00, "Don't require approval"),
+        (10, 'Manager must approve'),
+        (20, 'Admin must approve'),
+    )
+    APPROVE_NAMES = dict(APPROVE_CHOICES)
+    APPROVE_IDS = dict([choice[::-1] for choice in APPROVE_CHOICES])
 
     team = models.ForeignKey(Team)
 
     project = models.ForeignKey(Project, blank=True, null=True)
     team_video = models.ForeignKey(TeamVideo, blank=True, null=True)
 
-    perm_subtitle = models.PositiveIntegerField(choices=PERM_CHOICES,
-            verbose_name='subtitle permissions', default=PERM_IDS['Public'])
-    perm_translate = models.PositiveIntegerField(choices=PERM_CHOICES,
-            verbose_name='translate permissions', default=PERM_IDS['Public'])
-    perm_review = models.PositiveIntegerField(choices=PERM_CHOICES,
-            verbose_name='review permission', default=PERM_IDS['Managers'])
-    perm_approve = models.PositiveIntegerField(choices=PERM_CHOICES,
-            verbose_name='approve permissions', default=PERM_IDS['Owner'])
+    autocreate_subtitle = models.BooleanField(default=False)
+    autocreate_translate = models.BooleanField(default=False)
+
+    review_allowed = models.PositiveIntegerField(
+            choices=REVIEW_CHOICES, verbose_name='reviewers', default=0)
+
+    approve_allowed = models.PositiveIntegerField(
+            choices=APPROVE_CHOICES, verbose_name='approvers', default=0)
 
     created = models.DateTimeField(auto_now_add=True, editable=False)
     modified = models.DateTimeField(auto_now=True, editable=False)
@@ -1246,10 +1252,10 @@ class Workflow(models.Model):
                  'team': self.team.slug if self.team else None,
                  'project': self.project.id if self.project else None,
                  'team_video': self.team_video.id if self.team_video else None,
-                 'perm_subtitle': self.perm_subtitle,
-                 'perm_translate': self.perm_translate,
-                 'perm_review': self.perm_review,
-                 'perm_approve': self.perm_approve, }
+                 'autocreate_subtitle': self.autocreate_subtitle,
+                 'autocreate_translate': self.autocreate_translate,
+                 'review_allowed': self.review_allowed,
+                 'approve_allowed': self.approve_allowed, }
 
 
 class TaskManager(models.Manager):

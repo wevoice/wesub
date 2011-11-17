@@ -524,11 +524,12 @@ class SettingsForm(forms.ModelForm):
 class WorkflowForm(forms.ModelForm):
     class Meta:
         model = Workflow
-        fields = ('perm_subtitle', 'perm_translate', 'perm_review', 'perm_approve')
+        fields = ('autocreate_subtitle', 'autocreate_translate',
+                  'review_allowed', 'approve_allowed')
 
 class PermissionsForm(forms.ModelForm):
     class Meta:
         model = Team
         fields = ('membership_policy', 'video_policy', 'subtitle_policy',
-                  'translate_policy', 'task_assign_policy')
+                  'translate_policy', 'task_assign_policy', 'workflow_enabled')
 
