@@ -155,6 +155,16 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
             })
         return render_to_response("teams/detail-debug.html", extra_context, RequestContext(request))
 
+    all_langs = set()
+    for search_record in mqs:
+        if search_record.video_completed_langs:
+            all_langs.update(search_record.video_completed_langs)
+
+    language_choices = [(code, name) for code, name in get_languages_list()
+                        if code in all_langs]
+
+    extra_context['language_choices'] = language_choices
+
     return object_list(request, queryset=mqs, 
                        paginate_by=VIDEOS_ON_PAGE, 
                        template_name='teams/detail.html', 

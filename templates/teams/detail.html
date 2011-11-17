@@ -17,13 +17,32 @@
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
+        var VIDEO_LANGS = {};
 
-        $(document).ready(function(){
-            jQuery("select", ".filters").chosen();
+        $(function() {
+            $("select", ".filters").chosen();
+            $("select#lang-filter", ".filters").change(function(e) {
+                var select = $("select#lang-filter", ".filters");
+                var lang = select.val();
 
-            jQuery(":checkbox", ".admin-controls").bind('change', function(){
-                var menu = jQuery(this).parents('.admin-controls');
-                if(jQuery(this).attr('checked')) {
+                if (lang !== '') {
+                    $.each(VIDEO_LANGS, function(pk, langs) {
+                        var listing = $('.videos.listing > li.team_video_listing_' + pk);
+
+                        if ($.inArray(lang, langs) === -1) {
+                            listing.hide();
+                        } else {
+                            listing.show();
+                        }
+                    });
+                } else {
+                    $('.videos.listing > li').show();
+                }
+            });
+
+            $(":checkbox", ".admin-controls").bind('change', function(){
+                var menu = $(this).parents('.admin-controls');
+                if($(this).attr('checked')) {
                     menu.addClass('selected');
                 } else {
                     menu.removeClass('selected');
@@ -49,8 +68,10 @@
                 <ul class="filters">
                     <li>
                         <select name="lang-filter" id="lang-filter">
-                            <option value="all">All languages</option>
-                            <option value="en">English</option>
+                            <option value="">All languages</option>
+                            {% for code, name in language_choices %}
+                                <option value="{{ code }}">{{ name }}</option>
+                            {% endfor %}
                         </select>
                     </li>
                 </ul>
