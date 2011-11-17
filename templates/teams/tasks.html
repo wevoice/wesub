@@ -82,25 +82,25 @@ $(window).load(function() {
 </script>
 
 <script id="tasksListItem" type="text/html">
-    <p>
-        {{ #ghost }}
-            <b>GHOST</b>
-        {{ /ghost }}
-        {{ #completed }}
-            <b>COMPLETED</b>
-        {{ /completed }}
-        <a href="{{ teamVideoUrl }}">{{ teamVideoDisplay }}</a>
-        <br/>
-        <span>
-            {{ #languageDisplay}}
-                {{ languageDisplay }} subtitles
-            {{ /languageDisplay}}
+    <h3>
+        {{ #languageDisplay}}
+            {{ languageDisplay }} subtitles
+        {{ /languageDisplay}}
 
-            {{ ^languageDisplay}}
-                Transcription Needed
-            {{ /languageDisplay}}
+        {{ ^languageDisplay}}
+            Transcription Needed
+        {{ /languageDisplay}}:
+        <a href="{{ teamVideoUrl }}">{{ teamVideoDisplay }}</a>
+        <span class="descriptor">
+            {{ #ghost }}
+                <b>GHOST</b>
+            {{ /ghost }}
+            {{ #completed }}
+                <b>COMPLETED</b>
+            {{ /completed }}
         </span>
-        <br/>
+    </h3>
+    <p>
         <span class="assignee">
             {{ #assigneeDisplay }}
                 Assigned to {{ assigneeDisplay }}
