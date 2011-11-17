@@ -755,7 +755,7 @@ def create_task(request, slug, team_video_pk):
     can_assign = can_assign_tasks(team, request.user, team_video.project)
 
     if request.POST:
-        form = CreateTaskForm(team, team_video, request.POST)
+        form = CreateTaskForm(request.user, team, team_video, request.POST)
 
         if form.is_valid():
             task = form.save(commit=False)
@@ -772,7 +772,7 @@ def create_task(request, slug, team_video_pk):
             return HttpResponseRedirect(reverse('teams:team_tasks', args=[],
                                                 kwargs={'slug': team.slug}))
     else:
-        form = CreateTaskForm(team, team_video)
+        form = CreateTaskForm(request.user, team, team_video)
 
     subtitlable = json.dumps(can_create_task_subtitle(team_video, request.user))
     translatable_languages = json.dumps(can_create_task_translate(team_video, request.user))
