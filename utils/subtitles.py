@@ -98,7 +98,11 @@ def save_subtitle(video, language, parser, user=None, update_video=True):
                         metadata_type=name,
                         content=value
                     ).save()
-
+    version = version or old_version
+    if version.user != user:
+        # we might be only uptading the user , as in per bulk imports
+        version.user = user
+        version.save()
     language.video.release_writelock()
     language.video.save()
     translations = video.subtitlelanguage_set.filter(standard_language=language)
