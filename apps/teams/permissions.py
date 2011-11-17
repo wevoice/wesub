@@ -102,6 +102,9 @@ def can_assign_roles(team, user, project=None, lang=None,  role=None):
     (team or project or lang), but also that he can only assign 'lesser'
     roles than his own.
     """
+    if not user.is_authenticated():
+        return False
+
     member = team.members.get(user=user)
     # only owner can assing owner role!
     if member.role == ROLE_OWNER:
