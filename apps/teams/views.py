@@ -50,7 +50,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from teams.permissions import (
     can_add_video, can_assign_roles, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
-    can_create_task_approve
+    can_create_task_approve, can_view_tasks_tab
 )
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 12)
@@ -346,7 +346,7 @@ def team_settings(request, slug):
 def team_tasks(request, slug):
     team = Team.get(slug, request.user)
 
-    if not can_view_settings_tab(team, request.user):
+    if not can_view_tasks_tab(team, request.user):
         return HttpResponseForbidden("You cannot view this team")
 
     member = team.members.get(user=request.user)

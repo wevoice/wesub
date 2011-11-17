@@ -36,6 +36,7 @@ ROLE_ADMIN = "admin"
 ROLE_OWNER = 'owner'
 ROLE_MANAGER = 'manager'
 ROLE_CONTRIBUTOR = 'contributor'
+ROLE_OUTSIDER = 'outsider'
 
 #: Permissions that can be assigned to a model    
 TEAM_PERMISSIONS = (
