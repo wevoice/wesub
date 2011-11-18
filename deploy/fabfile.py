@@ -425,7 +425,7 @@ def _test_email(dir, to_address):
     with cd(os.path.join(dir, 'unisubs')):
         
         run('{0}/env/bin/python manage.py test_email {1} '
-            '--settings=unisubs_settings'.format(env.static_dir, to_address))
+            '--settings=unisubs_settings'.format(dir, to_address))
  
     
 def test_email(to_address):
