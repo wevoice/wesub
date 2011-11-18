@@ -63,26 +63,11 @@
     {% endwith %}
 
     <div class="view grid_9 alpha">
-<<<<<<< HEAD
         {% if team|can_add_video_to_team:user %}
             <div class="tools">
-=======
-        <div class="tools">
-            <ul class="filters">
-                <li>
-                    <select name="lang-filter" id="lang-filter">
-                        <option value="">All languages</option>
-                        {% for code, name in language_choices %}
-                            <option value="{{ code }}">{{ name }}</option>
-                        {% endfor %}
-                    </select>
-                </li>
-            </ul>
-            {% if team|can_add_video_to_team:user %}
->>>>>>> 4ee22e2776bd6e9d6dc29550c373cfb60091e8d4
                 <a href="{% url teams:add_video team.slug %}" class="button">{% trans "Add Videos" %}</a>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
 
         {% if not team.page_content and team.video %}
             {% widget widget_params %}
