@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import SuspiciousOperation
 from django.utils.translation import ugettext_lazy as _
 from django.utils.hashcompat import sha_constructor
 
@@ -43,6 +44,8 @@ class VideoVisibilityManager(models.Manager):
                     video= Video.objects.get(video_id=video_identifier)
                 except Video.DoesNotExist:
                     return None
+        else:
+            video = video_identifier
         if self.user_can_see(user, video, secret_key):
             return video
         return None

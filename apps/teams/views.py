@@ -53,13 +53,13 @@ from teams.permissions import (
     can_create_task_approve, can_view_tasks_tab
 )
 
-TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 12)
+TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
 HIGHTLIGHTED_TEAMS_ON_PAGE = getattr(settings, 'HIGHTLIGHTED_TEAMS_ON_PAGE', 10)
 CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS', 20)
 
-VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 30) 
-MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 30)
-APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 30)
+VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 15) 
+MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 15)
+APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)

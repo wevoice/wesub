@@ -420,6 +420,17 @@ def update_translations():
     """
     run ('cd {0} && sh update_translations.sh'.format(os.path.dirname(__file__)))
 
+def _test_email(dir, to_address):
+    
+    with cd(os.path.join(dir, 'unisubs')):
+        
+        run('{0}/env/bin/python manage.py test_email {1} '
+            '--settings=unisubs_settings'.format(dir, to_address))
+ 
+    
+def test_email(to_address):
+    _execute_on_all_hosts(lambda dir: _test_email(dir, to_address))
+    
 def test_celeryd():
     print '=== TEST CELERYD SCHEDULLER ==='
     env.host_string = env.celeryd_host

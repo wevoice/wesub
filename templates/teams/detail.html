@@ -20,9 +20,9 @@
         var VIDEO_LANGS = {};
 
         $(function() {
-            $("select", ".filters").chosen();
+            $("select", ".controls").chosen();
             $("select#lang-filter", ".filters").change(function(e) {
-                var select = $("select#lang-filter", ".filters");
+                var select = $("select#lang-filter", ".controls");
                 var lang = select.val();
 
                 if (lang !== '') {
@@ -63,21 +63,11 @@
     {% endwith %}
 
     <div class="view grid_9 alpha">
-        <div class="tools">
-            <ul class="filters">
-                <li>
-                    <select name="lang-filter" id="lang-filter">
-                        <option value="">All languages</option>
-                        {% for code, name in language_choices %}
-                            <option value="{{ code }}">{{ name }}</option>
-                        {% endfor %}
-                    </select>
-                </li>
-            </ul>
-            {% if team|can_add_video_to_team:user %}
+        {% if team|can_add_video_to_team:user %}
+            <div class="tools">
                 <a href="{% url teams:add_video team.slug %}" class="button">{% trans "Add Videos" %}</a>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
 
         {% if not team.page_content and team.video %}
             {% widget widget_params %}
@@ -96,8 +86,15 @@
     </div>
 
     <div class="controls grid_3 omega">
-        <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
         {% include "teams/_filters_videos.html" %}
+        <div class="refine">
+            <h4>Refine</h4>
+            <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
+            <select name="lang-filter" id="lang-filter">
+                <option value="all">All languages</option>
+                <option value="en">English</option>
+            </select>
+        </div>
         {% include "teams/_actions.html" %}
     </div>
 
