@@ -28,11 +28,22 @@ from videos.models import Video
 from videos.tasks import add
 import random
 import base64
-
+import socket
+import datetime
 class Command(BaseCommand):
     help = u'Test if Solr, Redis and Memcached are available'
     
     def handle(self, *args, **kwargs):
         
         from django.core.mail import send_mail
-        send_mail('test from fabric', 'should be here', 'noreply@pculture.org', [args[0]], fail_silently=False)
+        msg = u"Email from %s at %s" % (datetime.datetime.now(), socket.gethostname())
+        send_mail('test from fabric', msg, 'noreply@pculture.org', [args[0]], fail_silently=False)
+
+
+
+
+
+
+
+
+
