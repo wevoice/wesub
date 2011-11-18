@@ -738,6 +738,7 @@ def leave_team(request, slug):
 
 # Tasks
 @render_to('teams/tasks.html')
+@login_required
 def team_tasks(request, slug):
     team = Team.get(slug, request.user)
 
