@@ -347,7 +347,7 @@ class Team(models.Model):
         qs_list = []
         
         # FIXME do project filtering here
-        qs = self._filter(self._base_sqs(is_member), pairs_m )
+        qs = self._filter(self._base_sqs(is_member), pairs_m)
         qs_list.append(qs)
         qs_list.append(self._exclude(self._filter(self._base_sqs(is_member, project=project), pairs_0), 
                                      pairs_m))
@@ -365,7 +365,7 @@ class Team(models.Model):
         mqs = MultiQuerySet(*[qs for qs in qs_list if qs is not None])
         # this is way more efficient than making a count from all the
         # constituent querysets.
-        mqs.set_count(self._base_sqs(is_member).count())
+        mqs.set_count(self._base_sqs(is_member, project=project).count())
         return qs_list, mqs
 
     def get_videos_for_languages(self, languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS):
