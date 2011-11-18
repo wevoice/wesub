@@ -11,6 +11,8 @@ from haystack import site
 
 @periodic_task(run_every=crontab(minute=0, hour=6))
 def add_videos_notification(*args, **kwargs):
+    # temporarely disabling notification
+    return 
     from teams.models import TeamVideo, Team
     domain = Site.objects.get_current().domain
     
