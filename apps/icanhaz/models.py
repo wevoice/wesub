@@ -44,6 +44,8 @@ class VideoVisibilityManager(models.Manager):
                     video= Video.objects.get(video_id=video_identifier)
                 except Video.DoesNotExist:
                     return None
+        else:
+            video = video_identifier
         if self.user_can_see(user, video, secret_key):
             return video
         return None
