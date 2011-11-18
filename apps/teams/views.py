@@ -317,6 +317,8 @@ def create(request):
         'form': form
     }
 
+
+# Settings
 @render_to('teams/settings.html')
 @login_required
 def team_settings(request, slug):
@@ -350,37 +352,6 @@ def team_settings(request, slug):
         'settings_form': SettingsForm(),
         'permissions_form': PermissionsForm(),
         'workflow_form': WorkflowForm(),
-    }
-
-@render_to('teams/tasks.html')
-def team_tasks(request, slug):
-    team = Team.get(slug, request.user)
-
-    if not can_view_tasks_tab(team, request.user):
-        return HttpResponseForbidden("You cannot view this team")
-
-    member = team.members.get(user=request.user)
-
-    return {
-        'team': team,
-        'user_can_delete_tasks': member.can_delete_tasks(),
-        'user_can_assign_tasks': member.can_assign_tasks(),
-        'assign_form': TaskAssignForm(team, member),
-    }
-
-@render_to('teams/invite_members.html')
-@login_required
-def invite_members(request, slug):
-    team = Team.get(slug, request.user)
-
-    """ TODO: Permissions check?
-    if not can_invite_members(team, request.user):
-        return HttpResponseForbidden("You cannot invite new members for this team")
-    """
-
-    """ TODO: Add form and whatnot below? """
-    return {
-        'team': team,
     }
 
 @login_required
@@ -423,6 +394,23 @@ def upload_logo(request, slug):
     return HttpResponse(json.dumps(output))
 
 
+@render_to('teams/invite_members.html')
+@login_required
+def invite_members(request, slug):
+    team = Team.get(slug, request.user)
+
+    """ TODO: Permissions check?
+    if not can_invite_members(team, request.user):
+        return HttpResponseForbidden("You cannot invite new members for this team")
+    """
+
+    """ TODO: Add form and whatnot below? """
+    return {
+        'team': team,
+    }
+
+
+# Adding videos
 def _check_add_video_permission(request, team):
     if not team.is_member(request.user):
         raise Http404
@@ -748,6 +736,23 @@ def leave_team(request, slug):
     return redirect(request.META.get('HTTP_REFERER') or team)
 
 
+# Tasks
+@render_to('teams/tasks.html')
+def team_tasks(request, slug):
+    team = Team.get(slug, request.user)
+
+    if not can_view_tasks_tab(team, request.user):
+        return HttpResponseForbidden("You cannot view this team")
+
+    member = team.members.get(user=request.user)
+
+    return {
+        'team': team,
+        'user_can_delete_tasks': member.can_delete_tasks(),
+        'user_can_assign_tasks': member.can_assign_tasks(),
+        'assign_form': TaskAssignForm(team, member),
+    }
+
 @render_to('teams/create_task.html')
 def create_task(request, slug, team_video_pk):
     team = get_object_or_404(Team, slug=slug)
@@ -789,7 +794,6 @@ def create_task(request, slug, team_video_pk):
              'subtitlable': subtitlable,
              'can_assign': can_assign, }
 
-
 @login_required
 def perform_task(request):
     task = Task.objects.get(pk=request.POST.get('task_id'))
@@ -804,6 +808,7 @@ def perform_task(request):
     return HttpResponseRedirect(task.get_perform_url())
 
 
+# Projects
 def project_list(request, slug):
     team = get_object_or_404(Team, slug=slug)
     projects = Project.objects.for_team(team)
