@@ -193,7 +193,7 @@ var TasksTypesList = Class.$extend({
         }
 
         // Clear language dropdown and mark the target as current.
-        $('select#id_task_language').val('');
+        $('select#id_task_language').val('').trigger('liszt:updated');
         $('.type', this.el).removeClass('current');
         $(e.target).parent().addClass('current');
 
