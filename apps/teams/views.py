@@ -386,6 +386,7 @@ def upload_logo(request, slug):
         try:
             form.save()
             output['url'] =  str(team.logo_thumbnail())
+            output['url_full'] =  str(team.logo.url)
         except S3StorageError:
             output['error'] = {'logo': ugettext(u'File server unavailable. Try later. You can edit some other information without any problem.')}
     else:

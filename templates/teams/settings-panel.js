@@ -328,12 +328,15 @@ var TeamModel = Class.$extend({
         this.subtitle_policy = data.subtitle_policy;
         this.translate_policy = data.translate_policy;
         this.logo = data.logo;
+        this.logo_full = data.logo_full;
         this.workflowEnabled = data.workflow_enabled;
     }
 });
 var BasicPanel  = AsyncPanel.$extend({
     __init__: function() {
         // Rebind functions
+        this.saveImage = _.bind(this.saveImage, this);
+        this.saveData = _.bind(this.saveData, this);
         this.onSubmit = _.bind(this.onSubmit, this);
         this.onLoaded = _.bind(this.onLoaded, this);
         this.fillFromModel = _.bind(this.fillFromModel, this);
@@ -353,22 +356,32 @@ var BasicPanel  = AsyncPanel.$extend({
         TeamsApiV2.team_get(TEAM_SLUG, this.onLoaded);
     },
 
-    onImageUploadClick: function(e) {
+    saveImage: function(callback) {
+        var that = this;
+        if ($('form.logo input', this.el).val()) {
+            $('form.logo', this.el).ajaxSubmit({
+                success: function(resp, status, xhr, from) {
+                    that.onImageUploaded(resp);
+                    callback && callback();
+                },
+                dataType: 'json'
+            });
+        } else {
+            callback && callback();
+        }
+    },
+    onImageUploadClick: function(e, callback) {
         e.preventDefault();
-        $('form.logo', this.el).ajaxSubmit({
-            success: this.onImageUploaded,
-            dataType: 'json'
-        });
+        this.saveImage(callback);
         return false;
     },
-    onImageUploaded: function(resp, status, xhr, form) {
+    onImageUploaded: function(resp) {
         this.team.logo = resp['url'];
+        this.team.logo_full = resp['url_full'];
         this.fillFromModel();
     },
 
-    onSubmit: function(e) {
-        e.preventDefault();
-
+    saveData: function() {
         var data = {
             name: $('#basic_name', this.el).val(),
             description: $('#basic_description', this.el).val(),
@@ -379,6 +392,11 @@ var BasicPanel  = AsyncPanel.$extend({
         TeamsApiV2.team_set(TEAM_SLUG, data, this.onLoaded);
 
         this.workflow && this.workflow.onSubmit();
+    },
+    onSubmit: function(e) {
+        e.preventDefault();
+        this.saveImage(this.saveData);
+        return false;
     },
     onLoaded: function(data) {
         this.team = new TeamModel(data);
@@ -391,9 +409,11 @@ var BasicPanel  = AsyncPanel.$extend({
 
         if (this.team.logo) {
             $('#current_logo', this.el).attr('src', this.team.logo);
+            $('.content img.logo').attr('src', this.team.logo_full);
         } else {
             // TODO: Fill in placeholder image.
             $('#current_logo', this.el).attr('src', 'some/placeholder.jpg');
+            $('.content img.logo').attr('src',  'some/placeholder.jpg');
         }
 
         // We edit the page-level title here too.  It's not part of the

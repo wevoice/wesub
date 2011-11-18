@@ -445,6 +445,7 @@ class Team(models.Model):
                  'subtitle_policy': self.subtitle_policy,
                  'translate_policy': self.translate_policy,
                  'logo': self.logo_thumbnail() if self.logo else None,
+                 'logo_full': self.logo.url if self.logo else None,
                  'workflow_enabled': self.workflow_enabled, }
 # this needs to be constructed after the model definition since we need a
 # reference to the class itself
