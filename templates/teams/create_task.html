@@ -59,6 +59,9 @@
                         {% endif %}
                     </div>
                 </fieldset>
+                <div class="cannot-create" style="display: none;">
+                    {% trans "You do not have permission to create any valid tasks for this video." %}
+                </div>
             </div>
 
             <div class="grid_4 omega">
@@ -73,15 +76,6 @@
     </div>
     <div class="controls grid_3 omega">
         <ul>
-            {# <li> #}
-            {#     <a href="{% url teams:add_video slug=team.slug %}">{% trans "Add a Video" %}</a> #}
-            {# </li> #}
-            {# <li class="current"> #}
-            {#     <a href="{% url teams:add_videos slug=team.slug %}">{% trans "Add Multiple Videos" %}</a> #}
-            {# </li> #}
-            {# <li> #}
-            {#     <a href="{{ team.get_absolute_url }}">← {% trans "Back to Videos" %}</a> #}
-            {# </li> #}
         </ul>
     </div>
 {% endblock %}

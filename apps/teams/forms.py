@@ -371,9 +371,10 @@ class CreateTaskForm(ErrorableModelForm):
     language = forms.ChoiceField(choices=(), required=False)
     assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
-    def __init__(self, team, team_video, *args, **kwargs):
+    def __init__(self, user, team, team_video, *args, **kwargs):
         super(CreateTaskForm, self).__init__(*args, **kwargs)
 
+        self.user = user
         self.team_video = team_video
 
         team_user_ids = team.members.values_list('user', flat=True)
@@ -439,9 +440,11 @@ class CreateTaskForm(ErrorableModelForm):
             self.add_error(_(u"There is already a task in progress for that video/language."))
 
         if assignee:
-            if not can_assign_tasks(team, project, lang):
-                self.add_error(_(u"You are not allowed to assign this task."),
-                               'assignee', cd)
+            # TODO
+            # if not can_assign_tasks(team, self.user, project, lang):
+            #     self.add_error(_(u"You are not allowed to assign this task."),
+            #                    'assignee', cd)
+            pass
 
         type_name = Task.TYPE_NAMES[type]
 

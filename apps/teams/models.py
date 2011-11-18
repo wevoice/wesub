@@ -1217,29 +1217,19 @@ class Workflow(models.Model):
     def get_specific_target(self):
         return self.team_video or self.project or self.team
 
+
     def __unicode__(self):
         return u'Workflow for %s' % self.get_specific_target()
 
 
     # Convenience functions for checking if a step of the workflow is enabled.
-    def _step_enabled(self, step):
-        return step != Workflow.PERM_IDS['Disabled']
-
-    @property
-    def subtitle_enabled(self):
-        return self._step_enabled(self.perm_subtitle)
-
-    @property
-    def translate_enabled(self):
-        return self._step_enabled(self.perm_translate)
-
     @property
     def review_enabled(self):
-        return self._step_enabled(self.perm_review)
+        return True if self.review_allowed else False
 
     @property
     def approve_enabled(self):
-        return self._step_enabled(self.perm_approve)
+        return True if self.approve_allowed else False
 
 
     def to_dict(self):

@@ -246,6 +246,7 @@ var TasksPanel = AsyncPanel.$extend({
     onTasksLanguagesListLoaded: function(data) {
         this.languagesList = new TasksLanguagesList(data, this);
         $('#tasks_language_filter', this.el).append(this.languagesList.el);
+        $('#id_task_language').chosen();
     },
 
     getFilters: function() {
@@ -262,6 +263,5 @@ var TasksPanel = AsyncPanel.$extend({
 function bootstrap() {
     var panel = new TasksPanel();
     $('.panel-holder').append(panel.el);
-    panel.el.show();
 }
 bootstrap();

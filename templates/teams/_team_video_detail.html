@@ -1,6 +1,6 @@
-{% load i18n teams_tags %}
+{% load i18n teams_tags to_json %}
 
-<li>
+<li class="team_video_listing_{{ search_record.team_video_pk }}">
   <h3>
     <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.title|truncatewords:9 }}</a>
     {% if search_record.project_name != "_root" %}
@@ -48,13 +48,25 @@
     </ul>
   {% endif %}
 
-  <script type="text/javascript">
-      $('a.team_video_{{ search_record.team_video_pk }}').click(function(){
-          unisubs.api.openUnisubsDialogOnsite(
-              '{{search_record.video_id}}',
-              '{{search_record.video_url}}',
-              GLOBAL_WIDGET_SETTINGS);
-          return false;
-      });
-  </script>
+    <script type="text/javascript">
+        $('a.team_video_{{ search_record.team_video_pk }}').click(function(){
+            unisubs.api.openUnisubsDialogOnsite(
+                  '{{search_record.video_id}}',
+                  '{{search_record.video_url}}',
+                  GLOBAL_WIDGET_SETTINGS
+            );
+
+            return false;
+        });
+
+        if (VIDEO_LANGS) {
+            {% with search_record.video_completed_langs as langs %}
+                {% if langs %}
+                    VIDEO_LANGS[{{ search_record.team_video_pk }}] = {{ search_record.video_completed_langs|to_json|safe }};
+                {% else %}
+                    VIDEO_LANGS[{{ search_record.team_video_pk }}] = [];
+                {% endif %}
+            {% endwith %}
+        }
+</script>
 </li>

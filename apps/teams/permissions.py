@@ -25,7 +25,8 @@ from teams.permissions_const import (
     CREATE_TASKS_PERM, ASSIGN_TASKS_PERM, ADD_VIDEOS_PERM,
     EDIT_VIDEO_SETTINGS_PERM, MESSAGE_ALL_MEMBERS_PERM, ACCEPT_ASSIGNMENT_PERM,
     PERFORM_MANAGER_REVIEW_PERM, PERFORM_PEER_REVIEW_PERM, EDIT_SUBS_PERM,
-    RULES, ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN
+    RULES, ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN, ROLE_MANAGER,
+    ROLE_OUTSIDER
 )
 
 from teams.models import MembershipNarrowing, Team, Workflow
@@ -81,6 +82,14 @@ def can_change_team_settings(team, user, project=None, lang=None, role=None) :
 def _perms_equal_or_lower(role):
     return ROLES_ORDER[ROLES_ORDER.index(role):]
 
+def _perms_equal_or_greater(role, include_outsiders=False):
+    roles = ROLES_ORDER
+
+    if include_outsiders:
+        roles = roles + [ROLE_OUTSIDER]
+
+    return roles[:roles.index(role) + 1]
+
 def roles_assignable_to(team, user, project=None, lang=None):
     roles_for_user = set([x.role for x in team.members.filter(user=user)])
     higer_role = ROLES_ORDER[max([ROLES_ORDER.index(x) for x in roles_for_user ])]
@@ -93,6 +102,9 @@ def can_assign_roles(team, user, project=None, lang=None,  role=None):
     (team or project or lang), but also that he can only assign 'lesser'
     roles than his own.
     """
+    if not user.is_authenticated():
+        return False
+
     member = team.members.get(user=user)
     # only owner can assing owner role!
     if member.role == ROLE_OWNER:
@@ -149,6 +161,9 @@ def can_edit_project(team, user, project, lang=None):
     
 def can_view_settings_tab(team, user):
     return team.members.filter(user=user,role__in =[ROLE_ADMIN, ROLE_OWNER]).exists()
+
+def can_view_tasks_tab(team, user):
+    return team.members.filter(user=user).exists()
     
 def model_has_permission(member, perm_name, model):
     return perm_name in _perms_for(member.role, model)
@@ -210,16 +225,59 @@ def list_narrowings(team, user, models, lists=False):
 
 # Task creation checks
 def _user_can_create_task_subtitle(user, team_video):
-    return True
+    role = team_video.team.members.get(user=user).role
+
+    role_req = {
+        10: ROLE_CONTRIBUTOR,
+        20: ROLE_MANAGER,
+        30: ROLE_ADMIN,
+    }[team_video.team.task_assign_policy]
+
+    return role in _perms_equal_or_greater(role_req)
 
 def _user_can_create_task_translate(user, team_video):
-    return True
+    role = team_video.team.members.get(user=user).role
+
+    role_req = {
+        10: ROLE_CONTRIBUTOR,
+        20: ROLE_MANAGER,
+        30: ROLE_ADMIN,
+    }[team_video.team.task_assign_policy]
+
+    return role in _perms_equal_or_greater(role_req)
 
 def _user_can_create_task_review(user, team_video):
-    return True
+    workflow = Workflow.get_for_team_video(team_video)
+
+    if not workflow.review_enabled:
+        # TODO: Allow users to create on-the-fly review tasks even if reviewing
+        #       is not enabled in the workflow?
+        return False
+
+    role = team_video.team.members.get(user=user).role
+
+    role_req = {
+        10: ROLE_CONTRIBUTOR,
+        20: ROLE_MANAGER,
+        30: ROLE_ADMIN,
+    }[workflow.review_allowed]
+
+    return role in _perms_equal_or_greater(role_req)
 
 def _user_can_create_task_approve(user, team_video):
-    return True
+    workflow = Workflow.get_for_team_video(team_video)
+
+    if not workflow.approve_enabled:
+        return False
+
+    role = team_video.team.members.get(user=user).role
+
+    role_req = {
+        10: ROLE_MANAGER,
+        20: ROLE_ADMIN,
+    }[workflow.approve_allowed]
+
+    return role in _perms_equal_or_greater(role_req)
 
 
 def can_create_task_subtitle(team_video, user=None):

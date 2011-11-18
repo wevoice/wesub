@@ -50,7 +50,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from teams.permissions import (
     can_add_video, can_assign_roles, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
-    can_create_task_approve
+    can_create_task_approve, can_view_tasks_tab
 )
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -154,6 +154,16 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
                 'languages': languages
             })
         return render_to_response("teams/detail-debug.html", extra_context, RequestContext(request))
+
+    all_langs = set()
+    for search_record in mqs:
+        if search_record.video_completed_langs:
+            all_langs.update(search_record.video_completed_langs)
+
+    language_choices = [(code, name) for code, name in get_languages_list()
+                        if code in all_langs]
+
+    extra_context['language_choices'] = language_choices
 
     return object_list(request, queryset=mqs, 
                        paginate_by=VIDEOS_ON_PAGE, 
@@ -346,7 +356,7 @@ def team_settings(request, slug):
 def team_tasks(request, slug):
     team = Team.get(slug, request.user)
 
-    if not can_view_settings_tab(team, request.user):
+    if not can_view_tasks_tab(team, request.user):
         return HttpResponseForbidden("You cannot view this team")
 
     member = team.members.get(user=request.user)
@@ -745,7 +755,7 @@ def create_task(request, slug, team_video_pk):
     can_assign = can_assign_tasks(team, request.user, team_video.project)
 
     if request.POST:
-        form = CreateTaskForm(team, team_video, request.POST)
+        form = CreateTaskForm(request.user, team, team_video, request.POST)
 
         if form.is_valid():
             task = form.save(commit=False)
@@ -762,7 +772,7 @@ def create_task(request, slug, team_video_pk):
             return HttpResponseRedirect(reverse('teams:team_tasks', args=[],
                                                 kwargs={'slug': team.slug}))
     else:
-        form = CreateTaskForm(team, team_video)
+        form = CreateTaskForm(request.user, team, team_video)
 
     subtitlable = json.dumps(can_create_task_subtitle(team_video, request.user))
     translatable_languages = json.dumps(can_create_task_translate(team_video, request.user))

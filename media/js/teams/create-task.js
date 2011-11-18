@@ -61,6 +61,14 @@ $(function() {
             return false;
         }
     });
+    var nothing_enabled = _.all(typeSelector.find('option').get(), function(el) {
+        return !!$(el).attr('disabled');
+    });
+    if (nothing_enabled) {
+        typeSelector.hide();
+        $('.submit').hide();
+        $('.cannot-create').show();
+    }
 
     // Chosenify select elements
     $(".chosen select").chosen();
