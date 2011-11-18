@@ -21,7 +21,7 @@
 
         $(function() {
             $("select", ".controls").chosen();
-            $("select#lang-filter", ".filters").change(function(e) {
+            $("select#lang-filter", ".controls").change(function(e) {
                 var select = $("select#lang-filter", ".controls");
                 var lang = select.val();
 
@@ -91,8 +91,10 @@
             <h4>Refine</h4>
             <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
             <select name="lang-filter" id="lang-filter">
-                <option value="all">All languages</option>
-                <option value="en">English</option>
+                <option value="">All languages</option>
+                {% for code, name in language_choices %}
+                    <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
             </select>
         </div>
         {% include "teams/_actions.html" %}
