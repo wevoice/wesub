@@ -156,7 +156,7 @@ var ProjectSelectionButton = Class.$extend({
 
     }
 });
-var ProjectPanel  = AsyncPanel.$extend({
+var ProjectPanel = AsyncPanel.$extend({
     __init__: function(){
         this.onProjectListLoaded = _.bind(this.onProjectListLoaded, this);
         this.onNewProjectClicked = _.bind(this.onNewProjectClicked, this);
@@ -575,7 +575,7 @@ var TabViewer = Class.$extend({
             var item = new TabMenuItem(x);
             $(menuContainer).append(item.el);
             return item;
-        })
+        });
 
         $(menuContainer).click(_.bind(this.onClick, this));
         this.panelContainer = panelContainer;
