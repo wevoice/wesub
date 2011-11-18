@@ -37,18 +37,9 @@
 
         {% if team|can_invite_to_team:user %}
             <div class="tools">
-                <ul class="filters">
-                    <li>
-                        <select name="lang-filter" id="lang-filter">
-                            <option value="all">All languages</option>
-                            <option value="en">English</option>
-                        </select>
-                    </li>
-                </ul>
                 <a href="{% url teams:invite_members slug=team.slug %}" class="button">Invite Members</a>
             </div>
         {% endif %}
-        {% if is_paginated %}{% paginator %}{% endif %}
         <ul class="members listing">
             {% for member in team_member_list %}
             {% with member.pk as mpk%}
@@ -81,9 +72,11 @@
                     </li>
                 </ul>
                   <ul class="admin-controls">
+                    {% comment %}
                     <li>
                       <input type="checkbox"/>
                     </li>
+                    {% endcomment %}
                     {% if member in assignable_roles%}
                       <li>
                         <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" >Edit</a>
@@ -98,8 +91,15 @@
     </div>
 
     <div class="controls grid_3 omega">
-        <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
         {% include "teams/_filters_members.html" %}
+        <div class="refine">
+            <h4>Refine</h4>
+            <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
+            <select name="lang-filter" id="lang-filter">
+                <option value="all">All languages</option>
+                <option value="en">English</option>
+            </select>
+        </div>
         {% include "teams/_actions.html" %}
     </div>
 

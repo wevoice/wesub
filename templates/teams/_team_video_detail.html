@@ -13,7 +13,7 @@
       {{ search_record.description|truncatewords:20|urlize }}.
     {% endif %}
   </p>
-  <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}" class="thumb"><img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail"></a>
+  <a href="{% url videos:video video_id=search_record.video_id %}" class="thumb"><img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail"></a>
   <ul class="actions">
       <li>
           <h4>
@@ -31,9 +31,11 @@
 
   {% if can_edit_video %}
     <ul class="admin-controls">
+      {% comment %}
       <li>
         <input type="checkbox"/>
       </li>
+      {% endcomment %}
       <li>
         <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}">Edit</a>
       </li>

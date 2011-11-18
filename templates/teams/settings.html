@@ -235,15 +235,11 @@ This is needed, since it's for the js templating
             <div class="grid_4 alpha messages">
                 <fieldset>
                     <legend>Team Management</legend>
-
                     <label for="id_membership_policy">How can users join your team?</label>
                     {% endverbatim %}{{ permissions_form.membership_policy }}{% verbatim %}
 
                     <label for="id_video_policy">Who can add/remove videos?</label>
                     {% endverbatim %}{{ permissions_form.video_policy }}{% verbatim %}
-
-                    <label for="id_task_assign_policy">Who can assign tasks?</label>
-                    {% endverbatim %}{{ permissions_form.task_assign_policy }}{% verbatim %}
 
                 </fieldset>
                 <fieldset>
@@ -261,6 +257,12 @@ This is needed, since it's for the js templating
                 </fieldset>
             </div>
             <div class="grid_4 omega guidelines">
+                <fieldset>
+                    <legend>Tasks</legend>
+                    <p class="notation">Team members with assignment privileges can only assign tasks they can themselves complete.</p>
+                    <label for="id_task_assign_policy">Who can assign tasks?</label>
+                    {% endverbatim %}{{ permissions_form.task_assign_policy }}{% verbatim %}
+                </fieldset>
                 <fieldset>
                     <legend>Workflows</legend>
                     <p class="notation">Add moderation steps and automate tasks</p>

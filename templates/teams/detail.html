@@ -19,7 +19,7 @@
         var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
 
         $(document).ready(function(){
-            jQuery("select", ".filters").chosen();
+            jQuery("select", ".controls").chosen();
 
             jQuery(":checkbox", ".admin-controls").bind('change', function(){
                 var menu = jQuery(this).parents('.admin-controls');
@@ -46,14 +46,6 @@
     <div class="view grid_9 alpha">
         {% if team|can_add_video_to_team:user %}
             <div class="tools">
-                <ul class="filters">
-                    <li>
-                        <select name="lang-filter" id="lang-filter">
-                            <option value="all">All languages</option>
-                            <option value="en">English</option>
-                        </select>
-                    </li>
-                </ul>
                 <a href="{% url teams:add_video team.slug %}" class="button">{% trans "Add Videos" %}</a>
             </div>
         {% endif %}
@@ -75,8 +67,15 @@
     </div>
 
     <div class="controls grid_3 omega">
-        <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
         {% include "teams/_filters_videos.html" %}
+        <div class="refine">
+            <h4>Refine</h4>
+            <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
+            <select name="lang-filter" id="lang-filter">
+                <option value="all">All languages</option>
+                <option value="en">English</option>
+            </select>
+        </div>
         {% include "teams/_actions.html" %}
     </div>
 
