@@ -160,9 +160,15 @@ def can_edit_project(team, user, project, lang=None):
     pass
     
 def can_view_settings_tab(team, user):
+    if not user.is_authenticated():
+        return False
+
     return team.members.filter(user=user,role__in =[ROLE_ADMIN, ROLE_OWNER]).exists()
 
 def can_view_tasks_tab(team, user):
+    if not user.is_authenticated():
+        return False
+
     return team.members.filter(user=user).exists()
     
 def model_has_permission(member, perm_name, model):
