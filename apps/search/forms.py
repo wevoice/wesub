@@ -105,7 +105,7 @@ class SearchForm(forms.Form):
         clean_query = qs.query.clean(q)
         qs = qs.auto_query(q)
         if clean_query:
-            qs = qs.filter_or(title=clean_query)
+            qs = qs.filter_or(title=clean_query).filter(is_public=True)
         return qs
     
     def search_qs(self, qs):
