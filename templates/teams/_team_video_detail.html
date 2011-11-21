@@ -43,7 +43,11 @@
           <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}">New Task</a>
       </li>
       <li>
-        <a href="">Remove</a>
+          <form action="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" method="post" style="display: none;">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}" />
+          </form>
+          <a class="remove-video" href="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}">Remove</a>
       </li>
     </ul>
   {% endif %}

@@ -48,6 +48,16 @@
                     menu.removeClass('selected');
                 }
             });
+
+            $('.remove-video').click(function(e) {
+                e.preventDefault();
+
+                resp = confirm('Are you sure you want to delete this team video?');
+                if (resp) {
+                    $(this).siblings('form').submit();
+                }
+                return false;
+            });
         });
     </script>
 {% endblock %}

@@ -518,23 +518,42 @@ def team_video(request, team_video_pk):
     return context
 
 @render_to_json
-@login_required    
+@login_required
 def remove_video(request, team_video_pk):
     team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
 
-    #TODO: check if this should be on a project levl
+    if not request.POST:
+        error = _(u'Request must be a POST request.')
+
+        if request.is_ajax():
+            return { 'success': False, 'error': error }
+        else:
+            messages.error(request, error)
+            return HttpResponseRedirect(reverse('teams:user_teams'))
+
+    next = request.POST.get('next', reverse('teams:user_teams'))
+
+    # TODO: check if this should be on a project level
     if not can_add_video(team_video.team, request.user):
-        return {
-            'success': False,
-            'error': ugettext('You can\'t remove video')
-        }
-    
+        error = _(u'You can\'t remove that video.')
+
+        if request.is_ajax():
+            return { 'success': False, 'error': error }
+        else:
+            messages.error(request, error)
+            return HttpResponseRedirect(next)
+
+    for task in team_video.task_set.all():
+        task.delete()
+
     team_video.delete()
-    return {
-        'success': True
-    }        
-    
-        
+
+    if request.is_ajax():
+        return { 'success': True }
+    else:
+        return HttpResponseRedirect(next)
+
+
 @render_to_json
 @login_required
 def remove_member(request, slug, user_pk):
