@@ -47,9 +47,11 @@
             <li class="current">
                 <a href="{% url teams:add_video slug=team.slug %}">{% trans "Add a Video" %}</a>
             </li>
+            {% comment %}
             <li>
                 <a href="{% url teams:add_videos slug=team.slug %}">{% trans "Add Multiple Videos" %}</a>
             </li>
+            {% endcomment %}
             <li>
                 <a href="{{ team.get_absolute_url }}">← {% trans "Back to Videos" %}</a>
             </li>
