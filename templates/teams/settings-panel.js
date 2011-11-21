@@ -1,4 +1,4 @@
-var ACTIVE_CLASS  =- "current";
+var ACTIVE_CLASS  = "current";
 
 var CONTAINER_SELECTOR = ".panel-holder";
 
@@ -585,6 +585,7 @@ var TabViewer = Class.$extend({
     },
     onClick: function(e){
         e.preventDefault();
+
         var scope = this;
         if (this.currentItem){
             this.currentItem.showPanel(false);
