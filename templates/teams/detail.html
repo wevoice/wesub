@@ -89,7 +89,9 @@
         {% include "teams/_filters_videos.html" %}
         <div class="refine">
             <h4>Refine</h4>
+            {% comment %}
             <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
+            {% endcomment %}
             <select name="lang-filter" id="lang-filter">
                 <option value="">All languages</option>
                 {% for code, name in language_choices %}
