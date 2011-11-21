@@ -238,9 +238,14 @@ var TasksPanel = AsyncPanel.$extend({
     },
 
     onTasksListLoaded: function(data) {
-        this.tasks = _.map(data, function(t) {
+        this.tasks = _.map(data['tasks'], function(t) {
             return new TaskListItem(new TaskModel(t), this);
         }, this);
+
+        _.each(data['counts'], function(val, key) {
+            $('.types li a span.' + key).text(val);
+        });
+
         this.renderTasksList();
     },
     onTasksLanguagesListLoaded: function(data) {
