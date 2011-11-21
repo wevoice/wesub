@@ -477,15 +477,8 @@ class TaskAssignForm(forms.Form):
         self.fields['assignee'].queryset = User.objects.filter(user__team=team)
 
 
-    def clean_task(self):
-        task = self.cleaned_data['task']
-
-        # TODO: check that self.user has permission to assign the task
-
-        return task
-
     def clean(self):
-        if not self.member.can_assign_tasks():
+        if not can_assign_tasks(self.team, self.member.user):
             raise forms.ValidationError(_(
                 u'You do not have permission to assign this task.'))
 

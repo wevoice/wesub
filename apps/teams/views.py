@@ -751,7 +751,7 @@ def team_tasks(request, slug):
     return {
         'team': team,
         'user_can_delete_tasks': member.can_delete_tasks(),
-        'user_can_assign_tasks': member.can_assign_tasks(),
+        'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
     }
 

@@ -561,7 +561,7 @@ var TabMenuItem = Class.$extend({
         if (shows){
             $(this.panelEl).show();
             if(this.klass){
-                return  new this.klass();
+                return new this.klass();
             }
         }else{
             $(this.panelEl).hide();
