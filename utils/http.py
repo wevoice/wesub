@@ -8,6 +8,6 @@ def url_exists(url):
     """
 
     h = httplib2.Http()
-    resp, content = h.request(url)
+    resp, content = h.request(url, method="HEAD")
     h.follow_all_redirects = True
     return 200<= resp.status <400
