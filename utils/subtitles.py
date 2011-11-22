@@ -51,12 +51,14 @@ def is_version_same(version, parser):
             
     return True
 
-def save_subtitle(video, language, parser, user=None, update_video=True, forks=True):
+def save_subtitle(video, language, parser, user=None, update_video=True,
+                  forks=True, as_forked=True, translated_from=None):
     from videos.models import SubtitleVersion, Subtitle, SubtitleMetadata
     from videos.tasks import video_changed_tasks
 
     key = str(uuid4()).replace('-', '')
-
+    if language.is_original:
+        as_forked = True
     video._make_writelock(user, key)
     video.save()
     
@@ -71,13 +73,16 @@ def save_subtitle(video, language, parser, user=None, update_video=True, forks=T
         version = SubtitleVersion(
             language=language, version_no=version_no,
             datetime_started=datetime.now(), user=user,
-            note=u'Uploaded', is_forked=True, time_change=1, text_change=1)
+            note=u'Uploaded', is_forked=as_forked, time_change=1, text_change=1)
+        if len(parser) > 0:
+            version.has_version = True
         version.save()
 
         ids = []
 
         for i, item in enumerate(parser):
             id = int(random.random()*10e12)
+                
             while id in ids:
                 id = int(random.random()*10e12)
             ids.append(id)
@@ -99,6 +104,9 @@ def save_subtitle(video, language, parser, user=None, update_video=True, forks=T
                         content=value
                     ).save()
     version = version or old_version
+    if version.is_forked != as_forked:
+        version.is_forked = as_forked
+        version.save()
     if version.user != user:
         # we might be only uptading the user , as in per bulk imports
         version.user = user
