@@ -15,7 +15,7 @@ var AsyncPanel = Class.$extend({
         $(this.el).innerHTML(icanhaz.IMAGE_PRELOADER);
         $.ajax(url, {
             success: function(res){
-                $(this.el).innerHTML(oldEl)
+                $(this.el).innerHTML(oldEl);
                 this.onLoadDone(res);
             }
         });
@@ -34,7 +34,7 @@ var BaseModel = Class.$extend({
     },
     update: function(data, filters){
         if (!data){
-            return
+            return;
         }
         _.each(_.keys(data), function(key){
             this[key] = filters && filters[key]? 
@@ -45,9 +45,9 @@ var BaseModel = Class.$extend({
     isNew: function(){
         return ! _.isNumber(this.pk);
     },
-    delete: function(){
+    'delete': function() {
         delete this['pk'];
-        this.isDeleted=true
+        this.isDeleted=true;
     },
     toObject: function(){
         var data = {};

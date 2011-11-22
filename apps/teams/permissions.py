@@ -118,14 +118,6 @@ def can_assign_roles(team, user, project=None, lang=None,  role=None):
     return False
 
 
-@_check_perms(CREATE_TASKS_PERM)
-def can_create_tasks(team, user, project=None):
-    pass
-
-@_check_perms(ASSIGN_TASKS_PERM)
-def can_assign_tasks(team, user, project=None, lang=None):
-    pass
-
 def can_add_video(team, user, project=None, lang=None):
     if not team.video_policy :
         return True
@@ -229,7 +221,25 @@ def list_narrowings(team, user, models, lists=False):
     
 
 
-# Task creation checks
+# Tasks
+@_check_perms(CREATE_TASKS_PERM)
+def can_create_tasks(team, user, project=None):
+    # for now, use the same logic as assignment
+    return can_assign_tasks(team, user, project)
+
+@_check_perms(ASSIGN_TASKS_PERM)
+def can_assign_tasks(team, user, project=None, lang=None):
+    role = team.members.get(user=user).role
+
+    role_required = {
+        10: ROLE_CONTRIBUTOR,
+        20: ROLE_MANAGER,
+        30: ROLE_ADMIN,
+    }[team.task_assign_policy]
+
+    return role in _perms_equal_or_greater(role_required)
+
+
 def _user_can_create_task_subtitle(user, team_video):
     role = team_video.team.members.get(user=user).role
 

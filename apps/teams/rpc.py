@@ -276,6 +276,16 @@ class TeamsApiV2Class(object):
                 for l in languages]
 
 
+    def _task_category_counts(self, team):
+        # Realize the queryset here to avoid five separate DB calls.
+        tasks = list(team.task_set.incomplete())
+        counts = {'all': len(tasks)}
+        for type in ['Subtitle', 'Translate', 'Review', 'Approve']:
+            counts[type.lower()] = len([t for t in tasks
+                                        if t.type == Task.TYPE_IDS[type]])
+        return counts
+
+
     def tasks_list(self, team_slug, filters, user):
         '''List tasks for the given team, optionally filtered.
 
@@ -315,7 +325,8 @@ class TeamsApiV2Class(object):
         real_tasks = [t.to_dict(user) for t in real_tasks]
         ghost_tasks = _ghost_tasks(team, tasks, filters, member)
 
-        return real_tasks + ghost_tasks
+        return { 'counts': self._task_category_counts(team),
+                 'tasks': real_tasks + ghost_tasks, }
 
 
     def task_assign(self, task_id, assignee_id, user):

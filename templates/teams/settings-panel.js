@@ -1,4 +1,4 @@
-var ACTIVE_CLASS  =- "current";
+var ACTIVE_CLASS  = "current";
 
 var CONTAINER_SELECTOR = ".panel-holder";
 
@@ -156,7 +156,7 @@ var ProjectSelectionButton = Class.$extend({
 
     }
 });
-var ProjectPanel  = AsyncPanel.$extend({
+var ProjectPanel = AsyncPanel.$extend({
     __init__: function(){
         this.onProjectListLoaded = _.bind(this.onProjectListLoaded, this);
         this.onNewProjectClicked = _.bind(this.onNewProjectClicked, this);
@@ -561,7 +561,7 @@ var TabMenuItem = Class.$extend({
         if (shows){
             $(this.panelEl).show();
             if(this.klass){
-                return  new this.klass();
+                return new this.klass();
             }
         }else{
             $(this.panelEl).hide();
@@ -575,7 +575,7 @@ var TabViewer = Class.$extend({
             var item = new TabMenuItem(x);
             $(menuContainer).append(item.el);
             return item;
-        })
+        });
 
         $(menuContainer).click(_.bind(this.onClick, this));
         this.panelContainer = panelContainer;
@@ -585,6 +585,7 @@ var TabViewer = Class.$extend({
     },
     onClick: function(e){
         e.preventDefault();
+
         var scope = this;
         if (this.currentItem){
             this.currentItem.showPanel(false);
