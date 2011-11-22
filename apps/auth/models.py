@@ -311,7 +311,7 @@ class Awards(models.Model):
                 pass
             
     @classmethod
-    def on_subtitle_version_save(cls, sender, instance, created, **kwargs):
+    def on_subtitle_version_save(cls, sender, instance, created, timestamp=None, **kwargs):
         if not instance.user:
             return
         
