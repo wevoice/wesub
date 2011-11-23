@@ -63,11 +63,13 @@ class Team(models.Model):
     INVITATION_BY_MANAGER = 2
     INVITATION_BY_ALL = 3
     OPEN = 4
+    INVITATION_BY_ADMIN = 5
     MEMBERSHIP_POLICY_CHOICES = (
-        (APPLICATION, _(u'Application')),
-        (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
-        (INVITATION_BY_ALL, _(u'Invitation by any member')),
         (OPEN, _(u'Open')),
+        (APPLICATION, _(u'Application')),
+        (INVITATION_BY_ALL, _(u'Invitation by any team member')),
+        (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
+        (INVITATION_BY_ADMIN, _(u'Invitation by admin')),
     )
     MEMBER_REMOVE = 1
     MANAGER_REMOVE = 2
@@ -197,7 +199,7 @@ class Team(models.Model):
     
     def get_site_url(self):
         return 'http://%s%s' % (Site.objects.get_current().domain, self.get_absolute_url())
-    
+
 
     def _is_role(self, user, role=None):
         if not user.is_authenticated():
@@ -206,14 +208,15 @@ class Team(models.Model):
         if role:
             qs = qs.filter(role=role)
         return qs.exists()
-        
+
+    def is_admin(self, user):
+        return self._is_role(user, TeamMember.ROLE_ADMIN)
+
     def is_manager(self, user):
         return self._is_role(user, TeamMember.ROLE_MANAGER)
 
     def is_member(self, user):
         return self._is_role(user)
-    
-    
 
     def is_contributor(self, user, authenticated=True):
         """
@@ -248,9 +251,12 @@ class Team(models.Model):
         return self.is_member(user)
 
     def can_invite(self, user):
-        if self.membership_policy == self.INVITATION_BY_MANAGER:
+        if self.membership_policy == self.INVITATION_BY_ADMIN:
+            return self.is_admin(user)
+
+        elif self.membership_policy == self.INVITATION_BY_MANAGER:
             return self.is_manager(user)
-        
+
         return self.is_member(user)
 
 
@@ -308,7 +314,6 @@ class Team(models.Model):
             return reduce(lambda x, y: x | y, sq_list)
 
     def _filter(self, sqs, sq_list):
-        from haystack.query import SQ
         sq_expression = self._sq_expression(sq_list)
         return None if (sq_expression is None) else sqs.filter(sq_expression)
 
@@ -912,19 +917,12 @@ class TeamMember(models.Model):
         # return self.role in ('Admin', 'Owner')
         return self.role == 'manager'
 
-        
-        
-    def save(self, *args, **kwargs):
-        creating = self.pk is None
-        super(TeamMember, self).save(*args, **kwargs)
-        if creating:
-            MembershipNarrowing.objects.create_for_member(self)
-            
+
     class Meta:
         unique_together = (('team', 'user'),)
 
-class MembershipNarrowingManager(models.Manager):
 
+class MembershipNarrowingManager(models.Manager):
     def get_for_team(self, team, user):
         return self.filter(membership__id_in=[x.id for x in team.members.filter(user=user)])
         
@@ -937,20 +935,14 @@ class MembershipNarrowingManager(models.Manager):
     def get_for_langs(self, member):
         return self.for_type(TeamVideoLanguage).filter(member=member)
 
-    def create_for_member(self, member):
-        return MembershipNarrowing.objects.get_or_create(
-            content_type = ContentType.objects.get_for_model(member.team),
-            object_pk = member.pk,
-            member = member,
-            added_by=None)[0]
         
-    def create(self, member, narrowing, added_by):
+    def create(self, member, target, added_by):
         return MembershipNarrowing.objects.get_or_create(
-            content_type = ContentType.objects.get_for_model(narrowing),
-            object_pk = narrowing.pk,
+            content_type = ContentType.objects.get_for_model(target),
+            object_pk = target.pk,
             member = member,
             added_by=added_by)[0]
-        
+
 class MembershipNarrowing(models.Model):
     """
     Represent narrowings that can be made on memberships.
@@ -984,10 +976,9 @@ class MembershipNarrowing(models.Model):
         msyql
         """
         if not MembershipNarrowing._cached_allowed_types:
-
             MembershipNarrowing._cached_allowed_types = \
                          [ContentType.objects.get_for_model(m) for m in \
-                          [Team, Project, TeamVideoLanguage]]
+                          (Project, TeamVideoLanguage)]
         return MembershipNarrowing._cached_allowed_types
         
     def __unicode__(self):
@@ -999,7 +990,8 @@ class MembershipNarrowing(models.Model):
             raise ValueError("MembershipNarrowing cannot be assigned to %s, allowed types are %s"
             % (self.content, MembershipNarrowing.allowed_types))
         super(MembershipNarrowing, self).save(*args, **kwargs)   
-        
+
+
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
     user = models.ForeignKey(User, related_name='team_applications')

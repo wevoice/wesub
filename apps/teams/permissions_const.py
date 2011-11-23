@@ -1,23 +1,23 @@
 # Universal Subtitles, universalsubtitles.org
-# 
+#
 # Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 #: All available permissions
-RENAME_TEAM_PERM =  ("rename_team", "Rename team",) 
+RENAME_TEAM_PERM =  ("rename_team", "Rename team",)
 EDIT_TEAM_SETTINGS_PERM = ("edit_team_settings", "Edit team settings",)
 EDIT_PROJECT_SETTINGS_PERM = ("edit_project_settings", "Edit project settings",)
 ASSIGN_ROLE_PERM = ("assign_roles", "Assign Roles",)
@@ -32,57 +32,57 @@ PERFORM_PEER_REVIEW_PERM = ("perform_peer_review", "Perform peer review")
 EDIT_SUBS_PERM = ("edit_subs", "Edit subs")
 
 #: All roles
-ROLE_ADMIN = "admin"
+ROLE_ADMIN = 'admin'
 ROLE_OWNER = 'owner'
 ROLE_MANAGER = 'manager'
 ROLE_CONTRIBUTOR = 'contributor'
 ROLE_OUTSIDER = 'outsider'
 
-#: Permissions that can be assigned to a model    
+#: Permissions that can be assigned to a model
 TEAM_PERMISSIONS = (
     RENAME_TEAM_PERM,
-    EDIT_TEAM_SETTINGS_PERM ,
+    EDIT_TEAM_SETTINGS_PERM,
     EDIT_PROJECT_SETTINGS_PERM,
-    ASSIGN_ROLE_PERM, 
-    ASSIGN_TASKS_PERM ,
+    ASSIGN_ROLE_PERM,
+    ASSIGN_TASKS_PERM,
     CREATE_TASKS_PERM,
-    ADD_VIDEOS_PERM ,
-    EDIT_VIDEO_SETTINGS_PERM ,
-    MESSAGE_ALL_MEMBERS_PERM , 
-    ACCEPT_ASSIGNMENT_PERM , 
-    PERFORM_MANAGER_REVIEW_PERM, 
-    PERFORM_PEER_REVIEW_PERM, 
+    ADD_VIDEOS_PERM,
+    EDIT_VIDEO_SETTINGS_PERM,
+    MESSAGE_ALL_MEMBERS_PERM,
+    ACCEPT_ASSIGNMENT_PERM,
+    PERFORM_MANAGER_REVIEW_PERM,
+    PERFORM_PEER_REVIEW_PERM,
     EDIT_SUBS_PERM,
-)   
+)
 
 PROJECT_PERMISSIONS = (
-    ASSIGN_ROLE_PERM, 
+    ASSIGN_ROLE_PERM,
     ASSIGN_TASKS_PERM ,
     CREATE_TASKS_PERM,
     ADD_VIDEOS_PERM ,
     EDIT_PROJECT_SETTINGS_PERM,
     EDIT_VIDEO_SETTINGS_PERM ,
-    ACCEPT_ASSIGNMENT_PERM , 
-    PERFORM_MANAGER_REVIEW_PERM, 
-    PERFORM_PEER_REVIEW_PERM, 
+    ACCEPT_ASSIGNMENT_PERM ,
+    PERFORM_MANAGER_REVIEW_PERM,
+    PERFORM_PEER_REVIEW_PERM,
     EDIT_SUBS_PERM,
-    MESSAGE_ALL_MEMBERS_PERM , 
+    MESSAGE_ALL_MEMBERS_PERM ,
 )
 
 LANG_PERMISSIONS =  (
     ASSIGN_TASKS_PERM ,
     ADD_VIDEOS_PERM ,
     EDIT_VIDEO_SETTINGS_PERM ,
-    ACCEPT_ASSIGNMENT_PERM , 
-    PERFORM_MANAGER_REVIEW_PERM, 
-    PERFORM_PEER_REVIEW_PERM, 
+    ACCEPT_ASSIGNMENT_PERM ,
+    PERFORM_MANAGER_REVIEW_PERM,
+    PERFORM_PEER_REVIEW_PERM,
     EDIT_SUBS_PERM ,
 )
 
 
 # Rules combine roles and the available permissions
 RULES = {}
-RULES[ROLE_OWNER] = set(TEAM_PERMISSIONS)        
+RULES[ROLE_OWNER] = set(TEAM_PERMISSIONS)
 RULES[ROLE_ADMIN] = set((
     EDIT_TEAM_SETTINGS_PERM,
     EDIT_PROJECT_SETTINGS_PERM ,
@@ -91,7 +91,7 @@ RULES[ROLE_ADMIN] = set((
     CREATE_TASKS_PERM,
     ADD_VIDEOS_PERM ,
     EDIT_VIDEO_SETTINGS_PERM,
-    MESSAGE_ALL_MEMBERS_PERM , 
+    MESSAGE_ALL_MEMBERS_PERM ,
     ACCEPT_ASSIGNMENT_PERM ,
     PERFORM_MANAGER_REVIEW_PERM ,
     PERFORM_PEER_REVIEW_PERM,

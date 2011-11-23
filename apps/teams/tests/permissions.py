@@ -1,55 +1,29 @@
-
-import os
-import json
-
 from django.test import TestCase
-from django.core.urlresolvers import reverse
-from os import path
-
-from django.conf import settings
-from apps.teams.models import Team, Invite, TeamVideo, \
-    Application, TeamMember, TeamVideoLanguage
-from messages.models import Message
-from videos.models import Video, VIDEO_TYPE_YOUTUBE, SubtitleLanguage, Action
-from django.db.models import ObjectDoesNotExist
+from apps.teams.models import Team, TeamVideo, TeamMember
 from auth.models import CustomUser as User
-from django.contrib.contenttypes.models import ContentType
-from apps.teams import tasks
-from widget.rpc import Rpc
-from datetime import datetime, timedelta
-from django.core.management import call_command
-from django.core import mail
-from apps.videos import metadata_manager 
-import re
+from apps.teams.tests.teamstestsutils import refresh_obj
 
-
-
-from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr , rpc
-from apps.teams.models import Team, TeamMember
-
-from apps.teams.permissions import remove_role, add_role, \
-     can_edit_subs_for, can_peer_review, can_manager_review, \
-     can_accept_assignments, can_message_all_members,  \
-     can_change_team_settings, can_change_video_settings, can_add_video, \
-     can_assign_tasks, can_assign_roles, can_change_video_settings, _perms_for, \
-     roles_assignable_to
+from apps.teams.permissions import (
+    remove_role, add_role, can_edit_subs_for, can_peer_review,
+    can_manager_review, can_accept_assignments, can_message_all_members,
+    can_change_team_settings, can_change_video_settings, can_add_video,
+    can_assign_tasks, can_assign_roles, _perms_for, roles_assignable_to
+)
 from apps.teams.permissions_const import *
-from django.core.exceptions import SuspiciousOperation
 
 
 
 class BaseTestPermission(TestCase):
-
-           
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
         self.team  = Team.objects.all()[0]
         self.team.video_policy = Team.MEMBER_ADD
         self.video = self.team.videos.all()[0]
         self.user = User.objects.all()[0]
-        
+
         self.owner, c= TeamMember.objects.get_or_create(
             user= User.objects.all()[2], role=TeamMember.ROLE_OWNER, team=self.team)
+
 
 class TestRules(BaseTestPermission):
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
@@ -61,13 +35,13 @@ class TestRules(BaseTestPermission):
                     funcs_true, funcs_false, project=None, lang=None):
         for func in funcs_true:
             self.assertTrue(func(team, user, project, lang), func.__name__)
-        
+
         for func in funcs_false:
             res = func(team, user, project, lang)
             self.assertFalse(res, func.__name__)
-            
+
     def test_roles_assignable(self):
-        
+
         user = User.objects.filter(teams__isnull=True)[0]
         team = self.team
         member = add_role(self.team, user, self.owner,TeamMember.ROLE_OWNER)
@@ -75,7 +49,7 @@ class TestRules(BaseTestPermission):
             ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
         ])
         remove_role(team, user, TeamMember.ROLE_OWNER)
-        
+
         member = add_role(self.team, user, self.owner, TeamMember.ROLE_ADMIN)
         self.assertItemsEqual(roles_assignable_to(team, user, ROLE_ADMIN), [
              ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
@@ -92,10 +66,10 @@ class TestRules(BaseTestPermission):
         self.assertItemsEqual(roles_assignable_to(team, user, ROLE_CONTRIBUTOR), [
               ROLE_CONTRIBUTOR
         ])
-        
+
     def test_perms_for_manager(self):
         # project
-        print 
+        print
         self.assertItemsEqual(_perms_for(TeamMember.ROLE_MANAGER, Team), (
             ASSIGN_TASKS_PERM[0],
             CREATE_TASKS_PERM[0],
@@ -147,12 +121,12 @@ class TestRules(BaseTestPermission):
                              can_peer_review,
                          ], [],lang=lang)
         return
-        
+
     def test_admin_team_wide(self):
         user = User.objects.filter(teams__isnull=True)[0]
         add_role(self.team, user, self.owner,TeamMember.ROLE_ADMIN)
 
-        
+
         self._test_perms(self.team,
                          user, [
                              can_change_team_settings,
@@ -175,18 +149,17 @@ class TestRules(BaseTestPermission):
                          ], [], project=project)
         team_video = TeamVideo.objects.filter(team=self.team)[0]
         lang = team_video.video.subtitle_language()
-          
 
     def test_manager_for_team(self):
         user = User.objects.filter(teams__isnull=True)[0]
         project = self.team.default_project
         add_role(self.team, user, self.owner,TeamMember.ROLE_MANAGER)
-            
+
         self._test_perms(self.team,
                          user, [
                              can_assign_tasks,
                              can_add_video,
-                             can_change_video_settings, 
+                             can_change_video_settings,
                              can_peer_review,
                              can_manager_review,
                              can_accept_assignments,
@@ -195,12 +168,12 @@ class TestRules(BaseTestPermission):
                              can_assign_roles,
                              can_message_all_members,
                          ])
-        
+
     def test_manager_for_project(self):
         user = User.objects.filter(teams__isnull=True)[0]
         project = self.team.default_project
         add_role(self.team, user, self.owner, TeamMember.ROLE_MANAGER, project )
-            
+
         self._test_perms(self.team,
                          user, [
                              can_assign_tasks,
@@ -234,4 +207,4 @@ class TestRules(BaseTestPermission):
         add_role(self.team, user, self.owner,TeamMember.ROLE_ADMIN, project)
         self.assertTrue(can_assign_roles(self.team, user,  project, role=ROLE_CONTRIBUTOR))
         self.assertFalse(can_assign_roles(self.team, user,   project, role=ROLE_OWNER))
-    
+

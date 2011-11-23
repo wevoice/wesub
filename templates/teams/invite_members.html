@@ -19,17 +19,21 @@
 
     <div class="view grid_9 alpha">
         <form method='post' action="." enctype="multipart/form-data" class="invite-members">
+            {{ form.non_field_errors }}
             <div class="grid_4 alpha">
                 <fieldset>
                     <legend>Invite Existing Users</legend>
-                    <label>Names or Usernames <span class="notation">type for suggestions</span></label>
-                    <input type="text" />
+                    {{ form.errors.usernames }}
+                    <label for="id_usernames">Usernames</label>
+                    {{ form.usernames }}
                 </fieldset>
+
                 <fieldset>
                     <legend>Invite via Email</legend>
 
+                    {{ form.errors.emails }}
                     <label>Email Adresses</label>
-                    <input type="text" />
+                    {{ form.emails }}
                 </fieldset>
             </div>
 
@@ -37,25 +41,21 @@
                 <fieldset>
                     <legend>Invite Details</legend>
 
-                    <label>Message</label>
-                    <textarea></textarea>
+                    {{ form.errors.message }}
+                    <label for="id_message">Message</label>
+                    {{ form.message }}
 
-                    <label>Role</label>
-                    <select>
-                        <option value="">Contributor</option>
-                        <option value="">Manager</option>
-                        <option value="">Admin</option>
-                    </select>
+                    {{ form.errors.role }}
+                    <label for="id_role">Role</label>
+                    {{ form.role }}
                 </fieldset>
             </div>
 
             <div class="grid_9 submit">
                 <button>{% trans 'Send Invites' %}</button>
             </div>
-            {% comment %}
-                TODO: Re-add when we've got a form object...
-                {% csrf_token %}
-            {% endcomment %}
+
+            {% csrf_token %}
         </form>
     </div>
     <div class="controls grid_3 omega">
