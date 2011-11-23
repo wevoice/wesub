@@ -22,7 +22,6 @@ class InternalOnlyBackend(object):
         return [x for x in addresses if x in self.white_listed_addresses]
         
     def send_messages(self, email_messages):
-        import pdb;pdb.set_trace()
         self.file_backend.send_messages(email_messages)
         for message in email_messages:
             message.to = self.get_whitelisted(message.to)
