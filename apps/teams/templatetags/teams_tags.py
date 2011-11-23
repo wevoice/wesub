@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,14 +16,8 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
 from django import template
-from teams.models import Team, Invite, TeamVideo, Project, TeamMember
+from teams.models import Team, TeamVideo, Project, TeamMember
 from videos.models import Action, Video
 from apps.widget import video_cache
 from django.conf import settings
@@ -31,15 +25,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.utils.http import urlquote
 from widget.views import base_widget_params
-from django.utils import simplejson as json
-from django.utils.http import urlquote
 
 from templatetag_sugar.register import tag
-from templatetag_sugar.parser import Name, Variable, Constant, Optional, Model
+from templatetag_sugar.parser import Name, Variable, Constant
 
-from apps.teams.permissions import list_narrowings
-from apps.teams.permissions import can_view_settings_tab as _can_view_settings_tab, roles_assignable_to
-from apps.teams.permissions import can_assign_roles as _can_assign_roles
+from apps.teams.permissions import get_narrowing_dict
+from apps.teams.permissions import can_view_settings_tab as _can_view_settings_tab
+from apps.teams.permissions import roles_user_can_assign
 
 DEV_OR_STAGING = getattr(settings, 'DEV', False) or getattr(settings, 'STAGING', False)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 10)
@@ -230,8 +222,8 @@ def team_projects(context, team, varname):
     
 @tag(register, [Variable(), Constant("as"), Name()])
 def member_projects(context, member, varname):
-    narrowings = list_narrowings(member.team, member.user, [Project])
-    context[varname]   = narrowings['Project']
+    narrowings = get_narrowing_dict(member.team, member.user, [Project])
+    context[varname] = [n.content for n in narrowings['Project']]
     return ""
 
     
@@ -246,7 +238,7 @@ def can_assign_roles(team, user, project=None):
            edit roles
            {% endif %}
     """
-    return _can_assign_roles(team, user, project)
+    return roles_user_can_assign(team, user)
     
 @register.filter
 def has_applicant(team, user):
@@ -283,8 +275,8 @@ def members(team, countOnly=False):
         qs = qs.count()
     return qs
 
-@register.filter    
+@register.filter
 def get_assignable_roles(team, user):
-    roles =  roles_assignable_to(team, user)
+    roles = roles_user_can_assign(team, user)
     verbose_roles = [x for x in TeamMember.ROLES if x[0] in roles]
     return verbose_roles

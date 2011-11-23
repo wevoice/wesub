@@ -1,24 +1,27 @@
 # Universal Subtitles, universalsubtitles.org
-# 
+#
 # Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import  wraps
 from utils.translation import SUPPORTED_LANGUAGES_DICT
+from teams.models import (
+    MembershipNarrowing, Workflow, TeamMember, Project, TeamVideoLanguage
+)
 
 from teams.permissions_const import (
     EDIT_TEAM_SETTINGS_PERM, EDIT_PROJECT_SETTINGS_PERM, ASSIGN_ROLE_PERM,
@@ -29,60 +32,50 @@ from teams.permissions_const import (
     ROLE_OUTSIDER
 )
 
-from teams.models import MembershipNarrowing, Team, Workflow
 
-def can_rename_team(team, user):
-    return team.is_owner(user)
-
-    
 def _passes_test(team, user, project, lang, perm_name):
     if isinstance(perm_name, tuple):
         perm_name = perm_name[0]
+
     member = team.members.get(user=user)
-    if member.role == ROLE_OWNER:
+    role = get_role_for_target(user, team, project, lang)
+
+    if role == ROLE_OWNER:
         # short circuit logic for onwers, as they can do anything
         return True
-    # first we check if this role has (withouth narrowning)
-    # the permission asked. E.g. contributor cannot rename
-    # a team
 
     for model in [x for x in (team, project, lang) if x]:
         if model_has_permission(member, perm_name, model) is False:
-            continue 
+            continue
 
-        if MembershipNarrowing.objects.for_type(model).filter(member=member).exists():
-            return True
-    
+
 def _check_perms( perm_name,):
     def wrapper(func):
         def wrapped(team, user, project=None, lang=None, video=None):
             return _passes_test(team, user, project, lang, perm_name)
         return wraps(func)(wrapped)
     return wrapper
-            
-def _is_owner(func):
-    def wrapper(team, user, *args, **kwargs):
-        if team.members.filter(
-            user=user,
-            role = ROLE_OWNER).exists():
-            return True
-        return func(team, user, *args, **kwargs)
-    return wraps(func)(wrapper)
-        
-def _owner(team, user):
-    from teams.models import TeamMember
-    return  team.members.filter(
-        user=user,
-        role = TeamMember.ROLE_OWNER).exists()
 
-@_check_perms(EDIT_TEAM_SETTINGS_PERM)
-def can_change_team_settings(team, user, project=None, lang=None, role=None) :
-    return False    
 
-def _perms_equal_or_lower(role):
-    return ROLES_ORDER[ROLES_ORDER.index(role):]
+def _perms_equal_or_lower(role, include_outsiders=False):
+    """Return a list of roles equal to or less powerful than the given role.
+
+    If `include_outsiders` is given ROLE_OUTSIDER may be included.
+
+    """
+    roles = ROLES_ORDER
+
+    if include_outsiders:
+        roles = roles + [ROLE_OUTSIDER]
+
+    return roles[roles.index(role):]
 
 def _perms_equal_or_greater(role, include_outsiders=False):
+    """Return a list of roles equal to or more powerful than the given role.
+
+    If `include_outsiders` is given ROLE_OUTSIDER may be included.
+
+    """
     roles = ROLES_ORDER
 
     if include_outsiders:
@@ -90,36 +83,172 @@ def _perms_equal_or_greater(role, include_outsiders=False):
 
     return roles[:roles.index(role) + 1]
 
-def roles_assignable_to(team, user, project=None, lang=None):
-    roles_for_user = set([x.role for x in team.members.filter(user=user)])
-    higer_role = ROLES_ORDER[max([ROLES_ORDER.index(x) for x in roles_for_user ])]
-        
-    return _perms_equal_or_lower(higer_role)
-    
-def can_assign_roles(team, user, project=None, lang=None,  role=None):
-    """
-    Checks if the user can generally assing roles for that model
-    (team or project or lang), but also that he can only assign 'lesser'
-    roles than his own.
-    """
-    if not user.is_authenticated():
-        return False
 
+# Utility functions
+def get_member(user, team):
+    """Return the TeamMember object (or None) for the given user/team."""
+
+    if not user.is_authenticated():
+        return None
+
+    try:
+        return team.members.get(user=user)
+    except TeamMember.DoesNotExist:
+        return None
+
+def get_role(member):
+    """Return the member's general role in the team.
+    
+    Does NOT take narrowings into account!
+
+    """
+    if not member:
+        return ROLE_OUTSIDER
+    else:
+        return member.role
+
+def get_role_for_target(user, team, project=None, lang=None):
+    """Return the role the given user effectively has for the given target.
+
+    `lang` should be a string (the language code).
+
+    """
+    member = get_member(user, team)
+    role = get_role(member)
+    narrowings = get_narrowings(member)
+
+    # If the user has no narrowings, just return their overall role.
+    if not narrowings:
+        return role
+
+    # Otherwise the narrowings must match the target.
+    project_narrowings = [n.content for n in narrowings
+                          if n.content_type == Project]
+    lang_narrowings = [n.content.language for n in narrowings
+                       if n.content_type == TeamVideoLanguage]
+
+    if project_narrowings and project not in project_narrowings:
+        return ROLE_CONTRIBUTOR
+
+    if lang_narrowings and lang not in lang_narrowings:
+        return ROLE_CONTRIBUTOR
+
+    return role
+
+def roles_user_can_assign(team, user):
+    """Return a list of the roles the given user can assign for the given team.
+
+    Rules:
+
+        * Unrestricted owners can assign all roles.
+        * Unrestricted admins can assign any other role (for now).
+        * No one else can assign any roles.
+    
+    """
+    member = get_member(user, team)
+    user_role = get_role(member)
+    narrowings = get_narrowings(member)
+
+    if narrowings:
+        return []
+
+    if user_role == ROLE_OWNER:
+        return ROLES_ORDER
+    elif user_role == ROLE_ADMIN:
+        return ROLES_ORDER[1:]
+    else:
+        return []
+
+
+# Narrowings
+def get_narrowings(member):
+    """Return narrowings for the given member in the given team."""
+
+    if not member:
+        return []
+    else:
+        return list(member.narrowings.all())
+
+def get_narrowing_dict(team, user, models, lists=False):
+    """Return a dict of MembershipNarrowings for the given member/models.
+
+    `models` should be an iterable of Model classes, something
+    like [Project, TeamVideoLanguage].
+
+    The returned dictionary will contain keys that are strings of the model
+    names, like this:
+
+    { 'Project': [<Narrowing 1>, ...], }
+
+    If the `lists` parameter is given the values of this dictionary will be list
+    objects, otherwise they will be keps at querysets.
+
+    Each given class will have an entry in the dictionary, though it may be
+    empty.
+
+    """
+    data = {}
     member = team.members.get(user=user)
-    # only owner can assing owner role!
-    if member.role == ROLE_OWNER:
-        return True
-    can_do =  _passes_test(team, user, project, lang, ASSIGN_ROLE_PERM)    
-    if can_do:
-        # makes sure we allow only <= new roles assignment, e.g
-        # a project owner can assign any other role, but a manager
-        # cannot assign admins nor owners
-        return role in roles_assignable_to(team, user,project, lang)
+
+    # TODO: Make this use only one DB call.
+    for model in models:
+        items = member.narrowings.for_type(model)
+        data[model._meta.object_name] = items if not lists else list(items)
+
+    return data
+
+def add_narrowing_to_member(member, target, added_by):
+    """Add a narrowing to the given member for the given target.
+
+    `target` should be a Project or TeamVideoLanguage object.
+
+    """
+    return MembershipNarrowing.objects.create(member, target, added_by)
+
+
+# Roles
+def _perms_for(role, model):
+    return [x[0] for x in RULES[role].intersection(model._meta.permissions)]
+
+def model_has_permission(member, perm_name, model):
+    return perm_name in _perms_for(member.role, model)
+
+def add_role(team, cuser, added_by,  role, project=None, lang=None):
+    from teams.models import TeamMember
+    member, created = TeamMember.objects.get_or_create(
+        user=cuser,team=team, defaults={'role':role})
+    member.role = role
+    member.save()
+    target = lang or project or team
+    add_narrowing_to_member(member, target, added_by)
+    return member
+
+def remove_role(team, user, role, project=None, lang=None):
+    role = role or ROLE_CONTRIBUTOR
+    team.members.filter(user=user, role=role).delete()
+
+
+# Various permissions
+@_check_perms(EDIT_TEAM_SETTINGS_PERM)
+def can_change_team_settings(team, user, project=None, lang=None, role=None) :
     return False
 
+def can_assign_role(team, user, role):
+    """Return whether the given user can assign the given role.
+
+    Only unrestricted owners can ever assign the owner role.
+
+    Only unrestricted admins (and owners, of course) can assign any other role
+    (for now).
+
+    """
+    return role in roles_user_can_assign(team, user)
+
+def can_rename_team(team, user):
+    return team.is_owner(user)
 
 def can_add_video(team, user, project=None, lang=None):
-    if not team.video_policy :
+    if not team.video_policy:
         return True
     return _passes_test(team, user, project, lang, ADD_VIDEOS_PERM)
 
@@ -143,14 +272,14 @@ def can_manager_review(team, user, project=None, lang=None):
 def can_peer_review(team, user, project=None, lang=None):
     pass
 
-@_check_perms(EDIT_SUBS_PERM)    
+@_check_perms(EDIT_SUBS_PERM)
 def can_edit_subs_for(team, user, project=None, lang=None):
     pass
-    
+
 @_check_perms(EDIT_PROJECT_SETTINGS_PERM)
 def can_edit_project(team, user, project, lang=None):
     pass
-    
+
 def can_view_settings_tab(team, user):
     if not user.is_authenticated():
         return False
@@ -162,66 +291,12 @@ def can_view_tasks_tab(team, user):
         return False
 
     return team.members.filter(user=user).exists()
-    
-def model_has_permission(member, perm_name, model):
-    return perm_name in _perms_for(member.role, model)
-                               
-def _perms_for(role, model):
-    return [x[0] for x in RULES[role].\
-            intersection(model._meta.permissions)]
-    
-def add_role(team, cuser, added_by,  role, project=None, lang=None):
-    from teams.models import TeamMember
-    member, created = TeamMember.objects.get_or_create(
-        user=cuser,team=team, defaults={'role':role})
-    member.role = role
-    member.save()
-    narrowing = lang or project or team
-    add_narrowing_to_member(member, narrowing, added_by)
-    return member 
 
-def remove_role(team, user, role, project=None, lang=None):
-    role = role or ROLE_CONTRIBUTOR
-    team.members.filter(user=user, role=role).delete()
+def can_invite(team, user):
+    return team.can_invite(user)
 
 
-def add_narrowing_to_member(member, narrowing, added_by):
-    """
-    If adding any a narrowing one must remove any Team objects
-    that will allow an user to execute actions on anything
-    withing that team
-    """
-    if not isinstance(narrowing, Team):
-       MembershipNarrowing.objects.for_type(Team).filter(member=member).delete()
-    return MembershipNarrowing.objects.create(member, narrowing, added_by)
-    
-def add_narrowing(team, user, narrowing, added_by):
-    return add_narrowing_to_member(team.members.get(user=user), narrowing. added_by)
-
-
-def remove_narrowings(team, user, narrowings):
-    try:
-        iter(narrowings)
-    except TypeError:
-        narrowings = [narrowings]
-    member = team.members.get(user=user)
-    [MembershipNarrowing.objects.get(
-        object_pk=x.pk,
-        content_type=ContentType.objects.get_for_model(x),
-        member=member) for x in narrowings]
-    
-         
-def list_narrowings(team, user, models, lists=False):
-   data = {}
-   for model in models:
-       items =  MembershipNarrowing.objects.for_type(model).filter(
-               member=team.members.get(user=user))
-       data[model._meta.object_name] = items if not lists else list(items)
-   return data    
-    
-
-
-# Tasks
+# Task permissions
 @_check_perms(CREATE_TASKS_PERM)
 def can_create_tasks(team, user, project=None):
     # for now, use the same logic as assignment
@@ -241,7 +316,7 @@ def can_assign_tasks(team, user, project=None, lang=None):
 
 
 def _user_can_create_task_subtitle(user, team_video):
-    role = team_video.team.members.get(user=user).role
+    role = get_role_for_target(user, team_video.team, team_video.project, None)
 
     role_req = {
         10: ROLE_CONTRIBUTOR,
@@ -252,7 +327,8 @@ def _user_can_create_task_subtitle(user, team_video):
     return role in _perms_equal_or_greater(role_req)
 
 def _user_can_create_task_translate(user, team_video):
-    role = team_video.team.members.get(user=user).role
+    # TODO: Take language into account here
+    role = get_role_for_target(user, team_video.team, team_video.project, None)
 
     role_req = {
         10: ROLE_CONTRIBUTOR,
@@ -270,7 +346,8 @@ def _user_can_create_task_review(user, team_video):
         #       is not enabled in the workflow?
         return False
 
-    role = team_video.team.members.get(user=user).role
+    # TODO: Take language into account here
+    role = get_role_for_target(user, team_video.team, team_video.project, None)
 
     role_req = {
         10: ROLE_CONTRIBUTOR,
@@ -286,7 +363,8 @@ def _user_can_create_task_approve(user, team_video):
     if not workflow.approve_enabled:
         return False
 
-    role = team_video.team.members.get(user=user).role
+    # TODO: Take language into account here
+    role = get_role_for_target(user, team_video.team, team_video.project, None)
 
     role_req = {
         10: ROLE_MANAGER,
@@ -336,6 +414,8 @@ def can_create_task_translate(team_video, user=None):
     already exist.  The task will simply "take over" that language from that
     point forward.
 
+    Languages are returned as strings (language codes like 'en').
+
     """
     if user and not _user_can_create_task_translate(user, team_video):
         return []
@@ -364,6 +444,8 @@ def can_create_task_review(team_video, user=None):
     * There are no review tasks for that language.
     * There are no approve tasks for that language.
     * The user has permission to create the review task.
+
+    Languages are returned as strings (language codes like 'en').
 
     """
     if user and not _user_can_create_task_review(user, team_video):
@@ -401,6 +483,8 @@ def can_create_task_approve(team_video, user=None):
     * There are no open translation tasks for that language.
     * There are no approve tasks for that language.
     * The user has permission to create the approve task.
+
+    Languages are returned as strings (language codes like 'en').
 
     """
     if user and not _user_can_create_task_review(user, team_video):

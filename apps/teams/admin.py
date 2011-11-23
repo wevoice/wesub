@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib import admin
-from teams.models import Team, TeamMember, TeamVideo, Workflow, Task, Setting
+from teams.models import Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing
 from videos.models import SubtitleLanguage
 from django.utils.translation import ugettext_lazy as _
 from messages.forms import TeamAdminPageMessageForm
@@ -122,6 +122,12 @@ class TaskAdmin(admin.ModelAdmin):
     raw_id_fields = ('team_video', 'team', 'assignee')
     ordering = ('-created',)
 
+class MembershipNarrowingAdmin(admin.ModelAdmin):
+    list_display = ('member', 'content_type', 'content')
+    list_filter = ('created', 'modified')
+    raw_id_fields = ('member',)
+    ordering = ('-created',)
+
 class SettingAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'team', 'key', 'created', 'modified')
     list_filter = ('key', 'created', 'modified')
@@ -135,4 +141,5 @@ admin.site.register(Team, TeamAdmin)
 admin.site.register(TeamVideo, TeamVideoAdmin)
 admin.site.register(Workflow, WorkflowAdmin)
 admin.site.register(Task, TaskAdmin)
+admin.site.register(MembershipNarrowing, MembershipNarrowingAdmin)
 admin.site.register(Setting, SettingAdmin)

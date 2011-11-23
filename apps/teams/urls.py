@@ -1,27 +1,21 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2011 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
 from django.conf.urls.defaults import *
 from teams.rpc import rpc_router
 
@@ -38,9 +32,9 @@ urlpatterns = patterns('teams.views',
     url('^edit/(?P<slug>[-\w]+)/$', 'team_settings', name='settings'),
     url('^complete/(?P<slug>[-\w]+)/$', 'completed_videos', name='completed_videos'),
     url('^join_team/(?P<slug>[-\w]+)/$', 'join_team', name='join_team'),
-    url('^leave_team/(?P<slug>[-\w]+)/$', 'leave_team', name='leave_team'),                       
+    url('^leave_team/(?P<slug>[-\w]+)/$', 'leave_team', name='leave_team'),
     url('^highlight/(?P<slug>[-\w]+)/$', 'highlight', name='highlight'),
-    url('^unhighlight/(?P<slug>[-\w]+)/$', 'highlight', {'highlight': False}, name='unhighlight'),    
+    url('^unhighlight/(?P<slug>[-\w]+)/$', 'highlight', {'highlight': False}, name='unhighlight'),
     url('^applications/(?P<slug>[-\w]+)/$', 'applications', name='applications'),
     url('^application/approve/(?P<slug>[-\w]+)/(?P<user_pk>\d+)/$', 'approve_application', name='approve_application'),
     url('^application/deny/(?P<slug>[-\w]+)/(?P<user_pk>\d+)/$', 'deny_application', name='deny_application'),

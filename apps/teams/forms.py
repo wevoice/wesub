@@ -18,7 +18,7 @@
 
 from auth.models import CustomUser as User
 from django import forms
-from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow
+from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
 from django.utils.translation import ugettext_lazy as _
 from utils.validators import MaxFileSizeValidator
 from django.conf import settings
@@ -30,6 +30,9 @@ import re
 from utils.translation import get_languages_list
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from teams.permissions import can_assign_tasks
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+
 
 from apps.teams.moderation import add_moderation, remove_moderation
 
@@ -528,4 +531,72 @@ class PermissionsForm(forms.ModelForm):
         model = Team
         fields = ('membership_policy', 'video_policy', 'subtitle_policy',
                   'translate_policy', 'task_assign_policy', 'workflow_enabled')
+
+
+class InviteForm(forms.Form):
+    usernames = forms.CharField(required=False)
+    emails = forms.CharField(required=False)
+    message = forms.CharField(required=False, widget=forms.Textarea)
+    role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1])
+
+    def __init__(self, team, user, *args, **kwargs):
+        self.team = team
+        self.user = user
+        self.fields['role'].choices = roles_assignable_to(team, user)
+        super(InviteForm, self).__init__(*args, **kwargs)
+
+
+    def clean_usernames(self):
+        raw_usernames = self.cleaned_data['usernames']
+
+        usernames = filter(None, [name.strip() for name in raw_usernames.split(',')])
+
+        for username in usernames:
+            try:
+                User.objects.get(username=username)
+            except User.DoesNotExist:
+                raise forms.ValidationError(_(u'User "%s" does not exist!') % username)
+
+            try:
+                self.team.members.get(user__username=username)
+            except TeamMember.DoesNotExist:
+                pass
+            else:
+                raise forms.ValidationError(_(u'User "%s" is already a member of this team!') % username)
+
+        self._split_usernames = usernames
+        return raw_usernames
+
+    def clean_emails(self):
+        raw_emails = self.cleaned_data['emails']
+
+        emails = filter(None, [email.strip() for email in raw_emails.split(',')])
+
+        for email in emails:
+            try:
+                validate_email(email)
+            except ValidationError:
+                raise forms.ValidationError(_(u'"%s" is not a valid email address!') % email)
+
+            try:
+                self.team.members.get(user__email=email)
+            except TeamMember.DoesNotExist:
+                pass
+            else:
+                raise forms.ValidationError(_(u'A user with email address "%s" is already a member of this team!') % email)
+
+        self._split_emails = emails
+        return raw_emails
+
+
+    def save(self):
+        for username in self._split_usernames:
+            user = User.objects.get(username=username)
+            Invite.objects.get_or_create(team=self.team, user=user, defaults={
+                'note': self.cleaned_data['message'],
+                'author': self.user
+            })
+        for email in self._split_emails:
+            # TODO
+            pass
 

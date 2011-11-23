@@ -32,11 +32,10 @@ from utils.rpc import Error, Msg, RpcRouter
 from utils.forms import flatten_errorlists
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 
-from icanhaz.projects_decorators import raise_forbidden_project
 from teams.permissions import can_edit_project
 from teams.forms import TaskAssignForm, TaskDeleteForm, GuidelinesMessagesForm, SettingsForm, WorkflowForm, PermissionsForm
 from teams.project_forms import ProjectForm
-from teams.permissions import list_narrowings, roles_assignable_to, can_assign_roles
+from teams.permissions import get_narrowing_dict, roles_user_can_assign, can_assign_role
 
 
 class TeamsApiClass(object):
@@ -524,11 +523,11 @@ class TeamsApiV2Class(object):
     def member_role_info(self, team_slug, member_pk, user=None):
         team = Team.objects.get(slug=team_slug)
         member = team.members.get(pk=member_pk)
-        roles =  roles_assignable_to(team, member.user)
+        roles =  roles_user_can_assign(team, member.user)
         # massage the data format to make it easier to work with
         # over the client side templating
         verbose_roles = [{"val":x[0], "name":x[1]} for x in TeamMember.ROLES if x[0] in roles]
-        narrowings =list_narrowings(team, member.user, [Project, TeamVideoLanguage], lists=True) 
+        narrowings = get_narrowing_dict(team, member.user, [Project, TeamVideoLanguage], lists=True)
         languages = {}
 
         for x in narrowings["TeamVideoLanguage"]:
@@ -562,7 +561,7 @@ class TeamsApiV2Class(object):
                        projects, languages, user=None):
         team = Team.objects.get(slug=team_slug)
         member = team.members.get(pk=member_pk)
-        if can_assign_roles(team, user,None, None, role ):
+        if can_assign_role(team, user, role):
             for project_pk in projects:
                 MembershipNarrowing.objects.get_or_create(
                     content=team.project_set.get(pk=project_pk,member=member))

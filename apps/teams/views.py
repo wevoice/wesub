@@ -21,7 +21,7 @@ from utils.translation import get_languages_list
 from teams.forms import (
     CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
     EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
-    SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm
+    SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm
 )
 from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
 from django.shortcuts import get_object_or_404, redirect, render_to_response
@@ -48,9 +48,9 @@ from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
 
 from teams.permissions import (
-    can_add_video, can_assign_roles, can_view_settings_tab, can_assign_tasks,
+    can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
-    can_create_task_approve, can_view_tasks_tab
+    can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign
 )
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -246,26 +246,24 @@ def detail_members(request, slug, role=None):
     
     qs = team.members.all()
     if q:
-        qs = qs.filter(Q(user__first_name__icontains=q)|Q(user__last_name__icontains=q) \
+        qs = qs.filter(Q(user__first_name__icontains=q)|Q(user__last_name__icontains=q)
                        |Q(user__username__icontains=q)|Q(user__biography__icontains=q))
 
     if role:
         qs = qs.filter(role=role)
 
-    extra_context = widget.add_onsite_js_files({})  
+    extra_context = widget.add_onsite_js_files({})
 
     # if we are a member that can also edit roles, we create a dict of
     # roles that we can assign, this will vary from user to user, since
     # let's say an admin can change roles, but not for anyone above him
     # the owner, for example
     assignable_roles = []
-    if can_assign_roles(team, request.user):
+    if roles_user_can_assign(team, request.user):
         for member in qs:
-            if can_assign_roles(
-                team,
-                request.user, project=None, lang=None,
-                role=member.role):
+            if can_assign_role(team, request.user, role=member.role):
                 assignable_roles.append(member)
+
     extra_context.update({
         'team': team,
         'query': q,
@@ -395,22 +393,6 @@ def upload_logo(request, slug):
     return HttpResponse(json.dumps(output))
 
 
-@render_to('teams/invite_members.html')
-@login_required
-def invite_members(request, slug):
-    team = Team.get(slug, request.user)
-
-    """ TODO: Permissions check?
-    if not can_invite_members(team, request.user):
-        return HttpResponseForbidden("You cannot invite new members for this team")
-    """
-
-    """ TODO: Add form and whatnot below? """
-    return {
-        'team': team,
-    }
-
-
 # Adding videos
 def _check_add_video_permission(request, team):
     if not team.is_member(request.user):
@@ -522,7 +504,7 @@ def team_video(request, team_video_pk):
 def remove_video(request, team_video_pk):
     team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
 
-    if not request.POST:
+    if request.method != 'POST':
         error = _(u'Request must be a POST request.')
 
         if request.is_ajax():
@@ -554,13 +536,42 @@ def remove_video(request, team_video_pk):
         return HttpResponseRedirect(next)
 
 
+# Members
+@render_to('teams/invite_members.html')
+@login_required
+def invite_members(request, slug):
+    team = Team.get(slug, request.user)
+
+    if not can_invite(team, request.user):
+        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
+
+    if request.POST:
+        form = InviteForm(team, request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('teams:detail_members',
+                                                args=[], kwargs={'slug': team.slug}))
+    else:
+        form = InviteForm(team, request.user)
+
+    """ TODO: Permissions check?
+    if not can_invite_members(team, request.user):
+        return HttpResponseForbidden("You cannot invite new members for this team")
+    """
+
+    """ TODO: Add form and whatnot below? """
+    return {
+        'team': team,
+        'form': form,
+    }
+
 @render_to_json
 @login_required
 def remove_member(request, slug, user_pk):
     team = Team.get(slug, request.user)
 
     member = get_object_or_404(TeamMember, team=team, user__pk=user_pk)
-    if can_assign_roles(team , request.user, role=member.role):
+    if can_assign_role(team, request.user, role=member.role):
         user = member.user
         if not user == request.user:
             TeamMember.objects.filter(team=team, user=user).delete()
@@ -712,12 +723,6 @@ def accept_invite(request, invite_pk, accept=True):
         
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-@permission_required('teams.change_team')
-def highlight(request, slug, highlight=True):
-    item = get_object_or_404(Team, slug=slug)
-    item.highlight = highlight
-    item.save()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required
 def join_team(request, slug):
@@ -754,6 +759,14 @@ def leave_team(request, slug):
         messages.error(request, _(u'You are not member of this team.'))
     
     return redirect(request.META.get('HTTP_REFERER') or team)
+
+
+@permission_required('teams.change_team')
+def highlight(request, slug, highlight=True):
+    item = get_object_or_404(Team, slug=slug)
+    item.highlight = highlight
+    item.save()
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 # Tasks

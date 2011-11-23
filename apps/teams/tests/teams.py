@@ -749,7 +749,7 @@ class TeamsTest(TestCase):
         #-----------delete video -------------
         url = reverse("teams:remove_video", kwargs={"team_video_pk": tv.pk})
         response = self.client.post(url)
-        self.failUnlessEqual(response.status_code, 200)
+        self.failUnlessEqual(response.status_code, 302)
         try:
             team.teamvideo_set.get(pk=1)
             self.fail()
