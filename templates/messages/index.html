@@ -1,4 +1,4 @@
-{% extends "settings.html" %}
+{% extends "profiles/base.html" %}
 
 {% load paginator i18n %}
 
@@ -111,65 +111,70 @@
     </script>
 {% endblock %}
 
-{% block settings_content %}
+{% block main_content %}
 
-<div class="hd">
-  <h2 class="msg_header">
-    {% trans 'Messages' %}
-  </h2>
-  <ul class="inline_tabs">
-    <li class="active"><a href="{% url messages:index %}">{% trans "Inbox" %}</a></li>
-    <li><a href="{% url messages:sent %}">{% trans "Sent" %}</a></li>
-  </ul>
-</div>
+    <h2>{% trans 'Messages' %}</h2>
 
-{% if message_list %}
-    {% if is_paginated %}{% paginator %}{% endif %}
-    
-    <table border="0" class="messages">
-      <thead>
-        <tr>
-          <th></th>
-          <th>{% trans "From" %}</th>
-          <th>{% trans "Message" %}</th>
-          <th>{% trans "Date" %}</th>
-          <th></th>
-        </tr>
-      </thead>
-      
-      <tbody>
-        {% for msg in message_list %}
-        <tr {% if not msg.read %} class="unread"{% endif %}>
-          <td class="msg_avatar">
-            {% with msg.author.small_avatar as author_avatar_url %}
-                {% if author_avatar_url %}
-                    <img src="{{ author_avatar_url }}" width="30" height="30" alt="{% trans 'Avatar' %}"/>
-                {% else %}
-                    <img src="{{ STATIC_URL }}/images/default_thumb_small.png" alt="{% trans 'Avatar' %}"/>
-                {% endif %}
-            {% endwith %}
-          </td>
-          <td class="msg_from">
-              {% if msg.author %}
-                <a href="{{ msg.author.get_absolute_url }}">{{ msg.author }}</a>
-              {% endif %}
-          </td>
-          <td>
-              <a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">{{ msg }}</a>
-          </td>
-          <td class="msg_date">{{ msg.created|timesince }} {% trans 'ago' %}</td>
-          <td class="msg_delete"><a class="red_button small delete" message_id="{{ msg.pk }}">{% trans "Delete" %}</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    
-    {% if is_paginated %}{% paginator %}{% endif %}
-{% else %}
-    <p class="no_messages">
-      {% trans 'You have no messages.' %}
-    </p>
-{% endif %}
+    {% with 'messages' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+    {% if message_list %}
+        {% if is_paginated %}{% paginator %}{% endif %}
+        
+        <table border="0" class="messages">
+          <thead>
+            <tr>
+              <th></th>
+              <th>{% trans "From" %}</th>
+              <th>{% trans "Message" %}</th>
+              <th>{% trans "Date" %}</th>
+              <th></th>
+            </tr>
+          </thead>
+          
+          <tbody>
+            {% for msg in message_list %}
+            <tr {% if not msg.read %} class="unread"{% endif %}>
+              <td class="msg_avatar">
+                {% with msg.author.small_avatar as author_avatar_url %}
+                    {% if author_avatar_url %}
+                        <img src="{{ author_avatar_url }}" width="30" height="30" alt="{% trans 'Avatar' %}"/>
+                    {% else %}
+                        <img src="{{ STATIC_URL }}/images/default_thumb_small.png" alt="{% trans 'Avatar' %}"/>
+                    {% endif %}
+                {% endwith %}
+              </td>
+              <td class="msg_from">
+                  {% if msg.author %}
+                    <a href="{{ msg.author.get_absolute_url }}">{{ msg.author }}</a>
+                  {% endif %}
+              </td>
+              <td>
+                  <a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">{{ msg }}</a>
+              </td>
+              <td class="msg_date">{{ msg.created|timesince }} {% trans 'ago' %}</td>
+              <td class="msg_delete"><a class="red_button small delete" message_id="{{ msg.pk }}">{% trans "Delete" %}</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        
+        {% if is_paginated %}{% paginator %}{% endif %}
+        {% else %}
+            <p class="empty">
+              {% trans 'You have no messages.' %}
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="controls grid_3 omega">
+        <ul>
+            <li class="current"><a href="{% url messages:index %}">{% trans "Inbox" %}</a></li>
+            <li><a href="{% url messages:sent %}">{% trans "Sent" %}</a></li>
+        </ul>
+    </div>
 
 <div class="msg_modal_wrap" id="msg_modal">
   <a href="#close" class="close">{% trans "Close" %}</a>

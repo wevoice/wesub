@@ -20,6 +20,7 @@ from django.conf.urls.defaults import *
 from profiles.views import rpc_router
 
 urlpatterns = patterns('profiles.views',
+    url(r'^dashboard/$', 'dashboard', name='dashboard'),
     url(r'^mine/$', 'my_profile', name='my_profile'),
     url(r'^edit/$', 'edit_profile', name='edit'),
     url(r'^router/$', rpc_router, name='rpc_router'),

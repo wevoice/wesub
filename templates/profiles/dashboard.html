@@ -1,0 +1,60 @@
+{% extends "profiles/base.html" %}
+
+{% load i18n messages_tags recent_activity auth_tags profiles_tags %}
+
+{% block body_attrs %}id="dashboard" class="v1"{% endblock %}
+
+{% block title %}Dashboard | {{ user_info }} | Universal Subtitles{% endblock %}
+
+{% block main_content %}
+
+    <h2>{{ user_info }}</h2>
+
+    {% with 'dashboard' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        <div class="grid_5 alpha">
+            <h3>What's Going on</h3>
+            <ul class="listing">
+                <li>Spanish subtitles for <a href="">Promo Video #3</a> (Some Team) <span class="timestamp">2 hours ago</span></li>
+            </ul>
+
+            <h3>Your Tasks</h3>
+            <ul class="listing">
+                <li><a href="">Something waiting...</a></li>
+            </ul>
+        </div>
+
+        <div class="grid_4 omega">
+            <h3>The Latest</h3>
+            <ul class="featured">
+                <li>You have 2 new messages</li>
+                <li>You have saved work on Blah video</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="controls grid_3 omega">
+        <ul>
+            <li class="current"><a href="">Overview</a></li>
+            <li><a href="">Something else</a></li>
+        </ul>
+
+        {% comment %}
+            <h4>My Teams</h4>
+            {% with user.teams.all as user_teams %}
+            <ul class="secondary">
+                {% if user_teams %}
+                    {% for t in user_teams %}
+                    <li>
+                        <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
+                    </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+            {% endwith %}
+        {% endcomment %}
+    </div>
+{% endblock %}

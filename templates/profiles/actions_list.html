@@ -1,5 +1,30 @@
-{% extends "videos/actions_list.html" %}
+{% extends "profiles/base.html" %}
 
-	{% block h2 %}
-		<h2><a href="{{ user_info.get_absolute_url }}">{{ user_info }}</a></h2>
-	{% endblock %}
+{% load paginator i18n %}
+
+{% block main_content %}
+	<h2>{{ user_info }}</h2>
+
+	{% with 'activity' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+    	
+    	{% if is_paginated %}{% paginator %}{% endif %}
+        
+        {% with action_list as events %}
+			<ul class="listing activity">
+	    		{% for item in events %}
+				    <li>{{ item.render }}</li>
+				{% endfor %}
+	    	</ul>
+        {% endwith %}
+            
+        {% if is_paginated %}{% paginator %}{% endif %}
+
+    </div>
+
+    <div class="controls grid_3 omega">
+    </div>
+{% endblock %}
