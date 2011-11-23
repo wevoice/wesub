@@ -25,24 +25,23 @@
 {% endblock %}
 
 {% block main_content %}
+
+    <h2>
+        {{ user_info|title }}
+    </h2>
+
+    {% with 'profile' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+
     {% if user_info.is_active %}
-        <div class="grid_9 alpha">
-            <div class="pod">
-                <div class="hd">
-                    <h2>
-                        {{ user_info|title }}'s Activity
-                    </h2>
-                    {% if can_edit %}
-                        <a href="{% url profiles:edit %}" class="heading_button">Edit profile</a>
-                    {% endif %}
+        <div class="view grid_9 alpha">
+            {% if can_edit %}
+                <div class="tools">
+                    <a class="button" href="{% url profiles:edit %}">Edit profile</a>
                 </div>
-                {% if user_info.action_set.exists %}
-                    {% recent_activity user_info %}
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="grid_3 omega meta">
+            {% endif %}
+            
             <img src="{{ user_info.avatar }}">
             <h4>{% trans 'Member since' %}</h4>
             <p>
@@ -67,14 +66,22 @@
             {% if user.is_authenticated and not user == user_info %}
                 {% send_message_form user_info %}
             {% endif %}
+            
+            {% comment %}
+                {% if user_info.action_set.exists %}
+                            {% recent_activity user_info %}
+                        {% endif %} 
+            {% endcomment %}
+        </div>
+        
+        <div class="controls grid_3 omega">
+            
         </div>
         
         {{ block.super }}
     {% else %}
         <div class="grid_9">
-            <div class="pod">
-                <p>{% trans 'User deleted his profile' %}</p>
-            </div>
+            <p class="empty">{% trans 'User deleted his profile' %}</p>
         </div>         
     {% endif %}
 {% endblock %}

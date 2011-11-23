@@ -1,0 +1,26 @@
+{% load i18n teams_tags %}
+
+<ul class="tabs">
+    <li{% if current == "profile" %} class="current" {% endif %}>
+        <a href="{% url profiles:profile user.username %}">
+            {% trans "Profile" %}
+        </a>
+    </li>
+    <li{% if current == "activity" %} class="current" {% endif %}>
+        <a href="{% url profiles:actions_list user_info.id %}">
+            {% trans "Activity" %}
+        </a>
+    </li>
+
+    <li{% if current == "messages" %} class="current" {% endif %}>
+        <a href="{% url messages:index %}">
+            {% trans "Messages" %}
+        </a>
+    </li>
+
+    <li{% if current == "dashboard" %} class="current" {% endif %}>
+        <a href="{% url profiles:dashboard %}">
+            {% trans "Dashboard" %}
+        </a>
+    </li>
+</ul>

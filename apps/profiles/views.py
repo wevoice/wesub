@@ -78,6 +78,15 @@ class OptimizedQuerySet(LoadRelatedQuerySet):
                 videos[l.video_id].langs_cache.append(l)
 
 @login_required
+def dashboard(request):
+    user = request.user
+    context = {
+        'user_info': user,
+    }
+
+    return direct_to_template(request, 'profiles/dashboard.html', context)
+
+@login_required
 def my_profile(request):
     user = request.user
     qs = user.videos.order_by('-edited')
