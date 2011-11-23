@@ -146,12 +146,7 @@ def roles_user_can_assign(team, user, to_user=None):
         * Admins cannot change the role of an owner.
     
     """
-    member = get_member(user, team)
-    user_role = get_role(member)
-    narrowings = get_narrowings(member)
-
-    if narrowings:
-        return []
+    user_role = get_role_for_target(user, team)
 
     if user_role == ROLE_OWNER:
         return ROLES_ORDER
@@ -287,12 +282,24 @@ def can_edit_project(team, user, project, lang=None):
     pass
 
 def can_view_settings_tab(team, user):
-    if not user.is_authenticated():
-        return False
+    """Return whether the given user can view (and therefore edit) the team's settings.
 
-    return team.members.filter(user=user,role__in =[ROLE_ADMIN, ROLE_OWNER]).exists()
+    The user must be an unrestricted admin or an owner to do so.
+
+    """
+    role = get_role_for_target(user, team)
+
+    return role in [ROLE_ADMIN, ROLE_OWNER]
 
 def can_view_tasks_tab(team, user):
+    """Return whether the given user can view the tasks tab for the given team.
+    
+    To view the tasks tab, the user just has to be a member of the team.
+
+    TODO: Consider "public" tasks?
+
+    """
+
     if not user.is_authenticated():
         return False
 
