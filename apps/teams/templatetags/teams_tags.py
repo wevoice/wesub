@@ -232,15 +232,6 @@ def can_view_settings_tab(team, user):
    return _can_view_settings_tab(team, user)
 
 @register.filter
-def can_assign_roles(team, user, project=None):
-    """
-    Usage {% if team|can_assign_roles:user %}
-           edit roles
-           {% endif %}
-    """
-    return roles_user_can_assign(team, user)
-    
-@register.filter
 def has_applicant(team, user):
     return team.applications.filter(user=user).exists()
 

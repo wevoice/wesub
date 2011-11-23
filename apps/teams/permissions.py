@@ -135,7 +135,7 @@ def get_role_for_target(user, team, project=None, lang=None):
 
     return role
 
-def roles_user_can_assign(team, user):
+def roles_user_can_assign(team, user, to_user=None):
     """Return a list of the roles the given user can assign for the given team.
 
     Rules:
@@ -143,6 +143,7 @@ def roles_user_can_assign(team, user):
         * Unrestricted owners can assign all roles.
         * Unrestricted admins can assign any other role (for now).
         * No one else can assign any roles.
+        * Admins cannot change the role of an owner.
     
     """
     member = get_member(user, team)
@@ -155,6 +156,9 @@ def roles_user_can_assign(team, user):
     if user_role == ROLE_OWNER:
         return ROLES_ORDER
     elif user_role == ROLE_ADMIN:
+        if to_user:
+            if get_role(get_member(to_user, team)) == ROLE_OWNER:
+                return []
         return ROLES_ORDER[1:]
     else:
         return []
@@ -233,16 +237,18 @@ def remove_role(team, user, role, project=None, lang=None):
 def can_change_team_settings(team, user, project=None, lang=None, role=None) :
     return False
 
-def can_assign_role(team, user, role):
-    """Return whether the given user can assign the given role.
+def can_assign_role(team, user, role, to_user):
+    """Return whether the given user can assign the given role to the given other user.
 
     Only unrestricted owners can ever assign the owner role.
 
     Only unrestricted admins (and owners, of course) can assign any other role
     (for now).
 
+    Admins cannot change the roles of Owners.
+
     """
-    return role in roles_user_can_assign(team, user)
+    return role in roles_user_can_assign(team, user, to_user)
 
 def can_rename_team(team, user):
     return team.is_owner(user)
@@ -293,7 +299,19 @@ def can_view_tasks_tab(team, user):
     return team.members.filter(user=user).exists()
 
 def can_invite(team, user):
-    return team.can_invite(user)
+    """Return whether the given user can send an invite for the given team."""
+
+    role = get_role_for_target(user, team)
+
+    role_required = {
+        4: ROLE_CONTRIBUTOR,  # Open (but you have to be a member to send an invite)
+        1: ROLE_ADMIN,        # Application (reviewed by admins, so only admins can invite)
+        3: ROLE_CONTRIBUTOR,  # Invitation by any team member
+        2: ROLE_MANAGER,      # Invitation by manager
+        5: ROLE_ADMIN,        # Invitation by admin
+    }[team.membership_policy]
+
+    return role in _perms_equal_or_greater(role_required)
 
 
 # Task permissions

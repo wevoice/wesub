@@ -561,7 +561,7 @@ class TeamsApiV2Class(object):
                        projects, languages, user=None):
         team = Team.objects.get(slug=team_slug)
         member = team.members.get(pk=member_pk)
-        if can_assign_role(team, user, role):
+        if can_assign_role(team, user, role, member.user):
             for project_pk in projects:
                 MembershipNarrowing.objects.get_or_create(
                     content=team.project_set.get(pk=project_pk,member=member))

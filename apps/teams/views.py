@@ -261,7 +261,7 @@ def detail_members(request, slug, role=None):
     assignable_roles = []
     if roles_user_can_assign(team, request.user):
         for member in qs:
-            if can_assign_role(team, request.user, role=member.role):
+            if can_assign_role(team, request.user, member.role, member.user):
                 assignable_roles.append(member)
 
     extra_context.update({
@@ -571,7 +571,7 @@ def remove_member(request, slug, user_pk):
     team = Team.get(slug, request.user)
 
     member = get_object_or_404(TeamMember, team=team, user__pk=user_pk)
-    if can_assign_role(team, request.user, role=member.role):
+    if can_assign_role(team, request.user, member.role, member.user):
         user = member.user
         if not user == request.user:
             TeamMember.objects.filter(team=team, user=user).delete()
@@ -582,14 +582,14 @@ def remove_member(request, slug, user_pk):
             return {
                 'success': False,
                 'error': ugettext('You can\'t remove youself')
-            }          
+            }
     else:
         return {
             'success': False,
             'error': ugettext('You can\'t remove user')
-        }        
+        }
 
-@login_required        
+@login_required
 def edit_members(request, slug):
     team = Team.get(slug, request.user)
     
