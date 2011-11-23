@@ -28,7 +28,7 @@ from settings import ALL_LANGUAGES
 
 TIMEOUT = 60 * 60 * 24 * 5 # 5 days
 
-def get_video_id(video_url, public_only=False):
+def get_video_id(video_url, public_only=False, referer=None):
     """
     Returns the cache video_id for this video
     If public only is
@@ -48,9 +48,6 @@ def get_video_id(video_url, public_only=False):
             return None
         
         video_id = video.video_id
-        if public_only and not VideoVisibilityPolicy.objects.can_show_widget(video, referer):
-            # what is the best way to proceed here, return and set the value to False
-            return None
         
         cache.set(cache_key, video_id, TIMEOUT)
         return video_id

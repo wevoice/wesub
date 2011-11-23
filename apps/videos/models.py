@@ -285,7 +285,7 @@ class Video(models.Model):
             pass
 
     @classmethod
-    def get_or_create_for_url(cls, video_url=None, vt=None, user=None):
+    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
         assert video_url or vt, 'should be video URL or VideoType'
         vt = vt or video_type_registrar.video_type_for_url(video_url)
         if not vt:
@@ -334,6 +334,9 @@ class Video(models.Model):
                 obj.update_search_index()
                 video, created = obj, True
 
+        if timestamp and video_url_obj.created != timestamp:
+           video_url_obj.created = timestamp
+           video_url_obj.save(updates_timestamp=False)
         user and user.follow_new_video and video.followers.add(user)
 
         return video, created
@@ -633,7 +636,7 @@ class SubtitleLanguage(models.Model):
     # have more than 0 subtitles?
     had_version = models.BooleanField(default=False, editable=False)
     is_forked = models.BooleanField(default=False, editable=False)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField()
     subtitles_fetched_count = models.IntegerField(default=0, editable=False)
     followers = models.ManyToManyField(User, blank=True, related_name='followed_languages', editable=False)
     title = models.CharField(max_length=2048, blank=True)
@@ -877,6 +880,11 @@ class SubtitleLanguage(models.Model):
         self.standard_language = None
         self.save()
 
+        def save(self, updates_timestamp=True, *args, **kwargs):
+            if updates_timestamp:
+                self.created = datetime.now()
+            super(SubtitleLanguage, self).save(*args, **kwargs)
+            
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 
 
@@ -947,14 +955,14 @@ class SubtitleVersion(SubtitleCollection):
     def __unicode__(self):
         return u'%s #%s' % (self.language, self.version_no)
     
-    def save(self, *args, **kwargs):
+    def save(self,  *args, **kwargs):
         created = not self.pk
         if created and self.language.video.is_moderated:
             self.moderation_status  = WAITING_MODERATION
         super(SubtitleVersion, self).save(*args, **kwargs)
         if created:
             #but some bug happen, I've no idea why
-            Action.create_caption_handler(self)
+            Action.create_caption_handler(self, self.datetime_started)
             if self.user:
                 video = self.language.video
                 has_other_versions = SubtitleVersion.objects.filter(language__video=video) \
@@ -1484,7 +1492,7 @@ class Action(models.Model):
             obj.save()
     
     @classmethod
-    def create_caption_handler(cls, instance):
+    def create_caption_handler(cls, instance, timestamp=None):
         user = instance.user
         video = instance.language.video
         language = instance.language
@@ -1504,7 +1512,7 @@ class Action(models.Model):
         obj = cls(video=video)
         obj.action_type = cls.ADD_VIDEO
         obj.user = user
-        obj.created = datetime.now()
+        obj.created = video.created or datetime.now()
         obj.save()
      
     @classmethod
@@ -1522,7 +1530,7 @@ class Action(models.Model):
         obj.language = version.language
         obj.user = moderator
         obj.action_type = cls.APPROVE_VERSION
-        obj.created = datetime.now()
+        obj.created = datetime_started or datetime.now()
         obj.save()
 
     @classmethod
@@ -1564,7 +1572,7 @@ class VideoUrl(models.Model):
     videoid = models.CharField(max_length=50, blank=True)
     primary = models.BooleanField(default=False)
     original = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField()
     added_by = models.ForeignKey(User, null=True, blank=True)
 
     def __unicode__(self):
@@ -1592,6 +1600,11 @@ class VideoUrl(models.Model):
     def effective_url(self):
         return video_type_registrar[self.type].video_url(self)
 
+    def save(self, updates_timestamp=True, *args, **kwargs):
+        if updates_timestamp:
+            self.created = datetime.now()
+        super(VideoUrl, self).save(*args, **kwargs)
+        
 post_save.connect(Action.create_video_url_handler, VideoUrl)
 post_save.connect(video_cache.on_video_url_save, VideoUrl)
 

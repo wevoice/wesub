@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-13 01:31-0600\n"
+"POT-Creation-Date: 2011-11-20 01:31-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -474,23 +474,23 @@ msgstr ""
 msgid "This user cannot change those settings"
 msgstr ""
 
-#: apps/icanhaz/models.py:185
+#: apps/icanhaz/models.py:188
 msgid "Public"
 msgstr ""
 
-#: apps/icanhaz/models.py:186
+#: apps/icanhaz/models.py:189
 msgid "Only with secret url"
 msgstr ""
 
-#: apps/icanhaz/models.py:187
+#: apps/icanhaz/models.py:190
 msgid "Only authorized members"
 msgstr ""
 
-#: apps/icanhaz/models.py:202
+#: apps/icanhaz/models.py:205
 msgid "public"
 msgstr ""
 
-#: apps/icanhaz/models.py:203
+#: apps/icanhaz/models.py:206
 msgid "no embeding allowed"
 msgstr ""
 
