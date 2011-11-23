@@ -98,7 +98,7 @@ def get_member(user, team):
 
 def get_role(member):
     """Return the member's general role in the team.
-    
+
     Does NOT take narrowings into account!
 
     """
@@ -144,7 +144,7 @@ def roles_user_can_assign(team, user, to_user=None):
         * Unrestricted admins can assign any other role (for now).
         * No one else can assign any roles.
         * Admins cannot change the role of an owner.
-    
+
     """
     user_role = get_role_for_target(user, team)
 
@@ -228,10 +228,6 @@ def remove_role(team, user, role, project=None, lang=None):
 
 
 # Various permissions
-@_check_perms(EDIT_TEAM_SETTINGS_PERM)
-def can_change_team_settings(team, user, project=None, lang=None, role=None) :
-    return False
-
 def can_assign_role(team, user, role, to_user):
     """Return whether the given user can assign the given role to the given other user.
 
@@ -246,40 +242,26 @@ def can_assign_role(team, user, role, to_user):
     return role in roles_user_can_assign(team, user, to_user)
 
 def can_rename_team(team, user):
-    return team.is_owner(user)
+    """Return whether the given user can edit the name of a team.
 
-def can_add_video(team, user, project=None, lang=None):
-    if not team.video_policy:
-        return True
-    return _passes_test(team, user, project, lang, ADD_VIDEOS_PERM)
+    Only team owners can rename teams.
 
-@_check_perms(EDIT_VIDEO_SETTINGS_PERM)
-def can_change_video_settings(team, user, project, lang):
-    pass
+    """
+    role = get_role_for_target(user, team)
+    return role == ROLE_OWNER
 
-@_check_perms(MESSAGE_ALL_MEMBERS_PERM)
-def can_message_all_members(team, user, project=None, lang=None):
-    pass
+def can_add_video(team, user, project=None):
+    """Return whether the given user can add a video to the given target."""
 
-@_check_perms(ACCEPT_ASSIGNMENT_PERM)
-def can_accept_assignments(team, user, project=None, lang=None):
-    pass
+    role = get_role_for_target(user, team, project)
 
-@_check_perms(PERFORM_MANAGER_REVIEW_PERM)
-def can_manager_review(team, user, project=None, lang=None):
-    pass
+    role_required = {
+        1: ROLE_CONTRIBUTOR,
+        2: ROLE_MANAGER,
+        3: ROLE_CONTRIBUTOR,
+    }[team.video_policy]
 
-@_check_perms(PERFORM_PEER_REVIEW_PERM)
-def can_peer_review(team, user, project=None, lang=None):
-    pass
-
-@_check_perms(EDIT_SUBS_PERM)
-def can_edit_subs_for(team, user, project=None, lang=None):
-    pass
-
-@_check_perms(EDIT_PROJECT_SETTINGS_PERM)
-def can_edit_project(team, user, project, lang=None):
-    pass
+    return role in _perms_equal_or_greater(role_required)
 
 def can_view_settings_tab(team, user):
     """Return whether the given user can view (and therefore edit) the team's settings.
@@ -293,7 +275,7 @@ def can_view_settings_tab(team, user):
 
 def can_view_tasks_tab(team, user):
     """Return whether the given user can view the tasks tab for the given team.
-    
+
     To view the tasks tab, the user just has to be a member of the team.
 
     TODO: Consider "public" tasks?
@@ -319,6 +301,39 @@ def can_invite(team, user):
     }[team.membership_policy]
 
     return role in _perms_equal_or_greater(role_required)
+
+
+@_check_perms(EDIT_TEAM_SETTINGS_PERM)
+def can_change_team_settings(team, user, project=None, lang=None, role=None) :
+    return False
+
+@_check_perms(EDIT_PROJECT_SETTINGS_PERM)
+def can_edit_project(team, user, project, lang=None):
+    pass
+
+@_check_perms(EDIT_SUBS_PERM)
+def can_edit_subs_for(team, user, project=None, lang=None):
+    pass
+
+@_check_perms(PERFORM_MANAGER_REVIEW_PERM)
+def can_manager_review(team, user, project=None, lang=None):
+    pass
+
+@_check_perms(PERFORM_PEER_REVIEW_PERM)
+def can_peer_review(team, user, project=None, lang=None):
+    pass
+
+@_check_perms(EDIT_VIDEO_SETTINGS_PERM)
+def can_change_video_settings(team, user, project, lang):
+    pass
+
+@_check_perms(MESSAGE_ALL_MEMBERS_PERM)
+def can_message_all_members(team, user, project=None, lang=None):
+    pass
+
+@_check_perms(ACCEPT_ASSIGNMENT_PERM)
+def can_accept_assignments(team, user, project=None, lang=None):
+    pass
 
 
 # Task permissions
