@@ -71,7 +71,12 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     if not parser:
         return
     
-    language, create = SubtitleLanguage.objects.get_or_create(video=video, language=lc)
+    language, create = SubtitleLanguage.objects.get_or_create(
+        video=video,
+        language=lc,
+        defaults={
+            'created': datetime.now(),
+    })
     language.is_original = False
     language.is_forked = True
     language.save()

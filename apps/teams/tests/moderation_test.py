@@ -659,7 +659,9 @@ if feature_is_on('MODERATION'):
             # second team should be filteres
             team2 = Team.objects.exclude(pk=team1.pk)[0]
             tv2 = team2.teamvideo_set.exclude(video=tv1.video)[0]
-            lang, c  = SubtitleLanguage.objects.get_or_create(video=tv2.video, is_original=False, language="pt")
+            lang, c  = SubtitleLanguage.objects.get_or_create(video=tv2.video, is_original=False, language="pt",  defaults={
+                    'created': datetime.now(),
+            })
             member = TeamMember(user=self.user, team=team2, role=TeamMember.ROLE_MANAGER)
             member.save()
             add_moderation(tv2.video, team2, self.user)

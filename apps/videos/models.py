@@ -880,10 +880,10 @@ class SubtitleLanguage(models.Model):
         self.standard_language = None
         self.save()
 
-        def save(self, updates_timestamp=True, *args, **kwargs):
-            if updates_timestamp:
-                self.created = datetime.now()
-            super(SubtitleLanguage, self).save(*args, **kwargs)
+    def save(self, updates_timestamp=True, *args, **kwargs):
+        if updates_timestamp:
+            self.created = datetime.now()
+        super(SubtitleLanguage, self).save(*args, **kwargs)
             
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 
