@@ -41,6 +41,7 @@ class TestRules(BaseTestPermission):
             res = func(team, user, project, lang)
             self.assertFalse(res, func.__name__)
 
+
     def test_roles_assignable(self):
         user = User.objects.filter(teams__isnull=True)[0]
         team = self.team
@@ -66,6 +67,8 @@ class TestRules(BaseTestPermission):
         remove_role(team, user, TeamMember.ROLE_ADMIN)
         narrowing.delete()
 
+        # TODO: Test that admins can't assign roles to owners.
+
         # No one else can assign roles.
         add_role(self.team, user, self.owner, TeamMember.ROLE_MANAGER)
         self.assertItemsEqual(roles_user_can_assign(team, user, None), [])
@@ -77,7 +80,6 @@ class TestRules(BaseTestPermission):
 
     def test_perms_for_manager(self):
         # project
-        print
         self.assertItemsEqual(_perms_for(TeamMember.ROLE_MANAGER, Team), (
             ASSIGN_TASKS_PERM[0],
             CREATE_TASKS_PERM[0],
@@ -94,7 +96,6 @@ class TestRules(BaseTestPermission):
         self._test_perms(self.team,
                          user, [
                              can_change_team_settings,
-                             can_assign_roles,
                              can_assign_tasks,
                              can_change_team_settings,
                              can_message_all_members,
@@ -106,7 +107,6 @@ class TestRules(BaseTestPermission):
         self._test_perms(self.team,
                          user, [
                              can_change_team_settings,
-                             can_assign_roles,
                              can_assign_tasks,
                              can_change_team_settings,
                              can_message_all_members,
@@ -120,7 +120,6 @@ class TestRules(BaseTestPermission):
         self._test_perms(self.team,
                          user, [
                              can_change_team_settings,
-                             can_assign_roles,
                              can_assign_tasks,
                              can_change_team_settings,
                              can_message_all_members,
@@ -173,7 +172,6 @@ class TestRules(BaseTestPermission):
                              can_accept_assignments,
                          ],[
                              can_change_team_settings,
-                             can_assign_roles,
                              can_message_all_members,
                          ])
 
@@ -209,10 +207,13 @@ class TestRules(BaseTestPermission):
                              ])
 
     def test_can_assign_roles(self):
-        # for role assignment, we need more specific testing
         user = User.objects.filter(teams__isnull=True)[0]
-        project = self.team.default_project
-        add_role(self.team, user, self.owner,TeamMember.ROLE_ADMIN, project)
+
+        add_role(self.team, user, self.owner, TeamMember.ROLE_ADMIN)
         self.assertTrue(can_assign_role(self.team, user, role=ROLE_CONTRIBUTOR, to_user=None))
         self.assertFalse(can_assign_role(self.team, user, role=ROLE_OWNER, to_user=None))
+        remove_role(self.team, user, TeamMember.ROLE_ADMIN)
 
+        add_role(self.team, user, self.owner, TeamMember.ROLE_OWNER)
+        self.assertTrue(can_assign_role(self.team, user, role=ROLE_OWNER, to_user=None))
+        remove_role(self.team, user, TeamMember.ROLE_OWNER)
