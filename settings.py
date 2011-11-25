@@ -870,7 +870,7 @@ if _USE_INTEGRATION:
 EMAIL_BACKEND = "utils.safemail.InternalOnlyBackend"
 EMAIL_FILE_PATH = '/tmp/unisubs-messages'
 # on staging and dev only the emails listed bellow will receive actual mail
-EMAIL_NOTIFICATION_RECEIVERS = ("arthur@stimuli.com.br", "steve@stevelosh.com", )
+EMAIL_NOTIFICATION_RECEIVERS = ("arthur@stimuli.com.br", "steve@stevelosh.com", "@pculture.org")
 # If True will not try to load media (e.g. javascript files) from third parties.
 # If you're developing and have no net access, enable this setting on your
 # settings_local.py
