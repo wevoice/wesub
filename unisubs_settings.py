@@ -70,6 +70,8 @@ elif INSTALLATION == PRODUCTION:
     ADMINS = (
       ('universalsubtitles-errors', 'universalsubtitles-errors@pculture.org'),
     )
+    # only send actual email on the production server
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     
 if INSTALLATION == STAGING or INSTALLATION == PRODUCTION:
     uslogging_db = {
