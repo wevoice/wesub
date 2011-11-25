@@ -7,7 +7,8 @@ from apps.teams.permissions import (
     remove_role, add_role, can_edit_subs_for, can_peer_review,
     can_manager_review, can_accept_assignments, can_message_all_members,
     can_change_team_settings, can_change_video_settings, can_add_video,
-    can_assign_tasks, can_assign_roles, _perms_for, roles_assignable_to
+    can_assign_tasks, can_assign_role, _perms_for, roles_user_can_assign,
+    add_narrowing_to_member
 )
 from apps.teams.permissions_const import *
 
@@ -41,31 +42,38 @@ class TestRules(BaseTestPermission):
             self.assertFalse(res, func.__name__)
 
     def test_roles_assignable(self):
-
         user = User.objects.filter(teams__isnull=True)[0]
         team = self.team
-        member = add_role(self.team, user, self.owner,TeamMember.ROLE_OWNER)
-        self.assertItemsEqual(roles_assignable_to(team, user, ROLE_OWNER), [
+
+        # Owners can do anything.
+        add_role(self.team, user, self.owner, TeamMember.ROLE_OWNER)
+        self.assertItemsEqual(roles_user_can_assign(team, user, None), [
             ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
         ])
         remove_role(team, user, TeamMember.ROLE_OWNER)
 
-        member = add_role(self.team, user, self.owner, TeamMember.ROLE_ADMIN)
-        self.assertItemsEqual(roles_assignable_to(team, user, ROLE_ADMIN), [
-             ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+        # Admins can do anything except assign owners.
+        add_role(self.team, user, self.owner, TeamMember.ROLE_ADMIN)
+        self.assertItemsEqual(roles_user_can_assign(team, user, None), [
+            ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
         ])
         remove_role(team, user, TeamMember.ROLE_ADMIN)
-        team = refresh_obj(team)
-        member = add_role(self.team, user, self.owner, TeamMember.ROLE_MANAGER)
-        self.assertItemsEqual(roles_assignable_to(team , user, ROLE_MANAGER), [
-             ROLE_MANAGER, ROLE_CONTRIBUTOR
-        ])
+
+        # Restricted Admins can't assign roles at all.
+        member = add_role(self.team, user, self.owner, TeamMember.ROLE_ADMIN)
+        narrowing = add_narrowing_to_member(member, team.project_set.all()[0], member)
+        self.assertItemsEqual(roles_user_can_assign(team, user, None), [])
+        remove_role(team, user, TeamMember.ROLE_ADMIN)
+        narrowing.delete()
+
+        # No one else can assign roles.
+        add_role(self.team, user, self.owner, TeamMember.ROLE_MANAGER)
+        self.assertItemsEqual(roles_user_can_assign(team, user, None), [])
         remove_role(team, user, TeamMember.ROLE_MANAGER)
-        team = refresh_obj(team)
-        member = add_role(self.team, user, self.owner,TeamMember.ROLE_CONTRIBUTOR)
-        self.assertItemsEqual(roles_assignable_to(team, user, ROLE_CONTRIBUTOR), [
-              ROLE_CONTRIBUTOR
-        ])
+
+        add_role(self.team, user, self.owner, TeamMember.ROLE_CONTRIBUTOR)
+        self.assertItemsEqual(roles_user_can_assign(team, user, None), [])
+        remove_role(team, user, TeamMember.ROLE_CONTRIBUTOR)
 
     def test_perms_for_manager(self):
         # project
@@ -205,6 +213,6 @@ class TestRules(BaseTestPermission):
         user = User.objects.filter(teams__isnull=True)[0]
         project = self.team.default_project
         add_role(self.team, user, self.owner,TeamMember.ROLE_ADMIN, project)
-        self.assertTrue(can_assign_roles(self.team, user,  project, role=ROLE_CONTRIBUTOR))
-        self.assertFalse(can_assign_roles(self.team, user,   project, role=ROLE_OWNER))
+        self.assertTrue(can_assign_role(self.team, user, role=ROLE_CONTRIBUTOR, to_user=None))
+        self.assertFalse(can_assign_role(self.team, user, role=ROLE_OWNER, to_user=None))
 

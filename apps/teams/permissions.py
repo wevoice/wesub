@@ -123,9 +123,9 @@ def get_role_for_target(user, team, project=None, lang=None):
 
     # Otherwise the narrowings must match the target.
     project_narrowings = [n.content for n in narrowings
-                          if n.content_type == Project]
+                          if n.content_type.model_class() == Project]
     lang_narrowings = [n.content.language for n in narrowings
-                       if n.content_type == TeamVideoLanguage]
+                       if n.content_type.model_class() == TeamVideoLanguage]
 
     if project_narrowings and project not in project_narrowings:
         return ROLE_CONTRIBUTOR
@@ -200,6 +200,7 @@ def add_narrowing_to_member(member, target, added_by):
     """Add a narrowing to the given member for the given target.
 
     `target` should be a Project or TeamVideoLanguage object.
+    `added_by` must be a TeamMember object.
 
     """
     return MembershipNarrowing.objects.create(member, target, added_by)
