@@ -21,7 +21,6 @@ def get_video_from_code(func):
         return HttpResponseForbidden("You cannot see this video")
     
     def wrapper(request, video_id, *args, **kwargs):
-        #import pdb;pdb.set_trace()
         # check if this is a a sha1 hash
         if SHA1_RE.search(video_id):
             # secret, find the url for this

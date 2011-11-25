@@ -534,6 +534,7 @@ class Rpc(BaseRpc):
                 language=language_code,
                 standard_language=standard_language,
                 defaults={
+                    'created': datetime.now(),
                     'is_forked': forked,
                     'writelock_session_key': '' })
             editable = created or language.can_writelock(request)

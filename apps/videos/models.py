@@ -880,10 +880,10 @@ class SubtitleLanguage(models.Model):
         self.standard_language = None
         self.save()
 
-        def save(self, updates_timestamp=True, *args, **kwargs):
-            if updates_timestamp:
-                self.created = datetime.now()
-            super(SubtitleLanguage, self).save(*args, **kwargs)
+    def save(self, updates_timestamp=True, *args, **kwargs):
+        if updates_timestamp:
+            self.created = datetime.now()
+        super(SubtitleLanguage, self).save(*args, **kwargs)
             
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 
@@ -928,7 +928,67 @@ class SubtitleCollection(models.Model):
                         s, t_dict[s.subtitle_id]) for s in subs]
         setattr(self, ATTR, effective_subtitles)
         return effective_subtitles
+        
+class SubtitleVersionManager(models.Manager):
+    def new_version(self, parser, language, user, translated_from=None, note="", timestamp=None):
+        version_no = 0
+        version = language.version()
+        forked = not translated_from 
+        if version is not None:
+            version_no = version.version_no + 1
+        if translated_from is not None:
+            forked = False
+        version = SubtitleVersion(
+                language=language, version_no=version_no, note=note,
+                is_forked=forked, time_change=1, text_change=1,
+                datetime_started=datetime.now())
+        version.is_forked = forked
+        version.has_version = True
+        version.datetime_started = timestamp or datetime.now()
+        version.user=user
+        version.save()
+        
+        ids = []
 
+        original_subs = None
+        if translated_from and translated_from.version():
+            original_subs = list(translated_from.version().subtitle_set.order_by("subtitle_order"))
+        for i, item in enumerate(parser):
+            original_sub  = None
+            if translated_from and len(original_subs) > i:
+                original_sub  = original_subs[i ]
+                if original_sub.start_time != item['start_time'] or \
+                   original_sub.end_time != item['end_time']:
+                    raise Exception("No apparent match between original: %s and %s" % (original_sub, item))
+            if original_sub:
+               id = original_sub.subtitle_id
+               order = original_sub.subtitle_order
+            else:
+                id = int(random.random()*10e12)
+                order = i +1
+                while id in ids:
+                    id = int(random.random()*10e12)
+            ids.append(id)
+
+            metadata = item.pop('metadata', None)
+
+            caption, created = Subtitle.objects.get_or_create(version=version, subtitle_id=str(id))
+            caption.datetime_started = datetime.now()
+            caption.subtitle_order = order
+            caption.subtitle_text = item['subtitle_text']
+            caption.start_time = item['start_time']
+            caption.end_time = item['end_time']
+            caption.save()
+            
+            if metadata:
+                for name, value in metadata.items():
+                    SubtitleMetadata(
+                        subtitle=caption,
+                        metadata_type=name,
+                        content=value
+                    ).save()
+        return version
+ 
 class SubtitleVersion(SubtitleCollection):
     """
     user -> The legacy data model allowed null users. We do not allow it anymore, but
@@ -946,6 +1006,7 @@ class SubtitleVersion(SubtitleCollection):
     notification_sent = models.BooleanField(default=False)
     result_of_rollback = models.BooleanField(default=False)
 
+    objects = SubtitleVersionManager()
 
 
     class Meta:
