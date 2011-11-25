@@ -251,7 +251,7 @@ def can_rename_team(team, user):
     role = get_role_for_target(user, team)
     return role == ROLE_OWNER
 
-def can_add_video(team, user, project=None):
+def can_add_video(team, user, project=None, lang=None):
     """Return whether the given user can add a video to the given target."""
 
     role = get_role_for_target(user, team, project)
@@ -305,8 +305,8 @@ def can_invite(team, user):
 
 
 @_check_perms(EDIT_TEAM_SETTINGS_PERM)
-def can_change_team_settings(team, user, project=None, lang=None, role=None) :
-    return False
+def can_change_team_settings(team, user, project=None, lang=None, role=None):
+    return can_view_settings_tab(team, user)
 
 @_check_perms(EDIT_PROJECT_SETTINGS_PERM)
 def can_edit_project(team, user, project, lang=None):
@@ -343,7 +343,6 @@ def can_create_tasks(team, user, project=None):
     # for now, use the same logic as assignment
     return can_assign_tasks(team, user, project)
 
-@_check_perms(ASSIGN_TASKS_PERM)
 def can_assign_tasks(team, user, project=None, lang=None):
     role = team.members.get(user=user).role
 

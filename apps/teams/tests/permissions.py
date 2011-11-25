@@ -131,8 +131,7 @@ class TestRules(BaseTestPermission):
 
     def test_admin_team_wide(self):
         user = User.objects.filter(teams__isnull=True)[0]
-        add_role(self.team, user, self.owner,TeamMember.ROLE_ADMIN)
-
+        add_role(self.team, user, self.owner, TeamMember.ROLE_ADMIN)
 
         self._test_perms(self.team,
                          user, [
@@ -143,6 +142,7 @@ class TestRules(BaseTestPermission):
                              can_manager_review,
                              can_peer_review,
                          ], [])
+
         project = self.team.default_project
         self._test_perms(self.team,
                          user, [
@@ -154,8 +154,6 @@ class TestRules(BaseTestPermission):
                              can_manager_review,
                              can_peer_review,
                          ], [], project=project)
-        team_video = TeamVideo.objects.filter(team=self.team)[0]
-        lang = team_video.video.subtitle_language()
 
     def test_manager_for_team(self):
         user = User.objects.filter(teams__isnull=True)[0]
@@ -178,6 +176,7 @@ class TestRules(BaseTestPermission):
     def test_manager_for_project(self):
         user = User.objects.filter(teams__isnull=True)[0]
         project = self.team.default_project
+
         add_role(self.team, user, self.owner, TeamMember.ROLE_MANAGER, project )
 
         self._test_perms(self.team,
