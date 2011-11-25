@@ -465,7 +465,7 @@ def generate_docs():
     with cd(os.path.join(env.static_dir, 'unisubs')):
         run('%s/env/bin/sphinx-build %s/unisubs/docs/ %s/media/docs/' % (env.static_dir, env.static_dir, env.static_dir))
 
-def _get_settings_values(*settings_name):
+def _get_settings_values(dir, *settings_name):
     with cd(os.path.join(dir, 'unisubs')):
         run('../env/bin/python manage.py get_settings_values %s --settings=unisubs_settings' % " ".join(settings_name))
 
@@ -474,7 +474,8 @@ def get_settings_values(*settings_names):
     Connects to all servers and verifies a given django setting, usage:
     fab env:user get_settings_values:EMAIL_BACKEND,MEDIA_URL
     """
-    _execute_on_all_hosts(lambda dir: _get_settings_values(dir, settings_name))
+    _execute_on_all_hosts(lambda dir: _get_settings_values(dir, *settings_names))
+    
 try:
     from local_env import *
     def local (username):
