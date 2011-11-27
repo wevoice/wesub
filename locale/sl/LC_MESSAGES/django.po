@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-20 01:31-0600\n"
+"POT-Creation-Date: 2011-11-27 01:31-0600\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -347,6 +347,18 @@ msgstr ""
 
 #: settings.py:125 utils/translation_names.py:83
 msgid "Kazakh"
+msgstr ""
+
+#: settings.py:126 utils/translation_names.py:58
+msgid "Georgian"
+msgstr ""
+
+#: settings.py:127
+msgid "Ilocano"
+msgstr ""
+
+#: settings.py:128
+msgid "Cebuano"
 msgstr ""
 
 #: apps/auth/admin.py:13 templates/statistic/users_statistic.html:12
@@ -5828,10 +5840,6 @@ msgstr ""
 
 #: utils/translation_names.py:57
 msgid "Galician"
-msgstr ""
-
-#: utils/translation_names.py:58
-msgid "Georgian"
 msgstr ""
 
 #: utils/translation_names.py:59
