@@ -225,6 +225,9 @@ class VideoVisibilityPolicy(models.Model):
         if skips_timestamp is False:
             self.modified = datetime.datetime.now()
         super(VideoVisibilityPolicy, self).save(*args, **kwargs)
+        if self.is_public != self.video.is_public:
+            self.video.is_public = self.is_public
+            self.video.save()
         if updates_metadata:
             video_changed_tasks(self.video.pk)
 

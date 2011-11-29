@@ -107,6 +107,11 @@ class AlreadyEditingException(Exception):
     def __unicode__(self):
         return self.msg
     
+class PublicVideoManager(models.Manager):
+
+    def get_query_set(self):
+        return super(PublicVideoManager, self).get_query_set().filter(is_public=True)
+        
 class Video(models.Model):
     """Central object in the system"""
 
@@ -141,7 +146,14 @@ class Video(models.Model):
     languages_count = models.PositiveIntegerField(default=0, db_index=True, editable=False)
     moderated_by = models.ForeignKey("teams.Team", blank=True, null=True, related_name="moderating")
 
+    # denormalized convenience from VideoVisibility, should not be set
+    # directely
+    is_public = models.BooleanField(default=True)
 
+
+    public  = PublicVideoManager()
+    objects = models.Manager()
+    
     def __unicode__(self):
         title = self.title_display()
         if len(title) > 60:

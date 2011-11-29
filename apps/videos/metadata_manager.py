@@ -26,6 +26,7 @@ def update_metadata(video_pk):
     video = Video.objects.get(pk=video_pk)
     video.edited = datetime.now()
     video.save()
+    _update_is_public(video)
     _update_forked(video)
     _update_changes(video)
     _update_subtitle_counts(video)
@@ -183,3 +184,8 @@ def _update_team_tasks(video):
     for team_video in video.teamvideo_set.all():
         complete_applicable_tasks.delay(team_video.id)
 
+def _update_is_public(video):
+    if video.policy:
+        video.is_public = policy.is_public
+    else:
+        video.is_public = True
