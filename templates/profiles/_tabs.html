@@ -2,7 +2,7 @@
 
 <ul class="tabs">
     <li{% if current == "profile" %} class="current" {% endif %}>
-        <a href="{% url profiles:profile user.username %}">
+        <a href="{% url profiles:profile user_info.username %}">
             {% trans "Profile" %}
         </a>
     </li>
