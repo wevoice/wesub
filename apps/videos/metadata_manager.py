@@ -186,6 +186,6 @@ def _update_team_tasks(video):
 
 def _update_is_public(video):
     if video.policy:
-        video.is_public = policy.is_public
+        video.is_public = video.policy.is_public
     else:
         video.is_public = True

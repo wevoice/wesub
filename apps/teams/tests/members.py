@@ -3,12 +3,6 @@ from django.test import TestCase
 from auth.models import CustomUser as User
 from apps.teams.models import Team, TeamMember
 from apps.teams.forms import CreateTeamForm
-from apps.teams.permissions import (
-    remove_role, add_role, can_edit_subs_for, can_peer_review,
-    can_manager_review, can_accept_assignments, can_message_all_members,
-    can_change_team_settings, can_change_video_settings, can_add_video,
-    can_assign_tasks, can_change_video_settings, _perms_for, roles_assignable_to
-)
 
 
 class BaseMembershipTests(TestCase):

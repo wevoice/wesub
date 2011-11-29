@@ -127,6 +127,10 @@ def get_role_for_target(user, team, project=None, lang=None):
     lang_narrowings = [n.content.language for n in narrowings
                        if n.content_type.model_class() == TeamVideoLanguage]
 
+    # The default project is the same as "no project".
+    if project and project.is_default_project:
+        project = None
+
     if project_narrowings and project not in project_narrowings:
         return ROLE_CONTRIBUTOR
 
@@ -251,7 +255,7 @@ def can_rename_team(team, user):
     role = get_role_for_target(user, team)
     return role == ROLE_OWNER
 
-def can_add_video(team, user, project=None, lang=None):
+def can_add_video(team, user, project=None):
     """Return whether the given user can add a video to the given target."""
 
     role = get_role_for_target(user, team, project)
@@ -273,6 +277,9 @@ def can_view_settings_tab(team, user):
     role = get_role_for_target(user, team)
 
     return role in [ROLE_ADMIN, ROLE_OWNER]
+
+def can_change_team_settings(team, user):
+    return can_view_settings_tab(team, user)
 
 def can_view_tasks_tab(team, user):
     """Return whether the given user can view the tasks tab for the given team.
@@ -303,37 +310,41 @@ def can_invite(team, user):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_change_video_settings(user, team_video):
+    role = get_role_for_target(user, team_video.team, team_video.project, None)
+    return role in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]
 
-@_check_perms(EDIT_TEAM_SETTINGS_PERM)
-def can_change_team_settings(team, user, project=None, lang=None, role=None):
-    return can_view_settings_tab(team, user)
+def can_review(team_video, user, lang=None):
+    workflow = Workflow.get_for_team_video(team_video)
+    role = get_role_for_target(user, team_video.team, team_video.project, lang)
 
-@_check_perms(EDIT_PROJECT_SETTINGS_PERM)
-def can_edit_project(team, user, project, lang=None):
-    pass
+    # For now, don't allow require if it's disabled in the workflow.
+    # TODO: Change this to allow one-off reviews?
+    if not workflow.review_allowed:
+        return False
+
+    role_req = {
+        10: ROLE_CONTRIBUTOR,
+        20: ROLE_MANAGER,
+        30: ROLE_ADMIN,
+    }[workflow.review_allowed]
+
+    return role in _perms_equal_or_greater(role_req)
+
+def can_message_all_members(team, user):
+    role = get_role_for_target(user, team)
+    return role in [ROLE_ADMIN, ROLE_OWNER]
+
+def can_edit_project(team, user, project):
+    if project.is_default_project:
+        return False
+
+    role = get_role_for_target(user, team, project, None)
+    return role in [ROLE_ADMIN, ROLE_OWNER]
+
 
 @_check_perms(EDIT_SUBS_PERM)
 def can_edit_subs_for(team, user, project=None, lang=None):
-    pass
-
-@_check_perms(PERFORM_MANAGER_REVIEW_PERM)
-def can_manager_review(team, user, project=None, lang=None):
-    pass
-
-@_check_perms(PERFORM_PEER_REVIEW_PERM)
-def can_peer_review(team, user, project=None, lang=None):
-    pass
-
-@_check_perms(EDIT_VIDEO_SETTINGS_PERM)
-def can_change_video_settings(team, user, project, lang):
-    pass
-
-@_check_perms(MESSAGE_ALL_MEMBERS_PERM)
-def can_message_all_members(team, user, project=None, lang=None):
-    pass
-
-@_check_perms(ACCEPT_ASSIGNMENT_PERM)
-def can_accept_assignments(team, user, project=None, lang=None):
     pass
 
 
@@ -344,7 +355,7 @@ def can_create_tasks(team, user, project=None):
     return can_assign_tasks(team, user, project)
 
 def can_assign_tasks(team, user, project=None, lang=None):
-    role = team.members.get(user=user).role
+    role = get_role_for_target(user, team, project, lang)
 
     role_required = {
         10: ROLE_CONTRIBUTOR,
