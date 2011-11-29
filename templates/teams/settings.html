@@ -84,9 +84,9 @@ This is needed, since it's for the js templating
         </div>
 
         <div class="grid_9 submit">
-          <a class="button project-delete">Delete</a>
-          <a class="button project-save">Save</a>
-          <a class="button project-cancel">Changed my mind just cancel</a>
+          <a class="button delete project-delete">Delete</a>
+          <a class="button cancel project-cancel">Cancel</a>
+          <a class="button save project-save">Save</a>
         </div>
     </form>
   </div>
@@ -370,7 +370,7 @@ This is needed, since it's for the js templating
 </script>
 
 <script id="workflow" type="text/html">
-    <fieldset class="workflow">
+    <fieldset id="workflow">
         <label for="id_autocreate_subtitle">
             {% endverbatim %}{{ workflow_form.autocreate_subtitle }}{% verbatim %}
             Automatically create subtitle tasks
