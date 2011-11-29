@@ -189,3 +189,4 @@ def _update_is_public(video):
         video.is_public = video.policy.is_public
     else:
         video.is_public = True
+    video.save()

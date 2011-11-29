@@ -151,8 +151,8 @@ class Video(models.Model):
     is_public = models.BooleanField(default=True)
 
 
-    public  = PublicVideoManager()
     objects = models.Manager()
+    public  = PublicVideoManager()
     
     def __unicode__(self):
         title = self.title_display()

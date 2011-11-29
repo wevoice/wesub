@@ -232,9 +232,9 @@ class VideoVisibilityPolicy(models.Model):
             video_changed_tasks(self.video.pk)
 
     def delete(self, updates_metadata=True, *args, **kwargs):
+        super(VideoVisibilityPolicy, self).delete(*args, **kwargs)
         if updates_metadata:
             video_changed_tasks(self.video.pk)
-        super(VideoVisibilityPolicy, self).delete(*args, **kwargs)
         
 
     @property    
