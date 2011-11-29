@@ -33,30 +33,6 @@ from teams.permissions_const import (
 )
 
 
-def _passes_test(team, user, project, lang, perm_name):
-    if isinstance(perm_name, tuple):
-        perm_name = perm_name[0]
-
-    member = team.members.get(user=user)
-    role = get_role_for_target(user, team, project, lang)
-
-    if role == ROLE_OWNER:
-        # short circuit logic for onwers, as they can do anything
-        return True
-
-    for model in [x for x in (team, project, lang) if x]:
-        if model_has_permission(member, perm_name, model) is False:
-            continue
-
-
-def _check_perms( perm_name,):
-    def wrapper(func):
-        def wrapped(team, user, project=None, lang=None, video=None):
-            return _passes_test(team, user, project, lang, perm_name)
-        return wraps(func)(wrapped)
-    return wrapper
-
-
 def _perms_equal_or_lower(role, include_outsiders=False):
     """Return a list of roles equal to or less powerful than the given role.
 
@@ -211,12 +187,6 @@ def add_narrowing_to_member(member, target, added_by):
 
 
 # Roles
-def _perms_for(role, model):
-    return [x[0] for x in RULES[role].intersection(model._meta.permissions)]
-
-def model_has_permission(member, perm_name, model):
-    return perm_name in _perms_for(member.role, model)
-
 def add_role(team, cuser, added_by,  role, project=None, lang=None):
     from teams.models import TeamMember
     member, created = TeamMember.objects.get_or_create(
@@ -356,7 +326,6 @@ def can_create_and_edit_subtitles(user, team_video, lang=None):
 
 
 # Task permissions
-@_check_perms(CREATE_TASKS_PERM)
 def can_create_tasks(team, user, project=None):
     # for now, use the same logic as assignment
     return can_assign_tasks(team, user, project)

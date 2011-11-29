@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from apps.teams.permissions_const import *
 from apps.teams.permissions import (
     remove_role, add_role, can_message_all_members, can_add_video,
-    can_assign_tasks, can_assign_role, _perms_for, roles_user_can_assign,
+    can_assign_tasks, can_assign_role, roles_user_can_assign,
     add_narrowing_to_member, can_rename_team, can_view_settings_tab,
     can_change_team_settings, can_view_tasks_tab, can_invite,
     can_change_video_settings, can_review, can_message_all_members,
