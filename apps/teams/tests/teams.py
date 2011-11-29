@@ -437,6 +437,10 @@ class TeamsTest(TestCase):
         video = Video.objects.get(id=en.video.id)
         self.assertEqual(True, video.is_complete)
 
+        # We have to update the metadata here to make sure the video is marked
+        # as complete for Solr.
+        metadata_manager.update_metadata(video.pk)
+
         reset_solr()
 
         search_record_list = self._complete_search_record_list(team)
@@ -469,6 +473,9 @@ class TeamsTest(TestCase):
         url = reverse("teams:team_video", kwargs={"team_video_pk": tv.pk})
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse("teams:team_video", kwargs={"team_video_pk": tv.pk}))
+
+        reset_solr()
+
         tv = team.teamvideo_set.get(pk=1)
         team_video_search_records = self._tv_search_record_list(team)
 
@@ -564,6 +571,8 @@ class TeamsTest(TestCase):
         self.client.post(
             reverse('videos:upload_subtitles'),
             self._make_data(new_team_video.video.id, 'es'))
+
+        reset_solr()
 
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url)
