@@ -823,3 +823,12 @@ if _USE_INTEGRATION:
     for dirname in os.listdir(_INTEGRATION_PATH):
         if os.path.isfile(os.path.join(_INTEGRATION_PATH, dirname, '__init__.py')):
             INSTALLED_APPS += (dirname,)
+
+EMAIL_BACKEND = "utils.safemail.InternalOnlyBackend"
+EMAIL_FILE_PATH = '/tmp/unisubs-messages'
+# on staging and dev only the emails listed bellow will receive actual mail
+EMAIL_NOTIFICATION_RECEIVERS = ("arthur@stimuli.com.br", "steve@stevelosh.com", "@pculture.org")
+# If True will not try to load media (e.g. javascript files) from third parties.
+# If you're developing and have no net access, enable this setting on your
+# settings_local.py
+RUN_LOCALLY = False
