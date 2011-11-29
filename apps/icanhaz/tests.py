@@ -176,7 +176,7 @@ class BusinessLogic(BasicDataTest):
         video = refresh(self.video)
         self.assertFalse(video.is_public)
         policy.delete()
-        video_changed_tasks.delay(video.video_pk)
+        video_changed_tasks.delay(video.pk)
         video = refresh(self.video)
         self.assertTrue(self.video.is_public)
         
