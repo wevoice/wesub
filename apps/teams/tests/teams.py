@@ -20,7 +20,7 @@ from apps.teams import tasks
 from datetime import datetime, timedelta, date
 from django.core.management import call_command
 from django.core import mail
-from apps.videos import metadata_manager 
+from apps.videos import metadata_manager
 import re
 
 
@@ -38,51 +38,51 @@ def fix_teams_roles(teams=None):
     for t in teams or Team.objects.all():
        for member in t.members.all():
            add_role(t, member.user,  t.members.all()[0], member.role)
-           
+
 class TestNotification(TestCase):
-    
+
     fixtures = ["test.json"]
-    
+
     def setUp(self):
         fix_teams_roles()
         self.team = Team(name='test', slug='test')
         self.team.save()
-        
+
         self.user = User.objects.all()[:1].get()
         self.user.is_active = True
         self.user.changes_notification = True
         self.user.email = 'test@test.com'
         self.user.save()
-        
+
         self.tm = TeamMember(team=self.team, user=self.user)
         self.tm.save()
 
         v1 = Video.objects.all()[:1].get()
         self.tv1 = TeamVideo(team=self.team, video=v1, added_by=self.user)
         self.tv1.save()
-        
+
         v2 = Video.objects.exclude(pk=v1.pk)[:1].get()
         self.tv2 = TeamVideo(team=self.team, video=v2, added_by=self.user)
         self.tv2.save()
-        
+
     def test_new_team_video_notification(self):
         #check initial data
         self.assertEqual(self.team.teamvideo_set.count(), 2)
         self.assertEqual(self.team.users.count(), 1)
 
-        
+
         #mockup for send_templated_email to test context of email
         import utils
-        
+
         send_templated_email = utils.send_templated_email
-        
+
         def send_templated_email_mockup(to, subject, body_template, body_dict, *args, **kwargs):
             send_templated_email_mockup.context = body_dict
             send_templated_email(to, subject, body_template, body_dict, *args, **kwargs)
-        
-        utils.send_templated_email = send_templated_email_mockup        
+
+        utils.send_templated_email = send_templated_email_mockup
         reload(tasks)
-        
+
         #test notification about two new videos
         TeamVideo.objects.filter(pk__in=[self.tv1.pk, self.tv2.pk]).update(created=datetime.today())
         self.assertEqual(TeamVideo.objects.filter(created__gt=self.team.last_notification_time).count(), 2)
@@ -92,7 +92,7 @@ class TestNotification(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [self.user.email])
         self.assertEqual(len(send_templated_email_mockup.context['team_videos']), 2)
-        
+
         #test if user turn off notification
         self.user.is_active = False
         self.user.save()
@@ -100,14 +100,14 @@ class TestNotification(TestCase):
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
-        
+
         self.user.is_active = True
         self.user.changes_notification = False
         self.user.save()
         mail.outbox = []
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
-        self.assertEqual(len(mail.outbox), 0)        
+        self.assertEqual(len(mail.outbox), 0)
 
         self.user.changes_notification = True
         self.user.save()
@@ -116,15 +116,15 @@ class TestNotification(TestCase):
         mail.outbox = []
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
-        self.assertEqual(len(mail.outbox), 0)    
+        self.assertEqual(len(mail.outbox), 0)
 
         self.tm.changes_notification = True
         self.tm.save()
-        
+
         #test notification if one video is new
         created_date = self.team.last_notification_time + timedelta(seconds=10)
         TeamVideo.objects.filter(pk=self.tv1.pk).update(created=created_date)
-        
+
         self.assertEqual(TeamVideo.objects.filter(created__gt=self.team.last_notification_time).count(), 1)
         mail.outbox = []
         tasks.add_videos_notification.delay()
@@ -135,17 +135,17 @@ class TestNotification(TestCase):
 
         #test notification if all videos are already old
         created_date = self.team.last_notification_time - timedelta(seconds=10)
-        TeamVideo.objects.filter(team=self.team).update(created=created_date)        
+        TeamVideo.objects.filter(team=self.team).update(created=created_date)
         self.assertEqual(TeamVideo.objects.filter(created__gt=self.team.last_notification_time).count(), 0)
         mail.outbox = []
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
-        
+
 class TestTasks(TestCase):
-    
+
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-    
+
     def setUp(self):
         self.tv = TeamVideo.objects.all()[0]
         self.sl = SubtitleLanguage.objects.exclude(language='')[0]
@@ -155,9 +155,9 @@ class TestTasks(TestCase):
 
 class TeamDetailMetadataTest(TestCase):
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-    
+
     def setUp(self):
-        
+
         fix_teams_roles()
         self.auth = {
             "username": u"admin",
@@ -270,9 +270,9 @@ class TeamDetailMetadataTest(TestCase):
         self.assertEquals(len(settings.ALL_LANGUAGES) - 1, len(sls))
 
 class TeamsTest(TestCase):
-    
+
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-    
+
     def setUp(self):
         fix_teams_roles()
         self.auth = {
@@ -294,20 +294,20 @@ class TeamsTest(TestCase):
         }
         old_count = TeamVideo.objects.count()
         old_video_count = Video.objects.count()
-        
+
         url = reverse("teams:add_video", kwargs={"slug": team.slug})
         # the lowest permission level where one can add videos
         member = team.members.get(user=self.user)
-        member.role = TeamMember.ROLE_MANAGER 
+        member.role = TeamMember.ROLE_MANAGER
         member.save()
         response = self.client.post(url, data)
         new_count = TeamVideo.objects.count()
         self.assertEqual(old_count+1, new_count)
-        
+
         if Video.objects.count() > old_video_count:
             created_video = Video.objects.order_by('-created')[0]
             self.assertEqual(self.user, created_video.user)
-        
+
     def _set_my_languages(self, *args):
         from auth.models import UserLanguage
         for ul in self.user.userlanguage_set.all():
@@ -322,7 +322,7 @@ class TeamsTest(TestCase):
     def _create_new_team_video(self):
         self.client.login(**self.auth)
         response = self.client.get(reverse("teams:create"))
-        
+
         data = {
             "description": u"",
             "video_url": u"",
@@ -331,7 +331,7 @@ class TeamsTest(TestCase):
             "logo": u"",
             "slug": u"new-team",
             "name": u"New team",
-            
+
         }
 
         response = self.client.post(reverse("teams:create"), data)
@@ -340,18 +340,18 @@ class TeamsTest(TestCase):
         team = Team.objects.get(slug=data['slug'])
 
         self._add_team_video(team, u'en', u"http://videos.mozilla.org/firefox/3.5/switch/switch.ogv")
-        
+
         tv = TeamVideo.objects.order_by('-id')[0]
-        
+
         result = tasks.update_one_team_video.delay(tv.id)
-        
+
         if result.failed():
             self.fail(result.traceback)
 
         return team, tv
 
     def _make_data(self, video_id, lang):
-        
+
         return {
             'language': lang,
             'video': video_id,
@@ -367,14 +367,14 @@ class TeamsTest(TestCase):
         url = reverse("teams:completed_videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
         return response.context['team_video_list']
-    
+
     def test_team_join_leave(self):
         team = Team.objects.get(pk=1)
         join_url = reverse('teams:join_team', args=[team.slug])
         leave_url = reverse('teams:leave_team', args=[team.slug])
-        
+
         self.client.login(**self.auth)
-        
+
         #---------------------------------------
         self.assertTrue(team.is_open())
         TeamMember.objects.filter(team=team, user=self.user).delete()
@@ -382,12 +382,12 @@ class TeamsTest(TestCase):
         response = self.client.get(join_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(team.is_member(self.user))
-        
+
         #---------------------------------------
         response = self.client.get(leave_url)
         self.assertEqual(response.status_code, 302)
         self.assertFalse(team.is_member(self.user))
-        
+
         #---------------------------------------
         team.membership_policy = Team.INVITATION_BY_MANAGER
         team.save()
@@ -395,24 +395,24 @@ class TeamsTest(TestCase):
         response = self.client.get(join_url)
         self.assertEqual(response.status_code, 302)
         self.assertFalse(team.is_member(self.user))
-        
+
     def test_add_video(self):
         self.client.login(**self.auth)
-        
+
         team = Team.objects.get(pk=1)
         TeamMember.objects.get_or_create(user=self.user, team=team)
-        
+
         self.assertTrue(team.users.count() > 1)
-        
+
         for tm in team.members.all():
             tm.changes_notification = True
             tm.save()
             tm.user.is_active = True
             tm.user.changes_notification = True
             tm.user.save()
-        
+
         self._add_team_video(team, u'en', u"http://videos.mozilla.org/firefox/3.5/switch/switch.ogv")
-    
+
     def test_team_video_delete(self):
         #this test can fail only on MySQL
         team = Team.objects.get(pk=1)
@@ -464,14 +464,14 @@ class TeamsTest(TestCase):
             "thumbnail": u"",
             "description": u"and descriptionnn",
             "project": team.default_project.pk,
-            
+
         }
         url = reverse("teams:team_video", kwargs={"team_video_pk": tv.pk})
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse("teams:team_video", kwargs={"team_video_pk": tv.pk}))
         tv = team.teamvideo_set.get(pk=1)
         team_video_search_records = self._tv_search_record_list(team)
-        
+
         for tv in team_video_search_records:
             if tv.title == 'change title':
                 break
@@ -494,7 +494,7 @@ class TeamsTest(TestCase):
 
         reset_solr()
 
-        # The video should be in the list. 
+        # The video should be in the list.
         record_list = self._tv_search_record_list(team)
         self.assertEqual(1, len(record_list))
         self.assertEqual(new_team_video.video.video_id, record_list[0].video_id)
@@ -558,23 +558,23 @@ class TeamsTest(TestCase):
         self._set_my_languages('ko', 'en')
 
         self.client.post(
-            reverse('videos:upload_subtitles'), 
+            reverse('videos:upload_subtitles'),
             self._make_data(new_team_video.video.id, 'en'))
 
         self.client.post(
-            reverse('videos:upload_subtitles'), 
+            reverse('videos:upload_subtitles'),
             self._make_data(new_team_video.video.id, 'es'))
 
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.assertEqual(1, len(response.context['team_video_md_list']))
-    
+
     def test_team_create_with_video(self):
         self.client.login(**self.auth)
-        
+
         response = self.client.get(reverse("teams:create"))
         self.failUnlessEqual(response.status_code, 200)
-        
+
         data = {
             "description": u"",
             "video_url": u"http://www.youtube.com/watch?v=OFaWxcH6I9E",
@@ -590,19 +590,19 @@ class TeamsTest(TestCase):
         self.assertTrue(team.video)
         self.assertEqual(team.video.user, self.user)
         self.assertTrue(team.video.title)
-        
+
     def test_all_views(self):
         self.client.login(**self.auth)
-        
+
         team = Team(
            slug="new-team",
             membership_policy=4,
             video_policy =1,
-           name="New-name") 
+           name="New-name")
         team.save()
-        tm = TeamMember.objects.create_first_member(team, self.user) 
+        tm = TeamMember.objects.create_first_member(team, self.user)
         #------- create ----------
-        
+
         data = {
             "description": u"",
             "video_url": u"",
@@ -615,11 +615,11 @@ class TeamsTest(TestCase):
 
         #---------- index -------------
         response = self.client.get(reverse("teams:index"))
-        self.failUnlessEqual(response.status_code, 200) 
-               
+        self.failUnlessEqual(response.status_code, 200)
+
         response = self.client.get(reverse("teams:index"), {'q': 'vol'})
         self.failUnlessEqual(response.status_code, 200)
-        
+
         data = {
             "q": u"vol",
             "o": u"date"
@@ -629,13 +629,13 @@ class TeamsTest(TestCase):
 
         response = self.client.get(reverse("teams:index"), {'o': 'my'})
         self.failUnlessEqual(response.status_code, 200)
-                
-       
+
+
         #-------------- edit members ---------------
         url = reverse("teams:edit_members", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
-        
+
         #-------------- edit videos -----------------
         url = reverse("teams:edit_videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
@@ -646,44 +646,44 @@ class TeamsTest(TestCase):
         self.failUnlessEqual(response.status_code, 404)
 
         self.client.logout()
-        
+
         url = reverse("teams:settings", kwargs={"slug": "volunteer"})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 302)
-        
+
         self.client.login(**self.auth)
         #-------------- applications ----------------
         url = reverse("teams:applications", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
-        
+
         #------------ detail ---------------------
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
-        
+
         url = reverse("teams:detail", kwargs={"slug": team.pk})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
-        
+
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
-        
+
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'Lions'})
         self.failUnlessEqual(response.status_code, 200)
-        
+
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'empty result'})
-        self.failUnlessEqual(response.status_code, 200)        
-        
+        self.failUnlessEqual(response.status_code, 200)
+
         #------------ detail members -------------
-        
+
         url = reverse("teams:detail_members", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
-        
+
         url = reverse("teams:detail_members", kwargs={"slug": team.slug})
         response = self.client.get(url, {'q': 'test'})
         self.failUnlessEqual(response.status_code, 200)
@@ -692,11 +692,11 @@ class TeamsTest(TestCase):
         #Deprecated
         #url = reverse("teams:members_actions", kwargs={"slug": team.slug})
         #response = self.client.get(url)
-        #self.failUnlessEqual(response.status_code, 200)        
-        
+        #self.failUnlessEqual(response.status_code, 200)
+
         #------------- add video ----------------------
         self.client.login(**self.auth)
-        
+
         data = {
             "languages-MAX_NUM_FORMS": u"",
             "description": u"",
@@ -738,7 +738,7 @@ class TeamsTest(TestCase):
         }
         url = reverse("teams:team_video", kwargs={"team_video_pk": tv.pk})
         response = self.client.post(url, data)
-        self.assertRedirects(response, reverse("teams:team_video", kwargs={"team_video_pk": tv.pk}))        
+        self.assertRedirects(response, reverse("teams:team_video", kwargs={"team_video_pk": tv.pk}))
         tv = team.teamvideo_set.get(pk=1)
         self.assertEqual(tv.title, u"change title")
         self.assertEqual(tv.description, u"and description")
@@ -755,11 +755,11 @@ class TeamsTest(TestCase):
             self.fail()
         except ObjectDoesNotExist:
             pass
-        
+
         #----------inviting to team-----------
         user2 = User.objects.get(username="alerion")
         TeamMember.objects.filter(user=user2, team=team).delete()
-        
+
         data = {
             "username": user2.username,
             "note": u"asd",
@@ -771,21 +771,21 @@ class TeamsTest(TestCase):
         invite = Invite.objects.get(user__username=user2.username, team=team)
         ct = ContentType.objects.get_for_model(Invite)
         Message.objects.filter(object_pk=invite.pk, content_type=ct, user=user2)
-        
+
         members_count = team.members.count()
-        
+
         self.client.login(username = user2.username, password ='alerion')
         url = reverse("teams:accept_invite", kwargs={"invite_pk": invite.pk})
         response = self.client.get(url)
-        
+
         self.assertEqual(members_count+1, team.members.count())
-        
+
         self.client.login(**self.auth)
 
         url = reverse("teams:edit_members", kwargs={"slug": team.slug})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
- 
+
         data = {
             "ot": u"desc",
             "page": u"1",
@@ -797,13 +797,13 @@ class TeamsTest(TestCase):
 
         tm,c = TeamMember.objects.get_or_create(user=self.user, team=team)
         tm.role = TeamMember.ROLE_ADMIN
-        tm.save() 
+        tm.save()
         url = reverse("teams:remove_member", kwargs={"user_pk": user2.pk, "slug": team.slug})
         response = self.client.post(url)
         self.failUnlessEqual(response.status_code, 200)
-        
+
         self.assertFalse(team.is_member(user2))
-        
+
         url = reverse("teams:completed_videos", kwargs={"slug": team.slug})
         response = self.client.post(url)
         self.failUnlessEqual(response.status_code, 200)
@@ -811,7 +811,7 @@ class TeamsTest(TestCase):
         url = reverse("teams:videos_actions", kwargs={"slug": team.slug})
         response = self.client.post(url)
         self.failUnlessEqual(response.status_code, 200)
-        
+
         self.client.login()
         TeamMember.objects.filter(user=self.user, team=team).delete()
         self.assertFalse(team.is_member(self.user))
@@ -819,7 +819,7 @@ class TeamsTest(TestCase):
         response = self.client.post(url)
         self.failUnlessEqual(response.status_code, 302)
         self.assertTrue(team.is_member(self.user))
-        
+
     def test_fixes(self):
         url = reverse("teams:detail", kwargs={"slug": 'slug-does-not-exist'})
         response = self.client.get(url)
@@ -830,24 +830,24 @@ from utils.rpc import Error, Msg
 from django.contrib.auth.models import AnonymousUser
 
 class TestJqueryRpc(TestCase):
-    
+
     def setUp(self):
         fix_teams_roles()
         self.team = Team(name='Test', slug='test')
         self.team.save()
         self.user = User.objects.all()[:1].get()
         self.rpc = TeamsApiClass()
-    
+
     def test_promote_user(self):
         other_user = User.objects.exclude(pk=self.user.pk)[:1].get()
         user_tm = TeamMember(team=self.team, user=self.user)
         user_tm.save()
         other_user_tm = TeamMember(team=self.team, user=other_user)
         other_user_tm.save()
-        
+
         self.assertEqual(other_user_tm.role, TeamMember.ROLE_CONTRIBUTOR)
         self.assertEqual(user_tm.role, TeamMember.ROLE_CONTRIBUTOR)
-        
+
         response = self.rpc.promote_user(self.team.pk, other_user_tm.pk, TeamMember.ROLE_MANAGER, AnonymousUser())
         if not isinstance(response, Error):
             self.fail('Anonymouse user is not member of team')
@@ -855,34 +855,34 @@ class TestJqueryRpc(TestCase):
         response = self.rpc.promote_user(self.team.pk, other_user_tm.pk, TeamMember.ROLE_MANAGER, self.user)
         if not isinstance(response, Error):
             self.fail('User should be manager')
-            
+
         user_tm.role = TeamMember.ROLE_MANAGER
         user_tm.save()
-        
+
         NEW_ROLE = TeamMember.ROLE_CONTRIBUTOR
         response = self.rpc.promote_user(self.team.pk, other_user_tm.pk, NEW_ROLE, self.user)
         self.assertTrue(isinstance(response, Msg))
         other_user_tm = refresh_obj(other_user_tm)
         self.assertEqual(other_user_tm.role, NEW_ROLE)
-        
+
         response = self.rpc.promote_user(self.team.pk, user_tm.pk, TeamMember.ROLE_CONTRIBUTOR, self.user)
         if not isinstance(response, Error):
-            self.fail('Can\'t promote yourself')        
-        
+            self.fail('Can\'t promote yourself')
+
         response = self.rpc.promote_user(self.team.pk, other_user_tm.pk, 'undefined role 123456', self.user)
         if not isinstance(response, Error):
-            self.fail('Incorrect role')                
+            self.fail('Incorrect role')
 
         response = self.rpc.promote_user(self.team.pk, 123456, TeamMember.ROLE_MANAGER, self.user)
         if not isinstance(response, Error):
-            self.fail('Undefined team member')    
+            self.fail('Undefined team member')
 
         undefined_team_pk = 123456
         self.assertFalse(Team.objects.filter(pk=undefined_team_pk))
         response = self.rpc.promote_user(undefined_team_pk, other_user_tm.pk, TeamMember.ROLE_MANAGER, self.user)
         if not isinstance(response, Error):
-            self.fail('Undefined team')   
-        
+            self.fail('Undefined team')
+
     def test_create_application(self):
         response = self.rpc.create_application(self.team.pk, '', AnonymousUser())
         if not isinstance(response, Error):
@@ -892,51 +892,51 @@ class TestJqueryRpc(TestCase):
         response = self.rpc.create_application(None, '', self.user)
         if not isinstance(response, Error):
             self.fail('Undefined team')
-        #---------------------------------------    
+        #---------------------------------------
         self.team.membership_policy = Team.INVITATION_BY_MANAGER
         self.team.save()
-        
+
         response = self.rpc.create_application(self.team.pk, '', self.user)
         if not isinstance(response, Error):
             self.fail('Team is not opened')
         #---------------------------------------
         self.team.membership_policy = Team.OPEN
         self.team.save()
-        
+
         self.assertFalse(self.team.is_member(self.user))
-        
+
         response = self.rpc.create_application(self.team.pk, '', self.user)
-        
+
         if isinstance(response, Error):
             self.fail(response)
-        
-        self.assertTrue(self.team.is_member(self.user))        
+
+        self.assertTrue(self.team.is_member(self.user))
         #---------------------------------------
         self.team.members.filter(user=self.user).delete()
-        
+
         self.team.membership_policy = Team.APPLICATION
         self.team.save()
-        
-        self.assertFalse(Application.objects.filter(user=self.user, team=self.team).exists())  
+
+        self.assertFalse(Application.objects.filter(user=self.user, team=self.team).exists())
         response = self.rpc.create_application(self.team.pk, '', self.user)
 
         if isinstance(response, Error):
             self.fail(response)
-        
+
         self.assertFalse(self.team.is_member(self.user))
         self.assertTrue(Application.objects.filter(user=self.user, team=self.team).exists())
-        #---------------------------------------         
+        #---------------------------------------
 
 class TeamsDetailQueryTest(TestCase):
-    
+
     fixtures = ["staging_users.json"]
-    
+
     def setUp(self):
         fix_teams_roles()
         self.auth = {
             "username": u"admin",
             "password": u"admin"
-        }    
+        }
         self.user = User.objects.get(username=self.auth["username"])
 
         self.client.login(**self.auth)
@@ -979,8 +979,8 @@ class TeamsDetailQueryTest(TestCase):
     def test_hide_trans_back_to_original_lang(self):
         """
         context https://www.pivotaltracker.com/story/show/12883401
-        my languages are english and arabic. video is in arabic, 
-        and it has complete translations in english and no arabic subs. 
+        my languages are english and arabic. video is in arabic,
+        and it has complete translations in english and no arabic subs.
         qs1 and qs2 must not contain opportunity to translate into arabic.
         """
         user_langs = ["en", "ar"]
@@ -1003,7 +1003,7 @@ class TeamsDetailQueryTest(TestCase):
 
 class TestLanguagePreference(TestCase):
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-    
+
     def setUp(self):
         fix_teams_roles()
         self.auth = {
@@ -1033,8 +1033,8 @@ class TestLanguagePreference(TestCase):
         self.assertIn("en" , self.langs_set)
         self.assertNotIn("en" , generated)
         self.assertNotIn("en" , cached)
-        
-        
+
+
     def test_writable_lang(self):
         # no tlp, should be all languages
         generated =TeamLanguagePreference.objects._generate_writable(self.team )
@@ -1053,4 +1053,4 @@ class TestLanguagePreference(TestCase):
         self.assertIn("en" , self.langs_set)
         self.assertNotIn("en" , generated)
         self.assertNotIn("en" , cached)
-        
+
