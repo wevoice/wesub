@@ -1,6 +1,5 @@
 #from django.utils import unittest
 import json
-
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 
@@ -9,6 +8,7 @@ from teams.search_indexes import TeamVideoLanguagesIndex
 from auth.models import CustomUser as User
 from videos.models import Video
 from videos.search_indexes import VideoIndex
+from videos.tasks import video_changed_tasks
 from apps.icanhaz.models import VideoVisibilityPolicy
 
 # FIXME move the reset solr to a common test util packages
@@ -155,6 +155,30 @@ class BusinessLogic(BasicDataTest):
             VideoVisibilityPolicy.objects.can_create_for_video(video, self.regular_user))
         self.assertFalse(
             VideoVisibilityPolicy.objects.can_create_for_video(video, self.team2))
+        
+    def test_updates_video_model(self):
+        self.assertTrue(self.video.is_public)
+        policy = VideoVisibilityPolicy.objects.create_for_video(
+            self.video,
+            VideoVisibilityPolicy.SITE_VISIBILITY_PRIVATE_OWNER,
+            self.regular_user,
+        )
+        video = refresh(self.video)
+        self.assertFalse(video.is_public)
+        
+    def test_updates_video_model_delete(self):
+        self.assertTrue(self.video.is_public)
+        policy = VideoVisibilityPolicy.objects.create_for_video(
+            self.video,
+            VideoVisibilityPolicy.SITE_VISIBILITY_PRIVATE_OWNER,
+            self.regular_user,
+        )
+        video = refresh(self.video)
+        self.assertFalse(video.is_public)
+        policy.delete()
+        video_changed_tasks.delay(video.video_pk)
+        video = refresh(self.video)
+        self.assertTrue(self.video.is_public)
         
         
         

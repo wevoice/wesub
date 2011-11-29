@@ -120,8 +120,6 @@ def get_pager(objects, on_page=15, page='1', orphans=0):
 
 def send_templated_email(to, subject, body_template, body_dict, 
                          from_email=None, ct="html", fail_silently=False):
-    # disable notifications untill we are 100% certain
-    return 
     if not isinstance(to, list): to = [to]
     if not from_email: from_email = settings.DEFAULT_FROM_EMAIL
 

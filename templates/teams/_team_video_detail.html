@@ -4,7 +4,7 @@
   <h3>
     <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.title|truncatewords:9 }}</a>
     {% if search_record.project_name != "_root" %}
-        <span class="descriptor">{{ search_record.project_name }}</span>
+        <span class="descriptor"><a href="{% url teams:project_video_list slug=team.slug,project_slug=search_record.project_slug %}">{{ search_record.project_name }}</a></span>
     {% endif %}
   </h3>
 
