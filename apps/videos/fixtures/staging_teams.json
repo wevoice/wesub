@@ -9,7 +9,8 @@
             "created": "2010-11-11 10:52:09", 
             "points": 0, 
             "membership_policy": 4, 
-            "video_policy": 1, 
+            "video_policy": 2, 
+            "task_assign_policy": 20, 
             "highlight": false, 
             "logo": "", 
             "slug": "volunteer", 
@@ -26,6 +27,18 @@
             "modified": "2010-11-11 10:52:09", 
             "team": 1,
             "slug": "_root"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "teams.project", 
+        "fields": {
+            "name": "Test Project", 
+            "description": "Project for testing.", 
+            "created": "2010-11-11 10:52:09", 
+            "modified": "2010-11-11 10:52:09", 
+            "team": 1,
+            "slug": "test"
         }
     }, 
     {
@@ -97,7 +110,7 @@
             "thumbnail": "", 
             "added_by": 9998,
             "created": "2010-11-11 10:52:09",
-            "project": 1
+            "project": 2
         }
     }            
 ]
