@@ -92,7 +92,7 @@ class Team(models.Model):
         (10, 'Anyone'),
         (20, 'Any team member'),
         (30, 'Only managers and admins'),
-        (40, 'Ony admins'),
+        (40, 'Only admins'),
     )
     SUBTITLE_NAMES = dict(SUBTITLE_CHOICES)
     SUBTITLE_IDS = dict([choice[::-1] for choice in SUBTITLE_CHOICES])

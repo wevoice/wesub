@@ -342,10 +342,17 @@ def can_edit_project(team, user, project):
     role = get_role_for_target(user, team, project, None)
     return role in [ROLE_ADMIN, ROLE_OWNER]
 
+def can_create_and_edit_subtitles(user, team_video, lang=None):
+    role = get_role_for_target(user, team_video.team, team_video.project, lang)
 
-@_check_perms(EDIT_SUBS_PERM)
-def can_edit_subs_for(team, user, project=None, lang=None):
-    pass
+    role_req = {
+        10: ROLE_OUTSIDER,
+        20: ROLE_CONTRIBUTOR,
+        30: ROLE_MANAGER,
+        40: ROLE_ADMIN,
+    }[team_video.team.subtitle_policy]
+
+    return role in _perms_equal_or_greater(role_req, include_outsiders=True)
 
 
 # Task permissions

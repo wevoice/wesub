@@ -10,7 +10,7 @@ from apps.teams.permissions import (
     add_narrowing_to_member, can_rename_team, can_view_settings_tab,
     can_change_team_settings, can_view_tasks_tab, can_invite,
     can_change_video_settings, can_review, can_message_all_members,
-    can_edit_project
+    can_edit_project, can_create_and_edit_subtitles
 )
 
 
@@ -29,10 +29,6 @@ class BaseTestPermission(TestCase):
 
         self.outsider = User.objects.get(username='outsider')
 
-        self.nonproject_video = TeamVideo.objects.filter(project__pk=1)[0]
-        self.project_video = TeamVideo.objects.filter(project__pk=2)[0]
-
-
     @property
     def default_project(self):
         return self.team.project_set.get(pk=1)
@@ -40,6 +36,15 @@ class BaseTestPermission(TestCase):
     @property
     def test_project(self):
         return self.team.project_set.get(pk=2)
+
+
+    @property
+    def nonproject_video(self):
+        return TeamVideo.objects.filter(project__pk=1)[0]
+
+    @property
+    def project_video(self):
+        return TeamVideo.objects.filter(project__pk=2)[0]
 
 
     @contextmanager
@@ -57,15 +62,6 @@ class TestRules(BaseTestPermission):
 
     def _login(self):
         self.client.login(**self.auth)
-
-    def _test_perms(self, team, user,
-                    funcs_true, funcs_false, project=None, lang=None):
-        for func in funcs_true:
-            self.assertTrue(func(team, user, project, lang), func.__name__)
-
-        for func in funcs_false:
-            res = func(team, user, project, lang)
-            self.assertFalse(res, func.__name__)
 
 
     # Testing specific permissions
@@ -258,31 +254,28 @@ class TestRules(BaseTestPermission):
 
     def test_can_change_video_settings(self):
         user, outsider = self.user, self.outsider
-        project_video, nonproject_video = self.project_video, self.nonproject_video
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
-                self.assertTrue(can_change_video_settings(user, project_video))
-                self.assertTrue(can_change_video_settings(user, nonproject_video))
+                self.assertTrue(can_change_video_settings(user, self.project_video))
+                self.assertTrue(can_change_video_settings(user, self.nonproject_video))
 
         for r in [ROLE_CONTRIBUTOR]:
             with self.role(r):
-                self.assertFalse(can_change_video_settings(user, project_video))
-                self.assertFalse(can_change_video_settings(user, nonproject_video))
+                self.assertFalse(can_change_video_settings(user, self.project_video))
+                self.assertFalse(can_change_video_settings(user, self.nonproject_video))
 
         for r in [ROLE_MANAGER, ROLE_ADMIN]:
             with self.role(r, self.test_project):
-                self.assertTrue(can_change_video_settings(user, project_video))
-                self.assertFalse(can_change_video_settings(user, nonproject_video))
+                self.assertTrue(can_change_video_settings(user, self.project_video))
+                self.assertFalse(can_change_video_settings(user, self.nonproject_video))
 
-        self.assertFalse(can_change_video_settings(outsider, project_video))
-        self.assertFalse(can_change_video_settings(outsider, nonproject_video))
+        self.assertFalse(can_change_video_settings(outsider, self.project_video))
+        self.assertFalse(can_change_video_settings(outsider, self.nonproject_video))
 
     def test_can_review(self):
         user, outsider = self.user, self.outsider
-        team_video = self.nonproject_video
-        project_team_video = self.project_video
-        workflow = Workflow.get_for_team_video(team_video)
+        workflow = Workflow.get_for_team_video(self.nonproject_video)
 
         # TODO: Test with Project/video-specific workflows.
 
@@ -292,9 +285,9 @@ class TestRules(BaseTestPermission):
 
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
-                self.assertFalse(can_review(team_video, user))
+                self.assertFalse(can_review(self.nonproject_video, user))
 
-        self.assertFalse(can_review(team_video, outsider))
+        self.assertFalse(can_review(self.nonproject_video, outsider))
 
         # Peer reviewing.
         workflow.review_allowed = Workflow.REVIEW_IDS["Peer must review"]
@@ -302,9 +295,9 @@ class TestRules(BaseTestPermission):
 
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
-                self.assertTrue(can_review(team_video, user))
+                self.assertTrue(can_review(self.nonproject_video, user))
 
-        self.assertFalse(can_review(team_video, outsider))
+        self.assertFalse(can_review(self.nonproject_video, outsider))
 
         # Manager review.
         workflow.review_allowed = Workflow.REVIEW_IDS["Manager must review"]
@@ -312,18 +305,18 @@ class TestRules(BaseTestPermission):
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
-                self.assertTrue(can_review(team_video, user))
+                self.assertTrue(can_review(self.nonproject_video, user))
 
         for r in [ROLE_CONTRIBUTOR]:
             with self.role(r):
-                self.assertFalse(can_review(team_video, user))
+                self.assertFalse(can_review(self.nonproject_video, user))
 
         for r in [ROLE_MANAGER, ROLE_ADMIN]:
             with self.role(r, self.test_project):
-                self.assertFalse(can_review(team_video, user))
-                self.assertTrue(can_review(project_team_video, user))
+                self.assertFalse(can_review(self.nonproject_video, user))
+                self.assertTrue(can_review(self.project_video, user))
 
-        self.assertFalse(can_review(team_video, outsider))
+        self.assertFalse(can_review(self.nonproject_video, outsider))
 
         # Admin review.
         workflow.review_allowed = Workflow.REVIEW_IDS["Admin must review"]
@@ -331,18 +324,18 @@ class TestRules(BaseTestPermission):
 
         for r in [ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
-                self.assertTrue(can_review(team_video, user))
+                self.assertTrue(can_review(self.nonproject_video, user))
 
         for r in [ROLE_MANAGER, ROLE_CONTRIBUTOR]:
             with self.role(r):
-                self.assertFalse(can_review(team_video, user))
+                self.assertFalse(can_review(self.nonproject_video, user))
 
         for r in [ROLE_ADMIN]:
             with self.role(r, self.test_project):
-                self.assertFalse(can_review(team_video, user))
-                self.assertTrue(can_review(project_team_video, user))
+                self.assertFalse(can_review(self.nonproject_video, user))
+                self.assertTrue(can_review(self.project_video, user))
 
-        self.assertFalse(can_review(team_video, outsider))
+        self.assertFalse(can_review(self.nonproject_video, outsider))
 
     def test_can_message_all_members(self):
         team, user, outsider = self.team, self.user, self.outsider
@@ -388,4 +381,65 @@ class TestRules(BaseTestPermission):
         self.assertFalse(can_edit_project(team, outsider, test_project))
 
         # TODO: Test with a second project.
+
+    def test_can_create_and_edit_subtitles(self):
+        team, user, outsider = self.team, self.user, self.outsider
+
+        # Anyone
+        team.subtitle_policy = Team.SUBTITLE_IDS['Anyone']
+        team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_create_and_edit_subtitles(user, self.nonproject_video))
+
+        self.assertTrue(can_create_and_edit_subtitles(outsider, self.nonproject_video))
+
+        # Contributors only.
+        team.subtitle_policy = Team.SUBTITLE_IDS['Any team member']
+        team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_create_and_edit_subtitles(user, self.nonproject_video))
+
+        self.assertFalse(can_create_and_edit_subtitles(outsider, self.nonproject_video))
+
+        # Managers only.
+        team.subtitle_policy = Team.SUBTITLE_IDS['Only managers and admins']
+        team.save()
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_create_and_edit_subtitles(user, self.nonproject_video))
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN]:
+            with self.role(r, self.test_project):
+                self.assertFalse(can_create_and_edit_subtitles(user, self.nonproject_video))
+                self.assertTrue(can_create_and_edit_subtitles(user, self.project_video))
+
+        for r in [ROLE_CONTRIBUTOR]:
+            with self.role(r):
+                self.assertFalse(can_create_and_edit_subtitles(user, self.nonproject_video))
+
+        self.assertFalse(can_create_and_edit_subtitles(outsider, self.nonproject_video))
+
+        # Admins only.
+        team.subtitle_policy = Team.SUBTITLE_IDS['Only admins']
+        team.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_create_and_edit_subtitles(user, self.nonproject_video))
+
+        for r in [ROLE_ADMIN]:
+            with self.role(r, self.test_project):
+                self.assertFalse(can_create_and_edit_subtitles(user, self.nonproject_video))
+                self.assertTrue(can_create_and_edit_subtitles(user, self.project_video))
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                self.assertFalse(can_create_and_edit_subtitles(user, self.nonproject_video))
+
+        self.assertFalse(can_create_and_edit_subtitles(outsider, self.nonproject_video))
 
