@@ -280,13 +280,13 @@ class Video(models.Model):
         This is a little hack, because Django uses get_absolute_url in own way,
         so it was impossible just copy to VideoSearchResult
         """        
-        kwargs = {}
-        if locale:
-            kwargs['locale'] = locale 
+        kwargs = {'video_id' : self.video_id}
         title = self.title_for_url()
         if title:
-            return reverse('videos:video_with_title', args=[self.video_id, urlquote(title)], kwargs=kwargs)
-        return reverse('videos:video', args=[self.video_id], kwargs=kwargs)
+            kwargs['title'] = title
+            return reverse('videos:video_with_title',
+                           kwargs=kwargs)
+        return reverse('videos:video',  kwargs=kwargs)
     
     get_absolute_url = _get_absolute_url
     
