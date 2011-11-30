@@ -3,14 +3,14 @@
 {% with current_project=project %}
     <ul>
         <li {% if not current_project %}class="current"{% endif %}>
-            <a href="{{ team.get_absolute_url }}">All videos</a>
+            <a href="{{ team.get_absolute_url }}">All videos <span>{{ team.teamvideo_set.count }}</span></a>
         </li>
 
         {% team_projects team as projects %}
 
         {% for project in projects %}
             <li {% if current_project == project %}class="current"{% endif %}>
-                <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}">{{ project }}</a>
+                <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}">{{ project }} <span>{{ project.teamvideo_set.count }}</span></a>
             </li>
         {% endfor %}
     </ul>
