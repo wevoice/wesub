@@ -230,11 +230,15 @@ var TasksPanel = AsyncPanel.$extend({
     renderTasksList: function() {
         var tasksListing = $('.tasks.listing');
 
-        $('li', tasksListing).remove();
+        if (_.isEmpty(this.tasks)) {
+            tasksListing.html('<li class="empty">Sorry, no tasks here.</li>');
+        } else {
+            $('li', tasksListing).remove();
 
-        _.each(this.tasks, function(task) {
-            tasksListing.append(task.el);
-        });
+            _.each(this.tasks, function(task) {
+                tasksListing.append(task.el);
+            });
+        }
     },
 
     onTasksListLoaded: function(data) {
