@@ -668,7 +668,7 @@ function bootstrapTabs(){
     var buttons = [
         {label:"Basic Settings", panelSelector:".panel-basic", klass:BasicPanel},
         {label:"Guidelines and messages", panelSelector:".panel-guidelines", klass:GuidelinesPanel},
-        {label:"Permissions", panelSelector:".panel-permissions", klass:PermissionsPanel},
+        {label:"Permissions and workflow", panelSelector:".panel-permissions", klass:PermissionsPanel},
         {label:"Projects", panelSelector:".panel-projects", klass:ProjectPanel},
     ];
     var viewer = new TabViewer(buttons, $(".sub-settings-panel"), $(CONTAINER_SELECTOR));
