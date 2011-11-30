@@ -32,7 +32,7 @@ from apps.teams.permissions import (
     can_change_team_settings, can_view_tasks_tab, can_invite,
     can_change_video_settings, can_review, can_message_all_members,
     can_edit_project, can_create_and_edit_subtitles, can_create_task_subtitle,
-    can_create_task_translate
+    can_create_task_translate, can_join_team
 )
 
 
@@ -138,6 +138,27 @@ class TestRules(BaseTestPermission):
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN]:
             with self.role(r):
                 self.assertFalse(can_rename_team(team, user))
+
+    def test_can_join_team(self):
+        user, team, outsider = self.user, self.team, self.outsider
+
+        # Current members can't join the team.
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertFalse(can_join_team(team, user))
+
+        # Outsiders can join the team.
+        team.membership_policy = Team.OPEN
+        team.save()
+        self.assertTrue(can_join_team(team, outsider))
+
+        # But not if the team requires invitation/application.
+        for policy in [Team.APPLICATION, Team.INVITATION_BY_ALL, Team.INVITATION_BY_MANAGER, Team.INVITATION_BY_ADMIN]:
+            team.membership_policy = policy
+            team.save()
+            self.assertFalse(can_join_team(team, outsider))
+
+
 
     def test_can_add_video(self):
         user = self.user
