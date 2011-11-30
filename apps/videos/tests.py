@@ -758,12 +758,12 @@ class ViewsTest(WebUseTest):
         self.video.save()
         url = self.video.get_absolute_url('en')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         self.video.title = ''
         self.video.save()
         response = self.client.get(self.video.get_absolute_url('en'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
     def test_access_video_page_no_original(self):
         from widget.tests import create_two_sub_session, RequestMockup
