@@ -16,10 +16,13 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import datetime
 from django.test import TestCase
-from apps.teams.models import Team, TeamVideo, TeamMember, Workflow
+from apps.teams.models import Team, TeamVideo, TeamMember, Workflow, Task
 from auth.models import CustomUser as User
 from contextlib import contextmanager
+from apps.testhelpers import views as helpers
+from utils.translation import SUPPORTED_LANGUAGES_DICT
 
 from apps.teams.permissions_const import *
 from apps.teams.permissions import (
@@ -28,8 +31,22 @@ from apps.teams.permissions import (
     add_narrowing_to_member, can_rename_team, can_view_settings_tab,
     can_change_team_settings, can_view_tasks_tab, can_invite,
     can_change_video_settings, can_review, can_message_all_members,
-    can_edit_project, can_create_and_edit_subtitles
+    can_edit_project, can_create_and_edit_subtitles, can_create_task_subtitle,
+    can_create_task_translate
 )
+
+
+TOTAL_LANGS = len(SUPPORTED_LANGUAGES_DICT)
+
+
+def _set_subtitles(team_video, language, original, complete, translations=[]):
+    translations = [{'code': lang, 'is_original': False, 'is_complete': True,
+                     'num_subs': 1} for lang in translations]
+
+    data = {'code': language, 'is_original': original, 'is_complete': complete,
+            'num_subs': 1, 'translations': translations}
+
+    helpers._add_lang_to_video(team_video.video, data, None)
 
 
 class BaseTestPermission(TestCase):
@@ -461,3 +478,189 @@ class TestRules(BaseTestPermission):
 
         self.assertFalse(can_create_and_edit_subtitles(outsider, self.nonproject_video))
 
+
+    # TODO: Ensure later steps block earlier steps.
+    def test_can_create_task_subtitle(self):
+        team, user, outsider = self.team, self.user, self.outsider
+
+        # When no subtitles exist yet, it depends on the team's task creation
+        # policy.
+        self.assertTrue(can_create_task_subtitle(self.nonproject_video))
+
+        # Any team member.
+        team.task_assign_policy = Team.TASK_ASSIGN_IDS['Any team member']
+        team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_create_task_subtitle(self.nonproject_video, user))
+
+        self.assertFalse(can_create_task_subtitle(self.nonproject_video, outsider))
+
+        # Manager+
+        team.task_assign_policy = Team.TASK_ASSIGN_IDS['Managers and admins']
+        team.save()
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_create_task_subtitle(self.nonproject_video, user))
+
+        for r in [ROLE_CONTRIBUTOR]:
+            with self.role(r):
+                self.assertFalse(can_create_task_subtitle(self.nonproject_video, user))
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN]:
+            with self.role(r, self.test_project):
+                self.assertFalse(can_create_task_subtitle(self.nonproject_video, user))
+
+        self.assertFalse(can_create_task_subtitle(self.nonproject_video, outsider))
+
+        # Admin+
+        team.task_assign_policy = Team.TASK_ASSIGN_IDS['Admins only']
+        team.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_create_task_subtitle(self.nonproject_video, user))
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                self.assertFalse(can_create_task_subtitle(self.nonproject_video, user))
+
+        for r in [ROLE_ADMIN]:
+            with self.role(r, self.test_project):
+                self.assertFalse(can_create_task_subtitle(self.nonproject_video, user))
+
+        self.assertFalse(can_create_task_subtitle(self.nonproject_video, outsider))
+
+        # Once a subtitle task exists, no one can create another.
+        team.task_assign_policy = Team.TASK_ASSIGN_IDS['Any team member']
+        team.save()
+
+        t = Task(type=Task.TYPE_IDS['Subtitle'], team=team, team_video=self.nonproject_video)
+        t.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertFalse(can_create_task_subtitle(self.nonproject_video, user))
+
+        # Even if it's completed.
+        t.completed = datetime.datetime.now()
+        t.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertFalse(can_create_task_subtitle(self.nonproject_video, user))
+
+        # Unless it's deleted, of course.
+        t.deleted = True
+        t.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_create_task_subtitle(self.nonproject_video, user))
+
+        # Once subtitles exist, no one can create a new task.
+        _set_subtitles(self.nonproject_video, 'en', True, True)
+
+        self.assertFalse(can_create_task_subtitle(self.nonproject_video))
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertFalse(can_create_task_subtitle(self.nonproject_video, user))
+
+        self.assertFalse(can_create_task_subtitle(self.nonproject_video, outsider))
+
+    def test_can_create_task_translate(self):
+        team, user, outsider = self.team, self.user, self.outsider
+
+        # When no subtitles exist yet, no translations can be created.
+        self.assertEqual(can_create_task_translate(self.nonproject_video), [])
+
+        # Add some sample subtitles.  Now we can create translation tasks
+        # (but not to that language, since it's already done).
+        _set_subtitles(self.nonproject_video, 'en', True, True)
+
+        langs = can_create_task_translate(self.nonproject_video)
+
+        self.assertEqual(len(langs), TOTAL_LANGS - 1)
+        self.assertTrue('en' not in langs)
+
+        # Languages with translations finished can't have new translation tasks.
+        _set_subtitles(self.nonproject_video, 'en', True, True, ['fr', 'de'])
+
+        langs = can_create_task_translate(self.nonproject_video)
+
+        self.assertEqual(len(langs), TOTAL_LANGS - 3)
+        self.assertTrue('en' not in langs)
+        self.assertTrue('fr' not in langs)
+
+        # Test role restrictions.
+        _set_subtitles(self.nonproject_video, 'en', True, True, ['fr'])
+
+        # Any team member.
+        team.task_assign_policy = Team.TASK_ASSIGN_IDS['Any team member']
+        team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                langs = can_create_task_translate(self.nonproject_video, user)
+
+                self.assertEqual(len(langs), TOTAL_LANGS - 2)
+                self.assertTrue('en' not in langs)
+                self.assertTrue('fr' not in langs)
+
+        langs = can_create_task_translate(self.nonproject_video, outsider)
+        self.assertEqual(langs, [])
+
+        # Managers+
+        team.task_assign_policy = Team.TASK_ASSIGN_IDS['Managers and admins']
+        team.save()
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                langs = can_create_task_translate(self.nonproject_video, user)
+
+                self.assertEqual(len(langs), TOTAL_LANGS - 2)
+                self.assertTrue('en' not in langs)
+                self.assertTrue('fr' not in langs)
+
+        for r in [ROLE_CONTRIBUTOR]:
+            with self.role(r):
+                langs = can_create_task_translate(self.nonproject_video, user)
+                self.assertEqual(langs, [])
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN]:
+            with self.role(r, self.test_project):
+                langs = can_create_task_translate(self.nonproject_video, user)
+                self.assertEqual(langs, [])
+
+        langs = can_create_task_translate(self.nonproject_video, outsider)
+        self.assertEqual(langs, [])
+
+        # Admins+
+        team.task_assign_policy = Team.TASK_ASSIGN_IDS['Admins only']
+        team.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                langs = can_create_task_translate(self.nonproject_video, user)
+
+                self.assertEqual(len(langs), TOTAL_LANGS - 2)
+                self.assertTrue('en' not in langs)
+                self.assertTrue('fr' not in langs)
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                langs = can_create_task_translate(self.nonproject_video, user)
+                self.assertEqual(langs, [])
+
+        for r in [ROLE_ADMIN]:
+            with self.role(r, self.test_project):
+                langs = can_create_task_translate(self.nonproject_video, user)
+                self.assertEqual(langs, [])
+
+        langs = can_create_task_translate(self.nonproject_video, outsider)
+        self.assertEqual(langs, [])
+
+    # TODO: Review/approve task tests.

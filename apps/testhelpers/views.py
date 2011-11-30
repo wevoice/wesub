@@ -1,4 +1,3 @@
-# Create your views here.
 import os, json,  time, datetime
 from random import shuffle
 from django.http import HttpResponse
@@ -23,13 +22,13 @@ def debug_lang(sl):
 
 def debug_video(v):
     return "%s :: %s\n" % (v.title_display(), v.pk) + "\n".join([debug_lang(x) for x in v.subtitlelanguage_set.all()])
-                     
+
 def _get_fixture_path(model_name):
     return os.path.join(settings.PROJECT_ROOT, "apps", "testhelpers", "fixtures", "%s-fixtures.json" % model_name)
 
 def _get_fixture_file(model_name):
     return file(_get_fixture_path(model_name))
-    
+
 
 def _add_subtitles(sub_lang, num_subs, translated_from=None):
     version = SubtitleVersion(language=sub_lang, note="Automagically-created")
@@ -44,11 +43,11 @@ def _add_subtitles(sub_lang, num_subs, translated_from=None):
         if not translated_from:
              subtitle.start_time=i * 1.0
              subtitle.end_time =i + 0.8
-             
+
         else:
             subtitle.subtitle_text += " translated from (%s)" % (translated_from)
         subtitle.save()
-    return version    
+    return version
 
 def _copy_subtitles(fromlang, tolang, maxout=None):
     version = SubtitleVersion(language=tolang, note="Automagically-copied")
@@ -63,9 +62,8 @@ def _copy_subtitles(fromlang, tolang, maxout=None):
         i += 1
         if maxout and maxout  == i:
             break
-    
-def _add_lang_to_video(video, props,  translated_from=None):
 
+def _add_lang_to_video(video, props,  translated_from=None):
     if props.get('is_original', False):
         sl = video.subtitle_language()
         sl and sl.delete()
@@ -83,8 +81,7 @@ def _add_lang_to_video(video, props,  translated_from=None):
 
     if not translated_from:
         _add_subtitles(sub_lang, num_subs)
-
-    if translated_from:
+    else:
         sub_lang.is_original = False
         sub_lang.is_forked = False
         sub_lang.standard_language = translated_from
@@ -97,14 +94,14 @@ def _add_lang_to_video(video, props,  translated_from=None):
     sub_lang.is_complete = props.get("is_complete", False)
     sub_lang.save()
     from videos.tasks import video_changed_tasks
-    video_changed_tasks.delay(sub_lang.video.id)
-    return sub_lang    
-            
+    video_changed_tasks(sub_lang.video.id)
+    return sub_lang
+
 def _add_langs_to_video(video, props):
     for prop in props:
         _add_lang_to_video(video, prop)
-                            
-    
+
+
 def _create_videos(video_data, users):
     videos = []
 
@@ -119,7 +116,7 @@ def _create_videos(video_data, users):
         _add_langs_to_video(video, x['langs'])
         if len(x['langs']) > 0:
             video.is_subtitled = True
-        video.save()    
+        video.save()
         videos.append(video)
 
     return videos
@@ -129,8 +126,8 @@ def _hydrate_users(users_data):
     for x in serializers.deserialize('json', users_data):
         x.save()
         users.append(x.object)
-    return users         
-    
+    return users
+
 # create 30 videos
 def _create_team_videos(team, videos, users):
     tvs = []
@@ -141,14 +138,14 @@ def _create_team_videos(team, videos, users):
         team_video.added_by = member
         team_video.save()
         tvs.append(team_video)
-    return tvs    
+    return tvs
 
-@transaction.commit_on_success        
+@transaction.commit_on_success
 def _do_it(video_data_url=None):
     team, created = Team.objects.get_or_create(slug="unisubs-test-team")
     team.name = "Unisubs test"
     team.save()
-    
+
     team.videos.all().delete()
     users = _hydrate_users(_get_fixture_file("users").read())
     if video_data_url:
@@ -161,13 +158,13 @@ def _do_it(video_data_url=None):
 
     videos = _create_videos(video_data, [])
     _create_team_videos(team, videos, users)
-    
+
 @staff_member_required
 @never_in_prod
 def load_team_fixtures(request ):
     load_from = request.GET.get("load_from", None)
     videos = _do_it(load_from)
     return HttpResponse( "created %s videos" % len(videos))
-    
-    
-        
+
+
+

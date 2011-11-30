@@ -455,8 +455,11 @@ def can_create_task_translate(team_video, user=None):
     existing_translate_tasks = team_video.task_set.all_translate()
     existing_translate_languages = set(t.language for t in existing_translate_tasks)
 
+    existing_languages = set(sl.language
+                             for sl in team_video.video.completed_subtitle_languages())
+
     # TODO: Order this for individual users?
-    return list(candidate_languages - existing_translate_languages)
+    return list(candidate_languages - existing_translate_languages - existing_languages)
 
 def can_create_task_review(team_video, user=None):
     """Return a list of languages for which a review task can be created for the given video.
