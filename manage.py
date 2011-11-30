@@ -18,6 +18,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 # annoying as this is, it's meant to silence the damn keydcache warning
+import warnings
 import logging
 class NullHandler(logging.Handler):
     def emit(self, record):
@@ -41,4 +42,9 @@ except ImportError:
     sys.exit(1)
 
 if __name__ == "__main__":
-    execute_manager(settings)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        warnings.filterwarnings("ignore",category=UserWarning, message=".*was already imported from.*")
+        warnings.filterwarnings("ignore",message=".*integer argument expected, got float.*")
+
+        execute_manager(settings)
