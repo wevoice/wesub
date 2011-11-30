@@ -15,6 +15,7 @@
 {% endblock %}
 
 {% block scripts %}
+    {% include "utils/chosenify.html" %}
     {{ block.super }}
     {% if assignable_roles %}
         {% include_bundle "js-teams-settings-panel" %}
@@ -95,7 +96,7 @@
         <div class="refine">
             <h4>Refine</h4>
             {% comment %}
-            <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
+              <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
             {% endcomment %}
             <select name="lang-filter" id="lang-filter">
                 <option value="all">All languages</option>

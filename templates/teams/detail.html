@@ -13,6 +13,7 @@
 
 {% block scripts %}
     {{ block.super }}
+    {% include "utils/chosenify.html" %}
     {% include_bundle "unisubs-onsite-compiled" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
@@ -20,7 +21,6 @@
         var VIDEO_LANGS = {};
 
         $(function() {
-            $("select", ".controls").chosen();
             $("select#lang-filter", ".controls").change(function(e) {
                 var select = $("select#lang-filter", ".controls");
                 var lang = select.val();
@@ -37,15 +37,6 @@
                     });
                 } else {
                     $('.videos.listing > li').show();
-                }
-            });
-
-            $(":checkbox", ".admin-controls").bind('change', function(){
-                var menu = $(this).parents('.admin-controls');
-                if($(this).attr('checked')) {
-                    menu.addClass('selected');
-                } else {
-                    menu.removeClass('selected');
                 }
             });
 
