@@ -24,4 +24,6 @@ urlpatterns = patterns('emails_example.views',
     url('^email_title_changed/$', 'email_title_changed', name='email_title_changed'),
     url('^email_video_url_add/$', 'email_video_url_add', name='email_video_url_add'),
     url('^email_start_notification/$', 'email_start_notification', name='email_start_notification'),
+    url('^email_notification/$', 'email_notification', name='email_notification'),
+    url('^email_notification_non_editor/$', 'email_notification_non_editor', name='email_notification_non_editor'),
 )

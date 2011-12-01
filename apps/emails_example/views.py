@@ -17,8 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.views.generic.simple import direct_to_template
-from utils import check_is_staff
-from videos.models import Video, SubtitleLanguage
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.contrib import messages
@@ -28,6 +27,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from apps.videos.tasks import _make_caption_data
 
 @login_required
 def index(request):
@@ -98,6 +98,59 @@ def email_video_url_add(request):
         "STATIC_URL": settings.STATIC_URL,
     }
     return direct_to_template(request, 'videos/email_video_url_add.html', context)
+
+@login_required
+def email_notification_non_editor(request):
+    try:
+        language = SubtitleLanguage.objects.all()[2]
+    except SubtitleLanguage.DoesNotExist:
+        language = None
+
+    qs = SubtitleVersion.objects.filter(language=language).order_by('-version_no')
+    most_recent_version = qs[0]
+    caption_version = qs[1]
+    captions = _make_caption_data(most_recent_version, caption_version)
+
+    context = {
+        'domain': Site.objects.get_current().domain,
+        'language': language,
+        'language_url': language.get_absolute_url(),
+        'version': most_recent_version,
+        'video': language.video,
+        'captions': captions,
+        'video_url': language.video.get_absolute_url(),
+        'last_version': caption_version,
+        "STATIC_URL": settings.STATIC_URL,
+        'your_version': caption_version,
+    }
+    return direct_to_template(request, 'videos/email_notification_non_editors.html', context)
+
+@login_required
+def email_notification(request):
+    try:
+        language = SubtitleLanguage.objects.all()[2]
+    except SubtitleLanguage.DoesNotExist:
+        language = None
+
+    qs = SubtitleVersion.objects.filter(language=language).order_by('-version_no')
+    most_recent_version = qs[0]
+    caption_version = qs[1]
+    captions = _make_caption_data(most_recent_version, caption_version)
+
+    context = {
+        'domain': Site.objects.get_current().domain,
+        'language': language,
+        'language_url': language.get_absolute_url(),
+        'version': most_recent_version,
+        'video': language.video,
+        'captions': captions,
+        'video_url': language.video.get_absolute_url(),
+        'last_version': caption_version,
+        "STATIC_URL": settings.STATIC_URL,
+        'your_version': caption_version,
+        'user_url': caption_version.user and caption_version.user.get_absolute_url(),
+    }
+    return direct_to_template(request, 'videos/email_notification.html', context)
 
 @login_required
 def email_start_notification(request):
