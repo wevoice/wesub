@@ -31,7 +31,7 @@ from templatetag_sugar.parser import Name, Variable, Constant
 
 from apps.teams.permissions import get_narrowing_dict
 from apps.teams.permissions import can_view_settings_tab as _can_view_settings_tab
-from apps.teams.permissions import roles_user_can_assign
+from apps.teams.permissions import roles_user_can_assign, can_invite
 
 DEV_OR_STAGING = getattr(settings, 'DEV', False) or getattr(settings, 'STAGING', False)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 10)
@@ -48,9 +48,7 @@ def can_approve_application(team, user):
 
 @register.filter
 def can_invite_to_team(team, user):
-    if not user.is_authenticated():
-        return False
-    return team.can_invite(user)
+    return can_invite(team, user)
 
 @register.filter
 def can_add_video_to_team(team, user):

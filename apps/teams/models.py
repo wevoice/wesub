@@ -250,15 +250,6 @@ class Team(models.Model):
             return self.is_manager(user)
         return self.is_member(user)
 
-    def can_invite(self, user):
-        if self.membership_policy == self.INVITATION_BY_ADMIN:
-            return self.is_admin(user)
-
-        elif self.membership_policy == self.INVITATION_BY_MANAGER:
-            return self.is_manager(user)
-
-        return self.is_member(user)
-
 
     # moderation
     
