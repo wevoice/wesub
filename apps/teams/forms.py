@@ -543,6 +543,8 @@ class InviteForm(forms.Form):
 
     def __init__(self, team, user, *args, **kwargs):
         super(InviteForm, self).__init__(*args, **kwargs)
+        self.team = team
+        self.user = user
         self.fields['role'].choices = [(r, ROLE_NAMES[r])
                                        for r in roles_user_can_assign(team, user)]
 
@@ -595,7 +597,8 @@ class InviteForm(forms.Form):
             user = User.objects.get(username=username)
             Invite.objects.get_or_create(team=self.team, user=user, defaults={
                 'note': self.cleaned_data['message'],
-                'author': self.user
+                'author': self.user,
+                'role': self.cleaned_data['role'],
             })
         for email in self._split_emails:
             # TODO

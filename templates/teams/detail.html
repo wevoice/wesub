@@ -64,7 +64,7 @@
     {% endwith %}
 
     <div class="view grid_9 alpha">
-        {% if team|can_add_video_to_team:user %}
+        {% if can_add_video %}
             <div class="tools">
                 <a href="{% url teams:add_video team.slug %}" class="button">{% trans "Add Videos" %}</a>
             </div>

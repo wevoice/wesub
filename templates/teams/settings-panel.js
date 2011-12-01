@@ -1,4 +1,4 @@
-var ACTIVE_CLASS  = "current";
+ ACTIVE_CLASS  = "current";
 
 var CONTAINER_SELECTOR = ".panel-holder";
 
@@ -398,7 +398,7 @@ var BasicPanel  = AsyncPanel.$extend({
         this.team = new TeamModel(data);
         this.fillFromModel();
         if(showMessage){
-            displayFeedbackMessage("Settings saved.", "error");
+            displayFeedbackMessage("Settings saved.");
         }
     },
 
@@ -462,7 +462,7 @@ var GuidelinesPanel  = AsyncPanel.$extend({
             $('#id_' + setting.key, this.el).val(setting.data);
         }, this);
         if(showMessage){
-            displayFeedbackMessage("Guidelines saved.", "error");
+            displayFeedbackMessage("Guidelines saved.");
         }
     }
 });
@@ -514,7 +514,7 @@ var PermissionsPanel = AsyncPanel.$extend({
         this.team = new TeamModel(data);
         this.fillFromModel();
         if (showMessage){
-            displayFeedbackMessage("Permissions saved.", "error");
+            displayFeedbackMessage("Permissions saved.");
         }
     },
     onSubmit: function(e) {
