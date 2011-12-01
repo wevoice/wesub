@@ -6,6 +6,17 @@ var ON_PROJECT_SAVED = "onProjectSaved";
 var ON_PROJECT_CANCELED = "onProjectCanceled";
 var ON_PROJECT_DELETED = "onProjectDeleted";
 
+function clearFeedbackMessage(){
+    $("#messages").remove();
+}
+
+function displayFeedbackMessage(msg, type){
+    clearFeedbackMessage();
+    var el= ich.feedbackMessage({msg:msg, type:type});
+    $(".content.wrapper").prepend(el);
+    $(el).hide().fadeIn("slow");
+}
+window.displayFeedbackMessage = displayFeedbackMessage;
 // Projects -------------------------------------------------------------------
 var ProjectModel = BaseModel.$extend({});
 var ProjectEditPanel = Class.$extend({
@@ -66,7 +77,7 @@ var ProjectEditPanel = Class.$extend({
     onChangeProjectReturned: function(data){
         var res = data;
         if (res && res.success){
-            $.jGrowl(res.msg);
+            displayFeedbackMessage(res.msg,'error');
             if (res.obj){
                 this.model.update(res.obj);
                 this.el.trigger(ON_PROJECT_SAVED, this.model);
@@ -74,9 +85,8 @@ var ProjectEditPanel = Class.$extend({
             }
             // show errors
         }else{
-            $.jGrowl.error(data.result.message);
             if(data.result && data.result.errors){
-
+                displayFeedbackMessage("Oops, something went wrong", 'error');
             }
         }
     },
@@ -210,6 +220,7 @@ var ProjectPanel = AsyncPanel.$extend({
         this.projectEditPanel.el.bind(ON_PROJECT_CANCELED, this.onProjectCanceled);
         this.projectEditPanel.el.bind(ON_PROJECT_DELETED, this.onProjectDeleted);
         $(this.projectAddButton).hide();
+        clearFeedbackMessage();
         return false;
     },
     onProjectListLoaded: function(data){
@@ -367,12 +378,15 @@ var BasicPanel  = AsyncPanel.$extend({
         }
     },
     saveData: function() {
+        
         var data = {
             name: $('#basic_name', this.el).val(),
             description: $('#basic_description', this.el).val()
         };
-        TeamsApiV2.team_set(TEAM_SLUG, data, this.onLoaded);
-
+        var that = this;
+        TeamsApiV2.team_set(TEAM_SLUG, function(data, extra){
+            that.onLoaded(data, extra, true);
+        });
         this.workflow && this.workflow.onSubmit();
     },
     onSubmit: function(e) {
@@ -380,9 +394,12 @@ var BasicPanel  = AsyncPanel.$extend({
         this.saveImage(this.saveData);
         return false;
     },
-    onLoaded: function(data) {
+    onLoaded: function(data, extra, showMessage) {
         this.team = new TeamModel(data);
         this.fillFromModel();
+        if(showMessage){
+            displayFeedbackMessage("Settings saved.", "error");
+        }
     },
 
     fillFromModel: function() {
@@ -417,9 +434,9 @@ var GuidelinesPanel  = AsyncPanel.$extend({
         // Bind events
         $('form', this.el).submit(this.onSubmit);
 
-        // Load initial data
+        //Load initial data
+        var that = this;
         TeamsApiV2.guidelines_get(TEAM_SLUG, this.onLoaded);
-
         // Constants
         this.SETTING_KEYS = [
             'messages_invite', 'messages_manager', 'messages_admin',
@@ -434,13 +451,19 @@ var GuidelinesPanel  = AsyncPanel.$extend({
         _.each(this.SETTING_KEYS, function(key) {
             data[key] = $('#id_' + key, this.el).val();
         });
-
-        TeamsApiV2.guidelines_set(TEAM_SLUG, data, this.onLoaded);
+        var that = this;
+        TeamsApiV2.guidelines_set(TEAM_SLUG, data, function(data, extra){
+            that.onLoaded(data, extra, true);
+        });
     },
-    onLoaded: function(data) {
+ 
+    onLoaded: function(data, extra, showMessage) {
         _.each(data, function(setting) {
             $('#id_' + setting.key, this.el).val(setting.data);
         }, this);
+        if(showMessage){
+            displayFeedbackMessage("Guidelines saved.", "error");
+        }
     }
 });
 
@@ -465,7 +488,7 @@ var PermissionsPanel = AsyncPanel.$extend({
         // Load initial data
         this.workflow = null;
         this.team = null;
-        TeamsApiV2.team_get(TEAM_SLUG, this.onLoaded);
+        TeamsApiV2.team_get(TEAM_SLUG, this.onLoaded)
     },
     onWorkflowStatusChange: function(e) {
         if ($('#permissions_workflows_enabled', this.el).attr('checked')) {
@@ -487,9 +510,12 @@ var PermissionsPanel = AsyncPanel.$extend({
         $('.workflow', this.el).html('');
         this.workflow = null;
     },
-    onLoaded: function(data) {
+    onLoaded: function(data, extra, showMessage) {
         this.team = new TeamModel(data);
         this.fillFromModel();
+        if (showMessage){
+            displayFeedbackMessage("Permissions saved.", "error");
+        }
     },
     onSubmit: function(e) {
         e.preventDefault();
@@ -502,8 +528,10 @@ var PermissionsPanel = AsyncPanel.$extend({
             translate_policy: $('#id_translate_policy', this.el).val(),
             workflow_enabled: $('#permissions_workflows_enabled', this.el).attr('checked')
         };
-
-        TeamsApiV2.permissions_set(TEAM_SLUG, data, this.onLoaded);
+        var that = this;
+        TeamsApiV2.permissions_set(TEAM_SLUG, data, function(data, extra){
+            that.onLoaded(data, extra, true);
+        });
 
         this.workflow && this.workflow.onSubmit();
     },
@@ -567,7 +595,7 @@ var TabViewer = Class.$extend({
     },
     onClick: function(e){
         e.preventDefault();
-
+        clearFeedbackMessage();
         var scope = this;
         if (this.currentItem){
             this.currentItem.showPanel(false);
