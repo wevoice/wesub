@@ -32,7 +32,7 @@ unisubs.streamer.StreamBox.prototype.createDom = function() {
     unisubs.streamer.StreamBox.superClass_.createDom.call(this);
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     this.transcriptElem_ = $d('div', 'unisubs-transcript');
-    this.resyncButton_ = $d('a', 'resync', 'Re-sync');
+    this.resyncButton_ = $d('a', 'resync', 'Back to current line');
     unisubs.style.setVisibility(this.resyncButton_, false);
     var unisubsLink = 
         $d('a', { 'href': '#', 'id': 'unisubs-logo' },
