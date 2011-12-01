@@ -3561,7 +3561,7 @@ div.unisubs-substreamer div.unisubs-substreamer-controls {
 .unisubs-substreamer-controls .unisubs-search-container {
    position: absolute !important;
    display: block !important;
-   top: 0 !important;
+   top: 5px !important;
    right: 0 !important;
    width: 225px !important;
 }
