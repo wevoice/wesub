@@ -479,7 +479,7 @@ class TeamsApiV2Class(object):
         else:
              return dict(
                  success=False,
-                 msg = "Please correct the errors bellow",
+                 msg = "Please correct the errors below",
                  errors = form.errors
                  )   
 
