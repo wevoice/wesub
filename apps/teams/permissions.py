@@ -252,6 +252,19 @@ def can_add_video(team, user, project=None):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_edit_video(team_video, user):
+    """Return whether the given user can edit the given video."""
+
+    role = get_role_for_target(user, team_video.team, team_video.project)
+
+    role_required = {
+        1: ROLE_CONTRIBUTOR,
+        2: ROLE_MANAGER,
+        3: ROLE_CONTRIBUTOR,
+    }[team_video.team.video_policy]
+
+    return role in _perms_equal_or_greater(role_required)
+
 def can_view_settings_tab(team, user):
     """Return whether the given user can view (and therefore edit) the team's settings.
 

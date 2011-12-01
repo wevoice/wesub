@@ -32,7 +32,7 @@ from apps.teams.permissions import (
     can_change_team_settings, can_view_tasks_tab, can_invite,
     can_change_video_settings, can_review, can_message_all_members,
     can_edit_project, can_create_and_edit_subtitles, can_create_task_subtitle,
-    can_create_task_translate, can_join_team
+    can_create_task_translate, can_join_team, can_edit_video
 )
 
 
@@ -158,8 +158,6 @@ class TestRules(BaseTestPermission):
             team.save()
             self.assertFalse(can_join_team(team, outsider))
 
-
-
     def test_can_add_video(self):
         user = self.user
         team = self.team
@@ -192,6 +190,38 @@ class TestRules(BaseTestPermission):
         with self.role(ROLE_MANAGER, self.test_project):
             self.assertFalse(can_add_video(team, user))
             self.assertTrue(can_add_video(team, user, project=self.test_project))
+
+    def test_can_edit_video(self):
+        user, team = self.user, self.team
+
+        # Ensure that the "members can add" policies work.
+        for policy in [Team.MEMBER_ADD, Team.MEMBER_REMOVE]:
+            team.video_policy = policy
+            team.save()
+
+            for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+                with self.role(r):
+                    self.assertTrue(can_edit_video(self.nonproject_video, user))
+
+            self.assertFalse(can_edit_video(self.nonproject_video, self.outsider))
+
+        # Ensure the "managers can add" policy works.
+        team.video_policy = Team.MANAGER_REMOVE
+        team.save()
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_edit_video(self.nonproject_video, user))
+
+        with self.role(ROLE_CONTRIBUTOR):
+            self.assertFalse(can_edit_video(self.nonproject_video, user))
+
+        self.assertFalse(can_edit_video(self.nonproject_video, self.outsider))
+
+        # Make sure narrowings are taken into account.
+        with self.role(ROLE_MANAGER, self.test_project):
+            self.assertFalse(can_edit_video(self.nonproject_video, user))
+            self.assertTrue(can_edit_video(self.project_video, user))
 
     def test_can_view_settings_tab(self):
         # Only admins and owners can view/change the settings tab, so this one

@@ -31,7 +31,8 @@ from templatetag_sugar.parser import Name, Variable, Constant
 
 from apps.teams.permissions import get_narrowing_dict
 from apps.teams.permissions import can_view_settings_tab as _can_view_settings_tab
-from apps.teams.permissions import roles_user_can_assign, can_invite
+from apps.teams.permissions import can_edit_video as _can_edit_video
+from apps.teams.permissions import roles_user_can_assign, can_invite, can_add_video
 
 DEV_OR_STAGING = getattr(settings, 'DEV', False) or getattr(settings, 'STAGING', False)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 10)
@@ -51,12 +52,8 @@ def can_invite_to_team(team, user):
     return can_invite(team, user)
 
 @register.filter
-def can_add_video_to_team(team, user):
-    return team.can_add_video(user)    
-
-@register.filter
 def can_edit_video(tv, user):
-    return tv.can_edit(user) 
+    return _can_edit_video(tv, user)
 
 @register.filter
 def can_remove_video(tv, user):
@@ -98,16 +95,16 @@ def team_activity(context, team):
 @register.inclusion_tag('teams/_team_add_video_select.html', takes_context=True)    
 def team_add_video_select(context):
     request = context['request']
-    
+
     #fix problem with encoding "?" in build_absolute_uri. It is not encoded,
     #so we get not same URL that page has
     location = request.get_full_path()
     context['video_absolute_url'] = request.build_absolute_uri(urlquote(location))
-    
+
     user = context['user']
     if user.is_authenticated():
         qs = Team.objects.filter(users=user)
-        context['teams'] = [item for item in qs if item.can_add_video(user)]
+        context['teams'] = [team for team in qs if can_add_video(team, user)]
     return context 
 
 @register.inclusion_tag('videos/_team_list.html')

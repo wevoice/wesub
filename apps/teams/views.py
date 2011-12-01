@@ -51,7 +51,7 @@ from teams.permissions import (
     can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
     can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign,
-    can_join_team
+    can_join_team, can_edit_video
 )
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -135,7 +135,7 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
     extra_context.update({
         'team': team,
         'project':project,
-        'can_edit_video': team.can_edit_video(request.user)
+        'can_add_video': can_add_video(team, request.user)
     })
 
     general_settings = {}
@@ -187,7 +187,7 @@ def detail_old(request, slug, is_debugging=False, languages=None):
     extra_context = widget.add_onsite_js_files({})    
     extra_context.update({
         'team': team,
-        'can_edit_video': team.can_edit_video(request.user)
+        'can_edit_video': can_add_video(team, request.user)
     })
 
     general_settings = {}
@@ -398,28 +398,15 @@ def upload_logo(request, slug):
 
 
 # Adding videos
-def _check_add_video_permission(request, team):
-    if not team.is_member(request.user):
-        raise Http404
-
-    if not can_add_video(team, request.user):
-        messages.error(request, _(u'You can\'t add video.'))
-        return {
-            'team': team
-        }
-
 @render_to('teams/add_video.html')
 @login_required
 def add_video(request, slug):
     team = Team.get(slug, request.user)
 
-    resp = _check_add_video_permission(request, team)
-    
-    if resp:
-        print "failed, team.video_policy=%s, request.user=%s, is_ember:%s, members %s" %(team.video_policy, request.user, team.is_member(request.user), team.members.all())
-        print team.members.get(user=request.user).role
-        return resp
-    
+    if not can_add_video(team, request.user):
+        messages.error(request, _(u'You can\'t add video.'))
+        return HttpResponseRedirect(team.get_absolute_url())
+
     initial = {
         'video_url': request.GET.get('url', ''),
         'title': request.GET.get('title', '')
@@ -443,9 +430,9 @@ def add_video(request, slug):
 def add_videos(request, slug):
     team = Team.get(slug, request.user)
 
-    resp = _check_add_video_permission(request, team)
-    if resp:
-        return resp
+    if not can_add_video(team, request.user):
+        messages.error(request, _(u'You can\'t add video.'))
+        return HttpResponseRedirect(team.get_absolute_url())
 
     form = AddTeamVideosFromFeedForm(team, request.user, request.POST or None)
 
@@ -481,8 +468,9 @@ def edit_videos(request, slug):
 def team_video(request, team_video_pk):
     team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
 
-    if not team_video.can_edit(request.user):
-        raise Http404
+    if not can_edit_video(team_video, request.user):
+        messages.error(request, _(u'You can\'t edit this video.'))
+        return HttpResponseRedirect(team_video.team.get_absolute_url())
 
     meta = team_video.video.metadata()
     form = EditTeamVideoForm(request.POST or None, request.FILES or None,

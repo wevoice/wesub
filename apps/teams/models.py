@@ -243,14 +243,6 @@ class Team(models.Model):
             return False
         return self.is_member(user)
     
-    def can_add_video(self, user):
-        if not user.is_authenticated():
-            return False
-        if self.video_policy == self.MANAGER_REMOVE:
-            return self.is_manager(user)
-        return self.is_member(user)
-
-
     # moderation
     
     def get_pending_moderation( self, video=None):
@@ -527,9 +519,6 @@ class TeamVideo(models.Model):
 
     def can_remove(self, user):
         return self.team.can_remove_video(user, self)
-    
-    def can_edit(self, user):
-        return self.team.can_edit_video(user, self)
     
     def link_to_page(self):
         if self.all_languages:
