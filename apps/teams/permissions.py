@@ -16,19 +16,13 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.contrib.contenttypes.models import ContentType
-from django.utils.functional import  wraps
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 from teams.models import (
-    MembershipNarrowing, Workflow, TeamMember, Project, TeamVideoLanguage
+    Team, MembershipNarrowing, Workflow, TeamMember, Project, TeamVideoLanguage
 )
 
 from teams.permissions_const import (
-    EDIT_TEAM_SETTINGS_PERM, EDIT_PROJECT_SETTINGS_PERM, ASSIGN_ROLE_PERM,
-    CREATE_TASKS_PERM, ASSIGN_TASKS_PERM, ADD_VIDEOS_PERM,
-    EDIT_VIDEO_SETTINGS_PERM, MESSAGE_ALL_MEMBERS_PERM, ACCEPT_ASSIGNMENT_PERM,
-    PERFORM_MANAGER_REVIEW_PERM, PERFORM_PEER_REVIEW_PERM, EDIT_SUBS_PERM,
-    RULES, ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN, ROLE_MANAGER,
+    ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN, ROLE_MANAGER,
     ROLE_OUTSIDER
 )
 
@@ -215,6 +209,26 @@ def can_assign_role(team, user, role, to_user):
 
     """
     return role in roles_user_can_assign(team, user, to_user)
+
+def can_join_team(team, user):
+    """Return whether the given user can join a team.
+
+    Users can join a team iff:
+
+    * They are not already a member.
+    * The team has an open joining policy.
+
+    Otherwise they need to be invited or fill out an application.
+
+    """
+    role = get_role_for_target(user, team)
+    if role != ROLE_OUTSIDER:
+        return False
+
+    if team.membership_policy != Team.OPEN:
+        return False
+
+    return True
 
 def can_rename_team(team, user):
     """Return whether the given user can edit the name of a team.

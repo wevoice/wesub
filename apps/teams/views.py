@@ -50,7 +50,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from teams.permissions import (
     can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
-    can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign
+    can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign,
+    can_join_team
 )
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -728,17 +729,13 @@ def accept_invite(request, invite_pk, accept=True):
 def join_team(request, slug):
     team = get_object_or_404(Team, slug=slug)
     user = request.user
-    
-    try:
-        TeamMember.objects.get(team=team, user=user)
-        messages.error(request, _(u'You are already a member of this team.'))
-    except TeamMember.DoesNotExist:
-        if not team.is_open():
-            messages.error(request, _(u'This team is not open.'))
-        else:
-            TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR).save()
-            messages.success(request, _(u'You are now a member of this team.'))
-    
+
+    if not can_join_team(team, user):
+        messages.error(request, _(u'You cannot join this team.'))
+    else:
+        TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR).save()
+        messages.success(request, _(u'You are now a member of this team.'))
+
     return redirect(team)
 
 @login_required
