@@ -25,6 +25,12 @@
 
         <form id="tasks_type_filter"></form>
 
+        <div class="refine">
+            <form id="tasks_language_filter">
+                <h4>Refine</h4>
+            </form>
+        </div>
+
         {% include "teams/_actions.html" %}
     </div>
 
@@ -168,11 +174,6 @@ $(window).load(function() {
 </script>
 
 <script id="tasksPanel" type="text/html">
-    <div class="tools panel-tasks">
-        <form id="tasks_language_filter">
-            <label for="id_task_language">Language needed:</label>
-        </form>
-    </div>
     <ul class="tasks listing"></ul>
 </script>
 

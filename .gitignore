@@ -1,5 +1,7 @@
 *~
 *.pyc
+*.swo
+*.swp
 pip-log.txt
 deploy/src/*
 *.sqlite3
