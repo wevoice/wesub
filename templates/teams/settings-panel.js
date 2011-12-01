@@ -341,9 +341,6 @@ var BasicPanel  = AsyncPanel.$extend({
         this.onLoaded = _.bind(this.onLoaded, this);
         this.fillFromModel = _.bind(this.fillFromModel, this);
 
-        this.onImageUploadClick = _.bind(this.onImageUploadClick, this);
-        this.onImageUploaded = _.bind(this.onImageUploaded, this);
-
         // Render template
         this.el = ich.basicPanel();
 
@@ -361,7 +358,6 @@ var BasicPanel  = AsyncPanel.$extend({
         if ($('form.logo input', this.el).val()) {
             $('form.logo', this.el).ajaxSubmit({
                 success: function(resp, status, xhr, from) {
-                    that.onImageUploaded(resp);
                     callback && callback();
                 },
                 dataType: 'json'
@@ -370,24 +366,10 @@ var BasicPanel  = AsyncPanel.$extend({
             callback && callback();
         }
     },
-    onImageUploadClick: function(e, callback) {
-        e.preventDefault();
-        this.saveImage(callback);
-        return false;
-    },
-    onImageUploaded: function(resp) {
-        this.team.logo = resp['url'];
-        this.team.logo_full = resp['url_full'];
-        this.fillFromModel();
-    },
-
     saveData: function() {
         var data = {
             name: $('#basic_name', this.el).val(),
-            description: $('#basic_description', this.el).val(),
-            membership_policy: $('#id_membership_policy', this.el).val(),
-            video_policy: $('#id_video_policy', this.el).val(),
-            workflow_enabled: $('#basic_workflows_enabled', this.el).attr('checked')
+            description: $('#basic_description', this.el).val()
         };
         TeamsApiV2.team_set(TEAM_SLUG, data, this.onLoaded);
 
