@@ -1013,12 +1013,14 @@ class Invite(models.Model):
     user = models.ForeignKey(User, related_name='team_invitations')
     note = models.TextField(blank=True, max_length=200)
     author = models.ForeignKey(User)
+    role = models.CharField(max_length=16, choices=TeamMember.ROLES,
+                            default=TeamMember.ROLE_CONTRIBUTOR)
     
     class Meta:
         unique_together = (('team', 'user'),)
     
     def accept(self):
-        TeamMember.objects.get_or_create(team=self.team, user=self.user)
+        TeamMember.objects.get_or_create(team=self.team, user=self.user, role=self.role)
         self.delete()
         
     def deny(self):
