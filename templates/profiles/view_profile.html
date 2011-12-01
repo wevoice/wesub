@@ -36,11 +36,6 @@
 
     {% if user_info.is_active %}
         <div class="view grid_9 alpha">
-            {% if can_edit %}
-                <div class="tools">
-                    <a class="button" href="{% url profiles:edit %}">Edit profile</a>
-                </div>
-            {% endif %}
             
             <img src="{{ user_info.avatar }}">
             <h4>{% trans 'Member since' %}</h4>
@@ -75,7 +70,20 @@
         </div>
         
         <div class="controls grid_3 omega">
-            
+            <ul>
+                <li class="current">
+                    <a href="{% url profiles:profile user_info.username %}">View Profile</a>
+                </li>
+                {% if can_edit %}
+                    <li>
+                        <a href="{% url profiles:edit %}">Edit profile</a>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="">Send Message</a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
         
         {{ block.super }}
