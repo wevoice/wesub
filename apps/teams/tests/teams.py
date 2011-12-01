@@ -640,11 +640,6 @@ class TeamsTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
 
 
-        #-------------- edit members ---------------
-        url = reverse("teams:edit_members", kwargs={"slug": team.slug})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-
         #-------------- edit videos -----------------
         url = reverse("teams:edit_videos", kwargs={"slug": team.slug})
         response = self.client.get(url)
@@ -790,19 +785,6 @@ class TeamsTest(TestCase):
         self.assertEqual(members_count+1, team.members.count())
 
         self.client.login(**self.auth)
-
-        url = reverse("teams:edit_members", kwargs={"slug": team.slug})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-
-        data = {
-            "ot": u"desc",
-            "page": u"1",
-            "o": u"username"
-        }
-        url = reverse("teams:edit_members", kwargs={"slug": team.slug})
-        response = self.client.get(url, data)
-        self.failUnlessEqual(response.status_code, 200)
 
         tm,c = TeamMember.objects.get_or_create(user=self.user, team=team)
         tm.role = TeamMember.ROLE_ADMIN
