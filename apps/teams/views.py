@@ -251,7 +251,10 @@ def detail_members(request, slug, role=None):
                        |Q(user__username__icontains=q)|Q(user__biography__icontains=q))
 
     if role:
-        qs = qs.filter(role=role)
+        if role == 'admin':
+            qs = qs.filter(role__in=[TeamMember.ROLE_OWNER, TeamMember.ROLE_ADMIN])
+        else:
+            qs = qs.filter(role=role)
 
     extra_context = widget.add_onsite_js_files({})
 

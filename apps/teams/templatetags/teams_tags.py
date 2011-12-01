@@ -258,6 +258,13 @@ def owners(team, countOnly=False):
     return _team_members(team, TeamMember.ROLE_OWNER, countOnly)
 
 @register.filter
+def owners_and_admins(team, countOnly=False):
+    qs = team.members.filter(role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    if countOnly:
+        qs = qs.count()
+    return qs
+
+@register.filter
 def members(team, countOnly=False):
     qs = team.members.all()
     if countOnly:

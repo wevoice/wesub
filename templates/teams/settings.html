@@ -77,9 +77,6 @@ This is needed, since it's for the js templating
                             <img id="current_logo" src=""/>
                         {% endif %}{% verbatim %}
                         <input type="file" id="basic_picture" name="logo" />
-                        <button class="upload-picture">
-                            <span>Upload</span>
-                        </button>
                         <p class="notation">Max width 940px</p>
                     </fieldset>
                 </form>
@@ -276,6 +273,13 @@ This is needed, since it's for the js templating
       <button class="red_button small submit_button cancel">{{cancelText}}</button>
       <button class="blue_button small submit_button confirm">{{okText}}</button>
     </div>
+</script>
+
+<script id="feedbackMessage" type="text/html">
+  <div id="messages">
+    <h2 class="{{type}}">{{msg}}</h2>
+    <a id="closeBut" style="display: block; float: right;" href="#">x</a>
+  </div>
 </script>
 
 {% endverbatim %}
