@@ -49,12 +49,22 @@
 
             <div class="grid_4 alpha">
                 <fieldset>
-                    <div class="type-selector">{{ form.errors.type }} {{ form.type }}</div>
+                    <div class="type-selector">
+                        {{ form.label.type }}
+                        {{ form.errors.type }}
+                        {{ form.type }}
+                    </div>
                     <div class="chosen">
-                        <div class="language-selector">{{ form.errors.language }} {{ form.language }}</div>
+                        <div class="language-selector">
+                            <label>Language</label>
+                            {{ form.errors.language }}
+                            {{ form.language }}
+                        </div>
                         {% if can_assign %}
                             <div class="assignee-selector">
-                                {{ form.errors.assignee }} {{ form.assignee }}
+                                <label>Assignee</label>
+                                {{ form.errors.assignee }}
+                                {{ form.assignee }}
                             </div>
                         {% endif %}
                     </div>
@@ -65,10 +75,14 @@
             </div>
 
             <div class="grid_4 omega">
-                <p>Video: {{ team_video.video }}</p>
+                <h5>Video</h5>
+                <div class="preselected">
+                    <p>{{ team_video.video }}</p>
+                    <img src="{{ team_video.video.thumbnail }}" alt="thumbnail"/>
+                </div>
             </div>
             <div class="grid_9 submit">
-                <button><span>{% trans "Save" %}</span></button>
+                <button>{% trans "Save" %}</button>
             </div>
 
             {% csrf_token %}

@@ -27,6 +27,7 @@ from django.shortcuts import redirect
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 @login_required
 def index(request):
