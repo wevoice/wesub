@@ -632,15 +632,16 @@ def approve_application(request, slug, user_pk):
 
     if not team.is_member(request.user):
         raise Http404
-    
-    if team.can_approve_application(request.user):
+
+    if can_invite(team, request.user):
         try:
             Application.objects.get(team=team, user=user_pk).approve()
             messages.success(request, _(u'Application approved.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
     else:
-        messages.error(request, _(u'You can\'t approve application.'))
+        messages.error(request, _(u'You can\'t approve applications.'))
+
     return redirect('teams:applications', team.pk)
 
 @login_required
@@ -649,15 +650,16 @@ def deny_application(request, slug, user_pk):
 
     if not team.is_member(request.user):
         raise Http404
-    
-    if team.can_approve_application(request.user):
+
+    if can_invite(team, request.user):
         try:
             Application.objects.get(team=team, user=user_pk).deny()
             messages.success(request, _(u'Application denied.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
     else:
-        messages.error(request, _(u'You can\'t deny application.'))
+        messages.error(request, _(u'You can\'t deny applications.'))
+
     return redirect('teams:applications', team.pk)
 
 @render_to_json
