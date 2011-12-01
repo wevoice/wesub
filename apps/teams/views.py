@@ -175,47 +175,6 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
                        template_object_name='team_video_md')
 
 
-def detail_old(request, slug, is_debugging=False, languages=None):
-    team = Team.get(slug, request.user)
-
-    if languages is None:
-        languages = get_user_languages_from_request(request)
-    if bool(is_debugging):
-        languages = request.GET.get("langs", "").split(",")
-
-    data = team.get_videos_for_languages(languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS)
-    mqs = data['videos']
-    
-    extra_context = widget.add_onsite_js_files({})    
-    extra_context.update({
-        'team': team,
-        'can_edit_video': can_add_video(team, request.user)
-    })
-
-    general_settings = {}
-    add_general_settings(request, general_settings)
-    extra_context['general_settings'] = json.dumps(general_settings)
-
-    if team.video:
-        extra_context['widget_params'] = base_widget_params(request, {
-            'video_url': team.video.get_video_url(), 
-            'base_state': {}
-        })
-
-    if bool(is_debugging) and request.user.is_staff:
-        extra_context.update(data)
-        extra_context.update({
-            'languages': languages,
-            })
-        return render_to_response("teams/detail-debug.html", extra_context, RequestContext(request))
-    
-    return object_list(request, queryset=mqs, 
-                       paginate_by=VIDEOS_ON_PAGE, 
-                       template_name='teams/detail.html', 
-                       extra_context=extra_context, 
-                       template_object_name='team_video_md')
-
-
 def completed_videos(request, slug):
     team = Team.get(slug, request.user)
     if team.is_member(request.user):
@@ -548,12 +507,6 @@ def invite_members(request, slug):
     else:
         form = InviteForm(team, request.user)
 
-    """ TODO: Permissions check?
-    if not can_invite_members(team, request.user):
-        return HttpResponseForbidden("You cannot invite new members for this team")
-    """
-
-    """ TODO: Add form and whatnot below? """
     return {
         'team': team,
         'form': form,
@@ -638,15 +591,16 @@ def approve_application(request, slug, user_pk):
 
     if not team.is_member(request.user):
         raise Http404
-    
-    if team.can_approve_application(request.user):
+
+    if can_invite(team, request.user):
         try:
             Application.objects.get(team=team, user=user_pk).approve()
             messages.success(request, _(u'Application approved.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
     else:
-        messages.error(request, _(u'You can\'t approve application.'))
+        messages.error(request, _(u'You can\'t approve applications.'))
+
     return redirect('teams:applications', team.pk)
 
 @login_required
@@ -655,15 +609,16 @@ def deny_application(request, slug, user_pk):
 
     if not team.is_member(request.user):
         raise Http404
-    
-    if team.can_approve_application(request.user):
+
+    if can_invite(team, request.user):
         try:
             Application.objects.get(team=team, user=user_pk).deny()
             messages.success(request, _(u'Application denied.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
     else:
-        messages.error(request, _(u'You can\'t deny application.'))
+        messages.error(request, _(u'You can\'t deny applications.'))
+
     return redirect('teams:applications', team.pk)
 
 @render_to_json

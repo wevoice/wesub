@@ -30,9 +30,6 @@ import re
 from utils.translation import get_languages_list
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from teams.permissions import can_assign_tasks
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
-
 
 from apps.teams.moderation import add_moderation, remove_moderation
 from apps.teams.permissions import roles_user_can_assign
@@ -537,7 +534,6 @@ class PermissionsForm(forms.ModelForm):
 
 class InviteForm(forms.Form):
     usernames = forms.CharField(required=False)
-    emails = forms.CharField(required=False)
     message = forms.CharField(required=False, widget=forms.Textarea)
     role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1])
 
@@ -570,27 +566,6 @@ class InviteForm(forms.Form):
         self._split_usernames = usernames
         return raw_usernames
 
-    def clean_emails(self):
-        raw_emails = self.cleaned_data['emails']
-
-        emails = filter(None, [email.strip() for email in raw_emails.split(',')])
-
-        for email in emails:
-            try:
-                validate_email(email)
-            except ValidationError:
-                raise forms.ValidationError(_(u'"%s" is not a valid email address!') % email)
-
-            try:
-                self.team.members.get(user__email=email)
-            except TeamMember.DoesNotExist:
-                pass
-            else:
-                raise forms.ValidationError(_(u'A user with email address "%s" is already a member of this team!') % email)
-
-        self._split_emails = emails
-        return raw_emails
-
 
     def save(self):
         for username in self._split_usernames:
@@ -600,7 +575,4 @@ class InviteForm(forms.Form):
                 'author': self.user,
                 'role': self.cleaned_data['role'],
             })
-        for email in self._split_emails:
-            # TODO
-            pass
 
