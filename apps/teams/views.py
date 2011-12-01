@@ -51,7 +51,7 @@ from teams.permissions import (
     can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
     can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign,
-    can_join_team, can_edit_video
+    can_join_team, can_edit_video, can_create_tasks
 )
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -135,7 +135,9 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
     extra_context.update({
         'team': team,
         'project':project,
-        'can_add_video': can_add_video(team, request.user)
+        'can_add_video': can_add_video(team, request.user, project),
+        'can_edit_videos': can_add_video(team, request.user, project),
+        'can_create_tasks': can_create_tasks(team, request.user, project),
     })
 
     general_settings = {}

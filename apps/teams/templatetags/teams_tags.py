@@ -29,10 +29,14 @@ from widget.views import base_widget_params
 from templatetag_sugar.register import tag
 from templatetag_sugar.parser import Name, Variable, Constant
 
-from apps.teams.permissions import get_narrowing_dict
 from apps.teams.permissions import can_view_settings_tab as _can_view_settings_tab
 from apps.teams.permissions import can_edit_video as _can_edit_video
-from apps.teams.permissions import roles_user_can_assign, can_invite, can_add_video
+from apps.teams.permissions import (
+    roles_user_can_assign, can_invite, can_add_video, can_create_task_subtitle,
+    get_narrowing_dict, can_create_task_translate, can_create_task_review,
+    can_create_task_approve
+)
+
 
 DEV_OR_STAGING = getattr(settings, 'DEV', False) or getattr(settings, 'STAGING', False)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 10)
@@ -273,3 +277,19 @@ def get_assignable_roles(team, user):
     roles = roles_user_can_assign(team, user)
     verbose_roles = [x for x in TeamMember.ROLES if x[0] in roles]
     return verbose_roles
+
+@register.filter
+def can_create_any_task(search_record, user=None):
+    tv = TeamVideo.objects.get(pk=search_record.team_video_pk)
+
+    if can_create_task_subtitle(tv, user):
+        return True
+    elif can_create_task_translate(tv, user):
+        return True
+    elif can_create_task_review(tv, user):
+        return True
+    elif can_create_task_approve(tv, user):
+        return True
+
+    return False
+
