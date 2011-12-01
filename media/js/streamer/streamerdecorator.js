@@ -121,4 +121,5 @@ unisubs.streamer.StreamerDecorator.decorate = function(videoPlayer) {
         unisubs.streamer.StreamerDecorator.makeStreamer(
             videoPlayer, streamBox, null, true);
     }
+    goog.style.setWidth(unisubs.streamer.StreamerDecorator.getUnisubsStreamerElem_(videoPlayer), videoPlayer.playerSize_.width);
 };
