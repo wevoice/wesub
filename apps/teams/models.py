@@ -266,9 +266,6 @@ class Team(models.Model):
     def video_is_moderated_by_team(self, video):
         return video.moderated_by == self
     
-    def can_approve_application(self, user):
-        return self.is_member(user)
-    
     @property
     def member_count(self):
         if not hasattr(self, '_member_count'):

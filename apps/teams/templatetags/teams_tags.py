@@ -47,9 +47,7 @@ register = template.Library()
 
 @register.filter
 def can_approve_application(team, user):
-    if not user.is_authenticated():
-        return False
-    return team.can_approve_application(user)
+    return can_invite(team, user)
 
 @register.filter
 def can_invite_to_team(team, user):
