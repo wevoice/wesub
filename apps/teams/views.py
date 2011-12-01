@@ -692,9 +692,9 @@ def invite(request):
             'error': ugettext(u'User does not exist.')
         }
     
-    if not team.can_invite(request.user):
+    if not can_invite(team, request.user):
         return {
-            'error': ugettext(u'You can\'t invite to team.')
+            'error': ugettext(u'You cannot invite people to this team.')
         }
         
     if team.is_member(user):

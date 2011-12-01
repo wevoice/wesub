@@ -17,6 +17,8 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 #: All available permissions
+from django.utils.translation import ugettext_lazy as _
+
 RENAME_TEAM_PERM =  ("rename_team", "Rename team",)
 EDIT_TEAM_SETTINGS_PERM = ("edit_team_settings", "Edit team settings",)
 EDIT_PROJECT_SETTINGS_PERM = ("edit_project_settings", "Edit project settings",)
@@ -37,6 +39,13 @@ ROLE_OWNER = 'owner'
 ROLE_MANAGER = 'manager'
 ROLE_CONTRIBUTOR = 'contributor'
 ROLE_OUTSIDER = 'outsider'
+
+ROLE_NAMES = {
+    ROLE_ADMIN: _(u'Admin'),
+    ROLE_OWNER: _(u'Owner'),
+    ROLE_MANAGER: _(u'Manager'),
+    ROLE_CONTRIBUTOR: _(u'Team Member'),
+}
 
 #: Permissions that can be assigned to a model
 TEAM_PERMISSIONS = (

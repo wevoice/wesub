@@ -35,6 +35,8 @@ from django.core.exceptions import ValidationError
 
 
 from apps.teams.moderation import add_moderation, remove_moderation
+from apps.teams.permissions import roles_user_can_assign
+from apps.teams.permissions_const import ROLE_NAMES
 
 from doorman import feature_is_on
 
@@ -540,10 +542,9 @@ class InviteForm(forms.Form):
     role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1])
 
     def __init__(self, team, user, *args, **kwargs):
-        self.team = team
-        self.user = user
-        self.fields['role'].choices = roles_assignable_to(team, user)
         super(InviteForm, self).__init__(*args, **kwargs)
+        self.fields['role'].choices = [(r, ROLE_NAMES[r])
+                                       for r in roles_user_can_assign(team, user)]
 
 
     def clean_usernames(self):
