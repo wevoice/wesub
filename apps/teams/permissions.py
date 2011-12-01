@@ -333,7 +333,9 @@ def can_message_all_members(team, user):
     return role in [ROLE_ADMIN, ROLE_OWNER]
 
 def can_edit_project(team, user, project):
-    if project.is_default_project:
+    # when checking for the permission to create a project
+    # project will be none
+    if project and project.is_default_project:
         return False
 
     role = get_role_for_target(user, team, project, None)
