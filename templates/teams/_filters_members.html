@@ -8,7 +8,7 @@
 
     <li {% if role == "admin" %}class="current"{% endif %}>
         <a href="{% url teams:detail_members_role slug=team.slug,role="admin" %}">Admins
-          <span>{{team|admins:"count"}}</span></a>
+          <span>{{team|owners_and_admins:"count"}}</span></a>
     </li>
 
     <li {% if role == "manager" %}class="current"{% endif %}>
