@@ -662,7 +662,7 @@
   margin-right: -8px;
 }
 /* line 581, ../../../unisubs-design/sass/v1.scss */
-.v1 form fieldset input[type="text"], .v1 form fieldset textarea {
+.v1 form fieldset input[type="text"], .v1 form fieldset input[type="password"], .v1 form fieldset textarea {
   display: block;
   width: 100%;
   border: 1px solid #b7c3c9;
@@ -759,39 +759,44 @@
 
 /* line 656, ../../../unisubs-design/sass/v1.scss */
 .v1 div.submit {
+  clear: both;
   margin-top: 2em;
   padding-top: 1em;
   border-top: 1px solid #dce2e5;
   text-align: right;
 }
-/* line 662, ../../../unisubs-design/sass/v1.scss */
+/* line 663, ../../../unisubs-design/sass/v1.scss */
 .v1 div.submit input {
   padding: 4px;
 }
+/* line 667, ../../../unisubs-design/sass/v1.scss */
+.v1 div.submit button {
+  margin: 0;
+}
 
-/* line 669, ../../../unisubs-design/sass/v1.scss */
+/* line 674, ../../../unisubs-design/sass/v1.scss */
 .v1 .controls form.search fieldset {
   padding: 0;
 }
-/* line 672, ../../../unisubs-design/sass/v1.scss */
+/* line 677, ../../../unisubs-design/sass/v1.scss */
 .v1 .controls form.search fieldset input {
   width: 180px;
   padding: .5em;
   color: #a0b2bd;
   border-color: #dce2e5;
 }
-/* line 678, ../../../unisubs-design/sass/v1.scss */
+/* line 683, ../../../unisubs-design/sass/v1.scss */
 .v1 .controls form.search fieldset input:focus {
   border-color: #678ca3;
 }
 
 /*************** @Dashboard ***************/
-/* line 689, ../../../unisubs-design/sass/v1.scss */
+/* line 694, ../../../unisubs-design/sass/v1.scss */
 #dashboard .featured {
   padding: 0;
   font-size: 14px;
 }
-/* line 693, ../../../unisubs-design/sass/v1.scss */
+/* line 698, ../../../unisubs-design/sass/v1.scss */
 #dashboard .featured li {
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
@@ -803,28 +808,28 @@
   padding: 1em;
   margin: .5em 0;
 }
-/* line 702, ../../../unisubs-design/sass/v1.scss */
+/* line 707, ../../../unisubs-design/sass/v1.scss */
 #dashboard .listing li {
   padding: 1em 150px 1em 0;
 }
-/* line 706, ../../../unisubs-design/sass/v1.scss */
+/* line 711, ../../../unisubs-design/sass/v1.scss */
 #dashboard .listing .timestamp {
   top: 1em;
 }
 
-/* line 712, ../../../unisubs-design/sass/v1.scss */
+/* line 717, ../../../unisubs-design/sass/v1.scss */
 .v1.dashboard h2 {
   margin: 0;
   padding-bottom: .5em;
 }
 
-/* line 717, ../../../unisubs-design/sass/v1.scss */
+/* line 722, ../../../unisubs-design/sass/v1.scss */
 .v1.dashboard .row {
   clear: both;
   margin: 2em 0 0;
 }
 
-/* line 723, ../../../unisubs-design/sass/v1.scss */
+/* line 728, ../../../unisubs-design/sass/v1.scss */
 .only-child h2 {
   padding: .5em 0;
   margin-bottom: 0;
@@ -832,7 +837,7 @@
 }
 
 /*************** @Overrides ***************/
-/* line 732, ../../../unisubs-design/sass/v1.scss */
+/* line 737, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button {
   float: none;
   padding: 0;
@@ -855,7 +860,7 @@
   background-image: -ms-linear-gradient(#ffffff, #eeeeee);
   background-image: linear-gradient(#ffffff, #eeeeee);
 }
-/* line 744, ../../../unisubs-design/sass/v1.scss */
+/* line 749, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button .sort_label {
   font-size: 11px;
   padding: .5em;
@@ -864,16 +869,16 @@
   display: block;
   color: #678ca3;
 }
-/* line 752, ../../../unisubs-design/sass/v1.scss */
+/* line 757, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button .sort_label:hover {
   background: transparent;
 }
-/* line 757, ../../../unisubs-design/sass/v1.scss */
+/* line 762, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button ul {
   margin: 0;
   padding: .5em 0 0;
 }
-/* line 762, ../../../unisubs-design/sass/v1.scss */
+/* line 767, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button ul li a {
   padding: .5em;
   display: block;
@@ -889,26 +894,26 @@
   -o-box-shadow: none;
   box-shadow: none;
 }
-/* line 775, ../../../unisubs-design/sass/v1.scss */
+/* line 780, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button ul li a:hover {
   background: #678ca3;
   color: #fff;
 }
-/* line 780, ../../../unisubs-design/sass/v1.scss */
+/* line 785, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button .arrow {
   width: 20px;
   height: 24px;
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }
-/* line 786, ../../../unisubs-design/sass/v1.scss */
+/* line 791, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button:hover {
   background: transparent;
 }
-/* line 789, ../../../unisubs-design/sass/v1.scss */
+/* line 794, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button:hover .sort_label {
   z-index: 999999999;
 }
-/* line 793, ../../../unisubs-design/sass/v1.scss */
+/* line 798, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button:hover ul {
   top: 21px;
   left: -1px;
@@ -936,7 +941,7 @@
   -khtml-border-bottom-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
-/* line 802, ../../../unisubs-design/sass/v1.scss */
+/* line 807, ../../../unisubs-design/sass/v1.scss */
 .v1 .sort_button:hover .arrow {
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }

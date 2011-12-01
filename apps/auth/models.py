@@ -76,6 +76,9 @@ class CustomUser(BaseUser):
     # for some login backends we end up with a full name but not 
     # a first name, last name pair.
     full_name = models.CharField(max_length=63, blank=True, default='')
+    # which partner created this user? For now it' only a string, at
+    # some point we'll need to model partners better
+    partner = models.CharField(blank=True, null=True, max_length=32, db_index=True)
     
     objects = UserManager()
     
