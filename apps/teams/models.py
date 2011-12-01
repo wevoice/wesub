@@ -884,16 +884,6 @@ class TeamMember(models.Model):
     def __unicode__(self):
         return u'%s' % self.user
 
-    def can_assign_tasks(self):
-        # TODO: Adjust once final roles are in place.
-        # return self.role in ('Manager', 'Admin', 'Owner')
-        return self.role == 'manager'
-
-    def can_delete_tasks(self):
-        # TODO: Adjust once final roles are in place.
-        # return self.role in ('Admin', 'Owner')
-        return self.role == 'manager'
-
 
     class Meta:
         unique_together = (('team', 'user'),)

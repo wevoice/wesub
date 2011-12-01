@@ -50,7 +50,7 @@ from teams.permissions import (
     can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
     can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign,
-    can_join_team, can_edit_video, can_create_tasks
+    can_join_team, can_edit_video, can_create_tasks, can_delete_tasks
 )
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -308,8 +308,8 @@ def team_settings(request, slug):
     return {
         'basic_settings_form': form,
         'team': team,
-        'user_can_delete_tasks': member.can_delete_tasks(),
-        'user_can_assign_tasks': member.can_assign_tasks(),
+        'user_can_delete_tasks': can_delete_tasks(team, request.user),
+        'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
         'settings_form': SettingsForm(),
         'permissions_form': PermissionsForm(),
@@ -656,7 +656,7 @@ def team_tasks(request, slug):
 
     return {
         'team': team,
-        'user_can_delete_tasks': member.can_delete_tasks(),
+        'user_can_delete_tasks': can_delete_tasks(team, request.user),
         'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
     }
