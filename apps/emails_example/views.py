@@ -148,6 +148,7 @@ def email_notification(request):
         'last_version': caption_version,
         "STATIC_URL": settings.STATIC_URL,
         'your_version': caption_version,
+        'user': request.user,
         'user_url': caption_version.user and caption_version.user.get_absolute_url(),
     }
     return direct_to_template(request, 'videos/email_notification.html', context)
