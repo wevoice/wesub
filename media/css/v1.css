@@ -1,27 +1,27 @@
 /*************** @General Styles ***************/
-/* line 25, ../../../unisubs-design/sass/v1.scss */
+/* line 25, ../sass/source/v1.scss */
 .v1 {
   color: #2f3c45;
 }
 
-/* line 29, ../../../unisubs-design/sass/v1.scss */
+/* line 29, ../sass/source/v1.scss */
 .v1 em {
   font-style: italic;
 }
 
-/* line 33, ../../../unisubs-design/sass/v1.scss */
+/* line 33, ../sass/source/v1.scss */
 .v1 .logo {
   margin: 1em 0 2em;
 }
 
-/* line 37, ../../../unisubs-design/sass/v1.scss */
+/* line 37, ../sass/source/v1.scss */
 .v1 .notation {
   font-size: .95em;
   color: #7692a3;
 }
 
-/* line 42, ../../../unisubs-design/sass/v1.scss */
-.v1 .button, .v1 .content button, .v1 .form-container button {
+/* line 42, ../sass/source/v1.scss */
+.v1 .button, .v1 .content button, .v1 .form-container button, .v1 .submit input {
   margin: 1em 0;
   padding: .5em;
   -moz-border-radius: 3px;
@@ -30,6 +30,7 @@
   -ms-border-radius: 3px;
   -khtml-border-radius: 3px;
   border-radius: 3px;
+  font-size: inherit;
   background-color: #0f517a;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #136aa1), color-stop(100%, #0f517a));
   background-image: -webkit-linear-gradient(#136aa1, #0f517a);
@@ -44,8 +45,8 @@
   cursor: pointer;
   color: #fff;
 }
-/* line 55, ../../../unisubs-design/sass/v1.scss */
-.v1 .button:hover, .v1 .content button:hover, .v1 .form-container button:hover {
+/* line 56, ../sass/source/v1.scss */
+.v1 .button:hover, .v1 .content button:hover, .v1 .form-container button:hover, .v1 .submit input:hover {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #136aa1), color-stop(100%, #0c4061));
   background-image: -webkit-linear-gradient(#136aa1, #0c4061);
   background-image: -moz-linear-gradient(#136aa1, #0c4061);
@@ -53,8 +54,8 @@
   background-image: -ms-linear-gradient(#136aa1, #0c4061);
   background-image: linear-gradient(#136aa1, #0c4061);
 }
-/* line 59, ../../../unisubs-design/sass/v1.scss */
-.v1 .button.primary, .v1 .content button.primary, .v1 .form-container button.primary {
+/* line 60, ../sass/source/v1.scss */
+.v1 .button.primary, .v1 .content button.primary, .v1 .form-container button.primary, .v1 .submit input.primary {
   font-size: 1.25em;
   padding: 1em;
   -moz-border-radius: 4px;
@@ -64,8 +65,8 @@
   -khtml-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 65, ../../../unisubs-design/sass/v1.scss */
-.v1 .button.reduced, .v1 .button.cancel, .v1 .content button.reduced, .v1 .content button.cancel, .v1 .form-container button.reduced, .v1 .form-container button.cancel {
+/* line 66, ../sass/source/v1.scss */
+.v1 .button.reduced, .v1 .button.cancel, .v1 .content button.reduced, .v1 .content button.cancel, .v1 .form-container button.reduced, .v1 .form-container button.cancel, .v1 .submit input.reduced, .v1 .submit input.cancel {
   border-color: #dce2e5;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #dce2e5));
   background-image: -webkit-linear-gradient(#ffffff, #dce2e5);
@@ -76,8 +77,8 @@
   text-shadow: none;
   color: #678ca3;
 }
-/* line 71, ../../../unisubs-design/sass/v1.scss */
-.v1 .button.reduced:hover, .v1 .button.cancel:hover, .v1 .content button.reduced:hover, .v1 .content button.cancel:hover, .v1 .form-container button.reduced:hover, .v1 .form-container button.cancel:hover {
+/* line 72, ../sass/source/v1.scss */
+.v1 .button.reduced:hover, .v1 .button.cancel:hover, .v1 .content button.reduced:hover, .v1 .content button.cancel:hover, .v1 .form-container button.reduced:hover, .v1 .form-container button.cancel:hover, .v1 .submit input.reduced:hover, .v1 .submit input.cancel:hover {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f3f6f8), color-stop(100%, #dce2e5));
   background-image: -webkit-linear-gradient(#f3f6f8, #dce2e5);
   background-image: -moz-linear-gradient(#f3f6f8, #dce2e5);
@@ -87,8 +88,8 @@
   border-color: #b7c3c9;
   color: #486f87;
 }
-/* line 78, ../../../unisubs-design/sass/v1.scss */
-.v1 .button.delete, .v1 .content button.delete, .v1 .form-container button.delete {
+/* line 79, ../sass/source/v1.scss */
+.v1 .button.delete, .v1 .content button.delete, .v1 .form-container button.delete, .v1 .submit input.delete {
   float: left;
   margin: 0 .5em 0 0;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #a11332), color-stop(100%, #7a0f26));
@@ -100,8 +101,8 @@
   border-color: #700C22;
   text-shadow: 1px 1px 1px #700C22;
 }
-/* line 85, ../../../unisubs-design/sass/v1.scss */
-.v1 .button.delete:hover, .v1 .content button.delete:hover, .v1 .form-container button.delete:hover {
+/* line 86, ../sass/source/v1.scss */
+.v1 .button.delete:hover, .v1 .content button.delete:hover, .v1 .form-container button.delete:hover, .v1 .submit input.delete:hover {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #a11332), color-stop(100%, #610c1e));
   background-image: -webkit-linear-gradient(#a11332, #610c1e);
   background-image: -moz-linear-gradient(#a11332, #610c1e);
@@ -109,18 +110,38 @@
   background-image: -ms-linear-gradient(#a11332, #610c1e);
   background-image: linear-gradient(#a11332, #610c1e);
 }
-/* line 90, ../../../unisubs-design/sass/v1.scss */
-.v1 .button.cancel, .v1 .content button.cancel, .v1 .form-container button.cancel {
+/* line 91, ../sass/source/v1.scss */
+.v1 .button.save, .v1 .content button.save, .v1 .form-container button.save, .v1 .submit input.save {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #69a113), color-stop(100%, #4f7a0f));
+  background-image: -webkit-linear-gradient(#69a113, #4f7a0f);
+  background-image: -moz-linear-gradient(#69a113, #4f7a0f);
+  background-image: -o-linear-gradient(#69a113, #4f7a0f);
+  background-image: -ms-linear-gradient(#69a113, #4f7a0f);
+  background-image: linear-gradient(#69a113, #4f7a0f);
+  border-color: #4F7A0F;
+  text-shadow: 1px 1px 1px #4F7A0F;
+}
+/* line 96, ../sass/source/v1.scss */
+.v1 .button.save:hover, .v1 .content button.save:hover, .v1 .form-container button.save:hover, .v1 .submit input.save:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #69a113), color-stop(100%, #476e0d));
+  background-image: -webkit-linear-gradient(#69a113, #476e0d);
+  background-image: -moz-linear-gradient(#69a113, #476e0d);
+  background-image: -o-linear-gradient(#69a113, #476e0d);
+  background-image: -ms-linear-gradient(#69a113, #476e0d);
+  background-image: linear-gradient(#69a113, #476e0d);
+}
+/* line 101, ../sass/source/v1.scss */
+.v1 .button.cancel, .v1 .content button.cancel, .v1 .form-container button.cancel, .v1 .submit input.cancel {
   float: left;
   margin: 0 .5em 0 0;
 }
 
-/* line 96, ../../../unisubs-design/sass/v1.scss */
+/* line 107, ../sass/source/v1.scss */
 .v1 .controls .button {
   display: block;
 }
 
-/* line 100, ../../../unisubs-design/sass/v1.scss */
+/* line 111, ../sass/source/v1.scss */
 .v1 .action-replacement {
   padding: 1em;
   margin: 1em 0 2em;
@@ -135,24 +156,24 @@
   text-align: center;
 }
 
-/* line 109, ../../../unisubs-design/sass/v1.scss */
+/* line 120, ../sass/source/v1.scss */
 .v1 .team-banner {
   margin-bottom: 2em;
 }
 
-/* line 113, ../../../unisubs-design/sass/v1.scss */
+/* line 124, ../sass/source/v1.scss */
 .v1 .view .empty {
   padding: 2em 1em;
   font-size: 18px;
   color: #678ca3;
 }
 
-/* line 120, ../../../unisubs-design/sass/v1.scss */
+/* line 131, ../sass/source/v1.scss */
 .v1 .view > div, .v1 .view > form {
   padding-top: 2em;
 }
 
-/* line 125, ../../../unisubs-design/sass/v1.scss */
+/* line 136, ../sass/source/v1.scss */
 .v1 ul .timestamp {
   position: absolute;
   top: 2em;
@@ -165,18 +186,18 @@
 }
 
 /*************** @Tabs ***************/
-/* line 139, ../../../unisubs-design/sass/v1.scss */
+/* line 150, ../sass/source/v1.scss */
 .v1 .tabs {
   float: left;
   width: 100%;
   padding: 0;
   border-bottom: 1px solid #dce2e5;
 }
-/* line 145, ../../../unisubs-design/sass/v1.scss */
+/* line 156, ../sass/source/v1.scss */
 .v1 .tabs li {
   display: inline;
 }
-/* line 148, ../../../unisubs-design/sass/v1.scss */
+/* line 159, ../sass/source/v1.scss */
 .v1 .tabs li a {
   display: block;
   float: left;
@@ -185,12 +206,12 @@
   color: #678ca3;
   border-style: solid;
 }
-/* line 156, ../../../unisubs-design/sass/v1.scss */
+/* line 167, ../sass/source/v1.scss */
 .v1 .tabs li a:hover {
   border-bottom-width: 2px;
   margin-bottom: -1px;
 }
-/* line 161, ../../../unisubs-design/sass/v1.scss */
+/* line 172, ../sass/source/v1.scss */
 .v1 .tabs li.current a {
   color: #3e6782;
   font-weight: bold;
@@ -199,7 +220,7 @@
 }
 
 /*************** @Tools ***************/
-/* line 171, ../../../unisubs-design/sass/v1.scss */
+/* line 182, ../sass/source/v1.scss */
 .v1 .view .tools {
   padding: 1em;
   margin: 0 -20px 0 0;
@@ -213,7 +234,7 @@
   background-image: -ms-linear-gradient(bottom, #fafafa, #ffffff 25%, #ffffff);
   background-image: linear-gradient(bottom, #fafafa, #ffffff 25%, #ffffff);
 }
-/* line 183, ../../../unisubs-design/sass/v1.scss */
+/* line 194, ../sass/source/v1.scss */
 .v1 .view .tools .button {
   background: transparent;
   border: 1px solid transparent;
@@ -221,7 +242,7 @@
   text-shadow: none;
   padding: .5em 1em;
 }
-/* line 190, ../../../unisubs-design/sass/v1.scss */
+/* line 201, ../sass/source/v1.scss */
 .v1 .view .tools .button:hover {
   border-color: #b7c3c9;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f3f6f8), color-stop(100%, #dce2e5));
@@ -232,73 +253,73 @@
   background-image: linear-gradient(#f3f6f8, #dce2e5);
   color: #486f87;
 }
-/* line 197, ../../../unisubs-design/sass/v1.scss */
+/* line 208, ../sass/source/v1.scss */
 .v1 .view .tools form {
   padding: 0;
 }
-/* line 201, ../../../unisubs-design/sass/v1.scss */
+/* line 212, ../sass/source/v1.scss */
 .v1 .view .tools .filters {
   float: left;
   padding: 0;
   margin: -0.5em 0 0 -0.5em;
 }
-/* line 206, ../../../unisubs-design/sass/v1.scss */
+/* line 217, ../sass/source/v1.scss */
 .v1 .view .tools .filters > li {
   display: inline;
   padding: 0;
 }
-/* line 210, ../../../unisubs-design/sass/v1.scss */
+/* line 221, ../sass/source/v1.scss */
 .v1 .view .tools .filters > li select {
   width: 140px;
 }
 
 /*************** @Listings ***************/
-/* line 219, ../../../unisubs-design/sass/v1.scss */
+/* line 230, ../sass/source/v1.scss */
 .v1 .listing {
   padding: 0;
 }
-/* line 222, ../../../unisubs-design/sass/v1.scss */
+/* line 233, ../sass/source/v1.scss */
 .v1 .listing > li {
   position: relative;
   padding: 2em 1em;
   border-bottom: 1px dotted #b7c3c9;
 }
-/* line 227, ../../../unisubs-design/sass/v1.scss */
+/* line 238, ../sass/source/v1.scss */
 .v1 .listing > li.empty {
   border: none;
 }
-/* line 231, ../../../unisubs-design/sass/v1.scss */
+/* line 242, ../sass/source/v1.scss */
 .v1 .listing > li h3 {
   position: relative;
   font-size: 13px;
   padding-bottom: .25em;
   line-height: 1.5em;
 }
-/* line 237, ../../../unisubs-design/sass/v1.scss */
+/* line 248, ../sass/source/v1.scss */
 .v1 .listing > li h3 > a {
   text-decoration: none;
   margin-right: .5em;
 }
-/* line 241, ../../../unisubs-design/sass/v1.scss */
+/* line 252, ../sass/source/v1.scss */
 .v1 .listing > li h3 > a:hover {
   border-width: 0 0 1px 0;
   border-style: dotted;
 }
-/* line 248, ../../../unisubs-design/sass/v1.scss */
+/* line 259, ../sass/source/v1.scss */
 .v1 .listing > li p {
   margin: .5em 0;
 }
-/* line 252, ../../../unisubs-design/sass/v1.scss */
+/* line 263, ../sass/source/v1.scss */
 .v1 .listing > li .thumb {
   position: absolute;
   top: 2em;
   left: 0;
 }
-/* line 256, ../../../unisubs-design/sass/v1.scss */
+/* line 267, ../sass/source/v1.scss */
 .v1 .listing > li .thumb img {
   border: 1px solid #b7c3c9;
 }
-/* line 261, ../../../unisubs-design/sass/v1.scss */
+/* line 272, ../sass/source/v1.scss */
 .v1 .listing > li .actions {
   position: absolute;
   top: 2em;
@@ -306,31 +327,46 @@
   width: 120px;
   padding: 0;
 }
-/* line 264, ../../../unisubs-design/sass/v1.scss */
+/* line 275, ../sass/source/v1.scss */
 .v1 .listing > li .actions li {
   padding: 0;
   text-align: right;
   color: #a0b2bd;
 }
-/* line 270, ../../../unisubs-design/sass/v1.scss */
+/* line 281, ../sass/source/v1.scss */
 .v1 .listing > li .actions a {
   color: #486f87;
   text-decoration: none;
 }
-/* line 275, ../../../unisubs-design/sass/v1.scss */
+/* line 286, ../sass/source/v1.scss */
 .v1 .listing > li .actions li > form {
   padding: 0;
 }
-/* line 279, ../../../unisubs-design/sass/v1.scss */
+/* line 290, ../sass/source/v1.scss */
 .v1 .listing > li .actions li > a, .v1 .listing > li .actions li > form a {
   display: block;
   padding: .5em 0;
 }
-/* line 283, ../../../unisubs-design/sass/v1.scss */
+/* line 294, ../sass/source/v1.scss */
 .v1 .listing > li .actions li > a:after, .v1 .listing > li .actions li > form a:after {
   content: ' →';
 }
-/* line 289, ../../../unisubs-design/sass/v1.scss */
+/* line 299, ../sass/source/v1.scss */
+.v1 .listing > li .actions .assignee-choice {
+  position: absolute;
+  top: o;
+  right: 0;
+  padding: 1em;
+  background: #486f87;
+  color: #fff;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+}
+/* line 309, ../sass/source/v1.scss */
 .v1 .listing > li .descriptor {
   font-size: 11px;
   font-weight: normal;
@@ -345,13 +381,13 @@
   border: 1px solid #dce2e5;
   color: #7692a3;
 }
-/* line 298, ../../../unisubs-design/sass/v1.scss */
+/* line 318, ../sass/source/v1.scss */
 .v1 .listing > li .descriptor a, .v1 .listing > li .descriptor a:hover {
   border: none;
   text-decoration: none;
   color: #7692a3;
 }
-/* line 305, ../../../unisubs-design/sass/v1.scss */
+/* line 325, ../sass/source/v1.scss */
 .v1 .listing > li .admin-controls {
   display: none;
   position: absolute;
@@ -375,19 +411,19 @@
   background-image: linear-gradient(#f3f6f8, #dce2e5);
   border: 1px solid #a0b2bd;
 }
-/* line 316, ../../../unisubs-design/sass/v1.scss */
+/* line 336, ../sass/source/v1.scss */
 .v1 .listing > li .admin-controls.selected {
   display: block;
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
-/* line 321, ../../../unisubs-design/sass/v1.scss */
+/* line 341, ../sass/source/v1.scss */
 .v1 .listing > li .admin-controls li {
   display: block;
   float: left;
   padding: 0;
 }
-/* line 326, ../../../unisubs-design/sass/v1.scss */
+/* line 346, ../sass/source/v1.scss */
 .v1 .listing > li .admin-controls li a {
   display: block;
   float: left;
@@ -397,7 +433,7 @@
   border-left: 1px solid #a0b2bd;
   cursor: pointer;
 }
-/* line 335, ../../../unisubs-design/sass/v1.scss */
+/* line 355, ../sass/source/v1.scss */
 .v1 .listing > li .admin-controls li a:hover {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f3f6f8), color-stop(100%, #b7c3c9));
   background-image: -webkit-linear-gradient(#f3f6f8, #b7c3c9);
@@ -407,114 +443,114 @@
   background-image: linear-gradient(#f3f6f8, #b7c3c9);
   color: #486f87;
 }
-/* line 341, ../../../unisubs-design/sass/v1.scss */
+/* line 361, ../sass/source/v1.scss */
 .v1 .listing > li .admin-controls li:first-child a {
   border-left: none;
 }
-/* line 345, ../../../unisubs-design/sass/v1.scss */
+/* line 365, ../sass/source/v1.scss */
 .v1 .listing > li .admin-controls li input[type="checkbox"] {
   margin: 5px 7px;
 }
-/* line 350, ../../../unisubs-design/sass/v1.scss */
+/* line 370, ../sass/source/v1.scss */
 .v1 .listing > li .admin-controls:hover {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
-/* line 355, ../../../unisubs-design/sass/v1.scss */
+/* line 375, ../sass/source/v1.scss */
 .v1 .listing > li:hover .admin-controls {
   display: block;
 }
 
-/* line 361, ../../../unisubs-design/sass/v1.scss */
+/* line 381, ../sass/source/v1.scss */
 .v1 .listing.videos > li {
   min-height: 5em;
   padding-left: 120px;
   padding-right: 150px;
 }
-/* line 366, ../../../unisubs-design/sass/v1.scss */
+/* line 386, ../sass/source/v1.scss */
 .v1 .listing.videos > li .thumb {
   width: 100px;
   height: 60px;
 }
-/* line 370, ../../../unisubs-design/sass/v1.scss */
+/* line 390, ../sass/source/v1.scss */
 .v1 .listing.videos > li .thumb img {
   height: 60px;
 }
 
-/* line 376, ../../../unisubs-design/sass/v1.scss */
+/* line 396, ../sass/source/v1.scss */
 .v1 .listing.members > li {
   min-height: 4em;
   padding-left: 65px;
   padding-right: 150px;
 }
-/* line 381, ../../../unisubs-design/sass/v1.scss */
+/* line 401, ../sass/source/v1.scss */
 .v1 .listing.members > li .thumb {
   width: 45px;
   height: 45px;
 }
-/* line 385, ../../../unisubs-design/sass/v1.scss */
+/* line 405, ../sass/source/v1.scss */
 .v1 .listing.members > li .thumb img {
   height: 45px;
 }
-/* line 390, ../../../unisubs-design/sass/v1.scss */
+/* line 410, ../sass/source/v1.scss */
 .v1 .listing.members > li.current {
   background: #f6f6e4;
 }
 
-/* line 395, ../../../unisubs-design/sass/v1.scss */
+/* line 415, ../sass/source/v1.scss */
 .v1 .listing.activity > li, .v1 .listing.tasks > li {
   padding-right: 150px;
 }
-/* line 398, ../../../unisubs-design/sass/v1.scss */
+/* line 418, ../sass/source/v1.scss */
 .v1 .listing.activity > li .actions, .v1 .listing.tasks > li .actions {
   width: 150px;
 }
 
-/* line 405, ../../../unisubs-design/sass/v1.scss */
+/* line 425, ../sass/source/v1.scss */
 .v1 .listing.tasks > li .done span {
   margin-right: .5em;
 }
 
-/* line 410, ../../../unisubs-design/sass/v1.scss */
+/* line 430, ../sass/source/v1.scss */
 .v1 .listing.teams > li {
   min-height: 4em;
   padding-left: 68px;
   padding-right: 150px;
 }
-/* line 415, ../../../unisubs-design/sass/v1.scss */
+/* line 435, ../sass/source/v1.scss */
 .v1 .listing.teams > li .thumb img {
   height: 48px;
 }
 
-/* line 420, ../../../unisubs-design/sass/v1.scss */
+/* line 440, ../sass/source/v1.scss */
 .v1 .view .pagination {
   float: none;
   padding: 1em 1em 0;
 }
-/* line 424, ../../../unisubs-design/sass/v1.scss */
+/* line 444, ../sass/source/v1.scss */
 .v1 .view .pagination em {
   box-shadow: none;
   font-style: normal;
   color: #a0b2bd;
   background: transparent;
 }
-/* line 431, ../../../unisubs-design/sass/v1.scss */
+/* line 451, ../sass/source/v1.scss */
 .v1 .view .pagination a {
   color: #678ca3;
 }
-/* line 434, ../../../unisubs-design/sass/v1.scss */
+/* line 454, ../sass/source/v1.scss */
 .v1 .view .pagination a:hover {
   box-shadow: none;
   background: #b7c3c9;
   color: #fff;
 }
-/* line 441, ../../../unisubs-design/sass/v1.scss */
+/* line 461, ../sass/source/v1.scss */
 .v1 .view .pagination .disabled {
   color: #a0b2bd;
 }
 
 /*************** @Controls ***************/
-/* line 448, ../../../unisubs-design/sass/v1.scss */
+/* line 468, ../sass/source/v1.scss */
 .v1 .controls {
   width: 199px;
   padding-left: 15px;
@@ -528,20 +564,20 @@
   background-image: -ms-linear-gradient(left, #f5f5f5, #ffffff 5%, #ffffff);
   background-image: linear-gradient(left, #f5f5f5, #ffffff 5%, #ffffff);
 }
-/* line 460, ../../../unisubs-design/sass/v1.scss */
+/* line 480, ../sass/source/v1.scss */
 .v1 .controls ul {
   padding: 0;
   margin: 2em 0;
 }
-/* line 464, ../../../unisubs-design/sass/v1.scss */
+/* line 484, ../sass/source/v1.scss */
 .v1 .controls ul.secondary {
   margin-top: 0;
 }
-/* line 468, ../../../unisubs-design/sass/v1.scss */
+/* line 488, ../sass/source/v1.scss */
 .v1 .controls ul li {
   padding: 0;
 }
-/* line 472, ../../../unisubs-design/sass/v1.scss */
+/* line 492, ../sass/source/v1.scss */
 .v1 .controls ul li a {
   position: relative;
   display: block;
@@ -563,7 +599,7 @@
   -khtml-border-bottom-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-/* line 482, ../../../unisubs-design/sass/v1.scss */
+/* line 502, ../sass/source/v1.scss */
 .v1 .controls ul li a:hover {
   background-color: #f9fafb;
   background-image: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #e8ecee), color-stop(5%, #f3f6f6), color-stop(100%, #f3f6f6));
@@ -573,14 +609,14 @@
   background-image: -ms-linear-gradient(left, #e8ecee, #f3f6f6 5%, #f3f6f6);
   background-image: linear-gradient(left, #e8ecee, #f3f6f6 5%, #f3f6f6);
 }
-/* line 491, ../../../unisubs-design/sass/v1.scss */
+/* line 511, ../sass/source/v1.scss */
 .v1 .controls ul li a span {
   position: absolute;
   top: .75em;
   right: .75em;
   color: #a0b2bd;
 }
-/* line 498, ../../../unisubs-design/sass/v1.scss */
+/* line 518, ../sass/source/v1.scss */
 .v1 .controls ul li.current a {
   background-color: #edf1f2;
   background-image: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #e2e8e9), color-stop(5%, #edf1f2), color-stop(100%, #edf1f2));
@@ -591,7 +627,7 @@
   background-image: linear-gradient(left, #e2e8e9, #edf1f2 5%, #edf1f2);
   color: #486f87;
 }
-/* line 507, ../../../unisubs-design/sass/v1.scss */
+/* line 527, ../sass/source/v1.scss */
 .v1 .controls ul li.current a:hover {
   background-color: #e8ecee;
   background-image: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #dce3e5), color-stop(5%, #e8ecee), color-stop(100%, #e8ecee));
@@ -601,11 +637,11 @@
   background-image: -ms-linear-gradient(left, #dce3e5, #e8ecee 5%, #e8ecee);
   background-image: linear-gradient(left, #dce3e5, #e8ecee 5%, #e8ecee);
 }
-/* line 516, ../../../unisubs-design/sass/v1.scss */
+/* line 536, ../sass/source/v1.scss */
 .v1 .controls ul li.current a span {
   color: #7692a3;
 }
-/* line 522, ../../../unisubs-design/sass/v1.scss */
+/* line 542, ../sass/source/v1.scss */
 .v1 .controls .refine {
   margin: 2em 0;
   padding: 1.5em 15px;
@@ -613,55 +649,59 @@
   border-top: 1px solid #f3f6f8;
   border-bottom: 1px solid #f3f6f8;
 }
-/* line 529, ../../../unisubs-design/sass/v1.scss */
+/* line 549, ../sass/source/v1.scss */
 .v1 .controls .refine form {
   padding: 0 0 1em;
 }
-/* line 533, ../../../unisubs-design/sass/v1.scss */
+/* line 553, ../sass/source/v1.scss */
 .v1 .controls .refine select {
   width: 100%;
 }
-/* line 538, ../../../unisubs-design/sass/v1.scss */
+/* line 558, ../sass/source/v1.scss */
 .v1 .controls h4 {
   color: #7692a3;
   padding-bottom: 1em;
 }
-/* line 543, ../../../unisubs-design/sass/v1.scss */
-.v1 .controls form ul {
-  margin: .5em 0 1.5em;
+/* line 563, ../sass/source/v1.scss */
+.v1 .controls form {
+  padding: 0;
+}
+/* line 566, ../sass/source/v1.scss */
+.v1 .controls form.search {
+  padding: 1em 0;
 }
 
 /*************** @Forms ***************/
-/* line 555, ../../../unisubs-design/sass/v1.scss */
+/* line 579, ../sass/source/v1.scss */
 .v1 form {
   padding: 1em 0;
 }
-/* line 558, ../../../unisubs-design/sass/v1.scss */
+/* line 582, ../sass/source/v1.scss */
 .v1 form fieldset {
   padding-bottom: 3em;
 }
-/* line 561, ../../../unisubs-design/sass/v1.scss */
+/* line 585, ../sass/source/v1.scss */
 .v1 form fieldset legend {
   font-weight: bold;
   padding-bottom: .5em;
 }
-/* line 566, ../../../unisubs-design/sass/v1.scss */
+/* line 590, ../sass/source/v1.scss */
 .v1 form fieldset input, .v1 form fieldset textarea {
   margin-bottom: .5em;
   padding: 4px;
 }
-/* line 571, ../../../unisubs-design/sass/v1.scss */
+/* line 595, ../sass/source/v1.scss */
 .v1 form fieldset label {
   display: block;
   width: 100%;
   padding: 1.5em 0 .25em;
 }
-/* line 575, ../../../unisubs-design/sass/v1.scss */
+/* line 599, ../sass/source/v1.scss */
 .v1 form fieldset label .notation {
   float: right;
   margin-right: -8px;
 }
-/* line 581, ../../../unisubs-design/sass/v1.scss */
+/* line 605, ../sass/source/v1.scss */
 .v1 form fieldset input[type="text"], .v1 form fieldset input[type="password"], .v1 form fieldset textarea {
   display: block;
   width: 100%;
@@ -673,44 +713,56 @@
   -khtml-border-radius: 2px;
   border-radius: 2px;
 }
-/* line 587, ../../../unisubs-design/sass/v1.scss */
+/* line 611, ../sass/source/v1.scss */
 .v1 form fieldset input[type='checkbox'] {
   margin: 0 4px 0 0;
 }
-/* line 591, ../../../unisubs-design/sass/v1.scss */
+/* line 615, ../sass/source/v1.scss */
 .v1 form fieldset input[type='file'] {
   display: block;
   width: 100%;
   padding: 0;
 }
-/* line 596, ../../../unisubs-design/sass/v1.scss */
+/* line 620, ../sass/source/v1.scss */
 .v1 form fieldset select {
   margin-bottom: .5em;
   padding: 4px;
   width: 100%;
 }
-/* line 602, ../../../unisubs-design/sass/v1.scss */
+/* line 626, ../sass/source/v1.scss */
 .v1 form fieldset textarea {
   height: 5em;
 }
+/* line 631, ../sass/source/v1.scss */
+.v1 form .preselected {
+  padding: 1em;
+  margin: .5em 0;
+  background: #dce2e5;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+}
 
-/* line 609, ../../../unisubs-design/sass/v1.scss */
+/* line 640, ../sass/source/v1.scss */
 .v1 .panel-holder form {
   float: left;
   width: 100%;
   clear: both;
 }
 
-/* line 615, ../../../unisubs-design/sass/v1.scss */
+/* line 646, ../sass/source/v1.scss */
 .v1 .panel-holder .tools form {
   float: none;
 }
 
-/* line 619, ../../../unisubs-design/sass/v1.scss */
+/* line 650, ../sass/source/v1.scss */
 .v1 form.workflow {
   margin-top: -3em;
 }
-/* line 622, ../../../unisubs-design/sass/v1.scss */
+/* line 653, ../sass/source/v1.scss */
 .v1 form.workflow fieldset {
   padding: 0 1em;
   background: #dce2e5;
@@ -721,12 +773,12 @@
   -khtml-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 627, ../../../unisubs-design/sass/v1.scss */
+/* line 658, ../sass/source/v1.scss */
 .v1 form.workflow fieldset .button {
   margin-top: 2em;
 }
 
-/* line 633, ../../../unisubs-design/sass/v1.scss */
+/* line 664, ../sass/source/v1.scss */
 .v1 .permissions .workflow {
   margin-top: -2em;
   padding: 0 1em;
@@ -738,26 +790,26 @@
   -khtml-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 639, ../../../unisubs-design/sass/v1.scss */
+/* line 670, ../sass/source/v1.scss */
 .v1 .permissions .workflow fieldset {
   padding: 0;
 }
-/* line 642, ../../../unisubs-design/sass/v1.scss */
+/* line 673, ../sass/source/v1.scss */
 .v1 .permissions .workflow fieldset .button {
   float: right;
 }
 
-/* line 648, ../../../unisubs-design/sass/v1.scss */
+/* line 679, ../sass/source/v1.scss */
 .v1 .alpha .omega {
   margin-left: 60px;
 }
 
-/* line 652, ../../../unisubs-design/sass/v1.scss */
+/* line 683, ../sass/source/v1.scss */
 #dashboard .alpha .omega {
   margin-left: 10px;
 }
 
-/* line 656, ../../../unisubs-design/sass/v1.scss */
+/* line 687, ../sass/source/v1.scss */
 .v1 div.submit {
   clear: both;
   margin-top: 2em;
@@ -765,38 +817,38 @@
   border-top: 1px solid #dce2e5;
   text-align: right;
 }
-/* line 663, ../../../unisubs-design/sass/v1.scss */
-.v1 div.submit input {
-  padding: 4px;
+/* line 694, ../sass/source/v1.scss */
+.v1 div.submit form {
+  padding: 0;
 }
-/* line 667, ../../../unisubs-design/sass/v1.scss */
-.v1 div.submit button {
+/* line 698, ../sass/source/v1.scss */
+.v1 div.submit button, .v1 div.submit input {
   margin: 0;
 }
 
-/* line 674, ../../../unisubs-design/sass/v1.scss */
+/* line 707, ../sass/source/v1.scss */
 .v1 .controls form.search fieldset {
   padding: 0;
 }
-/* line 677, ../../../unisubs-design/sass/v1.scss */
+/* line 710, ../sass/source/v1.scss */
 .v1 .controls form.search fieldset input {
   width: 180px;
   padding: .5em;
   color: #a0b2bd;
   border-color: #dce2e5;
 }
-/* line 683, ../../../unisubs-design/sass/v1.scss */
+/* line 716, ../sass/source/v1.scss */
 .v1 .controls form.search fieldset input:focus {
   border-color: #678ca3;
 }
 
 /*************** @Dashboard ***************/
-/* line 694, ../../../unisubs-design/sass/v1.scss */
+/* line 727, ../sass/source/v1.scss */
 #dashboard .featured {
   padding: 0;
   font-size: 14px;
 }
-/* line 698, ../../../unisubs-design/sass/v1.scss */
+/* line 731, ../sass/source/v1.scss */
 #dashboard .featured li {
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
@@ -808,36 +860,59 @@
   padding: 1em;
   margin: .5em 0;
 }
-/* line 707, ../../../unisubs-design/sass/v1.scss */
+/* line 740, ../sass/source/v1.scss */
 #dashboard .listing li {
   padding: 1em 150px 1em 0;
 }
-/* line 711, ../../../unisubs-design/sass/v1.scss */
+/* line 744, ../sass/source/v1.scss */
 #dashboard .listing .timestamp {
   top: 1em;
 }
 
-/* line 717, ../../../unisubs-design/sass/v1.scss */
-.v1.dashboard h2 {
-  margin: 0;
-  padding-bottom: .5em;
-}
-
-/* line 722, ../../../unisubs-design/sass/v1.scss */
-.v1.dashboard .row {
-  clear: both;
-  margin: 2em 0 0;
-}
-
-/* line 728, ../../../unisubs-design/sass/v1.scss */
-.only-child h2 {
+/* line 750, ../sass/source/v1.scss */
+.v1 .only-child h2 {
   padding: .5em 0;
   margin-bottom: 0;
   border-bottom: 1px solid #dce2e5;
 }
 
+/*************** @Profile ***************/
+/* line 758, ../sass/source/v1.scss */
+#profile.v1 h2, #dashboard.v1 h2 {
+  line-height: 1.75em;
+}
+/* line 761, ../sass/source/v1.scss */
+#profile.v1 h2 img, #dashboard.v1 h2 img {
+  float: left;
+  padding: 2px;
+  margin-right: .5em;
+  border: 1px solid #dce2e5;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  height: 32px;
+}
+
+/* line 772, ../sass/source/v1.scss */
+#profile.v1 .view p, #profile.v1 .view ul {
+  margin-bottom: 2em;
+}
+/* line 776, ../sass/source/v1.scss */
+#profile.v1 .view ul {
+  padding: 0;
+}
+/* line 780, ../sass/source/v1.scss */
+#profile.v1 .view .alpha img {
+  padding: .5em;
+  border: 1px solid #dce2e5;
+  margin-bottom: 1em;
+}
+
 /*************** @Overrides ***************/
-/* line 737, ../../../unisubs-design/sass/v1.scss */
+/* line 790, ../sass/source/v1.scss */
 .v1 .sort_button {
   float: none;
   padding: 0;
@@ -860,7 +935,7 @@
   background-image: -ms-linear-gradient(#ffffff, #eeeeee);
   background-image: linear-gradient(#ffffff, #eeeeee);
 }
-/* line 749, ../../../unisubs-design/sass/v1.scss */
+/* line 802, ../sass/source/v1.scss */
 .v1 .sort_button .sort_label {
   font-size: 11px;
   padding: .5em;
@@ -869,16 +944,16 @@
   display: block;
   color: #678ca3;
 }
-/* line 757, ../../../unisubs-design/sass/v1.scss */
+/* line 810, ../sass/source/v1.scss */
 .v1 .sort_button .sort_label:hover {
   background: transparent;
 }
-/* line 762, ../../../unisubs-design/sass/v1.scss */
+/* line 815, ../sass/source/v1.scss */
 .v1 .sort_button ul {
   margin: 0;
   padding: .5em 0 0;
 }
-/* line 767, ../../../unisubs-design/sass/v1.scss */
+/* line 820, ../sass/source/v1.scss */
 .v1 .sort_button ul li a {
   padding: .5em;
   display: block;
@@ -894,26 +969,26 @@
   -o-box-shadow: none;
   box-shadow: none;
 }
-/* line 780, ../../../unisubs-design/sass/v1.scss */
+/* line 833, ../sass/source/v1.scss */
 .v1 .sort_button ul li a:hover {
   background: #678ca3;
   color: #fff;
 }
-/* line 785, ../../../unisubs-design/sass/v1.scss */
+/* line 838, ../sass/source/v1.scss */
 .v1 .sort_button .arrow {
   width: 20px;
   height: 24px;
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }
-/* line 791, ../../../unisubs-design/sass/v1.scss */
+/* line 844, ../sass/source/v1.scss */
 .v1 .sort_button:hover {
   background: transparent;
 }
-/* line 794, ../../../unisubs-design/sass/v1.scss */
+/* line 847, ../sass/source/v1.scss */
 .v1 .sort_button:hover .sort_label {
   z-index: 999999999;
 }
-/* line 798, ../../../unisubs-design/sass/v1.scss */
+/* line 851, ../sass/source/v1.scss */
 .v1 .sort_button:hover ul {
   top: 21px;
   left: -1px;
@@ -941,7 +1016,7 @@
   -khtml-border-bottom-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
-/* line 807, ../../../unisubs-design/sass/v1.scss */
+/* line 860, ../sass/source/v1.scss */
 .v1 .sort_button:hover .arrow {
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }

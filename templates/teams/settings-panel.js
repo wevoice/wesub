@@ -384,8 +384,8 @@ var BasicPanel  = AsyncPanel.$extend({
             description: $('#basic_description', this.el).val()
         };
         var that = this;
-        TeamsApiV2.team_set(TEAM_SLUG, function(data, extra){
-            that.onLoaded(data, extra, true);
+        TeamsApiV2.team_set(TEAM_SLUG, data, function(respData, extra){
+            that.onLoaded(respData, extra, true);
         });
         this.workflow && this.workflow.onSubmit();
     },
@@ -395,8 +395,10 @@ var BasicPanel  = AsyncPanel.$extend({
         return false;
     },
     onLoaded: function(data, extra, showMessage) {
-        this.team = new TeamModel(data);
-        this.fillFromModel();
+        if (!_.isEmpty(data)){
+            this.team = new TeamModel(data);
+            this.fillFromModel();
+        }
         if(showMessage){
             displayFeedbackMessage("Settings saved.");
         }
