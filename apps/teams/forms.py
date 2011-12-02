@@ -469,7 +469,7 @@ class CreateTaskForm(ErrorableModelForm):
 
 class TaskAssignForm(forms.Form):
     task = forms.ModelChoiceField(queryset=Task.objects.all())
-    assignee = forms.ModelChoiceField(queryset=User.objects.all())
+    assignee = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
 
     def __init__(self, team, user, *args, **kwargs):
         super(TaskAssignForm, self).__init__(*args, **kwargs)

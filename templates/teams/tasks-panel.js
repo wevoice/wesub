@@ -96,12 +96,11 @@ var TaskListItem = Class.$extend({
         e.preventDefault();
 
         var assignee_id = $(e.target).closest('form').find('select').val();
-        if (assignee_id !== "") {
-            if (this.model.type === "Translate") {
-                TeamsApiV2.task_translate_assign(this.model.teamVideo, this.model.language, assignee_id, this.onTaskAssigned);
-            } else {
-                TeamsApiV2.task_assign(this.model.pk, assignee_id, this.onTaskAssigned);
-            }
+
+        if (this.model.type === "Translate") {
+            TeamsApiV2.task_translate_assign(this.model.teamVideo, this.model.language, assignee_id, this.onTaskAssigned);
+        } else {
+            TeamsApiV2.task_assign(this.model.pk, assignee_id, this.onTaskAssigned);
         }
     },
     onDeleteClick: function(e) {
