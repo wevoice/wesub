@@ -852,12 +852,9 @@ class TeamMemderManager(models.Manager):
     use_for_related_fields = True
     
     def create_first_member(self, team, user):
-        """
-        Make sure that new teams always have a 'owner'
-        member
-        """
-        tm =  TeamMember(
-        team=team, user=user , role=ROLE_OWNER)
+        """Make sure that new teams always have an 'owner' member."""
+
+        tm = TeamMember(team=team, user=user, role=ROLE_OWNER)
         tm.save()
         return tm
 

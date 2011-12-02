@@ -372,7 +372,8 @@ class TeamsApiV2Class(object):
         The translation task will be created if it does not already exist.
 
         '''
-        # TODO: Check permissions here.
+        # TODO: Check permissions here. This will be tricky because of ghost tasks.
+
         tv = TeamVideo.objects.get(pk=team_video_id)
         task, created = Task.objects.get_or_create(team=tv.team, team_video=tv,
                 language=language, type=Task.TYPE_IDS['Translate'])
@@ -481,7 +482,7 @@ class TeamsApiV2Class(object):
                  errors = form.errors
                  )   
 
-    def project_delete(self, team_slug, project_pk, user):        
+    def project_delete(self, team_slug, project_pk, user):
         
         team = get_object_or_404(Team, slug=team_slug)
         project = get_object_or_404(Project, team=team, pk=project_pk)
