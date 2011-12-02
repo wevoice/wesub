@@ -478,22 +478,22 @@
 }
 
 /* line 396, ../sass/source/v1.scss */
-.v1 .listing.members > li {
+.v1 .listing.members > li, .v1 .listing.messages > li {
   min-height: 4em;
   padding-left: 65px;
   padding-right: 150px;
 }
 /* line 401, ../sass/source/v1.scss */
-.v1 .listing.members > li .thumb {
+.v1 .listing.members > li .thumb, .v1 .listing.messages > li .thumb {
   width: 45px;
   height: 45px;
 }
 /* line 405, ../sass/source/v1.scss */
-.v1 .listing.members > li .thumb img {
+.v1 .listing.members > li .thumb img, .v1 .listing.messages > li .thumb img {
   height: 45px;
 }
 /* line 410, ../sass/source/v1.scss */
-.v1 .listing.members > li.current {
+.v1 .listing.members > li.current, .v1 .listing.messages > li.current {
   background: #f6f6e4;
 }
 
@@ -897,11 +897,11 @@
 }
 
 /* line 772, ../sass/source/v1.scss */
-#profile.v1 .view p, #profile.v1 .view ul {
+#profile.v1 .view .grid_4 p, #profile.v1 .view .grid_4 ul {
   margin-bottom: 2em;
 }
 /* line 776, ../sass/source/v1.scss */
-#profile.v1 .view ul {
+#profile.v1 .view .grid_4 ul {
   padding: 0;
 }
 /* line 780, ../sass/source/v1.scss */

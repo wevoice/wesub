@@ -393,7 +393,7 @@ $darker: #3e6782;
 	}
 }
 
-.v1 .listing.members > li {
+.v1 .listing.members > li, .v1 .listing.messages > li {
 	min-height: 4em;
 	padding-left: 65px;
 	padding-right: 150px;
@@ -769,11 +769,11 @@ $darker: #3e6782;
 }
 
 #profile.v1 .view {
-	p, ul {
+	.grid_4 p, .grid_4 ul {
 		margin-bottom: 2em;
 	}
 
-	ul {
+	.grid_4 ul {
 		padding: 0;
 	}
 
