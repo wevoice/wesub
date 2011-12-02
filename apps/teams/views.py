@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from utils import render_to, render_to_json
-from utils.translation import get_languages_list
+from utils.translation import get_languages_list, languages_with_names
 from teams.forms import (
     CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
     EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
@@ -25,6 +25,7 @@ from teams.forms import (
 )
 from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
 from django.shortcuts import get_object_or_404, redirect, render_to_response
+from apps.auth.models import UserLanguage
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.contrib import messages
@@ -208,15 +209,18 @@ def completed_videos(request, slug):
                        template_object_name='team_video')    
 
 def detail_members(request, slug, role=None):
-    #just other tab of detail view
     q = request.REQUEST.get('q')
-    
+    lang = request.GET.get('lang')
+
     team = Team.get(slug, request.user)
-    
     qs = team.members.all()
+
     if q:
         qs = qs.filter(Q(user__first_name__icontains=q)|Q(user__last_name__icontains=q)
                        |Q(user__username__icontains=q)|Q(user__biography__icontains=q))
+
+    if lang:
+        qs = qs.filter(user__userlanguage__language=lang)
 
     if role:
         if role == 'admin':
@@ -236,18 +240,22 @@ def detail_members(request, slug, role=None):
             if can_assign_role(team, request.user, member.role, member.user):
                 assignable_roles.append(member)
 
+    users = team.members.values_list('user', flat=True)
+    user_langs = set(UserLanguage.objects.filter(user__in=users).values_list('language', flat=True))
+
     extra_context.update({
         'team': team,
         'query': q,
         'role': role,
         'assignable_roles': assignable_roles,
+        'languages': sorted(languages_with_names(user_langs).items(), key=lambda pair: pair[1]),
     })
-    
+
     if team.video:
         extra_context['widget_params'] = base_widget_params(request, {
             'video_url': team.video.get_video_url(), 
             'base_state': {}
-        })    
+        })
     return object_list(request, queryset=qs, 
                        paginate_by=MEMBERS_ON_PAGE, 
                        template_name='teams/detail_members.html', 

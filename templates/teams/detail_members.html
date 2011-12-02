@@ -95,12 +95,11 @@
         {% include "teams/_filters_members.html" %}
         <div class="refine">
             <h4>Refine</h4>
-            {% comment %}
-              <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
-            {% endcomment %}
             <select name="lang-filter" id="lang-filter">
                 <option value="all">All languages</option>
-                <option value="en">English</option>
+                {% for code, name in languages %}
+                    <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
             </select>
         </div>
         {% include "teams/_actions.html" %}
