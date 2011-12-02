@@ -65,15 +65,5 @@
 
             return false;
         });
-
-        if (VIDEO_LANGS) {
-            {% with search_record.video_completed_langs as langs %}
-                {% if langs %}
-                    VIDEO_LANGS[{{ search_record.team_video_pk }}] = {{ search_record.video_completed_langs|to_json|safe }};
-                {% else %}
-                    VIDEO_LANGS[{{ search_record.team_video_pk }}] = [];
-                {% endif %}
-            {% endwith %}
-        }
-</script>
+    </script>
 </li>

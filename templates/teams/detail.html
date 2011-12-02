@@ -24,20 +24,8 @@
             $("select#lang-filter", ".controls").change(function(e) {
                 var select = $("select#lang-filter", ".controls");
                 var lang = select.val();
-
-                if (lang !== '') {
-                    $.each(VIDEO_LANGS, function(pk, langs) {
-                        var listing = $('.videos.listing > li.team_video_listing_' + pk);
-
-                        if ($.inArray(lang, langs) === -1) {
-                            listing.hide();
-                        } else {
-                            listing.show();
-                        }
-                    });
-                } else {
-                    $('.videos.listing > li').show();
-                }
+                
+                // TODO: Go to URL with GET param here.
             });
 
             $('.remove-video').click(function(e) {
