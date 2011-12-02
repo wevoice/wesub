@@ -18,14 +18,16 @@
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
-        var VIDEO_LANGS = {};
 
         $(function() {
-            $("select#lang-filter", ".controls").change(function(e) {
-                var select = $("select#lang-filter", ".controls");
+            $select = $("select#lang-filter", ".controls");
+            $select.change(function(e) {
                 var lang = select.val();
-                
-                // TODO: Go to URL with GET param here.
+                if (lang !== '') {
+                    window.location = document.URL.split("?")[0] + '?lang=' + lang;
+                } else {
+                    window.location = document.URL.split("?")[0];
+                }
             });
 
             $('.remove-video').click(function(e) {
