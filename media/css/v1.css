@@ -478,22 +478,22 @@
 }
 
 /* line 396, ../sass/source/v1.scss */
-.v1 .listing.members > li {
+.v1 .listing.members > li, .v1 .listing.messages > li {
   min-height: 4em;
   padding-left: 65px;
   padding-right: 150px;
 }
 /* line 401, ../sass/source/v1.scss */
-.v1 .listing.members > li .thumb {
+.v1 .listing.members > li .thumb, .v1 .listing.messages > li .thumb {
   width: 45px;
   height: 45px;
 }
 /* line 405, ../sass/source/v1.scss */
-.v1 .listing.members > li .thumb img {
+.v1 .listing.members > li .thumb img, .v1 .listing.messages > li .thumb img {
   height: 45px;
 }
 /* line 410, ../sass/source/v1.scss */
-.v1 .listing.members > li.current {
+.v1 .listing.members > li.current, .v1 .listing.messages > li.current {
   background: #f6f6e4;
 }
 
@@ -846,9 +846,8 @@
 /* line 727, ../sass/source/v1.scss */
 #dashboard .featured {
   padding: 0;
-  font-size: 14px;
 }
-/* line 731, ../sass/source/v1.scss */
+/* line 730, ../sass/source/v1.scss */
 #dashboard .featured li {
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
@@ -860,16 +859,16 @@
   padding: 1em;
   margin: .5em 0;
 }
-/* line 740, ../sass/source/v1.scss */
+/* line 739, ../sass/source/v1.scss */
 #dashboard .listing li {
   padding: 1em 150px 1em 0;
 }
-/* line 744, ../sass/source/v1.scss */
+/* line 743, ../sass/source/v1.scss */
 #dashboard .listing .timestamp {
   top: 1em;
 }
 
-/* line 750, ../sass/source/v1.scss */
+/* line 749, ../sass/source/v1.scss */
 .v1 .only-child h2 {
   padding: .5em 0;
   margin-bottom: 0;
@@ -877,11 +876,11 @@
 }
 
 /*************** @Profile ***************/
-/* line 758, ../sass/source/v1.scss */
+/* line 757, ../sass/source/v1.scss */
 #profile.v1 h2, #dashboard.v1 h2 {
   line-height: 1.75em;
 }
-/* line 761, ../sass/source/v1.scss */
+/* line 760, ../sass/source/v1.scss */
 #profile.v1 h2 img, #dashboard.v1 h2 img {
   float: left;
   padding: 2px;
@@ -897,22 +896,22 @@
 }
 
 /* line 772, ../sass/source/v1.scss */
-#profile.v1 .view p, #profile.v1 .view ul {
-  margin-bottom: 2em;
-}
-/* line 776, ../sass/source/v1.scss */
-#profile.v1 .view ul {
-  padding: 0;
-}
-/* line 780, ../sass/source/v1.scss */
 #profile.v1 .view .alpha img {
   padding: .5em;
   border: 1px solid #dce2e5;
-  margin-bottom: 1em;
+}
+
+/* line 779, ../sass/source/v1.scss */
+.v1 .view .grid_4 p, .v1 .view .grid_4 ul {
+  margin-bottom: 2em;
+}
+/* line 783, ../sass/source/v1.scss */
+.v1 .view .grid_4 ul {
+  padding: 0;
 }
 
 /*************** @Overrides ***************/
-/* line 790, ../sass/source/v1.scss */
+/* line 791, ../sass/source/v1.scss */
 .v1 .sort_button {
   float: none;
   padding: 0;
@@ -935,7 +934,7 @@
   background-image: -ms-linear-gradient(#ffffff, #eeeeee);
   background-image: linear-gradient(#ffffff, #eeeeee);
 }
-/* line 802, ../sass/source/v1.scss */
+/* line 803, ../sass/source/v1.scss */
 .v1 .sort_button .sort_label {
   font-size: 11px;
   padding: .5em;
@@ -944,16 +943,16 @@
   display: block;
   color: #678ca3;
 }
-/* line 810, ../sass/source/v1.scss */
+/* line 811, ../sass/source/v1.scss */
 .v1 .sort_button .sort_label:hover {
   background: transparent;
 }
-/* line 815, ../sass/source/v1.scss */
+/* line 816, ../sass/source/v1.scss */
 .v1 .sort_button ul {
   margin: 0;
   padding: .5em 0 0;
 }
-/* line 820, ../sass/source/v1.scss */
+/* line 821, ../sass/source/v1.scss */
 .v1 .sort_button ul li a {
   padding: .5em;
   display: block;
@@ -969,26 +968,26 @@
   -o-box-shadow: none;
   box-shadow: none;
 }
-/* line 833, ../sass/source/v1.scss */
+/* line 834, ../sass/source/v1.scss */
 .v1 .sort_button ul li a:hover {
   background: #678ca3;
   color: #fff;
 }
-/* line 838, ../sass/source/v1.scss */
+/* line 839, ../sass/source/v1.scss */
 .v1 .sort_button .arrow {
   width: 20px;
   height: 24px;
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }
-/* line 844, ../sass/source/v1.scss */
+/* line 845, ../sass/source/v1.scss */
 .v1 .sort_button:hover {
   background: transparent;
 }
-/* line 847, ../sass/source/v1.scss */
+/* line 848, ../sass/source/v1.scss */
 .v1 .sort_button:hover .sort_label {
   z-index: 999999999;
 }
-/* line 851, ../sass/source/v1.scss */
+/* line 852, ../sass/source/v1.scss */
 .v1 .sort_button:hover ul {
   top: 21px;
   left: -1px;
@@ -1016,7 +1015,7 @@
   -khtml-border-bottom-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
-/* line 860, ../sass/source/v1.scss */
+/* line 861, ../sass/source/v1.scss */
 .v1 .sort_button:hover .arrow {
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }

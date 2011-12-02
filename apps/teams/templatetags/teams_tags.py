@@ -278,7 +278,10 @@ def get_assignable_roles(team, user):
 
 @register.filter
 def can_create_any_task(search_record, user=None):
-    tv = TeamVideo.objects.get(pk=search_record.team_video_pk)
+    try:
+        tv = TeamVideo.objects.get(pk=search_record.team_video_pk)
+    except TeamVideo.DoesNotExist:
+        return False
 
     if can_create_task_subtitle(tv, user):
         return True

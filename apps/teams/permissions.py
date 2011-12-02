@@ -18,7 +18,7 @@
 
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 from teams.models import (
-    Team, MembershipNarrowing, Workflow, TeamMember, Project, TeamVideoLanguage
+    Team, MembershipNarrowing, Workflow, TeamMember, Project, TeamVideoLanguage, Task
 )
 
 from teams.permissions_const import (
@@ -328,6 +328,20 @@ def can_review(team_video, user, lang=None):
 
     return role in _perms_equal_or_greater(role_req)
 
+def can_approve(team_video, user, lang=None):
+    workflow = Workflow.get_for_team_video(team_video)
+    role = get_role_for_target(user, team_video.team, team_video.project, lang)
+
+    if not workflow.approve_allowed:
+        return False
+
+    role_req = {
+        10: ROLE_MANAGER,
+        20: ROLE_ADMIN,
+    }[workflow.approve_allowed]
+
+    return role in _perms_equal_or_greater(role_req)
+
 def can_message_all_members(team, user):
     role = get_role_for_target(user, team)
     return role in [ROLE_ADMIN, ROLE_OWNER]
@@ -353,17 +367,31 @@ def can_create_and_edit_subtitles(user, team_video, lang=None):
 
     return role in _perms_equal_or_greater(role_req, include_outsiders=True)
 
+def can_create_and_edit_translations(user, team_video, lang=None):
+    role = get_role_for_target(user, team_video.team, team_video.project, lang)
+
+    role_req = {
+        10: ROLE_OUTSIDER,
+        20: ROLE_CONTRIBUTOR,
+        30: ROLE_MANAGER,
+        40: ROLE_ADMIN,
+    }[team_video.team.translate_policy]
+
+    return role in _perms_equal_or_greater(role_req, include_outsiders=True)
+
 
 # Task permissions
 def can_create_tasks(team, user, project=None):
     # for now, use the same logic as assignment
     return can_assign_tasks(team, user, project)
 
-def can_delete_tasks(team, user, project=None):
+def can_delete_tasks(team, user, project=None, lang=None):
     # for now, use the same logic as assignment
-    return can_assign_tasks(team, user, project)
+    return can_assign_tasks(team, user, project, lang)
 
 def can_assign_tasks(team, user, project=None, lang=None):
+    """Return whether the given user has permission to assign tasks at all."""
+
     role = get_role_for_target(user, team, project, lang)
 
     role_required = {
@@ -373,6 +401,40 @@ def can_assign_tasks(team, user, project=None, lang=None):
     }[team.task_assign_policy]
 
     return role in _perms_equal_or_greater(role_required)
+
+
+def can_perform_task(user, task):
+    """Return whether the given user can perform the given task."""
+
+    if task.type == Task.TYPE_IDS['Subtitle']:
+        return can_create_and_edit_subtitles(user, task.team_video)
+    elif task.type == Task.TYPE_IDS['Translate']:
+        return can_create_and_edit_translations(user, task.team_video, task.language)
+    elif task.type == Task.TYPE_IDS['Review']:
+        return can_review(task.team_video, user, task.language)
+    elif task.type == Task.TYPE_IDS['Approve']:
+        return can_approve(task.team_video, user, task.language)
+
+def can_assign_task(task, user):
+    """Return whether the given user can assign the given task.
+
+    Users can assign tasks iff:
+
+    * They are a high enough role to do so according to the team permissions.
+    * They can perform the task themselves.
+
+    """
+    team, project, lang = task.team, task.team_video.project, task.language
+
+    return can_assign_tasks(team, user, project, lang) and can_perform_task(user, task)
+
+def can_delete_task(task, user):
+    """Return whether the given user can delete the given task."""
+
+    # For now, use the same logic as assignment.
+    team, project, lang = task.team, task.team_video.project, task.language
+
+    return can_delete_tasks(team, user, project, lang) and can_perform_task(user, task)
 
 
 def _user_can_create_task_subtitle(user, team_video):

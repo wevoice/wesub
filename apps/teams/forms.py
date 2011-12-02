@@ -29,7 +29,7 @@ from utils.forms import AjaxForm, ErrorableModelForm
 import re
 from utils.translation import get_languages_list
 from utils.forms.unisub_video_form import UniSubBoundVideoField
-from teams.permissions import can_assign_tasks
+from teams.permissions import can_assign_task
 
 from apps.teams.moderation import add_moderation, remove_moderation
 from apps.teams.permissions import roles_user_can_assign
@@ -469,22 +469,23 @@ class CreateTaskForm(ErrorableModelForm):
 
 class TaskAssignForm(forms.Form):
     task = forms.ModelChoiceField(queryset=Task.objects.all())
-    assignee = forms.ModelChoiceField(queryset=User.objects.all())
+    assignee = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
 
-    def __init__(self, team, member, *args, **kwargs):
+    def __init__(self, team, user, *args, **kwargs):
         super(TaskAssignForm, self).__init__(*args, **kwargs)
 
         self.team = team
-        self.member = member
+        self.user = user
         self.fields['assignee'].queryset = User.objects.filter(user__team=team)
+        self.fields['task'].queryset = team.task_set.incomplete()
 
 
     def clean(self):
-        if not can_assign_tasks(self.team, self.member.user):
+        task = self.cleaned_data['task']
+
+        if not can_assign_task(task, self.user):
             raise forms.ValidationError(_(
                 u'You do not have permission to assign this task.'))
-
-        # TODO: check that the assignee can be assigned to the given task
 
         return self.cleaned_data
 

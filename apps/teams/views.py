@@ -51,7 +51,7 @@ from teams.permissions import (
     can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
     can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign,
-    can_join_team, can_edit_video, can_create_tasks, can_delete_tasks
+    can_join_team, can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task
 )
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -726,7 +726,7 @@ def create_task(request, slug, team_video_pk):
 def perform_task(request):
     task = Task.objects.get(pk=request.POST.get('task_id'))
 
-    if not task.perform_allowed(request.user):
+    if not can_perform_task(request.user, task):
         return HttpResponseForbidden(_(u'You are not allowed to perform this task.'))
 
     task.assignee = request.user
