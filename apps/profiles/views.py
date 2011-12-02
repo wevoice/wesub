@@ -122,7 +122,7 @@ def edit_profile(request):
         if formset.is_valid() and form_validated:
             formset.save()
             messages.success(request, _('Your profile has been updated.'))
-            return redirect('profiles:my_profile')
+            return redirect('profiles:profile', user_id = request.user.username)
     else:
         form = EditUserForm(instance=request.user, label_suffix="")
         formset = UserLanguageFormset(instance=request.user)
