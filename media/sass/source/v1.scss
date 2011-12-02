@@ -747,29 +747,41 @@ $darker: #3e6782;
 	}
 }
 
-.v1.dashboard h2 {
-	margin: 0;
-	padding-bottom: .5em;
-}
-
-.v1.dashboard .row {
-	clear: both;
-	margin: 2em 0 0;
-}
-
 .v1 .only-child h2 {
 	padding: .5em 0;
 	margin-bottom: 0;
 	border-bottom: 1px solid $fainter;
 }
 
+/*************** @Profile ***************/
 
+#profile.v1 h2, #dashboard.v1 h2 {
+	line-height: 1.75em;
 
+	img {
+		float: left;
+		padding: 2px;
+		margin-right: .5em;
+		border: 1px solid $fainter;
+		@include border-radius(3px);
+		height: 32px;
+	}
+}
 
-#profile.v1 .view .alpha img {
-	padding: .5em;
-	border: 1px solid $fainter;
-	margin-bottom: 1em;
+#profile.v1 .view {
+	p, ul {
+		margin-bottom: 2em;
+	}
+
+	ul {
+		padding: 0;
+	}
+
+	.alpha img {
+		padding: .5em;
+		border: 1px solid $fainter;
+		margin-bottom: 1em;
+	}
 }
 
 

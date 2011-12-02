@@ -870,25 +870,41 @@
 }
 
 /* line 750, ../sass/source/v1.scss */
-.v1.dashboard h2 {
-  margin: 0;
-  padding-bottom: .5em;
-}
-
-/* line 755, ../sass/source/v1.scss */
-.v1.dashboard .row {
-  clear: both;
-  margin: 2em 0 0;
-}
-
-/* line 760, ../sass/source/v1.scss */
 .v1 .only-child h2 {
   padding: .5em 0;
   margin-bottom: 0;
   border-bottom: 1px solid #dce2e5;
 }
 
-/* line 769, ../sass/source/v1.scss */
+/*************** @Profile ***************/
+/* line 758, ../sass/source/v1.scss */
+#profile.v1 h2, #dashboard.v1 h2 {
+  line-height: 1.75em;
+}
+/* line 761, ../sass/source/v1.scss */
+#profile.v1 h2 img, #dashboard.v1 h2 img {
+  float: left;
+  padding: 2px;
+  margin-right: .5em;
+  border: 1px solid #dce2e5;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  height: 32px;
+}
+
+/* line 772, ../sass/source/v1.scss */
+#profile.v1 .view p, #profile.v1 .view ul {
+  margin-bottom: 2em;
+}
+/* line 776, ../sass/source/v1.scss */
+#profile.v1 .view ul {
+  padding: 0;
+}
+/* line 780, ../sass/source/v1.scss */
 #profile.v1 .view .alpha img {
   padding: .5em;
   border: 1px solid #dce2e5;
@@ -896,7 +912,7 @@
 }
 
 /*************** @Overrides ***************/
-/* line 778, ../sass/source/v1.scss */
+/* line 790, ../sass/source/v1.scss */
 .v1 .sort_button {
   float: none;
   padding: 0;
@@ -919,7 +935,7 @@
   background-image: -ms-linear-gradient(#ffffff, #eeeeee);
   background-image: linear-gradient(#ffffff, #eeeeee);
 }
-/* line 790, ../sass/source/v1.scss */
+/* line 802, ../sass/source/v1.scss */
 .v1 .sort_button .sort_label {
   font-size: 11px;
   padding: .5em;
@@ -928,16 +944,16 @@
   display: block;
   color: #678ca3;
 }
-/* line 798, ../sass/source/v1.scss */
+/* line 810, ../sass/source/v1.scss */
 .v1 .sort_button .sort_label:hover {
   background: transparent;
 }
-/* line 803, ../sass/source/v1.scss */
+/* line 815, ../sass/source/v1.scss */
 .v1 .sort_button ul {
   margin: 0;
   padding: .5em 0 0;
 }
-/* line 808, ../sass/source/v1.scss */
+/* line 820, ../sass/source/v1.scss */
 .v1 .sort_button ul li a {
   padding: .5em;
   display: block;
@@ -953,26 +969,26 @@
   -o-box-shadow: none;
   box-shadow: none;
 }
-/* line 821, ../sass/source/v1.scss */
+/* line 833, ../sass/source/v1.scss */
 .v1 .sort_button ul li a:hover {
   background: #678ca3;
   color: #fff;
 }
-/* line 826, ../sass/source/v1.scss */
+/* line 838, ../sass/source/v1.scss */
 .v1 .sort_button .arrow {
   width: 20px;
   height: 24px;
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }
-/* line 832, ../sass/source/v1.scss */
+/* line 844, ../sass/source/v1.scss */
 .v1 .sort_button:hover {
   background: transparent;
 }
-/* line 835, ../sass/source/v1.scss */
+/* line 847, ../sass/source/v1.scss */
 .v1 .sort_button:hover .sort_label {
   z-index: 999999999;
 }
-/* line 839, ../sass/source/v1.scss */
+/* line 851, ../sass/source/v1.scss */
 .v1 .sort_button:hover ul {
   top: 21px;
   left: -1px;
@@ -1000,7 +1016,7 @@
   -khtml-border-bottom-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
-/* line 848, ../sass/source/v1.scss */
+/* line 860, ../sass/source/v1.scss */
 .v1 .sort_button:hover .arrow {
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }

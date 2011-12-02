@@ -47,7 +47,8 @@
 
 {% block main_content %}
     <h2>
-      {% trans 'Edit Your Profile' %}
+        <img src="{{ user_info.small_avatar }}">
+        {% trans 'Edit Your Profile' %}
     </h2>
     
     {% with 'profile' as current %}
@@ -200,14 +201,9 @@
     </div>
 
     <div class="controls grid_3 omega">
-        <ul>
-            <li>
-                <a href="{% url profiles:profile user_info.username %}">View Profile</a>
-            </li>
-            <li class="current">
-                <a href="{% url profiles:edit %}">Edit profile</a>
-            </li>
-        </ul>
+        {% with 'edit' as current %}
+            {% include 'profiles/_filters.html' %}
+        {% endwith %}
     </div>
 
 <script type="text/javascript">
