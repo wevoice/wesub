@@ -342,9 +342,13 @@ def upload_logo(request, slug):
     if not team.is_member(request.user):
         raise Http404
 
-    output = {}
+    output = {
+        'url' :  str(team.logo_thumbnail()),
+        'url_full':str(team.logo and team.logo.url),
+    }
     form = EditLogoForm(request.POST, instance=team, files=request.FILES)
-    if form.is_valid():
+    
+    if request.FILES and form.is_valid():
         try:
             form.save()
             output['url'] =  str(team.logo_thumbnail())
