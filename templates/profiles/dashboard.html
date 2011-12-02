@@ -8,7 +8,10 @@
 
 {% block main_content %}
 
-    <h2>{{ user_info }}</h2>
+    <h2>
+        <img src="{{ user.small_avatar }}" alt="{{ user|title }}'s avatar"/>
+        {{ user }}
+    </h2>
 
     {% with 'dashboard' as current %}
         {% include 'profiles/_tabs.html' %}

@@ -359,6 +359,10 @@ def can_create_tasks(team, user, project=None):
     # for now, use the same logic as assignment
     return can_assign_tasks(team, user, project)
 
+def can_delete_tasks(team, user, project=None):
+    # for now, use the same logic as assignment
+    return can_assign_tasks(team, user, project)
+
 def can_assign_tasks(team, user, project=None, lang=None):
     role = get_role_for_target(user, team, project, lang)
 

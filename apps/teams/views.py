@@ -33,7 +33,6 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from django.conf import settings
 from django.views.generic.list_detail import object_list
 from django.template import RequestContext
-from auth.models import CustomUser as User
 from django.db.models import Q, Count
 from django.contrib.auth.decorators import permission_required
 import random
@@ -51,7 +50,7 @@ from teams.permissions import (
     can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
     can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign,
-    can_join_team, can_edit_video, can_create_tasks
+    can_join_team, can_edit_video, can_create_tasks, can_delete_tasks
 )
 
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -120,8 +119,13 @@ def index(request, my_teams=False):
 def detail(request, slug, is_debugging=False, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
 
+    require_language = False
+
     if languages is None:
         languages = get_user_languages_from_request(request)
+    if 'lang' in request.GET:
+        require_language = True
+        languages = [request.GET['lang']]
     if bool(is_debugging):
         languages = request.GET.get('langs', '').split(',')
 
@@ -129,7 +133,10 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
         project = None
-    qs_list, mqs = team.get_videos_for_languages_haystack(languages, user=request.user, project=project)
+
+    qs_list, mqs = team.get_videos_for_languages_haystack(
+            languages, user=request.user, project=project,
+            require_language=require_language)
 
     extra_context = widget.add_onsite_js_files({})
     extra_context.update({
@@ -309,8 +316,8 @@ def team_settings(request, slug):
     return {
         'basic_settings_form': form,
         'team': team,
-        'user_can_delete_tasks': member.can_delete_tasks(),
-        'user_can_assign_tasks': member.can_assign_tasks(),
+        'user_can_delete_tasks': can_delete_tasks(team, request.user),
+        'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
         'settings_form': SettingsForm(),
         'permissions_form': PermissionsForm(),
@@ -343,9 +350,13 @@ def upload_logo(request, slug):
     if not team.is_member(request.user):
         raise Http404
 
-    output = {}
+    output = {
+        'url' :  str(team.logo_thumbnail()),
+        'url_full':str(team.logo and team.logo.url),
+    }
     form = EditLogoForm(request.POST, instance=team, files=request.FILES)
-    if form.is_valid():
+    
+    if request.FILES and form.is_valid():
         try:
             form.save()
             output['url'] =  str(team.logo_thumbnail())
@@ -490,28 +501,6 @@ def remove_video(request, team_video_pk):
 
 
 # Members
-@render_to('teams/invite_members.html')
-@login_required
-def invite_members(request, slug):
-    team = Team.get(slug, request.user)
-
-    if not can_invite(team, request.user):
-        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
-
-    if request.POST:
-        form = InviteForm(team, request.user, request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('teams:detail_members',
-                                                args=[], kwargs={'slug': team.slug}))
-    else:
-        form = InviteForm(team, request.user)
-
-    return {
-        'team': team,
-        'form': form,
-    }
-
 @render_to_json
 @login_required
 def remove_member(request, slug, user_pk):
@@ -535,37 +524,6 @@ def remove_member(request, slug, user_pk):
             'success': False,
             'error': ugettext('You can\'t remove user')
         }
-
-@login_required
-def edit_members(request, slug):
-    team = Team.get(slug, request.user)
-    
-    if not team.is_member(request.user):
-        raise Http404
-        
-    qs = team.members.select_related()
-    
-    ordering = request.GET.get('o')
-    order_type = request.GET.get('ot')
-
-    if ordering == 'username' and order_type in ['asc', 'desc']:
-        pr = '-' if order_type == 'desc' else ''
-        qs = qs.order_by(pr+'user__first_name', pr+'user__last_name', pr+'user__username')
-    elif ordering == 'role' and order_type in ['asc', 'desc']:
-        qs = qs.order_by(('-' if order_type == 'desc' else '')+'role')
-    
-    extra_context = {
-        'team': team,
-        'ordering': ordering,
-        'order_type': order_type,
-        'role_choices' : TeamMember.ROLES,
-    }
-
-    return object_list(request, queryset=qs,
-                       paginate_by=MEMBERS_ON_PAGE,
-                       template_name='teams/edit_members.html',
-                       template_object_name='members',
-                       extra_context=extra_context)    
 
 @login_required
 def applications(request, slug):
@@ -621,45 +579,28 @@ def deny_application(request, slug, user_pk):
 
     return redirect('teams:applications', team.pk)
 
-@render_to_json
+
+@render_to('teams/invite_members.html')
 @login_required
-def invite(request):
-    team_pk = request.POST.get('team_id')
-    username = request.POST.get('username')
-    note = request.POST.get('note', '')
-    
-    if not team_pk and not username:
-        raise Http404
-    
-    team = get_object_or_404(Team, pk=team_pk)
-    
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return {
-            'error': ugettext(u'User does not exist.')
-        }
-    
+def invite_members(request, slug):
+    team = Team.get(slug, request.user)
+
     if not can_invite(team, request.user):
-        return {
-            'error': ugettext(u'You cannot invite people to this team.')
-        }
-        
-    if team.is_member(user):
-        return {
-            'error': ugettext(u'This user is member of team already.')
-        }
-    
-    if len(note) > Invite._meta.get_field('note').max_length:
-        return {
-            'error': ugettext(u'Note is too long.')
-        }        
-        
-    Invite.objects.get_or_create(team=team, user=user, defaults={
-        'note': note, 
-        'author': request.user
-    })
-    return {}
+        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
+
+    if request.POST:
+        form = InviteForm(team, request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('teams:detail_members',
+                                                args=[], kwargs={'slug': team.slug}))
+    else:
+        form = InviteForm(team, request.user)
+
+    return {
+        'team': team,
+        'form': form,
+    }
 
 @login_required
 def accept_invite(request, invite_pk, accept=True):
@@ -727,7 +668,7 @@ def team_tasks(request, slug):
 
     return {
         'team': team,
-        'user_can_delete_tasks': member.can_delete_tasks(),
+        'user_can_delete_tasks': can_delete_tasks(team, request.user),
         'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
     }

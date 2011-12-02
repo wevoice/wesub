@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<ul>
+    <li{% if current == "profile" or current == "edit" %} class="current" {% endif %}>
+        <a href="{% url profiles:profile user_info.username %}">{% trans "User Details" %}</a>
+    </li>
+    <li{% if current == "activity" %} class="current" {% endif %}>
+        <a href="{% url profiles:actions_list user_info.id %}">
+            {% trans "Activity" %}
+        </a>
+    </li>
+</ul>

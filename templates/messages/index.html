@@ -113,7 +113,10 @@
 
 {% block main_content %}
 
-    <h2>{% trans 'Messages' %}</h2>
+    <h2>
+        <img src="{{ user.small_avatar }}">
+        {% trans 'Messages' %}
+    </h2>
 
     {% with 'messages' as current %}
         {% include 'profiles/_tabs.html' %}
