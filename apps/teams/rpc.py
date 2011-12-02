@@ -331,9 +331,8 @@ class TeamsApiV2Class(object):
     def task_assign(self, task_id, assignee_id, user):
         '''Assign a task to the given user, or unassign it if null/None.'''
         task = Task.objects.get(pk=task_id)
-        member = task.team.members.get(user=user)
 
-        form = TaskAssignForm(task.team, member,
+        form = TaskAssignForm(task.team, user,
                               data={'task': task_id, 'assignee': assignee_id})
         if form.is_valid():
             assignee = User.objects.get(pk=assignee_id) if assignee_id else None
@@ -341,7 +340,7 @@ class TeamsApiV2Class(object):
             task.assignee = assignee
             task.save()
 
-            return task.to_dict(member)
+            return task.to_dict(user)
         else:
             return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
 
