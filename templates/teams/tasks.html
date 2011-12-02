@@ -141,19 +141,26 @@ $(window).load(function() {
                 Assigned to {{ assigneeDisplay }}
             {{ /assigneeDisplay }}
 
-            {{ ^assigneeDisplay }}
-                {{ #assignAllowed }}
-                    <form action="" method="post">
-                        <a class="action-assign" href="#">Assign</a>
-                        <div class="assignee-choice" style="display: none;">
-                            {% endverbatim %}
-                                {{ assign_form.assignee }}
-                            {% verbatim %}
-                            <a class="action-assign-submit" href="#">Assign to User</a>
-                        </div>
-                    </form>
-                {{ /assignAllowed }}
+            {{ #assignAllowed }}
+                <form action="" method="post">
+                    <a class="action-assign" href="#">
+                        {{ #assigneeDisplay }}
+                            Reassign
+                        {{ /assigneeDisplay }}
+                        {{ ^assigneeDisplay }}
+                            Assign
+                        {{ /assigneeDisplay }}
+                    </a>
+                    <div class="assignee-choice" style="display: none;">
+                        {% endverbatim %}
+                            {{ assign_form.assignee }}
+                        {% verbatim %}
+                        <a class="action-assign-submit" href="#">Assign to User</a>
+                    </div>
+                </form>
+            {{ /assignAllowed }}
 
+            {{ ^assigneeDisplay }}
                 <form action="{{ performUrl }}" method="post">
                     {% endverbatim %}
                         {% csrf_token %}
