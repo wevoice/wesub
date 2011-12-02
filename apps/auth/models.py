@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,12 +16,6 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
 from django.contrib.auth.models import UserManager, User as BaseUser
 from django.db import models
 from django.db.models.signals import post_save
@@ -97,7 +91,7 @@ class CustomUser(BaseUser):
         if self.full_name:
             return self.full_name
         return self.username
-    
+
     def save(self, *args, **kwargs):
         send_confirmation = False
         
@@ -120,7 +114,7 @@ class CustomUser(BaseUser):
         
         if send_confirmation and send_email_confirmation:
             EmailConfirmation.objects.send_confirmation(self)
-    
+
     def unread_messages(self, hidden_meassage_id=None):
         from messages.models import Message
         
@@ -133,7 +127,7 @@ class CustomUser(BaseUser):
             pass
         
         return qs
-    
+
     @classmethod
     def video_followers_change_handler(cls, sender, instance, action, reverse, model, pk_set, **kwargs):
         from videos.models import SubtitleLanguage
@@ -197,7 +191,7 @@ class CustomUser(BaseUser):
             #instance is SubtitleLanguage
             cls.videos.through.objects.filter(video=instance) \
                 .exclude(customuser__followed_languages__video=instance.video).delete()
-    
+
     def get_languages(self):
         """
         Just to control this query
@@ -230,28 +224,49 @@ class CustomUser(BaseUser):
             return self.picture.thumb_url(size, size)
         else:
             return self._get_gravatar(size)        
-    
     def avatar(self):
         return self._get_avatar_by_size(100)
 
     def small_avatar(self):
         return self._get_avatar_by_size(50)
-    
+
     @models.permalink
     def get_absolute_url(self):
         return ('profiles:profile', [urlquote_plus(self.username)])
-    
+
     @property
     def language(self):
         return self.get_preferred_language_display()
+
+    def guess_best_lang(self, request=None):
+
+        if self.preferred_language:
+            return self.preferred_language
+
+        user_languages = list(self.userlanguage_set.all())
+        if user_languages:
+            return user_languages[0].language
+
+        from utils.translation import get_user_languages_from_request
+
+        if request:
+            languages = get_user_languages_from_request(request)
+            if languages:
+                return languages[0]
+
+        return 'en'
     
+    def guess_is_rtl(self, request=None):
+        from utils.translation import is_rtl
+        return is_rtl(self.guess_best_lang(request))
+
     @models.permalink
     def profile_url(self):
         return ('profiles:profile', [self.pk])
-    
+
     def hash_for_video(self, video_id):
         return hashlib.sha224(settings.SECRET_KEY+str(self.pk)+video_id).hexdigest()
-    
+
     @classmethod
     def get_anonymous(cls):
         return cls.objects.get(pk=settings.ANONYMOUS_USER_ID)

@@ -1,38 +1,32 @@
 # -*- coding: utf-8 -*-
 
-import os
-import json
-
-from django.test import TestCase
-from django.core.urlresolvers import reverse
-from os import path
-
-from django.conf import settings
-from apps.teams.models import Team, Invite, TeamVideo, \
-    Application, TeamMember, TeamVideoLanguage, TeamLanguagePreference
-from messages.models import Message
-from videos.models import Video, VIDEO_TYPE_YOUTUBE, SubtitleLanguage, Action
-from django.db.models import ObjectDoesNotExist
-from auth.models import CustomUser as User
-from django.contrib.contenttypes.models import ContentType
-from apps.teams import tasks
-
+import os, re, json
 from datetime import datetime, timedelta, date
-from django.core.management import call_command
+
 from django.core import mail
+from django.core.urlresolvers import reverse
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import ObjectDoesNotExist
+from django.test import TestCase
+
+from auth.models import CustomUser as User
+from apps.teams import tasks
+from apps.teams.permissions import add_role
+from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
+from apps.teams.models import (
+    Team, Invite, TeamVideo, Application, TeamMember, TeamVideoLanguage,
+    TeamLanguagePreference
+)
 from apps.videos import metadata_manager
-import re
-
-
+from apps.videos.models import Video, SubtitleLanguage
+from messages.models import Message
 from widget.tests import create_two_sub_session, RequestMockup
 
 LANGUAGEPAIR_RE = re.compile(r"([a-zA-Z\-]+)_([a-zA-Z_\-]+)_(.*)")
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
 
-from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr, rpc
-from apps.teams.permissions import add_role
 
-from django.conf import settings
 
 def fix_teams_roles(teams=None):
     for t in teams or Team.objects.all():
@@ -300,7 +294,7 @@ class TeamsTest(TestCase):
         member = team.members.get(user=self.user)
         member.role = TeamMember.ROLE_MANAGER
         member.save()
-        response = self.client.post(url, data)
+        self.client.post(url, data)
         new_count = TeamVideo.objects.count()
         self.assertEqual(old_count+1, new_count)
 
@@ -764,15 +758,23 @@ class TeamsTest(TestCase):
         user2 = User.objects.get(username="alerion")
         TeamMember.objects.filter(user=user2, team=team).delete()
 
+        member = TeamMember.objects.get(user=self.user, team=team)
+        member.role = TeamMember.ROLE_OWNER
+        member.save()
+
         data = {
-            "username": user2.username,
-            "note": u"asd",
-            "team_id": team.pk
+            "usernames": user2.username,
+            "message": u"test message",
+            "role": TeamMember.ROLE_CONTRIBUTOR,
         }
-        response = self.client.post(reverse("teams:invite"), data)
+        invite_url = reverse("teams:invite_members", args=(), kwargs={'slug': team.slug})
+        response = self.client.post(invite_url, data, follow=True)
         self.failUnlessEqual(response.status_code, 200)
 
         invite = Invite.objects.get(user__username=user2.username, team=team)
+        self.assertEqual(invite.role, TeamMember.ROLE_CONTRIBUTOR)
+        self.assertEqual(invite.note, u'test message')
+
         ct = ContentType.objects.get_for_model(Invite)
         Message.objects.filter(object_pk=invite.pk, content_type=ct, user=user2)
 

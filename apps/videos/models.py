@@ -49,6 +49,7 @@ from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_u
 from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
+from utils.translation import is_rtl
 
 from apps.teams. moderation_const import WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED
 
@@ -665,10 +666,10 @@ class SubtitleLanguage(models.Model):
     
     def __unicode__(self):
         return self.language_display()
-    
+
     def nonblank_subtitle_count(self):
         return len([s for s in self.latest_subtitles() if s.text])
-    
+
     def get_title_display(self):
         return self.get_title() or self.video.title
         
@@ -677,7 +678,7 @@ class SubtitleLanguage(models.Model):
             return self.video.title
         
         return self.title
-    
+
     def get_description(self):
         """
         Returns either the description for this
@@ -755,7 +756,6 @@ class SubtitleLanguage(models.Model):
         else:
             return  ('videos:translation_history', [self.video.video_id, self.language, self.pk])
 
-    
     def language_display(self):
         if self.is_original and not self.language:
             return 'Original'
@@ -775,7 +775,10 @@ class SubtitleLanguage(models.Model):
         delta = datetime.now() - self.writelock_time
         seconds = delta.days * 24 * 60 * 60 + delta.seconds
         return seconds < WRITELOCK_EXPIRATION
-    
+
+    def is_rtl(self):
+        return is_rtl(self.language)
+
     def can_writelock(self, request):
         return self.writelock_session_key == \
             request.browser_id or \
@@ -811,13 +814,13 @@ class SubtitleLanguage(models.Model):
     @property    
     def last_version(self):
         return self.latest_version(public_only=True)
-    
+
     def latest_version(self, public_only=True):
         try:
             return self._filter_public( self.subtitleversion_set.all(), public_only)[0]
         except (SubtitleVersion.DoesNotExist, IndexError):
             return None
-    
+
     def latest_subtitles(self):
         version = self.latest_version()
         if version:
@@ -832,7 +835,7 @@ class SubtitleLanguage(models.Model):
                 exclude = [exclude]            
             qs = qs.exclude(pk__in=[u.pk for u in exclude if u])
         return qs
-    
+
     def translations(self):
         return SubtitleLanguage.objects.filter(video=self.video, is_original=False, is_forked=False)
 
@@ -896,6 +899,8 @@ class SubtitleLanguage(models.Model):
         if updates_timestamp:
             self.created = datetime.now()
         super(SubtitleLanguage, self).save(*args, **kwargs)
+
+
             
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 

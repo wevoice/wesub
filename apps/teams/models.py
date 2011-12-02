@@ -852,12 +852,9 @@ class TeamMemderManager(models.Manager):
     use_for_related_fields = True
     
     def create_first_member(self, team, user):
-        """
-        Make sure that new teams always have a 'owner'
-        member
-        """
-        tm =  TeamMember(
-        team=team, user=user , role=ROLE_OWNER)
+        """Make sure that new teams always have an 'owner' member."""
+
+        tm = TeamMember(team=team, user=user, role=ROLE_OWNER)
         tm.save()
         return tm
 
@@ -1331,6 +1328,8 @@ class Task(models.Model):
         Useful for converting to JSON.
 
         '''
+        from teams.permissions import can_perform_task, can_assign_task, can_delete_task
+
         return { 'pk': self.id,
                  'team': self.team.id if self.team else None,
                  'team_video': self.team_video.id if self.team_video else None,
@@ -1343,7 +1342,9 @@ class Task(models.Model):
                  'language': self.language if self.language else None,
                  'language_display': SUPPORTED_LANGUAGES_DICT[self.language]
                                      if self.language else None,
-                 'perform_allowed': self.perform_allowed(user) if user else None,
+                 'perform_allowed': can_perform_task(user, self) if user else None,
+                 'assign_allowed': can_assign_task(self, user) if user else None,
+                 'delete_allowed': can_delete_task(self, user) if user else None,
                  'completed': True if self.completed else False, }
 
 
@@ -1351,31 +1352,6 @@ class Task(models.Model):
     def workflow(self):
         '''Return the most specific workflow for this task's TeamVideo.'''
         return Workflow.get_for_team_video(self.team_video)
-
-
-    def perform_allowed(self, user, workflow=None):
-        '''Return True if the user is permitted to perform this task, False otherwise.'''
-        if not user:
-            return False
-
-        # workflow = workflow or self.workflow
-
-        # role_required = {'Subtitle': workflow.perm_subtitle,
-        #                  'Translate': workflow.perm_translate,
-        #                  'Review': workflow.perm_review,
-        #                  'Approve': workflow.perm_approve}[Task.TYPE_NAMES[self.type]]
-
-        # roles = [choice_name for choice_id, choice_name in Workflow.PERM_CHOICES]
-        # roles_allowed = roles[:roles.index(role_required)+1]
-        # user_role = user.role.type
-
-        # return user_role in roles_allowed
-
-        # TODO: Implement this once roles are in place.
-        if not self.assignee:
-            return True
-        else:
-            return user == self.assignee
 
 
     def complete(self):

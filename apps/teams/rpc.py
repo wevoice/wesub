@@ -331,9 +331,8 @@ class TeamsApiV2Class(object):
     def task_assign(self, task_id, assignee_id, user):
         '''Assign a task to the given user, or unassign it if null/None.'''
         task = Task.objects.get(pk=task_id)
-        member = task.team.members.get(user=user)
 
-        form = TaskAssignForm(task.team, member,
+        form = TaskAssignForm(task.team, user,
                               data={'task': task_id, 'assignee': assignee_id})
         if form.is_valid():
             assignee = User.objects.get(pk=assignee_id) if assignee_id else None
@@ -341,7 +340,7 @@ class TeamsApiV2Class(object):
             task.assignee = assignee
             task.save()
 
-            return task.to_dict(member)
+            return task.to_dict(user)
         else:
             return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
 
@@ -373,7 +372,8 @@ class TeamsApiV2Class(object):
         The translation task will be created if it does not already exist.
 
         '''
-        # TODO: Check permissions here.
+        # TODO: Check permissions here. This will be tricky because of ghost tasks.
+
         tv = TeamVideo.objects.get(pk=team_video_id)
         task, created = Task.objects.get_or_create(team=tv.team, team_video=tv,
                 language=language, type=Task.TYPE_IDS['Translate'])
@@ -381,9 +381,8 @@ class TeamsApiV2Class(object):
 
         task.assignee = assignee
         task.save()
-        member = task.team.members.get(user=user)
 
-        return task.to_dict(member)
+        return task.to_dict(user)
 
     def task_translate_delete(self, team_video_id, language, user):
         '''Mark a translation task as deleted.
@@ -483,7 +482,7 @@ class TeamsApiV2Class(object):
                  errors = form.errors
                  )   
 
-    def project_delete(self, team_slug, project_pk, user):        
+    def project_delete(self, team_slug, project_pk, user):
         
         team = get_object_or_404(Team, slug=team_slug)
         project = get_object_or_404(Project, team=team, pk=project_pk)

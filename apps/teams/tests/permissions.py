@@ -32,7 +32,7 @@ from apps.teams.permissions import (
     can_change_team_settings, can_view_tasks_tab, can_invite,
     can_change_video_settings, can_review, can_message_all_members,
     can_edit_project, can_create_and_edit_subtitles, can_create_task_subtitle,
-    can_create_task_translate, can_join_team, can_edit_video
+    can_create_task_translate, can_join_team, can_edit_video, can_approve
 )
 
 
@@ -422,6 +422,60 @@ class TestRules(BaseTestPermission):
                 self.assertTrue(can_review(self.project_video, user))
 
         self.assertFalse(can_review(self.nonproject_video, outsider))
+
+    def test_can_approve(self):
+        user, outsider = self.user, self.outsider
+        workflow = Workflow.get_for_team_video(self.nonproject_video)
+
+        # TODO: Test with Project/video-specific workflows.
+
+        # Approval disabled.
+        workflow.approve_allowed = Workflow.APPROVE_IDS["Don't require approval"]
+        workflow.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertFalse(can_approve(self.nonproject_video, user))
+
+        self.assertFalse(can_approve(self.nonproject_video, outsider))
+
+        # Manager approval.
+        workflow.approve_allowed = Workflow.APPROVE_IDS["Manager must approve"]
+        workflow.save()
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_approve(self.nonproject_video, user))
+
+        for r in [ROLE_CONTRIBUTOR]:
+            with self.role(r):
+                self.assertFalse(can_approve(self.nonproject_video, user))
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN]:
+            with self.role(r, self.test_project):
+                self.assertFalse(can_approve(self.nonproject_video, user))
+                self.assertTrue(can_approve(self.project_video, user))
+
+        self.assertFalse(can_approve(self.nonproject_video, outsider))
+
+        # Admin approval.
+        workflow.approve_allowed = Workflow.APPROVE_IDS["Admin must approve"]
+        workflow.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_approve(self.nonproject_video, user))
+
+        for r in [ROLE_MANAGER, ROLE_CONTRIBUTOR]:
+            with self.role(r):
+                self.assertFalse(can_approve(self.nonproject_video, user))
+
+        for r in [ROLE_ADMIN]:
+            with self.role(r, self.test_project):
+                self.assertFalse(can_approve(self.nonproject_video, user))
+                self.assertTrue(can_approve(self.project_video, user))
+
+        self.assertFalse(can_approve(self.nonproject_video, outsider))
 
     def test_can_message_all_members(self):
         team, user, outsider = self.team, self.user, self.outsider

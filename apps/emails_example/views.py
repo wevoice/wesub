@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -128,7 +128,7 @@ def email_notification_non_editor(request):
 @login_required
 def email_notification(request):
     try:
-        language = SubtitleLanguage.objects.all()[2]
+        language = SubtitleLanguage.objects.all()[3]
     except SubtitleLanguage.DoesNotExist:
         language = None
 
@@ -136,6 +136,7 @@ def email_notification(request):
     most_recent_version = qs[0]
     caption_version = qs[1]
     captions = _make_caption_data(most_recent_version, caption_version)
+    user_is_rtl = request.user.guess_is_rtl(request=request)
 
     context = {
         'domain': Site.objects.get_current().domain,
@@ -144,6 +145,7 @@ def email_notification(request):
         'version': most_recent_version,
         'video': language.video,
         'captions': captions,
+        'user_is_rtl': user_is_rtl,
         'video_url': language.video.get_absolute_url(),
         'last_version': caption_version,
         "STATIC_URL": settings.STATIC_URL,

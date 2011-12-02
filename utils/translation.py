@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils import simplejson as json
 from django.utils.http import cookie_date
-from django.utils.translation import get_language, ugettext as _, ugettext_lazy
+from django.utils.translation import get_language, get_language_info, ugettext as _, ugettext_lazy
 from translation_names import ORIGINAL_LANGUAGE_NAMES
 
 SUPPORTED_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
@@ -129,3 +129,9 @@ def languages_with_names(langs):
             except KeyError:
                 pass
     return output
+
+def is_rtl(lang):
+    try:
+        return get_language_info(lang)['bidi']
+    except KeyError:
+        return False
