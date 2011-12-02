@@ -1328,7 +1328,7 @@ class Task(models.Model):
         Useful for converting to JSON.
 
         '''
-        from teams.permissions import can_perform_task
+        from teams.permissions import can_perform_task, can_assign_task, can_delete_task
 
         return { 'pk': self.id,
                  'team': self.team.id if self.team else None,
@@ -1343,6 +1343,8 @@ class Task(models.Model):
                  'language_display': SUPPORTED_LANGUAGES_DICT[self.language]
                                      if self.language else None,
                  'perform_allowed': can_perform_task(user, self) if user else None,
+                 'assign_allowed': can_assign_task(self, user) if user else None,
+                 'delete_allowed': can_delete_task(self, user) if user else None,
                  'completed': True if self.completed else False, }
 
 

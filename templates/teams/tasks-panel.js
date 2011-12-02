@@ -1,6 +1,4 @@
 var PERFORM_TASK_URL = "{% url teams:perform_task %}";
-var USER_CAN_ASSIGN_TASK = {% if user_can_assign_tasks %}true{% else %}false{% endif %};
-var USER_CAN_DELETE_TASK = {% if user_can_delete_tasks %}true{% else %}false{% endif %};
 
 // Tasks ----------------------------------------------------------------------
 var TaskModel = Class.$extend({
@@ -19,8 +17,8 @@ var TaskModel = Class.$extend({
         this.teamSlug = TEAM_SLUG;
         this.performAllowed = data.perform_allowed;
         this.performUrl = PERFORM_TASK_URL;
-        this.assignAllowed = USER_CAN_ASSIGN_TASK;
-        this.deleteAllowed = USER_CAN_DELETE_TASK;
+        this.assignAllowed = data.assign_allowed;
+        this.deleteAllowed = data.delete_allowed;
         this.steps = function() {
             var step = { 'Subtitle': 0,
                          'Translate': 2,
@@ -28,7 +26,7 @@ var TaskModel = Class.$extend({
                          'Approve': 6
             }[this.type];
             if (this.assignee) {
-                step += 1
+                step += 1;
             }
 
             return _.map(_.range(0, 7), function(i) {
