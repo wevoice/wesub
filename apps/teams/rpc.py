@@ -380,9 +380,8 @@ class TeamsApiV2Class(object):
 
         task.assignee = assignee
         task.save()
-        member = task.team.members.get(user=user)
 
-        return task.to_dict(member)
+        return task.to_dict(user)
 
     def task_translate_delete(self, team_video_id, language, user):
         '''Mark a translation task as deleted.
