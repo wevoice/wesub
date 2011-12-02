@@ -1,0 +1,852 @@
+@import "compass/css3/gradient";
+@import "compass/css3/border-radius";
+@import "compass/css3/box-shadow";
+@import "compass/css3/opacity";
+
+$usblue: #0f517a;
+$faintest: #f3f6f8;
+$fainter: #dce2e5;
+$faint: #b7c3c9;
+$lighter: #a0b2bd;
+$light: #7692a3;
+$normal: #678ca3;
+$dark: #486f87;
+$darker: #3e6782;
+
+/*************** @General Styles ***************/
+
+@mixin box-right {
+	position: absolute;
+	top: 2em; right: 0;
+	width: 120px;
+	padding: 0;
+}
+
+.v1 {
+	color: #2f3c45;
+}
+
+.v1 em {
+	font-style: italic;
+}
+
+.v1 .logo {
+	margin: 1em 0 2em;
+}
+
+.v1 .notation {
+  font-size: .95em;
+  color: $light;
+}
+
+.v1 .button, .v1 .content button, .v1 .form-container button, .v1 .submit input {
+	margin: 1em 0;
+	padding: .5em;
+	@include border-radius(3px);
+	font-size: inherit;
+	background-color: $usblue;
+	@include background-image(linear-gradient(#136aa1, $usblue));
+	border: 1px solid #0c4a70;
+	text-shadow: 1px 1px 1px #0c4a70;
+	text-decoration: none;
+	text-align: center;
+	cursor: pointer;
+	color: #fff;
+
+	&:hover {
+		@include background-image(linear-gradient(#136aa1, #0c4061));
+	}
+
+	&.primary {
+		font-size: 1.25em;
+		padding: 1em;
+		@include border-radius(4px);
+	}
+
+	&.reduced, &.cancel {
+		border-color: $fainter;
+		@include background-image(linear-gradient(#fff, $fainter));
+		text-shadow: none;
+		color: $normal;
+
+		&:hover {
+			@include background-image(linear-gradient($faintest, $fainter));
+			border-color: $faint;
+			color: $dark;
+		}
+	}
+
+	&.delete {
+		float: left;
+		margin: 0 .5em 0 0;
+		@include background-image(linear-gradient(#A11332, #7A0F26));
+		border-color: #700C22;
+		text-shadow: 1px 1px 1px #700C22;
+
+		&:hover {
+			@include background-image(linear-gradient(#A11332, #610c1e));
+		}
+	}
+
+	&.save {
+		@include background-image(linear-gradient(#69A113, #4F7A0F));
+		border-color: #4F7A0F;
+		text-shadow: 1px 1px 1px #4F7A0F;
+
+		&:hover {
+			@include background-image(linear-gradient(#69A113, #476e0d));
+		}
+	}
+
+	&.cancel {
+		float: left;
+		margin: 0 .5em 0 0;
+	}
+}
+
+.v1 .controls .button {
+	display: block;
+}
+
+.v1 .action-replacement {
+	padding: 1em;
+	margin: 1em 0 2em;
+	background: $faintest;
+	@include border-radius(4px);
+	color: $normal;
+	text-align: center;
+}
+
+.v1 .team-banner {
+	margin-bottom: 2em;
+}
+
+.v1 .view .empty {
+	padding: 2em 1em;
+	font-size: 18px;
+	color: $normal;
+}
+
+.v1 .view {
+	> div, > form {
+		padding-top: 2em;
+	}
+}
+
+.v1 ul .timestamp {
+	@include box-right;
+	width: 150px;
+	text-align: right;
+	color: $light;
+}
+
+/*************** @Tabs ***************/
+
+@mixin show-border {
+	border-bottom-width: 2px;
+	margin-bottom: -1px;
+}
+
+.v1 .tabs {
+	float: left;
+	width: 100%;
+	padding: 0;
+	border-bottom: 1px solid $fainter;
+
+	li {
+		display: inline;
+
+		a {
+			display: block;
+			float: left;
+			padding: 1em 2em;
+			text-decoration: none;
+			color: $normal;
+			border-style: solid;
+
+			&:hover {
+				@include show-border;
+			}
+		}
+
+		&.current a {
+			color: $darker;
+			font-weight: bold;
+			@include show-border;
+		}
+	}
+}
+
+/*************** @Tools ***************/
+
+.v1 .view .tools {
+	padding: 1em;
+	margin: 0 -20px 0 0;
+	border-bottom: 1px solid #e8ebed;
+	font-size: 11px;
+	text-align: right;
+	@include background-image(linear-gradient(
+		bottom,
+		hsla(0, 0%, 98%, 1),
+		hsla(0, 0%, 100%, 1) 25%,
+		hsla(0, 0%, 100%, 1)));
+
+	.button {
+		background: transparent;
+		border: 1px solid transparent;
+		color: $light;
+		text-shadow: none;
+		padding: .5em 1em;
+
+		&:hover {
+			border-color: $faint;
+			@include background-image(linear-gradient($faintest, $fainter));
+			color: $dark;
+		}
+	}
+
+	form {
+		padding: 0;
+	}
+
+	.filters {
+		float: left;
+		padding: 0;
+		margin: -.5em 0 0 -.5em;
+
+		> li {
+			display: inline;
+			padding: 0;
+
+			select {
+				width: 140px;
+			}
+		}
+	}
+}
+
+/*************** @Listings ***************/
+
+.v1 .listing {
+  padding: 0;
+
+	> li {
+	position: relative;
+	padding: 2em 1em;
+	border-bottom: 1px dotted $faint;
+
+		&.empty {
+			border:none;
+		}
+
+		h3 {
+			position: relative;
+			font-size: 13px;
+			padding-bottom: .25em;
+			line-height: 1.5em;
+
+			> a {
+				text-decoration: none;
+				margin-right: .5em;
+
+				&:hover {
+					border-width: 0 0 1px 0;
+					border-style: dotted;
+				}
+			}
+		}
+
+		p {
+			margin: .5em 0;
+		}
+
+		.thumb {
+			position: absolute;
+			top: 2em; left: 0;
+
+			img {
+				border: 1px solid $faint;
+			}
+		}
+
+		.actions {
+			@include box-right;
+
+			li {
+				padding: 0;
+				text-align: right;
+				color: $lighter;
+			}
+
+			a {
+				color: $dark;
+				text-decoration: none;
+			}
+
+			li > form {
+				padding: 0;
+			}
+
+			li > a, li > form a {
+				display: block;
+				padding: .5em 0;
+
+				&:after {
+					content: ' →';
+				}
+			}
+
+			.assignee-choice {
+				position: absolute;
+				top: o; right: 0;
+				padding: 1em;
+				background: $dark;
+				color: #fff;
+				@include border-radius(3px);
+			}
+		}
+
+		.descriptor {
+			font-size: 11px;
+			font-weight: normal;
+			padding: 1px 3px;
+			background: $faintest;
+			@include border-radius(2px);
+			border: 1px solid $fainter;
+			color: $light;
+
+			a, a:hover {
+				border: none;
+				text-decoration: none;
+				color: $light;
+			}
+		}
+
+		.admin-controls {
+			display: none;
+			position: absolute;
+			bottom: 1em; right: 0;
+			float: left;
+			padding: 0;
+			@include opacity(0.6);
+			@include border-radius(2px);
+			@include background-image(linear-gradient($faintest, $fainter));
+			border: 1px solid $lighter;
+
+			&.selected {
+				display: block;
+				@include opacity(1.0);
+			}
+
+			li {
+				display: block;
+				float: left;
+				padding: 0;
+
+				a {
+					display: block;
+					float: left;
+					padding: 5px 7px;
+					text-decoration: none;
+					color: $normal;
+					border-left: 1px solid $lighter;
+					cursor: pointer;
+
+					&:hover {
+						@include background-image(linear-gradient($faintest, $faint));
+						color: $dark;
+					}
+				}
+
+				&:first-child a {
+					border-left: none;
+				}
+
+				input[type="checkbox"] {
+					margin: 5px 7px;
+				}
+			}
+
+			&:hover {
+				@include opacity(1.0);
+			}
+		}
+
+		&:hover .admin-controls {
+			display: block;
+		}
+	}
+}
+
+.v1 .listing.videos > li {
+	min-height: 5em;
+	padding-left: 120px;
+	padding-right: 150px;
+
+	.thumb {
+		width: 100px;
+		height: 60px;
+
+		img {
+			height: 60px;
+		}
+	}
+}
+
+.v1 .listing.members > li {
+	min-height: 4em;
+	padding-left: 65px;
+	padding-right: 150px;
+
+	.thumb {
+		width: 45px;
+		height: 45px;
+
+		img {
+			height: 45px;
+		}
+	}
+
+	&.current {
+		background: #f6f6e4;
+	}
+}
+
+.v1 .listing.activity > li, .v1 .listing.tasks > li {
+	padding-right: 150px;
+
+	.actions {
+		width: 150px;
+	}
+}
+
+.v1 .listing.tasks > li .done {
+
+	span {
+		margin-right: .5em;
+	}
+}
+
+.v1 .listing.teams > li {
+	min-height: 4em;
+	padding-left: 68px;
+	padding-right: 150px;
+
+	.thumb img {
+		height: 48px;
+	}
+}
+
+.v1 .view .pagination {
+	float: none;
+	padding: 1em 1em 0;
+
+	em {
+		box-shadow: none;
+		font-style: normal;
+		color: $lighter;
+		background: transparent;
+	}
+
+	a {
+		color: $normal;
+
+		&:hover {
+			box-shadow: none;
+			background: $faint;
+			color: #fff;
+		}
+	}
+
+	.disabled {
+		color: $lighter;
+	}
+}
+
+/*************** @Controls ***************/
+
+.v1 .controls {
+	width: 199px;
+	padding-left: 15px;
+	padding-bottom: 4em;
+	border-left: 1px solid $fainter;
+	background-color: #fff;
+	@include background-image(linear-gradient(
+		left,
+		hsla(0, 0%, 96%, 1),
+		hsla(0, 0%, 100%, 1) 5%,
+		hsla(0, 0%, 100%, 1)));
+	
+	ul {
+		padding: 0;
+		margin: 2em 0;
+
+		&.secondary {
+			margin-top: 0;
+		}
+
+		li {
+			padding: 0;
+		}
+
+		li a {
+			position: relative;
+			display: block;
+			padding: .75em 0 .75em 15px;
+			margin-left: -15px;
+			margin-bottom: .5em;
+			text-decoration: none;
+			color: $normal;
+			@include border-right-radius(5px);
+
+			&:hover {
+				background-color: #f9fafb;
+				@include background-image(linear-gradient(
+					left,
+					hsla(192, 15%, 92%, 1),
+					hsla(192, 15%, 96%, 1) 5%,
+					hsla(192, 15%, 96%, 1)));
+				}
+			
+			span {
+				position: absolute;
+				top: .75em; right: .75em;
+				color: $lighter;
+			}
+		}
+
+		li.current a {
+			background-color: #edf1f2;
+			@include background-image(linear-gradient(
+				left,
+				hsla(192, 15%, 90%, 1),
+				hsla(192, 15%, 94%, 1) 5%,
+				hsla(192, 15%, 94%, 1)));
+			color: $dark;
+
+			&:hover {
+				background-color: #e8ecee;
+				@include background-image(linear-gradient(
+					left,
+					hsla(192, 15%, 88%, 1),
+					hsla(192, 15%, 92%, 1) 5%,
+					hsla(192, 15%, 92%, 1)));
+			}
+
+			span {
+				color: $light;
+			}
+		}
+	}
+
+	.refine {
+		margin: 2em 0;
+		padding: 1.5em 15px;
+		margin-left: -15px;
+		border-top: 1px solid $faintest;
+		border-bottom: 1px solid $faintest;
+
+		form {
+			padding: 0 0 1em;
+		}
+
+		select {
+			width: 100%;
+		}
+	}
+
+	h4 {
+		color: $light;
+		padding-bottom: 1em;
+	}
+
+	form {
+		padding: 0;
+
+		&.search {
+			padding: 1em 0;
+		}
+	}
+}
+
+/*************** @Forms ***************/
+
+@mixin block-level {
+	display: block;
+	width: 100%;
+}
+
+.v1 form {
+	padding: 1em 0;
+
+	fieldset {
+		padding-bottom: 3em;
+
+		legend {
+			font-weight: bold;
+			padding-bottom: .5em;
+		}
+
+		input, textarea {
+			margin-bottom: .5em;
+			padding: 4px;
+		}
+
+		label {
+			@include block-level;
+			padding: 1.5em 0 .25em;
+
+			.notation {
+				float: right;
+				margin-right: -8px;
+			}
+		}
+
+		input[type="text"], input[type="password"], textarea {
+			@include block-level;
+			border: 1px solid $faint;
+			@include border-radius(2px);
+		}
+
+		input[type='checkbox'] {
+			margin: 0 4px 0 0;
+		}
+
+		input[type='file'] {
+			@include block-level;
+			padding: 0;
+		}
+
+		select {
+			margin-bottom: .5em;
+			padding: 4px;
+			width: 100%;
+		}
+
+		textarea {
+			height: 5em;
+		}
+	}
+
+	.preselected {
+		padding: 1em;
+		margin: .5em 0;
+		background: $fainter;
+		@include border-radius(3px);
+	}
+
+}
+
+.v1 .panel-holder form {
+	float: left;
+	width: 100%;
+	clear: both;
+}
+
+.v1 .panel-holder .tools form {
+	float: none;
+}
+
+.v1 form.workflow {
+	margin-top: -3em;
+
+	fieldset {
+		padding: 0 1em;
+		background: $fainter;
+		@include border-radius(4px);
+
+		.button {
+			margin-top: 2em;
+		}
+	}
+}
+
+.v1 .permissions .workflow {
+	margin-top: -2em;
+	padding: 0 1em;
+	background: $fainter;
+	@include border-radius(4px);
+
+	fieldset {
+		padding: 0;
+
+		.button {
+			float: right;
+		}
+	}
+}
+
+.v1 .alpha .omega {
+	margin-left: 60px;
+}
+
+#dashboard .alpha .omega {
+	margin-left: 10px;
+}
+
+.v1 div.submit {
+	clear: both;
+	margin-top: 2em;
+	padding-top: 1em;
+	border-top: 1px solid $fainter;
+	text-align: right;
+
+	form {
+		padding: 0;
+	}
+
+	button, input {
+		margin: 0;
+	}
+
+
+}
+
+.v1 .controls form.search {
+
+	fieldset {
+		padding: 0;
+
+		input {
+			width: 180px;
+			padding: .5em;
+			color: $lighter;
+			border-color: $fainter;
+
+			&:focus {
+				border-color: $normal;
+			}
+		}
+	}
+}
+
+/*************** @Dashboard ***************/
+
+#dashboard {
+	
+	.featured {
+		padding: 0;
+		font-size: 14px;
+
+		li {
+			@include border-radius(4px);
+			background: $faintest;
+			padding: 1em;
+			margin: .5em 0;
+		}
+	}
+
+	.listing {
+		li {
+			padding: 1em 150px 1em 0;
+		}
+
+		.timestamp {
+			top: 1em;
+		}
+	}
+}
+
+.v1.dashboard h2 {
+	margin: 0;
+	padding-bottom: .5em;
+}
+
+.v1.dashboard .row {
+	clear: both;
+	margin: 2em 0 0;
+}
+
+.v1 .only-child h2 {
+	padding: .5em 0;
+	margin-bottom: 0;
+	border-bottom: 1px solid $fainter;
+}
+
+
+
+
+#profile.v1 .view .alpha img {
+	padding: .5em;
+	border: 1px solid $fainter;
+	margin-bottom: 1em;
+}
+
+
+/*************** @Overrides ***************/
+
+.v1 .sort_button {
+	float: none;
+	padding: 0;
+	margin: 0;
+	position: relative;
+	cursor: pointer;
+	width: 170px;
+	border-color: $fainter;
+	@include border-radius(3px);
+	text-align: left;
+	@include background-image(linear-gradient(#fff, #eee));
+
+	.sort_label {
+		font-size: 11px;
+		padding: .5em;
+		font-weight: normal !important;
+		text-shadow: 0 1px 0px #fff;
+		display: block;
+		color: $normal;
+
+		&:hover {
+			background: transparent;
+		}
+	}
+
+	ul {
+		margin: 0;
+		padding: .5em 0 0;
+	}
+
+	ul li a {
+		padding: .5em;
+		display: block;
+		text-decoration: none;
+		border-top: 1px solid $fainter;
+		border-bottom: none;
+		font-size: 11px;
+		font-weight: normal;
+		text-shadow: none;
+		color: $normal;
+		@include box-shadow(none);
+	}
+
+	ul li a:hover {
+		background: $normal;
+		color: #fff;
+	}
+
+	.arrow {
+		width: 20px;
+		height: 24px;
+		background: url('chosen-sprite.png') no-repeat 0 1px;
+	}
+
+	&:hover {
+		background: transparent;
+
+		.sort_label {
+			z-index: 999999999;
+		}
+
+		ul {
+			top: 21px;
+			left: -1px;
+			border-color: $fainter;
+			@include box-shadow(none);
+			@include background-image(linear-gradient(#fff, $faintest));
+			@include border-bottom-radius(3px);
+		}
+
+		.arrow {
+			background: url('chosen-sprite.png') no-repeat 0 1px;
+		}
+	}
+}
