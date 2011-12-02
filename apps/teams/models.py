@@ -313,7 +313,7 @@ class Team(models.Model):
             qs = qs.filter(project_pk=project.pk)
         return qs
 
-    def get_videos_for_languages_haystack(self, languages, project=None, user=None):
+    def get_videos_for_languages_haystack(self, languages, project=None, user=None, require_language=None):
         from utils.multi_query_set import MultiQuerySet
 
         is_member = user and user.is_authenticated() and self.members.filter(user=user).exists()
@@ -340,17 +340,21 @@ class Team(models.Model):
                 self._base_sqs(is_member, project).filter(
                     original_language__in=languages), 
                 pairs_m + pairs_0).order_by('has_lingua_franca'))
-        qs_list.append(self._exclude(
-                self._filter(self._base_sqs(is_member, project=project), langs),
-                pairs_m + pairs_0).exclude(original_language__in=languages))
+        if not require_language:
+            qs_list.append(self._exclude(
+                    self._filter(self._base_sqs(is_member, project=project), langs),
+                    pairs_m + pairs_0).exclude(original_language__in=languages))
         qs_list.append(self._exclude(
                 self._base_sqs(is_member, project=project), 
                 langs + pairs_m + pairs_0).exclude(
                 original_language__in=languages))
         mqs = MultiQuerySet(*[qs for qs in qs_list if qs is not None])
-        # this is way more efficient than making a count from all the
-        # constituent querysets.
-        mqs.set_count(self._base_sqs(is_member, project=project).count())
+
+        # This is way more efficient than making a count from all the
+        # constituent querysets.  Unfortunately we can't use it because we need
+        # to know the REAL, filtered count for pagination purposes.
+        # mqs.set_count(self._base_sqs(is_member, project=project).count())
+
         return qs_list, mqs
 
     def get_videos_for_languages(self, languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS):

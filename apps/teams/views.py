@@ -119,8 +119,13 @@ def index(request, my_teams=False):
 def detail(request, slug, is_debugging=False, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
 
+    require_language = False
+
     if languages is None:
         languages = get_user_languages_from_request(request)
+    if 'lang' in request.GET:
+        require_language = True
+        languages = [request.GET['lang']]
     if bool(is_debugging):
         languages = request.GET.get('langs', '').split(',')
 
@@ -128,7 +133,10 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
         project = None
-    qs_list, mqs = team.get_videos_for_languages_haystack(languages, user=request.user, project=project)
+
+    qs_list, mqs = team.get_videos_for_languages_haystack(
+            languages, user=request.user, project=project,
+            require_language=require_language)
 
     extra_context = widget.add_onsite_js_files({})
     extra_context.update({
