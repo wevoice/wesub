@@ -726,7 +726,6 @@ $darker: #3e6782;
 	
 	.featured {
 		padding: 0;
-		font-size: 14px;
 
 		li {
 			@include border-radius(4px);
@@ -769,18 +768,20 @@ $darker: #3e6782;
 }
 
 #profile.v1 .view {
-	.grid_4 p, .grid_4 ul {
-		margin-bottom: 2em;
-	}
-
-	.grid_4 ul {
-		padding: 0;
-	}
 
 	.alpha img {
 		padding: .5em;
 		border: 1px solid $fainter;
-		margin-bottom: 1em;
+	}
+}
+
+.v1 .view .grid_4 {
+	p, ul {
+		margin-bottom: 2em;
+	}
+
+	ul {
+		padding: 0;
 	}
 }
 
