@@ -252,6 +252,14 @@ New Header Styles
 	color: #444;
 }
 
+#main_bar ul#bar_menu li#me_menu #user_menu #menu ul#dropdown li h4 a {
+	padding: 0;
+}
+
+#main_bar ul#bar_menu li#me_menu #user_menu #menu ul#dropdown li h4 a:hover {
+	background: transparent;
+}
+
 #lang_bar {
 	background: #126295;
 	border-bottom: 1px #004068 solid;

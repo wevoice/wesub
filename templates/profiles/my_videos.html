@@ -1,0 +1,45 @@
+{% extends "profiles/base.html" %}
+
+{% load i18n teams_tags paginator profiles_tags widget auth_tags %}
+
+{% block title %}
+    {% trans 'My videos' %} | Universal Subtitles
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+{% endblock %}
+
+{% block email_confirmation_block %}
+    {% email_confirmation_notification 'true' %}
+{% endblock %}
+
+{% block main_content %}
+    <h2>{% trans 'My videos' %}</h2>
+
+    {% with 'dashboard' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        {% if is_paginated %}{% paginator %}{% endif %}
+        <ul class="listing videos">
+            {% for video in user_video_list %}
+                {% include 'profiles/_video_detail.html' %}
+            {% endfor %}
+        </ul>
+        {% if is_paginated %}{% paginator %}{% endif %}
+    </div>
+
+    <div class="controls grid_3 omega">
+        <ul>
+            <li><a href="{% url profiles:dashboard %}">Overview</a></li>
+            <li class="current"><a href="{% url profiles:my_videos %}">My Videos</a></li>
+        </ul>    
+    </div>
+
+{% endblock %}

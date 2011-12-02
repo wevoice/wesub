@@ -87,7 +87,7 @@ def dashboard(request):
     return direct_to_template(request, 'profiles/dashboard.html', context)
 
 @login_required
-def my_profile(request):
+def my_videos(request):
     user = request.user
     qs = user.videos.order_by('-edited')
     q = request.REQUEST.get('q')
@@ -95,6 +95,7 @@ def my_profile(request):
     if q:
         qs = qs.filter(Q(title__icontains=q)|Q(description__icontains=q))
     context = {
+        'user_info': user,
         'my_videos': True,
         'query': q
     }
@@ -102,7 +103,7 @@ def my_profile(request):
 
     return object_list(request, queryset=qs, 
                        paginate_by=VIDEOS_ON_PAGE, 
-                       template_name='profiles/my_profile.html', 
+                       template_name='profiles/my_videos.html', 
                        extra_context=context, 
                        template_object_name='user_video')    
 
@@ -133,6 +134,11 @@ def edit_profile(request):
         'edit_profile_page': True
     }
     return direct_to_template(request, 'profiles/edit_profile.html', context)
+
+@login_required
+def my_profile(request):
+
+    return profile(request, user_id = request.user.id)
 
 def profile(request, user_id=None):
     if user_id:

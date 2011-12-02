@@ -22,6 +22,7 @@ from profiles.views import rpc_router
 urlpatterns = patterns('profiles.views',
     url(r'^dashboard/$', 'dashboard', name='dashboard'),
     url(r'^mine/$', 'my_profile', name='my_profile'),
+    url(r'^dashboard/videos/$', 'my_videos', name='my_videos'),
     url(r'^edit/$', 'edit_profile', name='edit'),
     url(r'^router/$', rpc_router, name='rpc_router'),
     url(r'^router/api/$', rpc_router.api, name='rpc_api'),    

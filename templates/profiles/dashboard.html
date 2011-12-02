@@ -19,7 +19,7 @@
 
     <div class="view grid_9 alpha">
         <div class="grid_5 alpha">
-            <h3>What's Going on</h3>
+            <h3>Incoming Tasks</h3>
             <ul class="listing">
                 <li>Spanish subtitles for <a href="">Promo Video #3</a> (Some Team) <span class="timestamp">2 hours ago</span></li>
             </ul>
@@ -31,24 +31,15 @@
         </div>
 
         <div class="grid_4 omega">
-            <h3>The Latest</h3>
+            <h3>Alerts</h3>
             <ul class="featured">
-                <li>You have 2 new messages</li>
-                <li>You have saved work on Blah video</li>
+                <li>You have <a href="">saved work</a> on "Promotional Video #1"</li>
+                <li>You have <a href="">2 unread messages</a></li>
             </ul>
-        </div>
-    </div>
 
-    <div class="controls grid_3 omega">
-        <ul>
-            <li class="current"><a href="">Overview</a></li>
-            <li><a href="">Something else</a></li>
-        </ul>
-
-        {% comment %}
-            <h4>My Teams</h4>
+            <h3>My Teams</h3>
             {% with user.teams.all as user_teams %}
-            <ul class="secondary">
+            <ul>
                 {% if user_teams %}
                     {% for t in user_teams %}
                     <li>
@@ -58,6 +49,13 @@
                 {% endif %}
             </ul>
             {% endwith %}
-        {% endcomment %}
+        </div>
+    </div>
+
+    <div class="controls grid_3 omega">
+        <ul>
+            <li class="current"><a href="">Overview</a></li>
+            <li><a href="{% url profiles:my_videos %}">My Videos</a></li>
+        </ul>
     </div>
 {% endblock %}

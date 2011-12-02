@@ -49,7 +49,7 @@ def confirm_email(request, confirmation_key):
         messages.success(request, _(u'Email is confirmed.'))
     
     if request.user.is_authenticated():
-        return redirect('profiles:my_profile')
+        return redirect('profiles:dashboard')
     
     return redirect('/')
 
