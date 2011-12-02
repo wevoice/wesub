@@ -22,6 +22,19 @@
     {% endif %}
     {% include_bundle "unisubs-onsite-compiled" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>  
+    <script type="text/javascript">
+        $(function() {
+            $select = $("select#lang-filter", ".controls");
+            $select.change(function(e) {
+                var lang = $select.val();
+                if (lang !== '') {
+                    window.location = document.URL.split("?")[0] + '?lang=' + lang;
+                } else {
+                    window.location = document.URL.split("?")[0];
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block view_content %}
@@ -96,7 +109,7 @@
         <div class="refine">
             <h4>Refine</h4>
             <select name="lang-filter" id="lang-filter">
-                <option value="all">All languages</option>
+                <option value="">All languages</option>
                 {% for code, name in languages %}
                     <option value="{{ code }}">{{ name }}</option>
                 {% endfor %}
