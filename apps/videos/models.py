@@ -49,7 +49,6 @@ from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_u
 from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
-from utils.translation import is_rtl
 
 from apps.teams. moderation_const import WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED
 
@@ -777,6 +776,7 @@ class SubtitleLanguage(models.Model):
         return seconds < WRITELOCK_EXPIRATION
 
     def is_rtl(self):
+        from utils.translation import is_rtl
         return is_rtl(self.language)
 
     def can_writelock(self, request):
