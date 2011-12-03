@@ -726,6 +726,7 @@ $darker: #3e6782;
 	
 	.featured {
 		padding: 0;
+		margin-bottom: 4em;
 
 		li {
 			@include border-radius(4px);
@@ -736,7 +737,7 @@ $darker: #3e6782;
 	}
 
 	.listing {
-		margin-bottom: 2em;
+		margin-bottom: 4em;
 
 		li {
 			padding: 1em 150px 1em 0;
@@ -769,12 +770,12 @@ $darker: #3e6782;
 	}
 }
 
-#profile.v1 .view {
-
-	.alpha img {
-		padding: .5em;
-		border: 1px solid $fainter;
-	}
+#profile.v1 .view .avatar img {
+	float: right;
+	margin-right: -60px;
+	margin-left: 1em;
+	padding: .5em;
+	border: 1px solid $fainter;
 }
 
 .v1 .view .grid_4 {

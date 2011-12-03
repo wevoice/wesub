@@ -846,8 +846,9 @@
 /* line 727, ../sass/source/v1.scss */
 #dashboard .featured {
   padding: 0;
+  margin-bottom: 4em;
 }
-/* line 730, ../sass/source/v1.scss */
+/* line 731, ../sass/source/v1.scss */
 #dashboard .featured li {
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
@@ -859,20 +860,20 @@
   padding: 1em;
   margin: .5em 0;
 }
-/* line 738, ../sass/source/v1.scss */
+/* line 739, ../sass/source/v1.scss */
 #dashboard .listing {
-  margin-bottom: 2em;
+  margin-bottom: 4em;
 }
-/* line 741, ../sass/source/v1.scss */
+/* line 742, ../sass/source/v1.scss */
 #dashboard .listing li {
   padding: 1em 150px 1em 0;
 }
-/* line 745, ../sass/source/v1.scss */
+/* line 746, ../sass/source/v1.scss */
 #dashboard .listing .timestamp {
   top: 1em;
 }
 
-/* line 751, ../sass/source/v1.scss */
+/* line 752, ../sass/source/v1.scss */
 .v1 .only-child h2 {
   padding: .5em 0;
   margin-bottom: 0;
@@ -880,11 +881,11 @@
 }
 
 /*************** @Profile ***************/
-/* line 759, ../sass/source/v1.scss */
+/* line 760, ../sass/source/v1.scss */
 #profile.v1 h2, #dashboard.v1 h2 {
   line-height: 1.75em;
 }
-/* line 762, ../sass/source/v1.scss */
+/* line 763, ../sass/source/v1.scss */
 #profile.v1 h2 img, #dashboard.v1 h2 img {
   float: left;
   padding: 2px;
@@ -899,23 +900,26 @@
   height: 32px;
 }
 
-/* line 774, ../sass/source/v1.scss */
-#profile.v1 .view .alpha img {
+/* line 773, ../sass/source/v1.scss */
+#profile.v1 .view .avatar img {
+  float: right;
+  margin-right: -60px;
+  margin-left: 1em;
   padding: .5em;
   border: 1px solid #dce2e5;
 }
 
-/* line 781, ../sass/source/v1.scss */
+/* line 782, ../sass/source/v1.scss */
 .v1 .view .grid_4 p, .v1 .view .grid_4 ul {
   margin-bottom: 2em;
 }
-/* line 785, ../sass/source/v1.scss */
+/* line 786, ../sass/source/v1.scss */
 .v1 .view .grid_4 ul {
   padding: 0;
 }
 
 /*************** @Overrides ***************/
-/* line 793, ../sass/source/v1.scss */
+/* line 794, ../sass/source/v1.scss */
 .v1 .sort_button {
   float: none;
   padding: 0;
@@ -938,7 +942,7 @@
   background-image: -ms-linear-gradient(#ffffff, #eeeeee);
   background-image: linear-gradient(#ffffff, #eeeeee);
 }
-/* line 805, ../sass/source/v1.scss */
+/* line 806, ../sass/source/v1.scss */
 .v1 .sort_button .sort_label {
   font-size: 11px;
   padding: .5em;
@@ -947,16 +951,16 @@
   display: block;
   color: #678ca3;
 }
-/* line 813, ../sass/source/v1.scss */
+/* line 814, ../sass/source/v1.scss */
 .v1 .sort_button .sort_label:hover {
   background: transparent;
 }
-/* line 818, ../sass/source/v1.scss */
+/* line 819, ../sass/source/v1.scss */
 .v1 .sort_button ul {
   margin: 0;
   padding: .5em 0 0;
 }
-/* line 823, ../sass/source/v1.scss */
+/* line 824, ../sass/source/v1.scss */
 .v1 .sort_button ul li a {
   padding: .5em;
   display: block;
@@ -972,26 +976,26 @@
   -o-box-shadow: none;
   box-shadow: none;
 }
-/* line 836, ../sass/source/v1.scss */
+/* line 837, ../sass/source/v1.scss */
 .v1 .sort_button ul li a:hover {
   background: #678ca3;
   color: #fff;
 }
-/* line 841, ../sass/source/v1.scss */
+/* line 842, ../sass/source/v1.scss */
 .v1 .sort_button .arrow {
   width: 20px;
   height: 24px;
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }
-/* line 847, ../sass/source/v1.scss */
+/* line 848, ../sass/source/v1.scss */
 .v1 .sort_button:hover {
   background: transparent;
 }
-/* line 850, ../sass/source/v1.scss */
+/* line 851, ../sass/source/v1.scss */
 .v1 .sort_button:hover .sort_label {
   z-index: 999999999;
 }
-/* line 854, ../sass/source/v1.scss */
+/* line 855, ../sass/source/v1.scss */
 .v1 .sort_button:hover ul {
   top: 21px;
   left: -1px;
@@ -1019,7 +1023,7 @@
   -khtml-border-bottom-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
-/* line 863, ../sass/source/v1.scss */
+/* line 864, ../sass/source/v1.scss */
 .v1 .sort_button:hover .arrow {
   background: url("chosen-sprite.png") no-repeat 0 1px;
 }

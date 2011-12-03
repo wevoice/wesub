@@ -51,7 +51,6 @@
 
             <div class="grid_4 alpha">
             
-                <!--<img src="{{ user_info.avatar }}" alt="{{ user_info|title }}'s avatar">-->
                 <h3>{% trans "Username" %}</h3>
                 <p>{{ user_info.username }}</p>
 
@@ -73,7 +72,12 @@
                 </p>
             </div>
 
-            <div class="grid_4 omega">
+            <div class="grid_4">
+
+                <div class="avatar">
+                    <img src="{{ user_info.avatar }}" alt="{{ user_info|title }}'s avatar"/>
+                </div>
+
                 {% with user_info.get_languages as langs %}
                     {% if langs %}
                         <h3>{% trans "Languages" %}</h3>
