@@ -22,6 +22,14 @@ from django.db.models.signals import post_save
 from django.conf import settings
 import urllib
 import hashlib
+import hmac
+import time
+import uuid
+try:
+    from hashlib import sha1
+except ImportError:
+    import sha
+    sha1 = sha.sha
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.utils.http import urlquote_plus
 from django.core.exceptions import MultipleObjectsReturned
@@ -29,7 +37,7 @@ from utils.amazon import S3EnabledImageField
 from datetime import datetime, timedelta
 from django.core.cache import cache
 from django.utils.hashcompat import sha_constructor
-from random import random
+from random import random, randint
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
@@ -477,3 +485,50 @@ class EmailConfirmation(models.Model):
         expiration_date = self.sent + timedelta(days=EMAIL_CONFIRMATION_DAYS)
         return expiration_date <= datetime.now()
     key_expired.boolean = True        
+
+class LoginTokenManager(models.Manager):
+    def get_expired(self):
+        expires_in = datetime.now() - LoginToken.EXPIRES_IN
+        return self.filter(created__lt=expires_in)
+        
+    def generate_token(self, user):
+        new_uuid = uuid.uuid4()
+        return hmac.new("%s%s" % (user.pk, str(new_uuid)), digestmod=sha1).hexdigest()
+        
+    def for_user(self, user, updates=True):
+        try:
+           lt = self.get(user=user)
+           if updates:
+               lt.token = self.generate_token(user)
+               lt.created = datetime.now()
+               lt.save()
+        except LoginToken.DoesNotExist:
+            lt = self.create(user=user, token=self.generate_token(user))
+        return lt
+        
+class LoginToken(models.Model):
+    """
+    Links a user account to a secret, this allows a user to be logged in
+    just by clicking on a URL. Mostly 3rd parties need this when creating
+    content on a user's behalf and then redirecting them to our website.
+    The url should expire, just to avoid the security hazard of having those
+    lying around indefinitely.
+
+    When creating new instances, client code should use
+    LoginToken.objects.get_for_user(user)
+    This avoids breaking unique constrainst and badly formed tokens.
+    """
+    
+    EXPIRES_IN = timedelta(minutes=120) # minutes
+    user = models.OneToOneField(CustomUser, related_name="login_token")
+    token = models.CharField(max_length=40, unique=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    objects = LoginTokenManager()
+
+    @property
+    def is_expired(self):
+        return self.created + LoginToken.EXPIRES_IN <  datetime.now()
+        
+    def __unicode__(self):
+        return u"LoginToken for %s" %(self.user)

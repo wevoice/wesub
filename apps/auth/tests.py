@@ -15,9 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
+from datetime import datetime, timedelta
+from urlparse import urlparse
 
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from auth.models import CustomUser as User
+from auth.models import LoginToken
 from videos.models import Video
 
 class TestModels(TestCase):
@@ -123,3 +127,71 @@ class TestModels(TestCase):
         
         self.user.followed_languages = []
         self.assertEqual(self.user.videos.count(), 0)        
+
+
+class BaseTokenTest(TestCase):
+
+    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
+    def setUp(self):
+        self.user = User.objects.all()[0]
+        
+class LoginTokenModelTest(BaseTokenTest):
+    def test_creation(self):
+       lt1 = LoginToken.objects.for_user(self.user)
+       lt2 = LoginToken.objects.for_user(self.user, updates=False)
+       self.assertEqual(lt1.token, lt2.token)
+       self.assertEqual(len(lt1.token), 40)
+       # assesrt updates does what it says
+       lt3 = LoginToken.objects.for_user(self.user, updates=True)
+       self.assertNotEqual(lt3.token, lt2.token)
+       self.assertEqual(len(lt3.token), 40)
+
+    def test_expire(self):
+        
+       lt1 = LoginToken.objects.for_user(self.user)
+       self.assertFalse(lt1.is_expired)
+       self.assertFalse(LoginToken.objects.get_expired().filter(pk=lt1.pk).exists())
+       older_date = datetime.now() - timedelta(minutes=1) - LoginToken.EXPIRES_IN
+       lt1.created = older_date
+       lt1.save()
+       self.assertTrue(lt1.is_expired)
+       self.assertTrue(LoginToken.objects.get_expired().filter(pk=lt1.pk).exists())
+
+
+class LoginTokenViewsTest(BaseTokenTest):
+    def test_valid_login(self):
+       lt1 = LoginToken.objects.for_user(self.user)
+       redirect_url = '/en/videos/watch'
+       url = reverse("auth:token-login", args=(lt1.token,)) + "?next=%s" % redirect_url
+       response = self.client.get(url)
+       self.assertEqual(response.status_code, 302)
+       location = response._headers['location'][1]
+       redirect_path = urlparse(location).path
+       self.assertEqual(redirect_path, redirect_url)
+       
+    def test_invalid_login(self):
+       lt1 = LoginToken.objects.for_user(self.user)
+       redirect_url = '/en/videos/watch'
+       url = reverse("auth:token-login", args=(lt1.token,)) + "?next=%s" % redirect_url
+       lt1.delete()
+       response = self.client.get(url)
+       self.assertEqual(response.status_code, 403)
+       
+    def test_staff_is_offlimit(self):
+       lt1 = LoginToken.objects.for_user(self.user)
+       self.user.is_staff  = True
+       self.user.save()
+       redirect_url = '/en/videos/watch'
+       url = reverse("auth:token-login", args=(lt1.token,)) + "?next=%s" % redirect_url
+       response = self.client.get(url)
+       self.assertEqual(response.status_code, 403)
+     
+    def test_superuser_is_offlimit(self):
+       lt1 = LoginToken.objects.for_user(self.user)
+       self.user.is_superuser  = True
+       self.user.save()
+       redirect_url = '/en/videos/watch'
+       url = reverse("auth:token-login", args=(lt1.token,)) + "?next=%s" % redirect_url
+       response = self.client.get(url)
+       self.assertEqual(response.status_code, 403)
+ 

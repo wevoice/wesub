@@ -16,7 +16,7 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns, url 
 
 urlpatterns = patterns(
     'auth.views',
@@ -30,5 +30,6 @@ urlpatterns = patterns(
     url(r'^twitter_login_done/$', 'twitter_login_done', name='twitter_login_done'),
     url(r'^user_list/$', 'user_list', name='user_list'),
     url(r'confirm_email/(?P<confirmation_key>\w+)/$', 'confirm_email', name='confirm_email'),
+    url(r'auto-login/(?P<token>[\w]{40})/$', 'token_login', name='token-login'),
     url(r'resend_confirmation_email/$', 'resend_confirmation_email', name='resend_confirmation_email'),
 )
