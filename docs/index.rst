@@ -18,6 +18,7 @@ Contents:
    feature-flags
    permissions
    i18n
+   api
 
 
 Indices and tables
