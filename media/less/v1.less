@@ -236,12 +236,7 @@
     border-bottom: 1px solid #e8ebed;
     font-size: 11px;
     text-align: right;
-    .linear-gradient(
-        bottom,
-        hsla(0, 0%, 98%, 1),
-        hsla(0, 0%, 100%, 1) 25%,
-        hsla(0, 0%, 100%, 1)
-    );
+    .linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
 
     .button {
         background: transparent;
@@ -517,11 +512,7 @@
     padding-bottom: 4em;
     border-left: 1px solid @fainter;
     background-color: #fff;
-    @include background-image(linear-gradient(
-        left,
-        hsla(0, 0%, 96%, 1),
-        hsla(0, 0%, 100%, 1) 5%,
-        hsla(0, 0%, 100%, 1)));
+    .linear-gradient( left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
     
     ul {
         padding: 0;
@@ -547,12 +538,8 @@
 
             &:hover {
                 background-color: #f9fafb;
-                @include background-image(linear-gradient(
-                    left,
-                    hsla(192, 15%, 92%, 1),
-                    hsla(192, 15%, 96%, 1) 5%,
-                    hsla(192, 15%, 96%, 1)));
-                }
+                .linear-gradient( left, hsla(192, 15%, 92%, 1), hsla(192, 15%, 96%, 1) 5%, hsla(192, 15%, 96%, 1));
+            }
             
             span {
                 position: absolute;
@@ -563,20 +550,12 @@
 
         li.current a {
             background-color: #edf1f2;
-            @include background-image(linear-gradient(
-                left,
-                hsla(192, 15%, 90%, 1),
-                hsla(192, 15%, 94%, 1) 5%,
-                hsla(192, 15%, 94%, 1)));
+            .linear-gradient( left, hsla(192, 15%, 90%, 1), hsla(192, 15%, 94%, 1) 5%, hsla(192, 15%, 94%, 1));
             color: @dark;
 
             &:hover {
                 background-color: #e8ecee;
-                @include background-image(linear-gradient(
-                    left,
-                    hsla(192, 15%, 88%, 1),
-                    hsla(192, 15%, 92%, 1) 5%,
-                    hsla(192, 15%, 92%, 1)));
+                .linear-gradient( left, hsla(192, 15%, 88%, 1), hsla(192, 15%, 92%, 1) 5%, hsla(192, 15%, 92%, 1));
             }
 
             span {
@@ -584,7 +563,6 @@
             }
         }
     }
-
     .refine, div.search {
         margin: 2em 0;
         padding: 1.5em 15px;
@@ -600,17 +578,14 @@
             width: 100%;
         }
     }
-
     h4 {
         color: @light;
         padding-bottom: 1em;
     }
-
     form {
         padding: 0;
 
     }
-
     div.search {
         border-bottom: 0;
         padding-bottom: 0;
