@@ -1,4 +1,4 @@
-/*************** @General Styles ***************/
+/* General styles */
 .box-right {
   position: absolute;
   top: 2em;
@@ -215,7 +215,7 @@
   text-align: right;
   color: #7692a3;
 }
-/*************** @Tabs ***************/
+/* Tabs */
 .show-border {
   border-bottom-width: 2px;
   margin-bottom: -1px;
@@ -247,7 +247,7 @@
   border-bottom-width: 2px;
   margin-bottom: -1px;
 }
-/*************** @Tools ***************/
+/* Tools */
 .v1 .view .tools {
   padding: 1em;
   margin: 0 -20px 0 0;
@@ -294,7 +294,7 @@
 .v1 .view .tools .filters > li select {
   width: 140px;
 }
-/*************** @Listings ***************/
+/* Listings */
 .v1 .listing {
   padding: 0;
 }
@@ -529,7 +529,7 @@
 .v1 .view .pagination .disabled {
   color: #a0b2bd;
 }
-/*************** @Controls ***************/
+/* Controls */
 .v1 .controls {
   width: 199px;
   padding-left: 15px;
@@ -550,6 +550,7 @@
   margin-top: 0;
 }
 .v1 .controls ul li {
+  margin-bottom: .5em;
   padding: 0;
 }
 .v1 .controls ul li a {
@@ -557,7 +558,6 @@
   display: block;
   padding: .75em 0 .75em 15px;
   margin-left: -15px;
-  margin-bottom: .5em;
   text-decoration: none;
   color: #678ca3;
   -webkit-border-top-left-radius: 0;
@@ -634,7 +634,7 @@
 .v1 .controls div.search form {
   padding: 0;
 }
-/*************** @Forms ***************/
+/* Forms */
 .block-level {
   display: block;
   width: 100%;
@@ -772,7 +772,7 @@
 .v1 .controls form.search fieldset input:focus {
   border-color: #678ca3;
 }
-/*************** @Dashboard ***************/
+/* Dashboard */
 #dashboard .featured {
   padding: 0;
   margin-bottom: 4em;
@@ -802,7 +802,7 @@
   margin-bottom: 0;
   border-bottom: 1px solid #dce2e5;
 }
-/*************** @Profile ***************/
+/* Profile */
 #profile.v1 h2, #dashboard.v1 h2 {
   line-height: 1.75em;
 }
@@ -832,7 +832,7 @@
 .v1 .view .grid_4 ul {
   padding: 0;
 }
-/*************** @Overrides ***************/
+/* Overrides */
 .v1 .sort_button {
   float: none;
   padding: 0;

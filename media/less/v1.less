@@ -76,7 +76,7 @@
 @dark: #486f87;
 @darker: #3e6782;
 
-/*************** @General Styles ***************/
+/* General styles */
 
 .box-right {
     position: absolute;
@@ -86,9 +86,10 @@
 }
 .v1 {
     color: #2f3c45;
-}
-.v1 em {
-    font-style: italic;
+
+    em {
+        font-style: italic;
+    }
 }
 .v1 .logo {
     margin: 1em 0 2em;
@@ -192,7 +193,7 @@
     color: @light;
 }
 
-/*************** @Tabs ***************/
+/* Tabs */
 
 .show-border {
     border-bottom-width: 2px;
@@ -228,7 +229,7 @@
     }
 }
 
-/*************** @Tools ***************/
+/* Tools */
 
 .v1 .view .tools {
     padding: 1em;
@@ -272,7 +273,7 @@
     }
 }
 
-/*************** @Listings ***************/
+/* Listings */
 
 .v1 .listing {
   padding: 0;
@@ -504,7 +505,7 @@
     }
 }
 
-/*************** @Controls ***************/
+/* Controls */
 
 .v1 .controls {
     width: 199px;
@@ -523,6 +524,7 @@
         }
 
         li {
+            margin-bottom: .5em;
             padding: 0;
         }
 
@@ -531,7 +533,6 @@
             display: block;
             padding: .75em 0 .75em 15px;
             margin-left: -15px;
-            margin-bottom: .5em;
             text-decoration: none;
             color: @normal;
             .multi-border-radius(0, 5px, 5px, 0);
@@ -596,7 +597,7 @@
     }
 }
 
-/*************** @Forms ***************/
+/* Forms */
 
 .block-level {
     display: block;
@@ -738,7 +739,7 @@
     }
 }
 
-/*************** @Dashboard ***************/
+/* Dashboard */
 
 #dashboard {
     
@@ -766,14 +767,13 @@
         }
     }
 }
-
 .v1 .only-child h2 {
     padding: .5em 0;
     margin-bottom: 0;
     border-bottom: 1px solid @fainter;
 }
 
-/*************** @Profile ***************/
+/* Profile */
 
 #profile.v1 h2, #dashboard.v1 h2 {
     line-height: 1.75em;
@@ -804,7 +804,7 @@
     }
 }
 
-/*************** @Overrides ***************/
+/* Overrides */
 
 .v1 .sort_button {
     float: none;

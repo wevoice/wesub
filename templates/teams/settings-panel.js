@@ -597,34 +597,36 @@ var TabViewer = Class.$extend({
         $(this.menuItems[0].buttonEl).trigger("click");
     },
     onClick: function(e){
-        e.preventDefault();
-        clearFeedbackMessage();
-        var scope = this;
-        if (this.currentItem){
-            this.currentItem.showPanel(false);
-            this.currentItem.markActive(false);
-            if (this.currentKlass){
-                if (_.isFunction(this.currentKlass.hide)){
-                    this.currentKlass.hide();
-                }else{
-                    this.currentKlass.el.hide();
-                }
-            }
-        }
-        _.each(this.menuItems, function(x){
-            if (x.buttonEl == e.target){
-                x.markActive(true);
-                this.currentKlass = x.showPanel(true);
+        if ($(e.target).get(0).tagName != 'UL') {
+            e.preventDefault();
+            clearFeedbackMessage();
+            var scope = this;
+            if (this.currentItem){
+                this.currentItem.showPanel(false);
+                this.currentItem.markActive(false);
                 if (this.currentKlass){
-                    this.panelContainer.append(this.currentKlass.el);
+                    if (_.isFunction(this.currentKlass.hide)){
+                        this.currentKlass.hide();
+                    }else{
+                        this.currentKlass.el.hide();
+                    }
                 }
-                
-                scope.currentItem = x;
             }
+            _.each(this.menuItems, function(x){
+                if (x.buttonEl == e.target){
+                    x.markActive(true);
+                    this.currentKlass = x.showPanel(true);
+                    if (this.currentKlass){
+                        this.panelContainer.append(this.currentKlass.el);
+                    }
+                    
+                    scope.currentItem = x;
+                }
 
-            return;
-        }, this);
-        
+                return;
+            }, this);
+        }
+        return false;
     }
 });
 var ConfirmationDialog = Class.$extend({
