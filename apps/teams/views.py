@@ -135,9 +135,11 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
     else:
         project = None
 
+    query = request.GET.get('q')
+
     qs_list, mqs = team.get_videos_for_languages_haystack(
             languages, user=request.user, project=project,
-            require_language=require_language)
+            require_language=require_language, query=query)
 
     extra_context = widget.add_onsite_js_files({})
     extra_context.update({
