@@ -25,7 +25,9 @@ from videos.models import SubtitleLanguage
 
 from django.shortcuts import get_object_or_404
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator
 from django.utils.translation import ugettext as _
 from django.forms.models import model_to_dict
 from utils.rpc import Error, Msg, RpcRouter
@@ -37,6 +39,8 @@ from teams.forms import TaskAssignForm, TaskDeleteForm, GuidelinesMessagesForm, 
 from teams.project_forms import ProjectForm
 from teams.permissions import get_narrowing_dict, roles_user_can_assign, can_assign_role
 
+
+TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 15)
 
 class TeamsApiClass(object):
 
@@ -324,8 +328,17 @@ class TeamsApiV2Class(object):
         real_tasks = [t.to_dict(user) for t in real_tasks]
         ghost_tasks = _ghost_tasks(team, tasks, filters, member)
 
+        tasks = real_tasks + ghost_tasks
+        p = Paginator(tasks, TASKS_ON_PAGE)
+
+        pagination_info = {'num_pages': p.num_pages}
+
+        page_number = filters.get('page', 1)
+        page_of_tasks = p.page(page_number)
+
         return { 'counts': self._task_category_counts(team),
-                 'tasks': real_tasks + ghost_tasks, }
+                 'tasks': page_of_tasks.object_list,
+                 'pagination': pagination_info, }
 
 
     def task_assign(self, task_id, assignee_id, user):
