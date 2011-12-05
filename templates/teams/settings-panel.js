@@ -15,6 +15,10 @@ function displayFeedbackMessage(msg, type){
     var el= ich.feedbackMessage({msg:msg, type:type});
     $(".content.wrapper").prepend(el);
     $(el).hide().fadeIn("slow");
+    $('a#closeBut', el).click(function() {
+        $(el).remove();
+        return false;
+    });
 }
 window.displayFeedbackMessage = displayFeedbackMessage;
 // Projects -------------------------------------------------------------------
