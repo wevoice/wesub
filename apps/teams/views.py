@@ -208,60 +208,6 @@ def completed_videos(request, slug):
                        extra_context=extra_context, 
                        template_object_name='team_video')    
 
-def detail_members(request, slug, role=None):
-    q = request.REQUEST.get('q')
-    lang = request.GET.get('lang')
-
-    team = Team.get(slug, request.user)
-    qs = team.members.all()
-
-    if q:
-        qs = qs.filter(Q(user__first_name__icontains=q)|Q(user__last_name__icontains=q)
-                       |Q(user__username__icontains=q)|Q(user__biography__icontains=q))
-
-    if lang:
-        qs = qs.filter(user__userlanguage__language=lang)
-
-    if role:
-        if role == 'admin':
-            qs = qs.filter(role__in=[TeamMember.ROLE_OWNER, TeamMember.ROLE_ADMIN])
-        else:
-            qs = qs.filter(role=role)
-
-    extra_context = widget.add_onsite_js_files({})
-
-    # if we are a member that can also edit roles, we create a dict of
-    # roles that we can assign, this will vary from user to user, since
-    # let's say an admin can change roles, but not for anyone above him
-    # the owner, for example
-    assignable_roles = []
-    if roles_user_can_assign(team, request.user):
-        for member in qs:
-            if can_assign_role(team, request.user, member.role, member.user):
-                assignable_roles.append(member)
-
-    users = team.members.values_list('user', flat=True)
-    user_langs = set(UserLanguage.objects.filter(user__in=users).values_list('language', flat=True))
-
-    extra_context.update({
-        'team': team,
-        'query': q,
-        'role': role,
-        'assignable_roles': assignable_roles,
-        'languages': sorted(languages_with_names(user_langs).items(), key=lambda pair: pair[1]),
-    })
-
-    if team.video:
-        extra_context['widget_params'] = base_widget_params(request, {
-            'video_url': team.video.get_video_url(), 
-            'base_state': {}
-        })
-    return object_list(request, queryset=qs, 
-                       paginate_by=MEMBERS_ON_PAGE, 
-                       template_name='teams/detail_members.html', 
-                       extra_context=extra_context, 
-                       template_object_name='team_member')
-
 def videos_actions(request, slug):
     team = Team.get(slug, request.user)  
     videos_ids = team.teamvideo_set.values_list('video__id', flat=True)
@@ -509,6 +455,60 @@ def remove_video(request, team_video_pk):
 
 
 # Members
+def detail_members(request, slug, role=None):
+    q = request.REQUEST.get('q')
+    lang = request.GET.get('lang')
+
+    team = Team.get(slug, request.user)
+    qs = team.members.all()
+
+    if q:
+        qs = qs.filter(Q(user__first_name__icontains=q)|Q(user__last_name__icontains=q)
+                       |Q(user__username__icontains=q)|Q(user__biography__icontains=q))
+
+    if lang:
+        qs = qs.filter(user__userlanguage__language=lang)
+
+    if role:
+        if role == 'admin':
+            qs = qs.filter(role__in=[TeamMember.ROLE_OWNER, TeamMember.ROLE_ADMIN])
+        else:
+            qs = qs.filter(role=role)
+
+    extra_context = widget.add_onsite_js_files({})
+
+    # if we are a member that can also edit roles, we create a dict of
+    # roles that we can assign, this will vary from user to user, since
+    # let's say an admin can change roles, but not for anyone above him
+    # the owner, for example
+    assignable_roles = []
+    if roles_user_can_assign(team, request.user):
+        for member in qs:
+            if can_assign_role(team, request.user, member.role, member.user):
+                assignable_roles.append(member)
+
+    users = team.members.values_list('user', flat=True)
+    user_langs = set(UserLanguage.objects.filter(user__in=users).values_list('language', flat=True))
+
+    extra_context.update({
+        'team': team,
+        'query': q,
+        'role': role,
+        'assignable_roles': assignable_roles,
+        'languages': sorted(languages_with_names(user_langs).items(), key=lambda pair: pair[1]),
+    })
+
+    if team.video:
+        extra_context['widget_params'] = base_widget_params(request, {
+            'video_url': team.video.get_video_url(),
+            'base_state': {}
+        })
+    return object_list(request, queryset=qs,
+                       paginate_by=MEMBERS_ON_PAGE,
+                       template_name='teams/detail_members.html',
+                       extra_context=extra_context,
+                       template_object_name='team_member')
+
 @render_to_json
 @login_required
 def remove_member(request, slug, user_pk):
