@@ -72,10 +72,9 @@ var ProjectEditPanel = Class.$extend({
             values.name,
             values.slug,
             values.description,
-            values.order ,
+            values.order,
             wf,
-            this.onChangeProjectReturned
-        )
+            this.onChangeProjectReturned);
         return false;
     },
     onChangeProjectReturned: function(data){
@@ -108,7 +107,7 @@ var ProjectEditPanel = Class.$extend({
             "Yes, delete it!", 
             function (e){
                 if (e) {
-                    e.preventDefault()
+                    e.preventDefault();
                 }
                 that.onDeletionConfimed();
                 return false;
@@ -116,11 +115,11 @@ var ProjectEditPanel = Class.$extend({
             "Nope, leave it alone",
             function(e){
                 if (e) {
-                    e.preventDefault()
+                    e.preventDefault();
                 }
                 that.onDeletionCanceled();
                 return false;
-            })
+            });
         this.confirmationDialog.show();
         this.el.append(this.confirmationDialog.el);
         $("form", this.el).hide();
@@ -143,7 +142,7 @@ var ProjectEditPanel = Class.$extend({
                     $("form", that.el).hide();
                     that.el.trigger(ON_PROJECT_DELETED, [that.model]);
                     if (that.confirmationDialog){
-                        that.confirmationDialog.hide()
+                        that.confirmationDialog.hide();
                     }
                 }
             }
@@ -158,16 +157,14 @@ var ProjectListItem = Class.$extend({
         this.model = model;
         $("a.action-edit", this.el).click(function(e){
             e.preventDefault();
-            vel.trigger("onEditRequested", model)
+            vel.trigger("onEditRequested", model);
             return false;
-        })
-    },
-
-})
+        });
+    }
+});
 var ProjectSelectionButton = Class.$extend({
     __init__: function(pModel){
         this.model = pModel;
-
     }
 });
 var ProjectPanel = AsyncPanel.$extend({
@@ -209,9 +206,9 @@ var ProjectPanel = AsyncPanel.$extend({
         }
         $("li", this.projectListing).remove();
         _.each(this.projects, function(x){
-            var item = new ProjectListItem(x)
+            var item = new ProjectListItem(x);
             this.projectListing.append(item.el);
-            item.el.bind("onEditRequested", this.onEditRequested)
+            item.el.bind("onEditRequested", this.onEditRequested);
         }, this);
     },
     onEditRequested: function(e, model){
@@ -219,8 +216,8 @@ var ProjectPanel = AsyncPanel.$extend({
         this.projectEditPanel  = new ProjectEditPanel(model);
         this.el.eq(0).parent().append(this.projectEditPanel.el);
         this.projectEditPanel.show();
-        this.projectListing.hide()
-        this.projectEditPanel.el.bind(ON_PROJECT_SAVED, this.onProjectSaved)
+        this.projectListing.hide();
+        this.projectEditPanel.el.bind(ON_PROJECT_SAVED, this.onProjectSaved);
         this.projectEditPanel.el.bind(ON_PROJECT_CANCELED, this.onProjectCanceled);
         this.projectEditPanel.el.bind(ON_PROJECT_DELETED, this.onProjectDeleted);
         $(this.projectAddButton).hide();
@@ -229,7 +226,7 @@ var ProjectPanel = AsyncPanel.$extend({
     },
     onProjectListLoaded: function(data){
         _.each(data, function(x){
-            this.addProject(new ProjectModel(x))
+            this.addProject(new ProjectModel(x));
         }, this);
         this.renderProjectList();
     },
@@ -243,15 +240,14 @@ var ProjectPanel = AsyncPanel.$extend({
         this.projectEditPanel.el.unbind(ON_PROJECT_SAVED);
         this.projectEditPanel.el.unbind(ON_PROJECT_CANCELED);
         this.projectEditPanel.el.unbind(ON_PROJECT_DELETED);
-        this.projectListing.show()
+        this.projectListing.show();
         $(this.projectAddButton).show();
-        
     },
     onProjectCanceled: function(e){
         this._hideEditPanel();
     },
     onProjectSaved: function(e, p){
-        this._hideEditPanel()
+        this._hideEditPanel();
         this.addProject(p);
         this.renderProjectList();
     },
@@ -262,7 +258,7 @@ var ProjectPanel = AsyncPanel.$extend({
     },
     hide : function(){
         if (this.projectEditPanel){
-            this.projectEditPanel.hide()
+            this.projectEditPanel.hide();
         }
         this.el.each(function(i,o){
             $(o).remove();
@@ -494,7 +490,7 @@ var PermissionsPanel = AsyncPanel.$extend({
         // Load initial data
         this.workflow = null;
         this.team = null;
-        TeamsApiV2.team_get(TEAM_SLUG, this.onLoaded)
+        TeamsApiV2.team_get(TEAM_SLUG, this.onLoaded);
     },
     onWorkflowStatusChange: function(e) {
         if ($('#permissions_workflows_enabled', this.el).attr('checked')) {
@@ -634,7 +630,7 @@ var ConfirmationDialog = Class.$extend({
     __init__: function(title, body, okText, okCallback, cancelText, cancelCallback){
         this.title = title;
         this.body = body;
-        this.okText = okText || "Yeah";;
+        this.okText = okText || "Yeah";
         this.okCallback = okCallback ;
         this.cancelText = cancelText || "No";
         this.cancelCallback = cancelCallback;
@@ -685,7 +681,7 @@ function bootstrapTabs(){
         {label:"Basic Settings", panelSelector:".panel-basic", klass:BasicPanel},
         {label:"Guidelines and messages", panelSelector:".panel-guidelines", klass:GuidelinesPanel},
         {label:"Permissions and workflow", panelSelector:".panel-permissions", klass:PermissionsPanel},
-        {label:"Projects", panelSelector:".panel-projects", klass:ProjectPanel},
+        {label:"Projects", panelSelector:".panel-projects", klass:ProjectPanel}
     ];
     var viewer = new TabViewer(buttons, $(".sub-settings-panel"), $(CONTAINER_SELECTOR));
     viewer.openDefault();
