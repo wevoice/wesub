@@ -1,4 +1,4 @@
- ACTIVE_CLASS  = "current";
+ACTIVE_CLASS  = "current";
 
 var CONTAINER_SELECTOR = ".panel-holder";
 
@@ -6,10 +6,10 @@ var ON_PROJECT_SAVED = "onProjectSaved";
 var ON_PROJECT_CANCELED = "onProjectCanceled";
 var ON_PROJECT_DELETED = "onProjectDeleted";
 
+// Feedback -------------------------------------------------------------------
 function clearFeedbackMessage(){
     $("#messages").remove();
 }
-
 function displayFeedbackMessage(msg, type){
     clearFeedbackMessage();
     var el= ich.feedbackMessage({msg:msg, type:type});
@@ -21,6 +21,7 @@ function displayFeedbackMessage(msg, type){
     });
 }
 window.displayFeedbackMessage = displayFeedbackMessage;
+
 // Projects -------------------------------------------------------------------
 var ProjectModel = BaseModel.$extend({});
 var ProjectEditPanel = Class.$extend({
