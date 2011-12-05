@@ -24,7 +24,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.hashcompat import sha_constructor
 from videos.types import video_type_registrar
-from settings import ALL_LANGUAGES
 
 TIMEOUT = 60 * 60 * 24 * 5 # 5 days
 
@@ -75,7 +74,7 @@ def invalidate_cache(video_id):
             cache.delete(_subtitles_dict_key(video_id, l.pk))
     except Video.DoesNotExist:
         pass
-    for language in ALL_LANGUAGES:
+    for language in settings.ALL_LANGUAGES:
         cache.delete(_subtitle_language_pk_key(video_id, language[0]))
     cache.delete(_subtitle_language_pk_key(video_id, None))
     cache.delete(_subtitles_dict_key(video_id, None))
