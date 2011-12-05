@@ -207,6 +207,11 @@ var TasksPanel = AsyncPanel.$extend({
         this.removeTask = _.bind(this.removeTask, this);
         this.reloadTasks = _.bind(this.reloadTasks, this);
 
+        this.renderTasksList = _.bind(this.renderTasksList, this);
+        this.renderPagination = _.bind(this.renderPagination, this);
+
+        this.onPageClick = _.bind(this.onPageClick, this);
+
         // Render template
         this.el = ich.tasksPanel();
 
@@ -215,6 +220,7 @@ var TasksPanel = AsyncPanel.$extend({
 
         // Initialize data
         this.tasks = [];
+        this.page = 1;
         TeamsApiV2.tasks_list(TEAM_SLUG, {}, this.onTasksListLoaded);
 
         TeamsApiV2.tasks_languages_list(TEAM_SLUG, this.onTasksLanguagesListLoaded);
@@ -237,7 +243,29 @@ var TasksPanel = AsyncPanel.$extend({
             });
         }
     },
+    renderPagination: function(data) {
+        var i;
+        var pages = data['num_pages'];
 
+        $('.pagination').html('');
+
+        for (i = 1; i <= pages; i++) {
+            if (this.page === i) {
+                $('.pagination').append('<em>' + i + '</em>');
+            } else {
+                $('.pagination').append('<a href="#">' + i + '</a>');
+            }
+
+        }
+
+        $('.pagination a').click(this.onPageClick);
+    },
+
+    onPageClick: function(e) {
+        this.page = parseInt($(e.target).text());
+        this.reloadTasks();
+        return false;
+    },
     onTasksListLoaded: function(data) {
         this.tasks = _.map(data['tasks'], function(t) {
             return new TaskListItem(new TaskModel(t), this);
@@ -248,6 +276,7 @@ var TasksPanel = AsyncPanel.$extend({
         });
 
         this.renderTasksList();
+        this.renderPagination(data['pagination']);
     },
     onTasksLanguagesListLoaded: function(data) {
         this.languagesList = new TasksLanguagesList(data, this);
@@ -257,7 +286,8 @@ var TasksPanel = AsyncPanel.$extend({
 
     getFilters: function() {
         return { language: this.languagesList.getValue(),
-                 type: this.typesList.getValue() };
+                 type: this.typesList.getValue(),
+                 page: this.page };
     },
 
     removeTask: function(task) {
