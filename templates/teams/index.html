@@ -109,7 +109,7 @@
                         </li>
                     </ul>
 
-                {% comment %}
+                    {% comment %}
                         <div class="buttons-container">
                             {% if user.is_staff and perms.teams.change_team %}
                                 {% if team.highlight %}
@@ -128,7 +128,9 @@
                                     {% render_team_join team "small" %}
                                 {% endif %}
                             {% endif %}  
-                        </div>{% endcomment %}       
+                        </div>
+                    {% endcomment %}       
+
                 </li>
                 {% endfor %}
             </ul>
