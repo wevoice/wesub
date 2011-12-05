@@ -46,13 +46,11 @@ div#nyroModalWrapper h3 {
     padding: 15px;
 }
 a#closeBut {
-    /*background: url("../images/sprite.png") 0 -256px no-repeat !important;*/
     display: block;
     height: 28px;
     outline: 0;
     position: absolute;
     right: -27px;
-    /*text-indent: -9999em;*/
     top: 8px;
     width: 27px;
 }
