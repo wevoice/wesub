@@ -241,9 +241,13 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ =
         }
         var serverModel = new unisubs.subtitle.MSServerModel(
             sessionPK, this.videoID_, this.videoURL_, captionSet);
-        if (subtitles.IS_ORIGINAL || subtitles.FORKED)
+        if (unisubs.mode == 'review') {
+            this.openSubtitleReviewingDialog(serverModel, subtitles);
+        } else if (unisubs.mode == 'approve') {
+            this.openSubtitleApproveDialog(serverModel, subtitles);
+        } else if (subtitles.IS_ORIGINAL || subtitles.FORKED) {
             this.openSubtitlingDialog(serverModel, subtitles);
-        else {
+        } else {
             this.openDependentTranslationDialog_(
                 serverModel, subtitles, originalSubtitles);
         }
@@ -256,6 +260,26 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ =
         if (goog.isDefAndNotNull(unisubs.returnURL))
             window.location.replace(unisubs.returnURL);
     }
+};
+
+unisubs.widget.SubtitleDialogOpener.prototype.openSubtitleReviewingDialog = 
+    function(serverModel, subtitleState) 
+{
+    this.subOpenFn_ && this.subOpenFn_();
+    var subReviewDialog = new unisubs.reviewsubtitles.Dialog(this.videoSource_, serverModel, subtitleState);
+
+    subReviewDialog.setParentEventTarget(this);
+    subReviewDialog.setVisible(true);
+};
+
+unisubs.widget.SubtitleDialogOpener.prototype.openSubtitleApproveDialog = 
+    function(serverModel, subtitleState) 
+{
+    this.subOpenFn_ && this.subOpenFn_();
+    var subApproveDialog = new unisubs.approvesubtitles.Dialog(this.videoSource_, serverModel, subtitleState);
+
+    subApproveDialog.setParentEventTarget(this);
+    subApproveDialog.setVisible(true);
 };
 
 unisubs.widget.SubtitleDialogOpener.prototype.openSubtitlingDialog = 

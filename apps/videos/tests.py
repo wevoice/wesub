@@ -756,7 +756,8 @@ class ViewsTest(WebUseTest):
     def test_video(self):
         self.video.title = 'title'
         self.video.save()
-        response = self.client.get(self.video.get_absolute_url('en'))
+        url = self.video.get_absolute_url('en')
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         self.video.title = ''

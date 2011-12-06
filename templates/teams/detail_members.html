@@ -1,61 +1,163 @@
-{% extends "base.html" %}
+{% extends "teams/base.html" %}
 
-{% load i18n teams_tags paginator widget media_compressor %}
+{% load i18n teams_tags paginator widget media_compressor verbatim_templatetag %}
 
 {% block title %}
     {{ team }} | Universal Subtitles
 {% endblock %}
 
-{% block body_attrs %}id="teams"{% endblock %}
+{% block body_attrs %}id="teams" class="v1"{% endblock %}
 
 {% block css %}
     {{ block.super }}
      {% include_bundle "widget-css"%}
+     {% include_bundle "css-teams-settings-panel"%}
 {% endblock %}
 
 {% block scripts %}
+    {% include "utils/chosenify.html" %}
     {{ block.super }}
+    {% if assignable_roles %}
+        {% include_bundle "js-teams-settings-panel" %}
+    {% endif %}
     {% include_bundle "unisubs-onsite-compiled" %}
-    <script src="{% url teams:rpc_api %}" type="text/javascript"></script>     
+    <script src="{% url teams:rpc_api %}" type="text/javascript"></script>  
+    <script type="text/javascript">
+        $(function() {
+            $select = $("select#lang-filter", ".controls");
+            $select.change(function(e) {
+                var lang = $select.val();
+                if (lang !== '') {
+                    window.location = document.URL.split("?")[0] + '?lang=' + lang;
+                } else {
+                    window.location = document.URL.split("?")[0];
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
-{% block main_content %}
-<div class="grid_8 alpha">
-    <h2>
-        <a href="{{ team.get_absolute_url }}">{{ team }}</a> 
-        {% trans "Members" %}
-    </h2>
-    
+{% block view_content %}
+
+    {% with "members" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
+
     {% if team.video %}
         {% widget widget_params %}
     {% endif %}    
-    
-    <div id="members-tab">
-        {% if is_paginated %}{% paginator %}{% endif %}
-        <ul class="big_list">
+
+    <div class="view grid_9 alpha">
+
+        {% if team|can_invite_to_team:user %}
+            <div class="tools">
+                <a href="{% url teams:invite_members slug=team.slug %}" class="button">Invite Members</a>
+            </div>
+        {% endif %}
+        <ul class="members listing">
             {% for member in team_member_list %}
-            <li>
-                <span class="user_thumb">
-                    <img src="{{ member.user.avatar }}" />
-                </span>
-                <div class="info">
-                    <h4><a href="{{ member.user.get_absolute_url }}">{{ member.user }}</a></h4>
-                    {% if member.user.biography %}
-                    <p>
-                        {{ member.user.biography|truncatewords:25|linebreaksbr }}
-                    </p>
-                    {% endif %}
-                </div>
-            </li>
+                {% with member.pk as mpk%}
+                    <li>
+                        <h3>
+                            <a href="{{ member.user.get_absolute_url }}">
+                                {{ member.user }}
+                                {% if member.user == user %}(You){% endif %}
+                            </a>
+                            {% for lang in member.user.get_languages %}
+                                <span class="descriptor">{{ lang.get_language_display }}</span>
+                            {% endfor %}
+                        </h3>
+                        <p>
+                            {{ member.role|capfirst }}
+
+                            {% member_projects member as member_project %}
+                            {% if member_project %}
+                                (
+                                {% for project in member_project %}
+                                    {{project.name}}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                                )
+                            {% endif %}
+                        </p>
+                        <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>
+                        <ul class="actions">
+                            <li>
+                                <a href="">Send a message</a>
+                            </li>
+                        </ul>
+                        <ul class="admin-controls">
+                            {% if member in assignable_roles%}
+                                <li>
+                                    <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" >Edit</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                {% endwith %}
+            {% empty %}
+                <li class="empty">
+                    {% trans 'Sorry, no members found.' %}
+                </li>
             {% endfor %}
         </ul>
         {% if is_paginated %}{% paginator %}{% endif %}
     </div>
-</div>
 
-<div class="grid_4 omega">
-    {% include "teams/_team_detail.html" %}
-    {% team_activity team %}
-</div>
+    <div class="controls grid_3 omega">
+        {% include "teams/_filters_members.html" %}
+        {% include "teams/_search.html" %}
+        <div class="refine">
+            <h4>Refine</h4>
+            <select name="lang-filter" id="lang-filter">
+                <option value="">All languages</option>
+                {% for code, name in languages %}
+                    <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% include "teams/_actions.html" %}
+    </div>
 
+{% if assignable_roles %}
+    
+<script id="editRoleDialog" type="text/html">
+  {% verbatim %}
+  <div>
+    <a class="close">X</a>
+    <label>Role:</label>
+    <select class="roles">
+      {{#roles}}
+      <option val="{{val}}">{{name}}</option>
+      {{/roles}}
+      </select>
+    <div class="clearfix"></div>
+    <label>Project Restriction:</label>
+      <select data-placeholder="Choose-selected..." style="width:350px;" 
+              multiple class="chzn-select projects">
+      {{#projects}}
+          <option {{#selected}}selected="selected"{{/selected}} value="{{pk}}">{{name}}</option>
+      {{/projects}}
+      </select>
+    
+    <div class="clearfix"></div>
+    <label>Language Restriction:</label>
+      <select data-placeholder="Choose-selected..." style="width:350px;" 
+              multiple class="chzn-select langs">
+      {{#languages}}
+          <option {{#selected}}selected="selected"{{/selected}} value="{{code}}">{{name}}</option>
+      {{/languages}}
+      </select>
+    
+    <div class="clearfix">
+      <a class="button small action-close" > Cancel</a>
+      <a class="button small action-save" > Save</a>
+    </div>
+    </div>
+{% endverbatim %}
+</script>
+<script type="text/javascript" >
+  {% include "teams/assign-roles.js" %}
+</script>    
+
+{% endif %}
 {% endblock %}

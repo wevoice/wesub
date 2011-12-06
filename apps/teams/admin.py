@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,14 +16,8 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
 from django.contrib import admin
-from teams.models import Team, TeamMember, TeamVideo
+from teams.models import Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing
 from videos.models import SubtitleLanguage
 from django.utils.translation import ugettext_lazy as _
 from messages.forms import TeamAdminPageMessageForm
@@ -110,6 +104,42 @@ class TeamVideoAdmin(admin.ModelAdmin):
     team_link.short_description = _('Team')
     team_link.allow_tags = True
 
+class WorkflowAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'team', 'project', 'team_video', 'created')
+    list_filter = ('created', 'modified')
+    search_fields = ('team__name', 'project__name', 'team_video__title',
+                     'team_video__video__title')
+    raw_id_fields = ('team', 'team_video', 'project')
+    ordering = ('-created',)
+
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'type', 'team', 'team_video', 'language',
+                    'assignee', 'completed', 'deleted')
+    list_filter = ('type', 'deleted', 'created', 'modified', 'completed')
+    search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
+                     'assignee__last_name', 'team_video__title',
+                     'team_video__video__title')
+    raw_id_fields = ('team_video', 'team', 'assignee')
+    ordering = ('-created',)
+
+class MembershipNarrowingAdmin(admin.ModelAdmin):
+    list_display = ('member', 'content_type', 'content')
+    list_filter = ('created', 'modified')
+    raw_id_fields = ('member',)
+    ordering = ('-created',)
+
+class SettingAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'team', 'key', 'created', 'modified')
+    list_filter = ('key', 'created', 'modified')
+    search_fields = ('team__name',)
+    raw_id_fields = ('team',)
+    ordering = ('-created',)
+
+
 admin.site.register(TeamMember, TeamMemberAdmin)
 admin.site.register(Team, TeamAdmin)
 admin.site.register(TeamVideo, TeamVideoAdmin)
+admin.site.register(Workflow, WorkflowAdmin)
+admin.site.register(Task, TaskAdmin)
+admin.site.register(MembershipNarrowing, MembershipNarrowingAdmin)
+admin.site.register(Setting, SettingAdmin)

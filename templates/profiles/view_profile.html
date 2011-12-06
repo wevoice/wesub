@@ -25,56 +25,106 @@
 {% endblock %}
 
 {% block main_content %}
+
+    <h2>
+        <img src="{{ user_info.small_avatar }}" alt="{{ user_info|title }}'s avatar"/>
+        {{ user_info|title }}
+    </h2>
+
+    {% with 'profile' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+
     {% if user_info.is_active %}
-        <div class="grid_9 alpha">
-            <div class="pod">
-                <div class="hd">
-                    <h2>
-                        {{ user_info|title }}'s Activity
-                    </h2>
+        <div class="view grid_9 alpha">
+
+            {% if user.is_authenticated %}
+                <div class="tools">
                     {% if can_edit %}
-                        <a href="{% url profiles:edit %}" class="heading_button">Edit profile</a>
+                        <a class="button" href="{% url profiles:edit %}">Edit profile</a>
+                    {% endif %}
+                    {% if not user == user_info %}
+                        <a class="button" href="">Send Message</a>
                     {% endif %}
                 </div>
-                {% if user_info.action_set.exists %}
-                    {% recent_activity user_info %}
+            {% endif %}
+
+            <div class="grid_4 alpha">
+            
+                <h3>{% trans "Username" %}</h3>
+                <p>{{ user_info.username }}</p>
+
+                <h3>{% trans 'Member since' %}</h3>
+                <p>
+                    {{ user_info.date_joined|date:"DATETIME_FORMAT" }}
+                </p>
+                
+                {% if user_info.homepage %}
+                    <h3>{% trans 'Homepage' %}</h3>
+                    <p>
+                        <a href="{{ user_info.homepage }}">{{ user_info.homepage }}</a>
+                    </p>
                 {% endif %}
+
+                <h3>{% trans "About" %}</h3>
+                <p class="user_bio">
+                    {{ user_info.biography|urlize|default:_('<i>User has not submitted a bio.</i>')|linebreaksbr }}
+                </p>
             </div>
+
+            <div class="grid_4">
+
+                <div class="avatar">
+                    <img src="{{ user_info.avatar }}" alt="{{ user_info|title }}'s avatar"/>
+                </div>
+
+                {% with user_info.get_languages as langs %}
+                    {% if langs %}
+                        <h3>{% trans "Languages" %}</h3>
+                        <ul>
+                            {% for l in langs %}
+                            <li>
+                                {{ l.get_language_display }}
+                                {% if l.language == user_info.preferred_language %}
+                                    (Preferred)
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+                
+                {% with user_info.teams.all as user_teams %}
+                    {% if user_teams %}
+                        <h3>{% trans "Memberships" %}</h3>
+                        <ul>
+                            {% for t in user_teams %}
+                            <li>
+                                <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            {% comment %}
+                {% if user_info.action_set.exists %}
+                            {% recent_activity user_info %}
+                        {% endif %} 
+            {% endcomment %}
         </div>
         
-        <div class="grid_3 omega meta">
-            <img src="{{ user_info.avatar }}">
-            <h4>{% trans 'Member since' %}</h4>
-            <p>
-                {{ user_info.date_joined|date:"DATETIME_FORMAT" }}
-            </p>
-            {% if user_info.preferred_language %}
-                <h4>{% trans 'Preferred Language' %}</h4>
-                <p>
-                    {{ user_info.language }}
-                </p>
-            {% endif %}
-            {% if user_info.homepage %}
-                <h4>{% trans 'Homepage' %}</h4>
-                <p>
-                    <a href="{{ user_info.homepage }}">{{ user_info.homepage }}</a>
-                </p>
-            {% endif %}
-            <h4>{% trans "About" %}</h4>
-            <p class="user_bio">
-                {{ user_info.biography|urlize|default:_('<i>User has not submitted a bio.</i>')|linebreaksbr }}
-            </p>
-            {% if user.is_authenticated and not user == user_info %}
-                {% send_message_form user_info %}
-            {% endif %}
+        <div class="controls grid_3 omega">
+            {% with 'profile' as current %}
+                {% include 'profiles/_filters.html' %}
+            {% endwith %}
         </div>
         
         {{ block.super }}
     {% else %}
         <div class="grid_9">
-            <div class="pod">
-                <p>{% trans 'User deleted his profile' %}</p>
-            </div>
+            <p class="empty">{% trans 'User deleted his profile' %}</p>
         </div>         
     {% endif %}
 {% endblock %}

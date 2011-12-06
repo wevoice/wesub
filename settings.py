@@ -124,8 +124,9 @@ ALL_LANGUAGES['tl'] = gettext_noop(u'Tagalog')
 ALL_LANGUAGES['uz'] = gettext_noop(u'Uzbek')
 ALL_LANGUAGES['kk'] = gettext_noop(u'Kazakh')
 ALL_LANGUAGES['ka'] = gettext_noop(u'Georgian')
+
 ALL_LANGUAGES['ilo'] = gettext_noop(u'Ilocano')
-ALL_LANGUAGES['ceb'] = gettext_noop(u'Cebuano')
+ALL_LANGUAGES['ceb'] = gettext_noop(u'Cebuan')
 
 del ALL_LANGUAGES['no']
 ALL_LANGUAGES = tuple(i for i in ALL_LANGUAGES.items())
@@ -236,6 +237,7 @@ JS_CORE = \
      "js/widget/subtitle/editablecaptionset.js",
      'js/widget/logindialog.js',
      'js/widget/howtovideopanel.js',
+     'js/widget/guidelinespanel.js',
      'js/widget/dialog.js',
      'js/widget/captionmanager.js',
      'js/widget/rightpanel.js',
@@ -264,6 +266,12 @@ JS_DIALOG = \
      'js/finishfaildialog/errorpanel.js',
      'js/finishfaildialog/reattemptuploadpanel.js',
      'js/finishfaildialog/copydialog.js',
+     'js/widget/reviewsubtitles/dialog.js',
+     'js/widget/reviewsubtitles/reviewsubtitlespanel.js',
+     'js/widget/reviewsubtitles/reviewsubtitlesrightpanel.js',
+     'js/widget/approvesubtitles/dialog.js',
+     'js/widget/approvesubtitles/approvesubtitlespanel.js',
+     'js/widget/approvesubtitles/approvesubtitlesrightpanel.js',
      'js/widget/subtitle/dialog.js',
      'js/widget/subtitle/msservermodel.js',
      'js/widget/subtitle/subtitlewidget.js',
@@ -437,6 +445,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'context_processors.current_commit',
     'context_processors.custom',
     'context_processors.user_languages',
+    'context_processors.run_locally',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.i18n',
     'utils.context_processors.media',
@@ -482,6 +491,7 @@ INSTALLED_APPS = (
     'subrequests',
     'doorman',
     'icanhaz',
+    'tastypie',
     'unisubs' #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
 )
 
@@ -512,6 +522,7 @@ import re
 LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/widget'),
     re.compile('^/api'),
+    re.compile('^/api2'),
     re.compile('^/jstest'),
     re.compile('^/sitemap.*.xml'),
     #re.compile('^/crossdomain.xml'),
@@ -627,7 +638,8 @@ MEDIA_BUNDLES = {
             "css/html.css", 
             "css/about_faq.css", 
             "css/breadcrumb.css", 
-            "css/buttons.css", 
+            "css/buttons.css",
+            "css/chosen.css",
             "css/classes.css", 
             "css/comments.css", 
             "css/forms.css",
@@ -647,6 +659,7 @@ MEDIA_BUNDLES = {
             "css/services.css", 
             "css/solutions.css",
             "css/watch.css",
+            "css/v1.css",
           ),
         },
     "video_history":{
@@ -770,9 +783,8 @@ MEDIA_BUNDLES = {
               "js/jquery.rpc.js",
               "js/jquery.input_replacement.min.js",
               "js/messages.js",
-
+              "js/libs/chosen.jquery.min.js",
             ],
-        "optimizations": "SIMPLE_OPTIMIZATIONS",
         "closure_deps": "",
         "include_flash_deps": False,
         },
@@ -800,6 +812,37 @@ MEDIA_BUNDLES = {
         "optimizations": "WHITESPACE_ONLY",
         "closure_deps": "js/closure-dependencies.js",
         "files": JS_MODERATION_DASHBOARD,
+    },
+    "css-teams-settings-panel":{
+        "type":"css",
+        "files":(
+            "css/chosen.css",
+            "css/unisubs-widget.css",
+         ),
+    },
+    "js-teams-settings-panel":{
+        "type":"js",
+        "optimizations": "WHITESPACE_ONLY",
+        "closure_deps": "",
+        "files": (
+            "js/libs/ICanHaz.js",
+            "js/libs/classy.js",
+            "js/libs/underscore.js",
+            "js/libs/chosen.jquery.min.js",
+            "js/jquery.mod.js",
+         )
+    },
+    "js-teams-tasks-panel":{
+        "type":"js",
+        "optimizations": "WHITESPACE_ONLY",
+        "closure_deps": "",
+        "files": (
+            "js/libs/ICanHaz.js",
+            "js/libs/classy.js",
+            "js/libs/underscore.js",
+            "js/libs/chosen.jquery.min.js",
+            "js/jquery.mod.js",
+         )
     },
     "debug-embed-js": {
         "type": "js",

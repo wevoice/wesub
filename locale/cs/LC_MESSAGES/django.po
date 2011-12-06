@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-27 01:31-0600\n"
-"PO-Revision-Date: 2011-11-27 07:42+0000\n"
+"POT-Creation-Date: 2011-12-04 01:32-0600\n"
+"PO-Revision-Date: 2011-12-04 07:45+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Czech (http://www.transifex.net/projects/p/universalsubtitles/team/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -354,16 +354,16 @@ msgstr ""
 msgid "Georgian"
 msgstr ""
 
-#: settings.py:127
+#: settings.py:128
 msgid "Ilocano"
 msgstr ""
 
-#: settings.py:128
-msgid "Cebuano"
+#: settings.py:129
+msgid "Cebuan"
 msgstr ""
 
-#: apps/auth/admin.py:13 templates/statistic/users_statistic.html:12
-#: templates/teams/edit_members.html:93 templates/teams/edit_members.html:141
+#: apps/auth/admin.py:13 templates/profiles/view_profile.html:54
+#: templates/statistic/users_statistic.html:12
 msgid "Username"
 msgstr "Uživatelské jméno"
 
@@ -395,58 +395,58 @@ msgstr "Email"
 msgid "Hide"
 msgstr "Skrýt"
 
-#: apps/auth/models.py:87
+#: apps/auth/models.py:84
 msgid "Retired user"
 msgstr ""
 
-#: apps/auth/models.py:271
+#: apps/auth/models.py:292
 msgid "Add comment"
 msgstr "Přidat komentář"
 
-#: apps/auth/models.py:272
+#: apps/auth/models.py:293
 msgid "Start subtitles"
 msgstr "Začít titulky"
 
-#: apps/auth/models.py:273
+#: apps/auth/models.py:294
 msgid "Start translation"
 msgstr "Začít překlad"
 
-#: apps/auth/models.py:274
+#: apps/auth/models.py:295
 msgid "Edit subtitles"
 msgstr "Upravit titulky"
 
-#: apps/auth/models.py:275
+#: apps/auth/models.py:296
 msgid "Edit translation"
 msgstr "Upravit překlad"
 
-#: apps/auth/models.py:332
+#: apps/auth/models.py:353
 msgid "understand enough"
 msgstr "rozumím dost"
 
-#: apps/auth/models.py:333
+#: apps/auth/models.py:354
 msgid "understand 99%"
 msgstr "rozumím 99 %"
 
-#: apps/auth/models.py:334
+#: apps/auth/models.py:355
 msgid "write like a native"
 msgstr "píšu jako rodilý"
 
-#: apps/auth/models.py:339
+#: apps/auth/models.py:360
 msgid "follow requests in language"
 msgstr ""
 
-#: apps/auth/models.py:354
+#: apps/auth/models.py:375
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr ""
 "Toto je datum, kdy zobrazit prohlášení. A pouze poslední bude zobrazeno."
 
-#: apps/auth/models.py:452
+#: apps/auth/models.py:473
 msgid "e-mail confirmation"
 msgstr ""
 
-#: apps/auth/models.py:453
+#: apps/auth/models.py:474
 msgid "e-mail confirmations"
 msgstr ""
 
@@ -490,23 +490,23 @@ msgstr ""
 msgid "This user cannot change those settings"
 msgstr ""
 
-#: apps/icanhaz/models.py:188
+#: apps/icanhaz/models.py:191
 msgid "Public"
 msgstr ""
 
-#: apps/icanhaz/models.py:189
+#: apps/icanhaz/models.py:192
 msgid "Only with secret url"
 msgstr ""
 
-#: apps/icanhaz/models.py:190
+#: apps/icanhaz/models.py:193
 msgid "Only authorized members"
 msgstr ""
 
-#: apps/icanhaz/models.py:205
+#: apps/icanhaz/models.py:208
 msgid "public"
 msgstr ""
 
-#: apps/icanhaz/models.py:206
+#: apps/icanhaz/models.py:209
 msgid "no embeding allowed"
 msgstr ""
 
@@ -522,19 +522,19 @@ msgstr ""
 msgid "Please correct the errors bellow!"
 msgstr ""
 
-#: apps/messages/forms.py:49 apps/messages/forms.py:108
+#: apps/messages/forms.py:51 apps/messages/forms.py:111
 msgid "You should be authenticated to write messages"
 msgstr "Musíte být přihlášení, abyste mohli psát zprávy"
 
-#: apps/messages/forms.py:60
+#: apps/messages/forms.py:62
 msgid "Only send to speakers of..."
 msgstr "Poslat pouze zástupcům"
 
-#: apps/messages/forms.py:102 apps/teams/rpc.py:67
+#: apps/messages/forms.py:105 apps/teams/rpc.py:78
 msgid "You are not manager of this team."
 msgstr "Nejste správcem tohoto týmu."
 
-#: apps/messages/forms.py:142
+#: apps/messages/forms.py:145
 msgid "This message is from site administrator."
 msgstr "Tato zpráva je od administrátora stránek."
 
@@ -547,7 +547,7 @@ msgid "You should enter subject or message."
 msgstr "Měli byste vložit předmět nebo zprávu."
 
 #: apps/messages/rpc.py:34 apps/messages/rpc.py:50 apps/messages/rpc.py:58
-#: apps/messages/rpc.py:68 apps/profiles/rpc.py:51 apps/teams/rpc.py:34
+#: apps/messages/rpc.py:68 apps/profiles/rpc.py:51 apps/teams/rpc.py:45
 #: apps/videos/rpc.py:43
 msgid "You should be authenticated."
 msgstr "Měli byste být přihlášeni."
@@ -625,7 +625,7 @@ msgstr "Zadaná hesla se neshodují."
 msgid "Your email was updated."
 msgstr "Váš email byl aktualizován."
 
-#: apps/profiles/views.py:60 apps/teams/views.py:332
+#: apps/profiles/views.py:60 apps/teams/views.py:349 apps/teams/views.py:373
 msgid ""
 "File server unavailable. Try later. You can edit some other information "
 "without any problem."
@@ -633,7 +633,7 @@ msgstr ""
 "Souborový server nedostupný. Zkuste později. Jiné informace můžete bez "
 "problémů upravovat."
 
-#: apps/profiles/views.py:115
+#: apps/profiles/views.py:125
 msgid "Your profile has been updated."
 msgstr "Váš profil byl aktualizován."
 
@@ -710,44 +710,53 @@ msgstr ""
 msgid "in miles"
 msgstr "v mílích"
 
-#: apps/teams/admin.py:58
+#: apps/teams/admin.py:52
 #, python-format
 msgid "%(count)s messages sent"
 msgstr "%(count)s zpráv odesláno"
 
-#: apps/teams/admin.py:60
+#: apps/teams/admin.py:54
 msgid "Fill all fields please."
 msgstr "Vyplňte prosím všechna pole."
 
-#: apps/teams/admin.py:61
+#: apps/teams/admin.py:55
 msgid "Send message"
 msgstr "Poslat zprávu"
 
-#: apps/teams/admin.py:65
+#: apps/teams/admin.py:59
 msgid "Feature teams"
 msgstr "Ocenit týmy"
 
-#: apps/teams/admin.py:69
+#: apps/teams/admin.py:63
 msgid "Unfeature teams"
 msgstr "Odocenit týmy"
 
-#: apps/teams/admin.py:78 apps/teams/admin.py:110 apps/teams/models.py:100
+#: apps/teams/admin.py:72 apps/teams/admin.py:104 apps/teams/models.py:144
 msgid "Team"
 msgstr "Tým"
 
-#: apps/teams/admin.py:84 templates/videos/history.html:351
+#: apps/teams/admin.py:78 templates/videos/history.html:351
 msgid "User"
 msgstr "Uživatel"
 
-#: apps/teams/forms.py:87
+#: apps/teams/forms.py:61 apps/teams/forms.py:193
+#: libs/rosetta/templates/rosetta/languages.html:12
+msgid "Project"
+msgstr "Projekt"
+
+#: apps/teams/forms.py:65 apps/teams/forms.py:197
+msgid "Let's keep things tidy, shall we?"
+msgstr ""
+
+#: apps/teams/forms.py:98
 msgid "Moderate subtitles"
 msgstr ""
 
-#: apps/teams/forms.py:167
+#: apps/teams/forms.py:178
 msgid "Video URL"
 msgstr "URL videa"
 
-#: apps/teams/forms.py:168
+#: apps/teams/forms.py:179
 msgid ""
 "Enter the URL of any compatible video or any video on our site. You can also"
 " browse the site and use the 'Add Video to Team' menu."
@@ -755,26 +764,26 @@ msgstr ""
 "Vložte URL jakéhokoli kompatibilního videa nebo videa na naší stránce. "
 "Můžete také procházet stránku a použít menu ‚Přidat video do týmu."
 
-#: apps/teams/forms.py:176
+#: apps/teams/forms.py:187
 msgid "Video language"
 msgstr "Jazyk videa"
 
-#: apps/teams/forms.py:178
+#: apps/teams/forms.py:189
 msgid "It will be saved only if video does not exist in our database."
 msgstr "Bude uloženo, pouze pokud video již není v naší databázi."
 
-#: apps/teams/forms.py:207
+#: apps/teams/forms.py:227
 msgid "Set original language for this video."
 msgstr ""
 
-#: apps/teams/forms.py:255
+#: apps/teams/forms.py:277
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
 "appear."
 msgstr ""
 
-#: apps/teams/forms.py:258
+#: apps/teams/forms.py:280
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
@@ -782,121 +791,180 @@ msgid ""
 "and make sure to check \"Save feed\" box."
 msgstr ""
 
-#: apps/teams/forms.py:277 apps/teams/forms.py:313
+#: apps/teams/forms.py:298 apps/teams/forms.py:334
 msgid "Team intro video URL"
 msgstr "URL videa představení týmu"
 
-#: apps/teams/forms.py:279 apps/teams/forms.py:315
+#: apps/teams/forms.py:300 apps/teams/forms.py:336
 msgid ""
-"You can put an optional video \n"
-"on your team homepage that explains what your team is about, to attract volunteers. \n"
+"You can put an optional video\n"
+"on your team homepage that explains what your team is about, to attract volunteers.\n"
 "Enter a link to any compatible video, or to any video page on our site."
 msgstr ""
-"Volitelně můžete na domovskou stránku \n"
-"svého týmu nahrát video, které bude představovat váš tým, a přilákat tak dobrovolníky. \n"
-"Vložte odkaz na kompatibilní video nebo na stránku videa na tomto webu."
 
-#: apps/teams/forms.py:284
+#: apps/teams/forms.py:305
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr "URL týmu: http://universalsubtitles.org/teams/"
 
-#: apps/teams/models.py:61 libs/rosetta/templates/rosetta/languages.html:28
-#: templates/teams/_application_form.html:30
-msgid "Application"
-msgstr "Žádost"
+#: apps/teams/forms.py:389
+msgid "This video has already been subtitled."
+msgstr ""
 
-#: apps/teams/models.py:62
-msgid "Invitation by manager"
-msgstr "Pozvánka od správce"
+#: apps/teams/forms.py:394
+msgid "Subtitling of this video is already in progress."
+msgstr ""
 
-#: apps/teams/models.py:63
-msgid "Invitation by any member"
-msgstr "Pozvánka od kteréhokoli člena"
+#: apps/teams/forms.py:400
+msgid "No one has subtitled this video yet, so it can't be translated."
+msgstr ""
 
-#: apps/teams/models.py:64
+#: apps/teams/forms.py:406
+msgid ""
+"Subtitles in that language have not been completed yet, so they can't be "
+"reviewed."
+msgstr ""
+
+#: apps/teams/forms.py:412
+msgid ""
+"Subtitles in that language have not been completed yet, so they can't be "
+"approved."
+msgstr ""
+
+#: apps/teams/forms.py:423
+msgid "These subtitles must be reviewed before being approved."
+msgstr ""
+
+#: apps/teams/forms.py:442
+msgid "There is already a task in progress for that video/language."
+msgstr ""
+
+#: apps/teams/forms.py:488
+msgid "You do not have permission to assign this task."
+msgstr ""
+
+#: apps/teams/forms.py:558
+#, python-format
+msgid "User \"%s\" does not exist!"
+msgstr ""
+
+#: apps/teams/forms.py:565
+#, python-format
+msgid "User \"%s\" is already a member of this team!"
+msgstr ""
+
+#: apps/teams/models.py:68
 msgid "Open"
 msgstr "Otevřít"
 
+#: apps/teams/models.py:69 libs/rosetta/templates/rosetta/languages.html:28
+msgid "Application"
+msgstr "Žádost"
+
 #: apps/teams/models.py:70
+msgid "Invitation by any team member"
+msgstr ""
+
+#: apps/teams/models.py:71
+msgid "Invitation by manager"
+msgstr "Pozvánka od správce"
+
+#: apps/teams/models.py:72
+msgid "Invitation by admin"
+msgstr ""
+
+#: apps/teams/models.py:78
 msgid "Members can add and remove video"
 msgstr "Členové mohou vkládat a odstraňovat video"
 
-#: apps/teams/models.py:71
+#: apps/teams/models.py:79
 msgid "Managers can add and remove video"
 msgstr "Správci mohou vkládat a odstraňovat video"
 
-#: apps/teams/models.py:72
+#: apps/teams/models.py:80
 msgid "Members can only add videos"
 msgstr "Členové mohou pouze vkládat videa"
 
-#: apps/teams/models.py:75
+#: apps/teams/models.py:100
 msgid "name"
 msgstr "jméno"
 
-#: apps/teams/models.py:76
+#: apps/teams/models.py:101
 msgid "slug"
 msgstr "slimák"
 
-#: apps/teams/models.py:77
+#: apps/teams/models.py:102
 msgid "description"
 msgstr "popis"
 
-#: apps/teams/models.py:77
+#: apps/teams/models.py:102
 msgid "All urls will be converted to links."
 msgstr "Všechny URL budou převedeny na odkazy."
 
-#: apps/teams/models.py:79
+#: apps/teams/models.py:104
 #: templates/messages/_send_to_team_message_form.html:24
 msgid "logo"
 msgstr "logo"
 
-#: apps/teams/models.py:80
-msgid "membership policy"
-msgstr "nastavení členství"
-
-#: apps/teams/models.py:81
-msgid "video policy"
-msgstr "nastavení videa"
-
-#: apps/teams/models.py:82
+#: apps/teams/models.py:105
 msgid "publicly Visible?"
 msgstr "veřejně viditelné?"
 
-#: apps/teams/models.py:83 templates/search/search.html:145
+#: apps/teams/models.py:106 templates/search/search.html:145
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
 msgstr "videa"
 
-#: apps/teams/models.py:84
+#: apps/teams/models.py:107
 msgid "users"
 msgstr "uživatelé"
 
-#: apps/teams/models.py:86
+#: apps/teams/models.py:109
 msgid "applicants"
 msgstr "žadatelé"
 
-#: apps/teams/models.py:89
+#: apps/teams/models.py:112
 msgid "Intro Video"
 msgstr "Představovací video"
 
-#: apps/teams/models.py:91 templates/teams/edit.html:105
+#: apps/teams/models.py:114 templates/teams/edit.html:105
 msgid "Page content"
 msgstr "Obsah stránky"
 
-#: apps/teams/models.py:91
+#: apps/teams/models.py:114
 msgid "You can use markdown. This will replace Description."
 msgstr ""
 
-#: apps/teams/models.py:93
+#: apps/teams/models.py:116
 msgid "HTML that appears at the top of the teams page."
 msgstr "HTML, které se zobrazí nahoře na stránce týmu."
 
-#: apps/teams/models.py:101 templates/teams/index.html:8
+#: apps/teams/models.py:124
+msgid "membership policy"
+msgstr "nastavení členství"
+
+#: apps/teams/models.py:127
+msgid "video policy"
+msgstr "nastavení videa"
+
+#: apps/teams/models.py:130
+msgid "task assignment policy"
+msgstr ""
+
+#: apps/teams/models.py:133
+msgid "subtitling policy"
+msgstr ""
+
+#: apps/teams/models.py:136
+msgid "translation policy"
+msgstr ""
+
+#: apps/teams/models.py:145 templates/profiles/_top_user_panel.html:34
+#: templates/teams/index.html:6
 msgid "Teams"
 msgstr "Týmy"
 
-#: apps/teams/models.py:377
+#: apps/teams/models.py:504
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -905,36 +973,62 @@ msgstr ""
 "otitulkovat tohle video. Přidáním poznámky zvýšíte pravděpodobnost, že vám "
 "dobrovolníci pomohou!"
 
-#: apps/teams/models.py:379
+#: apps/teams/models.py:506
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr "Automaticky získáváme miniatury u určitých stránek, např. YouTube"
 
-#: apps/teams/models.py:380
+#: apps/teams/models.py:507
 msgid "Need help with all languages"
 msgstr "Potřebuji pomoc se všemi jazyky"
 
-#: apps/teams/models.py:381
+#: apps/teams/models.py:508
 msgid "If you check this, other languages will not be displayed."
 msgstr "Když toto zaškrtnete, ostatní jazyky nebudou zobrazeny."
 
-#: apps/teams/models.py:669
+#: apps/teams/models.py:871 apps/teams/permissions_const.py:45
+msgid "Owner"
+msgstr ""
+
+#: apps/teams/models.py:872 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Správce"
 
-#: apps/teams/models.py:670
-msgid "Member"
-msgstr "Člen"
+#: apps/teams/models.py:873 apps/teams/permissions_const.py:44
+#: templates/base.html:136 templates/videos/history.html:198
+#: templates/videos/video.html:157
+msgid "Admin"
+msgstr "Admin"
 
-#: apps/teams/models.py:671
+#: apps/teams/models.py:874
 msgid "Contributor"
 msgstr ""
 
-#: apps/teams/models.py:742
+#: apps/teams/models.py:973
+#, python-format
+msgid "Your application to %s was approved!"
+msgstr ""
+
+#: apps/teams/models.py:974
+#, python-format
+msgid "Congratulations, you're now a member of %s!"
+msgstr ""
+
+#: apps/teams/models.py:982
+#, python-format
+msgid "Your application to %s was denied."
+msgstr ""
+
+#: apps/teams/models.py:983
+#, python-format
+msgid "Sorry, your application to %s was rejected."
+msgstr ""
+
+#: apps/teams/models.py:1032
 msgid "Invitation to join a team"
 msgstr "Pozvánka k přidání se do týmu"
 
-#: apps/teams/moderation_forms.py:12 apps/teams/views.py:85
-#: templates/teams/index.html:32
+#: apps/teams/moderation_forms.py:12 apps/teams/views.py:88
+#: templates/teams/index.html:47
 msgid "Newest"
 msgstr "Nejnovější"
 
@@ -950,151 +1044,166 @@ msgstr ""
 msgid "Video title"
 msgstr ""
 
-#: apps/teams/rpc.py:41
+#: apps/teams/permissions_const.py:47
+msgid "Team Member"
+msgstr ""
+
+#: apps/teams/rpc.py:52
 msgid "Team does not exist"
 msgstr "Tým neexistuje"
 
-#: apps/teams/rpc.py:45 apps/teams/views.py:633
+#: apps/teams/rpc.py:56
 msgid "You are already a member of this team."
 msgstr "Již jste členem tohoto týmu."
 
-#: apps/teams/rpc.py:51
+#: apps/teams/rpc.py:62
 msgid "You are now a member of this team because it is open."
 msgstr "Nyní jste členem tohoto týmu, protože je otevřený."
 
-#: apps/teams/rpc.py:56
+#: apps/teams/rpc.py:67
 msgid "Application sent success. Wait for answer from team."
 msgstr "Žádost úspěšně odeslána. Počkejte na odpověď od týmu."
 
-#: apps/teams/rpc.py:58
+#: apps/teams/rpc.py:69
 msgid "You can't join this team by application."
 msgstr "Nemůžete žádat o přidání do tohoto týmu."
 
-#: apps/teams/rpc.py:64
+#: apps/teams/rpc.py:75
 msgid "Team does not exist."
 msgstr ""
 
-#: apps/teams/rpc.py:70
+#: apps/teams/rpc.py:81
 msgid "Incorrect team member role."
 msgstr ""
 
-#: apps/teams/rpc.py:75
+#: apps/teams/rpc.py:86
 msgid "Team member does not exist."
 msgstr ""
 
-#: apps/teams/rpc.py:78
+#: apps/teams/rpc.py:89
 msgid "You can't promote yourself."
 msgstr ""
 
-#: apps/teams/rpc.py:82
+#: apps/teams/rpc.py:93
 msgid "Team member role changed."
 msgstr ""
 
-#: apps/teams/tasks.py:29
+#: apps/teams/rpc.py:246 apps/teams/rpc.py:258 apps/teams/rpc.py:345
+#: apps/teams/rpc.py:436 apps/teams/rpc.py:520 apps/widget/rpc.py:455
+#: apps/widget/rpc.py:487
+msgid "\n"
+msgstr ""
+
+#: apps/teams/rpc.py:475
+#, python-format
+msgid "The project %s has been saved"
+msgstr ""
+
+#: apps/teams/tasks.py:28
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Nová videa týmu %(team)s jsou připravena k tvorbě titulků!"
 
-#: apps/teams/views.py:84 templates/teams/index.html:35
+#: apps/teams/views.py:87 templates/teams/index.html:50
 msgid "Name"
 msgstr "Jméno"
 
-#: apps/teams/views.py:86 templates/teams/index.html:29
+#: apps/teams/views.py:89 templates/teams/index.html:44
 msgid "Most Members"
 msgstr "Nejvíce členů"
 
-#: apps/teams/views.py:278
+#: apps/teams/views.py:290
 msgid "Your team has been created. Review or edit its information below."
 msgstr "Váš tým byl vytvořen. Níže zkontrolujte nebo upravte informace o něm."
 
-#: apps/teams/views.py:306
+#: apps/teams/views.py:316
 msgid "Your changes have been saved"
 msgstr "Vaše změny byly uloženy"
 
-#: apps/teams/views.py:343
+#: apps/teams/views.py:387 apps/teams/views.py:414
 msgid "You can't add video."
 msgstr "Nemůžete vkládat video."
 
-#: apps/teams/views.py:427
+#: apps/teams/views.py:452
+msgid "You can't edit this video."
+msgstr ""
+
+#: apps/teams/views.py:461
 msgid "Video has been updated."
 msgstr "Video bylo aktualizováno."
 
-#: apps/teams/views.py:456
-msgid "You can't remove video"
-msgstr "Nemůžete odstraňovat video"
+#: apps/teams/views.py:480
+msgid "Request must be a POST request."
+msgstr ""
 
-#: apps/teams/views.py:477
+#: apps/teams/views.py:492
+msgid "You can't remove that video."
+msgstr ""
+
+#: apps/teams/views.py:528
 msgid "You can't remove youself"
 msgstr "Nemůžete se odebrat"
 
-#: apps/teams/views.py:482
+#: apps/teams/views.py:533
 msgid "You can't remove user"
 msgstr "Nemůžete odebrat uživatele"
 
-#: apps/teams/views.py:544
+#: apps/teams/views.py:564
 msgid "Application approved."
 msgstr "Žádost schválena."
 
-#: apps/teams/views.py:546 apps/teams/views.py:563
+#: apps/teams/views.py:566 apps/teams/views.py:584
 msgid "Application does not exist."
 msgstr "Žádost neexistuje."
 
-#: apps/teams/views.py:548
-msgid "You can't approve application."
-msgstr "Nemůžete schválit žádost."
+#: apps/teams/views.py:568
+msgid "You can't approve applications."
+msgstr ""
 
-#: apps/teams/views.py:561
+#: apps/teams/views.py:582
 msgid "Application denied."
 msgstr "Žádost zamítnuta."
 
-#: apps/teams/views.py:565
-msgid "You can't deny application."
-msgstr "Nemůžete zamítnout žádost."
+#: apps/teams/views.py:586
+msgid "You can't deny applications."
+msgstr ""
 
-#: apps/teams/views.py:584
-msgid "User does not exist."
-msgstr "Uživatel neexistuje."
+#: apps/teams/views.py:597
+msgid "You cannot invite people to this team."
+msgstr ""
 
-#: apps/teams/views.py:589
-msgid "You can't invite to team."
-msgstr "Nemůžete zvát do týmu."
+#: apps/teams/views.py:631
+msgid "You cannot join this team."
+msgstr ""
 
-#: apps/teams/views.py:594
-msgid "This user is member of team already."
-msgstr "Uživatel již je členem týmu."
-
-#: apps/teams/views.py:599
-msgid "Note is too long."
-msgstr "Poznámka je příliš dlouhá."
-
-#: apps/teams/views.py:636
-msgid "This team is not open."
-msgstr "Tento tým není otevřený."
-
-#: apps/teams/views.py:639
+#: apps/teams/views.py:634
 msgid "You are now a member of this team."
 msgstr "Nyní jste členem tohoto týmu."
 
-#: apps/teams/views.py:652
+#: apps/teams/views.py:646
 msgid "You are last member of this team."
 msgstr "Jste posledním členem tohoto týmu."
 
-#: apps/teams/views.py:654
-msgid "You are last manager of this team."
+#: apps/teams/views.py:648
+msgid "You are last admin of this team."
 msgstr ""
 
-#: apps/teams/views.py:657
+#: apps/teams/views.py:651
 msgid "You have left this team."
 msgstr "Opustili jste tento tým."
 
-#: apps/teams/views.py:659
+#: apps/teams/views.py:653
 msgid "You are not member of this team."
+msgstr ""
+
+#: apps/teams/views.py:730
+msgid "You are not allowed to perform this task."
 msgstr ""
 
 #: apps/teams/templatetags/moderation.py:58
 #: apps/teams/templatetags/moderation.py:175
 #: apps/teams/templatetags/moderation.py:179
-#: templates/teams/applications.html:34
+#: templates/teams/applications.html:37
 msgid "Approve"
 msgstr "Schválit"
 
@@ -1118,7 +1227,7 @@ msgstr ""
 msgid "Moderation"
 msgstr ""
 
-#: apps/teams/templatetags/teams_tags.py:158
+#: apps/teams/templatetags/teams_tags.py:154
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Může mi někdo pomoci otitulkovat tato videa? %(url)s"
@@ -1207,27 +1316,21 @@ msgid "Youtube usernames"
 msgstr "Přihlašovací jména na YouTube"
 
 #: apps/videos/forms.py:389
-msgid "<span class=\"hint\">Enter usernames separated by comma.</span>"
-msgstr "<span class=\"hint\">Vložte přihlašovací jména oddělená čárkami.</span>"
+msgid "Enter usernames separated by comma."
+msgstr ""
 
 #: apps/videos/forms.py:390
 msgid "Youtube page link."
 msgstr "Odkaz na stránku na YouTube."
 
 #: apps/videos/forms.py:391
-msgid ""
-"<span class=\"hint\">For example: "
-"http://www.youtube.com/user/username</span>"
+msgid "For example: http://www.youtube.com/user/username"
 msgstr ""
-"<span class=\"hint\">Například: http://www.youtube.com/user/username</span>"
 
 #: apps/videos/forms.py:392
 msgid ""
-"<span class=\"hint\">Supported: Youtube, Vimeo, Blip or Dailymotion. Only "
-"supported sites added.</span>"
+"Supported: Youtube, Vimeo, Blip or Dailymotion. Only supported sites added."
 msgstr ""
-"<span class=\"hint\">Podporované: Youtube, Vimeo, Blip nebo Dailymotion. "
-"Vloženy pouze podporované stránky.</span>"
 
 #: apps/videos/forms.py:393
 msgid "Save feed"
@@ -1235,11 +1338,9 @@ msgstr "Uložit zdroj"
 
 #: apps/videos/forms.py:393
 msgid ""
-"<span class=\"hint checkbox_hint\">Choose this if you wish to add videos "
-"from this feed in the future. Only valid RSS feeds will be saved.</span>"
+"Choose this if you wish to add videos from this feed in the future. Only "
+"valid RSS feeds will be saved."
 msgstr ""
-"<span class=\"hint checkbox_hint\">Zvolte, pokud chcete přidávat videa odsud"
-" v budoucnu. Pouze platné zdroje RSS budou uloženy.</span>"
 
 #: apps/videos/forms.py:454
 msgid ""
@@ -1265,23 +1366,23 @@ msgstr ""
 msgid "captcha"
 msgstr "captcha"
 
-#: apps/videos/models.py:108
+#: apps/videos/models.py:121
 msgid "in seconds"
 msgstr "v sekundách"
 
-#: apps/videos/models.py:127
+#: apps/videos/models.py:140
 msgid "Sub.fetched"
 msgstr "Titulky nahrány"
 
-#: apps/videos/models.py:128
+#: apps/videos/models.py:141
 msgid "Widget views"
 msgstr "Zobrazení widgetu"
 
-#: apps/videos/models.py:129
+#: apps/videos/models.py:142
 msgid "Views"
 msgstr "Zobrazení"
 
-#: apps/videos/models.py:799
+#: apps/videos/models.py:860
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
@@ -1289,41 +1390,41 @@ msgstr ""
 "Omlouváme se, nyní nemůžete nahrát titulky, protože někdo již upravuje "
 "titulky v jazyce, který nahráváte, nebo z něj překládá"
 
-#: apps/videos/models.py:1238
+#: apps/videos/models.py:1368
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1243
+#: apps/videos/models.py:1373
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1248
+#: apps/videos/models.py:1378
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "přidal video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1250
+#: apps/videos/models.py:1380
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "video <a href=\"%(video_url)s\">%(video_name)s</a> přidáno"
 
-#: apps/videos/models.py:1256
+#: apps/videos/models.py:1386
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "změnil název videa <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1258
+#: apps/videos/models.py:1388
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Název byl změněn u videa <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1273
+#: apps/videos/models.py:1403
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1332,7 +1433,7 @@ msgstr ""
 "komentoval <a href=\"%(comments_url)s\">titulky %(language)s</a> u videa <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1275
+#: apps/videos/models.py:1405
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1341,17 +1442,17 @@ msgstr ""
 "Přidán komentář k <a href=\"%(comments_url)s\">titulkům %(language)s</a> u "
 "videa <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1278
+#: apps/videos/models.py:1408
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "komentoval video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1280
+#: apps/videos/models.py:1410
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Přidán komentář k videu <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1288
+#: apps/videos/models.py:1418
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
@@ -1360,7 +1461,7 @@ msgstr ""
 "založil <a href=\"%(language_url)s\">titulky %(language)s</a> k videu <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1290
+#: apps/videos/models.py:1420
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a "
@@ -1369,7 +1470,7 @@ msgstr ""
 "<a href=\"%(language_url)s\">titulky %(language)s</a> byly založeny k videu "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1301
+#: apps/videos/models.py:1431
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
@@ -1378,7 +1479,7 @@ msgstr ""
 "upravil <a href=\"%(language_url)s\">titulky %(language)s</a> u videa <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1303
+#: apps/videos/models.py:1433
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a "
@@ -1387,72 +1488,72 @@ msgstr ""
 "<a href=\"%(language_url)s\">titulky %(language)s subtitles</a> upraveny u "
 "videa <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1309
+#: apps/videos/models.py:1439
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "přidal novou URL k videu <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1311
+#: apps/videos/models.py:1441
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "Nová URL byla přidána k videu <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1325
+#: apps/videos/models.py:1455
 #, python-format
 msgid ""
 "requested subtitles for <a href=\"%(video_url)s\">%(video_name)s</a> in "
 "%(language)s. %(description)s"
 msgstr ""
 
-#: apps/videos/models.py:1327
+#: apps/videos/models.py:1457
 #, python-format
 msgid ""
 "New subtitles requested  for <a href=\"%(video_url)s\">%(video_name)s</a> in"
 " %(language)s. %(language_info)s%(description)s"
 msgstr ""
 
-#: apps/videos/models.py:1343
+#: apps/videos/models.py:1473
 msgid "add video"
 msgstr "přidat video"
 
-#: apps/videos/models.py:1344
+#: apps/videos/models.py:1474
 msgid "change title"
 msgstr "změnit název"
 
-#: apps/videos/models.py:1345
+#: apps/videos/models.py:1475
 msgid "comment"
 msgstr "komentovat"
 
-#: apps/videos/models.py:1346
+#: apps/videos/models.py:1476
 msgid "add version"
 msgstr "přidat verzi"
 
-#: apps/videos/models.py:1347
+#: apps/videos/models.py:1477
 msgid "add translation"
 msgstr "přidat překlad"
 
-#: apps/videos/models.py:1348
+#: apps/videos/models.py:1478
 msgid "add video url"
 msgstr "přidat url videa"
 
-#: apps/videos/models.py:1349
+#: apps/videos/models.py:1479
 msgid "request subtitles"
 msgstr ""
 
-#: apps/videos/models.py:1350
+#: apps/videos/models.py:1480
 msgid "approve version"
 msgstr ""
 
-#: apps/videos/models.py:1351
+#: apps/videos/models.py:1481
 msgid "add contributor"
 msgstr ""
 
-#: apps/videos/models.py:1352
+#: apps/videos/models.py:1482
 msgid "reject version"
 msgstr ""
 
-#: apps/videos/models.py:1540
+#: apps/videos/models.py:1670
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1608,7 +1709,7 @@ msgstr "Soukromé video"
 msgid "Undefined error"
 msgstr "Nedefinovaná chyba"
 
-#: apps/widget/rpc.py:97
+#: apps/widget/rpc.py:96
 msgid "Video embedding disabled by owner"
 msgstr ""
 
@@ -1635,10 +1736,6 @@ msgstr "Domů"
 msgid "Filter"
 msgstr "Filtr"
 
-#: libs/rosetta/templates/rosetta/languages.html:12
-msgid "Project"
-msgstr "Projekt"
-
 #: libs/rosetta/templates/rosetta/languages.html:13
 msgid "Third party"
 msgstr "Třetí strana"
@@ -1654,6 +1751,7 @@ msgstr "Postup"
 
 #: libs/rosetta/templates/rosetta/languages.html:30
 #: templates/messages/index.html:118 templates/messages/sent.html:85
+#: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:19
 msgid "Messages"
 msgstr "Zprávy"
 
@@ -1742,8 +1840,7 @@ msgid "Fuzzy only"
 msgstr "Pouze taková všelijaká"
 
 #: libs/rosetta/templates/rosetta/pofile.html:42
-#: templates/profiles/my_profile.html:32 templates/search/_search_form.html:31
-#: templates/teams/index.html:48
+#: templates/search/_search_form.html:31
 msgid "Search"
 msgstr "Hledat"
 
@@ -1990,45 +2087,40 @@ msgstr ""
 msgid "Transcribe, caption, translate, and subtitle videos."
 msgstr ""
 
-#: templates/base.html:134 templates/videos/history.html:198
-#: templates/videos/video.html:157
-msgid "Admin"
-msgstr "Admin"
-
-#: templates/base.html:137
+#: templates/base.html:139
 msgid "Sentry"
 msgstr ""
 
-#: templates/base.html:140
+#: templates/base.html:142
 msgid "Rosetta"
 msgstr "Rosetta"
 
-#: templates/base.html:157 templates/teams/_team_video_lang_detail.html:34
+#: templates/base.html:159 templates/teams/_team_video_lang_detail.html:34
 msgid "Create"
 msgstr "Tvořit"
 
-#: templates/base.html:158 templates/base_masterbranch.html:123
+#: templates/base.html:160 templates/base_masterbranch.html:123
 #: templates/bug.html:94
 msgid "Watch"
 msgstr "Dívat se"
 
-#: templates/base.html:165
+#: templates/base.html:167
 msgid "Volunteer"
 msgstr "Zapojit se"
 
-#: templates/base.html:166
+#: templates/base.html:168
 msgid "Services"
 msgstr "Služby"
 
-#: templates/base.html:167
+#: templates/base.html:169
 msgid "Help"
 msgstr "Nápověda"
 
-#: templates/base.html:171
+#: templates/base.html:173
 msgid "Sign In"
 msgstr "Přihlásit se"
 
-#: templates/base.html:200 templates/base_masterbranch.html:162
+#: templates/base.html:201 templates/base_masterbranch.html:162
 #: templates/bug.html:317
 msgid ""
 "Universal Subtitles is a project of <a "
@@ -2037,22 +2129,22 @@ msgstr ""
 "Universal Subtitles je projektem <a "
 "href=\"http://participatoryculture.org/\">PCF</a>."
 
-#: templates/base.html:203 templates/base_masterbranch.html:165
-#: templates/profiles/view_profile.html:63
+#: templates/base.html:204 templates/base_masterbranch.html:165
+#: templates/profiles/view_profile.html:69
 msgid "About"
 msgstr "O nás"
 
-#: templates/base.html:206 templates/base_masterbranch.html:168
+#: templates/base.html:207 templates/base_masterbranch.html:168
 #: templates/bug.html:323
 msgid "Contact Us"
 msgstr "Napište nám"
 
-#: templates/base.html:207 templates/base_masterbranch.html:169
+#: templates/base.html:208 templates/base_masterbranch.html:169
 #: templates/bug.html:324
 msgid "Privacy Policy"
 msgstr "Ochrana soukromí"
 
-#: templates/base.html:208 templates/base_masterbranch.html:170
+#: templates/base.html:209 templates/base_masterbranch.html:170
 #: templates/bug.html:325
 msgid "Terms of Service"
 msgstr "Podmínky služby"
@@ -3407,8 +3499,8 @@ msgstr ""
 msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Jste si jisti, že chcete nastálo odstranit váš profil?"
 
-#: templates/auth/delete_user.html:13 templates/messages/index.html:161
-#: templates/messages/sent.html:128
+#: templates/auth/delete_user.html:13 templates/messages/index.html:157
+#: templates/messages/sent.html:119
 msgid "Delete"
 msgstr "Smazat"
 
@@ -3442,16 +3534,15 @@ msgstr "Vytvořit účet"
 msgid "Create Account"
 msgstr "Vytvořit účet"
 
-#: templates/comments/_item.html:8 templates/messages/index.html:160
-#: templates/messages/sent.html:127 templates/videos/_action_tpl.html:22
+#: templates/comments/_item.html:8 templates/messages/index.html:151
+#: templates/messages/sent.html:116 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:12
 #: templates/videos/_video_url_panel.html:58 templates/videos/diffing.html:118
 #: templates/videos/diffing.html.py:173
 msgid "ago"
 msgstr "nazpět"
 
-#: templates/comments/_item.html:13 templates/messages/index.html:199
-#: templates/messages/sent.html:166
+#: templates/comments/_item.html:13 templates/messages/sent.html:166
 msgid "Reply"
 msgstr "Odpovědět"
 
@@ -3643,8 +3734,7 @@ msgstr "Poslat zprávu"
 
 #: templates/messages/_send_message_form.html:14
 #: templates/messages/_send_to_team_message_form.html:18
-#: templates/messages/index.html:175 templates/messages/sent.html:142
-#: templates/teams/edit_members.html:137
+#: templates/messages/index.html:180 templates/messages/sent.html:142
 #: templates/videos/_feedback_form.html:35
 #: templates/videos/_paste_transcription.html:113
 #: templates/videos/_upload_subtitles.html:7
@@ -3661,13 +3751,13 @@ msgstr "Poslat zprávu uživateli"
 #: templates/messages/_send_message_form.html:18
 #: templates/messages/_send_message_form.html:20
 #: templates/messages/_send_to_team_message_form.html:22
-#: templates/messages/index.html:179 templates/messages/sent.html:146
+#: templates/messages/sent.html:146
 msgid "avatar"
 msgstr "avatar"
 
 #: templates/messages/_send_message_form.html:30
 #: templates/messages/_send_to_team_message_form.html:34
-#: templates/messages/index.html:210 templates/messages/sent.html:177
+#: templates/messages/index.html:191 templates/messages/sent.html:177
 msgid "Send Message"
 msgstr "Poslat zprávu"
 
@@ -3688,7 +3778,7 @@ msgstr "Poslat zprávu týmu"
 msgid "The messages have been successfully sent."
 msgstr "Zprávy byly úspěšně odeslány."
 
-#: templates/messages/index.html:6 templates/profiles/_top_user_panel.html:27
+#: templates/messages/index.html:6
 msgid "My Messages"
 msgstr "Mé zprávy"
 
@@ -3696,59 +3786,41 @@ msgstr "Mé zprávy"
 msgid "Do you really wish to delete this message?"
 msgstr ""
 
-#: templates/messages/index.html:121 templates/messages/sent.html:88
-msgid "Inbox"
-msgstr ""
-
-#: templates/messages/index.html:122 templates/messages/sent.html:89
-msgid "Sent"
-msgstr ""
-
-#: templates/messages/index.html:133 templates/profiles/_send_message.html:10
-msgid "From"
-msgstr "Od"
-
-#: templates/messages/index.html:134 templates/messages/index.html.py:192
-#: templates/messages/sent.html:101 templates/messages/sent.html.py:159
-#: templates/profiles/_send_message.html:14
-#: templates/teams/edit_members.html:144
-msgid "Message"
-msgstr "Zpráva"
-
-#: templates/messages/index.html:135 templates/messages/sent.html:102
-#: templates/statistic/log_entry_model_admin.html:37
-#: templates/statistic/logger_model_admin.html:37
-msgid "Date"
-msgstr "Datum"
-
-#: templates/messages/index.html:146 templates/messages/index.html.py:148
-#: templates/messages/sent.html:113 templates/messages/sent.html.py:115
-msgid "Avatar"
-msgstr "Avatar"
-
-#: templates/messages/index.html:170 templates/messages/sent.html:137
+#: templates/messages/index.html:167
 msgid "You have no messages."
 msgstr "Nemáte žádné zprávy"
 
-#: templates/messages/index.html:177
-msgid "Message from"
-msgstr "Zpráva od"
+#: templates/messages/index.html:174 templates/messages/sent.html:136
+msgid "Inbox"
+msgstr ""
 
-#: templates/messages/index.html:185 templates/messages/sent.html:152
-msgid "Subject"
-msgstr "Předmět"
+#: templates/messages/index.html:175 templates/messages/sent.html:137
+msgid "Sent"
+msgstr ""
 
 #: templates/messages/sent.html:6
 msgid "Sent Messages"
 msgstr "Odeslané zprávy"
 
-#: templates/messages/sent.html:100
-msgid "To"
-msgstr "Adresát"
+#: templates/messages/sent.html:110 templates/messages/sent.html.py:112
+msgid "Avatar"
+msgstr "Avatar"
+
+#: templates/messages/sent.html:129
+msgid "You have no sent messages."
+msgstr ""
 
 #: templates/messages/sent.html:144
 msgid "Message to"
 msgstr "Zpráva pro"
+
+#: templates/messages/sent.html:152
+msgid "Subject"
+msgstr "Předmět"
+
+#: templates/messages/sent.html:159 templates/profiles/_send_message.html:14
+msgid "Message"
+msgstr "Zpráva"
 
 #: templates/messages/email/message_received.html:7
 #, python-format
@@ -3774,6 +3846,15 @@ msgstr ""
 #: templates/moderation/dashboard.html:60
 msgid "Reject Selected"
 msgstr ""
+
+#: templates/profiles/_filters.html:5
+msgid "User Details"
+msgstr ""
+
+#: templates/profiles/_filters.html:9 templates/teams/_tabs.html:16
+#: templates/videos/_video_activity.html:8
+msgid "Activity"
+msgstr "Aktivita"
 
 #: templates/profiles/_require_email_dialog.html:7
 msgid ""
@@ -3822,6 +3903,10 @@ msgstr "Jakými jazyky mluvíte?"
 msgid "Submit"
 msgstr "Vložit"
 
+#: templates/profiles/_send_message.html:10
+msgid "From"
+msgstr "Od"
+
 #: templates/profiles/_send_message.html:16
 msgid "No HTML"
 msgstr "Žádné HTML"
@@ -3846,32 +3931,19 @@ msgstr "Vložte zprávu prosím."
 msgid "Enter email please."
 msgstr "Vložte email prosím."
 
-#: templates/profiles/_top_user_panel.html:10
-msgid "My Videos"
-msgstr "Má videa"
+#: templates/profiles/_tabs.html:6 templates/profiles/_top_user_panel.html:15
+msgid "Profile"
+msgstr ""
 
-#: templates/profiles/_top_user_panel.html:14 templates/teams/index.html:8
-msgid "My Teams"
-msgstr "Mé týmy"
+#: templates/profiles/_tabs.html:19 templates/profiles/_top_user_panel.html:11
+msgid "Dashboard"
+msgstr ""
 
-#: templates/profiles/_top_user_panel.html:19
-msgid "View profile"
-msgstr "Zobrazit profil"
-
-#: templates/profiles/_top_user_panel.html:23
-msgid "Edit Profile"
-msgstr "Upravit profil"
-
-#: templates/profiles/_top_user_panel.html:36
+#: templates/profiles/_top_user_panel.html:28
 msgid "Logout"
 msgstr "Odhlásit se"
 
-#: templates/profiles/_top_user_panel.html:42
-msgid "Team Management"
-msgstr "Správa týmu"
-
 #: templates/profiles/_user_avatar.html:6
-#: templates/profiles/my_profile.html:73
 msgid "Edit profile"
 msgstr "Upravit profil"
 
@@ -3882,6 +3954,11 @@ msgstr "Úpravy mých videí"
 #: templates/profiles/_user_videos_activity.html:10
 msgid "No Activity"
 msgstr "Žádná aktivita"
+
+#: templates/profiles/_video_detail.html:20
+#: templates/teams/_team_video_detail.html:23
+msgid "No subtitles yet"
+msgstr ""
 
 #: templates/profiles/edit_profile.html:5
 msgid "Edit My Profile"
@@ -3902,92 +3979,78 @@ msgstr "Ukládám"
 msgid "Edit Your Profile"
 msgstr "Upravit profil"
 
-#: templates/profiles/edit_profile.html:53
-msgid "View Profile"
-msgstr ""
-
-#: templates/profiles/edit_profile.html:60
+#: templates/profiles/edit_profile.html:64
 msgid "Personal Info"
 msgstr "Osobní info"
 
-#: templates/profiles/edit_profile.html:67
-#: templates/profiles/edit_profile.html:73
-#: templates/profiles/edit_profile.html:79
-msgid "will display publicly"
-msgstr "bude zobrazeno veřejně"
-
-#: templates/profiles/edit_profile.html:92
+#: templates/profiles/edit_profile.html:86
 msgid "remove picture"
 msgstr "odstranit obrázek"
 
-#: templates/profiles/edit_profile.html:98
+#: templates/profiles/edit_profile.html:92
 msgid "Upload picture"
 msgstr "Nahrát obrázek"
 
-#: templates/profiles/edit_profile.html:125
+#: templates/profiles/edit_profile.html:104
 msgid ""
 "Notify me by email about new personal messages and edits to the videos I "
 "follow"
 msgstr ""
 
-#: templates/profiles/edit_profile.html:132
+#: templates/profiles/edit_profile.html:107
 msgid "Follow the videos I submit"
 msgstr ""
 
-#: templates/profiles/edit_profile.html:143
+#: templates/profiles/edit_profile.html:119
 msgid "Language Info"
 msgstr "Jazykové info"
 
-#: templates/profiles/edit_profile.html:159
+#: templates/profiles/edit_profile.html:136
 msgid "Languages I Know"
 msgstr "Jazyky, které znám"
 
-#: templates/profiles/edit_profile.html:163
-#: templates/profiles/edit_profile.html:189
+#: templates/profiles/edit_profile.html:141
+#: templates/profiles/edit_profile.html:167
 msgid "Remove Language"
 msgstr "Odstranit jazyk"
 
-#: templates/profiles/edit_profile.html:211
+#: templates/profiles/edit_profile.html:189
 msgid "Add Language"
 msgstr "Přidat jazyk"
 
-#: templates/profiles/edit_profile.html:220 templates/teams/edit.html:145
+#: templates/profiles/edit_profile.html:196 templates/teams/edit.html:145
 msgid "Save Changes"
 msgstr ""
 
-#: templates/profiles/edit_profile.html:224
+#: templates/profiles/edit_profile.html:199
 msgid "Permanently Delete Your Profile"
 msgstr "Natrvalo smazat svůj profil"
 
-#: templates/profiles/my_profile.html:6 templates/profiles/my_profile.html:23
+#: templates/profiles/my_videos.html:6 templates/profiles/my_videos.html:22
 msgid "My videos"
 msgstr "Má videa"
 
-#: templates/profiles/my_profile.html:60
-msgid "Bio"
-msgstr "Biografie"
-
-#: templates/profiles/my_profile.html:66
-msgid "Languages I understand"
-msgstr "Jazyky, kterým rozumím"
-
-#: templates/profiles/view_profile.html:47
+#: templates/profiles/view_profile.html:57
 msgid "Member since"
 msgstr "Členem od"
 
-#: templates/profiles/view_profile.html:52
-msgid "Preferred Language"
-msgstr "Preferovaný jazyk"
-
-#: templates/profiles/view_profile.html:58
+#: templates/profiles/view_profile.html:63
 msgid "Homepage"
 msgstr "Domovská stránka"
 
-#: templates/profiles/view_profile.html:65
+#: templates/profiles/view_profile.html:71
 msgid "<i>User has not submitted a bio.</i>"
 msgstr "<i>Uživatel nevložil biografii.</i>"
 
-#: templates/profiles/view_profile.html:76
+#: templates/profiles/view_profile.html:83
+msgid "Languages"
+msgstr ""
+
+#: templates/profiles/view_profile.html:99
+msgid "Memberships"
+msgstr ""
+
+#: templates/profiles/view_profile.html:128
 msgid "User deleted his profile"
 msgstr "Uživatel smazal svůj profil"
 
@@ -4273,6 +4336,11 @@ msgstr "Statistika jazyků"
 msgid "Lanuage"
 msgstr "Jazyk"
 
+#: templates/statistic/log_entry_model_admin.html:37
+#: templates/statistic/logger_model_admin.html:37
+msgid "Date"
+msgstr "Datum"
+
 #: templates/statistic/log_entry_model_admin.html:38
 #: templates/statistic/logger_model_admin.html:38
 msgid "Count"
@@ -4327,32 +4395,34 @@ msgstr "Metoda"
 msgid "Value"
 msgstr "Hodnota"
 
+#: templates/teams/_actions.html:18
+msgid "Sign in to Join Team"
+msgstr ""
+
+#: templates/teams/_actions.html:23
+msgid ""
+"Want to create your own captioning and translation team? Contact Dean Jansen"
+msgstr ""
+
 #: templates/teams/_application_form.html:4
-msgid "Send application"
-msgstr "Poslat žádost"
+msgid "Apply to Join"
+msgstr ""
 
 #: templates/teams/_application_form.html:8
 msgid "Apply to"
 msgstr "Požádat"
 
-#: templates/teams/_application_form.html:13
+#: templates/teams/_application_form.html:14
 msgid "Language skill"
 msgstr "Jazyková schopnost"
 
-#: templates/teams/_application_form.html:14
+#: templates/teams/_application_form.html:16
 #, python-format
 msgid ""
 "\n"
-"            No formal language training is required to translate for\n"
-"            %(team)s. But we do ask that all translators are confident in their\n"
-"            translation abilities. Please make sure your profile has your language\n"
-"            "
+"                        No formal language training is required to translate for %(team)s. But we do ask that all translators are confident in their translation abilities. Please make sure your profile has your language\n"
+"                    "
 msgstr ""
-"\n"
-"            Žádný formální jazykový trénink není vyžadován pro překlad pro\n"
-"            %(team)s. Ale i tak bychom rádi, aby si překladatelé byli jisti \n"
-"            svými schopnostmi. Ujistěte se prosím, že máte ve svém profilu své jazykové\n"
-"            "
 
 #: templates/teams/_application_form.html:19
 msgid "proficiency"
@@ -4362,7 +4432,26 @@ msgstr "schopnosti"
 msgid "specified"
 msgstr "specifikovány"
 
-#: templates/teams/_application_form.html:32
+#: templates/teams/_application_form.html:24
+msgid ""
+"\n"
+"                        We request that each new applicant does at least one full set of subtitles within the first week of joining. Aside from that, it’s up to you!\n"
+"                    "
+msgstr ""
+
+#: templates/teams/_application_form.html:31
+msgid "About you"
+msgstr ""
+
+#: templates/teams/_application_form.html:33
+#, python-format
+msgid ""
+"\n"
+"                    Tell us a little bit about yourself and why you’re interested in translating with %(team)s. This should be 3-5 sentences, no longer!\n"
+"                "
+msgstr ""
+
+#: templates/teams/_application_form.html:38
 msgid "Submit Application"
 msgstr "Odeslat žádost"
 
@@ -4374,31 +4463,8 @@ msgstr "Dokončené jazyky"
 msgid "Video Page"
 msgstr "Stránka videa"
 
-#: templates/teams/_edit_top_navigation.html:2
-msgid "View Team"
-msgstr ""
-
-#: templates/teams/_edit_top_navigation.html:5
-msgid "Settings"
-msgstr ""
-
-#: templates/teams/_edit_top_navigation.html:8
-#: templates/teams/detail_members.html:26
-msgid "Members"
-msgstr "Členové"
-
-#: templates/teams/_edit_top_navigation.html:11
-#: templates/teams/completed_videos.html:30
-#: templates/teams/detail-debug.html:44 templates/teams/detail.html:37
-msgid "Videos"
-msgstr "Videa"
-
-#: templates/teams/_edit_top_navigation.html:15
-msgid "Subtitles Pending"
-msgstr ""
-
-#: templates/teams/_edit_top_navigation.html:19
-msgid "Applicants"
+#: templates/teams/_filters_activity.html:11
+msgid "All Activity"
 msgstr ""
 
 #: templates/teams/_invite_friends_to_team.html:4
@@ -4431,7 +4497,7 @@ msgstr "Byli jste pozváni do nového týmu."
 msgid "Join"
 msgstr "Přidat se"
 
-#: templates/teams/_invite_message.html:6 templates/teams/applications.html:35
+#: templates/teams/_invite_message.html:6 templates/teams/applications.html:40
 msgid "Deny"
 msgstr "Zamítnout"
 
@@ -4451,6 +4517,23 @@ msgstr ""
 msgid "Leave this team"
 msgstr "Opustit tento tým"
 
+#: templates/teams/_tabs.html:6 templates/teams/completed_videos.html:30
+#: templates/teams/detail-debug.html:44
+msgid "Videos"
+msgstr "Videa"
+
+#: templates/teams/_tabs.html:11
+msgid "Members"
+msgstr "Členové"
+
+#: templates/teams/_tabs.html:22 templates/teams/tasks.html:12
+msgid "Tasks"
+msgstr ""
+
+#: templates/teams/_tabs.html:29 templates/teams/settings.html:11
+msgid "Settings"
+msgstr ""
+
 #: templates/teams/_team_activity.html:17
 msgid "Team Activity Stream"
 msgstr "Proud aktivit týmu"
@@ -4466,38 +4549,6 @@ msgstr "Zobrazit všechnu aktivitu"
 #: templates/teams/_team_add_video_select.html:7
 msgid "Add video to team"
 msgstr "Přidat video do týmu"
-
-#: templates/teams/_team_detail.html:7
-msgid "Manager's Settings & Controls"
-msgstr "Nastavení správce"
-
-#: templates/teams/_team_detail.html:25 templates/teams/edit_members.html:8
-msgid "Team Members"
-msgstr "Členové týmu"
-
-#: templates/teams/_team_detail.html:29
-msgid "Team Page"
-msgstr "Stránka týmu"
-
-#: templates/teams/_team_detail.html:33
-msgid "Completed Videos"
-msgstr "Dokončená videa"
-
-#: templates/teams/_team_detail.html:37
-msgid "Team Description"
-msgstr "Popis týmu"
-
-#: templates/teams/_team_detail.html:42
-msgid "Team Managers"
-msgstr "Správci týmu"
-
-#: templates/teams/_team_detail.html:48
-msgid "Video Policy"
-msgstr "Nastavení videí"
-
-#: templates/teams/_team_detail.html:52
-msgid "Membership Policy"
-msgstr "Nastavení členství"
 
 #: templates/teams/_team_message.html:3
 #, python-format
@@ -4533,24 +4584,12 @@ msgstr "Správcování"
 msgid "Add new team"
 msgstr "Přidat nový tým"
 
-#: templates/teams/_team_video_detail.html:14
-msgid "Video in:"
-msgstr "Video v:"
-
-#: templates/teams/_team_video_detail.html:18
-msgid "Add Subtitles "
-msgstr "Přidat titulky "
-
-#: templates/teams/_team_video_detail.html:21
-msgid "Edit Video"
-msgstr "Upravit video"
-
 #: templates/teams/_team_video_in_progress_list.html:5
 msgid "Subtitles currently in progress"
 msgstr "Titulky jsou nyní vytvářeny"
 
 #: templates/teams/_team_video_lang_detail.html:10
-#: templates/teams/edit_videos.html:51 templates/teams/index.html:98
+#: templates/teams/edit_videos.html:51
 msgid "Edit"
 msgstr "Upravit"
 
@@ -4584,7 +4623,7 @@ msgstr "nedokončeno"
 msgid "and"
 msgstr "a"
 
-#: templates/teams/_team_video_lang_list.html:14
+#: templates/teams/_team_video_lang_list.html:15
 #, python-format
 msgid ""
 "\n"
@@ -4607,47 +4646,71 @@ msgstr[2] ""
 "    %(total)s dalších.\n"
 "    "
 
-#: templates/teams/add_video.html:8 templates/teams/add_videos.html:8
+#: templates/teams/add_video.html:6 templates/teams/add_videos.html:6
 msgid "Team video"
 msgstr "Video týmu"
 
-#: templates/teams/add_video.html:25 templates/teams/edit_videos.html:19
+#: templates/teams/add_video.html:22 templates/teams/edit_videos.html:19
 msgid "Add video"
 msgstr "Přidat video"
 
-#: templates/teams/add_video.html:35 templates/teams/add_videos.html:35
-#: templates/teams/team_video.html:42 templates/videos/history.html:150
-#: templates/videos/video.html:111
+#: templates/teams/add_video.html:40 templates/teams/add_videos.html:38
+#: templates/teams/create_task.html:85 templates/teams/team_video.html:47
+#: templates/videos/history.html:150 templates/videos/video.html:111
 msgid "Save"
 msgstr "Uložit"
 
-#: templates/teams/add_videos.html:25
-msgid "Add videos"
+#: templates/teams/add_video.html:48 templates/teams/add_videos.html:46
+msgid "Add a Video"
 msgstr ""
 
-#: templates/teams/add_videos.html:27
-msgid "or"
+#: templates/teams/add_video.html:57 templates/teams/add_videos.html:52
+msgid "Back to Videos"
 msgstr ""
 
-#: templates/teams/add_videos.html:29
-msgid "add a single video"
+#: templates/teams/add_videos.html:22
+msgid "Add multiple videos"
 msgstr ""
 
-#: templates/teams/applications.html:8
+#: templates/teams/add_videos.html:49
+msgid "Add Multiple Videos"
+msgstr ""
+
+#: templates/teams/applications.html:6
 msgid "Team Aplications"
 msgstr "Žádosti o členství v týmu"
 
-#: templates/teams/applications.html:43
-msgid "There are no applicants at this time."
-msgstr "V tuto chvíli zde nejsou žádné žádosti."
+#: templates/teams/applications.html:49
+msgid "There are no applications right now"
+msgstr ""
 
-#: templates/teams/create.html:6 templates/teams/create.html.py:21
+#: templates/teams/create.html:6 templates/teams/create.html.py:23
 msgid "Create team"
 msgstr "Vytvořit tým"
 
-#: templates/teams/create.html:29
+#: templates/teams/create.html:30
 msgid "Create Team"
 msgstr "Vytvořit tým"
+
+#: templates/teams/create_task.html:8
+msgid "Create a Task"
+msgstr ""
+
+#: templates/teams/create_task.html:48
+msgid "New Task"
+msgstr ""
+
+#: templates/teams/create_task.html:73
+msgid "You do not have permission to create any valid tasks for this video."
+msgstr ""
+
+#: templates/teams/detail.html:59
+msgid "Add Videos"
+msgstr ""
+
+#: templates/teams/detail.html:75
+msgid "Sorry, no videos here"
+msgstr ""
 
 #: templates/teams/edit.html:8
 msgid "Team Settings"
@@ -4713,55 +4776,6 @@ msgstr "Nastavení soukromí týmu"
 msgid "You are not a manager of this team."
 msgstr "Nejste správce tohoto týmu."
 
-#: templates/teams/edit_members.html:37
-msgid "Enter username."
-msgstr "Vložte uživatelské jméno."
-
-#: templates/teams/edit_members.html:42
-msgid "Remove this user?"
-msgstr "Odstranit tohoto uživatele?"
-
-#: templates/teams/edit_members.html:81 templates/teams/edit_members.html:147
-msgid "Invite User"
-msgstr "Pozvat uživatele"
-
-#: templates/teams/edit_members.html:96
-msgid "Role"
-msgstr "Role"
-
-#: templates/teams/edit_members.html:111
-msgid "Remove from Team"
-msgstr "Odebrat z týmu"
-
-#: templates/teams/edit_members.html:139
-msgid "Invite user"
-msgstr "Pozvat uživatele"
-
-#: templates/teams/edit_members.html:156
-msgid "About Roles"
-msgstr ""
-
-#: templates/teams/edit_members.html:158
-msgid ""
-"\n"
-"                <strong>Manager:</strong> Can access all administrative functions including managing team members and approving moderated subtitles.\n"
-"            "
-msgstr ""
-
-#: templates/teams/edit_members.html:163
-msgid ""
-"\n"
-"                <strong>Member:</strong> Trusted members may add approved subtitles to a moderated video without review by the team manager.\n"
-"            "
-msgstr ""
-
-#: templates/teams/edit_members.html:168
-msgid ""
-"\n"
-"                <strong>Contributor:</strong> Can access team videos and contribute subtitles, but their work is subject to moderation by a manager.\n"
-"            "
-msgstr ""
-
 #: templates/teams/edit_videos.html:43
 msgid "Completed"
 msgstr "Dokončené"
@@ -4814,93 +4828,79 @@ msgstr ""
 msgid "Thank you!"
 msgstr ""
 
+#: templates/teams/index.html:6 templates/teams/index.html.py:29
+msgid "My Teams"
+msgstr "Mé týmy"
+
 #: templates/teams/index.html:18
 msgid "Team Directory"
 msgstr "Adresář týmů"
 
-#: templates/teams/index.html:26
+#: templates/teams/index.html:23
+msgid "All Teams"
+msgstr ""
+
+#: templates/teams/index.html:41
 msgid "Sort by"
 msgstr "Seřadit podle"
 
-#: templates/teams/index.html:39
-msgid "My teams"
-msgstr "Mé týmy"
-
-#: templates/teams/index.html:70
-msgid "your team"
-msgstr "váš tým"
-
-#: templates/teams/index.html:73
-msgid "private"
+#: templates/teams/index.html:64
+msgid "My team"
 msgstr ""
 
-#: templates/teams/index.html:78
+#: templates/teams/index.html:67
+msgid "Private"
+msgstr ""
+
+#: templates/teams/index.html:85
 #, python-format
 msgid ""
 "\n"
-"                        %(count)s member\n"
-"                    "
+"                                %(count)s member\n"
+"                            "
 msgid_plural ""
 "\n"
-"                        %(count)s members\n"
-"                    "
+"                                %(count)s members\n"
+"                            "
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: templates/teams/index.html:92 templates/teams/index.html.py:151
-msgid "Un-highlight this team"
-msgstr "Zrušit vyznamenání týmu"
-
-#: templates/teams/index.html:94 templates/teams/index.html.py:153
-msgid "Highlight this team"
-msgstr "Vyznamenat tým"
-
-#: templates/teams/index.html:115
-msgid "About Teams"
-msgstr ""
-
-#: templates/teams/index.html:117
-msgid ""
-"\n"
-"        Teams are a great way to work together on subtitling videos. \n"
-"        Membership and participation policies vary from team to team.\n"
-"        "
-msgstr ""
-
-#: templates/teams/index.html:125
-msgid "Highlighted Teams"
-msgstr "Vyznamenané týmy"
-
-#: templates/teams/index.html:135
-#, python-format
-msgid ""
-"\n"
-"                            Team with %(count)s member\n"
-"                        "
-msgid_plural ""
-"\n"
-"                            Team with %(count)s members\n"
-"                        "
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: templates/teams/index.html:164
+#: templates/teams/index.html:146
 msgid "Start a Team"
 msgstr "Založit tým"
 
-#: templates/teams/team_video.html:8
+#: templates/teams/invite_members.html:6
+msgid "Invite Members"
+msgstr ""
+
+#: templates/teams/invite_members.html:47
+msgid "Send Invites"
+msgstr ""
+
+#: templates/teams/invite_members.html:56
+msgid "Invite New Members"
+msgstr ""
+
+#: templates/teams/invite_members.html:59
+msgid "Back to Members"
+msgstr ""
+
+#: templates/teams/team_video.html:6
 msgid "Edit team video"
 msgstr "Upravit video týmu"
 
-#: templates/teams/team_video.html:36
+#: templates/teams/team_video.html:26
+msgid "Edit video"
+msgstr ""
+
+#: templates/teams/team_video.html:43
 msgid " This video is being moderated by team "
 msgstr ""
 
-#: templates/teams/videos_actions.html:16
-msgid "Edit Team"
-msgstr "Upravit tým"
+#: templates/teams/videos_actions.html:29
+msgid "Sorry, no activity yet"
+msgstr ""
 
 #: templates/videos/_error_feedback_form.html:7
 msgid ""
@@ -5195,10 +5195,6 @@ msgstr[2] ""
 "                      %(number)s jazyků\n"
 "                  "
 
-#: templates/videos/_video_activity.html:8
-msgid "Activity"
-msgstr "Aktivita"
-
 #: templates/videos/_video_activity.html:9
 msgid "Happened"
 msgstr "Čas"
@@ -5449,17 +5445,17 @@ msgstr "Vrátit zpět na verzi"
 msgid "Not Synced"
 msgstr "Nesynchronizováno"
 
-#: templates/videos/email_base.html:92
+#: templates/videos/email_base.html:94
 msgid "Don't send any more emails about this particular video."
 msgstr "Neposílat žádné další emaily o tomto konkrétním videu."
 
-#: templates/videos/email_base.html:102
+#: templates/videos/email_base.html:104
 msgid ""
 "To stop receiving these emails, go to your preferences page and uncheck "
 "\"notify me by email\":"
 msgstr ""
 
-#: templates/videos/email_base.html:104
+#: templates/videos/email_base.html:106
 msgid "My profile / preferences"
 msgstr "Můj profil / nastavení"
 
@@ -5471,76 +5467,76 @@ msgstr "Poslat příteli emailem\n"
 msgid "Send to Friend!"
 msgstr "Poslat příteli!"
 
-#: templates/videos/email_notification.html:8
+#: templates/videos/email_notification.html:9
 #, python-format
 msgid ""
 "\n"
-"            <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
-"            you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
-"            were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n"
-"            These changes went live immediately.  %(text_change)s of the text and\n"
-"            %(time_change)s of the timing was changed.\n"
-"            "
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n"
+"                These changes went live immediately.  %(text_change)s of the text and\n"
+"                %(time_change)s of the timing was changed.\n"
+"                "
 msgstr ""
 
-#: templates/videos/email_notification.html:16
+#: templates/videos/email_notification.html:17
 #, python-format
 msgid ""
 "\n"
-"            <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
-"            you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
-"            were changed. These changes went live immediately. %(text_change)s of the text and \n"
-"            %(time_change)s of the timing was changed.\n"
-"            "
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed. These changes went live immediately. %(text_change)s of the text and \n"
+"                %(time_change)s of the timing was changed.\n"
+"                "
 msgstr ""
 
-#: templates/videos/email_notification.html:25
-#: templates/videos/email_notification_non_editors.html:22
+#: templates/videos/email_notification.html:26
+#: templates/videos/email_notification_non_editors.html:23
 msgid "Compare the new version to the last version"
 msgstr "Porovnat novou verzi s poslední verzí"
 
-#: templates/videos/email_notification.html:26
+#: templates/videos/email_notification.html:27
 msgid "Compare your work to the new version"
 msgstr "Porovnat svou práci s novou verzí"
 
-#: templates/videos/email_notification.html:27
-#: templates/videos/email_notification_non_editors.html:23
+#: templates/videos/email_notification.html:28
+#: templates/videos/email_notification_non_editors.html:24
 msgid "Stop watching for changes on this video"
 msgstr "Přestat sledovat změny v tomto videu"
 
-#: templates/videos/email_notification.html:34
-#: templates/videos/email_notification_non_editors.html:30
+#: templates/videos/email_notification.html:36
+#: templates/videos/email_notification_non_editors.html:32
 msgid "Old Text"
 msgstr "Starý text"
 
-#: templates/videos/email_notification.html:37
-#: templates/videos/email_notification_non_editors.html:33
+#: templates/videos/email_notification.html:39
+#: templates/videos/email_notification_non_editors.html:35
 msgid "Changes to Subtitle Text"
 msgstr "Změny v textu titulků"
 
-#: templates/videos/email_notification.html:40
-#: templates/videos/email_notification_non_editors.html:36
+#: templates/videos/email_notification.html:42
+#: templates/videos/email_notification_non_editors.html:38
 msgid "New Text"
 msgstr "Nový text"
 
-#: templates/videos/email_notification_non_editors.html:8
+#: templates/videos/email_notification_non_editors.html:9
 #, python-format
 msgid ""
 "\n"
-"            <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
-"            to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
-"            were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. These changes went live immediately. %(change_percent)s of the timing was changed.  \n"
-"            "
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. These changes went live immediately. %(change_percent)s of the timing was changed.  \n"
+"                "
 msgstr ""
 
-#: templates/videos/email_notification_non_editors.html:14
+#: templates/videos/email_notification_non_editors.html:15
 #, python-format
 msgid ""
 "\n"
-"            <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
-"            to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
-"            were changed. These changes went live immediately. %(change_percent)s of the timing was changed.             \n"
-"            "
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed. These changes went live immediately. %(change_percent)s of the timing was changed.             \n"
+"                "
 msgstr ""
 
 #: templates/videos/email_start_notification.html:7

@@ -9,11 +9,36 @@
             "created": "2010-11-11 10:52:09", 
             "points": 0, 
             "membership_policy": 4, 
-            "video_policy": 1, 
+            "video_policy": 2, 
+            "task_assign_policy": 20, 
             "highlight": false, 
             "logo": "", 
             "slug": "volunteer", 
             "name": "Volunteer"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "teams.project", 
+        "fields": {
+            "name": "_root", 
+            "description": "Team for testing", 
+            "created": "2010-11-11 10:52:09", 
+            "modified": "2010-11-11 10:52:09", 
+            "team": 1,
+            "slug": "_root"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "teams.project", 
+        "fields": {
+            "name": "Test Project", 
+            "description": "Project for testing.", 
+            "created": "2010-11-11 10:52:09", 
+            "modified": "2010-11-11 10:52:09", 
+            "team": 1,
+            "slug": "test"
         }
     }, 
     {
@@ -30,7 +55,7 @@
         "model": "teams.teammember", 
         "fields": {
             "user": 9999, 
-            "role": "manager", 
+            "role": "owner", 
             "team": 1
         }
     },      
@@ -54,7 +79,8 @@
             "team": 1, 
             "thumbnail": "", 
             "added_by": 9998,
-            "created": "2010-11-11 10:52:09"
+            "created": "2010-11-11 10:52:09",
+            "project": 1
         }
     },
     {
@@ -68,7 +94,8 @@
             "team": 1, 
             "thumbnail": "", 
             "added_by": 9998,
-            "created": "2010-11-11 10:52:09"
+            "created": "2010-11-11 10:52:09",
+            "project": 1
         }
     },
     {
@@ -82,7 +109,8 @@
             "team": 1, 
             "thumbnail": "", 
             "added_by": 9998,
-            "created": "2010-11-11 10:52:09"
+            "created": "2010-11-11 10:52:09",
+            "project": 2
         }
     }            
 ]

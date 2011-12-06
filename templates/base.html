@@ -74,6 +74,7 @@ jQuery(function($){
     _gaq.push(['_setDomainName', '.universalsubtitles.org']);    
     _gaq.push(['_trackPageview']);
 
+    {% if not RUN_LOCALLY %}
     {% block analytics %}{% endblock %}
     
     (function() {
@@ -81,6 +82,7 @@ jQuery(function($){
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();
+    {% endif %}
 </script>
 {% endif %}
 <script type="text/javascript">
@@ -186,8 +188,7 @@ jQuery(function($){
     {% for message in messages %}
     <h2 class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</h2>
     {% endfor %}
-    <a href="#" id="closeBut" style="display: block; float: right;">&nbsp;</a>
-    <br style="clear: both"/>                
+    <a href="#" id="closeBut" style="display: block; float: right;">x</a>
   </div><!-- // messages -->
   {% endif %}
   
@@ -212,6 +213,7 @@ jQuery(function($){
 
 <div style="float: right; font-size: 0.6em; padding: 3px;">commit: {{ LAST_COMMIT_GUID }}</div>
 {% block bottom_scripts %}{% endblock %}
+{% if not RUN_LOCALLY %}
 <script type="text/javascript" charset="utf-8">
   Tender = {
     hideToggle: true,
@@ -219,5 +221,6 @@ jQuery(function($){
   }
 </script>
 <script src="https://universalsubtitles.tenderapp.com/tender_widget.js" type="text/javascript"></script>
+{% endif %}
 </body>
 </html>

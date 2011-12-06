@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<ul class="tabs">
+    <li{% if current == "profile" %} class="current" {% endif %}>
+        <a href="{% url profiles:my_profile %}">
+            {% trans "Profile" %}
+        </a>
+    </li>
+
+    {% if user.is_authenticated and user == user_info %}
+        <li{% if current == "messages" %} class="current" {% endif %}>
+            <a href="{% url messages:index %}">
+                {% trans "Messages" %}
+            </a>
+        </li>
+
+        <li{% if current == "dashboard" %} class="current" {% endif %}>
+            <a href="{% url profiles:dashboard %}">
+                {% trans "Dashboard" %}
+            </a>
+        </li>
+    {% endif %}
+</ul>

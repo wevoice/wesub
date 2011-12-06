@@ -1,0 +1,192 @@
+{% extends "teams/base.html" %}
+{% load i18n teams_tags paginator doorman media_compressor verbatim_templatetag %}
+
+{% block scripts %}
+    {{ block.super }}
+    {% include "utils/chosenify.html" %}
+    {% include_bundle "js-teams-tasks-panel" %}
+    <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
+{% endblock %}
+
+{% block title %}
+    {{ team }} {% trans 'Tasks' %} | Universal Subtitles
+{% endblock %}
+
+{% block view_content %}
+
+    {% with "tasks" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
+
+    <div class="panel-holder view grid_9 alpha">
+    </div>
+
+    <div class="controls grid_3 omega">
+
+        <form id="tasks_type_filter"></form>
+
+        <div class="refine">
+            <form id="tasks_language_filter">
+                <h4>Refine</h4>
+            </form>
+        </div>
+
+        {% include "teams/_actions.html" %}
+    </div>
+
+<script type="text/javascript">
+$(window).load(function() {
+    {% include "teams/panel-base.js" %}
+    {% include "teams/tasks-panel.js" %}
+});
+</script>
+
+<!-- templates -->
+<script id="IMAGE_PRELOADER" type="text/html">
+  <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
+</script>
+
+{% verbatim %}
+
+<script id="subMenuItem" type="text/html">
+  <li><a >{{label}}</a></li>
+</script>
+
+<script id="tasksLanguagesList" type="text/html">
+    <select id="id_task_language" name="language" class="chosen">
+        <option value="">All Languages</option>
+    </select>
+</script>
+
+<script id="tasksLanguagesListOption" type="text/html">
+    <option value="{{ language }}">{{ language_display }}</option>
+</script>
+
+<script id="tasksTypesList" type="text/html">
+    <ul class="types">
+        <li class="type current">
+            <a href="#">
+                All Pending
+                <span class="all"></span>
+            </a>
+            <input type="hidden" name="type" value="" />
+        </li>
+        <li class="type">
+            <a href="#">
+                Review
+                <span class="review"></span>
+            </a>
+            <input type="hidden" name="type" value="Review" />
+        </li>
+        <li class="type">
+            <a href="#">
+                Approve
+                <span class="approve"></span>
+            </a>
+            <input type="hidden" name="type" value="Approve" />
+        </li>
+        <li class="type">
+            <a href="#">
+                Translate
+                <span class="translate"></span>
+            </a>
+            <input type="hidden" name="type" value="Translate" />
+        </li>
+        <li class="type">
+            <a href="#">
+                Subtitle
+                <span class="subtitle"></span>
+            </a>
+            <input type="hidden" name="type" value="Subtitle" />
+        </li>
+    </ul>
+</script>
+
+<script id="tasksListItem" type="text/html">
+    <h3>
+        {{ #languageDisplay}}
+            Translate to {{ languageDisplay }}:
+        {{ /languageDisplay}}
+
+        {{ ^languageDisplay}}
+            Transcribe:
+        {{ /languageDisplay}}
+        <a href="{{ teamVideoUrl }}">{{ teamVideoDisplay }}</a>
+        <span class="descriptor">
+            {{ #ghost }}
+                <b>GHOST</b>
+            {{ /ghost }}
+            {{ #completed }}
+                <b>COMPLETED</b>
+            {{ /completed }}
+        </span>
+    </h3>
+    <p class="done">
+        <span>
+            {{ #steps }}
+                {{ #done }}
+                    &#x25FC;
+                {{ /done }}
+                {{ ^done }}
+                    &#x25FB;
+                {{ /done }}
+            {{ /steps }}
+        </span>
+
+        {{ stepDisplay }}
+    </p>
+    <ul class="actions">
+        <li>
+            {{ #assigneeDisplay }}
+                Assigned to {{ assigneeDisplay }}
+            {{ /assigneeDisplay }}
+
+            {{ #assignAllowed }}
+                <form action="" method="post">
+                    <a class="action-assign" href="#">
+                        {{ #assigneeDisplay }}
+                            Reassign
+                        {{ /assigneeDisplay }}
+                        {{ ^assigneeDisplay }}
+                            Assign
+                        {{ /assigneeDisplay }}
+                    </a>
+                    <div class="assignee-choice" style="display: none;">
+                        {% endverbatim %}
+                            {{ assign_form.assignee }}
+                        {% verbatim %}
+                        <a class="action-assign-submit" href="#">Assign to User</a>
+                    </div>
+                </form>
+            {{ /assignAllowed }}
+
+            {{ ^assigneeDisplay }}
+                <form action="{{ performUrl }}" method="post">
+                    {% endverbatim %}
+                        {% csrf_token %}
+                    {% verbatim %}
+                    <input type="hidden" name="task_id" value="{{ pk }}" />
+
+                    {{ #performAllowed }}
+                        <a class="perform" href="{{ performUrl }}">Perform Task</a>
+                    {{ /performAllowed }}
+                </form>
+            {{ /assigneeDisplay }}
+        </li>
+    </ul>
+    {{ #deleteAllowed }}
+        <ul class="admin-controls">
+            <li>
+                <a class="action-delete" href="#">Remove</a>
+            </li>
+        </ul>
+    {{ /deleteAllowed }}
+</script>
+
+<script id="tasksPanel" type="text/html">
+    <ul class="tasks listing"></ul>
+    <div class="pagination"></div>
+</script>
+
+{% endverbatim %}
+{% endblock %}

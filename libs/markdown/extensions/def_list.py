@@ -40,7 +40,6 @@ class DefListProcessor(markdown.blockprocessors.BlockProcessor):
             d = '%s\n%s' % (m.group(2), d)
         else:
             d = m.group(2)
-        #import ipdb; ipdb.set_trace()
         sibling = self.lastChild(parent)
         if not terms and sibling.tag == 'p':
             # The previous paragraph contains the terms

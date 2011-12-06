@@ -31,12 +31,15 @@ class TeamVideoLanguagesIndex(SearchIndex):
     original_language_display = CharField(indexed=False)
     has_lingua_franca = BooleanField()
     absolute_url = CharField(indexed=False)
+    project_pk = IntegerField(indexed=True)
     # never store an absolute url with solr
     # since the url changes according to the user
     # one cannot construct the url at index time
     # video_absolute_url = CharField(indexed=False)
     thumbnail = CharField(indexed=False)
     title = CharField(indexed=True)
+    project_name = CharField(indexed=False)
+    project_slug = CharField(indexed=False)
     description = CharField(indexed=False)
     is_complete = BooleanField()
     video_complete_date = DateTimeField(null=True)
@@ -88,12 +91,15 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['description'] = obj.description
         self.prepared_data['is_complete'] = obj.video.complete_date is not None
         self.prepared_data['video_complete_date'] = obj.video.complete_date
-        
+        self.prepared_data['project_pk'] = obj.project.pk
+        self.prepared_data['project_name'] = obj.project.name
+        self.prepared_data['project_slug'] = obj.project.slug
         completed_sls = obj.video.completed_subtitle_languages()
         self.prepared_data['video_completed_langs'] = \
             [sl.language for sl in completed_sls]
         self.prepared_data['video_completed_lang_urls'] = \
             [sl.get_absolute_url() for sl in completed_sls]
+
         policy = obj.video.policy
         owned_by = None
         if policy and policy.belongs_to_team:

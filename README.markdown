@@ -30,6 +30,7 @@ To run the development version:
     Then run following commands:
 
         cd /opt/unisubs
+        source ../extras/venv/bin/activate
         ./bootstrap-vagrant.sh
 
     It's safe to run `bootstrap-vagrant.sh` multiple times if something goes
@@ -63,3 +64,20 @@ tasks:
     BROKER_PASSWORD = "usrmqpassword"
     BROKER_VHOST = "ushost"
 
+### Werkzeug Debugger
+
+If you want to use the awesome Werkzeug debugging runserver instead of the
+standard Django one, you just have to run (while the virtualenv is activated):
+
+    pip install werkzeug
+
+And then use `./dev-runserver.sh plus` to run it.
+
+### bpython shell
+
+If you want to use the awesome bpython shell instead of the normal one you just
+need to run (while the virtualenv is activated):
+
+    pip install bpython
+
+Now when you run `pm shell` it will use bpython automatically.

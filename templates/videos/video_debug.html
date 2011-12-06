@@ -61,6 +61,7 @@ jQuery(function($) {
     <th>Percent done</th>
     <th>Num Subs</th>
     <th>translated from</ht>
+    <th>has versio</ht>
   </tr>
   {% for x in video.subtitlelanguage_set.all %}
   <tr>
@@ -71,6 +72,7 @@ jQuery(function($) {
     <td>{{x.percent_done}}</td>
     <td>{{x.subtitle_count}}</td>
     <td>{{x.standard_language}}</td>
+    <td>{{x.has_version}}</td>
   </tr>
   {% endfor %}
 </table>

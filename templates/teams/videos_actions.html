@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "teams/base.html" %}
 
 {% load i18n teams_tags paginator profiles_tags %}
 
@@ -6,36 +6,33 @@
     {{ team }} | Universal Subtitles
 {% endblock %}
 
-{% block body_attrs %}id="teams"{% endblock %}
+{% block body_attrs %}id="teams" class="v1"{% endblock %}
 
-{% block main_content %}
-<div class="grid_8 alpha">
-    <h2>
-        <a href="{{ team.get_absolute_url }}">{{ team }}</a>  
-        {% if team|is_team_manager:user %}
-            (<a href="{{ team.get_edit_url }}">{% trans 'Edit Team' %}</a>)
-        {% endif %}   
-    </h2>
-</div>
-<div class="grid_4 omega">
-    <div class="team_logo">
-        {% if team.logo %}
-        <img alt="{{ team }}" title="{{ team }}" src="{{ team.logo_thumbnail }}"/>
+{% block view_content %}
+
+    {% with "activity" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        {% if videos_action_list %}
+            {% if is_paginated %}{% paginator %}{% endif %}
+            <ul class="activity listing">
+                {% with 1 as medium_thumb %}
+                    {% for item in videos_action_list %}
+                        <li>{{ item.render }}</li>
+                    {% endfor %}
+                {% endwith %}
+            </ul>
+            {% if is_paginated %}{% paginator %}{% endif %}
+        {% else %}
+            <p class="empty">{% trans "Sorry, no activity yet" %}...</p>
         {% endif %}
     </div>
-</div>
-<div class="grid_8 alpha">
-    <div id="videos-tab">
-        {% if is_paginated %}{% paginator %}{% endif %}
-        <ul class="big_list">
-            {% with 1 as medium_thumb %}
-            {% for item in videos_action_list %}
-                <li>{{ item.render }}</li>
-            {% endfor %}
-            {% endwith %}
-        </ul>
-        {% if is_paginated %}{% paginator %}{% endif %}
+
+    <div class="controls grid_3 omega">
+        {% include "teams/_filters_activity.html" %}
+        {% include "teams/_actions.html" %}
     </div>
-</div>
 
 {% endblock %}

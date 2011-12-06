@@ -24,7 +24,12 @@ from sitemaps import sitemaps, sitemap_view, sitemap_index
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
-admin.site.unregister([AuthMeta, OpenidProfile, TwitterUserProfile, FacebookUserProfile])
+# these really should be unregistred but while in development the dev server
+# might have not registred yet, so we silence this exception
+try:
+    admin.site.unregister([AuthMeta, OpenidProfile, TwitterUserProfile, FacebookUserProfile])
+except admin.sites.NotRegistered:
+    pass
 
 # Monkeypatch the Celery admin to show a column for task run time in the list view.
 from djcelery.admin import TaskMonitor
@@ -121,8 +126,9 @@ urlpatterns = patterns(
      {'template': 'alpha-test01-mp4.htm'}, 'test-mp4-page'),
      url(r'^sitemap\.xml$', sitemap_index, {'sitemaps': sitemaps}, name="sitemap-index"),
      url(r'^sitemap-(?P<section>.+)\.xml$', sitemap_view, {'sitemaps': sitemaps}, name="sitemap"),
+     (r'^prototypes/', include('prototypes.urls', namespace='prototypes', 
+                            app_name='prototypes')),
 )
-
 try:
     from services import urls
     urlpatterns += patterns('',
@@ -147,10 +153,19 @@ try:
 except ImportError:
     pass
 
+try:
+    from apiv2 import urls as api2urls
+    urlpatterns += patterns('',
+        url(r'^api2/', include('apiv2.urls', namespace=api2urls.URL_NAMESPACE),),
+    )
+except ImportError:
+    pass
+    
 if feature_is_on('MODERATION'):
     urlpatterns += patterns("",
         (r'^moderation/', include('teams.moderation_urls', namespace="moderation")),
     )
+    
 if settings.DEBUG:
     urlpatterns += patterns('',
         (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',

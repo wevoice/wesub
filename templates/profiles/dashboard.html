@@ -1,0 +1,62 @@
+{% extends "profiles/base.html" %}
+
+{% load i18n messages_tags recent_activity auth_tags profiles_tags %}
+
+{% block body_attrs %}id="dashboard" class="v1"{% endblock %}
+
+{% block title %}Dashboard | {{ user_info }} | Universal Subtitles{% endblock %}
+
+{% block main_content %}
+
+    <h2>
+        <img src="{{ user.small_avatar }}" alt="{{ user|title }}'s avatar"/>
+        {{ user }}
+    </h2>
+
+    {% with 'dashboard' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        <div class="grid_5 alpha">
+            <h3>Incoming Tasks</h3>
+            <ul class="listing">
+                <li>Spanish subtitles for <a href="">Promo Video #3</a> (Twitter) <span class="timestamp">2 hours ago</span></li>
+                <li>Review Spanish subtitles for <a href="">Promo Video #2</a> (Twitter) <span class="timestamp">2 hours ago</span></li>
+            </ul>
+
+            <h3>Other Activity</h3>
+            <ul class="listing">
+                <li><a href="">Something waiting...</a></li>
+            </ul>
+        </div>
+
+        <div class="grid_4 omega">
+            <h3>Alerts</h3>
+            <ul class="featured">
+                <li>You have <a href="">saved work</a> on "Promotional Video #1"</li>
+                <li>You have <a href="">2 unread messages</a></li>
+            </ul>
+
+            <h3>My Teams</h3>
+            {% with user.teams.all as user_teams %}
+            <ul>
+                {% if user_teams %}
+                    {% for t in user_teams %}
+                    <li>
+                        <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
+                    </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+            {% endwith %}
+        </div>
+    </div>
+
+    <div class="controls grid_3 omega">
+        <ul>
+            <li class="current"><a href="">Overview</a></li>
+            <li><a href="{% url profiles:my_videos %}">My Videos</a></li>
+        </ul>
+    </div>
+{% endblock %}
