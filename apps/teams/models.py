@@ -316,7 +316,7 @@ class Team(models.Model):
 
         if query:
             for term in filter(None, [word.strip() for word in query.split()]):
-                qs = qs.filter(video_title__icontains=term)
+                qs = qs.filter(video_title__icontains=qs.query.clean(term))
 
         return qs
 
