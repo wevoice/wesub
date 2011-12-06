@@ -94,6 +94,10 @@
                         </ul>
                     </li>
                 {% endwith %}
+            {% empty %}
+                <li class="empty">
+                    {% trans 'Sorry, no members found.' %}
+                </li>
             {% endfor %}
         </ul>
         {% if is_paginated %}{% paginator %}{% endif %}
