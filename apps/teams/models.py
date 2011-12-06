@@ -16,6 +16,9 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import sentry_logger
+logger = sentry_logger.logging.getLogger("teams.models")
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.contrib.contenttypes.models import ContentType
@@ -36,6 +39,7 @@ from haystack.query import SQ
 from haystack import site
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 from utils import get_object_or_none
+from utils import classimporter
 import datetime 
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
@@ -1534,3 +1538,86 @@ class TeamLanguagePreference(models.Model):
         return u"%s preference for team %s" % (self.language_code, self.team)
 
 post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePreference)
+
+    
+class TeamNotificationSettingManager(models.Manager):
+    def notify_team(self, team_pk, video_id, event_name, language_pk=None):
+        """
+        Finds the matching notification settings for this team, instantiates
+        the notifier class , and sends the appropriate notification.
+        If the notification settings has an email target, sends an email.
+        If the http settings are filled, then sends the request.
+
+        This can be ran as a task, as it requires no objects to be passed
+        """
+        try:
+            notification_settings = self.get(team__id=team_pk)
+        except TeamNotificationSetting.DoesNotExist:
+            return
+        notification_settings.notify(Video.objects.get(video_id=video_id), event_name,
+                                                 language_pk)
+           
+class TeamNotificationSetting(models.Model):
+    """
+    Info on how a team should be notified of changes to it's videos.
+    For now, a team can be notified by having a http request sent
+    with the payload as the notification information.
+    This cannot be hardcoded since teams might have different urls
+    for each environment.
+
+    Some teams have strict requirements on mapping video ids to their
+    internal values, and also their own language codes. Therefore we
+    need to configure a class that can do the correct mapping.
+    
+    TODO: allow email notifications
+    """
+    EVENT_VIDEO_NEW = "event-video-new"
+    EVENT_VIDEO_EDITED = "event-video-edited"
+    EVENT_LANGUAGE_NEW = "event-language-new"
+    EVENT_LANGUAGE_EDITED = "event-language-edit"
+    EVENT_SUBTITLE_NEW = "event-subtitle-new"
+    EVENT_SUBTITLE_APPROVED = "event-subtitle-approved"
+    EVENT_SUBTITLE_REJECTED = "event-subtitle-rejected"
+ 
+    team = models.OneToOneField(Team, related_name="notification_settings")
+    # the url to post the callback notifing partners of new video activity
+    request_url = models.URLField(blank=True, null=True)
+    basic_auth_username = models.CharField(max_length=255, blank=True, null=True)
+    basic_auth_password = models.CharField(max_length=255, blank=True, null=True)
+    # not being used, here to avoid extra migrations in the future
+    email = models.EmailField(blank=True, null=True)
+
+    # integers mapping to classes, see unisubs-integration/notificationsclasses.py
+    notification_class = models.IntegerField(default=1,)
+    
+    objects = TeamNotificationSettingManager()
+    
+    def get_notification_class(self):
+        try:
+            from notificationsclasses import NOTIFICATION_CLASS_MAP
+            
+            return NOTIFICATION_CLASS_MAP[self.notification_class]
+        except ImportError:
+            logger.exception("Apparently unisubs-integration is not installed")
+            
+        
+    def notify(self, video, event_name, language_pk=None):
+        """
+        Resolves what the notifier class is for this settings and
+        fires notfications it configures
+        """
+        notifier = self.get_notification_class()(self.team, video, event_name, language_pk=None)
+        if self.request_url:
+            success, content = notifier.send_http_request(
+                self.request_url,
+                self.basic_auth_username,
+                self.basic_auth_password
+            )
+            return success, content
+        # FIXME: spec and test this, for now just return
+        return
+        if self.email:
+            notifier.send_email(self.email, self.team, video, event_name, language_pk)
+        
+    def __unicode__(self):
+        return u'NotificationSettings for team %s' % (self.team)
