@@ -80,12 +80,12 @@
                     $('.reply-container textarea', $modal).val('');
                 }else{
                     $('.reply-container', $modal).hide();
-                }            	
+                }               
             }
             
             if (reply_msg_data){
-            	set_message_data(reply_msg_data, $('#msg_modal'));
-            	$('#msg_modal').mod();
+                set_message_data(reply_msg_data, $('#msg_modal'));
+                $('#msg_modal').mod();
             };
             
             $('#msg_modal').bind('before-show-modal', function(event, link){
@@ -105,7 +105,7 @@
                     });
                 };
                 
-				set_message_data(data, $modal);
+                set_message_data(data, $modal);
             });
         });
     </script>
@@ -138,7 +138,7 @@
                             From <a href="{{ msg.author.get_absolute_url }}">{{ msg.author }}</a>
                         </p>
                     {% endif %}
-                    <p>{{ msg.get_content }}</p>
+                    <p>{{ msg.get_content|safe }}</p>
                     <a class="thumb" href="{{ msg.author.get_absolute_url }}" title="View {{ msg.author }}'s profile">
                         {% with msg.author.small_avatar as author_avatar_url %}
                             {% if author_avatar_url %}
@@ -182,11 +182,11 @@
     <div class="clearfix reply-container">
         <form action="" method="post" accept-charset="utf-8" id="send-message-form">
           <div class="global-errors"></div>
-		    <style>
-		    	#message_form_id_content {
-		    		max-width: 355px;
-		    	}
-		    </style>              
+            <style>
+                #message_form_id_content {
+                    max-width: 355px;
+                }
+            </style>              
           {{ send_message_form.as_p }}
           <p><button type="submit" class="green_button small">{% trans "Send Message" %}</button></p>
         </form>
