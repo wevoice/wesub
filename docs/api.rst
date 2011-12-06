@@ -149,3 +149,30 @@ Represents a listing of all available languages on the Universal Subtitles platf
 Listing available languages::
 
    GET https://www.unversalsubtitles.org/api2/partners/languages/
+
+UserResouce
+------------
+
+One can list and create new users through the api.
+
+Listing users::
+
+    GET https://www.unversalsubtitles.org/api2/users/
+
+User datail::
+
+    GET https://www.unversalsubtitles.org/api2/users/[username]/
+    
+Creating Users::
+
+    POST https://www.unversalsubtitles.org/api2/users/
+
+Parameters:
+
+  * `username`: the username for later login.  30 chars or fewer alphanumeric chars, @, _ and - are accepted.
+  * `password`: any number of chars, all chars allowed.
+  * `first_name`: Any chars, max 30 chars. Optional. 
+  * `last_name`: Any chars, max 30 chars. Optional. 
+  * `create_login_token` : If sent the response will also include a url that when clicked will login the recently created user. This URL expires in 2 hours
+  
+The response also includes the 'api_key' for that user. If clients wish to make requests on behalf of this newly created user through the api, they must hold on to this key, since it won't be returned in the detailed view.  
