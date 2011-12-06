@@ -61,9 +61,9 @@
 }
 .opacity(@op) {
     filter: alpha(opacity=@op);
-    -moz-opacity: @op/100;
-    -khtml-opacity: @op/100;
-    opacity: @op/100;
+    -moz-opacity: @op;
+    -khtml-opacity: @op;
+    opacity: @op;
 }
 
 @usblue: #0f517a;
@@ -276,12 +276,12 @@
 /* Listings */
 
 .v1 .listing {
-  padding: 0;
+    padding: 0;
 
-    > li {
-    position: relative;
-    padding: 2em 1em;
-    border-bottom: 1px dotted @faint;
+    & > li {
+        position: relative;
+        padding: 2em 1em;
+        border-bottom: 1px dotted @faint;
 
         &.empty {
             border:none;
@@ -293,7 +293,7 @@
             padding-bottom: .25em;
             line-height: 1.5em;
 
-            > a {
+            & > a {
                 text-decoration: none;
                 margin-right: .5em;
 
@@ -420,8 +420,10 @@
             }
         }
 
-        &:hover .admin-controls {
-            display: block;
+        &:hover {
+            .admin-controls {
+                display: block;
+            }
         }
     }
 }
@@ -881,4 +883,3 @@
         }
     }
 }
-
