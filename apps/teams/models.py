@@ -140,7 +140,7 @@ class Team(models.Model):
     objects = TeamManager()
 
     class Meta:
-        ordering = ['-name']
+        ordering = ['name']
         verbose_name = _(u'Team')
         verbose_name_plural = _(u'Teams')
 
