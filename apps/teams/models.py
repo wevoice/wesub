@@ -1435,6 +1435,7 @@ class Setting(models.Model):
         (100, 'messages_invite'),
         (101, 'messages_manager'),
         (102, 'messages_admin'),
+        (103, 'messages_application'),
         (200, 'guidelines_subtitle'),
         (201, 'guidelines_translate'),
         (202, 'guidelines_review'),

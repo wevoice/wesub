@@ -509,6 +509,7 @@ class GuidelinesMessagesForm(forms.Form):
     messages_invite = forms.CharField(max_length=1024, required=False)
     messages_manager = forms.CharField(max_length=1024, required=False)
     messages_admin = forms.CharField(max_length=1024, required=False)
+    messages_application = forms.CharField(max_length=1024, required=False)
 
     guidelines_subtitle = forms.CharField(max_length=1024, required=False)
     guidelines_translate = forms.CharField(max_length=1024, required=False)

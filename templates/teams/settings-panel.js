@@ -442,7 +442,7 @@ var GuidelinesPanel  = AsyncPanel.$extend({
         TeamsApiV2.guidelines_get(TEAM_SLUG, this.onLoaded);
         // Constants
         this.SETTING_KEYS = [
-            'messages_invite', 'messages_manager', 'messages_admin',
+            'messages_invite', 'messages_application', 'messages_manager', 'messages_admin',
             'guidelines_subtitle', 'guidelines_translate', 'guidelines_review'
         ];
     },
