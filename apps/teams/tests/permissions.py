@@ -32,7 +32,8 @@ from apps.teams.permissions import (
     can_change_team_settings, can_view_tasks_tab, can_invite,
     can_change_video_settings, can_review, can_message_all_members,
     can_edit_project, can_create_and_edit_subtitles, can_create_task_subtitle,
-    can_create_task_translate, can_join_team, can_edit_video, can_approve
+    can_create_task_translate, can_join_team, can_edit_video, can_approve,
+    roles_user_can_invite
 )
 
 
@@ -125,6 +126,31 @@ class TestRules(BaseTestPermission):
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
             with self.role(r):
                 self.assertItemsEqual(roles_user_can_assign(team, user, None), [])
+
+    def test_roles_inviteable(self):
+        user = User.objects.filter(teams__isnull=True)[0]
+        team = self.team
+
+        # Owners can do anything.
+        with self.role(ROLE_OWNER):
+            self.assertItemsEqual(roles_user_can_invite(team, user), [
+                ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+            ])
+
+        # Admins can do anything except invite owners.
+        with self.role(ROLE_ADMIN):
+            self.assertItemsEqual(roles_user_can_invite(team, user), [
+                ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+            ])
+
+        # Restricted Admins can only invite contributors.
+        with self.role(ROLE_ADMIN, self.test_project):
+            self.assertItemsEqual(roles_user_can_invite(team, user), [ROLE_CONTRIBUTOR])
+
+        # Everyone else can only invite contributors.
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                self.assertItemsEqual(roles_user_can_invite(team, user), [ROLE_CONTRIBUTOR])
 
     def test_can_rename_team(self):
         user = self.user

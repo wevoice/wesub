@@ -109,6 +109,7 @@ def get_role_for_target(user, team, project=None, lang=None):
 
     return role
 
+
 def roles_user_can_assign(team, user, to_user=None):
     """Return a list of the roles the given user can assign for the given team.
 
@@ -131,6 +132,25 @@ def roles_user_can_assign(team, user, to_user=None):
         return ROLES_ORDER[1:]
     else:
         return []
+
+def roles_user_can_invite(team, user):
+    """Return a list of the roles the given user can invite for the given team.
+
+    Rules:
+
+        * Unrestricted owners can invite all roles.
+        * Unrestricted admins can invite any non-owner role.
+        * Everyone else can only invite contributors.
+
+    """
+    user_role = get_role_for_target(user, team)
+
+    if user_role == ROLE_OWNER:
+        return ROLES_ORDER
+    elif user_role == ROLE_ADMIN:
+        return ROLES_ORDER[1:]
+    else:
+        return [ROLE_CONTRIBUTOR]
 
 
 # Narrowings
