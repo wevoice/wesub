@@ -465,8 +465,11 @@ def detail_members(request, slug, role=None):
     qs = team.members.all()
 
     if q:
-        qs = qs.filter(Q(user__first_name__icontains=q)|Q(user__last_name__icontains=q)
-                       |Q(user__username__icontains=q)|Q(user__biography__icontains=q))
+        for term in filter(None, [term.strip() for term in q.split()]):
+            qs = qs.filter(Q(user__first_name__icontains=term)
+                         | Q(user__last_name__icontains=term)
+                         | Q(user__username__icontains=term)
+                         | Q(user__biography__icontains=term))
 
     if lang:
         qs = qs.filter(user__userlanguage__language=lang)
