@@ -137,11 +137,11 @@
         {% if is_paginated %}{% paginator %}{% endif %}
     </div>
     <div class="controls grid_3 omega">
-        <form action="." class="search">
-            <fieldset>
-                <input type="text" name="q" value="{{ query|default:'Search...' }}"/>
-            </fieldset>
-        </form>
+
+        <div class="refine">
+            <h4>Refine</h4>
+            {% include "teams/_search.html" %}
+        </div>
         
         {% if user.is_superuser and user.is_active %}
             <a href="{% url teams:create %}" class="button primary start_team">{% trans 'Start a Team' %}</a>
