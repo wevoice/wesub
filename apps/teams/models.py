@@ -140,7 +140,7 @@ class Team(models.Model):
     objects = TeamManager()
 
     class Meta:
-        ordering = ['-name']
+        ordering = ['name']
         verbose_name = _(u'Team')
         verbose_name_plural = _(u'Teams')
 
@@ -316,7 +316,7 @@ class Team(models.Model):
 
         if query:
             for term in filter(None, [word.strip() for word in query.split()]):
-                qs = qs.filter(video_title__icontains=term)
+                qs = qs.filter(video_title__icontains=qs.query.clean(term))
 
         return qs
 

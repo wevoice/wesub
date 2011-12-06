@@ -22,7 +22,7 @@
         $(function() {
             $select = $("select#lang-filter", ".controls");
             $select.change(function(e) {
-                var lang = select.val();
+                var lang = $select.val();
                 if (lang !== '') {
                     window.location = document.URL.split("?")[0] + '?lang=' + lang;
                 } else {
@@ -78,12 +78,9 @@
 
     <div class="controls grid_3 omega">
         {% include "teams/_filters_videos.html" %}
-        {% include "teams/_search.html" %}
         <div class="refine">
             <h4>Refine</h4>
-            {% comment %}
-            <form class="search"><fieldset><input type="text" value="Search..."/></fieldset></form>
-            {% endcomment %}
+            {% include "teams/_search.html" %}
             <select name="lang-filter" id="lang-filter">
                 <option value="">All languages</option>
                 {% for code, name in language_choices %}
