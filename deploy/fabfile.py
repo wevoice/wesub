@@ -471,10 +471,10 @@ def test_memcached():
                 raise Exception('Machines {0} and {1} are using different memcached instances'.format(
                         host[0], other_host[0]))
 
-def generate_docs():
+def build_docs():
     env.host_string = DEV_HOST
     with cd(os.path.join(env.static_dir, 'unisubs')):
-        run('%s/env/bin/sphinx-build %s/unisubs/docs/ %s/media/docs/' % (env.static_dir, env.static_dir, env.static_dir))
+        run('%s/env/bin/sphinx-build docs/ media/docs/' % (env.static_dir))
 
 def _get_settings_values(dir, *settings_name):
     with cd(os.path.join(dir, 'unisubs')):
