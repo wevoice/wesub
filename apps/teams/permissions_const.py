@@ -44,7 +44,7 @@ ROLE_NAMES = {
     ROLE_ADMIN: _(u'Admin'),
     ROLE_OWNER: _(u'Owner'),
     ROLE_MANAGER: _(u'Manager'),
-    ROLE_CONTRIBUTOR: _(u'Team Member'),
+    ROLE_CONTRIBUTOR: _(u'Contributor'),
 }
 
 #: Permissions that can be assigned to a model
