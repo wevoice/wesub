@@ -105,9 +105,9 @@
 
     <div class="controls grid_3 omega">
         {% include "teams/_filters_members.html" %}
-        {% include "teams/_search.html" %}
         <div class="refine">
             <h4>Refine</h4>
+            {% include "teams/_search.html" %}
             <select name="lang-filter" id="lang-filter">
                 <option value="">All languages</option>
                 {% for code, name in languages %}
