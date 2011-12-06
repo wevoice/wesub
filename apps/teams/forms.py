@@ -32,7 +32,7 @@ from utils.forms.unisub_video_form import UniSubBoundVideoField
 from teams.permissions import can_assign_task
 
 from apps.teams.moderation import add_moderation, remove_moderation
-from apps.teams.permissions import roles_user_can_assign
+from apps.teams.permissions import roles_user_can_invite
 from apps.teams.permissions_const import ROLE_NAMES
 
 from doorman import feature_is_on
@@ -543,7 +543,7 @@ class InviteForm(forms.Form):
         self.team = team
         self.user = user
         self.fields['role'].choices = [(r, ROLE_NAMES[r])
-                                       for r in roles_user_can_assign(team, user)]
+                                       for r in roles_user_can_invite(team, user)]
 
 
     def clean_usernames(self):
