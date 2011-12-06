@@ -95,7 +95,7 @@
                             {% else %}
                                 {% if user.is_authenticated %}
                                     {% if team.is_open %}
-                                        <a href="">Join team</a>
+                                        <a onclick="return confirm('{% trans "Do you really wish to join this team?" %}')" href="{% url teams:join_team team.slug %}">{% trans "Join team" %}</a>
                                     {% endif %}
                                     {% if team.is_by_application %}
                                         {% if not team|has_applicant:user %}
