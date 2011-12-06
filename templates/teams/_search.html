@@ -1,11 +1,5 @@
-<div class="search">
-    <h4>Search</h4>
-    <form action="." method="get" class="search">
-        <fieldset>
-            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search" />
-        </fieldset>
-        <div>
-            <input type="submit" name="" value="Search" />
-        </div>
-    </form>
-</div>
+<form action="." method="get" class="search">
+    <fieldset>
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search&hellip;" />
+    </fieldset>
+</form>
