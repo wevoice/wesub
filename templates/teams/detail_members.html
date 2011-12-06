@@ -56,49 +56,44 @@
         {% endif %}
         <ul class="members listing">
             {% for member in team_member_list %}
-            {% with member.pk as mpk%}
-            <li>
-                <h3>
-                    <a href="{{ member.user.get_absolute_url }}">
-                        {{ member.user }}
-                        {% if member.user == user %}(You){% endif %}
-                    </a>
-                    {% for lang in member.user.get_languages %}
-                        <span class="descriptor">{{ lang.get_language_display }}</span>
-                    {% endfor %}
-                </h3>
-                <p>
-                  {{ member.role|capfirst }}
-                  
-                    {% member_projects member as member_project %}
-                    {% if member_project %}
-                        (
-                        {% for project in member_project %}
-                            {{project.name}}{% if not forloop.last %},{% endif %}
-                        {% endfor %}
-                        )
-                    {% endif %}
-                </p>
-                <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>
-                <ul class="actions">
+                {% with member.pk as mpk%}
                     <li>
-                        <a href="">Send a message</a>
+                        <h3>
+                            <a href="{{ member.user.get_absolute_url }}">
+                                {{ member.user }}
+                                {% if member.user == user %}(You){% endif %}
+                            </a>
+                            {% for lang in member.user.get_languages %}
+                                <span class="descriptor">{{ lang.get_language_display }}</span>
+                            {% endfor %}
+                        </h3>
+                        <p>
+                            {{ member.role|capfirst }}
+
+                            {% member_projects member as member_project %}
+                            {% if member_project %}
+                                (
+                                {% for project in member_project %}
+                                    {{project.name}}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                                )
+                            {% endif %}
+                        </p>
+                        <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>
+                        <ul class="actions">
+                            <li>
+                                <a href="">Send a message</a>
+                            </li>
+                        </ul>
+                        <ul class="admin-controls">
+                            {% if member in assignable_roles%}
+                                <li>
+                                    <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" >Edit</a>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </li>
-                </ul>
-                  <ul class="admin-controls">
-                    {% comment %}
-                    <li>
-                      <input type="checkbox"/>
-                    </li>
-                    {% endcomment %}
-                    {% if member in assignable_roles%}
-                      <li>
-                        <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" >Edit</a>
-                      </li>
-                    {% endif %}
-                  </ul>
-            </li>
-            {% endwith %}
+                {% endwith %}
             {% endfor %}
         </ul>
         {% if is_paginated %}{% paginator %}{% endif %}
