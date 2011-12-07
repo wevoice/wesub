@@ -205,7 +205,13 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.user = user
         super(AddTeamVideoForm, self).__init__(*args, **kwargs)
         self.fields['language'].choices = get_languages_list(True)
-        self.fields['project'].queryset = self.team.project_set.all()
+        
+        projects = self.team.project_set.all()
+        self.fields['project'].queryset = projects
+
+        ordered_projects = ([p for p in projects if p.is_default_project] +
+                            [p for p in projects if not p.is_default_project])
+        self.fields['project'].choices = [(p.pk, p) for p in ordered_projects]
 
     def clean_video_url(self):
         video_url = self.cleaned_data['video_url']
