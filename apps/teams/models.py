@@ -280,6 +280,12 @@ class Team(models.Model):
             setattr(self, '_videos_count', self.videos.count())
         return self._videos_count        
     
+    def application_message(self):
+        try:
+            return self.settings.get(key=Setting.KEY_IDS['messages_application']).data
+        except Setting.DoesNotExist:
+            return ''
+
     @property
     def applications_count(self):
         if not hasattr(self, '_applications_count'):

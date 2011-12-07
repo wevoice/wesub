@@ -532,10 +532,10 @@ class TeamsApiV2Class(object):
         else:
             return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
 
-    def member_role_info(self, team_slug, member_pk, user=None):
+    def member_role_info(self, team_slug, member_pk, user):
         team = Team.objects.get(slug=team_slug)
         member = team.members.get(pk=member_pk)
-        roles =  roles_user_can_assign(team, member.user)
+        roles =  roles_user_can_assign(team, user, member.user)
         # massage the data format to make it easier to work with
         # over the client side templating
         verbose_roles = [{"val":x[0], "name":x[1]} for x in TeamMember.ROLES if x[0] in roles]
@@ -544,29 +544,28 @@ class TeamsApiV2Class(object):
 
         for x in narrowings["TeamVideoLanguage"]:
             languages[x.content.language] = x.contant.pk
-                     
-                     
-                         
+
         project_narrowings = [x.content for x in narrowings["Project"]]
-        
+
         projects = []
         for p in Project.objects.for_team(team):
             data = dict(pk=p.pk, name=p.name)
             if p in project_narrowings:
                 data['selected'] = "selected"
             projects.append(data)
-                       
+
         langs = []
         for  l in ALL_LANGUAGES:
             data = dict(val=[0], name=l[1])
             if l[0] in languages:
                 data['pk'] = languages[l[0]]
-                data['selected'] ='selected' 
+                data['selected'] ='selected'
             langs.append(data)
         return {
-            "roles" : verbose_roles,
-            "languages":langs ,
-            "projects": projects
+            'current_role': member.role,
+            'roles': verbose_roles,
+            'languages': langs,
+            'projects': projects,
         }
 
     def save_role(self, team_slug, member_pk, role, \

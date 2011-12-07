@@ -21,7 +21,7 @@
         {% include_bundle "js-teams-settings-panel" %}
     {% endif %}
     {% include_bundle "unisubs-onsite-compiled" %}
-    <script src="{% url teams:rpc_api %}" type="text/javascript"></script>  
+    <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         $(function() {
             $select = $("select#lang-filter", ".controls");
@@ -45,7 +45,7 @@
 
     {% if team.video %}
         {% widget widget_params %}
-    {% endif %}    
+    {% endif %}
 
     <div class="view grid_9 alpha">
 
@@ -91,7 +91,7 @@
                             </li>
                         </ul>
                         <ul class="admin-controls">
-                            {% if member in assignable_roles%}
+                            {% if member in assignable_roles %}
                                 <li>
                                     <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" >Edit</a>
                                 </li>
@@ -120,45 +120,43 @@
     </div>
 
 {% if assignable_roles %}
-    
-<script id="editRoleDialog" type="text/html">
-  {% verbatim %}
-  <div>
-    <a class="close">X</a>
-    <label>Role:</label>
-    <select class="roles">
-      {{#roles}}
-      <option val="{{val}}">{{name}}</option>
-      {{/roles}}
-      </select>
-    <div class="clearfix"></div>
-    <label>Project Restriction:</label>
-      <select data-placeholder="Choose-selected..." style="width:350px;" 
-              multiple class="chzn-select projects">
-      {{#projects}}
-          <option {{#selected}}selected="selected"{{/selected}} value="{{pk}}">{{name}}</option>
-      {{/projects}}
-      </select>
-    
-    <div class="clearfix"></div>
-    <label>Language Restriction:</label>
-      <select data-placeholder="Choose-selected..." style="width:350px;" 
-              multiple class="chzn-select langs">
-      {{#languages}}
-          <option {{#selected}}selected="selected"{{/selected}} value="{{code}}">{{name}}</option>
-      {{/languages}}
-      </select>
-    
-    <div class="clearfix">
-      <a class="button small action-close" > Cancel</a>
-      <a class="button small action-save" > Save</a>
-    </div>
-    </div>
-{% endverbatim %}
-</script>
+    <script id="editRoleDialog" type="text/html">
+        {% verbatim %}
+        <div>
+            <a class="close">X</a>
+            <label>Role:</label>
+            <select class="roles">
+                {{#roles}}
+                    <option value="{{val}}">{{name}}</option>
+                {{/roles}}
+            </select>
+            <div class="clearfix"></div>
+            <label>Project Restriction:</label>
+            <select data-placeholder="Choose-selected..." style="width:350px;" multiple class="chzn-select projects">
+                {{#projects}}
+                    <option {{#selected}}selected="selected"{{/selected}} value="{{pk}}">{{name}}</option>
+                {{/projects}}
+            </select>
+
+            <div class="clearfix"></div>
+            <label>Language Restriction:</label>
+            <select data-placeholder="Choose-selected..." style="width:350px;"
+                multiple class="chzn-select langs">
+                {{#languages}}
+                    <option {{#selected}}selected="selected"{{/selected}} value="{{code}}">{{name}}</option>
+                {{/languages}}
+            </select>
+
+            <div class="clearfix">
+                <a class="button small action-close" > Cancel</a>
+                <a class="button small action-save" > Save</a>
+            </div>
+        </div>
+        {% endverbatim %}
+    </script>
 <script type="text/javascript" >
-  {% include "teams/assign-roles.js" %}
-</script>    
+    {% include "teams/assign-roles.js" %}
+</script>
 
 {% endif %}
 {% endblock %}

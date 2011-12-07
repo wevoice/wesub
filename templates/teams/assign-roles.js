@@ -1,7 +1,7 @@
 (function(){
-    
+
    var EDIT_SELECTOR = ".edit-role" ;
-    
+
     var EditRoleDialog = Class.$extend({
         __init__:function(pk, teamSlug){
             this.pk = pk;
@@ -10,17 +10,17 @@
             this.save = _.bind(this.save, this);
         },
         loadInfo: function(){
-            
             TeamsApiV2.member_role_info(
                 this.teamSlug,
                 this.pk,
                 _.bind(this.show, this)
-                )
+            );
         },
         show: function(res){
-            console.log(res)
-            
             this.el = ich.editRoleDialog(res);
+
+            $('select option[value="' + res['current_role'] + '"]', this.el).attr('selected', 'selected');
+
             $(this.el).show();
             $(this.el).css({
                 width:"600",
@@ -31,13 +31,11 @@
                 padding:"20px",
                 border:"2px solid red",
                 "background-color": "white"
-                    
             });
             $("a.action-close", this.el).click(this.hide);
             $("a.action-save", this.el).click(this.save);
             $("body").append(this.el);
             $(".chzn-select", this.el).chosen();
-            
         },
         save: function(e){
             e.preventDefault();
@@ -49,9 +47,9 @@
                 this.pk,
                 role,
                 projects,
-                languages, 
+                languages,
                 this.hide
-            )
+            );
            return false;
         },
         hide:function(e){
@@ -67,8 +65,7 @@
         var teamSlug = $(e.target).data("team-slug");
         var dialog = new EditRoleDialog(pk, teamSlug);
         dialog.loadInfo();
-        console.log(dialog)
-    };
+    }
     function bootstrapButton(el){
         $(el).click(function(e){
             onEditClicked(e);
