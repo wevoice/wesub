@@ -42,7 +42,6 @@ import widget
 from videos.models import Action
 from django.utils import simplejson as json
 from utils.amazon import S3StorageError
-from utils.translation import get_user_languages_from_request
 from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -120,26 +119,17 @@ def index(request, my_teams=False):
 def detail(request, slug, is_debugging=False, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
 
-    require_language = False
-
-    if languages is None:
-        languages = get_user_languages_from_request(request)
-    if 'lang' in request.GET:
-        require_language = True
-        languages = [request.GET['lang']]
-    if bool(is_debugging):
-        languages = request.GET.get('langs', '').split(',')
-
     if project_slug is not None:
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
         project = None
 
     query = request.GET.get('q')
+    sort = request.GET.get('sort')
+    language = request.GET.get('lang')
 
-    qs_list, mqs = team.get_videos_for_languages_haystack(
-            languages, user=request.user, project=project,
-            require_language=require_language, query=query)
+    qs = team.get_videos_for_languages_haystack(
+        language, user=request.user, project=project, query=query, sort=sort)
 
     extra_context = widget.add_onsite_js_files({})
     extra_context.update({
@@ -162,14 +152,12 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
 
     if bool(is_debugging) and request.user.is_staff:
         extra_context.update({
-                'mqs': mqs,
-                'qs_list': qs_list,
-                'languages': languages
-            })
+            'qs': qs,
+        })
         return render_to_response("teams/detail-debug.html", extra_context, RequestContext(request))
 
     all_langs = set()
-    for search_record in mqs:
+    for search_record in qs:
         if search_record.video_completed_langs:
             all_langs.update(search_record.video_completed_langs)
 
@@ -178,10 +166,10 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
 
     extra_context['language_choices'] = language_choices
 
-    return object_list(request, queryset=mqs, 
-                       paginate_by=VIDEOS_ON_PAGE, 
-                       template_name='teams/detail.html', 
-                       extra_context=extra_context, 
+    return object_list(request, queryset=qs,
+                       paginate_by=VIDEOS_ON_PAGE,
+                       template_name='teams/detail.html',
+                       extra_context=extra_context,
                        template_object_name='team_video_md')
 
 
@@ -646,23 +634,47 @@ def join_team(request, slug):
 
     return redirect(team)
 
+
+def _check_can_leave(team, user):
+    """Return an error message if the member cannot leave the team, otherwise None."""
+
+    try:
+        member = TeamMember.objects.get(team=team, user=user)
+    except TeamMember.DoesNotExist:
+        return u'You are not a member of this team.'
+
+    if not team.members.exclude(pk=member.pk).exists():
+        return u'You are the last member of this team.'
+
+    is_last_owner = (
+        member.role == TeamMember.ROLE_OWNER
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exclude(pk=member.pk).exists()
+    )
+    if is_last_owner:
+        return u'You are the last owner of this team.'
+
+    is_last_admin = (
+        member.role == TeamMember.ROLE_ADMIN
+        and not team.members.filter(role=TeamMember.ROLE_ADMIN).exclude(pk=member.pk).exists()
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exists()
+    )
+    if is_last_admin:
+        return u'You are the last admin of this team.'
+
+    return None
+
 @login_required
 def leave_team(request, slug):
     team = get_object_or_404(Team, slug=slug)
     user = request.user
-    try:
-        tm = TeamMember.objects.get(team=team, user=user)
-        
-        if not team.members.exclude(pk=tm.pk).exists():
-            messages.error(request, _(u'You are last member of this team.'))
-        elif not team.members.filter(role=TeamMember.ROLE_OWNER).exclude(pk=tm.pk).exists():
-            messages.error(request, _(u'You are last admin of this team.'))
-        else:
-            tm.delete()
-            messages.success(request, _(u'You have left this team.'))
-    except TeamMember.DoesNotExist:
-        messages.error(request, _(u'You are not member of this team.'))
-    
+
+    error = _check_can_leave(team, user)
+    if error:
+        messages.error(request, _(error))
+    else:
+        TeamMember.objects.get(team=team, user=user).delete()
+        messages.success(request, _(u'You have left this team.'))
+
     return redirect(request.META.get('HTTP_REFERER') or team)
 
 

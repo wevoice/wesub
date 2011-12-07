@@ -37,25 +37,25 @@ from haystack.query import SQ
 from haystack import site
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 from utils import get_object_or_none
-from utils import classimporter
+from utils.searching import get_terms
 import datetime 
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
 from apps.teams.moderation_const import WAITING_MODERATION
 from teams.permissions_const import TEAM_PERMISSIONS, PROJECT_PERMISSIONS, \
-      LANG_PERMISSIONS, ROLE_ADMIN, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_MANAGER
+        LANG_PERMISSIONS, ROLE_ADMIN, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_MANAGER
 
 def get_perm_names(model, perms):
     return [("%s-%s-%s" % (model._meta.app_label, model._meta.object_name, p[0]), p[1],) for p in perms]
-    
+
 
 class TeamManager(models.Manager):
-    
+
     def for_user(self, user):
         if user.is_authenticated():
             return self.get_query_set().filter(models.Q(is_visible=True)| \
-                                        models.Q(members__user=user)).distinct()
+                    models.Q(members__user=user)).distinct()
         else:
             return self.get_query_set().filter(is_visible=True)
 
@@ -67,42 +67,42 @@ class Team(models.Model):
     OPEN = 4
     INVITATION_BY_ADMIN = 5
     MEMBERSHIP_POLICY_CHOICES = (
-        (OPEN, _(u'Open')),
-        (APPLICATION, _(u'Application')),
-        (INVITATION_BY_ALL, _(u'Invitation by any team member')),
-        (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
-        (INVITATION_BY_ADMIN, _(u'Invitation by admin')),
-    )
+            (OPEN, _(u'Open')),
+            (APPLICATION, _(u'Application')),
+            (INVITATION_BY_ALL, _(u'Invitation by any team member')),
+            (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
+            (INVITATION_BY_ADMIN, _(u'Invitation by admin')),
+            )
     MEMBER_REMOVE = 1
     MANAGER_REMOVE = 2
     MEMBER_ADD = 3
     VIDEO_POLICY_CHOICES = (
-        (MEMBER_REMOVE, _(u'Members can add and remove video')),  #any member can add/delete video
-        (MANAGER_REMOVE, _(u'Managers can add and remove video')),    #only managers can add/remove video
-        (MEMBER_ADD, _(u'Members can only add videos'))  #members can only add video
-    )
+            (MEMBER_REMOVE, _(u'Members can add and remove video')),  #any member can add/delete video
+            (MANAGER_REMOVE, _(u'Managers can add and remove video')),    #only managers can add/remove video
+            (MEMBER_ADD, _(u'Members can only add videos'))  #members can only add video
+            )
 
     TASK_ASSIGN_CHOICES = (
-        (10, 'Any team member'),
-        (20, 'Managers and admins'),
-        (30, 'Admins only'),
-    )
+            (10, 'Any team member'),
+            (20, 'Managers and admins'),
+            (30, 'Admins only'),
+            )
     TASK_ASSIGN_NAMES = dict(TASK_ASSIGN_CHOICES)
     TASK_ASSIGN_IDS = dict([choice[::-1] for choice in TASK_ASSIGN_CHOICES])
 
     SUBTITLE_CHOICES = (
-        (10, 'Anyone'),
-        (20, 'Any team member'),
-        (30, 'Only managers and admins'),
-        (40, 'Only admins'),
-    )
+            (10, 'Anyone'),
+            (20, 'Any team member'),
+            (30, 'Only managers and admins'),
+            (40, 'Only admins'),
+            )
     SUBTITLE_NAMES = dict(SUBTITLE_CHOICES)
     SUBTITLE_IDS = dict([choice[::-1] for choice in SUBTITLE_CHOICES])
-    
+
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
     description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links.'))
-    
+
     logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True, upload_to='teams/logo/')
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
@@ -124,20 +124,20 @@ class Team(models.Model):
 
     # Policies and Permissions
     membership_policy = models.IntegerField(_(u'membership policy'),
-                                            choices=MEMBERSHIP_POLICY_CHOICES,
-                                            default=OPEN)
+            choices=MEMBERSHIP_POLICY_CHOICES,
+            default=OPEN)
     video_policy = models.IntegerField(_(u'video policy'),
-                                       choices=VIDEO_POLICY_CHOICES,
-                                       default=MEMBER_REMOVE)
+            choices=VIDEO_POLICY_CHOICES,
+            default=MEMBER_REMOVE)
     task_assign_policy = models.IntegerField(_(u'task assignment policy'),
-                                             choices=TASK_ASSIGN_CHOICES,
-                                             default=TASK_ASSIGN_IDS['Any team member'])
+            choices=TASK_ASSIGN_CHOICES,
+            default=TASK_ASSIGN_IDS['Any team member'])
     subtitle_policy = models.IntegerField(_(u'subtitling policy'),
-                                          choices=SUBTITLE_CHOICES,
-                                          default=SUBTITLE_IDS['Anyone'])
+            choices=SUBTITLE_CHOICES,
+            default=SUBTITLE_IDS['Anyone'])
     translate_policy = models.IntegerField(_(u'translation policy'),
-                                           choices=SUBTITLE_CHOICES,
-                                           default=SUBTITLE_IDS['Anyone'])
+            choices=SUBTITLE_CHOICES,
+            default=SUBTITLE_IDS['Anyone'])
 
     objects = TeamManager()
 
@@ -147,29 +147,29 @@ class Team(models.Model):
         verbose_name_plural = _(u'Teams')
 
 
-       
+
 
 
     def __unicode__(self):
         return self.name
- 
+
     def render_message(self, msg):
         context = {
-            'team': self, 
-            'msg': msg,
-            'author': msg.author,
-            'author_page': msg.author.get_absolute_url(),
-            'team_page': self.get_absolute_url(),
-            "STATIC_URL": settings.STATIC_URL,
-        }
+                'team': self, 
+                'msg': msg,
+                'author': msg.author,
+                'author_page': msg.author.get_absolute_url(),
+                'team_page': self.get_absolute_url(),
+                "STATIC_URL": settings.STATIC_URL,
+                }
         return render_to_string('teams/_team_message.html', context)
-    
+
     def is_open(self):
         return self.membership_policy == self.OPEN
-    
+
     def is_by_application(self):
         return self.membership_policy == self.APPLICATION
-    
+
     @classmethod
     def get(cls, slug, user=None, raise404=True):
         if user:
@@ -183,10 +183,10 @@ class Team(models.Model):
                 return qs.get(pk=int(slug))
             except (cls.DoesNotExist, ValueError):
                 pass
-            
+
         if raise404:
             raise Http404       
-    
+
     def logo_thumbnail(self):
         if self.logo:
             return self.logo.thumb_url(100, 100)
@@ -194,7 +194,7 @@ class Team(models.Model):
     def small_logo_thumbnail(self):
         if self.logo:
             return self.logo.thumb_url(50, 50)
-    
+
     @models.permalink
     def get_absolute_url(self):
         return ('teams:detail', [self.slug])
@@ -289,86 +289,38 @@ class Team(models.Model):
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
 
-    def _sq_expression(self, sq_list):
-        if len(sq_list) == 0:
-            return None
-        else:
-            return reduce(lambda x, y: x | y, sq_list)
 
-    def _filter(self, sqs, sq_list):
-        sq_expression = self._sq_expression(sq_list)
-        return None if (sq_expression is None) else sqs.filter(sq_expression)
-
-    def _exclude(self, sqs, sq_list):
-        if sqs is None:
-            return None
-        sq_expression = self._sq_expression(sq_list)
-        return sqs if sq_expression is None else sqs.exclude(sq_expression)
-
-    def _base_sqs(self, is_member=False, project=None, query=None):
+    def get_videos_for_languages_haystack(self, language, project=None, user=None, query=None, sort=None):
         from teams.search_indexes import TeamVideoLanguagesIndex
+
+        is_member = (user and user.is_authenticated()
+                     and self.members.filter(user=user).exists())
 
         if is_member:
             qs =  TeamVideoLanguagesIndex.results_for_members(self).filter(team_id=self.id)
         else:
             qs =  TeamVideoLanguagesIndex.results().filter(team_id=self.id)
 
-        if project is not None:
+        if project:
             qs = qs.filter(project_pk=project.pk)
 
         if query:
-            for term in filter(None, [word.strip() for word in query.split()]):
+            for term in get_terms(query):
                 qs = qs.filter(video_title__icontains=qs.query.clean(term))
 
+        if language:
+            qs = qs.filter(video_completed_langs=language)
+
+        qs = qs.order_by({
+             'name':  'video_title_exact',
+            '-name': '-video_title_exact',
+             'subs':  'num_completed_subs',
+            '-subs': '-num_completed_subs',
+             'time':  'team_video_create_date',
+            '-time': '-team_video_create_date',
+        }.get(sort or '-time'))
+
         return qs
-
-    def get_videos_for_languages_haystack(self, languages, project=None, user=None,
-                                          require_language=None, query=None):
-        from utils.multi_query_set import MultiQuerySet
-
-        is_member = (user and user.is_authenticated()
-                     and self.members.filter(user=user).exists())
-
-        languages.extend([l[:l.find('-')] for l in 
-                           languages if l.find('-') > -1])
-        languages = list(set(languages))
-
-        pairs_m, pairs_0, langs = [], [], []
-        for l1 in languages:
-            langs.append(SQ(content='S_{0}'.format(l1)))
-            for l0 in languages:
-                if l1 != l0:
-                    pairs_m.append(self._lang_pair((l1, l0), "M"))
-                    pairs_0.append(self._lang_pair((l1, l0), "0"))
-
-        qs_list = []
-        
-        # FIXME do project filtering here
-        qs = self._filter(self._base_sqs(is_member, query=query), pairs_m)
-        qs_list.append(qs)
-        qs_list.append(self._exclude(
-                self._filter(self._base_sqs(is_member, project=project, query=query), pairs_0),
-                pairs_m))
-        qs_list.append(self._exclude(
-                self._base_sqs(is_member, project, query=query).filter(
-                    original_language__in=languages), 
-                pairs_m + pairs_0).order_by('has_lingua_franca'))
-        if not require_language:
-            qs_list.append(self._exclude(
-                    self._filter(self._base_sqs(is_member, project=project, query=query), langs),
-                    pairs_m + pairs_0).exclude(original_language__in=languages))
-        qs_list.append(self._exclude(
-                self._base_sqs(is_member, project=project, query=query),
-                langs + pairs_m + pairs_0).exclude(
-                original_language__in=languages))
-        mqs = MultiQuerySet(*[qs for qs in qs_list if qs is not None])
-
-        # This is way more efficient than making a count from all the
-        # constituent querysets.  Unfortunately we can't use it because we need
-        # to know the REAL, filtered count for pagination purposes.
-        # mqs.set_count(self._base_sqs(is_member, project=project).count())
-
-        return qs_list, mqs
 
     def get_videos_for_languages(self, languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS):
         from utils.multi_query_set import TeamMultyQuerySet
