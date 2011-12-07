@@ -543,8 +543,8 @@ class TeamsTest(TestCase):
         search_record_list = self._tv_search_record_list(team)
         self.assertEqual(2, len(search_record_list))
 
-        # but the one with en subs should be first, since we can translate it into russian.
-        self.assertEqual('en', search_record_list[0].original_language)
+        # but the one with en subs should be second, since it was added earlier
+        self.assertEqual('en', search_record_list[1].original_language)
 
     def test_one_tvl(self):
         team, new_team_video = self._create_new_team_video()
