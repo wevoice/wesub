@@ -44,7 +44,7 @@
 {% endblock %}
 
 {% block select_language_dialog %}
-	{% select_language_dialog %}
+    {% select_language_dialog %}
 {% endblock %}
 
 {% block view_content %}
@@ -56,7 +56,7 @@
     <div class="view grid_9 alpha">
         {% if can_add_video %}
             <div class="tools">
-                <a href="{% url teams:add_video team.slug %}" class="button">{% trans "Add Videos" %}</a>
+                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.slug }}{% endif %}" class="button">{% trans "Add Videos" %}</a>
             </div>
         {% endif %}
 

@@ -445,7 +445,7 @@ class Project(models.Model):
     
     def __unicode__(self):
         if self.is_default_project:
-            return u"---"
+            return u"---------"
         return u"%s" % (self.name)
 
     def save(self, slug=None,*args, **kwargs):

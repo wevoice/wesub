@@ -327,6 +327,12 @@ def add_video(request, slug):
         'video_url': request.GET.get('url', ''),
         'title': request.GET.get('title', '')
     }
+
+    try:
+        if request.GET.get('project'):
+            initial['project'] = Project.objects.get(slug=request.GET.get('project'))
+    except Project.DoesNotExist:
+        pass
     
     form = AddTeamVideoForm(team, request.user, request.POST or None, request.FILES or None, initial=initial)
     

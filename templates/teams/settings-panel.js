@@ -81,7 +81,7 @@ var ProjectEditPanel = Class.$extend({
     onChangeProjectReturned: function(data){
         var res = data;
         if (res && res.success){
-            displayFeedbackMessage(res.msg,'error');
+            displayFeedbackMessage(res.msg,'success');
             if (res.obj){
                 this.model.update(res.obj);
                 this.el.trigger(ON_PROJECT_SAVED, this.model);
