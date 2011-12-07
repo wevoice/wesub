@@ -628,23 +628,47 @@ def join_team(request, slug):
 
     return redirect(team)
 
+
+def _check_can_leave(team, user):
+    """Return an error message if the member cannot leave the team, otherwise None."""
+
+    try:
+        member = TeamMember.objects.get(team=team, user=user)
+    except TeamMember.DoesNotExist:
+        return u'You are not a member of this team.'
+
+    if not team.members.exclude(pk=member.pk).exists():
+        return u'You are the last member of this team.'
+
+    is_last_owner = (
+        member.role == TeamMember.ROLE_OWNER
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exclude(pk=member.pk).exists()
+    )
+    if is_last_owner:
+        return u'You are the last owner of this team.'
+
+    is_last_admin = (
+        member.role == TeamMember.ROLE_ADMIN
+        and not team.members.filter(role=TeamMember.ROLE_ADMIN).exclude(pk=member.pk).exists()
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exists()
+    )
+    if is_last_admin:
+        return u'You are the last admin of this team.'
+
+    return None
+
 @login_required
 def leave_team(request, slug):
     team = get_object_or_404(Team, slug=slug)
     user = request.user
-    try:
-        tm = TeamMember.objects.get(team=team, user=user)
-        
-        if not team.members.exclude(pk=tm.pk).exists():
-            messages.error(request, _(u'You are last member of this team.'))
-        elif not team.members.filter(role=TeamMember.ROLE_OWNER).exclude(pk=tm.pk).exists():
-            messages.error(request, _(u'You are last admin of this team.'))
-        else:
-            tm.delete()
-            messages.success(request, _(u'You have left this team.'))
-    except TeamMember.DoesNotExist:
-        messages.error(request, _(u'You are not member of this team.'))
-    
+
+    error = _check_can_leave(team, user)
+    if error:
+        messages.error(request, _(error))
+    else:
+        TeamMember.objects.get(team=team, user=user).delete()
+        messages.success(request, _(u'You have left this team.'))
+
     return redirect(request.META.get('HTTP_REFERER') or team)
 
 
