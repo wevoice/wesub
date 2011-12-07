@@ -36,6 +36,7 @@ from haystack.query import SQ
 from haystack import site
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 from utils import get_object_or_none
+from utils.searching import get_terms
 import datetime 
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
@@ -287,86 +288,38 @@ class Team(models.Model):
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
 
-    def _sq_expression(self, sq_list):
-        if len(sq_list) == 0:
-            return None
-        else:
-            return reduce(lambda x, y: x | y, sq_list)
 
-    def _filter(self, sqs, sq_list):
-        sq_expression = self._sq_expression(sq_list)
-        return None if (sq_expression is None) else sqs.filter(sq_expression)
-
-    def _exclude(self, sqs, sq_list):
-        if sqs is None:
-            return None
-        sq_expression = self._sq_expression(sq_list)
-        return sqs if sq_expression is None else sqs.exclude(sq_expression)
-
-    def _base_sqs(self, is_member=False, project=None, query=None):
+    def get_videos_for_languages_haystack(self, language, project=None, user=None, query=None, sort=None):
         from teams.search_indexes import TeamVideoLanguagesIndex
+
+        is_member = (user and user.is_authenticated()
+                     and self.members.filter(user=user).exists())
 
         if is_member:
             qs =  TeamVideoLanguagesIndex.results_for_members(self).filter(team_id=self.id)
         else:
             qs =  TeamVideoLanguagesIndex.results().filter(team_id=self.id)
 
-        if project is not None:
+        if project:
             qs = qs.filter(project_pk=project.pk)
 
         if query:
-            for term in filter(None, [word.strip() for word in query.split()]):
+            for term in get_terms(query):
                 qs = qs.filter(video_title__icontains=qs.query.clean(term))
 
+        if language:
+            qs = qs.filter(video_completed_langs=language)
+
+        qs = qs.order_by({
+             'name':  'video_title_exact',
+            '-name': '-video_title_exact',
+             'subs':  'num_completed_subs',
+            '-subs': '-num_completed_subs',
+             'time':  'team_video_create_date',
+            '-time': '-team_video_create_date',
+        }.get(sort or '-time'))
+
         return qs
-
-    def get_videos_for_languages_haystack(self, languages, project=None, user=None,
-                                          require_language=None, query=None):
-        from utils.multi_query_set import MultiQuerySet
-
-        is_member = (user and user.is_authenticated()
-                     and self.members.filter(user=user).exists())
-
-        languages.extend([l[:l.find('-')] for l in 
-                           languages if l.find('-') > -1])
-        languages = list(set(languages))
-
-        pairs_m, pairs_0, langs = [], [], []
-        for l1 in languages:
-            langs.append(SQ(content='S_{0}'.format(l1)))
-            for l0 in languages:
-                if l1 != l0:
-                    pairs_m.append(self._lang_pair((l1, l0), "M"))
-                    pairs_0.append(self._lang_pair((l1, l0), "0"))
-
-        qs_list = []
-        
-        # FIXME do project filtering here
-        qs = self._filter(self._base_sqs(is_member, query=query), pairs_m)
-        qs_list.append(qs)
-        qs_list.append(self._exclude(
-                self._filter(self._base_sqs(is_member, project=project, query=query), pairs_0),
-                pairs_m))
-        qs_list.append(self._exclude(
-                self._base_sqs(is_member, project, query=query).filter(
-                    original_language__in=languages), 
-                pairs_m + pairs_0).order_by('has_lingua_franca'))
-        if not require_language:
-            qs_list.append(self._exclude(
-                    self._filter(self._base_sqs(is_member, project=project, query=query), langs),
-                    pairs_m + pairs_0).exclude(original_language__in=languages))
-        qs_list.append(self._exclude(
-                self._base_sqs(is_member, project=project, query=query),
-                langs + pairs_m + pairs_0).exclude(
-                original_language__in=languages))
-        mqs = MultiQuerySet(*[qs for qs in qs_list if qs is not None])
-
-        # This is way more efficient than making a count from all the
-        # constituent querysets.  Unfortunately we can't use it because we need
-        # to know the REAL, filtered count for pagination purposes.
-        # mqs.set_count(self._base_sqs(is_member, project=project).count())
-
-        return qs_list, mqs
 
     def get_videos_for_languages(self, languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS):
         from utils.multi_query_set import TeamMultyQuerySet
