@@ -3,6 +3,7 @@ from random import shuffle
 from django.http import HttpResponse
 from django.conf import settings
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
 
 from apps.teams.models import Team, TeamVideo
 from apps.videos.models import Video, VideoUrl, SubtitleLanguage, SubtitleVersion, Subtitle
@@ -165,6 +166,9 @@ def load_team_fixtures(request ):
     load_from = request.GET.get("load_from", None)
     videos = _do_it(load_from)
     return HttpResponse( "created %s videos" % len(videos))
-
-
-
+    
+@csrf_exempt
+def echo_json(request):
+    data   = getattr(request, request.method).copy()
+    data["url_path"] = request.path
+    return HttpResponse(json.dumps(data, indent=4))

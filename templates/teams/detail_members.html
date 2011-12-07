@@ -54,6 +54,11 @@
                 <a href="{% url teams:invite_members slug=team.slug %}" class="button">Invite Members</a>
             </div>
         {% endif %}
+
+        {% if team_member_list|length == 0 %}
+            <p class="empty">{% trans "Sorry, no members found." %}</p>
+        {% endif %}
+
         <ul class="members listing">
             {% for member in team_member_list %}
                 {% with member.pk as mpk%}
@@ -94,10 +99,6 @@
                         </ul>
                     </li>
                 {% endwith %}
-            {% empty %}
-                <li class="empty">
-                    {% trans 'Sorry, no members found.' %}
-                </li>
             {% endfor %}
         </ul>
         {% if is_paginated %}{% paginator %}{% endif %}

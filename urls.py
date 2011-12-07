@@ -128,6 +128,7 @@ urlpatterns = patterns(
      url(r'^sitemap-(?P<section>.+)\.xml$', sitemap_view, {'sitemaps': sitemaps}, name="sitemap"),
      (r'^prototypes/', include('prototypes.urls', namespace='prototypes', 
                             app_name='prototypes')),
+    url(r"helpers/", include('testhelpers.urls', namespace='helpers')),
 )
 try:
     from services import urls

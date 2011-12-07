@@ -16,6 +16,7 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.contrib.contenttypes.models import ContentType
@@ -43,18 +44,18 @@ ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
 from apps.teams.moderation_const import WAITING_MODERATION
 from teams.permissions_const import TEAM_PERMISSIONS, PROJECT_PERMISSIONS, \
-      LANG_PERMISSIONS, ROLE_ADMIN, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_MANAGER
+        LANG_PERMISSIONS, ROLE_ADMIN, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_MANAGER
 
 def get_perm_names(model, perms):
     return [("%s-%s-%s" % (model._meta.app_label, model._meta.object_name, p[0]), p[1],) for p in perms]
-    
+
 
 class TeamManager(models.Manager):
-    
+
     def for_user(self, user):
         if user.is_authenticated():
             return self.get_query_set().filter(models.Q(is_visible=True)| \
-                                        models.Q(members__user=user)).distinct()
+                    models.Q(members__user=user)).distinct()
         else:
             return self.get_query_set().filter(is_visible=True)
 
@@ -66,42 +67,42 @@ class Team(models.Model):
     OPEN = 4
     INVITATION_BY_ADMIN = 5
     MEMBERSHIP_POLICY_CHOICES = (
-        (OPEN, _(u'Open')),
-        (APPLICATION, _(u'Application')),
-        (INVITATION_BY_ALL, _(u'Invitation by any team member')),
-        (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
-        (INVITATION_BY_ADMIN, _(u'Invitation by admin')),
-    )
+            (OPEN, _(u'Open')),
+            (APPLICATION, _(u'Application')),
+            (INVITATION_BY_ALL, _(u'Invitation by any team member')),
+            (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
+            (INVITATION_BY_ADMIN, _(u'Invitation by admin')),
+            )
     MEMBER_REMOVE = 1
     MANAGER_REMOVE = 2
     MEMBER_ADD = 3
     VIDEO_POLICY_CHOICES = (
-        (MEMBER_REMOVE, _(u'Members can add and remove video')),  #any member can add/delete video
-        (MANAGER_REMOVE, _(u'Managers can add and remove video')),    #only managers can add/remove video
-        (MEMBER_ADD, _(u'Members can only add videos'))  #members can only add video
-    )
+            (MEMBER_REMOVE, _(u'Members can add and remove video')),  #any member can add/delete video
+            (MANAGER_REMOVE, _(u'Managers can add and remove video')),    #only managers can add/remove video
+            (MEMBER_ADD, _(u'Members can only add videos'))  #members can only add video
+            )
 
     TASK_ASSIGN_CHOICES = (
-        (10, 'Any team member'),
-        (20, 'Managers and admins'),
-        (30, 'Admins only'),
-    )
+            (10, 'Any team member'),
+            (20, 'Managers and admins'),
+            (30, 'Admins only'),
+            )
     TASK_ASSIGN_NAMES = dict(TASK_ASSIGN_CHOICES)
     TASK_ASSIGN_IDS = dict([choice[::-1] for choice in TASK_ASSIGN_CHOICES])
 
     SUBTITLE_CHOICES = (
-        (10, 'Anyone'),
-        (20, 'Any team member'),
-        (30, 'Only managers and admins'),
-        (40, 'Only admins'),
-    )
+            (10, 'Anyone'),
+            (20, 'Any team member'),
+            (30, 'Only managers and admins'),
+            (40, 'Only admins'),
+            )
     SUBTITLE_NAMES = dict(SUBTITLE_CHOICES)
     SUBTITLE_IDS = dict([choice[::-1] for choice in SUBTITLE_CHOICES])
-    
+
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
     description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links.'))
-    
+
     logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True, upload_to='teams/logo/')
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
@@ -123,20 +124,20 @@ class Team(models.Model):
 
     # Policies and Permissions
     membership_policy = models.IntegerField(_(u'membership policy'),
-                                            choices=MEMBERSHIP_POLICY_CHOICES,
-                                            default=OPEN)
+            choices=MEMBERSHIP_POLICY_CHOICES,
+            default=OPEN)
     video_policy = models.IntegerField(_(u'video policy'),
-                                       choices=VIDEO_POLICY_CHOICES,
-                                       default=MEMBER_REMOVE)
+            choices=VIDEO_POLICY_CHOICES,
+            default=MEMBER_REMOVE)
     task_assign_policy = models.IntegerField(_(u'task assignment policy'),
-                                             choices=TASK_ASSIGN_CHOICES,
-                                             default=TASK_ASSIGN_IDS['Any team member'])
+            choices=TASK_ASSIGN_CHOICES,
+            default=TASK_ASSIGN_IDS['Any team member'])
     subtitle_policy = models.IntegerField(_(u'subtitling policy'),
-                                          choices=SUBTITLE_CHOICES,
-                                          default=SUBTITLE_IDS['Anyone'])
+            choices=SUBTITLE_CHOICES,
+            default=SUBTITLE_IDS['Anyone'])
     translate_policy = models.IntegerField(_(u'translation policy'),
-                                           choices=SUBTITLE_CHOICES,
-                                           default=SUBTITLE_IDS['Anyone'])
+            choices=SUBTITLE_CHOICES,
+            default=SUBTITLE_IDS['Anyone'])
 
     objects = TeamManager()
 
@@ -146,29 +147,29 @@ class Team(models.Model):
         verbose_name_plural = _(u'Teams')
 
 
-       
+
 
 
     def __unicode__(self):
         return self.name
- 
+
     def render_message(self, msg):
         context = {
-            'team': self, 
-            'msg': msg,
-            'author': msg.author,
-            'author_page': msg.author.get_absolute_url(),
-            'team_page': self.get_absolute_url(),
-            "STATIC_URL": settings.STATIC_URL,
-        }
+                'team': self, 
+                'msg': msg,
+                'author': msg.author,
+                'author_page': msg.author.get_absolute_url(),
+                'team_page': self.get_absolute_url(),
+                "STATIC_URL": settings.STATIC_URL,
+                }
         return render_to_string('teams/_team_message.html', context)
-    
+
     def is_open(self):
         return self.membership_policy == self.OPEN
-    
+
     def is_by_application(self):
         return self.membership_policy == self.APPLICATION
-    
+
     @classmethod
     def get(cls, slug, user=None, raise404=True):
         if user:
@@ -182,10 +183,10 @@ class Team(models.Model):
                 return qs.get(pk=int(slug))
             except (cls.DoesNotExist, ValueError):
                 pass
-            
+
         if raise404:
             raise Http404       
-    
+
     def logo_thumbnail(self):
         if self.logo:
             return self.logo.thumb_url(100, 100)
@@ -193,7 +194,7 @@ class Team(models.Model):
     def small_logo_thumbnail(self):
         if self.logo:
             return self.logo.thumb_url(50, 50)
-    
+
     @models.permalink
     def get_absolute_url(self):
         return ('teams:detail', [self.slug])
@@ -1487,3 +1488,89 @@ class TeamLanguagePreference(models.Model):
         return u"%s preference for team %s" % (self.language_code, self.team)
 
 post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePreference)
+
+    
+class TeamNotificationSettingManager(models.Manager):
+    def notify_team(self, team_pk, video_id, event_name, language_pk=None):
+        """
+        Finds the matching notification settings for this team, instantiates
+        the notifier class , and sends the appropriate notification.
+        If the notification settings has an email target, sends an email.
+        If the http settings are filled, then sends the request.
+
+        This can be ran as a task, as it requires no objects to be passed
+        """
+        try:
+            notification_settings = self.get(team__id=team_pk)
+        except TeamNotificationSetting.DoesNotExist:
+            return
+        notification_settings.notify(Video.objects.get(video_id=video_id), event_name,
+                                                 language_pk)
+           
+class TeamNotificationSetting(models.Model):
+    """
+    Info on how a team should be notified of changes to it's videos.
+    For now, a team can be notified by having a http request sent
+    with the payload as the notification information.
+    This cannot be hardcoded since teams might have different urls
+    for each environment.
+
+    Some teams have strict requirements on mapping video ids to their
+    internal values, and also their own language codes. Therefore we
+    need to configure a class that can do the correct mapping.
+    
+    TODO: allow email notifications
+    """
+    EVENT_VIDEO_NEW = "event-video-new"
+    EVENT_VIDEO_EDITED = "event-video-edited"
+    EVENT_LANGUAGE_NEW = "event-language-new"
+    EVENT_LANGUAGE_EDITED = "event-language-edit"
+    EVENT_SUBTITLE_NEW = "event-subtitle-new"
+    EVENT_SUBTITLE_APPROVED = "event-subtitle-approved"
+    EVENT_SUBTITLE_REJECTED = "event-subtitle-rejected"
+ 
+    team = models.OneToOneField(Team, related_name="notification_settings")
+    # the url to post the callback notifing partners of new video activity
+    request_url = models.URLField(blank=True, null=True)
+    basic_auth_username = models.CharField(max_length=255, blank=True, null=True)
+    basic_auth_password = models.CharField(max_length=255, blank=True, null=True)
+    # not being used, here to avoid extra migrations in the future
+    email = models.EmailField(blank=True, null=True)
+
+    # integers mapping to classes, see unisubs-integration/notificationsclasses.py
+    notification_class = models.IntegerField(default=1,)
+    
+    objects = TeamNotificationSettingManager()
+    
+    def get_notification_class(self):
+        # move this import to the module level and test_settings break. Fun.
+        import sentry_logger
+        logger = sentry_logger.logging.getLogger("teams.models")
+        try:
+            from notificationsclasses import NOTIFICATION_CLASS_MAP
+            
+            return NOTIFICATION_CLASS_MAP[self.notification_class]
+        except ImportError:
+            logger.exception("Apparently unisubs-integration is not installed")
+            
+        
+    def notify(self, video, event_name, language_pk=None):
+        """
+        Resolves what the notifier class is for this settings and
+        fires notfications it configures
+        """
+        notifier = self.get_notification_class()(self.team, video, event_name, language_pk=None)
+        if self.request_url:
+            success, content = notifier.send_http_request(
+                self.request_url,
+                self.basic_auth_username,
+                self.basic_auth_password
+            )
+            return success, content
+        # FIXME: spec and test this, for now just return
+        return
+        if self.email:
+            notifier.send_email(self.email, self.team, video, event_name, language_pk)
+        
+    def __unicode__(self):
+        return u'NotificationSettings for team %s' % (self.team)
