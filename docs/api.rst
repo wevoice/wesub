@@ -85,6 +85,11 @@ Video Detail::
 
 The video listing resource already returns a `resource_uri` for each video to be used when retrieving the details.
 
+Updating a video object::
+
+   PUT https://www.unversalsubtitles.org/api2/partners/videos/[video-id]/
+
+With the same parameters for creation. Note that through out our system, a video cannot have it's URLs changed. So you can change other video attributes (title, description) but the URL sent must be the same original one.
 
 VideoLanguageResource
 ---------------------
