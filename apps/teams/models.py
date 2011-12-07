@@ -16,8 +16,6 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import sentry_logger
-logger = sentry_logger.logging.getLogger("teams.models")
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
@@ -1593,6 +1591,9 @@ class TeamNotificationSetting(models.Model):
     objects = TeamNotificationSettingManager()
     
     def get_notification_class(self):
+        # move this import to the module level and test_settings break. Fun.
+        import sentry_logger
+        logger = sentry_logger.logging.getLogger("teams.models")
         try:
             from notificationsclasses import NOTIFICATION_CLASS_MAP
             
