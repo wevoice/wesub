@@ -203,7 +203,7 @@ def _detect_language(version_id):
     try:
         version = SubtitleVersion.objects.get(id=version_id)
     except SubtitleVersion.DoesNotExist:
-        return    
+        return
 
     language = version.language
     if language.is_original and not language.language:
