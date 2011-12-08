@@ -13,8 +13,7 @@
             TeamsApiV2.member_role_info(
                 this.teamSlug,
                 this.pk,
-                _.bind(this.show, this)
-            );
+                _.bind(this.show, this));
         },
         show: function(res){
             this.el = ich.editRoleDialog(res);
@@ -22,16 +21,7 @@
             $('select option[value="' + res['current_role'] + '"]', this.el).attr('selected', 'selected');
 
             $(this.el).show();
-            $(this.el).css({
-                width:"600",
-                height:"400",
-                position:"absolute",
-                left:"200px",
-                top:"200px",
-                padding:"20px",
-                border:"2px solid red",
-                "background-color": "white"
-            });
+            $('body').append('<div class="well"></div>');
             $("a.action-close", this.el).click(this.hide);
             $("a.action-save", this.el).click(this.save);
             $("body").append(this.el);
@@ -48,8 +38,7 @@
                 role,
                 projects,
                 languages,
-                this.hide
-            );
+                this.hide);
            return false;
         },
         hide:function(e){
@@ -57,6 +46,7 @@
                 e.preventDefault();
             }
             $(this.el).remove();
+            $('div.well').remove();
         }
     });
     function onEditClicked(e){

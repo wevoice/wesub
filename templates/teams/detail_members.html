@@ -122,34 +122,43 @@
     {% if assignable_roles %}
         <script id="editRoleDialog" type="text/html">
             {% verbatim %}
-            <div>
-                <a class="close">X</a>
-                <label>Role:</label>
-                <select class="roles">
-                    {{#roles}}
-                        <option value="{{val}}">{{name}}</option>
-                    {{/roles}}
-                </select>
-                <div class="clearfix"></div>
-                <label>Project Restriction:</label>
-                <select data-placeholder="Choose-selected..." style="width:350px;" multiple class="chzn-select projects">
-                    {{#projects}}
-                        <option {{#selected}}selected="selected"{{/selected}} value="{{pk}}">{{name}}</option>
-                    {{/projects}}
-                </select>
-
-                <div class="clearfix"></div>
-                <label>Language Restriction:</label>
-                <select data-placeholder="Choose-selected..." style="width:350px;"
-                    multiple class="chzn-select langs">
-                    {{#languages}}
-                        <option {{#selected}}selected="selected"{{/selected}} value="{{code}}">{{name}}</option>
-                    {{/languages}}
-                </select>
-
-                <div class="clearfix">
-                    <a class="button small action-close" > Cancel</a>
-                    <a class="button small action-save" > Save</a>
+            <div class="bootstrap">
+                <div class="modal">
+                    <div class="modal-header">
+                        <a href="#" class="close action-close">x</a>
+                        <h3>Edit member role</h3>
+                    </div>
+                    <div class="modal-body">
+                        <div class="field clearfix">
+                            <label for="roles">Role:</label>
+                            <select class="roles" id="roles">
+                                {{#roles}}
+                                    <option value="{{val}}">{{name}}</option>
+                                {{/roles}}
+                            </select>
+                        </div>
+                        <div class="field clearfix">
+                            <label>Project Restriction:</label>
+                            <select data-placeholder="Choose-selected..." style="width:350px;" multiple class="chzn-select projects">
+                                {{#projects}}
+                                    <option {{#selected}}selected="selected"{{/selected}} value="{{pk}}">{{name}}</option>
+                                {{/projects}}
+                            </select>
+                        </div>
+                        <div class="field clearfix">
+                            <label>Language Restriction:</label>
+                            <select data-placeholder="Choose-selected..." style="width:350px;"
+                                multiple class="chzn-select langs">
+                                {{#languages}}
+                                    <option {{#selected}}selected="selected"{{/selected}} value="{{code}}">{{name}}</option>
+                                {{/languages}}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn secondary action-close" > Cancel</a>
+                        <a class="btn primary action-save" > Save</a>
+                    </div>
                 </div>
             </div>
             {% endverbatim %}
