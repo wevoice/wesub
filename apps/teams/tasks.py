@@ -114,7 +114,7 @@ def api_notify_on_language_activity(team_pk, language_pk, event_name):
 @task()
 def api_notify_on_video_activity(team_video_pk,event_name):
     from teams.models import TeamVideo
-    tv = TeamVideo.objects.get(pk=team_video_pk).select_related("team", "video", "team__notification_settings")
+    tv = TeamVideo.objects.get(pk=team_video_pk)
     tv.team.notification_settings.notify(
            tv.video,
            event_name,
