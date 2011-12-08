@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block body_attrs %}class="v1 teams"{% endblock %}
+
+{% block main_content %}
+
+    <div class="team-banner"><img src="http://blog.universalsubtitles.org/wp-content/uploads/2011/08/twitter-video-translation-project.png" alt="Twitter, son"></div>
+
+    <ul class="tabs">
+        <li><a href="/prototypes/team-videos/">Videos</a></li>
+        <li><a href="/prototypes/team-members/">Members</a></li>
+        <li><a href="/prototypes/team-activity/">Activity</a></li>
+        <li class="current"><a href="/prototypes/team-tasks/">Tasks</a></li>
+        <li><a href="/prototypes/team-settings/">Settings</a></li>
+    </ul>
+
+    <div class="view grid_9 alpha">
+
+        <ul class="activity listing">
+            <li>
+                <h3><a href="">Promotional Video</a></h3>
+                <p>Spanish Subtitles</p>
+                <ul class="actions">
+                    <li><a href="">Review now</a></li>
+                </ul>
+            </li>
+            <li>
+                <h3><a href="">Promotional Video</a></h3>
+                <p>French Subtitles</p>
+                <ul class="actions">
+                    <li>Due in 4 days</li>
+                </ul>
+            </li>
+            <li>
+                <h3><a href="">Introducing Something Important</a></h3>
+                <p>English Subtitles</p>
+                <ul class="actions">
+                    <li><a href="">Approve now</a></li>
+                </ul>
+            </li>
+            <li>
+                <h3><a href="">Something funny that a cat did</a></h3>
+                <p>Turkish Subtitles</p>
+                <ul class="actions">
+                    <li>Due in 6 days</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="controls grid_3 omega">
+        <ul>
+            <li class="current"><a href="">All Pending<span>40</span></a></li>
+            <li><a href="">Approve<span>5</span></a></li>
+            <li><a href="">Review<span>6</span></a></li>
+            <li><a href="">Translate<span>19</span></a></li>
+            <li><a href="">Subtitle<span>10</span></a></li>
+        </ul>
+    </div>
+{% endblock %}

@@ -203,7 +203,7 @@ def _detect_language(version_id):
     try:
         version = SubtitleVersion.objects.get(id=version_id)
     except SubtitleVersion.DoesNotExist:
-        return    
+        return
 
     language = version.language
     if language.is_original and not language.language:
@@ -214,8 +214,8 @@ def _detect_language(version_id):
             if len(text) >= 300:
                 break
         r = json.loads(urllib.urlopen(url % urlquote_plus(text)).read())
-
-        if r and not 'error' in r:
+        status = r['responseStatus']
+        if r and not 'error' in r and status != 403:
             try:
                 SubtitleLanguage.objects.get(video=language.video, language=r['responseData']['language'])
             except SubtitleLanguage.DoesNotExist:
@@ -321,6 +321,7 @@ def _send_letter_caption(caption_version):
             context['your_version'] = item
             context['user'] = item.user
             context['hash'] = item.user.hash_for_video(context['video'].video_id)
+            context['user_is_rtl'] = item.user.guess_is_rtl()
             send_templated_email(item.user.email, subject, 
                                  'videos/email_notification.html',
                                  context, fail_silently=not settings.DEBUG)
@@ -330,6 +331,8 @@ def _send_letter_caption(caption_version):
     for user in followers:
         context['user'] = user
         context['hash'] = user.hash_for_video(context['video'].video_id)
+        context['user_is_rtl'] = user.guess_is_rtl()
         send_templated_email(user.email, subject, 
                              'videos/email_notification_non_editors.html',
                              context, fail_silently=not settings.DEBUG)        
+

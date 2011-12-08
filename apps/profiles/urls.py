@@ -20,7 +20,9 @@ from django.conf.urls.defaults import *
 from profiles.views import rpc_router
 
 urlpatterns = patterns('profiles.views',
+    url(r'^dashboard/$', 'dashboard', name='dashboard'),
     url(r'^mine/$', 'my_profile', name='my_profile'),
+    url(r'^dashboard/videos/$', 'my_videos', name='my_videos'),
     url(r'^edit/$', 'edit_profile', name='edit'),
     url(r'^router/$', rpc_router, name='rpc_router'),
     url(r'^router/api/$', rpc_router.api, name='rpc_api'),    
@@ -29,4 +31,5 @@ urlpatterns = patterns('profiles.views',
     url(r'^remove_avatar/$', 'remove_avatar', name='remove_avatar'),
     url(r'^activities/(?P<user_id>.+)/$', 'actions_list', name='actions_list'),
     url(r'^profile/(?P<user_id>.+)/$', 'profile', name='profile'),
+    url(r'^generate-api-key/$', 'generate_api_key', name='generate-api-key'),
 )

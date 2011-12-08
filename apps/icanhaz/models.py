@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import SuspiciousOperation
 from django.utils.translation import ugettext_lazy as _
 from django.utils.hashcompat import sha_constructor
 
@@ -43,6 +44,8 @@ class VideoVisibilityManager(models.Manager):
                     video= Video.objects.get(video_id=video_identifier)
                 except Video.DoesNotExist:
                     return None
+        else:
+            video = video_identifier
         if self.user_can_see(user, video, secret_key):
             return video
         return None
@@ -150,7 +153,10 @@ class VideoVisibilityManager(models.Manager):
         return self.filter(video=video).exists()
 
     def gen_secret(self, policy):
-        inp_str = "%s-%s-%s" % (settings.SECRET_KEY, time.time()  / (random.randint(0,1000)* 1.0), policy.video.pk)
+        # rand must be > 0 else we can get a division by zero bug
+        # which will be a pain to debug since this is coming from the
+        # random number ;)
+        inp_str = "%s-%s-%s" % (settings.SECRET_KEY, time.time()  / (random.randint(1,1000)* 1.0), policy.video.pk)
         return sha_constructor(inp_str).hexdigest()[:40]
 
     def id_for_video(self, video):
@@ -219,13 +225,16 @@ class VideoVisibilityPolicy(models.Model):
         if skips_timestamp is False:
             self.modified = datetime.datetime.now()
         super(VideoVisibilityPolicy, self).save(*args, **kwargs)
+        if self.is_public != self.video.is_public:
+            self.video.is_public = self.is_public
+            self.video.save()
         if updates_metadata:
             video_changed_tasks(self.video.pk)
 
     def delete(self, updates_metadata=True, *args, **kwargs):
+        super(VideoVisibilityPolicy, self).delete(*args, **kwargs)
         if updates_metadata:
             video_changed_tasks(self.video.pk)
-        super(VideoVisibilityPolicy, self).delete(*args, **kwargs)
         
 
     @property    

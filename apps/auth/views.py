@@ -16,11 +16,12 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import REDIRECT_FIELD_NAME,  get_backends
+from django.contrib.auth import login as stock_login
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout, login as auth_login
 from auth.forms import CustomUserCreationForm
@@ -30,7 +31,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.simple import direct_to_template
 from socialauth.models import AuthMeta, OpenidProfile, TwitterUserProfile, FacebookUserProfile
 from utils.translation import get_user_languages_from_cookie
-from auth.models import UserLanguage, CustomUser as User, EmailConfirmation
+from auth.models import UserLanguage, CustomUser as User, EmailConfirmation, \
+     LoginToken
 from django.contrib.admin.views.decorators import staff_member_required
 import facebook.djangofb as facebook
 import base64, re
@@ -49,7 +51,7 @@ def confirm_email(request, confirmation_key):
         messages.success(request, _(u'Email is confirmed.'))
     
     if request.user.is_authenticated():
-        return redirect('profiles:my_profile')
+        return redirect('profiles:dashboard')
     
     return redirect('/')
 
@@ -303,3 +305,31 @@ def facebook_login_done(request, next):
         # We were not able to authenticate the user.
         # Redirect them to login page, preserving their destination.
         return HttpResponseRedirect(fallback_url)
+
+def token_login(request, token):
+    """
+    Automagically logs a user in from a secret token.
+    Will only work for the CustomUser backend, and will not
+    let staff or admin users login.
+    Receives a '?next=' parameter of where to redirect the user into
+    If the token has expired or is not found, a 403 is returned.
+    """
+    # we return 403 even from not found tokens, just being a bit more
+    # strict about not leaking valid tokens
+    try:
+        lt = LoginToken.objects.get(token=token)
+        user = lt.user
+        # be paranoid, these users should never be login / staff members
+        if  (user.is_staff is False ) and (user.is_superuser is False):
+            # this will only work if user has the CustoUser backend
+            # not a third party provider
+            backend = get_backends()[0]
+            user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+            stock_login(request, user)
+            next_url = request.GET.get("next", reverse("profiles:edit"))
+            return HttpResponseRedirect(next_url)
+    
+    except LoginToken.DoesNotExist:
+        pass
+    return HttpResponseForbidden("Invalid user token")
+    

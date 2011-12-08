@@ -174,7 +174,7 @@ if feature_is_on('MODERATION'):
             self.assertEquals(self.video.moderated_by, self.team)
 
         def test_create_moderation_only_for_members(self):
-            member = TeamMember(user=self.user, team=self.team, role=TeamMember.ROLE_MEMBER)
+            member = TeamMember(user=self.user, team=self.team, role=TeamMember.ROLE_CONTRIBUTOR)
             member.save()
             e = None
             try:
@@ -205,7 +205,7 @@ if feature_is_on('MODERATION'):
             member = TeamMember(user=self.user, team=self.team, role=TeamMember.ROLE_MANAGER)
             member.save()
             add_moderation(self.video, self.team, self.user)
-            member.role = TeamMember.ROLE_MEMBER
+            member.role = TeamMember.ROLE_CONTRIBUTOR
             member.save()
             e = None
             self.assertRaises(SuspiciousOperation, remove_moderation, *(self.video, self.team, self.user))
@@ -580,7 +580,7 @@ if feature_is_on('MODERATION'):
             res =  self._get_widget_moderation_status(video_url.url)
             self.assertTrue(res["is_moderated"])
 
-        def test_contribuitors_do_bypass_moderation(self):
+        def test_contributors_do_bypass_moderation(self):
             lang = self.video.subtitle_language()
             member, created = TeamMember.objects.get_or_create(user=self.user, team=self.team)
             member.role=TeamMember.ROLE_MANAGER
@@ -659,7 +659,9 @@ if feature_is_on('MODERATION'):
             # second team should be filteres
             team2 = Team.objects.exclude(pk=team1.pk)[0]
             tv2 = team2.teamvideo_set.exclude(video=tv1.video)[0]
-            lang, c  = SubtitleLanguage.objects.get_or_create(video=tv2.video, is_original=False, language="pt")
+            lang, c  = SubtitleLanguage.objects.get_or_create(video=tv2.video, is_original=False, language="pt",  defaults={
+                    'created': datetime.now(),
+            })
             member = TeamMember(user=self.user, team=team2, role=TeamMember.ROLE_MANAGER)
             member.save()
             add_moderation(tv2.video, team2, self.user)

@@ -1,4 +1,4 @@
-{% extends "settings.html" %}
+{% extends "profiles/base.html" %}
 
 {% load thumbnail i18n doorman auth_tags %}
 
@@ -45,185 +45,166 @@
     </script>
 {% endblock %}
 
-{% block settings_content %}
-  <div class="hd">
+{% block main_content %}
     <h2>
-      {% trans 'Edit Your Profile' %}
+        <img src="{{ user_info.small_avatar }}">
+        {% trans 'Edit Your Profile' %}
     </h2>
-    <a href="{% url profiles:profile user.username %}" class="heading_button">{% trans 'View Profile' %}</a>
-  </div>
-  <form class="edit_profile" action="." method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="grid_9 clearfix">
+    
+    {% with 'profile' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
 
-          <div class="grid_5 alpha">
-              <h3>{% trans 'Personal Info' %}</h3>
-              {{ form.non_field_errors }}
-              <p>
-                  {{ form.username.errors }}
-                  {{ form.username.label_tag }}
-                  {{ form.username }}
-                  {{ form.username.help_text }}
-                  <span>{% trans 'will display publicly' %}</span>
-              </p>              
-              <p>
-                  {{ form.first_name.errors }}
-                  {{ form.first_name.label_tag }}
-                  {{ form.first_name }}
-                  <span>{% trans 'will display publicly' %}</span>
-              </p>
-              <p>
-                  {{ form.last_name.errors }}
-                  {{ form.last_name.label_tag }}
-                  {{ form.last_name }}
-                  <span>{% trans 'will display publicly' %}</span>
-              </p>
-              <p>
-                  {{ form.homepage.errors }}
-                  {{ form.homepage.label_tag }}
-                  {{ form.homepage }}
-              </p>
-              <p class="error_list" id="picture-errors">
-              {{ form.picture.errors }}
-              </p>
-              <p class="avatar-container">
-                  <img class="user-avatar" src="{{ user_info.avatar }}" style="margin-right: 5px"/>
-                  {% if user_info.picture %}
-                      <a class="remove-avatar" href="#">{% trans 'remove picture' %}</a>
-                  {% endif %}
-              </p>
-              <div style="float: left; clear: both; margin-bottom: 30px;">
-                  <input type="file" id="id_picture" name="picture" size="6"/>
-                  <button  class="green_button small upload-picture" style="z-index: 1; padding-left: 10px;">
-                      <span><span class="plus"></span>{% trans 'Upload picture' %}</span>
-                  </button>
-              </div>            
-              <p>
-                  {{ form.email.errors }}
-                  {{ form.email.label_tag }}
-                  {{ form.email }}
-              </p>
-              <p>
-                  {{ form.current_password.errors }}
-                  {{ form.current_password.label_tag }}
-                  {{ form.current_password }}
-              </p>
-              <p>
-                  {{ form.new_password.errors }}
-                  {{ form.new_password.label_tag }}
-                  {{ form.new_password }}
-              </p>
-              <p>
-                  {{ form.new_password_verify.errors }}
-                  {{ form.new_password_verify.label_tag }}
-                  {{ form.new_password_verify }}
-              </p>
-              <p class="checkbox">
-                  {{ form.changes_notification.errors }}
-                  {{ form.changes_notification }}
-                  <label for="id_changes_notification">
-                      {% trans "Notify me by email about new personal messages and edits to the videos I follow" %}
-                  </label>
-              </p>
-              <p class="checkbox">
-                  {{ form.follow_new_video.errors }}
-                  {{ form.follow_new_video }}
-                  <label for="id_follow_new_video">
-                      {% trans "Follow the videos I submit" %}
-                  </label>
-              </p>              
-              <p>
-                  {{ form.biography.errors }}
-                  {{ form.biography.label_tag }}
-                  {{ form.biography }}
-              </p>                          
-          </div>
+    <div class="view grid_9 alpha">
+        <form class="edit_profile" action="." method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
-          <div class="grid_3 omega">
-              <h3>{% trans 'Language Info' %}</h3>
-              <h4>
-                  {{ form.preferred_language.errors }}
-                  {{ form.preferred_language.label_tag }}
-              </h4>
-              <p>
-                  {{ form.preferred_language }}
-              </p>
-              {% comment %}
-              <p>
-                  {{ form.autoplay_preferences.errors }}
-                  {{ form.autoplay_preferences.label_tag }}
-                  {{ form.autoplay_preferences }}                
-              </p>
-              {% endcomment %}
-              <h4>{% trans 'Languages I Know' %}</h4>
-              <div class="empty-form" style="display: none">
-                  <li class="user_language clearfix">
-                      {{ formset.empty_form.id }}
-                      <a href="#" class="small_close remove-language">{% trans 'Remove Language' %}</a>
-                      <div class="entry">
-                        {{ formset.empty_form.language }}
-                        {{ formset.empty_form.proficiency }}
-                          {% switch_feature REQUESTS %}
-                        <p>
+            <div class="grid_4 alpha">
+                <fieldset>
+                    <legend>{% trans 'Personal Info' %}</legend>
+                    
+                    {{ form.non_field_errors }}
 
-                          {{ formset.empty_form.follow_requests }}
-                          <label for="{{ formset.empty_form.follow_requests.auto_id }}">
-                              {{ formset.empty_form.follow_requests.label }}
-                          </label>
-                        </p>
-                        {% endswitch_feature %}
-                        <div style="display: none" class="delete-checkbox">
-                            {{ form.DELETE }}
-                        </div>
-                      </div>                
-                  </li>
-              </div>
-              <ul class="language_list">
-                  {{ formset.management_form }}
-                  {{ formset.non_field_errors }}
-                  {% for form in formset.forms %}
-                      <li class="user_language clearfix">
-                          {{ form.non_field_errors }}
-                          {{ form.id }}
-                          <a href="#" class="small_close remove-language">{% trans 'Remove Language' %}</a>
-                          <div class="entry">
-                            {{ form.language.errors }}
-                            {{ form.language }}
-                            {{ form.proficiency.errors }}
-                            {{ form.proficiency }}
-                            {% switch_feature REQUESTS %}
-                            <p>
-                              {{ form.follow_requests }}
-                              <label for="{{ form.follow_requests.auto_id }}">
-                                  {{ form.follow_requests.label }}
-                              </label>
-                            </p>
-                            {% endswitch_feature %}
-                            <div style="display: none" class="delete-checkbox">
-                                {{ form.DELETE }}
-                            </div>
-                          </div>
-                      </li>
-                  {% endfor %}
-              </ul>
-              <button class="green_button small add-language">
-                  <span><span class="plus"></span>{% trans 'Add Language' %}</span>
-              </button>
-          </div>
-          <div class="clearboth">
-              &nbsp;
-          </div>
-      </div>
-      <div class="ft">
-        <button class="blue_button small" type="submit" value="Save">
-            <span>{% trans 'Save Changes' %}</span>
-        </button>
-            
-        <a href="{% url auth:delete_user %}">
-            <span>{% trans 'Permanently Delete Your Profile' %}</span>
-        </a>
-      </div>
-  </form>
+                    {% include "_form_field.html" with field=form.username %}
+                    <p class="notation">Will display publicly</p>
+
+                    {% include "_form_field.html" with field=form.first_name %}
+                    <p class="notation">Will display publicly</p>
+                               
+                    {% include "_form_field.html" with field=form.last_name %}
+                    <p class="notation">Will display publicly</p>
+
+
+                    {% include "_form_field.html" with field=form.homepage %}
+
+                    <p class="error_list" id="picture-errors">
+                    {{ form.picture.errors }}
+                    </p>
+                    <p class="avatar-container">
+                      <img class="user-avatar" src="{{ user_info.avatar }}" style="margin-right: 5px"/>
+                      {% if user_info.picture %}
+                          <a class="remove-avatar" href="#">{% trans 'remove picture' %}</a>
+                      {% endif %}
+                    </p>
+                    
+                      <input type="file" id="id_picture" name="picture" size="6"/>
+                      <button  class="button">
+                          {% trans 'Upload picture' %}
+                      </button>
+
+                    {% include "_form_field.html" with field=form.email %}
+
+                    {% include "_form_field.html" with field=form.current_password %}
+
+                    {% include "_form_field.html" with field=form.new_password %}
+                    
+                    {% include "_form_field.html" with field=form.new_password_verify %}
+
+                    {% include "_form_field.html" with field=form.changes_notification %}
+                    <p class="notation">{% trans "Notify me by email about new personal messages and edits to the videos I follow" %}</p>
+                    
+                    {% include "_form_field.html" with field=form.follow_new_video %}
+                    <p class="notation">{% trans "Follow the videos I submit" %}</p>
+                    
+                    {% include "_form_field.html" with field=form.biography %}           
+                        
+                    <label>Your api key</label>
+                    <p><span class="api-key-holder">{{form.instance.api_key.key}}</span><span class="api-key-status"></span></p>
+                    <a href="{% url profiles:generate-api-key %}" class="get-new-api-bt button">Generate new key</a>
+                </fieldset>
+            </div>
+
+            <div class="grid_4 omega">
+                <fieldset>
+                    <legend>{% trans 'Language Info' %}</legend>
+                    <h4>
+                        {{ form.preferred_language.errors }}
+                        {{ form.preferred_language.label_tag }}
+                    </h4>
+                    <p>
+                        {{ form.preferred_language }}
+                    </p>
+                    {% comment %}
+                    <p>
+                        {{ form.autoplay_preferences.errors }}
+                        {{ form.autoplay_preferences.label_tag }}
+                        {{ form.autoplay_preferences }}                
+                    </p>
+                    {% endcomment %}
+                    
+                    <h4>{% trans 'Languages I Know' %}</h4>
+                    
+                    <div class="empty-form" style="display: none">
+                        <li class="user_language clearfix">
+                            {{ formset.empty_form.id }}
+                            <a href="#" class="small_close remove-language">{% trans 'Remove Language' %}</a>
+                            <div class="entry">
+                              {{ formset.empty_form.language }}
+                              {{ formset.empty_form.proficiency }}
+                              {% switch_feature REQUESTS %}
+                                <p>
+
+                                  {{ formset.empty_form.follow_requests }}
+                                  <label for="{{ formset.empty_form.follow_requests.auto_id }}">
+                                      {{ formset.empty_form.follow_requests.label }}
+                                  </label>
+                                </p>
+                                {% endswitch_feature %}
+                                <div style="display: none" class="delete-checkbox">
+                                    {{ form.DELETE }}
+                                </div>
+                            </div>                
+                        </li>
+                    </div>
+                    <ul class="language_list">
+                        {{ formset.management_form }}
+                        {{ formset.non_field_errors }}
+                        {% for form in formset.forms %}
+                            <li class="user_language clearfix">
+                                {{ form.non_field_errors }}
+                                {{ form.id }}
+                                <a href="#" class="small_close remove-language">{% trans 'Remove Language' %}</a>
+                                <div class="entry">
+                                    {{ form.language.errors }}
+                                    {{ form.language }}
+                                    {{ form.proficiency.errors }}
+                                    {{ form.proficiency }}
+                                    {% switch_feature REQUESTS %}
+                                        <p>
+                                            {{ form.follow_requests }}
+                                            <label for="{{ form.follow_requests.auto_id }}">
+                                                {{ form.follow_requests.label }}
+                                            </label>
+                                        </p>
+                                    {% endswitch_feature %}
+                                    <div style="display: none" class="delete-checkbox">
+                                        {{ form.DELETE }}
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <button class="button add-language">
+                        {% trans 'Add Language' %}
+                    </button>
+                </fieldset>
+            </div>
+
+            <div class="submit">
+                <button class="button save" type="submit" value="Save">
+                    {% trans 'Save Changes' %}
+                </button>
+                    
+                <a class="button delete" href="{% url auth:delete_user %}">{% trans 'Permanently Delete Your Profile' %}</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="controls grid_3 omega">
+        {% with 'edit' as current %}
+            {% include 'profiles/_filters.html' %}
+        {% endwith %}
+    </div>
 
 <script type="text/javascript">
     var form_count = {{ formset.total_form_count }};
@@ -249,5 +230,20 @@
     $('.upload-picture').click(function(){
         return false;
     });
+</script>
+<script type="text/javascript">
+  $(".get-new-api-bt").click(function(e){
+     e.preventDefault();
+     $.ajax({
+       url: $(this).attr("href"),
+       dataType: "json",
+       type: "POST",
+       success: function(res){
+           $(".api-key-holder").text(res.key);
+           $(".api-key-status").text("Key generated, enjoy!");
+         }
+      }) ;
+     return false;
+  })
 </script>
 {% endblock %}

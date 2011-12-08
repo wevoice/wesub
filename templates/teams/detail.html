@@ -1,12 +1,10 @@
-{% extends "base.html" %}
+{% extends "teams/base.html" %}
 
 {% load i18n teams_tags paginator profiles_tags widget markup media_compressor %}
 
 {% block title %}
     {{ team }} | Universal Subtitles
 {% endblock %}
-
-{% block body_attrs %}id="teams"{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -15,59 +13,82 @@
 
 {% block scripts %}
     {{ block.super }}
+    {% include "utils/chosenify.html" %}
     {% include_bundle "unisubs-onsite-compiled" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
+
+        $(function() {
+            $select = $("select#lang-filter", ".controls");
+            $select.change(function(e) {
+                var lang = $select.val();
+                if (lang !== '') {
+                    window.location = document.URL.split("?")[0] + '?lang=' + lang;
+                } else {
+                    window.location = document.URL.split("?")[0];
+                }
+            });
+
+            $('.remove-video').click(function(e) {
+                e.preventDefault();
+
+                resp = confirm('Are you sure you want to delete this team video?');
+                if (resp) {
+                    $(this).siblings('form').submit();
+                }
+                return false;
+            });
+        });
     </script>
 {% endblock %}
 
 {% block select_language_dialog %}
-	{% select_language_dialog %}
+    {% select_language_dialog %}
 {% endblock %}
 
-{% block main_content %}
+{% block view_content %}
 
-{% if team.header_html_text %}
-<div id="team_header_html" class="clearfix">
-  {{team.header_html_text|safe}}
-</div><!-- // team_header_html -->
-{% endif %}
+    {% with "videos" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
 
-<h2 id="team_title">{{ team }} {% trans "Videos" %}</h2>
-
-{% if team.page_content %}
-  <div class="team_html clearfix">
-    {{ team.page_content|force_escape|markdown }}
-  </div>    
-{% endif %}
-
-<div style="margin-top: 6px;" class="grid_8 alpha">
-    {% if not team.page_content and team.video %}
-        {% widget widget_params %}
-    {% endif %}
-    
-    <div id="videos-tab">
-        {% if allow_noone_language %}
-            {% invite_friends_to_team team %}
+    <div class="view grid_9 alpha">
+        {% if can_add_video %}
+            <div class="tools">
+                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.slug }}{% endif %}" class="button">{% trans "Add Videos" %}</a>
+            </div>
         {% endif %}
 
-        <ul class="big_list">
-            {% for md_obj in team_video_md_list %}
-            <li>
-                {% team_video_detail md_obj %}
-            </li>
-            {% endfor %}
-        </ul>
-        {% if is_paginated %}{% paginator %}{% endif %}
+        {% if not team.page_content and team.video %}
+            {% widget widget_params %}
+        {% endif %}
+        
+        {% if team_video_md_list %}
+            <ul class="videos listing">
+                {% for md_obj in team_video_md_list %}
+                    {% team_video_detail md_obj %}
+                {% endfor %}
+            </ul>
+            {% if is_paginated %}{% paginator %}{% endif %}
+        {% else %}
+            <p class="empty">{% trans "Sorry, no videos here" %}...</p>
+        {% endif %}
     </div>
-</div>
 
-<div class="grid_4 omega">
-    <div id="sidebar_team_detail">
-    {% include "teams/_team_detail.html" %}
+    <div class="controls grid_3 omega">
+        {% include "teams/_filters_videos.html" %}
+        <div class="refine">
+            <h4>Refine</h4>
+            {% include "teams/_search.html" %}
+            <select name="lang-filter" id="lang-filter">
+                <option value="">All languages</option>
+                {% for code, name in language_choices %}
+                    <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% include "teams/_actions.html" %}
     </div>
-    {% team_activity team %}
-</div>
 
 {% endblock %}

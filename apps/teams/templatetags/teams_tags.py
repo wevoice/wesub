@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,23 +16,27 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
 from django import template
-from teams.models import Team, Invite
-from videos.models import Action
+from teams.models import Team, TeamVideo, Project, TeamMember
+from videos.models import Action, Video
 from apps.widget import video_cache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.utils.http import urlquote
 from widget.views import base_widget_params
-from django.utils import simplejson as json
-from django.utils.http import urlquote
+
+from templatetag_sugar.register import tag
+from templatetag_sugar.parser import Name, Variable, Constant
+
+from apps.teams.permissions import can_view_settings_tab as _can_view_settings_tab
+from apps.teams.permissions import can_edit_video as _can_edit_video
+from apps.teams.permissions import (
+    roles_user_can_assign, can_invite, can_add_video, can_create_task_subtitle,
+    get_narrowing_dict, can_create_task_translate, can_create_task_review,
+    can_create_task_approve
+)
+
 
 DEV_OR_STAGING = getattr(settings, 'DEV', False) or getattr(settings, 'STAGING', False)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 10)
@@ -43,23 +47,15 @@ register = template.Library()
 
 @register.filter
 def can_approve_application(team, user):
-    if not user.is_authenticated():
-        return False
-    return team.can_approve_application(user)
+    return can_invite(team, user)
 
 @register.filter
 def can_invite_to_team(team, user):
-    if not user.is_authenticated():
-        return False
-    return team.can_invite(user)
-
-@register.filter
-def can_add_video_to_team(team, user):
-    return team.can_add_video(user)    
+    return can_invite(team, user)
 
 @register.filter
 def can_edit_video(tv, user):
-    return tv.can_edit(user) 
+    return _can_edit_video(tv, user)
 
 @register.filter
 def can_remove_video(tv, user):
@@ -101,16 +97,16 @@ def team_activity(context, team):
 @register.inclusion_tag('teams/_team_add_video_select.html', takes_context=True)    
 def team_add_video_select(context):
     request = context['request']
-    
+
     #fix problem with encoding "?" in build_absolute_uri. It is not encoded,
     #so we get not same URL that page has
     location = request.get_full_path()
     context['video_absolute_url'] = request.build_absolute_uri(urlquote(location))
-    
+
     user = context['user']
     if user.is_authenticated():
         qs = Team.objects.filter(users=user)
-        context['teams'] = [item for item in qs if item.can_add_video(user)]
+        context['teams'] = [team for team in qs if can_add_video(team, user)]
     return context 
 
 @register.inclusion_tag('videos/_team_list.html')
@@ -161,13 +157,20 @@ def invite_friends_to_team(context, team):
     return context
 
 @register.inclusion_tag('teams/_team_video_lang_list.html', takes_context=True)  
-def team_video_lang_list(context, team_video_search_record, max_items=6):
+def team_video_lang_list(context, model_or_search_record, max_items=6):
     """
     max_items: if there are more items than max_items, they will be truncated to X more.
     """
+    
+    if isinstance(model_or_search_record, TeamVideo):
+        video_url = reverse("teams:team_video", kwargs={"team_video_pk":model_or_search_record.pk})
+    elif isinstance(model_or_search_record, Video):
+        video_url =  reverse("videos:video", kwargs={"video_id":model_or_search_record.video_id})
+    else:
+        video_url =  reverse("teams:team_video", kwargs={"team_video_pk":model_or_search_record.team_video_pk})
     return  {
-        'sub_statuses': video_cache.get_video_languages_verbose(team_video_search_record.video_id, max_items),
-        'search_record': team_video_search_record
+        'sub_statuses': video_cache.get_video_languages_verbose(model_or_search_record.video_id, max_items),
+        "video_url": video_url ,
         }
 
 @register.inclusion_tag('teams/_team_video_in_progress_list.html')
@@ -190,3 +193,104 @@ def render_team_leave(context, team, button_size="huge"):
     context['team'] = team
     context['button_size'] = button_size
     return context
+
+@tag(register, [Variable(), Constant("as"), Name()])
+def team_projects(context, team, varname):
+    """
+    Sets the project list on the context, but only the non default
+    hidden projects.
+    Usage:
+    {%  team_projects team as projects %}
+        {% for project in projects %}
+            project
+        {% endfor %}
+    If you do want to loop through all project:
+
+    {% for p in team.project_set.all %}
+      {% if p.is_default_project %}
+         blah
+      {% else %}
+    {%endif %}
+    {% endfor %} 
+
+    """
+    context[varname] = Project.objects.for_team(team)
+    return ""
+    
+@tag(register, [Variable(), Constant("as"), Name()])
+def member_projects(context, member, varname):
+    narrowings = get_narrowing_dict(member.team, member.user, [Project])
+    context[varname] = [n.content for n in narrowings['Project']]
+    return ""
+
+    
+@register.filter
+def can_view_settings_tab(team, user):
+   return _can_view_settings_tab(team, user)
+
+@register.filter
+def has_applicant(team, user):
+    return team.applications.filter(user=user).exists()
+
+def _team_members(team, role, countOnly):
+    qs = team.members.filter(role=role) 
+    if countOnly:
+        qs = qs.count()
+    return qs
+    
+@register.filter
+def contributors(team, countOnly=False):
+    return _team_members(team, TeamMember.ROLE_CONTRIBUTOR, countOnly)
+    
+@register.filter
+def managers(team, countOnly=False):
+    return _team_members(team, TeamMember.ROLE_MANAGER, countOnly)
+    
+    
+@register.filter
+def admins(team, countOnly=False):
+    return _team_members(team, TeamMember.ROLE_ADMIN, countOnly)
+
+    
+@register.filter
+def owners(team, countOnly=False):
+    return _team_members(team, TeamMember.ROLE_OWNER, countOnly)
+
+@register.filter
+def owners_and_admins(team, countOnly=False):
+    qs = team.members.filter(role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    if countOnly:
+        qs = qs.count()
+    return qs
+
+@register.filter
+def members(team, countOnly=False):
+    qs = team.members.all()
+    if countOnly:
+        qs = qs.count()
+    return qs
+
+@register.filter
+def get_assignable_roles(team, user):
+    roles = roles_user_can_assign(team, user)
+    verbose_roles = [x for x in TeamMember.ROLES if x[0] in roles]
+    return verbose_roles
+
+@register.filter
+def can_create_any_task(search_record, user=None):
+    try:
+        tv = TeamVideo.objects.get(pk=search_record.team_video_pk)
+    except TeamVideo.DoesNotExist:
+        return False
+
+    if can_create_task_subtitle(tv, user):
+        return True
+    elif can_create_task_translate(tv, user):
+        return True
+    elif can_create_task_review(tv, user):
+        return True
+    elif can_create_task_approve(tv, user):
+        return True
+
+    return False
+

@@ -1,0 +1,63 @@
+{% extends "teams/base.html" %}
+
+{% load i18n teams_tags widget media_compressor %}
+
+{% block title %}
+    {% trans 'Invite Members' %} | Universal Subtitles
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+     {% include_bundle "widget-css"%}
+{% endblock %}
+
+{% block view_content %}
+
+    {% with "members" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        <form method='post' action="." enctype="multipart/form-data" class="invite-members">
+            {{ form.non_field_errors }}
+            <div class="grid_4 alpha">
+                <fieldset>
+                    <legend>Invite Existing Users</legend>
+                    {{ form.errors.usernames }}
+                    <label for="id_usernames">Usernames</label>
+                    {{ form.usernames }}
+                </fieldset>
+            </div>
+
+            <div class="grid_4 omega">
+                <fieldset>
+                    <legend>Invite Details</legend>
+
+                    {{ form.errors.message }}
+                    <label for="id_message">Message</label>
+                    {{ form.message }}
+
+                    {{ form.errors.role }}
+                    <label for="id_role">Role</label>
+                    {{ form.role }}
+                </fieldset>
+            </div>
+
+            <div class="grid_9 submit">
+                <button>{% trans 'Send Invites' %}</button>
+            </div>
+
+            {% csrf_token %}
+        </form>
+    </div>
+    <div class="controls grid_3 omega">
+        <ul>
+            <li class="current">
+                <a href="{% url teams:invite_members slug=team.slug %}">{% trans "Invite New Members" %}</a>
+            </li>
+            <li>
+                <a href="{% url teams:detail_members team.slug %}">← {% trans "Back to Members" %}</a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

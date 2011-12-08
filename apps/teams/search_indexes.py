@@ -1,8 +1,6 @@
 import json
-import datetime
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 from haystack.indexes import *
 from haystack.query import SearchQuerySet
 from haystack.backends import SQ
@@ -25,28 +23,32 @@ class TeamVideoLanguagesIndex(SearchIndex):
     team_video_pk = IntegerField(indexed=False)
     video_pk = IntegerField(indexed=False)
     video_id = CharField(indexed=False)
-    video_title = CharField(indexed=True)
+    video_title = CharField(faceted=True)
     video_url = CharField(indexed=False)
     original_language = CharField()
     original_language_display = CharField(indexed=False)
     has_lingua_franca = BooleanField()
     absolute_url = CharField(indexed=False)
+    project_pk = IntegerField(indexed=True)
     # never store an absolute url with solr
     # since the url changes according to the user
     # one cannot construct the url at index time
     # video_absolute_url = CharField(indexed=False)
     thumbnail = CharField(indexed=False)
-    title = CharField(indexed=True)
+    title = CharField()
+    project_name = CharField(indexed=False)
+    project_slug = CharField(indexed=False)
     description = CharField(indexed=False)
     is_complete = BooleanField()
     video_complete_date = DateTimeField(null=True)
     # list of completed language codes
-    video_completed_langs = MultiValueField(indexed=False)
+    video_completed_langs = MultiValueField()
     # list of completed language absolute urls. should have 1-1 mapping to video_compelted_langs
     video_completed_lang_urls = MultiValueField(indexed=False)
 
     needs_moderation = BooleanField()
     latest_submission_date = DateTimeField(null=True)
+    team_video_create_date = DateTimeField()
     
     moderation_languages_names = MultiValueField(null=True)
     moderation_languages_pks = MultiValueField(null=True)
@@ -61,6 +63,8 @@ class TeamVideoLanguagesIndex(SearchIndex):
     is_public = BooleanField()
     owned_by_team_id = IntegerField(null=True)
     
+    num_completed_subs = IntegerField()
+
     def prepare(self, obj):
         self.prepared_data = super(TeamVideoLanguagesIndex, self).prepare(obj)
         self.prepared_data['team_id'] = obj.team.id
@@ -88,12 +92,17 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['description'] = obj.description
         self.prepared_data['is_complete'] = obj.video.complete_date is not None
         self.prepared_data['video_complete_date'] = obj.video.complete_date
-        
+        self.prepared_data['project_pk'] = obj.project.pk
+        self.prepared_data['project_name'] = obj.project.name
+        self.prepared_data['project_slug'] = obj.project.slug
+        self.prepared_data['team_video_create_date'] = obj.created
         completed_sls = obj.video.completed_subtitle_languages()
+        self.prepared_data['num_completed_subs'] = len(completed_sls)
         self.prepared_data['video_completed_langs'] = \
             [sl.language for sl in completed_sls]
         self.prepared_data['video_completed_lang_urls'] = \
             [sl.get_absolute_url() for sl in completed_sls]
+
         policy = obj.video.policy
         owned_by = None
         if policy and policy.belongs_to_team:

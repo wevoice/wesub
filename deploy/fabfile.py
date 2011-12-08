@@ -314,7 +314,7 @@ def _git_checkout(commit):
 
 
 def _get_optional_repo_version(repo):
-    with open(os.path.join(env.web_dir, 'unisubs', 'optional', repo)) as f:
+    with open(os.path.join(os.path.split(__file__)[0],repo)) as f:
         return f.read().strip()
 
 
@@ -343,18 +343,25 @@ def remove_disabled():
     for host in env.web_hosts:
         env.host_string = host
         run('rm {0}/unisubs/disabled'.format(env.web_dir))
-
+        
+def _update_integration(dir, branch_name, commit):
+    with cd(os.path.join(dir, 'unisubs', 'unisubs-integration')):
+        with settings(warn_only=True):
+            run('git branch --track {0} origin/{0}'.format(branch_name))
+            run('git checkout {0}'.format(branch_name))
+        _git_pull()
+        
 def update_integration():
     '''Update the integration repo to the version recorded in the site repo.
 
     At the moment it is assumed that the optional/unisubs-integration file
     exists, and that the unisubs-integration repo has already been cloned down.
 
+    The file should be in the form:  branch-name/commit-hash
     TODO: Run this from update_web automatically
     '''
-    commit = _get_optional_repo_version('unisubs-integration')
-    with cd(os.path.join(env.web_dir, 'unisubs', 'unisubs-integration')):
-        _git_checkout(commit)
+    branch_name, commit = _get_optional_repo_version('unisubs-integration').split("/")
+    _execute_on_all_hosts(lambda dir: _update_integration(dir, branch_name, commit))
 
 def update_web():
     """
@@ -509,6 +516,17 @@ def update_translations():
     """
     run ('cd {0} && sh update_translations.sh'.format(os.path.dirname(__file__)))
 
+def _test_email(dir, to_address):
+    
+    with cd(os.path.join(dir, 'unisubs')):
+        
+        run('{0}/env/bin/python manage.py test_email {1} '
+            '--settings=unisubs_settings'.format(dir, to_address))
+ 
+    
+def test_email(to_address):
+    _execute_on_all_hosts(lambda dir: _test_email(dir, to_address))
+    
 def test_celeryd():
     with Output("Testing Celery scheduler"):
         env.host_string = env.celeryd_host
@@ -549,12 +567,23 @@ def test_memcached():
                     raise Exception('Machines {0} and {1} are using different memcached instances'.format(
                             host[0], other_host[0]))
 
-def generate_docs():
+def build_docs():
     with Output("Generating documentation"):
         env.host_string = DEV_HOST
         with cd(os.path.join(env.static_dir, 'unisubs')):
-            run('%s/env/bin/sphinx-build %s/unisubs/docs/ %s/media/docs/' % (env.static_dir, env.static_dir, env.static_dir))
+            run('%s/env/bin/sphinx-build docs/ media/docs/' % (env.static_dir))
 
+def _get_settings_values(dir, *settings_name):
+    with cd(os.path.join(dir, 'unisubs')):
+        run('../env/bin/python manage.py get_settings_values %s --settings=unisubs_settings' % " ".join(settings_name))
+
+def get_settings_values(*settings_names):
+    """
+    Connects to all servers and verifies a given django setting, usage:
+    fab env:user get_settings_values:EMAIL_BACKEND,MEDIA_URL
+    """
+    _execute_on_all_hosts(lambda dir: _get_settings_values(dir, *settings_names))
+    
 try:
     from local_env import *
     def local (username):

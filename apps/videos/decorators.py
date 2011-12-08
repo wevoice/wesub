@@ -21,7 +21,6 @@ def get_video_from_code(func):
         return HttpResponseForbidden("You cannot see this video")
     
     def wrapper(request, video_id, *args, **kwargs):
-        #import pdb;pdb.set_trace()
         # check if this is a a sha1 hash
         if SHA1_RE.search(video_id):
             # secret, find the url for this
@@ -31,9 +30,9 @@ def get_video_from_code(func):
             if not video:
                 return raise_forbidden(request, video)
         else:
+            video = get_object_or_404(Video, video_id=video_id)
             video =  VideoVisibilityPolicy.objects.video_for_user(
-            request.user,
-            video_id)
+            request.user, video)
             
             if not video:
                 return raise_forbidden(request, video_id)

@@ -65,5 +65,36 @@
         </form>        
         
         <iframe width="700" height="500" frameborder="no" src="{% url emails_example:email_video_url_add %}"></iframe>
+
+        <h3>Notification of subtitles being changed.</h3>
+        
+        <form method="post" action="{% url emails_example:send_email %}">
+            <div>
+            {% csrf_token %}
+            <input type="hidden" value="3" name="type">
+            Subject: <input name="subject" value="Video's subtitles changed on Universal Subtitles" />
+            <br/>
+            Email: <input name="email" />
+            <br/>
+            <button>Send</button>
+            </div>
+        </form>        
+        
+        <iframe width="700" height="500" frameborder="no" src="{% url emails_example:email_notification %}"></iframe>
+        <h3>Notification of subtitles being changed (non-editor).</h3>
+        
+        <form method="post" action="{% url emails_example:send_email %}">
+            <div>
+            {% csrf_token %}
+            <input type="hidden" value="3" name="type">
+            Subject: <input name="subject" value="Video's subtitles changed on Universal Subtitles (non-editor)" />
+            <br/>
+            Email: <input name="email" />
+            <br/>
+            <button>Send</button>
+            </div>
+        </form>        
+        
+        <iframe width="700" height="500" frameborder="no" src="{% url emails_example:email_notification_non_editor %}"></iframe>
     </body>
 </html>

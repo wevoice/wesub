@@ -25,6 +25,7 @@ from django.contrib import messages
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _, ugettext
 from utils.amazon import S3StorageError
+from tastypie.models import ApiKey
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_list
 from videos.models import Video, Action, SubtitleLanguage
@@ -34,7 +35,6 @@ from profiles.rpc import ProfileApiClass
 from utils.rpc import RpcRouter
 from utils.orm import LoadRelatedQuerySet
 from django.shortcuts import get_object_or_404
-
 rpc_router = RpcRouter('profiles:rpc_router', {
     'ProfileApi': ProfileApiClass()
 })
@@ -78,7 +78,16 @@ class OptimizedQuerySet(LoadRelatedQuerySet):
                 videos[l.video_id].langs_cache.append(l)
 
 @login_required
-def my_profile(request):
+def dashboard(request):
+    user = request.user
+    context = {
+        'user_info': user,
+    }
+
+    return direct_to_template(request, 'profiles/dashboard.html', context)
+
+@login_required
+def my_videos(request):
     user = request.user
     qs = user.videos.order_by('-edited')
     q = request.REQUEST.get('q')
@@ -86,6 +95,7 @@ def my_profile(request):
     if q:
         qs = qs.filter(Q(title__icontains=q)|Q(description__icontains=q))
     context = {
+        'user_info': user,
         'my_videos': True,
         'query': q
     }
@@ -93,7 +103,7 @@ def my_profile(request):
 
     return object_list(request, queryset=qs, 
                        paginate_by=VIDEOS_ON_PAGE, 
-                       template_name='profiles/my_profile.html', 
+                       template_name='profiles/my_videos.html', 
                        extra_context=context, 
                        template_object_name='user_video')    
 
@@ -113,7 +123,7 @@ def edit_profile(request):
         if formset.is_valid() and form_validated:
             formset.save()
             messages.success(request, _('Your profile has been updated.'))
-            return redirect('profiles:my_profile')
+            return redirect('profiles:profile', user_id = request.user.username)
     else:
         form = EditUserForm(instance=request.user, label_suffix="")
         formset = UserLanguageFormset(instance=request.user)
@@ -124,6 +134,11 @@ def edit_profile(request):
         'edit_profile_page': True
     }
     return direct_to_template(request, 'profiles/edit_profile.html', context)
+
+@login_required
+def my_profile(request):
+
+    return profile(request, user_id = request.user.id)
 
 def profile(request, user_id=None):
     if user_id:
@@ -171,4 +186,14 @@ def actions_list(request, user_id):
                        paginate_by=settings.ACTIVITIES_ONPAGE,
                        template_name='profiles/actions_list.html',
                        template_object_name='action',
-                       extra_context=extra_context)       
+                       extra_context=extra_context)
+
+@login_required
+def generate_api_key(request):
+    key, created = ApiKey.objects.get_or_create(user=request.user)
+    if not created:
+        key.key = key.generate_key()
+        key.key = key.generate_key()
+        key.save()
+    return HttpResponse(json.dumps({"key":key.key}))
+    

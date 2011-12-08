@@ -24,11 +24,10 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.hashcompat import sha_constructor
 from videos.types import video_type_registrar
-from settings import ALL_LANGUAGES
 
 TIMEOUT = 60 * 60 * 24 * 5 # 5 days
 
-def get_video_id(video_url, public_only=False):
+def get_video_id(video_url, public_only=False, referer=None):
     """
     Returns the cache video_id for this video
     If public only is
@@ -48,9 +47,6 @@ def get_video_id(video_url, public_only=False):
             return None
         
         video_id = video.video_id
-        if public_only and not VideoVisibilityPolicy.objects.can_show_widget(video, referer):
-            # what is the best way to proceed here, return and set the value to False
-            return None
         
         cache.set(cache_key, video_id, TIMEOUT)
         return video_id
@@ -78,7 +74,7 @@ def invalidate_cache(video_id):
             cache.delete(_subtitles_dict_key(video_id, l.pk))
     except Video.DoesNotExist:
         pass
-    for language in ALL_LANGUAGES:
+    for language in settings.ALL_LANGUAGES:
         cache.delete(_subtitle_language_pk_key(video_id, language[0]))
     cache.delete(_subtitle_language_pk_key(video_id, None))
     cache.delete(_subtitles_dict_key(video_id, None))

@@ -43,7 +43,7 @@ def is_version_same(version, parser):
     if version.subtitle_set.count() != len(subtitles):
         return False
     
-    for item in zip(subtitles, version.subtitle_set.all()):
+    for item in zip(subtitles, list(version.subtitle_set.all())):
         if item[0]['subtitle_text'] != item[1].subtitle_text or \
             item[0]['start_time'] != item[1].start_time or \
             item[0]['end_time'] != item[1].end_time:
@@ -51,12 +51,14 @@ def is_version_same(version, parser):
             
     return True
 
-def save_subtitle(video, language, parser, user=None, update_video=True):
+def save_subtitle(video, language, parser, user=None, update_video=True,
+                  forks=True, as_forked=True, translated_from=None):
     from videos.models import SubtitleVersion, Subtitle, SubtitleMetadata
     from videos.tasks import video_changed_tasks
 
     key = str(uuid4()).replace('-', '')
-
+    if language.is_original:
+        as_forked = True
     video._make_writelock(user, key)
     video.save()
     
@@ -71,13 +73,16 @@ def save_subtitle(video, language, parser, user=None, update_video=True):
         version = SubtitleVersion(
             language=language, version_no=version_no,
             datetime_started=datetime.now(), user=user,
-            note=u'Uploaded', is_forked=True, time_change=1, text_change=1)
+            note=u'Uploaded', is_forked=as_forked, time_change=1, text_change=1)
+        if len(parser) > 0:
+            version.has_version = True
         version.save()
 
         ids = []
 
         for i, item in enumerate(parser):
             id = int(random.random()*10e12)
+                
             while id in ids:
                 id = int(random.random()*10e12)
             ids.append(id)
@@ -86,23 +91,31 @@ def save_subtitle(video, language, parser, user=None, update_video=True):
 
             caption = Subtitle(**item)
             caption.version = version
+            caption.datetime_started = datetime.now()
             caption.subtitle_id = str(id)
             caption.subtitle_order = i+1
             caption.save()
             
             if metadata:
-                print metadata
                 for name, value in metadata.items():
                     SubtitleMetadata(
                         subtitle=caption,
                         metadata_type=name,
                         content=value
                     ).save()
-
+    version = version or old_version
+    if version.is_forked != as_forked:
+        version.is_forked = as_forked
+        version.save()
+    if version.user != user:
+        # we might be only uptading the user , as in per bulk imports
+        version.user = user
+        version.save()
     language.video.release_writelock()
     language.video.save()
-    translations = video.subtitlelanguage_set.filter(standard_language=language)
-    [t.fork(from_version=old_version, user=user) for t in translations]
+    if forks:
+        translations = video.subtitlelanguage_set.filter(standard_language=language)
+        [t.fork(from_version=old_version, user=user) for t in translations]
     if update_video:
         video_changed_tasks.delay(video.id, None if version is None else version.id)
         

@@ -97,3 +97,6 @@ export PATH=~/bin:$PATH
 function pm {
     python manage.py $* --settings=dev_settings
 }
+function pmt {
+    python manage.py test $* --settings=dev_settings_test
+}

@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,18 +16,20 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
 from django.contrib.auth.models import UserManager, User as BaseUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.conf import settings
 import urllib
 import hashlib
+import hmac
+import time
+import uuid
+try:
+    from hashlib import sha1
+except ImportError:
+    import sha
+    sha1 = sha.sha
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.utils.http import urlquote_plus
 from django.core.exceptions import MultipleObjectsReturned
@@ -35,7 +37,7 @@ from utils.amazon import S3EnabledImageField
 from datetime import datetime, timedelta
 from django.core.cache import cache
 from django.utils.hashcompat import sha_constructor
-from random import random
+from random import random, randint
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
@@ -76,6 +78,9 @@ class CustomUser(BaseUser):
     # for some login backends we end up with a full name but not 
     # a first name, last name pair.
     full_name = models.CharField(max_length=63, blank=True, default='')
+    # which partner created this user? For now it' only a string, at
+    # some point we'll need to model partners better
+    partner = models.CharField(blank=True, null=True, max_length=32, db_index=True)
     
     objects = UserManager()
     
@@ -94,7 +99,7 @@ class CustomUser(BaseUser):
         if self.full_name:
             return self.full_name
         return self.username
-    
+
     def save(self, *args, **kwargs):
         send_confirmation = False
         
@@ -117,7 +122,7 @@ class CustomUser(BaseUser):
         
         if send_confirmation and send_email_confirmation:
             EmailConfirmation.objects.send_confirmation(self)
-    
+
     def unread_messages(self, hidden_meassage_id=None):
         from messages.models import Message
         
@@ -130,7 +135,7 @@ class CustomUser(BaseUser):
             pass
         
         return qs
-    
+
     @classmethod
     def video_followers_change_handler(cls, sender, instance, action, reverse, model, pk_set, **kwargs):
         from videos.models import SubtitleLanguage
@@ -194,7 +199,7 @@ class CustomUser(BaseUser):
             #instance is SubtitleLanguage
             cls.videos.through.objects.filter(video=instance) \
                 .exclude(customuser__followed_languages__video=instance.video).delete()
-    
+
     def get_languages(self):
         """
         Just to control this query
@@ -212,7 +217,10 @@ class CustomUser(BaseUser):
 
     def managed_teams(self):
         from apps.teams.models import TeamMember
-        return self.teams.filter(members__role=TeamMember.ROLE_MANAGER)
+        return self.teams.filter(members__role__in=[
+            TeamMember.ROLE_OWNER,
+            TeamMember.ROLE_ADMIN,
+            TeamMember.ROLE_MANAGER])
 
     def _get_gravatar(self, size):
         url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.email.lower()).hexdigest() + "?"
@@ -224,28 +232,49 @@ class CustomUser(BaseUser):
             return self.picture.thumb_url(size, size)
         else:
             return self._get_gravatar(size)        
-    
     def avatar(self):
         return self._get_avatar_by_size(100)
 
     def small_avatar(self):
         return self._get_avatar_by_size(50)
-    
+
     @models.permalink
     def get_absolute_url(self):
         return ('profiles:profile', [urlquote_plus(self.username)])
-    
+
     @property
     def language(self):
         return self.get_preferred_language_display()
+
+    def guess_best_lang(self, request=None):
+
+        if self.preferred_language:
+            return self.preferred_language
+
+        user_languages = list(self.userlanguage_set.all())
+        if user_languages:
+            return user_languages[0].language
+
+        from utils.translation import get_user_languages_from_request
+
+        if request:
+            languages = get_user_languages_from_request(request)
+            if languages:
+                return languages[0]
+
+        return 'en'
     
+    def guess_is_rtl(self, request=None):
+        from utils.translation import is_rtl
+        return is_rtl(self.guess_best_lang(request))
+
     @models.permalink
     def profile_url(self):
         return ('profiles:profile', [self.pk])
-    
+
     def hash_for_video(self, video_id):
         return hashlib.sha224(settings.SECRET_KEY+str(self.pk)+video_id).hexdigest()
-    
+
     @classmethod
     def get_anonymous(cls):
         return cls.objects.get(pk=settings.ANONYMOUS_USER_ID)
@@ -308,7 +337,7 @@ class Awards(models.Model):
                 pass
             
     @classmethod
-    def on_subtitle_version_save(cls, sender, instance, created, **kwargs):
+    def on_subtitle_version_save(cls, sender, instance, created, timestamp=None, **kwargs):
         if not instance.user:
             return
         
@@ -456,3 +485,50 @@ class EmailConfirmation(models.Model):
         expiration_date = self.sent + timedelta(days=EMAIL_CONFIRMATION_DAYS)
         return expiration_date <= datetime.now()
     key_expired.boolean = True        
+
+class LoginTokenManager(models.Manager):
+    def get_expired(self):
+        expires_in = datetime.now() - LoginToken.EXPIRES_IN
+        return self.filter(created__lt=expires_in)
+        
+    def generate_token(self, user):
+        new_uuid = uuid.uuid4()
+        return hmac.new("%s%s" % (user.pk, str(new_uuid)), digestmod=sha1).hexdigest()
+        
+    def for_user(self, user, updates=True):
+        try:
+           lt = self.get(user=user)
+           if updates:
+               lt.token = self.generate_token(user)
+               lt.created = datetime.now()
+               lt.save()
+        except LoginToken.DoesNotExist:
+            lt = self.create(user=user, token=self.generate_token(user))
+        return lt
+        
+class LoginToken(models.Model):
+    """
+    Links a user account to a secret, this allows a user to be logged in
+    just by clicking on a URL. Mostly 3rd parties need this when creating
+    content on a user's behalf and then redirecting them to our website.
+    The url should expire, just to avoid the security hazard of having those
+    lying around indefinitely.
+
+    When creating new instances, client code should use
+    LoginToken.objects.get_for_user(user)
+    This avoids breaking unique constrainst and badly formed tokens.
+    """
+    
+    EXPIRES_IN = timedelta(minutes=120) # minutes
+    user = models.OneToOneField(CustomUser, related_name="login_token")
+    token = models.CharField(max_length=40, unique=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    objects = LoginTokenManager()
+
+    @property
+    def is_expired(self):
+        return self.created + LoginToken.EXPIRES_IN <  datetime.now()
+        
+    def __unicode__(self):
+        return u"LoginToken for %s" %(self.user)

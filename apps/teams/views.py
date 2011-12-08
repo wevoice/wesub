@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,26 +16,24 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
-
 from utils import render_to, render_to_json
-from teams.forms import CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm, EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm
-from teams.models import Team, TeamMember, Invite, Application, TeamVideo
+from utils.translation import get_languages_list, languages_with_names
+from teams.forms import (
+    CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
+    EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
+    SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm
+)
+from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
 from django.shortcuts import get_object_or_404, redirect, render_to_response
+from apps.auth.models import UserLanguage
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.contrib import messages
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.conf import settings
 from django.views.generic.list_detail import object_list
 from django.template import RequestContext
-from auth.models import CustomUser as User
 from django.db.models import Q, Count
 from django.contrib.auth.decorators import permission_required
 import random
@@ -44,20 +42,24 @@ import widget
 from videos.models import Action
 from django.utils import simplejson as json
 from utils.amazon import S3StorageError
-from utils.translation import get_user_languages_from_request
-from teams.rpc import TeamsApi
 from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
 
+from teams.permissions import (
+    can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
+    can_create_task_subtitle, can_create_task_translate, can_create_task_review,
+    can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign,
+    can_join_team, can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task
+)
 
-TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 12)
+TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
 HIGHTLIGHTED_TEAMS_ON_PAGE = getattr(settings, 'HIGHTLIGHTED_TEAMS_ON_PAGE', 10)
 CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS', 20)
 
-VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 30) 
-MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 30)
-APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 30)
+VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 15) 
+MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 15)
+APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
@@ -114,20 +116,28 @@ def index(request, my_teams=False):
                        template_object_name='teams',
                        extra_context=extra_context)
 
-def detail(request, slug, is_debugging=False, languages=None):
+def detail(request, slug, is_debugging=False, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
 
-    if languages is None:
-        languages = get_user_languages_from_request(request)
-    if bool(is_debugging):
-        languages = request.GET.get('langs', '').split(',')
+    if project_slug is not None:
+        project = get_object_or_404(Project, team=team, slug=project_slug)
+    else:
+        project = None
 
-    qs_list, mqs = team.get_videos_for_languages_haystack(languages, request.user)
+    query = request.GET.get('q')
+    sort = request.GET.get('sort')
+    language = request.GET.get('lang')
+
+    qs = team.get_videos_for_languages_haystack(
+        language, user=request.user, project=project, query=query, sort=sort)
 
     extra_context = widget.add_onsite_js_files({})
     extra_context.update({
         'team': team,
-        'can_edit_video': team.can_edit_video(request.user)
+        'project':project,
+        'can_add_video': can_add_video(team, request.user, project),
+        'can_edit_videos': can_add_video(team, request.user, project),
+        'can_create_tasks': can_create_tasks(team, request.user, project),
     })
 
     general_settings = {}
@@ -142,57 +152,24 @@ def detail(request, slug, is_debugging=False, languages=None):
 
     if bool(is_debugging) and request.user.is_staff:
         extra_context.update({
-                'mqs': mqs,
-                'qs_list': qs_list,
-                'languages': languages
-            })
-        return render_to_response("teams/detail-debug.html", extra_context, RequestContext(request))
-
-    return object_list(request, queryset=mqs, 
-                       paginate_by=VIDEOS_ON_PAGE, 
-                       template_name='teams/detail.html', 
-                       extra_context=extra_context, 
-                       template_object_name='team_video_md')
-
-
-def detail_old(request, slug, is_debugging=False, languages=None):
-    team = Team.get(slug, request.user)
-
-    if languages is None:
-        languages = get_user_languages_from_request(request)
-    if bool(is_debugging):
-        languages = request.GET.get("langs", "").split(",")
-
-    data = team.get_videos_for_languages(languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS)
-    mqs = data['videos']
-    
-    extra_context = widget.add_onsite_js_files({})    
-    extra_context.update({
-        'team': team,
-        'can_edit_video': team.can_edit_video(request.user)
-    })
-
-    general_settings = {}
-    add_general_settings(request, general_settings)
-    extra_context['general_settings'] = json.dumps(general_settings)
-
-    if team.video:
-        extra_context['widget_params'] = base_widget_params(request, {
-            'video_url': team.video.get_video_url(), 
-            'base_state': {}
+            'qs': qs,
         })
-
-    if bool(is_debugging) and request.user.is_staff:
-        extra_context.update(data)
-        extra_context.update({
-            'languages': languages,
-            })
         return render_to_response("teams/detail-debug.html", extra_context, RequestContext(request))
-    
-    return object_list(request, queryset=mqs, 
-                       paginate_by=VIDEOS_ON_PAGE, 
-                       template_name='teams/detail.html', 
-                       extra_context=extra_context, 
+
+    all_langs = set()
+    for search_record in qs:
+        if search_record.video_completed_langs:
+            all_langs.update(search_record.video_completed_langs)
+
+    language_choices = [(code, name) for code, name in get_languages_list()
+                        if code in all_langs]
+
+    extra_context['language_choices'] = language_choices
+
+    return object_list(request, queryset=qs,
+                       paginate_by=VIDEOS_ON_PAGE,
+                       template_name='teams/detail.html',
+                       extra_context=extra_context,
                        template_object_name='team_video_md')
 
 
@@ -221,35 +198,6 @@ def completed_videos(request, slug):
                        extra_context=extra_context, 
                        template_object_name='team_video')    
 
-def detail_members(request, slug):
-    #just other tab of detail view
-    q = request.REQUEST.get('q')
-    
-    team = Team.get(slug, request.user)
-    
-    qs = team.members.all()
-    if q:
-        qs = qs.filter(Q(user__first_name__icontains=q)|Q(user__last_name__icontains=q) \
-                       |Q(user__username__icontains=q)|Q(user__biography__icontains=q))
-
-    extra_context = widget.add_onsite_js_files({})  
-
-    extra_context.update({
-        'team': team,
-        'query': q
-    })
-    
-    if team.video:
-        extra_context['widget_params'] = base_widget_params(request, {
-            'video_url': team.video.get_video_url(), 
-            'base_state': {}
-        })    
-    return object_list(request, queryset=qs, 
-                       paginate_by=MEMBERS_ON_PAGE, 
-                       template_name='teams/detail_members.html', 
-                       extra_context=extra_context, 
-                       template_object_name='team_member')
-
 def videos_actions(request, slug):
     team = Team.get(slug, request.user)  
     videos_ids = team.teamvideo_set.values_list('video__id', flat=True)
@@ -276,26 +224,24 @@ def create(request):
         if form.is_valid():
             team = form.save(user)
             messages.success(request, _('Your team has been created. Review or edit its information below.'))
-            return redirect(team.get_edit_url())
+            return redirect(reverse("teams:settings", kwargs={"slug":team.slug}))
     else:
         form = CreateTeamForm(request.user)
     return {
         'form': form
     }
 
-@render_to('teams/edit.html')
+
+# Settings
+@render_to('teams/settings.html')
 @login_required
-def edit(request, slug):
+def team_settings(request, slug):
     team = Team.get(slug, request.user)
 
-    if not team.is_member(request.user):
-        raise Http404
-    
-    if not team.is_manager(request.user):
-        return {
-            'team': team
-        }
-    
+    if not can_view_settings_tab(team, request.user):
+        return HttpResponseForbidden("You cannot view this team")
+
+    member = team.members.get(user=request.user)
     if request.method == 'POST':
         if request.user.is_staff:
             form = EditTeamFormAdmin(request.POST, request.FILES, instance=team)
@@ -304,15 +250,22 @@ def edit(request, slug):
         if form.is_valid():
             form.save()
             messages.success(request, _(u'Your changes have been saved'))
-            return redirect(team.get_edit_url())
+            return redirect(reverse("teams:settings", kwargs={"slug":team.slug}))
     else:
         if request.user.is_staff:
             form = EditTeamFormAdmin(instance=team)
         else:
             form = EditTeamForm(instance=team)
+
     return {
-        'form': form,
-        'team': team
+        'basic_settings_form': form,
+        'team': team,
+        'user_can_delete_tasks': can_delete_tasks(team, request.user),
+        'user_can_assign_tasks': can_assign_tasks(team, request.user),
+        'assign_form': TaskAssignForm(team, member),
+        'settings_form': SettingsForm(),
+        'permissions_form': PermissionsForm(),
+        'workflow_form': WorkflowForm(),
     }
 
 @login_required
@@ -334,30 +287,52 @@ def edit_logo(request, slug):
         output['error'] = form.get_errors()
     return HttpResponse('<textarea>%s</textarea>'  % json.dumps(output))
 
+@login_required
+def upload_logo(request, slug):
+    team = Team.get(slug, request.user)
 
-def _check_add_video_permission(request, team):
     if not team.is_member(request.user):
         raise Http404
 
-    if not team.can_add_video(request.user):
-        messages.error(request, _(u'You can\'t add video.'))
-        return {
-            'team': team
-        }
+    output = {
+        'url' :  str(team.logo_thumbnail()),
+        'url_full':str(team.logo and team.logo.url),
+    }
+    form = EditLogoForm(request.POST, instance=team, files=request.FILES)
+    
+    if request.FILES and form.is_valid():
+        try:
+            form.save()
+            output['url'] =  str(team.logo_thumbnail())
+            output['url_full'] =  str(team.logo.url)
+        except S3StorageError:
+            output['error'] = {'logo': ugettext(u'File server unavailable. Try later. You can edit some other information without any problem.')}
+    else:
+        output['error'] = form.get_errors()
 
+    return HttpResponse(json.dumps(output))
+
+
+# Adding videos
 @render_to('teams/add_video.html')
 @login_required
 def add_video(request, slug):
     team = Team.get(slug, request.user)
 
-    resp = _check_add_video_permission(request, team)
-    if resp:
-        return resp
-    
+    if not can_add_video(team, request.user):
+        messages.error(request, _(u'You can\'t add video.'))
+        return HttpResponseRedirect(team.get_absolute_url())
+
     initial = {
         'video_url': request.GET.get('url', ''),
         'title': request.GET.get('title', '')
     }
+
+    try:
+        if request.GET.get('project'):
+            initial['project'] = Project.objects.get(slug=request.GET.get('project'))
+    except Project.DoesNotExist:
+        pass
     
     form = AddTeamVideoForm(team, request.user, request.POST or None, request.FILES or None, initial=initial)
     
@@ -377,9 +352,9 @@ def add_video(request, slug):
 def add_videos(request, slug):
     team = Team.get(slug, request.user)
 
-    resp = _check_add_video_permission(request, team)
-    if resp:
-        return resp
+    if not can_add_video(team, request.user):
+        messages.error(request, _(u'You can\'t add video.'))
+        return HttpResponseRedirect(team.get_absolute_url())
 
     form = AddTeamVideosFromFeedForm(team, request.user, request.POST or None)
 
@@ -415,8 +390,9 @@ def edit_videos(request, slug):
 def team_video(request, team_video_pk):
     team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
 
-    if not team_video.can_edit(request.user):
-        raise Http404
+    if not can_edit_video(team_video, request.user):
+        messages.error(request, _(u'You can\'t edit this video.'))
+        return HttpResponseRedirect(team_video.team.get_absolute_url())
 
     meta = team_video.video.metadata()
     form = EditTeamVideoForm(request.POST or None, request.FILES or None,
@@ -438,34 +414,108 @@ def team_video(request, team_video_pk):
     return context
 
 @render_to_json
-@login_required    
+@login_required
 def remove_video(request, team_video_pk):
     team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
 
-    if not team_video.team.is_member(request.user):
-        raise Http404
-    
-    if team_video.can_remove(request.user):
-        team_video.delete()
-        return {
-            'success': True
-        }        
+    if request.method != 'POST':
+        error = _(u'Request must be a POST request.')
+
+        if request.is_ajax():
+            return { 'success': False, 'error': error }
+        else:
+            messages.error(request, error)
+            return HttpResponseRedirect(reverse('teams:user_teams'))
+
+    next = request.POST.get('next', reverse('teams:user_teams'))
+
+    # TODO: check if this should be on a project level
+    if not can_add_video(team_video.team, request.user):
+        error = _(u'You can\'t remove that video.')
+
+        if request.is_ajax():
+            return { 'success': False, 'error': error }
+        else:
+            messages.error(request, error)
+            return HttpResponseRedirect(next)
+
+    for task in team_video.task_set.all():
+        task.delete()
+
+    team_video.delete()
+
+    if request.is_ajax():
+        return { 'success': True }
     else:
-        return {
-            'success': False,
-            'error': ugettext('You can\'t remove video')
-        }
-        
+        return HttpResponseRedirect(next)
+
+
+# Members
+def detail_members(request, slug, role=None):
+    q = request.REQUEST.get('q')
+    lang = request.GET.get('lang')
+
+    team = Team.get(slug, request.user)
+    qs = team.members.all()
+
+    if q:
+        for term in filter(None, [term.strip() for term in q.split()]):
+            qs = qs.filter(Q(user__first_name__icontains=term)
+                         | Q(user__last_name__icontains=term)
+                         | Q(user__username__icontains=term)
+                         | Q(user__biography__icontains=term))
+
+    if lang:
+        qs = qs.filter(user__userlanguage__language=lang)
+
+    if role:
+        if role == 'admin':
+            qs = qs.filter(role__in=[TeamMember.ROLE_OWNER, TeamMember.ROLE_ADMIN])
+        else:
+            qs = qs.filter(role=role)
+
+    extra_context = widget.add_onsite_js_files({})
+
+    # if we are a member that can also edit roles, we create a dict of
+    # roles that we can assign, this will vary from user to user, since
+    # let's say an admin can change roles, but not for anyone above him
+    # the owner, for example
+    assignable_roles = []
+    if roles_user_can_assign(team, request.user):
+        for member in qs:
+            if can_assign_role(team, request.user, member.role, member.user):
+                assignable_roles.append(member)
+
+    users = team.members.values_list('user', flat=True)
+    user_langs = set(UserLanguage.objects.filter(user__in=users).values_list('language', flat=True))
+
+    extra_context.update({
+        'team': team,
+        'query': q,
+        'role': role,
+        'assignable_roles': assignable_roles,
+        'languages': sorted(languages_with_names(user_langs).items(), key=lambda pair: pair[1]),
+    })
+
+    if team.video:
+        extra_context['widget_params'] = base_widget_params(request, {
+            'video_url': team.video.get_video_url(),
+            'base_state': {}
+        })
+    return object_list(request, queryset=qs,
+                       paginate_by=MEMBERS_ON_PAGE,
+                       template_name='teams/detail_members.html',
+                       extra_context=extra_context,
+                       template_object_name='team_member')
+
 @render_to_json
 @login_required
 def remove_member(request, slug, user_pk):
     team = Team.get(slug, request.user)
 
-    if not team.is_member(request.user):
-        raise Http404
-
-    if team.is_manager(request.user):
-        user = get_object_or_404(User, pk=user_pk)
+    member = get_object_or_404(TeamMember, team=team, user__pk=user_pk)
+    if can_assign_role(team, request.user, member.role, member.user):
+        user = member.user
         if not user == request.user:
             TeamMember.objects.filter(team=team, user=user).delete()
             return {
@@ -475,50 +525,19 @@ def remove_member(request, slug, user_pk):
             return {
                 'success': False,
                 'error': ugettext('You can\'t remove youself')
-            }          
+            }
     else:
         return {
             'success': False,
             'error': ugettext('You can\'t remove user')
-        }        
-
-@login_required        
-def edit_members(request, slug):
-    team = Team.get(slug, request.user)
-    
-    if not team.is_member(request.user):
-        raise Http404
-        
-    qs = team.members.select_related()
-    
-    ordering = request.GET.get('o')
-    order_type = request.GET.get('ot')
-
-    if ordering == 'username' and order_type in ['asc', 'desc']:
-        pr = '-' if order_type == 'desc' else ''
-        qs = qs.order_by(pr+'user__first_name', pr+'user__last_name', pr+'user__username')
-    elif ordering == 'role' and order_type in ['asc', 'desc']:
-        qs = qs.order_by(('-' if order_type == 'desc' else '')+'role')
-    
-    extra_context = {
-        'team': team,
-        'ordering': ordering,
-        'order_type': order_type,
-        'role_choices' : TeamMember.ROLES,
-    }
-
-    return object_list(request, queryset=qs,
-                       paginate_by=MEMBERS_ON_PAGE,
-                       template_name='teams/edit_members.html',
-                       template_object_name='members',
-                       extra_context=extra_context)    
+        }
 
 @login_required
 def applications(request, slug):
     team = Team.get(slug, request.user)
     
     if not team.is_member(request.user):
-        raise Http404
+        return  HttpResponseForbidden("Not allowed")
     
     qs = team.applications.all()
         
@@ -537,15 +556,16 @@ def approve_application(request, slug, user_pk):
 
     if not team.is_member(request.user):
         raise Http404
-    
-    if team.can_approve_application(request.user):
+
+    if can_invite(team, request.user):
         try:
             Application.objects.get(team=team, user=user_pk).approve()
             messages.success(request, _(u'Application approved.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
     else:
-        messages.error(request, _(u'You can\'t approve application.'))
+        messages.error(request, _(u'You can\'t approve applications.'))
+
     return redirect('teams:applications', team.pk)
 
 @login_required
@@ -554,56 +574,40 @@ def deny_application(request, slug, user_pk):
 
     if not team.is_member(request.user):
         raise Http404
-    
-    if team.can_approve_application(request.user):
+
+    if can_invite(team, request.user):
         try:
             Application.objects.get(team=team, user=user_pk).deny()
             messages.success(request, _(u'Application denied.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
     else:
-        messages.error(request, _(u'You can\'t deny application.'))
+        messages.error(request, _(u'You can\'t deny applications.'))
+
     return redirect('teams:applications', team.pk)
 
-@render_to_json
+
+@render_to('teams/invite_members.html')
 @login_required
-def invite(request):
-    team_pk = request.POST.get('team_id')
-    username = request.POST.get('username')
-    note = request.POST.get('note', '')
-    
-    if not team_pk and not username:
-        raise Http404
-    
-    team = get_object_or_404(Team, pk=team_pk)
-    
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return {
-            'error': ugettext(u'User does not exist.')
-        }
-    
-    if not team.can_invite(request.user):
-        return {
-            'error': ugettext(u'You can\'t invite to team.')
-        }
-        
-    if team.is_member(user):
-        return {
-            'error': ugettext(u'This user is member of team already.')
-        }
-    
-    if len(note) > Invite._meta.get_field('note').max_length:
-        return {
-            'error': ugettext(u'Note is too long.')
-        }        
-        
-    Invite.objects.get_or_create(team=team, user=user, defaults={
-        'note': note, 
-        'author': request.user
-    })
-    return {}
+def invite_members(request, slug):
+    team = Team.get(slug, request.user)
+
+    if not can_invite(team, request.user):
+        return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
+
+    if request.POST:
+        form = InviteForm(team, request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('teams:detail_members',
+                                                args=[], kwargs={'slug': team.slug}))
+    else:
+        form = InviteForm(team, request.user)
+
+    return {
+        'team': team,
+        'form': form,
+    }
 
 @login_required
 def accept_invite(request, invite_pk, accept=True):
@@ -616,6 +620,64 @@ def accept_invite(request, invite_pk, accept=True):
         
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
+
+@login_required
+def join_team(request, slug):
+    team = get_object_or_404(Team, slug=slug)
+    user = request.user
+
+    if not can_join_team(team, user):
+        messages.error(request, _(u'You cannot join this team.'))
+    else:
+        TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR).save()
+        messages.success(request, _(u'You are now a member of this team.'))
+
+    return redirect(team)
+
+
+def _check_can_leave(team, user):
+    """Return an error message if the member cannot leave the team, otherwise None."""
+
+    try:
+        member = TeamMember.objects.get(team=team, user=user)
+    except TeamMember.DoesNotExist:
+        return u'You are not a member of this team.'
+
+    if not team.members.exclude(pk=member.pk).exists():
+        return u'You are the last member of this team.'
+
+    is_last_owner = (
+        member.role == TeamMember.ROLE_OWNER
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exclude(pk=member.pk).exists()
+    )
+    if is_last_owner:
+        return u'You are the last owner of this team.'
+
+    is_last_admin = (
+        member.role == TeamMember.ROLE_ADMIN
+        and not team.members.filter(role=TeamMember.ROLE_ADMIN).exclude(pk=member.pk).exists()
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exists()
+    )
+    if is_last_admin:
+        return u'You are the last admin of this team.'
+
+    return None
+
+@login_required
+def leave_team(request, slug):
+    team = get_object_or_404(Team, slug=slug)
+    user = request.user
+
+    error = _check_can_leave(team, user)
+    if error:
+        messages.error(request, _(error))
+    else:
+        TeamMember.objects.get(team=team, user=user).delete()
+        messages.success(request, _(u'You have left this team.'))
+
+    return redirect(request.META.get('HTTP_REFERER') or team)
+
+
 @permission_required('teams.change_team')
 def highlight(request, slug, highlight=True):
     item = get_object_or_404(Team, slug=slug)
@@ -623,39 +685,85 @@ def highlight(request, slug, highlight=True):
     item.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
+
+# Tasks
+@render_to('teams/tasks.html')
 @login_required
-def join_team(request, slug):
+def team_tasks(request, slug):
+    team = Team.get(slug, request.user)
+
+    if not can_view_tasks_tab(team, request.user):
+        return HttpResponseForbidden("You cannot view this team")
+
+    member = team.members.get(user=request.user)
+
+    return {
+        'team': team,
+        'user_can_delete_tasks': can_delete_tasks(team, request.user),
+        'user_can_assign_tasks': can_assign_tasks(team, request.user),
+        'assign_form': TaskAssignForm(team, member),
+    }
+
+@render_to('teams/create_task.html')
+def create_task(request, slug, team_video_pk):
     team = get_object_or_404(Team, slug=slug)
-    user = request.user
-    
-    try:
-        TeamMember.objects.get(team=team, user=user)
-        messages.error(request, _(u'You are already a member of this team.'))
-    except TeamMember.DoesNotExist:
-        if not team.is_open():
-            messages.error(request, _(u'This team is not open.'))
-        else:
-            TeamMember(team=team, user=user).save()
-            messages.success(request, _(u'You are now a member of this team.'))
-    
-    return redirect(team)
+    team_video = get_object_or_404(TeamVideo, pk=team_video_pk, team=team)
+    can_assign = can_assign_tasks(team, request.user, team_video.project)
+
+    if request.POST:
+        form = CreateTaskForm(request.user, team, team_video, request.POST)
+
+        if form.is_valid():
+            task = form.save(commit=False)
+
+            task.subtitle_language = form.subtitle_language
+            task.team = team
+            task.team_video = team_video
+
+            if task.type in [Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']]:
+                task.approved = Task.APPROVED_IDS['In Progress']
+
+            task.save()
+
+            return HttpResponseRedirect(reverse('teams:team_tasks', args=[],
+                                                kwargs={'slug': team.slug}))
+    else:
+        form = CreateTaskForm(request.user, team, team_video)
+
+    subtitlable = json.dumps(can_create_task_subtitle(team_video, request.user))
+    translatable_languages = json.dumps(can_create_task_translate(team_video, request.user))
+    reviewable_languages = json.dumps(can_create_task_review(team_video, request.user))
+    approvable_languages = json.dumps(can_create_task_approve(team_video, request.user))
+
+    language_choices = json.dumps(get_languages_list(True))
+
+    return { 'form': form, 'team': team, 'team_video': team_video,
+             'translatable_languages': translatable_languages,
+             'reviewable_languages': reviewable_languages,
+             'approvable_languages': approvable_languages,
+             'language_choices': language_choices,
+             'subtitlable': subtitlable,
+             'can_assign': can_assign, }
 
 @login_required
-def leave_team(request, slug):
+def perform_task(request):
+    task = Task.objects.get(pk=request.POST.get('task_id'))
+
+    if not can_perform_task(request.user, task):
+        return HttpResponseForbidden(_(u'You are not allowed to perform this task.'))
+
+    task.assignee = request.user
+    task.save()
+
+    # ... perform task ...
+    return HttpResponseRedirect(task.get_perform_url())
+
+
+# Projects
+def project_list(request, slug):
     team = get_object_or_404(Team, slug=slug)
-    user = request.user
-    
-    try:
-        tm = TeamMember.objects.get(team=team, user=user)
-        
-        if not team.members.exclude(pk=tm.pk).exists():
-            messages.error(request, _(u'You are last member of this team.'))
-        elif not team.members.filter(role=TeamMember.ROLE_MANAGER).exclude(pk=tm.pk).exists():
-            messages.error(request, _(u'You are last manager of this team.'))
-        else:
-            tm.delete()
-            messages.success(request, _(u'You have left this team.'))
-    except TeamMember.DoesNotExist:
-        messages.error(request, _(u'You are not member of this team.'))
-    
-    return redirect(request.META.get('HTTP_REFERER') or team)
+    projects = Project.objects.for_team(team)
+    return render_to_response("teams/project_list.html", {
+        "team":team,
+        "projects": projects
+    }, RequestContext(request))

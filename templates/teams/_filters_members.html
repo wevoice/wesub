@@ -1,0 +1,31 @@
+{% load i18n teams_tags %}
+
+<ul>
+    <li {% if not role and current != "applicants" %}class="current"{% endif %}>
+        <a href="{% url teams:detail_members team.slug %}">All Members
+          <span>{{team|members:"count"}}</span></a>
+    </li>
+
+    <li {% if role == "admin" %}class="current"{% endif %}>
+        <a href="{% url teams:detail_members_role slug=team.slug,role="admin" %}">Admins
+          <span>{{team|owners_and_admins:"count"}}</span></a>
+    </li>
+
+    <li {% if role == "manager" %}class="current"{% endif %}>
+        <a href="{% url teams:detail_members_role slug=team.slug,role="manager" %}">Managers
+          <span>{{team|managers:"count"}}</span></a>
+    </li>
+
+    <li {% if role == "contributor" %}class="current"{% endif %}>
+        <a href="{% url teams:detail_members_role slug=team.slug,role="contributor" %}">
+          Contributors<span>{{team|contributors:"count"}}</span></a>
+    </li>
+
+    {% if team|can_approve_application:user %}
+        <li{% if current == 'applicants' %} class="current"{% endif %}>
+          <a href="{% url teams:applications slug=team.slug %}"> 
+            Applicants <span>{{team.applications.all.count }}</span>
+            </a>
+        </li>
+    {% endif %}
+</ul>

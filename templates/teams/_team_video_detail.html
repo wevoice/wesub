@@ -1,35 +1,69 @@
-{% load i18n teams_tags %}
-<a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}" class="thumbnail_medium">
-    <img height="100" src="{{ search_record.thumbnail }}">
-</a>
-<div class="info">
-    <h4><a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}">{{ search_record.title }}</a></h4>
-    <div class="clearfix">
-      <div  class="completed_translations">{% team_video_lang_list search_record %}</div>
-    </div>
+{% load i18n teams_tags to_json %}
 
-    <p></p>
-        {% team_video_in_progress_list search_record %} 
-         <p class="team-detail-list-description">
-         {% if search_record.description %}{{ search_record.description|urlize }}. {% endif %}{% if search_record.original_language %} <span class="team-detail-list-video-in-lang">{% trans "Video in:" %}&nbsp;{{search_record.original_language_display}}.</span>{% endif %}
-           </p>
-    <div class="team-video-buttons-container">
-      <a class="blue_button small team_video_{{ search_record.team_video_pk }} add_subtitles_bt" href="#">
-        {% trans 'Add Subtitles ' %}
-      </a>
-      {% if can_edit_video %}
-          <a style="margin-left: 0px !important;" class="blue_button small" href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}">{% trans 'Edit Video' %}</a>
-      {% endif %}
+<li class="team_video_listing_{{ search_record.team_video_pk }}">
+  <h3>
+    <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.title|truncatewords:9 }}</a>
+    {% if search_record.project_name != "_root" %}
+        <span class="descriptor"><a href="{% url teams:project_video_list slug=team.slug,project_slug=search_record.project_slug %}">{{ search_record.project_name }}</a></span>
+    {% endif %}
+  </h3>
 
+  <p>
+    {% if search_record.description %}
+      {{ search_record.description|truncatewords:20|urlize }}.
+    {% endif %}
+  </p>
+  <a href="{% url videos:video video_id=search_record.video_id %}" class="thumb"><img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail"></a>
+  <ul class="actions">
+      <li>
+          <h4>
+              {% if search_record.video_completed_langs %}
+                  <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.video_completed_langs|length }} language{{ search_record.video_completed_langs|length|pluralize }}</a>
+              {% else %}
+                {% trans "No subtitles yet" %}
+              {% endif %}
+          </h4>
+      </li>
+      <li>
+        <a href="#" class="team_video_{{ search_record.team_video_pk }}">Add subtitles</a>
+      </li>
+  </ul>
 
-    </div>
-</div><!-- // info -->
-<script type="text/javascript">
-    $('a.team_video_{{ search_record.team_video_pk }}').click(function(){
-        unisubs.api.openUnisubsDialogOnsite(
-            '{{search_record.video_id}}', 
-            '{{search_record.video_url}}', 
-            GLOBAL_WIDGET_SETTINGS);
-        return false;
-k    });
-</script>
+  {% if can_edit_videos or can_create_tasks %}
+      <ul class="admin-controls">
+          {% if can_edit_videos %}
+              <li>
+                  <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}">Edit</a>
+              </li>
+          {% endif %}
+          {% if can_create_tasks %}
+              {% if search_record|can_create_any_task:request.user %}
+                  <li>
+                      <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}">New Task</a>
+                  </li>
+              {% endif %}
+          {% endif %}
+          {% if can_edit_videos %}
+              <li>
+                  <form action="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" method="post" style="display: none;">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.path }}" />
+                  </form>
+                  <a class="remove-video" href="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}">Remove</a>
+              </li>
+          {% endif %}
+      </ul>
+  {% endif %}
+
+    <script type="text/javascript">
+        $('a.team_video_{{ search_record.team_video_pk }}').click(function(){
+            unisubs.api.openUnisubsDialogOnsite(
+                  '{{search_record.video_id}}',
+                  '{{search_record.video_url}}',
+                  GLOBAL_WIDGET_SETTINGS
+            );
+
+            return false;
+        });
+    </script>
+</li>

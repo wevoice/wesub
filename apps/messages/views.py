@@ -39,7 +39,8 @@ def index(request, message_pk=None):
 
     extra_context = {
         'send_message_form': SendMessageForm(request.user, auto_id='message_form_id_%s'),
-        'messages_display': True
+        'messages_display': True,
+        'user_info': user
     }
     
     reply = request.GET.get('reply')
@@ -70,10 +71,12 @@ def index(request, message_pk=None):
     
 @login_required    
 def sent(request):
+    user = request.user
     qs = Message.objects.for_author(request.user)
     extra_context = {
         'send_message_form': SendMessageForm(request.user, auto_id='message_form_id_%s'),
-        'messages_display': True        
+        'messages_display': True,
+        'user_info': user      
     }
     return object_list(request, queryset=qs,
                        paginate_by=MESSAGES_ON_PAGE,
