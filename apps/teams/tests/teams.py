@@ -543,8 +543,8 @@ class TeamsTest(TestCase):
         search_record_list = self._tv_search_record_list(team)
         self.assertEqual(2, len(search_record_list))
 
-        # but the one with en subs should be first, since we can translate it into russian.
-        self.assertEqual('en', search_record_list[0].original_language)
+        # but the one with en subs should be second, since it was added earlier
+        self.assertEqual('en', search_record_list[1].original_language)
 
     def test_one_tvl(self):
         team, new_team_video = self._create_new_team_video()
@@ -968,28 +968,6 @@ class TeamsDetailQueryTest(TestCase):
         created_pks = [x.pk for x in created_tvs]
         multi = mq.MultiQuerySet(*[TeamVideo.objects.filter(pk=x) for x in created_pks])
         self.assertTrue([x.pk for x in multi] == created_pks)
-
-    def test_hide_trans_back_to_original_lang(self):
-        """
-        context https://www.pivotaltracker.com/story/show/12883401
-        my languages are english and arabic. video is in arabic,
-        and it has complete translations in english and no arabic subs.
-        qs1 and qs2 must not contain opportunity to translate into arabic.
-        """
-        user_langs = ["en", "ar"]
-        self._set_my_languages(*user_langs)
-        qs_list, mqs = self.team.get_videos_for_languages_haystack(user_langs)
-        titles = [x.video_title for x in qs_list[0]] if qs_list[0] else []
-        titles.extend([x.video_title for x in qs_list[1]] if qs_list[1] else [])
-        self.assertFalse("dont-translate-back-to-arabic" in titles)
-
-    def test_lingua_franca_later(self):
-        # context https://www.pivotaltracker.com/story/show/12883401
-        user_langs = ["en", "ar"]
-        self._set_my_languages(*user_langs)
-        qs_list, mqs = self.team.get_videos_for_languages_haystack(user_langs)
-        titles = [x.video_title for x in qs_list[2]]
-        self.assertTrue(titles.index(u'a') < titles.index(u'c'))
 
 
 
