@@ -81,6 +81,7 @@ class BaseNotification(object):
         query for the latest data. This is team dependent if the team
         has a custom base url.
         """
+        from apiv2.api import VideoLanguageResource, VideoResource
         if self.language:
             return VideoLanguageResource(self.api_name).get_resource_uri(self.language)
         else:
@@ -102,7 +103,7 @@ class BaseNotification(object):
         data = dict(event=self.event_name, api_url=self.api_url,
                     language_code=self.language_code, video=self.video_id)
         try:
-            resp, content = h.request(url, "POST", urlencode(data))
+            resp, content = h.request(url, method="POST", data=data)
             success =  200<= resp.status <400
             if success is False:
                 logger.error("Failed to send team notification to %s - from teams:%s, status code:%s, response:%s" %(
