@@ -35,6 +35,9 @@ from django.utils import translation
 from widget.forms import  FinishReviewForm, FinishApproveForm
 from utils.forms import flatten_errorlists
 from teams.models import Task
+from teams.signals import api_subtitles_edited, api_subtitles_approved, \
+     api_subtitles_rejected, api_language_new, api_language_edited, \
+     api_video_edited
 
 from utils import send_templated_email
 from statistic.tasks import st_widget_view_statistic_update
@@ -344,12 +347,15 @@ class Rpc(BaseRpc):
             language.is_complete = completed
         if new_title is not None:
             language.title = new_title
+            api_language_edited.send(language)
         language.save()
 
         if new_version is not None:
             video_changed_tasks.delay(language.video.id, new_version.id)
+            api_subtitles_edited.send(new_version)
         else:
             video_changed_tasks.delay(language.video.id)
+            api_video_edited.send(language.video)
 
         # we have a default user message, since the UI lets users save non
         # changed subs, but the backend will realize and will not save that
@@ -477,8 +483,10 @@ class Rpc(BaseRpc):
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
                 user_message =  'These subtitles have been approved and your notes have been sent to the author.'
+                api_subtitles_approved.send(task.language.version())
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
                 user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
+                api_subtitles_rejected.send(task.language.version())
             else:
                 user_message =  'Your notes have been saved.'
 
@@ -541,6 +549,8 @@ class Rpc(BaseRpc):
         if editable:
             language.writelock(request)
             language.save()
+            if create_new:
+                api_language_new.send(language)
         return language, editable
 
     def _fix_blank_original(self, video_id):
