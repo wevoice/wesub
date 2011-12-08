@@ -32,7 +32,7 @@ from utils.forms.unisub_video_form import UniSubBoundVideoField
 from teams.permissions import can_assign_task
 
 from apps.teams.moderation import add_moderation, remove_moderation
-from apps.teams.permissions import roles_user_can_invite
+from apps.teams.permissions import roles_user_can_invite, can_delete_task
 from apps.teams.permissions_const import ROLE_NAMES
 
 from doorman import feature_is_on
@@ -506,7 +506,9 @@ class TaskDeleteForm(forms.Form):
     def clean_task(self):
         task = self.cleaned_data['task']
 
-        # TODO: check that self.user has permission to delete the task
+        if not can_delete_task(task, self.user):
+            raise forms.ValidationError(_(
+                u'You do not have permission to delete this task.'))
 
         return task
 

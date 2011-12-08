@@ -406,7 +406,10 @@ def can_create_tasks(team, user, project=None):
     return can_assign_tasks(team, user, project)
 
 def can_delete_tasks(team, user, project=None, lang=None):
-    # for now, use the same logic as assignment
+    # for now, use the same logic as assignment, minus contributors
+    role = get_role_for_target(user, team, project, lang)
+    if role == ROLE_CONTRIBUTOR:
+        return False
     return can_assign_tasks(team, user, project, lang)
 
 def can_assign_tasks(team, user, project=None, lang=None):
@@ -451,7 +454,6 @@ def can_assign_task(task, user):
 def can_delete_task(task, user):
     """Return whether the given user can delete the given task."""
 
-    # For now, use the same logic as assignment.
     team, project, lang = task.team, task.team_video.project, task.language
 
     return can_delete_tasks(team, user, project, lang) and can_perform_task(user, task)
