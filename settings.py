@@ -660,6 +660,7 @@ MEDIA_BUNDLES = {
             "css/solutions.css",
             "css/watch.css",
             "css/v1.css",
+            "css/bootstrap.css",
           ),
         },
     "video_history":{

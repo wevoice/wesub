@@ -10,8 +10,8 @@
 
 {% block css %}
     {{ block.super }}
-     {% include_bundle "widget-css"%}
-     {% include_bundle "css-teams-settings-panel"%}
+    {% include_bundle "widget-css"%}
+    {% include_bundle "css-teams-settings-panel"%}
 {% endblock %}
 
 {% block scripts %}
@@ -119,44 +119,44 @@
         {% include "teams/_actions.html" %}
     </div>
 
-{% if assignable_roles %}
-    <script id="editRoleDialog" type="text/html">
-        {% verbatim %}
-        <div>
-            <a class="close">X</a>
-            <label>Role:</label>
-            <select class="roles">
-                {{#roles}}
-                    <option value="{{val}}">{{name}}</option>
-                {{/roles}}
-            </select>
-            <div class="clearfix"></div>
-            <label>Project Restriction:</label>
-            <select data-placeholder="Choose-selected..." style="width:350px;" multiple class="chzn-select projects">
-                {{#projects}}
-                    <option {{#selected}}selected="selected"{{/selected}} value="{{pk}}">{{name}}</option>
-                {{/projects}}
-            </select>
+    {% if assignable_roles %}
+        <script id="editRoleDialog" type="text/html">
+            {% verbatim %}
+            <div>
+                <a class="close">X</a>
+                <label>Role:</label>
+                <select class="roles">
+                    {{#roles}}
+                        <option value="{{val}}">{{name}}</option>
+                    {{/roles}}
+                </select>
+                <div class="clearfix"></div>
+                <label>Project Restriction:</label>
+                <select data-placeholder="Choose-selected..." style="width:350px;" multiple class="chzn-select projects">
+                    {{#projects}}
+                        <option {{#selected}}selected="selected"{{/selected}} value="{{pk}}">{{name}}</option>
+                    {{/projects}}
+                </select>
 
-            <div class="clearfix"></div>
-            <label>Language Restriction:</label>
-            <select data-placeholder="Choose-selected..." style="width:350px;"
-                multiple class="chzn-select langs">
-                {{#languages}}
-                    <option {{#selected}}selected="selected"{{/selected}} value="{{code}}">{{name}}</option>
-                {{/languages}}
-            </select>
+                <div class="clearfix"></div>
+                <label>Language Restriction:</label>
+                <select data-placeholder="Choose-selected..." style="width:350px;"
+                    multiple class="chzn-select langs">
+                    {{#languages}}
+                        <option {{#selected}}selected="selected"{{/selected}} value="{{code}}">{{name}}</option>
+                    {{/languages}}
+                </select>
 
-            <div class="clearfix">
-                <a class="button small action-close" > Cancel</a>
-                <a class="button small action-save" > Save</a>
+                <div class="clearfix">
+                    <a class="button small action-close" > Cancel</a>
+                    <a class="button small action-save" > Save</a>
+                </div>
             </div>
-        </div>
-        {% endverbatim %}
-    </script>
-<script type="text/javascript" >
-    {% include "teams/assign-roles.js" %}
-</script>
+            {% endverbatim %}
+        </script>
+        <script type="text/javascript" >
+            {% include "teams/assign-roles.js" %}
+        </script>
+    {% endif %}
 
-{% endif %}
 {% endblock %}
