@@ -1553,7 +1553,7 @@ class TeamNotificationSetting(models.Model):
         import sentry_logger
         logger = sentry_logger.logging.getLogger("teams.models")
         try:
-            from notificationsclasses import NOTIFICATION_CLASS_MAP
+            from notificationclasses import NOTIFICATION_CLASS_MAP
             
             return NOTIFICATION_CLASS_MAP[self.notification_class]
         except ImportError:
@@ -1565,7 +1565,8 @@ class TeamNotificationSetting(models.Model):
         Resolves what the notifier class is for this settings and
         fires notfications it configures
         """
-        notifier = self.get_notification_class()(self.team, video, event_name, language_pk=None)
+        notifier = self.get_notification_class()(
+            self.team, video, event_name, language_pk)
         if self.request_url:
             success, content = notifier.send_http_request(
                 self.request_url,
