@@ -114,7 +114,7 @@ def _project_to_dict(p):
 def _build_translation_task_dict(team, team_video, language, member):
     task_dict = Task(team=team, team_video=team_video,
                      type=Task.TYPE_IDS['Translate'], assignee=None,
-                     language=language).to_dict(member)
+                     language=language).to_dict(member.user)
     task_dict['ghost'] = True
     return task_dict
 
