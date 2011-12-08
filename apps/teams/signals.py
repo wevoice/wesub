@@ -110,6 +110,7 @@ def api_on_video_edited(sender, **kwargs):
     
 
 def api_on_teamvideo_new(sender, **kwargs):
+    from teams import tasks as team_tasks
     from teams.models import TeamNotificationSetting
     team_tasks.api_notify_on_video_activity.delay(
             sender.pk,
