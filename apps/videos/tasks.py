@@ -214,8 +214,8 @@ def _detect_language(version_id):
             if len(text) >= 300:
                 break
         r = json.loads(urllib.urlopen(url % urlquote_plus(text)).read())
-
-        if r and not 'error' in r:
+        status = r['responseStatus']
+        if r and not 'error' in r and status != 403:
             try:
                 SubtitleLanguage.objects.get(video=language.video, language=r['responseData']['language'])
             except SubtitleLanguage.DoesNotExist:
