@@ -167,7 +167,7 @@ def _get_completed_language_dict(team_videos, languages):
     return completed_languages
 
 
-TEAM_LANGUAGES = ['fr', 'es', 'tl']
+TEAM_LANGUAGES = []
 
 def _get_translation_tasks(team, tasks, member, team_video, language):
     # TODO: Once this is a setting, look it up.

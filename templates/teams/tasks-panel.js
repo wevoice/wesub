@@ -262,7 +262,7 @@ var TasksPanel = AsyncPanel.$extend({
     },
 
     onPageClick: function(e) {
-        this.page = parseInt($(e.target).text());
+        this.page = parseInt($(e.target).text(), 10);
         this.reloadTasks();
         return false;
     },

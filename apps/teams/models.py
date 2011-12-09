@@ -1078,8 +1078,11 @@ class Workflow(models.Model):
         else:
             team_id = workflows[0].team.pk
 
+        team = Team.objects.get(pk=team_id)
+        default_workflow = Workflow(team=team)
+
         if not workflows:
-            return Workflow(team=Team.objects.get(pk=team_id))
+            return default_workflow
 
         if type == 'team_video':
             try:
@@ -1100,6 +1103,9 @@ class Workflow(models.Model):
                 # If there's no project-specific workflow for this project,
                 # there might be one for its team, so we'll fall through.
                 pass
+
+        if not team.workflow_enabled:
+            return default_workflow
 
         return [w for w in workflows
                 if (not w.project) and (not w.team_video)][0]
@@ -1553,7 +1559,7 @@ class TeamNotificationSetting(models.Model):
         import sentry_logger
         logger = sentry_logger.logging.getLogger("teams.models")
         try:
-            from notificationsclasses import NOTIFICATION_CLASS_MAP
+            from notificationclasses import NOTIFICATION_CLASS_MAP
             
             return NOTIFICATION_CLASS_MAP[self.notification_class]
         except ImportError:
@@ -1565,7 +1571,8 @@ class TeamNotificationSetting(models.Model):
         Resolves what the notifier class is for this settings and
         fires notfications it configures
         """
-        notifier = self.get_notification_class()(self.team, video, event_name, language_pk=None)
+        notifier = self.get_notification_class()(
+            self.team, video, event_name, language_pk)
         if self.request_url:
             success, content = notifier.send_http_request(
                 self.request_url,

@@ -24,6 +24,7 @@ from teams.forms import (
     SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm
 )
 from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
+from teams.signals import api_teamvideo_new
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
 from django.contrib.auth.decorators import login_required
@@ -340,6 +341,8 @@ def add_video(request, slug):
         obj =  form.save(False)
         obj.added_by = request.user
         obj.save()
+        api_teamvideo_new.send(obj)
+        messages.success(request, form.success_message())
         return redirect(obj)
         
     return {
@@ -360,6 +363,7 @@ def add_videos(request, slug):
 
     if form.is_valid():
         team_videos = form.save()
+        [api_teamvideo_new.send(tv) for tv in team_videos]
         messages.success(request, form.success_message() % {'count': len(team_videos)})
         return redirect(team)
 

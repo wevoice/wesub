@@ -364,12 +364,16 @@
   padding: 1em;
   background: #486f87;
   color: #fff;
+  z-index: 90;
   -webkit-background-clip: padding-box;
   -webkit-border-radius: 3px;
   -moz-background-clip: padding-box;
   -moz-border-radius: 3px;
   border-radius: 3px;
   background-clip: padding-box;
+}
+.v1 .listing  > li .actions .action-assign-submit {
+  color: #FFF;
 }
 .v1 .listing  > li .descriptor {
   font-size: 11px;

@@ -235,6 +235,9 @@ class AddTeamVideoForm(BaseVideoBoundForm):
 
         return self.cleaned_data
 
+    def success_message(self):
+        return 'Video successfully added to team.'
+
     def save(self, commit=True):
         video_language = self.cleaned_data['language']
         video = self.fields['video_url'].video
