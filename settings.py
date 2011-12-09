@@ -36,7 +36,6 @@ lang_dict['sr-latn'] = gettext_noop(u'Serbian, Latin')
 lang_dict['zh-cn'] = gettext_noop(u'Chinese, Simplified')
 lang_dict['zh-tw'] = gettext_noop(u'Chinese, Traditional')
 lang_dict['eo'] = gettext_noop(u'Esperanto')
-global_settings.LANGUAGES = tuple(i for i in lang_dict.items())
 
 METADATA_LANGUAGES = (
     ('meta-tw', 'Metadata: Twitter'),
@@ -129,8 +128,10 @@ ALL_LANGUAGES['ilo'] = gettext_noop(u'Ilocano')
 ALL_LANGUAGES['ceb'] = gettext_noop(u'Cebuan')
 
 del ALL_LANGUAGES['no']
+full_langs = dict(lang_dict.items() + ALL_LANGUAGES.items())
 ALL_LANGUAGES = tuple(i for i in ALL_LANGUAGES.items())
-
+# this has to be set after all languages have been appended
+global_settings.LANGUAGES = tuple(i for i in full_langs.items())
 # languages that more people speak, and therefore
 # are it's translators are not as rare
 LINGUA_FRANCAS = ["en", "en-gb"]
