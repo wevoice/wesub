@@ -66,7 +66,7 @@
                         <h3>
                             <a href="{{ member.user.get_absolute_url }}">
                                 {{ member.user }}
-                                {% if member.user == user %}(You){% endif %}
+                                {% if member.user == user %}(Me){% endif %}
                             </a>
                             {% for lang in member.user.get_languages %}
                                 <span class="descriptor">{{ lang.get_language_display }}</span>
@@ -156,8 +156,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a class="btn secondary action-close" > Cancel</a>
-                        <a class="btn primary action-save" > Save</a>
+                        <a class="btn primary action-save" >Save</a>
+                        <a class="btn secondary action-close" >Cancel</a>
                     </div>
                 </div>
             </div>

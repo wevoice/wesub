@@ -342,6 +342,7 @@ def add_video(request, slug):
         obj.added_by = request.user
         obj.save()
         api_teamvideo_new.send(obj)
+        messages.success(request, form.success_message())
         return redirect(obj)
         
     return {
