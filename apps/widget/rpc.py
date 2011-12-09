@@ -478,15 +478,15 @@ class Rpc(BaseRpc):
             if task.approved in Task.APPROVED_FINISHED_IDS:
                 task.completed = datetime.now()
 
-            task.subtitle_language.release_writelock()
+            task.subtitle_version.language.release_writelock()
             task.save()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
                 user_message =  'These subtitles have been approved and your notes have been sent to the author.'
-                api_subtitles_approved.send(task.subtitle_language.version())
+                api_subtitles_approved.send(task.subtitle_version)
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
                 user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
-                api_subtitles_rejected.send(task.subtitle_language.version())
+                api_subtitles_rejected.send(task.subtitle_version)
             else:
                 user_message =  'Your notes have been saved.'
 
