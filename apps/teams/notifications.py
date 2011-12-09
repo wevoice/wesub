@@ -106,10 +106,10 @@ class BaseNotification(object):
         h = Http()
         if basic_auth_username and basic_auth_password:
             h.add_credentials(basic_auth_username, basic_auth_password)
-        data = dict(event=self.event_name, api_url=self.api_url,
-                    language_code=self.language_code, video=self.video_id)
+        data = urlencode(dict(event=self.event_name, api_url=self.api_url,
+                    language_code=self.language_code, video=self.video_id))
         try:
-            resp, content = h.request(url, method="POST", data=data)
+            resp, content = h.request(url, method="POST", body=data)
             success =  200<= resp.status <400
             if success is False:
                 logger.error("Failed to send team notification to %s - from teams:%s, status code:%s, response:%s" %(
