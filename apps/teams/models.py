@@ -22,7 +22,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.exceptions import ValidationError
-from videos.models import Video, SubtitleLanguage
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
 from django.db.models.signals import post_save, post_delete
@@ -1278,7 +1278,7 @@ class Task(models.Model):
     language = models.CharField(max_length=16, choices=ALL_LANGUAGES, blank=True,
                                 db_index=True)
     assignee = models.ForeignKey(User, blank=True, null=True)
-    subtitle_language = models.ForeignKey(SubtitleLanguage, blank=True, null=True)
+    subtitle_version = models.ForeignKey(SubtitleVersion, blank=True, null=True)
 
     deleted = models.BooleanField(default=False)
 
@@ -1352,20 +1352,26 @@ class Task(models.Model):
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         language=self.language, type=Task.TYPE_IDS['Review'])
+            task.save()
         else:
-            # The review step may be disabled.
-            # If so, we move directly to the approve step.
-            task = Task(team=self.team, team_video=self.team_video,
-                        language=self.language, type=Task.TYPE_IDS['Approve'])
+            # The review step may be disabled.  If so, we check the approve step.
+            if self.workflow.approve_enabled:
+                task = Task(team=self.team, team_video=self.team_video,
+                            language=self.language, type=Task.TYPE_IDS['Approve'])
+                task.save()
+            else:
+                task = None
 
-        task.save()
         return task
 
     def _complete_review(self):
         if self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         language=self.language, type=Task.TYPE_IDS['Approve'])
-        task.save()
+            task.save()
+        else:
+            task = None
+
         return task
 
     def _complete_approve(self):
@@ -1375,7 +1381,7 @@ class Task(models.Model):
     def get_perform_url(self):
         '''Return the URL that will open whichever dialog necessary to perform this task.'''
         mode = Task.TYPE_NAMES[self.type].lower()
-        return self.subtitle_language.get_widget_url(mode=mode, task_id=self.pk)
+        return self.subtitle_version.language.get_widget_url(mode=mode, task_id=self.pk)
 
 
 class SettingManager(models.Manager):
