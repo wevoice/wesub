@@ -1159,7 +1159,9 @@ class Workflow(models.Model):
 
 
     def __unicode__(self):
-        return u'Workflow for %s' % self.get_specific_target()
+        target = self.get_specific_target()
+        return u'Workflow %s for %s (%s %d)' % (
+                self.pk, target, target.__class__.__name__, target.pk)
 
 
     # Convenience functions for checking if a step of the workflow is enabled.

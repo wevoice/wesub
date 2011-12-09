@@ -389,6 +389,9 @@ class TestRules(BaseTestPermission):
         user, outsider = self.user, self.outsider
         workflow = Workflow.get_for_team_video(self.nonproject_video)
 
+        self.team.workflow_enabled = True
+        self.team.save()
+
         # TODO: Test with Project/video-specific workflows.
 
         # Review disabled.
@@ -449,8 +452,22 @@ class TestRules(BaseTestPermission):
 
         self.assertFalse(can_review(self.nonproject_video, outsider))
 
+        # Workflows disabled entirely.
+        self.team.workflow_enabled = False
+        self.team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertFalse(can_review(self.nonproject_video, user))
+
+        self.assertFalse(can_review(self.nonproject_video, outsider))
+
     def test_can_approve(self):
         user, outsider = self.user, self.outsider
+
+        self.team.workflow_enabled = True
+        self.team.save()
+
         workflow = Workflow.get_for_team_video(self.nonproject_video)
 
         # TODO: Test with Project/video-specific workflows.
@@ -471,6 +488,7 @@ class TestRules(BaseTestPermission):
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
+                user = User.objects.all()[0]
                 self.assertTrue(can_approve(self.nonproject_video, user))
 
         for r in [ROLE_CONTRIBUTOR]:
@@ -502,6 +520,17 @@ class TestRules(BaseTestPermission):
                 self.assertTrue(can_approve(self.project_video, user))
 
         self.assertFalse(can_approve(self.nonproject_video, outsider))
+
+        # Workflows disabled entirely.
+        self.team.workflow_enabled = False
+        self.team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertFalse(can_approve(self.nonproject_video, user))
+
+        self.assertFalse(can_approve(self.nonproject_video, outsider))
+
 
     def test_can_message_all_members(self):
         team, user, outsider = self.team, self.user, self.outsider
