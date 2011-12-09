@@ -1,11 +1,21 @@
 {% if widget_type != "checkbox" %}
-    {{ field.label_tag }} 
+	{% if label %}
+		<label for="{{ field.html_name }}">{{ label }}</label>
+	{% else %}
+	    {{ field.label_tag }} 
+    {% endif %}
     {{ field }}
 {% else %}
-    <label for="{{ field.html_name }}">{{ field }} {{ field.label }}</label>
+    <label for="{{ field.html_name }}">
+    	{{ field }} {% if label %}{{ label }}{% else %}{{ field.label }}{% endif %}
+    </label>
 {% endif %}
 
-{% if field.help_text %}
-    <p class="notation">{{ field.help_text }}</p>
+{% if help_text %}
+	<p class="notation">{{ help_text }}</p>
+{% else %}
+	{% if field.help_text %}
+    	<p class="notation">{{ field.help_text }}</p>
+    {% endif %}
 {% endif %}
 {{ field.errors }}
