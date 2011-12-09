@@ -11,7 +11,7 @@ def reset_requests():
     global REQUEST_CALLBACKS
     REQUEST_CALLBACKS = [] 
 
-def add_call(url, **kwargs):
+def store_request_call(url, **kwargs):
     method = kwargs.pop('method', None)
     data = kwargs.pop("data", {})
     global REQUEST_CALLBACKS
