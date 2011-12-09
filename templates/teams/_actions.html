@@ -15,7 +15,7 @@
             {% endif %}
         {% endif %}
     {% else %}
-        <a class="button primary" href="{% url auth:login %}?next={{ request.path_info|urlencode }}">{% trans "Sign in to Join Team" %}</a>
+        <a id="signin-join" class="button primary" href="{% url auth:login %}?next={{ request.path_info|urlencode }}">{% trans "Sign in to Join Team" %}</a>
     {% endif %}
 {% endif %} 
   
