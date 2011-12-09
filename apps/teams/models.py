@@ -1497,7 +1497,8 @@ post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePrefere
 
     
 class TeamNotificationSettingManager(models.Manager):
-    def notify_team(self, team_pk, video_id, event_name, language_pk=None):
+    def notify_team(self, team_pk, video_id, event_name,
+                    language_pk=None, version_pk=None):
         """
         Finds the matching notification settings for this team, instantiates
         the notifier class , and sends the appropriate notification.
@@ -1511,7 +1512,7 @@ class TeamNotificationSettingManager(models.Manager):
         except TeamNotificationSetting.DoesNotExist:
             return
         notification_settings.notify(Video.objects.get(video_id=video_id), event_name,
-                                                 language_pk)
+                                                 language_pk, version_pk)
            
 class TeamNotificationSetting(models.Model):
     """
@@ -1560,13 +1561,13 @@ class TeamNotificationSetting(models.Model):
             logger.exception("Apparently unisubs-integration is not installed")
             
         
-    def notify(self, video, event_name, language_pk=None):
+    def notify(self, video, event_name, language_pk=None, version_pk=None):
         """
         Resolves what the notifier class is for this settings and
         fires notfications it configures
         """
         notifier = self.get_notification_class()(
-            self.team, video, event_name, language_pk)
+            self.team, video, event_name, language_pk, version_pk)
         if self.request_url:
             success, content = notifier.send_http_request(
                 self.request_url,

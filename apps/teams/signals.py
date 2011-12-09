@@ -45,7 +45,7 @@ def _teams_to_notify(video):
     video.
     """
     from teams.models import Team
-    return list( Team.objects.filter(teamvideo=video, notification_settings__isnull=False))
+    return list( Team.objects.filter(teamvideo__video=video, notification_settings__isnull=False))
     
 def _execute_video_task(video, event_name):
     from teams import tasks as team_tasks
@@ -76,7 +76,7 @@ def _execute_version_task(version, event_name):
     for team in teams:
         team_tasks.api_notify_on_subtitles_activity.delay(
             team.pk,
-            version.language.pk,
+            version.pk,
             event_name
             )
     
