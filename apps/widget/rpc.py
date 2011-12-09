@@ -483,10 +483,10 @@ class Rpc(BaseRpc):
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
                 user_message =  'These subtitles have been approved and your notes have been sent to the author.'
-                api_subtitles_approved.send(task.language.version())
+                api_subtitles_approved.send(task.subtitle_language.version())
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
                 user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
-                api_subtitles_rejected.send(task.language.version())
+                api_subtitles_rejected.send(task.subtitle_language.version())
             else:
                 user_message =  'Your notes have been saved.'
 

@@ -1078,8 +1078,11 @@ class Workflow(models.Model):
         else:
             team_id = workflows[0].team.pk
 
+        team = Team.objects.get(pk=team_id)
+        default_workflow = Workflow(team=team)
+
         if not workflows:
-            return Workflow(team=Team.objects.get(pk=team_id))
+            return default_workflow
 
         if type == 'team_video':
             try:
@@ -1100,6 +1103,9 @@ class Workflow(models.Model):
                 # If there's no project-specific workflow for this project,
                 # there might be one for its team, so we'll fall through.
                 pass
+
+        if not team.workflow_enabled:
+            return default_workflow
 
         return [w for w in workflows
                 if (not w.project) and (not w.team_video)][0]
@@ -1497,7 +1503,8 @@ post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePrefere
 
     
 class TeamNotificationSettingManager(models.Manager):
-    def notify_team(self, team_pk, video_id, event_name, language_pk=None):
+    def notify_team(self, team_pk, video_id, event_name,
+                    language_pk=None, version_pk=None):
         """
         Finds the matching notification settings for this team, instantiates
         the notifier class , and sends the appropriate notification.
@@ -1511,7 +1518,7 @@ class TeamNotificationSettingManager(models.Manager):
         except TeamNotificationSetting.DoesNotExist:
             return
         notification_settings.notify(Video.objects.get(video_id=video_id), event_name,
-                                                 language_pk)
+                                                 language_pk, version_pk)
            
 class TeamNotificationSetting(models.Model):
     """
@@ -1560,13 +1567,13 @@ class TeamNotificationSetting(models.Model):
             logger.exception("Apparently unisubs-integration is not installed")
             
         
-    def notify(self, video, event_name, language_pk=None):
+    def notify(self, video, event_name, language_pk=None, version_pk=None):
         """
         Resolves what the notifier class is for this settings and
         fires notfications it configures
         """
         notifier = self.get_notification_class()(
-            self.team, video, event_name, language_pk)
+            self.team, video, event_name, language_pk, version_pk)
         if self.request_url:
             success, content = notifier.send_http_request(
                 self.request_url,

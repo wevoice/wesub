@@ -91,13 +91,14 @@ def complete_applicable_tasks(team_video_id):
 @task()
 def api_notify_on_subtitles_activity(team_pk, version_pk, event_name):
     from teams.models import Team
-    from videls.models import SubtitleVersion
-    version = SubtitleVersion.objects.get(pk=version_pk).select_related("language", "language__video")
-    team = Team.objects.get(pk=team_pk).select_related("notification_settings")
+    from videos.models import SubtitleVersion
+    version = SubtitleVersion.objects.select_related("language", "language__video").get(pk=version_pk)
+    team = Team.objects.select_related("notification_settings").get(pk=team_pk)
     team.notification_settings.notify(
            version.language.video,
            event_name,
-           version.language.pk) 
+           version.language.pk,
+           version_pk) 
  
 @task()
 def api_notify_on_language_activity(team_pk, language_pk, event_name):
@@ -114,7 +115,7 @@ def api_notify_on_language_activity(team_pk, language_pk, event_name):
 @task()
 def api_notify_on_video_activity(team_video_pk,event_name):
     from teams.models import TeamVideo
-    tv = TeamVideo.objects.get(pk=team_video_pk).select_related("team", "video", "team__notification_settings")
+    tv = TeamVideo.objects.get(pk=team_video_pk)
     tv.team.notification_settings.notify(
            tv.video,
            event_name,
