@@ -225,22 +225,23 @@ var TasksPanel = AsyncPanel.$extend({
 
         TeamsApiV2.tasks_languages_list(TEAM_SLUG, this.onTasksLanguagesListLoaded);
     },
-
     reloadTasks: function() {
         TeamsApiV2.tasks_list(TEAM_SLUG, this.getFilters(), this.onTasksListLoaded);
     },
-
     renderTasksList: function() {
         var tasksListing = $('.tasks.listing');
 
         if (_.isEmpty(this.tasks)) {
             tasksListing.html('<li class="empty">Sorry, no tasks here.</li>');
+            $('div.pagination').hide();
         } else {
             $('li', tasksListing).remove();
 
             _.each(this.tasks, function(task) {
                 tasksListing.append(task.el);
             });
+
+            $('div.pagination').show();
         }
     },
     renderPagination: function(data) {
@@ -249,20 +250,31 @@ var TasksPanel = AsyncPanel.$extend({
 
         $('.pagination').html('');
 
+        if (this.page == 1) {
+            $('.pagination').append('<span class="previous_page disabled">← Previous</span>');
+        } else {
+            $('.pagination').append('<a class="previous_page" href="#" data-page="' + (this.page - 1) + '">← Previous</a>');
+        }
+
         for (i = 1; i <= pages; i++) {
             if (this.page === i) {
                 $('.pagination').append('<em>' + i + '</em>');
             } else {
-                $('.pagination').append('<a href="#">' + i + '</a>');
+                $('.pagination').append('<a href="#" data-page="' + i + '">' + i + '</a>');
             }
-
         }
+
+        if (this.page == pages) {
+            $('.pagination').append('<span class="next_page disabled">Next →</span>');
+        } else {
+            $('.pagination').append('<a class="next_page" href="#" data-page="' + (this.page + 1) + '">Next →</a>');
+        }
+
 
         $('.pagination a').click(this.onPageClick);
     },
-
     onPageClick: function(e) {
-        this.page = parseInt($(e.target).text(), 10);
+        this.page = parseInt($(e.target).attr('data-page'), 10);
         this.reloadTasks();
         return false;
     },
@@ -283,13 +295,11 @@ var TasksPanel = AsyncPanel.$extend({
         $('#tasks_language_filter').append(this.languagesList.el);
         $('#id_task_language').chosen();
     },
-
     getFilters: function() {
         return { language: this.languagesList.getValue(),
                  type: this.typesList.getValue(),
                  page: this.page };
     },
-
     removeTask: function(task) {
         this.tasks = _.without(this.tasks, task);
     }

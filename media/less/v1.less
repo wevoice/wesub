@@ -52,12 +52,12 @@
     background: @image, -moz-linear-gradient(center top, @start 0%, @stop 100%);
     background: @image, -moz-gradient(center top, @start 0%, @stop 100%);
 }
-.linear-gradient(@position: bottom, @first, @second, @third) {
-    background-image: -webkit-linear-gradient(bottom, @first, @second, @third);
-    background-image: -moz-linear-gradient(bottom, @first, @second, @third);
-    background-image: -o-linear-gradient(bottom, @first, @second, @third);
-    background-image: -ms-linear-gradient(bottom, @first, @second, @third);
-    background-image: linear-gradient(bottom, @first, @second, @third);
+.linear-gradient(@position, @first, @second, @third) {
+    background-image: -webkit-linear-gradient(@position, @first, @second, @third);
+    background-image: -moz-linear-gradient(@position, @first, @second, @third);
+    background-image: -o-linear-gradient(@position, @first, @second, @third);
+    background-image: -ms-linear-gradient(@position, @first, @second, @third);
+    background-image: linear-gradient(@position, @first, @second, @third);
 }
 .opacity(@op) {
     filter: alpha(opacity=@op);
@@ -495,7 +495,6 @@
         color: @lighter;
         background: transparent;
     }
-
     a {
         color: @normal;
 
@@ -505,7 +504,6 @@
             color: #fff;
         }
     }
-
     .disabled {
         color: @lighter;
     }
@@ -519,7 +517,7 @@
     padding-bottom: 4em;
     border-left: 1px solid @fainter;
     background-color: #fff;
-    .linear-gradient( left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
+    .linear-gradient(left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
     
     ul {
         padding: 0;
