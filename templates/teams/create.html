@@ -44,7 +44,7 @@
                     {% include "_form_field.html" with field=form.name %}
                     {% include "_form_field.html" with field=form.description %}
                     {% include "_form_field.html" with field=form.slug label="Team URL" help_text="http://universalsubtitles.org/teams/" %}
-                    {% include "_form_field.html" with field=form.is_visible %}
+                    {% include "_form_field.html" with field=form.is_visible widget_type="checkbox" %}
                 <fieldset>
             </div>
             <div class="grid_4 omega">
