@@ -137,7 +137,7 @@
                                 {{/roles}}
                             </select>
                         </div>
-                        <div class="field clearfix">
+                        <div class="field clearfix {{^projects}}hidden{{/projects}}">
                             <label>Project Restriction:</label>
                             <select data-placeholder="None" style="width:350px;" multiple class="chzn-select projects">
                                 {{#projects}}
