@@ -271,7 +271,6 @@ class TeamsApiV2Class(object):
 
         # TODO: Handle the team language setting here once team settings are
         # implemented.
-        languages += ['fr', 'es', 'tl']
         languages = list(set(languages))
 
         return [{'language': l,
