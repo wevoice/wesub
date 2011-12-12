@@ -27,11 +27,10 @@ from utils.translation import SUPPORTED_LANGUAGES_DICT
 from apps.teams.permissions_const import *
 from apps.teams.permissions import (
     remove_role, add_role, can_message_all_members, can_add_video,
-    can_assign_tasks, can_assign_role, roles_user_can_assign,
-    add_narrowing_to_member, can_rename_team, can_view_settings_tab,
+    roles_user_can_assign, can_rename_team, can_view_settings_tab,
     can_change_team_settings, can_view_tasks_tab, can_invite,
-    can_change_video_settings, can_review, can_message_all_members,
-    can_edit_project, can_create_and_edit_subtitles, can_create_task_subtitle,
+    can_change_video_settings, can_review, can_edit_project,
+    can_create_and_edit_subtitles, can_create_task_subtitle,
     can_create_task_translate, can_join_team, can_edit_video, can_approve,
     roles_user_can_invite
 )

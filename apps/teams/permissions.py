@@ -162,42 +162,18 @@ def get_narrowings(member):
     else:
         return list(member.narrowings.all())
 
-def get_narrowing_dict(team, user, models, lists=False):
-    """Return a dict of MembershipNarrowings for the given member/models.
+def add_narrowing_to_member(member, project=None, language='', added_by=None):
+    """Add a narrowing to the given member for the given project or language.
 
-    `models` should be an iterable of Model classes, something
-    like [Project, TeamVideoLanguage].
-
-    The returned dictionary will contain keys that are strings of the model
-    names, like this:
-
-    { 'Project': [<Narrowing 1>, ...], }
-
-    If the `lists` parameter is given the values of this dictionary will be list
-    objects, otherwise they will be keps at querysets.
-
-    Each given class will have an entry in the dictionary, though it may be
-    empty.
-
-    """
-    data = {}
-    member = team.members.get(user=user)
-
-    # TODO: Make this use only one DB call.
-    for model in models:
-        items = member.narrowings.for_type(model)
-        data[model._meta.object_name] = items if not lists else list(items)
-
-    return data
-
-def add_narrowing_to_member(member, target, added_by):
-    """Add a narrowing to the given member for the given target.
-
-    `target` should be a Project or TeamVideoLanguage object.
+    `project` must be a Project object.
+    `language` must be a language code like 'en'.
     `added_by` must be a TeamMember object.
 
     """
-    return MembershipNarrowing.objects.create(member, target, added_by)
+    narrowing = MembershipNarrowing(member=member, project=project, language=language, added_by=added_by)
+    narrowing.save()
+
+    return narrowing
 
 
 def _add_project_narrowings(member, project_pks, author):
@@ -248,14 +224,17 @@ def set_narrowings(member, project_pks, languages, author=None):
 
 
 # Roles
-def add_role(team, cuser, added_by,  role, project=None, lang=None):
+def add_role(team, cuser, added_by, role, project=None, lang=None):
     from teams.models import TeamMember
+
     member, created = TeamMember.objects.get_or_create(
-        user=cuser,team=team, defaults={'role':role})
+        user=cuser, team=team, defaults={'role': role})
     member.role = role
     member.save()
-    target = lang or project or team
-    add_narrowing_to_member(member, target, added_by)
+
+    if project or lang:
+        add_narrowing_to_member(member, project, lang, added_by)
+
     return member
 
 def remove_role(team, user, role, project=None, lang=None):

@@ -33,7 +33,7 @@ from apps.teams.permissions import can_view_settings_tab as _can_view_settings_t
 from apps.teams.permissions import can_edit_video as _can_edit_video
 from apps.teams.permissions import (
     roles_user_can_assign, can_invite, can_add_video, can_create_task_subtitle,
-    get_narrowing_dict, can_create_task_translate, can_create_task_review,
+    can_create_task_translate, can_create_task_review,
     can_create_task_approve
 )
 
@@ -85,8 +85,6 @@ def team_select(context, team):
 
 @register.inclusion_tag('teams/_team_activity.html', takes_context=True)    
 def team_activity(context, team):
-    from utils.orm import load_related_fk
-    
     videos_ids = team.teamvideo_set.values_list('video_id', flat=True)
     action_qs = Action.objects.select_related('video', 'user', 'language', 'language__video').filter(video__pk__in=videos_ids)[:ACTIONS_ON_PAGE]
 

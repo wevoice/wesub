@@ -20,7 +20,7 @@ from collections import defaultdict
 from auth.models import CustomUser as User
 from teams.models import (
     Team, TeamMember, Application, Workflow, Project, TeamVideo, Task, Setting,
-    TeamVideoLanguage, ALL_LANGUAGES
+    ALL_LANGUAGES
 )
 
 from videos.models import SubtitleLanguage
@@ -42,7 +42,7 @@ from teams.forms import (
     WorkflowForm, PermissionsForm
 )
 from teams.permissions import (
-    get_narrowing_dict, roles_user_can_assign, can_assign_role,
+    roles_user_can_assign, can_assign_role,
     can_edit_project, set_narrowings
 )
 
