@@ -92,10 +92,8 @@ def get_role_for_target(user, team, project=None, lang=None):
         return role
 
     # Otherwise the narrowings must match the target.
-    project_narrowings = [n.content for n in narrowings
-                          if n.content_type.model_class() == Project]
-    lang_narrowings = [n.content.language for n in narrowings
-                       if n.content_type.model_class() == TeamVideoLanguage]
+    project_narrowings = [n.project for n in narrowings if n.project]
+    lang_narrowings = [n.language for n in narrowings if n.language]
 
     # The default project is the same as "no project".
     if project and project.is_default_project:
