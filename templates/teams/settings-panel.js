@@ -15,6 +15,7 @@ function displayFeedbackMessage(msg, type){
     var el= ich.feedbackMessage({msg:msg, type:type});
     $(".content.wrapper").prepend(el);
     $(el).hide().fadeIn("slow");
+    $('html, body').animate({ scrollTop: 0 }, 'fast');
     $('a#closeBut', el).click(function() {
         $(el).remove();
         return false;
@@ -169,7 +170,7 @@ var ProjectSelectionButton = Class.$extend({
     }
 });
 var ProjectPanel = AsyncPanel.$extend({
-    __init__: function(){
+    __init__: function() {
         this.onProjectListLoaded = _.bind(this.onProjectListLoaded, this);
         this.onNewProjectClicked = _.bind(this.onNewProjectClicked, this);
         this.onProjectSaved = _.bind(this.onProjectSaved, this);
@@ -177,11 +178,11 @@ var ProjectPanel = AsyncPanel.$extend({
         this.onProjectDeleted = _.bind(this.onProjectDeleted, this);
         this.onEditRequested = _.bind(this.onEditRequested, this);
         this.el = ich.projectPanel();
-        this.projectAddButton =  $("a.project-add", this.el).click(this.onNewProjectClicked);
+        this.$projectAddButton =  $('a.project-add', this.el).click(this.onNewProjectClicked);
+        this.$projectTools =  $($(this.el).eq(0));
         scope = this;
         TeamsApiV2.project_list(TEAM_SLUG, this.onProjectListLoaded);
         this.projects = [];
-        
     },
     
     addProject: function(pModel){
@@ -221,7 +222,7 @@ var ProjectPanel = AsyncPanel.$extend({
         this.projectEditPanel.el.bind(ON_PROJECT_SAVED, this.onProjectSaved);
         this.projectEditPanel.el.bind(ON_PROJECT_CANCELED, this.onProjectCanceled);
         this.projectEditPanel.el.bind(ON_PROJECT_DELETED, this.onProjectDeleted);
-        $(this.projectAddButton).hide();
+        this.$projectTools.hide();
         clearFeedbackMessage();
         return false;
     },
@@ -231,8 +232,7 @@ var ProjectPanel = AsyncPanel.$extend({
         }, this);
         this.renderProjectList();
     },
-    
-    onNewProjectClicked : function(e, model){
+    onNewProjectClicked: function(e, model){
         this.onEditRequested(e, new ProjectModel());
         return false;
     },
@@ -242,7 +242,7 @@ var ProjectPanel = AsyncPanel.$extend({
         this.projectEditPanel.el.unbind(ON_PROJECT_CANCELED);
         this.projectEditPanel.el.unbind(ON_PROJECT_DELETED);
         this.projectListing.show();
-        $(this.projectAddButton).show();
+        this.$projectTools.show();
     },
     onProjectCanceled: function(e){
         this._hideEditPanel();
@@ -257,7 +257,7 @@ var ProjectPanel = AsyncPanel.$extend({
         this.removeProject(p);
         this.renderProjectList();
     },
-    hide : function(){
+    hide: function(){
         if (this.projectEditPanel){
             this.projectEditPanel.hide();
         }
