@@ -162,7 +162,7 @@ def get_narrowings(member):
     else:
         return list(member.narrowings.all())
 
-def add_narrowing_to_member(member, project=None, language='', added_by=None):
+def add_narrowing_to_member(member, project=None, language=None, added_by=None):
     """Add a narrowing to the given member for the given project or language.
 
     `project` must be a Project object.
@@ -170,6 +170,9 @@ def add_narrowing_to_member(member, project=None, language='', added_by=None):
     `added_by` must be a TeamMember object.
 
     """
+    if not language:
+        language = ''
+
     narrowing = MembershipNarrowing(member=member, project=project, language=language, added_by=added_by)
     narrowing.save()
 
