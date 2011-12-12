@@ -634,11 +634,6 @@ class TeamsTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
 
 
-        #-------------- edit videos -----------------
-        url = reverse("teams:edit_videos", kwargs={"slug": team.slug})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-
         url = reverse("teams:settings", kwargs={"slug": "volunteer1"})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 404)
