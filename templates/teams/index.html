@@ -89,24 +89,6 @@
                             {% endblocktrans %}
                             </h4>
                         </li>
-                        <li>
-                            {% if team|is_team_member:user %}
-                                <a href="">Leave team</a>
-                            {% else %}
-                                {% if user.is_authenticated %}
-                                    {% if team.is_open %}
-                                        <a onclick="return confirm('{% trans "Do you really wish to join this team?" %}')" href="{% url teams:join_team team.slug %}">{% trans "Join team" %}</a>
-                                    {% endif %}
-                                    {% if team.is_by_application %}
-                                        {% if not team|has_applicant:user %}
-                                            <a href="">Apply to join</a>
-                                        {% else %}
-                                            Your application is pending
-                                        {% endif %}
-                                    {% endif %}
-                                {% endif %}
-                            {% endif %} 
-                        </li>
                     </ul>
 
                     {% comment %}
