@@ -70,13 +70,14 @@ This is needed, since it's for the js templating
 
                 <form class="logo" action="{% endverbatim %}{% url teams:upload_logo team.slug %}{% verbatim %}" method="POST">
                     <fieldset>
-                        <legend>Logo/Banner</legend>
+                        <legend>Display Settings</legend>
+                        <label>Logo/Banner</label>
                         {% endverbatim %}{% csrf_token %}
                         {% if team.logo %}
                             <img id="current_logo" src=""/>
                         {% endif %}{% verbatim %}
                         <input type="file" id="basic_picture" name="logo" />
-                        <p class="notation">Max width 940px</p>
+                        <p class="notation">Max 940 x 235</p>
                     </fieldset>
                 </form>
 
