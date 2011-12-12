@@ -18,9 +18,11 @@
 
 from collections import defaultdict
 from auth.models import CustomUser as User
-from teams.models import Team, TeamMember, Application, Workflow, \
-     Project, TeamVideo, Task, Setting, TeamVideoLanguage, ALL_LANGUAGES, \
-     MembershipNarrowing
+from teams.models import (
+    Team, TeamMember, Application, Workflow, Project, TeamVideo, Task, Setting,
+    TeamVideoLanguage, ALL_LANGUAGES
+)
+
 from videos.models import SubtitleLanguage
 
 from django.shortcuts import get_object_or_404
@@ -34,10 +36,15 @@ from utils.rpc import Error, Msg, RpcRouter
 from utils.forms import flatten_errorlists
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 
-from teams.permissions import can_edit_project
-from teams.forms import TaskAssignForm, TaskDeleteForm, GuidelinesMessagesForm, SettingsForm, WorkflowForm, PermissionsForm
 from teams.project_forms import ProjectForm
-from teams.permissions import get_narrowing_dict, roles_user_can_assign, can_assign_role
+from teams.forms import (
+    TaskAssignForm, TaskDeleteForm, GuidelinesMessagesForm, SettingsForm,
+    WorkflowForm, PermissionsForm
+)
+from teams.permissions import (
+    get_narrowing_dict, roles_user_can_assign, can_assign_role,
+    can_edit_project, set_narrowings
+)
 
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
@@ -567,23 +574,25 @@ class TeamsApiV2Class(object):
             'projects': projects,
         }
 
-    def save_role(self, team_slug, member_pk, role, \
-                       projects, languages, user=None):
+    def save_role(self, team_slug, member_pk, role, projects, languages, user=None):
         team = Team.objects.get(slug=team_slug)
         member = team.members.get(pk=member_pk)
+
+        projects = map(int, projects or [])
+        languages = languages or []
+
         if can_assign_role(team, user, role, member.user):
-            for project_pk in projects:
-                MembershipNarrowing.objects.get_or_create(
-                    content=team.project_set.get(pk=project_pk,member=member))
-            for lang_id in languages:
-                MembershipNarrowing.objects.get_or_create(
-                    content=TeamVideoLanguage.objects.get(
-                        language=lang_id),
-                        team=team)
-        return {
-             "success":True
-         }       
-        
+            member.role = role
+            member.save()
+
+            set_narrowings(member, projects, languages, user)
+
+            return { 'success': True }
+        else:
+            return { 'success': False,
+                     'errors': [_('You cannot assign that role to that member.')] }
+
+
 TeamsApiV2 = TeamsApiV2Class()
 
 rpc_router = RpcRouter('teams:rpc_router', {

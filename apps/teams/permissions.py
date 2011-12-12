@@ -200,6 +200,59 @@ def add_narrowing_to_member(member, target, added_by):
     return MembershipNarrowing.objects.create(member, target, added_by)
 
 
+def _add_project_narrowings(member, project_pks, author):
+    for project_pk in project_pks:
+        project = member.team.project_set.get(pk=project_pk)
+        MembershipNarrowing(content=project, member=member, added_by=author).save()
+
+def _del_project_narrowings(member, project_pks):
+    project_narrowings = MembershipNarrowing.objects.get_for_projects(member=member)
+
+    for project_pk in project_pks:
+        narrowing = project_narrowings.get(object_pk=project_pk)
+        narrowing.delete()
+
+def _add_language_narrowings(member, languages, author):
+    # for language in languages:
+    #     l = TeamVideoLanguage.objects.get(language=language)
+    #     MembershipNarrowing(content=project, member=member, added_by=author).save()
+    pass
+
+def _del_language_narrowings(member, languages):
+    # for project_pk in project_pks:
+    #     project = member.team.project_set.get(pk=project_pk)
+    #     narrowing = MembershipNarrowing.objects.get(content=project, member=member)
+    #     narrowing.delete()
+    pass
+
+
+def set_narrowings(member, project_pks, languages, author=None):
+    if author:
+        author = TeamMember.objects.get(team=member.team, user=author)
+
+    # Projects
+    existing_projects = set(int(narrowing.object_pk) for narrowing in
+                            MembershipNarrowing.objects.get_for_projects(member))
+    desired_projects = set(project_pks)
+
+    projects_to_create = desired_projects - existing_projects
+    projects_to_delete = existing_projects - desired_projects
+
+    _add_project_narrowings(member, projects_to_create, author)
+    _del_project_narrowings(member, projects_to_delete)
+
+    # Languages
+    existing_languages = set(narrowing.content.languages for narrowing in
+                             MembershipNarrowing.objects.get_for_langs(member))
+    desired_languages = set(languages)
+
+    languages_to_create = desired_languages - existing_languages
+    languages_to_delete = existing_languages - desired_languages
+
+    _add_language_narrowings(member, languages_to_create, author)
+    _del_language_narrowings(member, languages_to_delete)
+
+
 # Roles
 def add_role(team, cuser, added_by,  role, project=None, lang=None):
     from teams.models import TeamMember
