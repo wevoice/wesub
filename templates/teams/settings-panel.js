@@ -351,7 +351,6 @@ var BasicPanel  = AsyncPanel.$extend({
     saveImage: function(callback) {
         var that = this;
         if ($('form.logo input[type="file"]', this.el).val()) {
-            console.log('we are here');
             $('form.logo', this.el).ajaxSubmit({
                 success: function(resp, status, xhr, from) {
                     callback && callback();
