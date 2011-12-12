@@ -139,7 +139,7 @@
                         </div>
                         <div class="field clearfix">
                             <label>Project Restriction:</label>
-                            <select data-placeholder="Choose-selected..." style="width:350px;" multiple class="chzn-select projects">
+                            <select data-placeholder="None" style="width:350px;" multiple class="chzn-select projects">
                                 {{#projects}}
                                     <option {{#selected}}selected="selected"{{/selected}} value="{{pk}}">{{name}}</option>
                                 {{/projects}}
@@ -147,7 +147,7 @@
                         </div>
                         <div class="field clearfix">
                             <label>Language Restriction:</label>
-                            <select data-placeholder="Choose-selected..." style="width:350px;"
+                            <select data-placeholder="None" style="width:350px;"
                                 multiple class="chzn-select langs">
                                 {{#languages}}
                                     <option {{#selected}}selected="selected"{{/selected}} value="{{code}}">{{name}}</option>
