@@ -15,6 +15,7 @@ function displayFeedbackMessage(msg, type){
     var el= ich.feedbackMessage({msg:msg, type:type});
     $(".content.wrapper").prepend(el);
     $(el).hide().fadeIn("slow");
+    $('html, body').animate({ scrollTop: 0 }, 'fast');
     $('a#closeBut', el).click(function() {
         $(el).remove();
         return false;
@@ -169,7 +170,7 @@ var ProjectSelectionButton = Class.$extend({
     }
 });
 var ProjectPanel = AsyncPanel.$extend({
-    __init__: function(){
+    __init__: function() {
         this.onProjectListLoaded = _.bind(this.onProjectListLoaded, this);
         this.onNewProjectClicked = _.bind(this.onNewProjectClicked, this);
         this.onProjectSaved = _.bind(this.onProjectSaved, this);
