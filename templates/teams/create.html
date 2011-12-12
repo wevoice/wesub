@@ -40,19 +40,17 @@
             {% csrf_token %}
             <div class="grid_4 alpha">
                 <fieldset>
-                    <legend>{% trans "Basic Settings" %}</legend>
+                    <legend>{% trans "Team Details" %}</legend>
                     {% include "_form_field.html" with field=form.name %}
-                    {% include "_form_field.html" with field=form.description %}
                     {% include "_form_field.html" with field=form.slug label="Team URL" help_text="http://universalsubtitles.org/teams/" %}
-                    {% include "_form_field.html" with field=form.is_visible widget_type="checkbox" %}
+                    {% include "_form_field.html" with field=form.description %}
                 <fieldset>
             </div>
             <div class="grid_4 omega">
                 <fieldset>
-                    <legend>{% trans "Display and Permissions" %}</legend>
-                    {% include "_form_field.html" with field=form.logo %}
-                    {% include "_form_field.html" with field=form.membership_policy label="Who can join your team?" %}
-                    {% include "_form_field.html" with field=form.video_policy label="Who can manage videos?" %}
+                    <legend>{% trans "Display Settings" %}</legend>
+                    {% include "_form_field.html" with field=form.logo label="Logo/Banner" help_text="Max 940 x 235" %}
+                    {% include "_form_field.html" with field=form.is_visible widget_type="checkbox" %}
                 </fieldset>
             </div>
             <div class="submit">
