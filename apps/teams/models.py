@@ -861,74 +861,26 @@ class TeamMember(models.Model):
         unique_together = (('team', 'user'),)
 
 
-class MembershipNarrowingManager(models.Manager):
-    def get_for_team(self, team, user):
-        return self.filter(membership__id_in=[x.id for x in team.members.filter(user=user)])
-        
-    def for_type(self, model):
-        return self.filter(content_type=ContentType.objects.get_for_model(model))
-        
-    def get_for_projects(self, member):
-        return self.for_type(Project).filter(member=member)
-        
-    def get_for_langs(self, member):
-        return self.for_type(TeamVideoLanguage).filter(member=member)
-
-        
-    def create(self, member, target, added_by):
-        return MembershipNarrowing.objects.get_or_create(
-            content_type = ContentType.objects.get_for_model(target),
-            object_pk = target.pk,
-            member = member,
-            added_by=added_by)[0]
-
 class MembershipNarrowing(models.Model):
-    """
-    Represent narrowings that can be made on memberships.
-    A membership permission might be applyed to an entire
-    team, or be narrowed to projet or to a language.
+    """Represent narrowings that can be made on memberships.
+
+    Narrowings can apply to projects or languages, but not both.
+
     """
     member = models.ForeignKey(TeamMember, related_name="narrowings")
-    content_type = models.ForeignKey(ContentType,
-        related_name="content_type_set_for_%(class)s")
-    object_pk = models.TextField('object ID')
-    content = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    project = models.ForeignKey(Project, null=True, blank=True)
+    language = models.CharField(max_length=24, blank=True, choices=ALL_LANGUAGES)
+
+    added_by = models.ForeignKey(TeamMember, related_name="narrowing_includer", null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True, blank=None)
     modified = models.DateTimeField(auto_now=True, blank=None)
-    added_by = models.ForeignKey(TeamMember, related_name="narrowing_includer", null=True, blank=True)
-    
-    objects = MembershipNarrowingManager()
-    
-    @property
-    @classmethod
-    def allowed_types(self):
-        """
-        Cache the content types where we allow narrowing to occur. This
-        should not be needed to change at run time. If it ever does, just
-        clear _cached_allowed_types
-        This cannot simply be declared on the model class since by the
-        time them class is defined we might or might not have loaded the
-        other models (+ contenty type), this means that we can have
-        an error related to import order and it is not very predictable,
-        e.g. would fail when running the unit tests on sqlite but not on
-        msyql
-        """
-        if not MembershipNarrowing._cached_allowed_types:
-            MembershipNarrowing._cached_allowed_types = \
-                         [ContentType.objects.get_for_model(m) for m in \
-                          (Project, TeamVideoLanguage)]
-        return MembershipNarrowing._cached_allowed_types
-        
-    def __unicode__(self):
-        return u"Permission restriction for %s and %s " % (
-            self.member, self.content)
 
-    def save(self, *args, **kwargs):
-        if False and self.content_type not in MembershipNarrowing.allowed_types:
-            raise ValueError("MembershipNarrowing cannot be assigned to %s, allowed types are %s"
-            % (self.content, MembershipNarrowing.allowed_types))
-        super(MembershipNarrowing, self).save(*args, **kwargs)   
+    def __unicode__(self):
+        if self.project:
+            return u"Permission restriction for %s to project %s " % (self.member, self.project)
+        else:
+            return u"Permission restriction for %s to language %s " % (self.member, self.language)
 
 
 class Application(models.Model):

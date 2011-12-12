@@ -545,18 +545,15 @@ class TeamsApiV2Class(object):
         # massage the data format to make it easier to work with
         # over the client side templating
         verbose_roles = [{"val":x[0], "name":x[1]} for x in TeamMember.ROLES if x[0] in roles]
-        narrowings = get_narrowing_dict(team, member.user, [Project, TeamVideoLanguage], lists=True)
-        current_languages = []
+        narrowings = member.narrowings.all()
 
-        for x in narrowings["TeamVideoLanguage"]:
-            current_languages.append(x.content.language)
-
-        project_narrowings = [x.content for x in narrowings["Project"]]
+        current_languages = [n.language for n in narrowings if n.language]
+        current_projects = [n.project for n in narrowings if n.project]
 
         projects = []
         for p in Project.objects.for_team(team):
             data = dict(pk=p.pk, name=p.name)
-            if p in project_narrowings:
+            if p in current_projects:
                 data['selected'] = "selected"
             projects.append(data)
 

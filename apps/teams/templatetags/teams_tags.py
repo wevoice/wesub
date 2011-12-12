@@ -219,8 +219,8 @@ def team_projects(context, team, varname):
     
 @tag(register, [Variable(), Constant("as"), Name()])
 def member_projects(context, member, varname):
-    narrowings = get_narrowing_dict(member.team, member.user, [Project])
-    context[varname] = [n.content for n in narrowings['Project']]
+    narrowings = member.narrowings.filter(project__isnull=False)
+    context[varname] = [n.project for n in narrowings]
     return ""
 
     

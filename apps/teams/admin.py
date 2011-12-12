@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib import admin
-from teams.models import Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing
+from teams.models import Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing, Project
 from videos.models import SubtitleLanguage
 from django.utils.translation import ugettext_lazy as _
 from messages.forms import TeamAdminPageMessageForm
@@ -123,15 +123,22 @@ class TaskAdmin(admin.ModelAdmin):
     ordering = ('-created',)
 
 class MembershipNarrowingAdmin(admin.ModelAdmin):
-    list_display = ('member', 'content_type', 'content')
+    list_display = ('member', 'project', 'language')
     list_filter = ('created', 'modified')
-    raw_id_fields = ('member',)
+    raw_id_fields = ('member', 'project')
     ordering = ('-created',)
 
 class SettingAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'team', 'key', 'created', 'modified')
     list_filter = ('key', 'created', 'modified')
     search_fields = ('team__name',)
+    raw_id_fields = ('team',)
+    ordering = ('-created',)
+
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('name', 'team', 'workflow_enabled')
+    list_filter = ('workflow_enabled', 'created', 'modified')
+    search_fields = ('team__name', 'name')
     raw_id_fields = ('team',)
     ordering = ('-created',)
 
@@ -143,3 +150,4 @@ admin.site.register(Workflow, WorkflowAdmin)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(MembershipNarrowing, MembershipNarrowingAdmin)
 admin.site.register(Setting, SettingAdmin)
+admin.site.register(Project, ProjectAdmin)
