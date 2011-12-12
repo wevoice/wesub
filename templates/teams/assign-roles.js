@@ -8,12 +8,13 @@
             this.teamSlug = teamSlug;
             this.hide = _.bind(this.hide, this);
             this.save = _.bind(this.save, this);
+            this.show = _.bind(this.show, this);
         },
         loadInfo: function(){
             TeamsApiV2.member_role_info(
                 this.teamSlug,
                 this.pk,
-                _.bind(this.show, this));
+                this.show);
         },
         show: function(res){
             this.el = ich.editRoleDialog(res);
