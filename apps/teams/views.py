@@ -370,24 +370,6 @@ def add_videos(request, slug):
     return { 'form': form, 'team': team, }
 
 
-@login_required
-def edit_videos(request, slug):
-    team = Team.get(slug, request.user)
-    
-    if not team.is_member(request.user):
-        raise Http404
-    
-    qs = team.teamvideo_set.all()
-    
-    extra_context = {
-        'team': team,
-    }
-    return object_list(request, queryset=qs,
-                       paginate_by=VIDEOS_ON_PAGE,
-                       template_name='teams/edit_videos.html',
-                       template_object_name='videos',
-                       extra_context=extra_context)
-
 
 @login_required
 @render_to('teams/team_video.html')

@@ -40,7 +40,7 @@ from teams.project_forms import ProjectForm
 from teams.permissions import get_narrowing_dict, roles_user_can_assign, can_assign_role
 
 
-TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 1)
+TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
 
 class TeamsApiClass(object):
 

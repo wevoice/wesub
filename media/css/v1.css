@@ -704,6 +704,9 @@
   border-radius: 3px;
   background-clip: padding-box;
 }
+.v1 form .preselected img {
+  max-width: 100%;
+}
 .v1 .panel-holder form {
   float: left;
   width: 100%;
