@@ -353,6 +353,9 @@
   text-align: right;
   color: #a0b2bd;
 }
+.v1 .listing  > li .actions li h4 {
+  padding: .5em 0;
+}
 .v1 .listing  > li .actions a {
   color: #486f87;
   text-decoration: none;

@@ -71,7 +71,7 @@
                         {% if team.description %}
                             {{ team.description|truncatewords:20|urlize }}
                         {% else %}
-                            {{ team.videos_count }} videos
+                            No description...
                         {% endif %}
                     </p>
                     <ul class="actions">
@@ -83,6 +83,13 @@
                                 {{ count }} members
                             {% endblocktrans %}
                             </h4>
+                        </li>
+                        <li>
+                            {% blocktrans count count=team.videos_count %}
+                                {{ count }} video
+                            {% plural %}
+                                {{ count }} videos
+                            {% endblocktrans %}
                         </li>
                     </ul>
 
