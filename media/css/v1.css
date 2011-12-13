@@ -18,6 +18,7 @@
 .v1 .tabs{float:left;width:100%;padding:0;border-bottom:1px solid #dce2e5;}.v1 .tabs li{display:inline;}.v1 .tabs li a{display:block;float:left;padding:1em 2em;text-decoration:none;color:#678ca3;border-style:solid;}.v1 .tabs li a:hover{border-bottom-width:2px;margin-bottom:-1px;}
 .v1 .tabs li.current a{color:#3e6782;font-weight:bold;border-bottom-width:2px;margin-bottom:-1px;}
 .v1 .view .tools{position:relative;padding:1em;margin:0 -20px 0 0;height:15px;border-bottom:1px solid #e8ebed;font-size:11px;text-align:right;background-image:-webkit-linear-gradient(bottom, #fafafa, #ffffff 25%, #ffffff);background-image:-moz-linear-gradient(bottom, #fafafa, #ffffff 25%, #ffffff);background-image:-o-linear-gradient(bottom, #fafafa, #ffffff 25%, #ffffff);background-image:-ms-linear-gradient(bottom, #fafafa, #ffffff 25%, #ffffff);background-image:linear-gradient(bottom, #fafafa, #ffffff 25%, #ffffff);}.v1 .view .tools .button{background:transparent;border:1px solid transparent;color:#7692a3;text-shadow:none;padding:.5em 1em;}.v1 .view .tools .button:hover{border-color:#b7c3c9;background-color:#e8ecef;background-image:-webkit-gradient(linear, left top, left bottom, from(#f3f6f8), to(#dce2e5));background-image:-webkit-linear-gradient(#f3f6f8, #dce2e5);background-image:-moz-linear-gradient(center top, #f3f6f8 0%, #dce2e5 100%);background-image:-moz-gradient(center top, #f3f6f8 0%, #dce2e5 100%);background-image:-ms-linear-gradient(#f3f6f8, #dce2e5);background-image:-o-linear-gradient(#f3f6f8, #dce2e5);background-image:linear-gradient(#f3f6f8, #dce2e5);color:#486f87;}
+.v1 .view .tools h2{position:absolute;top:1em;left:1em;display:inline;font-size:inherit;color:inherit;}
 .v1 .view .tools form{padding:0;}
 .v1 .view .tools .filters{float:left;padding:0;margin:-0.5em 0 0 -0.5em;}.v1 .view .tools .filters>li{display:inline;padding:0;}.v1 .view .tools .filters>li select{width:140px;}
 .v1 .listing{padding:0;}.v1 .listing >li{position:relative;padding:2em 1em;border-bottom:1px dotted #b7c3c9;}.v1 .listing >li.empty{border:none;}
@@ -42,7 +43,6 @@
 .v1 .listing.members>li.current,.v1 .listing.messages>li.current{background:#f6f6e4;}
 .v1 .listing.activity>li,.v1 .listing.tasks>li{padding-right:150px;}.v1 .listing.activity>li .actions,.v1 .listing.tasks>li .actions{width:150px;}
 .v1 .listing.tasks>li .done span{margin-right:.5em;}
-.v1 .listing.teams>li{min-height:4em;padding-left:68px;padding-right:150px;}.v1 .listing.teams>li .thumb img{height:48px;}
 .v1 .view .pagination{float:none;padding:1em 1em 0;}.v1 .view .pagination em{box-shadow:none;font-style:normal;color:#a0b2bd;background:transparent;}
 .v1 .view .pagination a{color:#678ca3;}.v1 .view .pagination a:hover{box-shadow:none;background:#b7c3c9;color:#fff;}
 .v1 .view .pagination .disabled{color:#a0b2bd;}
