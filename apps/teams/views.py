@@ -230,10 +230,10 @@ def videos_actions(request, slug):
 @staff_member_required
 def create(request):
     user = request.user
-    
+
     if not DEV and not (user.is_superuser and user.is_active):
         raise Http404 
-    
+
     if request.method == 'POST':
         form = CreateTeamForm(request.user, request.POST, request.FILES)
         if form.is_valid():
@@ -242,9 +242,8 @@ def create(request):
             return redirect(reverse("teams:settings", kwargs={"slug":team.slug}))
     else:
         form = CreateTeamForm(request.user)
-    return {
-        'form': form
-    }
+
+    return { 'form': form }
 
 
 # Settings
