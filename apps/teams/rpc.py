@@ -311,7 +311,7 @@ class TeamsApiV2Class(object):
         member = Team.objects.get(slug=team_slug).members.get(user=user)
 
         if filters.get('assignee'):
-            tasks = tasks.filter(assignee=filters['assignee'])
+            tasks = tasks.filter(assignee__username=filters['assignee'])
         if filters.get('team_video'):
             tasks = tasks.filter(team_video=filters['team_video'])
 

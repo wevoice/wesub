@@ -1311,6 +1311,7 @@ class Task(models.Model):
             # The review step may be disabled.  If so, we check the approve step.
             if self.workflow.approve_enabled:
                 task = Task(team=self.team, team_video=self.team_video,
+                            subtitle_version=self.subtitle_version,
                             language=self.language, type=Task.TYPE_IDS['Approve'])
                 task.save()
             else:
@@ -1321,6 +1322,7 @@ class Task(models.Model):
     def _complete_review(self):
         if self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=self.subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'])
             task.save()
         else:
