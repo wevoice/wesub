@@ -73,16 +73,17 @@
                             {% endfor %}
                         </h3>
                         <p>
+                            {% for narrowing in member.language_narrowings %}
+                                {{ narrowing.get_language_display }}
+                            {% endfor %}
+                        </p>
+                        <p>
                             {{ member.role|capfirst }}
-
-                            {% member_projects member as member_project %}
-                            {% if member_project %}
-                                (
-                                {% for project in member_project %}
-                                    {{project.name}}{% if not forloop.last %},{% endif %}
-                                {% endfor %}
-                                )
-                            {% endif %}
+                            {% with member.project_narrowings as narrowings %}
+                                {% if narrowings %}
+                                    ({% for narrowing in narrowings %}{{ narrowing.project.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
+                                {% endif %}
+                            {% endwith %}
                         </p>
                         <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>
                         <ul class="actions">

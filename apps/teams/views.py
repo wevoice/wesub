@@ -502,7 +502,7 @@ def detail_members(request, slug, role=None):
         })
     return object_list(request, queryset=qs,
                        paginate_by=MEMBERS_ON_PAGE,
-                       template_name='teams/detail_members.html',
+                       template_name='teams/team-members-list.html',
                        extra_context=extra_context,
                        template_object_name='team_member')
 
