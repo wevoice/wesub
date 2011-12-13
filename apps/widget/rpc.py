@@ -330,7 +330,8 @@ class Rpc(BaseRpc):
         return self.save_finished(
             request.user, session, subtitles, new_title, completed, forked)
 
-    def save_finished(self, user, session, subtitles, new_title=None, completed=None, forked=False):
+    def save_finished(self, user, session, subtitles, new_title=None,
+                      completed=None, forked=False):
         from apps.teams.moderation import is_moderated, user_can_moderate
         
         language = session.language
@@ -393,11 +394,13 @@ class Rpc(BaseRpc):
 
     def _create_version_from_session(self, session, user=None, forked=False):
         latest_version = session.language.version(public_only=False)
+        forked_from = (forked and latest_version ) or None
         kwargs = dict(language=session.language,
                       version_no=(0 if latest_version is None 
                                   else latest_version.version_no + 1),
                       is_forked=(session.base_language is 
                                  None or forked == True),
+                      forked_from = forked_from,
                       datetime_started=session.datetime_started)
         if user is not None:
             kwargs['user'] = user

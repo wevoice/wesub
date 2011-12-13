@@ -50,7 +50,7 @@
     <div class="view grid_9 alpha">
 
         {% if team|can_invite_to_team:user %}
-            <div class="tools">
+            <div class="tools group">
                 <a href="{% url teams:invite_members slug=team.slug %}" class="button">Invite Members</a>
             </div>
         {% endif %}

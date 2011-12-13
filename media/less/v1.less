@@ -232,8 +232,10 @@
 /* Tools */
 
 .v1 .view .tools {
+    position: relative;
     padding: 1em;
     margin: 0 -20px 0 0;
+    height: 15px;
     border-bottom: 1px solid #e8ebed;
     font-size: 11px;
     text-align: right;
@@ -582,6 +584,14 @@
         select {
             width: 100%;
         }
+
+        .chzn-container {
+            margin-bottom: 1em;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
     h4 {
         color: @light;
@@ -823,7 +833,9 @@
     float: none;
     padding: 0;
     margin: 0;
-    position: relative;
+    position: absolute;
+    top: .5em;
+    left: 1em;
     cursor: pointer;
     width: 170px;
     border-color: @fainter;
@@ -870,7 +882,7 @@
     .arrow {
         width: 20px;
         height: 24px;
-        background: url('chosen-sprite.png') no-repeat 0 1px;
+        background: url('../images/chosen-sprite.png') no-repeat 0 1px;
     }
 
     &:hover {
@@ -884,13 +896,14 @@
             top: 21px;
             left: -1px;
             border-color: @fainter;
+            border-top: none;
             .box-shadow(none);
             .vertical-gradient(#fff, @faintest);
             .multi-border-radius(0, 0, 3px, 3px);
         }
 
         .arrow {
-            background: url('chosen-sprite.png') no-repeat 0 1px;
+            background: url('../images/chosen-sprite.png') no-repeat -18px 1px;
         }
     }
 }

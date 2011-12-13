@@ -40,7 +40,7 @@
                 projects,
                 languages,
                 this.hide);
-            displayFeedbackMessage('something', 'Member saved.');
+            displayFeedbackMessage('Member saved.', 'success');
            return false;
         },
         hide:function(result){

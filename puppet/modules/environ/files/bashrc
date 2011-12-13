@@ -93,6 +93,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
+alias go='cu && so && ./dev-runserver.sh plus'
 export PATH=~/bin:$PATH
 function pm {
     python manage.py $* --settings=dev_settings

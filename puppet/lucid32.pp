@@ -42,6 +42,7 @@ class lucid32 {
   package { "curl": ensure => "present", }
   package { "git-core": ensure => "installed", }
   package { "swig": ensure => "installed", }
+  package { "vim": ensure => "installed", }
 }
 
 class { "lucid32": }
