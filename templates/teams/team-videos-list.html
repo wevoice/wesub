@@ -54,17 +54,28 @@
     {% endwith %}
 
     <div class="view grid_9 alpha">
-        <div class="tools group"> <div class="sort_button">
+        <div class="tools group">
+            <div class="sort_button">
                 <div class="arrow">
                 </div>
                 <span class="sort_label">{% trans 'Sort by' %} <strong>{{ order_name }}</strong></span>
                 <ul>
                     <li>
                         <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=name">{% trans 'Name, A-Z' %}</a>
+                    </li>
+                    <li>
                         <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-name">{% trans 'Name, Z-A' %}</a>
+                    </li>
+                    <li>
                         <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-time">{% trans 'Time, Newest' %}</a>
+                    </li>
+                    <li>
                         <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=time">{% trans 'Time, Oldest' %}</a>
+                    </li>
+                    <li>
                         <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-subs">{% trans 'Subtitles, Most' %}</a>
+                    </li>
+                    <li>
                         <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=subs">{% trans 'Subtitles, Least' %}</a>
                     </li>
                 </ul>

@@ -78,13 +78,6 @@
 
 /* General styles */
 
-.group:after {
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
-}
 .box-right {
     position: absolute;
     top: 2em; right: 0;
@@ -239,8 +232,10 @@
 /* Tools */
 
 .v1 .view .tools {
+    position: relative;
     padding: 1em;
     margin: 0 -20px 0 0;
+    height: 15px;
     border-bottom: 1px solid #e8ebed;
     font-size: 11px;
     text-align: right;
@@ -250,8 +245,6 @@
         background: transparent;
         border: 1px solid transparent;
         color: @light;
-        float: right;
-        margin: 0;
         text-shadow: none;
         padding: .5em 1em;
 
@@ -260,6 +253,15 @@
             .vertical-gradient(@faintest, @fainter);
             color: @dark;
         }
+    }
+
+    h2 {
+        position: absolute;
+        top: 1em;
+        left: 1em;
+        display: inline;
+        font-size: inherit;
+        color: inherit;
     }
 
     form {
@@ -485,15 +487,6 @@
         margin-right: .5em;
     }
 }
-.v1 .listing.teams > li {
-    min-height: 4em;
-    padding-left: 68px;
-    padding-right: 150px;
-
-    .thumb img {
-        height: 48px;
-    }
-}
 .v1 .view .pagination {
     float: none;
     padding: 1em 1em 0;
@@ -590,6 +583,14 @@
 
         select {
             width: 100%;
+        }
+
+        .chzn-container {
+            margin-bottom: 1em;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
         }
     }
     h4 {
@@ -829,10 +830,12 @@
 /* Overrides */
 
 .v1 .sort_button {
-    float: left;
+    float: none;
     padding: 0;
     margin: 0;
-    position: relative;
+    position: absolute;
+    top: .5em;
+    left: 1em;
     cursor: pointer;
     width: 170px;
     border-color: @fainter;
@@ -879,7 +882,7 @@
     .arrow {
         width: 20px;
         height: 24px;
-        background: url('chosen-sprite.png') no-repeat 0 1px;
+        background: url('../images/chosen-sprite.png') no-repeat 0 1px;
     }
 
     &:hover {
@@ -893,13 +896,14 @@
             top: 21px;
             left: -1px;
             border-color: @fainter;
+            border-top: none;
             .box-shadow(none);
             .vertical-gradient(#fff, @faintest);
             .multi-border-radius(0, 0, 3px, 3px);
         }
 
         .arrow {
-            background: url('chosen-sprite.png') no-repeat 0 1px;
+            background: url('../images/chosen-sprite.png') no-repeat -18px 1px;
         }
     }
 }

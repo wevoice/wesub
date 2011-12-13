@@ -113,8 +113,7 @@ def roles_user_can_assign(team, user, to_user=None):
 
     Rules:
 
-        * Unrestricted owners can assign all roles.
-        * Unrestricted admins can assign any other role (for now).
+        * Unrestricted admins and owners can assign any role but owners.
         * No one else can assign any roles.
         * Admins cannot change the role of an owner.
 
@@ -122,7 +121,7 @@ def roles_user_can_assign(team, user, to_user=None):
     user_role = get_role_for_target(user, team)
 
     if user_role == ROLE_OWNER:
-        return ROLES_ORDER
+        return ROLES_ORDER[1:]
     elif user_role == ROLE_ADMIN:
         if to_user:
             if get_role(get_member(to_user, team)) == ROLE_OWNER:
@@ -195,6 +194,25 @@ def _add_language_narrowings(member, languages, author):
 def _del_language_narrowings(member, languages):
     for language in languages:
         MembershipNarrowing.objects.get(language=language, member=member).delete()
+
+
+def can_set_language_narrowings(team, user, target):
+    # role = get_role_for_target(user, team)
+    target_role = get_role(get_member(target, team))
+
+    if target_role not in [ROLE_MANAGER]:
+        return False
+
+    return True
+
+def can_set_project_narrowings(team, user, target):
+    # role = get_role_for_target(user, team)
+    target_role = get_role(get_member(target, team))
+
+    if target_role not in [ROLE_MANAGER, ROLE_ADMIN]:
+        return False
+
+    return True
 
 
 def set_narrowings(member, project_pks, languages, author=None):

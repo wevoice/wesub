@@ -104,10 +104,10 @@ class TestRules(BaseTestPermission):
         user = User.objects.filter(teams__isnull=True)[0]
         team = self.team
 
-        # Owners can do anything.
+        # Owners can do anything except create other owners.
         with self.role(ROLE_OWNER):
             self.assertItemsEqual(roles_user_can_assign(team, user, None), [
-                ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+                ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
             ])
 
         # Admins can do anything except assign owners and changing owners' roles.

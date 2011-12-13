@@ -31,6 +31,25 @@ def _get_fixture_file(model_name):
     return file(_get_fixture_path(model_name))
 
 
+def _append_subs(version, num_subs= 2, include_timing=False, make_new_version=True):
+    if make_new_version:
+        version = SubtitleVersion(version_no=version.version_no+1,
+        language=version.language)
+    if include_timing:
+        last = version.ordered_subtitles()[-1]
+        start_time = last.end_time + 1
+    for i in range(0, num_subs):
+        subtitle = Subtitle(version=version,
+                            subtitle_id="%s" % i,
+                            subtitle_order=i,
+             subtitle_text = "Sub %s for lang (%s)" % (i, version.language.language))
+        if include_timing:
+             subtitle.start_time=i * 1.0 + start_time
+             subtitle.end_time =i + 0.8 + start_time
+
+
+        
+    
 def _add_subtitles(sub_lang, num_subs, translated_from=None):
     version = SubtitleVersion(language=sub_lang, note="Automagically-created")
     version.datetime_started = datetime.datetime.now()
