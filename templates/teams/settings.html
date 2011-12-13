@@ -60,8 +60,13 @@ This is needed, since it's for the js templating
                             <label for="basic_name">Name</label>
                             <input id="basic_name" type="text" name="name" value="" />
 
+                            <label for="basic_slug">Team URL</label>
+                            <input id="basic_slug" type="text" name="slug" disabled="disabled" value="" />
+                            <p class="notation">http://universalsubtitles.org/teams/<em>team_slug</em></p>
+
                             <label for="basic_description">Description</label>
-                            <textarea id="basic_description" name="name"></textarea>
+                            <textarea id="basic_description" name="description"></textarea>
+                            <p class="notation">All urls will be converted to links.</p>
                         </fieldset>
                 </form>
             </div>
@@ -78,6 +83,7 @@ This is needed, since it's for the js templating
                         {% endif %}{% verbatim %}
                         <input type="file" id="basic_picture" name="logo" />
                         <p class="notation">Max 940 x 235</p>
+                        <label><input id="basic_visibility" type="checkbox" name="visibility"/> Publicly visible?</label>
                     </fieldset>
                 </form>
 
