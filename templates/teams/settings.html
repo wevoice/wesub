@@ -58,7 +58,13 @@ This is needed, since it's for the js templating
                             <legend>Team Details</legend>
 
                             <label for="basic_name">Name</label>
-                            <input id="basic_name" type="text" name="name" value="" />
+                            {% endverbatim %}
+                                {% if team|can_rename_team:request.user %}
+                                    <input id="basic_name" type="text" name="name" value="" />
+                                {% else %}
+                                    <input id="basic_name" type="text" name="name" value="" disabled="disabled" />
+                                {% endif %}
+                            {% verbatim %}
 
                             <label for="basic_slug">Team URL</label>
                             <input id="basic_slug" type="text" name="slug" disabled="disabled" value="" />

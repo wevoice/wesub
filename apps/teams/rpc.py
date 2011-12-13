@@ -43,8 +43,8 @@ from teams.forms import (
     WorkflowForm, PermissionsForm
 )
 from teams.permissions import (
-    roles_user_can_assign, can_assign_role,
-    can_edit_project, set_narrowings
+    roles_user_can_assign, can_assign_role, can_edit_project, set_narrowings,
+    can_rename_team
 )
 
 
@@ -249,9 +249,13 @@ class TeamsApiV2Class(object):
 
     def team_set(self, team_slug, data, user):
         team = Team.objects.get(slug=team_slug)
+        name = team.name
 
         form = SettingsForm(data, instance=team)
         if form.is_valid():
+            if form.cleaned_data['name'] != name and not can_rename_team(team, user):
+                return Error(_(u'You cannot rename this team.'))
+
             form.save()
             return team.to_dict()
         else:
