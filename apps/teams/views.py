@@ -68,17 +68,17 @@ DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
 
 def index(request, my_teams=False):
     q = request.REQUEST.get('q')
-    
-    ordering = request.GET.get('o', 'members')
 
     if my_teams and request.user.is_authenticated():
+        ordering = 'name'
         qs = Team.objects.filter(members__user=request.user)
     else:
+        ordering = request.GET.get('o', 'members')
         qs = Team.objects.for_user(request.user).annotate(_member_count=Count('users__pk'))
-    
+
     if q:
         qs = qs.filter(Q(name__icontains=q)|Q(description__icontains=q))
-    
+
     order_fields = {
         'name': 'name',
         'date': 'created',
@@ -93,17 +93,17 @@ def index(request, my_teams=False):
         'name': 'asc',
         'date': 'desc',
         'members': 'desc'
-    }    
+    }
     order_type = request.GET.get('ot', order_fields_type.get(ordering, 'desc'))
 
     if ordering in order_fields and order_type in ['asc', 'desc']:
         qs = qs.order_by(('-' if order_type == 'desc' else '')+order_fields[ordering])
-    
+
     highlighted_ids = list(Team.objects.for_user(request.user).filter(highlight=True).values_list('id', flat=True))
     random.shuffle(highlighted_ids)
     highlighted_qs = Team.objects.filter(pk__in=highlighted_ids[:HIGHTLIGHTED_TEAMS_ON_PAGE]) \
         .annotate(_member_count=Count('users__pk'))
-    
+
     extra_context = {
         'my_teams': my_teams,
         'query': q,

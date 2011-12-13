@@ -77,11 +77,19 @@
                     <ul class="actions">
                         <li>
                             <h4>
-                            {% blocktrans count count=team.member_count %}
-                                {{ count }} member
-                            {% plural %}
-                                {{ count }} members
-                            {% endblocktrans %}
+                                {% if my_teams %}
+                                    {% blocktrans count count=team.users.count %}
+                                        {{ count }} member
+                                    {% plural %}
+                                        {{ count }} members
+                                    {% endblocktrans %}
+                                {% else %}
+                                    {% blocktrans count count=team.member_count %}
+                                        {{ count }} member
+                                    {% plural %}
+                                        {{ count }} members
+                                    {% endblocktrans %}
+                                {% endif %}
                             </h4>
                         </li>
                     </ul>
