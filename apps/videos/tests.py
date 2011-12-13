@@ -202,7 +202,6 @@ class BusinessLogicTest(TestCase):
                          Subtitle.objects.filter(version=fr.version()).count() )
         # now, when we rollback, we want to make sure we end up with
         # the correct subs and a non forked language
-        import pdb;pdb.set_trace()
         fr_version = refresh_obj(fr_version)
         fr_version.rollback(self.user)
         fr = refresh_obj(fr)
