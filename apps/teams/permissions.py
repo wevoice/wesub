@@ -196,6 +196,25 @@ def _del_language_narrowings(member, languages):
         MembershipNarrowing.objects.get(language=language, member=member).delete()
 
 
+def can_set_language_narrowings(team, user, target):
+    # role = get_role_for_target(user, team)
+    target_role = get_role(get_member(target, team))
+
+    if target_role not in [ROLE_MANAGER]:
+        return False
+
+    return True
+
+def can_set_project_narrowings(team, user, target):
+    # role = get_role_for_target(user, team)
+    target_role = get_role(get_member(target, team))
+
+    if target_role not in [ROLE_MANAGER, ROLE_ADMIN]:
+        return False
+
+    return True
+
+
 def set_narrowings(member, project_pks, languages, author=None):
     if author:
         author = TeamMember.objects.get(team=member.team, user=author)
