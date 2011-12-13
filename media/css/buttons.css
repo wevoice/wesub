@@ -309,14 +309,14 @@ a.small_button span {
     nowhitespace: afterproperty;
 }
 .sort_button ul {
-    display: none
+    display: none;
 }
 .sort_button ul li {
     margin: 0 !important; padding: 0 !important; padding: 0;
-    list-style: none
+    list-style: none;
 }
 .sort_button ul li a.first {
-    border-top: none
+    border-top: none;
 }
 .sort_button ul li a.last {
     border-bottom: none;
@@ -340,7 +340,7 @@ a.small_button span {
     text-shadow: 0 1px 0 #fff;
 }
 .sort_button ul li a:hover {
-    background: #ecf9fc
+    background: #ecf9fc;
 }
 .sort_button:hover {
     
