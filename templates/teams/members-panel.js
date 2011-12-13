@@ -1,6 +1,6 @@
 (function(){
 
-   var EDIT_SELECTOR = ".edit-role" ;
+    var EDIT_SELECTOR = ".edit-role";
 
     var EditRoleDialog = Class.$extend({
         __init__:function(pk, teamSlug){
@@ -40,14 +40,13 @@
                 projects,
                 languages,
                 this.hide);
+            displayFeedbackMessage('something', 'Member saved.');
            return false;
         },
-        hide:function(e){
-            if (e){
-                e.preventDefault();
-            }
+        hide:function(result){
             $(this.el).remove();
             $('div.well').remove();
+            return false;
         }
     });
     function onEditClicked(e){

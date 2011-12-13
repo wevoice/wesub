@@ -113,7 +113,7 @@ def index(request, my_teams=False):
     }
     return object_list(request, queryset=qs,
                        paginate_by=TEAMS_ON_PAGE,
-                       template_name='teams/index.html',
+                       template_name='teams/teams-list.html',
                        template_object_name='teams',
                        extra_context=extra_context)
 
@@ -169,7 +169,7 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
 
     return object_list(request, queryset=qs,
                        paginate_by=VIDEOS_ON_PAGE,
-                       template_name='teams/detail.html',
+                       template_name='teams/team-videos-list.html',
                        extra_context=extra_context,
                        template_object_name='team_video_md')
 

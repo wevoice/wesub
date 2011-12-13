@@ -6,23 +6,6 @@ var ON_PROJECT_SAVED = "onProjectSaved";
 var ON_PROJECT_CANCELED = "onProjectCanceled";
 var ON_PROJECT_DELETED = "onProjectDeleted";
 
-// Feedback -------------------------------------------------------------------
-function clearFeedbackMessage(){
-    $("#messages").remove();
-}
-function displayFeedbackMessage(msg, type){
-    clearFeedbackMessage();
-    var el= ich.feedbackMessage({msg:msg, type:type});
-    $(".content.wrapper").prepend(el);
-    $(el).hide().fadeIn("slow");
-    $('html, body').animate({ scrollTop: 0 }, 'fast');
-    $('a#closeBut', el).click(function() {
-        $(el).remove();
-        return false;
-    });
-}
-window.displayFeedbackMessage = displayFeedbackMessage;
-
 // Projects -------------------------------------------------------------------
 var ProjectModel = BaseModel.$extend({});
 var ProjectEditPanel = Class.$extend({
@@ -367,7 +350,7 @@ var BasicPanel  = AsyncPanel.$extend({
 
     saveImage: function(callback) {
         var that = this;
-        if ($('form.logo input', this.el).val()) {
+        if ($('form.logo input[type="file"]', this.el).val()) {
             $('form.logo', this.el).ajaxSubmit({
                 success: function(resp, status, xhr, from) {
                     callback && callback();
@@ -379,7 +362,6 @@ var BasicPanel  = AsyncPanel.$extend({
         }
     },
     saveData: function() {
-        
         var data = {
             name: $('#basic_name', this.el).val(),
             description: $('#basic_description', this.el).val()
@@ -400,7 +382,7 @@ var BasicPanel  = AsyncPanel.$extend({
             this.team = new TeamModel(data);
             this.fillFromModel();
         }
-        if(showMessage){
+        if (showMessage){
             displayFeedbackMessage("Settings saved.");
         }
     },

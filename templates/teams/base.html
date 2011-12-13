@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n teams_tags %}
+{% load i18n teams_tags verbatim_templatetag %}
 
 {% block body_attrs %}id="teams" class="v1"{% endblock %}
 
@@ -12,4 +12,14 @@
     {% endif %}
 
     {% block view_content %}{% endblock %}
+
+    {% verbatim %}
+    <script id="feedbackMessage" type="text/html">
+        <div id="messages">
+            <h2 class="{{type}}">{{msg}}</h2>
+            <a id="closeBut" style="display: block; float: right;" href="#">x</a>
+        </div>
+    </script>
+    {% endverbatim %}
+
 {% endblock %}

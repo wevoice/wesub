@@ -16,6 +16,10 @@ Every request must have the username and the api keys as headers. Ex::
    X-api-username: my_username_here
    X-apikey: my_api_key_here
 
+So a sample request would look like this::
+ 
+   $curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key'  https://staging.universalsubtitles.org/api2/partners/videos/
+
 Data Formats
 =============
 The api accepts request data and will output the following formats: JSON, XML and YAML. Unless you have a strong reason not to, we recommend using the JSON format, as it's the one that gets the most usage (and therefore more testing).
@@ -38,6 +42,10 @@ Therefore, most clients should be making requests against:
 https://www.unversalsubtitles.org/api2/partners/
 
 All API requests should go through https. The staging environment might need HTTP basic auth, please contact us to request credentials.  
+When basic auth is needed on staging, you end up with a request like this::
+
+    $curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key' --user basic_auth_username:basic_auth_password https://staging.universalsubtitles.org/api2/partners/videos/
+
 If you're under a partnership, you might have a different base URL. Please contact us if you're not sure.
 
 Available Resources
