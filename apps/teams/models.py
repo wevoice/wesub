@@ -49,11 +49,12 @@ def get_perm_names(model, perms):
 
 
 class TeamManager(models.Manager):
-
     def for_user(self, user):
         if user.is_authenticated():
-            return self.get_query_set().filter(models.Q(is_visible=True)| \
-                    models.Q(members__user=user)).distinct()
+            return self.get_query_set().filter(
+                    models.Q(is_visible=True) |
+                    models.Q(members__user=user)
+            ).distinct()
         else:
             return self.get_query_set().filter(is_visible=True)
 
@@ -183,7 +184,7 @@ class Team(models.Model):
                 pass
 
         if raise404:
-            raise Http404       
+            raise Http404
 
     def logo_thumbnail(self):
         if self.logo:
@@ -271,7 +272,7 @@ class Team(models.Model):
         if not hasattr(self, '_member_count'):
             setattr(self, '_member_count', self.users.count())
         return self._member_count
-    
+
     @property
     def videos_count(self):
         if not hasattr(self, '_videos_count'):
