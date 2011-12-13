@@ -69,7 +69,7 @@ DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
 def index(request, my_teams=False):
     q = request.REQUEST.get('q')
     
-    ordering = request.GET.get('o', 'name')
+    ordering = request.GET.get('o', 'members')
 
     if my_teams and request.user.is_authenticated():
         qs = Team.objects.filter(members__user=request.user)
