@@ -78,13 +78,6 @@
 
 /* General styles */
 
-.group:after {
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
-}
 .box-right {
     position: absolute;
     top: 2em; right: 0;
@@ -250,8 +243,6 @@
         background: transparent;
         border: 1px solid transparent;
         color: @light;
-        float: right;
-        margin: 0;
         text-shadow: none;
         padding: .5em 1em;
 
@@ -591,6 +582,14 @@
         select {
             width: 100%;
         }
+
+        .chzn-container {
+            margin-bottom: 1em;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
     h4 {
         color: @light;
@@ -829,7 +828,7 @@
 /* Overrides */
 
 .v1 .sort_button {
-    float: left;
+    float: none;
     padding: 0;
     margin: 0;
     position: relative;
