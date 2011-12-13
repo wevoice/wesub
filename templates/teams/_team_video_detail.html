@@ -25,7 +25,7 @@
           </h4>
       </li>
       <li>
-        <a href="#" class="team_video_{{ search_record.team_video_pk }}">Add subtitles</a>
+        <a href="#">View tasks</a>
       </li>
   </ul>
 
@@ -36,6 +36,7 @@
                   <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}">Edit</a>
               </li>
           {% endif %}
+          {% comment %}
           {% if can_create_tasks %}
               {% if search_record|can_create_any_task:request.user %}
                   <li>
@@ -43,6 +44,7 @@
                   </li>
               {% endif %}
           {% endif %}
+          {% endcomment %}
           {% if can_edit_videos %}
               <li>
                   <form action="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" method="post" style="display: none;">
