@@ -36,14 +36,15 @@ from utils.rpc import Error, Msg, RpcRouter
 from utils.forms import flatten_errorlists
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 
+from teams.tasks import update_one_team_video
 from teams.project_forms import ProjectForm
 from teams.forms import (
     TaskAssignForm, TaskDeleteForm, GuidelinesMessagesForm, SettingsForm,
     WorkflowForm, PermissionsForm
 )
 from teams.permissions import (
-    roles_user_can_assign, can_assign_role,
-    can_edit_project, set_narrowings
+    roles_user_can_assign, can_assign_role, can_edit_project, set_narrowings,
+    can_rename_team
 )
 
 
@@ -248,9 +249,13 @@ class TeamsApiV2Class(object):
 
     def team_set(self, team_slug, data, user):
         team = Team.objects.get(slug=team_slug)
+        name = team.name
 
         form = SettingsForm(data, instance=team)
         if form.is_valid():
+            if form.cleaned_data['name'] != name and not can_rename_team(team, user):
+                return Error(_(u'You cannot rename this team.'))
+
             form.save()
             return team.to_dict()
         else:
@@ -311,7 +316,7 @@ class TeamsApiV2Class(object):
         member = Team.objects.get(slug=team_slug).members.get(user=user)
 
         if filters.get('assignee'):
-            tasks = tasks.filter(assignee=filters['assignee'])
+            tasks = tasks.filter(assignee__username=filters['assignee'])
         if filters.get('team_video'):
             tasks = tasks.filter(team_video=filters['team_video'])
 
@@ -502,15 +507,22 @@ class TeamsApiV2Class(object):
                  )   
 
     def project_delete(self, team_slug, project_pk, user):
-        
         team = get_object_or_404(Team, slug=team_slug)
         project = get_object_or_404(Project, team=team, pk=project_pk)
-        if can_edit_project(team, user, project) is False:
-            return {"success":False, "message": "This team member cannot edit project"}
+
+        if not can_edit_project(team, user, project):
+            return {"success": False, "message": "This team member cannot edit project"}
+
+        team_videos = [tv.id for tv in project.teamvideo_set.all()]
+
         videos_affected = project.teamvideo_set.all().update(project=team.default_project)
+        for id in team_videos:
+            update_one_team_video(id)
+
         project.delete()
+
         return dict(
-            videos_affected = videos_affected,
+            videos_affected=videos_affected,
             success=True,
             msg="Project %s has been deleted" % project.name,
             isRemoval=True

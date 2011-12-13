@@ -19,8 +19,6 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 from django.core.exceptions import ValidationError
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from auth.models import CustomUser as User
@@ -427,7 +425,7 @@ class Project(models.Model):
     # the default project is just a convenience UI that pretends to be part of
     # the team . If this ever gets changed, you need to change migrations/0044
     DEFAULT_NAME = "_root"
-    
+
     team = models.ForeignKey(Team)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(blank=True)
@@ -1311,6 +1309,7 @@ class Task(models.Model):
             # The review step may be disabled.  If so, we check the approve step.
             if self.workflow.approve_enabled:
                 task = Task(team=self.team, team_video=self.team_video,
+                            subtitle_version=self.subtitle_version,
                             language=self.language, type=Task.TYPE_IDS['Approve'])
                 task.save()
             else:
@@ -1321,6 +1320,7 @@ class Task(models.Model):
     def _complete_review(self):
         if self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=self.subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'])
             task.save()
         else:
