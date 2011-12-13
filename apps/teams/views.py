@@ -370,7 +370,6 @@ def add_videos(request, slug):
     return { 'form': form, 'team': team, }
 
 
-
 @login_required
 @render_to('teams/team_video.html')
 def team_video(request, team_video_pk):

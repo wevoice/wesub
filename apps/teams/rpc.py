@@ -36,6 +36,7 @@ from utils.rpc import Error, Msg, RpcRouter
 from utils.forms import flatten_errorlists
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 
+from teams.tasks import update_one_team_video
 from teams.project_forms import ProjectForm
 from teams.forms import (
     TaskAssignForm, TaskDeleteForm, GuidelinesMessagesForm, SettingsForm,
@@ -502,15 +503,22 @@ class TeamsApiV2Class(object):
                  )   
 
     def project_delete(self, team_slug, project_pk, user):
-        
         team = get_object_or_404(Team, slug=team_slug)
         project = get_object_or_404(Project, team=team, pk=project_pk)
-        if can_edit_project(team, user, project) is False:
-            return {"success":False, "message": "This team member cannot edit project"}
+
+        if not can_edit_project(team, user, project):
+            return {"success": False, "message": "This team member cannot edit project"}
+
+        team_videos = [tv.id for tv in project.teamvideo_set.all()]
+
         videos_affected = project.teamvideo_set.all().update(project=team.default_project)
+        for id in team_videos:
+            update_one_team_video(id)
+
         project.delete()
+
         return dict(
-            videos_affected = videos_affected,
+            videos_affected=videos_affected,
             success=True,
             msg="Project %s has been deleted" % project.name,
             isRemoval=True
