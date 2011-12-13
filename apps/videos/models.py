@@ -869,7 +869,8 @@ class SubtitleLanguage(models.Model):
             language=to_language, version_no=version_no,
             datetime_started=datetime.now(),
             note=u'Uploaded', is_forked=True, time_change=1, 
-            text_change=1, result_of_rollback=result_of_rollback)
+            text_change=1, result_of_rollback=result_of_rollback,
+            forked_from=from_version)
         if user:
             kwargs['user'] = user
         version = SubtitleVersion(**kwargs)
@@ -947,7 +948,8 @@ class SubtitleCollection(models.Model):
         return effective_subtitles
         
 class SubtitleVersionManager(models.Manager):
-    def new_version(self, parser, language, user, translated_from=None, note="", timestamp=None):
+    def new_version(self, parser, language, user,
+                    translated_from=None, note="", timestamp=None):
         version_no = 0
         version = language.version()
         forked = not translated_from 
@@ -1022,6 +1024,7 @@ class SubtitleVersion(SubtitleCollection):
     text_change = models.FloatField(null=True, blank=True, editable=False)
     notification_sent = models.BooleanField(default=False)
     result_of_rollback = models.BooleanField(default=False)
+    forked_from = models.ForeignKey("self", blank=True, null=True)
 
     objects = SubtitleVersionManager()
 
@@ -1163,7 +1166,12 @@ class SubtitleVersion(SubtitleCollection):
         
         for item in self.subtitle_set.all():
             item.duplicate_for(version=new_version).save()
-
+        if last_version.forked_from:
+            if self.language.standard_language and self.language.is_forked == True :
+                # we are rolling back to a version that was dependent
+                # but isn't anymore, so we need to restablish that dependency
+                self.language.is_forked = False
+                self.language.save()
         return new_version
 
     def is_all_blank(self):
