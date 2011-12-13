@@ -847,17 +847,20 @@ class TeamMember(models.Model):
     user = models.ForeignKey(User, related_name='user')
     role = models.CharField(max_length=16, default=ROLE_CONTRIBUTOR, choices=ROLES)
     changes_notification = models.BooleanField(default=True)
-
     
     objects = TeamMemderManager()
 
     def __unicode__(self):
         return u'%s' % self.user
 
+    def project_narrowings(self):
+        return self.narrowings.filter(project__isnull=False)
+
+    def language_narrowings(self):
+        return self.narrowings.filter(project__isnull=True)
 
     class Meta:
         unique_together = (('team', 'user'),)
-
 
 class MembershipNarrowing(models.Model):
     """Represent narrowings that can be made on memberships.
