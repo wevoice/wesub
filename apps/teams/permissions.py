@@ -113,8 +113,7 @@ def roles_user_can_assign(team, user, to_user=None):
 
     Rules:
 
-        * Unrestricted owners can assign all roles.
-        * Unrestricted admins can assign any other role (for now).
+        * Unrestricted admins and owners can assign any role but owners.
         * No one else can assign any roles.
         * Admins cannot change the role of an owner.
 
@@ -122,7 +121,7 @@ def roles_user_can_assign(team, user, to_user=None):
     user_role = get_role_for_target(user, team)
 
     if user_role == ROLE_OWNER:
-        return ROLES_ORDER
+        return ROLES_ORDER[1:]
     elif user_role == ROLE_ADMIN:
         if to_user:
             if get_role(get_member(to_user, team)) == ROLE_OWNER:
