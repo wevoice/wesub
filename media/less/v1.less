@@ -232,8 +232,10 @@
 /* Tools */
 
 .v1 .view .tools {
+    position: relative;
     padding: 1em;
     margin: 0 -20px 0 0;
+    height: 15px;
     border-bottom: 1px solid #e8ebed;
     font-size: 11px;
     text-align: right;
@@ -831,7 +833,9 @@
     float: none;
     padding: 0;
     margin: 0;
-    position: relative;
+    position: absolute;
+    top: .5em;
+    left: 1em;
     cursor: pointer;
     width: 170px;
     border-color: @fainter;
