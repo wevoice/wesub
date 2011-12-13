@@ -1,4 +1,11 @@
 /* General styles */
+.group:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
 .box-right {
   position: absolute;
   top: 2em;
@@ -264,6 +271,8 @@
   background: transparent;
   border: 1px solid transparent;
   color: #7692a3;
+  float: right;
+  margin: 0;
   text-shadow: none;
   padding: .5em 1em;
 }
@@ -845,7 +854,7 @@
 }
 /* Overrides */
 .v1 .sort_button {
-  float: none;
+  float: left;
   padding: 0;
   margin: 0;
   position: relative;

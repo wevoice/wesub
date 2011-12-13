@@ -65,6 +65,7 @@ ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
 
+
 def index(request, my_teams=False):
     q = request.REQUEST.get('q')
     
@@ -166,13 +167,26 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
                         if code in all_langs]
 
     extra_context['language_choices'] = language_choices
+    extra_context['query'] = query
+
+    sort_names = {
+        'name': 'Name, A-Z',
+        '-name': 'Name, Z-A',
+        '-time': 'Time, Newest',
+        'time': 'Time, Oldest',
+        '-subs': 'Subtitles, Most',
+        'subs': 'Subtitles, Least',
+    }
+    if sort:
+        extra_context['order_name'] = sort_names[sort]
+    else:
+        extra_context['order_name'] = sort_names['name']
 
     return object_list(request, queryset=qs,
                        paginate_by=VIDEOS_ON_PAGE,
                        template_name='teams/team-videos-list.html',
                        extra_context=extra_context,
                        template_object_name='team_video_md')
-
 
 def completed_videos(request, slug):
     team = Team.get(slug, request.user)
@@ -314,7 +328,7 @@ def upload_logo(request, slug):
     return HttpResponse(json.dumps(output))
 
 
-# Adding videos
+# Videos
 @render_to('teams/add_video.html')
 @login_required
 def add_video(request, slug):
@@ -368,8 +382,6 @@ def add_videos(request, slug):
         return redirect(team)
 
     return { 'form': form, 'team': team, }
-
-
 
 @login_required
 @render_to('teams/team_video.html')
@@ -606,7 +618,6 @@ def accept_invite(request, invite_pk, accept=True):
         
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-
 @login_required
 def join_team(request, slug):
     team = get_object_or_404(Team, slug=slug)
@@ -619,7 +630,6 @@ def join_team(request, slug):
         messages.success(request, _(u'You are now a member of this team.'))
 
     return redirect(team)
-
 
 def _check_can_leave(team, user):
     """Return an error message if the member cannot leave the team, otherwise None."""
@@ -662,7 +672,6 @@ def leave_team(request, slug):
         messages.success(request, _(u'You have left this team.'))
 
     return redirect(request.META.get('HTTP_REFERER') or team)
-
 
 @permission_required('teams.change_team')
 def highlight(request, slug, highlight=True):

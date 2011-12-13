@@ -54,11 +54,25 @@
     {% endwith %}
 
     <div class="view grid_9 alpha">
-        {% if can_add_video %}
-            <div class="tools">
-                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.slug }}{% endif %}" class="button">{% trans "Add Video" %}</a>
+        <div class="tools group"> <div class="sort_button">
+                <div class="arrow">
+                </div>
+                <span class="sort_label">{% trans 'Sort by' %} <strong>{{ order_name }}</strong></span>
+                <ul>
+                    <li>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=name">{% trans 'Name, A-Z' %}</a>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-name">{% trans 'Name, Z-A' %}</a>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-time">{% trans 'Time, Newest' %}</a>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=time">{% trans 'Time, Oldest' %}</a>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-subs">{% trans 'Subtitles, Most' %}</a>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=subs">{% trans 'Subtitles, Least' %}</a>
+                    </li>
+                </ul>
             </div>
-        {% endif %}
+            {% if can_add_video %}
+                    <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.slug }}{% endif %}" class="button">{% trans "Add Video" %}</a>
+            {% endif %}
+        </div>
 
         {% if not team.page_content and team.video %}
             {% widget widget_params %}
