@@ -108,8 +108,11 @@ class BaseNotification(object):
         h = Http()
         if basic_auth_username and basic_auth_password:
             h.add_credentials(basic_auth_username, basic_auth_password)
-        data = urlencode(dict(event=self.event_name, api_url=self.api_url,
-                    language_code=self.language_code, video=self.video_id))
+        data = dict(event=self.event_name, api_url=self.api_url,
+                    video_id=self.video_id)
+        if self.language_code:
+            data.update({"language_code":self.language_code} )
+        data = urlencode(data)
         url = "%s?%s"  % (url , data)
         try:
             resp, content = h.request(url, method="POST", body=data)
