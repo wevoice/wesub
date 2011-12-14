@@ -188,7 +188,7 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
     if sort:
         extra_context['order_name'] = sort_names[sort]
     else:
-        extra_context['order_name'] = sort_names['name']
+        extra_context['order_name'] = sort_names['-time']
 
     return object_list(request, queryset=qs,
                        paginate_by=VIDEOS_ON_PAGE,
