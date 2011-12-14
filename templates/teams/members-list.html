@@ -72,19 +72,14 @@
                                 <span class="descriptor">{{ lang.get_language_display }}</span>
                             {% endfor %}
                         </h3>
-                        <p>
-                            {% for narrowing in member.language_narrowings %}
-                                {{ narrowing.get_language_display }}
-                            {% endfor %}
-                        </p>
-                        <p>
-                            {{ member.role|capfirst }}
-                            {% with member.project_narrowings as narrowings %}
-                                {% if narrowings %}
-                                    ({% for narrowing in narrowings %}{{ narrowing.project.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
-                                {% endif %}
-                            {% endwith %}
-                        </p>
+                        <p>{{ member.role|capfirst }}
+                        {% if member.role == 'admin' or member.role == 'manager' %}
+                            {% if member.language_narrowings or member.project_narrowings %}
+                                {% if member.project_narrowings %}for {% for narrowing in member.project_narrowings %}{% if forloop.last and not forloop.first %}and {% endif %}<em>{{ narrowing.project.name }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "project" %}{{ member.project_narrowings|length|pluralize }}{% if member.language_narrowings %} and {% endif %}{% endif %}
+
+                                {% if member.language_narrowings %}for {% for narrowing in member.language_narrowings %}{% if forloop.last and not forloop.first %}and {% endif %}<em>{{ narrowing.get_language_display }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "language" %}{{ member.language_narrowings|length|pluralize }}{% endif %}
+                            {% endif %}
+                        {% endif %}
                         <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>
                         <ul class="actions">
                             <li>
@@ -113,7 +108,7 @@
             <select name="lang-filter" id="lang-filter">
                 <option value="">All languages</option>
                 {% for code, name in languages %}
-                    <option value="{{ code }}">{{ name }}</option>
+                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
                 {% endfor %}
             </select>
         </div>

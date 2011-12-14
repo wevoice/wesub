@@ -96,7 +96,17 @@ This is needed, since it's for the js templating
             </div>
             
             <div class="grid_9 submit">
-                <form class="team-settings"><input type="submit" class="submit save" value="Save Changes" name="save" /></form>
+                <form class="team-settings">
+
+                    {% endverbatim %}
+                    {% comment %}
+                        TODO: This button should only be displayed if the logged-in-user has the Owner role for this team.
+                    {% endcomment %}
+                    <input type="submit" class="button delete project-delete" onclick="return confirm('{% trans "Do you really wish to delete this team?" %}')" value="Delete team" />
+                    {% verbatim %}
+
+                    <input type="submit" class="submit save" value="Save Changes" name="save" />
+                </form>
             </div>
         </div>
     </div>

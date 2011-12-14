@@ -312,17 +312,21 @@ one, two, three
 	color: #444;
 }
 
-#funders {
-  padding: 24px 15px;
+#support-rec {
+  clear: both;
   border-top: 1px solid #cfcfcf;
   color: #7c7c7c;
-  text-align: center;
 }
 
-#funders p {
+#support-rec div {
+  text-align: center;
+  padding: 2em 0;
+}
+
+#support-rec div p {
   margin-bottom: 24px;
 }
 
-#funders img {
+#support-rec div img {
   margin: 10px 20px;
 }

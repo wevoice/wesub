@@ -135,16 +135,13 @@ def roles_user_can_invite(team, user):
 
     Rules:
 
-        * Unrestricted owners can invite all roles.
-        * Unrestricted admins can invite any non-owner role.
+        * Unrestricted owners and admins can invite all roles but owner.
         * Everyone else can only invite contributors.
 
     """
     user_role = get_role_for_target(user, team)
 
-    if user_role == ROLE_OWNER:
-        return ROLES_ORDER
-    elif user_role == ROLE_ADMIN:
+    if user_role in [ROLE_OWNER, ROLE_ADMIN]:
         return ROLES_ORDER[1:]
     else:
         return [ROLE_CONTRIBUTOR]
@@ -380,7 +377,7 @@ def can_review(team_video, user, lang=None):
     workflow = Workflow.get_for_team_video(team_video)
     role = get_role_for_target(user, team_video.team, team_video.project, lang)
 
-    # For now, don't allow require if it's disabled in the workflow.
+    # For now, don't allow review if it's disabled in the workflow.
     # TODO: Change this to allow one-off reviews?
     if not workflow.review_allowed:
         return False
@@ -493,6 +490,7 @@ def can_assign_task(task, user):
     """
     team, project, lang = task.team, task.team_video.project, task.language
 
+    
     return can_assign_tasks(team, user, project, lang) and can_perform_task(user, task)
 
 def can_delete_task(task, user):

@@ -17,13 +17,18 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from utils import render_to, render_to_json
+from collections import defaultdict
 from utils.translation import get_languages_list, languages_with_names
 from teams.forms import (
     CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
     EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
-    SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm
+    SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm,
+    TaskDeleteForm, GhostTaskAssignForm, GhostTaskDeleteForm
 )
-from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project
+from teams.models import (
+    Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
+    SubtitleLanguage
+)
 from teams.signals import api_teamvideo_new
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
@@ -46,6 +51,8 @@ from utils.amazon import S3StorageError
 from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
+from utils.translation import SUPPORTED_LANGUAGES_DICT
+from apps.videos.templatetags.paginator import paginate
 
 from teams.permissions import (
     can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
@@ -54,6 +61,7 @@ from teams.permissions import (
     can_join_team, can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task
 )
 
+TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
 HIGHTLIGHTED_TEAMS_ON_PAGE = getattr(settings, 'HIGHTLIGHTED_TEAMS_ON_PAGE', 10)
 CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS', 20)
@@ -184,7 +192,7 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
 
     return object_list(request, queryset=qs,
                        paginate_by=VIDEOS_ON_PAGE,
-                       template_name='teams/team-videos-list.html',
+                       template_name='teams/videos-list.html',
                        extra_context=extra_context,
                        template_object_name='team_video_md')
 
@@ -501,7 +509,7 @@ def detail_members(request, slug, role=None):
         })
     return object_list(request, queryset=qs,
                        paginate_by=MEMBERS_ON_PAGE,
-                       template_name='teams/team-members-list.html',
+                       template_name='teams/members-list.html',
                        extra_context=extra_context,
                        template_object_name='team_member')
 
@@ -667,7 +675,13 @@ def leave_team(request, slug):
     if error:
         messages.error(request, _(error))
     else:
+        tasks = Task.objects.incomplete().filter(team=team, assignee=user)
+        for task in tasks:
+            task.assignee = None
+            task.save()
+
         TeamMember.objects.get(team=team, user=user).delete()
+
         messages.success(request, _(u'You have left this team.'))
 
     return redirect(request.META.get('HTTP_REFERER') or team)
@@ -681,22 +695,230 @@ def highlight(request, slug, highlight=True):
 
 
 # Tasks
+TEAM_LANGUAGES = []
+
+def _build_translation_task_dict(team, team_video, language, member):
+    task_dict = Task(team=team, team_video=team_video,
+                     type=Task.TYPE_IDS['Translate'], assignee=None,
+                     language=language).to_dict(member.user)
+    task_dict['ghost'] = True
+    return task_dict
+
+def _translation_task_needed(tasks, team_video, language):
+    '''Return True if a translation task for the language needs to be added to the list.'''
+
+    result = False
+
+    video_tasks = [t for t in tasks if t.team_video == team_video]
+    for task in video_tasks:
+        if task.type == Task.TYPE_IDS['Subtitle']:
+            if not task.completed:
+                # There's an incomplete subtitling task, so we don't need to
+                # return a ghost (yet).
+                return False
+            else:
+                # If there's a *complete* subtitling task we *may* need to
+                # return a ghost (if there isn't already one there).
+                result = True
+
+    videolanguage_tasks = [t for t in video_tasks if t.language == language]
+    for task in videolanguage_tasks:
+        if task.type in (Task.TYPE_IDS['Translate'], Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']):
+            # There is already a translation task or a task later in the
+            # process in the DB for this video/language combination.
+            # No need to return a ghost.
+            return False
+
+    return result
+
+def _get_completed_language_dict(team_videos, languages):
+    '''Return a dict of video IDs to languages complete for each video.
+
+    This is created all at once so we can use only one query to look the
+    information up, instead of using a separate one for each video later when
+    we're going through them.
+
+    '''
+    video_ids = [tv.video.id for tv in TeamVideo.objects.filter(id__in=team_videos)]
+
+    completed_langs = SubtitleLanguage.objects.filter(
+            video__in=video_ids, language__in=languages, is_complete=True
+    ).values_list('video', 'language')
+
+    completed_languages = defaultdict(list)
+
+    for video_id, lang in completed_langs:
+        completed_languages[video_id].append(lang)
+
+    return completed_languages
+
+def _get_translation_tasks(team, tasks, member, team_video, language):
+    # TODO: Once this is a setting, look it up.
+    if language:
+        if language not in TEAM_LANGUAGES:
+            return []
+        else:
+            languages = [language]
+    else:
+        languages = TEAM_LANGUAGES
+    languages = map(str, languages)
+
+    team_videos = [team_video] if team_video else team.teamvideo_set.all()
+    completed_languages = _get_completed_language_dict(team_videos, languages)
+
+    return [_build_translation_task_dict(team, team_video, language, member)
+            for language in languages
+            for team_video in team_videos
+            if _translation_task_needed(tasks, team_video, language)
+            and language not in completed_languages[team_video.video.pk]]
+
+def _ghost_tasks(team, tasks, filters, member):
+    '''Return a list of "ghost" tasks for the given team.
+
+    Ghost tasks are tasks that don't exist in the database, but should be shown
+    to the user anyway.
+
+    '''
+    type = filters.get('type')
+    should_add = (                           # Add the ghost translation tasks iff:
+        ((not type) or type == u'Translate') # We care about translation tasks
+        and not filters.get('completed')     # We care about incomplete tasks
+        and not filters.get('assignee')      # We care about unassigned tasks
+    )
+
+    if should_add:
+        return _get_translation_tasks(team, tasks, member,
+                                      filters.get('team_video'),
+                                      filters.get('language'))
+    else:
+        return []
+
+def _get_or_create_workflow(team_slug, project_id, team_video_id):
+    try:
+        workflow = Workflow.objects.get(team__slug=team_slug, project=project_id,
+                                        team_video=team_video_id)
+    except Workflow.DoesNotExist:
+        # We special case this because Django won't let us create new models
+        # with the IDs, we need to actually pass in the Model objects for
+        # the ForeignKey fields.
+        #
+        # Most of the time we won't need to do these three extra queries.
+
+        team = Team.objects.get(slug=team_slug)
+        project = Project.objects.get(pk=project_id) if project_id else None
+        team_video = TeamVideo.objects.get(pk=team_video_id) if team_video_id else None
+
+        workflow = Workflow(team=team, project=project, team_video=team_video)
+
+    return workflow
+
+
+def _task_languages(team, user):
+    languages = filter(None, Task.objects.filter(team=team, deleted=False)
+                                         .values_list('language', flat=True)
+                                         .distinct())
+
+    # TODO: Handle the team language setting here once team settings are
+    # implemented.
+    languages = list(set(languages))
+
+    return [{'code': l, 'name': SUPPORTED_LANGUAGES_DICT[l]} for l in languages]
+
+def _task_category_counts(team):
+    # Realize the queryset here to avoid five separate DB calls.
+    tasks = list(team.task_set.incomplete())
+    counts = {'all': len(tasks)}
+    for type in ['Subtitle', 'Translate', 'Review', 'Approve']:
+        counts[type.lower()] = len([t for t in tasks
+                                    if t.type == Task.TYPE_IDS[type]])
+    return counts
+
+def _tasks_list(team, filters, user):
+    '''List tasks for the given team, optionally filtered.
+
+    `filters` should be an object/dict with zero or more of the following keys:
+
+    * type: a string describing the type of task. 'Subtitle', 'Translate', etc.
+    * completed: true or false
+    * assignee: user ID as an integer
+    * team_video: team video ID as an integer
+
+    '''
+    tasks = Task.objects.filter(team=team, deleted=False)
+    member = team.members.get(user=user)
+
+    if filters.get('team_video'):
+        tasks = tasks.filter(team_video=filters['team_video'])
+
+    # Force the main query here for performance.  This way we can manipulate
+    # the list in-memory instead of making several more calls to the DB
+    # below.
+    tasks = list(tasks)
+    real_tasks = tasks
+
+    # We have to run most of the filtering after the main task list is
+    # created, because if we do it beforehand some of the tasks needed to
+    # determine which ghost tasks to show may be excluded.
+    if not filters.get('completed'):
+        real_tasks = [t for t in real_tasks if not t.completed]
+
+    if filters.get('language'):
+        real_tasks = [t for t in real_tasks if t.language == filters['language']]
+
+    if filters.get('type'):
+        real_tasks = [t for t in real_tasks if t.type == Task.TYPE_IDS[filters['type']]]
+
+    if filters.get('assignee'):
+        assignee = filters.get('assignee')
+
+        if assignee == 'me':
+            real_tasks = [t for t in real_tasks if t.assignee == user]
+        elif assignee == 'none':
+            real_tasks = [t for t in real_tasks if t.assignee == None]
+        elif assignee:
+            real_tasks = [t for t in real_tasks
+                          if t.assignee and t.assignee.id == int(assignee)]
+
+    real_tasks = [t.to_dict(user) for t in real_tasks]
+    ghost_tasks = _ghost_tasks(team, tasks, filters, member)
+
+    tasks = real_tasks + ghost_tasks
+    return tasks
+
+def _get_task_filters(request):
+    return { 'language': request.GET.get('lang'),
+             'type': request.GET.get('type'),
+             'team_video': request.GET.get('team_video'),
+             'assignee': request.GET.get('assignee'),
+    }
+
 @render_to('teams/tasks.html')
 @login_required
 def team_tasks(request, slug):
     team = Team.get(slug, request.user)
 
     if not can_view_tasks_tab(team, request.user):
-        return HttpResponseForbidden("You cannot view this team")
+        return HttpResponseForbidden(_("You cannot view this team's tasks."))
 
     member = team.members.get(user=request.user)
+    languages = _task_languages(team, request.user)
+    category_counts = _task_category_counts(team)
 
-    return {
+    tasks = _tasks_list(team, _get_task_filters(request), request.user)
+    tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
+
+    context = {
         'team': team,
         'user_can_delete_tasks': can_delete_tasks(team, request.user),
         'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
+        'languages': languages,
+        'category_counts': category_counts,
+        'tasks': tasks,
     }
+    context.update(pagination_info)
+    return context
+
 
 @render_to('teams/create_task.html')
 def create_task(request, slug, team_video_pk):
@@ -751,6 +973,112 @@ def perform_task(request):
 
     # ... perform task ...
     return HttpResponseRedirect(task.get_perform_url())
+
+
+def _delete_task_normal(request, team):
+    '''Delete a normal task.'''
+
+    form = TaskDeleteForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        task = form.cleaned_data['task']
+        task.deleted = True
+        task.save()
+
+        return True
+
+    return False
+
+def _delete_task_ghost(request, team):
+    '''Delete a ghost task.'''
+
+    form = GhostTaskDeleteForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        tv = form.cleaned_data['team_video']
+        language = form.cleaned_data['language']
+
+        task, created = Task.objects.get_or_create(team=team, team_video=tv,
+                             language=language, type=Task.TYPE_IDS['Translate'])
+
+        task.deleted = True
+        task.save()
+
+        return True
+
+    return False
+
+def delete_task(request, slug):
+    '''Mark a task as deleted.
+
+    The task will not be physically deleted from the database, but will be
+    flagged and won't appear in further task listings.
+
+    '''
+    team = get_object_or_404(Team, slug=slug)
+    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+
+    if request.POST.get('is_ghost'):
+        success = _delete_task_ghost(request, team)
+    else:
+        success = _delete_task_normal(request, team)
+
+    if success:
+        messages.success(request, _('Task deleted.'))
+    else:
+        messages.error(request, _('You cannot delete this task.'))
+
+    return HttpResponseRedirect(next)
+
+
+def _assign_task_normal(request, team):
+    '''Assign a normal task.'''
+
+    form = TaskAssignForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        task = form.cleaned_data['task']
+        assignee = form.cleaned_data['assignee']
+
+        task.assignee = assignee
+        task.save()
+
+        return True
+
+    return False
+
+def _assign_task_ghost(request, team):
+    '''Assign a ghost task to the given user.'''
+
+    form = GhostTaskAssignForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        tv = form.cleaned_data['team_video']
+        assignee = form.cleaned_data['assignee']
+        language = form.cleaned_data['language']
+
+        task, created = Task.objects.get_or_create(team=team, team_video=tv,
+                             language=language, type=Task.TYPE_IDS['Translate'])
+
+        task.assignee = assignee
+        task.save()
+
+        return True
+
+    return False
+
+def assign_task(request, slug):
+    '''Assign a task to the given user, or unassign it if null/None.'''
+    team = get_object_or_404(Team, slug=slug)
+    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+
+    if request.POST.get('is_ghost'):
+        success = _assign_task_ghost(request, team)
+    else:
+        success = _assign_task_normal(request, team)
+
+    if success:
+        messages.success(request, _('Task assigned.'))
+    else:
+        messages.error(request, _('You cannot assign this task.'))
+
+    return HttpResponseRedirect(next)
 
 
 # Projects

@@ -78,6 +78,13 @@
 
 /* General styles */
 
+.group:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
 .box-right {
     position: absolute;
     top: 2em; right: 0;
@@ -115,13 +122,11 @@
     &:hover {
         .vertical-gradient(#136aa1, #0c4061);
     }
-
     &.primary {
         font-size: 1.25em;
         padding: 1em;
         .border-radius(4px);
     }
-
     &.reduced, &.cancel {
         border-color: @fainter;
         .vertical-gradient(#fff, @fainter);
@@ -134,7 +139,6 @@
             color: @dark;
         }
     }
-
     &.delete {
         float: left;
         margin: 0 .5em 0 0;
@@ -146,7 +150,6 @@
             .vertical-gradient(#A11332, #610c1e);
         }
     }
-
     &.save {
         .vertical-gradient(#69A113, #4F7A0F);
         border-color: #4F7A0F;
@@ -156,7 +159,6 @@
             .vertical-gradient(#69A113, #476e0d);
         }
     }
-
     &.cancel {
         float: left;
         margin: 0 .5em 0 0;
@@ -358,19 +360,6 @@
                     content: ' →';
                 }
             }
-
-            .assignee-choice {
-                position: absolute;
-                top: o; right: 0;
-                padding: 1em;
-                background: @dark;
-                color: #fff;
-                z-index: 90;
-                .border-radius(3px);
-            }
-            .action-assign-submit {
-                color: #FFF;
-            }
         }
 
         .descriptor {
@@ -437,6 +426,11 @@
             &:hover {
                 .opacity(1.0);
             }
+
+            form {
+                padding: 0;
+            }
+
         }
 
         &:hover {
@@ -444,10 +438,23 @@
                 display: block;
             }
         }
+
+        .assignee-choice {
+            position: absolute;
+            top: 1em; right: 0;
+            padding: 1em;
+            background: @dark;
+            color: #fff;
+            z-index: 90;
+            .border-radius(3px);
+        }
+        .action-assign-submit {
+            color: #FFF;
+        }
     }
 }
 .v1 .listing.videos > li {
-    min-height: 5em;
+    min-height: 6em;
     padding-left: 120px;
     padding-right: 150px;
 
@@ -479,6 +486,7 @@
     }
 }
 .v1 .listing.activity > li, .v1 .listing.tasks > li {
+    min-height: 6em;
     padding-right: 150px;
 
     .actions {
