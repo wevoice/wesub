@@ -119,5 +119,5 @@ def api_notify_on_video_activity(team_video_pk,event_name):
     tv.team.notification_settings.notify(
            tv.video,
            event_name,
-           None) 
+           ) 
  
