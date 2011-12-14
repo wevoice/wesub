@@ -1,5 +1,5 @@
 {% extends "teams/base.html" %}
-{% load i18n teams_tags paginator doorman media_compressor verbatim_templatetag %}
+{% load i18n teams_tags paginator doorman media_compressor verbatim_templatetag query_string %}
 
 {% block scripts %}
     {{ block.super }}
@@ -19,15 +19,144 @@
     {% endwith %}
 
     <div class="panel-holder view grid_9 alpha">
+        <ul class="tasks listing">
+            {% for task in tasks %}
+                <li>
+                    <h3>
+                        {% if task.language_display %}
+                            Translate to {{ task.language_display }}:
+                        {% else %}
+                            Transcribe:
+                        {% endif %}
+
+                        <a href="{{ task.team_video_url }}">{{ task.team_video_display }}</a>
+                        <span class="descriptor">
+                            {% if task.ghost %}
+                                <b>GHOST</b>
+                            {% endif %}
+
+                            {% if task.completed %}
+                                <b>COMPLETED</b>
+                            {% endif %}
+                        </span>
+                    </h3>
+                    <p class="done">
+                        <span>
+                            {# TODO: "Done" meter #}
+                        </span>
+
+                        {{ stepDisplay }}
+                    </p>
+                    <ul class="actions">
+                        <li>
+                            {% if task.assignee_display %}
+                                Assigned to {{ task.assignee_display }}
+                            {% endif %}
+
+                            {% if task.assign_allowed %}
+                                <form action="{% url teams:assign_task slug=team.slug %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="task" value="{{ task.pk }}" />
+                                    <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+
+                                    <a class="action-assign" href="#">
+                                        {% if task.assignee_display %}
+                                            Reassign
+                                        {% else %}
+                                            Assign
+                                        {% endif %}
+                                    </a>
+
+                                    <div class="assignee-choice" style="display: none;">
+                                        {{ assign_form.assignee }}
+                                        <a class="action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
+                                    </div>
+                                </form>
+                            {% endif %}
+
+                            {% if not task.assignee_display %}
+                                <form action="{% url teams:perform_task %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="task_id" value="{{ task.pk }}" />
+
+                                    {% if task.perform_allowed %}
+                                        <a class="perform" href="{% url teams:perform_task %}">Perform Task</a>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </li>
+                    </ul>
+                    {% if task.delete_allowed %}
+                        <form action="{% url teams:delete_task slug=team.slug %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="task" value="{{ task.pk }}" />
+                            <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+
+                            <ul class="admin-controls">
+                                <li>
+                                    <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">Remove</a>
+                                </li>
+                            </ul>
+                        </form>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li class="empty">Sorry, no tasks here.</li>
+            {% endfor %}
+        </ul>
+
+        {% if is_paginated %}{% paginator %}{% endif %}
     </div>
 
     <div class="controls grid_3 omega">
-
-        <form id="tasks_type_filter"></form>
+        <form id="tasks_type_filter">
+            <ul class="types">
+                <li class="type {% if not request.GET.type %}current{% endif %}">
+                    <a href="?">
+                        All Pending
+                        <span class="all">{{ category_counts.all }}</span>
+                    </a>
+                </li>
+                <li class="type {% if request.GET.type == "Review" %}current{% endif %}">
+                    <a href="{% query_string type="Review" %}">
+                        Review
+                        <span class="review">{{ category_counts.review }}</span>
+                    </a>
+                </li>
+                <li class="type {% if request.GET.type == "Approve" %}current{% endif %}">
+                    <a href="{% query_string type="Approve" %}">
+                        Approve
+                        <span class="approve">{{ category_counts.approve }}</span>
+                    </a>
+                </li>
+                <li class="type {% if request.GET.type == "Translate" %}current{% endif %}">
+                    <a href="{% query_string type="Translate" %}">
+                        Translate
+                        <span class="translate">{{ category_counts.translate }}</span>
+                    </a>
+                </li>
+                <li class="type {% if request.GET.type == "Subtitle" %}current{% endif %}">
+                    <a href="{% query_string type="Subtitle" %}">
+                        Subtitle
+                        <span class="subtitle">{{ category_counts.subtitle }}</span>
+                    </a>
+                </li>
+            </ul>
+        </form>
 
         <div class="refine">
             <form id="tasks_language_filter">
                 <h4>Refine</h4>
+
+                <select id="id_task_language" name="language" class="lang-filter chosen">
+                    <option value="">All Languages</option>
+                    {% for language in languages %}
+                        <option value="{{ language.code }}"
+                        {% if request.GET.lang == language.code %}
+                            selected="selected" 
+                        {% endif %}>{{ language.name }}</option>
+                    {% endfor %}
+                </select>
 
                 <select>
                     <option value="">All Assignees</option>
@@ -40,159 +169,30 @@
         {% include "teams/_actions.html" %}
     </div>
 
-<script type="text/javascript">
-$(window).load(function() {
-    {% include "teams/panel-base.js" %}
-    {% include "teams/tasks-panel.js" %}
-});
-</script>
+    <script type="text/javascript">
+        $(function() {
+            $language = $("select.lang-filter", ".controls");
+            $language.change(function(e) {
+                var lang = $language.val();
+                if (lang !== '') {
+                    window.location = document.URL.split("?")[0] + '?lang=' + lang;
+                } else {
+                    window.location = document.URL.split("?")[0];
+                }
+            });
+            $('a.action-assign').click(function(e) {
+                $(e.target).hide();
+                $(e.target).siblings('.assignee-choice').fadeIn('fast');
+                return false;
+            });
+            $('a.action-assign-submit, a.action-delete, a.perform').click(function(e) {
+                $(e.target).closest('form').submit();
+                return false;
+            });
+        });
+    </script>
 
-<!-- templates -->
-<script id="IMAGE_PRELOADER" type="text/html">
-  <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
-</script>
-
-{% verbatim %}
-
-<script id="subMenuItem" type="text/html">
-  <li><a >{{label}}</a></li>
-</script>
-
-<script id="tasksLanguagesList" type="text/html">
-    <select id="id_task_language" name="language" class="chosen">
-        <option value="">All Languages</option>
-    </select>
-</script>
-
-<script id="tasksLanguagesListOption" type="text/html">
-    <option value="{{ language }}">{{ language_display }}</option>
-</script>
-
-<script id="tasksTypesList" type="text/html">
-    <ul class="types">
-        <li class="type current">
-            <a href="#">
-                All Pending
-                <span class="all"></span>
-            </a>
-            <input type="hidden" name="type" value="" />
-        </li>
-        <li class="type">
-            <a href="#">
-                Review
-                <span class="review"></span>
-            </a>
-            <input type="hidden" name="type" value="Review" />
-        </li>
-        <li class="type">
-            <a href="#">
-                Approve
-                <span class="approve"></span>
-            </a>
-            <input type="hidden" name="type" value="Approve" />
-        </li>
-        <li class="type">
-            <a href="#">
-                Translate
-                <span class="translate"></span>
-            </a>
-            <input type="hidden" name="type" value="Translate" />
-        </li>
-        <li class="type">
-            <a href="#">
-                Subtitle
-                <span class="subtitle"></span>
-            </a>
-            <input type="hidden" name="type" value="Subtitle" />
-        </li>
-    </ul>
-</script>
-
-<script id="tasksListItem" type="text/html">
-    <h3>
-        {{ #languageDisplay}}
-            Translate to {{ languageDisplay }}:
-        {{ /languageDisplay}}
-
-        {{ ^languageDisplay}}
-            Transcribe:
-        {{ /languageDisplay}}
-        <a href="{{ teamVideoUrl }}">{{ teamVideoDisplay }}</a>
-        <span class="descriptor">
-            {{ #ghost }}
-                <b>GHOST</b>
-            {{ /ghost }}
-            {{ #completed }}
-                <b>COMPLETED</b>
-            {{ /completed }}
-        </span>
-    </h3>
-    <p class="done">
-        <span>
-            {{ #steps }}
-                {{ #done }}
-                    &#x25FC;
-                {{ /done }}
-                {{ ^done }}
-                    &#x25FB;
-                {{ /done }}
-            {{ /steps }}
-        </span>
-
-        {{ stepDisplay }}
-    </p>
-    <ul class="actions">
-        <li>
-            {{ #assigneeDisplay }}
-                Assigned to {{ assigneeDisplay }}
-            {{ /assigneeDisplay }}
-
-            {{ #assignAllowed }}
-                <form action="" method="post">
-                    <a class="action-assign" href="#">
-                        {{ #assigneeDisplay }}
-                            Reassign
-                        {{ /assigneeDisplay }}
-                        {{ ^assigneeDisplay }}
-                            Assign
-                        {{ /assigneeDisplay }}
-                    </a>
-                    <div class="assignee-choice" style="display: none;">
-                        {% endverbatim %}
-                            {{ assign_form.assignee }}
-                        {% verbatim %}
-                        <a class="action-assign-submit" href="#">Assign to User</a>
-                    </div>
-                </form>
-            {{ /assignAllowed }}
-
-            {{ ^assigneeDisplay }}
-                <form action="{{ performUrl }}" method="post">
-                    {% endverbatim %}
-                        {% csrf_token %}
-                    {% verbatim %}
-                    <input type="hidden" name="task_id" value="{{ pk }}" />
-
-                    {{ #performAllowed }}
-                        <a class="perform" href="{{ performUrl }}">Perform Task</a>
-                    {{ /performAllowed }}
-                </form>
-            {{ /assigneeDisplay }}
-        </li>
-    </ul>
-    {{ #deleteAllowed }}
-        <ul class="admin-controls">
-            <li>
-                <a class="action-delete" href="#">Remove</a>
-            </li>
-        </ul>
-    {{ /deleteAllowed }}
-</script>
-
-<script id="tasksPanel" type="text/html">
-    <ul class="tasks listing"></ul>
-    <div class="pagination"></div>
-</script>
-
-{% endverbatim %}
+    <script id="IMAGE_PRELOADER" type="text/html">
+        <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
+    </script>
 {% endblock %}
