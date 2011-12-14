@@ -81,7 +81,7 @@
                 </ul>
             </div>
             {% if can_add_video %}
-                    <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.slug }}{% endif %}" class="button">{% trans "Add Video" %}</a>
+                    <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
             {% endif %}
         </div>
 
