@@ -155,6 +155,10 @@
     text-shadow: 0 1px 0 #FFF;
     top: -5px;
 }
+#main_bar #user_menu .message_count {
+    float: right;
+    color: #bbb;
+}
 #main_bar ul#bar_menu li#me_menu #user_menu #menu ul#dropdown li ul#teams_menu {
     border-top: 1px #e4ecee solid;
     margin: 10px 0 0 0;
