@@ -109,7 +109,7 @@
             <select name="lang-filter" id="lang-filter">
                 <option value="">All languages</option>
                 {% for code, name in language_choices %}
-                    <option value="{{ code }}">{{ name }}</option>
+                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
                 {% endfor %}
             </select>
         </div>
