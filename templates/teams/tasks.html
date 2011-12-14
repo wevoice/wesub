@@ -116,8 +116,9 @@
                     {% endif %}
                     {% if task.assign_allowed %}
                     <div class="assignee-choice" style="display: none;">
+                        <a class="cancel" href="#">Cancel</a>
                         {{ assign_form.assignee }}
-                        <a class="action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
+                        <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
                     </div>
                     {% endif %}
                 </li>
@@ -215,9 +216,13 @@
             });
 
             $('a.action-assign').click(function(e) {
-                $(e.target).parents('.admin-controls').siblings('.assignee-choice').fadeIn('fast');
+                $(e.target).parents('.admin-controls').siblings('.assignee-choice').fadeIn('fast').children('.chzn-container').css('width', '100%');
                 return false;
             });
+            $('.assignee-choice a.cancel').click(function(e) {
+                $(e.target).parents('.assignee-choice').fadeOut('fast');
+            });
+
             $('a.action-assign-submit, a.action-delete, a.perform').click(function(e) {
                 $(e.target).closest('form').submit();
                 return false;

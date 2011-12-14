@@ -442,11 +442,24 @@
         .assignee-choice {
             position: absolute;
             top: 1em; right: 0;
+            width: 160px;
             padding: 1em;
-            background: @dark;
-            color: #fff;
+            background: @fainter;
             z-index: 90;
             .border-radius(3px);
+
+            .chzn-container {
+                margin: 1em 0 0;
+            }
+
+            a {
+                display: block;
+            }
+
+            .cancel {
+                float: right;
+                color: @light;
+            }
         }
         .action-assign-submit {
             color: #FFF;
