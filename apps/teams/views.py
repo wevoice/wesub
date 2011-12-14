@@ -341,8 +341,11 @@ def upload_logo(request, slug):
 def add_video(request, slug):
     team = Team.get(slug, request.user)
 
-    if not can_add_video(team, request.user):
-        messages.error(request, _(u'You can\'t add video.'))
+    project_id = request.GET.get('project') or request.POST.get('project') or None
+    project = Project.objects.get(team=team, pk=project_id) if project_id else team.default_project
+
+    if not can_add_video(team, request.user, project):
+        messages.error(request, _(u"You can't add video."))
         return HttpResponseRedirect(team.get_absolute_url())
 
     initial = {
@@ -350,14 +353,11 @@ def add_video(request, slug):
         'title': request.GET.get('title', '')
     }
 
-    try:
-        if request.GET.get('project'):
-            initial['project'] = Project.objects.get(slug=request.GET.get('project'))
-    except Project.DoesNotExist:
-        pass
-    
+    if project:
+        initial['project'] = project
+
     form = AddTeamVideoForm(team, request.user, request.POST or None, request.FILES or None, initial=initial)
-    
+
     if form.is_valid():
         obj =  form.save(False)
         obj.added_by = request.user
@@ -365,7 +365,7 @@ def add_video(request, slug):
         api_teamvideo_new.send(obj)
         messages.success(request, form.success_message())
         return redirect(obj)
-        
+
     return {
         'form': form,
         'team': team
