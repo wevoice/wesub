@@ -7,12 +7,15 @@
             <span class="descriptor"><a href="{% url teams:project_video_list slug=team.slug,project_slug=search_record.project_slug %}">{{ search_record.project_name }}</a></span>
         {% endif %}
     </h3>
+
     <p>
         {% if search_record.description %}
             {{ search_record.description|truncatewords:20|urlize }}.
         {% endif %}
     </p>
+
     <a href="{% url videos:video video_id=search_record.video_id %}" class="thumb"><img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail"></a>
+
     <ul class="actions">
         <li>
             <h4>
@@ -27,21 +30,22 @@
             <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}">View tasks</a>
         </li>
     </ul>
-    {% if can_edit_videos or can_create_tasks %}
+
+    {% if team|is_team_member:request.user %}
         <ul class="admin-controls">
-            {% if can_edit_videos %}
+            {% if search_record.team_video_pk|can_edit_video:request.user %}
                 <li>
                     <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}">Edit</a>
                 </li>
             {% endif %}
-            {% if can_create_tasks %}
-                {% if search_record|can_create_any_task:request.user %}
-                    <li>
-                        <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}">New Task</a>
-                    </li>
-                {% endif %}
+
+            {% if search_record|can_create_any_task:request.user %}
+                <li>
+                    <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}">New Task</a>
+                </li>
             {% endif %}
-            {% if can_edit_videos %}
+
+            {% if search_record.team_video_pk|can_edit_video:request.user %}
                 <li>
                     <form action="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" method="post" style="display: none;">
                         {% csrf_token %}
@@ -52,6 +56,7 @@
             {% endif %}
         </ul>
     {% endif %}
+
     <script type="text/javascript">
         $('a.team_video_{{ search_record.team_video_pk }}').click(function(){
             unisubs.api.openUnisubsDialogOnsite(
