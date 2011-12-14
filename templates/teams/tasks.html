@@ -221,6 +221,7 @@
             });
             $('.assignee-choice a.cancel').click(function(e) {
                 $(e.target).parents('.assignee-choice').fadeOut('fast');
+                return false;
             });
 
             $('a.action-assign-submit, a.action-delete, a.perform').click(function(e) {
