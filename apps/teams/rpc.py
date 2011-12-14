@@ -155,27 +155,6 @@ class TeamsApiV2Class(object):
             return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
 
 
-    def task_translate_delete(self, team_video_id, language, user):
-        '''Mark a translation task as deleted.
-
-        This is special-cased from the normal delete function because we don't
-        create translation tasks in advance -- it would be too wasteful.  The
-        translation task will be created if it does not already exist.
-
-        The task will not be physically deleted from the database, but will be
-        flagged and won't appear in further task listings.
-
-        '''
-        tv = TeamVideo.objects.get(pk=team_video_id)
-        task, created = Task.objects.get_or_create(team=tv.team, team_video=tv,
-                language=language, type=Task.TYPE_IDS['Translate'])
-
-        task.deleted = True
-        task.save()
-
-        return task.to_dict()
-
-
     # Workflows
     def workflow_get(self, team_slug, project_id, team_video_id, user):
         if team_video_id:

@@ -59,6 +59,7 @@
                                 <form action="{% url teams:assign_task slug=team.slug %}" method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+
                                     {% if task.ghost %}
                                         <input type="hidden" name="is_ghost" value="1" />
                                         <input type="hidden" name="team_video" value="{{ task.team_video }}" />
@@ -98,8 +99,16 @@
                     {% if task.delete_allowed %}
                         <form action="{% url teams:delete_task slug=team.slug %}" method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="task" value="{{ task.pk }}" />
                             <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+
+                            {% if task.ghost %}
+                                <input type="hidden" name="is_ghost" value="1" />
+                                <input type="hidden" name="team_video" value="{{ task.team_video }}" />
+                                <input type="hidden" name="language" value="{{ task.language }}" />
+                            {% else %}
+                                <input type="hidden" name="task" value="{{ task.pk }}" />
+                                <input type="hidden" name="is_ghost" value="" />
+                            {% endif %}
 
                             <ul class="admin-controls">
                                 <li>
