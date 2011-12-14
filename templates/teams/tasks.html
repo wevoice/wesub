@@ -84,7 +84,7 @@
                                 </form>
                             {% endif %}
 
-                            {% if not task.assignee_display %}
+                            {% if task.perform_allowed %}
                                 <form action="{% url teams:perform_task %}" method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="task_id" value="{{ task.pk }}" />
@@ -163,9 +163,9 @@
         </form>
 
         <div class="refine">
-            <form id="tasks_language_filter">
-                <h4>Refine</h4>
+            <h4>Refine</h4>
 
+            <form action="" method="get">
                 <select id="id_task_language" name="language" class="lang-filter chosen">
                     <option value="">All Languages</option>
                     {% for language in languages %}
@@ -175,11 +175,13 @@
                         {% endif %}>{{ language.name }}</option>
                     {% endfor %}
                 </select>
+            </form>
 
-                <select>
-                    <option value="">All Assignees</option>
-                    <option value="">Assigned to me</option>
-                    <option value="">Unassigned</option>
+            <form action="" method="get">
+                <select name="assignee" class="assignee-filter">
+                    <option value="" {% if not request.GET.assignee %}selected="selected"{% endif %}>All Assignees</option>
+                    <option value="me" {% if request.GET.assignee == "me" %}selected="selected"{% endif %}>Assigned to me</option>
+                    <option value="none" {% if request.GET.assignee == "none" %}selected="selected"{% endif %}>Unassigned</option>
                 </select>
             </form>
         </div>
@@ -198,6 +200,17 @@
                     window.location = document.URL.split("?")[0];
                 }
             });
+
+            $assignee = $("select.assignee-filter", ".controls");
+            $assignee.change(function(e) {
+                var a = $assignee.val();
+                if (a !== '') {
+                    window.location = document.URL.split("?")[0] + '?assignee=' + a;
+                } else {
+                    window.location = document.URL.split("?")[0];
+                }
+            });
+
             $('a.action-assign').click(function(e) {
                 $(e.target).hide();
                 $(e.target).siblings('.assignee-choice').fadeIn('fast');

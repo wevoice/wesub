@@ -847,8 +847,6 @@ def _tasks_list(team, filters, user):
     tasks = Task.objects.filter(team=team, deleted=False)
     member = team.members.get(user=user)
 
-    if filters.get('assignee'):
-        tasks = tasks.filter(assignee__username=filters['assignee'])
     if filters.get('team_video'):
         tasks = tasks.filter(team_video=filters['team_video'])
 
@@ -863,10 +861,23 @@ def _tasks_list(team, filters, user):
     # determine which ghost tasks to show may be excluded.
     if not filters.get('completed'):
         real_tasks = [t for t in real_tasks if not t.completed]
+
     if filters.get('language'):
         real_tasks = [t for t in real_tasks if t.language == filters['language']]
+
     if filters.get('type'):
         real_tasks = [t for t in real_tasks if t.type == Task.TYPE_IDS[filters['type']]]
+
+    if filters.get('assignee'):
+        assignee = filters.get('assignee')
+
+        if assignee == 'me':
+            real_tasks = [t for t in real_tasks if t.assignee == user]
+        elif assignee == 'none':
+            real_tasks = [t for t in real_tasks if t.assignee == None]
+        elif assignee:
+            real_tasks = [t for t in real_tasks
+                          if t.assignee and t.assignee.id == int(assignee)]
 
     real_tasks = [t.to_dict(user) for t in real_tasks]
     ghost_tasks = _ghost_tasks(team, tasks, filters, member)
@@ -877,7 +888,9 @@ def _tasks_list(team, filters, user):
 def _get_task_filters(request):
     return { 'language': request.GET.get('lang'),
              'type': request.GET.get('type'),
-             'team_video': request.GET.get('team_video'), }
+             'team_video': request.GET.get('team_video'),
+             'assignee': request.GET.get('assignee'),
+    }
 
 @render_to('teams/tasks.html')
 @login_required
