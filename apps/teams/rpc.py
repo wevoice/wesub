@@ -155,22 +155,6 @@ class TeamsApiV2Class(object):
             return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
 
 
-    def task_assign(self, task_id, assignee_id, user):
-        '''Assign a task to the given user, or unassign it if null/None.'''
-        task = Task.objects.get(pk=task_id)
-
-        form = TaskAssignForm(task.team, user,
-                              data={'task': task_id, 'assignee': assignee_id})
-        if form.is_valid():
-            assignee = User.objects.get(pk=assignee_id) if assignee_id else None
-
-            task.assignee = assignee
-            task.save()
-
-            return task.to_dict(user)
-        else:
-            return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
-
 
     def task_translate_assign(self, team_video_id, language, assignee_id, user):
         '''Assign a translation task to the given user, or unassign it if given null/None.

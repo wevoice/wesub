@@ -32,6 +32,7 @@ from teams.models import (
 from teams.signals import api_teamvideo_new
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
+from apps.auth.models import CustomUser as User
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.contrib import messages
@@ -974,6 +975,24 @@ def delete_task(request, slug):
 
     return HttpResponseRedirect(next)
 
+def assign_task(request, slug):
+    '''Assign a task to the given user, or unassign it if null/None.'''
+    team = get_object_or_404(Team, slug=slug)
+    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+
+    form = TaskAssignForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        task = form.cleaned_data['task']
+        assignee = form.cleaned_data['assignee']
+
+        task.assignee = assignee
+        task.save()
+
+        messages.success(request, _('Task assigned.'))
+    else:
+        messages.error(request, _('You cannot assign this task.'))
+
+    return HttpResponseRedirect(next)
 
 # Projects
 def project_list(request, slug):

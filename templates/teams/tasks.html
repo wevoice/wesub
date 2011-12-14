@@ -54,8 +54,10 @@
                             {% endif %}
 
                             {% if task.assign_allowed %}
-                                <form action="" method="post">
+                                <form action="{% url teams:assign_task slug=team.slug %}" method="post">
                                     {% csrf_token %}
+                                    <input type="hidden" name="task" value="{{ task.pk }}" />
+                                    <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
                                     <a class="action-assign" href="#">
                                         {% if task.assignee_display %}
@@ -64,9 +66,10 @@
                                             Assign
                                         {% endif %}
                                     </a>
+
                                     <div class="assignee-choice" style="display: none;">
                                         {{ assign_form.assignee }}
-                                        <a class="action-assign-submit" href="#">Assign to User</a>
+                                        <a class="action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
                                     </div>
                                 </form>
                             {% endif %}
@@ -109,7 +112,7 @@
         <form id="tasks_type_filter">
             <ul class="types">
                 <li class="type {% if not request.GET.type %}current{% endif %}">
-                    <a href="{% query_string request.GET type="" %}">
+                    <a href="?">
                         All Pending
                         <span class="all">{{ category_counts.all }}</span>
                     </a>
