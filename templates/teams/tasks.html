@@ -31,16 +31,15 @@
 
                         <a href="{{ task.team_video_url }}">{{ task.team_video_display }}</a>
                         <span class="descriptor">
-                            <b>{{ task.type }}</b>
-
-                            {% if task.ghost %}
-                                <b>GHOST</b>
-                            {% endif %}
-
-                            {% if task.completed %}
-                                <b>COMPLETED</b>
-                            {% endif %}
+                            {{ task.type }}
                         </span>
+                        {% if task.ghost %}
+                            <span class="descriptor">GHOST</span>
+                        {% endif %}
+
+                        {% if task.completed %}
+                            <span class="descriptor">COMPLETED</span>
+                        {% endif %}
                     </h3>
                     <p class="done">
                         <span>
@@ -55,35 +54,6 @@
                                 Assigned to {{ task.assignee_display }}
                             {% endif %}
 
-                            {% if task.assign_allowed %}
-                                <form action="{% url teams:assign_task slug=team.slug %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
-
-                                    {% if task.ghost %}
-                                        <input type="hidden" name="is_ghost" value="1" />
-                                        <input type="hidden" name="team_video" value="{{ task.team_video }}" />
-                                        <input type="hidden" name="language" value="{{ task.language }}" />
-                                    {% else %}
-                                        <input type="hidden" name="task" value="{{ task.pk }}" />
-                                        <input type="hidden" name="is_ghost" value="" />
-                                    {% endif %}
-
-                                    <a class="action-assign" href="#">
-                                        {% if task.assignee_display %}
-                                            Reassign
-                                        {% else %}
-                                            Assign
-                                        {% endif %}
-                                    </a>
-
-                                    <div class="assignee-choice" style="display: none;">
-                                        {{ assign_form.assignee }}
-                                        <a class="action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
-                                    </div>
-                                </form>
-                            {% endif %}
-
                             {% if task.perform_allowed %}
                                 <form action="{% url teams:perform_task %}" method="post">
                                     {% csrf_token %}
@@ -96,26 +66,59 @@
                             {% endif %}
                         </li>
                     </ul>
-                    {% if task.delete_allowed %}
-                        <form action="{% url teams:delete_task slug=team.slug %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
-                            {% if task.ghost %}
-                                <input type="hidden" name="is_ghost" value="1" />
-                                <input type="hidden" name="team_video" value="{{ task.team_video }}" />
-                                <input type="hidden" name="language" value="{{ task.language }}" />
-                            {% else %}
-                                <input type="hidden" name="task" value="{{ task.pk }}" />
-                                <input type="hidden" name="is_ghost" value="" />
-                            {% endif %}
+                    {% if task.delete_allowed or task.assign_allowed %}
+                    <ul class="admin-controls">
+                        {% if task.assign_allowed %}
+                        <li>
+                            <form action="{% url teams:assign_task slug=team.slug %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
-                            <ul class="admin-controls">
-                                <li>
-                                    <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">Remove</a>
-                                </li>
-                            </ul>
-                        </form>
+                                {% if task.ghost %}
+                                    <input type="hidden" name="is_ghost" value="1" />
+                                    <input type="hidden" name="team_video" value="{{ task.team_video }}" />
+                                    <input type="hidden" name="language" value="{{ task.language }}" />
+                                {% else %}
+                                    <input type="hidden" name="task" value="{{ task.pk }}" />
+                                    <input type="hidden" name="is_ghost" value="" />
+                                {% endif %}
+
+                                <a class="action-assign" href="#">
+                                    {% if task.assignee_display %}
+                                        Reassign
+                                    {% else %}
+                                        Assign
+                                    {% endif %}
+                                </a>
+                            </form>
+                        </li>
+                        {% endif %}
+                        {% if task.delete_allowed %}
+                        <li>
+                            <form action="{% url teams:delete_task slug=team.slug %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+
+                                {% if task.ghost %}
+                                    <input type="hidden" name="is_ghost" value="1" />
+                                    <input type="hidden" name="team_video" value="{{ task.team_video }}" />
+                                    <input type="hidden" name="language" value="{{ task.language }}" />
+                                {% else %}
+                                    <input type="hidden" name="task" value="{{ task.pk }}" />
+                                    <input type="hidden" name="is_ghost" value="" />
+                                {% endif %}
+                                <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">Remove</a>
+                            </form>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    {% endif %}
+                    {% if task.assign_allowed %}
+                    <div class="assignee-choice" style="display: none;">
+                        {{ assign_form.assignee }}
+                        <a class="action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
+                    </div>
                     {% endif %}
                 </li>
             {% empty %}
@@ -212,8 +215,7 @@
             });
 
             $('a.action-assign').click(function(e) {
-                $(e.target).hide();
-                $(e.target).siblings('.assignee-choice').fadeIn('fast');
+                $(e.target).parents('.admin-controls').siblings('.assignee-choice').fadeIn('fast');
                 return false;
             });
             $('a.action-assign-submit, a.action-delete, a.perform').click(function(e) {
