@@ -739,7 +739,7 @@ def _get_completed_language_dict(team_videos, languages):
     we're going through them.
 
     '''
-    video_ids = [tv.video.id for tv in team_videos]
+    video_ids = [tv.video.id for tv in TeamVideo.objects.filter(id__in=team_videos)]
 
     completed_langs = SubtitleLanguage.objects.filter(
             video__in=video_ids, language__in=languages, is_complete=True
@@ -876,7 +876,8 @@ def _tasks_list(team, filters, user):
 
 def _get_task_filters(request):
     return { 'language': request.GET.get('lang'),
-             'type': request.GET.get('type'), }
+             'type': request.GET.get('type'),
+             'team_video': request.GET.get('team_video'), }
 
 @render_to('teams/tasks.html')
 @login_required
@@ -904,6 +905,7 @@ def team_tasks(request, slug):
     }
     context.update(pagination_info)
     return context
+
 
 @render_to('teams/create_task.html')
 def create_task(request, slug, team_video_pk):
