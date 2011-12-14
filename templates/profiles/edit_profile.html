@@ -108,8 +108,9 @@
                     
                     {% include "_form_field.html" with field=form.biography %}           
                         
-                    <label>Your api key</label>
-                    <p><span class="api-key-holder">{{form.instance.api_key.key}}</span><span class="api-key-status"></span></p>
+                    <label>Your API key</label>
+                    <p><span class="api-key-holder">{{form.instance.api_key.key}}</span></p>
+                    <p><span class="api-key-status"></span></p>
                     <a href="{% url profiles:generate-api-key %}" class="get-new-api-bt button">Generate new key</a>
                 </fieldset>
             </div>
