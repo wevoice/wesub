@@ -27,7 +27,7 @@
             </h4>
         </li>
         <li>
-            <a href="#">View tasks</a>
+            <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}">View tasks</a>
         </li>
     </ul>
 
@@ -64,7 +64,6 @@
                 '{{search_record.video_url}}',
                 GLOBAL_WIDGET_SETTINGS
             );
-
             return false;
         });
     </script>

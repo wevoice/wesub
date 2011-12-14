@@ -1,7 +1,6 @@
 #services {
   position: relative;
   width: 770px;
-  min-height: 850px;
 }
 
 #services h1 {
@@ -77,4 +76,8 @@
 
 #services-partners li p {
   margin: .5em 0;
+}
+
+#recognition img {
+  margin: 1em 2em 1em 0;
 }

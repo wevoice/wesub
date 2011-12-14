@@ -360,19 +360,6 @@
                     content: ' →';
                 }
             }
-
-            .assignee-choice {
-                position: absolute;
-                top: o; right: 0;
-                padding: 1em;
-                background: @dark;
-                color: #fff;
-                z-index: 90;
-                .border-radius(3px);
-            }
-            .action-assign-submit {
-                color: #FFF;
-            }
         }
 
         .descriptor {
@@ -439,12 +426,43 @@
             &:hover {
                 .opacity(1.0);
             }
+
+            form {
+                padding: 0;
+            }
+
         }
 
         &:hover {
             .admin-controls {
                 display: block;
             }
+        }
+
+        .assignee-choice {
+            position: absolute;
+            top: 1em; right: 0;
+            width: 160px;
+            padding: 1em;
+            background: @fainter;
+            z-index: 90;
+            .border-radius(3px);
+
+            .chzn-container {
+                margin: 1em 0 0;
+            }
+
+            a {
+                display: block;
+            }
+
+            .cancel {
+                float: right;
+                color: @light;
+            }
+        }
+        .action-assign-submit {
+            color: #FFF;
         }
     }
 }
