@@ -135,16 +135,13 @@ def roles_user_can_invite(team, user):
 
     Rules:
 
-        * Unrestricted owners can invite all roles.
-        * Unrestricted admins can invite any non-owner role.
+        * Unrestricted owners and admins can invite all roles but owner.
         * Everyone else can only invite contributors.
 
     """
     user_role = get_role_for_target(user, team)
 
-    if user_role == ROLE_OWNER:
-        return ROLES_ORDER
-    elif user_role == ROLE_ADMIN:
+    if user_role in [ROLE_OWNER, ROLE_ADMIN]:
         return ROLES_ORDER[1:]
     else:
         return [ROLE_CONTRIBUTOR]
