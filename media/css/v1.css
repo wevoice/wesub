@@ -1,4 +1,11 @@
 /* General styles */
+.group:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
 .box-right {
   position: absolute;
   top: 2em;
