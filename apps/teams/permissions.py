@@ -380,7 +380,7 @@ def can_review(team_video, user, lang=None):
     workflow = Workflow.get_for_team_video(team_video)
     role = get_role_for_target(user, team_video.team, team_video.project, lang)
 
-    # For now, don't allow require if it's disabled in the workflow.
+    # For now, don't allow review if it's disabled in the workflow.
     # TODO: Change this to allow one-off reviews?
     if not workflow.review_allowed:
         return False
@@ -493,6 +493,7 @@ def can_assign_task(task, user):
     """
     team, project, lang = task.team, task.team_video.project, task.language
 
+    
     return can_assign_tasks(team, user, project, lang) and can_perform_task(user, task)
 
 def can_delete_task(task, user):

@@ -155,27 +155,6 @@ class TeamsApiV2Class(object):
             return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
 
 
-
-    def task_translate_assign(self, team_video_id, language, assignee_id, user):
-        '''Assign a translation task to the given user, or unassign it if given null/None.
-
-        This is special-cased from the normal assignment function because we
-        don't create translation tasks in advance -- it would be too wasteful.
-        The translation task will be created if it does not already exist.
-
-        '''
-        # TODO: Check permissions here. This will be tricky because of ghost tasks.
-
-        tv = TeamVideo.objects.get(pk=team_video_id)
-        task, created = Task.objects.get_or_create(team=tv.team, team_video=tv,
-                language=language, type=Task.TYPE_IDS['Translate'])
-        assignee = User.objects.get(pk=assignee_id) if assignee_id else None
-
-        task.assignee = assignee
-        task.save()
-
-        return task.to_dict(user)
-
     def task_translate_delete(self, team_video_id, language, user):
         '''Mark a translation task as deleted.
 

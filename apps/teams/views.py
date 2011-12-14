@@ -23,7 +23,7 @@ from teams.forms import (
     CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
     EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
     SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm,
-    TaskDeleteForm
+    TaskDeleteForm, GhostTaskAssignForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -975,10 +975,8 @@ def delete_task(request, slug):
 
     return HttpResponseRedirect(next)
 
-def assign_task(request, slug):
-    '''Assign a task to the given user, or unassign it if null/None.'''
-    team = get_object_or_404(Team, slug=slug)
-    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+def _assign_task_normal(request, team):
+    '''Assign a normal task.'''
 
     form = TaskAssignForm(team, request.user, data=request.POST)
     if form.is_valid():
@@ -988,11 +986,47 @@ def assign_task(request, slug):
         task.assignee = assignee
         task.save()
 
+        return True
+
+    return False
+
+def _assign_task_ghost(request, team):
+    '''Assign a ghost task to the given user.'''
+
+    form = GhostTaskAssignForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        tv = form.cleaned_data['team_video']
+        assignee = form.cleaned_data['assignee']
+        language = form.cleaned_data['language']
+
+        task, created = Task.objects.get_or_create(team=team, team_video=tv,
+                             language=language, type=Task.TYPE_IDS['Translate'])
+
+        task.assignee = assignee
+        task.save()
+
+        return True
+
+    return False
+
+
+def assign_task(request, slug):
+    '''Assign a task to the given user, or unassign it if null/None.'''
+    team = get_object_or_404(Team, slug=slug)
+    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+
+    if request.POST.get('is_ghost'):
+        success = _assign_task_ghost(request, team)
+    else:
+        success = _assign_task_normal(request, team)
+
+    if success:
         messages.success(request, _('Task assigned.'))
     else:
         messages.error(request, _('You cannot assign this task.'))
 
     return HttpResponseRedirect(next)
+
 
 # Projects
 def project_list(request, slug):

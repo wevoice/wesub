@@ -477,8 +477,8 @@ class CreateTaskForm(ErrorableModelForm):
 
 
 class TaskAssignForm(forms.Form):
-    task = forms.ModelChoiceField(queryset=Task.objects.all())
-    assignee = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
+    task = forms.ModelChoiceField(queryset=Task.objects.none())
+    assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
     def __init__(self, team, user, *args, **kwargs):
         super(TaskAssignForm, self).__init__(*args, **kwargs)
@@ -495,6 +495,30 @@ class TaskAssignForm(forms.Form):
         if not can_assign_task(task, self.user):
             raise forms.ValidationError(_(
                 u'You do not have permission to assign this task.'))
+
+        return self.cleaned_data
+
+class GhostTaskAssignForm(forms.Form):
+    team_video = forms.ModelChoiceField(queryset=TeamVideo.objects.all())
+    assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
+    language = forms.ChoiceField(choices=(), required=False)
+
+    def __init__(self, team, user, *args, **kwargs):
+        super(GhostTaskAssignForm, self).__init__(*args, **kwargs)
+
+        self.team = team
+        self.user = user
+        self.fields['language'].choices = get_languages_list(True)
+        self.fields['assignee'].queryset = User.objects.filter(user__team=team)
+        self.fields['team_video'].queryset = team.teamvideo_set.all()
+
+    def clean(self):
+        # task = self.cleaned_data['task']
+
+        # TODO: Check permissions here. This will be tricky because of ghost tasks.
+        # if not can_assign_task(task, self.user):
+        #     raise forms.ValidationError(_(
+        #         u'You do not have permission to assign this task.'))
 
         return self.cleaned_data
 
