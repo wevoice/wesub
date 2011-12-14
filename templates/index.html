@@ -159,12 +159,19 @@
                 {% include 'videos/_watch_page.html' %}
             {% endwith %}
     </div><!-- // featured_videos -->
-
-    <div id="funders" class="clearboth">
-      <p>Universal Subtitles is generously supported by<br />
-      <a href="http://www.mozilla.org/"><img src="{{ STATIC_URL }}images/funders/mozilla.png" alt="Mozilla Foundation"/></a></p>
-      <p>With additional funding by<br />
-      <a href="http://www.macfound.org/"><img src="{{ STATIC_URL }}images/funders/macarthur.png" alt="MacArthur Foundation"/></a>
-      <a href="http://www.soros.org/"><img src="{{ STATIC_URL }}images/funders/opensociety.png" alt="Open Society Foundations"/></a></p>
+    <div id="support-rec" class="clearboth">
+      <div class="grid_7 alpha">
+        <p>Generously supported by<br />
+        <a href="http://www.mozilla.org/"><img src="{{ STATIC_URL }}images/funders/mozilla.png" alt="Mozilla Foundation"/></a></p>
+        <p>With additional funding by<br />
+        <a href="http://www.macfound.org/"><img src="{{ STATIC_URL }}images/funders/macarthur.png" alt="MacArthur Foundation"/></a>
+        <a href="http://www.soros.org/"><img src="{{ STATIC_URL }}images/funders/opensociety.png" alt="Open Society Foundations"/></a></p>
+      </div>
+      <div id="recognition" class="grid_5 omega">
+        <p>Recognized by<br />
+        <a href="/about#fcc-award"><img src="{{ STATIC_URL }}images/awards/fcc.png" alt="FCC Award Advancement in Accessibility"/></a>
+        <a href="/about#tech-award"><img src="{{ STATIC_URL }}images/awards/tech_awards.png" alt="Tech Awards 2011"/></a>
+        <a href="/about/iia-award"><img src="{{ STATIC_URL }}images/awards/iia.png" alt="Intercultural Innovation Award"/></a></p>
+      </div>
     </div>
 {% endblock %}<!-- // main_content -->
