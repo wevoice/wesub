@@ -477,8 +477,8 @@ class CreateTaskForm(ErrorableModelForm):
 
 
 class TaskAssignForm(forms.Form):
-    task = forms.ModelChoiceField(queryset=Task.objects.all())
-    assignee = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
+    task = forms.ModelChoiceField(queryset=Task.objects.none())
+    assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
     def __init__(self, team, user, *args, **kwargs):
         super(TaskAssignForm, self).__init__(*args, **kwargs)
@@ -498,12 +498,40 @@ class TaskAssignForm(forms.Form):
 
         return self.cleaned_data
 
+class GhostTaskAssignForm(forms.Form):
+    team_video = forms.ModelChoiceField(queryset=TeamVideo.objects.all())
+    assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
+    language = forms.ChoiceField(choices=(), required=False)
+
+    def __init__(self, team, user, *args, **kwargs):
+        super(GhostTaskAssignForm, self).__init__(*args, **kwargs)
+
+        self.team = team
+        self.user = user
+        self.fields['language'].choices = get_languages_list(True)
+        self.fields['assignee'].queryset = User.objects.filter(user__team=team)
+        self.fields['team_video'].queryset = team.teamvideo_set.all()
+
+    def clean(self):
+        # task = self.cleaned_data['task']
+
+        # TODO: Check permissions here. This will be tricky because of ghost tasks.
+        # if not can_assign_task(task, self.user):
+        #     raise forms.ValidationError(_(
+        #         u'You do not have permission to assign this task.'))
+
+        return self.cleaned_data
+
+
 class TaskDeleteForm(forms.Form):
     task = forms.ModelChoiceField(queryset=Task.objects.all())
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, team, user, *args, **kwargs):
+        super(TaskDeleteForm, self).__init__(*args, **kwargs)
+
         self.user = user
-        return super(TaskDeleteForm, self).__init__(*args, **kwargs)
+
+        self.fields['task'].queryset = team.task_set.incomplete()
 
 
     def clean_task(self):
@@ -512,6 +540,29 @@ class TaskDeleteForm(forms.Form):
         if not can_delete_task(task, self.user):
             raise forms.ValidationError(_(
                 u'You do not have permission to delete this task.'))
+
+        return task
+
+class GhostTaskDeleteForm(forms.Form):
+    team_video = forms.ModelChoiceField(queryset=TeamVideo.objects.all())
+    language = forms.ChoiceField(choices=(), required=False)
+
+    def __init__(self, team, user, *args, **kwargs):
+        super(GhostTaskDeleteForm, self).__init__(*args, **kwargs)
+
+        self.team = team
+        self.user = user
+        self.fields['language'].choices = get_languages_list(True)
+        self.fields['team_video'].queryset = team.teamvideo_set.all()
+
+
+    def clean_task(self):
+        task = self.cleaned_data['task']
+
+        # TODO: Check permissions here. This will be tricky because of ghost tasks.
+        # if not can_delete_task(task, self.user):
+        #     raise forms.ValidationError(_(
+        #         u'You do not have permission to delete this task.'))
 
         return task
 

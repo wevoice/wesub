@@ -23,7 +23,7 @@ from teams.forms import (
     CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
     EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
     SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm,
-    TaskDeleteForm
+    TaskDeleteForm, GhostTaskAssignForm, GhostTaskDeleteForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -32,7 +32,6 @@ from teams.models import (
 from teams.signals import api_teamvideo_new
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
-from apps.auth.models import CustomUser as User
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.contrib import messages
@@ -676,7 +675,13 @@ def leave_team(request, slug):
     if error:
         messages.error(request, _(error))
     else:
+        tasks = Task.objects.incomplete().filter(team=team, assignee=user)
+        for task in tasks:
+            task.assignee = None
+            task.save()
+
         TeamMember.objects.get(team=team, user=user).delete()
+
         messages.success(request, _(u'You have left this team.'))
 
     return redirect(request.META.get('HTTP_REFERER') or team)
@@ -734,7 +739,7 @@ def _get_completed_language_dict(team_videos, languages):
     we're going through them.
 
     '''
-    video_ids = [tv.video.id for tv in team_videos]
+    video_ids = [tv.video.id for tv in TeamVideo.objects.filter(id__in=team_videos)]
 
     completed_langs = SubtitleLanguage.objects.filter(
             video__in=video_ids, language__in=languages, is_complete=True
@@ -871,7 +876,8 @@ def _tasks_list(team, filters, user):
 
 def _get_task_filters(request):
     return { 'language': request.GET.get('lang'),
-             'type': request.GET.get('type'), }
+             'type': request.GET.get('type'),
+             'team_video': request.GET.get('team_video'), }
 
 @render_to('teams/tasks.html')
 @login_required
@@ -899,6 +905,7 @@ def team_tasks(request, slug):
     }
     context.update(pagination_info)
     return context
+
 
 @render_to('teams/create_task.html')
 def create_task(request, slug, team_video_pk):
@@ -954,6 +961,38 @@ def perform_task(request):
     # ... perform task ...
     return HttpResponseRedirect(task.get_perform_url())
 
+
+def _delete_task_normal(request, team):
+    '''Delete a normal task.'''
+
+    form = TaskDeleteForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        task = form.cleaned_data['task']
+        task.deleted = True
+        task.save()
+
+        return True
+
+    return False
+
+def _delete_task_ghost(request, team):
+    '''Delete a ghost task.'''
+
+    form = GhostTaskDeleteForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        tv = form.cleaned_data['team_video']
+        language = form.cleaned_data['language']
+
+        task, created = Task.objects.get_or_create(team=team, team_video=tv,
+                             language=language, type=Task.TYPE_IDS['Translate'])
+
+        task.deleted = True
+        task.save()
+
+        return True
+
+    return False
+
 def delete_task(request, slug):
     '''Mark a task as deleted.
 
@@ -961,24 +1000,24 @@ def delete_task(request, slug):
     flagged and won't appear in further task listings.
 
     '''
+    team = get_object_or_404(Team, slug=slug)
     next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
 
-    form = TaskDeleteForm(request.user, data=request.POST)
-    if form.is_valid():
-        task = form.cleaned_data['task']
-        task.deleted = True
-        task.save()
+    if request.POST.get('is_ghost'):
+        success = _delete_task_ghost(request, team)
+    else:
+        success = _delete_task_normal(request, team)
 
+    if success:
         messages.success(request, _('Task deleted.'))
     else:
         messages.error(request, _('You cannot delete this task.'))
 
     return HttpResponseRedirect(next)
 
-def assign_task(request, slug):
-    '''Assign a task to the given user, or unassign it if null/None.'''
-    team = get_object_or_404(Team, slug=slug)
-    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+
+def _assign_task_normal(request, team):
+    '''Assign a normal task.'''
 
     form = TaskAssignForm(team, request.user, data=request.POST)
     if form.is_valid():
@@ -988,11 +1027,46 @@ def assign_task(request, slug):
         task.assignee = assignee
         task.save()
 
+        return True
+
+    return False
+
+def _assign_task_ghost(request, team):
+    '''Assign a ghost task to the given user.'''
+
+    form = GhostTaskAssignForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        tv = form.cleaned_data['team_video']
+        assignee = form.cleaned_data['assignee']
+        language = form.cleaned_data['language']
+
+        task, created = Task.objects.get_or_create(team=team, team_video=tv,
+                             language=language, type=Task.TYPE_IDS['Translate'])
+
+        task.assignee = assignee
+        task.save()
+
+        return True
+
+    return False
+
+def assign_task(request, slug):
+    '''Assign a task to the given user, or unassign it if null/None.'''
+    team = get_object_or_404(Team, slug=slug)
+    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+
+    if request.POST.get('is_ghost'):
+        success = _assign_task_ghost(request, team)
+    else:
+        success = _assign_task_normal(request, team)
+
+    if success:
         messages.success(request, _('Task assigned.'))
     else:
         messages.error(request, _('You cannot assign this task.'))
 
     return HttpResponseRedirect(next)
+
 
 # Projects
 def project_list(request, slug):
