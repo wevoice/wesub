@@ -71,27 +71,13 @@
                     <ul class="admin-controls">
                         {% if task.assign_allowed %}
                         <li>
-                            <form action="{% url teams:assign_task slug=team.slug %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
-
-                                {% if task.ghost %}
-                                    <input type="hidden" name="is_ghost" value="1" />
-                                    <input type="hidden" name="team_video" value="{{ task.team_video }}" />
-                                    <input type="hidden" name="language" value="{{ task.language }}" />
+                            <a class="action-assign" href="#">
+                                {% if task.assignee_display %}
+                                    Reassign
                                 {% else %}
-                                    <input type="hidden" name="task" value="{{ task.pk }}" />
-                                    <input type="hidden" name="is_ghost" value="" />
+                                    Assign
                                 {% endif %}
-
-                                <a class="action-assign" href="#">
-                                    {% if task.assignee_display %}
-                                        Reassign
-                                    {% else %}
-                                        Assign
-                                    {% endif %}
-                                </a>
-                            </form>
+                            </a>
                         </li>
                         {% endif %}
                         {% if task.delete_allowed %}
@@ -115,11 +101,25 @@
                     </ul>
                     {% endif %}
                     {% if task.assign_allowed %}
-                    <div class="assignee-choice" style="display: none;">
-                        <a class="cancel" href="#">Cancel</a>
-                        {{ assign_form.assignee }}
-                        <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
-                    </div>
+                        <form class="assign-form" action="{% url teams:assign_task slug=team.slug %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+
+                            {% if task.ghost %}
+                                <input type="hidden" name="is_ghost" value="1" />
+                                <input type="hidden" name="team_video" value="{{ task.team_video }}" />
+                                <input type="hidden" name="language" value="{{ task.language }}" />
+                            {% else %}
+                                <input type="hidden" name="task" value="{{ task.pk }}" />
+                                <input type="hidden" name="is_ghost" value="" />
+                            {% endif %}
+
+                            <div class="assignee-choice" style="display: none;">
+                                <a class="cancel" href="#">Cancel</a>
+                                {{ assign_form.assignee }}
+                                <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
+                            </div>
+                        </form>
                     {% endif %}
                 </li>
             {% empty %}
@@ -216,7 +216,12 @@
             });
 
             $('a.action-assign').click(function(e) {
-                $(e.target).parents('.admin-controls').siblings('.assignee-choice').fadeIn('fast').children('.chzn-container').css('width', '100%');
+                $(e.target).parents('.admin-controls')
+                           .siblings('form.assign-form')
+                               .children('div.assignee-choice')
+                                   .fadeIn('fast')
+                                   .children('.chzn-container')
+                                       .css('width', '100%');
                 return false;
             });
             $('.assignee-choice a.cancel').click(function(e) {
