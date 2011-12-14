@@ -84,13 +84,14 @@
                         </li>
                     </ul>
                     {% if task.delete_allowed %}
-                        <form action="" method="post">
+                        <form action="{% url teams:delete_task slug=team.slug %}" method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="task_id" value="{{ task.pk }}" />
+                            <input type="hidden" name="task" value="{{ task.pk }}" />
+                            <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
                             <ul class="admin-controls">
                                 <li>
-                                    <a class="action-delete" href="#">Remove</a>
+                                    <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">Remove</a>
                                 </li>
                             </ul>
                         </form>

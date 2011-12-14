@@ -22,7 +22,8 @@ from utils.translation import get_languages_list, languages_with_names
 from teams.forms import (
     CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
     EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
-    SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm
+    SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm,
+    TaskDeleteForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -951,6 +952,27 @@ def perform_task(request):
 
     # ... perform task ...
     return HttpResponseRedirect(task.get_perform_url())
+
+def delete_task(request, slug):
+    '''Mark a task as deleted.
+
+    The task will not be physically deleted from the database, but will be
+    flagged and won't appear in further task listings.
+
+    '''
+    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+
+    form = TaskDeleteForm(request.user, data=request.POST)
+    if form.is_valid():
+        task = form.cleaned_data['task']
+        task.deleted = True
+        task.save()
+
+        messages.success(request, _('Task deleted.'))
+    else:
+        messages.error(request, _('You cannot delete this task.'))
+
+    return HttpResponseRedirect(next)
 
 
 # Projects

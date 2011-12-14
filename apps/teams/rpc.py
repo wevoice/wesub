@@ -171,25 +171,6 @@ class TeamsApiV2Class(object):
         else:
             return Error(_(u'\n'.join(flatten_errorlists(form.errors))))
 
-    def task_delete(self, task_id, user):
-        '''Mark a task as deleted.
-
-        The task will not be physically deleted from the database, but will be
-        flagged and won't appear in further task listings.
-
-        '''
-
-        form = TaskDeleteForm(user, data={'task': task_id})
-        if form.is_valid():
-            task = Task.objects.get(pk=task_id)
-
-            task.deleted = True
-            task.save()
-
-            return task.to_dict()
-        else:
-            return { 'success': False, 'errors': form.errors }
-
 
     def task_translate_assign(self, team_video_id, language, assignee_id, user):
         '''Assign a translation task to the given user, or unassign it if given null/None.
