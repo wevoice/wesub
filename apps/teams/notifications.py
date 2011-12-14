@@ -85,13 +85,15 @@ class BaseNotification(object):
         has a custom base url.
         """
         from apiv2.api import VideoLanguageResource, VideoResource
+        video_klass = getattr(self.__class__, "video_resource_class", VideoResource)
         if self.language:
-            url =  VideoLanguageResource(self.api_name).get_resource_uri(self.language)
+            lang_klass = getattr(self.__class__, "language_resource_class", VideoLanguageResource)
+            url =  lang_klass(self.api_name).get_resource_uri(self.language)
             if self.version_pk:
                url += "subtitles/?version_no=%s"  % self.version.version_no
             return url
         else:
-            return VideoResource(self.api_name).get_resource_uri(self.video)
+            return video_klass(self.api_name).get_resource_uri(self.video)
 
     @property
     def video_id(self):
