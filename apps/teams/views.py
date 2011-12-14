@@ -191,7 +191,7 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
 
     return object_list(request, queryset=qs,
                        paginate_by=VIDEOS_ON_PAGE,
-                       template_name='teams/team-videos-list.html',
+                       template_name='teams/videos-list.html',
                        extra_context=extra_context,
                        template_object_name='team_video_md')
 
@@ -508,7 +508,7 @@ def detail_members(request, slug, role=None):
         })
     return object_list(request, queryset=qs,
                        paginate_by=MEMBERS_ON_PAGE,
-                       template_name='teams/team-members-list.html',
+                       template_name='teams/members-list.html',
                        extra_context=extra_context,
                        template_object_name='team_member')
 
