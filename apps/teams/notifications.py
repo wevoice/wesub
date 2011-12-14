@@ -110,6 +110,7 @@ class BaseNotification(object):
             h.add_credentials(basic_auth_username, basic_auth_password)
         data = urlencode(dict(event=self.event_name, api_url=self.api_url,
                     language_code=self.language_code, video=self.video_id))
+        url = "%s?%s"  % (url , data)
         try:
             resp, content = h.request(url, method="POST", body=data)
             success =  200<= resp.status <400
