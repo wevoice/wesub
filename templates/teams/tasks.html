@@ -43,7 +43,12 @@
                     </h3>
                     <p class="done">
                         <span>
-                            {# TODO: "Done" meter #}
+                            Status:
+                            {% if not task.assignee %}
+                                Awaiting assignment.
+                            {% else %}
+                                In-progress.
+                            {% endif %}
                         </span>
 
                         {{ stepDisplay }}
