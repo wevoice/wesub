@@ -1,0 +1,17 @@
+<ul class="sub-settings-panel">
+    <li {% if current_sub == "settings" %}class="current"{% endif %}>
+        <a href="{% url teams:edit_settings slug=team.slug %}">Basic Settings</a>
+    </li>
+
+    <li {% if current_sub == "guidelines" %}class="current"{% endif %}>
+        <a href="{% url teams:edit_guidelines slug=team.slug %}">Guidelines and messages</a>
+    </li>
+
+    <li {% if current_sub == "permissions" %}class="current"{% endif %}>
+        <a href="">Permissions and workflows</a>
+    </li>
+
+    <li {% if current_sub == "projects" %}class="current"{% endif %}>
+        <a href="">Projects</a>
+    </li>
+</ul>
