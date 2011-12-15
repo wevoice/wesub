@@ -48,7 +48,6 @@ from teams.permissions import (
 
 
 class TeamsApiClass(object):
-
     def create_application(self, team_id, msg, user):
         if not user.is_authenticated():
             return Error(_('You should be authenticated.'))
@@ -117,13 +116,10 @@ def _project_to_dict(p):
 
 
 
-
 class TeamsApiV2Class(object):
     def test_api(self, message, user):
         return Msg(u'Received message: "%s" from user "%s"' % (message, unicode(user)))
 
-
-    # Guidelines and messages
     def member_role_info(self, team_slug, member_pk, user):
         team = Team.objects.get(slug=team_slug)
         member = team.members.get(pk=member_pk)

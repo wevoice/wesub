@@ -380,6 +380,30 @@ def edit_settings(request, slug):
 
     return { 'team': team, 'form': form, }
 
+@render_to('teams/permissions.html')
+@login_required
+def edit_permissions(request, slug):
+    team = Team.get(slug, request.user)
+    workflow = Workflow.get_for_target(team.id, 'team')
+
+    if request.POST:
+        form = PermissionsForm(request.POST, instance=team)
+        workflow_form = WorkflowForm(request.POST, instance=workflow)
+
+        if form.is_valid() and workflow_form.is_valid():
+            form.save()
+
+            if form.cleaned_data['workflow_enabled']:
+                workflow_form.save()
+
+            messages.success(request, _(u'Settings saved.'))
+            return HttpResponseRedirect(request.path)
+    else:
+        form = PermissionsForm(instance=team)
+        workflow_form = WorkflowForm(instance=workflow)
+
+    return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
+
 
 # Videos
 @render_to('teams/add_video.html')
@@ -749,6 +773,7 @@ def search_members(request, slug):
                for m in team.members.filter(user__username__icontains=q)]
 
     return { 'results': results }
+
 
 # Tasks
 TEAM_LANGUAGES = []
