@@ -18,6 +18,7 @@
     {{ block.super }}
     {% include_bundle "js-teams-tasks-panel" %}
     <script src="{{ STATIC_URL }}js/libs/chosen.jquery.min.js" type="text/javascript"></script>
+    <script src="{{ STATIC_URL }}js/libs/chosen.ajax.jquery.js" type="text/javascript"></script>
 
     <script type="text/javascript">
         var languageChoices = {{ language_choices|safe }};
