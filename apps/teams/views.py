@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
+#
 # Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from utils import render_to, render_to_json
@@ -24,7 +24,7 @@ from teams.forms import (
     EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
     SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm,
     TaskDeleteForm, GhostTaskAssignForm, GhostTaskDeleteForm,
-    GuidelinesMessagesForm, RenameableSettingsForm
+    GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -67,7 +67,7 @@ TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
 HIGHTLIGHTED_TEAMS_ON_PAGE = getattr(settings, 'HIGHTLIGHTED_TEAMS_ON_PAGE', 10)
 CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS', 20)
 
-VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 15) 
+VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 15)
 MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 15)
 APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
@@ -157,7 +157,7 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
 
     if team.video:
         extra_context['widget_params'] = base_widget_params(request, {
-            'video_url': team.video.get_video_url(), 
+            'video_url': team.video.get_video_url(),
             'base_state': {}
         })
 
@@ -205,34 +205,34 @@ def completed_videos(request, slug):
         qs = TeamVideoLanguagesIndex.results()
     qs = qs.filter(team_id=team.id).filter(is_complete=True).order_by('-video_complete_date')
 
-    extra_context = widget.add_onsite_js_files({})    
+    extra_context = widget.add_onsite_js_files({})
     extra_context.update({
         'team': team
     })
-    
+
     if team.video:
         extra_context['widget_params'] = base_widget_params(request, {
-            'video_url': team.video.get_video_url(), 
+            'video_url': team.video.get_video_url(),
             'base_state': {}
         })
 
-    return object_list(request, queryset=qs, 
-                       paginate_by=VIDEOS_ON_PAGE, 
-                       template_name='teams/completed_videos.html', 
-                       extra_context=extra_context, 
-                       template_object_name='team_video')    
+    return object_list(request, queryset=qs,
+                       paginate_by=VIDEOS_ON_PAGE,
+                       template_name='teams/completed_videos.html',
+                       extra_context=extra_context,
+                       template_object_name='team_video')
 
 def videos_actions(request, slug):
-    team = Team.get(slug, request.user)  
+    team = Team.get(slug, request.user)
     videos_ids = team.teamvideo_set.values_list('video__id', flat=True)
     qs = Action.objects.filter(video__pk__in=videos_ids)
     extra_context = {
         'team': team
-    }   
-    return object_list(request, queryset=qs, 
-                       paginate_by=ACTIONS_ON_PAGE, 
-                       template_name='teams/videos_actions.html', 
-                       extra_context=extra_context, 
+    }
+    return object_list(request, queryset=qs,
+                       paginate_by=ACTIONS_ON_PAGE,
+                       template_name='teams/videos_actions.html',
+                       extra_context=extra_context,
                        template_object_name='videos_action')
 
 @render_to('teams/create.html')
@@ -241,7 +241,7 @@ def create(request):
     user = request.user
 
     if not DEV and not (user.is_superuser and user.is_active):
-        raise Http404 
+        raise Http404
 
     if request.method == 'POST':
         form = CreateTeamForm(request.user, request.POST, request.FILES)
@@ -297,7 +297,7 @@ def edit_logo(request, slug):
 
     if not team.is_member(request.user):
         raise Http404
-    
+
     output = {}
     form = EditLogoForm(request.POST, instance=team, files=request.FILES)
     if form.is_valid():
@@ -322,7 +322,7 @@ def upload_logo(request, slug):
         'url_full':str(team.logo and team.logo.url),
     }
     form = EditLogoForm(request.POST, instance=team, files=request.FILES)
-    
+
     if request.FILES and form.is_valid():
         try:
             form.save()
@@ -403,6 +403,80 @@ def edit_permissions(request, slug):
         workflow_form = WorkflowForm(instance=workflow)
 
     return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
+
+@render_to('teams/edit-projects.html')
+@login_required
+def edit_projects(request, slug):
+    team = Team.get(slug, request.user)
+    projects = team.project_set.all()
+    return { 'team': team, 'projects': projects, }
+
+@render_to('teams/edit-projects-add.html')
+@login_required
+def add_project(request, slug):
+    team = Team.get(slug, request.user)
+
+    if request.POST:
+        form = ProjectForm(request.POST)
+        workflow_form = WorkflowForm(request.POST)
+
+        if form.is_valid() and workflow_form.is_valid():
+            project = form.save(commit=False)
+            project.team = team
+            project.save()
+
+            if project.workflow_enabled:
+                workflow = workflow_form.save(commit=False)
+                workflow.team = team
+                workflow.project = project
+                workflow.save()
+
+            messages.success(request, _(u'Project added.'))
+            return HttpResponseRedirect(
+                    reverse('teams:edit_projects', args=[], kwargs={'slug': slug}))
+    else:
+        form = ProjectForm()
+        workflow_form = WorkflowForm()
+
+    return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
+
+@render_to('teams/edit-projects-edit.html')
+@login_required
+def edit_project(request, slug, project_slug):
+    team = Team.get(slug, request.user)
+    project = Project.objects.get(slug=project_slug, team=team)
+
+    if project.is_default_project:
+        messages.error(request, _(u'You cannot edit that project.'))
+        return HttpResponseRedirect(
+                reverse('teams:edit_projects', args=[], kwargs={'slug': slug}))
+
+    try:
+        workflow = Workflow.objects.get(team=team, project=project)
+    except Workflow.DoesNotExist:
+        workflow = None
+
+    if request.POST:
+        form = ProjectForm(request.POST, instance=project)
+        workflow_form = WorkflowForm(request.POST, instance=workflow)
+
+        if form.is_valid() and workflow_form.is_valid():
+            form.save()
+
+            if project.workflow_enabled:
+                workflow = workflow_form.save(commit=False)
+                workflow.team = team
+                workflow.project = project
+                workflow.save()
+
+            messages.success(request, _(u'Project saved.'))
+            return HttpResponseRedirect(
+                    reverse('teams:edit_projects', args=[], kwargs={'slug': slug}))
+    else:
+        form = ProjectForm(instance=project)
+        workflow_form = WorkflowForm(instance=workflow)
+
+    return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
 
 
 # Videos
@@ -610,12 +684,12 @@ def remove_member(request, slug, user_pk):
 @login_required
 def applications(request, slug):
     team = Team.get(slug, request.user)
-    
+
     if not team.is_member(request.user):
         return  HttpResponseForbidden("Not allowed")
-    
+
     qs = team.applications.all()
-        
+
     extra_context = {
         'team': team
     }
@@ -623,7 +697,7 @@ def applications(request, slug):
                        paginate_by=APLICATIONS_ON_PAGE,
                        template_name='teams/applications.html',
                        template_object_name='applications',
-                       extra_context=extra_context) 
+                       extra_context=extra_context)
 
 @login_required
 def approve_application(request, slug, user_pk):
@@ -687,12 +761,12 @@ def invite_members(request, slug):
 @login_required
 def accept_invite(request, invite_pk, accept=True):
     invite = get_object_or_404(Invite, pk=invite_pk, user=request.user)
-    
+
     if accept:
         invite.accept()
     else:
         invite.deny()
-        
+
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required

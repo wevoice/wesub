@@ -12,6 +12,6 @@
     </li>
 
     <li {% if current_sub == "projects" %}class="current"{% endif %}>
-        <a href="">Projects</a>
+        <a href="{% url teams:edit_projects slug=team.slug %}">Projects</a>
     </li>
 </ul>

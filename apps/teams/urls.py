@@ -58,6 +58,9 @@ urlpatterns = patterns('teams.views',
     url('^(?P<slug>[-\w]+)/edit-settings/$', 'edit_settings', name='edit_settings'),
     url('^(?P<slug>[-\w]+)/edit-guidelines/$', 'edit_guidelines', name='edit_guidelines'),
     url('^(?P<slug>[-\w]+)/edit-permissions/$', 'edit_permissions', name='edit_permissions'),
+    url('^(?P<slug>[-\w]+)/edit-projects/$', 'edit_projects', name='edit_projects'),
+    url('^(?P<slug>[-\w]+)/edit-projects/add/$', 'add_project', name='add_project'),
+    url('^(?P<slug>[-\w]+)/edit-projects/(?P<project_slug>[-\w]+)/$', 'edit_project', name='edit_project'),
     # just /p/ will bring all videos on any projects
     url('^(?P<slug>[-\w]+)/p/(?P<project_slug>[-\w]+)?/?$', 'detail', name='project_video_list'),
 )

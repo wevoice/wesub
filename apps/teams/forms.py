@@ -650,3 +650,9 @@ class InviteForm(forms.Form):
                 'role': self.cleaned_data['role'],
             })
 
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ('name', 'description', 'workflow_enabled')
+
