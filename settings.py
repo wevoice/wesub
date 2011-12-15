@@ -785,7 +785,7 @@ MEDIA_BUNDLES = {
               "js/jquery.rpc.js",
               "js/jquery.input_replacement.min.js",
               "js/messages.js",
-              "js/libs/chosen.jquery.min.js",
+              "js/libs/chosen.jquery.js",
             ],
         "closure_deps": "",
         "include_flash_deps": False,
@@ -830,7 +830,7 @@ MEDIA_BUNDLES = {
             "js/libs/ICanHaz.js",
             "js/libs/classy.js",
             "js/libs/underscore.js",
-            "js/libs/chosen.jquery.min.js",
+            "js/libs/chosen.jquery.js",
             "js/jquery.mod.js",
          )
     },
@@ -842,7 +842,7 @@ MEDIA_BUNDLES = {
             "js/libs/ICanHaz.js",
             "js/libs/classy.js",
             "js/libs/underscore.js",
-            "js/libs/chosen.jquery.min.js",
+            "js/libs/chosen.jquery.js",
             "js/jquery.mod.js",
          )
     },
