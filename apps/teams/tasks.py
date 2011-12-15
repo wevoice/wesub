@@ -21,7 +21,7 @@ def add_videos_notification(*args, **kwargs):
 
         team.last_notification_time = datetime.now()
         team.save()
-        members = team.users.filter( changes_notification=True, is_active=True) \
+        members = team.users.filter( notify_by_email=True, is_active=True) \
             .distinct()
 
         subject = _(u'New %(team)s videos ready for subtitling!') % dict(team=team)

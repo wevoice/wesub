@@ -100,10 +100,10 @@
                     
                     {% include "_form_field.html" with field=form.new_password_verify %}
 
-                    {% include "_form_field.html" with field=form.changes_notification widget_type="checkbox" %}
+                    {% include "_form_field.html" with field=form.notify_by_email widget_type="checkbox" %}
                     <p class="notation">{% trans "Notify me by email about new personal messages and edits to the videos I follow" %}</p>
                     
-                    {% include "_form_field.html" with field=form.follow_new_video widget_type="checkbox" %}
+                    {% include "_form_field.html" with field=form.notify_by_message widget_type="checkbox" %}
                     <p class="notation">{% trans "Follow the videos I submit" %}</p>
                     
                     {% include "_form_field.html" with field=form.biography %}           
