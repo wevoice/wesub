@@ -904,8 +904,19 @@ def team_tasks(request, slug):
     languages = _task_languages(team, request.user)
     category_counts = _task_category_counts(team)
 
-    tasks = _tasks_list(team, _get_task_filters(request), request.user)
+    filters = _get_task_filters(request)
+
+    tasks = _tasks_list(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
+
+    if filters.get('team_video'):
+        filters['team_video'] = team.videos.get(id=filters['team_video'])
+
+    if filters.get('assignee'):
+        if filters['assignee'] == 'me':
+            filters['assignee'] = team.members.get(user=request.user)
+        else:
+            filters['assignee'] = team.members.get(user=filters['assignee'])
 
     context = {
         'team': team,
@@ -915,6 +926,7 @@ def team_tasks(request, slug):
         'languages': languages,
         'category_counts': category_counts,
         'tasks': tasks,
+        'filters': filters
     }
     context.update(pagination_info)
     return context
