@@ -1,0 +1,47 @@
+{% extends "profiles/base.html" %}
+
+{% load paginator i18n %}
+
+{% block title %}
+    {% trans 'Compose a Message' %} | Universal Subtitles
+{% endblock %}
+
+{% block scripts %}
+    {% include "utils/chosenify.html" %}
+{% endblock %}
+
+{% block main_content %}
+
+    <h2>
+        {% trans 'Messages' %}
+    </h2>
+
+    {% with 'messages' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha new-message">
+        <form action="" method="post">
+            <fieldset>
+                <legend>Compose a Message</legend>
+                <label for="">Recipient(s)</label>
+                <select name="" id="">
+                    <option value="">Blah</option>
+                    <option value="">Blah</option>
+                </select>
+                <label for="">Message</label>
+                <textarea name="" id=""></textarea>
+            </fieldset>
+            <div class="submit">
+                <button>Send</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="controls grid_3 omega">
+        <ul>
+            <li class="current"><a href="{% url messages:index %}">{% trans "Inbox" %}</a></li>
+            <li><a href="{% url messages:sent %}">{% trans "Sent" %}</a></li>
+        </ul>
+    </div>
+{% endblock %}

@@ -27,7 +27,8 @@ from messages.views import rpc_router
 
 urlpatterns = patterns('messages.views',
     url('^$', 'index', name='index'),
-    url('^sent/$', 'sent', name='sent'), 
+    url('^sent/$', 'sent', name='sent'),
+    url('^new/$', 'new', name='new'),
     url(r'^router/$', rpc_router, name='rpc_router'),
     url(r'^router/api/$', rpc_router.api, name='rpc_api'),    
 )

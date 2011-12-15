@@ -19,6 +19,7 @@ from messages.models import Message
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.views.generic.list_detail import object_list
+from django.views.generic.simple import direct_to_template
 from messages.rpc import MessagesApiClass
 from utils.rpc import RpcRouter
 from messages.forms import SendMessageForm
@@ -82,4 +83,13 @@ def sent(request):
                        paginate_by=MESSAGES_ON_PAGE,
                        template_name='messages/sent.html',
                        template_object_name='message',
-                       extra_context=extra_context)    
+                       extra_context=extra_context)
+
+@login_required
+def new(request):
+    user = request.user
+    context = {
+        'user_info': user,
+    }
+
+    return direct_to_template(request, 'messages/new.html', context)
