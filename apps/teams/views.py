@@ -971,6 +971,8 @@ def team_tasks(request, slug):
     if filters.get('assignee'):
         if filters['assignee'] == 'me':
             filters['assignee'] = team.members.get(user=request.user)
+        elif filters['assignee'] == 'none':
+            filters['assignee'] == None
         else:
             filters['assignee'] = team.members.get(user=filters['assignee'])
 
