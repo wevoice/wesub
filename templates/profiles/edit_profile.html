@@ -100,11 +100,13 @@
                     
                     {% include "_form_field.html" with field=form.new_password_verify %}
 
-                    {% include "_form_field.html" with field=form.notify_by_email widget_type="checkbox" %}
-                    <p class="notation">{% trans "Notify me by email about new personal messages and edits to the videos I follow" %}</p>
-                    
+                      <!-- fix this, the setting cannot be false for notify_by_message and notify_by_email  -->
                     {% include "_form_field.html" with field=form.notify_by_message widget_type="checkbox" %}
-                    <p class="notation">{% trans "Follow the videos I submit" %}</p>
+                    <p class="notation">{% trans "Send me notifications to the UniversalSubtitles.org message inbox" %}</p>
+                    
+                    {% include "_form_field.html" with field=form.notify_by_email widget_type="checkbox" %}
+                    <p class="notation">{% trans "Send an email notification for each message received" %}</p>
+                    
                     
                     {% include "_form_field.html" with field=form.biography %}           
                         
