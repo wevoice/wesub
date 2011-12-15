@@ -740,6 +740,16 @@ def highlight(request, slug, highlight=True):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
+@render_to_json
+def search_members(request, slug):
+    team = Team.get(slug, request.user)
+    q = request.GET.get('q')
+
+    results = [[m.user.id, m.user.username]
+               for m in team.members.filter(user__username__icontains=q)]
+
+    return { 'results': results }
+
 # Tasks
 TEAM_LANGUAGES = []
 
