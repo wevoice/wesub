@@ -3,18 +3,5 @@
         $("select", ".v1 .content").filter(function() {
             return !$(this).parents('div').hasClass('ajaxChosen');
         }).chosen();
-        $("div.ajaxChosen select", ".v1 .content").ajaxChosen({
-            method: 'GET',
-            url: '/en/teams/test/members/search/',
-            dataType: 'json'
-        }, function (data) {
-            var terms = {};
-
-            $.each(data.results, function (i, val) {
-                terms[data.results[i][0]] = data.results[i][1];
-            });
-
-            return terms;
-        });
     });
 </script>

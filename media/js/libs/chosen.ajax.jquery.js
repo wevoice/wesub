@@ -15,9 +15,15 @@
                     $lis = $sel.children('li');
 
                     if ($lis.length === 1) {
-                        $sel.children('li').remove();
-                        $sel.append($('<li class="no-results">Begin typing to search.</li>'));
+                        $lis.remove();
                     }
+
+                    if ($('li.no-results', $sel).length === 0) {
+                        $sel.prepend($('<li class="no-results">Begin typing to search.</li>'));
+                    }
+
+                    $lis.removeClass('highlighted');
+
                     return false;
                 }
                 $(this).data('prevVal', val);

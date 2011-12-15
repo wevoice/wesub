@@ -121,7 +121,7 @@
 
                             <div class="assignee-choice" style="display: none;">
                                 <a class="cancel" href="#">Cancel</a>
-                                <div class="ajaxChosen">
+                                <div class="member-ajax-chosen">
                                     {{ assign_form.assignee }}
                                 </div>
                                 <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
@@ -239,6 +239,20 @@
             $('a.action-assign-submit, a.action-delete, a.perform').click(function(e) {
                 $(e.target).closest('form').submit();
                 return false;
+            });
+
+            $("div.member-ajax-chosen select", ".v1 .content").ajaxChosen({
+                method: 'GET',
+                url: '/en/teams/{{ team.slug }}/members/search/',
+                dataType: 'json'
+            }, function (data) {
+                var terms = {};
+
+                $.each(data.results, function (i, val) {
+                    terms[data.results[i][0]] = data.results[i][1];
+                });
+
+                return terms;
             });
         });
     </script>
