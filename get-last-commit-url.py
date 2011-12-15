@@ -14,7 +14,12 @@ def main():
 
     hash, title = output.split(' ', 1)
 
-    sys.stderr.write('%s\n' % title)
+    try:
+        from fabric.colors import blue
+        sys.stderr.write(blue(title))
+    except ImportError:
+        sys.stderr.write('%s' % title)
+
     sys.stdout.write('https://github.com/pculture/unisubs/commit/%s' % hash)
 
 if __name__ == '__main__':
