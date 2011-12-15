@@ -41,7 +41,7 @@ class MessageTest(TestCase):
         self.message.save()
 
     def test_send_email_to_allowed_user(self):
-        self.user.changes_notification = True
+        self.user.notify_by_email = True
         self.user.save()
         assert self.user.is_active and self.user.email
         
@@ -49,7 +49,7 @@ class MessageTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_send_email_to_optout_user(self):
-        self.user.changes_notification = False
+        self.user.notify_by_email = False
         self.user.save()
         assert self.user.is_active and self.user.email
                 

@@ -27,7 +27,7 @@
             "valid_email": false,
             "user_permissions": [],
             "groups": [],
-            "changes_notification": true,
+            "notify_by_email": true,
             "autoplay_preferences": 1,
             "homepage": "",
             "biography": ""
@@ -61,7 +61,7 @@
             "valid_email": false,
             "user_permissions": [],
             "groups": [],
-            "changes_notification": true,
+            "notify_by_email": true,
             "autoplay_preferences": 1,
             "homepage": "",
             "biography": ""
@@ -95,7 +95,7 @@
             "valid_email": false,
             "user_permissions": [],
             "groups": [],
-            "changes_notification": true,
+            "notify_by_email": true,
             "autoplay_preferences": 1,
             "homepage": "",
             "biography": ""
@@ -129,7 +129,7 @@
             "valid_email": false,
             "user_permissions": [],
             "groups": [],
-            "changes_notification": true,
+            "notify_by_email": true,
             "autoplay_preferences": 1,
             "homepage": "",
             "biography": ""

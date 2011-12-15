@@ -121,7 +121,9 @@
 
                             <div class="assignee-choice" style="display: none;">
                                 <a class="cancel" href="#">Cancel</a>
-                                {{ assign_form.assignee }}
+                                <div class="ajaxChosen">
+                                    {{ assign_form.assignee }}
+                                </div>
                                 <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
                             </div>
                         </form>
@@ -225,7 +227,7 @@
                            .siblings('form.assign-form')
                                .children('div.assignee-choice')
                                    .fadeIn('fast')
-                                   .children('.chzn-container')
+                                   .find('.chzn-container')
                                        .css('width', '100%');
                 return false;
             });

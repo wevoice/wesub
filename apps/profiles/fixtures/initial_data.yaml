@@ -14,7 +14,7 @@
       
 - fields:
     biography: ''
-    changes_notification: true
+    notify_by_email: true
     groups: []
     homepage: ''
     picture: ''

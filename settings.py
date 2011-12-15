@@ -363,7 +363,7 @@ JS_BASE_DEPENDENCIES = [
 ]
 
 JS_MODERATION_DASHBOARD =  [
-    "js/jquery-1.4.3.js",
+    "js/jquery-1.7.1.js",
     "js/jquery-ui-1.8.16.custom.min.js",
     "js/jgrowl/jquery.jgrowl.js",
     "js/jalerts/jquery.alerts.js",
@@ -775,7 +775,7 @@ MEDIA_BUNDLES = {
         "type":"js",
         "optimizations": "WHITESPACE_ONLY",
         "files":[
-              "js/jquery-1.4.3.js",
+              "js/jquery-1.7.1.js",
               "js/jquery-ui-1.8.16.custom.min.js",
               "js/jgrowl/jquery.jgrowl.js",
               "js/jalerts/jquery.alerts.js",
@@ -786,6 +786,7 @@ MEDIA_BUNDLES = {
               "js/jquery.input_replacement.min.js",
               "js/messages.js",
               "js/libs/chosen.jquery.min.js",
+              "js/libs/chosen.ajax.jquery.js",
             ],
         "closure_deps": "",
         "include_flash_deps": False,
@@ -831,6 +832,7 @@ MEDIA_BUNDLES = {
             "js/libs/classy.js",
             "js/libs/underscore.js",
             "js/libs/chosen.jquery.min.js",
+            "js/libs/chosen.ajax.jquery.js",
             "js/jquery.mod.js",
          )
     },
@@ -843,6 +845,7 @@ MEDIA_BUNDLES = {
             "js/libs/classy.js",
             "js/libs/underscore.js",
             "js/libs/chosen.jquery.min.js",
+            "js/libs/chosen.ajax.jquery.js",
             "js/jquery.mod.js",
          )
     },

@@ -66,8 +66,13 @@ class CustomUser(BaseUser):
         max_length=16, choices=ALL_LANGUAGES, blank=True)
     picture = S3EnabledImageField(blank=True, upload_to='pictures/')
     valid_email = models.BooleanField(default=False)
-    changes_notification = models.BooleanField(default=True)
-    follow_new_video = models.BooleanField(default=True)
+    
+    # if true, items that end on the user activity stream will also be
+    # sent as email
+    notify_by_email= models.BooleanField(default=True)
+    # if true, items that end on the user activity stream will also be
+    # sent as a message
+    notify_by_message = models.BooleanField(default=True)
     biography = models.TextField('Tell us about yourself', blank=True)
     autoplay_preferences = models.IntegerField(
         choices=AUTOPLAY_CHOICES, default=AUTOPLAY_ON_BROWSER)

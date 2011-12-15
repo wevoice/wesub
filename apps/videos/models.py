@@ -349,7 +349,7 @@ class Video(models.Model):
         if timestamp and video_url_obj.created != timestamp:
            video_url_obj.created = timestamp
            video_url_obj.save(updates_timestamp=False)
-        user and user.follow_new_video and video.followers.add(user)
+        user and user.notify_by_message and video.followers.add(user)
 
         return video, created
 
@@ -482,7 +482,7 @@ class Video(models.Model):
         self.writelock_time = None
 
     def notification_list(self, exclude=None):
-        qs = self.followers.filter(changes_notification=True, is_active=True)
+        qs = self.followers.filter(notify_by_email=True, is_active=True)
         if exclude:
             if not isinstance(exclude, (list, tuple)):
                 exclude = [exclude]
@@ -828,7 +828,7 @@ class SubtitleLanguage(models.Model):
         return []
 
     def notification_list(self, exclude=None):
-        qs = self.followers.filter(changes_notification=True, is_active=True)
+        qs = self.followers.filter(notify_by_email=True, is_active=True)
 
         if exclude:
             if not isinstance(exclude, (list, tuple)):
@@ -1183,7 +1183,7 @@ class SubtitleVersion(SubtitleCollection):
 def update_followers(sender, instance, created, **kwargs):
     user = instance.user
     lang = instance.language
-    if created and user and user.changes_notification:
+    if created and user and user.notify_by_email:
         if not SubtitleVersion.objects.filter(user=user).exists():
             #If user edited before it should be in followers, or removed yourself, 
             #so we should not add again
