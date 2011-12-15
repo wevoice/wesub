@@ -11,7 +11,13 @@
                     return false;
                 }
                 if (val.length < 1) {
-                    var none = $('<li class="no-results"></li>');
+                    $sel = $('ul.chzn-results', select.next('.chzn-container'));
+                    $lis = $sel.children('li');
+
+                    if ($lis.length === 1) {
+                        $sel.children('li').remove();
+                        $sel.append($('<li class="no-results">Begin typing to search.</li>'));
+                    }
                     return false;
                 }
                 $(this).data('prevVal', val);
@@ -23,10 +29,10 @@
                     success;
                 } else {
                     success = options.success;
-                }
+                };
                 options.success = function(data) {
                     var items;
-                    if (!(data !== null)) {
+                    if (!(data != null)) {
                         return;
                     }
                     select.find('option').each(function() {
@@ -38,8 +44,9 @@
                     $.each(items, function(value, text) {
                         return $("<option />", {'value': value, 'html': text}).appendTo(select);
                     });
+                    var rem = field.attr('value');
                     select.trigger("liszt:updated");
-                    field.attr('value', val);
+                    field.attr('value', rem);
 
                     field.keyup();
 
