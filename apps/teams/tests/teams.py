@@ -81,12 +81,16 @@ class TestNotification(TestCase):
         TeamVideo.objects.filter(pk__in=[self.tv1.pk, self.tv2.pk]).update(created=datetime.today())
         self.assertEqual(TeamVideo.objects.filter(created__gt=self.team.last_notification_time).count(), 2)
         mail.outbox = []
+        self.user.changes_notification = True
+        self.user.save()
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [self.user.email])
         self.assertEqual(len(send_templated_email_mockup.context['team_videos']), 2)
 
+        self.user.changes_notification = False
+        self.user.save()
         #test if user turn off notification
         self.user.is_active = False
         self.user.save()
@@ -103,18 +107,11 @@ class TestNotification(TestCase):
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
 
+
+        self.tm.save()
+
         self.user.changes_notification = True
         self.user.save()
-        self.tm.changes_notification = False
-        self.tm.save()
-        mail.outbox = []
-        tasks.add_videos_notification.delay()
-        self.team = Team.objects.get(pk=self.team.pk)
-        self.assertEqual(len(mail.outbox), 0)
-
-        self.tm.changes_notification = True
-        self.tm.save()
-
         #test notification if one video is new
         created_date = self.team.last_notification_time + timedelta(seconds=10)
         TeamVideo.objects.filter(pk=self.tv1.pk).update(created=created_date)
