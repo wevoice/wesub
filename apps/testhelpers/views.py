@@ -190,5 +190,4 @@ def load_team_fixtures(request ):
 def echo_json(request):
     data   = getattr(request, request.method).copy()
     data["url_path"] = request.path
-    print data
     return HttpResponse(json.dumps(data, indent=4))

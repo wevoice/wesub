@@ -380,6 +380,30 @@ def edit_settings(request, slug):
 
     return { 'team': team, 'form': form, }
 
+@render_to('teams/permissions.html')
+@login_required
+def edit_permissions(request, slug):
+    team = Team.get(slug, request.user)
+    workflow = Workflow.get_for_target(team.id, 'team')
+
+    if request.POST:
+        form = PermissionsForm(request.POST, instance=team)
+        workflow_form = WorkflowForm(request.POST, instance=workflow)
+
+        if form.is_valid() and workflow_form.is_valid():
+            form.save()
+
+            if form.cleaned_data['workflow_enabled']:
+                workflow_form.save()
+
+            messages.success(request, _(u'Settings saved.'))
+            return HttpResponseRedirect(request.path)
+    else:
+        form = PermissionsForm(instance=team)
+        workflow_form = WorkflowForm(instance=workflow)
+
+    return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
+
 
 # Videos
 @render_to('teams/add_video.html')
@@ -750,6 +774,7 @@ def search_members(request, slug):
 
     return { 'results': results }
 
+
 # Tasks
 TEAM_LANGUAGES = []
 
@@ -960,8 +985,21 @@ def team_tasks(request, slug):
     languages = _task_languages(team, request.user)
     category_counts = _task_category_counts(team)
 
-    tasks = _tasks_list(team, _get_task_filters(request), request.user)
+    filters = _get_task_filters(request)
+
+    tasks = _tasks_list(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
+
+    if filters.get('team_video'):
+        filters['team_video'] = team.videos.get(id=filters['team_video'])
+
+    if filters.get('assignee'):
+        if filters['assignee'] == 'me':
+            filters['assignee'] = team.members.get(user=request.user)
+        elif filters['assignee'] == 'none':
+            filters['assignee'] == None
+        else:
+            filters['assignee'] = team.members.get(user=filters['assignee'])
 
     context = {
         'team': team,
@@ -971,6 +1009,7 @@ def team_tasks(request, slug):
         'languages': languages,
         'category_counts': category_counts,
         'tasks': tasks,
+        'filters': filters
     }
     context.update(pagination_info)
     return context

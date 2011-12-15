@@ -847,7 +847,6 @@ class TeamMember(models.Model):
     team = models.ForeignKey(Team, related_name='members')
     user = models.ForeignKey(User, related_name='user')
     role = models.CharField(max_length=16, default=ROLE_CONTRIBUTOR, choices=ROLES)
-    changes_notification = models.BooleanField(default=True)
     
     objects = TeamMemderManager()
 

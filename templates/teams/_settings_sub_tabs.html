@@ -8,7 +8,7 @@
     </li>
 
     <li {% if current_sub == "permissions" %}class="current"{% endif %}>
-        <a href="">Permissions and workflows</a>
+        <a href="{% url teams:edit_permissions slug=team.slug %}">Permissions and workflows</a>
     </li>
 
     <li {% if current_sub == "projects" %}class="current"{% endif %}>

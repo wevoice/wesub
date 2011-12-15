@@ -44,7 +44,7 @@ class TestNotification(TestCase):
 
         self.user = User.objects.all()[:1].get()
         self.user.is_active = True
-        self.user.changes_notification = True
+        self.user.notify_by_email = True
         self.user.email = 'test@test.com'
         self.user.save()
 
@@ -81,12 +81,16 @@ class TestNotification(TestCase):
         TeamVideo.objects.filter(pk__in=[self.tv1.pk, self.tv2.pk]).update(created=datetime.today())
         self.assertEqual(TeamVideo.objects.filter(created__gt=self.team.last_notification_time).count(), 2)
         mail.outbox = []
+        self.user.notify_by_email = True
+        self.user.save()
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [self.user.email])
         self.assertEqual(len(send_templated_email_mockup.context['team_videos']), 2)
 
+        self.user.notify_by_email = False
+        self.user.save()
         #test if user turn off notification
         self.user.is_active = False
         self.user.save()
@@ -96,25 +100,18 @@ class TestNotification(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
         self.user.is_active = True
-        self.user.changes_notification = False
+        self.user.notify_by_email = False
         self.user.save()
         mail.outbox = []
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
 
-        self.user.changes_notification = True
+
+        self.tm.save()
+
+        self.user.notify_by_email = True
         self.user.save()
-        self.tm.changes_notification = False
-        self.tm.save()
-        mail.outbox = []
-        tasks.add_videos_notification.delay()
-        self.team = Team.objects.get(pk=self.team.pk)
-        self.assertEqual(len(mail.outbox), 0)
-
-        self.tm.changes_notification = True
-        self.tm.save()
-
         #test notification if one video is new
         created_date = self.team.last_notification_time + timedelta(seconds=10)
         TeamVideo.objects.filter(pk=self.tv1.pk).update(created=created_date)
@@ -399,10 +396,10 @@ class TeamsTest(TestCase):
         self.assertTrue(team.users.count() > 1)
 
         for tm in team.members.all():
-            tm.changes_notification = True
+            tm.notify_by_email = True
             tm.save()
             tm.user.is_active = True
-            tm.user.changes_notification = True
+            tm.user.notify_by_email = True
             tm.user.save()
 
         self._add_team_video(team, u'en', u"http://videos.mozilla.org/firefox/3.5/switch/switch.ogv")

@@ -836,7 +836,7 @@ class ViewsTest(WebUseTest):
         v = Video.objects.all()[:1].get()
         
         user = User.objects.exclude(id=self.user.id)[:1].get()
-        user.changes_notification = True
+        user.notify_by_email = True
         user.is_active = True
         user.save()
         v.followers.add(user)
@@ -1548,7 +1548,7 @@ class TestTasks(TestCase):
         self.language = self.video.subtitle_language()
         self.latest_version = self.language.latest_version(public_only=True)
         
-        self.latest_version.user.changes_notification = True
+        self.latest_version.user.notify_by_email = True
         self.latest_version.user.is_active = True
         self.latest_version.user.save()
         
