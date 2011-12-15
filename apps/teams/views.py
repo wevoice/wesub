@@ -23,11 +23,12 @@ from teams.forms import (
     CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
     EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
     SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm,
-    TaskDeleteForm, GhostTaskAssignForm, GhostTaskDeleteForm
+    TaskDeleteForm, GhostTaskAssignForm, GhostTaskDeleteForm,
+    GuidelinesMessagesForm, RenameableSettingsForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    SubtitleLanguage
+    SubtitleLanguage, Setting
 )
 from teams.signals import api_teamvideo_new
 from django.shortcuts import get_object_or_404, redirect, render_to_response
@@ -58,7 +59,7 @@ from teams.permissions import (
     can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
     can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign,
-    can_join_team, can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task
+    can_join_team, can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task, can_rename_team
 )
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
@@ -333,6 +334,51 @@ def upload_logo(request, slug):
         output['error'] = form.get_errors()
 
     return HttpResponse(json.dumps(output))
+
+@render_to('teams/guidelines.html')
+@login_required
+def edit_guidelines(request, slug):
+    team = Team.get(slug, request.user)
+
+    initial = dict((s.key_name, s.data) for s in team.settings.messages_guidelines())
+    if request.POST:
+        form = GuidelinesMessagesForm(request.POST, initial=initial)
+
+        if form.is_valid():
+            for key, val in form.cleaned_data.items():
+                setting, c = Setting.objects.get_or_create(team=team, key=Setting.KEY_IDS[key])
+                setting.data = val
+                setting.save()
+
+        messages.success(request, _(u'Guidelines and messages updated.'))
+        return HttpResponseRedirect(request.path)
+    else:
+        form = GuidelinesMessagesForm(initial=initial)
+
+    return { 'team': team, 'form': form, }
+
+@render_to('teams/settings.html')
+@login_required
+def edit_settings(request, slug):
+    team = Team.get(slug, request.user)
+
+    if can_rename_team(team, request.user):
+        FormClass = RenameableSettingsForm
+    else:
+        FormClass = SettingsForm
+
+    if request.POST:
+        form = FormClass(request.POST, request.FILES, instance=team)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(request, _(u'Settings saved.'))
+            return HttpResponseRedirect(request.path)
+    else:
+        form = FormClass(instance=team)
+
+    return { 'team': team, 'form': form, }
 
 
 # Videos
@@ -693,6 +739,16 @@ def highlight(request, slug, highlight=True):
     item.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
+
+@render_to_json
+def search_members(request, slug):
+    team = Team.get(slug, request.user)
+    q = request.GET.get('q')
+
+    results = [[m.user.id, m.user.username]
+               for m in team.members.filter(user__username__icontains=q)]
+
+    return { 'results': results }
 
 # Tasks
 TEAM_LANGUAGES = []

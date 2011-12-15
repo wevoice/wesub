@@ -62,7 +62,7 @@ def _execute_language_task(language, event_name):
     video = language.video
     teams = _teams_to_notify(video)
     for team in teams:
-        team_tasks.api_notify_on_subtitles_activity.delay(
+        team_tasks.api_notify_on_language_activity.delay(
             team.pk,
             language.pk,
             event_name

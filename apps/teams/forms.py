@@ -568,19 +568,29 @@ class GhostTaskDeleteForm(forms.Form):
 
 
 class GuidelinesMessagesForm(forms.Form):
-    messages_invite = forms.CharField(max_length=1024, required=False)
-    messages_manager = forms.CharField(max_length=1024, required=False)
-    messages_admin = forms.CharField(max_length=1024, required=False)
-    messages_application = forms.CharField(max_length=1024, required=False)
+    messages_invite = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    messages_manager = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    messages_admin = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    messages_application = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
 
-    guidelines_subtitle = forms.CharField(max_length=1024, required=False)
-    guidelines_translate = forms.CharField(max_length=1024, required=False)
-    guidelines_review = forms.CharField(max_length=1024, required=False)
+    guidelines_subtitle = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    guidelines_translate = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    guidelines_review = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
 
-class SettingsForm(forms.ModelForm):
+
+class RenameableSettingsForm(forms.ModelForm):
+    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
+
     class Meta:
         model = Team
-        fields = ('name', 'description', 'workflow_enabled')
+        fields = ('name', 'description', 'logo', 'is_visible')
+
+class SettingsForm(forms.ModelForm):
+    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
+
+    class Meta:
+        model = Team
+        fields = ('description', 'logo', 'is_visible')
 
 
 class WorkflowForm(forms.ModelForm):
