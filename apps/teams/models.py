@@ -1498,13 +1498,13 @@ class TeamNotificationSetting(models.Model):
     
     TODO: allow email notifications
     """
-    EVENT_VIDEO_NEW = "event-video-new"
-    EVENT_VIDEO_EDITED = "event-video-edited"
-    EVENT_LANGUAGE_NEW = "event-language-new"
-    EVENT_LANGUAGE_EDITED = "event-language-edit"
-    EVENT_SUBTITLE_NEW = "event-subtitle-new"
-    EVENT_SUBTITLE_APPROVED = "event-subtitle-approved"
-    EVENT_SUBTITLE_REJECTED = "event-subtitle-rejected"
+    EVENT_VIDEO_NEW = "video-new"
+    EVENT_VIDEO_EDITED = "video-edited"
+    EVENT_LANGUAGE_NEW = "language-new"
+    EVENT_LANGUAGE_EDITED = "language-edit"
+    EVENT_SUBTITLE_NEW = "subs-new"
+    EVENT_SUBTITLE_APPROVED = "subs-approved"
+    EVENT_SUBTITLE_REJECTED = "subs-rejected"
  
     team = models.OneToOneField(Team, related_name="notification_settings")
     # the url to post the callback notifing partners of new video activity

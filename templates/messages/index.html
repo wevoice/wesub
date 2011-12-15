@@ -123,6 +123,9 @@
     {% endwith %}
 
     <div class="view grid_9 alpha">
+        <div class="tools">
+            <a class="button" href="{% url messages:new %}">{% trans "Compose" %}</a>
+        </div>
     {% if message_list %}
         {% if is_paginated %}{% paginator %}{% endif %}
         
