@@ -21,8 +21,10 @@ def send_new_message_notification(message_id):
         return
 
     to = "%s <%s>" % (user, user.email)
-    
-    subject = _(u"%(author)s sent you a message on Universal Subtitles: %(subject)s")
+    if message.author:
+        subject = _(u"New message from %(author)s on Universal Subtitles: %(subject)s")
+    else: 
+        subject = _("New message on Universal Subtitles: %(subject)s")
     subject = subject % {
         'author': message.author, 
         'subject': message.subject

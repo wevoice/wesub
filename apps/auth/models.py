@@ -440,6 +440,7 @@ class EmailConfirmationManager(models.Manager):
 
     def send_confirmation(self, user):
         assert user.email
+        from messages.models import Message
         
         self.filter(user=user).delete()
         
@@ -460,8 +461,8 @@ class EmailConfirmationManager(models.Manager):
         subject = u'Please confirm your email address for %s' % current_site.name
         message = render_to_string(
             "auth/email_confirmation_message.txt", context)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
-                  [user.email])
+        msg_obj = Message(user=user, subject=subject, content=message)
+        msg_obj.save()
         return self.create(
             user=user,
             sent=datetime.now(),

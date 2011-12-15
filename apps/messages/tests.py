@@ -55,3 +55,12 @@ class MessageTest(TestCase):
                 
         self._create_message(self.user)
         self.assertEquals(len(mail.outbox), 0)
+
+    def test_message_to_optout_user(self):
+        self.user.notify_by_message = False
+        self.user.save()
+        self._create_message(self.user)
+        self.assertEquals(len(mail.outbox), 0)
+        self.assertEquals(Message.objects.unread().filter(user=self.user).count(), 0)
+        self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
+        
