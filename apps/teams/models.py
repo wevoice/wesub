@@ -1234,16 +1234,15 @@ class Task(models.Model):
         return u'%d' % self.id
 
 
-    def to_dict(self, user=None):
-        '''Return a dictionary representing this task.
+    def to_dict(self, request, user=None):
+        '''Return a dictionary representing this task.'''
 
-        Useful for converting to JSON.
-
-        '''
         from teams.permissions import can_perform_task, can_assign_task, can_delete_task
 
         return { 'pk': self.id,
                  'team': self.team.id if self.team else None,
+                 'video_id': self.team_video.video.video_id,
+                 'video_url': self.team_video.video.get_video_url(),
                  'team_video': self.team_video.id if self.team_video else None,
                  'team_video_display': unicode(self.team_video) if self.team_video else None,
                  'team_video_url': self.team_video.video.get_absolute_url() if self.team_video else None,
