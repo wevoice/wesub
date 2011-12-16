@@ -442,7 +442,7 @@ def add_project(request, slug):
 
             messages.success(request, _(u'Project added.'))
             return HttpResponseRedirect(
-                    reverse('teams:edit_projects', args=[], kwargs={'slug': slug}))
+                    reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
     else:
         form = ProjectForm()
         workflow_form = WorkflowForm()
