@@ -63,9 +63,7 @@
             </div>
 
             <div class="grid_9 submit">
-                <a class="button delete project-delete">Delete</a>
-                <a class="button cancel project-cancel">Cancel</a>
-                <a class="button save project-save">Save</a>
+                <a class="button cancel project-cancel" href="{% url teams:settings_projects slug=team.slug %}">Cancel</a>
                 <input type="submit" class="submit save" value="Save Changes" name="save" />
             </div>
         </form>
