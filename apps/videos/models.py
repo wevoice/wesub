@@ -28,6 +28,7 @@ from django.utils.safestring import mark_safe
 from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_save
+from django.db.models import Q
 from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
 from django.conf import settings
@@ -1346,6 +1347,8 @@ class ActionRenderer(object):
             info = self.render_APPROVE_VERSION(item)
         elif item.action_type == Action.REJECT_VERSION:
             info = self.render_REJECT_VERSION(item)                
+        elif item.action_type == Action.MEMBER_JOINED:
+            info = self.render_MEMBER_JOINED(item)
 
         else:
             info = ''
@@ -1466,6 +1469,16 @@ class ActionRenderer(object):
 
         return msg % kwargs
 
+    def render_MEMBER_JOINED(self, item):
+        msg = _("%s joined the %s team as a %s" % (
+            item.user, item.team, item.member.role))
+        return msg
+
+class ActionManager(models.Manager):
+    
+    def for_user(self, user):
+        return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
+        
 class Action(models.Model):
     ADD_VIDEO = 1
     CHANGE_TITLE = 2
@@ -1494,13 +1507,16 @@ class Action(models.Model):
     renderer_for_video = ActionRenderer('videos/_action_tpl_video.html')
     
     user = models.ForeignKey(User, null=True, blank=True)
-    video = models.ForeignKey(Video)
+    video = models.ForeignKey(Video, null=True, blank=True)
     language = models.ForeignKey(SubtitleLanguage, blank=True, null=True)
     team = models.ForeignKey("teams.Team", blank=True, null=True)
+    member = models.ForeignKey("teams.TeamMember", blank=True, null=True)
     comment = models.ForeignKey(Comment, blank=True, null=True)
     action_type = models.IntegerField(choices=TYPES)
     new_video_title = models.CharField(max_length=2048, blank=True)
     created = models.DateTimeField()
+    
+    objects = ActionManager()
     
     class Meta:
         ordering = ['-created']
@@ -1525,7 +1541,7 @@ class Action(models.Model):
     def is_add_version(self):
         return self.action_type == self.ADD_VERSION
 
-    def is_add_contributor(self):
+    def is_member_joined(self):
         return self.action_type == self.MEMBER_JOINED
     
     def is_comment(self):
@@ -1554,7 +1570,15 @@ class Action(models.Model):
             return self.user.profile_set.all()[0]
         except IndexError:
             pass        
-    
+
+    @classmethod
+    def create_new_member_handler(cls, member):
+        action = cls(team=member.team, user=member.user)
+        action.created = datetime.now()
+        action.action_type = cls.MEMBER_JOINED
+        action.member = member
+        action.save()
+        
     @classmethod
     def change_title_handler(cls, video, user):
         action = cls(new_video_title=video.title, video=video)
@@ -1563,6 +1587,7 @@ class Action(models.Model):
         action.action_type = cls.CHANGE_TITLE
         action.save()
     
+        [type(y) for y in kwargs.values()]
     @classmethod
     def create_comment_handler(cls, sender, instance, created, **kwargs):
         if created:
