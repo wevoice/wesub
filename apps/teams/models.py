@@ -865,11 +865,15 @@ class TeamMember(models.Model):
         if created:
             notifier.team_member_new(instance)
         
+    @classmethod    
+    def on_member_deleted(self, sender, instance, *args, **kwargs):
+        notifier.team_member_leave(instance)
 
     class Meta:
         unique_together = (('team', 'user'),)
 
 post_save.connect(TeamMember.on_member_saved, TeamMember)
+post_delete.connect(TeamMember.on_member_deleted, TeamMember)
 
 class MembershipNarrowing(models.Model):
     """Represent narrowings that can be made on memberships.

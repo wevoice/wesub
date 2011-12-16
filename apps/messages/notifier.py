@@ -65,14 +65,7 @@ def team_member_new(member):
     # as a team might have thousands of members, this one item has
     # to show up on all of them
     Action.create_new_member_handler(member)
-    # we send a bunch of 
-    msg = Message()
-    msg.subject = ugettext(u'Your application to %s was denied.') % member.team.name
-    msg.content = ugettext(u"Sorry, your application to %s was rejected.") % member.team.name
-    msg.user = member.user
-    msg.object = member.team
-    msg.save()
-   # notify  admins and owners through messages
+    # notify  admins and owners through messages
     notifiable = TeamMember.objects.filter( team=member.team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     for m in notifiable:
@@ -88,4 +81,25 @@ def team_member_new(member):
         msg.object = m.team
         msg.save()
 
-
+def team_member_leave(member):
+    from videos.models import Action   
+    from teams.models import TeamMember
+    # the feed item should appear on the timeline for all team members
+    # as a team might have thousands of members, this one item has
+    # to show up on all of them
+    Action.create_new_member_handler(member)
+    # notify  admins and owners through messages
+    notifiable = TeamMember.objects.filter( team=member.team,
+       role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    for m in notifiable:
+        msg = Message()
+        if m.user == member.user:
+             base_str = ugettext("You've left the %s team.'" %
+                                 (m.team))
+        base_str = ugettext("%s left the %s team " % (
+            m.user, m.team))
+        msg.subject = ugettext(base_str)
+        msg.content = ugettext(base_str + " on %s" % (datetime.datetime.now()))
+        msg.user = m.user
+        msg.object = m.team
+        msg.save()
