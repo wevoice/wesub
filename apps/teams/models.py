@@ -25,7 +25,7 @@ from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
 from django.db.models.signals import post_save, post_delete
 from messages.models import Message
-from messages import notifier
+from messages import tasks as notifier
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.http import Http404
@@ -863,11 +863,11 @@ class TeamMember(models.Model):
     @classmethod    
     def on_member_saved(self, sender, instance, created, *args, **kwargs):
         if created:
-            notifier.team_member_new(instance)
+            notifier.team_member_new.delay(instance.pk)
         
     @classmethod    
     def on_member_deleted(self, sender, instance, *args, **kwargs):
-        notifier.team_member_leave(instance)
+        notifier.team_member_leave.delay(instance.team.pk, instance.user.pk)
 
     class Meta:
         unique_together = (('team', 'user'),)
@@ -909,14 +909,20 @@ class Application(models.Model):
 
     def approve(self):
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
-        notifier.team_application_approved(self)
+        notifier.team_application_approved.delay(self.pk)
         self.delete()
     
     def deny(self):
         self._send_deny_message()
-        notifier.team_application_denied(self)
+        notifier.team_application_denied.delay(self.pk)
         self.delete()
         
+    @classmethod    
+    def on_saved(self, sender, instance, created, *args, **kwargs):
+        if created:
+            notifier.team_member_new.delay(instance.pk)
+        
+post_save.connect(Application.on_saved, Application)
 class Invite(models.Model):
     team = models.ForeignKey(Team, related_name='invitations')
     user = models.ForeignKey(User, related_name='team_invitations')
@@ -949,7 +955,7 @@ models.signals.pre_delete.connect(Message.on_delete, Invite)
     
 def invite_send_message(sender, instance, created, **kwargs):
     if created:
-        notifier.team_invitation_sent(instance)
+        notifier.team_invitation_sent.delay(instance.pk)
    
 post_save.connect(invite_send_message, Invite, dispatch_uid="teams.invite.send_invite")
 
@@ -1523,13 +1529,13 @@ class TeamNotificationSetting(models.Model):
         
     def notify(self, video, event_name, language_pk=None, version_pk=None):
         """
-        Resolves what the notifier class is for this settings and
+        Resolves what the notification class is for this settings and
         fires notfications it configures
         """
-        notifier = self.get_notification_class()(
+        notification = self.get_notification_class()(
             self.team, video, event_name, language_pk, version_pk)
         if self.request_url:
-            success, content = notifier.send_http_request(
+            success, content = notification.send_http_request(
                 self.request_url,
                 self.basic_auth_username,
                 self.basic_auth_password
@@ -1538,7 +1544,7 @@ class TeamNotificationSetting(models.Model):
         # FIXME: spec and test this, for now just return
         return
         if self.email:
-            notifier.send_email(self.email, self.team, video, event_name, language_pk)
+            notification.send_email(self.email, self.team, video, event_name, language_pk)
         
     def __unicode__(self):
         return u'NotificationSettings for team %s' % (self.team)

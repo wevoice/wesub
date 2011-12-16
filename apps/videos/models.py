@@ -1349,6 +1349,8 @@ class ActionRenderer(object):
             info = self.render_REJECT_VERSION(item)                
         elif item.action_type == Action.MEMBER_JOINED:
             info = self.render_MEMBER_JOINED(item)
+        elif item.action_type == Action.MEMBER_LEFT:
+            info = self.render_MEMBER_LEFT(item)
 
         else:
             info = ''
@@ -1473,6 +1475,12 @@ class ActionRenderer(object):
         msg = _("%s joined the %s team as a %s" % (
             item.user, item.team, item.member.role))
         return msg
+        
+    def render_MEMBER_LEFT(self, item):
+        msg = _("%s left the %s team" % (
+            item.user, item.team))
+        return msg
+
 
 class ActionManager(models.Manager):
     
@@ -1490,6 +1498,7 @@ class Action(models.Model):
     APPROVE_VERSION = 8
     MEMBER_JOINED = 9
     REJECT_VERSION = 10
+    MEMBER_LEFT = 11
     TYPES = (
         (ADD_VIDEO, _(u'add video')),
         (CHANGE_TITLE, _(u'change title')),
@@ -1500,6 +1509,7 @@ class Action(models.Model):
         (SUBTITLE_REQUEST, _(u'request subtitles')),
         (APPROVE_VERSION, _(u'approve version')),
         (MEMBER_JOINED, _(u'add contributor')),
+        (MEMBER_LEFT, _(u'remove contributor')),
         (REJECT_VERSION, _(u'reject version')),
     )
     
@@ -1571,6 +1581,13 @@ class Action(models.Model):
         except IndexError:
             pass        
 
+    @classmethod
+    def create_member_left_handler(cls, team, user):
+        action = cls(team=team, user=user)
+        action.created = datetime.now()
+        action.action_type = cls.MEMBER_LEFT
+        action.save()
+        
     @classmethod
     def create_new_member_handler(cls, member):
         action = cls(team=member.team, user=member.user)

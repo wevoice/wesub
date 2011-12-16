@@ -174,6 +174,7 @@ class MessageTest(TestCase):
         contributor_messge_count_1, contributor_email_count_1 = _get_counts(contributor)
 
         # now delete and check numers
+        tm_user = tm.user
         tm.delete()
         # save the last team member and check that each group has appropriate counts 
         # owner and admins should receive email + message
@@ -194,7 +195,7 @@ class MessageTest(TestCase):
 
 
         # now, this has to show up on everybody activitis fed
-        action = Action.objects.get(team=team, user=tm.user, action_type=Action.MEMBER_JOINED)
+        action = Action.objects.get(team=team, user=tm_user, action_type=Action.MEMBER_LEFT)
         self.assertTrue(Action.objects.for_user(tm.user).filter(pk=action.pk).exists())
         self.assertTrue(Action.objects.for_user(owner.user).filter(pk=action.pk).exists())
         self.assertTrue(Action.objects.for_user(manager.user).filter(pk=action.pk).exists())
