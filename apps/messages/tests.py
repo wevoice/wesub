@@ -24,7 +24,7 @@ from apps.auth.models import CustomUser as User
 from django.core import mail
 
 from apps.messages.models import Message
-from teams.models import Team, TeamMember
+from teams.models import Team, TeamMember, Application
 from videos.models import Action
 
 class MessageTest(TestCase):
@@ -201,3 +201,57 @@ class MessageTest(TestCase):
         self.assertTrue(Action.objects.for_user(manager.user).filter(pk=action.pk).exists())
         self.assertTrue(Action.objects.for_user(contributor.user).filter(pk=action.pk).exists())
         self.assertTrue(Action.objects.for_user(admin.user).filter(pk=action.pk).exists())
+        
+    def test_application_new(self):
+        def _get_counts(member):
+            email_to = "%s <%s>" %(member.user.username, member.user.email) 
+            return Message.objects.filter(user=member.user).count() , \
+                len([x for x in mail.outbox if email_to in x.recipients()])
+            
+        
+        team , created= Team.objects.get_or_create(name='test', slug='test')
+        applying_user = User.objects.all()[0]
+        # creates dummy users:
+        for x in xrange(0,4):
+            user, member = User.objects.get_or_create(
+                username="test%s" % x,
+                email = "test%s@example.com" % x,
+            )
+            tm = TeamMember(team=team, user=user)
+            if x == 0:
+                tm.role = TeamMember.ROLE_OWNER
+                owner = tm
+            elif x == 1:
+                tm.role = TeamMember.ROLE_ADMIN
+                admin = tm
+            elif x == 2:
+                tm.role = TeamMember.ROLE_MANAGER
+                manager = tm
+            elif x == 3:
+                tm.role = TeamMember.ROLE_CONTRIBUTOR
+                contributor = tm
+            tm.save()
+            
+        # now make sure we count previsou messages
+        owner_messge_count_1, owner_email_count_1 = _get_counts(owner)
+        admin_messge_count_1, admin_email_count_1 = _get_counts(admin)
+        manager_messge_count_1, manager_email_count_1 = _get_counts(manager)
+        contributor_messge_count_1, contributor_email_count_1 = _get_counts(contributor)
+
+        # now delete and check numers
+        Application.objects.create(team=team,user=applying_user)
+        # owner and admins should receive email + message
+        owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
+        self.assertEqual(owner_messge_count_1 + 1, owner_messge_count_2)
+        self.assertEqual(owner_email_count_1 + 1, owner_email_count_2)
+        admin_messge_count_2, admin_email_count_2 = _get_counts(admin)
+        self.assertEqual(admin_messge_count_1 + 1, admin_messge_count_2)
+        self.assertEqual(admin_email_count_1 + 1, admin_email_count_2)
+        # manager shoud not
+        manager_messge_count_2, manager_email_count_2 = _get_counts(manager)
+        self.assertEqual(manager_messge_count_1 , manager_messge_count_2)
+        self.assertEqual(manager_email_count_1 , manager_email_count_2)
+        # contributor shoud not
+        contributor_messge_count_2, contributor_email_count_2 = _get_counts(contributor)
+        self.assertEqual(contributor_messge_count_1 , contributor_messge_count_2)
+        self.assertEqual(contributor_email_count_1 , contributor_email_count_2)

@@ -86,15 +86,19 @@ def team_invitation_sent(invite_pk):
 @task()
 def application_sent(application_pk):
     from messages.models import Message
-    from teams.models import Application
+    from teams.models import Application, TeamMember
+    
     application = Application.objects.get(pk=application_pk)
-    msg = Message()
-    msg.subject = ugettext(u'Your application to %s was approved!') % application.team.name
-    msg.content = ugettext(u"Congratulations, you're now a member of %s!") % application.team.name
-    msg.user = application.user
-    msg.object = application.team
-    msg.author = User.get_anonymous()
-    msg.save()
+    notifiable = TeamMember.objects.filter( team=application.team,
+       role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    for m in notifiable:
+        msg = Message()
+        msg.subject = ugettext(u'%s is applying for team %s') % (application.user, application.team.name)
+        msg.content = ugettext(u'%s is applying for team %s') % (application.user, application.team.name)
+        msg.user = m.user
+        msg.object = application.team
+        msg.author = application.user
+        msg.save()
 
 def team_application_approved(application_pk):
     from messages.models import Message
