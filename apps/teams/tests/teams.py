@@ -630,18 +630,6 @@ class TeamsTest(TestCase):
         response = self.client.get(reverse("teams:index"), {'o': 'my'})
         self.failUnlessEqual(response.status_code, 200)
 
-
-        url = reverse("teams:settings", kwargs={"slug": "volunteer1"})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 404)
-
-        self.client.logout()
-
-        url = reverse("teams:settings", kwargs={"slug": "volunteer"})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 302)
-
-        self.client.login(**self.auth)
         #-------------- applications ----------------
         url = reverse("teams:applications", kwargs={"slug": team.slug})
         response = self.client.get(url)

@@ -248,7 +248,7 @@ def create(request):
         if form.is_valid():
             team = form.save(user)
             messages.success(request, _('Your team has been created. Review or edit its information below.'))
-            return redirect(reverse("teams:settings", kwargs={"slug":team.slug}))
+            return redirect(reverse("teams:settings_basic", kwargs={"slug":team.slug}))
     else:
         form = CreateTeamForm(request.user)
 
