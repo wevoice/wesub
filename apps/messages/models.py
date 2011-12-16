@@ -124,6 +124,15 @@ class Message(models.Model):
         if not self.subject and not self.content and not self.object:
             raise ValidationError(_(u'You should enter subject or message.'))
     
+    def save(self, *args, **kwargs):
+        """
+        If the receipient (user) has opted out completly of receiving site
+        messages we mark the message as read, but still stored in the database
+        """
+        if not self.user.notify_by_message:
+            self.read = True
+        super (Message, self).save(*args, **kwargs)
+        
     @classmethod
     def on_delete(cls, sender, instance, **kwargs):
         ct = ContentType.objects.get_for_model(sender)
@@ -133,7 +142,7 @@ class Message(models.Model):
     def on_message_saved(self, sender, instance, created, *args, **kwargs):
         from messages.tasks import send_new_message_notification
 
-        if created and instance.user.notify_by_email:
+        if created and instance.user.notify_by_email and instance.user.notify_by_message:
             send_new_message_notification.delay(instance.pk)
         
 post_save.connect(Message.on_message_saved, Message)

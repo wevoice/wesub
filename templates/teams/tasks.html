@@ -19,6 +19,30 @@
     {% endwith %}
 
     <div class="panel-holder view grid_9 alpha">
+        {% if team|can_add_tasks:user and filters.team_video != None %}
+            <div class="tools">
+                <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">Add Task</a>
+            </div>
+        {% endif %}
+
+        {% if filters.assignee or filters.team_video or filters.language %}
+        <p class="active-filters">Showing
+            {% if filters.assignee == 'none' %}
+                <strong>unassigned</strong>
+            {% endif %}
+            {% if filters.language %}
+                <strong>{{ filters.language }}</strong> language
+            {% endif %}
+            tasks
+            {% if filters.team_video %}
+                for <strong>{{ filters.team_video }}</strong>
+            {% endif %}
+            {% if filters.assignee and filters.assignee != 'none' %}
+                assigned to <strong>{{ filters.assignee }}</strong>
+            {% endif %}
+        </p>
+        {% endif %}
+
         <ul class="tasks listing">
             {% for task in tasks %}
                 <li>

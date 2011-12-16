@@ -46,24 +46,24 @@
     <div class="view grid_9 alpha">
         <form method="post" action="." class="create-task">
             {{ form.non_field_errors }}
-            <h3>{% trans "New Task" %}</h3>
+            <h3 class="form-title">{% trans "New Task" %}</h3>
 
             <div class="grid_4 alpha">
                 <fieldset>
                     <div class="type-selector">
-                        {{ form.label.type }}
+                        <label>{% trans "What needs to be done?" %}</label>
                         {{ form.errors.type }}
                         {{ form.type }}
                     </div>
                     <div class="chosen">
                         <div class="language-selector">
-                            <label>Language</label>
+                            <label>{% trans "What language is needed?" %}</label>
                             {{ form.errors.language }}
                             {{ form.language }}
                         </div>
                         {% if can_assign %}
                             <div class="assignee-selector">
-                                <label>Assignee</label>
+                                <label>{% trans "Who should do it?" %}</label>
                                 {{ form.errors.assignee }}
                                 {{ form.assignee }}
                             </div>
@@ -76,11 +76,13 @@
             </div>
 
             <div class="grid_4 omega">
-                <h5>Video</h5>
-                <div class="preselected">
-                    <p>{{ team_video.video }}</p>
-                    <img src="{{ team_video.video.thumbnail }}" alt="thumbnail"/>
-                </div>
+                <fieldset>
+                    <label>{% trans "Selected Video" %}</label>
+                    <div class="preselected">
+                        <p>{{ team_video.video }}</p>
+                        <img src="{{ team_video.video.thumbnail }}" alt="thumbnail"/>
+                    </div>
+                </fieldset>
             </div>
             <div class="grid_9 submit">
                 <button>{% trans "Save" %}</button>
@@ -91,6 +93,12 @@
     </div>
     <div class="controls grid_3 omega">
         <ul>
+            <li class="current">
+                <a href="#">{% trans "New task form" %}</a>
+            </li>
+            <li>
+                <a href="{% url teams:team_tasks team.slug %}?team_video={{ team_video.id }}">← {% trans "Back to tasks list" %}</a>
+            </li>
         </ul>
     </div>
 {% endblock %}

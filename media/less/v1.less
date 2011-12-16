@@ -288,6 +288,13 @@
 
 /* Listings */
 
+.v1 .view p.active-filters {
+    margin: 1.2em -8px 0 1em;
+    padding: 1em;
+    .border-radius(3px);
+    background-color: @faintest;
+}
+
 .v1 .listing {
     padding: 0;
 
@@ -339,7 +346,7 @@
                 color: @lighter;
 
                 h4 {
-                    padding: .5em 0;
+                    padding: .25em 0;
                 }
             }
 
@@ -354,7 +361,7 @@
 
             li > a, li > form a {
                 display: block;
-                padding: .5em 0;
+                padding: .25em 0;
 
                 &:after {
                     content: ' →';
@@ -645,6 +652,10 @@
 .v1 form {
     padding: 1em 0;
 
+    .form-title {
+        margin: 1em 0 0 5px;
+    }
+
     fieldset {
         padding-bottom: 3em;
 
@@ -693,18 +704,26 @@
             height: 5em;
         }
     }
+}
+.v1 .view form .preselected {
+    position: relative;
+    padding: 1em 1em 1em 75px;
+    margin: .5em 0;
+    background: @fainter;
+    .border-radius(3px);
+    min-height: 3em;
 
-    .preselected {
-        padding: 1em;
-        margin: .5em 0;
-        background: @fainter;
-        .border-radius(3px);
-
-        img {
-            max-width: 100%;
-        }
+    p {
+        float: none;
+        margin: 0;
     }
 
+    img {
+        position: absolute;
+        top: 1em;
+        left: 1em;
+        max-width: 50px;
+    }
 }
 .v1 .panel-holder form {
     float: left;
