@@ -759,9 +759,14 @@ class TeamsTest(TestCase):
             "message": u"test message",
             "role": TeamMember.ROLE_CONTRIBUTOR,
         }
+        user_mail_box_count = Message.objects.unread().filter(user=user2).count()
         invite_url = reverse("teams:invite_members", args=(), kwargs={'slug': team.slug})
         response = self.client.post(invite_url, data, follow=True)
         self.failUnlessEqual(response.status_code, 200)
+        
+        self.assertEqual(user_mail_box_count + 1,
+                         Message.objects.unread().filter(user=user2).count())
+        
 
         invite = Invite.objects.get(user__username=user2.username, team=team)
         self.assertEqual(invite.role, TeamMember.ROLE_CONTRIBUTOR)

@@ -93,7 +93,7 @@
                                 Assigned to {{ task.assignee_display }}
                             {% endif %}
 
-                            {% if task.perform_allowed %}
+                            {% if task.perform_allowed and task.assignee == request.user.id %}
                                 {% if task.type == "Subtitle" %}
                                     <a class="perform perform-task-{{ task.pk }}" href="">Perform Task</a>
 
@@ -199,25 +199,25 @@
                     </a>
                 </li>
                 <li class="type {% if request.GET.type == "Review" %}current{% endif %}">
-                    <a href="{% query_string type="Review" %}">
+                    <a href="{% query_string request.GET type="Review" %}">
                         Review
                         <span class="review">{{ category_counts.review }}</span>
                     </a>
                 </li>
                 <li class="type {% if request.GET.type == "Approve" %}current{% endif %}">
-                    <a href="{% query_string type="Approve" %}">
+                    <a href="{% query_string request.GET type="Approve" %}">
                         Approve
                         <span class="approve">{{ category_counts.approve }}</span>
                     </a>
                 </li>
                 <li class="type {% if request.GET.type == "Translate" %}current{% endif %}">
-                    <a href="{% query_string type="Translate" %}">
+                    <a href="{% query_string request.GET type="Translate" %}">
                         Translate
                         <span class="translate">{{ category_counts.translate }}</span>
                     </a>
                 </li>
                 <li class="type {% if request.GET.type == "Subtitle" %}current{% endif %}">
-                    <a href="{% query_string type="Subtitle" %}">
+                    <a href="{% query_string request.GET type="Subtitle" %}">
                         Subtitle
                         <span class="subtitle">{{ category_counts.subtitle }}</span>
                     </a>
@@ -254,25 +254,24 @@
 
     <script type="text/javascript">
         $(function() {
+
+            var root = document.URL.split("?")[0];
             $language = $("select.lang-filter", ".controls");
-            $language.change(function(e) {
-                var lang = $language.val();
-                if (lang !== '') {
-                    window.location = document.URL.split("?")[0] + '?lang=' + lang;
-                } else {
-                    window.location = document.URL.split("?")[0];
-                }
+            $assignee = $("select.assignee-filter", ".controls");
+
+            $('select.lang-filter, select.assignee-filter', '.controls').change(function(e) {
+                BuildParams($language.val(), $assignee.val());
             });
 
-            $assignee = $("select.assignee-filter", ".controls");
-            $assignee.change(function(e) {
-                var a = $assignee.val();
-                if (a !== '') {
-                    window.location = document.URL.split("?")[0] + '?assignee=' + a;
-                } else {
-                    window.location = document.URL.split("?")[0];
+            function BuildParams(lang, assign) {
+                if (lang !== '') {
+                    lang = '&lang=' + lang;
                 }
-            });
+                if (assign !== '') {
+                    assign = '&assignee=' + assign;
+                }
+                window.location = '?' + lang + assign;
+            }
 
             $('a.action-assign').click(function(e) {
                 $(e.target).parents('.admin-controls')

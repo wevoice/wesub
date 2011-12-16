@@ -1475,7 +1475,7 @@ class Action(models.Model):
     ADD_TRANSLATION = 6
     SUBTITLE_REQUEST = 7
     APPROVE_VERSION = 8
-    ADD_CONTRIBUTOR = 9
+    MEMBER_JOINED = 9
     REJECT_VERSION = 10
     TYPES = (
         (ADD_VIDEO, _(u'add video')),
@@ -1486,7 +1486,7 @@ class Action(models.Model):
         (ADD_VIDEO_URL, _(u'add video url')),
         (SUBTITLE_REQUEST, _(u'request subtitles')),
         (APPROVE_VERSION, _(u'approve version')),
-        (ADD_CONTRIBUTOR, _(u'add contributor')),
+        (MEMBER_JOINED, _(u'add contributor')),
         (REJECT_VERSION, _(u'reject version')),
     )
     
@@ -1496,6 +1496,7 @@ class Action(models.Model):
     user = models.ForeignKey(User, null=True, blank=True)
     video = models.ForeignKey(Video)
     language = models.ForeignKey(SubtitleLanguage, blank=True, null=True)
+    team = models.ForeignKey("teams.Team", blank=True, null=True)
     comment = models.ForeignKey(Comment, blank=True, null=True)
     action_type = models.IntegerField(choices=TYPES)
     new_video_title = models.CharField(max_length=2048, blank=True)
@@ -1525,7 +1526,7 @@ class Action(models.Model):
         return self.action_type == self.ADD_VERSION
 
     def is_add_contributor(self):
-        return self.action_type == self.ADD_CONTRIBUTOR
+        return self.action_type == self.MEMBER_JOINED
     
     def is_comment(self):
         return self.action_type == self.COMMENT

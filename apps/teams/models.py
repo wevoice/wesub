@@ -25,6 +25,7 @@ from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
 from django.db.models.signals import post_save, post_delete
 from messages.models import Message
+from messages import notifier
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.http import Http404
@@ -892,32 +893,16 @@ class Application(models.Model):
     class Meta:
         unique_together = (('team', 'user'),)
     
-    def _send_approve_message(self):
-        msg = Message()
-        msg.subject = ugettext(u'Your application to %s was approved!') % self.team.name
-        msg.content = ugettext(u"Congratulations, you're now a member of %s!") % self.team.name
-        msg.user = self.user
-        msg.object = self.team
-        msg.author = User.get_anonymous()
-        msg.save()
-
-    def _send_deny_message(self):
-        msg = Message()
-        msg.subject = ugettext(u'Your application to %s was denied.') % self.team.name
-        msg.content = ugettext(u"Sorry, your application to %s was rejected.") % self.team.name
-        msg.user = self.user
-        msg.object = self.team
-        msg.author = User.get_anonymous()
-        msg.save()
-
+        
 
     def approve(self):
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
-        self._send_approve_message()
+        notifier.team_application_approved(self)
         self.delete()
     
     def deny(self):
         self._send_deny_message()
+        notifier.team_application_denied(self)
         self.delete()
         
 class Invite(models.Model):
@@ -952,13 +937,8 @@ models.signals.pre_delete.connect(Message.on_delete, Invite)
     
 def invite_send_message(sender, instance, created, **kwargs):
     if created:
-        msg = Message()
-        msg.subject = ugettext(u'Invitation to join a team')
-        msg.user = instance.user
-        msg.object = instance
-        msg.author = instance.author
-        msg.save()
-    
+        notifier.team_invitation_sent(instance)
+   
 post_save.connect(invite_send_message, Invite, dispatch_uid="teams.invite.send_invite")
 
 

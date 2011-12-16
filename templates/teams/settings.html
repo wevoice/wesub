@@ -1,5 +1,5 @@
 {% extends "teams/base.html" %}
-{% load i18n teams_tags paginator doorman media_compressor verbatim_templatetag %}
+{% load i18n teams_tags paginator doorman media_compressor %}
 
 {% block title %}
     {{ team }} {% trans 'Settings' %} | Universal Subtitles
@@ -10,63 +10,56 @@
         {% include "teams/_tabs.html" %}
     {% endwith %}
 
-    <div class="panel-holder view grid_9 alpha">
-        <div class="tab panel-projects" style="">
-            <div class="panel-basic">
-                <div id="basic_settings_form">
-                    <form class="team-settings" enctype="multipart/form-data" method="POST" action="">
-                        {% csrf_token %}
+    <div class="view grid_9 alpha">
+        <form class="team-settings" enctype="multipart/form-data" method="POST" action="">
+            {% csrf_token %}
 
-                        <div class="grid_4 alpha">
-                            <fieldset>
-                                <legend>Team Details</legend>
+            <div class="grid_4 alpha">
+                <fieldset>
+                    <legend>Team Details</legend>
 
-                                <label for="id_name">Name</label>
+                    <label for="id_name">Name</label>
 
-                                {% if team|can_rename_team:request.user %}
-                                    {{ form.name }}
-                                {% else %}
-                                    <input id="id_name" type="text" name="name" value="{{ team.name }}" disabled="disabled" />
-                                {% endif %}
+                    {% if team|can_rename_team:request.user %}
+                        {{ form.name }}
+                    {% else %}
+                        <input id="id_name" type="text" name="name" value="{{ team.name }}" disabled="disabled" />
+                    {% endif %}
 
-                                <label for="basic_slug">Team URL</label>
-                                <input id="basic_slug" type="text" name="slug" disabled="disabled" value="" />
-                                <p class="notation">http://universalsubtitles.org/teams/<em>team_slug</em></p>
+                    <label for="basic_slug">Team URL</label>
+                    <input id="basic_slug" type="text" name="slug" disabled="disabled" value="" />
+                    <p class="notation">http://universalsubtitles.org/teams/<em>team_slug</em></p>
 
-                                <label for="basic_description">Description</label>
-                                {{ form.description }}
-                                <p class="notation">All urls will be converted to links.</p>
-                            </fieldset>
-                        </div>
-
-                        <div class="grid_4 omega">
-                            <fieldset>
-                                <legend>Display Settings</legend>
-
-                                <label for="id_logo">Logo/Banner</label>
-                                {% if team.logo %}
-                                    <img id="current_logo" src="{{ team.logo_thumbnail }}"/>
-                                {% endif %}
-                                <input type="file" id="id_logo" name="logo" />
-                                <p class="notation">Max 940 x 235</p>
-
-                                <label for="id_is_visible">{{ form.is_visible }} Publicly visible?</label>
-                            </fieldset>
-                        </div>
-
-                        <div class="grid_9 submit">
-                            {% comment %}
-                                TODO: This button should only be displayed if the logged-in-user has the Owner role for this team.
-                            {% endcomment %}
-                            <input type="submit" class="button delete project-delete" onclick="return confirm('{% trans "Do you really wish to delete this team?" %}')" value="Delete team" />
-
-                            <input type="submit" class="submit save" value="Save Changes" name="save" />
-                        </div>
-                    </form>
-                </div>
+                    <label for="basic_description">Description</label>
+                    {{ form.description }}
+                    <p class="notation">All urls will be converted to links.</p>
+                </fieldset>
             </div>
-        </div>
 
+            <div class="grid_4 omega">
+                <fieldset>
+                    <legend>Display Settings</legend>
+
+                    <label for="id_logo">Logo/Banner</label>
+                    {% if team.logo %}
+                        <img id="current_logo" src="{{ team.logo_thumbnail }}"/>
+                    {% endif %}
+                    <input type="file" id="id_logo" name="logo" />
+                    <p class="notation">Max 940 x 235</p>
+
+                    <label for="id_is_visible">{{ form.is_visible }} Publicly visible?</label>
+                </fieldset>
+            </div>
+
+            <div class="grid_9 submit">
+                {% comment %}
+                    TODO: This button should only be displayed if the logged-in-user has the Owner role for this team.
+                {% endcomment %}
+                <input type="submit" class="button delete project-delete" onclick="return confirm('{% trans "Do you really wish to delete this team?" %}')" value="Delete team" />
+
+                <input type="submit" class="submit save" value="Save Changes" name="save" />
+            </div>
+        </form>
         {% include "teams/_basic_settings.html" %}
     </div>
 

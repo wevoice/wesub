@@ -1,5 +1,5 @@
 {% extends "teams/base.html" %}
-{% load i18n teams_tags paginator doorman media_compressor verbatim_templatetag %}
+{% load i18n teams_tags paginator doorman media_compressor %}
 
 {% block title %}
     {{ team }} {% trans 'Settings' %} | Universal Subtitles
@@ -10,28 +10,26 @@
         {% include "teams/_tabs.html" %}
     {% endwith %}
 
-    <div class="panel-holder view grid_9 alpha">
-        <div class="tab panel-projects">
-            <div class="tools group panel-project">
-                <a class="button project-add" href="{% url teams:add_project slug=team.slug %}">Add Project</a>
-            </div>
-            <ul class="projects listing">
-                {% for project in projects %}
-                    {% if not project.is_default_project %}
-                        <li>
-                            <span>
-                                <a href="{% url teams:project_video_list slug=project.team.slug project_slug=project.slug %}">{{ project.name }}</a>
-                            </span>
-                            <ul class="actions">
-                                <li>
-                                    <a class="action-edit" href="{% url teams:edit_project slug=team.slug project_slug=project.slug %}">Edit</a>
-                                </li>
-                            </ul>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+    <div class="view grid_9 alpha">
+        <div class="tools group">
+            <a class="button project-add" href="{% url teams:add_project slug=team.slug %}">Add Project</a>
         </div>
+        <ul class="projects listing">
+            {% for project in projects %}
+                {% if not project.is_default_project %}
+                    <li>
+                        <span>
+                            <a href="{% url teams:project_video_list slug=project.team.slug project_slug=project.slug %}">{{ project.name }}</a>
+                        </span>
+                        <ul class="actions">
+                            <li>
+                                <a class="action-edit" href="{% url teams:edit_project slug=team.slug project_slug=project.slug %}">Edit</a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
         {% include "teams/_basic_settings.html" %}
     </div>
 

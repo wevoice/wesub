@@ -335,31 +335,9 @@ def upload_logo(request, slug):
 
     return HttpResponse(json.dumps(output))
 
-@render_to('teams/guidelines.html')
-@login_required
-def edit_guidelines(request, slug):
-    team = Team.get(slug, request.user)
-
-    initial = dict((s.key_name, s.data) for s in team.settings.messages_guidelines())
-    if request.POST:
-        form = GuidelinesMessagesForm(request.POST, initial=initial)
-
-        if form.is_valid():
-            for key, val in form.cleaned_data.items():
-                setting, c = Setting.objects.get_or_create(team=team, key=Setting.KEY_IDS[key])
-                setting.data = val
-                setting.save()
-
-        messages.success(request, _(u'Guidelines and messages updated.'))
-        return HttpResponseRedirect(request.path)
-    else:
-        form = GuidelinesMessagesForm(initial=initial)
-
-    return { 'team': team, 'form': form, }
-
 @render_to('teams/settings.html')
 @login_required
-def edit_settings(request, slug):
+def settings_basic(request, slug):
     team = Team.get(slug, request.user)
 
     if can_rename_team(team, request.user):
@@ -380,9 +358,31 @@ def edit_settings(request, slug):
 
     return { 'team': team, 'form': form, }
 
-@render_to('teams/permissions.html')
+@render_to('teams/settings-guidelines.html')
 @login_required
-def edit_permissions(request, slug):
+def settings_guidelines(request, slug):
+    team = Team.get(slug, request.user)
+
+    initial = dict((s.key_name, s.data) for s in team.settings.messages_guidelines())
+    if request.POST:
+        form = GuidelinesMessagesForm(request.POST, initial=initial)
+
+        if form.is_valid():
+            for key, val in form.cleaned_data.items():
+                setting, c = Setting.objects.get_or_create(team=team, key=Setting.KEY_IDS[key])
+                setting.data = val
+                setting.save()
+
+        messages.success(request, _(u'Guidelines and messages updated.'))
+        return HttpResponseRedirect(request.path)
+    else:
+        form = GuidelinesMessagesForm(initial=initial)
+
+    return { 'team': team, 'form': form, }
+
+@render_to('teams/settings-permissions.html')
+@login_required
+def settings_permissions(request, slug):
     team = Team.get(slug, request.user)
     workflow = Workflow.get_for_target(team.id, 'team')
 
@@ -404,14 +404,23 @@ def edit_permissions(request, slug):
 
     return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
 
-@render_to('teams/edit-projects.html')
+@render_to('teams/settings-languages.html')
 @login_required
-def edit_projects(request, slug):
+def settings_languages(request, slug):
+    team = Team.get(slug, request.user)
+
+    ## TODO: Form stuff
+
+    return { 'team': team }
+
+@render_to('teams/settings-projects.html')
+@login_required
+def settings_projects(request, slug):
     team = Team.get(slug, request.user)
     projects = team.project_set.all()
     return { 'team': team, 'projects': projects, }
 
-@render_to('teams/edit-projects-add.html')
+@render_to('teams/settings-projects-add.html')
 @login_required
 def add_project(request, slug):
     team = Team.get(slug, request.user)
@@ -440,7 +449,7 @@ def add_project(request, slug):
 
     return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
 
-@render_to('teams/edit-projects-edit.html')
+@render_to('teams/settings-projects-edit.html')
 @login_required
 def edit_project(request, slug, project_slug):
     team = Team.get(slug, request.user)
@@ -979,9 +988,22 @@ def _task_languages(team, user):
 
     return [{'code': l, 'name': SUPPORTED_LANGUAGES_DICT[l]} for l in languages]
 
-def _task_category_counts(team):
+def _task_category_counts(team, filters, user):
     # Realize the queryset here to avoid five separate DB calls.
     tasks = list(team.task_set.incomplete())
+
+    if filters['language']:
+        tasks = [t for t in tasks if t.language == filters['language']]
+
+    if filters['team_video']:
+        tasks = [t for t in tasks if t.team_video == filters['team_video']]
+
+    if filters['assignee']:
+        if filters['assignee'] == 'none':
+            tasks = [t for t in tasks if t.assignee == None]
+        else:
+            tasks = [t for t in tasks if t.assignee == user]
+
     counts = {'all': len(tasks)}
     for type in ['Subtitle', 'Translate', 'Review', 'Approve']:
         counts[type.lower()] = len([t for t in tasks
@@ -1057,11 +1079,11 @@ def team_tasks(request, slug):
 
     member = team.members.get(user=request.user)
     languages = _task_languages(team, request.user)
-    category_counts = _task_category_counts(team)
 
     filters = _get_task_filters(request)
 
     tasks = _tasks_list(request, team, filters, request.user)
+    category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
     if filters.get('team_video'):

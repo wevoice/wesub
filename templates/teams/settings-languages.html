@@ -1,0 +1,54 @@
+{% extends "teams/base.html" %}
+{% load i18n teams_tags %}
+
+{% block title %}
+    {{ team }} {% trans 'Settings' %} | Universal Subtitles
+{% endblock %}
+
+{% block view_content %}
+    {% with "settings" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        <form class="team-settings" enctype="multipart/form-data" method="POST" action="">
+            {% csrf_token %}
+
+            <div class="grid_4 alpha">
+                <fieldset>
+                    <legend>Preferred Languages</legend>
+                    <p class="notation">Translation tasks will be auto-created for these languages</p>
+                    <select>
+                        <option value="">Boom</option>
+                        <option value="">Bam</option>
+                    </select>
+                </fieldset>
+            </div>
+
+            <div class="grid_4 omega">
+                <fieldset>
+                    <legend>Blacklisted Languages</legend>
+                    <p class="notation">Won't be shown when creating or performing tasks</p>
+                    <select>
+                        <option value="">Boom</option>
+                        <option value="">Bam</option>
+                    </select>
+                </fieldset>
+            </div>
+
+            <div class="grid_9 submit">
+                <input type="submit" class="submit save" value="Save Changes" name="save" />
+            </div>
+        </form>
+        {% include "teams/_basic_settings.html" %}
+    </div>
+
+    <div class="controls grid_3 omega ">
+        {% with "languages" as current_sub %}
+            {% include "teams/_settings_sub_tabs.html" %}
+        {% endwith %}
+
+        {% include "teams/_actions.html" %}
+    </div>
+
+{% endblock %}
