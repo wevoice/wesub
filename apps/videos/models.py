@@ -1587,7 +1587,6 @@ class Action(models.Model):
         action.action_type = cls.CHANGE_TITLE
         action.save()
     
-        [type(y) for y in kwargs.values()]
     @classmethod
     def create_comment_handler(cls, sender, instance, created, **kwargs):
         if created:
