@@ -177,7 +177,7 @@ def actions_list(request, user_id):
         except (User.DoesNotExist, ValueError):
             raise Http404
         
-    qs = Action.objects.filter(user=user)
+    qs = Action.objects.for_user(user)
     extra_context = {
         'user_info': user
     }
