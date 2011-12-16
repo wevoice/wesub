@@ -25,6 +25,24 @@
             </div>
         {% endif %}
 
+        {% if filters.assignee or filters.team_video or filters.language %}
+        <p class="active-filters">Showing
+            {% if filters.assignee == 'none' %}
+                <strong>unassigned</strong>
+            {% endif %}
+            {% if filters.language %}
+                <strong>{{ filters.language }}</strong> language
+            {% endif %}
+            tasks
+            {% if filters.team_video %}
+                for <strong>{{ filters.team_video }}</strong>
+            {% endif %}
+            {% if filters.assignee and filters.assignee != 'none' %}
+                assigned to <strong>{{ filters.assignee }}</strong>
+            {% endif %}
+        </p>
+        {% endif %}
+
         <ul class="tasks listing">
             {% for task in tasks %}
                 <li>

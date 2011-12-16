@@ -93,6 +93,12 @@
     </div>
     <div class="controls grid_3 omega">
         <ul>
+            <li class="current">
+                <a href="#">{% trans "New task form" %}</a>
+            </li>
+            <li>
+                <a href="{% url teams:team_tasks team.slug %}?team_video={{ team_video.id }}">← {% trans "Back to tasks list" %}</a>
+            </li>
         </ul>
     </div>
 {% endblock %}
