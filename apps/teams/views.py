@@ -988,7 +988,7 @@ def _task_category_counts(team):
                                     if t.type == Task.TYPE_IDS[type]])
     return counts
 
-def _tasks_list(team, filters, user):
+def _tasks_list(request, team, filters, user):
     '''List tasks for the given team, optionally filtered.
 
     `filters` should be an object/dict with zero or more of the following keys:
@@ -1034,7 +1034,7 @@ def _tasks_list(team, filters, user):
             real_tasks = [t for t in real_tasks
                           if t.assignee and t.assignee.id == int(assignee)]
 
-    real_tasks = [t.to_dict(user) for t in real_tasks]
+    real_tasks = [t.to_dict(request, user) for t in real_tasks]
     ghost_tasks = _ghost_tasks(team, tasks, filters, member)
 
     tasks = real_tasks + ghost_tasks
@@ -1061,7 +1061,7 @@ def team_tasks(request, slug):
 
     filters = _get_task_filters(request)
 
-    tasks = _tasks_list(team, filters, request.user)
+    tasks = _tasks_list(request, team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
     if filters.get('team_video'):
@@ -1075,6 +1075,10 @@ def team_tasks(request, slug):
         else:
             filters['assignee'] = team.members.get(user=filters['assignee'])
 
+    widget_settings = {}
+    from apps.widget.rpc import add_general_settings
+    add_general_settings(request, widget_settings)
+
     context = {
         'team': team,
         'user_can_delete_tasks': can_delete_tasks(team, request.user),
@@ -1083,7 +1087,9 @@ def team_tasks(request, slug):
         'languages': languages,
         'category_counts': category_counts,
         'tasks': tasks,
-        'filters': filters
+        'filters': filters,
+        'widget_settings': widget_settings,
+
     }
     context.update(pagination_info)
     return context
@@ -1101,7 +1107,6 @@ def create_task(request, slug, team_video_pk):
         if form.is_valid():
             task = form.save(commit=False)
 
-            task.subtitle_language = form.subtitle_language
             task.team = team
             task.team_video = team_video
 
@@ -1129,6 +1134,7 @@ def create_task(request, slug, team_video_pk):
              'language_choices': language_choices,
              'subtitlable': subtitlable,
              'can_assign': can_assign, }
+
 
 @login_required
 def perform_task(request):

@@ -1,11 +1,21 @@
 {% extends "teams/base.html" %}
-{% load i18n teams_tags paginator doorman media_compressor verbatim_templatetag query_string %}
+{% load to_json i18n teams_tags paginator doorman media_compressor verbatim_templatetag query_string %}
+
+{% block css %}
+    {{ block.super }}
+    {% include_bundle "widget-css"%}
+{% endblock %}
 
 {% block scripts %}
     {{ block.super }}
     {% include "utils/chosenify.html" %}
     {% include_bundle "js-teams-tasks-panel" %}
+    {% include_bundle "unisubs-offsite-compiled" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
+    </script>
 {% endblock %}
 
 {% block title %}
@@ -84,14 +94,32 @@
                             {% endif %}
 
                             {% if task.perform_allowed %}
-                                <form action="{% url teams:perform_task %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="task_id" value="{{ task.pk }}" />
+                                {% if task.type == "Subtitle" %}
+                                    <a class="perform perform-task-{{ task.pk }}" href="">Perform Task</a>
 
-                                    {% if task.perform_allowed %}
-                                        <a class="perform" href="{% url teams:perform_task %}">Perform Task</a>
-                                    {% endif %}
-                                </form>
+                                    <script type="text/javascript">
+                                        $('.perform-task-{{ task.pk }}').click(function() {
+
+                                            var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.video_url }}');
+                                            var opener = new unisubs.widget.SubtitleDialogOpener(
+                                                '{{ task.video_id }}', '{{ task.video_url }}', 
+                                                videoSource, null, null
+                                            );
+                                            opener.showStartDialog();
+
+                                            return false;
+                                        });
+                                    </script>
+                                {% else %}
+                                    <form action="{% url teams:perform_task %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="task_id" value="{{ task.pk }}" />
+
+                                        {% if task.perform_allowed %}
+                                            <a class="perform" href="{% url teams:perform_task %}">Perform Task</a>
+                                        {% endif %}
+                                    </form>
+                                {% endif %}
                             {% endif %}
                         </li>
                     </ul>
