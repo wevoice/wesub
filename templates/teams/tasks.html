@@ -19,6 +19,12 @@
     {% endwith %}
 
     <div class="panel-holder view grid_9 alpha">
+        {% if team|can_add_tasks:user and filters.team_video != None %}
+            <div class="tools">
+                <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">Add Task</a>
+            </div>
+        {% endif %}
+
         <ul class="tasks listing">
             {% for task in tasks %}
                 <li>

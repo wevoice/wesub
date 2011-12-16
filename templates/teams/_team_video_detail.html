@@ -20,14 +20,14 @@
         <li>
             <h4>
                 {% if search_record.video_completed_langs %}
-                    <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.video_completed_langs|length }} language{{ search_record.video_completed_langs|length|pluralize }}</a>
+                    <a href="{% url videos:video video_id=search_record.video_id %}" title="View available subtitles">{{ search_record.video_completed_langs|length }} language{{ search_record.video_completed_langs|length|pluralize }}</a>
                 {% else %}
                     {% trans "No subtitles yet" %}
                 {% endif %}
             </h4>
         </li>
         <li>
-            <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}">View tasks</a>
+            <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="View open tasks for this video">View tasks</a>
         </li>
     </ul>
 
