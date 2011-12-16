@@ -83,6 +83,19 @@
 
     <script type="text/javascript">
         $(window).load(function(){
+            $workflow = $('#id_workflow_enabled');
+
+            if ($workflow.attr('checked')) {
+                $('.v1 .workflow').show();
+            }
+
+            $workflow.change(function() {
+                if ($workflow.attr('checked')) {
+                    $('.v1 .workflow').show();
+                } else {
+                    $('.v1 .workflow').hide();
+                }
+            });
         });
     </script>
 
