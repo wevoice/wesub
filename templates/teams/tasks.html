@@ -172,7 +172,10 @@
                             <div class="assignee-choice" style="display: none;">
                                 <a class="cancel" href="#">Cancel</a>
                                 <div class="member-ajax-chosen">
-                                    <select name="assignee"></select>
+                                    <select name="assignee">
+                                        <option>-----</option>
+                                        <option>Begin typing to search.</option>
+                                    </select>
                                 </div>
                                 <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
                             </div>
