@@ -988,9 +988,22 @@ def _task_languages(team, user):
 
     return [{'code': l, 'name': SUPPORTED_LANGUAGES_DICT[l]} for l in languages]
 
-def _task_category_counts(team):
+def _task_category_counts(team, filters, user):
     # Realize the queryset here to avoid five separate DB calls.
     tasks = list(team.task_set.incomplete())
+
+    if filters['language']:
+        tasks = [t for t in tasks if t.language == filters['language']]
+
+    if filters['team_video']:
+        tasks = [t for t in tasks if t.team_video == filters['team_video']]
+
+    if filters['assignee']:
+        if filters['assignee'] == 'none':
+            tasks = [t for t in tasks if t.assignee == None]
+        else:
+            tasks = [t for t in tasks if t.assignee == user]
+
     counts = {'all': len(tasks)}
     for type in ['Subtitle', 'Translate', 'Review', 'Approve']:
         counts[type.lower()] = len([t for t in tasks
@@ -1066,9 +1079,11 @@ def team_tasks(request, slug):
 
     member = team.members.get(user=request.user)
     languages = _task_languages(team, request.user)
-    category_counts = _task_category_counts(team)
 
     filters = _get_task_filters(request)
+
+    category_counts = _task_category_counts(team, filters, request.user)
+
 
     tasks = _tasks_list(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
