@@ -1065,7 +1065,7 @@ def team_tasks(request, slug):
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
     if filters.get('team_video'):
-        filters['team_video'] = team.videos.get(id=filters['team_video'])
+        filters['team_video'] = TeamVideo.objects.get(pk=filters['team_video'])
 
     if filters.get('assignee'):
         if filters['assignee'] == 'me':
