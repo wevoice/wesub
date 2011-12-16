@@ -1,5 +1,5 @@
 {% extends "teams/base.html" %}
-{% load i18n teams_tags paginator doorman media_compressor verbatim_templatetag %}
+{% load i18n teams_tags paginator doorman media_compressor %}
 
 {% block title %}
     {{ team }} {% trans 'Settings' %} | Universal Subtitles
@@ -21,7 +21,7 @@
 
             <div class="grid_4 alpha">
                 <fieldset>
-                    <legend>Edit Project: {{ project }}</legend>
+                    <legend>Add new project</legend>
 
                     <label for="id_name">Name</label>
                     {{ form.errors.name }}

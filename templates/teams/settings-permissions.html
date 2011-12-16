@@ -1,5 +1,5 @@
 {% extends "teams/base.html" %}
-{% load i18n teams_tags paginator doorman media_compressor verbatim_templatetag %}
+{% load i18n teams_tags paginator doorman media_compressor %}
 
 {% block title %}
     {{ team }} {% trans 'Settings' %} | Universal Subtitles
@@ -11,33 +11,45 @@
     {% endwith %}
 
     <div class="view grid_9 alpha">
-        <div class="tools group">
-            <a class="button project-add" href="{% url teams:add_project slug=team.slug %}">Add Project</a>
-        </div>
-
-        <form action="" method="POST">
+        <form class="permissions" action="" method="POST">
             {% csrf_token %}
-            {{ form.non_field_errors }}
 
-            <div class="grid_4 alpha">
+            <div class="grid_4 alpha messages">
                 <fieldset>
-                    <legend>Add new project</legend>
+                    <legend>Team Management</legend>
+                    <label for="id_membership_policy">How can users join your team?</label>
+                    {{ form.membership_policy }}
 
-                    <label for="id_name">Name</label>
-                    {{ form.errors.name }}
-                    {{ form.name }}
+                    <label for="id_video_policy">Who can add/remove videos?</label>
+                    {{ form.video_policy }}
+                </fieldset>
 
-                    <label for="id_description">Description</label>
-                    {{ form.errors.description }}
-                    {{ form.description }}
+                <fieldset>
+                    <legend>Subtitling</legend>
+
+                    <label for="id_subtitle_policy">Who can create subtitles?</label>
+                    <p class="notation">i.e. transcribe from video and perform time-alignment</p>
+                    {{ form.subtitle_policy }}
+
+                    <label for="id_translate_policy">Who can translate subtitles?</label>
+                    <p class="notation">i.e. translate text from an original subtitle into a new language</p>
+                    {{ form.translate_policy }}
                 </fieldset>
             </div>
+            <div class="grid_4 omega guidelines">
+                <fieldset>
+                    <legend>Tasks</legend>
 
-            <div class="grid_4 omega">
+                    <p class="notation">Manage subtitling and translation work for your videos</p>
+                    <label for="id_task_assign_policy">Who can create and assign tasks?</label>
+                    {{ form.task_assign_policy }}
+                    <p class="notation">Specified members will only be able to create/assign tasks they are permitted to complete themselves</p>
+                </fieldset>
+
                 <fieldset>
                     <legend>Workflows</legend>
-                    <p class="notation">Moderate this project's subtitles. Will override the team's workflow if exists.</p>
 
+                    <p class="notation">Workflows enable you to add moderation steps and automate tasks</p>
                     <label for="id_workflow_enabled">{{ form.workflow_enabled }} Enable workflows</label>
                 </fieldset>
 
@@ -63,18 +75,13 @@
             </div>
 
             <div class="grid_9 submit">
-                <a class="button delete project-delete">Delete</a>
-                <a class="button cancel project-cancel">Cancel</a>
-                <a class="button save project-save">Save</a>
                 <input type="submit" class="submit save" value="Save Changes" name="save" />
             </div>
         </form>
-
-        {% include "teams/_basic_settings.html" %}
     </div>
 
     <div class="controls grid_3 omega ">
-        {% with "projects" as current_sub %}
+        {% with "permissions" as current_sub %}
             {% include "teams/_settings_sub_tabs.html" %}
         {% endwith %}
 
