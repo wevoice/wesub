@@ -202,25 +202,24 @@
 
     <script type="text/javascript">
         $(function() {
+
+            var root = document.URL.split("?")[0];
             $language = $("select.lang-filter", ".controls");
-            $language.change(function(e) {
-                var lang = $language.val();
-                if (lang !== '') {
-                    window.location = document.URL.split("?")[0] + '?lang=' + lang;
-                } else {
-                    window.location = document.URL.split("?")[0];
-                }
+            $assignee = $("select.assignee-filter", ".controls");
+
+            $('select.lang-filter, select.assignee-filter', '.controls').change(function(e) {
+                BuildParams($language.val(), $assignee.val());
             });
 
-            $assignee = $("select.assignee-filter", ".controls");
-            $assignee.change(function(e) {
-                var a = $assignee.val();
-                if (a !== '') {
-                    window.location = document.URL.split("?")[0] + '?assignee=' + a;
-                } else {
-                    window.location = document.URL.split("?")[0];
+            function BuildParams(lang, assign) {
+                if (lang !== '') {
+                    lang = '&lang=' + lang;
                 }
-            });
+                if (assign !== '') {
+                    assign = '&assignee=' + assign;
+                }
+                window.location = '?' + lang + assign;
+            }
 
             $('a.action-assign').click(function(e) {
                 $(e.target).parents('.admin-controls')
