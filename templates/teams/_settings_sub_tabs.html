@@ -2,7 +2,7 @@
 
 <ul class="sub-settings-panel">
     <li {% if current_sub == "settings" %}class="current"{% endif %}>
-        <a href="{% url teams:settings slug=team.slug %}">{% trans "Basic Settings" %}</a>
+        <a href="{% url teams:settings_basic slug=team.slug %}">{% trans "Basic Settings" %}</a>
     </li>
 
     <li {% if current_sub == "guidelines" %}class="current"{% endif %}>

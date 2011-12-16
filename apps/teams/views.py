@@ -20,11 +20,11 @@ from utils import render_to, render_to_json
 from collections import defaultdict
 from utils.translation import get_languages_list, languages_with_names
 from teams.forms import (
-    CreateTeamForm, EditTeamForm, EditTeamFormAdmin, AddTeamVideoForm,
-    EditTeamVideoForm, EditLogoForm, AddTeamVideosFromFeedForm, TaskAssignForm,
-    SettingsForm, CreateTaskForm, PermissionsForm, WorkflowForm, InviteForm,
-    TaskDeleteForm, GhostTaskAssignForm, GhostTaskDeleteForm,
-    GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm
+    CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
+    AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, CreateTaskForm,
+    PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
+    GhostTaskAssignForm, GhostTaskDeleteForm, GuidelinesMessagesForm,
+    RenameableSettingsForm, ProjectForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -34,7 +34,7 @@ from teams.signals import api_teamvideo_new
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _, ugettext
@@ -48,7 +48,6 @@ from widget.views import base_widget_params
 import widget
 from videos.models import Action
 from django.utils import simplejson as json
-from utils.amazon import S3StorageError
 from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -56,10 +55,11 @@ from utils.translation import SUPPORTED_LANGUAGES_DICT
 from apps.videos.templatetags.paginator import paginate
 
 from teams.permissions import (
-    can_add_video, can_assign_role, can_view_settings_tab, can_assign_tasks,
-    can_create_task_subtitle, can_create_task_translate, can_create_task_review,
-    can_create_task_approve, can_view_tasks_tab, can_invite, roles_user_can_assign,
-    can_join_team, can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task, can_rename_team
+    can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
+    can_create_task_translate, can_create_task_review, can_create_task_approve,
+    can_view_tasks_tab, can_invite, roles_user_can_assign, can_join_team,
+    can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
+    can_rename_team
 )
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
@@ -256,85 +256,6 @@ def create(request):
 
 
 # Settings
-@render_to('teams/settings.html')
-@login_required
-def team_settings(request, slug):
-    team = Team.get(slug, request.user)
-
-    if not can_view_settings_tab(team, request.user):
-        return HttpResponseForbidden("You cannot view this team")
-
-    member = team.members.get(user=request.user)
-    if request.method == 'POST':
-        if request.user.is_staff:
-            form = EditTeamFormAdmin(request.POST, request.FILES, instance=team)
-        else:
-            form = EditTeamForm(request.POST, request.FILES, instance=team)
-        if form.is_valid():
-            form.save()
-            messages.success(request, _(u'Your changes have been saved'))
-            return redirect(reverse("teams:settings", kwargs={"slug":team.slug}))
-    else:
-        if request.user.is_staff:
-            form = EditTeamFormAdmin(instance=team)
-        else:
-            form = EditTeamForm(instance=team)
-
-    return {
-        'basic_settings_form': form,
-        'team': team,
-        'user_can_delete_tasks': can_delete_tasks(team, request.user),
-        'user_can_assign_tasks': can_assign_tasks(team, request.user),
-        'assign_form': TaskAssignForm(team, member),
-        'settings_form': SettingsForm(),
-        'permissions_form': PermissionsForm(),
-        'workflow_form': WorkflowForm(),
-    }
-
-@login_required
-def edit_logo(request, slug):
-    team = Team.get(slug, request.user)
-
-    if not team.is_member(request.user):
-        raise Http404
-
-    output = {}
-    form = EditLogoForm(request.POST, instance=team, files=request.FILES)
-    if form.is_valid():
-        try:
-            form.save()
-            output['url'] =  str(team.logo_thumbnail())
-        except S3StorageError:
-            output['error'] = {'logo': ugettext(u'File server unavailable. Try later. You can edit some other information without any problem.')}
-    else:
-        output['error'] = form.get_errors()
-    return HttpResponse('<textarea>%s</textarea>'  % json.dumps(output))
-
-@login_required
-def upload_logo(request, slug):
-    team = Team.get(slug, request.user)
-
-    if not team.is_member(request.user):
-        raise Http404
-
-    output = {
-        'url' :  str(team.logo_thumbnail()),
-        'url_full':str(team.logo and team.logo.url),
-    }
-    form = EditLogoForm(request.POST, instance=team, files=request.FILES)
-
-    if request.FILES and form.is_valid():
-        try:
-            form.save()
-            output['url'] =  str(team.logo_thumbnail())
-            output['url_full'] =  str(team.logo.url)
-        except S3StorageError:
-            output['error'] = {'logo': ugettext(u'File server unavailable. Try later. You can edit some other information without any problem.')}
-    else:
-        output['error'] = form.get_errors()
-
-    return HttpResponse(json.dumps(output))
-
 @render_to('teams/settings.html')
 @login_required
 def settings_basic(request, slug):

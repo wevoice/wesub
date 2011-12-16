@@ -25,7 +25,7 @@ from django.conf import settings
 from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS
 from videos.forms import AddFromFeedForm
 from django.utils.safestring import mark_safe
-from utils.forms import AjaxForm, ErrorableModelForm
+from utils.forms import ErrorableModelForm
 import re
 from utils.translation import get_languages_list
 from utils.forms.unisub_video_form import UniSubBoundVideoField
@@ -37,19 +37,6 @@ from apps.teams.permissions_const import ROLE_NAMES
 
 from doorman import feature_is_on
 
-
-class EditLogoForm(forms.ModelForm, AjaxForm):
-    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
-
-
-    class Meta:
-        model = Team
-        fields = ('logo',)
-
-    def clean(self):
-        if 'logo' in self.cleaned_data and not self.cleaned_data.get('logo'):
-            del self.cleaned_data['logo']
-        return self.cleaned_data
 
 class EditTeamVideoForm(forms.ModelForm):
     author = forms.CharField(max_length=255, required=False)
@@ -327,54 +314,6 @@ Enter a link to any compatible video, or to any video page on our site.''')
         team.save()
         TeamMember.objects.create_first_member(team=team, user=user)
         return team
-
-class EditTeamForm(BaseVideoBoundForm):
-    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
-
-    class Meta:
-        model = Team
-        fields = ('name', 'description', 'logo',
-                  'membership_policy', 'is_moderated', 'video_policy',
-                  'is_visible', 'video_url', 'application_text',
-                  'page_content')
-
-    def __init__(self, *args, **kwargs):
-        super(EditTeamForm, self).__init__(*args, **kwargs)
-        self.fields['video_url'].label = _(u'Team intro video URL')
-        self.fields['video_url'].required = False
-        self.fields['video_url'].help_text = _(u'''You can put an optional video
-on your team homepage that explains what your team is about, to attract volunteers.
-Enter a link to any compatible video, or to any video page on our site.''')
-        self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
-        self.fields['is_moderated'].widget.attrs['class'] = 'checkbox'
-
-    def clean(self):
-        if 'logo' in self.cleaned_data:
-            #It is saved with edit_logo view
-            del self.cleaned_data['logo']
-        return self.cleaned_data
-
-    def save(self):
-        team = super(EditTeamForm, self).save(False)
-        video = self.fields['video_url'].video
-        if video:
-            team.video = video
-        team.save()
-
-        if team.is_open():
-            for item in team.applications.all():
-                item.approve()
-        return team
-
-class EditTeamFormAdmin(EditTeamForm):
-    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
-
-    class Meta:
-        model = Team
-        fields = ('name', 'header_html_text', 'description', 'logo',
-                  'membership_policy', 'is_moderated', 'video_policy',
-                  'is_visible', 'video_url', 'application_text',
-                  'page_content')
 
 
 class CreateTaskForm(ErrorableModelForm):
