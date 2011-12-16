@@ -39,6 +39,12 @@
                 </li>
             {% endif %}
 
+            {% if search_record|can_create_any_task:request.user %}
+                <li>
+                    <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}">New Task</a>
+                </li>
+            {% endif %}
+
             {% if search_record.team_video_pk|can_edit_video:request.user %}
                 <li>
                     <form action="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" method="post" style="display: none;">
