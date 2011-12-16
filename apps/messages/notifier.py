@@ -25,12 +25,12 @@ Currently we support:
 Messages models will trigger an email to be sent if
 the user has allowed email notifications
 """
-
+import datetime
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from auth.models import CustomUser as User
 from messages.models import Message
-   
+
 def team_invitation_sent(invite):
     msg = Message()
     msg.subject = ugettext("You've been invited to team %s on Universal Subtitles" % invite.team.name)
@@ -58,4 +58,48 @@ def team_application_denied(application):
     msg.author = User.get_anonymous()
     msg.save()
 
+def team_member_new(member):
+    from videos.models import Action   
+    from teams.models import TeamMember
+    # the feed item should appear on the timeline for all team members
+    # as a team might have thousands of members, this one item has
+    # to show up on all of them
+    Action.create_new_member_handler(member)
+    # notify  admins and owners through messages
+    notifiable = TeamMember.objects.filter( team=member.team,
+       role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    for m in notifiable:
+        msg = Message()
+        if m.user == member.user:
+             base_str = ugettext("You've joined the %s team as a(n) %s'" %
+                                 (m.team, m.role))
+        base_str = ugettext("%s joined the %s team as a(n) %s" % (
+            m.user, m.team, m.role))
+        msg.subject = ugettext(base_str)
+        msg.content = ugettext(base_str + " on %s" % (datetime.datetime.now()))
+        msg.user = m.user
+        msg.object = m.team
+        msg.save()
 
+def team_member_leave(member):
+    from videos.models import Action   
+    from teams.models import TeamMember
+    # the feed item should appear on the timeline for all team members
+    # as a team might have thousands of members, this one item has
+    # to show up on all of them
+    Action.create_new_member_handler(member)
+    # notify  admins and owners through messages
+    notifiable = TeamMember.objects.filter( team=member.team,
+       role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    for m in notifiable:
+        msg = Message()
+        if m.user == member.user:
+             base_str = ugettext("You've left the %s team.'" %
+                                 (m.team))
+        base_str = ugettext("%s left the %s team " % (
+            m.user, m.team))
+        msg.subject = ugettext(base_str)
+        msg.content = ugettext(base_str + " on %s" % (datetime.datetime.now()))
+        msg.user = m.user
+        msg.object = m.team
+        msg.save()

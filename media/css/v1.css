@@ -78,7 +78,7 @@
 .v1 .panel-holder form{float:left;width:100%;clear:both;}
 .v1 .panel-holder .tools form{float:none;}
 .v1 form.workflow{margin-top:-3em;}.v1 form.workflow fieldset{padding:0 1em;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:4px;-moz-background-clip:padding-box;-moz-border-radius:4px;border-radius:4px;background-clip:padding-box;}.v1 form.workflow fieldset .button{margin-top:2em;}
-.v1 .permissions .workflow{margin-top:-2em;padding:0 1em;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:4px;-moz-background-clip:padding-box;-moz-border-radius:4px;border-radius:4px;background-clip:padding-box;}.v1 .permissions .workflow fieldset{padding:0;}.v1 .permissions .workflow fieldset .button{float:right;}
+.v1 .workflow{display:none;margin-top:-2em;padding:0 1em;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:4px;-moz-background-clip:padding-box;-moz-border-radius:4px;border-radius:4px;background-clip:padding-box;}.v1 .workflow fieldset{padding-bottom:1.5em;}.v1 .workflow fieldset .button{float:right;}
 .v1 .alpha .omega{margin-left:60px;}
 #dashboard .alpha .omega{margin-left:10px;}
 .v1 div.submit{clear:both;margin-top:2em;padding-top:1em;border-top:1px solid #dce2e5;text-align:right;}.v1 div.submit form{padding:0;}

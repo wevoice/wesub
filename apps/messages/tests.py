@@ -24,6 +24,8 @@ from apps.auth.models import CustomUser as User
 from django.core import mail
 
 from apps.messages.models import Message
+from teams.models import Team, TeamMember
+from videos.models import Action
 
 class MessageTest(TestCase):
 
@@ -64,3 +66,137 @@ class MessageTest(TestCase):
         self.assertEquals(Message.objects.unread().filter(user=self.user).count(), 0)
         self.assertEquals(Message.objects.filter(user=self.user).count(), 1)
         
+    def test_member_join(self):
+        def _get_counts(member):
+            email_to = "%s <%s>" %(member.user.username, member.user.email) 
+            return Message.objects.filter(user=member.user).count() , \
+                len([x for x in mail.outbox if email_to in x.recipients()])
+            
+        
+        team , created= Team.objects.get_or_create(name='test', slug='test')
+        
+        # creates dummy users:
+        for x in xrange(0,5):
+            user, member = User.objects.get_or_create(
+                username="test%s" % x,
+                email = "test%s@example.com" % x,
+            )
+            tm = TeamMember(team=team, user=user)
+            if x == 0:
+                tm.role = TeamMember.ROLE_OWNER
+                owner = tm
+            elif x == 1:
+                tm.role = TeamMember.ROLE_ADMIN
+                admin = tm
+            elif x == 2:
+                tm.role = TeamMember.ROLE_MANAGER
+                manager = tm
+            elif x == 3:
+                tm.role = TeamMember.ROLE_CONTRIBUTOR
+                contributor = tm
+            if x < 4:
+                # don't save the last role until we have counts
+                tm.save()
+            else:
+                tm.role= TeamMember.ROLE_CONTRIBUTOR
+            
+        # now make sure we count previsou messages
+        owner_messge_count_1, owner_email_count_1 = _get_counts(owner)
+        admin_messge_count_1, admin_email_count_1 = _get_counts(admin)
+        manager_messge_count_1, manager_email_count_1 = _get_counts(manager)
+        contributor_messge_count_1, contributor_email_count_1 = _get_counts(contributor)
+        # save the last team member and check that each group has appropriate counts 
+        tm.save()
+        # owner and admins should receive email + message
+        owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
+        self.assertEqual(owner_messge_count_1 + 1, owner_messge_count_2)
+        self.assertEqual(owner_email_count_1 + 1, owner_email_count_2)
+        admin_messge_count_2, admin_email_count_2 = _get_counts(admin)
+        self.assertEqual(admin_messge_count_1 + 1, admin_messge_count_2)
+        self.assertEqual(admin_email_count_1 + 1, admin_email_count_2)
+        # manager shoud not
+        manager_messge_count_2, manager_email_count_2 = _get_counts(manager)
+        self.assertEqual(manager_messge_count_1 , manager_messge_count_2)
+        self.assertEqual(manager_email_count_1 , manager_email_count_2)
+        # contributor shoud not
+        contributor_messge_count_2, contributor_email_count_2 = _get_counts(contributor)
+        self.assertEqual(contributor_messge_count_1 , contributor_messge_count_2)
+        self.assertEqual(contributor_email_count_1 , contributor_email_count_2)
+
+
+        # now, this has to show up on everybody activitis fed
+        action = Action.objects.get(team=team, user=tm.user, action_type=Action.MEMBER_JOINED)
+        self.assertTrue(Action.objects.for_user(tm.user).filter(pk=action.pk).exists())
+        self.assertTrue(Action.objects.for_user(owner.user).filter(pk=action.pk).exists())
+        self.assertTrue(Action.objects.for_user(manager.user).filter(pk=action.pk).exists())
+        self.assertTrue(Action.objects.for_user(contributor.user).filter(pk=action.pk).exists())
+        self.assertTrue(Action.objects.for_user(admin.user).filter(pk=action.pk).exists())
+        
+    def test_member_leave(self):
+        def _get_counts(member):
+            email_to = "%s <%s>" %(member.user.username, member.user.email) 
+            return Message.objects.filter(user=member.user).count() , \
+                len([x for x in mail.outbox if email_to in x.recipients()])
+            
+        
+        team , created= Team.objects.get_or_create(name='test', slug='test')
+        
+        # creates dummy users:
+        for x in xrange(0,5):
+            user, member = User.objects.get_or_create(
+                username="test%s" % x,
+                email = "test%s@example.com" % x,
+            )
+            tm = TeamMember(team=team, user=user)
+            if x == 0:
+                tm.role = TeamMember.ROLE_OWNER
+                owner = tm
+            elif x == 1:
+                tm.role = TeamMember.ROLE_ADMIN
+                admin = tm
+            elif x == 2:
+                tm.role = TeamMember.ROLE_MANAGER
+                manager = tm
+            elif x == 3:
+                tm.role = TeamMember.ROLE_CONTRIBUTOR
+                contributor = tm
+            if x < 4:
+                # don't save the last role until we have counts
+                tm.save()
+            else:
+                tm.role= TeamMember.ROLE_CONTRIBUTOR
+            
+        tm.save()
+        # now make sure we count previsou messages
+        owner_messge_count_1, owner_email_count_1 = _get_counts(owner)
+        admin_messge_count_1, admin_email_count_1 = _get_counts(admin)
+        manager_messge_count_1, manager_email_count_1 = _get_counts(manager)
+        contributor_messge_count_1, contributor_email_count_1 = _get_counts(contributor)
+
+        # now delete and check numers
+        tm.delete()
+        # save the last team member and check that each group has appropriate counts 
+        # owner and admins should receive email + message
+        owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
+        self.assertEqual(owner_messge_count_1 + 1, owner_messge_count_2)
+        self.assertEqual(owner_email_count_1 + 1, owner_email_count_2)
+        admin_messge_count_2, admin_email_count_2 = _get_counts(admin)
+        self.assertEqual(admin_messge_count_1 + 1, admin_messge_count_2)
+        self.assertEqual(admin_email_count_1 + 1, admin_email_count_2)
+        # manager shoud not
+        manager_messge_count_2, manager_email_count_2 = _get_counts(manager)
+        self.assertEqual(manager_messge_count_1 , manager_messge_count_2)
+        self.assertEqual(manager_email_count_1 , manager_email_count_2)
+        # contributor shoud not
+        contributor_messge_count_2, contributor_email_count_2 = _get_counts(contributor)
+        self.assertEqual(contributor_messge_count_1 , contributor_messge_count_2)
+        self.assertEqual(contributor_email_count_1 , contributor_email_count_2)
+
+
+        # now, this has to show up on everybody activitis fed
+        action = Action.objects.get(team=team, user=tm.user, action_type=Action.MEMBER_JOINED)
+        self.assertTrue(Action.objects.for_user(tm.user).filter(pk=action.pk).exists())
+        self.assertTrue(Action.objects.for_user(owner.user).filter(pk=action.pk).exists())
+        self.assertTrue(Action.objects.for_user(manager.user).filter(pk=action.pk).exists())
+        self.assertTrue(Action.objects.for_user(contributor.user).filter(pk=action.pk).exists())
+        self.assertTrue(Action.objects.for_user(admin.user).filter(pk=action.pk).exists())

@@ -63,9 +63,7 @@
             </div>
 
             <div class="grid_9 submit">
-                <a class="button delete project-delete">Delete</a>
-                <a class="button cancel project-cancel">Cancel</a>
-                <a class="button save project-save">Save</a>
+                <input type="submit" class="button delete project-delete" value="Delete" />
                 <input type="submit" class="submit save" value="Save Changes" name="save" />
             </div>
         </form>
@@ -83,6 +81,19 @@
 
     <script type="text/javascript">
         $(window).load(function(){
+            $workflow = $('#id_workflow_enabled');
+
+            if ($workflow.attr('checked')) {
+                $('.v1 .workflow').show();
+            }
+
+            $workflow.change(function() {
+                if ($workflow.attr('checked')) {
+                    $('.v1 .workflow').show();
+                } else {
+                    $('.v1 .workflow').hide();
+                }
+            });
         });
     </script>
 
