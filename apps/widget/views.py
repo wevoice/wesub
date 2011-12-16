@@ -117,7 +117,7 @@ def onsite_widget(request):
                      if s.data.strip()])
 
             # TODO: Go to the tasks panel once the history stuff is implemented
-            config['team_url'] = reverse('teams:settings',
+            config['team_url'] = reverse('teams:settings_basic',
                                          kwargs={'slug': team.slug})
         else:
             config['guidelines'] = {}
