@@ -83,7 +83,7 @@
                                 Assigned to {{ task.assignee_display }}
                             {% endif %}
 
-                            {% if task.perform_allowed %}
+                            {% if task.perform_allowed and task.assignee == request.user.id %}
                                 <form action="{% url teams:perform_task %}" method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="task_id" value="{{ task.pk }}" />
