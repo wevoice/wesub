@@ -645,6 +645,10 @@
 .v1 form {
     padding: 1em 0;
 
+    .form-title {
+        margin: 1em 0 0 5px;
+    }
+
     fieldset {
         padding-bottom: 3em;
 
@@ -693,18 +697,26 @@
             height: 5em;
         }
     }
+}
+.v1 .view form .preselected {
+    position: relative;
+    padding: 1em 1em 1em 75px;
+    margin: .5em 0;
+    background: @fainter;
+    .border-radius(3px);
+    min-height: 3em;
 
-    .preselected {
-        padding: 1em;
-        margin: .5em 0;
-        background: @fainter;
-        .border-radius(3px);
-
-        img {
-            max-width: 100%;
-        }
+    p {
+        float: none;
+        margin: 0;
     }
 
+    img {
+        position: absolute;
+        top: 1em;
+        left: 1em;
+        max-width: 50px;
+    }
 }
 .v1 .panel-holder form {
     float: left;

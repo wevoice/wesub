@@ -63,7 +63,8 @@
 .v1 .controls form{padding:0;}
 .v1 .controls div.search{border-bottom:0;padding-bottom:0;}.v1 .controls div.search form{padding:0;}
 .block-level{display:block;width:100%;}
-.v1 form{padding:1em 0;}.v1 form fieldset{padding-bottom:3em;}.v1 form fieldset legend{font-weight:bold;padding-bottom:.5em;}
+.v1 form{padding:1em 0;}.v1 form .form-title{margin:1em 0 0 5px;}
+.v1 form fieldset{padding-bottom:3em;}.v1 form fieldset legend{font-weight:bold;padding-bottom:.5em;}
 .v1 form fieldset input,.v1 form fieldset textarea{margin-bottom:.5em;padding:4px;}
 .v1 form fieldset label{display:block;width:100%;padding:1.5em 0 .25em;}.v1 form fieldset label .notation{float:right;margin-right:-8px;}
 .v1 form fieldset input[type="text"],.v1 form fieldset input[type="password"],.v1 form fieldset textarea{display:block;width:100%;border:1px solid #b7c3c9;-webkit-background-clip:padding-box;-webkit-border-radius:2px;-moz-background-clip:padding-box;-moz-border-radius:2px;border-radius:2px;background-clip:padding-box;}
@@ -71,7 +72,8 @@
 .v1 form fieldset input[type='file']{display:block;width:100%;padding:0;}
 .v1 form fieldset select{margin-bottom:.5em;padding:4px;width:100%;}
 .v1 form fieldset textarea{height:5em;}
-.v1 form .preselected{padding:1em;margin:.5em 0;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;}.v1 form .preselected img{max-width:100%;}
+.v1 .view form .preselected{position:relative;padding:1em 1em 1em 75px;margin:.5em 0;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;min-height:3em;}.v1 .view form .preselected p{float:none;margin:0;}
+.v1 .view form .preselected img{position:absolute;top:1em;left:1em;max-width:50px;}
 .v1 .panel-holder form{float:left;width:100%;clear:both;}
 .v1 .panel-holder .tools form{float:none;}
 .v1 form.workflow{margin-top:-3em;}.v1 form.workflow fieldset{padding:0 1em;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:4px;-moz-background-clip:padding-box;-moz-border-radius:4px;border-radius:4px;background-clip:padding-box;}.v1 form.workflow fieldset .button{margin-top:2em;}
