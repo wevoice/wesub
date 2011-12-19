@@ -193,7 +193,7 @@
         <form id="tasks_type_filter">
             <ul class="types">
                 <li class="type {% if not request.GET.type %}current{% endif %}">
-                    <a href="?">
+                    <a href="{{ request.path }}{% query_string request.GET type="" %}">
                         {% trans "All Pending" %}
                         <span class="all">{{ category_counts.all }}</span>
                     </a>
@@ -230,21 +230,23 @@
 
             <form action="" method="get">
                 <select id="id_task_language" name="language" class="lang-filter chosen">
-                    <option value="">All Languages</option>
+                    <option value="{{ request.path }}{% query_string request.GET lang="" %}">All Languages</option>
                     {% for language in languages %}
-                        <option value="{{ language.code }}"
-                        {% if request.GET.lang == language.code %}
-                            selected="selected" 
-                        {% endif %}>{{ language.name }}</option>
+                        <option value="{% query_string request.GET lang=language.code %}"
+                            {% if request.GET.lang == language.code %}
+                                selected="selected" 
+                            {% endif %}>
+                            {{ language.name }}
+                        </option>
                     {% endfor %}
                 </select>
             </form>
 
             <form action="" method="get">
                 <select name="assignee" class="assignee-filter">
-                    <option value="" {% if not request.GET.assignee %}selected="selected"{% endif %}>All Assignees</option>
-                    <option value="me" {% if request.GET.assignee == "me" %}selected="selected"{% endif %}>Assigned to me</option>
-                    <option value="none" {% if request.GET.assignee == "none" %}selected="selected"{% endif %}>Unassigned</option>
+                    <option value="{{ request.path }}{% query_string request.GET assignee="" %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>All Assignees</option>
+                    <option value="{% query_string request.GET assignee="me" %}" {% if request.GET.assignee == "me" %}selected="selected"{% endif %}>Assigned to me</option>
+                    <option value="{% query_string request.GET assignee="none" %}" {% if request.GET.assignee == "none" %}selected="selected"{% endif %}>Unassigned</option>
                 </select>
             </form>
         </div>
@@ -255,23 +257,10 @@
     <script type="text/javascript">
         $(function() {
 
-            var root = document.URL.split("?")[0];
-            $language = $("select.lang-filter", ".controls");
-            $assignee = $("select.assignee-filter", ".controls");
-
             $('select.lang-filter, select.assignee-filter', '.controls').change(function(e) {
-                BuildParams($language.val(), $assignee.val());
+                var url = $(this).children('option:selected').attr('value');
+                window.location = url;
             });
-
-            function BuildParams(lang, assign) {
-                if (lang !== '') {
-                    lang = '&lang=' + lang;
-                }
-                if (assign !== '') {
-                    assign = '&assignee=' + assign;
-                }
-                window.location = '?' + lang + assign;
-            }
 
             $('a.action-assign').click(function(e) {
                 $('div.assignee-choice').hide();
