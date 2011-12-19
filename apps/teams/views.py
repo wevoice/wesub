@@ -418,7 +418,7 @@ def add_video(request, slug):
     project_id = request.GET.get('project') or request.POST.get('project') or None
     project = Project.objects.get(team=team, pk=project_id) if project_id else team.default_project
 
-    if not can_add_video(team, request.user, project):
+    if request.POST and not can_add_video(team, request.user, project):
         messages.error(request, _(u"You can't add video."))
         return HttpResponseRedirect(team.get_absolute_url())
 
@@ -508,8 +508,7 @@ def remove_video(request, team_video_pk):
 
     next = request.POST.get('next', reverse('teams:user_teams'))
 
-    # TODO: check if this should be on a project level
-    if not can_add_video(team_video.team, request.user):
+    if not can_add_video(team_video.team, request.user, team_video.project):
         error = _(u'You can\'t remove that video.')
 
         if request.is_ajax():
@@ -754,11 +753,6 @@ def leave_team(request, slug):
     if error:
         messages.error(request, _(error))
     else:
-        tasks = Task.objects.incomplete().filter(team=team, assignee=user)
-        for task in tasks:
-            task.assignee = None
-            task.save()
-
         TeamMember.objects.get(team=team, user=user).delete()
 
         messages.success(request, _(u'You have left this team.'))
