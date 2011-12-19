@@ -95,8 +95,15 @@ def application_sent(application_pk):
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     for m in notifiable:
         msg = Message()
+        
+        body = render_to_string("messages/email/application_sent.html", {
+            "applicant": application.user,
+            "team":application.team,
+            "note":application.note,
+            "user":m.user,
+        })
         msg.subject = ugettext(u'%s is applying for team %s') % (application.user, application.team.name)
-        msg.content = ugettext(u'%s is applying for team %s') % (application.user, application.team.name)
+        msg.content = body
         msg.user = m.user
         msg.object = application.team
         msg.author = application.user

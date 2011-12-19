@@ -1,0 +1,19 @@
+{% extends "videos/email_base.html" %}
+
+{% load i18n localeurl_tags %}
+
+{% block content %}
+
+{% blocktrans with message.author as author %}
+
+
+Hi {{ user }},
+
+{{ applicant }} has applied to join the {{ team.name }} team, and has included the following message:
+
+{{ note }}
+
+<a href="">Approve</a> or <a href="">deny</a> this request.
+{% endblock %}
+
+{% block dont_send %}{% endblock %}
