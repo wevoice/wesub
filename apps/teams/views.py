@@ -418,7 +418,7 @@ def add_video(request, slug):
     project_id = request.GET.get('project') or request.POST.get('project') or None
     project = Project.objects.get(team=team, pk=project_id) if project_id else team.default_project
 
-    if not can_add_video(team, request.user, project):
+    if request.POST and not can_add_video(team, request.user, project):
         messages.error(request, _(u"You can't add video."))
         return HttpResponseRedirect(team.get_absolute_url())
 

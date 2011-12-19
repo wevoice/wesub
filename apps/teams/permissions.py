@@ -314,6 +314,13 @@ def can_add_video(team, user, project=None):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_add_video_somewhere(team, user):
+    """Return whether the given user can add a video somewhere in the given team."""
+
+    # TODO: Make this faster.
+    return any(can_add_video(team, user, project)
+               for project in team.project_set.all())
+
 def can_edit_video(team_video, user):
     """Return whether the given user can edit the given video."""
 
