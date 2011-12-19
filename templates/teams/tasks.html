@@ -195,32 +195,32 @@
             <ul class="types">
                 <li class="type {% if not request.GET.type %}current{% endif %}">
                     <a href="?">
-                        All Pending
+                        {% trans "All Pending" %}
                         <span class="all">{{ category_counts.all }}</span>
+                    </a>
+                </li>
+                <li class="type {% if request.GET.type == "Subtitle" %}current{% endif %}">
+                    <a href="{% query_string request.GET type="Subtitle" %}">
+                        {% trans "Subtitle" %}
+                        <span class="subtitle">{{ category_counts.subtitle }}</span>
+                    </a>
+                </li>
+                <li class="type {% if request.GET.type == "Translate" %}current{% endif %}">
+                    <a href="{% query_string request.GET type="Translate" %}">
+                        {% trans "Translate" %}
+                        <span class="translate">{{ category_counts.translate }}</span>
                     </a>
                 </li>
                 <li class="type {% if request.GET.type == "Review" %}current{% endif %}">
                     <a href="{% query_string request.GET type="Review" %}">
-                        Review
+                        {% trans "Review" %}
                         <span class="review">{{ category_counts.review }}</span>
                     </a>
                 </li>
                 <li class="type {% if request.GET.type == "Approve" %}current{% endif %}">
                     <a href="{% query_string request.GET type="Approve" %}">
-                        Approve
+                        {% trans "Approve" %}
                         <span class="approve">{{ category_counts.approve }}</span>
-                    </a>
-                </li>
-                <li class="type {% if request.GET.type == "Translate" %}current{% endif %}">
-                    <a href="{% query_string request.GET type="Translate" %}">
-                        Translate
-                        <span class="translate">{{ category_counts.translate }}</span>
-                    </a>
-                </li>
-                <li class="type {% if request.GET.type == "Subtitle" %}current{% endif %}">
-                    <a href="{% query_string request.GET type="Subtitle" %}">
-                        Subtitle
-                        <span class="subtitle">{{ category_counts.subtitle }}</span>
                     </a>
                 </li>
             </ul>
