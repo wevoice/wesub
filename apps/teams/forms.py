@@ -581,13 +581,16 @@ class InviteForm(forms.Form):
 
 
     def save(self):
+        from messages import tasks as notifier
         for username in self._split_usernames:
             user = User.objects.get(username=username)
-            Invite.objects.get_or_create(team=self.team, user=user, defaults={
+            invite, created = Invite.objects.get_or_create(team=self.team, user=user, defaults={
                 'note': self.cleaned_data['message'],
                 'author': self.user,
                 'role': self.cleaned_data['role'],
             })
+            
+            notifier.team_invitation_sent.delay(invite.pk)
 
 
 class ProjectForm(forms.ModelForm):

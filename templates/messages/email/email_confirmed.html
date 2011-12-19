@@ -1,0 +1,15 @@
+{% extends "videos/email_base.html" %}
+
+{% load i18n localeurl_tags %}
+
+{% block content %}
+Hi {{ user }},
+
+Thanks for verifying your email address. Your Universal Subtitles account is now fully activated!
+
+Happy subtitling!
+
+
+{% endblock %}
+
+{% block dont_send %}{% endblock %}
