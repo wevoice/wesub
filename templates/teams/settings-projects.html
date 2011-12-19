@@ -12,24 +12,28 @@
 
     <div class="view grid_9 alpha">
         <div class="tools group">
-            <a class="button project-add" href="{% url teams:add_project slug=team.slug %}">Add Project</a>
+            <a class="button project-add" href="{% url teams:add_project slug=team.slug %}">{% trans "Add Project" %}</a>
         </div>
-        <ul class="projects listing">
-            {% for project in projects %}
-                {% if not project.is_default_project %}
-                    <li>
-                        <span>
-                            <a href="{% url teams:project_video_list slug=project.team.slug project_slug=project.slug %}">{{ project.name }}</a>
-                        </span>
-                        <ul class="actions">
-                            <li>
-                                <a class="action-edit" href="{% url teams:edit_project slug=team.slug project_slug=project.slug %}">Edit</a>
-                            </li>
-                        </ul>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
+        {% if projects %}
+            <ul class="projects listing">
+                {% for project in projects %}
+                    {% if not project.is_default_project %}
+                        <li>
+                            <span>
+                                <a href="{% url teams:project_video_list slug=project.team.slug project_slug=project.slug %}">{{ project.name }}</a>
+                            </span>
+                            <ul class="actions">
+                                <li>
+                                    <a class="action-edit" href="{% url teams:edit_project slug=team.slug project_slug=project.slug %}">Edit</a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty">{% trans "This team does not have any projects yet" %}</p>
+        {% endif %}
         {% include "teams/_basic_settings.html" %}
     </div>
 
