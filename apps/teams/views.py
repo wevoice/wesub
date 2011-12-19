@@ -535,7 +535,7 @@ def detail_members(request, slug, role=None):
     lang = request.GET.get('lang')
 
     team = Team.get(slug, request.user)
-    qs = team.members.all()
+    qs = team.members.filter(user__is_active=True)
 
     if q:
         for term in filter(None, [term.strip() for term in q.split()]):
@@ -581,6 +581,7 @@ def detail_members(request, slug, role=None):
             'video_url': team.video.get_video_url(),
             'base_state': {}
         })
+
     return object_list(request, queryset=qs,
                        paginate_by=MEMBERS_ON_PAGE,
                        template_name='teams/members-list.html',
@@ -778,7 +779,8 @@ def search_members(request, slug):
     q = request.GET.get('term')
 
     results = [[m.user.id, m.user.username]
-               for m in team.members.filter(user__username__icontains=q)]
+               for m in team.members.filter(user__username__icontains=q,
+                                            user__is_active=True)]
 
     return { 'results': results }
 
