@@ -1338,6 +1338,11 @@ class Task(models.Model):
         '''Return the URL that will open whichever dialog necessary to perform this task.'''
         mode = Task.TYPE_NAMES[self.type].lower()
         return self.subtitle_version.language.get_widget_url(mode=mode, task_id=self.pk)
+    
+    def save(self, *args, **kwargs):
+        result = super(Task, self).save(*args, **kwargs)
+        update_one_team_video.delay(self.team_video.pk)
+        return result
 
 
 class SettingManager(models.Manager):
