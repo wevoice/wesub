@@ -10,7 +10,7 @@ from itertools import izip, cycle
 import simplejson as json
 from dateutil import parser
 from dateutil.tz import tzutc
-from datetime import datetime
+from datetime import datetime, timedelta
 from M2Crypto import EVP
 
 class MultiPass(object):
@@ -53,7 +53,6 @@ class MultiPass(object):
     def decode(self, data):
         aes = EVP.Cipher("aes_128_cbc", key=self.secret,
             iv=self.iv, op=0)
-
         data = data.encode('ascii')
 
         string = base64.urlsafe_b64decode(data + '=' * (4 - len(data) % 4))
@@ -65,7 +64,8 @@ class MultiPass(object):
 
         if 'expires' in obj:
             expires_utc = parser.parse(obj['expires'])
-            if datetime.now(tz=tzutc()) > expires_utc:
+            limit_time = datetime.now(tz=tzutc()) - timedelta(minutes=10) 
+            if limit_time > expires_utc:
                 raise Exception("Expired!")
 
         return obj
