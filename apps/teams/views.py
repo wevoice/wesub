@@ -921,7 +921,7 @@ def _task_category_counts(team, filters, user):
         tasks = [t for t in tasks if t.language == filters['language']]
 
     if filters['team_video']:
-        tasks = [t for t in tasks if t.team_video == filters['team_video']]
+        tasks = [t for t in tasks if t.team_video.pk == int(filters['team_video'])]
 
     if filters['assignee']:
         if filters['assignee'] == 'none':
