@@ -21,6 +21,7 @@ import json
 
 from django.test import TestCase
 from apps.auth.models import CustomUser as User
+from apps.auth.models import EmailConfirmation
 from django.core import mail
 
 from apps.messages.models import Message
@@ -255,3 +256,15 @@ class MessageTest(TestCase):
         contributor_messge_count_2, contributor_email_count_2 = _get_counts(contributor)
         self.assertEqual(contributor_messge_count_1 , contributor_messge_count_2)
         self.assertEqual(contributor_email_count_1 , contributor_email_count_2)
+
+
+    def test_account_verified(self):
+       user = User.objects.filter(
+           notify_by_email=True, email__isnull=False)[0]
+       c = EmailConfirmation.objects.send_confirmation(user)
+       num_emails = len(mail.outbox)
+       num_messages = Message.objects.filter(user=user).count()
+       EmailConfirmation.objects.confirm_email(c.confirmation_key)
+       self.assertEqual(num_emails +1, len(mail.outbox))
+       self.assertEqual(num_messages +1,
+                        Message.objects.filter(user=user).count())

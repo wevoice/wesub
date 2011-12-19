@@ -30,6 +30,7 @@ import datetime
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.template.loader import render_to_string
 
 from sentry.client.models import client
 from celery.task import task
@@ -179,3 +180,19 @@ def team_member_leave(team_pk, user_pk):
         msg.user = m.user
         msg.object = m.team
         msg.save()
+        
+@task()
+def email_confirmed(user_pk):
+    from messages.models import Message
+    user = User.objects.get(pk=user_pk)
+    subject = "Welcome aboard!"
+    body = render_to_string("messages/email/email_confirmed.html", {"user":user})
+    message  = Message(
+        user=user,
+        subject=subject,
+        content=body
+    )
+    message.save()
+    return True
+    
+    

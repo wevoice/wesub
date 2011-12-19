@@ -433,9 +433,11 @@ class EmailConfirmationManager(models.Manager):
         except self.model.DoesNotExist:
             return None
         if not confirmation.key_expired():
+            from messages import tasks as notifier
             user = confirmation.user
             user.valid_email = True
             user.save()
+            notifier.email_confirmed.delay(user.pk)
             return user
 
     def send_confirmation(self, user):
