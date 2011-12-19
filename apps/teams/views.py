@@ -508,8 +508,7 @@ def remove_video(request, team_video_pk):
 
     next = request.POST.get('next', reverse('teams:user_teams'))
 
-    # TODO: check if this should be on a project level
-    if not can_add_video(team_video.team, request.user):
+    if not can_add_video(team_video.team, request.user, team_video.project):
         error = _(u'You can\'t remove that video.')
 
         if request.is_ajax():
