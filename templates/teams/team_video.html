@@ -49,6 +49,16 @@
             {% csrf_token %}
         </form>
     </div>
+    <div class="controls grid_3 omega">
+        <ul>
+            <li class="current">
+                <a href="{% url teams:team_video team_video_pk=team_video.pk %}">Edit video form</a>
+            </li>
+            <li>
+                <a href="{{ team.get_absolute_url }}">← Back to videos</a>
+            </li>
+        </ul>
+    </div>
     <script type="text/javascript">
       {% include "teams/team_video.js" %}
     </script>
