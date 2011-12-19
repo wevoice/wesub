@@ -418,7 +418,7 @@ def add_video(request, slug):
     project_id = request.GET.get('project') or request.POST.get('project') or None
     project = Project.objects.get(team=team, pk=project_id) if project_id else team.default_project
 
-    if not can_add_video(team, request.user, project):
+    if request.POST and not can_add_video(team, request.user, project):
         messages.error(request, _(u"You can't add video."))
         return HttpResponseRedirect(team.get_absolute_url())
 
@@ -508,8 +508,7 @@ def remove_video(request, team_video_pk):
 
     next = request.POST.get('next', reverse('teams:user_teams'))
 
-    # TODO: check if this should be on a project level
-    if not can_add_video(team_video.team, request.user):
+    if not can_add_video(team_video.team, request.user, team_video.project):
         error = _(u'You can\'t remove that video.')
 
         if request.is_ajax():
@@ -786,7 +785,7 @@ TEAM_LANGUAGES = []
 def _build_translation_task_dict(team, team_video, language, member):
     task_dict = Task(team=team, team_video=team_video,
                      type=Task.TYPE_IDS['Translate'], assignee=None,
-                     language=language).to_dict(member.user)
+                     language=language).to_dict(member.user if member else None)
     task_dict['ghost'] = True
     return task_dict
 
@@ -944,7 +943,7 @@ def _tasks_list(request, team, filters, user):
 
     '''
     tasks = Task.objects.filter(team=team, deleted=False)
-    member = team.members.get(user=user)
+    member = team.members.get(user=user) if user else None
 
     if filters.get('team_video'):
         tasks = tasks.filter(team_video=filters['team_video'])
@@ -992,19 +991,19 @@ def _get_task_filters(request):
     }
 
 @render_to('teams/tasks.html')
-@login_required
 def team_tasks(request, slug):
     team = Team.get(slug, request.user)
 
     if not can_view_tasks_tab(team, request.user):
         return HttpResponseForbidden(_("You cannot view this team's tasks."))
 
-    member = team.members.get(user=request.user)
+    user = request.user if request.user.is_authenticated() else None
+    member = team.members.get(user=user) if user else None
     languages = _task_languages(team, request.user)
 
     filters = _get_task_filters(request)
 
-    tasks = _tasks_list(request, team, filters, request.user)
+    tasks = _tasks_list(request, team, filters, user)
     category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 

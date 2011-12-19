@@ -314,6 +314,13 @@ def can_add_video(team, user, project=None):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_add_video_somewhere(team, user):
+    """Return whether the given user can add a video somewhere in the given team."""
+
+    # TODO: Make this faster.
+    return any(can_add_video(team, user, project)
+               for project in team.project_set.all())
+
 def can_edit_video(team_video, user):
     """Return whether the given user can edit the given video."""
 
@@ -343,16 +350,11 @@ def can_change_team_settings(team, user):
 def can_view_tasks_tab(team, user):
     """Return whether the given user can view the tasks tab for the given team.
 
-    To view the tasks tab, the user just has to be a member of the team.
-
-    TODO: Consider "public" tasks?
+    For now, the tab is public.  We may come back and revisit this later.
 
     """
 
-    if not user.is_authenticated():
-        return False
-
-    return team.members.filter(user=user).exists()
+    return True
 
 def can_invite(team, user):
     """Return whether the given user can send an invite for the given team."""
