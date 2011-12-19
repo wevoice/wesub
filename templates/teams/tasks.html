@@ -275,6 +275,7 @@
             }
 
             $('a.action-assign').click(function(e) {
+                $('div.assignee-choice').hide();
                 $(e.target).parents('.admin-controls')
                            .siblings('form.assign-form')
                                .children('div.assignee-choice')
