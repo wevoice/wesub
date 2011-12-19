@@ -754,11 +754,6 @@ def leave_team(request, slug):
     if error:
         messages.error(request, _(error))
     else:
-        tasks = Task.objects.incomplete().filter(team=team, assignee=user)
-        for task in tasks:
-            task.assignee = None
-            task.save()
-
         TeamMember.objects.get(team=team, user=user).delete()
 
         messages.success(request, _(u'You have left this team.'))
