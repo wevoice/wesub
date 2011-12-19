@@ -30,6 +30,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
     has_lingua_franca = BooleanField()
     absolute_url = CharField(indexed=False)
     project_pk = IntegerField(indexed=True)
+    task_count = IntegerField()
     # never store an absolute url with solr
     # since the url changes according to the user
     # one cannot construct the url at index time
@@ -102,6 +103,8 @@ class TeamVideoLanguagesIndex(SearchIndex):
             [sl.language for sl in completed_sls]
         self.prepared_data['video_completed_lang_urls'] = \
             [sl.get_absolute_url() for sl in completed_sls]
+
+        self.prepared_data['task_count'] = models.Task.objects.incomplete().filter(team_video=obj).count()
 
         policy = obj.video.policy
         owned_by = None
