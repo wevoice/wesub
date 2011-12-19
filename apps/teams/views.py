@@ -379,7 +379,7 @@ def edit_project(request, slug, project_slug):
     if project.is_default_project:
         messages.error(request, _(u'You cannot edit that project.'))
         return HttpResponseRedirect(
-                reverse('teams:edit_projects', args=[], kwargs={'slug': slug}))
+                reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
 
     try:
         workflow = Workflow.objects.get(team=team, project=project)
@@ -401,7 +401,7 @@ def edit_project(request, slug, project_slug):
 
             messages.success(request, _(u'Project saved.'))
             return HttpResponseRedirect(
-                    reverse('teams:edit_projects', args=[], kwargs={'slug': slug}))
+                    reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
     else:
         form = ProjectForm(instance=project)
         workflow_form = WorkflowForm(instance=workflow)
