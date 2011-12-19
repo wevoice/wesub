@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block view_content %}
+    {% include "utils/chosenify.html" %}
     {% with "settings" as current %}
         {% include "teams/_tabs.html" %}
     {% endwith %}
