@@ -1,5 +1,5 @@
 {% extends "teams/base.html" %}
-{% load to_json i18n teams_tags paginator doorman media_compressor verbatim_templatetag query_string %}
+{% load to_json i18n teams_tags paginator doorman media_compressor verbatim_templatetag query_string utils_tags %}
 
 {% block css %}
     {{ block.super }}
@@ -41,8 +41,7 @@
                 <strong>unassigned</strong>
             {% endif %}
             {% if filters.language %}
-                <strong>{{ filters.language }}</strong> language
-            {% endif %}
+                <strong>{{ filters.language|lang_name_from_code }}</strong> language {% endif %}
             tasks
             {% if filters.team_video %}
                 for <strong>{{ filters.team_video }}</strong>
