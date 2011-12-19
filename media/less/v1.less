@@ -289,7 +289,7 @@
 /* Listings */
 
 .v1 .view p.active-filters {
-    margin: 1.2em -8px 0 1em;
+    margin: 1.2em -8px 0 4px;
     padding: 1em;
     .border-radius(3px);
     background-color: @faintest;
@@ -563,8 +563,9 @@
     .linear-gradient(left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
     
     ul {
-        padding: 0;
-        margin: 2em 0;
+        padding: 2em 0;
+        margin-left: -15px;
+        border-bottom: 1px solid @faintest;
 
         &.secondary {
             margin-top: 0;
@@ -579,7 +580,6 @@
             position: relative;
             display: block;
             padding: .75em 0 .75em 15px;
-            margin-left: -15px;
             text-decoration: none;
             color: @normal;
             .multi-border-radius(0, 5px, 5px, 0);
@@ -612,10 +612,8 @@
         }
     }
     .refine, div.search {
-        margin: 2em 0;
-        padding: 1.5em 15px;
-        margin-left: -15px;
-        border-top: 1px solid @faintest;
+        padding: 1.5em 15px 1em;
+        margin: 0 0 2em -15px;
         border-bottom: 1px solid @faintest;
 
         form {
