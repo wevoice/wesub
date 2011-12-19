@@ -53,7 +53,8 @@ def _execute_video_task(video, event_name):
     tvs =  list( TeamVideo.objects.filter(video=video, team__notification_settings__isnull=False))
     for tv in tvs:
         team_tasks.api_notify_on_video_activity.delay(
-            tv.video.pk,
+            tvs.team.pk,
+            tvs.video.video_id,
             event_name
             )
     
@@ -113,7 +114,8 @@ def api_on_teamvideo_new(sender, **kwargs):
     from teams.models import TeamNotificationSetting
     
     return team_tasks.api_notify_on_video_activity.delay(
-            sender.pk,
+            sender.team.pk,
+            sender.video.video_id ,
             TeamNotificationSetting.EVENT_VIDEO_NEW)
 
 #: Actual available signals

@@ -953,11 +953,7 @@ class Invite(models.Model):
     
 models.signals.pre_delete.connect(Message.on_delete, Invite)
     
-def invite_send_message(sender, instance, created, **kwargs):
-    if created:
-        notifier.team_invitation_sent.delay(instance.pk)
    
-post_save.connect(invite_send_message, Invite, dispatch_uid="teams.invite.send_invite")
 
 
 class Workflow(models.Model):

@@ -677,6 +677,10 @@ def invite_members(request, slug):
     if request.POST:
         form = InviteForm(team, request.user, request.POST)
         if form.is_valid():
+            # the form will fire the notifications for invitees
+            # this cannot be done on model signal, since you migt be
+            # sending invites twice for the same user, and that borks
+            # the naive signal for only created invitations
             form.save()
             return HttpResponseRedirect(reverse('teams:detail_members',
                                                 args=[], kwargs={'slug': team.slug}))

@@ -76,13 +76,14 @@ def send_new_message_notification(message_id):
 def team_invitation_sent(invite_pk):
     from messages.models import Message
     from teams.models import Invite
-    invite = Invite.objects.get(invite_pk)
+    invite = Invite.objects.get(pk=invite_pk)
     msg = Message()
     msg.subject = ugettext("You've been invited to team %s on Universal Subtitles" % invite.team.name)
     msg.user = invite.user
     msg.object = invite
     msg.author = invite.author
     msg.save()
+    return True
         
 @task()
 def application_sent(application_pk):
