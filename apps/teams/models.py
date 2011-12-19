@@ -1260,6 +1260,7 @@ class Task(models.Model):
                  'team_video': self.team_video.id if self.team_video else None,
                  'team_video_display': unicode(self.team_video) if self.team_video else None,
                  'team_video_url': self.team_video.video.get_absolute_url() if self.team_video else None,
+                 'widget_url': self.get_widget_url(),
                  'type': Task.TYPE_NAMES[self.type],
                  'public': self.public,
                  'assignee': self.assignee.id if self.assignee else None,
@@ -1278,6 +1279,11 @@ class Task(models.Model):
         '''Return the most specific workflow for this task's TeamVideo.'''
         return Workflow.get_for_team_video(self.team_video)
 
+
+    def get_widget_url(self):
+        mode = Task.TYPE_NAMES[self.type].lower()
+        if self.subtitle_version:
+            return self.subtitle_version.language.video.get_widget_url(mode, self.pk)
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
