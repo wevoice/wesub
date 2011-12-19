@@ -57,10 +57,17 @@
             {% for task in tasks %}
                 <li>
                     <h3>
-                        {% if task.language_display %}
-                            Translate to {{ task.language_display }}:
-                        {% else %}
+                        {% if task.type == "Subtitle" %}
                             Transcribe:
+                        {% endif %}
+                        {% if task.type == "Translate" %}
+                            Translate to {{ task.language_display }}:
+                        {% endif %}
+                        {% if task.type == "Review" %}
+                            Review {{ task.language_display }}:
+                        {% endif %}
+                        {% if task.type == "Approve" %}
+                            Approve {{ task.language_display }}:
                         {% endif %}
 
                         <a href="{{ task.team_video_url }}">{{ task.team_video_display }}</a>
@@ -109,14 +116,7 @@
                                         });
                                     </script>
                                 {% else %}
-                                    <form action="{% url teams:perform_task %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="task_id" value="{{ task.pk }}" />
-
-                                        {% if task.perform_allowed %}
-                                            <a class="perform" href="{% url teams:perform_task %}">Perform Task</a>
-                                        {% endif %}
-                                    </form>
+                                    <a class="perform" href="{{ task.widget_url }}">Perform Task</a>
                                 {% endif %}
                             {% endif %}
                         </li>
