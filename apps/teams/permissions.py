@@ -597,8 +597,8 @@ def can_create_task_translate(team_video, user=None):
     * The user has permission to create the translation task.
 
     Note: you *can* create translation tasks if subtitles for that language
-    already exist.  The task will simply "take over" that language from that
-    point forward.
+    already exist (but not if they're done!).  The task will simply "take over"
+    that language from that point forward.
 
     Languages are returned as strings (language codes like 'en').
 

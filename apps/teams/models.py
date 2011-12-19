@@ -23,7 +23,7 @@ from django.core.exceptions import ValidationError
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from messages.models import Message
 from messages import tasks as notifier
 from django.template.loader import render_to_string
@@ -154,11 +154,12 @@ class Team(models.Model):
         return self.name
 
     def render_message(self, msg):
+        author_page = msg.author.get_absolute_url() if msg.author else ''
         context = {
                 'team': self, 
                 'msg': msg,
                 'author': msg.author,
-                'author_page': msg.author.get_absolute_url(),
+                'author_page': author_page,
                 'team_page': self.get_absolute_url(),
                 "STATIC_URL": settings.STATIC_URL,
                 }
@@ -872,7 +873,12 @@ class TeamMember(models.Model):
     class Meta:
         unique_together = (('team', 'user'),)
 
+def clear_tasks(sender, instance, *args, **kwargs):
+    tasks = instance.team.task_set.incomplete().filter(assignee=instance.user)
+    tasks.update(assignee=None)
+
 post_save.connect(TeamMember.on_member_saved, TeamMember)
+pre_delete.connect(clear_tasks, TeamMember, dispatch_uid='teams.members.clear-tasks-on-delete')
 post_delete.connect(TeamMember.on_member_deleted, TeamMember)
 
 class MembershipNarrowing(models.Model):
