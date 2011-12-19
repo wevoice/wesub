@@ -419,6 +419,15 @@
                         .vertical-gradient(@faintest, @faint);
                         color: @dark;
                     }
+
+                    &.disabled {
+                        color: @lighter;
+
+                        &:hover {
+                            background: none;
+                            color: @lighter;
+                        }
+                    }
                 }
 
                 &:first-child a {
