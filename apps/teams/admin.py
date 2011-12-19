@@ -119,7 +119,7 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
                      'assignee__last_name', 'team_video__title',
                      'team_video__video__title')
-    raw_id_fields = ('team_video', 'team', 'assignee')
+    raw_id_fields = ('team_video', 'team', 'assignee', 'subtitle_version')
     ordering = ('-created',)
 
 class MembershipNarrowingAdmin(admin.ModelAdmin):

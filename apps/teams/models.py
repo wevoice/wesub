@@ -1283,7 +1283,7 @@ class Task(models.Model):
     def get_widget_url(self):
         mode = Task.TYPE_NAMES[self.type].lower()
         if self.subtitle_version:
-            return self.subtitle_version.language.video.get_widget_url(mode, self.pk)
+            return self.subtitle_version.language.get_widget_url(mode, self.pk)
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
