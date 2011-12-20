@@ -153,9 +153,11 @@
                     </a>
                     <span class="timestamp">{{ msg.created|timesince }} {% trans 'ago' %}</span>
                     <ul class="admin-controls">
-                        <li>
-                            <a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">Reply</a>
-                        </li>
+                        {% if msg.author != None %}
+                            <li>
+                                <a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">Reply</a>
+                            </li>
+                        {% endif %}
                         <li>
                             <a href="#" class="delete" message_id="{{ msg.pk }}">{% trans "Delete" %}</a>
                         </li>
