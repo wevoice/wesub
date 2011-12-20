@@ -955,8 +955,6 @@ class TeamsDetailQueryTest(TestCase):
         self.assertTrue([x.pk for x in multi] == created_pks)
 
 
-
-
 class TestLanguagePreference(TestCase):
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
 
@@ -970,6 +968,7 @@ class TestLanguagePreference(TestCase):
         self.langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
         from apps.teams.cache import invalidate_lang_preferences
         invalidate_lang_preferences(self.team)
+
 
     def test_readable_lang(self):
         # no tlp, should be all languages
@@ -990,7 +989,6 @@ class TestLanguagePreference(TestCase):
         self.assertNotIn("en" , generated)
         self.assertNotIn("en" , cached)
 
-
     def test_writable_lang(self):
         # no tlp, should be all languages
         generated =TeamLanguagePreference.objects._generate_writable(self.team )
@@ -1010,3 +1008,33 @@ class TestLanguagePreference(TestCase):
         self.assertNotIn("en" , generated)
         self.assertNotIn("en" , cached)
 
+    def test_preferred_lang(self):
+        # No preference, so no languages should be preferred.
+        generated = TeamLanguagePreference.objects._generate_preferred(self.team)
+        cached = TeamLanguagePreference.objects.get_preferred(self.team)
+        self.assertItemsEqual([], generated)
+        self.assertItemsEqual([], cached)
+
+        # Create one preferred.
+        tlp = TeamLanguagePreference(team=self.team, language_code="en", preferred=True)
+        tlp.save()
+
+        # Check everything.
+        generated = TeamLanguagePreference.objects._generate_preferred(self.team)
+        cached = TeamLanguagePreference.objects.get_preferred(self.team)
+
+        self.assertItemsEqual(["en"], generated)
+        self.assertItemsEqual(["en"], cached)
+
+        # Make sure this preferred language doesn't show up as a blocker.
+        generated = TeamLanguagePreference.objects._generate_readable(self.team)
+        cached = TeamLanguagePreference.objects.get_readable(self.team)
+
+        self.assertIn("en", generated)
+        self.assertIn("en", cached)
+
+        generated = TeamLanguagePreference.objects._generate_writable(self.team)
+        cached = TeamLanguagePreference.objects.get_writable(self.team)
+
+        self.assertIn("en", generated)
+        self.assertIn("en", cached)
