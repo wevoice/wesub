@@ -35,16 +35,16 @@
             </div>
         {% endif %}
 
-        {% if filters.assignee or filters.team_video or filters.language %}
+        {% if filters.assignee or filters.team_video or filters.language or filters.type %}
         <p class="active-filters">Showing
             {% if filters.assignee == 'none' %}
                 <strong>unassigned</strong>
             {% endif %}
+            {% if filters.language %}
+                <strong>{{ filters.language|lang_name_from_code }}</strong> language {% endif %}
             {% if filters.type %}
                 <strong>{{ filters.type }}</strong>
             {% endif %}
-            {% if filters.language %}
-                <strong>{{ filters.language|lang_name_from_code }}</strong> language {% endif %}
             tasks
             {% if filters.team_video %}
                 for <strong>{{ filters.team_video }}</strong>
@@ -59,68 +59,55 @@
             {% for task in tasks %}
                 <li>
                     <h3>
-                        {% if task.type == "Subtitle" %}
-                            Subtitle:
-                        {% endif %}
-                        {% if task.type == "Translate" %}
-                            Translate to {{ task.language_display }}:
-                        {% endif %}
-                        {% if task.type == "Review" %}
-                            Review {{ task.language_display }}:
-                        {% endif %}
-                        {% if task.type == "Approve" %}
-                            Approve {{ task.language_display }}:
-                        {% endif %}
-
-                        <a href="{{ task.team_video_url }}">{{ task.team_video_display }}</a>
-                        <span class="descriptor">
-                            {{ task.type }}
-                        </span>
-                        {% if task.ghost %}
-                            <span class="descriptor">GHOST</span>
-                        {% endif %}
-
-                        {% if task.completed %}
-                            <span class="descriptor">COMPLETED</span>
-                        {% endif %}
+                        <span{% if task.type == "Subtitle" %} class="current"{% endif %}>{% trans "Subtitle" %}</span>/<span{% if task.type == "Translate" %} class="current"{% endif %}>{% trans "Translate" %}</span>
+                        →
+                        <span{% if task.type == "Review" %} class="current"{% endif %}>{% trans "Review" %}</span>
+                        →
+                        <span{% if task.type == "Approve" %} class="current"{% endif %}>{% trans "Approve" %}</span>
+                        →
+                        {% trans "Published" %}
                     </h3>
-                    <p class="done">
-                        <span>
-                            Status:
-                            {% if not task.assignee %}
-                                Awaiting assignment.
-                            {% else %}
-                                In-progress.
-                            {% endif %}
-                        </span>
-
-                        {{ stepDisplay }}
-                    </p>
+                    <p>{% trans "Video" %}: {{ task.team_video_display|truncatewords:8 }}</p>
+                    {% if task.language_display %}
+                        <p>{% trans "Language" %}: {{ task.language_display }}</p>
+                    {% endif %}
                     <ul class="actions">
                         <li>
-                            {% if task.assignee_display %}
-                                Assigned to {{ task.assignee_display }}
-                            {% endif %}
-
-                            {% if task.perform_allowed and task.assignee == request.user.id %}
-                                {% if task.type == "Subtitle" or task.type == "Translate"%}
-                                    <a class="perform perform-task-{{ task.pk }}" href="">Perform Task</a>
-
-                                    <script type="text/javascript">
-                                        $('.perform-task-{{ task.pk }}').click(function() {
-                                            var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.video_url }}');
-                                            var opener = new unisubs.widget.SubtitleDialogOpener( '{{ task.video_id }}', '{{ task.video_url }}', 
-                                                videoSource, null, null
-                                            );
-                                            opener.showStartDialog();
-
-                                            return false;
-                                        });
-                                    </script>
+                            <h4>
+                                {% if task.assignee %}
+                                    {% trans "Assigned to" %}
+                                    {% if task.assignee == user.id %}
+                                        {% trans "you" %}
+                                    {% else %}
+                                         {{ task.assignee_display }}
+                                    {% endif %}
                                 {% else %}
-                                    <a class="perform" href="{{ task.widget_url }}">Perform Task</a>
+                                    {% trans "Unassigned" %}
                                 {% endif %}
+                            </h4>
+                        </li>
+
+                        {% if task.perform_allowed and task.assignee == request.user.id %}
+                            <li>
+                            {% if task.type == "Subtitle" or task.type == "Translate"%}
+                                <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Perform Task" %}</a>
+
+                                <script type="text/javascript">
+                                    $('.perform-task-{{ task.pk }}').click(function() {
+                                        var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.video_url }}');
+                                        var opener = new unisubs.widget.SubtitleDialogOpener( '{{ task.video_id }}', '{{ task.video_url }}', 
+                                            videoSource, null, null
+                                        );
+                                        opener.showStartDialog();
+
+                                        return false;
+                                    });
+                                </script>
+                            {% else %}
+                                <a class="perform" href="{{ task.widget_url }}">{% trans "Perform Task" %}</a>
                             {% endif %}
+                            </li>
+                        {% endif %}
                         </li>
                     </ul>
 
