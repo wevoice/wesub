@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
+#
 # Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 
@@ -37,7 +37,7 @@ from haystack import site
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 from utils import get_object_or_none
 from utils.searching import get_terms
-import datetime 
+import datetime
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
@@ -156,7 +156,7 @@ class Team(models.Model):
     def render_message(self, msg):
         author_page = msg.author.get_absolute_url() if msg.author else ''
         context = {
-                'team': self, 
+                'team': self,
                 'msg': msg,
                 'author': msg.author,
                 'author_page': author_page,
@@ -199,7 +199,7 @@ class Team(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('teams:detail', [self.slug])
-    
+
     def get_site_url(self):
         return 'http://%s%s' % (Site.objects.get_current().domain, self.get_absolute_url())
 
@@ -226,16 +226,16 @@ class Team(models.Model):
         Contibutors can add new subs videos but they migh need to be moderated
         """
         return self._is_role(user, TeamMember.ROLE_CONTRIBUTOR)
-    
+
     def can_remove_video(self, user, team_video=None):
         if not user.is_authenticated():
-            return False          
+            return False
         if self.video_policy == self.MANAGER_REMOVE and self.is_manager(user):
             return True
         if self.video_policy == self.MEMBER_REMOVE and self.is_member(user):
             return True
         return False
-    
+
     def can_edit_video(self, user, team_video=None):
         if not user.is_authenticated():
             return False
@@ -245,22 +245,22 @@ class Team(models.Model):
         if not user.is_authenticated():
             return False
         return self.is_member(user)
-    
+
     # moderation
-    
+
     def get_pending_moderation( self, video=None):
         from videos.models import SubtitleVersion
         qs =  SubtitleVersion.objects.filter(language__video__moderated_by=self, moderation_status=WAITING_MODERATION)
         if video is not None:
             qs = qs.filter(language__video=video)
-        return qs    
-            
+        return qs
+
 
     def can_add_moderation(self, user):
         if not user.is_authenticated():
             return False
         return self.is_manager(user)
-        
+
     def can_remove_moderation(self, user):
         if not user.is_authenticated():
             return False
@@ -268,7 +268,7 @@ class Team(models.Model):
 
     def video_is_moderated_by_team(self, video):
         return video.moderated_by == self
-    
+
     @property
     def member_count(self):
         if not hasattr(self, '_member_count'):
@@ -279,8 +279,8 @@ class Team(models.Model):
     def videos_count(self):
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', self.videos.count())
-        return self._videos_count        
-    
+        return self._videos_count
+
     def application_message(self):
         try:
             return self.settings.get(key=Setting.KEY_IDS['messages_application']).data
@@ -332,9 +332,9 @@ class Team(models.Model):
     def get_videos_for_languages(self, languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS):
         from utils.multi_query_set import TeamMultyQuerySet
         languages.extend([l[:l.find('-')] for l in languages if l.find('-') > -1])
-        
+
         langs_pairs = []
-        
+
         for l1 in languages:
             for l0 in languages:
                 if not l1 == l0:
@@ -395,7 +395,7 @@ class Team(models.Model):
             # make sure we create a default project
             self.default_project
 
-    
+
     def to_dict(self):
         return { 'pk': self.pk,
                  'name': self.name,
@@ -422,7 +422,7 @@ class ProjectManager(models.Manager):
         elif isinstance(team_identifier, str):
             team = Team.objects.get(slug=team_identifier)
         return Project.objects.filter(team=team).exclude(name=Project.DEFAULT_NAME)
-    
+
 class Project(models.Model):
     #: All tvs belong to a project, wheather the team has enabled them or not
     # the default project is just a convenience UI that pretends to be part of
@@ -443,7 +443,7 @@ class Project(models.Model):
     workflow_enabled = models.BooleanField(default=False)
 
     objects = ProjectManager()
-    
+
     def __unicode__(self):
         if self.is_default_project:
             return u"---------"
@@ -458,14 +458,14 @@ class Project(models.Model):
     @property
     def is_default_project(self):
         return self.name == Project.DEFAULT_NAME
-        
+
     class Meta:
         unique_together = (
                 ("team", "name",),
                 ("team", "slug",),
         )
         permissions = PROJECT_PERMISSIONS
-        
+
 
 
 class TeamVideo(models.Model):
@@ -474,9 +474,9 @@ class TeamVideo(models.Model):
     title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True,
         help_text=_(u'Use this space to explain why you or your team need to caption or subtitle this video. Adding a note makes volunteers more likely to help out!'))
-    thumbnail = S3EnabledImageField(upload_to='teams/video_thumbnails/', null=True, blank=True, 
+    thumbnail = S3EnabledImageField(upload_to='teams/video_thumbnails/', null=True, blank=True,
         help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'))
-    all_languages = models.BooleanField(_('Need help with all languages'), default=False, 
+    all_languages = models.BooleanField(_('Need help with all languages'), default=False,
         help_text=_('If you check this, other languages will not be displayed.'))
     added_by = models.ForeignKey(User)
     created = models.DateTimeField(auto_now_add=True)
@@ -486,22 +486,22 @@ class TeamVideo(models.Model):
 
     class Meta:
         unique_together = (('team', 'video'),)
-    
+
     def __unicode__(self):
         return self.title or unicode(self.video)
 
     def can_remove(self, user):
         return self.team.can_remove_video(user, self)
-    
+
     def link_to_page(self):
         if self.all_languages:
             return self.video.get_absolute_url()
         return self.video.video_link()
-        
+
     @models.permalink
     def get_absolute_url(self):
         return ('teams:team_video', [self.pk])
-    
+
     def get_thumbnail(self):
         if self.thumbnail:
             return self.thumbnail.thumb_url(100, 100)
@@ -510,10 +510,10 @@ class TeamVideo(models.Model):
             th = self.video.get_thumbnail()
             if th:
                 return th
-        
+
         if self.team.logo:
             return self.team.logo_thumbnail()
-        
+
         return ''
 
     def _original_language(self):
@@ -635,7 +635,7 @@ class TeamVideo(models.Model):
     def _add_searchable_language(self, language, sublang_dict, sls):
         complete_sublangs = []
         if language in sublang_dict:
-            complete_sublangs = [sl for sl in sublang_dict[language] if 
+            complete_sublangs = [sl for sl in sublang_dict[language] if
                                  not sl.is_dependent() and sl.is_complete]
         if len(complete_sublangs) == 0:
             sls.append("S_{0}".format(language))
@@ -654,7 +654,7 @@ class TeamVideo(models.Model):
         if not hasattr(self, "project"):
             self.project = self.team.default_project
         super(TeamVideo, self).save(*args, **kwargs)
-        
+
 
 
     def is_checked_out(self, ignore_user=None):
@@ -696,7 +696,7 @@ def team_video_save(sender, instance, created, **kwargs):
     update_one_team_video.delay(instance.id)
 
 def team_video_delete(sender, instance, **kwargs):
-    # not using an async task for this since the async task 
+    # not using an async task for this since the async task
     # could easily execute way after the instance is gone,
     # and backend.remove requires the instance.
     tv_search_index = site.get_index(TeamVideo)
@@ -716,7 +716,7 @@ class TeamVideoLanguage(models.Model):
     is_complete = models.BooleanField(default=False, db_index=True)
     percent_done = models.IntegerField(default=0, db_index=True)
     is_lingua_franca = models.BooleanField(default=False, db_index=True)
-    
+
     class Meta:
         unique_together = (('team_video', 'subtitle_language'),)
 
@@ -804,7 +804,7 @@ class TeamVideoLanguage(models.Model):
     class Meta:
         permissions = LANG_PERMISSIONS
 
-        
+
 
 class TeamVideoLanguagePair(models.Model):
     team_video = models.ForeignKey(TeamVideo)
@@ -822,7 +822,7 @@ class TeamVideoLanguagePair(models.Model):
 
 class TeamMemderManager(models.Manager):
     use_for_related_fields = True
-    
+
     def create_first_member(self, team, user):
         """Make sure that new teams always have an 'owner' member."""
 
@@ -832,24 +832,24 @@ class TeamMemderManager(models.Manager):
 
     def managers(self):
         return self.get_query_set().filter(role=TeamMember.ROLE_MANAGER)
-    
+
 class TeamMember(models.Model):
     ROLE_OWNER = ROLE_OWNER
     ROLE_ADMIN = ROLE_ADMIN
     ROLE_MANAGER = ROLE_MANAGER
     ROLE_CONTRIBUTOR = ROLE_CONTRIBUTOR
-    
+
     ROLES = (
         (ROLE_OWNER, _("Owner")),
         (ROLE_MANAGER, _("Manager")),
         (ROLE_ADMIN, _("Admin")),
         (ROLE_CONTRIBUTOR, _("Contributor")),
     )
-    
+
     team = models.ForeignKey(Team, related_name='members')
     user = models.ForeignKey(User, related_name='user')
     role = models.CharField(max_length=16, default=ROLE_CONTRIBUTOR, choices=ROLES)
-    
+
     objects = TeamMemderManager()
 
     def __unicode__(self):
@@ -860,13 +860,13 @@ class TeamMember(models.Model):
 
     def language_narrowings(self):
         return self.narrowings.filter(project__isnull=True)
-        
-    @classmethod    
+
+    @classmethod
     def on_member_saved(self, sender, instance, created, *args, **kwargs):
         if created:
             notifier.team_member_new.delay(instance.pk)
-        
-    @classmethod    
+
+    @classmethod
     def on_member_deleted(self, sender, instance, *args, **kwargs):
         notifier.team_member_leave.delay(instance.team.pk, instance.user.pk)
 
@@ -907,27 +907,27 @@ class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
     user = models.ForeignKey(User, related_name='team_applications')
     note = models.TextField(blank=True)
-    
+
     class Meta:
         unique_together = (('team', 'user'),)
-    
-        
+
+
 
     def approve(self):
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
         notifier.team_application_approved.delay(self.pk)
         self.delete()
-    
+
     def deny(self):
         self._send_deny_message()
         notifier.team_application_denied.delay(self.pk)
         self.delete()
-        
-    @classmethod    
+
+    @classmethod
     def on_saved(self, sender, instance, created, *args, **kwargs):
         if created:
             notifier.team_member_new.delay(instance.pk)
-        
+
 post_save.connect(Application.on_saved, Application)
 class Invite(models.Model):
     team = models.ForeignKey(Team, related_name='invitations')
@@ -936,30 +936,30 @@ class Invite(models.Model):
     author = models.ForeignKey(User)
     role = models.CharField(max_length=16, choices=TeamMember.ROLES,
                             default=TeamMember.ROLE_CONTRIBUTOR)
-    
+
     class Meta:
         unique_together = (('team', 'user'),)
-    
+
     def accept(self):
         TeamMember.objects.get_or_create(team=self.team, user=self.user, role=self.role)
         self.delete()
-        
+
     def deny(self):
         self.delete()
-    
+
     def render_message(self, msg):
         message = get_object_or_none(Setting, team=self.team,
                                      key=Setting.KEY_IDS['messages_invite'])
         return render_to_string('teams/_invite_message.html',
                                 {'invite': self, 'custom_message': message})
-    
+
     def message_json_data(self, data, msg):
         data['can-reaply'] = False
         return data
-    
+
 models.signals.pre_delete.connect(Message.on_delete, Invite)
-    
-   
+
+
 
 
 class Workflow(models.Model):
@@ -1344,7 +1344,7 @@ class Task(models.Model):
         '''Return the URL that will open whichever dialog necessary to perform this task.'''
         mode = Task.TYPE_NAMES[self.type].lower()
         return self.subtitle_version.language.get_widget_url(mode=mode, task_id=self.pk)
-    
+
     def save(self, *args, **kwargs):
         result = super(Task, self).save(*args, **kwargs)
         update_one_team_video.delay(self.team_video.pk)
@@ -1403,19 +1403,27 @@ class Setting(models.Model):
 
 
 class TeamLanguagePreferenceManager(models.Manager):
-
     def _generate_writable(self, team):
         langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
-        tlp_allows_writes =  set([x['language_code'] for x in  self.for_team(team).filter(allow_writes=False).values("language_code")])
-        return langs_set- tlp_allows_writes
-            
+
+        unwritable = self.for_team(team).filter(allow_writes=False, preferred=False).values("language_code")
+        unwritable = set([x['language_code'] for x in unwritable])
+
+        return langs_set - unwritable
+
     def _generate_readable(self, team):
-        langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
-        tlp_allows_reads =  set([x['language_code'] for x in self.for_team(team).filter(allow_reads=False).values(
-            "language_code")])
-        return langs_set - tlp_allows_reads
-            
-            
+        langs = set([x[0] for x in settings.ALL_LANGUAGES])
+
+        unreadable = self.for_team(team).filter(allow_reads=False, preferred=False).values("language_code")
+        unreadable = set([x['language_code'] for x in unreadable])
+
+        return langs - unreadable
+
+    def _generate_preferred(self, team):
+        preferred = self.for_team(team).filter(preferred=True).values("language_code")
+        return set([x['language_code'] for x in preferred])
+
+
     def for_team(self, team):
         return self.get_query_set().filter(team=team)
 
@@ -1423,58 +1431,84 @@ class TeamLanguagePreferenceManager(models.Manager):
         from teams.cache import invalidate_lang_preferences
         invalidate_lang_preferences(instance.team)
 
+
     def get_readable(self, team):
         from teams.cache import get_readable_langs
         return get_readable_langs(team)
-        
+
     def get_writable(self, team):
         from teams.cache import get_writable_langs
         return get_writable_langs(team)
-        
+
+    def get_preferred(self, team):
+        from teams.cache import get_preferred_langs
+        return get_preferred_langs(team)
+
 class TeamLanguagePreference(models.Model):
-    """
-    Represent language preferences for a given team. A team might say,
-    for example that Yoruba translations do not translate a team, then
-    that language should not have tasks assigned to it, nor it should
-    allow roles to be narrowed to that language.
+    """Represent language preferences for a given team.
 
-    This is how settings should interact, TLP means that we have created
-    a TeamLanguagePreference for that team and language.
-    | Action                                                  | NO TLP | allow_read=True,  | allow_read=False,  |
-    |                                                         |        | allow_write=False | allow_write=False  |     
-    =============================================================================================================
-    | assignable as tasks                                     | X      |                   |                    |
-    | assignable as narrowing to a certain team member / role | X      |                   |                    |
-    | listed on the widget for viewing                        | X      | X                 |                    |
-    | listed on the widget for improving                      | X      |                   |                    |
-    | returned from the api read operations                   | X      | X                 |                    |
-    | upload  / write operations from the api                 | X      |                   |                    |
-    | show up on the start dialog                             | X      |                   |                    |
+    First, TLPs may mark a language as "preferred".  If that's the case then the
+    other attributes of this model are irrelevant and can be ignored.
+    "Preferred" languages will have ghost translation tasks created for them.
 
-    Allow read = False and allow_writes = False essentially means that
-    language is block for that team, while allow_write=False and
-    allow_read=True means we can read subs but cannot write subs
-    Allow_read=true and allow_write=true is invalid, just remove the row
-    all together.
+    If preferred is False, the TLP describes a *restriction* on the language
+    instead.  Writing in that language may be prevented, or both reading and
+    writing may be prevented.
+
+    (Note: "writing" means not only writing new subtitles but also creating
+    tasks, etc)
+
+    This is how the restriction settings should interact.  TLP means that we
+    have created a TeamLanguagePreference for that team and language.
+
+    | Action                                  | NO TLP | allow_read=True,  | allow_read=False, |
+    |                                         |        | allow_write=False | allow_write=False |
+    ============================================================================================
+    | assignable as tasks                     | X      |                   |                   |
+    | assignable as narrowing                 | X      |                   |                   |
+    | listed on the widget for viewing        | X      | X                 |                   |
+    | listed on the widget for improving      | X      |                   |                   |
+    | returned from the api read operations   | X      | X                 |                   |
+    | upload  / write operations from the api | X      |                   |                   |
+    | show up on the start dialog             | X      |                   |                   |
+
+    Remember, this table only applies if preferred=False.  If the language is
+    preferred the "restriction" attributes are effectively garbage.  Maybe we
+    should make the column nullable to make this more clear?
+
+    allow_read=True, allow_write=True, preferred=False is invalid.  Just remove
+    the row all together.
+
     """
     team = models.ForeignKey(Team, related_name="lang_preferences")
     language_code = models.CharField(max_length=16)
+
     allow_reads = models.BooleanField()
     allow_writes = models.BooleanField()
+    preferred = models.BooleanField(default=False)
 
     objects = TeamLanguagePreferenceManager()
-    
+
+    class Meta:
+        unique_together = ('team', 'language_code')
+
+
     def clean(self, *args, **kwargs):
         if self.allow_reads and self.allow_writes:
-            raise ValidationError("No sense in having all allowed, just remove the preference for this language")
+            raise ValidationError("No sense in having all allowed, just remove the preference for this language.")
+
+        if self.preferred and (self.allow_reads or self.allow_writes):
+            raise ValidationError("Cannot restrict a preferred language.")
+
         super(TeamLanguagePreference, self).clean(*args, **kwargs)
 
     def __unicode__(self):
         return u"%s preference for team %s" % (self.language_code, self.team)
 
+
 post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePreference)
 
-    
+
 class TeamNotificationSettingManager(models.Manager):
     def notify_team(self, team_pk, video_id, event_name,
                     language_pk=None, version_pk=None):
@@ -1492,7 +1526,7 @@ class TeamNotificationSettingManager(models.Manager):
             return
         notification_settings.notify(Video.objects.get(video_id=video_id), event_name,
                                                  language_pk, version_pk)
-           
+
 class TeamNotificationSetting(models.Model):
     """
     Info on how a team should be notified of changes to it's videos.
@@ -1504,7 +1538,7 @@ class TeamNotificationSetting(models.Model):
     Some teams have strict requirements on mapping video ids to their
     internal values, and also their own language codes. Therefore we
     need to configure a class that can do the correct mapping.
-    
+
     TODO: allow email notifications
     """
     EVENT_VIDEO_NEW = "video-new"
@@ -1514,7 +1548,7 @@ class TeamNotificationSetting(models.Model):
     EVENT_SUBTITLE_NEW = "subs-new"
     EVENT_SUBTITLE_APPROVED = "subs-approved"
     EVENT_SUBTITLE_REJECTED = "subs-rejected"
- 
+
     team = models.OneToOneField(Team, related_name="notification_settings")
     # the url to post the callback notifing partners of new video activity
     request_url = models.URLField(blank=True, null=True)
@@ -1525,21 +1559,21 @@ class TeamNotificationSetting(models.Model):
 
     # integers mapping to classes, see unisubs-integration/notificationsclasses.py
     notification_class = models.IntegerField(default=1,)
-    
+
     objects = TeamNotificationSettingManager()
-    
+
     def get_notification_class(self):
         # move this import to the module level and test_settings break. Fun.
         import sentry_logger
         logger = sentry_logger.logging.getLogger("teams.models")
         try:
             from notificationclasses import NOTIFICATION_CLASS_MAP
-            
+
             return NOTIFICATION_CLASS_MAP[self.notification_class]
         except ImportError:
             logger.exception("Apparently unisubs-integration is not installed")
-            
-        
+
+
     def notify(self, video, event_name, language_pk=None, version_pk=None):
         """
         Resolves what the notification class is for this settings and
@@ -1558,6 +1592,6 @@ class TeamNotificationSetting(models.Model):
         return
         if self.email:
             notification.send_email(self.email, self.team, video, event_name, language_pk)
-        
+
     def __unicode__(self):
         return u'NotificationSettings for team %s' % (self.team)
