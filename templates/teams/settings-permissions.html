@@ -35,7 +35,7 @@
                 </fieldset>
             </div>
             <div class="grid_9" id="summary">
-                <h4>How your subtitles will get published</h4>
+                <h4>How your subtitles will get published <em>(configure below)</em></h4>
                 <div class="grid_2">
                     <h5>Subtitled</h5>
                     <p id="perm-sub"><p>
@@ -117,17 +117,17 @@
     <script type="text/javascript">
         $(window).load(function(){
             $workflow = $('#id_workflow_enabled');
-
-            if ($workflow.attr('checked')) {
-                $('.v1 .workflow').show();
-            }
-
+            
             // Fields to watch
             $subperm = $('#id_subtitle_policy');
             $transperm = $('#id_translate_policy');
             $revperm = $('#id_review_allowed');
             $appperm = $('#id_approve_allowed');
 
+            // Inspect/observe the workflow checkbox
+            if ($workflow.attr('checked')) {
+                $('.v1 .workflow').show();
+            }
             $workflow.change(function() {
                 if ($workflow.attr('checked')) {
                     $('.v1 .workflow').show();
@@ -140,6 +140,7 @@
                 }
             });
 
+            // Observe the permissions fields
             $subperm.change(function() {
                 $('#perm-sub').html($subperm.children('option:selected').html());
             });
@@ -163,6 +164,7 @@
                 }
             });
 
+            // Load state
             $subperm.trigger('change');
             $transperm.trigger('change');
             $revperm.trigger('change');
