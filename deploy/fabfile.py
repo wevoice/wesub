@@ -226,9 +226,10 @@ def _git_checkout(commit):
     _clear_permissions('.')
 
 
-def _get_optional_repo_version(repo):
-    with open(os.path.join(os.path.split(__file__)[0],repo)) as f:
-        return f.read().strip()
+def _get_optional_repo_version(dir, repo):
+    '''Find the optional repo version by looking at its file in optional/.'''
+    with cd(os.path.join(dir, 'unisubs', 'optional')):
+        return run('cat {0}'.format(repo))
 
 
 def _reload_app_server(dir=None):
@@ -257,24 +258,25 @@ def remove_disabled():
         env.host_string = host
         run('rm {0}/unisubs/disabled'.format(env.web_dir))
         
-def _update_integration(dir, branch_name, commit):
+def _update_integration(dir):
+    '''Actually update the integration repo on a single host.'''
+
     with cd(os.path.join(dir, 'unisubs', 'unisubs-integration')):
         with settings(warn_only=True):
-            run('git branch --track {0} origin/{0}'.format(branch_name))
-            run('git checkout {0}'.format(branch_name))
-        _git_pull()
-        
+            _git_checkout(_get_optional_repo_version(dir, 'unisubs-integration'))
+
 def update_integration():
     '''Update the integration repo to the version recorded in the site repo.
 
     At the moment it is assumed that the optional/unisubs-integration file
     exists, and that the unisubs-integration repo has already been cloned down.
 
-    The file should be in the form:  branch-name/commit-hash
+    The file should contain the commit hash and nothing else.
+
     TODO: Run this from update_web automatically
+
     '''
-    branch_name, commit = _get_optional_repo_version('unisubs-integration').split("/")
-    _execute_on_all_hosts(lambda dir: _update_integration(dir, branch_name, commit))
+    _execute_on_all_hosts(_update_integration)
 
 def update_web():
     """
