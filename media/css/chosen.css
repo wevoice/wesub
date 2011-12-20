@@ -6,6 +6,7 @@
   zoom: 1;
   color: #3e6782;
   *display: inline;
+  margin-bottom: .5em;
 }
 .v1 .chzn-container .chzn-drop {
   background: #fff;
