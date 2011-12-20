@@ -611,7 +611,7 @@ def can_create_task_translate(team_video, user=None):
     if not team_video.subtitles_finished():
         return []
 
-    candidate_languages = set(SUPPORTED_LANGUAGES_DICT.keys())
+    candidate_languages = set(team_video.team.get_writable_langs())
 
     existing_translate_tasks = team_video.task_set.all_translate()
     existing_translate_languages = set(t.language for t in existing_translate_tasks)

@@ -396,6 +396,13 @@ class Team(models.Model):
             self.default_project
 
 
+    def get_writable_langs(self):
+        return TeamLanguagePreference.objects.get_writable(self)
+
+    def get_readable_langs(self):
+        return TeamLanguagePreference.objects.get_readable(self)
+
+
     def to_dict(self):
         return { 'pk': self.pk,
                  'name': self.name,

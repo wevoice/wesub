@@ -327,7 +327,9 @@ class CreateTaskForm(ErrorableModelForm):
         self.team_video = team_video
 
         team_user_ids = team.members.values_list('user', flat=True)
-        self.fields['language'].choices = get_languages_list(True)
+
+        langs = [l for l in get_languages_list(True) if l[0] in team.get_writable_langs()]
+        self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
 
