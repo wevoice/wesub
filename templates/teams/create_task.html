@@ -54,6 +54,7 @@
                         <label>{% trans "What needs to be done?" %}</label>
                         {{ form.errors.type }}
                         {{ form.type }}
+                        <p class="notation">{% trans "Grayed-out tasks are currently unavailable. For example, a Translate task cannot precede a Subtitle task." %}</p>
                     </div>
                     <div class="chosen">
                         <div class="language-selector">
@@ -66,6 +67,7 @@
                                 <label>{% trans "Who should do it?" %}</label>
                                 {{ form.errors.assignee }}
                                 {{ form.assignee }}
+                                <p class="notation">{% trans "Tasks left unassigned can be claimed by members with the appropriate permissions." %}</p>
                             </div>
                         {% endif %}
                     </div>
