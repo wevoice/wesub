@@ -488,6 +488,7 @@ def team_video(request, team_video_pk):
         'team': team_video.team,
         'team_video': team_video,
         'form': form,
+        'user': request.user,
         'widget_params': base_widget_params(request, {'video_url': team_video.video.get_video_url(), 'base_state': {}})
     })
     return context
