@@ -76,17 +76,24 @@
 .v1 form fieldset input[type='file']{display:block;width:100%;padding:0;}
 .v1 form fieldset select{margin-bottom:.5em;padding:4px;width:100%;}
 .v1 form fieldset textarea{height:5em;}
-.v1 .view form .preselected{position:relative;padding:1em 1em 1em 75px;margin:.5em 0;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;min-height:3em;}.v1 .view form .preselected p{float:none;margin:0;}
-.v1 .view form .preselected img{position:absolute;top:1em;left:1em;max-width:50px;}
+.v1 form p{color:inherit;}
+.v1 .view form .preselected{position:relative;padding:1em;margin:.5em 0;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;}.v1 .view form .preselected p{float:none;margin:0;}
+.v1 .view form .preselected.video{padding-left:75px;min-height:3em;}.v1 .view form .preselected.video img{position:absolute;top:1em;left:1em;max-width:50px;}
 .v1 .panel-holder form{float:left;width:100%;clear:both;}
 .v1 .panel-holder .tools form{float:none;}
 .v1 form.workflow{margin-top:-3em;}.v1 form.workflow fieldset{padding:0 1em;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:4px;-moz-background-clip:padding-box;-moz-border-radius:4px;border-radius:4px;background-clip:padding-box;}.v1 form.workflow fieldset .button{margin-top:2em;}
 .v1 .workflow{display:none;margin-top:-2em;padding:0 1em;background:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:4px;-moz-background-clip:padding-box;-moz-border-radius:4px;border-radius:4px;background-clip:padding-box;}.v1 .workflow fieldset{padding-bottom:1.5em;}.v1 .workflow fieldset .button{float:right;}
 .v1 .alpha .omega{margin-left:60px;}
 #dashboard .alpha .omega{margin-left:10px;}
-.v1 div.submit{clear:both;margin-top:2em;padding-top:1em;border-top:1px solid #dce2e5;text-align:right;}.v1 div.submit form{padding:0;}
+.v1 div.submit{clear:both;margin:2em 0 0;padding-top:1em;border-top:1px solid #dce2e5;text-align:right;}.v1 div.submit form{padding:0;}
 .v1 div.submit button,.v1 div.submit input{margin:0;}
 .v1 .controls form.search fieldset{padding:0;}.v1 .controls form.search fieldset input{width:180px;padding:.5em;color:#a0b2bd;border-color:#dce2e5;}.v1 .controls form.search fieldset input:focus{border-color:#678ca3;}
+#summary{width:720px;margin:0 0 2em;padding:1.5em 0;border-top:1px solid #dce2e5;border-bottom:1px solid #dce2e5;background-image:-webkit-linear-gradient(top, #f0f0f0, #fafafa 5%, #fafafa 95%, #f0f0f0);background-image:-moz-linear-gradient(top, #f0f0f0, #fafafa 5%, #fafafa 95%, #f0f0f0);background-image:-o-linear-gradient(top, #f0f0f0, #fafafa 5%, #fafafa 95%, #f0f0f0);background-image:-ms-linear-gradient(top, #f0f0f0, #fafafa 5%, #fafafa 95%, #f0f0f0);background-image:linear-gradient(top, #f0f0f0, #fafafa 5%, #fafafa 95%, #f0f0f0);}#summary h4{margin:0 20px 1em;}#summary h4 em{font-weight:normal;font-style:normal;}
+#summary .grid_2{position:relative;margin:0 20px;color:#678ca3;}#summary .grid_2.omega{margin-right:0;}
+#summary .grid_2 h5{font-weight:bold;}
+#summary .grid_2 .divider{margin:1em;}
+#summary .grid_2 span{font-size:1.5em;position:absolute;top:0;right:-1em;}
+#summary p{margin:0;}
 #dashboard .featured{padding:0;margin-bottom:4em;}#dashboard .featured li{border-left:4px solid #dce2e5;padding:1em;margin:.5em 0;}
 #dashboard .listing{margin-bottom:4em;}#dashboard .listing li{padding:1em 150px 1em 0;}
 #dashboard .listing .timestamp{top:1em;}
