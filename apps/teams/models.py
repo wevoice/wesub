@@ -474,7 +474,6 @@ class Project(models.Model):
         permissions = PROJECT_PERMISSIONS
 
 
-
 class TeamVideo(models.Model):
     team = models.ForeignKey(Team)
     video = models.ForeignKey(Video)
@@ -698,7 +697,6 @@ class TeamVideo(models.Model):
                 self.video.subtitle_language().is_complete_and_synced())
 
 
-
 def team_video_save(sender, instance, created, **kwargs):
     update_one_team_video.delay(instance.id)
 
@@ -827,6 +825,7 @@ class TeamVideoLanguagePair(models.Model):
     language_pair = models.CharField(db_index=True, max_length=16)
     percent_complete = models.IntegerField(db_index=True, default=0)
 
+
 class TeamMemderManager(models.Manager):
     use_for_related_fields = True
 
@@ -862,11 +861,28 @@ class TeamMember(models.Model):
     def __unicode__(self):
         return u'%s' % self.user
 
+
     def project_narrowings(self):
         return self.narrowings.filter(project__isnull=False)
 
     def language_narrowings(self):
         return self.narrowings.filter(project__isnull=True)
+
+
+    def project_narrowings_fast(self):
+        return [n for n in  self.narrowings_fast() if n.project]
+
+    def language_narrowings_fast(self):
+        return [n for n in  self.narrowings_fast() if not n.project]
+
+    def narrowings_fast(self):
+        if hasattr(self, '_cached_narrowings'):
+            if self._cached_narrowings is not None:
+                return self._cached_narrowings
+
+        self._cached_narrowings = self.narrowings.all()
+        return self._cached_narrowings
+
 
     @classmethod
     def on_member_saved(self, sender, instance, created, *args, **kwargs):
@@ -880,6 +896,7 @@ class TeamMember(models.Model):
     class Meta:
         unique_together = (('team', 'user'),)
 
+
 def clear_tasks(sender, instance, *args, **kwargs):
     tasks = instance.team.task_set.incomplete().filter(assignee=instance.user)
     tasks.update(assignee=None)
@@ -887,6 +904,7 @@ def clear_tasks(sender, instance, *args, **kwargs):
 post_save.connect(TeamMember.on_member_saved, TeamMember)
 pre_delete.connect(clear_tasks, TeamMember, dispatch_uid='teams.members.clear-tasks-on-delete')
 post_delete.connect(TeamMember.on_member_deleted, TeamMember)
+
 
 class MembershipNarrowing(models.Model):
     """Represent narrowings that can be made on memberships.
@@ -965,8 +983,6 @@ class Invite(models.Model):
         return data
 
 models.signals.pre_delete.connect(Message.on_delete, Invite)
-
-
 
 
 class Workflow(models.Model):
