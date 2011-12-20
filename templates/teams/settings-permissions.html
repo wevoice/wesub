@@ -23,7 +23,43 @@
                     <label for="id_video_policy">Who can add/remove videos?</label>
                     {{ form.video_policy }}
                 </fieldset>
+            </div>
+            <div class="grid_4 omega guidelines">
+                <fieldset>
+                    <legend>Tasks</legend>
 
+                    <p class="notation">Manage subtitling and translation work for your videos</p>
+                    <label for="id_task_assign_policy">Who can create and assign tasks?</label>
+                    {{ form.task_assign_policy }}
+                    <p class="notation">Specified members will only be able to create/assign tasks they are permitted to complete themselves</p>
+                </fieldset>
+            </div>
+            <div class="grid_9" id="summary">
+                <h4>How your subtitles will get published</h4>
+                <div class="grid_2">
+                    <h5>Subtitled</h5>
+                    <p id="perm-sub"><p>
+                    <p class="divider">or ...</p>
+                    <h5>Translated</h5>
+                    <p id="perm-trans"></p>
+                    <span>→</span>
+                </div>
+                <div class="grid_2" id="review-step">
+                    <h5>Reviewed</h5>
+                    <p id="perm-rev"></p>
+                    <span>→</span>
+                </div>
+                <div class="grid_2" id="approve-step">
+                    <h5>Approved</h5>
+                    <p id="perm-app"></p>
+                    <span>→</span>
+                </div>
+                <div class="grid_2 omega">
+                    <h5>Published</h5>
+                </div>
+            </div>
+
+            <div class="grid_4 alpha messages">
                 <fieldset>
                     <legend>Subtitling</legend>
 
@@ -38,17 +74,7 @@
             </div>
             <div class="grid_4 omega guidelines">
                 <fieldset>
-                    <legend>Tasks</legend>
-
-                    <p class="notation">Manage subtitling and translation work for your videos</p>
-                    <label for="id_task_assign_policy">Who can create and assign tasks?</label>
-                    {{ form.task_assign_policy }}
-                    <p class="notation">Specified members will only be able to create/assign tasks they are permitted to complete themselves</p>
-                </fieldset>
-
-                <fieldset>
                     <legend>Workflows</legend>
-
                     <p class="notation">Workflows enable you to add moderation steps and automate tasks</p>
                     <label for="id_workflow_enabled">{{ form.workflow_enabled }} Enable workflows</label>
                 </fieldset>
@@ -96,13 +122,51 @@
                 $('.v1 .workflow').show();
             }
 
+            // Fields to watch
+            $subperm = $('#id_subtitle_policy');
+            $transperm = $('#id_translate_policy');
+            $revperm = $('#id_review_allowed');
+            $appperm = $('#id_approve_allowed');
+
             $workflow.change(function() {
                 if ($workflow.attr('checked')) {
                     $('.v1 .workflow').show();
+                    $revperm.trigger('change');
+                    $appperm.trigger('change');
                 } else {
                     $('.v1 .workflow').hide();
+                    $('#review-step').hide();
+                    $('#approve-step').hide();
                 }
             });
+
+            $subperm.change(function() {
+                $('#perm-sub').html($subperm.children('option:selected').html());
+            });
+            $transperm.change(function() {
+                $('#perm-trans').html($transperm.children('option:selected').html());
+            });
+            $revperm.change(function() {
+                if($revperm.children('option:selected').val() != 0){
+                    $('#review-step').show();
+                    $('#perm-rev').html($revperm.children('option:selected').html());
+                } else {
+                    $('#review-step').hide();
+                }
+            });
+            $appperm.change(function() {
+                if($appperm.children('option:selected').val() != 0){
+                    $('#approve-step').show();
+                    $('#perm-app').html($appperm.children('option:selected').html());
+                } else {
+                    $('#approve-step').hide();
+                }
+            });
+
+            $subperm.trigger('change');
+            $transperm.trigger('change');
+            $revperm.trigger('change');
+            $appperm.trigger('change');
         });
     </script>
 

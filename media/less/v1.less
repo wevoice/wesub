@@ -729,19 +729,28 @@
             height: 5em;
         }
     }
+
+    p {
+        color: inherit;
+    }
 }
 .v1 .view form .preselected {
     position: relative;
-    padding: 1em 1em 1em 75px;
+    padding: 1em;
     margin: .5em 0;
     background: @fainter;
     .border-radius(3px);
-    min-height: 3em;
 
     p {
         float: none;
         margin: 0;
     }
+
+}
+
+.v1 .view form .preselected.video {
+    padding-left: 75px;
+    min-height: 3em;
 
     img {
         position: absolute;
@@ -750,6 +759,7 @@
         max-width: 50px;
     }
 }
+
 .v1 .panel-holder form {
     float: left;
     width: 100%;
@@ -794,7 +804,7 @@
 }
 .v1 div.submit {
     clear: both;
-    margin-top: 2em;
+    margin: 2em 0 0;
     padding-top: 1em;
     border-top: 1px solid @fainter;
     text-align: right;
@@ -825,6 +835,52 @@
             }
         }
     }
+}
+
+#summary {
+    width: 720px;
+    margin: 0 0 2em;
+    padding: 1.5em 0;
+    border-top: 1px solid @fainter;
+    border-bottom: 1px solid @fainter;
+    background-image: -webkit-linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1) 95%, hsla(0, 0%, 95%, 1));
+    background-image: -moz-linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1) 95%, hsla(0, 0%, 95%, 1));
+    background-image: -o-linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1) 95%, hsla(0, 0%, 95%, 1));
+    background-image: -ms-linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1) 95%, hsla(0, 0%, 95%, 1));
+    background-image: linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1) 95%, hsla(0, 0%, 95%, 1));
+
+    h4 {
+        margin: 0 10px 1em;
+    }
+
+    .grid_2 {
+        position: relative;
+        margin: 0 30px 0 10px;
+        color: @normal;
+
+        &.omega {
+            margin: 0 0 0 10px;
+        }
+
+        h5 {
+            font-weight: bold;
+        }
+
+        .divider {
+            margin: 1em;
+        }
+
+        span {
+            font-size: 1.5em;
+            position: absolute;
+            top: 0; right: -1.5em;
+        }
+    }
+
+    p {
+        margin: 0;
+    }
+
 }
 
 /* Dashboard */
