@@ -17,7 +17,10 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib import admin
-from teams.models import Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing, Project
+from teams.models import (
+    Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing,
+    Project, TeamLanguagePreference
+)
 from videos.models import SubtitleLanguage
 from django.utils.translation import ugettext_lazy as _
 from messages.forms import TeamAdminPageMessageForm
@@ -123,6 +126,13 @@ class TaskAdmin(admin.ModelAdmin):
     raw_id_fields = ('team_video', 'team', 'assignee', 'subtitle_version')
     ordering = ('-created',)
 
+class TeamLanguagePreferenceAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'team', 'language_code', 'preferred',
+                    'allow_reads', 'allow_writes')
+    list_filter = ('preferred', 'allow_reads', 'allow_writes')
+    search_fields = ('team__name',)
+    raw_id_fields = ('team',)
+
 class MembershipNarrowingAdmin(admin.ModelAdmin):
     list_display = ('member', 'project', 'language')
     list_filter = ('created', 'modified')
@@ -149,6 +159,7 @@ admin.site.register(Team, TeamAdmin)
 admin.site.register(TeamVideo, TeamVideoAdmin)
 admin.site.register(Workflow, WorkflowAdmin)
 admin.site.register(Task, TaskAdmin)
+admin.site.register(TeamLanguagePreference, TeamLanguagePreferenceAdmin)
 admin.site.register(MembershipNarrowing, MembershipNarrowingAdmin)
 admin.site.register(Setting, SettingAdmin)
 admin.site.register(Project, ProjectAdmin)
