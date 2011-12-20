@@ -13,16 +13,14 @@
 
     <div class="view grid_9 alpha">
         <form class="team-settings" enctype="multipart/form-data" method="POST" action="">
+            {{ form.non_field_errors }}
             {% csrf_token %}
 
             <div class="grid_4 alpha">
                 <fieldset>
                     <legend>Preferred Languages</legend>
                     <p class="notation">Translation tasks will be auto-created for these languages</p>
-                    <select>
-                        <option value="">Boom</option>
-                        <option value="">Bam</option>
-                    </select>
+                    {{ form.preferred }}
                 </fieldset>
             </div>
 
@@ -30,10 +28,7 @@
                 <fieldset>
                     <legend>Blacklisted Languages</legend>
                     <p class="notation">Won't be shown when creating or performing tasks</p>
-                    <select>
-                        <option value="">Boom</option>
-                        <option value="">Bam</option>
-                    </select>
+                    {{ form.blacklisted }}
                 </fieldset>
             </div>
 

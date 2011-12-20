@@ -24,11 +24,11 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, CreateTaskForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GhostTaskAssignForm, GhostTaskDeleteForm, GuidelinesMessagesForm,
-    RenameableSettingsForm, ProjectForm
+    RenameableSettingsForm, ProjectForm, LanguagesForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    SubtitleLanguage, Setting
+    SubtitleLanguage, Setting, TeamLanguagePreference
 )
 from teams.signals import api_teamvideo_new
 from django.shortcuts import get_object_or_404, redirect, render_to_response
@@ -127,7 +127,7 @@ def index(request, my_teams=False):
                        template_object_name='teams',
                        extra_context=extra_context)
 
-def detail(request, slug, is_debugging=False, project_slug=None, languages=None):
+def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
 
     if project_slug is not None:
@@ -160,12 +160,6 @@ def detail(request, slug, is_debugging=False, project_slug=None, languages=None)
             'video_url': team.video.get_video_url(),
             'base_state': {}
         })
-
-    if bool(is_debugging) and request.user.is_staff:
-        extra_context.update({
-            'qs': qs,
-        })
-        return render_to_response("teams/detail-debug.html", extra_context, RequestContext(request))
 
     all_langs = set()
     for search_record in qs:
@@ -325,15 +319,6 @@ def settings_permissions(request, slug):
 
     return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
 
-@render_to('teams/settings-languages.html')
-@login_required
-def settings_languages(request, slug):
-    team = Team.get(slug, request.user)
-
-    ## TODO: Form stuff
-
-    return { 'team': team }
-
 @render_to('teams/settings-projects.html')
 @login_required
 def settings_projects(request, slug):
@@ -407,6 +392,77 @@ def edit_project(request, slug, project_slug):
         workflow_form = WorkflowForm(instance=workflow)
 
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
+
+
+
+def _set_languages(team, codes_preferred, codes_blacklisted):
+    tlps = TeamLanguagePreference.objects.for_team(team)
+
+    existing = set(tlp.language_code for tlp in tlps)
+
+    desired_preferred = set(codes_preferred)
+    desired_blacklisted = set(codes_blacklisted)
+    desired = desired_preferred | desired_blacklisted
+
+    # Figure out which languages need to be deleted/created/changed.
+    to_delete = existing - desired
+
+    to_create_preferred = desired_preferred - existing
+    to_set_preferred = desired_preferred & existing
+
+    to_create_blacklisted = desired_blacklisted - existing
+    to_set_blacklisted = desired_blacklisted & existing
+
+    # Delete unneeded prefs.
+    for tlp in tlps.filter(language_code__in=to_delete):
+        tlp.delete()
+
+    # Change existing prefs.
+    for tlp in tlps.filter(language_code__in=to_set_preferred):
+        tlp.preferred, tlp.allow_reads, tlp.allow_writes = True, False, False
+        tlp.save()
+
+    for tlp in tlps.filter(language_code__in=to_set_blacklisted):
+        tlp.preferred, tlp.allow_reads, tlp.allow_writes = False, False, False
+        tlp.save()
+
+    # Create remaining prefs.
+    for lang in to_create_preferred:
+        tlp = TeamLanguagePreference(team=team, language_code=lang,
+                                     allow_reads=False, allow_writes=False,
+                                     preferred=True)
+        tlp.save()
+
+    for lang in to_create_blacklisted:
+        tlp = TeamLanguagePreference(team=team, language_code=lang,
+                                     allow_reads=False, allow_writes=False,
+                                     preferred=False)
+        tlp.save()
+
+
+@render_to('teams/settings-languages.html')
+@login_required
+def settings_languages(request, slug):
+    team = Team.get(slug, request.user)
+
+    preferred = [tlp.language_code for tlp in
+                 TeamLanguagePreference.objects.for_team(team).filter(preferred=True)]
+    blacklisted = [tlp.language_code for tlp in
+                   TeamLanguagePreference.objects.for_team(team).filter(preferred=False)]
+    initial = {'preferred': preferred, 'blacklisted': blacklisted}
+
+    if request.POST:
+        form = LanguagesForm(team, request.POST, initial=initial)
+
+        if form.is_valid():
+            _set_languages(team, form.cleaned_data['preferred'], form.cleaned_data['blacklisted'])
+
+            messages.success(request, _(u'Settings saved.'))
+            return HttpResponseRedirect(request.path)
+    else:
+        form = LanguagesForm(team, initial=initial)
+
+    return { 'team': team, 'form': form }
 
 
 # Videos

@@ -43,7 +43,6 @@ class EditTeamVideoForm(forms.ModelForm):
     creation_date = forms.DateField(required=False, input_formats=['%Y-%m-%d'],
                                     help_text="Format: YYYY-MM-DD")
 
-
     project = forms.ModelChoiceField(
         label=_(u'Project'),
         queryset = Project.objects.none(),
@@ -543,6 +542,27 @@ class PermissionsForm(forms.ModelForm):
         model = Team
         fields = ('membership_policy', 'video_policy', 'subtitle_policy',
                   'translate_policy', 'task_assign_policy', 'workflow_enabled')
+
+
+class LanguagesForm(forms.Form):
+    preferred = forms.MultipleChoiceField(required=False, choices=())
+    blacklisted = forms.MultipleChoiceField(required=False, choices=())
+
+    def __init__(self, team, *args, **kwargs):
+        super(LanguagesForm, self).__init__(*args, **kwargs)
+
+        self.team = team
+        self.fields['preferred'].choices = get_languages_list(True)
+        self.fields['blacklisted'].choices = get_languages_list(True)
+
+    def clean(self):
+        preferred = set(self.cleaned_data['preferred'])
+        blacklisted = set(self.cleaned_data['blacklisted'])
+
+        if len(preferred & blacklisted):
+            raise forms.ValidationError(_(u'You cannot blacklist a preferred language.'))
+
+        return self.cleaned_data
 
 
 class InviteForm(forms.Form):
