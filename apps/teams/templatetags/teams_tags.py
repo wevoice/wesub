@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django import template
-from teams.models import Team, TeamVideo, Project, TeamMember
+from teams.models import Team, TeamVideo, Project, TeamMember, Workflow
 from videos.models import Action, Video
 from apps.widget import video_cache
 from django.conf import settings
@@ -302,3 +302,13 @@ def can_create_any_task(search_record, user=None):
 
     return False
 
+
+@register.filter
+def review_enabled(team):
+    w = Workflow.get_for_target(team.id, 'team')
+    return w.review_enabled
+
+@register.filter
+def approve_enabled(team):
+    w = Workflow.get_for_target(team.id, 'team')
+    return w.approve_enabled
