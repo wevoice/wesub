@@ -78,9 +78,9 @@ unisubs.reviewsubtitles.ReviewSubtitlesRightPanel.prototype.appendMiddleContents
     handler.listen(this.editedVersionLink_, 'click', this.editedVersionLinkClicked_);
 };
 unisubs.reviewsubtitles.ReviewSubtitlesRightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
-    this.sendBackButton_ = $d('a', {'class': 'unisubs-done'}, 'Send Back');
-    this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done'}, 'Save for Later');
-    this.approveButton_ = $d('a', {'class': 'unisubs-done'}, 'Approve');
+    this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
+    this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
+    this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Approve');
 
     el.appendChild(this.sendBackButton_);
     el.appendChild(this.saveForLaterButton_);
