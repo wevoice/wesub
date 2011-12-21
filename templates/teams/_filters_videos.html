@@ -10,7 +10,7 @@
 
         {% for project in projects %}
             <li {% if current_project == project %}class="current"{% endif %}>
-                <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}">{{ project }} <span>{{ project.teamvideo_set.count }}</span></a>
+                <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}">{{ project }} <span>{{ project.teamvideo__count }}</span></a>
             </li>
         {% endfor %}
     </ul>
