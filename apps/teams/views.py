@@ -605,6 +605,7 @@ def remove_video(request, team_video_pk):
 
 
 # Members
+@render_to('teams/members-list.html')
 def detail_members(request, slug, role=None):
     q = request.REQUEST.get('q')
     lang = request.GET.get('lang')
@@ -630,13 +631,17 @@ def detail_members(request, slug, role=None):
 
     extra_context = widget.add_onsite_js_files({})
 
+    team_member_list, pagination_info = paginate(qs, MEMBERS_ON_PAGE, request.GET.get('page'))
+    extra_context.update(pagination_info)
+    extra_context['team_member_list'] = team_member_list
+
     # if we are a member that can also edit roles, we create a dict of
     # roles that we can assign, this will vary from user to user, since
     # let's say an admin can change roles, but not for anyone above him
     # the owner, for example
     assignable_roles = []
     if roles_user_can_assign(team, request.user):
-        for member in qs:
+        for member in team_member_list:
             if can_assign_role(team, request.user, member.role, member.user):
                 assignable_roles.append(member)
 
@@ -657,11 +662,7 @@ def detail_members(request, slug, role=None):
             'base_state': {}
         })
 
-    return object_list(request, queryset=qs,
-                       paginate_by=MEMBERS_ON_PAGE,
-                       template_name='teams/members-list.html',
-                       extra_context=extra_context,
-                       template_object_name='team_member')
+    return extra_context
 
 @login_required
 def remove_member(request, slug, user_pk):
