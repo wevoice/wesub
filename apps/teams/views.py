@@ -127,6 +127,7 @@ def index(request, my_teams=False):
                        template_object_name='teams',
                        extra_context=extra_context)
 
+@render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
 
@@ -150,6 +151,15 @@ def detail(request, slug, project_slug=None, languages=None):
         'can_edit_videos': can_add_video(team, request.user, project),
         'can_create_tasks': can_create_tasks(team, request.user, project),
     })
+
+    if extra_context['can_add_video'] or extra_context['can_edit_videos'] or extra_context['can_create_tasks']:
+        # Cheat and reduce the number of videos on the page if we're dealing with
+        # someone who can edit videos in the team, for performance reasons.
+        is_editor = True
+        per_page = 10
+    else:
+        is_editor = False
+        per_page = VIDEOS_ON_PAGE
 
     general_settings = {}
     add_general_settings(request, general_settings)
@@ -185,18 +195,18 @@ def detail(request, slug, project_slug=None, languages=None):
     else:
         extra_context['order_name'] = sort_names['-time']
 
-    # Cheat and reduce the number of videos on the page if we're dealing with
-    # someone who can edit the team, for performance reasons.
-    if extra_context['can_add_video'] or extra_context['can_edit_videos'] or extra_context['can_create_tasks']:
-        per_page = 10
-    else:
-        per_page = VIDEOS_ON_PAGE
+    team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
+    extra_context.update(pagination_info)
+    extra_context['team_video_md_list'] = team_video_md_list
 
-    return object_list(request, queryset=qs,
-                       paginate_by=per_page,
-                       template_name='teams/videos-list.html',
-                       extra_context=extra_context,
-                       template_object_name='team_video_md')
+    if is_editor:
+        team_video_ids = [record.team_video_pk for record in team_video_md_list]
+        team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('team', 'project'))
+        team_videos = dict((tv.pk, tv) for tv in team_videos)
+        for record in team_video_md_list:
+            record._team_video = team_videos.get(record.team_video_pk)
+
+    return extra_context
 
 def completed_videos(request, slug):
     team = Team.get(slug, request.user)

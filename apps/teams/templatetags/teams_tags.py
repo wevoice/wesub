@@ -18,6 +18,7 @@
 
 from django import template
 from teams.models import Team, TeamVideo, Project, TeamMember, Workflow
+from django.db.models import Count
 from videos.models import Action, Video
 from apps.widget import video_cache
 from django.conf import settings
@@ -219,7 +220,7 @@ def team_projects(context, team, varname):
     {% endfor %}
 
     """
-    context[varname] = Project.objects.for_team(team)
+    context[varname] = Project.objects.for_team(team).annotate(Count('teamvideo'))
     return ""
 
 @tag(register, [Variable(), Constant("as"), Name()])
@@ -285,12 +286,18 @@ def get_assignable_roles(team, user):
     verbose_roles = [x for x in TeamMember.ROLES if x[0] in roles]
     return verbose_roles
 
+
 @register.filter
 def can_create_any_task(search_record, user=None):
-    try:
-        tv = TeamVideo.objects.get(pk=search_record.team_video_pk)
-    except TeamVideo.DoesNotExist:
-        return False
+    if hasattr(search_record, '_team_video'):
+        # This is ugly, but allows us to pre-fetch the teamvideos for the
+        # search records all at once to avoid multiple DB queries.
+        tv = search_record._team_video
+    else:
+        try:
+            tv = TeamVideo.objects.get(pk=search_record.team_video_pk)
+        except TeamVideo.DoesNotExist:
+            return False
 
     if can_create_task_subtitle(tv, user):
         return True

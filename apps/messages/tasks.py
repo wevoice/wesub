@@ -154,8 +154,9 @@ def team_member_new(member_pk):
         if m.user == member.user:
              base_str = ugettext("You've joined the %s team as a(n) %s'" %
                                  (m.team, m.role))
-        base_str = ugettext("%s joined the %s team as a(n) %s" % (
-            m.user, m.team, m.role))
+        else:
+             base_str = ugettext("%s joined the %s team as a(n) %s" % (
+            member.user, m.team, m.role))
         msg.subject = ugettext(base_str)
         msg.content = ugettext(base_str + " on %s" % (datetime.datetime.now()))
         msg.user = m.user
