@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
-from messages.models import Message
+import time
+
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.utils.http import cookie_date
 from django.views.generic.list_detail import object_list
 from django.views.generic.simple import direct_to_template
+
+from auth.models import CustomUser as User
+from messages.models import Message
 from messages.rpc import MessagesApiClass
-from utils.rpc import RpcRouter
 from messages.forms import SendMessageForm
-from django.utils.http import cookie_date
-import time
+from utils.rpc import RpcRouter
+from utils import render_to_json
 
 rpc_router = RpcRouter('messages:rpc_router', {
     'MessagesApi': MessagesApiClass()
@@ -93,3 +97,14 @@ def new(request):
     }
 
     return direct_to_template(request, 'messages/new.html', context)
+
+@render_to_json
+def search_users(request):
+    users = User.objects.all()
+    q = request.GET.get('term')
+
+    results = [[u.id, u.username]
+               for u in users.filter(username__icontains=q,
+                                            is_active=True)]
+
+    return { 'results': results }

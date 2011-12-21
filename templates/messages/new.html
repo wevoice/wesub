@@ -6,10 +6,6 @@
     {% trans 'Compose a Message' %} | Universal Subtitles
 {% endblock %}
 
-{% block scripts %}
-    {% include "utils/chosenify.html" %}
-{% endblock %}
-
 {% block main_content %}
 
     <h2>
@@ -25,10 +21,12 @@
             <fieldset>
                 <legend>Compose a Message</legend>
                 <label for="">Recipient(s)</label>
-                <select name="" id="">
-                    <option value="">Blah</option>
-                    <option value="">Blah</option>
-                </select>
+                <div class="ajaxChosen">
+                    <select name="id_user" name="user">
+                        <option value="">-----</option>
+                        <option value="">Begin typing to search.</option>
+                    </select>
+                </div>
                 <label for="">Message</label>
                 <textarea name="" id=""></textarea>
             </fieldset>
@@ -44,4 +42,20 @@
             <li><a href="{% url messages:sent %}">{% trans "Sent" %}</a></li>
         </ul>
     </div>
+
+    <script type="text/javascript">
+        $(".ajaxChosen select").ajaxChosen({
+            method: 'GET',
+            url: '/en/messages/users/search/',
+            dataType: 'json'
+        }, function (data) {
+            var terms = {};
+
+            $.each(data.results, function (i, val) {
+                terms[data.results[i][0]] = data.results[i][1];
+            });
+
+            return terms;
+        });
+    </script>
 {% endblock %}
