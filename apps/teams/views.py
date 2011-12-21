@@ -201,10 +201,11 @@ def detail(request, slug, project_slug=None, languages=None):
 
     if is_editor:
         team_video_ids = [record.team_video_pk for record in team_video_md_list]
-        team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('team', 'project'))
+        team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
         team_videos = dict((tv.pk, tv) for tv in team_videos)
         for record in team_video_md_list:
             record._team_video = team_videos.get(record.team_video_pk)
+            record._team_video.original_language_code = record.original_language
 
     return extra_context
 

@@ -689,7 +689,7 @@ class TeamVideo(models.Model):
     # Convenience functions
     def subtitles_started(self):
         """Return True if subtitles have been started for this video, otherwise False."""
-        return self.video.has_original_language()
+        return True if self._original_language() else False
 
     def subtitles_finished(self):
         """Return True if at least one set of subtitles has been finished for this video."""
