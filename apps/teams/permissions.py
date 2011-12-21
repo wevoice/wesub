@@ -585,7 +585,7 @@ def can_create_task_subtitle(team_video, user=None):
     if team_video.subtitles_started():
         return False
 
-    if list(team_video.task_set.all_subtitle()[:1]):
+    if team_video.task_set.all_subtitle().exists():
         return False
 
     return True
@@ -613,16 +613,23 @@ def can_create_task_translate(team_video, user=None):
     if user and not _user_can_create_task_translate(user, team_video):
         return []
 
-    if not team_video.subtitles_finished():
-        return []
+    if hasattr(team_video, 'completed_langs'):
+        if not team_video.completed_langs:
+            return False
+    else:
+        if not team_video.subtitles_finished():
+            return []
 
     candidate_languages = set(team_video.team.get_writable_langs())
 
     existing_translate_tasks = team_video.task_set.all_translate()
     existing_translate_languages = set(t.language for t in existing_translate_tasks)
 
-    existing_languages = set(sl.language
-                             for sl in team_video.video.completed_subtitle_languages())
+    if hasattr(team_video, 'completed_langs'):
+        existing_languages = set(team_video.completed_langs)
+    else:
+        existing_languages = set(
+                sl.language for sl in team_video.video.completed_subtitle_languages())
 
     # TODO: Order this for individual users?
     return list(candidate_languages - existing_translate_languages - existing_languages)
