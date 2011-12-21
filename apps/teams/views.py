@@ -591,7 +591,7 @@ def detail_members(request, slug, role=None):
     lang = request.GET.get('lang')
 
     team = Team.get(slug, request.user)
-    qs = team.members.filter(user__is_active=True)
+    qs = team.members.select_related('user').filter(user__is_active=True)
 
     if q:
         for term in filter(None, [term.strip() for term in q.split()]):

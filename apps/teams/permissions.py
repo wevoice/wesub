@@ -61,10 +61,15 @@ def get_member(user, team):
     if not user.is_authenticated():
         return None
 
-    try:
-        return team.members.get(user=user)
-    except TeamMember.DoesNotExist:
-        return None
+    if hasattr(user, '_cached_teammember'):
+        return user._cached_teammember
+    else:
+        try:
+            user._cached_teammember = team.members.get(user=user)
+        except TeamMember.DoesNotExist:
+            user._cached_teammember = None
+
+        return user._cached_teammember
 
 def get_role(member):
     """Return the member's general role in the team.
@@ -154,7 +159,7 @@ def get_narrowings(member):
     if not member:
         return []
     else:
-        return list(member.narrowings.all())
+        return list(member.narrowings_fast())
 
 def add_narrowing_to_member(member, project=None, language=None, added_by=None):
     """Add a narrowing to the given member for the given project or language.
@@ -611,7 +616,7 @@ def can_create_task_translate(team_video, user=None):
     if not team_video.subtitles_finished():
         return []
 
-    candidate_languages = set(SUPPORTED_LANGUAGES_DICT.keys())
+    candidate_languages = set(team_video.team.get_writable_langs())
 
     existing_translate_tasks = team_video.task_set.all_translate()
     existing_translate_languages = set(t.language for t in existing_translate_tasks)

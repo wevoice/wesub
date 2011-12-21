@@ -74,10 +74,10 @@
                         </h3>
                         <p>{{ member.role|capfirst }}
                         {% if member.role == 'admin' or member.role == 'manager' %}
-                            {% if member.language_narrowings or member.project_narrowings %}
-                                {% if member.project_narrowings %}for {% for narrowing in member.project_narrowings %}{% if forloop.last and not forloop.first %}and {% endif %}<em>{{ narrowing.project.name }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "project" %}{{ member.project_narrowings|length|pluralize }}{% if member.language_narrowings %} and {% endif %}{% endif %}
+                            {% if member.language_narrowings_fast or member.project_narrowings_fast %}
+                                {% if member.project_narrowings_fast %}for {% for narrowing in member.project_narrowings_fast %}{% if forloop.last and not forloop.first %}and {% endif %}<em>{{ narrowing.project.name }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "project" %}{{ member.project_narrowings_fast|length|pluralize }}{% if member.language_narrowings_fast %} and {% endif %}{% endif %}
 
-                                {% if member.language_narrowings %}for {% for narrowing in member.language_narrowings %}{% if forloop.last and not forloop.first %}and {% endif %}<em>{{ narrowing.get_language_display }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "language" %}{{ member.language_narrowings|length|pluralize }}{% endif %}
+                                {% if member.language_narrowings_fast %}for {% for narrowing in member.language_narrowings_fast %}{% if forloop.last and not forloop.first %}and {% endif %}<em>{{ narrowing.get_language_display }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "language" %}{{ member.language_narrowings_fast|length|pluralize }}{% endif %}
                             {% endif %}
                         {% endif %}
                         <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>

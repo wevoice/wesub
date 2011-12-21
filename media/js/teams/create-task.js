@@ -71,7 +71,9 @@ $(function() {
     }
 
     // Chosenify select elements
-    $(".chosen select").chosen();
+    $(".chosen select").filter(function() {
+        return !$(this).parents('div').hasClass('ajaxChosen');
+    }).chosen();
 
     // Perform initial filtering
     filterLanguages();

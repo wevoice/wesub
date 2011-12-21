@@ -141,8 +141,9 @@ class TeamsApiV2Class(object):
                 projects.append(data)
 
         langs = []
+        writeable_languages = team.get_writable_langs()
         if can_set_language_narrowings(team, user, member.user):
-            for code, name in ALL_LANGUAGES:
+            for code, name in [l for l in ALL_LANGUAGES if l[0] in writeable_languages]:
                 lang = {
                     'selected': True if code in current_languages else False,
                     'code': code,

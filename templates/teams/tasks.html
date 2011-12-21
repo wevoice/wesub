@@ -59,6 +59,22 @@
             {% for task in tasks %}
                 <li>
                     <h3>
+                        {% if task.type == "Subtitle" %}
+                            New 
+                        {% else %}
+                            {{ task.type }}
+                        {% endif %}
+                        {% if task.type == "Translate" %}
+                            Subtitles into {{ task.language_display }}
+                        {% else %}
+                            {% if task.language_display %}
+                                {{ task.language_display }}
+                            {% endif %}
+                            Subtitles
+                        {% endif %}
+                    </h3>
+                    <p>{% trans "Video" %}: {{ task.team_video_display|truncatewords:8 }}</p>
+                    <p class="steps">
                         <span{% if task.type == "Subtitle" %} class="current"{% endif %}>{% trans "Subtitle" %}</span>/<span{% if task.type == "Translate" %} class="current"{% endif %}>{% trans "Translate" %}</span>
                         {% if team|review_enabled %}
                             →
@@ -70,11 +86,7 @@
                         {% endif %}
                         →
                         {% trans "Published" %}
-                    </h3>
-                    <p>{% trans "Video" %}: {{ task.team_video_display|truncatewords:8 }}</p>
-                    {% if task.language_display %}
-                        <p>{% trans "Language" %}: {{ task.language_display }}</p>
-                    {% endif %}
+                    </p>
                     <ul class="actions">
                         <li>
                             <h4>
@@ -91,26 +103,28 @@
                             </h4>
                         </li>
 
-                        {% if task.perform_allowed and task.assignee == request.user.id %}
-                            <li>
-                            {% if task.type == "Subtitle" or task.type == "Translate"%}
-                                <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Perform Task" %}</a>
+                        {% if task.perform_allowed %}
+                            {% if task.assignee == request.user.id or task.assignee == None %}
+                                <li>
+                                    {% if task.type == "Subtitle" or task.type == "Translate"%}
+                                        <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Perform Task" %}</a>
 
-                                <script type="text/javascript">
-                                    $('.perform-task-{{ task.pk }}').click(function() {
-                                        var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.video_url }}');
-                                        var opener = new unisubs.widget.SubtitleDialogOpener( '{{ task.video_id }}', '{{ task.video_url }}', 
-                                            videoSource, null, null
-                                        );
-                                        opener.showStartDialog();
+                                        <script type="text/javascript">
+                                            $('.perform-task-{{ task.pk }}').click(function() {
+                                                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.video_url }}');
+                                                var opener = new unisubs.widget.SubtitleDialogOpener( '{{ task.video_id }}', '{{ task.video_url }}', 
+                                                    videoSource, null, null
+                                                );
+                                                opener.showStartDialog();
 
-                                        return false;
-                                    });
-                                </script>
-                            {% else %}
-                                <a class="perform" href="{{ task.widget_url }}">{% trans "Perform Task" %}</a>
+                                                return false;
+                                            });
+                                        </script>
+                                    {% else %}
+                                        <a class="perform" href="{{ task.widget_url }}">{% trans "Perform Task" %}</a>
+                                    {% endif %}
+                                </li>
                             {% endif %}
-                            </li>
                         {% endif %}
                         </li>
                     </ul>

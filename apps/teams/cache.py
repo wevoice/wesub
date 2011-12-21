@@ -62,3 +62,4 @@ def get_preferred_langs(team):
         value = TeamLanguagePreference.objects._generate_preferred(team)
         cache.set(cache_key, value, TIMEOUT)
     return value
+
