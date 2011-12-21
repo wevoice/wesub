@@ -56,7 +56,8 @@ def can_invite_to_team(team, user):
 
 @register.filter
 def can_edit_video(team_video_pk, user):
-    tv = TeamVideo.objects.get(pk=team_video_pk)
+    tv = TeamVideo.objects.select_related('team', 'project').get(pk=team_video_pk)
+
     return _can_edit_video(tv, user)
 
 @register.filter
