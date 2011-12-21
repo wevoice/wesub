@@ -493,7 +493,7 @@ INSTALLED_APPS = (
     'doorman',
     'icanhaz',
     'tastypie',
-    'unisubs' #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
+    'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
 )
 
 # Celery settings
@@ -880,3 +880,37 @@ EMAIL_NOTIFICATION_RECEIVERS = ("arthur@stimuli.com.br", "steve@stevelosh.com", 
 # If you're developing and have no net access, enable this setting on your
 # settings_local.py
 RUN_LOCALLY = False
+
+try:
+    import debug_toolbar
+
+    INSTALLED_APPS += ('debug_toolbar',)
+    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+
+    DEBUG_TOOLBAR_PANELS = (
+        'debug_toolbar.panels.timer.TimerDebugPanel',
+        # 'apps.testhelpers.debug_toolbar_extra.ProfilingPanel',
+        # 'apps.testhelpers.debug_toolbar_extra.HaystackDebugPanel',
+        'debug_toolbar.panels.sql.SQLDebugPanel',
+    )
+
+    def custom_show_toolbar(request):
+        print request.user
+        print request.user.is_staff
+        if request.user.is_staff and '__debug__/m/' in request.path:
+            return True
+
+        if request.user.is_staff and 'debug_toolbar' in request.GET:
+            return True
+
+        return False
+
+    DEBUG_TOOLBAR_CONFIG = {
+        'INTERCEPT_REDIRECTS': False,
+        'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+        'EXTRA_SIGNALS': [],
+        'HIDE_DJANGO_SQL': False,
+        'TAG': 'div',
+    }
+except ImportError:
+    pass
