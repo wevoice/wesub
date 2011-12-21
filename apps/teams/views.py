@@ -895,7 +895,7 @@ def _get_completed_language_dict(team_videos, languages):
     we're going through them.
 
     '''
-    video_ids = [tv.video.id for tv in TeamVideo.objects.filter(id__in=team_videos)]
+    video_ids = [tv.video_id for tv in team_videos]
 
     completed_langs = SubtitleLanguage.objects.filter(
             video__in=video_ids, language__in=languages, is_complete=True
@@ -1013,7 +1013,7 @@ def _tasks_list(request, team, filters, user):
     * team_video: team video ID as an integer
 
     '''
-    tasks = Task.objects.filter(team=team, deleted=False)
+    tasks = Task.objects.filter(team=team, deleted=False).select_related('team_video__video', 'assignee', 'team')
     member = team.members.get(user=user) if user else None
 
     if filters.get('team_video'):
