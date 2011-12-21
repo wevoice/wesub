@@ -224,11 +224,15 @@ def video(request, video, video_url=None, title=None):
         for l in translations:
             l.pending_moderation_count = get_pending_count(l)
             
-    context['widget_params'] = _widget_params(request, video, language=None, video_url=video_url and video_url.effective_url)
+    context['widget_params'] = _widget_params(
+        request, video, language=None,
+        video_url=video_url and video_url.effective_url,
+        size=(480,360)
+    )
+    
     _add_share_panel_context_for_video(context, video)
     context['lang_count'] = video.subtitlelanguage_set.filter(has_version=True).count()
     context['original'] = video.subtitle_language()
-    
     return render_to_response('videos/video.html', context,
                               context_instance=RequestContext(request))
 
@@ -463,7 +467,7 @@ def history(request, video, lang=None, lang_id=None):
                        template_object_name='revision',
                        extra_context=context)
 
-def _widget_params(request, video, version_no=None, language=None, video_url=None):
+def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):
     primary_url = video_url or video.get_video_url()
     alternate_urls = [vu.effective_url for vu in video.videourl_set.all() 
                       if vu.effective_url != primary_url]
@@ -477,6 +481,8 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
     if language:
         params['base_state']['language_code'] = language.language
         params['base_state']['language_pk'] = language.pk
+    if size:
+        params['video_config'] = {"width":size[0], "height":size[1]}
 
     return base_widget_params(request, params)
 
