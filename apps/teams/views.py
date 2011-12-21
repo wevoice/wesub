@@ -185,8 +185,15 @@ def detail(request, slug, project_slug=None, languages=None):
     else:
         extra_context['order_name'] = sort_names['-time']
 
+    # Cheat and reduce the number of videos on the page if we're dealing with
+    # someone who can edit the team, for performance reasons.
+    if extra_context['can_add_video'] or extra_context['can_edit_videos'] or extra_context['can_create_tasks']:
+        per_page = 10
+    else:
+        per_page = VIDEOS_ON_PAGE
+
     return object_list(request, queryset=qs,
-                       paginate_by=VIDEOS_ON_PAGE,
+                       paginate_by=per_page,
                        template_name='teams/videos-list.html',
                        extra_context=extra_context,
                        template_object_name='team_video_md')
