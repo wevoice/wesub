@@ -59,6 +59,22 @@
             {% for task in tasks %}
                 <li>
                     <h3>
+                        {% if task.type == "Subtitle" %}
+                            New 
+                        {% else %}
+                            {{ task.type }}
+                        {% endif %}
+                        {% if task.type == "Translate" %}
+                            Subtitles into {{ task.language_display }}
+                        {% else %}
+                            {% if task.language_display %}
+                                {{ task.language_display }}
+                            {% endif %}
+                            Subtitles
+                        {% endif %}
+                    </h3>
+                    <p>{% trans "Video" %}: {{ task.team_video_display|truncatewords:8 }}</p>
+                    <p class="steps">
                         <span{% if task.type == "Subtitle" %} class="current"{% endif %}>{% trans "Subtitle" %}</span>/<span{% if task.type == "Translate" %} class="current"{% endif %}>{% trans "Translate" %}</span>
                         {% if team|review_enabled %}
                             →
@@ -70,11 +86,7 @@
                         {% endif %}
                         →
                         {% trans "Published" %}
-                    </h3>
-                    <p>{% trans "Video" %}: {{ task.team_video_display|truncatewords:8 }}</p>
-                    {% if task.language_display %}
-                        <p>{% trans "Language" %}: {{ task.language_display }}</p>
-                    {% endif %}
+                    </p>
                     <ul class="actions">
                         <li>
                             <h4>

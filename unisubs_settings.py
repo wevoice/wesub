@@ -48,13 +48,6 @@ elif INSTALLATION == STAGING:
     REDIS_DB = "2"
     AWS_QUEUE_PREFIX = 'STAGING'
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
-    # Tracelyzer instrumentation
-    # http://support.tracelytics.com/kb/instrumenting-your-app/instrumenting-django-appsw
-    try:
-        import oboeware.djangoware
-    except ImportError:
-        import sys
-        print >> sys.stderr, "[oboe] Unable to instrument app and middleware"
     EMAIL_SUBJECT_PREFIX = '[usubs-staging]'
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 elif INSTALLATION == PRODUCTION:
