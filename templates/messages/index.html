@@ -181,21 +181,21 @@
         </ul>
     </div>
 
-<div class="msg_modal_wrap" id="msg_modal">
-  <a href="#close" class="close">{% trans "Close" %}</a>
-  <div class="msg_modal">
-    <div class="clearfix reply-container">
-        <form action="" method="post" accept-charset="utf-8" id="send-message-form">
-          <div class="global-errors"></div>
-            <style>
-                #message_form_id_content {
-                    max-width: 355px;
-                }
-            </style>              
-          {{ send_message_form.as_p }}
-          <p><button type="submit" class="green_button small">{% trans "Send Message" %}</button></p>
-        </form>
+    <div class="msg_modal_wrap" id="msg_modal">
+        <a href="#close" class="close">{% trans "Close" %}</a>
+        <div class="msg_modal">
+            <div class="clearfix reply-container">
+                <form action="" method="post" accept-charset="utf-8" id="send-message-form">
+                    <div class="global-errors"></div>
+                    <style>
+                        #message_form_id_content {
+                            max-width: 355px;
+                        }
+                    </style>              
+                    {{ send_message_form.as_p }}
+                    <p><button type="submit" class="green_button small">{% trans "Send Message" %}</button></p>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 {% endblock %}
