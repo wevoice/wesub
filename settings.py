@@ -895,8 +895,6 @@ try:
     )
 
     def custom_show_toolbar(request):
-        print request.user
-        print request.user.is_staff
         if request.user.is_staff and '__debug__/m/' in request.path:
             return True
 
