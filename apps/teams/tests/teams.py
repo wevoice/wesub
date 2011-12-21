@@ -778,7 +778,7 @@ class TeamsTest(TestCase):
         tm.save()
         url = reverse("teams:remove_member", kwargs={"user_pk": user2.pk, "slug": team.slug})
         response = self.client.post(url)
-        self.failUnlessEqual(response.status_code, 200)
+        self.failUnlessEqual(response.status_code, 302)
 
         self.assertFalse(team.is_member(user2))
 

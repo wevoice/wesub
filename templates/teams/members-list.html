@@ -86,13 +86,16 @@
                                 <a href="">Send a message</a>
                             </li>
                         </ul>
-                        <ul class="admin-controls">
-                            {% if member in assignable_roles %}
+                        {% if member in assignable_roles %}
+                            <ul class="admin-controls">
                                 <li>
                                     <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" >Edit</a>
                                 </li>
-                            {% endif %}
-                        </ul>
+                                <li>
+                                <a onclick="return confirm('{% trans 'Are you sure you want to delete this team member?' %}');" href="{% url teams:remove_member slug=team.slug user_pk=member.user.pk %}" class="delete">Delete</a>
+                                </li>
+                            </ul>
+                        {% endif %}
                     </li>
                 {% endwith %}
             {% endfor %}
