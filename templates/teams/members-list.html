@@ -83,7 +83,7 @@
                         <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>
                         <ul class="actions">
                             <li>
-                                <a href="">Send a message</a>
+                                <a href="{% url messages:new %}?user_id={{ member.user.pk }}&username={{ member.user.username }}">Send a message</a>
                             </li>
                         </ul>
                         {% if member in assignable_roles %}

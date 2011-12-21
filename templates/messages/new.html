@@ -25,6 +25,9 @@
                     <select name="id_user" name="user">
                         <option value="">-----</option>
                         <option value="">Begin typing to search.</option>
+                        {% if request.GET.user_id %}
+                            <option selected="selected" value="{{ request.GET.user_id }}">{{ request.GET.username }}</option>
+                        {% endif %}
                     </select>
                 </div>
                 <label for="">Message</label>
