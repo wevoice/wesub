@@ -425,7 +425,7 @@ class TaskAssignForm(forms.Form):
 
         self.team = team
         self.user = user
-        self.fields['assignee'].queryset = User.objects.filter(user__team=team)
+        self.fields['assignee'].queryset = User.objects.filter(team_members__team=team)
         self.fields['task'].queryset = team.task_set.incomplete()
 
 
@@ -449,7 +449,7 @@ class GhostTaskAssignForm(forms.Form):
         self.team = team
         self.user = user
         self.fields['language'].choices = get_languages_list(True)
-        self.fields['assignee'].queryset = User.objects.filter(user__team=team)
+        self.fields['assignee'].queryset = User.objects.filter(team_members__team=team)
         self.fields['team_video'].queryset = team.teamvideo_set.all()
 
     def clean(self):
