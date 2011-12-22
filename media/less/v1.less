@@ -822,16 +822,31 @@
 
     fieldset {
         padding: 0;
+        position: relative;
 
         input {
-            width: 180px;
+            width: 162px;
             padding: .5em;
+            padding-right: 30px;
             color: @lighter;
             border-color: @fainter;
 
             &:focus {
                 border-color: @normal;
             }
+        }
+        a.reset {
+            background: transparent url('../images/form-reset-icon.png') 7px 7px no-repeat;
+            color: #739AAE;
+            height: 25px;
+            position: absolute;
+            right: 1px;
+            text-align: center;
+            text-indent: -1000em;
+            text-shadow: 0 1px 1px #FFF;
+            top: 1px;
+            width: 25px;
+            .multi-border-radius(0, 2px, 2px, 0);
         }
     }
 }
