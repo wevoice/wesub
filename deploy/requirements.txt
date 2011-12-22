@@ -42,9 +42,12 @@ django-debug-toolbar==0.8.3
 # This can be commented out if you're using sqlite
 MySQL_python>=1.2.2
 Sphinx==1.0.7
-# pyfacebook isn't on PyPi for some reason
--e git+https://github.com/sciyoshi/pyfacebook.git@be8e843c6eeedf0a03cf#egg=facebook
+# pyfacebook needs to be forked as not do fight with oboeware
+vendor/pyfacebook-1.0a2.tar.gz
 vendor/Unidecode-0.04.9.tar.gz 
 M2Crypto==0.21.1
 vendor/django-templatetag-sugar.tar.gz
 vendor/django-tastypie-e8af3152.tar.gz
+# this should be commented until we are sure we want to deploy this to prod
+#vendor/oboe-0.4.0.tar.gz 
+
