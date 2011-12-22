@@ -47,6 +47,19 @@ ALL_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 
 register = template.Library()
 
+
+def _get_team_video_from_search_record(search_record):
+    if hasattr(search_record, '_team_video'):
+        # This is ugly, but allows us to pre-fetch the teamvideos for the
+        # search records all at once to avoid multiple DB queries.
+        return search_record._team_video
+    else:
+        try:
+            return TeamVideo.objects.get(pk=search_record.team_video_pk)
+        except TeamVideo.DoesNotExist:
+            return None
+
+
 @register.filter
 def can_approve_application(team, user):
     return can_invite(team, user)
@@ -56,8 +69,8 @@ def can_invite_to_team(team, user):
     return can_invite(team, user)
 
 @register.filter
-def can_edit_video(team_video_pk, user):
-    tv = TeamVideo.objects.select_related('team', 'project').get(pk=team_video_pk)
+def can_edit_video(search_record, user):
+    tv = _get_team_video_from_search_record(search_record)
 
     return _can_edit_video(tv, user)
 
@@ -289,15 +302,7 @@ def get_assignable_roles(team, user):
 
 @register.filter
 def can_create_any_task(search_record, user=None):
-    if hasattr(search_record, '_team_video'):
-        # This is ugly, but allows us to pre-fetch the teamvideos for the
-        # search records all at once to avoid multiple DB queries.
-        tv = search_record._team_video
-    else:
-        try:
-            tv = TeamVideo.objects.get(pk=search_record.team_video_pk)
-        except TeamVideo.DoesNotExist:
-            return False
+    tv = _get_team_video_from_search_record(search_record)
 
     if can_create_task_subtitle(tv, user):
         return True

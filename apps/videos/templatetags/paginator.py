@@ -21,8 +21,13 @@ from django.core.paginator import Paginator
 register = template.Library()
 
 def paginate(items, per_page, page):
-    page = int(page) if page else 1
+    if page != 'last':
+        page = int(page) if page else 1
+
     paginator = Paginator(items, per_page, allow_empty_first_page=True)
+    if page == 'last':
+        page = paginator.num_pages
+
     page_obj = paginator.page(page)
 
     return page_obj.object_list, {
