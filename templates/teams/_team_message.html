@@ -5,8 +5,10 @@
         of the <a href="{{ team_page }}">{{ team }}</a> team.
     {% endblocktrans %}
     <br/>
-    {% blocktrans %}
-        You received this notification because you are a member of the 
-        <a href="{{ team_page }}">{{ team }}</a> team. 
-    {% endblocktrans %}
+    {% if 'denied' not in msg.content %}
+        {% blocktrans %}
+            You received this notification because you are a member of the 
+            <a href="{{ team_page }}">{{ team }}</a> team. 
+        {% endblocktrans %}
+    {% endif %}
 </div>
