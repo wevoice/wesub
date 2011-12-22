@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block body_attrs %}id="video_profile"{% endblock %}
+{% block body_attrs %}id="video_profile" class="v1 video_view"{% endblock %}
 
 {% load escapejs widget comments recent_activity paginator i18n subtitles_tags teams_tags videos_tags media_compressor moderation doorman %}
 
@@ -78,22 +78,66 @@
 
     <meta property="og:site_name" content="Universal Subtitles"/>
     <meta property="og:description"
-          content="{% title_for_video video  %}"/>
+          content="{% title_for_video video %}"/>
 {% endblock  %}
 
 
 {% block main_content %}
-    <h2 class="main-title">
-        <span class="title-container" style="float: none;">{{ video }}</span>
-    </h2>
+    {% comment %}
+        - embed code changes betw video and subs
+        - sharing buttons are video-wide, not subs specific
+        - like button is subs specific though too
+        - show which languages are in progress
+        - need 'create subs' menu
+        - upload subs not clear that it's optional
+        - Select Original Language, Create Subtitles In..., Translate Subtitles To..., Upload From File, Upload Text Transcript
+        - Is follow video-wide or subs wide
+    {% endcomment %}
     {% if saved %}
-    <div id="messages">
-        <h2>{% blocktrans %}Subtitles saved!  You can share the video with friends,
-        or get an embed code for your site.  To add a
-        translation, click the button below.{% endblocktrans %}</h2>
-        <a href="#" id="closeBut">{% trans "Close" %}</a>
-    </div>
+        <div id="messages">
+            <p>{% blocktrans %}Subtitles saved! You can share the video with friends, or get an embed code for your site. To add atranslation, click the button below.{% endblocktrans %}</p>
+            <a href="#" id="closeBut">{% trans "Close" %}</a>
+        </div>
     {% endif %}
+
+    <div class="grid_4 context alpha">
+        <h2 class="main-title">
+            {{ video }}
+        </h2>
+        <p class="permalink"><a href="{{share_panel_permalink}}">Permalink</a></p>
+        <div class="description">
+            {{ video.description }}
+            <a href="#">Expand</a>
+        </div>
+        <div class="sharing-tools">
+            {% if shows_widget_sharing %}
+                {% include '_sharing_widget.html' %}
+            {% endif %}
+        </div>
+
+        {% if user.is_staff and perms.videos.edit_video %}
+            <h3>{% trans "Admin" %}</h3>
+            <ul id="admin-menu">
+                <li>
+                    <a href="{% url videos:video_debug video.video_id %}" target="blank"> View debug info </a>
+                </li>
+                <li>
+                    <a href="{% url admin:videos_video_change video.pk %}" target="blank"> {% trans 'Edit in Admin Interface' %}</a>
+                </li>
+                <li>{% feature_video video %}</li>
+                <li>
+                {% if user %}
+                    {% render_visibility_button video user %}
+                {% endif %}
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+    <div class="grid_8 view omega">
+        {% widget widget_params %}
+    </div>
+    {% comment %}
+    <br class="clearboth"/>
 
     <div id="edit-title-dialog" style="display: none" class="msg_modal_wrap" >
         <a href="#close" class="close">{% trans "Close" %}</a>
@@ -112,15 +156,7 @@
             </p>
         </div>
     </div>
-        
-    <div class="grid_6 alpha left_column">
-        {% widget widget_params %}
-    </div>
-    <div class="grid_6 omega right_column">
-      {% if shows_widget_sharing %}
-      {% include '_sharing_widget.html' %}
-      {% endif %}
-    </div>
+
     <div class="section">
         <div class="grid_3 left_nav_wrapper alpha">
             <h3>{% trans "Video" %}</h3>
@@ -221,6 +257,7 @@
             </div>
         </div>
     </div>
+    {% endcomment %}
 {% endblock %}
 
 {% block bottom_scripts %}

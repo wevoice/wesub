@@ -308,12 +308,13 @@ form.message p span {
     -webkit-border-radius: 3px;
     border-radius: 3px;
     color: inherit;
-    height: 20px;
     position: absolute;
-    right: 5px;
+    right: 10px;
     text-decoration: none;
-    top: 5px !important;
-    width: 20px;
+    top: 10px !important;
+    width: auto;
+    font-size: 11px;
+    color: #8bb0b8;
 }
 #messages #closeBut:hover {
     color: #CF616D

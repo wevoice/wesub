@@ -1048,3 +1048,114 @@
         padding: 5px !important;
     }
 }
+
+/* Video view */
+
+.video_view {
+
+    .view {
+
+        > div {
+            padding: 0;
+        }
+    }
+
+    .context {
+        width: 294px;
+        padding: 0 15px 0 0;
+        margin-right: 0;
+        border-left: none;
+        border-right: 1px solid @fainter;
+        .linear-gradient(right, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
+
+        p.permalink {
+            margin: -.5em 0 .5em;
+
+            a {
+                font-size: 11px;
+                text-decoration: none;
+                color: @lighter;
+            }
+        }
+
+        .description {
+            color: @dark;
+            height: 6em;
+            overflow: hidden;
+            padding-bottom: 1em;
+            line-height: 150%;
+        }
+
+        h2, h3 {
+            font-weight: normal;
+        }
+
+        h3 {
+            clear: both;
+            padding: 2em 0 .5em;
+            margin-bottom: .5em;
+            border-bottom: 1px solid @fainter;
+
+            &.sub-title {
+                padding-top: 0;
+                margin-bottom: 0;
+                border: none;
+                color: @dark;
+            }
+        }
+
+        ul {
+            padding: 0;
+        }
+
+        ul.buttons {
+            float: left;
+            width: 100%;
+
+            li {
+                display: inline;
+
+                a {
+                    display: block;
+                    float: left;
+                    text-indent: -9999em;
+                    height: 22px;
+                    width: 22px;
+                    padding: .25em;
+                    margin-right: .25em;
+
+                    &.facebook {
+                        background: url('../images/share_icons.png') no-repeat 5px 5px;
+                    }
+
+                    &.twitter {
+                        background: url('../images/share_icons.png') no-repeat 5px -32px;
+                    }
+
+                    &.email {
+                        background: url('../images/share_icons.png') no-repeat 5px -67px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+ol.subtitles {
+    
+    li {
+        position: relative;
+        padding: 1em 1em 1em 100px;
+        border-bottom: 1px solid @faintest;
+
+        .timing {
+            position: absolute;
+            top: 1em; left: 1em;
+            width: 75px;
+
+            .data {
+                display: none;
+            }
+        }
+    }
+}
