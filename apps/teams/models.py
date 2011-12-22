@@ -853,7 +853,7 @@ class TeamMember(models.Model):
     )
 
     team = models.ForeignKey(Team, related_name='members')
-    user = models.ForeignKey(User, related_name='user')
+    user = models.ForeignKey(User, related_name='team_members')
     role = models.CharField(max_length=16, default=ROLE_CONTRIBUTOR, choices=ROLES, db_index=True)
     
     objects = TeamMemderManager()
@@ -1484,16 +1484,16 @@ class TeamLanguagePreference(models.Model):
     This is how the restriction settings should interact.  TLP means that we
     have created a TeamLanguagePreference for that team and language.
 
-    | Action                                  | NO TLP | allow_read=True,  | allow_read=False, |
-    |                                         |        | allow_write=False | allow_write=False |
-    ============================================================================================
-    | assignable as tasks                     | X      |                   |                   |
-    | assignable as narrowing                 | X      |                   |                   |
-    | listed on the widget for viewing        | X      | X                 |                   |
-    | listed on the widget for improving      | X      |                   |                   |
-    | returned from the api read operations   | X      | X                 |                   |
-    | upload  / write operations from the api | X      |                   |                   |
-    | show up on the start dialog             | X      |                   |                   |
+    | Action                                 | NO  | allow_read=True,  | allow_read=False, |
+    |                                        | TLP | allow_write=False | allow_write=False |
+    ========================================================================================
+    | assignable as tasks                    | X   |                   |                   |
+    | assignable as narrowing                | X   |                   |                   |
+    | listed on the widget for viewing       | X   | X                 |                   |
+    | listed on the widget for improving     | X   |                   |                   |
+    | returned from the api read operations  | X   | X                 |                   |
+    | upload / write operations from the api | X   |                   |                   |
+    | show up on the start dialog            | X   |                   |                   |
 
     Remember, this table only applies if preferred=False.  If the language is
     preferred the "restriction" attributes are effectively garbage.  Maybe we

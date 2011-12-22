@@ -379,7 +379,7 @@ class CreateTaskForm(ErrorableModelForm):
 
         type = cd['type']
         lang = cd['language']
-        assignee = cd['language']
+        assignee = cd['assignee']
 
         team_video = self.team_video
         project, team = team_video.project, team_video.team
@@ -391,8 +391,8 @@ class CreateTaskForm(ErrorableModelForm):
             self.add_error(_(u"There is already a task in progress for that video/language."))
 
         if assignee:
-            # TODO
-            # if not can_assign_tasks(team, self.user, project, lang):
+            # TODO: Check perms
+            # if not can_assign_task(task, self.user):
             #     self.add_error(_(u"You are not allowed to assign this task."),
             #                    'assignee', cd)
             pass
@@ -425,7 +425,7 @@ class TaskAssignForm(forms.Form):
 
         self.team = team
         self.user = user
-        self.fields['assignee'].queryset = User.objects.filter(user__team=team)
+        self.fields['assignee'].queryset = User.objects.filter(team_members__team=team)
         self.fields['task'].queryset = team.task_set.incomplete()
 
 
@@ -449,7 +449,7 @@ class GhostTaskAssignForm(forms.Form):
         self.team = team
         self.user = user
         self.fields['language'].choices = get_languages_list(True)
-        self.fields['assignee'].queryset = User.objects.filter(user__team=team)
+        self.fields['assignee'].queryset = User.objects.filter(team_members__team=team)
         self.fields['team_video'].queryset = team.teamvideo_set.all()
 
     def clean(self):

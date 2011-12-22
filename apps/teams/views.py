@@ -206,6 +206,7 @@ def detail(request, slug, project_slug=None, languages=None):
         for record in team_video_md_list:
             record._team_video = team_videos.get(record.team_video_pk)
             record._team_video.original_language_code = record.original_language
+            record._team_video.completed_langs = record.video_completed_langs
 
     return extra_context
 
@@ -412,7 +413,6 @@ def edit_project(request, slug, project_slug):
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
 
 
-
 def _set_languages(team, codes_preferred, codes_blacklisted):
     tlps = TeamLanguagePreference.objects.for_team(team)
 
@@ -456,7 +456,6 @@ def _set_languages(team, codes_preferred, codes_blacklisted):
                                      allow_reads=False, allow_writes=False,
                                      preferred=False)
         tlp.save()
-
 
 @render_to('teams/settings-languages.html')
 @login_required
@@ -604,6 +603,7 @@ def remove_video(request, team_video_pk):
 
 
 # Members
+@render_to('teams/members-list.html')
 def detail_members(request, slug, role=None):
     q = request.REQUEST.get('q')
     lang = request.GET.get('lang')
@@ -629,13 +629,17 @@ def detail_members(request, slug, role=None):
 
     extra_context = widget.add_onsite_js_files({})
 
+    team_member_list, pagination_info = paginate(qs, MEMBERS_ON_PAGE, request.GET.get('page'))
+    extra_context.update(pagination_info)
+    extra_context['team_member_list'] = team_member_list
+
     # if we are a member that can also edit roles, we create a dict of
     # roles that we can assign, this will vary from user to user, since
     # let's say an admin can change roles, but not for anyone above him
     # the owner, for example
     assignable_roles = []
     if roles_user_can_assign(team, request.user):
-        for member in qs:
+        for member in team_member_list:
             if can_assign_role(team, request.user, member.role, member.user):
                 assignable_roles.append(member)
 
@@ -656,11 +660,7 @@ def detail_members(request, slug, role=None):
             'base_state': {}
         })
 
-    return object_list(request, queryset=qs,
-                       paginate_by=MEMBERS_ON_PAGE,
-                       template_name='teams/members-list.html',
-                       extra_context=extra_context,
-                       template_object_name='team_member')
+    return extra_context
 
 @login_required
 def remove_member(request, slug, user_pk):
@@ -852,8 +852,6 @@ def search_members(request, slug):
 
 
 # Tasks
-TEAM_LANGUAGES = []
-
 def _build_translation_task_dict(team, team_video, language, member):
     task_dict = Task(team=team, team_video=team_video,
                      type=Task.TYPE_IDS['Translate'], assignee=None,
@@ -896,10 +894,8 @@ def _get_completed_language_dict(team_videos, languages):
     we're going through them.
 
     '''
-    video_ids = [tv.video_id for tv in team_videos]
-
     completed_langs = SubtitleLanguage.objects.filter(
-            video__in=video_ids, language__in=languages, is_complete=True
+            video__in=team_videos, language__in=languages, is_complete=True
     ).values_list('video', 'language')
 
     completed_languages = defaultdict(list)
@@ -910,17 +906,20 @@ def _get_completed_language_dict(team_videos, languages):
     return completed_languages
 
 def _get_translation_tasks(team, tasks, member, team_video, language):
-    # TODO: Once this is a setting, look it up.
+    preferred_langs = TeamLanguagePreference.objects.get_preferred(team)
+
     if language:
-        if language not in TEAM_LANGUAGES:
+        if language not in preferred_langs:
             return []
         else:
             languages = [language]
     else:
-        languages = TEAM_LANGUAGES
+        languages = preferred_langs
+
     languages = map(str, languages)
 
-    team_videos = [team_video] if team_video else team.teamvideo_set.all()
+    team_videos = ([team_video] if team_video
+                   else team.teamvideo_set.values_list('pk', flat=True))
     completed_languages = _get_completed_language_dict(team_videos, languages)
 
     return [_build_translation_task_dict(team, team_video, language, member)
