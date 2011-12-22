@@ -413,7 +413,6 @@ def edit_project(request, slug, project_slug):
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
 
 
-
 def _set_languages(team, codes_preferred, codes_blacklisted):
     tlps = TeamLanguagePreference.objects.for_team(team)
 
@@ -457,7 +456,6 @@ def _set_languages(team, codes_preferred, codes_blacklisted):
                                      allow_reads=False, allow_writes=False,
                                      preferred=False)
         tlp.save()
-
 
 @render_to('teams/settings-languages.html')
 @login_required
@@ -896,10 +894,8 @@ def _get_completed_language_dict(team_videos, languages):
     we're going through them.
 
     '''
-    video_ids = [tv.video_id for tv in team_videos]
-
     completed_langs = SubtitleLanguage.objects.filter(
-            video__in=video_ids, language__in=languages, is_complete=True
+            video__in=team_videos, language__in=languages, is_complete=True
     ).values_list('video', 'language')
 
     completed_languages = defaultdict(list)
@@ -922,7 +918,8 @@ def _get_translation_tasks(team, tasks, member, team_video, language):
 
     languages = map(str, languages)
 
-    team_videos = [team_video] if team_video else team.teamvideo_set.all()
+    team_videos = ([team_video] if team_video
+                   else team.teamvideo_set.values_list('pk', flat=True))
     completed_languages = _get_completed_language_dict(team_videos, languages)
 
     return [_build_translation_task_dict(team, team_video, language, member)
