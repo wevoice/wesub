@@ -185,15 +185,17 @@ def detail(request, slug, project_slug=None, languages=None):
     sort_names = {
         'name': 'Name, A-Z',
         '-name': 'Name, Z-A',
-        '-time': 'Time, Newest',
         'time': 'Time, Oldest',
-        '-subs': 'Subtitles, Most',
+        '-time': 'Time, Newest',
         'subs': 'Subtitles, Least',
+        '-subs': 'Subtitles, Most',
     }
     if sort:
         extra_context['order_name'] = sort_names[sort]
     else:
         extra_context['order_name'] = sort_names['-time']
+
+    extra_context['current_videos_count'] = qs.count()
 
     team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
     extra_context.update(pagination_info)
