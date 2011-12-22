@@ -400,6 +400,7 @@ def can_review(team_video, user, lang=None):
 def can_approve(team_video, user, lang=None):
     workflow = Workflow.get_for_team_video(team_video)
     role = get_role_for_target(user, team_video.team, team_video.project, lang)
+
     if not workflow.approve_allowed:
         return False
 

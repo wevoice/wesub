@@ -86,10 +86,18 @@ class BaseTestPermission(TestCase):
     def role(self, r, project=None):
         add_role(self.team, self.user, self.owner, r, project=project)
 
+        # Handle the caching in permissions.get_role_for_target().
+        if hasattr(self.user, '_cached_teammember'):
+            delattr(self.user, '_cached_teammember')
+
         try:
             yield
         finally:
             remove_role(self.team, self.user, r, project=project)
+
+        # Handle the caching in permissions.get_role_for_target().
+        if hasattr(self.user, '_cached_teammember'):
+            delattr(self.user, '_cached_teammember')
 
 
 class TestRules(BaseTestPermission):
@@ -101,8 +109,7 @@ class TestRules(BaseTestPermission):
 
     # Testing specific permissions
     def test_roles_assignable(self):
-        user = User.objects.filter(teams__isnull=True)[0]
-        team = self.team
+        user, team = self.user, self.team
 
         # Owners can do anything except create other owners.
         with self.role(ROLE_OWNER):
@@ -127,8 +134,7 @@ class TestRules(BaseTestPermission):
                 self.assertItemsEqual(roles_user_can_assign(team, user, None), [])
 
     def test_roles_inviteable(self):
-        user = User.objects.filter(teams__isnull=True)[0]
-        team = self.team
+        user, team = self.user, self.team
 
         # Owners can do anything but owners.
         with self.role(ROLE_OWNER):
@@ -487,7 +493,6 @@ class TestRules(BaseTestPermission):
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
-                user = User.objects.all()[0]
                 self.assertTrue(can_approve(self.nonproject_video, user))
 
         for r in [ROLE_CONTRIBUTOR]:
