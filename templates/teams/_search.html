@@ -9,11 +9,12 @@
         if ('{{ request.GET.q }}' !== '') {
             $searchFieldset = $('form.search fieldset');
             $searchFieldset.append('<a href="#" class="reset">x</a>');
-            $('a.reset', $searchFieldset).click(function() {
-                $(this).siblings('input[name="q"]')
+            $anc = $('a.reset', $searchFieldset);
+            $anc.click(function() {
+                $anc.siblings('input[name="q"]')
                     .val('')
                     .attr('placeholder', 'Loading...');
-                $(this).hide();
+                $anc.hide();
                 $searchFieldset.parent().submit();
                 return false;
             });
