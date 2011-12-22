@@ -854,8 +854,6 @@ def search_members(request, slug):
 
 
 # Tasks
-TEAM_LANGUAGES = []
-
 def _build_translation_task_dict(team, team_video, language, member):
     task_dict = Task(team=team, team_video=team_video,
                      type=Task.TYPE_IDS['Translate'], assignee=None,
@@ -912,14 +910,16 @@ def _get_completed_language_dict(team_videos, languages):
     return completed_languages
 
 def _get_translation_tasks(team, tasks, member, team_video, language):
-    # TODO: Once this is a setting, look it up.
+    preferred_langs = TeamLanguagePreference.objects.get_preferred(team)
+
     if language:
-        if language not in TEAM_LANGUAGES:
+        if language not in preferred_langs:
             return []
         else:
             languages = [language]
     else:
-        languages = TEAM_LANGUAGES
+        languages = preferred_langs
+
     languages = map(str, languages)
 
     team_videos = [team_video] if team_video else team.teamvideo_set.all()
