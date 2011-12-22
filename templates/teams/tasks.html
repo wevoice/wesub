@@ -36,53 +36,53 @@
         {% endif %}
 
         {% if filters.assignee or filters.team_video or filters.language or filters.type %}
-        <p class="active-filters">Showing
-            {% if filters.assignee == 'none' %}
-                <strong>unassigned</strong>
-            {% endif %}
-            {% if filters.language %}
-                <strong>{{ filters.language|lang_name_from_code }}</strong> language {% endif %}
-            {% if filters.type %}
-                <strong>{{ filters.type }}</strong>
-            {% endif %}
-            tasks
-            {% if filters.team_video %}
-                for <strong>{{ filters.team_video }}</strong>
-            {% endif %}
-            {% if filters.assignee and filters.assignee != 'none' %}
-                assigned to <strong>{{ filters.assignee }}</strong>
-            {% endif %}
-        </p>
+            <p class="active-filters">Showing
+                {% if filters.assignee == 'none' %}
+                    <strong>unassigned</strong>
+                {% endif %}
+                {% if filters.language %}
+                    <strong>{{ filters.language|lang_name_from_code }}</strong> language {% endif %}
+                {% if filters.type %}
+                    <strong>{{ filters.type }}</strong>
+                {% endif %}
+                tasks
+                {% if filters.team_video %}
+                    for <strong>{{ filters.team_video }}</strong>
+                {% endif %}
+                {% if filters.assignee and filters.assignee != 'none' %}
+                    assigned to <strong>{{ filters.assignee }}</strong>
+                {% endif %}
+            </p>
         {% endif %}
 
         <ul class="tasks listing">
             {% for task in tasks %}
                 <li>
                     <h3>
-                        {% if task.type == "Subtitle" %}
+                        {% if task.get_type_display == "Subtitle" %}
                             New 
                         {% else %}
-                            {{ task.type }}
+                            {{ task.get_type_display }}
                         {% endif %}
-                        {% if task.type == "Translate" %}
+                        {% if task.get_type_display == "Translate" %}
                             Subtitles into {{ task.language_display }}
                         {% else %}
-                            {% if task.language_display %}
-                                {{ task.language_display }}
+                            {% if task.get_language_display %}
+                                {{ task.get_language_display }}
                             {% endif %}
                             Subtitles
                         {% endif %}
                     </h3>
-                    <p>{% trans "Video" %}: {{ task.team_video_display|truncatewords:8 }}</p>
+                    <p>{% trans "Video" %}: {{ task.team_video|truncatewords:8 }}</p>
                     <p class="steps">
-                        <span{% if task.type == "Subtitle" %} class="current"{% endif %}>{% trans "Subtitle" %}</span>/<span{% if task.type == "Translate" %} class="current"{% endif %}>{% trans "Translate" %}</span>
+                        <span{% if task.get_type_display == "Subtitle" %} class="current"{% endif %}>{% trans "Subtitle" %}</span>/<span{% if task.get_type_display == "Translate" %} class="current"{% endif %}>{% trans "Translate" %}</span>
                         {% if team|review_enabled %}
                             →
-                            <span{% if task.type == "Review" %} class="current"{% endif %}>{% trans "Review" %}</span>
+                            <span{% if task.get_type_display == "Review" %} class="current"{% endif %}>{% trans "Review" %}</span>
                         {% endif %}
                         {% if team|approve_enabled %}
                             →
-                            <span{% if task.type == "Approve" %} class="current"{% endif %}>{% trans "Approve" %}</span>
+                            <span{% if task.get_type_display == "Approve" %} class="current"{% endif %}>{% trans "Approve" %}</span>
                         {% endif %}
                         →
                         {% trans "Published" %}
@@ -92,10 +92,10 @@
                             <h4>
                                 {% if task.assignee %}
                                     {% trans "Assigned to" %}
-                                    {% if task.assignee == user.id %}
+                                    {% if task.assignee == user %}
                                         {% trans "you" %}
                                     {% else %}
-                                         {{ task.assignee_display }}
+                                         {{ task.assignee }}
                                     {% endif %}
                                 {% else %}
                                     {% trans "Unassigned" %}
@@ -103,16 +103,16 @@
                             </h4>
                         </li>
 
-                        {% if task.perform_allowed %}
-                            {% if task.assignee == request.user.id or task.assignee == None %}
+                        {% if task|can_perform_task:user %}
+                            {% if task.assignee == user or not task.assignee %}
                                 <li>
-                                    {% if task.type == "Subtitle" or task.type == "Translate"%}
+                                    {% if task.get_type_display == "Subtitle" or task.get_type_display == "Translate"%}
                                         <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Perform Task" %}</a>
 
                                         <script type="text/javascript">
                                             $('.perform-task-{{ task.pk }}').click(function() {
-                                                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.video_url }}');
-                                                var opener = new unisubs.widget.SubtitleDialogOpener( '{{ task.video_id }}', '{{ task.video_url }}', 
+                                                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
+                                                var opener = new unisubs.widget.SubtitleDialogOpener( '{{ task.team_video.video_id }}', '{{ task.team_video.video.get_video_url }}', 
                                                     videoSource, null, null
                                                 );
                                                 opener.showStartDialog();
@@ -121,60 +121,46 @@
                                             });
                                         </script>
                                     {% else %}
-                                        <a class="perform" href="{{ task.widget_url }}">{% trans "Perform Task" %}</a>
+                                        <a class="perform" href="{{ task.get_widget_url }}">{% trans "Perform Task" %}</a>
                                     {% endif %}
                                 </li>
                             {% endif %}
                         {% endif %}
-                        </li>
                     </ul>
 
-                    {% if task.delete_allowed or task.assign_allowed %}
-                    <ul class="admin-controls">
-                        {% if task.assign_allowed %}
-                        <li>
-                            <a class="action-assign" href="#">
-                                {% if task.assignee_display %}
-                                    Reassign
-                                {% else %}
-                                    Assign
-                                {% endif %}
-                            </a>
-                        </li>
-                        {% endif %}
-                        {% if task.delete_allowed %}
-                        <li>
-                            <form action="{% url teams:delete_task slug=team.slug %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+                    {% if task|can_delete_task:user or task|can_assign_task:user %}
+                        <ul class="admin-controls">
+                            {% if task|can_assign_task:user %}
+                                <li>
+                                    <a class="action-assign" href="#">
+                                        {% if task.assignee %}
+                                            Reassign
+                                        {% else %}
+                                            Assign
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if task|can_delete_task:user %}
+                                <li>
+                                    <form action="{% url teams:delete_task slug=team.slug %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
-                                {% if task.ghost %}
-                                    <input type="hidden" name="is_ghost" value="1" />
-                                    <input type="hidden" name="team_video" value="{{ task.team_video }}" />
-                                    <input type="hidden" name="language" value="{{ task.language }}" />
-                                {% else %}
-                                    <input type="hidden" name="task" value="{{ task.pk }}" />
-                                    <input type="hidden" name="is_ghost" value="" />
-                                {% endif %}
-                                <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">Remove</a>
-                            </form>
-                        </li>
-                        {% endif %}
-                    </ul>
+                                        <input type="hidden" name="task" value="{{ task.pk }}" />
+                                        <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">Remove</a>
+                                    </form>
+                                </li>
+                            {% endif %}
+                        </ul>
                     {% endif %}
-                    {% if task.assign_allowed %}
+
+                    {% if task|can_assign_task:user %}
                         <form class="assign-form" action="{% url teams:assign_task slug=team.slug %}" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
-                            {% if task.ghost %}
-                                <input type="hidden" name="is_ghost" value="1" />
-                                <input type="hidden" name="team_video" value="{{ task.team_video }}" />
-                                <input type="hidden" name="language" value="{{ task.language }}" />
-                            {% else %}
-                                <input type="hidden" name="task" value="{{ task.pk }}" />
-                                <input type="hidden" name="is_ghost" value="" />
-                            {% endif %}
+                            <input type="hidden" name="task" value="{{ task.pk }}" />
 
                             <div class="assignee-choice" style="display: none;">
                                 <a class="cancel" href="#">Cancel</a>
