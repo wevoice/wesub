@@ -33,6 +33,9 @@ from templatetag_sugar.parser import Name, Variable, Constant
 from apps.teams.permissions import can_view_settings_tab as _can_view_settings_tab
 from apps.teams.permissions import can_edit_video as _can_edit_video
 from apps.teams.permissions import can_rename_team as _can_rename_team
+from apps.teams.permissions import can_perform_task as _can_perform_task
+from apps.teams.permissions import can_assign_task as _can_assign_task
+from apps.teams.permissions import can_delete_task as _can_delete_task
 from apps.teams.permissions import (
     roles_user_can_assign, can_invite, can_add_video_somewhere, can_create_tasks,
     can_create_task_subtitle, can_create_task_translate, can_create_task_review,
@@ -325,3 +328,16 @@ def review_enabled(team):
 def approve_enabled(team):
     w = Workflow.get_for_target(team.id, 'team')
     return w.approve_enabled
+
+@register.filter
+def can_perform_task(task, user):
+    return _can_perform_task(user, task)
+
+@register.filter
+def can_assign_task(task, user):
+    return _can_assign_task(task, user)
+
+@register.filter
+def can_delete_task(task, user):
+    return _can_delete_task(task, user)
+

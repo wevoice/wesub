@@ -403,18 +403,6 @@ class Team(models.Model):
         return TeamLanguagePreference.objects.get_readable(self)
 
 
-    def to_dict(self):
-        return { 'pk': self.pk,
-                 'name': self.name,
-                 'description': self.description,
-                 'membership_policy': self.membership_policy,
-                 'video_policy': self.video_policy,
-                 'task_assign_policy': self.task_assign_policy,
-                 'subtitle_policy': self.subtitle_policy,
-                 'translate_policy': self.translate_policy,
-                 'logo': self.logo_thumbnail() if self.logo else None,
-                 'logo_full': self.logo.url if self.logo else None,
-                 'workflow_enabled': self.workflow_enabled, }
 # this needs to be constructed after the model definition since we need a
 # reference to the class itself
 Team._meta.permissions = TEAM_PERMISSIONS
@@ -1150,22 +1138,6 @@ class Workflow(models.Model):
         return True if self.approve_allowed else False
 
 
-    def to_dict(self):
-        '''Return a dictionary representing this workflow.
-
-        Useful for converting to JSON.
-
-        '''
-        return { 'pk': self.id,
-                 'team': self.team.slug if self.team else None,
-                 'project': self.project.id if self.project else None,
-                 'team_video': self.team_video.id if self.team_video else None,
-                 'autocreate_subtitle': self.autocreate_subtitle,
-                 'autocreate_translate': self.autocreate_translate,
-                 'review_allowed': self.review_allowed,
-                 'approve_allowed': self.approve_allowed, }
-
-
 class TaskManager(models.Manager):
     def not_deleted(self):
         return self.get_query_set().filter(deleted=False)
@@ -1275,32 +1247,6 @@ class Task(models.Model):
 
     def __unicode__(self):
         return u'%d' % self.id
-
-
-    def to_dict(self, request, user=None):
-        '''Return a dictionary representing this task.'''
-
-        from teams.permissions import can_perform_task, can_assign_task, can_delete_task
-
-        return { 'pk': self.id,
-                 'team': self.team.id if self.team else None,
-                 'video_id': self.team_video.video.video_id,
-                 'video_url': self.team_video.video.get_video_url(),
-                 'team_video': self.team_video.id if self.team_video else None,
-                 'team_video_display': unicode(self.team_video) if self.team_video else None,
-                 'team_video_url': self.team_video.video.get_absolute_url() if self.team_video else None,
-                 'widget_url': self.get_widget_url(),
-                 'type': Task.TYPE_NAMES[self.type],
-                 'public': self.public,
-                 'assignee': self.assignee.id if self.assignee else None,
-                 'assignee_display': unicode(self.assignee) if self.assignee else None,
-                 'language': self.language if self.language else None,
-                 'language_display': SUPPORTED_LANGUAGES_DICT[self.language]
-                                     if self.language else None,
-                 'perform_allowed': can_perform_task(user, self) if user else None,
-                 'assign_allowed': can_assign_task(self, user) if user else None,
-                 'delete_allowed': can_delete_task(self, user) if user else None,
-                 'completed': True if self.completed else False, }
 
 
     @property
@@ -1472,7 +1418,8 @@ class TeamLanguagePreference(models.Model):
 
     First, TLPs may mark a language as "preferred".  If that's the case then the
     other attributes of this model are irrelevant and can be ignored.
-    "Preferred" languages will have ghost translation tasks created for them.
+    "Preferred" languages will have translation tasks automatically created for
+    them when subtitles are added.
 
     If preferred is False, the TLP describes a *restriction* on the language
     instead.  Writing in that language may be prevented, or both reading and

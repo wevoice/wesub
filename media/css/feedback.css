@@ -51,6 +51,7 @@ div.recaptcha-field #recaptcha_widget_div {
     border: 1px solid rgba(0,0,0,0.7);
     border-radius: 4px;
     font-size: 11px;
+    margin-left: -460px !important;
     padding: 2em 5px;
     width: auto;
 }
