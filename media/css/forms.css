@@ -328,6 +328,20 @@ form.message p span {
     margin: 0;
     padding: 0;
 }
+#messages h2 ul {
+    background: #EAEEF0;
+    margin: 10px auto 0 auto !important;
+    text-align: left;
+    padding: 10px;
+    width: 41%;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+#messages h2 ul li {
+    list-style-type: disc;
+    margin: 5px 0 5px 20px;
+}
 
 /* Feedback form */
 

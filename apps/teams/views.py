@@ -260,7 +260,22 @@ def create(request):
         form = CreateTeamForm(request.user, request.POST, request.FILES)
         if form.is_valid():
             team = form.save(user)
-            messages.success(request, _('Your team has been created. Review or edit its information below.'))
+            messages.success(request, _("""
+                Your team has been created. Here are some next steps:
+                <ul>
+                    <li><a href="%s">Edit team members' permissions</a></li>
+                    <li><a href="%s">Activate and customize workflows for your team</a></li>
+                    <li><a href="%s">Create and customize projects</a></li>
+                    <li><a href="%s">Edit language preferences</a></li>
+                    <li><a href="%s">Customize instructions to caption makers and translators</a></li>
+                </ul>
+                """ % (
+                    reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                    reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                    reverse("teams:settings_projects", kwargs={"slug": team.slug}),
+                    reverse("teams:settings_languages", kwargs={"slug": team.slug}),
+                    reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
+                )))
             return redirect(reverse("teams:settings_basic", kwargs={"slug":team.slug}))
     else:
         form = CreateTeamForm(request.user)
