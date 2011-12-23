@@ -2,8 +2,8 @@
 
 {% with current_project=project %}
     <ul>
-        <li {% if not current_project %}class="current"{% endif %}>
-            <a href="{{ team.get_absolute_url }}">All videos <span>{{ current_videos_count }}</span></a>
+        <li {% if not filtered %}class="current"{% endif %}>
+            <a href="{{ team.get_absolute_url }}">All videos <span>{{ all_videos_count }}</span></a>
         </li>
 
         {% team_projects team as projects %}

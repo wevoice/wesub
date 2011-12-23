@@ -1,6 +1,6 @@
 {% extends "teams/base.html" %}
 
-{% load i18n query_string teams_tags paginator profiles_tags widget markup media_compressor %}
+{% load i18n utils_tags query_string teams_tags paginator profiles_tags widget markup media_compressor %}
 
 {% block title %}
     {{ team }} | Universal Subtitles
@@ -79,6 +79,23 @@
                     <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
             {% endif %}
         </div>
+
+        {% if filtered %}
+            <p class="active-filters">
+                Showing videos
+                    {% if request.GET.q %}
+                        matching <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
+                    {% endif %}
+                    {% if request.GET.lang %}
+                        in <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
+                    {% endif %}
+                    {% if project %}
+                        in project <strong>{{ project }}</strong>
+                    {% endif %}
+                    ({{ current_videos_count }} result{{ current_videos_count|pluralize }})
+                <a href="{{ team.get_absolute_url }}" class="clear-filters">Clear all filters</a>
+            </p>
+        {% endif %}
 
         {% if not team.page_content and team.video %}
             {% widget widget_params %}
