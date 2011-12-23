@@ -379,11 +379,11 @@ def add_project(request, slug):
 def edit_project(request, slug, project_slug):
     team = Team.get(slug, request.user)
     project = Project.objects.get(slug=project_slug, team=team)
+    project_list_url = reverse('teams:settings_projects', args=[], kwargs={'slug': slug})
 
     if project.is_default_project:
         messages.error(request, _(u'You cannot edit that project.'))
-        return HttpResponseRedirect(
-                reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
+        return HttpResponseRedirect(project_list_url)
 
     try:
         workflow = Workflow.objects.get(team=team, project=project)
@@ -391,21 +391,25 @@ def edit_project(request, slug, project_slug):
         workflow = None
 
     if request.POST:
-        form = ProjectForm(request.POST, instance=project)
-        workflow_form = WorkflowForm(request.POST, instance=workflow)
+        if request.POST.get('delete', None) == 'Delete':
+            project.delete()
+            messages.success(request, _(u'Project deleted.'))
+            return HttpResponseRedirect(project_list_url)
+        else:
+            form = ProjectForm(request.POST, instance=project)
+            workflow_form = WorkflowForm(request.POST, instance=workflow)
 
-        if form.is_valid() and workflow_form.is_valid():
-            form.save()
+            if form.is_valid() and workflow_form.is_valid():
+                form.save()
 
-            if project.workflow_enabled:
-                workflow = workflow_form.save(commit=False)
-                workflow.team = team
-                workflow.project = project
-                workflow.save()
+                if project.workflow_enabled:
+                    workflow = workflow_form.save(commit=False)
+                    workflow.team = team
+                    workflow.project = project
+                    workflow.save()
 
-            messages.success(request, _(u'Project saved.'))
-            return HttpResponseRedirect(
-                    reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
+                messages.success(request, _(u'Project saved.'))
+                return HttpResponseRedirect(project_list_url)
     else:
         form = ProjectForm(instance=project)
         workflow_form = WorkflowForm(instance=workflow)
@@ -1105,3 +1109,4 @@ def project_list(request, slug):
         "team":team,
         "projects": projects
     }, RequestContext(request))
+
