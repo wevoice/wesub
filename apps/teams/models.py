@@ -843,7 +843,7 @@ class TeamMember(models.Model):
     team = models.ForeignKey(Team, related_name='members')
     user = models.ForeignKey(User, related_name='team_members')
     role = models.CharField(max_length=16, default=ROLE_CONTRIBUTOR, choices=ROLES, db_index=True)
-    
+
     objects = TeamMemderManager()
 
     def __unicode__(self):
@@ -1308,7 +1308,7 @@ class Task(models.Model):
         return task
 
     def _complete_review(self):
-        if self.workflow.approve_enabled:
+        if self.workflow.approve_enabled and self.approved == Task.APPROVED_IDS['Approved']:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=self.subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'])
