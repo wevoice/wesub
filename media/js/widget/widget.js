@@ -433,6 +433,12 @@ unisubs.widget.Widget.exportJSSymbols = function(isCrossDomain){
         unisubs.widget.Widget.getAllWidgets);
 
     goog.exportSymbol(
+        "unisubs.player.MediaSource.videoSourceForURL",
+        unisubs.player.MediaSource.videoSourceForURL);
+    goog.exportSymbol(
+        "unisubs.widget.SubtitleDialogOpener",
+        unisubs.widget.SubtitleDialogOpener);
+    goog.exportSymbol(
         "unisubs.widget.WidgetController",
         unisubs.widget.WidgetController);
     goog.exportSymbol(
