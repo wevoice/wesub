@@ -445,6 +445,11 @@ unisubs.widget.Widget.exportJSSymbols = function(isCrossDomain){
         "unisubs.widget.WidgetController.makeGeneralSettings",
         unisubs.widget.WidgetController.makeGeneralSettings);
 
+    goog.exportProperty(
+        unisubs.widget.SubtitleDialogOpener.prototype,
+        "showStartDialog",
+        unisubs.widget.SubtitleDialogOpener.prototype.showStartDialog );
+
     goog.exportSymbol(
         "unisubs.widget.DropDown.Selection",
         unisubs.widget.DropDown.Selection);
