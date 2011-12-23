@@ -19,8 +19,6 @@
 from datetime import datetime
 from videos import models
 from widget.models import SubtitlingSession
-import simplejson as json
-import widget
 from widget.base_rpc import BaseRpc
 from django.conf import settings
 from django.db.models import Sum
@@ -85,8 +83,6 @@ class Rpc(BaseRpc):
         return { 'response': 'ok' }
 
     def show_widget(self, request, video_url, is_remote, base_state=None, additional_video_urls=None):
-        public_only = False
-        
         video_id = video_cache.get_video_id(video_url) 
         if video_id is None: # for example, private youtube video or private widgets
             return None
@@ -445,12 +441,12 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
+            task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
-                task.completed = datetime.now()
+                task.complete()
 
             task.subtitle_version.language.release_writelock()
-            task.save()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
                 user_message =  'These subtitles have been approved and your notes have been sent to the author.'
@@ -459,6 +455,7 @@ class Rpc(BaseRpc):
             else:
                 user_message =  'Your notes have been saved.'
 
+            video_changed_tasks.delay(task.team_video.video_id)
             return {'response': 'ok', 'user_message': user_message}
         else:
             return {'error_msg': _(u'\n'.join(flatten_errorlists(form.errors)))}
@@ -477,12 +474,12 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
+            task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
-                task.completed = datetime.now()
+                task.complete()
 
             task.subtitle_version.language.release_writelock()
-            task.save()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
                 user_message =  'These subtitles have been approved and your notes have been sent to the author.'
@@ -493,6 +490,7 @@ class Rpc(BaseRpc):
             else:
                 user_message =  'Your notes have been saved.'
 
+            video_changed_tasks.delay(task.team_video.video_id)
             return {'response': 'ok', 'user_message': user_message}
         else:
             return {'error_msg': _(u'\n'.join(flatten_errorlists(form.errors)))}
