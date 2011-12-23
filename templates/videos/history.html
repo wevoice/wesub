@@ -138,9 +138,8 @@
         <h2 class="main-title">
             {{ video }}
         </h2>
-        {% widget widget_params %}
         <p class="permalink"><a href="{{share_panel_permalink}}">Permalink</a></p>
-        <div class="description">
+        <div id="description" class="abbr">
             {{ video.description }}
             <a href="#">Expand</a>
         </div>
@@ -157,25 +156,20 @@
                 {% for item in last_version.ordered_subtitles %}
                 <li>
                     {% if item.display_time %}
-                    <span class="timing">
+                    <div class="timing">
                         <span class="data">{{ item.start_time }}</span>
-                        <span>
-                            <span>{{ item.display_time }}</span>
-                        </span>
+                        {{ item.display_time }}
                         {% if item.display_end_time %}
-                        <span>
-                            <span>{{ item.display_end_time }}</span>
-                        </span>
+                        –
+                        {{ item.display_end_time }}
                         {% endif %}
-                    </span>
-                    {% else %}
-                    <span class="timing">
-                        <span>{% trans 'Not Synced' %}</span>
-                    </span>
-                    {% endif %}
-                    <div>
-                        {{ item.text|linebreaksbr }}
                     </div>
+                    {% else %}
+                    <div class="timing">
+                        {% trans 'Not Synced' %}
+                    </div>
+                    {% endif %}
+                    {{ item.text|linebreaksbr }}
                 </li>
                 {% endfor %}
             </ol>

@@ -57,6 +57,7 @@
                     $.jGrowl.error('{% trans "Enter non-empty title" %}');
                 }
             });
+
         });
     </script>
 {% endblock %}
@@ -105,7 +106,7 @@
             {{ video }}
         </h2>
         <p class="permalink"><a href="{{share_panel_permalink}}">Permalink</a></p>
-        <div class="description">
+        <div id="description" class="abbr">
             {{ video.description }}
             <a href="#">Expand</a>
         </div>
@@ -119,10 +120,10 @@
             <h3>{% trans "Admin" %}</h3>
             <ul id="admin-menu">
                 <li>
-                    <a href="{% url videos:video_debug video.video_id %}" target="blank"> View debug info </a>
+                    <a href="{% url videos:video_debug video.video_id %}" target="blank">View debug info</a>
                 </li>
                 <li>
-                    <a href="{% url admin:videos_video_change video.pk %}" target="blank"> {% trans 'Edit in Admin Interface' %}</a>
+                    <a href="{% url admin:videos_video_change video.pk %}" target="blank">{% trans 'Edit in Admin Interface' %}</a>
                 </li>
                 <li>{% feature_video video %}</li>
                 <li>
@@ -136,8 +137,19 @@
     <div class="grid_8 view omega">
         {% widget widget_params %}
     </div>
+    <div class="bootstrap">
+        <div class="modal">
+            <div class="modal-header">
+                <a href="#" class="close action-close">x</a>
+                <h3>Embed video</h3>
+            </div>
+            <div class="modal-body">
+                <textarea readonly="readonly">{{share_panel_embed_code}}</textarea>
+            </div>
+        </div>
+    </div>
+     
     {% comment %}
-    <br class="clearboth"/>
 
     <div id="edit-title-dialog" style="display: none" class="msg_modal_wrap" >
         <a href="#close" class="close">{% trans "Close" %}</a>
