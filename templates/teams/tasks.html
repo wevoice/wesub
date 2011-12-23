@@ -104,7 +104,7 @@
                         </li>
 
                         {% if task|can_perform_task:user %}
-                            {% if task.assignee == user or not task.assignee %}
+                            {% if task.assignee == user %}
                                 <li>
                                     {% if task.get_type_display == "Subtitle" or task.get_type_display == "Translate"%}
                                         <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Perform Task" %}</a>
