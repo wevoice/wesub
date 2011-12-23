@@ -1,5 +1,6 @@
 <form action="" method="get" class="search">
     <fieldset>
+        <input type="hidden" name="lang" value="{{ request.GET.lang }}" />
         <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search&hellip;" />
     </fieldset>
 </form>
