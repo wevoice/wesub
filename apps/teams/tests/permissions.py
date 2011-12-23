@@ -18,6 +18,7 @@
 
 import datetime
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 from apps.teams.models import Team, TeamVideo, TeamMember, Workflow, Task
 from auth.models import CustomUser as User
 from contextlib import contextmanager
@@ -32,7 +33,8 @@ from apps.teams.permissions import (
     can_change_video_settings, can_review, can_edit_project,
     can_create_and_edit_subtitles, can_create_task_subtitle,
     can_create_task_translate, can_join_team, can_edit_video, can_approve,
-    roles_user_can_invite
+    roles_user_can_invite, can_add_video_somewhere, can_assign_tasks,
+    can_create_and_edit_translations, save_role
 )
 
 
@@ -828,3 +830,62 @@ class TestRules(BaseTestPermission):
         self.assertEqual(langs, [])
 
     # TODO: Review/approve task tests.
+
+class TestViews(BaseTestPermission):
+    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
+    
+    def test_save_role(self):
+        
+        from apps.icanhaz.models import VideoVisibilityPolicy
+        owner = self.team.members.filter(role=ROLE_OWNER)[0]
+        member  = self.team.members.filter(role=ROLE_CONTRIBUTOR)[0]
+        member.user.set_password("hey")
+        member.user.save()
+        
+        tv = self.team.teamvideo_set.all()[0]
+        video_url = reverse("videos:video", args=(tv.video.video_id,))
+        owner.user.set_password("hey")
+        owner.user.save()
+        policy = VideoVisibilityPolicy.objects.create_for_video(
+                tv.video,
+                VideoVisibilityPolicy.SITE_VISIBILITY_PRIVATE_OWNER,
+                self.team,
+            )
+
+        resp = self.client.get(video_url, follow=True)
+        self.assertNotEqual(resp.status_code, 200)
+
+        self.team.video_policy = Team.MEMBER_ADD
+        self.task_assign_policy = 10
+        self.team.save()
+        self.assertTrue(can_add_video(self.team, member.user))
+        
+        self.assertTrue(can_add_video_somewhere(self.team, member.user))
+        self.assertTrue(can_view_tasks_tab(self.team, member.user))
+        self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
+        self.assertTrue(can_create_and_edit_translations(member.user, tv))
+        self.assertFalse(can_view_settings_tab(self.team, member.user))
+        save_role(self.team, member, ROLE_ADMIN, [], [], owner.user)
+        member = TeamMember.objects.get(pk=member.pk)
+        self.assertEqual(member.role, ROLE_ADMIN)
+        
+        self.assertTrue(can_add_video_somewhere(self.team, member.user))
+        self.assertTrue(can_view_tasks_tab(self.team, member.user))
+        self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
+        self.assertTrue(can_create_and_edit_translations(member.user, tv))
+        self.assertTrue(can_view_settings_tab(self.team, member.user))
+        
+        save_role(self.team, member, ROLE_CONTRIBUTOR, [], [], owner.user)
+        member = TeamMember.objects.get(pk=member.pk)
+        
+        self.assertEqual(member.role, ROLE_CONTRIBUTOR)
+        self.assertFalse(can_view_settings_tab(self.team, member.user))
+        self.assertTrue(can_add_video_somewhere(self.team, member.user))
+        self.assertTrue(can_view_tasks_tab(self.team, member.user))
+        self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
+        self.assertTrue(can_create_and_edit_translations(member.user, tv))
+
+        self.client.login(username=member.user.username, password="hey")
+        resp = self.client.get(video_url, follow=True)
+        self.assertEqual(resp.status_code, 200)
+                            

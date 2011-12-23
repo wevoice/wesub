@@ -64,7 +64,7 @@
         "model": "teams.teammember", 
         "fields": {
             "user": 2, 
-            "role": "member", 
+            "role": "contributor", 
             "team": 1
         }
     },         

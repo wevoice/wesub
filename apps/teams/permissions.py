@@ -151,6 +151,18 @@ def roles_user_can_invite(team, user):
     else:
         return [ROLE_CONTRIBUTOR]
 
+def save_role(team, member, role, projects, languages, user=None):
+
+    languages = languages or []
+
+    if can_assign_role(team, user, role, member.user):
+        member.role = role
+        member.save()
+        
+        set_narrowings(member, projects, languages, user)
+        return True
+    return False
+
 
 # Narrowings
 def get_narrowings(member):
@@ -220,7 +232,6 @@ def can_set_project_narrowings(team, user, target):
 def set_narrowings(member, project_pks, languages, author=None):
     if author:
         author = TeamMember.objects.get(team=member.team, user=author)
-
     # Projects
     existing_projects = set(narrowing.project.pk for narrowing in
                             member.narrowings.filter(project__isnull=False))
@@ -310,7 +321,6 @@ def can_add_video(team, user, project=None):
     """Return whether the given user can add a video to the given target."""
 
     role = get_role_for_target(user, team, project)
-
     role_required = {
         1: ROLE_CONTRIBUTOR,
         2: ROLE_MANAGER,
