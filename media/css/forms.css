@@ -342,6 +342,9 @@ form.message p span {
     list-style-type: disc;
     margin: 5px 0 5px 20px;
 }
+#messages ul li {
+    padding: .5em 0;
+}
 
 /* Feedback form */
 
