@@ -60,12 +60,12 @@
                 <li>
                     <h3>
                         {% if task.get_type_display == "Subtitle" %}
-                            New 
+                            New
                         {% else %}
                             {{ task.get_type_display }}
                         {% endif %}
                         {% if task.get_type_display == "Translate" %}
-                            Subtitles into {{ task.language_display }}
+                            Subtitles into {{ task.get_language_display }}
                         {% else %}
                             {% if task.get_language_display %}
                                 {{ task.get_language_display }}
@@ -112,7 +112,7 @@
                                         <script type="text/javascript">
                                             $('.perform-task-{{ task.pk }}').click(function() {
                                                 var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
-                                                var opener = new unisubs.widget.SubtitleDialogOpener( '{{ task.team_video.video_id }}', '{{ task.team_video.video.get_video_url }}', 
+                                                var opener = new unisubs.widget.SubtitleDialogOpener('{{ task.team_video.video.video_id }}', '{{ task.team_video.video.get_video_url }}',
                                                     videoSource, null, null
                                                 );
                                                 opener.showStartDialog();
@@ -232,7 +232,7 @@
                     {% for language in languages %}
                         <option value="{% query_string request.GET lang=language.code %}"
                             {% if request.GET.lang == language.code %}
-                                selected="selected" 
+                                selected="selected"
                             {% endif %}>
                             {{ language.name }}
                         </option>
