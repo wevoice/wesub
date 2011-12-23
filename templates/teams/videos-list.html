@@ -1,6 +1,6 @@
 {% extends "teams/base.html" %}
 
-{% load i18n teams_tags paginator profiles_tags widget markup media_compressor %}
+{% load i18n utils_tags query_string teams_tags paginator profiles_tags widget markup media_compressor %}
 
 {% block title %}
     {{ team }} | Universal Subtitles
@@ -22,12 +22,7 @@
         $(function() {
             $select = $("select#lang-filter", ".controls");
             $select.change(function(e) {
-                var lang = $select.val();
-                if (lang !== '') {
-                    window.location = document.URL.split("?")[0] + '?lang=' + lang;
-                } else {
-                    window.location = document.URL.split("?")[0];
-                }
+                window.location = $(this).children('option:selected').attr('value');
             });
 
             $('.remove-video').click(function(e) {
@@ -85,6 +80,23 @@
             {% endif %}
         </div>
 
+        {% if filtered %}
+            <p class="active-filters">
+                Showing videos
+                    {% if request.GET.q %}
+                        matching <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
+                    {% endif %}
+                    {% if request.GET.lang %}
+                        in <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
+                    {% endif %}
+                    {% if project %}
+                        in project <strong>{{ project }}</strong>
+                    {% endif %}
+                    ({{ current_videos_count }} result{{ current_videos_count|pluralize }})
+                <a href="{{ team.get_absolute_url }}" class="clear-filters">Clear all filters</a>
+            </p>
+        {% endif %}
+
         {% if not team.page_content and team.video %}
             {% widget widget_params %}
         {% endif %}
@@ -109,9 +121,9 @@
             <h4>Refine</h4>
             {% include "teams/_search.html" %}
             <select name="lang-filter" id="lang-filter">
-                <option value="">All languages</option>
+                <option value="{% query_string request.GET lang='' %}">All languages</option>
                 {% for code, name in language_choices %}
-                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
+                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
                 {% endfor %}
             </select>
         </div>

@@ -1093,14 +1093,12 @@
             }
         }
 
-        #description {
+        .description {
             color: @dark;
-            line-height: 150%;
-        }
-
-        .abbr {
-            max-height: 6em;
+            height: 6em;
             overflow: hidden;
+            padding-bottom: 1em;
+            line-height: 150%;
         }
 
         h2, h3 {
@@ -1159,19 +1157,16 @@
 }
 
 ol.subtitles {
-    font-size: 13px;
     
     li {
         position: relative;
-        padding: 1em 1em 1em 125px;
+        padding: 1em 1em 1em 100px;
         border-bottom: 1px solid @faintest;
-        line-height: 150%;
 
         .timing {
             position: absolute;
             top: 1em; left: 1em;
-            width: 95px;
-            color: @lighter;
+            width: 75px;
 
             .data {
                 display: none;
