@@ -52,7 +52,7 @@ register = template.Library()
 
 
 def _get_team_video_from_search_record(search_record):
-    if hasattr(search_record, '_team_video'):
+    if getattr(search_record, '_team_video', None):
         # This is ugly, but allows us to pre-fetch the teamvideos for the
         # search records all at once to avoid multiple DB queries.
         return search_record._team_video
@@ -74,7 +74,6 @@ def can_invite_to_team(team, user):
 @register.filter
 def can_edit_video(search_record, user):
     tv = _get_team_video_from_search_record(search_record)
-
     return _can_edit_video(tv, user)
 
 @register.filter

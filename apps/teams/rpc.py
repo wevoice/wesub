@@ -42,7 +42,8 @@ from teams.forms import (
 )
 from teams.permissions import (
     roles_user_can_assign, can_assign_role, can_edit_project, set_narrowings,
-    can_rename_team, can_set_project_narrowings, can_set_language_narrowings
+    can_rename_team, can_set_project_narrowings, can_set_language_narrowings,
+    save_role
 )
 
 
@@ -163,16 +164,10 @@ class TeamsApiV2Class(object):
     def save_role(self, team_slug, member_pk, role, projects, languages, user=None):
         team = Team.objects.get(slug=team_slug)
         member = team.members.get(pk=member_pk)
-
+        
         projects = map(int, projects or [])
-        languages = languages or []
-
-        if can_assign_role(team, user, role, member.user):
-            member.role = role
-            member.save()
-
-            set_narrowings(member, projects, languages, user)
-
+        res = save_role(team, member, role, projects, languages, user)
+        if res:
             return { 'success': True }
         else:
             return { 'success': False,
