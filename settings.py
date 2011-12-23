@@ -824,7 +824,7 @@ MEDIA_BUNDLES = {
             "css/unisubs-widget.css",
          ),
     },
-    "js-teams-settings-panel":{
+    "js-teams":{
         "type":"js",
         "optimizations": "WHITESPACE_ONLY",
         "closure_deps": "",
@@ -835,19 +835,7 @@ MEDIA_BUNDLES = {
             "js/libs/chosen.jquery.min.js",
             "js/libs/chosen.ajax.jquery.js",
             "js/jquery.mod.js",
-         )
-    },
-    "js-teams-tasks-panel":{
-        "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
-        "closure_deps": "",
-        "files": (
-            "js/libs/ICanHaz.js",
-            "js/libs/classy.js",
-            "js/libs/underscore.js",
-            "js/libs/chosen.jquery.min.js",
-            "js/libs/chosen.ajax.jquery.js",
-            "js/jquery.mod.js",
+            "js/teams/create-task.js",
          )
     },
     "debug-embed-js": {

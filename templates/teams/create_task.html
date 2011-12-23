@@ -2,7 +2,7 @@
 
 {% load i18n teams_tags widget media_compressor form_helpers %}
 
-{% block body_attrs %}id="teams" class="v1"{% endblock %}
+{% block body_attrs %}id="teams" class="v1 create-task"{% endblock %}
 
 {% block title %}
     {% trans "Create a Task" %} | Universal Subtitles
@@ -16,9 +16,6 @@
 
 {% block scripts %}
     {{ block.super }}
-    {% include_bundle "js-teams-tasks-panel" %}
-    <script src="{{ STATIC_URL }}js/libs/chosen.jquery.min.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/libs/chosen.ajax.jquery.js" type="text/javascript"></script>
 
     <script type="text/javascript">
         var languageChoices = {{ language_choices|safe }};
@@ -28,7 +25,7 @@
         var subtitlable = {{ subtitlable|safe }};
     </script>
 
-    <script src="{{ STATIC_URL }}js/teams/create-task.js" type="text/javascript"></script>
+    {% include_bundle "js-teams" %}
 {% endblock %}
 
 {% block main_content %}
