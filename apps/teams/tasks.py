@@ -65,24 +65,18 @@ def complete_applicable_tasks(team_video_id):
     except TeamVideo.DoesNotExist:
         return
 
-    incomplete_tasks = team_video.task_set.filter(completed__isnull=True)
-
+    incomplete_tasks = team_video.task_set.incomplete()
     completed_languages = team_video.video.completed_subtitle_languages()
+
     subtitle_complete = any([sl.is_original and sl.is_complete
                              for sl in completed_languages])
+
     translate_complete = [sl.language for sl in completed_languages]
-    review_complete = []
-    approve_complete = []
 
     for t in incomplete_tasks:
         should_complete = (
             (t.type == Task.TYPE_IDS['Subtitle'] and subtitle_complete)
-            or (t.type == Task.TYPE_IDS['Translate']
-                and t.language in translate_complete)
-            or (t.type == Task.TYPE_IDS['Review']
-                and t.language in review_complete)
-            or (t.type == Task.TYPE_IDS['Approve']
-                and t.language in approve_complete)
+            or (t.type == Task.TYPE_IDS['Translate'] and t.language in translate_complete)
         )
         if should_complete:
             t.complete()
@@ -110,7 +104,7 @@ def api_notify_on_language_activity(team_pk, language_pk, event_name):
  
 @task()
 def api_notify_on_video_activity(team_pk, video_id,event_name):
-    from teams.models import TeamVideo, TeamNotificationSetting
+    from teams.models import TeamNotificationSetting
     TeamNotificationSetting.objects.notify_team(
         team_pk, video_id, event_name)
  
