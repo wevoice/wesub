@@ -1272,10 +1272,20 @@ class Task(models.Model):
         }[Task.TYPE_NAMES[self.type]]()
 
     def _complete_subtitle(self):
-        # Normally we would create the next task in the sequence here, but since
-        # we don't create translation tasks ahead of time for efficieny reasons
-        # we simply do nothing.
-        return None
+        tasks = []
+
+        if self.workflow.autocreate_translate:
+            preferred_langs = TeamLanguagePreference.objects.get_preferred(self.team)
+            subtitle_version = self.team_video.video.latest_version()
+
+            for lang in preferred_langs:
+                task = Task(team=self.team, team_video=self.team_video,
+                            subtitle_version=subtitle_version,
+                            language=lang, type=Task.TYPE_IDS['Translate'])
+                task.save()
+                tasks.append(task)
+
+        return tasks
 
     def _complete_translate(self):
         if self.workflow.review_enabled:
