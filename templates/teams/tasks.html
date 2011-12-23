@@ -9,8 +9,10 @@
 {% block scripts %}
     {{ block.super }}
     {% include "utils/chosenify.html" %}
-    {% include_bundle "js-teams-tasks-panel" %}
+
+    {% include_bundle "js-teams" %}
     {% include_bundle "unisubs-offsite-compiled" %}
+
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
 
     <script type="text/javascript">
