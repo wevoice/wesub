@@ -1268,7 +1268,7 @@ class Task(models.Model):
         return { 'Subtitle': self._complete_subtitle,
                  'Translate': self._complete_translate,
                  'Review': self._complete_review,
-                 'Approve': self._complete_review,
+                 'Approve': self._complete_approve,
         }[Task.TYPE_NAMES[self.type]]()
 
     def _complete_subtitle(self):
