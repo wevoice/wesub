@@ -128,9 +128,11 @@ def index(request, my_teams=False):
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
+    filtered = False
 
     if project_slug is not None:
         project = get_object_or_404(Project, team=team, slug=project_slug)
+        filtered = True
     else:
         project = None
 
@@ -138,10 +140,16 @@ def detail(request, slug, project_slug=None, languages=None):
     sort = request.GET.get('sort')
     language = request.GET.get('lang')
 
+    if query or language:
+        filtered = True
+
     qs = team.get_videos_for_languages_haystack(
         language, user=request.user, project=project, query=query, sort=sort)
 
     extra_context = widget.add_onsite_js_files({})
+
+    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(None, user=request.user, project=None, query=None, sort=sort).count()
+
     extra_context.update({
         'team': team,
         'project':project,
@@ -194,6 +202,7 @@ def detail(request, slug, project_slug=None, languages=None):
         extra_context['order_name'] = sort_names['-time']
 
     extra_context['current_videos_count'] = qs.count()
+    extra_context['filtered'] = filtered
 
     team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
     extra_context.update(pagination_info)
