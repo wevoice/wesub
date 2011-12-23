@@ -345,77 +345,6 @@ def settings_projects(request, slug):
     projects = team.project_set.all()
     return { 'team': team, 'projects': projects, }
 
-@render_to('teams/settings-projects-add.html')
-@login_required
-def add_project(request, slug):
-    team = Team.get(slug, request.user)
-
-    if request.POST:
-        form = ProjectForm(request.POST)
-        workflow_form = WorkflowForm(request.POST)
-
-        if form.is_valid() and workflow_form.is_valid():
-            project = form.save(commit=False)
-            project.team = team
-            project.save()
-
-            if project.workflow_enabled:
-                workflow = workflow_form.save(commit=False)
-                workflow.team = team
-                workflow.project = project
-                workflow.save()
-
-            messages.success(request, _(u'Project added.'))
-            return HttpResponseRedirect(
-                    reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
-    else:
-        form = ProjectForm()
-        workflow_form = WorkflowForm()
-
-    return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
-
-@render_to('teams/settings-projects-edit.html')
-@login_required
-def edit_project(request, slug, project_slug):
-    team = Team.get(slug, request.user)
-    project = Project.objects.get(slug=project_slug, team=team)
-    project_list_url = reverse('teams:settings_projects', args=[], kwargs={'slug': slug})
-
-    if project.is_default_project:
-        messages.error(request, _(u'You cannot edit that project.'))
-        return HttpResponseRedirect(project_list_url)
-
-    try:
-        workflow = Workflow.objects.get(team=team, project=project)
-    except Workflow.DoesNotExist:
-        workflow = None
-
-    if request.POST:
-        if request.POST.get('delete', None) == 'Delete':
-            project.delete()
-            messages.success(request, _(u'Project deleted.'))
-            return HttpResponseRedirect(project_list_url)
-        else:
-            form = ProjectForm(request.POST, instance=project)
-            workflow_form = WorkflowForm(request.POST, instance=workflow)
-
-            if form.is_valid() and workflow_form.is_valid():
-                form.save()
-
-                if project.workflow_enabled:
-                    workflow = workflow_form.save(commit=False)
-                    workflow.team = team
-                    workflow.project = project
-                    workflow.save()
-
-                messages.success(request, _(u'Project saved.'))
-                return HttpResponseRedirect(project_list_url)
-    else:
-        form = ProjectForm(instance=project)
-        workflow_form = WorkflowForm(instance=workflow)
-
-    return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
-
 
 def _set_languages(team, codes_preferred, codes_blacklisted):
     tlps = TeamLanguagePreference.objects.for_team(team)
@@ -1109,4 +1038,75 @@ def project_list(request, slug):
         "team":team,
         "projects": projects
     }, RequestContext(request))
+
+@render_to('teams/settings-projects-add.html')
+@login_required
+def add_project(request, slug):
+    team = Team.get(slug, request.user)
+
+    if request.POST:
+        form = ProjectForm(request.POST)
+        workflow_form = WorkflowForm(request.POST)
+
+        if form.is_valid() and workflow_form.is_valid():
+            project = form.save(commit=False)
+            project.team = team
+            project.save()
+
+            if project.workflow_enabled:
+                workflow = workflow_form.save(commit=False)
+                workflow.team = team
+                workflow.project = project
+                workflow.save()
+
+            messages.success(request, _(u'Project added.'))
+            return HttpResponseRedirect(
+                    reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
+    else:
+        form = ProjectForm()
+        workflow_form = WorkflowForm()
+
+    return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
+
+@render_to('teams/settings-projects-edit.html')
+@login_required
+def edit_project(request, slug, project_slug):
+    team = Team.get(slug, request.user)
+    project = Project.objects.get(slug=project_slug, team=team)
+    project_list_url = reverse('teams:settings_projects', args=[], kwargs={'slug': slug})
+
+    if project.is_default_project:
+        messages.error(request, _(u'You cannot edit that project.'))
+        return HttpResponseRedirect(project_list_url)
+
+    try:
+        workflow = Workflow.objects.get(team=team, project=project)
+    except Workflow.DoesNotExist:
+        workflow = None
+
+    if request.POST:
+        if request.POST.get('delete', None) == 'Delete':
+            project.delete()
+            messages.success(request, _(u'Project deleted.'))
+            return HttpResponseRedirect(project_list_url)
+        else:
+            form = ProjectForm(request.POST, instance=project)
+            workflow_form = WorkflowForm(request.POST, instance=workflow)
+
+            if form.is_valid() and workflow_form.is_valid():
+                form.save()
+
+                if project.workflow_enabled:
+                    workflow = workflow_form.save(commit=False)
+                    workflow.team = team
+                    workflow.project = project
+                    workflow.save()
+
+                messages.success(request, _(u'Project saved.'))
+                return HttpResponseRedirect(project_list_url)
+    else:
+        form = ProjectForm(instance=project)
+        workflow_form = WorkflowForm(instance=workflow)
+
+    return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
 
