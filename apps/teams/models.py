@@ -101,7 +101,7 @@ class Team(models.Model):
 
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
-    description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links.'))
+    description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links. Line breaks and HTML not supported.'))
 
     logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True, upload_to='teams/logo/')
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
