@@ -63,7 +63,7 @@
             </div>
 
             <div class="grid_9 submit">
-                <input type="submit" class="button delete project-delete" value="Delete" />
+                <input type="submit" onclick="return confirm('{% trans 'Are you sure you want to delete this project?' %}');" name="delete" class="button delete project-delete" value="Delete" />
                 <input type="submit" class="submit save" value="Save Changes" name="save" />
             </div>
         </form>
