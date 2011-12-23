@@ -65,7 +65,7 @@
                             {{ task.get_type_display }}
                         {% endif %}
                         {% if task.get_type_display == "Translate" %}
-                            Subtitles into {{ task.language_display }}
+                            Subtitles into {{ task.get_language_display }}
                         {% else %}
                             {% if task.get_language_display %}
                                 {{ task.get_language_display }}
