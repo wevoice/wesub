@@ -1288,15 +1288,18 @@ class Task(models.Model):
         return tasks
 
     def _complete_translate(self):
+        subtitle_version = self.team_video.video.latest_version(language_code=self.language)
+
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'])
             task.save()
         else:
             # The review step may be disabled.  If so, we check the approve step.
             if self.workflow.approve_enabled:
                 task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=self.subtitle_version,
+                            subtitle_version=subtitle_version,
                             language=self.language, type=Task.TYPE_IDS['Approve'])
                 task.save()
             else:
