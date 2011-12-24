@@ -1,6 +1,6 @@
 {% extends "profiles/base.html" %}
 
-{% load i18n messages_tags recent_activity auth_tags profiles_tags %}
+{% load i18n messages_tags recent_activity auth_tags profiles_tags teams_tags %}
 
 {% block body_attrs %}id="dashboard" class="v1"{% endblock %}
 
@@ -64,6 +64,7 @@
                     {% for t in user_teams %}
                     <li>
                         <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
+                        (<a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team t.slug %}">{% trans "leave team" %}</a>)
                     </li>
                     {% endfor %}
                 {% endif %}

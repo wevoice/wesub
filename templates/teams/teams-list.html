@@ -101,6 +101,14 @@
                         </li>
                     </ul>
 
+                    {% if my_teams %}
+                        <ul class="admin-controls">
+                            <li>
+                                <a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team team.slug %}">{% trans "Leave team" %}</a>
+                            </li>
+                        </ul>
+                    {% endif %}
+
                     {% comment %}
                         <div class="buttons-container">
                             {% if user.is_staff and perms.teams.change_team %}
