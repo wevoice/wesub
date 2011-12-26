@@ -801,9 +801,13 @@ def search_members(request, slug):
     team = Team.get(slug, request.user)
     q = request.GET.get('term')
 
-    results = [[m.user.id, m.user.username]
-               for m in team.members.filter(user__username__icontains=q,
-                                            user__is_active=True)]
+    members = team.members.filter(user__is_active=True).filter(
+        Q(user__username__icontains=q) |
+        Q(user__first_name__icontains=q) |
+        Q(user__last_name__icontains=q)
+    )
+    results = [[m.user.id, '%s (%s)' % (m.user, m.user.username)]
+               for m in members]
 
     return { 'results': results }
 
