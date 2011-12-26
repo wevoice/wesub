@@ -1,8 +1,6 @@
 {% load i18n teams_tags %}
 
-{% if team|is_team_member:user %}
-    {% render_team_leave team %}
-{% else %}
+{% if not team|is_team_member:user %}
     {% if user.is_authenticated %}
         {% if team.is_open %}
             {% render_team_join team %}
