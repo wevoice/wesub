@@ -1285,6 +1285,10 @@ class Task(models.Model):
             preferred_langs = TeamLanguagePreference.objects.get_preferred(self.team)
 
             for lang in preferred_langs:
+                sl = self.team_video.video.subtitle_language(lang)
+                if sl and sl.is_complete_and_synced():
+                    continue
+
                 task = Task(team=self.team, team_video=self.team_video,
                             subtitle_version=subtitle_version,
                             language=lang, type=Task.TYPE_IDS['Translate'])

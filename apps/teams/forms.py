@@ -353,6 +353,12 @@ class TaskCreateForm(ErrorableModelForm):
                            'type', cleaned_data)
             return
 
+        sl = self.team_video.video.subtitle_language(cleaned_data['language'])
+        if sl and sl.is_complete_and_synced():
+            self.add_error(_(u"This language already has a complete set of subtitles."),
+                           'language', cleaned_data)
+            return
+
     def _check_task_creation_review(self, tasks, cleaned_data):
         if not self.subtitle_language or not self.subtitle_language.is_complete_and_synced():
             self.add_error(_(u"Subtitles in that language have not been completed yet, so they can't be reviewed."),
