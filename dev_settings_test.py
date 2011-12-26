@@ -30,7 +30,7 @@ DATABASES = {
         }
     }
 
-CACHE_PREFIX = "testcache-"
+CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
