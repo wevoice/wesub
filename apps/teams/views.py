@@ -366,7 +366,7 @@ def settings_permissions(request, slug):
 @login_required
 def settings_projects(request, slug):
     team = Team.get(slug, request.user)
-    projects = team.project_set.all()
+    projects = team.project_set.exclude(name=Project.DEFAULT_NAME)
     return { 'team': team, 'projects': projects, }
 
 
