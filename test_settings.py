@@ -1,4 +1,3 @@
-
 from settings import *
 #from dev_settings import *
 
@@ -7,7 +6,7 @@ ROOT_URLCONF = 'urls'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': rel('unisubs.sqlite3'), 
+        'NAME': rel('unisubs.sqlite3'),
     }
 }
 
