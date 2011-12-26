@@ -18,21 +18,35 @@
 
     <div class="view grid_9 alpha new-message">
         <form action="" method="post">
+            {% csrf_token %}
+
             <fieldset>
                 <legend>Compose a Message</legend>
+
+                {{ form.non_field_errors }}
+
                 <label for="">Recipient(s)</label>
+                {{ form.errors.user }}
                 <div class="ajaxChosen">
-                    <select name="id_user" name="user">
+                    <select id="id_user" name="user">
                         <option value="">-----</option>
                         <option value="">Begin typing to search.</option>
-                        {% if request.GET.user_id %}
-                            <option selected="selected" value="{{ request.GET.user_id }}">{{ request.GET.username }}</option>
+
+                        {% if selected_user %}
+                            <option selected="selected" value="{{ selected_user.id }}">{{ selected_user.username }}</option>
                         {% endif %}
                     </select>
                 </div>
-                <label for="">Message</label>
-                <textarea name="" id=""></textarea>
+
+                <label for="id_team">Team</label>
+                {{ form.errors.team }}
+                {{ form.team }}
+
+                <label for="id_content">Message</label>
+                {{ form.errors.content }}
+                {{ form.content }}
             </fieldset>
+
             <div class="submit">
                 <button>Send</button>
             </div>
