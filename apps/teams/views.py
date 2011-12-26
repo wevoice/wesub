@@ -449,7 +449,7 @@ def add_video(request, slug):
     project = Project.objects.get(team=team, pk=project_id) if project_id else team.default_project
 
     if request.POST and not can_add_video(team, request.user, project):
-        messages.error(request, _(u"You can't add video."))
+        messages.error(request, _(u"You can't add that video to this team/project."))
         return HttpResponseRedirect(team.get_absolute_url())
 
     initial = {
@@ -481,7 +481,7 @@ def add_videos(request, slug):
     team = Team.get(slug, request.user)
 
     if not can_add_video(team, request.user):
-        messages.error(request, _(u'You can\'t add video.'))
+        messages.error(request, _(u"You can't add videos to this team/project."))
         return HttpResponseRedirect(team.get_absolute_url())
 
     form = AddTeamVideosFromFeedForm(team, request.user, request.POST or None)
