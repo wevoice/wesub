@@ -44,6 +44,11 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.models import Site
 import inspect
 
+try:
+    import oboe
+except ImportError:
+    oboe = None
+    
 def print_last_exception():
     """
     this can be useful for asynchronous tasks debuging
@@ -129,6 +134,11 @@ def send_templated_email(to, subject, body_template, body_dict,
     bcc = settings.EMAIL_BCC_LIST
     email = EmailMessage(subject, message, from_email, to, bcc=bcc)
     email.content_subtype = ct
+    if oboe:
+        try:
+            oboe.Context.log('email', 'info', backtrace=False,**{"template":body_template})
+        except Exception, e:
+            print >> sys.stderr, "Oboe error: %s" % e
     email.send(fail_silently)
 
 from sentry.client.models import client

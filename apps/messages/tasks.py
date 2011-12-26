@@ -39,6 +39,7 @@ from auth.models import CustomUser as User
 
 from utils import send_templated_email
 
+        
 @task()
 def send_new_message_notification(message_id):
     from messages.models import Message
@@ -74,6 +75,8 @@ def send_new_message_notification(message_id):
 
 @task()
 def team_invitation_sent(invite_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import Invite
     invite = Invite.objects.get(pk=invite_pk)
@@ -87,6 +90,8 @@ def team_invitation_sent(invite_pk):
 
 @task()
 def application_sent(application_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import Application, TeamMember
 
@@ -108,10 +113,11 @@ def application_sent(application_pk):
         msg.object = application.team
         msg.author = application.user
         msg.save()
-
-
-@task()
+        
+@task
 def team_application_approved(application_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import Application
     application = Application.objects.get(pk=application_pk)
@@ -126,6 +132,9 @@ def team_application_approved(application_pk):
 
 @task()
 def team_application_denied(application_pk):
+    
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import Application
     application = Application.objects.get(pk=application_pk)
@@ -139,6 +148,8 @@ def team_application_denied(application_pk):
 
 @task()
 def team_member_new(member_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import TeamMember
     member = TeamMember.objects.get(pk=member_pk)
@@ -154,11 +165,11 @@ def team_member_new(member_pk):
     for m in notifiable:
         msg = Message()
         if m.user == member.user:
-             base_str = ugettext("You've joined the %s team as a(n) %s'" %
-                                 (m.team, m.role))
+             base_str = ugettext(u"You've joined the %s team as a(n) %s'" %
+                                 (m.team, member.role))
         else:
-             base_str = ugettext("%s joined the %s team as a(n) %s" % (
-            member.user, m.team, m.role))
+             base_str = ugettext(u"%s joined the %s team as a(n) %s" % (
+            member.user, m.team, member.role))
         msg.subject = ugettext(base_str)
         msg.content = ugettext(base_str + " on %s" % (datetime.datetime.now()))
         msg.user = m.user
@@ -167,6 +178,8 @@ def team_member_new(member_pk):
 
 @task()
 def team_member_leave(team_pk, user_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import TeamMember, Team
     user = User.objects.get(pk=user_pk)
