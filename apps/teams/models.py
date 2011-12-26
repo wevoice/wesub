@@ -16,9 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-
 from django.db import models
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from auth.models import CustomUser as User
@@ -34,7 +33,6 @@ from teams.tasks import update_one_team_video
 from utils.panslugify import pan_slugify
 from haystack.query import SQ
 from haystack import site
-from utils.translation import SUPPORTED_LANGUAGES_DICT
 from utils import get_object_or_none
 from utils.searching import get_terms
 import datetime
@@ -650,7 +648,6 @@ class TeamVideo(models.Model):
         super(TeamVideo, self).save(*args, **kwargs)
 
 
-
     def is_checked_out(self, ignore_user=None):
         '''Return whether this video is checked out in a task.
 
@@ -695,7 +692,16 @@ def team_video_delete(sender, instance, **kwargs):
     tv_search_index = site.get_index(TeamVideo)
     tv_search_index.backend.remove(instance)
 
+def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
+    if created and not raw:
+        workflow = Workflow.get_for_team_video(instance)
+        if workflow.autocreate_subtitle:
+            Task(team=instance.team, team_video=instance, subtitle_version=None,
+                 language='', type=Task.TYPE_IDS['Subtitle']).save()
+
+
 post_save.connect(team_video_save, TeamVideo, dispatch_uid="teams.teamvideo.team_video_save")
+post_save.connect(team_video_autocreate_task, TeamVideo, dispatch_uid='teams.teamvideo.team_video_autocreate_task')
 post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.team_video_delete")
 
 class TeamVideoLanguage(models.Model):
@@ -1273,10 +1279,10 @@ class Task(models.Model):
 
     def _complete_subtitle(self):
         tasks = []
+        subtitle_version = self.team_video.video.latest_version()
 
         if self.workflow.autocreate_translate:
             preferred_langs = TeamLanguagePreference.objects.get_preferred(self.team)
-            subtitle_version = self.team_video.video.latest_version()
 
             for lang in preferred_langs:
                 task = Task(team=self.team, team_video=self.team_video,
@@ -1284,6 +1290,19 @@ class Task(models.Model):
                             language=lang, type=Task.TYPE_IDS['Translate'])
                 task.save()
                 tasks.append(task)
+
+        if self.workflow.review_enabled:
+            task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=subtitle_version,
+                        language=self.language, type=Task.TYPE_IDS['Review'])
+            task.save()
+            tasks.append(task)
+        elif self.workflow.approve_enabled:
+            task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=subtitle_version,
+                        language=self.language, type=Task.TYPE_IDS['Approve'])
+            task.save()
+            tasks.append(task)
 
         return tasks
 
