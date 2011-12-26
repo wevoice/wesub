@@ -12,6 +12,9 @@ DATABASES = {
 }
 
 
+CACHE_PREFIX = "testcache-"
+CACHE_TIMEOUT = 60
+
 HAYSTACK_SOLR_URL = 'http://localhost:38983/solr/testing'
 
 CELERY_ALWAYS_EAGER = True
