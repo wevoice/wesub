@@ -938,7 +938,6 @@ class Application(models.Model):
         self.delete()
 
     def deny(self):
-        self._send_deny_message()
         notifier.team_application_denied.delay(self.pk)
         self.delete()
 
