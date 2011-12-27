@@ -39,7 +39,7 @@ def invalidate_lang_preferences(team):
 def get_readable_langs(team):
     cache_key = _team_readable_langs_id(team)
     value = cache.get(cache_key)
-    if value is  None:
+    if value is None:
         from teams.models import TeamLanguagePreference
         value = TeamLanguagePreference.objects._generate_readable(team)
         cache.set(cache_key, value, TIMEOUT)
