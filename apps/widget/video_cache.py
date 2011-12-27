@@ -192,6 +192,10 @@ def get_video_languages(video_id):
         video = Video.objects.get(video_id=video_id)
         languages = video.subtitlelanguage_set.filter(has_version=True)
 
+        team_video = video.get_team_video()
+        if team_video:
+            languages = languages.filter(language__in=team_video.team.get_readable_langs())
+
         return_value = [language_summary(l) for l in languages]
         cache.set(cache_key, return_value, TIMEOUT)
         return return_value

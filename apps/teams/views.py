@@ -60,6 +60,8 @@ from teams.permissions import (
     can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
     can_rename_team
 )
+from teams.tasks import invalidate_video_caches
+
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -434,6 +436,7 @@ def settings_languages(request, slug):
             _set_languages(team, form.cleaned_data['preferred'], form.cleaned_data['blacklisted'])
 
             messages.success(request, _(u'Settings saved.'))
+            invalidate_video_caches.delay(team.pk)
             return HttpResponseRedirect(request.path)
     else:
         form = LanguagesForm(team, initial=initial)

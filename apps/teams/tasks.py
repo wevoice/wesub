@@ -8,6 +8,15 @@ from datetime import datetime
 from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from haystack import site
+from widget.video_cache import invalidate_cache as invalidate_video_cache
+
+
+@task()
+def invalidate_video_caches(team_id):
+    from apps.teams.models import Team
+    team = Team.objects.get(pk=team_id)
+    for video_id in team.teamvideo_set.values_list('video__video_id', flat=True):
+        invalidate_video_cache(video_id)
 
 @periodic_task(run_every=crontab(minute=0, hour=6))
 def add_videos_notification(*args, **kwargs):
