@@ -34,7 +34,7 @@ from apps.teams.permissions import (
     can_create_and_edit_subtitles, can_create_task_subtitle,
     can_create_task_translate, can_join_team, can_edit_video, can_approve,
     roles_user_can_invite, can_add_video_somewhere, can_assign_tasks,
-    can_create_and_edit_translations, save_role
+    can_create_and_edit_translations, save_role, can_remove_video
 )
 
 
@@ -55,7 +55,7 @@ class BaseTestPermission(TestCase):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
         self.team  = Team.objects.all()[0]
-        self.team.video_policy = Team.MANAGER_REMOVE
+        self.team.video_policy = Team.VP_MANAGER
         self.video = self.team.videos.all()[0]
 
         # TODO: Remove these magic queryset indexes
@@ -195,19 +195,18 @@ class TestRules(BaseTestPermission):
         user = self.user
         team = self.team
 
-        # Ensure that the "members can add" policies work.
-        for policy in [Team.MEMBER_ADD, Team.MEMBER_REMOVE]:
-            team.video_policy = policy
-            team.save()
+        # Policy: members.
+        team.video_policy = Team.VP_MEMBER
+        team.save()
 
-            for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
-                with self.role(r):
-                    self.assertTrue(can_add_video(team, user))
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_add_video(team, user))
 
-            self.assertFalse(can_add_video(team, self.outsider))
+        self.assertFalse(can_add_video(team, self.outsider))
 
-        # Ensure the "managers can add" policy works.
-        team.video_policy = Team.MANAGER_REMOVE
+        # Policy: managers.
+        team.video_policy = Team.VP_MANAGER
         team.save()
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
@@ -224,22 +223,35 @@ class TestRules(BaseTestPermission):
             self.assertFalse(can_add_video(team, user))
             self.assertTrue(can_add_video(team, user, project=self.test_project))
 
+        # Policy: admins.
+        team.video_policy = Team.VP_ADMIN
+        team.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_add_video(team, user))
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                self.assertFalse(can_add_video(team, user))
+
+        self.assertFalse(can_add_video(team, self.outsider))
+
     def test_can_edit_video(self):
         user, team = self.user, self.team
 
-        # Ensure that the "members can add" policies work.
-        for policy in [Team.MEMBER_ADD, Team.MEMBER_REMOVE]:
-            team.video_policy = policy
-            team.save()
+        # Policy: members.
+        team.video_policy = Team.VP_MEMBER
+        team.save()
 
-            for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
-                with self.role(r):
-                    self.assertTrue(can_edit_video(self.nonproject_video, user))
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_edit_video(self.nonproject_video, user))
 
-            self.assertFalse(can_edit_video(self.nonproject_video, self.outsider))
+        self.assertFalse(can_edit_video(self.nonproject_video, self.outsider))
 
-        # Ensure the "managers can add" policy works.
-        team.video_policy = Team.MANAGER_REMOVE
+        # Policy: managers.
+        team.video_policy = Team.VP_MANAGER
         team.save()
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
@@ -255,6 +267,66 @@ class TestRules(BaseTestPermission):
         with self.role(ROLE_MANAGER, self.test_project):
             self.assertFalse(can_edit_video(self.nonproject_video, user))
             self.assertTrue(can_edit_video(self.project_video, user))
+
+        # Policy: admins.
+        team.video_policy = Team.VP_ADMIN
+        team.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_edit_video(self.nonproject_video, user))
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                self.assertFalse(can_edit_video(self.nonproject_video, user))
+
+        self.assertFalse(can_edit_video(self.nonproject_video, self.outsider))
+
+    def test_can_remove_video(self):
+        user, team = self.user, self.team
+
+        # Policy: members.
+        team.video_policy = Team.VP_MEMBER
+        team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_remove_video(self.nonproject_video, user))
+
+        self.assertFalse(can_remove_video(self.nonproject_video, self.outsider))
+
+        # Policy: managers.
+        team.video_policy = Team.VP_MANAGER
+        team.save()
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_remove_video(self.nonproject_video, user))
+
+        with self.role(ROLE_CONTRIBUTOR):
+            self.assertFalse(can_remove_video(self.nonproject_video, user))
+
+        self.assertFalse(can_remove_video(self.nonproject_video, self.outsider))
+
+        # Make sure narrowings are taken into account.
+        with self.role(ROLE_MANAGER, self.test_project):
+            self.assertFalse(can_remove_video(self.nonproject_video, user))
+            self.assertTrue(can_remove_video(self.project_video, user))
+
+        # Policy: admins.
+        team.video_policy = Team.VP_ADMIN
+        team.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_remove_video(self.nonproject_video, user))
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                self.assertFalse(can_remove_video(self.nonproject_video, user))
+
+        self.assertFalse(can_remove_video(self.nonproject_video, self.outsider))
+
 
     def test_can_view_settings_tab(self):
         # Only admins and owners can view/change the settings tab, so this one
@@ -833,15 +905,15 @@ class TestRules(BaseTestPermission):
 
 class TestViews(BaseTestPermission):
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-    
+
     def test_save_role(self):
-        
+
         from apps.icanhaz.models import VideoVisibilityPolicy
         owner = self.team.members.filter(role=ROLE_OWNER)[0]
         member  = self.team.members.filter(role=ROLE_CONTRIBUTOR)[0]
         member.user.set_password("hey")
         member.user.save()
-        
+
         tv = self.team.teamvideo_set.all()[0]
         video_url = reverse("videos:video", args=(tv.video.video_id,))
         owner.user.set_password("hey")
@@ -855,11 +927,11 @@ class TestViews(BaseTestPermission):
         resp = self.client.get(video_url, follow=True)
         self.assertNotEqual(resp.status_code, 200)
 
-        self.team.video_policy = Team.MEMBER_ADD
+        self.team.video_policy = Team.VP_MEMBER
         self.task_assign_policy = 10
         self.team.save()
         self.assertTrue(can_add_video(self.team, member.user))
-        
+
         self.assertTrue(can_add_video_somewhere(self.team, member.user))
         self.assertTrue(can_view_tasks_tab(self.team, member.user))
         self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
@@ -868,16 +940,16 @@ class TestViews(BaseTestPermission):
         save_role(self.team, member, ROLE_ADMIN, [], [], owner.user)
         member = TeamMember.objects.get(pk=member.pk)
         self.assertEqual(member.role, ROLE_ADMIN)
-        
+
         self.assertTrue(can_add_video_somewhere(self.team, member.user))
         self.assertTrue(can_view_tasks_tab(self.team, member.user))
         self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
         self.assertTrue(can_create_and_edit_translations(member.user, tv))
         self.assertTrue(can_view_settings_tab(self.team, member.user))
-        
+
         save_role(self.team, member, ROLE_CONTRIBUTOR, [], [], owner.user)
         member = TeamMember.objects.get(pk=member.pk)
-        
+
         self.assertEqual(member.role, ROLE_CONTRIBUTOR)
         self.assertFalse(can_view_settings_tab(self.team, member.user))
         self.assertTrue(can_add_video_somewhere(self.team, member.user))
@@ -888,4 +960,4 @@ class TestViews(BaseTestPermission):
         self.client.login(username=member.user.username, password="hey")
         resp = self.client.get(video_url, follow=True)
         self.assertEqual(resp.status_code, 200)
-                            
+
