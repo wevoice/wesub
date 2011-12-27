@@ -8,8 +8,6 @@
     <li><a href="{{share_panel_email_url}}" target="email_friends" class="email" title="{% trans 'Email to friends' %}">{% trans 'Email to friends' %}</a></li>
     <li class="unisubs-facebook-like"><iframe src="http://www.facebook.com/plugins/like.php?href={{ share_panel_permalink|urlencode }}&layout=button_count&show_faces=false&width=150&action=like&colorscheme=light&height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:150px; height:25px; padding: .45em .25em;" allowTransparency="true"></iframe></li>
   </ul>
-
-  {% comment %}{% include 'videos/_follow_video_button.html' %}{% endcomment %}
   
   <h3>
     {% trans 'Embed' %}
@@ -17,10 +15,23 @@
       (with {{ language.get_language_display }} subtitles)
     {% endif %}
   </h3>
-  <p><a target="embedoptions" href="https://github.com/pculture/unisubs/wiki/Embed-Code-Usage-Guide">Get Embed Code</a></p>
-  {% comment %}<p class="unisubs-embed">
-    <textarea readonly="readonly">{{share_panel_embed_code}}</textarea>
-  </p>{% endcomment %}
+  <p><a href="#embed-modal" class="open-modal">Get Embed Code</a></p>
+  <div class="bootstrap">
+        <div id="embed-modal" class="modal">
+            <div class="modal-header">
+                <a href="#" class="close action-close">x</a>
+                <h3>Embed video</h3>
+            </div>
+            <div class="modal-body">
+                <form>
+                  <fieldset>
+                    <label>Use the following code to embed this video</label>
+                    <textarea readonly="readonly" rows="8">{{share_panel_embed_code}}</textarea>
+                  </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
 
 <script type="text/javascript">
     jQuery('.unisubs-share .unisubs-twitter-share').click(function(){
@@ -35,7 +46,7 @@
 
     // Select all text when embed code is clicked
     // .focus is not properly working with chrome so using .click
-    $(".unisubs-embed textarea").click(function(){
+    $("#embed-modal textarea").click(function(){
         this.select();
     });
 </script>
