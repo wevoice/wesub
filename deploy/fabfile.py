@@ -68,7 +68,7 @@ def staging(username):
                 celeryd_host          = ADMIN_HOST,
                 celeryd_proj_root     = 'universalsubtitles.staging',
                 separate_uslogging_db = True,
-                celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart")
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
 
 def dev(username):
     _create_env(username              = username,
@@ -82,7 +82,7 @@ def dev(username):
                 celeryd_host          = DEV_HOST,
                 celeryd_proj_root     = 'universalsubtitles.dev',
                 separate_uslogging_db = False,
-                celeryd_bounce_cmd    = "/etc/init.d/celeryd.dev restart")
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd.dev restart &&  /etc/init.d/celeryevcam.dev start")
 
 def unisubs(username):
     _create_env(username              = username,
@@ -97,7 +97,7 @@ def unisubs(username):
                 celeryd_host          = ADMIN_HOST,
                 celeryd_proj_root     = 'universalsubtitles',
                 separate_uslogging_db = True,
-                celeryd_bounce_cmd    = "/etc/init.d/celeryd restart")
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd restart  && /etc/init.d/celeryevcam start ")
 
 
 def syncdb():
