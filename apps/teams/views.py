@@ -1054,6 +1054,7 @@ def delete_task(request, slug):
 
     return HttpResponseRedirect(next)
 
+
 def assign_task(request, slug):
     '''Assign a task to the given user, or unassign it if null/None.'''
     team = get_object_or_404(Team, slug=slug)
@@ -1072,6 +1073,24 @@ def assign_task(request, slug):
         messages.error(request, _('You cannot assign this task.'))
 
     return HttpResponseRedirect(next)
+
+@render_to_json
+@login_required
+def assign_task_ajax(request, slug):
+    '''Assign a task to the given user, or unassign it if null/None.'''
+    team = get_object_or_404(Team, slug=slug)
+
+    form = TaskAssignForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        task = form.cleaned_data['task']
+        assignee = form.cleaned_data['assignee']
+
+        task.assignee = assignee
+        task.save()
+
+        return { 'success': True }
+    else:
+        return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
 
 
 # Projects
