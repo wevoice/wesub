@@ -35,7 +35,7 @@
                     success;
                 } else {
                     success = options.success;
-                };
+                }
                 options.success = function(data) {
                     var items;
                     if (!(data != null)) {
