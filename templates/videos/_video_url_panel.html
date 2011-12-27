@@ -2,7 +2,7 @@
 
 {% if video.allow_video_urls_edit or perms.videos_videourl_add %}
     <div class="tools">
-        <a href="#" class="button" data-modal="add-video-url">
+        <a href="#add-url-modal" class="button open-modal">
             {% trans 'Add new URL' %}
         </a>
     </div>
@@ -13,10 +13,10 @@
             <h3>
                 <a href="{{ item.get_absolute_url }}">{{ item }}</a> 
                 {% if item.primary %}
-                    <span class="descriptor">{% trans 'Primary' %}</span>
+                    <span class="descriptor primary">{% trans 'Primary' %}</span>
                 {% endif %}
                 {% if item.original %}
-                    <span class="descriptor">{% trans 'Original' %}</span>
+                    <span class="descriptor original">{% trans 'Original' %}</span>
                 {% endif %}
             </h3>
             <p>
@@ -53,20 +53,21 @@
   </div>
 </div>
 <div class="bootstrap">
-    <div class="modal">
+    <div id="add-url-modal" class="modal">
         <div class="modal-header">
-            <a href="#" class="close action-close">{% trans "Close" %}</a>
+            <a href="#" class="close action-close">x</a>
             <h3>{% trans 'Add another URL for this video' %}</h3>
+            <p class="notation">
+                {% trans "Add a URL for another version of the exact same video. Useful many versions of the same video exist, or when there are different formats (like HTML5)" %}
+            </p>
         </div>
         
         {% if user.is_authenticated %}
             <form method="post" action="{% url videos:video_url_create %}">
                 <div class="modal-body">
-                    <p>
-                        {% trans "Add a URL for another version of the exact same video. This is useful in cases where many versions of the same video exist, or when there are versions in different formats (like HTML5)" %}
-                    </p>
                     <div class="global-errors"></div>
-                    {{ form.as_p }}
+                    {% include "_form_field.html" with field=form.url %}
+                    {{ form.video }}
                 </div>
                 <div class="modal-footer">
                     <p class="button-container">
@@ -76,6 +77,7 @@
                         {% trans 'Saving...' %}
                     </p>
                 </div>
+                {% csrf_token %}
             </form>
             {% else %}
             <div class="modal-body">
@@ -104,15 +106,15 @@ jQuery(function($){
                     }else{
                         var $primary_span = $('#urls-tab .primary');
                         if ( ! $primary_span.length){
-                            $primary_span = $("<span class='primary'>[{% trans 'PRIMARY' %}]</span>");
+                            $primary_span = $("<span class='descriptor primary'>{% trans 'Primary' %}</span>");
                         };
                         var $span = $primary_span.clone();
                         
                         $primary_span.remove();
                         $('#urls-tab .make-primary-url-link').show();
-                        var $tr = $this.parents('tr');
-                        $tr.find('.url-td').append($span);
-                        $tr.find('.make-primary-url-link').hide();
+                        var $li = $this.parents('li');
+                        $li.find('h3').append($span);
+                        $li.find('.make-primary-url-link').hide();
                     }
                 }, 'json');
          }else{
@@ -131,7 +133,7 @@ jQuery(function($){
                         if (response.error){
                             $.jGrowl.error(response.error);
                         }else{
-                            $url.parents('tr').remove();
+                            $url.parents('li').remove();
                         }
                     }, 'json')                
             }
@@ -139,14 +141,9 @@ jQuery(function($){
             alert('{% trans "You are not authenticated" %}');
         }
         return false;
-    }); 
-    
-    $('#add-video-url').bind('close-modal', function(){
-        $('#add-video-url form p.error_list').remove();
-        $('#id_url').val('');
     });
     
-    $('#add-video-url form').ajaxForm({
+    $('#add-url-modal form').ajaxForm({
         dataType: 'json',
         success: function(data, status, xhr, $form){
             $('.button-container', $form).show();
@@ -170,17 +167,6 @@ jQuery(function($){
             $('.button-container', $form).hide();
             $('.saving-container', $form).show();
         }
-    });
-    
-    $.tablesorter.addParser({
-        id: 'since-time',
-        is: function(s) { 
-            return false; 
-        },
-        format: function(s, table, td) { 
-            return $(td).attr('time') - 0;
-        }, 
-        type: 'numeric'         
     });
 
 });             
