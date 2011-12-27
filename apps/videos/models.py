@@ -248,6 +248,14 @@ class Video(models.Model):
     def video_link(self):
         return ('videos:history', [self.video_id])
     
+    def get_team_video(self):
+        tvs = self.teamvideo_set.all().select_related('team')[:1]
+        if not tvs:
+            return None
+        else:
+            return tvs[0]
+
+
     def thumbnail_link(self):
         if not self.thumbnail:
             return ''

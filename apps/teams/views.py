@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from utils import render_to, render_to_json
+from utils.searching import get_terms
 from utils.translation import get_languages_list, languages_with_names
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
@@ -59,9 +60,12 @@ from teams.permissions import (
     can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
     can_rename_team
 )
+from teams.tasks import invalidate_video_caches
+
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
+MAX_MEMBER_SEARCH_RESULTS = 40
 HIGHTLIGHTED_TEAMS_ON_PAGE = getattr(settings, 'HIGHTLIGHTED_TEAMS_ON_PAGE', 10)
 CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS', 20)
 
@@ -432,6 +436,7 @@ def settings_languages(request, slug):
             _set_languages(team, form.cleaned_data['preferred'], form.cleaned_data['blacklisted'])
 
             messages.success(request, _(u'Settings saved.'))
+            invalidate_video_caches.delay(team.pk)
             return HttpResponseRedirect(request.path)
     else:
         form = LanguagesForm(team, initial=initial)
@@ -799,14 +804,28 @@ def highlight(request, slug, highlight=True):
 @render_to_json
 def search_members(request, slug):
     team = Team.get(slug, request.user)
-    q = request.GET.get('term')
+    q = request.GET.get('term', '').replace('(', '').replace(')', '')
+    terms = get_terms(q)
+    task_id = request.GET.get('task')
 
-    members = team.members.filter(user__is_active=True).filter(
-        Q(user__username__icontains=q) |
-        Q(user__first_name__icontains=q) |
-        Q(user__last_name__icontains=q)
-    )
-    results = [[m.user.id, '%s (%s)' % (m.user, m.user.username)]
+    members = team.members.filter(user__is_active=True)
+    for term in terms:
+        members = members.filter(
+            Q(user__username__icontains=term) |
+            Q(user__first_name__icontains=term) |
+            Q(user__last_name__icontains=term)
+        )
+    members = members.select_related('user')[:MAX_MEMBER_SEARCH_RESULTS]
+
+    if task_id:
+        task = Task.objects.not_deleted().get(team=team, pk=task_id)
+        members = [m for m in members if can_perform_task(m.user, task)]
+    else:
+        task = None
+
+    results = [[m.user.id,
+                u'%s (%s)' % (m.user, m.user.username),
+                can_perform_task(m.user, task) if task else None]
                for m in members]
 
     return { 'results': results }
@@ -1038,6 +1057,7 @@ def delete_task(request, slug):
 
     return HttpResponseRedirect(next)
 
+
 def assign_task(request, slug):
     '''Assign a task to the given user, or unassign it if null/None.'''
     team = get_object_or_404(Team, slug=slug)
@@ -1056,6 +1076,24 @@ def assign_task(request, slug):
         messages.error(request, _('You cannot assign this task.'))
 
     return HttpResponseRedirect(next)
+
+@render_to_json
+@login_required
+def assign_task_ajax(request, slug):
+    '''Assign a task to the given user, or unassign it if null/None.'''
+    team = get_object_or_404(Team, slug=slug)
+
+    form = TaskAssignForm(team, request.user, data=request.POST)
+    if form.is_valid():
+        task = form.cleaned_data['task']
+        assignee = form.cleaned_data['assignee']
+
+        task.assignee = assignee
+        task.save()
+
+        return { 'success': True }
+    else:
+        return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
 
 
 # Projects

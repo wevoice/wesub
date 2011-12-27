@@ -108,24 +108,17 @@
                         {% if task|can_perform_task:user %}
                             {% if task.assignee == user %}
                                 <li>
-                                    {% if task.get_type_display == "Subtitle" or task.get_type_display == "Translate"%}
-                                        <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Perform Task" %}</a>
-
-                                        <script type="text/javascript">
-                                            $('.perform-task-{{ task.pk }}').click(function() {
-                                                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
-                                                var opener = new unisubs.widget.SubtitleDialogOpener('{{ task.team_video.video.video_id }}', '{{ task.team_video.video.get_video_url }}',
-                                                    videoSource, null, null
-                                                );
-                                                opener.showStartDialog();
-
-                                                return false;
-                                            });
-                                        </script>
-                                    {% else %}
-                                        <a class="perform" href="{{ task.get_widget_url }}">{% trans "Perform Task" %}</a>
-                                    {% endif %}
+                                    {% include "teams/_perform_task_link.html" %}
                                 </li>
+                            {% else %}
+                                {% if task.assignee == None %}
+                                    <li>
+                                        <a class="assign-and-perform" href="#">{% trans "Perform Task" %}<span class="task-id" style="display: none;">{{ task.pk }}</span></a>
+                                    </li>
+                                    <li style="display: none;">
+                                        {% include "teams/_perform_task_link.html" %}
+                                    </li>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     </ul>
@@ -279,6 +272,25 @@
 
             $('a.action-assign-submit, a.action-delete').click(function(e) {
                 $(e.target).closest('form').submit();
+                return false;
+            });
+
+            $('a.assign-and-perform').click(function(e) {
+                var target = $(e.target);
+
+                $.ajax({
+                    url: '{% url teams:assign_task_ajax slug=team.slug %}',
+                    type: 'POST',
+                    data: {
+                        task: target.find('span.task-id').text(),
+                        assignee: {% firstof request.user.id -1 %}
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        target.hide();
+                        target.closest('ul').find('a.perform').closest('li').show().find('.perform').click();
+                    }
+                });
+
                 return false;
             });
 
