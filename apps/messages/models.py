@@ -131,8 +131,10 @@ class Message(models.Model):
         """
         if not self.user.notify_by_message:
             self.read = True
-        super (Message, self).save(*args, **kwargs)
 
+        if not getattr(settings, "MESSAGES_DISABLED", False):
+            super (Message, self).save(*args, **kwargs)
+        
     @classmethod
     def on_delete(cls, sender, instance, **kwargs):
         ct = ContentType.objects.get_for_model(sender)
@@ -140,6 +142,8 @@ class Message(models.Model):
 
     @classmethod
     def on_message_saved(self, sender, instance, created, *args, **kwargs):
+        if getattr(settings, "MESSAGES_DISABLED", False):
+            return
         from messages.tasks import send_new_message_notification
 
         if created and instance.user.notify_by_email and instance.user.notify_by_message:
