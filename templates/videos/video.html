@@ -5,8 +5,6 @@
 {% load escapejs widget comments recent_activity paginator i18n subtitles_tags teams_tags videos_tags media_compressor moderation doorman %}
 
 {% block css %}
-
-    
     {{ block.super }}
     {% include_bundle "video_history" %}
     {% include_bundle "widget-css"%}
@@ -15,14 +13,16 @@
 {% block scripts %}
     {{ block.super }}
     {% include_bundle "unisubs-onsite-compiled" %}
-    <script src="{{ STATIC_URL }}js/jquery.tablesorter.min.js" type="text/javascript"></script>
     <script src="{{ STATIC_URL }}js/jquery.tabs.js" type="text/javascript"></script>
     <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
     {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
     
     <script type="text/javascript">
         jQuery(document).ready( function($) {
-            $('.inline_tabs').tabs();
+            $('#submenu').tabs();
+            $('#submenu a').click(function(){
+                $(this).parents('li').addClass('current').siblings('li').removeClass('current');
+            });
     
             $('#add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
@@ -56,6 +56,28 @@
                 }else{
                     $.jGrowl.error('{% trans "Enter non-empty title" %}');
                 }
+            });
+
+            $('.modal-header .close', '.bootstrap').click(function(){
+                $(this).parents('.modal').hide();
+            });
+
+            $('.abbr').each(function(){
+                var content = $(this).children('.abbr-content');
+                if(content.height() > 72) {
+                    $(this).addClass('collapsed').append('<a class="expand" href="#">Show all ↓</a>');
+                }
+            });
+
+            $('.expand', '.abbr').live('click', function(){
+                var container = $(this).parents('.abbr');
+                var content = $(this).siblings('.abbr-content');
+                if(container.hasClass('collapsed')){
+                    $(this).text('Collapse ↑');
+                } else {
+                    $(this).text('Show all ↓');
+                }
+                container.toggleClass('collapsed expanded');
             });
 
         });
@@ -93,6 +115,7 @@
         - upload subs not clear that it's optional
         - Select Original Language, Create Subtitles In..., Translate Subtitles To..., Upload From File, Upload Text Transcript
         - Is follow video-wide or subs wide
+        + crediting info
     {% endcomment %}
     {% if saved %}
         <div id="messages">
@@ -105,17 +128,36 @@
         <h2 class="main-title">
             {{ video }}
         </h2>
-        <p class="permalink"><a href="{{share_panel_permalink}}">Permalink</a></p>
+        <!--<p class="permalink"><a href="{{share_panel_permalink}}">{% trans "Permalink" %}</a></p>-->
         <div id="description" class="abbr">
-            {{ video.description }}
-            <a href="#">Expand</a>
+            <div class="abbr-content">
+                {{ video.description }}
+            </div>
         </div>
+        <ul class="metrics">
+            <li>
+                <p>{{ video.widget_views_count }}</p>
+                <h4>View{{ video.widget_views_count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{{ video.view_count }}</p>
+                <h4>Site View{{ video.view_count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{{ video.followers.count }}</p>
+                <h4>Follower{{ video.followers.count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{{ video.languages_count }}</p>
+                <h4>Language{{ video.languages_count|pluralize }}</h4>
+            </li>
+        </ul>
         <div class="sharing-tools">
             {% if shows_widget_sharing %}
                 {% include '_sharing_widget.html' %}
             {% endif %}
         </div>
-
+        {% comment %}
         {% if user.is_staff and perms.videos.edit_video %}
             <h3>{% trans "Admin" %}</h3>
             <ul id="admin-menu">
@@ -133,9 +175,46 @@
                 </li>
             </ul>
         {% endif %}
+{% endcomment %}
+            <!--<li>
+                <p>{{ video.duration|format_duration }}</p>
+                <h4>Length</h4>
+            </li>-->
     </div>
     <div class="grid_8 view omega">
-        {% widget widget_params %}
+        <ul id="submenu">
+            <li class="current"><a href="#video-tab">{% trans "Video" %}</a></li>
+            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{% get_comment_count video %}</span></a></li>
+            <li><a href="#activity-tab">{% trans "History" %}</a></li>
+            <li class="hascount"><a href="#urls-tab">{% trans "URLs" %}<span>{% video_url_count video %}</span></a></li>
+        </ul>
+        <div id="video-tab">
+            {% widget widget_params %}
+            <div class="video-tools">
+                <h3>Add Subtitles</h3>
+                <ul>
+                    <li>
+                        <a href="">Add translations</a>
+                    </li>
+                    <li>
+                        <a href="">Upload subtitles</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="comments-tab" style="display:none;">
+            <h3>{% trans "Leave a comment" %}</h3>
+            {% render_comment_form video %}
+            <h3>{% trans "Comments" %}</h3>
+            {% render_comment_list video %}
+        </div>
+        <div id="activity-tab" style="display:none;">
+            {% video_activity video %}
+            <a href="{% url videos:actions_list video.video_id %}" style="margin: 10px">{% trans 'View all activity' %}</a>
+        </div>
+        <div id="urls-tab" style="display:none;">
+            {% video_url_panel %}
+        </div>
     </div>
     <div class="bootstrap">
         <div class="modal">
@@ -169,106 +248,41 @@
         </div>
     </div>
 
-    <div class="section">
-        <div class="grid_3 left_nav_wrapper alpha">
-            <h3>{% trans "Video" %}</h3>
-            <ul class="left_nav" id="video-menu">
-                <li class="active">
-                    <a href="{{ video.get_absolute_url }}">{% trans 'Info' %}</a>
-                </li>
-                <li class="contribute">
-                  {% if not video.subtitle_language %}
-                      <a href="#" id="add_subtitles"> {% trans 'Add Subtitles' %}</a><br /><br />
-                  {% else %}
-                      <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Add Translation' %}</a>
-                  {% endif %}
-                <li>
-                <li class="contribute">{% upload_subtitles video %}<li>
-                <li class="contribute">{% paste_transcription %}</li>
-            </ul>
-            <h3>{% trans "Subtitles" %}</h3>
-            <ul class="left_nav" id="subtitles-menu">
-                {% include 'videos/_left_navigation.html' %}
-            </ul>
+        {# CONTRIBUTE #}
+        <li class="contribute">
+          {% if not video.subtitle_language %}
+              <a href="#" id="add_subtitles"> {% trans 'Add Subtitles' %}</a><br /><br />
+          {% else %}
+              <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Add Translation' %}</a>
+          {% endif %}
+        <li>
+        <li class="contribute">{% upload_subtitles video %}<li>
+        <li class="contribute">{% paste_transcription %}</li>
 
-              <h3>{% if user_can_moderate%}{% trans "Moderation" %}{% endif %}</h3>
-              <ul class="left_nav" id="moderation-menu">
-                {% switch_feature MODERATION %}
-                    <li>{% render_approve_all_button video user %}</li>
-                {% endswitch_feature %}
-                <li>{% team_add_video_select %}</li>
-                <li>{% render_belongs_to_team_list video %}</li>
-              </ul>
+        {# SUBTITLES #}
+        <h3>{% trans "Subtitles" %}</h3>
+        <ul class="left_nav" id="subtitles-menu">
+            {% include 'videos/_left_navigation.html' %}
+        </ul>
+
+        {# MODERATION #}
+        <h3>{% if user_can_moderate%}{% trans "Moderation" %}{% endif %}</h3>
+          <ul class="left_nav" id="moderation-menu">
+            {% switch_feature MODERATION %}
+                <li>{% render_approve_all_button video user %}</li>
+            {% endswitch_feature %}
+            <li>{% team_add_video_select %}</li>
+            <li>{% render_belongs_to_team_list video %}</li>
+          </ul>
 
 
-            {% if user.is_staff and perms.videos.edit_video %}
-              <h3>{% trans "Admin" %}</h3>
-              <ul class="left_nav" id="admin-menu">
-                <li>
-                  <a href="{% url videos:video_debug video.video_id %}" target="blank"> View debug info </a>
-                </li>
-                <li>
-                  <a href="{% url admin:videos_video_change video.pk %}" target="blank"> {% trans 'Edit in Admin Interface' %}</a>
-                </li>
-                <li>{% feature_video video %}</li>
-                <li>
-                    {% if user %}
-                        {% render_visibility_button video user %}
-                    {% endif %}
-                </li>
-              </ul>
+        {# EDIT TITLE #}
+        {% if user.is_authenticated %}
+            {% if not video.title or video.is_html5 or user.is_superuser %}
+                <a class="heading_button edit-title" href="#" data-modal="edit-title-dialog">{% trans 'Edit title' %}</a>
             {% endif %}
+        {% endif %}
 
-        </div>
-        <div class="grid_9 omega pod">
-            <div class="hd">
-                <h2 class="title-container">{{ video }}</h2>
-                {% if user.is_authenticated %}
-                    {% if not video.title or video.is_html5 or user.is_superuser %}
-                        <a class="heading_button edit-title" href="#" data-modal="edit-title-dialog">{% trans 'Edit title' %}</a>
-                    {% endif %}
-                {% endif %}
-                <ul class="inline_tabs">
-                    <li class="active">
-                        <a href="#activity-tab">
-                        <span class="inline_text">{% trans 'Activity Stream' %}</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#comments-tab">
-                        <span class="inline_text">{% trans 'Comments' %}</span>
-                        <span class="badgy_out">
-                            <span class="badgy">{% get_comment_count video %}</span>
-                        </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#urls-tab">
-                        <span class="inline_text">{% trans 'Video URLs' %}</span>
-                        <span class="badgy_out">
-                            <span class="badgy">{% video_url_count video %}</span>
-                        </span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div id="comments-tab" style="display: none">
-                
-                    {% render_comment_form video %}
-                    {% render_comment_list video %}
-
-            </div>
-            <div id="activity-tab">
-                    {% video_activity video %}
-                <div class="ft">
-                    <a href="{% url videos:actions_list video.video_id %}" style="margin: 10px">{% trans 'View all activity' %}</a>
-                </div>
-            </div>
-            <div id="urls-tab" style="display: none">
-                {% video_url_panel %}
-            </div>
-        </div>
-    </div>
     {% endcomment %}
 {% endblock %}
 
