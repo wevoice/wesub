@@ -1,34 +1,38 @@
 # Universal Subtitles, universalsubtitles.org
-# 
+#
 # Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import time
 
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.utils.http import cookie_date
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.list_detail import object_list
-from django.views.generic.simple import direct_to_template
 
-from auth.models import CustomUser as User
-from messages.models import Message
-from messages.rpc import MessagesApiClass
-from messages.forms import SendMessageForm
+from apps.auth.models import CustomUser as User
+from apps.messages.forms import SendMessageForm, NewMessageForm
+from apps.messages.models import Message
+from apps.messages.rpc import MessagesApiClass
+from utils import render_to_json, render_to
 from utils.rpc import RpcRouter
-from utils import render_to_json
+
 
 rpc_router = RpcRouter('messages:rpc_router', {
     'MessagesApi': MessagesApiClass()
@@ -47,7 +51,7 @@ def index(request, message_pk=None):
         'messages_display': True,
         'user_info': user
     }
-    
+
     reply = request.GET.get('reply')
 
     if reply:
@@ -71,17 +75,17 @@ def index(request, message_pk=None):
         response.set_cookie(Message.hide_cookie_name, last_message.pk, max_age, expires)
     except Message.DoesNotExist:
         pass
-    
+
     return response
-    
-@login_required    
+
+@login_required
 def sent(request):
     user = request.user
     qs = Message.objects.for_author(request.user)
     extra_context = {
         'send_message_form': SendMessageForm(request.user, auto_id='message_form_id_%s'),
         'messages_display': True,
-        'user_info': user      
+        'user_info': user
     }
     return object_list(request, queryset=qs,
                        paginate_by=MESSAGES_ON_PAGE,
@@ -90,13 +94,37 @@ def sent(request):
                        extra_context=extra_context)
 
 @login_required
+@render_to('messages/new.html')
 def new(request):
-    user = request.user
-    context = {
-        'user_info': user,
-    }
+    selected_user = None
 
-    return direct_to_template(request, 'messages/new.html', context)
+    if request.POST:
+        form = NewMessageForm(request.user, request.POST)
+
+        if form.is_valid():
+            if form.cleaned_data['user']:
+                Message(user=form.cleaned_data['user'], author=request.user,
+                        content=form.cleaned_data['content']).save()
+            elif form.cleaned_data['team']:
+                # TODO: Move this into a task for performance?
+                for member in form.cleaned_data['team'].members.all():
+                    if member.user != request.user:
+                        Message(user=member.user, author=request.user,
+                                content=form.cleaned_data['content']).save()
+
+            messages.success(request, _(u'Message sent.'))
+            return HttpResponseRedirect(reverse('messages:index'))
+        else:
+            if request.POST.get('user'):
+                selected_user = User.objects.get(id=request.POST['user'])
+    else:
+        form = NewMessageForm(request.user)
+
+    return {
+        'selected_user': selected_user,
+        'user_info': request.user,
+        'form': form,
+    }
 
 @render_to_json
 def search_users(request):

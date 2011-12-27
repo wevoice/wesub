@@ -32,7 +32,7 @@ from utils.forms.unisub_video_form import UniSubBoundVideoField
 from teams.permissions import can_assign_task
 
 from apps.teams.moderation import add_moderation, remove_moderation
-from apps.teams.permissions import roles_user_can_invite, can_delete_task
+from apps.teams.permissions import roles_user_can_invite, can_delete_task, can_add_video
 from apps.teams.permissions_const import ROLE_NAMES
 
 from doorman import feature_is_on
@@ -174,7 +174,6 @@ class AddTeamVideoForm(BaseVideoBoundForm):
                                  required=False,
                                  help_text=_(u'It will be saved only if video does not exist in our database.'))
 
-
     project = forms.ModelChoiceField(
         label=_(u'Project'),
         queryset = Project.objects.none(),
@@ -182,6 +181,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         empty_label=None,
         help_text=_(u"Let's keep things tidy, shall we?")
     )
+
     class Meta:
         model = TeamVideo
         fields = ('video_url', 'language', 'title', 'description', 'thumbnail', 'project',)
@@ -190,13 +190,16 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.team = team
         self.user = user
         super(AddTeamVideoForm, self).__init__(*args, **kwargs)
+
         self.fields['language'].choices = get_languages_list(True)
-        
+
         projects = self.team.project_set.all()
         self.fields['project'].queryset = projects
 
         ordered_projects = ([p for p in projects if p.is_default_project] +
                             [p for p in projects if not p.is_default_project])
+        ordered_projects = [p for p in ordered_projects if can_add_video(team, user, p)]
+
         self.fields['project'].choices = [(p.pk, p) for p in ordered_projects]
 
     def clean_video_url(self):
@@ -348,6 +351,12 @@ class TaskCreateForm(ErrorableModelForm):
         if not self.team_video.subtitles_finished():
             self.add_error(_(u"No one has subtitled this video yet, so it can't be translated."),
                            'type', cleaned_data)
+            return
+
+        sl = self.team_video.video.subtitle_language(cleaned_data['language'])
+        if sl and sl.is_complete_and_synced():
+            self.add_error(_(u"This language already has a complete set of subtitles."),
+                           'language', cleaned_data)
             return
 
     def _check_task_creation_review(self, tasks, cleaned_data):
@@ -562,7 +571,7 @@ class InviteForm(forms.Form):
                 'author': self.user,
                 'role': self.cleaned_data['role'],
             })
-            
+
             notifier.team_invitation_sent.delay(invite.pk)
 
 

@@ -1,4 +1,3 @@
-
 from settings import *
 #from dev_settings import *
 
@@ -7,10 +6,13 @@ ROOT_URLCONF = 'urls'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': rel('unisubs.sqlite3'), 
+        'NAME': rel('unisubs.sqlite3'),
     }
 }
 
+
+CACHE_PREFIX = "testcache"
+CACHE_TIMEOUT = 60
 
 HAYSTACK_SOLR_URL = 'http://localhost:38983/solr/testing'
 

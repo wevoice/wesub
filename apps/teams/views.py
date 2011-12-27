@@ -366,7 +366,7 @@ def settings_permissions(request, slug):
 @login_required
 def settings_projects(request, slug):
     team = Team.get(slug, request.user)
-    projects = team.project_set.all()
+    projects = team.project_set.exclude(name=Project.DEFAULT_NAME)
     return { 'team': team, 'projects': projects, }
 
 
@@ -449,7 +449,7 @@ def add_video(request, slug):
     project = Project.objects.get(team=team, pk=project_id) if project_id else team.default_project
 
     if request.POST and not can_add_video(team, request.user, project):
-        messages.error(request, _(u"You can't add video."))
+        messages.error(request, _(u"You can't add that video to this team/project."))
         return HttpResponseRedirect(team.get_absolute_url())
 
     initial = {
@@ -481,7 +481,7 @@ def add_videos(request, slug):
     team = Team.get(slug, request.user)
 
     if not can_add_video(team, request.user):
-        messages.error(request, _(u'You can\'t add video.'))
+        messages.error(request, _(u"You can't add videos to this team/project."))
         return HttpResponseRedirect(team.get_absolute_url())
 
     form = AddTeamVideosFromFeedForm(team, request.user, request.POST or None)
@@ -801,9 +801,13 @@ def search_members(request, slug):
     team = Team.get(slug, request.user)
     q = request.GET.get('term')
 
-    results = [[m.user.id, m.user.username]
-               for m in team.members.filter(user__username__icontains=q,
-                                            user__is_active=True)]
+    members = team.members.filter(user__is_active=True).filter(
+        Q(user__username__icontains=q) |
+        Q(user__first_name__icontains=q) |
+        Q(user__last_name__icontains=q)
+    )
+    results = [[m.user.id, '%s (%s)' % (m.user, m.user.username)]
+               for m in members]
 
     return { 'results': results }
 

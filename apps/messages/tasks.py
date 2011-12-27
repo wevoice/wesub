@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
+#
 # Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 """
 Centralizes notification sending throught the website.
@@ -39,6 +39,7 @@ from auth.models import CustomUser as User
 
 from utils import send_templated_email
 
+        
 @task()
 def send_new_message_notification(message_id):
     from messages.models import Message
@@ -48,7 +49,7 @@ def send_new_message_notification(message_id):
         msg = '**send_new_message_notification**. Message does not exist. ID: %s' % message_id
         client.create_from_text(msg, logger='celery')
         return
-    
+
     user = message.user
 
     if not user.email or not user.is_active or not user.notify_by_email:
@@ -57,13 +58,13 @@ def send_new_message_notification(message_id):
     to = "%s <%s>" % (user, user.email)
     if message.author:
         subject = _(u"New message from %(author)s on Universal Subtitles: %(subject)s")
-    else: 
+    else:
         subject = _("New message on Universal Subtitles: %(subject)s")
     subject = subject % {
-        'author': message.author, 
+        'author': message.author,
         'subject': message.subject
     }
-        
+
     context = {
         "message": message,
         "domain":  Site.objects.get_current().domain,
@@ -71,9 +72,11 @@ def send_new_message_notification(message_id):
     }
 
     send_templated_email(to, subject, "messages/email/message_received.html", context)
-    
-@task()    
+
+@task()
 def team_invitation_sent(invite_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import Invite
     invite = Invite.objects.get(pk=invite_pk)
@@ -84,18 +87,20 @@ def team_invitation_sent(invite_pk):
     msg.author = invite.author
     msg.save()
     return True
-        
+
 @task()
 def application_sent(application_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import Application, TeamMember
-    
+
     application = Application.objects.get(pk=application_pk)
     notifiable = TeamMember.objects.filter( team=application.team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     for m in notifiable:
         msg = Message()
-        
+
         body = render_to_string("messages/email/application_sent.html", {
             "applicant": application.user,
             "team":application.team,
@@ -108,8 +113,11 @@ def application_sent(application_pk):
         msg.object = application.team
         msg.author = application.user
         msg.save()
-
+        
+@task
 def team_application_approved(application_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import Application
     application = Application.objects.get(pk=application_pk)
@@ -122,8 +130,11 @@ def team_application_approved(application_pk):
     msg.save()
 
 
-@task() 
+@task()
 def team_application_denied(application_pk):
+    
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import Application
     application = Application.objects.get(pk=application_pk)
@@ -135,12 +146,14 @@ def team_application_denied(application_pk):
     msg.author = User.get_anonymous()
     msg.save()
 
-@task() 
+@task()
 def team_member_new(member_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import TeamMember
     member = TeamMember.objects.get(pk=member_pk)
-    from videos.models import Action   
+    from videos.models import Action
     from teams.models import TeamMember
     # the feed item should appear on the timeline for all team members
     # as a team might have thousands of members, this one item has
@@ -152,24 +165,26 @@ def team_member_new(member_pk):
     for m in notifiable:
         msg = Message()
         if m.user == member.user:
-             base_str = ugettext("You've joined the %s team as a(n) %s'" %
-                                 (m.team, m.role))
+             base_str = ugettext(u"You've joined the %s team as a(n) %s'" %
+                                 (m.team, member.role))
         else:
-             base_str = ugettext("%s joined the %s team as a(n) %s" % (
-            member.user, m.team, m.role))
+             base_str = ugettext(u"%s joined the %s team as a(n) %s" % (
+            member.user, m.team, member.role))
         msg.subject = ugettext(base_str)
         msg.content = ugettext(base_str + " on %s" % (datetime.datetime.now()))
         msg.user = m.user
         msg.object = m.team
         msg.save()
 
-@task() 
+@task()
 def team_member_leave(team_pk, user_pk):
+    if getattr(settings, "MESSAGES_DISABLED", False):
+        return
     from messages.models import Message
     from teams.models import TeamMember, Team
     user = User.objects.get(pk=user_pk)
     team = Team.objects.get(pk=team_pk)
-    from videos.models import Action   
+    from videos.models import Action
     # the feed item should appear on the timeline for all team members
     # as a team might have thousands of members, this one item has
     # to show up on all of them
@@ -189,7 +204,7 @@ def team_member_leave(team_pk, user_pk):
         msg.user = m.user
         msg.object = m.team
         msg.save()
-        
+
 @task()
 def email_confirmed(user_pk):
     from messages.models import Message
@@ -203,5 +218,5 @@ def email_confirmed(user_pk):
     )
     message.save()
     return True
-    
-    
+
+
