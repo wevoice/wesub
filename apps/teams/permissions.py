@@ -16,10 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from utils.translation import SUPPORTED_LANGUAGES_DICT
-from teams.models import (
-    Team, MembershipNarrowing, Workflow, TeamMember, Project, TeamVideoLanguage, Task
-)
+from teams.models import Team, MembershipNarrowing, Workflow, TeamMember, Task
 
 from teams.permissions_const import (
     ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN, ROLE_MANAGER,
@@ -158,7 +155,7 @@ def save_role(team, member, role, projects, languages, user=None):
     if can_assign_role(team, user, role, member.user):
         member.role = role
         member.save()
-        
+
         set_narrowings(member, projects, languages, user)
         return True
     return False
@@ -317,6 +314,7 @@ def can_rename_team(team, user):
     role = get_role_for_target(user, team)
     return role == ROLE_OWNER
 
+
 def can_add_video(team, user, project=None):
     """Return whether the given user can add a video to the given target."""
 
@@ -324,7 +322,7 @@ def can_add_video(team, user, project=None):
     role_required = {
         1: ROLE_CONTRIBUTOR,
         2: ROLE_MANAGER,
-        3: ROLE_CONTRIBUTOR,
+        3: ROLE_ADMIN,
     }[team.video_policy]
 
     return role in _perms_equal_or_greater(role_required)
@@ -336,6 +334,19 @@ def can_add_video_somewhere(team, user):
     return any(can_add_video(team, user, project)
                for project in team.project_set.all())
 
+def can_remove_video(team_video, user):
+    """Return whether the given user can remove the given video."""
+
+    role = get_role_for_target(user, team_video.team, team_video.project)
+
+    role_required = {
+        1: ROLE_CONTRIBUTOR,
+        2: ROLE_MANAGER,
+        3: ROLE_ADMIN,
+    }[team_video.team.video_policy]
+
+    return role in _perms_equal_or_greater(role_required)
+
 def can_edit_video(team_video, user):
     """Return whether the given user can edit the given video."""
 
@@ -344,10 +355,11 @@ def can_edit_video(team_video, user):
     role_required = {
         1: ROLE_CONTRIBUTOR,
         2: ROLE_MANAGER,
-        3: ROLE_CONTRIBUTOR,
+        3: ROLE_ADMIN,
     }[team_video.team.video_policy]
 
     return role in _perms_equal_or_greater(role_required)
+
 
 def can_view_settings_tab(team, user):
     """Return whether the given user can view (and therefore edit) the team's settings.
@@ -508,7 +520,7 @@ def can_assign_task(task, user):
     """
     team, project, lang = task.team, task.team_video.project, task.language
 
-    
+
     return can_assign_tasks(team, user, project, lang) and can_perform_task(user, task)
 
 def can_delete_task(task, user):

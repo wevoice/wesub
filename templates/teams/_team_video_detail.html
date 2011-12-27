@@ -60,6 +60,12 @@
                     </li>
                 {% endif %}
 
+                {% comment %}
+                    Right now we're using the same logic for editing and
+                    removing videos, so we don't do a separate check here for
+                    performance reasons.
+                {% endcomment %}
+
                 {% if can_edit_this_video %}
                     <li>
                         <form action="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" method="post" style="display: none;">

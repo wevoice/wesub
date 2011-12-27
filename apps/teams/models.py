@@ -71,14 +71,15 @@ class Team(models.Model):
             (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
             (INVITATION_BY_ADMIN, _(u'Invitation by admin')),
             )
-    MEMBER_REMOVE = 1
-    MANAGER_REMOVE = 2
-    MEMBER_ADD = 3
+
+    VP_MEMBER = 1
+    VP_MANAGER = 2
+    VP_ADMIN = 3
     VIDEO_POLICY_CHOICES = (
-            (MEMBER_REMOVE, _(u'Members can add and remove video')),  #any member can add/delete video
-            (MANAGER_REMOVE, _(u'Managers can add and remove video')),    #only managers can add/remove video
-            (MEMBER_ADD, _(u'Members can only add videos'))  #members can only add video
-            )
+        (VP_MEMBER, _(u'Any team member')),
+        (VP_MANAGER, _(u'Managers and admins')),
+        (VP_ADMIN, _(u'Admins only'))
+    )
 
     TASK_ASSIGN_CHOICES = (
             (10, 'Any team member'),
@@ -126,7 +127,7 @@ class Team(models.Model):
             default=OPEN)
     video_policy = models.IntegerField(_(u'video policy'),
             choices=VIDEO_POLICY_CHOICES,
-            default=MEMBER_REMOVE)
+            default=VP_MEMBER)
     task_assign_policy = models.IntegerField(_(u'task assignment policy'),
             choices=TASK_ASSIGN_CHOICES,
             default=TASK_ASSIGN_IDS['Any team member'])
@@ -143,9 +144,6 @@ class Team(models.Model):
         ordering = ['name']
         verbose_name = _(u'Team')
         verbose_name_plural = _(u'Teams')
-
-
-
 
 
     def __unicode__(self):
@@ -224,20 +222,6 @@ class Team(models.Model):
         Contibutors can add new subs videos but they migh need to be moderated
         """
         return self._is_role(user, TeamMember.ROLE_CONTRIBUTOR)
-
-    def can_remove_video(self, user, team_video=None):
-        if not user.is_authenticated():
-            return False
-        if self.video_policy == self.MANAGER_REMOVE and self.is_manager(user):
-            return True
-        if self.video_policy == self.MEMBER_REMOVE and self.is_member(user):
-            return True
-        return False
-
-    def can_edit_video(self, user, team_video=None):
-        if not user.is_authenticated():
-            return False
-        return self.can_add_video(user)
 
     def can_see_video(self, user, team_video=None):
         if not user.is_authenticated():
@@ -481,9 +465,6 @@ class TeamVideo(models.Model):
 
     def __unicode__(self):
         return self.title or unicode(self.video)
-
-    def can_remove(self, user):
-        return self.team.can_remove_video(user, self)
 
     def link_to_page(self):
         if self.all_languages:
