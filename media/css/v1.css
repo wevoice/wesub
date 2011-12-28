@@ -75,7 +75,7 @@ p.view-more{margin-top:1em;text-align:center;}p.view-more a{text-decoration:none
 .v1 .controls form{padding:0;}
 .v1 .controls div.search{border-bottom:0;padding-bottom:0;}.v1 .controls div.search form{padding:0;}
 .block-level{display:block;width:100%;}
-.v1 form{padding:1em 0;}.v1 form .form-title{margin:1em 0 0 5px;}
+.v1 form{padding:1em 0;}.v1 form .form-title{margin:1em 0 0 0;}
 .v1 form fieldset{padding-bottom:3em;}.v1 form fieldset legend{font-weight:bold;padding-bottom:.5em;}
 .v1 form fieldset input,.v1 form fieldset textarea{margin-bottom:.5em;padding:4px;}
 .v1 form fieldset label{display:block;width:100%;padding:1.5em 0 .25em;}.v1 form fieldset label .notation{float:right;margin-right:-8px;}
