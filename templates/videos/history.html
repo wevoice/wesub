@@ -52,7 +52,7 @@
                     window.location.replace(url);
                 }
             });
-            $('#submenu').tabs();
+            $('.tabs').tabs();
     
             $('#add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
@@ -140,9 +140,9 @@
             <div id="description" class="abbr">
                 <div class="abbr-content">
                     {% if language.description %}
-                        {{ language.description }}
+                        {{ language.description|urlize|linebreaks }}
                     {% else %}
-                        {{ video.description }}
+                        {{ video.description|urlize|linebreaks }}
                     {% endif %}
                 </div>
             </div>
@@ -180,14 +180,14 @@
         </div>
     </div>
     <div class="grid_8 view omega">
-        <ul id="submenu">
+        <ul class="tabs">
             <li class="current"><a href="#transcripts-tab">{% trans "Subtitles" %}</a></li>
             <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{% get_comment_count language %}</span></a></li>
             <li class="hascount"><a href="#revisions-tab">{% trans "History" %}<span>{{ hits }}</span></a></li>
         </ul>
         <div class="tab" id="transcripts-tab">
             <div class="tools">
-                <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit' %}{% endif %}</a>
+                <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit Language' %}{% endif %}</a>
                 {% if last_version.subtitles %}
                     <div class="sort_button action">
                         <div class='arrow'>

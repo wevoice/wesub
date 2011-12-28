@@ -23,3 +23,13 @@
     {% endverbatim %}
 
 {% endblock %}
+
+{% block page_controls %}
+    {% if user.is_staff and perms.videos.edit_video %}
+        <ul id="page_controls">
+            <li>
+                <a href="{% url admin:teams_team_change team.pk %}" target="blank">{% trans 'Edit team' %}</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}

@@ -54,6 +54,9 @@
 
     <div class="view grid_9 alpha">
         <div class="tools group">
+            {% if can_add_video %}
+                    <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
+            {% endif %}
             <div class="sort_button">
                 <div class="arrow">
                 </div>
@@ -79,9 +82,6 @@
                     </li>
                 </ul>
             </div>
-            {% if can_add_video %}
-                    <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
-            {% endif %}
         </div>
 
         {% if filtered %}

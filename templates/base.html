@@ -164,6 +164,7 @@
                 {% if user|can_translate %}
                     <li><a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a></li>
                 {% endif %}
+                <li><a href="https://github.com/pculture/unisubs/" title="{{ LAST_COMMIT_GUID }}">Github</a></li>
             </ul>
             {% block page_controls %}{% endblock %}
         </div>
@@ -231,8 +232,6 @@
             <a href="{% url terms_page %}">{% trans 'Terms of Service' %}</a>
         </div>
     </div>
-
-    <div style="float: right; font-size: 0.6em; padding: 3px;"><a href="https://github.com/pculture/unisubs/">commit: {{ LAST_COMMIT_GUID }}</a></div>
 
     {% block bottom_scripts %}{% endblock %}
 
