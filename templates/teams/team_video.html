@@ -34,7 +34,11 @@
 
             <div class="grid_4 omega">
                 <fieldset>
-                    {% include "_form_field.html" with field=form.project %}
+                    {% if team.has_projects %}
+                        {% include "_form_field.html" with field=form.project %}
+                    {% else %}
+                        <input type="hidden" name="project" value="{{ team.default_project.id }}" />
+                    {% endif %}
                     {% include "_form_field.html" with field=form.thumbnail %}
                 </fieldset>
             </div>

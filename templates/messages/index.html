@@ -133,7 +133,7 @@
             {% for msg in message_list %}
                 <li{% if not msg.read %} class="unread"{% endif %}>
                     <h3>
-                        <a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">{{ msg }}</a>
+                        {{ msg }}
                     </h3>
                 
                     {% if msg.author %}
