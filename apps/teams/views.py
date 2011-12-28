@@ -457,10 +457,6 @@ def add_video(request, slug):
         messages.error(request, _(u"You can't add that video to this team/project."))
         return HttpResponseRedirect(team.get_absolute_url())
 
-    if team.has_projects and project.slug == '_root':
-        # Return a form error
-        pass
-
     initial = {
         'video_url': request.GET.get('url', ''),
         'title': request.GET.get('title', '')
