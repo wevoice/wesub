@@ -808,6 +808,23 @@ class TeamsTest(TestCase):
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 404)
 
+    def test_is_visible(self):
+        hidden  = Team(name='secret', slug='secret', is_visible=False)
+        hidden.save()
+        teams = Team.objects.all()
+        url = reverse("teams:detail", kwargs={"slug":hidden.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        url = reverse("teams:index")
+        
+        response = self.client.get(url)
+        teams = response.context['teams_list']
+        self.assertTrue(len(teams) < 10)
+        teams_pks = [t.pk for t in teams]
+        print teams_pks, hidden.pk
+        
+        self.assertNotIn(hidden.pk, teams_pks)
+        
 from apps.teams.rpc import TeamsApiClass
 from utils.rpc import Error, Msg
 from django.contrib.auth.models import AnonymousUser

@@ -58,7 +58,7 @@ from teams.permissions import (
     can_create_task_translate, can_create_task_review, can_create_task_approve,
     can_view_tasks_tab, can_invite, roles_user_can_assign, can_join_team,
     can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
-    can_rename_team
+    can_rename_team, can_change_team_settings
 )
 from teams.tasks import invalidate_video_caches
 
@@ -302,6 +302,10 @@ def create(request):
 def settings_basic(request, slug):
     team = Team.get(slug, request.user)
 
+    if not can_change_team_settings(team, request.user):
+        messages.error(request, _(u'You do not have permission to edit this team.'))
+        return HttpResponseRedirect(team.get_absolute_url())
+
     if can_rename_team(team, request.user):
         FormClass = RenameableSettingsForm
     else:
@@ -324,6 +328,10 @@ def settings_basic(request, slug):
 @login_required
 def settings_guidelines(request, slug):
     team = Team.get(slug, request.user)
+
+    if not can_change_team_settings(team, request.user):
+        messages.error(request, _(u'You do not have permission to edit this team.'))
+        return HttpResponseRedirect(team.get_absolute_url())
 
     initial = dict((s.key_name, s.data) for s in team.settings.messages_guidelines())
     if request.POST:
@@ -348,6 +356,10 @@ def settings_permissions(request, slug):
     team = Team.get(slug, request.user)
     workflow = Workflow.get_for_target(team.id, 'team')
 
+    if not can_change_team_settings(team, request.user):
+        messages.error(request, _(u'You do not have permission to edit this team.'))
+        return HttpResponseRedirect(team.get_absolute_url())
+
     if request.POST:
         form = PermissionsForm(request.POST, instance=team)
         workflow_form = WorkflowForm(request.POST, instance=workflow)
@@ -371,6 +383,11 @@ def settings_permissions(request, slug):
 def settings_projects(request, slug):
     team = Team.get(slug, request.user)
     projects = team.project_set.exclude(name=Project.DEFAULT_NAME)
+
+    if not can_change_team_settings(team, request.user):
+        messages.error(request, _(u'You do not have permission to edit this team.'))
+        return HttpResponseRedirect(team.get_absolute_url())
+
     return { 'team': team, 'projects': projects, }
 
 
@@ -422,6 +439,10 @@ def _set_languages(team, codes_preferred, codes_blacklisted):
 @login_required
 def settings_languages(request, slug):
     team = Team.get(slug, request.user)
+
+    if not can_change_team_settings(team, request.user):
+        messages.error(request, _(u'You do not have permission to edit this team.'))
+        return HttpResponseRedirect(team.get_absolute_url())
 
     preferred = [tlp.language_code for tlp in
                  TeamLanguagePreference.objects.for_team(team).filter(preferred=True)]
