@@ -11,7 +11,7 @@
   
   <h3>
     {% trans 'Embed' %}
-    {% if language.get_language_display %}
+    {% if language.get_language_display and not language.is_original %}
       (with {{ language.get_language_display }} subtitles)
     {% endif %}
   </h3>
@@ -21,11 +21,11 @@
             <div class="modal-header">
                 <a href="#" class="close action-close">x</a>
                 <h3>Embed video</h3>
+                <p class="notation">Use the following code to embed this video. See our <a href="https://github.com/pculture/unisubs/wiki/Embed-Code-Usage-Guide" title="Embed usage guide">usage guide</a> for more details on embedding.</p>
             </div>
             <div class="modal-body">
                 <form>
                   <fieldset>
-                    <label>Use the following code to embed this video</label>
                     <textarea readonly="readonly" rows="8">{{share_panel_embed_code}}</textarea>
                   </fieldset>
                 </form>
