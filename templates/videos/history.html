@@ -52,7 +52,7 @@
                     window.location.replace(url);
                 }
             });
-            $('#submenu').tabs();
+            $('.tabs').tabs();
     
             $('#add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
@@ -180,7 +180,7 @@
         </div>
     </div>
     <div class="grid_8 view omega">
-        <ul id="submenu">
+        <ul class="tabs">
             <li class="current"><a href="#transcripts-tab">{% trans "Subtitles" %}</a></li>
             <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{% get_comment_count language %}</span></a></li>
             <li class="hascount"><a href="#revisions-tab">{% trans "History" %}<span>{{ hits }}</span></a></li>

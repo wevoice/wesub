@@ -215,32 +215,51 @@
     border-bottom-width: 2px;
     margin-bottom: -1px;
 }
-.v1 .tabs {
+.v1 .tabs  {
     float: left;
     width: 100%;
-    padding: 0;
     border-bottom: 1px solid @fainter;
+    margin: 0 -10px;
+    padding: 0 10px 0 0;
 
     li {
         display: inline;
 
         a {
+            position: relative;
             display: block;
             float: left;
-            padding: 1em 2em;
+            font-size: 13px;
+            padding: 1em 1.5em;
             text-decoration: none;
+            border-right: 1px solid @fainter;
+            border-top: 1px solid @fainter;
             color: @normal;
-            border-style: solid;
+            .linear-gradient(bottom, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 15%, hsla(0, 0%, 98%, 1));
 
             &:hover {
-                .show-border;
+                .linear-gradient(bottom, hsla(0, 0%, 91%, 1), hsla(0, 0%, 95%, 1) 15%, hsla(0, 0%, 95%, 1));
             }
         }
 
         &.current a {
-            color: @darker;
-            font-weight: bold;
-            .show-border;
+            border-bottom: 1px solid #fff;
+            margin-bottom: -1px;
+            color: inherit;
+            background: #fff;
+        }
+
+        &:last-child a {
+            -webkit-border-top-right-radius: 3px;
+            -moz-border-radius-topright: 3px;
+            border-top-right-radius: 3px;
+        }
+
+        &:first-child a {
+            -webkit-border-top-left-radius: 3px;
+            -moz-border-radius-topleft: 3px;
+            border-top-left-radius: 3px;
+            border-left: 1px solid @fainter;
         }
     }
 }
@@ -1040,32 +1059,9 @@ p.view-more {
 
     .view {
 
-        #submenu  {
-            float: left;
-            width: 100%;
-            border-bottom: 1px solid @fainter;
-            margin: 0 -10px;
-            padding: 0 10px 0 0;
+        .tabs  {
 
             li {
-                display: inline;
-
-                a {
-                    position: relative;
-                    display: block;
-                    float: left;
-                    font-size: 13px;
-                    padding: 1em 1.5em;
-                    text-decoration: none;
-                    border-right: 1px solid @fainter;
-                    border-top: 1px solid @fainter;
-                    color: @normal;
-                    .linear-gradient(bottom, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 15%, hsla(0, 0%, 98%, 1));
-
-                    &:hover {
-                        .linear-gradient(bottom, hsla(0, 0%, 91%, 1), hsla(0, 0%, 95%, 1) 15%, hsla(0, 0%, 95%, 1));
-                    }
-                }
 
                 &.hascount a {
                     padding-right: 2em;
@@ -1079,17 +1075,9 @@ p.view-more {
                     }
                 }
 
-                &.current a {
-                    border-bottom: 1px solid #fff;
-                    margin-bottom: -1px;
-                    color: inherit;
-                    background: #fff;
-                }
-
-                &:last-child a {
-                    -webkit-border-top-right-radius: 3px;
-                    -moz-border-radius-topright: 3px;
-                    border-top-right-radius: 3px;
+                &:first-child a {
+                    .border-radius(0);
+                    border-left: none;
                 }
             }
         }
