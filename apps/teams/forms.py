@@ -216,11 +216,13 @@ class AddTeamVideoForm(BaseVideoBoundForm):
     def clean(self):
         language = self.cleaned_data['language']
         video = self.fields['video_url'].video
-        original_sl = video.subtitle_language()
 
-        if video and (original_sl and not original_sl.language) and not language:
-            msg = _(u'Set original language for this video.')
-            self._errors['language'] = self.error_class([msg])
+        if video:
+            original_sl = video.subtitle_language()
+
+            if (original_sl and not original_sl.language) and not language:
+                msg = _(u'Set original language for this video.')
+                self._errors['language'] = self.error_class([msg])
 
         return self.cleaned_data
 
