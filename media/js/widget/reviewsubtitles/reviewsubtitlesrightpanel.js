@@ -58,24 +58,6 @@ unisubs.reviewsubtitles.ReviewSubtitlesRightPanel.prototype.appendMiddleContents
     this.serverModel_.fetchReviewData(unisubs.task_id, function(body) {
         goog.dom.forms.setValue(that.bodyInput_, body);
     });
-
-    el.appendChild($d('hr'));
-
-    this.reassignLink_ = $d('a', {'href': unisubs.team_url}, 'reassign this task');
-    this.editedVersionLink_ = $d('a', {'href': '#'}, 'submit an edited version');
-
-    el.appendChild($d('p', null,
-                      'You can also ',
-                      this.reassignLink_,
-                      ' to someone else, or ',
-                      this.editedVersionLink_,
-                      ' yourself.',
-                      ' If you submit a new version it will also be subject to review.'
-                  ));
-
-    var handler = this.getHandler();
-    handler.listen(this.reassignLink_, 'click', this.reassignLinkClicked_);
-    handler.listen(this.editedVersionLink_, 'click', this.editedVersionLinkClicked_);
 };
 unisubs.reviewsubtitles.ReviewSubtitlesRightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
@@ -129,11 +111,4 @@ unisubs.reviewsubtitles.ReviewSubtitlesRightPanel.prototype.saveForLaterButtonCl
 unisubs.reviewsubtitles.ReviewSubtitlesRightPanel.prototype.sendBackButtonClicked_ = function(e){
     e.preventDefault();
     this.finish('Rejected');
-};
-unisubs.reviewsubtitles.ReviewSubtitlesRightPanel.prototype.reassignLinkClicked_ = function(e){
-    // TODO
-};
-unisubs.reviewsubtitles.ReviewSubtitlesRightPanel.prototype.editedVersionLinkClicked_ = function(e){
-    e.preventDefault();
-    // TODO
 };
