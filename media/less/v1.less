@@ -190,6 +190,13 @@
     font-size: 18px;
     color: @normal;
 }
+.v1 .view .action-call {
+    clear: both;
+    padding: 1em;
+    font-size: 1.25em;
+    .border-radius(3px);
+    background-color: @fainter;
+}
 .v1 .view {
     > div, > form {
         padding-top: 2em;
@@ -1087,8 +1094,15 @@ p.view-more {
             }
         }
 
-        .active-filters {
+        p.active-filters {
             padding-right: 0;
+            margin: 1em 0;
+
+            a {
+                text-decoration: none;
+                color: inherit;
+                border-bottom: 1px dotted @dark;
+            }
         }
 
         .tab {
@@ -1121,15 +1135,21 @@ p.view-more {
             padding: 0;
         }
 
-        .video-tools {
-            clear: both;
+        #video-tab .video-tools {
+
+            h3 {
+                font-weight: normal;
+                padding: 1em 0 .5em;
+                margin: 0 0 .5em;
+                border-bottom: 1px solid @fainter;
+            }
 
             ul {
                 padding: 0;
             }
 
-            .sort_button {
-                position: static;
+            p {
+                margin-bottom: 1em;
             }
         }
     }
@@ -1180,6 +1200,10 @@ p.view-more {
         #description {
             color: @dark;
             line-height: 150%;
+
+            p {
+                margin-bottom: .5em;
+            }
         }
 
         a {
@@ -1202,11 +1226,14 @@ p.view-more {
 
             &.sub-title {
                 padding-top: 0;
-                margin-bottom: .5em;
-                margin-top: -.6em;
+                margin-bottom: -.25em;
                 border: none;
                 color: @dark;
                 line-height: 1.25em;
+
+                a {
+                    color: @dark;
+                }
             }
         }
 

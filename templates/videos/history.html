@@ -103,11 +103,30 @@
           content="{% title_for_video video language %}"/>
 {% endblock  %}
 
+{% comment %}
+    TODO:
+        - title/description editing?
+        - localization sweep
+{% endcomment %}
+
 {% block main_content %}
 
     <div class="grid_4 context alpha">
+        <h3 class="sub-title">
+            <a href="{{share_panel_permalink}}" title="Language permalink">
+                {% if language.is_original %}
+                    {% trans 'Original' %}
+                {% endif %}
+                {{ language.get_language_display }}
+                subtitles
+                {%comment%}{% if language.is_dependent %}
+                    {% trans 'translated from' %} {{ language.standard_language }}
+                {% endif %}{%endcomment%}    
+            </a>
+        </h3>
         <h2 class="main-title">
-            <a href="{{share_panel_permalink}}" title="Permalink">
+            <a href="{{ video.get_absolute_url }}" title="View video">
+                ←
                 {% if language.title %}
                     {{ language.title }}
                 {% else %}
@@ -115,16 +134,7 @@
                 {% endif %}
             </a>
         </h2>
-        <h3 class="sub-title">
-            {% if language.is_original %}
-                    {% trans 'Original' %}
-                {% endif %}
-                {{ language.get_language_display }}
-                subtitles
-                {% if language.is_dependent %}
-                    {% trans 'translated from' %} {{ language.standard_language }}
-                {% endif %}
-        </h3>
+
         {% widget widget_params %}
         {% if language.description or video.description %}
             <div id="description" class="abbr">
@@ -160,10 +170,14 @@
                 {% include '_sharing_widget.html' %}
             {% endif %}
         </div>
-        <h3>{% trans "Subtitles" %}</h3>
-        <ul class="left_nav" id="subtitles-menu">
-            {% include 'videos/_left_navigation.html' %}
-        </ul>
+        <h3>{% trans "View Subtitles" %}</h3>
+        <div class="abbr">
+            <div class="abbr-content">
+                <ul id="subtitles-menu">
+                    {% include 'videos/_left_navigation.html' %}
+                </ul>
+            </div>
+        </div>
     </div>
     <div class="grid_8 view omega">
         <ul id="submenu">
@@ -205,7 +219,21 @@
                 {% endif %}
             </div>
             {% if last_version.has_subtitles %}
-                <!--<p class="active-filters">Showing <strong>Revision {{ language.last_version.version_no }}</strong>, created by <strong>{{ language.latest_version.user }}</strong> on <strong>{{ language.last_version.revision_time }}</strong></p>-->
+                <p class="active-filters">
+                    {% if language.is_dependent %}
+                        Subtitles
+                        {% trans 'translated from' %}
+                        {{ language.standard_language }}.
+                    {% endif %}
+                    Showing
+                    <strong>Revision {{ language.last_version.version_no }}</strong>,
+                    created
+                    <strong>{{ language.last_version.revision_time }}</strong>
+                    by
+                    <a href="language.latest_version.user.profile_url" title="View {{ language.latest_version.user }}'s profile">
+                        <strong>{{ language.latest_version.user }}</strong>
+                    </a>.
+                </p>
                 <ol class="subtitles">
                     {% for item in last_version.ordered_subtitles %}
                     <li>

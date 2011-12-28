@@ -81,16 +81,16 @@
           content="{% title_for_video video %}"/>
 {% endblock  %}
 
+{% comment %}
+    TODO:
+        - title/description editing?
+        - team controls
+        - better way to display 'contribute' actions?
+        - maybe a better way to show languages?
+        - localization sweep
+{% endcomment %}
 
 {% block main_content %}
-    {% comment %}
-        - show which languages are in progress
-        - need 'create subs' menu
-        - upload subs not clear that it's optional
-        - Select Original Language, Create Subtitles In..., Translate Subtitles To..., Upload From File, Upload Text Transcript
-        - Is follow video-wide or subs wide
-        + crediting info
-    {% endcomment %}
     {% if saved %}
         <div id="messages">
             <p>{% blocktrans %}Subtitles saved! You can share the video with friends, or get an embed code for your site. To add atranslation, click the button below.{% endblocktrans %}</p>
@@ -100,7 +100,7 @@
 
     <div class="grid_4 context alpha">
         <h2 class="main-title">
-            <a href="{{share_panel_permalink}}" title="Permalink">{{ video }}</a>
+            <a href="{{share_panel_permalink}}" title="Video permalink">{{ video }}</a>
         </h2>
         <div id="description" class="abbr">
             <div class="abbr-content">
@@ -130,14 +130,14 @@
                 {% include '_sharing_widget.html' %}
             {% endif %}
         </div>
-        <h3>{% trans "Subtitles" %}</h3>
-        <ul id="subtitles-menu">
-            {% include 'videos/_left_navigation.html' %}
-        </ul>
-        {% comment %}<li>
-                <p>{{ video.duration|format_duration }}</p>
-                <h4>Length</h4>
-            </li>{% endcomment %}
+        <h3>{% trans "View Subtitles" %}</h3>
+        <div class="abbr">
+            <div class="abbr-content">
+                <ul id="subtitles-menu">
+                    {% include 'videos/_left_navigation.html' %}
+                </ul>
+            </div>
+        </div>
     </div>
     <div class="grid_8 view omega">
         <ul id="submenu">
@@ -148,27 +148,17 @@
         </ul>
         <div class="tab" id="video-tab">
             {% widget widget_params %}
-            <div class="video-tools">
-                <div class="grid_2 alpha">
-                    <h3>Add Subtitles</h3>
-                    <ul>
-                        <li>
-                            {% if not video.subtitle_language %}
-                                <a href="#" id="add_subtitles"> {% trans 'Add Subtitles' %}</a>
-                            {% else %}
-                                <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Add a Translation' %}</a>
-                            {% endif %}
-                        </li>
-                        <li>{% upload_subtitles video %}<li>
-                        <li>{% paste_transcription %}</li>
-                    </ul>
-                </div>
-                <div class="grid_3">
-                    <h3>{% trans "Moderation" %}</h3>
-                    <ul id="moderation-menu">
-                        <li>{% team_add_video_select %}</li>
-                        <li>{% render_belongs_to_team_list video %}</li>
-                    </ul>
+            <div class="clearboth">
+                <div class="video-tools grid_4 alpha">
+                    <h3>Contribute</h3>
+                    <p>
+                        {% if not video.subtitle_language %}
+                            This video doesn't have any subtitles yet :( <a href="#" id="add_subtitles">{% trans 'Create subtitles now' %}</a>!</li>
+                        {% else %}
+                            Don't see the language you're looking for? <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!</li>
+                        {% endif %}
+                        {% upload_subtitles video %}
+                    </p>
                 </div>
             </div>
         </div>
@@ -191,6 +181,14 @@
     </div>
      
     {% comment %}
+
+    <div class="grid_3">
+        <h3>{% trans "Moderation" %}</h3>
+        <ul id="moderation-menu">
+            <li>{% team_add_video_select %}</li>
+            <li>{% render_belongs_to_team_list video %}</li>
+        </ul>
+    </div>
 
     {# EDIT TITLE #}
         {% if user.is_authenticated %}
@@ -216,15 +214,6 @@
                 </p>
             </div>
         </div>
-
-    {# MODERATION #}
-        <h3>{% if user_can_moderate%}{% trans "Moderation" %}{% endif %}</h3>
-          <ul class="left_nav" id="moderation-menu">
-
-            <li>{% team_add_video_select %}</li>
-            <li>{% render_belongs_to_team_list video %}</li>
-          </ul>
-
     {% endcomment %}
 {% endblock %}
 
