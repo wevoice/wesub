@@ -39,7 +39,7 @@
                     {% else %}
                         <input type="hidden" name="project" value="{{ team.default_project.id }}" />
                     {% endif %}
-                    {% inclendude "_form_field.html" with field=form.thumbnail %}
+                    {% include "_form_field.html" with field=form.thumbnail %}
                 </fieldset>
             </div>
 
