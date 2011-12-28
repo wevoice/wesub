@@ -7,7 +7,8 @@ jQuery(document).ready(function($){
         if(orig_height > 72) {
             $(this).addClass('collapsed').append('<a class="expand" href="#">Show all ↓</a>');
 
-            $(this).find('.expand').live('click', function(){
+            $(this).find('.expand').live('click', function(e){
+                e.preventDefault();
                 if(container.hasClass('collapsed')){
                     content.animate({
                         height: orig_height
