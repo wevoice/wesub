@@ -8,6 +8,8 @@
 
 {% block main_content %}
 
+    {% include "utils/chosenify.html" %}
+
     <h2>
         {% trans 'Messages' %}
     </h2>
@@ -25,7 +27,7 @@
 
                 {{ form.non_field_errors }}
 
-                <label for="">Recipient(s)</label>
+                <label for="">Recipient</label>
                 {{ form.errors.user }}
                 <div class="ajaxChosen">
                     <select id="id_user" name="user">
@@ -36,6 +38,8 @@
                         {% endif %}
                     </select>
                 </div>
+
+                <div class="or" style="margin: 10px 0 0 0; text-align: center; font-weight: bold;">-- or --</div>
 
                 <label for="id_team">Team</label>
                 {{ form.errors.team }}
