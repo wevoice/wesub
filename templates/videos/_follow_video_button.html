@@ -12,6 +12,7 @@
                 isAuthenticated: false,
                 isVideoFollower: false,
                 isLanguageFollower: false,
+                isFollower: false,
                 
                 followCls: 'follow',
                 unfollowCls: 'unfollow',
@@ -31,29 +32,24 @@
                             .addClass(this.options.unfollowCls)
             },            
             _render: function(){
-                if (this.options.isVideoFollower){
+                if((!this.options.languageId && this.options.isVideoFollower) || (this.options.languageId && this.options.isLanguageFollower)){
+                    this.options.isFollower = true;
                     this.element.html('{% trans "✓ Following" %}');
                     this._setUnfollowCls();
-                }else if( ! this.options.languageId){
-                    this.element.html('{% trans "Follow" %}');
-                    this._setFollowCls();
-                }else if(this.options.isLanguageFollower){
-                    this.element.html('{% trans "✓ Following" %}'+' '+this.options.languageName);
-                    this._setUnfollowCls();
-                }else{
-                    this.element.html('{% trans "Follow" %}'+' '+this.options.languageName);
+                } else {
+                    this.element.html('{% trans " Not Following" %}');
                     this._setFollowCls();
                 }
             },
             _onClick: function(e){
-                if ( ! this.options.isAuthenticated){
+                if (!this.options.isAuthenticated){
                     this.onUnauthenticateClick();
                     return;
                 };
-                
-                if (this.options.isVideoFollower || this.options.isLanguageFollower){
+
+                if(this.options.isFollower) {
                     this.showUnfollowDialog();
-                }else{
+                } else {
                     this.showFollowDialog();
                 };
                 
@@ -86,14 +82,14 @@
             },
             showUnfollowDialog: function(){
                 if (this.options.isVideoFollower){
-                    var title = '{% trans "You will not receive any notification when subtitles in any language for this video are edited.  You can choose to follow again at any time." %}';
-                    var button_name = "{% trans 'Stopped following all subtitles' %}";
+                    var title = '{% trans "You will stop receiving notifications when any subtitles for this video are edited.  You can choose to follow again at any time." %}';
+                    var button_name = "{% trans 'Stop following this video' %}";
                     
                 }else{
-                    var title = '{% trans "You will not receive any notification when " %}'
+                    var title = '{% trans "You will stop receiving notification when " %}'
                         +this.options.languageName
                         +' {% trans " subtitles for this video are edited. You can choose to follow again at any time." %}';
-                    var button_name = "{% trans 'Stopped following ' %}"
+                    var button_name = "{% trans 'Stop following ' %}"
                         +this.options.languageName
                         +"{% trans ' subtitles' %}";
                 };
@@ -143,15 +139,15 @@
             },
             showFollowDialog: function(){
                 if (this.options.languageId){
-                    var title = '{% trans "You will now receive an email when anyone edits " %}'
+                    var title = '{% trans "You will receive notifications when anyone edits " %}'
                         +this.options.languageName
                         +' {% trans " subtitles for this video. You can stop these emails at any time." %}';
-                    var button_name = "{% trans 'Now following ' %}"
+                    var button_name = "{% trans 'Follow ' %}"
                         +this.options.languageName
                         +"{% trans ' subtitles' %}";
                 }else{
-                    var title = '{% trans "You will now receive an email when anyone edits any subtitles for this video. You can stop these emails at any time." %}';
-                    var button_name = "{% trans 'Now following all subtitles' %}";
+                    var title = '{% trans "You will receive notifications when anyone edits any subtitles for this video. You can stop these emails at any time." %}';
+                    var button_name = "{% trans 'Follow this video' %}";
                 };
                 
                 var options = {
