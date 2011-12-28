@@ -31,7 +31,6 @@
                     <select id="id_user" name="user">
                         <option value="">-----</option>
                         <option value="">Begin typing to search.</option>
-
                         {% if selected_user %}
                             <option selected="selected" value="{{ selected_user.id }}">{{ selected_user.username }}</option>
                         {% endif %}
