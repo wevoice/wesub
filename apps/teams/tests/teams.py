@@ -281,8 +281,13 @@ class TeamsTest(TestCase):
             "title": u"",
             "video_url": video_url,
             "thumbnail": u"",
-            "project": team.project_set.exclude(slug='_root')[0].pk,
         }
+
+        if team.has_projects:
+            data['project'] = team.project_set.exclude(slug='_root')[0].pk
+        else:
+            data['project'] = team.default_project.pk
+
         old_count = TeamVideo.objects.count()
         old_video_count = Video.objects.count()
 
