@@ -124,7 +124,17 @@
         {{ block.super }}
     {% else %}
         <div class="grid_9">
-            <p class="empty">{% trans 'User deleted his profile' %}</p>
+            <p class="empty">{% trans 'Profile deleted by user.' %}</p>
         </div>         
+    {% endif %}
+{% endblock %}
+
+{% block page_controls %}
+    {% if user.is_staff and perms.videos.edit_video %}
+        <ul id="page_controls">
+            <li>
+                <a href="{% url admin:auth_customuser_change user_info.pk %}" target="blank">{% trans 'Edit user' %}</a>
+            </li>
+        </ul>
     {% endif %}
 {% endblock %}
