@@ -353,6 +353,9 @@ def _bounce_celeryd():
     if bool(env.celeryd_bounce_cmd):
         sudo(env.celeryd_bounce_cmd, pty=False)
 
+def bounce_celeryd():
+    _bounce_celeryd()
+    
 def _update_static(dir):
     with cd(os.path.join(dir, 'unisubs')):
         media_dir = '{0}/unisubs/media/'.format(dir)
