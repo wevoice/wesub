@@ -14,15 +14,14 @@
     {{ block.super }}
     {% include_bundle "unisubs-onsite-compiled" %}
     <script src="{{ STATIC_URL }}js/jquery.tabs.js" type="text/javascript"></script>
+    <script src="{{ STATIC_URL }}js/unisubs.modal.js" type="text/javascript"></script>
+    <script src="{{ STATIC_URL }}js/unisubs.abbr.js" type="text/javascript"></script>
     <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
     {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
     
     <script type="text/javascript">
         jQuery(document).ready( function($) {
             $('#submenu').tabs();
-            $('#submenu a').click(function(){
-                $(this).parents('li').addClass('current').siblings('li').removeClass('current');
-            });
     
             $('#add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
@@ -58,28 +57,6 @@
                 }
             });
 
-            $('.modal-header .close', '.bootstrap').click(function(){
-                $(this).parents('.modal').hide();
-            });
-
-            $('.abbr').each(function(){
-                var content = $(this).children('.abbr-content');
-                if(content.height() > 72) {
-                    $(this).addClass('collapsed').append('<a class="expand" href="#">Show all ↓</a>');
-                }
-            });
-
-            $('.expand', '.abbr').live('click', function(){
-                var container = $(this).parents('.abbr');
-                var content = $(this).siblings('.abbr-content');
-                if(container.hasClass('collapsed')){
-                    $(this).text('Collapse ↑');
-                } else {
-                    $(this).text('Show all ↓');
-                }
-                container.toggleClass('collapsed expanded');
-            });
-
         });
     </script>
 {% endblock %}
@@ -107,9 +84,6 @@
 
 {% block main_content %}
     {% comment %}
-        - embed code changes betw video and subs
-        - sharing buttons are video-wide, not subs specific
-        - like button is subs specific though too
         - show which languages are in progress
         - need 'create subs' menu
         - upload subs not clear that it's optional
@@ -126,9 +100,8 @@
 
     <div class="grid_4 context alpha">
         <h2 class="main-title">
-            {{ video }}
+            <a href="{{share_panel_permalink}}" title="Permalink">{{ video }}</a>
         </h2>
-        <!--<p class="permalink"><a href="{{share_panel_permalink}}">{% trans "Permalink" %}</a></p>-->
         <div id="description" class="abbr">
             <div class="abbr-content">
                 {{ video.description }}
@@ -136,12 +109,12 @@
         </div>
         <ul class="metrics">
             <li>
-                <p>{{ video.widget_views_count }}</p>
-                <h4>View{{ video.widget_views_count|pluralize }}</h4>
+                <p>{{ video.views.total }}</p>
+                <h4>View{{ video.views.total|pluralize }}</h4>
             </li>
             <li>
-                <p>{{ video.view_count }}</p>
-                <h4>Site View{{ video.view_count|pluralize }}</h4>
+                <p>{{ video.widget_views_count }}</p>
+                <h4>Play{{ video.widget_views_count|pluralize }}</h4>
             </li>
             <li>
                 <p>{{ video.followers.count }}</p>
@@ -157,29 +130,14 @@
                 {% include '_sharing_widget.html' %}
             {% endif %}
         </div>
-        {% comment %}
-        {% if user.is_staff and perms.videos.edit_video %}
-            <h3>{% trans "Admin" %}</h3>
-            <ul id="admin-menu">
-                <li>
-                    <a href="{% url videos:video_debug video.video_id %}" target="blank">View debug info</a>
-                </li>
-                <li>
-                    <a href="{% url admin:videos_video_change video.pk %}" target="blank">{% trans 'Edit in Admin Interface' %}</a>
-                </li>
-                <li>{% feature_video video %}</li>
-                <li>
-                {% if user %}
-                    {% render_visibility_button video user %}
-                {% endif %}
-                </li>
-            </ul>
-        {% endif %}
-{% endcomment %}
-            <!--<li>
+        <h3>{% trans "Subtitles" %}</h3>
+        <ul id="subtitles-menu">
+            {% include 'videos/_left_navigation.html' %}
+        </ul>
+        {% comment %}<li>
                 <p>{{ video.duration|format_duration }}</p>
                 <h4>Length</h4>
-            </li>-->
+            </li>{% endcomment %}
     </div>
     <div class="grid_8 view omega">
         <ul id="submenu">
@@ -188,102 +146,105 @@
             <li><a href="#activity-tab">{% trans "History" %}</a></li>
             <li class="hascount"><a href="#urls-tab">{% trans "URLs" %}<span>{% video_url_count video %}</span></a></li>
         </ul>
-        <div id="video-tab">
+        <div class="tab" id="video-tab">
             {% widget widget_params %}
             <div class="video-tools">
-                <h3>Add Subtitles</h3>
-                <ul>
-                    <li>
-                        <a href="">Add translations</a>
-                    </li>
-                    <li>
-                        <a href="">Upload subtitles</a>
-                    </li>
-                </ul>
+                <div class="grid_2 alpha">
+                    <h3>Add Subtitles</h3>
+                    <ul>
+                        <li>
+                            {% if not video.subtitle_language %}
+                                <a href="#" id="add_subtitles"> {% trans 'Add Subtitles' %}</a>
+                            {% else %}
+                                <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Add a Translation' %}</a>
+                            {% endif %}
+                        </li>
+                        <li>{% upload_subtitles video %}<li>
+                        <li>{% paste_transcription %}</li>
+                    </ul>
+                </div>
+                <div class="grid_3">
+                    <h3>{% trans "Moderation" %}</h3>
+                    <ul id="moderation-menu">
+                        <li>{% team_add_video_select %}</li>
+                        <li>{% render_belongs_to_team_list video %}</li>
+                    </ul>
+                </div>
             </div>
         </div>
-        <div id="comments-tab" style="display:none;">
+        <div class="tab" id="comments-tab" style="display:none;">
             <h3>{% trans "Leave a comment" %}</h3>
             {% render_comment_form video %}
-            <h3>{% trans "Comments" %}</h3>
+            <h3>{% get_comment_count video %} {% trans "Comments" %}</h3>
             {% render_comment_list video %}
         </div>
-        <div id="activity-tab" style="display:none;">
+        <div class="tab" id="activity-tab" style="display:none;">
             {% video_activity video %}
-            <a href="{% url videos:actions_list video.video_id %}" style="margin: 10px">{% trans 'View all activity' %}</a>
+            <p class="view-more"><a href="{% url videos:actions_list video.video_id %}">{% trans 'View all activity' %}</a></p>
         </div>
-        <div id="urls-tab" style="display:none;">
+        <div class="tab" id="urls-tab" style="display:none;">
             {% video_url_panel %}
         </div>
-    </div>
-    <div class="bootstrap">
-        <div class="modal">
-            <div class="modal-header">
-                <a href="#" class="close action-close">x</a>
-                <h3>Embed video</h3>
-            </div>
-            <div class="modal-body">
-                <textarea readonly="readonly">{{share_panel_embed_code}}</textarea>
-            </div>
-        </div>
+        {% if user.is_authenticated %}
+            {% include 'videos/_follow_video_button.html' %}
+        {% endif %}
     </div>
      
     {% comment %}
 
-    <div id="edit-title-dialog" style="display: none" class="msg_modal_wrap" >
-        <a href="#close" class="close">{% trans "Close" %}</a>
-        <h3>{% trans 'You are editing the original video title (translations will not be affected)' %}</h3>
-        <div class="msg_modal">
-            <p>
-            {% blocktrans %}
-            IMPORTANT: the new title will appear in the lists of videos and in 
-            the original subtitle set. Any existing translations will not be affected. 
-            Please update each translation separately, if necessary.
-            {% endblocktrans %}
-            </p>
-            <p>
-                <input type="text" val="" style="width: 100%" class="title-input">
-                <button class="green_button small save-title" style="margin: 0 0 15px 0; float: right">{% trans "Save" %}</button>
-            </p>
-        </div>
-    </div>
-
-        {# CONTRIBUTE #}
-        <li class="contribute">
-          {% if not video.subtitle_language %}
-              <a href="#" id="add_subtitles"> {% trans 'Add Subtitles' %}</a><br /><br />
-          {% else %}
-              <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Add Translation' %}</a>
-          {% endif %}
-        <li>
-        <li class="contribute">{% upload_subtitles video %}<li>
-        <li class="contribute">{% paste_transcription %}</li>
-
-        {# SUBTITLES #}
-        <h3>{% trans "Subtitles" %}</h3>
-        <ul class="left_nav" id="subtitles-menu">
-            {% include 'videos/_left_navigation.html' %}
-        </ul>
-
-        {# MODERATION #}
-        <h3>{% if user_can_moderate%}{% trans "Moderation" %}{% endif %}</h3>
-          <ul class="left_nav" id="moderation-menu">
-            {% switch_feature MODERATION %}
-                <li>{% render_approve_all_button video user %}</li>
-            {% endswitch_feature %}
-            <li>{% team_add_video_select %}</li>
-            <li>{% render_belongs_to_team_list video %}</li>
-          </ul>
-
-
-        {# EDIT TITLE #}
+    {# EDIT TITLE #}
         {% if user.is_authenticated %}
             {% if not video.title or video.is_html5 or user.is_superuser %}
                 <a class="heading_button edit-title" href="#" data-modal="edit-title-dialog">{% trans 'Edit title' %}</a>
             {% endif %}
         {% endif %}
 
+        <div id="edit-title-dialog" style="display: none" class="msg_modal_wrap" >
+            <a href="#close" class="close">{% trans "Close" %}</a>
+            <h3>{% trans 'You are editing the original video title (translations will not be affected)' %}</h3>
+            <div class="msg_modal">
+                <p>
+                {% blocktrans %}
+                IMPORTANT: the new title will appear in the lists of videos and in 
+                the original subtitle set. Any existing translations will not be affected. 
+                Please update each translation separately, if necessary.
+                {% endblocktrans %}
+                </p>
+                <p>
+                    <input type="text" val="" style="width: 100%" class="title-input">
+                    <button class="green_button small save-title" style="margin: 0 0 15px 0; float: right">{% trans "Save" %}</button>
+                </p>
+            </div>
+        </div>
+
+    {# MODERATION #}
+        <h3>{% if user_can_moderate%}{% trans "Moderation" %}{% endif %}</h3>
+          <ul class="left_nav" id="moderation-menu">
+
+            <li>{% team_add_video_select %}</li>
+            <li>{% render_belongs_to_team_list video %}</li>
+          </ul>
+
     {% endcomment %}
+{% endblock %}
+
+{% block page_controls %}
+    {% if user.is_staff and perms.videos.edit_video %}
+        <ul id="page_controls">
+            <li>
+                <a href="{% url videos:video_debug video.video_id %}" target="blank">Debug info</a>
+            </li>
+            <li>
+                <a href="{% url admin:videos_video_change video.pk %}" target="blank">{% trans 'Edit video' %}</a>
+            </li>
+            <li>{% feature_video video %}</li>
+            <li>
+            {% if user %}
+                {% render_visibility_button video user %}
+            {% endif %}
+            </li>
+        </ul>
+    {% endif %}
 {% endblock %}
 
 {% block bottom_scripts %}
