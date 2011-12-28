@@ -187,7 +187,7 @@
         </ul>
         <div class="tab" id="transcripts-tab">
             <div class="tools">
-                <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit' %}{% endif %}</a>
+                <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit Language' %}{% endif %}</a>
                 {% if last_version.subtitles %}
                     <div class="sort_button action">
                         <div class='arrow'>

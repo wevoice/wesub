@@ -277,12 +277,13 @@
     .linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
 
     .button, button {
+        float: right;
         background: transparent;
         border: 1px solid transparent;
         color: @light;
         text-shadow: none;
         padding: .5em 1em;
-        margin: 0;
+        margin: -.5em 0 0;
 
         &:hover {
             border-color: @faint;
@@ -317,6 +318,11 @@
                 width: 140px;
             }
         }
+    }
+
+    .sort_button {
+        float: right;
+        margin: -.5em .5em 0 0;
     }
 }
 
@@ -1316,23 +1322,12 @@ ol.subtitles {
     float: none;
     padding: 0;
     margin: 0;
-    position: absolute;
-    top: .5em;
-    left: 1em;
     cursor: pointer;
     width: 170px;
     border-color: @fainter;
     .border-radius(3px);
     text-align: left;
     .vertical-gradient(#fff, #eee);
-
-    &.action {
-        float: right;
-        position: relative;
-        top: -.6em;
-        left: 0;
-        margin-left: .5em;
-    }
 
     .sort_label {
         font-size: 11px;
