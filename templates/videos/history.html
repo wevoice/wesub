@@ -140,9 +140,9 @@
             <div id="description" class="abbr">
                 <div class="abbr-content">
                     {% if language.description %}
-                        {{ language.description }}
+                        {{ language.description|urlize|linebreaks }}
                     {% else %}
-                        {{ video.description }}
+                        {{ video.description|urlize|linebreaks }}
                     {% endif %}
                 </div>
             </div>
