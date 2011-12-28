@@ -1,7 +1,6 @@
 #admin_controls {
     position: fixed;
     bottom: 0; left: 0;
-    width: 100%;
     -moz-box-shadow: 0 0 10px rgba(0,0,0, 0.3);
     -webkit-box-shadow: 0 0 10px rgba(0,0,0, 0.3);
     background: hsla(0, 0%, 97%, .8);
