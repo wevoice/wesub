@@ -370,6 +370,11 @@ class Team(models.Model):
             p.save()
             return p
 
+    @property
+    def has_projects(self):
+        projects = Project.objects.filter(team=self)
+        return True if projects.count() > 1 else False
+
     def save(self, *args, **kwargs):
         creating = self.pk is None
         super(Team, self).save(*args, **kwargs)
