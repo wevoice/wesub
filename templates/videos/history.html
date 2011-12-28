@@ -300,6 +300,16 @@
     {% endcomment %}
 {% endblock %}
 
+{% block page_controls %}
+    {% if user.is_staff and perms.videos.edit_video %}
+        <ul id="page_controls">
+            <li>
+                <a href="{% url admin:videos_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Language' %}</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+
 {% block bottom_scripts %}
     <script>
         $(window).load( function() {
