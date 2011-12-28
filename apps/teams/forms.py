@@ -194,6 +194,10 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.fields['language'].choices = get_languages_list(True)
 
         projects = self.team.project_set.all()
+
+        if len(projects) > 1:
+            projects = projects.exclude(slug='_root')
+
         self.fields['project'].queryset = projects
 
         ordered_projects = ([p for p in projects if p.is_default_project] +
