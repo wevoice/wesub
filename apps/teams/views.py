@@ -598,6 +598,7 @@ def detail_members(request, slug, role=None):
         for term in filter(None, [term.strip() for term in q.split()]):
             qs = qs.filter(Q(user__first_name__icontains=term)
                          | Q(user__last_name__icontains=term)
+                         | Q(user__email__icontains=term)
                          | Q(user__username__icontains=term)
                          | Q(user__biography__icontains=term))
 
