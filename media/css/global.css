@@ -1,28 +1,35 @@
 #admin_controls {
-    -moz-border-radius: 5px;
-    -moz-box-shadow: 0 0    8px rgba(0,0,0, 0.2);
-    -webkit-border-radius: 5px;
-    -webkit-box-shadow: 0 0 8px rgba(0,0,0, 0.2);
-    background: #FFF;
-    border: 1px #FFF solid;
-    left: 10px;
-    padding: 5px;
-    position: absolute;
-    top: 10px;
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    -moz-box-shadow: 0 0 10px rgba(0,0,0, 0.3);
+    -webkit-box-shadow: 0 0 10px rgba(0,0,0, 0.3);
+    background: hsla(0, 0%, 97%, .8);
     z-index: 99;
 }
+#admin_controls ul {
+    float: left;
+    padding: 0;
+}
+#admin_controls ul li {
+    display: inline;
+}
 #admin_controls a {
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
     display: block;
+    float: left;
     font-size: 12px;
-    font-weight: bold;
-    padding: 10px;
+    padding: 1.5em;
     text-decoration: none;
+    color: #a0b2bd;
+}
+#admin_controls:hover a {
+    color: #7692a3;
 }
 #admin_controls a:hover {
-    background: #FFF;
-    color: #555;
+    color: #1573AD;
+}
+#site_controls {
+    border-right: 1px solid #ddd;
 }
 
 /* New header styles */

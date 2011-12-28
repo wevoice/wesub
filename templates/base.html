@@ -154,15 +154,18 @@
 
     {% if user.is_staff or user|can_translate %}
         <div id="admin_controls">
-          {% if user.is_staff %}
-          <a target="_blank" href="{% url admin:index %}"><span>{% trans 'Admin' %}</span></a>
-          {% endif %}
-          {% if user.is_superuser %}
-          <a target="_blank" href="{% url sentry %}"><span>{% trans 'Sentry' %}</span></a>
-          {% endif %}
-          {% if user|can_translate %}
-          <a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a>
-          {% endif %}
+            <ul id="site_controls">
+                {% if user.is_staff %}
+                    <li><a target="_blank" href="{% url admin:index %}">{% trans 'Admin' %}</a></li>
+                {% endif %}
+                {% if user.is_superuser %}
+                    <li><a target="_blank" href="{% url sentry %}">{% trans 'Sentry' %}</a></li>
+                {% endif %}
+                {% if user|can_translate %}
+                    <li><a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a></li>
+                {% endif %}
+            </ul>
+            {% block page_controls %}{% endblock %}
         </div>
     {% endif %}
     {% require_email_dialog %}
