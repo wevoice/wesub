@@ -1,8 +1,6 @@
 {% load i18n videos_tags  %}
 
-  <div id="video_follow" class="clearfix">
-      <button class="follow-video-button"></button>
-  </div><!-- // video_follow -->
+<button class="follow-button"></button>
   
 <script type="text/javascript">
     jQuery(function($){
@@ -15,8 +13,8 @@
                 isVideoFollower: false,
                 isLanguageFollower: false,
                 
-                followCls: 'green_button',
-                unfollowCls: 'blue_button',
+                followCls: 'follow',
+                unfollowCls: 'unfollow',
                 loginUrl: ''
               },
             _create: function() {
@@ -34,13 +32,13 @@
             },            
             _render: function(){
                 if (this.options.isVideoFollower){
-                    this.element.html('{% trans "Unfollow Video" %}');
+                    this.element.html('{% trans "✓ Following" %}');
                     this._setUnfollowCls();
                 }else if( ! this.options.languageId){
-                    this.element.html('{% trans "Follow Video" %}');
+                    this.element.html('{% trans "Follow" %}');
                     this._setFollowCls();
                 }else if(this.options.isLanguageFollower){
-                    this.element.html('{% trans "Unfollow" %}'+' '+this.options.languageName);
+                    this.element.html('{% trans "✓ Following" %}'+' '+this.options.languageName);
                     this._setUnfollowCls();
                 }else{
                     this.element.html('{% trans "Follow" %}'+' '+this.options.languageName);
@@ -188,7 +186,7 @@
             }
         });
         
-        $('.follow-video-button').followVideoButton({
+        $('.follow-button').followVideoButton({
             videoId: '{{ video.pk }}',
             languageId: '{{ language.pk }}',
             languageName: '{{ language.language_display }}',
@@ -196,6 +194,20 @@
             isVideoFollower: {% if video|is_follower:user %}true{% else %}false{% endif %},
             isLanguageFollower: {% if language|is_follower:user %}true{% else %}false{% endif %},
             loginUrl: '{% url auth:login %}?next={{ request.path_info|urlencode }}'
+        });
+
+        $('.follow-button').each(function(){
+            var orig = $(this).text();
+            
+            $(this).hover(function(){
+                if($(this).hasClass('unfollow')){
+                    $(this).text('{% trans "x Stop Following" %}');
+                } else {
+                    $(this).text('{% trans "✓ Click to Follow" %}');
+                }
+            }, function(){
+                $(this).text(orig);
+            });
         });
     });
 </script>
