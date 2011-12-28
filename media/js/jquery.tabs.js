@@ -7,13 +7,13 @@
         this.each(function(){
             var $this = $(this);
             
-            var $last_active_tab = $($('li.active a', $this).attr('href'));
+            var $last_active_tab = $($('li.current a', $this).attr('href'));
             $('a', $this).add($('a.link_to_tab')).click(function(){
                 var href = $(this).attr('href')
                 $last_active_tab.hide();
                 $last_active_tab = $(href).show();
-                $('li', $this).removeClass('active');
-                $('a[href='+href+']', $this).parent('li').addClass('active');
+                $('li', $this).removeClass('current');
+                $('a[href='+href+']', $this).parent('li').addClass('current');
                 document.location.hash = href.split('-')[0];
                 return false;
             });            

@@ -227,7 +227,7 @@ def video(request, video, video_url=None, title=None):
     context['widget_params'] = _widget_params(
         request, video, language=None,
         video_url=video_url and video_url.effective_url,
-        size=(480,360)
+        size=(620,370)
     )
     
     _add_share_panel_context_for_video(context, video)
@@ -454,7 +454,7 @@ def history(request, video, lang=None, lang_id=None):
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations    
     context['last_version'] = language.latest_version(public_only=False)
-    context['widget_params'] = _widget_params(request, video, version_no=None, language=language)
+    context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
     context['edit_url'] = language.get_widget_url()
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))

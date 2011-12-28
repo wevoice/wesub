@@ -643,7 +643,6 @@ MEDIA_BUNDLES = {
             "css/buttons.css",
             "css/chosen.css",
             "css/classes.css", 
-            "css/comments.css", 
             "css/forms.css",
             "css/index.css",
             "css/layout.css",
