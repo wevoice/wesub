@@ -110,11 +110,11 @@
         </div>
         <ul class="metrics">
             <li>
-                <p>{{ video.view_count }}</p>
+                <p>{{ video.view_count|simplify_number }}</p>
                 <h4>View{{ video.view_count|pluralize }}</h4>
             </li>
             <li>
-                <p>{{ video.widget_views_count }}</p>
+                <p>{{ video.widget_views_count|simplify_number }}</p>
                 <h4>Play{{ video.widget_views_count|pluralize }}</h4>
             </li>
             <li>
