@@ -213,7 +213,7 @@ def clear_permissions():
 
 def _git_pull():
     run('git checkout --force')
-    run('git pull --rebase')
+    run('git pull --ff-only')
     run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
     run('chmod g+w -R .git 2> /dev/null; /bin/true')
     _clear_permissions('.')
