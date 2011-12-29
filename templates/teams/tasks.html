@@ -37,7 +37,6 @@
             </div>
         {% endif %}
 
-        {% if filters.assignee or filters.team_video or filters.language or filters.type %}
         {% if filtered %}
             <p class="active-filters">Showing
                 {% if filters.assignee == 'none' %}
@@ -220,7 +219,7 @@
         </form>
 
         <div class="refine">
-            <h4>Refine</h4>
+            <h4>{% trans "Search and Filter" %}</h4>
 
             <form action="" method="get">
                 <select id="id_task_language" name="language" class="lang-filter chosen">

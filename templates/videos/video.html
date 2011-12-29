@@ -110,8 +110,8 @@
         </div>
         <ul class="metrics">
             <li>
-                <p>{{ video.views.total }}</p>
-                <h4>View{{ video.views.total|pluralize }}</h4>
+                <p>{{ video.view_count }}</p>
+                <h4>View{{ video.view_count|pluralize }}</h4>
             </li>
             <li>
                 <p>{{ video.widget_views_count }}</p>
@@ -132,6 +132,7 @@
             {% endif %}
         </div>
         <h3>{% trans "View Subtitles" %}</h3>
+        {% if video.subtitle_language %}
         <div class="abbr">
             <div class="abbr-content">
                 <ul id="subtitles-menu">
@@ -139,6 +140,9 @@
                 </ul>
             </div>
         </div>
+        {% else %}
+            <p>Be the first to <a href="#" id="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+        {% endif %}
     </div>
     <div class="grid_8 view omega">
         <ul class="tabs">
