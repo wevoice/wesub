@@ -1419,6 +1419,15 @@ ol.subtitles {
     }
 }
 
+/* Chosenify */
+.v1 .chzn-container ul.chzn-results, .v1 ul.chzn-choices {
+    margin-bottom: 4px !important;
+
+    input {
+        padding: 5px !important;
+    }
+}
+
 .v1 .bootstrap .modal {
 
     .modal-header h3 {
@@ -1438,29 +1447,27 @@ ol.subtitles {
         }
     }
 
-    .modal-body fieldset {
-        padding: 0;
+    .modal-body {
+        fieldset {
+            padding: 0;
+
+        }
+        textarea {
+            font-family: Monaco,"Bitstream Vera Sans Mono","Lucida Console",monospace;
+            width: 98%;
+            height: auto;
+        }
+        ul.chzn-choices, ul.chzn-results {
+            margin: 0 !important;
+        }
     }
 
-    .modal-body textarea {
-        font-family: Monaco,"Bitstream Vera Sans Mono","Lucida Console",monospace;
-        width: 98%;
-        height: auto;
-    }
 
     button {
         margin: 0;
     }
 }
 
-/* Chosenify */
-.v1 .chzn-container ul.chzn-results, .v1 ul.chzn-choices {
-    margin-bottom: 4px !important;
-
-    input {
-        padding: 5px !important;
-    }
-}
 
 /* Metrics badge */
 

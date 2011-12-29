@@ -1,7 +1,7 @@
 {% load i18n %}
 <div style="margin-top: 5px; border-top: 1px solid #A2A2A2">
     {% blocktrans %}
-        A message from <a href="{{ author_page }}">{{ author }}</a> to all members 
+        A message {% endblocktrans %}{% if author %}{% blocktrans %}from <{% endblocktrans %}a href="{{ author_page }}">{{ author }}</a>{%endif%} {% blocktrans %}to all members 
         of the <a href="{{ team_page }}">{{ team }}</a> team.
     {% endblocktrans %}
     <br/>

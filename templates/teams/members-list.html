@@ -20,7 +20,6 @@
     {% if assignable_roles %}
         {% include_bundle "js-teams" %}
     {% endif %}
-    {% include_bundle "unisubs-onsite-compiled" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         $(function() {
@@ -150,7 +149,7 @@
                                 {{/roles}}
                             </select>
                         </div>
-                        <div class="field clearfix {{^projects}}hidden{{/projects}}">
+                        <div class="{{^projects}}hidden{{/projects}}">
                             <label>Project Restriction:</label>
                             <select data-placeholder="None" style="width:350px;" multiple class="chzn-select projects">
                                 {{#projects}}
@@ -158,7 +157,7 @@
                                 {{/projects}}
                             </select>
                         </div>
-                        <div class="field clearfix {{^languages}}hidden{{/languages}}">
+                        <div class="{{^languages}}hidden{{/languages}}">
                             <label>Language Restriction:</label>
                             <select data-placeholder="None" style="width:350px;"
                                 multiple class="chzn-select langs">
