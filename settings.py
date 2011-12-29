@@ -835,7 +835,9 @@ MEDIA_BUNDLES = {
             "js/libs/chosen.ajax.jquery.js",
             "js/jquery.mod.js",
             "js/teams/create-task.js",
-         )
+         ),
+        "include_js_base_dependencies": False,
+        "include_flash_deps": False,
     },
     "debug-embed-js": {
         "type": "js",
