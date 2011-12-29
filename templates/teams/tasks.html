@@ -37,7 +37,7 @@
             </div>
         {% endif %}
 
-        {% if filtered %}
+        {% if filters.assignee or filters.language or filters.type or filters.team_video %}
             <p class="active-filters">Showing
                 {% if filters.assignee == 'none' %}
                     <strong>unassigned</strong>
@@ -54,6 +54,7 @@
                 {% if filters.assignee and filters.assignee != 'none' %}
                     assigned to <strong>{{ filters.assignee }}</strong>
                 {% endif %}
+                <a href="{{ request.path }}{% query_string request.GET type="" lang="" assignee="" %}" class="clear-filters">Clear all filters</a>
             </p>
         {% endif %}
 
