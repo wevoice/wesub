@@ -1,6 +1,8 @@
+body{overflow-y:scroll;}
 .group:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
 .box-right{position:absolute;top:2em;right:0;width:120px;padding:0;}
 .v1{color:#2f3c45;}.v1 em{font-style:italic;}
+.v1 .bootstrap div.modal{display:none;}
 .v1 .logo{margin:1em 0 2em;}
 .v1 .notation{font-size:.95em;color:#7692a3;}
 .v1 .view .grid_4 p.notation{margin:0 0 1em;float:none;}
