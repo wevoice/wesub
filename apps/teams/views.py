@@ -590,11 +590,13 @@ def remove_video(request, team_video_pk):
 def detail_members(request, slug, role=None):
     q = request.REQUEST.get('q')
     lang = request.GET.get('lang')
+    filtered = False
 
     team = Team.get(slug, request.user)
     qs = team.members.select_related('user').filter(user__is_active=True)
 
     if q:
+        filtered = True
         for term in filter(None, [term.strip() for term in q.split()]):
             qs = qs.filter(Q(user__first_name__icontains=term)
                          | Q(user__last_name__icontains=term)
@@ -603,15 +605,18 @@ def detail_members(request, slug, role=None):
                          | Q(user__biography__icontains=term))
 
     if lang:
+        filtered = True
         qs = qs.filter(user__userlanguage__language=lang)
 
     if role:
+        filtered = True
         if role == 'admin':
             qs = qs.filter(role__in=[TeamMember.ROLE_OWNER, TeamMember.ROLE_ADMIN])
         else:
             qs = qs.filter(role=role)
 
     extra_context = widget.add_onsite_js_files({})
+    extra_context['filtered'] = filtered
 
     team_member_list, pagination_info = paginate(qs, MEMBERS_ON_PAGE, request.GET.get('page'))
     extra_context.update(pagination_info)

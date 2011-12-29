@@ -38,6 +38,7 @@
         {% endif %}
 
         {% if filters.assignee or filters.team_video or filters.language or filters.type %}
+        {% if filtered %}
             <p class="active-filters">Showing
                 {% if filters.assignee == 'none' %}
                     <strong>unassigned</strong>
