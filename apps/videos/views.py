@@ -501,7 +501,7 @@ def revision(request,  version):
     if feature_is_on("MODERATION"):
         context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['widget_params'] = _widget_params(request, \
-            language.video, version.version_no, language)
+            language.video, version.version_no, language, size=(289,173))
     context['latest_version'] = language.latest_version()
     version.ordered_subtitles()
 
