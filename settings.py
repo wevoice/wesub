@@ -879,6 +879,8 @@ try:
         'debug_toolbar.panels.timer.TimerDebugPanel',
         # 'apps.testhelpers.debug_toolbar_extra.ProfilingPanel',
         # 'apps.testhelpers.debug_toolbar_extra.HaystackDebugPanel',
+        'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+        'debug_toolbar.panels.template.TemplateDebugPanel',
         'debug_toolbar.panels.sql.SQLDebugPanel',
     )
 
