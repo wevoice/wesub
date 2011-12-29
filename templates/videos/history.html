@@ -161,7 +161,7 @@
                 <h4>Line{{ language.subtitle_count|pluralize }}</h4>
             </li>
             <li>
-                <p>{{ language.percent_done }}%</p>
+                <p>{% complete_indicator language 'pct' %}</p>
                 <h4>Complete</h4>
             </li>
         </ul>
