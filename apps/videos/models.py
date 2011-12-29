@@ -139,7 +139,9 @@ class Video(models.Model):
     featured = models.DateTimeField(null=True, blank=True)
 
     subtitles_fetched_count = models.IntegerField(_(u'Sub.fetched'), default=0, db_index=True, editable=False)
+    # counter for evertime the widget plays accounted for both on and off site
     widget_views_count = models.IntegerField(_(u'Widget views'), default=0, db_index=True, editable=False)
+    # counter for the # of times the video page is shown in the unisubs website
     view_count = models.PositiveIntegerField(_(u'Views'), default=0, db_index=True, editable=False)
     
     # Denormalizing the subtitles(had_version) count, in order to get faster joins
