@@ -853,7 +853,7 @@ class TeamMember(models.Model):
         return [n for n in  self.narrowings_fast() if n.project]
 
     def language_narrowings_fast(self):
-        return [n for n in  self.narrowings_fast() if not n.project]
+        return [n for n in self.narrowings_fast() if n.language]
 
     def narrowings_fast(self):
         if hasattr(self, '_cached_narrowings'):
