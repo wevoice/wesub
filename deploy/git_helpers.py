@@ -1,10 +1,11 @@
 import os, sys, re
 from subprocess import Popen, PIPE
 
-def get_current_commit_hash(short=True):
-    if os.path.islink('.git'):
-        sys.stderr.write('WARNING: .git is a symlink.  '
-                         'Things may not work correctly.\n')
+def get_current_commit_hash(short=True, skip_sanity_checks=False):
+    if not skip_sanity_checks:
+        if os.path.islink('.git'):
+            sys.stderr.write('WARNING: .git is a symlink.  '
+                            'Things may not work correctly.\n')
 
     process = Popen(["git", "rev-parse", "HEAD"], stdout=PIPE)
 
@@ -12,16 +13,17 @@ def get_current_commit_hash(short=True):
     if guid:
         guid = guid[:8]
 
-    try:
-        import commit
-        if commit.LAST_COMMIT_GUID.split('/')[-1] != guid:
-            sys.stderr.write('WARNING: commit.py is out of date.  '
-                             'Things may not work correctly.  '
-                             'Use "python deploy/create_commit_file.py" to update it.\n')
-    except ImportError:
-        sys.stderr.write('WARNING: commit.py does not exist.  '
-                         'Things may not work correctly.  '
-                         'Use "python deploy/create_commit_file.py" to create it.\n')
+    if not skip_sanity_checks:
+        try:
+            import commit
+            if commit.LAST_COMMIT_GUID.split('/')[-1] != guid:
+                sys.stderr.write('WARNING: commit.py is out of date.  '
+                                'Things may not work correctly.  '
+                                'Use "python deploy/create_commit_file.py" to update it.\n')
+        except ImportError:
+            sys.stderr.write('WARNING: commit.py does not exist.  '
+                            'Things may not work correctly.  '
+                            'Use "python deploy/create_commit_file.py" to create it.\n')
     return guid
 
 def get_current_branch():
