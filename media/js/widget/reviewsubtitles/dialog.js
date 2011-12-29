@@ -79,8 +79,26 @@ unisubs.reviewsubtitles.Dialog.prototype.showGuidelines_ = function() {
 };
 
 unisubs.reviewsubtitles.Dialog.prototype.createRightPanel_ = function() {
+    var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var title = "Review Subtitles";
-    var helpContents = new unisubs.RightPanel.HelpContents(title, ["Help goes here"]);
+    var helpContents = new unisubs.RightPanel.HelpContents(title, [
+        $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
+        $d('p', {}, "Once you're finished reviewing, you can either ",
+                    $d('strong', {}, "send the subtitles back"),
+                    " to their creator for additional work, or ",
+                    $d('strong', {}, "approve"),
+                    " them to be published. ",
+                    "If you're unable to complete the task at this time, you can also ",
+                    $d('strong', {}, "save this task"),
+                    " for later."),
+        $d('div', {'className': 'unisubs-extra'},
+            $d('p', {}, "Enter review notes here. ",
+                        "They will be shared with all previous and future contributors, ",
+                        "and added to the subtitles history as a ",
+                        $d('em', {}, "public comment"),
+                        "."),
+            $d('span', {'className': 'unisubs-spanarrow'}))
+    ]);
     return new unisubs.reviewsubtitles.ReviewSubtitlesRightPanel(
         this, this.serverModel_, helpContents, [], false, "Done?", "Submit final Review");
 };
