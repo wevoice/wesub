@@ -78,6 +78,9 @@
 
 /* General styles */
 
+body {
+    overflow-y: scroll;
+}
 .group:after {
     content: ".";
     display: block;
@@ -96,6 +99,11 @@
 
     em {
         font-style: italic;
+    }
+}
+.v1 .bootstrap {
+    div.modal {
+        display: none;
     }
 }
 .v1 .logo {
@@ -1066,7 +1074,6 @@ p.view-more {
     .view {
 
         .tabs  {
-            margin: 0 -10px;
 
             li {
 
@@ -1207,7 +1214,6 @@ p.view-more {
 
         h2 a {
             color: inherit;
-            word-wrap: break-word;
         }
 
         h2, h3 {

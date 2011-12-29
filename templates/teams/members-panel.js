@@ -18,15 +18,28 @@
         },
         show: function(res){
             this.el = ich.editRoleDialog(res);
+            hideEdit = this.hide;
+            $body = $('body');
 
             $('select option[value="' + res['current_role'] + '"]', this.el).attr('selected', 'selected');
 
-            $(this.el).show();
-            $('body').append('<div class="well"></div>');
-            $("a.action-close", this.el).click(this.hide);
+            $body.append('<div class="well"></div>');
+            $target = $('div.modal', $body.append(this.el));
+            $target.show();
+
+            $('.chzn-select', this.el).chosen();
             $("a.action-save", this.el).click(this.save);
-            $("body").append(this.el);
-            $(".chzn-select", this.el).chosen();
+            $("a.action-close", this.el).click(function() {
+                hideEdit($target);
+            });
+
+            $target.click(function(event){
+                event.stopPropagation();
+            });
+
+            $('html').bind('click.modal', function() {
+                hideEdit($target);
+            });
         },
         save: function(e){
             e.preventDefault();
@@ -43,9 +56,10 @@
             displayFeedbackMessage('Member saved.', 'success');
            return false;
         },
-        hide:function(result){
-            $(this.el).remove();
+        hide:function(e){
+            e.parent().remove();
             $('div.well').remove();
+            $('html').unbind('click.modal');
             return false;
         }
     });
