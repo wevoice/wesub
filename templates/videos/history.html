@@ -161,7 +161,7 @@
                 <h4>Line{{ language.subtitle_count|pluralize }}</h4>
             </li>
             <li>
-                <p>{% complete_indicator language %}</p>
+                <p>{{ language.percent_done }}%</p>
                 <h4>Complete</h4>
             </li>
         </ul>
@@ -180,6 +180,9 @@
         </div>
     </div>
     <div class="grid_8 view omega">
+        {% if user.is_authenticated %}
+            {% include 'videos/_follow_video_button.html' %}
+        {% endif %}
         <ul class="tabs">
             <li class="current"><a href="#transcripts-tab">{% trans "Subtitles" %}</a></li>
             <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{% get_comment_count language %}</span></a></li>
@@ -313,9 +316,6 @@
             <p class="empty">{% trans 'No subtitles for this language.' %}</p>
             {% endif %}
         </div>
-        {% if user.is_authenticated %}
-            {% include 'videos/_follow_video_button.html' %}
-        {% endif %}
     </div>
 
     {% comment %}

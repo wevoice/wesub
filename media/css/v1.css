@@ -114,7 +114,7 @@ p.view-more{margin-top:1em;text-align:center;}p.view-more a{text-decoration:none
 .v1 .view .grid_4 p,.v1 .view .grid_4 ul{margin-bottom:2em;}
 .v1 .view .grid_4 ul{padding:0;}.v1 .view .grid_4 ul.errorlist{margin-bottom:0;width:auto;}
 .v1 .view.new-message form{padding:4em 2em 2em;}
-.video_view .view .tabs{margin:0 -10px;}.video_view .view .tabs li.hascount a{padding-right:2em;}.video_view .view .tabs li.hascount a span{color:#a0b2bd;font-size:10px;line-height:1em;position:absolute;top:.75em;right:.75em;}
+.video_view .view{position:relative;}.video_view .view .tabs{margin:0 -10px;}.video_view .view .tabs li.hascount a{padding-right:2em;}.video_view .view .tabs li.hascount a span{color:#a0b2bd;font-size:10px;line-height:1em;position:absolute;top:.75em;right:.75em;}
 .video_view .view .tabs li:first-child a{-webkit-background-clip:padding-box;-webkit-border-radius:0;-moz-background-clip:padding-box;-moz-border-radius:0;border-radius:0;background-clip:padding-box;border-left:none;}
 .video_view .view p.active-filters{padding-right:0;margin:1em 0;}.video_view .view p.active-filters a{text-decoration:none;color:inherit;border-bottom:1px dotted #486f87;}
 .video_view .view .tab{clear:both;}
