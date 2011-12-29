@@ -134,25 +134,23 @@ class TeamsApiV2Class(object):
         current_projects = [n.project for n in narrowings if n.project]
 
         projects = []
-        if can_set_project_narrowings(team, user, member.user):
-            for p in Project.objects.for_team(team):
-                data = dict(pk=p.pk, name=p.name)
-                if p in current_projects:
-                    data['selected'] = "selected"
-                projects.append(data)
+        for p in Project.objects.for_team(team):
+            data = dict(pk=p.pk, name=p.name)
+            if p in current_projects:
+                data['selected'] = "selected"
+            projects.append(data)
 
         langs = []
         writeable_languages = team.get_writable_langs()
-        if can_set_language_narrowings(team, user, member.user):
-            for code, name in [l for l in ALL_LANGUAGES if l[0] in writeable_languages]:
-                lang = {
-                    'selected': True if code in current_languages else False,
-                    'code': code,
-                    'name': name,
-                }
-                langs.append(lang)
+        for code, name in [l for l in ALL_LANGUAGES if l[0] in writeable_languages]:
+            lang = {
+                'selected': True if code in current_languages else False,
+                'code': code,
+                'name': name,
+            }
+            langs.append(lang)
 
-            langs.sort(key=lambda l: unicode(l['name']))
+        langs.sort(key=lambda l: unicode(l['name']))
 
         return {
             'current_role': member.role,

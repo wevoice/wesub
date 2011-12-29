@@ -156,6 +156,7 @@ ol.subtitles li .timing .data{display:none;}
 .v1 .bootstrap .modal .modal-header h3{padding:0;border:none;margin:0;clear:none;font-size:16px;}
 .v1 .bootstrap .modal form{padding:0;margin:0;}.v1 .bootstrap .modal form p{float:none;}
 .v1 .bootstrap .modal .modal-body fieldset{padding:0;}
+.v1 .bootstrap .modal .chzn-drop{margin-top:-4px !important;width:100% !important;}
 .v1 .bootstrap .modal .modal-body textarea{font-family:Monaco,"Bitstream Vera Sans Mono","Lucida Console",monospace;width:98%;height:auto;}
 .v1 .bootstrap .modal button{margin:0;}
 .v1 .chzn-container ul.chzn-results,.v1 ul.chzn-choices{margin-bottom:4px !important;}.v1 .chzn-container ul.chzn-results input,.v1 ul.chzn-choices input{padding:5px !important;}
