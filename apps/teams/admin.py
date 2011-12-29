@@ -134,10 +134,15 @@ class TeamLanguagePreferenceAdmin(admin.ModelAdmin):
     raw_id_fields = ('team',)
 
 class MembershipNarrowingAdmin(admin.ModelAdmin):
-    list_display = ('member', 'project', 'language')
+    list_display = ('member', 'team', 'project', 'language')
     list_filter = ('created', 'modified')
     raw_id_fields = ('member', 'project')
     ordering = ('-created',)
+    search_fields = ('member__team__name', 'member__user__username')
+
+    def team(self, o):
+        return o.member.team
+    team.admin_order_field = 'member__team'
 
 class SettingAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'team', 'key', 'created', 'modified')
