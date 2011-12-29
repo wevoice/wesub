@@ -192,9 +192,6 @@ def create_from_feed(request):
 create_from_feed.csrf_exempt = True
 
 
-
-
-
 @get_video_from_code
 def video(request, video, video_url=None, title=None):
     if video_url:
@@ -255,20 +252,19 @@ def video_list(request):
                        template_object_name='video',
                        extra_context=extra_context)
 
-@get_video_revision
 def actions_list(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
     qs = Action.objects.filter(video=video)
     extra_context = {
         'video': video
     }
-                
+
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.ACTIVITIES_ONPAGE,
                        template_name='videos/actions_list.html',
                        template_object_name='action',
-                       extra_context=extra_context)      
-        
+                       extra_context=extra_context)
+
 @login_required
 @transaction.commit_manually
 def upload_subtitles(request):
