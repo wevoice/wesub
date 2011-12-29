@@ -38,7 +38,7 @@ def get_current_branch():
 
     return branch
 
-def get_guid():
-    guid = get_current_commit_hash()
+def get_guid(skip_sanity_checks=False):
+    guid = get_current_commit_hash(skip_sanity_checks=skip_sanity_checks)
     branch = get_current_branch()
     return "%s/%s" % (branch, guid)
