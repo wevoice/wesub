@@ -299,16 +299,18 @@
                         <li>
                             <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
                             <h3>
-                                <a href="{% url videos:revision pk=item.pk %}">Revision {{ item.version_no }}</a>, {{ item.revision_time }}
+                                <a href="{% url videos:revision pk=item.pk %}">Revision {{ item.version_no }} - {{ item.revision_time }}</a>
                             </h3>
-                            <p>
-                                {% if item.user %}
-                                    <a href="{% url profiles:profile item.user.pk %}">{{ item.user }}</a>
-                                {% endif %}
-                                {% if item.note %}{{ item.note }}{% endif %}
-                            </p>
-                            <p>{{ item.time_change_display }}</p>
-                            <p>{{ item.text_change_display }}</p>
+                            {% if item.user %}
+                                <p>by <a href="{% url profiles:profile item.user.pk %}">{{ item.user }}</a></p>
+                            {% endif %}
+                            {% if item.note %}
+                                <p>{{ item.note }}</p>
+                            {% endif %}
+                            <ul class="actions">
+                                <li><h4>Timing: {{ item.time_change_display }}</h4></li>
+                                <li><h4>Text: {{ item.text_change_display }}</h4></li>
+                            </ul>
                         </li>
                     {% endfor %}
                 </ul>
