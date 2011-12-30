@@ -26,12 +26,16 @@
             $body.append('<div class="well"></div>');
             $target = $('div.modal', $body.append(this.el));
             $target.show();
+            $select = $('select', this.el);
 
             $('.chzn-select', this.el).chosen();
             $("a.action-save", this.el).click(this.save);
             $("a.action-close", this.el).click(function() {
                 hideEdit($target);
             });
+
+            $select.change(this.buildRestrictions);
+            $select.trigger('change');
 
             $target.click(function(event){
                 event.stopPropagation();
@@ -40,6 +44,22 @@
             $('html').bind('click.modal', function() {
                 hideEdit($target);
             });
+        },
+        buildRestrictions: function() {
+            var val = $(this).val();
+            var $lang = $('#language-restriction');
+            var $proj = $('#project-restriction');
+
+            if (val == 'manager') {
+                $lang.show();
+                $proj.show();
+            } else if (val == 'contributor') {
+                $lang.hide();
+                $proj.hide();
+            } else if (val == 'admin') {
+                $lang.hide();
+                $proj.show();
+            }
         },
         save: function(e){
             e.preventDefault();
