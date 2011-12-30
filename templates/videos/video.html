@@ -85,10 +85,6 @@
 {% comment %}
     TODO:
         - title/description editing?
-        - team controls
-        - better way to display 'contribute' actions?
-        - maybe a better way to show languages?
-        - localization sweep
 {% endcomment %}
 
 {% block main_content %}
@@ -173,7 +169,7 @@
                     <h3>{% trans "Collaborate" %}</h3>
                     {% if video.get_team_video %}
                         <p>
-                            This video belongs to the following teams:
+                            {% trans "This video belongs to the following teams" %}:
                         </p>
                         {% render_belongs_to_team_list video %}
                     {% endif %}
@@ -198,14 +194,6 @@
     </div>
      
     {% comment %}
-
-    <div class="grid_3">
-        <h3>{% trans "Moderation" %}</h3>
-        <ul id="moderation-menu">
-            <li>{% team_add_video_select %}</li>
-            <li>{% render_belongs_to_team_list video %}</li>
-        </ul>
-    </div>
 
     {# EDIT TITLE #}
         {% if user.is_authenticated %}
