@@ -86,7 +86,7 @@ def notify_comment_by_email(comment,  version=None,  moderator=None, is_rejectio
     if language:
         followers.update(language.notification_list(comment.user))
     for user in followers:
-        send_templated_email_async.delay(
+        res = send_templated_email_async.delay(
             user.email,
             subject,
             "comments/email/comment-notification.html", 
