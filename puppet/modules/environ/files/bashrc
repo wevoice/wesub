@@ -101,3 +101,6 @@ function pm {
 function pmt {
     python manage.py test $* --settings=dev_settings_test
 }
+
+# on login, drop us on the working directory with the venv activated
+cd /opt/unisubs/ && source /opt/extras/venv/bin/activate
