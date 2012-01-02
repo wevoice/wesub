@@ -170,15 +170,15 @@ One can list and create new users through the api.
 
 Listing users::
 
-    GET https://www.universalsubtitles.org/api2/users/
+    GET https://www.universalsubtitles.org/api2/partners/users/
 
 User datail::
 
-    GET https://www.universalsubtitles.org/api2/users/[username]/
+    GET https://www.universalsubtitles.org/api2/partners/users/[username]/
     
 Creating Users::
 
-    POST https://www.universalsubtitles.org/api2/users/
+    POST https://www.universalsubtitles.org/api2/partners/users/
 
 Parameters:
 
