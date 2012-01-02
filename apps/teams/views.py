@@ -51,6 +51,7 @@ from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
 from utils.translation import SUPPORTED_LANGUAGES_DICT
+from messages import tasks as notifier
 from apps.videos.templatetags.paginator import paginate
 
 from teams.permissions import (
@@ -734,7 +735,6 @@ def invite_members(request, slug):
 
     if not can_invite(team, request.user):
         return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
-
     if request.POST:
         form = InviteForm(team, request.user, request.POST)
         if form.is_valid():
@@ -814,7 +814,11 @@ def leave_team(request, slug):
     if error:
         messages.error(request, _(error))
     else:
-        TeamMember.objects.get(team=team, user=user).delete()
+        member = TeamMember.objects.get(team=team, user=user)
+        tm_user_pk = member.user.pk
+        team_pk = member.team.pk
+        member.delete()
+        notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
 

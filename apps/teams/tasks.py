@@ -47,7 +47,7 @@ def add_videos_notification(*args, **kwargs):
                 "STATIC_URL": settings.STATIC_URL,
             }
 
-            send_templated_email(user.email, subject, 
+            send_templated_email(user, subject, 
                                  'teams/email_new_videos.html',
                                  context, fail_silently=not settings.DEBUG)
 

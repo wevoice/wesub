@@ -140,13 +140,3 @@ class Message(models.Model):
         ct = ContentType.objects.get_for_model(sender)
         cls.objects.filter(content_type__pk=ct.pk, object_pk=instance.pk).delete()
 
-    @classmethod
-    def on_message_saved(self, sender, instance, created, *args, **kwargs):
-        if getattr(settings, "MESSAGES_DISABLED", False):
-            return
-        from messages.tasks import send_new_message_notification
-
-        if created and instance.user.notify_by_email and instance.user.notify_by_message:
-            send_new_message_notification.delay(instance.pk)
-
-post_save.connect(Message.on_message_saved, Message)

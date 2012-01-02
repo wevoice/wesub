@@ -1,0 +1,22 @@
+{% extends "videos/email_base.html" %}
+
+{% load i18n localeurl_tags %}
+
+{% block content %}
+
+{% blocktrans with message.author as author %}
+
+Hi {{ user }},
+
+{{ inviter }} has invited you to become a {{ role }} for the <a href="{{ invite.team.get_absolute_url }}">{{ team.name }} team</a> on Universal Subtitles. Lucky you!
+
+{{note}}
+
+To accept this invitation and join the team:
+
+<a href="{% url teams:accept_invite invite.pk %}">{% trans 'Join' %}</a>
+
+To decline this invitation :
+<a href="{% url teams:deny_invite invite.pk %}">{% trans 'Reject' %}</a>
+
+{% block dont_send %}{% endblock %}

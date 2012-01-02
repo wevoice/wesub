@@ -25,8 +25,10 @@ from apps.auth.models import EmailConfirmation
 from django.core import mail
 
 from apps.messages.models import Message
+from apps.messages import tasks as notifier
 from teams.models import Team, TeamMember, Application
 from videos.models import Action
+from utils import send_templated_email
 
 class MessageTest(TestCase):
 
@@ -35,20 +37,23 @@ class MessageTest(TestCase):
         self.subject = "Let's talk"
         self.body = "Will you please help me out with Portuguese trans?"
         self.user = User.objects.exclude(pk=self.author.pk)[:1].get()
-         
+
     def _create_message(self, to_user):
         self.message = Message(user=to_user,
                            author=self.author,
                            subject=self.subject,
-                           content=self.body)
+                          content=self.body)
         self.message.save()
+
+    def _send_email(self, to_user):
+        send_templated_email(to_user, "test email", "messages/email/email_confirmed.html", {})
 
     def test_send_email_to_allowed_user(self):
         self.user.notify_by_email = True
         self.user.save()
         assert self.user.is_active and self.user.email
         
-        self._create_message(self.user)
+        self._send_email(self.user)
         self.assertEqual(len(mail.outbox), 1)
 
     def test_send_email_to_optout_user(self):
@@ -56,12 +61,14 @@ class MessageTest(TestCase):
         self.user.save()
         assert self.user.is_active and self.user.email
                 
-        self._create_message(self.user)
+        self._send_email(self.user)
         self.assertEquals(len(mail.outbox), 0)
 
     def test_message_to_optout_user(self):
         self.user.notify_by_message = False
+        self.user.notify_by_email = False
         self.user.save()
+        self._send_email(self.user)
         self._create_message(self.user)
         self.assertEquals(len(mail.outbox), 0)
         self.assertEquals(Message.objects.unread().filter(user=self.user).count(), 0)
@@ -147,6 +154,7 @@ class MessageTest(TestCase):
             user, member = User.objects.get_or_create(
                 username="test%s" % x,
                 email = "test%s@example.com" % x,
+                notify_by_email = True,
             )
             tm = TeamMember(team=team, user=user)
             if x == 0:
@@ -175,8 +183,12 @@ class MessageTest(TestCase):
         contributor_messge_count_1, contributor_email_count_1 = _get_counts(contributor)
 
         # now delete and check numers
+        
         tm_user = tm.user
+        tm_user_pk = tm.user.pk
+        team_pk = tm.team.pk
         tm.delete()
+        notifier.team_member_leave(team_pk, tm_user_pk)
         # save the last team member and check that each group has appropriate counts 
         # owner and admins should receive email + message
         owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
@@ -217,6 +229,7 @@ class MessageTest(TestCase):
             user, member = User.objects.get_or_create(
                 username="test%s" % x,
                 email = "test%s@example.com" % x,
+                notify_by_email = True,
             )
             tm = TeamMember(team=team, user=user)
             if x == 0:
@@ -243,6 +256,7 @@ class MessageTest(TestCase):
         Application.objects.create(team=team,user=applying_user)
         # owner and admins should receive email + message
         owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
+        print [x.subject for x in Message.objects.filter(user=owner.user)]
         self.assertEqual(owner_messge_count_1 + 1, owner_messge_count_2)
         self.assertEqual(owner_email_count_1 + 1, owner_email_count_2)
         admin_messge_count_2, admin_email_count_2 = _get_counts(admin)

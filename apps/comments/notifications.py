@@ -22,7 +22,6 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from auth.models import CustomUser as User
-from utils import send_templated_email
 from localeurl.utils import universal_url
 from utils.tasks import send_templated_email_async
 
@@ -87,7 +86,7 @@ def notify_comment_by_email(comment,  version=None,  moderator=None, is_rejectio
         followers.update(language.notification_list(comment.user))
     for user in followers:
         res = send_templated_email_async.delay(
-            user.email,
+            user,
             subject,
             "messages/email/comment-notification.html", 
             {

@@ -686,7 +686,7 @@ def video_url_create(request):
                 'domain': Site.objects.get_current().domain,
                 'hash': user.hash_for_video(video.video_id)
             }
-            send_templated_email(user.email, subject, 
+            send_templated_email(user, subject, 
                                  'videos/email_video_url_add.html',
                                  context, fail_silently=not settings.DEBUG)          
     else:

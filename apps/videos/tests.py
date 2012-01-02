@@ -937,7 +937,7 @@ class ViewsTest(WebUseTest):
         version = language.latest_version(public_only=True)
         self.assertEqual(len(version.subtitles()), 2)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to[0], self.user.email)
+        self.assertIn(self.user.email, mail.outbox[0].to[0])
         self.assertTrue(self.video.followers.filter(pk=user1.pk).exists())
         
     def test_paste_transcription_windows(self):

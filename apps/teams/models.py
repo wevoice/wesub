@@ -920,19 +920,20 @@ class Application(models.Model):
 
     def approve(self):
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
-        notifier.team_application_approved.delay(self.pk)
         self.delete()
 
     def deny(self):
+        # we can't delete the row until the notification task has run
         notifier.team_application_denied.delay(self.pk)
-        self.delete()
 
     @classmethod
     def on_saved(self, sender, instance, created, *args, **kwargs):
+        print "signal for application"
         if created:
-            notifier.team_member_new.delay(instance.pk)
+            notifier.application_sent.delay(instance.pk)
 
 post_save.connect(Application.on_saved, Application)
+
 class Invite(models.Model):
     team = models.ForeignKey(Team, related_name='invitations')
     user = models.ForeignKey(User, related_name='team_invitations')
@@ -951,11 +952,6 @@ class Invite(models.Model):
     def deny(self):
         self.delete()
 
-    def render_message(self, msg):
-        message = get_object_or_none(Setting, team=self.team,
-                                     key=Setting.KEY_IDS['messages_invite'])
-        return render_to_string('teams/_invite_message.html',
-                                {'invite': self, 'custom_message': message})
 
     def message_json_data(self, data, msg):
         data['can-reaply'] = False
