@@ -50,7 +50,7 @@ def notify_comment_by_email(comment,  version=None,  moderator=None, is_rejectio
         language = ct
 
     domain = Site.objects.get_current().domain
-    email_body = render_to_string("comments/email/comment-notification.html", {
+    email_body = render_to_string("messages/email/comment-notification.html", {
             "video": video,
             "version": version,
             "moderator": moderator,
@@ -89,7 +89,7 @@ def notify_comment_by_email(comment,  version=None,  moderator=None, is_rejectio
         res = send_templated_email_async.delay(
             user.email,
             subject,
-            "comments/email/comment-notification.html", 
+            "messages/email/comment-notification.html", 
             {
                 "video": video,
                 "commenter": unicode(comment.user),
