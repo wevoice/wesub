@@ -463,7 +463,7 @@ class EmailConfirmationManager(models.Manager):
             "confirmation_key": confirmation_key,
         }
         subject = u'Please confirm your email address for %s' % current_site.name
-        send_templated_email_async(user, subject, "auth/email_confirmation_message.txt", context)
+        send_templated_email_async(user.email, subject, "auth/email_confirmation_message.txt", context)
         return self.create(
             user=user,
             sent=datetime.now(),
