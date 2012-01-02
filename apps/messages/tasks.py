@@ -38,6 +38,7 @@ from celery.task import task
 from auth.models import CustomUser as User
 
 from utils import send_templated_email
+from utils import get_object_or_none
 
         
 @task()

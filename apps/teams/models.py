@@ -33,7 +33,6 @@ from teams.tasks import update_one_team_video
 from utils.panslugify import pan_slugify
 from haystack.query import SQ
 from haystack import site
-from utils import get_object_or_none
 from utils.searching import get_terms
 import datetime
 
