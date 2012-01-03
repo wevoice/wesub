@@ -88,17 +88,16 @@
                 $('#msg_modal').mod();
             };
             
-            $('#msg_modal').bind('before-show-modal', function(event, link){
+            $('.mark-read').bind('click', function(event, link){
                 var $link = $(link);
-                var $modal = $(this);
                 var data = $link.metadata();
                 
-                if ( ! data['is-read']){
+                if (!data['is-read']){
                     MessagesApi.mark_as_read(data['id'], function(response){
                         if (response.error){
                             $.jGrowl.error(response.error);
                         } else {
-                            $link.parents('tr').removeClass('unread');
+                            $link.parents('li').removeClass('unread');
                             data['is-read'] = true;
                             $link.set_metadata(data);
                         }
@@ -153,9 +152,14 @@
                     </a>
                     <span class="timestamp">{{ msg.created|timesince }} {% trans 'ago' %}</span>
                     <ul class="admin-controls">
+                        {% if not msg.read %}
+                        <li>
+                            <a href="#" data="{{ msg.json_data }}" class="mark-read">{% trans "Mark Read" %}</a>
+                        </li>
+                        {% endif %}
                         {% if msg.author != None %}
                             <li>
-                                <a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">Reply</a>
+                                <a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">{% trans "Reply" %}</a>
                             </li>
                         {% endif %}
                         <li>

@@ -30,7 +30,7 @@
                 field = $(this);
                 options.data = {
                     term: val,
-                    task: $('select#id_type option:selected').val()
+                    task: field.parents('form.assign-form').children('input[name="task"]').val()
                 };
                 if (typeof success !== "undefined" && success !== null) {
                     success;

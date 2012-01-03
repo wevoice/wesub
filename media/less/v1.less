@@ -587,6 +587,13 @@ body {
         background: #f6f6e4;
     }
 }
+.v1 .listing.messages > li {
+    opacity: .6;
+
+    &.unread {
+        opacity: 1;
+    }
+}
 .v1 .listing.activity > li, .v1 .listing.tasks > li, .v1 .listing.urls > li {
     padding-right: 150px;
 
@@ -1051,6 +1058,10 @@ p.view-more {
         .timestamp {
             top: 1em;
         }
+    }
+
+    .view ul {
+        padding: 0;
     }
 }
 .v1 .only-child h2 {
