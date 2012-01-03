@@ -41,7 +41,7 @@ from utils import send_templated_email
 from utils import get_object_or_none
 
 def get_url_base():
-    url_base = "http://" + Site.objects.get_current().domain
+    return "http://" + Site.objects.get_current().domain
         
 @task()
 def send_new_message_notification(message_id):
@@ -179,22 +179,24 @@ def team_member_new(member_pk):
     notifiable = TeamMember.objects.filter( team=member.team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER]).exclude(pk=member.pk)
     for m in notifiable:
-        template_name = "messages/email/team-new-member.html"
         context = {
             "new_member": member.user,
             "team":member.team,
             "user":m.user,
-            "role":member.role
+            "role":member.role,
+            "url_base":get_url_base(),
         }
-        body = render_to_string(template_name,context) 
- 
-        msg = Message()
-        msg.subject = ugettext("%s team has a new member" % (member.team))
-        msg.content = body
-        msg.user = m.user
-        msg.object = m.team
-        msg.save()
-        send_templated_email(msg.user, msg.subject, template_name, context)
+        body = render_to_string("messages/team-new-member.txt",context) 
+        subject = ugettext("%s team has a new member" % (member.team))
+        if m.user.notify_by_message:
+            msg = Message()
+            msg.subject = subject
+            msg.content = body
+            msg.user = m.user
+            msg.object = m.team
+            msg.save()
+        template_name = "messages/email/team-new-member.html"
+        send_templated_email(m.user, subject, template_name, context)
 
         
     # now send welcome mail to the new member

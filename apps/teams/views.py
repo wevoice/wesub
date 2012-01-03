@@ -772,9 +772,10 @@ def join_team(request, slug):
     if not can_join_team(team, user):
         messages.error(request, _(u'You cannot join this team.'))
     else:
-        TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR).save()
+        member = TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR)
+        member.save()
         messages.success(request, _(u'You are now a member of this team.'))
-
+        notifier.team_member_new.delay(member.pk)
     return redirect(team)
 
 def _check_can_leave(team, user):
