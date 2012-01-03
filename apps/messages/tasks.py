@@ -40,8 +40,8 @@ from auth.models import CustomUser as User
 from utils import send_templated_email
 from utils import get_object_or_none
 
-
-url_base = "http://" + Site.objects.get_current().domain
+def get_url_base():
+    url_base = "http://" + Site.objects.get_current().domain
         
 @task()
 def send_new_message_notification(message_id):
@@ -118,7 +118,7 @@ def application_sent(application_pk):
         template_name = "messages/application-sent.txt"
         context = {
             "applicant": application.user,
-            "url_base": url_base,
+            "url_base": get_url_base(),
             "team":application.team,
             "note":application.note,
             "user":m.user,
@@ -148,7 +148,7 @@ def team_application_denied(application_pk):
     context = {
         "team": application.team,
         "user": application.user,
-        "url_base": url_base,
+        "url_base": get_url_base(),
         "note": application.note,
     }
     if application.user.notify_by_message:
@@ -262,6 +262,7 @@ def team_member_leave(team_pk, user_pk):
     msg.object = team
     msg.save()
     send_templated_email(msg.user, msg.subject, template_name, context)
+    
 @task()
 def email_confirmed(user_pk):
     from messages.models import Message

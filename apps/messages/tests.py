@@ -232,6 +232,7 @@ class MessageTest(TestCase):
                 username="test%s" % x,
                 email = "test%s@example.com" % x,
                 notify_by_email = True,
+                notify_by_message = True,
             )
             tm = TeamMember(team=team, user=user)
             if x == 0:
@@ -255,10 +256,11 @@ class MessageTest(TestCase):
         contributor_messge_count_1, contributor_email_count_1 = _get_counts(contributor)
 
         # now delete and check numers
-        Application.objects.create(team=team,user=applying_user)
+        app = Application.objects.create(team=team,user=applying_user)
+        app.save()
+        notifier.application_sent.run(app.pk)
         # owner and admins should receive email + message
         owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
-        print [x.subject for x in Message.objects.filter(user=owner.user)]
         self.assertEqual(owner_messge_count_1 + 1, owner_messge_count_2)
         self.assertEqual(owner_email_count_1 + 1, owner_email_count_2)
         admin_messge_count_2, admin_email_count_2 = _get_counts(admin)
