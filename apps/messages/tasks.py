@@ -97,6 +97,7 @@ def team_invitation_sent(invite_pk):
         "inviter":invite.author,
         "team": invite.team,
         "invite_pk": invite_pk,
+        "note": invite.note,
     }
     send_templated_email(invite.user, title, template_name, context)
     return True
