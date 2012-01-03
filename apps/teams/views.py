@@ -251,8 +251,7 @@ def completed_videos(request, slug):
 
 def videos_actions(request, slug):
     team = Team.get(slug, request.user)
-    videos_ids = team.teamvideo_set.values_list('video__id', flat=True)
-    qs = Action.objects.filter(video__pk__in=videos_ids)
+    qs = Action.objects.for_team(team)
     extra_context = {
         'team': team
     }

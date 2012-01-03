@@ -1494,6 +1494,10 @@ class ActionRenderer(object):
 
 class ActionManager(models.Manager):
     
+    def for_team(self, team):
+        videos_ids = team.teamvideo_set.values_list('video_id', flat=True)
+        return self.select_related('video', 'user', 'language', 'language__video')\
+                              .filter(Q(video__pk__in=videos_ids)|Q(team=team)) 
     def for_user(self, user):
         return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
         
