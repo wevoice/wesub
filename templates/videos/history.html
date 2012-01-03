@@ -79,7 +79,7 @@
     {% if language.is_original %}
         "{{ language.get_title_display }}" {% trans "with subtitles" %} | Universal Subtitles
     {% else %}
-        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %}| Universal Subtitles
+        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
     {% endif %}
 {% endblock %}
 
@@ -185,7 +185,7 @@
         </ul>
         <div class="tab" id="transcripts-tab">
             <div class="tools">
-                <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit Language' %}{% endif %}</a>
+                <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit Subtitles' %}{% endif %}</a>
                 {% if last_version.subtitles %}
                     <div class="sort_button action">
                         <div class='arrow'>
@@ -329,7 +329,7 @@
     {% if user.is_staff and perms.videos.edit_video %}
         <ul id="page_controls">
             <li>
-                <a href="{% url admin:videos_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Language' %}</a>
+                <a href="{% url admin:videos_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Subtitles' %}</a>
             </li>
         </ul>
     {% endif %}
