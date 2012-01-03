@@ -65,7 +65,7 @@ def index(request, message_pk=None):
 
     response = object_list(request, queryset=qs,
                        paginate_by=MESSAGES_ON_PAGE,
-                       template_name='messages/index.html',
+                       template_name='messages/list.html',
                        template_object_name='message',
                        extra_context=extra_context)
     try:
