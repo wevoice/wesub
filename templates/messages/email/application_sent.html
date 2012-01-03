@@ -12,7 +12,8 @@ Hi {{ user }},
 
 {{ note }}
 
-<a href="">Approve</a> or <a href="">deny</a> this request.
+<a href="{{base_url}}{% url teams:approve_application slug=team.slug,user_pk=applicant.pk %}">Approve</a> or 
+<a href="{{base_url}}{% url teams:deny_application slug=team.slug,user_pk=applicant.pk %}">deny</a> this request.
 {% endblock %}
 
 {% block dont_send %}{% endblock %}

@@ -70,7 +70,6 @@ def send_new_message_notification(message_id):
         "domain":  Site.objects.get_current().domain,
         "STATIC_URL": settings.STATIC_URL,
     }
-
     send_templated_email(user, subject, "messages/email/message_received.html", context)
 
 @task()
@@ -86,12 +85,13 @@ def team_invitation_sent(invite_pk):
     
     context = {'invite': invite, 'custom_message': custom_message}
     title = ugettext(u"You've been invited to team %s on Universal Subtitles" % invite.team.name)
-    msg = Message()
-    msg.subject = title
-    msg.user = invite.user
-    msg.object = invite
-    msg.author = invite.author
-    msg.save()
+    if invite.user.notify_by_message:
+        msg = Message()
+        msg.subject = title
+        msg.user = invite.user
+        msg.object = invite
+        msg.author = invite.author
+        msg.save()
     context = {
         "user":invite.user,
         "inviter":invite.author,
@@ -112,7 +112,6 @@ def application_sent(application_pk):
     notifiable = TeamMember.objects.filter( team=application.team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     for m in notifiable:
-        msg = Message()
 
         template_name = "messages/email/application_sent.html"
         context = {
@@ -122,13 +121,16 @@ def application_sent(application_pk):
             "user":m.user,
         }
         body = render_to_string(template_name,context) 
-        msg.subject = ugettext(u'%s is applying for team %s') % (application.user, application.team.name)
-        msg.content = body
-        msg.user = m.user
-        msg.object = application.team
-        msg.author = application.user
-        msg.save()
-        send_templated_email(msg.user, msg.subject, template_name, context)
+        subject  = ugettext(u'%s is applying for team %s') % (application.user, application.team.name)
+        if m.user.notify_by_message:
+            msg = Message()
+            msg.subject = subject
+            msg.content = body
+            msg.user = m.user
+            msg.object = application.team
+            msg.author = application.user
+            msg.save()
+        send_templated_email(m.user, subject, template_name, context)
         
 
 @task()
