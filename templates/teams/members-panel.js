@@ -77,7 +77,7 @@
            return false;
         },
         hide:function(e){
-            e.parent().remove();
+            this.el.remove();
             $('div.well').remove();
             $('html').unbind('click.modal');
             return false;
