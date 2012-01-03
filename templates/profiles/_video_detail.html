@@ -14,8 +14,8 @@
   <ul class="actions">
       <li>
           <h4>
-              {% if search_record.video_completed_langs %}
-                  <a href="{{ video.get_absolute_url }}">{{ video.languages_count|length }} language{{ video.languages_count|length|pluralize }}</a>
+              {% if video.languages_count > 0 %}
+                  <a href="{{ video.get_absolute_url }}">{{ video.languages_count }} language{{ video.languages_count|pluralize }}</a>
               {% else %}
                 {% trans "No subtitles yet" %}
               {% endif %}
