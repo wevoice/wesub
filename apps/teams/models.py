@@ -34,10 +34,12 @@ from utils.panslugify import pan_slugify
 from haystack.query import SQ
 from haystack import site
 from utils.searching import get_terms
+from django.contrib.contenttypes.models import ContentType
 import datetime
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
+from apps.comments.models import Comment
 from apps.teams.moderation_const import WAITING_MODERATION
 from teams.permissions_const import TEAM_PERMISSIONS, PROJECT_PERMISSIONS, \
         LANG_PERMISSIONS, ROLE_ADMIN, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_MANAGER
@@ -1241,6 +1243,18 @@ class Task(models.Model):
         return Workflow.get_for_team_video(self.team_video)
 
 
+    def _add_comment(self):
+        """Add a comment on the SubtitleLanguage for this task with the body as content."""
+        if self.body.strip():
+            lang_ct = ContentType.objects.get_for_model(SubtitleLanguage)
+            Comment(
+                content=self.body,
+                object_pk=self.subtitle_version.language.pk,
+                content_type=lang_ct,
+                submit_date=self.completed,
+                user=self.assignee,
+            ).save()
+
     def get_widget_url(self):
         mode = Task.TYPE_NAMES[self.type].lower()
         if self.subtitle_version:
@@ -1311,6 +1325,8 @@ class Task(models.Model):
         return task
 
     def _complete_review(self):
+        self._add_comment()
+
         if self.workflow.approve_enabled and self.approved == Task.APPROVED_IDS['Approved']:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=self.subtitle_version,
@@ -1322,7 +1338,7 @@ class Task(models.Model):
         return task
 
     def _complete_approve(self):
-        pass
+        self._add_comment()
 
 
     def get_perform_url(self):
