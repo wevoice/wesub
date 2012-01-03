@@ -82,6 +82,7 @@ def dashboard(request):
     user = request.user
     context = {
         'user_info': user,
+        'action_list': Action.objects.for_user(user)[:10]
     }
 
     return direct_to_template(request, 'profiles/dashboard.html', context)
@@ -168,18 +169,11 @@ def send_message(request):
         output['errors'] = form.get_errors()
     return HttpResponse(json.dumps(output), "text/javascript")
 
-def actions_list(request, user_id):
-    try:
-        user = User.objects.get(username=user_id)
-    except User.DoesNotExist:
-        try:
-            user = User.objects.get(id=user_id)
-        except (User.DoesNotExist, ValueError):
-            raise Http404
-        
-    qs = Action.objects.for_user(user)
+@login_required
+def actions_list(request):
+    qs = Action.objects.for_user(request.user)
     extra_context = {
-        'user_info': user
+        'user_info': request.user
     }
                 
     return object_list(request, queryset=qs, allow_empty=True,

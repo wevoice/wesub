@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2011 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.db import models
@@ -39,13 +39,13 @@ class Comment(models.Model):
     reply_to = models.ForeignKey('self', blank=True, null=True)
     content = models.TextField('comment', max_length=COMMENT_MAX_LENGTH)
     submit_date = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ('-submit_date',)
-        
+
     def __unicode__(self):
         return "%s: %s..." % (self.user.__unicode__(), self.content[:50])
-    
+
     @classmethod
     def get_for_object(self, obj):
         if obj.pk:
@@ -53,5 +53,5 @@ class Comment(models.Model):
             return self.objects.filter(content_type=ct, object_pk=obj.pk).order_by('submit_date').select_related('user')
         else:
             return self.objects.none()
-        
+
 post_save.connect(Awards.on_comment_save, Comment)
