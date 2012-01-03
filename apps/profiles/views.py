@@ -82,7 +82,7 @@ def dashboard(request):
     user = request.user
     context = {
         'user_info': user,
-        'action_list': Action.objects.for_user(user)[:5]
+        'action_list': Action.objects.for_user(user)[:10]
     }
 
     return direct_to_template(request, 'profiles/dashboard.html', context)
