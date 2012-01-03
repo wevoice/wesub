@@ -59,7 +59,7 @@ from teams.permissions import (
     can_create_task_translate, can_create_task_review, can_create_task_approve,
     can_view_tasks_tab, can_invite, roles_user_can_assign, can_join_team,
     can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
-    can_rename_team, can_change_team_settings
+    can_rename_team, can_change_team_settings, can_perform_task_for
 )
 from teams.tasks import invalidate_video_caches
 
@@ -832,12 +832,30 @@ def highlight(request, slug, highlight=True):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
+def _member_search_result(member, team, task_id, team_video_id, task_type, task_lang):
+    result = [member.user.id, u'%s (%s)' % (member.user, member.user.username)]
+
+    if task_id:
+        task = Task.objects.not_deleted().get(team=team, pk=task_id)
+        result += [can_perform_task(member.user, task)]
+    elif team_video_id:
+        team_video = TeamVideo.objects.get(pk=team_video_id)
+        result += [can_perform_task_for(member.user, task_type, team_video, task_lang)]
+    else:
+        result += [None]
+
+    return result
+
 @render_to_json
 def search_members(request, slug):
     team = Team.get(slug, request.user)
     q = request.GET.get('term', '').replace('(', '').replace(')', '')
     terms = get_terms(q)
+
     task_id = request.GET.get('task')
+    task_type = request.GET.get('task_type')
+    task_lang = request.GET.get('task_lang')
+    team_video_id = request.GET.get('team_video')
 
     members = team.members.filter(user__is_active=True)
     for term in terms:
@@ -848,15 +866,7 @@ def search_members(request, slug):
         )
     members = members.select_related('user')[:MAX_MEMBER_SEARCH_RESULTS]
 
-    if task_id:
-        task = Task.objects.not_deleted().get(team=team, pk=task_id)
-        members = [m for m in members if can_perform_task(m.user, task)]
-    else:
-        task = None
-
-    results = [[m.user.id,
-                u'%s (%s)' % (m.user, m.user.username),
-                can_perform_task(m.user, task) if task else None]
+    results = [_member_search_result(m, team, task_id, team_video_id, task_type, task_lang)
                for m in members]
 
     return { 'results': results }
