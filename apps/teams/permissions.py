@@ -497,17 +497,22 @@ def can_assign_tasks(team, user, project=None, lang=None):
     return role in _perms_equal_or_greater(role_required)
 
 
+def can_perform_task_for(user, type, team_video, language):
+    """Return whether the given user can perform the given type of task."""
+
+    if type == Task.TYPE_IDS['Subtitle']:
+        return can_create_and_edit_subtitles(user, team_video)
+    elif type == Task.TYPE_IDS['Translate']:
+        return can_create_and_edit_translations(user, team_video, language)
+    elif type == Task.TYPE_IDS['Review']:
+        return can_review(team_video, user, language)
+    elif type == Task.TYPE_IDS['Approve']:
+        return can_approve(team_video, user, language)
+
 def can_perform_task(user, task):
     """Return whether the given user can perform the given task."""
 
-    if task.type == Task.TYPE_IDS['Subtitle']:
-        return can_create_and_edit_subtitles(user, task.team_video)
-    elif task.type == Task.TYPE_IDS['Translate']:
-        return can_create_and_edit_translations(user, task.team_video, task.language)
-    elif task.type == Task.TYPE_IDS['Review']:
-        return can_review(task.team_video, user, task.language)
-    elif task.type == Task.TYPE_IDS['Approve']:
-        return can_approve(task.team_video, user, task.language)
+    return can_perform_task_for(user, task.type, task.team_video, task.language)
 
 def can_assign_task(task, user):
     """Return whether the given user can assign the given task.
