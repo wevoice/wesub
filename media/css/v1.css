@@ -116,7 +116,7 @@ p.view-more{margin-top:1em;text-align:center;}p.view-more a{text-decoration:none
 #profile.v1 h2,#dashboard.v1 h2{line-height:1.75em;}#profile.v1 h2 img,#dashboard.v1 h2 img{float:left;padding:2px;margin-right:.5em;border:1px solid #dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;height:32px;}
 #profile.v1 .view .avatar img{float:right;margin-right:-60px;margin-left:1em;padding:.5em;border:1px solid #dce2e5;}
 .v1 .view .grid_4 p,.v1 .view .grid_4 ul{margin-bottom:2em;}
-.v1 .view .grid_4 ul{padding:0;}.v1 .view .grid_4 ul.errorlist{margin-bottom:0;width:auto;}
+.v1 .view .grid_4 ul.errorlist{margin-bottom:0;width:auto;}
 .v1 .view.new-message form{padding:4em 2em 2em;}
 .video_view .view{position:relative;}.video_view .view p.active-filters{padding-right:0;margin:1em 0;}.video_view .view p.active-filters a{text-decoration:none;color:inherit;border-bottom:1px dotted #486f87;}
 .video_view .view .tab{clear:both;}
