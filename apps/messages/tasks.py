@@ -148,14 +148,17 @@ def team_application_denied(application_pk):
     context = {
         "team": application.team,
         "user": application.user,
+        "url_base": url_base,
+        "note": application.note,
     }
-    msg = Message()
-    msg.subject = ugettext(u'Your application to join the %s team has been declined' % application.team.name)
-    msg.content = render_to_string(template_name, context)
-    msg.user = application.user
-    msg.object = application.team
-    msg.author = User.get_anonymous()
-    msg.save()
+    if application.user.notify_by_message:
+        msg = Message()
+        msg.subject = ugettext(u'Your application to join the %s team has been declined' % application.team.name)
+        msg.content = render_to_string("messages/team-application-denied.txt", context)
+        msg.user = application.user
+        msg.object = application.team
+        msg.author = User.get_anonymous()
+        msg.save()
     send_templated_email(msg.user, msg.subject, template_name, context)
     application.delete()
 
