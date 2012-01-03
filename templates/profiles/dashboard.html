@@ -38,7 +38,16 @@
             <h3>Activity</h3>
             <!-- Show user's activity feed here -->
             <ul class="listing">
-                <li><a href="">Something waiting...</a></li>
+              {% with action_list as events %}
+			  <ul class="listing activity">
+	    		{% for item in events %}
+				<li>{{ item.render }}</li>
+                {% empty %}
+                <li class="empty">Sorry, no activity yet.</li>
+				{% endfor %}
+	    	</ul>
+        {% endwith %}
+              <li><a href="{% url profiles:actions_list user_id=user_info.pk %}">See all</a></li>
             </ul>
         </div>
 
