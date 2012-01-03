@@ -34,6 +34,7 @@ from utils.rpc import Error, Msg, RpcRouter
 from utils.forms import flatten_errorlists
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 
+from messages import tasks as notifier
 from teams.tasks import update_one_team_video
 from teams.project_forms import ProjectForm
 from teams.forms import (
@@ -73,6 +74,8 @@ class TeamsApiClass(object):
             application, created = Application.objects.get_or_create(team=team, user=user)
             application.note = msg
             application.save()
+            notifier.application_sent.delay(application.pk)
+ 
             return Msg(_(u'Application sent success. Wait for answer from team.'))
         else:
             return Error(_(u'You can\'t join this team by application.'))

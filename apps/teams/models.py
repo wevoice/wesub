@@ -927,13 +927,7 @@ class Application(models.Model):
         # we can't delete the row until the notification task has run
         notifier.team_application_denied.delay(self.pk)
 
-    @classmethod
-    def on_saved(self, sender, instance, created, *args, **kwargs):
-        print "signal for application"
-        if created:
-            notifier.application_sent.delay(instance.pk)
 
-post_save.connect(Application.on_saved, Application)
 
 class Invite(models.Model):
     team = models.ForeignKey(Team, related_name='invitations')
