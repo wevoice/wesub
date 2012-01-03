@@ -77,7 +77,7 @@
 
 {% block title %}
     {% if language.is_original %}
-        "{{ language.get_title_display }}" {% trans "with subtitles" %} | Universal Subtitles
+        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
     {% else %}
         "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
     {% endif %}
