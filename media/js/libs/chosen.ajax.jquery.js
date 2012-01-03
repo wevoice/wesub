@@ -29,7 +29,8 @@
                 $(this).data('prevVal', val);
                 field = $(this);
                 options.data = {
-                    term: val
+                    term: val,
+                    task: $('select#id_type option:selected').val()
                 };
                 if (typeof success !== "undefined" && success !== null) {
                     success;
