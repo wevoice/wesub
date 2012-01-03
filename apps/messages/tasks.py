@@ -40,6 +40,8 @@ from auth.models import CustomUser as User
 from utils import send_templated_email
 from utils import get_object_or_none
 
+
+url_base = "http://" + Site.objects.get_current().domain
         
 @task()
 def send_new_message_notification(message_id):
@@ -113,9 +115,10 @@ def application_sent(application_pk):
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     for m in notifiable:
 
-        template_name = "messages/email/application_sent.html"
+        template_name = "messages/application-sent.txt"
         context = {
             "applicant": application.user,
+            "url_base": url_base,
             "team":application.team,
             "note":application.note,
             "user":m.user,
@@ -130,7 +133,7 @@ def application_sent(application_pk):
             msg.object = application.team
             msg.author = application.user
             msg.save()
-        send_templated_email(m.user, subject, template_name, context)
+        send_templated_email(m.user, subject, "messages/email/application-sent-email.html", context)
         
 
 @task()
