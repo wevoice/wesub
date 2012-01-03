@@ -183,6 +183,7 @@ Creating Users::
 Parameters:
 
   * `username`: the username for later login.  30 chars or fewer alphanumeric chars, @, _ and - are accepted.
+  * `email`: A valid email address
   * `password`: any number of chars, all chars allowed.
   * `first_name`: Any chars, max 30 chars. Optional. 
   * `last_name`: Any chars, max 30 chars. Optional. 
