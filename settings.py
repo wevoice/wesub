@@ -28,14 +28,6 @@ gettext_noop = lambda s: s
 
 from django.conf import global_settings
 #: see doc/i18n
-lang_dict = dict(global_settings.LANGUAGES)
-lang_dict['es-ar'] = gettext_noop(u'Spanish, Argentinian')
-lang_dict['en-gb'] = gettext_noop(u'English, British')
-lang_dict['pt-br'] = gettext_noop(u'Portuguese, Brazilian')
-lang_dict['sr-latn'] = gettext_noop(u'Serbian, Latin')
-lang_dict['zh-cn'] = gettext_noop(u'Chinese, Simplified')
-lang_dict['zh-tw'] = gettext_noop(u'Chinese, Traditional')
-lang_dict['eo'] = gettext_noop(u'Esperanto')
 
 METADATA_LANGUAGES = (
     ('meta-tw', 'Metadata: Twitter'),
@@ -49,6 +41,7 @@ ALL_LANGUAGES = dict(ALL_LANGUAGES)
 ALL_LANGUAGES['iu'] = gettext_noop(u'Inuktitut')
 ALL_LANGUAGES['moh'] = gettext_noop(u'Mohawk')
 ALL_LANGUAGES['oji'] = gettext_noop(u'Anishinaabe')
+ALL_LANGUAGES['pt-br'] = gettext_noop(u'Portuguese, Brazilian')
 ALL_LANGUAGES['cr'] = gettext_noop(u'Cree')
 ALL_LANGUAGES['eo'] = gettext_noop(u'Esperanto')
 ALL_LANGUAGES['hai'] = gettext_noop(u'Haida')
@@ -128,8 +121,19 @@ ALL_LANGUAGES['ka'] = gettext_noop(u'Georgian')
 ALL_LANGUAGES['ilo'] = gettext_noop(u'Ilocano')
 ALL_LANGUAGES['ceb'] = gettext_noop(u'Cebuan')
 
+ALL_LANGUAGES['es-ar'] = gettext_noop(u'Spanish, Argentinian')
+ALL_LANGUAGES['en-gb'] = gettext_noop(u'English, British')
+ALL_LANGUAGES['sr-latn'] = gettext_noop(u'Serbian, Latin')
+ALL_LANGUAGES['zh-cn'] = gettext_noop(u'Chinese, Simplified')
+ALL_LANGUAGES['zh-tw'] = gettext_noop(u'Chinese, Traditional')
+ALL_LANGUAGES['eo'] = gettext_noop(u'Esperanto')
+ALL_LANGUAGES['es-mx'] = gettext_noop(u'Spanish, Mexican')
+ALL_LANGUAGES['es-ni'] = gettext_noop(u'Spanish, Nicaraguan')
+ALL_LANGUAGES['nb'] = gettext_noop(u'Bokmal, Norwegian')
+ALL_LANGUAGES['nn'] = gettext_noop(u'Nynorsk, Norwegian')
+
 del ALL_LANGUAGES['no']
-full_langs = dict(lang_dict.items() + ALL_LANGUAGES.items())
+full_langs = dict(ALL_LANGUAGES.items())
 ALL_LANGUAGES = tuple(i for i in ALL_LANGUAGES.items())
 # this has to be set after all languages have been appended
 global_settings.LANGUAGES = tuple(i for i in full_langs.items())
