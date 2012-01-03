@@ -56,6 +56,7 @@ body{overflow-y:scroll;}
 .v1 .listing.videos>li{min-height:6em;padding-left:120px;padding-right:150px;}.v1 .listing.videos>li .thumb{width:100px;height:60px;}.v1 .listing.videos>li .thumb img{height:60px;}
 .v1 .listing.members>li,.v1 .listing.messages>li{min-height:4em;padding-left:65px;padding-right:150px;}.v1 .listing.members>li .thumb,.v1 .listing.messages>li .thumb{width:45px;height:45px;}.v1 .listing.members>li .thumb img,.v1 .listing.messages>li .thumb img{height:45px;}
 .v1 .listing.members>li.current,.v1 .listing.messages>li.current{background:#f6f6e4;}
+.v1 .listing.messages>li{opacity:.6;}.v1 .listing.messages>li.unread{opacity:1;}
 .v1 .listing.activity>li,.v1 .listing.tasks>li,.v1 .listing.urls>li{padding-right:150px;}.v1 .listing.activity>li .actions,.v1 .listing.tasks>li .actions,.v1 .listing.urls>li .actions{width:150px;}
 .v1 .listing.tasks>li{min-height:5em;}.v1 .listing.tasks>li p.steps{color:#678ca3;}.v1 .listing.tasks>li p.steps .current{font-weight:bold;color:#2f3c45;}
 .v1 .listing.tasks>li .done span{margin-right:.5em;}
@@ -112,6 +113,7 @@ p.view-more{margin-top:1em;text-align:center;}p.view-more a{text-decoration:none
 #dashboard .featured{padding:0;margin-bottom:4em;}#dashboard .featured li{border-left:4px solid #dce2e5;padding:1em;margin:.5em 0;}
 #dashboard .listing{margin-bottom:4em;}#dashboard .listing li{padding:1em 150px 1em 0;}
 #dashboard .listing .timestamp{top:1em;}
+#dashboard .view ul{padding:0;}
 .v1 .only-child h2{padding:.5em 0;margin-bottom:0;border-bottom:1px solid #dce2e5;}
 #profile.v1 h2,#dashboard.v1 h2{line-height:1.75em;}#profile.v1 h2 img,#dashboard.v1 h2 img{float:left;padding:2px;margin-right:.5em;border:1px solid #dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;height:32px;}
 #profile.v1 .view .avatar img{float:right;margin-right:-60px;margin-left:1em;padding:.5em;border:1px solid #dce2e5;}
