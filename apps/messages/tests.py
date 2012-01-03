@@ -83,7 +83,6 @@ class MessageTest(TestCase):
             
         
         team , created= Team.objects.get_or_create(name='test', slug='test')
-        
         # creates dummy users:
         for x in xrange(0,5):
             user, member = User.objects.get_or_create(
@@ -116,6 +115,7 @@ class MessageTest(TestCase):
         contributor_messge_count_1, contributor_email_count_1 = _get_counts(contributor)
         # save the last team member and check that each group has appropriate counts 
         tm.save()
+        notifier.team_member_new(tm.pk)
         # owner and admins should receive email + message
         owner_messge_count_2, owner_email_count_2 = _get_counts(owner)
         self.assertEqual(owner_messge_count_1 + 1, owner_messge_count_2)
