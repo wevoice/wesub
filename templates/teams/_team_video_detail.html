@@ -26,19 +26,21 @@
                 {% endif %}
             </h4>
         </li>
-        <li>
-            <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="View open tasks for this video">
-                {% if search_record.task_count %}
-                    {% blocktrans count counter=search_record.task_count %}
-                        1 open task
-                    {% plural %}
-                    {{ counter }} open tasks
-                    {% endblocktrans %}
-                {% else %}
-                    {% trans "No open tasks" %}
-                {% endif %}
-            </a>
-        </li>
+        {% if team|is_team_member:user %}
+            <li>
+                <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="View open tasks for this video">
+                    {% if search_record.task_count %}
+                        {% blocktrans count counter=search_record.task_count %}
+                            1 open task
+                        {% plural %}
+                        {{ counter }} open tasks
+                        {% endblocktrans %}
+                    {% else %}
+                        {% trans "No open tasks" %}
+                    {% endif %}
+                </a>
+            </li>
+        {% endif %}
     </ul>
 
     {% if user_is_team_member %}
