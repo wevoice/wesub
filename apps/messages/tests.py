@@ -27,6 +27,7 @@ from django.core import mail
 from apps.messages.models import Message
 from apps.messages import tasks as notifier
 from teams.models import Team, TeamMember, Application
+from teams.forms import TeamInvitationForm
 from videos.models import Action
 from utils import send_templated_email
 
@@ -283,3 +284,22 @@ class MessageTest(TestCase):
        self.assertEqual(num_emails +1, len(mail.outbox))
        self.assertEqual(num_messages +1,
                         Message.objects.filter(user=user).count())
+
+    def test_team_inviation_sent(self):
+        team , created= Team.objects.get_or_create(name='test', slug='test')
+        applying_user = User.objects.all()[0]
+        applying_user.notify_by_email = True
+        applying_user.save()
+        mail.outbox = []
+        message = "Won't you be my valentine?"
+        f = TeamInvitationForm(data={
+            "usernames":applying_user.username,
+            "role":"admin",
+            "message": message,
+        })
+        
+        f.save()
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertIn(applying_user.email, msg.to )
+        self.assertIn(message, msg.body, )

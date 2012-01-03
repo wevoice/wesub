@@ -78,12 +78,13 @@ def team_invitation_sent(invite_pk):
     if getattr(settings, "MESSAGES_DISABLED", False):
         return
     from messages.models import Message
-    from teams.models import Invite
+    from teams.models import Invite, Setting
     invite = Invite.objects.get(pk=invite_pk)
-    custom_message = get_object_or_none(Setting, team=self.team,
+    custom_message = get_object_or_none(Setting, team=invite.team,
                                      key=Setting.KEY_IDS['messages_invite'])
-    message =  render_to_string('messages/email/invitation-sent.html',
-                                {'invite': invite, 'custom_message': message})
+    template_name = 'messages/email/invitation-sent.html'
+    
+    context = {'invite': invite, 'custom_message': custom_message}
     title = ugettext(u"You've been invited to team %s on Universal Subtitles" % invite.team.name)
     msg = Message()
     msg.subject = title
@@ -95,7 +96,9 @@ def team_invitation_sent(invite_pk):
         "user":invite.user,
         "inviter":invite.author,
         "team": invite.team,
+        "invite_pk": invite_pk,
     }
+    send_templated_email(invite.user, title, template_name, context)
     return True
 
 @task()

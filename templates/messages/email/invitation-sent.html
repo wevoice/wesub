@@ -4,7 +4,6 @@
 
 {% block content %}
 
-{% blocktrans with message.author as author %}
 
 Hi {{ user }},
 
@@ -14,9 +13,9 @@ Hi {{ user }},
 
 To accept this invitation and join the team:
 
-<a href="{% url teams:accept_invite invite.pk %}">{% trans 'Join' %}</a>
+<a href="{% url teams:accept_invite invite_pk=invite_pk %}">{% trans 'Join' %}</a>
 
 To decline this invitation :
-<a href="{% url teams:deny_invite invite.pk %}">{% trans 'Reject' %}</a>
-
+<a href="{% url teams:deny_invite invite_pk=invite_pk %}">{% trans 'Reject' %}</a>
+{% endblock %}
 {% block dont_send %}{% endblock %}
