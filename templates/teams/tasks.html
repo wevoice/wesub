@@ -79,11 +79,11 @@
                     <p>{% trans "Video" %}: {{ task.team_video|truncatewords:8 }}</p>
                     <p class="steps">
                         <span{% if task.get_type_display == "Subtitle" %} class="current"{% endif %}>{% trans "Subtitle" %}</span>/<span{% if task.get_type_display == "Translate" %} class="current"{% endif %}>{% trans "Translate" %}</span>
-                        {% if team|review_enabled %}
+                        {% if task.workflow.review_enabled %}
                             →
                             <span{% if task.get_type_display == "Review" %} class="current"{% endif %}>{% trans "Review" %}</span>
                         {% endif %}
-                        {% if team|approve_enabled %}
+                        {% if task.workflow.approve_enabled %}
                             →
                             <span{% if task.get_type_display == "Approve" %} class="current"{% endif %}>{% trans "Approve" %}</span>
                         {% endif %}

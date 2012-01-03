@@ -373,7 +373,7 @@ class Team(models.Model):
 
     @property
     def has_projects(self):
-        projects = Project.objects.filter(team=self)
+        projects = self.project_set.all()
         return True if projects.count() > 1 else False
 
     def save(self, *args, **kwargs):

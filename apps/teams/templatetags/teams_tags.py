@@ -324,12 +324,33 @@ def can_create_any_task(search_record, user=None):
 @register.filter
 def review_enabled(team):
     w = Workflow.get_for_target(team.id, 'team')
-    return w.review_enabled
+
+    if w.review_enabled:
+        return True
+
+    for p in team.project_set.all():
+        if p.workflow_enabled:
+            w = Workflow.get_for_project(p)
+            if w.review_enabled:
+                return True
+
+    return False
+
 
 @register.filter
 def approve_enabled(team):
     w = Workflow.get_for_target(team.id, 'team')
-    return w.approve_enabled
+
+    if w.approve_enabled:
+        return True
+
+    for p in team.project_set.all():
+        if p.workflow_enabled:
+            w = Workflow.get_for_project(p)
+            if w.approve_enabled:
+                return True
+
+    return False
 
 @register.filter
 def can_perform_task(task, user):
