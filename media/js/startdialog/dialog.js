@@ -54,7 +54,8 @@ unisubs.startdialog.Dialog.prototype.createDom = function() {
     var el = this.getElement();
     el.appendChild(
         $d('h3', null, 'Create subtitles'));
-    this.contentDiv_ = $d('div', null, "Loading...");
+    this.contentDiv_ = $d('div', null, '');
+    this.contentDiv_.innerHTML = "<p>Loading&hellip;</p>";
     el.appendChild(this.contentDiv_);
 };
 
