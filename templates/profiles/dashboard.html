@@ -4,7 +4,7 @@
 
 {% block body_attrs %}id="dashboard" class="v1"{% endblock %}
 
-{% block title %}Dashboard | {{ user_info }} | Universal Subtitles{% endblock %}
+{% block title %}{% trans "Dashboard" %} | {{ user_info }} | Universal Subtitles{% endblock %}
 
 {% block main_content %}
 
@@ -18,47 +18,9 @@
     {% endwith %}
 
     <div class="view grid_9 alpha">
-        <div class="grid_5 alpha">
-            <h3>Tasks</h3>
-            <!--
-                IF there are tasks assigned to the user, list those here.
-
-                ELSE show <p class="empty">No incoming tasks...</p>
-            -->
-            <ul class="listing">
-                <!--
-                    FOR each task, if the task hasn't yet been accepted or
-                    rejected, give the LI a class of "new"
-                -->
-                <li><a href="">Spanish subtitles</a> for Promo Video #3 (Twitter) <span class="timestamp">2 hours ago</span></li>
-
-                <li><a href="">Review Spanish subtitles</a> for Promo Video #2 (TED) <span class="timestamp">2 hours ago</span></li>
-            </ul>
-
-            <h3>Activity</h3>
-            <!-- Show user's activity feed here -->
-            <ul class="listing">
-              {% with action_list as events %}
-			  <ul class="listing activity">
-	    		{% for item in events %}
-				<li>{{ item.render }}</li>
-                {% empty %}
-                <li class="empty">Sorry, no activity yet.</li>
-				{% endfor %}
-	    	</ul>
-        {% endwith %}
-              <li><a href="{% url profiles:actions_list %}">See all</a></li>
-            </ul>
-        </div>
-
-        <div class="grid_4 omega">
-            <h3>Alerts</h3>
+        <div class="grid_4 alpha">
+            <h3>{% trans "Alerts" %}</h3>
             <ul class="featured">
-                <!--
-                    IF user has any ongoing work in browser's local storage
-                -->
-                <li>You have <a href="">saved work</a> on "Promotional Video #1"</li>
-
                 {% with user.unread_messages.count as new_msg_count %}
                     {% if new_msg_count %}
                         <li>You have <a href="{% url messages:index %}">{{ user.unread_messages.count }} unread message{{ user.unread_messages.count|pluralize }}</a></li>
@@ -66,7 +28,7 @@
                 {% endwith %}
             </ul>
 
-            <h3>My Teams</h3>
+            <h3>{% trans "Teams" %}</h3>
             {% with user.teams.all as user_teams %}
             <ul>
                 {% if user_teams %}
@@ -80,7 +42,46 @@
             </ul>
             {% endwith %}
         </div>
+
+        <div class="grid_5 omega">
+            <h3>{% trans "Feed" %}</h3>
+            <ul class="listing">
+              {% with action_list as events %}
+			  <ul class="listing activity">
+	    		{% for item in events %}
+				<li>{{ item.render }}</li>
+                {% empty %}
+                <li class="empty">Sorry, no activity yet.</li>
+				{% endfor %}
+	    	</ul>
+        {% endwith %}
+              <li><a href="{% url profiles:actions_list %}">See all</a></li>
+            </ul>
+        </div>
     </div>
+
+    {% comment %}
+        <h3>Tasks</h3>
+        <!--
+            IF there are tasks assigned to the user, list those here.
+
+            ELSE show <p class="empty">No incoming tasks...</p>
+        -->
+        <ul class="listing">
+            <!--
+                FOR each task, if the task hasn't yet been accepted or
+                rejected, give the LI a class of "new"
+            -->
+            <li><a href="">Spanish subtitles</a> for Promo Video #3 (Twitter) <span class="timestamp">2 hours ago</span></li>
+
+            <li><a href="">Review Spanish subtitles</a> for Promo Video #2 (TED) <span class="timestamp">2 hours ago</span></li>
+        </ul>
+
+        <!--
+            IF user has any ongoing work in browser's local storage
+        -->
+        <li>You have <a href="">saved work</a> on "Promotional Video #1"</li>
+    {% endcomment %}
 
     <div class="controls grid_3 omega">
         <ul>
