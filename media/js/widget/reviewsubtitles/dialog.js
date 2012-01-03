@@ -93,10 +93,10 @@ unisubs.reviewsubtitles.Dialog.prototype.createRightPanel_ = function() {
                     " for later."),
         $d('div', {'className': 'unisubs-extra'},
             $d('p', {}, "Enter review notes here. ",
-                        "They will be shared with all previous and future contributors, ",
-                        "and added to the subtitles history as a ",
+                        "They will be sent to all previous contributors ",
+                        "and posted as a ",
                         $d('em', {}, "public comment"),
-                        "."),
+                        " to the subtitles."),
             $d('span', {'className': 'unisubs-spanarrow'}))
     ]);
     return new unisubs.reviewsubtitles.ReviewSubtitlesRightPanel(

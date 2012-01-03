@@ -149,7 +149,7 @@
                                 {{/roles}}
                             </select>
                         </div>
-                        <div class="field clearfix {{^projects}}hidden{{/projects}}">
+                        <div id="project-restriction" class="{{^projects}}hidden{{/projects}}">
                             <label>Project Restriction:</label>
                             <select data-placeholder="None" style="width:350px;" multiple class="chzn-select projects">
                                 {{#projects}}
@@ -157,7 +157,7 @@
                                 {{/projects}}
                             </select>
                         </div>
-                        <div class="field clearfix {{^languages}}hidden{{/languages}}">
+                        <div id="language-restriction" class="{{^languages}}hidden{{/languages}}">
                             <label>Language Restriction:</label>
                             <select data-placeholder="None" style="width:350px;"
                                 multiple class="chzn-select langs">

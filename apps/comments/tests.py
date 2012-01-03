@@ -95,17 +95,13 @@ class CommentEmailTests(TestCase):
         num_followers = 2
         body_dicts = []
         from utils import tasks
-        send_templated_email_old = tasks.send_templated_email
-        def send_templated_email(email, subject, template, body_dict, 
-                                       from_email=None, ct="html", fail_silently=False):
-            body_dicts.append(body_dict)
-        tasks.send_templated_email = send_templated_email
         self._create_followers(self.video, num_followers)
+        mail.outbox = []
         notify_comment_by_email(self.comment)
-        body_dict = body_dicts[0]
-        self.assertEqual(self.comment.user.username, body_dict['commenter'])
-        self.assertEqual(self.comment.user.get_absolute_url(), body_dict['commenter_url'])
-        tasks.send_templated_email = send_templated_email_old
+        self.assertEqual(len(mail.outbox), num_followers)
+        for msg in mail.outbox:
+            self.assertEqual(msg.subject, u'admin left a comment on the video Hax')
+        
 
     def test_comment_view_for_video(self):
         num_followers = 2

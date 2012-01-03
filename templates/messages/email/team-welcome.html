@@ -1,0 +1,18 @@
+{% extends "videos/email_base.html" %}
+{% comment %}
+This gets sent to the rest of the team, notifying about the new member
+{% endcomment %}
+{% load i18n localeurl_tags %}
+
+{% block content %}
+
+Hi {{ user }},
+
+Congratulations! You are now a member of the {{ team.name }} team.
+
+Start browsing <a href="{% url teams:videos slug=team.slug}">team videos</a> 
+or look for <a href="{% url teams:team_tasks slug=team.slug %}">tasks</a> you can take on to help out.
+
+Happy subtitling!
+{% endblock %}
+{% block dont_send %}{% endblock %}

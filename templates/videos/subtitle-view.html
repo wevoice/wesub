@@ -77,13 +77,9 @@
 
 {% block title %}
     {% if language.is_original %}
-        {% blocktrans with language.get_title_display as title %}
-        {{ title }} with subtitles | Universal Subtitles
-        {% endblocktrans %}
+        "{{ language.get_title_display }}" {% trans "with subtitles" %} | Universal Subtitles
     {% else %}
-        {% blocktrans with language.get_title_display as title and language.get_language_display as language %}
-        {{ title }} with {{ language }} subtitles | Universal Subtitles
-        {% endblocktrans %}
+        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
     {% endif %}
 {% endblock %}
 
@@ -106,19 +102,18 @@
 {% comment %}
     TODO:
         - title/description editing?
-        - localization sweep
 {% endcomment %}
 
 {% block main_content %}
 
     <div class="grid_4 context alpha">
         <h3 class="sub-title">
-            <a href="{{share_panel_permalink}}" title="Language permalink">
+            <a href="{{ language.language_url }}" title="Language permalink">
                 {% if language.is_original %}
                     {% trans 'Original' %}
                 {% endif %}
                 {{ language.get_language_display }}
-                subtitles
+                {% trans "subtitles" %}
                 {%comment%}{% if language.is_dependent %}
                     {% trans 'translated from' %} {{ language.standard_language }}
                 {% endif %}{%endcomment%}    
@@ -149,20 +144,20 @@
         {% endif %}
         <ul class="metrics">
             <li>
-                <p>{{ language.subtitles_fetched_count }}</p>
-                <h4>View{{ language.subtitles_fetched_count|pluralize }}</h4>
+                <p>{{ language.subtitles_fetched_count|simplify_number }}</p>
+                <h4>{% trans "Play" %}{{ language.subtitles_fetched_count|pluralize }}</h4>
             </li>
             <li>
                 <p>{{ language.followers.count }}</p>
-                <h4>Follower{{ language.followers.count|pluralize }}</h4>
+                <h4>{% trans "Follower" %}{{ language.followers.count|pluralize }}</h4>
             </li>
             <li>
                 <p>{{ language.subtitle_count }}</p>
-                <h4>Line{{ language.subtitle_count|pluralize }}</h4>
+                <h4>{% trans "Line" %}{{ language.subtitle_count|pluralize }}</h4>
             </li>
             <li>
-                <p>{{ language.percent_done }}%</p>
-                <h4>Complete</h4>
+                <p>{% complete_indicator language 'pct' %}</p>
+                <h4>{% trans "Complete" %}</h4>
             </li>
         </ul>
         <div class="sharing-tools">
@@ -190,7 +185,7 @@
         </ul>
         <div class="tab" id="transcripts-tab">
             <div class="tools">
-                <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit Language' %}{% endif %}</a>
+                <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit Subtitles' %}{% endif %}</a>
                 {% if last_version.subtitles %}
                     <div class="sort_button action">
                         <div class='arrow'>
@@ -224,15 +219,15 @@
             {% if last_version.has_subtitles %}
                 <p class="active-filters">
                     {% if language.is_dependent %}
-                        Subtitles
+                        {% trans "Subtitles" %}
                         {% trans 'translated from' %}
                         {{ language.standard_language }}.
                     {% endif %}
-                    Showing
-                    <strong>Revision {{ language.last_version.version_no }}</strong>,
-                    created
+                    {% trans "Showing" %}
+                    <strong>{% trans "Revision" %} {{ language.last_version.version_no }}</strong>,
+                    {% trans "created" %}
                     <strong>{{ language.last_version.revision_time }}</strong>
-                    by
+                    {% trans "by" %}
                     <a href="language.latest_version.user.profile_url" title="View {{ language.latest_version.user }}'s profile">
                         <strong>{{ language.latest_version.user }}</strong>
                     </a>.
@@ -299,16 +294,18 @@
                         <li>
                             <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
                             <h3>
-                                <a href="{% url videos:revision pk=item.pk %}">Revision {{ item.version_no }}</a>, {{ item.revision_time }}
+                                <a href="{% url videos:revision pk=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
                             </h3>
-                            <p>
-                                {% if item.user %}
-                                    <a href="{% url profiles:profile item.user.pk %}">{{ item.user }}</a>
-                                {% endif %}
-                                {% if item.note %}{{ item.note }}{% endif %}
-                            </p>
-                            <p>{{ item.time_change_display }}</p>
-                            <p>{{ item.text_change_display }}</p>
+                            {% if item.user %}
+                                <p>{% trans "by" %} <a href="{% url profiles:profile item.user.pk %}">{{ item.user }}</a></p>
+                            {% endif %}
+                            {% if item.note %}
+                                <p>{{ item.note }}</p>
+                            {% endif %}
+                            <ul class="actions">
+                                <li><h4>{% trans "Timing" %}: {{ item.time_change_display }}</h4></li>
+                                <li><h4>{% trans "Text" %}: {{ item.text_change_display }}</h4></li>
+                            </ul>
                         </li>
                     {% endfor %}
                 </ul>
@@ -332,7 +329,7 @@
     {% if user.is_staff and perms.videos.edit_video %}
         <ul id="page_controls">
             <li>
-                <a href="{% url admin:videos_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Language' %}</a>
+                <a href="{% url admin:videos_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Subtitles' %}</a>
             </li>
         </ul>
     {% endif %}

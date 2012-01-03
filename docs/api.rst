@@ -170,19 +170,20 @@ One can list and create new users through the api.
 
 Listing users::
 
-    GET https://www.universalsubtitles.org/api2/users/
+    GET https://www.universalsubtitles.org/api2/partners/users/
 
 User datail::
 
-    GET https://www.universalsubtitles.org/api2/users/[username]/
+    GET https://www.universalsubtitles.org/api2/partners/users/[username]/
     
 Creating Users::
 
-    POST https://www.universalsubtitles.org/api2/users/
+    POST https://www.universalsubtitles.org/api2/partners/users/
 
 Parameters:
 
   * `username`: the username for later login.  30 chars or fewer alphanumeric chars, @, _ and - are accepted.
+  * `email`: A valid email address
   * `password`: any number of chars, all chars allowed.
   * `first_name`: Any chars, max 30 chars. Optional. 
   * `last_name`: Any chars, max 30 chars. Optional. 

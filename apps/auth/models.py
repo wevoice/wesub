@@ -48,6 +48,8 @@ from django.core.mail import send_mail
 from localeurl import patch_reverse
 patch_reverse()
 
+from utils.tasks import send_templated_email_async
+
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 EMAIL_CONFIRMATION_DAYS = getattr(settings, 'EMAIL_CONFIRMATION_DAYS', 3)
 
@@ -461,10 +463,7 @@ class EmailConfirmationManager(models.Manager):
             "confirmation_key": confirmation_key,
         }
         subject = u'Please confirm your email address for %s' % current_site.name
-        message = render_to_string(
-            "auth/email_confirmation_message.txt", context)
-        msg_obj = Message(user=user, subject=subject, content=message)
-        msg_obj.save()
+        send_templated_email_async(user, subject, "auth/email_confirmation_message.txt", context)
         return self.create(
             user=user,
             sent=datetime.now(),

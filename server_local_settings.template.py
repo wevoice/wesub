@@ -45,7 +45,7 @@ DEFAULT_BUCKET = '' # special note: should be blank for dev.
 
 # Handy to temporarily route Django email messages to a file
 #EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-#EMAIL_FILE_PATH = '/tmp/unisubs-messages'
+EMAIL_FILE_PATH = '/tmp/unisubs-messages'
 
 FACEBOOK_API_KEY = FACEBOOK_APP_ID = 'INSERT FACEBOOK APP ID'
 FACEBOOK_SECRET_KEY = 'INSERT FACEBOOK SECRET KEY'

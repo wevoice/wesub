@@ -230,7 +230,7 @@ def video(request, video, video_url=None, title=None):
     _add_share_panel_context_for_video(context, video)
     context['lang_count'] = video.subtitlelanguage_set.filter(has_version=True).count()
     context['original'] = video.subtitle_language()
-    return render_to_response('videos/video.html', context,
+    return render_to_response('videos/video-view.html', context,
                               context_instance=RequestContext(request))
 
 
@@ -459,7 +459,7 @@ def history(request, video, lang=None, lang_id=None):
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.REVISIONS_ONPAGE, 
                        page=request.GET.get('page', 1),
-                       template_name='videos/history.html',
+                       template_name='videos/subtitle-view.html',
                        template_object_name='revision',
                        extra_context=context)
 
@@ -497,7 +497,7 @@ def revision(request,  version):
     if feature_is_on("MODERATION"):
         context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['widget_params'] = _widget_params(request, \
-            language.video, version.version_no, language)
+            language.video, version.version_no, language, size=(289,173))
     context['latest_version'] = language.latest_version()
     version.ordered_subtitles()
 
@@ -686,7 +686,7 @@ def video_url_create(request):
                 'domain': Site.objects.get_current().domain,
                 'hash': user.hash_for_video(video.video_id)
             }
-            send_templated_email(user.email, subject, 
+            send_templated_email(user, subject, 
                                  'videos/email_video_url_add.html',
                                  context, fail_silently=not settings.DEBUG)          
     else:

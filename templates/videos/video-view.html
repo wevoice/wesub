@@ -63,7 +63,7 @@
 {% endblock %}
 
 {% block title %}
-    {{ video.title_display }} | Universal Subtitles
+    "{{ video.title_display }}" | Universal Subtitles
 {% endblock %}
 
 {% block opengraph-head %}
@@ -85,10 +85,6 @@
 {% comment %}
     TODO:
         - title/description editing?
-        - team controls
-        - better way to display 'contribute' actions?
-        - maybe a better way to show languages?
-        - localization sweep
 {% endcomment %}
 
 {% block main_content %}
@@ -110,20 +106,20 @@
         </div>
         <ul class="metrics">
             <li>
-                <p>{{ video.view_count }}</p>
-                <h4>View{{ video.view_count|pluralize }}</h4>
+                <p>{{ video.view_count|simplify_number }}</p>
+                <h4>{% trans "View" %}{{ video.view_count|pluralize }}</h4>
             </li>
             <li>
-                <p>{{ video.widget_views_count }}</p>
-                <h4>Play{{ video.widget_views_count|pluralize }}</h4>
+                <p>{{ video.widget_views_count|simplify_number }}</p>
+                <h4>{% trans "Play" %}{{ video.widget_views_count|pluralize }}</h4>
             </li>
             <li>
                 <p>{{ video.followers.count }}</p>
-                <h4>Follower{{ video.followers.count|pluralize }}</h4>
+                <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
             </li>
             <li>
                 <p>{{ video.languages_count }}</p>
-                <h4>Language{{ video.languages_count|pluralize }}</h4>
+                <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
             </li>
         </ul>
         <div class="sharing-tools">
@@ -141,7 +137,7 @@
             </div>
         </div>
         {% else %}
-            <p>Be the first to <a href="#" id="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+            <p>{% trans "Be the first to " %}<a href="#" id="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
         {% endif %}
     </div>
     <div class="grid_8 view omega">
@@ -158,16 +154,28 @@
             {% widget widget_params %}
             <div class="clearboth">
                 <div class="video-tools grid_4 alpha">
-                    <h3>Contribute</h3>
+                    <h3>{% trans "Contribute" %}</h3>
                     <p>
                         {% if not video.subtitle_language %}
-                            This video doesn't have any subtitles yet :( <a href="#" id="add_subtitles">{% trans 'Create subtitles now' %}</a>!</li>
+                            {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" id="add_subtitles">{% trans 'Create subtitles now' %}</a>!</li>
                         {% else %}
-                            Don't see the language you're looking for? <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!</li>
+                            {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!</li>
                         {% endif %}
                         {% upload_subtitles video %}
                     </p>
                 </div>
+                {% if video.get_team_video or user.managed_teams %}
+                <div class="video-tools grid_4 omega">
+                    <h3>{% trans "Collaborate" %}</h3>
+                    {% if video.get_team_video %}
+                        <p>
+                            {% trans "This video belongs to the following teams" %}:
+                        </p>
+                        {% render_belongs_to_team_list video %}
+                    {% endif %}
+                    {% team_add_video_select %}
+                </div>
+                {% endif %}
             </div>
         </div>
         <div class="tab" id="comments-tab" style="display:none;">
@@ -186,14 +194,6 @@
     </div>
      
     {% comment %}
-
-    <div class="grid_3">
-        <h3>{% trans "Moderation" %}</h3>
-        <ul id="moderation-menu">
-            <li>{% team_add_video_select %}</li>
-            <li>{% render_belongs_to_team_list video %}</li>
-        </ul>
-    </div>
 
     {# EDIT TITLE #}
         {% if user.is_authenticated %}

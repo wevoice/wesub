@@ -110,7 +110,41 @@ def render_visibility_button(video, user):
         
      }
 
-# Register filter
+@register.filter
+def simplify_number(value):
+    num = str(value)
+    size = len(num)
+
+    # Billions
+    if size > 9:
+        bils = num[0:-9]
+        dec = num[-9:-8]
+        if dec != '0':
+            return '{0}.{1}b'.format(bils, dec)
+        else:
+            return '{0}b'.format(bils)
+
+    # Millions
+    elif size > 6:
+        mils = num[0:-6]
+        dec = num[-6:-5]
+        if dec != '0':
+            return '{0}.{1}m'.format(mils, dec)
+        else:
+            return '{0}m'.format(mils)
+
+    # Ten-thousands
+    elif size > 4:
+        thou = num[0:-3]
+        dec = num[-3:-2]
+        if dec != '0':
+            return '{0}.{1}k'.format(thou, dec)
+        else:
+            return '{0}k'.format(thou)
+
+    else:
+        return num
+
 @register.filter
 def format_duration(value):
     

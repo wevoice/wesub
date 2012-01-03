@@ -135,13 +135,10 @@ class UserCreationTest(TestCase):
 
     def test_notfications(self):
         self.assertEqual(len(mail.outbox), 0)
-        # by defaults, users will receive notifications both on
-        # the unisubs mesasage box and through email
         user = User(email='la@example.com', username='someone')
         user.set_password("secret")
         user.save()
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(Message.objects.filter(user=user).count(), 1)
         
     #
 class BaseTokenTest(TestCase):

@@ -124,8 +124,31 @@ def get_pager(objects, on_page=15, page='1', orphans=0):
     return page
 
 def send_templated_email(to, subject, body_template, body_dict, 
-                         from_email=None, ct="html", fail_silently=False):
-    if not isinstance(to, list): to = [to]
+                         from_email=None, ct="html", fail_silently=False, check_user_preference=True):
+    """
+    Sends an html email with a template name and a rendering context.
+    Parameters:
+        to: a list of email addresses of User objects
+        check_user_preferences: If set to false will send the email regardless
+             of the user's notification preferences. This is useful in
+             situations where you must send the email, for example on
+             password retrivals.
+    """
+    from auth.models import CustomUser as User
+    to_unchecked = to
+    if not isinstance(to_unchecked, list):
+        to_unchecked = [to]
+    to = []
+    # if passed a User, check that he has opted in for email notification
+    # unless check_user_preference is False (useful for example for password)
+    # retrivals, else users that have opted out of email notifications
+    # can never recover their passowrd
+    for recipient in to_unchecked:
+        if isinstance(recipient, User):
+            if check_user_preference is False or  recipient.notify_by_email:
+                to.append("%s <%s>" % (recipient, recipient.email))
+        else:
+            to.append(recipient)
     if not from_email: from_email = settings.DEFAULT_FROM_EMAIL
 
     body_dict['STATIC_URL_BASE'] = settings.STATIC_URL_BASE

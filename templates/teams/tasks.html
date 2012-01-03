@@ -263,7 +263,11 @@
                                .children('div.assignee-choice')
                                    .fadeIn('fast')
                                    .find('.chzn-container')
-                                       .css('width', '100%');
+                                       .css('width', '100%')
+                                            .find('.chzn-drop')
+                                                .css('width', '99%')
+                                                    .find('input')
+                                                        .css('width', '82%');
                 return false;
             });
             $('.assignee-choice a.cancel').click(function(e) {

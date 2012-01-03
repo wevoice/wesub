@@ -2,7 +2,7 @@
 <div>
     <h4>
         {% trans 'You have been invited to a new team' %}:
-        <a href="{{ invite.team.get_absolute_url }}">{{ invite.team }}</a>
+        <a href="{{  }}">{{ invite.team }}</a>
     </h4> 
     <div>
         <a href="{% url teams:accept_invite invite.pk %}">{% trans 'Join' %}</a>

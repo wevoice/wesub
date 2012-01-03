@@ -26,7 +26,6 @@ from django.conf import settings
 from django.db.models.signals import post_save
 
 from localeurl.utils import universal_url
-from utils.tasks import send_templated_email_async
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
 

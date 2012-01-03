@@ -937,7 +937,7 @@ class ViewsTest(WebUseTest):
         version = language.latest_version(public_only=True)
         self.assertEqual(len(version.subtitles()), 2)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to[0], self.user.email)
+        self.assertIn(self.user.email, mail.outbox[0].to[0])
         self.assertTrue(self.video.followers.filter(pk=user1.pk).exists())
         
     def test_paste_transcription_windows(self):
@@ -2130,7 +2130,7 @@ class TestTemplateTags(TestCase):
         from apps.videos.templatetags.subtitles_tags import complete_indicator
         # one original  complete
         l = SubtitleLanguage.objects.filter(is_original=True, is_complete=True)[0]
-        self.assertEqual("100 %", complete_indicator(l))
+        self.assertEqual("100%", complete_indicator(l))
         # one original non complete with 0 subs
 
         l = SubtitleLanguage.objects.filter(is_forked=True, is_complete=False)[0]
@@ -2140,7 +2140,7 @@ class TestTemplateTags(TestCase):
         self.assertEqual("2 Lines", complete_indicator(l))
         # one trans non complete
         l = SubtitleLanguage.objects.filter(video__title="b", language='pt')[0]
-        self.assertEqual("60 %", complete_indicator(l))
+        self.assertEqual("60%", complete_indicator(l))
         
 
 def _create_trans( video, latest_version=None, lang_code=None, forked=False):
