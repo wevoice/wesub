@@ -78,19 +78,25 @@ def send_new_message_notification(message_id):
 def team_invitation_sent(invite_pk):
     from messages.models import Message
     from teams.models import Invite, Setting
+    import pdb;pdb.set_trace()
     invite = Invite.objects.get(pk=invite_pk)
     custom_message = get_object_or_none(Setting, team=invite.team,
                                      key=Setting.KEY_IDS['messages_invite'])
-    template_name = 'messages/email/invitation-sent.html'
     
-    context = {'invite': invite, 'custom_message': custom_message}
+    context = {
+        'invite': invite,
+        'custom_message': custom_message,
+        'url_base': get_url_base(),
+    }
     title = ugettext(u"You've been invited to team %s on Universal Subtitles" % invite.team.name)
     if invite.user.notify_by_message:
+        body = render_to_string("messages/team-you-have-been-invited.txt")
         msg = Message()
         msg.subject = title
         msg.user = invite.user
         msg.object = invite
         msg.author = invite.author
+        msg.content = body
         msg.save()
     context = {
         "user":invite.user,
@@ -99,6 +105,7 @@ def team_invitation_sent(invite_pk):
         "invite_pk": invite_pk,
         "note": invite.note,
     }
+    template_name = 'messages/team-you-have-been-invited.html'
     send_templated_email(invite.user, title, template_name, context)
     return True
 
