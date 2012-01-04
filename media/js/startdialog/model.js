@@ -28,6 +28,7 @@ unisubs.startdialog.Model = function(json, opt_langState) {
      * @type {Array.<string>} Array of langauge codes
      */
     this.myLanguages_ = json['my_languages'];
+    this.limitLanguages_ = json['limit_languages'];
     goog.array.removeDuplicates(this.myLanguages_);
     this.myLanguages_ = goog.array.filter(
         this.myLanguages_, function(l) { 
@@ -37,7 +38,7 @@ unisubs.startdialog.Model = function(json, opt_langState) {
     this.videoLanguages_ = new unisubs.startdialog.VideoLanguages(
         json['video_languages']);
     this.toLanguages_ = new unisubs.startdialog.ToLanguages(
-        this.myLanguages_, this.videoLanguages_, 
+        this.myLanguages_, this.videoLanguages_, this.limitLanguages_,
         opt_langState);
     /**
      * @type {?string}

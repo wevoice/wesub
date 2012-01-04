@@ -162,10 +162,15 @@ class Rpc(BaseRpc):
         original_language = None
         if video.subtitle_language():
             original_language = video.subtitle_language().language
+
+        tv = video.get_team_video()
+        writable_langs = list(tv.team.get_writable_langs()) if tv else None
+
         return {
             'my_languages': my_languages,
             'video_languages': video_languages,
-            'original_language': original_language }
+            'original_language': original_language,
+            'limit_languages': writable_langs, }
 
     def fetch_video_id_and_settings(self, request, video_id):
         is_original_language_subtitled = self._subtitle_count(video_id) > 0
