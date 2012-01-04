@@ -982,7 +982,7 @@ def team_tasks(request, slug):
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
     languages = _task_languages(team, request.user)
-    languages = sorted(languages, key=lambda l: l['name']),
+    languages = sorted(languages, key=lambda l: l['name'])
     filters = _get_task_filters(request)
 
     tasks = _tasks_list(request, team, filters, user)
