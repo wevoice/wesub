@@ -303,7 +303,6 @@ class MessageTest(TestCase):
         })
         f.is_valid()
         f.save()
-        return
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertIn(applying_user.email, msg.to[0] )
