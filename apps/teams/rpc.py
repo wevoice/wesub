@@ -69,14 +69,14 @@ class TeamsApiClass(object):
 
         if team.is_open():
             TeamMember(team=team, user=user).save()
-            return Msg(_(u'You are now a member of this team because it is open.'))
+            return Msg(_(u'You are now a member of this team.'))
         elif team.is_by_application():
             application, created = Application.objects.get_or_create(team=team, user=user)
             application.note = msg
             application.save()
             notifier.application_sent.delay(application.pk)
  
-            return Msg(_(u'Application sent success. Wait for answer from team.'))
+            return Msg(_(u'Your application has been submitted. You will be notified of the team administrator\'s response'))
         else:
             return Error(_(u'You can\'t join this team by application.'))
 
