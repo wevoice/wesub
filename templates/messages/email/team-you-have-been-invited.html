@@ -9,7 +9,17 @@ Hi {{ user }},<br/>
 
 <p>{{ inviter }} has invited you to become a {{ role }} for the <a href="{{url_base}}{% url teams:detail slug=team.slug %}">{{ team.name }} team</a> on Universal Subtitles. Lucky you!</p>
 
-<p>{% if note %}{{note}} {% endif %}</p>
+
+    {% if custom_message %}
+        <p>
+            {{ custom_message.data }}
+        </p>
+    {% endif %}
+    {% if invite.note %}
+    <p>
+        {{ invite.note }}
+    </p>
+    {% endif %}
 
 To accept this invitation and join the team:<br/>
 

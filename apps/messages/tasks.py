@@ -79,6 +79,8 @@ def team_invitation_sent(invite_pk):
     from messages.models import Message
     from teams.models import Invite, Setting
     invite = Invite.objects.get(pk=invite_pk)
+    team_default_message = get_object_or_none(Setting, team=invite.team,
+                                     key=Setting.KEY_IDS['messages_invite'])
     context = {
         'invite': invite,
         "user":invite.user,
@@ -86,6 +88,7 @@ def team_invitation_sent(invite_pk):
         "team": invite.team,
         "invite_pk": invite_pk,
         'note': invite.note,
+        'team_default_message': team_default_message,
         'url_base': get_url_base(),
     }
     title = ugettext(u"You've been invited to team %s on Universal Subtitles" % invite.team.name)
@@ -99,13 +102,7 @@ def team_invitation_sent(invite_pk):
         msg.content = body
         msg.save()
     template_name = 'messages/email/team-you-have-been-invited.html'
-    custom_message = get_object_or_none(Setting, team=invite.team,
-                                     key=Setting.KEY_IDS['messages_invite'])
-    note = render_to_string('teams/_invite_message.html',
-                                {'invite': invite, 'custom_message': custom_message})
-    context.update({"note":note})
-    send_templated_email(invite.user, title, template_name, context)
-    return True
+    return send_templated_email(invite.user, title, template_name, context)
 
 @task()
 def application_sent(application_pk):
