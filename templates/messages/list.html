@@ -91,8 +91,8 @@
                 $('#msg_modal').mod();
             };
             
-            $('.mark-read').bind('click', function(event, link){
-                var $link = $(link);
+            $('.mark-read').bind('click', function(event){
+                var $link = $(this);
                 var data = $link.metadata();
                 
                 if (!data['is-read']){
@@ -100,14 +100,18 @@
                         if (response.error){
                             $.jGrowl.error(response.error);
                         } else {
-                            $link.parents('li').removeClass('unread');
+                            $li = $link.parents('li.message');
+                            $li.removeClass('unread');
+                            $li.find('span.unread').remove();
                             data['is-read'] = true;
-                            $link.set_metadata(data);
+                            $link.parent().remove();
                         }
                     });
                 };
                 
-                set_message_data(data, $modal);
+                set_message_data(data, $('#msg_modal'));
+
+                return false;
             });
         });
     </script>
