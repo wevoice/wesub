@@ -369,7 +369,7 @@ JS_BASE_DEPENDENCIES = [
 ]
 
 JS_MODERATION_DASHBOARD =  [
-    "js/jquery-1.7.1.js",
+    "js/jquery-1.4.3.js",
     "js/jquery-ui-1.8.16.custom.min.js",
     "js/jgrowl/jquery.jgrowl.js",
     "js/jalerts/jquery.alerts.js",
@@ -780,7 +780,7 @@ MEDIA_BUNDLES = {
         "type":"js",
         "optimizations": "WHITESPACE_ONLY",
         "files":[
-              "js/jquery-1.7.1.js",
+              "js/jquery-1.4.3.js",
               "js/jquery-ui-1.8.16.custom.min.js",
               "js/jgrowl/jquery.jgrowl.js",
               "js/jalerts/jquery.alerts.js",
