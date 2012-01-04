@@ -76,8 +76,6 @@ def send_new_message_notification(message_id):
 
 @task()
 def team_invitation_sent(invite_pk):
-    if getattr(settings, "MESSAGES_DISABLED", False):
-        return
     from messages.models import Message
     from teams.models import Invite, Setting
     invite = Invite.objects.get(pk=invite_pk)
@@ -272,16 +270,24 @@ def email_confirmed(user_pk):
     from messages.models import Message
     user = User.objects.get(pk=user_pk)
     subject = "Welcome aboard!"
-    template_name = "messages/email/email_confirmed.html"
     context = {"user":user}
-    body = render_to_string(template_name, context)
-    message  = Message(
-        user=user,
-        subject=subject,
-        content=body
-    )
-    message.save()
+    if user.notify_by_message:
+        body = render_to_string("messages/email-confirmed.txt", context)
+        message  = Message(
+            user=user,
+            subject=subject,
+            content=body
+        )
+        message.save()
+    template_name = "messages/email/email-confirmed.html"
     send_templated_email(user, subject, template_name, context )
     return True
 
-
+@task()
+def team_task_assigned(task_pk):
+    from teams.models import Team, TeamMember, Task
+    try:
+        task = Task.objects.get(pk=task_pk)
+    except Task.DoesNotExist:
+        return False
+    subject = ugettext(u"")
