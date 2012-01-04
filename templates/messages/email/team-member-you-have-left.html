@@ -1,15 +1,14 @@
 {% extends "videos/email_base.html" %}
 {% comment %}
-This gets sent to the rest of the team, notifying about the new member
+This is sent to the team member who has left the team
 {% endcomment %}
 {% load i18n localeurl_tags %}
 
 {% block content %}
 
-Hi {{ user }},
+Hi {{ user }},<br/>
 
-You have officially left the {{ team.name }} team. Any team tasks that were assigned to you have been unassigned.
-
+You have officially left the {{ team.name }} team. Any team tasks that were assigned to you have been unassigned.</br?
 
 {% endblock %}
 {% block dont_send %}{% endblock %}

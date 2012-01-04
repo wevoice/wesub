@@ -866,14 +866,7 @@ class TeamMember(models.Model):
         return self._cached_narrowings
 
 
-    @classmethod
-    def on_member_saved(self, sender, instance, created, *args, **kwargs):
-        if created:
-            notifier.team_member_new.delay(instance.pk)
 
-    @classmethod
-    def on_member_deleted(self, sender, instance, *args, **kwargs):
-        notifier.team_member_leave.delay(instance.team.pk, instance.user.pk)
 
     class Meta:
         unique_together = (('team', 'user'),)
@@ -883,9 +876,7 @@ def clear_tasks(sender, instance, *args, **kwargs):
     tasks = instance.team.task_set.incomplete().filter(assignee=instance.user)
     tasks.update(assignee=None)
 
-post_save.connect(TeamMember.on_member_saved, TeamMember)
 pre_delete.connect(clear_tasks, TeamMember, dispatch_uid='teams.members.clear-tasks-on-delete')
-post_delete.connect(TeamMember.on_member_deleted, TeamMember)
 
 
 class MembershipNarrowing(models.Model):
@@ -942,7 +933,8 @@ class Invite(models.Model):
         unique_together = (('team', 'user'),)
 
     def accept(self):
-        TeamMember.objects.get_or_create(team=self.team, user=self.user, role=self.role)
+        member, created = TeamMember.objects.get_or_create(team=self.team, user=self.user, role=self.role)
+        notifier.team_member_new.delay(member.pk)
         self.delete()
 
     def deny(self):

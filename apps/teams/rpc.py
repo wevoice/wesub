@@ -165,6 +165,9 @@ class TeamsApiV2Class(object):
     def save_role(self, team_slug, member_pk, role, projects, languages, user=None):
         team = Team.objects.get(slug=team_slug)
         member = team.members.get(pk=member_pk)
+
+        if role == 'admin':
+            languages = None
         
         projects = map(int, projects or [])
         res = save_role(team, member, role, projects, languages, user)

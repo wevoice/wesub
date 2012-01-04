@@ -119,6 +119,7 @@ ALL_LANGUAGES['kk'] = gettext_noop(u'Kazakh')
 ALL_LANGUAGES['ka'] = gettext_noop(u'Georgian')
 
 ALL_LANGUAGES['ilo'] = gettext_noop(u'Ilocano')
+ALL_LANGUAGES['iro'] = gettext_noop(u'Iroquoian languages')
 ALL_LANGUAGES['ceb'] = gettext_noop(u'Cebuan')
 
 ALL_LANGUAGES['es-ar'] = gettext_noop(u'Spanish, Argentinian')
@@ -129,8 +130,8 @@ ALL_LANGUAGES['zh-tw'] = gettext_noop(u'Chinese, Traditional')
 ALL_LANGUAGES['eo'] = gettext_noop(u'Esperanto')
 ALL_LANGUAGES['es-mx'] = gettext_noop(u'Spanish, Mexican')
 ALL_LANGUAGES['es-ni'] = gettext_noop(u'Spanish, Nicaraguan')
-ALL_LANGUAGES['nb'] = gettext_noop(u'Bokmal, Norwegian')
-ALL_LANGUAGES['nn'] = gettext_noop(u'Nynorsk, Norwegian')
+ALL_LANGUAGES['nb'] = gettext_noop(u'Norwegian, Bokmal')
+ALL_LANGUAGES['nn'] = gettext_noop(u'Norwegian, Nynorsk')
 
 del ALL_LANGUAGES['no']
 full_langs = dict(ALL_LANGUAGES.items())
@@ -368,7 +369,7 @@ JS_BASE_DEPENDENCIES = [
 ]
 
 JS_MODERATION_DASHBOARD =  [
-    "js/jquery-1.7.1.js",
+    "js/jquery-1.4.3.js",
     "js/jquery-ui-1.8.16.custom.min.js",
     "js/jgrowl/jquery.jgrowl.js",
     "js/jalerts/jquery.alerts.js",
@@ -779,7 +780,7 @@ MEDIA_BUNDLES = {
         "type":"js",
         "optimizations": "WHITESPACE_ONLY",
         "files":[
-              "js/jquery-1.7.1.js",
+              "js/jquery-1.4.3.js",
               "js/jquery-ui-1.8.16.custom.min.js",
               "js/jgrowl/jquery.jgrowl.js",
               "js/jalerts/jquery.alerts.js",

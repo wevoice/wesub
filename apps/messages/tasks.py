@@ -41,7 +41,7 @@ from utils import send_templated_email
 from utils import get_object_or_none
 
 def get_url_base():
-    url_base = "http://" + Site.objects.get_current().domain
+    return "http://" + Site.objects.get_current().domain
         
 @task()
 def send_new_message_notification(message_id):
@@ -76,33 +76,33 @@ def send_new_message_notification(message_id):
 
 @task()
 def team_invitation_sent(invite_pk):
-    if getattr(settings, "MESSAGES_DISABLED", False):
-        return
     from messages.models import Message
     from teams.models import Invite, Setting
     invite = Invite.objects.get(pk=invite_pk)
-    custom_message = get_object_or_none(Setting, team=invite.team,
+    team_default_message = get_object_or_none(Setting, team=invite.team,
                                      key=Setting.KEY_IDS['messages_invite'])
-    template_name = 'messages/email/invitation-sent.html'
-    
-    context = {'invite': invite, 'custom_message': custom_message}
+    context = {
+        'invite': invite,
+        "user":invite.user,
+        "inviter":invite.author,
+        "team": invite.team,
+        "invite_pk": invite_pk,
+        'note': invite.note,
+        'team_default_message': team_default_message,
+        'url_base': get_url_base(),
+    }
     title = ugettext(u"You've been invited to team %s on Universal Subtitles" % invite.team.name)
     if invite.user.notify_by_message:
+        body = render_to_string("messages/team-you-have-been-invited.txt", context)
         msg = Message()
         msg.subject = title
         msg.user = invite.user
         msg.object = invite
         msg.author = invite.author
+        msg.content = body
         msg.save()
-    context = {
-        "user":invite.user,
-        "inviter":invite.author,
-        "team": invite.team,
-        "invite_pk": invite_pk,
-        "note": invite.note,
-    }
-    send_templated_email(invite.user, title, template_name, context)
-    return True
+    template_name = 'messages/email/team-you-have-been-invited.html'
+    return send_templated_email(invite.user, title, template_name, context)
 
 @task()
 def application_sent(application_pk):
@@ -134,6 +134,7 @@ def application_sent(application_pk):
             msg.author = application.user
             msg.save()
         send_templated_email(m.user, subject, "messages/email/application-sent-email.html", context)
+    return True
         
 
 @task()
@@ -179,22 +180,24 @@ def team_member_new(member_pk):
     notifiable = TeamMember.objects.filter( team=member.team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER]).exclude(pk=member.pk)
     for m in notifiable:
-        template_name = "messages/email/team-new-member.html"
         context = {
             "new_member": member.user,
             "team":member.team,
             "user":m.user,
-            "role":member.role
+            "role":member.role,
+            "url_base":get_url_base(),
         }
-        body = render_to_string(template_name,context) 
- 
-        msg = Message()
-        msg.subject = ugettext("%s team has a new member" % (member.team))
-        msg.content = body
-        msg.user = m.user
-        msg.object = m.team
-        msg.save()
-        send_templated_email(msg.user, msg.subject, template_name, context)
+        body = render_to_string("messages/team-new-member.txt",context) 
+        subject = ugettext("%s team has a new member" % (member.team))
+        if m.user.notify_by_message:
+            msg = Message()
+            msg.subject = subject
+            msg.content = body
+            msg.user = m.user
+            msg.object = m.team
+            msg.save()
+        template_name = "messages/email/team-new-member.html"
+        send_templated_email(m.user, subject, template_name, context)
 
         
     # now send welcome mail to the new member
@@ -229,55 +232,65 @@ def team_member_leave(team_pk, user_pk):
     # notify  admins and owners through messages
     notifiable = TeamMember.objects.filter( team=team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    subject = ugettext(u"%s has left the %s team" % (user, team))
     for m in notifiable:
-        template_name = "messages/email/team-member-left.html"
         context = {
             "parting_user": user,
             "team":team,
             "user":m.user,
+            "url_base":get_url_base(),
         }
-        body = render_to_string(template_name,context) 
- 
-        msg = Message()
-        msg.subject = ugettext(u"%s has left the %s team" % (user, team))
-        msg.content = body
-        msg.user = user
-        msg.object = team
-        msg.save()
-        send_templated_email(msg.user, msg.subject, template_name, context)
+        body = render_to_string("messages/team-member-left.txt",context) 
+        if m.user.notify_by_message:
+            msg = Message()
+            msg.subject = subject
+            msg.content = body
+            msg.user = m.user
+            msg.object = team
+            msg.save()
+        send_templated_email(m.user, subject, "messages/email/team-member-left.html", context)
 
         
-    # now send welcome mail to the new member
-    template_name = "messages/email/team-member-you-have-left.html"
     context = {
         "team":team,
         "user":user,
+        "url_base":get_url_base(),
     }
-    body = render_to_string(template_name,context) 
-
-    msg = Message()
-    msg.subject = ugettext("You've left the %s team!" % (team))
-    msg.content = body
-    msg.user = user
-    msg.object = team
-    msg.save()
-    send_templated_email(msg.user, msg.subject, template_name, context)
+    subject = ugettext("You've left the %s team!" % (team))
+    if user.notify_by_message:
+        template_name = "messages/team-member-you-have-left.txt"
+        msg = Message()
+        msg.subject = subject
+        msg.content = render_to_string(template_name,context)
+        msg.user = user
+        msg.object = team
+        msg.save()
+    template_name = "messages/email/team-member-you-have-left.html"
+    send_templated_email(user, subject, template_name, context)
     
 @task()
 def email_confirmed(user_pk):
     from messages.models import Message
     user = User.objects.get(pk=user_pk)
     subject = "Welcome aboard!"
-    template_name = "messages/email/email_confirmed.html"
     context = {"user":user}
-    body = render_to_string(template_name, context)
-    message  = Message(
-        user=user,
-        subject=subject,
-        content=body
-    )
-    message.save()
+    if user.notify_by_message:
+        body = render_to_string("messages/email-confirmed.txt", context)
+        message  = Message(
+            user=user,
+            subject=subject,
+            content=body
+        )
+        message.save()
+    template_name = "messages/email/email-confirmed.html"
     send_templated_email(user, subject, template_name, context )
     return True
 
-
+@task()
+def team_task_assigned(task_pk):
+    from teams.models import Team, TeamMember, Task
+    try:
+        task = Task.objects.get(pk=task_pk)
+    except Task.DoesNotExist:
+        return False
+    subject = ugettext(u"")

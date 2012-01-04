@@ -27,10 +27,13 @@
                         if (response.error){
                             $.jGrowl.error(response.error);
                         } else {
-                            $this.parents('tr').remove();
+                            $this.parents('li.message').fadeOut('fast', function() {
+                                $(this).remove();
+                            });
                         };
                     });
                 }
+                return false;
             });
             
             $('#send-message-form').ajaxForm({
@@ -88,8 +91,8 @@
                 $('#msg_modal').mod();
             };
             
-            $('.mark-read').bind('click', function(event, link){
-                var $link = $(link);
+            $('.mark-read').bind('click', function(event){
+                var $link = $(this);
                 var data = $link.metadata();
                 
                 if (!data['is-read']){
@@ -97,14 +100,18 @@
                         if (response.error){
                             $.jGrowl.error(response.error);
                         } else {
-                            $link.parents('li').removeClass('unread');
+                            $li = $link.parents('li.message');
+                            $li.removeClass('unread');
+                            $li.find('span.unread').remove();
                             data['is-read'] = true;
-                            $link.set_metadata(data);
+                            $link.parent().remove();
                         }
                     });
                 };
                 
-                set_message_data(data, $modal);
+                set_message_data(data, $('#msg_modal'));
+
+                return false;
             });
         });
     </script>
@@ -129,8 +136,11 @@
         {% if is_paginated %}{% paginator %}{% endif %}
         
         <ul class="listing messages">
+            <p class="active-filters">
+                You <strong>are {% if not user_info.notify_by_email %}not {% endif %}receiving</strong> message notifications via email. <a href="{% url profiles:edit %}">Edit preferences</a>.
+            </p>
             {% for msg in message_list %}
-                <li{% if not msg.read %} class="unread"{% endif %}>
+                <li class="message {% if not msg.read %}unread{% endif %}">
                     <h3>
                         {{ msg }}
                     </h3>
@@ -150,7 +160,7 @@
                             {% endif %}
                         {% endwith %}
                     </a>
-                    <span class="timestamp">{{ msg.created|timesince }} {% trans 'ago' %}</span>
+                    <span class="timestamp">{% if not msg.read %}<span class="unread">Unread</span>{% endif %}{{ msg.created|timesince }} {% trans 'ago' %}</span>
                     <ul class="admin-controls">
                         {% if not msg.read %}
                         <li>

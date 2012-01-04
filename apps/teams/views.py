@@ -62,6 +62,9 @@ from teams.permissions import (
     can_rename_team, can_change_team_settings, can_perform_task_for
 )
 from teams.tasks import invalidate_video_caches
+import logging
+import sentry_logger
+logger = logging.getLogger("teams.views")
 
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
@@ -251,8 +254,7 @@ def completed_videos(request, slug):
 
 def videos_actions(request, slug):
     team = Team.get(slug, request.user)
-    videos_ids = team.teamvideo_set.values_list('video__id', flat=True)
-    qs = Action.objects.filter(video__pk__in=videos_ids)
+    qs = Action.objects.for_team(team)
     extra_context = {
         'team': team
     }
@@ -772,9 +774,10 @@ def join_team(request, slug):
     if not can_join_team(team, user):
         messages.error(request, _(u'You cannot join this team.'))
     else:
-        TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR).save()
+        member = TeamMember(team=team, user=user, role=TeamMember.ROLE_CONTRIBUTOR)
+        member.save()
         messages.success(request, _(u'You are now a member of this team.'))
-
+        notifier.team_member_new.delay(member.pk)
     return redirect(team)
 
 def _check_can_leave(team, user):
@@ -901,8 +904,18 @@ def _task_languages(team, user):
     # TODO: Handle the team language setting here once team settings are
     # implemented.
     languages = list(set(languages))
-
-    return [{'code': l, 'name': SUPPORTED_LANGUAGES_DICT[l]} for l in languages]
+    lang_data = []
+    for l in languages:
+        if SUPPORTED_LANGUAGES_DICT.get(l, False):
+            lang_data.append({'code': l, 'name': SUPPORTED_LANGUAGES_DICT[l]} )
+        else:
+            logger.error("Failed to find language code for task", extra={
+                "data": {
+                    "language_code":l,
+                    "supported": SUPPORTED_LANGUAGES_DICT
+                }
+            })
+    return lang_data
 
 def _task_category_counts(team, filters, user):
     tasks = team.task_set.incomplete()
@@ -982,7 +995,7 @@ def team_tasks(request, slug):
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
     languages = _task_languages(team, request.user)
-    languages = sorted(languages, key=lambda l: l['name']),
+    languages = sorted(languages, key=lambda l: l['name'])
     filters = _get_task_filters(request)
 
     tasks = _tasks_list(request, team, filters, user)

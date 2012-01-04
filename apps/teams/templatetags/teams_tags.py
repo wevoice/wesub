@@ -19,6 +19,7 @@
 from django import template
 from teams.models import Team, TeamVideo, Project, TeamMember, Workflow
 from django.db.models import Count
+from django.db.models import Q
 from videos.models import Action, Video
 from apps.widget import video_cache
 from django.conf import settings
@@ -111,9 +112,7 @@ def team_select(context, team):
 
 @register.inclusion_tag('teams/_team_activity.html', takes_context=True)
 def team_activity(context, team):
-    videos_ids = team.teamvideo_set.values_list('video_id', flat=True)
-    action_qs = Action.objects.select_related('video', 'user', 'language', 'language__video').filter(video__pk__in=videos_ids)[:ACTIONS_ON_PAGE]
-
+    action_qs = Action.objects.for_team(team)[:ACTIONS_ON_PAGE]
     context['videos_actions'] = action_qs
 
     return context
