@@ -78,7 +78,6 @@ def send_new_message_notification(message_id):
 def team_invitation_sent(invite_pk):
     from messages.models import Message
     from teams.models import Invite, Setting
-    import pdb;pdb.set_trace()
     invite = Invite.objects.get(pk=invite_pk)
     custom_message = get_object_or_none(Setting, team=invite.team,
                                      key=Setting.KEY_IDS['messages_invite'])
