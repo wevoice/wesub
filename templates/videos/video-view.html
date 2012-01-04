@@ -24,7 +24,7 @@
         jQuery(document).ready( function($) {
             $('.tabs').tabs();
 
-            $('#add_subtitles').click( function() {
+            $('.add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
                 return false;
@@ -137,7 +137,7 @@
             </div>
         </div>
         {% else %}
-            <p>{% trans "Be the first to " %}<a href="#" id="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+            <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
         {% endif %}
     </div>
     <div class="grid_8 view omega">
@@ -157,7 +157,7 @@
                     <h3>{% trans "Contribute" %}</h3>
                     <p>
                         {% if not video.subtitle_language %}
-                            {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" id="add_subtitles">{% trans 'Create subtitles now' %}</a>!</li>
+                            {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!</li>
                         {% else %}
                             {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!</li>
                         {% endif %}
