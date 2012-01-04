@@ -47,7 +47,7 @@ class MessageTest(TestCase):
         self.message.save()
 
     def _send_email(self, to_user):
-        send_templated_email(to_user, "test email", "messages/email/email_confirmed.html", {})
+        send_templated_email(to_user, "test email", "messages/email/email-confirmed.html", {})
 
     def test_send_email_to_allowed_user(self):
         self.user.notify_by_email = True
