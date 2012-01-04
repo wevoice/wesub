@@ -129,8 +129,8 @@ ALL_LANGUAGES['zh-tw'] = gettext_noop(u'Chinese, Traditional')
 ALL_LANGUAGES['eo'] = gettext_noop(u'Esperanto')
 ALL_LANGUAGES['es-mx'] = gettext_noop(u'Spanish, Mexican')
 ALL_LANGUAGES['es-ni'] = gettext_noop(u'Spanish, Nicaraguan')
-ALL_LANGUAGES['nb'] = gettext_noop(u'Bokmal, Norwegian')
-ALL_LANGUAGES['nn'] = gettext_noop(u'Nynorsk, Norwegian')
+ALL_LANGUAGES['nb'] = gettext_noop(u'Norwegian, Bokmal')
+ALL_LANGUAGES['nn'] = gettext_noop(u'Norwegian, Nynorsk')
 
 del ALL_LANGUAGES['no']
 full_langs = dict(ALL_LANGUAGES.items())
