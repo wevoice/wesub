@@ -866,9 +866,6 @@ class TeamMember(models.Model):
 
 
 
-    @classmethod
-    def on_member_deleted(self, sender, instance, *args, **kwargs):
-        notifier.team_member_leave.delay(instance.team.pk, instance.user.pk)
 
     class Meta:
         unique_together = (('team', 'user'),)
@@ -879,7 +876,6 @@ def clear_tasks(sender, instance, *args, **kwargs):
     tasks.update(assignee=None)
 
 pre_delete.connect(clear_tasks, TeamMember, dispatch_uid='teams.members.clear-tasks-on-delete')
-post_delete.connect(TeamMember.on_member_deleted, TeamMember)
 
 
 class MembershipNarrowing(models.Model):

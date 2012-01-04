@@ -231,39 +231,41 @@ def team_member_leave(team_pk, user_pk):
     # notify  admins and owners through messages
     notifiable = TeamMember.objects.filter( team=team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
+    subject = ugettext(u"%s has left the %s team" % (user, team))
     for m in notifiable:
-        template_name = "messages/email/team-member-left.html"
         context = {
             "parting_user": user,
             "team":team,
             "user":m.user,
+            "url_base":get_url_base(),
         }
-        body = render_to_string(template_name,context) 
- 
-        msg = Message()
-        msg.subject = ugettext(u"%s has left the %s team" % (user, team))
-        msg.content = body
-        msg.user = user
-        msg.object = team
-        msg.save()
-        send_templated_email(msg.user, msg.subject, template_name, context)
+        body = render_to_string("messages/team-member-left.txt",context) 
+        if m.user.notify_by_message:
+            msg = Message()
+            msg.subject = subject
+            msg.content = body
+            msg.user = m.user
+            msg.object = team
+            msg.save()
+        send_templated_email(m.user, subject, "messages/email/team-member-left.html", context)
 
         
-    # now send welcome mail to the new member
-    template_name = "messages/email/team-member-you-have-left.html"
     context = {
         "team":team,
         "user":user,
+        "url_base":get_url_base(),
     }
-    body = render_to_string(template_name,context) 
-
-    msg = Message()
-    msg.subject = ugettext("You've left the %s team!" % (team))
-    msg.content = body
-    msg.user = user
-    msg.object = team
-    msg.save()
-    send_templated_email(msg.user, msg.subject, template_name, context)
+    subject = ugettext("You've left the %s team!" % (team))
+    if user.notify_by_message:
+        template_name = "messages/team-member-you-have-left.txt"
+        msg = Message()
+        msg.subject = subject
+        msg.content = render_to_string(template_name,context)
+        msg.user = user
+        msg.object = team
+        msg.save()
+    template_name = "messages/email/team-member-you-have-left.html"
+    send_templated_email(user, subject, template_name, context)
     
 @task()
 def email_confirmed(user_pk):
