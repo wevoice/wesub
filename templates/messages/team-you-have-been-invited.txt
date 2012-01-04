@@ -12,11 +12,10 @@ Hi {{ user }},
 {{note}}
 
 To accept this invitation and join the team:
-
-<a href="{{url_base}}{% url teams:accept_invite invite_pk=invite_pk %}">{% trans 'Join' %}</a>
+{{url_base}}{% url teams:accept_invite invite_pk=invite_pk %}
 
 To decline this invitation :
-<a href="{{url_base}}{% url teams:deny_invite invite_pk=invite_pk %}">{% trans 'Reject' %}</a>
+{{url_base}}{% url teams:deny_invite invite_pk=invite_pk %}
 
 {% endblock %}
 {% block dont_send %}{% endblock %}
