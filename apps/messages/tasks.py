@@ -26,7 +26,7 @@ Messages models will trigger an email to be sent if
 the user has allowed email notifications
 """
 import datetime
-
+import urllib
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -315,6 +315,7 @@ def team_task_assigned(task_pk):
     msg = None
     if user.notify_by_message:
         template_name = "messages/team-task-assigned.txt"
+        context["perform_url"] = urllib.unquote(context["perform_url"])
         msg = Message()
         msg.subject = subject
         msg.content = render_to_string(template_name,context)
