@@ -163,7 +163,7 @@ def send_templated_email(to, subject, body_template, body_dict,
             oboe.Context.log('email', 'info', backtrace=False,**{"template":body_template})
         except Exception, e:
             print >> sys.stderr, "Oboe error: %s" % e
-    email.send(fail_silently)
+    return email.send(fail_silently)
 
 from sentry.client.models import client
 

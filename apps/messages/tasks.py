@@ -29,6 +29,7 @@ import datetime
 
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.template.loader import render_to_string
 
@@ -39,6 +40,7 @@ from auth.models import CustomUser as User
 
 from utils import send_templated_email
 from utils import get_object_or_none
+from utils.translation import SUPPORTED_LANGUAGES_DICT
 
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
@@ -288,9 +290,40 @@ def email_confirmed(user_pk):
 
 @task()
 def team_task_assigned(task_pk):
-    from teams.models import Team, TeamMember, Task
+    from teams.models import Task
+    from messages.models import Message
     try:
-        task = Task.objects.get(pk=task_pk)
+        task = Task.objects.select_related("team_video__video", "team_video", "assignee").get(pk=task_pk, assignee__isnull=False)
     except Task.DoesNotExist:
         return False
-    subject = ugettext(u"")
+    task_type = Task.TYPE_NAMES[task.type]
+    subject = ugettext(u"You have a new task assignment on Universal Subtitles!")
+    perform_url = task.get_perform_url()
+    user = task.assignee
+    task_language  = None
+    if task.language:
+        task_language = SUPPORTED_LANGUAGES_DICT[task.language]
+    context = {
+        "team":task.team,
+        "user":user,
+        "task_type": task_type,
+        "task_language": task_language,
+        "url_base":get_url_base(),
+        "perform_url":perform_url,
+        "task":task,
+    }
+    msg = None
+    if user.notify_by_message:
+        template_name = "messages/team-task-assigned.txt"
+        msg = Message()
+        msg.subject = subject
+        msg.content = render_to_string(template_name,context)
+        msg.user = user
+        msg.object = task.team
+        msg.save()
+        
+    template_name = "messages/email/team-task-assigned.html"
+    email_res =  send_templated_email(user, subject, template_name, context)
+    return msg, email_res
+        
+    
