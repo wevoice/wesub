@@ -4,10 +4,11 @@
 
 {% block content %}
 
-Hi {{ user }},
+Hi {{ user }},<br/>
 
 Your application to join the {{ team.name }} team has been declined. The team’s administrators have included the following message:
-
+<p>
 {{ note }}
+</p>
 {% endblock %}
 {% block dont_send %}{% endblock %}
