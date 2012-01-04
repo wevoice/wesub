@@ -63,6 +63,9 @@ from teams.permissions import (
 )
 from teams.tasks import invalidate_video_caches
 
+import sentry_logger
+logger = logging.getLogger("teams.views")
+
 
 TASKS_ON_PAGE = getattr(settings, 'TASKS_ON_PAGE', 20)
 TEAMS_ON_PAGE = getattr(settings, 'TEAMS_ON_PAGE', 10)
@@ -901,8 +904,18 @@ def _task_languages(team, user):
     # TODO: Handle the team language setting here once team settings are
     # implemented.
     languages = list(set(languages))
-
-    return [{'code': l, 'name': SUPPORTED_LANGUAGES_DICT[l]} for l in languages]
+    lang_data = []
+    for l in languages:
+        if SUPPORTED_LANGUAGES_DICT.get(l, False):
+            lang_data.append({'code': l, 'name': SUPPORTED_LANGUAGES_DICT[l]} )
+        else:
+            logger.error("Failed to find language code for task", extra={
+                "data": {
+                    "language_code":l,
+                    "supported": SUPPORTED_LANGUAGES_DICT
+                }
+            })
+    return lang_data
 
 def _task_category_counts(team, filters, user):
     tasks = team.task_set.incomplete()

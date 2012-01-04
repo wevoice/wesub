@@ -119,6 +119,7 @@ ALL_LANGUAGES['kk'] = gettext_noop(u'Kazakh')
 ALL_LANGUAGES['ka'] = gettext_noop(u'Georgian')
 
 ALL_LANGUAGES['ilo'] = gettext_noop(u'Ilocano')
+ALL_LANGUAGES['iro'] = gettext_noop(u'Iroquoian languages')
 ALL_LANGUAGES['ceb'] = gettext_noop(u'Cebuan')
 
 ALL_LANGUAGES['es-ar'] = gettext_noop(u'Spanish, Argentinian')
