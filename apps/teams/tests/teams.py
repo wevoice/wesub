@@ -758,8 +758,8 @@ class TeamsTest(TestCase):
         response = self.client.post(invite_url, data, follow=True)
         self.failUnlessEqual(response.status_code, 200)
 
-        #self.assertEqual(user_mail_box_count + 1,
-        #                 Message.objects.unread().filter(user=user2).count())
+        self.assertEqual(user_mail_box_count + 1,
+                         Message.objects.unread().filter(user=user2).count())
 
 
         invite = Invite.objects.get(user__username=user2.username, team=team)

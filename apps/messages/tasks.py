@@ -84,12 +84,16 @@ def team_invitation_sent(invite_pk):
     
     context = {
         'invite': invite,
-        'custom_message': custom_message,
+        "user":invite.user,
+        "inviter":invite.author,
+        "team": invite.team,
+        "invite_pk": invite_pk,
+        'note': custom_message,
         'url_base': get_url_base(),
     }
     title = ugettext(u"You've been invited to team %s on Universal Subtitles" % invite.team.name)
     if invite.user.notify_by_message:
-        body = render_to_string("messages/team-you-have-been-invited.txt")
+        body = render_to_string("messages/team-you-have-been-invited.txt", context)
         msg = Message()
         msg.subject = title
         msg.user = invite.user
@@ -97,14 +101,7 @@ def team_invitation_sent(invite_pk):
         msg.author = invite.author
         msg.content = body
         msg.save()
-    context = {
-        "user":invite.user,
-        "inviter":invite.author,
-        "team": invite.team,
-        "invite_pk": invite_pk,
-        "note": invite.note,
-    }
-    template_name = 'messages/team-you-have-been-invited.html'
+    template_name = 'messages/email/team-you-have-been-invited.html'
     send_templated_email(invite.user, title, template_name, context)
     return True
 
@@ -138,6 +135,7 @@ def application_sent(application_pk):
             msg.author = application.user
             msg.save()
         send_templated_email(m.user, subject, "messages/email/application-sent-email.html", context)
+    return True
         
 
 @task()
