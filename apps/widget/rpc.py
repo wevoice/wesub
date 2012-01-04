@@ -222,7 +222,8 @@ class Rpc(BaseRpc):
                       language_code, 
                       subtitle_language_pk=None,
                       base_language_pk=None,
-                      original_language_code=None):
+                      original_language_code=None,
+                      mode=None):
         """Called by subtitling widget when subtitling or translation 
         is to commence on a video.
         """
@@ -245,7 +246,10 @@ class Rpc(BaseRpc):
 
         session = self._make_subtitling_session(
             request, language, base_language)
-        version_for_subs = language.version()
+        if mode in ('review', 'approve'):
+            version_for_subs = language.version(public_only=False)
+        else:
+            version_for_subs = language.version()
         if not version_for_subs:
             version_for_subs = self._create_version_from_session(session)
             version_no = 0

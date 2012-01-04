@@ -39,6 +39,7 @@ import datetime
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
+import apps.teams.moderation_const as MODERATION
 from apps.comments.models import Comment
 from apps.teams.moderation_const import WAITING_MODERATION
 from teams.permissions_const import TEAM_PERMISSIONS, PROJECT_PERMISSIONS, \
@@ -691,6 +692,7 @@ post_save.connect(team_video_save, TeamVideo, dispatch_uid="teams.teamvideo.team
 post_save.connect(team_video_autocreate_task, TeamVideo, dispatch_uid='teams.teamvideo.team_video_autocreate_task')
 post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.team_video_delete")
 
+
 class TeamVideoLanguage(models.Model):
     team_video = models.ForeignKey(TeamVideo, related_name='languages')
     video = models.ForeignKey(Video)
@@ -789,7 +791,6 @@ class TeamVideoLanguage(models.Model):
 
     class Meta:
         permissions = LANG_PERMISSIONS
-
 
 
 class TeamVideoLanguagePair(models.Model):
@@ -928,7 +929,7 @@ class Application(models.Model):
         notifier.team_application_denied.delay(self.pk)
 
 
-
+# Invites
 class Invite(models.Model):
     team = models.ForeignKey(Team, related_name='invitations')
     user = models.ForeignKey(User, related_name='team_invitations')
@@ -955,6 +956,7 @@ class Invite(models.Model):
 models.signals.pre_delete.connect(Message.on_delete, Invite)
 
 
+# Workflows
 class Workflow(models.Model):
     REVIEW_CHOICES = (
         (00, "Don't require review"),
@@ -1120,6 +1122,7 @@ class Workflow(models.Model):
         return True if self.approve_allowed else False
 
 
+# Tasks
 class TaskManager(models.Manager):
     def not_deleted(self):
         return self.get_query_set().filter(deleted=False)
@@ -1254,6 +1257,26 @@ class Task(models.Model):
         if self.subtitle_version:
             return self.subtitle_version.language.get_widget_url(mode, self.pk)
 
+
+    def _set_version_moderation_status(self):
+        """Set this task's subtitle_version's moderation_status to the appropriate value.
+
+        This assumes that this task is an Approve/Review task, and that the
+        approved field is set to Approved or Rejected.
+
+        """
+        assert self.get_type_display() in ('Approve', 'Review'), \
+               "Tried to set version moderation status from a non-review/approval task."
+
+        assert self.get_approved_display() in ('Approved', 'Rejected'), \
+               "Tried to set version moderation status from an un-ruled-upon task."
+
+        if self.approved == Task.APPROVED_IDS['Approved']:
+            self.subtitle_version.moderation_status = MODERATION.APPROVED
+        else:
+            self.subtitle_version.moderation_status = MODERATION.REJECTED
+        self.subtitle_version.save()
+
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
         self.completed = datetime.datetime.now()
@@ -1321,18 +1344,32 @@ class Task(models.Model):
     def _complete_review(self):
         self._add_comment()
 
-        if self.workflow.approve_enabled and self.approved == Task.APPROVED_IDS['Approved']:
-            task = Task(team=self.team, team_video=self.team_video,
-                        subtitle_version=self.subtitle_version,
-                        language=self.language, type=Task.TYPE_IDS['Approve'])
-            task.save()
+        task = None
+        if self.workflow.approve_enabled:
+            # Approval is enabled, so if the reviewer thought these subtitles
+            # were good we create the next task.
+            if self.approved == Task.APPROVED_IDS['Approved']:
+                task = Task(team=self.team, team_video=self.team_video,
+                            subtitle_version=self.subtitle_version,
+                            language=self.language, type=Task.TYPE_IDS['Approve'])
+                task.save()
+            else:
+                # The reviewer rejected this version, so it should be explicitly
+                # made non-public.
+                self._set_version_moderation_status()
         else:
-            task = None
+            # Approval isn't enabled, so the ruling of this Review task
+            # determines whether the subtitles go public.
+            self._set_version_moderation_status()
 
         return task
 
     def _complete_approve(self):
         self._add_comment()
+
+        # If we manage to get here, the ruling on this Approve task determines
+        # whether the subtitles should go public.
+        self._set_version_moderation_status()
 
 
     def get_perform_url(self):
@@ -1346,6 +1383,21 @@ class Task(models.Model):
         return result
 
 
+def task_moderate_version(sender, instance, created, **kwargs):
+    """If we create a review or approval task for this subtitle_version, mark it.
+
+    It *must* be awaiting moderation if we've just created one of these tasks.
+
+    """
+    if created and instance.subtitle_version:
+        if instance.type in (Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']):
+            instance.subtitle_version.moderation_status = WAITING_MODERATION
+            instance.subtitle_version.save()
+
+post_save.connect(task_moderate_version, Task, dispatch_uid="teams.task.task_moderate_version")
+
+
+# Settings
 class SettingManager(models.Manager):
     use_for_related_fields = True
 
@@ -1397,6 +1449,7 @@ class Setting(models.Model):
         return Setting.KEY_NAMES[self.key]
 
 
+# TeamLanguagePreferences
 class TeamLanguagePreferenceManager(models.Manager):
     def _generate_writable(self, team):
         langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
@@ -1505,6 +1558,7 @@ class TeamLanguagePreference(models.Model):
 post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePreference)
 
 
+# TeamNotificationSettings
 class TeamNotificationSettingManager(models.Manager):
     def notify_team(self, team_pk, video_id, event_name,
                     language_pk=None, version_pk=None):

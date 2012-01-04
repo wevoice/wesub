@@ -51,7 +51,7 @@ from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
 
-from apps.teams. moderation_const import WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED
+from apps.teams.moderation_const import WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED
 
 yt_service = YouTubeService()
 yt_service.ssl = False
@@ -809,9 +809,9 @@ class SubtitleLanguage(models.Model):
         self.writelock_time = None
 
     def _filter_public(self, versions, public_only):
-        from apps.teams.moderation import  APPROVED, UNMODERATED
+        from apps.teams.moderation import APPROVED, UNMODERATED
         if public_only:
-            versions = versions.filter( moderation_status__in=[APPROVED, UNMODERATED])
+            versions = versions.filter(moderation_status__in=[APPROVED, UNMODERATED])
         return versions
 
     def version(self, version_no=None, public_only=True):
@@ -921,7 +921,7 @@ class SubtitleCollection(models.Model):
     is_forked=models.BooleanField(default=False)
     # should not be changed directly, but using teams.moderation. as those will take care
     # of keeping the state constant and also updating metadata when needed
-    moderation_status = models.CharField(max_length=32, choices=MODERATION_STATUSES ,
+    moderation_status = models.CharField(max_length=32, choices=MODERATION_STATUSES,
                                          default=UNMODERATED, db_index=True)
 
     class Meta:

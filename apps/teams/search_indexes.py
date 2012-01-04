@@ -97,8 +97,10 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['project_name'] = obj.project.name
         self.prepared_data['project_slug'] = obj.project.slug
         self.prepared_data['team_video_create_date'] = obj.created
+
         completed_sls = obj.video.completed_subtitle_languages()
         self.prepared_data['num_completed_subs'] = len(completed_sls)
+
         self.prepared_data['video_completed_langs'] = \
             [sl.language for sl in completed_sls]
         self.prepared_data['video_completed_lang_urls'] = \
