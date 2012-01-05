@@ -5,5 +5,5 @@ Hi {{ user }},
 
 {{ note }}
 
-Aprove : {{url_base}}{% url teams:approve_application slug=team.slug,user_pk=applicant.pk %} or 
+Approve : {{url_base}}{% url teams:approve_application slug=team.slug,user_pk=applicant.pk %} or 
 Decline: {{url_base}}{% url teams:deny_application slug=team.slug,user_pk=applicant.pk %} this request
