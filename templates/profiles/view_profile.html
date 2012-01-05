@@ -44,7 +44,7 @@
                         <a class="button" href="{% url profiles:edit %}">Edit profile</a>
                     {% endif %}
                     {% if not user == user_info %}
-                        <a class="button" href="">Send Message</a>
+                        <a class="button" href="{% url messages:new %}?user_id={{ user_info.pk }}&username={{ user_info.username }}">Send Message</a>
                     {% endif %}
                 </div>
             {% endif %}

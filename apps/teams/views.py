@@ -1056,7 +1056,7 @@ def create_task(request, slug, team_video_pk):
                 task.subtitle_version = task.team_video.video.latest_version(language_code=task.language)
 
             task.save()
-
+            notifier.team_task_assigned.delay(task.pk)
             return HttpResponseRedirect(reverse('teams:team_tasks', args=[],
                                                 kwargs={'slug': team.slug}))
     else:
@@ -1125,6 +1125,7 @@ def assign_task(request, slug):
 
         task.assignee = assignee
         task.save()
+        notifier.team_task_assigned.delay(task.pk)
 
         messages.success(request, _('Task assigned.'))
     else:
@@ -1145,6 +1146,7 @@ def assign_task_ajax(request, slug):
 
         task.assignee = assignee
         task.save()
+        notifier.team_task_assigned.delay(task.pk)
 
         return { 'success': True }
     else:
