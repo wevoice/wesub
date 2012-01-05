@@ -27,8 +27,14 @@ class InternalOnlyBackend(object):
             # addresses might be in form Name <email>
             start,end = x.find("<"), x.find(">")
             if start != -1 and end != -1:
-               if x[start+1:end] in self.white_listed_addresses: 
-                clean.append(x)
+               trimmed = x[start+1:end]
+               if trimmed in self.white_listed_addresses:
+                   clean.append(x)
+               else:
+                   for white_listed in self.white_listed_addresses:
+                       if trimmed.endswith(white_listed):
+                           clean.append(x)
+                           break
             elif x in self.white_listed_addresses:
                 clean.append(x)
             else:
