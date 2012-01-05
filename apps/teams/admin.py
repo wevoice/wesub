@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
+#
 # Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib import admin
@@ -38,16 +38,16 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter = ('highlight', 'is_visible')
     actions = ['highlight', 'unhighlight', 'send_message']
     raw_id_fields = ['video']
-    
+
     def thumbnail(self, object):
         return '<img src="%s"/>' % object.logo_thumbnail()
     thumbnail.allow_tags = True
-    
+
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
         extra_context['message_form'] = TeamAdminPageMessageForm()
         return super(TeamAdmin, self).changelist_view(request, extra_context)
-        
+
     def send_message(self, request, queryset):
         form = TeamAdminPageMessageForm(request.POST)
         if form.is_valid():
@@ -56,11 +56,11 @@ class TeamAdmin(admin.ModelAdmin):
         else:
             self.message_user(request, _("Fill all fields please."))
     send_message.short_description = _('Send message')
-    
+
     def highlight(self, request, queryset):
         queryset.update(highlight=True)
     highlight.short_description = _('Feature teams')
-    
+
     def unhighlight(self, request, queryset):
         queryset.update(highlight=False)
     unhighlight.short_description = _('Unfeature teams')
@@ -69,7 +69,7 @@ class TeamMemberAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'team__name', 'user__first_name', 'user__last_name')
     list_display = ('role', 'team_link', 'user_link')
     raw_id_fields = ('user', 'team')
-    
+
     def team_link(self, obj):
         url = reverse('admin:teams_team_change', args=[obj.team_id])
         return u'<a href="%s">%s</a>' % (url, obj.team)
@@ -83,10 +83,10 @@ class TeamMemberAdmin(admin.ModelAdmin):
     user_link.allow_tags = True
 
 class TeamVideoForm(forms.ModelForm):
-    
+
     class Meta:
         model = TeamVideo
-        
+
     def __init__(self, *args, **kwargs):
         super(TeamVideoForm, self).__init__(*args, **kwargs)
 
@@ -94,14 +94,15 @@ class TeamVideoForm(forms.ModelForm):
             qs = SubtitleLanguage.objects.filter(video=self.instance.video)
         else:
             qs = SubtitleLanguage.objects.none()
-               
+
         self.fields['completed_languages'].queryset = qs
 
 class TeamVideoAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'team_link', 'created')
     readonly_fields = ('completed_languages',)
     raw_id_fields = ['video', 'team', 'added_by']
-    
+    search_fields = ('title',)
+
     def team_link(self, obj):
         url = reverse('admin:teams_team_change', args=[obj.team_id])
         return u'<a href="%s">%s</a>' % (url, obj.team)
