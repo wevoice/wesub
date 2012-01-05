@@ -288,7 +288,7 @@ class MessageTest(TestCase):
                         Message.objects.filter(user=user).count())
 
     def test_team_inviation_sent(self):
-        team , created= Team.objects.get_or_create(name='test', slug='test')
+        team, created= Team.objects.get_or_create(name='test', slug='test')
         owner, created = TeamMember.objects.get_or_create(
             team=team, user=User.objects.all()[2], role='owner')
         applying_user = User.objects.all()[0]
@@ -297,7 +297,7 @@ class MessageTest(TestCase):
         mail.outbox = []
         message = "Will you be my valentine?"
         f = InviteForm(user=owner.user, team=team,data={
-            "usernames":applying_user.username,
+            "user_id":applying_user.id,
             "role":"admin",
             "message": message,
         })
