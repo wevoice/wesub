@@ -744,7 +744,7 @@ def invite_members(request, slug):
         form = InviteForm(team, request.user, request.POST)
         if form.is_valid():
             # the form will fire the notifications for invitees
-            # this cannot be done on model signal, since you migt be
+            # this cannot be done on model signal, since you might be
             # sending invites twice for the same user, and that borks
             # the naive signal for only created invitations
             form.save()

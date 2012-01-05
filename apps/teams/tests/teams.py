@@ -749,7 +749,7 @@ class TeamsTest(TestCase):
         member.save()
 
         data = {
-            "usernames": user2.username,
+            "user_id": user2.id,
             "message": u"test message",
             "role": TeamMember.ROLE_CONTRIBUTOR,
         }
