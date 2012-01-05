@@ -58,15 +58,18 @@ def get_member(user, team):
     if not user.is_authenticated():
         return None
 
-    if hasattr(user, '_cached_teammember'):
-        return user._cached_teammember
+    if hasattr(user, '_cached_teammember') and user._cached_teammember.get(team.pk):
+        return user._cached_teammember[team.pk]
     else:
-        try:
-            user._cached_teammember = team.members.get(user=user)
-        except TeamMember.DoesNotExist:
-            user._cached_teammember = None
+        if not hasattr(user, '_cached_teammember'):
+            user._cached_teammember = {}
 
-        return user._cached_teammember
+        try:
+            user._cached_teammember[team.pk] = team.members.get(user=user)
+        except TeamMember.DoesNotExist:
+            user._cached_teammember[team.pk] = None
+
+        return user._cached_teammember[team.pk]
 
 def get_role(member):
     """Return the member's general role in the team.
