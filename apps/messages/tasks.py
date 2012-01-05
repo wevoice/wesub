@@ -161,7 +161,6 @@ def team_application_denied(application_pk):
         msg.content = render_to_string("messages/team-application-denied.txt", context)
         msg.user = application.user
         msg.object = application.team
-        msg.author = User.get_anonymous()
         msg.save()
     send_templated_email(msg.user, msg.subject, template_name, context)
     application.delete()
