@@ -46,24 +46,24 @@
 
         {% if team|can_invite_to_team:user %}
             <div class="tools group">
-                <a href="{% url teams:invite_members slug=team.slug %}" class="button">Invite Members</a>
+                <a href="{% url teams:invite_members slug=team.slug %}" class="button">{% trans 'Invite Members' %}</a>
             </div>
         {% endif %}
 
         {% if filtered %}
             <p class="active-filters">
-                    Showing 
+                    {% trans 'Showing' %} 
                     {% if role %}
                          <strong>{{ role }}</strong>
                     {% endif %}
-                    members
+                    {% trans 'members' %}
                     {% if request.GET.q %}
-                        matching <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
+                        {% trans 'matching' %} <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
                     {% endif %}
                     {% if request.GET.lang %}
-                        speaking <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
+                        {% trans 'speaking' %} <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
                     {% endif %}
-                <a href="{% url teams:detail_members team.slug %}" class="clear-filters">Clear all filters</a>
+                <a href="{% url teams:detail_members team.slug %}" class="clear-filters">{% trans 'Clear all filters' %}</a>
             </p>
         {% endif %}
 
@@ -79,7 +79,7 @@
                         <h3>
                             <a href="{{ member.user.get_absolute_url }}">
                                 {{ member.user }}
-                                {% if member.user == user %}(Me){% endif %}
+                                {% if member.user == user %}({% trans 'Me' %}){% endif %}
                             </a>
                             {% for lang in member.user.get_languages %}
                                 <span class="descriptor">{{ lang.get_language_display }}</span>
@@ -88,9 +88,9 @@
                         <p>{{ member.role|capfirst }}
                         {% if member.role == 'admin' or member.role == 'manager' %}
                             {% if member.language_narrowings_fast or member.project_narrowings_fast %}
-                                {% if member.project_narrowings_fast %}for {% for narrowing in member.project_narrowings_fast %}{% if forloop.last and not forloop.first %}and {% endif %}<em>{{ narrowing.project.name }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "project" %}{{ member.project_narrowings_fast|length|pluralize }}{% if member.language_narrowings_fast %} and {% endif %}{% endif %}
+                                {% if member.project_narrowings_fast %}{% trans 'for' %} {% for narrowing in member.project_narrowings_fast %}{% if forloop.last and not forloop.first %}{% trans 'and' %} {% endif %}<em>{{ narrowing.project.name }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "project" %}{{ member.project_narrowings_fast|length|pluralize }}{% if member.language_narrowings_fast %} {% trans 'and' %} {% endif %}{% endif %}
 
-                                {% if member.language_narrowings_fast %}for {% for narrowing in member.language_narrowings_fast %}{% if forloop.last and not forloop.first %}and {% endif %}<em>{{ narrowing.get_language_display }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "language" %}{{ member.language_narrowings_fast|length|pluralize }}{% endif %}
+                                {% if member.language_narrowings_fast %}{% trans 'for' %} {% for narrowing in member.language_narrowings_fast %}{% if forloop.last and not forloop.first %}{% trans 'and' %} {% endif %}<em>{{ narrowing.get_language_display }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "language" %}{{ member.language_narrowings_fast|length|pluralize }}{% endif %}
                             {% endif %}
                         {% endif %}
                         <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>
@@ -102,10 +102,10 @@
                         {% if member in assignable_roles %}
                             <ul class="admin-controls">
                                 <li>
-                                    <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" >Edit</a>
+                                    <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" >{% trans 'Edit' %}</a>
                                 </li>
                                 <li>
-                                <a onclick="return confirm('{% trans 'Are you sure you want to delete this team member?' %}');" href="{% url teams:remove_member slug=team.slug user_pk=member.user.pk %}" class="delete">Delete</a>
+                                <a onclick="return confirm('{% trans 'Are you sure you want to delete this team member?' %}');" href="{% url teams:remove_member slug=team.slug user_pk=member.user.pk %}" class="delete">{% trans 'Delete' %}</a>
                                 </li>
                             </ul>
                         {% endif %}
@@ -122,7 +122,7 @@
             <h4>{% trans "Search and Filter" %}</h4>
             {% include "teams/_search.html" %}
             <select name="lang-filter" id="lang-filter">
-                <option value="">All languages</option>
+                <option value="">{% trans 'All languages' %}</option>
                 {% for code, name in languages %}
                     <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
                 {% endfor %}

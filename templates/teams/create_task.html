@@ -43,30 +43,30 @@
     <div class="view grid_9 alpha">
         <form method="post" action="." class="create-task">
             {{ form.non_field_errors }}
-            <h3 class="form-title">{% trans "New Task" %}</h3>
-            <p class="notation">{% trans "Task availability depends on your team's settings and workflow. Some tasks (e.g. Translate) will always require original subtitles to be completed and published first. Others (like Review and Approve) must be enabled and can only follow a completed Subtitle/Translate task." %}</p>
+            <h3 class="form-title">{% trans 'New Task' %}</h3>
+            <p class="notation">{% trans 'Task availability depends on settings and workflow. Some tasks (e.g. Translate) will always require original subtitles to be completed and published first. Others (like Review and Approve) must be enabled and can only follow a completed Subtitle/Translate task.' %}</p>
             <div class="grid_4 alpha">
                 <fieldset>
                     <div class="type-selector">
-                        <label>{% trans "What needs to be done?" %}</label>
+                        <label>{% trans 'What needs to be done?' %}</label>
                         {{ form.errors.type }}
                         {{ form.type }}
-                        <p class="notation">{% trans "Grayed-out tasks are not available for this video at this time." %}</p>
+                        <p class="notation">{% trans 'Grayed-out tasks are not available for this video at this time.' %}</p>
                     </div>
                     <div class="chosen">
                         <div class="language-selector">
-                            <label>{% trans "What language is needed?" %}</label>
+                            <label>{% trans 'What language is needed?' %}</label>
                             {{ form.errors.language }}
                             {{ form.language }}
                         </div>
                         {% if can_assign %}
                             <div class="assignee-selector">
-                                <label>{% trans "Who should do it?" %}</label>
+                                <label>{% trans 'Who should do it?' %}</label>
                                 {{ form.errors.assignee }}
                                 <div class="ajaxChosen">
                                     <select id="id_assignee" name="assignee">
                                         <option value="">-----</option>
-                                        <option value="">Begin typing to search.</option>
+                                        <option value="">{% trans 'Begin typing to search' %}</option>
                                     </select>
                                 </div>
                                 <p class="notation">{% trans "Tasks left unassigned can be claimed by members with the appropriate permissions." %}</p>
@@ -89,7 +89,7 @@
                 </fieldset>
             </div>
             <div class="grid_9 submit">
-                <button>{% trans "Save" %}</button>
+                <button>{% trans 'Save' %}</button>
             </div>
 
             {% csrf_token %}
@@ -98,10 +98,10 @@
     <div class="controls grid_3 omega">
         <ul>
             <li class="current">
-                <a href="#">{% trans "New task form" %}</a>
+                <a href="#">{% trans 'New task form' %}</a>
             </li>
             <li>
-                <a href="{% url teams:team_tasks team.slug %}?team_video={{ team_video.id }}">← {% trans "Back to tasks list" %}</a>
+                <a href="{% url teams:team_tasks team.slug %}?team_video={{ team_video.id }}">← {% trans 'Back to tasks list' %}</a>
             </li>
         </ul>
     </div>

@@ -33,28 +33,28 @@
     <div class="panel-holder view grid_9 alpha">
         {% if team|can_add_tasks:user and filters.team_video != None %}
             <div class="tools">
-                <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">Add Task</a>
+                <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">{% trans 'Add Task' %}</a>
             </div>
         {% endif %}
 
         {% if filters.assignee or filters.language or filters.type or filters.team_video %}
-            <p class="active-filters">Showing
+            <p class="active-filters">{% trans 'Showing' %}
                 {% if filters.assignee == 'none' %}
-                    <strong>unassigned</strong>
+                    <strong>{% trans 'unassigned' %}</strong>
                 {% endif %}
                 {% if filters.language %}
-                    <strong>{{ filters.language|lang_name_from_code }}</strong> language {% endif %}
+                    <strong>{{ filters.language|lang_name_from_code }}</strong> {% trans 'language' %} {% endif %}
                 {% if filters.type %}
                     <strong>{{ filters.type }}</strong>
                 {% endif %}
-                tasks
+                {% trans 'tasks' %}
                 {% if filters.team_video %}
-                    for <strong>{{ filters.team_video }}</strong>
+                    {% trans 'for' %} <strong>{{ filters.team_video }}</strong>
                 {% endif %}
                 {% if filters.assignee and filters.assignee != 'none' %}
-                    assigned to <strong>{{ filters.assignee }}</strong>
+                    {% trans 'assigned to' %} <strong>{{ filters.assignee }}</strong>
                 {% endif %}
-                <a href="{{ request.path }}{% query_string request.GET type="" lang="" assignee="" %}" class="clear-filters">Clear all filters</a>
+                <a href="{{ request.path }}{% query_string request.GET type="" lang="" assignee="" %}" class="clear-filters">{% trans 'Clear all filters' %}</a>
             </p>
         {% endif %}
 
@@ -63,45 +63,45 @@
                 <li>
                     <h3>
                         {% if task.get_type_display == "Subtitle" %}
-                            New
+                            {% trans 'New' %}
                         {% else %}
                             {{ task.get_type_display }}
                         {% endif %}
                         {% if task.get_type_display == "Translate" %}
-                            Subtitles into {{ task.get_language_display }}
+                            {% trans 'Subtitles into' %} {{ task.get_language_display }}
                         {% else %}
                             {% if task.get_language_display %}
                                 {{ task.get_language_display }}
                             {% endif %}
-                            Subtitles
+                            {% trans 'Subtitles' %}
                         {% endif %}
                     </h3>
                     <p>{% trans "Video" %}: {{ task.team_video|truncatewords:8 }}</p>
                     <p class="steps">
-                        <span{% if task.get_type_display == "Subtitle" %} class="current"{% endif %}>{% trans "Subtitle" %}</span>/<span{% if task.get_type_display == "Translate" %} class="current"{% endif %}>{% trans "Translate" %}</span>
+                        <span{% if task.get_type_display == "Subtitle" %} class="current"{% endif %}>{% trans 'Subtitle' %}</span>/<span{% if task.get_type_display == "Translate" %} class="current"{% endif %}>{% trans 'Translate' %}</span>
                         {% if task.workflow.review_enabled %}
                             →
-                            <span{% if task.get_type_display == "Review" %} class="current"{% endif %}>{% trans "Review" %}</span>
+                            <span{% if task.get_type_display == "Review" %} class="current"{% endif %}>{% trans 'Review' %}</span>
                         {% endif %}
                         {% if task.workflow.approve_enabled %}
                             →
-                            <span{% if task.get_type_display == "Approve" %} class="current"{% endif %}>{% trans "Approve" %}</span>
+                            <span{% if task.get_type_display == 'Approve' %} class="current"{% endif %}>{% trans 'Approve' %}</span>
                         {% endif %}
                         →
-                        {% trans "Published" %}
+                        {% trans 'Published' %}
                     </p>
                     <ul class="actions">
                         <li>
                             <h4>
                                 {% if task.assignee %}
-                                    {% trans "Assigned to" %}
+                                    {% trans 'Assigned to' %}
                                     {% if task.assignee == user %}
-                                        {% trans "you" %}
+                                        {% trans 'you' %}
                                     {% else %}
                                          {{ task.assignee }}
                                     {% endif %}
                                 {% else %}
-                                    {% trans "Unassigned" %}
+                                    {% trans 'Unassigned' %}
                                 {% endif %}
                             </h4>
                         </li>
@@ -114,7 +114,7 @@
                             {% else %}
                                 {% if task.assignee == None %}
                                     <li>
-                                        <a class="assign-and-perform" href="#">{% trans "Perform Task" %}<span class="task-id" style="display: none;">{{ task.pk }}</span></a>
+                                        <a class="assign-and-perform" href="#">{% trans 'Perform Task' %}<span class="task-id" style="display: none;">{{ task.pk }}</span></a>
                                     </li>
                                     <li style="display: none;">
                                         {% include "teams/_perform_task_link.html" %}
@@ -130,9 +130,9 @@
                                 <li>
                                     <a class="action-assign" href="#">
                                         {% if task.assignee %}
-                                            Reassign
+                                            {% trans 'Reassign' %}
                                         {% else %}
-                                            Assign
+                                            {% trans 'Assign' %}
                                         {% endif %}
                                     </a>
                                 </li>
@@ -144,7 +144,7 @@
                                         <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
                                         <input type="hidden" name="task" value="{{ task.pk }}" />
-                                        <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">Remove</a>
+                                        <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">{% trans 'Remove' %}</a>
                                     </form>
                                 </li>
                             {% endif %}
@@ -159,20 +159,20 @@
                             <input type="hidden" name="task" value="{{ task.pk }}" />
 
                             <div class="assignee-choice" style="display: none;">
-                                <a class="cancel" href="#">Cancel</a>
+                                <a class="cancel" href="#">{% trans 'Cancel' %}</a>
                                 <div class="member-ajax-chosen">
                                     <select name="assignee">
                                         <option value="">-----</option>
-                                        <option value="">Begin typing to search.</option>
+                                        <option value="">{% trans 'Begin typing to search' %}</option>
                                     </select>
                                 </div>
-                                <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">Assign to User</a>
+                                <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">{% trans 'Assign to User' %}</a>
                             </div>
                         </form>
                     {% endif %}
                 </li>
             {% empty %}
-                <li class="empty">Sorry, no tasks here.</li>
+                <li class="empty">{% trans 'Sorry, no tasks here.' %}</li>
             {% endfor %}
         </ul>
 
@@ -224,7 +224,7 @@
 
             <form action="" method="get">
                 <select id="id_task_language" name="language" class="lang-filter chosen">
-                    <option value="{{ request.path }}{% query_string request.GET lang="" %}">All Languages</option>
+                    <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'All Languages' %}</option>
                     {% for language in languages %}
                         <option value="{% query_string request.GET lang=language.code %}"
                             {% if request.GET.lang == language.code %}
@@ -238,9 +238,9 @@
 
             <form action="" method="get">
                 <select name="assignee" class="assignee-filter">
-                    <option value="{{ request.path }}{% query_string request.GET assignee="" %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>All Assignees</option>
-                    <option value="{% query_string request.GET assignee="me" %}" {% if request.GET.assignee == "me" %}selected="selected"{% endif %}>Assigned to me</option>
-                    <option value="{% query_string request.GET assignee="none" %}" {% if request.GET.assignee == "none" %}selected="selected"{% endif %}>Unassigned</option>
+                    <option value="{{ request.path }}{% query_string request.GET assignee="" %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'All Assignees' %}</option>
+                    <option value="{% query_string request.GET assignee="me" %}" {% if request.GET.assignee == "me" %}selected="selected"{% endif %}>{% trans 'Assigned to me' %}</option>
+                    <option value="{% query_string request.GET assignee="none" %}" {% if request.GET.assignee == "none" %}selected="selected"{% endif %}>{% trans 'Unassigned' %}</option>
                 </select>
             </form>
         </div>

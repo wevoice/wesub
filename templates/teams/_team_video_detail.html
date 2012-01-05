@@ -20,7 +20,7 @@
         <li>
             <h4>
                 {% if search_record.video_completed_langs %}
-                    <a href="{% url videos:video video_id=search_record.video_id %}" title="View available subtitles">{{ search_record.video_completed_langs|length }} language{{ search_record.video_completed_langs|length|pluralize }}</a>
+                    <a href="{% url videos:video video_id=search_record.video_id %}" title="View available subtitles">{{ search_record.video_completed_langs|length }} {% trans 'language' %}{{ search_record.video_completed_langs|length|pluralize }}</a>
                 {% else %}
                     {% trans "No subtitles yet" %}
                 {% endif %}
@@ -36,7 +36,7 @@
                         {{ counter }} open tasks
                         {% endblocktrans %}
                     {% else %}
-                        {% trans "No open tasks" %}
+                        {% trans 'No open tasks' %}
                     {% endif %}
                 </a>
             </li>
@@ -48,18 +48,18 @@
             {% with search_record|can_edit_video:request.user as can_edit_this_video %}
                 {% if can_edit_this_video %}
                     <li>
-                        <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}" title="Edit this video">Edit</a>
+                        <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}" title="Edit this video">{% trans 'Edit' %}</a>
                     </li>
                 {% endif %}
 
                 {% can_create_any_task search_record request.user %}
                 {% if user_can_create_any_task %}
                     <li>
-                        <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}" title="Add a task for this video">+ Task</a>
+                        <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}" title="Add a task for this video">+ {% trans 'Task' %}</a>
                     </li>
                 {% else %}
                     <li>
-                        <a class="disabled" title="No available tasks to add">+ Task</a>
+                        <a class="disabled" title="No available tasks to add">+ {% trans 'Task' %}</a>
                     </li>
                 {% endif %}
 
@@ -75,7 +75,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{ request.path }}" />
                         </form>
-                        <a class="remove-video" href="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" title="Remove this video from the team">Remove</a>
+                        <a class="remove-video" href="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" title="Remove this video from the team">{% trans 'Remove' %}</a>
                     </li>
                 {% endif %}
             {% endwith %}
