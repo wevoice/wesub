@@ -26,7 +26,7 @@
                 {% endif %}
             </h4>
         </li>
-        {% if team|is_team_member:user %}
+        {% if user_is_team_member %}
             <li>
                 <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="View open tasks for this video">
                     {% if search_record.task_count %}
