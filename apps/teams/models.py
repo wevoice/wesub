@@ -1061,8 +1061,14 @@ class Workflow(models.Model):
 
         If workflows is not given it will be looked up with one DB query.
 
+        NOTE: This function caches the workflow for performance reasons.  If the
+        workflow changes within the space of a single request that
+        _cached_workflow should be cleared.
+
         '''
-        return Workflow.get_for_target(team_video.id, 'team_video', workflows)
+        if not hasattr(team_video, '_cached_workflow'):
+            team_video._cached_workflow = Workflow.get_for_target(team_video.id, 'team_video', workflows)
+        return team_video._cached_workflow
 
     @classmethod
     def get_for_project(cls, project, workflows=None):
