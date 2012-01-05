@@ -135,7 +135,11 @@ def _update_percent_done(video):
 def _update_has_had_version(video):
     for sl in video.subtitlelanguage_set.all():
         version = sl.latest_version()
-        if not version or (version and len(version.subtitles()) == 0):
+        if not version:
+            sl.had_version = False
+            sl.has_version = False
+            sl.save()
+        elif len(version.subtitles()) == 0:
             if sl.has_version:
                 sl.has_version = False
                 sl.save()
