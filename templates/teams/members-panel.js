@@ -50,15 +50,18 @@
             var $lang = $('#language-restriction');
             var $proj = $('#project-restriction');
 
+            var lang_count = $('option', $lang).length;
+            var proj_count = $('option', $proj).length;
+
             if (val == 'manager') {
-                $lang.show();
-                $proj.show();
+                if (lang_count) { $lang.show(); }
+                if (proj_count) { $proj.show(); }
             } else if (val == 'contributor') {
                 $lang.hide();
                 $proj.hide();
             } else if (val == 'admin') {
                 $lang.hide();
-                $proj.show();
+                if (proj_count) { $proj.show(); }
             }
         },
         save: function(e){
