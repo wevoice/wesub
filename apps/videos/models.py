@@ -828,7 +828,7 @@ class SubtitleLanguage(models.Model):
 
     def latest_version(self, public_only=True):
         try:
-            return self._filter_public( self.subtitleversion_set.all(), public_only)[0]
+            return self._filter_public(self.subtitleversion_set.all(), public_only)[0]
         except (SubtitleVersion.DoesNotExist, IndexError):
             return None
 

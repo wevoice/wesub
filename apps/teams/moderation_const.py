@@ -4,14 +4,14 @@ CAN_UNSET_VIDEO_AS_MODERATED = "can_unset_video_as_moderated"
 
 UNMODERATED = "not__under_moderation"
 WAITING_MODERATION = "waiting_moderation"
-APPROVED =   "approved"
+APPROVED = "approved"
 REJECTED = "rejected"
 
 MODERATION_STATUSES = (
-    (UNMODERATED , "not__under_moderation",),
-    (WAITING_MODERATION , "waiting_moderation",),
-    (APPROVED,   "approved"),
-    (REJECTED,  "rejected"),
+    (UNMODERATED, "not__under_moderation",),
+    (WAITING_MODERATION, "waiting_moderation",),
+    (APPROVED, "approved"),
+    (REJECTED, "rejected"),
 )
 
 SUBJECT_EMAIL_VERSION_REJECTED = "Your version for %s was declined"
