@@ -204,10 +204,12 @@ def team_member_new(member_pk):
 
         
     # now send welcome mail to the new member
-    template_name = "messages/email/team-welcome.html"
+    template_name = "messages/team-welcome.txt"
     context = {
-        "team":member.team,
-        "user":member.user,
+       "team":member.team,
+       "url_base":get_url_base(),
+       "role":member.role,
+       "user":member.user,
     }
     body = render_to_string(template_name,context) 
 
@@ -217,6 +219,7 @@ def team_member_new(member_pk):
     msg.user = member.user
     msg.object = member.team
     msg.save()
+    template_name = "messages/email/team-welcome.html"
     send_templated_email(msg.user, msg.subject, template_name, context)
 
 @task()

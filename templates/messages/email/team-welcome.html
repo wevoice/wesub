@@ -6,13 +6,13 @@ This gets sent to the rest of the team, notifying about the new member
 
 {% block content %}
 
-Hi {{ user }},
+Hi {{ user }},<br/>
 
-Congratulations! You are now a member of the {{ team.name }} team.
+<p>Congratulations! You are now a member of the {{ team.name }} team.</p>
 
-Start browsing <a href="{% url teams:videos slug=team.slug}">team videos</a> 
-or look for <a href="{% url teams:team_tasks slug=team.slug %}">tasks</a> you can take on to help out.
+<p>Start browsing <a href="{{url_base}}{% url teams:videos slug=team.slug}">team videos</a> 
+or look for <a href="{{url_base}}{% url teams:team_tasks slug=team.slug %}">tasks</a> you can take on to help out.</p>
 
-Happy subtitling!
+Happy subtitling!<br/>
 {% endblock %}
 {% block dont_send %}{% endblock %}
