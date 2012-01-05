@@ -238,7 +238,7 @@ def team_member_leave(team_pk, user_pk):
     subject = ugettext(u"%s has left the %s team" % (user, team))
     for m in notifiable:
         context = {
-            "parting_user": user,
+            "parting_member": user,
             "team":team,
             "user":m.user,
             "url_base":get_url_base(),
