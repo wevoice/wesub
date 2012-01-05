@@ -85,6 +85,7 @@ def team_invitation_sent(invite_pk):
                                      key=Setting.KEY_IDS['messages_invite'])
     context = {
         'invite': invite,
+        'role': invite.role,
         "user":invite.user,
         "inviter":invite.author,
         "team": invite.team,
