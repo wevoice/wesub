@@ -1,6 +1,6 @@
 Dear {{ user }},
 
-The {{ team.name }} team, has assigned you a new task:
+The {{ team.name }} team has assigned you a new task:
  {{ task_type }} {% if task_language %}{{ task_language}}{% endif %} subtitles for {{ task.team_video.video.title }}.
 
 

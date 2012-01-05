@@ -85,6 +85,7 @@ def team_invitation_sent(invite_pk):
                                      key=Setting.KEY_IDS['messages_invite'])
     context = {
         'invite': invite,
+        'role': invite.role,
         "user":invite.user,
         "inviter":invite.author,
         "team": invite.team,
@@ -160,7 +161,6 @@ def team_application_denied(application_pk):
         msg.content = render_to_string("messages/team-application-denied.txt", context)
         msg.user = application.user
         msg.object = application.team
-        msg.author = User.get_anonymous()
         msg.save()
     send_templated_email(msg.user, msg.subject, template_name, context)
     application.delete()
@@ -203,10 +203,12 @@ def team_member_new(member_pk):
 
         
     # now send welcome mail to the new member
-    template_name = "messages/email/team-welcome.html"
+    template_name = "messages/team-welcome.txt"
     context = {
-        "team":member.team,
-        "user":member.user,
+       "team":member.team,
+       "url_base":get_url_base(),
+       "role":member.role,
+       "user":member.user,
     }
     body = render_to_string(template_name,context) 
 
@@ -216,6 +218,7 @@ def team_member_new(member_pk):
     msg.user = member.user
     msg.object = member.team
     msg.save()
+    template_name = "messages/email/team-welcome.html"
     send_templated_email(msg.user, msg.subject, template_name, context)
 
 @task()
@@ -237,7 +240,7 @@ def team_member_leave(team_pk, user_pk):
     subject = ugettext(u"%s has left the %s team" % (user, team))
     for m in notifiable:
         context = {
-            "parting_user": user,
+            "parting_member": user,
             "team":team,
             "user":m.user,
             "url_base":get_url_base(),

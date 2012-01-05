@@ -1482,13 +1482,13 @@ class ActionRenderer(object):
         return msg % kwargs
 
     def render_MEMBER_JOINED(self, item):
-        msg = _("%s joined the %s team as a %s" % (
-            item.user, item.team, item.member.role))
+        msg = _("joined the %s team as a %s" % (
+             item.team, item.member.role))
         return msg
 
     def render_MEMBER_LEFT(self, item):
-        msg = _("%s left the %s team" % (
-            item.user, item.team))
+        msg = _("left the %s team" % (
+            item.team))
         return msg
 
 

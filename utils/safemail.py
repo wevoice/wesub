@@ -24,7 +24,12 @@ class InternalOnlyBackend(object):
     def get_whitelisted(self, addresses):
         clean = []
         for x in addresses:
-            if x in self.white_listed_addresses:
+            # addresses might be in form Name <email>
+            start,end = x.find("<"), x.find(">")
+            if start != -1 and end != -1:
+               if x[start+1:end] in self.white_listed_addresses: 
+                clean.append(x)
+            elif x in self.white_listed_addresses:
                 clean.append(x)
             else:
                 for white_listed in self.white_listed_addresses:
