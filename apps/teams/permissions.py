@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.db.models import Q
 from teams.models import Team, MembershipNarrowing, Workflow, TeamMember, Task
 
 from teams.permissions_const import (
@@ -685,19 +686,16 @@ def can_create_task_review(team_video, user=None):
     if user and not _user_can_create_task_review(user, team_video):
         return []
 
-    tasks = team_video.task_set
-
     # Find all languages that have a complete set of subtitles.
     # These are the ones we *might* be able to create a review task for.
     candidate_langs = set(sl.language for sl in team_video.video.completed_subtitle_languages())
 
     # Find all the languages that have a task which prevents a review task creation.
-    # TODO: Make this an OR'ed Q query for performance.
-    existing_task_langs = (
-            set(t.language for t in tasks.incomplete_translate())
-          | set(t.language for t in tasks.all_review())
-          | set(t.language for t in tasks.all_approve())
-    )
+    existing_task_langs = set(team_video.task_set.not_deleted().filter(
+            Q(completed=None, type=Task.TYPE_IDS['Translate']) # Incomplete Translate tasks
+          | Q(type=Task.TYPE_IDS['Review'])                    # Any Review task
+          | Q(type=Task.TYPE_IDS['Approve'])                   # Any Approve task
+    ).values_list('language', flat=True))
 
     # Return the candidate languages that don't have a review-preventing task.
     return list(candidate_langs - existing_task_langs)
@@ -734,11 +732,10 @@ def can_create_task_approve(team_video, user=None):
         candidate_langs = set(sl.language for sl in team_video.video.completed_subtitle_languages())
 
     # Find all the languages that have a task which prevents an approve task creation.
-    # TODO: Make this an OR'ed Q query for performance.
-    existing_task_langs = (
-            set(t.language for t in tasks.incomplete_translate())
-          | set(t.language for t in tasks.all_approve())
-    )
+    existing_task_langs = set(team_video.task_set.not_deleted().filter(
+            Q(completed=None, type=Task.TYPE_IDS['Translate']) # Incomplete Translate tasks
+          | Q(type=Task.TYPE_IDS['Approve'])                   # Any Approve task
+    ).values_list('language', flat=True))
 
     # Return the candidate languages that don't have a review-preventing task.
     return list(candidate_langs - existing_task_langs)

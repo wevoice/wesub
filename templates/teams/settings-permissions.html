@@ -16,85 +16,85 @@
 
             <div class="grid_4 alpha messages">
                 <fieldset>
-                    <legend>Team Management</legend>
-                    <label for="id_membership_policy">How can users join your team?</label>
+                    <legend>{% trans "Team Management" %}</legend>
+                    <label for="id_membership_policy">{% trans "How can users join your team?" %}</label>
                     {{ form.membership_policy }}
 
-                    <label for="id_video_policy">Who can add/remove videos?</label>
+                    <label for="id_video_policy">{% trans "Who can add/remove videos?" %}</label>
                     {{ form.video_policy }}
                 </fieldset>
             </div>
             <div class="grid_4 omega guidelines">
                 <fieldset>
-                    <legend>Tasks</legend>
+                    <legend>{% trans "Tasks" %}</legend>
 
-                    <p class="notation">Manage subtitling and translation work for your videos</p>
-                    <label for="id_task_assign_policy">Who can create and assign tasks?</label>
+                    <p class="notation">{% trans "Manage subtitling and translation work for your videos" %}</p>
+                    <label for="id_task_assign_policy">{% trans "Who can create and assign tasks?" %}</label>
                     {{ form.task_assign_policy }}
-                    <p class="notation">Specified members will only be able to create/assign tasks they are permitted to complete themselves</p>
+                    <p class="notation">{% trans "Specified members will only be able to create/assign tasks they are permitted to complete themselves" %}</p>
                 </fieldset>
             </div>
             <div class="grid_9" id="summary">
-                <h4>How your subtitles will get published <em>(configure below)</em></h4>
+                <h4>{% trans "How your subtitles will get published <em>(configure below)</em>" %}</h4>
                 <div class="grid_2">
-                    <h5>Subtitled</h5>
+                    <h5>{% trans "Subtitled" %}</h5>
                     <p id="perm-sub"><p>
-                    <p class="divider">or ...</p>
-                    <h5>Translated</h5>
+                    <p class="divider">{% trans "or ..." %}</p>
+                    <h5>{% trans "Translated" %}</h5>
                     <p id="perm-trans"></p>
                     <span>→</span>
                 </div>
                 <div class="grid_2" id="review-step">
-                    <h5>Reviewed</h5>
+                    <h5>{% trans "Reviewed" %}</h5>
                     <p id="perm-rev"></p>
                     <span>→</span>
                 </div>
                 <div class="grid_2" id="approve-step">
-                    <h5>Approved</h5>
+                    <h5>{% trans "Approved" %}</h5>
                     <p id="perm-app"></p>
                     <span>→</span>
                 </div>
                 <div class="grid_2 omega">
-                    <h5>Published</h5>
+                    <h5>{% trans "Published" %}</h5>
                 </div>
             </div>
 
             <div class="grid_4 alpha messages">
                 <fieldset>
-                    <legend>Subtitling</legend>
+                    <legend>{% trans "Subtitling" %}</legend>
 
-                    <label for="id_subtitle_policy">Who can create subtitles?</label>
-                    <p class="notation">i.e. transcribe from video and perform time-alignment</p>
+                    <label for="id_subtitle_policy">{% trans "Who can create subtitles?" %}</label>
+                    <p class="notation">{% trans "i.e. transcribe from video and perform time-alignment" %}</p>
                     {{ form.subtitle_policy }}
 
-                    <label for="id_translate_policy">Who can translate subtitles?</label>
-                    <p class="notation">i.e. translate text from an original subtitle into a new language</p>
+                    <label for="id_translate_policy">{% trans "Who can translate subtitles?" %}</label>
+                    <p class="notation">{% trans "i.e. translate text from an original subtitle into a new language" %}</p>
                     {{ form.translate_policy }}
                 </fieldset>
             </div>
             <div class="grid_4 omega guidelines">
                 <fieldset>
-                    <legend>Workflows</legend>
-                    <p class="notation">Workflows enable you to add moderation steps and automate tasks</p>
-                    <label for="id_workflow_enabled">{{ form.workflow_enabled }} Enable workflows</label>
+                    <legend>{% trans "Workflows" %}</legend>
+                    <p class="notation">{% trans "Workflows enable you to add moderation steps and automate tasks" %}</p>
+                    <label for="id_workflow_enabled">{{ form.workflow_enabled }} {% trans "Enable workflows" %}</label>
                 </fieldset>
 
                 <div class="workflow">
                     <fieldset id="workflow">
                         <label for="id_autocreate_subtitle">
                             {{ workflow_form.autocreate_subtitle }}
-                            Automatically create subtitle tasks
+                            {% trans "Automatically create subtitle tasks" %}
                         </label>
 
                         <label for="id_autocreate_translate">
                             {{ workflow_form.autocreate_translate }}
-                            Automatically create translation tasks
+                            {% trans "Automatically create translation tasks for preferred languages" %} (<a href="{% url teams:settings_languages slug=team.slug %}">{% trans "manage languages" %}</a>)
                         </label>
 
-                        <label for="id_review_allowed">Review</label>
+                        <label for="id_review_allowed">{% trans "Review" %}</label>
                         {{ workflow_form.review_allowed }}
 
-                        <label for="id_approve_allowed">Approval</label>
+                        <label for="id_approve_allowed">{% trans "Approval" %}</label>
                         {{ workflow_form.approve_allowed }}
                     </fieldset>
                 </div>
