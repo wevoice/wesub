@@ -421,7 +421,7 @@ class Video(models.Model):
     def version(self, version_no=None, language=None, public_only=True):
         if language is None:
             language = self.subtitle_language()
-        return None if language is None else language.version(version_no, public_only=True)
+        return None if language is None else language.version(version_no, public_only=public_only)
 
     def latest_version(self, language_code=None, public_only=True):
         language = self.subtitle_language(language_code)
@@ -442,8 +442,8 @@ class Video(models.Model):
             return Subtitle.objects.none()
 
     def latest_subtitles(self, language_code=None, public_only=True):
-        version = self.latest_version(language_code, public_only)
-        return [] if version is None else version.subtitles()
+        version = self.latest_version(language_code, public_only=public_only)
+        return [] if version is None else version.subtitles(public_only=public_only)
 
     def translation_language_codes(self):
         """All iso language codes with finished translations."""
@@ -534,10 +534,13 @@ class Video(models.Model):
                 return True
         return False
 
-    def completed_subtitle_languages(self):
-        return [sl for sl
-                in self.subtitlelanguage_set.all()
-                if sl.is_complete_and_synced()]
+    def completed_subtitle_languages(self, public_only=True):
+        completed = []
+        for sl in list(self.subtitlelanguage_set.all()):
+            c = sl.is_complete_and_synced(public_only=public_only)
+            if c:
+                completed.append(sl)
+        return completed
 
     @property
     def policy(self):
@@ -701,7 +704,7 @@ class SubtitleLanguage(models.Model):
     def is_dependent(self):
         return not self.is_original and not self.is_forked
 
-    def is_complete_and_synced(self):
+    def is_complete_and_synced(self, public_only=True):
         if not self.is_dependent() and not self.is_complete:
             return False
         if self.is_dependent():
@@ -710,8 +713,9 @@ class SubtitleLanguage(models.Model):
             standard_lang = self.real_standard_language()
             if not standard_lang or not standard_lang.is_complete:
                 return False
-        subtitles = self.latest_subtitles()
+        subtitles = self.latest_subtitles(public_only=public_only)
         if len(subtitles) == 0:
+            
             return False
         if len([s for s in subtitles[:-1] if not s.has_complete_timing()]) > 0:
             return False
@@ -832,10 +836,10 @@ class SubtitleLanguage(models.Model):
         except (SubtitleVersion.DoesNotExist, IndexError):
             return None
 
-    def latest_subtitles(self):
-        version = self.latest_version()
+    def latest_subtitles(self, public_only=True):
+        version = self.latest_version(public_only=public_only)
         if version:
-            return version.subtitles()
+            return version.subtitles(public_only=public_only)
         return []
 
     def notification_list(self, exclude=None):
@@ -928,7 +932,7 @@ class SubtitleCollection(models.Model):
         abstract = True
 
 
-    def subtitles(self, subtitles_to_use=None):
+    def subtitles(self, subtitles_to_use=None, public_only=True):
         ATTR = 'computed_effective_subtitles'
         if hasattr(self, ATTR):
             return getattr(self, ATTR)
@@ -942,7 +946,7 @@ class SubtitleCollection(models.Model):
             effective_subtitles = [EffectiveSubtitle.for_subtitle(s)
                                    for s in subtitles]
         else:
-            standard_collection = self._get_standard_collection()
+            standard_collection = self._get_standard_collection(public_only=public_only)
             if not standard_collection:
                 effective_subtitles = []
             else:
@@ -1116,10 +1120,10 @@ class SubtitleVersion(SubtitleCollection):
     def video(self):
         return self.language.video;
 
-    def _get_standard_collection(self):
+    def _get_standard_collection(self, public_only=True):
         standard_language = self.language.real_standard_language()
         if standard_language:
-            return standard_language.latest_version()
+            return standard_language.latest_version(public_only=public_only)
 
     def ordered_subtitles(self):
         subtitles = self.subtitles()
@@ -1167,7 +1171,7 @@ class SubtitleVersion(SubtitleCollection):
                             "Got error on forking insinde rollback, original %s, forked %s" %
                             (lang.pk, translation.pk))
 
-        last_version = self.language.latest_version(False)
+        last_version = self.language.latest_version(public_only=False)
         new_version_no = last_version.version_no + 1
         new_version = cls(language=lang, version_no=new_version_no, \
                               datetime_started=datetime.now(), user=user, note=note,
@@ -1223,11 +1227,11 @@ class SubtitleDraft(SubtitleCollection):
     def video(self):
         return self.language.video
 
-    def _get_standard_collection(self):
+    def _get_standard_collection(self, public_only=True):
         if self.language.standard_language:
-            return self.language.standard_language.latest_version()
+            return self.language.standard_language.latest_version(public_only=public_only)
         else:
-            return self.language.video.latest_version()
+            return self.language.video.latest_version(public_only=public_only)
 
     def is_dependent(self):
         return not self.language.is_original and not self.is_forked
