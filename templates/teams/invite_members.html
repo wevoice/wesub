@@ -22,26 +22,26 @@
             {{ form.non_field_errors }}
             <div class="grid_4 alpha">
                 <fieldset>
-                    <legend>{% trans "Recipient" %}</legend>
+                    <legend>{% trans 'Recipient' %}</legend>
                     {{ form.errors.usernames }}
-                    <label for="id_usernames">{% trans "Username" %}</label>
+                    <label for="id_usernames">{% trans 'Username' %}</label>
                     {{ form.usernames }}
-                    <p class="notation">{% trans "Universal Subtitles username of the user you want to invite." %}</p>
+                    <p class="notation">{% trans 'Universal Subtitles username of the user you want to invite.' %}</p>
                 </fieldset>
             </div>
 
             <div class="grid_4 omega">
                 <fieldset>
-                    <legend>{% trans "Invite Details" %}</legend>
+                    <legend>{% trans 'Invite Details' %}</legend>
 
                     {{ form.errors.message }}
-                    <label for="id_message">{% trans "Include a message" %}</label>
+                    <label for="id_message">{% trans 'Include a message' %}</label>
                     {{ form.message }}
 
                     {{ form.errors.role }}
-                    <label for="id_role">{% trans "Assign a role" %}</label>
+                    <label for="id_role">{% trans 'Assign a role' %}</label>
                     {{ form.role }}
-                    <p class="notation">{% trans "Role to be assigned to the user if they accept your invitation." %}</p>
+                    <p class="notation">{% trans 'Role to be assigned to the user if they accept your invitation.' %}</p>
                 </fieldset>
             </div>
 
@@ -55,10 +55,10 @@
     <div class="controls grid_3 omega">
         <ul>
             <li class="current">
-                <a href="{% url teams:invite_members slug=team.slug %}">{% trans "Invite New Members" %}</a>
+                <a href="{% url teams:invite_members slug=team.slug %}">{% trans 'Invite New Members' %}</a>
             </li>
             <li>
-                <a href="{% url teams:detail_members team.slug %}">← {% trans "Back to Members" %}</a>
+                <a href="{% url teams:detail_members team.slug %}">← {% trans 'Back to Members' %}</a>
             </li>
         </ul>
     </div>

@@ -12,7 +12,7 @@
 
     <div class="view grid_9 alpha">
         <div class="tools group">
-            <a class="button project-add" href="{% url teams:add_project slug=team.slug %}">{% trans "Add Project" %}</a>
+            <a class="button project-add" href="{% url teams:add_project slug=team.slug %}">{% trans 'Add Project' %}</a>
         </div>
         {% if projects %}
             <ul class="projects listing">
@@ -23,21 +23,20 @@
                         </span>
                         <ul class="actions">
                             <li>
-                                <a class="action-edit" href="{% url teams:edit_project slug=team.slug project_slug=project.slug %}">Edit</a>
+                                <a class="action-edit" href="{% url teams:edit_project slug=team.slug project_slug=project.slug %}">{% trans 'Edit' %}</a>
                             </li>
                         </ul>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="empty">{% trans "This team does not have any projects yet" %}</p>
+            <p class="empty">{% trans 'This team does not have any projects yet' %}</p>
         {% endif %}
-        {% include "teams/_basic_settings.html" %}
     </div>
 
     <div class="controls grid_3 omega ">
         {% with "projects" as current_sub %}
-            {% include "teams/_settings_sub_tabs.html" %}
+            {% include "teams/_filters_settings.html" %}
         {% endwith %}
 
         {% include "teams/_actions.html" %}
@@ -49,7 +48,7 @@
     </script>
 
     <script id="IMAGE_PRELOADER" type="text/html">
-        <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
+        <img class="placeholder" width="256" height="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
     </script>
 
     <script id="projectEditPanel" type="text/html">

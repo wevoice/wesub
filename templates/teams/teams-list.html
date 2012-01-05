@@ -71,7 +71,7 @@
                         {% if team.description %}
                             {{ team.description|truncatewords:20|urlize }}
                         {% else %}
-                            No description...
+                            {% trans 'No description...' %}
                         {% endif %}
                     </p>
                     <ul class="actions">
@@ -147,6 +147,10 @@
             <a href="{% url teams:create %}" class="button primary start_team">{% trans 'Start a Team' %}</a>
         {% endif %}
         
-        <p class="notation">Want to create your own captioning and translation team? Contact Dean Jansen, <a href="mailto:dean@pculture.org">dean@pculture.org</a></p>
+        <p class="notation">
+            {% blocktrans %}
+                Want to create your own captioning and translation team? Contact Dean Jansen, <a href="mailto:dean@pculture.org">dean@pculture.org</a>
+            {% endblocktrans %}
+        </p>
     </div>
 {% endblock %}

@@ -86,18 +86,18 @@
 
         {% if filtered %}
             <p class="active-filters">
-                Showing videos
+                {% trans 'Showing videos' %}
                     {% if request.GET.q %}
-                        matching <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
+                        {% trans 'matching' %} <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
                     {% endif %}
                     {% if request.GET.lang %}
-                        in <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
+                        {% trans 'in' %} <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
                     {% endif %}
                     {% if project %}
-                        in project <strong>{{ project }}</strong>
+                        {% trans 'in project' %} <strong>{{ project }}</strong>
                     {% endif %}
-                    ({{ current_videos_count }} result{{ current_videos_count|pluralize }})
-                <a href="{{ team.get_absolute_url }}" class="clear-filters">Clear all filters</a>
+                    ({{ current_videos_count }} {% trans 'result' %}{{ current_videos_count|pluralize }})
+                <a href="{{ team.get_absolute_url }}" class="clear-filters">{% trans 'Clear all filters' %}</a>
             </p>
         {% endif %}
 

@@ -20,17 +20,17 @@
 {% endblock %}
 
 {% block main_content %}
-    <h2>{% trans "Create a team" %}</h2>
+    <h2>{% trans 'Create a team' %}</h2>
 
     <ul class="tabs">
         <li{% if not user.teams.exists %} class="current"{% endif %}>
             <a href="{% url teams:index %}">
-                {% trans "All Teams" %}
+                {% trans 'All Teams' %}
             </a>
         </li>
         <li{% if user.teams.exists %} class="current"{% endif %}>
             <a href="{% url teams:user_teams %}">
-                {% trans "My Teams" %}
+                {% trans 'My Teams' %}
             </a>
         </li>
     </ul>
@@ -40,7 +40,7 @@
             {% csrf_token %}
             <div class="grid_4 alpha">
                 <fieldset>
-                    <legend>{% trans "Team Details" %}</legend>
+                    <legend>{% trans 'Team Details' %}</legend>
                     {% include "_form_field.html" with field=form.name %}
                     {% include "_form_field.html" with field=form.slug label="Team URL" help_text="http://universalsubtitles.org/teams/" %}
                     {% include "_form_field.html" with field=form.description %}
@@ -48,7 +48,7 @@
             </div>
             <div class="grid_4 omega">
                 <fieldset>
-                    <legend>{% trans "Display Settings" %}</legend>
+                    <legend>{% trans 'Display Settings' %}</legend>
                     {% include "_form_field.html" with field=form.logo label="Logo/Banner" help_text="Max 940 x 235" %}
                     {% include "_form_field.html" with field=form.is_visible widget_type="checkbox" %}
                 </fieldset>
@@ -62,13 +62,13 @@
     <div class="controls grid_3 omega">
         <ul>
             <li class="current">
-                <a href="#">{% trans "Create a team" %}</a>
+                <a href="#">{% trans 'Create a team' %}</a>
             </li>
             <li>
             {% if not user.teams.exists %}
-                <a href="{% url teams:index %}">← {% trans "Back to teams" %}</a>
+                <a href="{% url teams:index %}">← {% trans 'Back to teams' %}</a>
             {% else %}
-                <a href="{% url teams:user_teams %}">← {% trans "Back to my teams" %}</a>
+                <a href="{% url teams:user_teams %}">← {% trans 'Back to my teams' %}</a>
             {% endif %}
             </li>
         </ul>
