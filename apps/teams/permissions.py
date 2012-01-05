@@ -563,8 +563,8 @@ def _user_can_create_task_translate(user, team_video):
 
     return role in _perms_equal_or_greater(role_req)
 
-def _user_can_create_task_review(user, team_video):
-    workflow = Workflow.get_for_team_video(team_video)
+def _user_can_create_task_review(user, team_video, workflows=None):
+    workflow = Workflow.get_for_team_video(team_video, workflows)
 
     if not workflow.review_enabled:
         # TODO: Allow users to create on-the-fly review tasks even if reviewing
@@ -582,8 +582,8 @@ def _user_can_create_task_review(user, team_video):
 
     return role in _perms_equal_or_greater(role_req)
 
-def _user_can_create_task_approve(user, team_video):
-    workflow = Workflow.get_for_team_video(team_video)
+def _user_can_create_task_approve(user, team_video, workflows=None):
+    workflow = Workflow.get_for_team_video(team_video, workflows)
 
     if not workflow.approve_enabled:
         return False
@@ -599,7 +599,7 @@ def _user_can_create_task_approve(user, team_video):
     return role in _perms_equal_or_greater(role_req)
 
 
-def can_create_task_subtitle(team_video, user=None):
+def can_create_task_subtitle(team_video, user=None, workflows=None):
     """Return whether the given video can have a subtitle task created for it.
 
     If a user is given, return whether *that user* can create the task.
@@ -622,7 +622,7 @@ def can_create_task_subtitle(team_video, user=None):
 
     return True
 
-def can_create_task_translate(team_video, user=None):
+def can_create_task_translate(team_video, user=None, workflows=None):
     """Return a list of languages for which a translate task can be created for the given video.
 
     If a user is given, filter that list to contain only languages the user can
@@ -666,7 +666,7 @@ def can_create_task_translate(team_video, user=None):
     # TODO: Order this for individual users?
     return list(candidate_languages - existing_translate_languages - existing_languages)
 
-def can_create_task_review(team_video, user=None):
+def can_create_task_review(team_video, user=None, workflows=None):
     """Return a list of languages for which a review task can be created for the given video.
 
     If a user is given, filter that list to contain only languages the user can
@@ -683,7 +683,7 @@ def can_create_task_review(team_video, user=None):
     Languages are returned as strings (language codes like 'en').
 
     """
-    if user and not _user_can_create_task_review(user, team_video):
+    if user and not _user_can_create_task_review(user, team_video, workflows):
         return []
 
     # Find all languages that have a complete set of subtitles.
@@ -700,7 +700,7 @@ def can_create_task_review(team_video, user=None):
     # Return the candidate languages that don't have a review-preventing task.
     return list(candidate_langs - existing_task_langs)
 
-def can_create_task_approve(team_video, user=None):
+def can_create_task_approve(team_video, user=None, workflows=None):
     """Return a list of languages for which an approve task can be created for the given video.
 
     If a user is given, filter that list to contain only languages the user can
@@ -719,13 +719,13 @@ def can_create_task_approve(team_video, user=None):
     Languages are returned as strings (language codes like 'en').
 
     """
-    if user and not _user_can_create_task_review(user, team_video):
+    if user and not _user_can_create_task_approve(user, team_video, workflows):
         return []
 
     tasks = team_video.task_set
 
     # Find all languages we *might* be able to create an approve task for.
-    workflow = Workflow.get_for_team_video(team_video)
+    workflow = Workflow.get_for_team_video(team_video, workflows)
     if workflow.review_enabled:
         candidate_langs = set(t.language for t in tasks.complete_review('Approved'))
     else:

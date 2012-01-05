@@ -23,9 +23,14 @@
             <div class="grid_4 alpha">
                 <fieldset>
                     <legend>{% trans 'Recipient' %}</legend>
-                    {{ form.errors.usernames }}
-                    <label for="id_usernames">{% trans 'Username' %}</label>
-                    {{ form.usernames }}
+                    {{ form.errors.user_id }}
+                    <label for="user_id">{% trans 'Username' %}</label>
+                    <div class="ajaxChosen">
+                        <select name="user_id">
+                            <option value="">-----</option>
+                            <option value="">{% trans 'Begin typing to search.' %}</option>
+                        </select>
+                    </div>
                     <p class="notation">{% trans 'Universal Subtitles username of the user you want to invite.' %}</p>
                 </fieldset>
             </div>
@@ -62,4 +67,24 @@
             </li>
         </ul>
     </div>
+
+    <script type="text/javascript">
+    
+        $(function() {
+            $(".ajaxChosen select").ajaxChosen({
+                method: 'GET',
+                url: '/en/messages/users/search/',
+                dataType: 'json'
+            }, function (data) {
+                var terms = {};
+
+                $.each(data.results, function (i, val) {
+                    terms[data.results[i][0]] = data.results[i][1];
+                });
+
+                return terms;
+            });
+        });
+
+    </script>
 {% endblock %}

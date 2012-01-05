@@ -662,7 +662,13 @@ class TeamVideo(models.Model):
     # Convenience functions
     def subtitles_started(self):
         """Return True if subtitles have been started for this video, otherwise False."""
-        return True if self._original_language() else False
+
+        sl = self.video.subtitle_language()
+
+        if sl and sl.had_version:
+            return True
+        else:
+            return False
 
     def subtitles_finished(self):
         """Return True if at least one set of subtitles has been finished for this video."""
@@ -1372,9 +1378,10 @@ class Task(models.Model):
         mode = Task.TYPE_NAMES[self.type].lower()
         return self.subtitle_version.language.get_widget_url(mode=mode, task_id=self.pk)
 
-    def save(self, *args, **kwargs):
+    def save(self, update_team_video_index=True, *args, **kwargs):
         result = super(Task, self).save(*args, **kwargs)
-        update_one_team_video.delay(self.team_video.pk)
+        if update_team_video_index:
+            update_one_team_video.delay(self.team_video.pk)
         return result
 
 

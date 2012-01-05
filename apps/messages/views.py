@@ -115,10 +115,13 @@ def new(request):
             messages.success(request, _(u'Message sent.'))
             return HttpResponseRedirect(reverse('messages:index'))
         else:
-            if request.POST.get('user'):
-                selected_user = User.objects.get(id=request.POST['user'])
+            if request.GET.get('user'):
+                selected_user = User.objects.get(id=request.GET['user'])
     else:
         form = NewMessageForm(request.user)
+
+        if request.GET.get('user'):
+            selected_user = User.objects.get(username=request.GET['user'])
 
     return {
         'selected_user': selected_user,

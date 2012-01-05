@@ -304,20 +304,25 @@ def get_assignable_roles(team, user):
     return verbose_roles
 
 
-@register.filter
-def can_create_any_task(search_record, user=None):
+@tag(register, [Variable(), Variable()])
+def can_create_any_task(context, search_record, user):
     tv = _get_team_video_from_search_record(search_record)
+    workflows = context.get('team_workflows')
 
-    if can_create_task_subtitle(tv, user):
-        return True
-    elif can_create_task_translate(tv, user):
-        return True
-    elif can_create_task_review(tv, user):
-        return True
-    elif can_create_task_approve(tv, user):
-        return True
+    if can_create_task_subtitle(tv, user, workflows):
+        result = True
+    elif can_create_task_translate(tv, user, workflows):
+        result = True
+    elif can_create_task_review(tv, user, workflows):
+        result = True
+    elif can_create_task_approve(tv, user, workflows):
+        result = True
+    else:
+        result = False
 
-    return False
+    context['user_can_create_any_task'] = result
+
+    return ''
 
 
 @register.filter

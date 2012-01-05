@@ -1961,7 +1961,6 @@ embed#clippy {
 }
 .unisubs-timeline-sub span.unisubs-grabber:active {
     cursor: -moz-grabbing !important;
-    cursor: ;
 }
 .unisubs-timeline-sub .unisubs-subtext {
     margin: 17px 10px 0 10px !important;
@@ -1975,7 +1974,7 @@ embed#clippy {
     -webkit-box-shadow: 0 1px 3px rgba(0,0,0,01) !important;
     background: #fefefe !important;
     border: 1px solid #fff !important;
-    display: none !important;
+    display: none;
     height: 30px !important;
     position: absolute !important;
     top: 13px !important;

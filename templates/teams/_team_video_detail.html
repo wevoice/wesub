@@ -26,7 +26,7 @@
                 {% endif %}
             </h4>
         </li>
-        {% if team|is_team_member:user %}
+        {% if user_is_team_member %}
             <li>
                 <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="View open tasks for this video">
                     {% if search_record.task_count %}
@@ -52,7 +52,8 @@
                     </li>
                 {% endif %}
 
-                {% if search_record|can_create_any_task:request.user %}
+                {% can_create_any_task search_record request.user %}
+                {% if user_can_create_any_task %}
                     <li>
                         <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}" title="Add a task for this video">+ {% trans 'Task' %}</a>
                     </li>

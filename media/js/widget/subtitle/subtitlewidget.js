@@ -54,6 +54,7 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
         this.insertButton_ = this.createInsertButton_($d);
         goog.style.showElement(this.deleteButton_, false);
         goog.style.showElement(this.insertButton_, false);
+        this.contentElement_ = $d('span', 'unisubs-timestamp');
 
         this.setElementInternal(
             $d('li', null,
@@ -73,7 +74,6 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
                 this.titleElemInner_ =
                 $d('span'))));
     }
-    this.contentElement_ = $d('span', 'unisubs-timestamp');
     if (!this.displayTimes_) {
         goog.dom.classes.add(this.titleElem_, 'unisubs-title-notime');
         unisubs.style.showElement(this.contentElement_, false);

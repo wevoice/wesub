@@ -215,6 +215,9 @@ def detail(request, slug, project_slug=None, languages=None):
     team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
     extra_context.update(pagination_info)
     extra_context['team_video_md_list'] = team_video_md_list
+    extra_context['team_workflows'] = list(
+        Workflow.objects.filter(team=team.id)
+                        .select_related('project', 'team', 'team_video'))
 
     if is_editor:
         team_video_ids = [record.team_video_pk for record in team_video_md_list]
@@ -741,7 +744,7 @@ def invite_members(request, slug):
         form = InviteForm(team, request.user, request.POST)
         if form.is_valid():
             # the form will fire the notifications for invitees
-            # this cannot be done on model signal, since you migt be
+            # this cannot be done on model signal, since you might be
             # sending invites twice for the same user, and that borks
             # the naive signal for only created invitations
             form.save()
