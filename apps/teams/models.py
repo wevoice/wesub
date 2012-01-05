@@ -989,13 +989,13 @@ class Workflow(models.Model):
 
 
     @classmethod
-    def _get_target_team_id(cls, id, type):
+    def _get_target_team(cls, id, type):
         if type == 'team_video':
-            return TeamVideo.objects.get(pk=id).team.id
+            return TeamVideo.objects.select_related('team').get(pk=id).team
         elif type == 'project':
-            return Project.objects.get(pk=id).team.id
+            return Project.objects.select_related('team').get(pk=id).team
         else:
-            return id
+            return Team.objects.get(pk=id)
 
     @classmethod
     def get_for_target(cls, id, type, workflows=None):
@@ -1010,15 +1010,12 @@ class Workflow(models.Model):
         If workflows is not given it will be looked up with one DB query.
 
         '''
-
-
         if not workflows:
-            team_id = Workflow._get_target_team_id(id, type)
-            workflows = list(Workflow.objects.filter(team=team_id))
+            team = Workflow._get_target_team(id, type)
+            workflows = list(Workflow.objects.filter(team=team.id).select_related('project', 'team', 'team_video'))
         else:
-            team_id = workflows[0].team.pk
+            team = workflows[0].team
 
-        team = Team.objects.get(pk=team_id)
         default_workflow = Workflow(team=team)
 
         if not workflows:
@@ -1033,7 +1030,7 @@ class Workflow(models.Model):
                 # might be a workflow for its project, so we'll start looking
                 # for that instead.
                 team_video = TeamVideo.objects.get(pk=id)
-                id, type = team_video.project.id, 'project'
+                id, type = team_video.project_id, 'project'
 
         if type == 'project':
             try:
