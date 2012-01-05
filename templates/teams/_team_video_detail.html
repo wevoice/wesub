@@ -52,7 +52,8 @@
                     </li>
                 {% endif %}
 
-                {% if search_record|can_create_any_task:request.user %}
+                {% can_create_any_task search_record request.user %}
+                {% if user_can_create_any_task %}
                     <li>
                         <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}" title="Add a task for this video">+ Task</a>
                     </li>
