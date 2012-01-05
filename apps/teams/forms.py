@@ -534,7 +534,7 @@ class LanguagesForm(forms.Form):
 
 
 class InviteForm(forms.Form):
-    usernames = forms.CharField(required=False)
+    user_id = forms.CharField(required=False, widget=forms.Select)
     message = forms.CharField(required=False, widget=forms.Textarea)
     role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1])
 
@@ -546,39 +546,35 @@ class InviteForm(forms.Form):
                                        for r in roles_user_can_invite(team, user)]
 
 
-    def clean_usernames(self):
-        raw_usernames = self.cleaned_data['usernames']
+    def clean_user_id(self):
+        user_id = self.cleaned_data['user_id']
 
-        usernames = filter(None, [name.strip() for name in raw_usernames.split(',')])
+        try:
+            User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise forms.ValidationError(_(u'User does not exist!'))
 
-        for username in usernames:
-            try:
-                User.objects.get(username=username)
-            except User.DoesNotExist:
-                raise forms.ValidationError(_(u'User "%s" does not exist!') % username)
+        try:
+            self.team.members.get(user__id=user_id)
+        except TeamMember.DoesNotExist:
+            pass
+        else:
+            raise forms.ValidationError(_(u'User is already a member of this team!'))
 
-            try:
-                self.team.members.get(user__username=username)
-            except TeamMember.DoesNotExist:
-                pass
-            else:
-                raise forms.ValidationError(_(u'User "%s" is already a member of this team!') % username)
-
-        self._split_usernames = usernames
-        return raw_usernames
+        self.user_id = user_id
+        return user_id
 
 
     def save(self):
         from messages import tasks as notifier
-        for username in self._split_usernames:
-            user = User.objects.get(username=username)
-            invite, created = Invite.objects.get_or_create(team=self.team, user=user, defaults={
-                'note': self.cleaned_data['message'],
-                'author': self.user,
-                'role': self.cleaned_data['role'],
-            })
+        user = User.objects.get(id=self.user_id)
+        invite, created = Invite.objects.get_or_create(team=self.team, user=user, defaults={
+            'note': self.cleaned_data['message'],
+            'author': self.user,
+            'role': self.cleaned_data['role'],
+        })
 
-            notifier.team_invitation_sent.delay(invite.pk)
+        notifier.team_invitation_sent.delay(invite.pk)
 
 
 class ProjectForm(forms.ModelForm):
