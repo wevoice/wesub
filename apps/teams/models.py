@@ -1378,9 +1378,10 @@ class Task(models.Model):
         mode = Task.TYPE_NAMES[self.type].lower()
         return self.subtitle_version.language.get_widget_url(mode=mode, task_id=self.pk)
 
-    def save(self, *args, **kwargs):
+    def save(self, update_team_video_index=True, *args, **kwargs):
         result = super(Task, self).save(*args, **kwargs)
-        update_one_team_video.delay(self.team_video.pk)
+        if update_team_video_index:
+            update_one_team_video.delay(self.team_video.pk)
         return result
 
 
