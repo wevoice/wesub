@@ -32,7 +32,7 @@ from utils.forms.unisub_video_form import UniSubBoundVideoField
 from teams.permissions import can_assign_task
 
 from apps.teams.moderation import add_moderation, remove_moderation
-from apps.teams.permissions import roles_user_can_invite, can_delete_task, can_add_video
+from apps.teams.permissions import roles_user_can_invite, can_delete_task, can_add_video, can_perform_task
 from apps.teams.permissions_const import ROLE_NAMES
 
 from doorman import feature_is_on
@@ -445,10 +445,15 @@ class TaskAssignForm(forms.Form):
 
     def clean(self):
         task = self.cleaned_data['task']
+        assignee = self.cleaned_data['assignee']
 
         if not can_assign_task(task, self.user):
             raise forms.ValidationError(_(
                 u'You do not have permission to assign this task.'))
+
+        if not can_perform_task(assignee, task):
+            raise forms.ValidationError(_(
+                u'This user cannot perform that task'))
 
         return self.cleaned_data
 
