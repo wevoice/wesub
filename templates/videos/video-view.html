@@ -127,7 +127,12 @@
                 {% include '_sharing_widget.html' %}
             {% endif %}
         </div>
-        <h3>{% trans "View Subtitles" %}</h3>
+        <h3>
+            {% trans "View Subtitles" %}
+            {% if video.languages_count > 0 %}
+                ({{ video.languages_count }})
+            {% endif %}
+        </h3>
         {% if video.subtitle_language %}
         <div class="abbr">
             <div class="abbr-content">
