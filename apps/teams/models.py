@@ -19,6 +19,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
@@ -1256,7 +1257,20 @@ class Task(models.Model):
     def get_widget_url(self):
         mode = Task.TYPE_NAMES[self.type].lower()
         if self.subtitle_version:
-            return self.subtitle_version.language.get_widget_url(mode, self.pk)
+            base_url = self.subtitle_version.language.get_widget_url(mode, self.pk)
+        else:
+            video = self.team_video.video
+            if self.language and video.subtitle_language(self.language) :
+                lang = video.subtitle_language(self.language) 
+                base_url = reverse("videos:translation_history", kwargs={
+                    "video_id": video.video_id,
+                    "lang": lang.language,
+                    "lang_id": lang.pk,
+                })
+            else:
+                # subtitle tasks might not have a language
+                base_url = video.get_absolute_url() 
+        return base_url+  "?t=%s" % self.pk
 
 
     def _set_version_moderation_status(self):
