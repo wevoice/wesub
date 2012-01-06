@@ -31,10 +31,13 @@
     {% endwith %}
 
     <div class="panel-holder view grid_9 alpha">
-        {% if team|can_add_tasks:user and filters.team_video != None %}
-            <div class="tools">
-                <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">{% trans 'Add Task' %}</a>
-            </div>
+        {% if filters.team_video != None %}
+            {% can_create_any_task_for_teamvideo filters.team_video request.user %}
+            {% if user_can_create_any_task %}
+                <div class="tools">
+                    <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">{% trans 'Add Task' %}</a>
+                </div>
+            {% endif %}
         {% endif %}
 
         {% if filters.assignee or filters.language or filters.type or filters.team_video %}

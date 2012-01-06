@@ -304,18 +304,16 @@ def get_assignable_roles(team, user):
     return verbose_roles
 
 
-@tag(register, [Variable(), Variable()])
-def can_create_any_task(context, search_record, user):
-    tv = _get_team_video_from_search_record(search_record)
+def _can_create_any_task(context, team_video, user):
     workflows = context.get('team_workflows')
 
-    if can_create_task_subtitle(tv, user, workflows):
+    if can_create_task_subtitle(team_video, user, workflows):
         result = True
-    elif can_create_task_translate(tv, user, workflows):
+    elif can_create_task_translate(team_video, user, workflows):
         result = True
-    elif can_create_task_review(tv, user, workflows):
+    elif can_create_task_review(team_video, user, workflows):
         result = True
-    elif can_create_task_approve(tv, user, workflows):
+    elif can_create_task_approve(team_video, user, workflows):
         result = True
     else:
         result = False
@@ -323,6 +321,15 @@ def can_create_any_task(context, search_record, user):
     context['user_can_create_any_task'] = result
 
     return ''
+
+@tag(register, [Variable(), Variable()])
+def can_create_any_task_for_record(context, search_record, user):
+    team_video = _get_team_video_from_search_record(search_record)
+    return _can_create_any_task(context, team_video, user)
+
+@tag(register, [Variable(), Variable()])
+def can_create_any_task_for_teamvideo(context, team_video, user):
+    return _can_create_any_task(context, team_video, user)
 
 
 @register.filter
