@@ -194,6 +194,10 @@ create_from_feed.csrf_exempt = True
 
 @get_video_from_code
 def video(request, video, video_url=None, title=None):
+    """
+    If user is about to perform a task on this video, then t=[task.pk]
+    will be passed to as a url parameter.
+    """
     if video_url:
         video_url = get_object_or_404(VideoUrl, pk=video_url)
     
@@ -230,9 +234,27 @@ def video(request, video, video_url=None, title=None):
     _add_share_panel_context_for_video(context, video)
     context['lang_count'] = video.subtitlelanguage_set.filter(has_version=True).count()
     context['original'] = video.subtitle_language()
+    context['task'] =  _get_related_task(request)
+    
     return render_to_response('videos/video-view.html', context,
                               context_instance=RequestContext(request))
 
+def _get_related_task(request):
+    """
+    Checks if request has t=[task-id], and if so checks if the current
+    user can perform it, in case all goes well, return the task to be
+    performed.
+    """
+    task_pk = request.GET.get('t', None)
+    if task_pk:
+        from teams.models import Task
+        from teams.permissions import can_perform_task
+        try:
+            task = Task.objects.get(pk=task_pk)
+            if can_perform_task(request.user, task):
+                return task
+        except Task.DoesNotExist:
+            return 
 
 def video_list(request):
     qs = Video.objects.filter(is_subtitled=True)
@@ -455,6 +477,7 @@ def history(request, video, lang=None, lang_id=None):
     context['edit_url'] = language.get_widget_url()
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
     
+    context['task'] =  _get_related_task(request)
     _add_share_panel_context_for_history(context, video, lang)
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.REVISIONS_ONPAGE, 
