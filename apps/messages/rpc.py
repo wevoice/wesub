@@ -66,7 +66,7 @@ class MessagesApiClass(object):
     def send(self, rdata, user):
         if not user.is_authenticated():
             return {'error': _('You should be authenticated.')}
-        
+
         form = SendMessageForm(user, rdata)
         if form.is_valid():
             form.save()
