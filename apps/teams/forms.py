@@ -170,7 +170,7 @@ class BaseVideoBoundForm(forms.ModelForm):
             self.fields['video_url'].user = self.user
 
 class AddTeamVideoForm(BaseVideoBoundForm):
-    language = forms.ChoiceField(label=_(u'Video language'), choices=settings.ALL_LANGUAGES,
+    language = forms.ChoiceField(label=_(u'Video language'), choices=(),
                                  required=False,
                                  help_text=_(u'It will be saved only if video does not exist in our database.'))
 
@@ -191,7 +191,6 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.user = user
         super(AddTeamVideoForm, self).__init__(*args, **kwargs)
 
-        self.fields['language'].choices = get_languages_list(True)
 
         projects = self.team.project_set.all()
 
@@ -205,6 +204,10 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         ordered_projects = [p for p in ordered_projects if can_add_video(team, user, p)]
 
         self.fields['project'].choices = [(p.pk, p) for p in ordered_projects]
+
+        writable_langs = team.get_writable_langs()
+        self.fields['language'].choices = [c for c in get_languages_list(True)
+                                           if c[0] in writable_langs]
 
     def clean_video_url(self):
         video_url = self.cleaned_data['video_url']
