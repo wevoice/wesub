@@ -73,6 +73,7 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
             $d('span', {'className':'unisubs-title'},
                 this.titleElemInner_ =
                 $d('span'))));
+        this.contentElement_ = $d('span', 'unisubs-timestamp');
     }
     if (!this.displayTimes_) {
         goog.dom.classes.add(this.titleElem_, 'unisubs-title-notime');
