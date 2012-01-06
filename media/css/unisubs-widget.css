@@ -2213,7 +2213,7 @@ a.unisubs-openid span {
     left: 0 !important;
     position: absolute !important;
     top: 0 !important;
-    width: 841px !important;
+    padding: 15px !important;
 }
 .unisubs-guidelinespanel .unisubs-done, .unisubs-howtopanel .unisubs-done {
     display: block !important;
@@ -2222,7 +2222,6 @@ a.unisubs-openid span {
     width: 180px !important;
 }
 .unisubs-guidelinespanel, .unisubs-guidelinespanel h2, .unisubs-howtopanel, .unisubs-howtopanel h2, .unisubs-howtopanel .unisubs-videoDiv {
-    text-align: center !important;
     text-shadow: 0 0 0 !important;
 }
 .unisubs-howto-videocontainer {
