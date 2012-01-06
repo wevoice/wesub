@@ -51,7 +51,7 @@
                             }else{
                                 $('.global-errors', $form).prepend(error);
                             }
-                        };//for
+                        }
                     } else {
                         if (status.status){
                             $.jGrowl('{% trans "The message has been successfully sent." %}');
@@ -62,7 +62,7 @@
                 },
                 beforeSubmit: function(formData, $form, options){
                     $('p.error_list', $form).remove();
-                }                
+                }
             });    
             
             function set_message_data(data, $modal){
@@ -90,6 +90,10 @@
                 set_message_data(reply_msg_data, $('#msg_modal'));
                 $('#msg_modal').mod();
             };
+
+            $('.reply').bind('click', function() {
+                set_message_data($(this).metadata(), $('msg_modal'));
+            });
             
             $('.mark-read').bind('click', function(event){
                 var $link = $(this);
@@ -167,9 +171,9 @@
                             <a href="#" data="{{ msg.json_data }}" class="mark-read">{% trans "Mark Read" %}</a>
                         </li>
                         {% endif %}
-                        {% if msg.author != None %}
+                        {% if msg.author != None and msg.author != request.user %}
                             <li>
-                                <a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">{% trans "Reply" %}</a>
+                                <a class="reply" href="#" data-modal="msg_modal" data="{{ msg.json_data }}">{% trans "Reply" %}</a>
                             </li>
                         {% endif %}
                         <li>

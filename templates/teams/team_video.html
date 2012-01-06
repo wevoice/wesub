@@ -20,7 +20,7 @@
         {% include 'teams/_tabs.html' %}
     {% endwith %}
 
-    <div class="view grid_9 alpha">
+    <div class="view grid_9 alpha edit-team-video">
         <form method='post' action="." enctype="multipart/form-data">
 
             <h3>{% trans 'Edit video' %}: <em>{% firstof team_video.title team_video.video.title %}</em></h3>

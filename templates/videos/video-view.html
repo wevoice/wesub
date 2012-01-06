@@ -237,14 +237,27 @@
                 {% render_visibility_button video user %}
             {% endif %}
             </li>
+            {% if task %}<li> <a href="">task id={{task.pk}}</a></li>{% endif %}
         </ul>
     {% endif %}
 {% endblock %}
+  
 
 {% block bottom_scripts %}
     <script>
         $(window).load( function() {
             unisubs.messaging.simplemessage.displayPendingMessages();
+        {% if task %}
+            var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
+            var opener = new unisubs.widget.SubtitleDialogOpener(
+                '{{ task.team_video.video.video_id }}',
+                '{{ task.team_video.video.get_video_url }}',
+                videoSource, null, null
+            );
+            opener.showStartDialog();
+
+          // trigger open dialog here 
+        {% endif %}
         });
     </script>
 {% endblock %}

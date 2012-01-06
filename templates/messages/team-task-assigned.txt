@@ -4,6 +4,4 @@ The {{ team.name }} team has assigned you a new task:
  {{ task_type }} {% if task_language %}{{ task_language}}{% endif %} subtitles for {{ task.team_video.video.title }}.
 
 
-Perform this task:
-{{url_base}}{{ perform_url|safe }}
-
+Perform this task: {{url_base}}{{ perform_url|safe }}
