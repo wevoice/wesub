@@ -167,7 +167,7 @@
                             <a href="#" data="{{ msg.json_data }}" class="mark-read">{% trans "Mark Read" %}</a>
                         </li>
                         {% endif %}
-                        {% if msg.author != None %}
+                        {% if msg.author != None and msg.author != request.user %}
                             <li>
                                 <a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">{% trans "Reply" %}</a>
                             </li>
