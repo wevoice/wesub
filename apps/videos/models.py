@@ -34,7 +34,7 @@ from django.utils.dateformat import format as date_format
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
-from django.utils.http import urlquote_plus, urlquote
+from django.utils.http import urlquote_plus
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
@@ -813,7 +813,6 @@ class SubtitleLanguage(models.Model):
         self.writelock_time = None
 
     def _filter_public(self, versions, public_only):
-        from apps.teams.moderation import APPROVED, UNMODERATED
         if public_only:
             versions = versions.filter(moderation_status__in=[APPROVED, UNMODERATED])
         return versions

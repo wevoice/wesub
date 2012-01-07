@@ -235,7 +235,7 @@ class Team(models.Model):
 
     def get_pending_moderation( self, video=None):
         from videos.models import SubtitleVersion
-        qs =  SubtitleVersion.objects.filter(language__video__moderated_by=self, moderation_status=WAITING_MODERATION)
+        qs = SubtitleVersion.objects.filter(language__video__moderated_by=self, moderation_status=WAITING_MODERATION)
         if video is not None:
             qs = qs.filter(language__video=video)
         return qs
@@ -1261,7 +1261,7 @@ class Task(models.Model):
         else:
             video = self.team_video.video
             if self.language and video.subtitle_language(self.language) :
-                lang = video.subtitle_language(self.language) 
+                lang = video.subtitle_language(self.language)
                 base_url = reverse("videos:translation_history", kwargs={
                     "video_id": video.video_id,
                     "lang": lang.language,
@@ -1269,7 +1269,7 @@ class Task(models.Model):
                 })
             else:
                 # subtitle tasks might not have a language
-                base_url = video.get_absolute_url() 
+                base_url = video.get_absolute_url()
         return base_url+  "?t=%s" % self.pk
 
 
@@ -1290,6 +1290,7 @@ class Task(models.Model):
             self.subtitle_version.moderation_status = MODERATION.APPROVED
         else:
             self.subtitle_version.moderation_status = MODERATION.REJECTED
+
         self.subtitle_version.save()
 
     def complete(self):
@@ -1395,7 +1396,7 @@ class Task(models.Model):
         else:
             video = self.team_video.video
             if self.language and video.subtitle_language(self.language) :
-                lang = video.subtitle_language(self.language) 
+                lang = video.subtitle_language(self.language)
                 base_url = reverse("videos:translation_history", kwargs={
                     "video_id": video.video_id,
                     "lang": lang.language,
@@ -1403,7 +1404,7 @@ class Task(models.Model):
                 })
             else:
                 # subtitle tasks might not have a language
-                base_url = video.get_absolute_url() 
+                base_url = video.get_absolute_url()
         return base_url+  "?t=%s" % self.pk
 
 
