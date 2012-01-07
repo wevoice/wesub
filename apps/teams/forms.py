@@ -221,7 +221,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         return video_url
 
     def clean(self):
-        language = self.cleaned_data['language']
+        language = self.cleaned_data.get('language')
         video = self.fields['video_url'].video
 
         if video:
