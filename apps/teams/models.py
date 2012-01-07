@@ -1390,7 +1390,23 @@ class Task(models.Model):
     def get_perform_url(self):
         '''Return the URL that will open whichever dialog necessary to perform this task.'''
         mode = Task.TYPE_NAMES[self.type].lower()
-        return self.subtitle_version.language.get_widget_url(mode=mode, task_id=self.pk)
+        if self.subtitle_version:
+            base_url = self.subtitle_version.language.get_widget_url(mode, self.pk)
+        else:
+            video = self.team_video.video
+            if self.language and video.subtitle_language(self.language) :
+                lang = video.subtitle_language(self.language) 
+                base_url = reverse("videos:translation_history", kwargs={
+                    "video_id": video.video_id,
+                    "lang": lang.language,
+                    "lang_id": lang.pk,
+                })
+            else:
+                # subtitle tasks might not have a language
+                base_url = video.get_absolute_url() 
+        return base_url+  "?t=%s" % self.pk
+
+
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         result = super(Task, self).save(*args, **kwargs)
