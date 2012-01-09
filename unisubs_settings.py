@@ -125,3 +125,6 @@ STATIC_URL_BASE = STATIC_URL
 if COMPRESS_MEDIA:
     STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
 
+#  the keyd cache apps need this:
+CACHE_TIMEOUT  = 60
+CACHE_PREFIX  = "unisubscache"

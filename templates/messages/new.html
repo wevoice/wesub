@@ -72,7 +72,7 @@
             var terms = {};
 
             $.each(data.results, function (i, val) {
-                terms[data.results[i][0]] = data.results[i][1];
+                terms[data.results[i][0]] = data.results[i][1] + ' (' + data.results[i][2] + ')';
             });
 
             return terms;

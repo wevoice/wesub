@@ -134,7 +134,7 @@ def search_users(request):
     users = User.objects.all()
     q = request.GET.get('term')
 
-    results = [[u.id, u.username]
+    results = [[u.id, u.username, unicode(u)]
                for u in users.filter(username__icontains=q,
                                             is_active=True)]
 
