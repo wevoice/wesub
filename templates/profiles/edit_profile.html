@@ -13,7 +13,7 @@
     <script type="text/javascript">
         jQuery(function($){
             $('.remove-avatar').click(function(){
-                if (confirm('{% trans "Do you really want delete picture?" %}')){
+                if (confirm('{% trans "Do you really want delete your picture?" %}')){
                     $.post('{% url profiles:remove_avatar %}', {remove: true}, function(response){
                         if ( ! response.errors){
                             $('.user-avatar').attr('src', response.avatar);
@@ -199,7 +199,7 @@
                     {% trans 'Save Changes' %}
                 </button>
                     
-                <a class="button delete" href="{% url auth:delete_user %}">{% trans 'Permanently Delete Your Profile' %}</a>
+                <a class="button delete" onclick="return confirm('Are you sure you want to permanently delete your account? This action is irreversible.');" href="{% url auth:delete_user %}">{% trans 'Permanently Delete Your Profile' %}</a>
             </div>
         </form>
     </div>

@@ -30,8 +30,11 @@
                 field = $(this);
                 options.data = {
                     term: val,
-                    task_type: $('select#id_type option:selected').val(),
-                    task: field.parents('form.assign-form').children('input[name="task"]').val()
+                    task_type: $('select#id_type option:selected').val(), // Only for new tasks
+                    task: field.parents('form.assign-form').children('input[name="task"]').val(),
+                    task_lang: field.parents('form.assign-form').children('input[name="task_lang"]').val(),
+                    task_type: field.parents('form.assign-form').children('input[name="task_type"]').val(),
+                    team_video: field.parents('form.assign-form').children('input[name="task_video"]').val()
                 };
                 if (typeof success !== "undefined" && success !== null) {
                     success;

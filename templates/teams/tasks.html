@@ -159,7 +159,10 @@
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
-                            <input type="hidden" name="task" value="{{ task.pk }}" />
+                            <input type="hidden" name="task" value="{{ task.id }}" />
+                            <input type="hidden" name="task_type" value="{{ task.type }}" />
+                            <input type="hidden" name="task_lang" value="{{ task.language }}" />
+                            <input type="hidden" name="team_video" value="{{ task.team_video }}" />
 
                             <div class="assignee-choice" style="display: none;">
                                 <a class="cancel" href="#">{% trans 'Cancel' %}</a>
