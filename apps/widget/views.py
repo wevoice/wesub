@@ -16,6 +16,7 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import re
 import time
 
 from django.http import HttpResponse, Http404, HttpResponseServerError
@@ -83,7 +84,10 @@ def onsite_widget(request):
     context = widget.add_config_based_js_files(
         {}, settings.JS_API, 'unisubs-api.js')
     config = request.GET.get('config', '{}')
-
+    # strip any query string parama as that chokes the json string
+    match = re.search(r'(?P<qs>}\?.*)', config)
+    if match:
+        config = config[:match.start() +1 ]
     try:
         config = json.loads(config)
     except (ValueError, KeyError):
