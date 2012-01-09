@@ -251,7 +251,7 @@ class Video(models.Model):
         return ('videos:history', [self.video_id])
 
     def get_team_video(self):
-        tvs = self.teamvideo_set.filter(is_visible=True).select_related('team')[:1]
+        tvs = self.teamvideo_set.filter(team__is_visible=True).select_related('team')[:1]
         if not tvs:
             return None
         else:
