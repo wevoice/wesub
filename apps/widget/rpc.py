@@ -139,6 +139,7 @@ class Rpc(BaseRpc):
                     subtitles = self._autoplay_subtitles(
                         request.user, video_id, language_pk, None)
                     return_value['subtitles'] = subtitles
+
         return return_value
 
     def track_subtitle_play(self, request, video_id):

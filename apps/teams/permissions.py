@@ -381,11 +381,13 @@ def can_change_team_settings(team, user):
 def can_view_tasks_tab(team, user):
     """Return whether the given user can view the tasks tab for the given team.
 
-    For now, the tab is public.  We may come back and revisit this later.
+    Only team members can see the tasks tab.
 
     """
+    if not user or not user.is_authenticated():
+        return False
 
-    return True
+    return team.members.filter(user=user).exists()
 
 def can_invite(team, user):
     """Return whether the given user can send an invite for the given team."""

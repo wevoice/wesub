@@ -368,8 +368,8 @@ class TestRules(BaseTestPermission):
             with self.role(r):
                 self.assertTrue(can_view_tasks_tab(self.team, self.user))
 
-        # Even outsiders can view it!
-        self.assertTrue(can_view_tasks_tab(self.team, self.outsider))
+        # Outsiders can't.
+        self.assertFalse(can_view_tasks_tab(self.team, self.outsider))
 
     def test_can_invite(self):
         team, user, outsider = self.team, self.user, self.outsider
