@@ -158,7 +158,8 @@ class Rpc(BaseRpc):
         my_languages = get_user_languages_from_request(request)
         my_languages.extend([l[:l.find('-')] for l in my_languages if l.find('-') > -1])
         video = models.Video.objects.get(video_id=video_id)
-        video_languages = [language_summary(l) for l
+        team_video = video.get_team_video()
+        video_languages = [language_summary(l, team_video, request.user) for l
                            in video.subtitlelanguage_set.all()]
         original_language = None
         if video.subtitle_language():
@@ -635,13 +636,25 @@ class Rpc(BaseRpc):
             base_language,
             language.get_title())
 
-def language_summary(language):
+def language_summary(language, team_video=-1, user=None):
+    if team_video == -1:
+        team_video = language.video.get_team_video()
+
     summary = {
         'pk': language.pk,
         'language': language.language,
         'dependent': language.is_dependent(),
         'subtitle_count': language.subtitle_count,
-        'in_progress': language.is_writelocked }
+        'in_progress': language.is_writelocked,
+        'disabled': False }
+
+    if team_video:
+        tasks = team_video.task_set.incomplete().filter(language=language.language)
+        if tasks:
+            task = tasks[0]
+            if user and user != task.assignee:
+                summary['disabled'] = True
+
     if language.is_dependent():
         summary['percent_done'] = language.percent_done
         if language.real_standard_language():

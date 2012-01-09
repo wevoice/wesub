@@ -30,6 +30,7 @@ unisubs.startdialog.VideoLanguage = function(json) {
     this.STANDARD_PK = json['standard_pk'];
     this.SUBTITLE_COUNT = json['subtitle_count'];
     this.IN_PROGRESS = json['in_progress'];
+    this.DISABLED = json['disabled'];
 };
 
 unisubs.startdialog.VideoLanguage.prototype.languageName = function() {
@@ -40,11 +41,15 @@ unisubs.startdialog.VideoLanguage.prototype.languageName = function() {
 unisubs.startdialog.VideoLanguage.prototype.toString = function() {
     var name = this.languageName();
 
-    if (!this.DEPENDENT && this.SUBTITLE_COUNT > 0)
+    if (!this.DEPENDENT && this.SUBTITLE_COUNT > 0) {
         name += (this.IS_COMPLETE ? " (100%)" : " (incomplete)");
-    else if (this.DEPENDENT && this.PERCENT_DONE > 0)
+    } else if (this.DEPENDENT && this.PERCENT_DONE > 0) {
         name += " (" + this.PERCENT_DONE + "%)";
-    return name + (this.IN_PROGRESS ? " (in progress)" : "");
+    }
+
+    name += ((this.IN_PROGRESS || this.DISABLED) ? " (in progress)" : "");
+
+    return name;
 };
 
 unisubs.startdialog.VideoLanguage.prototype.completionStatus = function() {
