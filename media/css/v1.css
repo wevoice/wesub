@@ -55,7 +55,7 @@ body{overflow-y:scroll;}
 .v1 .listing >li .assignee-choice a{display:block;}
 .v1 .listing >li .assignee-choice .cancel{float:right;color:#7692a3;}
 .v1 .listing >li .action-assign-submit{color:#FFF;}
-.v1 .listing.videos>li{min-height:6em;padding-left:120px;padding-right:150px;}.v1 .listing.videos>li .thumb{width:100px;height:60px;}.v1 .listing.videos>li .thumb img{height:60px;}
+.v1 .listing.videos>li{min-height:6em;padding-left:120px;padding-right:150px;}.v1 .listing.videos>li .thumb{width:100px;height:60px;}.v1 .listing.videos>li .thumb img{height:60px;max-width:100px;}
 .v1 .listing.members>li,.v1 .listing.messages>li{min-height:4em;padding-left:65px;padding-right:150px;}.v1 .listing.members>li .thumb,.v1 .listing.messages>li .thumb{width:45px;height:45px;}.v1 .listing.members>li .thumb img,.v1 .listing.messages>li .thumb img{height:45px;}
 .v1 .listing.members>li.current,.v1 .listing.messages>li.current{background:#f6f6e4;}
 .v1 .listing.messages>li{opacity:.5;}.v1 .listing.messages>li.unread{opacity:1;}
