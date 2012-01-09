@@ -132,6 +132,11 @@
         <meta property="fb:admins" content="539835590"/>
     {% endblock  %}
 
+    {% if DEBUG %}
+        <script src="http://yandex.st/highlightjs/6.1/highlight.min.js"></script>
+        <link rel="stylesheet" href="http://yandex.st/highlightjs/6.1/styles/github.min.css">
+        <script>hljs.initHighlightingOnLoad();</script>
+    {% endif %}
 </head>
 
 <body {% block body_attrs %}{% endblock %}>
