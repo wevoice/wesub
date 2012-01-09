@@ -604,6 +604,14 @@ body {
     &.unread {
         opacity: 1;
     }
+    p {
+        a {
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+    }
 }
 .v1 .listing.activity > li, .v1 .listing.tasks > li, .v1 .listing.urls > li {
     padding-right: 150px;
