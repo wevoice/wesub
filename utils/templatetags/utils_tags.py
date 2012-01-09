@@ -164,6 +164,7 @@ def rawdump(x):
     output = pformat(x)+'\n'
     return output
 
+DUMP_TEMPLATE = '<pre><code class="python" style="font-family: Menlo, monospace; white-space: pre;">%s</code></pre>'
 @register.filter
 def dump(x):
-    return mark_safe(linebreaksbr(escape(rawdump(x))))
+    return mark_safe(DUMP_TEMPLATE % escape(rawdump(x)))
