@@ -520,6 +520,13 @@ def can_perform_task(user, task):
 
     return can_perform_task_for(user, task.type, task.team_video, task.language)
 
+def can_perform_task_type(user, team, task_type):
+    """Return whether the given user can perform the given type of task in the given team."""
+
+    # Magic?
+
+    return True
+
 def can_assign_task(task, user):
     """Return whether the given user can assign the given task.
 
