@@ -8,9 +8,13 @@
             var opener = new unisubs.widget.SubtitleDialogOpener(
                 '{{ task.team_video.video.video_id }}',
                 '{{ task.team_video.video.get_video_url }}',
-                videoSource, null, null
+                videoSource, null, null, 'fr'
             );
-            opener.showStartDialog();
+            {% if task.language %}
+                opener.showStartDialog(null, {LANGUAGE: '{{ task.language }}'});
+            {% else %}
+                opener.showStartDialog();
+            {% endif %}
 
             return false;
         });

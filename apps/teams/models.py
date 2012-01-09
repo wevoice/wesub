@@ -1419,13 +1419,15 @@ class Task(models.Model):
 def task_moderate_version(sender, instance, created, **kwargs):
     """If we create a review or approval task for this subtitle_version, mark it.
 
-    It *must* be awaiting moderation if we've just created one of these tasks.
+    It *must* be awaiting moderation if we've just created one of these tasks
+    (and it's not a pre-completed task).
 
     """
     if created and instance.subtitle_version:
         if instance.type in (Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']):
-            instance.subtitle_version.moderation_status = WAITING_MODERATION
-            instance.subtitle_version.save()
+            if not instance.completed:
+                instance.subtitle_version.moderation_status = WAITING_MODERATION
+                instance.subtitle_version.save()
 
 post_save.connect(task_moderate_version, Task, dispatch_uid="teams.task.task_moderate_version")
 
