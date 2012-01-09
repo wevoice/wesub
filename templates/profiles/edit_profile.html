@@ -13,7 +13,7 @@
     <script type="text/javascript">
         jQuery(function($){
             $('.remove-avatar').click(function(){
-                if (confirm('{% trans "Do you really want delete picture?" %}')){
+                if (confirm('{% trans "Do you really want delete your picture?" %}')){
                     $.post('{% url profiles:remove_avatar %}', {remove: true}, function(response){
                         if ( ! response.errors){
                             $('.user-avatar').attr('src', response.avatar);
