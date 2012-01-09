@@ -506,6 +506,9 @@ def can_assign_tasks(team, user, project=None, lang=None):
 def can_perform_task_for(user, type, team_video, language):
     """Return whether the given user can perform the given type of task."""
 
+    if type:
+        type = int(type)
+
     if type == Task.TYPE_IDS['Subtitle']:
         return can_create_and_edit_subtitles(user, team_video)
     elif type == Task.TYPE_IDS['Translate']:
@@ -519,13 +522,6 @@ def can_perform_task(user, task):
     """Return whether the given user can perform the given task."""
 
     return can_perform_task_for(user, task.type, task.team_video, task.language)
-
-def can_perform_task_type(user, team, task_type):
-    """Return whether the given user can perform the given type of task in the given team."""
-
-    # Magic?
-
-    return True
 
 def can_assign_task(task, user):
     """Return whether the given user can assign the given task.

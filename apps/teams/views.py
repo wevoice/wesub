@@ -60,7 +60,6 @@ from teams.permissions import (
     can_view_tasks_tab, can_invite, roles_user_can_assign, can_join_team,
     can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
     can_rename_team, can_change_team_settings, can_perform_task_for,
-    can_perform_task_type,
 )
 from teams.tasks import invalidate_video_caches
 import logging
@@ -848,8 +847,6 @@ def _member_search_result(member, team, task_id, team_video_id, task_type, task_
     elif team_video_id:
         team_video = TeamVideo.objects.get(pk=team_video_id)
         result += [can_perform_task_for(member.user, task_type, team_video, task_lang)]
-    elif task_type:
-        result += [can_perform_task_type(member.user, team, task_type)]
     else:
         result += [None]
 

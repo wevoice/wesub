@@ -30,13 +30,23 @@
                 field = $(this);
                 options.data = {
                     term: val,
-                    task_type: $('select#id_type option:selected').val(), // Only for new tasks
-                    task: field.parents('form.assign-form').children('input[name="task"]').val(),
-                    task_lang: field.parents('form.assign-form').children('input[name="task_lang"]').val(),
-                    team_video: field.parents('form.assign-form').children('input[name="task_video"]').val()
+
+                    // New tasks.
+                    task_type: $('select#id_type option:selected').val(),
+                    team_video: $('input[name="id_team_video"]').val()
+
                 };
                 if (!options.data['task_type']) {
-                    options.data['task_type'] = field.parents('form.assign-form').children('input[name="task_type"]').val();
+
+                    // Existing tasks.
+                    options.data = {
+                        term: val,
+                        task_type: field.parents('form.assign-form').children('input[name="task_type"]').val(),
+                        team_video: field.parents('form.assign-form').children('input[name="task_video"]').val(),
+                        task: field.parents('form.assign-form').children('input[name="task"]').val(),
+                        task_lang: field.parents('form.assign-form').children('input[name="task_lang"]').val()
+                    }
+
                 }
                 if (typeof success !== "undefined" && success !== null) {
                     success;
