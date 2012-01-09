@@ -1,13 +1,14 @@
+{% load utils_tags %}
 {{ field.errors }}
 {% if widget_type != "checkbox" %}
     {% if label %}
-        <label for="{{ field.html_name }}">{{ label }}</label>
+        <label for="id_{{ field.html_name }}">{{ label }}</label>
     {% else %}
         {{ field.label_tag }}
     {% endif %}
     {{ field }}
 {% else %}
-    <label for="{{ field.html_name }}">
+    <label for="id_{{ field.html_name }}">
         {{ field }} {% if label %}{{ label }}{% else %}{{ field.label }}{% endif %}
     </label>
 {% endif %}
