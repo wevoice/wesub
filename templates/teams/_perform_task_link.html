@@ -11,7 +11,7 @@
                 videoSource, null, null, 'fr'
             );
             {% if task.language %}
-                opener.showStartDialog(null, {LANGUAGE: '{{ task.language }}'});
+                opener.showStartDialog(null, {'LANGUAGE': '{{ task.language }}', 'FORCE': true});
             {% else %}
                 opener.showStartDialog();
             {% endif %}
