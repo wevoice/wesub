@@ -63,7 +63,6 @@
 
         <ul class="tasks listing">
             {% for task in tasks %}
-                {{ task|dump }}
                 <li>
                     <h3>
                         {% if task.get_type_display == "Subtitle" %}
