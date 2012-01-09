@@ -156,7 +156,13 @@ unisubs.startdialog.ToLanguages.prototype.addMissingLangs_ = function(toLanguage
 };
 
 unisubs.startdialog.ToLanguages.prototype.filterLangs_ = function(toLanguages) {
-    var validLangSet = new goog.structs.Set(this.limitLanguages_);
+    var validLangSet;
+    if (this.initialLanguageState_ && this.initialLanguageState_['FORCE']) {
+        validLangSet = new goog.structs.Set([this.initialLanguageState_['LANGUAGE']]);
+    } else {
+        validLangSet = new goog.structs.Set(this.limitLanguages_);
+    }
+
     if (validLangSet.isEmpty()) {
         return toLanguages;
     } else {
