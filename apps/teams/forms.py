@@ -544,7 +544,7 @@ class LanguagesForm(forms.Form):
 class InviteForm(forms.Form):
     user_id = forms.CharField(required=False, widget=forms.Select)
     message = forms.CharField(required=False, widget=forms.Textarea)
-    role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1])
+    role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1], initial='contributor')
 
     def __init__(self, team, user, *args, **kwargs):
         super(InviteForm, self).__init__(*args, **kwargs)
@@ -560,6 +560,8 @@ class InviteForm(forms.Form):
         try:
             User.objects.get(id=user_id)
         except User.DoesNotExist:
+            raise forms.ValidationError(_(u'User does not exist!'))
+        except ValueError:
             raise forms.ValidationError(_(u'User does not exist!'))
 
         try:

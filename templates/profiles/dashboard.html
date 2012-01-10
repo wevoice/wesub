@@ -18,7 +18,21 @@
     {% endwith %}
 
     <div class="view grid_9 alpha">
-        <div class="grid_4 alpha">
+        <div class="grid_5 alpha">
+            <h3>{% trans "Feed" %}</h3>
+            {% with action_list as events %}
+                <ul class="listing activity">
+                    {% for item in events %}
+                        <li>{{ item.render }}</li>
+                    {% empty %}
+                        <li class="empty">Sorry, no activity yet.</li>
+                    {% endfor %}
+                </ul>
+            {% endwith %}
+            <p><a href="{% url profiles:actions_list %}">See all</a></p>
+        </div>
+
+        <div class="grid_4 omega">
             <h3>{% trans "Alerts" %}</h3>
             <ul class="featured">
                 {% with user.unread_messages.count as new_msg_count %}
@@ -41,22 +55,6 @@
                 {% endif %}
             </ul>
             {% endwith %}
-        </div>
-
-        <div class="grid_5 omega">
-            <h3>{% trans "Feed" %}</h3>
-            <ul class="listing">
-              {% with action_list as events %}
-			  <ul class="listing activity">
-	    		{% for item in events %}
-				<li>{{ item.render }}</li>
-                {% empty %}
-                <li class="empty">Sorry, no activity yet.</li>
-				{% endfor %}
-	    	</ul>
-        {% endwith %}
-              <li><a href="{% url profiles:actions_list %}">See all</a></li>
-            </ul>
         </div>
     </div>
 

@@ -28,7 +28,7 @@
                 <li>
                     <a href="{% url logout %}?next={{ request.path_info|urlencode }}">{% trans 'Logout' %}</a>
                 </li>
-                {% with user.managed_teams as user_teams %}
+                {% with user.teams.all as user_teams %}
                     {% if user_teams %}
                         <li>
                             <div id="teams_menu">

@@ -29,7 +29,7 @@ simplejson==2.1.1
 django-haystack==1.2.4
 pysolr==2.0.14
 chardet==1.0.1
-boto==2.0b4
+vendor/boto-2.1.0-0.tar.gz
 python-memcached
 feedparser
 lxml==2.3
