@@ -561,6 +561,8 @@ class InviteForm(forms.Form):
             User.objects.get(id=user_id)
         except User.DoesNotExist:
             raise forms.ValidationError(_(u'User does not exist!'))
+        except ValueError:
+            raise forms.ValidationError(_(u'User does not exist!'))
 
         try:
             self.team.members.get(user__id=user_id)
