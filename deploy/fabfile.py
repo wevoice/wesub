@@ -131,6 +131,23 @@ def run_command(command):
         _git_pull()
         run('{0}/env/bin/python manage.py {1} '
             '--settings=unisubs_settings'.format(env.static_dir, command))
+        
+def _run_shell(base_dir, command, is_sudo=False):
+    if is_sudo:
+        f = sudo
+    else:
+        f = run
+    with cd(os.path.join(base_dir, 'unisubs')):
+        f('sh ../env/bin/activate && %s' % command)
+
+
+def run_shell(command, is_sudo=False):
+    """
+    Runs the given command inside the virtual env for each
+    host / environment.
+    """
+    _execute_on_all_hosts(lambda dir: _run_shell(dir, command, bool(is_sudo)))
+
 
 def migrate_fake(app_name):
     """Unfortunately, one must do this when moving an app to South for the first time.
