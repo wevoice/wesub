@@ -34,7 +34,7 @@
                         <option value="">-----</option>
                         <option value="">Begin typing to search.</option>
                         {% if selected_user %}
-                            <option selected="selected" value="{{ selected_user.id }}">{{ selected_user.username }}</option>
+                            <option selected="selected" value="{{ selected_user.id }}">{{ selected_user.username }} ({{ selected_user.get_full_name }})</option>
                         {% endif %}
                     </select>
                 </div>
