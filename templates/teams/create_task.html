@@ -51,6 +51,7 @@
                         <label>{% trans 'What needs to be done?' %}</label>
                         {{ form.errors.type }}
                         {{ form.type }}
+                        <input type="hidden" name="id_team_video" value="{{ team_video.id }}" />
                         <p class="notation">{% trans 'Grayed-out tasks are not available for this video at this time.' %}</p>
                     </div>
                     <div class="chosen">
@@ -114,7 +115,11 @@
             var terms = {};
 
             $.each(data.results, function (i, val) {
-                terms[data.results[i][0]] = data.results[i][1];
+                var can_perform_task = data.results[i][2];
+
+                if (can_perform_task) {
+                    terms[data.results[i][0]] = data.results[i][1];
+                }
             });
 
             return terms;

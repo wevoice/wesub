@@ -7,6 +7,6 @@ Dear {{ user }},</br>
 <p>The {{ team.name }} team has assigned you a new task:<br/>
  {{ task_type }} {% if task_language %}{{ task_language}}{% endif %} subtitles for {{ task.team_video.video.title }}.</p>
 
-<a href="{{url_base}}{{ perform_url|safe }}">Perform this task.</a><br/>
+<a href="{{url_base}}{% url teams:perform_task  slug=team.slug,task_pk=task.pk%}">Perform this task.</a><br/>
 {% endblock %}
 {% block dont_send %}{% endblock %}

@@ -33,11 +33,11 @@ from apps.messages.rpc import MessagesApiClass
 from utils import render_to_json, render_to
 from utils.rpc import RpcRouter
 
-
 rpc_router = RpcRouter('messages:rpc_router', {
     'MessagesApi': MessagesApiClass()
 })
 
+MAX_MEMBER_SEARCH_RESULTS = 40
 MESSAGES_ON_PAGE = getattr(settings, 'MESSAGES_ON_PAGE', 30)
 
 
@@ -137,5 +137,7 @@ def search_users(request):
     results = [[u.id, u.username, unicode(u)]
                for u in users.filter(username__icontains=q,
                                             is_active=True)]
+
+    results = results[:MAX_MEMBER_SEARCH_RESULTS]
 
     return { 'results': results }

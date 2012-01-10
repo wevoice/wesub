@@ -59,7 +59,7 @@ from teams.permissions import (
     can_create_task_translate, can_create_task_review, can_create_task_approve,
     can_view_tasks_tab, can_invite, roles_user_can_assign, can_join_team,
     can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
-    can_rename_team, can_change_team_settings, can_perform_task_for
+    can_rename_team, can_change_team_settings, can_perform_task_for,
 )
 from teams.tasks import invalidate_video_caches
 import logging
@@ -1081,8 +1081,13 @@ def create_task(request, slug, team_video_pk):
              'can_assign': can_assign, }
 
 @login_required
-def perform_task(request):
-    task = Task.objects.get(pk=request.POST.get('task_id'))
+def perform_task(request, slug=None, task_pk=None):
+    task_pk = task_pk or request.POST.get('task_id')
+    task = Task.objects.get(pk=task_pk)
+    if slug:
+        team = get_object_or_404(Team,slug=slug)
+        if task.team != team:
+            return HttpResponseForbidden(_(u'You are not allowed to perform this task.'))
 
     if not can_perform_task(request.user, task):
         return HttpResponseForbidden(_(u'You are not allowed to perform this task.'))
