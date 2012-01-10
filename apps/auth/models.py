@@ -229,6 +229,10 @@ class CustomUser(BaseUser):
             TeamMember.ROLE_ADMIN,
             TeamMember.ROLE_MANAGER])
 
+    def open_tasks(self):
+        from apps.teams.models import Task
+        return Task.objects.incomplete().filter(assignee=self)
+
     def _get_gravatar(self, size):
         url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.email.lower()).hexdigest() + "?"
         url += urllib.urlencode({'d': 'mm', 's':str(size)})

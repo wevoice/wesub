@@ -8,13 +8,11 @@
         {{ user_info }}
     </h2>
 
-	{% with 'profile' as current %}
+	{% with 'dashboard' as current %}
         {% include 'profiles/_tabs.html' %}
     {% endwith %}
 
     <div class="view grid_9 alpha">
-    	
-    	{% if is_paginated %}{% paginator %}{% endif %}
         
         {% with action_list as events %}
 			<ul class="listing activity">
@@ -32,7 +30,7 @@
 
     <div class="controls grid_3 omega">
         {% with 'activity' as current %}
-            {% include 'profiles/_filters.html' %}
+            {% include 'profiles/_filters_dashboard.html' %}
         {% endwith %}
     </div>
 {% endblock %}

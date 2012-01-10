@@ -1085,11 +1085,20 @@ body#teams div.edit-team-video form fieldset a {
     }
 
     .listing {
-        margin-bottom: 1em;
+        margin-bottom: 4em;
         margin-right: 25px;
 
         li {
             padding: 1em 150px 1em 0;
+        }
+
+        &.tasks li {
+            padding: 1em 0;
+            min-height: 0;
+
+            p {
+                margin-bottom: 0;
+            }
         }
 
         .timestamp {
@@ -1135,7 +1144,7 @@ body#teams div.edit-team-video form fieldset a {
 
     ul {
         padding: 0;
-        
+
         &.errorlist {
             margin-bottom: 0;
             width: auto;
