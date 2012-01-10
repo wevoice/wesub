@@ -301,7 +301,6 @@ def team_task_assigned(task_pk):
         return False
     task_type = Task.TYPE_NAMES[task.type]
     subject = ugettext(u"You have a new task assignment on Universal Subtitles!")
-    perform_url = task.get_perform_url()
     user = task.assignee
     task_language  = None
     if task.language:
@@ -312,13 +311,11 @@ def team_task_assigned(task_pk):
         "task_type": task_type,
         "task_language": task_language,
         "url_base":get_url_base(),
-        "perform_url":perform_url,
         "task":task,
     }
     msg = None
     if user.notify_by_message:
         template_name = "messages/team-task-assigned.txt"
-        context["perform_url"] = urllib.unquote(context["perform_url"])
         msg = Message()
         msg.subject = subject
         msg.content = render_to_string(template_name,context)

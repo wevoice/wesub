@@ -1081,8 +1081,13 @@ def create_task(request, slug, team_video_pk):
              'can_assign': can_assign, }
 
 @login_required
-def perform_task(request):
-    task = Task.objects.get(pk=request.POST.get('task_id'))
+def perform_task(request, slug=None, task_pk=None):
+    task_pk = task_pk or request.POST.get('task_id')
+    task = Task.objects.get(pk=task_pk)
+    if slug:
+        team = get_object_or_404(Team,slug=slug)
+        if task.team != team:
+            return HttpResponseForbidden(_(u'You are not allowed to perform this task.'))
 
     if not can_perform_task(request.user, task):
         return HttpResponseForbidden(_(u'You are not allowed to perform this task.'))
