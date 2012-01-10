@@ -169,7 +169,7 @@
                                 <div class="member-ajax-chosen">
                                     <select name="assignee">
                                         <option value="">-----</option>
-                                        <option value="">{% trans 'Begin typing to search' %}</option>
+                                        <option value="" class="begin-typing-trans">{% trans 'Begin typing to search' %}</option>
                                     </select>
                                 </div>
                                 <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">{% trans 'Assign to User' %}</a>
@@ -263,17 +263,33 @@
             });
 
             $('a.action-assign').click(function(e) {
+
                 $('div.assignee-choice').hide();
-                $(e.target).parents('.admin-controls')
-                           .siblings('form.assign-form')
-                               .children('div.assignee-choice')
-                                   .fadeIn('fast')
-                                   .find('.chzn-container')
-                                       .css('width', '100%')
-                                            .find('.chzn-drop')
-                                                .css('width', '99%')
-                                                    .find('input')
-                                                        .css('width', '82%');
+
+                $form = $(e.target).parents('.admin-controls').siblings('form.assign-form');
+
+                $assignee_choice = $form.children('div.assignee-choice');
+                $assignee_choice.fadeIn('fast');
+
+                // Reset select options on rebuild.
+                if (!window.begin_typing_trans) {
+                    window.begin_typing_trans = $('option.begin-typing-trans').eq(0).text();
+                }
+                $select = $form.find('select');
+                $select.children('option').remove();
+                $select.append('<option value="">-----</option>');
+                $select.append('<option value="">' + window.begin_typing_trans + '</option>');
+                $select.trigger('liszt:updated');
+
+                $chzn_container = $assignee_choice.find('.chzn-container');
+                $chzn_container.css('width', '100%')
+
+                $chzn_drop = $chzn_container.find('.chzn-drop')
+                $chzn_drop.css('width', '99%')
+
+                $chzn_input = $chzn_drop.find('input')
+                $chzn_input.css('width', '82%');
+
                 return false;
             });
             $('.assignee-choice a.cancel').click(function(e) {
