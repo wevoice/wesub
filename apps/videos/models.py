@@ -281,7 +281,10 @@ class Video(models.Model):
         NOTE: this method is used in videos.search_indexes.VideoSearchResult
         to prevent duplication of code in search result and in DB-query result
         """
-        return self.title.replace('/', '-').replace('?', '-').replace('&', '-')
+        return (self.title.replace('/', '-')
+                          .replace('?', '-')
+                          .replace('#', '-')
+                          .replace('&', '-'))
 
     def _get_absolute_url(self, locale=None):
         """
