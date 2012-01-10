@@ -450,7 +450,7 @@ class TaskAssignForm(forms.Form):
         task = self.cleaned_data['task']
         assignee = self.cleaned_data['assignee']
 
-        if not can_assign_task(task, self.user):
+        if not can_assign_task(task, self.user) and self.user != assignee:
             raise forms.ValidationError(_(
                 u'You do not have permission to assign this task.'))
 
