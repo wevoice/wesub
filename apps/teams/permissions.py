@@ -200,7 +200,7 @@ def _del_project_narrowings(member, project_pks):
     project_narrowings = member.narrowings.filter(project__isnull=False)
 
     for project_pk in project_pks:
-        project_narrowings.get(project=project_pk).delete()
+        project_narrowings.filter(project=project_pk).delete()
 
 def _add_language_narrowings(member, languages, author):
     for language in languages:
@@ -208,7 +208,7 @@ def _add_language_narrowings(member, languages, author):
 
 def _del_language_narrowings(member, languages):
     for language in languages:
-        MembershipNarrowing.objects.get(language=language, member=member).delete()
+        MembershipNarrowing.objects.filter(language=language, member=member).delete()
 
 
 def can_set_language_narrowings(team, user, target):
