@@ -408,12 +408,17 @@ class Rpc(BaseRpc):
         # be kept under moderation.
         team_video = session.language.video.get_team_video()
         if team_video:
-            task_exists = team_video.task_set.incomplete().filter(
+            tasks = team_video.task_set.incomplete().filter(
                     Q(language=session.language.language)
                   | Q(type=Task.TYPE_IDS['Subtitle'])
-            ).exists()
-            if task_exists:
+            )
+            if tasks:
                 moderation_status = WAITING_MODERATION
+                for task in tasks:
+                    if task.type == Task.TYPE_IDS['Subtitle']:
+                        if not task.language:
+                            task.language = session.language.language
+                            task.save()
 
         kwargs = dict(language=session.language,
                       version_no=(0 if latest_version is None
