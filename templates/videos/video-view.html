@@ -133,7 +133,7 @@
                 ({{ video.languages_count }})
             {% endif %}
         </h3>
-        {% if video.subtitle_language %}
+        {% if video.subtitle_language or translations %}
         <div class="abbr">
             <div class="abbr-content">
                 <ul id="subtitles-menu">
