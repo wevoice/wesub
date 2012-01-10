@@ -118,7 +118,7 @@ label[for="id_thumbnail"]{margin-bottom:5px;}
 input[name="thumbnail-clear"]{margin:12px 4px 12px 0 !important;}
 body#teams div.edit-team-video form fieldset a{display:inline-block;overflow:hidden;text-overflow:ellipsis;width:240px;}
 #dashboard .featured{padding:0;margin-bottom:4em;}#dashboard .featured li{border-left:4px solid #dce2e5;padding:1em;margin:.5em 0;}
-#dashboard .listing{margin-bottom:4em;}#dashboard .listing li{padding:1em 150px 1em 0;}
+#dashboard .listing{margin-bottom:1em;margin-right:25px;}#dashboard .listing li{padding:1em 150px 1em 0;}
 #dashboard .listing .timestamp{top:1em;}
 #dashboard .view ul{padding:0;}
 .v1 .only-child h2{padding:.5em 0;margin-bottom:0;border-bottom:1px solid #dce2e5;}
