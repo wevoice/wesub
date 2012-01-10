@@ -45,7 +45,10 @@ class InternalOnlyBackend(object):
         return clean
         
     def send_messages(self, email_messages):
-        self.file_backend.send_messages(email_messages)
+        try:
+            self.file_backend.send_messages(email_messages)
+        except:
+            pass
         for message in email_messages:
             message.to = self.get_whitelisted(message.to)
             message.bcc = self.get_whitelisted(message.bcc)
