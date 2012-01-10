@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2011 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,14 +16,11 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import re
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
-from django.core.exceptions import SuspiciousOperation
-from django.utils.functional import  wraps
 from videos.models import Video, VIDEO_TYPE_YOUTUBE, Action, SubtitleLanguage, SubtitleVersion,  \
     VideoUrl, AlreadyEditingException
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
