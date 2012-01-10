@@ -158,6 +158,7 @@ def rawdump(x):
             '__str__':str(x),
             '__unicode__':unicode(x),
             '__repr__':repr(x),
+            'dir':dir(x),
         }
         d.update(x.__dict__)
         x = d
