@@ -1306,7 +1306,7 @@ class Task(models.Model):
 
     def _complete_subtitle(self):
         tasks = []
-        subtitle_version = self.team_video.video.latest_version()
+        subtitle_version = self.team_video.video.latest_version(public_only=False)
 
         if self.workflow.autocreate_translate:
             preferred_langs = TeamLanguagePreference.objects.get_preferred(self.team)

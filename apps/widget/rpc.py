@@ -21,7 +21,7 @@ from videos import models
 from widget.models import SubtitlingSession
 from widget.base_rpc import BaseRpc
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from widget import video_cache
 from utils.translation import get_user_languages_from_request
 from django.utils.translation import ugettext as _
@@ -36,6 +36,7 @@ from teams.models import Task
 from teams.signals import api_subtitles_edited, api_subtitles_approved, \
      api_subtitles_rejected, api_language_new, api_language_edited, \
      api_video_edited
+from teams.moderation_const import UNMODERATED, WAITING_MODERATION
 
 from utils import send_templated_email
 from statistic.tasks import st_widget_view_statistic_update
@@ -253,10 +254,9 @@ class Rpc(BaseRpc):
 
         session = self._make_subtitling_session(
             request, language, base_language)
-        if mode in ('review', 'approve'):
-            version_for_subs = language.version(public_only=False)
-        else:
-            version_for_subs = language.version()
+
+        version_for_subs = language.version(public_only=False)
+
         if not version_for_subs:
             version_for_subs = self._create_version_from_session(session)
             version_no = 0
@@ -401,16 +401,37 @@ class Rpc(BaseRpc):
 
     def _create_version_from_session(self, session, user=None, forked=False):
         latest_version = session.language.version(public_only=False)
-        forked_from = (forked and latest_version ) or None
+        forked_from = (forked and latest_version) or None
+        moderation_status = UNMODERATED
+
+        # If there are any open team tasks for this video/language, it needs to
+        # be kept under moderation.
+        team_video = session.language.video.get_team_video()
+        if team_video:
+            tasks = team_video.task_set.incomplete().filter(
+                    Q(language=session.language.language)
+                  | Q(type=Task.TYPE_IDS['Subtitle'])
+            )
+            if tasks:
+                moderation_status = WAITING_MODERATION
+                for task in tasks:
+                    if task.type == Task.TYPE_IDS['Subtitle']:
+                        if not task.language:
+                            task.language = session.language.language
+                            task.save()
+
         kwargs = dict(language=session.language,
                       version_no=(0 if latest_version is None
                                   else latest_version.version_no + 1),
                       is_forked=(session.base_language is
                                  None or forked == True),
-                      forked_from = forked_from,
-                      datetime_started=session.datetime_started)
+                      forked_from=forked_from,
+                      datetime_started=session.datetime_started,
+                      moderation_status=moderation_status)
+
         if user is not None:
             kwargs['user'] = user
+
         return models.SubtitleVersion(**kwargs)
 
     def fetch_subtitles(self, request, video_id, language_pk):

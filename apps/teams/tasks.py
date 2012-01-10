@@ -75,7 +75,7 @@ def complete_applicable_tasks(team_video_id):
         return
 
     incomplete_tasks = team_video.task_set.incomplete()
-    completed_languages = team_video.video.completed_subtitle_languages()
+    completed_languages = team_video.video.completed_subtitle_languages(public_only=False)
 
     subtitle_complete = any([sl.is_original and sl.is_complete
                              for sl in completed_languages])
