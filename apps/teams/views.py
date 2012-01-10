@@ -321,7 +321,11 @@ def settings_basic(request, slug):
         form = FormClass(request.POST, request.FILES, instance=team)
 
         if form.is_valid():
-            form.save()
+            try:
+                form.save()
+            except:
+                logger.exception("Error on changing team settings")
+                raise
 
             messages.success(request, _(u'Settings saved.'))
             return HttpResponseRedirect(request.path)
