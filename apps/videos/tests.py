@@ -2141,6 +2141,14 @@ class TestTemplateTags(TestCase):
         # one trans non complete
         l = SubtitleLanguage.objects.filter(video__title="b", language='pt')[0]
         self.assertEqual("60%", complete_indicator(l))
+
+
+    def test_language_url_for_empty_lang(self):
+        v = self.videos[0]
+        l = SubtitleLanguage(video=v, has_version=True)
+        l.save()
+        from videos.templatetags.subtitles_tags import language_url
+        lurl = language_url(None, l)
         
 
 def _create_trans( video, latest_version=None, lang_code=None, forked=False):
