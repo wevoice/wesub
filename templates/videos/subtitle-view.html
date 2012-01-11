@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block body_attrs %}id="video" class="v1 video_view"{% endblock %}
+
+{% load escapejs paginator widget comments i18n subtitles_tags teams_tags media_compressor videos_tags moderation doorman%}
+
+{% block css %}
+    {{ block.super }}
+    {% include_bundle "video_history" %}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    {% include_bundle "unisubs-onsite-compiled" %}
+    {% if user_can_moderate %}
+       {% include_bundle "js-moderation-dashboard" 0 %}
+    {% endif %}
+
+    <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
+    {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
+    <script src="{{ STATIC_URL }}js/jquery.tabs.js" type="text/javascript"></script>
+    <script src="{{ STATIC_URL }}js/unisubs.modal.js" type="text/javascript"></script>
+    <script src="{{ STATIC_URL }}js/unisubs.abbr.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        //create url template
+        var DIFFING_URL = function() {
+            var url = '{% block diffing_link %}{% url videos:diffing 11111 22222 %}{% endblock %}';
+            return url.replace(/11111/, '<<first_pk>>').replace(/22222/, '<<second_pk>>');
+        }();
+        function get_compare_link(first_pk, second_pk) {
+            //set values from arguents
+            return DIFFING_URL.replace(/<<first_pk>>/, first_pk).replace(/<<second_pk>>/, second_pk);
+        }
+    
+        jQuery(document).ready( function($) {
+            $('.version_checkbox:first').attr('checked', 'checked');
+    
+            $('.version_checkbox').change( function() {
+                var $this = $(this);
+                var checked_length = $('.version_checkbox:checked').length;
+    
+                if ($this.attr('checked') && (checked_length > 2)) {
+                    $this.attr('checked', '');
+                }
+            });
+            $('.compare_versions_button').click( function() {
+                var $checked = $('.version_checkbox:checked');
+                if ($checked.length !== 2) {
+                    alert('{% trans "Select two revisions to compare, please" %}');
+                } else {
+                    var url = get_compare_link($checked[0].value, $checked[1].value);
+                    window.location.replace(url);
+                }
+            });
+            $('.tabs').tabs();
+    
+            $('#add_subtitles').click( function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
+                return false;
+            });
+            $('.add-translation-behavior').click( function(e) {
+                e.preventDefault();
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
+                return false;
+            });
+            $('.time_link').click( function() {
+                widget_widget_div.playAt(parseFloat(
+                $(this).find('.data').text()));
+                return false;
+            });
+            var SL_ID = '{{ language.id }}';
+        });
+    </script>
+{% endblock %}
+
+{% block title %}
+    {% if language.is_original %}
+        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
+    {% else %}
+        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
+    {% endif %}
+{% endblock %}
+
+{% block opengraph-head %}
+    {{block.super}}
+    <meta property="og:title" content="{% title_for_video video language %}"/>
+    <meta property="og:type" content="video"/>
+    <meta property="og:url" content="http://{{ current_site.domain }}{{ video.get_absolute_url }}"/>
+    {% if video.thumbnail %}
+    <meta property="og:image" content="{{ video.get_thumbnail }}" />
+    {% else %}
+    <meta property="og:image" content="{{ STATIC_URL }}images/small_logo.png" />
+    {% endif %}
+
+    <meta property="og:site_name" content="Universal Subtitles"/>
+    <meta property="og:description"
+          content="{% title_for_video video language %}"/>
+{% endblock  %}
+
+{% comment %}
+    TODO:
+        - title/description editing?
+{% endcomment %}
+
+{% block main_content %}
+
+    <div class="grid_4 context alpha">
+        <h3 class="sub-title">
+            <a href="{{ language.language_url }}" title="Language permalink">
+                {% if language.is_original %}
+                    {% trans 'Original' %}
+                {% endif %}
+                {{ language.get_language_display }}
+                {% trans "subtitles" %}
+                {%comment%}{% if language.is_dependent %}
+                    {% trans 'translated from' %} {{ language.standard_language }}
+                {% endif %}{%endcomment%}    
+            </a>
+        </h3>
+        <h2 class="main-title">
+            <a href="{{ video.get_absolute_url }}" title="View video">
+                ←
+                {% if language.title %}
+                    {{ language.title }}
+                {% else %}
+                    {{ video }}
+                {% endif %}
+            </a>
+        </h2>
+
+        {% widget widget_params %}
+        {% if language.description or video.description %}
+            <div id="description" class="abbr">
+                <div class="abbr-content">
+                    {% if language.description %}
+                        {{ language.description|urlize|linebreaks }}
+                    {% else %}
+                        {{ video.description|urlize|linebreaks }}
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        <ul class="metrics">
+            <li>
+                <p>{{ language.subtitles_fetched_count|simplify_number }}</p>
+                <h4>{% trans "Play" %}{{ language.subtitles_fetched_count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{{ language.followers.count }}</p>
+                <h4>{% trans "Follower" %}{{ language.followers.count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{{ language.subtitle_count }}</p>
+                <h4>{% trans "Line" %}{{ language.subtitle_count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{% complete_indicator language 'pct' %}</p>
+                <h4>{% trans "Complete" %}</h4>
+            </li>
+        </ul>
+        <div class="sharing-tools">
+            {% if shows_widget_sharing %}
+                {% include '_sharing_widget.html' %}
+            {% endif %}
+        </div>
+        <h3>
+            {% trans "View Subtitles" %}
+            {% if video.languages_count > 0 %}
+                ({{ video.languages_count }})
+            {% endif %}
+        </h3>
+        <div class="abbr">
+            <div class="abbr-content">
+                <ul id="subtitles-menu">
+                    {% include 'videos/_left_navigation.html' %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="grid_8 view omega">
+        {% if user.is_authenticated %}
+            {% include 'videos/_follow_video_button.html' %}
+        {% endif %}
+        <ul class="tabs">
+            <li class="current"><a href="#transcripts-tab">{% trans "Subtitles" %}</a></li>
+            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{% get_comment_count language %}</span></a></li>
+            <li class="hascount"><a href="#revisions-tab">{% trans "Revisions" %}<span>{{ hits }}</span></a></li>
+        </ul>
+        <div class="tab" id="transcripts-tab">
+            <div class="tools">
+                <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit Subtitles' %}{% endif %}</a>
+                {% if last_version.subtitles %}
+                    <div class="sort_button action">
+                        <div class='arrow'>
+                        </div>
+                        <span class="sort_label">
+                            <strong>{% trans 'Download' %}</strong>
+                        </span>
+                        <ul>
+                            <li>
+                                <a href="{% url widget:download_srt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">SRT</a>
+                            </li>
+                            <li>
+                                <a href="{% url widget:download_ssa %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">SSA</a>
+                            </li>
+                            <li>
+                                <a href="{% url widget:download_ttml %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">TTML</a>
+                            </li>
+                            <li>
+                                <a href="{% url widget:download_txt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">TXT</a>
+                            </li>
+                            <li>
+                                <a href="{% url widget:download_sbv %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">SBV</a>
+                            </li>
+                            <li>
+                                <a href="{% url widget:download_dxfp %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">DFXP</a>
+                            </li>                                
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            {% if last_version.has_subtitles %}
+                <p class="active-filters">
+                    {% if language.is_dependent %}
+                        {% trans "Subtitles" %}
+                        {% trans 'translated from' %}
+                        {{ language.standard_language }}.
+                    {% endif %}
+                    {% trans "Showing" %}
+                    <strong>{% trans "Revision" %} {{ language.last_version.version_no }}</strong>,
+                    {% trans "created" %}
+                    <strong>{{ language.last_version.revision_time }}</strong>
+                    {% trans "by" %}
+                    <a href="language.latest_version.user.profile_url" title="View {{ language.latest_version.user }}'s profile">
+                        <strong>{{ language.latest_version.user }}</strong>
+                    </a>.
+                </p>
+                <ol class="subtitles">
+                    {% for item in last_version.ordered_subtitles %}
+                    <li>
+                        {% if item.display_time %}
+                        <div class="timing">
+                            <a class="time_link" href="#" title="Play video here">
+                                <span class="data">{{ item.start_time }}</span>
+                                {{ item.display_time }}
+                                {% if item.display_end_time %}
+                                –
+                                {{ item.display_end_time }}
+                                {% endif %}
+                            </a>
+                        </div>
+                        {% else %}
+                        <div class="timing">
+                            {% trans 'Not Synced' %}
+                        </div>
+                        {% endif %}
+                        {{ item.text|linebreaksbr }}
+                    </li>
+                    {% endfor %}
+                </ol>
+            {% else %}
+                {% if revision_list|length > 1 %}
+                    <p class="empty">
+                        {% blocktrans %}
+                        The most recent revision for this language is blank, but there are older
+                        revisions that contain subtitles.
+                        {% endblocktrans %}
+                        <a href="#revisions-tab" class="link_to_tab">{% trans 'View revision history' %}</a>
+                    </p>
+                {% else %}
+                    <p class="empty">
+                        {% trans 'No subtitles yet.' %}
+                        <a href="#" id="add_subtitles">{% trans 'Make some!' %}</a>
+                    </p>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="tab" id="comments-tab" style="display:none;">
+            <h3>{% trans "Leave a comment" %}</h3>
+            {% render_comment_form language %}
+            <h3>{% get_comment_count language %} {% trans "Comments" %}</h3>
+            {% render_comment_list language %}
+        </div>
+        <div class="tab" id="revisions-tab" style="display:none;">
+            {% if revision_list|length > 1 %}
+                <div class="tools">
+                    <a class="button compare_versions_button">
+                        {% trans 'Compare Revisions' %}
+                    </a>
+                </div>
+            {% endif %}
+                    
+            {% if revision_list %}
+                {% if is_paginated %}{% paginator '#revisions' %}{% endif %}
+                <ul class="listing revisions">
+                    {% for item in revision_list %}
+                        <li>
+                            <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
+                            <h3>
+                                <a href="{% url videos:revision pk=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                            </h3>
+                            {% if item.user %}
+                                <p>{% trans "by" %} <a href="{% url profiles:profile item.user.pk %}">{{ item.user }}</a></p>
+                            {% endif %}
+                            {% if item.note %}
+                                <p>{{ item.note }}</p>
+                            {% endif %}
+                            <ul class="actions">
+                                <li><h4>{% trans "Timing" %}: {{ item.time_change_display }}</h4></li>
+                                <li><h4>{% trans "Text" %}: {{ item.text_change_display }}</h4></li>
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+            <p class="empty">{% trans 'No subtitles for this language.' %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% comment %}
+    <h2 class="main-title">
+        <a href="{{ video.get_absolute_url }}" class="title-container">{{ language.get_title_display }}</a>
+        {% if not language.standard_language and not language.is_original and user.is_authenticated %}
+        <a class="edit-title" href="#" data-modal="edit-title-dialog" style="color: #3196AD !important; text-decoration: underline;">{% trans 'edit title' %}</a>
+        {% endif %}
+    </h2>
+    {% endcomment %}
+{% endblock %}
+
+{% block page_controls %}
+    {% if user.is_staff and perms.videos.edit_video %}
+        <ul id="page_controls">
+            <li>
+                <a href="{% url admin:videos_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Subtitles' %}</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+
+{% block bottom_scripts %}
+    <script>
+        $(window).load( function() {
+            unisubs.messaging.simplemessage.displayPendingMessages();
+            {% if user_can_moderate %}
+                {% include 'moderation/moderation-buttons.js' %}
+            {% endif %}
+
+            $('#edit_subtitles_button').click( function(e) {
+                if (!(localStorage && localStorage.getItem)) {
+                    alert("Sorry, you'll need to upgrade your browser to use the subtitling dialog.");
+                    e.preventDefault();
+                }
+            });
+             {% if task %}
+                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
+                var opener = new unisubs.widget.SubtitleDialogOpener(
+                    '{{ task.team_video.video.video_id }}',
+                    '{{ task.team_video.video.get_video_url }}',
+                    videoSource, null, null
+                );
+                opener.showStartDialog();
+
+              // trigger open dialog here 
+            {% endif %}
+
+        });
+    </script>
+{% endblock %}

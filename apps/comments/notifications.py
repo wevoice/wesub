@@ -22,7 +22,6 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from auth.models import CustomUser as User
-from utils import send_templated_email
 from localeurl.utils import universal_url
 from utils.tasks import send_templated_email_async
 
@@ -50,7 +49,7 @@ def notify_comment_by_email(comment,  version=None,  moderator=None, is_rejectio
         language = ct
 
     domain = Site.objects.get_current().domain
-    email_body = render_to_string("comments/email/comment-notification.html", {
+    email_body = render_to_string("messages/email/comment-notification.html", {
             "video": video,
             "version": version,
             "moderator": moderator,
@@ -86,10 +85,10 @@ def notify_comment_by_email(comment,  version=None,  moderator=None, is_rejectio
     if language:
         followers.update(language.notification_list(comment.user))
     for user in followers:
-        send_templated_email_async.delay(
-            user.email,
+        res = send_templated_email_async.delay(
+            user,
             subject,
-            "comments/email/comment-notification.html", 
+            "messages/email/comment-notification.html", 
             {
                 "video": video,
                 "commenter": unicode(comment.user),

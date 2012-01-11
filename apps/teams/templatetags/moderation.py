@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2011 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import datetime
@@ -25,13 +25,11 @@ from django.utils.translation import ugettext_lazy as _
 from django import template
 from django.template.loader import render_to_string
 
-register = template.Library()
-
-from apps.teams.moderation import  APPROVED, WAITING_MODERATION, is_approved, is_rejected, is_waiting
-from apps.teams.moderation import   user_can_moderate as _user_can_moderate
-
+from apps.teams.moderation import is_approved, is_rejected, is_waiting
+from apps.teams.moderation import user_can_moderate as _user_can_moderate
 from apps.videos.models import SubtitleLanguage, SubtitleVersion
 
+register = template.Library()
 
 
 @register.inclusion_tag("moderation/_remove_approval_button.html")
@@ -43,7 +41,7 @@ def render_remove_approve_button(version_or_language):
     if is_waiting(version):
         return {}
     team = version.video.moderated_by
-     
+
     return {
         "team": team,
         "version": version
@@ -73,7 +71,7 @@ def render_approve_button(version_or_list):
         "label": label,
         "team": team,
         "url": url,
-        
+
         }
 
 @register.inclusion_tag("moderation/_approve_button.html")
@@ -126,26 +124,26 @@ def render_reject_button(version_or_language, label=None, confirms=False):
         "label": label or "Decline revision",
         "confirms": confirms,
         "url": url,
-       } 
-    
+       }
+
 
 @register.inclusion_tag("moderation/_approval_toolbar.html")
 def render_approval_toolbar( user, version):
     if version is None:
         return {}
-    team = version.video.moderated_by        
+    team = version.video.moderated_by
     can_moderate = _user_can_moderate(version.language.video,  user)
     if not team or not  can_moderate:
         return {
-            
+
         }
     return {
         "version":version,
         "team": team,
     }
-    
-    
-    
+
+
+
 @register.simple_tag
 def versions_to_moderate(team):
     return team.get_pending_moderation().order_by("language__video", "language").select_related("language", "language__video")
@@ -154,7 +152,7 @@ def versions_to_moderate(team):
 def versions_to_moderate_count(team):
     return team.get_pending_moderation().count()
 
-@register.simple_tag#inclusion_tag("moderation/_moderation_status_icon.html")
+@register.simple_tag
 def render_moderation_icon(version):
     return render_to_string("moderation/_moderation_status_icon.html",  {
         "is_moderated" :  version.language.video.is_moderated,
@@ -163,9 +161,8 @@ def render_moderation_icon(version):
 
 @register.simple_tag
 def render_moderation_togggle_button(version):
-    approved = version.moderation_status == APPROVED
     label = ""
-    
+
     if is_approved(version):
         template_name = "moderation/_reject_button.html"
         label = _("Unapprove")
@@ -178,7 +175,7 @@ def render_moderation_togggle_button(version):
         template_name = "moderation/_approve_button.html"
         label = _("Approve")
         url = reverse("moderation:revision-approve", kwargs={'team_id':version.video.moderated_by_id, "version_id":version.pk})
-        
+
     return render_to_string(template_name, {
             "label": label,
             "url" : url,
@@ -189,7 +186,7 @@ def user_can_moderate( user, video, team):
     return _user_can_moderate(video,  user)
 
 
-                    
+
 def parse_tokens(parser, bits):
     """
     Parse a tag bits (split tokens) and return a list on kwargs (from bits of the  fu=bar) and a list of arguments.
@@ -220,7 +217,7 @@ class ModerationInfoNode(template.Node):
         self.varname = kwargs['varname']
 
     def render(self, context):
-        team_video_index = self.team_video_index.resolve(context) 
+        team_video_index = self.team_video_index.resolve(context)
 
         if self.varname is not None:
             context[self.varname] = _dehidrate_versions(team_video_index)
@@ -235,7 +232,6 @@ def _dehidrate_versions(search_index):
     if bool(search_index.moderation_version_info) is False:
         return
     versions =   json.loads(search_index.moderation_version_info)
-    i = 0
     for lang_name, lang_pk, versions in zip(search_index.moderation_languages_names,\
             search_index.moderation_languages_pks, versions):
         x.append({
@@ -300,7 +296,7 @@ def render_approve_all_button(video, user):
 def shows_moderation_title( user, video):
     if video is None:
         return False
-    team = version.video.moderated_by        
+    team = version.video.moderated_by
     if team and _user_can_moderate(video,  user):
         return _("Moderation")
     return ""

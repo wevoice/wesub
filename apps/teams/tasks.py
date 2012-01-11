@@ -8,6 +8,15 @@ from datetime import datetime
 from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from haystack import site
+from widget.video_cache import invalidate_cache as invalidate_video_cache
+
+
+@task()
+def invalidate_video_caches(team_id):
+    from apps.teams.models import Team
+    team = Team.objects.get(pk=team_id)
+    for video_id in team.teamvideo_set.values_list('video__video_id', flat=True):
+        invalidate_video_cache(video_id)
 
 @periodic_task(run_every=crontab(minute=0, hour=6))
 def add_videos_notification(*args, **kwargs):
@@ -21,9 +30,8 @@ def add_videos_notification(*args, **kwargs):
 
         team.last_notification_time = datetime.now()
         team.save()
-
-        members = team.users.filter(changes_notification=True, is_active=True) \
-            .filter(user__changes_notification=True).distinct()
+        members = team.users.filter( notify_by_email=True, is_active=True) \
+            .distinct()
 
         subject = _(u'New %(team)s videos ready for subtitling!') % dict(team=team)
 
@@ -39,7 +47,7 @@ def add_videos_notification(*args, **kwargs):
                 "STATIC_URL": settings.STATIC_URL,
             }
 
-            send_templated_email(user.email, subject, 
+            send_templated_email(user, subject, 
                                  'teams/email_new_videos.html',
                                  context, fail_silently=not settings.DEBUG)
 
@@ -66,24 +74,18 @@ def complete_applicable_tasks(team_video_id):
     except TeamVideo.DoesNotExist:
         return
 
-    incomplete_tasks = team_video.task_set.filter(completed__isnull=True)
+    incomplete_tasks = team_video.task_set.incomplete()
+    completed_languages = team_video.video.completed_subtitle_languages(public_only=False)
 
-    completed_languages = team_video.video.completed_subtitle_languages()
     subtitle_complete = any([sl.is_original and sl.is_complete
                              for sl in completed_languages])
+
     translate_complete = [sl.language for sl in completed_languages]
-    review_complete = []
-    approve_complete = []
 
     for t in incomplete_tasks:
         should_complete = (
             (t.type == Task.TYPE_IDS['Subtitle'] and subtitle_complete)
-            or (t.type == Task.TYPE_IDS['Translate']
-                and t.language in translate_complete)
-            or (t.type == Task.TYPE_IDS['Review']
-                and t.language in review_complete)
-            or (t.type == Task.TYPE_IDS['Approve']
-                and t.language in approve_complete)
+            or (t.type == Task.TYPE_IDS['Translate'] and t.language in translate_complete)
         )
         if should_complete:
             t.complete()
@@ -91,32 +93,27 @@ def complete_applicable_tasks(team_video_id):
 @task()
 def api_notify_on_subtitles_activity(team_pk, version_pk, event_name):
     from teams.models import Team
-    from videls.models import SubtitleVersion
-    version = SubtitleVersion.objects.get(pk=version_pk).select_related("language", "language__video")
-    team = Team.objects.get(pk=team_pk).select_related("notification_settings")
+    from videos.models import SubtitleVersion
+    version = SubtitleVersion.objects.select_related("language", "language__video").get(pk=version_pk)
+    team = Team.objects.select_related("notification_settings").get(pk=team_pk)
     team.notification_settings.notify(
            version.language.video,
            event_name,
-           version.language.pk) 
+           version.language.pk,
+           version_pk) 
  
 @task()
 def api_notify_on_language_activity(team_pk, language_pk, event_name):
-    from teams.models import Team
-    from videls.models import SubtitleLanguage
-    language = SubtitleLanguage.objects.get(pk=language_pk).select_related("video")
-    team = Team.objects.get(pk=team_pk).select_related("notification_settings")
-    team.notification_settings.notify(
-           language.video,
-           event_name,
-           language.pk) 
+    from teams.models import TeamNotificationSetting
+    from videos.models import SubtitleLanguage
+    language = SubtitleLanguage.objects.select_related("video").get(pk=language_pk)
+    TeamNotificationSetting.objects.notify_team(
+        team_pk, language.video.video_id, event_name, language_pk)
  
  
 @task()
-def api_notify_on_video_activity(team_video_pk,event_name):
-    from teams.models import TeamVideo
-    tv = TeamVideo.objects.get(pk=team_video_pk)
-    tv.team.notification_settings.notify(
-           tv.video,
-           event_name,
-           None) 
+def api_notify_on_video_activity(team_pk, video_id,event_name):
+    from teams.models import TeamNotificationSetting
+    TeamNotificationSetting.objects.notify_team(
+        team_pk, video_id, event_name)
  

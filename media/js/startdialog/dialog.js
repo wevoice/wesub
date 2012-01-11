@@ -54,7 +54,8 @@ unisubs.startdialog.Dialog.prototype.createDom = function() {
     var el = this.getElement();
     el.appendChild(
         $d('h3', null, 'Create subtitles'));
-    this.contentDiv_ = $d('div', null, "Loading...");
+    this.contentDiv_ = $d('div', null, '');
+    this.contentDiv_.innerHTML = "<p>Loading&hellip;</p>";
     el.appendChild(this.contentDiv_);
 };
 
@@ -74,12 +75,22 @@ unisubs.startdialog.Dialog.prototype.setVisible = function(visible) {
 
 
 
-unisubs.startdialog.Dialog.prototype.makeDropdown_ = 
-    function($d, contents, opt_className) 
+unisubs.startdialog.Dialog.prototype.makeDropdown_ = function($d, contents, opt_className)
 {
-var options = [];
-    for (var i = 0; i < contents.length; i++){
-         options.push($d('option', {'value': contents[i][0]}, contents[i][1]));
+    var options = [];
+    var attrs, lang, name, disabled;
+
+    for (var i = 0; i < contents.length; i++) {
+        lang = contents[i][0];
+        name = contents[i][1];
+        disabled = contents[i][3];
+
+        attrs = { 'value': lang };
+        if (disabled) {
+            attrs['disabled'] = 'disabled';
+        }
+
+        options.push($d('option', attrs, name));
     }
     return $d('select', (opt_className || null), options);
 };
@@ -145,7 +156,8 @@ unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
     var toLanguageContents = goog.array.map(
         this.model_.toLanguages(),
         function(l) {
-            return [l.KEY, l.toString(), l.LANGUAGE];
+            return [l.KEY, l.toString(), l.LANGUAGE,
+                    (l.VIDEO_LANGUAGE ? l.VIDEO_LANGUAGE.DISABLED : false)];
         });
     this.toLanguageDropdown_ = this.makeDropdown_(
         $d, toLanguageContents, "to-language");

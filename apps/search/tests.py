@@ -52,6 +52,7 @@ class TestSearch(TestCase):
     
     def setUp(self):
         self.user = User.objects.all()[0]
+        reset_solr()
     
     def test_query_clean(self):
         video = Video.objects.all()[0]

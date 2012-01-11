@@ -1,29 +1,26 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2011 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import re
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
-from django.core.exceptions import SuspiciousOperation
-from django.utils.functional import  wraps
 from videos.models import Video, VIDEO_TYPE_YOUTUBE, Action, SubtitleLanguage, SubtitleVersion,  \
     VideoUrl, AlreadyEditingException
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
@@ -85,22 +82,22 @@ def watch_page(request):
         'popular_display_views': 'week'
     }
     return render_to_response('videos/watch.html', context,
-                              context_instance=RequestContext(request)) 
+                              context_instance=RequestContext(request))
 
 def featured_videos(request):
     return render_to_response('videos/featured_videos.html', {},
-                              context_instance=RequestContext(request)) 
+                              context_instance=RequestContext(request))
 
 def latest_videos(request):
     return render_to_response('videos/latest_videos.html', {},
-                              context_instance=RequestContext(request)) 
+                              context_instance=RequestContext(request))
 
 def popular_videos(request):
     return render_to_response('videos/popular_videos.html', {},
-                              context_instance=RequestContext(request)) 
+                              context_instance=RequestContext(request))
 
 def volunteer_page(request):
-    # Get the user comfort languages list 
+    # Get the user comfort languages list
     user_langs = get_user_languages_from_request(request)
 
     relevant = VideoIndex.public().filter(video_language_exact__in=user_langs) \
@@ -146,7 +143,7 @@ def bug(request):
         raise Http404
     general_settings = {}
     add_general_settings(request, general_settings)
-    context['general_settings'] = json.dumps(general_settings)    
+    context['general_settings'] = json.dumps(general_settings)
     return render_to_response('bug.html', context,
                               context_instance=RequestContext(request))
 
@@ -166,9 +163,9 @@ def create(request):
         messages.info(request, message=_(u'''Here is the subtitle workspace for your video. You can
 share the video with friends, or get an embed code for your site.  To add or
 improve subtitles, click the button below the video.'''))
-        
+
         if video_form.created:
-            messages.info(request, message=_(u'''Existing subtitles will be imported in a few minutes.'''))            
+            messages.info(request, message=_(u'''Existing subtitles will be imported in a few minutes.'''))
         return redirect(video.get_absolute_url())
     return render_to_response('videos/create.html', context,
                               context_instance=RequestContext(request))
@@ -184,7 +181,7 @@ def create_from_feed(request):
     context = {
         'video_form': VideoForm(),
         'youtube_form': form,
-        'from_feed': True 
+        'from_feed': True
     }
     return render_to_response('videos/create.html', context,
                               context_instance=RequestContext(request))
@@ -192,19 +189,20 @@ def create_from_feed(request):
 create_from_feed.csrf_exempt = True
 
 
-
-
-
 @get_video_from_code
 def video(request, video, video_url=None, title=None):
+    """
+    If user is about to perform a task on this video, then t=[task.pk]
+    will be passed to as a url parameter.
+    """
     if video_url:
         video_url = get_object_or_404(VideoUrl, pk=video_url)
-    
+
     if not video_url and ((video.title_for_url() and not video.title_for_url() == title) or (not video.title and title)):
         return redirect(video, permanent=True)
 
     video.update_view_counter()
-    
+
     # TODO: make this more pythonic, prob using kwargs
     context = widget.add_onsite_js_files({})
     context['video'] = video
@@ -218,20 +216,42 @@ def video(request, video, video_url=None, title=None):
     context['translations'] = translations
 
     context["user_can_moderate"] = user_can_moderate(video, request.user)
-    context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))    
+    context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
     if context["user_can_moderate"]:
         # FIXME: use  amore efficient count
         for l in translations:
             l.pending_moderation_count = get_pending_count(l)
-            
-    context['widget_params'] = _widget_params(request, video, language=None, video_url=video_url and video_url.effective_url)
+
+    context['widget_params'] = _widget_params(
+        request, video, language=None,
+        video_url=video_url and video_url.effective_url,
+        size=(620,370)
+    )
+
     _add_share_panel_context_for_video(context, video)
     context['lang_count'] = video.subtitlelanguage_set.filter(has_version=True).count()
     context['original'] = video.subtitle_language()
-    
-    return render_to_response('videos/video.html', context,
+    context['task'] =  _get_related_task(request)
+
+    return render_to_response('videos/video-view.html', context,
                               context_instance=RequestContext(request))
 
+def _get_related_task(request):
+    """
+    Checks if request has t=[task-id], and if so checks if the current
+    user can perform it, in case all goes well, return the task to be
+    performed.
+    """
+    task_pk = request.GET.get('t', None)
+    if task_pk:
+        from teams.models import Task
+        from teams.permissions import can_perform_task
+        try:
+            task = Task.objects.get(pk=task_pk)
+            if can_perform_task(request.user, task):
+                return task
+        except Task.DoesNotExist:
+            return
 
 def video_list(request):
     qs = Video.objects.filter(is_subtitled=True)
@@ -251,20 +271,19 @@ def video_list(request):
                        template_object_name='video',
                        extra_context=extra_context)
 
-@get_video_revision
 def actions_list(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
     qs = Action.objects.filter(video=video)
     extra_context = {
         'video': video
     }
-                
+
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.ACTIVITIES_ONPAGE,
                        template_name='videos/actions_list.html',
                        template_object_name='action',
-                       extra_context=extra_context)      
-        
+                       extra_context=extra_context)
+
 @login_required
 @transaction.commit_manually
 def upload_subtitles(request):
@@ -318,7 +337,7 @@ def upload_transcription_file(request):
 
 def feedback(request, hide_captcha=False):
     output = dict(success=False)
-    form = FeedbackForm(request.POST, initial={'captcha': request.META['REMOTE_ADDR']}, 
+    form = FeedbackForm(request.POST, initial={'captcha': request.META['REMOTE_ADDR']},
                         hide_captcha=hide_captcha)
     if form.is_valid():
         form.send(request)
@@ -342,7 +361,7 @@ def email_friend(request):
     text = request.GET.get('text', '')
     link = request.GET.get('link', '')
     if link:
-        text = link if not text else '%s\n%s' % (text, link) 
+        text = link if not text else '%s\n%s' % (text, link)
     from_email = ''
     if request.user.is_authenticated():
         from_email = request.user.email
@@ -354,10 +373,10 @@ def email_friend(request):
             if request.user.is_authenticated():
                 email_st.user = request.user
             email_st.save()
-            
+
             form.send()
             messages.info(request, 'Email Sent!')
-            
+
             return redirect(request.get_full_path())
     else:
         form = EmailFriendForm(auto_id="email_friend_id_%s", initial=initial, label_suffix="")
@@ -378,7 +397,7 @@ def legacy_history(request ,video, lang=None):
     In the old days we allowed only one translation per video.
     Therefore video urls looked like /vfjdh2/en/
     Now that this constraint is removed we need to redirect old urls
-    to the new view, that needs 
+    to the new view, that needs
     """
     try:
         language = video.subtitle_language(lang)
@@ -386,7 +405,7 @@ def legacy_history(request ,video, lang=None):
             raise SubtitleLanguage.DoesNotExist("No such language")
     except SubtitleLanguage.DoesNotExist:
         raise Http404()
-    
+
     return HttpResponseRedirect(reverse("videos:translation_history", kwargs={
             'video_id': video.video_id,
             'lang_id': language.pk,
@@ -422,10 +441,10 @@ def history(request, video, lang=None, lang_id=None):
     qs = language.subtitleversion_set.select_related('user')
     ordering, order_type = request.GET.get('o'), request.GET.get('ot')
     order_fields = {
-        'date': 'datetime_started', 
-        'user': 'user__username', 
-        'note': 'note', 
-        'time': 'time_change', 
+        'date': 'datetime_started',
+        'user': 'user__username',
+        'note': 'note',
+        'time': 'time_change',
         'text': 'text_change'
     }
     if ordering in order_fields and order_type in ['asc', 'desc']:
@@ -446,43 +465,46 @@ def history(request, video, lang=None, lang_id=None):
                 # FIXME: use  amore efficient count
             for l in translations:
                 l.pending_moderation_count = get_pending_count(l)
-        
+
     translations.sort(key=lambda f: f.get_language_display())
-    context['translations'] = translations    
+    context['translations'] = translations
     context['last_version'] = language.latest_version(public_only=False)
-    context['widget_params'] = _widget_params(request, video, version_no=None, language=language)
+    context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
     context['edit_url'] = language.get_widget_url()
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
-    
+
+    context['task'] =  _get_related_task(request)
     _add_share_panel_context_for_history(context, video, lang)
     return object_list(request, queryset=qs, allow_empty=True,
-                       paginate_by=settings.REVISIONS_ONPAGE, 
+                       paginate_by=settings.REVISIONS_ONPAGE,
                        page=request.GET.get('page', 1),
-                       template_name='videos/history.html',
+                       template_name='videos/subtitle-view.html',
                        template_object_name='revision',
                        extra_context=context)
 
-def _widget_params(request, video, version_no=None, language=None, video_url=None):
+def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):
     primary_url = video_url or video.get_video_url()
-    alternate_urls = [vu.effective_url for vu in video.videourl_set.all() 
+    alternate_urls = [vu.effective_url for vu in video.videourl_set.all()
                       if vu.effective_url != primary_url]
-    params = {'video_url': primary_url, 
-              'alternate_video_urls': alternate_urls, 
+    params = {'video_url': primary_url,
+              'alternate_video_urls': alternate_urls,
               'base_state': {}}
 
     if version_no:
         params['base_state']['revision'] = version_no
-        
+
     if language:
         params['base_state']['language_code'] = language.language
         params['base_state']['language_pk'] = language.pk
+    if size:
+        params['video_config'] = {"width":size[0], "height":size[1]}
 
     return base_widget_params(request, params)
 
 @get_video_revision
 def revision(request,  version):
- 
+
     context = widget.add_onsite_js_files({})
     context['video'] = version.video
     context['version'] = version
@@ -495,13 +517,13 @@ def revision(request,  version):
     if feature_is_on("MODERATION"):
         context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['widget_params'] = _widget_params(request, \
-            language.video, version.version_no, language)
+            language.video, version.version_no, language, size=(289,173))
     context['latest_version'] = language.latest_version()
     version.ordered_subtitles()
 
     return render_to_response('videos/revision.html', context,
-                              context_instance=RequestContext(request))     
-    
+                              context_instance=RequestContext(request))
+
 @login_required
 @get_video_revision
 def rollback(request, version):
@@ -528,7 +550,7 @@ def diffing(request, first_version, second_pk):
     video = first_version.language.video
     if second_version.datetime_started > first_version.datetime_started:
         first_version, second_version = second_version, first_version
-    
+
     second_captions = dict([(item.subtitle_id, item) for item in second_version.ordered_subtitles()])
     first_captions = dict([(item.subtitle_id, item) for item in first_version.ordered_subtitles()])
 
@@ -566,7 +588,7 @@ def diffing(request, first_version, second_pk):
             }
         data = [fcaption, scaption, changed]
         captions.append(data)
-        
+
     context = widget.add_onsite_js_files({})
     context['video'] = video
     context['captions'] = captions
@@ -576,13 +598,13 @@ def diffing(request, first_version, second_pk):
     context['latest_version'] = language.latest_version()
     context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['widget0_params'] = \
-        _widget_params(request, video, 
+        _widget_params(request, video,
                        first_version.version_no)
     context['widget1_params'] = \
         _widget_params(request, video,
                        second_version.version_no)
     return render_to_response('videos/diffing.html', context,
-                              context_instance=RequestContext(request)) 
+                              context_instance=RequestContext(request))
 
 def test_form_page(request):
     if request.method == 'POST':
@@ -594,7 +616,7 @@ def test_form_page(request):
     else:
         form = UserTestResultForm()
     context = {
-        'form': form           
+        'form': form
     }
     return render_to_response('videos/test_form_page.html', context,
                               context_instance=RequestContext(request))
@@ -606,7 +628,7 @@ def stop_notification(request, video_id):
 
     if not user_id or not hash:
         raise Http404
-    
+
     video = get_object_or_404(Video, video_id=video_id)
     user = get_object_or_404(User, id=user_id)
     context = dict(video=video, u=user)
@@ -629,14 +651,14 @@ def counter(request):
 @login_required
 def video_url_make_primary(request):
     output = {}
-    
+
     id = request.GET.get('id')
     if id:
         try:
             obj = VideoUrl.objects.get(id=id)
             if not obj.video.allow_video_urls_edit and not request.user.has_perm('videos.change_videourl'):
                 output['error'] = ugettext('You have not permission change this URL')
-            else:            
+            else:
                 VideoUrl.objects.filter(video=obj.video).update(primary=False)
                 obj.primary = True
                 obj.save()
@@ -648,26 +670,26 @@ def video_url_make_primary(request):
 def video_url_remove(request):
     output = {}
     id = request.GET.get('id')
-    
+
     if id:
         try:
             obj = VideoUrl.objects.get(id=id)
-            
+
             if not obj.video.allow_video_urls_edit and not request.user.has_perm('videos.delete_videourl'):
-                output['error'] = ugettext('You have not permission delete this URL')             
+                output['error'] = ugettext('You have not permission delete this URL')
             else:
                 if obj.original:
                     output['error'] = ugettext('You cann\'t remove original URL')
                 else:
-                    obj.delete()  
+                    obj.delete()
         except VideoUrl.DoesNotExist:
-            output['error'] = ugettext('Object does not exist')    
+            output['error'] = ugettext('Object does not exist')
     return HttpResponse(json.dumps(output))
 
 @login_required
 def video_url_create(request):
     output = {}
-    
+
     form = CreateVideoUrlForm(request.user, request.POST)
     if form.is_valid():
         obj = form.save()
@@ -684,14 +706,14 @@ def video_url_create(request):
                 'domain': Site.objects.get_current().domain,
                 'hash': user.hash_for_video(video.video_id)
             }
-            send_templated_email(user.email, subject, 
+            send_templated_email(user, subject,
                                  'videos/email_video_url_add.html',
-                                 context, fail_silently=not settings.DEBUG)          
+                                 context, fail_silently=not settings.DEBUG)
     else:
         output['errors'] = form.get_errors()
-    
+
     return HttpResponse(json.dumps(output))
-    
+
 def subscribe_to_updates(request):
     email_address = request.POST.get('email_address', '')
     data = urllib.urlencode({'email': email_address})
@@ -733,7 +755,7 @@ def video_debug(request, video_id):
         "get_video_urls": cache.get(vc._video_urls_key(vid)),
         "get_subtitles_dict": get_subtitles_dict,
         "get_video_languages": cache.get(vc._video_languages_key(vid)),
-        
+
         "get_video_languages_verbose": cache.get(vc._video_languages_verbose_key(vid)),
         "writelocked_langs": cache.get(vc._video_writelocked_langs_key(vid)),
     }

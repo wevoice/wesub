@@ -44,6 +44,11 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.models import Site
 import inspect
 
+try:
+    import oboe
+except ImportError:
+    oboe = None
+    
 def print_last_exception():
     """
     this can be useful for asynchronous tasks debuging
@@ -119,17 +124,46 @@ def get_pager(objects, on_page=15, page='1', orphans=0):
     return page
 
 def send_templated_email(to, subject, body_template, body_dict, 
-                         from_email=None, ct="html", fail_silently=False):
-    if not isinstance(to, list): to = [to]
+                         from_email=None, ct="html", fail_silently=False, check_user_preference=True):
+    """
+    Sends an html email with a template name and a rendering context.
+    Parameters:
+        to: a list of email addresses of User objects
+        check_user_preferences: If set to false will send the email regardless
+             of the user's notification preferences. This is useful in
+             situations where you must send the email, for example on
+             password retrivals.
+    """
+    from auth.models import CustomUser as User
+    to_unchecked = to
+    if not isinstance(to_unchecked, list):
+        to_unchecked = [to]
+    to = []
+    # if passed a User, check that he has opted in for email notification
+    # unless check_user_preference is False (useful for example for password)
+    # retrivals, else users that have opted out of email notifications
+    # can never recover their passowrd
+    for recipient in to_unchecked:
+        if isinstance(recipient, User):
+            if check_user_preference is False or  recipient.notify_by_email:
+                to.append(u"%s <%s>" % (recipient, recipient.email))
+        else:
+            to.append(recipient)
     if not from_email: from_email = settings.DEFAULT_FROM_EMAIL
 
     body_dict['STATIC_URL_BASE'] = settings.STATIC_URL_BASE
     body_dict['domain'] = Site.objects.get_current().domain
+    body_dict['url_base'] = "http://" + Site.objects.get_current().domain
     message = render_to_string(body_template, body_dict)
     bcc = settings.EMAIL_BCC_LIST
     email = EmailMessage(subject, message, from_email, to, bcc=bcc)
     email.content_subtype = ct
-    email.send(fail_silently)
+    if oboe:
+        try:
+            oboe.Context.log('email', 'info', backtrace=False,**{"template":body_template})
+        except Exception, e:
+            print >> sys.stderr, "Oboe error: %s" % e
+    return email.send(fail_silently)
 
 from sentry.client.models import client
 

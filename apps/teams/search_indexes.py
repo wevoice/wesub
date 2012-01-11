@@ -1,3 +1,21 @@
+# Universal Subtitles, universalsubtitles.org
+#
+# Copyright (C) 2011 Participatory Culture Foundation
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see
+# http://www.gnu.org/licenses/agpl-3.0.html.
+
 import json
 
 from django.conf import settings
@@ -17,7 +35,7 @@ LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 
 class TeamVideoLanguagesIndex(SearchIndex):
     text = CharField(
-        document=True, use_template=True, 
+        document=True, use_template=True,
         template_name="teams/teamvideo_languages_for_search.txt")
     team_id = IntegerField()
     team_video_pk = IntegerField(indexed=False)
@@ -30,6 +48,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
     has_lingua_franca = BooleanField()
     absolute_url = CharField(indexed=False)
     project_pk = IntegerField(indexed=True)
+    task_count = IntegerField()
     # never store an absolute url with solr
     # since the url changes according to the user
     # one cannot construct the url at index time
@@ -49,7 +68,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
     needs_moderation = BooleanField()
     latest_submission_date = DateTimeField(null=True)
     team_video_create_date = DateTimeField()
-    
+
     moderation_languages_names = MultiValueField(null=True)
     moderation_languages_pks = MultiValueField(null=True)
     # we'll serialize data from versions here -> links and usernames
@@ -62,7 +81,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
     # is_public=False and owned_by_team_id=X -> only team X can see this video
     is_public = BooleanField()
     owned_by_team_id = IntegerField(null=True)
-    
+
     num_completed_subs = IntegerField()
 
     def prepare(self, obj):
@@ -83,8 +102,8 @@ class TeamVideoLanguagesIndex(SearchIndex):
             self.prepared_data['original_language'] = ''
         self.prepared_data['has_lingua_franca'] = \
             bool(set(settings.LINGUA_FRANCAS) &
-                 set([sl.language for sl in 
-                      obj.video.subtitlelanguage_set.all() if 
+                 set([sl.language for sl in
+                      obj.video.subtitlelanguage_set.all() if
                       sl.is_dependable()]))
         self.prepared_data['absolute_url'] = obj.get_absolute_url()
         self.prepared_data['thumbnail'] = obj.get_thumbnail()
@@ -96,21 +115,25 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['project_name'] = obj.project.name
         self.prepared_data['project_slug'] = obj.project.slug
         self.prepared_data['team_video_create_date'] = obj.created
+
         completed_sls = obj.video.completed_subtitle_languages()
         self.prepared_data['num_completed_subs'] = len(completed_sls)
+
         self.prepared_data['video_completed_langs'] = \
             [sl.language for sl in completed_sls]
         self.prepared_data['video_completed_lang_urls'] = \
             [sl.get_absolute_url() for sl in completed_sls]
 
+        self.prepared_data['task_count'] = models.Task.objects.incomplete().filter(team_video=obj).count()
+
         policy = obj.video.policy
         owned_by = None
         if policy and policy.belongs_to_team:
             owned_by = policy.object_id
-        
+
         self.prepared_data['is_public'] =  VideoVisibilityPolicy.objects.video_is_public(obj.video)
         self.prepared_data["owned_by_team_id"] = owned_by
-        
+
         self.prepares_moderation_info( obj, self.prepared_data)
         return self.prepared_data
 
@@ -122,7 +145,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.moderation_languages_urls = []
         self.moderation_languages_names = []
         self.moderation_version_info = ""
-        
+
         pending_versions = obj.team.get_pending_moderation()
         pending_languages = list(SubtitleLanguage.objects.filter(video=obj.video,
                                                             subtitleversion__moderation_status=WAITING_MODERATION).distinct("language"))
@@ -148,18 +171,18 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['moderation_version_info'] = json.dumps(moderation_version_info)
 
 
-        
+
     @classmethod
     def results_for_members(self, team):
         base_qs = SearchQuerySet().models(models.TeamVideo)
         public = SQ(is_public=True)
         mine = SQ(is_public=False,  owned_by_team_id=team.pk)
-        return base_qs.filter(public | mine)            
+        return base_qs.filter(public | mine)
 
-        
+
     @classmethod
     def results(self):
         return SearchQuerySet().models(models.TeamVideo).filter(is_public=True)
-                
-            
+
+
 site.register(models.TeamVideo, TeamVideoLanguagesIndex)

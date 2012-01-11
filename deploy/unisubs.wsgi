@@ -31,6 +31,13 @@ application = django.core.handlers.wsgi.WSGIHandler()
 handler = django.core.handlers.wsgi.WSGIHandler()
 disabled_file_path = rel('unisubs', 'disabled')
 
+# instrumenting for tracelytics
+try:
+    import oboeware.djangoware
+except ImportError:
+    # production, dev and local installs shouldn have that
+    pass
+    
 def application(environ, start_response):
     if os.path.exists(disabled_file_path):
         start_response('200 OK', [('Content-type', 'text/html; charset=utf-8')])

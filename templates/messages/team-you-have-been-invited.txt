@@ -1,0 +1,17 @@
+
+Hi {{ user }},
+
+{{ inviter }} has invited you to become a {{ role }} for the team {{team.name}} ( {{url_base}}{% url teams:detail slug=team.slug %} ) on Universal Subtitles. Lucky you!
+{% if custom_message %}
+{{ custom_message.data }}
+{% endif %}
+{% if invite.note %}
+        {{ invite.note }}
+{% endif %}
+
+
+To accept this invitation and join the team:
+{{url_base}}{% url teams:accept_invite invite_pk=invite_pk %}
+
+To decline this invitation :
+{{url_base}}{% url teams:deny_invite invite_pk=invite_pk %}

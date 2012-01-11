@@ -1,32 +1,31 @@
 # Universal Subtitles, universalsubtitles.org
-# 
+#
 # Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-
 from django.db import models
-from django.utils.translation import ugettext_lazy as _, ugettext
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
-from videos.models import Video, SubtitleLanguage
+from django.core.urlresolvers import reverse
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from messages.models import Message
+from messages import tasks as notifier
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.http import Http404
@@ -35,13 +34,14 @@ from teams.tasks import update_one_team_video
 from utils.panslugify import pan_slugify
 from haystack.query import SQ
 from haystack import site
-from utils.translation import SUPPORTED_LANGUAGES_DICT
-from utils import get_object_or_none
 from utils.searching import get_terms
-import datetime 
+from django.contrib.contenttypes.models import ContentType
+import datetime
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
+import apps.teams.moderation_const as MODERATION
+from apps.comments.models import Comment
 from apps.teams.moderation_const import WAITING_MODERATION
 from teams.permissions_const import TEAM_PERMISSIONS, PROJECT_PERMISSIONS, \
         LANG_PERMISSIONS, ROLE_ADMIN, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_MANAGER
@@ -50,15 +50,19 @@ def get_perm_names(model, perms):
     return [("%s-%s-%s" % (model._meta.app_label, model._meta.object_name, p[0]), p[1],) for p in perms]
 
 
+# Teams
 class TeamManager(models.Manager):
+    def get_query_set(self):
+        return super(TeamManager, self).get_query_set().filter(deleted=False)
 
     def for_user(self, user):
         if user.is_authenticated():
-            return self.get_query_set().filter(models.Q(is_visible=True)| \
-                    models.Q(members__user=user)).distinct()
+            return self.get_query_set().filter(
+                    models.Q(is_visible=True) |
+                    models.Q(members__user=user)
+            ).distinct()
         else:
             return self.get_query_set().filter(is_visible=True)
-
 
 class Team(models.Model):
     APPLICATION = 1
@@ -73,14 +77,15 @@ class Team(models.Model):
             (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
             (INVITATION_BY_ADMIN, _(u'Invitation by admin')),
             )
-    MEMBER_REMOVE = 1
-    MANAGER_REMOVE = 2
-    MEMBER_ADD = 3
+
+    VP_MEMBER = 1
+    VP_MANAGER = 2
+    VP_ADMIN = 3
     VIDEO_POLICY_CHOICES = (
-            (MEMBER_REMOVE, _(u'Members can add and remove video')),  #any member can add/delete video
-            (MANAGER_REMOVE, _(u'Managers can add and remove video')),    #only managers can add/remove video
-            (MEMBER_ADD, _(u'Members can only add videos'))  #members can only add video
-            )
+        (VP_MEMBER, _(u'Any team member')),
+        (VP_MANAGER, _(u'Managers and admins')),
+        (VP_ADMIN, _(u'Admins only'))
+    )
 
     TASK_ASSIGN_CHOICES = (
             (10, 'Any team member'),
@@ -101,7 +106,7 @@ class Team(models.Model):
 
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
-    description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links.'))
+    description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links. Line breaks and HTML not supported.'))
 
     logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True, upload_to='teams/logo/')
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
@@ -128,7 +133,7 @@ class Team(models.Model):
             default=OPEN)
     video_policy = models.IntegerField(_(u'video policy'),
             choices=VIDEO_POLICY_CHOICES,
-            default=MEMBER_REMOVE)
+            default=VP_MEMBER)
     task_assign_policy = models.IntegerField(_(u'task assignment policy'),
             choices=TASK_ASSIGN_CHOICES,
             default=TASK_ASSIGN_IDS['Any team member'])
@@ -139,7 +144,10 @@ class Team(models.Model):
             choices=SUBTITLE_CHOICES,
             default=SUBTITLE_IDS['Anyone'])
 
+    deleted = models.BooleanField(default=False)
+
     objects = TeamManager()
+    all_objects = models.Manager() # For accessing deleted teams, if necessary.
 
     class Meta:
         ordering = ['name']
@@ -147,18 +155,16 @@ class Team(models.Model):
         verbose_name_plural = _(u'Teams')
 
 
-
-
-
     def __unicode__(self):
         return self.name
 
     def render_message(self, msg):
+        author_page = msg.author.get_absolute_url() if msg.author else ''
         context = {
-                'team': self, 
+                'team': self,
                 'msg': msg,
                 'author': msg.author,
-                'author_page': msg.author.get_absolute_url(),
+                'author_page': author_page,
                 'team_page': self.get_absolute_url(),
                 "STATIC_URL": settings.STATIC_URL,
                 }
@@ -185,7 +191,7 @@ class Team(models.Model):
                 pass
 
         if raise404:
-            raise Http404       
+            raise Http404
 
     def logo_thumbnail(self):
         if self.logo:
@@ -198,7 +204,7 @@ class Team(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('teams:detail', [self.slug])
-    
+
     def get_site_url(self):
         return 'http://%s%s' % (Site.objects.get_current().domain, self.get_absolute_url())
 
@@ -225,41 +231,27 @@ class Team(models.Model):
         Contibutors can add new subs videos but they migh need to be moderated
         """
         return self._is_role(user, TeamMember.ROLE_CONTRIBUTOR)
-    
-    def can_remove_video(self, user, team_video=None):
-        if not user.is_authenticated():
-            return False          
-        if self.video_policy == self.MANAGER_REMOVE and self.is_manager(user):
-            return True
-        if self.video_policy == self.MEMBER_REMOVE and self.is_member(user):
-            return True
-        return False
-    
-    def can_edit_video(self, user, team_video=None):
-        if not user.is_authenticated():
-            return False
-        return self.can_add_video(user)
 
     def can_see_video(self, user, team_video=None):
         if not user.is_authenticated():
             return False
         return self.is_member(user)
-    
+
     # moderation
-    
+
     def get_pending_moderation( self, video=None):
         from videos.models import SubtitleVersion
-        qs =  SubtitleVersion.objects.filter(language__video__moderated_by=self, moderation_status=WAITING_MODERATION)
+        qs = SubtitleVersion.objects.filter(language__video__moderated_by=self, moderation_status=WAITING_MODERATION)
         if video is not None:
             qs = qs.filter(language__video=video)
-        return qs    
-            
+        return qs
+
 
     def can_add_moderation(self, user):
         if not user.is_authenticated():
             return False
         return self.is_manager(user)
-        
+
     def can_remove_moderation(self, user):
         if not user.is_authenticated():
             return False
@@ -267,19 +259,19 @@ class Team(models.Model):
 
     def video_is_moderated_by_team(self, video):
         return video.moderated_by == self
-    
+
     @property
     def member_count(self):
         if not hasattr(self, '_member_count'):
             setattr(self, '_member_count', self.users.count())
         return self._member_count
-    
+
     @property
     def videos_count(self):
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', self.videos.count())
-        return self._videos_count        
-    
+        return self._videos_count
+
     def application_message(self):
         try:
             return self.settings.get(key=Setting.KEY_IDS['messages_application']).data
@@ -331,9 +323,9 @@ class Team(models.Model):
     def get_videos_for_languages(self, languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS):
         from utils.multi_query_set import TeamMultyQuerySet
         languages.extend([l[:l.find('-')] for l in languages if l.find('-') > -1])
-        
+
         langs_pairs = []
-        
+
         for l1 in languages:
             for l0 in languages:
                 if not l1 == l0:
@@ -387,6 +379,11 @@ class Team(models.Model):
             p.save()
             return p
 
+    @property
+    def has_projects(self):
+        projects = self.project_set.all()
+        return True if projects.count() > 1 else False
+
     def save(self, *args, **kwargs):
         creating = self.pk is None
         super(Team, self).save(*args, **kwargs)
@@ -394,19 +391,14 @@ class Team(models.Model):
             # make sure we create a default project
             self.default_project
 
-    
-    def to_dict(self):
-        return { 'pk': self.pk,
-                 'name': self.name,
-                 'description': self.description,
-                 'membership_policy': self.membership_policy,
-                 'video_policy': self.video_policy,
-                 'task_assign_policy': self.task_assign_policy,
-                 'subtitle_policy': self.subtitle_policy,
-                 'translate_policy': self.translate_policy,
-                 'logo': self.logo_thumbnail() if self.logo else None,
-                 'logo_full': self.logo.url if self.logo else None,
-                 'workflow_enabled': self.workflow_enabled, }
+
+    def get_writable_langs(self):
+        return TeamLanguagePreference.objects.get_writable(self)
+
+    def get_readable_langs(self):
+        return TeamLanguagePreference.objects.get_readable(self)
+
+
 # this needs to be constructed after the model definition since we need a
 # reference to the class itself
 Team._meta.permissions = TEAM_PERMISSIONS
@@ -421,13 +413,13 @@ class ProjectManager(models.Manager):
         elif isinstance(team_identifier, str):
             team = Team.objects.get(slug=team_identifier)
         return Project.objects.filter(team=team).exclude(name=Project.DEFAULT_NAME)
-    
+
 class Project(models.Model):
     #: All tvs belong to a project, wheather the team has enabled them or not
     # the default project is just a convenience UI that pretends to be part of
     # the team . If this ever gets changed, you need to change migrations/0044
     DEFAULT_NAME = "_root"
-    
+
     team = models.ForeignKey(Team)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(blank=True)
@@ -442,7 +434,7 @@ class Project(models.Model):
     workflow_enabled = models.BooleanField(default=False)
 
     objects = ProjectManager()
-    
+
     def __unicode__(self):
         if self.is_default_project:
             return u"---------"
@@ -457,14 +449,13 @@ class Project(models.Model):
     @property
     def is_default_project(self):
         return self.name == Project.DEFAULT_NAME
-        
+
     class Meta:
         unique_together = (
                 ("team", "name",),
                 ("team", "slug",),
         )
         permissions = PROJECT_PERMISSIONS
-        
 
 
 class TeamVideo(models.Model):
@@ -473,9 +464,9 @@ class TeamVideo(models.Model):
     title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True,
         help_text=_(u'Use this space to explain why you or your team need to caption or subtitle this video. Adding a note makes volunteers more likely to help out!'))
-    thumbnail = S3EnabledImageField(upload_to='teams/video_thumbnails/', null=True, blank=True, 
+    thumbnail = S3EnabledImageField(upload_to='teams/video_thumbnails/', null=True, blank=True,
         help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'))
-    all_languages = models.BooleanField(_('Need help with all languages'), default=False, 
+    all_languages = models.BooleanField(_('Need help with all languages'), default=False,
         help_text=_('If you check this, other languages will not be displayed.'))
     added_by = models.ForeignKey(User)
     created = models.DateTimeField(auto_now_add=True)
@@ -485,22 +476,19 @@ class TeamVideo(models.Model):
 
     class Meta:
         unique_together = (('team', 'video'),)
-    
+
     def __unicode__(self):
         return self.title or unicode(self.video)
 
-    def can_remove(self, user):
-        return self.team.can_remove_video(user, self)
-    
     def link_to_page(self):
         if self.all_languages:
             return self.video.get_absolute_url()
         return self.video.video_link()
-        
+
     @models.permalink
     def get_absolute_url(self):
         return ('teams:team_video', [self.pk])
-    
+
     def get_thumbnail(self):
         if self.thumbnail:
             return self.thumbnail.thumb_url(100, 100)
@@ -509,10 +497,10 @@ class TeamVideo(models.Model):
             th = self.video.get_thumbnail()
             if th:
                 return th
-        
+
         if self.team.logo:
             return self.team.logo_thumbnail()
-        
+
         return ''
 
     def _original_language(self):
@@ -634,7 +622,7 @@ class TeamVideo(models.Model):
     def _add_searchable_language(self, language, sublang_dict, sls):
         complete_sublangs = []
         if language in sublang_dict:
-            complete_sublangs = [sl for sl in sublang_dict[language] if 
+            complete_sublangs = [sl for sl in sublang_dict[language] if
                                  not sl.is_dependent() and sl.is_complete]
         if len(complete_sublangs) == 0:
             sls.append("S_{0}".format(language))
@@ -653,7 +641,6 @@ class TeamVideo(models.Model):
         if not hasattr(self, "project"):
             self.project = self.team.default_project
         super(TeamVideo, self).save(*args, **kwargs)
-        
 
 
     def is_checked_out(self, ignore_user=None):
@@ -682,7 +669,13 @@ class TeamVideo(models.Model):
     # Convenience functions
     def subtitles_started(self):
         """Return True if subtitles have been started for this video, otherwise False."""
-        return self.video.has_original_language()
+
+        sl = self.video.subtitle_language()
+
+        if sl and sl.had_version:
+            return True
+        else:
+            return False
 
     def subtitles_finished(self):
         """Return True if at least one set of subtitles has been finished for this video."""
@@ -690,19 +683,28 @@ class TeamVideo(models.Model):
                 self.video.subtitle_language().is_complete_and_synced())
 
 
-
 def team_video_save(sender, instance, created, **kwargs):
     update_one_team_video.delay(instance.id)
 
 def team_video_delete(sender, instance, **kwargs):
-    # not using an async task for this since the async task 
+    # not using an async task for this since the async task
     # could easily execute way after the instance is gone,
     # and backend.remove requires the instance.
     tv_search_index = site.get_index(TeamVideo)
     tv_search_index.backend.remove(instance)
 
+def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
+    if created and not raw:
+        workflow = Workflow.get_for_team_video(instance)
+        if workflow.autocreate_subtitle:
+            Task(team=instance.team, team_video=instance, subtitle_version=None,
+                 language='', type=Task.TYPE_IDS['Subtitle']).save()
+
+
 post_save.connect(team_video_save, TeamVideo, dispatch_uid="teams.teamvideo.team_video_save")
+post_save.connect(team_video_autocreate_task, TeamVideo, dispatch_uid='teams.teamvideo.team_video_autocreate_task')
 post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.team_video_delete")
+
 
 class TeamVideoLanguage(models.Model):
     team_video = models.ForeignKey(TeamVideo, related_name='languages')
@@ -715,7 +717,7 @@ class TeamVideoLanguage(models.Model):
     is_complete = models.BooleanField(default=False, db_index=True)
     percent_done = models.IntegerField(default=0, db_index=True)
     is_lingua_franca = models.BooleanField(default=False, db_index=True)
-    
+
     class Meta:
         unique_together = (('team_video', 'subtitle_language'),)
 
@@ -803,7 +805,6 @@ class TeamVideoLanguage(models.Model):
     class Meta:
         permissions = LANG_PERMISSIONS
 
-        
 
 class TeamVideoLanguagePair(models.Model):
     team_video = models.ForeignKey(TeamVideo)
@@ -819,9 +820,10 @@ class TeamVideoLanguagePair(models.Model):
     language_pair = models.CharField(db_index=True, max_length=16)
     percent_complete = models.IntegerField(db_index=True, default=0)
 
+
 class TeamMemderManager(models.Manager):
     use_for_related_fields = True
-    
+
     def create_first_member(self, team, user):
         """Make sure that new teams always have an 'owner' member."""
 
@@ -831,142 +833,107 @@ class TeamMemderManager(models.Manager):
 
     def managers(self):
         return self.get_query_set().filter(role=TeamMember.ROLE_MANAGER)
-    
+
 class TeamMember(models.Model):
     ROLE_OWNER = ROLE_OWNER
     ROLE_ADMIN = ROLE_ADMIN
     ROLE_MANAGER = ROLE_MANAGER
     ROLE_CONTRIBUTOR = ROLE_CONTRIBUTOR
-    
+
     ROLES = (
         (ROLE_OWNER, _("Owner")),
         (ROLE_MANAGER, _("Manager")),
         (ROLE_ADMIN, _("Admin")),
         (ROLE_CONTRIBUTOR, _("Contributor")),
     )
-    
-    team = models.ForeignKey(Team, related_name='members')
-    user = models.ForeignKey(User, related_name='user')
-    role = models.CharField(max_length=16, default=ROLE_CONTRIBUTOR, choices=ROLES)
-    changes_notification = models.BooleanField(default=True)
 
-    
+    team = models.ForeignKey(Team, related_name='members')
+    user = models.ForeignKey(User, related_name='team_members')
+    role = models.CharField(max_length=16, default=ROLE_CONTRIBUTOR, choices=ROLES, db_index=True)
+
     objects = TeamMemderManager()
 
     def __unicode__(self):
         return u'%s' % self.user
 
 
+    def project_narrowings(self):
+        return self.narrowings.filter(project__isnull=False)
+
+    def language_narrowings(self):
+        return self.narrowings.filter(project__isnull=True)
+
+
+    def project_narrowings_fast(self):
+        return [n for n in  self.narrowings_fast() if n.project]
+
+    def language_narrowings_fast(self):
+        return [n for n in self.narrowings_fast() if n.language]
+
+    def narrowings_fast(self):
+        if hasattr(self, '_cached_narrowings'):
+            if self._cached_narrowings is not None:
+                return self._cached_narrowings
+
+        self._cached_narrowings = self.narrowings.all()
+        return self._cached_narrowings
+
+
+
+
     class Meta:
         unique_together = (('team', 'user'),)
 
 
-class MembershipNarrowingManager(models.Manager):
-    def get_for_team(self, team, user):
-        return self.filter(membership__id_in=[x.id for x in team.members.filter(user=user)])
-        
-    def for_type(self, model):
-        return self.filter(content_type=ContentType.objects.get_for_model(model))
-        
-    def get_for_projects(self, member):
-        return self.for_type(Project).filter(member=member)
-        
-    def get_for_langs(self, member):
-        return self.for_type(TeamVideoLanguage).filter(member=member)
+def clear_tasks(sender, instance, *args, **kwargs):
+    tasks = instance.team.task_set.incomplete().filter(assignee=instance.user)
+    tasks.update(assignee=None)
 
-        
-    def create(self, member, target, added_by):
-        return MembershipNarrowing.objects.get_or_create(
-            content_type = ContentType.objects.get_for_model(target),
-            object_pk = target.pk,
-            member = member,
-            added_by=added_by)[0]
+pre_delete.connect(clear_tasks, TeamMember, dispatch_uid='teams.members.clear-tasks-on-delete')
+
 
 class MembershipNarrowing(models.Model):
-    """
-    Represent narrowings that can be made on memberships.
-    A membership permission might be applyed to an entire
-    team, or be narrowed to projet or to a language.
+    """Represent narrowings that can be made on memberships.
+
+    Narrowings can apply to projects or languages, but not both.
+
     """
     member = models.ForeignKey(TeamMember, related_name="narrowings")
-    content_type = models.ForeignKey(ContentType,
-        related_name="content_type_set_for_%(class)s")
-    object_pk = models.TextField('object ID')
-    content = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    project = models.ForeignKey(Project, null=True, blank=True)
+    language = models.CharField(max_length=24, blank=True, choices=ALL_LANGUAGES)
+
+    added_by = models.ForeignKey(TeamMember, related_name="narrowing_includer", null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True, blank=None)
     modified = models.DateTimeField(auto_now=True, blank=None)
-    added_by = models.ForeignKey(TeamMember, related_name="narrowing_includer", null=True, blank=True)
-    
-    objects = MembershipNarrowingManager()
-    
-    @property
-    @classmethod
-    def allowed_types(self):
-        """
-        Cache the content types where we allow narrowing to occur. This
-        should not be needed to change at run time. If it ever does, just
-        clear _cached_allowed_types
-        This cannot simply be declared on the model class since by the
-        time them class is defined we might or might not have loaded the
-        other models (+ contenty type), this means that we can have
-        an error related to import order and it is not very predictable,
-        e.g. would fail when running the unit tests on sqlite but not on
-        msyql
-        """
-        if not MembershipNarrowing._cached_allowed_types:
-            MembershipNarrowing._cached_allowed_types = \
-                         [ContentType.objects.get_for_model(m) for m in \
-                          (Project, TeamVideoLanguage)]
-        return MembershipNarrowing._cached_allowed_types
-        
-    def __unicode__(self):
-        return u"Permission restriction for %s and %s " % (
-            self.member, self.content)
 
-    def save(self, *args, **kwargs):
-        if False and self.content_type not in MembershipNarrowing.allowed_types:
-            raise ValueError("MembershipNarrowing cannot be assigned to %s, allowed types are %s"
-            % (self.content, MembershipNarrowing.allowed_types))
-        super(MembershipNarrowing, self).save(*args, **kwargs)   
+    def __unicode__(self):
+        if self.project:
+            return u"Permission restriction for %s to project %s " % (self.member, self.project)
+        else:
+            return u"Permission restriction for %s to language %s " % (self.member, self.language)
 
 
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
     user = models.ForeignKey(User, related_name='team_applications')
     note = models.TextField(blank=True)
-    
+
     class Meta:
         unique_together = (('team', 'user'),)
-    
-    def _send_approve_message(self):
-        msg = Message()
-        msg.subject = ugettext(u'Your application to %s was approved!') % self.team.name
-        msg.content = ugettext(u"Congratulations, you're now a member of %s!") % self.team.name
-        msg.user = self.user
-        msg.object = self.team
-        msg.author = User.get_anonymous()
-        msg.save()
 
-    def _send_deny_message(self):
-        msg = Message()
-        msg.subject = ugettext(u'Your application to %s was denied.') % self.team.name
-        msg.content = ugettext(u"Sorry, your application to %s was rejected.") % self.team.name
-        msg.user = self.user
-        msg.object = self.team
-        msg.author = User.get_anonymous()
-        msg.save()
 
 
     def approve(self):
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
-        self._send_approve_message()
         self.delete()
-    
+
     def deny(self):
-        self._send_deny_message()
-        self.delete()
-        
+        # we can't delete the row until the notification task has run
+        notifier.team_application_denied.delay(self.pk)
+
+
+# Invites
 class Invite(models.Model):
     team = models.ForeignKey(Team, related_name='invitations')
     user = models.ForeignKey(User, related_name='team_invitations')
@@ -974,41 +941,27 @@ class Invite(models.Model):
     author = models.ForeignKey(User)
     role = models.CharField(max_length=16, choices=TeamMember.ROLES,
                             default=TeamMember.ROLE_CONTRIBUTOR)
-    
+
     class Meta:
         unique_together = (('team', 'user'),)
-    
+
     def accept(self):
-        TeamMember.objects.get_or_create(team=self.team, user=self.user, role=self.role)
+        member, created = TeamMember.objects.get_or_create(team=self.team, user=self.user, role=self.role)
+        notifier.team_member_new.delay(member.pk)
         self.delete()
-        
+
     def deny(self):
         self.delete()
-    
-    def render_message(self, msg):
-        message = get_object_or_none(Setting, team=self.team,
-                                     key=Setting.KEY_IDS['messages_invite'])
-        return render_to_string('teams/_invite_message.html',
-                                {'invite': self, 'custom_message': message})
-    
+
+
     def message_json_data(self, data, msg):
         data['can-reaply'] = False
         return data
-    
+
 models.signals.pre_delete.connect(Message.on_delete, Invite)
-    
-def invite_send_message(sender, instance, created, **kwargs):
-    if created:
-        msg = Message()
-        msg.subject = ugettext(u'Invitation to join a team')
-        msg.user = instance.user
-        msg.object = instance
-        msg.author = instance.author
-        msg.save()
-    
-post_save.connect(invite_send_message, Invite, dispatch_uid="teams.invite.send_invite")
 
 
+# Workflows
 class Workflow(models.Model):
     REVIEW_CHOICES = (
         (00, "Don't require review"),
@@ -1049,13 +1002,13 @@ class Workflow(models.Model):
 
 
     @classmethod
-    def _get_target_team_id(cls, id, type):
+    def _get_target_team(cls, id, type):
         if type == 'team_video':
-            return TeamVideo.objects.get(pk=id).team.id
+            return TeamVideo.objects.select_related('team').get(pk=id).team
         elif type == 'project':
-            return Project.objects.get(pk=id).team.id
+            return Project.objects.select_related('team').get(pk=id).team
         else:
-            return id
+            return Team.objects.get(pk=id)
 
     @classmethod
     def get_for_target(cls, id, type, workflows=None):
@@ -1070,15 +1023,12 @@ class Workflow(models.Model):
         If workflows is not given it will be looked up with one DB query.
 
         '''
-
-
         if not workflows:
-            team_id = Workflow._get_target_team_id(id, type)
-            workflows = list(Workflow.objects.filter(team=team_id))
+            team = Workflow._get_target_team(id, type)
+            workflows = list(Workflow.objects.filter(team=team.id).select_related('project', 'team', 'team_video'))
         else:
-            team_id = workflows[0].team.pk
+            team = workflows[0].team
 
-        team = Team.objects.get(pk=team_id)
         default_workflow = Workflow(team=team)
 
         if not workflows:
@@ -1093,7 +1043,7 @@ class Workflow(models.Model):
                 # might be a workflow for its project, so we'll start looking
                 # for that instead.
                 team_video = TeamVideo.objects.get(pk=id)
-                id, type = team_video.project.id, 'project'
+                id, type = team_video.project_id, 'project'
 
         if type == 'project':
             try:
@@ -1121,8 +1071,14 @@ class Workflow(models.Model):
 
         If workflows is not given it will be looked up with one DB query.
 
+        NOTE: This function caches the workflow for performance reasons.  If the
+        workflow changes within the space of a single request that
+        _cached_workflow should be cleared.
+
         '''
-        return Workflow.get_for_target(team_video.id, 'team_video', workflows)
+        if not hasattr(team_video, '_cached_workflow'):
+            team_video._cached_workflow = Workflow.get_for_target(team_video.id, 'team_video', workflows)
+        return team_video._cached_workflow
 
     @classmethod
     def get_for_project(cls, project, workflows=None):
@@ -1159,7 +1115,9 @@ class Workflow(models.Model):
 
 
     def __unicode__(self):
-        return u'Workflow for %s' % self.get_specific_target()
+        target = self.get_specific_target()
+        return u'Workflow %s for %s (%s %d)' % (
+                self.pk, target, target.__class__.__name__, target.pk)
 
 
     # Convenience functions for checking if a step of the workflow is enabled.
@@ -1172,22 +1130,7 @@ class Workflow(models.Model):
         return True if self.approve_allowed else False
 
 
-    def to_dict(self):
-        '''Return a dictionary representing this workflow.
-
-        Useful for converting to JSON.
-
-        '''
-        return { 'pk': self.id,
-                 'team': self.team.slug if self.team else None,
-                 'project': self.project.id if self.project else None,
-                 'team_video': self.team_video.id if self.team_video else None,
-                 'autocreate_subtitle': self.autocreate_subtitle,
-                 'autocreate_translate': self.autocreate_translate,
-                 'review_allowed': self.review_allowed,
-                 'approve_allowed': self.approve_allowed, }
-
-
+# Tasks
 class TaskManager(models.Manager):
     def not_deleted(self):
         return self.get_query_set().filter(deleted=False)
@@ -1278,7 +1221,7 @@ class Task(models.Model):
     language = models.CharField(max_length=16, choices=ALL_LANGUAGES, blank=True,
                                 db_index=True)
     assignee = models.ForeignKey(User, blank=True, null=True)
-    subtitle_language = models.ForeignKey(SubtitleLanguage, blank=True, null=True)
+    subtitle_version = models.ForeignKey(SubtitleVersion, blank=True, null=True)
 
     deleted = models.BooleanField(default=False)
 
@@ -1299,37 +1242,62 @@ class Task(models.Model):
         return u'%d' % self.id
 
 
-    def to_dict(self, user=None):
-        '''Return a dictionary representing this task.
-
-        Useful for converting to JSON.
-
-        '''
-        from teams.permissions import can_perform_task, can_assign_task, can_delete_task
-
-        return { 'pk': self.id,
-                 'team': self.team.id if self.team else None,
-                 'team_video': self.team_video.id if self.team_video else None,
-                 'team_video_display': unicode(self.team_video) if self.team_video else None,
-                 'team_video_url': self.team_video.get_absolute_url() if self.team_video else None,
-                 'type': Task.TYPE_NAMES[self.type],
-                 'public': self.public,
-                 'assignee': self.assignee.id if self.assignee else None,
-                 'assignee_display': unicode(self.assignee) if self.assignee else None,
-                 'language': self.language if self.language else None,
-                 'language_display': SUPPORTED_LANGUAGES_DICT[self.language]
-                                     if self.language else None,
-                 'perform_allowed': can_perform_task(user, self) if user else None,
-                 'assign_allowed': can_assign_task(self, user) if user else None,
-                 'delete_allowed': can_delete_task(self, user) if user else None,
-                 'completed': True if self.completed else False, }
-
-
     @property
     def workflow(self):
         '''Return the most specific workflow for this task's TeamVideo.'''
         return Workflow.get_for_team_video(self.team_video)
 
+
+    def _add_comment(self):
+        """Add a comment on the SubtitleLanguage for this task with the body as content."""
+        if self.body.strip():
+            lang_ct = ContentType.objects.get_for_model(SubtitleLanguage)
+            Comment(
+                content=self.body,
+                object_pk=self.subtitle_version.language.pk,
+                content_type=lang_ct,
+                submit_date=self.completed,
+                user=self.assignee,
+            ).save()
+
+    def get_widget_url(self):
+        mode = Task.TYPE_NAMES[self.type].lower()
+        if self.subtitle_version:
+            base_url = self.subtitle_version.language.get_widget_url(mode, self.pk)
+        else:
+            video = self.team_video.video
+            if self.language and video.subtitle_language(self.language) :
+                lang = video.subtitle_language(self.language)
+                base_url = reverse("videos:translation_history", kwargs={
+                    "video_id": video.video_id,
+                    "lang": lang.language,
+                    "lang_id": lang.pk,
+                })
+            else:
+                # subtitle tasks might not have a language
+                base_url = video.get_absolute_url()
+        return base_url+  "?t=%s" % self.pk
+
+
+    def _set_version_moderation_status(self):
+        """Set this task's subtitle_version's moderation_status to the appropriate value.
+
+        This assumes that this task is an Approve/Review task, and that the
+        approved field is set to Approved or Rejected.
+
+        """
+        assert self.get_type_display() in ('Approve', 'Review'), \
+               "Tried to set version moderation status from a non-review/approval task."
+
+        assert self.get_approved_display() in ('Approved', 'Rejected'), \
+               "Tried to set version moderation status from an un-ruled-upon task."
+
+        if self.approved == Task.APPROVED_IDS['Approved']:
+            self.subtitle_version.moderation_status = MODERATION.APPROVED
+        else:
+            self.subtitle_version.moderation_status = MODERATION.REJECTED
+
+        self.subtitle_version.save()
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
@@ -1339,45 +1307,138 @@ class Task(models.Model):
         return { 'Subtitle': self._complete_subtitle,
                  'Translate': self._complete_translate,
                  'Review': self._complete_review,
-                 'Approve': self._complete_review,
+                 'Approve': self._complete_approve,
         }[Task.TYPE_NAMES[self.type]]()
 
     def _complete_subtitle(self):
-        # Normally we would create the next task in the sequence here, but since
-        # we don't create translation tasks ahead of time for efficieny reasons
-        # we simply do nothing.
-        return None
+        tasks = []
+        subtitle_version = self.team_video.video.latest_version(public_only=False)
 
-    def _complete_translate(self):
+        if self.workflow.autocreate_translate:
+            preferred_langs = TeamLanguagePreference.objects.get_preferred(self.team)
+
+            for lang in preferred_langs:
+                sl = self.team_video.video.subtitle_language(lang)
+                if sl and sl.is_complete_and_synced():
+                    continue
+
+                task = Task(team=self.team, team_video=self.team_video,
+                            subtitle_version=subtitle_version,
+                            language=lang, type=Task.TYPE_IDS['Translate'])
+                task.save()
+                tasks.append(task)
+
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'])
-        else:
-            # The review step may be disabled.
-            # If so, we move directly to the approve step.
+            task.save()
+            tasks.append(task)
+        elif self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'])
+            task.save()
+            tasks.append(task)
 
-        task.save()
+        return tasks
+
+    def _complete_translate(self):
+        subtitle_version = self.team_video.video.latest_version(language_code=self.language)
+
+        if self.workflow.review_enabled:
+            task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=subtitle_version,
+                        language=self.language, type=Task.TYPE_IDS['Review'])
+            task.save()
+        else:
+            # The review step may be disabled.  If so, we check the approve step.
+            if self.workflow.approve_enabled:
+                task = Task(team=self.team, team_video=self.team_video,
+                            subtitle_version=subtitle_version,
+                            language=self.language, type=Task.TYPE_IDS['Approve'])
+                task.save()
+            else:
+                task = None
+
         return task
 
     def _complete_review(self):
+        self._add_comment()
+
+        task = None
         if self.workflow.approve_enabled:
-            task = Task(team=self.team, team_video=self.team_video,
-                        language=self.language, type=Task.TYPE_IDS['Approve'])
-        task.save()
+            # Approval is enabled, so if the reviewer thought these subtitles
+            # were good we create the next task.
+            if self.approved == Task.APPROVED_IDS['Approved']:
+                task = Task(team=self.team, team_video=self.team_video,
+                            subtitle_version=self.subtitle_version,
+                            language=self.language, type=Task.TYPE_IDS['Approve'])
+                task.save()
+            else:
+                # The reviewer rejected this version, so it should be explicitly
+                # made non-public.
+                self._set_version_moderation_status()
+        else:
+            # Approval isn't enabled, so the ruling of this Review task
+            # determines whether the subtitles go public.
+            self._set_version_moderation_status()
+
         return task
 
     def _complete_approve(self):
-        pass
+        self._add_comment()
+
+        # If we manage to get here, the ruling on this Approve task determines
+        # whether the subtitles should go public.
+        self._set_version_moderation_status()
 
 
     def get_perform_url(self):
         '''Return the URL that will open whichever dialog necessary to perform this task.'''
         mode = Task.TYPE_NAMES[self.type].lower()
-        return self.subtitle_language.get_widget_url(mode=mode, task_id=self.pk)
+        if self.subtitle_version:
+            base_url = self.subtitle_version.language.get_widget_url(mode, self.pk)
+        else:
+            video = self.team_video.video
+            if self.language and video.subtitle_language(self.language) :
+                lang = video.subtitle_language(self.language)
+                base_url = reverse("videos:translation_history", kwargs={
+                    "video_id": video.video_id,
+                    "lang": lang.language,
+                    "lang_id": lang.pk,
+                })
+            else:
+                # subtitle tasks might not have a language
+                base_url = video.get_absolute_url()
+        return base_url+  "?t=%s" % self.pk
 
 
+
+    def save(self, update_team_video_index=True, *args, **kwargs):
+        result = super(Task, self).save(*args, **kwargs)
+        if update_team_video_index:
+            update_one_team_video.delay(self.team_video.pk)
+        return result
+
+
+def task_moderate_version(sender, instance, created, **kwargs):
+    """If we create a review or approval task for this subtitle_version, mark it.
+
+    It *must* be awaiting moderation if we've just created one of these tasks
+    (and it's not a pre-completed task).
+
+    """
+    if created and instance.subtitle_version:
+        if instance.type in (Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']):
+            if not instance.completed:
+                instance.subtitle_version.moderation_status = WAITING_MODERATION
+                instance.subtitle_version.save()
+
+post_save.connect(task_moderate_version, Task, dispatch_uid="teams.task.task_moderate_version")
+
+
+# Settings
 class SettingManager(models.Manager):
     use_for_related_fields = True
 
@@ -1429,20 +1490,29 @@ class Setting(models.Model):
         return Setting.KEY_NAMES[self.key]
 
 
+# TeamLanguagePreferences
 class TeamLanguagePreferenceManager(models.Manager):
-
     def _generate_writable(self, team):
         langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
-        tlp_allows_writes =  set([x['language_code'] for x in  self.for_team(team).filter(allow_writes=False).values("language_code")])
-        return langs_set- tlp_allows_writes
-            
+
+        unwritable = self.for_team(team).filter(allow_writes=False, preferred=False).values("language_code")
+        unwritable = set([x['language_code'] for x in unwritable])
+
+        return langs_set - unwritable
+
     def _generate_readable(self, team):
-        langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
-        tlp_allows_reads =  set([x['language_code'] for x in self.for_team(team).filter(allow_reads=False).values(
-            "language_code")])
-        return langs_set - tlp_allows_reads
-            
-            
+        langs = set([x[0] for x in settings.ALL_LANGUAGES])
+
+        unreadable = self.for_team(team).filter(allow_reads=False, preferred=False).values("language_code")
+        unreadable = set([x['language_code'] for x in unreadable])
+
+        return langs - unreadable
+
+    def _generate_preferred(self, team):
+        preferred = self.for_team(team).filter(preferred=True).values("language_code")
+        return set([x['language_code'] for x in preferred])
+
+
     def for_team(self, team):
         return self.get_query_set().filter(team=team)
 
@@ -1450,60 +1520,89 @@ class TeamLanguagePreferenceManager(models.Manager):
         from teams.cache import invalidate_lang_preferences
         invalidate_lang_preferences(instance.team)
 
+
     def get_readable(self, team):
         from teams.cache import get_readable_langs
         return get_readable_langs(team)
-        
+
     def get_writable(self, team):
         from teams.cache import get_writable_langs
         return get_writable_langs(team)
-        
+
+    def get_preferred(self, team):
+        from teams.cache import get_preferred_langs
+        return get_preferred_langs(team)
+
 class TeamLanguagePreference(models.Model):
-    """
-    Represent language preferences for a given team. A team might say,
-    for example that Yoruba translations do not translate a team, then
-    that language should not have tasks assigned to it, nor it should
-    allow roles to be narrowed to that language.
+    """Represent language preferences for a given team.
 
-    This is how settings should interact, TLP means that we have created
-    a TeamLanguagePreference for that team and language.
-    | Action                                                  | NO TLP | allow_read=True,  | allow_read=False,  |
-    |                                                         |        | allow_write=False | allow_write=False  |     
-    =============================================================================================================
-    | assignable as tasks                                     | X      |                   |                    |
-    | assignable as narrowing to a certain team member / role | X      |                   |                    |
-    | listed on the widget for viewing                        | X      | X                 |                    |
-    | listed on the widget for improving                      | X      |                   |                    |
-    | returned from the api read operations                   | X      | X                 |                    |
-    | upload  / write operations from the api                 | X      |                   |                    |
-    | show up on the start dialog                             | X      |                   |                    |
+    First, TLPs may mark a language as "preferred".  If that's the case then the
+    other attributes of this model are irrelevant and can be ignored.
+    "Preferred" languages will have translation tasks automatically created for
+    them when subtitles are added.
 
-    Allow read = False and allow_writes = False essentially means that
-    language is block for that team, while allow_write=False and
-    allow_read=True means we can read subs but cannot write subs
-    Allow_read=true and allow_write=true is invalid, just remove the row
-    all together.
+    If preferred is False, the TLP describes a *restriction* on the language
+    instead.  Writing in that language may be prevented, or both reading and
+    writing may be prevented.
+
+    (Note: "writing" means not only writing new subtitles but also creating
+    tasks, etc)
+
+    This is how the restriction settings should interact.  TLP means that we
+    have created a TeamLanguagePreference for that team and language.
+
+    | Action                                 | NO  | allow_read=True,  | allow_read=False, |
+    |                                        | TLP | allow_write=False | allow_write=False |
+    ========================================================================================
+    | assignable as tasks                    | X   |                   |                   |
+    | assignable as narrowing                | X   |                   |                   |
+    | listed on the widget for viewing       | X   | X                 |                   |
+    | listed on the widget for improving     | X   |                   |                   |
+    | returned from the api read operations  | X   | X                 |                   |
+    | upload / write operations from the api | X   |                   |                   |
+    | show up on the start dialog            | X   |                   |                   |
+
+    Remember, this table only applies if preferred=False.  If the language is
+    preferred the "restriction" attributes are effectively garbage.  Maybe we
+    should make the column nullable to make this more clear?
+
+    allow_read=True, allow_write=True, preferred=False is invalid.  Just remove
+    the row all together.
+
     """
     team = models.ForeignKey(Team, related_name="lang_preferences")
     language_code = models.CharField(max_length=16)
+
     allow_reads = models.BooleanField()
     allow_writes = models.BooleanField()
+    preferred = models.BooleanField(default=False)
 
     objects = TeamLanguagePreferenceManager()
-    
+
+    class Meta:
+        unique_together = ('team', 'language_code')
+
+
     def clean(self, *args, **kwargs):
         if self.allow_reads and self.allow_writes:
-            raise ValidationError("No sense in having all allowed, just remove the preference for this language")
+            raise ValidationError("No sense in having all allowed, just remove the preference for this language.")
+
+        if self.preferred and (self.allow_reads or self.allow_writes):
+            raise ValidationError("Cannot restrict a preferred language.")
+
         super(TeamLanguagePreference, self).clean(*args, **kwargs)
 
     def __unicode__(self):
         return u"%s preference for team %s" % (self.language_code, self.team)
 
+
 post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePreference)
 
-    
+
+# TeamNotificationSettings
 class TeamNotificationSettingManager(models.Manager):
-    def notify_team(self, team_pk, video_id, event_name, language_pk=None):
+    def notify_team(self, team_pk, video_id, event_name,
+                    language_pk=None, version_pk=None):
         """
         Finds the matching notification settings for this team, instantiates
         the notifier class , and sends the appropriate notification.
@@ -1517,8 +1616,8 @@ class TeamNotificationSettingManager(models.Manager):
         except TeamNotificationSetting.DoesNotExist:
             return
         notification_settings.notify(Video.objects.get(video_id=video_id), event_name,
-                                                 language_pk)
-           
+                                                 language_pk, version_pk)
+
 class TeamNotificationSetting(models.Model):
     """
     Info on how a team should be notified of changes to it's videos.
@@ -1530,17 +1629,17 @@ class TeamNotificationSetting(models.Model):
     Some teams have strict requirements on mapping video ids to their
     internal values, and also their own language codes. Therefore we
     need to configure a class that can do the correct mapping.
-    
+
     TODO: allow email notifications
     """
-    EVENT_VIDEO_NEW = "event-video-new"
-    EVENT_VIDEO_EDITED = "event-video-edited"
-    EVENT_LANGUAGE_NEW = "event-language-new"
-    EVENT_LANGUAGE_EDITED = "event-language-edit"
-    EVENT_SUBTITLE_NEW = "event-subtitle-new"
-    EVENT_SUBTITLE_APPROVED = "event-subtitle-approved"
-    EVENT_SUBTITLE_REJECTED = "event-subtitle-rejected"
- 
+    EVENT_VIDEO_NEW = "video-new"
+    EVENT_VIDEO_EDITED = "video-edited"
+    EVENT_LANGUAGE_NEW = "language-new"
+    EVENT_LANGUAGE_EDITED = "language-edit"
+    EVENT_SUBTITLE_NEW = "subs-new"
+    EVENT_SUBTITLE_APPROVED = "subs-approved"
+    EVENT_SUBTITLE_REJECTED = "subs-rejected"
+
     team = models.OneToOneField(Team, related_name="notification_settings")
     # the url to post the callback notifing partners of new video activity
     request_url = models.URLField(blank=True, null=True)
@@ -1551,30 +1650,30 @@ class TeamNotificationSetting(models.Model):
 
     # integers mapping to classes, see unisubs-integration/notificationsclasses.py
     notification_class = models.IntegerField(default=1,)
-    
+
     objects = TeamNotificationSettingManager()
-    
+
     def get_notification_class(self):
         # move this import to the module level and test_settings break. Fun.
         import sentry_logger
         logger = sentry_logger.logging.getLogger("teams.models")
         try:
             from notificationclasses import NOTIFICATION_CLASS_MAP
-            
+
             return NOTIFICATION_CLASS_MAP[self.notification_class]
         except ImportError:
             logger.exception("Apparently unisubs-integration is not installed")
-            
-        
-    def notify(self, video, event_name, language_pk=None):
+
+
+    def notify(self, video, event_name, language_pk=None, version_pk=None):
         """
-        Resolves what the notifier class is for this settings and
+        Resolves what the notification class is for this settings and
         fires notfications it configures
         """
-        notifier = self.get_notification_class()(
-            self.team, video, event_name, language_pk)
+        notification = self.get_notification_class()(
+            self.team, video, event_name, language_pk, version_pk)
         if self.request_url:
-            success, content = notifier.send_http_request(
+            success, content = notification.send_http_request(
                 self.request_url,
                 self.basic_auth_username,
                 self.basic_auth_password
@@ -1583,7 +1682,7 @@ class TeamNotificationSetting(models.Model):
         # FIXME: spec and test this, for now just return
         return
         if self.email:
-            notifier.send_email(self.email, self.team, video, event_name, language_pk)
-        
+            notification.send_email(self.email, self.team, video, event_name, language_pk)
+
     def __unicode__(self):
         return u'NotificationSettings for team %s' % (self.team)

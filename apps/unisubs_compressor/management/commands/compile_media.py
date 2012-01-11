@@ -371,6 +371,11 @@ class Command(BaseCommand):
 
     def _copy_temp_dir_to_cache_dir(self):
         cache_dir = get_cache_dir()
+
+        assert not os.path.islink(cache_dir), (
+            "ERROR: %s is a symlink.  It must be a normal directory to compile static media." % cache_dir
+        )
+
         if os.path.exists(cache_dir):
             shutil.rmtree(cache_dir)
         for filename in os.listdir(self.temp_dir):

@@ -22,24 +22,31 @@
             {{ form.non_field_errors }}
             <div class="grid_4 alpha">
                 <fieldset>
-                    <legend>Invite Existing Users</legend>
-                    {{ form.errors.usernames }}
-                    <label for="id_usernames">Usernames</label>
-                    {{ form.usernames }}
+                    <legend>{% trans 'Recipient' %}</legend>
+                    {{ form.errors.user_id }}
+                    <label for="user_id">{% trans 'Username' %}</label>
+                    <div class="ajaxChosen">
+                        <select name="user_id">
+                            <option value="">-----</option>
+                            <option value="">{% trans 'Begin typing to search.' %}</option>
+                        </select>
+                    </div>
+                    <p class="notation">{% trans 'Universal Subtitles username of the user you want to invite.' %}</p>
                 </fieldset>
             </div>
 
             <div class="grid_4 omega">
                 <fieldset>
-                    <legend>Invite Details</legend>
+                    <legend>{% trans 'Invite Details' %}</legend>
 
                     {{ form.errors.message }}
-                    <label for="id_message">Message</label>
+                    <label for="id_message">{% trans 'Include a message' %}</label>
                     {{ form.message }}
 
                     {{ form.errors.role }}
-                    <label for="id_role">Role</label>
+                    <label for="id_role">{% trans 'Assign a role' %}</label>
                     {{ form.role }}
+                    <p class="notation">{% trans 'Role to be assigned to the user if they accept your invitation.' %}</p>
                 </fieldset>
             </div>
 
@@ -53,11 +60,31 @@
     <div class="controls grid_3 omega">
         <ul>
             <li class="current">
-                <a href="{% url teams:invite_members slug=team.slug %}">{% trans "Invite New Members" %}</a>
+                <a href="{% url teams:invite_members slug=team.slug %}">{% trans 'Invite New Members' %}</a>
             </li>
             <li>
-                <a href="{% url teams:detail_members team.slug %}">← {% trans "Back to Members" %}</a>
+                <a href="{% url teams:detail_members team.slug %}">← {% trans 'Back to Members' %}</a>
             </li>
         </ul>
     </div>
+
+    <script type="text/javascript">
+    
+        $(function() {
+            $(".ajaxChosen select").ajaxChosen({
+                method: 'GET',
+                url: '/en/messages/users/search/',
+                dataType: 'json'
+            }, function (data) {
+                var terms = {};
+
+                $.each(data.results, function (i, val) {
+                    terms[data.results[i][0]] = data.results[i][1] + ' (' + data.results[i][2] + ')';
+                });
+
+                return terms;
+            });
+        });
+
+    </script>
 {% endblock %}

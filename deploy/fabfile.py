@@ -143,7 +143,7 @@ def staging(username):
                 celeryd_host          = ADMIN_HOST,
                 celeryd_proj_root     = 'universalsubtitles.staging',
                 separate_uslogging_db = True,
-                celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart")
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
 
 def dev(username):
     _create_env(username              = username,
@@ -157,7 +157,7 @@ def dev(username):
                 celeryd_host          = DEV_HOST,
                 celeryd_proj_root     = 'universalsubtitles.dev',
                 separate_uslogging_db = False,
-                celeryd_bounce_cmd    = "/etc/init.d/celeryd.dev restart")
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd.dev restart &&  /etc/init.d/celeryevcam.dev start")
 
 def unisubs(username):
     _create_env(username              = username,
@@ -172,7 +172,24 @@ def unisubs(username):
                 celeryd_host          = ADMIN_HOST,
                 celeryd_proj_root     = 'universalsubtitles',
                 separate_uslogging_db = True,
-                celeryd_bounce_cmd    = "/etc/init.d/celeryd restart")
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd restart  && /etc/init.d/celeryevcam start ")
+
+def temp(username):
+    
+    global ADMIN_HOST
+    ADMIN_HOST = "pcf-us-admintmp.pculture.org:2191"
+    _create_env(username              = username,
+                hosts                 = ['pcf-us-tmp1.pculture.org:2191',],
+                s3_bucket             = 's3.temp.universalsubtitles.org',
+                installation_dir      = 'universalsubtitles.staging',
+                static_dir            = '/var/static/tmp',
+                name                  = 'staging',
+                memcached_bounce_cmd  = '/etc/init.d/memcached-staging restart',
+                admin_dir             = '/usr/local/universalsubtitles.staging',
+                celeryd_host          = ADMIN_HOST,
+                celeryd_proj_root     = 'universalsubtitles.staging',
+                separate_uslogging_db = True,
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
 
 
 def syncdb():
@@ -211,6 +228,22 @@ def run_command(command):
             _git_pull()
             run('{0}/env/bin/python manage.py {1} '
                 '--settings=unisubs_settings'.format(env.static_dir, command))
+
+def _run_shell(base_dir, command, is_sudo=False):
+    if is_sudo:
+        f = sudo
+    else:
+        f = run
+    with cd(os.path.join(base_dir, 'unisubs')):
+        f('sh ../env/bin/activate && %s' % command)
+
+def run_shell(command, is_sudo=False):
+    """
+    Runs the given command inside the virtual env for each
+    host / environment.
+    """
+    _execute_on_all_hosts(lambda dir: _run_shell(dir, command, bool(is_sudo)))
+
 
 def migrate_fake(app_name):
     '''Fake a migration to 0001 for the specified app
@@ -300,7 +333,7 @@ def clear_permissions():
 
 def _git_pull():
     run('git checkout --force')
-    run('git pull --rebase')
+    run('git pull --ff-only')
     run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
     run('chmod g+w -R .git 2> /dev/null; /bin/true')
     _clear_permissions('.')
@@ -313,9 +346,10 @@ def _git_checkout(commit):
     _clear_permissions('.')
 
 
-def _get_optional_repo_version(repo):
-    with open(os.path.join(os.path.split(__file__)[0],repo)) as f:
-        return f.read().strip()
+def _get_optional_repo_version(dir, repo):
+    '''Find the optional repo version by looking at its file in optional/.'''
+    with cd(os.path.join(dir, 'unisubs', 'optional')):
+        return run('cat {0}'.format(repo))
 
 
 def _reload_app_server(dir=None):
@@ -344,24 +378,25 @@ def remove_disabled():
         env.host_string = host
         run('rm {0}/unisubs/disabled'.format(env.web_dir))
         
-def _update_integration(dir, branch_name, commit):
+def _update_integration(dir):
+    '''Actually update the integration repo on a single host.'''
+
     with cd(os.path.join(dir, 'unisubs', 'unisubs-integration')):
         with settings(warn_only=True):
-            run('git branch --track {0} origin/{0}'.format(branch_name))
-            run('git checkout {0}'.format(branch_name))
-        _git_pull()
-        
+            _git_checkout(_get_optional_repo_version(dir, 'unisubs-integration'))
+
 def update_integration():
     '''Update the integration repo to the version recorded in the site repo.
 
     At the moment it is assumed that the optional/unisubs-integration file
     exists, and that the unisubs-integration repo has already been cloned down.
 
-    The file should be in the form:  branch-name/commit-hash
+    The file should contain the commit hash and nothing else.
+
     TODO: Run this from update_web automatically
+
     '''
-    branch_name, commit = _get_optional_repo_version('unisubs-integration').split("/")
-    _execute_on_all_hosts(lambda dir: _update_integration(dir, branch_name, commit))
+    _execute_on_all_hosts(_update_integration)
 
 def update_web():
     """
@@ -447,6 +482,9 @@ def _bounce_celeryd():
     if bool(env.celeryd_bounce_cmd):
         sudo(env.celeryd_bounce_cmd, pty=False)
 
+def bounce_celeryd():
+    _bounce_celeryd()
+    
 def _update_static(dir):
     with cd(os.path.join(dir, 'unisubs')):
         media_dir = '{0}/unisubs/media/'.format(dir)

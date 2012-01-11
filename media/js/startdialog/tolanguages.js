@@ -24,9 +24,10 @@ goog.provide('unisubs.startdialog.ToLanguages');
  * @param {unisubs.startdialog.VideoLanguages} videoLanguages
  * @param {int=} opt_initialLanguageState
  */
-unisubs.startdialog.ToLanguages = function(myLanguages, videoLanguages, opt_initialLanguageState) {
+unisubs.startdialog.ToLanguages = function(myLanguages, videoLanguages, limitLanguages, opt_initialLanguageState) {
     this.myLanguages_ = myLanguages;
     this.videoLanguages_ = videoLanguages;
+    this.limitLanguages_ = limitLanguages;
     this.initialLanguageState_ = opt_initialLanguageState || null;
     this.toLanguges_ = null;
     this.keyMap_ = null;
@@ -57,7 +58,7 @@ unisubs.startdialog.ToLanguages.prototype.makeToLanguages_ = function() {
     var userLangsCount = toLanguages.length;
     this.addMissingVideoLangs_(toLanguages);
     this.addMissingLangs_(toLanguages);
-    // we sort user langs differtly, so we split them
+    // we sort user langs differently, so we split them
     var userLangs = goog.array.splice(toLanguages, 0, userLangsCount);
     // sort others on ranking alone
     goog.array.sort(
@@ -91,6 +92,7 @@ unisubs.startdialog.ToLanguages.prototype.makeToLanguages_ = function() {
             return compare;
         });
     goog.array.insertArrayAt(toLanguages, userLangs, 0);
+    toLanguages = this.filterLangs_(toLanguages);
     return toLanguages;
 };
 
@@ -151,6 +153,23 @@ unisubs.startdialog.ToLanguages.prototype.addMissingLangs_ = function(toLanguage
             if (!langSet.contains(l[0]))
                 toLanguages.push(new unisubs.startdialog.ToLanguage(11, null, l[0]));
         });
+};
+
+unisubs.startdialog.ToLanguages.prototype.filterLangs_ = function(toLanguages) {
+    var validLangSet;
+    if (this.initialLanguageState_ && this.initialLanguageState_['FORCE']) {
+        validLangSet = new goog.structs.Set([this.initialLanguageState_['LANGUAGE']]);
+    } else {
+        validLangSet = new goog.structs.Set(this.limitLanguages_);
+    }
+
+    if (validLangSet.isEmpty()) {
+        return toLanguages;
+    } else {
+        return goog.array.filter(toLanguages, function(l) {
+            return validLangSet.contains(l.LANGUAGE);
+        });
+    }
 };
 
 unisubs.startdialog.ToLanguages.prototype.createMyLanguageToLangs_ = function(lang) {

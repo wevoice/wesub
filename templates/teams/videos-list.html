@@ -1,0 +1,137 @@
+{% extends "teams/base.html" %}
+
+{% load i18n utils_tags query_string teams_tags paginator profiles_tags widget markup media_compressor %}
+
+{% block title %}
+    {{ team }} | Universal Subtitles
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    {% include_bundle "widget-css"%}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+    {% include "utils/chosenify.html" %}
+
+    {% include_bundle "unisubs-onsite-compiled" %}
+
+    <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
+
+        $(function() {
+            $select = $("select#lang-filter", ".controls");
+            $select.change(function(e) {
+                window.location = $(this).children('option:selected').attr('value');
+            });
+
+            $('.remove-video').click(function(e) {
+                e.preventDefault();
+
+                resp = confirm('Are you sure you want to delete this team video?');
+                if (resp) {
+                    $(this).siblings('form').submit();
+                }
+                return false;
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block select_language_dialog %}
+    {% select_language_dialog %}
+{% endblock %}
+
+{% block view_content %}
+
+    {% with "videos" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        <div class="tools group">
+            {% if can_add_video %}
+                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
+            {% endif %}
+            <div class="sort_button">
+                <div class="arrow">
+                </div>
+                <span class="sort_label">{% trans 'Sort by' %} <strong>{{ order_name }}</strong></span>
+                <ul>
+                    <li>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=name">{% trans 'Name, A-Z' %}</a>
+                    </li>
+                    <li>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-name">{% trans 'Name, Z-A' %}</a>
+                    </li>
+                    <li>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-time">{% trans 'Time, Newest' %}</a>
+                    </li>
+                    <li>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=time">{% trans 'Time, Oldest' %}</a>
+                    </li>
+                    <li>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-subs">{% trans 'Subtitles, Most' %}</a>
+                    </li>
+                    <li>
+                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=subs">{% trans 'Subtitles, Least' %}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        {% if filtered %}
+            <p class="active-filters">
+                {% trans 'Showing videos' %}
+                    {% if request.GET.q %}
+                        {% trans 'matching' %} <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
+                    {% endif %}
+                    {% if request.GET.lang %}
+                        {% trans 'in' %} <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
+                    {% endif %}
+                    {% if project %}
+                        {% trans 'in project' %} <strong>{{ project }}</strong>
+                    {% endif %}
+                    ({{ current_videos_count }} {% trans 'result' %}{{ current_videos_count|pluralize }})
+                <a href="{{ team.get_absolute_url }}" class="clear-filters">{% trans 'Clear all filters' %}</a>
+            </p>
+        {% endif %}
+
+        {% if not team.page_content and team.video %}
+            {% widget widget_params %}
+        {% endif %}
+        
+        {% if team_video_md_list %}
+            <ul class="videos listing">
+                {% with team|is_team_member:request.user as user_is_team_member %}
+                    {% for md_obj in team_video_md_list %}
+                        {% team_video_detail md_obj %}
+                    {% endfor %}
+                {% endwith %}
+            </ul>
+            {% if is_paginated %}{% paginator %}{% endif %}
+        {% else %}
+            <p class="empty">{% trans "Sorry, no videos here" %}...</p>
+        {% endif %}
+    </div>
+
+    <div class="controls grid_3 omega">
+        {% include "teams/_filters_videos.html" %}
+        <div class="refine">
+            <h4>{% trans "Search and Filter" %}</h4>
+            {% include "teams/_search.html" %}
+            <select name="lang-filter" id="lang-filter">
+                <option value="{% query_string request.GET lang='' %}">All languages</option>
+                {% for code, name in language_choices %}
+                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% include "teams/_actions.html" %}
+    </div>
+
+{% endblock %}

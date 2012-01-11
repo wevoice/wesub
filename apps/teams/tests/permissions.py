@@ -18,6 +18,7 @@
 
 import datetime
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 from apps.teams.models import Team, TeamVideo, TeamMember, Workflow, Task
 from auth.models import CustomUser as User
 from contextlib import contextmanager
@@ -27,13 +28,14 @@ from utils.translation import SUPPORTED_LANGUAGES_DICT
 from apps.teams.permissions_const import *
 from apps.teams.permissions import (
     remove_role, add_role, can_message_all_members, can_add_video,
-    can_assign_tasks, can_assign_role, roles_user_can_assign,
-    add_narrowing_to_member, can_rename_team, can_view_settings_tab,
+    roles_user_can_assign, can_rename_team, can_view_settings_tab,
     can_change_team_settings, can_view_tasks_tab, can_invite,
-    can_change_video_settings, can_review, can_message_all_members,
-    can_edit_project, can_create_and_edit_subtitles, can_create_task_subtitle,
+    can_change_video_settings, can_review, can_edit_project,
+    can_create_and_edit_subtitles, can_create_task_subtitle,
     can_create_task_translate, can_join_team, can_edit_video, can_approve,
-    roles_user_can_invite
+    roles_user_can_invite, can_add_video_somewhere, can_assign_tasks,
+    can_create_and_edit_translations, save_role, can_remove_video,
+    can_delete_team
 )
 
 
@@ -54,7 +56,7 @@ class BaseTestPermission(TestCase):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
         self.team  = Team.objects.all()[0]
-        self.team.video_policy = Team.MANAGER_REMOVE
+        self.team.video_policy = Team.VP_MANAGER
         self.video = self.team.videos.all()[0]
 
         # TODO: Remove these magic queryset indexes
@@ -87,10 +89,18 @@ class BaseTestPermission(TestCase):
     def role(self, r, project=None):
         add_role(self.team, self.user, self.owner, r, project=project)
 
+        # Handle the caching in permissions.get_role_for_target().
+        if hasattr(self.user, '_cached_teammember'):
+            delattr(self.user, '_cached_teammember')
+
         try:
             yield
         finally:
             remove_role(self.team, self.user, r, project=project)
+
+        # Handle the caching in permissions.get_role_for_target().
+        if hasattr(self.user, '_cached_teammember'):
+            delattr(self.user, '_cached_teammember')
 
 
 class TestRules(BaseTestPermission):
@@ -102,13 +112,12 @@ class TestRules(BaseTestPermission):
 
     # Testing specific permissions
     def test_roles_assignable(self):
-        user = User.objects.filter(teams__isnull=True)[0]
-        team = self.team
+        user, team = self.user, self.team
 
-        # Owners can do anything.
+        # Owners can do anything except create other owners.
         with self.role(ROLE_OWNER):
             self.assertItemsEqual(roles_user_can_assign(team, user, None), [
-                ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+                ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
             ])
 
         # Admins can do anything except assign owners and changing owners' roles.
@@ -128,13 +137,12 @@ class TestRules(BaseTestPermission):
                 self.assertItemsEqual(roles_user_can_assign(team, user, None), [])
 
     def test_roles_inviteable(self):
-        user = User.objects.filter(teams__isnull=True)[0]
-        team = self.team
+        user, team = self.user, self.team
 
-        # Owners can do anything.
+        # Owners can do anything but owners.
         with self.role(ROLE_OWNER):
             self.assertItemsEqual(roles_user_can_invite(team, user), [
-                ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+                ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
             ])
 
         # Admins can do anything except invite owners.
@@ -165,6 +173,19 @@ class TestRules(BaseTestPermission):
             with self.role(r):
                 self.assertFalse(can_rename_team(team, user))
 
+    def test_can_delete_team(self):
+        user = self.user
+        team = self.team
+
+        # Owners can delete teams
+        with self.role(ROLE_OWNER):
+            self.assertTrue(can_delete_team(team, user))
+
+        # But no one else can delete a team
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN]:
+            with self.role(r):
+                self.assertFalse(can_delete_team(team, user))
+
     def test_can_join_team(self):
         user, team, outsider = self.user, self.team, self.outsider
 
@@ -188,19 +209,18 @@ class TestRules(BaseTestPermission):
         user = self.user
         team = self.team
 
-        # Ensure that the "members can add" policies work.
-        for policy in [Team.MEMBER_ADD, Team.MEMBER_REMOVE]:
-            team.video_policy = policy
-            team.save()
+        # Policy: members.
+        team.video_policy = Team.VP_MEMBER
+        team.save()
 
-            for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
-                with self.role(r):
-                    self.assertTrue(can_add_video(team, user))
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_add_video(team, user))
 
-            self.assertFalse(can_add_video(team, self.outsider))
+        self.assertFalse(can_add_video(team, self.outsider))
 
-        # Ensure the "managers can add" policy works.
-        team.video_policy = Team.MANAGER_REMOVE
+        # Policy: managers.
+        team.video_policy = Team.VP_MANAGER
         team.save()
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
@@ -217,22 +237,35 @@ class TestRules(BaseTestPermission):
             self.assertFalse(can_add_video(team, user))
             self.assertTrue(can_add_video(team, user, project=self.test_project))
 
+        # Policy: admins.
+        team.video_policy = Team.VP_ADMIN
+        team.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_add_video(team, user))
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                self.assertFalse(can_add_video(team, user))
+
+        self.assertFalse(can_add_video(team, self.outsider))
+
     def test_can_edit_video(self):
         user, team = self.user, self.team
 
-        # Ensure that the "members can add" policies work.
-        for policy in [Team.MEMBER_ADD, Team.MEMBER_REMOVE]:
-            team.video_policy = policy
-            team.save()
+        # Policy: members.
+        team.video_policy = Team.VP_MEMBER
+        team.save()
 
-            for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
-                with self.role(r):
-                    self.assertTrue(can_edit_video(self.nonproject_video, user))
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_edit_video(self.nonproject_video, user))
 
-            self.assertFalse(can_edit_video(self.nonproject_video, self.outsider))
+        self.assertFalse(can_edit_video(self.nonproject_video, self.outsider))
 
-        # Ensure the "managers can add" policy works.
-        team.video_policy = Team.MANAGER_REMOVE
+        # Policy: managers.
+        team.video_policy = Team.VP_MANAGER
         team.save()
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
@@ -248,6 +281,66 @@ class TestRules(BaseTestPermission):
         with self.role(ROLE_MANAGER, self.test_project):
             self.assertFalse(can_edit_video(self.nonproject_video, user))
             self.assertTrue(can_edit_video(self.project_video, user))
+
+        # Policy: admins.
+        team.video_policy = Team.VP_ADMIN
+        team.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_edit_video(self.nonproject_video, user))
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                self.assertFalse(can_edit_video(self.nonproject_video, user))
+
+        self.assertFalse(can_edit_video(self.nonproject_video, self.outsider))
+
+    def test_can_remove_video(self):
+        user, team = self.user, self.team
+
+        # Policy: members.
+        team.video_policy = Team.VP_MEMBER
+        team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_remove_video(self.nonproject_video, user))
+
+        self.assertFalse(can_remove_video(self.nonproject_video, self.outsider))
+
+        # Policy: managers.
+        team.video_policy = Team.VP_MANAGER
+        team.save()
+
+        for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_remove_video(self.nonproject_video, user))
+
+        with self.role(ROLE_CONTRIBUTOR):
+            self.assertFalse(can_remove_video(self.nonproject_video, user))
+
+        self.assertFalse(can_remove_video(self.nonproject_video, self.outsider))
+
+        # Make sure narrowings are taken into account.
+        with self.role(ROLE_MANAGER, self.test_project):
+            self.assertFalse(can_remove_video(self.nonproject_video, user))
+            self.assertTrue(can_remove_video(self.project_video, user))
+
+        # Policy: admins.
+        team.video_policy = Team.VP_ADMIN
+        team.save()
+
+        for r in [ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_remove_video(self.nonproject_video, user))
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
+            with self.role(r):
+                self.assertFalse(can_remove_video(self.nonproject_video, user))
+
+        self.assertFalse(can_remove_video(self.nonproject_video, self.outsider))
+
 
     def test_can_view_settings_tab(self):
         # Only admins and owners can view/change the settings tab, so this one
@@ -289,7 +382,7 @@ class TestRules(BaseTestPermission):
             with self.role(r):
                 self.assertTrue(can_view_tasks_tab(self.team, self.user))
 
-        # But outsiders can't (for now).
+        # Outsiders can't.
         self.assertFalse(can_view_tasks_tab(self.team, self.outsider))
 
     def test_can_invite(self):
@@ -389,6 +482,9 @@ class TestRules(BaseTestPermission):
         user, outsider = self.user, self.outsider
         workflow = Workflow.get_for_team_video(self.nonproject_video)
 
+        self.team.workflow_enabled = True
+        self.team.save()
+
         # TODO: Test with Project/video-specific workflows.
 
         # Review disabled.
@@ -449,8 +545,22 @@ class TestRules(BaseTestPermission):
 
         self.assertFalse(can_review(self.nonproject_video, outsider))
 
+        # Workflows disabled entirely.
+        self.team.workflow_enabled = False
+        self.team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertFalse(can_review(self.nonproject_video, user))
+
+        self.assertFalse(can_review(self.nonproject_video, outsider))
+
     def test_can_approve(self):
         user, outsider = self.user, self.outsider
+
+        self.team.workflow_enabled = True
+        self.team.save()
+
         workflow = Workflow.get_for_team_video(self.nonproject_video)
 
         # TODO: Test with Project/video-specific workflows.
@@ -502,6 +612,17 @@ class TestRules(BaseTestPermission):
                 self.assertTrue(can_approve(self.project_video, user))
 
         self.assertFalse(can_approve(self.nonproject_video, outsider))
+
+        # Workflows disabled entirely.
+        self.team.workflow_enabled = False
+        self.team.save()
+
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertFalse(can_approve(self.nonproject_video, user))
+
+        self.assertFalse(can_approve(self.nonproject_video, outsider))
+
 
     def test_can_message_all_members(self):
         team, user, outsider = self.team, self.user, self.outsider
@@ -795,3 +916,62 @@ class TestRules(BaseTestPermission):
         self.assertEqual(langs, [])
 
     # TODO: Review/approve task tests.
+
+class TestViews(BaseTestPermission):
+    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
+
+    def test_save_role(self):
+
+        from apps.icanhaz.models import VideoVisibilityPolicy
+        owner = self.team.members.filter(role=ROLE_OWNER)[0]
+        member  = self.team.members.filter(role=ROLE_CONTRIBUTOR)[0]
+        member.user.set_password("hey")
+        member.user.save()
+
+        tv = self.team.teamvideo_set.all()[0]
+        video_url = reverse("videos:video", args=(tv.video.video_id,))
+        owner.user.set_password("hey")
+        owner.user.save()
+        policy = VideoVisibilityPolicy.objects.create_for_video(
+                tv.video,
+                VideoVisibilityPolicy.SITE_VISIBILITY_PRIVATE_OWNER,
+                self.team,
+            )
+
+        resp = self.client.get(video_url, follow=True)
+        self.assertNotEqual(resp.status_code, 200)
+
+        self.team.video_policy = Team.VP_MEMBER
+        self.task_assign_policy = 10
+        self.team.save()
+        self.assertTrue(can_add_video(self.team, member.user))
+
+        self.assertTrue(can_add_video_somewhere(self.team, member.user))
+        self.assertTrue(can_view_tasks_tab(self.team, member.user))
+        self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
+        self.assertTrue(can_create_and_edit_translations(member.user, tv))
+        self.assertFalse(can_view_settings_tab(self.team, member.user))
+        save_role(self.team, member, ROLE_ADMIN, [], [], owner.user)
+        member = TeamMember.objects.get(pk=member.pk)
+        self.assertEqual(member.role, ROLE_ADMIN)
+
+        self.assertTrue(can_add_video_somewhere(self.team, member.user))
+        self.assertTrue(can_view_tasks_tab(self.team, member.user))
+        self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
+        self.assertTrue(can_create_and_edit_translations(member.user, tv))
+        self.assertTrue(can_view_settings_tab(self.team, member.user))
+
+        save_role(self.team, member, ROLE_CONTRIBUTOR, [], [], owner.user)
+        member = TeamMember.objects.get(pk=member.pk)
+
+        self.assertEqual(member.role, ROLE_CONTRIBUTOR)
+        self.assertFalse(can_view_settings_tab(self.team, member.user))
+        self.assertTrue(can_add_video_somewhere(self.team, member.user))
+        self.assertTrue(can_view_tasks_tab(self.team, member.user))
+        self.assertTrue(can_create_and_edit_subtitles(member.user, tv))
+        self.assertTrue(can_create_and_edit_translations(member.user, tv))
+
+        self.client.login(username=member.user.username, password="hey")
+        resp = self.client.get(video_url, follow=True)
+        self.assertEqual(resp.status_code, 200)
+

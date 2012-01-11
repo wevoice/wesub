@@ -28,15 +28,6 @@ gettext_noop = lambda s: s
 
 from django.conf import global_settings
 #: see doc/i18n
-lang_dict = dict(global_settings.LANGUAGES)
-lang_dict['es-ar'] = gettext_noop(u'Spanish, Argentinian')
-lang_dict['en-gb'] = gettext_noop(u'English, British')
-lang_dict['pt-br'] = gettext_noop(u'Portuguese, Brazilian')
-lang_dict['sr-latn'] = gettext_noop(u'Serbian, Latin')
-lang_dict['zh-cn'] = gettext_noop(u'Chinese, Simplified')
-lang_dict['zh-tw'] = gettext_noop(u'Chinese, Traditional')
-lang_dict['eo'] = gettext_noop(u'Esperanto')
-global_settings.LANGUAGES = tuple(i for i in lang_dict.items())
 
 METADATA_LANGUAGES = (
     ('meta-tw', 'Metadata: Twitter'),
@@ -47,90 +38,109 @@ METADATA_LANGUAGES = (
 ALL_LANGUAGES = list(global_settings.LANGUAGES)
 ALL_LANGUAGES.extend(METADATA_LANGUAGES)
 ALL_LANGUAGES = dict(ALL_LANGUAGES)
-ALL_LANGUAGES['iu'] = gettext_noop(u'Inuktitut')
-ALL_LANGUAGES['moh'] = gettext_noop(u'Mohawk')
-ALL_LANGUAGES['oji'] = gettext_noop(u'Anishinaabe')
-ALL_LANGUAGES['cr'] = gettext_noop(u'Cree')
-ALL_LANGUAGES['hai'] = gettext_noop(u'Haida')
-ALL_LANGUAGES['ase'] = gettext_noop(u'American Sign Language')
-ALL_LANGUAGES['wol'] = gettext_noop(u'Wolof')
-ALL_LANGUAGES['que'] = gettext_noop(u'Quechua')
-ALL_LANGUAGES['swa'] = gettext_noop(u'Swahili')
-ALL_LANGUAGES['br'] = gettext_noop(u'Breton')
-ALL_LANGUAGES['be'] = gettext_noop(u'Belarusian')
-ALL_LANGUAGES['ber'] = gettext_noop(u'Berber')
-ALL_LANGUAGES['hau'] = gettext_noop(u'Hausa')
-ALL_LANGUAGES['orm'] = gettext_noop(u'Oromo')
-ALL_LANGUAGES['zul'] = gettext_noop(u'Zulu')
-ALL_LANGUAGES['som'] = gettext_noop(u'Somali')
-ALL_LANGUAGES['yor'] = gettext_noop(u'Yoruba')
-ALL_LANGUAGES['ibo'] = gettext_noop(u'Igbo')
+
+
+
 ALL_LANGUAGES['af'] = gettext_noop(u'Afrikaans')
-ALL_LANGUAGES['kin'] = gettext_noop(u'Kinyarwanda')
-ALL_LANGUAGES['amh'] = gettext_noop(u'Amharic')
-ALL_LANGUAGES['sna'] = gettext_noop(u'Shona')
-ALL_LANGUAGES['bam'] = gettext_noop(u'Bambara')
 ALL_LANGUAGES['aka'] = gettext_noop(u'Akan')
-ALL_LANGUAGES['bnt'] = gettext_noop(u'Ibibio')
-ALL_LANGUAGES['ful'] = gettext_noop(u'Fula')
-ALL_LANGUAGES['mlg'] = gettext_noop(u'Malagasy')
-ALL_LANGUAGES['lin'] = gettext_noop(u'Lingala')
-ALL_LANGUAGES['nya'] = gettext_noop(u'Chewa')
-ALL_LANGUAGES['xho'] = gettext_noop(u'Xhosa')
-ALL_LANGUAGES['kon'] = gettext_noop(u'Kongo')
-ALL_LANGUAGES['tir'] = gettext_noop(u'Tigrinya')
-ALL_LANGUAGES['luo'] = gettext_noop(u'Luo')
-ALL_LANGUAGES['lua'] = gettext_noop(u'Luba-Kasai')
-ALL_LANGUAGES['kik'] = gettext_noop(u'Gikuyu')
-ALL_LANGUAGES['mos'] = gettext_noop(u'Mossi')
-ALL_LANGUAGES['sot'] = gettext_noop(u'Sotho')
-ALL_LANGUAGES['luy'] = gettext_noop(u'Luhya')
-ALL_LANGUAGES['tsn'] = gettext_noop(u'Tswana')
-ALL_LANGUAGES['kau'] = gettext_noop(u'Kanuri')
-ALL_LANGUAGES['umb'] = gettext_noop(u'Umbundu')
-ALL_LANGUAGES['nso'] = gettext_noop(u'Northern Sotho')
-ALL_LANGUAGES['mnk'] = gettext_noop(u'Mandinka')
-ALL_LANGUAGES['ky'] = gettext_noop(u'Kyrgyz')
-ALL_LANGUAGES['mr'] = gettext_noop(u'Marathi')
-ALL_LANGUAGES['ml'] = gettext_noop(u'Malayalam')
-ALL_LANGUAGES['or'] = gettext_noop(u'Oriya')
-ALL_LANGUAGES['gu'] = gettext_noop(u'Gujarati')
+ALL_LANGUAGES['amh'] = gettext_noop(u'Amharic')
 ALL_LANGUAGES['as'] = gettext_noop(u'Assamese')
-ALL_LANGUAGES['fil'] = gettext_noop(u'Filipino')
-ALL_LANGUAGES['si'] = gettext_noop(u'Sinhala')
-ALL_LANGUAGES['zh'] = gettext_noop(u'Chinese, Yue')
-ALL_LANGUAGES['oc'] = gettext_noop(u'Occitan')
-ALL_LANGUAGES['ht'] = gettext_noop(u'Creole, Haitian')
-ALL_LANGUAGES['ne'] = gettext_noop(u'Nepali')
-ALL_LANGUAGES['ee'] = gettext_noop(u'Ewe')
-ALL_LANGUAGES['ms'] = gettext_noop(u'Malay')
-ALL_LANGUAGES['yi'] = gettext_noop(u'Yiddish')
-ALL_LANGUAGES['my'] = gettext_noop(u'Burmese')
-ALL_LANGUAGES['bo'] = gettext_noop(u'Tibetan')
+ALL_LANGUAGES['ase'] = gettext_noop(u'American Sign Language')
 ALL_LANGUAGES['ast'] = gettext_noop(u'Asturian')
 ALL_LANGUAGES['ay'] = gettext_noop(u'Aymara')
-ALL_LANGUAGES['ps'] = gettext_noop(u'Pashto')
-ALL_LANGUAGES['lkt'] = gettext_noop(u'Lakota')
-ALL_LANGUAGES['kw'] = gettext_noop(u'Cornish')
-ALL_LANGUAGES['tlh'] = gettext_noop(u'Klingon')
-ALL_LANGUAGES['mt'] = gettext_noop(u'Maltese')
-ALL_LANGUAGES['hy'] = gettext_noop(u'Armenian')
+ALL_LANGUAGES['bam'] = gettext_noop(u'Bambara')
+ALL_LANGUAGES['be'] = gettext_noop(u'Belarusian')
+ALL_LANGUAGES['ber'] = gettext_noop(u'Berber')
 ALL_LANGUAGES['bi'] = gettext_noop(u'Bislama')
-ALL_LANGUAGES['fr-ca'] = gettext_noop(u'French, Canadian')
-ALL_LANGUAGES['sh'] = gettext_noop(u'Serbo-Croatian')
-ALL_LANGUAGES['lo'] = gettext_noop(u'Lao')
-ALL_LANGUAGES['rup'] = gettext_noop(u'Macedo (Aromanian) Romanian')
-ALL_LANGUAGES['tl'] = gettext_noop(u'Tagalog')
-ALL_LANGUAGES['uz'] = gettext_noop(u'Uzbek')
-ALL_LANGUAGES['kk'] = gettext_noop(u'Kazakh')
-ALL_LANGUAGES['ka'] = gettext_noop(u'Georgian')
-
-ALL_LANGUAGES['ilo'] = gettext_noop(u'Ilocano')
+ALL_LANGUAGES['bnt'] = gettext_noop(u'Ibibio')
+ALL_LANGUAGES['bo'] = gettext_noop(u'Tibetan')
+ALL_LANGUAGES['br'] = gettext_noop(u'Breton')
 ALL_LANGUAGES['ceb'] = gettext_noop(u'Cebuan')
+ALL_LANGUAGES['cr'] = gettext_noop(u'Cree')
+ALL_LANGUAGES['ee'] = gettext_noop(u'Ewe')
+ALL_LANGUAGES['en-gb'] = gettext_noop(u'English, British')
+ALL_LANGUAGES['eo'] = gettext_noop(u'Esperanto')
+ALL_LANGUAGES['eo'] = gettext_noop(u'Esperanto')
+ALL_LANGUAGES['es-ar'] = gettext_noop(u'Spanish, Argentinian')
+ALL_LANGUAGES['es-mx'] = gettext_noop(u'Spanish, Mexican')
+ALL_LANGUAGES['es-ni'] = gettext_noop(u'Spanish, Nicaraguan')
+ALL_LANGUAGES['fil'] = gettext_noop(u'Filipino')
+ALL_LANGUAGES['fr-ca'] = gettext_noop(u'French, Canadian')
+ALL_LANGUAGES['ful'] = gettext_noop(u'Fula')
+ALL_LANGUAGES['gu'] = gettext_noop(u'Gujarati')
+ALL_LANGUAGES['hai'] = gettext_noop(u'Haida')
+ALL_LANGUAGES['hau'] = gettext_noop(u'Hausa')
+ALL_LANGUAGES['ht'] = gettext_noop(u'Creole, Haitian')
+ALL_LANGUAGES['hy'] = gettext_noop(u'Armenian')
+ALL_LANGUAGES['ibo'] = gettext_noop(u'Igbo')
+ALL_LANGUAGES['ilo'] = gettext_noop(u'Ilocano')
+ALL_LANGUAGES['iro'] = gettext_noop(u'Iroquoian languages')
+ALL_LANGUAGES['iu'] = gettext_noop(u'Inuktitut')
+ALL_LANGUAGES['ka'] = gettext_noop(u'Georgian')
+ALL_LANGUAGES['kau'] = gettext_noop(u'Kanuri')
+ALL_LANGUAGES['kik'] = gettext_noop(u'Gikuyu')
+ALL_LANGUAGES['kin'] = gettext_noop(u'Kinyarwanda')
+ALL_LANGUAGES['kk'] = gettext_noop(u'Kazakh')
+ALL_LANGUAGES['kon'] = gettext_noop(u'Kongo')
+ALL_LANGUAGES['kw'] = gettext_noop(u'Cornish')
+ALL_LANGUAGES['ky'] = gettext_noop(u'Kyrgyz')
+ALL_LANGUAGES['lin'] = gettext_noop(u'Lingala')
+ALL_LANGUAGES['lkt'] = gettext_noop(u'Lakota')
+ALL_LANGUAGES['lo'] = gettext_noop(u'Lao')
+ALL_LANGUAGES['lua'] = gettext_noop(u'Luba-Kasai')
+ALL_LANGUAGES['luo'] = gettext_noop(u'Luo')
+ALL_LANGUAGES['luy'] = gettext_noop(u'Luhya')
+ALL_LANGUAGES['ml'] = gettext_noop(u'Malayalam')
+ALL_LANGUAGES['mlg'] = gettext_noop(u'Malagasy')
+ALL_LANGUAGES['mnk'] = gettext_noop(u'Mandinka')
+ALL_LANGUAGES['moh'] = gettext_noop(u'Mohawk')
+ALL_LANGUAGES['mos'] = gettext_noop(u'Mossi')
+ALL_LANGUAGES['mr'] = gettext_noop(u'Marathi')
+ALL_LANGUAGES['ms'] = gettext_noop(u'Malay')
+ALL_LANGUAGES['mt'] = gettext_noop(u'Maltese')
+ALL_LANGUAGES['my'] = gettext_noop(u'Burmese')
+ALL_LANGUAGES['nb'] = gettext_noop(u'Norwegian, Bokmal')
+ALL_LANGUAGES['ne'] = gettext_noop(u'Nepali')
+ALL_LANGUAGES['nn'] = gettext_noop(u'Norwegian, Nynorsk')
+ALL_LANGUAGES['nso'] = gettext_noop(u'Northern Sotho')
+ALL_LANGUAGES['nya'] = gettext_noop(u'Chewa')
+ALL_LANGUAGES['oc'] = gettext_noop(u'Occitan')
+ALL_LANGUAGES['oji'] = gettext_noop(u'Anishinaabe')
+ALL_LANGUAGES['or'] = gettext_noop(u'Oriya')
+ALL_LANGUAGES['orm'] = gettext_noop(u'Oromo')
+ALL_LANGUAGES['ps'] = gettext_noop(u'Pashto')
+ALL_LANGUAGES['pt-br'] = gettext_noop(u'Portuguese, Brazilian')
+ALL_LANGUAGES['que'] = gettext_noop(u'Quechua')
+ALL_LANGUAGES['rup'] = gettext_noop(u'Macedo (Aromanian) Romanian')
+ALL_LANGUAGES['sh'] = gettext_noop(u'Serbo-Croatian')
+ALL_LANGUAGES['si'] = gettext_noop(u'Sinhala')
+ALL_LANGUAGES['sna'] = gettext_noop(u'Shona')
+ALL_LANGUAGES['som'] = gettext_noop(u'Somali')
+ALL_LANGUAGES['sot'] = gettext_noop(u'Sotho')
+ALL_LANGUAGES['sr-latn'] = gettext_noop(u'Serbian, Latin')
+ALL_LANGUAGES['swa'] = gettext_noop(u'Swahili')
+ALL_LANGUAGES['tir'] = gettext_noop(u'Tigrinya')
+ALL_LANGUAGES['tl'] = gettext_noop(u'Tagalog')
+ALL_LANGUAGES['tlh'] = gettext_noop(u'Klingon')
+ALL_LANGUAGES['tsn'] = gettext_noop(u'Tswana')
+ALL_LANGUAGES['umb'] = gettext_noop(u'Umbundu')
+ALL_LANGUAGES['uz'] = gettext_noop(u'Uzbek')
+ALL_LANGUAGES['wol'] = gettext_noop(u'Wolof')
+ALL_LANGUAGES['xho'] = gettext_noop(u'Xhosa')
+ALL_LANGUAGES['yi'] = gettext_noop(u'Yiddish')
+ALL_LANGUAGES['yor'] = gettext_noop(u'Yoruba')
+ALL_LANGUAGES['zh'] = gettext_noop(u'Chinese, Yue')
+ALL_LANGUAGES['zh-cn'] = gettext_noop(u'Chinese, Simplified')
+ALL_LANGUAGES['zh-tw'] = gettext_noop(u'Chinese, Traditional')
+ALL_LANGUAGES['zul'] = gettext_noop(u'Zulu')
 
-del ALL_LANGUAGES['no']
+if ALL_LANGUAGES.get('no', None):
+    del ALL_LANGUAGES['no']
+    
+full_langs = dict(ALL_LANGUAGES.items())
 ALL_LANGUAGES = tuple(i for i in ALL_LANGUAGES.items())
-
+# this has to be set after all languages have been appended
+global_settings.LANGUAGES = tuple(i for i in full_langs.items())
 # languages that more people speak, and therefore
 # are it's translators are not as rare
 LINGUA_FRANCAS = ["en", "en-gb"]
@@ -492,7 +502,7 @@ INSTALLED_APPS = (
     'doorman',
     'icanhaz',
     'tastypie',
-    'unisubs' #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
+    'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
 )
 
 # Celery settings
@@ -641,7 +651,6 @@ MEDIA_BUNDLES = {
             "css/buttons.css",
             "css/chosen.css",
             "css/classes.css", 
-            "css/comments.css", 
             "css/forms.css",
             "css/index.css",
             "css/layout.css",
@@ -785,6 +794,7 @@ MEDIA_BUNDLES = {
               "js/jquery.input_replacement.min.js",
               "js/messages.js",
               "js/libs/chosen.jquery.min.js",
+              "js/libs/chosen.ajax.jquery.js",
             ],
         "closure_deps": "",
         "include_flash_deps": False,
@@ -821,7 +831,7 @@ MEDIA_BUNDLES = {
             "css/unisubs-widget.css",
          ),
     },
-    "js-teams-settings-panel":{
+    "js-teams":{
         "type":"js",
         "optimizations": "WHITESPACE_ONLY",
         "closure_deps": "",
@@ -830,20 +840,12 @@ MEDIA_BUNDLES = {
             "js/libs/classy.js",
             "js/libs/underscore.js",
             "js/libs/chosen.jquery.min.js",
+            "js/libs/chosen.ajax.jquery.js",
             "js/jquery.mod.js",
-         )
-    },
-    "js-teams-tasks-panel":{
-        "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
-        "closure_deps": "",
-        "files": (
-            "js/libs/ICanHaz.js",
-            "js/libs/classy.js",
-            "js/libs/underscore.js",
-            "js/libs/chosen.jquery.min.js",
-            "js/jquery.mod.js",
-         )
+            "js/teams/create-task.js",
+         ),
+        "include_js_base_dependencies": False,
+        "include_flash_deps": False,
     },
     "debug-embed-js": {
         "type": "js",
@@ -876,3 +878,37 @@ EMAIL_NOTIFICATION_RECEIVERS = ("arthur@stimuli.com.br", "steve@stevelosh.com", 
 # If you're developing and have no net access, enable this setting on your
 # settings_local.py
 RUN_LOCALLY = False
+
+try:
+    import debug_toolbar
+
+    INSTALLED_APPS += ('debug_toolbar',)
+    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+
+    DEBUG_TOOLBAR_PANELS = (
+        'debug_toolbar.panels.timer.TimerDebugPanel',
+        # 'apps.testhelpers.debug_toolbar_extra.ProfilingPanel',
+        # 'apps.testhelpers.debug_toolbar_extra.HaystackDebugPanel',
+        'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+        'debug_toolbar.panels.template.TemplateDebugPanel',
+        'debug_toolbar.panels.sql.SQLDebugPanel',
+    )
+
+    def custom_show_toolbar(request):
+        if request.user.is_staff and '__debug__/m/' in request.path:
+            return True
+
+        if request.user.is_staff and 'debug_toolbar' in request.GET:
+            return True
+
+        return False
+
+    DEBUG_TOOLBAR_CONFIG = {
+        'INTERCEPT_REDIRECTS': False,
+        'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+        'EXTRA_SIGNALS': [],
+        'HIDE_DJANGO_SQL': False,
+        'TAG': 'div',
+    }
+except ImportError:
+    pass

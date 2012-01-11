@@ -9,6 +9,7 @@ deploy/src/*
 *calcdeps.js
 *compiled.js
 .DS_Store
+.venv
 closure-library
 jsunit
 media/profile_images

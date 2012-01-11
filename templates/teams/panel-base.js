@@ -59,3 +59,20 @@ var BaseModel = Class.$extend({
         return data;
     }
 });
+
+// Feedback -------------------------------------------------------------------
+function clearFeedbackMessage(){
+    $("#messages").remove();
+}
+function displayFeedbackMessage(msg, type){
+    clearFeedbackMessage();
+    var el = ich.feedbackMessage({msg:msg, type:type});
+    $(".content.wrapper").prepend(el);
+    $(el).hide().fadeIn("slow");
+    $('html, body').animate({ scrollTop: 0 }, 'fast');
+    $('a#closeBut', el).click(function() {
+        $(el).remove();
+        return false;
+    });
+}
+window.displayFeedbackMessage = displayFeedbackMessage;

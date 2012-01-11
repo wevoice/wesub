@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block body_attrs %}id="video_profile" class="v1 video_view"{% endblock %}
+
+{% load escapejs widget comments recent_activity paginator i18n subtitles_tags teams_tags videos_tags media_compressor moderation doorman %}
+
+{% block css %}
+
+    {{ block.super }}
+    {% include_bundle "video_history" %}
+    {% include_bundle "widget-css"%}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    {% include_bundle "unisubs-onsite-compiled" %}
+    <script src="{{ STATIC_URL }}js/jquery.tabs.js" type="text/javascript"></script>
+    <script src="{{ STATIC_URL }}js/unisubs.modal.js" type="text/javascript"></script>
+    <script src="{{ STATIC_URL }}js/unisubs.abbr.js" type="text/javascript"></script>
+    <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
+    {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
+
+    <script type="text/javascript">
+        jQuery(document).ready( function($) {
+            $('.tabs').tabs();
+
+            $('.add_subtitles').click( function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
+                return false;
+            });
+            $('.add-translation-behavior').click( function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
+                return false;
+            });
+            var VIDEO_ID = '{{ video.pk }}';
+
+            $('.edit-title').click( function() {
+                $('#edit-title-dialog .title-input').val($('.title-container').html());
+            });
+
+            $('#edit-title-dialog .save-title').click(function(){
+                var title = $('#edit-title-dialog .title-input').val();
+                if (title) {
+                    $('.title-container').html(title).hide().fadeIn();
+                    VideosApi.change_title_video(VIDEO_ID, title, function(response){
+                        if (response.error) {
+                            $.jGrowl.error(response.error);
+                        } else {
+                            $('.title-container').html(title);
+                            document.title = title + " | Universal Subtitles";
+                        }
+                    });
+                    $('#edit-title-dialog').modClose();
+                }else{
+                    $.jGrowl.error('{% trans "Enter non-empty title" %}');
+                }
+            });
+
+        });
+    </script>
+{% endblock %}
+
+{% block title %}
+    "{{ video.title_display }}" | Universal Subtitles
+{% endblock %}
+
+{% block opengraph-head %}
+    {{block.super}}
+    <meta property="og:title" content="{% title_for_video video  %}"/>
+    <meta property="og:type" content="video"/>
+    <meta property="og:url" content="http://{{ current_site.domain }}{{ video.get_absolute_url }}"/>
+    {% if video.thumbnail %}
+    <meta property="og:image" content="{{ video.get_thumbnail }}" />
+    {% else %}
+    <meta property="og:image" content="{{ STATIC_URL }}images/small_logo.png" />
+    {% endif %}
+
+    <meta property="og:site_name" content="Universal Subtitles"/>
+    <meta property="og:description"
+          content="{% title_for_video video %}"/>
+{% endblock  %}
+
+{% comment %}
+    TODO:
+        - title/description editing?
+{% endcomment %}
+
+{% block main_content %}
+    {% if saved %}
+        <div id="messages">
+            <p>{% blocktrans %}Subtitles saved! You can share the video with friends, or get an embed code for your site. To add atranslation, click the button below.{% endblocktrans %}</p>
+            <a href="#" id="closeBut">{% trans "Close" %}</a>
+        </div>
+    {% endif %}
+
+    <div class="grid_4 context alpha">
+        <h2 class="main-title">
+            <a href="{{share_panel_permalink}}" title="Video permalink">{{ video }}</a>
+        </h2>
+        <div id="description" class="abbr">
+            <div class="abbr-content">
+                {{ video.description|urlize|linebreaks }}
+            </div>
+        </div>
+        <ul class="metrics">
+            <li>
+                <p>{{ video.view_count|simplify_number }}</p>
+                <h4>{% trans "View" %}{{ video.view_count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{{ video.widget_views_count|simplify_number }}</p>
+                <h4>{% trans "Play" %}{{ video.widget_views_count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{{ video.followers.count }}</p>
+                <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{{ video.languages_count }}</p>
+                <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
+            </li>
+        </ul>
+        <div class="sharing-tools">
+            {% if shows_widget_sharing %}
+                {% include '_sharing_widget.html' %}
+            {% endif %}
+        </div>
+        <h3>
+            {% trans "View Subtitles" %}
+            {% if video.languages_count > 0 %}
+                ({{ video.languages_count }})
+            {% endif %}
+        </h3>
+        {% if video.subtitle_language or translations %}
+        <div class="abbr">
+            <div class="abbr-content">
+                <ul id="subtitles-menu">
+                    {% include 'videos/_left_navigation.html' %}
+                </ul>
+            </div>
+        </div>
+        {% else %}
+            <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+        {% endif %}
+    </div>
+    <div class="grid_8 view omega">
+        {% if user.is_authenticated %}
+            {% include 'videos/_follow_video_button.html' %}
+        {% endif %}
+        <ul class="tabs">
+            <li class="current"><a href="#video-tab">{% trans "Video" %}</a></li>
+            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{% get_comment_count video %}</span></a></li>
+            <li><a href="#activity-tab">{% trans "Activity" %}</a></li>
+            <li class="hascount"><a href="#urls-tab">{% trans "URLs" %}<span>{% video_url_count video %}</span></a></li>
+        </ul>
+        <div class="tab" id="video-tab">
+            {% widget widget_params %}
+            <div class="clearboth">
+                <div class="video-tools grid_4 alpha">
+                    <h3>{% trans "Contribute" %}</h3>
+                    <p>
+                        {% if not video.subtitle_language %}
+                            {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!</li>
+                        {% else %}
+                            {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!</li>
+                        {% endif %}
+                        {% upload_subtitles video %}
+                    </p>
+                </div>
+                {% if video.get_team_video or user.managed_teams %}
+                <div class="video-tools grid_4 omega">
+                    <h3>{% trans "Collaborate" %}</h3>
+                    {% if video.get_team_video %}
+                        <p>
+                            {% trans "This video belongs to the following teams" %}:
+                        </p>
+                        {% render_belongs_to_team_list video %}
+                    {% endif %}
+                    {% team_add_video_select %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="tab" id="comments-tab" style="display:none;">
+            <h3>{% trans "Leave a comment" %}</h3>
+            {% render_comment_form video %}
+            <h3>{% get_comment_count video %} {% trans "Comments" %}</h3>
+            {% render_comment_list video %}
+        </div>
+        <div class="tab" id="activity-tab" style="display:none;">
+            {% video_activity video %}
+            <p class="view-more"><a href="{% url videos:actions_list video.video_id %}">{% trans 'View all activity' %}</a></p>
+        </div>
+        <div class="tab" id="urls-tab" style="display:none;">
+            {% video_url_panel %}
+        </div>
+    </div>
+     
+    {% comment %}
+
+    {# EDIT TITLE #}
+        {% if user.is_authenticated %}
+            {% if not video.title or video.is_html5 or user.is_superuser %}
+                <a class="heading_button edit-title" href="#" data-modal="edit-title-dialog">{% trans 'Edit title' %}</a>
+            {% endif %}
+        {% endif %}
+
+        <div id="edit-title-dialog" style="display: none" class="msg_modal_wrap" >
+            <a href="#close" class="close">{% trans "Close" %}</a>
+            <h3>{% trans 'You are editing the original video title (translations will not be affected)' %}</h3>
+            <div class="msg_modal">
+                <p>
+                {% blocktrans %}
+                IMPORTANT: the new title will appear in the lists of videos and in 
+                the original subtitle set. Any existing translations will not be affected. 
+                Please update each translation separately, if necessary.
+                {% endblocktrans %}
+                </p>
+                <p>
+                    <input type="text" val="" style="width: 100%" class="title-input">
+                    <button class="green_button small save-title" style="margin: 0 0 15px 0; float: right">{% trans "Save" %}</button>
+                </p>
+            </div>
+        </div>
+    {% endcomment %}
+{% endblock %}
+
+{% block page_controls %}
+    {% if user.is_staff and perms.videos.edit_video %}
+        <ul id="page_controls">
+            <li>
+                <a href="{% url videos:video_debug video.video_id %}" target="blank">Debug info</a>
+            </li>
+            <li>
+                <a href="{% url admin:videos_video_change video.pk %}" target="blank">{% trans 'Edit video' %}</a>
+            </li>
+            <li>{% feature_video video %}</li>
+            <li>
+            {% if user %}
+                {% render_visibility_button video user %}
+            {% endif %}
+            </li>
+            {% if task %}<li> <a href="">task id={{task.pk}}</a></li>{% endif %}
+        </ul>
+    {% endif %}
+{% endblock %}
+  
+
+{% block bottom_scripts %}
+    <script>
+        $(window).load( function() {
+            unisubs.messaging.simplemessage.displayPendingMessages();
+        {% if task %}
+            var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
+            var opener = new unisubs.widget.SubtitleDialogOpener(
+                '{{ task.team_video.video.video_id }}',
+                '{{ task.team_video.video.get_video_url }}',
+                videoSource, null, null
+            );
+            opener.showStartDialog();
+
+          // trigger open dialog here 
+        {% endif %}
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "videos/email_base.html" %}
+{% load i18n localeurl_tags %}
+
+{% block content %}
+
+{% load i18n %}{% blocktrans with current_site.name as site_name and user.email as email %}Hi,
+
+Thanks for joining Universal Subtitles!<br/>
+
+<p>If you created the "{{ user }}" user account on universalsubtitles.org, please click the following link to confirm your email address ({{ email }}):<br/></p>
+
+<p><a href="{{ activate_url }}">confirm email</a></p>
+
+<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@universalsubtitles.org.</p>
+
+Thanks, <br/>
+The Universal Subtitles team
+{% endblocktrans %}
+{% endblock %}
+
+{% block dont_send %} {% endblock %}

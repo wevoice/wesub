@@ -1,19 +1,19 @@
 // Universal Subtitles, universalsubtitles.org
-// 
+//
 // Copyright (C) 2010 Participatory Culture Foundation
-// 
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see 
+// along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.widget.Widget');
@@ -34,15 +34,15 @@ unisubs.widget.Widget = function(widgetConfig) {
     this.videoConfig_ = widgetConfig['video_config'];
     this.streamer_ = widgetConfig['streamer'];
     /**
-     * If true, this is the equivalent of clicking on "Add subtitles" 
-     * if base state is null, or equivalent of clicking on "Improve 
+     * If true, this is the equivalent of clicking on "Add subtitles"
+     * if base state is null, or equivalent of clicking on "Improve
      * these subtitles" if base state is not null.
      * @type {boolean}
      */
-    this.subtitleImmediately_ = 
+    this.subtitleImmediately_ =
         !!widgetConfig['subtitle_immediately'];
     /**
-     * If true, this is the equivalent of clicking on 
+     * If true, this is the equivalent of clicking on
      * "Add New Translation"
      * @type {boolean}
      */
@@ -68,7 +68,7 @@ unisubs.widget.Widget.widgetsCreated_ = [];
 
 /* Gets all widgets created on this page.
  * @return {Array} All widgets created on this page.
- * The array is cloned, so end user code can loop, filter and otherwise 
+ * The array is cloned, so end user code can loop, filter and otherwise
  * modify the array without compromising our global registry.
  */
 unisubs.widget.Widget.getAllWidgets = function(){
@@ -77,10 +77,10 @@ unisubs.widget.Widget.getAllWidgets = function(){
 
 /* Get the last widget on this page with the given video URL.
  * @param {String} url The video url to find widgets for.
- * Note that it will only contain the last widget with a given URL. 
- * If a page contains X widgets with the same video url, 
+ * Note that it will only contain the last widget with a given URL.
+ * If a page contains X widgets with the same video url,
  * only the last one will be fetched from this call (even if their
- * other configs differ). To get all widgets on the page, use 
+ * other configs differ). To get all widgets on the page, use
  * the unisubs.widgets.Widget.getAllWidgetsByURL method.
  * @return {unisubs.widgets.Widget} The widget (or undefined if not found).
  */
@@ -90,7 +90,7 @@ unisubs.widget.Widget.getWidgetByURL = function(url){
 
 /* Get the last widget on this page with the given video URL.
  * @param {String} url The video url to find widgets for.
- * @return {Array} An array with zero or more widgets with the given URL. 
+ * @return {Array} An array with zero or more widgets with the given URL.
  */
 unisubs.widget.Widget.getAllWidgetsByURL = function(url){
     if (!url){
@@ -120,7 +120,7 @@ unisubs.widget.Widget.prototype.findVideoSource_ = function() {
     if (this.alternateVideoURLs_ && this.alternateVideoURLs_.length > 0) {
         var mainVideoSpec = this.videoURL_;
         if (this.videoConfig_)
-            mainVideoSpec = { 'url': this.videoURL_, 
+            mainVideoSpec = { 'url': this.videoURL_,
                               'config': this.videoConfig_ };
         return unisubs.player.MediaSource.bestVideoSource(
             goog.array.concat(mainVideoSpec, this.alternateVideoURLs_));
@@ -130,8 +130,8 @@ unisubs.widget.Widget.prototype.findVideoSource_ = function() {
             this.videoURL_, this.videoConfig_);
 };
 
-unisubs.widget.Widget.prototype.isVideoSourceImmediatelyUsable_ = 
-    function() 
+unisubs.widget.Widget.prototype.isVideoSourceImmediatelyUsable_ =
+    function()
 {
     if (this.videoSource_ instanceof unisubs.player.BlipTVPlaceholder)
         return false;
@@ -143,8 +143,8 @@ unisubs.widget.Widget.prototype.isVideoSourceImmediatelyUsable_ =
     }
 };
 
-unisubs.widget.Widget.prototype.addVideoLoadingPlaceholder_ = 
-    function(el) 
+unisubs.widget.Widget.prototype.addVideoLoadingPlaceholder_ =
+    function(el)
 {
     this.videoPlaceholder_ = this.getDomHelper().createDom(
         'div', 'unisubs-videoLoading', 'Loading...');
@@ -176,7 +176,7 @@ unisubs.widget.Widget.prototype.addWidget_ = function(el) {
         var videoTabContainer = new goog.ui.Component();
         this.addChild(videoTabContainer, true);
         videoTabContainer.addChild(this.videoTab_, true);
-        videoTabContainer.getElement().className = 
+        videoTabContainer.getElement().className =
             'unisubs-videoTab-container';
         this.videoTab_.showLoading();
     }
@@ -187,7 +187,7 @@ unisubs.widget.Widget.prototype.addWidget_ = function(el) {
     if (this.baseState_)
         args['base_state'] = this.baseState_.ORIGINAL_PARAM;
     unisubs.Rpc.call(
-        'show_widget', args, 
+        'show_widget', args,
         goog.bind(this.initializeState_, this),
         goog.bind(this.showWidgetError_, this));
     unisubs.Tracker.getInstance().trackEvent(
@@ -202,10 +202,10 @@ unisubs.widget.Widget.prototype.showWidgetError_ = function() {
         // waiting for video source from server.
         if (this.videoSource_ instanceof unisubs.player.BlipTVPlaceholder) {
             // out of luck.
-            
+
         }
         else {
-            this.createVideoPlayer_(this.videoSource_);            
+            this.createVideoPlayer_(this.videoSource_);
         }
     }
     if (this.videoTab_) {
@@ -252,8 +252,8 @@ unisubs.widget.Widget.prototype.initializeStateTab_ = function(result) {
             goog.bind(subController.openSubtitleDialog, subController));
     else if (this.translateImmediately_)
         goog.Timer.callOnce(
-            goog.bind(subController_.openNewLanguageDialog, 
-                      subController_));    
+            goog.bind(subController_.openNewLanguageDialog,
+                      subController_));
 };
 
 unisubs.widget.Widget.prototype.initializeStateStreamer_ = function(result) {
@@ -288,7 +288,7 @@ unisubs.widget.Widget.prototype.videoDimensionsKnown_ = function() {
 };
 
 /**
- * Select a menu item. Either called by selecting 
+ * Select a menu item. Either called by selecting
  * a menu item or programmatically by js on the page.
  */
 unisubs.widget.Widget.prototype.selectMenuItem = function(selection, opt_languageCode) {
@@ -307,7 +307,7 @@ unisubs.widget.Widget.prototype.selectMenuItem = function(selection, opt_languag
     else if (selection == s.LANGUAGE_SELECTED){
         playController.languageSelected(opt_languageCode);
     }
-        
+
 };
 
 unisubs.widget.Widget.prototype.playAt = function(time) {
@@ -330,9 +330,9 @@ unisubs.widget.Widget.prototype.openMenu = function (){
 unisubs.widget.Widget.exportJSSameDomain_ = function(){
 
     goog.exportSymbol(
-        "unisubs.widget.SameDomainEmbed.embed", 
+        "unisubs.widget.SameDomainEmbed.embed",
         unisubs.widget.SameDomainEmbed.embed);
-    
+
     goog.exportSymbol(
         "unisubs.player.supportsVideo", unisubs.player.supportsVideo);
     goog.exportSymbol(
@@ -341,12 +341,12 @@ unisubs.widget.Widget.exportJSSameDomain_ = function(){
         "unisubs.player.supportsOgg", unisubs.player.supportsOgg);
     goog.exportSymbol(
         "unisubs.player.supportsWebM", unisubs.player.supportsWebM);
-        
+
     // these are here to guarantee backwareds compatibility,
     // should be removed once we are sure partners do not need this
-    
+
     goog.exportSymbol(
-        "mirosubs.widget.SameDomainEmbed.embed", 
+        "mirosubs.widget.SameDomainEmbed.embed",
         unisubs.widget.SameDomainEmbed.embed);
 
     goog.exportSymbol(
@@ -362,7 +362,7 @@ unisubs.widget.Widget.exportJSSameDomain_ = function(){
 unisubs.widget.Widget.exportJSCrossDomain_ = function(){
         if (!unisubs.widget.CrossDomainEmbed){
             unisubs.widget.CrossDomainEmbed = {};
-        } 
+        }
         unisubs.widget.CrossDomainEmbed.Type = {
             EMBED_SCRIPT : 1,
             WIDGETIZER : 2,
@@ -373,13 +373,13 @@ unisubs.widget.Widget.exportJSCrossDomain_ = function(){
         goog.exportSymbol(
             'unisubs.widget.CrossDomainEmbed.embed',
             unisubs.widget.CrossDomainEmbed.embed);
-            
+
         // these are here to guarantee backwareds compatibility,
         // should be removed once we are sure partners do not need this
         goog.exportSymbol(
             'unisubs.widget.CrossDomainEmbed.embed',
             unisubs.widget.CrossDomainEmbed.embed);
-            
+
 };
 
 unisubs.widget.Widget.exportFireKeySequence = function() {
@@ -393,7 +393,7 @@ unisubs.widget.Widget.exportFireKeySequence = function() {
     goog.exportSymbol(
         'mirosubs.widget.fireKeySequence',
         goog.testing.events.fireNonAsciiKeySequence);
-    
+
 };
 
 /*
@@ -433,6 +433,24 @@ unisubs.widget.Widget.exportJSSymbols = function(isCrossDomain){
         unisubs.widget.Widget.getAllWidgets);
 
     goog.exportSymbol(
+        "unisubs.player.MediaSource.videoSourceForURL",
+        unisubs.player.MediaSource.videoSourceForURL);
+    goog.exportSymbol(
+        "unisubs.widget.SubtitleDialogOpener",
+        unisubs.widget.SubtitleDialogOpener);
+    goog.exportSymbol(
+        "unisubs.widget.WidgetController",
+        unisubs.widget.WidgetController);
+    goog.exportSymbol(
+        "unisubs.widget.WidgetController.makeGeneralSettings",
+        unisubs.widget.WidgetController.makeGeneralSettings);
+
+    goog.exportProperty(
+        unisubs.widget.SubtitleDialogOpener.prototype,
+        "showStartDialog",
+        unisubs.widget.SubtitleDialogOpener.prototype.showStartDialog );
+
+    goog.exportSymbol(
         "unisubs.widget.DropDown.Selection",
         unisubs.widget.DropDown.Selection);
     var s = unisubs.widget.DropDown.Selection;
@@ -440,7 +458,7 @@ unisubs.widget.Widget.exportJSSymbols = function(isCrossDomain){
     s['LANGUAGE_SELECTED'] = s.LANGUAGE_SELECTED;
     s['ADD_LANGUAGE'] = s.ADD_LANGUAGE;
     s['SUBTITLES_OFF'] = s.SUBTITLES_OFF;
-    
+
     if (isCrossDomain) {
         unisubs.widget.Widget.exportJSCrossDomain_();
     } else {

@@ -19,9 +19,11 @@ from datetime import datetime, timedelta
 from urlparse import urlparse
 
 from django.core.urlresolvers import reverse
+from django.core import mail
 from django.test import TestCase
 from auth.models import CustomUser as User
 from auth.models import LoginToken
+from messages.models import Message
 from videos.models import Video
 
 class TestModels(TestCase):
@@ -129,6 +131,16 @@ class TestModels(TestCase):
         self.assertEqual(self.user.videos.count(), 0)        
 
 
+class UserCreationTest(TestCase):
+
+    def test_notfications(self):
+        self.assertEqual(len(mail.outbox), 0)
+        user = User(email='la@example.com', username='someone')
+        user.set_password("secret")
+        user.save()
+        self.assertEqual(len(mail.outbox), 1)
+        
+    #
 class BaseTokenTest(TestCase):
 
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]

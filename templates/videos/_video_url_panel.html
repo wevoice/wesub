@@ -1,115 +1,95 @@
 {% load i18n %}
-{% comment %}
-<div style="padding: 10px">
-    {% blocktrans %}
-    A single video is often hosted in different places online and same
-    subtitles will work. 
-    {% endblocktrans %}
-    <a href="#" class="learn-more" data-modal="learn-more-urls">{% trans 'Learn more' %}</a><br/>
-    {% if not video.allow_video_urls_edit %}
-        {% blocktrans %}
-        Only manager can edit URLs for this video.
-        {% endblocktrans %}    
-    {% endif %}
-</div>
-{% endcomment %}
+
 {% if video.allow_video_urls_edit or perms.videos_videourl_add %}
-    <div class="actions">
-        <a href="#" class="blue_button small" data-modal="add-video-url">
+    <div class="tools">
+        <a href="#add-url-modal" class="button open-modal">
             {% trans 'Add new URL' %}
         </a>
     </div>
 {% endif %}
-<table cellpadding="0" cellspacing="0" id="video-url-table">
-<thead>
-  <tr>
-    <th>
-        <span>{% trans 'Title/URL' %}</span>
-    </th>
-    <th>
-        <span>{% trans 'Format/Host' %}</span>
-    </th>
-    <th>
-        <span>{% trans 'Added' %}</span>
-    </th>
-    <th>
-        <span>{% trans 'Added by' %}</span>
-    </th>
-    <th class="last">
-        <span>{% trans 'Actions' %}</span>
-    </th>
-  </tr> 
-</thead>
-<tbody>
+<ul class="listing urls">
     {% for item in video_urls %}
-        <tr>
-            <td class="url-td">
+        <li>
+            <h3>
                 <a href="{{ item.get_absolute_url }}">{{ item }}</a> 
                 {% if item.primary %}
-                    <span class="primary">[{% trans 'PRIMARY' %}]</span>
+                    <span class="descriptor primary">{% trans 'Primary' %}</span>
                 {% endif %}
                 {% if item.original %}
-                    <span>[{% trans 'ORIGINAL' %}]</span>
+                    <span class="descriptor original">{% trans 'Original' %}</span>
                 {% endif %}
-            </td>
-            <td>
+            </h3>
+            <p>
                 <a href="{{ item.url }}">{{ item.get_type_display }}</a>
-            </td>
-            <td time="{{ item.created_as_time }}">{{ item.created|timesince }} {% trans 'ago' %}</td>
-            <td>{{ item.added_by|default:'' }}</td>
-            <td>
-                {% if video.allow_video_urls_edit or perms.videos_videourl_delete %}
+                URL
+                {% if item.added_by %}
+                    added by {{ item.added_by }}
+                {% endif %}
+            </p>
+            <span class="timestamp" time="{{ item.created_as_time }}">{{ item.created|timesince }} {% trans 'ago' %}</span>
+            {% if video.allow_video_urls_edit or perms.videos_videourl_delete or perms.videos_videourl_change %}
+                <ul class="admin-controls">
+                    <li><a {% if item.primary %}style="display:none"{% endif %} href="#" video_url_id="{{ item.pk }}" class="make-primary-url-link">{% trans 'Make primary' %}</a></li>
                     {% if not item.original%}
-                        <a href="#" class="delete-url-link" video_url_id="{{ item.pk }}">{% trans 'remove' %}</a><br/>
+                        <li><a href="#" class="delete-url-link" video_url_id="{{ item.pk }}">{% trans 'Remove' %}</a></li>
                     {% endif %}
-                {% endif %}
-                {% if video.allow_video_urls_edit or perms.videos_videourl_change %}
-                <a {% if item.primary %}style="display:none"{% endif %} href="#" video_url_id="{{ item.pk }}" class="make-primary-url-link">{% trans 'make primary' %}</a>
-                {% endif %}
-            </td>
-        </tr>
+                </ul>
+            {% endif %}
+        </li>
     {% endfor %}
-</tbody>
-</table>
+</ul>
+
 <div id="learn-more-urls" style="display:none;" class="msg_modal_wrap">
   <a href="#close" class="close">{% trans "Close" %}</a>
   <h3>{% trans 'Learn more' %}</h3>
   <div class="msg_modal">
     <p>{% trans "Multiple video URLs let you link multiple videos to a single set of subtitles. Some example uses:" %}</p>
     <ul>
-      <li>{% trans "Two versions of the same video exist on Youtube.  You don't want subtitle volunteers to duplicate their work, so you add both versions to the multiple URLs pane." %}</li>
+      <li>{% trans "Two versions of the same video exist on Youtube.  You do not want subtitle volunteers to duplicate their work, so you add both versions to the multiple URLs pane." %}</li>
       <li>{% trans "You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the subtitles you make to work on all of those versions." %}</li>
       <li>{% trans "You want to provide different versions of a video to different browsers (HTML5/Ogg for free software users, or HTML5/h264 to iPad users).  If you add these URLs, our embed code will automatically fall back to whatever format is necessary for the browser." %}</li>
     </ul>
     <p>{% trans "Tip: double check that there are no timing problems." %}</p>
   </div>
 </div>
-<div id="add-video-url" style="display: none" class="msg_modal_wrap">
-    <a href="#close" class="close">{% trans "Close" %}</a>
-    <h3>{% trans 'Add another URL for this video' %}</h3>
-    <div class="msg_modal">
-        <div>
-            {% trans "Add a URL for another version of the exact same video." %}<br/>
-            {% trans "This is useful in cases where many versions of the same video exist, or when there are versions in different formats (like HTML5)" %}
+<div class="bootstrap">
+    <div id="add-url-modal" class="modal">
+        <div class="modal-header">
+            <a href="#" class="close action-close">x</a>
+            <h3>{% trans 'Add another URL for this video' %}</h3>
+            <p class="notation">
+                {% trans "Add a URL for another version of the exact same video. Useful many versions of the same video exist, or when there are different formats (like HTML5)" %}
+            </p>
         </div>
+        
         {% if user.is_authenticated %}
-        <form method="post" action="{% url videos:video_url_create %}">
-            <div class="global-errors"></div>
-            {{ form.as_p }}
-            <p class="button-container">
-                <button class="green_button small">{% trans 'Add' %}</button>
-            </p>
-            <p class="saving-container" style="display: none">
-                {% trans 'Saving...' %}
-            </p>
-        </form>
-        {% else %}
-        <p>
-            <a href="{% url auth:login %}?next={{ request.path_info }}">
-                {% trans 'Login to add new URL' %}
-            </a>        
-        </p>
-        {% endif %}
+            <form method="post" action="{% url videos:video_url_create %}">
+                <div class="modal-body">
+                    <div class="global-errors"></div>
+                    {% include "_form_field.html" with field=form.url %}
+                    {{ form.video }}
+                </div>
+                <div class="modal-footer">
+                    <p class="button-container">
+                        <button>{% trans 'Add' %}</button>
+                    </p>
+                    <p class="saving-container" style="display:none;">
+                        {% trans 'Saving...' %}
+                    </p>
+                </div>
+                {% csrf_token %}
+            </form>
+            {% else %}
+            <div class="modal-body">
+                <p>{% trans "You must be logged in to add a URL" %}</p>
+            </div>
+            <div class="modal-footer">
+                <a href="{% url auth:login %}?next={{ request.path_info }}">
+                    {% trans 'Login' %}
+                </a>        
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 <script type="text/javascript">
@@ -126,15 +106,15 @@ jQuery(function($){
                     }else{
                         var $primary_span = $('#urls-tab .primary');
                         if ( ! $primary_span.length){
-                            $primary_span = $("<span class='primary'>[{% trans 'PRIMARY' %}]</span>");
+                            $primary_span = $("<span class='descriptor primary'>{% trans 'Primary' %}</span>");
                         };
                         var $span = $primary_span.clone();
                         
                         $primary_span.remove();
                         $('#urls-tab .make-primary-url-link').show();
-                        var $tr = $this.parents('tr');
-                        $tr.find('.url-td').append($span);
-                        $tr.find('.make-primary-url-link').hide();
+                        var $li = $this.parents('li');
+                        $li.find('h3').append($span);
+                        $li.find('.make-primary-url-link').hide();
                     }
                 }, 'json');
          }else{
@@ -153,7 +133,7 @@ jQuery(function($){
                         if (response.error){
                             $.jGrowl.error(response.error);
                         }else{
-                            $url.parents('tr').remove();
+                            $url.parents('li').remove();
                         }
                     }, 'json')                
             }
@@ -161,14 +141,9 @@ jQuery(function($){
             alert('{% trans "You are not authenticated" %}');
         }
         return false;
-    }); 
-    
-    $('#add-video-url').bind('close-modal', function(){
-        $('#add-video-url form p.error_list').remove();
-        $('#id_url').val('');
     });
     
-    $('#add-video-url form').ajaxForm({
+    $('#add-url-modal form').ajaxForm({
         dataType: 'json',
         success: function(data, status, xhr, $form){
             $('.button-container', $form).show();
@@ -193,27 +168,6 @@ jQuery(function($){
             $('.saving-container', $form).show();
         }
     });
-    
-    $.tablesorter.addParser({
-        id: 'since-time',
-        is: function(s) { 
-            return false; 
-        },
-        format: function(s, table, td) { 
-            return $(td).attr('time') - 0;
-        }, 
-        type: 'numeric'         
-    });
-    
-    $("#video-url-table").tablesorter({
-        headers: {
-            2: {
-                sorter: 'since-time'
-            },
-            4: {
-                sorter: false 
-            }
-        }
-    });
+
 });             
 </script>

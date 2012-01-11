@@ -39,12 +39,12 @@
         <div class="view grid_9 alpha">
 
             {% if user.is_authenticated %}
-                <div class="tools">
+                <div class="tools group">
                     {% if can_edit %}
                         <a class="button" href="{% url profiles:edit %}">Edit profile</a>
                     {% endif %}
                     {% if not user == user_info %}
-                        <a class="button" href="">Send Message</a>
+                        <a class="button" href="{% url messages:new %}?user={{ user_info.username }}">Send Message</a>
                     {% endif %}
                 </div>
             {% endif %}
@@ -108,11 +108,6 @@
                 {% endwith %}
             </div>
 
-            {% comment %}
-                {% if user_info.action_set.exists %}
-                            {% recent_activity user_info %}
-                        {% endif %} 
-            {% endcomment %}
         </div>
         
         <div class="controls grid_3 omega">
@@ -124,7 +119,17 @@
         {{ block.super }}
     {% else %}
         <div class="grid_9">
-            <p class="empty">{% trans 'User deleted his profile' %}</p>
+            <p class="empty">{% trans 'Profile deleted by user.' %}</p>
         </div>         
+    {% endif %}
+{% endblock %}
+
+{% block page_controls %}
+    {% if user.is_staff and perms.videos.edit_video %}
+        <ul id="page_controls">
+            <li>
+                <a href="{% url admin:auth_customuser_change user_info.pk %}" target="blank">{% trans 'Edit user' %}</a>
+            </li>
+        </ul>
     {% endif %}
 {% endblock %}

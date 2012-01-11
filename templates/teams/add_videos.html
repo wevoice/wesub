@@ -43,13 +43,13 @@
     <div class="controls grid_3 omega">
         <ul>
             <li>
-                <a href="{% url teams:add_video slug=team.slug %}">{% trans "Add a Video" %}</a>
+                <a href="{% url teams:add_video slug=team.slug %}">{% trans 'Add a Video' %}</a>
             </li>
             <li class="current">
-                <a href="{% url teams:add_videos slug=team.slug %}">{% trans "Add Multiple Videos" %}</a>
+                <a href="{% url teams:add_videos slug=team.slug %}">{% trans 'Add Multiple Videos' %}</a>
             </li>
             <li>
-                <a href="{{ team.get_absolute_url }}">← {% trans "Back to Videos" %}</a>
+                <a href="{{ team.get_absolute_url }}">← {% trans 'Back to Videos' %}</a>
             </li>
         </ul>
     </div>

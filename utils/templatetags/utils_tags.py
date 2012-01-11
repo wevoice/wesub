@@ -3,8 +3,16 @@ from django import template
 from django.utils.translation import ugettext
 from django.contrib.sites.models import Site
 from django.template.defaulttags import URLNode, url
+from django.template.defaultfilters import linebreaksbr
 from django.template.defaultfilters import stringfilter
+from django.utils.html import escape
 from utils.translation import SUPPORTED_LANGUAGES_DICT_LAZY
+from pprint import pformat
+
+try:
+    from django.utils.safestring import mark_safe
+except ImportError: # v0.96 and 0.97-pre-autoescaping compat
+    def mark_safe(x): return x
 
 register = template.Library()
 
@@ -142,3 +150,22 @@ absurl = register.tag(absurl)
 @stringfilter
 def lang_name_from_code(value):
     return SUPPORTED_LANGUAGES_DICT_LAZY.get(value, value)
+
+@register.filter
+def rawdump(x):
+    if hasattr(x, '__dict__'):
+        d = {
+            '__str__':str(x),
+            '__unicode__':unicode(x),
+            '__repr__':repr(x),
+            'dir':dir(x),
+        }
+        d.update(x.__dict__)
+        x = d
+    output = pformat(x)+'\n'
+    return output
+
+DUMP_TEMPLATE = '<pre class="dump"><code class="python" style="font-family: Menlo, monospace; white-space: pre;">%s</code></pre>'
+@register.filter
+def dump(x):
+    return mark_safe(DUMP_TEMPLATE % escape(rawdump(x)))

@@ -1,30 +1,11 @@
 {% extends "base.html" %}
-{% block body_attrs %}id="video"{% endblock %}
+{% block body_attrs %}class="video_view v1"{% endblock %}
 
 {% load widget i18n media_compressor moderation doorman %}
 
 {% block css %}
   {{ block.super }}
   {% include_bundle "widget-css"%}
-  <style>
-    div.unisubs-widget {
-        position: relative;    
-    }
-    .unisubs-videoDiv {
-        text-align: center;
-    }
-    .unisubs-videoDiv video, .unisubs-videoDiv object, .unisubs-videoDiv embed{
-    width: 480px;
-    }
-    span.data {
-      display: none;
-    }
-    #embed{
-      white-space: pre;
-      background: #eee;
-      boder: #666;
-    }
-  </style>
 {% endblock %}
 
 {% block scripts %}
@@ -33,13 +14,13 @@
         jQuery(function($){
             var IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
             if (IS_AUTHENTICATED){
-                $('.roll_back').click(function(){
+                $('#rollback').click(function(){
                     if ( ! confirm('Subtitles will be rolled back to a previous version')){
                         return false;
                     }                    
                 });                
             }else{
-                $('.roll_back, .new_edit').click(function(){
+                $('#rollback, .new_edit').click(function(){
                     alert('You need to log in to do that.');
                     return false;
                 });
@@ -71,108 +52,133 @@
 {% endblock %}
 
 {% block main_content %}
-    <h2>{{ video }} - {{ language.language_display }} - {% trans 'Revision' %} #{{ version.version_no }} ({{ version.datetime_started|date:"n/j/Y" }})</h2>
-
-    <ul class="breadcrumb">
-      <li><a href="{{ video.get_absolute_url }}">{{ video }}</a></li> 
-      <li><a href="{{ language.get_absolute_url }}">{{ language.language_display }} {% trans 'Subtitles' %}</a></li>
-      <li>
-          <a href="{{ language.get_absolute_url }}#revisions">
-              {% trans 'Revision History' %}
-          </a>
-      </li>           
-      <li><a class="nohover" href="#">{% trans 'Revision' %} #{{ version.version_no }}</a></li>
-    </ul>
-        
-    {% if next_version %}
-        <div class="viewing_old">
-            {% blocktrans with language.language_display as lang and version.user as user and version.datetime_started|date:"H:i, j F Y" as date %}
-            This is an old revision of {{ lang }}
-            language subtitles for "{{ video }}", 
-            as edited by {{ user }} at {{ date }}. It may
-            differ significantly from the current revision.
-            {% endblocktrans %}
-        </div>
-    {% endif %}
-    
-        <ul class="pag" style="width: 420px">
-            
-          {% if prev_version %}
-              <li class="previous">
-                &#8592; 
-                <a href="{{ prev_version.get_absolute_url }}">
-                    {% blocktrans with version.version_no as version_no and prev_version.version_no as prev_version_no %}
-                    Compare #{{ version_no }} to #{{ prev_version_no }}
-                    {% endblocktrans %}
-                </a>
-              </li>
-          {% endif %}
-          
-          {% if next_version %}
-              <li class="next">
-                <a href="{{ next_version.get_absolute_url }}">
-                    {% blocktrans with version.version_no as version_no and next_version.version_no as next_version_no %}
-                    Compare #{{ version_no }} to #{{ next_version_no }}
-                    {% endblocktrans %}
-                </a> &#8594;              
-              </li>
-          {% endif %}
-          
-          {% if next_version or prev_version %}
-          <li class="current">
-            <a href="{{ latest_version.get_absolute_url }}">
-               {% blocktrans with version.version_no as version_no and latest_version.version_no as latest_version_no %}
-               Compare #{{ version_no }} to #{{ latest_version_no }}(current)
-               {% endblocktrans %}
-            </a>              
-          </li>
-          {% endif %}
+    <div class="grid_4 context alpha">
+        <h2 class="main-title">
+            <a href="" title="">
+                {{ language.language_display }}
+                subtitles,
+                Revision
+                {{ version.version_no }}
+            </a>
+        </h2>
+        <ul>
+            <li>
+                <strong>Author:</strong>
+                <a href="{{ version.user.profile_url }}" title="View {{ version.user }}'s profile">{{ version.user }}</a>
+            </li>
+            <li>
+                <strong>Date:</strong> {{ version.datetime_started|date:"j F Y (H:i)" }}
+            </li>
         </ul>
-    
-    <div class="left_column">
-        <br />
-        {% widget widget_params %}
-    </div>    
 
-    <div class="right_column">
-      <br /><br /><br /><br /><br />
-      {% comment %}
-      <a href="#" class="new_edit">
-          <span>{% trans 'Submit a new edit based on this version' %} (#{{ version.version_no }})</span>
-      </a>
-      {% endcomment %}
-      {% if next_version %}
-      <a href="{% url videos:rollback version.pk %}" class="roll_back">
-          <span>{% trans 'Roll back to version' %} (#{{ version.version_no }})</span>
-      </a>
-      {% endif %}
-      {% switch_feature MODERATION %}
-      {% render_approval_toolbar user version %}
-      {% endswitch_feature %}
-    </div>
-    <div class="clearboth">&nbsp;</div>
-    <a href="{{ language.get_absolute_url }}#revisions" class="return_history floatright">
-        &lt;&lt; {% trans 'See full revision history' %}
-    </a>
-    
-    <ul class="revision_list">
-      {% for item in version.ordered_subtitles %}
-        <li {% cycle 'class="even"' '' %}>
-          {% if item.display_time or item.display_end_time %}
-            <span class="time-span time_link">
-                <span class="data">{{ item.start_time }}</span>
-                <span class="badgy start">
-                    <span class="stamp_text">{{ item.display_time }}</span>
-                </span>
-                {% if item.display_end_time %}
-                    <span class="connector"></span>
-                    <span class="badgy end"><span class="stamp_text">{{ item.display_end_time }}</span></span> 
+        <h3>Subtitles</h3>
+        <ul>
+            <li>
+                <a href="{{ language.get_absolute_url }}">
+                    {% trans 'Published subtitles' %}
+                </a>
+            </li>
+            <li>
+                <a href="{{ language.get_absolute_url }}#revisions">
+                    {% trans 'All revisions' %}
+                </a>
+            </li>
+        </ul>
+        
+        <h3>Video</h3>
+        <h4>
+            <a href="{{ video.get_absolute_url }}" title="View video">
+                {% if language.title %}
+                    {{ language.title }}
+                {% else %}
+                    {{ video }}
                 {% endif %}
-            </span>          
-          {% endif %} {{ item.text|linebreaksbr }}
-        </li>
-      {% endfor %}
-    </ul>
+            </a>
+        </h4>
+        {% widget widget_params %}
+    </div>
+
+    <div class="grid_8 view omega">
+        <ul class="tabs">
+            {% if prev_version %}
+                <li>
+                    <a href="{{ prev_version.get_absolute_url }}">
+                        ←
+                        {% blocktrans with prev_version.version_no as prev_version_no %}
+                        Revision {{ prev_version_no }}
+                        {% endblocktrans %}
+                    </a>
+                </li>
+            {% endif %}
+            <li class="current">
+                <a href="{% url videos:revision pk=version.pk %}">
+                    Revision {{ version.version_no }}
+                </a>
+            </li>
+            {% if next_version and next_version != latest_version %}
+                <li>
+                    <a href="{{ next_version.get_absolute_url }}">
+                        {% blocktrans with next_version.version_no as next_version_no %}
+                        Revision {{ next_version_no }}
+                        {% endblocktrans %}
+                        →
+                    </a>       
+                </li>
+            {% endif %}
+            {% if next_version or prev_version %}
+                <li>
+                    <a href="{{ latest_version.get_absolute_url }}">
+                        {% blocktrans with version.version_no as version_no and latest_version.version_no as latest_version_no %}
+                        Revision {{ latest_version_no }} (latest)
+                        {% endblocktrans %}
+                    </a>              
+                </li>
+            {% endif %}
+        </ul>
+        {% if next_version %}
+            <div class="tools">
+                <a href="{% url videos:rollback version.pk %}" class="button" id="rollback">
+                    {% trans 'Roll back to this version' %}
+                </a>
+            </div>
+        {% endif %}
+        {% if next_version %}
+            <p class="active-filters">
+                {% blocktrans with language.language_display as lang and version.user as user and version.datetime_started|date:"j F Y (H:i)" as date %}
+                This is an old revision, edited by {{ user }} on {{ date }}. It may
+                differ significantly from the current revision.
+                {% endblocktrans %}
+            </p>
+        {% endif %}
+        <ol class="subtitles">
+            {% for item in version.ordered_subtitles %}
+            <li>
+                {% if item.display_time %}
+                <div class="timing">
+                    <a class="time_link" href="#" title="Play video here">
+                        <span class="data">{{ item.start_time }}</span>
+                        {{ item.display_time }}
+                        {% if item.display_end_time %}
+                        –
+                        {{ item.display_end_time }}
+                        {% endif %}
+                    </a>
+                </div>
+                {% else %}
+                <div class="timing">
+                    {% trans 'Not Synced' %}
+                </div>
+                {% endif %}
+                {{ item.text|linebreaksbr }}
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+{% comment %}
+
+      <li><a href="{{ language.get_absolute_url }}">{{ language.language_display }} {% trans 'Subtitles' %}</a></li>
+    
+{% endcomment %}
 {% endblock %}
 
 {% block bottom_scripts %}

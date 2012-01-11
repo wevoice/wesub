@@ -16,6 +16,10 @@ Every request must have the username and the api keys as headers. Ex::
    X-api-username: my_username_here
    X-apikey: my_api_key_here
 
+So a sample request would look like this::
+ 
+   $curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key'  https://staging.universalsubtitles.org/api2/partners/videos/
+
 Data Formats
 =============
 The api accepts request data and will output the following formats: JSON, XML and YAML. Unless you have a strong reason not to, we recommend using the JSON format, as it's the one that gets the most usage (and therefore more testing).
@@ -31,13 +35,17 @@ API ENDPOINT
 
 The endpoint for the api is the environment base URL +  `/api2/partners/`. Possible environments:
 
-* Staging: https://staging.unversalsubtitles.org/ 
-* Production: https://www.unversalsubtitles.org/
+* Staging: https://staging.universalsubtitles.org/ 
+* Production: https://www.universalsubtitles.org/
 
 Therefore, most clients should be making requests against:
-https://www.unversalsubtitles.org/api2/partners/
+https://www.universalsubtitles.org/api2/partners/
 
 All API requests should go through https. The staging environment might need HTTP basic auth, please contact us to request credentials.  
+When basic auth is needed on staging, you end up with a request like this::
+
+    $curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key' --user basic_auth_username:basic_auth_password https://staging.universalsubtitles.org/api2/partners/videos/
+
 If you're under a partnership, you might have a different base URL. Please contact us if you're not sure.
 
 Available Resources
@@ -52,7 +60,7 @@ Represents a video on Universal Subtitles.
 
 Listing videos
 
-    GET https://www.unversalsubtitles.org/api2/partners/videos/
+    GET https://www.universalsubtitles.org/api2/partners/videos/
 
 Parameters:
    
@@ -66,7 +74,7 @@ Parameters:
           
 Creating Videos::
   
-  POST https://www.unversalsubtitles.org/api2/partners/videos/
+  POST https://www.universalsubtitles.org/api2/partners/videos/
    
 Parameters:
   
@@ -81,13 +89,13 @@ Information about a specific video can be retrieved from the URL::
 
 Video Detail::
 
-  GET https://www.unversalsubtitles.org/api2/partners/videos/[video-id]/
+  GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/
 
 The video listing resource already returns a `resource_uri` for each video to be used when retrieving the details.
 
 Updating a video object::
 
-   PUT https://www.unversalsubtitles.org/api2/partners/videos/[video-id]/
+   PUT https://www.universalsubtitles.org/api2/partners/videos/[video-id]/
 
 With the same parameters for creation. Note that through out our system, a video cannot have it's URLs changed. So you can change other video attributes (title, description) but the URL sent must be the same original one.
 
@@ -97,11 +105,11 @@ Represents a language for a given video on Universal Subtitles.
 
 Listing video languages::
 
-      GET https://www.unversalsubtitles.org/api2/partners/videos/[video-id]/languages/
+      GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/
 
 Creating Video Languages::
 
-     POST https://www.unversalsubtitles.org/api2/partners/videos/[video-id]/languages/
+     POST https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/
    
 Parameters:
   * `language_code` : The language code (e.g 'en' or 'pt-br') to create. To list available languages, see `LanguageResource`
@@ -113,7 +121,7 @@ Parameters:
        
 Information about a specific video language can be retrieved from the URL::
 
-   GET https://www.unversalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
+   GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
 
 Where the language identifier can be the language code (e.g. 'en') or the numeric ID returned from calls to listing languages.
 
@@ -123,9 +131,9 @@ Represents the subtitle set for a given video language.
 
 Fetching subtitles for a given language::
     
-   GET https://www.unversalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
-   GET https://www.unversalsubtitles.org/api2/partners/videos/asfssd/languages/en/
-   GET https://www.unversalsubtitles.org/api2/partners/videos/asfssd/languages/111111/
+   GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
+   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/
+   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/111111/
    
 Available parameters
    
@@ -136,8 +144,8 @@ Available parameters
    
 Creating new subtitles for a language::
 
-   POST  https://www.unversalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
-   POST https://www.unversalsubtitles.org/api2/partners/videos/asfssd/languages/en/
+   POST  https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
+   POST https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/
     
 Parameters:
      
@@ -153,7 +161,7 @@ Represents a listing of all available languages on the Universal Subtitles platf
 
 Listing available languages::
 
-   GET https://www.unversalsubtitles.org/api2/partners/languages/
+   GET https://www.universalsubtitles.org/api2/partners/languages/
 
 UserResouce
 ------------
@@ -162,19 +170,20 @@ One can list and create new users through the api.
 
 Listing users::
 
-    GET https://www.unversalsubtitles.org/api2/users/
+    GET https://www.universalsubtitles.org/api2/partners/users/
 
 User datail::
 
-    GET https://www.unversalsubtitles.org/api2/users/[username]/
+    GET https://www.universalsubtitles.org/api2/partners/users/[username]/
     
 Creating Users::
 
-    POST https://www.unversalsubtitles.org/api2/users/
+    POST https://www.universalsubtitles.org/api2/partners/users/
 
 Parameters:
 
   * `username`: the username for later login.  30 chars or fewer alphanumeric chars, @, _ and - are accepted.
+  * `email`: A valid email address
   * `password`: any number of chars, all chars allowed.
   * `first_name`: Any chars, max 30 chars. Optional. 
   * `last_name`: Any chars, max 30 chars. Optional. 

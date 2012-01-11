@@ -48,13 +48,6 @@ elif INSTALLATION == STAGING:
     REDIS_DB = "2"
     AWS_QUEUE_PREFIX = 'STAGING'
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
-    # Tracelyzer instrumentation
-    # http://support.tracelytics.com/kb/instrumenting-your-app/instrumenting-django-appsw
-    try:
-        import oboeware.djangoware
-    except ImportError:
-        import sys
-        print >> sys.stderr, "[oboe] Unable to instrument app and middleware"
     EMAIL_SUBJECT_PREFIX = '[usubs-staging]'
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 elif INSTALLATION == PRODUCTION:
@@ -65,7 +58,6 @@ elif INSTALLATION == PRODUCTION:
     AWS_QUEUE_PREFIX = 'PRODUCTION'
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
     EMAIL_SUBJECT_PREFIX = '[usubs-production]'
-    EMAIL_BCC_LIST.append('socmedia@pculture.org')
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
     ADMINS = (
       ('universalsubtitles-errors', 'universalsubtitles-errors@pculture.org'),
@@ -132,3 +124,6 @@ STATIC_URL_BASE = STATIC_URL
 if COMPRESS_MEDIA:
     STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
 
+#  the keyd cache apps need this:
+CACHE_TIMEOUT  = 60
+CACHE_PREFIX  = "unisubscache"

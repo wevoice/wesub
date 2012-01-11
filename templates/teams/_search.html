@@ -1,5 +1,24 @@
-<form action="." method="get" class="search">
+<form action="" method="get" class="search">
     <fieldset>
+        <input type="hidden" name="lang" value="{{ request.GET.lang }}" />
         <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search&hellip;" />
     </fieldset>
 </form>
+
+<script type="text/javascript">
+    $(function() {
+        if ('{{ request.GET.q }}' !== '') {
+            $searchFieldset = $('form.search fieldset');
+            $searchFieldset.append('<a href="#" class="reset">x</a>');
+            $anc = $('a.reset', $searchFieldset);
+            $anc.click(function() {
+                $anc.siblings('input[name="q"]')
+                    .val('')
+                    .attr('placeholder', 'Loading...');
+                $anc.hide();
+                $searchFieldset.parent().submit();
+                return false;
+            });
+        }
+    });
+</script>

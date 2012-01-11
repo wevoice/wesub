@@ -1,21 +1,22 @@
 {% load i18n subtitles_tags doorman %}
-    {% if video.subtitle_language %}
-        <li class="{% complete_color video.subtitle_language %}{% if language.is_original %} active{% endif %}">
-            <a href="{% language_url request video.subtitle_language %}">
+
+{% if video.subtitle_language %}
+    <li class="{% complete_color video.subtitle_language %}{% if language.is_original %} active{% endif %}">
+        <a href="{% language_url request video.subtitle_language %}">
+            <span class="done_indicator"></span>
+            {{ video.subtitle_language.language_display }}
+            <span class="done_percentage">({% complete_indicator video.subtitle_language %})</span>
+        </a>
+    </li>
+{% endif %}
+{% if translations %}
+    {% for item in translations %}
+        <li class="{% complete_color item %}{% if language == item %} active{% endif %}">
+            <a href="{% language_url request item %}">
                 <span class="done_indicator"></span>
-                {{ video.subtitle_language.language_display }}
-                <span class="done_percentage">({% complete_indicator video.subtitle_language %})</span>
+                {{ item.get_language_display }}
+                <span class="done_percentage">({% complete_indicator item %})</span>
             </a>
         </li>
-    {% endif %}
-    {% if translations %} 
-      {% for item in translations %}  
-         <li class="{% complete_color item %}{% if language == item %} active{% endif %}">
-             <a href="{% language_url request item %}">
-                 <span class="done_indicator"></span>
-                 {{ item.get_language_display }}
-                 <span class="done_percentage">({% complete_indicator item %})</span>
-             </a>
-         </li>
-      {% endfor %} 
-    {% endif %}
+    {% endfor %}
+{% endif %}

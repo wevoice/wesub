@@ -16,8 +16,33 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django import template
+from django.core.paginator import Paginator
 
 register = template.Library()
+
+def paginate(items, per_page, page):
+    if page != 'last':
+        page = int(page) if page else 1
+
+    paginator = Paginator(items, per_page, allow_empty_first_page=True)
+    if page == 'last':
+        page = paginator.num_pages
+
+    page_obj = paginator.page(page)
+
+    return page_obj.object_list, {
+        'page': page,
+        'paginator': paginator,
+        'page_obj': page_obj,
+        'pages': paginator.num_pages,
+        'has_next': page_obj.has_next(),
+        'has_previous': page_obj.has_previous(),
+        'is_paginated': page_obj.has_other_pages(),
+        'hits': paginator.count,
+        'results_per_page': paginator.per_page,
+        'next': page_obj.next_page_number(),
+        'previous': page_obj.previous_page_number(),
+    }
 
 def paginator(context, anchor='', adjacent_pages=3):
     """

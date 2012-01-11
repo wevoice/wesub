@@ -16,10 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from utils.translation import SUPPORTED_LANGUAGES_DICT
-from teams.models import (
-    Team, MembershipNarrowing, Workflow, TeamMember, Project, TeamVideoLanguage, Task
-)
+from django.db.models import Q
+from teams.models import Team, MembershipNarrowing, Workflow, TeamMember, Task
 
 from teams.permissions_const import (
     ROLES_ORDER, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_ADMIN, ROLE_MANAGER,
@@ -61,10 +59,18 @@ def get_member(user, team):
     if not user.is_authenticated():
         return None
 
-    try:
-        return team.members.get(user=user)
-    except TeamMember.DoesNotExist:
-        return None
+    if hasattr(user, '_cached_teammember') and user._cached_teammember.get(team.pk):
+        return user._cached_teammember[team.pk]
+    else:
+        if not hasattr(user, '_cached_teammember'):
+            user._cached_teammember = {}
+
+        try:
+            user._cached_teammember[team.pk] = team.members.get(user=user)
+        except TeamMember.DoesNotExist:
+            user._cached_teammember[team.pk] = None
+
+        return user._cached_teammember[team.pk]
 
 def get_role(member):
     """Return the member's general role in the team.
@@ -92,10 +98,8 @@ def get_role_for_target(user, team, project=None, lang=None):
         return role
 
     # Otherwise the narrowings must match the target.
-    project_narrowings = [n.content for n in narrowings
-                          if n.content_type.model_class() == Project]
-    lang_narrowings = [n.content.language for n in narrowings
-                       if n.content_type.model_class() == TeamVideoLanguage]
+    project_narrowings = [n.project for n in narrowings if n.project]
+    lang_narrowings = [n.language for n in narrowings if n.language]
 
     # The default project is the same as "no project".
     if project and project.is_default_project:
@@ -115,8 +119,7 @@ def roles_user_can_assign(team, user, to_user=None):
 
     Rules:
 
-        * Unrestricted owners can assign all roles.
-        * Unrestricted admins can assign any other role (for now).
+        * Unrestricted admins and owners can assign any role but owners.
         * No one else can assign any roles.
         * Admins cannot change the role of an owner.
 
@@ -124,7 +127,7 @@ def roles_user_can_assign(team, user, to_user=None):
     user_role = get_role_for_target(user, team)
 
     if user_role == ROLE_OWNER:
-        return ROLES_ORDER
+        return ROLES_ORDER[1:]
     elif user_role == ROLE_ADMIN:
         if to_user:
             if get_role(get_member(to_user, team)) == ROLE_OWNER:
@@ -138,19 +141,28 @@ def roles_user_can_invite(team, user):
 
     Rules:
 
-        * Unrestricted owners can invite all roles.
-        * Unrestricted admins can invite any non-owner role.
+        * Unrestricted owners and admins can invite all roles but owner.
         * Everyone else can only invite contributors.
 
     """
     user_role = get_role_for_target(user, team)
 
-    if user_role == ROLE_OWNER:
-        return ROLES_ORDER
-    elif user_role == ROLE_ADMIN:
+    if user_role in [ROLE_OWNER, ROLE_ADMIN]:
         return ROLES_ORDER[1:]
     else:
         return [ROLE_CONTRIBUTOR]
+
+def save_role(team, member, role, projects, languages, user=None):
+
+    languages = languages or []
+
+    if can_assign_role(team, user, role, member.user):
+        member.role = role
+        member.save()
+
+        set_narrowings(member, projects, languages, user)
+        return True
+    return False
 
 
 # Narrowings
@@ -160,55 +172,102 @@ def get_narrowings(member):
     if not member:
         return []
     else:
-        return list(member.narrowings.all())
+        return list(member.narrowings_fast())
 
-def get_narrowing_dict(team, user, models, lists=False):
-    """Return a dict of MembershipNarrowings for the given member/models.
+def add_narrowing_to_member(member, project=None, language=None, added_by=None):
+    """Add a narrowing to the given member for the given project or language.
 
-    `models` should be an iterable of Model classes, something
-    like [Project, TeamVideoLanguage].
-
-    The returned dictionary will contain keys that are strings of the model
-    names, like this:
-
-    { 'Project': [<Narrowing 1>, ...], }
-
-    If the `lists` parameter is given the values of this dictionary will be list
-    objects, otherwise they will be keps at querysets.
-
-    Each given class will have an entry in the dictionary, though it may be
-    empty.
-
-    """
-    data = {}
-    member = team.members.get(user=user)
-
-    # TODO: Make this use only one DB call.
-    for model in models:
-        items = member.narrowings.for_type(model)
-        data[model._meta.object_name] = items if not lists else list(items)
-
-    return data
-
-def add_narrowing_to_member(member, target, added_by):
-    """Add a narrowing to the given member for the given target.
-
-    `target` should be a Project or TeamVideoLanguage object.
+    `project` must be a Project object.
+    `language` must be a language code like 'en'.
     `added_by` must be a TeamMember object.
 
     """
-    return MembershipNarrowing.objects.create(member, target, added_by)
+    if not language:
+        language = ''
+
+    narrowing = MembershipNarrowing(member=member, project=project, language=language, added_by=added_by)
+    narrowing.save()
+
+    return narrowing
+
+
+def _add_project_narrowings(member, project_pks, author):
+    for project_pk in project_pks:
+        project = member.team.project_set.get(pk=project_pk)
+        MembershipNarrowing(project=project, member=member, added_by=author).save()
+
+def _del_project_narrowings(member, project_pks):
+    project_narrowings = member.narrowings.filter(project__isnull=False)
+
+    for project_pk in project_pks:
+        project_narrowings.filter(project=project_pk).delete()
+
+def _add_language_narrowings(member, languages, author):
+    for language in languages:
+        MembershipNarrowing(language=language, member=member, added_by=author).save()
+
+def _del_language_narrowings(member, languages):
+    for language in languages:
+        MembershipNarrowing.objects.filter(language=language, member=member).delete()
+
+
+def can_set_language_narrowings(team, user, target):
+    # role = get_role_for_target(user, team)
+    target_role = get_role(get_member(target, team))
+
+    if target_role not in [ROLE_MANAGER]:
+        return False
+
+    return True
+
+def can_set_project_narrowings(team, user, target):
+    # role = get_role_for_target(user, team)
+    target_role = get_role(get_member(target, team))
+
+    if target_role not in [ROLE_MANAGER, ROLE_ADMIN]:
+        return False
+
+    return True
+
+
+def set_narrowings(member, project_pks, languages, author=None):
+    if author:
+        author = TeamMember.objects.get(team=member.team, user=author)
+    # Projects
+    existing_projects = set(narrowing.project.pk for narrowing in
+                            member.narrowings.filter(project__isnull=False))
+    desired_projects = set(project_pks)
+
+    projects_to_create = desired_projects - existing_projects
+    projects_to_delete = existing_projects - desired_projects
+
+    _add_project_narrowings(member, projects_to_create, author)
+    _del_project_narrowings(member, projects_to_delete)
+
+    # Languages
+    existing_languages = set(narrowing.language for narrowing in
+                             member.narrowings.filter(project__isnull=True))
+    desired_languages = set(languages)
+
+    languages_to_create = desired_languages - existing_languages
+    languages_to_delete = existing_languages - desired_languages
+
+    _add_language_narrowings(member, languages_to_create, author)
+    _del_language_narrowings(member, languages_to_delete)
 
 
 # Roles
-def add_role(team, cuser, added_by,  role, project=None, lang=None):
+def add_role(team, cuser, added_by, role, project=None, lang=None):
     from teams.models import TeamMember
+
     member, created = TeamMember.objects.get_or_create(
-        user=cuser,team=team, defaults={'role':role})
+        user=cuser, team=team, defaults={'role': role})
     member.role = role
     member.save()
-    target = lang or project or team
-    add_narrowing_to_member(member, target, added_by)
+
+    if project or lang:
+        add_narrowing_to_member(member, project, lang, added_by)
+
     return member
 
 def remove_role(team, user, role, project=None, lang=None):
@@ -259,16 +318,45 @@ def can_rename_team(team, user):
     role = get_role_for_target(user, team)
     return role == ROLE_OWNER
 
+def can_delete_team(team, user):
+    """Return whether the given user can delete the given team.
+
+    Only team owners can delete teams.
+
+    """
+    role = get_role_for_target(user, team)
+    return role == ROLE_OWNER
+
+
 def can_add_video(team, user, project=None):
     """Return whether the given user can add a video to the given target."""
 
     role = get_role_for_target(user, team, project)
+    role_required = {
+        1: ROLE_CONTRIBUTOR,
+        2: ROLE_MANAGER,
+        3: ROLE_ADMIN,
+    }[team.video_policy]
+
+    return role in _perms_equal_or_greater(role_required)
+
+def can_add_video_somewhere(team, user):
+    """Return whether the given user can add a video somewhere in the given team."""
+
+    # TODO: Make this faster.
+    return any(can_add_video(team, user, project)
+               for project in team.project_set.all())
+
+def can_remove_video(team_video, user):
+    """Return whether the given user can remove the given video."""
+
+    role = get_role_for_target(user, team_video.team, team_video.project)
 
     role_required = {
         1: ROLE_CONTRIBUTOR,
         2: ROLE_MANAGER,
-        3: ROLE_CONTRIBUTOR,
-    }[team.video_policy]
+        3: ROLE_ADMIN,
+    }[team_video.team.video_policy]
 
     return role in _perms_equal_or_greater(role_required)
 
@@ -280,10 +368,11 @@ def can_edit_video(team_video, user):
     role_required = {
         1: ROLE_CONTRIBUTOR,
         2: ROLE_MANAGER,
-        3: ROLE_CONTRIBUTOR,
+        3: ROLE_ADMIN,
     }[team_video.team.video_policy]
 
     return role in _perms_equal_or_greater(role_required)
+
 
 def can_view_settings_tab(team, user):
     """Return whether the given user can view (and therefore edit) the team's settings.
@@ -301,13 +390,10 @@ def can_change_team_settings(team, user):
 def can_view_tasks_tab(team, user):
     """Return whether the given user can view the tasks tab for the given team.
 
-    To view the tasks tab, the user just has to be a member of the team.
-
-    TODO: Consider "public" tasks?
+    Only team members can see the tasks tab.
 
     """
-
-    if not user.is_authenticated():
+    if not user or not user.is_authenticated():
         return False
 
     return team.members.filter(user=user).exists()
@@ -335,7 +421,7 @@ def can_review(team_video, user, lang=None):
     workflow = Workflow.get_for_team_video(team_video)
     role = get_role_for_target(user, team_video.team, team_video.project, lang)
 
-    # For now, don't allow require if it's disabled in the workflow.
+    # For now, don't allow review if it's disabled in the workflow.
     # TODO: Change this to allow one-off reviews?
     if not workflow.review_allowed:
         return False
@@ -426,17 +512,25 @@ def can_assign_tasks(team, user, project=None, lang=None):
     return role in _perms_equal_or_greater(role_required)
 
 
+def can_perform_task_for(user, type, team_video, language):
+    """Return whether the given user can perform the given type of task."""
+
+    if type:
+        type = int(type)
+
+    if type == Task.TYPE_IDS['Subtitle']:
+        return can_create_and_edit_subtitles(user, team_video)
+    elif type == Task.TYPE_IDS['Translate']:
+        return can_create_and_edit_translations(user, team_video, language)
+    elif type == Task.TYPE_IDS['Review']:
+        return can_review(team_video, user, language)
+    elif type == Task.TYPE_IDS['Approve']:
+        return can_approve(team_video, user, language)
+
 def can_perform_task(user, task):
     """Return whether the given user can perform the given task."""
 
-    if task.type == Task.TYPE_IDS['Subtitle']:
-        return can_create_and_edit_subtitles(user, task.team_video)
-    elif task.type == Task.TYPE_IDS['Translate']:
-        return can_create_and_edit_translations(user, task.team_video, task.language)
-    elif task.type == Task.TYPE_IDS['Review']:
-        return can_review(task.team_video, user, task.language)
-    elif task.type == Task.TYPE_IDS['Approve']:
-        return can_approve(task.team_video, user, task.language)
+    return can_perform_task_for(user, task.type, task.team_video, task.language)
 
 def can_assign_task(task, user):
     """Return whether the given user can assign the given task.
@@ -448,6 +542,7 @@ def can_assign_task(task, user):
 
     """
     team, project, lang = task.team, task.team_video.project, task.language
+
 
     return can_assign_tasks(team, user, project, lang) and can_perform_task(user, task)
 
@@ -482,8 +577,8 @@ def _user_can_create_task_translate(user, team_video):
 
     return role in _perms_equal_or_greater(role_req)
 
-def _user_can_create_task_review(user, team_video):
-    workflow = Workflow.get_for_team_video(team_video)
+def _user_can_create_task_review(user, team_video, workflows=None):
+    workflow = Workflow.get_for_team_video(team_video, workflows)
 
     if not workflow.review_enabled:
         # TODO: Allow users to create on-the-fly review tasks even if reviewing
@@ -501,8 +596,8 @@ def _user_can_create_task_review(user, team_video):
 
     return role in _perms_equal_or_greater(role_req)
 
-def _user_can_create_task_approve(user, team_video):
-    workflow = Workflow.get_for_team_video(team_video)
+def _user_can_create_task_approve(user, team_video, workflows=None):
+    workflow = Workflow.get_for_team_video(team_video, workflows)
 
     if not workflow.approve_enabled:
         return False
@@ -518,7 +613,7 @@ def _user_can_create_task_approve(user, team_video):
     return role in _perms_equal_or_greater(role_req)
 
 
-def can_create_task_subtitle(team_video, user=None):
+def can_create_task_subtitle(team_video, user=None, workflows=None):
     """Return whether the given video can have a subtitle task created for it.
 
     If a user is given, return whether *that user* can create the task.
@@ -536,12 +631,12 @@ def can_create_task_subtitle(team_video, user=None):
     if team_video.subtitles_started():
         return False
 
-    if list(team_video.task_set.all_subtitle()[:1]):
+    if team_video.task_set.all_subtitle().exists():
         return False
 
     return True
 
-def can_create_task_translate(team_video, user=None):
+def can_create_task_translate(team_video, user=None, workflows=None):
     """Return a list of languages for which a translate task can be created for the given video.
 
     If a user is given, filter that list to contain only languages the user can
@@ -555,8 +650,8 @@ def can_create_task_translate(team_video, user=None):
     * The user has permission to create the translation task.
 
     Note: you *can* create translation tasks if subtitles for that language
-    already exist.  The task will simply "take over" that language from that
-    point forward.
+    already exist (but not if they're done!).  The task will simply "take over"
+    that language from that point forward.
 
     Languages are returned as strings (language codes like 'en').
 
@@ -564,21 +659,28 @@ def can_create_task_translate(team_video, user=None):
     if user and not _user_can_create_task_translate(user, team_video):
         return []
 
-    if not team_video.subtitles_finished():
-        return []
+    if hasattr(team_video, 'completed_langs'):
+        if not team_video.completed_langs:
+            return False
+    else:
+        if not team_video.subtitles_finished():
+            return []
 
-    candidate_languages = set(SUPPORTED_LANGUAGES_DICT.keys())
+    candidate_languages = set(team_video.team.get_writable_langs())
 
     existing_translate_tasks = team_video.task_set.all_translate()
     existing_translate_languages = set(t.language for t in existing_translate_tasks)
 
-    existing_languages = set(sl.language
-                             for sl in team_video.video.completed_subtitle_languages())
+    if hasattr(team_video, 'completed_langs'):
+        existing_languages = set(team_video.completed_langs)
+    else:
+        existing_languages = set(
+                sl.language for sl in team_video.video.completed_subtitle_languages())
 
     # TODO: Order this for individual users?
     return list(candidate_languages - existing_translate_languages - existing_languages)
 
-def can_create_task_review(team_video, user=None):
+def can_create_task_review(team_video, user=None, workflows=None):
     """Return a list of languages for which a review task can be created for the given video.
 
     If a user is given, filter that list to contain only languages the user can
@@ -595,27 +697,24 @@ def can_create_task_review(team_video, user=None):
     Languages are returned as strings (language codes like 'en').
 
     """
-    if user and not _user_can_create_task_review(user, team_video):
+    if user and not _user_can_create_task_review(user, team_video, workflows):
         return []
-
-    tasks = team_video.task_set
 
     # Find all languages that have a complete set of subtitles.
     # These are the ones we *might* be able to create a review task for.
     candidate_langs = set(sl.language for sl in team_video.video.completed_subtitle_languages())
 
     # Find all the languages that have a task which prevents a review task creation.
-    # TODO: Make this an OR'ed Q query for performance.
-    existing_task_langs = (
-            set(t.language for t in tasks.incomplete_translate())
-          | set(t.language for t in tasks.all_review())
-          | set(t.language for t in tasks.all_approve())
-    )
+    existing_task_langs = set(team_video.task_set.not_deleted().filter(
+            Q(completed=None, type=Task.TYPE_IDS['Translate']) # Incomplete Translate tasks
+          | Q(type=Task.TYPE_IDS['Review'])                    # Any Review task
+          | Q(type=Task.TYPE_IDS['Approve'])                   # Any Approve task
+    ).values_list('language', flat=True))
 
     # Return the candidate languages that don't have a review-preventing task.
     return list(candidate_langs - existing_task_langs)
 
-def can_create_task_approve(team_video, user=None):
+def can_create_task_approve(team_video, user=None, workflows=None):
     """Return a list of languages for which an approve task can be created for the given video.
 
     If a user is given, filter that list to contain only languages the user can
@@ -634,24 +733,23 @@ def can_create_task_approve(team_video, user=None):
     Languages are returned as strings (language codes like 'en').
 
     """
-    if user and not _user_can_create_task_review(user, team_video):
+    if user and not _user_can_create_task_approve(user, team_video, workflows):
         return []
 
     tasks = team_video.task_set
 
     # Find all languages we *might* be able to create an approve task for.
-    workflow = Workflow.get_for_team_video(team_video)
+    workflow = Workflow.get_for_team_video(team_video, workflows)
     if workflow.review_enabled:
         candidate_langs = set(t.language for t in tasks.complete_review('Approved'))
     else:
         candidate_langs = set(sl.language for sl in team_video.video.completed_subtitle_languages())
 
     # Find all the languages that have a task which prevents an approve task creation.
-    # TODO: Make this an OR'ed Q query for performance.
-    existing_task_langs = (
-            set(t.language for t in tasks.incomplete_translate())
-          | set(t.language for t in tasks.all_approve())
-    )
+    existing_task_langs = set(team_video.task_set.not_deleted().filter(
+            Q(completed=None, type=Task.TYPE_IDS['Translate']) # Incomplete Translate tasks
+          | Q(type=Task.TYPE_IDS['Approve'])                   # Any Approve task
+    ).values_list('language', flat=True))
 
     # Return the candidate languages that don't have a review-preventing task.
     return list(candidate_langs - existing_task_langs)

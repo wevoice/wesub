@@ -24,7 +24,18 @@ class InternalOnlyBackend(object):
     def get_whitelisted(self, addresses):
         clean = []
         for x in addresses:
-            if x in self.white_listed_addresses:
+            # addresses might be in form Name <email>
+            start,end = x.find("<"), x.find(">")
+            if start != -1 and end != -1:
+               trimmed = x[start+1:end]
+               if trimmed in self.white_listed_addresses:
+                   clean.append(x)
+               else:
+                   for white_listed in self.white_listed_addresses:
+                       if trimmed.endswith(white_listed):
+                           clean.append(x)
+                           break
+            elif x in self.white_listed_addresses:
                 clean.append(x)
             else:
                 for white_listed in self.white_listed_addresses:
@@ -34,7 +45,10 @@ class InternalOnlyBackend(object):
         return clean
         
     def send_messages(self, email_messages):
-        self.file_backend.send_messages(email_messages)
+        try:
+            self.file_backend.send_messages(email_messages)
+        except:
+            pass
         for message in email_messages:
             message.to = self.get_whitelisted(message.to)
             message.bcc = self.get_whitelisted(message.bcc)

@@ -1,29 +1,27 @@
 # Universal Subtitles, universalsubtitles.org
-# 
+#
 # Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from datetime import datetime
 from videos import models
 from widget.models import SubtitlingSession
-import simplejson as json
-import widget
 from widget.base_rpc import BaseRpc
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from widget import video_cache
 from utils.translation import get_user_languages_from_request
 from django.utils.translation import ugettext as _
@@ -38,6 +36,7 @@ from teams.models import Task
 from teams.signals import api_subtitles_edited, api_subtitles_approved, \
      api_subtitles_rejected, api_language_new, api_language_edited, \
      api_video_edited
+from teams.moderation_const import UNMODERATED, WAITING_MODERATION
 
 from utils import send_templated_email
 from statistic.tasks import st_widget_view_statistic_update
@@ -85,9 +84,7 @@ class Rpc(BaseRpc):
         return { 'response': 'ok' }
 
     def show_widget(self, request, video_url, is_remote, base_state=None, additional_video_urls=None):
-        public_only = False
-        
-        video_id = video_cache.get_video_id(video_url) 
+        video_id = video_cache.get_video_id(video_url)
         if video_id is None: # for example, private youtube video or private widgets
             return None
         visibility_policy = video_cache.get_visibility_policies(video_id)
@@ -97,7 +94,7 @@ class Rpc(BaseRpc):
                 referer=request.META.get('referer'),
                 user=request.user):
                 return {"error_msg": _("Video embedding disabled by owner")}
-        try:    
+        try:
             video_urls = video_cache.get_video_urls(video_id)
         except models.Video.DoesNotExist:
             video_cache.invalidate_video_id(video_url)
@@ -131,7 +128,7 @@ class Rpc(BaseRpc):
             if lang_pk is  None:
                 lang_pk = video_cache.pk_for_default_language(video_id, lang_code)
             subtitles = self._autoplay_subtitles(
-                request.user, video_id, 
+                request.user, video_id,
                 lang_pk,
                 base_state.get('revision', None))
             return_value['subtitles'] = subtitles
@@ -143,6 +140,7 @@ class Rpc(BaseRpc):
                     subtitles = self._autoplay_subtitles(
                         request.user, video_id, language_pk, None)
                     return_value['subtitles'] = subtitles
+
         return return_value
 
     def track_subtitle_play(self, request, video_id):
@@ -161,15 +159,21 @@ class Rpc(BaseRpc):
         my_languages = get_user_languages_from_request(request)
         my_languages.extend([l[:l.find('-')] for l in my_languages if l.find('-') > -1])
         video = models.Video.objects.get(video_id=video_id)
-        video_languages = [language_summary(l) for l 
+        team_video = video.get_team_video()
+        video_languages = [language_summary(l, team_video, request.user) for l
                            in video.subtitlelanguage_set.all()]
         original_language = None
         if video.subtitle_language():
             original_language = video.subtitle_language().language
+
+        tv = video.get_team_video()
+        writable_langs = list(tv.team.get_writable_langs()) if tv else []
+
         return {
             'my_languages': my_languages,
             'video_languages': video_languages,
-            'original_language': original_language }
+            'original_language': original_language,
+            'limit_languages': writable_langs, }
 
     def fetch_video_id_and_settings(self, request, video_id):
         is_original_language_subtitled = self._subtitle_count(video_id) > 0
@@ -222,12 +226,13 @@ class Rpc(BaseRpc):
         }
 
 
-    def start_editing(self, request, video_id, 
-                      language_code, 
+    def start_editing(self, request, video_id,
+                      language_code,
                       subtitle_language_pk=None,
                       base_language_pk=None,
-                      original_language_code=None):
-        """Called by subtitling widget when subtitling or translation 
+                      original_language_code=None,
+                      mode=None):
+        """Called by subtitling widget when subtitling or translation
         is to commence on a video.
         """
         # TODO: remove whenever blank SubtitleLanguages become illegal.
@@ -240,16 +245,18 @@ class Rpc(BaseRpc):
                 pk=base_language_pk)
 
         language, can_edit = self._get_language_for_editing(
-            request, video_id, language_code, 
+            request, video_id, language_code,
             subtitle_language_pk, base_language)
 
         if not can_edit:
-            return { "can_edit": False, 
+            return { "can_edit": False,
                      "locked_by" : language.writelock_owner_name }
 
         session = self._make_subtitling_session(
             request, language, base_language)
-        version_for_subs = language.version()
+
+        version_for_subs = language.version(public_only=False)
+
         if not version_for_subs:
             version_for_subs = self._create_version_from_session(session)
             version_no = 0
@@ -312,8 +319,8 @@ class Rpc(BaseRpc):
             return { 'response': 'ok' }
 
 
-    def finished_subtitles(self, request, session_pk, subtitles=None, 
-                           new_title=None, completed=None, 
+    def finished_subtitles(self, request, session_pk, subtitles=None,
+                           new_title=None, completed=None,
                            forked=False,
                            throw_exception=False):
         session = SubtitlingSession.objects.get(pk=session_pk)
@@ -330,9 +337,10 @@ class Rpc(BaseRpc):
         return self.save_finished(
             request.user, session, subtitles, new_title, completed, forked)
 
-    def save_finished(self, user, session, subtitles, new_title=None, completed=None, forked=False):
+    def save_finished(self, user, session, subtitles, new_title=None,
+                      completed=None, forked=False):
         from apps.teams.moderation import is_moderated, user_can_moderate
-        
+
         language = session.language
         new_version = None
         if subtitles is not None and \
@@ -393,14 +401,37 @@ class Rpc(BaseRpc):
 
     def _create_version_from_session(self, session, user=None, forked=False):
         latest_version = session.language.version(public_only=False)
+        forked_from = (forked and latest_version) or None
+        moderation_status = UNMODERATED
+
+        # If there are any open team tasks for this video/language, it needs to
+        # be kept under moderation.
+        team_video = session.language.video.get_team_video()
+        if team_video:
+            tasks = team_video.task_set.incomplete().filter(
+                    Q(language=session.language.language)
+                  | Q(type=Task.TYPE_IDS['Subtitle'])
+            )
+            if tasks:
+                moderation_status = WAITING_MODERATION
+                for task in tasks:
+                    if task.type == Task.TYPE_IDS['Subtitle']:
+                        if not task.language:
+                            task.language = session.language.language
+                            task.save()
+
         kwargs = dict(language=session.language,
-                      version_no=(0 if latest_version is None 
+                      version_no=(0 if latest_version is None
                                   else latest_version.version_no + 1),
-                      is_forked=(session.base_language is 
+                      is_forked=(session.base_language is
                                  None or forked == True),
-                      datetime_started=session.datetime_started)
+                      forked_from=forked_from,
+                      datetime_started=session.datetime_started,
+                      moderation_status=moderation_status)
+
         if user is not None:
             kwargs['user'] = user
+
         return models.SubtitleVersion(**kwargs)
 
     def fetch_subtitles(self, request, video_id, language_pk):
@@ -442,12 +473,12 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
+            task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
-                task.completed = datetime.now()
+                task.complete()
 
-            task.subtitle_language.release_writelock()
-            task.save()
+            task.subtitle_version.language.release_writelock()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
                 user_message =  'These subtitles have been approved and your notes have been sent to the author.'
@@ -456,6 +487,7 @@ class Rpc(BaseRpc):
             else:
                 user_message =  'Your notes have been saved.'
 
+            video_changed_tasks.delay(task.team_video.video_id)
             return {'response': 'ok', 'user_message': user_message}
         else:
             return {'error_msg': _(u'\n'.join(flatten_errorlists(form.errors)))}
@@ -474,22 +506,23 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
+            task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
-                task.completed = datetime.now()
+                task.complete()
 
-            task.subtitle_language.release_writelock()
-            task.save()
+            task.subtitle_version.language.release_writelock()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
                 user_message =  'These subtitles have been approved and your notes have been sent to the author.'
-                api_subtitles_approved.send(task.language.version())
+                api_subtitles_approved.send(task.subtitle_version)
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
                 user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
-                api_subtitles_rejected.send(task.language.version())
+                api_subtitles_rejected.send(task.subtitle_version)
             else:
                 user_message =  'Your notes have been saved.'
 
+            video_changed_tasks.delay(task.team_video.video_id)
             return {'response': 'ok', 'user_message': user_message}
         else:
             return {'error_msg': _(u'\n'.join(flatten_errorlists(form.errors)))}
@@ -515,10 +548,10 @@ class Rpc(BaseRpc):
         elif language.is_forked and base_language:
             return True
         else:
-            return language.standard_language != base_language 
+            return language.standard_language != base_language
 
     def _get_language_for_editing(
-        self, request, video_id, language_code, 
+        self, request, video_id, language_code,
         subtitle_language_pk=None, base_language=None):
 
         video = models.Video.objects.get(video_id=video_id)
@@ -595,7 +628,7 @@ class Rpc(BaseRpc):
 
     def _autoplay_subtitles(self, user, video_id, language_pk, version_no):
         cache =  video_cache.get_subtitles_dict(
-            video_id, language_pk, version_no, 
+            video_id, language_pk, version_no,
             lambda version: self._subtitles_dict(version))
         if cache and cache.get("language", None) is not None:
             cache['language_code'] = cache['language'].language
@@ -624,18 +657,29 @@ class Rpc(BaseRpc):
             base_language,
             language.get_title())
 
-def language_summary( language):
+def language_summary(language, team_video=-1, user=None):
+    if team_video == -1:
+        team_video = language.video.get_team_video()
+
     summary = {
         'pk': language.pk,
         'language': language.language,
         'dependent': language.is_dependent(),
         'subtitle_count': language.subtitle_count,
-        'in_progress': language.is_writelocked }
+        'in_progress': language.is_writelocked,
+        'disabled': False }
+
+    if team_video:
+        tasks = team_video.task_set.incomplete().filter(language=language.language)
+        if tasks:
+            task = tasks[0]
+            if user and user != task.assignee:
+                summary['disabled'] = True
+
     if language.is_dependent():
         summary['percent_done'] = language.percent_done
         if language.real_standard_language():
-            summary['standard_pk'] = \
-                language.real_standard_language().pk
+            summary['standard_pk'] = language.real_standard_language().pk
     else:
         summary['is_complete'] = language.is_complete
     return summary

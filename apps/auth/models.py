@@ -48,6 +48,8 @@ from django.core.mail import send_mail
 from localeurl import patch_reverse
 patch_reverse()
 
+from utils.tasks import send_templated_email_async
+
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 EMAIL_CONFIRMATION_DAYS = getattr(settings, 'EMAIL_CONFIRMATION_DAYS', 3)
 
@@ -66,8 +68,13 @@ class CustomUser(BaseUser):
         max_length=16, choices=ALL_LANGUAGES, blank=True)
     picture = S3EnabledImageField(blank=True, upload_to='pictures/')
     valid_email = models.BooleanField(default=False)
-    changes_notification = models.BooleanField(default=True)
-    follow_new_video = models.BooleanField(default=True)
+    
+    # if true, items that end on the user activity stream will also be
+    # sent as email
+    notify_by_email= models.BooleanField(default=True)
+    # if true, items that end on the user activity stream will also be
+    # sent as a message
+    notify_by_message = models.BooleanField(default=True)
     biography = models.TextField('Tell us about yourself', blank=True)
     autoplay_preferences = models.IntegerField(
         choices=AUTOPLAY_CHOICES, default=AUTOPLAY_ON_BROWSER)
@@ -221,6 +228,10 @@ class CustomUser(BaseUser):
             TeamMember.ROLE_OWNER,
             TeamMember.ROLE_ADMIN,
             TeamMember.ROLE_MANAGER])
+
+    def open_tasks(self):
+        from apps.teams.models import Task
+        return Task.objects.incomplete().filter(assignee=self)
 
     def _get_gravatar(self, size):
         url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.email.lower()).hexdigest() + "?"
@@ -428,13 +439,16 @@ class EmailConfirmationManager(models.Manager):
         except self.model.DoesNotExist:
             return None
         if not confirmation.key_expired():
+            from messages import tasks as notifier
             user = confirmation.user
             user.valid_email = True
             user.save()
+            notifier.email_confirmed.delay(user.pk)
             return user
 
     def send_confirmation(self, user):
         assert user.email
+        from messages.models import Message
         
         self.filter(user=user).delete()
         
@@ -453,10 +467,7 @@ class EmailConfirmationManager(models.Manager):
             "confirmation_key": confirmation_key,
         }
         subject = u'Please confirm your email address for %s' % current_site.name
-        message = render_to_string(
-            "auth/email_confirmation_message.txt", context)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
-                  [user.email])
+        send_templated_email_async(user, subject, "messages/email/email-confirmation.html", context)
         return self.create(
             user=user,
             sent=datetime.now(),

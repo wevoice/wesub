@@ -20,7 +20,7 @@
         {% include 'teams/_tabs.html' %}
     {% endwith %}
 
-    <div class="view grid_9 alpha">
+    <div class="view grid_9 alpha edit-team-video">
         <form method='post' action="." enctype="multipart/form-data">
 
             <h3>{% trans 'Edit video' %}: <em>{% firstof team_video.title team_video.video.title %}</em></h3>
@@ -34,13 +34,17 @@
 
             <div class="grid_4 omega">
                 <fieldset>
-                    {% include "_form_field.html" with field=form.project %}
+                    {% if team.has_projects %}
+                        {% include "_form_field.html" with field=form.project %}
+                    {% else %}
+                        <input type="hidden" name="project" value="{{ team.default_project.id }}" />
+                    {% endif %}
                     {% include "_form_field.html" with field=form.thumbnail %}
                 </fieldset>
             </div>
 
             {% if form.is_moderated_by_other_team %}
-                {% blocktrans %} This video is being moderated by team {% endblocktrans %} <a href="{% url teams:detail slug=form.is_moderated_by_other_team.slug %}">{{form.is_moderated_by_other_team}}</a>.
+                {% trans 'This video is being moderated by team' %} <a href="{% url teams:detail slug=form.is_moderated_by_other_team.slug %}">{{form.is_moderated_by_other_team}}</a>.
             {% endif %}
 
             <div class="grid_9 submit">
@@ -48,6 +52,16 @@
             </div>
             {% csrf_token %}
         </form>
+    </div>
+    <div class="controls grid_3 omega">
+        <ul>
+            <li class="current">
+                <a href="{% url teams:team_video team_video_pk=team_video.pk %}">{% trans 'Edit video form' %}</a>
+            </li>
+            <li>
+                <a href="{{ team.get_absolute_url }}">← {% trans 'Back to videos' %}</a>
+            </li>
+        </ul>
     </div>
     <script type="text/javascript">
       {% include "teams/team_video.js" %}

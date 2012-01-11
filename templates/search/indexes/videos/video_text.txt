@@ -11,5 +11,5 @@
     {{ lang.language_display }}
     {% for item in lang.latest_subtitles %}
         {{ item.text }}
-    {% endfor %}    
+    {% endfor %}
 {% endfor %}

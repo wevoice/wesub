@@ -1,0 +1,49 @@
+{% extends "teams/base.html" %}
+{% load i18n teams_tags %}
+
+{% block title %}
+    {{ team }} {% trans 'Settings' %} | Universal Subtitles
+{% endblock %}
+
+{% block view_content %}
+    {% include "utils/chosenify.html" %}
+    {% with "settings" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        <form class="team-settings" enctype="multipart/form-data" method="POST" action="">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+
+            <div class="grid_4 alpha">
+                <fieldset>
+                    <legend>{% trans 'Preferred Languages' %}</legend>
+                    <p class="notation">{% trans 'Translation tasks will be auto-created for these languages' %}</p>
+                    {{ form.preferred }}
+                </fieldset>
+            </div>
+
+            <div class="grid_4 omega">
+                <fieldset>
+                    <legend>{% trans 'Blacklisted Languages' %}</legend>
+                    <p class="notation">{% trans 'Will not be shown when creating or performing tasks' %}</p>
+                    {{ form.blacklisted }}
+                </fieldset>
+            </div>
+
+            <div class="grid_9 submit">
+                <input type="submit" class="submit save" value="Save Changes" name="save" />
+            </div>
+        </form>
+    </div>
+
+    <div class="controls grid_3 omega ">
+        {% with "languages" as current_sub %}
+            {% include "teams/_filters_settings.html" %}
+        {% endwith %}
+
+        {% include "teams/_actions.html" %}
+    </div>
+
+{% endblock %}

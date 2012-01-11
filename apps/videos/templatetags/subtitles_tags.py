@@ -58,14 +58,19 @@ def paste_transcription(context):
     return context
 
 @register.simple_tag
-def complete_indicator(language):
+def complete_indicator(language, mode='normal'):
     if language.is_original or language.is_forked:
         if language.is_complete and language.subtitle_count > 0:
-            return "100 %"
+            return "100%"
+        if mode == 'pct':
+            if language.subtitle_count == 0:
+                return "0%"
+            else:
+                return "??"
         v = language.version()
         count = v and v.subtitle_set.count() or 0
         return ungettext('%(count)s Line', '%(count)s Lines', count) % {'count': count}
-    return '%i %%' % language.percent_done
+    return '%i%%' % language.percent_done
 
 @register.simple_tag
 def complete_color(language):
@@ -105,7 +110,7 @@ def language_url(request, lang):
     and if the video is private or public.
     """
     vid = VideoVisibilityPolicy.objects.id_for_video(lang.video)
-    if lang.is_original:
+    if lang.is_original or lang.language == u"":
         return  reverse('videos:history', args=[vid])
     else:
         return  reverse('videos:translation_history', args=[vid, lang.language, lang.pk])

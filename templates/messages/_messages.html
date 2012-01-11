@@ -5,7 +5,7 @@
         You have {{ msg_count }} new messages.
     {% endblocktrans %}
     <a href="{% url messages:index %}">{% trans 'View all' %}</a>
-    <a href="#" class="hide-messages" style="float: right; font-size: 0.8em">{% trans "hide" %}</a>
+    <a href="#" class="hide-messages">{% trans "Hide" %}</a>
     <script type="text/javascript">
         $('.note .hide-messages').click(function(){
             var $this = $(this);

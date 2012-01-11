@@ -1,0 +1,178 @@
+{% extends "teams/base.html" %}
+{% load i18n teams_tags paginator doorman media_compressor %}
+
+{% block title %}
+    {{ team }} {% trans 'Settings' %} | Universal Subtitles
+{% endblock %}
+
+{% block view_content %}
+    {% with "settings" as current %}
+        {% include "teams/_tabs.html" %}
+    {% endwith %}
+
+    <div class="view grid_9 alpha">
+        <form class="permissions" action="" method="POST">
+            {% csrf_token %}
+
+            <div class="grid_4 alpha messages">
+                <fieldset>
+                    <legend>{% trans 'Team Management' %}</legend>
+                    <label for="id_membership_policy">{% trans 'How can users join your team?' %}</label>
+                    {{ form.membership_policy }}
+
+                    <label for="id_video_policy">{% trans 'Who can add/remove videos?' %}</label>
+                    {{ form.video_policy }}
+                </fieldset>
+            </div>
+            <div class="grid_4 omega guidelines">
+                <fieldset>
+                    <legend>{% trans 'Tasks' %}</legend>
+
+                    <p class="notation">{% trans 'Manage subtitling and translation work for your videos' %}</p>
+                    <label for="id_task_assign_policy">{% trans 'Who can create and assign tasks?' %}</label>
+                    {{ form.task_assign_policy }}
+                    <p class="notation">{% trans 'Specified members will only be able to create/assign tasks they are permitted to complete themselves' %}</p>
+                </fieldset>
+            </div>
+            <div class="grid_9" id="summary">
+                <h4>{% trans 'How your subtitles will get published <em>(configure below)</em>' %}</h4>
+                <div class="grid_2">
+                    <h5>{% trans 'Subtitled' %}</h5>
+                    <p id="perm-sub"><p>
+                    <p class="divider">{% trans 'or ...' %}</p>
+                    <h5>{% trans 'Translated' %}</h5>
+                    <p id="perm-trans"></p>
+                    <span>→</span>
+                </div>
+                <div class="grid_2" id="review-step">
+                    <h5>{% trans 'Reviewed' %}</h5>
+                    <p id="perm-rev"></p>
+                    <span>→</span>
+                </div>
+                <div class="grid_2" id="approve-step">
+                    <h5>{% trans 'Approved' %}</h5>
+                    <p id="perm-app"></p>
+                    <span>→</span>
+                </div>
+                <div class="grid_2 omega">
+                    <h5>{% trans 'Published' %}</h5>
+                </div>
+            </div>
+
+            <div class="grid_4 alpha messages">
+                <fieldset>
+                    <legend>{% trans 'Subtitling' %}</legend>
+
+                    <label for="id_subtitle_policy">{% trans 'Who can create subtitles?' %}</label>
+                    <p class="notation">{% trans 'i.e. transcribe from video and perform time-alignment' %}</p>
+                    {{ form.subtitle_policy }}
+
+                    <label for="id_translate_policy">{% trans 'Who can translate subtitles?' %}</label>
+                    <p class="notation">{% trans 'i.e. translate text from an original subtitle into a new language' %}</p>
+                    {{ form.translate_policy }}
+                </fieldset>
+            </div>
+            <div class="grid_4 omega guidelines">
+                <fieldset>
+                    <legend>{% trans 'Workflows' %}</legend>
+                    <p class="notation">{% trans 'Workflows enable you to add moderation steps and automate tasks' %}</p>
+                    <label for="id_workflow_enabled">{{ form.workflow_enabled }} {% trans 'Enable workflows' %}</label>
+                </fieldset>
+
+                <div class="workflow">
+                    <fieldset id="workflow">
+                        <label for="id_autocreate_subtitle">
+                            {{ workflow_form.autocreate_subtitle }}
+                            {% trans 'Automatically create subtitle tasks' %}
+                        </label>
+
+                        <label for="id_autocreate_translate">
+                            {{ workflow_form.autocreate_translate }}
+                            {% trans 'Automatically create translation tasks for preferred languages' %} (<a href="{% url teams:settings_languages slug=team.slug %}">{% trans 'manage languages' %}</a>)
+                        </label>
+
+                        <label for="id_review_allowed">{% trans 'Review' %}</label>
+                        {{ workflow_form.review_allowed }}
+
+                        <label for="id_approve_allowed">{% trans 'Approval' %}</label>
+                        {{ workflow_form.approve_allowed }}
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="grid_9 submit">
+                <input type="submit" class="submit save" value="{% trans 'Save Changes' %}" name="save" />
+            </div>
+        </form>
+    </div>
+
+    <div class="controls grid_3 omega ">
+        {% with "permissions" as current_sub %}
+            {% include "teams/_filters_settings.html" %}
+        {% endwith %}
+
+        {% include "teams/_actions.html" %}
+    </div>
+
+    <script type="text/javascript">
+        $(window).load(function(){
+            $workflow = $('#id_workflow_enabled');
+            
+            // Fields to watch
+            $subperm = $('#id_subtitle_policy');
+            $transperm = $('#id_translate_policy');
+            $revperm = $('#id_review_allowed');
+            $appperm = $('#id_approve_allowed');
+
+            // Inspect/observe the workflow checkbox
+            if ($workflow.attr('checked')) {
+                $('.v1 .workflow').show();
+            }
+            $workflow.change(function() {
+                if ($workflow.attr('checked')) {
+                    $('.v1 .workflow').show();
+                    $revperm.trigger('change');
+                    $appperm.trigger('change');
+                } else {
+                    $('.v1 .workflow').hide();
+                    $('#review-step').hide();
+                    $('#approve-step').hide();
+                }
+            });
+
+            // Observe the permissions fields
+            $subperm.change(function() {
+                $('#perm-sub').html($subperm.children('option:selected').html());
+            });
+            $transperm.change(function() {
+                $('#perm-trans').html($transperm.children('option:selected').html());
+            });
+            $revperm.change(function() {
+                if($revperm.children('option:selected').val() != 0){
+                    $('#review-step').show();
+                    $('#perm-rev').html($revperm.children('option:selected').html());
+                } else {
+                    $('#review-step').hide();
+                }
+            });
+            $appperm.change(function() {
+                if($appperm.children('option:selected').val() != 0){
+                    $('#approve-step').show();
+                    $('#perm-app').html($appperm.children('option:selected').html());
+                } else {
+                    $('#approve-step').hide();
+                }
+            });
+
+            // Load state
+            $subperm.trigger('change');
+            $transperm.trigger('change');
+            $revperm.trigger('change');
+            $appperm.trigger('change');
+        });
+    </script>
+
+    <script id="IMAGE_PRELOADER" type="text/html">
+        <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
+    </script>
+{% endblock %}

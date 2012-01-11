@@ -29,7 +29,7 @@ urlpatterns = patterns('profiles.views',
     url(r'^send_message/$', 'send_message', name='send_message'),
     url(r'^edit_avatar/$', 'edit_avatar', name='edit_avatar'),
     url(r'^remove_avatar/$', 'remove_avatar', name='remove_avatar'),
-    url(r'^activities/(?P<user_id>.+)/$', 'actions_list', name='actions_list'),
+    url(r'^activities/$', 'actions_list', name='actions_list'),
     url(r'^profile/(?P<user_id>.+)/$', 'profile', name='profile'),
     url(r'^generate-api-key/$', 'generate_api_key', name='generate-api-key'),
 )

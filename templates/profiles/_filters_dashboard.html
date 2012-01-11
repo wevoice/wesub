@@ -1,0 +1,13 @@
+{% load i18n %}
+
+<ul>
+    <li{% if current = 'overview' %} class="current"{% endif %}>
+    	<a href="{% url profiles:dashboard %}">{% trans 'Overview' %}</a>
+    </li>
+    <li{% if current = 'activity' %} class="current"{% endif %}>
+    <a href="{% url profiles:actions_list %}">{% trans 'Recent Activity' %}</a>
+    </li>
+    <li{% if current = 'videos' %} class="current"{% endif %}>
+    	<a href="{% url profiles:my_videos %}">{% trans 'My Videos' %}</a>
+    </li>
+</ul>

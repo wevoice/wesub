@@ -1,11 +1,23 @@
 {% extends "teams/base.html" %}
-{% load i18n teams_tags paginator doorman media_compressor verbatim_templatetag %}
+{% load to_json i18n teams_tags paginator doorman media_compressor verbatim_templatetag query_string utils_tags %}
+
+{% block css %}
+    {{ block.super }}
+    {% include_bundle "widget-css"%}
+{% endblock %}
 
 {% block scripts %}
     {{ block.super }}
     {% include "utils/chosenify.html" %}
-    {% include_bundle "js-teams-tasks-panel" %}
+
+    {% include_bundle "unisubs-offsite-compiled" %}
+    {% include_bundle "js-teams" %}
+
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
+    </script>
 {% endblock %}
 
 {% block title %}
@@ -19,174 +31,317 @@
     {% endwith %}
 
     <div class="panel-holder view grid_9 alpha">
+        {% if filters.team_video != None %}
+            {% can_create_any_task_for_teamvideo filters.team_video request.user %}
+            {% if user_can_create_any_task %}
+                <div class="tools">
+                    <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">{% trans 'Add Task' %}</a>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if filters.assignee or filters.language or filters.type or filters.team_video %}
+            <p class="active-filters">{% trans 'Showing' %}
+                {% if filters.assignee == 'none' %}
+                    <strong>{% trans 'unassigned' %}</strong>
+                {% endif %}
+                {% if filters.language %}
+                    <strong>{{ filters.language|lang_name_from_code }}</strong> {% trans 'language' %} {% endif %}
+                {% if filters.type %}
+                    <strong>{{ filters.type }}</strong>
+                {% endif %}
+                {% trans 'tasks' %}
+                {% if filters.team_video %}
+                    {% trans 'for' %} <strong>{{ filters.team_video }}</strong>
+                {% endif %}
+                {% if filters.assignee and filters.assignee != 'none' %}
+                    {% trans 'assigned to' %} <strong>{{ filters.assignee }}</strong>
+                {% endif %}
+                <a href="{{ request.path }}{% query_string request.GET type="" lang="" assignee="" %}" class="clear-filters">{% trans 'Clear all filters' %}</a>
+            </p>
+        {% endif %}
+
+        <ul class="tasks listing">
+            {% for task in tasks %}
+                <li>
+                    <h3>
+                        {% if task.get_type_display == "Subtitle" %}
+                            {% trans 'New' %}
+                        {% else %}
+                            {{ task.get_type_display }}
+                        {% endif %}
+                        {% if task.get_type_display == "Translate" %}
+                            {% trans 'Subtitles into' %} {{ task.get_language_display }}
+                        {% else %}
+                            {% if task.get_language_display %}
+                                {{ task.get_language_display }}
+                            {% endif %}
+                            {% trans 'Subtitles' %}
+                        {% endif %}
+                    </h3>
+                    <p>{% trans "Video" %}: {{ task.team_video|truncatewords:8 }}</p>
+                    <p class="steps">
+                        <span{% if task.get_type_display == "Subtitle" %} class="current"{% endif %}>{% trans 'Subtitle' %}</span>/<span{% if task.get_type_display == "Translate" %} class="current"{% endif %}>{% trans 'Translate' %}</span>
+                        {% if task.workflow.review_enabled %}
+                            →
+                            <span{% if task.get_type_display == "Review" %} class="current"{% endif %}>{% trans 'Review' %}</span>
+                        {% endif %}
+                        {% if task.workflow.approve_enabled %}
+                            →
+                            <span{% if task.get_type_display == 'Approve' %} class="current"{% endif %}>{% trans 'Approve' %}</span>
+                        {% endif %}
+                        →
+                        {% trans 'Published' %}
+                    </p>
+                    <ul class="actions">
+                        <li>
+                            <h4>
+                                {% if task.assignee %}
+                                    {% trans 'Assigned to' %}
+                                    {% if task.assignee == user %}
+                                        {% trans 'you' %}
+                                    {% else %}
+                                         {{ task.assignee }}
+                                    {% endif %}
+                                {% else %}
+                                    {% trans 'Unassigned' %}
+                                {% endif %}
+                            </h4>
+                        </li>
+
+                        {% if task|can_perform_task:user %}
+                            {% if task.assignee == user %}
+                                <li>
+                                    {% include "teams/_perform_task_link.html" %}
+                                </li>
+                            {% else %}
+                                {% if task.assignee == None %}
+                                    <li>
+                                        <a class="assign-and-perform" href="#">{% trans 'Perform Task' %}<span class="task-id" style="display: none;">{{ task.pk }}</span></a>
+                                    </li>
+                                    <li style="display: none;">
+                                        {% include "teams/_perform_task_link.html" %}
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+
+                    {% if task|can_delete_task:user or task|can_assign_task:user %}
+                        <ul class="admin-controls">
+                            {% if task|can_assign_task:user %}
+                                <li>
+                                    <a class="action-assign" href="#">
+                                        {% if task.assignee %}
+                                            {% trans 'Reassign' %}
+                                        {% else %}
+                                            {% trans 'Assign' %}
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if task|can_delete_task:user %}
+                                <li>
+                                    <form action="{% url teams:delete_task slug=team.slug %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+
+                                        <input type="hidden" name="task" value="{{ task.pk }}" />
+                                        <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">{% trans 'Remove' %}</a>
+                                    </form>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+
+                    {% if task|can_assign_task:user %}
+                        <form class="assign-form" action="{% url teams:assign_task slug=team.slug %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+
+                            <input type="hidden" name="task" value="{{ task.id }}" />
+                            <input type="hidden" name="task_type" value="{{ task.type }}" />
+                            <input type="hidden" name="task_lang" value="{{ task.language }}" />
+                            <input type="hidden" name="team_video" value="{{ task.team_video }}" />
+
+                            <div class="assignee-choice" style="display: none;">
+                                <a class="cancel" href="#">{% trans 'Cancel' %}</a>
+                                <div class="member-ajax-chosen">
+                                    <select name="assignee">
+                                        <option value="">-----</option>
+                                        <option value="" class="begin-typing-trans">{% trans 'Begin typing to search' %}</option>
+                                    </select>
+                                </div>
+                                <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">{% trans 'Assign to User' %}</a>
+                            </div>
+                        </form>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li class="empty">{% trans 'Sorry, no tasks here.' %}</li>
+            {% endfor %}
+        </ul>
+
+        {% if is_paginated %}{% paginator %}{% endif %}
     </div>
 
     <div class="controls grid_3 omega">
-
-        <form id="tasks_type_filter"></form>
+        <form id="tasks_type_filter">
+            <ul class="types">
+                <li class="type {% if not request.GET.type %}current{% endif %}">
+                    <a href="{{ request.path }}{% query_string request.GET type="" %}">
+                        {% trans "All Pending" %}
+                        <span class="all">{{ category_counts.all }}</span>
+                    </a>
+                </li>
+                <li class="type {% if request.GET.type == "Subtitle" %}current{% endif %}">
+                    <a href="{% query_string request.GET type="Subtitle" %}">
+                        {% trans "Subtitle" %}
+                        <span class="subtitle">{{ category_counts.subtitle }}</span>
+                    </a>
+                </li>
+                <li class="type {% if request.GET.type == "Translate" %}current{% endif %}">
+                    <a href="{% query_string request.GET type="Translate" %}">
+                        {% trans "Translate" %}
+                        <span class="translate">{{ category_counts.translate }}</span>
+                    </a>
+                </li>
+                {% if team|review_enabled %}
+                    <li class="type {% if request.GET.type == "Review" %}current{% endif %}">
+                        <a href="{% query_string request.GET type="Review" %}">
+                            {% trans "Review" %}
+                            <span class="review">{{ category_counts.review }}</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if team|approve_enabled %}
+                    <li class="type {% if request.GET.type == "Approve" %}current{% endif %}">
+                        <a href="{% query_string request.GET type="Approve" %}">
+                            {% trans "Approve" %}
+                            <span class="approve">{{ category_counts.approve }}</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </form>
 
         <div class="refine">
-            <form id="tasks_language_filter">
-                <h4>Refine</h4>
+            <h4>{% trans "Search and Filter" %}</h4>
+
+            <form action="" method="get">
+                <select id="id_task_language" name="language" class="lang-filter chosen">
+                    <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'All Languages' %}</option>
+                    {% for language in languages %}
+                        <option value="{% query_string request.GET lang=language.code %}"
+                            {% if request.GET.lang == language.code %}
+                                selected="selected"
+                            {% endif %}>
+                            {{ language.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+
+            <form action="" method="get">
+                <select name="assignee" class="assignee-filter">
+                    <option value="{{ request.path }}{% query_string request.GET assignee="" %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'All Assignees' %}</option>
+                    <option value="{% query_string request.GET assignee="me" %}" {% if request.GET.assignee == "me" %}selected="selected"{% endif %}>{% trans 'Assigned to me' %}</option>
+                    <option value="{% query_string request.GET assignee="none" %}" {% if request.GET.assignee == "none" %}selected="selected"{% endif %}>{% trans 'Unassigned' %}</option>
+                </select>
             </form>
         </div>
 
         {% include "teams/_actions.html" %}
     </div>
 
-<script type="text/javascript">
-$(window).load(function() {
-    {% include "teams/panel-base.js" %}
-    {% include "teams/tasks-panel.js" %}
-});
-</script>
+    <script type="text/javascript">
+        $(function() {
 
-<!-- templates -->
-<script id="IMAGE_PRELOADER" type="text/html">
-  <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
-</script>
+            $('select.lang-filter, select.assignee-filter', '.controls').change(function(e) {
+                var url = $(this).children('option:selected').attr('value');
+                window.location = url;
+            });
 
-{% verbatim %}
+            $('a.action-assign').click(function(e) {
 
-<script id="subMenuItem" type="text/html">
-  <li><a >{{label}}</a></li>
-</script>
+                $('div.assignee-choice').hide();
 
-<script id="tasksLanguagesList" type="text/html">
-    <select id="id_task_language" name="language" class="chosen">
-        <option value="">All Languages</option>
-    </select>
-</script>
+                $form = $(e.target).parents('.admin-controls').siblings('form.assign-form');
 
-<script id="tasksLanguagesListOption" type="text/html">
-    <option value="{{ language }}">{{ language_display }}</option>
-</script>
+                $assignee_choice = $form.children('div.assignee-choice');
+                $assignee_choice.fadeIn('fast');
 
-<script id="tasksTypesList" type="text/html">
-    <ul class="types">
-        <li class="type current">
-            <a href="#">
-                All Pending
-                <span class="all"></span>
-            </a>
-            <input type="hidden" name="type" value="" />
-        </li>
-        <li class="type">
-            <a href="#">
-                Review
-                <span class="review"></span>
-            </a>
-            <input type="hidden" name="type" value="Review" />
-        </li>
-        <li class="type">
-            <a href="#">
-                Approve
-                <span class="approve"></span>
-            </a>
-            <input type="hidden" name="type" value="Approve" />
-        </li>
-        <li class="type">
-            <a href="#">
-                Translate
-                <span class="translate"></span>
-            </a>
-            <input type="hidden" name="type" value="Translate" />
-        </li>
-        <li class="type">
-            <a href="#">
-                Subtitle
-                <span class="subtitle"></span>
-            </a>
-            <input type="hidden" name="type" value="Subtitle" />
-        </li>
-    </ul>
-</script>
+                // Reset select options on rebuild.
+                if (!window.begin_typing_trans) {
+                    window.begin_typing_trans = $('option.begin-typing-trans').eq(0).text();
+                }
+                $select = $form.find('select');
+                $select.children('option').remove();
+                $select.append('<option value="">-----</option>');
+                $select.append('<option value="">' + window.begin_typing_trans + '</option>');
+                $select.trigger('liszt:updated');
 
-<script id="tasksListItem" type="text/html">
-    <h3>
-        {{ #languageDisplay}}
-            Translate to {{ languageDisplay }}:
-        {{ /languageDisplay}}
+                $chzn_container = $assignee_choice.find('.chzn-container');
+                $chzn_container.css('width', '100%')
 
-        {{ ^languageDisplay}}
-            Transcribe:
-        {{ /languageDisplay}}
-        <a href="{{ teamVideoUrl }}">{{ teamVideoDisplay }}</a>
-        <span class="descriptor">
-            {{ #ghost }}
-                <b>GHOST</b>
-            {{ /ghost }}
-            {{ #completed }}
-                <b>COMPLETED</b>
-            {{ /completed }}
-        </span>
-    </h3>
-    <p class="done">
-        <span>
-            {{ #steps }}
-                {{ #done }}
-                    &#x25FC;
-                {{ /done }}
-                {{ ^done }}
-                    &#x25FB;
-                {{ /done }}
-            {{ /steps }}
-        </span>
+                $chzn_drop = $chzn_container.find('.chzn-drop')
+                $chzn_drop.css('width', '99%')
 
-        {{ stepDisplay }}
-    </p>
-    <ul class="actions">
-        <li>
-            {{ #assigneeDisplay }}
-                Assigned to {{ assigneeDisplay }}
-            {{ /assigneeDisplay }}
+                $chzn_input = $chzn_drop.find('input')
+                $chzn_input.css('width', '82%');
 
-            {{ #assignAllowed }}
-                <form action="" method="post">
-                    <a class="action-assign" href="#">
-                        {{ #assigneeDisplay }}
-                            Reassign
-                        {{ /assigneeDisplay }}
-                        {{ ^assigneeDisplay }}
-                            Assign
-                        {{ /assigneeDisplay }}
-                    </a>
-                    <div class="assignee-choice" style="display: none;">
-                        {% endverbatim %}
-                            {{ assign_form.assignee }}
-                        {% verbatim %}
-                        <a class="action-assign-submit" href="#">Assign to User</a>
-                    </div>
-                </form>
-            {{ /assignAllowed }}
+                return false;
+            });
+            $('.assignee-choice a.cancel').click(function(e) {
+                $(e.target).parents('.assignee-choice').fadeOut('fast');
+                return false;
+            });
 
-            {{ ^assigneeDisplay }}
-                <form action="{{ performUrl }}" method="post">
-                    {% endverbatim %}
-                        {% csrf_token %}
-                    {% verbatim %}
-                    <input type="hidden" name="task_id" value="{{ pk }}" />
+            $('a.action-assign-submit, a.action-delete').click(function(e) {
+                $(e.target).closest('form').submit();
+                return false;
+            });
 
-                    {{ #performAllowed }}
-                        <a class="perform" href="{{ performUrl }}">Perform Task</a>
-                    {{ /performAllowed }}
-                </form>
-            {{ /assigneeDisplay }}
-        </li>
-    </ul>
-    {{ #deleteAllowed }}
-        <ul class="admin-controls">
-            <li>
-                <a class="action-delete" href="#">Remove</a>
-            </li>
-        </ul>
-    {{ /deleteAllowed }}
-</script>
+            $('a.assign-and-perform').click(function(e) {
+                var target = $(e.target);
 
-<script id="tasksPanel" type="text/html">
-    <ul class="tasks listing"></ul>
-    <div class="pagination"></div>
-</script>
+                $.ajax({
+                    url: '{% url teams:assign_task_ajax slug=team.slug %}',
+                    type: 'POST',
+                    data: {
+                        task: target.find('span.task-id').text(),
+                        assignee: {% firstof request.user.id -1 %}
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        target.hide();
+                        target.closest('ul').find('a.perform').closest('li').show().find('.perform').click();
+                    }
+                });
 
-{% endverbatim %}
+                return false;
+            });
+
+            $("div.member-ajax-chosen select", ".v1 .content").ajaxChosen({
+                method: 'GET',
+                url: '/en/teams/{{ team.slug }}/members/search/',
+                dataType: 'json'
+            }, function (data) {
+                var terms = {};
+
+                $.each(data.results, function (i, val) {
+                    var can_perform_task = data.results[i][2];
+
+                    if (can_perform_task) {
+                        terms[data.results[i][0]] = data.results[i][1];
+                    }
+                });
+
+                return terms;
+            });
+        });
+    </script>
+
+    <script id="IMAGE_PRELOADER" type="text/html">
+        <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
+    </script>
 {% endblock %}

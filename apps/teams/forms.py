@@ -25,37 +25,23 @@ from django.conf import settings
 from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS
 from videos.forms import AddFromFeedForm
 from django.utils.safestring import mark_safe
-from utils.forms import AjaxForm, ErrorableModelForm
+from utils.forms import ErrorableModelForm
 import re
 from utils.translation import get_languages_list
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from teams.permissions import can_assign_task
 
 from apps.teams.moderation import add_moderation, remove_moderation
-from apps.teams.permissions import roles_user_can_invite, can_delete_task
+from apps.teams.permissions import roles_user_can_invite, can_delete_task, can_add_video, can_perform_task
 from apps.teams.permissions_const import ROLE_NAMES
 
 from doorman import feature_is_on
 
 
-class EditLogoForm(forms.ModelForm, AjaxForm):
-    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
-
-
-    class Meta:
-        model = Team
-        fields = ('logo',)
-
-    def clean(self):
-        if 'logo' in self.cleaned_data and not self.cleaned_data.get('logo'):
-            del self.cleaned_data['logo']
-        return self.cleaned_data
-
 class EditTeamVideoForm(forms.ModelForm):
     author = forms.CharField(max_length=255, required=False)
     creation_date = forms.DateField(required=False, input_formats=['%Y-%m-%d'],
                                     help_text="Format: YYYY-MM-DD")
-
 
     project = forms.ModelChoiceField(
         label=_(u'Project'),
@@ -184,18 +170,18 @@ class BaseVideoBoundForm(forms.ModelForm):
             self.fields['video_url'].user = self.user
 
 class AddTeamVideoForm(BaseVideoBoundForm):
-    language = forms.ChoiceField(label=_(u'Video language'), choices=settings.ALL_LANGUAGES,
+    language = forms.ChoiceField(label=_(u'Video language'), choices=(),
                                  required=False,
                                  help_text=_(u'It will be saved only if video does not exist in our database.'))
-
 
     project = forms.ModelChoiceField(
         label=_(u'Project'),
         queryset = Project.objects.none(),
-        required=False,
+        required=True,
         empty_label=None,
         help_text=_(u"Let's keep things tidy, shall we?")
     )
+
     class Meta:
         model = TeamVideo
         fields = ('video_url', 'language', 'title', 'description', 'thumbnail', 'project',)
@@ -204,14 +190,24 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.team = team
         self.user = user
         super(AddTeamVideoForm, self).__init__(*args, **kwargs)
-        self.fields['language'].choices = get_languages_list(True)
-        
+
+
         projects = self.team.project_set.all()
+
+        if len(projects) > 1:
+            projects = projects.exclude(slug='_root')
+
         self.fields['project'].queryset = projects
 
         ordered_projects = ([p for p in projects if p.is_default_project] +
                             [p for p in projects if not p.is_default_project])
+        ordered_projects = [p for p in ordered_projects if can_add_video(team, user, p)]
+
         self.fields['project'].choices = [(p.pk, p) for p in ordered_projects]
+
+        writable_langs = team.get_writable_langs()
+        self.fields['language'].choices = [c for c in get_languages_list(True)
+                                           if c[0] in writable_langs]
 
     def clean_video_url(self):
         video_url = self.cleaned_data['video_url']
@@ -225,13 +221,15 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         return video_url
 
     def clean(self):
-        language = self.cleaned_data['language']
+        language = self.cleaned_data.get('language')
         video = self.fields['video_url'].video
-        original_sl = video.subtitle_language()
 
-        if video and (original_sl and not original_sl.language) and not language:
-            msg = _(u'Set original language for this video.')
-            self._errors['language'] = self.error_class([msg])
+        if video:
+            original_sl = video.subtitle_language()
+
+            if (original_sl and not original_sl.language) and not language:
+                msg = _(u'Set original language for this video.')
+                self._errors['language'] = self.error_class([msg])
 
         return self.cleaned_data
 
@@ -298,7 +296,7 @@ class CreateTeamForm(BaseVideoBoundForm):
 
     class Meta:
         model = Team
-        fields = ('name', 'slug', 'description', 'logo', 'membership_policy', 'is_moderated', 'video_policy',
+        fields = ('name', 'slug', 'description', 'logo', 'is_moderated',
                   'is_visible', 'video_url')
 
     def __init__(self, user, *args, **kwargs):
@@ -328,68 +326,22 @@ Enter a link to any compatible video, or to any video page on our site.''')
         TeamMember.objects.create_first_member(team=team, user=user)
         return team
 
-class EditTeamForm(BaseVideoBoundForm):
-    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
 
-    class Meta:
-        model = Team
-        fields = ('name', 'description', 'logo',
-                  'membership_policy', 'is_moderated', 'video_policy',
-                  'is_visible', 'video_url', 'application_text',
-                  'page_content')
-
-    def __init__(self, *args, **kwargs):
-        super(EditTeamForm, self).__init__(*args, **kwargs)
-        self.fields['video_url'].label = _(u'Team intro video URL')
-        self.fields['video_url'].required = False
-        self.fields['video_url'].help_text = _(u'''You can put an optional video
-on your team homepage that explains what your team is about, to attract volunteers.
-Enter a link to any compatible video, or to any video page on our site.''')
-        self.fields['is_visible'].widget.attrs['class'] = 'checkbox'
-        self.fields['is_moderated'].widget.attrs['class'] = 'checkbox'
-
-    def clean(self):
-        if 'logo' in self.cleaned_data:
-            #It is saved with edit_logo view
-            del self.cleaned_data['logo']
-        return self.cleaned_data
-
-    def save(self):
-        team = super(EditTeamForm, self).save(False)
-        video = self.fields['video_url'].video
-        if video:
-            team.video = video
-        team.save()
-
-        if team.is_open():
-            for item in team.applications.all():
-                item.approve()
-        return team
-
-class EditTeamFormAdmin(EditTeamForm):
-    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
-
-    class Meta:
-        model = Team
-        fields = ('name', 'header_html_text', 'description', 'logo',
-                  'membership_policy', 'is_moderated', 'video_policy',
-                  'is_visible', 'video_url', 'application_text',
-                  'page_content')
-
-
-class CreateTaskForm(ErrorableModelForm):
+class TaskCreateForm(ErrorableModelForm):
     type = forms.TypedChoiceField(choices=Task.TYPE_CHOICES, coerce=int)
     language = forms.ChoiceField(choices=(), required=False)
     assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
     def __init__(self, user, team, team_video, *args, **kwargs):
-        super(CreateTaskForm, self).__init__(*args, **kwargs)
+        super(TaskCreateForm, self).__init__(*args, **kwargs)
 
         self.user = user
         self.team_video = team_video
 
         team_user_ids = team.members.values_list('user', flat=True)
-        self.fields['language'].choices = get_languages_list(True)
+
+        langs = [l for l in get_languages_list(True) if l[0] in team.get_writable_langs()]
+        self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
 
@@ -408,6 +360,12 @@ class CreateTaskForm(ErrorableModelForm):
         if not self.team_video.subtitles_finished():
             self.add_error(_(u"No one has subtitled this video yet, so it can't be translated."),
                            'type', cleaned_data)
+            return
+
+        sl = self.team_video.video.subtitle_language(cleaned_data['language'])
+        if sl and sl.is_complete_and_synced():
+            self.add_error(_(u"This language already has a complete set of subtitles."),
+                           'language', cleaned_data)
             return
 
     def _check_task_creation_review(self, tasks, cleaned_data):
@@ -439,7 +397,7 @@ class CreateTaskForm(ErrorableModelForm):
 
         type = cd['type']
         lang = cd['language']
-        assignee = cd['language']
+        assignee = cd['assignee']
 
         team_video = self.team_video
         project, team = team_video.project, team_video.team
@@ -451,8 +409,8 @@ class CreateTaskForm(ErrorableModelForm):
             self.add_error(_(u"There is already a task in progress for that video/language."))
 
         if assignee:
-            # TODO
-            # if not can_assign_tasks(team, self.user, project, lang):
+            # TODO: Check perms
+            # if not can_assign_task(task, self.user):
             #     self.add_error(_(u"You are not allowed to assign this task."),
             #                    'assignee', cd)
             pass
@@ -475,35 +433,42 @@ class CreateTaskForm(ErrorableModelForm):
         model = Task
         fields = ('type', 'language', 'assignee')
 
-
 class TaskAssignForm(forms.Form):
-    task = forms.ModelChoiceField(queryset=Task.objects.all())
-    assignee = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
+    task = forms.ModelChoiceField(queryset=Task.objects.none())
+    assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
     def __init__(self, team, user, *args, **kwargs):
         super(TaskAssignForm, self).__init__(*args, **kwargs)
 
         self.team = team
         self.user = user
-        self.fields['assignee'].queryset = User.objects.filter(user__team=team)
+        self.fields['assignee'].queryset = User.objects.filter(team_members__team=team)
         self.fields['task'].queryset = team.task_set.incomplete()
 
 
     def clean(self):
         task = self.cleaned_data['task']
+        assignee = self.cleaned_data['assignee']
 
-        if not can_assign_task(task, self.user):
+        if not can_assign_task(task, self.user) and self.user != assignee:
             raise forms.ValidationError(_(
                 u'You do not have permission to assign this task.'))
+
+        if not can_perform_task(assignee, task):
+            raise forms.ValidationError(_(
+                u'This user cannot perform that task'))
 
         return self.cleaned_data
 
 class TaskDeleteForm(forms.Form):
     task = forms.ModelChoiceField(queryset=Task.objects.all())
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, team, user, *args, **kwargs):
+        super(TaskDeleteForm, self).__init__(*args, **kwargs)
+
         self.user = user
-        return super(TaskDeleteForm, self).__init__(*args, **kwargs)
+
+        self.fields['task'].queryset = team.task_set.incomplete()
 
 
     def clean_task(self):
@@ -517,20 +482,30 @@ class TaskDeleteForm(forms.Form):
 
 
 class GuidelinesMessagesForm(forms.Form):
-    messages_invite = forms.CharField(max_length=1024, required=False)
-    messages_manager = forms.CharField(max_length=1024, required=False)
-    messages_admin = forms.CharField(max_length=1024, required=False)
-    messages_application = forms.CharField(max_length=1024, required=False)
+    messages_invite = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    messages_manager = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    messages_admin = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    messages_application = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
 
-    guidelines_subtitle = forms.CharField(max_length=1024, required=False)
-    guidelines_translate = forms.CharField(max_length=1024, required=False)
-    guidelines_review = forms.CharField(max_length=1024, required=False)
+    guidelines_subtitle = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    guidelines_translate = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    guidelines_review = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
 
-class SettingsForm(forms.ModelForm):
-    # TODO: Handle slug change.
+
+class RenameableSettingsForm(forms.ModelForm):
+    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
+
     class Meta:
         model = Team
-        fields = ('name', 'description', 'workflow_enabled')
+        fields = ('name', 'description', 'logo', 'is_visible')
+
+class SettingsForm(forms.ModelForm):
+    logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
+
+    class Meta:
+        model = Team
+        fields = ('description', 'logo', 'is_visible')
+
 
 class WorkflowForm(forms.ModelForm):
     class Meta:
@@ -545,10 +520,31 @@ class PermissionsForm(forms.ModelForm):
                   'translate_policy', 'task_assign_policy', 'workflow_enabled')
 
 
+class LanguagesForm(forms.Form):
+    preferred = forms.MultipleChoiceField(required=False, choices=())
+    blacklisted = forms.MultipleChoiceField(required=False, choices=())
+
+    def __init__(self, team, *args, **kwargs):
+        super(LanguagesForm, self).__init__(*args, **kwargs)
+
+        self.team = team
+        self.fields['preferred'].choices = get_languages_list(True)
+        self.fields['blacklisted'].choices = get_languages_list(True)
+
+    def clean(self):
+        preferred = set(self.cleaned_data['preferred'])
+        blacklisted = set(self.cleaned_data['blacklisted'])
+
+        if len(preferred & blacklisted):
+            raise forms.ValidationError(_(u'You cannot blacklist a preferred language.'))
+
+        return self.cleaned_data
+
+
 class InviteForm(forms.Form):
-    usernames = forms.CharField(required=False)
+    user_id = forms.CharField(required=False, widget=forms.Select)
     message = forms.CharField(required=False, widget=forms.Textarea)
-    role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1])
+    role = forms.ChoiceField(choices=TeamMember.ROLES[1:][::-1], initial='contributor')
 
     def __init__(self, team, user, *args, **kwargs):
         super(InviteForm, self).__init__(*args, **kwargs)
@@ -558,34 +554,41 @@ class InviteForm(forms.Form):
                                        for r in roles_user_can_invite(team, user)]
 
 
-    def clean_usernames(self):
-        raw_usernames = self.cleaned_data['usernames']
+    def clean_user_id(self):
+        user_id = self.cleaned_data['user_id']
 
-        usernames = filter(None, [name.strip() for name in raw_usernames.split(',')])
+        try:
+            User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise forms.ValidationError(_(u'User does not exist!'))
+        except ValueError:
+            raise forms.ValidationError(_(u'User does not exist!'))
 
-        for username in usernames:
-            try:
-                User.objects.get(username=username)
-            except User.DoesNotExist:
-                raise forms.ValidationError(_(u'User "%s" does not exist!') % username)
+        try:
+            self.team.members.get(user__id=user_id)
+        except TeamMember.DoesNotExist:
+            pass
+        else:
+            raise forms.ValidationError(_(u'User is already a member of this team!'))
 
-            try:
-                self.team.members.get(user__username=username)
-            except TeamMember.DoesNotExist:
-                pass
-            else:
-                raise forms.ValidationError(_(u'User "%s" is already a member of this team!') % username)
-
-        self._split_usernames = usernames
-        return raw_usernames
+        self.user_id = user_id
+        return user_id
 
 
     def save(self):
-        for username in self._split_usernames:
-            user = User.objects.get(username=username)
-            Invite.objects.get_or_create(team=self.team, user=user, defaults={
-                'note': self.cleaned_data['message'],
-                'author': self.user,
-                'role': self.cleaned_data['role'],
-            })
+        from messages import tasks as notifier
+        user = User.objects.get(id=self.user_id)
+        invite, created = Invite.objects.get_or_create(team=self.team, user=user, defaults={
+            'note': self.cleaned_data['message'],
+            'author': self.user,
+            'role': self.cleaned_data['role'],
+        })
+
+        notifier.team_invitation_sent.delay(invite.pk)
+
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ('name', 'description', 'workflow_enabled')
 

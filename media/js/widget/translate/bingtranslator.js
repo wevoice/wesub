@@ -100,7 +100,7 @@ unisubs.translate.BingTranslator.BING_APP_ID_ = 'B97A24C0E08728B33D41E853C50D405
  * @type {goog.Uri}
  * @private
  */
-unisubs.translate.BingTranslator.BASE_URI_ = new goog.Uri("http://api.microsofttranslator.com/V2/Ajax.svc/TranslateArray");
+unisubs.translate.BingTranslator.BASE_URI_ = new goog.Uri("https://api.microsofttranslator.com/V2/Ajax.svc/TranslateArray");
 
 /**
  * Jsonp handler for Bing Translator API

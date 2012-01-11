@@ -6,6 +6,7 @@
   zoom: 1;
   color: #3e6782;
   *display: inline;
+  margin-bottom: .5em;
 }
 .v1 .chzn-container .chzn-drop {
   background: #fff;
@@ -14,6 +15,7 @@
   position: absolute;
   top: 29px;
   left: 0;
+  width: auto;
   -webkit-box-shadow: 0 4px 5px rgba(0,0,0,.15);
   -moz-box-shadow   : 0 4px 5px rgba(0,0,0,.15);
   -o-box-shadow     : 0 4px 5px rgba(0,0,0,.15);
@@ -197,7 +199,7 @@
   background-image: linear-gradient(top, #e4e4e4 0%,#eeeeee 70%);
   color: #678ca3;
   border: 1px solid #dce2e5;
-  line-height: 13px;
+  line-height: 16px;
   padding: 3px 19px 3px 6px;
   margin: 3px 0 3px 5px;
   position: relative;
@@ -241,7 +243,6 @@
 }
 .v1 .chzn-container .chzn-results li {
   display: none;
-  line-height: 80%;
   padding: 7px 7px 8px;
   margin: 0;
   list-style: none;

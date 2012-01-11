@@ -37,10 +37,12 @@ class lucid32 {
     projectdir => $projectdir
   }
   class { 'nginx': }
+  class { 'gettext': }
 
   package { "curl": ensure => "present", }
   package { "git-core": ensure => "installed", }
   package { "swig": ensure => "installed", }
+  package { "vim": ensure => "installed", }
 }
 
 class { "lucid32": }

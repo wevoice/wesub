@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2011 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib.auth import REDIRECT_FIELD_NAME,  get_backends
@@ -37,9 +37,10 @@ from django.contrib.admin.views.decorators import staff_member_required
 import facebook.djangofb as facebook
 import base64, re
 
+
 def login(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
-    return render_login(request, CustomUserCreationForm(label_suffix=""), 
+    return render_login(request, CustomUserCreationForm(label_suffix=""),
                         AuthenticationForm(label_suffix=""), redirect_to)
 
 def confirm_email(request, confirmation_key):
@@ -49,10 +50,10 @@ def confirm_email(request, confirmation_key):
         messages.error(request, _(u'Confirmation key expired.'))
     else:
         messages.success(request, _(u'Email is confirmed.'))
-    
+
     if request.user.is_authenticated():
         return redirect('profiles:dashboard')
-    
+
     return redirect('/')
 
 @login_required
@@ -74,7 +75,7 @@ def create_user(request):
                             password=form.cleaned_data['password1'])
         langs = get_user_languages_from_cookie(request)
         for l in langs:
-            UserLanguage.objects.get_or_create(user=user, language=l)        
+            UserLanguage.objects.get_or_create(user=user, language=l)
         auth_login(request, user)
         return HttpResponseRedirect(redirect_to)
     else:
@@ -101,12 +102,14 @@ def user_list(request):
 def delete_user(request):
     if request.POST.get('delete'):
         user = request.user
-        
+
         AuthMeta.objects.filter(user=user).delete()
         OpenidProfile.objects.filter(user=user).delete()
         TwitterUserProfile.objects.filter(user=user).delete()
         FacebookUserProfile.objects.filter(user=user).delete()
-        
+
+        user.team_members.all().delete()
+
         user.is_active = False
         user.save()
         logout(request)
@@ -135,7 +138,7 @@ def render_login(request, user_creation_form, login_form, redirect_to):
             'login_form' : login_form,
             REDIRECT_FIELD_NAME: redirect_to,
             }, context_instance=RequestContext(request))
-        
+
 def make_redirect_to(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
     if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
@@ -158,14 +161,14 @@ def twitter_login(request, next=None):
     if next is not None:
         callback_url = '%s%s?next=%s' % \
              (get_url_host(request),
-             reverse("auth:twitter_login_done"), 
+             reverse("auth:twitter_login_done"),
              urlquote(next))
     twitter = oauthtwitter.TwitterOAuthClient(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
-    try: 
+    try:
         request_token = twitter.fetch_request_token(callback_url)
     except URLError:
         messages.error(request, 'Problem with connect to Twitter. Try again.')
-        return redirect('auth:login')        
+        return redirect('auth:login')
     request.session['request_token'] = request_token.to_string()
     signin_url = twitter.authorize_token_url(request_token)
     return HttpResponseRedirect(signin_url)
@@ -180,9 +183,9 @@ def twitter_login_done(request):
         # Redirect the user to the login page,
         # So the user can click on the sign-in with twitter button
         return HttpResponse("We didn't redirect you to twitter...")
-    
+
     token = oauth.OAuthToken.from_string(request_token)
-    
+
     # If the token from session and token from twitter does not match
     #   means something bad happened to tokens
     if token.key != request.GET.get('oauth_token', 'no-token'):
@@ -191,15 +194,15 @@ def twitter_login_done(request):
         return HttpResponse("Something wrong! Tokens do not match...")
 
     twitter = oauthtwitter.TwitterOAuthClient(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
-    try:  
+    try:
         access_token = twitter.fetch_access_token(token, oauth_verifier)
     except URLError:
         messages.error(request, 'Problem with connect to Twitter. Try again.')
         return redirect('auth:login')
-    
+
     request.session['access_token'] = access_token.to_string()
     user = authenticate(access_token=access_token)
-    
+
     # if user is authenticated then login user
     if user:
         auth_login(request, user)
@@ -328,8 +331,8 @@ def token_login(request, token):
             stock_login(request, user)
             next_url = request.GET.get("next", reverse("profiles:edit"))
             return HttpResponseRedirect(next_url)
-    
+
     except LoginToken.DoesNotExist:
         pass
     return HttpResponseForbidden("Invalid user token")
-    
+

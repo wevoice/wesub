@@ -110,5 +110,112 @@ def render_visibility_button(video, user):
         
      }
 
+@register.filter
+def simplify_number(value):
+    num = str(value)
+    size = len(num)
 
+    # Billions
+    if size > 9:
+        bils = num[0:-9]
+        dec = num[-9:-8]
+        if dec != '0':
+            return '{0}.{1}b'.format(bils, dec)
+        else:
+            return '{0}b'.format(bils)
+
+    # Millions
+    elif size > 6:
+        mils = num[0:-6]
+        dec = num[-6:-5]
+        if dec != '0':
+            return '{0}.{1}m'.format(mils, dec)
+        else:
+            return '{0}m'.format(mils)
+
+    # Ten-thousands
+    elif size > 4:
+        thou = num[0:-3]
+        dec = num[-3:-2]
+        if dec != '0':
+            return '{0}.{1}k'.format(thou, dec)
+        else:
+            return '{0}k'.format(thou)
+
+    else:
+        return num
+
+@register.filter
+def format_duration(value):
     
+    """
+    Based on a Template Tag by Dan Ward 2009 (http://d-w.me)  
+    Usage: {{ VALUE|format_duration }}
+    """
+        
+    # Place seconds in to integer
+    secs = int(value)
+    
+    # If seconds are greater than 0
+    if secs > 0:
+        
+        # Import math library
+        import math
+        
+        # Place durations of given units in to variables
+        daySecs = 86400
+        hourSecs = 3600
+        minSecs = 60
+        
+        # Create string to hold outout
+        durationString = ''
+        
+        # Calculate number of days from seconds
+        days = int(math.floor(secs / int(daySecs)))
+        
+        # Subtract days from seconds
+        secs = secs - (days * int(daySecs))
+        
+        # Calculate number of hours from seconds (minus number of days)
+        hours = int(math.floor(secs / int(hourSecs)))
+        
+        # Subtract hours from seconds
+        secs = secs - (hours * int(hourSecs))
+        
+        # Calculate number of minutes from seconds (minus number of days and hours)
+        minutes = int(math.floor(secs / int(minSecs)))
+        
+        # Subtract days from seconds
+        secs = secs - (minutes * int(minSecs))
+        
+        # Calculate number of seconds (minus days, hours and minutes)
+        seconds = secs
+        
+        # If number of days is greater than 0               
+        if days > 0:
+            
+            durationString += '%02d' % (days,) + ':'
+        
+        # Determine if next string is to be shown
+        if hours > 0 or days > 0:
+
+            durationString += '%02d' % (hours,) + ':'
+        
+        # If number of minutes is greater than 0                
+        if minutes > 0 or days > 0 or hours > 0:
+
+            durationString += '%02d' % (minutes,) + ':'
+        
+        # If number of seconds is greater than 0                
+        if seconds > 0 or minutes > 0 or days > 0 or hours > 0:
+
+            durationString += '%02d' % (seconds,)
+            
+        # Return duration string
+        return durationString.strip()
+        
+    # If seconds are not greater than 0
+    else:
+        
+        # Provide 'No duration' message
+        return 'No duration'

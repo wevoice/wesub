@@ -28,7 +28,7 @@ LIMIT = settings.RECENT_ACTIVITIES_ONPAGE
 
 @register.inclusion_tag('videos/_recent_activity.html')
 def recent_activity(user):
-    qs = Action.objects.filter(user=user)
+    qs = Action.objects.for_user(user=user)
     
     return {
         'events': qs[:LIMIT],

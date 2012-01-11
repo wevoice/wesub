@@ -44,7 +44,7 @@ class TestNotification(TestCase):
 
         self.user = User.objects.all()[:1].get()
         self.user.is_active = True
-        self.user.changes_notification = True
+        self.user.notify_by_email = True
         self.user.email = 'test@test.com'
         self.user.save()
 
@@ -81,12 +81,17 @@ class TestNotification(TestCase):
         TeamVideo.objects.filter(pk__in=[self.tv1.pk, self.tv2.pk]).update(created=datetime.today())
         self.assertEqual(TeamVideo.objects.filter(created__gt=self.team.last_notification_time).count(), 2)
         mail.outbox = []
+        self.user.notify_by_email = True
+        self.user.save()
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to, [self.user.email])
+        
+        self.assertIn(self.user.email, mail.outbox[0].to[0] )
         self.assertEqual(len(send_templated_email_mockup.context['team_videos']), 2)
 
+        self.user.notify_by_email = False
+        self.user.save()
         #test if user turn off notification
         self.user.is_active = False
         self.user.save()
@@ -96,25 +101,18 @@ class TestNotification(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
         self.user.is_active = True
-        self.user.changes_notification = False
+        self.user.notify_by_email = False
         self.user.save()
         mail.outbox = []
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
 
-        self.user.changes_notification = True
+
+        self.tm.save()
+
+        self.user.notify_by_email = True
         self.user.save()
-        self.tm.changes_notification = False
-        self.tm.save()
-        mail.outbox = []
-        tasks.add_videos_notification.delay()
-        self.team = Team.objects.get(pk=self.team.pk)
-        self.assertEqual(len(mail.outbox), 0)
-
-        self.tm.changes_notification = True
-        self.tm.save()
-
         #test notification if one video is new
         created_date = self.team.last_notification_time + timedelta(seconds=10)
         TeamVideo.objects.filter(pk=self.tv1.pk).update(created=created_date)
@@ -284,8 +282,13 @@ class TeamsTest(TestCase):
             "title": u"",
             "video_url": video_url,
             "thumbnail": u"",
-            "project": team.default_project.pk,
         }
+
+        if team.has_projects:
+            data['project'] = team.project_set.exclude(slug='_root')[0].pk
+        else:
+            data['project'] = team.default_project.pk
+
         old_count = TeamVideo.objects.count()
         old_video_count = Video.objects.count()
 
@@ -399,10 +402,10 @@ class TeamsTest(TestCase):
         self.assertTrue(team.users.count() > 1)
 
         for tm in team.members.all():
-            tm.changes_notification = True
+            tm.notify_by_email = True
             tm.save()
             tm.user.is_active = True
-            tm.user.changes_notification = True
+            tm.user.notify_by_email = True
             tm.user.save()
 
         self._add_team_video(team, u'en', u"http://videos.mozilla.org/firefox/3.5/switch/switch.ogv")
@@ -633,23 +636,6 @@ class TeamsTest(TestCase):
         response = self.client.get(reverse("teams:index"), {'o': 'my'})
         self.failUnlessEqual(response.status_code, 200)
 
-
-        #-------------- edit videos -----------------
-        url = reverse("teams:edit_videos", kwargs={"slug": team.slug})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-
-        url = reverse("teams:settings", kwargs={"slug": "volunteer1"})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 404)
-
-        self.client.logout()
-
-        url = reverse("teams:settings", kwargs={"slug": "volunteer"})
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 302)
-
-        self.client.login(**self.auth)
         #-------------- applications ----------------
         url = reverse("teams:applications", kwargs={"slug": team.slug})
         response = self.client.get(url)
@@ -763,13 +749,18 @@ class TeamsTest(TestCase):
         member.save()
 
         data = {
-            "usernames": user2.username,
+            "user_id": user2.id,
             "message": u"test message",
             "role": TeamMember.ROLE_CONTRIBUTOR,
         }
+        user_mail_box_count = Message.objects.unread().filter(user=user2).count()
         invite_url = reverse("teams:invite_members", args=(), kwargs={'slug': team.slug})
         response = self.client.post(invite_url, data, follow=True)
         self.failUnlessEqual(response.status_code, 200)
+
+        self.assertEqual(user_mail_box_count + 1,
+                         Message.objects.unread().filter(user=user2).count())
+
 
         invite = Invite.objects.get(user__username=user2.username, team=team)
         self.assertEqual(invite.role, TeamMember.ROLE_CONTRIBUTOR)
@@ -793,7 +784,7 @@ class TeamsTest(TestCase):
         tm.save()
         url = reverse("teams:remove_member", kwargs={"user_pk": user2.pk, "slug": team.slug})
         response = self.client.post(url)
-        self.failUnlessEqual(response.status_code, 200)
+        self.failUnlessEqual(response.status_code, 302)
 
         self.assertFalse(team.is_member(user2))
 
@@ -818,6 +809,23 @@ class TeamsTest(TestCase):
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 404)
 
+    def test_is_visible(self):
+        hidden  = Team(name='secret', slug='secret', is_visible=False)
+        hidden.save()
+        teams = Team.objects.all()
+        url = reverse("teams:detail", kwargs={"slug":hidden.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        url = reverse("teams:index")
+        
+        response = self.client.get(url)
+        teams = response.context['teams_list']
+        self.assertTrue(len(teams) < 10)
+        teams_pks = [t.pk for t in teams]
+        print teams_pks, hidden.pk
+        
+        self.assertNotIn(hidden.pk, teams_pks)
+        
 from apps.teams.rpc import TeamsApiClass
 from utils.rpc import Error, Msg
 from django.contrib.auth.models import AnonymousUser
@@ -970,8 +978,6 @@ class TeamsDetailQueryTest(TestCase):
         self.assertTrue([x.pk for x in multi] == created_pks)
 
 
-
-
 class TestLanguagePreference(TestCase):
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
 
@@ -985,6 +991,7 @@ class TestLanguagePreference(TestCase):
         self.langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
         from apps.teams.cache import invalidate_lang_preferences
         invalidate_lang_preferences(self.team)
+
 
     def test_readable_lang(self):
         # no tlp, should be all languages
@@ -1005,7 +1012,6 @@ class TestLanguagePreference(TestCase):
         self.assertNotIn("en" , generated)
         self.assertNotIn("en" , cached)
 
-
     def test_writable_lang(self):
         # no tlp, should be all languages
         generated =TeamLanguagePreference.objects._generate_writable(self.team )
@@ -1025,3 +1031,33 @@ class TestLanguagePreference(TestCase):
         self.assertNotIn("en" , generated)
         self.assertNotIn("en" , cached)
 
+    def test_preferred_lang(self):
+        # No preference, so no languages should be preferred.
+        generated = TeamLanguagePreference.objects._generate_preferred(self.team)
+        cached = TeamLanguagePreference.objects.get_preferred(self.team)
+        self.assertItemsEqual([], generated)
+        self.assertItemsEqual([], cached)
+
+        # Create one preferred.
+        tlp = TeamLanguagePreference(team=self.team, language_code="en", preferred=True)
+        tlp.save()
+
+        # Check everything.
+        generated = TeamLanguagePreference.objects._generate_preferred(self.team)
+        cached = TeamLanguagePreference.objects.get_preferred(self.team)
+
+        self.assertItemsEqual(["en"], generated)
+        self.assertItemsEqual(["en"], cached)
+
+        # Make sure this preferred language doesn't show up as a blocker.
+        generated = TeamLanguagePreference.objects._generate_readable(self.team)
+        cached = TeamLanguagePreference.objects.get_readable(self.team)
+
+        self.assertIn("en", generated)
+        self.assertIn("en", cached)
+
+        generated = TeamLanguagePreference.objects._generate_writable(self.team)
+        cached = TeamLanguagePreference.objects.get_writable(self.team)
+
+        self.assertIn("en", generated)
+        self.assertIn("en", cached)

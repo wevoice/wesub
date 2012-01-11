@@ -1999,6 +1999,9 @@
 .bootstrap .modal-body div.field {
     margin-bottom: 10px;
 }
+.bootstrap .modal-body div.hidden {
+    display: none;
+}
 .bootstrap .modal-footer {
   -moz-border-radius: 0 0 6px 6px;
   -moz-box-shadow: inset 0 1px 0 #ffffff;

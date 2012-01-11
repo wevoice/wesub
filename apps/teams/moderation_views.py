@@ -1,31 +1,42 @@
+# Universal Subtitles, universalsubtitles.org
+#
+# Copyright (C) 2011 Participatory Culture Foundation
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see
+# http://www.gnu.org/licenses/agpl-3.0.html.
+
 import json
 import datetime
-import time
 
 from django.shortcuts import get_object_or_404, render_to_response
-from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core.exceptions import SuspiciousOperation
-from django.http import HttpResponseForbidden, HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.views.decorators.http import  require_POST
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.functional import  wraps
 
-from django.views.generic.list_detail import object_list
-
-from utils.translation import get_user_languages_from_request, get_languages_list
-
-from apps.teams.moderation import CAN_MODERATE_VERSION, CAN_SET_VIDEO_AS_MODERATED,\
-  CAN_UNSET_VIDEO_AS_MODERATED, MODERATION_STATUSES, UNMODERATED, APPROVED, \
-  WAITING_MODERATION, REJECTED
+from apps.teams.moderation import APPROVED, WAITING_MODERATION, REJECTED
 from apps.teams.moderation import approve_version as core_approve_version
 from apps.teams.moderation import reject_version as core_reject_version
 from apps.teams.moderation import remove_version_moderation as core_remove_version_moderation
+from apps.teams.search_indexes import TeamVideoLanguagesIndex
 from apps.teams.templatetags.moderation import render_moderation_togggle_button, render_moderation_icon
 
 from apps.videos.models import SubtitleVersion, Video
-from apps.teams.models import Team, TeamVideo
+from apps.teams.models import Team
 from apps.teams.moderation_forms import ModerationListSearchForm
 
 from apps.teams.moderation import _update_search_index
@@ -38,7 +49,7 @@ def _check_moderate_permission(view):
         if not team.is_member(request.user):
             error_msg ="This user does not have the permission to moderate this team"
             if request.is_ajax():
-                return {"success":False, "errors":[error_msg] } 
+                return {"success":False, "errors":[error_msg] }
             return  HttpResponseForbidden(error_msg)
         return view(request, team, *args, **kwargs)
     return wraps(view)(wrapper)
@@ -73,8 +84,8 @@ def _set_moderation(request, team, version, status,  updates_meta=True, rejectio
         if request.is_ajax():
             return HttpResponse(json.dumps({"success":False, "message": error_message}))
         return HttpResponseForbidden(error_message)
-        
-@to_json    
+
+@to_json
 @_check_moderate_permission
 @require_POST
 def approve_version(request, team, version_id):
@@ -108,9 +119,8 @@ def remove_moderation_version(request, team, version_id):
 def _batch_set_moderation(request, team, status, before_rev=None, lang_id= None):
     if before_rev is not None:
         versions = team.get_pending_moderation().filter(pk__lte=before_rev, language=lang_id)
-    else:    
+    else:
         versions = request.POST.get("version_ids" , None)
-    res = []
     versions = list(versions)
     for v in versions:
         _set_moderation(request, team, v, APPROVED,  updates_meta=False)
@@ -198,4 +208,4 @@ def approve_all_for_video(request, team, video_id, timestamp):
     for version in list(pending):
         _set_moderation(request, team, version.id, APPROVED)
     return res
-    
+

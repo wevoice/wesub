@@ -58,29 +58,11 @@ unisubs.approvesubtitles.ApproveSubtitlesRightPanel.prototype.appendMiddleConten
     this.serverModel_.fetchApproveData(unisubs.task_id, function(body) {
         goog.dom.forms.setValue(that.bodyInput_, body);
     });
-
-    el.appendChild($d('hr'));
-
-    this.reassignLink_ = $d('a', {'href': unisubs.team_url}, 'reassign this task');
-    this.editedVersionLink_ = $d('a', {'href': '#'}, 'submit an edited version');
-
-    el.appendChild($d('p', null,
-                      'You can also ',
-                      this.reassignLink_,
-                      ' to someone else, or ',
-                      this.editedVersionLink_,
-                      ' yourself.',
-                      ' If you submit a new version it will also be subject to approval.'
-                  ));
-
-    var handler = this.getHandler();
-    handler.listen(this.reassignLink_, 'click', this.reassignLinkClicked_);
-    handler.listen(this.editedVersionLink_, 'click', this.editedVersionLinkClicked_);
 };
 unisubs.approvesubtitles.ApproveSubtitlesRightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
-    this.sendBackButton_ = $d('a', {'class': 'unisubs-done'}, 'Send Back');
-    this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done'}, 'Save for Later');
-    this.approveButton_ = $d('a', {'class': 'unisubs-done'}, 'Approve');
+    this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
+    this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
+    this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Approve');
 
     el.appendChild(this.sendBackButton_);
     el.appendChild(this.saveForLaterButton_);
@@ -129,11 +111,4 @@ unisubs.approvesubtitles.ApproveSubtitlesRightPanel.prototype.saveForLaterButton
 unisubs.approvesubtitles.ApproveSubtitlesRightPanel.prototype.sendBackButtonClicked_ = function(e){
     e.preventDefault();
     this.finish('Rejected');
-};
-unisubs.approvesubtitles.ApproveSubtitlesRightPanel.prototype.reassignLinkClicked_ = function(e){
-    // TODO
-};
-unisubs.approvesubtitles.ApproveSubtitlesRightPanel.prototype.editedVersionLinkClicked_ = function(e){
-    e.preventDefault();
-    // TODO
 };

@@ -1,10 +1,10 @@
 {% extends "profiles/base.html" %}
 
-{% load i18n messages_tags recent_activity auth_tags profiles_tags %}
+{% load i18n messages_tags recent_activity auth_tags profiles_tags teams_tags %}
 
 {% block body_attrs %}id="dashboard" class="v1"{% endblock %}
 
-{% block title %}Dashboard | {{ user_info }} | Universal Subtitles{% endblock %}
+{% block title %}{% trans "Dashboard" %} | {{ user_info }} | Universal Subtitles{% endblock %}
 
 {% block main_content %}
 
@@ -19,32 +19,61 @@
 
     <div class="view grid_9 alpha">
         <div class="grid_5 alpha">
-            <h3>Incoming Tasks</h3>
-            <ul class="listing">
-                <li>Spanish subtitles for <a href="">Promo Video #3</a> (Twitter) <span class="timestamp">2 hours ago</span></li>
-                <li>Review Spanish subtitles for <a href="">Promo Video #2</a> (Twitter) <span class="timestamp">2 hours ago</span></li>
+            <h3>{% trans 'Open Tasks' %}</h3>
+            <ul class="listing tasks">
+                {% for task in user.open_tasks %}
+                    <li>
+                        <p>
+                            {% if task.get_type_display == "Subtitle" %}
+                                {% trans 'New' %}
+                            {% else %}
+                                {{ task.get_type_display }}
+                            {% endif %}
+                            {% if task.get_type_display == "Translate" %}
+                                {% trans 'Subtitles into' %} {{ task.get_language_display }}
+                            {% else %}
+                                {% if task.get_language_display %}
+                                    {{ task.get_language_display }}
+                                {% endif %}
+                                {% trans 'Subtitles' %}
+                            {% endif %}
+                            {% trans 'for' %}
+                            <em>{{ task.team_video|truncatewords:8 }}</em>
+                        </p>
+                    </li>
+                {% endfor %}
             </ul>
 
-            <h3>Other Activity</h3>
-            <ul class="listing">
-                <li><a href="">Something waiting...</a></li>
-            </ul>
+            <h3>{% trans "Recent Activity" %} (<a href="{% url profiles:actions_list %}">View all</a>)</h3>
+            {% with action_list as events %}
+                <ul class="listing activity">
+                    {% for item in events %}
+                        <li>{{ item.render }}</li>
+                    {% empty %}
+                        <li class="empty">Sorry, no activity yet.</li>
+                    {% endfor %}
+                </ul>
+            {% endwith %}
         </div>
 
         <div class="grid_4 omega">
-            <h3>Alerts</h3>
+            <h3>{% trans 'Alerts' %}</h3>
             <ul class="featured">
-                <li>You have <a href="">saved work</a> on "Promotional Video #1"</li>
-                <li>You have <a href="{% url messages:index %}">2 unread messages</a></li>
+                {% with user.unread_messages.count as new_msg_count %}
+                    {% if new_msg_count %}
+                        <li>You have <a href="{% url messages:index %}">{{ user.unread_messages.count }} unread message{{ user.unread_messages.count|pluralize }}</a></li>
+                    {% endif %}
+                {% endwith %}
             </ul>
 
-            <h3>My Teams</h3>
+            <h3>{% trans "Teams" %}</h3>
             {% with user.teams.all as user_teams %}
             <ul>
                 {% if user_teams %}
                     {% for t in user_teams %}
                     <li>
                         <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
+                        (<a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team t.slug %}">{% trans "leave team" %}</a>)
                     </li>
                     {% endfor %}
                 {% endif %}
@@ -53,10 +82,32 @@
         </div>
     </div>
 
-    <div class="controls grid_3 omega">
-        <ul>
-            <li class="current"><a href="">Overview</a></li>
-            <li><a href="{% url profiles:my_videos %}">My Videos</a></li>
+    {% comment %}
+        <h3>Tasks</h3>
+        <!--
+            IF there are tasks assigned to the user, list those here.
+
+            ELSE show <p class="empty">No incoming tasks...</p>
+        -->
+        <ul class="listing">
+            <!--
+                FOR each task, if the task hasn't yet been accepted or
+                rejected, give the LI a class of "new"
+            -->
+            <li><a href="">Spanish subtitles</a> for Promo Video #3 (Twitter) <span class="timestamp">2 hours ago</span></li>
+
+            <li><a href="">Review Spanish subtitles</a> for Promo Video #2 (TED) <span class="timestamp">2 hours ago</span></li>
         </ul>
+
+        <!--
+            IF user has any ongoing work in browser's local storage
+        -->
+        <li>You have <a href="">saved work</a> on "Promotional Video #1"</li>
+    {% endcomment %}
+
+    <div class="controls grid_3 omega">
+        {% with 'overview' as current %}
+            {% include 'profiles/_filters_dashboard.html' %}
+        {% endwith %}
     </div>
 {% endblock %}

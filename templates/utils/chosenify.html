@@ -1,5 +1,7 @@
 <script type="text/javascript">
-	jQuery(document).ready(function() {
-		$("select", ".v1 .content").chosen();
-	});
+    jQuery(document).ready(function() {
+        $("select", ".v1 .content").filter(function() {
+            return !$(this).parents('div').hasClass('ajaxChosen');
+        }).chosen();
+    });
 </script>

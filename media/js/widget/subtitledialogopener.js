@@ -102,7 +102,8 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditing_ =
         'language_code': openDialogArgs.LANGUAGE,
         'subtitle_language_pk': openDialogArgs.SUBLANGUAGE_PK || null,
         'base_language_pk': openDialogArgs.BASELANGUAGE_PK || null,
-        'original_language_code': openDialogArgs.ORIGINAL_LANGUAGE || null };
+        'original_language_code': openDialogArgs.ORIGINAL_LANGUAGE || null,
+        'mode': unisubs.mode || null };
     var that = this;
     unisubs.Rpc.call(
         'start_editing', args,

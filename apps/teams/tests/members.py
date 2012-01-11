@@ -9,7 +9,7 @@ class BaseMembershipTests(TestCase):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
         self.team  = Team.objects.all()[0]
-        self.team.video_policy = Team.MEMBER_ADD
+        self.team.video_policy = Team.VP_MEMBER
         self.video = self.team.videos.all()[0]
         self.user = User.objects.all()[0]
 
