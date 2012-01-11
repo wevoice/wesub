@@ -167,6 +167,7 @@
                             {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!</li>
                         {% endif %}
                         {% upload_subtitles video %}
+                        {% paste_transcription %}
                     </p>
                 </div>
                 {% if video.get_team_video or user.managed_teams %}
