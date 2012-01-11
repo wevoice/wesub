@@ -146,7 +146,7 @@ def send_templated_email(to, subject, body_template, body_dict,
     for recipient in to_unchecked:
         if isinstance(recipient, User):
             if check_user_preference is False or  recipient.notify_by_email:
-                to.append("%s <%s>" % (recipient, recipient.email))
+                to.append(u"%s <%s>" % (recipient, recipient.email))
         else:
             to.append(recipient)
     if not from_email: from_email = settings.DEFAULT_FROM_EMAIL
