@@ -134,7 +134,9 @@ ALL_LANGUAGES['zh-cn'] = gettext_noop(u'Chinese, Simplified')
 ALL_LANGUAGES['zh-tw'] = gettext_noop(u'Chinese, Traditional')
 ALL_LANGUAGES['zul'] = gettext_noop(u'Zulu')
 
-del ALL_LANGUAGES['no']
+if ALL_LANGUAGES.get('no', None):
+    del ALL_LANGUAGES['no']
+    
 full_langs = dict(ALL_LANGUAGES.items())
 ALL_LANGUAGES = tuple(i for i in ALL_LANGUAGES.items())
 # this has to be set after all languages have been appended
