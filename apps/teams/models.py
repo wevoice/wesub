@@ -1299,6 +1299,19 @@ class Task(models.Model):
 
         self.subtitle_version.save()
 
+    def _create_translation_tasks(self, subtitle_version):
+        preferred_langs = TeamLanguagePreference.objects.get_preferred(self.team)
+
+        for lang in preferred_langs:
+            sl = self.team_video.video.subtitle_language(lang)
+            if sl and sl.is_complete_and_synced():
+                continue
+
+            task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=subtitle_version,
+                        language=lang, type=Task.TYPE_IDS['Translate'])
+            task.save()
+
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
         self.completed = datetime.datetime.now()
@@ -1311,37 +1324,22 @@ class Task(models.Model):
         }[Task.TYPE_NAMES[self.type]]()
 
     def _complete_subtitle(self):
-        tasks = []
         subtitle_version = self.team_video.video.latest_version(public_only=False)
-
-        if self.workflow.autocreate_translate:
-            preferred_langs = TeamLanguagePreference.objects.get_preferred(self.team)
-
-            for lang in preferred_langs:
-                sl = self.team_video.video.subtitle_language(lang)
-                if sl and sl.is_complete_and_synced():
-                    continue
-
-                task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=subtitle_version,
-                            language=lang, type=Task.TYPE_IDS['Translate'])
-                task.save()
-                tasks.append(task)
 
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'])
             task.save()
-            tasks.append(task)
         elif self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'])
             task.save()
-            tasks.append(task)
+        else:
+            if self.workflow.autocreate_translate:
+                self._create_translation_tasks(subtitle_version)
 
-        return tasks
 
     def _complete_translate(self):
         subtitle_version = self.team_video.video.latest_version(language_code=self.language)
@@ -1384,6 +1382,10 @@ class Task(models.Model):
             # determines whether the subtitles go public.
             self._set_version_moderation_status()
 
+            # If the subtitles are okay, go ahead and autocreate translation tasks.
+            if self.workflow.autocreate_translate and self.approved == Task.APPROVED_IDS['Approved']:
+                self._create_translation_tasks(self.subtitle_version)
+
         return task
 
     def _complete_approve(self):
@@ -1392,6 +1394,10 @@ class Task(models.Model):
         # If we manage to get here, the ruling on this Approve task determines
         # whether the subtitles should go public.
         self._set_version_moderation_status()
+
+        # If the subtitles are okay, go ahead and autocreate translation tasks.
+        if self.workflow.autocreate_translate and self.approved == Task.APPROVED_IDS['Approved']:
+            self._create_translation_tasks(self.subtitle_version)
 
 
     def get_perform_url(self):

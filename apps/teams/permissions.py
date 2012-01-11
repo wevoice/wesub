@@ -421,8 +421,6 @@ def can_review(team_video, user, lang=None):
     workflow = Workflow.get_for_team_video(team_video)
     role = get_role_for_target(user, team_video.team, team_video.project, lang)
 
-    # For now, don't allow review if it's disabled in the workflow.
-    # TODO: Change this to allow one-off reviews?
     if not workflow.review_allowed:
         return False
 
@@ -432,7 +430,16 @@ def can_review(team_video, user, lang=None):
         30: ROLE_ADMIN,
     }[workflow.review_allowed]
 
-    return role in _perms_equal_or_greater(role_req)
+    # Check that the user has the correct role.
+    if role not in _perms_equal_or_greater(role_req):
+        return False
+
+    # Users cannot review their own subtitles.
+    subtitle_version = team_video.video.latest_version(language_code=lang, public_only=False)
+    if lang and subtitle_version.user == user:
+        return False
+
+    return True
 
 def can_approve(team_video, user, lang=None):
     workflow = Workflow.get_for_team_video(team_video)
