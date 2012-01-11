@@ -56,7 +56,7 @@
                     TODO: This button should only be displayed if the logged-in-user has the Owner role for this team.
                 {% endcomment %}
                 <input type="submit" class="submit save" value="Save Changes" name="save" />
-                <input type="submit" class="button delete project-delete" onclick="return confirm('{% trans "Do you really wish to delete this team?" %}')" value="Delete team" />
+                <input type="submit" class="button delete project-delete" onclick="return confirm('{% trans "Do you really wish to delete this team?" %}')" value="Delete team" name="delete" />
             </div>
         </form>
     </div>
@@ -68,11 +68,6 @@
 
         {% include "teams/_actions.html" %}
     </div>
-
-    <script type="text/javascript">
-        $(window).load(function(){
-        });
-    </script>
 
     <script id="IMAGE_PRELOADER" type="text/html">
         <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>

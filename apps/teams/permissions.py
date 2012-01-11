@@ -318,6 +318,15 @@ def can_rename_team(team, user):
     role = get_role_for_target(user, team)
     return role == ROLE_OWNER
 
+def can_delete_team(team, user):
+    """Return whether the given user can delete the given team.
+
+    Only team owners can delete teams.
+
+    """
+    role = get_role_for_target(user, team)
+    return role == ROLE_OWNER
+
 
 def can_add_video(team, user, project=None):
     """Return whether the given user can add a video to the given target."""

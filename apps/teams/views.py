@@ -60,6 +60,7 @@ from teams.permissions import (
     can_view_tasks_tab, can_invite, roles_user_can_assign, can_join_team,
     can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
     can_rename_team, can_change_team_settings, can_perform_task_for,
+    can_delete_team,
 )
 from teams.tasks import invalidate_video_caches
 import logging
@@ -303,6 +304,16 @@ def create(request):
 
 
 # Settings
+def _delete_team(request, team):
+    if not can_delete_team(team, request.user):
+        messages.error(request, _(u'You do not have permission to delete this team.'))
+        return None
+
+    team.deleted = True
+    team.save()
+
+    return HttpResponseRedirect(reverse('teams:index'))
+
 @render_to('teams/settings.html')
 @login_required
 def settings_basic(request, slug):
@@ -311,6 +322,11 @@ def settings_basic(request, slug):
     if not can_change_team_settings(team, request.user):
         messages.error(request, _(u'You do not have permission to edit this team.'))
         return HttpResponseRedirect(team.get_absolute_url())
+
+    if request.POST.get('delete'):
+        r = _delete_team(request, team)
+        if r:
+            return r
 
     if can_rename_team(team, request.user):
         FormClass = RenameableSettingsForm

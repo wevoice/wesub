@@ -34,7 +34,8 @@ from apps.teams.permissions import (
     can_create_and_edit_subtitles, can_create_task_subtitle,
     can_create_task_translate, can_join_team, can_edit_video, can_approve,
     roles_user_can_invite, can_add_video_somewhere, can_assign_tasks,
-    can_create_and_edit_translations, save_role, can_remove_video
+    can_create_and_edit_translations, save_role, can_remove_video,
+    can_delete_team
 )
 
 
@@ -171,6 +172,19 @@ class TestRules(BaseTestPermission):
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN]:
             with self.role(r):
                 self.assertFalse(can_rename_team(team, user))
+
+    def test_can_delete_team(self):
+        user = self.user
+        team = self.team
+
+        # Owners can delete teams
+        with self.role(ROLE_OWNER):
+            self.assertTrue(can_delete_team(team, user))
+
+        # But no one else can delete a team
+        for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN]:
+            with self.role(r):
+                self.assertFalse(can_delete_team(team, user))
 
     def test_can_join_team(self):
         user, team, outsider = self.user, self.team, self.outsider
