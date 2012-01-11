@@ -34,7 +34,7 @@
                     // New tasks.
                     task_type: $('select#id_type option:selected').val(),
                     team_video: $('input[name="id_team_video"]').val(),
-                    team_video: $('input[name="language"]').val()
+                    task_lang: $('input[name="language"]').val()
 
                 };
                 if (!options.data['task_type']) {
