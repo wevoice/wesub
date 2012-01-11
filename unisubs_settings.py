@@ -58,7 +58,6 @@ elif INSTALLATION == PRODUCTION:
     AWS_QUEUE_PREFIX = 'PRODUCTION'
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
     EMAIL_SUBJECT_PREFIX = '[usubs-production]'
-    EMAIL_BCC_LIST.append('socmedia@pculture.org')
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
     ADMINS = (
       ('universalsubtitles-errors', 'universalsubtitles-errors@pculture.org'),
