@@ -986,6 +986,14 @@ def _tasks_list(request, team, filters, user):
     if filters.get('language'):
         tasks = tasks.filter(language=filters['language'])
 
+    if filters.get('q'):
+        terms = get_terms(filters['q'])
+        for term in terms:
+            tasks = tasks.filter(
+                Q(team_video__video__title__icontains=term)
+              | Q(team_video__title__icontains=term)
+            )
+
     if filters.get('type'):
         tasks = tasks.filter(type=Task.TYPE_IDS[filters['type']])
 
@@ -1005,7 +1013,8 @@ def _get_task_filters(request):
     return { 'language': request.GET.get('lang'),
              'type': request.GET.get('type'),
              'team_video': request.GET.get('team_video'),
-             'assignee': request.GET.get('assignee'), }
+             'assignee': request.GET.get('assignee'),
+             'q': request.GET.get('q'), }
 
 
 @render_to('teams/tasks.html')
