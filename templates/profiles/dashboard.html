@@ -19,7 +19,32 @@
 
     <div class="view grid_9 alpha">
         <div class="grid_5 alpha">
-            <h3>{% trans "Feed" %}</h3>
+            <h3>{% trans 'Open Tasks' %}</h3>
+            <ul class="listing tasks">
+                {% for task in user.open_tasks %}
+                    <li>
+                        <p>
+                            {% if task.get_type_display == "Subtitle" %}
+                                {% trans 'New' %}
+                            {% else %}
+                                {{ task.get_type_display }}
+                            {% endif %}
+                            {% if task.get_type_display == "Translate" %}
+                                {% trans 'Subtitles into' %} {{ task.get_language_display }}
+                            {% else %}
+                                {% if task.get_language_display %}
+                                    {{ task.get_language_display }}
+                                {% endif %}
+                                {% trans 'Subtitles' %}
+                            {% endif %}
+                            {% trans 'for' %}
+                            <em>{{ task.team_video|truncatewords:8 }}</em>
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <h3>{% trans "Recent Activity" %} (<a href="{% url profiles:actions_list %}">View all</a>)</h3>
             {% with action_list as events %}
                 <ul class="listing activity">
                     {% for item in events %}
@@ -29,11 +54,10 @@
                     {% endfor %}
                 </ul>
             {% endwith %}
-            <p><a href="{% url profiles:actions_list %}">See all</a></p>
         </div>
 
         <div class="grid_4 omega">
-            <h3>{% trans "Alerts" %}</h3>
+            <h3>{% trans 'Alerts' %}</h3>
             <ul class="featured">
                 {% with user.unread_messages.count as new_msg_count %}
                     {% if new_msg_count %}
@@ -82,9 +106,8 @@
     {% endcomment %}
 
     <div class="controls grid_3 omega">
-        <ul>
-            <li class="current"><a href="">Overview</a></li>
-            <li><a href="{% url profiles:my_videos %}">My Videos</a></li>
-        </ul>
+        {% with 'overview' as current %}
+            {% include 'profiles/_filters_dashboard.html' %}
+        {% endwith %}
     </div>
 {% endblock %}

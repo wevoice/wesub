@@ -50,7 +50,11 @@ def get_perm_names(model, perms):
     return [("%s-%s-%s" % (model._meta.app_label, model._meta.object_name, p[0]), p[1],) for p in perms]
 
 
+# Teams
 class TeamManager(models.Manager):
+    def get_query_set(self):
+        return super(TeamManager, self).get_query_set().filter(deleted=False)
+
     def for_user(self, user):
         if user.is_authenticated():
             return self.get_query_set().filter(
@@ -59,7 +63,6 @@ class TeamManager(models.Manager):
             ).distinct()
         else:
             return self.get_query_set().filter(is_visible=True)
-
 
 class Team(models.Model):
     APPLICATION = 1
@@ -141,7 +144,10 @@ class Team(models.Model):
             choices=SUBTITLE_CHOICES,
             default=SUBTITLE_IDS['Anyone'])
 
+    deleted = models.BooleanField(default=False)
+
     objects = TeamManager()
+    all_objects = models.Manager() # For accessing deleted teams, if necessary.
 
     class Meta:
         ordering = ['name']

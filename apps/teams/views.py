@@ -60,6 +60,7 @@ from teams.permissions import (
     can_view_tasks_tab, can_invite, roles_user_can_assign, can_join_team,
     can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
     can_rename_team, can_change_team_settings, can_perform_task_for,
+    can_delete_team,
 )
 from teams.tasks import invalidate_video_caches
 import logging
@@ -303,6 +304,16 @@ def create(request):
 
 
 # Settings
+def _delete_team(request, team):
+    if not can_delete_team(team, request.user):
+        messages.error(request, _(u'You do not have permission to delete this team.'))
+        return None
+
+    team.deleted = True
+    team.save()
+
+    return HttpResponseRedirect(reverse('teams:index'))
+
 @render_to('teams/settings.html')
 @login_required
 def settings_basic(request, slug):
@@ -311,6 +322,11 @@ def settings_basic(request, slug):
     if not can_change_team_settings(team, request.user):
         messages.error(request, _(u'You do not have permission to edit this team.'))
         return HttpResponseRedirect(team.get_absolute_url())
+
+    if request.POST.get('delete'):
+        r = _delete_team(request, team)
+        if r:
+            return r
 
     if can_rename_team(team, request.user):
         FormClass = RenameableSettingsForm
@@ -970,6 +986,14 @@ def _tasks_list(request, team, filters, user):
     if filters.get('language'):
         tasks = tasks.filter(language=filters['language'])
 
+    if filters.get('q'):
+        terms = get_terms(filters['q'])
+        for term in terms:
+            tasks = tasks.filter(
+                Q(team_video__video__title__icontains=term)
+              | Q(team_video__title__icontains=term)
+            )
+
     if filters.get('type'):
         tasks = tasks.filter(type=Task.TYPE_IDS[filters['type']])
 
@@ -989,7 +1013,8 @@ def _get_task_filters(request):
     return { 'language': request.GET.get('lang'),
              'type': request.GET.get('type'),
              'team_video': request.GET.get('team_video'),
-             'assignee': request.GET.get('assignee'), }
+             'assignee': request.GET.get('assignee'),
+             'q': request.GET.get('q'), }
 
 
 @render_to('teams/tasks.html')

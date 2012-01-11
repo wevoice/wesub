@@ -156,10 +156,11 @@ class NewMessageForm(forms.Form):
     team = forms.ModelChoiceField(queryset=Team.objects.none(), required=False)
     user = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
     content = forms.CharField(widget=forms.Textarea)
+    subject = forms.CharField(required=False)
 
     class Meta:
         model = Message
-        fields = ('user', 'content')
+        fields = ('user', 'content', 'subject')
 
 
     def __init__(self, author, *args, **kwargs):

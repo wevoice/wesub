@@ -51,6 +51,10 @@
                     {{ form.team }}
                 {% endif %}
 
+                <label for="id_subject">Subject</label>
+                {{ form.errors.subject }}
+                {{ form.subject }}
+
                 <label for="id_content">Message</label>
                 {{ form.errors.content }}
                 {{ form.content }}

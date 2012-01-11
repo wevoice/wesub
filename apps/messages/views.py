@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+
 import time
 
 from django.conf import settings
@@ -104,13 +105,15 @@ def new(request):
         if form.is_valid():
             if form.cleaned_data['user']:
                 Message(user=form.cleaned_data['user'], author=request.user,
-                        content=form.cleaned_data['content']).save()
+                        content=form.cleaned_data['content'],
+                        subject=form.cleaned_data['subject']).save()
             elif form.cleaned_data['team']:
                 # TODO: Move this into a task for performance?
                 for member in form.cleaned_data['team'].members.all():
                     if member.user != request.user:
                         Message(user=member.user, author=request.user,
-                                content=form.cleaned_data['content']).save()
+                                content=form.cleaned_data['content'],
+                                subject=form.cleaned_data['subject']).save()
 
             messages.success(request, _(u'Message sent.'))
             return HttpResponseRedirect(reverse('messages:index'))
