@@ -110,7 +110,7 @@ def language_url(request, lang):
     and if the video is private or public.
     """
     vid = VideoVisibilityPolicy.objects.id_for_video(lang.video)
-    if lang.is_original:
+    if lang.is_original or lang.language == u"":
         return  reverse('videos:history', args=[vid])
     else:
         return  reverse('videos:translation_history', args=[vid, lang.language, lang.pk])
