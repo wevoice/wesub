@@ -5,5 +5,5 @@ Hi {{ user }}, </br>
 
 <p>{{ note|linebreaks }}</p>
 <br/>
-<a href="{{base_url}}{% url teams:approve_application slug=team.slug,user_pk=applicant.pk %}">Approve</a> or 
-<a href="{{base_url}}{% url teams:deny_application slug=team.slug,user_pk=applicant.pk %}">deny</a> this request.
+<a href="{{url_base}}{% url teams:approve_application slug=team.slug,user_pk=applicant.pk %}">Approve</a> or 
+<a href="{{url_base}}{% url teams:deny_application slug=team.slug,user_pk=applicant.pk %}">deny</a> this request.

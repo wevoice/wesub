@@ -2211,9 +2211,10 @@ a.unisubs-openid span {
     color: white !important;
     height: 800px !important;
     left: 0 !important;
+    padding: 15px !important;
     position: absolute !important;
     top: 0 !important;
-    padding: 15px !important;
+    text-align: center !important;
     width: 842px !important;
 }
 .unisubs-guidelinespanel .unisubs-done, .unisubs-howtopanel .unisubs-done {
