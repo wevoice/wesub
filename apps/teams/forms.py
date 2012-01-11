@@ -225,6 +225,10 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         video = self.fields['video_url'].video
 
         if video:
+            if TeamVideo.objects.filter(video=video, team__deleted=False).exists():
+                msg = _(u'This video already belongs to a team.')
+                self._errors['video_url'] = self.error_class([msg])
+
             original_sl = video.subtitle_language()
 
             if (original_sl and not original_sl.language) and not language:
