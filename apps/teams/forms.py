@@ -458,9 +458,12 @@ class TaskAssignForm(forms.Form):
             raise forms.ValidationError(_(
                 u'You do not have permission to assign this task.'))
 
-        if not can_perform_task(assignee, task):
-            raise forms.ValidationError(_(
-                u'This user cannot perform that task'))
+        if assignee is None:
+            return self.cleaned_data
+        else:
+            if not can_perform_task(assignee, task):
+                raise forms.ValidationError(_(
+                    u'This user cannot perform that task.'))
 
         return self.cleaned_data
 
