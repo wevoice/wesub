@@ -99,6 +99,23 @@ def unisubs(username):
                 separate_uslogging_db = True,
                 celeryd_bounce_cmd    = "/etc/init.d/celeryd restart  && /etc/init.d/celeryevcam start ")
 
+def temp(username):
+    
+    global ADMIN_HOST
+    ADMIN_HOST = "pcf-us-admintmp.pculture.org:2191"
+    _create_env(username              = username,
+                hosts                 = ['pcf-us-tmp1.pculture.org:2191',],
+                s3_bucket             = 's3.temp.universalsubtitles.org',
+                installation_dir      = 'universalsubtitles.staging',
+                static_dir            = '/var/static/tmp',
+                name                  = 'staging',
+                memcached_bounce_cmd  = '/etc/init.d/memcached-staging restart',
+                admin_dir             = '/usr/local/universalsubtitles.staging',
+                celeryd_host          = ADMIN_HOST,
+                celeryd_proj_root     = 'universalsubtitles.staging',
+                separate_uslogging_db = True,
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
+
 
 def syncdb():
     env.host_string = DEV_HOST
