@@ -56,11 +56,10 @@ from apps.videos.templatetags.paginator import paginate
 
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
-    can_create_task_translate, can_create_task_review, can_create_task_approve,
-    can_view_tasks_tab, can_invite, roles_user_can_assign, can_join_team,
-    can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
-    can_rename_team, can_change_team_settings, can_perform_task_for,
-    can_delete_team,
+    can_create_task_translate, can_view_tasks_tab, can_invite,
+    roles_user_can_assign, can_join_team, can_edit_video, can_create_tasks,
+    can_delete_tasks, can_perform_task, can_rename_team,
+    can_change_team_settings, can_perform_task_for, can_delete_team,
 )
 from teams.tasks import invalidate_video_caches
 import logging
@@ -1096,15 +1095,11 @@ def create_task(request, slug, team_video_pk):
 
     subtitlable = json.dumps(can_create_task_subtitle(team_video, request.user))
     translatable_languages = json.dumps(can_create_task_translate(team_video, request.user))
-    reviewable_languages = json.dumps(can_create_task_review(team_video, request.user))
-    approvable_languages = json.dumps(can_create_task_approve(team_video, request.user))
 
     language_choices = json.dumps(get_languages_list(True))
 
     return { 'form': form, 'team': team, 'team_video': team_video,
              'translatable_languages': translatable_languages,
-             'reviewable_languages': reviewable_languages,
-             'approvable_languages': approvable_languages,
              'language_choices': language_choices,
              'subtitlable': subtitlable,
              'can_assign': can_assign, }

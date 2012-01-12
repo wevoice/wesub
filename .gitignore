@@ -59,3 +59,5 @@ unisubs-integration
 user-data/video
 media/static-cache
 .ropeproject
+/tags
+/tags.bak
