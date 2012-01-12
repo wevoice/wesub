@@ -43,12 +43,14 @@
                     </select>
                 </div>
 
-                {% if request.user.teams.all %}
-                    <div class="or" style="margin: 10px 0 0 0; text-align: center; font-weight: bold;">-- or --</div>
+                {% if not request.GET.user %}
+                    {% if request.user.messageable_teams %}
+                        <div class="or" style="margin: 10px 0 0 0; text-align: center; font-weight: bold;">-- or --</div>
 
-                    <label for="id_team">Team</label>
-                    {{ form.errors.team }}
-                    {{ form.team }}
+                        <label for="id_team">Team</label>
+                        {{ form.errors.team }}
+                        {{ form.team }}
+                    {% endif %}
                 {% endif %}
 
                 <label for="id_subject">Subject</label>

@@ -538,12 +538,8 @@ class Video(models.Model):
         return False
 
     def completed_subtitle_languages(self, public_only=True):
-        completed = []
-        for sl in list(self.subtitlelanguage_set.all()):
-            c = sl.is_complete_and_synced(public_only=public_only)
-            if c:
-                completed.append(sl)
-        return completed
+        return [sl for sl in self.subtitlelanguage_set.all()
+                if sl.is_complete_and_synced(public_only=public_only)]
 
     @property
     def policy(self):
@@ -684,7 +680,7 @@ class SubtitleLanguage(models.Model):
         return self.language_display()
 
     def nonblank_subtitle_count(self):
-        return len([s for s in self.latest_subtitles() if s.text])
+        return len([s for s in self.latest_subtitles(public_only=False) if s.text])
 
     def get_title_display(self):
         return self.get_title() or self.video.title
