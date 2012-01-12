@@ -42,8 +42,7 @@ from apps.teams.permissions import (
 )
 from apps.teams.permissions import (
     roles_user_can_assign, can_invite, can_add_video_somewhere, can_create_tasks,
-    can_create_task_subtitle, can_create_task_translate, can_create_task_review,
-    can_create_task_approve
+    can_create_task_subtitle, can_create_task_translate
 )
 
 
@@ -310,10 +309,6 @@ def _can_create_any_task(context, team_video, user):
     if can_create_task_subtitle(team_video, user, workflows):
         result = True
     elif can_create_task_translate(team_video, user, workflows):
-        result = True
-    elif can_create_task_review(team_video, user, workflows):
-        result = True
-    elif can_create_task_approve(team_video, user, workflows):
         result = True
     else:
         result = False

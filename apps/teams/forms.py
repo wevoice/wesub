@@ -332,7 +332,7 @@ Enter a link to any compatible video, or to any video page on our site.''')
 
 
 class TaskCreateForm(ErrorableModelForm):
-    type = forms.TypedChoiceField(choices=Task.TYPE_CHOICES, coerce=int)
+    type = forms.TypedChoiceField(choices=Task.TYPE_CHOICES[:2], coerce=int)
     language = forms.ChoiceField(choices=(), required=False)
     assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
@@ -372,29 +372,6 @@ class TaskCreateForm(ErrorableModelForm):
                            'language', cleaned_data)
             return
 
-    def _check_task_creation_review(self, tasks, cleaned_data):
-        if not self.subtitle_language or not self.subtitle_language.is_complete_and_synced():
-            self.add_error(_(u"Subtitles in that language have not been completed yet, so they can't be reviewed."),
-                           'type', cleaned_data)
-            return
-
-    def _check_task_creation_approve(self, tasks, cleaned_data):
-        if not self.subtitle_language or not self.subtitle_language.is_complete_and_synced():
-            self.add_error(_(u"Subtitles in that language have not been completed yet, so they can't be approved."),
-                           'type', cleaned_data)
-            return
-
-        workflow = Workflow.get_for_team_video(self.team_video)
-
-        if workflow.review_enabled:
-            review_tasks = [t for t in tasks if t.type == Task.TYPE_IDS['Review']
-                                                and t.completed]
-
-            if not review_tasks:
-                self.add_error(_(u"These subtitles must be reviewed before being approved."),
-                               'type', cleaned_data)
-                return
-
 
     def clean(self):
         cd = self.cleaned_data
@@ -421,13 +398,8 @@ class TaskCreateForm(ErrorableModelForm):
 
         type_name = Task.TYPE_NAMES[type]
 
-        self.subtitle_language = (team_video.video.subtitle_language(lang)
-                                  if type_name in ('Review', 'Approve') else None)
-
         {'Subtitle': self._check_task_creation_subtitle,
          'Translate': self._check_task_creation_translate,
-         'Review': self._check_task_creation_review,
-         'Approve': self._check_task_creation_approve,
         }[type_name](existing_tasks, cd)
 
         return cd

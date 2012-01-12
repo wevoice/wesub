@@ -9,11 +9,7 @@ $(function() {
             var step = typeSelector.find(":selected").text();
             var langs;
 
-            if (step === 'Review') {
-                langs = reviewableLanguages;
-            } else if (step === 'Approve') {
-                langs = approvableLanguages;
-            } else if (step === 'Translate') {
+            if (step === 'Translate') {
                 langs = translatableLanguages;
             } else if (step === 'Subtitle') {
                 $('.language-selector').hide();
@@ -39,12 +35,6 @@ $(function() {
         });
 
         // Disable invalid task types
-        if (_.isEmpty(reviewableLanguages)) {
-            typeSelector.find(':contains("Review")').attr('disabled', 'disabled');
-        }
-        if (_.isEmpty(approvableLanguages)) {
-            typeSelector.find(':contains("Approve")').attr('disabled', 'disabled');
-        }
         if (_.isEmpty(translatableLanguages)) {
             typeSelector.find(':contains("Translate")').attr('disabled', 'disabled');
         }
