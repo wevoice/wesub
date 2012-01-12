@@ -229,6 +229,10 @@ class CustomUser(BaseUser):
             TeamMember.ROLE_ADMIN,
             TeamMember.ROLE_MANAGER])
 
+    @property
+    def can_message_teams(self):
+        return True
+
     def open_tasks(self):
         from apps.teams.models import Task
         return Task.objects.incomplete().filter(assignee=self)
