@@ -229,9 +229,11 @@ class CustomUser(BaseUser):
             TeamMember.ROLE_ADMIN,
             TeamMember.ROLE_MANAGER])
 
-    @property
-    def can_message_teams(self):
-        return True
+    def messageable_teams(self):
+        from apps.teams.permissions import can_message_all_members
+        teams = self.teams.all()
+        messageable_team_ids = [t.id for t in teams if can_message_all_members(t, self)]
+        return self.teams.filter(id__in=messageable_team_ids)
 
     def open_tasks(self):
         from apps.teams.models import Task

@@ -109,7 +109,6 @@ def new(request):
                         subject=form.cleaned_data['subject']).save()
             elif form.cleaned_data['team']:
                 # TODO: Move this into a task for performance?
-                # TODO: Make sure user has permissions to message this team.
                 for member in form.cleaned_data['team'].members.all():
                     if member.user != request.user:
                         Message(user=member.user, author=request.user,
