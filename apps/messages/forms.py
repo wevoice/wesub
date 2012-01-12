@@ -172,9 +172,7 @@ class NewMessageForm(forms.Form):
 
         # This isn't the fastest way to do this, but it's the simplest, and
         # performance probably won't be an issue here.
-        user_teams = author.teams.all()
-        messageable_team_ids = [t.id for t in user_teams if can_message_all_members(t, author)]
-        self.fields['team'].queryset = author.teams.filter(id__in=messageable_team_ids)
+        self.fields['team'].queryset = author.messageable_teams()
 
 
     def clean(self):
