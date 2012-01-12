@@ -175,11 +175,12 @@
                     <h3>{% trans "Collaborate" %}</h3>
                     {% if video.get_team_video %}
                         <p>
-                            {% trans "This video belongs to the following teams" %}:
+                            {% trans "This video belongs to the following team" %}:
                         </p>
                         {% render_belongs_to_team_list video %}
+                    {% else %}
+                        {% team_add_video_select %}
                     {% endif %}
-                    {% team_add_video_select %}
                 </div>
                 {% endif %}
             </div>

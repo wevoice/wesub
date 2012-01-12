@@ -41,21 +41,24 @@
         {% endif %}
 
         {% if filters.assignee or filters.language or filters.type or filters.team_video %}
-            <p class="active-filters">{% trans 'Showing' %}
+            <p class="active-filters">{% trans 'Showing tasks' %}
+                {% if filters.type %}
+                    {% trans 'to' %} <strong>{{ filters.type }}</strong>
+                {% endif %}
+                {% if request.GET.q %}
+                    {% trans 'matching' %} <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
+                {% endif %}
+                {% if filters.language %}
+                    {% trans 'for language' %} <strong>{{ filters.language|lang_name_from_code }}</strong>
+                {% endif %}
                 {% if filters.assignee == 'none' %}
                     <strong>{% trans 'unassigned' %}</strong>
                 {% endif %}
-                {% if filters.language %}
-                    <strong>{{ filters.language|lang_name_from_code }}</strong> {% trans 'language' %} {% endif %}
-                {% if filters.type %}
-                    <strong>{{ filters.type }}</strong>
-                {% endif %}
-                {% trans 'tasks' %}
-                {% if filters.team_video %}
-                    {% trans 'for' %} <strong>{{ filters.team_video }}</strong>
-                {% endif %}
                 {% if filters.assignee and filters.assignee != 'none' %}
                     {% trans 'assigned to' %} <strong>{{ filters.assignee }}</strong>
+                {% endif %}
+                {% if filters.team_video %}
+                    {% trans 'for' %} <strong>{{ filters.team_video }}</strong>
                 {% endif %}
                 <a href="{{ request.path }}{% query_string request.GET type="" lang="" assignee="" %}" class="clear-filters">{% trans 'Clear all filters' %}</a>
             </p>
@@ -118,9 +121,11 @@
                             {% else %}
                                 {% if task.assignee == None %}
                                     <li>
-                                        <a class="assign-and-perform" href="#">{% trans 'Perform Task' %}<span class="task-id" style="display: none;">{{ task.pk }}</span></a>
+                                        <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
+                                            {% trans 'Perform Task' %}
+                                        </a>
                                     </li>
-                                    <li style="display: none;">
+                                    <li class="hidden-perform-link" style="display: none;">
                                         {% include "teams/_perform_task_link.html" %}
                                     </li>
                                 {% endif %}
@@ -228,7 +233,7 @@
 
         <div class="refine">
             <h4>{% trans "Search and Filter" %}</h4>
-
+            {% include "teams/_search.html" %}
             <form action="" method="get">
                 <select id="id_task_language" name="language" class="lang-filter chosen">
                     <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'All Languages' %}</option>
@@ -242,7 +247,6 @@
                     {% endfor %}
                 </select>
             </form>
-
             <form action="" method="get">
                 <select name="assignee" class="assignee-filter">
                     <option value="{{ request.path }}{% query_string request.GET assignee="" %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'All Assignees' %}</option>
@@ -304,18 +308,25 @@
             });
 
             $('a.assign-and-perform').click(function(e) {
-                var target = $(e.target);
+                var $target = $(e.target);
+                $target.text('Loading...');
 
                 $.ajax({
                     url: '{% url teams:assign_task_ajax slug=team.slug %}',
                     type: 'POST',
                     data: {
-                        task: target.find('span.task-id').text(),
+                        task: $target.attr('data-id'),
                         assignee: {% firstof request.user.id -1 %}
                     },
                     success: function(data, textStatus, jqXHR) {
-                        target.hide();
-                        target.closest('ul').find('a.perform').closest('li').show().find('.perform').click();
+                        $target.hide();
+
+                        $li = $target.parent().siblings('li.hidden-perform-link');
+                        $li.show();
+
+                        $link = $li.children('a.perform');
+                        $link.text('Loading...');
+                        window.location = $link.attr('href');
                     }
                 });
 
