@@ -48,5 +48,5 @@ M2Crypto==0.21.1
 vendor/django-templatetag-sugar.tar.gz
 vendor/django-tastypie-e8af3152.tar.gz
 # this should be commented until we are sure we want to deploy this to prod
-#vendor/oboe-0.4.0.tar.gz 
+#vendor/oboe-0.4.1.0.tar.gz 
 
