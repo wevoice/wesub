@@ -35,8 +35,9 @@
             {% endif %}
         {% endwith %}
 
-        <div class="tools group expandable">
-            <p>Showing tasks of <span>all types ▼</span> for <span>all languages ▼</span> assigned to <span>no one ▼</span></p>
+        <div class="tools group">
+            {% include "teams/_search.html" %}
+            <p>Showing <span>all types ▼</span> for <span>all languages ▼</span> assigned to <span>no one ▼</span></p>
         </div>
 
         {% comment %}{% if filters.team_video != None %}

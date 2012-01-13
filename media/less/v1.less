@@ -299,9 +299,8 @@ body {
     position: relative;
     padding: 1em 0 1em 1em;
     margin: 0 0 0 -10px;
-    height: 15px;
+    min-height: 18px;
     border-bottom: 1px solid #e8ebed;
-    font-size: 11px;
     text-align: right;
     .linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
 
@@ -352,6 +351,37 @@ body {
     .sort_button {
         float: right;
         margin: -.5em .5em 0 0;
+    }
+
+    form.search {
+        position: absolute;
+        top: .5em; left: .65em;
+        width: 180px;
+        margin: 0;
+        padding: 0;
+
+        fieldset {
+            padding: 0;
+            
+            input {
+                float: left;
+                border-color: @fainter;
+
+                &:focus {
+                    border-color: @normal;
+                }
+            }
+
+            a.reset {
+                display: block;
+                position: absolute;
+                top: 0; left: 172px;
+                text-decoration: none;
+                color: @light;
+                padding: .5em;
+                line-height: 1.5em;
+            }
+        }
     }
 }
 
@@ -833,7 +863,7 @@ p.view-more {
             }
         }
     }
-    .refine, div.search {
+    .refine {
         padding: 1.5em 15px 1em;
         margin: 0 0 2em -15px;
         border-bottom: 1px solid @faintest;
@@ -861,14 +891,6 @@ p.view-more {
     form {
         padding: 0;
 
-    }
-    div.search {
-        border-bottom: 0;
-        padding-bottom: 0;
-
-        form {
-            padding: 0;
-        }
     }
 }
 
@@ -1696,7 +1718,7 @@ pre.dump {
     }
 }
 
-#teams .view form {
+#teams .view form.settings {
     margin-left: 1.5em;
     margin-right: 2.5em;
 }
