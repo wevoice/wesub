@@ -233,7 +233,7 @@
                     {% trans "created" %}
                     <strong>{{ language.last_version.revision_time }}</strong>
                     {% trans "by" %}
-                    <a href="language.latest_version.user.profile_url" title="View {{ language.latest_version.user }}'s profile">
+                    <a href="{{ language.latest_version.user.profile_url}}" title="View {{ language.latest_version.user }}'s profile">
                         <strong>{{ language.latest_version.user }}</strong>
                     </a>.
                 </p>

@@ -248,6 +248,16 @@ class Rpc(BaseRpc):
             request, video_id, language_code,
             subtitle_language_pk, base_language)
 
+        video = models.Video.objects.get(video_id=video_id)
+        team_video = video.get_team_video()
+        if team_video:
+            tasks = team_video.task_set.incomplete().filter(language=language_code)
+            if tasks:
+                task = tasks[0]
+                if not request.user.is_authenticated() or request.user != task.assignee:
+                    return { "can_edit": False,
+                             "locked_by": str(task.assignee or task.team) }
+
         if not can_edit:
             return { "can_edit": False,
                      "locked_by" : language.writelock_owner_name }
