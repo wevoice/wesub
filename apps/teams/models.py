@@ -683,6 +683,19 @@ class TeamVideo(models.Model):
                 self.video.subtitle_language().is_complete_and_synced())
 
 
+def _create_translation_tasks(team_video, subtitle_version):
+    preferred_langs = TeamLanguagePreference.objects.get_preferred(team_video.team)
+
+    for lang in preferred_langs:
+        sl = team_video.video.subtitle_language(lang)
+        if sl and sl.is_complete_and_synced():
+            continue
+
+        task = Task(team=team_video.team, team_video=team_video,
+                    subtitle_version=subtitle_version,
+                    language=lang, type=Task.TYPE_IDS['Translate'])
+        task.save()
+
 def team_video_save(sender, instance, created, **kwargs):
     update_one_team_video.delay(instance.id)
 
@@ -697,8 +710,12 @@ def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     if created and not raw:
         workflow = Workflow.get_for_team_video(instance)
         if workflow.autocreate_subtitle:
-            Task(team=instance.team, team_video=instance, subtitle_version=None,
-                 language='', type=Task.TYPE_IDS['Subtitle']).save()
+            existing_subtitles = instance.video.completed_subtitle_languages(public_only=True)
+            if not existing_subtitles:
+                Task(team=instance.team, team_video=instance, subtitle_version=None,
+                    language='', type=Task.TYPE_IDS['Subtitle']).save()
+            else:
+                _create_translation_tasks(instance, existing_subtitles[0].latest_version())
 
 
 post_save.connect(team_video_save, TeamVideo, dispatch_uid="teams.teamvideo.team_video_save")
@@ -1300,19 +1317,6 @@ class Task(models.Model):
 
         self.subtitle_version.save()
 
-    def _create_translation_tasks(self, subtitle_version):
-        preferred_langs = TeamLanguagePreference.objects.get_preferred(self.team)
-
-        for lang in preferred_langs:
-            sl = self.team_video.video.subtitle_language(lang)
-            if sl and sl.is_complete_and_synced():
-                continue
-
-            task = Task(team=self.team, team_video=self.team_video,
-                        subtitle_version=subtitle_version,
-                        language=lang, type=Task.TYPE_IDS['Translate'])
-            task.save()
-
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
@@ -1340,7 +1344,7 @@ class Task(models.Model):
             task.save()
         else:
             if self.workflow.autocreate_translate:
-                self._create_translation_tasks(subtitle_version)
+                _create_translation_tasks(self.team_video, self.subtitle_version)
 
     def _complete_translate(self):
         subtitle_version = self.team_video.video.latest_version(language_code=self.language, public_only=False)
@@ -1385,7 +1389,7 @@ class Task(models.Model):
 
             # If the subtitles are okay, go ahead and autocreate translation tasks.
             if self.workflow.autocreate_translate and self.approved == Task.APPROVED_IDS['Approved']:
-                self._create_translation_tasks(self.subtitle_version)
+                _create_translation_tasks(self.team_video, self.subtitle_version)
 
         return task
 
@@ -1398,7 +1402,7 @@ class Task(models.Model):
 
         # If the subtitles are okay, go ahead and autocreate translation tasks.
         if self.workflow.autocreate_translate and self.approved == Task.APPROVED_IDS['Approved']:
-            self._create_translation_tasks(self.subtitle_version)
+            _create_translation_tasks(self.team_video, self.subtitle_version)
 
 
     def get_perform_url(self):
