@@ -26,19 +26,27 @@
 
 {% block view_content %}
 
-    {% with "tasks" as current %}
-        {% include "teams/_tabs.html" %}
-    {% endwith %}
+    <div class="view grid_8 omega">
+        {% with "tasks" as current %}
+            {% if not project %}
+                {% include 'teams/_tabs.html' %}
+            {% else %}
+                {% include 'teams/_tabs_projects.html' %}
+            {% endif %}
+        {% endwith %}
 
-    <div class="panel-holder view grid_9 alpha">
-        {% if filters.team_video != None %}
+        <div class="tools group expandable">
+            <p>Showing tasks of <span>all types ▼</span> for <span>all languages ▼</span> assigned to <span>no one ▼</span></p>
+        </div>
+
+        {% comment %}{% if filters.team_video != None %}
             {% can_create_any_task_for_teamvideo filters.team_video request.user %}
             {% if user_can_create_any_task %}
                 <div class="tools">
                     <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">{% trans 'Add Task' %}</a>
                 </div>
             {% endif %}
-        {% endif %}
+        {% endif %}{% endcomment %}
 
         {% if filters.assignee or filters.language or filters.type or filters.team_video %}
             <p class="active-filters">{% trans 'Showing tasks' %}
@@ -82,8 +90,11 @@
                             {% trans 'Subtitles' %}
                         {% endif %}
                     </h3>
-                    <p>{% trans "Video" %}: {{ task.team_video|truncatewords:8 }}</p>
-                    <p class="steps">
+                    <p>{% trans "Video" %}: <a href="">{{ task.team_video|truncatewords:5 }}</a></p>
+                    {% if task.get_type_display != 'Subtitle' %}
+                        <p><a href="">{% trans 'View subtitles' %}</a></p>
+                    {% endif %}
+                    <!-- <p class="steps">
                         <span{% if task.get_type_display == "Subtitle" %} class="current"{% endif %}>{% trans 'Subtitle' %}</span>/<span{% if task.get_type_display == "Translate" %} class="current"{% endif %}>{% trans 'Translate' %}</span>
                         {% if task.workflow.review_enabled %}
                             →
@@ -95,7 +106,7 @@
                         {% endif %}
                         →
                         {% trans 'Published' %}
-                    </p>
+                    </p> -->
                     <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.video.thumbnail }}" alt="{{ task.team_video.title }}"></a>
                     <ul class="actions">
                         <li>
@@ -190,7 +201,7 @@
 
         {% if is_paginated %}{% paginator %}{% endif %}
     </div>
-
+{% comment %}
     <div class="controls grid_3 omega">
         <form id="tasks_type_filter">
             <ul class="types">
@@ -235,6 +246,11 @@
             <h4>{% trans "Search and Filter" %}</h4>
             {% include "teams/_search.html" %}
             <form action="" method="get">
+                <select id="id_task_project" name="project" class="proj-filter chosen">
+                    <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'All Projects' %}</option>
+                </select>
+            </form>
+            <form action="" method="get">
                 <select id="id_task_language" name="language" class="lang-filter chosen">
                     <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'All Languages' %}</option>
                     {% for language in languages %}
@@ -258,6 +274,7 @@
 
         {% include "teams/_actions.html" %}
     </div>
+{% endcomment %}
 
     <script type="text/javascript">
         $(function() {

@@ -10,11 +10,11 @@
 
 {% block view_content %}
 
-    {% with "activity" as current %}
-        {% include "teams/_tabs.html" %}
-    {% endwith %}
+    <div class="view grid_8 omega">
+        {% with "activity" as current %}
+            {% include "teams/_tabs.html" %}
+        {% endwith %}
 
-    <div class="view grid_9 alpha">
         {% if videos_action_list %}
             {% if is_paginated %}{% paginator %}{% endif %}
             <ul class="activity listing">

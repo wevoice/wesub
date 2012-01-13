@@ -563,17 +563,13 @@ body {
     }
 }
 .v1 .listing.videos > li {
-    min-height: 8em;
-    padding-left: 140px;
-    padding-right: 160px;
+
 
     .thumb {
-        width: 120px;
-        height: 90px;
+
 
         img {
-            max-height: 90px;
-            max-width: 120px;
+
         }
     }
 }
@@ -618,7 +614,7 @@ body {
     }
 }
 .v1 .listing.tasks > li {
-    padding-left: 100px;
+    padding-left: 110px;
     min-height: 5em;
 
     p.steps {
@@ -638,6 +634,11 @@ body {
 
     .thumb img {
         max-width: 80px;
+        margin-left: 10px;
+    }
+
+    form.assign-form {
+        padding: 0;
     }
 
 }
@@ -1574,5 +1575,89 @@ pre.dump {
         padding: 18px 15px;
         .border-radius();
         .box-shadow(1px, 1px, 3px, rgba(0, 0, 0, .4));
+    }
+}
+
+
+/******************** @Crazytown *****/
+
+#teams .view .tools {
+    margin: 0 0 0 -10px;
+    padding-right: 0;
+}
+
+#teams .backnav {
+    padding-bottom: .25em;
+
+    a {
+        color: @light;
+    }
+}
+
+#teams .context h2 span {
+    color: @faint;
+    float: none;
+}
+
+#teams .view .expandable {
+    overflow: hidden;
+
+    .button {
+
+        span {
+            display: block;
+            float: right;
+            width: 16px;
+            height: 1.5em;
+            background: url('../images/chosen-sprite.png') no-repeat 0px -5px;
+            margin-left: 4px;
+        }
+    }
+}
+
+#teams .view .tools {
+
+    p {
+        color: @lighter;
+
+        span {
+            color: @dark;
+        }
+    }
+
+}
+
+#teams .listing.videos li {
+    position: relative;
+    width: 310px;
+    padding: 10px 0;
+    float: left;
+    border: none;
+
+    h3 {
+        margin: 0 10px 10px;
+        height: 2em;
+    }
+
+    .thumb {
+        position: static;
+
+        img {
+            width: 290px;
+            margin: 10px 10px 0;
+        }
+    }
+
+    .callout {
+        position: absolute;
+        top: 1em;
+        right: 0;
+        padding: .75em;
+        color: #fff;
+        .border-radius(3px);
+        text-decoration: none;
+        .vertical-gradient(@normal, @dark);
+        text-shadow: 1px 1px 1px @dark;
+        .box-shadow(0, 0, 2px, @lighter);
     }
 }

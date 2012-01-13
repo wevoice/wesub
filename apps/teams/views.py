@@ -170,7 +170,7 @@ def detail(request, slug, project_slug=None, languages=None):
         # Cheat and reduce the number of videos on the page if we're dealing with
         # someone who can edit videos in the team, for performance reasons.
         is_editor = True
-        per_page = 10
+        per_page = 6
     else:
         is_editor = False
         per_page = VIDEOS_ON_PAGE
@@ -1017,11 +1017,17 @@ def _get_task_filters(request):
 
 
 @render_to('teams/tasks.html')
-def team_tasks(request, slug):
+def team_tasks(request, slug, project_slug=None):
     team = Team.get(slug, request.user)
 
     if not can_view_tasks_tab(team, request.user):
         return HttpResponseForbidden(_("You cannot view this team's tasks."))
+
+    # TODO: Review this
+    if project_slug is not None:
+        project = get_object_or_404(Project, team=team, slug=project_slug)
+    else:
+        project = None
 
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
@@ -1050,6 +1056,7 @@ def team_tasks(request, slug):
 
     context = {
         'team': team,
+        'project': project, # TODO: Review
         'user_can_delete_tasks': can_delete_tasks(team, request.user),
         'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
@@ -1264,4 +1271,3 @@ def edit_project(request, slug, project_slug):
         workflow_form = WorkflowForm(instance=workflow)
 
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
-

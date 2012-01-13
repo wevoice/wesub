@@ -48,41 +48,54 @@
 
 {% block view_content %}
 
-    {% with "videos" as current %}
-        {% include "teams/_tabs.html" %}
-    {% endwith %}
+    <div class="grid_8 view omega">
+        {% with "videos" as current %}
+            {% if not project %}
+                {% include 'teams/_tabs.html' %}
+            {% else %}
+                {% include 'teams/_tabs_projects.html' %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="tools group expandable">
+            <a href="#" class="button">
+                <span></span>
+                {% trans "Sort and Filter" %}
+            </a>
+            <!-- <div class="grid_8">
+                <div class="grid_4">
+                    {% include "teams/_search.html" %}
+                </div>
+                <div class="grid_4">
+                    <select name="lang-filter" id="lang-filter">
+                        <option value="{% query_string request.GET lang='' %}">All languages</option>
+                        {% for code, name in language_choices %}
+                            <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div> -->
+        </div>
+
+        {% if team_video_md_list %}
+            <ul class="videos listing">
+                {% with team|is_team_member:request.user as user_is_team_member %}
+                    {% for md_obj in team_video_md_list %}
+                        {% team_video_detail md_obj %}
+                    {% endfor %}
+                {% endwith %}
+            </ul>
+            {% if is_paginated %}{% paginator %}{% endif %}
+        {% else %}
+            <p class="empty">{% trans "Sorry, no videos here" %}...</p>
+        {% endif %}
+    </div>
+
+    {% comment %}
+
 
     <div class="view grid_9 alpha">
-        <div class="tools group">
-            {% if can_add_video %}
-                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
-            {% endif %}
-            <div class="sort_button">
-                <div class="arrow">
-                </div>
-                <span class="sort_label">{% trans 'Sort by' %} <strong>{{ order_name }}</strong></span>
-                <ul>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=name">{% trans 'Name, A-Z' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-name">{% trans 'Name, Z-A' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-time">{% trans 'Time, Newest' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=time">{% trans 'Time, Oldest' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-subs">{% trans 'Subtitles, Most' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=subs">{% trans 'Subtitles, Least' %}</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        
 
         {% if filtered %}
             <p class="active-filters">
@@ -133,5 +146,7 @@
         </div>
         {% include "teams/_actions.html" %}
     </div>
+
+    {% endcomment %}
 
 {% endblock %}

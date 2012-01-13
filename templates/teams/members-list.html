@@ -34,21 +34,25 @@
 
 {% block view_content %}
 
-    {% with "members" as current %}
-        {% include "teams/_tabs.html" %}
-    {% endwith %}
+    <div class="view grid_8 omega">
 
-    {% if team.video %}
-        {% widget widget_params %}
-    {% endif %}
+        {% with "members" as current %}
+            {% if not project %}
+                {% include 'teams/_tabs.html' %}
+            {% else %}
+                {% include 'teams/_tabs_projects.html' %}
+            {% endif %}
+        {% endwith %}
 
-    <div class="view grid_9 alpha">
+        <div class="tools group">
+            <a href="" class="button">{% trans "Sort and Filter" %}</a>
+        </div>
 
-        {% if team|can_invite_to_team:user %}
+        {% comment %}{% if team|can_invite_to_team:user %}
             <div class="tools group">
                 <a href="{% url teams:invite_members slug=team.slug %}" class="button">{% trans 'Invite Members' %}</a>
             </div>
-        {% endif %}
+        {% endif %}{% endcomment %}
 
         {% if filtered %}
             <p class="active-filters">
@@ -115,7 +119,7 @@
         </ul>
         {% if is_paginated %}{% paginator %}{% endif %}
     </div>
-
+{% comment %}
     <div class="controls grid_3 omega">
         {% include "teams/_filters_members.html" %}
         <div class="refine">
@@ -130,6 +134,7 @@
         </div>
         {% include "teams/_actions.html" %}
     </div>
+{% endcomment %}
 
     {% if assignable_roles %}
         <script id="editRoleDialog" type="text/html">
