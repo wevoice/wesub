@@ -1,6 +1,6 @@
 {% extends "teams/base.html" %}
 
-{% load i18n utils_tags query_string teams_tags paginator profiles_tags widget markup media_compressor %}
+{% load i18n utils_tags query_string teams_tags paginator profiles_tags markup media_compressor %}
 
 {% block title %}
     {{ team }} | Universal Subtitles
@@ -57,24 +57,8 @@
             {% endif %}
         {% endwith %}
 
-        <div class="tools group expandable">
-            <a href="#" class="button">
-                <span></span>
-                {% trans "Sort and Filter" %}
-            </a>
-            <!-- <div class="grid_8">
-                <div class="grid_4">
-                    {% include "teams/_search.html" %}
-                </div>
-                <div class="grid_4">
-                    <select name="lang-filter" id="lang-filter">
-                        <option value="{% query_string request.GET lang='' %}">All languages</option>
-                        {% for code, name in language_choices %}
-                            <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div> -->
+        <div class="tools group">
+            
         </div>
 
         {% if team_video_md_list %}
@@ -93,10 +77,6 @@
 
     {% comment %}
 
-
-    <div class="view grid_9 alpha">
-        
-
         {% if filtered %}
             <p class="active-filters">
                 {% trans 'Showing videos' %}
@@ -113,28 +93,7 @@
                 <a href="{{ team.get_absolute_url }}" class="clear-filters">{% trans 'Clear all filters' %}</a>
             </p>
         {% endif %}
-
-        {% if not team.page_content and team.video %}
-            {% widget widget_params %}
-        {% endif %}
         
-        {% if team_video_md_list %}
-            <ul class="videos listing">
-                {% with team|is_team_member:request.user as user_is_team_member %}
-                    {% for md_obj in team_video_md_list %}
-                        {% team_video_detail md_obj %}
-                    {% endfor %}
-                {% endwith %}
-            </ul>
-            {% if is_paginated %}{% paginator %}{% endif %}
-        {% else %}
-            <p class="empty">{% trans "Sorry, no videos here" %}...</p>
-        {% endif %}
-    </div>
-
-    <div class="controls grid_3 omega">
-        {% include "teams/_filters_videos.html" %}
-        <div class="refine">
             <h4>{% trans "Search and Filter" %}</h4>
             {% include "teams/_search.html" %}
             <select name="lang-filter" id="lang-filter">
@@ -143,9 +102,6 @@
                     <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
                 {% endfor %}
             </select>
-        </div>
-        {% include "teams/_actions.html" %}
-    </div>
 
     {% endcomment %}
 

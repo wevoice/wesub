@@ -1,34 +1,35 @@
-{% load i18n teams_tags videos_tags query_string %}
+{% load i18n teams_tags utils_tags query_string %}
 
 {% team_projects team as projects %}
 
 <h2 class="main-title">
-    <a href="" title="permalink">About {{ team }}</a>
+    <a href="" title="permalink">{% trans 'About' %} {{ team }}</a>
 </h2>
 <div id="description" class="abbr">
     <div class="abbr-content">
-        <p>The TED Open Translation Project brings TEDTalks beyond the English-speaking world by offering subtitles, interactive transcripts and the ability for any talk to be translated by volunteers worldwide.</p>
+        {{ team.description|urlize|linebreaks }}
     </div>
 </div>
 <ul class="metrics">
     <li>
-        <p>{{ projects.count }}</p>
-        <h4>{% trans "Projects" %}</h4>
+        <p>{{ projects.count|simplify_number }}</p>
+        <h4>{% trans "Project" %}{{ projects.count|pluralize }}</h4>
     </li>
     <li>
         <p>{{ all_videos_count|simplify_number }}</p>
-        <h4>{% trans "Videos" %}</h4>
+        <h4>{% trans "Video" %}{{ all_videos_count|pluralize }}</h4>
     </li>
     <li>
-        <p>{{team|members:"count"}}</p>
-        <h4>{% trans "Members" %}</h4>
+        <p>{{team|members:'count'|simplify_number}}</p>
+        <h4>{% trans "Member" %}{{ team|members:'count'|pluralize }}</h4>
     </li>
     <li>
         <p>22</p>
-        <h4>{% trans "Tasks" %}</h4>
+        <h4>{% trans "Task" %}</h4>
     </li>
 </ul>
-<h3>Share</h3>
+<h3>{% trans 'Share' %}</h3>
+<!-- TODO: This all needs to be hooked up. See video pages for working examples -->
 <ul class="buttons">
     <li><a href="#" onclick="return share_on_facebook(event);" class="facebook" title="{% trans 'Post to Facebook' %}">{% trans 'Post to Facebook' %}</a></li>
     <li><a href="{{share_panel_twitter_url}}" target="post_to_twitter" class="twitter" title="{% trans 'Post to Twitter' %}">{% trans 'Post to Twitter' %}</a></li>
@@ -37,7 +38,7 @@
 </ul>
 
 {% if projects.count > 0 %}
-    <h3>Projects</h3>
+    <h3>{% trans 'Projects' %}</h3>
     <ul>
         {% for project in projects %}
             <li>
@@ -48,3 +49,7 @@
         {% endfor %}
     </ul>
 {% endif %}
+
+{% comment %}
+    {% include "teams/_actions.html" %}
+{% endcomment %}

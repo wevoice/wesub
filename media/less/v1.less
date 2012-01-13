@@ -297,8 +297,8 @@ body {
 .v1 .view .tools {
     clear: both;
     position: relative;
-    padding: 1em;
-    margin: 0 -20px 0 0;
+    padding: 1em 0 1em 1em;
+    margin: 0 0 0 -10px;
     height: 15px;
     border-bottom: 1px solid #e8ebed;
     font-size: 11px;
@@ -369,6 +369,7 @@ body {
 }
 
 .v1 .listing {
+    clear: both;
     padding: 0;
 
     & > li {
@@ -563,13 +564,75 @@ body {
     }
 }
 .v1 .listing.videos > li {
+    position: relative;
+    width: 310px;
+    padding: 10px 0;
+    float: left;
+    border: none;
 
+    h3 {
+        clear: both;
+        margin: 0 10px 10px;
+        height: 2em;
+    }
 
     .thumb {
-
+        position: relative;
+        top: 0;
 
         img {
+            width: 290px;
+            margin: 10px 10px 0;
+        }
+    }
 
+    a {
+        text-decoration: none;
+    }
+
+    .languages {
+        position: absolute;
+        top: 11px;
+        left: 11px;
+        width: 290px;
+        margin: 0;
+        padding: .75em 0;
+        text-indent: 1em;
+        background: hsla(0%, 0%, 0%, .45);
+        color: #eee;
+        text-shadow: 1px 1px 1px #444;
+
+    }
+
+    .callout {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: .75em;
+        .border-radius(3px);
+        text-indent: 0;
+        color: #fff;
+        .vertical-gradient(@normal, @dark);
+        text-shadow: 1px 1px 1px @dark;
+        .box-shadow(-1px, 1px, 1px, hsla(0%, 0%, 0%, .35));
+    }
+
+    .admin-controls {
+        right: 1em;
+        bottom: .5em;
+        background: transparent;
+        border: none;
+
+        a {
+            background: transparent;
+            border: none;
+            color: #aaa;
+
+            &:hover {
+                background: transparent;
+                color: #fff;
+            }
         }
     }
 }
@@ -1581,22 +1644,12 @@ pre.dump {
 
 /******************** @Crazytown *****/
 
-#teams .view .tools {
-    margin: 0 0 0 -10px;
-    padding-right: 0;
-}
-
 #teams .backnav {
     padding-bottom: .25em;
 
     a {
         color: @light;
     }
-}
-
-#teams .context h2 span {
-    color: @faint;
-    float: none;
 }
 
 #teams .view .expandable {
@@ -1627,37 +1680,23 @@ pre.dump {
 
 }
 
-#teams .listing.videos li {
-    position: relative;
-    width: 310px;
-    padding: 10px 0;
-    float: left;
-    border: none;
+#teams .view .subnav {
+    text-align: left;
+    padding: 1em 0;
 
-    h3 {
-        margin: 0 10px 10px;
-        height: 2em;
-    }
+    ul li {
+        display: inline;
 
-    .thumb {
-        position: static;
-
-        img {
-            width: 290px;
-            margin: 10px 10px 0;
+        a {
+            color: @light;
+            text-decoration: none;
+            margin-right: 1em;
+            line-height: 1.5em;
         }
     }
+}
 
-    .callout {
-        position: absolute;
-        top: 1em;
-        right: 0;
-        padding: .75em;
-        color: #fff;
-        .border-radius(3px);
-        text-decoration: none;
-        .vertical-gradient(@normal, @dark);
-        text-shadow: 1px 1px 1px @dark;
-        .box-shadow(0, 0, 2px, @lighter);
-    }
+#teams .view form {
+    margin-left: 1.5em;
+    margin-right: 2.5em;
 }

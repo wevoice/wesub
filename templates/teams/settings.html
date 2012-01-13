@@ -6,15 +6,21 @@
 {% endblock %}
 
 {% block view_content %}
-    {% with "settings" as current %}
-        {% include "teams/_tabs.html" %}
-    {% endwith %}
 
-    <div class="view grid_9 alpha">
+    <div class="view grid_8 omega">
+        {% with 'settings' as current %}
+            {% include 'teams/_tabs.html' %}
+        {% endwith %}
+
+        <div class="tools subnav">
+            {% with 'settings' as current_sub %}
+                {% include 'teams/_subnav_settings.html' %}
+            {% endwith %}
+        </div>
+
         <form class="team-settings" enctype="multipart/form-data" method="POST" action="">
             {% csrf_token %}
 
-            <div class="grid_4 alpha">
                 <fieldset>
                     <legend>Team Details</legend>
 
@@ -34,9 +40,7 @@
                     {{ form.description }}
                     <p class="notation">All urls will be converted to links. Line breaks and HTML not supported.</p>
                 </fieldset>
-            </div>
 
-            <div class="grid_4 omega">
                 <fieldset>
                     <legend>Display Settings</legend>
 
@@ -49,9 +53,8 @@
 
                     <label for="id_is_visible">{{ form.is_visible }} Publicly visible?</label>
                 </fieldset>
-            </div>
 
-            <div class="grid_9 submit">
+            <div class="submit">
                 {% comment %}
                     TODO: This button should only be displayed if the logged-in-user has the Owner role for this team.
                 {% endcomment %}
@@ -59,14 +62,6 @@
                 <input type="submit" class="button delete project-delete" onclick="return confirm('{% trans "Do you really wish to delete this team?" %}')" value="Delete team" name="delete" />
             </div>
         </form>
-    </div>
-
-    <div class="controls grid_3 omega ">
-        {% with "settings" as current_sub %}
-            {% include "teams/_filters_settings.html" %}
-        {% endwith %}
-
-        {% include "teams/_actions.html" %}
     </div>
 
     <script id="IMAGE_PRELOADER" type="text/html">

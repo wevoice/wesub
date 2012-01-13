@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<ul>
+<ul class="sub-settings-panel">
     <li {% if current_sub == "settings" %}class="current"{% endif %}>
         <a href="{% url teams:settings_basic slug=team.slug %}">{% trans "Basic Settings" %}</a>
     </li>
