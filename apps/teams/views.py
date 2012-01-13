@@ -519,7 +519,7 @@ def add_video(request, slug):
         obj.save()
         api_teamvideo_new.send(obj)
         messages.success(request, form.success_message())
-        return redirect(obj)
+        return redirect(team.get_absolute_url())
 
     return {
         'form': form,
