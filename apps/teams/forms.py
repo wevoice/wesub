@@ -398,6 +398,10 @@ class TaskCreateForm(ErrorableModelForm):
 
         type_name = Task.TYPE_NAMES[type]
 
+        if type_name == 'Translate':
+            if lang == '':
+                self.add_error(_(u"You must select a language for a Translate task."))
+
         {'Subtitle': self._check_task_creation_subtitle,
          'Translate': self._check_task_creation_translate,
         }[type_name](existing_tasks, cd)
