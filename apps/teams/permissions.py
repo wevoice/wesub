@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.db.models import Q
 from teams.models import Team, MembershipNarrowing, Workflow, TeamMember, Task
 
 from teams.permissions_const import (
@@ -417,6 +416,7 @@ def can_change_video_settings(user, team_video):
     role = get_role_for_target(user, team_video.team, team_video.project, None)
     return role in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]
 
+
 def can_review(team_video, user, lang=None):
     workflow = Workflow.get_for_team_video(team_video)
     role = get_role_for_target(user, team_video.team, team_video.project, lang)
@@ -437,6 +437,21 @@ def can_review(team_video, user, lang=None):
     # Users cannot review their own subtitles.
     subtitle_version = team_video.video.latest_version(language_code=lang, public_only=False)
     if lang and subtitle_version.user == user:
+        # Hacky special case.  When the following is true:
+        #
+        # * The team has only one admin/owner.
+        # * There is no one else who can review subtitles.
+        #
+        # Then we let that admin/owner review their own subtitles.
+        ao_roles = (ROLE_ADMIN, ROLE_OWNER)
+        if role in ao_roles and role_req in ao_roles:
+            is_only_reviewer = not team_video.team.members.filter(
+                user__is_active=True, role__in=ao_roles
+            ).exclude(user=user).exists()
+
+            if is_only_reviewer:
+                return True
+
         return False
 
     return True
@@ -454,6 +469,7 @@ def can_approve(team_video, user, lang=None):
     }[workflow.approve_allowed]
 
     return role in _perms_equal_or_greater(role_req)
+
 
 def can_message_all_members(team, user):
     role = get_role_for_target(user, team)
