@@ -698,7 +698,7 @@ class TeamsTest(TestCase):
         url = reverse("teams:add_video", kwargs={"slug": team.slug})
         response = self.client.post(url, data)
         self.assertEqual(tv_len+1, team.teamvideo_set.count())
-        self.assertRedirects(response, reverse("teams:team_video", kwargs={"team_video_pk": 3}))
+        self.assertRedirects(response, reverse("teams:detail", kwargs={"slug": team.slug}))
 
         #-------edit team video -----------------
         team = Team.objects.get(pk=1)
