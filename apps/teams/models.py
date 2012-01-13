@@ -1048,7 +1048,8 @@ class Workflow(models.Model):
         if type == 'project':
             try:
                 return [w for w in workflows
-                        if w.project and w.project.id == id and not w.team_video][0]
+                        if w.project and w.project.workflow_enabled
+                        and w.project.id == id and not w.team_video][0]
             except IndexError:
                 # If there's no project-specific workflow for this project,
                 # there might be one for its team, so we'll fall through.
