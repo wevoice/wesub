@@ -40,7 +40,7 @@
             {% endif %}
         {% endif %}
 
-        {% if filters.assignee or filters.language or filters.type or filters.team_video %}
+        {% if filters.assignee or filters.language or filters.type or filters.team_video or request.GET.q %}
             <p class="active-filters">{% trans 'Showing tasks' %}
                 {% if filters.type %}
                     {% trans 'to' %} <strong>{{ filters.type }}</strong>
@@ -60,7 +60,7 @@
                 {% if filters.team_video %}
                     {% trans 'for' %} <strong>{{ filters.team_video }}</strong>
                 {% endif %}
-                <a href="{{ request.path }}{% query_string request.GET type="" lang="" assignee="" %}" class="clear-filters">{% trans 'Clear all filters' %}</a>
+                <a href="{{ request.path }}{% query_string request.GET q="" type="" lang="" assignee="" %}" class="clear-filters">{% trans 'Clear all filters' %}</a>
             </p>
         {% endif %}
 
