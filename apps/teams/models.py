@@ -1312,6 +1312,7 @@ class Task(models.Model):
                         language=lang, type=Task.TYPE_IDS['Translate'])
             task.save()
 
+
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
         self.completed = datetime.datetime.now()
@@ -1340,9 +1341,8 @@ class Task(models.Model):
             if self.workflow.autocreate_translate:
                 self._create_translation_tasks(subtitle_version)
 
-
     def _complete_translate(self):
-        subtitle_version = self.team_video.video.latest_version(language_code=self.language)
+        subtitle_version = self.team_video.video.latest_version(language_code=self.language, public_only=False)
 
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
