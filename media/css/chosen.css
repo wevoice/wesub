@@ -281,10 +281,6 @@
 
 /* @group Active  */
 .v1 .chzn-container-active .chzn-single {
-  -webkit-box-shadow: 0 0 5px rgba(0,0,0,.3);
-  -moz-box-shadow   : 0 0 5px rgba(0,0,0,.3);
-  -o-box-shadow     : 0 0 5px rgba(0,0,0,.3);
-  box-shadow        : 0 0 5px rgba(0,0,0,.3);
   border: 1px solid #b7c3c9;
 }
 .v1 .chzn-container-active .chzn-single-with-drop {

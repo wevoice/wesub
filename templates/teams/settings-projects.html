@@ -6,21 +6,23 @@
 {% endblock %}
 
 {% block view_content %}
-    {% with "settings" as current %}
-        {% include "teams/_tabs.html" %}
-    {% endwith %}
 
-    <div class="view grid_9 alpha">
-        <div class="tools group">
-            <a class="button project-add" href="{% url teams:add_project slug=team.slug %}">{% trans 'Add Project' %}</a>
+    <div class="view grid_8 omega">
+        {% with 'settings' as current %}
+            {% include 'teams/_tabs.html' %}
+        {% endwith %}
+        <div class="tools subnav">
+            {% with 'projects' as current_sub %}
+                {% include 'teams/_subnav_settings.html' %}
+            {% endwith %}
+
+            <!-- <a class="button project-add" href="{% url teams:add_project slug=team.slug %}">{% trans 'Add Project' %}</a> -->
         </div>
         {% if projects %}
             <ul class="projects listing">
                 {% for project in projects %}
                     <li>
-                        <span>
-                            <a href="{% url teams:project_video_list slug=project.team.slug project_slug=project.slug %}">{{ project.name }}</a>
-                        </span>
+                        <p>{{ project.name }}</p>
                         <ul class="actions">
                             <li>
                                 <a class="action-edit" href="{% url teams:edit_project slug=team.slug project_slug=project.slug %}">{% trans 'Edit' %}</a>
@@ -32,14 +34,6 @@
         {% else %}
             <p class="empty">{% trans 'This team does not have any projects yet' %}</p>
         {% endif %}
-    </div>
-
-    <div class="controls grid_3 omega ">
-        {% with "projects" as current_sub %}
-            {% include "teams/_filters_settings.html" %}
-        {% endwith %}
-
-        {% include "teams/_actions.html" %}
     </div>
 
     <script type="text/javascript">

@@ -1,16 +1,16 @@
 {% load i18n %}
 
-<ul class="sub-settings-panel">
+<ul>
     <li {% if current_sub == "settings" %}class="current"{% endif %}>
-        <a href="{% url teams:settings_basic slug=team.slug %}">{% trans "Basic Settings" %}</a>
+        <a href="{% url teams:settings_basic slug=team.slug %}">{% trans "Team Details" %}</a>
     </li>
 
     <li {% if current_sub == "guidelines" %}class="current"{% endif %}>
-        <a href="{% url teams:settings_guidelines slug=team.slug %}">{% trans "Guidelines and messages" %}</a>
+        <a href="{% url teams:settings_guidelines slug=team.slug %}">{% trans "Messages" %}</a>
     </li>
 
     <li {% if current_sub == "permissions" %}class="current"{% endif %}>
-        <a href="{% url teams:settings_permissions slug=team.slug %}">{% trans "Permissions and workflows" %}</a>
+        <a href="{% url teams:settings_permissions slug=team.slug %}">{% trans "Workflows" %}</a>
     </li>
 
     <li {% if current_sub == "languages" %}class="current"{% endif %}>

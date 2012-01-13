@@ -24,7 +24,7 @@
         var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
 
         $(function() {
-            $select = $("select#lang-filter", ".controls");
+            $select = $("select#lang-filter", ".tools");
             $select.change(function(e) {
                 window.location = $(this).children('option:selected').attr('value');
             });
@@ -59,7 +59,12 @@
 
         <div class="tools group">
             {% include "teams/_search.html" %}
-            <p>Showing videos with subtitles in <span>all languages ▼</span></p>
+            <p>Showing videos with subtitles in <select name="lang-filter" id="lang-filter">
+                <option value="{% query_string request.GET lang='' %}">All languages</option>
+                {% for code, name in language_choices %}
+                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
+                {% endfor %}
+            </select></p>
         </div>
 
         {% if team_video_md_list %}

@@ -1089,7 +1089,8 @@ p.view-more {
 }
 
 #summary {
-    width: 720px;
+    float: left;
+    width: 100%;
     margin: 0 0 2em;
     padding: 1.5em 0;
     border-top: 1px solid @fainter;
@@ -1111,6 +1112,7 @@ p.view-more {
 
     .grid_2 {
         position: relative;
+        width: 105px;
         margin: 0 20px;
         color: @normal;
 
@@ -1129,7 +1131,7 @@ p.view-more {
         span {
             font-size: 1.5em;
             position: absolute;
-            top: 0; right: -1em;
+            top: 0; right: -1.5em;
         }
     }
 
@@ -1573,6 +1575,38 @@ ol.subtitles {
     }
 }
 
+.v1 .tools {
+    .chzn-container {
+        margin-bottom: 0;
+        margin-left: 2px;
+        text-align: left;
+
+        .chzn-drop {
+            border-top: 1px solid @faint;
+        }
+    }
+    .chzn-container,
+    .chzn-container-single,
+    .chzn-container-single .chzn-single,
+    .chzn-container-active .chzn-single
+    .chzn-container-single .chzn-single-with-drop,
+    .chzn-container-single .chzn-single div {
+        border: none;
+        background: transparent;
+    }
+    .chzn-container-single .chzn-single {
+        padding: 0;
+        height: 18px;
+        line-height: 18px;
+    }
+    .chzn-container-single .chzn-single div b {
+        background-position: 0 -2px;
+    }
+    .chzn-container-active .chzn-single-with-drop div b {
+        background-position: -18px -1px;
+    }
+}
+
 .v1 .bootstrap .modal {
 
     .modal-header h3 {
@@ -1714,6 +1748,10 @@ pre.dump {
             text-decoration: none;
             margin-right: 1em;
             line-height: 1.5em;
+        }
+
+        &.current a {
+            color: inherit;
         }
     }
 }

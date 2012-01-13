@@ -23,7 +23,7 @@
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         $(function() {
-            $select = $("select#lang-filter", ".controls");
+            $select = $("select#lang-filter", ".tools");
             $select.change(function(e) {
                 window.location = $(this).children('option:selected').attr('value');
             });
@@ -45,7 +45,28 @@
         {% endwith %}
 
         <div class="tools group">
-            <a href="" class="button">{% trans "Sort and Filter" %}</a>
+            {% include "teams/_search.html" %}
+            <p>
+                Showing members of
+                <select name="role-filter" id="role-filter">
+                    <option value="">{% trans 'all roles' %}</option>
+                    {% comment %}
+                        {% for role in ????? %}
+                            <option {% if request.GET.role == role %}selected="selected"{% endif %} value="{% query_string request.GET lang=role %}">{{ role }}</option>
+                        {% endfor %}
+                    {% endcomment %}
+                </select>
+                speaking
+                <select name="lang-filter" id="lang-filter">
+                    <option value="">{% trans 'all languages' %}</option>
+                    {% for code, name in languages %}
+                        <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+                {% if filtered %}
+                    <a href="{% url teams:detail_members team.slug %}" class="clear-filters">{% trans 'x' %}</a>
+                {% endif %}
+            </p>
         </div>
 
         {% comment %}{% if team|can_invite_to_team:user %}
@@ -53,23 +74,6 @@
                 <a href="{% url teams:invite_members slug=team.slug %}" class="button">{% trans 'Invite Members' %}</a>
             </div>
         {% endif %}{% endcomment %}
-
-        {% if filtered %}
-            <p class="active-filters">
-                    {% trans 'Showing' %} 
-                    {% if role %}
-                         <strong>{{ role }}</strong>
-                    {% endif %}
-                    {% trans 'members' %}
-                    {% if request.GET.q %}
-                        {% trans 'matching' %} <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
-                    {% endif %}
-                    {% if request.GET.lang %}
-                        {% trans 'speaking' %} <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
-                    {% endif %}
-                <a href="{% url teams:detail_members team.slug %}" class="clear-filters">{% trans 'Clear all filters' %}</a>
-            </p>
-        {% endif %}
 
 
         {% if team_member_list|length == 0 %}
@@ -119,22 +123,6 @@
         </ul>
         {% if is_paginated %}{% paginator %}{% endif %}
     </div>
-{% comment %}
-    <div class="controls grid_3 omega">
-        {% include "teams/_filters_members.html" %}
-        <div class="refine">
-            <h4>{% trans "Search and Filter" %}</h4>
-            {% include "teams/_search.html" %}
-            <select name="lang-filter" id="lang-filter">
-                <option value="">{% trans 'All languages' %}</option>
-                {% for code, name in languages %}
-                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        {% include "teams/_actions.html" %}
-    </div>
-{% endcomment %}
 
     {% if assignable_roles %}
         <script id="editRoleDialog" type="text/html">
