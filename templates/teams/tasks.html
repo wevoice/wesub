@@ -325,7 +325,11 @@
 
                         $link = $li.children('a.perform');
                         $link.text('Loading...');
-                        window.location = $link.attr('href');
+                        if ($link.attr('href') !== '') {
+                            window.location = $link.attr('href');
+                        } else {
+                            $link.click();
+                        }
                     }
                 });
 
