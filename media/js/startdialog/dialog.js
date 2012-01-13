@@ -159,6 +159,14 @@ unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
         $d('p', null, 
            $d('span', null, 'Subtitle into: '),
            this.toLanguageDropdown_));
+
+    var renderedToLanguages = goog.dom.getElementByClass('to-language');
+    var selected = goog.dom.getChildren(renderedToLanguages)[renderedToLanguages.selectedIndex];
+    if (selected.disabled) {
+        var next = goog.dom.getNextElementSibling(selected);
+        goog.dom.forms.setValue(renderedToLanguages, next.value);
+    }
+
 };
 unisubs.startdialog.Dialog.prototype.addFromLanguageSection_ = function($d) {
     this.fromContainer_ = $d('span');
