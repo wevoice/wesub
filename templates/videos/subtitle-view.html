@@ -33,9 +33,9 @@
         }
     
         jQuery(document).ready( function($) {
-            $('.version_checkbox:first').attr('checked', 'checked');
+            $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
     
-            $('.version_checkbox').change( function() {
+            $('.version_checkbox', '.revisions').change( function() {
                 var $this = $(this);
                 var checked_length = $('.version_checkbox:checked').length;
     
@@ -297,8 +297,8 @@
                 <ul class="listing revisions">
                     {% for item in revision_list %}
                         <li>
-                            <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
                             <h3>
+                                <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
                                 <a href="{% url videos:revision pk=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
                             </h3>
                             {% if item.user %}

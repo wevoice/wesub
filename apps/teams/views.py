@@ -604,9 +604,12 @@ def remove_video(request, team_video_pk):
 
     team_video.delete()
 
+    msg = _(u'Video has been removed from the team.')
+
     if request.is_ajax():
         return { 'success': True }
     else:
+        messages.success(request, msg)
         return HttpResponseRedirect(next)
 
 
@@ -688,7 +691,7 @@ def remove_member(request, slug, user_pk):
         user = member.user
         if not user == request.user:
             TeamMember.objects.filter(team=team, user=user).delete()
-            messages.success(request, _(u'Member removed from team.'))
+            messages.success(request, _(u'Member has been removed from the team.'))
             return HttpResponseRedirect(return_path)
         else:
             messages.error(request, _(u'Use the "Leave this team" button to remove yourself from this team.'))
