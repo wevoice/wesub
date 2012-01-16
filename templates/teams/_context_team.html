@@ -3,13 +3,29 @@
 {% team_projects team as projects %}
 
 <h2 class="main-title">
-    <a href="" title="permalink">{% trans 'About' %} {{ team }}</a>
+    <a href="" title="permalink">{{ team }}</a>
 </h2>
 <div id="description" class="abbr">
     <div class="abbr-content">
         {{ team.description|urlize|linebreaks }}
     </div>
 </div>
+{% if projects.count > 0 %}
+<div id="projects-list" class="abbr">
+    <div class="abbr-content">
+        <h4>{% trans 'Projects' %}</h4>
+        <ul>
+            {% for project in projects %}
+                <li>
+                    <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}{% query_string request.GET %}">
+                        {{ project }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
 <ul class="metrics">
     <li>
         <p>{{ projects.count|simplify_number }}</p>
@@ -38,19 +54,5 @@
     </ul>
 {% endif %}
 
-{% if projects.count > 0 %}
-    <h3>{% trans 'Projects' %}</h3>
-    <ul>
-        {% for project in projects %}
-            <li>
-                <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}{% query_string request.GET %}">
-                    {{ project }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
 
-{% comment %}
-    {% include "teams/_actions.html" %}
-{% endcomment %}
+{% include "teams/_actions.html" %}
