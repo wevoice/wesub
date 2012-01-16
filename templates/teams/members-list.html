@@ -23,7 +23,7 @@
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         $(function() {
-            $select = $("select#lang-filter", ".tools");
+            $select = $("select#lang-filter, select#role-filter", ".tools");
             $select.change(function(e) {
                 window.location = $(this).children('option:selected').attr('value');
             });
@@ -45,18 +45,16 @@
         {% endwith %}
 
         <div class="tools group">
-            {% include "teams/_search.html" %}
+            {% include 'teams/_search.html' %}
             <p>
-                Showing members of
+                {% trans 'Showing' %}
                 <select name="role-filter" id="role-filter">
-                    <option value="">{% trans 'all roles' %}</option>
-                    {% comment %}
-                        {% for role in ????? %}
-                            <option {% if request.GET.role == role %}selected="selected"{% endif %} value="{% query_string request.GET lang=role %}">{{ role }}</option>
-                        {% endfor %}
-                    {% endcomment %}
+                    <option value="{% url teams:detail_members team.slug %}{% query_string request.GET %}">{% trans 'all members' %}</option>
+                    <option value="{% url teams:detail_members_role slug=team.slug,role='admin' %}{% query_string request.GET %}"{% if role == 'admin' %} selected="selected"{% endif %}>{% trans 'admins' %}</option>
+                    <option value="{% url teams:detail_members_role slug=team.slug,role='manager' %}{% query_string request.GET %}"{% if role == 'manager' %} selected="selected"{% endif %}>{% trans 'managers' %}</option>
+                    <option value="{% url teams:detail_members_role slug=team.slug,role='contributor' %}{% query_string request.GET %}"{% if role == 'contributors' %} selected="selected"{% endif %}>{% trans 'contributor' %}</option>
                 </select>
-                speaking
+                {% trans 'speaking' %}
                 <select name="lang-filter" id="lang-filter">
                     <option value="">{% trans 'all languages' %}</option>
                     {% for code, name in languages %}
@@ -74,6 +72,10 @@
                 <a href="{% url teams:invite_members slug=team.slug %}" class="button">{% trans 'Invite Members' %}</a>
             </div>
         {% endif %}{% endcomment %}
+
+        {% if team|can_approve_application:user and team.applications.all.count > 0 %}
+            <p class="active-filters">{% trans 'This team has' %} <a href="{% url teams:applications slug=team.slug %}{% query_string request.GET %}">{{ team.applications.all.count }} {% trans 'open applications' %}</a></p>
+        {% endif %}
 
 
         {% if team_member_list|length == 0 %}
