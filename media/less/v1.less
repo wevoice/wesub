@@ -435,8 +435,14 @@ body {
             position: absolute;
             top: 2em; left: 0;
 
-            img {
-                border: 1px solid @faint;
+            a {
+                display: inline-block;
+                max-height: 229px;
+                overflow: hidden;
+
+                img {
+                    border: 1px solid @faint;
+                }
             }
         }
         span.timestamp {
@@ -628,7 +634,7 @@ body {
         margin: 0;
         padding: .75em 0;
         text-indent: 1em;
-        background: hsla(0%, 0%, 0%, .45);
+        background: hsla(0%, 0%, 0%, .75);
         color: #eee;
         text-shadow: 1px 1px 1px #444;
 
@@ -651,17 +657,28 @@ body {
     .admin-controls {
         right: 1em;
         bottom: .5em;
-        background: transparent;
         border: none;
 
         a {
-            background: transparent;
             border: none;
             color: #aaa;
 
             &:hover {
-                background: transparent;
                 color: #fff;
+            }
+        }
+    }
+    &:hover {
+        .admin-controls {
+            background: hsla(0%, 0%, 0%, .75);
+            opacity: 1;
+
+            li {
+                a {
+                    &:hover {
+                        color: black;
+                    }
+                }
             }
         }
     }
