@@ -626,6 +626,7 @@ def _generate_initial_data():
         'fo': 'fo',
         'fr-ca': 'fr-ca',
         'ful': 'ful',
+        'ga': 'ga',
         'gd': 'gd',
         'gn': 'gn',
         'gu': 'gu',
