@@ -64,12 +64,12 @@
                 </select>
                 {% trans 'assigned to' %}
                 <select name="assignee" class="assignee-filter">
-                    <option value="{{ request.path }}{% query_string request.GET assignee="" %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
-                    <option value="{% query_string request.GET assignee="me" %}" {% if request.GET.assignee == "me" %}selected="selected"{% endif %}>{% trans 'me' %}</option>
-                    <option value="{% query_string request.GET assignee="none" %}" {% if request.GET.assignee == "none" %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
+                    <option value="{{ request.path }}{% query_string request.GET assignee='' %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
+                    <option value="{% query_string request.GET assignee='me' %}" {% if request.GET.assignee == 'me' %}selected="selected"{% endif %}>{% trans 'me' %}</option>
+                    <option value="{% query_string request.GET assignee='none' %}" {% if request.GET.assignee == 'none' %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
                 </select>
                 {% if filters.assignee or filters.language or filters.type or filters.team_video or request.GET.q %}
-                    <a href="{% url teams:team_tasks team.slug %}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'x' %}</a>
+                    <a href="{{ request.path }}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'x' %}</a>
                 {% endif %}
             </p>
         </div>

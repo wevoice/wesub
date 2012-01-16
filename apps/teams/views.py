@@ -964,7 +964,7 @@ def _task_category_counts(team, filters, user):
 
     return counts
 
-def _tasks_list(request, team, filters, user):
+def _tasks_list(request, team, project, filters, user):
     '''List tasks for the given team, optionally filtered.
 
     `filters` should be an object/dict with zero or more of the following keys:
@@ -976,6 +976,9 @@ def _tasks_list(request, team, filters, user):
 
     '''
     tasks = Task.objects.filter(team=team.id, deleted=False)
+
+    if project:
+        tasks = tasks.filter(team_video__project = project)
 
     if filters.get('team_video'):
         tasks = tasks.filter(team_video=filters['team_video'])
@@ -1038,7 +1041,7 @@ def team_tasks(request, slug, project_slug=None):
     languages = sorted(languages, key=lambda l: l['name'])
     filters = _get_task_filters(request)
 
-    tasks = _tasks_list(request, team, filters, user)
+    tasks = _tasks_list(request, team, project, filters, user)
     category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
