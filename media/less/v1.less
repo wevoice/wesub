@@ -180,12 +180,13 @@ body {
     display: block;
 }
 .v1 .action-replacement {
-    padding: 1em;
-    margin: 1em 0 2em;
+    padding: 1.5em;
+    margin: 2em 0 1em;
     background: @faintest;
     .border-radius(4px);
     color: @normal;
     text-align: center;
+    border: 1px solid @fainter;
 }
 .v1 .team-banner {
     margin-bottom: 2em;
@@ -1704,10 +1705,10 @@ pre.dump {
 /******************** @Crazytown *****/
 
 #teams .backnav {
-    padding-bottom: .25em;
-
+    color: @light; 
+        
     a {
-        color: @light;
+        color: #2f3c45;
     }
 }
 
@@ -1762,4 +1763,18 @@ pre.dump {
 #teams .view form.settings {
     margin-left: 1.5em;
     margin-right: 2.5em;
+}
+
+#teams .context #signin-join {
+    display: block;
+    margin: 2em 1em 1em;
+}
+
+#teams .context .notation {
+    clear: both;
+    padding-top: 2em;
+}
+
+#teams .context #projects-list h4 {
+    padding: 1.5em 0 1em;
 }

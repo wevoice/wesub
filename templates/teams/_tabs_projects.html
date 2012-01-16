@@ -16,7 +16,7 @@
         {% if team|can_view_settings_tab:user %}
             <li{% if current == "settings" %} class="current" {% endif %}>
                 <a href="{% url teams:edit_project slug=team.slug project_slug=project.slug %}">
-                    {% trans "Project Settings" %}
+                    {% trans "Settings" %}
                 </a>
             </li>
         {% endif %}

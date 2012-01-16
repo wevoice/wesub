@@ -3,7 +3,7 @@
 {% team_projects team as projects %}
 
 <p class="backnav">
-    <a href="{{ team.get_absolute_url }}" title="Team page">← {{ team }}</a> /
+    <a href="{{ team.get_absolute_url }}" title="Team page">{{ team }}</a> / Projects /
 </p>
 <h2 class="main-title">
     <a href="" title="permalink">{{ project }}</a>
@@ -38,12 +38,12 @@
 </ul>
 
 {% if projects.count > 1 %}
-    <h3>{% trans 'Other Projects' %}</h3>
+    <h3>{% trans 'Other' %} {{ team }} {% trans 'Projects' %}</h3>
     <ul>
         {% for proj in projects %}
             {% if proj != project %}
                 <li>
-                    <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}">
+                    <a href="{% url teams:project_video_list slug=team.slug,project_slug=proj.slug %}">
                         {{ proj }}
                     </a>
                 </li>
@@ -51,3 +51,5 @@
         {% endfor %}
     </ul>
 {% endif %}
+
+{% include "teams/_actions.html" %}
