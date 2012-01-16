@@ -633,7 +633,6 @@ body {
         left: 17px;
         width: auto;
         margin: 0;
-        background: hsla(0%, 0%, 0%, .75);
         padding: .5em .75em;
         background: hsla(0%, 0%, 0%, .35);
         color: #eee;
@@ -663,6 +662,8 @@ body {
         right: 1em;
         bottom: .6em;
         border: none;
+        background: hsla(0%, 0%, 0%, .35);
+        opacity: 1;
 
         a {
             border: none;
@@ -670,21 +671,12 @@ body {
 
             &:hover {
                 color: #fff;
+                background: transparent;
             }
         }
-    }
-    &:hover {
-        .admin-controls {
-            background: hsla(0%, 0%, 0%, .75);
-            opacity: 1;
 
-            li {
-                a {
-                    &:hover {
-                        color: black;
-                    }
-                }
-            }
+        &:hover {
+            background: hsla(0%, 0%, 0%, .55);
         }
     }
 }
