@@ -37,7 +37,41 @@
 
         <div class="tools group">
             {% include "teams/_search.html" %}
-            <p>Showing <span>all types ▼</span> for <span>all languages ▼</span> assigned to <span>no one ▼</span></p>
+            <p>
+                {% trans 'Showing' %}
+                <select id="id_task_type" name="type" class="type-filter chosen">
+                    <option value="{{ request.path }}{% query_string request.GET type="" %}">{% trans 'all' %}</option>
+                    <option value="{% query_string request.GET type='Subtitle' %}" {% if request.GET.type == 'Subtitle' %}selected="selected"{% endif %}>{% trans 'subtitle' %}</option>
+                    <option value="{% query_string request.GET type='Translate' %}" {% if request.GET.type == 'Translate' %}selected="selected"{% endif %}>{% trans 'translate' %}</option>
+                    {% if team|review_enabled %}
+                        <option value="{% query_string request.GET type='Review' %}" {% if request.GET.type == 'Review' %}selected="selected"{% endif %}>{% trans 'review' %}</option>
+                    {% endif %}
+                    {% if team|approve_enabled %}
+                        <option value="{% query_string request.GET type='Approve' %}" {% if request.GET.type == 'Approve' %}selected="selected"{% endif %}>{% trans 'approve' %}</option>
+                    {% endif %}
+                </select>
+                {% trans 'tasks for' %}
+                <select id="id_task_language" name="language" class="lang-filter chosen">
+                    <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'all languages' %}</option>
+                    {% for language in languages %}
+                        <option value="{% query_string request.GET lang=language.code %}"
+                            {% if request.GET.lang == language.code %}
+                                selected="selected"
+                            {% endif %}>
+                            {{ language.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% trans 'assigned to' %}
+                <select name="assignee" class="assignee-filter">
+                    <option value="{{ request.path }}{% query_string request.GET assignee="" %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
+                    <option value="{% query_string request.GET assignee="me" %}" {% if request.GET.assignee == "me" %}selected="selected"{% endif %}>{% trans 'me' %}</option>
+                    <option value="{% query_string request.GET assignee="none" %}" {% if request.GET.assignee == "none" %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
+                </select>
+                {% if filters.assignee or filters.language or filters.type or filters.team_video or request.GET.q %}
+                    <a href="{% url teams:team_tasks team.slug %}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'x' %}</a>
+                {% endif %}
+            </p>
         </div>
 
         {% comment %}{% if filters.team_video != None %}
@@ -48,30 +82,6 @@
                 </div>
             {% endif %}
         {% endif %}{% endcomment %}
-
-        {% if filters.assignee or filters.language or filters.type or filters.team_video or request.GET.q %}
-            <p class="active-filters">{% trans 'Showing tasks' %}
-                {% if filters.type %}
-                    {% trans 'to' %} <strong>{{ filters.type }}</strong>
-                {% endif %}
-                {% if request.GET.q %}
-                    {% trans 'matching' %} <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
-                {% endif %}
-                {% if filters.language %}
-                    {% trans 'for language' %} <strong>{{ filters.language|lang_name_from_code }}</strong>
-                {% endif %}
-                {% if filters.assignee == 'none' %}
-                    <strong>{% trans 'unassigned' %}</strong>
-                {% endif %}
-                {% if filters.assignee and filters.assignee != 'none' %}
-                    {% trans 'assigned to' %} <strong>{{ filters.assignee }}</strong>
-                {% endif %}
-                {% if filters.team_video %}
-                    {% trans 'for' %} <strong>{{ filters.team_video }}</strong>
-                {% endif %}
-                <a href="{{ request.path }}{% query_string request.GET q="" type="" lang="" assignee="" %}" class="clear-filters">{% trans 'Clear all filters' %}</a>
-            </p>
-        {% endif %}
 
         <ul class="tasks listing">
             {% for task in tasks %}
@@ -202,85 +212,11 @@
 
         {% if is_paginated %}{% paginator %}{% endif %}
     </div>
-{% comment %}
-    <div class="controls grid_3 omega">
-        <form id="tasks_type_filter">
-            <ul class="types">
-                <li class="type {% if not request.GET.type %}current{% endif %}">
-                    <a href="{{ request.path }}{% query_string request.GET type="" %}">
-                        {% trans "All Pending" %}
-                        <span class="all">{{ category_counts.all }}</span>
-                    </a>
-                </li>
-                <li class="type {% if request.GET.type == "Subtitle" %}current{% endif %}">
-                    <a href="{% query_string request.GET type="Subtitle" %}">
-                        {% trans "Subtitle" %}
-                        <span class="subtitle">{{ category_counts.subtitle }}</span>
-                    </a>
-                </li>
-                <li class="type {% if request.GET.type == "Translate" %}current{% endif %}">
-                    <a href="{% query_string request.GET type="Translate" %}">
-                        {% trans "Translate" %}
-                        <span class="translate">{{ category_counts.translate }}</span>
-                    </a>
-                </li>
-                {% if team|review_enabled %}
-                    <li class="type {% if request.GET.type == "Review" %}current{% endif %}">
-                        <a href="{% query_string request.GET type="Review" %}">
-                            {% trans "Review" %}
-                            <span class="review">{{ category_counts.review }}</span>
-                        </a>
-                    </li>
-                {% endif %}
-                {% if team|approve_enabled %}
-                    <li class="type {% if request.GET.type == "Approve" %}current{% endif %}">
-                        <a href="{% query_string request.GET type="Approve" %}">
-                            {% trans "Approve" %}
-                            <span class="approve">{{ category_counts.approve }}</span>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </form>
-
-        <div class="refine">
-            <h4>{% trans "Search and Filter" %}</h4>
-            {% include "teams/_search.html" %}
-            <form action="" method="get">
-                <select id="id_task_project" name="project" class="proj-filter chosen">
-                    <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'All Projects' %}</option>
-                </select>
-            </form>
-            <form action="" method="get">
-                <select id="id_task_language" name="language" class="lang-filter chosen">
-                    <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'All Languages' %}</option>
-                    {% for language in languages %}
-                        <option value="{% query_string request.GET lang=language.code %}"
-                            {% if request.GET.lang == language.code %}
-                                selected="selected"
-                            {% endif %}>
-                            {{ language.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </form>
-            <form action="" method="get">
-                <select name="assignee" class="assignee-filter">
-                    <option value="{{ request.path }}{% query_string request.GET assignee="" %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'All Assignees' %}</option>
-                    <option value="{% query_string request.GET assignee="me" %}" {% if request.GET.assignee == "me" %}selected="selected"{% endif %}>{% trans 'Assigned to me' %}</option>
-                    <option value="{% query_string request.GET assignee="none" %}" {% if request.GET.assignee == "none" %}selected="selected"{% endif %}>{% trans 'Unassigned' %}</option>
-                </select>
-            </form>
-        </div>
-
-        {% include "teams/_actions.html" %}
-    </div>
-{% endcomment %}
 
     <script type="text/javascript">
         $(function() {
 
-            $('select.lang-filter, select.assignee-filter', '.controls').change(function(e) {
+            $('select.lang-filter, select.assignee-filter, select.type-filter', '.tools').change(function(e) {
                 var url = $(this).children('option:selected').attr('value');
                 window.location = url;
             });

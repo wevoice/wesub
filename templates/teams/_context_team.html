@@ -16,8 +16,8 @@
         <h4>{% trans "Project" %}{{ projects.count|pluralize }}</h4>
     </li>
     <li>
-        <p>{{ all_videos_count|simplify_number }}</p>
-        <h4>{% trans "Video" %}{{ all_videos_count|pluralize }}</h4>
+        <p>{{ team.videos_count|simplify_number }}</p>
+        <h4>{% trans "Video" %}{{ team.videos_count|pluralize }}</h4>
     </li>
     <li>
         <p>{{team|members:'count'|simplify_number}}</p>
