@@ -44,7 +44,6 @@ unisubs.startdialog.Dialog = function(videoID, initialLanguageState, callback) {
     this.callback_ = callback;
 };
 goog.inherits(unisubs.startdialog.Dialog, goog.ui.Dialog);
-
 unisubs.startdialog.Dialog.FORK_VALUE = 'forkk';
 
 unisubs.startdialog.Dialog.prototype.createDom = function() {
@@ -58,12 +57,10 @@ unisubs.startdialog.Dialog.prototype.createDom = function() {
     this.contentDiv_.innerHTML = "<p>Loading&hellip;</p>";
     el.appendChild(this.contentDiv_);
 };
-
 unisubs.startdialog.Dialog.prototype.enterDocument = function() {
     unisubs.startdialog.Dialog.superClass_.enterDocument.call(this);
     this.connectEvents_();
 };
-
 unisubs.startdialog.Dialog.prototype.setVisible = function(visible) {
     unisubs.startdialog.Dialog.superClass_.setVisible.call(this, visible);
     if (visible)
@@ -73,10 +70,7 @@ unisubs.startdialog.Dialog.prototype.setVisible = function(visible) {
             goog.bind(this.responseReceived_, this));
 };
 
-
-
-unisubs.startdialog.Dialog.prototype.makeDropdown_ = function($d, contents, opt_className)
-{
+unisubs.startdialog.Dialog.prototype.makeDropdown_ = function($d, contents, opt_className) {
     var options = [];
     var attrs, lang, name, disabled;
 
@@ -92,9 +86,9 @@ unisubs.startdialog.Dialog.prototype.makeDropdown_ = function($d, contents, opt_
 
         options.push($d('option', attrs, name));
     }
+
     return $d('select', (opt_className || null), options);
 };
-
 unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
     this.fetchCompleted_ = true;
     this.model_ = new unisubs.startdialog.Model(jsonResult, this.initialLanguageState_);
@@ -122,7 +116,6 @@ unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
     this.connectEvents_();
     this.maybeShowWarning_();
 };
-
 unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
     var fromLanguages = this.model_.fromLanguages();
     goog.style.showElement(
@@ -151,7 +144,6 @@ unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
         this.fromLanguageDropdown_ = null;
     }
 };
-
 unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
     var toLanguageContents = goog.array.map(
         this.model_.toLanguages(),
@@ -162,12 +154,20 @@ unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
     this.toLanguageDropdown_ = this.makeDropdown_(
         $d, toLanguageContents, "to-language");
     this.toLanguageDropdown_.value = this.model_.getSelectedLanguage().KEY;
+
     this.contentDiv_.appendChild(
         $d('p', null, 
            $d('span', null, 'Subtitle into: '),
            this.toLanguageDropdown_));
-};
 
+    var renderedToLanguages = goog.dom.getElementByClass('to-language');
+    var selected = goog.dom.getChildren(renderedToLanguages)[renderedToLanguages.selectedIndex];
+    if (selected.disabled) {
+        var next = goog.dom.getNextElementSibling(selected);
+        goog.dom.forms.setValue(renderedToLanguages, next.value);
+    }
+
+};
 unisubs.startdialog.Dialog.prototype.addFromLanguageSection_ = function($d) {
     this.fromContainer_ = $d('span');
     this.fromLanguageSection_ =
@@ -177,7 +177,6 @@ unisubs.startdialog.Dialog.prototype.addFromLanguageSection_ = function($d) {
               this.fromContainer_));
     this.contentDiv_.appendChild(this.fromLanguageSection_);
 };
-
 unisubs.startdialog.Dialog.prototype.addOriginalLanguageSection_ = function($d) {
     if (this.model_.originalLanguageShown()) {
         this.originalLangDropdown_ = this.makeDropdown_(
@@ -195,7 +194,6 @@ unisubs.startdialog.Dialog.prototype.addOriginalLanguageSection_ = function($d) 
                unisubs.languageNameForCode(
                    this.model_.getOriginalLanguage())));
 };
-
 unisubs.startdialog.Dialog.prototype.connectEvents_ = function() {
     if (!this.isInDocument() || !this.fetchCompleted_)
         return;
@@ -214,23 +212,20 @@ unisubs.startdialog.Dialog.prototype.connectEvents_ = function() {
             goog.events.EventType.CHANGE,
             this.originalLangChanged_);
 };
-
 unisubs.startdialog.Dialog.prototype.originalLangChanged_ = function(e) {
     this.model_.selectOriginalLanguage(this.originalLangDropdown_.value);
     this.setFromContents_();
 };
 
-
 unisubs.startdialog.Dialog.prototype.toLanguageChanged_ = function(e) {
+    console.log('in tolangchanged');
     this.model_.selectLanguage(this.toLanguageDropdown_.value);
     this.setFromContents_();
     this.maybeShowWarning_();
 };
-
 unisubs.startdialog.Dialog.prototype.fromLanguageChanged_ = function(e) {
     this.maybeShowWarning_();
 };
-
 unisubs.startdialog.Dialog.prototype.maybeShowWarning_ = function() {
     var warning = null;
     if (this.fromLanguageDropdown_ && 
@@ -239,12 +234,10 @@ unisubs.startdialog.Dialog.prototype.maybeShowWarning_ = function() {
         warning = this.warningMessage_();
     this.showWarning_(warning);
 };
-
 unisubs.startdialog.Dialog.prototype.showWarning_ = function(warning) {
     goog.dom.setTextContent(this.warningElem_, warning || '');
     goog.style.showElement(this.warningElem_, !!warning);
 };
-
 unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
     /**
      * @type {unisubs.startdialog.ToLanguage}
@@ -254,7 +247,7 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
      * @type {unisubs.startdialog.VideoLanguageLanguage}
      */
     var fromLanguage = this.model_.findFromForPK(
-        parseInt(this.fromLanguageDropdown_.value));
+        parseInt(this.fromLanguageDropdown_.value, 0));
     if (toLanguage.translationStartsFromScratch(fromLanguage)) {
         var message = "";
         if (toLanguage.VIDEO_LANGUAGE.DEPENDENT) {
@@ -265,7 +258,7 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
         }
         var bestLanguages = this.model_.bestLanguages(
             toLanguage.LANGUAGE, fromLanguage.LANGUAGE);
-        if (bestLanguages != null) {
+        if (bestLanguages !== null) {
             message += "There is a better choice for translating into " +
                 toLanguage.LANGUAGE_NAME + " from " + 
                 fromLanguage.languageName() + ". ";            
@@ -279,7 +272,6 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
     }
     return null;
 };
-
 unisubs.startdialog.Dialog.prototype.okClicked_ = function(e) {
     e.preventDefault();
     if (this.okHasBeenClicked_)
@@ -289,7 +281,7 @@ unisubs.startdialog.Dialog.prototype.okClicked_ = function(e) {
     if (this.fromLanguageDropdown_ && 
         this.fromLanguageDropdown_.value != 
             unisubs.startdialog.Dialog.FORK_VALUE)
-        fromLanguageID = parseInt(this.fromLanguageDropdown_.value);
+        fromLanguageID = parseInt(this.fromLanguageDropdown_.value, 0);
     var toLanguage = this.model_.toLanguageForKey(
         this.toLanguageDropdown_.value);
     var that = this;
