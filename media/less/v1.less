@@ -623,16 +623,19 @@ body {
 
     .languages {
         position: absolute;
-        top: 11px;
-        left: 11px;
-        width: 290px;
+        top: 17px;
+        left: 17px;
+        width: auto;
         margin: 0;
-        padding: .75em 0;
-        text-indent: 1em;
-        background: hsla(0%, 0%, 0%, .45);
+        padding: .5em .75em;
+        background: hsla(0%, 0%, 0%, .35);
         color: #eee;
         text-shadow: 1px 1px 1px #444;
+        .border-radius(3px);
+    }
 
+    &:hover .languages {
+        background: hsla(0%, 0%, 0%, .55);
     }
 
     .callout {
@@ -651,18 +654,18 @@ body {
 
     .admin-controls {
         right: 1em;
-        bottom: .5em;
-        background: transparent;
+        bottom: .6em;
+        background: hsla(0%, 0%, 0%, .35);
         border: none;
 
         a {
             background: transparent;
             border: none;
-            color: #aaa;
+            color: #eee;
 
             &:hover {
                 background: transparent;
-                color: #fff;
+                color: #bbb;
             }
         }
     }
