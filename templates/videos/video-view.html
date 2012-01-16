@@ -161,7 +161,7 @@
                 <div class="video-tools grid_4 alpha">
                     <h3>{% trans "Contribute" %}</h3>
                     <p>
-                        {% if not video.subtitle_language %}
+                        {% if video.languages_count < 1 %}
                             {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!</li>
                         {% else %}
                             {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!</li>

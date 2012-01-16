@@ -101,6 +101,7 @@
                         →
                         {% trans 'Published' %}
                     </p>
+                    <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.video.thumbnail }}" alt="{{ task.team_video.title }}"></a>
                     <ul class="actions">
                         <li>
                             <h4>
@@ -157,7 +158,7 @@
                                         <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
                                         <input type="hidden" name="task" value="{{ task.pk }}" />
-                                        <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}">{% trans 'Remove' %}</a>
+                                        <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}" onclick="return confirm('{% trans 'Are you sure you want to delete this task?' %}');">{% trans 'Delete' %}</a>
                                     </form>
                                 </li>
                             {% endif %}
