@@ -101,9 +101,9 @@
                             {% trans 'Subtitles' %}
                         {% endif %}
                     </h3>
-                    <p>{% trans "Video" %}: <a href="{{ task.team_video.video.get_absolute_url }}">{{ task.team_video|truncatewords:5 }}</a></p>
+                    <p>{% trans "Video" %}: <a href="{{ task.team_video.video.get_absolute_url }}">{{ task.team_video|truncatewords:6 }}</a></p>
                     {% if task.subtitle_version %}
-                        <p><a href="{{ task.subtitle_version.language.get_absolute_url }}">{% trans 'View subtitles' %}</a></p>
+                        <p>{% trans 'Subtitles' %}: <a href="{{ task.subtitle_version.language.get_absolute_url }}">{% trans 'View draft' %}</a></p>
                     {% endif %}
                     <!-- <p class="steps">
                         <span{% if task.get_type_display == "Subtitle" %} class="current"{% endif %}>{% trans 'Subtitle' %}</span>/<span{% if task.get_type_display == "Translate" %} class="current"{% endif %}>{% trans 'Translate' %}</span>
