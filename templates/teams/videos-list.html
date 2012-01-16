@@ -67,6 +67,12 @@
             </select></p>
         </div>
 
+        {% if can_add_video %}
+            <div class="list-actions">
+                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button reduced">{% trans "Add Video" %}</a>
+            </div>
+        {% endif %}
+
         {% if team_video_md_list %}
             <ul class="videos listing">
                 {% with team|is_team_member:request.user as user_is_team_member %}
@@ -80,35 +86,5 @@
             <p class="empty">{% trans "Sorry, no videos here" %}...</p>
         {% endif %}
     </div>
-
-    {% comment %}
-
-        {% if filtered %}
-            <p class="active-filters">
-                {% trans 'Showing videos' %}
-                    {% if request.GET.q %}
-                        {% trans 'matching' %} <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
-                    {% endif %}
-                    {% if request.GET.lang %}
-                        {% trans 'in' %} <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
-                    {% endif %}
-                    {% if project %}
-                        {% trans 'in project' %} <strong>{{ project }}</strong>
-                    {% endif %}
-                    ({{ current_videos_count }} {% trans 'result' %}{{ current_videos_count|pluralize }})
-                <a href="{{ team.get_absolute_url }}" class="clear-filters">{% trans 'Clear all filters' %}</a>
-            </p>
-        {% endif %}
-        
-            <h4>{% trans "Search and Filter" %}</h4>
-            {% include "teams/_search.html" %}
-            <select name="lang-filter" id="lang-filter">
-                <option value="{% query_string request.GET lang='' %}">All languages</option>
-                {% for code, name in language_choices %}
-                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
-                {% endfor %}
-            </select>
-
-    {% endcomment %}
 
 {% endblock %}
