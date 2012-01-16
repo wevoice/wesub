@@ -72,14 +72,19 @@
                             {% trans 'New' %}
                         {% else %}
                             {{ task.get_type_display }}
+                            {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
+                                {% if task.team_video.video.has_original_language %}
+                                    Original
+                                {% endif %}
+                            {% endif %}
                         {% endif %}
                         {% if task.get_type_display == "Translate" %}
                             {% trans 'Subtitles into' %} {{ task.get_language_display }}
                         {% else %}
-                            {% if task.get_language_display %}
-                                {{ task.get_language_display }}
-                            {% endif %}
                             {% trans 'Subtitles' %}
+                            {% if task.get_language_display %}
+                                ({{ task.get_language_display }})
+                            {% endif %}
                         {% endif %}
                     </h3>
                     <p>{% trans "Video" %}: {{ task.team_video|truncatewords:8 }}</p>
