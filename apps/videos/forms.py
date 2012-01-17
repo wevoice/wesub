@@ -33,9 +33,9 @@ from math_captcha.forms import MathCaptchaForm
 from django.utils.safestring import mark_safe
 from django.db.models import ObjectDoesNotExist
 from videos.types import video_type_registrar, VideoTypeError
+from videos.types.youtube import yt_service
 from videos.models import VideoUrl
 from utils.forms import AjaxForm, EmailListField, UsernameListField
-from gdata.youtube.service import YouTubeService
 from videos.tasks import video_changed_tasks
 from utils.translation import get_languages_list
 from utils.forms import StripRegexField, FeedURLField
@@ -398,7 +398,7 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         self.user = user
         super(AddFromFeedForm, self).__init__(*args, **kwargs)
         
-        self.yt_service = YouTubeService()
+        self.yt_service = yt_service
         self.video_types = [] #tuples: (video_type, video_info)
         self.feed_urls = [] #tuples: (feed_url, last_saved_entry_url)
         self.video_limit_routreach = False 
