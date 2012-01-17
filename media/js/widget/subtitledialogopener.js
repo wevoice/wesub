@@ -198,7 +198,7 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
             result['original_subtitles']);
         var captionSet = new unisubs.subtitle.EditableCaptionSet(
             subtitles.SUBTITLES, subtitles.IS_COMPLETE, 
-            subtitles.TITLE, subtitles.DESCRIPTION, opt_wasForkedDuringEditing);
+            subtitles.TITLE, subtitles.DESCRIPTION, opt_wasForkedDuringEditing, subtitles.LANGUAGE_NAME);
         if (!fromResuming) {
             this.saveInitialSubs_(sessionPK, captionSet);
         }

@@ -30,6 +30,7 @@ class BaseRpc:
         return {
             'subtitles': subtitles,
             'language_code': language_code,
+            'language_name': LANGUAGES_MAP[language_code],
             'language_pk': language_pk,
             'is_original': is_original,
             'is_complete': is_complete,
