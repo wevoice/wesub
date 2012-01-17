@@ -2216,6 +2216,9 @@ a.unisubs-openid span {
     top: 0 !important;
     width: 842px !important;
 }
+.unisubs-howtopanel div {
+    text-align: center !important;
+}
 .unisubs-guidelinespanel .unisubs-done, .unisubs-howtopanel .unisubs-done {
     display: block !important;
     float: none !important;
