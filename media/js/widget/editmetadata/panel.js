@@ -55,13 +55,23 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     this.getElement().appendChild(this.contentElem_ = $d('div'));
     // for original languages we won't have original subtitles
     var source = this.originalSubtitles_ ? this.originalSubtitles_ : this.subtitles_;
-    var title = source.title ? source.title : " no title ";
-    var description = source.description? source.description : " no description" ;
-    this.getElement().appendChild( $d('ul', 'unisubs-titlesList',
-                                      $d("li", null,
-                                         $t("Title: " + title)),
-                                      $d("li", null,
-                                         $t("Description: " + description))));
+    var originalTitle = source.title ? source.title : " no title ";
+    var originalDescription = source.description? source.description : " no description" ;
+    var title = this.subtitles_.title ? this.subtitles_.title : "";
+    var description = this.subtitles_.description ? this.subtitles_.description : "";
+
+    var originalDescription = source.description? source.description : " no description" ;
+    this.titleTranslationWidget_ = 
+        new unisubs.translate.TitleTranslationWidget(
+            originalTitle, this.subtitles_);
+    this.addChild(this.titleTranslationWidget_, true);
+    this.titleTranslationWidget_.setTranslation(title);
+    this.descriptionTranslationWidget_ = 
+        new unisubs.translate.DescriptionTranslationWidget(
+            originalDescription, this.subtitles_);
+    this.addChild(this.descriptionTranslationWidget_, true);
+    this.descriptionTranslationWidget_.setTranslation(description);
+
 };
 unisubs.editmetadata.Panel.prototype.getRightPanel = function() {
    if (!this.rightPanel_) {

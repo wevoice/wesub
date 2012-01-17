@@ -400,6 +400,7 @@ JS_DIALOG = \
      'js/widget/translate/translationpanel.js',
      'js/widget/translate/translationlist.js',
      'js/widget/translate/translationwidget.js',
+     'js/widget/translate/descriptiontranslationwidget.js',
      'js/widget/translate/translationrightpanel.js',
      'js/widget/translate/forkdialog.js',
      'js/widget/translate/titletranslationwidget.js']
