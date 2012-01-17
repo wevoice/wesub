@@ -153,12 +153,22 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
             rightPanel, et.SAVEANDEXIT, this.handleSaveAndExitKeyPress_).
         listen(
             rightPanel, et.GOTOSTEP, this.handleGoToStep_);
-    if (state == s.SYNC || state == s.REVIEW) {
-        rightPanel.showBackLink(
-            state == s.SYNC ? "Back to Typing" : "Back to Sync");
+    var backButtonText = null;
+    if (state == s.EDIT_METADATA ){
+        backButtonText = "Back to Typing";
+    }else if (state == s.SYNC){
+        backButtonText = "Back to Title & Description";
+    }else if (state == s.REVIEW ){
+        backButtonText = "Back to Sync";
+    }
+    if (backButtonText){
+        rightPanel.showBackLink(backButtonText);
         this.rightPanelListener_.listen(
             rightPanel, et.BACK, this.handleBackKeyPress_);
-        this.timelineSubtitleSet_ =
+
+    }
+    if (state == s.SYNC || state == s.REVIEW) {
+            this.timelineSubtitleSet_ =
             new unisubs.timeline.SubtitleSet(
                 this.captionSet_, this.getVideoPlayerInternal());
         this.getTimelinePanelInternal().addChild(
@@ -243,9 +253,11 @@ unisubs.subtitle.Dialog.prototype.handleKeyUp_ = function(event) {
 unisubs.subtitle.Dialog.prototype.handleBackKeyPress_ = function(event) {
     var s = unisubs.subtitle.Dialog.State_;
     if (this.state_ == s.SYNC)
-        this.setState_(s.TRANSCRIBE);
+        this.setState_(s.EDIT_METADATA);
     else if (this.state_ == s.REVIEW)
         this.setState_(s.SYNC);
+    else if (this.state_ == s.EDIT_METADATA)
+        this.setState_(s.TRANSCRIBE);
 };
 unisubs.subtitle.Dialog.prototype.handleLegendKeyPress_ = function(event) {
     if (event.keyCode == goog.events.KeyCodes.TAB &&
