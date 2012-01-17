@@ -259,6 +259,14 @@ def _git_checkout(commit):
     run('chmod g+w -R .git 2> /dev/null; /bin/true')
     _clear_permissions('.')
 
+def _git_checkout_branch_and_reset(commit, branch='master'):
+    run('git fetch')
+    run('git checkout %s' % branch)
+    run('git reset --hard %s' % commit)
+    run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    run('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _clear_permissions('.')
+
 
 def _get_optional_repo_version(dir, repo):
     '''Find the optional repo version by looking at its file in optional/.'''
@@ -297,7 +305,7 @@ def _update_integration(dir):
 
     with cd(os.path.join(dir, 'unisubs', 'unisubs-integration')):
         with settings(warn_only=True):
-            _git_checkout(_get_optional_repo_version(dir, 'unisubs-integration'))
+            _git_checkout_branch_and_reset(_get_optional_repo_version(dir, 'unisubs-integration'))
 
 def update_integration():
     '''Update the integration repo to the version recorded in the site repo.
