@@ -681,6 +681,9 @@ span.unisubs-widget {
     padding: 3px !important;
     width: 350px !important;
 }
+textarea.unisubs-descriptionField{
+   height:140px !important
+}
 .unisubs-whats {
     color: #999 !important;
     display: block !important;

@@ -332,7 +332,7 @@ class Rpc(BaseRpc):
     def finished_subtitles(self, request, session_pk, subtitles=None,
                            new_title=None, completed=None,
                            forked=False,
-                           throw_exception=False):
+                           throw_exception=False, new_description=None):
         session = SubtitlingSession.objects.get(pk=session_pk)
         if not request.user.is_authenticated():
             return { 'response': 'not_logged_in' }
@@ -345,10 +345,10 @@ class Rpc(BaseRpc):
             raise Exception('purposeful exception for testing')
 
         return self.save_finished(
-            request.user, session, subtitles, new_title, completed, forked)
+            request.user, session, subtitles, new_title, completed, forked, new_description)
 
     def save_finished(self, user, session, subtitles, new_title=None,
-                      completed=None, forked=False):
+                      completed=None, forked=False, new_description=None):
         from apps.teams.moderation import is_moderated, user_can_moderate
 
         language = session.language
@@ -360,14 +360,25 @@ class Rpc(BaseRpc):
             self._save_subtitles(
                 new_version.subtitle_set, subtitles, new_version.is_forked)
 
+        # if any of the language attributes have changed (title , descr
+        # compleltedness) we must trigger the api notification.
+        must_trigger_api_language_edited = False
         language.release_writelock()
         if completed is not None:
             language.is_complete = completed
+            if language.is_complete != completed:
+                must_trigger_api_language_edited = True
         if new_title is not None:
             language.title = new_title
-            api_language_edited.send(language)
+            must_trigger_api_language_edited = True
+        if new_description is not None:
+            language.description = new_description
+            must_trigger_api_language_edited = True
         language.save()
 
+        if must_trigger_api_language_edited :
+            api_language_edited.send(language)
+            
         if new_version is not None:
             video_changed_tasks.delay(language.video.id, new_version.id)
             api_subtitles_edited.send(new_version)
@@ -665,7 +676,9 @@ class Rpc(BaseRpc):
             is_latest,
             version.is_forked or force_forked,
             base_language,
-            language.get_title())
+            language.get_title(),
+            language.get_description()
+        )
 
 def language_summary(language, team_video=-1, user=None):
     if team_video == -1:

@@ -358,6 +358,9 @@ JS_DIALOG = \
      'js/widget/approvesubtitles/dialog.js',
      'js/widget/approvesubtitles/approvesubtitlespanel.js',
      'js/widget/approvesubtitles/approvesubtitlesrightpanel.js',
+     'js/widget/editmetadata/dialog.js',
+     'js/widget/editmetadata/panel.js',
+     'js/widget/editmetadata/editmetadatarightpanel.js',
      'js/widget/subtitle/dialog.js',
      'js/widget/subtitle/msservermodel.js',
      'js/widget/subtitle/subtitlewidget.js',
@@ -397,6 +400,7 @@ JS_DIALOG = \
      'js/widget/translate/translationpanel.js',
      'js/widget/translate/translationlist.js',
      'js/widget/translate/translationwidget.js',
+     'js/widget/translate/descriptiontranslationwidget.js',
      'js/widget/translate/translationrightpanel.js',
      'js/widget/translate/forkdialog.js',
      'js/widget/translate/titletranslationwidget.js']

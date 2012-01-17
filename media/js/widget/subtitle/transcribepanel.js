@@ -109,7 +109,7 @@ unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
           "on-screen."].join(''),
          ["Use the key controls below to pause and jump back, ",
           "which will help you keep up."].join('')],
-         3, 0);
+         4, 0);
     var extraHelp = [
         "Press play, then type everything people say in the text " +
             "entry below the video.",
@@ -126,7 +126,7 @@ unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
     ];
     return new unisubs.subtitle.TranscribeRightPanel(
         this.serverModel_, helpContents, extraHelp, keySpecs,
-        true, "Done?", "Next Step: Syncing");
+        true, "Done?", "Next Step: Title & Description");
 };
 unisubs.subtitle.TranscribePanel.prototype.enterDocument = function() {
     unisubs.subtitle.TranscribePanel.superClass_.enterDocument.call(this);

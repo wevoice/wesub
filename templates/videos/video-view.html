@@ -101,7 +101,7 @@
         </h2>
         <div id="description" class="abbr">
             <div class="abbr-content">
-                {{ video.description|urlize|linebreaks }}
+                {{ video.get_description|urlize|linebreaks }}
             </div>
         </div>
         <ul class="metrics">

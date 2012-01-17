@@ -35,7 +35,7 @@ unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal =
 {
     var helpContents = new unisubs.RightPanel.HelpContents(
         "Review and make corrections",
-        null, 3, 2);
+        null, 4, 3);
     helpContents.html =
         "<p>Watch the video one more time and correct any mistakes in text or timing. Tips for making high quality subtitles:</p>" +
         "<ul>" +
