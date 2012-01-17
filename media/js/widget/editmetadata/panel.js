@@ -52,7 +52,7 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
 
     var $t = goog.bind(this.getDomHelper().createTextNode, this.getDomHelper());
-    this.getElement().appendChild(this.contentElem_ = $d('div'));
+    var el = this.getElement().appendChild(this.contentElem_ = $d('div'));
     // for original languages we won't have original subtitles
     var source = this.originalSubtitles_ ? this.originalSubtitles_ : this.subtitles_;
     var originalTitle = source.title ? source.title : " no title ";
@@ -64,14 +64,16 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     this.titleTranslationWidget_ = 
         new unisubs.translate.TitleTranslationWidget(
             originalTitle, this.subtitles_);
-    this.addChild(this.titleTranslationWidget_, true);
-    this.titleTranslationWidget_.setTranslation(title);
     this.descriptionTranslationWidget_ = 
         new unisubs.translate.DescriptionTranslationWidget(
             originalDescription, this.subtitles_);
+    //this.
+
+    this.setElementInternal(this.getDomHelper().createDom('ul', "unisubs-titlesList"));
+    this.addChild(this.titleTranslationWidget_, true);
     this.addChild(this.descriptionTranslationWidget_, true);
     this.descriptionTranslationWidget_.setTranslation(description);
-
+    this.titleTranslationWidget_.setTranslation(title);
 };
 unisubs.editmetadata.Panel.prototype.getRightPanel = function() {
    if (!this.rightPanel_) {

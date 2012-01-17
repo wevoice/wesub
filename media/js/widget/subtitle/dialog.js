@@ -218,7 +218,6 @@ unisubs.subtitle.Dialog.prototype.setFinishedState_ = function() {
     }
 };
 unisubs.subtitle.Dialog.prototype.handleGoToStep_ = function(event) {
-    console.log('handle go to step', event);
     this.setState_(event.stepNo);
 };
 unisubs.subtitle.Dialog.prototype.handleKeyDown_ = function(event) {
@@ -413,7 +412,6 @@ unisubs.subtitle.Dialog.prototype.togglePause_ = function() {
 };
 unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
-    console.log("state", this.state)
     if (this.state_ == s.TRANSCRIBE)
         return new unisubs.subtitle.TranscribePanel(
             this.captionSet_,
