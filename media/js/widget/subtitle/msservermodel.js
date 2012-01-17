@@ -150,6 +150,12 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
         args['new_title'] = this.captionSet_.title;
         atLeastOneThingChanged = true;
     }
+    if (goog.isDefAndNotNull(this.captionSet_.description) &&
+        this.captionSet_.description != initialCaptionSet.description) {
+        args['new_description'] = this.captionSet_.description;
+        atLeastOneThingChanged = true;
+    }
+
     if (goog.isDefAndNotNull(this.captionSet_.completed) &&
         this.captionSet_.completed != initialCaptionSet.completed) {
         args['completed'] = this.captionSet_.completed;

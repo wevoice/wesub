@@ -29,12 +29,13 @@ goog.provide('unisubs.subtitle.EditableCaptionSet');
  * @constructor
  * @param {array.<object.<string, *>>} existingJsonCaptions No sort order necessary.
  * @param {boolean=} opt_completed Only meaningful for non-dependent subs.
- * @param {string=} opt_title Only meaningful for translations
+ * @param {string=} opt_title 
+ * @param {string=} opt_description 
  * @param {boolean=} opt_forkedDuringEdits This is a bit ugly, but this parameter should only be used 
  *     when deserializing an EditableCaptionSet from memory after a finish failure. It means that 
  *     during the failed editing session, the EditableCaptionSet got forked.
  */
-unisubs.subtitle.EditableCaptionSet = function(existingJsonCaptions, opt_completed, opt_title, opt_forkedDuringEdits)
+unisubs.subtitle.EditableCaptionSet = function(existingJsonCaptions, opt_completed, opt_title,  opt_description, opt_forkedDuringEdits)
 {
     goog.events.EventTarget.call(this);
     var that = this;
@@ -55,6 +56,8 @@ unisubs.subtitle.EditableCaptionSet = function(existingJsonCaptions, opt_complet
     }
     this.completed = opt_completed;
     this.title = opt_title;
+    
+    this.description = opt_description;
     this.forkedDuringEdits_ = !!opt_forkedDuringEdits;
 };
 goog.inherits(unisubs.subtitle.EditableCaptionSet, goog.events.EventTarget);

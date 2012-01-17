@@ -65,9 +65,11 @@ goog.inherits(unisubs.subtitle.Dialog, unisubs.Dialog);
  */
 unisubs.subtitle.Dialog.State_ = {
     TRANSCRIBE: 0,
-    SYNC: 1,
-    REVIEW: 2,
-    FINISHED: 3
+    EDIT_METADATA: 1,
+    SYNC: 2,
+    REVIEW: 3,
+    FINISHED: 4
+    
 };
 unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
@@ -205,6 +207,7 @@ unisubs.subtitle.Dialog.prototype.setFinishedState_ = function() {
     }
 };
 unisubs.subtitle.Dialog.prototype.handleGoToStep_ = function(event) {
+    console.log('handle go to step', event);
     this.setState_(event.stepNo);
 };
 unisubs.subtitle.Dialog.prototype.handleKeyDown_ = function(event) {
@@ -397,6 +400,7 @@ unisubs.subtitle.Dialog.prototype.togglePause_ = function() {
 };
 unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
+    console.log("state", this.state)
     if (this.state_ == s.TRANSCRIBE)
         return new unisubs.subtitle.TranscribePanel(
             this.captionSet_,
@@ -410,6 +414,12 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.captionManager_);
     else if (this.state_ == s.REVIEW)
         return new unisubs.subtitle.ReviewPanel(
+            this.captionSet_,
+            this.getVideoPlayerInternal(),
+            this.serverModel_,
+           this.captionManager_);
+    else if (this.state_ == s.EDIT_METADATA)
+        return new unisubs.editmetadata.Panel(
             this.captionSet_,
             this.getVideoPlayerInternal(),
             this.serverModel_,
