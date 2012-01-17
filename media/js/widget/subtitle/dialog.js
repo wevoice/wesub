@@ -25,7 +25,7 @@ goog.provide('unisubs.subtitle.Dialog');
  */
 unisubs.subtitle.Dialog = function(videoSource, serverModel,
                                     subtitles, opt_opener,
-                                    opt_skipFinished) {
+                                    opt_skipFinished, originalSubtitles) {
     unisubs.Dialog.call(this, videoSource);
     unisubs.SubTracker.getInstance().start(false);
     this.serverModel_ = serverModel;
@@ -56,6 +56,7 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel,
     this.subtitles_ = subtitles;
 
     this.keyEventsSuspended_ = false;
+    this.originalSubtitles_ = originalSubtitles;
 };
 goog.inherits(unisubs.subtitle.Dialog, unisubs.Dialog);
 
@@ -435,7 +436,8 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.captionSet_,
             this.getVideoPlayerInternal(),
             this.serverModel_,
-            this.captionManager_);
+            this.captionManager_,
+            this.originalSubtitles_ );
 };
 unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;

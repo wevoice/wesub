@@ -209,7 +209,7 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         } else if (unisubs.mode == 'approve') {
             this.openSubtitleApproveDialog(serverModel, subtitles);
         } else if (subtitles.IS_ORIGINAL || subtitles.FORKED) {
-            this.openSubtitlingDialog(serverModel, subtitles);
+            this.openSubtitlingDialog(serverModel, subtitles, originalSubtitles);
         } else {
             this.openDependentTranslationDialog_(
                 serverModel, subtitles, originalSubtitles);
@@ -238,13 +238,14 @@ unisubs.widget.SubtitleDialogOpener.prototype.openSubtitleApproveDialog = functi
     subApproveDialog.setParentEventTarget(this);
     subApproveDialog.setVisible(true);
 };
-unisubs.widget.SubtitleDialogOpener.prototype.openSubtitlingDialog = function(serverModel, subtitleState) {
+unisubs.widget.SubtitleDialogOpener.prototype.openSubtitlingDialog = function(serverModel, subtitleState, originalSubtitles) {
     if (this.subOpenFn_)
         this.subOpenFn_();
     var subDialog = new unisubs.subtitle.Dialog(
         this.videoSource_,
         serverModel, subtitleState,
-        this);
+        this,
+        originalSubtitles);
     subDialog.setParentEventTarget(this);
     subDialog.setVisible(true);
 };

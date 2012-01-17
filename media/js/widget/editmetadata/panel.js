@@ -26,7 +26,7 @@ goog.provide('unisubs.editmetadata.Panel');
  * @param {unisubs.CaptionManager} Caption manager, already containing subtitles
  *     with start_time set.
  */
-unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, captionManager) {
+unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, captionManager, originalSubtitles) {
     goog.ui.Component.call(this);
     /**
      * @type {unisubs.subtitle.EditableCaptionSet}
@@ -39,6 +39,7 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, capti
      */
     this.serverModel = serverModel;
     this.captionManager_ = captionManager;
+    this.originalSubtitles_ = originalSubtitles;
 };
 goog.inherits(unisubs.editmetadata.Panel, goog.ui.Component);
 
@@ -50,9 +51,17 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     unisubs.editmetadata.Panel.superClass_.createDom.call(this);
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
 
+    var $t = goog.bind(this.getDomHelper().createTextNode, this.getDomHelper());
     this.getElement().appendChild(this.contentElem_ = $d('div'));
-
-    this.getElement().appendChild(this.contentElem_ = $d('h1', "Edit title and description for video"));
+    // for original languages we won't have original subtitles
+    var source = this.originalSubtitles_ ? this.originalSubtitles_ : this.subtitles_;
+    var title = source.title ? source.title : " no title ";
+    var description = source.description? source.description : " no description" ;
+    this.getElement().appendChild( $d('ul', 'unisubs-titlesList',
+                                      $d("li", null,
+                                         $t("Title: " + title)),
+                                      $d("li", null,
+                                         $t("Description: " + description))));
 };
 unisubs.editmetadata.Panel.prototype.getRightPanel = function() {
    if (!this.rightPanel_) {
@@ -77,7 +86,7 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var title = "Edit attributes for ";
     var helpContents = new unisubs.RightPanel.HelpContents(title, [
-        $d('p', {}, "Fx meteadata"),
+        $d('p', {}, "You should edit title and description for this video language "),
     ], 4, 1);
     return new unisubs.editmetadata.RightPanel(this, 
                                                this.serverModel,

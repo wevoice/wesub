@@ -676,7 +676,9 @@ class Rpc(BaseRpc):
             is_latest,
             version.is_forked or force_forked,
             base_language,
-            language.get_title())
+            language.get_title(),
+            language.get_description()
+        )
 
 def language_summary(language, team_video=-1, user=None):
     if team_video == -1:
