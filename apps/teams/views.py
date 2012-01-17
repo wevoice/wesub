@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.utils.http import urlencode
 from utils import render_to, render_to_json
 from utils.searching import get_terms
 from utils.translation import get_languages_list, languages_with_names
@@ -125,7 +126,8 @@ def index(request, my_teams=False):
         'ordering': ordering,
         'order_type': order_type,
         'order_name': order_fields_name.get(ordering, 'name'),
-        'highlighted_qs': highlighted_qs
+        'highlighted_qs': highlighted_qs,
+        'share_panel_email_url': share_panel_email_url,
     }
     return object_list(request, queryset=qs,
                        paginate_by=TEAMS_ON_PAGE,
@@ -218,6 +220,10 @@ def detail(request, slug, project_slug=None, languages=None):
     extra_context['team_workflows'] = list(
         Workflow.objects.filter(team=team.id)
                         .select_related('project', 'team', 'team_video'))
+
+    message = 'Check out the "%s" team on Universal Subtitles: %s' % (team.name, request.build_absolute_uri())
+    share_panel_email_url = reverse('videos:email_friend')
+    extra_context['share_panel_email_url'] = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
 
     if is_editor:
         team_video_ids = [record.team_video_pk for record in team_video_md_list]
