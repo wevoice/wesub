@@ -38,11 +38,11 @@ from django.utils.http import urlquote_plus
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
-from gdata.youtube.service import YouTubeService
 
 from auth.models import CustomUser as User, Awards
 from videos import EffectiveSubtitle, is_synced, is_synced_value
 from videos.types import video_type_registrar
+from videos.types.youtube import yt_service
 from videos.feed_parser import FeedParser
 from comments.models import Comment
 from statistic import st_widget_view_statistic
@@ -53,8 +53,6 @@ from utils.amazon import S3EnabledImageField
 
 from apps.teams.moderation_const import WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED
 
-yt_service = YouTubeService()
-yt_service.ssl = False
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)
 VIDEO_TYPE_HTML5 = 'H'

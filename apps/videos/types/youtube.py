@@ -32,15 +32,25 @@ from django.utils.http import urlquote
 import logging
 from celery.task import task
 
-logger = logging.getLogger('youtube')
+logger = logging.getLogger("youtube")
 
 SUPPORTED_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
+YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
 
-yt_service = YouTubeService()
-yt_service.ssl = False
-
+    
 _('Private video')
 _('Undefined error')
+
+def get_youtube_service():
+    """
+    Gets instance of youtube service with the proper developer key
+    this is needed, else our quota is serverly damaged.
+    """
+    yt_service = YouTubeService(developer_key=YOUTUBE_API_SECRET)
+    yt_service.ssl = False
+    return yt_service
+    
+yt_service = get_youtube_service()
 
 @task
 def save_subtitles_for_lang(lang, video_pk, youtube_id):
@@ -173,8 +183,10 @@ class YoutubeVideoType(VideoType):
         
         try:
             self.get_subtitles(video_obj)
-        except Exception, e:
-            logger.error("Error getting subs from youtube: %s" % e)
+        except :
+            import sentry_logger
+            logger = logging.getLogger("youtube")
+            logger.exception("Error getting subs from youtube:" )
             
         return video_obj
     
