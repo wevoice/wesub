@@ -35,18 +35,18 @@
 
 <script type="text/javascript">
     jQuery('.unisubs-share .unisubs-twitter-share').click(function(){
-            jQuery.get('{% url statistic:tw_update_share_statistic %}');
-            });
-function share_on_facebook(event) {
-    jQuery.get('{% url statistic:fb_update_share_statistic %}');
-    window.open('{{share_panel_facebook_url}}',
-            'post_to_fb', 'status=0,width=560,height=320');
-    return false;
-}
+        jQuery.get('{% url statistic:tw_update_share_statistic %}');
+    });
+    function share_on_facebook(event) {
+        jQuery.get('{% url statistic:fb_update_share_statistic %}');
+        window.open('{{share_panel_facebook_url}}',
+                'post_to_fb', 'status=0,width=560,height=320');
+        return false;
+    }
 
-// Select all text when embed code is clicked
-// .focus is not properly working with chrome so using .click
-$("#embed-modal textarea").click(function(){
+    // Select all text when embed code is clicked
+    // .focus is not properly working with chrome so using .click
+    $("#embed-modal textarea").click(function(){
         this.select();
-        });
-    </script>
+    });
+</script>
