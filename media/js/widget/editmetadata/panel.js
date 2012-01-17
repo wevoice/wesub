@@ -79,10 +79,13 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function() {
     var helpContents = new unisubs.RightPanel.HelpContents(title, [
         $d('p', {}, "Fx meteadata"),
     ], 4, 1);
-    return new unisubs.editmetadata.RightPanel(
-        this, this.serverModel, helpContents, [],
-        null, false, "Done?",
-        "Next step, sync");
+    return new unisubs.editmetadata.RightPanel(this, 
+                                               this.serverModel,
+                                               helpContents,
+                                               [],
+                                               true,
+                                               "Done? ",
+                                               "Next step, Sync");
 
 };
 

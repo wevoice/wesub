@@ -23,8 +23,13 @@ goog.provide('unisubs.editmetadata.RightPanel');
  * @constructor
  * @extends unisubs.RightPanel
  */
-unisubs.editmetadata.RightPanel = function(
-    dialog, serverModel, helpContents, legendKeySpecs, showRestart, doneStrongText, doneText) {
+unisubs.editmetadata.RightPanel = function(dialog, 
+                                           serverModel, 
+                                           helpContents, 
+                                           legendKeySpecs, 
+                                           showRestart, 
+                                           doneStrongText, 
+                                           doneText) {
     unisubs.RightPanel.call(this, serverModel, helpContents, null,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
@@ -69,11 +74,6 @@ unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function(
         });
 };
 
-unisubs.editmetadata.RightPanel.prototype.appendMiddleContentsInternalx = function($d, el) {
-};
-unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternalx = function($d, el) {
-
-};
 
 unisubs.editmetadata.RightPanel.prototype.finish = function(approved) {
 };

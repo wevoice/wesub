@@ -428,6 +428,8 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
 unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
     if (this.state_ == s.TRANSCRIBE)
+        return s.EDIT_METADATA;
+    else if (this.state_ == s.EDIT_METADATA)
         return s.SYNC;
     else if (this.state_ == s.SYNC)
         return s.REVIEW;
