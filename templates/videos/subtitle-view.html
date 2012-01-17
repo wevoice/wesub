@@ -131,7 +131,7 @@
         </h2>
 
         {% widget widget_params %}
-        {% if language.description or video.description %}
+        {% if language.get_description or video.description %}
             <div id="description" class="abbr">
                 <div class="abbr-content">
                     {% if language.description %}
