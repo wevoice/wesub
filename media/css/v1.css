@@ -177,7 +177,7 @@ ol.subtitles li .timing .data{display:none;}
 .v1 .sort_button:hover .arrow{background:url('../images/chosen-sprite.png') no-repeat -18px 1px;}
 .v1 .chzn-container ul.chzn-results,.v1 ul.chzn-choices{margin-bottom:4px !important;padding-left:4px;}.v1 .chzn-container ul.chzn-results input,.v1 ul.chzn-choices input{padding:5px !important;}
 .v1 .filters p{height:16px;line-height:18px;vertical-align:middle;}.v1 .filters p span.inner{vertical-align:middle;}
-.v1 .filters .chzn-container{height:100%;margin-bottom:0;margin-left:2px;text-align:left;vertical-align:middle;}.v1 .filters .chzn-container .chzn-drop{border-top:1px solid #b7c3c9;}
+.v1 .filters .chzn-container{height:100%;margin-bottom:0;margin-left:7px;text-align:left;vertical-align:middle;}.v1 .filters .chzn-container .chzn-drop{border-top:1px solid #b7c3c9;}
 .v1 .filters .chzn-container,.v1 .filters .chzn-container-single,.v1 .filters .chzn-container-single .chzn-single,.v1 .filters .chzn-container-active .chzn-single .chzn-container-single .chzn-single-with-drop,.v1 .filters .chzn-container-single .chzn-single div{border:none;background:transparent;}
 .v1 .filters .chzn-container-single .chzn-single{padding:0;height:18px;line-height:17px;vertical-align:-2px;}
 .v1 .filters .chzn-container-single .chzn-single{vertical-align:0;}.v1 .filters .chzn-container-single .chzn-single div b{background-position:-6px -4px;}
