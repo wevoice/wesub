@@ -134,7 +134,8 @@ def send_templated_email(to, subject, body_template, body_dict,
              situations where you must send the email, for example on
              password retrivals.
     """
-    from auth.models import CustomUser as User
+    from auth.models import CustomUser 
+    from django.contrib.auth.models import User
     to_unchecked = to
     if not isinstance(to_unchecked, list):
         to_unchecked = [to]
@@ -144,9 +145,11 @@ def send_templated_email(to, subject, body_template, body_dict,
     # retrivals, else users that have opted out of email notifications
     # can never recover their passowrd
     for recipient in to_unchecked:
-        if isinstance(recipient, User):
+        if isinstance(recipient, User) or isinstance(recipient, CustomUser):
+            if not bool(recipient.email):
+                continue
             if check_user_preference is False or  recipient.notify_by_email:
-                to.append(u"%s <%s>" % (recipient, recipient.email))
+                to.append(recipient.email)
         else:
             to.append(recipient)
     if not from_email: from_email = settings.DEFAULT_FROM_EMAIL
