@@ -163,11 +163,10 @@ def detail(request, slug, project_slug=None, languages=None):
         'project':project,
         'can_add_video': can_add_video(team, request.user, project),
         'can_edit_videos': can_add_video(team, request.user, project),
-        'can_create_tasks': can_create_tasks(team, request.user, project),
         'filtered': filtered
     })
 
-    if extra_context['can_add_video'] or extra_context['can_edit_videos'] or extra_context['can_create_tasks']:
+    if extra_context['can_add_video'] or extra_context['can_edit_videos']:
         # Cheat and reduce the number of videos on the page if we're dealing with
         # someone who can edit videos in the team, for performance reasons.
         is_editor = True

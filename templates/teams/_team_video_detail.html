@@ -26,25 +26,22 @@
         {% endif %}
         {% with search_record|can_edit_video:request.user as can_edit_this_video %}
             {% if can_edit_this_video %}
-            {% comment %}OR can assign tasks{% endcomment %}
                 <ul class="admin-controls">
-                    {% comment %}IF can assign tasks{% endcomment %}
-                        <li>
-                            <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="Manage tasks">{% trans 'Tasks' %}</a>
-                        </li>
-                    {% comment %}{% endif %}{% endcomment %}
-                
-                        <li>
-                            <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}" title="Edit this video">{% trans 'Edit' %}</a>
-                        </li>
+                    <li>
+                        <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="Manage tasks">{% trans 'Tasks' %}</a>
+                    </li>
 
-                        <li>
-                            <form action="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" method="post" style="display: none;">
-                                {% csrf_token %}
-                                <input type="hidden" name="next" value="{{ request.path }}" />
-                            </form>
-                            <a class="remove-video" href="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" title="Remove this video from the team">{% trans 'Remove' %}</a>
-                        </li>
+                    <li>
+                        <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}" title="Edit this video">{% trans 'Edit' %}</a>
+                    </li>
+
+                    <li>
+                        <form action="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" method="post" style="display: none;">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}" />
+                        </form>
+                        <a class="remove-video" href="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" title="Remove this video from the team">{% trans 'Remove' %}</a>
+                    </li>
                 </ul>
             {% endif %}
         {% endwith %}
