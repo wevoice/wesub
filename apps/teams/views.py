@@ -142,7 +142,6 @@ def detail(request, slug, project_slug=None, languages=None):
 
     if project_slug is not None:
         project = get_object_or_404(Project, team=team, slug=project_slug)
-        filtered = True
     else:
         project = None
 
