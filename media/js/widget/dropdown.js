@@ -1,6 +1,6 @@
 // Universal Subtitles, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2011 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -77,7 +77,7 @@ unisubs.widget.DropDown.prototype.setCurrentSubtitleState = function(subtitleSta
     this.subtitleState_ = subtitleState;
     this.setCurrentLangClassName_();
     unisubs.style.showElement(this.improveSubtitlesLink_, !!subtitleState);
-    goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href = 
+    goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href =
         this.createDownloadSRTURL_();
 };
 
@@ -123,10 +123,10 @@ unisubs.widget.DropDown.prototype.updateSubtitleStats_ = function() {
         this.subCountSpan_, '(' + this.subtitleCount_ + ' lines)');
 
     if (!this.forStreamer_) {
-        // As Maggie pointed out, the "Subtitles off" link really has no 
+        // As Maggie pointed out, the "Subtitles off" link really has no
         // meaning in the streamer.
         goog.dom.append(
-            this.languageList_, 
+            this.languageList_,
             this.subtitlesOff_);
     }
 
@@ -140,7 +140,7 @@ unisubs.widget.DropDown.prototype.updateSubtitleStats_ = function() {
 unisubs.widget.DropDown.prototype.addLanguageListRequestLink_ = function($d) {
 // still not showing request stuff, lol.
 /*
-    this.languageListRequestLink_ = 
+    this.languageListRequestLink_ =
         $d('a', {'href': '#', 'className': 'requestsubs'}, "request subtitles");
     var li = $d('li', 'request',
                 "Don't see the language you want? Please ",
@@ -162,8 +162,8 @@ unisubs.widget.DropDown.prototype.addVideoLanguagesLinks_ = function($d) {
                   data.completionStatus()));
         var linkLi = $d('li', null, link);
         this.videoLanguagesLinks_.push(
-            { link: link, 
-              linkLi: linkLi, 
+            { link: link,
+              linkLi: linkLi,
               videoLanguage: data});
         goog.dom.append(this.languageList_, linkLi);
     }
@@ -188,14 +188,14 @@ unisubs.widget.DropDown.prototype.createSubtitleHomepageURL_ = function() {
 
 unisubs.widget.DropDown.prototype.createDownloadSRTURL_ = function(lang_pk) {
     var uri = new goog.Uri(unisubs.siteURL());
-    uri.setPath("/widget/download_" + 
+    uri.setPath("/widget/download_" +
                (unisubs.IS_NULL ? "null_" : "") + "srt/");
-    uri.setParameterValue("video_id", this.videoID_);               
+    uri.setParameterValue("video_id", this.videoID_);
 
     if (this.subtitleState_ && this.subtitleState_.LANGUAGE_PK){
-       uri.setParameterValue('lang_pk', this.subtitleState_.LANGUAGE_PK); 
+       uri.setParameterValue('lang_pk', this.subtitleState_.LANGUAGE_PK);
     }
-       
+
     return uri.toString();
 };
 
@@ -225,6 +225,13 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
            $d('a', {'href': this.createDownloadSRTURL_()},
               'Download Subtitles'));
 
+    this.moderatedNotice_ =
+        $d('li', 'unisubs-moderated',
+           $d('p', 'These subtitles are moderated.'),
+           $d('p', 'Visit the ',
+                   $d('a', {'href': unisubs.getVideoHomepageURL(this.videoID_)}, 'video page'),
+                   ' to contribute.'));
+
     this.createAccountLink_ =
         $d('li', 'unisubs-createAccount',
            $d('a', {'href': '#'}, 'Login or Create Account'));
@@ -237,7 +244,7 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
     this.logoutLink_ =
         $d('li', null,
            $d('a', {'href': '#'}, 'Logout'));
-    this.getEmbedCodeLink_ = 
+    this.getEmbedCodeLink_ =
         $d('li', null,
            $d('a', {'href': unisubs.getSubtitleHomepageURL(this.videoID_)}, 'Get Embed Code'));
 };
@@ -248,14 +255,18 @@ unisubs.widget.DropDown.prototype.updateActions_ = function() {
     this.getDomHelper().removeChildren(this.settingsActions_);
 
     // FIXME: this should use goog.dom.append and turn into one line.
-    this.videoActions_.appendChild(this.addLanguageLink_);
-    this.videoActions_.appendChild(this.improveSubtitlesLink_);
-// still not showing request link
-//    this.videoActions_.appendChild(this.requestSubtitlesLink_);
+
+    if (this.isModerated() && unisubs.isEmbeddedInDifferentDomain()) {
+        this.videoActions_.appendChild(this.moderatedNotice_);
+    } else {
+        this.videoActions_.appendChild(this.addLanguageLink_);
+        this.videoActions_.appendChild(this.improveSubtitlesLink_);
+    }
+
     this.videoActions_.appendChild(this.subtitleHomepageLink_);
-    this.videoActions_.appendChild(this.getEmbedCodeLink_);    
+    this.videoActions_.appendChild(this.getEmbedCodeLink_);
     this.videoActions_.appendChild(this.downloadSubtitlesLink_);
-    
+
     if (unisubs.currentUsername == null)
         this.settingsActions_.appendChild(this.createAccountLink_);
     else {
@@ -303,7 +314,7 @@ unisubs.widget.DropDown.prototype.enterDocument = function() {
                this.onDocClick_, true);
     if (this.languageListRequestLink_) {
         this.getHandler().listen(
-            this.languageListRequestLink_, click, 
+            this.languageListRequestLink_, click,
             goog.bind(this.menuItemClicked_, this, s.REQUEST_SUBTITLES));
     }
 
@@ -327,8 +338,8 @@ unisubs.widget.DropDown.prototype.addLanguageLinkListeners_ = function() {
         function(tLink) {
             that.languageClickHandler_.listen(tLink.link, 'click',
                 goog.bind(
-                    that.languageSelected_, 
-                    that, 
+                    that.languageSelected_,
+                    that,
                     tLink.videoLanguage
                 ));
         });
@@ -358,7 +369,7 @@ unisubs.widget.DropDown.prototype.menuItemClicked_ = function(type, e) {
     else if (type == s.DOWNLOAD_SUBTITLES){
         window.open(goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href);
     }
-        
+
     else if (type == s.ADD_LANGUAGE || type == s.IMPROVE_SUBTITLES ||
              type == s.REQUEST_SUBTITLES || type == s.SUBTITLES_OFF)
         this.dispatchEvent(type);
@@ -368,14 +379,14 @@ unisubs.widget.DropDown.prototype.menuItemClicked_ = function(type, e) {
 
 unisubs.widget.DropDown.prototype.languageSelected_ = function(videoLanguage, e) {
     if (e){
-        e.preventDefault();        
+        e.preventDefault();
     }
     this.dispatchLanguageSelection_(videoLanguage);
-    goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href = 
+    goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href =
         this.createDownloadSRTURL_();
 };
 
-unisubs.widget.DropDown.prototype.dispatchLanguageSelection_ = function(videoLanguage) {    
+unisubs.widget.DropDown.prototype.dispatchLanguageSelection_ = function(videoLanguage) {
     this.dispatchEvent(
         new unisubs.widget.DropDown.LanguageSelectedEvent(videoLanguage));
 };

@@ -1,14 +1,19 @@
-from celery.task import task
-from utils import send_templated_email
-from django.contrib.sites.models import Site
-from django.conf import settings
+from datetime import datetime
+
 from celery.decorators import periodic_task
 from celery.schedules import crontab
-from datetime import datetime
+from celery.task import task
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from haystack import site
-from widget.video_cache import invalidate_cache as invalidate_video_cache
+
+from utils import send_templated_email
+from widget.video_cache import (
+    invalidate_cache as invalidate_video_cache,
+    invalidate_video_moderation
+)
 
 
 @task()
@@ -18,13 +23,20 @@ def invalidate_video_caches(team_id):
     for video_id in team.teamvideo_set.values_list('video__video_id', flat=True):
         invalidate_video_cache(video_id)
 
+@task()
+def invalidate_video_moderation_caches(team):
+    """Invalidate the moderation status caches for all the given team's videos."""
+    for video_id in team.teamvideo_set.values_list('video__video_id', flat=True):
+        invalidate_video_moderation(video_id)
+
+
 @periodic_task(run_every=crontab(minute=0, hour=6))
 def add_videos_notification(*args, **kwargs):
     from teams.models import TeamVideo, Team
     domain = Site.objects.get_current().domain
-    
+
     qs = Team.objects.filter(teamvideo__created__gt=F('last_notification_time')).distinct()
-    
+
     for team in qs:
         team_videos = TeamVideo.objects.filter(team=team, created__gt=team.last_notification_time)
 
@@ -47,7 +59,7 @@ def add_videos_notification(*args, **kwargs):
                 "STATIC_URL": settings.STATIC_URL,
             }
 
-            send_templated_email(user, subject, 
+            send_templated_email(user, subject,
                                  'teams/email_new_videos.html',
                                  context, fail_silently=not settings.DEBUG)
 
@@ -100,8 +112,8 @@ def api_notify_on_subtitles_activity(team_pk, version_pk, event_name):
            version.language.video,
            event_name,
            version.language.pk,
-           version_pk) 
- 
+           version_pk)
+
 @task()
 def api_notify_on_language_activity(team_pk, language_pk, event_name):
     from teams.models import TeamNotificationSetting
@@ -109,11 +121,10 @@ def api_notify_on_language_activity(team_pk, language_pk, event_name):
     language = SubtitleLanguage.objects.select_related("video").get(pk=language_pk)
     TeamNotificationSetting.objects.notify_team(
         team_pk, language.video.video_id, event_name, language_pk)
- 
- 
+
 @task()
 def api_notify_on_video_activity(team_pk, video_id,event_name):
     from teams.models import TeamNotificationSetting
     TeamNotificationSetting.objects.notify_team(
         team_pk, video_id, event_name)
- 
+

@@ -13,23 +13,18 @@
 
 {% block view_content %}
 
-    {% with "videos" as current %}
-        {% include "teams/_tabs.html" %}
-    {% endwith %}
 
-    <div class="view grid_9 alpha">
+    <div class="view grid_8 omega">
+        {% with 'videos' as current %}
+            {% include 'teams/_tabs.html' %}
+        {% endwith %}
+
         <form method='post' action="." enctype="multipart/form-data" class="add-video">
             <h3>{% trans 'Add video' %}</h3>
-            <div class="grid_4 alpha">
                 <fieldset>
                     {% include "_form_field.html" with field=form.video_url %}
                     {% include "_form_field.html" with field=form.title %}
                     {% include "_form_field.html" with field=form.description %}
-                </fieldset>
-            </div>
-
-            <div class="grid_4 omega">
-                <fieldset>
                     {% include "_form_field.html" with field=form.language %}
                     {% if team.has_projects %}
                         {% include "_form_field.html" with field=form.project %}
@@ -37,28 +32,12 @@
                         <input type="hidden" name="project" value="{{ team.default_project.id }}" />
                     {% endif %}
                     {% include "_form_field.html" with field=form.thumbnail %}
-                </fieldset>
             </div>
 
-            <div class="grid_9 submit">
+            <div class="submit">
                 <button>{% trans 'Save' %}</button>
             </div>
             {% csrf_token %}
         </form>
-    </div>
-    <div class="controls grid_3 omega">
-        <ul>
-            <li class="current">
-                <a href="{% url teams:add_video slug=team.slug %}">{% trans "Add a Video" %}</a>
-            </li>
-            {% comment %}
-            <li>
-                <a href="{% url teams:add_videos slug=team.slug %}">{% trans "Add Multiple Videos" %}</a>
-            </li>
-            {% endcomment %}
-            <li>
-                <a href="{{ team.get_absolute_url }}">← {% trans "Back to Videos" %}</a>
-            </li>
-        </ul>
     </div>
 {% endblock %}

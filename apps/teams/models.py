@@ -239,6 +239,24 @@ class Team(models.Model):
 
     # moderation
 
+    def get_workflow(self):
+        return Workflow.get_for_target(self.id, 'team')
+
+    def moderates_videos(self):
+        """Return True if this team moderates videos in some way, False otherwise.
+
+        Moderation means the team restricts who can create subtitles and/or
+        translations.
+
+        """
+        if self.subtitle_policy != Team.SUBTITLE_IDS['Anyone']:
+            return True
+
+        if self.translate_policy != Team.SUBTITLE_IDS['Anyone']:
+            return True
+
+        return False
+
     def get_pending_moderation( self, video=None):
         from videos.models import SubtitleVersion
         qs = SubtitleVersion.objects.filter(language__video__moderated_by=self, moderation_status=WAITING_MODERATION)
@@ -717,10 +735,21 @@ def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
             else:
                 _create_translation_tasks(instance, existing_subtitles[0].latest_version())
 
+def team_video_add_video_moderation(sender, instance, created, raw, **kwargs):
+    if created and not raw and instance.team.moderates_videos():
+        instance.video.moderated_by = instance.team
+        instance.video.save()
+
+def team_video_rm_video_moderation(sender, instance, **kwargs):
+    instance.video.moderated_by = None
+    instance.video.save()
+
 
 post_save.connect(team_video_save, TeamVideo, dispatch_uid="teams.teamvideo.team_video_save")
 post_save.connect(team_video_autocreate_task, TeamVideo, dispatch_uid='teams.teamvideo.team_video_autocreate_task')
+post_save.connect(team_video_add_video_moderation, TeamVideo, dispatch_uid='teams.teamvideo.team_video_add_video_moderation')
 post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.team_video_delete")
+post_delete.connect(team_video_rm_video_moderation, TeamVideo, dispatch_uid="teams.teamvideo.team_video_rm_video_moderation")
 
 
 class TeamVideoLanguage(models.Model):
