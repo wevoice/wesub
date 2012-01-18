@@ -55,11 +55,9 @@
 
         <div class="tools group">
             {% include "teams/_search.html" %}
-            {% comment %}
-                {% if can_add_video %}
-                            <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
-                        {% endif %}  
-            {% endcomment %}
+            {% if can_add_video %}
+                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
+            {% endif %}  
             <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
         </div>
         <div class="filters{% if filtered %} active{% endif %}">
@@ -76,14 +74,6 @@
                 {% endif %}
             </p>
         </div>
-
-        {% comment %}
-            {% if can_add_video %}
-                    <div class="list-actions">
-                        <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button reduced">{% trans "Add Video" %}</a>
-                    </div>
-                {% endif %} 
-        {% endcomment %}
 
         {% if team_video_md_list %}
             <ul class="videos listing">

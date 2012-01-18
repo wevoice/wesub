@@ -37,6 +37,12 @@
 
         <div class="tools group">
             {% include "teams/_search.html" %}
+            {% if filters.team_video != None %}
+                {% can_create_any_task_for_teamvideo filters.team_video request.user %}
+                {% if user_can_create_any_task %}
+                    <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">{% trans 'Add Task' %}</a>
+                {% endif %}
+            {% endif %}
             <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
         </div>
 
@@ -77,15 +83,6 @@
                 {% endif %}
             </p>
         </div>
-
-        {% comment %}{% if filters.team_video != None %}
-            {% can_create_any_task_for_teamvideo filters.team_video request.user %}
-            {% if user_can_create_any_task %}
-                <div class="tools">
-                    <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">{% trans 'Add Task' %}</a>
-                </div>
-            {% endif %}
-        {% endif %}{% endcomment %}
 
         {% if tasks %}
             <ul class="tasks listing">

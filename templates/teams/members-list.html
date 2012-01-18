@@ -39,6 +39,9 @@
 
         <div class="tools group">
             {% include 'teams/_search.html' %}
+            {% if team|can_invite_to_team:user %}
+                <a href="{% url teams:invite_members slug=team.slug %}" class="button reduced">{% trans 'Invite Members' %}</a>
+            {% endif %} 
             <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
         </div>
 
@@ -63,14 +66,6 @@
                 {% endif %}
             </p>
         </div>
-
-        {% comment %}
-            {% if team|can_invite_to_team:user %}
-                    <div class="list-actions">
-                        <a href="{% url teams:invite_members slug=team.slug %}" class="button reduced">{% trans 'Invite Members' %}</a>
-                    </div>
-                {% endif %} 
-        {% endcomment %}
 
         {% if team|can_approve_application:user and team.applications.all.count > 0 %}
             <p class="active-filters">{% trans 'This team has' %} <a href="{% url teams:applications slug=team.slug %}{% query_string request.GET %}">{{ team.applications.all.count }} {% trans 'open applications' %}</a></p>
