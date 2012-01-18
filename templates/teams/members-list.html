@@ -68,7 +68,7 @@
         </div>
 
         {% if team|can_approve_application:user and team.applications.all.count > 0 %}
-            <p class="active-filters">{% trans 'This team has' %} <a href="{% url teams:applications slug=team.slug %}{% query_string request.GET %}">{{ team.applications.all.count }} {% trans 'open applications' %}</a></p>
+            <p class="view-notice">{% trans 'This team has' %} <a href="{% url teams:applications slug=team.slug %}{% query_string request.GET %}">{{ team.applications.all.count }} {% trans 'open applications' %}</a></p>
         {% endif %}
 
 

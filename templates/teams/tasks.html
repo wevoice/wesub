@@ -84,6 +84,12 @@
             </p>
         </div>
 
+        {% if filters.team_video %}
+            <p class="view-notice">
+                {% trans 'Video' %}: <strong>{{ filters.team_video }}</strong>
+            </p>
+        {% endif %}
+
         {% if tasks %}
             <ul class="tasks listing">
                 {% for task in tasks %}
@@ -112,19 +118,6 @@
                         {% if task.subtitle_version %}
                             <p>{% trans 'Subtitles' %}: <a href="{{ task.subtitle_version.language.get_absolute_url }}">{% trans 'View draft' %}</a></p>
                         {% endif %}
-                        <!-- <p class="steps">
-                            <span{% if task.get_type_display == "Subtitle" %} class="current"{% endif %}>{% trans 'Subtitle' %}</span>/<span{% if task.get_type_display == "Translate" %} class="current"{% endif %}>{% trans 'Translate' %}</span>
-                            {% if task.workflow.review_enabled %}
-                                →
-                                <span{% if task.get_type_display == "Review" %} class="current"{% endif %}>{% trans 'Review' %}</span>
-                            {% endif %}
-                            {% if task.workflow.approve_enabled %}
-                                →
-                                <span{% if task.get_type_display == 'Approve' %} class="current"{% endif %}>{% trans 'Approve' %}</span>
-                            {% endif %}
-                            →
-                            {% trans 'Published' %}
-                        </p> -->
                         <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.video.thumbnail }}" alt="{{ task.team_video.title }}"></a>
                         <ul class="actions">
                             <li>
