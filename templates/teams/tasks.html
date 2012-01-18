@@ -53,7 +53,7 @@
             </a>
         </div>
 
-        <div class="filters">
+        <div class="filters {% if filtered %}active{% endif %}">
             <p>
                 <span class="inner">{% trans 'Showing' %}</span>
                 <select id="id_task_type" name="type" class="type-filter chosen">
