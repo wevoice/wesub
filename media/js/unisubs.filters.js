@@ -2,9 +2,7 @@ jQuery(document).ready(function($){
     $('#sort-filter').click(function(e) {
         e.preventDefault();
 
-        $('.filters').animate({
-            height: 'toggle'
-            }, 'fast');
+        $('.filters').toggle();
         
         $(this).children('span').toggleClass('open');
     });
