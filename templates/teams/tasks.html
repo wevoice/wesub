@@ -14,7 +14,7 @@
     {% include_bundle "js-teams" %}
 
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
-
+    <script src="{{ STATIC_URL }}js/unisubs.filters.js" type="text/javascript"></script>
     <script type="text/javascript">
         unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
     </script>
@@ -37,6 +37,10 @@
 
         <div class="tools group">
             {% include "teams/_search.html" %}
+            <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
+        </div>
+
+        <div class="filters{% if filtered %} active{% endif %}">
             <p>
                 {% trans 'Showing' %}
                 <select id="id_task_type" name="type" class="type-filter chosen">
@@ -68,8 +72,8 @@
                     <option value="{% query_string request.GET assignee='me' %}" {% if request.GET.assignee == 'me' %}selected="selected"{% endif %}>{% trans 'me' %}</option>
                     <option value="{% query_string request.GET assignee='none' %}" {% if request.GET.assignee == 'none' %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
                 </select>
-                {% if filters.assignee or filters.language or filters.type or filters.team_video or request.GET.q %}
-                    <a href="{{ request.path }}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'x' %}</a>
+                {% if filtered %}
+                    <a href="{{ request.path }}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'Clear all' %}</a>
                 {% endif %}
             </p>
         </div>
@@ -222,11 +226,6 @@
 
     <script type="text/javascript">
         $(function() {
-
-            $('select.lang-filter, select.assignee-filter, select.type-filter', '.tools').change(function(e) {
-                var url = $(this).children('option:selected').attr('value');
-                window.location = url;
-            });
 
             $('a.action-assign').click(function(e) {
 

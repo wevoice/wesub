@@ -166,6 +166,7 @@ def detail(request, slug, project_slug=None, languages=None):
         'can_add_video': can_add_video(team, request.user, project),
         'can_edit_videos': can_add_video(team, request.user, project),
         'can_create_tasks': can_create_tasks(team, request.user, project),
+        'filtered': filtered
     })
 
     if extra_context['can_add_video'] or extra_context['can_edit_videos'] or extra_context['can_create_tasks']:

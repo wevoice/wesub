@@ -21,14 +21,7 @@
         {% include_bundle "js-teams" %}
     {% endif %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
-    <script type="text/javascript">
-        $(function() {
-            $select = $("select#lang-filter, select#role-filter", ".tools");
-            $select.change(function(e) {
-                window.location = $(this).children('option:selected').attr('value');
-            });
-        });
-    </script>
+    <script src="{{ STATIC_URL }}js/unisubs.filters.js" type="text/javascript"></script>
     <script src="{{ STATIC_URL }}js/unisubs.modal.js" type="text/javascript"></script>
 {% endblock %}
 
@@ -46,6 +39,10 @@
 
         <div class="tools group">
             {% include 'teams/_search.html' %}
+            <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
+        </div>
+
+        <div class="filters{% if filtered %} active{% endif %}">
             <p>
                 {% trans 'Showing' %}
                 <select name="role-filter" id="role-filter">
@@ -62,16 +59,18 @@
                     {% endfor %}
                 </select>
                 {% if filtered %}
-                    <a href="{% url teams:detail_members team.slug %}" class="clear-filters">{% trans 'x' %}</a>
+                    <a href="{% url teams:detail_members team.slug %}" class="clear-filters">{% trans 'Clear all' %}</a>
                 {% endif %}
             </p>
         </div>
 
-        {% if team|can_invite_to_team:user %}
-            <div class="list-actions">
-                <a href="{% url teams:invite_members slug=team.slug %}" class="button reduced">{% trans 'Invite Members' %}</a>
-            </div>
-        {% endif %}
+        {% comment %}
+            {% if team|can_invite_to_team:user %}
+                    <div class="list-actions">
+                        <a href="{% url teams:invite_members slug=team.slug %}" class="button reduced">{% trans 'Invite Members' %}</a>
+                    </div>
+                {% endif %} 
+        {% endcomment %}
 
         {% if team|can_approve_application:user and team.applications.all.count > 0 %}
             <p class="active-filters">{% trans 'This team has' %} <a href="{% url teams:applications slug=team.slug %}{% query_string request.GET %}">{{ team.applications.all.count }} {% trans 'open applications' %}</a></p>

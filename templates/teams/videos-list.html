@@ -19,16 +19,12 @@
     {% include_bundle "unisubs-onsite-compiled" %}
 
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
+    <script src="{{ STATIC_URL }}js/unisubs.filters.js" type="text/javascript"></script>
 
     <script type="text/javascript">
         var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
 
         $(function() {
-            $select = $("select#lang-filter", ".tools");
-            $select.change(function(e) {
-                window.location = $(this).children('option:selected').attr('value');
-            });
-
             $('.remove-video').click(function(e) {
                 e.preventDefault();
 
@@ -59,19 +55,35 @@
 
         <div class="tools group">
             {% include "teams/_search.html" %}
-            <p>Showing videos with subtitles in <select name="lang-filter" id="lang-filter">
-                <option value="{% query_string request.GET lang='' %}">All languages</option>
-                {% for code, name in language_choices %}
-                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
-                {% endfor %}
-            </select></p>
+            {% comment %}
+                {% if can_add_video %}
+                            <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
+                        {% endif %}  
+            {% endcomment %}
+            <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
+        </div>
+        <div class="filters{% if filtered %} active{% endif %}">
+            <p>
+                {% trans 'Showing videos with subtitles in' %}
+                <select name="lang-filter" id="lang-filter">
+                    <option value="{% query_string request.GET lang='' %}">{% trans 'all languages' %}s</option>
+                    {% for code, name in language_choices %}
+                        <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+                {% if filtered %}
+                    <a href="{% url teams:detail team.slug %}" class="clear-filters">{% trans 'Clear all' %}</a>
+                {% endif %}
+            </p>
         </div>
 
-        {% if can_add_video %}
-            <div class="list-actions">
-                <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button reduced">{% trans "Add Video" %}</a>
-            </div>
-        {% endif %}
+        {% comment %}
+            {% if can_add_video %}
+                    <div class="list-actions">
+                        <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button reduced">{% trans "Add Video" %}</a>
+                    </div>
+                {% endif %} 
+        {% endcomment %}
 
         {% if team_video_md_list %}
             <ul class="videos listing">

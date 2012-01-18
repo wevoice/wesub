@@ -33,7 +33,7 @@ body{overflow-y:scroll;}
 .v1 .view .tools .sort_button{float:right;margin:-0.5em 0.5em 0 0;}
 .v1 .view .tools form.search{position:absolute;top:.5em;left:.65em;width:160px;margin:0;padding:0;}.v1 .view .tools form.search fieldset{padding:0;}.v1 .view .tools form.search fieldset input{float:left;border-color:#dce2e5;}.v1 .view .tools form.search fieldset input:focus{border-color:#678ca3;}
 .v1 .view .tools form.search fieldset a.reset{display:block;position:absolute;top:0;left:152px;text-decoration:none;color:#7692a3;padding:.5em;line-height:1.5em;}
-.v1 .view p.active-filters{margin:1.2em -8px 0 4px;padding:1em;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;background-color:#f3f6f8;}.v1 .view p.active-filters a.clear-filters{float:right;}
+.v1 .view p.active-filters{margin:1.2em 1em 0 4px;padding:1em;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;background-color:#f3f6f8;}.v1 .view p.active-filters a.clear-filters{float:right;}
 .v1 .listing{clear:both;padding:0;}.v1 .listing >li{position:relative;padding:2em 1em;border-bottom:1px dotted #b7c3c9;}.v1 .listing >li.empty{border:none;}
 .v1 .listing >li h3{position:relative;font-size:13px;padding-bottom:.25em;line-height:1.5em;}.v1 .listing >li h3 >a{text-decoration:none;}.v1 .listing >li h3 >a:hover{border-width:0 0 1px 0;border-style:dotted;}
 .v1 .listing >li p{margin:.5em 0;}
@@ -176,11 +176,11 @@ ol.subtitles li .timing .data{display:none;}
 .v1 .sort_button:hover ul{top:21px;left:-1px;border-color:#dce2e5;border-top:none;-webkit-box-shadow:none 1px 2px #cccccc;-moz-box-shadow:none 1px 2px #cccccc;box-shadow:none 1px 2px #cccccc;background-color:#f9fbfc;background-image:-webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#f3f6f8));background-image:-webkit-linear-gradient(#ffffff, #f3f6f8);background-image:-moz-linear-gradient(center top, #ffffff 0%, #f3f6f8 100%);background-image:-moz-gradient(center top, #ffffff 0%, #f3f6f8 100%);background-image:-ms-linear-gradient(#ffffff, #f3f6f8);background-image:-o-linear-gradient(#ffffff, #f3f6f8);background-image:linear-gradient(#ffffff, #f3f6f8);-webkit-border-top-left-radius:0;-webkit-border-top-right-radius:0;-webkit-border-bottom-right-radius:3px;-webkit-border-bottom-left-radius:3px;-moz-border-radius-topleft:0;-moz-border-radius-topright:0;-moz-border-radius-bottomright:3px;-moz-border-radius-bottomleft:3px;border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px;}
 .v1 .sort_button:hover .arrow{background:url('../images/chosen-sprite.png') no-repeat -18px 1px;}
 .v1 .chzn-container ul.chzn-results,.v1 ul.chzn-choices{margin-bottom:4px !important;padding-left:4px;}.v1 .chzn-container ul.chzn-results input,.v1 ul.chzn-choices input{padding:5px !important;}
-.v1 .tools .chzn-container{margin-bottom:0;margin-left:2px;text-align:left;}.v1 .tools .chzn-container .chzn-drop{border-top:1px solid #b7c3c9;}
-.v1 .tools .chzn-container,.v1 .tools .chzn-container-single,.v1 .tools .chzn-container-single .chzn-single,.v1 .tools .chzn-container-active .chzn-single .chzn-container-single .chzn-single-with-drop,.v1 .tools .chzn-container-single .chzn-single div{border:none;background:transparent;}
-.v1 .tools .chzn-container-single .chzn-single{padding:0;height:18px;line-height:18px;}
-.v1 .tools .chzn-container-single .chzn-single div b{background-position:0 -2px;}
-.v1 .tools .chzn-container-active .chzn-single-with-drop div b{background-position:-18px -1px;}
+.v1 .filters .chzn-container{margin-bottom:0;margin-left:2px;text-align:left;}.v1 .filters .chzn-container .chzn-drop{border-top:1px solid #b7c3c9;}
+.v1 .filters .chzn-container,.v1 .filters .chzn-container-single,.v1 .filters .chzn-container-single .chzn-single,.v1 .filters .chzn-container-active .chzn-single .chzn-container-single .chzn-single-with-drop,.v1 .filters .chzn-container-single .chzn-single div{border:none;background:transparent;}
+.v1 .filters .chzn-container-single .chzn-single{padding:0;height:18px;line-height:18px;}
+.v1 .filters .chzn-container-single .chzn-single div b{background-position:0 -2px;}
+.v1 .filters .chzn-container-active .chzn-single-with-drop div b{background-position:-18px -1px;}
 .v1 .bootstrap .modal .modal-header h3{padding:0;border:none;margin:0;clear:none;font-size:16px;}
 .v1 .bootstrap .modal form{padding:0;margin:0;}.v1 .bootstrap .modal form p{float:none;}
 .v1 .bootstrap .modal .modal-body fieldset{padding:0;}
@@ -200,4 +200,9 @@ pre.dump code{font-family:Consolas,Menlo,"Courier New",monospace;margin:15px 0;p
 #teams .context #signin-join{display:block;margin:2em 1em 1em;}
 #teams .context .notation{clear:both;padding-top:2em;}
 #teams .context #projects-list h4{padding:1.5em 0 1em;}
-#teams .view .list-actions{padding:2em 1em 0;text-align:right;}
+#teams .view .tools #sort-filter{padding:.5em;text-decoration:none;color:#678ca3;line-height:1.5em;}
+#teams .view .tools #sort-filter span{padding:0 8px;background:url('../images/chosen-sprite.png') no-repeat 4px -4px;}
+#teams .view .tools #sort-filter span.open{background:url('../images/chosen-sprite.png') no-repeat -14px -3px;}
+#teams .view .filters{display:none;text-align:center;padding:1em;margin-left:-10px;margin-bottom:1em;border-bottom:1px solid #e8ebed;background:-moz-linear-gradient(top, #f2f2f2 0%, #fafafa 25%, #f5f5f5 75%, #f2f2f2 100%);background:-webkit-linear-gradient(top, #f2f2f2 0%, #fafafa 25%, #f5f5f5 75%, #f2f2f2 100%);background:-webkit-gradient(linear, left top, left bottom, color-stop(0, #f2f2f2), color-stop(0.25, #fafafa), color-stop(0.75, #f5f5f5), color-stop(1, #f2f2f2));background:-o-linear-gradient(top, #f2f2f2 0%, #fafafa 25%, #f5f5f5 75%, #f2f2f2 100%);background:-ms-linear-gradient(top, #f2f2f2 0%, #fafafa 25%, #f5f5f5 75%, #f2f2f2 100%);background:linear-gradient(top, #f2f2f2 0%, #fafafa 25%, #f5f5f5 75%, #f2f2f2 100%);}#teams .view .filters .chzn-container{width:auto !important;}
+#teams .view .filters a.clear-filters{float:right;text-decoration:none;color:#7692a3;}
+#teams .view .filters.active{display:block;}

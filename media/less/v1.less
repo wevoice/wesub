@@ -389,7 +389,7 @@ body {
 /* Listings */
 
 .v1 .view p.active-filters {
-    margin: 1.2em -8px 0 4px;
+    margin: 1.2em 1em 0 4px;
     padding: 1em;
     .border-radius(3px);
     background-color: @faintest;
@@ -1592,7 +1592,7 @@ ol.subtitles {
     }
 }
 
-.v1 .tools {
+.v1 .filters {
     .chzn-container {
         margin-bottom: 0;
         margin-left: 2px;
@@ -1792,7 +1792,53 @@ pre.dump {
     padding: 1.5em 0 1em;
 }
 
-#teams .view .list-actions {
-    padding: 2em 1em 0;
-    text-align: right;
+#teams .view .tools {
+
+    #sort-filter {
+        padding: .5em;
+        text-decoration: none;
+        color: @normal;
+        line-height: 1.5em;
+
+        &:hover {
+        }
+
+        span {
+            padding: 0 8px;
+            background: url('../images/chosen-sprite.png') no-repeat 4px -4px;
+        }
+
+        span.open {
+            background: url('../images/chosen-sprite.png') no-repeat -14px -3px;
+        }
+    }
+}
+
+#teams .view .filters {
+    display: none;
+    text-align: center;
+    padding: 1em;
+    margin-left: -10px;
+    margin-bottom: 1em;
+    border-bottom: 1px solid #e8ebed;
+    background: -moz-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -webkit-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0, hsla(0%, 0%, 95%, 1)), color-stop(0.25, hsla(0%, 0%, 98%, 1)), color-stop(0.75, #f5f5f5), color-stop(1, hsla(0%, 0%, 95%, 1)));
+    background: -o-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -ms-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+
+    .chzn-container {
+        width: auto !important;
+    }
+
+    a.clear-filters {
+        float: right;
+        text-decoration: none;
+        color: @light;
+    }
+}
+
+#teams .view .filters.active {
+    display: block;
 }
