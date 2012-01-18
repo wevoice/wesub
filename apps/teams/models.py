@@ -292,6 +292,12 @@ class Team(models.Model):
             setattr(self, '_videos_count', self.videos.count())
         return self._videos_count
 
+    @property
+    def tasks_count(self):
+        if not hasattr(self, '_tasks_count'):
+            setattr(self, '_tasks_count', Task.objects.filter(team=self, deleted=False, completed=None).count())
+        return self._tasks_count
+
     def application_message(self):
         try:
             return self.settings.get(key=Setting.KEY_IDS['messages_application']).data
@@ -411,7 +417,6 @@ class Team(models.Model):
             # make sure we create a default project
             self.default_project
 
-
     def get_writable_langs(self):
         return TeamLanguagePreference.objects.get_writable(self)
 
@@ -469,6 +474,20 @@ class Project(models.Model):
     @property
     def is_default_project(self):
         return self.name == Project.DEFAULT_NAME
+    
+    @property
+    def videos_count(self):
+        if not hasattr(self, '_videos_count'):
+            setattr(self, '_videos_count', TeamVideo.objects.filter(project=self).count())
+        return self._videos_count
+    
+    @property
+    def tasks_count(self):
+        tasks = Task.objects.filter(team=self.team, deleted=False, completed=None)
+        
+        if not hasattr(self, '_tasks_count'):
+            setattr(self, '_tasks_count', tasks.filter(team_video__project = self).count())
+        return self._tasks_count
 
     class Meta:
         unique_together = (

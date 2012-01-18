@@ -1,4 +1,4 @@
-{% load i18n teams_tags %}
+{% load i18n teams_tags utils_tags %}
 
 {% team_projects team as projects %}
 
@@ -13,22 +13,17 @@
         {{ project.description|urlize|linebreaks }}
     </div>
     {% if project.description|length > 300 %}
-        <a class="expand" href="#">Show all ↓</a>
+        <a class="expand" href="#">{% trans 'Show all' %} ↓</a>
     {% endif %}
 </div>
 <ul class="metrics">
-    <!-- TODO: Decide what metrics are useful here -->
     <li>
-    <p>22</p>
-    <h4>{% trans "Videos" %}</h4>
+        <p>{{ project.videos_count|simplify_number }}</p>
+        <h4>{% trans "Video" %}{{ project.videos_count|pluralize }}</h4>
     </li>
     <li>
-    <p>13</p>
-    <h4>{% trans "Tasks" %}</h4>
-    </li>
-    <li>
-    <p>3</p>
-    <h4>{% trans "Managers" %}</h4>
+        <p>{{ project.tasks_count|simplify_number }}</p>
+        <h4>{% trans "Task" %}{{ project.tasks_count|pluralize }}</h4>
     </li>
 </ul>
 {% if team.is_visible %}
