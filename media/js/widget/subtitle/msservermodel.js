@@ -326,7 +326,7 @@ unisubs.subtitle.MSServerModel.prototype.logIn = function() {
 };
 
 unisubs.subtitle.MSServerModel.prototype.getPermalink = function() {
-    return [unisubs.siteURL(), "/videos/", this.videoID_, "/info/"].join('');
+    return unisubs.getVideoHomepageURL(this.videoID_);
 };
 
 unisubs.subtitle.MSServerModel.prototype.getVideoID = function() {

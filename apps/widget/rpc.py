@@ -162,6 +162,7 @@ class Rpc(BaseRpc):
         team_video = video.get_team_video()
         video_languages = [language_summary(l, team_video, request.user) for l
                            in video.subtitlelanguage_set.all()]
+
         original_language = None
         if video.subtitle_language():
             original_language = video.subtitle_language().language
@@ -173,7 +174,9 @@ class Rpc(BaseRpc):
             'my_languages': my_languages,
             'video_languages': video_languages,
             'original_language': original_language,
-            'limit_languages': writable_langs, }
+            'limit_languages': writable_langs,
+            'is_moderated': video.is_moderated,
+            'video_url': video.get_absolute_url(), }
 
     def fetch_video_id_and_settings(self, request, video_id):
         is_original_language_subtitled = self._subtitle_count(video_id) > 0

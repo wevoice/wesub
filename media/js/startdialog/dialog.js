@@ -1,19 +1,19 @@
 // Universal Subtitles, universalsubtitles.org
-// 
-// Copyright (C) 2010 Participatory Culture Foundation
-// 
+//
+// Copyright (C) 2011 Participatory Culture Foundation
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see 
+// along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.startdialog.Dialog');
@@ -21,16 +21,16 @@ goog.provide('unisubs.startdialog.Dialog');
 /**
  * @constructor
  * @param {string} videoID
- * @param {?unisubs.widget.SubtitleState} initialLanguageState The state 
+ * @param {?unisubs.widget.SubtitleState} initialLanguageState The state
  * for the initial lang to be displayed.
- * @param {function(?string, string, ?number, ?number, function())} 
- * callback When OK button is 
+ * @param {function(?string, string, ?number, ?number, function())}
+ * callback When OK button is
  *     clicked, this will be called with: arg0: original language. This is
  *     non-null if and only if the user is presented with the original language
- *     dropdown in the dialog. arg1: to language: the code for the language 
- *     to which we are translating. arg2: to language subtitle id, if they selected 
- * an existing subtitlelanguage. arg3: from subtitle language id: the id for the 
- * SubtitleLanguage to translate from. This will be null iff the user intends to make 
+ *     dropdown in the dialog. arg1: to language: the code for the language
+ *     to which we are translating. arg2: to language subtitle id, if they selected
+ * an existing subtitlelanguage. arg3: from subtitle language id: the id for the
+ * SubtitleLanguage to translate from. This will be null iff the user intends to make
  *     forked/original. arg4: function to close the dialog.
  */
 unisubs.startdialog.Dialog = function(videoID, initialLanguageState, callback) {
@@ -48,7 +48,7 @@ unisubs.startdialog.Dialog.FORK_VALUE = 'forkk';
 
 unisubs.startdialog.Dialog.prototype.createDom = function() {
     unisubs.startdialog.Dialog.superClass_.createDom.call(this);
-    var $d = goog.bind(this.getDomHelper().createDom, 
+    var $d = goog.bind(this.getDomHelper().createDom,
                        this.getDomHelper());
     var el = this.getElement();
     el.appendChild(
@@ -90,6 +90,20 @@ unisubs.startdialog.Dialog.prototype.makeDropdown_ = function($d, contents, opt_
     return $d('select', (opt_className || null), options);
 };
 unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
+    var isModerated = jsonResult['is_moderated'];
+
+    if (isModerated && unisubs.isEmbeddedInDifferentDomain()) {
+        var videoUrl = jsonResult['video_url'];
+
+        this.contentDiv_.innerHTML = (
+            "<p>Subtitles for this video are moderated.</p>" +
+            "<p>Please visit the " +
+            "<a href='" + videoUrl + "'>video page</a> " +
+            "to contribute.</p>" );
+
+        return;
+    }
+
     this.fetchCompleted_ = true;
     this.model_ = new unisubs.startdialog.Model(jsonResult, this.initialLanguageState_);
     goog.dom.removeChildren(this.contentDiv_);
@@ -102,10 +116,10 @@ unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
     this.warningElem_ = $d('p', 'warning');
     goog.dom.append(this.contentDiv_, this.warningElem_);
     goog.style.showElement(this.warningElem_, false);
-    this.okButton_ = 
-        $d('a', 
-           {'href':'#', 
-            'className': "unisubs-green-button unisubs-big"}, 
+    this.okButton_ =
+        $d('a',
+           {'href':'#',
+            'className': "unisubs-green-button unisubs-big"},
            'Continue');
     goog.dom.append(this.contentDiv_, this.okButton_);
     var clearDiv = $d('div');
@@ -156,7 +170,7 @@ unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
     this.toLanguageDropdown_.value = this.model_.getSelectedLanguage().KEY;
 
     this.contentDiv_.appendChild(
-        $d('p', null, 
+        $d('p', null,
            $d('span', null, 'Subtitle into: '),
            this.toLanguageDropdown_));
 
@@ -184,13 +198,13 @@ unisubs.startdialog.Dialog.prototype.addOriginalLanguageSection_ = function($d) 
         this.originalLangDropdown_.value = 'en';
         this.model_.selectOriginalLanguage('en');
         this.contentDiv_.appendChild(
-            $d('p', null, 
-               $d('span', null, 'This video is in: '), 
+            $d('p', null,
+               $d('span', null, 'This video is in: '),
                this.originalLangDropdown_));
     }
     else
         this.contentDiv_.appendChild(
-            $d('p', null, "This video is in " + 
+            $d('p', null, "This video is in " +
                unisubs.languageNameForCode(
                    this.model_.getOriginalLanguage())));
 };
@@ -228,8 +242,8 @@ unisubs.startdialog.Dialog.prototype.fromLanguageChanged_ = function(e) {
 };
 unisubs.startdialog.Dialog.prototype.maybeShowWarning_ = function() {
     var warning = null;
-    if (this.fromLanguageDropdown_ && 
-        this.fromLanguageDropdown_.value != 
+    if (this.fromLanguageDropdown_ &&
+        this.fromLanguageDropdown_.value !=
         unisubs.startdialog.Dialog.FORK_VALUE)
         warning = this.warningMessage_();
     this.showWarning_(warning);
@@ -251,20 +265,20 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
     if (toLanguage.translationStartsFromScratch(fromLanguage)) {
         var message = "";
         if (toLanguage.VIDEO_LANGUAGE.DEPENDENT) {
-            message = "The " + toLanguage.LANGUAGE_NAME + 
-                " subtitles you selected were translated from " + 
-                toLanguage.VIDEO_LANGUAGE.getStandardLang().languageName() + 
+            message = "The " + toLanguage.LANGUAGE_NAME +
+                " subtitles you selected were translated from " +
+                toLanguage.VIDEO_LANGUAGE.getStandardLang().languageName() +
                 ". ";
         }
         var bestLanguages = this.model_.bestLanguages(
             toLanguage.LANGUAGE, fromLanguage.LANGUAGE);
         if (bestLanguages !== null) {
             message += "There is a better choice for translating into " +
-                toLanguage.LANGUAGE_NAME + " from " + 
-                fromLanguage.languageName() + ". ";            
+                toLanguage.LANGUAGE_NAME + " from " +
+                fromLanguage.languageName() + ". ";
         }
         else {
-            message += "If you're translating into " + toLanguage.LANGUAGE_NAME + 
+            message += "If you're translating into " + toLanguage.LANGUAGE_NAME +
                 " from " + fromLanguage.languageName() + ", you'll need to " +
                 "start from scratch.";
         }
@@ -278,15 +292,15 @@ unisubs.startdialog.Dialog.prototype.okClicked_ = function(e) {
         return;
     this.okHasBeenClicked_ = true;
     var fromLanguageID = null;
-    if (this.fromLanguageDropdown_ && 
-        this.fromLanguageDropdown_.value != 
+    if (this.fromLanguageDropdown_ &&
+        this.fromLanguageDropdown_.value !=
             unisubs.startdialog.Dialog.FORK_VALUE)
         fromLanguageID = parseInt(this.fromLanguageDropdown_.value, 0);
     var toLanguage = this.model_.toLanguageForKey(
         this.toLanguageDropdown_.value);
     var that = this;
     this.callback_(
-        this.model_.originalLanguageShown() ? 
+        this.model_.originalLanguageShown() ?
             this.originalLangDropdown_.value : null,
         toLanguage.LANGUAGE,
         toLanguage.VIDEO_LANGUAGE ? toLanguage.VIDEO_LANGUAGE.PK : null,

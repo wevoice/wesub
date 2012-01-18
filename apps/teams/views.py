@@ -62,9 +62,9 @@ from teams.permissions import (
     can_delete_tasks, can_perform_task, can_rename_team,
     can_change_team_settings, can_perform_task_for, can_delete_team,
 )
-from teams.tasks import invalidate_video_caches
+from teams.tasks import invalidate_video_caches, invalidate_video_moderation_caches
 import logging
-import sentry_logger
+import sentry_logger # Magical import to make sure Sentry's error recording happens.
 logger = logging.getLogger("teams.views")
 
 
@@ -391,6 +391,7 @@ def settings_guidelines(request, slug):
 def settings_permissions(request, slug):
     team = Team.get(slug, request.user)
     workflow = Workflow.get_for_target(team.id, 'team')
+    moderated = team.moderates_videos()
 
     if not can_change_team_settings(team, request.user):
         messages.error(request, _(u'You do not have permission to edit this team.'))
@@ -405,6 +406,10 @@ def settings_permissions(request, slug):
 
             if form.cleaned_data['workflow_enabled']:
                 workflow_form.save()
+
+            moderation_changed = moderated != form.instance.moderates_videos()
+            if moderation_changed:
+                invalidate_video_moderation_caches.delay(team)
 
             messages.success(request, _(u'Settings saved.'))
             return HttpResponseRedirect(request.path)

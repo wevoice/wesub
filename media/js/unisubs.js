@@ -404,6 +404,10 @@ unisubs.LoginEvent = function(username) {
     this.username = username;
 };
 
+unisubs.getVideoHomepageURL = function(videoID) {
+    return [unisubs.siteURL(), "/videos/", videoID, "/info/"].join('');
+};
+
 unisubs.getSubtitleHomepageURL = function(videoID) {
     return [unisubs.siteURL(), "/videos/", videoID].join('');
 };
