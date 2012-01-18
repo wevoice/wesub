@@ -32,11 +32,17 @@
         
             <fieldset>
                 <legend>{% trans 'Tasks' %}</legend>
-
                 <p class="notation">{% trans 'Manage subtitling and translation work for your videos' %}</p>
+
                 <label for="id_task_assign_policy">{% trans 'Who can create and assign tasks?' %}</label>
                 {{ form.task_assign_policy }}
                 <p class="notation">{% trans 'Specified members will only be able to create/assign tasks they are permitted to complete themselves' %}</p>
+
+                <label for="id_max_tasks_per_member">{% trans 'How many tasks can a user have at once?' %}</label>
+                {{ form.errors.max_tasks_per_member }}
+                {{ form.max_tasks_per_member }}
+                <p class="notation">{% trans 'Leave blank or enter 0 for no limit.' %}</p>
+
             </fieldset>
 
             <fieldset>

@@ -143,6 +143,8 @@ class Team(models.Model):
     translate_policy = models.IntegerField(_(u'translation policy'),
             choices=SUBTITLE_CHOICES,
             default=SUBTITLE_IDS['Anyone'])
+    max_tasks_per_member = models.PositiveIntegerField(_(u'maximum tasks per member'),
+            default=None, null=True, blank=True)
 
     deleted = models.BooleanField(default=False)
 
@@ -925,6 +927,13 @@ class TeamMember(models.Model):
         return self._cached_narrowings
 
 
+    def has_max_tasks(self):
+        """Return True if this member has the maximum number of tasks, False otherwise."""
+        max_tasks = self.team.max_tasks_per_member
+        if max_tasks:
+            if self.user.task_set.incomplete().filter(team=self.team).count() >= max_tasks:
+                return True
+        return False
 
 
     class Meta:

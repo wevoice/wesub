@@ -880,10 +880,16 @@ def _member_search_result(member, team, task_id, team_video_id, task_type, task_
 
     if task_id:
         task = Task.objects.not_deleted().get(team=team, pk=task_id)
-        result += [can_perform_task(member.user, task)]
+        if member.has_max_tasks():
+            result += [False]
+        else:
+            result += [can_perform_task(member.user, task)]
     elif team_video_id:
         team_video = TeamVideo.objects.get(pk=team_video_id)
-        result += [can_perform_task_for(member.user, task_type, team_video, task_lang)]
+        if member.has_max_tasks():
+            result += [False]
+        else:
+            result += [can_perform_task_for(member.user, task_type, team_video, task_lang)]
     else:
         result += [None]
 

@@ -426,20 +426,32 @@ class TaskAssignForm(forms.Form):
         self.fields['task'].queryset = team.task_set.incomplete()
 
 
-    def clean(self):
-        task = self.cleaned_data['task']
+    def clean_assignee(self):
         assignee = self.cleaned_data['assignee']
 
-        if not can_assign_task(task, self.user) and self.user != assignee:
-            raise forms.ValidationError(_(
-                u'You do not have permission to assign this task.'))
-
-        if assignee is None:
-            return self.cleaned_data
-        else:
-            if not can_perform_task(assignee, task):
+        if assignee:
+            member = self.team.members.get(user=assignee)
+            if member.has_max_tasks():
                 raise forms.ValidationError(_(
-                    u'This user cannot perform that task.'))
+                    u'That user has already been assigned the maximum number of tasks.'))
+
+        return assignee
+
+    def clean(self):
+        task = self.cleaned_data['task']
+        assignee = self.cleaned_data.get('assignee', -1)
+
+        if assignee != -1:
+            if not can_assign_task(task, self.user) and self.user != assignee:
+                raise forms.ValidationError(_(
+                    u'You do not have permission to assign this task.'))
+
+            if assignee is None:
+                return self.cleaned_data
+            else:
+                if not can_perform_task(assignee, task):
+                    raise forms.ValidationError(_(
+                        u'This user cannot perform that task.'))
 
         return self.cleaned_data
 
@@ -500,7 +512,8 @@ class PermissionsForm(forms.ModelForm):
     class Meta:
         model = Team
         fields = ('membership_policy', 'video_policy', 'subtitle_policy',
-                  'translate_policy', 'task_assign_policy', 'workflow_enabled')
+                  'translate_policy', 'task_assign_policy', 'workflow_enabled',
+                  'max_tasks_per_member',)
 
 
 class LanguagesForm(forms.Form):
