@@ -77,7 +77,7 @@ class MessageTest(TestCase):
         
     def test_member_join(self):
         def _get_counts(member):
-            email_to = "%s <%s>" %(member.user.username, member.user.email) 
+            email_to = "%s" %( member.user.email) 
             return Message.objects.filter(user=member.user).count() , \
                 len([x for x in mail.outbox if email_to in x.recipients()])
             
@@ -144,7 +144,7 @@ class MessageTest(TestCase):
     def test_member_leave(self):
         return # fix me now
         def _get_counts(member):
-            email_to = "%s <%s>" %(member.user.username, member.user.email) 
+            email_to = "%s" %( member.user.email) 
             return Message.objects.filter(user=member.user).count() , \
                 len([x for x in mail.outbox if email_to in x.recipients()])
             
@@ -219,7 +219,7 @@ class MessageTest(TestCase):
         
     def test_application_new(self):
         def _get_counts(member):
-            email_to = "%s <%s>" %(member.user.username, member.user.email) 
+            email_to = "%s" %(member.user.email) 
             return Message.objects.filter(user=member.user).count() , \
                 len([x for x in mail.outbox if email_to in x.recipients()])
             
