@@ -13,59 +13,44 @@
 
 {% block view_content %}
 
-    {% with "members" as current %}
-        {% include "teams/_tabs.html" %}
-    {% endwith %}
-
-    <div class="view grid_9 alpha">
+    <div class="view grid_8 omega">
+        {% with 'members' as current %}
+            {% include 'teams/_tabs.html' %}
+        {% endwith %}
         <form method='post' action="." enctype="multipart/form-data" class="invite-members">
             {{ form.non_field_errors }}
-            <div class="grid_4 alpha">
-                <fieldset>
-                    <legend>{% trans 'Recipient' %}</legend>
-                    {{ form.errors.user_id }}
-                    <label for="user_id">{% trans 'Username' %}</label>
-                    <div class="ajaxChosen">
-                        <select name="user_id">
-                            <option value="">-----</option>
-                            <option value="">{% trans 'Begin typing to search.' %}</option>
-                        </select>
-                    </div>
-                    <p class="notation">{% trans 'Universal Subtitles username of the user you want to invite.' %}</p>
-                </fieldset>
-            </div>
+            <fieldset>
+                <legend>{% trans 'Recipient' %}</legend>
+                {{ form.errors.user_id }}
+                <label for="user_id">{% trans 'Username' %}</label>
+                <div class="ajaxChosen">
+                    <select name="user_id">
+                        <option value="">-----</option>
+                        <option value="">{% trans 'Begin typing to search.' %}</option>
+                    </select>
+                </div>
+                <p class="notation">{% trans 'Universal Subtitles username of the user you want to invite.' %}</p>
+            </fieldset>
 
-            <div class="grid_4 omega">
-                <fieldset>
-                    <legend>{% trans 'Invite Details' %}</legend>
+            <fieldset>
+                <legend>{% trans 'Invite Details' %}</legend>
 
-                    {{ form.errors.message }}
-                    <label for="id_message">{% trans 'Include a message' %}</label>
-                    {{ form.message }}
+                {{ form.errors.message }}
+                <label for="id_message">{% trans 'Include a message' %}</label>
+                {{ form.message }}
 
-                    {{ form.errors.role }}
-                    <label for="id_role">{% trans 'Assign a role' %}</label>
-                    {{ form.role }}
-                    <p class="notation">{% trans 'Role to be assigned to the user if they accept your invitation.' %}</p>
-                </fieldset>
-            </div>
+                {{ form.errors.role }}
+                <label for="id_role">{% trans 'Assign a role' %}</label>
+                {{ form.role }}
+                <p class="notation">{% trans 'Role to be assigned to the user if they accept your invitation.' %}</p>
+            </fieldset>
 
-            <div class="grid_9 submit">
+            <div class="submit">
                 <button>{% trans 'Send Invites' %}</button>
             </div>
 
             {% csrf_token %}
         </form>
-    </div>
-    <div class="controls grid_3 omega">
-        <ul>
-            <li class="current">
-                <a href="{% url teams:invite_members slug=team.slug %}">{% trans 'Invite New Members' %}</a>
-            </li>
-            <li>
-                <a href="{% url teams:detail_members team.slug %}">← {% trans 'Back to Members' %}</a>
-            </li>
-        </ul>
     </div>
 
     <script type="text/javascript">

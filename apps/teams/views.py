@@ -127,7 +127,6 @@ def index(request, my_teams=False):
         'order_type': order_type,
         'order_name': order_fields_name.get(ordering, 'name'),
         'highlighted_qs': highlighted_qs,
-        'share_panel_email_url': share_panel_email_url,
     }
     return object_list(request, queryset=qs,
                        paginate_by=TEAMS_ON_PAGE,
