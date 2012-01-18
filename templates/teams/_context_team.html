@@ -5,10 +5,13 @@
 <h2 class="main-title">
     <a href="" title="permalink">{{ team }}</a>
 </h2>
-<div id="description" class="abbr">
-    <div class="abbr-content">
+<div id="description"{% if team.description|length > 300 %} class="abbr collapsed"{% endif %}>
+    <div>
         {{ team.description|urlize|linebreaks }}
     </div>
+    {% if team.description|length > 300 %}
+        <a class="expand" href="#">Show all ↓</a>
+    {% endif %}
 </div>
 {% if projects.count > 0 %}
 <div id="projects-list" class="abbr">

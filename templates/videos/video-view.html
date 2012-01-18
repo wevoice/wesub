@@ -82,11 +82,6 @@
           content="{% title_for_video video %}"/>
 {% endblock  %}
 
-{% comment %}
-    TODO:
-        - title/description editing?
-{% endcomment %}
-
 {% block main_content %}
     {% if saved %}
         <div id="messages">
@@ -99,10 +94,13 @@
         <h2 class="main-title">
             <a href="{{share_panel_permalink}}" title="Video permalink">{{ video }}</a>
         </h2>
-        <div id="description" class="abbr">
-            <div class="abbr-content">
-                {{ video.get_description|urlize|linebreaks }}
+        <div id="description"{% if video.description|length > 300 %} class="abbr collapsed"{% endif %}>
+            <div>
+                {{ video.description|urlize|linebreaks }}
             </div>
+            {% if video.description|length > 300 %}
+                <a class="expand" href="#">Show all ↓</a>
+            {% endif %}
         </div>
         <ul class="metrics">
             <li>
@@ -134,13 +132,16 @@
             {% endif %}
         </h3>
         {% if video.subtitle_language or translations %}
-        <div class="abbr">
-            <div class="abbr-content">
-                <ul id="subtitles-menu">
-                    {% include 'videos/_left_navigation.html' %}
-                </ul>
+            <div{% if video.languages_count > 15 %} class="abbr collapsed"{% endif %}>
+                <div>
+                    <ul id="subtitles-menu">
+                        {% include 'videos/_left_navigation.html' %}
+                    </ul>
+                </div>
+                {% if video.languages_count > 15 %}
+                    <a class="expand" href="#">Show all ↓</a>
+                {% endif %}
             </div>
-        </div>
         {% else %}
             <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
         {% endif %}

@@ -8,10 +8,13 @@
 <h2 class="main-title">
     <a href="" title="permalink">{{ project }}</a>
 </h2>
-<div id="description" class="abbr">
-    <div class="abbr-content">
+<div id="description"{% if project.description|length > 300 %} class="abbr collapsed"{% endif %}>
+    <div>
         {{ project.description|urlize|linebreaks }}
     </div>
+    {% if project.description|length > 300 %}
+        <a class="expand" href="#">Show all ↓</a>
+    {% endif %}
 </div>
 <ul class="metrics">
     <!-- TODO: Decide what metrics are useful here -->

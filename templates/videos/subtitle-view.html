@@ -99,11 +99,6 @@
           content="{% title_for_video video language %}"/>
 {% endblock  %}
 
-{% comment %}
-    TODO:
-        - title/description editing?
-{% endcomment %}
-
 {% block main_content %}
 
     <div class="grid_4 context alpha">
@@ -131,17 +126,18 @@
         </h2>
 
         {% widget widget_params %}
-        {% if language.get_description or video.description %}
-            <div id="description" class="abbr">
-                <div class="abbr-content">
-                    {% if language.description %}
-                        {{ language.description|urlize|linebreaks }}
-                    {% else %}
-                        {{ video.description|urlize|linebreaks }}
-                    {% endif %}
+
+        {% if language.get_description %}
+            <div id="description"{% if language.get_description|length > 300 %} class="abbr collapsed"{% endif %}>
+                <div>
+                    {{ language.get_description|urlize|linebreaks }}
                 </div>
+                {% if language.get_description|length > 300 %}
+                    <a class="expand" href="#">Show all ↓</a>
+                {% endif %}
             </div>
         {% endif %}
+
         <ul class="metrics">
             <li>
                 <p>{{ language.subtitles_fetched_count|simplify_number }}</p>
@@ -171,12 +167,16 @@
                 ({{ video.languages_count }})
             {% endif %}
         </h3>
-        <div class="abbr">
-            <div class="abbr-content">
+        
+        <div{% if video.languages_count > 15 %} class="abbr collapsed"{% endif %}>
+            <div>
                 <ul id="subtitles-menu">
                     {% include 'videos/_left_navigation.html' %}
                 </ul>
             </div>
+            {% if video.languages_count > 15 %}
+                <a class="expand" href="#">Show all ↓</a>
+            {% endif %}
         </div>
     </div>
     <div class="grid_8 view omega">
