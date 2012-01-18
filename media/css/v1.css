@@ -140,6 +140,7 @@ body#teams div.edit-team-video form fieldset a{display:inline-block;overflow:hid
 .v1 .view.new-message form{padding:4em 2em 2em;}
 .video_view .view{position:relative;}.video_view .view p.view-notice{padding-right:0;margin:1em 0;}.video_view .view p.view-notice a{text-decoration:none;color:inherit;border-bottom:1px dotted #486f87;}
 .video_view .view .tab{clear:both;}
+.video_view .view video,.video_view .view object,.video_view .view .unisubs-widget span.unisubs-videoplayer{width:620px !important;height:370px !important;}
 .video_view .view #video-tab,.video_view .view #comments-tab{padding-top:10px;}.video_view .view #video-tab h3,.video_view .view #comments-tab h3{margin-top:1em;}
 .video_view .view #activity-tab,.video_view .view #urls-tab{padding:0;}
 .video_view .view #comments-tab{padding-left:10px;}
@@ -152,8 +153,10 @@ body#teams div.edit-team-video form fieldset a{display:inline-block;overflow:hid
 .video_view button.follow-button.unfollow:hover,.video_view button.follow-button:hover.unfollow:hover{color:#B6464D;}
 .v1 .context{width:289px;padding:0 20px 0 0;margin-right:0;border-left:none;border-right:1px solid #dce2e5;background-image:-webkit-linear-gradient(right, #f7f7f7, #ffffff 2%, #ffffff);background-image:-moz-linear-gradient(right, #f7f7f7, #ffffff 2%, #ffffff);background-image:-o-linear-gradient(right, #f7f7f7, #ffffff 2%, #ffffff);background-image:-ms-linear-gradient(right, #f7f7f7, #ffffff 2%, #ffffff);background-image:linear-gradient(right, #f7f7f7, #ffffff 2%, #ffffff);}.v1 .context p.permalink{margin:-0.5em 0 0.5em;}.v1 .context p.permalink a{font-size:11px;text-decoration:none;color:#b7c3c9;}
 .v1 .context .abbr{position:relative;clear:both;}.v1 .context .abbr .expand{display:block;padding:.5em 0;margin-top:.5em;text-align:center;border-top:1px solid #f3f6f8;color:#a0b2bd;text-decoration:none;}
-.v1 .context .abbr.collapsed .abbr-content{height:6em;overflow:hidden;}
+.v1 .context .abbr div{height:6em;overflow:hidden;}
+.v1 .context .abbr.expanded div{height:auto;}
 .v1 .context #widget_div{padding-bottom:1.5em;}
+.v1 .context video,.v1 .context object,.v1 .context .unisubs-widget span.unisubs-videoplayer{width:289px !important;height:173px !important;}
 .v1 .context #description{color:#486f87;line-height:150%;}.v1 .context #description p{margin-bottom:.5em;}
 .v1 .context a{text-decoration:none;}
 .v1 .context h2 a{color:inherit;word-wrap:break-word;}

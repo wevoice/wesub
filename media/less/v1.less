@@ -1271,6 +1271,11 @@ body#teams div.edit-team-video form fieldset a {
             clear: both;
         }
 
+        video, object, .unisubs-widget span.unisubs-videoplayer {
+            width: 620px !important;
+            height: 370px !important;
+        }
+
         #video-tab, #comments-tab {
             padding-top: 10px;
 
@@ -1369,15 +1374,24 @@ body#teams div.edit-team-video form fieldset a {
             text-decoration: none;
         }
 
-        &.collapsed .abbr-content {
+        div {
             height: 6em;
             overflow: hidden;
+        }
+
+        &.expanded div {
+            height: auto;
         }
 
     }
 
     #widget_div {
         padding-bottom: 1.5em;
+    }
+
+    video, object, .unisubs-widget span.unisubs-videoplayer {
+        width: 289px !important;
+        height: 173px !important;
     }
 
     #description {
