@@ -82,7 +82,7 @@ unisubs.editmetadata.Dialog.prototype.createRightPanel_ = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var title = "Edit Title & Description Subtitles";
     var helpContents = new unisubs.RightPanel.HelpContents(title, [
-        $d('p', {}, "Edit title and description for this video."),
+        $d('p', {}, "Edit title and description for this video.")
     ]);
     return new unisubs.editmetadata.EditmetadataRightPanel(
         this, this.serverModel_, helpContents, [], false, "Done?", "Submit final Review");

@@ -43,12 +43,19 @@
                     <a class="button" href="{% url teams:create_task slug=team.slug team_video_pk=request.GET.team_video %}">{% trans 'Add Task' %}</a>
                 {% endif %}
             {% endif %}
-            <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
+            <a href="#filter" id="sort-filter">
+                {% if filtered %}
+                    <strong>{{ filtered }}</strong> active filter{{ filtered|pluralize }}
+                {% else %}
+                    Filters
+                {% endif %}
+                <span></span>
+            </a>
         </div>
 
-        <div class="filters{% if filtered %} active{% endif %}">
+        <div class="filters {% if filtered %}active{% endif %}">
             <p>
-                {% trans 'Showing' %}
+                <span class="inner">{% trans 'Showing' %}</span>
                 <select id="id_task_type" name="type" class="type-filter chosen">
                     <option value="{{ request.path }}{% query_string request.GET type="" %}">{% trans 'all' %}</option>
                     <option value="{% query_string request.GET type='Subtitle' %}" {% if request.GET.type == 'Subtitle' %}selected="selected"{% endif %}>{% trans 'subtitle' %}</option>
@@ -60,7 +67,7 @@
                         <option value="{% query_string request.GET type='Approve' %}" {% if request.GET.type == 'Approve' %}selected="selected"{% endif %}>{% trans 'approve' %}</option>
                     {% endif %}
                 </select>
-                {% trans 'tasks for' %}
+                <span class="inner">{% trans 'tasks for' %}</span>
                 <select id="id_task_language" name="language" class="lang-filter chosen">
                     <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'all languages' %}</option>
                     {% for language in languages %}
@@ -72,7 +79,7 @@
                         </option>
                     {% endfor %}
                 </select>
-                {% trans 'assigned to' %}
+                <span class="inner">{% trans 'assigned to' %}</span>
                 <select name="assignee" class="assignee-filter">
                     <option value="{{ request.path }}{% query_string request.GET assignee='' %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
                     <option value="{% query_string request.GET assignee='me' %}" {% if request.GET.assignee == 'me' %}selected="selected"{% endif %}>{% trans 'me' %}</option>

@@ -58,11 +58,18 @@
             {% if can_add_video %}
                 <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
             {% endif %}  
-            <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
+            <a href="#filter" id="sort-filter">
+                {% if filtered %}
+                    <strong>{{ filtered }}</strong> active filter{{ filtered|pluralize }}
+                {% else %}
+                    Filters
+                {% endif %}
+                <span></span>
+            </a>
         </div>
-        <div class="filters{% if filtered %} active{% endif %}">
+        <div class="filters {% if filtered %}active{% endif %}">
             <p>
-                {% trans 'Showing videos with subtitles in' %}
+                <span class="inner">{% trans 'Showing videos with subtitles in' %}</span>
                 <select name="lang-filter" id="lang-filter">
                     <option value="{% query_string request.GET lang='' %}">{% trans 'all languages' %}</option>
                     {% for code, name in language_choices %}

@@ -137,7 +137,7 @@ def index(request, my_teams=False):
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
-    filtered = False
+    filtered = 0
 
     if project_slug is not None:
         project = get_object_or_404(Project, team=team, slug=project_slug)
@@ -148,8 +148,8 @@ def detail(request, slug, project_slug=None, languages=None):
     sort = request.GET.get('sort')
     language = request.GET.get('lang')
 
-    if query or language:
-        filtered = True
+    if language:
+        filtered = filtered + 1
 
     qs = team.get_videos_for_languages_haystack(
         language, user=request.user, project=project, query=query, sort=sort)
@@ -1061,6 +1061,7 @@ def team_tasks(request, slug, project_slug=None):
     languages = _task_languages(team, request.user)
     languages = sorted(languages, key=lambda l: l['name'])
     filters = _get_task_filters(request)
+    filtered = 0
 
     tasks = _tasks_list(request, team, project, filters, user)
     category_counts = _task_category_counts(team, filters, request.user)
@@ -1076,6 +1077,13 @@ def team_tasks(request, slug, project_slug=None):
             filters['assignee'] == None
         else:
             filters['assignee'] = team.members.get(user=filters['assignee'])
+        filtered = filtered + 1
+
+    if filters.get('language'):
+        filtered = filtered + 1
+
+    if filters.get('type'):
+        filtered = filtered + 1
 
     widget_settings = {}
     from apps.widget.rpc import add_general_settings
@@ -1092,6 +1100,7 @@ def team_tasks(request, slug, project_slug=None):
         'tasks': tasks,
         'filters': filters,
         'widget_settings': widget_settings,
+        'filtered': filtered,
     }
 
     context.update(pagination_info)
