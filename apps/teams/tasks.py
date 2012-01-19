@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from celery.decorators import periodic_task
 from celery.schedules import crontab
@@ -32,20 +32,15 @@ def invalidate_video_moderation_caches(team):
 
 @periodic_task(run_every=crontab(minute=0, hour=7))
 def expire_tasks():
-    from teams.models import Team
+    from teams.models import Task
 
-    now = datetime.now()
-    teams = Team.objects.exclude(task_expiration=0).exclude(task_expiration=None)
-    for team in teams:
-        limit = timedelta(days=team.task_expiration)
-        assigned_tasks = team.task_set.incomplete().filter(
-            assignee__isnull=False,
-            assignment_date__isnull=False,
-        )
-        for task in assigned_tasks:
-            if task.assignment_date + limit < now:
-                task.assignee = None
-                task.save()
+    expired_tasks = Task.objects.incomplete().filter(
+        expiration_date__isnull=False,
+        expiration_date__lt=datetime.now(),
+    )
+    for task in expired_tasks:
+        task.assignee = task.expiration_date = None
+        task.save()
 
 
 @periodic_task(run_every=crontab(minute=0, hour=6))

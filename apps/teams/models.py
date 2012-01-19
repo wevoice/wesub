@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -36,7 +37,6 @@ from haystack.query import SQ
 from haystack import site
 from utils.searching import get_terms
 from django.contrib.contenttypes.models import ContentType
-import datetime
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
@@ -45,6 +45,7 @@ from apps.comments.models import Comment
 from apps.teams.moderation_const import WAITING_MODERATION
 from teams.permissions_const import TEAM_PERMISSIONS, PROJECT_PERMISSIONS, \
         LANG_PERMISSIONS, ROLE_ADMIN, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_MANAGER
+
 
 def get_perm_names(model, perms):
     return [("%s-%s-%s" % (model._meta.app_label, model._meta.object_name, p[0]), p[1],) for p in perms]
@@ -430,6 +431,8 @@ class Team(models.Model):
 # reference to the class itself
 Team._meta.permissions = TEAM_PERMISSIONS
 
+
+# Project
 class ProjectManager(models.Manager):
 
     def for_team(self, team_identifier):
@@ -476,17 +479,17 @@ class Project(models.Model):
     @property
     def is_default_project(self):
         return self.name == Project.DEFAULT_NAME
-    
+
     @property
     def videos_count(self):
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', TeamVideo.objects.filter(project=self).count())
         return self._videos_count
-    
+
     @property
     def tasks_count(self):
         tasks = Task.objects.filter(team=self.team, deleted=False, completed=None)
-        
+
         if not hasattr(self, '_tasks_count'):
             setattr(self, '_tasks_count', tasks.filter(team_video__project = self).count())
         return self._tasks_count
@@ -499,6 +502,7 @@ class Project(models.Model):
         permissions = PROJECT_PERMISSIONS
 
 
+# TeamVideo
 class TeamVideo(models.Model):
     team = models.ForeignKey(Team)
     video = models.ForeignKey(Video)
@@ -775,6 +779,7 @@ post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.
 post_delete.connect(team_video_rm_video_moderation, TeamVideo, dispatch_uid="teams.teamvideo.team_video_rm_video_moderation")
 
 
+# TeamVideoLanguage
 class TeamVideoLanguage(models.Model):
     team_video = models.ForeignKey(TeamVideo, related_name='languages')
     video = models.ForeignKey(Video)
@@ -875,6 +880,7 @@ class TeamVideoLanguage(models.Model):
         permissions = LANG_PERMISSIONS
 
 
+# TeamVideoLanguagePair
 class TeamVideoLanguagePair(models.Model):
     team_video = models.ForeignKey(TeamVideo)
     team = models.ForeignKey(Team)
@@ -890,6 +896,7 @@ class TeamVideoLanguagePair(models.Model):
     percent_complete = models.IntegerField(db_index=True, default=0)
 
 
+# TeamMember
 class TeamMemderManager(models.Manager):
     use_for_related_fields = True
 
@@ -968,6 +975,7 @@ def clear_tasks(sender, instance, *args, **kwargs):
 pre_delete.connect(clear_tasks, TeamMember, dispatch_uid='teams.members.clear-tasks-on-delete')
 
 
+# MembershipNarrowing
 class MembershipNarrowing(models.Model):
     """Represent narrowings that can be made on memberships.
 
@@ -990,6 +998,7 @@ class MembershipNarrowing(models.Model):
             return u"Permission restriction for %s to language %s " % (self.member, self.language)
 
 
+# Application
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
     user = models.ForeignKey(User, related_name='team_applications')
@@ -1307,7 +1316,7 @@ class Task(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     modified = models.DateTimeField(auto_now=True, editable=False)
     completed = models.DateTimeField(blank=True, null=True)
-    assignment_date = models.DateTimeField(blank=True, null=True)
+    expiration_date = models.DateTimeField(blank=True, null=True)
 
     # Review and Approval -specific fields
     approved = models.PositiveIntegerField(choices=APPROVED_CHOICES,
@@ -1510,6 +1519,19 @@ class Task(models.Model):
                 # subtitle tasks might not have a language
                 base_url = video.get_absolute_url()
         return base_url+  "?t=%s" % self.pk
+
+
+    def set_expiration(self):
+        """Set the expiration_date of this task.  Does not save().
+
+        Requires that self.team and self.assignee be set correctly.
+
+        """
+        if not self.team.task_expiration or not self.assignee:
+            self.expiration_date = None
+        else:
+            limit = datetime.timedelta(days=self.team.task_expiration)
+            self.expiration_date = datetime.datetime.now() + limit
 
 
     def save(self, update_team_video_index=True, *args, **kwargs):

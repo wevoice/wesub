@@ -1036,6 +1036,21 @@ def _tasks_list(request, team, project, filters, user):
 
     return tasks.select_related('team_video__video', 'assignee', 'team')
 
+def _order_tasks(request, tasks):
+    sort = request.GET.get('sort', '-created')
+
+    if sort == 'created':
+        tasks = tasks.order_by('created')
+    elif sort == '-created':
+        tasks = tasks.order_by('-created')
+    elif sort == 'expires':
+        tasks = tasks.order_by('expiration_date')
+    elif sort == '-expires':
+        tasks = tasks.order_by('-expiration_date')
+
+    return tasks
+
+
 def _get_task_filters(request):
     return { 'language': request.GET.get('lang'),
              'type': request.GET.get('type'),
@@ -1064,7 +1079,8 @@ def team_tasks(request, slug, project_slug=None):
     filters = _get_task_filters(request)
     filtered = 0
 
-    tasks = _tasks_list(request, team, project, filters, user)
+    tasks = _order_tasks(request,
+                         _tasks_list(request, team, project, filters, user))
     category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
@@ -1123,8 +1139,7 @@ def create_task(request, slug, team_video_pk):
             task.team = team
             task.team_video = team_video
 
-            if task.assignee:
-                task.assignment_date = datetime.datetime.now()
+            task.set_expiration()
 
             if task.type == Task.TYPE_IDS['Subtitle']:
                 task.language = ''
@@ -1203,7 +1218,7 @@ def assign_task(request, slug):
         assignee = form.cleaned_data['assignee']
 
         task.assignee = assignee
-        task.assignment_date = datetime.datetime.now()
+        task.set_expiration()
         task.save()
         notifier.team_task_assigned.delay(task.pk)
 
@@ -1225,7 +1240,7 @@ def assign_task_ajax(request, slug):
         assignee = form.cleaned_data['assignee']
 
         task.assignee = assignee
-        task.assignment_date = datetime.datetime.now()
+        task.set_expiration()
         task.save()
         notifier.team_task_assigned.delay(task.pk)
 
