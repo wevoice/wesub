@@ -2523,6 +2523,14 @@ div.unisubs-dropdown {
     text-decoration: none !important;
     text-shadow: 0 0 0 !important;
 }
+.unisubs-dropdown .unisubs-actions .unisubs-moderated p {
+    color: #aaa !important;
+    margin: 10px 20px !important;
+}
+.unisubs-dropdown .unisubs-actions .unisubs-moderated p a {
+    display: inline !important;
+    padding: 0 !important;
+}
 .unisubs-dropdown .unisubs-addTranslation {
     background: url("../images/dropdown_icons.png") 19px 7px no-repeat !important;
     color: #a9c712 !important;

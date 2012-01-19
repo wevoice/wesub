@@ -173,9 +173,6 @@ unisubs.widget.DropDown.prototype.createActionList_ = function($d) {
     this.actions_ = $d('div', {'className': 'unisubs-actions'});
     this.createActionLinks_($d);
     this.actions_.appendChild(this.unisubsLink_);
-    if (this.isModerated_){
-        this.actions_.appendChild($d('h4', null, 'SUBS ARE MODERATED'));
-    }
     this.actions_.appendChild($d('h4', null, 'THIS VIDEO'));
     this.actions_.appendChild(this.videoActions_);
     this.actions_.appendChild($d('h4', null, 'MY SETTINGS'));
@@ -227,10 +224,13 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
 
     this.moderatedNotice_ =
         $d('li', 'unisubs-moderated',
-           $d('p', 'These subtitles are moderated.'),
-           $d('p', 'Visit the ',
-                   $d('a', {'href': unisubs.getVideoHomepageURL(this.videoID_)}, 'video page'),
-                   ' to contribute.'));
+           $d('p', null,
+                'These subtitles are moderated. Visit the ', 
+                $d('a', {'href': unisubs.getVideoHomepageURL(this.videoID_)},
+                    'video page'),
+                ' to contribute.'
+            )
+        );
 
     this.createAccountLink_ =
         $d('li', 'unisubs-createAccount',
