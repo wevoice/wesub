@@ -145,6 +145,8 @@ class Team(models.Model):
             default=SUBTITLE_IDS['Anyone'])
     max_tasks_per_member = models.PositiveIntegerField(_(u'maximum tasks per member'),
             default=None, null=True, blank=True)
+    task_expiration = models.PositiveIntegerField(_(u'task expiration (days)'),
+            default=None, null=True, blank=True)
 
     deleted = models.BooleanField(default=False)
 
@@ -1305,6 +1307,7 @@ class Task(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     modified = models.DateTimeField(auto_now=True, editable=False)
     completed = models.DateTimeField(blank=True, null=True)
+    assignment_date = models.DateTimeField(blank=True, null=True)
 
     # Review and Approval -specific fields
     approved = models.PositiveIntegerField(choices=APPROVED_CHOICES,

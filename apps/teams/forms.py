@@ -513,7 +513,7 @@ class PermissionsForm(forms.ModelForm):
         model = Team
         fields = ('membership_policy', 'video_policy', 'subtitle_policy',
                   'translate_policy', 'task_assign_policy', 'workflow_enabled',
-                  'max_tasks_per_member',)
+                  'max_tasks_per_member', 'task_expiration',)
 
 
 class LanguagesForm(forms.Form):

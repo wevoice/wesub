@@ -16,6 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import datetime
+
 from django.utils.http import urlencode
 from utils import render_to, render_to_json
 from utils.searching import get_terms
@@ -58,9 +60,9 @@ from apps.videos.templatetags.paginator import paginate
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
     can_create_task_translate, can_view_tasks_tab, can_invite,
-    roles_user_can_assign, can_join_team, can_edit_video, can_create_tasks,
-    can_delete_tasks, can_perform_task, can_rename_team,
-    can_change_team_settings, can_perform_task_for, can_delete_team,
+    roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
+    can_perform_task, can_rename_team, can_change_team_settings,
+    can_perform_task_for, can_delete_team,
 )
 from teams.tasks import invalidate_video_caches, invalidate_video_moderation_caches
 import logging
@@ -1121,6 +1123,9 @@ def create_task(request, slug, team_video_pk):
             task.team = team
             task.team_video = team_video
 
+            if task.assignee:
+                task.assignment_date = datetime.datetime.now()
+
             if task.type == Task.TYPE_IDS['Subtitle']:
                 task.language = ''
 
@@ -1198,6 +1203,7 @@ def assign_task(request, slug):
         assignee = form.cleaned_data['assignee']
 
         task.assignee = assignee
+        task.assignment_date = datetime.datetime.now()
         task.save()
         notifier.team_task_assigned.delay(task.pk)
 
@@ -1219,6 +1225,7 @@ def assign_task_ajax(request, slug):
         assignee = form.cleaned_data['assignee']
 
         task.assignee = assignee
+        task.assignment_date = datetime.datetime.now()
         task.save()
         notifier.team_task_assigned.delay(task.pk)
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from celery.decorators import periodic_task
 from celery.schedules import crontab
@@ -28,6 +28,24 @@ def invalidate_video_moderation_caches(team):
     """Invalidate the moderation status caches for all the given team's videos."""
     for video_id in team.teamvideo_set.values_list('video__video_id', flat=True):
         invalidate_video_moderation(video_id)
+
+
+@periodic_task(run_every=crontab(minute=0, hour=7))
+def expire_tasks():
+    from teams.models import Team
+
+    now = datetime.now()
+    teams = Team.objects.exclude(task_expiration=0).exclude(task_expiration=None)
+    for team in teams:
+        limit = timedelta(days=team.task_expiration)
+        assigned_tasks = team.task_set.incomplete().filter(
+            assignee__isnull=False,
+            assignment_date__isnull=False,
+        )
+        for task in assigned_tasks:
+            if task.assignment_date + limit < now:
+                task.assignee = None
+                task.save()
 
 
 @periodic_task(run_every=crontab(minute=0, hour=6))
