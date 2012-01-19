@@ -43,10 +43,10 @@
                 {{ form.max_tasks_per_member }}
                 <p class="notation">{% trans 'If left blank there will be no limit.' %}</p>
 
-                <label for="id_task_expiration">{% trans 'How long does it take tasks to expire (in days)?' %}</label>
+                <label for="id_task_expiration">{% trans 'How many days should an assignee get to complete a task?' %}</label>
                 {{ form.errors.task_expiration }}
                 {{ form.task_expiration }}
-                <p class="notation">{% trans 'If left blank there will be no limit.' %}</p>
+                <p class="notation">{% trans 'If left blank tasks will not expire.' %}</p>
             </fieldset>
 
             <fieldset>
