@@ -381,7 +381,7 @@ class Rpc(BaseRpc):
 
         if must_trigger_api_language_edited :
             api_language_edited.send(language)
-            
+
         if new_version is not None:
             video_changed_tasks.delay(language.video.id, new_version.id)
             api_subtitles_edited.send(new_version)
@@ -394,7 +394,7 @@ class Rpc(BaseRpc):
         # version. In those cases, we want to show the defatul user message.
         user_message = "Your changes have been saved. It will take a minute or so for your subtitles to appear."
         if new_version is not None and new_version.version_no == 0:
-            user_message = "Your changes have been saved. It will take a minute or so for your subtitles to appear."
+            pass
         elif new_version and is_moderated(new_version):
             if user_can_moderate(language.video, user) is False:
                 user_message = ("This video is moderated by %s. \n\n"
@@ -405,6 +405,20 @@ class Rpc(BaseRpc):
                                 "moderator to review. After they approve your subtitles, "
                                 "they will show up on our site and in the widget."
                 ) % (new_version.video.moderated_by.name)
+
+        # If we've just saved a completed subtitle language, we may need to
+        # complete a subtitle or translation task.
+        if language.is_complete:
+            team_video = language.video.get_team_video()
+            if team_video:
+                tasks = team_video.task_set.incomplete().filter(
+                    type__in=(Task.TYPE_IDS['Subtitle'],
+                              Task.TYPE_IDS['Translate']),
+                    language=language.language
+                )
+                for task in tasks:
+                    task.complete()
+
         return {
             'user_message': user_message,
             'response': 'ok' }

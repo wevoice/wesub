@@ -1376,6 +1376,19 @@ class Task(models.Model):
 
         self.subtitle_version.save()
 
+    def _send_back(self):
+        print "Sending back..."
+        if self.subtitle_version.language.is_original:
+            type = Task.TYPE_IDS['Subtitle']
+        else:
+            type = Task.TYPE_IDS['Translate']
+
+        task = Task(team=self.team, team_video=self.team_video,
+                    subtitle_version=self.subtitle_version,
+                    language=self.language, type=type)
+        task.save()
+        print task
+
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
@@ -1441,14 +1454,22 @@ class Task(models.Model):
                 # The reviewer rejected this version, so it should be explicitly
                 # made non-public.
                 self._set_version_moderation_status()
+
+                # Send the subtitles back for improvement.
+                self._send_back()
         else:
             # Approval isn't enabled, so the ruling of this Review task
             # determines whether the subtitles go public.
             self._set_version_moderation_status()
 
-            # If the subtitles are okay, go ahead and autocreate translation tasks.
-            if self.workflow.autocreate_translate and self.approved == Task.APPROVED_IDS['Approved']:
-                _create_translation_tasks(self.team_video, self.subtitle_version)
+            if self.approved == Task.APPROVED_IDS['Approved']:
+                # If the subtitles are okay, go ahead and autocreate translation
+                # tasks if necessary.
+                if self.workflow.autocreate_translate:
+                    _create_translation_tasks(self.team_video, self.subtitle_version)
+            else:
+                # Send the subtitles back for improvement.
+                self._send_back()
 
         return task
 
@@ -1460,8 +1481,12 @@ class Task(models.Model):
         self._set_version_moderation_status()
 
         # If the subtitles are okay, go ahead and autocreate translation tasks.
-        if self.workflow.autocreate_translate and self.approved == Task.APPROVED_IDS['Approved']:
-            _create_translation_tasks(self.team_video, self.subtitle_version)
+        if self.approved == Task.APPROVED_IDS['Approved']:
+            if self.workflow.autocreate_translate:
+                _create_translation_tasks(self.team_video, self.subtitle_version)
+        else:
+            # Send the subtitles back for improvement.
+            self._send_back()
 
 
     def get_perform_url(self):
@@ -1484,7 +1509,6 @@ class Task(models.Model):
         return base_url+  "?t=%s" % self.pk
 
 
-
     def save(self, update_team_video_index=True, *args, **kwargs):
         result = super(Task, self).save(*args, **kwargs)
         if update_team_video_index:
@@ -1505,7 +1529,8 @@ def task_moderate_version(sender, instance, created, **kwargs):
                 instance.subtitle_version.moderation_status = WAITING_MODERATION
                 instance.subtitle_version.save()
 
-post_save.connect(task_moderate_version, Task, dispatch_uid="teams.task.task_moderate_version")
+post_save.connect(task_moderate_version, Task,
+                  dispatch_uid="teams.task.task_moderate_version")
 
 
 # Settings

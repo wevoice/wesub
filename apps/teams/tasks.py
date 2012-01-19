@@ -78,31 +78,6 @@ def update_one_team_video(team_video_id):
 
 
 @task()
-def complete_applicable_tasks(team_video_id):
-    from teams.models import TeamVideo, Task
-
-    try:
-        team_video = TeamVideo.objects.get(id=team_video_id)
-    except TeamVideo.DoesNotExist:
-        return
-
-    incomplete_tasks = team_video.task_set.incomplete()
-    completed_languages = team_video.video.completed_subtitle_languages(public_only=False)
-
-    subtitle_complete = any([sl.is_original and sl.is_complete
-                             for sl in completed_languages])
-
-    translate_complete = [sl.language for sl in completed_languages]
-
-    for t in incomplete_tasks:
-        should_complete = (
-            (t.type == Task.TYPE_IDS['Subtitle'] and subtitle_complete)
-            or (t.type == Task.TYPE_IDS['Translate'] and t.language in translate_complete)
-        )
-        if should_complete:
-            t.complete()
-
-@task()
 def api_notify_on_subtitles_activity(team_pk, version_pk, event_name):
     from teams.models import Team
     from videos.models import SubtitleVersion

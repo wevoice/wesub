@@ -17,7 +17,6 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from teams.models import TeamVideo, TeamVideoLanguage
-from teams.tasks import complete_applicable_tasks
 from datetime import datetime
 
 from apps.teams.moderation import user_can_moderate, APPROVED
@@ -37,7 +36,6 @@ def update_metadata(video_pk):
     _update_complete_date(video)
     _invalidate_cache(video)
     _recalculate_team_detail_metadata(video)
-    _update_team_tasks(video)
 
 def _update_forked(video):
     for sl in video.subtitlelanguage_set.all():
@@ -184,9 +182,6 @@ def _recalculate_team_detail_metadata(video):
         team_video.update_team_video_language_pairs()
         TeamVideoLanguage.update(team_video)
 
-def _update_team_tasks(video):
-    for team_video in video.teamvideo_set.all():
-        complete_applicable_tasks.delay(team_video.id)
 
 def _update_is_public(video):
     if video.policy:
