@@ -41,8 +41,9 @@ from apps.teams.permissions import (
     can_remove_video as _can_remove_video,
 )
 from apps.teams.permissions import (
-    roles_user_can_assign, can_invite, can_add_video_somewhere, can_create_tasks,
-    can_create_task_subtitle, can_create_task_translate
+    roles_user_can_assign, can_invite, can_add_video_somewhere,
+    can_create_tasks, can_create_task_subtitle, can_create_task_translate,
+    can_create_and_edit_subtitles, can_create_and_edit_translations
 )
 
 
@@ -362,3 +363,42 @@ def can_assign_task(task, user):
 def can_delete_task(task, user):
     return _can_delete_task(task, user)
 
+
+@register.filter
+def can_create_subtitles_for(user, video):
+    """Return True if the user can create original subtitles for this video.
+
+    Safe to use with anonymous users as well as non-team videos.
+
+    Usage:
+
+        {% if request.user|can_create_subtitles_for:video %}
+            ...
+        {% endif %}
+
+    """
+    team_video = video.get_team_video()
+
+    if not team_video:
+        return True
+    else:
+        return can_create_and_edit_subtitles(user, team_video)
+@register.filter
+def can_create_translations_for(user, video):
+    """Return True if the user can create translations for this video.
+
+    Safe to use with anonymous users as well as non-team videos.
+
+    Usage:
+
+        {% if request.user|can_create_translations_for:video %}
+            ...
+        {% endif %}
+
+    """
+    team_video = video.get_team_video()
+
+    if not team_video:
+        return True
+    else:
+        return can_create_and_edit_translations(user, team_video)
