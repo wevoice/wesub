@@ -210,8 +210,10 @@ def video(request, video, video_url=None, title=None):
     if original:
         original.pending_moderation_count =  get_pending_count(video.subtitle_language())
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    translations = list(video.subtitlelanguage_set.filter(had_version=True) \
-        .filter(is_original=False).select_related('video'))
+    translations = list(
+            video.subtitlelanguage_set.filter(is_original=False)
+                                      .select_related('video')
+    )
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations
 
