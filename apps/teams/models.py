@@ -1314,7 +1314,9 @@ class Task(models.Model):
     objects = TaskManager()
 
     def __unicode__(self):
-        return u'%d' % self.id
+        return u'Task %s (%s) for %s' % (self.id or "unsaved",
+                                         self.get_type_display(),
+                                         self.team_video)
 
 
     @property
