@@ -60,6 +60,21 @@
     </ul>
 {% endif %}
 
+{% if team|is_team_member:user %}
+    {% with team|user_role:user as role %}
+        <h3>{{ role|capfirst }} Tools</h3>
+        <ul>
+            <li>
+                <a href="{% url teams:team_tasks team.slug %}?assignee=me">My Tasks</a>
+                ({{ team|user_tasks_count:user }})
+            </li>
+            <li>
+                <a href="{% url teams:team_tasks team.slug %}?assignee=none">Available tasks</a>
+            </li>
+        </ul>
+    {% endwith %}
+{% endif %}
+
 <script type="text/javascript">
     jQuery('.unisubs-share .unisubs-twitter-share').click(function(){
         jQuery.get('{% url statistic:tw_update_share_statistic %}');
