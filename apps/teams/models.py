@@ -1427,6 +1427,15 @@ class Task(models.Model):
                         language=self.language, type=Task.TYPE_IDS['Approve'])
             task.save()
         else:
+            # Subtitle task is done, and there is no approval or review
+            # required, so we mark the version as approved.
+            subtitle_version.moderation_status = MODERATION.APPROVED
+            subtitle_version.save()
+
+            # We need to make sure this is updated correctly here.
+            from apps.videos import metadata_manager
+            metadata_manager.update_metadata(self.team_video.video.pk)
+
             if self.workflow.autocreate_translate:
                 _create_translation_tasks(self.team_video, self.subtitle_version)
 
@@ -1438,15 +1447,23 @@ class Task(models.Model):
                         subtitle_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'])
             task.save()
-        else:
+        elif self.workflow.approve_enabled:
             # The review step may be disabled.  If so, we check the approve step.
-            if self.workflow.approve_enabled:
-                task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=subtitle_version,
-                            language=self.language, type=Task.TYPE_IDS['Approve'])
-                task.save()
-            else:
-                task = None
+            task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=subtitle_version,
+                        language=self.language, type=Task.TYPE_IDS['Approve'])
+            task.save()
+        else:
+            # Translation task is done, and there is no approval or review
+            # required, so we mark the version as approved.
+            subtitle_version.moderation_status = MODERATION.APPROVED
+            subtitle_version.save()
+
+            # We need to make sure this is updated correctly here.
+            from apps.videos import metadata_manager
+            metadata_manager.update_metadata(self.team_video.video.pk)
+
+            task = None
 
         return task
 

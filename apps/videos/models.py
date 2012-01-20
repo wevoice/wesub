@@ -914,6 +914,29 @@ class SubtitleLanguage(models.Model):
             self.created = datetime.now()
         super(SubtitleLanguage, self).save(*args, **kwargs)
 
+    def calculate_percent_done(self):
+        if not self.is_dependent():
+            return None
+
+        translation_count = self.nonblank_subtitle_count()
+        real_standard_language = self.real_standard_language()
+
+        if real_standard_language:
+            subtitle_count = real_standard_language.nonblank_subtitle_count()
+        else:
+            subtitle_count = 0
+
+        if subtitle_count == 0:
+            percent_done = 0
+        else:
+            percent_done = int(100 * float(translation_count) / float(subtitle_count))
+            percent_done = max(0, min(percent_done, 100))
+
+        if translation_count and percent_done < 1:
+            percent_done = 1
+
+        return percent_done
+
 
 
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)

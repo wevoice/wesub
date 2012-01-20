@@ -408,7 +408,7 @@ class Rpc(BaseRpc):
 
         # If we've just saved a completed subtitle language, we may need to
         # complete a subtitle or translation task.
-        if language.is_complete:
+        if language.is_complete or language.calculate_percent_done() == 100:
             team_video = language.video.get_team_video()
             if team_video:
                 tasks = team_video.task_set.incomplete().filter(
