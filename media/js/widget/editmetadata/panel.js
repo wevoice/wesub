@@ -26,7 +26,7 @@ goog.provide('unisubs.editmetadata.Panel');
  * @param {unisubs.CaptionManager} Caption manager, already containing subtitles
  *     with start_time set.
  */
-unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, captionManager, originalSubtitles) {
+unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, captionManager, originalSubtitles, numSteps) {
     goog.ui.Component.call(this);
     /**
      * @type {unisubs.subtitle.EditableCaptionSet}
@@ -40,6 +40,8 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, capti
     this.serverModel = serverModel;
     this.captionManager_ = captionManager;
     this.originalSubtitles_ = originalSubtitles;
+    // when in the translate dialog, there are only 2 stepts, for the subtitling, there are 4
+    this.numSteps_ = numSteps && 4;
 };
 goog.inherits(unisubs.editmetadata.Panel, goog.ui.Component);
 
@@ -77,7 +79,7 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
 };
 unisubs.editmetadata.Panel.prototype.getRightPanel = function() {
    if (!this.rightPanel_) {
-        this.rightPanel_ = this.createRightPanel_();
+        this.rightPanel_ = this.createRightPanel_(this.numSteps_);
         //this.listenToRightPanel_();
     }
     return this.rightPanel_;
@@ -94,7 +96,7 @@ unisubs.editmetadata.Panel.prototype.suspendKeyEvents = function(suspended) {
     this.keyEventsSuspended_ = suspended;
 };
 
-unisubs.editmetadata.Panel.prototype.createRightPanel_ = function() {
+unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var title = "Edit language attributes"
     var desc = "You should edit title and description for " + this.subtitles_.languageName;
@@ -102,7 +104,7 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function() {
         title, 
         [
             $d('p', {}, desc)
-        ], 4, 1);
+        ], numSteps, 1);
     return new unisubs.editmetadata.RightPanel(this, 
                                                this.serverModel,
                                                helpContents,

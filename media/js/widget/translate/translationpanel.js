@@ -30,11 +30,12 @@ goog.provide('unisubs.translate.TranslationPanel');
  * @param {unisubs.subtitle.SubtitleState} standardSubState
  */
 unisubs.translate.TranslationPanel = function(captionSet,
-                                               standardSubState) {
-    goog.ui.Component.call(this);
+                                               standardSubState, dialog) {
     this.captionSet_ = captionSet
     this.standardSubState_ = standardSubState;
+    goog.ui.Component.call(this);
     this.contentElem_ = null;
+    this.dialog_ = dialog;
 };
 goog.inherits(unisubs.translate.TranslationPanel, goog.ui.Component);
 
@@ -59,3 +60,39 @@ unisubs.translate.TranslationPanel.prototype.createDom = function() {
 unisubs.translate.TranslationPanel.prototype.getTranslationList = function(){
     return this.translationList_;
 };
+unisubs.translate.TranslationPanel.prototype.getRightPanel =
+    function(serverModel)
+{
+    if (!this.rightPanel_) {
+        this.rightPanel_ = this.createRightPanel_();
+        //this.listenToRightPanel_();
+    }
+    return this.rightPanel_;
+};
+
+unisubs.translate.TranslationPanel.prototype.createRightPanel_ = function(){
+    var title = this.captionSet_.VERSION > 0 ? 
+        "Editing Translation" : "Adding a New Translation";
+    var helpContents = new unisubs.RightPanel.HelpContents(
+        title,
+        [["Thanks for volunteering to translate! Your translation will be available to ",
+"everyone  watching the video in our widget."].join(''),
+         ["Please translate each line, one by one, in the white  ", 
+          "space below each line."].join(''),
+         ["If you need to rearrange the order of words or split a phrase ",
+          "differently, that's okay."].join(''),
+         ["As you're translating, you can use the \"TAB\" key to advance to ",
+          "the next line, and \"Shift-TAB\" to go back."].join('')
+        ], 2, 0);
+    var extraHelp = [
+        ["Google Translate", "http://translate.google.com/"],
+        ["List of dictionaries", "http://yourdictionary.com/languages.html"],
+        ["Firefox spellcheck dictionaries", 
+         "https://addons.mozilla.org/en-US/firefox/browse/type:3"]
+    ];
+    return new unisubs.translate.TranslationRightPanel(
+        this.dialog_,
+        this.serverModel_, helpContents, extraHelp, [], false, "Done?", 
+        "Submit final translation", "Resources for Translators");
+
+}
