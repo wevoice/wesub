@@ -1074,8 +1074,6 @@ class SubtitleVersion(SubtitleCollection):
 
     def save(self,  *args, **kwargs):
         created = not self.pk
-        if created and self.language.video.is_moderated:
-            self.moderation_status  = WAITING_MODERATION
         super(SubtitleVersion, self).save(*args, **kwargs)
         if created:
             #but some bug happen, I've no idea why

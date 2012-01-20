@@ -33,10 +33,14 @@ from django.utils import translation
 from widget.forms import  FinishReviewForm, FinishApproveForm
 from utils.forms import flatten_errorlists
 from teams.models import Task
-from teams.signals import api_subtitles_edited, api_subtitles_approved, \
-     api_subtitles_rejected, api_language_new, api_language_edited, \
-     api_video_edited
+from teams.signals import (
+    api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
+    api_language_new, api_language_edited, api_video_edited
+)
 from teams.moderation_const import UNMODERATED, WAITING_MODERATION
+from teams.permissions import (
+    can_create_and_edit_subtitles, can_create_and_edit_translations
+)
 
 from utils import send_templated_email
 from statistic.tasks import st_widget_view_statistic_update
@@ -229,6 +233,35 @@ class Rpc(BaseRpc):
         }
 
 
+    def _check_team_video_locking(self, user, video_id, language_code, is_translation):
+        """Check whether the a team prevents the user from editing the subs.
+
+        Returns a dict appropriate for sending back if the user should be
+        prevented from editing them, or None if the user can safely edit.
+
+        """
+        video = models.Video.objects.get(video_id=video_id)
+        team_video = video.get_team_video()
+
+        if not team_video:
+            # If there's no team video to worry about, just bail early.
+            return None
+
+        # Check that there are no open tasks for this action.
+        tasks = team_video.task_set.incomplete().filter(language=language_code)
+        if tasks:
+            task = tasks[0]
+            if not user.is_authenticated() or user != task.assignee:
+                return { "can_edit": False, "locked_by": str(task.assignee or task.team) }
+
+        # Check that the team's policies don't prevent the action.
+        if is_translation:
+            can_edit = can_create_and_edit_translations(user, team_video, language_code)
+        else:
+            can_edit = can_create_and_edit_subtitles(user, team_video, language_code)
+        if not can_edit:
+            return { "can_edit": False, "locked_by": str(team_video.team) }
+
     def start_editing(self, request, video_id,
                       language_code,
                       subtitle_language_pk=None,
@@ -251,15 +284,10 @@ class Rpc(BaseRpc):
             request, video_id, language_code,
             subtitle_language_pk, base_language)
 
-        video = models.Video.objects.get(video_id=video_id)
-        team_video = video.get_team_video()
-        if team_video:
-            tasks = team_video.task_set.incomplete().filter(language=language_code)
-            if tasks:
-                task = tasks[0]
-                if not request.user.is_authenticated() or request.user != task.assignee:
-                    return { "can_edit": False,
-                             "locked_by": str(task.assignee or task.team) }
+        # Check for team-related locking.
+        locked = self._check_team_video_locking(request.user, video_id, language_code, is_translation=bool(base_language_pk))
+        if locked:
+            return locked
 
         if not can_edit:
             return { "can_edit": False,
@@ -287,6 +315,7 @@ class Rpc(BaseRpc):
             self._save_original_language(video_id, original_language_code)
         video_cache.writelock_add_lang(video_id, language.language)
         return return_dict
+
 
     def resume_editing(self, request, session_pk):
         session = SubtitlingSession.objects.get(pk=session_pk)
