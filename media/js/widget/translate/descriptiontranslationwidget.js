@@ -35,7 +35,7 @@ unisubs.translate.DescriptionTranslationWidget.prototype.createDom = function() 
     this.setElementInternal(
         $d('li', null,
            $d('div', null,
-              $d('span', 'unisubs-description unisubs-description-notime', 'DESCRIPTION: '+this.originalVideoDescription_),
+              $d('span', 'unisubs-description unisubs-description-notime', 'Description'),
               this.loadingIndicator_ = $d('span', 'unisubs-loading-indicator', 'loading...')
            ),
            this.translateInput_ = $d('textarea', {"class":'unisubs-translateField unisubs-descriptionField', "rows":"10"})
