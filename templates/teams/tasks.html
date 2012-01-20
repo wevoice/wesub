@@ -44,27 +44,22 @@
                 {% endif %}
             {% endif %}
             <a href="#filter" id="sort-filter">
-                {% if filtered %}
-                    <strong>{{ filtered }}</strong> active filter{{ filtered|pluralize }}
-                {% else %}
-                    Filters
-                {% endif %}
+                {% trans 'Filter and Sort' %}
                 <span></span>
             </a>
         </div>
 
-        <div class="filters {% if filtered %}active{% endif %}">
+        <div class="filters {% if filtered or request.GET.sort %}active{% endif %}">
             <p>
-                <span class="inner">{% trans 'Showing' %}</span>
                 <select id="id_task_type" name="type" class="type-filter chosen">
-                    <option value="{{ request.path }}{% query_string request.GET type="" %}">{% trans 'all' %}</option>
-                    <option value="{% query_string request.GET type='Subtitle' %}" {% if request.GET.type == 'Subtitle' %}selected="selected"{% endif %}>{% trans 'subtitle' %}</option>
-                    <option value="{% query_string request.GET type='Translate' %}" {% if request.GET.type == 'Translate' %}selected="selected"{% endif %}>{% trans 'translate' %}</option>
+                    <option value="{{ request.path }}{% query_string request.GET type="" %}">{% trans 'All' %}</option>
+                    <option value="{% query_string request.GET type='Subtitle' %}" {% if request.GET.type == 'Subtitle' %}selected="selected"{% endif %}>{% trans 'Subtitle' %}</option>
+                    <option value="{% query_string request.GET type='Translate' %}" {% if request.GET.type == 'Translate' %}selected="selected"{% endif %}>{% trans 'Translate' %}</option>
                     {% if team|review_enabled %}
-                        <option value="{% query_string request.GET type='Review' %}" {% if request.GET.type == 'Review' %}selected="selected"{% endif %}>{% trans 'review' %}</option>
+                        <option value="{% query_string request.GET type='Review' %}" {% if request.GET.type == 'Review' %}selected="selected"{% endif %}>{% trans 'Review' %}</option>
                     {% endif %}
                     {% if team|approve_enabled %}
-                        <option value="{% query_string request.GET type='Approve' %}" {% if request.GET.type == 'Approve' %}selected="selected"{% endif %}>{% trans 'approve' %}</option>
+                        <option value="{% query_string request.GET type='Approve' %}" {% if request.GET.type == 'Approve' %}selected="selected"{% endif %}>{% trans 'Approve' %}</option>
                     {% endif %}
                 </select>
                 <span class="inner">{% trans 'tasks for' %}</span>
@@ -85,8 +80,23 @@
                     <option value="{% query_string request.GET assignee='me' %}" {% if request.GET.assignee == 'me' %}selected="selected"{% endif %}>{% trans 'me' %}</option>
                     <option value="{% query_string request.GET assignee='none' %}" {% if request.GET.assignee == 'none' %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
                 </select>
-                {% if filtered %}
-                    <a href="{{ request.path }}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'Clear all' %}</a>
+                {% trans 'sorted by' %}
+                <select name="sort">
+                    <option {% if request.GET.sort == '-created' or not request.GET.sort %}selected="selected"{% endif %} value="{% query_string request.GET sort='created' %}">
+                        {% trans 'date, newest' %}
+                    </option>
+                    <option {% if request.GET.sort == 'created' %}selected="selected"{% endif %} value="{% query_string request.GET sort='created' %}">
+                        {% trans 'date, oldest' %}
+                    </option>
+                    <option {% if request.GET.sort == '-expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-expires' %}">
+                        {% trans 'time left, least' %}
+                    </option>
+                    <option {% if request.GET.sort == 'expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='expires' %}">
+                        {% trans 'time left, most' %}
+                    </option>
+                </select>
+                {% if filtered or request.GET.sort %}
+                    <a href="{{ request.path }}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'Clear' %}</a>
                 {% endif %}
             </p>
         </div>

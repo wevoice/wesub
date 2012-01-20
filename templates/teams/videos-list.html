@@ -59,25 +59,42 @@
                 <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
             {% endif %}  
             <a href="#filter" id="sort-filter">
-                {% if filtered %}
-                    <strong>{{ filtered }}</strong> active filter{{ filtered|pluralize }}
-                {% else %}
-                    Filters
-                {% endif %}
+                {% trans 'Filter and Sort' %}
                 <span></span>
             </a>
         </div>
-        <div class="filters {% if filtered %}active{% endif %}">
+        <div class="filters {% if filtered or request.GET.sort %}active{% endif %}">
             <p>
-                <span class="inner">{% trans 'Showing videos with subtitles in' %}</span>
+                {% trans 'Videos with subtitles in' %}
                 <select name="lang-filter" id="lang-filter">
                     <option value="{% query_string request.GET lang='' %}">{% trans 'all languages' %}</option>
                     {% for code, name in language_choices %}
                         <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
                     {% endfor %}
                 </select>
-                {% if filtered %}
-                    <a href="{% url teams:detail team.slug %}" class="clear-filters">{% trans 'Clear all' %}</a>
+                {% trans 'sorted by' %}
+                <select name="sort">
+                    <option {% if request.GET.sort == 'name' %}selected="selected"{% endif %} value="{% query_string request.GET sort='name' %}">
+                        {% trans 'name, a-z' %}
+                    </option>
+                    <option {% if request.GET.sort == '-name' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-name' %}">
+                        {% trans 'name, z-a' %}
+                    </option>
+                    <option {% if request.GET.sort == '-time' or not request.GET.sort %}selected="selected"{% endif %} value="{% query_string request.GET sort='-time' %}">
+                        {% trans 'time, newest' %}
+                    </option>
+                    <option {% if request.GET.sort == 'time' %}selected="selected"{% endif %} value="{% query_string request.GET sort='time' %}">
+                        {% trans 'time, oldest' %}
+                    </option>
+                    <option {% if request.GET.sort == '-subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-subs' %}">
+                        {% trans 'subtitles, most' %}
+                    </option>
+                    <option {% if request.GET.sort == 'subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='subs' %}">
+                        {% trans 'subtitles, least' %}
+                    </option>
+                </select>
+                {% if filtered or request.GET.sort %}
+                    <a href="{% url teams:detail team.slug %}" class="clear-filters">{% trans 'Clear' %}</a>
                 {% endif %}
             </p>
         </div>
