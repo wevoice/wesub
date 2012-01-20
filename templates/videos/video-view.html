@@ -142,7 +142,13 @@
                 {% endif %}
             </div>
         {% else %}
-            <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+            {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
+                <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+            {% else %}
+                <p>
+                    {% trans "This video doesn't have any subtitles yet" %} :(
+                </p>
+            {% endif %}
         {% endif %}
     </div>
     <div class="grid_8 view omega">
@@ -162,12 +168,20 @@
                     <h3>{% trans "Contribute" %}</h3>
                     <p>
                         {% if video.languages_count < 1 %}
-                            {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!</li>
+                            {% if request.user|can_create_subtitles_for:video %}
+                                {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!
+                            {% endif %}
                         {% else %}
-                            {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!</li>
+                            {% if request.user|can_create_translations_for:video %}
+                                {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!
+                            {% endif %}
                         {% endif %}
-                        {% upload_subtitles video %}
-                        {% paste_transcription %}
+                        {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
+                            {% upload_subtitles video %}
+                            {% paste_transcription %}
+                        {% else %}
+                            {% trans 'Subtitles for this video are moderated. If it belongs to a team, try joining the team to contribute.' %}
+                        {% endif %}
                     </p>
                 </div>
                 {% if video.get_team_video or user.managed_teams %}

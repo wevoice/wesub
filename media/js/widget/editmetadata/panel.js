@@ -96,8 +96,8 @@ unisubs.editmetadata.Panel.prototype.suspendKeyEvents = function(suspended) {
 
 unisubs.editmetadata.Panel.prototype.createRightPanel_ = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    var title = "Edit language attributes"
-    var desc = "You should edit title and description for " + this.subtitles_.languageName;
+    var title = "Editing subtitle info"
+    var desc = "Please take a moment to update the " + this.subtitles_.languageName + " title and description for these subtitles.";
     var helpContents = new unisubs.RightPanel.HelpContents(
         title, 
         [
@@ -112,4 +112,3 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function() {
                                                "Next step, Sync");
 
 };
-
