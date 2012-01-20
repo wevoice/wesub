@@ -82,7 +82,7 @@
                 </select>
                 {% trans 'sorted by' %}
                 <select name="sort">
-                    <option {% if request.GET.sort == '-created' or not request.GET.sort %}selected="selected"{% endif %} value="{% query_string request.GET sort='created' %}">
+                    <option {% if request.GET.sort == '-created' or not request.GET.sort %}selected="selected"{% endif %} value="{% query_string request.GET sort='-created' %}">
                         {% trans 'date, newest' %}
                     </option>
                     <option {% if request.GET.sort == 'created' %}selected="selected"{% endif %} value="{% query_string request.GET sort='created' %}">
