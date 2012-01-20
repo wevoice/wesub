@@ -422,9 +422,9 @@ width: 400px;
 /*//////////   ~  Percent Done Indicators  ~   //////////*/
 
 
-
-
-
+#subtitles-menu {
+  color: #777;
+}
 
 .done_indicator{
 padding: 11px 11px 0 0;
