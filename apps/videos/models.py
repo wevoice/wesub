@@ -616,7 +616,9 @@ class VideoMetadata(models.Model):
                 raise ValueError(
                     "Cannot add a metadata value twice, tried %s -> %s which clashes with %s -> %s" %
                     (num, readable_name, x[0], x[1]))
-        choices = choices + (num, readable_name,)
+            elif x[0] == num and x[1] == readable_name:
+                return
+        choices = choices + ((num, readable_name,),)
         # public attr is read only
         VIDEO_META_CHOICES = field._choices = choices
         update_metadata_choices()
