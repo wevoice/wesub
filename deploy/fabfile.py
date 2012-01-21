@@ -338,11 +338,12 @@ def update_web():
         env.host_string = ADMIN_HOST
         with cd(os.path.join(env.admin_dir, 'unisubs')):
             _git_pull()
+            _update_integration(env.admin_dir)
     for host in env.web_hosts:
         env.host_string = host
         with cd('{0}/unisubs'.format(env.web_dir)):
-            python_exe = '{0}/env/bin/python'.format(env.web_dir)
             _git_pull()
+            _update_integration(env.web_dir)
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -print0 | xargs -0 rm")
     _bounce_celeryd()
