@@ -142,7 +142,7 @@
                                     {% if task.assignee %}
                                         {% trans 'Assigned to' %}
                                         {% if task.assignee == user %}
-                                            {% trans 'you' %}
+                                            {% trans 'me' %}
                                         {% else %}
                                              {{ task.assignee }}
                                         {% endif %}
