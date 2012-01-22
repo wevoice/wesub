@@ -153,6 +153,9 @@
                                     {% endif %}
                                 </h4>
                             </li>
+                            {% if task.expiration_date != None %}
+                                <li>Due in {{ task.expiration_date|timeuntil }}</li>
+                            {% endif %}
 
                             {% if task|can_perform_task:user %}
                                 {% if task.assignee == user %}
@@ -172,6 +175,7 @@
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
+
                         </ul>
 
                         {% if task|can_delete_task:user or task|can_assign_task:user %}
