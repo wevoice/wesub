@@ -88,12 +88,14 @@
                     <option {% if request.GET.sort == 'created' %}selected="selected"{% endif %} value="{% query_string request.GET sort='created' %}">
                         {% trans 'date, oldest' %}
                     </option>
-                    <option {% if request.GET.sort == '-expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-expires' %}">
-                        {% trans 'time left, least' %}
-                    </option>
-                    <option {% if request.GET.sort == 'expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='expires' %}">
-                        {% trans 'time left, most' %}
-                    </option>
+                    {% if team.task_expiration != None %}
+                        <option {% if request.GET.sort == '-expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-expires' %}">
+                            {% trans 'time left, least' %}
+                        </option>
+                        <option {% if request.GET.sort == 'expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='expires' %}">
+                            {% trans 'time left, most' %}
+                        </option>
+                    {% endif %}
                 </select>
                 {% if filtered or request.GET.sort %}
                     <a href="{{ request.path }}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'Clear' %}</a>
