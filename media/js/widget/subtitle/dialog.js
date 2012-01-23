@@ -472,10 +472,12 @@ unisubs.subtitle.Dialog.prototype.disposeCurrentPanels_ = function() {
 unisubs.subtitle.Dialog.prototype.disposeInternal = function() {
     unisubs.subtitle.Dialog.superClass_.disposeInternal.call(this);
     this.disposeCurrentPanels_();
-    this.captionManager_.dispose();
+    if (this.captionManager_)
+        this.captionManager_.dispose();
     this.serverModel_.dispose();
     this.rightPanelListener_.dispose();
-    this.captionSet_.dispose();
+    if (this.captionSet_)
+        this.captionSet_.dispose();
 };
 unisubs.subtitle.Dialog.prototype.addTranslationsAndClose = function() {
     // Adam hypothesizes that this will get called 0 times except in testing
