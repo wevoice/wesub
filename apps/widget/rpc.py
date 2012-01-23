@@ -402,13 +402,18 @@ class Rpc(BaseRpc):
                 must_trigger_api_language_edited = True
         if new_title is not None:
             language.title = new_title
+            if language.is_original:
+                language.video.title = language.title
             must_trigger_api_language_edited = True
         if new_description is not None:
             language.description = new_description
+            if language.is_original:
+                language.video.description = language.description
             must_trigger_api_language_edited = True
         language.save()
 
         if must_trigger_api_language_edited :
+            language.video.save()
             api_language_edited.send(language)
 
         if new_version is not None:
