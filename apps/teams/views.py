@@ -1122,6 +1122,7 @@ def team_tasks(request, slug, project_slug=None):
         'filters': filters,
         'widget_settings': widget_settings,
         'filtered': filtered,
+        'member': member,
     }
 
     context.update(pagination_info)
