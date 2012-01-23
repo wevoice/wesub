@@ -111,7 +111,7 @@ unisubs.translate.Dialog.prototype.createRightPanel_ = function() {
 };
 unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
     e.preventDefault();
-    this.saveWork(true);
+    this.saveWork(false);
 };
 unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
     event.preventDefault();
