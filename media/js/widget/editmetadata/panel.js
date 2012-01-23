@@ -26,7 +26,7 @@ goog.provide('unisubs.editmetadata.Panel');
  * @param {unisubs.CaptionManager} Caption manager, already containing subtitles
  *     with start_time set.
  */
-unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, captionManager, originalSubtitles, numSteps) {
+unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, captionManager, originalSubtitles, inSubtitlingDialog) {
     goog.ui.Component.call(this);
     /**
      * @type {unisubs.subtitle.EditableCaptionSet}
@@ -41,7 +41,15 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, capti
     this.captionManager_ = captionManager;
     this.originalSubtitles_ = originalSubtitles;
     // when in the translate dialog, there are only 2 stepts, for the subtitling, there are 4
-    this.numSteps_ = numSteps && 4;
+    if (inSubtitlingDialog){
+
+        this.numSteps_ = 4;
+        this.nextButtonText_ = "Next step, Sync";
+    }else{
+        
+        this.numSteps_ = "Submit subtitles";
+        this.nextButtonText_ = "Next step, Sync";
+    }
 };
 goog.inherits(unisubs.editmetadata.Panel, goog.ui.Component);
 
@@ -79,7 +87,7 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
 };
 unisubs.editmetadata.Panel.prototype.getRightPanel = function() {
    if (!this.rightPanel_) {
-        this.rightPanel_ = this.createRightPanel_(this.numSteps_);
+        this.rightPanel_ = this.createRightPanel_();
         //this.listenToRightPanel_();
     }
     return this.rightPanel_;
@@ -104,14 +112,14 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
         title, 
         [
             $d('p', {}, desc)
-        ], numSteps, 1);
+        ], this.numSteps_, 1);
     return new unisubs.editmetadata.RightPanel(this, 
                                                this.serverModel,
                                                helpContents,
                                                [],
                                                true,
                                                "Done? ",
-                                               "Next step, Sync");
+                                               this.nextButtonText_);
 
 };
 

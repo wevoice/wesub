@@ -435,7 +435,8 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.getVideoPlayerInternal(),
             this.serverModel_,
             this.captionManager_,
-            this.originalSubtitles_ );
+            this.originalSubtitles_ ,
+            true);
 };
 unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;

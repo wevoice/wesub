@@ -114,9 +114,13 @@ unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
     this.saveWork(true);
 };
 unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
-    this.saveWork(true);
     event.preventDefault();
+    if (this.state_ == unisubs.subtitle.Dialog.State_.EDIT_METADATA)
+        this.saveWork(true);
+    else
+        this.enterState_(this.nextState_());
 };
+
 unisubs.translate.Dialog.prototype.isWorkSaved = function() {
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();
 };
@@ -253,7 +257,7 @@ unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.serverModel_,
             this.captionManager_,
             this.standardSubState_ ,
-            2
+            false
         );
 };
 
