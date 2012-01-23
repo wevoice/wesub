@@ -134,7 +134,7 @@
                             {% endif %}
                         </h3>
                         <p>{% trans "Video" %}: <a href="{{ task.team_video.video.get_absolute_url }}">{{ task.team_video|truncatewords:6 }}</a></p>
-                        {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
+                        {% if task|can_perform_task:user and task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
                             <p>{% trans 'Subtitles' %}: <a href="{{ task.subtitle_version.language.get_absolute_url }}">{% trans 'View draft' %}</a></p>
                         {% endif %}
                         <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.video.thumbnail }}" alt="{{ task.team_video.title }}"></a>
