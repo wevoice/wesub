@@ -64,7 +64,10 @@ from teams.permissions import (
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team,
 )
-from teams.tasks import invalidate_video_caches, invalidate_video_moderation_caches
+from teams.tasks import (
+    invalidate_video_caches, invalidate_video_moderation_caches,
+    update_video_moderation
+)
 import logging
 import sentry_logger # Magical import to make sure Sentry's error recording happens.
 logger = logging.getLogger("teams.views")
@@ -409,6 +412,7 @@ def settings_permissions(request, slug):
 
             moderation_changed = moderated != form.instance.moderates_videos()
             if moderation_changed:
+                update_video_moderation.delay(team)
                 invalidate_video_moderation_caches.delay(team)
 
             messages.success(request, _(u'Settings saved.'))
@@ -1118,6 +1122,7 @@ def team_tasks(request, slug, project_slug=None):
         'filters': filters,
         'widget_settings': widget_settings,
         'filtered': filtered,
+        'member': member,
     }
 
     context.update(pagination_info)

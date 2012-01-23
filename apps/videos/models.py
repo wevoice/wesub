@@ -686,19 +686,24 @@ class SubtitleLanguage(models.Model):
         return self.get_title() or self.video.title
 
     def get_title(self):
-        if self.is_original:
+        if self.title:
+            return self.title
+        elif self.is_original:
             return self.video.title
-
-        return self.title
+        elif self.standard_language:
+            return self.standard_language.get_title()
 
     def get_description(self):
         """
         Returns either the description for this
         language or for the original one
         """
-        if self.is_original:
+        if self.description:
+            return self.description
+        elif self.is_original:
             return self.video.description
-        return self.description
+        elif self.standard_language:
+            return self.standard_language.get_description()
 
     def is_dependent(self):
         return not self.is_original and not self.is_forked
@@ -1074,8 +1079,6 @@ class SubtitleVersion(SubtitleCollection):
 
     def save(self,  *args, **kwargs):
         created = not self.pk
-        if created and self.language.video.is_moderated:
-            self.moderation_status  = WAITING_MODERATION
         super(SubtitleVersion, self).save(*args, **kwargs)
         if created:
             #but some bug happen, I've no idea why

@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django import template
-from teams.models import Team, TeamVideo, Project, TeamMember, Workflow
+from teams.models import Team, TeamVideo, Project, TeamMember, Workflow, Task
 from django.db.models import Count
 from django.db.models import Q
 from videos.models import Action, Video
@@ -99,6 +99,22 @@ def is_team_member(team, user):
     if not user.is_authenticated():
         return False
     return team.is_member(user)
+
+@register.filter
+def user_role(team, user):
+    member = TeamMember.objects.get(team=team,user=user)
+    return member.role
+
+@register.filter
+def user_tasks_count(team, user):
+    tasks = Task.objects.filter(team=team,assignee=user,deleted=False,completed=None)
+    return tasks.count()
+
+@register.filter
+def user_project_tasks_count(project, user):
+    team = project.team
+    tasks = Task.objects.filter(team=team,assignee=user,team_video__project=project,deleted=False,completed=None)
+    return tasks.count()
 
 @register.inclusion_tag('teams/_team_select.html', takes_context=True)
 def team_select(context, team):

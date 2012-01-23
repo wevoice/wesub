@@ -29,6 +29,14 @@ def invalidate_video_moderation_caches(team):
     for video_id in team.teamvideo_set.values_list('video__video_id', flat=True):
         invalidate_video_moderation(video_id)
 
+@task()
+def update_video_moderation(team):
+    """Set the moderated_by field for all the given team's videos."""
+    from apps.videos.models import Video
+
+    moderated_by = team if team.moderates_videos() else None
+    Video.objects.filter(teamvideo__team=team).update(moderated_by=moderated_by)
+
 
 @periodic_task(run_every=crontab(minute=0, hour=7))
 def expire_tasks():

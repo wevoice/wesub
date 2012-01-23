@@ -95,7 +95,7 @@ unisubs.subtitle.SyncPanel.prototype.createRightPanelInternal = function() {
     return new unisubs.RightPanel(
         this.serverModel, helpContents, extraHelp,
         this.makeKeySpecsInternal(), true, "Done?",
-        "Next Step: Reviewing");
+        "Next Step: Check your work");
 };
 unisubs.subtitle.SyncPanel.prototype.makeKeySpecsInternal = function() {
     var KC = goog.events.KeyCodes;

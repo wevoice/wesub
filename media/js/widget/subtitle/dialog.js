@@ -158,7 +158,7 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
     if (state == s.EDIT_METADATA ){
         backButtonText = "Back to Typing";
     }else if (state == s.SYNC){
-        backButtonText = "Back to Title & Description";
+        backButtonText = "Back to Subtitle info";
     }else if (state == s.REVIEW ){
         backButtonText = "Back to Sync";
     }

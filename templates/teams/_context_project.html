@@ -36,6 +36,21 @@
     </ul>
 {% endif %}
 
+{% if team|is_team_member:user %}
+    {% with team|user_role:user as role %}
+        <h3>{{ role|capfirst }} Tools</h3>
+        <ul>
+            <li>
+                <a href="{% url teams:project_tasks slug=team.slug, project_slug=project.slug %}?assignee=me">My {{ project }} tasks</a>
+                ({{ project|user_project_tasks_count:user }})
+            </li>
+            <li>
+                <a href="{% url teams:project_tasks slug=team.slug, project_slug=project.slug %}?assignee=none">Available {{ project }} tasks</a>
+            </li>
+        </ul>
+    {% endwith %}
+{% endif %}
+
 <script type="text/javascript">
     jQuery('.unisubs-share .unisubs-twitter-share').click(function(){
         jQuery.get('{% url statistic:tw_update_share_statistic %}');
