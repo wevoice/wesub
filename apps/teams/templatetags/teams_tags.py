@@ -110,6 +110,12 @@ def user_tasks_count(team, user):
     tasks = Task.objects.filter(team=team,assignee=user,deleted=False,completed=None)
     return tasks.count()
 
+@register.filter
+def user_project_tasks_count(project, user):
+    team = project.team
+    tasks = Task.objects.filter(team=team,assignee=user,team_video__project=project,deleted=False,completed=None)
+    return tasks.count()
+
 @register.inclusion_tag('teams/_team_select.html', takes_context=True)
 def team_select(context, team):
     user = context['user']
