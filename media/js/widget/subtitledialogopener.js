@@ -112,8 +112,15 @@ unisubs.widget.SubtitleDialogOpener.prototype.resumeEditing_ = function(savedSub
                 // FIXME: ouch, kinda hacky.
                 result['subtitles']['subtitles'] = 
                     savedSubtitles.CAPTION_SET.makeJsonSubs();
-                result['subtitles']['title'] = 
-                    savedSubtitles.CAPTION_SET.title;
+                if (savedSubtitles.CAPTION_SET.title && savedSubtitles.CAPTION_SET.title.length){
+                    result['subtitles']['title'] = 
+                        savedSubtitles.CAPTION_SET.title;
+                }
+                if (savedSubtitles.CAPTION_SET.description && savedSubtitles.CAPTION_SET.description.length){
+                    result['subtitles']['description'] = 
+                        savedSubtitles.CAPTION_SET.description;
+                }
+
                 that.startEditingResponseHandler_(
                     result, true, 
                     savedSubtitles.CAPTION_SET.wasForkedDuringEdits());
