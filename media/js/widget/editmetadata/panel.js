@@ -47,8 +47,8 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, capti
         this.nextButtonText_ = "Next step, Sync";
     }else{
         
-        this.numSteps_ = "Submit subtitles";
-        this.nextButtonText_ = "Next step, Sync";
+        this.numSteps_ = 2;
+        this.nextButtonText_ = "Submit final translation";
     }
 };
 goog.inherits(unisubs.editmetadata.Panel, goog.ui.Component);

@@ -93,6 +93,6 @@ unisubs.translate.TranslationPanel.prototype.createRightPanel_ = function(){
     return new unisubs.translate.TranslationRightPanel(
         this.dialog_,
         this.serverModel_, helpContents, extraHelp, [], false, "Done?", 
-        "Submit final translation", "Resources for Translators");
+        "Next step: Title & Description", "Resources for Translators");
 
 }

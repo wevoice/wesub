@@ -107,7 +107,7 @@ unisubs.translate.Dialog.prototype.createRightPanel_ = function() {
     return new unisubs.translate.TranslationRightPanel(
         this,
         this.serverModel_, helpContents, extraHelp, [], false, "Done?", 
-        "Submit final translation", "Resources for Translators");
+        "Next Step: Title & Description", "Resources for Translators");
 };
 unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
     e.preventDefault();
