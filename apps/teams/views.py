@@ -271,7 +271,15 @@ def completed_videos(request, slug):
 
 def videos_actions(request, slug):
     team = Team.get(slug, request.user)
-    qs = Action.objects.for_team(team)
+
+    try:
+        user = request.user if request.user.is_authenticated() else None
+        member = team.members.get(user=user) if user else None
+    except TeamMember.DoesNotExist:
+        member = False
+
+    public_only = False if member else True
+    qs = Action.objects.for_team(team, public_only=public_only)
     extra_context = {
         'team': team
     }

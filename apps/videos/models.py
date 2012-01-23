@@ -111,6 +111,7 @@ class PublicVideoManager(models.Manager):
     def get_query_set(self):
         return super(PublicVideoManager, self).get_query_set().filter(is_public=True)
 
+
 class Video(models.Model):
     """Central object in the system"""
 
@@ -1521,11 +1522,21 @@ class ActionRenderer(object):
 
 
 class ActionManager(models.Manager):
-
-    def for_team(self, team):
+    def for_team(self, team, public_only=True):
         videos_ids = team.teamvideo_set.values_list('video_id', flat=True)
-        return self.select_related('video', 'user', 'language', 'language__video')\
-                              .filter(Q(video__pk__in=videos_ids)|Q(team=team)) 
+
+        result = self.select_related(
+            'video', 'user', 'language', 'language__video'
+        ).filter(
+            Q(video__pk__in=videos_ids) |
+            Q(team=team)
+        )
+
+        if public_only:
+            result = result.filter(language__has_version=True)
+
+        return result
+
     def for_user(self, user):
         return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
 
