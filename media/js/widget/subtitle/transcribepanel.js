@@ -85,6 +85,7 @@ unisubs.subtitle.TranscribePanel.prototype.getRightPanel =
     }
     return this.rightPanel_;
 };
+
 unisubs.subtitle.TranscribePanel.prototype.listenToRightPanel_ = function() {
     if (this.rightPanel_ && this.isInDocument()) {
         this.getHandler().listen(this.rightPanel_,
