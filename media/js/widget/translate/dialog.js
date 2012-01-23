@@ -125,7 +125,8 @@ unisubs.translate.Dialog.prototype.isWorkSaved = function() {
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();
 };
 unisubs.translate.Dialog.prototype.enterDocument = function() {
-    //unisubs.translate.Dialog.superClass_.enterDocument.call(this);
+    // this is where we listen to the dialog close button
+    unisubs.subtitle.Dialog.superClass_.enterDocument.call(this);
     unisubs.Dialog.translationDialogOpen = true;
     var that = this;
     this.getRightPanelInternal().showDownloadLink(
