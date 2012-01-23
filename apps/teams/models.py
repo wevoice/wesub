@@ -1389,7 +1389,16 @@ class Task(models.Model):
         self.subtitle_version.save()
 
     def _send_back(self):
-        print "Sending back..."
+        previous_task = Task.objects.complete().filter(
+            team_video=self.team_video, language=self.language, team=self.team,
+            type__in=(Task.TYPE_IDS['Subtitle'], Task.TYPE_IDS['Translate'])
+        ).order_by('-completed')[:1]
+
+        if previous_task:
+            assignee = previous_task[0].assignee
+        else:
+            assignee = None
+
         if self.subtitle_version.language.is_original:
             type = Task.TYPE_IDS['Subtitle']
         else:
@@ -1397,9 +1406,8 @@ class Task(models.Model):
 
         task = Task(team=self.team, team_video=self.team_video,
                     subtitle_version=self.subtitle_version,
-                    language=self.language, type=type)
+                    language=self.language, type=type, assignee=assignee)
         task.save()
-        print task
 
 
     def complete(self):
