@@ -21,6 +21,7 @@ from gdata.service import RequestError
 import re
 import httplib2
 from utils import YoutubeXMLParser
+from utils.language_codes  import LanguageCode
 from base import VideoType, VideoTypeError
 from auth.models import CustomUser as User
 from datetime import datetime
@@ -57,8 +58,14 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import Video
     
     lc = lang.get('lang_code')
-
+    #lc  = LanguageCode(lc.lower(), "unisubs").encode("unisubs")
     if not lc in SUPPORTED_LANGUAGES_DICT:
+        logger.warn("Youtube import did not find language code", extra={
+            "data":{
+                "language_code": lc,
+                "youtube_id": youtube_id,
+            }
+        })
         return
     
     try:
