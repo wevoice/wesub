@@ -768,8 +768,13 @@ def team_video_add_video_moderation(sender, instance, created, raw, **kwargs):
         instance.video.save()
 
 def team_video_rm_video_moderation(sender, instance, **kwargs):
-    instance.video.moderated_by = None
-    instance.video.save()
+    try:
+        # when removing a video, this will be triggered by the fk constraing
+        # and will be already removed
+        instance.video.moderated_by = None
+        instance.video.save()
+    except Video.DoesNotExist:
+        pass
 
 
 post_save.connect(team_video_save, TeamVideo, dispatch_uid="teams.teamvideo.team_video_save")
