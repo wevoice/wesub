@@ -509,6 +509,18 @@ def can_create_and_edit_translations(user, team_video, lang=None):
     return role in _perms_equal_or_greater(role_req, include_outsiders=True)
 
 
+def can_publish_edits_immediately(team_video, user, lang):
+    workflow = Workflow.get_for_team_video(team_video)
+
+    if workflow.approve_allowed:
+        return can_approve(team_video, user, lang)
+
+    if workflow.review_allowed:
+        return can_review(team_video, user, lang)
+
+    return True
+
+
 # Task permissions
 def can_create_tasks(team, user, project=None):
     # for now, use the same logic as assignment

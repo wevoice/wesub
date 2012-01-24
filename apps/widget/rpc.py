@@ -32,14 +32,15 @@ from icanhaz.models import VideoVisibilityPolicy
 from django.utils import translation
 from widget.forms import  FinishReviewForm, FinishApproveForm
 from utils.forms import flatten_errorlists
-from teams.models import Task
+from teams.models import Task, Workflow
 from teams.signals import (
     api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
     api_language_new, api_language_edited, api_video_edited
 )
 from teams.moderation_const import UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
-    can_create_and_edit_subtitles, can_create_and_edit_translations
+    can_create_and_edit_subtitles, can_create_and_edit_translations,
+    can_publish_edits_immediately, can_review, can_approve
 )
 
 from utils import send_templated_email
@@ -389,6 +390,11 @@ class Rpc(BaseRpc):
                 (len(subtitles) > 0 or language.latest_version(public_only=False) is not None):
             new_version = self._create_version_from_session(session, user, forked)
             new_version.save()
+
+            if hasattr(new_version, 'task_to_save'):
+                new_version.task_to_save.subtitle_version = new_version
+                new_version.task_to_save.save()
+
             self._save_subtitles(
                 new_version.subtitle_set, subtitles, new_version.is_forked)
 
@@ -471,26 +477,82 @@ class Rpc(BaseRpc):
                     end_time=s['end_time'],
                     subtitle_order=s['sub_order'])
 
-    def _create_version_from_session(self, session, user=None, forked=False):
-        latest_version = session.language.version(public_only=False)
-        forked_from = (forked and latest_version) or None
-        moderation_status = UNMODERATED
+    def _moderate_session(self, session, user):
+        """Return the right moderation_status for a version based on the given session.
+
+        Also may possibly return a Task object that needs to be saved once the
+        subtitle_version is ready.
+
+        Also perform any ancillary tasks that are appropriate, assuming the
+        version actually gets created later.
+
+        Also :(
+
+        """
+        sl = session.language
+        team_video = sl.video.get_team_video()
+
+        if not team_video:
+            return UNMODERATED, None
 
         # If there are any open team tasks for this video/language, it needs to
         # be kept under moderation.
-        team_video = session.language.video.get_team_video()
-        if team_video:
-            tasks = team_video.task_set.incomplete().filter(
-                    Q(language=session.language.language)
-                  | Q(type=Task.TYPE_IDS['Subtitle'])
-            )
-            if tasks:
-                moderation_status = WAITING_MODERATION
-                for task in tasks:
-                    if task.type == Task.TYPE_IDS['Subtitle']:
-                        if not task.language:
-                            task.language = session.language.language
-                            task.save()
+        tasks = team_video.task_set.incomplete().filter(
+                Q(language=sl.language)
+              | Q(type=Task.TYPE_IDS['Subtitle'])
+        )
+        if tasks:
+            for task in tasks:
+                if task.type == Task.TYPE_IDS['Subtitle']:
+                    if not task.language:
+                        task.language = sl.language
+                        task.save()
+            return WAITING_MODERATION, None
+
+        # If there are already active subtitles for this language, we're dealing
+        # with an edit.
+        if sl.has_version:
+            if not can_publish_edits_immediately(team_video, user, sl.language):
+                workflow = Workflow.get_for_team_video(team_video)
+                if workflow.approve_allowed:
+                    type = Task.TYPE_IDS['Approve']
+                    can_do = can_approve
+                else:
+                    type = Task.TYPE_IDS['Review']
+                    can_do = can_review
+
+                # Find the assignee.
+                #
+                # For now, we'll assign the review/approval task to whomever did
+                # it last time (if it was indeed done), but only if they're
+                # still eligible to perform it now.
+                last_task = team_video.task_set.completed().filter(
+                    language=sl.language, type=type
+                ).order_by('-completed')[:1]
+
+                assignee = None
+                if last_task:
+                    candidate = last_task.assignee
+                    if candidate and not can_do(team_video, candidate, sl.language):
+                        assignee = candidate
+
+                # This is just terrible.
+                #
+                # We have to create a task here, but we need to have the
+                # subtitle_version to do it correctly, and that doesn't get
+                # saved until much later, a few functions away.
+                task = Task(team=team_video.team, team_video=team_video,
+                            assignee=assignee, language=sl.language, type=type)
+
+                return WAITING_MODERATION, task
+
+        return UNMODERATED, None
+
+    def _create_version_from_session(self, session, user=None, forked=False):
+        latest_version = session.language.version(public_only=False)
+        forked_from = (forked and latest_version) or None
+
+        moderation_status, task = self._moderate_session(session, user)
 
         kwargs = dict(language=session.language,
                       version_no=(0 if latest_version is None
@@ -504,7 +566,14 @@ class Rpc(BaseRpc):
         if user is not None:
             kwargs['user'] = user
 
-        return models.SubtitleVersion(**kwargs)
+        version = models.SubtitleVersion(**kwargs)
+
+        if task:
+            # We may have a task that needs to be saved *after* this version is
+            # saved.
+            version.task_to_save = task
+
+        return version
 
     def fetch_subtitles(self, request, video_id, language_pk):
         cache = video_cache.get_subtitles_dict(

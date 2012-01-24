@@ -19,7 +19,6 @@
 from teams.models import TeamVideo, TeamVideoLanguage
 from datetime import datetime
 
-from apps.teams.moderation import user_can_moderate, APPROVED
 def update_metadata(video_pk):
     from videos.models import Video
     video = Video.objects.get(pk=video_pk)
@@ -93,8 +92,6 @@ def _update_changes_on_nonzero_version(version, last_version):
     subs_length = len(subtitles)
     version.time_change = min(time_count_changed / 1. / subs_length, 1)
     version.text_change = min(text_count_changed / 1. / subs_length, 1)
-    if user_can_moderate(version.video, version.user):
-        version.moderation_status = APPROVED
 
 def _update_subtitle_counts(video):
     for sl in video.subtitlelanguage_set.all():
