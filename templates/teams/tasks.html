@@ -53,7 +53,7 @@
             <p>
                 <select id="id_task_type" name="type" class="type-filter chosen">
                     <option value="{{ request.path }}{% query_string request.GET type="" %}">{% trans 'All' %}</option>
-                    <option value="{% query_string request.GET type='Subtitle' %}" {% if request.GET.type == 'Subtitle' %}selected="selected"{% endif %}>{% trans 'Subtitle' %}</option>
+                    <option value="{% query_string request.GET type='Subtitle' %}" {% if request.GET.type == 'Subtitle' %}selected="selected"{% endif %}>{% trans 'Transcribe' %}</option>
                     <option value="{% query_string request.GET type='Translate' %}" {% if request.GET.type == 'Translate' %}selected="selected"{% endif %}>{% trans 'Translate' %}</option>
                     {% if team|review_enabled %}
                         <option value="{% query_string request.GET type='Review' %}" {% if request.GET.type == 'Review' %}selected="selected"{% endif %}>{% trans 'Review' %}</option>
@@ -121,7 +121,7 @@
                                     {{ task.get_type_display }}
                                     {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
                                         {% if task.team_video.video.has_original_language %}
-                                            Original
+                                            {% trans 'Original' %}
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
