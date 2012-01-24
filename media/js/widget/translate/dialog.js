@@ -42,7 +42,7 @@ goog.inherits(unisubs.translate.Dialog, unisubs.subtitle.Dialog);
 
 unisubs.translate.Dialog.State_ = {
     TRANSLATE: 0,
-    EDIT_METADATA: 1,
+    EDIT_METADATA: 1
     
 };
 
