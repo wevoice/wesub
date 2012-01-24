@@ -52,14 +52,6 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
     var that = this;
     var w;
 
-    if (this.baseLanguageTitle_) {
-        this.titleTranslationWidget_ = 
-            new unisubs.translate.TitleTranslationWidget(
-                this.baseLanguageTitle_, this.captionSet_);
-        this.addChild(this.titleTranslationWidget_, true);
-        this.titleTranslationWidget_.setTranslation(this.captionSet_.title || '');
-    }
-
     var map = this.captionSet_.makeMap();
 
     goog.array.forEach(
