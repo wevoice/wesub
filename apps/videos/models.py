@@ -281,6 +281,7 @@ class Video(models.Model):
         to prevent duplication of code in search result and in DB-query result
         """
         return (self.title.replace('/', '-')
+                          .replace("'", '-')
                           .replace('?', '-')
                           .replace('#', '-')
                           .replace('&', '-'))
