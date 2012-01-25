@@ -93,14 +93,11 @@ unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
     var isModerated = jsonResult['is_moderated'];
 
     if (isModerated && unisubs.isEmbeddedInDifferentDomain()) {
-        var videoUrl = jsonResult['video_url'];
-
         this.contentDiv_.innerHTML = (
             "<p>Subtitles for this video are moderated.</p>" +
             "<p>Please visit the " +
-            "<a href='" + videoUrl + "'>video page</a> " +
+            "<a href='" + unisubs.getVideoHomepageURL(this.videoID_) + "'>video page</a> " +
             "to contribute.</p>" );
-
         return;
     }
 

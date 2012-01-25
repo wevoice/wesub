@@ -228,9 +228,7 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
                 'These subtitles are moderated. Visit the ', 
                 $d('a', {'href': unisubs.getVideoHomepageURL(this.videoID_)},
                     'video page'),
-                ' to contribute.'
-            )
-        );
+                ' to contribute.'));
 
     this.createAccountLink_ =
         $d('li', 'unisubs-createAccount',
@@ -267,9 +265,9 @@ unisubs.widget.DropDown.prototype.updateActions_ = function() {
     this.videoActions_.appendChild(this.getEmbedCodeLink_);
     this.videoActions_.appendChild(this.downloadSubtitlesLink_);
 
-    if (unisubs.currentUsername == null)
+    if (unisubs.currentUsername == null) {
         this.settingsActions_.appendChild(this.createAccountLink_);
-    else {
+    } else {
         goog.dom.setTextContent(
             goog.dom.getFirstElementChild(this.usernameLink_),
             unisubs.currentUsername);

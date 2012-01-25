@@ -180,8 +180,7 @@ class Rpc(BaseRpc):
             'video_languages': video_languages,
             'original_language': original_language,
             'limit_languages': writable_langs,
-            'is_moderated': video.is_moderated,
-            'video_url': video.get_absolute_url(), }
+            'is_moderated': video.is_moderated, }
 
     def fetch_video_id_and_settings(self, request, video_id):
         is_original_language_subtitled = self._subtitle_count(video_id) > 0
