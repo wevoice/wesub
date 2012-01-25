@@ -1524,13 +1524,11 @@ class ActionRenderer(object):
 
 class ActionManager(models.Manager):
     def for_team(self, team, public_only=True):
-        videos_ids = team.teamvideo_set.values_list('video_id', flat=True)
-
         result = self.select_related(
             'video', 'user', 'language', 'language__video'
         ).filter(
-            Q(video__pk__in=videos_ids) |
-            Q(team=team)
+            Q(team=team) |
+            Q(video__teamvideo__team=team)
         )
 
         if public_only:
