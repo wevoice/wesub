@@ -3,7 +3,7 @@
 <script type="text/javascript">
     jQuery(function($){
         var $panel = $('.actions-panel');
-        
+
         $('.nav-link', $panel).click(function(){
             $('.nav-link', $panel).removeClass('active');
             var id = $(this).addClass('active').attr('href')
@@ -15,7 +15,7 @@
 </script>
 <div class="actions-panel">
     <h3>{% trans 'Team Activity Stream' %}</h3>
-     
+
     <ul class="small_list" id="team-video-activity">
         {% for item in videos_actions %}
             <li>{{ item.render }}</li>
@@ -28,7 +28,7 @@
                 {% trans 'See All Activity' %}
             </a>
         </li>
-        {% endif %}         
+        {% endif %}
     </ul>
-   
+
 </div>
