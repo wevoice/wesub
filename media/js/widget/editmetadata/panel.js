@@ -106,7 +106,7 @@ unisubs.editmetadata.Panel.prototype.suspendKeyEvents = function(suspended) {
 
 unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    var title = "Editing subtitle info"
+    var title = "Edit Title & Description";
     var desc = "Please take a moment to update the " + this.subtitles_.languageName + " title and description for these subtitles.";
     var helpContents = new unisubs.RightPanel.HelpContents(
         title, 
