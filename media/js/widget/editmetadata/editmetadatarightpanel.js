@@ -33,7 +33,7 @@ unisubs.editmetadata.RightPanel = function(dialog,
     unisubs.RightPanel.call(this, serverModel, helpContents, null,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
-    this.showSaveExit = true;
+    this.showSaveExit = false;
     this.showDoneButton = true;
     this.helpContents = helpContents;
     // TODO: See if there's a way to avoid the circular reference here.
