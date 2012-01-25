@@ -11,7 +11,7 @@ $(function() {
 
             if (step === 'Translate') {
                 langs = translatableLanguages;
-            } else if (step === 'Subtitle') {
+            } else if (step === 'Transcribe') {
                 $('.language-selector').hide();
                 languageSelector.val('');
                 return;
