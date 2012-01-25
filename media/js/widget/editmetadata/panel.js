@@ -117,7 +117,7 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
                                                this.serverModel,
                                                helpContents,
                                                [],
-                                               true,
+                                               false,
                                                "Done? ",
                                                this.nextButtonText_);
 
