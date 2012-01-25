@@ -39,7 +39,7 @@ $(function() {
             typeSelector.find(':contains("Translate")').attr('disabled', 'disabled');
         }
         if (!subtitlable) {
-            typeSelector.find(':contains("Subtitle")').attr('disabled', 'disabled');
+            typeSelector.find(':contains("Transcribe")').attr('disabled', 'disabled');
         }
 
         // Select the first valid task type
