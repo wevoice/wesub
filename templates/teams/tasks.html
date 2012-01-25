@@ -159,13 +159,13 @@
                                     <li>Due in {{ task.expiration_date|timeuntil }}</li>
                                 {% endif %}
 
-                                {% if not has_max_tasks and task|can_perform_task:user %}
+                                {% if task|can_perform_task:user %}
                                     {% if task.assignee == user %}
                                         <li>
                                             {% include "teams/_perform_task_link.html" %}
                                         </li>
                                     {% else %}
-                                        {% if task.assignee == None %}
+                                        {% if not has_max_tasks and task.assignee == None %}
                                             <li>
                                                 <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
                                                     {% trans 'Perform Task' %}
