@@ -332,7 +332,8 @@ Enter a link to any compatible video, or to any video page on our site.''')
 
 
 class TaskCreateForm(ErrorableModelForm):
-    type = forms.TypedChoiceField(choices=Task.TYPE_CHOICES[:2], coerce=int)
+    choices = [(10, 'Transcribe'), Task.TYPE_CHOICES[1]]
+    type = forms.TypedChoiceField(choices=choices, coerce=int)
     language = forms.ChoiceField(choices=(), required=False)
     assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
@@ -351,7 +352,7 @@ class TaskCreateForm(ErrorableModelForm):
 
     def _check_task_creation_subtitle(self, tasks, cleaned_data):
         if self.team_video.subtitles_finished():
-            self.add_error(_(u"This video has already been subtitled."),
+            self.add_error(_(u"This video has already been transcribed."),
                            'type', cleaned_data)
             return
 
@@ -362,7 +363,7 @@ class TaskCreateForm(ErrorableModelForm):
 
     def _check_task_creation_translate(self, tasks, cleaned_data):
         if not self.team_video.subtitles_finished():
-            self.add_error(_(u"No one has subtitled this video yet, so it can't be translated."),
+            self.add_error(_(u"No one has transcribed this video yet, so it can't be translated."),
                            'type', cleaned_data)
             return
 

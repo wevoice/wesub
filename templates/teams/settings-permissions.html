@@ -52,7 +52,7 @@
             <fieldset>
                 <legend>{% trans 'Subtitling' %}</legend>
 
-                <label for="id_subtitle_policy">{% trans 'Who can create subtitles?' %}</label>
+                <label for="id_subtitle_policy">{% trans 'Who can transcribe subtitles?' %}</label>
                 <p class="notation">{% trans 'i.e. transcribe from video and perform time-alignment' %}</p>
                 {{ form.subtitle_policy }}
 
@@ -64,7 +64,7 @@
             <div id="summary">
                 <h4>{% trans 'How your subtitles will get published <em>(configure below)</em>' %}</h4>
                 <div class="grid_2">
-                    <h5>{% trans 'Subtitled' %}</h5>
+                    <h5>{% trans 'Transcribed' %}</h5>
                     <p id="perm-sub"><p>
                     <p class="divider">{% trans 'or ...' %}</p>
                     <h5>{% trans 'Translated' %}</h5>
@@ -96,7 +96,7 @@
                 <fieldset id="workflow">
                     <label for="id_autocreate_subtitle">
                         {{ workflow_form.autocreate_subtitle }}
-                        {% trans 'Automatically create subtitle tasks' %}
+                        {% trans 'Automatically create transcription tasks' %}
                     </label>
 
                     <label for="id_autocreate_translate">
