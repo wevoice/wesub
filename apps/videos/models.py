@@ -688,24 +688,30 @@ class SubtitleLanguage(models.Model):
         return self.get_title() or self.video.title
 
     def get_title(self):
+        """
+        Tries to get the tile, cascading through:
+           - The language's title
+           - The original language's title (in case it's a translation)
+           - The video's title as a fallback
+        """
         if self.title:
             return self.title
-        elif self.is_original:
-            return self.video.title
         elif self.standard_language:
             return self.standard_language.get_title()
+        return self.video.title
 
     def get_description(self):
         """
-        Returns either the description for this
-        language or for the original one
+        Tries to get the tile, cascading through:
+           - The language's description
+           - The original language's description (in case it's a translation)
+           - The video's description as a fallback
         """
         if self.description:
             return self.description
-        elif self.is_original:
-            return self.video.description
         elif self.standard_language:
             return self.standard_language.get_description()
+        return self.video.description
 
     def is_dependent(self):
         return not self.is_original and not self.is_forked
