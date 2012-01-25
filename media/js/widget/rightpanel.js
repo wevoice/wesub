@@ -266,27 +266,22 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
         goog.dom.append(stepsDiv, this.doneAnchor_);
         this.getHandler().listen(this.doneAnchor_, 'click', this.doneClicked_);
     } 
-    this.appendShowAndSave_($d, stepsDiv, this.saveAndExitClicked_)
-    goog.dom.append(el, stepsDiv);
-    this.updateLoginState();
-};
 
-unisubs.RightPanel.prototype.appendShowAndSave = function($d, el, callback){
     if (this.showSaveExit) {
         var saveAndExitAnchor = $d(
             'div', 'unisubs-saveandexit',
             $d('span', null, 'Need to stop and come back later? '),
             $d('a', {'href': '#'},
             $d('span', null, 'Save and Exit')));
-        goog.dom.append(el, saveAndExitAnchor);
+        goog.dom.append(stepsDiv, saveAndExitAnchor);
         this.getHandler().listen(
             saveAndExitAnchor, goog.events.EventType.CLICK,
-            callback);
+            this.saveAndExitClicked_);
     }
 
-
+    goog.dom.append(el, stepsDiv);
+    this.updateLoginState();
 };
-
 unisubs.RightPanel.prototype.legendKeyClicked_ = function(keyCode, modifiers, event) {
     this.dispatchEvent(
         new unisubs.RightPanel.LegendKeyEvent(keyCode, modifiers, event.type));
