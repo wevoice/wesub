@@ -69,8 +69,7 @@ body{overflow-y:scroll;}
 .v1 .listing.messages>li{opacity:.5;}.v1 .listing.messages>li.unread{opacity:1;}
 .v1 .listing.messages>li p a{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
 .v1 .listing.activity>li,.v1 .listing.tasks>li,.v1 .listing.urls>li{padding-right:150px;}.v1 .listing.activity>li .actions,.v1 .listing.tasks>li .actions,.v1 .listing.urls>li .actions{width:150px;}
-.v1 .listing.tasks>li{padding-left:110px;min-height:5em;}.v1 .listing.tasks>li p.steps{color:#678ca3;}.v1 .listing.tasks>li p.steps .current{font-weight:bold;color:#2f3c45;}
-.v1 .listing.tasks>li .done span{margin-right:.5em;}
+.v1 .listing.tasks>li{padding-left:110px;min-height:5em;}.v1 .listing.tasks>li .done span{margin-right:.5em;}
 .v1 .listing.tasks>li .thumb{max-width:80px;word-wrap:break-word;}.v1 .listing.tasks>li .thumb img{max-width:80px;margin-left:10px;}
 .v1 .listing.tasks>li form.assign-form{padding:0;}
 .v1 .listing.teams>li{padding-right:150px;}
@@ -209,7 +208,8 @@ pre.dump code{font-family:Consolas,Menlo,"Courier New",monospace;margin:15px 0;p
 #teams .context #signin-join{display:block;margin:1em;}
 #teams .context .notation{clear:both;padding-top:2em;}
 #teams .context #projects-list h4{padding:1.5em 0 1em;}
-#teams .view .tools #sort-filter{padding:.5em;text-decoration:none;color:#678ca3;line-height:1.5em;}
+#teams .view .tools #sort-filter{padding:.5em;text-decoration:none;color:#678ca3;line-height:1.5em;}#teams .view .tools #sort-filter:hover{color:#2f3c45;}#teams .view .tools #sort-filter:hover span{background:url('../images/chosen-hover.png') no-repeat 4px 3px;}
+#teams .view .tools #sort-filter:hover span.open{background:url('../images/chosen-hover.png') no-repeat 4px -28px;}
 #teams .view .tools #sort-filter span{padding:0 8px;background:url('../images/chosen-sprite.png') no-repeat 2px -4px;}
 #teams .view .tools #sort-filter span.open{background:url('../images/chosen-sprite.png') no-repeat -16px -4px;}
 #teams .view .tools .button{margin:0;float:none;}
