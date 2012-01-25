@@ -103,16 +103,16 @@
         </div>
         <ul class="metrics">
             <li>
-                <p>{{ video.view_count|simplify_number }}</p>
-                <h4>{% trans "View" %}{{ video.view_count|pluralize }}</h4>
-            </li>
-            <li>
                 <p>{{ video.widget_views_count|simplify_number }}</p>
-                <h4>{% trans "Play" %}{{ video.widget_views_count|pluralize }}</h4>
+                <h4>{% trans "View" %}{{ video.widget_views_count|pluralize }}</h4>
             </li>
             <li>
                 <p>{{ video.followers.count }}</p>
                 <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
+            </li>
+            <li>
+                <p>{{ video|get_comment_count }}</p>
+                <h4>{% trans "Comment" %}{{ video|get_comment_count|pluralize }}</h4>
             </li>
             <li>
                 <p>{{ video.languages_count }}</p>
@@ -157,7 +157,7 @@
         {% endif %}
         <ul class="tabs">
             <li class="current"><a href="#video-tab">{% trans "Video" %}</a></li>
-            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{% get_comment_count video %}</span></a></li>
+            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{{ video|get_comment_count }}</span></a></li>
             <li><a href="#activity-tab">{% trans "Activity" %}</a></li>
             <li class="hascount"><a href="#urls-tab">{% trans "URLs" %}<span>{% video_url_count video %}</span></a></li>
         </ul>
@@ -202,7 +202,7 @@
         <div class="tab" id="comments-tab" style="display:none;">
             <h3>{% trans "Leave a comment" %}</h3>
             {% render_comment_form video %}
-            <h3>{% get_comment_count video %} {% trans "Comments" %}</h3>
+            <h3>{{ video|get_comment_count }} {% trans "Comments" %}</h3>
             {% render_comment_list video %}
         </div>
         <div class="tab" id="activity-tab" style="display:none;">
@@ -213,34 +213,6 @@
             {% video_url_panel %}
         </div>
     </div>
-     
-    {% comment %}
-
-    {# EDIT TITLE #}
-        {% if user.is_authenticated %}
-            {% if not video.title or video.is_html5 or user.is_superuser %}
-                <a class="heading_button edit-title" href="#" data-modal="edit-title-dialog">{% trans 'Edit title' %}</a>
-            {% endif %}
-        {% endif %}
-
-        <div id="edit-title-dialog" style="display: none" class="msg_modal_wrap" >
-            <a href="#close" class="close">{% trans "Close" %}</a>
-            <h3>{% trans 'You are editing the original video title (translations will not be affected)' %}</h3>
-            <div class="msg_modal">
-                <p>
-                {% blocktrans %}
-                IMPORTANT: the new title will appear in the lists of videos and in 
-                the original subtitle set. Any existing translations will not be affected. 
-                Please update each translation separately, if necessary.
-                {% endblocktrans %}
-                </p>
-                <p>
-                    <input type="text" val="" style="width: 100%" class="title-input">
-                    <button class="green_button small save-title" style="margin: 0 0 15px 0; float: right">{% trans "Save" %}</button>
-                </p>
-            </div>
-        </div>
-    {% endcomment %}
 {% endblock %}
 
 {% block page_controls %}
