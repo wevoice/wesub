@@ -275,7 +275,8 @@ def video_list(request):
 
 def actions_list(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
-    qs = Action.objects.filter(video=video)
+    qs = Action.objects.for_video(video, request.user)
+
     extra_context = {
         'video': video
     }

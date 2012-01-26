@@ -126,12 +126,6 @@ def team_select(context, team):
         'can_create_team': DEV_OR_STAGING or (user.is_superuser and user.is_active)
     }
 
-@register.inclusion_tag('teams/_team_activity.html', takes_context=True)
-def team_activity(context, team):
-    action_qs = Action.objects.for_team(team)[:ACTIONS_ON_PAGE]
-    context['videos_actions'] = action_qs
-
-    return context
 
 @register.inclusion_tag('teams/_team_add_video_select.html', takes_context=True)
 def team_add_video_select(context):

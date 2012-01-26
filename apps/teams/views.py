@@ -280,6 +280,7 @@ def videos_actions(request, slug):
 
     public_only = False if member else True
     qs = Action.objects.for_team(team, public_only=public_only)
+
     extra_context = {
         'team': team
     }

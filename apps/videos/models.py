@@ -1365,7 +1365,6 @@ class SubtitleMetadata(models.Model):
 from django.template.loader import render_to_string
 
 class ActionRenderer(object):
-
     def __init__(self, template_name):
         self.template_name = template_name
 
@@ -1539,6 +1538,25 @@ class ActionManager(models.Manager):
 
     def for_user(self, user):
         return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
+
+    def for_video(self, video, user=None):
+        qs = Action.objects.filter(video=video)
+
+        team_video = video.get_team_video()
+        if team_video:
+            from teams.models import TeamMember
+
+            try:
+                user = user if user.is_authenticated() else None
+                member = team_video.team.members.get(user=user) if user else None
+            except TeamMember.DoesNotExist:
+                member = False
+
+            if not member:
+                qs = qs.filter(language__has_version=True)
+
+        return qs
+
 
 class Action(models.Model):
     ADD_VIDEO = 1
