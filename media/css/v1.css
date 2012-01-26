@@ -158,7 +158,8 @@ body#teams div.edit-team-video form fieldset a{display:inline-block;overflow:hid
 .v1 .context video,.v1 .context object,.v1 .context .unisubs-widget span.unisubs-videoplayer{width:289px !important;height:173px !important;}
 .v1 .context #description{color:#486f87;line-height:150%;}.v1 .context #description p{margin-bottom:.5em;}
 .v1 .context a{text-decoration:none;}
-.v1 .context h2 a{color:inherit;word-wrap:break-word;}
+.v1 .context h2,.v1 .context h3,.v1 .context h4{word-wrap:break-word;}
+.v1 .context h2 a{color:inherit;}
 .v1 .context h2,.v1 .context h3{font-weight:normal;}
 .v1 .context h3{clear:both;padding:2em 0 .5em;margin-bottom:.5em;border-bottom:1px solid #dce2e5;}.v1 .context h3.sub-title{padding-top:0;margin-bottom:-0.25em;border:none;color:#486f87;line-height:1.25em;}.v1 .context h3.sub-title a{color:#486f87;}
 .v1 .context h4{clear:both;font-size:13px;padding:.5em 0 1em;}
