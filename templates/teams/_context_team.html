@@ -61,18 +61,25 @@
 {% endif %}
 
 {% if team|is_team_member:user %}
-    {% with team|user_role:user as role %}
-        <h3>{{ role|capfirst }} Tools</h3>
-        <ul>
-            <li>
-                <a href="{% url teams:team_tasks team.slug %}?assignee=me">My Tasks</a>
-                ({{ team|user_tasks_count:user }})
-            </li>
-            <li>
-                <a href="{% url teams:team_tasks team.slug %}?assignee=none">Available tasks</a>
-            </li>
-        </ul>
-    {% endwith %}
+    <h3>Member Tools</h3>
+    <ul>
+        <li>
+            <a href="{% url teams:team_tasks team.slug %}?assignee=me">{% trans 'My tasks' %}</a>
+            ({{ team|user_tasks_count:user }})
+        </li>
+        {% with user.get_languages as langs %}
+            {% if langs %}
+                {% for l in langs %}
+                <li>
+                    <a href="{% url teams:team_tasks team.slug %}?lang={{ l.language }}">{% trans 'Tasks for' %} {{ l.get_language_display }}</a>
+                </li>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <li>
+            <a href="{% url teams:team_tasks team.slug %}?assignee=none">{% trans 'All available tasks' %}</a>
+        </li>
+    </ul>
 {% endif %}
 
 <script type="text/javascript">
