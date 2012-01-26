@@ -4,8 +4,8 @@
     <div class="thumb">
         <a href="{{ video.get_absolute_url }}" class="thumb"><img src="{{ video.get_thumbnail }}" alt="Thumbnail"></a>
         <a href="{% url videos:video video_id=video.id %}" class="languages">
-            {% if video.completed_langs %}
-                {{ video.completed_langs|length }} {% trans 'language' %}{{ video.completed_langs|length|pluralize }}
+            {% if video.languages_count > 0 %}
+                {{ video.languages_count }} {% trans 'language' %}{{ video.languages_count|pluralize }}
             {% else %}
                 {% trans "No subtitles yet" %}
             {% endif %}
