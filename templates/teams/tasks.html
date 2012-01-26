@@ -116,11 +116,11 @@
                         <li>
                             <h3>
                                 {% if task.get_type_display == "Subtitle" %}
-                                    {% trans 'New' %}
+                                    {% trans 'Transcribe' %}
                                 {% else %}
                                     {{ task.get_type_display }}
                                     {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
-                                        {% if task.team_video.video.has_original_language %}
+                                        {% if task.subtitle_version.language.is_original %}
                                             {% trans 'Original' %}
                                         {% endif %}
                                     {% endif %}
@@ -128,10 +128,10 @@
                                 {% if task.get_type_display == "Translate" %}
                                     {% trans 'Subtitles into' %} {{ task.get_language_display }}
                                 {% else %}
-                                    {% trans 'Subtitles' %}
                                     {% if task.get_language_display %}
-                                        ({{ task.get_language_display }})
+                                        {{ task.get_language_display }}
                                     {% endif %}
+                                    {% trans 'Subtitles' %}
                                 {% endif %}
                             </h3>
                             <p>{% trans "Video" %}: <a href="{{ task.team_video.video.get_absolute_url }}">{{ task.team_video|truncatewords:6 }}</a></p>

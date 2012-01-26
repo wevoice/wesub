@@ -69,7 +69,7 @@ body{overflow-y:scroll;}
 .v1 .listing.messages>li{opacity:.5;}.v1 .listing.messages>li.unread{opacity:1;}
 .v1 .listing.messages>li p a{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
 .v1 .listing.activity>li,.v1 .listing.tasks>li,.v1 .listing.urls>li{padding-right:150px;}.v1 .listing.activity>li .actions,.v1 .listing.tasks>li .actions,.v1 .listing.urls>li .actions{width:150px;}
-.v1 .listing.tasks>li{padding-left:110px;min-height:5em;}.v1 .listing.tasks>li .done span{margin-right:.5em;}
+.v1 .listing.tasks>li{padding-left:110px;min-height:6.5em;}.v1 .listing.tasks>li .done span{margin-right:.5em;}
 .v1 .listing.tasks>li .thumb{max-width:80px;word-wrap:break-word;}.v1 .listing.tasks>li .thumb img{max-width:80px;margin-left:10px;}
 .v1 .listing.tasks>li form.assign-form{padding:0;}
 .v1 .listing.teams>li{padding-right:150px;}
@@ -158,7 +158,8 @@ body#teams div.edit-team-video form fieldset a{display:inline-block;overflow:hid
 .v1 .context video,.v1 .context object,.v1 .context .unisubs-widget span.unisubs-videoplayer{width:289px !important;height:173px !important;}
 .v1 .context #description{color:#486f87;line-height:150%;}.v1 .context #description p{margin-bottom:.5em;}
 .v1 .context a{text-decoration:none;}
-.v1 .context h2 a{color:inherit;word-wrap:break-word;}
+.v1 .context h2,.v1 .context h3,.v1 .context h4{word-wrap:break-word;}
+.v1 .context h2 a{color:inherit;}
 .v1 .context h2,.v1 .context h3{font-weight:normal;}
 .v1 .context h3{clear:both;padding:2em 0 .5em;margin-bottom:.5em;border-bottom:1px solid #dce2e5;}.v1 .context h3.sub-title{padding-top:0;margin-bottom:-0.25em;border:none;color:#486f87;line-height:1.25em;}.v1 .context h3.sub-title a{color:#486f87;}
 .v1 .context h4{clear:both;font-size:13px;padding:.5em 0 1em;}
