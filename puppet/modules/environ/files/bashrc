@@ -106,3 +106,4 @@ alias clean_unisubs_messages='rm /tmp/unisubs-messages/*.log'
 
 # on login, drop us on the working directory with the venv activated
 cd /opt/unisubs/ && source /opt/extras/venv/bin/activate
+alias d='./dev-runserver.sh plus'

@@ -416,6 +416,13 @@ def legacy_history(request ,video, lang=None):
 
 @get_video_from_code
 def history(request, video, lang=None, lang_id=None):
+    if not lang:
+        return HttpResponseRedirect(video.get_absolute_url())
+    elif lang == 'unknown':
+        # A hacky workaround for now.
+        # This should go away when we stop allowing for blank SubtitleLanguages.
+        lang = ''
+
     video.update_view_counter()
 
     context = widget.add_onsite_js_files({})

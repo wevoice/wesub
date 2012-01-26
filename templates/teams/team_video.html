@@ -26,8 +26,6 @@
             <h3>{% trans 'Edit video' %}: <em>{% firstof team_video.title team_video.video.title %}</em></h3>
             <fieldset>
                 {% include "_form_field.html" with field=form.video_url %}
-                {% include "_form_field.html" with field=form.title %}
-                {% include "_form_field.html" with field=form.description %}
 
                 {% if team.has_projects %}
                     {% include "_form_field.html" with field=form.project %}

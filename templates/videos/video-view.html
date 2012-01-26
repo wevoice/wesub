@@ -187,7 +187,7 @@
 
                 {% with video.get_team_video as team_video %}
                     {% if team_video %}
-                        {% if team_video.team.is_public %}
+                        {% if team_video.team.is_visible %}
                             <div class="video-tools grid_4 omega">
                                 <h3>{% trans "Collaborate" %}</h3>
 
