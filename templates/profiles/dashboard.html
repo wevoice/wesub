@@ -66,18 +66,18 @@
                 {% endwith %}
             </ul>
 
-            <h3>{% trans "Teams" %}</h3>
             {% with user.teams.all as user_teams %}
-            <ul>
                 {% if user_teams %}
-                    {% for t in user_teams %}
-                    <li>
-                        <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
-                        (<a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team t.slug %}">{% trans "leave team" %}</a>)
-                    </li>
-                    {% endfor %}
+                    <h3>{% trans "Teams" %}</h3>
+                    <ul>
+                        {% for t in user_teams %}
+                            <li>
+                                <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
+                                (<a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team t.slug %}">{% trans "leave team" %}</a>)
+                            </li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
-            </ul>
             {% endwith %}
         </div>
     </div>
