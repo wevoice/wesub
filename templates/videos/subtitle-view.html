@@ -141,19 +141,19 @@
         <ul class="metrics">
             <li>
                 <p>{{ language.subtitles_fetched_count|simplify_number }}</p>
-                <h4>{% trans "Play" %}{{ language.subtitles_fetched_count|pluralize }}</h4>
+                <h4>{% trans "View" %}{{ language.subtitles_fetched_count|pluralize }}</h4>
             </li>
             <li>
                 <p>{{ language.followers.count }}</p>
                 <h4>{% trans "Follower" %}{{ language.followers.count|pluralize }}</h4>
             </li>
             <li>
-                <p>{{ language.subtitle_count }}</p>
-                <h4>{% trans "Line" %}{{ language.subtitle_count|pluralize }}</h4>
+                <p>{{ language|get_comment_count }}</p>
+                <h4>{% trans 'Comment' %}{{ language|get_comment_count|pluralize }}</h4>
             </li>
             <li>
-                <p>{% complete_indicator language 'pct' %}</p>
-                <h4>{% trans "Complete" %}</h4>
+                <p>{{ language.subtitle_count }}</p>
+                <h4>{% trans "Line" %}{{ language.subtitle_count|pluralize }}</h4>
             </li>
         </ul>
         <div class="sharing-tools">
@@ -185,7 +185,7 @@
         {% endif %}
         <ul class="tabs">
             <li class="current"><a href="#transcripts-tab">{% trans "Subtitles" %}</a></li>
-            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{% get_comment_count language %}</span></a></li>
+            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{{ language|get_comment_count }}</span></a></li>
             <li class="hascount"><a href="#revisions-tab">{% trans "Revisions" %}<span>{{ hits }}</span></a></li>
         </ul>
         <div class="tab" id="transcripts-tab">
@@ -280,7 +280,7 @@
         <div class="tab" id="comments-tab" style="display:none;">
             <h3>{% trans "Leave a comment" %}</h3>
             {% render_comment_form language %}
-            <h3>{% get_comment_count language %} {% trans "Comments" %}</h3>
+            <h3>{{ language|get_comment_count }} {% trans "Comments" %}</h3>
             {% render_comment_list language %}
         </div>
         <div class="tab" id="revisions-tab" style="display:none;">

@@ -50,6 +50,7 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, capti
         this.numSteps_ = 2;
         this.nextButtonText_ = "Submit final translation";
     }
+    this.inSubtitlingDialog_  = inSubtitlingDialog;
 };
 goog.inherits(unisubs.editmetadata.Panel, goog.ui.Component);
 
@@ -64,13 +65,18 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     var $t = goog.bind(this.getDomHelper().createTextNode, this.getDomHelper());
     var el = this.getElement().appendChild(this.contentElem_ = $d('div'));
     // for original languages we won't have original subtitles
-    var source = this.originalSubtitles_ ? this.originalSubtitles_ : this.subtitles_;
-    var originalTitle = source.title ? source.title : " no title ";
-    var originalDescription = source.description? source.description : " no description" ;
+    var source;
+    var originalTitle = originalDescription = "";
+    if (!this.inSubtitlingDialog_){
+        // we only show the original if this is a translation
+        source = this.originalSubtitles_ ? this.originalSubtitles_ : this.subtitles_;
+        originalTitle = source.TITLE ? source.TITLE : " no title ";
+        originalDescription = source.DESCRIPTION? source.DESCRIPTION : " no description" ;
+
+    }
     var title = this.subtitles_.title ? this.subtitles_.title : "";
     var description = this.subtitles_.description ? this.subtitles_.description : "";
 
-    var originalDescription = source.description? source.description : " no description" ;
     this.titleTranslationWidget_ = 
         new unisubs.translate.TitleTranslationWidget(
             originalTitle, this.subtitles_);
