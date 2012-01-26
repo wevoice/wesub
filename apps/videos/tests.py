@@ -990,10 +990,8 @@ class ViewsTest(WebUseTest):
     def test_history(self):
         # Redirect for now, until we remove the concept of SubtitleLanguages
         # with blank language codes.
-        response = self.client.get(reverse('videos:history', args=[self.video.video_id]))
-        self.assertEqual(response.status_code, 302)
-
-        self._simple_test('videos:history', [self.video.video_id], data={'o': 'user', 'ot': 'asc'})
+        self._simple_test('videos:history', [self.video.video_id], status=302)
+        self._simple_test('videos:history', [self.video.video_id], data={'o': 'user', 'ot': 'asc'}, status=302)
 
         sl = self.video.subtitlelanguage_set.all()[:1].get()
         sl.language = 'en'
