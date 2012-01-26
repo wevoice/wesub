@@ -82,7 +82,6 @@ VIDEO_TYPE = (
 VIDEO_META_CHOICES = (
     (1, 'Author',),
     (2, 'Creation Date',),
-    (100, 'ted_id',),
 )
 VIDEO_META_TYPE_NAMES = {}
 VIDEO_META_TYPE_VARS = {}
