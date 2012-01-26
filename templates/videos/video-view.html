@@ -184,20 +184,30 @@
                         {% endif %}
                     </p>
                 </div>
-                {% if video.get_team_video or user.managed_teams and not video.is_moderated %}
-                    <div class="video-tools grid_4 omega">
-                        <h3>{% trans "Collaborate" %}</h3>
-                        {% if video.get_team_video %}
-                            <p>
-                                {% trans "This video belongs to the following team" %}:
-                            </p>
-                            {% render_belongs_to_team_list video %}
+
+                {% with video.get_team_video as team_video %}
+                    {% if team_video %}
+                        {% if team_video.team.is_public %}
+                            <div class="video-tools grid_4 omega">
+                                <h3>{% trans "Collaborate" %}</h3>
+
+                                <p>
+                                    {% trans "This video belongs to the following team" %}:
+                                </p>
+
+                                {% render_belongs_to_team_list video %}
+                            </div>
                         {% endif %}
-                        {% if user.managed_teams and not video.is_moderated %}
-                            {% team_add_video_select %}
+                    {% else %}
+                        {% if user.managed_teams %}
+                            <div class="video-tools grid_4 omega">
+                                <h3>{% trans "Collaborate" %}</h3>
+
+                                {% team_add_video_select %}
+                            </div>
                         {% endif %}
-                    </div>
-                {% endif %}
+                    {% endif %}
+                {% endwith %}
             </div>
         </div>
         <div class="tab" id="comments-tab" style="display:none;">
