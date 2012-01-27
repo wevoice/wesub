@@ -33,7 +33,7 @@ class ThirdPartyAccount(models.Model):
     """
     type = models.CharField(max_length=10, choices=ACCOUNT_TYPES)
     # this is the third party account user name, eg the youtube user
-    username  = models.CharField(max_length=512, db_index=True, 
+    username  = models.CharField(max_length=256, db_index=True, 
                                  null=False, blank=False)
     oauth_access_token = models.CharField(max_length=256, db_index=True, 
                                           null=False, blank=False)
