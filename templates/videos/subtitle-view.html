@@ -190,6 +190,8 @@
         </ul>
         <div class="tab" id="transcripts-tab">
             <div class="tools">
+            <!-- TODO: Wrap in conditional; only show if vid is moderated by a team and user has ability to approve -->
+            <a href="#unpublish-modal" class="button open-modal">{% trans 'Unpublish' %}</a>
                 <a id="edit_subtitles_button" href="{{edit_url}}" class="button {% if not video.is_subtitled  %}add-translation-behavior{% endif %}">{% if not video.is_subtitled %}{% trans 'Add Translation' %}{% else %}{% trans 'Edit Subtitles' %}{% endif %}</a>
                 {% if last_version.subtitles %}
                     <div class="sort_button action">
@@ -320,14 +322,43 @@
         </div>
     </div>
 
-    {% comment %}
-    <h2 class="main-title">
-        <a href="{{ video.get_absolute_url }}" class="title-container">{{ language.get_title_display }}</a>
-        {% if not language.standard_language and not language.is_original and user.is_authenticated %}
-        <a class="edit-title" href="#" data-modal="edit-title-dialog" style="color: #3196AD !important; text-decoration: underline;">{% trans 'edit title' %}</a>
-        {% endif %}
-    </h2>
-    {% endcomment %}
+    <!-- TODO: Wrap in conditional; only show if vid is moderated by a team and user has ability to approve -->
+    <div class="bootstrap">
+        <div class="modal" id="unpublish-modal">
+            <div class="modal-header">
+                <h3>{% trans 'Unpublish subtitles' %}</h3>
+            </div>
+            <div class="modal-body">
+                <form action="">
+                    <fieldset>
+                        <h5>{% trans 'What would you like to unpublish?' %}</h5>
+                        <label class="radio">
+                            <input type="radio" name="scope" value="version" checked="checked">
+                            {% trans 'This version only' %}
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="scope" value="language">
+                            {% trans 'All versions for this language' %}
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="scope" value="dependents">
+                            {% trans 'This language and all dependent languages' %}
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <h5>{% trans 'Would you like to delete these subtitles completely?' %}</h5>
+                        <label class="checkbox">
+                            <input type="checkbox" name="delete" value="delete">
+                            {% trans 'Yes, delete these subtitles instead of sending them back for editing/review' %}
+                        </label>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button>{% trans 'Unpublish' %}</button>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block page_controls %}
