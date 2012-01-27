@@ -13,24 +13,24 @@
         <a class="expand" href="#">{% trans 'Show all' %} ↓</a>
     {% endif %}
 </div>
-{% if projects.count > 0 %}
-<div id="projects-list" {% if projects.count > 6 %} class="abbr collapsed"{% endif %}>
-    <div>
-        <h4>{% trans 'Projects' %}</h4>
-        <ul>
-            {% for project in projects %}
-                <li>
-                    <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}{% query_string request.GET %}">
-                        {{ project }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+{% if projects|length > 0 %}
+    <div id="projects-list" {% if projects|length > 6 %} class="abbr collapsed"{% endif %}>
+        <div>
+            <h4>{% trans 'Projects' %}</h4>
+            <ul>
+                {% for project in projects %}
+                    <li>
+                        <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}{% query_string request.GET %}">
+                            {{ project }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% if projects|length > 6 %}
+            <a class="expand" href="#">{% trans 'Show all' %} ↓</a>
+        {% endif %}
     </div>
-    {% if projects.count > 6 %}
-        <a class="expand" href="#">{% trans 'Show all' %} ↓</a>
-    {% endif %}
-</div>
 {% endif %}
 <ul class="metrics">
     <li>
@@ -38,16 +38,16 @@
         <h4>{% trans "Video" %}{{ team.videos_count|pluralize }}</h4>
     </li>
     <li>
-        <p>{{team|members:'count'|simplify_number}}</p>
-        <h4>{% trans "Member" %}{{ team|members:'count'|pluralize }}</h4>
+        <p>{{team.member_count|simplify_number}}</p>
+        <h4>{% trans "Member" %}{{ team.member_count|pluralize }}</h4>
     </li>
     <li>
         <p>{{ team.tasks_count|simplify_number }}</p>
         <h4>{% trans "Task" %}{{ team.tasks_count|pluralize }}</h4>
     </li>
     <li>
-        <p>{{ projects.count|simplify_number }}</p>
-        <h4>{% trans "Project" %}{{ projects.count|pluralize }}</h4>
+        <p>{{ projects|length|simplify_number }}</p>
+        <h4>{% trans "Project" %}{{ projects|length|pluralize }}</h4>
     </li>
 </ul>
 {% if team.is_visible %}

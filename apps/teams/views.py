@@ -16,8 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import datetime
-
 from django.utils.http import urlencode
 from utils import render_to, render_to_json
 from utils.searching import get_terms
@@ -161,7 +159,8 @@ def detail(request, slug, project_slug=None, languages=None):
 
     extra_context = widget.add_onsite_js_files({})
 
-    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(None, user=request.user, project=None, query=None, sort=sort).count()
+    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(
+        None, user=request.user, project=None, query=None, sort=sort).count()
 
     extra_context.update({
         'team': team,
