@@ -10,11 +10,11 @@ class Migration(SchemaMigration):
         
         # Adding model 'ThirdPartyAccount'
         db.create_table('accountlinker_thirdpartyaccount', (
-            ('username', self.gf('django.db.models.fields.CharField')(max_length=256, db_index=True)),
-            ('oauth_refresh_token', self.gf('django.db.models.fields.CharField')(max_length=256, db_index=True)),
+            ('username', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
+            ('oauth_refresh_token', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('oauth_access_token', self.gf('django.db.models.fields.CharField')(max_length=256, db_index=True)),
+            ('oauth_access_token', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
         ))
         db.send_create_signal('accountlinker', ['ThirdPartyAccount'])
 
@@ -35,10 +35,10 @@ class Migration(SchemaMigration):
         'accountlinker.thirdpartyaccount': {
             'Meta': {'unique_together': "(('type', 'oauth_access_token'),)", 'object_name': 'ThirdPartyAccount'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'oauth_access_token': ('django.db.models.fields.CharField', [], {'max_length': '256', 'db_index': 'True'}),
-            'oauth_refresh_token': ('django.db.models.fields.CharField', [], {'max_length': '256', 'db_index': 'True'}),
+            'oauth_access_token': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'oauth_refresh_token': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'username': ('django.db.models.fields.CharField', [], {'max_length': '256', 'db_index': 'True'})
+            'username': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'})
         }
     }
     
