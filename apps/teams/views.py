@@ -1348,26 +1348,13 @@ def edit_project(request, slug, project_slug):
 @render_to('teams/_third-party-accounts.html')
 @login_required
 def third_party_accounts(request, slug):
+    from accountlinker.views import _generate_youtube_oauth_request_link
     team = get_object_or_404(Team, slug=slug)
     if not can_change_team_settings(team, request.user):
         messages.error(request, _(u'You do not have permission to edit this team.'))
         return HttpResponseRedirect(team.get_absolute_url())
 
-    base =  "https://accounts.google.com/o/oauth2/auth?"
-    state = team.pk
-    
-    params = {
-        "client_id": settings.YOUTUBE_CLIENT_ID,
-        "redirect_uri": "http://%s%s" % (
-            Site.objects.get_current().domain,
-            reverse("accountlinker:youtube-oauth-callback")),
-        "scope": "https://gdata.youtube.com",
-        "state": state,
-        "response_type": "code",
-        "access_type": "offline",
-        
-    }
-    new_youtube_url = "%s?%s" % (base, urllib.urlencode(params))
+    new_youtube_url = _generate_youtube_oauth_request_link(str(team.pk))
     linked_accounts = team.third_party_accounts.all()
     return {
         "team":team,

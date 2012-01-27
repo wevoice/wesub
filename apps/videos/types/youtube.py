@@ -262,3 +262,22 @@ class YoutubeVideoType(VideoType):
         
         for item in langs:
             save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
+            
+class YouTubeApiBridge(object):
+    def authorize(self, access_token, refresh_token):
+        import gdata
+        import gdata.youtube.client
+        import gdata.youtube
+	import gdata.youtube.service
+        token  = gdata.gauth.OAuth2Token(
+            client_id=settings.YOUTUBE_CLIENT_ID,
+            client_secret=settings.YOUTUBE_CLIENT_SECRET,
+            scope='https://gdata.youtube.com',
+            user_agent='universal-subtitles',
+            access_token=access_token,
+            refresh_token=refresh_token
+        )
+        client = gdata.youtube.client.YouTubeClient()
+        token.authorize(client)
+        service = gdata.youtube.service.YouTubeService()
+        return client, service

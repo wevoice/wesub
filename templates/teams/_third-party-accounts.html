@@ -31,7 +31,7 @@
     active accounts
     <ul>
       {% for account in linked_accounts %}
-      {{account.type}}, {{acount.username}}, {%if account.oauth_token %}linked!{% endif %}
+      {{account.type}},  {%if account.oauth_access_token%}linked!{% endif %}
       {% endfor %}
       <a href="{{new_youtube_url}}">Link new Youtube Account</a>
 {% endblock %}

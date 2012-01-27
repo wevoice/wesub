@@ -17,9 +17,9 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import json
+import urllib
 
 import requests
-
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -27,13 +27,39 @@ from django.shortcuts import get_object_or_404, redirect, render_to_response
 
 from accountlinker.models import ThirdPartyAccount
 from teams.models import Team
+from videos.models import VIDEO_TYPE_YOUTUBE
+from videos.types.youtube import YouTubeApiBridge
+
 import logging
 import sentry_logger # Magical import to make sure Sentry's error recording happens.
 logger = logging.getLogger("authbelt.views")
 
 
+def _generate_youtube_oauth_request_link(state_str=None):
+    state_str = state_str or ""
+    base =  "https://accounts.google.com/o/oauth2/auth?"
+    state = state_str
+    
+    params = {
+        "client_id": settings.YOUTUBE_CLIENT_ID,
+        "redirect_uri": "http://%s%s" % (
+            Site.objects.get_current().domain,
+            reverse("accountlinker:youtube-oauth-callback")),
+        "scope": "https://gdata.youtube.com",
+        "state": state,
+        "response_type": "code",
+        "approval_prompt": "force",
+        "access_type": "offline",
+        
+    }
+    return "%s%s" % (base, urllib.urlencode(params))
+
 def youtube_oauth_callback(request):
-    print request
+    """
+    Stores the oauth tokes. We identify which team this belongs to
+    since we've passed the pk on the state param for the authorize request
+    """
+    import atom
     code = request.GET.get("code", None)
     if code is None:
         raise Exception("No code in youtube oauth callback")
@@ -51,18 +77,18 @@ def youtube_oauth_callback(request):
     
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
-        "client_secret": settings.YOUTUBE_API_SECRET,
+        "client_secret": settings.YOUTUBE_CLIENT_SECRET,
         "redirect_uri": "http://%s%s" % (
             Site.objects.get_current().domain,
             reverse("accountlinker:youtube-oauth-callback")),
         "code": code,
-        "grant_type": "authorization_code\n",
+        "grant_type": "authorization_code",
         
     }
     
-    params = "&\n".join(["%s=%s" % (k,v) for k,v in params.items()])
-    print params
-    response = requests.post(base, data=params)
+    response = requests.post(base, data=params, headers={
+        "Content-Type": "application/x-www-form-urlencoded"
+    })
     if response.status_code != 200:
         logger.error("Error on requesting Youtube Oauth token", extra={
                     "data": {
@@ -70,15 +96,18 @@ def youtube_oauth_callback(request):
                         "original_request": request,
                     },
                 })
-        import pdb;pdb.set_trace()
-        if settings.DEBUG:
-            raise Exception("oh my!")
                     
     content = json.loads(response.content)
-    new_account = ThirdPartyAccount(
+    bridge = YouTubeApiBridge() 
+    client, service = bridge.authorize(content['access_token'], content['refresh_token'])
+    feed = client.GetUserFeed(username='default')
+    author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
+    
+   # need to store the username for this account
+    team.third_party_accounts.create(
+        type = VIDEO_TYPE_YOUTUBE,
+        oauth_refresh_token = content['refresh_token'],
         oauth_access_token = content['access_token'],
-        oauth_refersh_token = content['refresh_token'],
-        team = team
+        username = author.name.text
     )
-    new_account.save()
     return redirect(reverse("teams:third-party-accounts", kwargs={"slug":team.slug}))
