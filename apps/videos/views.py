@@ -418,7 +418,7 @@ def legacy_history(request ,video, lang=None):
 @get_video_from_code
 def history(request, video, lang=None, lang_id=None):
     if not lang:
-        return HttpResponseRedirect(video.get_absolute_url())
+        return HttpResponseRedirect(video.get_absolute_url(video_id=video._video_id_used))
     elif lang == 'unknown':
         # A hacky workaround for now.
         # This should go away when we stop allowing for blank SubtitleLanguages.
