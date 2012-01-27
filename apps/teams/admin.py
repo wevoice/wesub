@@ -101,7 +101,7 @@ class TeamVideoAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'team_link', 'created')
     readonly_fields = ('completed_languages',)
     raw_id_fields = ['video', 'team', 'added_by']
-    search_fields = ('title',)
+    search_fields = ('title', 'video__title')
 
     def team_link(self, obj):
         url = reverse('admin:teams_team_change', args=[obj.team_id])

@@ -229,7 +229,6 @@ unisubs.startdialog.Dialog.prototype.originalLangChanged_ = function(e) {
 };
 
 unisubs.startdialog.Dialog.prototype.toLanguageChanged_ = function(e) {
-    console.log('in tolangchanged');
     this.model_.selectLanguage(this.toLanguageDropdown_.value);
     this.setFromContents_();
     this.maybeShowWarning_();

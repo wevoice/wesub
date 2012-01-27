@@ -217,7 +217,7 @@
             {% render_comment_list video %}
         </div>
         <div class="tab" id="activity-tab" style="display:none;">
-            {% video_activity video %}
+            {% video_activity video request.user %}
             <p class="view-more"><a href="{% url videos:actions_list video.video_id %}">{% trans 'View all activity' %}</a></p>
         </div>
         <div class="tab" id="urls-tab" style="display:none;">

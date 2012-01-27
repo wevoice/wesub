@@ -98,7 +98,16 @@ def is_team_manager(team, user):
 def is_team_member(team, user):
     if not user.is_authenticated():
         return False
-    return team.is_member(user)
+
+    # We cache this here because we need to use it all over the place and
+    # there's no point in making 3+ queries to the DB when one will do.
+    if not hasattr(user, '_cached_teammember_status'):
+        user._cached_teammember_status = {}
+
+    if team.pk not in user._cached_teammember_status:
+        user._cached_teammember_status[team.pk] = team.is_member(user)
+
+    return user._cached_teammember_status[team.pk]
 
 @register.filter
 def user_role(team, user):
@@ -126,12 +135,6 @@ def team_select(context, team):
         'can_create_team': DEV_OR_STAGING or (user.is_superuser and user.is_active)
     }
 
-@register.inclusion_tag('teams/_team_activity.html', takes_context=True)
-def team_activity(context, team):
-    action_qs = Action.objects.for_team(team)[:ACTIONS_ON_PAGE]
-    context['videos_actions'] = action_qs
-
-    return context
 
 @register.inclusion_tag('teams/_team_add_video_select.html', takes_context=True)
 def team_add_video_select(context):

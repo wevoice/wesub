@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2011 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib.auth.models import UserManager, User as BaseUser
@@ -58,7 +58,7 @@ class CustomUser(BaseUser):
     AUTOPLAY_ON_LANGUAGES = 2
     DONT_AUTOPLAY = 3
     AUTOPLAY_CHOICES = (
-        (AUTOPLAY_ON_BROWSER, 
+        (AUTOPLAY_ON_BROWSER,
          'Autoplay subtitles based on browser preferred languages'),
         (AUTOPLAY_ON_LANGUAGES, 'Autoplay subtitles in languages I know'),
         (DONT_AUTOPLAY, 'Don\'t autoplay subtitles')
@@ -68,7 +68,7 @@ class CustomUser(BaseUser):
         max_length=16, choices=ALL_LANGUAGES, blank=True)
     picture = S3EnabledImageField(blank=True, upload_to='pictures/')
     valid_email = models.BooleanField(default=False)
-    
+
     # if true, items that end on the user activity stream will also be
     # sent as email
     notify_by_email= models.BooleanField(default=True)
@@ -80,24 +80,24 @@ class CustomUser(BaseUser):
         choices=AUTOPLAY_CHOICES, default=AUTOPLAY_ON_BROWSER)
     award_points = models.IntegerField(default=0)
     last_ip = models.IPAddressField(blank=True, null=True)
-    # videos witch are related to user. this is for quicker queries 
+    # videos witch are related to user. this is for quicker queries
     videos = models.ManyToManyField('videos.Video', blank=True)
-    # for some login backends we end up with a full name but not 
+    # for some login backends we end up with a full name but not
     # a first name, last name pair.
     full_name = models.CharField(max_length=63, blank=True, default='')
     # which partner created this user? For now it' only a string, at
     # some point we'll need to model partners better
     partner = models.CharField(blank=True, null=True, max_length=32, db_index=True)
-    
+
     objects = UserManager()
-    
+
     class Meta:
         verbose_name = 'User'
-        
+
     def __unicode__(self):
         if not self.is_active:
             return ugettext('Retired user')
-            
+
         if self.first_name:
             if self.last_name:
                 return self.get_full_name()
@@ -109,7 +109,7 @@ class CustomUser(BaseUser):
 
     def save(self, *args, **kwargs):
         send_confirmation = False
-        
+
         if not self.email:
             self.valid_email = False
         elif self.pk:
@@ -120,33 +120,38 @@ class CustomUser(BaseUser):
                 send_confirmation = True
         elif self.email:
             send_confirmation = True
-            
+
         if send_confirmation:
             self.valid_email = False
-        
+
         send_email_confirmation = kwargs.pop('send_email_confirmation', True)
         super(CustomUser, self).save(*args, **kwargs)
-        
+
         if send_confirmation and send_email_confirmation:
             EmailConfirmation.objects.send_confirmation(self)
 
     def unread_messages(self, hidden_meassage_id=None):
         from messages.models import Message
-        
+
         qs = Message.objects.for_user(self).filter(read=False)
-        
+
         try:
             if hidden_meassage_id:
                 qs = qs.filter(pk__gt=hidden_meassage_id)
         except (ValueError, TypeError):
             pass
-        
+
         return qs
+
+    def unread_messages_count(self, hidden_meassage_id=None):
+        if not hasattr(self, '_unread_messages_count'):
+            self._unread_messages_count = self.unread_messages(hidden_meassage_id=hidden_meassage_id).count()
+        return self._unread_messages_count
 
     @classmethod
     def video_followers_change_handler(cls, sender, instance, action, reverse, model, pk_set, **kwargs):
         from videos.models import SubtitleLanguage
-        
+
         if reverse and action == 'post_add':
             #instance is User
             for video_pk in pk_set:
@@ -173,11 +178,11 @@ class CustomUser(BaseUser):
             #instance is Video
             cls.videos.through.objects.filter(video=instance) \
                 .exclude(customuser__followed_languages__video=instance).delete()
-            
+
     @classmethod
     def sl_followers_change_handler(cls, sender, instance, action, reverse, model, pk_set, **kwargs):
         from videos.models import Video, SubtitleLanguage
-        
+
         if reverse and action == 'post_add':
             #instance is User
             for sl_pk in pk_set:
@@ -217,7 +222,7 @@ class CustomUser(BaseUser):
             languages = self.userlanguage_set.all()
             cache.set('user_languages_%s' % self.pk, languages, 60*24*7)
 
-        return languages 
+        return languages
 
     def speaks_language(self, language_code):
         return language_code in [l.language for l in self.get_languages()]
@@ -248,7 +253,7 @@ class CustomUser(BaseUser):
         if self.picture:
             return self.picture.thumb_url(size, size)
         else:
-            return self._get_gravatar(size)        
+            return self._get_gravatar(size)
     def avatar(self):
         return self._get_avatar_by_size(100)
 
@@ -280,7 +285,7 @@ class CustomUser(BaseUser):
                 return languages[0]
 
         return 'en'
-    
+
     def guess_is_rtl(self, request=None):
         from utils.translation import is_rtl
         return is_rtl(self.guess_best_lang(request))
@@ -295,7 +300,7 @@ class CustomUser(BaseUser):
     @classmethod
     def get_anonymous(cls):
         return cls.objects.get(pk=settings.ANONYMOUS_USER_ID)
-    
+
 def create_custom_user(sender, instance, created, **kwargs):
     if created:
         values = {}
@@ -303,7 +308,7 @@ def create_custom_user(sender, instance, created, **kwargs):
             values[field.attname] = getattr(instance, field.attname)
         user = CustomUser(**values)
         user.save()
-    
+
 post_save.connect(create_custom_user, BaseUser)
 
 class Awards(models.Model):
@@ -324,7 +329,7 @@ class Awards(models.Model):
     type = models.IntegerField(choices=TYPE_CHOICES)
     user = models.ForeignKey(CustomUser, null=True)
     created = models.DateTimeField(auto_now_add=True)
-    
+
     def _set_points(self):
         if self.type == self.COMMENT:
             self.points = 10
@@ -338,13 +343,13 @@ class Awards(models.Model):
             self.points = 50
         else:
             self.points = 0
-        
+
     def save(self, *args, **kwrags):
         self.points or self._set_points()
         if not self.pk:
             CustomUser.objects.filter(pk=self.user.pk).update(award_points=models.F('award_points')+self.points)
         return super(Awards, self).save(*args, **kwrags)
-    
+
     @classmethod
     def on_comment_save(cls, sender, instance, created, **kwargs):
         if created:
@@ -352,12 +357,12 @@ class Awards(models.Model):
                 cls.objects.get_or_create(user=instance.user, type = cls.COMMENT)
             except MultipleObjectsReturned:
                 pass
-            
+
     @classmethod
     def on_subtitle_version_save(cls, sender, instance, created, timestamp=None, **kwargs):
         if not instance.user:
             return
-        
+
         if created and instance.version_no == 0:
             if instance.language.is_original:
                 type = cls.START_SUBTITLES
@@ -372,7 +377,7 @@ class Awards(models.Model):
             cls.objects.get_or_create(user=instance.user, type=type)
         except MultipleObjectsReturned:
             pass
-    
+
 class UserLanguage(models.Model):
     PROFICIENCY_CHOICES = (
         (1, _('understand enough')),
@@ -399,18 +404,18 @@ class Announcement(models.Model):
     content = models.CharField(max_length=500)
     created = models.DateTimeField(help_text=_(u'This is date when start to display announcement. And only the last will be displayed.'))
     hidden = models.BooleanField(default=False)
-    
+
     cache_key = 'last_accouncement'
     hide_cookie_name = 'hide_accouncement'
     cookie_date_format = '%d/%m/%Y %H:%M:%S'
-    
+
     class Meta:
         ordering = ['-created']
-    
+
     @classmethod
     def clear_cache(cls):
         cache.delete(cls.cache_key)
-        
+
     def save(self, *args, **kwargs):
         super(Announcement, self).save(*args, **kwargs)
         self.clear_cache()
@@ -418,11 +423,11 @@ class Announcement(models.Model):
     def delete(self, *args, **kwargs):
         return super(Announcement, self).delete(*args, **kwargs)
         self.clear_cache()
-    
+
     @classmethod
     def last(cls, hidden_date=None):
         last = cache.get(cls.cache_key, '')
-        
+
         if last == '':
             try:
                 qs = cls.objects.filter(created__lte=datetime.today()) \
@@ -431,12 +436,12 @@ class Announcement(models.Model):
             except cls.DoesNotExist:
                 last = None
             cache.set(cls.cache_key, last, 60*60)
-        
+
         if hidden_date and last and last.created < hidden_date:
             return None
-        
-        return last    
-        
+
+        return last
+
 class EmailConfirmationManager(models.Manager):
 
     def confirm_email(self, confirmation_key):
@@ -455,9 +460,9 @@ class EmailConfirmationManager(models.Manager):
     def send_confirmation(self, user):
         assert user.email
         from messages.models import Message
-        
+
         self.filter(user=user).delete()
-        
+
         salt = sha_constructor(str(random())+settings.SECRET_KEY).hexdigest()[:5]
         confirmation_key = sha_constructor(salt + user.email).hexdigest()
         try:
@@ -497,21 +502,21 @@ class EmailConfirmation(models.Model):
     class Meta:
         verbose_name = _("e-mail confirmation")
         verbose_name_plural = _("e-mail confirmations")
-        
+
     def key_expired(self):
         expiration_date = self.sent + timedelta(days=EMAIL_CONFIRMATION_DAYS)
         return expiration_date <= datetime.now()
-    key_expired.boolean = True        
+    key_expired.boolean = True
 
 class LoginTokenManager(models.Manager):
     def get_expired(self):
         expires_in = datetime.now() - LoginToken.EXPIRES_IN
         return self.filter(created__lt=expires_in)
-        
+
     def generate_token(self, user):
         new_uuid = uuid.uuid4()
         return hmac.new("%s%s" % (user.pk, str(new_uuid)), digestmod=sha1).hexdigest()
-        
+
     def for_user(self, user, updates=True):
         try:
            lt = self.get(user=user)
@@ -522,7 +527,7 @@ class LoginTokenManager(models.Manager):
         except LoginToken.DoesNotExist:
             lt = self.create(user=user, token=self.generate_token(user))
         return lt
-        
+
 class LoginToken(models.Model):
     """
     Links a user account to a secret, this allows a user to be logged in
@@ -535,7 +540,7 @@ class LoginToken(models.Model):
     LoginToken.objects.get_for_user(user)
     This avoids breaking unique constrainst and badly formed tokens.
     """
-    
+
     EXPIRES_IN = timedelta(minutes=120) # minutes
     user = models.OneToOneField(CustomUser, related_name="login_token")
     token = models.CharField(max_length=40, unique=True)
@@ -546,6 +551,6 @@ class LoginToken(models.Model):
     @property
     def is_expired(self):
         return self.created + LoginToken.EXPIRES_IN <  datetime.now()
-        
+
     def __unicode__(self):
         return u"LoginToken for %s" %(self.user)

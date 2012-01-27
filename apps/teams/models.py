@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -428,6 +428,17 @@ class Team(models.Model):
 
     def get_readable_langs(self):
         return TeamLanguagePreference.objects.get_readable(self)
+
+
+    def unpublishing_enabled(self):
+        '''Return True if unpublishing is enabled for this team, False otherwise.
+
+        At the moment unpublishing is only available if the team has reviewing
+        and/or approving enabled.
+
+        '''
+        w = self.get_workflow()
+        return True if w.review_enabled or w.approved_enabled else False
 
 
 # this needs to be constructed after the model definition since we need a

@@ -525,7 +525,7 @@ class Rpc(BaseRpc):
                 # For now, we'll assign the review/approval task to whomever did
                 # it last time (if it was indeed done), but only if they're
                 # still eligible to perform it now.
-                last_task = team_video.task_set.completed().filter(
+                last_task = team_video.task_set.complete().filter(
                     language=sl.language, type=type
                 ).order_by('-completed')[:1]
 

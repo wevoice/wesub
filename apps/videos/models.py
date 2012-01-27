@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -86,6 +86,8 @@ VIDEO_META_CHOICES = (
 VIDEO_META_TYPE_NAMES = {}
 VIDEO_META_TYPE_VARS = {}
 VIDEO_META_TYPE_IDS = {}
+
+
 def update_metadata_choices():
     global VIDEO_META_TYPE_NAMES, VIDEO_META_TYPE_VARS , VIDEO_META_TYPE_IDS
     VIDEO_META_TYPE_NAMES = dict(VIDEO_META_CHOICES)
@@ -98,6 +100,7 @@ WRITELOCK_EXPIRATION = 30 # 30 seconds
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
+
 class AlreadyEditingException(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -105,11 +108,11 @@ class AlreadyEditingException(Exception):
     def __unicode__(self):
         return self.msg
 
-class PublicVideoManager(models.Manager):
 
+# Video
+class PublicVideoManager(models.Manager):
     def get_query_set(self):
         return super(PublicVideoManager, self).get_query_set().filter(is_public=True)
-
 
 class Video(models.Model):
     """Central object in the system"""
@@ -575,6 +578,7 @@ class Video(models.Model):
             ("can_moderate_version"   , "Can moderate version" ,),
         )
 
+
 def create_video_id(sender, instance, **kwargs):
     instance.edited = datetime.now()
     if not instance or instance.video_id:
@@ -590,6 +594,7 @@ models.signals.pre_delete.connect(video_delete_handler, sender=Video)
 models.signals.m2m_changed.connect(User.video_followers_change_handler, sender=Video.followers.through)
 
 
+# VideoMetadata
 class VideoMetadata(models.Model):
     video = models.ForeignKey(Video)
     metadata_type = models.PositiveIntegerField(choices=VIDEO_META_CHOICES)
@@ -642,8 +647,8 @@ class VideoMetadata(models.Model):
         return datetime.strptime(s, '%Y-%m-%d').date() if s else None
 
 
+# SubtitleLanguage
 class SubtitleLanguage(models.Model):
-
     video = models.ForeignKey(Video)
     is_original = models.BooleanField()
     language = models.CharField(max_length=16, choices=ALL_LANGUAGES, blank=True)
@@ -652,12 +657,15 @@ class SubtitleLanguage(models.Model):
     writelock_owner = models.ForeignKey(User, null=True, blank=True, editable=False)
     is_complete = models.BooleanField(default=False)
     subtitle_count = models.IntegerField(default=0, editable=False)
+
     # has_version: Is there more than one version, and does the latest version
     # have more than 0 subtitles?
     has_version = models.BooleanField(default=False, editable=False)
+
     # had_version: Is there more than one version, and did some previous version
     # have more than 0 subtitles?
     had_version = models.BooleanField(default=False, editable=False)
+
     is_forked = models.BooleanField(default=False, editable=False)
     created = models.DateTimeField()
     subtitles_fetched_count = models.IntegerField(default=0, editable=False)
@@ -723,7 +731,7 @@ class SubtitleLanguage(models.Model):
                 return False
         subtitles = self.latest_subtitles(public_only=public_only)
         if len(subtitles) == 0:
-            
+
             return False
         if len([s for s in subtitles[:-1] if not s.has_complete_timing()]) > 0:
             return False
@@ -944,11 +952,19 @@ class SubtitleLanguage(models.Model):
 
         return percent_done
 
+    def unpublish(self):
+        '''Unpublish all versions of this language.'''
+
+        version = self.subtitleversion_set.order_by('version_no')[:0]
+        if version:
+            version[0].unpublish()
 
 
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 
 
+# SubtitleCollection
+# (parent class of SubtitleVersion and SubtitleDraft)
 class SubtitleCollection(models.Model):
     is_forked=models.BooleanField(default=False)
     # should not be changed directly, but using teams.moderation. as those will take care
@@ -990,6 +1006,8 @@ class SubtitleCollection(models.Model):
         setattr(self, ATTR, effective_subtitles)
         return effective_subtitles
 
+
+# SubtitleVersion
 class SubtitleVersionManager(models.Manager):
     def new_version(self, parser, language, user,
                     translated_from=None, note="", timestamp=None):
@@ -1221,6 +1239,42 @@ class SubtitleVersion(SubtitleCollection):
                 return False
         return True
 
+    def unpublish(self):
+        '''Unpublish this subtitle version (and all versions after it).
+
+        Does NOT create any Tasks to go back and fix them.
+
+        Returns the last SubtitleVersion in the chain (which is the one you'll
+        probably want to create a task for).
+
+        '''
+        team_video = self.language.video.get_team_video()
+
+        assert team_video, \
+               "Cannot unpublish for a video not moderated by a team."
+
+        assert team_video.team.unpublishing_enabled(), \
+               "Cannot unpublish for a team without unpublishing enabled."
+
+        versions = SubtitleVersion.objects.filter(
+            # This filter includes this SubtitleVersion itself
+            language=self.language,
+            version_no__gte=self.version_no
+        ).order_by('version_no')
+
+        last_version = None
+        for version in versions:
+            # Loop through instead of using .update() to ensure any .save()
+            # methods and signals get called.
+            version.moderation_status = WAITING_MODERATION
+            version.save()
+            last_version = version
+
+        # TODO: Dependent translations.  We'll also need to create tasks for
+        # them.
+        return last_version
+
+
 def update_followers(sender, instance, created, **kwargs):
     user = instance.user
     lang = instance.language
@@ -1234,6 +1288,8 @@ def update_followers(sender, instance, created, **kwargs):
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)
 
+
+# SubtitleDraft
 class SubtitleDraft(SubtitleCollection):
     language = models.ForeignKey(SubtitleLanguage)
     # null iff there is no SubtitleVersion yet.
@@ -1269,6 +1325,8 @@ class SubtitleDraft(SubtitleCollection):
         else:
             return request.browser_id == self.browser_id
 
+
+# Subtitle
 class SubtitleManager(models.Manager):
 
     def unsynced(self):
@@ -1343,11 +1401,14 @@ class Subtitle(models.Model):
             return u"(%4s) %s %s -> %s - syc = %s = %s -- Version %s" % (self.subtitle_order, self.subtitle_id,
                                           self.start_time, self.end_time, self.is_synced, self.subtitle_text, self.version_id)
 
+
+# SubtitleMetadata
 START_OF_PARAGRAPH = 1
 
 SUBTITLE_META_CHOICES = (
     (START_OF_PARAGRAPH, 'Start of pargraph'),
 )
+
 
 class SubtitleMetadata(models.Model):
     subtitle = models.ForeignKey(Subtitle)
@@ -1361,10 +1422,11 @@ class SubtitleMetadata(models.Model):
         ordering = ('created',)
         verbose_name_plural = 'subtitles metadata'
 
+
+# Action
 from django.template.loader import render_to_string
 
 class ActionRenderer(object):
-
     def __init__(self, template_name):
         self.template_name = template_name
 
@@ -1521,7 +1583,6 @@ class ActionRenderer(object):
             item.team))
         return msg
 
-
 class ActionManager(models.Manager):
     def for_team(self, team, public_only=True):
         result = self.select_related(
@@ -1538,6 +1599,24 @@ class ActionManager(models.Manager):
 
     def for_user(self, user):
         return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
+
+    def for_video(self, video, user=None):
+        qs = Action.objects.filter(video=video)
+
+        team_video = video.get_team_video()
+        if team_video:
+            from teams.models import TeamMember
+
+            try:
+                user = user if user.is_authenticated() else None
+                member = team_video.team.members.get(user=user) if user else None
+            except TeamMember.DoesNotExist:
+                member = False
+
+            if not member:
+                qs = qs.filter(language__has_version=True)
+
+        return qs
 
 class Action(models.Model):
     ADD_VIDEO = 1
@@ -1735,8 +1814,11 @@ class Action(models.Model):
             instance.action = obj
             instance.save()
 
+
 post_save.connect(Action.create_comment_handler, Comment)
 
+
+# UserTestResult
 class UserTestResult(models.Model):
     email = models.EmailField()
     browser = models.CharField(max_length=1024)
@@ -1745,6 +1827,8 @@ class UserTestResult(models.Model):
     task3 = models.TextField(blank=True)
     get_updates = models.BooleanField(default=False)
 
+
+# VideoUrl
 class VideoUrl(models.Model):
     video = models.ForeignKey(Video)
     type = models.CharField(max_length=1, choices=VIDEO_TYPE)
@@ -1785,9 +1869,12 @@ class VideoUrl(models.Model):
             self.created = datetime.now()
         super(VideoUrl, self).save(*args, **kwargs)
 
+
 post_save.connect(Action.create_video_url_handler, VideoUrl)
 post_save.connect(video_cache.on_video_url_save, VideoUrl)
 
+
+# VideoFeed
 class VideoFeed(models.Model):
     url = models.URLField()
     last_link = models.URLField(blank=True)

@@ -164,7 +164,8 @@ def detail(request, slug, project_slug=None, languages=None):
 
     extra_context = widget.add_onsite_js_files({})
 
-    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(None, user=request.user, project=None, query=None, sort=sort).count()
+    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(
+        None, user=request.user, project=None, query=None, sort=sort).count()
 
     extra_context.update({
         'team': team,
@@ -283,6 +284,7 @@ def videos_actions(request, slug):
 
     public_only = False if member else True
     qs = Action.objects.for_team(team, public_only=public_only)
+
     extra_context = {
         'team': team
     }
