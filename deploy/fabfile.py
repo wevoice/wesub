@@ -273,14 +273,6 @@ def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
     cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
     _clear_permissions('.')
 
-def _git_checkout_branch_and_reset(commit, branch='master'):
-    run('git fetch')
-    run('git checkout %s' % branch)
-    run('git reset --hard %s' % commit)
-    run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    run('chmod g+w -R .git 2> /dev/null; /bin/true')
-    _clear_permissions('.')
-
 
 def _get_optional_repo_version(dir, repo):
     '''Find the optional repo version by looking at its file in optional/.'''
