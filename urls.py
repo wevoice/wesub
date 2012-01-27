@@ -126,7 +126,8 @@ urlpatterns = patterns(
      {'template': 'alpha-test01-mp4.htm'}, 'test-mp4-page'),
      url(r'^sitemap\.xml$', sitemap_index, {'sitemaps': sitemaps}, name="sitemap-index"),
      url(r'^sitemap-(?P<section>.+)\.xml$', sitemap_view, {'sitemaps': sitemaps}, name="sitemap"),
-    url(r"helpers/", include('testhelpers.urls', namespace='helpers')),
+     url(r"helpers/", include('testhelpers.urls', namespace='helpers')),
+     url(r"accountlinker/", include('accountlinker.urls', namespace='accountlinker')),
 )
 try:
     from services import urls

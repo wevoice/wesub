@@ -583,6 +583,7 @@ INSTALLED_APPS = (
     'doorman',
     'icanhaz',
     'tastypie',
+    'accountlinker',
     'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
 )
 
@@ -616,6 +617,7 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/api2'),
     re.compile('^/jstest'),
     re.compile('^/sitemap.*.xml'),
+    re.compile('^/accountlinker/youtube-oauth-callback/'),
     #re.compile('^/crossdomain.xml'),
 )
 

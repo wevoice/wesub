@@ -21,7 +21,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from videos.models import Video, SubtitleLanguage, SubtitleVersion
+from videos.models import Video, SubtitleLanguage, SubtitleVersion,\
+     VideoUrl
 from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
 from django.db.models.signals import post_save, post_delete, pre_delete
@@ -113,6 +114,8 @@ class Team(models.Model):
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
+    # these allow unisubs to do things on user's behalf such as uploding subs to Youtub
+    third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",  related_name='tseams', verbose_name=_('third party accounts'))
     points = models.IntegerField(default=0, editable=False)
     applicants = models.ManyToManyField(User, through='Application', related_name='applicated_teams', verbose_name=_('applicants'))
     created = models.DateTimeField(auto_now_add=True)
@@ -1836,3 +1839,4 @@ class TeamNotificationSetting(models.Model):
 
     def __unicode__(self):
         return u'NotificationSettings for team %s' % (self.team)
+

@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import datetime
-
+import urllib
 from django.utils.http import urlencode
 from utils import render_to, render_to_json
 from utils.searching import get_terms
@@ -36,6 +36,7 @@ from teams.signals import api_teamvideo_new
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -56,6 +57,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from utils.translation import SUPPORTED_LANGUAGES_DICT
 from messages import tasks as notifier
 from apps.videos.templatetags.paginator import paginate
+
+from accountlinker.models import ThirdPartyAccount
 
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -1341,3 +1344,34 @@ def edit_project(request, slug, project_slug):
         workflow_form = WorkflowForm(instance=workflow)
 
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
+
+@render_to('teams/_third-party-accounts.html')
+@login_required
+def third_party_accounts(request, slug):
+    team = get_object_or_404(Team, slug=slug)
+    if not can_change_team_settings(team, request.user):
+        messages.error(request, _(u'You do not have permission to edit this team.'))
+        return HttpResponseRedirect(team.get_absolute_url())
+
+    base =  "https://accounts.google.com/o/oauth2/auth?"
+    state = team.pk
+    
+    params = {
+        "client_id": settings.YOUTUBE_CLIENT_ID,
+        "redirect_uri": "http://%s%s" % (
+            Site.objects.get_current().domain,
+            reverse("accountlinker:youtube-oauth-callback")),
+        "scope": "https://gdata.youtube.com",
+        "state": state,
+        "response_type": "code",
+        "access_type": "offline",
+        
+    }
+    new_youtube_url = "%s?%s" % (base, urllib.urlencode(params))
+    linked_accounts = team.third_party_accounts.all()
+    return {
+        "team":team,
+        "new_youtube_url": new_youtube_url,
+        "linked_accounts": linked_accounts,
+    }
+
