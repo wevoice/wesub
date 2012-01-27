@@ -179,7 +179,7 @@ def detail(request, slug, project_slug=None, languages=None):
         # Cheat and reduce the number of videos on the page if we're dealing with
         # someone who can edit videos in the team, for performance reasons.
         is_editor = True
-        per_page = 6
+        per_page = 8
     else:
         is_editor = False
         per_page = VIDEOS_ON_PAGE
