@@ -1745,25 +1745,32 @@ ol.subtitles {
         width: 24.7%;
         float: left;
         border-right: 1px solid #eaeaea;
+        padding: 0;
         text-align: center;
-        padding: .75em 0 .5em;
 
+        a {
+            color: #999;
+            display: block;
+            padding: .75em 0 .5em;
+
+            p {
+                font-size: 1.25em;
+                margin: 0;
+                line-height: 1em;
+                text-shadow: 1px -1px 1px #fff;
+            }
+            h4 {
+                font-weight: normal;
+                font-size: 11px;
+                padding-top: .25em;
+                padding-bottom: 0;
+            }
+            &:hover {
+                color: #35424A;
+            }
+        }
         &:last-child {
             border: none;
-        }
-
-        p {
-            font-size: 1.25em;
-            margin: 0;
-            line-height: 1em;
-            text-shadow: 1px -1px 1px #fff;
-        }
-
-        h4 {
-            font-weight: normal;
-            font-size: 11px;
-            padding-top: .25em;
-            padding-bottom: 0;
         }
     }
 }
