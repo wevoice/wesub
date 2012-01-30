@@ -11,7 +11,7 @@ LOCALES_RE = '|'.join(SUPPORTED_LOCALES)
 PATH_RE = re.compile(r'^/(?P<locale>%s)(?=/)(?P<path>.*)$' % LOCALES_RE)
 DOMAIN_RE = re.compile(r'^(?P<locale>%s)(?=/)\.(?P<domain>.*)$' % LOCALES_RE)
 DOMAIN_MAP = dict(localeurl.settings.DOMAINS)
-
+DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https://')
 from django.contrib.sites.models import Site
 
 def is_locale_independent(path):
@@ -112,7 +112,7 @@ def universal_url( *args, **kwargs):
     This is useful for email links, for exaple, where the recipient should choose the locale,
     and therefore the url
     """
-    protocol = kwargs.pop("protocol", "http")
+    protocol = DEFAULT_PROTOCOL
     try:
         original = urlresolvers.reverse(*args, **kwargs)
     except Exception, e:
