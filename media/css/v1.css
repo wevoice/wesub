@@ -56,8 +56,8 @@ body{overflow-y:scroll;}
 .v1 .listing >li .assignee-choice a{display:block;}
 .v1 .listing >li .assignee-choice .cancel{float:right;color:#7692a3;}
 .v1 .listing >li .action-assign-submit{color:#FFF;}
-.v1 .listing.videos>li{position:relative;width:310px;padding:10px 0;float:left;border:none;}.v1 .listing.videos>li h3{clear:both;margin:0 10px 10px;height:2em;}
-.v1 .listing.videos>li .thumb{position:relative;top:0;height:230px;}.v1 .listing.videos>li .thumb img{width:290px;margin:10px 10px 0;}
+.v1 .listing.videos>li{position:relative;width:310px;padding:10px 0;float:left;border:none;}.v1 .listing.videos>li h3{clear:both;margin:6px 10px 10px;height:2em;}
+.v1 .listing.videos>li .thumb{position:relative;top:0;height:180px;overflow:hidden;}.v1 .listing.videos>li .thumb img{width:290px;margin:10px 10px 0;}
 .v1 .listing.videos>li a{text-decoration:none;}
 .v1 .listing.videos>li .languages{position:absolute;top:17px;left:17px;width:auto;margin:0;padding:.5em .75em;background:rgba(0, 0, 0, 0.35);color:#eee;text-shadow:1px 1px 1px #444;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;}
 .v1 .listing.videos>li:hover .languages{background:rgba(0, 0, 0, 0.55);}
@@ -191,6 +191,8 @@ ol.subtitles li .timing .data{display:none;}
 .v1 .filters div.chzn-container-active div.chzn-drop{margin-left:-5px !important;margin-top:-1px !important;z-index:50;}
 .v1 .bootstrap .modal .modal-header h3{padding:0;border:none;margin:0;clear:none;font-size:16px;}
 .v1 .bootstrap .modal form{padding:0;margin:0;}.v1 .bootstrap .modal form p{float:none;}
+.v1 .bootstrap .modal form fieldset{padding-bottom:1em;}
+.v1 .bootstrap .modal form label.radio,.v1 .bootstrap .modal form label.checkbox{padding:0;display:block;float:none;text-align:left;width:100%;}.v1 .bootstrap .modal form label.radio input,.v1 .bootstrap .modal form label.checkbox input{margin-right:.5em;}
 .v1 .bootstrap .modal .modal-body fieldset{padding:0;}
 .v1 .bootstrap .modal .modal-body textarea{font-family:Monaco,"Bitstream Vera Sans Mono","Lucida Console",monospace;width:98%;height:auto;}
 .v1 .bootstrap .modal .modal-body ul.chzn-choices,.v1 .bootstrap .modal .modal-body ul.chzn-results{margin:0 !important;}

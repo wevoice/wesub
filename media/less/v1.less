@@ -599,14 +599,15 @@ body {
 
     h3 {
         clear: both;
-        margin: 0 10px 10px;
+        margin: 6px 10px 10px;
         height: 2em;
     }
 
     .thumb {
         position: relative;
         top: 0;
-        height: 230px;
+        height: 180px;
+        overflow: hidden;
 
         img {
             width: 290px;
@@ -1688,6 +1689,22 @@ ol.subtitles {
 
         p {
             float: none;
+        }
+
+        fieldset {
+            padding-bottom: 1em;
+        }
+
+        label.radio, label.checkbox {
+            padding: 0;
+            display: block;
+            float: none;
+            text-align: left;
+            width: 100%;
+
+            input {
+                margin-right: .5em;
+            }
         }
     }
 
