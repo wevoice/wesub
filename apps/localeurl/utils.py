@@ -11,7 +11,7 @@ LOCALES_RE = '|'.join(SUPPORTED_LOCALES)
 PATH_RE = re.compile(r'^/(?P<locale>%s)(?=/)(?P<path>.*)$' % LOCALES_RE)
 DOMAIN_RE = re.compile(r'^(?P<locale>%s)(?=/)\.(?P<domain>.*)$' % LOCALES_RE)
 DOMAIN_MAP = dict(localeurl.settings.DOMAINS)
-DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https://')
+DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
 from django.contrib.sites.models import Site
 
 def is_locale_independent(path):
