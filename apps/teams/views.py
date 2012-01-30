@@ -16,8 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import datetime
-import urllib
 from django.utils.http import urlencode
 from utils import render_to, render_to_json
 from utils.searching import get_terms
@@ -49,7 +47,7 @@ from django.contrib.auth.decorators import permission_required
 import random
 from widget.views import base_widget_params
 import widget
-from videos.models import Action
+from videos.models import Action, VideoUrl
 from django.utils import simplejson as json
 from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
@@ -1051,7 +1049,7 @@ def _tasks_list(request, team, project, filters, user):
         elif assignee:
             tasks = tasks.filter(assignee=int(assignee))
 
-    return tasks.select_related('team_video__video', 'assignee', 'team')
+    return tasks.select_related('team_video__video', 'team_video__team', 'assignee', 'team', 'team_video__project')
 
 def _order_tasks(request, tasks):
     sort = request.GET.get('sort', '-created')
@@ -1122,6 +1120,13 @@ def team_tasks(request, slug, project_slug=None):
     widget_settings = {}
     from apps.widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
+
+    video_pks = [t.team_video.video_id for t in tasks]
+    video_urls = dict([(vu.video_id, vu.effective_url) for vu in
+                       VideoUrl.objects.filter(video__in=video_pks, primary=True)])
+
+    for t in tasks:
+        t.cached_video_url = video_urls.get(t.team_video.video_id)
 
     context = {
         'team': team,

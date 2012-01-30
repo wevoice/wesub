@@ -1,13 +1,14 @@
 {% load i18n %}
+
 {% if task.get_type_display == "Subtitle" or task.get_type_display == "Translate"%}
     <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Perform Task" %}</a>
 
     <script type="text/javascript">
         $('.perform-task-{{ task.pk }}').click(function() {
-            var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
+            var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.cached_video_url }}');
             var opener = new unisubs.widget.SubtitleDialogOpener(
                 '{{ task.team_video.video.video_id }}',
-                '{{ task.team_video.video.get_video_url }}',
+                '{{ task.cached_video_url }}',
                 videoSource, null, null, 'fr'
             );
             {% if task.language %}
