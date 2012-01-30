@@ -41,5 +41,5 @@ class ThirdPartyAccount(models.Model):
                                            null=False, blank=False)
     
     class Meta:
-        unique_together = ("type", "oauth_access_token")
+        unique_together = ("type", "username")
     

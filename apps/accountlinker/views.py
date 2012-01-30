@@ -26,6 +26,8 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 
 from accountlinker.models import ThirdPartyAccount
+from localeurl.utils import universal_url
+
 from teams.models import Team
 from videos.models import VIDEO_TYPE_YOUTUBE
 from videos.types.youtube import YouTubeApiBridge
@@ -42,9 +44,8 @@ def _generate_youtube_oauth_request_link(state_str=None):
     
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
-        "redirect_uri": "http://%s%s" % (
-            Site.objects.get_current().domain,
-            reverse("accountlinker:youtube-oauth-callback")),
+        "redirect_uri": 
+            universal_url("accountlinker:youtube-oauth-callback"),
         "scope": "https://gdata.youtube.com",
         "state": state,
         "response_type": "code",
@@ -78,9 +79,7 @@ def youtube_oauth_callback(request):
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
         "client_secret": settings.YOUTUBE_CLIENT_SECRET,
-        "redirect_uri": "http://%s%s" % (
-            Site.objects.get_current().domain,
-            reverse("accountlinker:youtube-oauth-callback")),
+        "redirect_uri": universal_url("accountlinker:youtube-oauth-callback"),
         "code": code,
         "grant_type": "authorization_code",
         
@@ -103,11 +102,15 @@ def youtube_oauth_callback(request):
     feed = client.GetUserFeed(username='default')
     author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
     
-   # need to store the username for this account
-    team.third_party_accounts.create(
+    # make sure we don't store multiple auth tokes for the same account
+    account, created  = ThirdPartyAccount.objects.get_or_create(
         type = VIDEO_TYPE_YOUTUBE,
-        oauth_refresh_token = content['refresh_token'],
-        oauth_access_token = content['access_token'],
-        username = author.name.text
+        username = author.name.text,
+        defaults = {
+            
+        'oauth_refresh_token' : content['refresh_token'],
+        'oauth_access_token' : content['access_token'],
+        }
     )
+    team.third_party_accounts.add(account)
     return redirect(reverse("teams:third-party-accounts", kwargs={"slug":team.slug}))
