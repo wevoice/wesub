@@ -300,7 +300,6 @@ class Video(models.Model):
             return reverse('videos:video_with_title',
                            kwargs=kwargs)
         return reverse('videos:video',  kwargs=kwargs)
-    
 
     get_absolute_url = _get_absolute_url
 
