@@ -622,6 +622,7 @@ class VideoMetadata(models.Model):
                 return
         choices = choices + ((num, readable_name,),)
         # public attr is read only
+        global VIDEO_META_CHOICES
         VIDEO_META_CHOICES = field._choices = choices
         update_metadata_choices()
 
