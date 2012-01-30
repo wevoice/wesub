@@ -328,7 +328,7 @@ unisubs.subtitle.Dialog.prototype.saveWorkImpl_ = function(closeAfterSave, isCom
         },
         function(opt_status) {
             if (that.finishFailDialog_)
-                that.finishFailDialog_.failedAgain(opt_status);
+               that.finishFailDialog_.failedAgain(opt_status);
             else
                 that.finishFailDialog_ = unisubs.finishfaildialog.Dialog.show(
                     that.captionSet_, opt_status,
@@ -386,20 +386,26 @@ unisubs.subtitle.Dialog.prototype.showHowToForState_ = function(state) {
         videoChoice = vc.SYNC;
     else if (state == s.REVIEW)
         videoChoice = vc.REVIEW;
-    var howToPanel = new unisubs.HowToVideoPanel(videoChoice);
-    this.showTemporaryPanel(howToPanel);
-    this.displayingHowTo_ = true;
-    var that = this;
-    this.getHandler().listenOnce(
-        howToPanel, unisubs.HowToVideoPanel.CONTINUE,
-        function(e) {
-            goog.Timer.callOnce(function() {
-                that.displayingHowTo_ = false;
-                that.hideTemporaryPanel();
-                that.showGuidelinesForState_(state);
+    if (videoChoice){
+        // the edit metadata has no helper video
+        var howToPanel = new unisubs.HowToVideoPanel(videoChoice);
+        this.showTemporaryPanel(howToPanel);
+        this.displayingHowTo_ = true;
+        var that = this;
+        this.getHandler().listenOnce(
+            howToPanel, unisubs.HowToVideoPanel.CONTINUE,
+            function(e) {
+                goog.Timer.callOnce(function() {
+                    that.displayingHowTo_ = false;
+                    that.hideTemporaryPanel();
+                    that.showGuidelinesForState_(state);
+                });
             });
-        });
-};
+        
+    }else{
+        this.showGuidelinesForState_(state);
+    }
+ };
 
 unisubs.subtitle.Dialog.prototype.skipBack_ = function() {
     var videoPlayer = this.getVideoPlayerInternal();
