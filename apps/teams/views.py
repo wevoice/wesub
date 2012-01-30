@@ -246,6 +246,11 @@ def detail(request, slug, project_slug=None, languages=None):
 
     return extra_context
 
+def role_saved(request, slug):
+    messages.success(request, _(u'Member saved.'))
+    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
+    return HttpResponseRedirect(return_path)
+
 def completed_videos(request, slug):
     team = Team.get(slug, request.user)
     if team.is_member(request.user):
