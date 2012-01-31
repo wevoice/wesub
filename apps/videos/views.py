@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -215,7 +215,7 @@ def video(request, video, video_url=None, title=None):
         # a video might have more than 1 is_original sl, in which case
         # we guess the right one above, but still manage to include the others
         # bellow
-        translations.exclude(pk=original.pk)
+        translations = translations.exclude(pk=original.pk)
     translations = list(translations)
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations
