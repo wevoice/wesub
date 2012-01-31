@@ -38,22 +38,22 @@ goog.inherits(unisubs.widget.EmptySubsWarningDialog, goog.ui.Dialog);
 unisubs.widget.EmptySubsWarningDialog.prototype.createDom = function() {
     unisubs.widget.EmptySubsWarningDialog.superClass_.createDom.call(this);
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    this.getElement().appendChild($d('h3', null, "You have no subtitles to save"));
+    this.getElement().appendChild($d('h3', null, "You haven't entered any subtitles!"));
     this.getElement().appendChild(
         $d('div', null,
            $d('p', null, 
-              'Either go back and do some subtitling work, or just ' +
-              'leave without saving anything' )));
+              'You can go back and continue working on these subtitles, or ' +
+              'you can just exit without saving.' )));
     this.backToSubtitlingButton_ =
         $d('a',
            {'href':'#',
             'className': 'unisubs-green-button unisubs-big'},
-           'Back To subtitling!');
+           'Back to subtitling!');
     this.justQuitButton_ =
         $d('a',
            {'href':'#',
             'className': 'unisubs-green-button unisubs-big'},
-           'Leave without saving');
+           'Just exit');
     this.getElement().appendChild(this.backToSubtitlingButton_);
     this.getElement().appendChild(this.justQuitButton_);
     var clearDiv = $d('div');
