@@ -269,12 +269,13 @@ import gdata.youtube
 import gdata.youtube.service
            
 class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
+       
+    def __init__(self, access_token, refresh_token, youtube_video_id):
         """
         A wrapper around the gdata client, to make life easier.
         In order to edit captions for a video, the oauth credentials
         must be that video's owner on youtube.
         """
-    def __init__(self, access_token, refresh_token, youtube_video_id):
         super(YouTubeApiBridge, self).__init__()
         self.token  = gdata.gauth.OAuth2Token(
             client_id=settings.YOUTUBE_CLIENT_ID,
