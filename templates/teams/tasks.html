@@ -193,7 +193,7 @@
                                             </a>
                                         </li>
                                     {% endif %}
-                                    {% if task|can_delete_task:user %}
+                                    {% if task|can_delete_task:user and task.get_type_display != 'Review' and task.get_type_display != 'Approve' %}
                                         <li>
                                             <form action="{% url teams:delete_task slug=team.slug %}" method="post">
                                                 {% csrf_token %}
