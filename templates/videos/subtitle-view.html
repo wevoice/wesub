@@ -140,20 +140,28 @@
 
         <ul class="metrics">
             <li>
-                <p>{{ language.subtitles_fetched_count|simplify_number }}</p>
-                <h4>{% trans "View" %}{{ language.subtitles_fetched_count|pluralize }}</h4>
+                <div>
+                    <p>{{ language.subtitles_fetched_count|simplify_number }}</p>
+                    <h4>{% trans "View" %}{{ language.subtitles_fetched_count|pluralize }}</h4>
+                </div>
             </li>
             <li>
-                <p>{{ language.followers.count }}</p>
-                <h4>{% trans "Follower" %}{{ language.followers.count|pluralize }}</h4>
+                <div>
+                    <p>{{ language.followers.count }}</p>
+                    <h4>{% trans "Follower" %}{{ language.followers.count|pluralize }}</h4>
+                </div>
             </li>
             <li>
-                <p>{{ language|get_comment_count }}</p>
-                <h4>{% trans 'Comment' %}{{ language|get_comment_count|pluralize }}</h4>
+                <div>
+                    <p>{{ language|get_comment_count }}</p>
+                    <h4>{% trans 'Comment' %}{{ language|get_comment_count|pluralize }}</h4>
+                </div>
             </li>
             <li>
-                <p>{{ language.subtitle_count }}</p>
-                <h4>{% trans "Line" %}{{ language.subtitle_count|pluralize }}</h4>
+                <div>
+                    <p>{{ language.subtitle_count }}</p>
+                    <h4>{% trans "Line" %}{{ language.subtitle_count|pluralize }}</h4>
+                </div>
             </li>
         </ul>
         <div class="sharing-tools">

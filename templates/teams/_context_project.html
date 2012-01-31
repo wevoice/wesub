@@ -18,12 +18,16 @@
 </div>
 <ul class="metrics">
     <li>
-        <p>{{ project.videos_count|simplify_number }}</p>
-        <h4>{% trans "Video" %}{{ project.videos_count|pluralize }}</h4>
+        <div>
+            <p>{{ project.videos_count|simplify_number }}</p>
+            <h4>{% trans "Video" %}{{ project.videos_count|pluralize }}</h4>
+        </div>
     </li>
     <li>
-        <p>{{ project.tasks_count|simplify_number }}</p>
-        <h4>{% trans "Task" %}{{ project.tasks_count|pluralize }}</h4>
+        <div>
+            <p>{{ project.tasks_count|simplify_number }}</p>
+            <h4>{% trans "Task" %}{{ project.tasks_count|pluralize }}</h4>
+        </div>
     </li>
 </ul>
 {% if team.is_visible %}

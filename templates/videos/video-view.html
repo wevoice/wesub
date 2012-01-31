@@ -103,20 +103,28 @@
         </div>
         <ul class="metrics">
             <li>
-                <p>{{ video.widget_views_count|simplify_number }}</p>
-                <h4>{% trans "View" %}{{ video.widget_views_count|pluralize }}</h4>
+                <div>
+                    <p>{{ video.widget_views_count|simplify_number }}</p>
+                    <h4>{% trans "View" %}{{ video.widget_views_count|pluralize }}</h4>
+                </div>
             </li>
             <li>
-                <p>{{ video.followers.count }}</p>
-                <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
+                <div>
+                    <p>{{ video.followers.count }}</p>
+                    <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
+                </div>
             </li>
             <li>
-                <p>{{ video|get_comment_count }}</p>
-                <h4>{% trans "Comment" %}{{ video|get_comment_count|pluralize }}</h4>
+                <div>
+                    <p>{{ video|get_comment_count }}</p>
+                    <h4>{% trans "Comment" %}{{ video|get_comment_count|pluralize }}</h4>
+                </div>
             </li>
             <li>
-                <p>{{ video.languages_count }}</p>
-                <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
+                <div>
+                    <p>{{ video.languages_count }}</p>
+                    <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
+                </div>
             </li>
         </ul>
         <div class="sharing-tools">
