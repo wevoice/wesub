@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from teams.models import TeamVideo, TeamVideoLanguage
@@ -70,7 +70,7 @@ def _update_changes_on_version(version, last_version):
 
 def _update_changes_on_nonzero_version(version, last_version):
     subtitles = version.subtitles()
-    last_subtitles = dict([(item.subtitle_id, item) 
+    last_subtitles = dict([(item.subtitle_id, item)
                            for item in last_version.subtitles()])
     time_count_changed, text_count_changed = 0, 0
     new_subtitles_ids = set()
@@ -146,7 +146,7 @@ def _update_languages_count(video):
     video.languages_count = video.subtitlelanguage_set.filter(had_version=True).count()
     video.save()
 
-def _update_complete_date(video): 
+def _update_complete_date(video):
     is_complete = video.is_complete
     if is_complete and video.complete_date is None:
         video.complete_date = datetime.now()

@@ -451,7 +451,7 @@ def history(request, video, lang=None, lang_id=None):
         else:
             raise Http404
 
-    qs = language.subtitleversion_set.select_related('user')
+    qs = language.subtitleversion_set.not_restricted_by_moderation().select_related('user')
     ordering, order_type = request.GET.get('o'), request.GET.get('ot')
     order_fields = {
         'date': 'datetime_started',
@@ -481,7 +481,7 @@ def history(request, video, lang=None, lang_id=None):
 
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations
-    context['last_version'] = language.latest_version(public_only=False)
+    context['last_version'] = language.last_version
     context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
     context['edit_url'] = language.get_widget_url()

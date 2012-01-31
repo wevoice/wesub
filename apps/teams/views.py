@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -20,11 +20,14 @@ from django.utils.http import urlencode
 from utils import render_to, render_to_json
 from utils.searching import get_terms
 from utils.translation import get_languages_list, languages_with_names
+from utils.forms import flatten_errorlists
+from videos import metadata_manager
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
-    GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm
+    GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
+    UnpublishForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -34,7 +37,6 @@ from teams.signals import api_teamvideo_new
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.models import Site
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -56,14 +58,12 @@ from utils.translation import SUPPORTED_LANGUAGES_DICT
 from messages import tasks as notifier
 from apps.videos.templatetags.paginator import paginate
 
-from accountlinker.models import ThirdPartyAccount
-
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
     can_create_task_translate, can_view_tasks_tab, can_invite,
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
-    can_perform_task_for, can_delete_team,
+    can_perform_task_for, can_delete_team, can_review, can_approve,
 )
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
@@ -1373,4 +1373,72 @@ def third_party_accounts(request, slug):
         "new_youtube_url": new_youtube_url,
         "linked_accounts": linked_accounts,
     }
+
+
+# Unpublishing
+def _create_task_after_unpublishing(subtitle_version):
+    team_video = subtitle_version.language.video.get_team_video()
+    lang = subtitle_version.language.language
+
+    # If there's already an open review/approval task for this language, it
+    # means we just unpublished multiple versions in a row and can ignore this.
+    open_task_exists = (team_video.task_set.incomplete_review().exists()
+                     or team_video.task_set.incomplete_approve().exists())
+    if open_task_exists:
+        return None
+
+    workflow = Workflow.get_for_team_video(team_video)
+    if workflow.approve_allowed:
+        type = Task.TYPE_IDS['Approve']
+        can_do = can_approve
+    else:
+        type = Task.TYPE_IDS['Review']
+        can_do = can_review
+
+    last_task = (team_video.task_set.complete().filter(language=lang, type=type)
+                                               .order_by('-completed')
+                                               [:1])
+
+    assignee = None
+    if last_task:
+        candidate = last_task[0].assignee
+        if candidate and can_do(team_video, candidate, lang):
+            assignee = candidate
+
+    task = Task(team=team_video.team, team_video=team_video,
+                assignee=assignee, language=lang, type=type,
+                subtitle_version=subtitle_version)
+    task.save()
+
+    return task
+
+def unpublish(request, slug):
+    team = get_object_or_404(Team, slug=slug)
+
+    form = UnpublishForm(request.user, team, request.POST)
+    if not form.is_valid():
+        messages.error(request, _(u'Invalid unpublishing request.\nErrors:\n') + '\n'.join(flatten_errorlists(form.errors)))
+        return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
+
+    version = form.cleaned_data['subtitle_version']
+    team_video = version.language.video.get_team_video()
+    scope = form.cleaned_data['scope']
+    should_delete = form.cleaned_data['should_delete']
+
+    if scope == 'version':
+        result = version.unpublish(delete=should_delete)
+    elif scope == 'language':
+        # TODO Fix this...
+        result = version.language.unpublish(delete=should_delete)
+    else:
+        # TODO Write scope == 'dependents' code.
+        pass
+
+    if result:
+        _create_task_after_unpublishing(result)
+
+    metadata_manager.update_metadata(team_video.video.pk)
+
+    messages.success(request, _(u'Successfully unpublished subtitles.'))
+    return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
 

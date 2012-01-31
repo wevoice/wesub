@@ -38,11 +38,9 @@ from django.utils.http import urlquote_plus
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
-
 from auth.models import CustomUser as User, Awards
 from videos import EffectiveSubtitle, is_synced, is_synced_value
 from videos.types import video_type_registrar
-from videos.types.youtube import yt_service
 from videos.feed_parser import FeedParser
 from comments.models import Comment
 from statistic import st_widget_view_statistic
@@ -51,7 +49,9 @@ from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
 
-from apps.teams.moderation_const import WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED
+from apps.teams.moderation_const import (
+    WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED, REJECTED
+)
 
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)
@@ -953,12 +953,12 @@ class SubtitleLanguage(models.Model):
 
         return percent_done
 
-    def unpublish(self):
+    def unpublish(self, delete=False):
         '''Unpublish all versions of this language.'''
 
         version = self.subtitleversion_set.order_by('version_no')[:0]
         if version:
-            version[0].unpublish()
+            return version[0].unpublish(delete=delete)
 
 
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
@@ -1010,6 +1010,9 @@ class SubtitleCollection(models.Model):
 
 # SubtitleVersion
 class SubtitleVersionManager(models.Manager):
+    def not_restricted_by_moderation(self):
+        return self.get_query_set().exclude(moderation_status__in=[WAITING_MODERATION, REJECTED])
+
     def new_version(self, parser, language, user,
                     translated_from=None, note="", timestamp=None):
         version_no = 0
@@ -1240,13 +1243,13 @@ class SubtitleVersion(SubtitleCollection):
                 return False
         return True
 
-    def unpublish(self):
+    def unpublish(self, delete=False):
         '''Unpublish this subtitle version (and all versions after it).
 
         Does NOT create any Tasks to go back and fix them.
 
         Returns the last SubtitleVersion in the chain (which is the one you'll
-        probably want to create a task for).
+        probably want to create a task for) when not deleting.
 
         '''
         team_video = self.language.video.get_team_video()
@@ -1263,17 +1266,22 @@ class SubtitleVersion(SubtitleCollection):
             version_no__gte=self.version_no
         ).order_by('version_no')
 
-        last_version = None
-        for version in versions:
-            # Loop through instead of using .update() to ensure any .save()
-            # methods and signals get called.
-            version.moderation_status = WAITING_MODERATION
-            version.save()
-            last_version = version
+        if delete:
+            versions.delete()
+            return None
+        else:
+            last_version = None
+            for version in versions:
+                print "Unpublishing", version
+                # Loop through instead of using .update() to ensure any .save()
+                # methods and signals get called properly.
+                version.moderation_status = WAITING_MODERATION
+                version.save()
+                last_version = version
 
-        # TODO: Dependent translations.  We'll also need to create tasks for
-        # them.
-        return last_version
+            # TODO: Dependent translations.  We'll also need to create tasks for
+            # them.
+            return last_version
 
 
 def update_followers(sender, instance, created, **kwargs):

@@ -417,7 +417,7 @@ def can_change_video_settings(user, team_video):
     return role in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]
 
 
-def can_review(team_video, user, lang=None):
+def can_review(team_video, user, lang=None, allow_own=False):
     workflow = Workflow.get_for_team_video(team_video)
     role = get_role_for_target(user, team_video.team, team_video.project, lang)
 
@@ -434,7 +434,11 @@ def can_review(team_video, user, lang=None):
     if role not in _perms_equal_or_greater(role_req):
         return False
 
-    # Users cannot review their own subtitles.
+    # Users cannot review their own subtitles, unless we're specifically
+    # overriding that restriction in the arguments.
+    if allow_own:
+        return True
+
     subtitle_version = team_video.video.latest_version(language_code=lang, public_only=False)
     if lang and subtitle_version.user == user:
         # Hacky special case.  When the following is true:
@@ -519,6 +523,18 @@ def can_publish_edits_immediately(team_video, user, lang):
         return can_review(team_video, user, lang)
 
     return True
+
+
+def can_unpublish_subs(team_video, user, lang):
+    workflow = Workflow.get_for_team_video(team_video)
+
+    if workflow.approve_allowed:
+        return can_approve(team_video, user, lang)
+
+    if workflow.review_allowed:
+        return can_review(team_video, user, lang, allow_own=True)
+
+    return False
 
 
 # Task permissions

@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,27 +15,30 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import re
+
+from django import forms
+from django.conf import settings
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User
-from django import forms
-from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
-from django.utils.translation import ugettext_lazy as _
-from utils.validators import MaxFileSizeValidator
-from django.conf import settings
-from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS
-from videos.forms import AddFromFeedForm
-from django.utils.safestring import mark_safe
-from utils.forms import ErrorableModelForm
-import re
-from utils.translation import get_languages_list
-from utils.forms.unisub_video_form import UniSubBoundVideoField
-from teams.permissions import can_assign_task
-
-from apps.teams.moderation import add_moderation, remove_moderation
-from apps.teams.permissions import roles_user_can_invite, can_delete_task, can_add_video, can_perform_task
-from apps.teams.permissions_const import ROLE_NAMES
-
 from doorman import feature_is_on
+from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
+from teams.moderation import add_moderation, remove_moderation
+
+from teams.permissions import (
+    roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
+    can_assign_task, can_unpublish_subs
+)
+
+from teams.permissions_const import ROLE_NAMES
+from utils.forms import ErrorableModelForm
+from utils.forms.unisub_video_form import UniSubBoundVideoField
+from utils.translation import get_languages_list
+from utils.validators import MaxFileSizeValidator
+from videos.forms import AddFromFeedForm
+from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion
 
 
 class EditTeamVideoForm(forms.ModelForm):
@@ -588,4 +591,43 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ('name', 'description', 'workflow_enabled')
+
+
+class UnpublishForm(forms.Form):
+    subtitle_version = forms.ModelChoiceField(queryset=SubtitleVersion.objects.all())
+
+    should_delete = forms.BooleanField(
+            label=_(u'Would you like to delete these subtitles completely?'),
+            required=False)
+
+    scope = forms.ChoiceField(
+            label=_(u'What would you like to unpublish?'),
+            choices=(
+                ('version',    _(u'This version (and any later version) for this language.')),
+                ('language',   _(u'All versions for this language.')),
+                ('dependents', _(u'All versions for this language and any dependent languages.'))))
+
+
+    def __init__(self, user, team, *args, **kwargs):
+        super(UnpublishForm, self).__init__(*args, **kwargs)
+
+        self.user = user
+        self.team = team
+
+    def clean(self):
+        subtitle_version = self.cleaned_data['subtitle_version']
+
+        team_video = subtitle_version.language.video.get_team_video()
+
+        if not team_video:
+            raise forms.ValidationError(_(
+                u"These subtitles are not under a team's control."))
+
+        if not can_unpublish_subs(team_video, self.user, subtitle_version.language.language):
+            raise forms.ValidationError(_(
+                u'You do not have permission to unpublish these subtitles.'))
+
+        return self.cleaned_data
+
+
 

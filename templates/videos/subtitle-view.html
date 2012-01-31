@@ -31,14 +31,14 @@
             //set values from arguents
             return DIFFING_URL.replace(/<<first_pk>>/, first_pk).replace(/<<second_pk>>/, second_pk);
         }
-    
+
         jQuery(document).ready( function($) {
             $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
-    
+
             $('.version_checkbox', '.revisions').change( function() {
                 var $this = $(this);
                 var checked_length = $('.version_checkbox:checked').length;
-    
+
                 if ($this.attr('checked') && (checked_length > 2)) {
                     $this.attr('checked', '');
                 }
@@ -53,7 +53,7 @@
                 }
             });
             $('.tabs').tabs();
-    
+
             $('#add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
@@ -111,7 +111,7 @@
                 {% trans "subtitles" %}
                 {%comment%}{% if language.is_dependent %}
                     {% trans 'translated from' %} {{ language.standard_language }}
-                {% endif %}{%endcomment%}    
+                {% endif %}{%endcomment%}
             </a>
         </h3>
         <h2 class="main-title">
@@ -175,7 +175,7 @@
                 ({{ video.languages_count }})
             {% endif %}
         </h3>
-        
+
         <div{% if video.languages_count > 15 %} class="abbr collapsed"{% endif %}>
             <div>
                 <ul id="subtitles-menu">
@@ -228,7 +228,7 @@
                             </li>
                             <li>
                                 <a href="{% url widget:download_dxfp %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">DFXP</a>
-                            </li>                                
+                            </li>
                         </ul>
                     </div>
                 {% endif %}
@@ -241,12 +241,12 @@
                         {{ language.standard_language }}.
                     {% endif %}
                     {% trans "Showing" %}
-                    <strong>{% trans "Revision" %} {{ language.last_version.version_no }}</strong>,
+                    <strong>{% trans "Revision" %} {{ last_version.version_no }}</strong>,
                     {% trans "created" %}
-                    <strong>{{ language.last_version.revision_time }}</strong>
+                    <strong>{{ last_version.revision_time }}</strong>
                     {% trans "by" %}
-                    <a href="{{ language.latest_version.user.profile_url}}" title="View {{ language.latest_version.user }}'s profile">
-                        <strong>{{ language.latest_version.user }}</strong>
+                    <a href="{{ last_version.user.profile_url}}" title="View {{ last_version.user }}'s profile">
+                        <strong>{{ last_version.user }}</strong>
                     </a>.
                 </p>
                 <ol class="subtitles">
@@ -303,7 +303,7 @@
                     </a>
                 </div>
             {% endif %}
-                    
+
             {% if revision_list %}
                 {% if is_paginated %}{% paginator '#revisions' %}{% endif %}
                 <ul class="listing revisions">
@@ -332,43 +332,54 @@
         </div>
     </div>
 
-    <!-- TODO: Wrap in conditional; only show if vid is moderated by a team and user has ability to approve -->
-    <div class="bootstrap">
-        <div class="modal" id="unpublish-modal">
-            <div class="modal-header">
-                <h3>{% trans 'Unpublish subtitles' %}</h3>
+    {% with video.get_team_video as team_video %}
+        <!-- TODO: Only show if vid is moderated by a team and user has ability to approve -->
+        {% if team_video %}
+            <div class="bootstrap">
+                <div class="modal" id="unpublish-modal">
+                    <div class="modal-header">
+                        <h3>{% trans 'Unpublish subtitles' %}</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="{% url teams:unpublish slug=video.get_team_video.team.slug %}">
+                            <fieldset>
+                                <h5>{% trans 'What would you like to unpublish?' %}</h5>
+                                <label class="radio">
+                                    <input type="radio" name="scope" value="version" checked="checked">
+                                    {% trans 'This version only' %}
+                                </label>
+                                <label class="radio">
+                                    <input type="radio" name="scope" value="language">
+                                    {% trans 'All versions for this language' %}
+                                </label>
+                                <label class="radio">
+                                    <input type="radio" name="scope" value="dependents">
+                                    {% trans 'This language and all dependent languages' %}
+                                </label>
+                            </fieldset>
+
+                            <fieldset>
+                                <h5>{% trans 'Would you like to delete these subtitles completely?' %}</h5>
+                                <label class="checkbox">
+                                    <input type="checkbox" name="should_delete" value="1">
+                                    {% trans 'Yes, delete these subtitles instead of sending them back for editing/review' %}
+                                </label>
+                            </fieldset>
+
+                            {% csrf_token %}
+
+                            <input type="hidden" name="next" value="{{ request.path }}" />
+                            <input type="hidden" name="subtitle_version" value="{{ last_version.pk }}" />
+
+                            <div class="modal-footer">
+                                <button>{% trans 'Unpublish' %}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <form action="">
-                    <fieldset>
-                        <h5>{% trans 'What would you like to unpublish?' %}</h5>
-                        <label class="radio">
-                            <input type="radio" name="scope" value="version" checked="checked">
-                            {% trans 'This version only' %}
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="scope" value="language">
-                            {% trans 'All versions for this language' %}
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="scope" value="dependents">
-                            {% trans 'This language and all dependent languages' %}
-                        </label>
-                    </fieldset>
-                    <fieldset>
-                        <h5>{% trans 'Would you like to delete these subtitles completely?' %}</h5>
-                        <label class="checkbox">
-                            <input type="checkbox" name="delete" value="delete">
-                            {% trans 'Yes, delete these subtitles instead of sending them back for editing/review' %}
-                        </label>
-                    </fieldset>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button>{% trans 'Unpublish' %}</button>
-            </div>
-        </div>
-    </div>
+        {% endif %}
+    {% endwith %}
 {% endblock %}
 
 {% block page_controls %}
@@ -404,7 +415,7 @@
                 );
                 opener.showStartDialog();
 
-              // trigger open dialog here 
+              // trigger open dialog here
             {% endif %}
 
         });
