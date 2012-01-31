@@ -488,7 +488,7 @@ def history(request, video, lang=None, lang_id=None):
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
 
     context['task'] =  _get_related_task(request)
-    _add_share_panel_context_for_history(context, video, lang)
+    _add_share_panel_context_for_history(context, video, language)
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.REVISIONS_ONPAGE,
                        page=request.GET.get('page', 1),

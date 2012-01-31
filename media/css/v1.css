@@ -212,6 +212,7 @@ pre.dump code{font-family:Consolas,Menlo,"Courier New",monospace;margin:15px 0;p
 #teams div.join{clear:both;padding-top:2em;}
 #teams .context #signin-join{display:block;margin:1em;}
 #teams .context .notation{clear:both;padding-top:2em;}
+#teams .context .notation.policy{padding-top:0;margin-bottom:1em;}
 #teams .context #projects-list h4{padding:1.5em 0 1em;}
 #teams .view .tools #sort-filter{padding:.5em;text-decoration:none;color:#678ca3;line-height:1.5em;}#teams .view .tools #sort-filter:hover{color:#2f3c45;}#teams .view .tools #sort-filter:hover span{background:url('../images/chosen-hover.png') no-repeat 4px 3px;}
 #teams .view .tools #sort-filter:hover span.open{background:url('../images/chosen-hover.png') no-repeat 4px -28px;}

@@ -33,6 +33,16 @@
 
 {% if team|is_team_member:user %}
     <h3>Member Tools</h3>
+    {% if team.max_tasks_per_member or team.task_expiration %}
+        <p class="notation policy">
+        {% if team.max_tasks_per_member %}
+        <strong>{{ team.max_tasks_per_member }}</strong> task{{ team.max_tasks_per_member|pluralize }} per member{% if team.task_expiration %} • {% endif %}
+        {% endif %}
+        {% if team.task_expiration %}
+            <strong>{{ team.task_expiration }}</strong> day{{ team.task_expiration|pluralize }} per task
+        {% endif %}
+        </p>
+    {% endif %}
     <ul>
         <li>
             <a href="{% url teams:project_tasks slug=team.slug, project_slug=project.slug %}?assignee=me">My tasks</a>
