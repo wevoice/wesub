@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -531,8 +531,8 @@ class Rpc(BaseRpc):
 
                 assignee = None
                 if last_task:
-                    candidate = last_task.assignee
-                    if candidate and not can_do(team_video, candidate, sl.language):
+                    candidate = last_task[0].assignee
+                    if candidate and can_do(team_video, candidate, sl.language):
                         assignee = candidate
 
                 # This is just terrible.
@@ -798,6 +798,7 @@ class Rpc(BaseRpc):
             language.get_title(),
             language.get_description()
         )
+
 
 def language_summary(language, team_video=-1, user=None):
     if team_video == -1:
