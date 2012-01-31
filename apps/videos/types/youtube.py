@@ -263,13 +263,20 @@ class YoutubeVideoType(VideoType):
         for item in langs:
             save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
             
-class YouTubeApiBridge(object):
-    def authorize(self, access_token, refresh_token):
-        import gdata
-        import gdata.youtube.client
-        import gdata.youtube
-	import gdata.youtube.service
-        token  = gdata.gauth.OAuth2Token(
+import gdata
+import gdata.youtube.client
+import gdata.youtube
+import gdata.youtube.service
+           
+class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
+        """
+        A wrapper around the gdata client, to make life easier.
+        In order to edit captions for a video, the oauth credentials
+        must be that video's owner on youtube.
+        """
+    def __init__(self, access_token, refresh_token, youtube_video_id):
+        super(YouTubeApiBridge, self).__init__()
+        self.token  = gdata.gauth.OAuth2Token(
             client_id=settings.YOUTUBE_CLIENT_ID,
             client_secret=settings.YOUTUBE_CLIENT_SECRET,
             scope='https://gdata.youtube.com',
@@ -277,7 +284,47 @@ class YouTubeApiBridge(object):
             access_token=access_token,
             refresh_token=refresh_token
         )
-        client = gdata.youtube.client.YouTubeClient()
-        token.authorize(client)
-        service = gdata.youtube.service.YouTubeService()
-        return client, service
+        self.token.authorize(self)
+        self.youtube_video_id  = youtube_video_id
+        
+    def _get_captions_info(self):
+        import atom
+        entry = self.GetVideoEntry(video_id=self.youtube_video_id)
+        links = [x for x in entry.get_elements() if isinstance(x, atom.data.Link)]
+        caption_track = entry.get_link(rel= 'http://gdata.youtube.com/schemas/2007#video.captionTracks')
+        captions_feed = self.get_feed(caption_track.href,  desired_class=gdata.youtube.data.CaptionFeed)
+        captions = captions_feed.entry
+        self.captions  = {}
+        for entry in captions:
+            lang = entry.get_elements(tag="content")[0].lang
+            url = entry.get_edit_media_link().href
+            self.captions[lang] = {
+                "url": url,
+                "track": entry
+            }
+
+        return self.captions
+
+    def upload_captions(self, subtitle_version):
+        """
+        Will upload the subtitle version to this youtube video id.
+        If the subtitle already exists, will update it. At this time
+        the youtube api does not allow for updating title, so once that is
+        set, that's it.
+        """
+        from widget.srt_subs import GenerateSubtitlesHandler
+        handler = GenerateSubtitlesHandler.get('srt')
+        lang = subtitle_version.language.language
+        subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
+        content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
+        title = subtitle_version.language.get_title()
+        # we cant just update, we need to check if it alredy exists... if so, we need to update, not create
+        if hasattr(self, "captions") is False:
+            self._get_captions_info()
+        if lang in self.captions:
+            # updade
+            res = self.update_track(self.youtube_video_id, self.captions[lang]['track'], content, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
+            pass
+        else:
+            res = self.create_track(self.youtube_video_id, title, lang, content, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
+        return res
