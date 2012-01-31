@@ -348,6 +348,7 @@ JS_DIALOG = \
     ['js/subtracker.js',
      'js/srtwriter.js',
      'js/widget/unsavedwarning.js',
+     'js/widget/emptysubswarningdialog.js',
      'js/widget/droplockdialog.js',
      'js/finishfaildialog/dialog.js',
      'js/finishfaildialog/errorpanel.js',

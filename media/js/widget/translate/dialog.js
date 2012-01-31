@@ -135,6 +135,12 @@ unisubs.translate.Dialog.prototype.enterDocument = function() {
         });
 };
 unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
+    if (goog.array.isEmpty(
+        this.serverModel_.captionSet_.nonblankSubtitles())){
+        // there are no subs here, close dialog or back to subtitling
+        this.showEmptySubsDialog();
+        return;
+    }
     var that = this;
     this.getRightPanelInternal().showLoading(true);
     this.serverModel_.finish(

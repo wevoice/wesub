@@ -290,6 +290,11 @@ unisubs.subtitle.Dialog.prototype.isWorkSaved = function() {
 unisubs.subtitle.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
     if (this.captionSet_.needsSync()) {
         this.saveWorkImpl_(closeAfterSave, false);
+    } else if (goog.array.isEmpty(
+        this.serverModel_.captionSet_.nonblankSubtitles())){
+        // there are no subs here, close dialog or back to subtitling
+        this.showEmptySubsDialog();
+        return;
     } else {
         unisubs.subtitle.CompletedDialog.show(
             !!this.subtitles_.IS_COMPLETE,
