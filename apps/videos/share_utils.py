@@ -42,14 +42,14 @@ def _add_share_panel_context(context, facebook_url, twitter_url, embed_params,
     context["share_panel_permalink"] = permalink
 
 def _share_video_title(video):
-    return u"(\"{0}\") ".format(video.title) if video.title else ''
+    return u"\"{0}\" ".format(video.title) if video.title else ''
 
 def _add_share_panel_context_for_video(context, video):
     page_url = reverse('videos:video', kwargs={'video_id':video.video_id})
     abs_page_url = "http://{0}{1}".format(domain, page_url)
     
     if video.latest_version() is not None:
-        msg = _(u"Just found a version of this video with captions")
+        msg = _(u"Just found a version of this video with subtitles")
     else:
         msg = _("Check out this video and help make subtitles")
         
@@ -69,19 +69,23 @@ def _add_share_panel_context_for_video(context, video):
     )
 
 def _add_share_panel_context_for_history(context, video, language=None):
-    page_url = reverse('videos:history', args=[video.video_id])
+    page_url = language.get_absolute_url() if language else video.get_absolute_url()
     abs_page_url = "http://{0}{1}".format(domain, page_url)
     
-    msg = _(u"Just found a version of this video with captions")
+    msg = _(u"%(language)s subtitles for %(video)s:") % {
+        'language': language,
+        'video':_share_video_title(video)
+    }
     
-    email_message = _(u"Hey-- just found a version of this video %(video_title)s with captions: %(url)s")
+    email_message = _(u"Hey-- just found %(language)s subtitles for %(video_title)s: %(url)s")
     email_message = email_message % {
-        "video_title":_share_video_title(video), 
+        "video_title":_share_video_title(video),
+        "language": language,
         "url": abs_page_url
     }
     
     if language:
-        base_state = {'language': language}
+        base_state = {'language': language.language}
     else:
         base_state = {}
     
