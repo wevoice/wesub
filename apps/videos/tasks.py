@@ -340,36 +340,40 @@ def _send_letter_caption(caption_version):
                              context, fail_silently=not settings.DEBUG)
 
 
+
 def _update_captions_in_original_service(version_pk):
     """
     Pushes the latest caption set for this version to
     the original video provider (only Youtube supported right now)
     In order for this to work we the version must be published, synced
-    and must have a ThirdPartyAccount object for the same service and 
+    and have a ThirdPartyAccount object for the same service and 
     the username matching the username for the video url.
     """
-    from videos.models import SubtitleVersion, VideoUrl
+    from videos.models import SubtitleVersion
     from accountlinker.models import ThirdPartyAccount
-    from teams.moderation_const import APPROVED, UNMODERATED
-    # has to be an absolute import, else tries the local module
-    from .videos.types import video_type_registrar
+    from .videos.types import UPDATE_VERSION_ACTION
     try:
-        version = SubtitleVersion.objects.get(pk=version_pk)
+        version = SubtitleVersion.objects.select_related("language", "language__video").get(pk=version_pk)
     except SubtitleVersion.DoesNotExist:
         return
-    if version.moderation_status not in [APPROVED, UNMODERATED]:
+    ThirdPartyAccount.objects.mirror_on_third_party(
+        version.video, version.language, UPDATE_VERSION_ACTION, version)         
+
+def _delete_captions_in_original_service(language_pk):
+    """
+    Deletes the given subtitle language the original video provider 
+    (only Youtube supported right now) In order for this to work we the 
+    version must be have a ThirdPartyAccount object for the same service 
+    and the username matching the username for the video url.
+    """
+    from videos.models import SubtitleLanguage
+    from .videos.types import DELETE_LANGUAGE_ACTION
+    from accountlinker.models import ThirdPartyAccount
+    try:
+        language = SubtitleLanguage.objects.select_related("video").get(pk=language_pk)
+    except SubtitleLanguage.DoesNotExist:
         return
-    video = version.video
-    for vurl in video.videourl_set.all():
-        username = vurl.owner_username
-        if not username:
-            continue
-        try:
-            account = ThirdPartyAccount.objects.get(type=vurl.type, username=username)
-        except ThirdPartyAccount.ObjectDoesNotExist:
-            continue
-        
-        vt = video_type_registrar.video_type_for_url(vurl.url)
-        if hasattr(vt, "update_subtitles"):
-            vt.update_subtitles(version, account)
-              
+    ThirdPartyAccount.objects.mirror_on_third_party(
+        language.video, language.language, DELETE_LANGUAGE_ACTION)
+
+

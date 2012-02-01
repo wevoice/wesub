@@ -35,4 +35,7 @@ video_type_registrar.register(FLVVideoType)
 video_type_registrar.register(BrightcoveVideoType)
 video_type_registrar.register(Mp3VideoType)
 
-__all__ = ['VideoTypeError', 'video_type_registrar']
+UPDATE_VERSION_ACTION = 'update_subtitles'
+DELETE_LANGUAGE_ACTION = 'delete_subtitles'
+
+__all__ = ['VideoTypeError', 'video_type_registrar', "UPDATE_VERSION_ACTION", "DELETE_LANGUAGE_ACTION"]
