@@ -690,7 +690,8 @@ class SubtitleLanguage(models.Model):
         return self.language_display()
 
     def nonblank_subtitle_count(self):
-        return len([s for s in self.latest_subtitles(public_only=False) if s.text])
+        return len([s for s in self.latest_subtitles(public_only=False) \
+                    if s.text.strip()])
 
     def get_title_display(self):
         return self.get_title() or self.video.title

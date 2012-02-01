@@ -21,7 +21,7 @@ import json
 
 from django.test import TestCase
 from videos.models import Video, Action, VIDEO_TYPE_YOUTUBE, UserTestResult, \
-    SubtitleLanguage, VideoUrl, VideoFeed
+    SubtitleLanguage, VideoUrl, VideoFeed, Subtitle
 from apps.auth.models import CustomUser as User
 from utils import SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
 from django.core.urlresolvers import reverse
@@ -2151,6 +2151,47 @@ class TestTemplateTags(TestCase):
         from videos.templatetags.subtitles_tags import language_url
         lurl = language_url(None, l)
 
+
+class TestMetadataManager(TestCase):
+
+    fixtures = ['staging_users.json', 'staging_videos.json']
+    
+    def test_subtitles_count(self):
+        v = Video.objects.all()[0]
+        lang = SubtitleLanguage(language='en', video=v, is_forked=True)
+        lang.save()
+        v1 = create_version(lang, [
+                {
+                   "subtitle_order" : 1,
+                   "subtitle_text": "",
+                   "subtitle_id": "id1",
+                    'start_time': 1,
+                    'end_time': 2,
+                    
+                 },
+                  {
+                   "subtitle_order" : 2,
+                   "subtitle_text": "   ",
+                   "subtitle_id": "id2",
+                    'start_time': 3,
+                    'end_time': 4,
+                 },
+                  {
+                   "subtitle_order" : 3,
+                   "subtitle_text": "t3",
+                   "subtitle_id": "id3",
+                    'start_time': 5,
+                    'end_time': 6,
+                 },
+
+        ])
+        v1.is_forked = True
+        v1.save()
+        metadata_manager.update_metadata(v.pk)
+        lang = refresh_obj(lang)
+        v1 = lang.version()
+        self.assertEqual(len(v1.subtitles()), 3)
+        self.assertEqual(lang.subtitle_count, 1)
 
 def _create_trans( video, latest_version=None, lang_code=None, forked=False):
         translation = SubtitleLanguage()

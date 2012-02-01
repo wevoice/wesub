@@ -94,9 +94,11 @@ def _update_changes_on_nonzero_version(version, last_version):
     version.text_change = min(text_count_changed / 1. / subs_length, 1)
 
 def _update_subtitle_counts(video):
+    from videos.models import Subtitle
     for sl in video.subtitlelanguage_set.all():
         original_value = sl.subtitle_count
-        new_value = len(sl.latest_subtitles())
+        new_value = sl.nonblank_subtitle_count() or 0
+
         if original_value != new_value:
             sl.subtitle_count = new_value
             sl.save()
