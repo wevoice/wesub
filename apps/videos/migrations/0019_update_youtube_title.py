@@ -3,7 +3,8 @@ import datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-from videos.models import VIDEO_TYPE_YOUTUBE, yt_service
+from videos.models import VIDEO_TYPE_YOUTUBE
+from videos.types.youtube import yt_service
 from gdata.service import RequestError
 
 class Migration(DataMigration):
