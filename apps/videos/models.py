@@ -363,7 +363,10 @@ class Video(models.Model):
            video_url_obj.created = timestamp
            video_url_obj.save(updates_timestamp=False)
         user and user.notify_by_message and video.followers.add(user)
-
+        if not video_url_obj.owner_username:
+            if hasattr(vt, 'username'):
+                video_url_obj.owner_username = vt.username
+                video_url_obj.save()
         return video, created
 
     @property
@@ -978,6 +981,12 @@ class SubtitleCollection(models.Model):
 
 
     def subtitles(self, subtitles_to_use=None, public_only=True):
+        """
+        Returns EffectiveSubtitle instances but also fetches timing data 
+        from the original sub if this is a translation.
+        It will only match if the subtitile_id matches, else those subs 
+        not returned.
+        """
         ATTR = 'computed_effective_subtitles'
         if hasattr(self, ATTR):
             return getattr(self, ATTR)
@@ -1282,6 +1291,14 @@ class SubtitleVersion(SubtitleCollection):
             # TODO: Dependent translations.  We'll also need to create tasks for
             # them.
             return last_version
+            
+    def is_synced(self):
+        subtitles = self.subtitles()
+        if len([s for s in subtitles[:-1] if not s.has_complete_timing()]) > 0:
+            return False
+        if not is_synced_value(subtitles[-1].start_time):
+            return False
+        return True
 
 
 def update_followers(sender, instance, created, **kwargs):
@@ -1847,7 +1864,9 @@ class VideoUrl(models.Model):
     original = models.BooleanField(default=False)
     created = models.DateTimeField()
     added_by = models.ForeignKey(User, null=True, blank=True)
-
+    # this is the owner if the video is from a third party website
+    # shuch as Youtube or Vimeo username
+    owner_username = models.CharField(max_length=255, blank=True, null=True)
     def __unicode__(self):
         return self.url
 

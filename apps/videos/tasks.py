@@ -121,12 +121,12 @@ def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager
     from videos.models import Video
     from teams.models import TeamVideo
-
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         _send_notification(new_version_id)
         _check_alarm(new_version_id)
         _detect_language(new_version_id)
+        _update_captions_in_original_service(new_version_id)
 
     video = Video.objects.get(pk=video_pk)
     if video.teamvideo_set.count() > 0:
@@ -339,3 +339,34 @@ def _send_letter_caption(caption_version):
                              'videos/email_notification_non_editors.html',
                              context, fail_silently=not settings.DEBUG)
 
+
+def _update_captions_in_original_service(version_pk):
+    """
+    Pushes the latest caption set for this version to
+    the original video provider (only Youtube supported right now)
+    In order for this to work we the version must be published, synced
+    and must have a ThirdPartyAccount object for the same service and 
+    the username matching the username for the video url.
+    """
+    from videos.models import SubtitleVersion, VideoUrl
+    from accountlinker.models import ThirdPartyAccount
+    from teams.moderation_const import APPROVED, UNMODERATED
+    # has to be an absolute import, else tries the local module
+    from .videos.types import video_type_registrar
+    version = SubtitleVersion.objects.get(pk=version_pk)
+    if version.moderation_status not in [APPROVED, UNMODERATED]:
+        return
+    video = version.video
+    for vurl in video.videourl_set.all():
+        username = vurl.owner_username
+        if not username:
+            continue
+        try:
+            account = ThirdPartyAccount.objects.get(type=vurl.type, username=username)
+        except ThirdPartyAccount.ObjectDoesNotExist:
+            continue
+        
+        vt = video_type_registrar.video_type_for_url(vurl.url)
+        if hasattr(vt, "update_subtitles"):
+            vt.update_subtitles(version, account)
+              

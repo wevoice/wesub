@@ -150,6 +150,8 @@ class YoutubeVideoType(VideoType):
         self.url = url
         self.videoid = self._get_video_id(self.url)
         self.entry = self._get_entry(self.video_id)
+        author = self.entry.author[0]
+        self.username = author.name.text
 
     @property
     def video_id(self):
@@ -263,6 +265,20 @@ class YoutubeVideoType(VideoType):
         for item in langs:
             save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
             
+    def _get_bridge(self, third_party_account):
+        
+        return YouTubeApiBridge(third_party_account.oauth_access_token,
+                                  third_party_account.oauth_refresh_token,
+                                  self.videoid)
+        
+    def update_subtitles(self, subtitle_version, third_party_account):
+        bridge = self._get_bridge(third_party_account)
+        bridge.upload_captions(subtitle_version)
+        
+    def delete_subtitles(self, language, third_party_account):
+        bridge = self._get_bridge(third_party_account)
+        bridge = self.delete_subtitles()
+            
 import gdata
 import gdata.youtube.client
 import gdata.youtube
@@ -289,9 +305,18 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         self.youtube_video_id  = youtube_video_id
         
     def _get_captions_info(self):
+        """
+        Retrieves a dictionary with the current caption data for this youtube video.
+        Format is:
+        {
+            "lang_code": {
+                   "url": [url for track]
+                    "track": [track entry object, useful for other operations]
+             }
+        }
+        """
         import atom
         entry = self.GetVideoEntry(video_id=self.youtube_video_id)
-        links = [x for x in entry.get_elements() if isinstance(x, atom.data.Link)]
         caption_track = entry.get_link(rel= 'http://gdata.youtube.com/schemas/2007#video.captionTracks')
         captions_feed = self.get_feed(caption_track.href,  desired_class=gdata.youtube.data.CaptionFeed)
         captions = captions_feed.entry
@@ -309,9 +334,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
     def upload_captions(self, subtitle_version):
         """
         Will upload the subtitle version to this youtube video id.
-        If the subtitle already exists, will update it. At this time
-        the youtube api does not allow for updating title, so once that is
-        set, that's it.
+        If the subtitle already exists, will delete it and recreate it.
+        This subs should be synced! Else we upload might fail.
         """
         from widget.srt_subs import GenerateSubtitlesHandler
         handler = GenerateSubtitlesHandler.get('srt')
@@ -319,13 +343,25 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
         content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
         title = subtitle_version.language.get_title()
-        # we cant just update, we need to check if it alredy exists... if so, we need to update, not create
         if hasattr(self, "captions") is False:
             self._get_captions_info()
+        # we cant just update, we need to check if it already exists... if so, we delete it
         if lang in self.captions:
-            # updade
-            res = self.update_track(self.youtube_video_id, self.captions[lang]['track'], content, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
-            pass
-        else:
-            res = self.create_track(self.youtube_video_id, title, lang, content, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
+            res = self._delete_track(self.captions[lang]['track'])
+        res = self.create_track(self.youtube_video_id, title, lang, content, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
         return res
+
+    def _delete_track(self, track):
+        res = self.delete_track(self.youtube_video_id, track, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token)
+        return res
+        
+    def delete_subtitles(self, language):
+        """
+        Deletes the subtitles for this language on this YouTube video.
+        Smart enought to determine if this video already has such subs
+        
+        """
+        if hasattr(self, "captions") is False:
+            self._get_captions_info()
+        if language in self.captions:
+            self._delete_track(self.captions[lang]['track'])
