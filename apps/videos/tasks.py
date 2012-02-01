@@ -353,7 +353,10 @@ def _update_captions_in_original_service(version_pk):
     from teams.moderation_const import APPROVED, UNMODERATED
     # has to be an absolute import, else tries the local module
     from .videos.types import video_type_registrar
-    version = SubtitleVersion.objects.get(pk=version_pk)
+    try:
+        version = SubtitleVersion.objects.get(pk=version_pk)
+    except SubtitleVersion.DoesNotExist:
+        return
     if version.moderation_status not in [APPROVED, UNMODERATED]:
         return
     video = version.video
