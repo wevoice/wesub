@@ -600,6 +600,9 @@ def can_assign_task(task, user):
 def can_delete_task(task, user):
     """Return whether the given user can delete the given task."""
 
+    if task.get_type_display() in ['Review', 'Approve']:
+        return False
+
     team, project, lang = task.team, task.team_video.project, task.language
 
     return can_delete_tasks(team, user, project, lang) and can_perform_task(user, task)
