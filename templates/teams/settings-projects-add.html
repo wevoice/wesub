@@ -34,7 +34,7 @@
                     {{ form.description }}
                 </fieldset>
 
-                {% comment %}
+                <div style="display: none;">
                     <fieldset>
                             <legend>Workflows</legend>
                             <p class="notation">{% trans "Moderate this project's subtitles. Will override the team's workflow if exists." %}</p>
@@ -61,7 +61,7 @@
                             {{ workflow_form.approve_allowed }}
                         </fieldset>
                     </div> 
-                {% endcomment %}
+                </div>
 
             <div class="submit">
                 <a class="button cancel project-cancel" href="{% url teams:settings_projects slug=team.slug %}">{% trans 'Cancel' %}</a>
