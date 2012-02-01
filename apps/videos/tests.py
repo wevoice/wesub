@@ -372,7 +372,11 @@ class UploadSubtitlesTest(WebUseTest):
 # FIXME: why should these be false?
 #        self.assertFalse(video.is_subtitled)
 #        self.assertFalse(video.was_subtitled)
-        self.assertEquals(32, language.subtitle_count)
+        metadata_manager.update_metadata(video.pk)
+        language = refresh_obj(language)
+        # two of the test srts end up being empty, so the subtitle_count 
+        # should be real
+        self.assertEquals(30, language.subtitle_count)
         self.assertEquals(0, language.percent_done)
 
         data = self._make_data()
