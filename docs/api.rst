@@ -131,9 +131,9 @@ Represents the subtitle set for a given video language.
 
 Fetching subtitles for a given language::
     
-   GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
-   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/
-   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/111111/
+   GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/subtitles/
+   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/subtitles/
+   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/111111/subtitles/
    
 Available parameters
    
@@ -144,8 +144,8 @@ Available parameters
    
 Creating new subtitles for a language::
 
-   POST  https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
-   POST https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/
+   POST  https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/subtitles/
+   POST https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/subtitles/
     
 Parameters:
      

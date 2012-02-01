@@ -89,13 +89,13 @@ unisubs.subtitle.SyncPanel.prototype.createRightPanelInternal = function() {
          ["Don't worry about small mistakes. We can correct them in the ",
           "next step. If you need to start over, click \"restart\" ",
           "below."].join('')],
-        3, 1);
+        4, 2);
     var extraHelp = 
         ["Press play, then tap this button or the down arrow when the next subtitle should appear."];
     return new unisubs.RightPanel(
         this.serverModel, helpContents, extraHelp,
         this.makeKeySpecsInternal(), true, "Done?",
-        "Next Step: Reviewing");
+        "Next Step: Check your work");
 };
 unisubs.subtitle.SyncPanel.prototype.makeKeySpecsInternal = function() {
     var KC = goog.events.KeyCodes;

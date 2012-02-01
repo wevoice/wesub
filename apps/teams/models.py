@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,11 +16,13 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from videos.models import Video, SubtitleLanguage, SubtitleVersion
+from videos.models import Video, SubtitleLanguage, SubtitleVersion,\
+     VideoUrl
 from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
 from django.db.models.signals import post_save, post_delete, pre_delete
@@ -36,7 +38,6 @@ from haystack.query import SQ
 from haystack import site
 from utils.searching import get_terms
 from django.contrib.contenttypes.models import ContentType
-import datetime
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
@@ -45,6 +46,7 @@ from apps.comments.models import Comment
 from apps.teams.moderation_const import WAITING_MODERATION
 from teams.permissions_const import TEAM_PERMISSIONS, PROJECT_PERMISSIONS, \
         LANG_PERMISSIONS, ROLE_ADMIN, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_MANAGER
+
 
 def get_perm_names(model, perms):
     return [("%s-%s-%s" % (model._meta.app_label, model._meta.object_name, p[0]), p[1],) for p in perms]
@@ -112,6 +114,8 @@ class Team(models.Model):
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
+    # these allow unisubs to do things on user's behalf such as uploding subs to Youtub
+    third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",  related_name='tseams', verbose_name=_('third party accounts'))
     points = models.IntegerField(default=0, editable=False)
     applicants = models.ManyToManyField(User, through='Application', related_name='applicated_teams', verbose_name=_('applicants'))
     created = models.DateTimeField(auto_now_add=True)
@@ -143,6 +147,10 @@ class Team(models.Model):
     translate_policy = models.IntegerField(_(u'translation policy'),
             choices=SUBTITLE_CHOICES,
             default=SUBTITLE_IDS['Anyone'])
+    max_tasks_per_member = models.PositiveIntegerField(_(u'maximum tasks per member'),
+            default=None, null=True, blank=True)
+    task_expiration = models.PositiveIntegerField(_(u'task expiration (days)'),
+            default=None, null=True, blank=True)
 
     deleted = models.BooleanField(default=False)
 
@@ -239,6 +247,24 @@ class Team(models.Model):
 
     # moderation
 
+    def get_workflow(self):
+        return Workflow.get_for_target(self.id, 'team')
+
+    def moderates_videos(self):
+        """Return True if this team moderates videos in some way, False otherwise.
+
+        Moderation means the team restricts who can create subtitles and/or
+        translations.
+
+        """
+        if self.subtitle_policy != Team.SUBTITLE_IDS['Anyone']:
+            return True
+
+        if self.translate_policy != Team.SUBTITLE_IDS['Anyone']:
+            return True
+
+        return False
+
     def get_pending_moderation( self, video=None):
         from videos.models import SubtitleVersion
         qs = SubtitleVersion.objects.filter(language__video__moderated_by=self, moderation_status=WAITING_MODERATION)
@@ -271,6 +297,12 @@ class Team(models.Model):
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', self.videos.count())
         return self._videos_count
+
+    @property
+    def tasks_count(self):
+        if not hasattr(self, '_tasks_count'):
+            setattr(self, '_tasks_count', Task.objects.filter(team=self, deleted=False, completed=None).count())
+        return self._tasks_count
 
     def application_message(self):
         try:
@@ -391,7 +423,6 @@ class Team(models.Model):
             # make sure we create a default project
             self.default_project
 
-
     def get_writable_langs(self):
         return TeamLanguagePreference.objects.get_writable(self)
 
@@ -399,10 +430,23 @@ class Team(models.Model):
         return TeamLanguagePreference.objects.get_readable(self)
 
 
+    def unpublishing_enabled(self):
+        '''Return True if unpublishing is enabled for this team, False otherwise.
+
+        At the moment unpublishing is only available if the team has reviewing
+        and/or approving enabled.
+
+        '''
+        w = self.get_workflow()
+        return True if w.review_enabled or w.approved_enabled else False
+
+
 # this needs to be constructed after the model definition since we need a
 # reference to the class itself
 Team._meta.permissions = TEAM_PERMISSIONS
 
+
+# Project
 class ProjectManager(models.Manager):
 
     def for_team(self, team_identifier):
@@ -450,6 +494,20 @@ class Project(models.Model):
     def is_default_project(self):
         return self.name == Project.DEFAULT_NAME
 
+    @property
+    def videos_count(self):
+        if not hasattr(self, '_videos_count'):
+            setattr(self, '_videos_count', TeamVideo.objects.filter(project=self).count())
+        return self._videos_count
+
+    @property
+    def tasks_count(self):
+        tasks = Task.objects.filter(team=self.team, deleted=False, completed=None)
+
+        if not hasattr(self, '_tasks_count'):
+            setattr(self, '_tasks_count', tasks.filter(team_video__project = self).count())
+        return self._tasks_count
+
     class Meta:
         unique_together = (
                 ("team", "name",),
@@ -458,6 +516,7 @@ class Project(models.Model):
         permissions = PROJECT_PERMISSIONS
 
 
+# TeamVideo
 class TeamVideo(models.Model):
     team = models.ForeignKey(Team)
     video = models.ForeignKey(Video)
@@ -683,6 +742,19 @@ class TeamVideo(models.Model):
                 self.video.subtitle_language().is_complete_and_synced())
 
 
+def _create_translation_tasks(team_video, subtitle_version):
+    preferred_langs = TeamLanguagePreference.objects.get_preferred(team_video.team)
+
+    for lang in preferred_langs:
+        sl = team_video.video.subtitle_language(lang)
+        if sl and sl.is_complete_and_synced():
+            continue
+
+        task = Task(team=team_video.team, team_video=team_video,
+                    subtitle_version=subtitle_version,
+                    language=lang, type=Task.TYPE_IDS['Translate'])
+        task.save()
+
 def team_video_save(sender, instance, created, **kwargs):
     update_one_team_video.delay(instance.id)
 
@@ -697,15 +769,36 @@ def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     if created and not raw:
         workflow = Workflow.get_for_team_video(instance)
         if workflow.autocreate_subtitle:
-            Task(team=instance.team, team_video=instance, subtitle_version=None,
-                 language='', type=Task.TYPE_IDS['Subtitle']).save()
+            existing_subtitles = instance.video.completed_subtitle_languages(public_only=True)
+            if not existing_subtitles:
+                Task(team=instance.team, team_video=instance, subtitle_version=None,
+                    language='', type=Task.TYPE_IDS['Subtitle']).save()
+            else:
+                _create_translation_tasks(instance, existing_subtitles[0].latest_version())
+
+def team_video_add_video_moderation(sender, instance, created, raw, **kwargs):
+    if created and not raw and instance.team.moderates_videos():
+        instance.video.moderated_by = instance.team
+        instance.video.save()
+
+def team_video_rm_video_moderation(sender, instance, **kwargs):
+    try:
+        # when removing a video, this will be triggered by the fk constraing
+        # and will be already removed
+        instance.video.moderated_by = None
+        instance.video.save()
+    except Video.DoesNotExist:
+        pass
 
 
 post_save.connect(team_video_save, TeamVideo, dispatch_uid="teams.teamvideo.team_video_save")
 post_save.connect(team_video_autocreate_task, TeamVideo, dispatch_uid='teams.teamvideo.team_video_autocreate_task')
+post_save.connect(team_video_add_video_moderation, TeamVideo, dispatch_uid='teams.teamvideo.team_video_add_video_moderation')
 post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.team_video_delete")
+post_delete.connect(team_video_rm_video_moderation, TeamVideo, dispatch_uid="teams.teamvideo.team_video_rm_video_moderation")
 
 
+# TeamVideoLanguage
 class TeamVideoLanguage(models.Model):
     team_video = models.ForeignKey(TeamVideo, related_name='languages')
     video = models.ForeignKey(Video)
@@ -806,6 +899,7 @@ class TeamVideoLanguage(models.Model):
         permissions = LANG_PERMISSIONS
 
 
+# TeamVideoLanguagePair
 class TeamVideoLanguagePair(models.Model):
     team_video = models.ForeignKey(TeamVideo)
     team = models.ForeignKey(Team)
@@ -821,6 +915,7 @@ class TeamVideoLanguagePair(models.Model):
     percent_complete = models.IntegerField(db_index=True, default=0)
 
 
+# TeamMember
 class TeamMemderManager(models.Manager):
     use_for_related_fields = True
 
@@ -879,6 +974,13 @@ class TeamMember(models.Model):
         return self._cached_narrowings
 
 
+    def has_max_tasks(self):
+        """Return True if this member has the maximum number of tasks, False otherwise."""
+        max_tasks = self.team.max_tasks_per_member
+        if max_tasks:
+            if self.user.task_set.incomplete().filter(team=self.team).count() >= max_tasks:
+                return True
+        return False
 
 
     class Meta:
@@ -892,6 +994,7 @@ def clear_tasks(sender, instance, *args, **kwargs):
 pre_delete.connect(clear_tasks, TeamMember, dispatch_uid='teams.members.clear-tasks-on-delete')
 
 
+# MembershipNarrowing
 class MembershipNarrowing(models.Model):
     """Represent narrowings that can be made on memberships.
 
@@ -914,6 +1017,7 @@ class MembershipNarrowing(models.Model):
             return u"Permission restriction for %s to language %s " % (self.member, self.language)
 
 
+# Application
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
     user = models.ForeignKey(User, related_name='team_applications')
@@ -1048,7 +1152,8 @@ class Workflow(models.Model):
         if type == 'project':
             try:
                 return [w for w in workflows
-                        if w.project and w.project.id == id and not w.team_video][0]
+                        if w.project and w.project.workflow_enabled
+                        and w.project.id == id and not w.team_video][0]
             except IndexError:
                 # If there's no project-specific workflow for this project,
                 # there might be one for its team, so we'll fall through.
@@ -1230,6 +1335,7 @@ class Task(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     modified = models.DateTimeField(auto_now=True, editable=False)
     completed = models.DateTimeField(blank=True, null=True)
+    expiration_date = models.DateTimeField(blank=True, null=True)
 
     # Review and Approval -specific fields
     approved = models.PositiveIntegerField(choices=APPROVED_CHOICES,
@@ -1239,7 +1345,9 @@ class Task(models.Model):
     objects = TaskManager()
 
     def __unicode__(self):
-        return u'%d' % self.id
+        return u'Task %s (%s) for %s' % (self.id or "unsaved",
+                                         self.get_type_display(),
+                                         self.team_video)
 
 
     @property
@@ -1299,6 +1407,28 @@ class Task(models.Model):
 
         self.subtitle_version.save()
 
+    def _send_back(self):
+        previous_task = Task.objects.complete().filter(
+            team_video=self.team_video, language=self.language, team=self.team,
+            type__in=(Task.TYPE_IDS['Subtitle'], Task.TYPE_IDS['Translate'])
+        ).order_by('-completed')[:1]
+
+        if previous_task:
+            assignee = previous_task[0].assignee
+        else:
+            assignee = None
+
+        if self.subtitle_version.language.is_original:
+            type = Task.TYPE_IDS['Subtitle']
+        else:
+            type = Task.TYPE_IDS['Translate']
+
+        task = Task(team=self.team, team_video=self.team_video,
+                    subtitle_version=self.subtitle_version,
+                    language=self.language, type=type, assignee=assignee)
+        task.save()
+
+
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
         self.completed = datetime.datetime.now()
@@ -1311,55 +1441,56 @@ class Task(models.Model):
         }[Task.TYPE_NAMES[self.type]]()
 
     def _complete_subtitle(self):
-        tasks = []
         subtitle_version = self.team_video.video.latest_version(public_only=False)
-
-        if self.workflow.autocreate_translate:
-            preferred_langs = TeamLanguagePreference.objects.get_preferred(self.team)
-
-            for lang in preferred_langs:
-                sl = self.team_video.video.subtitle_language(lang)
-                if sl and sl.is_complete_and_synced():
-                    continue
-
-                task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=subtitle_version,
-                            language=lang, type=Task.TYPE_IDS['Translate'])
-                task.save()
-                tasks.append(task)
 
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'])
             task.save()
-            tasks.append(task)
         elif self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'])
             task.save()
-            tasks.append(task)
+        else:
+            # Subtitle task is done, and there is no approval or review
+            # required, so we mark the version as approved.
+            subtitle_version.moderation_status = MODERATION.APPROVED
+            subtitle_version.save()
 
-        return tasks
+            # We need to make sure this is updated correctly here.
+            from apps.videos import metadata_manager
+            metadata_manager.update_metadata(self.team_video.video.pk)
+
+            if self.workflow.autocreate_translate:
+                _create_translation_tasks(self.team_video, self.subtitle_version)
 
     def _complete_translate(self):
-        subtitle_version = self.team_video.video.latest_version(language_code=self.language)
+        subtitle_version = self.team_video.video.latest_version(language_code=self.language, public_only=False)
 
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'])
             task.save()
-        else:
+        elif self.workflow.approve_enabled:
             # The review step may be disabled.  If so, we check the approve step.
-            if self.workflow.approve_enabled:
-                task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=subtitle_version,
-                            language=self.language, type=Task.TYPE_IDS['Approve'])
-                task.save()
-            else:
-                task = None
+            task = Task(team=self.team, team_video=self.team_video,
+                        subtitle_version=subtitle_version,
+                        language=self.language, type=Task.TYPE_IDS['Approve'])
+            task.save()
+        else:
+            # Translation task is done, and there is no approval or review
+            # required, so we mark the version as approved.
+            subtitle_version.moderation_status = MODERATION.APPROVED
+            subtitle_version.save()
+
+            # We need to make sure this is updated correctly here.
+            from apps.videos import metadata_manager
+            metadata_manager.update_metadata(self.team_video.video.pk)
+
+            task = None
 
         return task
 
@@ -1379,10 +1510,22 @@ class Task(models.Model):
                 # The reviewer rejected this version, so it should be explicitly
                 # made non-public.
                 self._set_version_moderation_status()
+
+                # Send the subtitles back for improvement.
+                self._send_back()
         else:
             # Approval isn't enabled, so the ruling of this Review task
             # determines whether the subtitles go public.
             self._set_version_moderation_status()
+
+            if self.approved == Task.APPROVED_IDS['Approved']:
+                # If the subtitles are okay, go ahead and autocreate translation
+                # tasks if necessary.
+                if self.workflow.autocreate_translate:
+                    _create_translation_tasks(self.team_video, self.subtitle_version)
+            else:
+                # Send the subtitles back for improvement.
+                self._send_back()
 
         return task
 
@@ -1392,6 +1535,14 @@ class Task(models.Model):
         # If we manage to get here, the ruling on this Approve task determines
         # whether the subtitles should go public.
         self._set_version_moderation_status()
+
+        # If the subtitles are okay, go ahead and autocreate translation tasks.
+        if self.approved == Task.APPROVED_IDS['Approved']:
+            if self.workflow.autocreate_translate:
+                _create_translation_tasks(self.team_video, self.subtitle_version)
+        else:
+            # Send the subtitles back for improvement.
+            self._send_back()
 
 
     def get_perform_url(self):
@@ -1414,6 +1565,18 @@ class Task(models.Model):
         return base_url+  "?t=%s" % self.pk
 
 
+    def set_expiration(self):
+        """Set the expiration_date of this task.  Does not save().
+
+        Requires that self.team and self.assignee be set correctly.
+
+        """
+        if not self.team.task_expiration or not self.assignee:
+            self.expiration_date = None
+        else:
+            limit = datetime.timedelta(days=self.team.task_expiration)
+            self.expiration_date = datetime.datetime.now() + limit
+
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         result = super(Task, self).save(*args, **kwargs)
@@ -1435,7 +1598,8 @@ def task_moderate_version(sender, instance, created, **kwargs):
                 instance.subtitle_version.moderation_status = WAITING_MODERATION
                 instance.subtitle_version.save()
 
-post_save.connect(task_moderate_version, Task, dispatch_uid="teams.task.task_moderate_version")
+post_save.connect(task_moderate_version, Task,
+                  dispatch_uid="teams.task.task_moderate_version")
 
 
 # Settings
@@ -1686,3 +1850,4 @@ class TeamNotificationSetting(models.Model):
 
     def __unicode__(self):
         return u'NotificationSettings for team %s' % (self.team)
+

@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django.core.urlresolvers import reverse
 from django import template
@@ -33,15 +33,15 @@ def upload_subtitles(context, video):
         initial['language'] = context['language'].language
     else:
         initial['language'] = translation.get_language()
-        
+
     original_language = video.subtitle_language()
     if original_language and original_language.language:
         initial['video_language'] = original_language.language
-    
+
     context['form'] = SubtitlesUploadForm(context['user'], initial=initial)
     return context
 
-@register.inclusion_tag('videos/_paste_transcription.html', takes_context=True)    
+@register.inclusion_tag('videos/_paste_transcription.html', takes_context=True)
 def paste_transcription(context):
     #It is just template of pop-up, you should add link with 'upload-transcript-button' class
     initial = {}
@@ -49,11 +49,11 @@ def paste_transcription(context):
         initial['language'] = context['language'].language
     else:
         initial['language'] = translation.get_language()
-        
+
     original_language = context['video'].subtitle_language()
     if original_language and original_language.language:
         initial['video_language'] = original_language.language
-                
+
     context['form'] = PasteTranscriptionForm(context['user'], initial=initial)
     return context
 
@@ -79,7 +79,7 @@ def complete_color(language):
             return 'eighty'
         else:
             return 'full'
-    
+
     val = language.percent_done
     if val >= 95:
         return 'eighty'
@@ -104,13 +104,12 @@ def video_url_count(video):
 
 @register.simple_tag
 def language_url(request, lang):
-    """
-    Returns the absolute url for that subtitle language.
-    Takens into consideration both if the lang is the original one
-    and if the video is private or public.
+    """Return the absolute url for that subtitle language.
+
+    Takens into consideration whether the video is private or public.  Also
+    handles the language-without-language that should be going away soon.
+
     """
     vid = VideoVisibilityPolicy.objects.id_for_video(lang.video)
-    if lang.is_original or lang.language == u"":
-        return  reverse('videos:history', args=[vid])
-    else:
-        return  reverse('videos:translation_history', args=[vid, lang.language, lang.pk])
+    lc = lang.language or 'unknown'
+    return reverse('videos:translation_history', args=[vid, lc, lang.pk])

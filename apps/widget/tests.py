@@ -28,7 +28,7 @@ import os
 
 from django.test import TestCase
 from auth.models import CustomUser
-from videos.models import Video, Action
+from videos.models import Video, Action, SubtitleLanguage
 from videos import models
 from widget.models import SubtitlingSession
 from widget.rpc import Rpc
@@ -825,6 +825,22 @@ class TestRpc(TestCase):
         language = video.subtitle_language()
         self.assertEquals(now, language.writelock_time)
         models.datetime = datetime
+        
+    def test_title_and_description_from_video(self):
+        request = RequestMockup(self.user_0)
+        video = Video.objects.all()[0]
+        title = "a title"
+        description = 'something'
+        video.title = title
+        video.description = description
+        video.save()
+        lang = SubtitleLanguage(language='en', is_original=False,
+                                video=video)
+        lang.save()
+        response = rpc.start_editing(
+            request, video.video_id, 'en', subtitle_language_pk=lang.pk)
+        self.assertEquals(response['subtitles']['title'], title)
+        self.assertEquals(response['subtitles']['description'], description)
 
     def test_create_translation_dependent_on_dependent(self):
         request = RequestMockup(self.user_0)

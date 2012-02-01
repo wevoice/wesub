@@ -2,10 +2,9 @@
 
 {% block body_attrs %}id="video_profile" class="v1 video_view"{% endblock %}
 
-{% load escapejs widget comments recent_activity paginator i18n subtitles_tags teams_tags videos_tags media_compressor moderation doorman %}
+{% load escapejs widget comments recent_activity paginator i18n subtitles_tags teams_tags videos_tags media_compressor moderation doorman utils_tags %}
 
 {% block css %}
-
     {{ block.super }}
     {% include_bundle "video_history" %}
     {% include_bundle "widget-css"%}
@@ -82,11 +81,6 @@
           content="{% title_for_video video %}"/>
 {% endblock  %}
 
-{% comment %}
-    TODO:
-        - title/description editing?
-{% endcomment %}
-
 {% block main_content %}
     {% if saved %}
         <div id="messages">
@@ -99,27 +93,38 @@
         <h2 class="main-title">
             <a href="{{share_panel_permalink}}" title="Video permalink">{{ video }}</a>
         </h2>
-        <div id="description" class="abbr">
-            <div class="abbr-content">
+        <div id="description"{% if video.description|length > 300 %} class="abbr collapsed"{% endif %}>
+            <div>
                 {{ video.description|urlize|linebreaks }}
             </div>
+            {% if video.description|length > 300 %}
+                <a class="expand" href="#">Show all ↓</a>
+            {% endif %}
         </div>
         <ul class="metrics">
             <li>
-                <p>{{ video.view_count|simplify_number }}</p>
-                <h4>{% trans "View" %}{{ video.view_count|pluralize }}</h4>
+                <div>
+                    <p>{{ video.widget_views_count|simplify_number }}</p>
+                    <h4>{% trans "View" %}{{ video.widget_views_count|pluralize }}</h4>
+                </div>
             </li>
             <li>
-                <p>{{ video.widget_views_count|simplify_number }}</p>
-                <h4>{% trans "Play" %}{{ video.widget_views_count|pluralize }}</h4>
+                <div>
+                    <p>{{ video.followers.count }}</p>
+                    <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
+                </div>
             </li>
             <li>
-                <p>{{ video.followers.count }}</p>
-                <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
+                <div>
+                    <p>{{ video|get_comment_count }}</p>
+                    <h4>{% trans "Comment" %}{{ video|get_comment_count|pluralize }}</h4>
+                </div>
             </li>
             <li>
-                <p>{{ video.languages_count }}</p>
-                <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
+                <div>
+                    <p>{{ video.languages_count }}</p>
+                    <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
+                </div>
             </li>
         </ul>
         <div class="sharing-tools">
@@ -134,15 +139,24 @@
             {% endif %}
         </h3>
         {% if video.subtitle_language or translations %}
-        <div class="abbr">
-            <div class="abbr-content">
-                <ul id="subtitles-menu">
-                    {% include 'videos/_left_navigation.html' %}
-                </ul>
+            <div{% if video.languages_count > 15 %} class="abbr collapsed"{% endif %}>
+                <div>
+                    <ul id="subtitles-menu">
+                        {% include 'videos/_left_navigation.html' %}
+                    </ul>
+                </div>
+                {% if video.languages_count > 15 %}
+                    <a class="expand" href="#">Show all ↓</a>
+                {% endif %}
             </div>
-        </div>
         {% else %}
-            <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+            {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
+                <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+            {% else %}
+                <p>
+                    {% trans "This video doesn't have any subtitles yet" %} :(
+                </p>
+            {% endif %}
         {% endif %}
     </div>
     <div class="grid_8 view omega">
@@ -151,7 +165,7 @@
         {% endif %}
         <ul class="tabs">
             <li class="current"><a href="#video-tab">{% trans "Video" %}</a></li>
-            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{% get_comment_count video %}</span></a></li>
+            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{{ video|get_comment_count }}</span></a></li>
             <li><a href="#activity-tab">{% trans "Activity" %}</a></li>
             <li class="hascount"><a href="#urls-tab">{% trans "URLs" %}<span>{% video_url_count video %}</span></a></li>
         </ul>
@@ -161,71 +175,63 @@
                 <div class="video-tools grid_4 alpha">
                     <h3>{% trans "Contribute" %}</h3>
                     <p>
-                        {% if not video.subtitle_language %}
-                            {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!</li>
+                        {% if video.languages_count < 1 %}
+                            {% if request.user|can_create_subtitles_for:video %}
+                                {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!
+                            {% endif %}
                         {% else %}
-                            {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!</li>
+                            {% if request.user|can_create_translations_for:video %}
+                                {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!
+                            {% endif %}
                         {% endif %}
-                        {% upload_subtitles video %}
-                        {% paste_transcription %}
+                        {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
+                            {% upload_subtitles video %}
+                            {% paste_transcription %}
+                        {% else %}
+                            {% trans 'Subtitles for this video are moderated. If it belongs to a team, try joining the team to contribute.' %}
+                        {% endif %}
                     </p>
                 </div>
-                {% if video.get_team_video or user.managed_teams %}
-                <div class="video-tools grid_4 omega">
-                    <h3>{% trans "Collaborate" %}</h3>
-                    {% if video.get_team_video %}
-                        <p>
-                            {% trans "This video belongs to the following teams" %}:
-                        </p>
-                        {% render_belongs_to_team_list video %}
+
+                {% with video.get_team_video as team_video %}
+                    {% if team_video %}
+                        {% if team_video.team.is_visible %}
+                            <div class="video-tools grid_4 omega">
+                                <h3>{% trans "Collaborate" %}</h3>
+
+                                <p>
+                                    {% trans "This video belongs to the following team" %}:
+                                </p>
+
+                                {% render_belongs_to_team_list video %}
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        {% if user.managed_teams %}
+                            <div class="video-tools grid_4 omega">
+                                <h3>{% trans "Collaborate" %}</h3>
+
+                                {% team_add_video_select %}
+                            </div>
+                        {% endif %}
                     {% endif %}
-                    {% team_add_video_select %}
-                </div>
-                {% endif %}
+                {% endwith %}
             </div>
         </div>
         <div class="tab" id="comments-tab" style="display:none;">
             <h3>{% trans "Leave a comment" %}</h3>
             {% render_comment_form video %}
-            <h3>{% get_comment_count video %} {% trans "Comments" %}</h3>
+            <h3>{{ video|get_comment_count }} {% trans "Comments" %}</h3>
             {% render_comment_list video %}
         </div>
         <div class="tab" id="activity-tab" style="display:none;">
-            {% video_activity video %}
+            {% video_activity video request.user %}
             <p class="view-more"><a href="{% url videos:actions_list video.video_id %}">{% trans 'View all activity' %}</a></p>
         </div>
         <div class="tab" id="urls-tab" style="display:none;">
             {% video_url_panel %}
         </div>
     </div>
-     
-    {% comment %}
-
-    {# EDIT TITLE #}
-        {% if user.is_authenticated %}
-            {% if not video.title or video.is_html5 or user.is_superuser %}
-                <a class="heading_button edit-title" href="#" data-modal="edit-title-dialog">{% trans 'Edit title' %}</a>
-            {% endif %}
-        {% endif %}
-
-        <div id="edit-title-dialog" style="display: none" class="msg_modal_wrap" >
-            <a href="#close" class="close">{% trans "Close" %}</a>
-            <h3>{% trans 'You are editing the original video title (translations will not be affected)' %}</h3>
-            <div class="msg_modal">
-                <p>
-                {% blocktrans %}
-                IMPORTANT: the new title will appear in the lists of videos and in 
-                the original subtitle set. Any existing translations will not be affected. 
-                Please update each translation separately, if necessary.
-                {% endblocktrans %}
-                </p>
-                <p>
-                    <input type="text" val="" style="width: 100%" class="title-input">
-                    <button class="green_button small save-title" style="margin: 0 0 15px 0; float: right">{% trans "Save" %}</button>
-                </p>
-            </div>
-        </div>
-    {% endcomment %}
 {% endblock %}
 
 {% block page_controls %}

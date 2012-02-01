@@ -1,26 +1,24 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from teams.models import TeamVideo, TeamVideoLanguage
-from teams.tasks import complete_applicable_tasks
 from datetime import datetime
 
-from apps.teams.moderation import user_can_moderate, APPROVED
 def update_metadata(video_pk):
     from videos.models import Video
     video = Video.objects.get(pk=video_pk)
@@ -37,7 +35,6 @@ def update_metadata(video_pk):
     _update_complete_date(video)
     _invalidate_cache(video)
     _recalculate_team_detail_metadata(video)
-    _update_team_tasks(video)
 
 def _update_forked(video):
     for sl in video.subtitlelanguage_set.all():
@@ -73,7 +70,7 @@ def _update_changes_on_version(version, last_version):
 
 def _update_changes_on_nonzero_version(version, last_version):
     subtitles = version.subtitles()
-    last_subtitles = dict([(item.subtitle_id, item) 
+    last_subtitles = dict([(item.subtitle_id, item)
                            for item in last_version.subtitles()])
     time_count_changed, text_count_changed = 0, 0
     new_subtitles_ids = set()
@@ -95,8 +92,6 @@ def _update_changes_on_nonzero_version(version, last_version):
     subs_length = len(subtitles)
     version.time_change = min(time_count_changed / 1. / subs_length, 1)
     version.text_change = min(text_count_changed / 1. / subs_length, 1)
-    if user_can_moderate(version.video, version.user):
-        version.moderation_status = APPROVED
 
 def _update_subtitle_counts(video):
     for sl in video.subtitlelanguage_set.all():
@@ -108,25 +103,11 @@ def _update_subtitle_counts(video):
 
 def _update_percent_done(video):
     for sl in video.subtitlelanguage_set.all():
-        if not sl.is_dependent():
+        percent_done = sl.calculate_percent_done()
+
+        if percent_done is None:
             continue
-        translation_count = sl.nonblank_subtitle_count()
-        real_standard_language = sl.real_standard_language()
 
-        if real_standard_language:
-            subtitle_count = real_standard_language.nonblank_subtitle_count()
-        else:
-            subtitle_count = 0
-
-        if subtitle_count == 0:
-            percent_done = 0
-        else:
-            percent_done = int(100 * float(translation_count) / float(subtitle_count))
-            percent_done = max(0, min(percent_done, 100))
-
-        if translation_count and percent_done < 1:
-            percent_done = 1
-        
         if percent_done != sl.percent_done:
             sl.percent_done = percent_done
             sl.is_complete = percent_done == 100
@@ -165,7 +146,7 @@ def _update_languages_count(video):
     video.languages_count = video.subtitlelanguage_set.filter(had_version=True).count()
     video.save()
 
-def _update_complete_date(video): 
+def _update_complete_date(video):
     is_complete = video.is_complete
     if is_complete and video.complete_date is None:
         video.complete_date = datetime.now()
@@ -184,9 +165,6 @@ def _recalculate_team_detail_metadata(video):
         team_video.update_team_video_language_pairs()
         TeamVideoLanguage.update(team_video)
 
-def _update_team_tasks(video):
-    for team_video in video.teamvideo_set.all():
-        complete_applicable_tasks.delay(team_video.id)
 
 def _update_is_public(video):
     if video.policy:

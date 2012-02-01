@@ -75,6 +75,7 @@
 @normal: #678ca3;
 @dark: #486f87;
 @darker: #3e6782;
+@darkest: #2f3c45;
 
 /* General styles */
 
@@ -95,7 +96,7 @@ body {
     padding: 0;
 }
 .v1 {
-    color: #2f3c45;
+    color: @darkest;
 
     em {
         font-style: italic;
@@ -180,12 +181,13 @@ body {
     display: block;
 }
 .v1 .action-replacement {
-    padding: 1em;
-    margin: 1em 0 2em;
+    padding: 1.5em;
+    margin: 2em 0 1em;
     background: @faintest;
     .border-radius(4px);
     color: @normal;
     text-align: center;
+    border: 1px solid @fainter;
 }
 .v1 .team-banner {
     margin-bottom: 2em;
@@ -297,11 +299,10 @@ body {
 .v1 .view .tools {
     clear: both;
     position: relative;
-    padding: 1em;
-    margin: 0 -20px 0 0;
-    height: 15px;
+    padding: 1em 0 1em 1em;
+    margin: 0 0 0 -10px;
+    min-height: 18px;
     border-bottom: 1px solid #e8ebed;
-    font-size: 11px;
     text-align: right;
     .linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
 
@@ -353,12 +354,43 @@ body {
         float: right;
         margin: -.5em .5em 0 0;
     }
+
+    form.search {
+        position: absolute;
+        top: .5em; left: .65em;
+        width: 160px;
+        margin: 0;
+        padding: 0;
+
+        fieldset {
+            padding: 0;
+            
+            input {
+                float: left;
+                border-color: @fainter;
+
+                &:focus {
+                    border-color: @normal;
+                }
+            }
+
+            a.reset {
+                display: block;
+                position: absolute;
+                top: 0; left: 152px;
+                text-decoration: none;
+                color: @light;
+                padding: .5em;
+                line-height: 1.5em;
+            }
+        }
+    }
 }
 
 /* Listings */
 
-.v1 .view p.active-filters {
-    margin: 1.2em -8px 0 4px;
+.v1 .view p.view-notice {
+    margin: 1.2em 1em 0 4px;
     padding: 1em;
     .border-radius(3px);
     background-color: @faintest;
@@ -369,6 +401,7 @@ body {
 }
 
 .v1 .listing {
+    clear: both;
     padding: 0;
 
     & > li {
@@ -379,11 +412,6 @@ body {
         &.empty {
             border:none;
         }
-
-        a {
-            white-space: nowrap;
-        }
-
         h3 {
             position: relative;
             font-size: 13px;
@@ -399,17 +427,21 @@ body {
                 }
             }
         }
-
         p {
             margin: .5em 0;
         }
-
         .thumb {
             position: absolute;
             top: 2em; left: 0;
 
-            img {
-                border: 1px solid @faint;
+            a {
+                display: inline-block;
+                max-height: 229px;
+                overflow: hidden;
+
+                img {
+                    border: 1px solid @faint;
+                }
             }
         }
         span.timestamp {
@@ -419,7 +451,6 @@ body {
                 margin-right: 8px;
             }
         }
-
         .actions {
             .box-right;
 
@@ -451,7 +482,6 @@ body {
                 }
             }
         }
-
         .descriptor {
             font-size: 11px;
             font-weight: normal;
@@ -470,21 +500,20 @@ body {
         }
 
         .admin-controls {
+            border: 1px solid @lighter;
             display: none;
-            position: absolute;
             bottom: 1em; right: 0;
             float: left;
             padding: 0;
+            position: absolute;
             .opacity(0.6);
             .border-radius(2px);
             .vertical-gradient(@faintest, @fainter);
-            border: 1px solid @lighter;
 
             &.selected {
                 display: block;
                 .opacity(1.0);
             }
-
             li {
                 display: block;
                 float: left;
@@ -513,26 +542,21 @@ body {
                         }
                     }
                 }
-
                 &:first-child a {
                     border-left: none;
                 }
-
                 input[type="checkbox"] {
                     margin: 5px 7px;
                 }
             }
-
             &:hover {
                 .opacity(1.0);
             }
-
             form {
                 padding: 0;
             }
 
         }
-
         &:hover {
             .admin-controls {
                 display: block;
@@ -567,17 +591,84 @@ body {
     }
 }
 .v1 .listing.videos > li {
-    min-height: 6em;
-    padding-left: 120px;
-    padding-right: 150px;
+    position: relative;
+    width: 310px;
+    padding: 10px 0;
+    float: left;
+    border: none;
+
+    h3 {
+        clear: both;
+        margin: 6px 10px 10px;
+        height: 2em;
+    }
 
     .thumb {
-        width: 100px;
-        height: 60px;
+        position: relative;
+        top: 0;
+        height: 180px;
+        overflow: hidden;
 
         img {
-            height: 60px;
-            max-width: 100px;
+            width: 290px;
+            margin: 10px 10px 0;
+        }
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    .languages {
+        position: absolute;
+        top: 17px;
+        left: 17px;
+        width: auto;
+        margin: 0;
+        padding: .5em .75em;
+        background: hsla(0%, 0%, 0%, .35);
+        color: #eee;
+        text-shadow: 1px 1px 1px #444;
+        .border-radius(3px);
+    }
+    &:hover .languages {
+        background: hsla(0%, 0%, 0%, .55);
+    }
+
+    .callout {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: .75em;
+        .border-radius(3px);
+        text-indent: 0;
+        color: #fff;
+        .vertical-gradient(@normal, @dark);
+        text-shadow: 1px 1px 1px @dark;
+        .box-shadow(-1px, 1px, 1px, hsla(0%, 0%, 0%, .35));
+    }
+
+    .admin-controls {
+        right: 1em;
+        bottom: .6em;
+        border: none;
+        background: hsla(0%, 0%, 0%, .55);
+        opacity: 1;
+        text-shadow: 1px 1px 1px #444;
+
+        a {
+            border: none;
+            color: #eee;
+
+            &:hover {
+                color: #fff;
+                background: transparent;
+                text-decoration: underline;
+            }
+        }
+        &:hover {
+            background: hsla(0%, 0%, 0%, .75);
         }
     }
 }
@@ -622,17 +713,8 @@ body {
     }
 }
 .v1 .listing.tasks > li {
-
-    min-height: 5em;
-
-    p.steps {
-        color: @normal;
-
-        .current {
-            font-weight: bold;
-            color: #2f3c45;
-        }
-    }
+    padding-left: 110px;
+    min-height: 6.5em;
 
     .done {
         span {
@@ -640,6 +722,23 @@ body {
         }
     }
 
+    .thumb {
+        max-width: 80px;
+        word-wrap: break-word;
+
+        img {
+            max-width: 80px;
+            margin-left: 10px;
+        }
+    }
+
+    form.assign-form {
+        padding: 0;
+    }
+
+}
+.v1 .listing.teams > li {
+    padding-right: 150px;
 }
 .v1 .view #comments-tab .listing.comments > li {
     position: relative;
@@ -769,7 +868,7 @@ p.view-more {
             }
         }
     }
-    .refine, div.search {
+    .refine {
         padding: 1.5em 15px 1em;
         margin: 0 0 2em -15px;
         border-bottom: 1px solid @faintest;
@@ -797,14 +896,6 @@ p.view-more {
     form {
         padding: 0;
 
-    }
-    div.search {
-        border-bottom: 0;
-        padding-bottom: 0;
-
-        form {
-            padding: 0;
-        }
     }
 }
 
@@ -1003,7 +1094,8 @@ p.view-more {
 }
 
 #summary {
-    width: 720px;
+    float: left;
+    width: 100%;
     margin: 0 0 2em;
     padding: 1.5em 0;
     border-top: 1px solid @fainter;
@@ -1025,6 +1117,7 @@ p.view-more {
 
     .grid_2 {
         position: relative;
+        width: 105px;
         margin: 0 20px;
         color: @normal;
 
@@ -1043,7 +1136,7 @@ p.view-more {
         span {
             font-size: 1.5em;
             position: absolute;
-            top: 0; right: -1em;
+            top: 0; right: -1.5em;
         }
     }
 
@@ -1162,7 +1255,7 @@ body#teams div.edit-team-video form fieldset a {
     .view {
         position: relative;
 
-        p.active-filters {
+        p.view-notice {
             padding-right: 0;
             margin: 1em 0;
 
@@ -1175,6 +1268,11 @@ body#teams div.edit-team-video form fieldset a {
 
         .tab {
             clear: both;
+        }
+
+        video, object, .unisubs-widget span.unisubs-videoplayer {
+            width: 620px !important;
+            height: 370px !important;
         }
 
         #video-tab, #comments-tab {
@@ -1275,15 +1373,24 @@ body#teams div.edit-team-video form fieldset a {
             text-decoration: none;
         }
 
-        &.collapsed .abbr-content {
+        div {
             height: 6em;
             overflow: hidden;
+        }
+
+        &.expanded div {
+            height: auto;
         }
 
     }
 
     #widget_div {
         padding-bottom: 1.5em;
+    }
+
+    video, object, .unisubs-widget span.unisubs-videoplayer {
+        width: 289px !important;
+        height: 173px !important;
     }
 
     #description {
@@ -1299,9 +1406,12 @@ body#teams div.edit-team-video form fieldset a {
         text-decoration: none;
     }
 
+    h2, h3, h4 {
+        word-wrap: break-word;
+    }
+
     h2 a {
         color: inherit;
-        word-wrap: break-word;
     }
 
     h2, h3 {
@@ -1477,6 +1587,10 @@ ol.subtitles {
     }
 }
 
+#tender_window #tender_closer {
+    color: #80B3CC;
+}
+
 /* Chosenify */
 .v1 .chzn-container ul.chzn-results, .v1 ul.chzn-choices {
     margin-bottom: 4px !important;
@@ -1484,6 +1598,82 @@ ol.subtitles {
 
     input {
         padding: 5px !important;
+    }
+}
+
+.v1 .filters {
+    p {
+        line-height: 18px;
+        height: 16px;
+        vertical-align: middle;
+    }
+    .chzn-container {
+        height: 100%;
+        margin-bottom: 0;
+        margin-left: 6px;
+        text-align: left;
+        vertical-align: middle;
+
+        .chzn-drop {
+            border-top: 1px solid @faint;
+        }
+    }
+    .chzn-container,
+    .chzn-container-single,
+    .chzn-container-single .chzn-single,
+    .chzn-container-active .chzn-single
+    .chzn-container-single .chzn-single-with-drop,
+    .chzn-container-single .chzn-single div {
+        border: none;
+        background: transparent;
+    }
+    .chzn-container-single .chzn-single {
+        padding: 0;
+        height: 18px;
+        line-height: 14px;
+    }
+    .chzn-container-single .chzn-single {
+        
+        div b {
+            background-position: -5px -5px;
+        }
+    }
+    .chzn-container-active .chzn-single-with-drop div b {
+        background-position: -23px -4px;
+    }
+    .chzn-container-active .chzn-single-with-drop {
+        overflow: visible !important;
+        position: relative;
+        z-index: 52;
+
+        span {
+            position: relative;
+            z-index: 53;
+        }
+        div {
+            z-index: 53;
+        }
+        &:before {
+            background: #FFF;
+            border: 1px solid #B9C3C8;
+            border-bottom: 1px solid #FFF;
+            content: "";
+            display: block;
+            left: -5px;
+            height: 100%;
+            position: absolute;
+            top: -5px;
+            width: 100%;
+            z-index: 51;
+            .multi-border-radius(5px, 5px, 0, 0);
+        }
+    }
+    div.chzn-container-active {
+        div.chzn-drop {
+            margin-left: -5px !important;
+            margin-top: -1px !important;
+            z-index: 50;
+        }
     }
 }
 
@@ -1503,6 +1693,22 @@ ol.subtitles {
 
         p {
             float: none;
+        }
+
+        fieldset {
+            padding-bottom: 1em;
+        }
+
+        label.radio, label.checkbox {
+            padding: 0;
+            display: block;
+            float: none;
+            text-align: left;
+            width: 100%;
+
+            input {
+                margin-right: .5em;
+            }
         }
     }
 
@@ -1543,25 +1749,32 @@ ol.subtitles {
         width: 24.7%;
         float: left;
         border-right: 1px solid #eaeaea;
+        padding: 0;
         text-align: center;
-        padding: .75em 0 .5em;
 
+        a, div {
+            color: #999;
+            display: block;
+            padding: .75em 0 .5em;
+
+            p {
+                font-size: 1.25em;
+                margin: 0;
+                line-height: 1em;
+                text-shadow: 1px -1px 1px #fff;
+            }
+            h4 {
+                font-weight: normal;
+                font-size: 11px;
+                padding-top: .25em;
+                padding-bottom: 0;
+            }
+        }
+        a:hover {
+            color: #35424A;
+        }
         &:last-child {
             border: none;
-        }
-
-        p {
-            font-size: 1.25em;
-            margin: 0;
-            line-height: 1em;
-            text-shadow: 1px -1px 1px #fff;
-        }
-
-        h4 {
-            font-weight: normal;
-            font-size: 11px;
-            padding-top: .25em;
-            padding-bottom: 0;
         }
     }
 }
@@ -1575,4 +1788,155 @@ pre.dump {
         .border-radius();
         .box-shadow(1px, 1px, 3px, rgba(0, 0, 0, .4));
     }
+}
+
+
+/******************** @Crazytown *****/
+
+#teams .backnav {
+    color: @light; 
+        
+    a {
+        color: @darkest;
+    }
+}
+
+#teams .view .expandable {
+    overflow: hidden;
+
+    .button {
+
+        span {
+            display: block;
+            float: right;
+            width: 16px;
+            height: 1.5em;
+            background: url('../images/chosen-sprite.png') no-repeat 0px -5px;
+            margin-left: 4px;
+        }
+    }
+}
+
+#teams .view .tools {
+
+    p {
+        color: @lighter;
+
+        span {
+            color: @dark;
+        }
+    }
+
+}
+
+#teams .view .subnav {
+    text-align: left;
+    padding: 1em 0;
+
+    ul li {
+        display: inline;
+
+        a {
+            color: @light;
+            text-decoration: none;
+            margin-right: 1em;
+            line-height: 1.5em;
+        }
+
+        &.current a {
+            color: inherit;
+        }
+    }
+}
+
+#teams .view form.settings {
+    margin-left: 1.5em;
+    margin-right: 2.5em;
+}
+
+#teams div.join {
+    clear: both;
+    padding-top: 2em;
+}
+#teams .context #signin-join {
+    display: block;
+    margin: 1em;
+}
+
+#teams .context .notation {
+    clear: both;
+    padding-top: 2em;
+}
+#teams .context .notation.policy {
+    padding-top: 0;
+    margin-bottom: 1em;
+}
+
+#teams .context #projects-list h4 {
+    padding: 1.5em 0 1em;
+}
+
+#teams .view .tools {
+
+    #sort-filter {
+        padding: .5em;
+        text-decoration: none;
+        color: @normal;
+        line-height: 1.5em;
+
+        &:hover {
+            color: @darkest;
+
+            span {
+                background: url('../images/chosen-hover.png') no-repeat 4px 3px;
+            }
+
+            span.open {
+                background: url('../images/chosen-hover.png') no-repeat 4px -28px;
+            }
+        }
+
+        span {
+            padding: 0 8px;
+            background: url('../images/chosen-sprite.png') no-repeat 2px -4px;
+        }
+
+        span.open {
+            background: url('../images/chosen-sprite.png') no-repeat -16px -4px;
+        }
+    }
+
+    .button {
+        margin: 0;
+        float: none;
+    }
+}
+
+#teams .view .filters {
+    display: none;
+    text-align: center;
+    padding: 1em;
+    margin-left: -10px;
+    margin-bottom: 1em;
+    border-bottom: 1px solid #e8ebed;
+    background: -moz-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -webkit-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0, hsla(0%, 0%, 95%, 1)), color-stop(0.25, hsla(0%, 0%, 98%, 1)), color-stop(0.75, #f5f5f5), color-stop(1, hsla(0%, 0%, 95%, 1)));
+    background: -o-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -ms-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+
+    .chzn-container {
+        width: auto !important;
+    }
+
+    a.clear-filters {
+        float: right;
+        text-decoration: none;
+        color: @light;
+    }
+}
+
+#teams .view .filters.active {
+    display: block;
 }

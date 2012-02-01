@@ -681,6 +681,9 @@ span.unisubs-widget {
     padding: 3px !important;
     width: 350px !important;
 }
+textarea.unisubs-descriptionField{
+   height:140px !important
+}
 .unisubs-whats {
     color: #999 !important;
     display: block !important;
@@ -2214,8 +2217,10 @@ a.unisubs-openid span {
     padding: 15px !important;
     position: absolute !important;
     top: 0 !important;
-    text-align: center !important;
     width: 842px !important;
+}
+.unisubs-howtopanel div {
+    text-align: center !important;
 }
 .unisubs-guidelinespanel .unisubs-done, .unisubs-howtopanel .unisubs-done {
     display: block !important;
@@ -2517,6 +2522,14 @@ div.unisubs-dropdown {
     padding: 5px 4px 5px 40px !important;
     text-decoration: none !important;
     text-shadow: 0 0 0 !important;
+}
+.unisubs-dropdown .unisubs-actions .unisubs-moderated p {
+    color: #aaa !important;
+    margin: 10px 20px !important;
+}
+.unisubs-dropdown .unisubs-actions .unisubs-moderated p a {
+    display: inline !important;
+    padding: 0 !important;
 }
 .unisubs-dropdown .unisubs-addTranslation {
     background: url("../images/dropdown_icons.png") 19px 7px no-repeat !important;

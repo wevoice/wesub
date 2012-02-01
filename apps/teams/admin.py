@@ -101,7 +101,7 @@ class TeamVideoAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'team_link', 'created')
     readonly_fields = ('completed_languages',)
     raw_id_fields = ['video', 'team', 'added_by']
-    search_fields = ('title',)
+    search_fields = ('title', 'video__title')
 
     def team_link(self, obj):
         url = reverse('admin:teams_team_change', args=[obj.team_id])
@@ -118,14 +118,18 @@ class WorkflowAdmin(admin.ModelAdmin):
     ordering = ('-created',)
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'type', 'team', 'team_video', 'language',
-                    'assignee', 'completed', 'deleted')
+    list_display = ('id', 'type', 'team', 'team_video', 'language',
+                    'assignee', 'is_complete', 'deleted')
     list_filter = ('type', 'deleted', 'created', 'modified', 'completed')
     search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
                      'assignee__last_name', 'team_video__title',
                      'team_video__video__title')
     raw_id_fields = ('team_video', 'team', 'assignee', 'subtitle_version')
     ordering = ('-created',)
+
+    def is_complete(self, o):
+        return True if o.completed else False
+    is_complete.boolean = True
 
 class TeamLanguagePreferenceAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'team', 'language_code', 'preferred',

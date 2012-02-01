@@ -15,6 +15,7 @@ test -L user-data/pictures || ln -s ../../extras/pictures user-data/pictures
 source venv/bin/activate
 cd deploy
 pip install -r requirements.txt
+pip install -r requirements-test.txt
 cd ..
 
 # Set up the DB ---------------------------------------------------------------

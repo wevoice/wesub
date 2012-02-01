@@ -193,7 +193,7 @@ class FacebookBackend(object):
 
         username = user_info['first_name']
         try:
-            user_profile = FacebookUserProfile.objects.get(user__is_active=True, facebook_uid=user_info['uid'])
+            user_profile = FacebookUserProfile.objects.get(facebook_uid=user_info['uid'])
             if user_profile.user.is_active:
                 return user_profile.user
             else:

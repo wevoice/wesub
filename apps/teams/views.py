@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,14 +16,18 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.utils.http import urlencode
 from utils import render_to, render_to_json
 from utils.searching import get_terms
 from utils.translation import get_languages_list, languages_with_names
+from utils.forms import flatten_errorlists
+from videos import metadata_manager
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
-    GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm
+    GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
+    UnpublishForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -45,7 +49,7 @@ from django.contrib.auth.decorators import permission_required
 import random
 from widget.views import base_widget_params
 import widget
-from videos.models import Action
+from videos.models import Action, VideoUrl
 from django.utils import simplejson as json
 from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
@@ -56,15 +60,17 @@ from apps.videos.templatetags.paginator import paginate
 
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
-    can_create_task_translate, can_create_task_review, can_create_task_approve,
-    can_view_tasks_tab, can_invite, roles_user_can_assign, can_join_team,
-    can_edit_video, can_create_tasks, can_delete_tasks, can_perform_task,
-    can_rename_team, can_change_team_settings, can_perform_task_for,
-    can_delete_team,
+    can_create_task_translate, can_view_tasks_tab, can_invite,
+    roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
+    can_perform_task, can_rename_team, can_change_team_settings,
+    can_perform_task_for, can_delete_team, can_review, can_approve,
 )
-from teams.tasks import invalidate_video_caches
+from teams.tasks import (
+    invalidate_video_caches, invalidate_video_moderation_caches,
+    update_video_moderation
+)
 import logging
-import sentry_logger
+import sentry_logger # Magical import to make sure Sentry's error recording happens.
 logger = logging.getLogger("teams.views")
 
 
@@ -126,7 +132,7 @@ def index(request, my_teams=False):
         'ordering': ordering,
         'order_type': order_type,
         'order_name': order_fields_name.get(ordering, 'name'),
-        'highlighted_qs': highlighted_qs
+        'highlighted_qs': highlighted_qs,
     }
     return object_list(request, queryset=qs,
                        paginate_by=TEAMS_ON_PAGE,
@@ -137,11 +143,10 @@ def index(request, my_teams=False):
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
-    filtered = False
+    filtered = 0
 
     if project_slug is not None:
         project = get_object_or_404(Project, team=team, slug=project_slug)
-        filtered = True
     else:
         project = None
 
@@ -149,29 +154,30 @@ def detail(request, slug, project_slug=None, languages=None):
     sort = request.GET.get('sort')
     language = request.GET.get('lang')
 
-    if query or language:
-        filtered = True
+    if language:
+        filtered = filtered + 1
 
     qs = team.get_videos_for_languages_haystack(
         language, user=request.user, project=project, query=query, sort=sort)
 
     extra_context = widget.add_onsite_js_files({})
 
-    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(None, user=request.user, project=None, query=None, sort=sort).count()
+    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(
+        None, user=request.user, project=None, query=None, sort=sort).count()
 
     extra_context.update({
         'team': team,
         'project':project,
         'can_add_video': can_add_video(team, request.user, project),
         'can_edit_videos': can_add_video(team, request.user, project),
-        'can_create_tasks': can_create_tasks(team, request.user, project),
+        'filtered': filtered
     })
 
-    if extra_context['can_add_video'] or extra_context['can_edit_videos'] or extra_context['can_create_tasks']:
+    if extra_context['can_add_video'] or extra_context['can_edit_videos']:
         # Cheat and reduce the number of videos on the page if we're dealing with
         # someone who can edit videos in the team, for performance reasons.
         is_editor = True
-        per_page = 10
+        per_page = 8
     else:
         is_editor = False
         per_page = VIDEOS_ON_PAGE
@@ -220,6 +226,15 @@ def detail(request, slug, project_slug=None, languages=None):
         Workflow.objects.filter(team=team.id)
                         .select_related('project', 'team', 'team_video'))
 
+    if not project:
+        message = 'Check out the "%s" team on Universal Subtitles: %s' % (team.name, request.build_absolute_uri())
+        share_panel_email_url = reverse('videos:email_friend')
+        extra_context['share_panel_email_url'] = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
+    else:
+        message = 'Check out the "%s" project on Universal Subtitles: %s' % (project.name, request.build_absolute_uri())
+        share_panel_email_url = reverse('videos:email_friend')
+        extra_context['share_panel_email_url'] = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
+
     if is_editor:
         team_video_ids = [record.team_video_pk for record in team_video_md_list]
         team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
@@ -230,6 +245,11 @@ def detail(request, slug, project_slug=None, languages=None):
             record._team_video.completed_langs = record.video_completed_langs
 
     return extra_context
+
+def role_saved(request, slug):
+    messages.success(request, _(u'Member saved.'))
+    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
+    return HttpResponseRedirect(return_path)
 
 def completed_videos(request, slug):
     team = Team.get(slug, request.user)
@@ -258,7 +278,16 @@ def completed_videos(request, slug):
 
 def videos_actions(request, slug):
     team = Team.get(slug, request.user)
-    qs = Action.objects.for_team(team)
+
+    try:
+        user = request.user if request.user.is_authenticated() else None
+        member = team.members.get(user=user) if user else None
+    except TeamMember.DoesNotExist:
+        member = False
+
+    public_only = False if member else True
+    qs = Action.objects.for_team(team, public_only=public_only)
+
     extra_context = {
         'team': team
     }
@@ -381,6 +410,7 @@ def settings_guidelines(request, slug):
 def settings_permissions(request, slug):
     team = Team.get(slug, request.user)
     workflow = Workflow.get_for_target(team.id, 'team')
+    moderated = team.moderates_videos()
 
     if not can_change_team_settings(team, request.user):
         messages.error(request, _(u'You do not have permission to edit this team.'))
@@ -395,6 +425,11 @@ def settings_permissions(request, slug):
 
             if form.cleaned_data['workflow_enabled']:
                 workflow_form.save()
+
+            moderation_changed = moderated != form.instance.moderates_videos()
+            if moderation_changed:
+                update_video_moderation.delay(team)
+                invalidate_video_moderation_caches.delay(team)
 
             messages.success(request, _(u'Settings saved.'))
             return HttpResponseRedirect(request.path)
@@ -515,12 +550,12 @@ def add_video(request, slug):
     form = AddTeamVideoForm(team, request.user, request.POST or None, request.FILES or None, initial=initial)
 
     if form.is_valid():
-        obj =  form.save(False)
+        obj = form.save(False)
         obj.added_by = request.user
         obj.save()
         api_teamvideo_new.send(obj)
         messages.success(request, form.success_message())
-        return redirect(obj)
+        return redirect(team.get_absolute_url())
 
     return {
         'form': form,
@@ -605,9 +640,12 @@ def remove_video(request, team_video_pk):
 
     team_video.delete()
 
+    msg = _(u'Video has been removed from the team.')
+
     if request.is_ajax():
         return { 'success': True }
     else:
+        messages.success(request, msg)
         return HttpResponseRedirect(next)
 
 
@@ -689,7 +727,7 @@ def remove_member(request, slug, user_pk):
         user = member.user
         if not user == request.user:
             TeamMember.objects.filter(team=team, user=user).delete()
-            messages.success(request, _(u'Member removed from team.'))
+            messages.success(request, _(u'Member has been removed from the team.'))
             return HttpResponseRedirect(return_path)
         else:
             messages.error(request, _(u'Use the "Leave this team" button to remove yourself from this team.'))
@@ -863,10 +901,16 @@ def _member_search_result(member, team, task_id, team_video_id, task_type, task_
 
     if task_id:
         task = Task.objects.not_deleted().get(team=team, pk=task_id)
-        result += [can_perform_task(member.user, task)]
+        if member.has_max_tasks():
+            result += [False]
+        else:
+            result += [can_perform_task(member.user, task)]
     elif team_video_id:
         team_video = TeamVideo.objects.get(pk=team_video_id)
-        result += [can_perform_task_for(member.user, task_type, team_video, task_lang)]
+        if member.has_max_tasks():
+            result += [False]
+        else:
+            result += [can_perform_task_for(member.user, task_type, team_video, task_lang)]
     else:
         result += [None]
 
@@ -962,7 +1006,7 @@ def _task_category_counts(team, filters, user):
 
     return counts
 
-def _tasks_list(request, team, filters, user):
+def _tasks_list(request, team, project, filters, user):
     '''List tasks for the given team, optionally filtered.
 
     `filters` should be an object/dict with zero or more of the following keys:
@@ -974,6 +1018,9 @@ def _tasks_list(request, team, filters, user):
 
     '''
     tasks = Task.objects.filter(team=team.id, deleted=False)
+
+    if project:
+        tasks = tasks.filter(team_video__project = project)
 
     if filters.get('team_video'):
         tasks = tasks.filter(team_video=filters['team_video'])
@@ -1007,7 +1054,22 @@ def _tasks_list(request, team, filters, user):
         elif assignee:
             tasks = tasks.filter(assignee=int(assignee))
 
-    return tasks.select_related('team_video__video', 'assignee', 'team')
+    return tasks.select_related('team_video__video', 'team_video__team', 'assignee', 'team', 'team_video__project')
+
+def _order_tasks(request, tasks):
+    sort = request.GET.get('sort', '-created')
+
+    if sort == 'created':
+        tasks = tasks.order_by('created')
+    elif sort == '-created':
+        tasks = tasks.order_by('-created')
+    elif sort == 'expires':
+        tasks = tasks.order_by('expiration_date')
+    elif sort == '-expires':
+        tasks = tasks.order_by('-expiration_date')
+
+    return tasks
+
 
 def _get_task_filters(request):
     return { 'language': request.GET.get('lang'),
@@ -1018,19 +1080,27 @@ def _get_task_filters(request):
 
 
 @render_to('teams/tasks.html')
-def team_tasks(request, slug):
+def team_tasks(request, slug, project_slug=None):
     team = Team.get(slug, request.user)
 
     if not can_view_tasks_tab(team, request.user):
         return HttpResponseForbidden(_("You cannot view this team's tasks."))
+
+    # TODO: Review this
+    if project_slug is not None:
+        project = get_object_or_404(Project, team=team, slug=project_slug)
+    else:
+        project = None
 
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
     languages = _task_languages(team, request.user)
     languages = sorted(languages, key=lambda l: l['name'])
     filters = _get_task_filters(request)
+    filtered = 0
 
-    tasks = _tasks_list(request, team, filters, user)
+    tasks = _order_tasks(request,
+                         _tasks_list(request, team, project, filters, user))
     category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
@@ -1044,13 +1114,28 @@ def team_tasks(request, slug):
             filters['assignee'] == None
         else:
             filters['assignee'] = team.members.get(user=filters['assignee'])
+        filtered = filtered + 1
+
+    if filters.get('language'):
+        filtered = filtered + 1
+
+    if filters.get('type'):
+        filtered = filtered + 1
 
     widget_settings = {}
     from apps.widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
 
+    video_pks = [t.team_video.video_id for t in tasks]
+    video_urls = dict([(vu.video_id, vu.effective_url) for vu in
+                       VideoUrl.objects.filter(video__in=video_pks, primary=True)])
+
+    for t in tasks:
+        t.cached_video_url = video_urls.get(t.team_video.video_id)
+
     context = {
         'team': team,
+        'project': project, # TODO: Review
         'user_can_delete_tasks': can_delete_tasks(team, request.user),
         'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
@@ -1059,6 +1144,8 @@ def team_tasks(request, slug):
         'tasks': tasks,
         'filters': filters,
         'widget_settings': widget_settings,
+        'filtered': filtered,
+        'member': member,
     }
 
     context.update(pagination_info)
@@ -1080,6 +1167,8 @@ def create_task(request, slug, team_video_pk):
             task.team = team
             task.team_video = team_video
 
+            task.set_expiration()
+
             if task.type == Task.TYPE_IDS['Subtitle']:
                 task.language = ''
 
@@ -1096,15 +1185,11 @@ def create_task(request, slug, team_video_pk):
 
     subtitlable = json.dumps(can_create_task_subtitle(team_video, request.user))
     translatable_languages = json.dumps(can_create_task_translate(team_video, request.user))
-    reviewable_languages = json.dumps(can_create_task_review(team_video, request.user))
-    approvable_languages = json.dumps(can_create_task_approve(team_video, request.user))
 
     language_choices = json.dumps(get_languages_list(True))
 
     return { 'form': form, 'team': team, 'team_video': team_video,
              'translatable_languages': translatable_languages,
-             'reviewable_languages': reviewable_languages,
-             'approvable_languages': approvable_languages,
              'language_choices': language_choices,
              'subtitlable': subtitlable,
              'can_assign': can_assign, }
@@ -1161,6 +1246,7 @@ def assign_task(request, slug):
         assignee = form.cleaned_data['assignee']
 
         task.assignee = assignee
+        task.set_expiration()
         task.save()
         notifier.team_task_assigned.delay(task.pk)
 
@@ -1182,6 +1268,7 @@ def assign_task_ajax(request, slug):
         assignee = form.cleaned_data['assignee']
 
         task.assignee = assignee
+        task.set_expiration()
         task.save()
         notifier.team_task_assigned.delay(task.pk)
 
@@ -1269,4 +1356,89 @@ def edit_project(request, slug, project_slug):
         workflow_form = WorkflowForm(instance=workflow)
 
     return { 'team': team, 'project': project, 'form': form, 'workflow_form': workflow_form, }
+
+@render_to('teams/_third-party-accounts.html')
+@login_required
+def third_party_accounts(request, slug):
+    from accountlinker.views import _generate_youtube_oauth_request_link
+    team = get_object_or_404(Team, slug=slug)
+    if not can_change_team_settings(team, request.user):
+        messages.error(request, _(u'You do not have permission to edit this team.'))
+        return HttpResponseRedirect(team.get_absolute_url())
+
+    new_youtube_url = _generate_youtube_oauth_request_link(str(team.pk))
+    linked_accounts = team.third_party_accounts.all()
+    return {
+        "team":team,
+        "new_youtube_url": new_youtube_url,
+        "linked_accounts": linked_accounts,
+    }
+
+
+# Unpublishing
+def _create_task_after_unpublishing(subtitle_version):
+    team_video = subtitle_version.language.video.get_team_video()
+    lang = subtitle_version.language.language
+
+    # If there's already an open review/approval task for this language, it
+    # means we just unpublished multiple versions in a row and can ignore this.
+    open_task_exists = (team_video.task_set.incomplete_review().exists()
+                     or team_video.task_set.incomplete_approve().exists())
+    if open_task_exists:
+        return None
+
+    workflow = Workflow.get_for_team_video(team_video)
+    if workflow.approve_allowed:
+        type = Task.TYPE_IDS['Approve']
+        can_do = can_approve
+    else:
+        type = Task.TYPE_IDS['Review']
+        can_do = can_review
+
+    last_task = (team_video.task_set.complete().filter(language=lang, type=type)
+                                               .order_by('-completed')
+                                               [:1])
+
+    assignee = None
+    if last_task:
+        candidate = last_task[0].assignee
+        if candidate and can_do(team_video, candidate, lang):
+            assignee = candidate
+
+    task = Task(team=team_video.team, team_video=team_video,
+                assignee=assignee, language=lang, type=type,
+                subtitle_version=subtitle_version)
+    task.save()
+
+    return task
+
+def unpublish(request, slug):
+    team = get_object_or_404(Team, slug=slug)
+
+    form = UnpublishForm(request.user, team, request.POST)
+    if not form.is_valid():
+        messages.error(request, _(u'Invalid unpublishing request.\nErrors:\n') + '\n'.join(flatten_errorlists(form.errors)))
+        return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
+
+    version = form.cleaned_data['subtitle_version']
+    team_video = version.language.video.get_team_video()
+    scope = form.cleaned_data['scope']
+    should_delete = form.cleaned_data['should_delete']
+
+    if scope == 'version':
+        result = version.unpublish(delete=should_delete)
+    elif scope == 'language':
+        # TODO Fix this...
+        result = version.language.unpublish(delete=should_delete)
+    else:
+        # TODO Write scope == 'dependents' code.
+        pass
+
+    if result:
+        _create_task_after_unpublishing(result)
+
+    metadata_manager.update_metadata(team_video.video.pk)
+
+    messages.success(request, _(u'Successfully unpublished subtitles.'))
+    return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
 

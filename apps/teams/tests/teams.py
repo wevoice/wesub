@@ -361,9 +361,9 @@ class TeamsTest(TestCase):
         return response.context['team_video_md_list']
 
     def _complete_search_record_list(self, team):
-        url = reverse("teams:completed_videos", kwargs={"slug": team.slug})
+        url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url)
-        return response.context['team_video_list']
+        return response.context['team_video_md_list']
 
     def test_team_join_leave(self):
         team = Team.objects.get(pk=1)
@@ -698,7 +698,7 @@ class TeamsTest(TestCase):
         url = reverse("teams:add_video", kwargs={"slug": team.slug})
         response = self.client.post(url, data)
         self.assertEqual(tv_len+1, team.teamvideo_set.count())
-        self.assertRedirects(response, reverse("teams:team_video", kwargs={"team_video_pk": 3}))
+        self.assertRedirects(response, reverse("teams:detail", kwargs={"slug": team.slug}))
 
         #-------edit team video -----------------
         team = Team.objects.get(pk=1)
@@ -787,10 +787,6 @@ class TeamsTest(TestCase):
         self.failUnlessEqual(response.status_code, 302)
 
         self.assertFalse(team.is_member(user2))
-
-        url = reverse("teams:completed_videos", kwargs={"slug": team.slug})
-        response = self.client.post(url)
-        self.failUnlessEqual(response.status_code, 200)
 
         url = reverse("teams:videos_actions", kwargs={"slug": team.slug})
         response = self.client.post(url)

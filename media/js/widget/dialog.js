@@ -249,6 +249,15 @@ unisubs.Dialog.prototype.setDropDownContentsInternal = function(dropDownContents
 unisubs.Dialog.prototype.getDropDownContents = function() {
     return this.dropDownContents_;
 };
+
+unisubs.Dialog.prototype.showEmptySubsDialog = function() {
+    var that = this;
+    var dialog = new unisubs.widget.EmptySubsWarningDialog(function(){
+            that.hideDialogImpl_(false);
+    })
+    dialog.setVisible(true);
+
+}
 unisubs.Dialog.prototype.showSaveWorkDialog_ = function() {
     var that = this;
     var unsavedWarning = new unisubs.UnsavedWarning(function(submit) {

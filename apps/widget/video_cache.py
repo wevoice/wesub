@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2011 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import datetime
@@ -21,11 +21,11 @@ import datetime
 from django.core.cache import cache
 from videos.types.base import VideoTypeError
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.utils.hashcompat import sha_constructor
 from videos.types import video_type_registrar
 
 TIMEOUT = 60 * 60 * 24 * 5 # 5 days
+
 
 def get_video_id(video_url, public_only=False, referer=None):
     """
@@ -42,12 +42,12 @@ def get_video_id(video_url, public_only=False, referer=None):
             video, create = Video.get_or_create_for_url(video_url)
         except VideoTypeError:
             return None
-        
+
         if not video:
             return None
-        
+
         video_id = video.video_id
-        
+
         cache.set(cache_key, video_id, TIMEOUT)
         return video_id
 
@@ -65,6 +65,8 @@ def associate_extra_url(video_url, video_id):
                 'videoid': video_id })
         cache.set(cache_key, video_url.videoid, TIMEOUT)
 
+
+# Invalidation
 def invalidate_cache(video_id):
     cache.delete(_video_urls_key(video_id))
     try:
@@ -94,6 +96,10 @@ def invalidate_cache(video_id):
 
 def invalidate_video_id(video_url):
     cache.delete(_video_id_key(video_url))
+
+def invalidate_video_moderation(video_id):
+    cache.delete(_video_is_moderated_key(video_id))
+
 
 def on_video_url_save(sender, instance, **kwargs):
     if instance.video_id:
@@ -150,7 +156,7 @@ def get_video_urls(video_id):
         return value
     else:
         from videos.models import Video
-        video_urls = [vu.effective_url for vu 
+        video_urls = [vu.effective_url for vu
                  in Video.objects.get(video_id=video_id).videourl_set.all()]
         cache.set(cache_key, video_urls, TIMEOUT)
         return video_urls
@@ -167,7 +173,7 @@ def get_subtitles_dict(
         if language_pk is None:
             language = video.subtitle_language()
         else:
-            
+
             try:
                 language = video.subtitlelanguage_set.get(pk=language_pk)
             except SubtitleLanguage.DoesNotExist:
@@ -239,7 +245,7 @@ def get_video_languages_verbose(video_id, max_items=6):
 def get_is_moderated(video_id):
     cache_key = _video_is_moderated_key(video_id)
     value = cache.get(cache_key)
-    if value is  None:
+    if value is None:
         from videos.models import Video
         video = Video.objects.get(video_id=video_id)
         value = video.is_moderated
@@ -262,16 +268,16 @@ def get_visibility_policies(video_id):
         }
         cache.set(cache_key, value, TIMEOUT)
     return value
-    
-        
-    
+
+
+# Writelocking
 def _writelocked_store_langs(video_id, langs):
     delimiter = ";"
     cache_key = _video_writelocked_langs_key(video_id)
     value = delimiter.join(langs)
     cache.set(cache_key, value, 5 * 60)
     return langs
-        
+
 def writelocked_langs(video_id):
     from videos.models import WRITELOCK_EXPIRATION, Video
     delimiter = ";"
@@ -293,7 +299,7 @@ def writelock_add_lang(video_id, language_code):
     if not language_code in langs:
         langs.append(language_code)
         _writelocked_store_langs(video_id, langs)
-        
+
 def writelock_remove_lang(video_id, language_code):
     langs = writelocked_langs(video_id)
     if language_code in langs:

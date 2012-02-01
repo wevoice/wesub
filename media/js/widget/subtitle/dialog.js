@@ -25,7 +25,7 @@ goog.provide('unisubs.subtitle.Dialog');
  */
 unisubs.subtitle.Dialog = function(videoSource, serverModel,
                                     subtitles, opt_opener,
-                                    opt_skipFinished) {
+                                    opt_skipFinished, originalSubtitles) {
     unisubs.Dialog.call(this, videoSource);
     unisubs.SubTracker.getInstance().start(false);
     this.serverModel_ = serverModel;
@@ -56,6 +56,7 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel,
     this.subtitles_ = subtitles;
 
     this.keyEventsSuspended_ = false;
+    this.originalSubtitles_ = originalSubtitles;
 };
 goog.inherits(unisubs.subtitle.Dialog, unisubs.Dialog);
 
@@ -65,9 +66,11 @@ goog.inherits(unisubs.subtitle.Dialog, unisubs.Dialog);
  */
 unisubs.subtitle.Dialog.State_ = {
     TRANSCRIBE: 0,
-    SYNC: 1,
-    REVIEW: 2,
-    FINISHED: 3
+    EDIT_METADATA: 1,
+    SYNC: 2,
+    REVIEW: 3,
+    FINISHED: 4
+    
 };
 unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
@@ -151,12 +154,22 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
             rightPanel, et.SAVEANDEXIT, this.handleSaveAndExitKeyPress_).
         listen(
             rightPanel, et.GOTOSTEP, this.handleGoToStep_);
-    if (state == s.SYNC || state == s.REVIEW) {
-        rightPanel.showBackLink(
-            state == s.SYNC ? "Back to Typing" : "Back to Sync");
+    var backButtonText = null;
+    if (state == s.EDIT_METADATA ){
+        backButtonText = "Back to Typing";
+    }else if (state == s.SYNC){
+        backButtonText = "Back to Subtitle info";
+    }else if (state == s.REVIEW ){
+        backButtonText = "Back to Sync";
+    }
+    if (backButtonText){
+        rightPanel.showBackLink(backButtonText);
         this.rightPanelListener_.listen(
             rightPanel, et.BACK, this.handleBackKeyPress_);
-        this.timelineSubtitleSet_ =
+
+    }
+    if (state == s.SYNC || state == s.REVIEW) {
+            this.timelineSubtitleSet_ =
             new unisubs.timeline.SubtitleSet(
                 this.captionSet_, this.getVideoPlayerInternal());
         this.getTimelinePanelInternal().addChild(
@@ -240,9 +253,11 @@ unisubs.subtitle.Dialog.prototype.handleKeyUp_ = function(event) {
 unisubs.subtitle.Dialog.prototype.handleBackKeyPress_ = function(event) {
     var s = unisubs.subtitle.Dialog.State_;
     if (this.state_ == s.SYNC)
-        this.setState_(s.TRANSCRIBE);
+        this.setState_(s.EDIT_METADATA);
     else if (this.state_ == s.REVIEW)
         this.setState_(s.SYNC);
+    else if (this.state_ == s.EDIT_METADATA)
+        this.setState_(s.TRANSCRIBE);
 };
 unisubs.subtitle.Dialog.prototype.handleLegendKeyPress_ = function(event) {
     if (event.keyCode == goog.events.KeyCodes.TAB &&
@@ -275,6 +290,11 @@ unisubs.subtitle.Dialog.prototype.isWorkSaved = function() {
 unisubs.subtitle.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
     if (this.captionSet_.needsSync()) {
         this.saveWorkImpl_(closeAfterSave, false);
+    } else if (goog.array.isEmpty(
+        this.serverModel_.captionSet_.nonblankSubtitles())){
+        // there are no subs here, close dialog or back to subtitling
+        this.showEmptySubsDialog();
+        return;
     } else {
         unisubs.subtitle.CompletedDialog.show(
             !!this.subtitles_.IS_COMPLETE,
@@ -313,7 +333,7 @@ unisubs.subtitle.Dialog.prototype.saveWorkImpl_ = function(closeAfterSave, isCom
         },
         function(opt_status) {
             if (that.finishFailDialog_)
-                that.finishFailDialog_.failedAgain(opt_status);
+               that.finishFailDialog_.failedAgain(opt_status);
             else
                 that.finishFailDialog_ = unisubs.finishfaildialog.Dialog.show(
                     that.captionSet_, opt_status,
@@ -371,20 +391,26 @@ unisubs.subtitle.Dialog.prototype.showHowToForState_ = function(state) {
         videoChoice = vc.SYNC;
     else if (state == s.REVIEW)
         videoChoice = vc.REVIEW;
-    var howToPanel = new unisubs.HowToVideoPanel(videoChoice);
-    this.showTemporaryPanel(howToPanel);
-    this.displayingHowTo_ = true;
-    var that = this;
-    this.getHandler().listenOnce(
-        howToPanel, unisubs.HowToVideoPanel.CONTINUE,
-        function(e) {
-            goog.Timer.callOnce(function() {
-                that.displayingHowTo_ = false;
-                that.hideTemporaryPanel();
-                that.showGuidelinesForState_(state);
+    if (videoChoice){
+        // the edit metadata has no helper video
+        var howToPanel = new unisubs.HowToVideoPanel(videoChoice);
+        this.showTemporaryPanel(howToPanel);
+        this.displayingHowTo_ = true;
+        var that = this;
+        this.getHandler().listenOnce(
+            howToPanel, unisubs.HowToVideoPanel.CONTINUE,
+            function(e) {
+                goog.Timer.callOnce(function() {
+                    that.displayingHowTo_ = false;
+                    that.hideTemporaryPanel();
+                    that.showGuidelinesForState_(state);
+                });
             });
-        });
-};
+        
+    }else{
+        this.showGuidelinesForState_(state);
+    }
+ };
 
 unisubs.subtitle.Dialog.prototype.skipBack_ = function() {
     var videoPlayer = this.getVideoPlayerInternal();
@@ -413,11 +439,21 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.captionSet_,
             this.getVideoPlayerInternal(),
             this.serverModel_,
-            this.captionManager_);
+           this.captionManager_);
+    else if (this.state_ == s.EDIT_METADATA)
+        return new unisubs.editmetadata.Panel(
+            this.captionSet_,
+            this.getVideoPlayerInternal(),
+            this.serverModel_,
+            this.captionManager_,
+            this.originalSubtitles_ ,
+            true);
 };
 unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
     if (this.state_ == s.TRANSCRIBE)
+        return s.EDIT_METADATA;
+    else if (this.state_ == s.EDIT_METADATA)
         return s.SYNC;
     else if (this.state_ == s.SYNC)
         return s.REVIEW;
@@ -447,10 +483,12 @@ unisubs.subtitle.Dialog.prototype.disposeCurrentPanels_ = function() {
 unisubs.subtitle.Dialog.prototype.disposeInternal = function() {
     unisubs.subtitle.Dialog.superClass_.disposeInternal.call(this);
     this.disposeCurrentPanels_();
-    this.captionManager_.dispose();
+    if (this.captionManager_)
+        this.captionManager_.dispose();
     this.serverModel_.dispose();
     this.rightPanelListener_.dispose();
-    this.captionSet_.dispose();
+    if (this.captionSet_)
+        this.captionSet_.dispose();
 };
 unisubs.subtitle.Dialog.prototype.addTranslationsAndClose = function() {
     // Adam hypothesizes that this will get called 0 times except in testing

@@ -1,0 +1,102 @@
+{% load i18n teams_tags utils_tags %}
+
+{% team_projects team as projects %}
+
+<p class="backnav">
+<a href="{{ team.get_absolute_url }}" title="Team page">{{ team }}</a> / Projects /
+</p>
+<h2 class="main-title">
+    <a href="" title="permalink">{{ project }}</a>
+</h2>
+<div id="description"{% if project.description|length > 300 %} class="abbr collapsed"{% endif %}>
+    <div>
+        {{ project.description|urlize|linebreaks }}
+    </div>
+    {% if project.description|length > 300 %}
+        <a class="expand" href="#">{% trans 'Show all' %} ↓</a>
+    {% endif %}
+</div>
+<ul class="metrics">
+    <li>
+        <div>
+            <p>{{ project.videos_count|simplify_number }}</p>
+            <h4>{% trans "Video" %}{{ project.videos_count|pluralize }}</h4>
+        </div>
+    </li>
+    <li>
+        <div>
+            <p>{{ project.tasks_count|simplify_number }}</p>
+            <h4>{% trans "Task" %}{{ project.tasks_count|pluralize }}</h4>
+        </div>
+    </li>
+</ul>
+
+{% if team|is_team_member:user %}
+    <h3>Member Tools</h3>
+    {% if team.max_tasks_per_member or team.task_expiration %}
+        <p class="notation policy">
+        {% if team.max_tasks_per_member %}
+        <strong>{{ team.max_tasks_per_member }}</strong> task{{ team.max_tasks_per_member|pluralize }} per member{% if team.task_expiration %} • {% endif %}
+        {% endif %}
+        {% if team.task_expiration %}
+            <strong>{{ team.task_expiration }}</strong> day{{ team.task_expiration|pluralize }} per task
+        {% endif %}
+        </p>
+    {% endif %}
+    <ul>
+        <li>
+            <a href="{% url teams:project_tasks slug=team.slug, project_slug=project.slug %}?assignee=me">My tasks</a>
+            ({{ project|user_project_tasks_count:user }})
+        </li>
+        {% with user.get_languages as langs %}
+            {% if langs %}
+                {% for l in langs %}
+                <li>
+                    <a href="{% url teams:team_tasks team.slug %}?lang={{ l.language }}">{% trans 'Tasks for' %} {{ l.get_language_display }}</a>
+                </li>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <li>
+            <a href="{% url teams:project_tasks slug=team.slug, project_slug=project.slug %}?assignee=none">All available tasks</a>
+        </li>
+    </ul>
+{% endif %}
+
+{% if team.is_visible %}
+    <h3>{% trans 'Share' %}</h3>
+    <ul class="buttons">
+        <li><a href="#" onclick="return share_on_facebook(event);" class="facebook" title="{% trans 'Post to Facebook' %}">{% trans 'Post to Facebook' %}</a></li>
+        <li><a href="http://twitter.com/share/?text={{ project.name|urlencode }} on Universal Subtitles&url={{ request.build_absolute_uri|urlencode }}" target="post_to_twitter" class="twitter" title="{% trans 'Post to Twitter' %}">{% trans 'Post to Twitter' %}</a></li>
+        <li><a href="{{share_panel_email_url}}" target="email_friends" class="email" title="{% trans 'Email to friends' %}">{% trans 'Email to friends' %}</a></li>
+        <li class="unisubs-facebook-like"><iframe src="http://www.facebook.com/plugins/like.php?href={{ request.build_absolute_uri|urlencode }}&layout=button_count&show_faces=false&width=150&action=like&colorscheme=light&height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:150px; height:25px; padding: .45em .25em;" allowTransparency="true"></iframe></li>
+    </ul>
+{% endif %}
+
+<script type="text/javascript">
+    jQuery('.unisubs-share .unisubs-twitter-share').click(function(){
+        jQuery.get('{% url statistic:tw_update_share_statistic %}');
+    });
+    function share_on_facebook(event) {
+        jQuery.get('{% url statistic:fb_update_share_statistic %}');
+        window.open('http://www.facebook.com/sharer.php?u={{ request.build_absolute_uri|urlencode }}&t={{ project.name|urlencode }} on Universal Subtitles', 'post_to_fb', 'status=0,width=560,height=320');
+        return false;
+    }
+</script>
+
+{% if projects.count > 1 %}
+    <h3>{% trans 'Other' %} {{ team }} {% trans 'Projects' %}</h3>
+    <ul>
+        {% for proj in projects %}
+            {% if proj != project %}
+                <li>
+                <a href="{% url teams:project_video_list slug=team.slug,project_slug=proj.slug %}">
+                    {{ proj }}
+                </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% include "teams/_actions.html" %}

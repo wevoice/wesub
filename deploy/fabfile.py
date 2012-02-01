@@ -252,11 +252,25 @@ def _git_pull():
     run('chmod g+w -R .git 2> /dev/null; /bin/true')
     _clear_permissions('.')
 
-def _git_checkout(commit):
-    run('git fetch')
-    run('git checkout --force %s' % commit)
-    run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    run('chmod g+w -R .git 2> /dev/null; /bin/true')
+def _git_checkout(commit, as_sudo=False):
+    cmd = run
+    if as_sudo:
+        cmd = sudo
+    cmd('git fetch')
+    cmd('git checkout --force %s' % commit)
+    cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _clear_permissions('.')
+
+def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
+    cmd = run
+    if as_sudo:
+        cmd = sudo
+    cmd('git fetch')
+    cmd('git checkout %s' % branch)
+    cmd('git reset --hard %s' % commit)
+    cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
     _clear_permissions('.')
 
 
@@ -292,12 +306,19 @@ def remove_disabled():
         env.host_string = host
         run('rm {0}/unisubs/disabled'.format(env.web_dir))
         
-def _update_integration(dir):
-    '''Actually update the integration repo on a single host.'''
+def _update_integration(dir, as_sudo=True):
+    '''
+    Actually update the integration repo on a single host.
+    Has to be run as root, else all users on all servers must have 
+    the right key for the private repo.
+    '''
 
     with cd(os.path.join(dir, 'unisubs', 'unisubs-integration')):
         with settings(warn_only=True):
-            _git_checkout(_get_optional_repo_version(dir, 'unisubs-integration'))
+            _git_checkout_branch_and_reset(
+                _get_optional_repo_version(dir, 'unisubs-integration'), 
+                as_sudo=as_sudo
+            )
 
 def update_integration():
     '''Update the integration repo to the version recorded in the site repo.
@@ -330,11 +351,12 @@ def update_web():
         env.host_string = ADMIN_HOST
         with cd(os.path.join(env.admin_dir, 'unisubs')):
             _git_pull()
+            _update_integration(env.admin_dir)
     for host in env.web_hosts:
         env.host_string = host
         with cd('{0}/unisubs'.format(env.web_dir)):
-            python_exe = '{0}/env/bin/python'.format(env.web_dir)
             _git_pull()
+            _update_integration(env.web_dir)
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -print0 | xargs -0 rm")
     _bounce_celeryd()

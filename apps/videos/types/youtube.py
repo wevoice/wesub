@@ -21,6 +21,7 @@ from gdata.service import RequestError
 import re
 import httplib2
 from utils import YoutubeXMLParser
+from utils.language_codes  import LanguageCode
 from base import VideoType, VideoTypeError
 from auth.models import CustomUser as User
 from datetime import datetime
@@ -32,23 +33,39 @@ from django.utils.http import urlquote
 import logging
 from celery.task import task
 
-logger = logging.getLogger('youtube')
+logger = logging.getLogger("youtube")
 
 SUPPORTED_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
+YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
 
-yt_service = YouTubeService()
-yt_service.ssl = False
-
+    
 _('Private video')
 _('Undefined error')
+
+def get_youtube_service():
+    """
+    Gets instance of youtube service with the proper developer key
+    this is needed, else our quota is serverly damaged.
+    """
+    yt_service = YouTubeService(developer_key=YOUTUBE_API_SECRET)
+    yt_service.ssl = False
+    return yt_service
+    
+yt_service = get_youtube_service()
 
 @task
 def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import Video
     
     lc = lang.get('lang_code')
-
+    #lc  = LanguageCode(lc.lower(), "unisubs").encode("unisubs")
     if not lc in SUPPORTED_LANGUAGES_DICT:
+        logger.warn("Youtube import did not find language code", extra={
+            "data":{
+                "language_code": lc,
+                "youtube_id": youtube_id,
+            }
+        })
         return
     
     try:
@@ -173,8 +190,10 @@ class YoutubeVideoType(VideoType):
         
         try:
             self.get_subtitles(video_obj)
-        except Exception, e:
-            logger.error("Error getting subs from youtube: %s" % e)
+        except :
+            import sentry_logger
+            logger = logging.getLogger("youtube")
+            logger.exception("Error getting subs from youtube:" )
             
         return video_obj
     
@@ -243,3 +262,70 @@ class YoutubeVideoType(VideoType):
         
         for item in langs:
             save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
+            
+import gdata
+import gdata.youtube.client
+import gdata.youtube
+import gdata.youtube.service
+           
+class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
+       
+    def __init__(self, access_token, refresh_token, youtube_video_id):
+        """
+        A wrapper around the gdata client, to make life easier.
+        In order to edit captions for a video, the oauth credentials
+        must be that video's owner on youtube.
+        """
+        super(YouTubeApiBridge, self).__init__()
+        self.token  = gdata.gauth.OAuth2Token(
+            client_id=settings.YOUTUBE_CLIENT_ID,
+            client_secret=settings.YOUTUBE_CLIENT_SECRET,
+            scope='https://gdata.youtube.com',
+            user_agent='universal-subtitles',
+            access_token=access_token,
+            refresh_token=refresh_token
+        )
+        self.token.authorize(self)
+        self.youtube_video_id  = youtube_video_id
+        
+    def _get_captions_info(self):
+        import atom
+        entry = self.GetVideoEntry(video_id=self.youtube_video_id)
+        links = [x for x in entry.get_elements() if isinstance(x, atom.data.Link)]
+        caption_track = entry.get_link(rel= 'http://gdata.youtube.com/schemas/2007#video.captionTracks')
+        captions_feed = self.get_feed(caption_track.href,  desired_class=gdata.youtube.data.CaptionFeed)
+        captions = captions_feed.entry
+        self.captions  = {}
+        for entry in captions:
+            lang = entry.get_elements(tag="content")[0].lang
+            url = entry.get_edit_media_link().href
+            self.captions[lang] = {
+                "url": url,
+                "track": entry
+            }
+
+        return self.captions
+
+    def upload_captions(self, subtitle_version):
+        """
+        Will upload the subtitle version to this youtube video id.
+        If the subtitle already exists, will update it. At this time
+        the youtube api does not allow for updating title, so once that is
+        set, that's it.
+        """
+        from widget.srt_subs import GenerateSubtitlesHandler
+        handler = GenerateSubtitlesHandler.get('srt')
+        lang = subtitle_version.language.language
+        subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
+        content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
+        title = subtitle_version.language.get_title()
+        # we cant just update, we need to check if it alredy exists... if so, we need to update, not create
+        if hasattr(self, "captions") is False:
+            self._get_captions_info()
+        if lang in self.captions:
+            # updade
+            res = self.update_track(self.youtube_video_id, self.captions[lang]['track'], content, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
+            pass
+        else:
+            res = self.create_track(self.youtube_video_id, title, lang, content, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
+        return res

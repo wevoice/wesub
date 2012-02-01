@@ -18,7 +18,7 @@
     </li>
     {% if team|is_team_member:user %}
         <li{% if current == "tasks" %} class="current" {% endif %}>
-            <a href="{% url teams:team_tasks team.slug %}">
+            <a href="{% url teams:team_tasks team.slug %}?assignee=none">
                 {% trans "Tasks" %}
             </a>
         </li>

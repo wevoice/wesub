@@ -1,5 +1,4 @@
 from django.conf import settings
-from recaptcha.client import captcha
 from django.shortcuts import render_to_response
 from videos.forms import  FeedbackForm
 

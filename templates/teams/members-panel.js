@@ -76,8 +76,8 @@
                 projects,
                 languages,
                 this.hide);
-            displayFeedbackMessage('Member saved.', 'success');
-           return false;
+            window.location = window.roleSavedURL;
+            return false;
         },
         hide:function(e){
             this.el.remove();

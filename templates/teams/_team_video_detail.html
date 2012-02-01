@@ -1,75 +1,40 @@
 {% load i18n teams_tags to_json %}
 
 <li class="team_video_listing_{{ search_record.team_video_pk }}">
-    <h3>
-        <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.title|truncatewords:9 }}</a>
-        {% if search_record.project_name != "_root" %}
-            <span class="descriptor"><a href="{% url teams:project_video_list slug=team.slug,project_slug=search_record.project_slug %}">{{ search_record.project_name }}</a></span>
-        {% endif %}
-    </h3>
 
-    <p>
-        {% if search_record.description %}
-            {{ search_record.description|truncatewords:18|urlize }}.
-        {% endif %}
-    </p>
-
-    <a href="{% url videos:video video_id=search_record.video_id %}" class="thumb"><img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail"></a>
-
-    <ul class="actions">
-        <li>
-            <h4>
-                {% if search_record.video_completed_langs %}
-                    <a href="{% url videos:video video_id=search_record.video_id %}" title="View available subtitles">{{ search_record.video_completed_langs|length }} {% trans 'language' %}{{ search_record.video_completed_langs|length|pluralize }}</a>
-                {% else %}
-                    {% trans "No subtitles yet" %}
-                {% endif %}
-            </h4>
-        </li>
+    <div class="thumb">
+        <a href="{% url videos:video video_id=search_record.video_id %}" title="{{ search_record.title }}">
+            <img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail">
+        </a>
+        <a href="{% url videos:video video_id=search_record.video_id %}" class="languages">
+            {% if search_record.video_completed_langs %}
+                {{ search_record.video_completed_langs|length }} {% trans 'language' %}{{ search_record.video_completed_langs|length|pluralize }}
+            {% else %}
+                {% trans "No subtitles yet" %}
+            {% endif %}
+        </a>
         {% if user_is_team_member %}
-            <li>
-                <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="View open tasks for this video">
-                    {% if search_record.task_count %}
+            {% if search_record.task_count %}
+                <a class="callout" href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="View available tasks for this video">
                         {% blocktrans count counter=search_record.task_count %}
-                            1 open task
+                            1 available task
                         {% plural %}
-                        {{ counter }} open tasks
+                            {{ counter }} available tasks
                         {% endblocktrans %}
-                    {% else %}
-                        {% trans 'No open tasks' %}
-                    {% endif %}
                 </a>
-            </li>
+            {% endif %}
         {% endif %}
-    </ul>
+        {% with search_record|can_edit_video:request.user as can_edit_this_video %}
+            {% if can_edit_this_video %}
+                <ul class="admin-controls">
+                    <li>
+                        <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="Manage tasks">{% trans 'Tasks' %}</a>
+                    </li>
 
-    {% if user_is_team_member %}
-        <ul class="admin-controls">
-            {% with search_record|can_edit_video:request.user as can_edit_this_video %}
-                {% if can_edit_this_video %}
                     <li>
                         <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}" title="Edit this video">{% trans 'Edit' %}</a>
                     </li>
-                {% endif %}
 
-                {% can_create_any_task_for_record search_record request.user %}
-                {% if user_can_create_any_task %}
-                    <li>
-                        <a href="{% url teams:create_task slug=team.slug team_video_pk=search_record.team_video_pk %}" title="Add a task for this video">+ {% trans 'Task' %}</a>
-                    </li>
-                {% else %}
-                    <li>
-                        <a class="disabled" title="No available tasks to add">+ {% trans 'Task' %}</a>
-                    </li>
-                {% endif %}
-
-                {% comment %}
-                    Right now we're using the same logic for editing and
-                    removing videos, so we don't do a separate check here for
-                    performance reasons.
-                {% endcomment %}
-
-                {% if can_edit_this_video %}
                     <li>
                         <form action="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" method="post" style="display: none;">
                             {% csrf_token %}
@@ -77,10 +42,14 @@
                         </form>
                         <a class="remove-video" href="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" title="Remove this video from the team">{% trans 'Remove' %}</a>
                     </li>
-                {% endif %}
-            {% endwith %}
-        </ul>
-    {% endif %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <h3>
+        <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.title|truncatewords:9 }}</a>
+    </h3>
 
     <script type="text/javascript">
         $('a.team_video_{{ search_record.team_video_pk }}').click(function(){

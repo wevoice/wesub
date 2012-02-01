@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -210,8 +210,13 @@ def video(request, video, video_url=None, title=None):
     if original:
         original.pending_moderation_count =  get_pending_count(video.subtitle_language())
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    translations = list(video.subtitlelanguage_set.filter(had_version=True) \
-        .filter(is_original=False).select_related('video'))
+    translations = video.subtitlelanguage_set.filter(had_version=True)
+    if original:
+        # a video might have more than 1 is_original sl, in which case
+        # we guess the right one above, but still manage to include the others
+        # bellow
+        translations = translations.exclude(pk=original.pk)
+    translations = list(translations)
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations
 
@@ -273,7 +278,8 @@ def video_list(request):
 
 def actions_list(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
-    qs = Action.objects.filter(video=video)
+    qs = Action.objects.for_video(video, request.user)
+
     extra_context = {
         'video': video
     }
@@ -414,6 +420,13 @@ def legacy_history(request ,video, lang=None):
 
 @get_video_from_code
 def history(request, video, lang=None, lang_id=None):
+    if not lang:
+        return HttpResponseRedirect(video.get_absolute_url(video_id=video._video_id_used))
+    elif lang == 'unknown':
+        # A hacky workaround for now.
+        # This should go away when we stop allowing for blank SubtitleLanguages.
+        lang = ''
+
     video.update_view_counter()
 
     context = widget.add_onsite_js_files({})
@@ -438,7 +451,7 @@ def history(request, video, lang=None, lang_id=None):
         else:
             raise Http404
 
-    qs = language.subtitleversion_set.select_related('user')
+    qs = language.subtitleversion_set.not_restricted_by_moderation().select_related('user')
     ordering, order_type = request.GET.get('o'), request.GET.get('ot')
     order_fields = {
         'date': 'datetime_started',
@@ -468,14 +481,14 @@ def history(request, video, lang=None, lang_id=None):
 
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations
-    context['last_version'] = language.latest_version(public_only=False)
+    context['last_version'] = language.last_version
     context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
     context['edit_url'] = language.get_widget_url()
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
 
     context['task'] =  _get_related_task(request)
-    _add_share_panel_context_for_history(context, video, lang)
+    _add_share_panel_context_for_history(context, video, language)
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.REVISIONS_ONPAGE,
                        page=request.GET.get('page', 1),

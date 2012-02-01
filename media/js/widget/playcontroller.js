@@ -1,36 +1,37 @@
 // Universal Subtitles, universalsubtitles.org
-// 
-// Copyright (C) 2010 Participatory Culture Foundation
-// 
+//
+// Copyright (C) 2011 Participatory Culture Foundation
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see 
+// along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.widget.PlayController');
 
 /**
  * @constructor
- * 
+ *
  */
 unisubs.widget.PlayController = function(
-    videoID, videoSource, videoPlayer, videoTab, dropDown, opt_subtitleState) 
-{
+    videoID, videoSource, videoPlayer, videoTab, dropDown, opt_subtitleState,
+    isModerated) {
     goog.events.EventTarget.call(this);
     this.videoID_ = videoID;
     this.videoSource_ = videoSource;
     this.videoPlayer_ = videoPlayer;
     this.videoTab_ = videoTab;
     this.dropDown_ = dropDown;
+    this.isModerated_ = isModerated;
     if (opt_subtitleState)
         this.setUpSubs_(opt_subtitleState);
     this.menuEventHandler_ = new goog.events.EventHandler(this);
@@ -82,7 +83,7 @@ unisubs.widget.PlayController.prototype.turnOffSubs = function() {
 };
 
 /**
- * Returns a non-null value if and only if subs are not turned off for the 
+ * Returns a non-null value if and only if subs are not turned off for the
  * the video right now.
  */
 unisubs.widget.PlayController.prototype.getSubtitleState = function() {
@@ -93,8 +94,8 @@ unisubs.widget.PlayController.prototype.getVideoSource = function() {
     return this.videoSource_;
 };
 
-unisubs.widget.PlayController.prototype.setUpSubs_ = 
-    function(subtitleState) 
+unisubs.widget.PlayController.prototype.setUpSubs_ =
+    function(subtitleState)
 {
     this.nudgeShown_ = false;
     this.disposeComponents_();
@@ -103,7 +104,7 @@ unisubs.widget.PlayController.prototype.setUpSubs_ =
     var captionSet = new unisubs.subtitle.EditableCaptionSet(
         subtitleState.SUBTITLES);
     this.subMap_ = captionSet.makeMap();
-    this.captionManager_ = 
+    this.captionManager_ =
         new unisubs.CaptionManager(this.videoPlayer_, captionSet);
     this.playEventHandler_ = new goog.events.EventHandler(this);
     this.playEventHandler_.
@@ -138,7 +139,7 @@ unisubs.widget.PlayController.prototype.trackPlay_ = function() {
         unisubs.Tracker.getInstance().trackEvent(
             "Subs Played",
             window.location.href,
-            videoURL); 
+            videoURL);
         unisubs.Rpc.call(
             'track_subtitle_play',
             { 'video_id': this.videoID_ });
@@ -165,8 +166,8 @@ unisubs.widget.PlayController.prototype.languageSelected = function(videoLanguag
         });
 };
 
-unisubs.widget.PlayController.prototype.setCaptionDisplayStrategy = 
-    function(strategy) 
+unisubs.widget.PlayController.prototype.setCaptionDisplayStrategy =
+    function(strategy)
 {
     this.captionDisplayStrategy_ = strategy;
 };
@@ -177,13 +178,13 @@ unisubs.widget.PlayController.prototype.captionReached_ = function(event) {
 };
 
 unisubs.widget.PlayController.prototype.finished_ = function() {
-    if (this.nudgeShown_){
+    if (this.nudgeShown_ || this.isModerated_){
         return;
     }
     var message = !!this.subtitleState_.LANGUAGE ?
         "Improve this Translation" : "Improve these Subtitles";
     this.videoTab_.updateNudge(
-        message, 
+        message,
         goog.bind(this.subtitleController_.improveSubtitles,
                   this.subtitleController_));
     this.videoTab_.showNudge(true);

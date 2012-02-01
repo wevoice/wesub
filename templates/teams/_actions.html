@@ -1,5 +1,6 @@
 {% load i18n teams_tags %}
 
+<div class="join">
 {% if not team|is_team_member:user %}
     {% if user.is_authenticated %}
         {% if team.is_open %}
@@ -15,7 +16,7 @@
     {% else %}
         <a id="signin-join" class="button primary" href="{% url auth:login %}?next={{ request.path_info|urlencode }}">{% trans "Sign in to Join Team" %}</a>
     {% endif %}
-{% endif %} 
-  
+{% endif %}
+</div>
 
-<p class="notation">{% trans "Want to create your own captioning and translation team? Contact Dean Jansen" %}, <a href="mailto:dean@pculture.org">dean@pculture.org</a></p>
+<p class="notation">{% trans "Want to create your own subtitling team? Contact Dean Jansen" %}, <a href="mailto:dean@pculture.org">dean@pculture.org</a></p>
