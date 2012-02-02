@@ -37,26 +37,37 @@ unisubs.UnsavedWarning.prototype.createDom = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var e = this.getElement();
     e.className = 'unisubs-warning';
-    e.appendChild($d('h2', null, 'Submit subtitles?'));
-    e.appendChild($d('p', null, 'Do you want to save your work for others to build on? If you were messing around or testing, please discard.'));
-    this.discardLink_ = $d('a', {'className': 'unisubs-link', 'href':'#'}, 'Discard');
-    this.submitLink_ = $d('a', {'className': 'unisubs-link', 'href': '#'}, 'Submit subtitles');
+
+    var discardLinkText, submitLinkText, warningTitle, warningDescription;
+    if (unisubs.mode === 'review') {
+        discardLinkText = 'Discard notes';
+        submitLinkText = 'Save notes';
+        warningTitle = 'Save notes?';
+        warningDescription = 'Would you like to save your notes? If so, they will be saved as comments (visible to the general public and sent to contributors).';
+    } else {
+        discardLinkText = 'Discard';
+        submitLinkText = 'Submit subtitles';
+        warningTitle = 'Submit subtitles?';
+        warningDescription = 'Do you want to save your work for others to build on? If you were messing around or testing, please discard.';
+    }
+
+    e.appendChild($d('h2', null, warningTitle));
+    e.appendChild($d('p', null, warningDescription));
+    this.discardLink_ = $d('a', {'className': 'unisubs-link', 'href':'#'}, discardLinkText);
+    this.submitLink_ = $d('a', {'className': 'unisubs-link', 'href': '#'}, submitLinkText);
     e.appendChild($d('div', 'unisubs-buttons', this.discardLink_, this.submitLink_));
 };
-
 unisubs.UnsavedWarning.prototype.enterDocument = function() {
     unisubs.UnsavedWarning.superClass_.enterDocument.call(this);
     this.getHandler().
         listen(this.discardLink_, 'click', this.linkClicked_).
         listen(this.submitLink_, 'click', this.linkClicked_);
 };
-
 unisubs.UnsavedWarning.prototype.linkClicked_ = function(e) {
     e.preventDefault();
     this.submitChosen_ = e.target == this.submitLink_;
     this.setVisible(false);    
 };
-
 unisubs.UnsavedWarning.prototype.setVisible = function(visible) {
     if (!visible)
         this.callback_(this.submitChosen_);

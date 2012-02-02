@@ -121,12 +121,12 @@ def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager
     from videos.models import Video
     from teams.models import TeamVideo
-
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         _send_notification(new_version_id)
         _check_alarm(new_version_id)
         _detect_language(new_version_id)
+        _update_captions_in_original_service(new_version_id)
 
     video = Video.objects.get(pk=video_pk)
     if video.teamvideo_set.count() > 0:
@@ -338,4 +338,42 @@ def _send_letter_caption(caption_version):
         send_templated_email(user, subject,
                              'videos/email_notification_non_editors.html',
                              context, fail_silently=not settings.DEBUG)
+
+
+
+def _update_captions_in_original_service(version_pk):
+    """
+    Pushes the latest caption set for this version to
+    the original video provider (only Youtube supported right now)
+    In order for this to work we the version must be published, synced
+    and have a ThirdPartyAccount object for the same service and 
+    the username matching the username for the video url.
+    """
+    from videos.models import SubtitleVersion
+    from accountlinker.models import ThirdPartyAccount
+    from .videos.types import UPDATE_VERSION_ACTION
+    try:
+        version = SubtitleVersion.objects.select_related("language", "language__video").get(pk=version_pk)
+    except SubtitleVersion.DoesNotExist:
+        return
+    ThirdPartyAccount.objects.mirror_on_third_party(
+        version.video, version.language, UPDATE_VERSION_ACTION, version)         
+
+def _delete_captions_in_original_service(language_pk):
+    """
+    Deletes the given subtitle language the original video provider 
+    (only Youtube supported right now) In order for this to work we the 
+    version must be have a ThirdPartyAccount object for the same service 
+    and the username matching the username for the video url.
+    """
+    from videos.models import SubtitleLanguage
+    from .videos.types import DELETE_LANGUAGE_ACTION
+    from accountlinker.models import ThirdPartyAccount
+    try:
+        language = SubtitleLanguage.objects.select_related("video").get(pk=language_pk)
+    except SubtitleLanguage.DoesNotExist:
+        return
+    ThirdPartyAccount.objects.mirror_on_third_party(
+        language.video, language.language, DELETE_LANGUAGE_ACTION)
+
 

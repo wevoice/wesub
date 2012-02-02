@@ -106,6 +106,7 @@
         {% if filters.team_video %}
             <p class="view-notice">
                 {% trans 'Video' %}: <strong>{{ filters.team_video }}</strong>
+                <a href="{{ request.path }}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'Clear' %}</a>
             </p>
         {% endif %}
 
@@ -180,32 +181,34 @@
 
                             </ul>
 
-                            {% if task|can_delete_task:user or task|can_assign_task:user %}
-                                <ul class="admin-controls">
-                                    {% if task|can_assign_task:user %}
-                                        <li>
-                                            <a class="action-assign" href="#">
-                                                {% if task.assignee %}
-                                                    {% trans 'Reassign' %}
-                                                {% else %}
-                                                    {% trans 'Assign' %}
-                                                {% endif %}
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                    {% if task|can_delete_task:user and task.get_type_display != 'Review' and task.get_type_display != 'Approve' %}
-                                        <li>
-                                            <form action="{% url teams:delete_task slug=team.slug %}" method="post">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+                            {% with can_delete=task|can_delete_task:user can_assign=task|can_assign_task:user %}
+                                {% if can_delete or can_assign %}
+                                    <ul class="admin-controls">
+                                        {% if can_assign %}
+                                            <li>
+                                                <a class="action-assign" href="#">
+                                                    {% if task.assignee %}
+                                                        {% trans 'Reassign' %}
+                                                    {% else %}
+                                                        {% trans 'Assign' %}
+                                                    {% endif %}
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                        {% if can_delete %}
+                                            <li>
+                                                <form action="{% url teams:delete_task slug=team.slug %}" method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
-                                                <input type="hidden" name="task" value="{{ task.pk }}" />
-                                                <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}" onclick="return confirm('{% trans 'Are you sure you want to delete this task?' %}');">{% trans 'Delete' %}</a>
-                                            </form>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            {% endif %}
+                                                    <input type="hidden" name="task" value="{{ task.pk }}" />
+                                                    <a class="action-delete" href="{% url teams:delete_task slug=team.slug %}" onclick="return confirm('{% trans 'Are you sure you want to delete this task?' %}');">{% trans 'Delete' %}</a>
+                                                </form>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                {% endif %}
+                            {% endwith %}
 
                             {% if task|can_assign_task:user %}
                                 <form class="assign-form" action="{% url teams:assign_task slug=team.slug %}" method="post">

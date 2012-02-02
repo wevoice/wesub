@@ -18,9 +18,50 @@
 
 from django.db import models
 
-from videos.models import  VIDEO_TYPE
+from teams.moderation_const import APPROVED, UNMODERATED
+from videos.models import  VIDEO_TYPE, SubtitleVersion, VideoUrl
 
+from .videos.types import video_type_registrar, UPDATE_VERSION_ACTION,\
+     DELETE_LANGUAGE_ACTION
+# for now, they kind of match
 ACCOUNT_TYPES = VIDEO_TYPE
+
+class ThirdPartyAccountManager(models.Manager):
+
+    def mirror_on_third_party(self, video, language,  action, version=None,):
+        """
+        Does the specified action (video.types.UPDATE_VERSION_ACTION or
+                                   video.types.DELETE_LANGUAGE_ACTION) 
+        on the original account (e.g. Youtube video).
+        For example, to update a given version to Youtube:
+             ThirdPartyAccountManager.objects.mirror_on_third_party(
+                       video, language, "update_subtitles", version)
+        For deleting, we only delete languages, so it should be 
+              ThirdPartyAccountManager.objects.mirror_on_third_party(
+                        video, language, "delete_subtitles")
+        This method is 'safe' to call, meaning that we only do syncing if there 
+        are matching third party credentials for this video.
+        The update will only be done if the version is synched
+        """
+        if action not in  [UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION]:
+            raise NotImplementedError("Mirror to third party does not support the %s action" % action)
+        if version and version.moderation_status not in [APPROVED, UNMODERATED]:
+            return
+        for vurl in video.videourl_set.all():
+            username = vurl.owner_username
+            if not username:
+                continue
+            try:
+                account = ThirdPartyAccount.objects.get(type=vurl.type, username=username)
+            except ThirdPartyAccount.ObjectDoesNotExist:
+                continue
+
+            vt = video_type_registrar.video_type_for_url(vurl.url)
+            if hasattr(vt, action):
+                if action == UPDATE_VERSION_ACTION:
+                    vt.update_subtitles(version, account)
+                elif action == DELETE_LANGUAGE_ACTION:
+                    vt.delete_subtitles(language, account)
 
 class ThirdPartyAccount(models.Model):
     """
@@ -39,6 +80,8 @@ class ThirdPartyAccount(models.Model):
                                           null=False, blank=False)
     oauth_refresh_token = models.CharField(max_length=255, db_index=True,
                                            null=False, blank=False)
+    
+    objects = ThirdPartyAccountManager()
     
     class Meta:
         unique_together = ("type", "username")
