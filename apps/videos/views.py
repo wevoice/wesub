@@ -210,7 +210,9 @@ def video(request, video, video_url=None, title=None):
     if original:
         original.pending_moderation_count =  get_pending_count(video.subtitle_language())
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    translations = video.subtitlelanguage_set.filter(had_version=True)
+    # we want a list of translations that had at least with version with subtitles
+    # this will not filter subtitleversion's whos subtitles are empty
+    translations = video.subtitlelanguage_set.exclude(subtitle_count=0)
     if original:
         # a video might have more than 1 is_original sl, in which case
         # we guess the right one above, but still manage to include the others
