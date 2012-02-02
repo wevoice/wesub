@@ -198,8 +198,10 @@
         </ul>
         <div class="tab" id="transcripts-tab">
             <div class="tools">
+                {% comment %}
                 <!-- TODO: Wrap in conditional; only show if vid is moderated by a team and user has ability to approve -->
                 <a href="#unpublish-modal" class="button open-modal">{% trans 'Unpublish' %}</a>
+                {% endcomment %}
                 {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
                     <a id="edit_subtitles_button" href="{{edit_url}}" class="button">{% trans 'Edit Subtitles' %}</a>
                 {% endif %}
@@ -332,6 +334,7 @@
         </div>
     </div>
 
+    {% comment %}
     {% with video.get_team_video as team_video %}
         <!-- TODO: Only show if vid is moderated by a team and user has ability to approve -->
         {% if team_video %}
@@ -380,6 +383,7 @@
             </div>
         {% endif %}
     {% endwith %}
+    {% endcomment %}
 {% endblock %}
 
 {% block page_controls %}
