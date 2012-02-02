@@ -448,9 +448,10 @@ def can_review(team_video, user, lang=None, allow_own=False):
         #
         # Then we let that admin/owner review their own subtitles.
         ao_roles = (ROLE_ADMIN, ROLE_OWNER)
-        if role in ao_roles and role_req in ao_roles:
+        review_roles = _perms_equal_or_greater(role_req)
+        if role in ao_roles:
             is_only_reviewer = not team_video.team.members.filter(
-                user__is_active=True, role__in=ao_roles
+                user__is_active=True, role__in=review_roles
             ).exclude(user=user).exists()
 
             if is_only_reviewer:
