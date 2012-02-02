@@ -3,7 +3,7 @@
 <li class="team_video_listing_{{ search_record.team_video_pk }}">
 
     <div class="thumb">
-        <a href="{% url videos:video video_id=search_record.video_id %}" title="{{ search_record.title }}">
+        <a href="{% url videos:video video_id=search_record.video_id %}" title="{{ search_record.video_title }}">
             <img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail">
         </a>
         <a href="{% url videos:video video_id=search_record.video_id %}" class="languages">
@@ -48,7 +48,7 @@
     </div>
 
     <h3>
-        <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.title|truncatewords:9 }}</a>
+        <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.video_title|truncatewords:9 }}</a>
     </h3>
 
     <script type="text/javascript">
