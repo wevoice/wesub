@@ -746,10 +746,21 @@ def _create_translation_tasks(team_video, subtitle_version):
     preferred_langs = TeamLanguagePreference.objects.get_preferred(team_video.team)
 
     for lang in preferred_langs:
+        # Don't create tasks for languages that are already complete.
         sl = team_video.video.subtitle_language(lang)
         if sl and sl.is_complete_and_synced():
             continue
 
+        # Don't create tasks for languages that already have one.
+        # Doesn't matter if it's complete or not.
+        task_exists = Task.objects.filter(
+            team=team_video.team, team_video=team_video, language=lang,
+            type=Task.TYPE_IDS['Translate']
+        ).exists()
+        if task_exists:
+            continue
+
+        # Otherwise, go ahead and create it.
         task = Task(team=team_video.team, team_video=team_video,
                     subtitle_version=subtitle_version,
                     language=lang, type=Task.TYPE_IDS['Translate'])
@@ -1538,6 +1549,7 @@ class Task(models.Model):
 
         # If the subtitles are okay, go ahead and autocreate translation tasks.
         if self.approved == Task.APPROVED_IDS['Approved']:
+            # But only if we haven't already.
             if self.workflow.autocreate_translate:
                 _create_translation_tasks(self.team_video, self.subtitle_version)
         else:
