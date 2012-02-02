@@ -39,7 +39,7 @@ unisubs.UnsavedWarning.prototype.createDom = function() {
     e.className = 'unisubs-warning';
 
     var discardLinkText, submitLinkText, warningTitle, warningDescription;
-    if (unisubs.mode === 'review') {
+    if (unisubs.mode === 'review' || unisubs.mode === 'approve') {
         discardLinkText = 'Discard notes';
         submitLinkText = 'Save notes';
         warningTitle = 'Save notes?';
