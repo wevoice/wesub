@@ -49,21 +49,6 @@ unisubs.translate.Dialog.State_ = {
 unisubs.translate.Dialog.prototype.createDom = function() {
     unisubs.translate.Dialog.superClass_.createDom.call(this);
     this.setDraggable(false);
-    this.translationPanel_ = new unisubs.translate.TranslationPanel(
-        this.serverModel_.getCaptionSet(), this.standardSubState_, this);
-    this.getCaptioningAreaInternal().addChild(
-        this.translationPanel_, true);
-    var rightPanel = this.createRightPanel_();
-    this.setRightPanelInternal(rightPanel);
-    this.getHandler().
-        listen(
-            rightPanel, unisubs.RightPanel.EventType.DONE,
-            this.handleDoneKeyPress_).
-        listen(
-            rightPanel, unisubs.RightPanel.EventType.SAVEANDEXIT,
-            this.handleSaveAndExitKeyPress_);
-    goog.dom.classes.add(this.getContentElement(),
-                         'unisubs-modal-widget-translate');
     this.showGuidelines_();
     this.enterState_(unisubs.translate.Dialog.State_.TRANSLATE);
 };
@@ -118,7 +103,7 @@ unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
     if (this.state_ == unisubs.subtitle.Dialog.State_.EDIT_METADATA)
         this.saveWork(true);
     else
-        this.enterState_(this.nextState_());
+        this.enterState_(unisubs.translate.Dialog.State_.EDIT_METADATA)
 };
 
 unisubs.translate.Dialog.prototype.isWorkSaved = function() {
@@ -254,9 +239,11 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
 };
 unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
     var s = unisubs.translate.Dialog.State_;
-    if (this.state_ == s.TRANSLATE)
-        return new unisubs.translate.TranslationPanel(
-        this.serverModel_.getCaptionSet(), this.standardSubState_, this);
+    if (this.state_ == s.TRANSLATE){
+        this.translationPanel_ =  new unisubs.translate.TranslationPanel(
+            this.serverModel_.getCaptionSet(), this.standardSubState_, this);
+        return this.translationPanel_; 
+    }
     else if (this.state_ == s.EDIT_METADATA)
         return new unisubs.editmetadata.Panel(
             this.serverModel_.getCaptionSet(),
