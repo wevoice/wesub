@@ -1,0 +1,16 @@
+Hi {{ user }},
+
+Your {{ task_language }} subtitles for the video “{{ title }}” have been {% if is_approval %}approved{%else%}reviewed{% endif %} by {{ reviewer }} from the {{ team.name }} team.
+
+{% if note %}
+{{ reviewer}} included the following note:
+
+{{ note }}
+{% endif %}
+
+{% if not is_approval %}
+Your subtitles have been submitted for approval
+{% endif %}
+
+Send {{reviewer}} a message: {{reviewer_message_url}}
+{% if is_approval %} or view your subtitles: {{subs_url}}{%endif%}

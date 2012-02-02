@@ -1480,6 +1480,8 @@ class ActionRenderer(object):
             info = self.render_MEMBER_JOINED(item)
         elif item.action_type == Action.MEMBER_LEFT:
             info = self.render_MEMBER_LEFT(item)
+        elif item.action_type == Action.REVIEW_VERSION:
+            info = self.render_REVIEW_VERSION(item)
 
         else:
             info = ''
@@ -1505,6 +1507,11 @@ class ActionRenderer(object):
             data["user"] = item.user
         return data
 
+    def render_REVIEW_VERSION(self, item):
+        kwargs = self._base_kwargs(item)
+        msg = _('  reviewed <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        return msg
+        
     def render_REJECT_VERSION(self, item):
         kwargs = self._base_kwargs(item)
         msg = _('  rejected <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
@@ -1657,6 +1664,7 @@ class Action(models.Model):
     MEMBER_JOINED = 9
     REJECT_VERSION = 10
     MEMBER_LEFT = 11
+    REVIEW_VERSION = 12
     TYPES = (
         (ADD_VIDEO, _(u'add video')),
         (CHANGE_TITLE, _(u'change title')),
@@ -1669,6 +1677,7 @@ class Action(models.Model):
         (MEMBER_JOINED, _(u'add contributor')),
         (MEMBER_LEFT, _(u'remove contributor')),
         (REJECT_VERSION, _(u'reject version')),
+        (REVIEW_VERSION, _(u'review version')),
     )
 
     renderer = ActionRenderer('videos/_action_tpl.html')
@@ -1816,7 +1825,7 @@ class Action(models.Model):
         obj.language = version.language
         obj.user = moderator
         obj.action_type = cls.APPROVE_VERSION
-        obj.created = datetime_started or datetime.now()
+        obj.created = kwargs.get('datetime_started' , datetime.now())
         obj.save()
 
     @classmethod
@@ -1827,6 +1836,16 @@ class Action(models.Model):
         obj.action_type = cls.REJECT_VERSION
         obj.created = datetime.now()
         obj.save()
+        
+    @classmethod
+    def create_reviewed_video_handler(cls, version, moderator,  **kwargs):
+        obj = cls(video=version.video)
+        obj.language = version.language
+        obj.user = moderator
+        obj.action_type = cls.REVIEW_VERSION
+        obj.created = datetime.now()
+        obj.save()
+
 
     @classmethod
     def create_subrequest_handler(cls, sender, instance, created, **kwargs):
