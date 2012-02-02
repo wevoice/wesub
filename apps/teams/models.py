@@ -1438,6 +1438,8 @@ class Task(models.Model):
                     subtitle_version=self.subtitle_version,
                     language=self.language, type=type, assignee=assignee)
         task.save()
+        # notification behaves differently if it was bounced back or not
+        notifier.send_reject_notification.delay(task, bool(assignee))
 
 
     def complete(self):

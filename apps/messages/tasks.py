@@ -386,3 +386,57 @@ def send_review_notification(task_pk, is_approval):
         Action.create_reviewed_video_handler(task.subtitle_version, reviewer)
     return msg, email_res
      
+@task
+def send_reject_notification(task_pk, sent_back):
+    from teams.models import Task
+    from videos.models import Action
+    from messages.models import Message
+    try:
+        task = Task.objects.select_related(
+            "team_video__video", "team_video", "assignee", "subtitle_version").get(
+                pk=task_pk)
+    except Task.DoesNotExist:
+        return False
+    
+    subject = ugettext(u"Your subtitles have been declined")
+    user = task.subtitle_version.user
+    task_language  = task.language
+    task_language = SUPPORTED_LANGUAGES_DICT[task.language]
+    reviewer = task.assignee
+    video = task.team_video.video
+    subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
+        'video_id': video.video_id,
+        'lang': task.language,
+        'lang_id': task.subtitle_version.language.pk,
+        
+    }))
+    reviewer_message_url = "%s%s?user=%s" % (
+        get_url_base(), reverse("messages:new"), reviewer.username)
+            
+    context = {
+        "team":task.team,
+        "title": task.subtitle_version.language.get_title(),
+        "user":user,
+        "task_language": task_language,
+        "url_base":get_url_base(),
+        "task":task,
+        "reviewer":reviewer,
+        "note":task.body,
+        "sent_back": sent_back,
+        "subs_url": subs_url,
+        "reviewer_message_url": reviewer_message_url, 
+    }
+    if user.notify_by_message:
+        template_name = "messages/team-task-rejected.txt"
+        msg = Message()
+        msg.subject = subject
+        msg.content = render_to_string(template_name,context)
+        msg.user = user
+        msg.object = task.team
+        msg.save()
+        
+    template_name = "messages/email/team-task-rejected.html"
+    email_res =  send_templated_email(user, subject, template_name, context)
+    Action.create_rejected_video_handler(task.subtitle_version, reviewer)
+    return msg, email_res
+     

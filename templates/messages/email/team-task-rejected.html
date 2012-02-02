@@ -1,0 +1,28 @@
+Hi {{ user }},
+
+<p>
+{% if sent_back %}
+{{ reviewer }} from the {{ team.name }} team has reviewed your {{ task_language }} subtitles for the video “{{ title }}”, and has requested additional work:
+
+{% else %}
+
+Your {{ task_language }} subtitles for the video “{{ title }}” have been declined by {{ reviewer }} from the {{ team.name }} team.
+{% endif %}
+</p>
+{% if note %}
+{{ reviewer}} included the following note:
+<p>
+{{ note }}
+</p>
+{% endif %}
+
+{% if sent_back %}
+<p>
+<a href="{{subs_url}}">Edit your subtitles</a>.
+</p>
+{% endif %}
+
+<a href="{{reviewer_message_url}}">Send {{ reviewer }} a message</a>
+
+
+
