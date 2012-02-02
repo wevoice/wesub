@@ -1517,6 +1517,8 @@ class Task(models.Model):
                             subtitle_version=self.subtitle_version,
                             language=self.language, type=Task.TYPE_IDS['Approve'])
                 task.save()
+                # approval review
+                notifier.send_review_notification.delay(task, True)
             else:
                 # The reviewer rejected this version, so it should be explicitly
                 # made non-public.
@@ -1534,6 +1536,9 @@ class Task(models.Model):
                 # tasks if necessary.
                 if self.workflow.autocreate_translate:
                     _create_translation_tasks(self.team_video, self.subtitle_version)
+                
+                # non approval review
+                notifier.send_review_notification.delay(self, False)
             else:
                 # Send the subtitles back for improvement.
                 self._send_back()

@@ -106,6 +106,7 @@
         {% if filters.team_video %}
             <p class="view-notice">
                 {% trans 'Video' %}: <strong>{{ filters.team_video }}</strong>
+                <a href="{{ request.path }}" class="clear-filters" title="{% trans 'Clear all filters and search terms' %}">{% trans 'Clear' %}</a>
             </p>
         {% endif %}
 

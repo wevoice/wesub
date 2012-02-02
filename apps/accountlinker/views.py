@@ -97,9 +97,8 @@ def youtube_oauth_callback(request):
                 })
                     
     content = json.loads(response.content)
-    bridge = YouTubeApiBridge() 
-    client, service = bridge.authorize(content['access_token'], content['refresh_token'])
-    feed = client.GetUserFeed(username='default')
+    bridge = YouTubeApiBridge(content['access_token'], content['refresh_token'], None) 
+    feed = bridge.GetUserFeed(username='default')
     author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
     
     # make sure we don't store multiple auth tokes for the same account
