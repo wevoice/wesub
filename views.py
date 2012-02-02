@@ -7,4 +7,4 @@ def get_feedback(request):
     return render_to_response("videos/_feedback_form.html", {
             'form':form,
             'key': settings.RECAPTCHA_PUBLIC
-            })
+    })
