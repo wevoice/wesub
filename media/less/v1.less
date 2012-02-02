@@ -1678,15 +1678,15 @@ ol.subtitles {
 }
 
 .v1 .bootstrap .modal {
-
-    .modal-header h3 {
-        padding: 0;
-        border: none;
-        margin: 0;
-        clear: none;
-        font-size: 16px;
+    .modal-header {
+        h3 {
+            padding: 0;
+            border: none;
+            margin: 0;
+            clear: none;
+            font-size: 16px;
+        }
     }
-
     form {
         padding: 0;
         margin: 0;
@@ -1697,21 +1697,25 @@ ol.subtitles {
 
         fieldset {
             padding-bottom: 1em;
+
+            p {
+                margin-bottom: 20px;
+            }
         }
 
         label.radio, label.checkbox {
             padding: 0;
             display: block;
-            float: none;
             text-align: left;
             width: 100%;
 
             input {
+                float: left;
+                margin-bottom: 3px;
                 margin-right: .5em;
             }
         }
     }
-
     .modal-body {
         fieldset {
             padding: 0;
@@ -1726,8 +1730,6 @@ ol.subtitles {
             margin: 0 !important;
         }
     }
-
-
     button {
         margin: 0;
     }

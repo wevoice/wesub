@@ -192,8 +192,8 @@ ol.subtitles li .timing .data{display:none;}
 .v1 .filters div.chzn-container-active div.chzn-drop{margin-left:-5px !important;margin-top:-1px !important;z-index:50;}
 .v1 .bootstrap .modal .modal-header h3{padding:0;border:none;margin:0;clear:none;font-size:16px;}
 .v1 .bootstrap .modal form{padding:0;margin:0;}.v1 .bootstrap .modal form p{float:none;}
-.v1 .bootstrap .modal form fieldset{padding-bottom:1em;}
-.v1 .bootstrap .modal form label.radio,.v1 .bootstrap .modal form label.checkbox{padding:0;display:block;float:none;text-align:left;width:100%;}.v1 .bootstrap .modal form label.radio input,.v1 .bootstrap .modal form label.checkbox input{margin-right:.5em;}
+.v1 .bootstrap .modal form fieldset{padding-bottom:1em;}.v1 .bootstrap .modal form fieldset p{margin-bottom:20px;}
+.v1 .bootstrap .modal form label.radio,.v1 .bootstrap .modal form label.checkbox{padding:0;display:block;text-align:left;width:100%;}.v1 .bootstrap .modal form label.radio input,.v1 .bootstrap .modal form label.checkbox input{float:left;margin-bottom:3px;margin-right:.5em;}
 .v1 .bootstrap .modal .modal-body fieldset{padding:0;}
 .v1 .bootstrap .modal .modal-body textarea{font-family:Monaco,"Bitstream Vera Sans Mono","Lucida Console",monospace;width:98%;height:auto;}
 .v1 .bootstrap .modal .modal-body ul.chzn-choices,.v1 .bootstrap .modal .modal-body ul.chzn-results{margin:0 !important;}

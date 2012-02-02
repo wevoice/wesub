@@ -40,7 +40,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{ request.path }}" />
                         </form>
-                        <a class="remove-video" href="{% url teams:remove_video team_video_pk=search_record.team_video_pk %}" title="Remove this video from the team">{% trans 'Remove' %}</a>
+                        <a class="remove-video open-modal" href="#remove-modal" title="Remove this video from the team">{% trans 'Remove' %}</a>
                     </li>
                 </ul>
             {% endif %}
