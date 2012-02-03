@@ -66,7 +66,7 @@
                 <select id="id_task_language" name="language" class="lang-filter chosen">
                     <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'all languages' %}</option>
                     {% for language in languages %}
-                        <option value="{% query_string request.GET lang=language.code %}"
+                        <option value="{% query_string request.GET lang=language.code page='' %}"
                             {% if request.GET.lang == language.code %}
                                 selected="selected"
                             {% endif %}>
