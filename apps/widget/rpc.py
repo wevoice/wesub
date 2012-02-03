@@ -476,6 +476,43 @@ class Rpc(BaseRpc):
                     end_time=s['end_time'],
                     subtitle_order=s['sub_order'])
 
+
+    def _get_review_or_approve_task(self, team_video, subtitle_language):
+        lang = subtitle_language.language
+        workflow = Workflow.get_for_team_video(team_video)
+
+        if workflow.approve_allowed:
+            type = Task.TYPE_IDS['Approve']
+            can_do = can_approve
+        elif workflow.review_allowed:
+            type = Task.TYPE_IDS['Review']
+            can_do = can_review
+        else:
+            return None
+
+        # Find the assignee.
+        #
+        # For now, we'll assign the review/approval task to whomever did
+        # it last time (if it was indeed done), but only if they're
+        # still eligible to perform it now.
+        last_task = team_video.task_set.complete().filter(
+            language=lang, type=type
+        ).order_by('-completed')[:1]
+
+        assignee = None
+        if last_task:
+            candidate = last_task[0].assignee
+            if candidate and can_do(team_video, candidate, lang):
+                assignee = candidate
+
+        # This is just terrible.
+        #
+        # We have to create a task here, but we need to have the
+        # subtitle_version to do it correctly, and that doesn't get
+        # saved until much later, a few functions away.
+        return Task(team=team_video.team, team_video=team_video,
+                    assignee=assignee, language=lang, type=type)
+
     def _moderate_session(self, session, user):
         """Return the right moderation_status for a version based on the given session.
 
@@ -508,41 +545,18 @@ class Rpc(BaseRpc):
                         task.save()
             return WAITING_MODERATION, None
 
-        # If there are already active subtitles for this language, we're dealing
-        # with an edit.
         if sl.has_version:
+            # If there are already active subtitles for this language, we're
+            # dealing with an edit.
             if not can_publish_edits_immediately(team_video, user, sl.language):
-                workflow = Workflow.get_for_team_video(team_video)
-                if workflow.approve_allowed:
-                    type = Task.TYPE_IDS['Approve']
-                    can_do = can_approve
-                else:
-                    type = Task.TYPE_IDS['Review']
-                    can_do = can_review
-
-                # Find the assignee.
-                #
-                # For now, we'll assign the review/approval task to whomever did
-                # it last time (if it was indeed done), but only if they're
-                # still eligible to perform it now.
-                last_task = team_video.task_set.complete().filter(
-                    language=sl.language, type=type
-                ).order_by('-completed')[:1]
-
-                assignee = None
-                if last_task:
-                    candidate = last_task[0].assignee
-                    if candidate and can_do(team_video, candidate, sl.language):
-                        assignee = candidate
-
-                # This is just terrible.
-                #
-                # We have to create a task here, but we need to have the
-                # subtitle_version to do it correctly, and that doesn't get
-                # saved until much later, a few functions away.
-                task = Task(team=team_video.team, team_video=team_video,
-                            assignee=assignee, language=sl.language, type=type)
-
+                task = self._get_review_or_approve_task(team_video, sl)
+                if task:
+                    return WAITING_MODERATION, task
+        else:
+            # Otherwise we're dealing with a new set of subtitles for this
+            # language.
+            task = self._get_review_or_approve_task(team_video, sl)
+            if task:
                 return WAITING_MODERATION, task
 
         return UNMODERATED, None
