@@ -233,7 +233,7 @@ class Rpc(BaseRpc):
         }
 
 
-    def _check_team_video_locking(self, user, video_id, language_code, is_translation):
+    def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode):
         """Check whether the a team prevents the user from editing the subs.
 
         Returns a dict appropriate for sending back if the user should be
@@ -255,12 +255,14 @@ class Rpc(BaseRpc):
                 return { "can_edit": False, "locked_by": str(task.assignee or task.team) }
 
         # Check that the team's policies don't prevent the action.
-        if is_translation:
-            can_edit = can_create_and_edit_translations(user, team_video, language_code)
-        else:
-            can_edit = can_create_and_edit_subtitles(user, team_video, language_code)
-        if not can_edit:
-            return { "can_edit": False, "locked_by": str(team_video.team) }
+        if mode not in ['review', 'approve']:
+            if is_translation:
+                can_edit = can_create_and_edit_translations(user, team_video, language_code)
+            else:
+                can_edit = can_create_and_edit_subtitles(user, team_video, language_code)
+
+            if not can_edit:
+                return { "can_edit": False, "locked_by": str(team_video.team) }
 
     def start_editing(self, request, video_id,
                       language_code,
@@ -285,7 +287,10 @@ class Rpc(BaseRpc):
             subtitle_language_pk, base_language)
 
         # Check for team-related locking.
-        locked = self._check_team_video_locking(request.user, video_id, language_code, is_translation=bool(base_language_pk))
+        locked = self._check_team_video_locking(request.user, video_id,
+                                                language_code,
+                                                is_translation=bool(base_language_pk),
+                                                mode=mode)
         if locked:
             return locked
 
