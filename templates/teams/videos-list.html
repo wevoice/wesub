@@ -63,29 +63,29 @@
             <p>
                 {% trans 'Videos with subtitles in' %}
                 <select name="lang-filter" id="lang-filter">
-                    <option value="{% query_string request.GET lang='' %}">{% trans 'all languages' %}</option>
+                    <option value="{% query_string request.GET lang='' page='' %}">{% trans 'all languages' %}</option>
                     {% for code, name in language_choices %}
                         <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code page='' %}">{{ name }}</option>
                     {% endfor %}
                 </select>
                 {% trans 'sorted by' %}
                 <select name="sort">
-                    <option {% if request.GET.sort == 'name' %}selected="selected"{% endif %} value="{% query_string request.GET sort='name' %}">
+                    <option {% if request.GET.sort == 'name' %}selected="selected"{% endif %} value="{% query_string request.GET sort='name' page='' %}">
                         {% trans 'name, a-z' %}
                     </option>
-                    <option {% if request.GET.sort == '-name' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-name' %}">
+                    <option {% if request.GET.sort == '-name' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-name' page='' %}">
                         {% trans 'name, z-a' %}
                     </option>
-                    <option {% if request.GET.sort == '-time' or not request.GET.sort %}selected="selected"{% endif %} value="{% query_string request.GET sort='-time' %}">
+                    <option {% if request.GET.sort == '-time' or not request.GET.sort %}selected="selected"{% endif %} value="{% query_string request.GET sort='-time' page='' %}">
                         {% trans 'time, newest' %}
                     </option>
-                    <option {% if request.GET.sort == 'time' %}selected="selected"{% endif %} value="{% query_string request.GET sort='time' %}">
+                    <option {% if request.GET.sort == 'time' %}selected="selected"{% endif %} value="{% query_string request.GET sort='time' page='' %}">
                         {% trans 'time, oldest' %}
                     </option>
-                    <option {% if request.GET.sort == '-subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-subs' %}">
+                    <option {% if request.GET.sort == '-subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-subs' page='' %}">
                         {% trans 'subtitles, most' %}
                     </option>
-                    <option {% if request.GET.sort == 'subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='subs' %}">
+                    <option {% if request.GET.sort == 'subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='subs' page='' %}">
                         {% trans 'subtitles, least' %}
                     </option>
                 </select>

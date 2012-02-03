@@ -52,19 +52,19 @@
         <div class="filters {% if filtered or request.GET.sort %}active{% endif %}">
             <p>
                 <select id="id_task_type" name="type" class="type-filter chosen">
-                    <option value="{{ request.path }}{% query_string request.GET type="" %}">{% trans 'All' %}</option>
-                    <option value="{% query_string request.GET type='Subtitle' %}" {% if request.GET.type == 'Subtitle' %}selected="selected"{% endif %}>{% trans 'Transcribe' %}</option>
-                    <option value="{% query_string request.GET type='Translate' %}" {% if request.GET.type == 'Translate' %}selected="selected"{% endif %}>{% trans 'Translate' %}</option>
+                    <option value="{{ request.path }}{% query_string request.GET type="" page='' %}">{% trans 'All' %}</option>
+                    <option value="{% query_string request.GET type='Subtitle' page='' %}" {% if request.GET.type == 'Subtitle' %}selected="selected"{% endif %}>{% trans 'Transcribe' %}</option>
+                    <option value="{% query_string request.GET type='Translate' page='' %}" {% if request.GET.type == 'Translate' %}selected="selected"{% endif %}>{% trans 'Translate' %}</option>
                     {% if team|review_enabled %}
-                        <option value="{% query_string request.GET type='Review' %}" {% if request.GET.type == 'Review' %}selected="selected"{% endif %}>{% trans 'Review' %}</option>
+                        <option value="{% query_string request.GET type='Review' page='' %}" {% if request.GET.type == 'Review' %}selected="selected"{% endif %}>{% trans 'Review' %}</option>
                     {% endif %}
                     {% if team|approve_enabled %}
-                        <option value="{% query_string request.GET type='Approve' %}" {% if request.GET.type == 'Approve' %}selected="selected"{% endif %}>{% trans 'Approve' %}</option>
+                        <option value="{% query_string request.GET type='Approve' page='' %}" {% if request.GET.type == 'Approve' %}selected="selected"{% endif %}>{% trans 'Approve' %}</option>
                     {% endif %}
                 </select>
                 <span class="inner">{% trans 'tasks for' %}</span>
                 <select id="id_task_language" name="language" class="lang-filter chosen">
-                    <option value="{{ request.path }}{% query_string request.GET lang="" %}">{% trans 'all languages' %}</option>
+                    <option value="{{ request.path }}{% query_string request.GET lang="" page='' %}">{% trans 'all languages' %}</option>
                     {% for language in languages %}
                         <option value="{% query_string request.GET lang=language.code page='' %}"
                             {% if request.GET.lang == language.code %}
@@ -76,23 +76,23 @@
                 </select>
                 <span class="inner">{% trans 'assigned to' %}</span>
                 <select name="assignee" class="assignee-filter">
-                    <option value="{{ request.path }}{% query_string request.GET assignee='' %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
-                    <option value="{% query_string request.GET assignee='me' %}" {% if request.GET.assignee == 'me' %}selected="selected"{% endif %}>{% trans 'me' %}</option>
-                    <option value="{% query_string request.GET assignee='none' %}" {% if request.GET.assignee == 'none' %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
+                    <option value="{{ request.path }}{% query_string request.GET assignee='' page='' %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
+                    <option value="{% query_string request.GET assignee='me' page='' %}" {% if request.GET.assignee == 'me' %}selected="selected"{% endif %}>{% trans 'me' %}</option>
+                    <option value="{% query_string request.GET assignee='none' page='' %}" {% if request.GET.assignee == 'none' %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
                 </select>
                 {% trans 'sorted by' %}
                 <select name="sort">
-                    <option {% if request.GET.sort == '-created' or not request.GET.sort %}selected="selected"{% endif %} value="{% query_string request.GET sort='-created' %}">
+                    <option {% if request.GET.sort == '-created' or not request.GET.sort %}selected="selected"{% endif %} value="{% query_string request.GET sort='-created' page='' %}">
                         {% trans 'date, newest' %}
                     </option>
-                    <option {% if request.GET.sort == 'created' %}selected="selected"{% endif %} value="{% query_string request.GET sort='created' %}">
+                    <option {% if request.GET.sort == 'created' %}selected="selected"{% endif %} value="{% query_string request.GET sort='created' page='' %}">
                         {% trans 'date, oldest' %}
                     </option>
                     {% if team.task_expiration != None %}
-                        <option {% if request.GET.sort == '-expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-expires' %}">
+                        <option {% if request.GET.sort == '-expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-expires' page='' %}">
                             {% trans 'time left, least' %}
                         </option>
-                        <option {% if request.GET.sort == 'expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='expires' %}">
+                        <option {% if request.GET.sort == 'expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='expires' page='' %}">
                             {% trans 'time left, most' %}
                         </option>
                     {% endif %}
