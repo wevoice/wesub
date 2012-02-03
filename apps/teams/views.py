@@ -226,15 +226,6 @@ def detail(request, slug, project_slug=None, languages=None):
         Workflow.objects.filter(team=team.id)
                         .select_related('project', 'team', 'team_video'))
 
-    if not project:
-        message = 'Check out the "%s" team on Universal Subtitles: %s' % (team.name, request.build_absolute_uri())
-        share_panel_email_url = reverse('videos:email_friend')
-        extra_context['share_panel_email_url'] = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
-    else:
-        message = 'Check out the "%s" project on Universal Subtitles: %s' % (project.name, request.build_absolute_uri())
-        share_panel_email_url = reverse('videos:email_friend')
-        extra_context['share_panel_email_url'] = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
-
     if is_editor:
         team_video_ids = [record.team_video_pk for record in team_video_md_list]
         team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
