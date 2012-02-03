@@ -494,6 +494,13 @@ class Project(models.Model):
     def is_default_project(self):
         return self.name == Project.DEFAULT_NAME
 
+    def get_site_url(self):
+        return 'http://%s%s' % (Site.objects.get_current().domain, self.get_absolute_url())
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('teams:project_video_list', [self.team.slug, self.slug])
+
     @property
     def videos_count(self):
         if not hasattr(self, '_videos_count'):

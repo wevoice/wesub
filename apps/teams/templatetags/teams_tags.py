@@ -140,14 +140,13 @@ def team_select(context, team):
 def share_panel_email_url(context):
     project = context.get('project')
     team = context.get('team')
-    request = context.get('request')
 
     if not project:
-        message = 'Check out the "%s" team on Universal Subtitles: %s' % (team.name, request.build_absolute_uri())
+        message = 'Check out the "%s" team on Universal Subtitles: %s' % (team.name, team.get_site_url())
         share_panel_email_url = reverse('videos:email_friend')
         share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
     else:
-        message = 'Check out the "%s" project on Universal Subtitles: %s' % (project.name, request.build_absolute_uri())
+        message = 'Check out the "%s" project on Universal Subtitles: %s' % (project.name, project.get_site_url())
         share_panel_email_url = reverse('videos:email_friend')
         share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
 
