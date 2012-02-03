@@ -137,11 +137,23 @@
                             </h3>
                             <p>{% trans "Video" %}: <a href="{{ task.team_video.video.get_absolute_url }}">{{ task.team_video|truncatewords:6 }}</a></p>
 
-                            {% comment %}
-                                {% if task|can_perform_task:user and task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
-                                    <p>{% trans 'Subtitles' %}: <a href="{{ task.subtitle_version.language.get_absolute_url }}">{% trans 'View draft' %}</a></p>
-                                {% endif %} 
-                            {% endcomment %}
+                            {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
+                                {% with task.subtitle_version as version %}
+                                    <p>
+                                        {% trans 'Subtitles' %}:
+                                        {% comment %}
+                                            <a href="{{ task.subtitle_version.language.get_absolute_url }}">{% trans 'draft' %}</a>
+                                        {% endcomment %}
+                                        {% if version.language.is_original %}
+                                            {% trans 'transcribed' %}
+                                        {% else %}
+                                            {% trans 'translated' %}
+                                        {% endif %}
+                                        by
+                                        <a href="{{ version.user.get_absolute_url }}" title="View {{ version.user }}'s profile">{{ version.user }}</a>
+                                    </p>
+                                {% endwith %}
+                            {% endif %} 
 
                             <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.video.thumbnail }}" alt="{{ task.team_video.title }}"></a>
                             <ul class="actions">
