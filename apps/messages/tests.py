@@ -17,7 +17,8 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import json
+import json, random
+from datetime import datetime
 
 from django.test import TestCase
 from apps.auth.models import CustomUser as User
@@ -26,9 +27,12 @@ from django.core import mail
 
 from apps.messages.models import Message
 from apps.messages import tasks as notifier
-from teams.models import Team, TeamMember, Application
+
+from teams.models import Team, TeamMember, Application, Workflow,\
+     TeamVideo, Task
 from teams.forms import InviteForm
-from videos.models import Action
+from videos.models import Action, Video, SubtitleVersion, SubtitleLanguage, \
+     Subtitle
 from utils import send_templated_email
 
 class MessageTest(TestCase):
@@ -307,3 +311,77 @@ class MessageTest(TestCase):
         msg = mail.outbox[0]
         self.assertIn(applying_user.email, msg.to[0] )
         self.assertIn(message, msg.body, )
+
+
+    def test_moderated_notifies_only_when_published(self):
+        """
+        Set up a public team, add new video and new version.
+        Notification should be sent.
+        Setup  a team with moderated videos
+        """
+        from teams.moderation_const import WAITING_MODERATION, APPROVED
+        def video_with_two_followers():
+            v, c = Video.get_or_create_for_url("http://blip.tv/file/get/Miropcf-AboutUniversalSubtitles847.ogv")
+            f1 = User.objects.all()[0]
+            f2 = User.objects.all()[1]
+            f1.notify_by_email = f2.notify_by_email = True
+            f1.save()
+            f2.save()
+            v.followers.add(f1, f2)
+            return v
+        def new_version(v):
+            
+            language, created = SubtitleLanguage.objects.get_or_create(video=v, language='en', is_original=True)
+            prev = language.version(public_only=False)
+            version_no = 0
+            if prev:
+                version_no = prev.version_no + 1
+            sv = SubtitleVersion(
+                language=language, user=User.objects.all()[2], version_no=version_no,
+                datetime_started = datetime.now()
+            )
+            sv.save()
+            s = Subtitle(
+                version=sv, subtitle_text=str(version_no + random.random()),
+                subtitle_order=1, subtitle_id=str(version_no),
+                start_time = random.random())
+            s.save()
+            return sv
+   
+        v = video_with_two_followers()
+        mail.outbox = []
+        from videos.tasks import  video_changed_tasks
+        v = video_with_two_followers()
+        sv = new_version(v)
+        video_changed_tasks(v.pk, sv.pk)
+        # notifications are only sent on the second version of a video
+        # as optimization
+        sv = new_version(v)
+        video_changed_tasks(v.pk, sv.pk)
+        # video is public , followers should be notified
+        self.assertEquals(len(mail.outbox), 2)
+        mail.outbox = []
+        # add to a moderated video
+        team = Team.objects.create(slug='my-team', name='myteam', workflow_enabled=True)
+        workflow = Workflow(team=team, review_allowed=20,approve_allowed=20 )
+        workflow.save()
+
+        tv = TeamVideo(team=team, video=v, added_by=User.objects.all()[2])
+        tv.save()
+        sv = new_version(v)
+        # with the widget, this would set up correctly
+        sv.moderation_status = WAITING_MODERATION
+        sv.save()
+        
+        video_changed_tasks(v.pk, sv.pk)
+        sv = SubtitleVersion.objects.get(pk=sv.pk)
+        self.assertFalse(sv.is_public)
+        # approve video
+        t = Task(type=40, approved=20, team_video=tv, team=team, language='en', subtitle_version=sv)
+        t.save()
+        t.complete()
+        video_changed_tasks(v.pk, sv.pk)
+        
+        self.assertEqual(len(mail.outbox), 2)
+
+        

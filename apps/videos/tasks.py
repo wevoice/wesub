@@ -176,7 +176,7 @@ def _send_notification(version_id):
     except SubtitleVersion.DoesNotExist:
         return
 
-    if version.result_of_rollback:
+    if version.result_of_rollback or not version.is_public:
         return
 
     version.notification_sent = True

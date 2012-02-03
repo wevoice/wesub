@@ -53,7 +53,7 @@ class ThirdPartyAccountManager(models.Manager):
                 continue
             try:
                 account = ThirdPartyAccount.objects.get(type=vurl.type, username=username)
-            except ThirdPartyAccount.ObjectDoesNotExist:
+            except ThirdPartyAccount.DoesNotExist:
                 continue
 
             vt = video_type_registrar.video_type_for_url(vurl.url)

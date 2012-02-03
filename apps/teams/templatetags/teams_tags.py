@@ -25,7 +25,7 @@ from apps.widget import video_cache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
-from django.utils.http import urlquote
+from django.utils.http import urlencode, urlquote
 from widget.views import base_widget_params
 
 from templatetag_sugar.register import tag
@@ -134,6 +134,24 @@ def team_select(context, team):
         'objects': qs,
         'can_create_team': DEV_OR_STAGING or (user.is_superuser and user.is_active)
     }
+
+
+@tag(register, [])
+def share_panel_email_url(context):
+    project = context.get('project')
+    team = context.get('team')
+    request = context.get('request')
+
+    if not project:
+        message = 'Check out the "%s" team on Universal Subtitles: %s' % (team.name, request.build_absolute_uri())
+        share_panel_email_url = reverse('videos:email_friend')
+        share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
+    else:
+        message = 'Check out the "%s" project on Universal Subtitles: %s' % (project.name, request.build_absolute_uri())
+        share_panel_email_url = reverse('videos:email_friend')
+        share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
+
+    return share_panel_email_url
 
 
 @register.inclusion_tag('teams/_team_add_video_select.html', takes_context=True)
