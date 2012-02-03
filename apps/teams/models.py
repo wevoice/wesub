@@ -1446,7 +1446,7 @@ class Task(models.Model):
         
         if sends_notification:
             # notify original submiter (assignee of self)
-            notifier.reviewed_and_sent_back.delay(self)
+            notifier.reviewed_and_sent_back.delay(self.pk)
 
 
     def complete(self):
@@ -1527,7 +1527,7 @@ class Task(models.Model):
                             language=self.language, type=Task.TYPE_IDS['Approve'])
                 task.save()
                 # approval review
-                notifier.reviewed_and_pending_approval.delay(self)
+                notifier.reviewed_and_pending_approval.delay(self.pk)
             else:
                 # The reviewer rejected this version, so it should be explicitly
                 # made non-public.
@@ -1547,7 +1547,7 @@ class Task(models.Model):
                     _create_translation_tasks(self.team_video, self.subtitle_version)
                 
                 # non approval review
-                notifier.reviewed_and_published.delay(self, False)
+                notifier.reviewed_and_published.delay(self.pk)
             else:
                 # Send the subtitles back for improvement.
                 self._send_back()
