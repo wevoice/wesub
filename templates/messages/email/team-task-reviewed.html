@@ -1,8 +1,18 @@
 Hi {{ user }},
 
-<p>Your {{ task_language }} subtitles for the video “{{ title }}” have been 
-{% if is_approval %}approved{%else%}reviewed{% endif %} by {{ reviewer }} from the {{ team.name }} team.</p>
-
+<p>Your {{ task_language }} subtitles for the video “{{ title }}” have been reviewed
+by {{ reviewer }} from the {{ team.name }} team.</p>
+<p>
+{% if sent_back %}
+The subtitles have been sent back to you for additional work and/or corrections.
+{% endif %}
+{% if reviewed_and_pending_approval %}
+The subtitles passed review and have been submitted for approval.
+{% endif %}
+{% if reviewed_and_published %}
+The subtitles passed review and have been published!
+{% endif %}
+</p>
 {% if note %}
 {{ reviewer}} included the following note:
 <p>
@@ -10,10 +20,7 @@ Hi {{ user }},
 </p>
 {% endif %}
 
-{% if not is_approval %}
-<p>Your subtitles have been submitted for approval.</p>
-{% endif %}
 
 <a href="{{reviewer_message_url}}">Send {{ reviewer }} a message</a>
-{% if is_approval %} or <br/>
+{% if sent_back %} or <br/>
 <a href="{{subs_url}}">view your subtitles</a>.{% endif %}

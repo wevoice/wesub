@@ -38,6 +38,10 @@ from celery.task import task
 
 from auth.models import CustomUser as User
 
+from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
+     REVIEWED_AND_PENDING_APPROVAL, REVIEWED_AND_SENT_BACK
+
+
 from utils import send_templated_email
 from utils import get_object_or_none
 from utils.translation import SUPPORTED_LANGUAGES_DICT
@@ -328,8 +332,7 @@ def team_task_assigned(task_pk):
     return msg, email_res
         
     
-@task
-def send_review_notification(task_pk, is_approval):
+def _reviewed_notification(task_pk, status):
     from teams.models import Task
     from videos.models import Action
     from messages.models import Message
@@ -340,8 +343,10 @@ def send_review_notification(task_pk, is_approval):
     except Task.DoesNotExist:
         return False
     
-    approval_name = "approved" if is_approval else "reviewed"
-    subject = ugettext(u"Your subtitles have been %s" % approval_name)
+    
+    subject = ugettext(u"Your subtitles have been reviewed")
+    if status == REVIEWED_AND_PUBLISHED:
+        subject += ugettext(" and published")
     user = task.subtitle_version.user
     task_language  = task.language
     task_language = SUPPORTED_LANGUAGES_DICT[task.language]
@@ -365,7 +370,9 @@ def send_review_notification(task_pk, is_approval):
         "task":task,
         "reviewer":reviewer,
         "note":task.body,
-        "is_approval": is_approval,
+        "reviewed_and_pending_approval": status == REVIEWED_AND_PENDING_APPROVAL,
+        "sent_back": status == REVIEWED_AND_SENT_BACK,
+        "reviewed_and_published": status == REVIEWED_AND_PUBLISHED,
         "subs_url": subs_url,
         "reviewer_message_url": reviewer_message_url, 
     }
@@ -380,14 +387,24 @@ def send_review_notification(task_pk, is_approval):
         
     template_name = "messages/email/team-task-reviewed.html"
     email_res =  send_templated_email(user, subject, template_name, context)
-    if is_approval:
-        Action.create_approved_video_handler(task.subtitle_version, reviewer)
-    else:
-        Action.create_reviewed_video_handler(task.subtitle_version, reviewer)
+    Action.create_reviewed_video_handler(task.subtitle_version, reviewer)
     return msg, email_res
      
 @task
+def reviewed_and_published(task_pk):
+    return _reviewed_notification(task_pk, REVIEWED_AND_PUBLISHED)
+    
+@task
+def reviewed_and_pending_approval(task_pk):
+    return _reviewed_notification(task_pk, REVIEWED_AND_PENDING_APPROVAL)
+    
+@task
+def reviewed_and_sent_back(task_pk):
+    return _reviewed_notification(task_pk, REVIEWED_AND_SENT_BACK)
+    
+@task
 def send_reject_notification(task_pk, sent_back):
+    raise NotImplementedError()
     from teams.models import Task
     from videos.models import Action
     from messages.models import Message

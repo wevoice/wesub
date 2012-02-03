@@ -1418,7 +1418,12 @@ class Task(models.Model):
 
         self.subtitle_version.save()
 
-    def _send_back(self):
+    def _send_back(self, sends_notification=True):
+        """
+        Creates a new task with the same type (tanslate or subtitle)
+        and tries to reassign it to the previous assignee.
+        Also sends notification by default.
+        """
         previous_task = Task.objects.complete().filter(
             team_video=self.team_video, language=self.language, team=self.team,
             type__in=(Task.TYPE_IDS['Subtitle'], Task.TYPE_IDS['Translate'])
@@ -1438,8 +1443,10 @@ class Task(models.Model):
                     subtitle_version=self.subtitle_version,
                     language=self.language, type=type, assignee=assignee)
         task.save()
-        # notification behaves differently if it was bounced back or not
-        notifier.send_reject_notification.delay(task, bool(assignee))
+        
+        if sends_notification:
+            # notify original submiter (assignee of self)
+            notifier.reviewed_and_sent_back.delay(self)
 
 
     def complete(self):
@@ -1520,7 +1527,7 @@ class Task(models.Model):
                             language=self.language, type=Task.TYPE_IDS['Approve'])
                 task.save()
                 # approval review
-                notifier.send_review_notification.delay(task, True)
+                notifier.reviewed_and_pending_approval.delay(self)
             else:
                 # The reviewer rejected this version, so it should be explicitly
                 # made non-public.
@@ -1540,7 +1547,7 @@ class Task(models.Model):
                     _create_translation_tasks(self.team_video, self.subtitle_version)
                 
                 # non approval review
-                notifier.send_review_notification.delay(self, False)
+                notifier.reviewed_and_published.delay(self, False)
             else:
                 # Send the subtitles back for improvement.
                 self._send_back()
