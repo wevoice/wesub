@@ -1301,6 +1301,10 @@ class SubtitleVersion(SubtitleCollection):
             return False
         return True
 
+    @property
+    def is_public(self):
+        return self.moderation_status in [APPROVED, UNMODERATED]
+
 
 def update_followers(sender, instance, created, **kwargs):
     user = instance.user
