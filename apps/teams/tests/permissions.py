@@ -35,7 +35,7 @@ from apps.teams.permissions import (
     can_create_task_translate, can_join_team, can_edit_video, can_approve,
     roles_user_can_invite, can_add_video_somewhere, can_assign_tasks,
     can_create_and_edit_translations, save_role, can_remove_video,
-    can_delete_team
+    can_delete_team, can_delete_video
 )
 
 
@@ -340,6 +340,19 @@ class TestRules(BaseTestPermission):
                 self.assertFalse(can_remove_video(self.nonproject_video, user))
 
         self.assertFalse(can_remove_video(self.nonproject_video, self.outsider))
+
+    def test_can_delete_video(self):
+        user, team = self.user, self.team
+
+
+        for r in [ ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_delete_video(self.nonproject_video, user))
+        for r in [ ROLE_MANAGER, ROLE_CONTRIBUTOR]:
+            with self.role(r):
+                self.assertFalse(can_delete_video(self.nonproject_video, user))
+
+        self.assertFalse(can_delete_video(self.nonproject_video, self.outsider))
 
 
     def test_can_view_settings_tab(self):

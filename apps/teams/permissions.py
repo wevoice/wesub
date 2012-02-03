@@ -359,6 +359,15 @@ def can_remove_video(team_video, user):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_delete_video(team_video, user):
+    """
+    Returns whether the give user can delete the original video
+    and all of it's data.
+    """
+    role = get_role_for_target(user, team_video.team)
+
+    return role in [ROLE_ADMIN, ROLE_OWNER]
+
 def can_edit_video(team_video, user):
     """Return whether the given user can edit the given video."""
 
