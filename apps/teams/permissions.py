@@ -426,6 +426,32 @@ def can_change_video_settings(user, team_video):
     return role in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]
 
 
+def can_review_own_subtitles(role, team_video):
+    '''Return True if a user with the given role can review their own subtitles.
+
+    This is a hacky special case.  When the following is true:
+
+    * The user is an owner.
+    * There is an admin and there is only one (admin or owner) for the team.
+
+    Then we let that admin/owner review their own subtitles.  Otherwise no
+    one can review their own subs.
+
+    '''
+
+    if role == ROLE_OWNER:
+        return True
+
+    if role == ROLE_ADMIN:
+        admin_owner_count = team_video.team.members.filter(
+            user__is_active=True, role__in=(ROLE_ADMIN, ROLE_OWNER)
+        ).count()
+
+        if admin_owner_count == 1:
+            return True
+
+    return False
+
 def can_review(team_video, user, lang=None, allow_own=False):
     workflow = Workflow.get_for_team_video(team_video)
     role = get_role_for_target(user, team_video.team, team_video.project, lang)
@@ -448,25 +474,13 @@ def can_review(team_video, user, lang=None, allow_own=False):
     if allow_own:
         return True
 
+    # Users usually cannot review their own subtitles.
     subtitle_version = team_video.video.latest_version(language_code=lang, public_only=False)
     if lang and subtitle_version.user == user:
-        # Hacky special case.  When the following is true:
-        #
-        # * The team has only one admin/owner.
-        # * There is no one else who can review subtitles.
-        #
-        # Then we let that admin/owner review their own subtitles.
-        ao_roles = (ROLE_ADMIN, ROLE_OWNER)
-        review_roles = _perms_equal_or_greater(role_req)
-        if role in ao_roles:
-            is_only_reviewer = not team_video.team.members.filter(
-                user__is_active=True, role__in=review_roles
-            ).exclude(user=user).exists()
-
-            if is_only_reviewer:
-                return True
-
-        return False
+        if can_review_own_subtitles(role, team_video):
+            return True
+        else:
+            return False
 
     return True
 
