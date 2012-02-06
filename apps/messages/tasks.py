@@ -403,6 +403,71 @@ def reviewed_and_sent_back(task_pk):
     return _reviewed_notification(task_pk, REVIEWED_AND_SENT_BACK)
     
 @task
+def approved_notification(task_pk, published=False):
+    """
+    On approval, it can be sent back (published=False) or
+    approved and published
+    """
+    from teams.models import Task
+    from videos.models import Action
+    from messages.models import Message
+    try:
+        task = Task.objects.select_related(
+            "team_video__video", "team_video", "assignee", "subtitle_version").get(
+                pk=task_pk)
+    except Task.DoesNotExist:
+        return False
+    
+    if published:
+        subject = ugettext(u"Your subtitles have been approved and published!")
+        template_txt = "messages/team-task-approved-published.txt"
+        template_html ="messages/email/team-task-approved-published.html" 
+    else:
+        
+        template_txt = "messages/team-task-approved-sentback.txt"
+        template_html ="messages/email/team-task-approved-sentback.html" 
+        subject = ugettext(u"Your subtitles have been declined")
+    user = task.subtitle_version.user
+    task_language  = task.language
+    task_language = SUPPORTED_LANGUAGES_DICT[task.language]
+    reviewer = task.assignee
+    video = task.team_video.video
+    subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
+        'video_id': video.video_id,
+        'lang': task.language,
+        'lang_id': task.subtitle_version.language.pk,
+        
+    }))
+    reviewer_message_url = "%s%s?user=%s" % (
+        get_url_base(), reverse("messages:new"), reviewer.username)
+            
+    context = {
+        "team":task.team,
+        "title": task.subtitle_version.language.get_title(),
+        "user":user,
+        "task_language": task_language,
+        "url_base":get_url_base(),
+        "task":task,
+        "reviewer":reviewer,
+        "note":task.body,
+        "subs_url": subs_url,
+        "reviewer_message_url": reviewer_message_url, 
+    }
+    if user.notify_by_message:
+        template_name = template_txt
+        msg = Message()
+        msg.subject = subject
+        msg.content = render_to_string(template_name,context)
+        msg.user = user
+        msg.object = task.team
+        msg.save()
+        
+    template_name = template_html
+    email_res =  send_templated_email(user, subject, template_name, context)
+    Action.create_rejected_video_handler(task.subtitle_version, reviewer)
+    return msg, email_res
+     
+@task
 def send_reject_notification(task_pk, sent_back):
     raise NotImplementedError()
     from teams.models import Task
