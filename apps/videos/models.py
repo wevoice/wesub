@@ -705,7 +705,11 @@ class SubtitleLanguage(models.Model):
         """
         if self.title:
             return self.title
-        elif self.standard_language:
+        # some data in production has ciclyc dependencies for this, e.g
+        # lang.a.standard_language = b
+        # b.standard_language =a
+        # not sure how this got here, but it has to be fixed and worked around
+        elif self.standard_language and self.standard_language.standard_language != self:
             return self.standard_language.get_title()
         return self.video.title
 
@@ -718,7 +722,11 @@ class SubtitleLanguage(models.Model):
         """
         if self.description:
             return self.description
-        elif self.standard_language:
+        # some data in production has ciclyc dependencies for this, e.g
+        # lang.a.standard_language = b
+        # b.standard_language =a
+        # not sure how this got here, but it has to be fixed and worked around
+        elif self.standard_language and self.standard_language.standard_language != self:
             return self.standard_language.get_description()
         return self.video.description
 
