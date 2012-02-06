@@ -1,9 +1,8 @@
 Hi {{ user }},
 
-Your {{ task_language }} subtitles for the video “{{ title }}” have been approved by {{ reviewer }} from the {{ team.name }} team and they are now published!
+{{ reviewer }} from the {{ team.name }} team has reviewed your {{ task_language }} subtitles for the video “{{ title }}” and has declined to publish them.
 
 {% if note %} {{ reviewer}} included the following note:
 {{ note }} {% endif %}
 
 Send {{reviewer}} a {{reviewer_message_url}}
-or view your subtitles {{subs_url}}
