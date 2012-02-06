@@ -14,7 +14,7 @@
     {% endif %}
 </div>
 {% if projects|length > 0 %}
-    <div id="projects-list" {% if projects|length > 6 %} class="abbr collapsed"{% endif %}>
+    <div id="projects-list" {% if projects|length > 6 %} class="collapsed"{% endif %}>
         <div>
             <h4>{% trans 'Projects' %}</h4>
             <ul>
@@ -109,6 +109,17 @@
         window.open('http://www.facebook.com/sharer.php?u={{ request.build_absolute_uri|urlencode }}&t={{ team.name|urlencode }} on Universal Subtitles', 'post_to_fb', 'status=0,width=560,height=320');
         return false;
     }
+    $(function() {
+        $('a.expand', 'div#projects-list').toggle(function() {
+            $(this).parent().toggleClass('collapsed');
+            $(this).text('{% trans "Show less" %} ↑');
+            return false;
+        }, function() {
+            $(this).parent().toggleClass('collapsed');
+            $(this).text('{% trans "Show all" %} ↓');
+            return false;
+        });
+    });
 </script>
 
 {% include "teams/_actions.html" %}

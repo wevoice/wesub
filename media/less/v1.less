@@ -1874,8 +1874,19 @@ pre.dump {
     margin-bottom: 1em;
 }
 
-#teams .context #projects-list h4 {
-    padding: 1.5em 0 1em;
+#teams .context #projects-list {
+    h4 {
+        padding: 1.5em 0 1em;
+    }
+    &.collapsed {
+        li {
+            display: none;
+
+            &:first-of-type {
+                display: block;
+            }
+        }
+    }
 }
 
 #teams .view .tools {

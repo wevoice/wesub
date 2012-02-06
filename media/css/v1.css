@@ -214,6 +214,7 @@ pre.dump code{font-family:Consolas,Menlo,"Courier New",monospace;margin:15px 0;p
 #teams .context .notation{clear:both;padding-top:2em;}
 #teams .context .notation.policy{padding-top:0;margin-bottom:1em;}
 #teams .context #projects-list h4{padding:1.5em 0 1em;}
+#teams .context #projects-list.collapsed li{display:none;}#teams .context #projects-list.collapsed li:first-of-type{display:block;}
 #teams .view .tools #sort-filter{padding:.5em;text-decoration:none;color:#678ca3;line-height:1.5em;}#teams .view .tools #sort-filter:hover{color:#2f3c45;}#teams .view .tools #sort-filter:hover span{background:url('../images/chosen-hover.png') no-repeat 4px 3px;}
 #teams .view .tools #sort-filter:hover span.open{background:url('../images/chosen-hover.png') no-repeat 4px -28px;}
 #teams .view .tools #sort-filter span{padding:0 8px;background:url('../images/chosen-sprite.png') no-repeat 2px -4px;}
