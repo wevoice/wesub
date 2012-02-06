@@ -1569,13 +1569,15 @@ class Task(models.Model):
         self._set_version_moderation_status()
 
         # If the subtitles are okay, go ahead and autocreate translation tasks.
-        if self.approved == Task.APPROVED_IDS['Approved']:
+        is_ok = self.approved == Task.APPROVED_IDS['Approved']
+        if is_ok:
             # But only if we haven't already.
             if self.workflow.autocreate_translate:
                 _create_translation_tasks(self.team_video, self.subtitle_version)
         else:
             # Send the subtitles back for improvement.
-            self._send_back()
+            self._send_back(sends_notification=False)
+        notifier.approved_notification.delay(self.pk, is_ok)
 
 
     def get_perform_url(self):
