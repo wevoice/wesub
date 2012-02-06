@@ -26,9 +26,16 @@
         var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
 
         $(function() {
+            $form = $('form', 'div#remove-modal');
             $('a.remove-video').click(function() {
-                $form = $('form', 'div#remove-modal');
                 $form.attr('action', $(this).siblings('form').attr('action'));
+            });
+
+            $form.submit(function() {
+                var $checked = $('input[name="del-opt"]:checked', 'div#remove-modal');
+                if ($checked.val() == 'total-destruction') {
+                    $form.attr('action', $form.attr('action').replace('remove', 'delete'));
+                }
             });
         });
     </script>
@@ -120,11 +127,11 @@
                     <fieldset>
                         <p>{% blocktrans %}You can choose to remove the video from the {{ team }} team or to delete the video (and all of its subtitles) from the system entirely. What would you like to do?{% endblocktrans %}</p>
                         <label class="radio">
-                            <input type="radio" name="del-opt" value="" checked="checked">
+                            <input type="radio" name="del-opt" value="team-removal" checked="checked">
                             {% blocktrans %}Just remove the video from the team (it will remain on Universal Subtitles but will no longer be subject to permissions and worfklows).{% endblocktrans %}
                         </label>
                         <label class="radio">
-                            <input type="radio" name="del-opt" value="language">
+                            <input type="radio" name="del-opt" value="total-destruction">
                             {% trans "Delete the video entirely." %}
                         </label>
                     </fieldset>
@@ -135,7 +142,7 @@
                     <input type="hidden" name="subtitle_version" value="" />
 
                     <div class="modal-footer">
-                        <button>{% trans "Delete" %}</button>
+                        <input type="submit" class="btn danger" value="{% trans "Delete" %}" />
                     </div>
                 </form>
             </div>
