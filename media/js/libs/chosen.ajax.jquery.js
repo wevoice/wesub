@@ -3,7 +3,24 @@
         return $.fn.ajaxChosen = function(options, callback) {
             var select;
             select = this;
-            this.chosen();
+            this.chosen().change(function() {
+                $select = $(this);
+
+                // New message
+                if ($('body').hasClass('new-message')) {
+                    $option = $('option:selected', $select);
+
+                    if ($select.attr('id') === 'id_user') {
+                        if ($option.val() !== '') {
+                            $('div.team, div.or').addClass('disabled');
+                            $('select#id_team').attr('disabled', 'disabled').trigger('liszt:updated');
+                        } else {
+                            $('div.team, div.or').removeClass('disabled');
+                            $('select#id_team').removeAttr('disabled').trigger('liszt:updated');
+                        }
+                    }
+                }
+            });
             return this.next('.chzn-container').find(".chzn-search > input").bind('keyup', function() {
                 var field, val;
                 val = $.trim($(this).attr('value'));
