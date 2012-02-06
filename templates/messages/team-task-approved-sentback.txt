@@ -1,8 +1,10 @@
 Hi {{ user }},
 
-{{ reviewer }} from the {{ team.name }} team has reviewed your {{ task_language }} subtitles for the video “{{ title }}” and has declined to publish them.
+{{ reviewer }} from the {{ team.name }} team has reviewed your {{ task_language }} subtitles for the video “{{ title }}”.
+
+The subtitles have been sent back for additional work and/or corrections.
 
 {% if note %} {{ reviewer}} included the following note:
 {{ note }} {% endif %}
 
-Send {{reviewer}} a {{reviewer_message_url}}
+Send {{reviewer}} a message: {{reviewer_message_url}}
