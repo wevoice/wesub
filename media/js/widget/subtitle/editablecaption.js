@@ -39,7 +39,7 @@ unisubs.subtitle.EditableCaption = function(opt_subOrder, opt_jsonCaption) {
             'start_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
             'end_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
             'sub_order' : opt_subOrder,
-            'start_of_paragraph': false,
+            'start_of_paragraph': false
         };
     this.previousCaption_ = null;
     this.nextCaption_ = null;
