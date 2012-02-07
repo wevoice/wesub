@@ -966,6 +966,7 @@ RUN_LOCALLY = False
 try:
     import debug_toolbar
 
+    EVERYONE_CAN_DEBUG = False
     INSTALLED_APPS += ('debug_toolbar',)
     MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
@@ -979,11 +980,12 @@ try:
     )
 
     def custom_show_toolbar(request):
-        if request.user.is_staff and '__debug__/m/' in request.path:
-            return True
+        from django.conf import settings
+        can_debug = settings.EVERYONE_CAN_DEBUG or request.user.is_staff
 
-        if request.user.is_staff and 'debug_toolbar' in request.GET:
-            return True
+        if can_debug:
+            if '__debug__/m/' in request.path or 'debug_toolbar' in request.GET:
+                return True
 
         return False
 
