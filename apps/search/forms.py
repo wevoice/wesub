@@ -26,6 +26,7 @@ ALL_LANGUAGES = get_simple_languages_list()
 
 class SearchForm(forms.Form):
     SORT_CHOICES = (
+        ('score', _(u'Relevance')),
         ('languages_count', _(u'Most languages')),
         ('today_views', _(u'Views Today')),
         ('week_views', _(u'Views This Week')),
@@ -33,7 +34,7 @@ class SearchForm(forms.Form):
         ('total_views', _(u'Total Views')),
     )
     q = forms.CharField(label=_(u'query'))
-    sort = forms.ChoiceField(choices=SORT_CHOICES, required=False, initial='languages_count',
+    sort = forms.ChoiceField(choices=SORT_CHOICES, required=False, initial='score',
                              label=_(u'Sort By'))
     langs = forms.ChoiceField(choices=ALL_LANGUAGES, required=False, label=_(u'Subtitled Into'),
                               help_text=_(u'Left blank for any language'), initial='')
@@ -126,6 +127,6 @@ class SearchForm(forms.Form):
         if ordering:
             qs = qs.order_by('-' + ordering)
         else:
-            qs = qs.order_by('-languages_count')
-            
+            qs = qs.order_by('-score')
+
         return qs
