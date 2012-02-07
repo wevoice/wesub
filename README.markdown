@@ -14,27 +14,28 @@ To run the development version:
 
         git clone git://github.com/pculture/unisubs.git unisubs
 
-    Now the entire project will be in the unisubs directory.
+   Now the entire project will be in the unisubs directory.
 
 2. Install VirtualBox and vagrant if you don't have them yet. Then type:
 
         vagrant up
 
-    This is going to create a vm and provision it. It should take 10-15 minutes.
-    Remember what mom said: a watched pot never boils.
+   This is going to create a vm and provision it. It should take 10-15 minutes.
+   Remember what mom said: a watched pot never boils.
 
 3. Switch over to your vagrant vm with:
 
         vagrant ssh
 
-    Then run following commands:
+   By default our `~/.bashrc` file will automatically move you to the shared
+   folder and activate the virtualenv.
 
-        cd /opt/unisubs
-        source ../extras/venv/bin/activate
+   Now run following command:
+
         ./bootstrap-vagrant.sh
 
-    It's safe to run `bootstrap-vagrant.sh` multiple times if something goes
-    wrong (like PyPi goes down).
+   It's safe to run `bootstrap-vagrant.sh` multiple times if something goes
+   wrong (like PyPi goes down).
 
 4. Add `unisubs.example.com` to your hosts file, pointing at `127.0.0.1`.  This
    is necessary for Twitter and Facebook oauth to work correctly.
@@ -43,9 +44,40 @@ To run the development version:
 
         ./dev-runserver.sh
 
-    You can access the site at <http://unisubs.example.com:8000>.
+   You can access the site at <http://unisubs.example.com:8000>.
 
-## Optional
+Testing
+-------
+
+To run unit tests, use the `pmt` alias.  This will ensure that you're using the
+correct settings for testing.
+
+You can specify specific tests to run, just like if you were using `nosetests`.
+For example:
+
+    $ vagrant ssh
+
+    # Just the tests in apps/teams/tests/permissions.py
+    $ pmt apps.teams.tests.permissions
+
+    # Tests defined as a class in apps/teams/tests/permissions.py
+    $ pmt apps.teams.tests.permissions:TestRules
+
+    # One specific test
+    $ pmt apps.teams.tests.permissions:TestRules.test_can_add_video
+
+    # Everything:
+    $ pmt
+
+Note: you may need to rebuild the Solr schema after running tests.  To do so,
+run the following command on the server:
+
+    sudo ./deploy/update_solr_schema_vagrant.sh
+
+**TODO:** Fix this.
+
+Optional
+--------
 
 You can optionally set up a few other pieces of the development environment that
 we haven't automated yet.
