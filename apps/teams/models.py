@@ -1386,6 +1386,9 @@ class Task(models.Model):
                 user=self.assignee,
             ).save()
 
+    def future(self):
+        return self.expiration_date > datetime.datetime.now()
+
     def get_widget_url(self):
         mode = Task.TYPE_NAMES[self.type].lower()
         if self.subtitle_version:
