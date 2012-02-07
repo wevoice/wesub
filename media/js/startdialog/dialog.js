@@ -154,7 +154,7 @@ unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
             this.buildModeratedMessage_();
         } else {
             unisubs.Rpc.call(
-                'can_user_subtitle_video',
+                'can_user_edit_video',
                 { 'video_id': this.videoID_ },
                 goog.bind(this.moderatedResponseReceived_, this));
         }
