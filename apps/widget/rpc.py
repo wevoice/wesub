@@ -492,7 +492,7 @@ class Rpc(BaseRpc):
                     start_time=s['start_time'],
                     end_time=s['end_time'],
                     subtitle_order=s['sub_order'],
-                    start_of_paragraph=s['start_of_paragraph'],
+                    start_of_paragraph=s.get('start_of_paragraph', False),
                 )
 
 
