@@ -57,7 +57,7 @@ unisubs.reviewsubtitles.ReviewSubtitlesPanel.prototype.createDom = function() {
     this.getElement().appendChild(this.contentElem_ = $d('div'));
 
     this.subtitleList_ = new unisubs.subtitle.SubtitleList(
-        this.videoPlayer_, this.subtitles_, true, false, true);
+        this.videoPlayer_, this.subtitles_, true, false, true, true);
     this.addChild(this.subtitleList_, true);
 };
 unisubs.reviewsubtitles.ReviewSubtitlesPanel.prototype.captionReached_ = function(event) {

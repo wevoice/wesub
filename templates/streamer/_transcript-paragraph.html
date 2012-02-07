@@ -1,0 +1,7 @@
+{% for this_paragraph in paragraphs %}
+<p class="unisubs-transcript-paragraph">
+    {% for sub in this_paragraph %}
+         <span class="unisubs-sub" id="usub-{{video.video_id}}-{{sub.subtitle_id}}">{{sub.text}}</span>
+    {% endfor %}
+</p>
+{% endfor %}

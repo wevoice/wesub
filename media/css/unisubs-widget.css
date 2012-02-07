@@ -967,6 +967,7 @@ ul.unisubs-titlesList {
 ul.unisubs-titlesList li.active {
     background: #caf3ff !important
 }
+
 ul.unisubs-titlesList li {
     border-bottom: 1px solid #ccc !important;
     font-weight: bold !important;
@@ -1007,12 +1008,25 @@ ul.unisubs-titlesList li:hover .unisubs-timestamp {
     padding-right: 9px !important;
     padding-top: 0px !important;
 }
-.unisubs-sub-delete, .unisubs-sub-insert {
+.unisubs-sub-delete, .unisubs-sub-insert, .unisubs-sub-paragraph {
     cursor: pointer !important;
     cursor: hand !important;
     position: absolute !important;
     top: 0px !important;
 }
+
+.unisubs-sub-paragraph {
+    background: url("../images/paragraph-marker.png") 0 0 no-repeat !important;
+    height: 28px !important;
+    left: 8px !important;
+    top: -5px !important;
+    width: 30px !important;
+}
+
+.unisubs-sub-paragraph.selected{
+    background: url("../images/paragraph-marker.png") 0 -55px no-repeat !important ;
+}
+
 .unisubs-sub-insert:active {
     background: url("../images/add-title.png") 0 0 no-repeat !important
 }
@@ -2791,7 +2805,7 @@ div.unisubs-transcript span {
     -moz-border-radius: 4px !important;
     -webkit-border-radius: 4px !important;
     border-radius: 4px !important;
-    margin: -4px -4px !important;
+    margin: -4px -2px !important;
     padding: 4px 4px !important;
 }
 .unisubs-right div a.widget-button {

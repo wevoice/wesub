@@ -491,7 +491,9 @@ class Rpc(BaseRpc):
                     subtitle_text=s['text'],
                     start_time=s['start_time'],
                     end_time=s['end_time'],
-                    subtitle_order=s['sub_order'])
+                    subtitle_order=s['sub_order'],
+                    start_of_paragraph=s['start_of_paragraph'],
+                )
 
 
     def _get_review_or_approve_task(self, team_video, subtitle_language):

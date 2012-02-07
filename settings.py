@@ -585,6 +585,7 @@ INSTALLED_APPS = (
     'icanhaz',
     'tastypie',
     'accountlinker',
+    'streamer',
     'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
 )
 

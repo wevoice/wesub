@@ -28,10 +28,11 @@ goog.provide('unisubs.subtitle.SubtitleWidget');
  *
  */
 unisubs.subtitle.SubtitleWidget = function(subtitle,
-                                            subtitleSet,
-                                            editingFn,
-                                            displayTimes,
-                                            readOnly) {
+                                           subtitleSet,
+                                           editingFn,
+                                           displayTimes,
+                                           readOnly,
+                                           displayParagraphMarker) {
     goog.ui.Component.call(this);
     this.subtitle_ = subtitle;
     this.subtitleSet_ = subtitleSet;
@@ -40,6 +41,7 @@ unisubs.subtitle.SubtitleWidget = function(subtitle,
     this.keyHandler_ = null;
     this.timeSpinner_ = null;
     this.readOnly_ = readOnly;
+    this.displayParagraphMarker_ = displayParagraphMarker;
     this.insertDeleteButtonsShowing_ = false;
 };
 goog.inherits(unisubs.subtitle.SubtitleWidget, goog.ui.Component);
@@ -52,8 +54,11 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
     if (!this.readOnly_) {
         this.deleteButton_ = this.createDeleteButton_($d);
         this.insertButton_ = this.createInsertButton_($d);
+        this.paragraphMarkerButton_ = this.createParagraphMarkerButton_($d);
+        this.updateParagraphMarkerButton_();
         goog.style.showElement(this.deleteButton_, false);
         goog.style.showElement(this.insertButton_, false);
+        goog.style.showElement(this.paragraphMarkerButton_, false);
         this.contentElement_ = $d('span', 'unisubs-timestamp');
 
         this.setElementInternal(
@@ -64,7 +69,10 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
                 this.titleElemInner_ =
                 $d('span')),
             this.deleteButton_,
-            this.insertButton_));
+            this.insertButton_, 
+            this.paragraphMarkerButton_
+        ));
+        
     } else {
         this.setElementInternal(
             $d('li', null,
@@ -97,6 +105,10 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
 unisubs.subtitle.SubtitleWidget.prototype.createDeleteButton_ = function($d) {
     return $d('div', 'unisubs-sub-delete', ' ');
 };
+unisubs.subtitle.SubtitleWidget.prototype.createParagraphMarkerButton_ = function($d) {
+    return $d('div', 'unisubs-sub-paragraph', ' ');
+    
+};
 unisubs.subtitle.SubtitleWidget.prototype.createInsertButton_ = function($d) {
     return $d('div', 'unisubs-sub-insert', ' ');
 };
@@ -107,6 +119,7 @@ unisubs.subtitle.SubtitleWidget.prototype.enterDocument = function() {
     if (!this.readOnly_) {
         this.getHandler().listen(this.deleteButton_, et.CLICK, this.deleteClicked_)
                          .listen(this.insertButton_, et.CLICK, this.insertClicked_)
+                         .listen(this.paragraphMarkerButton_, et.CLICK, this.paragraphMarkerClicked_)
                          .listen(this.titleElem_, et.CLICK, this.clicked_)
                          .listen(this.getElement(),
                                 [et.MOUSEOVER, et.MOUSEOUT],
@@ -128,6 +141,22 @@ unisubs.subtitle.SubtitleWidget.prototype.setActive = function(active) {
 unisubs.subtitle.SubtitleWidget.prototype.deleteClicked_ = function(e) {
     this.subtitleSet_.deleteCaption(this.subtitle_);
 };
+
+unisubs.subtitle.SubtitleWidget.prototype.updateParagraphMarkerButton_ = function() {
+    if (this.subtitle_.getStartOfParagraph()){
+        goog.dom.classes.add(this.paragraphMarkerButton_, "selected")
+    }else{
+        
+        goog.dom.classes.remove(this.paragraphMarkerButton_, "selected")
+    }
+
+}
+unisubs.subtitle.SubtitleWidget.prototype.paragraphMarkerClicked_ = function(e) {
+    e.stopPropagation();
+    this.subtitle_.toggleStartOfParagraph();
+    this.updateParagraphMarkerButton_();
+};
+
 unisubs.subtitle.SubtitleWidget.prototype.insertClicked_ = function(e) {
     e.stopPropagation();
     this.showInsertDeleteButtons_(false);
@@ -174,6 +203,7 @@ unisubs.subtitle.SubtitleWidget.prototype.showInsertDeleteButtons_ =
     if (!this.readOnly_) {
         goog.style.showElement(this.deleteButton_, show);
         goog.style.showElement(this.insertButton_, show);
+        goog.style.showElement(this.paragraphMarkerButton_, show);
     }
 };
 unisubs.subtitle.SubtitleWidget.prototype.clicked_ = function(event) {
