@@ -42,6 +42,7 @@ unisubs.startdialog.Dialog = function(videoID, initialLanguageState, callback) {
     this.model_ = null;
     this.initialLanguageState_ = initialLanguageState;
     this.callback_ = callback;
+    this.startDialogJson_ = null;
 };
 goog.inherits(unisubs.startdialog.Dialog, goog.ui.Dialog);
 unisubs.startdialog.Dialog.FORK_VALUE = 'forkk';
@@ -89,23 +90,16 @@ unisubs.startdialog.Dialog.prototype.makeDropdown_ = function($d, contents, opt_
 
     return $d('select', (opt_className || null), options);
 };
-unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
-    var isModerated = jsonResult['is_moderated'];
 
-    if (isModerated && unisubs.isEmbeddedInDifferentDomain()) {
-        this.contentDiv_.innerHTML = (
-            "<p>Subtitles for this video are moderated.</p>" +
-            "<p>Please visit the " +
-            "<a href='" + unisubs.getVideoHomepageURL(this.videoID_) + "'>video page</a> " +
-            "to contribute.</p>" );
-        return;
-    }
-
+unisubs.startdialog.Dialog.prototype.buildStartDialogContents_ = function() {
     this.fetchCompleted_ = true;
-    this.model_ = new unisubs.startdialog.Model(jsonResult, this.initialLanguageState_);
+    this.model_ = new unisubs.startdialog.Model(this.startDialogJson_,
+                                                this.initialLanguageState_);
+
     goog.dom.removeChildren(this.contentDiv_);
     var $d = goog.bind(this.getDomHelper().createDom,
                        this.getDomHelper());
+
     this.addOriginalLanguageSection_($d);
     this.addToLanguageSection_($d);
     this.addFromLanguageSection_($d);
@@ -113,6 +107,7 @@ unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
     this.warningElem_ = $d('p', 'warning');
     goog.dom.append(this.contentDiv_, this.warningElem_);
     goog.style.showElement(this.warningElem_, false);
+
     this.okButton_ =
         $d('a',
            {'href':'#',
@@ -122,11 +117,52 @@ unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
     var clearDiv = $d('div');
     unisubs.style.setProperty(clearDiv, 'clear', 'both');
     clearDiv.innerHTML = "&nbsp;";
+
     this.contentDiv_.appendChild(clearDiv);
     this.reposition();
     this.connectEvents_();
     this.maybeShowWarning_();
 };
+unisubs.startdialog.Dialog.prototype.buildPermissionDeniedMessage_ = function() {
+    this.contentDiv_.innerHTML = (
+        "<p>Subtitles for this video are moderated.</p>" +
+        "<p>You do not have permission to subtitle this video.</p>" +
+        "<p>Please visit the " +
+        "<a href='" + unisubs.getVideoHomepageURL(this.videoID_) + "'>video page</a> " +
+        "to contribute.</p>" );
+};
+unisubs.startdialog.Dialog.prototype.buildModeratedMessage_ = function() {
+    this.contentDiv_.innerHTML = (
+        "<p>Subtitles for this video are moderated.</p>" +
+        "<p>Please visit the " +
+        "<a href='" + unisubs.getVideoHomepageURL(this.videoID_) + "'>video page</a> " +
+        "to contribute.</p>" );
+};
+unisubs.startdialog.Dialog.prototype.moderatedResponseReceived_ = function(jsonResult) {
+    if (jsonResult['can_subtitle']) {
+        this.buildStartDialogContents_();
+    } else {
+        this.buildPermissionDeniedMessage_();
+    }
+};
+unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
+    var isModerated = jsonResult['is_moderated'];
+    this.startDialogJson_ = jsonResult;
+
+    if (isModerated) {
+        if (unisubs.isEmbeddedInDifferentDomain()) {
+            this.buildModeratedMessage_();
+        } else {
+            unisubs.Rpc.call(
+                'can_user_edit_video',
+                { 'video_id': this.videoID_ },
+                goog.bind(this.moderatedResponseReceived_, this));
+        }
+    } else {
+        this.buildStartDialogContents_();
+    }
+};
+
 unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
     var fromLanguages = this.model_.fromLanguages();
     goog.style.showElement(

@@ -1080,6 +1080,7 @@ class SubtitleVersionManager(models.Manager):
             caption.subtitle_text = item['subtitle_text']
             caption.start_time = item['start_time']
             caption.end_time = item['end_time']
+            caption.start_of_paragraph = item.get('start_of_paragraph', False)
             caption.save()
 
             if metadata:
@@ -1381,6 +1382,7 @@ class Subtitle(models.Model):
     start_time = models.FloatField(null=True)
     # in seconds. if no end time is set, should be null.
     end_time = models.FloatField(null=True)
+    start_of_paragraph = models.BooleanField(default=False)
 
     objects = SubtitleManager()
 
@@ -1395,6 +1397,7 @@ class Subtitle(models.Model):
     def duplicate_for(self, version=None, draft=None):
         return Subtitle(version=version,
                         draft=draft,
+                        start_of_paragraph = self.start_of_paragraph,
                         subtitle_id=self.subtitle_id,
                         subtitle_order=self.subtitle_order,
                         subtitle_text=self.subtitle_text,

@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -19,8 +19,7 @@
 from django import template
 from teams.models import Team, TeamVideo, Project, TeamMember, Workflow, Task
 from django.db.models import Count
-from django.db.models import Q
-from videos.models import Action, Video
+from videos.models import Video
 from apps.widget import video_cache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _

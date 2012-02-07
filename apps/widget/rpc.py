@@ -366,6 +366,18 @@ class Rpc(BaseRpc):
             return { 'response': 'ok' }
 
 
+    def can_user_edit_video(self, request, video_id):
+        video = models.Video.objects.get(video_id=video_id)
+        team_video = video.get_team_video()
+
+        if not team_video:
+            return {'response': 'ok', 'can_subtitle': True, 'can_translate': True}
+        else:
+            return {'response': 'ok',
+                    'can_subtitle': can_create_and_edit_subtitles(request.user, team_video),
+                    'can_translate': can_create_and_edit_translations(request.user, team_video)}
+
+
     def finished_subtitles(self, request, session_pk, subtitles=None,
                            new_title=None, completed=None,
                            forked=False,
@@ -479,7 +491,9 @@ class Rpc(BaseRpc):
                     subtitle_text=s['text'],
                     start_time=s['start_time'],
                     end_time=s['end_time'],
-                    subtitle_order=s['sub_order'])
+                    subtitle_order=s['sub_order'],
+                    start_of_paragraph=s.get('start_of_paragraph', False),
+                )
 
 
     def _get_review_or_approve_task(self, team_video, subtitle_language):

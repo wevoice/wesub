@@ -38,7 +38,8 @@ unisubs.subtitle.EditableCaption = function(opt_subOrder, opt_jsonCaption) {
             'text' : '',
             'start_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
             'end_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
-            'sub_order' : opt_subOrder
+            'sub_order' : opt_subOrder,
+            'start_of_paragraph': false
         };
     this.previousCaption_ = null;
     this.nextCaption_ = null;
@@ -49,6 +50,7 @@ unisubs.subtitle.EditableCaption.prototype.fork = function(jsonSub) {
     this.json['sub_order'] = jsonSub['sub_order'];
     this.json['start_time'] = jsonSub['start_time'];
     this.json['end_time'] = jsonSub['end_time'];
+    this.json['start_of_paragraph'] = jsonSub['start_of_paragraph'];
 };
 
 unisubs.subtitle.EditableCaption.orderCompare = function(a, b) {
@@ -103,7 +105,8 @@ unisubs.subtitle.EditableCaption.prototype.identicalTo = function(other) {
         this.getTrimmedText() == other.getTrimmedText() &&
         this.getStartTime() == other.getStartTime() &&
         this.getEndTime() == other.getEndTime() &&
-        this.getCaptionID() == other.getCaptionID();
+        this.getCaptionID() == other.getCaptionID() &&
+        this.getStartOfParagraph() == other.getStartOfParagraph();
 };
 unisubs.subtitle.EditableCaption.prototype.getSubOrder = function() {
     return this.json['sub_order'];
@@ -115,6 +118,24 @@ unisubs.subtitle.EditableCaption.prototype.setText = function(text, opt_dontTrac
 unisubs.subtitle.EditableCaption.prototype.getText = function() {
     return this.json['text'];
 };
+
+unisubs.subtitle.EditableCaption.prototype.getStartOfParagraph = function(){
+    return this.json['start_of_paragraph'];
+}
+
+unisubs.subtitle.EditableCaption.prototype.setStartOfParagraph = function(val, opt_dontTrack){
+    if (this.json['start_of_paragraph'] != Boolean(val)){
+        this.json['start_of_paragraph'] = Boolean(val);
+        this.changed_(false, opt_dontTrack);
+    }
+    return this.json['start_of_paragraph'];
+}
+
+
+unisubs.subtitle.EditableCaption.prototype.toggleStartOfParagraph = function(){
+    return this.setStartOfParagraph(!this.getStartOfParagraph(), true);
+}
+
 unisubs.subtitle.EditableCaption.prototype.getTrimmedText = function() {
     return goog.string.trim(this.json['text']);
 };

@@ -1,24 +1,24 @@
 {% load i18n%}
 
 {% if user.is_authenticated %}
-<div id="send_message" style="display: none">
-  <form class="message" method="post" action="{% url profiles:send_message %}" id="message-form">  
-     <h3>{% blocktrans %}Send a Message{% endblocktrans %}</h3>
-     {% csrf_token %}
-     <input type="hidden" name="user" value=""/>
-     <p>
-       <label>{% trans 'From' %}</label>
-       <input type="text" value="{{ user.email }}" name="email"/>    
-     </p>
-     <p>
-       <label>{% trans 'Message' %}</label>
-       <textarea class="to" type="text" name="message"></textarea>  
-       <span>{% trans 'No HTML' %}</span>
-       <span>{% trans 'Note: when you send a message the recipient can see your email and reply directly' %}</span>
-     </p>
-     <button type="submit" class="green_button big">{% trans 'Send a Message' %}</button>
-  </form>
-</div>
+    <div id="send_message" style="display: none">
+        <form class="message" method="post" action="{% url profiles:send_message %}" id="message-form">  
+            <h3>{% blocktrans %}Send a Message{% endblocktrans %}</h3>
+            {% csrf_token %}
+            <input type="hidden" name="user" value=""/>
+            <p>
+            <label>{% trans 'From' %}</label>
+            <input type="text" value="{{ user.email }}" name="email"/>    
+            </p>
+            <p>
+            <label>{% trans 'Message' %}</label>
+            <textarea class="to" type="text" name="message"></textarea>  
+            <span>{% trans 'No HTML' %}</span>
+            <span>{% trans 'Note: when you send a message the recipient can see your email and reply directly' %}</span>
+            </p>
+            <button type="submit" class="green_button big">{% trans 'Send a Message' %}</button>
+        </form>
+    </div>
 <script type="text/javascript">
 $(function(){
     $('.send_message').nyroModal({

@@ -136,7 +136,10 @@ body#teams div.edit-team-video form fieldset a{display:inline-block;overflow:hid
 #profile.v1 .view .avatar img{float:right;margin-right:-60px;margin-left:1em;padding:.5em;border:1px solid #dce2e5;}
 .v1 .view .grid_4 p,.v1 .view .grid_4 ul{margin-bottom:2em;}
 .v1 .view .grid_4 ul{padding:0;}.v1 .view .grid_4 ul.errorlist{margin-bottom:0;width:auto;}
-.v1 .view.new-message form{padding:4em 2em 2em;}
+.v1 .view.new-message form{padding:4em 2em 2em;}.v1 .view.new-message form div.recipient{float:left;}
+.v1 .view.new-message form div.or{float:left;font-weight:bold;margin:0 20px;padding-top:41px;text-align:center;}
+.v1 .view.new-message form div.team{float:left;}
+.v1 .view.new-message form div.disabled{opacity:.3;}
 .video_view .view{position:relative;}.video_view .view p.view-notice{padding-right:0;margin:1em 0;}.video_view .view p.view-notice a{text-decoration:none;color:inherit;border-bottom:1px dotted #486f87;}
 .video_view .view .tab{clear:both;}
 .video_view .view video,.video_view .view object,.video_view .view .unisubs-widget span.unisubs-videoplayer{width:620px !important;height:370px !important;}

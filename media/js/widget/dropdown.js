@@ -63,7 +63,7 @@ unisubs.widget.DropDown.prototype.setStats_ = function(dropDownContents) {
 
 unisubs.widget.DropDown.prototype.isModerated = function() {
     return this.isModerated_;
-}
+};
 
 unisubs.widget.DropDown.prototype.updateContents = function(dropDownContents) {
     this.setStats_(dropDownContents);
@@ -116,7 +116,7 @@ unisubs.widget.DropDown.prototype.updateSubtitleStats_ = function() {
 
     goog.dom.setTextContent(
         this.addTranslationAnchor_,
-        this.subtitleCount_ == 0 ?
+        this.subtitleCount_ === 0 ?
             'Add New Subtitles' : 'Add New Translation');
 
     goog.dom.setTextContent(
@@ -225,7 +225,7 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
     this.moderatedNotice_ =
         $d('li', 'unisubs-moderated',
            $d('p', null,
-                'These subtitles are moderated. Visit the ', 
+                'These subtitles are moderated. Visit the ',
                 $d('a', {'href': unisubs.getVideoHomepageURL(this.videoID_)},
                     'video page'),
                 ' to contribute.'));
@@ -247,25 +247,52 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
            $d('a', {'href': unisubs.getSubtitleHomepageURL(this.videoID_)}, 'Get Embed Code'));
 };
 
-unisubs.widget.DropDown.prototype.updateActions_ = function() {
+unisubs.widget.DropDown.prototype.moderatedResponseReceived_ = function(jsonResult) {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
+
+    if (jsonResult['can_subtitle'] || jsonResult['can_translate']) {
+        goog.dom.insertChildAt(this.videoActions_, this.addLanguageLink_, 0);
+    } else {
+        var e = $d('li', 'unisubs-moderated',
+           $d('p', null,
+              'These subtitles are moderated. You do not have permission to add a language.'));
+        goog.dom.insertChildAt(this.videoActions_, e, 0);
+    }
+};
+unisubs.widget.DropDown.prototype.addModeratedActionLinks_ = function() {
+    unisubs.Rpc.call(
+        'can_user_edit_video',
+        { 'video_id': this.videoID_ },
+        goog.bind(this.moderatedResponseReceived_, this));
+};
+unisubs.widget.DropDown.prototype.addModeratedNotice_ = function() {
+    this.videoActions_.appendChild(this.moderatedNotice_);
+};
+unisubs.widget.DropDown.prototype.addActionLinks_ = function() {
+    this.videoActions_.appendChild(this.addLanguageLink_);
+    this.videoActions_.appendChild(this.improveSubtitlesLink_);
+};
+unisubs.widget.DropDown.prototype.updateActions_ = function() {
     this.getDomHelper().removeChildren(this.videoActions_);
     this.getDomHelper().removeChildren(this.settingsActions_);
 
-    // FIXME: this should use goog.dom.append and turn into one line.
-
-    if (this.isModerated() && unisubs.isEmbeddedInDifferentDomain()) {
-        this.videoActions_.appendChild(this.moderatedNotice_);
+    this.videoActions_.appendChild(this.improveSubtitlesLink_);
+    if (this.isModerated()) {
+        if (unisubs.isEmbeddedInDifferentDomain()) {
+            this.addModeratedNotice_();
+        } else {
+            this.addModeratedActionLinks_();
+        }
     } else {
-        this.videoActions_.appendChild(this.addLanguageLink_);
-        this.videoActions_.appendChild(this.improveSubtitlesLink_);
+        this.addVideoLinks_();
     }
 
-    this.videoActions_.appendChild(this.subtitleHomepageLink_);
-    this.videoActions_.appendChild(this.getEmbedCodeLink_);
-    this.videoActions_.appendChild(this.downloadSubtitlesLink_);
+    goog.dom.append(this.videoActions_,
+                    this.subtitleHomepageLink_,
+                    this.getEmbedCodeLink_,
+                    this.downloadSubtitlesLink_);
 
-    if (unisubs.currentUsername == null) {
+    if (unisubs.currentUsername === null) {
         this.settingsActions_.appendChild(this.createAccountLink_);
     } else {
         goog.dom.setTextContent(
@@ -338,8 +365,7 @@ unisubs.widget.DropDown.prototype.addLanguageLinkListeners_ = function() {
                 goog.bind(
                     that.languageSelected_,
                     that,
-                    tLink.videoLanguage
-                ));
+                    tLink.videoLanguage));
         });
 };
 

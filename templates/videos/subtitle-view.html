@@ -253,7 +253,7 @@
                 </p>
                 <ol class="subtitles">
                     {% for item in last_version.ordered_subtitles %}
-                    <li>
+                    <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
                         {% if item.display_time %}
                         <div class="timing">
                             <a class="time_link" href="#" title="Play video here">
@@ -270,7 +270,7 @@
                             {% trans 'Not Synced' %}
                         </div>
                         {% endif %}
-                        {{ item.text|linebreaksbr }}
+                        {{ item.text|linebreaksbr }}{% if item.start_of_paragraph %}<p class='quiet'>¶</p>{% endif %} 
                     </li>
                     {% endfor %}
                 </ol>
