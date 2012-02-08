@@ -207,7 +207,7 @@ ol.subtitles li .timing .data{display:none;}
 .v1 .context .metrics li:last-child{border:none;}
 pre.dump code{font-family:Consolas,Menlo,"Courier New",monospace;margin:15px 0;padding:18px 15px;-webkit-background-clip:padding-box;-webkit-border-radius:5px;-moz-background-clip:padding-box;-moz-border-radius:5px;border-radius:5px;background-clip:padding-box;-webkit-box-shadow:1px 1px 3px rgba(0, 0, 0, 0.4);-moz-box-shadow:1px 1px 3px rgba(0, 0, 0, 0.4);box-shadow:1px 1px 3px rgba(0, 0, 0, 0.4);}
 #teams .backnav{color:#7692a3;}#teams .backnav a{color:#2f3c45;}
-#teams div.header a.logo-image{display:block;max-height:235px;max-width:940px;margin-bottom:20px;overflow:hidden;}
+#teams div.header{min-height:0;}#teams div.header a.logo-image{display:block;max-height:235px;max-width:940px;margin-bottom:20px;overflow:hidden;}
 #teams .view .expandable{overflow:hidden;}#teams .view .expandable .button span{display:block;float:right;width:16px;height:1.5em;background:url('../images/chosen-sprite.png') no-repeat 0px -5px;margin-left:4px;}
 #teams .view .tools p{color:#a0b2bd;}#teams .view .tools p span{color:#486f87;}
 #teams .view .subnav{text-align:left;padding:1em 0;}#teams .view .subnav ul li{display:inline;}#teams .view .subnav ul li a{color:#7692a3;text-decoration:none;margin-right:1em;line-height:1.5em;}
