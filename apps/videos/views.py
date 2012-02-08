@@ -676,7 +676,7 @@ def video_url_make_primary(request):
             else:
                 VideoUrl.objects.filter(video=obj.video).update(primary=False)
                 obj.primary = True
-                obj.save()
+                obj.save(updates_timestamp=False)
         except VideoUrl.DoesNotExist:
             output['error'] = ugettext('Object does not exist')
     return HttpResponse(json.dumps(output))
