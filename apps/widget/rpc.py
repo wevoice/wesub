@@ -89,8 +89,13 @@ class Rpc(BaseRpc):
         return { 'response': 'ok' }
 
     def show_widget(self, request, video_url, is_remote, base_state=None, additional_video_urls=None):
-        video_id = video_cache.get_video_id(video_url)
-        if video_id is None: # for example, private youtube video or private widgets
+        try:
+            video_id = video_cache.get_video_id(video_url)
+        except Exception as e:
+            # for example, private youtube video or private widgets
+            return {"error_msg": unicode(e)}
+            
+        if video_id is None: 
             return None
         visibility_policy = video_cache.get_visibility_policies(video_id)
         if visibility_policy.get('widget', None) != VideoVisibilityPolicy.WIDGET_VISIBILITY_PUBLIC:
@@ -103,7 +108,10 @@ class Rpc(BaseRpc):
             video_urls = video_cache.get_video_urls(video_id)
         except models.Video.DoesNotExist:
             video_cache.invalidate_video_id(video_url)
-            video_id = video_cache.get_video_id(video_url)
+            try:
+                video_id = video_cache.get_video_id(video_url)
+            except Exception as e:
+                return {"error_msg": unicode(e)}
             video_urls = video_cache.get_video_urls(video_id)
 
         return_value = {
