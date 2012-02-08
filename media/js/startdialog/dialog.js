@@ -43,6 +43,8 @@ unisubs.startdialog.Dialog = function(videoID, initialLanguageState, callback) {
     this.initialLanguageState_ = initialLanguageState;
     this.callback_ = callback;
     this.startDialogJson_ = null;
+    this.subtitleAllowed_ = true;
+    this.translateAllowed_ = true;
 };
 goog.inherits(unisubs.startdialog.Dialog, goog.ui.Dialog);
 unisubs.startdialog.Dialog.FORK_VALUE = 'forkk';
@@ -139,7 +141,24 @@ unisubs.startdialog.Dialog.prototype.buildModeratedMessage_ = function() {
         "to contribute.</p>" );
 };
 unisubs.startdialog.Dialog.prototype.moderatedResponseReceived_ = function(jsonResult) {
-    if (jsonResult['can_subtitle']) {
+    this.subtitleAllowed_ = jsonResult['can_subtitle'];
+    this.translateAllowed_ = jsonResult['can_translate'];
+
+    if (!this.subtitleAllowed) {
+        // We do a bit of redundant work here to prevent accidentally showing
+        // a start dialog when:
+        //
+        // * A user can translate, but not subtitle.
+        // * This video cannot be translated (yet).
+        var m = new unisubs.startdialog.Model(this.startDialogJson_, this.initialLanguageState_);
+        var subtitleOnly = m.fromLanguages().length === 0;
+
+        if (subtitleOnly) {
+            this.buildPermissionDeniedMessage_();
+        } else {
+            this.buildStartDialogContents_();
+        }
+    } else if (this.subtitleAllowed || this.translateAllowed) {
         this.buildStartDialogContents_();
     } else {
         this.buildPermissionDeniedMessage_();
@@ -167,15 +186,24 @@ unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
     var fromLanguages = this.model_.fromLanguages();
     goog.style.showElement(
         this.fromLanguageSection_, fromLanguages.length > 0);
+
     if (fromLanguages.length > 0) {
-        var fromLanguageContents = goog.array.map(
-            this.model_.fromLanguages(),
-            function(l) {
-                return [l.PK + '', l.toString()];
-            });
-        fromLanguageContents.push(
-            [unisubs.startdialog.Dialog.FORK_VALUE,
-             "Direct from video (more work)"]);
+        var fromLanguageContents = [];
+
+        if (this.translateAllowed_) {
+            fromLanguageContents = goog.array.map(
+                this.model_.fromLanguages(),
+                function(l) {
+                    return [l.PK + '', l.toString()];
+                });
+        }
+
+        if (this.subtitleAllowed_) {
+            fromLanguageContents.push(
+                [unisubs.startdialog.Dialog.FORK_VALUE,
+                    "Direct from video (more work)"]);
+        }
+
         var $d = goog.bind(this.getDomHelper().createDom,
                            this.getDomHelper());
         this.fromLanguageDropdown_ = this.makeDropdown_(
