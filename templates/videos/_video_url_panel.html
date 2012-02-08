@@ -106,7 +106,7 @@ jQuery(function($){
                     }else{
                         var $primary_span = $('#urls-tab .primary');
                         if ( ! $primary_span.length){
-                            $primary_span = $("<span class='descriptor primary'>{% trans 'Primary' %}</span>");
+                            $primary_span = $("<span class='descriptor primary'>{% trans 'Primary'|escapejs %}</span>");
                         };
                         var $span = $primary_span.clone();
                         
@@ -118,7 +118,7 @@ jQuery(function($){
                     }
                 }, 'json');
          }else{
-             alert('{% trans "You are not authenticated" %}');
+             alert('{% trans "You are not authenticated"|escapejs %}');
          }
          return false;
     });
@@ -127,7 +127,7 @@ jQuery(function($){
     $('.delete-url-link').click(function(){
         var $url = $(this);
         if (IS_AUTHENTICATED){
-            if (confirm('{% trans "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-matching videos or videos where subtitles fail to display correctly." %}')){
+            if (confirm('{% trans "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-matching videos or videos where subtitles fail to display correctly."|escapejs %}')){
                 $.get(remove_url, {id: $url.attr('video_url_id')},
                     function(response){
                         if (response.error){
@@ -138,7 +138,7 @@ jQuery(function($){
                     }, 'json')                
             }
         }else{
-            alert('{% trans "You are not authenticated" %}');
+            alert('{% trans "You are not authenticated"|escapejs %}');
         }
         return false;
     });

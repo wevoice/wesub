@@ -34,10 +34,10 @@
             _render: function(){
                 if((!this.options.languageId && this.options.isVideoFollower) || (this.options.languageId && this.options.isLanguageFollower)){
                     this.options.isFollower = true;
-                    this.element.html('{% trans "✓ Following" %}');
+                    this.element.html('{% trans "✓ Following"|escapejs %}');
                     this._setUnfollowCls();
                 } else {
-                    this.element.html('{% trans " Not Following" %}');
+                    this.element.html('{% trans " Not Following"|escapejs %}');
                     this._setFollowCls();
                 }
             },
@@ -82,16 +82,16 @@
             },
             showUnfollowDialog: function(){
                 if (this.options.isVideoFollower){
-                    var title = '{% trans "You will stop receiving notifications when any subtitles for this video are edited.  You can choose to follow again at any time." %}';
-                    var button_name = "{% trans 'Stop following this video' %}";
+                    var title = '{% trans "You will stop receiving notifications when any subtitles for this video are edited.  You can choose to follow again at any time."|escapejs %}';
+                    var button_name = "{% trans 'Stop following this video'|escapejs %}";
                     
                 }else{
-                    var title = '{% trans "You will stop receiving notification when " %}'
+                    var title = '{% trans "You will stop receiving notification when "|escapejs %}'
                         +this.options.languageName
-                        +' {% trans " subtitles for this video are edited. You can choose to follow again at any time." %}';
-                    var button_name = "{% trans 'Stop following ' %}"
+                        +' {% trans " subtitles for this video are edited. You can choose to follow again at any time."|escapejs %}';
+                    var button_name = "{% trans 'Stop following '|escapejs %}"
                         +this.options.languageName
-                        +"{% trans ' subtitles' %}";
+                        +"{% trans ' subtitles'|escapejs %}";
                 };
                 
                 var options = {
@@ -101,7 +101,7 @@
                 if (this.options.isVideoFollower){
                     options.okButton = null;
                     options.extraButtons.push({
-                        name: '{% trans "Unfollow all languages" %}',
+                        name: '{% trans "Unfollow all languages"|escapejs %}',
                         id: 'unfollow-all-languages-button',
                         type: 'ALL'
                     });
@@ -139,15 +139,15 @@
             },
             showFollowDialog: function(){
                 if (this.options.languageId){
-                    var title = '{% trans "You will receive notifications when anyone edits " %}'
+                    var title = '{% trans "You will receive notifications when anyone edits "|escapejs %}'
                         +this.options.languageName
-                        +' {% trans " subtitles for this video. You can stop these emails at any time." %}';
-                    var button_name = "{% trans 'Follow ' %}"
+                        +' {% trans " subtitles for this video. You can stop these emails at any time."|escapejs %}';
+                    var button_name = "{% trans 'Follow '|escapejs %}"
                         +this.options.languageName
-                        +"{% trans ' subtitles' %}";
+                        +"{% trans ' subtitles'|escapejs %}";
                 }else{
-                    var title = '{% trans "You will receive notifications when anyone edits any subtitles for this video. You can stop these emails at any time." %}';
-                    var button_name = "{% trans 'Follow this video' %}";
+                    var title = '{% trans "You will receive notifications when anyone edits any subtitles for this video. You can stop these emails at any time."|escapejs %}';
+                    var button_name = "{% trans 'Follow this video'|escapejs %}";
                 };
                 
                 var options = {
@@ -155,7 +155,7 @@
                 };
 
                 options.extraButtons.push({
-                    name: '{% trans "Follow all languages" %}',
+                    name: '{% trans "Follow all languages"|escapejs %}',
                     id: 'unfollow-all-languages-button',
                     type: 'ALL'
                 });
@@ -172,8 +172,8 @@
             },
             onUnauthenticateClick: function(){
                 var that = this;
-                $.jAlert('{% trans "You must log in to follow a video." %}', 
-                         '{% trans "Authentication required" %}',
+                $.jAlert('{% trans "You must log in to follow a video."|escapejs %}', 
+                         '{% trans "Authentication required"|escapejs %}',
                          function(button){
                              if (button === 'OK'){
                                  window.location.href = that.options.loginUrl;
@@ -197,9 +197,9 @@
             
             $(this).hover(function(){
                 if($(this).hasClass('unfollow')){
-                    $(this).text('{% trans "x Stop Following" %}');
+                    $(this).text('{% trans "x Stop Following"|escapejs %}');
                 } else {
-                    $(this).text('{% trans "✓ Click to Follow" %}');
+                    $(this).text('{% trans "✓ Click to Follow"|escapejs %}');
                 }
             }, function(){
                 $(this).text(orig);

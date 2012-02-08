@@ -172,7 +172,11 @@
                                     </h4>
                                 </li>
                                 {% if task.expiration_date != None %}
-                                    <li>Due in {{ task.expiration_date|timeuntil }}</li>
+                                    {% if task.future %}
+                                        <li>Due in {{ task.expiration_date|timeuntil }}</li>
+                                    {% else %}
+                                        <li>Overdue by {{ task.expiration_date|timesince }}</li>
+                                    {% endif %}
                                 {% endif %}
 
                                 {% if task|can_perform_task:user %}
