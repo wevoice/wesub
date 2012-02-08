@@ -237,7 +237,7 @@ unisubs.widget.Widget.prototype.initializeState_ = function(result) {
 unisubs.widget.Widget.prototype.initializeStateTab_ = function(result) {
     if (!result || result["error_msg"]) {
         // this happens, for example, for private youtube videos.
-        this.videoTab_.showError(result["error_msg"]);
+        this.videoTab_.showError(result && result["error_msg"]);
         return;
     }
 

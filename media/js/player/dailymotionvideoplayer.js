@@ -63,6 +63,14 @@ unisubs.player.DailymotionVideoPlayer.HEIGHT = 300;
 
 unisubs.player.DailymotionVideoPlayer.prototype.enterDocument = function() {
     unisubs.player.DailymotionVideoPlayer.superClass_.enterDocument.call(this);
+    var sizeFromConfig = this.videoSource_.sizeFromConfig();
+    if (!this.forDialog_ && sizeFromConfig)
+        this.playerSize_ = sizeFromConfig;
+    else
+        this.playerSize_ = this.forDialog_ ?
+        unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+        unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+
     if (!this.swfEmbedded_) {
         this.swfEmbedded_ = true;
         var videoDiv = this.getDomHelper().createDom('div');
@@ -80,8 +88,8 @@ unisubs.player.DailymotionVideoPlayer.prototype.enterDocument = function() {
         this.setDimensionsKnownInternal();
         window["swfobject"]["embedSWF"](
             [baseURL, queryString].join(''),
-            videoDiv.id, unisubs.player.DailymotionVideoPlayer.WIDTH,
-            unisubs.player.DailymotionVideoPlayer.HEIGHT, "8",
+            videoDiv.id, this.playerSize_.width,
+            this.playerSize_.height, "8",
             null, null, params, atts);
     }
     this.getHandler().
@@ -157,8 +165,7 @@ unisubs.player.DailymotionVideoPlayer.prototype.setPlayheadTime = function(playh
 };
 
 unisubs.player.DailymotionVideoPlayer.prototype.getVideoSize = function() {
-    return new goog.math.Size(unisubs.player.DailymotionVideoPlayer.WIDTH,
-                              unisubs.player.DailymotionVideoPlayer.HEIGHT);
+    return this.playerSize_;
 };
 
 unisubs.player.DailymotionVideoPlayer.prototype.isPausedInternal = function() {

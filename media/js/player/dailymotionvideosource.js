@@ -22,10 +22,12 @@ goog.provide('unisubs.player.DailymotionVideoSource');
  * @constructor
  * @implements {unisubs.player.MediaSource}
  */
-unisubs.player.DailymotionVideoSource = function(videoID, videoURL) {
+unisubs.player.DailymotionVideoSource = function(videoID, videoURL, opt_videoConfig) {
     this.videoID_ = videoID;
     this.videoURL_ = videoURL;
     this.uuid_ = unisubs.randomString();
+    
+    this.videoConfig_ = opt_videoConfig;
 };
 
 unisubs.player.DailymotionVideoSource.prototype.createPlayer = function() {
@@ -38,9 +40,21 @@ unisubs.player.DailymotionVideoSource.prototype.createControlledPlayer = functio
 
 unisubs.player.DailymotionVideoSource.prototype.createPlayer_ = function(chromeless) {
     return new unisubs.player.DailymotionVideoPlayer(
-        new unisubs.player.DailymotionVideoSource(this.videoID_, this.videoURL_), 
+        new unisubs.player.DailymotionVideoSource(this.videoID_, this.videoURL_, this.videoConfig_), 
         chromeless);
 };
+
+unisubs.player.DailymotionVideoSource.prototype.sizeFromConfig = function() {
+    if (this.videoConfig_ && this.videoConfig_['width'] && 
+        this.videoConfig_['height']) {
+        return new goog.math.Size(
+            parseInt(this.videoConfig_['width']), parseInt(this.videoConfig_['height']));
+    }
+    else {
+        return null;
+    }
+};
+
 
 unisubs.player.DailymotionVideoSource.prototype.getVideoId = function() {
     return this.videoID_;

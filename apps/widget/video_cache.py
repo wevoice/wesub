@@ -41,7 +41,7 @@ def get_video_id(video_url, public_only=False, referer=None):
         try:
             video, create = Video.get_or_create_for_url(video_url)
         except VideoTypeError:
-            return None
+            raise
 
         if not video:
             return None
