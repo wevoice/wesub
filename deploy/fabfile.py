@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from __future__ import with_statement
-from fabric.api import run, put, sudo, env, cd, local
+from fabric.api import run, sudo, env, cd, local
 from fabric.context_managers import settings
 import string
 import random
@@ -79,7 +79,7 @@ def dev(username):
                 name                  = 'dev',
                 memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                 admin_dir             = None,
-                admin_host            = 'pcf-us-admin.pculture.org:2191',
+                admin_host            = 'dev.universalsubtitles.org:2191',
                 celeryd_host          = DEV_HOST,
                 celeryd_proj_root     = 'universalsubtitles.dev',
                 separate_uslogging_db = False,
