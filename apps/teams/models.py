@@ -777,11 +777,22 @@ def team_video_save(sender, instance, created, **kwargs):
     update_one_team_video.delay(instance.id)
 
 def team_video_delete(sender, instance, **kwargs):
+    from videos import metadata_manager
     # not using an async task for this since the async task
     # could easily execute way after the instance is gone,
     # and backend.remove requires the instance.
     tv_search_index = site.get_index(TeamVideo)
     tv_search_index.backend.remove(instance)
+    video = instance.video
+    # we need to publish all unpublished subs for this video:
+    SubtitleVersion.objects.filter(language__video=video).update(
+        moderation_status=MODERATION.UNMODERATED)
+    video.is_public = True
+    video.moderated_by = None
+    video.save()
+    
+    metadata_manager.update_metadata(video.pk)
+    
 
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     if created and not raw:
