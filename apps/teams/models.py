@@ -782,6 +782,15 @@ def team_video_delete(sender, instance, **kwargs):
     # and backend.remove requires the instance.
     tv_search_index = site.get_index(TeamVideo)
     tv_search_index.backend.remove(instance)
+    video = instance.video
+    # we need to publish all unpublished subs for this video:
+    SubtitleVersion.objects.filter(language__video=video).update(
+        moderation_status=MODERATION.UNMODERATED)
+    video.is_public = True
+    video.moderated_by = None
+    video.save()
+    video.update_search_index()
+    
 
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     if created and not raw:

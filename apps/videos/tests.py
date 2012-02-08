@@ -2218,7 +2218,7 @@ def _create_trans( video, latest_version=None, lang_code=None, forked=False):
                 s.duplicate_for(v).save()
         return translation
 
-def create_version(lang, subs, user=None):
+def create_version(lang, subs=None, user=None):
     latest = lang.latest_version()
     version_no = latest and latest.version_no + 1 or 1
     version = SubtitleVersion(version_no=version_no,
@@ -2226,6 +2226,15 @@ def create_version(lang, subs, user=None):
                               language=lang,
                               datetime_started=datetime.now())
     version.save()
+    if subs is None:
+        subs = []
+        for x in xrange(0,5):
+            subs.append({
+                "subtitle_text": "hey %s" % x,
+                "subtitle_id": "%s-%s-%s" % (version_no, lang.pk, x),
+                "start_time": x,
+                "end_time": (x* 1.0) - 0.1
+            })
     for sub in subs:
         s = Subtitle(**sub)
         s.version  = version
@@ -2233,5 +2242,12 @@ def create_version(lang, subs, user=None):
     return version
 
 
+def create_langs_and_versions(video, langs, user=None):
+    versions = []
+    for lang in langs:
+        l, c = SubtitleLanguage.objects.get_or_create(language=lang, video=video, is_forked=True)
+        versions.append(create_version(l))
+    return versions
+    
 def refresh_obj(m):
     return m.__class__._default_manager.get(pk=m.pk)

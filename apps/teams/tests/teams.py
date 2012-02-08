@@ -12,6 +12,7 @@ from django.test import TestCase
 
 from auth.models import CustomUser as User
 from apps.teams import tasks
+from apps.teams import moderation_const as MODERATION
 from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
@@ -415,13 +416,28 @@ class TeamsTest(TestCase):
         team = Team.objects.get(pk=1)
         tv = team.teamvideo_set.exclude(video__subtitlelanguage__language='')[:1].get()
         TeamVideoLanguage.update(tv)
+        # create a few languages with subs
+        from videos.tests import create_langs_and_versions
+        video = tv.video
+        video.is_public = False
+        video.moderated_by = team
+        video.save()
+        langs = ["en" "es", 'fr', 'pt_br']
+        versions = create_langs_and_versions(video, langs)
         self.assertNotEqual(tv.languages.count(), 0)
+        for v in versions:
+            v.moderation_status = MODERATION.WAITING_MODERATION
         tv.delete()
         try:
             TeamVideo.objects.get(pk=tv.pk)
             self.fail()
         except TeamVideo.DoesNotExist:
             pass
+        video = refresh_obj(video)
+        for lang in langs:
+            self.assertTrue(video.subtitle_language(lang).version())
+        self.assertTrue(video.is_public)
+        self.assertEqual(video.moderated_by, None)
 
     def test_complete_contents(self):
         request = RequestMockup(User.objects.all()[0])
