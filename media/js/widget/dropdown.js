@@ -284,7 +284,7 @@ unisubs.widget.DropDown.prototype.updateActions_ = function() {
             this.addModeratedActionLinks_();
         }
     } else {
-        this.addVideoLinks_();
+        this.addActionLinks_();
     }
 
     goog.dom.append(this.videoActions_,
