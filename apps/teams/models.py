@@ -777,6 +777,7 @@ def team_video_save(sender, instance, created, **kwargs):
     update_one_team_video.delay(instance.id)
 
 def team_video_delete(sender, instance, **kwargs):
+    from videos import metadata_manager
     # not using an async task for this since the async task
     # could easily execute way after the instance is gone,
     # and backend.remove requires the instance.
@@ -789,7 +790,8 @@ def team_video_delete(sender, instance, **kwargs):
     video.is_public = True
     video.moderated_by = None
     video.save()
-    video.update_search_index()
+    
+    metadata_manager.update_metadata(video.pk)
     
 
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):

@@ -2225,6 +2225,7 @@ def create_version(lang, subs=None, user=None):
                               user=user or User.objects.all()[0],
                               language=lang,
                               datetime_started=datetime.now())
+    version.is_forked = lang.is_forked
     version.save()
     if subs is None:
         subs = []
