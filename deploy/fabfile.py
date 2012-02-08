@@ -62,13 +62,13 @@ def staging(username):
                 installation_dir      = 'universalsubtitles.staging',
                 static_dir            = '/var/static/staging',
                 name                  = 'staging',
-                memcached_bounce_cmd  = '/etc/init.d/memcached-staging restart',
+                memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                 admin_dir             = '/usr/local/universalsubtitles.staging',
                 admin_host            = 'pcf-us-adminstg.pculture.org:2191',
                 celeryd_host          = 'pcf-us-adminstg.pculture.org:2191',
                 celeryd_proj_root     = 'universalsubtitles.staging',
                 separate_uslogging_db = True,
-                celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
 
 def dev(username):
     _create_env(username              = username,
