@@ -77,7 +77,7 @@
             <p>
                 {% trans 'Videos with subtitles in' %}
                 <select name="lang-filter" id="lang-filter">
-                    <option value="{% query_string request.GET lang='' page='' %}">{% trans 'all languages' %}</option>
+                    <option value="{{ request.path }}{% query_string request.GET lang='' page='' %}">{% trans 'all languages' %}</option>
                     {% for code, name in language_choices %}
                         <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code page='' %}">{{ name }}</option>
                     {% endfor %}
