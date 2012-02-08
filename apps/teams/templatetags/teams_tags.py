@@ -38,6 +38,7 @@ from apps.teams.permissions import (
     can_assign_task as _can_assign_task,
     can_delete_task as _can_delete_task,
     can_remove_video as _can_remove_video,
+    can_approve as _can_approve,
 )
 from apps.teams.permissions import (
     roles_user_can_assign, can_invite, can_add_video_somewhere,
@@ -437,3 +438,31 @@ def can_create_translations_for(user, video):
         return True
     else:
         return can_create_and_edit_translations(user, team_video)
+
+@register.filter
+def can_unpublish(user, video):
+    """Return True if the user can unpublish subtitles for this video.
+
+    Safe to use with anonymous users as well as non-team videos.
+
+    Usage:
+
+        {% if request.user|can_unpublish:video %}
+            ...
+        {% endif %}
+
+    """
+    team_video = video.get_team_video()
+
+    if not team_video:
+        return False
+
+    workflow = Workflow.get_for_team_video(team_video)
+    if not workflow:
+        return False
+
+    if workflow.approve_enabled:
+        return _can_approve(team_video, user)
+
+    return False
+
