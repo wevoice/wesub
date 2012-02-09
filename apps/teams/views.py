@@ -70,7 +70,7 @@ from teams.tasks import (
     update_video_moderation
 )
 import logging
-import sentry_logger # Magical import to make sure Sentry's error recording happens.
+import sentry_logger # Magical import to make Sentry's error recording happen.
 assert sentry_logger # It's okay, Pyflakes.  Trust me.
 logger = logging.getLogger("teams.views")
 
@@ -193,13 +193,9 @@ def detail(request, slug, project_slug=None, languages=None):
             'base_state': {}
         })
 
-    all_langs = set()
-    for search_record in qs:
-        if search_record.video_completed_langs:
-            all_langs.update(search_record.video_completed_langs)
-
+    readable_langs = TeamLanguagePreference.objects.get_readable(team)
     language_choices = [(code, name) for code, name in get_languages_list()
-                        if code in all_langs]
+                        if code in readable_langs]
 
     extra_context['language_choices'] = language_choices
     extra_context['query'] = query
