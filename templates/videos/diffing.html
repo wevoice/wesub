@@ -127,7 +127,7 @@
             <a href="#" class="new_edit">
                 {% trans 'Submit a new edit based on this version' %} (#{{ second_version.version_no }})
             </a>
-            {% if second_version.next_version %}
+            {% if second_version.next_version and rollback_allowed %}
                 <a href="{% url videos:rollback second_version.pk %}" class="roll_back">
                     {% trans 'Roll back to version' %} (#{{ second_version.version_no }})
                 </a>
@@ -184,7 +184,7 @@
             <a href="#" class="new_edit" id="edit_0">
                 {% trans 'Submit a new edit based on this version' %} (#{{ first_version.version_no }})
             </a>
-            {% if first_version.next_version %}
+            {% if first_version.next_version and rollback_allowed %}
                 <a href="{% url videos:rollback first_version.pk %}" class="roll_back">
                     {% trans 'Roll back to version' %} (#{{ first_version.version_no }})
                 </a>

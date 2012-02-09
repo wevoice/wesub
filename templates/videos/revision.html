@@ -13,13 +13,13 @@
     <script type="text/javascript">
         jQuery(function($){
             var IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
-            if (IS_AUTHENTICATED){
+            if (IS_AUTHENTICATED && '{{rollback_allowed}}' == 'True')
                 $('#rollback').click(function(){
                     if ( ! confirm('Subtitles will be rolled back to a previous version')){
                         return false;
                     }                    
                 });                
-            }else{
+            }else {
                 $('#rollback, .new_edit').click(function(){
                     alert('You need to log in to do that.');
                     return false;

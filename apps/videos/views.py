@@ -535,14 +535,15 @@ def revision(request,  version):
             language.video, version.version_no, language, size=(289,173))
     context['latest_version'] = language.latest_version()
     version.ordered_subtitles()
-
+    context['rollback_allowed'] = not version.video.is_moderated 
     return render_to_response('videos/revision.html', context,
                               context_instance=RequestContext(request))
 
 @login_required
 @get_video_revision
 def rollback(request, version):
-
+    if version.video.is_moderated:
+        return HttpResponseForbidden("Moderated videos cannot be rollbacked, they need to be unpublished")
     is_writelocked = version.language.is_writelocked
     if is_writelocked:
         messages.error(request, u'Can not rollback now, because someone is editing subtitles.')
@@ -612,6 +613,7 @@ def diffing(request, first_version, second_pk):
     context['second_version'] = second_version
     context['latest_version'] = language.latest_version()
     context["user_can_moderate"] = user_can_moderate(video, request.user)
+    context['rollback_allowed'] = not video.is_moderated 
     context['widget0_params'] = \
         _widget_params(request, video,
                        first_version.version_no)
