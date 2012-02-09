@@ -66,8 +66,8 @@ goog.inherits(unisubs.subtitle.Dialog, unisubs.Dialog);
  */
 unisubs.subtitle.Dialog.State_ = {
     TRANSCRIBE: 0,
-    EDIT_METADATA: 1,
-    SYNC: 2,
+    SYNC: 1,
+    EDIT_METADATA: 2,
     REVIEW: 3,
     FINISHED: 4
     
@@ -156,11 +156,11 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
             rightPanel, et.GOTOSTEP, this.handleGoToStep_);
     var backButtonText = null;
     if (state == s.EDIT_METADATA ){
-        backButtonText = "Back to Typing";
-    }else if (state == s.SYNC){
-        backButtonText = "Back to Subtitle info";
-    }else if (state == s.REVIEW ){
         backButtonText = "Back to Sync";
+    }else if (state == s.SYNC){
+        backButtonText = "Back to Typing";
+    }else if (state == s.REVIEW ){
+        backButtonText = "Back to Edit Info";
     }
     if (backButtonText){
         rightPanel.showBackLink(backButtonText);
@@ -253,11 +253,11 @@ unisubs.subtitle.Dialog.prototype.handleKeyUp_ = function(event) {
 unisubs.subtitle.Dialog.prototype.handleBackKeyPress_ = function(event) {
     var s = unisubs.subtitle.Dialog.State_;
     if (this.state_ == s.SYNC)
-        this.setState_(s.EDIT_METADATA);
-    else if (this.state_ == s.REVIEW)
-        this.setState_(s.SYNC);
-    else if (this.state_ == s.EDIT_METADATA)
         this.setState_(s.TRANSCRIBE);
+    else if (this.state_ == s.REVIEW)
+        this.setState_(s.EDIT_METADATA);
+    else if (this.state_ == s.EDIT_METADATA)
+        this.setState_(s.SYNC);
 };
 unisubs.subtitle.Dialog.prototype.handleLegendKeyPress_ = function(event) {
     if (event.keyCode == goog.events.KeyCodes.TAB &&
@@ -452,11 +452,11 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
 unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
     if (this.state_ == s.TRANSCRIBE)
-        return s.EDIT_METADATA;
-    else if (this.state_ == s.EDIT_METADATA)
         return s.SYNC;
-    else if (this.state_ == s.SYNC)
+    else if (this.state_ == s.EDIT_METADATA)
         return s.REVIEW;
+    else if (this.state_ == s.SYNC)
+        return s.EDIT_METADATA;
     else if (this.state_ == s.REVIEW)
         return s.FINISHED;
 };
