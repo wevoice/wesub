@@ -40,11 +40,11 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, capti
     this.serverModel = serverModel;
     this.captionManager_ = captionManager;
     this.originalSubtitles_ = originalSubtitles;
-    // when in the translate dialog, there are only 2 stepts, for the subtitling, there are 4
+    // when in the translate dialog, there are only 2 steps, for the subtitling, there are 4
     if (inSubtitlingDialog){
 
         this.numSteps_ = 4;
-        this.nextButtonText_ = "Next step, Sync";
+        this.nextButtonText_ = "Next Step: Check your work";
     }else{
         
         this.numSteps_ = 2;
@@ -118,7 +118,7 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
         title, 
         [
             $d('p', {}, desc)
-        ], this.numSteps_, 1);
+        ], this.numSteps_, 2);
     return new unisubs.editmetadata.RightPanel(this, 
                                                this.serverModel,
                                                helpContents,

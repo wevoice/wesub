@@ -127,7 +127,7 @@ unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
     ];
     return new unisubs.subtitle.TranscribeRightPanel(
         this.serverModel_, helpContents, extraHelp, keySpecs,
-        true, "Done?", "Next Step: Subtitle info");
+        true, "Done?", "Next Step: Sync");
 };
 unisubs.subtitle.TranscribePanel.prototype.enterDocument = function() {
     unisubs.subtitle.TranscribePanel.superClass_.enterDocument.call(this);
