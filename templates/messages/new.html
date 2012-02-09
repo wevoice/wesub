@@ -48,14 +48,12 @@
                         </div>
                     </div>
 
-                    {% if not request.GET.user %}
+                    {% if not request.GET.user and request.user.messageable_teams %}
                         <div class="or">-- or --</div>
                         <div class="team">
-                            {% if request.user.messageable_teams %}
-                                <label for="id_team">Team</label>
-                                {{ form.errors.team }}
-                                {{ form.team }}
-                            {% endif %}
+                            <label for="id_team">Team</label>
+                            {{ form.errors.team }}
+                            {{ form.team }}
                         </div>
                     {% endif %}
                 </div>

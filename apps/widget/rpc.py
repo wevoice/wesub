@@ -457,19 +457,25 @@ class Rpc(BaseRpc):
         # changed subs, but the backend will realize and will not save that
         # version. In those cases, we want to show the defatul user message.
         user_message = "Your changes have been saved. It will take a minute or so for your subtitles to appear."
-        if new_version is not None and new_version.version_no == 0:
-            pass
-        elif new_version and is_moderated(new_version):
-            if user_can_moderate(language.video, user) is False:
-                user_message = ("This video is moderated by %s. \n\n"
-
-                                "You will not see your subtitles in our widget "
-                                "when you leave this page, they will only appear "
-                                "on our site. We have saved your work for the team "
-                                "moderator to review. After they approve your subtitles, "
-                                "they will show up on our site and in the widget."
-                ) % (new_version.video.moderated_by.name)
-
+        # we can have a new version, or not
+        
+        if language.video.is_moderated:
+            if new_version:
+                if user_can_moderate(language.video, user) is False:
+                    msg = ("This video is moderated by %s. \n\n" 
+                           "You will not see your subtitles in our widget " 
+                           "when you leave this page, they will only appear "
+                           "on our site. We have saved your work for the team "
+                           "moderator to review. After they approve your subtitles, "
+                           "they will show up on our site and in the widget.")
+            else:
+                if user_can_moderate(language.video, user) is False:
+                    msg = (
+                        "This video is moderated by %s."
+                        "You will not see your subtitles in our widget when you leave "
+                        "this page, they will only be stored on our site."
+                    )
+            user_message = msg % (new_version.video.moderated_by.name)
         # If we've just saved a completed subtitle language, we may need to
         # complete a subtitle or translation task.
         if language.is_complete or language.calculate_percent_done() == 100:
@@ -482,7 +488,6 @@ class Rpc(BaseRpc):
                 )
                 for task in tasks:
                     task.complete()
-
         return {
             'user_message': user_message,
             'response': 'ok' }
