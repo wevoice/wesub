@@ -71,6 +71,7 @@ from teams.tasks import (
 )
 import logging
 import sentry_logger # Magical import to make sure Sentry's error recording happens.
+assert sentry_logger # It's okay, Pyflakes.  Trust me.
 logger = logging.getLogger("teams.views")
 
 
