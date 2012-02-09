@@ -100,7 +100,7 @@ unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
 };
 unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
     event.preventDefault();
-    if (this.state_ == unisubs.subtitle.Dialog.State_.EDIT_METADATA)
+    if (this.state_ == unisubs.translate.Dialog.State_.EDIT_METADATA)
         this.saveWork(true);
     else
         this.enterState_(unisubs.translate.Dialog.State_.EDIT_METADATA)
