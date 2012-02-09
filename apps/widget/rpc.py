@@ -460,6 +460,7 @@ class Rpc(BaseRpc):
         # we can have a new version, or not
         
         if language.video.is_moderated:
+            msg = None
             if new_version:
                 if user_can_moderate(language.video, user) is False:
                     msg = ("This video is moderated by %s. \n\n" 
@@ -475,7 +476,8 @@ class Rpc(BaseRpc):
                         "You will not see your subtitles in our widget when you leave "
                         "this page, they will only be stored on our site."
                     )
-            user_message = msg % (new_version.video.moderated_by.name)
+            if msg:
+                user_message = msg % (new_version.video.moderated_by.name)
         # If we've just saved a completed subtitle language, we may need to
         # complete a subtitle or translation task.
         if language.is_complete or language.calculate_percent_done() == 100:
