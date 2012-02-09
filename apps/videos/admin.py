@@ -79,7 +79,7 @@ class SubtitleVersionInline(admin.TabularInline):
 
 class SubtitleLanguageAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ['video', 'is_original', 'language', 'is_complete', 'had_version', 'versions', 'subtitle_count']
+    list_display = ['video', 'is_original', 'language', 'is_complete', 'had_version', 'subtitle_count']
     list_filter = ['is_original', 'is_complete']
     search_fields = ['video__title', 'video__video_id', 'language']
     raw_id_fields = ['video']

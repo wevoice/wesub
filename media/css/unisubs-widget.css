@@ -1024,7 +1024,7 @@ ul.unisubs-titlesList li:hover .unisubs-timestamp {
 }
 
 .unisubs-sub-paragraph.selected{
-    background: url("../images/paragraph-marker.png") 0 -55px no-repeat !important ;
+    background: url("../images/paragraph-marker.png") 0 -57px no-repeat !important ;
 }
 
 .unisubs-sub-insert:active {

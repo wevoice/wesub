@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.utils.http import urlencode
 from utils import render_to, render_to_json
 from utils.searching import get_terms
 from utils.translation import get_languages_list, languages_with_names
@@ -71,7 +70,8 @@ from teams.tasks import (
     update_video_moderation
 )
 import logging
-import sentry_logger # Magical import to make sure Sentry's error recording happens.
+import sentry_logger # Magical import to make Sentry's error recording happen.
+assert sentry_logger # It's okay, Pyflakes.  Trust me.
 logger = logging.getLogger("teams.views")
 
 
@@ -193,13 +193,9 @@ def detail(request, slug, project_slug=None, languages=None):
             'base_state': {}
         })
 
-    all_langs = set()
-    for search_record in qs:
-        if search_record.video_completed_langs:
-            all_langs.update(search_record.video_completed_langs)
-
+    readable_langs = TeamLanguagePreference.objects.get_readable(team)
     language_choices = [(code, name) for code, name in get_languages_list()
-                        if code in all_langs]
+                        if code in readable_langs]
 
     extra_context['language_choices'] = language_choices
     extra_context['query'] = query
@@ -1076,7 +1072,8 @@ def team_tasks(request, slug, project_slug=None):
     team = Team.get(slug, request.user)
 
     if not can_view_tasks_tab(team, request.user):
-        return HttpResponseForbidden(_("You cannot view this team's tasks."))
+        messages.error(request, _("You cannot view this team's tasks."))
+        return HttpResponseRedirect(team.get_absolute_url())
 
     # TODO: Review this
     if project_slug is not None:

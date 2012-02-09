@@ -144,7 +144,7 @@ unisubs.startdialog.Dialog.prototype.moderatedResponseReceived_ = function(jsonR
     this.subtitleAllowed_ = jsonResult['can_subtitle'];
     this.translateAllowed_ = jsonResult['can_translate'];
 
-    if (!this.subtitleAllowed) {
+    if (!this.subtitleAllowed_) {
         // We do a bit of redundant work here to prevent accidentally showing
         // a start dialog when:
         //
@@ -158,7 +158,7 @@ unisubs.startdialog.Dialog.prototype.moderatedResponseReceived_ = function(jsonR
         } else {
             this.buildStartDialogContents_();
         }
-    } else if (this.subtitleAllowed || this.translateAllowed) {
+    } else if (this.subtitleAllowed_ || this.translateAllowed_) {
         this.buildStartDialogContents_();
     } else {
         this.buildPermissionDeniedMessage_();
