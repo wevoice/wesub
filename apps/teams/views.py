@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.utils.http import urlencode
 from utils import render_to, render_to_json
 from utils.searching import get_terms
 from utils.translation import get_languages_list, languages_with_names
@@ -1076,7 +1075,8 @@ def team_tasks(request, slug, project_slug=None):
     team = Team.get(slug, request.user)
 
     if not can_view_tasks_tab(team, request.user):
-        return HttpResponseForbidden(_("You cannot view this team's tasks."))
+        messages.error(request, _("You cannot view this team's tasks."))
+        return HttpResponseRedirect(team.get_absolute_url())
 
     # TODO: Review this
     if project_slug is not None:
