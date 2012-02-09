@@ -15,7 +15,7 @@ body{overflow-y:scroll;}
 .v1 .controls .button{display:block;}
 .v1 .action-replacement{padding:1.5em;margin:2em 0 1em;background:#f3f6f8;-webkit-background-clip:padding-box;-webkit-border-radius:4px;-moz-background-clip:padding-box;-moz-border-radius:4px;border-radius:4px;background-clip:padding-box;color:#678ca3;text-align:center;border:1px solid #dce2e5;}
 .v1 .team-banner{margin-bottom:2em;}
-.v1 .view .empty{padding:2em 1em;font-size:18px;color:#678ca3;}
+.v1 .view .empty{clear:both;padding:2em 1em;font-size:18px;color:#678ca3;}
 .v1 .view .action-call{clear:both;padding:1em;font-size:1.25em;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;background-color:#dce2e5;}
 .v1 .view>div,.v1 .view>form{padding-top:2em;}
 .v1 ul .timestamp{position:absolute;top:2em;right:0;width:120px;padding:0;width:150px;text-align:right;color:#7692a3;}
