@@ -1092,7 +1092,7 @@ class Invite(models.Model):
 
 
     def message_json_data(self, data, msg):
-        data['can-reaply'] = False
+        data['can-reply'] = False
         return data
 
 models.signals.pre_delete.connect(Message.on_delete, Invite)

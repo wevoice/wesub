@@ -99,7 +99,7 @@ class Message(models.Model):
             'message-subject': self.subject,
             'message-subject-display': unicode(self),
             'is-read': self.read,
-            'can-reaply': bool(self.author_id)
+            'can-reply': bool(self.author_id)
         }
         if self.object and hasattr(self.object, 'message_json_data'):
             data = self.object.message_json_data(data, self)

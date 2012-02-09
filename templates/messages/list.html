@@ -78,7 +78,7 @@
                 $('.message-subject').html(data['message-subject-display']);
                 $('#message_form_id_subject').val('Re: '+data['message-subject']);
                 
-                if (data['can-reaply']){
+                if (data['can-reply']){
                     $('.reply-container', $modal).show();
                     $('.reply-container textarea', $modal).val('');
                 }else{
