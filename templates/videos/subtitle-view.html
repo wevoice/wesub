@@ -201,7 +201,7 @@
                 {% if request.user|can_unpublish:video %}
                     <a href="#unpublish-modal" class="button open-modal">{% trans 'Unpublish' %}</a>
                 {% endif %}
-                {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
+                {% if language.is_original and request.user|can_create_subtitles_for:video or not language.is_original and request.user|can_create_translations_for:video %}
                     <a id="edit_subtitles_button" href="{{edit_url}}" class="button">{% trans 'Edit Subtitles' %}</a>
                 {% endif %}
                 {% if last_version.subtitles %}
