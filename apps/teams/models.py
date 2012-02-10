@@ -21,8 +21,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from videos.models import Video, SubtitleLanguage, SubtitleVersion,\
-     VideoUrl
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
 from django.db.models.signals import post_save, post_delete, pre_delete
@@ -442,7 +441,7 @@ class Team(models.Model):
 
         '''
         w = self.get_workflow()
-        return True if w.review_enabled or w.approved_enabled else False
+        return True if w.review_enabled or w.approve_enabled else False
 
 
 # this needs to be constructed after the model definition since we need a
@@ -794,9 +793,9 @@ def team_video_delete(sender, instance, **kwargs):
     video.is_public = True
     video.moderated_by = None
     video.save()
-    
+
     metadata_manager.update_metadata(video.pk)
-    
+
 
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     if created and not raw:
@@ -1468,7 +1467,7 @@ class Task(models.Model):
                     subtitle_version=self.subtitle_version,
                     language=self.language, type=type, assignee=assignee)
         task.save()
-        
+
         if sends_notification:
             # notify original submiter (assignee of self)
             notifier.reviewed_and_sent_back.delay(self.pk)
@@ -1570,7 +1569,7 @@ class Task(models.Model):
                 # tasks if necessary.
                 if self.workflow.autocreate_translate:
                     _create_translation_tasks(self.team_video, self.subtitle_version)
-                
+
                 # non approval review
                 notifier.reviewed_and_published.delay(self.pk)
             else:

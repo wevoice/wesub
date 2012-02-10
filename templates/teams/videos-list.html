@@ -42,6 +42,13 @@
                     else {
                         return false;
                     }
+                } else {
+                    if (confirm("All open tasks for this video will be aborted, and in-progress subtitles will be published. Do you want to proceed?")) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
                 }
             });
         });
