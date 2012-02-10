@@ -21,8 +21,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from videos.models import Video, SubtitleLanguage, SubtitleVersion,\
-     VideoUrl
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
 from django.db.models.signals import post_save, post_delete, pre_delete
@@ -442,7 +441,7 @@ class Team(models.Model):
 
         '''
         w = self.get_workflow()
-        return True if w.review_enabled or w.approved_enabled else False
+        return True if w.review_enabled or w.approve_enabled else False
 
 
 # this needs to be constructed after the model definition since we need a
