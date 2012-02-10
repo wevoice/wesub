@@ -82,7 +82,7 @@ MAX_MEMBER_SEARCH_RESULTS = 40
 HIGHTLIGHTED_TEAMS_ON_PAGE = getattr(settings, 'HIGHTLIGHTED_TEAMS_ON_PAGE', 10)
 CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS', 20)
 
-VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 15)
+VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 16)
 MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 15)
 APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
@@ -229,9 +229,10 @@ def detail(request, slug, project_slug=None, languages=None):
         team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
         team_videos = dict((tv.pk, tv) for tv in team_videos)
         for record in team_video_md_list:
-            record._team_video = team_videos.get(record.team_video_pk)
-            record._team_video.original_language_code = record.original_language
-            record._team_video.completed_langs = record.video_completed_langs
+            if record:
+                record._team_video = team_videos.get(record.team_video_pk)
+                record._team_video.original_language_code = record.original_language
+                record._team_video.completed_langs = record.video_completed_langs
 
     return extra_context
 
