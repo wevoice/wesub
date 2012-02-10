@@ -272,12 +272,18 @@ class YoutubeVideoType(VideoType):
                                   self.videoid)
         
     def update_subtitles(self, subtitle_version, third_party_account):
+        """
+        Updated subtitles on Youtube. This method should not be called
+        directly. See accountlinker.models.ThirdPartyAccounts.mirror_on_third_party
+        That call will check if the video can be updated(must be synched,
+        must be public, etc).
+        """
         bridge = self._get_bridge(third_party_account)
         bridge.upload_captions(subtitle_version)
         
     def delete_subtitles(self, language, third_party_account):
         bridge = self._get_bridge(third_party_account)
-        bridge = self.delete_subtitles()
+        bridge.delete_subtitles()
             
 import gdata
 import gdata.youtube.client
