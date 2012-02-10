@@ -968,7 +968,7 @@ class SubtitleLanguage(models.Model):
     def unpublish(self, delete=False):
         '''Unpublish all versions of this language.'''
 
-        version = self.subtitleversion_set.order_by('version_no')[:0]
+        version = self.subtitleversion_set.order_by('version_no')[:1]
         if version:
             return version[0].unpublish(delete=delete)
 
@@ -991,9 +991,9 @@ class SubtitleCollection(models.Model):
 
     def subtitles(self, subtitles_to_use=None, public_only=True):
         """
-        Returns EffectiveSubtitle instances but also fetches timing data 
+        Returns EffectiveSubtitle instances but also fetches timing data
         from the original sub if this is a translation.
-        It will only match if the subtitile_id matches, else those subs 
+        It will only match if the subtitile_id matches, else those subs
         not returned.
         """
         ATTR = 'computed_effective_subtitles'
@@ -1291,7 +1291,6 @@ class SubtitleVersion(SubtitleCollection):
         else:
             last_version = None
             for version in versions:
-                print "Unpublishing", version
                 # Loop through instead of using .update() to ensure any .save()
                 # methods and signals get called properly.
                 version.moderation_status = WAITING_MODERATION
@@ -1301,7 +1300,7 @@ class SubtitleVersion(SubtitleCollection):
             # TODO: Dependent translations.  We'll also need to create tasks for
             # them.
             return last_version
-            
+
     def is_synced(self):
         subtitles = self.subtitles()
         if len([s for s in subtitles[:-1] if not s.has_complete_timing()]) > 0:
@@ -1526,7 +1525,7 @@ class ActionRenderer(object):
         kwargs = self._base_kwargs(item)
         msg = _('  reviewed <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
-        
+
     def render_REJECT_VERSION(self, item):
         kwargs = self._base_kwargs(item)
         msg = _('  rejected <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
@@ -1851,7 +1850,7 @@ class Action(models.Model):
         obj.action_type = cls.REJECT_VERSION
         obj.created = datetime.now()
         obj.save()
-        
+
     @classmethod
     def create_reviewed_video_handler(cls, version, moderator,  **kwargs):
         obj = cls(video=version.video)

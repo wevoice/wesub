@@ -1435,7 +1435,6 @@ def unpublish(request, slug):
     if scope == 'version':
         result = version.unpublish(delete=should_delete)
     elif scope == 'language':
-        # TODO Fix this...
         result = version.language.unpublish(delete=should_delete)
     else:
         # TODO Write scope == 'dependents' code.
