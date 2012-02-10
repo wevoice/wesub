@@ -794,9 +794,9 @@ def team_video_delete(sender, instance, **kwargs):
     video.is_public = True
     video.moderated_by = None
     video.save()
-    
+
     metadata_manager.update_metadata(video.pk)
-    
+
 
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     if created and not raw:
@@ -1468,7 +1468,7 @@ class Task(models.Model):
                     subtitle_version=self.subtitle_version,
                     language=self.language, type=type, assignee=assignee)
         task.save()
-        
+
         if sends_notification:
             # notify original submiter (assignee of self)
             notifier.reviewed_and_sent_back.delay(self.pk)
@@ -1570,7 +1570,7 @@ class Task(models.Model):
                 # tasks if necessary.
                 if self.workflow.autocreate_translate:
                     _create_translation_tasks(self.team_video, self.subtitle_version)
-                
+
                 # non approval review
                 notifier.reviewed_and_published.delay(self.pk)
             else:

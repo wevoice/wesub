@@ -33,6 +33,7 @@ from teams.models import (
     Setting, TeamLanguagePreference
 )
 from teams.signals import api_teamvideo_new
+import teams.moderation_const as MODERATION
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
 from django.contrib.auth.decorators import login_required
@@ -1214,7 +1215,24 @@ def delete_task(request, slug):
     form = TaskDeleteForm(team, request.user, data=request.POST)
     if form.is_valid():
         task = form.cleaned_data['task']
+        video = task.team_video.video
         task.deleted = True
+
+        if task.subtitle_version:
+            if form.cleaned_data['discard_subs']:
+                sl = task.subtitle_version.language
+                task.subtitle_version.delete()
+                task.subtitle_version = None
+                if not sl.subtitleversion_set.exists():
+                    sl.delete()
+
+            if task.get_type_display() in ['Review', 'Approve']:
+                # TODO: Handle subtitle/translate tasks here too?
+                if not form.cleaned_data['discard_subs']:
+                    task.subtitle_version.moderation_status = MODERATION.APPROVED
+                    task.subtitle_version.save()
+                    metadata_manager.update_metadata(video.pk)
+
         task.save()
 
         messages.success(request, _('Task deleted.'))
