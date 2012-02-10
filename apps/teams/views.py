@@ -231,8 +231,9 @@ def detail(request, slug, project_slug=None, languages=None):
         for record in team_video_md_list:
             if record:
                 record._team_video = team_videos.get(record.team_video_pk)
-                record._team_video.original_language_code = record.original_language
-                record._team_video.completed_langs = record.video_completed_langs
+                if record._team_video:
+                    record._team_video.original_language_code = record.original_language
+                    record._team_video.completed_langs = record.video_completed_langs
 
     return extra_context
 
