@@ -366,7 +366,7 @@ class Command(BaseCommand):
             return 
         targets = [os.path.join(base, x) for x 
                    in sorted_ls("media/static-cache/")
-                   if x.startswith(".") is False][:-num_to_keep]
+                   if x.startswith(".") is False and x != LAST_COMMIT_GUID ][:-num_to_keep]
         [shutil.rmtree(t) for t in targets ]
 
     def _copy_temp_dir_to_cache_dir(self):
