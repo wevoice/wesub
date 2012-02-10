@@ -174,7 +174,7 @@ body#teams div.edit-team-video form fieldset a{display:inline-block;overflow:hid
 ol.subtitles{clear:both;}ol.subtitles li{position:relative;padding:1em 1em 1em 120px;margin-left:-10px;border-bottom:1px solid #f3f6f8;}ol.subtitles li:hover{background-color:#f3f6f8;}
 ol.subtitles li .timing{position:absolute;top:1em;left:1em;width:75px;}ol.subtitles li .timing a{color:#7692a3;text-decoration:none;}
 ol.subtitles li .timing .data{display:none;}
-ol.subtitles li .quiet{position:absolute;top:1em;left:100px;color:#7692a3;}
+ol.subtitles li .quiet{position:absolute;top:1em;left:100px;color:#a0b2bd;}
 .v1 .sort_button{float:none;padding:0;margin:0;cursor:pointer;width:170px;border-color:#dce2e5;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;text-align:left;background-color:#f7f7f7;background-image:-webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#eeeeee));background-image:-webkit-linear-gradient(#ffffff, #eeeeee);background-image:-moz-linear-gradient(center top, #ffffff 0%, #eeeeee 100%);background-image:-moz-gradient(center top, #ffffff 0%, #eeeeee 100%);background-image:-ms-linear-gradient(#ffffff, #eeeeee);background-image:-o-linear-gradient(#ffffff, #eeeeee);background-image:linear-gradient(#ffffff, #eeeeee);}.v1 .sort_button .sort_label{font-size:11px;padding:.5em;font-weight:normal !important;text-shadow:0 1px 0px #fff;display:block;color:#678ca3;}.v1 .sort_button .sort_label:hover{background:transparent;}
 .v1 .sort_button ul{margin:0;padding:.5em 0 0;}
 .v1 .sort_button ul li a{padding:.5em;display:block;text-decoration:none;border-top:1px solid #dce2e5;border-bottom:none;font-size:11px;font-weight:normal;text-shadow:none;color:#678ca3;-webkit-box-shadow:none 1px 2px #cccccc;-moz-box-shadow:none 1px 2px #cccccc;box-shadow:none 1px 2px #cccccc;}
@@ -221,6 +221,7 @@ pre.dump code{font-family:Consolas,Menlo,"Courier New",monospace;margin:15px 0;p
 #teams .context .notation.policy{padding-top:0;margin-bottom:1em;}
 #teams .context #projects-list h4{padding:1.5em 0 1em;}
 #teams .context #projects-list.collapsed li{display:none;}#teams .context #projects-list.collapsed li:first-of-type{display:block;}
+#teams .context #projects-list .count{padding-left:.5em;color:#a0b2bd;}
 #teams .view .tools #sort-filter{padding:.5em;text-decoration:none;color:#678ca3;line-height:1.5em;}#teams .view .tools #sort-filter:hover{color:#2f3c45;}#teams .view .tools #sort-filter:hover span{background:url('../images/chosen-hover.png') no-repeat 4px 3px;}
 #teams .view .tools #sort-filter:hover span.open{background:url('../images/chosen-hover.png') no-repeat 4px -28px;}
 #teams .view .tools #sort-filter span{padding:0 8px;background:url('../images/chosen-sprite.png') no-repeat 2px -4px;}
