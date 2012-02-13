@@ -24,7 +24,7 @@
                             {{ project }}
                             <span class="count">
                                 {{ project.videos_count }}
-                                {% trans 'videos' %}
+                                {% trans 'video' %}{{ project.videos_count|pluralize }}
                             </span>
                         </a>
                     </li>
