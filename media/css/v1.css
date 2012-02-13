@@ -194,7 +194,7 @@ ol.subtitles li .quiet{position:absolute;top:1em;left:100px;color:#a0b2bd;}
 .v1 .filters .chzn-container-active .chzn-single-with-drop{overflow:visible !important;position:relative;z-index:52;}.v1 .filters .chzn-container-active .chzn-single-with-drop span{position:relative;z-index:53;}
 .v1 .filters .chzn-container-active .chzn-single-with-drop div{z-index:53;}
 .v1 .filters .chzn-container-active .chzn-single-with-drop:before{background:#FFF;border:1px solid #B9C3C8;border-bottom:1px solid #FFF;content:"";display:block;left:-5px;height:100%;position:absolute;top:-5px;width:100%;z-index:51;-webkit-border-top-left-radius:5px;-webkit-border-top-right-radius:5px;-webkit-border-bottom-right-radius:0;-webkit-border-bottom-left-radius:0;-moz-border-radius-topleft:5px;-moz-border-radius-topright:5px;-moz-border-radius-bottomright:0;-moz-border-radius-bottomleft:0;border-top-left-radius:5px;border-top-right-radius:5px;border-bottom-right-radius:0;border-bottom-left-radius:0;}
-.v1 .filters div.chzn-container-active div.chzn-drop{margin-left:-5px !important;margin-top:-1px !important;z-index:50;}
+.v1 .filters div.chzn-container-active div.chzn-drop{margin-left:-5px !important;margin-top:-1px !important;z-index:50;}.v1 .filters div.chzn-container-active div.chzn-drop li{width:100%;}
 .v1 .bootstrap .modal .modal-header h3{padding:0;border:none;margin:0;clear:none;font-size:16px;}
 .v1 .bootstrap .modal form{padding:0;margin:0;}.v1 .bootstrap .modal form p{float:none;}
 .v1 .bootstrap .modal form fieldset{padding-bottom:1em;}.v1 .bootstrap .modal form fieldset p{margin-bottom:20px;}
