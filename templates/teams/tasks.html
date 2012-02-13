@@ -173,7 +173,7 @@
                                 </li>
                                 {% if task.expiration_date != None %}
                                     {% if task.future %}
-                                        <li>Due in {{ task.expiration_date|timeuntil }}</li>
+                                        <li class="due">Due in {{ task.expiration_date|timeuntil }}</li>
                                     {% else %}
                                         <li class="due">Overdue by {{ task.expiration_date|timesince }}</li>
                                     {% endif %}
@@ -232,12 +232,12 @@
                                                         <fieldset>
                                                             {% if task.get_type_display == "Review" or task.get_type_display == "Approve" %}
                                                                 <p>What would you like to do with the subtitles for this task?</p>
-                                                                <label class="radio" for="id_discard_subs_yes">
-                                                                    <input checked="checked" type="radio" name="discard_subs" value="1" id="id_discard_subs_yes"/>
+                                                                <label class="radio" for="id_discard_subs_yes_{{ task.pk }}">
+                                                                    <input checked="checked" type="radio" name="discard_subs" value="1" id="id_discard_subs_yes_{{ task.pk }}"/>
                                                                     {% trans "Delete these subtitles permanently" %}
                                                                 </label>
-                                                                <label class="radio" for="id_discard_subs_no">
-                                                                    <input type="radio" name="discard_subs" value="0" id="id_discard_subs_no"/>
+                                                                <label class="radio" for="id_discard_subs_no_{{ task.pk }}">
+                                                                    <input type="radio" name="discard_subs" value="0" id="id_discard_subs_no_{{ task.pk }}"/>
                                                                     {% trans "Publish these subtitles immediately" %}
                                                                 </label>
                                                             {% else %}
