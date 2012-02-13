@@ -207,8 +207,6 @@ def video(request, video, video_url=None, title=None):
     context = widget.add_onsite_js_files({})
     context['video'] = video
     original = video.subtitle_language()
-    if original:
-        original.pending_moderation_count =  get_pending_count(video.subtitle_language())
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
     # we want a list of translations that had at least with version with subtitles
     # this will not filter subtitleversion's whos subtitles are empty
@@ -224,10 +222,6 @@ def video(request, video, video_url=None, title=None):
 
     context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
-    if context["user_can_moderate"]:
-        # FIXME: use  amore efficient count
-        for l in translations:
-            l.pending_moderation_count = get_pending_count(l)
 
     context['widget_params'] = _widget_params(
         request, video, language=None,
