@@ -751,6 +751,8 @@ class TeamVideo(models.Model):
         return (self.subtitles_started() and
                 self.video.subtitle_language().is_complete_and_synced())
 
+    def get_workflow(self):
+        return Workflow.get_for_team_video(self)
 
 def _create_translation_tasks(team_video, subtitle_version):
     preferred_langs = TeamLanguagePreference.objects.get_preferred(team_video.team)
