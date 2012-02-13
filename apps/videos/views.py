@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
@@ -53,7 +53,7 @@ from utils.decorators import never_in_prod
 from utils.translation import get_user_languages_from_request
 from django.utils.http import urlquote_plus
 from videos.tasks import video_changed_tasks
-from videos.search_indexes import VideoSearchResult, VideoIndex
+from videos.search_indexes import VideoIndex
 import datetime
 from icanhaz.models import VideoVisibilityPolicy
 from videos.decorators import get_video_revision, get_video_from_code
@@ -334,7 +334,6 @@ def paste_transcription(request):
 
 @login_required
 def upload_transcription_file(request):
-    from django.utils.encoding import force_unicode, DjangoUnicodeDecodeError
     output = {}
     form = TranscriptionFileForm(request.POST, request.FILES)
     if form.is_valid():
@@ -535,7 +534,7 @@ def revision(request,  version):
             language.video, version.version_no, language, size=(289,173))
     context['latest_version'] = language.latest_version()
     version.ordered_subtitles()
-    context['rollback_allowed'] = not version.video.is_moderated 
+    context['rollback_allowed'] = not version.video.is_moderated
     return render_to_response('videos/revision.html', context,
                               context_instance=RequestContext(request))
 
@@ -613,7 +612,7 @@ def diffing(request, first_version, second_pk):
     context['second_version'] = second_version
     context['latest_version'] = language.latest_version()
     context["user_can_moderate"] = user_can_moderate(video, request.user)
-    context['rollback_allowed'] = not video.is_moderated 
+    context['rollback_allowed'] = not video.is_moderated
     context['widget0_params'] = \
         _widget_params(request, video,
                        first_version.version_no)
@@ -736,12 +735,12 @@ def subscribe_to_updates(request):
     data = urllib.urlencode({'email': email_address})
     req = urllib2.Request(
         'http://pcf8.pculture.org/interspire/form.php?form=3', data)
-    response = urllib2.urlopen(req)
+    urllib2.urlopen(req)
     return HttpResponse('ok', 'text/plain')
 
 def test_celery(request):
     from videos.tasks import add
-    r = add.delay(1, 2)
+    add.delay(1, 2)
     return HttpResponse('Hello, from Amazon SQS backend for Celery!')
 
 @staff_member_required
