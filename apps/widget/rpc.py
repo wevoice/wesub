@@ -406,7 +406,6 @@ class Rpc(BaseRpc):
 
     def save_finished(self, user, session, subtitles, new_title=None,
                       completed=None, forked=False, new_description=None):
-        from apps.teams.moderation import is_moderated, user_can_moderate
 
         language = session.language
         new_version = None
@@ -456,28 +455,13 @@ class Rpc(BaseRpc):
         # we have a default user message, since the UI lets users save non
         # changed subs, but the backend will realize and will not save that
         # version. In those cases, we want to show the defatul user message.
-        user_message = "Your changes have been saved. It will take a minute or so for your subtitles to appear."
-        # we can have a new version, or not
-        
+        user_message = "Your changes have been saved. It may take a moment for your subtitles to appear."
         if language.video.is_moderated:
-            msg = None
-            if new_version:
-                if user_can_moderate(language.video, user) is False:
-                    msg = ("This video is moderated by %s. \n\n" 
-                           "You will not see your subtitles in our widget " 
-                           "when you leave this page, they will only appear "
-                           "on our site. We have saved your work for the team "
-                           "moderator to review. After they approve your subtitles, "
-                           "they will show up on our site and in the widget.")
-            else:
-                if user_can_moderate(language.video, user) is False:
-                    msg = (
-                        "This video is moderated by %s."
-                        "You will not see your subtitles in our widget when you leave "
-                        "this page, they will only be stored on our site."
-                    )
-            if msg:
-                user_message = msg % (new_version.video.moderated_by.name)
+            # if a video is under moderation, just let the user know
+            user_message = ("This video is moderated by %s. \n\n" 
+                           "Your changes will be reviewed by the "
+                           "team's moderators.'") % \
+                           (new_version.video.moderated_by.name)
         # If we've just saved a completed subtitle language, we may need to
         # complete a subtitle or translation task.
         if language.is_complete or language.calculate_percent_done() == 100:
