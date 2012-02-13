@@ -1158,7 +1158,7 @@ class VolunteerRpcTest(TestCase):
         rel, rest = rpc._get_volunteer_sqs(self.request, self.user)
 
         self.assertEqual(4, len(rel))
-        self.assertEqual(3, len(rest))
+        self.assertEqual(5, len(rest))
 
 #Testings VideoType classes
 from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
