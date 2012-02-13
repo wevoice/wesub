@@ -40,6 +40,7 @@ body{overflow-y:scroll;}
 .v1 .listing >li .thumb{position:absolute;top:2em;left:0;}.v1 .listing >li .thumb a{display:inline-block;max-height:229px;overflow:hidden;}.v1 .listing >li .thumb a img{border:1px solid #b7c3c9;}
 .v1 .listing >li span.timestamp span.unread{color:#126295;font-weight:bold;margin-right:8px;}
 .v1 .listing >li .actions{position:absolute;top:2em;right:0;width:120px;padding:0;}.v1 .listing >li .actions li{padding:0;text-align:right;color:#a0b2bd;}.v1 .listing >li .actions li h4{padding:.25em 0;}
+.v1 .listing >li .actions li.due{font-size:11px;}
 .v1 .listing >li .actions a{color:#486f87;text-decoration:none;}
 .v1 .listing >li .actions li>form{padding:0;}
 .v1 .listing >li .actions li>a,.v1 .listing >li .actions li>form a{display:block;padding:.25em 0;}.v1 .listing >li .actions li>a:after,.v1 .listing >li .actions li>form a:after{content:' →';}
@@ -195,8 +196,8 @@ ol.subtitles li .quiet{position:absolute;top:1em;left:100px;color:#a0b2bd;}
 .v1 .filters .chzn-container-active .chzn-single-with-drop div{z-index:53;}
 .v1 .filters .chzn-container-active .chzn-single-with-drop:before{background:#FFF;border:1px solid #B9C3C8;border-bottom:1px solid #FFF;content:"";display:block;left:-5px;height:100%;position:absolute;top:-5px;width:100%;z-index:51;-webkit-border-top-left-radius:5px;-webkit-border-top-right-radius:5px;-webkit-border-bottom-right-radius:0;-webkit-border-bottom-left-radius:0;-moz-border-radius-topleft:5px;-moz-border-radius-topright:5px;-moz-border-radius-bottomright:0;-moz-border-radius-bottomleft:0;border-top-left-radius:5px;border-top-right-radius:5px;border-bottom-right-radius:0;border-bottom-left-radius:0;}
 .v1 .filters div.chzn-container-active div.chzn-drop{margin-left:-5px !important;margin-top:-1px !important;z-index:50;}.v1 .filters div.chzn-container-active div.chzn-drop li{width:100%;}
-.v1 .bootstrap .modal .modal-header h3{padding:0;border:none;margin:0;clear:none;font-size:16px;}
-.v1 .bootstrap .modal form{padding:0;margin:0;}.v1 .bootstrap .modal form p{float:none;}
+.v1 .bootstrap .modal .modal-header h3{border:none;clear:none;font-size:16px;line-height:36px;margin:0;padding:0;position:static;}
+.v1 .bootstrap .modal form{padding:0;margin:0;}.v1 .bootstrap .modal form p{float:none;margin-top:0;}
 .v1 .bootstrap .modal form fieldset{padding-bottom:1em;}.v1 .bootstrap .modal form fieldset p{margin-bottom:20px;}
 .v1 .bootstrap .modal form label.radio,.v1 .bootstrap .modal form label.checkbox{padding:0;display:block;text-align:left;width:100%;}.v1 .bootstrap .modal form label.radio input,.v1 .bootstrap .modal form label.checkbox input{float:left;margin-bottom:3px;margin-right:.5em;}
 .v1 .bootstrap .modal .modal-body fieldset{padding:0;}
