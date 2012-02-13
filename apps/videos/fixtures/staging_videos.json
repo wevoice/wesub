@@ -152,6 +152,51 @@
         }
     },    
     {
+        "pk": 8, 
+        "model": "videos.video", 
+        "fields": {
+            "view_count": 0, 
+            "writelock_owner": null, 
+            "title": "This is my unique title", 
+            "writelock_session_key": "", 
+            "video_id": "mKzjvZHgZ0xHi", 
+            "is_subtitled": false, 
+            "thumbnail": "http://i.ytimg.com/vi/KttxRC7iOeU/0.jpg", 
+            "writelock_time": null, 
+            "created": "2010-11-24 11:49:12", 
+            "subtitles_fetched_count": 0, 
+            "duration": 12, 
+            "allow_community_edits": false, 
+            "was_subtitled": false, 
+            "widget_views_count": 1, 
+            "allow_video_urls_edit": true,
+            "created": "2011-01-30 08:54:43"
+        }
+    },
+    {
+        "pk": 9, 
+        "model": "videos.video", 
+        "fields": {
+            "view_count": 0, 
+            "writelock_owner": null, 
+            "title": "Default", 
+            "description": "this is my unique description",
+            "writelock_session_key": "", 
+            "video_id": "mKzjvZHgZ0xHa", 
+            "is_subtitled": false, 
+            "thumbnail": "http://i.ytimg.com/vi/KttxRC7iOeU/0.jpg", 
+            "writelock_time": null, 
+            "created": "2010-11-24 11:49:12", 
+            "subtitles_fetched_count": 0, 
+            "duration": 12, 
+            "allow_community_edits": false, 
+            "was_subtitled": false, 
+            "widget_views_count": 10,
+            "allow_video_urls_edit": true,
+            "created": "2011-01-30 08:54:43"
+        }
+    },
+    {
         "pk": 2, 
         "model": "videos.videourl", 
         "fields": {

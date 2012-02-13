@@ -158,3 +158,24 @@ class TestSearch(TestCase):
             
             result = SearchForm.apply_query(u'BBC', sqs)
             self.assertTrue(video in [item.object for item in result], u"Failed to find video by 'BBC' with title: %s" % title)              
+
+    def test_search_relevance(self):
+        reset_solr()
+
+        rpc = SearchApiClass()
+        rdata = RpcMultiValueDict(dict(q=u'unique'))
+
+        result = rpc.search(rdata, self.user, testing=True)['sqs']
+        videos = [item.object for item in result]
+
+        # by default, title is more important than description
+        self.assertEquals(videos[0].title, u"This is my unique title")
+        self.assertEquals(videos[1].title, u"Default")
+        self.assertEquals(videos[1].description, u"this is my unique description")
+
+        rdata = RpcMultiValueDict(dict(q=u'unique', sort="total_views"))
+        result = rpc.search(rdata, self.user, testing=True)['sqs']
+        videos = [item.object for item in result]
+
+        self.assertEquals(videos[0].title, u"Default")
+        self.assertEquals(videos[1].title, u"This is my unique title")
