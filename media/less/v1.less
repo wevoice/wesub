@@ -464,6 +464,9 @@ body {
                 h4 {
                     padding: .25em 0;
                 }
+                &.due {
+                    font-size: 11px;
+                }
             }
 
             a {
@@ -1702,6 +1705,10 @@ ol.subtitles {
             margin-left: -5px !important;
             margin-top: -1px !important;
             z-index: 50;
+
+            li {
+                width: 100%;
+            }
         }
     }
 }
@@ -1709,11 +1716,13 @@ ol.subtitles {
 .v1 .bootstrap .modal {
     .modal-header {
         h3 {
-            padding: 0;
             border: none;
-            margin: 0;
             clear: none;
             font-size: 16px;
+            line-height: 36px;
+            margin: 0;
+            padding: 0;
+            position: static;
         }
     }
     form {
@@ -1722,6 +1731,7 @@ ol.subtitles {
 
         p {
             float: none;
+            margin-top: 0;
         }
 
         fieldset {
