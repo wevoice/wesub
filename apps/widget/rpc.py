@@ -406,7 +406,6 @@ class Rpc(BaseRpc):
 
     def save_finished(self, user, session, subtitles, new_title=None,
                       completed=None, forked=False, new_description=None):
-        from apps.teams.moderation import is_moderated, user_can_moderate
 
         language = session.language
         new_version = None
