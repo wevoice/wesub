@@ -23,7 +23,6 @@ from django.conf import settings
 import urllib
 import hashlib
 import hmac
-import time
 import uuid
 try:
     from hashlib import sha1
@@ -37,11 +36,9 @@ from utils.amazon import S3EnabledImageField
 from datetime import datetime, timedelta
 from django.core.cache import cache
 from django.utils.hashcompat import sha_constructor
-from random import random, randint
+from random import random
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.template.loader import render_to_string
-from django.core.mail import send_mail
 
 #I'm not sure this is the best way do do this, but this models.py is executed
 #before all other and before url.py
@@ -300,6 +297,10 @@ class CustomUser(BaseUser):
     @classmethod
     def get_anonymous(cls):
         return cls.objects.get(pk=settings.ANONYMOUS_USER_ID)
+
+    @property
+    def is_anonymous(self):
+        return self.pk == settings.ANONYMOUS_USER_ID
 
 def create_custom_user(sender, instance, created, **kwargs):
     if created:
