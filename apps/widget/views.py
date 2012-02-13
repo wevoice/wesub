@@ -43,6 +43,10 @@ from uslogging.models import WidgetDialogCall
 from auth.models import CustomUser
 from django.contrib.admin.views.decorators import staff_member_required
 from widget.models import SubtitlingSession
+from apps.teams.models import Task
+from django.http import HttpResponseRedirect
+from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
 
 rpc_views = Rpc()
 null_rpc_views = NullRpc()
@@ -81,6 +85,7 @@ def widgetizerbootloader(request):
 
 def onsite_widget(request):
     """Used for subtitle dialog"""
+
     context = widget.add_config_based_js_files(
         {}, settings.JS_API, 'unisubs-api.js')
     config = request.GET.get('config', '{}')
@@ -92,6 +97,13 @@ def onsite_widget(request):
         config = json.loads(config)
     except (ValueError, KeyError):
         raise Http404
+
+    if config.get('task'):
+        task = get_object_or_404(Task, pk=config.get('task'))
+        if task.completed:
+            messages.error(request, _(u'That task has already been completed.'))
+            return HttpResponseRedirect(reverse('teams:team_tasks',
+                                                kwargs={'slug': task.team.slug}))
 
     if 'HTTP_REFERER' in request.META:
         config['returnURL'] = request.META['HTTP_REFERER']
