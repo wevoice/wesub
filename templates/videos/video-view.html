@@ -175,21 +175,23 @@
                 <div class="video-tools grid_4 alpha">
                     <h3>{% trans "Contribute" %}</h3>
                     <p>
-                        {% if video.languages_count < 1 %}
-                            {% if request.user|can_create_subtitles_for:video %}
-                                {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!
+                        {% with can_create_subs=request.user|can_create_subtitles_for:video can_create_trans=request.user|can_create_translations_for:video %}
+                            {% if video.languages_count < 1 %}
+                                {% if can_create_subs %}
+                                    {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!
+                                {% endif %}
+                            {% else %}
+                                {% if can_create_trans %}
+                                    {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!
+                                {% endif %}
                             {% endif %}
-                        {% else %}
-                            {% if request.user|can_create_translations_for:video %}
-                                {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!
+                            {% if can_create_subs or can_create_trans %}
+                                {% upload_subtitles video %}
+                                {% paste_transcription %}
+                            {% else %}
+                                {% trans 'Subtitles for this video are moderated. If it belongs to a team, try joining the team to contribute.' %}
                             {% endif %}
-                        {% endif %}
-                        {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
-                            {% upload_subtitles video %}
-                            {% paste_transcription %}
-                        {% else %}
-                            {% trans 'Subtitles for this video are moderated. If it belongs to a team, try joining the team to contribute.' %}
-                        {% endif %}
+                        {% endwith %}
                     </p>
                 </div>
 
