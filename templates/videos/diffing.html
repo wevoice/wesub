@@ -10,7 +10,7 @@
   {% include_bundle "widget-css"%}
   <style>
     div.unisubs-widget {
-        position: relative;    
+        position: relative;
     }
     .unisubs-videoDiv {
         text-align: center;
@@ -38,8 +38,8 @@
                 $('.roll_back').click(function(){
                     if ( ! confirm('{% trans "Subtitles will be rolled back to a previous version" %}')){
                         return false;
-                    }                    
-                });                
+                    }
+                });
             }else{
                 $('.roll_back, .new_edit').click(function(){
                     alert('{% trans "You need to log in to do that." %}');
@@ -83,7 +83,7 @@
         {% else %}
             {% blocktrans with first_version.version_no as version_no and second_version.version_no as second_version_no %}
             Comparing revision (#{{ second_version_no }}) to current revision (#{{ version_no }})
-            {% endblocktrans %}        
+            {% endblocktrans %}
         {% endif %}
     </h2>
 
@@ -92,7 +92,7 @@
           <a href="{{ video.get_absolute_url }}">
               {{ video }}
           </a>
-      </li>        
+      </li>
       <li>
           <a href="{{ language.get_absolute_url }}">
               {{ language.language_display }} {% trans 'Subtitles' %}
@@ -102,14 +102,14 @@
           <a href="{{ language.get_absolute_url }}#revisions">
               {% trans 'Revision History' %}
           </a>
-      </li>          
+      </li>
       <li>
           <a href="#" class="nohover">{% trans 'Comparing Revision' %} #{{ first_version.version_no }} & #{{ second_version.version_no }}</a>
       </li>
     </ul>
-    
+
     <div style="clear: both"></div>
-    
+
     <div class="left_column">
         <h3 class="diff_title">
             {% blocktrans with second_version.version_no as version_no and second_version.user as user %}
@@ -117,12 +117,12 @@
             {% endblocktrans %}
             <span class="small">{{ second_version.datetime_started|timesince }} {% trans "ago" %}</span>
         </h3>
-      
+
         <div class="clear">&nbsp;</div>
-        
+
         {% widget widget1_params 'widget_div_1' %}
         <div class="clear tall">&nbsp;</div>
-        
+
         <div class="revision_buttons">
             <a href="#" class="new_edit">
                 {% trans 'Submit a new edit based on this version' %} (#{{ second_version.version_no }})
@@ -134,7 +134,7 @@
             {% endif %}
 
         </div>
-        
+
         <table cellpadding="0" cellspacing="0">
           {% for item in captions %}
             <tr {% cycle 'class="even"' '' %}>
@@ -149,12 +149,12 @@
                           <span class="connector"></span>
                           <span class="badgy end">
                               <span class="stamp_text">{{ item.1.display_end_time }}</span>
-                          </span> 
+                          </span>
                         {% endif %}
-                    </span>                
-            
+                    </span>
+
                 {% else %}
-                <span class="time-span"><span class="badgy no-sync">{% trans 'Not Synced' %}</span></span> 
+                <span class="time-span"><span class="badgy no-sync">{% trans 'Not Synced' %}</span></span>
                 {% endif %}
                   <span {% if item.2.text %}class="time_change"{% endif %}>
                     {{ item.1.text }}
@@ -164,18 +164,18 @@
           {% endfor %}
         </table>
     </div>
-    
+
     <div class="right_column">
         <h3 class="diff_title">
             {% blocktrans with first_version.version_no as version_no and first_version.user as user %}
             Revision #{{ version_no }} by {{ user }}
-            {% endblocktrans %}            
+            {% endblocktrans %}
              <span class="small">{{ first_version.datetime_started|timesince }} {% trans "ago" %}</span>
         </h3>
-   
-        
+
+
         <div class="clear">&nbsp;</div>
-        
+
         {% widget widget0_params 'widget_div_0' %}
         <div class="clear tall">&nbsp;</div>
 
@@ -193,7 +193,7 @@
                 {% render_approval_toolbar user first_version %}
                 {% endswitch_feature %}
         </div>
-        
+
         <table cellpadding="0" cellspacing="0">
 
           {% for item in captions %}
@@ -210,11 +210,11 @@
                           <span class="connector"></span>
                           <span class="badgy end">
                               <span class="stamp_text">{{ item.0.display_end_time }}</span>
-                          </span> 
+                          </span>
                         {% endif %}
-                    </span>                
+                    </span>
                 {% else %}
-                <span class="time-span"><span class="badgy no-sync">{% trans 'Not Synced' %}</span></span> 
+                <span class="time-span"><span class="badgy no-sync">{% trans 'Not Synced' %}</span></span>
                 {% endif %}
                   <span {% if item.2.text %}class="time_change"{% endif %}>
                     {{ item.0.text }}
@@ -223,14 +223,14 @@
             </tr>
           {% endfor %}
         </table>
-    </div>    
+    </div>
     {% if user_can_moderate %}
     <script type="text/javascript">
        $(window).load(function(){
           window.UNISUBS_MOD_REPLACE_HTML_BUTTON = true;
-       
+
           {% include 'moderation/moderation-buttons.js' %}
       });
-    </script> 
+    </script>
     {% endif %}
 {% endblock %}
