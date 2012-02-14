@@ -51,6 +51,14 @@
                     }
                 }
             });
+
+            {% if request.GET.lang %}
+                $select = $('select#lang-filter');
+                $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
+                $select.children().removeAttr('selected');
+                $opt.attr('selected', 'selected');
+                $select.trigger('liszt:updated');
+            {% endif %}
         });
     </script>
 {% endblock %}
@@ -86,7 +94,7 @@
                 <select name="lang-filter" id="lang-filter">
                     <option value="{{ request.path }}{% query_string request.GET lang='' page='' %}">{% trans 'all languages' %}</option>
                     {% for code, name in language_choices %}
-                        <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code page='' %}">{{ name }}</option>
+                        <option id="lang-opt-{{ code }}" {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code page='' %}">{{ name }}</option>
                     {% endfor %}
                 </select>
                 {% trans 'sorted by' %}
