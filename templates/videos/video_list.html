@@ -10,18 +10,18 @@
   <table cellpadding="0" cellspacing="0">
   <thead>
     <tr>
-      <th width="400"><span>{% trans 'URL' %}</span></th>
-      <th>
-          {% ordered_column "widget_views_count" _("Pageloads") %}
-	  </th>
+        <th width="400"><span>{% trans 'URL' %}</span></th>
+        <th>
+            {% ordered_column "widget_views_count" _("Pageloads") %}
+        </th>
 
-      <th width="160">
-          {% ordered_column "subtitles_fetched_count" _("Subtitles Fetched") %}       
+        <th width="160">
+            {% ordered_column "subtitles_fetched_count" _("Subtitles Fetched") %}
 
-      </th>
-      <th>
-          {% ordered_column "languages_count" _("Subtitles and Translations") %}  	
-	   </th>
+        </th>
+        <th>
+            {% ordered_column "languages_count" _("Subtitles and Translations") %}
+        </th>
     </tr>
 </thead>
 <tbody>
@@ -39,7 +39,7 @@
     {% endfor %}
 </tbody>
   </table>
-  {% if is_paginated %}{% paginator %}{% endif %} 
+  {% if is_paginated %}{% paginator %}{% endif %}
 {% else %}
   <p>{% trans 'There are no videos.' %}</p>
 {% endif %}
