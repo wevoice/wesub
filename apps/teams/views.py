@@ -36,8 +36,9 @@ from teams.signals import api_teamvideo_new
 import teams.moderation_const as MODERATION
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
+from django.contrib.sites.models import Site
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -55,6 +56,7 @@ from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
 from utils.translation import SUPPORTED_LANGUAGES_DICT
+from utils import DEFAULT_PROTOCOL
 from messages import tasks as notifier
 from apps.videos.templatetags.paginator import paginate
 
@@ -1493,3 +1495,25 @@ def delete_video(request, team_video_pk):
         return HttpResponseRedirect(next)
    
     
+@login_required
+def auto_captions_status(request, slug):
+    """
+    Prints a simple table of partner status for captions, this should
+    should be used internally (as a cvs file with tab delimiters)
+    """
+    buffer = []
+    team = get_object_or_404(Team, slug=slug)
+    if not team.is_member(request.user):
+        return  HttpResponseForbidden("Not allowed")
+    buffer.append( "Video\tproject\tURL\tstatus\tjob_id\ttask_id\tcreated on\tcompleted on")
+    for tv in team.teamvideo_set.all().select_related("job", "project", "video"):
+        jobs = tv.job_set.all()
+        extra = ""
+        if jobs.exists():
+            j = jobs[0]
+            extra = "%s\t%s\t%s\t%s\t%s" % (j.status, j.job_id, j.task_id, j.created_on, j.completed_on)
+        url = "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, tv.video.get_absolute_url())
+        buffer.append( "Video:%s\t %s\t%s\t %s" % (tv.video.title,tv.project.name, url, extra))
+    response =  HttpResponse( "\n".join(buffer), content_type="text/csv")
+    response['Content-Disposition'] = 'filename=team-status.csv'
+    return response

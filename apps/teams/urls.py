@@ -69,6 +69,7 @@ urlpatterns = patterns('teams.views',
     url('^(?P<slug>[-\w]+)/p/(?P<project_slug>[-\w]+)/tasks/?$', 'team_tasks', name='project_tasks'),
     url('^(?P<slug>[-\w]+)/third-party-accounts/$', 'third_party_accounts', name='third-party-accounts'),
     url('^(?P<slug>[-\w]+)/unpublish/$', 'unpublish', name='unpublish'),
+    url('^(?P<slug>[-\w]+)/auto-captions-status/$', 'auto_captions_status', name='auto-captions-status'),
 )
 
 urlpatterns += patterns('',
