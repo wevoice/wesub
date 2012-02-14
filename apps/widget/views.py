@@ -47,6 +47,7 @@ from apps.teams.models import Task
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
+from utils import DEFAULT_PROTOCOL
 
 rpc_views = Rpc()
 null_rpc_views = NullRpc()
@@ -175,7 +176,7 @@ def onsite_widget_resume(request):
 def widget_demo(request):
     context = {}
     context['js_use_compiled'] = settings.COMPRESS_MEDIA
-    context['site_url'] = 'http://{0}'.format(
+    context['site_url'] = '{0}://{1}'.format( DEFAULT_PROTOCOL,
         request.get_host())
     if 'video_url' not in request.GET:
         context['help_mode'] = True

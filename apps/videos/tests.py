@@ -1051,7 +1051,7 @@ class ViewsTest(WebUseTest):
         for i in xrange(0,20):
             s, created = Subtitle.objects.get_or_create(
                 version=new_v,
-                subtitle_id="%s" % i,
+                subtitle_id= "%s" % i,
                 subtitle_order=i,
                 subtitle_text="%s lala" % i
             )
