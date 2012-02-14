@@ -1338,7 +1338,6 @@ class TaskManager(models.Manager):
         return self.not_deleted().filter(type__in=(Task.TYPE_IDS['Review'],
                                                    Task.TYPE_IDS['Approve']))
 
-
 class Task(models.Model):
     TYPE_CHOICES = (
         (10, 'Subtitle'),

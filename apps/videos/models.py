@@ -1027,47 +1027,6 @@ class SubtitleCollection(models.Model):
 
 
 # SubtitleVersion
-def restrict_versions(version_qs, user, subtitle_language):
-    """Filter the given queryset of SubtitleVersions for the user.
-
-    Returns a list of SubtitleVersions the user has permission to see.
-
-    This function performs several DB queries, so try not to call it more than
-    once per page.
-
-    This will realize the queryset into a list, so do any other filtering you
-    might need before you call this function.
-
-    TODO: Different logic for rejected vs waiting_moderation?
-
-    """
-    team_video = subtitle_language.video.get_team_video()
-
-    if not team_video:
-        return False
-
-    def _version_viewable(version):
-        # Versions not under moderation can always be viewed.
-        if version.is_public:
-            return True
-
-        # Otherwise the version is moderated.
-        # Non-logged-in users can never see it.
-        if not user or not user.is_authenticated() or user.is_anonymous:
-            return False
-
-        # Subtitle authors can view their own drafts.
-        if not version.user.is_anonymous and user.pk == version.user.pk:
-            return True
-
-        # Anyone reviewing/approving this version can view its drafts.
-        users = (version.task_set.all_review_or_approve()
-                                 .values_list('assignee__id', flat=True))
-        return user.pk in users
-
-    return filter(_version_viewable, version_qs)
-
-
 class SubtitleVersionManager(models.Manager):
     def not_restricted_by_moderation(self):
         return self.get_query_set().exclude(moderation_status__in=[WAITING_MODERATION, REJECTED])
@@ -1367,6 +1326,79 @@ def update_followers(sender, instance, created, **kwargs):
 
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)
+
+
+def restrict_versions(version_qs, user, subtitle_language):
+    """Filter the given queryset of SubtitleVersions for the user.
+
+    Returns a list of SubtitleVersions the user has permission to see.
+
+    This function performs several DB queries, so try not to call it more than
+    once per page.
+
+    This will realize the queryset into a list, so do any other filtering you
+    might need before you call this function.
+
+    TODO: Different logic for rejected vs waiting_moderation?
+
+    """
+    team_video = subtitle_language.video.get_team_video()
+
+    if not team_video:
+        return False
+
+    def _version_viewable(version):
+        # Versions not under moderation can always be viewed.
+        if version.is_public:
+            return True
+
+        # Otherwise the version is moderated.
+        # Non-logged-in users can never see it.
+        if not user or not user.is_authenticated() or user.is_anonymous:
+            return False
+
+        # Subtitle authors can view their own drafts.
+        if not version.user.is_anonymous and user.pk == version.user.pk:
+            return True
+
+        # Anyone reviewing/approving this version can view its drafts.
+        users = (version.task_set.all_review_or_approve()
+                                 .values_list('assignee__id', flat=True))
+        return user.pk in users
+
+    return filter(_version_viewable, version_qs)
+
+def has_viewable_draft(version, user):
+    """Return True if the given version has draft subtitles viewable by the user.
+
+    This function performs several DB queries, so try not to call it more than
+    once per page.
+
+    TODO: Different logic for rejected vs waiting_moderation?
+
+    """
+    team_video = version.language.video.get_team_video()
+
+    if not team_video:
+        return False
+
+    # Public versions are not drafts.
+    if version.is_public:
+        return False
+
+    # Otherwise the version is a draft.
+    # Non-logged-in users can never see it.
+    if not user or not user.is_authenticated() or user.is_anonymous:
+        return False
+
+    # Subtitle authors can view their own drafts.
+    if not version.user.is_anonymous and user.pk == version.user.pk:
+        return True
+
+    # Anyone reviewing/approving this version can view its drafts.
+    users = (version.task_set.all_review_or_approve()
+                             .values_list('assignee__id', flat=True))
+    return user.pk in users
 
 
 # SubtitleDraft
