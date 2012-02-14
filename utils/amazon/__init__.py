@@ -20,6 +20,7 @@ from django.core.files import File
 from fields import S3EnabledImageField, S3EnabledFileField
 from django.core.mail import mail_admins
 from sentry.client.models import client
+from utils import DEFAULT_PROTOCOL
 from StringIO import StringIO
 import os
 
@@ -116,7 +117,7 @@ class S3Storage(FileSystemStorage):
     
     def url(self, name):
         name = name.replace('\\', '/')
-        return 'http://%s.%s/%s' % (self.bucket.name, DEFAULT_HOST, name)
+        return '%s://%s.%s/%s' % (DEFAULT_PROTOCOL, self.bucket.name, DEFAULT_HOST, name)
         #return Key(self.bucket, name).generate_url(100000)
     
     def get_available_name(self, name):

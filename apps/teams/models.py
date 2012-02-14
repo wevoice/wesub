@@ -36,6 +36,8 @@ from utils.panslugify import pan_slugify
 from haystack.query import SQ
 from haystack import site
 from utils.searching import get_terms
+
+from utils import DEFAULT_PROTOCOL
 from django.contrib.contenttypes.models import ContentType
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
@@ -217,7 +219,7 @@ class Team(models.Model):
         return ('teams:detail', [self.slug])
 
     def get_site_url(self):
-        return 'http://%s%s' % (Site.objects.get_current().domain, self.get_absolute_url())
+        return '%s://%s%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, self.get_absolute_url())
 
 
     def _is_role(self, user, role=None):
@@ -498,7 +500,7 @@ class Project(models.Model):
         return self.name == Project.DEFAULT_NAME
 
     def get_site_url(self):
-        return 'http://%s%s' % (Site.objects.get_current().domain, self.get_absolute_url())
+        return '%s://%s%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, self.get_absolute_url())
 
     @models.permalink
     def get_absolute_url(self):

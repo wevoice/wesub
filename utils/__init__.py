@@ -44,6 +44,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.models import Site
 import inspect
 
+DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
+
 try:
     import oboe
 except ImportError:
@@ -156,7 +158,7 @@ def send_templated_email(to, subject, body_template, body_dict,
 
     body_dict['STATIC_URL_BASE'] = settings.STATIC_URL_BASE
     body_dict['domain'] = Site.objects.get_current().domain
-    body_dict['url_base'] = "http://" + Site.objects.get_current().domain
+    body_dict['url_base'] = "%s://%s" % (DEFAULT_PROTOCOL,  Site.objects.get_current().domain)
     message = render_to_string(body_template, body_dict)
     bcc = settings.EMAIL_BCC_LIST
     email = EmailMessage(subject, message, from_email, to, bcc=bcc)

@@ -16,7 +16,7 @@ from haystack import site
 from sentry.client.handlers import SentryHandler
 from sentry.client.models import client
 
-from utils import send_templated_email
+from utils import send_templated_email, DEFAULT_PROTOCOL
 from videos.models import VideoFeed, SubtitleLanguage, Video
 
 
@@ -233,7 +233,7 @@ def _send_letter_translation_start(translation_version):
         context = {
             'version': translation_version,
             'domain': domain,
-            'video_url': 'http://%s%s' % (domain, video.get_absolute_url()),
+            'video_url': '%s://%s%s' % (DEFAULT_PROTOCOL, domain, video.get_absolute_url()),
             'user': user,
             'language': language,
             'video': video,

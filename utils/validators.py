@@ -1,10 +1,13 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat as fs_format
 from django.core import validators
 from django.contrib.sites.models import Site
 from utils.http import url_exists
+from utils import DEFAULT_PROTOCOL
 from django import forms
+
 
 class MaxFileSizeValidator(object):
     
@@ -30,6 +33,6 @@ class UniSubURLValidator(validators.URLValidator):
     def __call__(self, value):
         super(UniSubURLValidator, self).__call__(value)
 
-        if self._verify_exists and not value.startswith('http://'+self.host):
+        if self._verify_exists and not value.startswith('%s://%s' %(DEFAULT_PROTOCOL, self.host)):
             if not url_exists(value):
                 raise forms.ValidationError(_(u'This URL appears to be a broken link.'))
