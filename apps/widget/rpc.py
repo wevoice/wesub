@@ -406,7 +406,7 @@ class Rpc(BaseRpc):
 
     def save_finished(self, user, session, subtitles, new_title=None,
                       completed=None, forked=False, new_description=None):
-
+        from apps.teams.moderation import user_can_moderate
         language = session.language
         new_version = None
         if subtitles is not None and \
@@ -452,19 +452,42 @@ class Rpc(BaseRpc):
             video_changed_tasks.delay(language.video.id)
             api_video_edited.send(language.video)
 
-        # we have a default user message, since the UI lets users save non
-        # changed subs, but the backend will realize and will not save that
-        # version. In those cases, we want to show the defatul user message.
-        user_message = "Your changes have been saved. It may take a moment for your subtitles to appear."
-        if language.video.is_moderated:
-            # if a video is under moderation, just let the user know
-            user_message = ("This video is moderated by %s. \n\n" 
-                           "Your changes will be reviewed by the "
-                           "team's moderators.'") % \
-                           (new_version.video.moderated_by.name)
+        # The message displayed to the user  has a complex requirement /  outcomes
+        # 1) Subs will go live in a moment. Works for unmoderated subs and for D and H 
+        # D. Transcript, post-publish edit by moderator with the power to approve. Will go live immediately.
+        # H. Translation, post-publish edit by moderator with the power to approve. Will go live immediately.
+        # 2) Subs must be completed before being submitted to moderators. Works for A and E 
+        # A. Transcript, incomplete (checkbox not ticked). Must be completed before being submitted to moderators.
+        # E. Translation, incomplete (some lines missing). Must be completed before being submitted to moderators.
+        # 3) Subs will be submitted for review/approval. Works for B, C, F, and G
+        # B. Transcript, complete (checkbox ticked). Will be submitted to moderators promptly for approval or rejection.
+        # C. Transcript, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
+        # F. Translation, complete (all the lines filled). Will be submitted to moderators promptly for approval or rejection.
+        # G. Translation, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
+        message_will_be_live_soon = "Your changes have been saved. It may take a moment for your subtitles to appear."
+        message_will_be_submited = ("This video is moderated by %s"
+                                    "Your changes will be reviewed by the "
+                                    "team's moderators.")
+        message_incomplete = ("Your substitle is incomplete."
+                              "Your changes will be reviewed by the "
+                              "team %s  moderators after they are completed")
+        under_moderation = language.video.is_moderated
+        _user_can_moderate =  user_can_moderate(language.video, user)
+        is_complete = language.is_complete or language.calculate_percent_done() == 100
+        # this is case 1
+        if under_moderation and _user_can_moderate is False:
+            if is_complete:
+                # case 3
+                user_message = message_will_be_submited % ( language.video.moderated_by.name)
+            else:
+                # case 2
+                user_message = message_incomplete % ( language.video.moderated_by.name)
+        else:
+            user_message = message_will_be_live_soon
+            
         # If we've just saved a completed subtitle language, we may need to
         # complete a subtitle or translation task.
-        if language.is_complete or language.calculate_percent_done() == 100:
+        if is_complete:
             team_video = language.video.get_team_video()
             if team_video:
                 tasks = team_video.task_set.incomplete().filter(
