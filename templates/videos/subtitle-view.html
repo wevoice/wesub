@@ -353,8 +353,8 @@
                                         <input type="radio" name="scope" value="language">
                                         {% trans 'All versions for this language' %}
                                     </label>
-                                    <label class="radio">
-                                        <input type="radio" name="scope" value="dependents">
+                                    <label class="radio" style="display: none;">
+                                        <input type="hidden" name="scope" value="0">
                                         {% trans 'This language and all dependent languages' %}
                                     </label>
                                 </fieldset>
