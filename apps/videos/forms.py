@@ -170,18 +170,17 @@ class SubtitlesUploadBaseForm(forms.Form):
 
         team_video = video.get_team_video()
         if team_video:
+            msg = _(u"Uploading subtitles in this language was forbidden by team %s which moderates the video." % team_video.team)
+
             if team_video.task_set.incomplete().filter(language=language).exists():
-                raise forms.ValidationError(_(
-                    u"Subtitles cannot be uploaded for a language with open tasks."))
+                raise forms.ValidationError(msg)
 
             if team_video.task_set.incomplete_subtitle().exists():
-                raise forms.ValidationError(_(
-                    u"Subtitles cannot be uploaded for a video with an open transcribe task."))
+                raise forms.ValidationError(msg)
 
             workflow = team_video.get_workflow()
             if workflow.approve_allowed or workflow.review_allowed:
-                raise forms.ValidationError(_(
-                    u"Subtitles cannot be uploaded for videos that require approval."))
+                raise forms.ValidationError(msg)
 
         return self.cleaned_data
 
