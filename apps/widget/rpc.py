@@ -465,12 +465,12 @@ class Rpc(BaseRpc):
         # F. Translation, complete (all the lines filled). Will be submitted to moderators promptly for approval or rejection.
         # G. Translation, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
         message_will_be_live_soon = "Your changes have been saved. It may take a moment for your subtitles to appear."
-        message_will_be_submited = ("This video is moderated by %s"
+        message_will_be_submited = ("This video is moderated by %s."
                                     "Your changes will be reviewed by the "
                                     "team's moderators.")
-        message_incomplete = ("Your substitle is incomplete."
-                              "Your changes will be reviewed by the "
-                              "team %s  moderators after they are completed")
+        message_incomplete = ("These subtitles are incomplete. "
+                              "They will not be submitted for publishing "
+                              "until they've been completed.")
         under_moderation = language.video.is_moderated
         _user_can_moderate =  user_can_moderate(language.video, user)
         is_complete = language.is_complete or language.calculate_percent_done() == 100
