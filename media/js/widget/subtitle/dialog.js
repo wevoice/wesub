@@ -25,7 +25,8 @@ goog.provide('unisubs.subtitle.Dialog');
  */
 unisubs.subtitle.Dialog = function(videoSource, serverModel,
                                     subtitles, opt_opener,
-                                    opt_skipFinished, originalSubtitles) {
+                                    opt_skipFinished, originalSubtitles, 
+                                   isReviewOrApproval) {
     unisubs.Dialog.call(this, videoSource);
     unisubs.SubTracker.getInstance().start(false);
     this.serverModel_ = serverModel;
@@ -57,6 +58,7 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel,
 
     this.keyEventsSuspended_ = false;
     this.originalSubtitles_ = originalSubtitles;
+    this.isReviewOrApproval_ = isReviewOrApproval;
 };
 goog.inherits(unisubs.subtitle.Dialog, unisubs.Dialog);
 
@@ -72,6 +74,8 @@ unisubs.subtitle.Dialog.State_ = {
     FINISHED: 4
     
 };
+
+
 unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
     this.getVideoPlayerInternal().showCaptionText(c ? c.getText() : '');
@@ -453,8 +457,14 @@ unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
     if (this.state_ == s.TRANSCRIBE)
         return s.SYNC;
-    else if (this.state_ == s.EDIT_METADATA)
-        return s.REVIEW;
+    else if (this.state_ == s.EDIT_METADATA){
+
+        if (this.isReviewOrApproval_){
+        }else{
+
+            return s.REVIEW;
+        }
+    }
     else if (this.state_ == s.SYNC)
         return s.EDIT_METADATA;
     else if (this.state_ == s.REVIEW)

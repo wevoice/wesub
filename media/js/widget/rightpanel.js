@@ -331,6 +331,10 @@ unisubs.RightPanel.prototype.updateLoginState = function() {
     }
 };
 
+unisubs.RightPanel.prototype.appendsNotesForReview = function(jsonSubsFn) {
+
+}
+
 unisubs.RightPanel.prototype.showDownloadLink = function(jsonSubsFn) {
     goog.style.showElement(this.downloadLink_, true);
     this.jsonSubsFn_ = jsonSubsFn;
@@ -399,3 +403,96 @@ unisubs.RightPanel.GoToStepEvent = function(stepNo) {
     this.type = unisubs.RightPanel.EventType.GOTOSTEP;
     this.stepNo = stepNo;
 };
+
+/* Since all panels might use this under review we abstract them here.
+* Returns a json object with the title, help contents and extraHelp needed to populate this
+* panel for review
+*/
+unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, currentStep){
+    // return as a json literal, else the closure compiler will mangle this
+    var bodyInput = $d('textarea', {'class': 'unisubs-review-notes', 'id': 'unisubs-review-notes', 'name': 'notes'});
+
+    
+    var title = "Review this translation";
+    var helpContents = unisubs.RightPanel.HelpContents(title, [
+        $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
+        $d('p', {}, "Once you're finished reviewing, you can either ",
+           $d('strong', {}, "send the subtitles back"),
+           " to their creator for additional work, or ",
+           $d('strong', {}, "approve"),
+           " them to be published. ",
+           "If you're unable to complete the task at this time, you can also ",
+           $d('strong', {}, "save this task"),
+           " for later."),
+        $d('div', {'className': 'unisubs-extra'},
+           $d('p', {}, "Enter review notes here. ",
+              "They will be sent to all previous contributors ",
+              "and posted as a ",
+              $d('em', {}, "public comment"),
+              " to the subtitles."),
+           $d('span', {'className': 'unisubs-spanarrow'})),
+
+        $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
+        bodyInput
+    ], numSteps, currentStep);
+
+    return  {
+        'bodyInput': bodyInput,
+        'helpContents' : helpContents ,
+        'extraHelp' :  [
+            $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
+            $d('textarea', {'class': 'unisubs-review-notes', 'id': 'unisubs-review-notes', 'name': 'notes'})
+        ]
+    }
+}
+
+/* Since all panels might use this under approval, we abstract them here.
+* Returns a json object with the title, help contents and extraHelp needed to populate this
+* panel for approval.
+*/
+unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, currentStep){
+    // return as a json literal, else the closure compiler will mangle this
+    var  title   = "Approve this translation";
+    var bodyInput = $d('textarea', {'class': 'unisubs-approve-notes', 'id': 'unisubs-approve-notes', 'name': 'notes'});
+
+
+
+    var helpContents = new unisubs.RightPanel.HelpContents(title, [
+        $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
+        $d('p', {}, "Once you're finished reviewing, you can either ",
+                    $d('strong', {}, "send the subtitles back"),
+                    " to their creator for additional work, or ",
+                    $d('strong', {}, "approve"),
+                    " them to be published. ",
+                    "If you're unable to complete the task at this time, you can also ",
+                    $d('strong', {}, "save this task"),
+                    " for later."),
+        $d('div', {'className': 'unisubs-extra'},
+            $d('p', {}, "Enter review notes here. ",
+                        "They will be sent to all previous contributors ",
+                        "and posted as a ",
+                        $d('em', {}, "public comment"),
+                        " to the subtitles."),
+            $d('span', {'className': 'unisubs-spanarrow'})),
+
+        $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
+        bodyInput
+
+    ], numSteps, currentStep);
+
+    return {
+        'bodyInput': bodyInput,
+        'helpContents' : helpContents,
+        'extraHelp' : [
+        ]
+    };
+}
+
+unisubs.RightPanel.createInternalContentsReviewOrApproval = function($d, reviewOrApprovalType, numSteps, currentStep){
+    if (reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL['REVIEW']){
+        return unisubs.RightPanel.createInternalContentsForReview($d, numSteps, currentStep)
+    }else if(reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']){
+        return unisubs.RightPanel.createInternalContentsForApproval($d, numSteps, currentStep);
+    }
+    return null;
+}

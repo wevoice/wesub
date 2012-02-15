@@ -21,18 +21,21 @@ goog.provide('unisubs.approvesubtitles.Dialog');
 /**
  * @constructor
  */
-unisubs.approvesubtitles.Dialog = function(videoSource, serverModel, subtitleState) {
-    unisubs.Dialog.call(this, videoSource);
+unisubs.approvesubtitles.Dialog = function(videoSource, serverModel,
+                                    subtitles, opt_opener,
+                                    opt_skipFinished, originalSubtitles, 
+                                   isReviewOrApproval) {
+    unisubs.subtitle.Dialog.call(this, videoSource, serverModel,
+                                    subtitles, opt_opener,
+                                    opt_skipFinished, originalSubtitles, 
+                                   isReviewOrApproval) 
     unisubs.SubTracker.getInstance().start(true);
 
     this.opener_ = opener;
-    this.subtitleState_ = subtitleState;
-    this.serverModel_ = serverModel;
     this.captionSet_ = this.serverModel_.getCaptionSet();
-    this.captionManager_ = new unisubs.CaptionManager(this.getVideoPlayerInternal(), this.captionSet_);
-    this.saved_ = false;
+    this.rightPanelListener_ = new goog.events.EventHandler(this);
 };
-goog.inherits(unisubs.approvesubtitles.Dialog, unisubs.Dialog);
+goog.inherits(unisubs.approvesubtitles.Dialog, unisubs.subtitle.Dialog);
 
 unisubs.approvesubtitles.Dialog.prototype.createDom = function() {
     unisubs.approvesubtitles.Dialog.superClass_.createDom.call(this);

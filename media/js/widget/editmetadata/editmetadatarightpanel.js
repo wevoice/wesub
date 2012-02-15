@@ -26,11 +26,12 @@ goog.provide('unisubs.editmetadata.RightPanel');
 unisubs.editmetadata.RightPanel = function(dialog, 
                                            serverModel, 
                                            helpContents, 
+                                           extraHelp,
                                            legendKeySpecs, 
                                            showRestart, 
                                            doneStrongText, 
-                                           doneText) {
-    unisubs.RightPanel.call(this, serverModel, helpContents, null,
+                                           doneText, isReviewOrApproval) {
+    unisubs.RightPanel.call(this, serverModel, helpContents, extraHelp,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
     this.showSaveExit = false;
@@ -38,8 +39,10 @@ unisubs.editmetadata.RightPanel = function(dialog,
     this.helpContents = helpContents;
     // TODO: See if there's a way to avoid the circular reference here.
     this.dialog_ = dialog;
+    this.isReviewOrApproval_ = isReviewOrApproval;
 };
 goog.inherits(unisubs.editmetadata.RightPanel, unisubs.RightPanel);
+
 
 unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function($d, el) {
     var helpHeadingDiv = $d('div', 'unisubs-help-heading');
@@ -68,10 +71,11 @@ unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function(
         div.innerHTML = this.helpContents_.html;
         el.appendChild(div);
     }
-    else
+    else{
         goog.array.forEach(this.helpContents_.paragraphs, function(p) {
             el.appendChild($d('p', null, p));
         });
+    }
 };
 
 

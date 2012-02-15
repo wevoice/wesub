@@ -26,7 +26,7 @@ unisubs.translate.Dialog = function(opener,
                                      serverModel,
                                      videoSource, 
                                      subtitleState, 
-                                     standardSubState) {
+                                     standardSubState, reviewOrApprovalType) {
     unisubs.Dialog.call(this, videoSource);
     unisubs.SubTracker.getInstance().start(true);
     this.opener_ = opener;
@@ -37,6 +37,7 @@ unisubs.translate.Dialog = function(opener,
     this.serverModel_.init();
     this.saved_ = false;
     this.rightPanelListener_ = new goog.events.EventHandler(this);
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
 };
 goog.inherits(unisubs.translate.Dialog, unisubs.subtitle.Dialog);
 
@@ -239,9 +240,13 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
 };
 unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
     var s = unisubs.translate.Dialog.State_;
+    console.log("is review", this.isReview());
+    
+    console.log("is approval", this.isApproval());
     if (this.state_ == s.TRANSLATE){
         this.translationPanel_ =  new unisubs.translate.TranslationPanel(
-            this.serverModel_.getCaptionSet(), this.standardSubState_, this);
+            this.serverModel_.getCaptionSet(), this.standardSubState_, this, 
+            this.reviewOrApprovalType_, this.serverModel_);
         return this.translationPanel_; 
     }
     else if (this.state_ == s.EDIT_METADATA)
@@ -251,7 +256,8 @@ unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.serverModel_,
             this.captionManager_,
             this.standardSubState_ ,
-            false
+            false,
+            this.reviewOrApprovalType_
         );
 };
 

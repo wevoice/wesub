@@ -26,7 +26,9 @@ goog.provide('unisubs.editmetadata.Panel');
  * @param {unisubs.CaptionManager} Caption manager, already containing subtitles
  *     with start_time set.
  */
-unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, captionManager, originalSubtitles, inSubtitlingDialog) {
+unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, 
+                                      captionManager, originalSubtitles, 
+                                      inSubtitlingDialog, reviewOrApprovalType) {
     goog.ui.Component.call(this);
     /**
      * @type {unisubs.subtitle.EditableCaptionSet}
@@ -41,6 +43,7 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, capti
     this.captionManager_ = captionManager;
     this.originalSubtitles_ = originalSubtitles;
     // when in the translate dialog, there are only 2 steps, for the subtitling, there are 4
+    this.currentStep_ = 1;
     if (inSubtitlingDialog){
 
         this.numSteps_ = 4;
@@ -51,6 +54,7 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, capti
         this.nextButtonText_ = "Submit final translation";
     }
     this.inSubtitlingDialog_  = inSubtitlingDialog;
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
 };
 goog.inherits(unisubs.editmetadata.Panel, goog.ui.Component);
 
@@ -112,19 +116,26 @@ unisubs.editmetadata.Panel.prototype.suspendKeyEvents = function(suspended) {
 
 unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    var title = "Edit Title & Description";
-    var desc = "Please take a moment to update the " + this.subtitles_.languageName + " title and description for these subtitles.";
-    var helpContents = new unisubs.RightPanel.HelpContents(
-        title, 
-        [
-            $d('p', {}, desc)
-        ], this.numSteps_, 2);
-    return new unisubs.editmetadata.RightPanel(this, 
-                                               this.serverModel,
-                                               helpContents,
-                                               [],
-                                               false,
-                                               "Done? ",
-                                               this.nextButtonText_);
+    var reviewOrApproval = true;
+    var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
+        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
+    if (! internalComponents){
+        reviewOrApproval = false;
+        var title = "Edit Title & Description";
+        var desc = "Please take a moment to update the " + this.subtitles_.languageName + " title and description for these subtitles.";
+        var helpContents = new unisubs.RightPanel.HelpContents(
+            title, [$d('p', {}, desc)],
+            this.numSteps_, this.currentStep_);
+        internalComponents = {
+        'helpContents' : helpContents,
+        'extraHelp' : []
+        }
+
+    }
+    return new unisubs.editmetadata.RightPanel(
+        this.dialog_,
+        this.serverModel_, internalComponents['helpContents'], internalComponents['extraHelp'], [], false, "Done?", 
+        this.nextButtonText_,  reviewOrApproval);
+
 
 };

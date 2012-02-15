@@ -49,7 +49,7 @@ unisubs.approvesubtitles.ApproveSubtitlesRightPanel.APPROVAL_STAGES_ = {
 };
 
 unisubs.approvesubtitles.ApproveSubtitlesRightPanel.prototype.appendMiddleContentsInternal = function($d, el) {
-    el.appendChild($d('label', {'class': 'unisubs-approve-notes-label', 'for': 'unisubs-approve-notes'}, 'Notes'));
+    el.appendChild($d('label', {'class': 'unisubs-approve-notes-label', 'for': 'unisubs-approve-notes'}, 'xNotes'));
 
     this.bodyInput_ = $d('textarea', {'class': 'unisubs-approve-notes', 'id': 'unisubs-approve-notes', 'name': 'notes'});
     el.appendChild(this.bodyInput_);
