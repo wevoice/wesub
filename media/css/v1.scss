@@ -1,20 +1,20 @@
 @mixin border-radius($radius: 5px) {
-    -webkit-background-clip: padding-box;
-    -webkit-border-radius: $radius;
     -moz-background-clip: padding-box;
     -moz-border-radius: $radius;
-    border-radius: $radius;
+    -webkit-background-clip: padding-box;
+    -webkit-border-radius: $radius;
     background-clip: padding-box;
+    border-radius: $radius;
 }
 @mixin box-shadow($horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
-  -webkit-box-shadow: $horizontal $vertical $blur $color;
-  -moz-box-shadow: $horizontal $vertical $blur $color;
-  box-shadow: $horizontal $vertical $blur $color;
+    -moz-box-shadow: $horizontal $vertical $blur $color;
+    -webkit-box-shadow: $horizontal $vertical $blur $color;
+    box-shadow: $horizontal $vertical $blur $color;
 }
 @mixin inset-box-shadow($horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
-  -webkit-box-shadow: inset $horizontal $vertical $blur $color;
-  -moz-box-shadow: inset $horizontal $vertical $blur $color;
-  box-shadow: inset $horizontal $vertical $blur $color;
+    -moz-box-shadow: inset $horizontal $vertical $blur $color;
+    -webkit-box-shadow: inset $horizontal $vertical $blur $color;
+    box-shadow: inset $horizontal $vertical $blur $color;
 }
 @mixin multi-color-border($top, $sides, $bottom) {
     border-top: 1px solid $top;
@@ -66,16 +66,16 @@
     opacity: $op;
 }
 
-$usblue: #0f517a;
-$faintest: #f3f6f8;
-$fainter: #dce2e5;
-$faint: #b7c3c9;
-$lighter: #a0b2bd;
-$light: #7692a3;
-$normal: #678ca3;
 $dark: #486f87;
 $darker: #3e6782;
 $darkest: #2f3c45;
+$faint: #b7c3c9;
+$fainter: #dce2e5;
+$faintest: #f3f6f8;
+$light: #7692a3;
+$lighter: #a0b2bd;
+$normal: #678ca3;
+$usblue: #0f517a;
 
 /* General styles */
 
@@ -111,12 +111,12 @@ body {
     margin: 1em 0 2em;
 }
 .v1 .notation {
-  font-size: .95em;
-  color: $light;
+    font-size: .95em;
+    color: $light;
 }
 .v1 .view .grid_4 p.notation {
-    margin: 0 0 1em;
     float: none;
+    margin: 0 0 1em;
 }
 .v1 .button, .v1 .content button, .v1 .form-container button, .v1 .submit input {
     margin: 1em 0;
@@ -368,7 +368,7 @@ div.hidden {
 
         fieldset {
             padding: 0;
-            
+
             input {
                 float: left;
                 border-color: $fainter;
@@ -824,7 +824,7 @@ p.view-more {
     border-left: 1px solid $fainter;
     background-color: #fff;
     @include linear-gradient(left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
-    
+
     ul {
         padding: 2em 0;
         margin-left: -15px;
@@ -851,7 +851,7 @@ p.view-more {
                 background-color: #f9fafb;
                 @include linear-gradient( left, hsla(192, 15%, 92%, 1), hsla(192, 15%, 96%, 1) 5%, hsla(192, 15%, 96%, 1));
             }
-            
+
             span {
                 position: absolute;
                 top: .75em; right: .75em;
@@ -1089,8 +1089,8 @@ p.view-more {
 }
 
 .v1 #comment-form fieldset {
-  padding: 0;
-    
+    padding: 0;
+
     label {
         padding-top: 0;
     }
@@ -1171,7 +1171,7 @@ body#teams div.edit-team-video form fieldset a {
 /* Dashboard */
 
 #dashboard {
-    
+
     .featured {
         padding: 0;
         margin-bottom: 4em;
@@ -1297,7 +1297,7 @@ body#teams div.edit-team-video form fieldset a {
             width: 620px !important;
             height: 370px !important;
         }
-        
+
         #video-tab, #comments-tab {
             padding-top: 10px;
 
@@ -1509,7 +1509,7 @@ body#teams div.edit-team-video form fieldset a {
 
 ol.subtitles {
     clear: both;
-    
+
     li {
         position: relative;
         padding: 1em 1em 1em 120px;
@@ -1524,7 +1524,7 @@ ol.subtitles {
             position: absolute;
             top: 1em; left: 1em;
             width: 75px;
-            
+
             a {
                 color: $light;
                 text-decoration: none;
@@ -1668,7 +1668,7 @@ ol.subtitles {
         line-height: 14px;
     }
     .chzn-container-single .chzn-single {
-        
+
         div b {
             background-position: -5px -5px;
         }
@@ -1842,7 +1842,7 @@ pre.dump {
 
 #teams .backnav {
     color: $light; 
-        
+
     a {
         color: $darkest;
     }
