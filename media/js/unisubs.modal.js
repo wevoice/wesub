@@ -13,7 +13,7 @@ jQuery(document).ready(function($){
             closeModal($target);
         });
     });
-    $('.action-close', '.bootstrap').click(function(){
+    $('.action-close, .close', '.bootstrap').click(function(){
         closeModal($(this).parents('.modal'));
         return false;
     });
