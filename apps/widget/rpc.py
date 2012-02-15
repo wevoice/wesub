@@ -481,7 +481,7 @@ class Rpc(BaseRpc):
                 user_message = message_will_be_submited % ( language.video.moderated_by.name)
             else:
                 # case 2
-                user_message = message_incomplete % ( language.video.moderated_by.name)
+                user_message = message_incomplete 
         else:
             user_message = message_will_be_live_soon
             
