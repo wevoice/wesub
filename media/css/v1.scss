@@ -65,6 +65,16 @@
     filter: alpha(opacity=$op);
     opacity: $op;
 }
+@mixin box-right {
+    padding: 0;
+    position: absolute;
+    top: 2em; right: 0;
+    width: 120px;
+}
+@mixin block-level {
+    display: block;
+    width: 100%;
+}
 
 $dark: #486f87;
 $darker: #3e6782;
@@ -87,12 +97,6 @@ body {
     display: block;
     height: 0;
     visibility: hidden;
-}
-.box-right {
-    padding: 0;
-    position: absolute;
-    top: 2em; right: 0;
-    width: 120px;
 }
 .v1 {
     color: $darkest;
@@ -213,7 +217,7 @@ body {
     color: $light;
     text-align: right;
     width: 150px;
-    @extend box-right;
+    @include box-right;
 }
 div.hidden {
     display: none;
@@ -452,7 +456,7 @@ div.hidden {
             }
         }
         .actions {
-            @extend box-right;
+            @include box-right;
 
             li {
                 color: $lighter;
@@ -899,10 +903,6 @@ p.view-more {
 }
 
 /* Forms */
-.block-level {
-    display: block;
-    width: 100%;
-}
 .v1 form {
     padding: 1em 0;
 
@@ -925,7 +925,7 @@ p.view-more {
 
         label {
             padding: 1.5em 0 .25em;
-            @extend block-level;
+            @include block-level;
 
             .notation {
                 float: right;
@@ -935,7 +935,7 @@ p.view-more {
 
         input[type="text"], input[type="password"], textarea {
             border: 1px solid $faint;
-            @extend block-level;
+            @include block-level;
             @include border-radius(2px);
         }
 
@@ -945,7 +945,7 @@ p.view-more {
 
         input[type='file'] {
             padding: 0;
-            @extend block-level;
+            @include block-level;
         }
 
         select {
