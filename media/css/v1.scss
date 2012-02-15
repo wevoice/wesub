@@ -119,8 +119,6 @@ body {
     margin: 0 0 1em;
 }
 .v1 .button, .v1 .content button, .v1 .form-container button, .v1 .submit input {
-    @include border-radius(3px);
-    @include vertical-gradient(#136aa1, $usblue);
     background-color: $usblue;
     border: 1px solid #0c4a70;
     color: #fff;
@@ -131,42 +129,44 @@ body {
     text-align: center;
     text-decoration: none;
     text-shadow: 1px 1px 1px #0c4a70;
+    @include border-radius(3px);
+    @include vertical-gradient(#136aa1, $usblue);
 
     &:hover {
         @include vertical-gradient(#136aa1, #0c4061);
     }
     &.primary {
-        @include border-radius(4px);
         font-size: 1.25em;
         padding: 1em;
+        @include border-radius(4px);
     }
     &.reduced, &.cancel {
-        @include vertical-gradient(#fff, $fainter);
         border-color: $fainter;
         color: $normal;
         text-shadow: none;
+        @include vertical-gradient(#fff, $fainter);
 
         &:hover {
-            @include vertical-gradient($faintest, $fainter);
             border-color: $faint;
             color: $dark;
+            @include vertical-gradient($faintest, $fainter);
         }
     }
     &.delete {
-        @include vertical-gradient(#A11332, #7A0F26);
         border-color: #700C22;
         float: left;
         margin: 0 .5em 0 0;
         text-shadow: 1px 1px 1px #700C22;
+        @include vertical-gradient(#A11332, #7A0F26);
 
         &:hover {
             @include vertical-gradient(#A11332, #610c1e);
         }
     }
     &.save {
-        @include vertical-gradient(#69A113, #4F7A0F);
         border-color: #4F7A0F;
         text-shadow: 1px 1px 1px #4F7A0F;
+        @include vertical-gradient(#69A113, #4F7A0F);
 
         &:hover {
             @include vertical-gradient(#69A113, #476e0d);
@@ -181,13 +181,13 @@ body {
     display: block;
 }
 .v1 .action-replacement {
-    @include border-radius(4px);
     background: $faintest;
     border: 1px solid $fainter;
     color: $normal;
     margin: 2em 0 1em;
     padding: 1.5em;
     text-align: center;
+    @include border-radius(4px);
 }
 .v1 .team-banner {
     margin-bottom: 2em;
@@ -199,11 +199,11 @@ body {
     padding: 2em 1em;
 }
 .v1 .view .action-call {
-    @include border-radius(3px);
     background-color: $fainter;
     clear: both;
     font-size: 1.25em;
     padding: 1em;
+    @include border-radius(3px);
 }
 .v1 .view {
     > div, > form {
@@ -211,10 +211,10 @@ body {
     }
 }
 .v1 ul .timestamp {
-    @extend box-right;
     color: $light;
     text-align: right;
     width: 150px;
+    @extend box-right;
 }
 div.hidden {
     display: none;
@@ -236,7 +236,6 @@ div.hidden {
         display: inline;
 
         a {
-            @include linear-gradient(bottom, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 15%, hsla(0, 0%, 98%, 1));
             border-right: 1px solid $fainter;
             border-top: 1px solid $fainter;
             color: $normal;
@@ -246,6 +245,7 @@ div.hidden {
             padding: 1em 1.5em;
             position: relative;
             text-decoration: none;
+            @include linear-gradient(bottom, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 15%, hsla(0, 0%, 98%, 1));
 
             &:hover {
                 @include linear-gradient(bottom, hsla(0, 0%, 91%, 1), hsla(0, 0%, 95%, 1) 15%, hsla(0, 0%, 95%, 1));
@@ -293,8 +293,8 @@ div.hidden {
         }
 
         &:first-child a {
-            @include border-radius(0);
             border-left: none;
+            @include border-radius(0);
         }
     }
 }
@@ -302,7 +302,6 @@ div.hidden {
 /* Tools */
 
 .v1 .view .tools {
-    @include linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
     border-bottom: 1px solid #e8ebed;
     clear: both;
     margin: 0 0 0 -10px;
@@ -310,6 +309,7 @@ div.hidden {
     padding: 1em 0 1em 1em;
     position: relative;
     text-align: right;
+    @include linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
 
     .button, button {
         background: transparent;
@@ -321,9 +321,9 @@ div.hidden {
         text-shadow: none;
 
         &:hover {
-            @include vertical-gradient($faintest, $fainter);
             border-color: $faint;
             color: $dark;
+            @include vertical-gradient($faintest, $fainter);
         }
     }
 
@@ -395,11 +395,11 @@ div.hidden {
 /* Listings */
 
 .v1 .view p.view-notice {
-    @include border-radius(3px);
     background-color: $faintest;
     clear: both;
     margin: 1.2em 1em 0 4px;
     padding: 1em;
+    @include border-radius(3px);
 
     a.clear-filters {
         float: right;
@@ -492,7 +492,6 @@ div.hidden {
             }
         }
         .descriptor {
-            @include border-radius(2px);
             background: $faintest;
             border: 1px solid $fainter;
             color: $light;
@@ -500,6 +499,7 @@ div.hidden {
             font-weight: normal;
             margin-left: 3px;
             padding: 1px 3px;
+            @include border-radius(2px);
 
             a, a:hover {
                 border: none;
@@ -509,19 +509,19 @@ div.hidden {
         }
 
         .admin-controls {
-            @include border-radius(2px);
-            @include opacity(0.6);
-            @include vertical-gradient($faintest, $fainter);
             border: 1px solid $lighter;
             bottom: 1em; right: 0;
             display: none;
             float: left;
             padding: 0;
             position: absolute;
+            @include border-radius(2px);
+            @include opacity(0.6);
+            @include vertical-gradient($faintest, $fainter);
 
             &.selected {
-                @include opacity(1.0);
                 display: block;
+                @include opacity(1.0);
             }
             li {
                 display: block;
@@ -538,8 +538,8 @@ div.hidden {
                     text-decoration: none;
 
                     &:hover {
-                        @include vertical-gradient($faintest, $faint);
                         color: $dark;
+                        @include vertical-gradient($faintest, $faint);
                     }
 
                     &.disabled {
@@ -573,13 +573,13 @@ div.hidden {
         }
 
         .assignee-choice {
-            @include border-radius(3px);
             background: $fainter;
             padding: 1em;
             position: absolute;
             top: 1em; right: 0;
             width: 160px;
             z-index: 90;
+            @include border-radius(3px);
 
             .chzn-container {
                 margin: 1em 0 0;
@@ -629,7 +629,6 @@ div.hidden {
     }
 
     .languages {
-        @include border-radius(3px);
         background: hsla(0%, 0%, 0%, .35);
         color: #eee;
         left: 17px;
@@ -639,15 +638,13 @@ div.hidden {
         text-shadow: 1px 1px 1px #444;
         top: 17px;
         width: auto;
+        @include border-radius(3px);
     }
     &:hover .languages {
         background: hsla(0%, 0%, 0%, .55);
     }
 
     .callout {
-        @include border-radius(3px);
-        @include box-shadow(-1px, 1px, 1px, hsla(0%, 0%, 0%, .35));
-        @include vertical-gradient($normal, $dark);
         color: #fff;
         display: block;
         padding: .75em;
@@ -656,6 +653,9 @@ div.hidden {
         text-indent: 0;
         text-shadow: 1px 1px 1px $dark;
         top: 0;
+        @include border-radius(3px);
+        @include box-shadow(-1px, 1px, 1px, hsla(0%, 0%, 0%, .35));
+        @include vertical-gradient($normal, $dark);
     }
 
     .admin-controls {
@@ -758,12 +758,12 @@ div.hidden {
         margin-top: 0;
 
         img {
-            @include border-radius(3px);
             border: 1px solid $fainter;
             float: left;
             height: 32px;
             margin-right: 9px;
             padding: 2px;
+            @include border-radius(3px);
         }
     }
 
@@ -819,12 +819,12 @@ p.view-more {
 /* Controls */
 
 .v1 .controls {
-    @include linear-gradient(left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
     background-color: #fff;
     border-left: 1px solid $fainter;
     padding-bottom: 4em;
     padding-left: 15px;
     width: 199px;
+    @include linear-gradient(left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
 
     ul {
         border-bottom: 1px solid $faintest;
@@ -841,16 +841,16 @@ p.view-more {
         }
 
         li a {
-            @include multi-border-radius(0, 5px, 5px, 0);
             color: $normal;
             display: block;
             padding: .75em 0 .75em 15px;
             position: relative;
             text-decoration: none;
+            @include multi-border-radius(0, 5px, 5px, 0);
 
             &:hover {
-                @include linear-gradient( left, hsla(192, 15%, 92%, 1), hsla(192, 15%, 96%, 1) 5%, hsla(192, 15%, 96%, 1));
                 background-color: #f9fafb;
+                @include linear-gradient( left, hsla(192, 15%, 92%, 1), hsla(192, 15%, 96%, 1) 5%, hsla(192, 15%, 96%, 1));
             }
 
             span {
@@ -861,13 +861,13 @@ p.view-more {
         }
 
         li.current a {
-            @include linear-gradient( left, hsla(192, 15%, 90%, 1), hsla(192, 15%, 94%, 1) 5%, hsla(192, 15%, 94%, 1));
             background-color: #edf1f2;
             color: $dark;
+            @include linear-gradient( left, hsla(192, 15%, 90%, 1), hsla(192, 15%, 94%, 1) 5%, hsla(192, 15%, 94%, 1));
 
             &:hover {
-                @include linear-gradient( left, hsla(192, 15%, 88%, 1), hsla(192, 15%, 92%, 1) 5%, hsla(192, 15%, 92%, 1));
                 background-color: #e8ecee;
+                @include linear-gradient( left, hsla(192, 15%, 88%, 1), hsla(192, 15%, 92%, 1) 5%, hsla(192, 15%, 92%, 1));
             }
 
             span {
@@ -933,8 +933,8 @@ p.view-more {
         }
 
         label {
-            @extend block-level;
             padding: 1.5em 0 .25em;
+            @extend block-level;
 
             .notation {
                 float: right;
@@ -943,9 +943,9 @@ p.view-more {
         }
 
         input[type="text"], input[type="password"], textarea {
+            border: 1px solid $faint;
             @extend block-level;
             @include border-radius(2px);
-            border: 1px solid $faint;
         }
 
         input[type='checkbox'] {
@@ -953,8 +953,8 @@ p.view-more {
         }
 
         input[type='file'] {
-            @extend block-level;
             padding: 0;
+            @extend block-level;
         }
 
         select {
@@ -973,11 +973,11 @@ p.view-more {
     }
 }
 .v1 .view form .preselected {
-    @include border-radius(3px);
     background: $fainter;
     margin: .5em 0;
     padding: 1em;
     position: relative;
+    @include border-radius(3px);
 
     p {
         float: none;
@@ -1010,9 +1010,9 @@ p.view-more {
     margin-top: -3em;
 
     fieldset {
-        @include border-radius(4px);
         background: $fainter;
         padding: 0 1em;
+        @include border-radius(4px);
 
         .button {
             margin-top: 2em;
@@ -1020,11 +1020,11 @@ p.view-more {
     }
 }
 .v1 .workflow {
-    @include border-radius(4px);
     background: $fainter;
     display: none;
     margin-top: -2em;
     padding: 0 1em;
+    @include border-radius(4px);
 
     fieldset {
         padding-bottom: 1.5em;
@@ -1074,7 +1074,6 @@ p.view-more {
             }
         }
         a.reset {
-            @include multi-border-radius(0, 2px, 2px, 0);
             background: transparent url('../images/form-reset-icon.png') 7px 7px no-repeat;
             color: #739AAE;
             height: 25px;
@@ -1085,6 +1084,7 @@ p.view-more {
             text-shadow: 0 1px 1px #FFF;
             top: 1px;
             width: 25px;
+            @include multi-border-radius(0, 2px, 2px, 0);
         }
     }
 }
@@ -1223,12 +1223,12 @@ body#teams div.edit-team-video form fieldset a {
     line-height: 1.75em;
 
     img {
-        @include border-radius(3px);
         border: 1px solid $fainter;
         float: left;
         height: 32px;
         margin-right: .5em;
         padding: 2px;
+        @include border-radius(3px);
     }
 }
 #profile.v1 .view .avatar img {
@@ -1371,13 +1371,13 @@ body#teams div.edit-team-video form fieldset a {
 }
 
 .v1 .context {
-    @include linear-gradient(right, hsla(0, 0%, 97%, 1), hsla(0, 0%, 100%, 1) 2%, hsla(0, 0%, 100%, 1));
     border-left: none;
     border-right: 1px solid $fainter;
     margin-right: 0;
     padding: 0 20px 0 0;
     width: 289px;
     word-wrap: break-word;
+    @include linear-gradient(right, hsla(0, 0%, 97%, 1), hsla(0, 0%, 100%, 1) 2%, hsla(0, 0%, 100%, 1));
 
     p.permalink {
         margin: -.5em 0 .5em;
@@ -1549,8 +1549,6 @@ ol.subtitles {
 /* Overrides */
 
 .v1 .sort_button {
-    @include border-radius(3px);
-    @include vertical-gradient(#fff, #eee);
     border-color: $fainter;
     cursor: pointer;
     float: none;
@@ -1558,6 +1556,8 @@ ol.subtitles {
     padding: 0;
     text-align: left;
     width: 170px;
+    @include border-radius(3px);
+    @include vertical-gradient(#fff, #eee);
 
     .sort_label {
         color: $normal;
@@ -1578,7 +1578,6 @@ ol.subtitles {
     }
 
     ul li a {
-        @include box-shadow(none);
         border-bottom: none;
         border-top: 1px solid $fainter;
         color: $normal;
@@ -1588,6 +1587,7 @@ ol.subtitles {
         padding: .5em;
         text-decoration: none;
         text-shadow: none;
+        @include box-shadow(none);
     }
 
     ul li a:hover {
@@ -1609,13 +1609,13 @@ ol.subtitles {
         }
 
         ul {
-            @include box-shadow(none);
-            @include multi-border-radius(0, 0, 3px, 3px);
-            @include vertical-gradient(#fff, $faintest);
             border-color: $fainter;
             border-top: none;
             left: -1px;
             top: 21px;
+            @include box-shadow(none);
+            @include multi-border-radius(0, 0, 3px, 3px);
+            @include vertical-gradient(#fff, $faintest);
         }
 
         .arrow {
@@ -1691,7 +1691,6 @@ ol.subtitles {
             z-index: 53;
         }
         &:before {
-            @include multi-border-radius(5px, 5px, 0, 0);
             background: #FFF;
             border-bottom: 1px solid #FFF;
             border: 1px solid #B9C3C8;
@@ -1703,6 +1702,7 @@ ol.subtitles {
             top: -5px;
             width: 100%;
             z-index: 51;
+            @include multi-border-radius(5px, 5px, 0, 0);
         }
     }
     div.chzn-container-active {
@@ -1786,13 +1786,13 @@ ol.subtitles {
 /* Metrics badge */
 
 .v1 .context .metrics {
-    @include border-radius(3px);
-    @include linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 97%, 1));
     border: 1px solid #eaeaea;
     color: #999;
     float: left;
     margin: 1em 0;
     width: 100%;
+    @include border-radius(3px);
+    @include linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 97%, 1));
 
     li {
         border-right: 1px solid #eaeaea;
@@ -1831,11 +1831,11 @@ ol.subtitles {
 /* Debug */
 pre.dump {
     code {
-        @include border-radius();
-        @include box-shadow(1px, 1px, 3px, rgba(0, 0, 0, .4));
         font-family: Consolas, Menlo, "Courier New", monospace;
         margin: 15px 0;
         padding: 18px 15px;
+        @include border-radius();
+        @include box-shadow(1px, 1px, 3px, rgba(0, 0, 0, .4));
     }
 }
 
