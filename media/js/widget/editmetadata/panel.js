@@ -95,6 +95,7 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     this.descriptionTranslationWidget_.setTranslation(description);
     this.titleTranslationWidget_.setTranslation(title);
 };
+
 unisubs.editmetadata.Panel.prototype.getRightPanel = function() {
    if (!this.rightPanel_) {
         this.rightPanel_ = this.createRightPanel_();
@@ -103,6 +104,7 @@ unisubs.editmetadata.Panel.prototype.getRightPanel = function() {
     return this.rightPanel_;
 
 }
+
 unisubs.editmetadata.Panel.prototype.disposeInternal = function() {
     unisubs.editmetadata.Panel.superClass_.disposeInternal.call(this);
     if (this.rightPanel_) {
@@ -131,7 +133,11 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
         'extraHelp' : []
         }
 
+    }else{
+        this.bodyInput_ = internalComponents['bodyInput'];
     }
+    
+
     return new unisubs.editmetadata.RightPanel(
         this.dialog_,
         this.serverModel_, internalComponents['helpContents'], internalComponents['extraHelp'], [], false, "Done?", 
@@ -139,3 +145,20 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
 
 
 };
+
+
+unisubs.editmetadata.Panel.prototype.getNotesContent_ = function(){
+    if (this.bodyInput_){
+        return  this.bodyInput_.value;
+    }
+    return null;
+}
+
+unisubs.editmetadata.Panel.prototype.setNotesContent_ = function(newContent){
+    if (this.bodyInput_){
+        this.bodyInput_.value = newContent;
+        return true;
+    }
+    return null;
+}
+

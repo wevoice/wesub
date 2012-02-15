@@ -101,6 +101,8 @@ unisubs.translate.TranslationPanel.prototype.createRightPanel_ = function(){
         ]
         }
 
+    }else{
+        this.bodyInput_ = internalComponents['bodyInput'];
     }
     
     return new unisubs.translate.TranslationRightPanel(
@@ -110,6 +112,21 @@ unisubs.translate.TranslationPanel.prototype.createRightPanel_ = function(){
 
 
 
+}
+
+unisubs.translate.TranslationPanel.prototype.getNotesContent_ = function(){
+    if (this.bodyInput_){
+        return  this.bodyInput_.value;
+    }
+    return null;
+}
+
+unisubs.translate.TranslationPanel.prototype.setNotesContent_ = function(newContent){
+    if (this.bodyInput_){
+        this.bodyInput_.value = newContent;
+        return true;
+    }
+    return null;
 }
 
 
