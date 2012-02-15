@@ -205,6 +205,7 @@ ol.subtitles li .quiet{position:absolute;top:1em;left:100px;color:#a0b2bd;}
 .v1 .bootstrap .modal .modal-body textarea{width:98%;height:auto;}
 .v1 .bootstrap .modal .modal-body ul.chzn-choices,.v1 .bootstrap .modal .modal-body ul.chzn-results{margin:0 !important;}
 .v1 .bootstrap .modal button{margin:0;}
+.v1 .bootstrap .modal a.pull-left{float:left;margin-left:0;}
 .v1 .context .metrics{float:left;width:100%;background-image:-webkit-linear-gradient(top, #f5f5f5, #fafafa 5%, #f7f7f7);background-image:-moz-linear-gradient(top, #f5f5f5, #fafafa 5%, #f7f7f7);background-image:-o-linear-gradient(top, #f5f5f5, #fafafa 5%, #f7f7f7);background-image:-ms-linear-gradient(top, #f5f5f5, #fafafa 5%, #f7f7f7);background-image:linear-gradient(top, #f5f5f5, #fafafa 5%, #f7f7f7);-webkit-background-clip:padding-box;-webkit-border-radius:3px;-moz-background-clip:padding-box;-moz-border-radius:3px;border-radius:3px;background-clip:padding-box;border:1px solid #eaeaea;color:#999;margin:1em 0;}.v1 .context .metrics li{width:24.7%;float:left;border-right:1px solid #eaeaea;padding:0;text-align:center;}.v1 .context .metrics li a,.v1 .context .metrics li div{color:#999;display:block;padding:.75em 0 .5em;}.v1 .context .metrics li a p,.v1 .context .metrics li div p{font-size:1.25em;margin:0;line-height:1em;text-shadow:1px -1px 1px #ffffff;}
 .v1 .context .metrics li a h4,.v1 .context .metrics li div h4{font-weight:normal;font-size:11px;padding-top:.25em;padding-bottom:0;}
 .v1 .context .metrics li a:hover{color:#35424A;}
