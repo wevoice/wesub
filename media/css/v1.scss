@@ -78,7 +78,6 @@ $normal: #678ca3;
 $usblue: #0f517a;
 
 /* General styles */
-
 body {
     overflow-y: scroll;
 }
@@ -221,7 +220,6 @@ div.hidden {
 }
 
 /* Tabs */
-
 .show-border {
     border-bottom-width: 2px;
     margin-bottom: -1px;
@@ -273,7 +271,6 @@ div.hidden {
         }
     }
 }
-
 .v1 .view .tabs {
     margin: 0 -10px;
 
@@ -300,7 +297,6 @@ div.hidden {
 }
 
 /* Tools */
-
 .v1 .view .tools {
     border-bottom: 1px solid #e8ebed;
     clear: both;
@@ -393,7 +389,6 @@ div.hidden {
 }
 
 /* Listings */
-
 .v1 .view p.view-notice {
     background-color: $faintest;
     clear: both;
@@ -405,7 +400,6 @@ div.hidden {
         float: right;
     }
 }
-
 .v1 .listing {
     clear: both;
     padding: 0;
@@ -801,7 +795,6 @@ div.hidden {
         color: $lighter;
     }
 }
-
 p.view-more {
     margin-top: 1em;
     text-align: center;
@@ -817,7 +810,6 @@ p.view-more {
 }
 
 /* Controls */
-
 .v1 .controls {
     background-color: #fff;
     border-left: 1px solid $fainter;
@@ -907,7 +899,6 @@ p.view-more {
 }
 
 /* Forms */
-
 .block-level {
     display: block;
     width: 100%;
@@ -985,7 +976,6 @@ p.view-more {
     }
 
 }
-
 .v1 .view form .preselected.video {
     min-height: 3em;
     padding-left: 75px;
@@ -997,7 +987,6 @@ p.view-more {
         top: 1em;
     }
 }
-
 .v1 .panel-holder form {
     clear: both;
     float: left;
@@ -1088,7 +1077,6 @@ p.view-more {
         }
     }
 }
-
 .v1 #comment-form fieldset {
     padding: 0;
 
@@ -1099,7 +1087,6 @@ p.view-more {
         width: 602px;
     }
 }
-
 #summary {
     background-image: -moz-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
     background-image: -ms-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
@@ -1153,7 +1140,6 @@ p.view-more {
     }
 
 }
-
 label[for="thumbnail-clear_id"] {
     display: inline !important;
 }
@@ -1171,7 +1157,6 @@ body#teams div.edit-team-video form fieldset a {
 }
 
 /* Dashboard */
-
 #dashboard {
 
     .featured {
@@ -1218,7 +1203,6 @@ body#teams div.edit-team-video form fieldset a {
 }
 
 /* Profile */
-
 #profile.v1 h2, #dashboard.v1 h2 {
     line-height: 1.75em;
 
@@ -1274,7 +1258,6 @@ body#teams div.edit-team-video form fieldset a {
 }
 
 /* Video view */
-
 .video_view {
 
     .view {
@@ -1369,7 +1352,6 @@ body#teams div.edit-team-video form fieldset a {
         }
     }
 }
-
 .v1 .context {
     border-left: none;
     border-right: 1px solid $fainter;
@@ -1508,7 +1490,6 @@ body#teams div.edit-team-video form fieldset a {
         }
     }
 }
-
 ol.subtitles {
     clear: both;
 
@@ -1547,7 +1528,6 @@ ol.subtitles {
 }
 
 /* Overrides */
-
 .v1 .sort_button {
     border-color: $fainter;
     cursor: pointer;
@@ -1623,7 +1603,6 @@ ol.subtitles {
         }
     }
 }
-
 #tender_window #tender_closer {
     color: #80B3CC;
 }
@@ -1637,7 +1616,6 @@ ol.subtitles {
         padding: 5px !important;
     }
 }
-
 .v1 .filters {
     p {
         height: 16px;
@@ -1717,7 +1695,6 @@ ol.subtitles {
         }
     }
 }
-
 .v1 .bootstrap .modal {
     .modal-header {
         h3 {
@@ -1782,9 +1759,7 @@ ol.subtitles {
     }
 }
 
-
 /* Metrics badge */
-
 .v1 .context .metrics {
     border: 1px solid #eaeaea;
     color: #999;
@@ -1839,9 +1814,7 @@ pre.dump {
     }
 }
 
-
-/******************** $Crazytown *****/
-
+/* Crazytown */
 #teams .backnav {
     color: $light; 
 
@@ -1849,7 +1822,6 @@ pre.dump {
         color: $darkest;
     }
 }
-
 #teams div.header {
     min-height: 0;
 
@@ -1861,7 +1833,6 @@ pre.dump {
         overflow: hidden;
     }
 }
-
 #teams .view .expandable {
     overflow: hidden;
 
@@ -1877,7 +1848,6 @@ pre.dump {
         }
     }
 }
-
 #teams .view .tools {
 
     p {
@@ -1889,7 +1859,6 @@ pre.dump {
     }
 
 }
-
 #teams .view .subnav {
     padding: 1em 0;
     text-align: left;
@@ -1909,12 +1878,10 @@ pre.dump {
         }
     }
 }
-
 #teams .view form.settings {
     margin-left: 1.5em;
     margin-right: 2.5em;
 }
-
 #teams div.join {
     clear: both;
     padding-top: 2em;
@@ -1923,7 +1890,6 @@ pre.dump {
     display: block;
     margin: 1em;
 }
-
 #teams .context .notation {
     clear: both;
     padding-top: 2em;
@@ -1932,7 +1898,6 @@ pre.dump {
     margin-bottom: 1em;
     padding-top: 0;
 }
-
 #teams .context #projects-list {
     h4 {
         padding: 1.5em 0 1em;
@@ -1951,7 +1916,6 @@ pre.dump {
         padding-left: .5em;
     }
 }
-
 #teams .view .tools {
 
     #sort-filter {
@@ -1987,7 +1951,6 @@ pre.dump {
         margin: 0;
     }
 }
-
 #teams .view .filters {
     background: -moz-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
     background: -ms-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
@@ -2012,7 +1975,6 @@ pre.dump {
         text-decoration: none;
     }
 }
-
 #teams .view .filters.active {
     display: block;
 }
