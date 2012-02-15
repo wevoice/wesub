@@ -162,7 +162,7 @@ class Rpc(BaseRpc):
 
     def _find_remote_autoplay_language(self, request):
         language = None
-        if request.user.is_anonymous() or request.user.preferred_language == '':
+        if not request.user.is_authenticated() or request.user.preferred_language == '':
             language = translation.get_language_from_request(request)
         else:
             language = request.user.preferred_language
