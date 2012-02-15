@@ -35,7 +35,13 @@ unisubs.editmetadata.RightPanel = function(dialog,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
     this.showSaveExit = false;
-    this.showDoneButton = true;
+    if (isReviewOrApproval){
+
+        this.showDoneButton = false;
+    }else{
+
+        this.showDoneButton = true;
+    }
     this.helpContents = helpContents;
     // TODO: See if there's a way to avoid the circular reference here.
     this.dialog_ = dialog;
@@ -77,6 +83,22 @@ unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function(
         });
     }
 };
+
+unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
+    this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
+    this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
+    this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Approve');
+
+    el.appendChild(this.sendBackButton_);
+    el.appendChild(this.saveForLaterButton_);
+    el.appendChild(this.approveButton_);
+
+    var handler = this.getHandler();
+    handler.listen(this.sendBackButton_, 'click', this.sendBackButtonClicked_);
+    handler.listen(this.saveForLaterButton_, 'click', this.saveForLaterButtonClicked_);
+    handler.listen(this.approveButton_, 'click', this.approveButtonClicked_);
+};
+
 
 
 unisubs.editmetadata.RightPanel.prototype.finish = function(approved) {
