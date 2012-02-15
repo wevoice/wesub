@@ -17,52 +17,52 @@
     box-shadow: inset $horizontal $vertical $blur $color;
 }
 @mixin multi-color-border($top, $sides, $bottom) {
-    border-top: 1px solid $top;
+    border-bottom: 1px solid $bottom;
     border-left: 1px solid $sides;
     border-right: 1px solid $sides;
-    border-bottom: 1px solid $bottom;
+    border-top: 1px solid $top;
 }
 @mixin multi-border-radius($topLeft: 5px, $topRight: 5px, $bottomRight: 5px, $bottomLeft: 5px) {
-    -webkit-border-top-left-radius: $topLeft;
-    -webkit-border-top-right-radius: $topRight;
-    -webkit-border-bottom-right-radius: $bottomRight;
-    -webkit-border-bottom-left-radius: $bottomLeft;
+    -moz-border-radius-bottomleft: $bottomLeft;
+    -moz-border-radius-bottomright: $bottomRight;
     -moz-border-radius-topleft: $topLeft;
     -moz-border-radius-topright: $topRight;
-    -moz-border-radius-bottomright: $bottomRight;
-    -moz-border-radius-bottomleft: $bottomLeft;
+    -webkit-border-bottom-left-radius: $bottomLeft;
+    -webkit-border-bottom-right-radius: $bottomRight;
+    -webkit-border-top-left-radius: $topLeft;
+    -webkit-border-top-right-radius: $topRight;
+    border-bottom-left-radius: $bottomLeft;
+    border-bottom-right-radius: $bottomRight;
     border-top-left-radius: $topLeft;
     border-top-right-radius: $topRight;
-    border-bottom-right-radius: $bottomRight;
-    border-bottom-left-radius: $bottomLeft;
 }
 @mixin vertical-gradient($start: #000, $stop: #FFF) {
     background-color: ($start + $stop) / 2;
-    background-image: -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
-    background-image: -webkit-linear-gradient($start, $stop);
-    background-image: -moz-linear-gradient(center top, $start 0%, $stop 100%);
     background-image: -moz-gradient(center top, $start 0%, $stop 100%);
+    background-image: -moz-linear-gradient(center top, $start 0%, $stop 100%);
     background-image: -ms-linear-gradient($start, $stop);
     background-image: -o-linear-gradient($start, $stop);
+    background-image: -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
+    background-image: -webkit-linear-gradient($start, $stop);
     background-image: linear-gradient($start, $stop);
 }
 @mixin vertical-gradient-with-image($image, $start: #000, $stop: #FFF) {
-    background: ($start + $stop) / 2 $image;
-    background: $image, -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
-    background: $image, -moz-linear-gradient(center top, $start 0%, $stop 100%);
     background: $image, -moz-gradient(center top, $start 0%, $stop 100%);
+    background: $image, -moz-linear-gradient(center top, $start 0%, $stop 100%);
+    background: $image, -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
+    background: ($start + $stop) / 2 $image;
 }
 @mixin linear-gradient($position, $first, $second, $third) {
-    background-image: -webkit-linear-gradient($position, $first, $second, $third);
     background-image: -moz-linear-gradient($position, $first, $second, $third);
-    background-image: -o-linear-gradient($position, $first, $second, $third);
     background-image: -ms-linear-gradient($position, $first, $second, $third);
+    background-image: -o-linear-gradient($position, $first, $second, $third);
+    background-image: -webkit-linear-gradient($position, $first, $second, $third);
     background-image: linear-gradient($position, $first, $second, $third);
 }
 @mixin opacity($op) {
-    filter: alpha(opacity=$op);
-    -moz-opacity: $op;
     -khtml-opacity: $op;
+    -moz-opacity: $op;
+    filter: alpha(opacity=$op);
     opacity: $op;
 }
 
@@ -83,17 +83,17 @@ body {
     overflow-y: scroll;
 }
 .group:after {
+    clear: both;
     content: ".";
     display: block;
     height: 0;
-    clear: both;
     visibility: hidden;
 }
 .box-right {
+    padding: 0;
     position: absolute;
     top: 2em; right: 0;
     width: 120px;
-    padding: 0;
 }
 .v1 {
     color: $darkest;
@@ -111,40 +111,40 @@ body {
     margin: 1em 0 2em;
 }
 .v1 .notation {
-    font-size: .95em;
     color: $light;
+    font-size: .95em;
 }
 .v1 .view .grid_4 p.notation {
     float: none;
     margin: 0 0 1em;
 }
 .v1 .button, .v1 .content button, .v1 .form-container button, .v1 .submit input {
+    @include border-radius(3px);
+    @include vertical-gradient(#136aa1, $usblue);
+    background-color: $usblue;
+    border: 1px solid #0c4a70;
+    color: #fff;
+    cursor: pointer;
+    font-size: inherit;
     margin: 1em 0;
     padding: .5em;
-    @include border-radius(3px);
-    font-size: inherit;
-    background-color: $usblue;
-    @include vertical-gradient(#136aa1, $usblue);
-    border: 1px solid #0c4a70;
-    text-shadow: 1px 1px 1px #0c4a70;
-    text-decoration: none;
     text-align: center;
-    cursor: pointer;
-    color: #fff;
+    text-decoration: none;
+    text-shadow: 1px 1px 1px #0c4a70;
 
     &:hover {
         @include vertical-gradient(#136aa1, #0c4061);
     }
     &.primary {
+        @include border-radius(4px);
         font-size: 1.25em;
         padding: 1em;
-        @include border-radius(4px);
     }
     &.reduced, &.cancel {
-        border-color: $fainter;
         @include vertical-gradient(#fff, $fainter);
-        text-shadow: none;
+        border-color: $fainter;
         color: $normal;
+        text-shadow: none;
 
         &:hover {
             @include vertical-gradient($faintest, $fainter);
@@ -153,10 +153,10 @@ body {
         }
     }
     &.delete {
-        float: left;
-        margin: 0 .5em 0 0;
         @include vertical-gradient(#A11332, #7A0F26);
         border-color: #700C22;
+        float: left;
+        margin: 0 .5em 0 0;
         text-shadow: 1px 1px 1px #700C22;
 
         &:hover {
@@ -181,29 +181,29 @@ body {
     display: block;
 }
 .v1 .action-replacement {
-    padding: 1.5em;
-    margin: 2em 0 1em;
-    background: $faintest;
     @include border-radius(4px);
-    color: $normal;
-    text-align: center;
+    background: $faintest;
     border: 1px solid $fainter;
+    color: $normal;
+    margin: 2em 0 1em;
+    padding: 1.5em;
+    text-align: center;
 }
 .v1 .team-banner {
     margin-bottom: 2em;
 }
 .v1 .view .empty {
     clear: both;
-    padding: 2em 1em;
-    font-size: 18px;
     color: $normal;
+    font-size: 18px;
+    padding: 2em 1em;
 }
 .v1 .view .action-call {
-    clear: both;
-    padding: 1em;
-    font-size: 1.25em;
     @include border-radius(3px);
     background-color: $fainter;
+    clear: both;
+    font-size: 1.25em;
+    padding: 1em;
 }
 .v1 .view {
     > div, > form {
@@ -212,9 +212,9 @@ body {
 }
 .v1 ul .timestamp {
     @extend box-right;
-    width: 150px;
-    text-align: right;
     color: $light;
+    text-align: right;
+    width: 150px;
 }
 div.hidden {
     display: none;
@@ -227,25 +227,25 @@ div.hidden {
     margin-bottom: -1px;
 }
 .v1 .tabs  {
-    float: left;
-    width: 100%;
     border-bottom: 1px solid $fainter;
+    float: left;
     padding: 0 10px 0 0;
+    width: 100%;
 
     li {
         display: inline;
 
         a {
-            position: relative;
+            @include linear-gradient(bottom, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 15%, hsla(0, 0%, 98%, 1));
+            border-right: 1px solid $fainter;
+            border-top: 1px solid $fainter;
+            color: $normal;
             display: block;
             float: left;
             font-size: 13px;
             padding: 1em 1.5em;
+            position: relative;
             text-decoration: none;
-            border-right: 1px solid $fainter;
-            border-top: 1px solid $fainter;
-            color: $normal;
-            @include linear-gradient(bottom, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 15%, hsla(0, 0%, 98%, 1));
 
             &:hover {
                 @include linear-gradient(bottom, hsla(0, 0%, 91%, 1), hsla(0, 0%, 95%, 1) 15%, hsla(0, 0%, 95%, 1));
@@ -253,23 +253,23 @@ div.hidden {
         }
 
         &.current a {
-            border-bottom: 1px solid #fff;
-            margin-bottom: -1px;
-            color: inherit;
             background: #fff;
+            border-bottom: 1px solid #fff;
+            color: inherit;
+            margin-bottom: -1px;
         }
 
         &:last-child a {
-            -webkit-border-top-right-radius: 3px;
             -moz-border-radius-topright: 3px;
+            -webkit-border-top-right-radius: 3px;
             border-top-right-radius: 3px;
         }
 
         &:first-child a {
-            -webkit-border-top-left-radius: 3px;
             -moz-border-radius-topleft: 3px;
-            border-top-left-radius: 3px;
+            -webkit-border-top-left-radius: 3px;
             border-left: 1px solid $fainter;
+            border-top-left-radius: 3px;
         }
     }
 }
@@ -287,7 +287,8 @@ div.hidden {
                 font-size: 10px;
                 line-height: 1em;
                 position: absolute;
-                top: .75em; right: .75em;
+                right: .75em;
+                top: .75em;
             }
         }
 
@@ -301,38 +302,38 @@ div.hidden {
 /* Tools */
 
 .v1 .view .tools {
+    @include linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
+    border-bottom: 1px solid #e8ebed;
     clear: both;
-    position: relative;
-    padding: 1em 0 1em 1em;
     margin: 0 0 0 -10px;
     min-height: 18px;
-    border-bottom: 1px solid #e8ebed;
+    padding: 1em 0 1em 1em;
+    position: relative;
     text-align: right;
-    @include linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
 
     .button, button {
-        float: right;
         background: transparent;
         border: 1px solid transparent;
         color: $light;
-        text-shadow: none;
-        padding: .5em 1em;
+        float: right;
         margin: -.5em 0 0;
+        padding: .5em 1em;
+        text-shadow: none;
 
         &:hover {
-            border-color: $faint;
             @include vertical-gradient($faintest, $fainter);
+            border-color: $faint;
             color: $dark;
         }
     }
 
     h2 {
-        position: absolute;
-        top: 1em;
-        left: 1em;
+        color: inherit;
         display: inline;
         font-size: inherit;
-        color: inherit;
+        left: 1em;
+        position: absolute;
+        top: 1em;
     }
 
     form {
@@ -341,8 +342,8 @@ div.hidden {
 
     .filters {
         float: left;
-        padding: 0;
         margin: -.5em 0 0 -.5em;
+        padding: 0;
 
         > li {
             display: inline;
@@ -360,18 +361,18 @@ div.hidden {
     }
 
     form.search {
+        margin: 0;
+        padding: 0;
         position: absolute;
         top: .5em; left: .65em;
         width: 160px;
-        margin: 0;
-        padding: 0;
 
         fieldset {
             padding: 0;
 
             input {
-                float: left;
                 border-color: $fainter;
+                float: left;
 
                 &:focus {
                     border-color: $normal;
@@ -379,13 +380,13 @@ div.hidden {
             }
 
             a.reset {
-                display: block;
-                position: absolute;
-                top: 0; left: 152px;
-                text-decoration: none;
                 color: $light;
-                padding: .5em;
+                display: block;
                 line-height: 1.5em;
+                padding: .5em;
+                position: absolute;
+                text-decoration: none;
+                top: 0; left: 152px;
             }
         }
     }
@@ -394,11 +395,11 @@ div.hidden {
 /* Listings */
 
 .v1 .view p.view-notice {
+    @include border-radius(3px);
+    background-color: $faintest;
     clear: both;
     margin: 1.2em 1em 0 4px;
     padding: 1em;
-    @include border-radius(3px);
-    background-color: $faintest;
 
     a.clear-filters {
         float: right;
@@ -410,25 +411,25 @@ div.hidden {
     padding: 0;
 
     & > li {
-        position: relative;
-        padding: 2em 1em;
         border-bottom: 1px dotted $faint;
+        padding: 2em 1em;
+        position: relative;
 
         &.empty {
             border:none;
         }
         h3 {
-            position: relative;
             font-size: 13px;
-            padding-bottom: .25em;
             line-height: 1.5em;
+            padding-bottom: .25em;
+            position: relative;
 
             & > a {
                 text-decoration: none;
 
                 &:hover {
-                    border-width: 0 0 1px 0;
                     border-style: dotted;
+                    border-width: 0 0 1px 0;
                 }
             }
         }
@@ -460,9 +461,9 @@ div.hidden {
             @extend box-right;
 
             li {
+                color: $lighter;
                 padding: 0;
                 text-align: right;
-                color: $lighter;
 
                 h4 {
                     padding: .25em 0;
@@ -491,36 +492,36 @@ div.hidden {
             }
         }
         .descriptor {
-            font-size: 11px;
-            font-weight: normal;
-            padding: 1px 3px;
-            margin-left: 3px;
-            background: $faintest;
             @include border-radius(2px);
+            background: $faintest;
             border: 1px solid $fainter;
             color: $light;
+            font-size: 11px;
+            font-weight: normal;
+            margin-left: 3px;
+            padding: 1px 3px;
 
             a, a:hover {
                 border: none;
-                text-decoration: none;
                 color: $light;
+                text-decoration: none;
             }
         }
 
         .admin-controls {
+            @include border-radius(2px);
+            @include opacity(0.6);
+            @include vertical-gradient($faintest, $fainter);
             border: 1px solid $lighter;
-            display: none;
             bottom: 1em; right: 0;
+            display: none;
             float: left;
             padding: 0;
             position: absolute;
-            @include opacity(0.6);
-            @include border-radius(2px);
-            @include vertical-gradient($faintest, $fainter);
 
             &.selected {
-                display: block;
                 @include opacity(1.0);
+                display: block;
             }
             li {
                 display: block;
@@ -528,13 +529,13 @@ div.hidden {
                 padding: 0;
 
                 a {
+                    border-left: 1px solid $lighter;
+                    color: $normal;
+                    cursor: pointer;
                     display: block;
                     float: left;
                     padding: 5px 7px;
                     text-decoration: none;
-                    color: $normal;
-                    border-left: 1px solid $lighter;
-                    cursor: pointer;
 
                     &:hover {
                         @include vertical-gradient($faintest, $faint);
@@ -572,13 +573,13 @@ div.hidden {
         }
 
         .assignee-choice {
+            @include border-radius(3px);
+            background: $fainter;
+            padding: 1em;
             position: absolute;
             top: 1em; right: 0;
             width: 160px;
-            padding: 1em;
-            background: $fainter;
             z-index: 90;
-            @include border-radius(3px);
 
             .chzn-container {
                 margin: 1em 0 0;
@@ -589,8 +590,8 @@ div.hidden {
             }
 
             .cancel {
-                float: right;
                 color: $light;
+                float: right;
             }
         }
         .action-assign-submit {
@@ -599,27 +600,27 @@ div.hidden {
     }
 }
 .v1 .listing.videos > li {
+    border: none;
+    float: left;
+    padding: 10px 0;
     position: relative;
     width: 310px;
-    padding: 10px 0;
-    float: left;
-    border: none;
 
     h3 {
         clear: both;
-        margin: 6px 10px 10px;
         height: 2em;
+        margin: 6px 10px 10px;
     }
 
     .thumb {
-        position: relative;
-        top: 0;
         height: 180px;
         overflow: hidden;
+        position: relative;
+        top: 0;
 
         img {
-            width: 290px;
             margin: 10px 10px 0;
+            width: 290px;
         }
     }
 
@@ -628,41 +629,41 @@ div.hidden {
     }
 
     .languages {
-        position: absolute;
-        top: 17px;
-        left: 17px;
-        width: auto;
-        margin: 0;
-        padding: .5em .75em;
+        @include border-radius(3px);
         background: hsla(0%, 0%, 0%, .35);
         color: #eee;
+        left: 17px;
+        margin: 0;
+        padding: .5em .75em;
+        position: absolute;
         text-shadow: 1px 1px 1px #444;
-        @include border-radius(3px);
+        top: 17px;
+        width: auto;
     }
     &:hover .languages {
         background: hsla(0%, 0%, 0%, .55);
     }
 
     .callout {
-        display: block;
-        position: absolute;
-        top: 0;
-        right: 0;
-        padding: .75em;
         @include border-radius(3px);
-        text-indent: 0;
-        color: #fff;
-        @include vertical-gradient($normal, $dark);
-        text-shadow: 1px 1px 1px $dark;
         @include box-shadow(-1px, 1px, 1px, hsla(0%, 0%, 0%, .35));
+        @include vertical-gradient($normal, $dark);
+        color: #fff;
+        display: block;
+        padding: .75em;
+        position: absolute;
+        right: 0;
+        text-indent: 0;
+        text-shadow: 1px 1px 1px $dark;
+        top: 0;
     }
 
     .admin-controls {
-        right: 1em;
-        bottom: .6em;
-        border: none;
         background: hsla(0%, 0%, 0%, .55);
+        border: none;
+        bottom: .6em;
         opacity: 1;
+        right: 1em;
         text-shadow: 1px 1px 1px #444;
 
         a {
@@ -670,8 +671,8 @@ div.hidden {
             color: #eee;
 
             &:hover {
-                color: #fff;
                 background: transparent;
+                color: #fff;
                 text-decoration: underline;
             }
         }
@@ -686,8 +687,8 @@ div.hidden {
     padding-right: 150px;
 
     .thumb {
-        width: 45px;
         height: 45px;
+        width: 45px;
 
         img {
             height: 45px;
@@ -719,8 +720,8 @@ div.hidden {
     }
 }
 .v1 .listing.tasks > li {
-    padding-left: 110px;
     min-height: 6.5em;
+    padding-left: 110px;
 
     .done {
         span {
@@ -733,8 +734,8 @@ div.hidden {
         word-wrap: break-word;
 
         img {
-            max-width: 80px;
             margin-left: 10px;
+            max-width: 80px;
         }
     }
 
@@ -747,22 +748,22 @@ div.hidden {
     padding-right: 150px;
 }
 .v1 .view #comments-tab .listing.comments > li {
-    position: relative;
     padding: 1em 48px 2em;
+    position: relative;
 
     h3 {
-        margin-top: 0;
-        margin-left: -48px;
-        margin-bottom: 1em;
         line-height: 32px;
+        margin-bottom: 1em;
+        margin-left: -48px;
+        margin-top: 0;
 
         img {
-            float: left;
-            padding: 2px;
-            border: 1px solid $fainter;
             @include border-radius(3px);
+            border: 1px solid $fainter;
+            float: left;
             height: 32px;
             margin-right: 9px;
+            padding: 2px;
         }
     }
 
@@ -782,17 +783,17 @@ div.hidden {
     padding: 1em 1em 0;
 
     em {
-        box-shadow: none;
-        font-style: normal;
-        color: $lighter;
         background: transparent;
+        box-shadow: none;
+        color: $lighter;
+        font-style: normal;
     }
     a {
         color: $normal;
 
         &:hover {
-            box-shadow: none;
             background: $faint;
+            box-shadow: none;
             color: #fff;
         }
     }
@@ -806,8 +807,8 @@ p.view-more {
     text-align: center;
 
     a {
-        text-decoration: none;
         color: $light;
+        text-decoration: none;
 
         &:after {
             content: ' →';
@@ -818,17 +819,17 @@ p.view-more {
 /* Controls */
 
 .v1 .controls {
-    width: 199px;
-    padding-left: 15px;
-    padding-bottom: 4em;
-    border-left: 1px solid $fainter;
-    background-color: #fff;
     @include linear-gradient(left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
+    background-color: #fff;
+    border-left: 1px solid $fainter;
+    padding-bottom: 4em;
+    padding-left: 15px;
+    width: 199px;
 
     ul {
-        padding: 2em 0;
-        margin-left: -15px;
         border-bottom: 1px solid $faintest;
+        margin-left: -15px;
+        padding: 2em 0;
 
         &.secondary {
             margin-top: 0;
@@ -840,33 +841,33 @@ p.view-more {
         }
 
         li a {
-            position: relative;
+            @include multi-border-radius(0, 5px, 5px, 0);
+            color: $normal;
             display: block;
             padding: .75em 0 .75em 15px;
+            position: relative;
             text-decoration: none;
-            color: $normal;
-            @include multi-border-radius(0, 5px, 5px, 0);
 
             &:hover {
-                background-color: #f9fafb;
                 @include linear-gradient( left, hsla(192, 15%, 92%, 1), hsla(192, 15%, 96%, 1) 5%, hsla(192, 15%, 96%, 1));
+                background-color: #f9fafb;
             }
 
             span {
+                color: $lighter;
                 position: absolute;
                 top: .75em; right: .75em;
-                color: $lighter;
             }
         }
 
         li.current a {
-            background-color: #edf1f2;
             @include linear-gradient( left, hsla(192, 15%, 90%, 1), hsla(192, 15%, 94%, 1) 5%, hsla(192, 15%, 94%, 1));
+            background-color: #edf1f2;
             color: $dark;
 
             &:hover {
-                background-color: #e8ecee;
                 @include linear-gradient( left, hsla(192, 15%, 88%, 1), hsla(192, 15%, 92%, 1) 5%, hsla(192, 15%, 92%, 1));
+                background-color: #e8ecee;
             }
 
             span {
@@ -875,9 +876,9 @@ p.view-more {
         }
     }
     .refine {
-        padding: 1.5em 15px 1em;
-        margin: 0 0 2em -15px;
         border-bottom: 1px solid $faintest;
+        margin: 0 0 2em -15px;
+        padding: 1.5em 15px 1em;
 
         form {
             padding: 0 0 1em;
@@ -943,8 +944,8 @@ p.view-more {
 
         input[type="text"], input[type="password"], textarea {
             @extend block-level;
-            border: 1px solid $faint;
             @include border-radius(2px);
+            border: 1px solid $faint;
         }
 
         input[type='checkbox'] {
@@ -972,11 +973,11 @@ p.view-more {
     }
 }
 .v1 .view form .preselected {
-    position: relative;
-    padding: 1em;
-    margin: .5em 0;
-    background: $fainter;
     @include border-radius(3px);
+    background: $fainter;
+    margin: .5em 0;
+    padding: 1em;
+    position: relative;
 
     p {
         float: none;
@@ -986,21 +987,21 @@ p.view-more {
 }
 
 .v1 .view form .preselected.video {
-    padding-left: 75px;
     min-height: 3em;
+    padding-left: 75px;
 
     img {
-        position: absolute;
-        top: 1em;
         left: 1em;
         max-width: 50px;
+        position: absolute;
+        top: 1em;
     }
 }
 
 .v1 .panel-holder form {
+    clear: both;
     float: left;
     width: 100%;
-    clear: both;
 }
 .v1 .panel-holder .tools form {
     float: none;
@@ -1009,9 +1010,9 @@ p.view-more {
     margin-top: -3em;
 
     fieldset {
-        padding: 0 1em;
-        background: $fainter;
         @include border-radius(4px);
+        background: $fainter;
+        padding: 0 1em;
 
         .button {
             margin-top: 2em;
@@ -1019,11 +1020,11 @@ p.view-more {
     }
 }
 .v1 .workflow {
+    @include border-radius(4px);
+    background: $fainter;
     display: none;
     margin-top: -2em;
     padding: 0 1em;
-    background: $fainter;
-    @include border-radius(4px);
 
     fieldset {
         padding-bottom: 1.5em;
@@ -1040,10 +1041,10 @@ p.view-more {
     margin-left: 10px;
 }
 .v1 div.submit {
+    border-top: 1px solid $fainter;
     clear: both;
     margin: 2em 0 0;
     padding-top: 1em;
-    border-top: 1px solid $fainter;
     text-align: right;
 
     form {
@@ -1062,17 +1063,18 @@ p.view-more {
         position: relative;
 
         input {
-            width: 162px;
-            padding: .5em;
-            padding-right: 30px;
-            color: $lighter;
             border-color: $fainter;
+            color: $lighter;
+            padding-right: 30px;
+            padding: .5em;
+            width: 162px;
 
             &:focus {
                 border-color: $normal;
             }
         }
         a.reset {
+            @include multi-border-radius(0, 2px, 2px, 0);
             background: transparent url('../images/form-reset-icon.png') 7px 7px no-repeat;
             color: #739AAE;
             height: 25px;
@@ -1083,7 +1085,6 @@ p.view-more {
             text-shadow: 0 1px 1px #FFF;
             top: 1px;
             width: 25px;
-            @include multi-border-radius(0, 2px, 2px, 0);
         }
     }
 }
@@ -1100,32 +1101,32 @@ p.view-more {
 }
 
 #summary {
+    background-image: -moz-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    background-image: -ms-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    background-image: -o-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    background-image: -webkit-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    background-image: linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    border-bottom: 1px solid $fainter;
+    border-top: 1px solid $fainter;
     float: left;
-    width: 100%;
     margin: 0 0 2em;
     padding: 1.5em 0;
-    border-top: 1px solid $fainter;
-    border-bottom: 1px solid $fainter;
-    background-image: -webkit-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
-    background-image: -moz-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
-    background-image: -o-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
-    background-image: -ms-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
-    background-image: linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    width: 100%;
 
     h4 {
         margin: 0 20px 1em;
 
         em {
-            font-weight: normal;
             font-style: normal;
+            font-weight: normal;
         }
     }
 
     .grid_2 {
+        color: $normal;
+        margin: 0 20px;
         position: relative;
         width: 105px;
-        margin: 0 20px;
-        color: $normal;
 
         &.omega {
             margin-right: 0;
@@ -1142,7 +1143,8 @@ p.view-more {
         span {
             font-size: 1.5em;
             position: absolute;
-            top: 0; right: -1.5em;
+            top: 0;
+            right: -1.5em;
         }
     }
 
@@ -1173,13 +1175,13 @@ body#teams div.edit-team-video form fieldset a {
 #dashboard {
 
     .featured {
-        padding: 0;
         margin-bottom: 4em;
+        padding: 0;
 
         li {
             border-left: 4px solid $fainter;
-            padding: 1em;
             margin: .5em 0;
+            padding: 1em;
         }
     }
 
@@ -1192,8 +1194,8 @@ body#teams div.edit-team-video form fieldset a {
         }
 
         &.tasks li {
-            padding: 1em 0;
             min-height: 0;
+            padding: 1em 0;
 
             p {
                 margin-bottom: 0;
@@ -1210,9 +1212,9 @@ body#teams div.edit-team-video form fieldset a {
     }
 }
 .v1 .only-child h2 {
-    padding: .5em 0;
-    margin-bottom: 0;
     border-bottom: 1px solid $fainter;
+    margin-bottom: 0;
+    padding: .5em 0;
 }
 
 /* Profile */
@@ -1221,20 +1223,20 @@ body#teams div.edit-team-video form fieldset a {
     line-height: 1.75em;
 
     img {
-        float: left;
-        padding: 2px;
-        margin-right: .5em;
-        border: 1px solid $fainter;
         @include border-radius(3px);
+        border: 1px solid $fainter;
+        float: left;
         height: 32px;
+        margin-right: .5em;
+        padding: 2px;
     }
 }
 #profile.v1 .view .avatar img {
-    float: right;
-    margin-right: -60px;
-    margin-left: 1em;
-    padding: .5em;
     border: 1px solid $fainter;
+    float: right;
+    margin-left: 1em;
+    margin-right: -60px;
+    padding: .5em;
 }
 .v1 .view .grid_4 {
     p, ul {
@@ -1279,13 +1281,13 @@ body#teams div.edit-team-video form fieldset a {
         position: relative;
 
         p.view-notice {
-            padding-right: 0;
             margin: 1em 0;
+            padding-right: 0;
 
             a {
-                text-decoration: none;
-                color: inherit;
                 border-bottom: 1px dotted $dark;
+                color: inherit;
+                text-decoration: none;
             }
         }
 
@@ -1294,8 +1296,8 @@ body#teams div.edit-team-video form fieldset a {
         }
 
         video, object, .unisubs-widget span.unisubs-videoplayer {
-            width: 620px !important;
             height: 370px !important;
+            width: 620px !important;
         }
 
         #video-tab, #comments-tab {
@@ -1327,15 +1329,15 @@ body#teams div.edit-team-video form fieldset a {
         #video-tab .video-tools {
 
             h3 {
-                font-weight: normal;
-                padding: 1em 0 .5em;
-                margin: 0 0 .5em;
                 border-bottom: 1px solid $fainter;
+                font-weight: normal;
+                margin: 0 0 .5em;
+                padding: 1em 0 .5em;
             }
 
             ul {
-                padding: 0;
                 margin-bottom: 1em;
+                padding: 0;
             }
 
             p {
@@ -1349,14 +1351,14 @@ body#teams div.edit-team-video form fieldset a {
     }
 
     button.follow-button, button.follow-button:hover {
-        position: absolute;
-        top: 0; right: 0;
-        margin: 0;
-        border: none;
         background: transparent;
-        text-shadow: none;
+        border: none;
         color: $lighter;
+        margin: 0;
         padding: 1em;
+        position: absolute;
+        text-shadow: none;
+        top: 0; right: 0;
 
         &.follow:hover {
             color: #8ca367;
@@ -1369,35 +1371,35 @@ body#teams div.edit-team-video form fieldset a {
 }
 
 .v1 .context {
-    width: 289px;
-    padding: 0 20px 0 0;
-    margin-right: 0;
+    @include linear-gradient(right, hsla(0, 0%, 97%, 1), hsla(0, 0%, 100%, 1) 2%, hsla(0, 0%, 100%, 1));
     border-left: none;
     border-right: 1px solid $fainter;
-    @include linear-gradient(right, hsla(0, 0%, 97%, 1), hsla(0, 0%, 100%, 1) 2%, hsla(0, 0%, 100%, 1));
+    margin-right: 0;
+    padding: 0 20px 0 0;
+    width: 289px;
     word-wrap: break-word;
 
     p.permalink {
         margin: -.5em 0 .5em;
 
         a {
+            color: $faint;
             font-size: 11px;
             text-decoration: none;
-            color: $faint;
         }
     }
 
     .abbr {
-        position: relative;
         clear: both;
+        position: relative;
 
         .expand {
-            display: block;
-            padding: .5em 0;
-            margin-top: .5em;
-            text-align: center;
             border-top: 1px solid $faintest;
             color: $lighter;
+            display: block;
+            margin-top: .5em;
+            padding: .5em 0;
+            text-align: center;
             text-decoration: none;
         }
 
@@ -1417,8 +1419,8 @@ body#teams div.edit-team-video form fieldset a {
     }
 
     video, object, .unisubs-widget span.unisubs-videoplayer {
-        width: 289px !important;
         height: 173px !important;
+        width: 289px !important;
     }
 
     #description {
@@ -1447,17 +1449,17 @@ body#teams div.edit-team-video form fieldset a {
     }
 
     h3 {
-        clear: both;
-        padding: 2em 0 .5em;
-        margin-bottom: .5em;
         border-bottom: 1px solid $fainter;
+        clear: both;
+        margin-bottom: .5em;
+        padding: 2em 0 .5em;
 
         &.sub-title {
-            padding-top: 0;
-            margin-bottom: -.25em;
             border: none;
             color: $dark;
             line-height: 1.25em;
+            margin-bottom: -.25em;
+            padding-top: 0;
 
             a {
                 color: $dark;
@@ -1485,11 +1487,11 @@ body#teams div.edit-team-video form fieldset a {
             a {
                 display: block;
                 float: left;
-                text-indent: -9999em;
                 height: 22px;
-                width: 22px;
-                padding: .25em;
                 margin-right: .25em;
+                padding: .25em;
+                text-indent: -9999em;
+                width: 22px;
 
                 &.facebook {
                     background: url('../images/share_icons.png') no-repeat 5px 5px;
@@ -1511,10 +1513,10 @@ ol.subtitles {
     clear: both;
 
     li {
-        position: relative;
-        padding: 1em 1em 1em 120px;
-        margin-left: -10px;
         border-bottom: 1px solid $faintest;
+        margin-left: -10px;
+        padding: 1em 1em 1em 120px;
+        position: relative;
 
         &:hover {
             background-color: $faintest;
@@ -1536,10 +1538,10 @@ ol.subtitles {
         }
 
         .quiet {
+            color: $lighter;
+            left: 100px;
             position: absolute;
             top: 1em;
-            left: 100px;
-            color: $lighter;
         }
     }
 }
@@ -1547,23 +1549,23 @@ ol.subtitles {
 /* Overrides */
 
 .v1 .sort_button {
-    float: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    width: 170px;
-    border-color: $fainter;
     @include border-radius(3px);
-    text-align: left;
     @include vertical-gradient(#fff, #eee);
+    border-color: $fainter;
+    cursor: pointer;
+    float: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    width: 170px;
 
     .sort_label {
-        font-size: 11px;
-        padding: .5em;
-        font-weight: normal !important;
-        text-shadow: 0 1px 0px #fff;
-        display: block;
         color: $normal;
+        display: block;
+        font-size: 11px;
+        font-weight: normal !important;
+        padding: .5em;
+        text-shadow: 0 1px 0px #fff;
 
         &:hover {
             background: transparent;
@@ -1576,16 +1578,16 @@ ol.subtitles {
     }
 
     ul li a {
-        padding: .5em;
-        display: block;
-        text-decoration: none;
-        border-top: 1px solid $fainter;
+        @include box-shadow(none);
         border-bottom: none;
+        border-top: 1px solid $fainter;
+        color: $normal;
+        display: block;
         font-size: 11px;
         font-weight: normal;
+        padding: .5em;
+        text-decoration: none;
         text-shadow: none;
-        color: $normal;
-        @include box-shadow(none);
     }
 
     ul li a:hover {
@@ -1594,9 +1596,9 @@ ol.subtitles {
     }
 
     .arrow {
-        width: 20px;
-        height: 24px;
         background: url('../images/chosen-sprite.png') no-repeat 0 1px;
+        height: 24px;
+        width: 20px;
     }
 
     &:hover {
@@ -1607,13 +1609,13 @@ ol.subtitles {
         }
 
         ul {
-            top: 21px;
-            left: -1px;
+            @include box-shadow(none);
+            @include multi-border-radius(0, 0, 3px, 3px);
+            @include vertical-gradient(#fff, $faintest);
             border-color: $fainter;
             border-top: none;
-            @include box-shadow(none);
-            @include vertical-gradient(#fff, $faintest);
-            @include multi-border-radius(0, 0, 3px, 3px);
+            left: -1px;
+            top: 21px;
         }
 
         .arrow {
@@ -1638,8 +1640,8 @@ ol.subtitles {
 
 .v1 .filters {
     p {
-        line-height: 18px;
         height: 16px;
+        line-height: 18px;
         vertical-align: middle;
     }
     .chzn-container {
@@ -1659,13 +1661,13 @@ ol.subtitles {
     .chzn-container-active .chzn-single
     .chzn-container-single .chzn-single-with-drop,
     .chzn-container-single .chzn-single div {
-        border: none;
         background: transparent;
+        border: none;
     }
     .chzn-container-single .chzn-single {
-        padding: 0;
         height: 18px;
         line-height: 14px;
+        padding: 0;
     }
     .chzn-container-single .chzn-single {
 
@@ -1689,18 +1691,18 @@ ol.subtitles {
             z-index: 53;
         }
         &:before {
+            @include multi-border-radius(5px, 5px, 0, 0);
             background: #FFF;
-            border: 1px solid #B9C3C8;
             border-bottom: 1px solid #FFF;
+            border: 1px solid #B9C3C8;
             content: "";
             display: block;
-            left: -5px;
             height: 100%;
+            left: -5px;
             position: absolute;
             top: -5px;
             width: 100%;
             z-index: 51;
-            @include multi-border-radius(5px, 5px, 0, 0);
         }
     }
     div.chzn-container-active {
@@ -1729,8 +1731,8 @@ ol.subtitles {
         }
     }
     form {
-        padding: 0;
         margin: 0;
+        padding: 0;
 
         p {
             float: none;
@@ -1746,8 +1748,8 @@ ol.subtitles {
         }
 
         label.radio, label.checkbox {
-            padding: 0;
             display: block;
+            padding: 0;
             text-align: left;
             width: 100%;
 
@@ -1764,8 +1766,8 @@ ol.subtitles {
 
         }
         textarea {
-            width: 98%;
             height: auto;
+            width: 98%;
         }
         ul.chzn-choices, ul.chzn-results {
             margin: 0 !important;
@@ -1784,20 +1786,20 @@ ol.subtitles {
 /* Metrics badge */
 
 .v1 .context .metrics {
-    float: left;
-    width: 100%;
-    @include linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 97%, 1));
     @include border-radius(3px);
+    @include linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 97%, 1));
     border: 1px solid #eaeaea;
     color: #999;
+    float: left;
     margin: 1em 0;
+    width: 100%;
 
     li {
-        width: 24.7%;
-        float: left;
         border-right: 1px solid #eaeaea;
+        float: left;
         padding: 0;
         text-align: center;
+        width: 24.7%;
 
         a, div {
             color: #999;
@@ -1806,15 +1808,15 @@ ol.subtitles {
 
             p {
                 font-size: 1.25em;
-                margin: 0;
                 line-height: 1em;
+                margin: 0;
                 text-shadow: 1px -1px 1px #fff;
             }
             h4 {
-                font-weight: normal;
                 font-size: 11px;
-                padding-top: .25em;
+                font-weight: normal;
                 padding-bottom: 0;
+                padding-top: .25em;
             }
         }
         a:hover {
@@ -1829,11 +1831,11 @@ ol.subtitles {
 /* Debug */
 pre.dump {
     code {
+        @include border-radius();
+        @include box-shadow(1px, 1px, 3px, rgba(0, 0, 0, .4));
         font-family: Consolas, Menlo, "Courier New", monospace;
         margin: 15px 0;
         padding: 18px 15px;
-        @include border-radius();
-        @include box-shadow(1px, 1px, 3px, rgba(0, 0, 0, .4));
     }
 }
 
@@ -1853,9 +1855,9 @@ pre.dump {
 
     a.logo-image {
         display: block;
+        margin-bottom: 20px;
         max-height: 235px;
         max-width: 940px;
-        margin-bottom: 20px;
         overflow: hidden;
     }
 }
@@ -1866,12 +1868,12 @@ pre.dump {
     .button {
 
         span {
+            background: url('../images/chosen-sprite.png') no-repeat 0px -5px;
             display: block;
             float: right;
-            width: 16px;
             height: 1.5em;
-            background: url('../images/chosen-sprite.png') no-repeat 0px -5px;
             margin-left: 4px;
+            width: 16px;
         }
     }
 }
@@ -1889,17 +1891,17 @@ pre.dump {
 }
 
 #teams .view .subnav {
-    text-align: left;
     padding: 1em 0;
+    text-align: left;
 
     ul li {
         display: inline;
 
         a {
             color: $light;
-            text-decoration: none;
-            margin-right: 1em;
             line-height: 1.5em;
+            margin-right: 1em;
+            text-decoration: none;
         }
 
         &.current a {
@@ -1927,8 +1929,8 @@ pre.dump {
     padding-top: 2em;
 }
 #teams .context .notation.policy {
-    padding-top: 0;
     margin-bottom: 1em;
+    padding-top: 0;
 }
 
 #teams .context #projects-list {
@@ -1945,18 +1947,18 @@ pre.dump {
         }
     }
     .count {
-        padding-left: .5em;
         color: $lighter;
+        padding-left: .5em;
     }
 }
 
 #teams .view .tools {
 
     #sort-filter {
-        padding: .5em;
-        text-decoration: none;
         color: $normal;
         line-height: 1.5em;
+        padding: .5em;
+        text-decoration: none;
 
         &:hover {
             color: $darkest;
@@ -1971,8 +1973,8 @@ pre.dump {
         }
 
         span {
-            padding: 0 8px;
             background: url('../images/chosen-sprite.png') no-repeat 2px -4px;
+            padding: 0 8px;
         }
 
         span.open {
@@ -1981,33 +1983,33 @@ pre.dump {
     }
 
     .button {
-        margin: 0;
         float: none;
+        margin: 0;
     }
 }
 
 #teams .view .filters {
-    display: none;
-    text-align: center;
-    padding: 1em;
-    margin-left: -10px;
-    margin-bottom: 1em;
-    border-bottom: 1px solid #e8ebed;
     background: -moz-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
-    background: -webkit-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0, hsla(0%, 0%, 95%, 1)), color-stop(0.25, hsla(0%, 0%, 98%, 1)), color-stop(0.75, #f5f5f5), color-stop(1, hsla(0%, 0%, 95%, 1)));
-    background: -o-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
     background: -ms-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -o-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0, hsla(0%, 0%, 95%, 1)), color-stop(0.25, hsla(0%, 0%, 98%, 1)), color-stop(0.75, #f5f5f5), color-stop(1, hsla(0%, 0%, 95%, 1)));
+    background: -webkit-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
     background: linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    border-bottom: 1px solid #e8ebed;
+    display: none;
+    margin-bottom: 1em;
+    margin-left: -10px;
+    padding: 1em;
+    text-align: center;
 
     .chzn-container {
         width: auto !important;
     }
 
     a.clear-filters {
+        color: $light;
         float: right;
         text-decoration: none;
-        color: $light;
     }
 }
 
