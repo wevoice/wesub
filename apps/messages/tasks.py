@@ -417,7 +417,11 @@ def approved_notification(task_pk, published=False):
                 pk=task_pk)
     except Task.DoesNotExist:
         return False
-    
+    # some tasks are being created without subtitles version, see
+    # https://unisubs.sifterapp.com/projects/12298/issues/552092/comments
+    if not task.subtitle_version:
+        return False
+
     if published:
         subject = ugettext(u"Your subtitles have been approved and published!")
         template_txt = "messages/team-task-approved-published.txt"

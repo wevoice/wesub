@@ -13,8 +13,9 @@ jQuery(document).ready(function($){
             closeModal($target);
         });
     });
-    $('.modal-header .close', '.bootstrap').click(function(){
+    $('.action-close, .close', '.bootstrap').click(function(){
         closeModal($(this).parents('.modal'));
+        return false;
     });
 
     function closeModal(e) { 

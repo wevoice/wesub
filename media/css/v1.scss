@@ -1,102 +1,105 @@
-.border-radius(@radius: 5px) {
-    -webkit-background-clip: padding-box;
-    -webkit-border-radius: @radius;
+@mixin border-radius($radius: 5px) {
     -moz-background-clip: padding-box;
-    -moz-border-radius: @radius;
-    border-radius: @radius;
+    -moz-border-radius: $radius;
+    -webkit-background-clip: padding-box;
+    -webkit-border-radius: $radius;
     background-clip: padding-box;
+    border-radius: $radius;
 }
-.box-shadow(@horizontal: 0px, @vertical: 1px, @blur: 2px, @color: #CCC) {
-  -webkit-box-shadow: @horizontal @vertical @blur @color;
-  -moz-box-shadow: @horizontal @vertical @blur @color;
-  box-shadow: @horizontal @vertical @blur @color;
+@mixin box-shadow($horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
+    -moz-box-shadow: $horizontal $vertical $blur $color;
+    -webkit-box-shadow: $horizontal $vertical $blur $color;
+    box-shadow: $horizontal $vertical $blur $color;
 }
-.inset-box-shadow(@horizontal: 0px, @vertical: 1px, @blur: 2px, @color: #CCC) {
-  -webkit-box-shadow: inset @horizontal @vertical @blur @color;
-  -moz-box-shadow: inset @horizontal @vertical @blur @color;
-  box-shadow: inset @horizontal @vertical @blur @color;
+@mixin inset-box-shadow($horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
+    -moz-box-shadow: inset $horizontal $vertical $blur $color;
+    -webkit-box-shadow: inset $horizontal $vertical $blur $color;
+    box-shadow: inset $horizontal $vertical $blur $color;
 }
-.multi-color-border(@top, @sides, @bottom) {
-    border-top: 1px solid @top;
-    border-left: 1px solid @sides;
-    border-right: 1px solid @sides;
-    border-bottom: 1px solid @bottom;
+@mixin multi-color-border($top, $sides, $bottom) {
+    border-bottom: 1px solid $bottom;
+    border-left: 1px solid $sides;
+    border-right: 1px solid $sides;
+    border-top: 1px solid $top;
 }
-.multi-border-radius(@topLeft: 5px, @topRight: 5px, @bottomRight: 5px, @bottomLeft: 5px) {
-    -webkit-border-top-left-radius: @topLeft;
-    -webkit-border-top-right-radius: @topRight;
-    -webkit-border-bottom-right-radius: @bottomRight;
-    -webkit-border-bottom-left-radius: @bottomLeft;
-    -moz-border-radius-topleft: @topLeft;
-    -moz-border-radius-topright: @topRight;
-    -moz-border-radius-bottomright: @bottomRight;
-    -moz-border-radius-bottomleft: @bottomLeft;
-    border-top-left-radius: @topLeft;
-    border-top-right-radius: @topRight;
-    border-bottom-right-radius: @bottomRight;
-    border-bottom-left-radius: @bottomLeft;
+@mixin multi-border-radius($topLeft: 5px, $topRight: 5px, $bottomRight: 5px, $bottomLeft: 5px) {
+    -moz-border-radius-bottomleft: $bottomLeft;
+    -moz-border-radius-bottomright: $bottomRight;
+    -moz-border-radius-topleft: $topLeft;
+    -moz-border-radius-topright: $topRight;
+    -webkit-border-bottom-left-radius: $bottomLeft;
+    -webkit-border-bottom-right-radius: $bottomRight;
+    -webkit-border-top-left-radius: $topLeft;
+    -webkit-border-top-right-radius: $topRight;
+    border-bottom-left-radius: $bottomLeft;
+    border-bottom-right-radius: $bottomRight;
+    border-top-left-radius: $topLeft;
+    border-top-right-radius: $topRight;
 }
-.vertical-gradient(@start: #000, @stop: #FFF) {
-    background-color: (@start + @stop) / 2;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(@start), to(@stop));
-    background-image: -webkit-linear-gradient(@start, @stop);
-    background-image: -moz-linear-gradient(center top, @start 0%, @stop 100%);
-    background-image: -moz-gradient(center top, @start 0%, @stop 100%);
-    background-image: -ms-linear-gradient(@start, @stop);
-    background-image: -o-linear-gradient(@start, @stop);
-    background-image: linear-gradient(@start, @stop);
+@mixin vertical-gradient($start: #000, $stop: #FFF) {
+    background-color: ($start + $stop) / 2;
+    background-image: -moz-gradient(center top, $start 0%, $stop 100%);
+    background-image: -moz-linear-gradient(center top, $start 0%, $stop 100%);
+    background-image: -ms-linear-gradient($start, $stop);
+    background-image: -o-linear-gradient($start, $stop);
+    background-image: -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
+    background-image: -webkit-linear-gradient($start, $stop);
+    background-image: linear-gradient($start, $stop);
 }
-.vertical-gradient-with-image(@start: #000, @stop: #FFF, @image) {
-    background: (@start + @stop) / 2 @image;
-    background: @image, -webkit-gradient(linear, left top, left bottom, from(@start), to(@stop));
-    background: @image, -moz-linear-gradient(center top, @start 0%, @stop 100%);
-    background: @image, -moz-gradient(center top, @start 0%, @stop 100%);
+@mixin vertical-gradient-with-image($image, $start: #000, $stop: #FFF) {
+    background: $image, -moz-gradient(center top, $start 0%, $stop 100%);
+    background: $image, -moz-linear-gradient(center top, $start 0%, $stop 100%);
+    background: $image, -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
+    background: ($start + $stop) / 2 $image;
 }
-.linear-gradient(@position, @first, @second, @third) {
-    background-image: -webkit-linear-gradient(@position, @first, @second, @third);
-    background-image: -moz-linear-gradient(@position, @first, @second, @third);
-    background-image: -o-linear-gradient(@position, @first, @second, @third);
-    background-image: -ms-linear-gradient(@position, @first, @second, @third);
-    background-image: linear-gradient(@position, @first, @second, @third);
+@mixin linear-gradient($position, $first, $second, $third) {
+    background-image: -moz-linear-gradient($position, $first, $second, $third);
+    background-image: -ms-linear-gradient($position, $first, $second, $third);
+    background-image: -o-linear-gradient($position, $first, $second, $third);
+    background-image: -webkit-linear-gradient($position, $first, $second, $third);
+    background-image: linear-gradient($position, $first, $second, $third);
 }
-.opacity(@op) {
-    filter: alpha(opacity=@op);
-    -moz-opacity: @op;
-    -khtml-opacity: @op;
-    opacity: @op;
+@mixin opacity($op) {
+    -khtml-opacity: $op;
+    -moz-opacity: $op;
+    filter: alpha(opacity=$op);
+    opacity: $op;
+}
+@mixin box-right {
+    padding: 0;
+    position: absolute;
+    top: 2em; right: 0;
+    width: 120px;
+}
+@mixin block-level {
+    display: block;
+    width: 100%;
 }
 
-@usblue: #0f517a;
-@faintest: #f3f6f8;
-@fainter: #dce2e5;
-@faint: #b7c3c9;
-@lighter: #a0b2bd;
-@light: #7692a3;
-@normal: #678ca3;
-@dark: #486f87;
-@darker: #3e6782;
-@darkest: #2f3c45;
+$dark: #486f87;
+$darker: #3e6782;
+$darkest: #2f3c45;
+$faint: #b7c3c9;
+$fainter: #dce2e5;
+$faintest: #f3f6f8;
+$light: #7692a3;
+$lighter: #a0b2bd;
+$normal: #678ca3;
+$usblue: #0f517a;
 
 /* General styles */
-
 body {
     overflow-y: scroll;
 }
 .group:after {
+    clear: both;
     content: ".";
     display: block;
     height: 0;
-    clear: both;
     visibility: hidden;
 }
-.box-right {
-    position: absolute;
-    top: 2em; right: 0;
-    width: 120px;
-    padding: 0;
-}
 .v1 {
-    color: @darkest;
+    color: $darkest;
 
     em {
         font-style: italic;
@@ -111,65 +114,65 @@ body {
     margin: 1em 0 2em;
 }
 .v1 .notation {
-  font-size: .95em;
-  color: @light;
+    color: $light;
+    font-size: .95em;
 }
 .v1 .view .grid_4 p.notation {
-    margin: 0 0 1em;
     float: none;
+    margin: 0 0 1em;
 }
 .v1 .button, .v1 .content button, .v1 .form-container button, .v1 .submit input {
+    background-color: $usblue;
+    border: 1px solid #0c4a70;
+    color: #fff;
+    cursor: pointer;
+    font-size: inherit;
     margin: 1em 0;
     padding: .5em;
-    .border-radius(3px);
-    font-size: inherit;
-    background-color: @usblue;
-    .vertical-gradient(#136aa1, @usblue);
-    border: 1px solid #0c4a70;
-    text-shadow: 1px 1px 1px #0c4a70;
-    text-decoration: none;
     text-align: center;
-    cursor: pointer;
-    color: #fff;
+    text-decoration: none;
+    text-shadow: 1px 1px 1px #0c4a70;
+    @include border-radius(3px);
+    @include vertical-gradient(#136aa1, $usblue);
 
     &:hover {
-        .vertical-gradient(#136aa1, #0c4061);
+        @include vertical-gradient(#136aa1, #0c4061);
     }
     &.primary {
         font-size: 1.25em;
         padding: 1em;
-        .border-radius(4px);
+        @include border-radius(4px);
     }
     &.reduced, &.cancel {
-        border-color: @fainter;
-        .vertical-gradient(#fff, @fainter);
+        border-color: $fainter;
+        color: $normal;
         text-shadow: none;
-        color: @normal;
+        @include vertical-gradient(#fff, $fainter);
 
         &:hover {
-            .vertical-gradient(@faintest, @fainter);
-            border-color: @faint;
-            color: @dark;
+            border-color: $faint;
+            color: $dark;
+            @include vertical-gradient($faintest, $fainter);
         }
     }
     &.delete {
+        border-color: #700C22;
         float: left;
         margin: 0 .5em 0 0;
-        .vertical-gradient(#A11332, #7A0F26);
-        border-color: #700C22;
         text-shadow: 1px 1px 1px #700C22;
+        @include vertical-gradient(#A11332, #7A0F26);
 
         &:hover {
-            .vertical-gradient(#A11332, #610c1e);
+            @include vertical-gradient(#A11332, #610c1e);
         }
     }
     &.save {
-        .vertical-gradient(#69A113, #4F7A0F);
         border-color: #4F7A0F;
         text-shadow: 1px 1px 1px #4F7A0F;
+        @include vertical-gradient(#69A113, #4F7A0F);
 
         &:hover {
-            .vertical-gradient(#69A113, #476e0d);
+            @include vertical-gradient(#69A113, #476e0d);
         }
     }
     &.cancel {
@@ -181,29 +184,29 @@ body {
     display: block;
 }
 .v1 .action-replacement {
-    padding: 1.5em;
+    background: $faintest;
+    border: 1px solid $fainter;
+    color: $normal;
     margin: 2em 0 1em;
-    background: @faintest;
-    .border-radius(4px);
-    color: @normal;
+    padding: 1.5em;
     text-align: center;
-    border: 1px solid @fainter;
+    @include border-radius(4px);
 }
 .v1 .team-banner {
     margin-bottom: 2em;
 }
 .v1 .view .empty {
     clear: both;
-    padding: 2em 1em;
+    color: $normal;
     font-size: 18px;
-    color: @normal;
+    padding: 2em 1em;
 }
 .v1 .view .action-call {
+    background-color: $fainter;
     clear: both;
-    padding: 1em;
     font-size: 1.25em;
-    .border-radius(3px);
-    background-color: @fainter;
+    padding: 1em;
+    @include border-radius(3px);
 }
 .v1 .view {
     > div, > form {
@@ -211,69 +214,67 @@ body {
     }
 }
 .v1 ul .timestamp {
-    .box-right;
-    width: 150px;
+    color: $light;
     text-align: right;
-    color: @light;
+    width: 150px;
+    @include box-right;
 }
 div.hidden {
     display: none;
 }
 
 /* Tabs */
-
 .show-border {
     border-bottom-width: 2px;
     margin-bottom: -1px;
 }
 .v1 .tabs  {
+    border-bottom: 1px solid $fainter;
     float: left;
-    width: 100%;
-    border-bottom: 1px solid @fainter;
     padding: 0 10px 0 0;
+    width: 100%;
 
     li {
         display: inline;
 
         a {
-            position: relative;
+            border-right: 1px solid $fainter;
+            border-top: 1px solid $fainter;
+            color: $normal;
             display: block;
             float: left;
             font-size: 13px;
             padding: 1em 1.5em;
+            position: relative;
             text-decoration: none;
-            border-right: 1px solid @fainter;
-            border-top: 1px solid @fainter;
-            color: @normal;
-            .linear-gradient(bottom, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 15%, hsla(0, 0%, 98%, 1));
+            @include linear-gradient(bottom, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 15%, hsla(0, 0%, 98%, 1));
 
             &:hover {
-                .linear-gradient(bottom, hsla(0, 0%, 91%, 1), hsla(0, 0%, 95%, 1) 15%, hsla(0, 0%, 95%, 1));
+                @include linear-gradient(bottom, hsla(0, 0%, 91%, 1), hsla(0, 0%, 95%, 1) 15%, hsla(0, 0%, 95%, 1));
             }
         }
 
         &.current a {
-            border-bottom: 1px solid #fff;
-            margin-bottom: -1px;
-            color: inherit;
             background: #fff;
+            border-bottom: 1px solid #fff;
+            color: inherit;
+            margin-bottom: -1px;
         }
 
         &:last-child a {
-            -webkit-border-top-right-radius: 3px;
             -moz-border-radius-topright: 3px;
+            -webkit-border-top-right-radius: 3px;
             border-top-right-radius: 3px;
         }
 
         &:first-child a {
-            -webkit-border-top-left-radius: 3px;
             -moz-border-radius-topleft: 3px;
+            -webkit-border-top-left-radius: 3px;
+            border-left: 1px solid $fainter;
             border-top-left-radius: 3px;
-            border-left: 1px solid @fainter;
         }
     }
 }
-
 .v1 .view .tabs {
     margin: 0 -10px;
 
@@ -283,56 +284,56 @@ div.hidden {
             padding-right: 2em;
 
             span {
-                color: @lighter;
+                color: $lighter;
                 font-size: 10px;
                 line-height: 1em;
                 position: absolute;
-                top: .75em; right: .75em;
+                right: .75em;
+                top: .75em;
             }
         }
 
         &:first-child a {
-            .border-radius(0);
             border-left: none;
+            @include border-radius(0);
         }
     }
 }
 
 /* Tools */
-
 .v1 .view .tools {
+    border-bottom: 1px solid #e8ebed;
     clear: both;
-    position: relative;
-    padding: 1em 0 1em 1em;
     margin: 0 0 0 -10px;
     min-height: 18px;
-    border-bottom: 1px solid #e8ebed;
+    padding: 1em 0 1em 1em;
+    position: relative;
     text-align: right;
-    .linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
+    @include linear-gradient( bottom, hsla(0, 0%, 98%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
 
     .button, button {
-        float: right;
         background: transparent;
         border: 1px solid transparent;
-        color: @light;
-        text-shadow: none;
-        padding: .5em 1em;
+        color: $light;
+        float: right;
         margin: -.5em 0 0;
+        padding: .5em 1em;
+        text-shadow: none;
 
         &:hover {
-            border-color: @faint;
-            .vertical-gradient(@faintest, @fainter);
-            color: @dark;
+            border-color: $faint;
+            color: $dark;
+            @include vertical-gradient($faintest, $fainter);
         }
     }
 
     h2 {
-        position: absolute;
-        top: 1em;
-        left: 1em;
+        color: inherit;
         display: inline;
         font-size: inherit;
-        color: inherit;
+        left: 1em;
+        position: absolute;
+        top: 1em;
     }
 
     form {
@@ -341,8 +342,8 @@ div.hidden {
 
     .filters {
         float: left;
-        padding: 0;
         margin: -.5em 0 0 -.5em;
+        padding: 0;
 
         > li {
             display: inline;
@@ -360,75 +361,73 @@ div.hidden {
     }
 
     form.search {
+        margin: 0;
+        padding: 0;
         position: absolute;
         top: .5em; left: .65em;
         width: 160px;
-        margin: 0;
-        padding: 0;
 
         fieldset {
             padding: 0;
-            
+
             input {
+                border-color: $fainter;
                 float: left;
-                border-color: @fainter;
 
                 &:focus {
-                    border-color: @normal;
+                    border-color: $normal;
                 }
             }
 
             a.reset {
+                color: $light;
                 display: block;
-                position: absolute;
-                top: 0; left: 152px;
-                text-decoration: none;
-                color: @light;
-                padding: .5em;
                 line-height: 1.5em;
+                padding: .5em;
+                position: absolute;
+                text-decoration: none;
+                top: 0; left: 152px;
             }
         }
     }
 }
 
 /* Listings */
-
 .v1 .view p.view-notice {
+    background-color: $faintest;
     clear: both;
     margin: 1.2em 1em 0 4px;
     padding: 1em;
-    .border-radius(3px);
-    background-color: @faintest;
+    @include border-radius(3px);
 
     a.clear-filters {
         float: right;
     }
 }
-
 .v1 .listing {
     clear: both;
     padding: 0;
 
     & > li {
-        position: relative;
+        border-bottom: 1px dotted $faint;
         padding: 2em 1em;
-        border-bottom: 1px dotted @faint;
+        position: relative;
 
         &.empty {
             border:none;
         }
         h3 {
-            position: relative;
             font-size: 13px;
-            padding-bottom: .25em;
             line-height: 1.5em;
+            padding-bottom: .25em;
+            position: relative;
 
             & > a {
                 text-decoration: none;
 
                 &:hover {
-                    border-width: 0 0 1px 0;
                     border-style: dotted;
+                    border-width: 0 0 1px 0;
                 }
             }
         }
@@ -445,7 +444,7 @@ div.hidden {
                 overflow: hidden;
 
                 img {
-                    border: 1px solid @faint;
+                    border: 1px solid $faint;
                 }
             }
         }
@@ -457,12 +456,12 @@ div.hidden {
             }
         }
         .actions {
-            .box-right;
+            @include box-right;
 
             li {
+                color: $lighter;
                 padding: 0;
                 text-align: right;
-                color: @lighter;
 
                 h4 {
                     padding: .25em 0;
@@ -473,7 +472,7 @@ div.hidden {
             }
 
             a {
-                color: @dark;
+                color: $dark;
                 text-decoration: none;
             }
 
@@ -491,36 +490,36 @@ div.hidden {
             }
         }
         .descriptor {
+            background: $faintest;
+            border: 1px solid $fainter;
+            color: $light;
             font-size: 11px;
             font-weight: normal;
-            padding: 1px 3px;
             margin-left: 3px;
-            background: @faintest;
-            .border-radius(2px);
-            border: 1px solid @fainter;
-            color: @light;
+            padding: 1px 3px;
+            @include border-radius(2px);
 
             a, a:hover {
                 border: none;
+                color: $light;
                 text-decoration: none;
-                color: @light;
             }
         }
 
         .admin-controls {
-            border: 1px solid @lighter;
-            display: none;
+            border: 1px solid $lighter;
             bottom: 1em; right: 0;
+            display: none;
             float: left;
             padding: 0;
             position: absolute;
-            .opacity(0.6);
-            .border-radius(2px);
-            .vertical-gradient(@faintest, @fainter);
+            @include border-radius(2px);
+            @include opacity(0.6);
+            @include vertical-gradient($faintest, $fainter);
 
             &.selected {
                 display: block;
-                .opacity(1.0);
+                @include opacity(1.0);
             }
             li {
                 display: block;
@@ -528,25 +527,25 @@ div.hidden {
                 padding: 0;
 
                 a {
+                    border-left: 1px solid $lighter;
+                    color: $normal;
+                    cursor: pointer;
                     display: block;
                     float: left;
                     padding: 5px 7px;
                     text-decoration: none;
-                    color: @normal;
-                    border-left: 1px solid @lighter;
-                    cursor: pointer;
 
                     &:hover {
-                        .vertical-gradient(@faintest, @faint);
-                        color: @dark;
+                        color: $dark;
+                        @include vertical-gradient($faintest, $faint);
                     }
 
                     &.disabled {
-                        color: @lighter;
+                        color: $lighter;
 
                         &:hover {
                             background: none;
-                            color: @lighter;
+                            color: $lighter;
                         }
                     }
                 }
@@ -558,7 +557,7 @@ div.hidden {
                 }
             }
             &:hover {
-                .opacity(1.0);
+                @include opacity(1.0);
             }
             form {
                 padding: 0;
@@ -572,13 +571,13 @@ div.hidden {
         }
 
         .assignee-choice {
+            background: $fainter;
+            padding: 1em;
             position: absolute;
             top: 1em; right: 0;
             width: 160px;
-            padding: 1em;
-            background: @fainter;
             z-index: 90;
-            .border-radius(3px);
+            @include border-radius(3px);
 
             .chzn-container {
                 margin: 1em 0 0;
@@ -589,8 +588,8 @@ div.hidden {
             }
 
             .cancel {
+                color: $light;
                 float: right;
-                color: @light;
             }
         }
         .action-assign-submit {
@@ -599,27 +598,27 @@ div.hidden {
     }
 }
 .v1 .listing.videos > li {
+    border: none;
+    float: left;
+    padding: 10px 0;
     position: relative;
     width: 310px;
-    padding: 10px 0;
-    float: left;
-    border: none;
 
     h3 {
         clear: both;
-        margin: 6px 10px 10px;
         height: 2em;
+        margin: 6px 10px 10px;
     }
 
     .thumb {
-        position: relative;
-        top: 0;
         height: 180px;
         overflow: hidden;
+        position: relative;
+        top: 0;
 
         img {
-            width: 290px;
             margin: 10px 10px 0;
+            width: 290px;
         }
     }
 
@@ -628,41 +627,41 @@ div.hidden {
     }
 
     .languages {
-        position: absolute;
-        top: 17px;
-        left: 17px;
-        width: auto;
-        margin: 0;
-        padding: .5em .75em;
         background: hsla(0%, 0%, 0%, .35);
         color: #eee;
+        left: 17px;
+        margin: 0;
+        padding: .5em .75em;
+        position: absolute;
         text-shadow: 1px 1px 1px #444;
-        .border-radius(3px);
+        top: 17px;
+        width: auto;
+        @include border-radius(3px);
     }
     &:hover .languages {
         background: hsla(0%, 0%, 0%, .55);
     }
 
     .callout {
-        display: block;
-        position: absolute;
-        top: 0;
-        right: 0;
-        padding: .75em;
-        .border-radius(3px);
-        text-indent: 0;
         color: #fff;
-        .vertical-gradient(@normal, @dark);
-        text-shadow: 1px 1px 1px @dark;
-        .box-shadow(-1px, 1px, 1px, hsla(0%, 0%, 0%, .35));
+        display: block;
+        padding: .75em;
+        position: absolute;
+        right: 0;
+        text-indent: 0;
+        text-shadow: 1px 1px 1px $dark;
+        top: 0;
+        @include border-radius(3px);
+        @include box-shadow(-1px, 1px, 1px, hsla(0%, 0%, 0%, .35));
+        @include vertical-gradient($normal, $dark);
     }
 
     .admin-controls {
-        right: 1em;
-        bottom: .6em;
-        border: none;
         background: hsla(0%, 0%, 0%, .55);
+        border: none;
+        bottom: .6em;
         opacity: 1;
+        right: 1em;
         text-shadow: 1px 1px 1px #444;
 
         a {
@@ -670,8 +669,8 @@ div.hidden {
             color: #eee;
 
             &:hover {
-                color: #fff;
                 background: transparent;
+                color: #fff;
                 text-decoration: underline;
             }
         }
@@ -686,8 +685,8 @@ div.hidden {
     padding-right: 150px;
 
     .thumb {
-        width: 45px;
         height: 45px;
+        width: 45px;
 
         img {
             height: 45px;
@@ -719,8 +718,8 @@ div.hidden {
     }
 }
 .v1 .listing.tasks > li {
-    padding-left: 110px;
     min-height: 6.5em;
+    padding-left: 110px;
 
     .done {
         span {
@@ -733,8 +732,8 @@ div.hidden {
         word-wrap: break-word;
 
         img {
-            max-width: 80px;
             margin-left: 10px;
+            max-width: 80px;
         }
     }
 
@@ -747,22 +746,22 @@ div.hidden {
     padding-right: 150px;
 }
 .v1 .view #comments-tab .listing.comments > li {
-    position: relative;
     padding: 1em 48px 2em;
+    position: relative;
 
     h3 {
-        margin-top: 0;
-        margin-left: -48px;
-        margin-bottom: 1em;
         line-height: 32px;
+        margin-bottom: 1em;
+        margin-left: -48px;
+        margin-top: 0;
 
         img {
+            border: 1px solid $fainter;
             float: left;
-            padding: 2px;
-            border: 1px solid @fainter;
-            .border-radius(3px);
             height: 32px;
             margin-right: 9px;
+            padding: 2px;
+            @include border-radius(3px);
         }
     }
 
@@ -782,32 +781,31 @@ div.hidden {
     padding: 1em 1em 0;
 
     em {
-        box-shadow: none;
-        font-style: normal;
-        color: @lighter;
         background: transparent;
+        box-shadow: none;
+        color: $lighter;
+        font-style: normal;
     }
     a {
-        color: @normal;
+        color: $normal;
 
         &:hover {
+            background: $faint;
             box-shadow: none;
-            background: @faint;
             color: #fff;
         }
     }
     .disabled {
-        color: @lighter;
+        color: $lighter;
     }
 }
-
 p.view-more {
     margin-top: 1em;
     text-align: center;
 
     a {
+        color: $light;
         text-decoration: none;
-        color: @light;
 
         &:after {
             content: ' →';
@@ -816,19 +814,18 @@ p.view-more {
 }
 
 /* Controls */
-
 .v1 .controls {
-    width: 199px;
-    padding-left: 15px;
-    padding-bottom: 4em;
-    border-left: 1px solid @fainter;
     background-color: #fff;
-    .linear-gradient(left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
-    
+    border-left: 1px solid $fainter;
+    padding-bottom: 4em;
+    padding-left: 15px;
+    width: 199px;
+    @include linear-gradient(left, hsla(0, 0%, 96%, 1), hsla(0, 0%, 100%, 1) 5%, hsla(0, 0%, 100%, 1));
+
     ul {
-        padding: 2em 0;
+        border-bottom: 1px solid $faintest;
         margin-left: -15px;
-        border-bottom: 1px solid @faintest;
+        padding: 2em 0;
 
         &.secondary {
             margin-top: 0;
@@ -840,44 +837,44 @@ p.view-more {
         }
 
         li a {
-            position: relative;
+            color: $normal;
             display: block;
             padding: .75em 0 .75em 15px;
+            position: relative;
             text-decoration: none;
-            color: @normal;
-            .multi-border-radius(0, 5px, 5px, 0);
+            @include multi-border-radius(0, 5px, 5px, 0);
 
             &:hover {
                 background-color: #f9fafb;
-                .linear-gradient( left, hsla(192, 15%, 92%, 1), hsla(192, 15%, 96%, 1) 5%, hsla(192, 15%, 96%, 1));
+                @include linear-gradient( left, hsla(192, 15%, 92%, 1), hsla(192, 15%, 96%, 1) 5%, hsla(192, 15%, 96%, 1));
             }
-            
+
             span {
+                color: $lighter;
                 position: absolute;
                 top: .75em; right: .75em;
-                color: @lighter;
             }
         }
 
         li.current a {
             background-color: #edf1f2;
-            .linear-gradient( left, hsla(192, 15%, 90%, 1), hsla(192, 15%, 94%, 1) 5%, hsla(192, 15%, 94%, 1));
-            color: @dark;
+            color: $dark;
+            @include linear-gradient( left, hsla(192, 15%, 90%, 1), hsla(192, 15%, 94%, 1) 5%, hsla(192, 15%, 94%, 1));
 
             &:hover {
                 background-color: #e8ecee;
-                .linear-gradient( left, hsla(192, 15%, 88%, 1), hsla(192, 15%, 92%, 1) 5%, hsla(192, 15%, 92%, 1));
+                @include linear-gradient( left, hsla(192, 15%, 88%, 1), hsla(192, 15%, 92%, 1) 5%, hsla(192, 15%, 92%, 1));
             }
 
             span {
-                color: @light;
+                color: $light;
             }
         }
     }
     .refine {
-        padding: 1.5em 15px 1em;
+        border-bottom: 1px solid $faintest;
         margin: 0 0 2em -15px;
-        border-bottom: 1px solid @faintest;
+        padding: 1.5em 15px 1em;
 
         form {
             padding: 0 0 1em;
@@ -896,7 +893,7 @@ p.view-more {
         }
     }
     h4 {
-        color: @light;
+        color: $light;
         padding-bottom: 1em;
     }
     form {
@@ -906,11 +903,6 @@ p.view-more {
 }
 
 /* Forms */
-
-.block-level {
-    display: block;
-    width: 100%;
-}
 .v1 form {
     padding: 1em 0;
 
@@ -932,8 +924,8 @@ p.view-more {
         }
 
         label {
-            .block-level;
             padding: 1.5em 0 .25em;
+            @include block-level;
 
             .notation {
                 float: right;
@@ -942,9 +934,9 @@ p.view-more {
         }
 
         input[type="text"], input[type="password"], textarea {
-            .block-level;
-            border: 1px solid @faint;
-            .border-radius(2px);
+            border: 1px solid $faint;
+            @include block-level;
+            @include border-radius(2px);
         }
 
         input[type='checkbox'] {
@@ -952,8 +944,8 @@ p.view-more {
         }
 
         input[type='file'] {
-            .block-level;
             padding: 0;
+            @include block-level;
         }
 
         select {
@@ -972,11 +964,11 @@ p.view-more {
     }
 }
 .v1 .view form .preselected {
-    position: relative;
-    padding: 1em;
+    background: $fainter;
     margin: .5em 0;
-    background: @fainter;
-    .border-radius(3px);
+    padding: 1em;
+    position: relative;
+    @include border-radius(3px);
 
     p {
         float: none;
@@ -984,23 +976,21 @@ p.view-more {
     }
 
 }
-
 .v1 .view form .preselected.video {
-    padding-left: 75px;
     min-height: 3em;
+    padding-left: 75px;
 
     img {
-        position: absolute;
-        top: 1em;
         left: 1em;
         max-width: 50px;
+        position: absolute;
+        top: 1em;
     }
 }
-
 .v1 .panel-holder form {
+    clear: both;
     float: left;
     width: 100%;
-    clear: both;
 }
 .v1 .panel-holder .tools form {
     float: none;
@@ -1009,9 +999,9 @@ p.view-more {
     margin-top: -3em;
 
     fieldset {
+        background: $fainter;
         padding: 0 1em;
-        background: @fainter;
-        .border-radius(4px);
+        @include border-radius(4px);
 
         .button {
             margin-top: 2em;
@@ -1019,11 +1009,11 @@ p.view-more {
     }
 }
 .v1 .workflow {
+    background: $fainter;
     display: none;
     margin-top: -2em;
     padding: 0 1em;
-    background: @fainter;
-    .border-radius(4px);
+    @include border-radius(4px);
 
     fieldset {
         padding-bottom: 1.5em;
@@ -1040,10 +1030,10 @@ p.view-more {
     margin-left: 10px;
 }
 .v1 div.submit {
+    border-top: 1px solid $fainter;
     clear: both;
     margin: 2em 0 0;
     padding-top: 1em;
-    border-top: 1px solid @fainter;
     text-align: right;
 
     form {
@@ -1062,14 +1052,14 @@ p.view-more {
         position: relative;
 
         input {
-            width: 162px;
-            padding: .5em;
+            border-color: $fainter;
+            color: $lighter;
             padding-right: 30px;
-            color: @lighter;
-            border-color: @fainter;
+            padding: .5em;
+            width: 162px;
 
             &:focus {
-                border-color: @normal;
+                border-color: $normal;
             }
         }
         a.reset {
@@ -1083,14 +1073,13 @@ p.view-more {
             text-shadow: 0 1px 1px #FFF;
             top: 1px;
             width: 25px;
-            .multi-border-radius(0, 2px, 2px, 0);
+            @include multi-border-radius(0, 2px, 2px, 0);
         }
     }
 }
-
 .v1 #comment-form fieldset {
-  padding: 0;
-    
+    padding: 0;
+
     label {
         padding-top: 0;
     }
@@ -1098,34 +1087,33 @@ p.view-more {
         width: 602px;
     }
 }
-
 #summary {
+    background-image: -moz-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    background-image: -ms-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    background-image: -o-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    background-image: -webkit-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    background-image: linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    border-bottom: 1px solid $fainter;
+    border-top: 1px solid $fainter;
     float: left;
-    width: 100%;
     margin: 0 0 2em;
     padding: 1.5em 0;
-    border-top: 1px solid @fainter;
-    border-bottom: 1px solid @fainter;
-    background-image: -webkit-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
-    background-image: -moz-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
-    background-image: -o-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
-    background-image: -ms-linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
-    background-image: linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
+    width: 100%;
 
     h4 {
         margin: 0 20px 1em;
 
         em {
-            font-weight: normal;
             font-style: normal;
+            font-weight: normal;
         }
     }
 
     .grid_2 {
+        color: $normal;
+        margin: 0 20px;
         position: relative;
         width: 105px;
-        margin: 0 20px;
-        color: @normal;
 
         &.omega {
             margin-right: 0;
@@ -1142,7 +1130,8 @@ p.view-more {
         span {
             font-size: 1.5em;
             position: absolute;
-            top: 0; right: -1.5em;
+            top: 0;
+            right: -1.5em;
         }
     }
 
@@ -1151,7 +1140,6 @@ p.view-more {
     }
 
 }
-
 label[for="thumbnail-clear_id"] {
     display: inline !important;
 }
@@ -1169,17 +1157,16 @@ body#teams div.edit-team-video form fieldset a {
 }
 
 /* Dashboard */
-
 #dashboard {
-    
+
     .featured {
-        padding: 0;
         margin-bottom: 4em;
+        padding: 0;
 
         li {
-            border-left: 4px solid @fainter;
-            padding: 1em;
+            border-left: 4px solid $fainter;
             margin: .5em 0;
+            padding: 1em;
         }
     }
 
@@ -1192,8 +1179,8 @@ body#teams div.edit-team-video form fieldset a {
         }
 
         &.tasks li {
-            padding: 1em 0;
             min-height: 0;
+            padding: 1em 0;
 
             p {
                 margin-bottom: 0;
@@ -1210,31 +1197,30 @@ body#teams div.edit-team-video form fieldset a {
     }
 }
 .v1 .only-child h2 {
-    padding: .5em 0;
+    border-bottom: 1px solid $fainter;
     margin-bottom: 0;
-    border-bottom: 1px solid @fainter;
+    padding: .5em 0;
 }
 
 /* Profile */
-
 #profile.v1 h2, #dashboard.v1 h2 {
     line-height: 1.75em;
 
     img {
+        border: 1px solid $fainter;
         float: left;
-        padding: 2px;
-        margin-right: .5em;
-        border: 1px solid @fainter;
-        .border-radius(3px);
         height: 32px;
+        margin-right: .5em;
+        padding: 2px;
+        @include border-radius(3px);
     }
 }
 #profile.v1 .view .avatar img {
+    border: 1px solid $fainter;
     float: right;
-    margin-right: -60px;
     margin-left: 1em;
+    margin-right: -60px;
     padding: .5em;
-    border: 1px solid @fainter;
 }
 .v1 .view .grid_4 {
     p, ul {
@@ -1272,20 +1258,19 @@ body#teams div.edit-team-video form fieldset a {
 }
 
 /* Video view */
-
 .video_view {
 
     .view {
         position: relative;
 
         p.view-notice {
-            padding-right: 0;
             margin: 1em 0;
+            padding-right: 0;
 
             a {
-                text-decoration: none;
+                border-bottom: 1px dotted $dark;
                 color: inherit;
-                border-bottom: 1px dotted @dark;
+                text-decoration: none;
             }
         }
 
@@ -1294,10 +1279,10 @@ body#teams div.edit-team-video form fieldset a {
         }
 
         video, object, .unisubs-widget span.unisubs-videoplayer {
-            width: 620px !important;
             height: 370px !important;
+            width: 620px !important;
         }
-        
+
         #video-tab, #comments-tab {
             padding-top: 10px;
 
@@ -1327,15 +1312,15 @@ body#teams div.edit-team-video form fieldset a {
         #video-tab .video-tools {
 
             h3 {
+                border-bottom: 1px solid $fainter;
                 font-weight: normal;
-                padding: 1em 0 .5em;
                 margin: 0 0 .5em;
-                border-bottom: 1px solid @fainter;
+                padding: 1em 0 .5em;
             }
 
             ul {
-                padding: 0;
                 margin-bottom: 1em;
+                padding: 0;
             }
 
             p {
@@ -1349,14 +1334,14 @@ body#teams div.edit-team-video form fieldset a {
     }
 
     button.follow-button, button.follow-button:hover {
-        position: absolute;
-        top: 0; right: 0;
-        margin: 0;
-        border: none;
         background: transparent;
-        text-shadow: none;
-        color: @lighter;
+        border: none;
+        color: $lighter;
+        margin: 0;
         padding: 1em;
+        position: absolute;
+        text-shadow: none;
+        top: 0; right: 0;
 
         &.follow:hover {
             color: #8ca367;
@@ -1367,37 +1352,36 @@ body#teams div.edit-team-video form fieldset a {
         }
     }
 }
-
 .v1 .context {
-    width: 289px;
-    padding: 0 20px 0 0;
-    margin-right: 0;
     border-left: none;
-    border-right: 1px solid @fainter;
-    .linear-gradient(right, hsla(0, 0%, 97%, 1), hsla(0, 0%, 100%, 1) 2%, hsla(0, 0%, 100%, 1));
+    border-right: 1px solid $fainter;
+    margin-right: 0;
+    padding: 0 20px 0 0;
+    width: 289px;
     word-wrap: break-word;
+    @include linear-gradient(right, hsla(0, 0%, 97%, 1), hsla(0, 0%, 100%, 1) 2%, hsla(0, 0%, 100%, 1));
 
     p.permalink {
         margin: -.5em 0 .5em;
 
         a {
+            color: $faint;
             font-size: 11px;
             text-decoration: none;
-            color: @faint;
         }
     }
 
     .abbr {
-        position: relative;
         clear: both;
+        position: relative;
 
         .expand {
+            border-top: 1px solid $faintest;
+            color: $lighter;
             display: block;
-            padding: .5em 0;
             margin-top: .5em;
+            padding: .5em 0;
             text-align: center;
-            border-top: 1px solid @faintest;
-            color: @lighter;
             text-decoration: none;
         }
 
@@ -1417,12 +1401,12 @@ body#teams div.edit-team-video form fieldset a {
     }
 
     video, object, .unisubs-widget span.unisubs-videoplayer {
-        width: 289px !important;
         height: 173px !important;
+        width: 289px !important;
     }
 
     #description {
-        color: @dark;
+        color: $dark;
         line-height: 150%;
 
         p {
@@ -1447,20 +1431,20 @@ body#teams div.edit-team-video form fieldset a {
     }
 
     h3 {
+        border-bottom: 1px solid $fainter;
         clear: both;
-        padding: 2em 0 .5em;
         margin-bottom: .5em;
-        border-bottom: 1px solid @fainter;
+        padding: 2em 0 .5em;
 
         &.sub-title {
-            padding-top: 0;
-            margin-bottom: -.25em;
             border: none;
-            color: @dark;
+            color: $dark;
             line-height: 1.25em;
+            margin-bottom: -.25em;
+            padding-top: 0;
 
             a {
-                color: @dark;
+                color: $dark;
             }
         }
     }
@@ -1485,11 +1469,11 @@ body#teams div.edit-team-video form fieldset a {
             a {
                 display: block;
                 float: left;
-                text-indent: -9999em;
                 height: 22px;
-                width: 22px;
-                padding: .25em;
                 margin-right: .25em;
+                padding: .25em;
+                text-indent: -9999em;
+                width: 22px;
 
                 &.facebook {
                     background: url('../images/share_icons.png') no-repeat 5px 5px;
@@ -1506,27 +1490,26 @@ body#teams div.edit-team-video form fieldset a {
         }
     }
 }
-
 ol.subtitles {
     clear: both;
-    
+
     li {
-        position: relative;
-        padding: 1em 1em 1em 120px;
+        border-bottom: 1px solid $faintest;
         margin-left: -10px;
-        border-bottom: 1px solid @faintest;
+        padding: 1em 1em 1em 120px;
+        position: relative;
 
         &:hover {
-            background-color: @faintest;
+            background-color: $faintest;
         }
 
         .timing {
             position: absolute;
             top: 1em; left: 1em;
             width: 75px;
-            
+
             a {
-                color: @light;
+                color: $light;
                 text-decoration: none;
             }
 
@@ -1536,34 +1519,33 @@ ol.subtitles {
         }
 
         .quiet {
+            color: $lighter;
+            left: 100px;
             position: absolute;
             top: 1em;
-            left: 100px;
-            color: @lighter;
         }
     }
 }
 
 /* Overrides */
-
 .v1 .sort_button {
-    float: none;
-    padding: 0;
-    margin: 0;
+    border-color: $fainter;
     cursor: pointer;
-    width: 170px;
-    border-color: @fainter;
-    .border-radius(3px);
+    float: none;
+    margin: 0;
+    padding: 0;
     text-align: left;
-    .vertical-gradient(#fff, #eee);
+    width: 170px;
+    @include border-radius(3px);
+    @include vertical-gradient(#fff, #eee);
 
     .sort_label {
-        font-size: 11px;
-        padding: .5em;
-        font-weight: normal !important;
-        text-shadow: 0 1px 0px #fff;
+        color: $normal;
         display: block;
-        color: @normal;
+        font-size: 11px;
+        font-weight: normal !important;
+        padding: .5em;
+        text-shadow: 0 1px 0px #fff;
 
         &:hover {
             background: transparent;
@@ -1576,27 +1558,27 @@ ol.subtitles {
     }
 
     ul li a {
-        padding: .5em;
-        display: block;
-        text-decoration: none;
-        border-top: 1px solid @fainter;
         border-bottom: none;
+        border-top: 1px solid $fainter;
+        color: $normal;
+        display: block;
         font-size: 11px;
         font-weight: normal;
+        padding: .5em;
+        text-decoration: none;
         text-shadow: none;
-        color: @normal;
-        .box-shadow(none);
+        @include box-shadow(none);
     }
 
     ul li a:hover {
-        background: @normal;
+        background: $normal;
         color: #fff;
     }
 
     .arrow {
-        width: 20px;
-        height: 24px;
         background: url('../images/chosen-sprite.png') no-repeat 0 1px;
+        height: 24px;
+        width: 20px;
     }
 
     &:hover {
@@ -1607,13 +1589,13 @@ ol.subtitles {
         }
 
         ul {
-            top: 21px;
-            left: -1px;
-            border-color: @fainter;
+            border-color: $fainter;
             border-top: none;
-            .box-shadow(none);
-            .vertical-gradient(#fff, @faintest);
-            .multi-border-radius(0, 0, 3px, 3px);
+            left: -1px;
+            top: 21px;
+            @include box-shadow(none);
+            @include multi-border-radius(0, 0, 3px, 3px);
+            @include vertical-gradient(#fff, $faintest);
         }
 
         .arrow {
@@ -1621,7 +1603,6 @@ ol.subtitles {
         }
     }
 }
-
 #tender_window #tender_closer {
     color: #80B3CC;
 }
@@ -1635,11 +1616,10 @@ ol.subtitles {
         padding: 5px !important;
     }
 }
-
 .v1 .filters {
     p {
-        line-height: 18px;
         height: 16px;
+        line-height: 18px;
         vertical-align: middle;
     }
     .chzn-container {
@@ -1650,7 +1630,7 @@ ol.subtitles {
         vertical-align: middle;
 
         .chzn-drop {
-            border-top: 1px solid @faint;
+            border-top: 1px solid $faint;
         }
     }
     .chzn-container,
@@ -1659,16 +1639,16 @@ ol.subtitles {
     .chzn-container-active .chzn-single
     .chzn-container-single .chzn-single-with-drop,
     .chzn-container-single .chzn-single div {
-        border: none;
         background: transparent;
+        border: none;
     }
     .chzn-container-single .chzn-single {
-        padding: 0;
         height: 18px;
         line-height: 14px;
+        padding: 0;
     }
     .chzn-container-single .chzn-single {
-        
+
         div b {
             background-position: -5px -5px;
         }
@@ -1690,17 +1670,17 @@ ol.subtitles {
         }
         &:before {
             background: #FFF;
-            border: 1px solid #B9C3C8;
             border-bottom: 1px solid #FFF;
+            border: 1px solid #B9C3C8;
             content: "";
             display: block;
-            left: -5px;
             height: 100%;
+            left: -5px;
             position: absolute;
             top: -5px;
             width: 100%;
             z-index: 51;
-            .multi-border-radius(5px, 5px, 0, 0);
+            @include multi-border-radius(5px, 5px, 0, 0);
         }
     }
     div.chzn-container-active {
@@ -1715,7 +1695,6 @@ ol.subtitles {
         }
     }
 }
-
 .v1 .bootstrap .modal {
     .modal-header {
         h3 {
@@ -1729,8 +1708,8 @@ ol.subtitles {
         }
     }
     form {
-        padding: 0;
         margin: 0;
+        padding: 0;
 
         p {
             float: none;
@@ -1746,8 +1725,8 @@ ol.subtitles {
         }
 
         label.radio, label.checkbox {
-            padding: 0;
             display: block;
+            padding: 0;
             text-align: left;
             width: 100%;
 
@@ -1764,8 +1743,8 @@ ol.subtitles {
 
         }
         textarea {
-            width: 98%;
             height: auto;
+            width: 98%;
         }
         ul.chzn-choices, ul.chzn-results {
             margin: 0 !important;
@@ -1774,26 +1753,28 @@ ol.subtitles {
     button {
         margin: 0;
     }
+    a.pull-left {
+        float: left;
+        margin-left: 0;
+    }
 }
 
-
 /* Metrics badge */
-
 .v1 .context .metrics {
-    float: left;
-    width: 100%;
-    .linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 97%, 1));
-    .border-radius(3px);
     border: 1px solid #eaeaea;
     color: #999;
+    float: left;
     margin: 1em 0;
+    width: 100%;
+    @include border-radius(3px);
+    @include linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 97%, 1));
 
     li {
-        width: 24.7%;
-        float: left;
         border-right: 1px solid #eaeaea;
+        float: left;
         padding: 0;
         text-align: center;
+        width: 24.7%;
 
         a, div {
             color: #999;
@@ -1802,15 +1783,15 @@ ol.subtitles {
 
             p {
                 font-size: 1.25em;
-                margin: 0;
                 line-height: 1em;
+                margin: 0;
                 text-shadow: 1px -1px 1px #fff;
             }
             h4 {
-                font-weight: normal;
                 font-size: 11px;
-                padding-top: .25em;
+                font-weight: normal;
                 padding-bottom: 0;
+                padding-top: .25em;
             }
         }
         a:hover {
@@ -1828,74 +1809,68 @@ pre.dump {
         font-family: Consolas, Menlo, "Courier New", monospace;
         margin: 15px 0;
         padding: 18px 15px;
-        .border-radius();
-        .box-shadow(1px, 1px, 3px, rgba(0, 0, 0, .4));
+        @include border-radius();
+        @include box-shadow(1px, 1px, 3px, rgba(0, 0, 0, .4));
     }
 }
 
-
-/******************** @Crazytown *****/
-
+/* Crazytown */
 #teams .backnav {
-    color: @light; 
-        
+    color: $light; 
+
     a {
-        color: @darkest;
+        color: $darkest;
     }
 }
-
 #teams div.header {
     min-height: 0;
 
     a.logo-image {
         display: block;
+        margin-bottom: 20px;
         max-height: 235px;
         max-width: 940px;
-        margin-bottom: 20px;
         overflow: hidden;
     }
 }
-
 #teams .view .expandable {
     overflow: hidden;
 
     .button {
 
         span {
+            background: url('../images/chosen-sprite.png') no-repeat 0px -5px;
             display: block;
             float: right;
-            width: 16px;
             height: 1.5em;
-            background: url('../images/chosen-sprite.png') no-repeat 0px -5px;
             margin-left: 4px;
+            width: 16px;
         }
     }
 }
-
 #teams .view .tools {
 
     p {
-        color: @lighter;
+        color: $lighter;
 
         span {
-            color: @dark;
+            color: $dark;
         }
     }
 
 }
-
 #teams .view .subnav {
-    text-align: left;
     padding: 1em 0;
+    text-align: left;
 
     ul li {
         display: inline;
 
         a {
-            color: @light;
-            text-decoration: none;
-            margin-right: 1em;
+            color: $light;
             line-height: 1.5em;
+            margin-right: 1em;
+            text-decoration: none;
         }
 
         &.current a {
@@ -1903,12 +1878,10 @@ pre.dump {
         }
     }
 }
-
 #teams .view form.settings {
     margin-left: 1.5em;
     margin-right: 2.5em;
 }
-
 #teams div.join {
     clear: both;
     padding-top: 2em;
@@ -1917,16 +1890,14 @@ pre.dump {
     display: block;
     margin: 1em;
 }
-
 #teams .context .notation {
     clear: both;
     padding-top: 2em;
 }
 #teams .context .notation.policy {
-    padding-top: 0;
     margin-bottom: 1em;
+    padding-top: 0;
 }
-
 #teams .context #projects-list {
     h4 {
         padding: 1.5em 0 1em;
@@ -1941,21 +1912,20 @@ pre.dump {
         }
     }
     .count {
+        color: $lighter;
         padding-left: .5em;
-        color: @lighter;
     }
 }
-
 #teams .view .tools {
 
     #sort-filter {
+        color: $normal;
+        line-height: 1.5em;
         padding: .5em;
         text-decoration: none;
-        color: @normal;
-        line-height: 1.5em;
 
         &:hover {
-            color: @darkest;
+            color: $darkest;
 
             span {
                 background: url('../images/chosen-hover.png') no-repeat 4px 3px;
@@ -1967,8 +1937,8 @@ pre.dump {
         }
 
         span {
-            padding: 0 8px;
             background: url('../images/chosen-sprite.png') no-repeat 2px -4px;
+            padding: 0 8px;
         }
 
         span.open {
@@ -1977,36 +1947,34 @@ pre.dump {
     }
 
     .button {
-        margin: 0;
         float: none;
+        margin: 0;
     }
 }
-
 #teams .view .filters {
-    display: none;
-    text-align: center;
-    padding: 1em;
-    margin-left: -10px;
-    margin-bottom: 1em;
-    border-bottom: 1px solid #e8ebed;
     background: -moz-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
-    background: -webkit-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0, hsla(0%, 0%, 95%, 1)), color-stop(0.25, hsla(0%, 0%, 98%, 1)), color-stop(0.75, #f5f5f5), color-stop(1, hsla(0%, 0%, 95%, 1)));
-    background: -o-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
     background: -ms-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -o-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0, hsla(0%, 0%, 95%, 1)), color-stop(0.25, hsla(0%, 0%, 98%, 1)), color-stop(0.75, #f5f5f5), color-stop(1, hsla(0%, 0%, 95%, 1)));
+    background: -webkit-linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
     background: linear-gradient(top, hsla(0%, 0%, 95%, 1) 0%, hsla(0%, 0%, 98%, 1) 25%, #f5f5f5 75%, hsla(0%, 0%, 95%, 1) 100%);
+    border-bottom: 1px solid #e8ebed;
+    display: none;
+    margin-bottom: 1em;
+    margin-left: -10px;
+    padding: 1em;
+    text-align: center;
 
     .chzn-container {
         width: auto !important;
     }
 
     a.clear-filters {
+        color: $light;
         float: right;
         text-decoration: none;
-        color: @light;
     }
 }
-
 #teams .view .filters.active {
     display: block;
 }
