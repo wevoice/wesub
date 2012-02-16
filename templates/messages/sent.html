@@ -22,7 +22,9 @@
                         if (response.error){
                             $.jGrowl.error(response.error);
                         } else {
-                            $this.parents('tr').remove();
+                            $this.parents('li.message').fadeOut('fast', function() {
+                                $(this).remove();
+                            });
                         };
                     });
                 }
@@ -95,7 +97,7 @@
 
             <ul class="listing messages">
             {% for msg in message_list %}
-                <li{% if not msg.read %} class="unread"{% endif %}>
+                <li class="message {% if not msg.read %}unread{% endif %}">
                     <h3><a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">{{ msg }}</a></h3>
                 
                     <p>
