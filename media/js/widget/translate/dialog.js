@@ -247,8 +247,13 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
     
     var videoPlayer = this.getVideoPlayerInternal();
     if (this.isInDocument()) {
-        videoPlayer.pause();
-        videoPlayer.setPlayheadTime(0);
+        if (!videoPlayer.isPaused()){
+            videoPlayer.pause();
+        }
+        if(videoPlayer.getPlayheadTime()){
+            videoPlayer.setPlayheadTime(0);
+            videoPlayer.pause();
+        }
     }
 };
 unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
@@ -312,4 +317,16 @@ unisubs.translate.Dialog.prototype.forkImpl_ = function() {
     this.opener_.openSubtitlingDialog(
         this.serverModel_,
         this.subtitleState_);
+};
+
+unisubs.translate.Dialog.prototype.disposeCurrentPanels_ = function() {
+    if (this.currentSubtitlePanel_) {
+        this.currentSubtitlePanel_.dispose();
+        this.currentSubtitlePanel_ = null;
+    }
+    this.rightPanelListener_.removeAll();
+    if (this.timelineSubtitleSet_ != null) {
+        this.timelineSubtitleSet_.dispose();
+        this.timelineSubtitleSet_ = null;
+    }
 };
