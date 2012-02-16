@@ -1206,6 +1206,23 @@ def perform_task(request, slug=None, task_pk=None):
     # ... perform task ...
     return HttpResponseRedirect(task.get_perform_url())
 
+def _delete_subtitle_version(version):
+    sl = version.language
+    n = version.version_no
+
+    # Delete this specific version...
+    version.delete()
+
+    # We also want to delete all draft subs leading up to this version.
+    for v in sl.subtitleversion_set.filter(version_no__lt=n).order_by('-version_no'):
+        if version.is_public:
+            break
+        v.delete()
+
+    # And if we've deleted everything in the language, we can delete the language as well.
+    if not sl.subtitleversion_set.exists():
+        sl.delete()
+
 def delete_task(request, slug):
     '''Mark a task as deleted.
 
@@ -1224,11 +1241,8 @@ def delete_task(request, slug):
 
         if task.subtitle_version:
             if form.cleaned_data['discard_subs']:
-                sl = task.subtitle_version.language
-                task.subtitle_version.delete()
+                _delete_subtitle_version(task.subtitle_version)
                 task.subtitle_version = None
-                if not sl.subtitleversion_set.exists():
-                    sl.delete()
 
             if task.get_type_display() in ['Review', 'Approve']:
                 # TODO: Handle subtitle/translate tasks here too?
