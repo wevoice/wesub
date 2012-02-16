@@ -119,7 +119,8 @@ class S3Storage(FileSystemStorage):
         # we cannot use bucketname.amazonaws... since then the bucket
         # name will be part of the domain, and our ssl certificate
         # won't match that
-        return "%s%s" % (settings.MEDIA_URL, self.name)
+        name = name.replace('\\', '/')
+        return "%s%s" % (settings.MEDIA_URL, name)
     
     def get_available_name(self, name):
         return name
