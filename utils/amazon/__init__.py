@@ -116,9 +116,11 @@ class S3Storage(FileSystemStorage):
         return self.bucket.get_key(name).size
     
     def url(self, name):
+        # we cannot use bucketname.amazonaws... since then the bucket
+        # name will be part of the domain, and our ssl certificate
+        # won't match that
         name = name.replace('\\', '/')
-        return '%s://%s.%s/%s' % (DEFAULT_PROTOCOL, self.bucket.name, DEFAULT_HOST, name)
-        #return Key(self.bucket, name).generate_url(100000)
+        return "%s%s" % (settings.MEDIA_URL, name)
     
     def get_available_name(self, name):
         return name
