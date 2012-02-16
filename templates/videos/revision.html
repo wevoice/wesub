@@ -135,7 +135,7 @@
                 </li>
             {% endif %}
         </ul>
-        {% if next_version %}
+        {% if next_version and rollback_allowed %}
             <div class="tools">
                 <a href="{% url videos:rollback version.pk %}" class="button" id="rollback">
                     {% trans 'Roll back to this version' %}

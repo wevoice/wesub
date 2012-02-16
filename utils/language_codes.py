@@ -287,7 +287,7 @@ def _generate_initial_data():
         'sr': u'Serbian (\u0421\u0440\u043f\u0441\u043a\u0438 / Srpski)',
         'sr-latn': u'Serbian, Latin',
         'ss': u'Swati',
-        'su': u'Sudanese',
+        'su': u'Sundanese',
         'sv': u'Swedish (Svenska)',
         'swa': u'Swahili',
         'ta': u'Tamil (\u0ba4\u0bae\u0bbf\u0bb4\u0bcd)',

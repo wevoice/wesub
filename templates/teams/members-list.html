@@ -101,11 +101,13 @@
                             {% endif %}
                         {% endif %}
                         <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>
-                        <ul class="actions">
-                            <li>
-                                <a href="{% url messages:new %}?user={{ member.user.username }}">Send a message</a>
-                            </li>
-                        </ul>
+                        {% if member.user != user %}
+                            <ul class="actions">
+                                <li>
+                                    <a href="{% url messages:new %}?user={{ member.user.username }}">Send a message</a>
+                                </li>
+                            </ul>
+                        {% endif %}
                         {% if member in assignable_roles %}
                             <ul class="admin-controls">
                                 <li>

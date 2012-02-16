@@ -145,7 +145,7 @@ def _update_is_was_subtitled(video):
             video.save()
 
 def _update_languages_count(video):
-    video.languages_count = video.subtitlelanguage_set.filter(had_version=True).count()
+    video.languages_count = video.subtitlelanguage_set.filter(had_version=True, has_version=True).count()
     video.save()
 
 def _update_complete_date(video):

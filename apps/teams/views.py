@@ -33,10 +33,12 @@ from teams.models import (
     Setting, TeamLanguagePreference
 )
 from teams.signals import api_teamvideo_new
+import teams.moderation_const as MODERATION
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from apps.auth.models import UserLanguage
+from django.contrib.sites.models import Site
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -54,6 +56,7 @@ from teams.search_indexes import TeamVideoLanguagesIndex
 from widget.rpc import add_general_settings
 from django.contrib.admin.views.decorators import staff_member_required
 from utils.translation import SUPPORTED_LANGUAGES_DICT
+from utils import DEFAULT_PROTOCOL
 from messages import tasks as notifier
 from apps.videos.templatetags.paginator import paginate
 
@@ -81,7 +84,7 @@ MAX_MEMBER_SEARCH_RESULTS = 40
 HIGHTLIGHTED_TEAMS_ON_PAGE = getattr(settings, 'HIGHTLIGHTED_TEAMS_ON_PAGE', 10)
 CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS = getattr(settings, 'CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS', 20)
 
-VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 15)
+VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 16)
 MEMBERS_ON_PAGE = getattr(settings, 'MEMBERS_ON_PAGE', 15)
 APLICATIONS_ON_PAGE = getattr(settings, 'APLICATIONS_ON_PAGE', 15)
 ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
@@ -228,9 +231,11 @@ def detail(request, slug, project_slug=None, languages=None):
         team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
         team_videos = dict((tv.pk, tv) for tv in team_videos)
         for record in team_video_md_list:
-            record._team_video = team_videos.get(record.team_video_pk)
-            record._team_video.original_language_code = record.original_language
-            record._team_video.completed_langs = record.video_completed_langs
+            if record:
+                record._team_video = team_videos.get(record.team_video_pk)
+                if record._team_video:
+                    record._team_video.original_language_code = record.original_language
+                    record._team_video.completed_langs = record.video_completed_langs
 
     return extra_context
 
@@ -1214,7 +1219,24 @@ def delete_task(request, slug):
     form = TaskDeleteForm(team, request.user, data=request.POST)
     if form.is_valid():
         task = form.cleaned_data['task']
+        video = task.team_video.video
         task.deleted = True
+
+        if task.subtitle_version:
+            if form.cleaned_data['discard_subs']:
+                sl = task.subtitle_version.language
+                task.subtitle_version.delete()
+                task.subtitle_version = None
+                if not sl.subtitleversion_set.exists():
+                    sl.delete()
+
+            if task.get_type_display() in ['Review', 'Approve']:
+                # TODO: Handle subtitle/translate tasks here too?
+                if not form.cleaned_data['discard_subs']:
+                    task.subtitle_version.moderation_status = MODERATION.APPROVED
+                    task.subtitle_version.save()
+                    metadata_manager.update_metadata(video.pk)
+
         task.save()
 
         messages.success(request, _('Task deleted.'))
@@ -1417,7 +1439,6 @@ def unpublish(request, slug):
     if scope == 'version':
         result = version.unpublish(delete=should_delete)
     elif scope == 'language':
-        # TODO Fix this...
         result = version.language.unpublish(delete=should_delete)
     else:
         # TODO Write scope == 'dependents' code.
@@ -1474,3 +1495,25 @@ def delete_video(request, team_video_pk):
         return HttpResponseRedirect(next)
    
     
+@login_required
+def auto_captions_status(request, slug):
+    """
+    Prints a simple table of partner status for captions, this should
+    should be used internally (as a cvs file with tab delimiters)
+    """
+    buffer = []
+    team = get_object_or_404(Team, slug=slug)
+    if not team.is_member(request.user):
+        return  HttpResponseForbidden("Not allowed")
+    buffer.append( "Video\tproject\tURL\tstatus\tjob_id\ttask_id\tcreated on\tcompleted on")
+    for tv in team.teamvideo_set.all().select_related("job", "project", "video"):
+        jobs = tv.job_set.all()
+        extra = ""
+        if jobs.exists():
+            j = jobs[0]
+            extra = "%s\t%s\t%s\t%s\t%s" % (j.status, j.job_id, j.task_id, j.created_on, j.completed_on)
+        url = "%s://%s%s" % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, tv.video.get_absolute_url())
+        buffer.append( "Video:%s\t %s\t%s\t %s" % (tv.video.title,tv.project.name, url, extra))
+    response =  HttpResponse( "\n".join(buffer), content_type="text/csv")
+    response['Content-Disposition'] = 'filename=team-status.csv'
+    return response

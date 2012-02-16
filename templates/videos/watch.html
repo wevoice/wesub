@@ -6,7 +6,7 @@
 
 {% block scripts %}
     {{ block.super }}
-    <script src="{% url videos:rpc_api %}" type="text/javascript"></script>  
+    <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
     <script src="{{ STATIC_URL }}js/jquery.address-1.4.fixed.js" type="text/javascript"></script>
     <script src="{{ STATIC_URL }}js/jquery.ajax-paginator.js" type="text/javascript"></script>
 {% endblock %}
@@ -37,7 +37,7 @@
         <a class="btn_more_videos more-popular-video-link" href="{% url videos:popular_videos %}">
             {% trans "More Popular Videos" %}
         </a>
-        
+
         <h2>{% trans "Popular Videos" %}</h2>
         <a id="popular_sort" href="#">
             <span class="current-sort">{% trans "This Week" %}</span>
@@ -50,7 +50,7 @@
                     <li val="total">{% trans "All Time" %}</li>
                 </ul>
             </div><!-- // sort_menu -->
-            
+
         </a>
         <script type="text/javascript">
             jQuery(function($){
@@ -61,16 +61,16 @@
                 $('#popular_sort').click(function(){
                     return false;
                 });
-                
+
                 var update_more_link = function(){
                     var href = $('a.more-popular-video-link').attr('href');
                     var link = href.split('#')[0]+'#/?sort='+$sort_menu.find('li:hidden').attr('val');
-                    $('a.more-popular-video-link').attr('href', link);                    
+                    $('a.more-popular-video-link').attr('href', link);
                 };
-                
+
                 $('li', $sort_menu).click(function(){
                     var $this = $(this);
-                    
+
                     $('li', $sort_menu).show();
                     $this.hide();
                     $current_sort.html($this.html());
@@ -83,7 +83,7 @@
                     return false;
                 });
             });
-        </script>                        
+        </script>
     </div><!-- // hd -->
     <div class="bd">
         <div class="popular-videos-content">
@@ -110,7 +110,7 @@
         <div class="watch-page-content">
             {% with latest_videos as video_list %}
                 {% include 'videos/_watch_page.html' with showdate="true" %}
-            {% endwith %}    
+            {% endwith %}
         </div>
     </div><!-- // bd -->
 </div><!-- // pod -->

@@ -22,6 +22,10 @@
                     <li>
                         <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}{% query_string request.GET %}">
                             {{ project }}
+                            <span class="count">
+                                {{ project.videos_count }}
+                                {% trans 'video' %}{{ project.videos_count|pluralize }}
+                            </span>
                         </a>
                     </li>
                 {% endfor %}

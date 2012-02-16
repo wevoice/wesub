@@ -21,8 +21,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from videos.models import Video, SubtitleLanguage, SubtitleVersion,\
-     VideoUrl
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from auth.models import CustomUser as User
 from utils.amazon import S3EnabledImageField
 from django.db.models.signals import post_save, post_delete, pre_delete
@@ -37,6 +36,8 @@ from utils.panslugify import pan_slugify
 from haystack.query import SQ
 from haystack import site
 from utils.searching import get_terms
+
+from utils import DEFAULT_PROTOCOL
 from django.contrib.contenttypes.models import ContentType
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
@@ -218,7 +219,7 @@ class Team(models.Model):
         return ('teams:detail', [self.slug])
 
     def get_site_url(self):
-        return 'http://%s%s' % (Site.objects.get_current().domain, self.get_absolute_url())
+        return '%s://%s%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, self.get_absolute_url())
 
 
     def _is_role(self, user, role=None):
@@ -442,7 +443,7 @@ class Team(models.Model):
 
         '''
         w = self.get_workflow()
-        return True if w.review_enabled or w.approved_enabled else False
+        return True if w.review_enabled or w.approve_enabled else False
 
 
 # this needs to be constructed after the model definition since we need a
@@ -499,7 +500,7 @@ class Project(models.Model):
         return self.name == Project.DEFAULT_NAME
 
     def get_site_url(self):
-        return 'http://%s%s' % (Site.objects.get_current().domain, self.get_absolute_url())
+        return '%s://%s%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, self.get_absolute_url())
 
     @models.permalink
     def get_absolute_url(self):
@@ -752,6 +753,8 @@ class TeamVideo(models.Model):
         return (self.subtitles_started() and
                 self.video.subtitle_language().is_complete_and_synced())
 
+    def get_workflow(self):
+        return Workflow.get_for_team_video(self)
 
 def _create_translation_tasks(team_video, subtitle_version):
     preferred_langs = TeamLanguagePreference.objects.get_preferred(team_video.team)
@@ -794,9 +797,9 @@ def team_video_delete(sender, instance, **kwargs):
     video.is_public = True
     video.moderated_by = None
     video.save()
-    
+
     metadata_manager.update_metadata(video.pk)
-    
+
 
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     if created and not raw:
@@ -1333,6 +1336,10 @@ class TaskManager(models.Manager):
     def all_approve(self):
         return self._type('Approve', None)
 
+    def all_review_or_approve(self):
+        return self.not_deleted().filter(type__in=(Task.TYPE_IDS['Review'],
+                                                   Task.TYPE_IDS['Approve']))
+
 class Task(models.Model):
     TYPE_CHOICES = (
         (10, 'Subtitle'),
@@ -1468,7 +1475,7 @@ class Task(models.Model):
                     subtitle_version=self.subtitle_version,
                     language=self.language, type=type, assignee=assignee)
         task.save()
-        
+
         if sends_notification:
             # notify original submiter (assignee of self)
             notifier.reviewed_and_sent_back.delay(self.pk)
@@ -1570,7 +1577,7 @@ class Task(models.Model):
                 # tasks if necessary.
                 if self.workflow.autocreate_translate:
                     _create_translation_tasks(self.team_video, self.subtitle_version)
-                
+
                 # non approval review
                 notifier.reviewed_and_published.delay(self.pk)
             else:

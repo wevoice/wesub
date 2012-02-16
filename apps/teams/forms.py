@@ -461,6 +461,7 @@ class TaskAssignForm(forms.Form):
 
 class TaskDeleteForm(forms.Form):
     task = forms.ModelChoiceField(queryset=Task.objects.all())
+    discard_subs = forms.BooleanField(required=False)
 
     def __init__(self, team, user, *args, **kwargs):
         super(TaskDeleteForm, self).__init__(*args, **kwargs)

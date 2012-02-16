@@ -624,12 +624,23 @@ def can_assign_task(task, user):
 def can_delete_task(task, user):
     """Return whether the given user can delete the given task."""
 
-    if task.get_type_display() in ['Review', 'Approve']:
-        return False
-
     team, project, lang = task.team, task.team_video.project, task.language
 
-    return can_delete_tasks(team, user, project, lang) and can_perform_task(user, task)
+    can_delete = can_delete_tasks(team, user, project, lang)
+
+    # Allow stray review tasks to be deleted.
+    if task.type == Task.TYPE_IDS['Review']:
+        workflow = Workflow.get_for_team_video(task.team_video)
+        if not workflow.review_allowed:
+            return can_delete
+
+    # Allow stray approve tasks to be deleted.
+    if task.type == Task.TYPE_IDS['Approve']:
+        workflow = Workflow.get_for_team_video(task.team_video)
+        if not workflow.approve_allowed:
+            return can_delete
+
+    return can_delete and can_perform_task(user, task)
 
 
 def _user_can_create_task_subtitle(user, team_video):

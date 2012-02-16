@@ -20,6 +20,7 @@ from django.core.files import File
 from fields import S3EnabledImageField, S3EnabledFileField
 from django.core.mail import mail_admins
 from sentry.client.models import client
+from utils import DEFAULT_PROTOCOL
 from StringIO import StringIO
 import os
 
@@ -115,9 +116,11 @@ class S3Storage(FileSystemStorage):
         return self.bucket.get_key(name).size
     
     def url(self, name):
+        # we cannot use bucketname.amazonaws... since then the bucket
+        # name will be part of the domain, and our ssl certificate
+        # won't match that
         name = name.replace('\\', '/')
-        return 'http://%s.%s/%s' % (self.bucket.name, DEFAULT_HOST, name)
-        #return Key(self.bucket, name).generate_url(100000)
+        return "%s%s" % (settings.MEDIA_URL, name)
     
     def get_available_name(self, name):
         return name

@@ -80,7 +80,6 @@ unisubs.approvesubtitles.Dialog.prototype.showGuidelines_ = function() {
         });
     });
 };
-
 unisubs.approvesubtitles.Dialog.prototype.createRightPanel_ = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var title = "Approve Subtitles";
@@ -105,12 +104,10 @@ unisubs.approvesubtitles.Dialog.prototype.createRightPanel_ = function() {
     return new unisubs.approvesubtitles.ApproveSubtitlesRightPanel(
         this, this.serverModel_, helpContents, [], false, "Done?", "Submit final Approval");
 };
-
 unisubs.approvesubtitles.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
     this.getVideoPlayerInternal().showCaptionText(c ? c.getText() : '');
 };
-
 unisubs.approvesubtitles.Dialog.prototype.enterDocument = function() {
     unisubs.approvesubtitles.Dialog.superClass_.enterDocument.call(this);
     unisubs.Dialog.translationDialogOpen = false;
@@ -120,32 +117,26 @@ unisubs.approvesubtitles.Dialog.prototype.enterDocument = function() {
             unisubs.CaptionManager.CAPTION,
             this.captionReached_);
 };
-
 unisubs.approvesubtitles.Dialog.prototype.disposeInternal = function() {
     unisubs.approvesubtitles.Dialog.superClass_.disposeInternal.call(this);
     this.serverModel_.dispose();
     this.timelineSubtitleSet_.dispose();
     this.timelineSubtitleSet_ = null;
 };
-
 unisubs.approvesubtitles.Dialog.prototype.getSubtitleLanguage = function() {
     return this.subtitleState_.LANGUAGE;
 };
-
 unisubs.approvesubtitles.Dialog.prototype.getServerModel = function() {
     return this.serverModel_;
 };
-
 unisubs.approvesubtitles.Dialog.prototype.isWorkSaved = function() {
     return this.saved_ || false;
 };
-
 unisubs.approvesubtitles.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
     var that = this;
     this.getRightPanelInternal().showLoading(true);
     this.getRightPanelInternal().finish('In Progress');
 };
-
 unisubs.approvesubtitles.Dialog.prototype.onWorkSaved = function(closeAfterSave){
     this.saved_ = true;
     unisubs.widget.ResumeEditingRecord.clear();

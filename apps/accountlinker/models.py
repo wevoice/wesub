@@ -41,11 +41,13 @@ class ThirdPartyAccountManager(models.Manager):
                         video, language, "delete_subtitles")
         This method is 'safe' to call, meaning that we only do syncing if there 
         are matching third party credentials for this video.
-        The update will only be done if the version is synched
+        The update will only be done if the version is synced
         """
         if action not in  [UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION]:
-            raise NotImplementedError("Mirror to third party does not support the %s action" % action)
-        if version and version.moderation_status not in [APPROVED, UNMODERATED]:
+            raise NotImplementedError(
+                "Mirror to third party does not support the %s action" % action)
+        if (version and version.moderation_status not in\
+           [APPROVED, UNMODERATED]) or not version.is_synced():
             return
         for vurl in video.videourl_set.all():
             username = vurl.owner_username
