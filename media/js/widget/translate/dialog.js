@@ -78,35 +78,12 @@ unisubs.translate.Dialog.prototype.showGuidelines_ = function() {
         });
     });
 };
-unisubs.translate.Dialog.prototype.createRightPanel_ = function() {
-    var title = this.subtitleState_.VERSION > 0 ? 
-        "Editing Translation" : "Adding a New Translation";
-    var helpContents = new unisubs.RightPanel.HelpContents(
-        title,
-        [["Thanks for volunteering to translate! Your translation will be available to ",
-"everyone  watching the video in our widget."].join(''),
-         ["Please translate each line, one by one, in the white  ", 
-          "space below each line."].join(''),
-         ["If you need to rearrange the order of words or split a phrase ",
-          "differently, that's okay."].join(''),
-         ["As you're translating, you can use the \"TAB\" key to advance to ",
-          "the next line, and \"Shift-TAB\" to go back."].join('')
-        ], 2, 0);
-    var extraHelp = [
-        ["Google Translate", "http://translate.google.com/"],
-        ["List of dictionaries", "http://yourdictionary.com/languages.html"],
-        ["Firefox spellcheck dictionaries", 
-         "https://addons.mozilla.org/en-US/firefox/browse/type:3"]
-    ];
-    return new unisubs.translate.TranslationRightPanel(
-        this,
-        this.serverModel_, helpContents, extraHelp, [], false, "Done?", 
-        "Next Step: Title & Description", "Resources for Translators");
-};
+
 unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
     e.preventDefault();
     this.saveWork(false);
 };
+
 unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
     event.preventDefault();
     if (this.state_ == unisubs.translate.Dialog.State_.EDIT_METADATA)
@@ -118,6 +95,7 @@ unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
 unisubs.translate.Dialog.prototype.isWorkSaved = function() {
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();
 };
+
 unisubs.translate.Dialog.prototype.enterDocument = function() {
     // this is where we listen to the dialog close button
     unisubs.subtitle.Dialog.superClass_.enterDocument.call(this);
@@ -146,6 +124,7 @@ unisubs.translate.Dialog.prototype.onNotesFetched_ = function(body) {
         this.currentSubtitlePanel_.setNotesContent_(body);
     }
 }
+
 unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
     if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles())){
@@ -170,6 +149,7 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
                     goog.bind(that.saveWorkInternal, that, closeAfterSave));
         });
 };
+
 unisubs.translate.Dialog.prototype.showGuidelinesForState_ = function(state) {
     this.setState_(state);
 }
