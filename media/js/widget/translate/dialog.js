@@ -38,7 +38,14 @@ unisubs.translate.Dialog = function(opener,
     this.saved_ = false;
     this.rightPanelListener_ = new goog.events.EventHandler(this);
     this.reviewOrApprovalType_ = reviewOrApprovalType;
-    console.log("creating dialog")
+    // if this is a review approve dialog, we must fetch saved notes for this task if available
+    // but we should only do it when the dialog laods the first time
+    // (else as users move back and forward between panels we might
+    // overwrite their notes). This is what this flag is for
+    this.notesFectched_ = false;
+    if ( !Boolean(this.reviewOrApprovalType_)){
+       this.notesFectched_ = true; 
+    }
 };
 goog.inherits(unisubs.translate.Dialog, unisubs.subtitle.Dialog);
 
@@ -120,7 +127,25 @@ unisubs.translate.Dialog.prototype.enterDocument = function() {
         function() {
             return that.makeJsonSubs();
         });
+
+    if (this.reviewOrApprovalType_ && !this.notesFectched_){
+        var func  = this.serverModel_.fetchReviewData ;
+        var that = this;
+        if (this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']){
+            func = this.serverModel_.fetchApproveData;
+        }
+        func(unisubs.task_id, function(body) {
+            that.onNotesFetched_(body);
+        });
+    }
 };
+
+
+unisubs.translate.Dialog.prototype.onNotesFetched_ = function(body) {
+    if( this.currentSubtitlePanel_ && this.currentSubtitlePanel_.setNotesContent_){
+        this.currentSubtitlePanel_.setNotesContent_(body);
+    }
+}
 unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
     if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles())){
@@ -263,7 +288,8 @@ unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.captionManager_,
             this.standardSubState_ ,
             false,
-            this.reviewOrApprovalType_
+            this.reviewOrApprovalType_,
+            this
         );
 };
 

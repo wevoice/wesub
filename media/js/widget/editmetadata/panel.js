@@ -28,18 +28,19 @@ goog.provide('unisubs.editmetadata.Panel');
  */
 unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, 
                                       captionManager, originalSubtitles, 
-                                      inSubtitlingDialog, reviewOrApprovalType) {
+                                      inSubtitlingDialog, reviewOrApprovalType, dialog) {
     goog.ui.Component.call(this);
     /**
      * @type {unisubs.subtitle.EditableCaptionSet}
      */
     this.subtitles_ = subtitles;
+    this.dialog_ = dialog;
 
     this.videoPlayer_ = videoPlayer;
     /**
      * @protected
      */
-    this.serverModel = serverModel;
+    this.serverModel_ = serverModel;
     this.captionManager_ = captionManager;
     this.originalSubtitles_ = originalSubtitles;
     // when in the translate dialog, there are only 2 steps, for the subtitling, there are 4
@@ -141,10 +142,11 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
     return new unisubs.editmetadata.RightPanel(
         this.dialog_,
         this.serverModel_, internalComponents['helpContents'], internalComponents['extraHelp'], [], false, "Done?", 
-        this.nextButtonText_,  reviewOrApproval);
+        this.nextButtonText_,  reviewOrApproval, this.bodyInput_);
 
 
 };
+
 
 
 unisubs.editmetadata.Panel.prototype.getNotesContent_ = function(){
@@ -155,6 +157,7 @@ unisubs.editmetadata.Panel.prototype.getNotesContent_ = function(){
 }
 
 unisubs.editmetadata.Panel.prototype.setNotesContent_ = function(newContent){
+    console.log("settings notes content", newContent)
     if (this.bodyInput_){
         this.bodyInput_.value = newContent;
         return true;

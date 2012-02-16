@@ -30,8 +30,11 @@ unisubs.editmetadata.RightPanel = function(dialog,
                                            legendKeySpecs, 
                                            showRestart, 
                                            doneStrongText, 
-                                           doneText, isReviewOrApproval) {
-    unisubs.RightPanel.call(this, serverModel, helpContents, extraHelp,
+                                           doneText, 
+                                           isReviewOrApproval,
+                                           notesInput
+                                          ) {
+    unisubs.RightPanel.call(this,  serverModel, helpContents, extraHelp,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
     this.showSaveExit = false;
@@ -46,6 +49,7 @@ unisubs.editmetadata.RightPanel = function(dialog,
     // TODO: See if there's a way to avoid the circular reference here.
     this.dialog_ = dialog;
     this.isReviewOrApproval_ = isReviewOrApproval;
+    this.notesInput_ = notesInput;
 };
 goog.inherits(unisubs.editmetadata.RightPanel, unisubs.RightPanel);
 
@@ -84,8 +88,36 @@ unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function(
     }
 };
 
+unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
+    if (e){
+        e.preventDefault();
+    }
+    var dialog = this.dialog_;
+    var that = this;
+    var successCallback = function(serverMsg) {
+        unisubs.subtitle.OnSavedDialog.show(serverMsg, function() {
+            dialog.onWorkSaved(true);
+        }, 'approve');
+    };
+
+    var failureCallback = function(opt_status) {
+        if (dialog.finishFailDialog_) {
+            dialog.finishFailDialog_.failedAgain(opt_status);
+        } else {
+            dialog.finishFailDialog_ = unisubs.finishfaildialog.Dialog.show(
+                that.serverModel_.getCaptionSet(), opt_status,
+                goog.bind(dialog.saveWorkInternal, dialog, false));
+        }
+    };
+
+    this.serverModel_.finishApprove({
+        'task_id': unisubs.task_id,
+        'body': goog.dom.forms.getValue(this.notesInput_),
+        'approved': approvalCode
+    }, successCallback, failureCallback);
+};
+
 unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
-    
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
     this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
     this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Approve');
@@ -95,12 +127,16 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
     el.appendChild(this.approveButton_);
 
     var handler = this.getHandler();
-    handler.listen(this.sendBackButton_, 'click', this.sendBackButtonClicked_);
-    handler.listen(this.saveForLaterButton_, 'click', this.saveForLaterButtonClicked_);
-    handler.listen(this.approveButton_, 'click', this.approveButtonClicked_);
+    var that = this;
+    handler.listen(this.sendBackButton_, 'click', function(e){
+        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SEND_BACK);
+    });
+    handler.listen(this.saveForLaterButton_, 'click', function(e){
+        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SAVE_FOR_LATER);
+    });
+    handler.listen(this.approveButton_, 'click', function(e){
+        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED);
+    });
 };
 
 
-
-unisubs.editmetadata.RightPanel.prototype.finish = function(approved) {
-};
