@@ -85,6 +85,7 @@ unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function(
 };
 
 unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
+    
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
     this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
     this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Approve');

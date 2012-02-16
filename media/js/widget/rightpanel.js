@@ -223,6 +223,14 @@ unisubs.RightPanel.prototype.appendMiddleContentsInternal = function($d, el) {
 unisubs.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
     // dear subclasses, override me if you want. love, rightpanel.
 };
+unisubs.RightPanel.prototype.createBackAnchor_ = function($d, el) {
+    var anchor = $d('a', {'className':'unisubs-backTo unisubs-greybutton', 'href':'#'},
+           'Return to Typing');
+    this.getHandler().listen(anchor, 'click', this.backClickedInternal);
+    unisubs.style.showElement(anchor, false);
+    return anchor;
+
+}
 unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
     this.loginDiv_ = $d('div');
     this.loadingGif_ = $d('img',
@@ -236,10 +244,7 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
                              goog.dom.createTextNode(this.doneText_)));
     var stepsDiv = $d('div', 'unisubs-steps', this.loginDiv_);
 
-    this.backAnchor_ =
-        $d('a', {'className':'unisubs-backTo unisubs-greybutton', 'href':'#'},
-           'Return to Typing');
-    this.getHandler().listen(this.backAnchor_, 'click', this.backClickedInternal);
+    this.backAnchor_ = this.createBackAnchor_($d, el);
     unisubs.style.showElement(this.backAnchor_, false);
     stepsDiv.appendChild(this.backAnchor_);
 

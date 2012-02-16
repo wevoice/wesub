@@ -195,7 +195,7 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
 
     this.suspendKeyEvents_(false);
 
-    var s = unisubs.subtitle.Dialog.State_;
+    var s = unisubs.translate.Dialog.State_;
 
     this.setExtraClass_();
 
@@ -239,7 +239,7 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
             rightPanel, et.BACK, this.handleBackKeyPress_);
 
     }
-
+    
     var videoPlayer = this.getVideoPlayerInternal();
     if (this.isInDocument()) {
         videoPlayer.pause();
