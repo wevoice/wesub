@@ -85,7 +85,7 @@ def dev(username):
                 separate_uslogging_db = False,
                 celeryd_bounce_cmd    = "/etc/init.d/celeryd.dev restart &&  /etc/init.d/celeryevcam.dev start")
 
-def unisubs(username):
+def production(username):
     _create_env(username              = username,
                 hosts                 = ['pcf-us-cluster1.pculture.org:2191',
                                         'pcf-us-cluster2.pculture.org:2191'],
