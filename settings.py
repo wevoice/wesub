@@ -763,7 +763,6 @@ MEDIA_BUNDLES = {
         "type":"css",
         "files":(
                "css/unisubs-widget.css" ,
-               "css/nyroModal.css",
                "css/dev.css"
          ),
         },
@@ -778,7 +777,6 @@ MEDIA_BUNDLES = {
     "home":{
         "type":"css",
         "files":(
-            "css/nyroModal.css",
             "css/unisubs-widget.css",
          ),
         },
@@ -786,7 +784,6 @@ MEDIA_BUNDLES = {
          "type":"css",
          "files":(
             "css/new_index.css",
-             "css/nyroModal.css",
              "css/unisubs-widget.css",
           ),
          },

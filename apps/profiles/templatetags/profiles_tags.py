@@ -78,11 +78,6 @@ def user_videos_activity(context, user=None):
         context['users_actions'] = Action.objects.none()
     return context
 
-@register.inclusion_tag('profiles/_send_message.html', takes_context=True)
-def send_message(context):
-    return {
-        'user': context['user']
-    }
 
 @register.inclusion_tag('profiles/_user_avatar.html', takes_context=True)    
 def user_avatar(context, user_obj):
