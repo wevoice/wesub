@@ -528,6 +528,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 INSTALLED_APPS = (
+    # this needs to be first, yay for app model loading mess
+    'auth',
     # django stock apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -556,7 +558,6 @@ INSTALLED_APPS = (
     'socialauth',
     # our apps
     'accountlinker',
-    'auth',
     'comments',
     'doorman',
     'icanhaz',
