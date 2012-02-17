@@ -15,19 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+from django.core.urlresolvers import reverse
+from django.forms.models import model_to_dict
+from django.utils.translation import ugettext as _
 
+from messages import tasks as notifier
 from teams.models import (
     Team, TeamMember, Application, Project, ALL_LANGUAGES
 )
-
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
-from django.forms.models import model_to_dict
-from utils.rpc import Error, Msg, RpcRouter
-
-from messages import tasks as notifier
 from teams.permissions import roles_user_can_assign, save_role
-
+from utils.rpc import Error, Msg, RpcRouter
 
 
 class TeamsApiClass(object):
@@ -56,10 +53,11 @@ class TeamsApiClass(object):
             application.note = msg
             application.save()
             notifier.application_sent.delay(application.pk)
- 
-            return Msg(_(u'Your application has been submitted. You will be notified of the team administrator\'s response'))
+
+            return Msg(_(u"Your application has been submitted. "
+                         u"You will be notified of the team administrator's response"))
         else:
-            return Error(_(u'You can\'t join this team by application.'))
+            return Error(_(u"You can't join this team by application."))
 
     def promote_user(self, team_id, member_id, role, user):
         try:
@@ -89,7 +87,8 @@ TeamsApi = TeamsApiClass()
 
 
 def _project_to_dict(p):
-    d  = model_to_dict(p, fields=["name", "slug", "order", "description", "pk", "workflow_enabled"])
+    d  = model_to_dict(p, fields=["name", "slug", "order", "description", "pk",
+                                  "workflow_enabled"])
     d.update({
         "pk":p.pk,
         "url": reverse("teams:project_video_list", kwargs={
@@ -149,7 +148,7 @@ class TeamsApiV2Class(object):
 
         if role == 'admin':
             languages = None
-        
+
         projects = map(int, projects or [])
         res = save_role(team, member, role, projects, languages, user)
         if res:

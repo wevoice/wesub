@@ -15,42 +15,48 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
 import datetime
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
+
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from videos.models import Video, SubtitleLanguage, SubtitleVersion
-from auth.models import CustomUser as User
-from utils.amazon import S3EnabledImageField
+from django.db import models
 from django.db.models.signals import post_save, post_delete, pre_delete
-from messages.models import Message
-from messages import tasks as notifier
-from django.template.loader import render_to_string
-from django.conf import settings
 from django.http import Http404
-from django.contrib.sites.models import Site
-from teams.tasks import update_one_team_video
-from utils.panslugify import pan_slugify
-from haystack.query import SQ
+from django.template.loader import render_to_string
+from django.utils.translation import ugettext_lazy as _
 from haystack import site
-from utils.searching import get_terms
+from haystack.query import SQ
 
+import teams.moderation_const as MODERATION
+from apps.comments.models import Comment
+from auth.models import CustomUser as User
+from messages import tasks as notifier
+from messages.models import Message
+from teams.moderation_const import WAITING_MODERATION
+from teams.permissions_const import (
+    TEAM_PERMISSIONS, PROJECT_PERMISSIONS, LANG_PERMISSIONS, ROLE_OWNER,
+    ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+)
+from teams.tasks import update_one_team_video
 from utils import DEFAULT_PROTOCOL
-from django.contrib.contenttypes.models import ContentType
+from utils.amazon import S3EnabledImageField
+from utils.panslugify import pan_slugify
+from utils.searching import get_terms
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
+
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
-import apps.teams.moderation_const as MODERATION
-from apps.comments.models import Comment
-from apps.teams.moderation_const import WAITING_MODERATION
-from teams.permissions_const import TEAM_PERMISSIONS, PROJECT_PERMISSIONS, \
-        LANG_PERMISSIONS, ROLE_ADMIN, ROLE_OWNER, ROLE_CONTRIBUTOR, ROLE_MANAGER
-
 
 def get_perm_names(model, perms):
-    return [("%s-%s-%s" % (model._meta.app_label, model._meta.object_name, p[0]), p[1],) for p in perms]
+    return [("%s-%s-%s" % (model._meta.app_label,
+                           model._meta.object_name,
+                           p[0]),
+             p[1])
+            for p in perms]
 
 
 # Teams

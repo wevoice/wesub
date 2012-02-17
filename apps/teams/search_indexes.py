@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,17 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
-import json
-
 from django.conf import settings
-from haystack.indexes import *
-from haystack.query import SearchQuerySet
-from haystack.backends import SQ
 from haystack import site
+from haystack.backends import SQ
+from haystack.indexes import (
+    IntegerField, CharField, BooleanField, SearchIndex, DateTimeField,
+    MultiValueField
+)
+from haystack.query import SearchQuerySet
 
-from teams import models
 from icanhaz.models import VideoVisibilityPolicy
+from teams import models
 
 
 LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)

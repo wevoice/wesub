@@ -15,12 +15,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import logging
+import random
 
-from utils import render_to, render_to_json
-from utils.searching import get_terms
-from utils.translation import get_languages_list, languages_with_names
-from utils.forms import flatten_errorlists
-from videos import metadata_manager
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
+from django.db.models import Q, Count
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.template import RequestContext
+from django.utils import simplejson as json
+from django.utils.translation import ugettext_lazy as _
+from django.views.generic.list_detail import object_list
+
+import teams.moderation_const as MODERATION
+import widget
+from apps.auth.models import UserLanguage
+from apps.videos.templatetags.paginator import paginate
+from messages import tasks as notifier
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
@@ -32,34 +48,6 @@ from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
     Setting, TeamLanguagePreference
 )
-from teams.signals import api_teamvideo_new
-import teams.moderation_const as MODERATION
-from django.shortcuts import get_object_or_404, redirect, render_to_response
-from apps.auth.models import UserLanguage
-from django.contrib.sites.models import Site
-from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-from django.views.generic.list_detail import object_list
-from django.template import RequestContext
-from django.db.models import Q, Count
-from django.contrib.auth.decorators import permission_required
-import random
-from widget.views import base_widget_params
-import widget
-from videos.models import Action, VideoUrl
-from django.utils import simplejson as json
-from teams.search_indexes import TeamVideoLanguagesIndex
-from widget.rpc import add_general_settings
-from django.contrib.admin.views.decorators import staff_member_required
-from utils.translation import SUPPORTED_LANGUAGES_DICT
-from utils import DEFAULT_PROTOCOL
-from messages import tasks as notifier
-from apps.videos.templatetags.paginator import paginate
-
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
     can_create_task_translate, can_view_tasks_tab, can_invite,
@@ -68,11 +56,22 @@ from teams.permissions import (
     can_perform_task_for, can_delete_team, can_review, can_approve,
     can_delete_video,
 )
+from teams.search_indexes import TeamVideoLanguagesIndex
+from teams.signals import api_teamvideo_new
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
     update_video_moderation
 )
-import logging
+from utils import render_to, render_to_json, DEFAULT_PROTOCOL
+from utils.forms import flatten_errorlists
+from utils.searching import get_terms
+from utils.translation import get_languages_list, languages_with_names, SUPPORTED_LANGUAGES_DICT
+from videos import metadata_manager
+from videos.models import Action, VideoUrl
+from widget.rpc import add_general_settings
+from widget.views import base_widget_params
+
+
 import sentry_logger # Magical import to make Sentry's error recording happen.
 assert sentry_logger # It's okay, Pyflakes.  Trust me.
 logger = logging.getLogger("teams.views")
