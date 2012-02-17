@@ -566,7 +566,6 @@ INSTALLED_APPS = (
     'search',
     'statistic',
     'streamer',
-    'subrequests',
     'teams',
     'testhelpers',
     'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
@@ -919,8 +918,8 @@ MEDIA_BUNDLES = {
 }
 
 
+# this is used in our feature swither app, doorman, empty for now
 FEATURE_FLAGS  = {
-    "REQUESTS": False,
 }
 
 _INTEGRATION_PATH = os.path.join(PROJECT_ROOT, 'unisubs-integration')

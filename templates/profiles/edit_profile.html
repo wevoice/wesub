@@ -157,14 +157,6 @@
                                     {{ form.language }}
                                     {{ form.proficiency.errors }}
                                     {{ form.proficiency }}
-                                    {% switch_feature REQUESTS %}
-                                        <p>
-                                            {{ form.follow_requests }}
-                                            <label for="{{ form.follow_requests.auto_id }}">
-                                                {{ form.follow_requests.label }}
-                                            </label>
-                                        </p>
-                                    {% endswitch_feature %}
                                     <div style="display: none" class="delete-checkbox">
                                         {{ form.DELETE }}
                                     </div>

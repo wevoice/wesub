@@ -41,21 +41,6 @@ unisubs.widget.SubtitleController = function(
         },
         goog.bind(playController.stopForDialog, playController));
 
-    /**
-     * Show a request subtitles button as a nudge.
-     * It will get overwritten by the Improve Subtitles button.
-     */
-    if (!this.dropDown_.hasSubtitles()) {
-        /*
-        this.videoTab_.updateNudge(
-            'Request Subtitles',
-            goog.bind(this.openRequestSubtitlesDialog,
-                      this));
-        
-        this.videoTab_.showNudge(true);
-         */
-    }
-
     this.handler_.listenOnce(
         this.dialogOpener_,
         goog.ui.Dialog.EventType.AFTER_HIDE,
@@ -70,10 +55,6 @@ unisubs.widget.SubtitleController = function(
             dropDown,
             s.IMPROVE_SUBTITLES,
             this.improveSubtitles).
-       listen(
-            dropDown,
-            s.REQUEST_SUBTITLES,
-            this.requestSubtitles_).
        listen(
             videoTab.getAnchorElem(), 'click',
             this.videoAnchorClicked_
@@ -144,13 +125,6 @@ unisubs.widget.SubtitleController.prototype.improveSubtitles = function() {
 };
 
 /**
- * Corresponds to "request subtitles" in menu.
- */
-unisubs.widget.SubtitleController.prototype.requestSubtitles_ = function() {
-    this.openRequestSubtitlesDialog();
-};
-
-/**
  * Corresponds to "add new subs" in menu.
  */
 unisubs.widget.SubtitleController.prototype.openSubtitleDialog = 
@@ -180,19 +154,3 @@ unisubs.widget.SubtitleController.prototype.subtitleDialogClosed_ = function(e) 
     }
 };
 
-/**
- * Opens the request subtitles dialog.
- */
-unisubs.widget.SubtitleController.prototype.openRequestSubtitlesDialog = function()
-{
-    unisubs.login();
-    if (unisubs.isLoginAttemptInProgress()) {
-        //Logging in
-        return;
-    }
-    else{
-        // Create a new request Dialog
-        var dialog = new unisubs.RequestDialog(this.videoID_);
-        dialog.setVisible(true);
-    }
-}
