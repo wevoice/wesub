@@ -25,8 +25,6 @@ from haystack.backends import SQ
 from haystack import site
 
 from teams import models
-from apps.teams.moderation import WAITING_MODERATION
-from apps.videos.models import SubtitleLanguage
 from icanhaz.models import VideoVisibilityPolicy
 
 
@@ -65,15 +63,8 @@ class TeamVideoLanguagesIndex(SearchIndex):
     # list of completed language absolute urls. should have 1-1 mapping to video_compelted_langs
     video_completed_lang_urls = MultiValueField(indexed=False)
 
-    needs_moderation = BooleanField()
     latest_submission_date = DateTimeField(null=True)
     team_video_create_date = DateTimeField()
-
-    moderation_languages_names = MultiValueField(null=True)
-    moderation_languages_pks = MultiValueField(null=True)
-    # we'll serialize data from versions here -> links and usernames
-    # that will be on the appgove all for that language
-    moderation_version_info = CharField(indexed=False)
 
     # possible values for visibility:
     # is_public=True anyone can see
@@ -134,43 +125,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['is_public'] =  VideoVisibilityPolicy.objects.video_is_public(obj.video)
         self.prepared_data["owned_by_team_id"] = owned_by
 
-        self.prepares_moderation_info( obj, self.prepared_data)
         return self.prepared_data
-
-    def prepares_moderation_info(self, obj, prepared_data):
-        mod_on_same_team =  obj.video.moderated_by == obj.team
-        on_mod = obj.team.get_pending_moderation().filter(language__video=obj.video).count() > 0
-        self.prepared_data["needs_moderation"] =  mod_on_same_team and on_mod
-
-        self.moderation_languages_urls = []
-        self.moderation_languages_names = []
-        self.moderation_version_info = ""
-
-        pending_versions = obj.team.get_pending_moderation()
-        pending_languages = list(SubtitleLanguage.objects.filter(video=obj.video,
-                                                            subtitleversion__moderation_status=WAITING_MODERATION).distinct("language"))
-        if len(pending_languages) == 0 or self.prepared_data["needs_moderation"] is False:
-            return
-
-        prepared_data['moderation_languages_names'] =  []
-        prepared_data['moderation_languages_pks'] =  []
-        moderation_version_info = []
-        for lang in pending_languages:
-            prepared_data['moderation_languages_names'].append(lang.language)
-            prepared_data['moderation_languages_pks'].append(lang.pk)
-            versions = pending_versions.filter(language=lang)
-            version_info = []
-            for version in versions:
-                version_info.append({
-                        "username":version.user and version.user.username,
-                        "user_id": version.user and version.user.pk,
-                        "pk":version.pk
-                })
-            moderation_version_info.append( version_info)
-        self.prepared_data["latest_submission_date"] = pending_versions.order_by("-datetime_started")[0].datetime_started
-        self.prepared_data['moderation_version_info'] = json.dumps(moderation_version_info)
-
-
 
     @classmethod
     def results_for_members(self, team):

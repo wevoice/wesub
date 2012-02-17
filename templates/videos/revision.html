@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body_attrs %}class="video_view v1"{% endblock %}
 
-{% load widget i18n media_compressor moderation doorman %}
+{% load widget i18n media_compressor doorman %}
 
 {% block css %}
   {{ block.super }}
@@ -43,10 +43,6 @@
         });
     </script>
     {% include_bundle "unisubs-onsite-compiled" 0 %}
-    {% switch_feature MODERATION %}
-        {% if user_can_moderate %}
-           {% include_bundle "js-moderation-dashboard" 0 %}
-        {% endif %}
     {% endswitch_feature %}
 
 {% endblock %}
@@ -179,16 +175,5 @@
       <li><a href="{{ language.get_absolute_url }}">{{ language.language_display }} {% trans 'Subtitles' %}</a></li>
     
 {% endcomment %}
-{% endblock %}
-
-{% block bottom_scripts %}
-    {% if user_can_moderate %}
-<script>
-    $(window).load(function(){
-              window.UNISUBS_MOD_REPLACE_HTML_BUTTON = true;
-    {% include 'moderation/moderation-buttons.js' %}
-  });
-</script>
-{% endif %}
 {% endblock %}
 

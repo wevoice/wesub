@@ -57,7 +57,6 @@ from videos.search_indexes import VideoIndex
 import datetime
 from icanhaz.models import VideoVisibilityPolicy
 from videos.decorators import get_video_revision, get_video_from_code
-from doorman import feature_is_on
 
 from apps.teams.moderation import user_can_moderate, get_pending_count
 
@@ -467,12 +466,6 @@ def history(request, video, lang=None, lang_id=None):
         .filter(had_version=True).select_related('video'))
 
     context["user_can_moderate"] = False
-    if feature_is_on("MODERATION"):
-        context["user_can_moderate"] = user_can_moderate(video, request.user)
-        if context["user_can_moderate"]:
-                # FIXME: use  amore efficient count
-            for l in translations:
-                l.pending_moderation_count = get_pending_count(l)
 
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations
@@ -522,8 +515,6 @@ def revision(request,  version):
     context['language'] = language
 
     context["user_can_moderate"] = False
-    if feature_is_on("MODERATION"):
-        context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['widget_params'] = _widget_params(request, \
             language.video, version.version_no, language, size=(289,173))
     context['latest_version'] = language.latest_version()

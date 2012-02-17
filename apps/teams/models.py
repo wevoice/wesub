@@ -334,26 +334,6 @@ class Team(models.Model):
 
         return False
 
-    def get_pending_moderation(self, video=None):
-        """Return q QS of the SubtitleVersions for this team that are awaiting a moderation ruling."""
-        from videos.models import SubtitleVersion
-        qs = SubtitleVersion.objects.filter(language__video__moderated_by=self, moderation_status=WAITING_MODERATION)
-        if video is not None:
-            qs = qs.filter(language__video=video)
-        return qs
-
-    def can_add_moderation(self, user):
-        # TODO: Can we remove this now that we have the teams/permissions stuff in place?
-        if not user.is_authenticated():
-            return False
-        return self.is_manager(user)
-
-    def can_remove_moderation(self, user):
-        # TODO: Can we remove this now that we have the teams/permissions stuff in place?
-        if not user.is_authenticated():
-            return False
-        return self.is_manager(user)
-
     def video_is_moderated_by_team(self, video):
         """Return True if this team moderates the given video, False otherwise."""
         return video.moderated_by == self

@@ -455,24 +455,6 @@ JS_BASE_DEPENDENCIES = [
     'flowplayer/flowplayer-3.2.6.min.js',
 ]
 
-JS_MODERATION_DASHBOARD =  [
-    "js/jquery-1.4.3.js",
-    "js/jquery-ui-1.8.16.custom.min.js",
-    "js/jgrowl/jquery.jgrowl.js",
-    "js/jalerts/jquery.alerts.js",
-    "js/jquery.form.js",
-    "js/jquery.metadata.js",
-    "js/jquery.mod.js",
-    "js/jquery.rpc.js",
-    "js/jquery.input_replacement.min.js",
-    'js/closure-library/closure/goog/base.js',    
-    'js/closure-dependencies.js',    
-    "js/messages.js",
-    "js/jquery.address-1.4.fixed.js",
-    "js/jquery.ajax-paginator.js",
-    "js/moderation/simplewarning.js",
-    "js/moderation/confirmrejectiondialog.js",
-    ]
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -901,12 +883,6 @@ MEDIA_BUNDLES = {
                 "js/testing/timerstub.js",
             ]
     },
-    "js-moderation-dashboard":{
-        "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
-        "closure_deps": "js/closure-dependencies.js",
-        "files": JS_MODERATION_DASHBOARD,
-    },
     "css-teams-settings-panel":{
         "type":"css",
         "files":(
@@ -939,7 +915,6 @@ MEDIA_BUNDLES = {
 
 
 FEATURE_FLAGS  = {
-    "MODERATION" : False,
     "REQUESTS": False,
 }
 
