@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 """
@@ -67,25 +67,25 @@ rpc = Rpc()
 null_rpc = NullRpc()
 
 class TestRpcView(TestCase):
-    
+
     def test_views(self):
         #UnicodeEncodeError: 500 status
         data = {
             'русский': '{}'
         }
-        response = self.client.post(reverse('widget:rpc', args=['show_widget']), data)
+        self.client.post(reverse('widget:rpc', args=['show_widget']), data)
 
         #broken json: 500 status
         data = {
             'param': '{broken - json "'
         }
-        response = self.client.post(reverse('widget:rpc', args=['show_widget']), data)
+        self.client.post(reverse('widget:rpc', args=['show_widget']), data)
         #call private method
-        response = self.client.get(reverse('widget:rpc', args=['_subtitle_count']))
+        self.client.get(reverse('widget:rpc', args=['_subtitle_count']))
         #500, because method does not exists: 500 status
-        response = self.client.get(reverse('widget:rpc', args=['undefined_method']))
+        self.client.get(reverse('widget:rpc', args=['undefined_method']))
         #incorect arguments number: 500 status
-        response = self.client.get(reverse('widget:rpc', args=['show_widget']))
+        self.client.get(reverse('widget:rpc', args=['show_widget']))
 
     def test_rpc(self):
         video_url = 'http://www.youtube.com/watch?v=z2U_jf0urVQ'
@@ -103,7 +103,7 @@ class TestRpcView(TestCase):
 
 class TestRpc(TestCase):
     fixtures = ['test_widget.json', 'test.json']
-    
+
     def setUp(self):
         self.user_0 = CustomUser.objects.get(pk=3)
         self.user_1 = CustomUser.objects.get(pk=4)
@@ -111,7 +111,7 @@ class TestRpc(TestCase):
         video_cache.invalidate_video_id(
             'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv')
 
-        
+
 
     def test_new_trans_on_fork_creates_new(self):
         # for https://www.pivotaltracker.com/story/show/13248955
@@ -140,8 +140,8 @@ class TestRpc(TestCase):
         sub_pk = original_spanish.pk
         return_value = rpc.start_editing(
             request,
-            video.video_id, 
-            "es", 
+            video.video_id,
+            "es",
             subtitle_language_pk=sub_pk,
             base_language_pk=base_language.pk
         )
@@ -153,13 +153,13 @@ class TestRpc(TestCase):
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request, session_pk, inserted);
 
-        video = Video.objects.get(pk=video_pk)        
-        self.assertEqual(video.subtitlelanguage_set.all().count(), 3)        
+        video = Video.objects.get(pk=video_pk)
+        self.assertEqual(video.subtitlelanguage_set.all().count(), 3)
 
         return_value = rpc.start_editing(
             request,
-            video.video_id, 
-            "es", 
+            video.video_id,
+            "es",
             subtitle_language_pk=sub_pk,
             base_language_pk=base_language.pk
         )
@@ -172,22 +172,22 @@ class TestRpc(TestCase):
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request, session_pk, inserted);
 
-        video = Video.objects.get(pk=video_pk)        
+        video = Video.objects.get(pk=video_pk)
         self.assertEqual(video.subtitlelanguage_set.all().count(), 3)
 
-    
+
     def test_actions_for_subtitle_edit(self):
         request = RequestMockup(self.user_0)
         action_ids = [a.id for a in Action.objects.all()]
-        version = self._create_basic_version(request)
+        self._create_basic_version(request)
         qs = Action.objects.exclude(id__in=action_ids).exclude(action_type=Action.ADD_VIDEO)
         self.assertEqual(qs.count(), 1)
 
     def test_no_user_for_video_creation(self):
         request = RequestMockup(self.user_0)
-        action_ids = [i.id for i in Action.objects.all()]
-        return_value = rpc.show_widget(
-            request, 
+        [i.id for i in Action.objects.all()]
+        rpc.show_widget(
+            request,
             'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
             False)
 
@@ -195,7 +195,6 @@ class TestRpc(TestCase):
         #moved to MySQL in crone
         request = RequestMockup(self.user_0)
         version = self._create_basic_version(request)
-        subtitles_fetched_count = version.video.subtitles_fetched_count
 
         subs = rpc.fetch_subtitles(request, version.video.video_id, version.language.pk)
         self.assertEqual(1, len(subs['subtitles']))
@@ -223,7 +222,7 @@ class TestRpc(TestCase):
             False, additional_video_urls=[url_0])
         self.assertEqual(video_id, return_value['video_id'])
         subs = rpc.fetch_subtitles(
-            request, video_id, 
+            request, video_id,
             return_value['drop_down_contents'][0]['pk'])
         self.assertEquals(1, len(subs['subtitles']))
         return_value = rpc.show_widget(
@@ -233,18 +232,18 @@ class TestRpc(TestCase):
     def test_keep_subtitling_dialog_open(self):
         request = RequestMockup(self.user_0)
         return_value = rpc.show_widget(
-            request, 
+            request,
             'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
             False)
         video_id = return_value['video_id']
         return_value = rpc.start_editing(
-            request, video_id, 'en', 
+            request, video_id, 'en',
             original_language_code='en')
         self.assertEqual(True, return_value['can_edit'])
         subs = return_value['subtitles']
         self.assertEqual(0, subs['version'])
         self.assertEqual(0, len(subs['subtitles']))
-        # the subtitling dialog pings the server, even 
+        # the subtitling dialog pings the server, even
         # though we've done no subtitling work yet.
         rpc.regain_lock(request, return_value['session_pk'])
         video = Video.objects.get(video_id=video_id)
@@ -258,7 +257,7 @@ class TestRpc(TestCase):
         # this will fail if locking is dependent on anything in session,
         # which can get cleared after login.
         request.session = {}
-        rpc.finished_subtitles(request, session.pk, 
+        rpc.finished_subtitles(request, session.pk,
                                [{'subtitle_id': 'aa',
                                  'text': 'hey you!',
                                  'start_time': 2.3,
@@ -278,7 +277,7 @@ class TestRpc(TestCase):
     def test_get_widget_url(self):
         request = RequestMockup(self.user_0)
         session = self._create_basic_version(request)
-        language = Video.objects.get(
+        Video.objects.get(
             video_id=session.video.video_id).subtitle_language()
         # succeeds if no error.
 
@@ -322,7 +321,7 @@ class TestRpc(TestCase):
             False)
         return_value = rpc.start_editing(request_1, video_id, 'en')
         self.assertEqual(False, return_value['can_edit'])
-        self.assertEqual(self.user_0.__unicode__(), 
+        self.assertEqual(self.user_0.__unicode__(),
                          return_value['locked_by'])
 
     def test_basic(self):
@@ -341,7 +340,7 @@ class TestRpc(TestCase):
                      'end_time': 3.4,
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request_0, session_pk, inserted)
-        
+
         v = models.Video.objects.get(video_id=video_id)
 
         self.assertEqual(1, v.subtitlelanguage_set.count())
@@ -390,7 +389,7 @@ class TestRpc(TestCase):
                      'start_time': -1,
                      'end_time': -1,
                      'sub_order': 3.0}]
-        rpc.finished_subtitles(request, return_value['session_pk'], 
+        rpc.finished_subtitles(request, return_value['session_pk'],
                                subtitles=inserted, completed=True)
         video = Video.objects.get(pk=session.language.video.pk)
         language = video.subtitle_language()
@@ -528,7 +527,7 @@ class TestRpc(TestCase):
         video_id = return_value['video_id']
         # we submit only blank subs.
         response = rpc.start_editing(
-            request_0, video_id, 
+            request_0, video_id,
             'en', original_language_code='en')
         session_pk = response['session_pk']
         rpc.finished_subtitles(
@@ -571,7 +570,7 @@ class TestRpc(TestCase):
         # user_1 opens translate dialog
         request_1 = RequestMockup(self.user_1, "b")
         rpc.show_widget(
-            request_1, 
+            request_1,
             'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
             False)
         response = rpc.start_editing(
@@ -658,19 +657,19 @@ class TestRpc(TestCase):
 
         # now fork subtitles
         response = rpc.start_editing(
-            request, session.video.video_id, 'es', 
+            request, session.video.video_id, 'es',
             subtitle_language_pk=language.pk)
         sub_state = response['subtitles']
         self.assertEquals(True, sub_state['forked'])
         self.assertTrue(
-            ('base_language_pk' not in sub_state) or 
+            ('base_language_pk' not in sub_state) or
             sub_state['base_language_pk'] is None)
         subtitles = sub_state['subtitles']
         self.assertEquals(2, len(subtitles))
         self.assertEquals('a_es', subtitles[0]['text'])
         self.assertEquals(2.3, subtitles[0]['start_time'])
         self.assertEquals(3.4, subtitles[0]['end_time'])
-        
+
         session_pk = response['session_pk']
         new_subs = [{'subtitle_id': subtitles[0]['subtitle_id'],
                      'text': 'a_edited',
@@ -723,7 +722,7 @@ class TestRpc(TestCase):
 
         # save as forked.
         rpc.finished_subtitles(
-            request, 
+            request,
             session_pk,
             subtitles=subtitles,
             forked=True)
@@ -741,7 +740,7 @@ class TestRpc(TestCase):
         self.assertEquals(1.3, subtitles[0].start_time)
         self.assertEquals(2.4, subtitles[0].end_time)
         self.assertEquals(6.4, subtitles[1].start_time)
-        self.assertEquals(8.8, subtitles[1].end_time)        
+        self.assertEquals(8.8, subtitles[1].end_time)
 
     def test_change_original_language_legal(self):
         request = RequestMockup(self.user_0)
@@ -769,7 +768,7 @@ class TestRpc(TestCase):
         # now claim that spanish is the original language
         es_sl = models.Video.objects.get(video_id=video_id).subtitle_language('es')
         return_value = rpc.start_editing(
-            request, video_id, 'es', 
+            request, video_id, 'es',
             subtitle_language_pk=es_sl.pk,
             original_language_code='es')
         session_pk = return_value['session_pk']
@@ -816,16 +815,16 @@ class TestRpc(TestCase):
         self.assertEquals(None, return_value['subtitles'])
 
     def test_ensure_language_locked_on_regain_lock(self):
-        request = RequestMockup(self.user_0)        
+        request = RequestMockup(self.user_0)
         session = self._start_editing(request)
         now = datetime.now().replace(microsecond=0) + timedelta(seconds=20)
         models.datetime = FakeDatetime(now)
-        response = rpc.regain_lock(request, session.pk)
+        rpc.regain_lock(request, session.pk)
         video = models.Video.objects.get(pk=session.video.pk)
         language = video.subtitle_language()
         self.assertEquals(now, language.writelock_time)
         models.datetime = datetime
-        
+
     def test_title_and_description_from_video(self):
         request = RequestMockup(self.user_0)
         video = Video.objects.all()[0]
@@ -846,7 +845,7 @@ class TestRpc(TestCase):
         request = RequestMockup(self.user_0)
         session = create_two_sub_dependent_session(request)
         response = rpc.start_editing(
-            request, session.video.video_id, 'fr', 
+            request, session.video.video_id, 'fr',
             base_language_pk=session.language.pk)
         session_pk = response['session_pk']
         orig_subs = response['original_subtitles']['subtitles']
@@ -859,7 +858,7 @@ class TestRpc(TestCase):
             'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
             False)
         lang = [r for r in response['drop_down_contents'] if r['language'] == 'fr'][0]
-        subs = rpc.fetch_subtitles(request, session.video.video_id, 
+        subs = rpc.fetch_subtitles(request, session.video.video_id,
                                    lang['pk'])
         subs = subs['subtitles']
         self.assertEqual(1, len(subs))
@@ -902,7 +901,7 @@ class TestRpc(TestCase):
                      'start_time': 3.4,
                      'end_time': 5.8,
                      'sub_order': 2.0},
-                    {'subtitle_id': 'e', 
+                    {'subtitle_id': 'e',
                       'text': 'd_es',
                      'start_time': 4.3,
                      'end_time': 5.2,
@@ -947,7 +946,7 @@ class TestRpc(TestCase):
         french_lang = models.Video.objects.get(video_id=video_id).subtitle_language('fr')
         self.assertEquals(True, french_lang.is_forked)
         self.assertEquals(2.35, french_lang.latest_version().subtitles()[0].start_time)
-        
+
         spanish_lang = models.Video.objects.get(video_id=video_id).subtitle_language('es')
         self.assertEquals(True, spanish_lang.is_forked)
         self.assertEquals(2.3, spanish_lang.latest_version().subtitles()[0].start_time)
@@ -972,9 +971,9 @@ class TestRpc(TestCase):
         sub_langs = models.Video.objects.get(id=session.video.id).subtitlelanguage_set.filter(language='fr')
 
         # now someone tries to edit es based on fr.
-        
+
         response = rpc.start_editing(
-            request, session.video.video_id, 'es', 
+            request, session.video.video_id, 'es',
             base_language_pk=sub_langs[0].pk)
         session_pk = response['session_pk']
         inserted = [{'subtitle_id': 'a', 'text': 'a_es'}]
@@ -987,11 +986,11 @@ class TestRpc(TestCase):
     def test_edit_zero_translation(self):
         request = RequestMockup(self.user_0)
         session = create_two_sub_session(request)
-        
-        # now create empty subs for a language. We can do this by 
+
+        # now create empty subs for a language. We can do this by
         # starting editing but not finishing. Should create a 0% language.
         response = rpc.start_editing(
-            request, session.video.video_id, 'es', 
+            request, session.video.video_id, 'es',
             base_language_pk=session.video.subtitle_language('en').id)
         session_pk = response['session_pk']
         rpc.release_lock(request, session_pk)
@@ -1005,14 +1004,14 @@ class TestRpc(TestCase):
 
         response = rpc.start_editing(
             request, video.video_id, 'es',
-            subtitle_language_pk=sl_es.pk, 
+            subtitle_language_pk=sl_es.pk,
             base_language_pk=sl_en.pk)
         session_pk = response['session_pk']
         inserted = [{'subtitle_id': u'a',
                      'text': 'heyes!'}]
         # test passes if the following command executes without throwing an exception.
         response= rpc.finished_subtitles(
-            request, session_pk, 
+            request, session_pk,
             inserted)
 
         sl_es = models.SubtitleLanguage.objects.get(id=sl_es.id)
@@ -1026,23 +1025,24 @@ class TestRpc(TestCase):
         # user_1 opens translate dialog
         request_1 = RequestMockup(self.user_1, "b")
         rpc.show_widget(
-            request_1, 
+            request_1,
             'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
             False)
         response = rpc.start_editing(
             request_1, session.video.video_id, 'es', base_language_pk=en_sl.pk)
         session_pk = response['session_pk']
         title = 'new title'
-        return_value = rpc.finished_subtitles(request_1, session_pk, new_title=title)
+        rpc.finished_subtitles(request_1, session_pk, new_title=title)
         language = SubtitlingSession.objects.get(id=session_pk).language
         self.assertEquals(title, language.title)
 
     def test_youtube_ei_failure(self):
         import sentry_logger
+        assert sentry_logger # Shut up, Pyflakes.
         from utils.requestfactory import RequestFactory
         rf = RequestFactory()
         request = rf.get("/")
-        
+
         num_messages = Message.objects.all().count()
         self.assertEquals(0, num_messages)
 
@@ -1068,7 +1068,7 @@ class TestRpc(TestCase):
         request = RequestMockup(self.user_0)
         video_id = Video.objects.get(id=self.video_pk).video_id
         request_langs = ['en', 'hi', 'fr']
-        response = rpc.submit_subtitle_request(request, video_id, request_langs, 
+        response = rpc.submit_subtitle_request(request, video_id, request_langs,
                                                True, '')
         self.assertEqual(True, response.get('status'))
         self.assertEqual(len(request_langs), response.get('count'))
@@ -1161,13 +1161,13 @@ def create_two_sub_dependent_session(request):
     session = create_two_sub_session(request)
     sl_en = session.video.subtitle_language('en')
     response = rpc.start_editing(
-        request, session.video.video_id, 
+        request, session.video.video_id,
         'es', base_language_pk=sl_en.pk)
     session_pk = response['session_pk']
-    inserted = [{'subtitle_id': 'a', 'text': 'a_es'}, 
+    inserted = [{'subtitle_id': 'a', 'text': 'a_es'},
                 {'subtitle_id': 'b', 'text': 'b_es'}]
     rpc.finished_subtitles(
-        request, session_pk, 
+        request, session_pk,
         inserted)
     return SubtitlingSession.objects.get(pk=session_pk)
 
@@ -1182,10 +1182,10 @@ def _make_packet(updated=[], inserted=[], deleted=[], packet_no=1):
 class TestCache(TestCase):
 
     fixtures = ['test_widget.json']
-    
+
     def setUp(self):
         self.user_0 = CustomUser.objects.get(pk=3)
-        
+
     def test_get_cache_url_no_exceptions(self):
         e = None
         try:
@@ -1241,13 +1241,13 @@ class TestCache(TestCase):
         cache_key = video_cache._video_id_key(url)
         video_cache.cache.set(cache_key, "", video_cache.TIMEOUT)
         video_id = video_cache.get_video_id(url)
-        res = video_cache.get_subtitles_dict(video_id, 0, 0, lambda x: x)
+        video_cache.get_subtitles_dict(video_id, 0, 0, lambda x: x)
 
 from widget.srt_subs import TTMLSubtitles, SRTSubtitles, SBVSubtitles, TXTSubtitles, SSASubtitles
 
 class TestSubtitlesGenerator(TestCase):
     fixtures = ['test_widget.json']
-    
+
     def setUp(self):
         self.video = Video.objects.all()[:1].get()
         self.subtitles = []
@@ -1259,23 +1259,23 @@ class TestSubtitlesGenerator(TestCase):
         self.subtitles.append({
             'start': 1,
             'end': 2,
-            'text': u'Не аглійські субтитри. Її'                               
+            'text': u'Не аглійські субтитри. Її'
         })
         self.subtitles.append({
             'start': 359999.0,
             'end': 359999.0,
             'text': u"Andres Martinez: Right. And I guess\xa0\x1e\x1e\n I'm tempted to cut to what is the answer."
-        })        
-        
+        })
+
     def test_ttml(self):
         handler = TTMLSubtitles
         h = handler(self.subtitles, self.video)
         self.assertTrue(unicode(h))
-    
+
     def test_one_subtitle(self):
         subtitles = [{
-            'text': u'Witam, jestem Fr\xe9d\xe9ric Couchet, General Manager, od kwietnia', 
-            'end': 3.1000000000000001, 
+            'text': u'Witam, jestem Fr\xe9d\xe9ric Couchet, General Manager, od kwietnia',
+            'end': 3.1000000000000001,
             'start': 0.0
         }]
         self.assertTrue(unicode(SRTSubtitles(subtitles, self.video)))
@@ -1284,4 +1284,4 @@ class TestSubtitlesGenerator(TestCase):
         self.assertTrue(unicode(SBVSubtitles(subtitles, self.video)))
         self.assertTrue(unicode(TXTSubtitles(subtitles, self.video)))
 
-    
+

@@ -1,37 +1,41 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
-from widget.base_rpc import BaseRpc
-from videos import models
 from django.conf import settings
 from django.conf.global_settings import LANGUAGES
-import widget
+
+from utils.translation import get_user_languages_from_request
+from videos import models
 from videos.types import video_type_registrar
 from videos.types.bliptv import BlipTvVideoType
-from utils.translation import get_user_languages_from_request
+from widget.base_rpc import BaseRpc
+
 
 ALL_LANGUAGES = settings.ALL_LANGUAGES
 LANGUAGES_MAP = dict(ALL_LANGUAGES)
 
 class NullRpc(BaseRpc):
+    STUB_VIDEO_LANG = [
+        {"dependent": False, "is_complete": True, "language": "en"},
+        {"dependent": False, "is_complete": True, "language": "eu"},
+        {"dependent": False, "is_complete": True, "language": "gl"},
+        {"dependent": False, "is_complete": False, "language": "meta-tw"},
+    ]
 
-    STUB_VIDEO_LANG = [{"dependent": False, "is_complete": True, "language": "en"}, {"dependent": False, "is_complete": True, "language": "eu"}, {"dependent": False, "is_complete": True, "language": "gl"}, {"dependent": False, "is_complete": False, "language": "meta-tw"}]
-                       
     def show_widget(self, request, video_url, is_remote, base_state=None):
         return_value = {
             'video_id' : 'abc',
@@ -83,9 +87,9 @@ class NullRpc(BaseRpc):
             'my_languages': my_languages,
             'all_languages': all_languages
         }
-    
-    def start_editing(self, request, video_id, 
-                      language_code, 
+
+    def start_editing(self, request, video_id,
+                      language_code,
                       subtitle_language_pk=None,
                       base_language_pk=None,
                       original_language_code=None):

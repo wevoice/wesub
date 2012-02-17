@@ -15,37 +15,39 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
+import logging
 from datetime import datetime
-from videos import models
-from widget.models import SubtitlingSession
-from widget.base_rpc import BaseRpc
+
 from django.conf import settings
 from django.db.models import Sum, Q
-from widget import video_cache
-from utils.translation import get_user_languages_from_request
-from django.utils.translation import ugettext as _
-from subrequests.models import SubtitleRequest
-from uslogging.models import WidgetDialogLog
-from videos.tasks import video_changed_tasks
-from icanhaz.models import VideoVisibilityPolicy
 from django.utils import translation
-from widget.forms import  FinishReviewForm, FinishApproveForm
-from utils.forms import flatten_errorlists
+from django.utils.translation import ugettext as _
+
+from icanhaz.models import VideoVisibilityPolicy
+from statistic.tasks import st_widget_view_statistic_update
+from subrequests.models import SubtitleRequest
 from teams.models import Task, Workflow
-from teams.signals import (
-    api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
-    api_language_new, api_language_edited, api_video_edited
-)
 from teams.moderation_const import UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
     can_publish_edits_immediately, can_review, can_approve
 )
-
+from teams.signals import (
+    api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
+    api_language_new, api_language_edited, api_video_edited
+)
+from uslogging.models import WidgetDialogLog
 from utils import send_templated_email
-from statistic.tasks import st_widget_view_statistic_update
-import logging
+from utils.forms import flatten_errorlists
+from utils.translation import get_user_languages_from_request
+from videos import models
+from videos.tasks import video_changed_tasks
+from widget import video_cache
+from widget.base_rpc import BaseRpc
+from widget.forms import  FinishReviewForm, FinishApproveForm
+from widget.models import SubtitlingSession
+
+
 yt_logger = logging.getLogger("youtube-ei-error")
 
 ALL_LANGUAGES = settings.ALL_LANGUAGES
@@ -94,8 +96,8 @@ class Rpc(BaseRpc):
         except Exception as e:
             # for example, private youtube video or private widgets
             return {"error_msg": unicode(e)}
-            
-        if video_id is None: 
+
+        if video_id is None:
             return None
         visibility_policy = video_cache.get_visibility_policies(video_id)
         if visibility_policy.get('widget', None) != VideoVisibilityPolicy.WIDGET_VISIBILITY_PUBLIC:
@@ -453,10 +455,10 @@ class Rpc(BaseRpc):
             api_video_edited.send(language.video)
 
         # The message displayed to the user  has a complex requirement /  outcomes
-        # 1) Subs will go live in a moment. Works for unmoderated subs and for D and H 
+        # 1) Subs will go live in a moment. Works for unmoderated subs and for D and H
         # D. Transcript, post-publish edit by moderator with the power to approve. Will go live immediately.
         # H. Translation, post-publish edit by moderator with the power to approve. Will go live immediately.
-        # 2) Subs must be completed before being submitted to moderators. Works for A and E 
+        # 2) Subs must be completed before being submitted to moderators. Works for A and E
         # A. Transcript, incomplete (checkbox not ticked). Must be completed before being submitted to moderators.
         # E. Translation, incomplete (some lines missing). Must be completed before being submitted to moderators.
         # 3) Subs will be submitted for review/approval. Works for B, C, F, and G
@@ -481,10 +483,10 @@ class Rpc(BaseRpc):
                 user_message = message_will_be_submited % ( language.video.moderated_by.name)
             else:
                 # case 2
-                user_message = message_incomplete 
+                user_message = message_incomplete
         else:
             user_message = message_will_be_live_soon
-            
+
         # If we've just saved a completed subtitle language, we may need to
         # complete a subtitle or translation task.
         if is_complete:

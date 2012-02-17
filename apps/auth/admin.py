@@ -1,13 +1,33 @@
-from django.contrib import admin
-from django.contrib.auth.models import User
-from django.contrib.auth.admin import UserAdmin
-from models import CustomUser, Announcement
-from django.contrib.auth.forms import UserCreationForm
-from django import forms
-from django.utils.translation import ugettext_lazy as _
-from django.db import models
-from django.contrib.admin import widgets
+# Universal Subtitles, universalsubtitles.org
+# 
+# Copyright (C) 2012 Participatory Culture Foundation
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see 
+# http://www.gnu.org/licenses/agpl-3.0.html.
 from datetime import datetime
+
+from django import forms
+from django.contrib import admin
+from django.contrib.admin import widgets
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+from models import CustomUser, Announcement
+
 
 class CustomUserCreationForm(UserCreationForm):
     username = forms.RegexField(label=_("Username"), max_length=30, regex=r'^\w+$',
@@ -16,7 +36,7 @@ class CustomUserCreationForm(UserCreationForm):
     password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput)
     email = forms.EmailField(label=_('Email'))
-    
+
     class Meta:
         model = CustomUser
         fields = ("username", "email")
@@ -38,16 +58,16 @@ class AnnouncementAdmin(admin.ModelAdmin):
     }
     list_display = ('content', 'created', 'visible')
     actions = ['make_hidden']
-    
+
     def get_form(self, request, obj=None, **kwargs):
         form = super(AnnouncementAdmin, self).get_form(request, obj=None, **kwargs)
-        
+
         default_help_text = form.base_fields['created'].help_text
         now = datetime.now()
         form.base_fields['created'].help_text = default_help_text+\
             u'</br>Current server time is %s. Value is saved without timezone converting.' % now.strftime('%m/%d/%Y %H:%M:%S')
         return form
-    
+
     def visible(self, obj):
         return not obj.hidden
     visible.boolean = True
@@ -56,7 +76,7 @@ class AnnouncementAdmin(admin.ModelAdmin):
         Announcement.clear_cache()
         queryset.update(hidden=True)
     make_hidden.short_description = _(u'Hide')
-    
+
 admin.site.register(Announcement, AnnouncementAdmin)
-admin.site.unregister(User)    
+admin.site.unregister(User)
 admin.site.register(CustomUser, CustomUserAdmin)
