@@ -58,7 +58,6 @@ import datetime
 from icanhaz.models import VideoVisibilityPolicy
 from videos.decorators import get_video_revision, get_video_from_code
 
-from apps.teams.moderation import user_can_moderate, get_pending_count
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -219,7 +218,6 @@ def video(request, video, video_url=None, title=None):
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations
 
-    context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
 
     context['widget_params'] = _widget_params(
@@ -596,7 +594,6 @@ def diffing(request, first_version, second_pk):
     context['first_version'] = first_version
     context['second_version'] = second_version
     context['latest_version'] = language.latest_version()
-    context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['rollback_allowed'] = not video.is_moderated
     context['widget0_params'] = \
         _widget_params(request, video,
