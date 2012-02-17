@@ -89,6 +89,16 @@ VIDEO_META_TYPE_IDS = {}
 
 
 def update_metadata_choices():
+    """Refresh the VIDEO_META_TYPE_* set of constants.
+
+    When VIDEO_META_CHOICES is updated through VideoMetadata.add_metadata_type()
+    the set of extra lookup variables needs to be updated as well.  This
+    function does that.
+
+    You should never need to call this directly --
+    VideoMetadata.add_metadata_type() will take care of it.
+
+    """
     global VIDEO_META_TYPE_NAMES, VIDEO_META_TYPE_VARS , VIDEO_META_TYPE_IDS
     VIDEO_META_TYPE_NAMES = dict(VIDEO_META_CHOICES)
     VIDEO_META_TYPE_VARS = dict((k, name.lower().replace(' ', '_'))
@@ -165,11 +175,21 @@ class Video(models.Model):
         return title
 
     def update_search_index(self):
+        """Queue a Celery task that will update this video's Solr entry."""
         from utils.celery_search_index import update_search_index
         update_search_index.delay(self.__class__, self.pk)
 
     @property
     def views(self):
+        """Return a dict of the number of views recorded for this video.
+
+        The map will look like:
+
+            {'month': 100, 'week': 5, 'year': 10223, 'total': 20333}
+
+        Caches this map in memcache for two hours.
+
+        """
         if not hasattr(self, '_video_views_statistic'):
             cache_key = 'video_views_statistic_%s' % self.pk
             views_st = cache.get(cache_key)
@@ -211,6 +231,7 @@ class Video(models.Model):
         return title
 
     def update_view_counter(self):
+        """Queue a Celery task that will increment the number of views for this video."""
         try:
             st_video_view_handler_update.delay(video_id=self.video_id)
         except:
@@ -218,6 +239,7 @@ class Video(models.Model):
             client.create_from_exception()
 
     def update_subtitles_fetched(self, lang=None):
+        """Queue a Celery task that will increment the number of times this video's subtitles were fetched."""
         try:
             sl_pk = lang.pk if lang else None
             st_sub_fetch_handler_update.delay(video_id=self.video_id, sl_pk=sl_pk)
@@ -230,6 +252,12 @@ class Video(models.Model):
             client.create_from_exception()
 
     def get_thumbnail(self):
+        """Return a URL to this video's thumbnail, or '' if there isn't one.
+
+        This may be an absolute or relative URL, depending on whether the
+        thumbnail is stored in our media folder or on S3.
+
+        """
         if self.s3_thumbnail:
             return self.s3_thumbnail.url
 
@@ -239,6 +267,12 @@ class Video(models.Model):
         return ''
 
     def get_small_thumbnail(self):
+        """Return a URL to a small version of this video's thumbnail, or '' if there isn't one.
+
+        This may be an absolute or relative URL, depending on whether the
+        thumbnail is stored in our media folder or on S3.
+
+        """
         if self.s3_thumbnail:
             return self.s3_thumbnail.thumb_url(120, 90)
 
@@ -252,11 +286,17 @@ class Video(models.Model):
         return ('videos:history', [self.video_id])
 
     def get_team_video(self):
+        """Return the TeamVideo object for this video, or None if there isn't one."""
         tvs = self.teamvideo_set.select_related('team')[:1]
         return tvs[0] if tvs else None
 
 
     def thumbnail_link(self):
+        """Return a URL to this video's thumbnail, or '' if there isn't one.
+
+        Unlike get_thumbnail, this URL will always be absolute.
+
+        """
         if not self.thumbnail:
             return ''
 
@@ -266,6 +306,7 @@ class Video(models.Model):
         return settings.STATIC_URL+self.thumbnail
 
     def is_html5(self):
+        """Return True if the original URL for this video is an HTML5 one, False otherwise."""
         try:
             return self.videourl_set.filter(original=True)[:1].get().is_html5()
         except models.ObjectDoesNotExist:
@@ -275,9 +316,13 @@ class Video(models.Model):
         return self.get_absolute_url()
 
     def title_for_url(self):
-        """
-        NOTE: this method is used in videos.search_indexes.VideoSearchResult
-        to prevent duplication of code in search result and in DB-query result
+        """Return this video's title with non-URL-friendly characters replaced.
+
+        NOTE: this method is used in videos.search_indexes.VideoSearchResult to
+        prevent duplication of code in search result and in DB-query result.
+
+        TODO: Just use slugify() instead?
+
         """
         return (self.title.replace('/', '-')
                           .replace("'", '-')
@@ -304,6 +349,11 @@ class Video(models.Model):
     get_absolute_url = _get_absolute_url
 
     def get_video_url(self):
+        """Return the primary video URL for this video if one exists, otherwise None.
+
+        This will return a string of an actual URL, not a VideoUrl.
+
+        """
         try:
             return self.videourl_set.filter(primary=True).all()[:1].get().effective_url
         except models.ObjectDoesNotExist:
@@ -371,6 +421,11 @@ class Video(models.Model):
 
     @property
     def language(self):
+        """Return the language code of this video's original language as a string.
+
+        Will return None if unknown.
+
+        """
         ol = self._original_subtitle_language()
 
         if ol and ol.language:
@@ -378,23 +433,43 @@ class Video(models.Model):
 
     @property
     def filename(self):
+        """Return a filename-safe version of this video's string representation.
+
+        Could be useful when providing a user with a file related to this video
+        to download, etc.
+
+        """
         from django.utils.text import get_valid_filename
 
         return get_valid_filename(self.__unicode__())
 
     def lang_filename(self, language):
+        """Return a filename-safe version of this video's string representation with a language code.
+
+        Could be useful when providing a user with a file of subs to download,
+        etc.
+
+        """
         name = self.filename
         lang = language.language or u'original'
         return u'%s.%s' % (name, lang)
 
     @property
     def subtitle_state(self):
-        """Subtitling state for this video
+        """Return the subtitling state for this video.
+
+        The value returned will be one of the NO_SUBTITLES or SUBTITLES_FINISHED
+        constants.
+
         """
-        return NO_SUBTITLES if self.latest_version() \
-            is None else SUBTITLES_FINISHED
+        return NO_SUBTITLES if self.latest_version() is None else SUBTITLES_FINISHED
 
     def _original_subtitle_language(self):
+        """Return the SubtitleLanguage in the original language of this video, or None.
+
+        Caches the result in the object.
+
+        """
         if not hasattr(self, '_original_subtitle'):
             try:
                 original = self.subtitlelanguage_set.filter(is_original=True)[:1].get()
@@ -406,11 +481,24 @@ class Video(models.Model):
         return getattr(self, '_original_subtitle')
 
     def has_original_language(self):
+        """Return True if this video has a SubtitleLanguage for its original language, False otherwise.
+
+        NOTE: this uses another method which caches the result in the object, so
+        this will effectively be cached in-object as well.
+
+        """
         original_language = self._original_subtitle_language()
         if original_language:
             return original_language.language != ''
 
     def subtitle_language(self, language_code=None):
+        """Return the SubtitleLanguage for this video with the given language code, or None.
+
+        If None is passed as a language_code, the original language
+        SubtitleLanguage will be returned.  In this case the value will be
+        cached in-object.
+
+        """
         try:
             if language_code is None:
                 return self._original_subtitle_language()
@@ -421,14 +509,43 @@ class Video(models.Model):
             return None
 
     def subtitle_languages(self, language_code):
+        """Return all SubtitleLanguages for this video with the given language code."""
         return self.subtitlelanguage_set.filter(language=language_code)
 
     def version(self, version_no=None, language=None, public_only=True):
+        """Return the SubtitleVersion for this video matching the given criteria.
+
+        If language is given (it must be a SubtitleLanguage, NOT a string
+        language code) the version will be looked up for that, otherwise the
+        original language will be used.
+
+        If version_no is given, the version with that number will be returned.
+
+        If public_only is True (the default) only versions visible to the public
+        (i.e.: not moderated) will be considered.  If it is false all versions
+        are eligable.
+
+        If no version fitting all the criteria is found, None is returned.
+
+        """
         if language is None:
             language = self.subtitle_language()
         return None if language is None else language.version(version_no, public_only=public_only)
 
     def latest_version(self, language_code=None, public_only=True):
+        """Return the latest SubtitleVersion for this video matching the given criteria.
+
+        If language is given (it must be a SubtitleLanguage, NOT a string
+        language code) the version will be looked up for that, otherwise the
+        original language will be used.
+
+        If public_only is True (the default) only versions visible to the public
+        (i.e.: not moderated) will be considered.  If it is false all versions
+        are eligable.
+
+        If no version fitting all the criteria is found, None is returned.
+
+        """
         language = self.subtitle_language(language_code)
         return None if language is None else language.latest_version(public_only=public_only)
 
@@ -583,6 +700,12 @@ class Video(models.Model):
 
 
 def create_video_id(sender, instance, **kwargs):
+    """Generate (and set) a random video_id for this video before saving.
+
+    Also fills in the edited timestamp.
+    TODO: Split the 'edited' update out into a new function.
+
+    """
     instance.edited = datetime.now()
     if not instance or instance.video_id:
         return
@@ -608,12 +731,15 @@ class VideoMetadata(models.Model):
 
     @classmethod
     def add_metadata_type(cls, num, readable_name):
-        """
-        Adds a new metadata choice. These can't be added at class
-        creation time because some of those types live on the integration
-        repo and therefore can't be referenced from here.
-        This makes sure that if code is trying to do this dinamically
-        we'll never allow it to overwrite a key with a different name
+        """Add a new metadata_type choice.
+
+        These can't be added at class creation time because some of those types
+        live on the integration repo and therefore can't be referenced from
+        here.
+
+        This makes sure that if code is trying to do this dynamically we'll
+        never allow it to overwrite a key with a different name.
+
         """
         field = VideoMetadata._meta.get_field_by_name("metadata_type")[0]
         choices = field.choices
@@ -629,6 +755,7 @@ class VideoMetadata(models.Model):
         global VIDEO_META_CHOICES
         VIDEO_META_CHOICES = field._choices = choices
         update_metadata_choices()
+
 
     class Meta:
         ordering = ('created',)
