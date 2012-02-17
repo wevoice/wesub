@@ -56,9 +56,11 @@ def get_perm_names(model, perms):
 # Teams
 class TeamManager(models.Manager):
     def get_query_set(self):
+        """Return a QS of all non-deleted teams."""
         return super(TeamManager, self).get_query_set().filter(deleted=False)
 
     def for_user(self, user):
+        """Return a QS of all the (non-deleted) teams visible for the given user."""
         if user.is_authenticated():
             return self.get_query_set().filter(
                     models.Q(is_visible=True) |
@@ -115,8 +117,10 @@ class Team(models.Model):
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
+
     # these allow unisubs to do things on user's behalf such as uploding subs to Youtub
     third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",  related_name='tseams', verbose_name=_('third party accounts'))
+
     points = models.IntegerField(default=0, editable=False)
     applicants = models.ManyToManyField(User, through='Application', related_name='applicated_teams', verbose_name=_('applicants'))
     created = models.DateTimeField(auto_now_add=True)
@@ -164,29 +168,52 @@ class Team(models.Model):
         verbose_name_plural = _(u'Teams')
 
 
+    def save(self, *args, **kwargs):
+        creating = self.pk is None
+        super(Team, self).save(*args, **kwargs)
+        if creating:
+            # make sure we create a default project
+            self.default_project
+
     def __unicode__(self):
         return self.name
 
     def render_message(self, msg):
+        """Return a string of HTML represention a team header for a notification.
+
+        TODO: Get this out of the model and into a templatetag or something.
+
+        """
         author_page = msg.author.get_absolute_url() if msg.author else ''
         context = {
-                'team': self,
-                'msg': msg,
-                'author': msg.author,
-                'author_page': author_page,
-                'team_page': self.get_absolute_url(),
-                "STATIC_URL": settings.STATIC_URL,
-                }
+            'team': self,
+            'msg': msg,
+            'author': msg.author,
+            'author_page': author_page,
+            'team_page': self.get_absolute_url(),
+            "STATIC_URL": settings.STATIC_URL,
+        }
         return render_to_string('teams/_team_message.html', context)
 
     def is_open(self):
+        """Return True if this team's membership is open to the public, False otherwise."""
         return self.membership_policy == self.OPEN
 
     def is_by_application(self):
+        """Return True if this team's membership is by application only, False otherwise."""
         return self.membership_policy == self.APPLICATION
 
     @classmethod
     def get(cls, slug, user=None, raise404=True):
+        """Return the Team with the given slug.
+
+        If a user is given the Team must be visible to that user.  Otherwise the
+        Team must be visible to the public.
+
+        If raise404 is given an Http404 exception will be raised if a suitable
+        team is not found.  Otherwise None will be returned.
+
+        """
         if user:
             qs = cls.objects.for_user(user)
         else:
@@ -202,28 +229,60 @@ class Team(models.Model):
         if raise404:
             raise Http404
 
+    def get_workflow(self):
+        """Return the workflow for the given team.
+
+        A workflow will always be returned.  If one isn't specified for the team
+        a default (unsaved) one will be populated with default values and
+        returned.
+
+        TODO: Refactor this behaviour into something less confusing.
+
+        """
+        return Workflow.get_for_target(self.id, 'team')
+
+
+    # Thumbnails
     def logo_thumbnail(self):
+        """Return the URL for a kind-of small version of this team's logo, or None."""
         if self.logo:
             return self.logo.thumb_url(100, 100)
 
     def medium_logo_thumbnail(self):
+        """Return the URL for a medium version of this team's logo, or None."""
         if self.logo:
             return self.logo.thumb_url(280, 100)
 
     def small_logo_thumbnail(self):
+        """Return the URL for a really small version of this team's logo, or None."""
         if self.logo:
             return self.logo.thumb_url(50, 50)
 
+
+    # URLs
     @models.permalink
     def get_absolute_url(self):
         return ('teams:detail', [self.slug])
 
     def get_site_url(self):
-        return '%s://%s%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, self.get_absolute_url())
+        """Return the full, absolute URL for this team, including http:// and the domain."""
+        return '%s://%s%s' % (DEFAULT_PROTOCOL,
+                              Site.objects.get_current().domain,
+                              self.get_absolute_url())
 
 
+    # Membership and roles
     def _is_role(self, user, role=None):
-        if not user.is_authenticated():
+        """Return True if the given user has the given role in this team, False otherwise.
+
+        Safe to use with null or unauthenticated users.
+
+        If no role is given, simply return whether the user is a member of this team at all.
+
+        TODO: Change this to use the stuff in teams.permissions.
+
+        """
+        if not user or not user.is_authenticated():
             return False
         qs = self.members.filter(user=user)
         if role:
@@ -231,30 +290,35 @@ class Team(models.Model):
         return qs.exists()
 
     def is_admin(self, user):
+        """Return True if the given user is an admin of this team, False otherwise."""
         return self._is_role(user, TeamMember.ROLE_ADMIN)
 
     def is_manager(self, user):
+        """Return True if the given user is a manager of this team, False otherwise."""
         return self._is_role(user, TeamMember.ROLE_MANAGER)
 
     def is_member(self, user):
+        """Return True if the given user is a member of this team, False otherwise."""
         return self._is_role(user)
 
     def is_contributor(self, user, authenticated=True):
-        """
-        Contibutors can add new subs videos but they migh need to be moderated
-        """
+        """Return True if the given user is a contributor of this team, False otherwise."""
         return self._is_role(user, TeamMember.ROLE_CONTRIBUTOR)
 
     def can_see_video(self, user, team_video=None):
+        """I have no idea.
+
+        TODO: Figure out what this thing is, and if it's still necessary.
+
+        """
         if not user.is_authenticated():
             return False
         return self.is_member(user)
 
     # moderation
 
-    def get_workflow(self):
-        return Workflow.get_for_target(self.id, 'team')
 
+    # Moderation
     def moderates_videos(self):
         """Return True if this team moderates videos in some way, False otherwise.
 
@@ -270,46 +334,69 @@ class Team(models.Model):
 
         return False
 
-    def get_pending_moderation( self, video=None):
+    def get_pending_moderation(self, video=None):
+        """Return q QS of the SubtitleVersions for this team that are awaiting a moderation ruling."""
         from videos.models import SubtitleVersion
         qs = SubtitleVersion.objects.filter(language__video__moderated_by=self, moderation_status=WAITING_MODERATION)
         if video is not None:
             qs = qs.filter(language__video=video)
         return qs
 
-
     def can_add_moderation(self, user):
+        # TODO: Can we remove this now that we have the teams/permissions stuff in place?
         if not user.is_authenticated():
             return False
         return self.is_manager(user)
 
     def can_remove_moderation(self, user):
+        # TODO: Can we remove this now that we have the teams/permissions stuff in place?
         if not user.is_authenticated():
             return False
         return self.is_manager(user)
 
     def video_is_moderated_by_team(self, video):
+        """Return True if this team moderates the given video, False otherwise."""
         return video.moderated_by == self
 
+
+    # Item counts
     @property
     def member_count(self):
+        """Return the number of members of this team.
+
+        Caches the result in-object for performance.
+
+        """
         if not hasattr(self, '_member_count'):
             setattr(self, '_member_count', self.users.count())
         return self._member_count
 
     @property
     def videos_count(self):
+        """Return the number of videos of this team.
+
+        Caches the result in-object for performance.
+
+        """
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', self.videos.count())
         return self._videos_count
 
     @property
     def tasks_count(self):
+        """Return the number of incomplete, undeleted tasks of this team.
+
+        Caches the result in-object for performance.
+
+        """
         if not hasattr(self, '_tasks_count'):
             setattr(self, '_tasks_count', Task.objects.filter(team=self, deleted=False, completed=None).count())
         return self._tasks_count
 
+
+    # Applications (people applying to join)
     def application_message(self):
+        """Return the membership application message for this team, or '' if none exists."""
         try:
             return self.settings.get(key=Setting.KEY_IDS['messages_application']).data
         except Setting.DoesNotExist:
@@ -317,13 +404,19 @@ class Team(models.Model):
 
     @property
     def applications_count(self):
+        """Return the number of open membership applications to this team.
+
+        Caches the result in-object for performance.
+
+        """
         if not hasattr(self, '_applications_count'):
             setattr(self, '_applications_count', self.applications.count())
         return self._applications_count
 
+
+    # Language pairs
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
-
 
     def get_videos_for_languages_haystack(self, language, project=None, user=None, query=None, sort=None):
         from teams.search_indexes import TeamVideoLanguagesIndex
@@ -407,8 +500,18 @@ class Team(models.Model):
             'qs': qs,
             }
 
+
+    # Projects
     @property
     def default_project(self):
+        """Return the default project for this team.
+
+        If it doesn't already exist it will be created.
+
+        TODO: Move the creation into a signal on the team to avoid creating
+        multiple default projects here?
+
+        """
         try:
             return Project.objects.get(team=self, slug=Project.DEFAULT_NAME)
         except Project.DoesNotExist:
@@ -418,23 +521,29 @@ class Team(models.Model):
 
     @property
     def has_projects(self):
-        projects = self.project_set.all()
-        return True if projects.count() > 1 else False
+        """Return True if this team has projects other than the default one, False otherwise."""
+        return self.project_set.count() > 1
 
-    def save(self, *args, **kwargs):
-        creating = self.pk is None
-        super(Team, self).save(*args, **kwargs)
-        if creating:
-            # make sure we create a default project
-            self.default_project
 
+    # Readable/writeable language codes
     def get_writable_langs(self):
+        """Return a list of language code strings that are writable for this team.
+
+        This value may come from memcache.
+
+        """
         return TeamLanguagePreference.objects.get_writable(self)
 
     def get_readable_langs(self):
+        """Return a list of language code strings that are readable for this team.
+
+        This value may come from memcache.
+
+        """
         return TeamLanguagePreference.objects.get_readable(self)
 
 
+    # Unpublishing
     def unpublishing_enabled(self):
         '''Return True if unpublishing is enabled for this team, False otherwise.
 
@@ -446,16 +555,21 @@ class Team(models.Model):
         return True if w.review_enabled or w.approve_enabled else False
 
 
-# this needs to be constructed after the model definition since we need a
-# reference to the class itself
+# This needs to be constructed after the model definition since we need a
+# reference to the class itself.
 Team._meta.permissions = TEAM_PERMISSIONS
 
 
 # Project
 class ProjectManager(models.Manager):
-
     def for_team(self, team_identifier):
-        if hasattr(team_identifier,"pk"):
+        """Return all non-default projects for the given team with the given identifier.
+
+        The team_identifier passed may be an actual Team object, or a string
+        containing a team slug, or the primary key of a team as an integer.
+
+        """
+        if hasattr(team_identifier, "pk"):
             team = team_identifier
         elif isinstance(team_identifier, int):
             team = Team.objects.get(pk=team_identifier)
@@ -464,7 +578,7 @@ class ProjectManager(models.Manager):
         return Project.objects.filter(team=team).exclude(name=Project.DEFAULT_NAME)
 
 class Project(models.Model):
-    #: All tvs belong to a project, wheather the team has enabled them or not
+    # All tvs belong to a project, wheather the team has enabled them or not
     # the default project is just a convenience UI that pretends to be part of
     # the team . If this ever gets changed, you need to change migrations/0044
     DEFAULT_NAME = "_root"
@@ -497,28 +611,43 @@ class Project(models.Model):
 
     @property
     def is_default_project(self):
+        """Return True if this project is a default project for a team, False otherwise."""
         return self.name == Project.DEFAULT_NAME
 
+
     def get_site_url(self):
+        """Return the full, absolute URL for this project, including http:// and the domain."""
         return '%s://%s%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain, self.get_absolute_url())
 
     @models.permalink
     def get_absolute_url(self):
         return ('teams:project_video_list', [self.team.slug, self.slug])
 
+
     @property
     def videos_count(self):
+        """Return the number of videos in this project.
+
+        Caches the result in-object for performance.
+
+        """
         if not hasattr(self, '_videos_count'):
             setattr(self, '_videos_count', TeamVideo.objects.filter(project=self).count())
         return self._videos_count
 
     @property
     def tasks_count(self):
+        """Return the number of incomplete, undeleted tasks in this project.
+
+        Caches the result in-object for performance.
+
+        """
         tasks = Task.objects.filter(team=self.team, deleted=False, completed=None)
 
         if not hasattr(self, '_tasks_count'):
             setattr(self, '_tasks_count', tasks.filter(team_video__project = self).count())
         return self._tasks_count
+
 
     class Meta:
         unique_together = (
@@ -534,11 +663,13 @@ class TeamVideo(models.Model):
     video = models.ForeignKey(Video)
     title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True,
-        help_text=_(u'Use this space to explain why you or your team need to caption or subtitle this video. Adding a note makes volunteers more likely to help out!'))
+        help_text=_(u'Use this space to explain why you or your team need to '
+                    u'caption or subtitle this video. Adding a note makes '
+                    u'volunteers more likely to help out!'))
     thumbnail = S3EnabledImageField(upload_to='teams/video_thumbnails/', null=True, blank=True,
         help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'))
     all_languages = models.BooleanField(_('Need help with all languages'), default=False,
-        help_text=_('If you check this, other languages will not be displayed.'))
+        help_text=_(u'If you check this, other languages will not be displayed.'))
     added_by = models.ForeignKey(User)
     created = models.DateTimeField(auto_now_add=True)
     completed_languages = models.ManyToManyField(SubtitleLanguage, blank=True)
