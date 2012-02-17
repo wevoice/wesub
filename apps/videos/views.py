@@ -458,8 +458,6 @@ def history(request, video, lang=None, lang_id=None):
 
     context['video'] = video
     original = video.subtitle_language()
-    if original:
-        original.pending_moderation_count =  get_pending_count(video.subtitle_language())
     translations = list(video.subtitlelanguage_set.filter(is_original=False) \
         .filter(had_version=True).select_related('video'))
 
