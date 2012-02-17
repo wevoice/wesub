@@ -572,7 +572,6 @@ INSTALLED_APPS = (
     'statistic',
     'search',
     'utils',
-    'targetter',
     'livesettings',
     'indexer',
     'paging',
