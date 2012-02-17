@@ -816,9 +816,6 @@ class TeamVideo(models.Model):
             self._add_searchable_language(lang[0], langs, sls)
         return sls
 
-    def get_pending_moderation(self):
-        return self.team.get_pending_moderation(self.video)
-
     def save(self, *args, **kwargs):
         if not hasattr(self, "project"):
             self.project = self.team.default_project
