@@ -1048,19 +1048,22 @@ class TeamVideoLanguagePair(models.Model):
     team_video = models.ForeignKey(TeamVideo)
     team = models.ForeignKey(Team)
     video = models.ForeignKey(Video)
+
     # language_0 and subtitle_language_0 are the potential standards.
     language_0 = models.CharField(max_length=16, choices=ALL_LANGUAGES, db_index=True)
     subtitle_language_0 = models.ForeignKey(
         SubtitleLanguage, null=False, related_name="team_video_language_pairs_0")
+
     language_1 = models.CharField(max_length=16, choices=ALL_LANGUAGES, db_index=True)
     subtitle_language_1 = models.ForeignKey(
         SubtitleLanguage, null=True, related_name="team_video_language_pairs_1")
+
     language_pair = models.CharField(db_index=True, max_length=16)
     percent_complete = models.IntegerField(db_index=True, default=0)
 
 
 # TeamMember
-class TeamMemderManager(models.Manager):
+class TeamMemberManager(models.Manager):
     use_for_related_fields = True
 
     def create_first_member(self, team, user):
@@ -1090,7 +1093,7 @@ class TeamMember(models.Model):
     user = models.ForeignKey(User, related_name='team_members')
     role = models.CharField(max_length=16, default=ROLE_CONTRIBUTOR, choices=ROLES, db_index=True)
 
-    objects = TeamMemderManager()
+    objects = TeamMemberManager()
 
     def __unicode__(self):
         return u'%s' % self.user
