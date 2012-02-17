@@ -24,12 +24,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User
 from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
-
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
     can_assign_task, can_unpublish_subs
 )
-
 from teams.permissions_const import ROLE_NAMES
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
