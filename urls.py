@@ -38,7 +38,6 @@ admin.site.unregister([TaskState])
 TaskMonitor.list_display += ('runtime',)
 admin.site.register(TaskState, TaskMonitor)
 
-from doorman import feature_is_on
 
 js_info_dict = {
     'packages': ('unisubs'),
@@ -127,7 +126,7 @@ urlpatterns = patterns(
      url(r'^sitemap\.xml$', sitemap_index, {'sitemaps': sitemaps}, name="sitemap-index"),
      url(r'^sitemap-(?P<section>.+)\.xml$', sitemap_view, {'sitemaps': sitemaps}, name="sitemap"),
      url(r"helpers/", include('testhelpers.urls', namespace='helpers')),
-     url(r"accountlinker/", include('accountlinker.urls', namespace='accountlinker')),
+     url(r"accountlinker/", include('accountlinker.urls')),
 )
 try:
     from services import urls
@@ -161,10 +160,6 @@ try:
 except ImportError:
     pass
     
-if feature_is_on('MODERATION'):
-    urlpatterns += patterns("",
-        (r'^moderation/', include('teams.moderation_urls', namespace="moderation")),
-    )
     
 if settings.DEBUG:
     urlpatterns += patterns('',
