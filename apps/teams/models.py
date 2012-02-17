@@ -196,11 +196,11 @@ class Team(models.Model):
         return render_to_string('teams/_team_message.html', context)
 
     def is_open(self):
-        """Return True if this team's membership is open to the public, False otherwise."""
+        """Return whether this team's membership is open to the public."""
         return self.membership_policy == self.OPEN
 
     def is_by_application(self):
-        """Return True if this team's membership is by application only, False otherwise."""
+        """Return whether this team's membership is by application only."""
         return self.membership_policy == self.APPLICATION
 
     @classmethod
@@ -273,7 +273,7 @@ class Team(models.Model):
 
     # Membership and roles
     def _is_role(self, user, role=None):
-        """Return True if the given user has the given role in this team, False otherwise.
+        """Return whether the given user has the given role in this team.
 
         Safe to use with null or unauthenticated users.
 
@@ -290,19 +290,19 @@ class Team(models.Model):
         return qs.exists()
 
     def is_admin(self, user):
-        """Return True if the given user is an admin of this team, False otherwise."""
+        """Return whether the given user is an admin of this team."""
         return self._is_role(user, TeamMember.ROLE_ADMIN)
 
     def is_manager(self, user):
-        """Return True if the given user is a manager of this team, False otherwise."""
+        """Return whether the given user is a manager of this team."""
         return self._is_role(user, TeamMember.ROLE_MANAGER)
 
     def is_member(self, user):
-        """Return True if the given user is a member of this team, False otherwise."""
+        """Return whether the given user is a member of this team."""
         return self._is_role(user)
 
     def is_contributor(self, user, authenticated=True):
-        """Return True if the given user is a contributor of this team, False otherwise."""
+        """Return whether the given user is a contributor of this team, False otherwise."""
         return self._is_role(user, TeamMember.ROLE_CONTRIBUTOR)
 
     def can_see_video(self, user, team_video=None):
@@ -320,7 +320,7 @@ class Team(models.Model):
 
     # Moderation
     def moderates_videos(self):
-        """Return True if this team moderates videos in some way, False otherwise.
+        """Return whether this team moderates videos in some way, False otherwise.
 
         Moderation means the team restricts who can create subtitles and/or
         translations.
@@ -335,7 +335,7 @@ class Team(models.Model):
         return False
 
     def video_is_moderated_by_team(self, video):
-        """Return True if this team moderates the given video, False otherwise."""
+        """Return whether this team moderates the given video."""
         return video.moderated_by == self
 
 
@@ -501,7 +501,7 @@ class Team(models.Model):
 
     @property
     def has_projects(self):
-        """Return True if this team has projects other than the default one, False otherwise."""
+        """Return whether this team has projects other than the default one."""
         return self.project_set.count() > 1
 
 
@@ -525,7 +525,7 @@ class Team(models.Model):
 
     # Unpublishing
     def unpublishing_enabled(self):
-        '''Return True if unpublishing is enabled for this team, False otherwise.
+        '''Return whether unpublishing is enabled for this team.
 
         At the moment unpublishing is only available if the team has reviewing
         and/or approving enabled.
@@ -591,7 +591,7 @@ class Project(models.Model):
 
     @property
     def is_default_project(self):
-        """Return True if this project is a default project for a team, False otherwise."""
+        """Return whether this project is a default project for a team."""
         return self.name == Project.DEFAULT_NAME
 
 
@@ -847,24 +847,27 @@ class TeamVideo(models.Model):
 
     # Convenience functions
     def subtitles_started(self):
-        """Return True if subtitles have been started for this video, otherwise False."""
-
+        """Return whether subtitles have been started for this video."""
         sl = self.video.subtitle_language()
-
-        if sl and sl.had_version:
-            return True
-        else:
-            return False
+        return True if sl and sl.had_version else False
 
     def subtitles_finished(self):
-        """Return True if at least one set of subtitles has been finished for this video."""
+        """Return whether at least one set of subtitles has been finished for this video."""
         return (self.subtitles_started() and
                 self.video.subtitle_language().is_complete_and_synced())
 
     def get_workflow(self):
+        """Return the appropriate Workflow for this TeamVideo."""
         return Workflow.get_for_team_video(self)
 
+
 def _create_translation_tasks(team_video, subtitle_version):
+    """Create any translation tasks that should be autocreated for this video.
+
+    subtitle_version should be the original SubtitleVersion that these tasks
+    will probably be translating from.
+
+    """
     preferred_langs = TeamLanguagePreference.objects.get_preferred(team_video.team)
 
     for lang in preferred_langs:
@@ -888,10 +891,21 @@ def _create_translation_tasks(team_video, subtitle_version):
                     language=lang, type=Task.TYPE_IDS['Translate'])
         task.save()
 
+
 def team_video_save(sender, instance, created, **kwargs):
+    """Update the Solr index for this team video.
+
+    TODO: Rename this to something more specific.
+
+    """
     update_one_team_video.delay(instance.id)
 
 def team_video_delete(sender, instance, **kwargs):
+    """Perform necessary actions for when a TeamVideo is deleted.
+
+    TODO: Split this up into separate signals.
+
+    """
     from videos import metadata_manager
     # not using an async task for this since the async task
     # could easily execute way after the instance is gone,
@@ -910,6 +924,7 @@ def team_video_delete(sender, instance, **kwargs):
 
 
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
+    """Create subtitle/translation tasks for a newly added TeamVideo, if necessary."""
     if created and not raw:
         workflow = Workflow.get_for_team_video(instance)
         if workflow.autocreate_subtitle:
@@ -921,11 +936,13 @@ def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
                 _create_translation_tasks(instance, existing_subtitles[0].latest_version())
 
 def team_video_add_video_moderation(sender, instance, created, raw, **kwargs):
+    """Set the .moderated_by attribute on a newly created TeamVideo's Video, if necessary."""
     if created and not raw and instance.team.moderates_videos():
         instance.video.moderated_by = instance.team
         instance.video.save()
 
 def team_video_rm_video_moderation(sender, instance, **kwargs):
+    """Clear the .moderated_by attribute on a newly deleted TeamVideo's Video, if necessary."""
     try:
         # when removing a video, this will be triggered by the fk constraing
         # and will be already removed
@@ -1136,7 +1153,7 @@ class TeamMember(models.Model):
 
 
     def has_max_tasks(self):
-        """Return True if this member has the maximum number of tasks, False otherwise."""
+        """Return whether this member has the maximum number of tasks."""
         max_tasks = self.team.max_tasks_per_member
         if max_tasks:
             if self.user.task_set.incomplete().filter(team=self.team).count() >= max_tasks:
@@ -1424,12 +1441,12 @@ class Workflow(models.Model):
     # Convenience functions for checking if a step of the workflow is enabled.
     @property
     def review_enabled(self):
-        """Return True if any form of review is enabled for this workflow, False otherwise."""
+        """Return whether any form of review is enabled for this workflow."""
         return True if self.review_allowed else False
 
     @property
     def approve_enabled(self):
-        """Return True if any form of approval is enabled for this workflow, False otherwise."""
+        """Return whether any form of approval is enabled for this workflow."""
         return True if self.approve_allowed else False
 
 
@@ -1613,7 +1630,7 @@ class Task(models.Model):
             ).save()
 
     def future(self):
-        """Return True if this task expires in the future, False otherwise."""
+        """Return whether this task expires in the future."""
         return self.expiration_date > datetime.datetime.now()
 
     def get_widget_url(self):

@@ -306,7 +306,7 @@ class Video(models.Model):
         return settings.STATIC_URL+self.thumbnail
 
     def is_html5(self):
-        """Return True if the original URL for this video is an HTML5 one, False otherwise."""
+        """Return whether if the original URL for this video is an HTML5 one."""
         try:
             return self.videourl_set.filter(original=True)[:1].get().is_html5()
         except models.ObjectDoesNotExist:
@@ -481,7 +481,7 @@ class Video(models.Model):
         return getattr(self, '_original_subtitle')
 
     def has_original_language(self):
-        """Return True if this video has a SubtitleLanguage for its original language, False otherwise.
+        """Return whether this video has a SubtitleLanguage for its original language.
 
         NOTE: this uses another method which caches the result in the object, so
         this will effectively be cached in-object as well.
@@ -1496,7 +1496,7 @@ def restrict_versions(version_qs, user, subtitle_language):
     return filter(_version_viewable, version_qs)
 
 def has_viewable_draft(version, user):
-    """Return True if the given version has draft subtitles viewable by the user.
+    """Return whether the given version has draft subtitles viewable by the user.
 
     This function performs several DB queries, so try not to call it more than
     once per page.

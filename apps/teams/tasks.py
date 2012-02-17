@@ -18,6 +18,7 @@ from widget.video_cache import (
 
 @task()
 def invalidate_video_caches(team_id):
+    """Invalidate all TeamVideo caches for all the given team's videos."""
     from apps.teams.models import Team
     team = Team.objects.get(pk=team_id)
     for video_id in team.teamvideo_set.values_list('video__video_id', flat=True):
@@ -40,6 +41,11 @@ def update_video_moderation(team):
 
 @periodic_task(run_every=crontab(minute=0, hour=7))
 def expire_tasks():
+    """Find any tasks that are past their expiration date and unassign them.
+
+    We currently run this once per day (at 7 AM server time).
+
+    """
     from teams.models import Task
 
     expired_tasks = Task.objects.incomplete().filter(
@@ -87,6 +93,7 @@ def add_videos_notification(*args, **kwargs):
 
 @task()
 def update_one_team_video(team_video_id):
+    """Update the Solr index for the given team video."""
     from teams.models import TeamVideo
     try:
         team_video = TeamVideo.objects.get(id=team_video_id)

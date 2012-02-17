@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,35 +17,16 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from teams.models import (
-    Team, TeamMember, Application, Workflow, Project, TeamVideo, Task, Setting,
-    ALL_LANGUAGES
+    Team, TeamMember, Application, Project, ALL_LANGUAGES
 )
 
-from videos.models import SubtitleLanguage
-
-from django.shortcuts import get_object_or_404
-
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.core.paginator import Paginator
 from django.utils.translation import ugettext as _
 from django.forms.models import model_to_dict
 from utils.rpc import Error, Msg, RpcRouter
-from utils.forms import flatten_errorlists
-from utils.translation import SUPPORTED_LANGUAGES_DICT
 
 from messages import tasks as notifier
-from teams.tasks import update_one_team_video
-from teams.project_forms import ProjectForm
-from teams.forms import (
-    TaskAssignForm, TaskDeleteForm, GuidelinesMessagesForm, SettingsForm,
-    WorkflowForm, PermissionsForm
-)
-from teams.permissions import (
-    roles_user_can_assign, can_assign_role, can_edit_project, set_narrowings,
-    can_rename_team, can_set_project_narrowings, can_set_language_narrowings,
-    save_role
-)
+from teams.permissions import roles_user_can_assign, save_role
 
 
 
