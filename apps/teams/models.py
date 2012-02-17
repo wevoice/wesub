@@ -1096,9 +1096,6 @@ class TeamMemberManager(models.Manager):
         tm.save()
         return tm
 
-    def managers(self):
-        return self.get_query_set().filter(role=TeamMember.ROLE_MANAGER)
-
 class TeamMember(models.Model):
     ROLE_OWNER = ROLE_OWNER
     ROLE_ADMIN = ROLE_ADMIN
