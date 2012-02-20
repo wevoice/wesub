@@ -1498,7 +1498,8 @@ def unpublish(request, slug):
                         language.unpublish(delete=should_delete)])
     elif scope == 'dependents':
         translations = list(SubtitleLanguage.objects.filter(video=language.video,
-                                                            standard_language=language))
+                                                            standard_language=language,
+                                                            is_forked=False))
         for l in [language] + translations:
             results.append([l.pk,
                             l.unpublish(delete=should_delete)])
