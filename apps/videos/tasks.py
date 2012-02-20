@@ -1,3 +1,20 @@
+# Universal Subtitles, universalsubtitles.org
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see
+# http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
 import urllib
 from urllib import urlopen
@@ -342,12 +359,14 @@ def _send_letter_caption(caption_version):
 
 
 def _update_captions_in_original_service(version_pk):
-    """
-    Pushes the latest caption set for this version to
-    the original video provider (only Youtube supported right now)
-    In order for this to work we the version must be published, synced
-    and have a ThirdPartyAccount object for the same service and 
-    the username matching the username for the video url.
+    """Push the latest caption set for this version to the original video provider.
+
+    Only Youtube is supported right now.
+
+    In order for this to work we the version must be published, synced and have
+    a ThirdPartyAccount object for the same service and the username matching
+    the username for the video url.
+
     """
     from videos.models import SubtitleVersion
     from accountlinker.models import ThirdPartyAccount
@@ -357,14 +376,17 @@ def _update_captions_in_original_service(version_pk):
     except SubtitleVersion.DoesNotExist:
         return
     ThirdPartyAccount.objects.mirror_on_third_party(
-        version.video, version.language, UPDATE_VERSION_ACTION, version)         
+        version.video, version.language, UPDATE_VERSION_ACTION, version)
 
 def _delete_captions_in_original_service(language_pk):
-    """
-    Deletes the given subtitle language the original video provider 
-    (only Youtube supported right now) In order for this to work we the 
-    version must be have a ThirdPartyAccount object for the same service 
-    and the username matching the username for the video url.
+    """Delete the given subtitle language in the original video provider.
+
+    Only Youtube is supported right now.
+
+    In order for this to work we the version must be have a ThirdPartyAccount
+    object for the same service and the username matching the username for the
+    video url.
+
     """
     from videos.models import SubtitleLanguage
     from .videos.types import DELETE_LANGUAGE_ACTION
