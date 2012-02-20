@@ -48,7 +48,7 @@ class ThirdPartyAccountManager(models.Manager):
                 "Mirror to third party does not support the %s action" % action)
 
         if version:
-            if not version.is_public() or not version.is_synced():
+            if not version.is_public or not version.is_synced():
                 # We can't mirror unsynced or non-public versions.
                 return
 
