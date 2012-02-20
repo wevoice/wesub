@@ -816,8 +816,8 @@ class SubtitleLanguage(models.Model):
     def __unicode__(self):
         return self.language_display()
 
-    def nonblank_subtitle_count(self):
-        return len([s for s in self.latest_subtitles(public_only=False) \
+    def nonblank_subtitle_count(self, public_only=False):
+        return len([s for s in self.latest_subtitles(public_only=public_only)
                     if s.text.strip()])
 
     def get_title_display(self):
@@ -1073,11 +1073,11 @@ class SubtitleLanguage(models.Model):
         if not self.is_dependent():
             return None
 
-        translation_count = self.nonblank_subtitle_count()
+        translation_count = self.nonblank_subtitle_count(public_only=False)
         real_standard_language = self.real_standard_language()
 
         if real_standard_language:
-            subtitle_count = real_standard_language.nonblank_subtitle_count()
+            subtitle_count = real_standard_language.nonblank_subtitle_count(public_only=True)
         else:
             subtitle_count = 0
 
