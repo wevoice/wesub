@@ -25,8 +25,7 @@ goog.provide('unisubs.subtitle.Dialog');
  */
 unisubs.subtitle.Dialog = function(videoSource, serverModel,
                                     subtitles, opt_opener,
-                                    opt_skipFinished, originalSubtitles, 
-                                   isReviewOrApproval) {
+                                    opt_skipFinished, reviewOrApprovalType) {
     unisubs.Dialog.call(this, videoSource);
     unisubs.SubTracker.getInstance().start(false);
     this.serverModel_ = serverModel;
@@ -57,8 +56,16 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel,
     this.subtitles_ = subtitles;
 
     this.keyEventsSuspended_ = false;
-    this.originalSubtitles_ = originalSubtitles;
-    this.isReviewOrApproval_ = isReviewOrApproval;
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
+    // if this is a review approve dialog, we must fetch saved notes for this task if available
+    // but we should only do it when the dialog laods the first time
+    // (else as users move back and forward between panels we might
+    // overwrite their notes). This is what this flag is for
+    this.notesFectched_ = false;
+    if ( !Boolean(this.reviewOrApprovalType_)){
+       this.notesFectched_ = true; 
+    }
+
 };
 goog.inherits(unisubs.subtitle.Dialog, unisubs.Dialog);
 
@@ -108,6 +115,18 @@ unisubs.subtitle.Dialog.prototype.enterDocument = function() {
             this.captionManager_,
             unisubs.CaptionManager.CAPTION,
             this.captionReached_);
+
+    if (this.reviewOrApprovalType_ && !this.notesFectched_){
+        var func  = this.serverModel_.fetchReviewData ;
+        var that = this;
+        if (this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']){
+            func = this.serverModel_.fetchApproveData;
+        }
+        func(unisubs.task_id, function(body) {
+            that.onNotesFetched_(body);
+        });
+    }
+
 };
 unisubs.subtitle.Dialog.prototype.setExtraClass_ = function() {
     var extraClasses = goog.array.map(
@@ -431,27 +450,35 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
         return new unisubs.subtitle.TranscribePanel(
             this.captionSet_,
             this.getVideoPlayerInternal(),
-            this.serverModel_);
+            this.serverModel_, 
+            this.reviewOrApprovalType_
+        );
     else if (this.state_ == s.SYNC)
         return new unisubs.subtitle.SyncPanel(
             this.captionSet_,
             this.getVideoPlayerInternal(),
             this.serverModel_,
-            this.captionManager_);
+            this.captionManager_,
+            this.reviewOrApprovalType_
+        );
     else if (this.state_ == s.REVIEW)
         return new unisubs.subtitle.ReviewPanel(
             this.captionSet_,
             this.getVideoPlayerInternal(),
             this.serverModel_,
-           this.captionManager_);
+            this.captionManager_,
+            this.reviewOrApprovalType_
+        );
     else if (this.state_ == s.EDIT_METADATA)
         return new unisubs.editmetadata.Panel(
             this.captionSet_,
             this.getVideoPlayerInternal(),
             this.serverModel_,
             this.captionManager_,
-            this.originalSubtitles_ ,
-            true);
+            null,
+            true, 
+            this.reviewOrApprovalType_
+        );
 };
 unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
@@ -518,6 +545,13 @@ unisubs.subtitle.Dialog.prototype.addTranslationsAndClose = function() {
             });
     }
 };
+
+unisubs.subtitle.Dialog.prototype.onNotesFetched_ = function(body) {
+    if( this.currentSubtitlePanel_ && this.currentSubtitlePanel_.setNotesContent_){
+        this.currentSubtitlePanel_.setNotesContent_(body);
+    }
+}
+
 
 unisubs.subtitle.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;

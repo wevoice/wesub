@@ -246,7 +246,8 @@ unisubs.widget.SubtitleDialogOpener.prototype.openSubtitleApproveDialog = functi
                                                subtitleState, originalSubtitles,
                                                unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']);
     }else{
-        dialog =  new unisubs.subtitle.Dialog(this.videoSource_, serverModel, subtitleState , true);
+        dialog =  new unisubs.subtitle.Dialog(this.videoSource_, serverModel, subtitleState,
+                                              true, false, unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']);
     }
     this.subOpenFn_ && this.subOpenFn_();
     return dialog;

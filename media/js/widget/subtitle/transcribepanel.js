@@ -28,7 +28,8 @@ goog.provide('unisubs.subtitle.TranscribePanel');
  * @param {unisubs.ServerModel} serverModel Used to create RightPanel, which
  *     needs access to server to login.
  */
-unisubs.subtitle.TranscribePanel = function(captionSet, videoPlayer, serverModel) {
+unisubs.subtitle.TranscribePanel = function(captionSet, videoPlayer, serverModel,
+                                            reviewOrApprovalType) {
     goog.ui.Component.call(this);
 
     this.captionSet_ = captionSet;
@@ -41,6 +42,10 @@ unisubs.subtitle.TranscribePanel = function(captionSet, videoPlayer, serverModel
      */
     this.keyHandler_ = null;
     this.keyEventsSuspended_ = false;
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
+    this.numSteps_ = 4;
+    this.currentStep_ = 0;
+    this.nextButtonText_ = "Next Step: Sync";
 };
 goog.inherits(unisubs.subtitle.TranscribePanel, goog.ui.Component);
 
@@ -101,21 +106,10 @@ unisubs.subtitle.TranscribePanel.prototype.listenToRightPanel_ = function() {
     }
 };
 unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
-    var helpContents = new unisubs.RightPanel.HelpContents(
-        "Typing",
-        [["Thanks for making subtitles!! It's easy to learn ",
-          "and actually fun to do."].join(''),
-         ["While you watch the video, type everything people ",
-          "say and all important text that appears ",
-          "on-screen."].join(''),
-         ["Use the key controls below to pause and jump back, ",
-          "which will help you keep up."].join('')],
-         4, 0);
-    var extraHelp = [
-        "Press play, then type everything people say in the text " +
-            "entry below the video.",
-        "Don't let subtitles get too long. Hit Enter for a new line."
-    ];
+    var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
+    var reviewOrApproval = true;
+    var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
+        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
     var KC = goog.events.KeyCodes;
     var keySpecs = [
         new unisubs.RightPanel.KeySpec(
@@ -125,9 +119,35 @@ unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
             'Skip Back 8 Seconds', KC.TAB,
             unisubs.RightPanel.KeySpec.Modifier.SHIFT)
     ];
+
+    if (! internalComponents){
+        internalComponents = {
+        'helpContents' : new unisubs.RightPanel.HelpContents(
+                "Typing",
+                [["Thanks for making subtitles!! It's easy to learn ",
+                  "and actually fun to do."].join(''),
+                 ["While you watch the video, type everything people ",
+                  "say and all important text that appears ",
+                  "on-screen."].join(''),
+                 ["Use the key controls below to pause and jump back, ",
+                  "which will help you keep up."].join('')],
+            this.numSteps_, this.currentStep_),
+            'extraHelp': [
+                "Press play, then type everything people say in the text " +
+                    "entry below the video.",
+                "Don't let subtitles get too long. Hit Enter for a new line."
+            ]
+        }
+    }else{
+
+        this.bodyInput_ = internalComponents['bodyInput'];
+
+    }
     return new unisubs.subtitle.TranscribeRightPanel(
-        this.serverModel_, helpContents, extraHelp, keySpecs,
-        true, "Done?", "Next Step: Sync");
+            this.serverModel_, internalComponents['helpContents'],
+            internalComponents['extraHelp'], keySpecs , "Done?", this.nextButtonText_, 
+            reviewOrApproval, this.bodyInput_);
+
 };
 unisubs.subtitle.TranscribePanel.prototype.enterDocument = function() {
     unisubs.subtitle.TranscribePanel.superClass_.enterDocument.call(this);

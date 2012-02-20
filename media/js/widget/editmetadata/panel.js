@@ -44,14 +44,14 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel,
     this.captionManager_ = captionManager;
     this.originalSubtitles_ = originalSubtitles;
     // when in the translate dialog, there are only 2 steps, for the subtitling, there are 4
-    this.currentStep_ = 1;
     if (inSubtitlingDialog){
-
+        this.currentStep_ = 2;
         this.numSteps_ = 4;
         this.nextButtonText_ = "Next Step: Check your work";
     }else{
         
         this.numSteps_ = 2;
+        this.currentStep = 1;
         this.nextButtonText_ = "Submit final translation";
     }
     this.inSubtitlingDialog_  = inSubtitlingDialog;
@@ -140,8 +140,8 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
     
 
     return new unisubs.editmetadata.RightPanel(
-        this.dialog_,
-        this.serverModel_, internalComponents['helpContents'], internalComponents['extraHelp'], [], false, "Done?", 
+        this.dialog_, this.serverModel_, internalComponents['helpContents'], 
+        internalComponents['extraHelp'], [], false, "Done?", 
         this.nextButtonText_,  reviewOrApproval, this.bodyInput_);
 
 
