@@ -67,7 +67,10 @@ from utils.forms import flatten_errorlists
 from utils.searching import get_terms
 from utils.translation import get_languages_list, languages_with_names, SUPPORTED_LANGUAGES_DICT
 from videos import metadata_manager
-from videos.models import Action, VideoUrl
+from videos.tasks import (
+    _update_captions_in_original_service, _delete_captions_in_original_service
+)
+from videos.models import Action, VideoUrl, SubtitleLanguage
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 
@@ -1436,6 +1439,40 @@ def _create_task_after_unpublishing(subtitle_version):
 
     return task
 
+def _propagate_unpublish_to_external_services(language_pk):
+    """Push the 'unpublishing' of subs to third-party providers for the given language.
+
+    The unpublishing must be fully complete before this function is called.
+
+    """
+    try:
+        language = SubtitleLanguage.objects.get(pk=language_pk)
+    except SubtitleLanguage.DoesNotExist:
+        # TODO: Handle the edge case of deletions of entire languages.  We can't
+        #       deal with this now because the unpublishing runs asynchronously
+        #       and the versions/languages will be deleted by the
+        #       time the task runs.
+        return
+
+    # Find the latest public version to determine what kind of third-party call
+    # we need to make.
+    latest_version = language.latest_version(public_only=True)
+
+    if latest_version:
+        # There's a latest version that's still public, so third-party services
+        # should use that one.
+        _update_captions_in_original_service(latest_version.pk)
+    else:
+        # There's no latest version that's still public, but we know the
+        # language still exists.
+        #
+        # This means that all of the subs in the language have been unpublished
+        # and are awaiting moderation.
+        #
+        # In this case we should delete the subs from the external service
+        # entirely, since we know that all the subs we have are bad.
+        _delete_captions_in_original_service(language_pk)
+
 def unpublish(request, slug):
     team = get_object_or_404(Team, slug=slug)
 
@@ -1448,19 +1485,22 @@ def unpublish(request, slug):
     team_video = version.language.video.get_team_video()
     scope = form.cleaned_data['scope']
     should_delete = form.cleaned_data['should_delete']
+    language = version.language
+    language_pk = version.language.pk
 
     if scope == 'version':
         result = version.unpublish(delete=should_delete)
     elif scope == 'language':
-        result = version.language.unpublish(delete=should_delete)
+        result = language.unpublish(delete=should_delete)
     else:
         # TODO Write scope == 'dependents' code.
-        pass
+        result = None
 
     if result:
         _create_task_after_unpublishing(result)
 
     metadata_manager.update_metadata(team_video.video.pk)
+    _propagate_unpublish_to_external_services(language_pk)
 
     messages.success(request, _(u'Successfully unpublished subtitles.'))
     return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
