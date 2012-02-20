@@ -549,7 +549,9 @@ class UnpublishForm(forms.Form):
         self.team = team
 
     def clean(self):
-        subtitle_version = self.cleaned_data['subtitle_version']
+        subtitle_version = self.cleaned_data.get('subtitle_version')
+        if not subtitle_version:
+            return self.cleaned_data
 
         team_video = subtitle_version.language.video.get_team_video()
 
