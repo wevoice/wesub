@@ -319,7 +319,6 @@ JS_CORE = \
      'js/streamer/streamsub.js', 
      'js/streamer/streamervideotab.js', 
      'js/streamer/streamerdecorator.js', 
-     'js/requestdialog.js',
      'js/widget/videotab.js',
      'js/widget/hangingvideotab.js',
      'js/widget/subtitle/editablecaption.js',
