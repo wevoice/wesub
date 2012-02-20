@@ -1406,6 +1406,8 @@ class SubtitleVersion(SubtitleCollection):
         assert team_video.team.unpublishing_enabled(), \
                "Cannot unpublish for a team without unpublishing enabled."
 
+        language = self.language
+
         versions = SubtitleVersion.objects.filter(
             # This filter includes this SubtitleVersion itself
             language=self.language,
@@ -1414,6 +1416,12 @@ class SubtitleVersion(SubtitleCollection):
 
         if delete:
             versions.delete()
+
+            # Delete the SubtitleLanguage too if we're removing the root version
+            # (and therefore all later ones too).
+            if self.version_no == 0:
+                language.delete()
+
             return None
         else:
             last_version = None
