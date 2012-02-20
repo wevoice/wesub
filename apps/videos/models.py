@@ -2157,3 +2157,4 @@ class VideoFeed(models.Model):
             checked_entries += 1
 
         return checked_entries
+
