@@ -22,11 +22,13 @@ goog.provide('unisubs.player.DailymotionVideoPlayer');
  * @constructor
  * @param {unisubs.player.DailymotionVideoSource} videoSource
  * @param {boolean=} opt_chromeless
+ * @param {boolean=} opt_forDialog
  */
-unisubs.player.DailymotionVideoPlayer = function(videoSource, opt_chromeless) {
+unisubs.player.DailymotionVideoPlayer = function(videoSource, opt_chromeless, opt_forDialog) {
     unisubs.player.AbstractVideoPlayer.call(this, videoSource);
     this.videoSource_ = videoSource;
     this.chromeless_ = !!opt_chromeless;
+    this.forDialog_ = !!opt_forDialog;
 
     this.player_ = null;
     this.playerAPIID_ = [videoSource.getUUID(),
