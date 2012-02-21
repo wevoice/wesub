@@ -1686,7 +1686,7 @@ ol.subtitles {
     div.chzn-container-active {
         div.chzn-drop {
             margin-left: -5px !important;
-            margin-top: -1px !important;
+            margin-top: -3px !important;
             z-index: 50;
 
             li {
@@ -1962,17 +1962,37 @@ pre.dump {
     display: none;
     margin-bottom: 1em;
     margin-left: -10px;
-    padding: 1em;
-    text-align: center;
+    padding: 10px 40px 5px 10px;
+    position: relative;
+    text-align: left;
 
     .chzn-container {
         width: auto !important;
-    }
 
+        a.chzn-single {
+            line-height: 16px;
+        }
+    }
+    p {
+        float: left;
+        height: auto;
+    }
+    div.filter-chunk {
+        display: block;
+        float: left;
+        margin-bottom: 5px;
+        
+        span.inner {
+            margin-left: 6px;
+        }
+    }
     a.clear-filters {
         color: $light;
         float: right;
+        position: absolute;
+        right: 16px;
         text-decoration: none;
+        top: 11px;
     }
 }
 #teams .view .filters.active {
