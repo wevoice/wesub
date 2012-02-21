@@ -1688,7 +1688,6 @@ ol.subtitles li .quiet {
 }
 .v1 .filters .chzn-container-active .chzn-single-with-drop:before {
   background: #FFF;
-  border-bottom: 1px solid #FFF;
   border: 1px solid #B9C3C8;
   content: "";
   display: block;
@@ -1710,6 +1709,7 @@ ol.subtitles li .quiet {
   border-bottom-right-radius: 0;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
+  border-bottom: 1px solid #FFF;
 }
 .v1 .filters div.chzn-container-active div.chzn-drop {
   margin-left: -5px !important;

@@ -1670,7 +1670,6 @@ ol.subtitles {
         }
         &:before {
             background: #FFF;
-            border-bottom: 1px solid #FFF;
             border: 1px solid #B9C3C8;
             content: "";
             display: block;
@@ -1681,6 +1680,7 @@ ol.subtitles {
             width: 100%;
             z-index: 51;
             @include multi-border-radius(5px, 5px, 0, 0);
+            border-bottom: 1px solid #FFF;
         }
     }
     div.chzn-container-active {
