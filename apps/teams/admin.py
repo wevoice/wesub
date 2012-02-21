@@ -34,12 +34,12 @@ class TeamMemberInline(admin.TabularInline):
     raw_id_fields = ['user']
 
 class TeamAdmin(admin.ModelAdmin):
-    inlines = [TeamMemberInline]
     search_fields = ('name'),
     list_display = ('name', 'membership_policy', 'video_policy', 'is_visible', 'highlight', 'last_notification_time', 'thumbnail')
     list_filter = ('highlight', 'is_visible')
     actions = ['highlight', 'unhighlight', 'send_message']
-    raw_id_fields = ['video']
+    raw_id_fields = ['video', 'users', 'videos', 'applicants']
+    exclude = ('third_party_accounts', 'users', 'applicants','videos')
 
     def thumbnail(self, object):
         return '<img src="%s"/>' % object.logo_thumbnail()
