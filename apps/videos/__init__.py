@@ -70,7 +70,8 @@ class EffectiveSubtitle:
             'text': self.text,
             'start': self.start_time,
             'end': self.end_time,
-            'id': self.pk
+            'id': self.pk,
+            'start_of_paragraph': self.start_of_paragraph,
         }
 
     def has_same_timing(self, subtitle):

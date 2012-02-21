@@ -1409,8 +1409,10 @@ def _create_task_after_unpublishing(subtitle_version):
 
     # If there's already an open review/approval task for this language, it
     # means we just unpublished multiple versions in a row and can ignore this.
-    open_task_exists = (team_video.task_set.incomplete_review().exists()
-                     or team_video.task_set.incomplete_approve().exists())
+    open_task_exists = (
+            team_video.task_set.incomplete_review().filter(language=lang).exists()
+         or team_video.task_set.incomplete_approve().filter(language=lang).exists()
+    )
     if open_task_exists:
         return None
 
@@ -1422,10 +1424,10 @@ def _create_task_after_unpublishing(subtitle_version):
         type = Task.TYPE_IDS['Review']
         can_do = can_review
 
+    # Try to guess the appropriate assignee by looking at the last task.
     last_task = (team_video.task_set.complete().filter(language=lang, type=type)
                                                .order_by('-completed')
                                                [:1])
-
     assignee = None
     if last_task:
         candidate = last_task[0].assignee
@@ -1486,21 +1488,31 @@ def unpublish(request, slug):
     scope = form.cleaned_data['scope']
     should_delete = form.cleaned_data['should_delete']
     language = version.language
-    language_pk = version.language.pk
 
+    results = []
     if scope == 'version':
-        result = version.unpublish(delete=should_delete)
+        results.append([version.language.pk,
+                        version.unpublish(delete=should_delete)])
     elif scope == 'language':
-        result = language.unpublish(delete=should_delete)
+        results.append([language.pk,
+                        language.unpublish(delete=should_delete)])
+    elif scope == 'dependents':
+        translations = list(SubtitleLanguage.objects.filter(video=language.video,
+                                                            standard_language=language,
+                                                            is_forked=False))
+        for l in [language] + translations:
+            results.append([l.pk,
+                            l.unpublish(delete=should_delete)])
     else:
-        # TODO Write scope == 'dependents' code.
-        result = None
+        assert False, 'Invalid scope.'
 
-    if result:
-        _create_task_after_unpublishing(result)
+    for language_pk, version_for_task in results:
+        _propagate_unpublish_to_external_services(language_pk)
+
+        if version_for_task:
+            _create_task_after_unpublishing(version_for_task)
 
     metadata_manager.update_metadata(team_video.video.pk)
-    _propagate_unpublish_to_external_services(language_pk)
 
     messages.success(request, _(u'Successfully unpublished subtitles.'))
     return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
