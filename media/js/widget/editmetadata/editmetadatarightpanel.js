@@ -32,23 +32,22 @@ unisubs.editmetadata.RightPanel = function(dialog,
                                            doneStrongText, 
                                            doneText, 
                                            isReviewOrApproval,
-                                           notesInput
+                                           notesInput,
+                                           inSubtitlingDialog
                                           ) {
     unisubs.RightPanel.call(this,  serverModel, helpContents, extraHelp,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
     this.showSaveExit = false;
-    if (isReviewOrApproval){
-
+    this.showDoneButton = true;
+    if (isReviewOrApproval && ! inSubtitlingDialog){
         this.showDoneButton = false;
-    }else{
-
-        this.showDoneButton = true;
-    }
+    }    
     this.helpContents = helpContents;
     // TODO: See if there's a way to avoid the circular reference here.
     this.dialog_ = dialog;
     this.isReviewOrApproval_ = isReviewOrApproval;
+    this.inSubtitlingDialog_ = inSubtitlingDialog;
     this.notesInput_ = notesInput;
 };
 goog.inherits(unisubs.editmetadata.RightPanel, unisubs.RightPanel);
@@ -86,8 +85,20 @@ unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function(
             el.appendChild($d('p', null, p));
         });
     }
+    
+    // FIXME : check if not needed when not in review mode
+    if (false && this.showDoneButton){
+        
+        var stepsDiv = $d('div', 'unisubs-steps', this.loginDiv_);
+        this.doneAnchor_ = this.createDoneAnchor_($d);
+        stepsDiv.appendChild(this.doneAnchor_);
+        el.appendChild(stepsDiv);
+        
+        this.getHandler().listen(this.doneAnchor_, 'click', this.doneClicked_);
+    }
 };
 
+// FIXME: remove duplication from the subtitle.reviewpanel
 unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
     if (e){
         e.preventDefault();
@@ -118,7 +129,8 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
 };
 
 unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
-    if (!this.isReviewOrApproval_){
+    if (!this.isReviewOrApproval_ || this.inSubtitlingDialog_){
+        // for the subtitling dialog, we need the button to advance to the next painel
         return;
     }
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');

@@ -109,6 +109,7 @@ unisubs.RightPanel.prototype.showBackLink = function(linkText) {
     unisubs.style.showElement(this.backAnchor_, true);
     goog.dom.setTextContent(this.backAnchor_, linkText);
 };
+
 unisubs.RightPanel.prototype.appendHelpContentsInternal = function($d, el) {
     var helpHeadingDiv = $d('div', 'unisubs-help-heading');
     el.appendChild(helpHeadingDiv);
@@ -231,18 +232,24 @@ unisubs.RightPanel.prototype.createBackAnchor_ = function($d, el) {
     return anchor;
 
 }
-unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
-    this.loginDiv_ = $d('div');
-    this.loadingGif_ = $d('img',
-                          {'src': unisubs.imageAssetURL('spinner.gif') });
-    this.showLoading(false);
-    this.doneAnchor_ = $d('a', {'className':'unisubs-done', 'href':'#'},
+unisubs.RightPanel.prototype.createDoneAnchor_ = function($d) {
+    return $d('a', {'className':'unisubs-done', 'href':'#'},
                           $d('span', null,
                              this.loadingGif_,
                              $d('strong', null, this.doneStrongText_),
                              goog.dom.createTextNode(" "),
                              goog.dom.createTextNode(this.doneText_)));
+}
+
+unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
+    this.loginDiv_ = $d('div');
+    this.loadingGif_ = $d('img',
+                          {'src': unisubs.imageAssetURL('spinner.gif') });
+    this.showLoading(false);
+    this.doneAnchor_ = this.createDoneAnchor_($d);
     var stepsDiv = $d('div', 'unisubs-steps', this.loginDiv_);
+    
+
 
     this.backAnchor_ = this.createBackAnchor_($d, el);
     unisubs.style.showElement(this.backAnchor_, false);

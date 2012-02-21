@@ -158,12 +158,18 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
     var captionPanel = this.getCaptioningAreaInternal();
     captionPanel.removeChildren(true);
     captionPanel.addChild(nextSubPanel, true);
-
+       
+   
     var rightPanel = nextSubPanel.getRightPanel();
     this.setRightPanelInternal(rightPanel);
 
     this.getTimelinePanelInternal().removeChildren(true);
-
+    
+    var currentNoteContent =  this.getNotesContent_(this.currentSubtitlePanel_);
+    if (currentNoteContent){
+        this.setNotesContent_(nextSubPanel, currentNoteContent)
+    }
+ 
     this.disposeCurrentPanels_();
     this.currentSubtitlePanel_ = nextSubPanel;
 
@@ -467,7 +473,8 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.getVideoPlayerInternal(),
             this.serverModel_,
             this.captionManager_,
-            this.reviewOrApprovalType_
+            this.reviewOrApprovalType_,
+            this
         );
     else if (this.state_ == s.EDIT_METADATA)
         return new unisubs.editmetadata.Panel(
@@ -547,9 +554,24 @@ unisubs.subtitle.Dialog.prototype.addTranslationsAndClose = function() {
 };
 
 unisubs.subtitle.Dialog.prototype.onNotesFetched_ = function(body) {
-    if( this.currentSubtitlePanel_ && this.currentSubtitlePanel_.setNotesContent_){
-        this.currentSubtitlePanel_.setNotesContent_(body);
+    this.setNotesContent_(this.currentSubtitlePanel_, body);
+}
+
+unisubs.subtitle.Dialog.prototype.setNotesContent_ = function(panel, newContent) {
+    if (panel && panel.bodyInput_){
+        panel.bodyInput_.value = newContent;
+        return true;
     }
+    return null;
+}
+
+
+
+unisubs.subtitle.Dialog.prototype.getNotesContent_ = function(panel) {
+    if (panel && panel.bodyInput_){
+        return  panel.bodyInput_.value;
+    }
+    return null;
 }
 
 
