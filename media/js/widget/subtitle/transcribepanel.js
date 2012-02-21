@@ -111,16 +111,18 @@ unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
     var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
         $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
     var KC = goog.events.KeyCodes;
-    var keySpecs = [
-        new unisubs.RightPanel.KeySpec(
-            'unisubs-play', 'unisubs-tab', 'tab', 'Play/Pause', KC.TAB, 0),
-        new unisubs.RightPanel.KeySpec(
-            'unisubs-skip', 'unisubs-control', 'shift\n+\ntab',
-            'Skip Back 8 Seconds', KC.TAB,
-            unisubs.RightPanel.KeySpec.Modifier.SHIFT)
-    ];
-
+    var keySpecs = [];
     if (! internalComponents){
+        keySpecs = [
+            new unisubs.RightPanel.KeySpec(
+                'unisubs-play', 'unisubs-tab', 'tab', 'Play/Pause', KC.TAB, 0),
+            new unisubs.RightPanel.KeySpec(
+                'unisubs-skip', 'unisubs-control', 'shift\n+\ntab',
+                'Skip Back 8 Seconds', KC.TAB,
+                unisubs.RightPanel.KeySpec.Modifier.SHIFT)
+        ];
+
+
         internalComponents = {
         'helpContents' : new unisubs.RightPanel.HelpContents(
                 "Typing",
