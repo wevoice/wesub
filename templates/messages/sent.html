@@ -22,10 +22,13 @@
                         if (response.error){
                             $.jGrowl.error(response.error);
                         } else {
-                            $this.parents('tr').remove();
+                            $this.parents('li.message').fadeOut('fast', function() {
+                                $(this).remove();
+                            });
                         };
                     });
                 }
+                return false;
             });
             
             $('#send-message-form').ajaxForm({
@@ -95,16 +98,14 @@
 
             <ul class="listing messages">
             {% for msg in message_list %}
-                <li{% if not msg.read %} class="unread"{% endif %}>
+                <li class="message {% if not msg.read %}unread{% endif %}">
                     <h3><a href="#" data-modal="msg_modal" data="{{ msg.json_data }}">{{ msg }}</a></h3>
                 
                     <p>
-                        From
-                        {% if msg.author %}
-                            <a href="{{ msg.author.get_absolute_url }}">{{ msg.author }}</a>
-                        {% endif %}
+                        To
+                        <a href="{{ msg.user.get_absolute_url }}">{{ msg.user }}</a>
                     </p>
-                    <a class="thumb"href="{{ msg.author.get_absolute_url }}">
+                    <a class="thumb"href="{{ msg.user.get_absolute_url }}">
                         {% with msg.user.small_avatar as user_avatar_url %}
                             {% if user_avatar_url %}
                                 <img src="{{ user_avatar_url }}" alt="{% trans 'Avatar' %}"/>

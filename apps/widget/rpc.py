@@ -15,37 +15,37 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
+import logging
 from datetime import datetime
-from videos import models
-from widget.models import SubtitlingSession
-from widget.base_rpc import BaseRpc
+
 from django.conf import settings
 from django.db.models import Sum, Q
-from widget import video_cache
-from utils.translation import get_user_languages_from_request
-from django.utils.translation import ugettext as _
-from subrequests.models import SubtitleRequest
-from uslogging.models import WidgetDialogLog
-from videos.tasks import video_changed_tasks
-from icanhaz.models import VideoVisibilityPolicy
 from django.utils import translation
-from widget.forms import  FinishReviewForm, FinishApproveForm
-from utils.forms import flatten_errorlists
+from django.utils.translation import ugettext as _
+from icanhaz.models import VideoVisibilityPolicy
+from statistic.tasks import st_widget_view_statistic_update
 from teams.models import Task, Workflow
-from teams.signals import (
-    api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
-    api_language_new, api_language_edited, api_video_edited
-)
 from teams.moderation_const import UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
     can_publish_edits_immediately, can_review, can_approve
 )
-
+from teams.signals import (
+    api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
+    api_language_new, api_language_edited, api_video_edited
+)
+from uslogging.models import WidgetDialogLog
 from utils import send_templated_email
-from statistic.tasks import st_widget_view_statistic_update
-import logging
+from utils.forms import flatten_errorlists
+from utils.translation import get_user_languages_from_request
+from videos import models
+from videos.tasks import video_changed_tasks
+from widget import video_cache
+from widget.base_rpc import BaseRpc
+from widget.forms import  FinishReviewForm, FinishApproveForm
+from widget.models import SubtitlingSession
+
+
 yt_logger = logging.getLogger("youtube-ei-error")
 
 ALL_LANGUAGES = settings.ALL_LANGUAGES
@@ -94,8 +94,8 @@ class Rpc(BaseRpc):
         except Exception as e:
             # for example, private youtube video or private widgets
             return {"error_msg": unicode(e)}
-            
-        if video_id is None: 
+
+        if video_id is None:
             return None
         visibility_policy = video_cache.get_visibility_policies(video_id)
         if visibility_policy.get('widget', None) != VideoVisibilityPolicy.WIDGET_VISIBILITY_PUBLIC:
@@ -198,47 +198,6 @@ class Rpc(BaseRpc):
             'video_id': video_id,
             'is_original_language_subtitled': is_original_language_subtitled,
             'general_settings': general_settings }
-
-    def fetch_request_dialog_contents(self, request, video_id):
-        '''
-        Fetch the contents for creating a dialog to create request subtitles
-        form.
-        '''
-        my_languages = get_user_languages_from_request(request)
-        my_languages.extend([l[:l.find('-')] for l in my_languages if l.find('-') > -1])
-
-        # List of language-code tuples
-        all_languages = sorted(LANGUAGES_MAP.items())
-
-        ##TODO: Filter all_languages according to already submitted requests
-        # after creation of SubtitleRequest Model
-
-        return {
-            'my_languages': my_languages,
-            'all_languages': all_languages
-        }
-
-    def submit_subtitle_request(self, request, video_id, request_languages, track_request,
-                                description):
-        '''
-        Processes a request submitted through the UI
-        '''
-        status = True
-        message = ''
-
-        subreqs = SubtitleRequest.objects.create_requests(
-                video_id,
-                request.user,
-                request_languages,
-                track=track_request,
-                description=description,
-        )
-
-        return {
-            'status':status,
-            'message': message,
-            'count' : len(subreqs),
-        }
 
 
     def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode):
@@ -406,7 +365,7 @@ class Rpc(BaseRpc):
 
     def save_finished(self, user, session, subtitles, new_title=None,
                       completed=None, forked=False, new_description=None):
-        from apps.teams.moderation import user_can_moderate
+        from apps.teams.permissions import can_publish_edits_immediately
         language = session.language
         new_version = None
         if subtitles is not None and \
@@ -453,10 +412,10 @@ class Rpc(BaseRpc):
             api_video_edited.send(language.video)
 
         # The message displayed to the user  has a complex requirement /  outcomes
-        # 1) Subs will go live in a moment. Works for unmoderated subs and for D and H 
+        # 1) Subs will go live in a moment. Works for unmoderated subs and for D and H
         # D. Transcript, post-publish edit by moderator with the power to approve. Will go live immediately.
         # H. Translation, post-publish edit by moderator with the power to approve. Will go live immediately.
-        # 2) Subs must be completed before being submitted to moderators. Works for A and E 
+        # 2) Subs must be completed before being submitted to moderators. Works for A and E
         # A. Transcript, incomplete (checkbox not ticked). Must be completed before being submitted to moderators.
         # E. Translation, incomplete (some lines missing). Must be completed before being submitted to moderators.
         # 3) Subs will be submitted for review/approval. Works for B, C, F, and G
@@ -472,19 +431,24 @@ class Rpc(BaseRpc):
                               "They will not be submitted for publishing "
                               "until they've been completed.")
         under_moderation = language.video.is_moderated
-        _user_can_moderate =  user_can_moderate(language.video, user)
+        
+        _user_can_publish =  True
+        team_video_set = language.video.teamvideo_set
+        if under_moderation and team_video_set.exists():
+            # videos are only supposed to have one team video
+            _user_can_publish = can_publish_edits_immediately(team_video_set.all()[0], user)
         is_complete = language.is_complete or language.calculate_percent_done() == 100
         # this is case 1
-        if under_moderation and _user_can_moderate is False:
+        if under_moderation and _user_can_publish is False:
             if is_complete:
                 # case 3
                 user_message = message_will_be_submited % ( language.video.moderated_by.name)
             else:
                 # case 2
-                user_message = message_incomplete 
+                user_message = message_incomplete
         else:
             user_message = message_will_be_live_soon
-            
+
         # If we've just saved a completed subtitle language, we may need to
         # complete a subtitle or translation task.
         if is_complete:

@@ -25,6 +25,14 @@
     <script src="{{ STATIC_URL }}js/unisubs.modal.js" type="text/javascript"></script>
     <script type="text/javascript">
         window.roleSavedURL = '{% url teams:role_saved team.slug %}';
+
+        {% if request.GET.lang %}
+            $select = $('select#lang-filter');
+            $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
+            $select.children().removeAttr('selected');
+            $opt.attr('selected', 'selected');
+            $select.trigger('liszt:updated');
+        {% endif %}
     </script>
 {% endblock %}
 
@@ -48,26 +56,30 @@
             <a href="#filter" id="sort-filter">{% trans 'Filter and Sort' %}<span></span></a>
         </div>
 
-        <div class="filters{% if filtered %} active{% endif %}">
+        <div class="filters group{% if filtered %} active{% endif %}">
             <p>
-                {% trans 'Showing' %}
-                <select name="role-filter" id="role-filter">
-                    <option value="{% url teams:detail_members team.slug %}{% query_string request.GET %}">{% trans 'all members' %}</option>
-                    <option value="{% url teams:detail_members_role slug=team.slug,role='admin' %}{% query_string request.GET %}"{% if role == 'admin' %} selected="selected"{% endif %}>{% trans 'admins' %}</option>
-                    <option value="{% url teams:detail_members_role slug=team.slug,role='manager' %}{% query_string request.GET %}"{% if role == 'manager' %} selected="selected"{% endif %}>{% trans 'managers' %}</option>
-                    <option value="{% url teams:detail_members_role slug=team.slug,role='contributor' %}{% query_string request.GET %}"{% if role == 'contributors' %} selected="selected"{% endif %}>{% trans 'contributor' %}</option>
-                </select>
-                {% trans 'speaking' %}
-                <select name="lang-filter" id="lang-filter">
-                    <option value="">{% trans 'all languages' %}</option>
-                    {% for code, name in languages %}
-                        <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
-                    {% endfor %}
-                </select>
-                {% if filtered %}
-                    <a href="{% url teams:detail_members team.slug %}" class="clear-filters">{% trans 'Clear' %}</a>
-                {% endif %}
+                <div class="filter-chunk">
+                    <span class="inner">{% trans 'Showing' %}</span>
+                    <select name="role-filter" id="role-filter">
+                        <option value="{% url teams:detail_members team.slug %}{% query_string request.GET %}">{% trans 'all members' %}</option>
+                        <option value="{% url teams:detail_members_role slug=team.slug,role='admin' %}{% query_string request.GET %}"{% if role == 'admin' %} selected="selected"{% endif %}>{% trans 'admins' %}</option>
+                        <option value="{% url teams:detail_members_role slug=team.slug,role='manager' %}{% query_string request.GET %}"{% if role == 'manager' %} selected="selected"{% endif %}>{% trans 'managers' %}</option>
+                        <option value="{% url teams:detail_members_role slug=team.slug,role='contributor' %}{% query_string request.GET %}"{% if role == 'contributors' %} selected="selected"{% endif %}>{% trans 'contributor' %}</option>
+                    </select>
+                </div>
+                <div class="filter-chunk">
+                    <span class="inner">{% trans 'speaking' %}</span>
+                    <select name="lang-filter" id="lang-filter">
+                        <option value="">{% trans 'all languages' %}</option>
+                        {% for code, name in languages %}
+                            <option id="lang-opt-{{ code }}" {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </p>
+            {% if filtered %}
+                <a href="{% url teams:detail_members team.slug %}" class="clear-filters">{% trans 'Clear' %}</a>
+            {% endif %}
         </div>
 
         {% if team|can_approve_application:user and team.applications.all.count > 0 %}

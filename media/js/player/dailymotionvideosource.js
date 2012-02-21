@@ -31,17 +31,17 @@ unisubs.player.DailymotionVideoSource = function(videoID, videoURL, opt_videoCon
 };
 
 unisubs.player.DailymotionVideoSource.prototype.createPlayer = function() {
-    return this.createPlayer_(false);
+    return this.createPlayer_(false, false);
 };
 
 unisubs.player.DailymotionVideoSource.prototype.createControlledPlayer = function() {
-    return new unisubs.player.ControlledVideoPlayer(this.createPlayer_(true));
+    return new unisubs.player.ControlledVideoPlayer(this.createPlayer_(true, true));
 };
 
-unisubs.player.DailymotionVideoSource.prototype.createPlayer_ = function(chromeless) {
+unisubs.player.DailymotionVideoSource.prototype.createPlayer_ = function(chromeless, forDialog) {
     return new unisubs.player.DailymotionVideoPlayer(
         new unisubs.player.DailymotionVideoSource(this.videoID_, this.videoURL_, this.videoConfig_), 
-        chromeless);
+        chromeless, forDialog);
 };
 
 unisubs.player.DailymotionVideoSource.prototype.sizeFromConfig = function() {

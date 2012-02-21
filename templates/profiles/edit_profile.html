@@ -138,15 +138,6 @@
                             <div class="entry">
                               {{ formset.empty_form.language }}
                               {{ formset.empty_form.proficiency }}
-                              {% switch_feature REQUESTS %}
-                                <p>
-
-                                  {{ formset.empty_form.follow_requests }}
-                                  <label for="{{ formset.empty_form.follow_requests.auto_id }}">
-                                      {{ formset.empty_form.follow_requests.label }}
-                                  </label>
-                                </p>
-                                {% endswitch_feature %}
                                 <div style="display: none" class="delete-checkbox">
                                     {{ form.DELETE }}
                                 </div>
@@ -166,14 +157,6 @@
                                     {{ form.language }}
                                     {{ form.proficiency.errors }}
                                     {{ form.proficiency }}
-                                    {% switch_feature REQUESTS %}
-                                        <p>
-                                            {{ form.follow_requests }}
-                                            <label for="{{ form.follow_requests.auto_id }}">
-                                                {{ form.follow_requests.label }}
-                                            </label>
-                                        </p>
-                                    {% endswitch_feature %}
                                     <div style="display: none" class="delete-checkbox">
                                         {{ form.DELETE }}
                                     </div>
