@@ -51,7 +51,7 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel,
     }else{
         
         this.numSteps_ = 2;
-        this.currentStep = 1;
+        this.currentStep_ = 1;
         this.nextButtonText_ = "Submit final translation";
     }
     this.inSubtitlingDialog_  = inSubtitlingDialog;

@@ -36,7 +36,7 @@ unisubs.subtitle.ReviewRightPanel = function(dialog,
                              legendKeySpecs,
                              showRestart, doneStrongText, doneText);
     this.isReviewOrApproval_  = isReviewOrApproval;
-    this.showDoneButton = false;
+    this.showDoneButton = ! isReviewOrApproval;
     this.notesInput_ = notesInput_;
     this.dialog_ = dialog;
 };

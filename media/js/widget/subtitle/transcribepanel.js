@@ -147,7 +147,7 @@ unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
     }
     return new unisubs.subtitle.TranscribeRightPanel(
             this.serverModel_, internalComponents['helpContents'],
-            internalComponents['extraHelp'], keySpecs , "Done?", this.nextButtonText_, 
+            internalComponents['extraHelp'], keySpecs , true, "Done?", this.nextButtonText_, 
             reviewOrApproval, this.bodyInput_);
 
 };

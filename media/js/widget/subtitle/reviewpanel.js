@@ -46,10 +46,13 @@ unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal =
     if (! internalComponents){
         reviewOrApproval = false;
         keySpecs = this.makeKeySpecsInternal();
-        var helpContents = new unisubs.RightPanel.HelpContents(
-            "Check your work",
-            this.numSteps_, this.currentStep_);
-        helpContents.html =
+        internalComponents = {
+            'helpContents': new unisubs.RightPanel.HelpContents(
+                "Check your work", [],
+                this.numSteps_, this.currentStep_)
+        }
+        
+        internalComponents['helpContents'].html =
         "<p>Watch the video one more time and correct any mistakes in text or timing. Tips for making high quality subtitles:</p>" +
         "<ul>" +
         "<li>Include text that appears in the video (signs, etc.)</li>" +
