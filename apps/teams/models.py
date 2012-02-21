@@ -1864,6 +1864,20 @@ class Task(models.Model):
                 base_url = video.get_absolute_url()
         return base_url+  "?t=%s" % self.pk
 
+    def get_reviewer(self):
+        if self.type == 40:
+            previous = Task.objects.complete().filter(
+                team_video=self.team_video,
+                language=self.language,
+                team=self.team,
+                type=Task.TYPE_IDS['Review']).order_by('-completed')[:1]
+
+            if previous:
+                reviewer = previous[0].assignee
+            else:
+                reviewer = None
+
+            return reviewer
 
     def set_expiration(self):
         """Set the expiration_date of this task.  Does not save().

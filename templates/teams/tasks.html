@@ -167,6 +167,13 @@
                                         {% endif %}
                                         by
                                         <a href="{{ version.user.get_absolute_url }}" title="View {{ version.user }}'s profile">{{ version.user }}</a>
+                                        {% if task.get_type_display == 'Approve' %}
+                                            {% with task.get_reviewer as reviewer %}
+                                                {% if reviewer %},
+                                                    reviewed by {{ reviewer }}.
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% endif %}
                                     </p>
                                 {% endwith %}
                             {% endif %} 
