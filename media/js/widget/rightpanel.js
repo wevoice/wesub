@@ -485,7 +485,7 @@ unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, cu
                         " to the subtitles."),
             $d('span', {'className': 'unisubs-spanarrow'})),
 
-        $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
+        $d('label', {'class': 'unisubs-approve-notes-label', 'for': 'unisubs-approve-notes'}, 'Notes'),
         bodyInput
 
     ], numSteps, currentStep);

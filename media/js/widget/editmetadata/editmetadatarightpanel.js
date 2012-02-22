@@ -106,7 +106,7 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
     var dialog = this.dialog_;
     var that = this;
     
-    var actionName = this.reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
+    var actionName = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
         'approve' : 'review';
     var successCallback = function(serverMsg) {
         unisubs.subtitle.OnSavedDialog.show(serverMsg, function() {
@@ -139,7 +139,7 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
     }
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
     this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
-    var buttonText = this.reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
+    var buttonText = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
         'Approve' : 'Review';
     this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, buttonText);
 
