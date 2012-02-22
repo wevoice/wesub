@@ -190,7 +190,7 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
     var backButtonText = null;
     if (state == s.EDIT_METADATA ){
         backButtonText = "Back to Sync";
-    }else if (state == s.SYNC){
+    }else if (state == s.SYNC && ! this.reviewOrApprovalType_){
         backButtonText = "Back to Typing";
     }else if (state == s.REVIEW ){
         backButtonText = "Back to Edit Info";
