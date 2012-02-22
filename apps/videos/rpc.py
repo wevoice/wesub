@@ -173,28 +173,6 @@ class VideosApiClass(object):
 
         return render_page(page, sqs, request=request, display_views=sort)
 
-    def _get_volunteer_sqs(self, request, user):
-        '''
-        Return the search query set for videos which would be relevant to
-        volunteer for writing subtitles.
-        '''
-
-        user_langs = get_user_languages_from_request(request)
-        rest_langs = dict(settings.ALL_LANGUAGES).keys()
-        for lang in user_langs:
-            rest_langs.remove(lang)
-
-        relevant = VideoIndex.public().filter(video_language_exact__in=user_langs) \
-            .filter_or(languages_exact__in=user_langs) \
-            .order_by('-requests_count')
-
-        # Rest of the videos, which most probably would not be much useful
-        # for the volunteer
-        rest = VideoIndex.public().exclude(languages_exact__in=user_langs) \
-            .exclude(video_language_exact__in=user_langs) \
-            .order_by('-requests_count')
-
-        return relevant, rest
 
     @add_request_to_kwargs
     def load_featured_page_volunteer(self, page, request, user):
