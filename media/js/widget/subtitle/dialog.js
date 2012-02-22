@@ -89,7 +89,11 @@ unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
 };
 unisubs.subtitle.Dialog.prototype.createDom = function() {
     unisubs.subtitle.Dialog.superClass_.createDom.call(this);
-    this.enterState_(unisubs.subtitle.Dialog.State_.TRANSCRIBE);
+    var initialState = unisubs.subtitle.Dialog.State_.TRANSCRIBE;
+    if (this.reviewOrApprovalType_){
+        initialState = unisubs.subtitle.Dialog.State_.SYNC;
+    }
+    this.enterState_(initialState);
 };
 unisubs.subtitle.Dialog.prototype.showDownloadLink_ = function() {
     var that = this;
@@ -489,20 +493,29 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
 };
 unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
-    if (this.state_ == s.TRANSCRIBE)
-        return s.SYNC;
-    else if (this.state_ == s.EDIT_METADATA){
+    // the dialog is different when reviewing / approving
+    // we only show the sync and edit metadata panels
+    if (this.reviewOrApprovalType_){
+       if (this.state_ == s.SYNC)
+            return s.EDIT_METADATA;
 
-        if (this.isReviewOrApproval_){
-        }else{
+    }else{
+        if (this.state_ == s.TRANSCRIBE)
+            return s.SYNC;
+        else if (this.state_ == s.EDIT_METADATA){
 
-            return s.REVIEW;
+            if (this.isReviewOrApproval_){
+            }else{
+
+                return s.REVIEW;
+            }
         }
+        else if (this.state_ == s.SYNC)
+            return s.EDIT_METADATA;
+        else if (this.state_ == s.REVIEW)
+            return s.FINISHED;
+
     }
-    else if (this.state_ == s.SYNC)
-        return s.EDIT_METADATA;
-    else if (this.state_ == s.REVIEW)
-        return s.FINISHED;
 };
 unisubs.subtitle.Dialog.prototype.showLoginNag_ = function() {
     // not doing anything here right now.

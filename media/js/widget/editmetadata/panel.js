@@ -44,7 +44,7 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel,
     this.captionManager_ = captionManager;
     this.originalSubtitles_ = originalSubtitles;
     // when in the translate dialog, there are only 2 steps, for the subtitling, there are 4
-    if (inSubtitlingDialog){
+    if (!reviewOrApprovalType){
         this.currentStep_ = 2;
         this.numSteps_ = 4;
         this.nextButtonText_ = "Next Step: Check your work";

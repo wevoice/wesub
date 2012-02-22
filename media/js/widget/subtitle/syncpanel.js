@@ -48,8 +48,14 @@ unisubs.subtitle.SyncPanel = function(subtitles, videoPlayer,
     this.downHeld_ = false;
     this.keyEventsSuspended_ = false;
     this.reviewOrApprovalType_ = reviewOrApprovalType;
-    this.numSteps_ = 4;
-    this.currentStep_ = 1;
+    if (this.reviewOrApprovalType_){
+
+        this.numSteps_ = 2;
+        this.currentStep_ = 0;
+    }else{
+        this.numSteps_ = 4;
+        this.currentStep_ = 1;
+    }
 
 };
 goog.inherits(unisubs.subtitle.SyncPanel, goog.ui.Component);

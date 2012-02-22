@@ -40,7 +40,7 @@ unisubs.editmetadata.RightPanel = function(dialog,
 
     this.showSaveExit = false;
     this.showDoneButton = true;
-    if (reviewOrApprovalType && ! inSubtitlingDialog){
+    if (reviewOrApprovalType ){
         this.showDoneButton = false;
     }    
     this.helpContents = helpContents;
@@ -133,7 +133,7 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
 };
 
 unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
-    if (!this.reviewOrApprovalType_ || this.inSubtitlingDialog_){
+    if (!this.reviewOrApprovalType_ ){
         // for the subtitling dialog, we need the button to advance to the next painel
         return;
     }
