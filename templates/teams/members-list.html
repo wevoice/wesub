@@ -3,7 +3,7 @@
 {% load i18n query_string utils_tags teams_tags paginator widget media_compressor verbatim_templatetag %}
 
 {% block title %}
-    {{ team }} | Universal Subtitles
+    {% trans 'Members' %} - {{ team }} | Universal Subtitles
 {% endblock %}
 
 {% block body_attrs %}id="teams" class="v1"{% endblock %}
