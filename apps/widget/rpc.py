@@ -365,7 +365,6 @@ class Rpc(BaseRpc):
 
     def save_finished(self, user, session, subtitles, new_title=None,
                       completed=None, forked=False, new_description=None):
-        from apps.teams.permissions import can_publish_edits_immediately
         language = session.language
         new_version = None
         if subtitles is not None and \
@@ -436,7 +435,7 @@ class Rpc(BaseRpc):
         team_video_set = language.video.teamvideo_set
         if under_moderation and team_video_set.exists():
             # videos are only supposed to have one team video
-            _user_can_publish = can_publish_edits_immediately(team_video_set.all()[0], user)
+            _user_can_publish = can_publish_edits_immediately(team_video_set.all()[0], user, language.language)
         is_complete = language.is_complete or language.calculate_percent_done() == 100
         # this is case 1
         if under_moderation and _user_can_publish is False:

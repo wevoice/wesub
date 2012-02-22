@@ -20,11 +20,13 @@
         unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
 
         {% if request.GET.lang %}
-            $select = $('select#lang-filter');
-            $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
-            $select.children().removeAttr('selected');
-            $opt.attr('selected', 'selected');
-            $select.trigger('liszt:updated');
+            $(function() {
+                $select = $('select#id_task_language');
+                $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
+                $select.children().removeAttr('selected');
+                $opt.attr('selected', 'selected');
+                $select.trigger('liszt:updated');
+            });
         {% endif %}
     </script>
 {% endblock %}

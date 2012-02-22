@@ -1133,33 +1133,6 @@ class ViewsTest(WebUseTest):
             response = self.client.post(url)
             self.assertEqual(response.status_code, 200)
 
-class VolunteerRpcTest(TestCase):
-
-    fixtures = ['staging_users.json', 'staging_videos.json',
-                'test-userlangs.json']
-
-    def setUp(self):
-        from teams.tests import reset_solr
-
-        cache.clear()
-        reset_solr()
-
-        self.user = User.objects.all()[0]
-        self.request = RequestMockup(self.user)
-
-        for language in SubtitleLanguage.objects.all():
-            v = language.version()
-            if v:
-                video_changed_tasks.delay(v.video.pk)
-
-    def test_get_volunteer_sqs(self):
-
-        rpc = VideosApiClass()
-        rel, rest = rpc._get_volunteer_sqs(self.request, self.user)
-
-        self.assertEqual(4, len(rel))
-        self.assertEqual(5, len(rest))
-
 #Testings VideoType classes
 from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
 
