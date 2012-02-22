@@ -33,6 +33,9 @@ unisubs.startdialog.VideoLanguages = function(jsonVideoLanguages) {
     this.videoLanguages_ = goog.array.filter(
         videoLanguages,
         function(l) {
+            if (l['DISABLED']) {
+                return false;
+            }
             return !!unisubs.languageNameForCode(l.LANGUAGE) ||
                 l.SUBTITLE_COUNT > 0;
         });
