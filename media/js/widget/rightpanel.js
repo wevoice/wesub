@@ -426,7 +426,7 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
 
     
     var title = "Review this translation";
-    var helpContents = unisubs.RightPanel.HelpContents(title, [
+    var helpContents = new unisubs.RightPanel.HelpContents(title, [
         $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
         $d('p', {}, "Once you're finished reviewing, you can either ",
            $d('strong', {}, "send the subtitles back"),
@@ -452,8 +452,6 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
         'bodyInput': bodyInput,
         'helpContents' : helpContents ,
         'extraHelp' :  [
-            $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
-            $d('textarea', {'class': 'unisubs-review-notes', 'id': 'unisubs-review-notes', 'name': 'notes'})
         ]
     }
 }

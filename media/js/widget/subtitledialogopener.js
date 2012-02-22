@@ -213,9 +213,11 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
             sessionPK, this.videoID_, this.videoURL_, captionSet);
         var dialog ;
         if (unisubs.mode == 'review') {
-            dialog = this.openSubtitleReviewingDialog(serverModel, subtitles, originalSubtitles);
+            dialog = this.openSubtitleModerationDialog(serverModel, subtitles, originalSubtitles, 
+                                                       unisubs.Dialog.REVIEW_OR_APPROVAL['REVIEW']);
         } else if (unisubs.mode == 'approve') {
-            dialog = this.openSubtitleApproveDialog(serverModel, subtitles, originalSubtitles);
+            dialog = this.openSubtitleModerationDialog(serverModel, subtitles, originalSubtitles, 
+                                                      unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']);
         } else if (subtitles.IS_ORIGINAL || subtitles.FORKED) {
             dialog = this.openSubtitlingDialog(serverModel, subtitles, originalSubtitles);
         } else {
@@ -234,20 +236,14 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
             window.location.replace(unisubs.returnURL);
     }
 };
-unisubs.widget.SubtitleDialogOpener.prototype.openSubtitleReviewingDialog = function(serverModel, subtitleState) {
-    this.subOpenFn_ && this.subOpenFn_();
-    return new unisubs.reviewsubtitles.Dialog(this.videoSource_, serverModel, subtitleState,
-                                              unisubs.Dialog.REVIEW_OR_APPROVAL['REVIEW']);
-};
-unisubs.widget.SubtitleDialogOpener.prototype.openSubtitleApproveDialog = function(serverModel, subtitleState, originalSubtitles) {
+
+unisubs.widget.SubtitleDialogOpener.prototype.openSubtitleModerationDialog = function(serverModel, subtitleState, originalSubtitles, mode) {
     var dialog;
     if (originalSubtitles){
         dialog =  new unisubs.translate.Dialog(this, serverModel, this.videoSource_,
-                                               subtitleState, originalSubtitles,
-                                               unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']);
+                                               subtitleState, originalSubtitles, mode);
     }else{
-        dialog =  new unisubs.subtitle.Dialog(this.videoSource_, serverModel, subtitleState,
-                                              true, false, unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']);
+        dialog =  new unisubs.subtitle.Dialog(this.videoSource_, serverModel, subtitleState, mode);
     }
     this.subOpenFn_ && this.subOpenFn_();
     return dialog;

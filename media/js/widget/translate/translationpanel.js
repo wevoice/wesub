@@ -81,12 +81,10 @@ unisubs.translate.TranslationPanel.prototype.getRightPanel =
 unisubs.translate.TranslationPanel.prototype.createRightPanel_ = function(){
     
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    var reviewOrApproval = true;
     var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
         $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
     
     if (! internalComponents){
-        reviewOrApproval = false;
 
         var title = this.captionSet_.VERSION > 0 ? 
                 "Editing Translation" : "Adding a New Translation";
@@ -108,7 +106,7 @@ unisubs.translate.TranslationPanel.prototype.createRightPanel_ = function(){
     return new unisubs.translate.TranslationRightPanel(
         this.dialog_,
         this.serverModel_, internalComponents['helpContents'], internalComponents['extraHelp'], [], false, "Done?", 
-        "Next step: Title & Description", "Resources for Translators", reviewOrApproval);
+        "Next step: Title & Description", "Resources for Translators", this.reviewOrApprovalType_);
 
 
 

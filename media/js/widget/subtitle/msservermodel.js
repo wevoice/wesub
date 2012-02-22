@@ -245,40 +245,23 @@ unisubs.subtitle.MSServerModel.prototype.fetchApproveData = function(taskId, suc
 
 };
 
-unisubs.subtitle.MSServerModel.prototype.finishReview = function(data, successCallback, failureCallback) {
+unisubs.subtitle.MSServerModel.prototype.finishApproveOrReview = function(data, isReview, successCallback, failureCallback) {
     var that = this;
+    var methodName, errorMsg;
+    if (isReview){
+        methodName = 'finish_review';
+        errorMsg = 'Problem saving review. Response: ' 
+    }else{
+        methodName = 'finish_approve';
+        errorMsg = 'Problem saving approval. Response: ' 
+    }
     unisubs.Rpc.call(
-        'finish_review',
+        methodName,
         data,
         function(result) {
             if (result['response'] != 'ok') {
                 // this should never happen.
-                alert('Problem saving review. Response: ' +
-                      result["response"]);
-                failureCallback(200);
-            } else {
-                that.finished_ = true;
-                if (successCallback) {
-                    successCallback(result["user_message"]);
-                }
-            }
-        }, function(opt_status) {
-            if (failureCallback) {
-                failureCallback(opt_status);
-            }
-        }, true);
-
-};
-unisubs.subtitle.MSServerModel.prototype.finishApprove = function(data, successCallback, failureCallback) {
-    var that = this;
-    unisubs.Rpc.call(
-        'finish_approve',
-        data,
-        function(result) {
-            if (result['response'] != 'ok') {
-                // this should never happen.
-                alert('Problem saving approval. Response: ' +
-                      result["response"]);
+                alert( errorMsg + result["response"]);
                 failureCallback(200);
             } else {
                 that.finished_ = true;

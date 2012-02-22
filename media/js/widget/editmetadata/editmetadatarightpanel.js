@@ -31,7 +31,7 @@ unisubs.editmetadata.RightPanel = function(dialog,
                                            showRestart, 
                                            doneStrongText, 
                                            doneText, 
-                                           isReviewOrApproval,
+                                           reviewOrApprovalType,
                                            notesInput,
                                            inSubtitlingDialog
                                           ) {
@@ -40,13 +40,13 @@ unisubs.editmetadata.RightPanel = function(dialog,
 
     this.showSaveExit = false;
     this.showDoneButton = true;
-    if (isReviewOrApproval && ! inSubtitlingDialog){
+    if (reviewOrApprovalType && ! inSubtitlingDialog){
         this.showDoneButton = false;
     }    
     this.helpContents = helpContents;
     // TODO: See if there's a way to avoid the circular reference here.
     this.dialog_ = dialog;
-    this.isReviewOrApproval_ = isReviewOrApproval;
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
     this.inSubtitlingDialog_ = inSubtitlingDialog;
     this.notesInput_ = notesInput;
 };
@@ -105,10 +105,13 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
     }
     var dialog = this.dialog_;
     var that = this;
+    
+    var actionName = this.reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
+        'approve' : 'review';
     var successCallback = function(serverMsg) {
         unisubs.subtitle.OnSavedDialog.show(serverMsg, function() {
             dialog.onWorkSaved(true);
-        }, 'approve');
+        }, actionName);
     };
 
     var failureCallback = function(opt_status) {
@@ -121,21 +124,24 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
         }
     };
 
-    this.serverModel_.finishApprove({
+    var data = {
         'task_id': unisubs.task_id,
         'body': goog.dom.forms.getValue(this.notesInput_),
         'approved': approvalCode
-    }, successCallback, failureCallback);
+    }
+    this.serverModel_.finishApproveOrReview(data, actionName == 'review', successCallback, failureCallback);
 };
 
 unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
-    if (!this.isReviewOrApproval_ || this.inSubtitlingDialog_){
+    if (!this.reviewOrApprovalType_ || this.inSubtitlingDialog_){
         // for the subtitling dialog, we need the button to advance to the next painel
         return;
     }
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
     this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
-    this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Approve');
+    var buttonText = this.reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
+        'Approve' : 'Review';
+    this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, buttonText);
 
     el.appendChild(this.sendBackButton_);
     el.appendChild(this.saveForLaterButton_);

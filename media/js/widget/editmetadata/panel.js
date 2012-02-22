@@ -142,7 +142,7 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
     return new unisubs.editmetadata.RightPanel(
         this.dialog_, this.serverModel_, internalComponents['helpContents'], 
         internalComponents['extraHelp'], [], false, "Done?", 
-        this.nextButtonText_,  reviewOrApproval, this.bodyInput_, this.inSubtitlingDialog_);
+        this.nextButtonText_,  this.reviewOrApprovalType_, this.bodyInput_, this.inSubtitlingDialog_);
 
 
 };
