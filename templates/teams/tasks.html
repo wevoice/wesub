@@ -19,15 +19,15 @@
     <script type="text/javascript">
         unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
 
-        $(function() {
-            {% if request.GET.lang %}
+        {% if request.GET.lang %}
+            $(function() {
                 $select = $('select#id_task_language');
                 $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
                 $select.children().removeAttr('selected');
                 $opt.attr('selected', 'selected');
                 $select.trigger('liszt:updated');
-            {% endif %}
-        });
+            });
+        {% endif %}
     </script>
 {% endblock %}
 

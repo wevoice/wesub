@@ -26,15 +26,15 @@
     <script type="text/javascript">
         window.roleSavedURL = '{% url teams:role_saved team.slug %}';
 
-        $(function() {
-            {% if request.GET.lang %}
+        {% if request.GET.lang %}
+            $(function() {
                 $select = $('select#lang-filter');
                 $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
                 $select.children().removeAttr('selected');
                 $opt.attr('selected', 'selected');
                 $select.trigger('liszt:updated');
-            {% endif %}
-        });
+            });
+        {% endif %}
     </script>
 {% endblock %}
 
