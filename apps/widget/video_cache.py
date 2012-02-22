@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,14 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
 import datetime
 
-from django.core.cache import cache
-from videos.types.base import VideoTypeError
 from django.conf import settings
+from django.core.cache import cache
 from django.utils.hashcompat import sha_constructor
+
 from videos.types import video_type_registrar
+from videos.types.base import VideoTypeError
+
 
 TIMEOUT = 60 * 60 * 24 * 5 # 5 days
 

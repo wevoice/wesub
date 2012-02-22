@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,28 +16,30 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django import forms
 from django.contrib import admin
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
+
+from messages.forms import TeamAdminPageMessageForm
 from teams.models import (
     Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing,
     Project, TeamLanguagePreference
 )
 from videos.models import SubtitleLanguage
-from django.utils.translation import ugettext_lazy as _
-from messages.forms import TeamAdminPageMessageForm
-from django.core.urlresolvers import reverse
-from django import forms
+
 
 class TeamMemberInline(admin.TabularInline):
     model = TeamMember
     raw_id_fields = ['user']
 
 class TeamAdmin(admin.ModelAdmin):
-    inlines = [TeamMemberInline]
     search_fields = ('name'),
     list_display = ('name', 'membership_policy', 'video_policy', 'is_visible', 'highlight', 'last_notification_time', 'thumbnail')
     list_filter = ('highlight', 'is_visible')
     actions = ['highlight', 'unhighlight', 'send_message']
-    raw_id_fields = ['video']
+    raw_id_fields = ['video', 'users', 'videos', 'applicants']
+    exclude = ('third_party_accounts', 'users', 'applicants','videos')
 
     def thumbnail(self, object):
         return '<img src="%s"/>' % object.logo_thumbnail()

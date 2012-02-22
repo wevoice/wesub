@@ -1688,7 +1688,6 @@ ol.subtitles li .quiet {
 }
 .v1 .filters .chzn-container-active .chzn-single-with-drop:before {
   background: #FFF;
-  border-bottom: 1px solid #FFF;
   border: 1px solid #B9C3C8;
   content: "";
   display: block;
@@ -1710,10 +1709,11 @@ ol.subtitles li .quiet {
   border-bottom-right-radius: 0;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
+  border-bottom: 1px solid #FFF;
 }
 .v1 .filters div.chzn-container-active div.chzn-drop {
   margin-left: -5px !important;
-  margin-top: -1px !important;
+  margin-top: -3px !important;
   z-index: 50;
 }
 .v1 .filters div.chzn-container-active div.chzn-drop li {
@@ -1970,16 +1970,35 @@ pre.dump code {
   display: none;
   margin-bottom: 1em;
   margin-left: -10px;
-  padding: 1em;
-  text-align: center;
+  padding: 10px 40px 5px 10px;
+  position: relative;
+  text-align: left;
 }
 #teams .view .filters .chzn-container {
   width: auto !important;
 }
+#teams .view .filters .chzn-container a.chzn-single {
+  line-height: 16px;
+}
+#teams .view .filters p {
+  float: left;
+  height: auto;
+}
+#teams .view .filters div.filter-chunk {
+  display: block;
+  float: left;
+  margin-bottom: 5px;
+}
+#teams .view .filters div.filter-chunk span.inner {
+  margin-left: 6px;
+}
 #teams .view .filters a.clear-filters {
   color: #7692a3;
   float: right;
+  position: absolute;
+  right: 16px;
   text-decoration: none;
+  top: 11px;
 }
 
 #teams .view .filters.active {

@@ -15,12 +15,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import logging
+import random
 
-from utils import render_to, render_to_json
-from utils.searching import get_terms
-from utils.translation import get_languages_list, languages_with_names
-from utils.forms import flatten_errorlists
-from videos import metadata_manager
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
+from django.db.models import Q, Count
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.template import RequestContext
+from django.utils import simplejson as json
+from django.utils.translation import ugettext_lazy as _
+from django.views.generic.list_detail import object_list
+
+import teams.moderation_const as MODERATION
+import widget
+from apps.auth.models import UserLanguage
+from apps.videos.templatetags.paginator import paginate
+from messages import tasks as notifier
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
@@ -32,34 +48,6 @@ from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
     Setting, TeamLanguagePreference
 )
-from teams.signals import api_teamvideo_new
-import teams.moderation_const as MODERATION
-from django.shortcuts import get_object_or_404, redirect, render_to_response
-from apps.auth.models import UserLanguage
-from django.contrib.sites.models import Site
-from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-from django.views.generic.list_detail import object_list
-from django.template import RequestContext
-from django.db.models import Q, Count
-from django.contrib.auth.decorators import permission_required
-import random
-from widget.views import base_widget_params
-import widget
-from videos.models import Action, VideoUrl
-from django.utils import simplejson as json
-from teams.search_indexes import TeamVideoLanguagesIndex
-from widget.rpc import add_general_settings
-from django.contrib.admin.views.decorators import staff_member_required
-from utils.translation import SUPPORTED_LANGUAGES_DICT
-from utils import DEFAULT_PROTOCOL
-from messages import tasks as notifier
-from apps.videos.templatetags.paginator import paginate
-
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
     can_create_task_translate, can_view_tasks_tab, can_invite,
@@ -68,11 +56,25 @@ from teams.permissions import (
     can_perform_task_for, can_delete_team, can_review, can_approve,
     can_delete_video,
 )
+from teams.search_indexes import TeamVideoLanguagesIndex
+from teams.signals import api_teamvideo_new
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
     update_video_moderation
 )
-import logging
+from utils import render_to, render_to_json, DEFAULT_PROTOCOL
+from utils.forms import flatten_errorlists
+from utils.searching import get_terms
+from utils.translation import get_languages_list, languages_with_names, SUPPORTED_LANGUAGES_DICT
+from videos import metadata_manager
+from videos.tasks import (
+    _update_captions_in_original_service, _delete_captions_in_original_service
+)
+from videos.models import Action, VideoUrl, SubtitleLanguage
+from widget.rpc import add_general_settings
+from widget.views import base_widget_params
+
+
 import sentry_logger # Magical import to make Sentry's error recording happen.
 assert sentry_logger # It's okay, Pyflakes.  Trust me.
 logger = logging.getLogger("teams.views")
@@ -1206,6 +1208,23 @@ def perform_task(request, slug=None, task_pk=None):
     # ... perform task ...
     return HttpResponseRedirect(task.get_perform_url())
 
+def _delete_subtitle_version(version):
+    sl = version.language
+    n = version.version_no
+
+    # Delete this specific version...
+    version.delete()
+
+    # We also want to delete all draft subs leading up to this version.
+    for v in sl.subtitleversion_set.filter(version_no__lt=n).order_by('-version_no'):
+        if version.is_public:
+            break
+        v.delete()
+
+    # And if we've deleted everything in the language, we can delete the language as well.
+    if not sl.subtitleversion_set.exists():
+        sl.delete()
+
 def delete_task(request, slug):
     '''Mark a task as deleted.
 
@@ -1224,11 +1243,8 @@ def delete_task(request, slug):
 
         if task.subtitle_version:
             if form.cleaned_data['discard_subs']:
-                sl = task.subtitle_version.language
-                task.subtitle_version.delete()
+                _delete_subtitle_version(task.subtitle_version)
                 task.subtitle_version = None
-                if not sl.subtitleversion_set.exists():
-                    sl.delete()
 
             if task.get_type_display() in ['Review', 'Approve']:
                 # TODO: Handle subtitle/translate tasks here too?
@@ -1393,8 +1409,10 @@ def _create_task_after_unpublishing(subtitle_version):
 
     # If there's already an open review/approval task for this language, it
     # means we just unpublished multiple versions in a row and can ignore this.
-    open_task_exists = (team_video.task_set.incomplete_review().exists()
-                     or team_video.task_set.incomplete_approve().exists())
+    open_task_exists = (
+            team_video.task_set.incomplete_review().filter(language=lang).exists()
+         or team_video.task_set.incomplete_approve().filter(language=lang).exists()
+    )
     if open_task_exists:
         return None
 
@@ -1406,10 +1424,10 @@ def _create_task_after_unpublishing(subtitle_version):
         type = Task.TYPE_IDS['Review']
         can_do = can_review
 
+    # Try to guess the appropriate assignee by looking at the last task.
     last_task = (team_video.task_set.complete().filter(language=lang, type=type)
                                                .order_by('-completed')
                                                [:1])
-
     assignee = None
     if last_task:
         candidate = last_task[0].assignee
@@ -1423,6 +1441,40 @@ def _create_task_after_unpublishing(subtitle_version):
 
     return task
 
+def _propagate_unpublish_to_external_services(language_pk):
+    """Push the 'unpublishing' of subs to third-party providers for the given language.
+
+    The unpublishing must be fully complete before this function is called.
+
+    """
+    try:
+        language = SubtitleLanguage.objects.get(pk=language_pk)
+    except SubtitleLanguage.DoesNotExist:
+        # TODO: Handle the edge case of deletions of entire languages.  We can't
+        #       deal with this now because the unpublishing runs asynchronously
+        #       and the versions/languages will be deleted by the
+        #       time the task runs.
+        return
+
+    # Find the latest public version to determine what kind of third-party call
+    # we need to make.
+    latest_version = language.latest_version(public_only=True)
+
+    if latest_version:
+        # There's a latest version that's still public, so third-party services
+        # should use that one.
+        _update_captions_in_original_service(latest_version.pk)
+    else:
+        # There's no latest version that's still public, but we know the
+        # language still exists.
+        #
+        # This means that all of the subs in the language have been unpublished
+        # and are awaiting moderation.
+        #
+        # In this case we should delete the subs from the external service
+        # entirely, since we know that all the subs we have are bad.
+        _delete_captions_in_original_service(language_pk)
+
 def unpublish(request, slug):
     team = get_object_or_404(Team, slug=slug)
 
@@ -1435,17 +1487,30 @@ def unpublish(request, slug):
     team_video = version.language.video.get_team_video()
     scope = form.cleaned_data['scope']
     should_delete = form.cleaned_data['should_delete']
+    language = version.language
 
+    results = []
     if scope == 'version':
-        result = version.unpublish(delete=should_delete)
+        results.append([version.language.pk,
+                        version.unpublish(delete=should_delete)])
     elif scope == 'language':
-        result = version.language.unpublish(delete=should_delete)
+        results.append([language.pk,
+                        language.unpublish(delete=should_delete)])
+    elif scope == 'dependents':
+        translations = list(SubtitleLanguage.objects.filter(video=language.video,
+                                                            standard_language=language,
+                                                            is_forked=False))
+        for l in [language] + translations:
+            results.append([l.pk,
+                            l.unpublish(delete=should_delete)])
     else:
-        # TODO Write scope == 'dependents' code.
-        pass
+        assert False, 'Invalid scope.'
 
-    if result:
-        _create_task_after_unpublishing(result)
+    for language_pk, version_for_task in results:
+        _propagate_unpublish_to_external_services(language_pk)
+
+        if version_for_task:
+            _create_task_after_unpublishing(version_for_task)
 
     metadata_manager.update_metadata(team_video.video.pk)
 

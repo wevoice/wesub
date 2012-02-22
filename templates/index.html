@@ -34,7 +34,7 @@
           <ul>
             <li>{% trans "Embed the video anywhere" %}</li>
             <li>{% trans "Add subtitles yourself or ask viewers to help." %}</li>
-            <li>{% trans "Full site integration" %}</li>
+            <li><a href="https://github.com/pculture/unisubs/wiki/Widgetizer-Script---for-YouTube-and-HTML5">{% trans "Full site integration" %}</a></li>
           </ul>
         </div>
       </div> <!-- end #subtitle -->
@@ -45,7 +45,7 @@
           {% blocktrans %}
             Our deaf and hard of hearing users and non-profits request help for videos that need captions or translations. 
           {% endblocktrans %}
-          {% comment %}<a href="{% url videos:volunteer_category category='requested' %}">{% trans "See the most requested videos." %}</a>{% endcomment %}
+          <a href="http://blog.universalsubtitles.org/volunteer/">{% trans "Start volunteering." %}</a>
         </p>
       </div>
       
@@ -116,9 +116,9 @@
           </a>
         </li>
         <li>
-          <a target="_blank" href="http://blog.universalsubtitles.org/translating-state-of-the-union-2011/">
+          <a target="_blank" href="http://www.universalsubtitles.org/en/teams/newshour">
           <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_pbs.png"/></span>
-          <span class="url">{% trans "NewsHour Example" %}</span>
+          <span class="url">{% trans "NewsHour Team" %}</span>
           </a>
         </li>
       </ul>

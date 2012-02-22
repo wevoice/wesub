@@ -41,7 +41,6 @@ goog.inherits(unisubs.widget.DropDown, goog.ui.Component);
 unisubs.widget.DropDown.Selection = {
     ADD_LANGUAGE: "add_language",
     IMPROVE_SUBTITLES: "improve_subtitles",
-    REQUEST_SUBTITLES: "request_subtitles",
     SUBTITLE_HOMEPAGE: "subtitle_homepage",
     DOWNLOAD_SUBTITLES: "download_subtitles",
     CREATE_ACCOUNT: "create_account",
@@ -57,7 +56,6 @@ unisubs.widget.DropDown.prototype.hasSubtitles = function() {
 };
 unisubs.widget.DropDown.prototype.setStats_ = function(dropDownContents) {
     this.videoLanguages_ = dropDownContents.LANGUAGES;
-    this.shouldShowRequestLink_ = dropDownContents.shouldShowRequestLink();
     this.isModerated_ = dropDownContents.IS_MODERATED;
 };
 
@@ -130,23 +128,7 @@ unisubs.widget.DropDown.prototype.updateSubtitleStats_ = function() {
             this.subtitlesOff_);
     }
 
-    if (this.shouldShowRequestLink_) {
-        this.addLanguageListRequestLink_($d);
-    }
-
     this.addVideoLanguagesLinks_($d);
-};
-
-unisubs.widget.DropDown.prototype.addLanguageListRequestLink_ = function($d) {
-// still not showing request stuff, lol.
-/*
-    this.languageListRequestLink_ =
-        $d('a', {'href': '#', 'className': 'requestsubs'}, "request subtitles");
-    var li = $d('li', 'request',
-                "Don't see the language you want? Please ",
-                this.languageListRequestLink_, "!");
-    goog.dom.append(this.languageList_, li);
-*/
 };
 
 unisubs.widget.DropDown.prototype.addVideoLanguagesLinks_ = function($d) {
@@ -209,10 +191,6 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
     this.improveSubtitlesLink_ =
         $d('li', 'unisubs-improveSubtitles',
            $d('a', {'href': '#'}, 'Improve These Subtitles'));
-    // this is hidden throught the css on unisubs-widget.css
-    this.requestSubtitlesLink_ =
-        $d('li', 'unisubs-requestSubtitles',
-           $d('a', {'href': '#'}, 'Request Subtitles'));
    this.subtitleHomepageLink_ =
         $d('li', 'unisubs-subtitleHomepage',
            $d('a', {'href': this.createSubtitleHomepageURL_()},
@@ -315,8 +293,6 @@ unisubs.widget.DropDown.prototype.enterDocument = function() {
                goog.bind(this.menuItemClicked_, this, s.ADD_LANGUAGE)).
         listen(this.improveSubtitlesLink_, click,
                goog.bind(this.menuItemClicked_, this, s.IMPROVE_SUBTITLES)).
-        listen(this.requestSubtitlesLink_, click,
-               goog.bind(this.menuItemClicked_, this, s.REQUEST_SUBTITLES)).
         listen(this.subtitleHomepageLink_, click,
                goog.bind(this.menuItemClicked_, this, s.SUBTITLE_HOMEPAGE)).
         listen(this.downloadSubtitlesLink_, click,
@@ -337,11 +313,6 @@ unisubs.widget.DropDown.prototype.enterDocument = function() {
         listen(this.getDomHelper().getDocument(),
                goog.events.EventType.MOUSEDOWN,
                this.onDocClick_, true);
-    if (this.languageListRequestLink_) {
-        this.getHandler().listen(
-            this.languageListRequestLink_, click,
-            goog.bind(this.menuItemClicked_, this, s.REQUEST_SUBTITLES));
-    }
 
     // Webkit doesn't fire a mousedown event when opening the context menu,
     // but we need one to update menu visibility properly. So in Safari handle
@@ -362,7 +333,7 @@ unisubs.widget.DropDown.prototype.addLanguageLinkListeners_ = function() {
     goog.array.forEach(this.videoLanguagesLinks_,
         function(tLink) {
             that.languageClickHandler_.listen(tLink.link, 'click',
-                goog.bind(
+               goog.bind(
                     that.languageSelected_,
                     that,
                     tLink.videoLanguage));
@@ -395,7 +366,7 @@ unisubs.widget.DropDown.prototype.menuItemClicked_ = function(type, e) {
     }
 
     else if (type == s.ADD_LANGUAGE || type == s.IMPROVE_SUBTITLES ||
-             type == s.REQUEST_SUBTITLES || type == s.SUBTITLES_OFF)
+             type == s.SUBTITLES_OFF)
         this.dispatchEvent(type);
 
     this.hide();

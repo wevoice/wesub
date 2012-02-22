@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,27 +15,38 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import base64, re
+from urllib2 import URLError
 
-from django.contrib.auth import REDIRECT_FIELD_NAME,  get_backends
-from django.contrib.auth import login as stock_login
+import facebook.djangofb as facebook
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import (
+    REDIRECT_FIELD_NAME, get_backends, login as stock_login, authenticate,
+    logout, login as auth_login
+)
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponseForbidden
-from django.contrib.auth import authenticate
-from django.contrib.auth import logout, login as auth_login
-from auth.forms import CustomUserCreationForm
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.simple import direct_to_template
-from socialauth.models import AuthMeta, OpenidProfile, TwitterUserProfile, FacebookUserProfile
+from oauth import oauth
+
+from auth.forms import CustomUserCreationForm
+from auth.models import (
+    UserLanguage, CustomUser as User, EmailConfirmation, LoginToken
+)
+from socialauth.lib import oauthtwitter2 as oauthtwitter
+from socialauth.models import (
+    AuthMeta, OpenidProfile, TwitterUserProfile, FacebookUserProfile
+)
+from socialauth.views import get_url_host
 from utils.translation import get_user_languages_from_cookie
-from auth.models import UserLanguage, CustomUser as User, EmailConfirmation, \
-     LoginToken
-from django.contrib.admin.views.decorators import staff_member_required
-import facebook.djangofb as facebook
-import base64, re
 
 
 def login(request):
@@ -90,7 +101,6 @@ def user_list(request):
             context_instance=RequestContext(request))
     else:
         langs = re.split('[, ]+', langs)
-        user_ids = set()
         users = User.objects.filter(userlanguage__language__in=langs).distinct()
         return render_to_response(
             'auth/user_list.csv',
@@ -128,6 +138,7 @@ def login_post(request):
     else:
         return render_login(request, CustomUserCreationForm(label_suffix=""), form, redirect_to)
 
+
 # Helpers
 
 def render_login(request, user_creation_form, login_form, redirect_to):
@@ -146,14 +157,6 @@ def make_redirect_to(request):
     else:
         return redirect_to
 
-from socialauth.views import get_url_host
-from django.core.urlresolvers import reverse
-from django.conf import settings
-from socialauth.lib import oauthtwitter2 as oauthtwitter
-from django.http import HttpResponse
-from oauth import oauth
-from urllib2 import URLError
-from django.utils.http import urlquote
 
 def twitter_login(request, next=None):
     callback_url = None

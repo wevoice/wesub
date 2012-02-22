@@ -31,7 +31,6 @@ media/js/unisubs-statwidget.js
 media/js/unisubs-api*.js
 media/js/unisubs-streamer.js
 media/js/js-base-dependencies.js
-media/js/js-moderation-dashboard.js
 media/js/js-onsite-dialog.js
 media/js/js-testing-base.js
 media/sass/.sass-cache

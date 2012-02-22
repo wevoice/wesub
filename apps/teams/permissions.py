@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -129,9 +129,9 @@ def roles_user_can_assign(team, user, to_user=None):
         return ROLES_ORDER[1:]
     elif user_role == ROLE_ADMIN:
         if to_user:
-            if get_role(get_member(to_user, team)) == ROLE_OWNER:
+            if get_role(get_member(to_user, team)) == ROLE_OWNER or get_role(get_member(to_user, team)) == ROLE_ADMIN:
                 return []
-        return ROLES_ORDER[1:]
+        return ROLES_ORDER[2:]
     else:
         return []
 
@@ -152,7 +152,6 @@ def roles_user_can_invite(team, user):
         return [ROLE_CONTRIBUTOR]
 
 def save_role(team, member, role, projects, languages, user=None):
-
     languages = languages or []
 
     if can_assign_role(team, user, role, member.user):
@@ -191,47 +190,43 @@ def add_narrowing_to_member(member, project=None, language=None, added_by=None):
 
 
 def _add_project_narrowings(member, project_pks, author):
+    """Add narrowings on the given member for the given project PKs.
+
+    Marks them as having come from the given author.
+
+    """
     for project_pk in project_pks:
         project = member.team.project_set.get(pk=project_pk)
         MembershipNarrowing(project=project, member=member, added_by=author).save()
 
 def _del_project_narrowings(member, project_pks):
+    """Delete any narrowings on the given member for the given project PKs."""
     project_narrowings = member.narrowings.filter(project__isnull=False)
 
     for project_pk in project_pks:
         project_narrowings.filter(project=project_pk).delete()
 
 def _add_language_narrowings(member, languages, author):
+    """Add narrowings on the given member for the given language code strings.
+
+    Marks them as having come from the given author.
+
+    """
     for language in languages:
         MembershipNarrowing(language=language, member=member, added_by=author).save()
 
 def _del_language_narrowings(member, languages):
+    """Delete any narrowings on the given member for the given language code strings."""
     for language in languages:
         MembershipNarrowing.objects.filter(language=language, member=member).delete()
 
 
-def can_set_language_narrowings(team, user, target):
-    # role = get_role_for_target(user, team)
-    target_role = get_role(get_member(target, team))
-
-    if target_role not in [ROLE_MANAGER]:
-        return False
-
-    return True
-
-def can_set_project_narrowings(team, user, target):
-    # role = get_role_for_target(user, team)
-    target_role = get_role(get_member(target, team))
-
-    if target_role not in [ROLE_MANAGER, ROLE_ADMIN]:
-        return False
-
-    return True
-
-
 def set_narrowings(member, project_pks, languages, author=None):
+    """Add and delete any narrowings necessary to match the given set for the given member."""
+
     if author:
         author = TeamMember.objects.get(team=member.team, user=author)
+
     # Projects
     existing_projects = set(narrowing.project.pk for narrowing in
                             member.narrowings.filter(project__isnull=False))
@@ -500,13 +495,15 @@ def can_approve(team_video, user, lang=None):
 
 
 def can_message_all_members(team, user):
+    """Return whether the user has permission to message all members of the given team."""
     role = get_role_for_target(user, team)
     return role in [ROLE_ADMIN, ROLE_OWNER]
 
 def can_edit_project(team, user, project):
-    # when checking for the permission to create a project
-    # project will be none
+    """Return whether the user has permission to edit the details of the given project."""
     if project and project.is_default_project:
+        # when checking for the permission to create a project
+        # project will be none
         return False
 
     role = get_role_for_target(user, team, project, None)
@@ -538,6 +535,14 @@ def can_create_and_edit_translations(user, team_video, lang=None):
 
 
 def can_publish_edits_immediately(team_video, user, lang):
+    """Return whether the user has permission to publish subtitle edits immediately.
+
+    This may be the case when review/approval is not required, or when it is but
+    the user is someone who can do it themselves.
+
+    lang should be a language code string.
+
+    """
     workflow = Workflow.get_for_team_video(team_video)
 
     if workflow.approve_allowed:
@@ -550,6 +555,11 @@ def can_publish_edits_immediately(team_video, user, lang):
 
 
 def can_unpublish_subs(team_video, user, lang):
+    """Return whether the user has permission to unpublish subtitles.
+
+    lang should be a language code string.
+
+    """
     workflow = Workflow.get_for_team_video(team_video)
 
     if workflow.approve_allowed:
@@ -563,11 +573,14 @@ def can_unpublish_subs(team_video, user, lang):
 
 # Task permissions
 def can_create_tasks(team, user, project=None):
+    """Return whether the given user has permission to create tasks at all."""
+
     # for now, use the same logic as assignment
     return can_assign_tasks(team, user, project)
 
 def can_delete_tasks(team, user, project=None, lang=None):
-    # for now, use the same logic as assignment, minus contributors
+    """Return whether the given user has permission to delete tasks at all."""
+
     role = get_role_for_target(user, team, project, lang)
     if role == ROLE_CONTRIBUTOR:
         return False

@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -18,17 +18,17 @@
 
 from django.db import models
 
-from teams.moderation_const import APPROVED, UNMODERATED
-from videos.models import  VIDEO_TYPE, SubtitleVersion, VideoUrl
+from videos.models import VIDEO_TYPE
+from .videos.types import (
+    video_type_registrar, UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
+)
 
-from .videos.types import video_type_registrar, UPDATE_VERSION_ACTION,\
-     DELETE_LANGUAGE_ACTION
 # for now, they kind of match
 ACCOUNT_TYPES = VIDEO_TYPE
 
 class ThirdPartyAccountManager(models.Manager):
 
-    def mirror_on_third_party(self, video, language,  action, version=None,):
+    def mirror_on_third_party(self, video, language, action, version=None):
         """
         Does the specified action (video.types.UPDATE_VERSION_ACTION or
                                    video.types.DELETE_LANGUAGE_ACTION) 
@@ -43,12 +43,15 @@ class ThirdPartyAccountManager(models.Manager):
         are matching third party credentials for this video.
         The update will only be done if the version is synced
         """
-        if action not in  [UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION]:
+        if action not in [UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION]:
             raise NotImplementedError(
                 "Mirror to third party does not support the %s action" % action)
-        if (version and version.moderation_status not in\
-           [APPROVED, UNMODERATED]) or not version.is_synced():
-            return
+
+        if version:
+            if not version.is_public or not version.is_synced():
+                # We can't mirror unsynced or non-public versions.
+                return
+
         for vurl in video.videourl_set.all():
             username = vurl.owner_username
             if not username:

@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 # 
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,28 +15,29 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
-"""
-Defines signals relevant to Teams.
-There is quite a bit of inderection here, but the goal is to make
+
+"""Defines signals relevant to Teams.
+
+There is quite a bit of indirection here, but the goal is to make
 dispatching these events as simple as possible, since it might occur
 in multiple places.
+
 1) Client codes dispatches a signal listed in this module:
-ex: signals.api_on_subtitles_edited.send(subtitle_version)
+   ex: signals.api_on_subtitles_edited.send(subtitle_version)
 2) The signal calls that handler, which chooses the right event name
-for the signal and calls the matching sub method (for videos, languages, etc)
+   for the signal and calls the matching sub method (for videos, languages, etc)
 3) The submethod finds all teams that should be notified (since a video)
-can belong to more than on team). For each team:
+   can belong to more than on team). For each team:
 3a) Puts the right task on queue, if the teams has a TeamNotificationsSettings
 3b) The taks querys the TeamNotificationSettings models to fire notifications
 3c) The TNS checks if there is available data (e.g. which url to post to)
 3d) Instantiates the right notification class (since specific partners must
-have their notification data massaged to their needs - e.g. changing the video
-ids to their own, or the api links to their own endpoints)
+    have their notification data massaged to their needs - e.g. changing the video
+    ids to their own, or the api links to their own endpoints)
 3e) The notification class fires the notification
 """
 
 from django import dispatch
-
 
 
 def _teams_to_notify(video):

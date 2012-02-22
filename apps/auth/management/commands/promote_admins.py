@@ -1,26 +1,28 @@
-from optparse import make_option
 import json
-
 import logging
+from optparse import make_option
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
+
+
 logger = logging.getLogger(__name__)
 
-from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
-from django.conf import settings
 
 class Command(BaseCommand):
     help = 'Makes sure that all admin users on auth/users/fixtures/_admins are admins'
-    
+
     option_list = BaseCommand.option_list + (
         make_option('--email', action='store', dest='email',
-            default=None, help='The email of a user to be promoted'
-                'If set, will override the args param and clear all languages'),
+                    default=None, help='The email of a user to be promoted'
+                    'If set, will override the args param and clear all languages'),
         make_option('--pass', action='store', dest='new_password',
-            default=None, help='A new passowrd to be changed - optional'
-                ''),
+                    default=None, help='A new passowrd to be changed - optional'
+                    ''),
         make_option('--userlist-path', action='store', dest='userlist_path',
-            default=None, help='Where the json user list should be stored'
-                ''),
+                    default=None, help='Where the json user list should be stored'
+                    ''),
     )
 
     def promote_user(self, email, new_password=None):
@@ -37,7 +39,7 @@ class Command(BaseCommand):
                 logger.exception("failed to promote user", email)
         return processed
 
-                
+
     def handle(self, *langs, **kwargs):
         processed = []
         if kwargs.get('email', None) is not None:
@@ -46,10 +48,12 @@ class Command(BaseCommand):
         else:
             if kwargs.get("userlist_path", None) is not None:
                 users_data = json.load(open(kwargs['userlist_path']))
-            else:    
+            else:
                 users_data = getattr(settings, "PROMOTE_TO_ADMINS", [])
+
             # no command line args, we should get the userlist-path
-            
+
             for data in users_data:
                 processed.append(self.promote_user(data['email'], data.get("new_password", None)))
+
         print "processed %s" %  processed

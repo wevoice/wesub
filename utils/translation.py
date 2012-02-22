@@ -28,7 +28,7 @@ def get_languages_list(with_empty=False):
     cache_key = 'langs-cache-%s' % get_language() 
     
     languages = cache.get(cache_key)
-    
+
     if not languages:
         languages = []
         
@@ -42,6 +42,7 @@ def get_languages_list(with_empty=False):
         cache.set(cache_key, languages, 60*60)
     if with_empty:
         languages = [('', '---------')]+languages
+
     return languages
 
 from django.utils.translation.trans_real import parse_accept_lang_header

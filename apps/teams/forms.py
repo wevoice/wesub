@@ -23,15 +23,11 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User
-from doorman import feature_is_on
 from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
-from teams.moderation import add_moderation, remove_moderation
-
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
     can_assign_task, can_unpublish_subs
 )
-
 from teams.permissions_const import ROLE_NAMES
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
@@ -65,56 +61,9 @@ class EditTeamVideoForm(forms.ModelForm):
 
 
         self.fields['project'].queryset = self.instance.team.project_set.all()
-        if feature_is_on("MODERATION"):
-            self.should_add_moderation = self.should_remove_moderation = False
-
-            if self.instance:
-                video  = self.instance.video
-                team = self.instance.team
-
-                if video and team:
-                    who_owns = video.moderated_by
-                    is_ours = who_owns and who_owns == team
-                    is_moderated = False
-                    if who_owns and not is_ours:
-                        self.is_moderated_by_other_team = who_owns
-                        # should write about moderation
-                        pass
-                    else:
-                        if is_ours:
-                            is_moderated = True
-                        self.fields['is_moderated'] = forms.BooleanField(
-                            label=_("Moderate subtitles"),
-                            initial=is_moderated,
-                            required=False
-                        )
-
+        
     def clean(self, *args, **kwargs):
         super(EditTeamVideoForm, self).clean(*args, **kwargs)
-
-        if feature_is_on("MODERATION"):
-            should_moderate = self.cleaned_data.get("is_moderated", False)
-            if self.instance:
-
-                team = self.instance.team
-                video = self.instance.video
-                who_owns = video.moderated_by
-                is_ours = who_owns and who_owns == team
-                if should_moderate:
-                    if  is_ours:
-                    # do nothing, we are good!
-                        pass
-                    elif  who_owns:
-                        self._errors['is_moderated'] = self.error_class([u"This video is already moderated by team %s" % who_owns])
-                        del self.cleaned_data['is_moderated']
-                    else:
-                        self.should_add_moderation = True
-                else:
-                    if not who_owns:
-                        # do nothing we are good!
-                        pass
-                    elif is_ours:
-                        self.should_remove_moderation = True
 
         return self.cleaned_data
 
@@ -122,22 +71,6 @@ class EditTeamVideoForm(forms.ModelForm):
         obj = super(EditTeamVideoForm, self).save(*args, **kwargs)
 
         video = obj.video
-        team = obj.team
-
-        if feature_is_on("MODERATION"):
-            if self.should_add_moderation:
-                try:
-                    add_moderation(video, team, self.user)
-                except Exception ,e:
-                    raise
-                    self._errors["should_moderate"] = [e]
-            elif self.should_remove_moderation:
-
-                    try:
-                        remove_moderation(video, team, self.user)
-                    except Exception ,e:
-                        raise
-                        self._errors["should_moderate"] = [e]
 
         author = self.cleaned_data['author'].strip()
         creation_date = VideoMetadata.date_to_string(self.cleaned_data['creation_date'])
@@ -616,7 +549,9 @@ class UnpublishForm(forms.Form):
         self.team = team
 
     def clean(self):
-        subtitle_version = self.cleaned_data['subtitle_version']
+        subtitle_version = self.cleaned_data.get('subtitle_version')
+        if not subtitle_version:
+            return self.cleaned_data
 
         team_video = subtitle_version.language.video.get_team_video()
 

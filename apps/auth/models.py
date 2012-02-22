@@ -40,8 +40,9 @@ from random import random
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 
-#I'm not sure this is the best way do do this, but this models.py is executed
-#before all other and before url.py
+
+# I'm not sure this is the best way do do this, but this models.py is executed
+# before all other and before url.py
 from localeurl import patch_reverse
 patch_reverse()
 

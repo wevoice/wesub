@@ -319,7 +319,6 @@ JS_CORE = \
      'js/streamer/streamsub.js', 
      'js/streamer/streamervideotab.js', 
      'js/streamer/streamerdecorator.js', 
-     'js/requestdialog.js',
      'js/widget/videotab.js',
      'js/widget/hangingvideotab.js',
      'js/widget/subtitle/editablecaption.js',
@@ -449,24 +448,6 @@ JS_BASE_DEPENDENCIES = [
     'flowplayer/flowplayer-3.2.6.min.js',
 ]
 
-JS_MODERATION_DASHBOARD =  [
-    "js/jquery-1.4.3.js",
-    "js/jquery-ui-1.8.16.custom.min.js",
-    "js/jgrowl/jquery.jgrowl.js",
-    "js/jalerts/jquery.alerts.js",
-    "js/jquery.form.js",
-    "js/jquery.metadata.js",
-    "js/jquery.mod.js",
-    "js/jquery.rpc.js",
-    "js/jquery.input_replacement.min.js",
-    'js/closure-library/closure/goog/base.js',    
-    'js/closure-dependencies.js',    
-    "js/messages.js",
-    "js/jquery.address-1.4.fixed.js",
-    "js/jquery.ajax-paginator.js",
-    "js/moderation/simplewarning.js",
-    "js/moderation/confirmrejectiondialog.js",
-    ]
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -540,49 +521,52 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 INSTALLED_APPS = (
+    # this needs to be first, yay for app model loading mess
     'auth',
-    'django.contrib.auth',
-    'localeurl',
-    'socialauth',
-    'openid_consumer',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.sitemaps',
+    # django stock apps
     'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
     'django.contrib.markup',
+    'django.contrib.sessions',
+    'django.contrib.sitemaps',
+    'django.contrib.sites',
     'django.contrib.webdesign',
+    # third party apps
     'django_extensions',
-    'profiles',
-    'sorl.thumbnail',
-    'videos',
-    'teams',
-    'widget',
-    'uslogging',
-    'south',
+    'djcelery',
     'haystack',
-    'comments',
-    'messages',
-    'statistic',
-    'search',
-    'utils',
-    'targetter',
-    'livesettings',
     'indexer',
+    'livesettings',
     'paging',
+    'rosetta',
     'sentry',
     'sentry.client',
-    'djcelery',
-    'rosetta',
-    'testhelpers',
-    'unisubs_compressor',
-    'subrequests',
+    'sorl.thumbnail',
+    'south',
+    'tastypie',
+    # third party apps forked on our repo
+    'localeurl',
+    'openid_consumer',
+    'socialauth',
+    # our apps
+    'accountlinker',
+    'comments',
     'doorman',
     'icanhaz',
-    'tastypie',
-    'accountlinker',
+    'messages',
+    'profiles',
+    'search',
+    'statistic',
     'streamer',
+    'teams',
+    'testhelpers',
     'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
+    'unisubs_compressor',
+    'uslogging',
+    'utils',
+    'videos',
+    'widget',
 )
 
 # Celery settings
@@ -757,7 +741,6 @@ MEDIA_BUNDLES = {
         "type":"css",
         "files":(
                "css/unisubs-widget.css" ,
-               "css/nyroModal.css",
                "css/dev.css"
          ),
         },
@@ -772,7 +755,6 @@ MEDIA_BUNDLES = {
     "home":{
         "type":"css",
         "files":(
-            "css/nyroModal.css",
             "css/unisubs-widget.css",
          ),
         },
@@ -780,7 +762,6 @@ MEDIA_BUNDLES = {
          "type":"css",
          "files":(
             "css/new_index.css",
-             "css/nyroModal.css",
              "css/unisubs-widget.css",
           ),
          },
@@ -899,12 +880,6 @@ MEDIA_BUNDLES = {
                 "js/testing/timerstub.js",
             ]
     },
-    "js-moderation-dashboard":{
-        "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
-        "closure_deps": "js/closure-dependencies.js",
-        "files": JS_MODERATION_DASHBOARD,
-    },
     "css-teams-settings-panel":{
         "type":"css",
         "files":(
@@ -936,9 +911,8 @@ MEDIA_BUNDLES = {
 }
 
 
+# this is used in our feature swither app, doorman, empty for now
 FEATURE_FLAGS  = {
-    "MODERATION" : False,
-    "REQUESTS": False,
 }
 
 _INTEGRATION_PATH = os.path.join(PROJECT_ROOT, 'unisubs-integration')
