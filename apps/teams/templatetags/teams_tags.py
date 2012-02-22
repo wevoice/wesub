@@ -41,7 +41,7 @@ from apps.teams.permissions import (
     can_approve as _can_approve,
 )
 from apps.teams.permissions import (
-    roles_user_can_assign, can_invite, can_add_video_somewhere,
+    can_invite, can_add_video_somewhere,
     can_create_tasks, can_create_task_subtitle, can_create_task_translate,
     can_create_and_edit_subtitles, can_create_and_edit_translations
 )
@@ -241,6 +241,7 @@ def team_video_in_progress_list(team_video_search_record):
         'languages': langs
         }
 
+
 @register.inclusion_tag('teams/_join_button.html', takes_context=True)
 def render_team_join(context, team, button_size="huge"):
     context['team'] = team
@@ -328,11 +329,33 @@ def members(team, countOnly=False):
     return qs
 
 @register.filter
-def get_assignable_roles(team, user):
-    roles = roles_user_can_assign(team, user)
-    verbose_roles = [x for x in TeamMember.ROLES if x[0] in roles]
-    return verbose_roles
+def can_leave_team(team, user):
+    """Return True if the user can leave the team, else return False."""
 
+    try:
+        member = TeamMember.objects.get(team=team, user=user)
+    except TeamMember.DoesNotExist:
+        return False
+
+    if not team.members.exclude(pk=member.pk).exists():
+        False
+
+    is_last_owner = (
+        member.role == TeamMember.ROLE_OWNER
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exclude(pk=member.pk).exists()
+    )
+    if is_last_owner:
+        return False
+
+    is_last_admin = (
+        member.role == TeamMember.ROLE_ADMIN
+        and not team.members.filter(role=TeamMember.ROLE_ADMIN).exclude(pk=member.pk).exists()
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exists()
+    )
+    if is_last_admin:
+        return False
+
+    return True
 
 @tag(register, [Variable(), Variable()])
 def can_create_any_task_for_teamvideo(context, team_video, user):

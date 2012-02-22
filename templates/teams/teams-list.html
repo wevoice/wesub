@@ -101,7 +101,7 @@
                         </li>
                     </ul>
 
-                    {% if my_teams %}
+                    {% if my_teams and team|can_leave_team:user %}
                         <ul class="admin-controls">
                             <li>
                                 <a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team team.slug %}">{% trans "Leave team" %}</a>
