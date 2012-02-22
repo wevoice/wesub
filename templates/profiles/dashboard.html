@@ -24,33 +24,36 @@
                 {% for task in user.open_tasks %}
                     <li>
                         <p>
-                            {% if task.get_type_display == "Subtitle" %}
-                                {% trans 'New' %}
-                            {% else %}
-                                {{ task.get_type_display }}
-                            {% endif %}
-                            {% if task.get_type_display == "Translate" %}
-                                {% trans 'Subtitles into' %} {{ task.get_language_display }}
-                            {% else %}
-                                {% if task.get_language_display %}
-                                    {{ task.get_language_display }}
+                            {{ task.team }}:
+                            <a href="{{ task.get_widget_url }}">
+                                {% if task.get_type_display == "Subtitle" %}
+                                    {% trans 'Transcribe' %}
+                                {% else %}
+                                    {{ task.get_type_display }}
                                 {% endif %}
-                                {% trans 'Subtitles' %}
-                            {% endif %}
+                                {% if task.get_type_display == "Translate" %}
+                                    {% trans 'Subtitles into' %} {{ task.get_language_display }}
+                                {% else %}
+                                    {% if task.get_language_display %}
+                                        {{ task.get_language_display }}
+                                    {% endif %}
+                                    {% trans 'Subtitles' %}
+                                {% endif %}
+                            </a>
                             {% trans 'for' %}
-                            <em>{{ task.team_video|truncatewords:8 }}</em>
+                            <a href="{{ task.team_video.video.get_absolute_url }}" title="View video"><em>{{ task.team_video|truncatewords:8 }}</em></a>
                         </p>
                     </li>
                 {% endfor %}
             </ul>
 
-            <h3>{% trans "Recent Activity" %} (<a href="{% url profiles:actions_list %}">View all</a>)</h3>
+            <h3>{% trans "Recent Activity" %} (<a href="{% url profiles:actions_list %}">{% trans 'View all' %}</a>)</h3>
             {% with action_list as events %}
                 <ul class="listing activity">
                     {% for item in events %}
                         <li>{{ item.render }}</li>
                     {% empty %}
-                        <li class="empty">Sorry, no activity yet.</li>
+                        <li class="empty">{% trans 'Sorry, no activity yet.' %}</li>
                     {% endfor %}
                 </ul>
             {% endwith %}
