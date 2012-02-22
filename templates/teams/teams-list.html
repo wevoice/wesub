@@ -109,28 +109,6 @@
                         </ul>
                     {% endif %}
 
-                    {% comment %}
-                        <div class="buttons-container">
-                            {% if user.is_staff and perms.teams.change_team %}
-                                {% if team.highlight %}
-                                    <a href="{% url teams:unhighlight team.slug %}" class="blue_button small">{% trans 'Un-highlight this team' %}</a>
-                                {% else %}
-                                    <a href="{% url teams:highlight team.slug %}" class="blue_button small">{% trans 'Highlight this team' %}</a>
-                                {% endif %}
-                            {% endif %}
-                            {% if team|is_team_member:user and team|is_team_manager:user%}
-                                <a href="{% url teams:settings slug=team.slug %}" class="blue_button small">{% trans 'Edit' %}</a>
-                            {% endif %}
-                            {% if team|is_team_member:user %}
-                                {% render_team_leave team %}
-                            {% else %}
-                                {% if team.is_open %}
-                                    {% render_team_join team "small" %}
-                                {% endif %}
-                            {% endif %}  
-                        </div>
-                    {% endcomment %}       
-
                 </li>
                 {% endfor %}
             </ul>
