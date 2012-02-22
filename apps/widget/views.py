@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import re
 import time
+import traceback
 
 import simplejson as json
 from django.conf import settings
@@ -345,7 +346,8 @@ def rpc(request, method_name, null=False):
     try:
         result = func(**args)
     except TypeError:
-        result = {'error': 'Incorrect number of arguments'}
+        result = {'error': 'Incorrect number of arguments',
+                  'traceback': traceback.format_exc()}
 
     user_message = result and result.pop("_user_message", None)
     response = HttpResponse(json.dumps(result), "application/json")
