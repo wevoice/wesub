@@ -29,21 +29,21 @@ unisubs.subtitle.ReviewRightPanel = function(dialog,
                                              showRestart,
                                              doneStrongText,
                                              doneText,
-                                             isReviewOrApproval,
+                                             reviewOrApprovalType,
                                              notesInput_
                                             ) {
     unisubs.RightPanel.call(this, serverModel, helpContents, extraHelp,
                              legendKeySpecs,
                              showRestart, doneStrongText, doneText);
-    this.isReviewOrApproval_  = isReviewOrApproval;
-    this.showDoneButton = ! isReviewOrApproval;
+    this.reviewOrApprovalType_  = reviewOrApprovalType;
+    this.showDoneButton = ! reviewOrApprovalType;
     this.notesInput_ = notesInput_;
     this.dialog_ = dialog;
 };
 goog.inherits(unisubs.subtitle.ReviewRightPanel, unisubs.RightPanel);
 
 unisubs.subtitle.ReviewRightPanel.prototype.appendMiddleContentsInternal = function($d, el) {
-    if (this.isReviewOrApproval_){
+    if (this.reviewOrApprovalType_){
         return;
     }
     el.appendChild(this.makeExtra_($d,
@@ -52,16 +52,19 @@ unisubs.subtitle.ReviewRightPanel.prototype.appendMiddleContentsInternal = funct
         'Double click any subtitle to edit text. Rollover subtitles and use buttons to tweak time, add / remove subtitles.'));
 };
 
+// FIXME: dupliaction with editmetadatarightpanel
 unisubs.subtitle.ReviewRightPanel.prototype.finish = function(e, approvalCode) {
     if (e){
         e.preventDefault();
     }
     var dialog = this.dialog_;
     var that = this;
+    var actionName = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
+        'approve' : 'review';
     var successCallback = function(serverMsg) {
         unisubs.subtitle.OnSavedDialog.show(serverMsg, function() {
             dialog.onWorkSaved(true);
-        }, 'approve');
+        }, actionName);
     };
 
     var failureCallback = function(opt_status) {
@@ -74,21 +77,25 @@ unisubs.subtitle.ReviewRightPanel.prototype.finish = function(e, approvalCode) {
         }
     };
 
-    this.serverModel_.finishApprove({
+    this.serverModel_.finishApproveOrReview({
         'task_id': unisubs.task_id,
         'body': goog.dom.forms.getValue(this.notesInput_),
         'approved': approvalCode
-    }, successCallback, failureCallback);
+    }, actionName == 'review', successCallback, failureCallback);
 };
 
+// FIXME: dupliaction with editmetadatarightpanel
 unisubs.subtitle.ReviewRightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
-    if (!this.isReviewOrApproval_ ){
+    if (!this.reviewOrApprovalType_ ){
         // for the subtitling dialog, we need the button to advance to the next painel
         return;
     }
+    var buttonText = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
+        'Approve' : 'Review';
+
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
     this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
-    this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Approve');
+    this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, buttonText);
 
     el.appendChild(this.sendBackButton_);
     el.appendChild(this.saveForLaterButton_);

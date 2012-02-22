@@ -237,13 +237,14 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
     }
 };
 
-unisubs.widget.SubtitleDialogOpener.prototype.openSubtitleModerationDialog = function(serverModel, subtitleState, originalSubtitles, mode) {
+unisubs.widget.SubtitleDialogOpener.prototype.openSubtitleModerationDialog = function(
+    serverModel, subtitleState, originalSubtitles, mode) {
     var dialog;
     if (originalSubtitles){
         dialog =  new unisubs.translate.Dialog(this, serverModel, this.videoSource_,
                                                subtitleState, originalSubtitles, mode);
     }else{
-        dialog =  new unisubs.subtitle.Dialog(this.videoSource_, serverModel, subtitleState, mode);
+        dialog =  new unisubs.subtitle.Dialog(this.videoSource_, serverModel, subtitleState, false, false, mode);
     }
     this.subOpenFn_ && this.subOpenFn_();
     return dialog;

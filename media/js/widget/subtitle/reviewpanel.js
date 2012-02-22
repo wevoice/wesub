@@ -39,12 +39,10 @@ unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal =
     function()
 {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    var reviewOrApproval = true;
     var keySpecs = [];
     var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
         $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
     if (! internalComponents){
-        reviewOrApproval = false;
         keySpecs = this.makeKeySpecsInternal();
         internalComponents = {
             'helpContents': new unisubs.RightPanel.HelpContents(
@@ -66,5 +64,5 @@ unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal =
     return new unisubs.subtitle.ReviewRightPanel(
         this.dialog_, this.serverModel, internalComponents['helpContents'], 
         internalComponents['extraHelp'], keySpecs , false, "Done?", 
-        this.nextButtonText_,  reviewOrApproval , this.bodyInput_);
+        this.nextButtonText_,  this.reviewOrApprovalType_ , this.bodyInput_);
 };
