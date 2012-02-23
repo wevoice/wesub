@@ -538,7 +538,6 @@ class UnpublishForm(forms.Form):
             label=_(u'What would you like to unpublish?'),
             choices=(
                 ('version',    _(u'This version (and any later version) for this language.')),
-                ('language',   _(u'All versions for this language.')),
                 ('dependents', _(u'All versions for this language and any dependent languages.'))))
 
 
