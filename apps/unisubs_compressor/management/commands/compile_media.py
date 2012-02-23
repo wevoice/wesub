@@ -101,7 +101,11 @@ def get_cache_base_url():
     return "%s%s/%s" % (settings.STATIC_URL_BASE, settings.COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID)
 
 def get_cache_dir():
-    return os.path.join(settings.STATIC_ROOT, settings.COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID)
+    # on vagrant this is a symlink
+    return os.path.realpath(
+        os.path.join(
+            settings.STATIC_ROOT,
+            settings.COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID))
 
 def sorted_ls(path):
     """
@@ -377,6 +381,7 @@ class Command(BaseCommand):
         )
 
         if os.path.exists(cache_dir):
+            # on vagrant this is a symlink
             shutil.rmtree(cache_dir)
         for filename in os.listdir(self.temp_dir):
             shutil.move(os.path.join(self.temp_dir, filename), 
