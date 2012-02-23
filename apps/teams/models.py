@@ -1630,13 +1630,15 @@ class Task(models.Model):
         """Add a comment on the SubtitleLanguage for this task with the body as content."""
         if self.body.strip():
             lang_ct = ContentType.objects.get_for_model(SubtitleLanguage)
-            Comment(
+            comment = Comment(
                 content=self.body,
                 object_pk=self.subtitle_version.language.pk,
                 content_type=lang_ct,
                 submit_date=self.completed,
                 user=self.assignee,
             ).save()
+            notifier.send_video_comment_notification(comment.pk,
+                                    version=self.subtitle_version.pk)
 
     def future(self):
         """Return whether this task expires in the future."""

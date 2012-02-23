@@ -25,7 +25,7 @@ goog.provide('unisubs.subtitle.Dialog');
  */
 unisubs.subtitle.Dialog = function(videoSource, serverModel,
                                     subtitles, opt_opener,
-                                    opt_skipFinished, originalSubtitles) {
+                                    opt_skipFinished, reviewOrApprovalType) {
     unisubs.Dialog.call(this, videoSource);
     unisubs.SubTracker.getInstance().start(false);
     this.serverModel_ = serverModel;
@@ -56,7 +56,16 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel,
     this.subtitles_ = subtitles;
 
     this.keyEventsSuspended_ = false;
-    this.originalSubtitles_ = originalSubtitles;
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
+    // if this is a review approve dialog, we must fetch saved notes for this task if available
+    // but we should only do it when the dialog laods the first time
+    // (else as users move back and forward between panels we might
+    // overwrite their notes). This is what this flag is for
+    this.notesFectched_ = false;
+    if ( !Boolean(this.reviewOrApprovalType_)){
+       this.notesFectched_ = true; 
+    }
+
 };
 goog.inherits(unisubs.subtitle.Dialog, unisubs.Dialog);
 
@@ -72,13 +81,19 @@ unisubs.subtitle.Dialog.State_ = {
     FINISHED: 4
     
 };
+
+
 unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
     this.getVideoPlayerInternal().showCaptionText(c ? c.getText() : '');
 };
 unisubs.subtitle.Dialog.prototype.createDom = function() {
     unisubs.subtitle.Dialog.superClass_.createDom.call(this);
-    this.enterState_(unisubs.subtitle.Dialog.State_.TRANSCRIBE);
+    var initialState = unisubs.subtitle.Dialog.State_.TRANSCRIBE;
+    if (this.reviewOrApprovalType_){
+        initialState = unisubs.subtitle.Dialog.State_.SYNC;
+    }
+    this.enterState_(initialState);
 };
 unisubs.subtitle.Dialog.prototype.showDownloadLink_ = function() {
     var that = this;
@@ -104,6 +119,18 @@ unisubs.subtitle.Dialog.prototype.enterDocument = function() {
             this.captionManager_,
             unisubs.CaptionManager.CAPTION,
             this.captionReached_);
+
+    if (this.reviewOrApprovalType_ && !this.notesFectched_){
+        var func  = this.serverModel_.fetchReviewData ;
+        var that = this;
+        if (this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']){
+            func = this.serverModel_.fetchApproveData;
+        }
+        func(unisubs.task_id, function(body) {
+            that.onNotesFetched_(body);
+        });
+    }
+
 };
 unisubs.subtitle.Dialog.prototype.setExtraClass_ = function() {
     var extraClasses = goog.array.map(
@@ -135,12 +162,18 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
     var captionPanel = this.getCaptioningAreaInternal();
     captionPanel.removeChildren(true);
     captionPanel.addChild(nextSubPanel, true);
-
+       
+   
     var rightPanel = nextSubPanel.getRightPanel();
     this.setRightPanelInternal(rightPanel);
 
     this.getTimelinePanelInternal().removeChildren(true);
-
+    
+    var currentNoteContent =  this.getNotesContent_(this.currentSubtitlePanel_);
+    if (currentNoteContent){
+        this.setNotesContent_(nextSubPanel, currentNoteContent)
+    }
+ 
     this.disposeCurrentPanels_();
     this.currentSubtitlePanel_ = nextSubPanel;
 
@@ -157,7 +190,7 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
     var backButtonText = null;
     if (state == s.EDIT_METADATA ){
         backButtonText = "Back to Sync";
-    }else if (state == s.SYNC){
+    }else if (state == s.SYNC && ! this.reviewOrApprovalType_){
         backButtonText = "Back to Typing";
     }else if (state == s.REVIEW ){
         backButtonText = "Back to Edit Info";
@@ -427,38 +460,62 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
         return new unisubs.subtitle.TranscribePanel(
             this.captionSet_,
             this.getVideoPlayerInternal(),
-            this.serverModel_);
+            this.serverModel_, 
+            this.reviewOrApprovalType_
+        );
     else if (this.state_ == s.SYNC)
         return new unisubs.subtitle.SyncPanel(
             this.captionSet_,
             this.getVideoPlayerInternal(),
             this.serverModel_,
-            this.captionManager_);
+            this.captionManager_,
+            this.reviewOrApprovalType_
+        );
     else if (this.state_ == s.REVIEW)
         return new unisubs.subtitle.ReviewPanel(
             this.captionSet_,
             this.getVideoPlayerInternal(),
             this.serverModel_,
-           this.captionManager_);
+            this.captionManager_,
+            this.reviewOrApprovalType_,
+            this
+        );
     else if (this.state_ == s.EDIT_METADATA)
         return new unisubs.editmetadata.Panel(
             this.captionSet_,
             this.getVideoPlayerInternal(),
             this.serverModel_,
             this.captionManager_,
-            this.originalSubtitles_ ,
-            true);
+            null,
+            true, 
+            this.reviewOrApprovalType_
+        );
 };
 unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
-    if (this.state_ == s.TRANSCRIBE)
-        return s.SYNC;
-    else if (this.state_ == s.EDIT_METADATA)
-        return s.REVIEW;
-    else if (this.state_ == s.SYNC)
-        return s.EDIT_METADATA;
-    else if (this.state_ == s.REVIEW)
-        return s.FINISHED;
+    // the dialog is different when reviewing / approving
+    // we only show the sync and edit metadata panels
+    if (this.reviewOrApprovalType_){
+       if (this.state_ == s.SYNC)
+            return s.EDIT_METADATA;
+
+    }else{
+        if (this.state_ == s.TRANSCRIBE)
+            return s.SYNC;
+        else if (this.state_ == s.EDIT_METADATA){
+
+            if (this.isReviewOrApproval_){
+            }else{
+
+                return s.REVIEW;
+            }
+        }
+        else if (this.state_ == s.SYNC)
+            return s.EDIT_METADATA;
+        else if (this.state_ == s.REVIEW)
+            return s.FINISHED;
+
+    }
 };
 unisubs.subtitle.Dialog.prototype.showLoginNag_ = function() {
     // not doing anything here right now.
@@ -508,6 +565,28 @@ unisubs.subtitle.Dialog.prototype.addTranslationsAndClose = function() {
             });
     }
 };
+
+unisubs.subtitle.Dialog.prototype.onNotesFetched_ = function(body) {
+    this.setNotesContent_(this.currentSubtitlePanel_, body);
+}
+
+unisubs.subtitle.Dialog.prototype.setNotesContent_ = function(panel, newContent) {
+    if (panel && panel.bodyInput_){
+        panel.bodyInput_.value = newContent;
+        return true;
+    }
+    return null;
+}
+
+
+
+unisubs.subtitle.Dialog.prototype.getNotesContent_ = function(panel) {
+    if (panel && panel.bodyInput_){
+        return  panel.bodyInput_.value;
+    }
+    return null;
+}
+
 
 unisubs.subtitle.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;

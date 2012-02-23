@@ -17,21 +17,19 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import json, datetime
+import datetime
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 
-from videos.models import Video, Action, VIDEO_TYPE_YOUTUBE, UserTestResult, \
-    SubtitleLanguage, VideoUrl, SubtitleVersion
+from videos.models import Video
 from apps.auth.models import CustomUser as User
 
 from django.core import mail
 from apps.comments.models import Comment
-from apps.comments.notifications import  notify_comment_by_email, SUBJECT_EMAIL_VIDEO_COMMENTED
-from django.db.models import ObjectDoesNotExist 
+from messages.tasks import  send_video_comment_notification, SUBJECT_EMAIL_VIDEO_COMMENTED
 
 
 class CommentEmailTests(TestCase):
@@ -84,7 +82,7 @@ class CommentEmailTests(TestCase):
         num_followers = 5
         self._create_followers(self.video, num_followers)
         mail.outbox = []
-        notify_comment_by_email(self.comment)
+        send_video_comment_notification(self.comment.pk)
         self.assertEqual(len(mail.outbox), num_followers)
         email = mail.outbox[0]
         self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % (self.comment.user.username,
@@ -97,7 +95,7 @@ class CommentEmailTests(TestCase):
         from utils import tasks
         self._create_followers(self.video, num_followers)
         mail.outbox = []
-        notify_comment_by_email(self.comment)
+        send_video_comment_notification(self.comment.pk)
         self.assertEqual(len(mail.outbox), num_followers)
         for msg in mail.outbox:
             self.assertEqual(msg.subject, u'admin left a comment on the video Hax')

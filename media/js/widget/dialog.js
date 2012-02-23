@@ -293,3 +293,22 @@ unisubs.Dialog.prototype.disposeInternal = function() {
     this.videoPlayer_.dispose();
     this.idleTimer_.dispose();
 };
+
+unisubs.Dialog.REVIEW_OR_APPROVAL = {
+    REVIEW: 1,
+    APPROVAL: 2
+};
+unisubs.Dialog.MODERATION_OUTCOMES = {
+    APPROVED: 20,
+    SAVE_FOR_LATER: 10,
+    SEND_BACK: 30
+};
+
+
+unisubs.Dialog.prototype.isApproval = function(){
+    return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'];
+}
+
+unisubs.Dialog.prototype.isReview = function(){
+    return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['REVIEW'];
+}
