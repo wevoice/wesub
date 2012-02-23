@@ -175,7 +175,7 @@
                                         {% if task.get_type_display == 'Approve' %}
                                             {% with task.get_reviewer as reviewer %}
                                                 {% if reviewer %},
-                                                reviewed by <a href="{{ reviewer.get_absolute_url }}">{{ reviewer }}</a>.
+                                                    reviewed by <a href="{{ reviewer.get_absolute_url }}">{{ reviewer }}</a>.
                                                 {% endif %}
                                             {% endwith %}
                                         {% endif %}
