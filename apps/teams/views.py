@@ -1493,9 +1493,6 @@ def unpublish(request, slug):
     if scope == 'version':
         results.append([version.language.pk,
                         version.unpublish(delete=should_delete)])
-    elif scope == 'language':
-        results.append([language.pk,
-                        language.unpublish(delete=should_delete)])
     elif scope == 'dependents':
         translations = list(SubtitleLanguage.objects.filter(video=language.video,
                                                             standard_language=language,
