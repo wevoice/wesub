@@ -37,6 +37,7 @@ from sentry.client.models import client
 from celery.task import task
 
 from auth.models import CustomUser as User
+from localeurl.utils import universal_url
 
 from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
      REVIEWED_AND_PENDING_APPROVAL, REVIEWED_AND_SENT_BACK
@@ -526,3 +527,72 @@ def send_reject_notification(task_pk, sent_back):
     Action.create_rejected_video_handler(task.subtitle_version, reviewer)
     return msg, email_res
      
+COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
+SUBJECT_EMAIL_VIDEO_COMMENTED = "%s left a comment on the video %s"
+@task
+def send_video_comment_notification(comment_pk,  version_pk=None):
+    """
+    Comments can be attached to a video (appear in the videos:video (info)) page) OR
+                                  sublanguage (appear in the videos:translation_history  page)
+    Approval / Reviews notes are also stored as comments.
+                                  
+    """
+    from comments.models import Comment
+    from videos.models import Video, SubtitleLanguage, SubtitleVersion
+    try:
+        comment = Comment.objects.get(pk=comment_pk)
+    except Comment.DoesNotExist:
+        return
+    version = None
+    if version_pk:
+        try:
+            version = SubtitleVersion.objects.get(pk=version_pk)
+        except SubtitleVersion.DoesNotExist:
+            pass
+    ct = comment.content_object
+    if isinstance( ct, Video):
+        video = ct
+        version = None
+        language = None
+    elif isinstance(ct, SubtitleLanguage ):
+        video = ct.video
+        language = ct
+
+    domain = Site.objects.get_current().domain
+    if language:
+        language_url = universal_url("videos:translation_history", kwargs={
+            "video_id": video.video_id,
+            "lang": language.language,
+            "lang_id": language.pk,
+        })
+    else:
+        language_url = None
+    if version:
+        version_url = universal_url("videos:revision", kwargs={
+            "pk": version.pk,
+        })
+    else:
+        version_url = None
+    
+    subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % (comment.user.username, video.title_display())
+
+    followers = set(video.notification_list(comment.user))
+    if language:
+        followers.update(language.notification_list(comment.user))
+    for user in followers:
+        send_templated_email(
+            user,
+            subject,
+            "messages/email/comment-notification.html", 
+            {
+                "video": video,
+                "commenter": unicode(comment.user),
+                "commenter_url": comment.user.get_absolute_url(),
+                "version_url":version_url,
+                "language_url":language_url,
+                "domain":domain,
+                "version": version,
+                "body": comment.content,
+                "STATIC_URL": settings.STATIC_URL,
+            }, 
+            fail_silently=not settings.DEBUG)
