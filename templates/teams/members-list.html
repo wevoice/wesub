@@ -26,15 +26,18 @@
     <script type="text/javascript">
         window.roleSavedURL = '{% url teams:role_saved team.slug %}';
 
-        {% if request.GET.lang %}
-            $(function() {
-                $select = $('select#lang-filter');
+        $(function() {
+            // Handle weird back-button issue with browsers.
+            $select = $('select#lang-filter');
+            {% if request.GET.lang %}
                 $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
-                $select.children().removeAttr('selected');
-                $opt.attr('selected', 'selected');
-                $select.trigger('liszt:updated');
-            });
-        {% endif %}
+            {% else %}
+                $opt = $('option[id="lang-opt-any"]');
+            {% endif %}
+            $select.children().removeAttr('selected');
+            $opt.attr('selected', 'selected');
+            $select.trigger('liszt:updated');
+        });
     </script>
 {% endblock %}
 
@@ -72,7 +75,7 @@
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'speaking' %}</span>
                     <select name="lang-filter" id="lang-filter">
-                        <option value="">{% trans 'all languages' %}</option>
+                        <option id="lang-opt-any" value="">{% trans 'all languages' %}</option>
                         {% for code, name in languages %}
                             <option id="lang-opt-{{ code }}" {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
                         {% endfor %}
