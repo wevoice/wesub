@@ -21,6 +21,8 @@ from videos.models import (
     Video, SubtitleLanguage, SubtitleVersion, VideoFeed, VideoMetadata,
     VideoUrl
 )
+from videos.tasks import video_changed_tasks
+
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from utils.livesettings_values import EmailListValue
@@ -85,6 +87,11 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     raw_id_fields = ['video']
     inlines = [SubtitleVersionInline]
 
+    def delete_model(self, request, obj):
+        video = obj.video
+        super(SubtitleLanguageAdmin, self).delete_model(request, obj)
+        video_changed_tasks.delay(video)
+    
     def versions(self, obj):
         version_qs = obj.subtitleversion_set.all()
         link_tpl = '<a href="%s">#%s</a>'
