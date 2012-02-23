@@ -59,7 +59,7 @@ unisubs.subtitle.ReviewRightPanel.prototype.finish = function(e, approvalCode) {
     }
     var dialog = this.dialog_;
     var that = this;
-    var actionName = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
+    var actionName = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ? 
         'approve' : 'review';
     var successCallback = function(serverMsg) {
         unisubs.subtitle.OnSavedDialog.show(serverMsg, function() {
@@ -90,7 +90,7 @@ unisubs.subtitle.ReviewRightPanel.prototype.appendCustomButtonsInternal = functi
         // for the subtitling dialog, we need the button to advance to the next painel
         return;
     }
-    var buttonText = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'] ? 
+    var buttonText = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ? 
         'Approve' : 'Review';
 
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');

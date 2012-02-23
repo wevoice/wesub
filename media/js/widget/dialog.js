@@ -306,9 +306,9 @@ unisubs.Dialog.MODERATION_OUTCOMES = {
 
 
 unisubs.Dialog.prototype.isApproval = function(){
-    return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL'];
+    return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL;
 }
 
 unisubs.Dialog.prototype.isReview = function(){
-    return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['REVIEW'];
+    return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.REVIEW;
 }

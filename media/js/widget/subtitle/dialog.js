@@ -123,7 +123,7 @@ unisubs.subtitle.Dialog.prototype.enterDocument = function() {
     if (this.reviewOrApprovalType_ && !this.notesFectched_){
         var func  = this.serverModel_.fetchReviewData ;
         var that = this;
-        if (this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']){
+        if (this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL){
             func = this.serverModel_.fetchApproveData;
         }
         func(unisubs.task_id, function(body) {

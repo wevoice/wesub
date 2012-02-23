@@ -499,9 +499,9 @@ unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, cu
 }
 
 unisubs.RightPanel.createInternalContentsReviewOrApproval = function($d, reviewOrApprovalType, numSteps, currentStep){
-    if (reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL['REVIEW']){
+    if (reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL.REVIEW){
         return unisubs.RightPanel.createInternalContentsForReview($d, numSteps, currentStep)
-    }else if(reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']){
+    }else if(reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL){
         return unisubs.RightPanel.createInternalContentsForApproval($d, numSteps, currentStep);
     }
     return null;

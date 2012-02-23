@@ -214,10 +214,10 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         var dialog ;
         if (unisubs.mode == 'review') {
             dialog = this.openSubtitleModerationDialog(serverModel, subtitles, originalSubtitles, 
-                                                       unisubs.Dialog.REVIEW_OR_APPROVAL['REVIEW']);
+                                                       unisubs.Dialog.REVIEW_OR_APPROVAL.REVIEW);
         } else if (unisubs.mode == 'approve') {
             dialog = this.openSubtitleModerationDialog(serverModel, subtitles, originalSubtitles, 
-                                                      unisubs.Dialog.REVIEW_OR_APPROVAL['APPROVAL']);
+                                                      unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL);
         } else if (subtitles.IS_ORIGINAL || subtitles.FORKED) {
             dialog = this.openSubtitlingDialog(serverModel, subtitles, originalSubtitles);
         } else {
