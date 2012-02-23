@@ -197,22 +197,17 @@
 
                 {% with video.get_team_video as team_video %}
                     {% if team_video %}
-                        {% if team_video.team.is_visible %}
-                            <div class="video-tools grid_4 omega">
-                                <h3>{% trans "Collaborate" %}</h3>
-
-                                <p>
-                                    {% trans "This video belongs to the following team" %}:
-                                </p>
-
-                                {% render_belongs_to_team_list video %}
-                            </div>
-                        {% endif %}
+                        <div class="video-tools grid_4 omega">
+                            <h3>{% trans "Collaborate" %}</h3>
+                            <p>
+                                {% trans "This video belongs to the following team" %}:
+                            </p>
+                            {% render_belongs_to_team_list video user %}
+                        </div>
                     {% else %}
                         {% if user.managed_teams %}
                             <div class="video-tools grid_4 omega">
                                 <h3>{% trans "Collaborate" %}</h3>
-
                                 {% team_add_video_select %}
                             </div>
                         {% endif %}

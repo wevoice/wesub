@@ -19,15 +19,18 @@
     <script type="text/javascript">
         unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
 
-        {% if request.GET.lang %}
-            $(function() {
-                $select = $('select#id_task_language');
+        $(function() {
+            // Handle weird back-button issue with browsers.
+            $select = $('select#id_task_language');
+            {% if request.GET.lang %}
                 $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
-                $select.children().removeAttr('selected');
-                $opt.attr('selected', 'selected');
-                $select.trigger('liszt:updated');
-            });
-        {% endif %}
+            {% else %}
+                $opt = $('option[id="lang-opt-any"]');
+            {% endif %}
+            $select.children().removeAttr('selected');
+            $opt.attr('selected', 'selected');
+            $select.trigger('liszt:updated');
+        });
     </script>
 {% endblock %}
 
@@ -77,7 +80,7 @@
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'tasks for' %}</span>
                     <select id="id_task_language" name="language" class="lang-filter chosen">
-                        <option value="{{ request.path }}{% query_string request.GET lang="" page='' %}">{% trans 'all languages' %}</option>
+                        <option id="lang-opt-any" value="{{ request.path }}{% query_string request.GET lang="" page='' %}">{% trans 'all languages' %}</option>
                         {% for language in languages %}
                             <option id="lang-opt-{{ language.code }}" value="{% query_string request.GET lang=language.code page='' %}"
                                 {% if request.GET.lang == language.code %}
@@ -172,7 +175,7 @@
                                         {% if task.get_type_display == 'Approve' %}
                                             {% with task.get_reviewer as reviewer %}
                                                 {% if reviewer %},
-                                                    reviewed by {{ reviewer }}.
+                                                    reviewed by <a href="{{ reviewer.get_absolute_url }}">{{ reviewer }}</a>.
                                                 {% endif %}
                                             {% endwith %}
                                         {% endif %}
