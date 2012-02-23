@@ -169,14 +169,15 @@ def team_add_video_select(context):
     return context
 
 @register.inclusion_tag('videos/_team_list.html')
-def render_belongs_to_team_list(video):
+def render_belongs_to_team_list(video, user):
     teams =  []
-    for t in list(video.team_set.filter(is_visible=True)):
-        if video.moderated_by == t:
-            t.moderates =True
-            teams.insert(0, t)
-        else:
-            teams.append(t)
+    for t in list(video.team_set.filter()):
+        if t.is_visible or user in t.users.all():
+            if video.moderated_by == t:
+                t.moderates =True
+                teams.insert(0, t)
+            else:
+                teams.append(t)
     return {"teams": teams}
 
 
