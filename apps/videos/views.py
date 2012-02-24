@@ -251,23 +251,6 @@ def _get_related_task(request):
         except Task.DoesNotExist:
             return
 
-def video_list(request):
-    qs = Video.objects.filter(is_subtitled=True)
-    ordering = request.GET.get('o')
-    order_type = request.GET.get('ot')
-    extra_context = {}
-    order_fields = ['languages_count', 'widget_views_count', 'subtitles_fetched_count', 'was_subtitled']
-    if ordering in order_fields and order_type in ['asc', 'desc']:
-        qs = qs.order_by(('-' if order_type == 'desc' else '')+ordering)
-        extra_context['ordering'] = ordering
-        extra_context['order_type'] = order_type
-    else:
-        qs = qs.order_by('-widget_views_count')
-    return object_list(request, queryset=qs,
-                       paginate_by=50,
-                       template_name='videos/video_list.html',
-                       template_object_name='video',
-                       extra_context=extra_context)
 
 def actions_list(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)

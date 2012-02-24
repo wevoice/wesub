@@ -21,7 +21,6 @@ from videos.views import rpc_router
 
 urlpatterns = patterns(
     'videos.views',
-    url(r'^$', 'video_list', name='list'),
     url(r'^watch/$', 'watch_page', name='watch_page'),
     url(r'^watch/featured/$', 'featured_videos', name='featured_videos'),
     url(r'^watch/latest/$', 'latest_videos', name='latest_videos'),
