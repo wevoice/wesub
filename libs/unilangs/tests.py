@@ -18,7 +18,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.test import TestCase
-from language_codes import LanguageCode
+from .unilangs import LanguageCode
 
 
 class LanguageCodeTest(TestCase):
