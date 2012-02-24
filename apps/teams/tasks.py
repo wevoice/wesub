@@ -57,7 +57,7 @@ def expire_tasks():
         task.save()
 
 
-@periodic_task(run_every=crontab(minute=0, hour=6))
+@periodic_task(run_every=crontab(minute=0, hour=12))
 def add_videos_notification(*args, **kwargs):
     from teams.models import TeamVideo, Team
     domain = Site.objects.get_current().domain
