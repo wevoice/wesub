@@ -6,20 +6,16 @@ from django.core.cache import cache
 from django.utils import simplejson as json
 from django.utils.http import cookie_date
 from django.utils.translation import (
-    get_language, get_language_info, ugettext as _, ugettext_lazy
+    get_language, get_language_info, ugettext as _
 )
+from django.utils.translation.trans_real import parse_accept_lang_header
 
-from libs.unilangs import (
-    get_language_code_mapping, get_language_name_mapping
-)
+from libs.unilangs import get_language_name_mapping, LanguageCode
 
 
 # A set of all language codes we support.
 SUPPORTED_LANGUAGE_CODES = set(get_language_name_mapping('unisubs').keys())
 
-SUPPORTED_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
-SUPPORTED_LANGUAGES_DICT_LAZY = dict((k, ugettext_lazy(v))
-                                     for k, v in settings.ALL_LANGUAGES)
 
 def _only_supported_languages(language_codes):
     """Filter the given list of language codes to contain only codes we support."""
@@ -28,14 +24,17 @@ def _only_supported_languages(language_codes):
     return [code for code in language_codes if code in SUPPORTED_LANGUAGE_CODES]
 
 
-def get_simple_languages_list(with_empty=False):
-    """Return a list of pairs of language codes to translated names.
+def get_language_choices_short(with_empty=False):
+    """Return a list of language code choices labeled with only the translated name.
 
     This does NOT include the native name of a language in the label, like the
-    get_languages_list function.
+    get_language_choices function.
 
     This function should probably not be used, if we want a consistent display
     across the site.
+
+    Right now it's only used on the Search page for the left column, because it
+    looks ugly with the full names there.
 
     """
     cache_key = 'simple-langs-cache-%s' % get_language()
@@ -55,8 +54,8 @@ def get_simple_languages_list(with_empty=False):
 
     return languages
 
-def get_languages_list(with_empty=False):
-    """Return a list of language code choices labeled in the current user's language.
+def get_language_choices(with_empty=False):
+    """Return a list of language code choices labeled in the standard manner.
 
     That last bit is the important part.  As an example, the "French" option
     will look like this when being viewed by an English user:
@@ -76,9 +75,8 @@ def get_languages_list(with_empty=False):
     if not languages:
         languages = []
 
-        for code, lc in get_language_code_mapping('unisubs').items():
-            label = u'%s (%s)' % (_(lc.name()), lc.native_name())
-            languages.append((code, label))
+        for code in SUPPORTED_LANGUAGE_CODES:
+            languages.append((code, get_language_label(code)))
 
         languages.sort(key=lambda item: item[1])
         cache.set(cache_key, languages, 60*60)
@@ -88,8 +86,11 @@ def get_languages_list(with_empty=False):
 
     return languages
 
-from django.utils.translation.trans_real import parse_accept_lang_header
-from django.utils import translation
+def get_language_label(code):
+    """Return the translated, human-readable label for the given language code."""
+    lc = LanguageCode(code, 'unisubs')
+    return u'%s (%s)' % (_(lc.name()), lc.native_name())
+
 
 def get_user_languages_from_request(request):
     """Return a list of our best guess at languages that request.user speaks."""
@@ -118,6 +119,7 @@ def get_user_languages_from_cookie(request):
     except (TypeError, ValueError):
         return []
 
+
 def languages_from_request(request):
     languages = []
 
@@ -126,7 +128,7 @@ def languages_from_request(request):
             languages.append(l)
 
     if not languages:
-        trans_lang = translation.get_language()
+        trans_lang = get_language()
         if not trans_lang in languages:
             languages.append(trans_lang)
 
@@ -151,9 +153,10 @@ def languages_with_labels(langs):
 
     These codes must be in the internal unisubs format.
 
+    The labels will be in the standard label format.
+
     """
-    return dict([code, label] for code, label in get_languages_list()
-                if code in langs)
+    return dict([code, get_language_label(code)] for code in langs)
 
 
 def is_rtl(lang):

@@ -31,7 +31,7 @@ from teams.permissions import (
 from teams.permissions_const import ROLE_NAMES
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
-from utils.translation import get_languages_list
+from utils.translation import get_language_choices
 from utils.validators import MaxFileSizeValidator
 from videos.forms import AddFromFeedForm
 from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion
@@ -142,7 +142,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.fields['project'].choices = [(p.pk, p) for p in ordered_projects]
 
         writable_langs = team.get_writable_langs()
-        self.fields['language'].choices = [c for c in get_languages_list(True)
+        self.fields['language'].choices = [c for c in get_language_choices(True)
                                            if c[0] in writable_langs]
 
     def clean_video_url(self):
@@ -281,7 +281,8 @@ class TaskCreateForm(ErrorableModelForm):
 
         team_user_ids = team.members.values_list('user', flat=True)
 
-        langs = [l for l in get_languages_list(True) if l[0] in team.get_writable_langs()]
+        langs = [l for l in get_language_choices(with_empty=True)
+                 if l[0] in team.get_writable_langs()]
         self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
@@ -462,8 +463,8 @@ class LanguagesForm(forms.Form):
         super(LanguagesForm, self).__init__(*args, **kwargs)
 
         self.team = team
-        self.fields['preferred'].choices = get_languages_list(True)
-        self.fields['blacklisted'].choices = get_languages_list(True)
+        self.fields['preferred'].choices = get_language_choices(True)
+        self.fields['blacklisted'].choices = get_language_choices(True)
 
     def clean(self):
         preferred = set(self.cleaned_data['preferred'])
