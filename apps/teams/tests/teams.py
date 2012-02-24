@@ -16,8 +16,7 @@ from apps.teams import moderation_const as MODERATION
 from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
-    Team, Invite, TeamVideo, Application, TeamMember, TeamVideoLanguage,
-    TeamLanguagePreference
+    Team, Invite, TeamVideo, Application, TeamMember, TeamLanguagePreference
 )
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage
