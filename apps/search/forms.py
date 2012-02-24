@@ -18,10 +18,10 @@
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from utils.translation import get_simple_languages_list
+from utils.translation import get_language_choices_short
 from videos.search_indexes import LanguageField
 
-ALL_LANGUAGES = get_simple_languages_list()
+ALL_LANGUAGES = get_language_choices_short()
 
 class SearchForm(forms.Form):
     SORT_CHOICES = (
@@ -59,7 +59,7 @@ class SearchForm(forms.Form):
             langs_data = facet_data['fields']['languages']
             self.fields['langs'].choices = self._make_choices_from_faceting(langs_data)
         else:
-            choices = list(get_simple_languages_list())
+            choices = list(get_language_choices_short())
             choices.insert(0, ('', _('All Languages')))
             self.fields['langs'].choices = choices
             self.fields['video_lang'].choices = choices
@@ -85,7 +85,7 @@ class SearchForm(forms.Form):
     def _make_choices_from_faceting(self, data):
         choices = []
 
-        ALL_LANGUAGES_NAMES = dict(get_simple_languages_list())
+        ALL_LANGUAGES_NAMES = dict(get_language_choices_short())
 
         for lang, val in data:
             lang = LanguageField.convert(lang)

@@ -24,11 +24,11 @@ def _only_supported_languages(language_codes):
     return [code for code in language_codes if code in SUPPORTED_LANGUAGE_CODES]
 
 
-def get_simple_languages_list(with_empty=False):
-    """Return a list of pairs of language codes to translated names.
+def get_language_choices_short(with_empty=False):
+    """Return a list of language code choices labeled with only the translated name.
 
     This does NOT include the native name of a language in the label, like the
-    get_languages_list function.
+    get_language_choices function.
 
     This function should probably not be used, if we want a consistent display
     across the site.
@@ -54,8 +54,8 @@ def get_simple_languages_list(with_empty=False):
 
     return languages
 
-def get_languages_list(with_empty=False):
-    """Return a list of language code choices labeled in the current user's language.
+def get_language_choices(with_empty=False):
+    """Return a list of language code choices labeled in the standard manner.
 
     That last bit is the important part.  As an example, the "French" option
     will look like this when being viewed by an English user:
@@ -154,7 +154,7 @@ def languages_with_labels(langs):
     These codes must be in the internal unisubs format.
 
     """
-    return dict([code, label] for code, label in get_languages_list()
+    return dict([code, label] for code, label in get_language_choices()
                 if code in langs)
 
 

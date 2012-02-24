@@ -37,7 +37,7 @@ from videos.types.youtube import yt_service
 from videos.models import VideoUrl
 from utils.forms import AjaxForm, EmailListField, UsernameListField
 from videos.tasks import video_changed_tasks
-from utils.translation import get_languages_list
+from utils.translation import get_language_choices
 from utils.forms import StripRegexField, FeedURLField
 from videos.feed_parser import FeedParser, FeedParserError
 from utils.forms import ReCaptchaField
@@ -155,8 +155,8 @@ class SubtitlesUploadBaseForm(forms.Form):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(SubtitlesUploadBaseForm, self).__init__(*args, **kwargs)
-        self.fields['language'].choices = get_languages_list()
-        self.fields['video_language'].choices = get_languages_list()
+        self.fields['language'].choices = get_language_choices()
+        self.fields['video_language'].choices = get_language_choices()
 
     def clean_video(self):
         video = self.cleaned_data['video']
