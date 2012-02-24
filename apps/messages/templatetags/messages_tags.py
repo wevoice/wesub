@@ -17,12 +17,10 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django import template
 
-from messages.forms import SendMessageForm, SendTeamMessageForm
 from messages.models import Message
 
 
 register = template.Library()
-
 
 @register.inclusion_tag('messages/_messages.html', takes_context=True)
 def messages(context):
@@ -46,17 +44,3 @@ def messages(context):
         'cookie_name': Message.hide_cookie_name
     }
 
-@register.inclusion_tag('messages/_send_message_form.html', takes_context=True)
-def send_message_form(context, receiver, link=False):
-    context['send_message_form'] = SendMessageForm(context['user'], initial={'user': receiver.pk})
-    context['receiver'] = receiver
-    context['form_id'] = 'send-message-form-%s' % receiver.pk
-    context['link'] = link
-    return context
-
-@register.inclusion_tag('messages/_send_to_team_message_form.html', takes_context=True)
-def send_to_team_message_form(context, team):
-    context['send_message_form'] = SendTeamMessageForm(context['user'], initial={'team': team})
-    context['form_id'] = 'send-message-to-team-form-%s' % team.pk
-    context['team'] = team
-    return context

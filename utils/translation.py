@@ -6,8 +6,9 @@ from django.core.cache import cache
 from django.utils import simplejson as json
 from django.utils.http import cookie_date
 from django.utils.translation import (
-    get_language, get_language_info, ugettext as _, ugettext_lazy
+    get_language, get_language_info, ugettext as _
 )
+from django.utils.translation.trans_real import parse_accept_lang_header
 
 from libs.unilangs import (
     get_language_code_mapping, get_language_name_mapping
@@ -18,8 +19,6 @@ from libs.unilangs import (
 SUPPORTED_LANGUAGE_CODES = set(get_language_name_mapping('unisubs').keys())
 
 SUPPORTED_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
-SUPPORTED_LANGUAGES_DICT_LAZY = dict((k, ugettext_lazy(v))
-                                     for k, v in settings.ALL_LANGUAGES)
 
 def _only_supported_languages(language_codes):
     """Filter the given list of language codes to contain only codes we support."""
@@ -88,8 +87,6 @@ def get_languages_list(with_empty=False):
 
     return languages
 
-from django.utils.translation.trans_real import parse_accept_lang_header
-from django.utils import translation
 
 def get_user_languages_from_request(request):
     """Return a list of our best guess at languages that request.user speaks."""
@@ -118,6 +115,7 @@ def get_user_languages_from_cookie(request):
     except (TypeError, ValueError):
         return []
 
+
 def languages_from_request(request):
     languages = []
 
@@ -126,7 +124,7 @@ def languages_from_request(request):
             languages.append(l)
 
     if not languages:
-        trans_lang = translation.get_language()
+        trans_lang = get_language()
         if not trans_lang in languages:
             languages.append(trans_lang)
 
