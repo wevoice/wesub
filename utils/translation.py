@@ -153,9 +153,10 @@ def languages_with_labels(langs):
 
     These codes must be in the internal unisubs format.
 
+    The labels will be in the standard label format.
+
     """
-    return dict([code, label] for code, label in get_language_choices()
-                if code in langs)
+    return dict([code, get_language_label(code)] for code in langs)
 
 
 def is_rtl(lang):
