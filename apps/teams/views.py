@@ -65,7 +65,7 @@ from teams.tasks import (
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
 from utils.searching import get_terms
-from utils.translation import get_languages_list, languages_with_labels
+from utils.translation import get_language_choices, languages_with_labels
 from videos import metadata_manager
 from videos.tasks import (
     _update_captions_in_original_service, _delete_captions_in_original_service
@@ -199,7 +199,7 @@ def detail(request, slug, project_slug=None, languages=None):
         })
 
     readable_langs = TeamLanguagePreference.objects.get_readable(team)
-    language_choices = [(code, name) for code, name in get_languages_list()
+    language_choices = [(code, name) for code, name in get_language_choices()
                         if code in readable_langs]
 
     extra_context['language_choices'] = language_choices
@@ -963,7 +963,7 @@ def _task_languages(team, user):
                                          .values_list('language', flat=True)
                                          .distinct())
 
-    language_labels = dict(get_languages_list(with_empty=True))
+    language_labels = dict(get_language_choices(with_empty=True))
 
     # TODO: Handle the team language setting here once team settings are
     # implemented.
@@ -1184,7 +1184,7 @@ def create_task(request, slug, team_video_pk):
     subtitlable = json.dumps(can_create_task_subtitle(team_video, request.user))
     translatable_languages = json.dumps(can_create_task_translate(team_video, request.user))
 
-    language_choices = json.dumps(get_languages_list(True))
+    language_choices = json.dumps(get_language_choices(True))
 
     return { 'form': form, 'team': team, 'team_video': team_video,
              'translatable_languages': translatable_languages,
