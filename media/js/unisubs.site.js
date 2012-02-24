@@ -157,7 +157,6 @@ var Site = function() {
                     jQuery.jGrowl.error(e.message);
                 });
             })();
-            
 
             window.usStartTime = (new Date()).getTime();
             window.addCSRFHeader = addCSRFHeader;

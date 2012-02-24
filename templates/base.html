@@ -148,17 +148,17 @@
         </div>
     {% endif %}
     {% block bottom_scripts %}{% endblock %}
-    {% if not RUN_LOCALLY %}
-        <script type="text/javascript" charset="utf-8">
-            Tender = {
-            hideToggle: true,
-            widgetToggles: [document.getElementById('help_link')]
-        }
-        </script>
-        <script src="https://universalsubtitles.tenderapp.com/tender_widget.js" type="text/javascript"></script>
-    {% endif %}
 
     {% if not DEBUG %}
+        {% if not RUN_LOCALLY %}
+            <script type="text/javascript" charset="utf-8">
+                Tender = {
+                    hideToggle: true,
+                    widgetToggles: [document.getElementById('help_link')]
+                }
+            </script>
+        {% endif %}
+        <script src="https://universalsubtitles.tenderapp.com/tender_widget.js" type="text/javascript"></script>
         <script type="text/javascript">
             var _gaq = _gaq || [];
             _gaq.push(['_setAccount', '{{ GOOGLE_ANALYTICS_NUMBER }}']);
