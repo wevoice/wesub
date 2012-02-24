@@ -887,9 +887,6 @@ class ViewsTest(WebUseTest):
         # with blank language codes.
         self.assertEqual(response.status_code, 302)
 
-    def test_video_list(self):
-        self._simple_test('videos:list')
-        self._simple_test('videos:list', data={'o': 'languages_count', 'ot': 'desc'})
 
     def test_bliptv_twice(self):
         VIDEO_FILE = 'http://blip.tv/file/get/Kipkay-AirDusterOfficeWeaponry223.m4v'
