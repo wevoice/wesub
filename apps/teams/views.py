@@ -65,7 +65,7 @@ from teams.tasks import (
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
 from utils.searching import get_terms
-from utils.translation import get_languages_list, languages_with_labels, SUPPORTED_LANGUAGES_DICT
+from utils.translation import get_languages_list, languages_with_labels
 from videos import metadata_manager
 from videos.tasks import (
     _update_captions_in_original_service, _delete_captions_in_original_service
@@ -963,18 +963,20 @@ def _task_languages(team, user):
                                          .values_list('language', flat=True)
                                          .distinct())
 
+    language_labels = dict(get_languages_list(with_empty=True))
+
     # TODO: Handle the team language setting here once team settings are
     # implemented.
     languages = list(set(languages))
     lang_data = []
     for l in languages:
-        if SUPPORTED_LANGUAGES_DICT.get(l, False):
-            lang_data.append({'code': l, 'name': SUPPORTED_LANGUAGES_DICT[l]} )
+        if language_labels.get(l):
+            lang_data.append({'code': l, 'name': language_labels[l]} )
         else:
             logger.error("Failed to find language code for task", extra={
                 "data": {
-                    "language_code":l,
-                    "supported": SUPPORTED_LANGUAGES_DICT
+                    "language_code": l,
+                    "supported": language_labels
                 }
             })
     return lang_data

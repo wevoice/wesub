@@ -10,15 +10,15 @@ from django.utils.translation import (
 )
 from django.utils.translation.trans_real import parse_accept_lang_header
 
-from libs.unilangs import (
-    get_language_code_mapping, get_language_name_mapping
-)
+from libs.unilangs import get_language_name_mapping, LanguageCode
 
 
 # A set of all language codes we support.
 SUPPORTED_LANGUAGE_CODES = set(get_language_name_mapping('unisubs').keys())
 
+# A dictionary of language codes to labels.
 SUPPORTED_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
+
 
 def _only_supported_languages(language_codes):
     """Filter the given list of language codes to contain only codes we support."""
@@ -78,9 +78,8 @@ def get_languages_list(with_empty=False):
     if not languages:
         languages = []
 
-        for code, lc in get_language_code_mapping('unisubs').items():
-            label = u'%s (%s)' % (_(lc.name()), lc.native_name())
-            languages.append((code, label))
+        for code in SUPPORTED_LANGUAGE_CODES:
+            languages.append((code, get_language_label(code)))
 
         languages.sort(key=lambda item: item[1])
         cache.set(cache_key, languages, 60*60)
@@ -89,6 +88,11 @@ def get_languages_list(with_empty=False):
         languages = [('', '---------')] + languages
 
     return languages
+
+def get_language_label(code):
+    """Return the translated, human-readable label for the given language code."""
+    lc = LanguageCode(code, 'unisubs')
+    return u'%s (%s)' % (_(lc.name()), lc.native_name())
 
 
 def get_user_languages_from_request(request):
