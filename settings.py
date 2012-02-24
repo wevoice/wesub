@@ -684,6 +684,7 @@ MEDIA_BUNDLES = {
               "js/messages.js",
               "js/libs/chosen.jquery.min.js",
               "js/libs/chosen.ajax.jquery.js",
+              "js/unisubs.site.js",
             ],
         "closure_deps": "",
         "include_flash_deps": False,
