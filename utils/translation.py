@@ -36,6 +36,9 @@ def get_simple_languages_list(with_empty=False):
     This function should probably not be used, if we want a consistent display
     across the site.
 
+    Right now it's only used on the Search page for the left column, because it
+    looks ugly with the full names there.
+
     """
     cache_key = 'simple-langs-cache-%s' % get_language()
     languages = cache.get(cache_key)
