@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 
 from profiles.forms import SelectLanguageForm, EditUserEmailForm
 from utils.rpc import RpcHttpResponse, add_request_to_kwargs, Error, Msg
-from utils.translation import get_user_languages_from_request
+from utils.translation import get_user_languages_from_request, languages_with_labels
 
 
 class ProfileApiClass(object):
@@ -38,7 +38,7 @@ class ProfileApiClass(object):
 
     @add_request_to_kwargs
     def get_user_languages(self, user, request):
-        return get_user_languages_from_request(request, with_names=True)
+        return languages_with_labels(get_user_languages_from_request(request))
 
     def set_email(self, email, user):
         if not user.is_authenticated():

@@ -65,7 +65,7 @@ from teams.tasks import (
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
 from utils.searching import get_terms
-from utils.translation import get_languages_list, languages_with_names, SUPPORTED_LANGUAGES_DICT
+from utils.translation import get_languages_list, languages_with_labels, SUPPORTED_LANGUAGES_DICT
 from videos import metadata_manager
 from videos.tasks import (
     _update_captions_in_original_service, _delete_captions_in_original_service
@@ -699,7 +699,7 @@ def detail_members(request, slug, role=None):
         'query': q,
         'role': role,
         'assignable_roles': assignable_roles,
-        'languages': sorted(languages_with_names(user_langs).items(), key=lambda pair: pair[1]),
+        'languages': sorted(languages_with_labels(user_langs).items(), key=lambda pair: pair[1]),
     })
 
     if team.video:

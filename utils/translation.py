@@ -9,12 +9,24 @@ from django.utils.translation import (
     get_language, get_language_info, ugettext as _, ugettext_lazy
 )
 
-from libs.unilangs import get_language_code_mapping, get_language_name_mapping
+from libs.unilangs import (
+    get_language_code_mapping, get_language_name_mapping
+)
 
+
+# A set of all language codes we support.
+SUPPORTED_LANGUAGE_CODES = set(get_language_name_mapping('unisubs').keys())
 
 SUPPORTED_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 SUPPORTED_LANGUAGES_DICT_LAZY = dict((k, ugettext_lazy(v))
                                      for k, v in settings.ALL_LANGUAGES)
+
+def _only_supported_languages(language_codes):
+    """Filter the given list of language codes to contain only codes we support."""
+
+    # TODO: Figure out the codec issue here.
+    return [code for code in language_codes if code in SUPPORTED_LANGUAGE_CODES]
+
 
 def get_simple_languages_list(with_empty=False):
     """Return a list of pairs of language codes to translated names.
@@ -44,7 +56,7 @@ def get_simple_languages_list(with_empty=False):
     return languages
 
 def get_languages_list(with_empty=False):
-    """Return a list of language code choices in the current user's language.
+    """Return a list of language code choices labeled in the current user's language.
 
     That last bit is the important part.  As an example, the "French" option
     will look like this when being viewed by an English user:
@@ -79,24 +91,17 @@ def get_languages_list(with_empty=False):
 from django.utils.translation.trans_real import parse_accept_lang_header
 from django.utils import translation
 
-def get_user_languages_from_request(request, only_supported=False, with_names=False):
+def get_user_languages_from_request(request):
+    """Return a list of our best guess at languages that request.user speaks."""
     languages = []
+
     if request.user.is_authenticated():
         languages = [l.language for l in request.user.get_languages()]
 
     if not languages:
         languages = languages_from_request(request)
 
-    if only_supported:
-        languages_to_remove = []
-        for item in languages:
-            if not item in SUPPORTED_LANGUAGES_DICT and \
-                not item.split('-')[0] in SUPPORTED_LANGUAGES_DICT:
-                    languages_to_remove.append(item)
-        for item in languages_to_remove:
-            languages.remove(item)
-
-    return with_names and languages_with_names(languages) or languages
+    return _only_supported_languages(languages)
 
 def set_user_languages_to_cookie(response, languages):
     max_age = 60*60*24
@@ -109,14 +114,11 @@ def set_user_languages_to_cookie(response, languages):
 def get_user_languages_from_cookie(request):
     try:
         langs = json.loads(request.COOKIES.get(settings.USER_LANGUAGES_COOKIE_NAME, '[]'))
-        for l in langs:
-            if not l in SUPPORTED_LANGUAGES_DICT:
-                langs.remove(l)
-        return langs
+        return _only_supported_languages(langs)
     except (TypeError, ValueError):
         return []
 
-def languages_from_request(request, only_supported=False, with_names=False):
+def languages_from_request(request):
     languages = []
 
     for l in get_user_languages_from_cookie(request):
@@ -142,25 +144,17 @@ def languages_from_request(request, only_supported=False, with_names=False):
             if lang and lang != '*' and not lang in languages:
                 languages.append(lang)
 
-    if only_supported:
-        for item in languages:
-            if not item in SUPPORTED_LANGUAGES_DICT:
-                languages.remove(item)
+    return _only_supported_languages(languages)
 
-    return with_names and languages_with_names(languages) or languages
+def languages_with_labels(langs):
+    """Return a dict of language codes to language labels for the given seq of codes.
 
-def languages_with_names(langs):
-    output = {}
-    for l in langs:
-        try:
-            output[l] = _(SUPPORTED_LANGUAGES_DICT[l])
-        except KeyError:
-            try:
-                l = l.split('-')[0]
-                output[l] = _(SUPPORTED_LANGUAGES_DICT[l])
-            except KeyError:
-                pass
-    return output
+    These codes must be in the internal unisubs format.
+
+    """
+    return dict([code, label] for code, label in get_languages_list()
+                if code in langs)
+
 
 def is_rtl(lang):
     try:
