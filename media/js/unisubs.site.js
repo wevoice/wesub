@@ -158,6 +158,12 @@ var Site = function() {
                 });
             })();
 
+            // Old modal
+            if (window.OLD_MODAL) {
+                $.mod();
+                $.metadata.setType("attr", "data");
+            }
+
             window.usStartTime = (new Date()).getTime();
             window.addCSRFHeader = addCSRFHeader;
             addCSRFHeader($);
