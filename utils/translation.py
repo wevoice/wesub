@@ -16,9 +16,6 @@ from libs.unilangs import get_language_name_mapping, LanguageCode
 # A set of all language codes we support.
 SUPPORTED_LANGUAGE_CODES = set(get_language_name_mapping('unisubs').keys())
 
-# A dictionary of language codes to labels.
-SUPPORTED_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
-
 
 def _only_supported_languages(language_codes):
     """Filter the given list of language codes to contain only codes we support."""
