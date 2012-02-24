@@ -68,5 +68,5 @@ $(function() {
             $('html').unbind('click.modal');
         }
     }
-bb
+
 });
