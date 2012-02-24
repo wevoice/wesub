@@ -32,7 +32,7 @@ def get_simple_languages_list(with_empty=False):
     if not languages:
         languages = []
 
-        for code, name in get_language_name_mapping('unisubs'):
+        for code, name in get_language_name_mapping('unisubs').items():
             languages.append((code, _(name)))
 
         languages.sort(key=lambda item: item[1])
@@ -64,7 +64,7 @@ def get_languages_list(with_empty=False):
     if not languages:
         languages = []
 
-        for code, lc in get_language_code_mapping('unisubs'):
+        for code, lc in get_language_code_mapping('unisubs').items():
             label = u'%s (%s)' % (_(lc.name()), lc.native_name())
             languages.append((code, label))
 
