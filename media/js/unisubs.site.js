@@ -20,7 +20,11 @@ var Site = function() {
     this.Views = {
         base: function() {
 
-            // Abbr
+            /*
+             * TODO: The modules in this section need to be
+             * pulled out into individual sub-views and only
+             * initialized on pages that use them.
+             */
             if ($('.abbr').length) {
                 $('.abbr').each(function(){
                     var container = $(this);
@@ -44,8 +48,6 @@ var Site = function() {
                     });
                 });
             }
-
-            // Filters
             if ($('#sort-filter').length) {
                 $('#sort-filter').click(function(e) {
                     e.preventDefault();
@@ -56,8 +58,6 @@ var Site = function() {
                     window.location = $(this).children('option:selected').attr('value');
                 });
             }
-
-            // Modal
             if ($('a.open-modal').length) {
                 $('a.open-modal').live('click',function(e){
                     e.preventDefault();
@@ -83,8 +83,6 @@ var Site = function() {
                     $('html').unbind('click.modal');
                 }
             }
-
-            // Tabs
             $.fn.tabs = function(options){
                 this.each(function(){
                     var $this = $(this);
@@ -109,8 +107,6 @@ var Site = function() {
                 }
                 return this;        
             };
-
-            // CSRF Header
             function addCSRFHeader($){
                 /* Django will guard against csrf even on XHR requests, so we need to read
                    the value from the cookie and add the header for it */
@@ -138,27 +134,21 @@ var Site = function() {
                     }
                 });
             }
-
-            // jQuery soup to someday be cleaned up
-            (function() {
-                $('#closeBut').click(function(){
-                    $('#messages').remove();
+            $('#closeBut').click(function(){
+                $('#messages').remove();
+                return false;
+            });
+            $('li.search input').keypress(function(e) {
+                if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+                    $('li.search form').submit();
                     return false;
-                });
-                $('li.search input').keypress(function(e) {
-                    if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-                        $('li.search form').submit();
-                        return false;
-                    }
-                    else
-                        return true;
-                });
-                jQuery.Rpc.on('exception', function(e){
-                    jQuery.jGrowl.error(e.message);
-                });
-            })();
-
-            // Old modal
+                }
+                else
+                    return true;
+            });
+            jQuery.Rpc.on('exception', function(e){
+                jQuery.jGrowl.error(e.message);
+            });
             if (window.OLD_MODAL) {
                 $.mod();
                 $.metadata.setType("attr", "data");
