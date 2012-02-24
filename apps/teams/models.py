@@ -436,56 +436,6 @@ class Team(models.Model):
 
         return qs
 
-    def get_videos_for_languages(self, languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS):
-        from utils.multi_query_set import TeamMultyQuerySet
-        languages.extend([l[:l.find('-')] for l in languages if l.find('-') > -1])
-
-        langs_pairs = []
-
-        for l1 in languages:
-            for l0 in languages:
-                if not l1 == l0:
-                    langs_pairs.append('%s_%s' % (l1, l0))
-
-        qs = TeamVideoLanguagePair.objects.filter(language_pair__in=langs_pairs, team=self) \
-            .select_related('team_video', 'team_video__video')
-        lqs = TeamVideoLanguage.objects.filter(team=self).select_related('team_video', 'team_video__video')
-
-        qs1 = qs.filter(percent_complete__gt=0,percent_complete__lt=100)
-        qs2 = qs.filter(percent_complete=0)
-        qs3 = lqs.filter(is_original=True, is_complete=False, language__in=languages).order_by("is_lingua_franca")
-        qs4 = lqs.filter(is_original=False, forked=True, is_complete=False, language__in=languages)
-        mqs = TeamMultyQuerySet(qs1, qs2, qs3, qs4)
-
-        total_count = TeamVideo.objects.filter(team=self).count()
-
-        additional = TeamVideoLanguagePair.objects.none()
-        all_videos = TeamVideo.objects.filter(team=self).select_related('video')
-
-        if total_count == 0:
-            mqs = all_videos
-        else:
-            if  total_count < CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS:
-                additional = all_videos.exclude(pk__in=[x.id for x in mqs ])
-            else:
-                additional = all_videos
-            mqs = TeamMultyQuerySet(qs1, qs2, qs3, qs4 , additional)
-
-        return {
-            'qs': qs,
-            'lqs': lqs,
-            'qs1': qs1,
-            'qs2': qs2,
-            'qs3': qs3,
-            'qs4': qs4,
-            'videos':mqs,
-            'videos_count': len(mqs),
-            'additional_count': additional.count(),
-            'additional': additional[:50],
-            'lqs': lqs,
-            'qs': qs,
-            }
-
 
     # Projects
     @property
@@ -725,102 +675,6 @@ class TeamVideo(models.Model):
             if latest_version:
                 sl1_subtitle_count = latest_version.subtitle_set.count()
             return 0 if sl1_subtitle_count == 0 else -1
-
-    def _update_team_video_language_pair(self, lang0, sl0, lang1, sl1):
-        percent_complete = self._calculate_percent_complete(sl0, sl1)
-        if sl1 is not None:
-            tvlps = TeamVideoLanguagePair.objects.filter(
-                team_video=self,
-                subtitle_language_0=sl0,
-                subtitle_language_1=sl1)
-        else:
-            tvlps = TeamVideoLanguagePair.objects.filter(
-                team_video=self,
-                subtitle_language_0__language=lang0,
-                language_1=lang1)
-        tvlp = None if len(tvlps) == 0 else tvlps[0]
-        if not tvlp and percent_complete != -1:
-            tvlp = TeamVideoLanguagePair(
-                team_video=self,
-                team=self.team,
-                video=self.video,
-                language_0=lang0,
-                subtitle_language_0=sl0,
-                language_1=lang1,
-                subtitle_language_1=sl1,
-                language_pair='{0}_{1}'.format(lang0, lang1),
-                percent_complete=percent_complete)
-            tvlp.save()
-        elif tvlp and percent_complete != -1:
-            tvlp.percent_complete = percent_complete
-            tvlp.save()
-        elif tvlp and percent_complete == -1:
-            tvlp.delete()
-
-    def _make_lp(self, lang0, sl0, lang1, sl1):
-        percent_complete = self._calculate_percent_complete(sl0, sl1)
-        if percent_complete == -1:
-            return None
-        else:
-            return "{0}_{1}_{2}".format(
-                lang0, lang1, "M" if percent_complete > 0 else "0")
-
-    def _update_tvlp_for_languages(self, lang0, lang1, langs):
-        sl0_list = langs.get(lang0, [])
-        sl1_list = langs.get(lang1, [])
-        if len(sl1_list) == 0:
-            sl1_list = [None]
-        for sl0 in sl0_list:
-            for sl1 in sl1_list:
-                self._update_team_video_language_pair(lang0, sl0, lang1, sl1)
-
-    def _add_lps_for_languages(self, lang0, lang1, langs, lps):
-        sl0_list = langs.get(lang0, [])
-        sl1_list = langs.get(lang1, [])
-        if len(sl1_list) == 0:
-            sl1_list = [None]
-        for sl0 in sl0_list:
-            for sl1 in sl1_list:
-                lp = self._make_lp(lang0, sl0, lang1, sl1)
-                if lp:
-                    lps.append(lp)
-
-    def update_team_video_language_pairs(self, lang_code_list=None):
-        TeamVideoLanguagePair.objects.filter(team_video=self).delete()
-        if lang_code_list is None:
-            lang_code_list = [item[0] for item in settings.ALL_LANGUAGES]
-        langs = self.video.subtitle_language_dict()
-        for lang0, sl0_list in langs.items():
-            for lang1 in lang_code_list:
-                if lang0 == lang1:
-                    continue
-                self._update_tvlp_for_languages(lang0, lang1, langs)
-
-    def searchable_language_pairs(self):
-        lps = []
-        lang_code_list = [item[0] for item in settings.ALL_LANGUAGES]
-        langs = self.video.subtitle_language_dict()
-        for lang0, sl0_list in langs.items():
-            for lang1 in lang_code_list:
-                if lang0 == lang1:
-                    continue
-                self._add_lps_for_languages(lang0, lang1, langs, lps)
-        return lps
-
-    def _add_searchable_language(self, language, sublang_dict, sls):
-        complete_sublangs = []
-        if language in sublang_dict:
-            complete_sublangs = [sl for sl in sublang_dict[language] if
-                                 not sl.is_dependent() and sl.is_complete]
-        if len(complete_sublangs) == 0:
-            sls.append("S_{0}".format(language))
-
-    def searchable_languages(self):
-        sls = []
-        langs = self.video.subtitle_language_dict()
-        for lang in settings.ALL_LANGUAGES:
-            self._add_searchable_language(lang[0], langs, sls)
-        return sls
 
     def save(self, *args, **kwargs):
         if not hasattr(self, "project"):
@@ -1068,24 +922,6 @@ class TeamVideoLanguage(models.Model):
     class Meta:
         permissions = LANG_PERMISSIONS
 
-
-# TeamVideoLanguagePair
-class TeamVideoLanguagePair(models.Model):
-    team_video = models.ForeignKey(TeamVideo)
-    team = models.ForeignKey(Team)
-    video = models.ForeignKey(Video)
-
-    # language_0 and subtitle_language_0 are the potential standards.
-    language_0 = models.CharField(max_length=16, choices=ALL_LANGUAGES, db_index=True)
-    subtitle_language_0 = models.ForeignKey(
-        SubtitleLanguage, null=False, related_name="team_video_language_pairs_0")
-
-    language_1 = models.CharField(max_length=16, choices=ALL_LANGUAGES, db_index=True)
-    subtitle_language_1 = models.ForeignKey(
-        SubtitleLanguage, null=True, related_name="team_video_language_pairs_1")
-
-    language_pair = models.CharField(db_index=True, max_length=16)
-    percent_complete = models.IntegerField(db_index=True, default=0)
 
 
 # TeamMember

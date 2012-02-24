@@ -164,7 +164,6 @@ def _invalidate_cache(video):
 def _recalculate_team_detail_metadata(video):
     team_videos = TeamVideo.objects.filter(video=video)
     for team_video in team_videos:
-        team_video.update_team_video_language_pairs()
         TeamVideoLanguage.update(team_video)
 
 
