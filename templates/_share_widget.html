@@ -5,11 +5,12 @@
 
     <p>{% trans 'Now everyone can watch the video with subtitles-- try it!' %}<br />
     {% trans 'Then tell the world and invite your friends to help translate:' %}</p>           
-
     <ul>
+      {% if not RUN_LOCALLY %}
         <li class="unisubs-facebook"><a href="#">{% trans 'Post to Facebook' %}</a></li>
         <li class="unisubs-twitter"><a href="#">{% trans 'Post to Twitter' %}</a></li>
         <li class="unisubs-friends"><a href="#">{% trans 'Email to friends' %}</a></li>         
+        {% endif %}
     </ul>
 
     <h3>{% trans 'Embed Code' %}</h3>

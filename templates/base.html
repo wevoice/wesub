@@ -6,6 +6,8 @@
 <html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="en" lang="en" {% block html_attrs %}{% endblock %} class="base">
 
 <head>
+    <title>{% block title %}Universal Subtitles - {% trans 'Transcribe, caption, translate, and subtitle videos.' %}{% endblock %}</title>
+
     <meta charset="utf-8" />
     {% if not current_site.name == 'unisubs' %}
         <meta name="robots" content="noindex, nofollow"/>
@@ -14,56 +16,33 @@
         <meta property="fb:admins" content="539835590"/>
     {% endblock  %}
 
-
-    <title>{% block title %}Universal Subtitles - {% trans 'Transcribe, caption, translate, and subtitle videos.' %}{% endblock %}</title>
-
+    <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
+    <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
     {% block css %}{% include_bundle "base" %}{% endblock %}
 
+    <!--[if IE]>
+        <style type="text/css"> .group { display: block; zoom: 1; } </style>
+    <![endif]-->
     <!--[if gte IE 8]>
         <link href="{{ STATIC_URL }}css/ie8.css" media="all" type="text/css" rel="stylesheet" />
     <![endif]-->
     <!--[if IE 8]>
-        <style>
-            .notIE { display: none !important ; }
-        </style>
+        <style> .notIE { display: none !important ; } </style>
     <![endif]-->
-
-    <!--[if IE]>
-        <style type="text/css">
-            .group {
-                display: block;
-                zoom: 1;
-            }
-        </style>
-    <![endif]-->
-
     <!--[if lt IE 9]>
         <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
-    <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
-
-    <script type="text/javascript">window.STATIC_URL = '{{STATIC_URL}}';</script>
     {% include_bundle "site_base_js" %}
     <script type="text/javascript" src="{% url js_i18n_catalog %}"></script>
     <script src="{% url profiles:rpc_api %}" type="text/javascript"></script>  
     {% block scripts %}{% endblock %}
     <script type="text/javascript">
-        jQuery(function($){
-            {% block oldmodal %}
-                $.mod();
-                $.metadata.setType("attr", "data");
-            {% endblock %}
-        });
+        window.STATIC_URL = '{{ STATIC_URL }}';
+        {% block oldmodal %}
+            window.OLD_MODAL = true; 
+        {% endblock %}
     </script>
-
-    {% if DEBUG %}
-        <script src="/site_media/js/highlight.min.js"></script>
-        <link rel="stylesheet" href="/site_media/css/github.min.css">
-        <script>hljs.initHighlightingOnLoad();</script>
-        <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
-    {% endif %}
 </head>
 
 <body {% block body_attrs %}{% endblock %}>
@@ -173,6 +152,11 @@
                 })();
             {% endif %}
         </script>
+    {% else %}
+        <script src="/site_media/js/highlight.min.js"></script>
+        <link rel="stylesheet" href="/site_media/css/github.min.css">
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
     {% endif %}
 
 </body>
