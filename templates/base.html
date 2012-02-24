@@ -1,20 +1,21 @@
 {% load thumbnail i18n announcement_tags messages_tags profiles_tags media_compressor auth_tags %}
+
 {% get_current_language_bidi as LANGUAGE_BIDI %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="en" lang="en">
+
+<!DOCTYPE html>
+<html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="en" lang="en" {% block html_attrs %}{% endblock %} class="base">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
+    <meta charset="utf-8" />
     {% if not current_site.name == 'unisubs' %}
-        <meta NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW"/>
+        <meta name="robots" content="noindex, nofollow"/>
     {% endif %}
+    {% block opengraph-head %}
+        <meta property="fb:admins" content="539835590"/>
+    {% endblock  %}
 
-    <script type="text/javascript">
-        window.usStartTime = (new Date()).getTime();
-        window.STATIC_URL = '{{STATIC_URL}}';
-    </script>
+
+    <title>{% block title %}Universal Subtitles - {% trans 'Transcribe, caption, translate, and subtitle videos.' %}{% endblock %}</title>
 
     {% block css %}{% include_bundle "base" %}{% endblock %}
 
@@ -42,98 +43,20 @@
 
     <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
     <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
+
+    <script type="text/javascript">window.STATIC_URL = '{{STATIC_URL}}';</script>
     {% include_bundle "site_base_js" %}
-
-    <script type="text/javascript">
-        jQuery(function($){
-            /* Django will guard against csrf even on XHR requests, so we need to read
-               the value from the cookie and add the header for it */
-            function addCSRFHeader($){
-                $.ajaxSetup({
-                    beforeSend: function(xhr, settings) {
-                        function getCookie(name) {
-                            var cookieValue = null;
-                            if (document.cookie && document.cookie != '') {
-                                var cookies = document.cookie.split(';');
-                                for (var i = 0; i < cookies.length; i++) {
-                                    var cookie = jQuery.trim(cookies[i]);
-                                    // Does this cookie string begin with the name we want?
-                                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                        break;
-                                    }
-                                }
-                            }
-
-                            return cookieValue;
-                        }
-                        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                            // Only send the token to relative URLs i.e. locally.
-                            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-                        }
-                    }
-                });
-            }
-            window.addCSRFHeader = addCSRFHeader;
-            addCSRFHeader($);                                        
-        });
-    </script>
-
     <script type="text/javascript" src="{% url js_i18n_catalog %}"></script>
     <script src="{% url profiles:rpc_api %}" type="text/javascript"></script>  
-
     {% block scripts %}{% endblock %}
-
-    <title>{% block title %}Universal Subtitles - {% trans 'Transcribe, caption, translate, and subtitle videos.' %}{% endblock %}</title>
-
-    {% if not DEBUG %}
-        <script type="text/javascript">
-            var _gaq = _gaq || [];
-            _gaq.push(['_setAccount', '{{ GOOGLE_ANALYTICS_NUMBER }}']);
-            _gaq.push(['_setDomainName', '.universalsubtitles.org']);    
-            _gaq.push(['_trackPageview']);
-            {% if not RUN_LOCALLY %}
-                {% block analytics %}{% endblock %}
-                (function() {
-                    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                })();
-            {% endif %}
-        </script>
-    {% endif %}
-
     <script type="text/javascript">
         jQuery(function($){
-
             {% block oldmodal %}
                 $.mod();
                 $.metadata.setType("attr", "data");
             {% endblock %}
-                
-            $('#closeBut').click(function(){
-                $('#messages').remove();
-                return false;
-            });
-
-            $('li.search input').keypress(function(e) {
-                if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-                    $('li.search form').submit();
-                    return false;
-                }
-                else
-                    return true;
-            });
-            
-            jQuery.Rpc.on('exception', function(e){
-                jQuery.jGrowl.error(e.message);
-            });
         });
     </script>
-
-    {% block opengraph-head %}
-        <meta property="fb:admins" content="539835590"/>
-    {% endblock  %}
 
     {% if DEBUG %}
         <script src="/site_media/js/highlight.min.js"></script>
@@ -144,15 +67,7 @@
 </head>
 
 <body {% block body_attrs %}{% endblock %}>
-
     {% csrf_token %}
-
-    {% comment %}
-        <!--[if lte IE 6]>
-            <div class="note"><strong>{% trans 'Universal Subtitles does not support your browser. Upgrade your browser or <a href="http://getfirefox.com">Try Firefox</a>.' %}</strong></div>
-        <![endif]-->
-    {% endcomment %}
-
     {% announcement %}
     {% if user.is_authenticated %}
         {% messages %}
@@ -160,9 +75,7 @@
             {% email_confirmation_notification %}
         {% endblock %}
     {% endif %}
-
     {% require_email_dialog %}
-
     <div id="main_bar">
         <div id="bar_wrap" class="clearfix">
             <h1><a href="/">Universal Subtitles</a></h1>
@@ -175,11 +88,6 @@
                 <ul id="bar_menu" class="clearfix">
                     <li id="nav_submit"><a href="{% url videos:create %}">{% trans 'Subtitle Videos' %}</a></li>
                     <li><a href="{% url videos:watch_page %}">{% trans 'Watch' %}</a></li>
-                    {% comment %}
-                        <li><a href="http://blog.universalsubtitles.org">{% trans 'Contribute' %}</a></li>
-                        <li><a href="http://blog.universalsubtitles.org">{% trans 'Solutions' %}</a></li>
-                        <li><a href="http://blog.universalsubtitles.org">{% trans 'Follow' %}</a></li>
-                    {% endcomment %}
                     <li><a href="http://blog.universalsubtitles.org/volunteer/">{% trans "Volunteer" %}</a></li>
                     <li><a href="{% url services_page %}">{% trans "Services" %}</a></li>
                     <li><a href="#" id="help_link"><span>{% trans 'Help' %}</span></a></li>
@@ -192,13 +100,11 @@
             </div>
         </div>
     </div>
-
     <div id="lang_bar">
         {% block select_language_dialog %}
             {% select_language_dialog %}
         {% endblock %}
     </div>
-
     <div class="content container_12 wrapper clearfix">
         {% if messages %}
             <div id="messages">
@@ -210,7 +116,6 @@
         {% endif %}
         {% block main_content %}{% endblock %}
     </div>
-
     <div class="footer">
         <div class="floatleft">
             {% trans 'Universal Subtitles is a project of <a href="http://participatoryculture.org/">PCF</a>.' %}  
@@ -242,17 +147,32 @@
             {% block page_controls %}{% endblock %}
         </div>
     {% endif %}
-
     {% block bottom_scripts %}{% endblock %}
 
-    {% if not RUN_LOCALLY %}
-        <script type="text/javascript" charset="utf-8">
-            Tender = {
-            hideToggle: true,
-            widgetToggles: [document.getElementById('help_link')]
-        }
-        </script>
+    {% if not DEBUG %}
+        {% if not RUN_LOCALLY %}
+            <script type="text/javascript" charset="utf-8">
+                Tender = {
+                    hideToggle: true,
+                    widgetToggles: [document.getElementById('help_link')]
+                }
+            </script>
+        {% endif %}
         <script src="https://universalsubtitles.tenderapp.com/tender_widget.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', '{{ GOOGLE_ANALYTICS_NUMBER }}']);
+            _gaq.push(['_setDomainName', '.universalsubtitles.org']);    
+            _gaq.push(['_trackPageview']);
+            {% if not RUN_LOCALLY %}
+                {% block analytics %}{% endblock %}
+                (function() {
+                    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                })();
+            {% endif %}
+        </script>
     {% endif %}
 
 </body>
