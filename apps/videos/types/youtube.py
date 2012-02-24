@@ -21,7 +21,7 @@ from gdata.service import RequestError
 import re
 import httplib2
 from utils import YoutubeXMLParser
-from utils.language_codes  import LanguageCode
+from libs.unilangs import LanguageCode
 from base import VideoType, VideoTypeError
 from auth.models import CustomUser as User
 from datetime import datetime
