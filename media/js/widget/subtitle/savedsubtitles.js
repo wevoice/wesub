@@ -61,7 +61,7 @@ unisubs.widget.SavedSubtitles.deserialize = function(json) {
             obj['sessionPK'], 
             new unisubs.subtitle.EditableCaptionSet(
                 obj['captionSet'], obj['isComplete'], obj['title'], 
-                obj['forked']));
+                obj['forked'], obj['description']));
     }
     else {
         return null;
