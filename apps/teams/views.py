@@ -64,6 +64,7 @@ from teams.tasks import (
 )
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
+from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
 from videos import metadata_manager
@@ -1325,19 +1326,23 @@ def add_project(request, slug):
         workflow_form = WorkflowForm(request.POST)
 
         if form.is_valid() and workflow_form.is_valid():
-            project = form.save(commit=False)
-            project.team = team
-            project.save()
 
-            if project.workflow_enabled:
-                workflow = workflow_form.save(commit=False)
-                workflow.team = team
-                workflow.project = project
-                workflow.save()
+            if team.project_set.filter(slug=pan_slugify(form.cleaned_data['name'])).exists():
+                messages.error(request, _(u"There's already a project with this name"))
+            else:
+                project = form.save(commit=False)
+                project.team = team
+                project.save()
 
-            messages.success(request, _(u'Project added.'))
-            return HttpResponseRedirect(
-                    reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
+                if project.workflow_enabled:
+                    workflow = workflow_form.save(commit=False)
+                    workflow.team = team
+                    workflow.project = project
+                    workflow.save()
+
+                messages.success(request, _(u'Project added.'))
+                return HttpResponseRedirect(
+                        reverse('teams:settings_projects', args=[], kwargs={'slug': slug}))
     else:
         form = ProjectForm()
         workflow_form = WorkflowForm()
