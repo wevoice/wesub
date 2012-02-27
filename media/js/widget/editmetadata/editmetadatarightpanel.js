@@ -38,7 +38,7 @@ unisubs.editmetadata.RightPanel = function(dialog,
     unisubs.RightPanel.call(this,  serverModel, helpContents, extraHelp,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
-    this.showSaveExit = false;
+    this.showSaveExit = true;
     this.showDoneButton = true;
     if (reviewOrApprovalType ){
         this.showDoneButton = false;
