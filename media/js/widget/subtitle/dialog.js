@@ -488,7 +488,8 @@ unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.captionManager_,
             null,
             true, 
-            this.reviewOrApprovalType_
+            this.reviewOrApprovalType_,
+            this
         );
 };
 unisubs.subtitle.Dialog.prototype.nextState_ = function() {

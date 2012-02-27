@@ -235,7 +235,18 @@ unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
     }
 };
 unisubs.subtitle.SyncPanel.prototype.currentlyEditingSubtitle_ = function() {
-    return this.subtitleList_.isCurrentlyEditing();
+    var inSublist =  this.subtitleList_.isCurrentlyEditing() ;
+    if (inSublist){
+        return true;
+    }
+    // focus could be on the review notes text area
+    // TODO: use this as an authoritative way to determine if subs are being edited
+    if (document.activeElement ){
+        var tagName  = document.activeElement.tagName.toLowerCase() ;
+        if (tagName  == 'input' || tagName == 'textarea'){
+            return true;
+        }
+    }
 };
 unisubs.subtitle.SyncPanel.prototype.captionReached_ = function(event) {
     var editableCaption = event.caption;
