@@ -109,7 +109,7 @@ unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var reviewOrApproval = true;
     var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
-        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
+        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_, true);
     var KC = goog.events.KeyCodes;
     var keySpecs = [];
     if (! internalComponents){

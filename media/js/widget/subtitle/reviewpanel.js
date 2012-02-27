@@ -41,7 +41,7 @@ unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal =
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var keySpecs = [];
     var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
-        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
+        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_, false);
     if (! internalComponents){
         keySpecs = this.makeKeySpecsInternal();
         internalComponents = {

@@ -420,12 +420,12 @@ unisubs.RightPanel.GoToStepEvent = function(stepNo) {
 * Returns a json object with the title, help contents and extraHelp needed to populate this
 * panel for review
 */
-unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, currentStep){
+unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, currentStep, isOriginal){
     // return as a json literal, else the closure compiler will mangle this
     var bodyInput = $d('textarea', {'class': 'unisubs-review-notes', 'id': 'unisubs-review-notes', 'name': 'notes'});
 
     
-    var title = "Review this translation";
+    var title = isOriginal? "Review subtitles": "Review this translation";
     var helpContents = new unisubs.RightPanel.HelpContents(title, [
         $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
         $d('p', {}, "Once you're finished reviewing, you can either ",
@@ -460,9 +460,10 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
 * Returns a json object with the title, help contents and extraHelp needed to populate this
 * panel for approval.
 */
-unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, currentStep){
+unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, currentStep, isOriginal){
     // return as a json literal, else the closure compiler will mangle this
-    var  title   = "Approve this translation";
+    
+    var title = isOriginal? "Approve subtitles": "Approve this translation";
     var bodyInput = $d('textarea', {'class': 'unisubs-approve-notes', 'id': 'unisubs-approve-notes', 'name': 'notes'});
 
 
@@ -498,11 +499,11 @@ unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, cu
     };
 }
 
-unisubs.RightPanel.createInternalContentsReviewOrApproval = function($d, reviewOrApprovalType, numSteps, currentStep){
+unisubs.RightPanel.createInternalContentsReviewOrApproval = function($d, reviewOrApprovalType, numSteps, currentStep, isOriginal){
     if (reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL.REVIEW){
-        return unisubs.RightPanel.createInternalContentsForReview($d, numSteps, currentStep)
+        return unisubs.RightPanel.createInternalContentsForReview($d, numSteps, currentStep, isOriginal)
     }else if(reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL){
-        return unisubs.RightPanel.createInternalContentsForApproval($d, numSteps, currentStep);
+        return unisubs.RightPanel.createInternalContentsForApproval($d, numSteps, currentStep, isOriginal);
     }
     return null;
 }
