@@ -102,6 +102,46 @@ When I say what's the relation,
 is it greater than or is
 '''
 
+SRT_TEXT_WITH_TRAILING_SPACE = u'''1 
+00:00:10,000 --> 00:00:14,000
+Merci. Félicitations aux étudiants 
+[de l'association Libertés Numériques -- NdR]
+
+
+
+2 
+00:00:14,100 --> 00:00:16,000
+d’avoir organisé cette réunion.
+
+
+
+3 
+00:00:16,100 --> 00:00:19,900
+Ils ont eu raison, non seulement 
+à cause de la célébrité de Richard
+
+
+
+4
+00:00:20,000 --> 00:00:22,200
+mais aussi parce que les sujets 
+nous intéressent beaucoup. 
+
+
+
+5
+00:00:22,300 --> 00:00:25,000
+Ils nous intéressent particulièrement 
+ici à Sciences Po 
+
+
+
+6
+00:00:25,100 --> 00:00:29,200
+puisque nous essayons d’abord 
+d’étudier les controverses
+'''
+
 
 TXT_TEXT = u'''Here is sub 1.
 
@@ -295,6 +335,24 @@ class SubtitleParserTest(TestCase):
         self.assertEqual(-1, result[1]['start_time'])
         self.assertEqual(-1, result[1]['end_time'])
         self.assertEqual('Here is sub 2.', result[1]['subtitle_text'])
+
+    def test_srt_with_trailing_spaces(self):
+        parser = SrtSubtitleParser(SRT_TEXT_WITH_TRAILING_SPACE)
+        result = list(parser)
+
+        self.assertEqual(6, len(result))
+
+        # making sure that the lines that have trailing spaces are
+        # being parsed
+        self._assert_sub(
+            result[0], 10.0, 14.0,
+            u'Merci. Félicitations aux étudiants \n[de l\'association Libertés Numériques -- NdR]')
+        self._assert_sub(
+            result[1], 14.1, 16,
+            u'd’avoir organisé cette réunion.')
+        self._assert_sub(                       
+            result[2], 16.1, 19.9,
+            u'Ils ont eu raison, non seulement \nà cause de la célébrité de Richard')
 
 class WebUseTest(TestCase):
     def _make_objects(self):
