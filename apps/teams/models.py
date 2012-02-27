@@ -1375,7 +1375,7 @@ class Task(models.Model):
             )
             comment.save()
             notifier.send_video_comment_notification(comment.pk,
-                                    version=self.subtitle_version.pk)
+                                    version_pk=self.subtitle_version.pk)
 
     def future(self):
         """Return whether this task expires in the future."""
