@@ -1635,6 +1635,10 @@ class Task(models.Model):
 
 
     def save(self, update_team_video_index=True, *args, **kwargs):
+        if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']):
+            assert self.subtitle_version, \
+                   "Review and Approve tasks must have a subtitle_version!"
+
         result = super(Task, self).save(*args, **kwargs)
         if update_team_video_index:
             update_one_team_video.delay(self.team_video.pk)
