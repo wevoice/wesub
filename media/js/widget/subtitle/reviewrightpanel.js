@@ -91,7 +91,7 @@ unisubs.subtitle.ReviewRightPanel.prototype.appendCustomButtonsInternal = functi
         return;
     }
     var buttonText = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ? 
-        'Approve' : 'Review';
+        'Approve' : 'Accept';
 
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
     this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
