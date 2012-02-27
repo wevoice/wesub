@@ -1372,7 +1372,8 @@ class Task(models.Model):
                 content_type=lang_ct,
                 submit_date=self.completed,
                 user=self.assignee,
-            ).save()
+            )
+            comment.save()
             notifier.send_video_comment_notification(comment.pk,
                                     version=self.subtitle_version.pk)
 
