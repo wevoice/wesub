@@ -1903,9 +1903,15 @@ pre.dump code {
   padding-top: 2em;
 }
 
-#teams .context #signin-join {
+#teams .context .join.button {
   display: block;
   margin: 1em;
+}
+#teams .context .join.button img {
+  max-height: 24px;
+}
+#teams .context .join.button * {
+  vertical-align: middle;
 }
 
 #teams .context .notation {

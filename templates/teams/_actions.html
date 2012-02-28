@@ -1,22 +1,29 @@
 {% load i18n teams_tags %}
 
-<div class="join">
 {% if not team|is_team_member:user %}
-    {% if user.is_authenticated %}
-        {% if team.is_open %}
-            {% render_team_join team %}
-        {% endif %}
-        {% if team.is_by_application %}
-            {% if not team|has_applicant:user %}
-                {% include "teams/_application_form.html" %}
+    <div class="join">
+        {% if user.is_authenticated %}
+            {% if team.is_open %}
+                {% render_team_join team %}
+            {% endif %}
+            {% if team.is_by_application %}
+                {% if not team|has_applicant:user %}
+                    {% include "teams/_application_form.html" %}
+                {% else %}
+                    <p class="action-replacement">{% trans "Your application is pending" %}</p>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            {% if team.auth_provider %}
+                <a href="{{ team.auth_provider.url }}" class="join button primary reduced">
+                    {% trans 'Join via' %}
+                    <img src="{{ team.auth_provider.image_url }}" alt="{{ team.auth_provider.verbose_name }}"/>
+                </a>
             {% else %}
-                <p class="action-replacement">{% trans "Your application is pending" %}</p>
+                <a id="signin-join" class="join button primary" href="{% url auth:login %}?next={% url teams:join_team team.slug %}">{% trans "Join Team" %}</a>
             {% endif %}
         {% endif %}
-    {% else %}
-        <a id="signin-join" class="button primary" href="{% url auth:login %}?next={% url teams:join_team team.slug %}">{% trans "Join Team" %}</a>
-    {% endif %}
+    </div>
 {% endif %}
-</div>
 
 <p class="notation">{% trans "Want to create your own subtitling team? Contact Dean Jansen" %}, <a href="mailto:dean@pculture.org">dean@pculture.org</a></p>
