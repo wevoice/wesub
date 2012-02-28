@@ -176,6 +176,53 @@ var Site = function(Site) {
         },
         members_list: function() {
             site.Utils.resetLangFilter();
+        },
+        video_view: function() {
+            $('.tabs').tabs();
+
+            $('.add_subtitles').click(function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
+                return false;
+            });
+            $('.add-translation-behavior').click(function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
+                return false;
+            });
+            $('.edit-title').click( function() {
+                $('#edit-title-dialog .title-input').val($('.title-container').html());
+            });
+            $('#edit-title-dialog .save-title').click(function() {
+                var title = $('#edit-title-dialog .title-input').val();
+                if (title) {
+                    $('.title-container').html(title).hide().fadeIn();
+                    VideosApi.change_title_video(window.VIDEO_ID, title, function(response) {
+                        if (response.error) {
+                            $.jGrowl.error(response.error);
+                        } else {
+                            $('.title-container').html(title);
+                            document.title = title + ' | Universal Subtitles';
+                        }
+                    });
+                    $('#edit-title-dialog').modClose();
+                } else {
+                    $.jGrowl.error(window.TITLE_ERROR);
+                }
+            });
+
+            unisubs.messaging.simplemessage.displayPendingMessages();
+
+            if (window.TASK) {
+                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
+                var opener = new unisubs.widget.SubtitleDialogOpener(
+                                     window.TASK_TEAM_VIDEO_ID,
+                                     window.TASK_TEAM_VIDEO_URL,
+                                     videoSource,
+                                     null,
+                                     null);
+                opener.showStartDialog();
+            }
         }
     };
 };
