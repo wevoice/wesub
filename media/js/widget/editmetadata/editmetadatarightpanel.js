@@ -124,12 +124,12 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
         }
     };
 
-    var data = {
-        'task_id': unisubs.task_id,
-        'body': goog.dom.forms.getValue(this.notesInput_),
-        'approved': approvalCode
-    }
-    this.serverModel_.finishApproveOrReview(data, actionName == 'review', successCallback, failureCallback);
+    // set the servel models vars to finishe this, the taskId and taskType were
+    // set when retrieving the task data
+    this.serverModel_.setTaskNotes(goog.dom.forms.getValue(this.notesInput_));
+    this.serverModel_.setTaskApproved(approvalCode)
+    this.serverModel_.finish(successCallback, failureCallback);
+
 };
 
 unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {

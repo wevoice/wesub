@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block body_attrs %}id="teams" class="v1"{% endblock %}
+{% block html_attrs %}id="members_list"{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -23,19 +24,7 @@
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         window.roleSavedURL = '{% url teams:role_saved team.slug %}';
-
-        $(function() {
-            // Handle weird back-button issue with browsers.
-            $select = $('select#lang-filter');
-            {% if request.GET.lang %}
-                $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
-            {% else %}
-                $opt = $('option[id="lang-opt-any"]');
-            {% endif %}
-            $select.children().removeAttr('selected');
-            $opt.attr('selected', 'selected');
-            $select.trigger('liszt:updated');
-        });
+        window.request_get_lang = '{{ request.GET.lang }}';
     </script>
 {% endblock %}
 
