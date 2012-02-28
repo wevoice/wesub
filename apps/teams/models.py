@@ -33,12 +33,13 @@ from haystack.query import SQ
 import teams.moderation_const as MODERATION
 from apps.comments.models import Comment
 from auth.models import CustomUser as User
+from auth.providers import get_authentication_provider
 from messages import tasks as notifier
 from messages.models import Message
 from teams.moderation_const import WAITING_MODERATION
 from teams.permissions_const import (
-    TEAM_PERMISSIONS, PROJECT_PERMISSIONS, LANG_PERMISSIONS, ROLE_OWNER,
-    ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+    TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
+    ROLE_CONTRIBUTOR
 )
 from teams.tasks import update_one_team_video
 from utils import DEFAULT_PROTOCOL
@@ -137,6 +138,9 @@ class Team(models.Model):
     is_moderated = models.BooleanField(default=False)
     header_html_text = models.TextField(blank=True, default='', help_text=_(u"HTML that appears at the top of the teams page."))
     last_notification_time = models.DateTimeField(editable=False, default=datetime.datetime.now)
+
+    auth_provider_code = models.CharField(_(u'authentication provider code'),
+            max_length=24, blank=True, default="")
 
     # Enabling Features
     projects_enabled = models.BooleanField(default=False)
@@ -247,6 +251,17 @@ class Team(models.Model):
         """
         return Workflow.get_for_target(self.id, 'team')
 
+    @property
+    def auth_provider(self):
+        """Return the authentication provider class for this Team, or None.
+
+        No DB queries are used, so this is safe to call many times.
+
+        """
+        if not self.auth_provider_code:
+            return None
+        else:
+            return get_authentication_provider(self.auth_provider_code)
 
     # Thumbnails
     def logo_thumbnail(self):
