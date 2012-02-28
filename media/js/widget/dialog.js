@@ -304,6 +304,10 @@ unisubs.Dialog.MODERATION_OUTCOMES = {
     SEND_BACK: 30
 };
 
+unisubs.Dialog.prototype.getTeamGuidelineForReview = function () {
+    var name = this.isApproval() ? 'approval' : 'review'; 
+    return unisubs.guidelines[name];
+}
 
 unisubs.Dialog.prototype.isApproval = function(){
     return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL;
