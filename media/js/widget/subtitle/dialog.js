@@ -126,7 +126,8 @@ unisubs.subtitle.Dialog.prototype.enterDocument = function() {
         if (this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL){
             func = this.serverModel_.fetchApproveData;
         }
-        func(unisubs.task_id, function(body) {
+        // make sure we retain the correct scope
+        func.call(this.serverModel_, unisubs.task_id, function(body) {
             that.onNotesFetched_(body);
         });
     }
