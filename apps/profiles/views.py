@@ -33,7 +33,7 @@ from profiles.rpc import ProfileApiClass
 from utils.amazon import S3StorageError
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
-from videos.models import Action, SubtitleLanguage
+from videos.models import Action, SubtitleLanguage, VideoUrl
 
 
 rpc_router = RpcRouter('profiles:rpc_router', {
@@ -81,9 +81,26 @@ class OptimizedQuerySet(LoadRelatedQuerySet):
 @login_required
 def dashboard(request):
     user = request.user
+
+    tasks = user.open_tasks()
+
+    widget_settings = {}
+    from apps.widget.rpc import add_general_settings
+    add_general_settings(request, widget_settings)
+
+    # For perform links on tasks
+    video_pks = [t.team_video.video_id for t in tasks]
+    video_urls = dict([(vu.video_id, vu.effective_url) for vu in
+                       VideoUrl.objects.filter(video__in=video_pks, primary=True)])
+
+    for t in tasks:
+        t.cached_video_url = video_urls.get(t.team_video.video_id)
+
     context = {
         'user_info': user,
-        'action_list': Action.objects.for_user(user)[:5]
+        'action_list': Action.objects.for_user(user)[:5],
+        'tasks': tasks,
+        'widget_settings': widget_settings,
     }
 
     return direct_to_template(request, 'profiles/dashboard.html', context)

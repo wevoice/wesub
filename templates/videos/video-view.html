@@ -11,20 +11,20 @@
     {% include_bundle "widget-css"%}
 {% endblock %}
 
-{% block scripts %}
-    {{ block.super }}
-    {% include_bundle "unisubs-onsite-compiled" %}
-    <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
-    {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
+    {% block scripts %}
+        {{ block.super }}
+        {% include_bundle "unisubs-onsite-compiled" %}
+        <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
+        {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
 
-    <script type="text/javascript">
-        window.VIDEO_ID = '{{ video.pk }}';
-        window.TITLE_ERROR = '{% trans "Enter non-empty title" %}';
-        window.TASK = '{% firstof task '' %}';
-        window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
-        window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
-    </script>
-{% endblock %}
+        <script type="text/javascript">
+            window.VIDEO_ID = '{{ video.pk }}';
+            window.TITLE_ERROR = '{% trans "Enter non-empty title" %}';
+            window.TASK = '{% firstof task '' %}';
+            window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
+            window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
+        </script>
+    {% endblock %}
 
 {% block title %}
     "{{ video.title_display }}" | Universal Subtitles
