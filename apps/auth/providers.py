@@ -79,4 +79,6 @@ class SampleAuthProvider(AuthenticationProvider):
     def image_url(self):
         return 'http://placekitten.com/200/200/'
 
-# add_authentication_provider(SampleAuthProvider)
+add_authentication_provider(SampleAuthProvider())
+
+
