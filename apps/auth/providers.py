@@ -23,9 +23,15 @@ if not hasattr(settings, 'AUTHENTICATION_PROVIDER_REGISTRY'):
     settings.AUTHENTICATION_PROVIDER_REGISTRY = {}
 
 def add_authentication_provider(ap_instance):
-    if ap_instance.code in settings.AUTHENTICATION_PROVIDER_REGISTRY:
-        if settings.AUTHENTICATION_PROVIDER_REGISTRY[ap_instance.code] != ap_instance:
+    existing_ap = settings.AUTHENTICATION_PROVIDER_REGISTRY.get(ap_instance.code)
+    if existing_ap:
+        if existing_ap.verbose_name != ap_instance.verbose_name:
             assert False, "Authentication provider code collision!"
+        else:
+            # Assume that if we're adding a provider with the same code and
+            # verbose_name as an existing one that it's Python's importing being
+            # silly and not a real collision.
+            return
 
     settings.AUTHENTICATION_PROVIDER_REGISTRY[ap_instance.code] = ap_instance
 
