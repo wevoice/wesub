@@ -639,7 +639,7 @@ class Rpc(BaseRpc):
             task.subtitle_version.language.release_writelock()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                user_message =  'These subtitles have been approved and your notes have been sent to the author.'
+                user_message =  'These subtitles have been accepted and your notes have been sent to the author.'
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
                 user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
             else:
