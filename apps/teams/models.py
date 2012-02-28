@@ -629,10 +629,10 @@ class TeamVideo(models.Model):
 
     def get_thumbnail(self):
         if self.thumbnail:
-            return self.thumbnail.thumb_url(100, 100)
+            return self.thumbnail.thumb_url(290, 165)
 
         if self.video.thumbnail:
-            th = self.video.get_thumbnail()
+            th = self.video.get_medium_thumbnail()
             if th:
                 return th
 
