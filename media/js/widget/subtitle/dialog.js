@@ -391,7 +391,14 @@ unisubs.subtitle.Dialog.prototype.enterState_ = function(state) {
 
 unisubs.subtitle.Dialog.prototype.showGuidelinesForState_ = function(state) {
     var s = unisubs.subtitle.Dialog.State_;
-    if (state !== s.TRANSCRIBE || !unisubs.guidelines['subtitle']) {
+    // the same dialog can be used in transcribing or review approval, which guidelines should we use?
+    var guideline = this.reviewOrApprovalType_ ? this.getTeamGuidelineForReview() : unisubs.guidelines['subtitle'];
+    // guidelines should only be shown in the first step, which is transcribe for non review, or sync for review:
+    var firstStep = s.TRANSCRIBE;
+    if (this.reviewOrApprovalType_){
+        firstStep = s.SYNC;
+    }
+    if (state !== firstStep || !guideline) {
         this.setState_(state);
         return;
     }
@@ -399,7 +406,8 @@ unisubs.subtitle.Dialog.prototype.showGuidelinesForState_ = function(state) {
     this.suspendKeyEvents_(true);
     this.getVideoPlayerInternal().pause();
 
-    var guidelinesPanel = new unisubs.GuidelinesPanel(unisubs.guidelines['subtitle']);
+    
+    var guidelinesPanel = new unisubs.GuidelinesPanel(guideline);
     this.showTemporaryPanel(guidelinesPanel);
     this.displayingGuidelines_ = true;
 
