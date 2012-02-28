@@ -56,7 +56,7 @@
                             {% trans 'for' %}
                             <a href="{{ task.team_video.video.get_absolute_url }}" title="View video"><em>{{ task.team_video|truncatewords:8 }}</em></a>
 
-                            ({% include "teams/_perform_task_link.html" %})
+                            <br />({% include "teams/_perform_task_link.html" %})
 
                         </p>
                     </li>
