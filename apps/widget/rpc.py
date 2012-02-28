@@ -348,7 +348,8 @@ class Rpc(BaseRpc):
     def finished_subtitles(self, request, session_pk, subtitles=None,
                            new_title=None, completed=None,
                            forked=False,
-                           throw_exception=False, new_description=None):
+                           throw_exception=False, new_description=None,
+                           task_id=None, task_notes=None, task_approved=None, task_type=None):
         session = SubtitlingSession.objects.get(pk=session_pk)
         if not request.user.is_authenticated():
             return { 'response': 'not_logged_in' }
@@ -361,11 +362,26 @@ class Rpc(BaseRpc):
             raise Exception('purposeful exception for testing')
 
         return self.save_finished(
-            request.user, session, subtitles, new_title, completed, forked, new_description)
+            request, request.user, session, subtitles, new_title, completed,
+            forked, new_description, task_id, task_notes, task_approved, task_type)
 
-    def save_finished(self, user, session, subtitles, new_title=None,
-                      completed=None, forked=False, new_description=None):
+    def save_finished(self, request, user, session, subtitles, new_title=None,
+                      completed=None, forked=False, new_description=None,
+                      task_id=None, task_notes=None, task_approved=None, task_type=None):
+        # TODO: lock all this in a transaction please!
+        
         language = session.language
+        # if this belongs to a task finish it:
+        if task_id:
+            res = {
+                "review": self._finish_review,
+                "approve": self._finish_approve
+            }[task_type](request, task_id, task_notes, task_approved)
+            # if the task did not succeeded, just bail out
+            if not res.get('response', 'ok'):
+                return res
+                
+            
         new_version = None
         if subtitles is not None and \
                 (len(subtitles) > 0 or language.latest_version(public_only=False) is not None):
@@ -622,7 +638,10 @@ class Rpc(BaseRpc):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
 
-    def finish_review(self, request, task_id=None, body=None, approved=None):
+    def _finish_review(self, request, task_id=None, body=None, approved=None):
+        """
+        Should be called as a first step when finishing subs in a task.
+        """
         data = {'task': task_id, 'body': body, 'approved': approved}
 
         form = FinishReviewForm(request, data)
@@ -655,7 +674,10 @@ class Rpc(BaseRpc):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
 
-    def finish_approve(self, request, task_id=None, body=None, approved=None):
+    def _finish_approve(self, request, task_id=None, body=None, approved=None):
+        """
+        Should be called as a first step before saving subs in a task.
+        """
         data = {'task': task_id, 'body': body, 'approved': approved}
 
         form = FinishApproveForm(request, data)
