@@ -60,7 +60,7 @@ from teams.search_indexes import TeamVideoLanguagesIndex
 from teams.signals import api_teamvideo_new
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
-    update_video_moderation
+    update_video_moderation, update_one_team_video
 )
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
@@ -1443,6 +1443,7 @@ def _create_task_after_unpublishing(subtitle_version):
 
     return task
 
+
 def _propagate_unpublish_to_external_services(language_pk):
     """Push the 'unpublishing' of subs to third-party providers for the given language.
 
@@ -1477,6 +1478,33 @@ def _propagate_unpublish_to_external_services(language_pk):
         # entirely, since we know that all the subs we have are bad.
         _delete_captions_in_original_service(language_pk)
 
+def _propagate_unpublish_to_tasks(team_video, language_pk, language_code):
+    """Push the 'unpublishing' of a language to any tasks applying to it.
+
+    The unpublishing must be fully complete before this function is called.
+
+    """
+    try:
+        language = SubtitleLanguage.objects.get(pk=language_pk)
+        if language and language.latest_version(public_only=False):
+            # Don't kill any tasks if there are still versions remaining.
+            return
+    except SubtitleLanguage.DoesNotExist:
+        pass
+
+    tasks_to_delete = team_video.task_set.not_deleted()
+
+    # If there is still no original language left, we can just delete all the
+    # tasks for this video because someone deleted everything.
+    #
+    # If there *is* an original language left, we just delete tasks for the
+    # languages that were unpublished.
+    if team_video.video.subtitle_language():
+        tasks_to_delete = tasks_to_delete.filter(language=language_code)
+
+    tasks_to_delete.update(deleted=True)
+
+
 def unpublish(request, slug):
     team = get_object_or_404(Team, slug=slug)
 
@@ -1493,25 +1521,27 @@ def unpublish(request, slug):
 
     results = []
     if scope == 'version':
-        results.append([version.language.pk,
+        results.append([version.language.pk, version.language.language,
                         version.unpublish(delete=should_delete)])
     elif scope == 'dependents':
         translations = list(SubtitleLanguage.objects.filter(video=language.video,
                                                             standard_language=language,
                                                             is_forked=False))
         for l in [language] + translations:
-            results.append([l.pk,
+            results.append([l.pk, l.language,
                             l.unpublish(delete=should_delete)])
     else:
         assert False, 'Invalid scope.'
 
-    for language_pk, version_for_task in results:
+    for language_pk, language_code, version_for_task in results:
         _propagate_unpublish_to_external_services(language_pk)
+        _propagate_unpublish_to_tasks(team_video, language_pk, language_code)
 
         if version_for_task:
             _create_task_after_unpublishing(version_for_task)
 
     metadata_manager.update_metadata(team_video.video.pk)
+    update_one_team_video(team_video.pk)
 
     messages.success(request, _(u'Successfully unpublished subtitles.'))
     return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
@@ -1557,8 +1587,8 @@ def delete_video(request, team_video_pk):
     else:
         messages.success(request, msg)
         return HttpResponseRedirect(next)
-   
-    
+
+
 @login_required
 def auto_captions_status(request, slug):
     """
