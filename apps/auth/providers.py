@@ -16,22 +16,25 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.conf import settings
 
-authentication_provider_registry = {}
 
-def add_authentication_provider(ap_class):
-    if ap_class.code in authentication_provider_registry:
-        if authentication_provider_registry[ap_class.code] != ap_class:
+if not hasattr(settings, 'AUTHENTICATION_PROVIDER_REGISTRY'):
+    settings.AUTHENTICATION_PROVIDER_REGISTRY = {}
+
+def add_authentication_provider(ap_instance):
+    if ap_instance.code in settings.AUTHENTICATION_PROVIDER_REGISTRY:
+        if settings.AUTHENTICATION_PROVIDER_REGISTRY[ap_instance.code] != ap_instance:
             assert False, "Authentication provider code collision!"
 
-    authentication_provider_registry[ap_class.code] = ap_class
+    settings.AUTHENTICATION_PROVIDER_REGISTRY[ap_instance.code] = ap_instance
 
 def get_authentication_provider(key):
-    return authentication_provider_registry.get(key)
+    return settings.AUTHENTICATION_PROVIDER_REGISTRY.get(key)
 
 def get_authentication_provider_choices():
     choices = []
-    for provider in authentication_provider_registry.values():
+    for provider in settings.AUTHENTICATION_PROVIDER_REGISTRY.values():
         choices.append((provider.code, provider.verbose_name))
     return choices
 
@@ -46,9 +49,8 @@ class AuthenticationProvider(object):
 
     * A verbose_name attribute, for admin labels.
 
-    * A url() method, which takes a TeamMember object and a "next" URL, and
-      returns the URL we should send the user to where they can log in with the
-      provider.
+    * A url() method, which takes a "next" URL, and returns the URL we should
+      send the user to where they can log in with the provider.
 
     * An image_url() method, which returns the URL for an image we should
       display to the user when they're deciding whether or not to continue and
@@ -71,7 +73,7 @@ class SampleAuthProvider(AuthenticationProvider):
     code = 'sample'
     verbose_name = 'Sample Provider'
 
-    def url(self, member, next=None):
+    def url(self, next=None):
         return 'http://example.com/'
 
     def image_url(self):
