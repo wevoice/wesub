@@ -38,7 +38,7 @@ unisubs.editmetadata.RightPanel = function(dialog,
     unisubs.RightPanel.call(this,  serverModel, helpContents, extraHelp,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
-    this.showSaveExit = false;
+    this.showSaveExit = true;
     this.showDoneButton = true;
     if (reviewOrApprovalType ){
         this.showDoneButton = false;
@@ -140,7 +140,7 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
     this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
     var buttonText = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ? 
-        'Approve' : 'Review';
+        'Approve' : 'Accept';
     this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, buttonText);
 
     el.appendChild(this.sendBackButton_);
