@@ -1,4 +1,4 @@
-var Site = function() {
+var Site = function(Site) {
 
     this.init = function() {
 
@@ -15,8 +15,21 @@ var Site = function() {
         if (this.$html.attr('id')) {
             this.Views[this.$html.attr('id')]();
         }
-    };
 
+    };
+    this.Utils = {
+        resetLangFilter: function() {
+            $select = $('select#lang-filter');
+            if (window.request_get_lang) {
+                $opt = $('option[id="lang-opt-' + window.request_get_lang + '"]');
+            } else {
+                $opt = $('option[id="lang-opt-any"]');
+            }
+            $select.children().removeAttr('selected');
+            $opt.attr('selected', 'selected');
+            $select.trigger('liszt:updated');
+        }
+    };
     this.Views = {
         base: function() {
 
@@ -160,11 +173,14 @@ var Site = function() {
         },
         home: function() {
 
+        },
+        members_list: function() {
+            site.Utils.resetLangFilter();
         }
     };
 };
 
 $(function() {
-    window.Site = new Site();
-    window.Site.init();
+    window.site = new Site();
+    window.site.init();
 });
