@@ -1909,6 +1909,7 @@ pre.dump code {
 }
 #teams .context .join.button img {
   max-height: 24px;
+  margin-left: 4px;
 }
 #teams .context .join.button * {
   vertical-align: middle;
