@@ -210,9 +210,6 @@ var Site = function(Site) {
                     $.jGrowl.error(window.TITLE_ERROR);
                 }
             });
-
-            unisubs.messaging.simplemessage.displayPendingMessages();
-
             if (window.TASK) {
                 var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
                 var opener = new unisubs.widget.SubtitleDialogOpener(
@@ -223,6 +220,8 @@ var Site = function(Site) {
                                      null);
                 opener.showStartDialog();
             }
+
+            unisubs.messaging.simplemessage.displayPendingMessages();
         }
     };
 };
