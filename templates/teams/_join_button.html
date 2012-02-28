@@ -1,2 +1,2 @@
 {% load i18n %}
-<a id="join" class="button primary" onclick="return confirm('{% trans "Do you really wish to join this team?" %}')" href="{% url teams:join_team team.slug %}">{% trans "Join this team now!" %}</a>
+<a id="join" class="join button primary" onclick="return confirm('{% trans "Do you really wish to join this team?" %}')" href="{% url teams:join_team team.slug %}">{% trans "Join this team now!" %}</a>

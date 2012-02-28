@@ -1886,9 +1886,18 @@ pre.dump {
     clear: both;
     padding-top: 2em;
 }
-#teams .context #signin-join {
+#teams .context .join.button {
     display: block;
     margin: 1em;
+
+    img {
+        max-height: 24px;
+        margin-left: 4px;
+    }
+
+    * {
+        vertical-align: middle;
+    }
 }
 #teams .context .notation {
     clear: both;
