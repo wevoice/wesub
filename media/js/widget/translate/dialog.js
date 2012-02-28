@@ -62,11 +62,14 @@ unisubs.translate.Dialog.prototype.createDom = function() {
     this.enterState_(unisubs.translate.Dialog.State_.TRANSLATE);
 };
 unisubs.translate.Dialog.prototype.showGuidelines_ = function() {
-    if (!unisubs.guidelines['translate']) {
-        return;
-    }
+    if (!unisubs.guidelines['translate']) var s = unisubs.subtitle.Dialog.State_;
+    // the same dialog can be used in transcribing or review approval, which guidelines should we use?
+    var guideline = this.reviewOrApprovalType_ ? this.getTeamGuidelineForReview() : unisubs.guidelines['translate'];
 
-    var guidelinesPanel = new unisubs.GuidelinesPanel(unisubs.guidelines['translate']);
+    if (!guideline) {
+        return;
+    } 
+    var guidelinesPanel = new unisubs.GuidelinesPanel(guideline);
     this.showTemporaryPanel(guidelinesPanel);
     this.displayingGuidelines_ = true;
 
