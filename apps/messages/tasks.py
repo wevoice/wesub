@@ -581,6 +581,8 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
             "messages/email/comment-notification.html",
             {
                 "video": video,
+                "user": user,
+                "hash": user.hash_for_video(video.video_id),
                 "commenter": unicode(comment.user),
                 "commenter_url": comment.user.get_absolute_url(),
                 "version_url":version_url,
