@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block body_attrs %}id="video_profile" class="v1 video_view"{% endblock %}
+{% block html_attrs %}id="video_view"{% endblock %}
 
 {% load escapejs widget comments recent_activity paginator i18n subtitles_tags teams_tags videos_tags media_compressor doorman utils_tags %}
 
@@ -10,53 +11,20 @@
     {% include_bundle "widget-css"%}
 {% endblock %}
 
-{% block scripts %}
-    {{ block.super }}
-    {% include_bundle "unisubs-onsite-compiled" %}
-    <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
-    {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
+    {% block scripts %}
+        {{ block.super }}
+        {% include_bundle "unisubs-onsite-compiled" %}
+        <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
+        {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
 
-    <script type="text/javascript">
-        jQuery(document).ready( function($) {
-            $('.tabs').tabs();
-
-            $('.add_subtitles').click( function() {
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
-                return false;
-            });
-            $('.add-translation-behavior').click( function() {
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
-                return false;
-            });
-            var VIDEO_ID = '{{ video.pk }}';
-
-            $('.edit-title').click( function() {
-                $('#edit-title-dialog .title-input').val($('.title-container').html());
-            });
-
-            $('#edit-title-dialog .save-title').click(function(){
-                var title = $('#edit-title-dialog .title-input').val();
-                if (title) {
-                    $('.title-container').html(title).hide().fadeIn();
-                    VideosApi.change_title_video(VIDEO_ID, title, function(response){
-                        if (response.error) {
-                            $.jGrowl.error(response.error);
-                        } else {
-                            $('.title-container').html(title);
-                            document.title = title + " | Universal Subtitles";
-                        }
-                    });
-                    $('#edit-title-dialog').modClose();
-                }else{
-                    $.jGrowl.error('{% trans "Enter non-empty title" %}');
-                }
-            });
-
-        });
-    </script>
-{% endblock %}
+        <script type="text/javascript">
+            window.VIDEO_ID = '{{ video.pk }}';
+            window.TITLE_ERROR = '{% trans "Enter non-empty title" %}';
+            window.TASK = '{% firstof task '' %}';
+            window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
+            window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
+        </script>
+    {% endblock %}
 
 {% block title %}
     "{{ video.title_display }}" | Universal Subtitles
@@ -191,16 +159,9 @@
                         {% endwith %}
                     </p>
                 </div>
-
                 {% with video.get_team_video as team_video %}
                     {% if team_video %}
-                        <div class="video-tools grid_4 omega">
-                            <h3>{% trans "Collaborate" %}</h3>
-                            <p>
-                                {% trans "This video belongs to the following team" %}:
-                            </p>
-                            {% render_belongs_to_team_list video user %}
-                        </div>
+                        {% render_belongs_to_team_list video user %}
                     {% else %}
                         {% if user.managed_teams %}
                             <div class="video-tools grid_4 omega">
@@ -249,21 +210,3 @@
 {% endblock %}
   
 
-{% block bottom_scripts %}
-    <script>
-        $(window).load( function() {
-            unisubs.messaging.simplemessage.displayPendingMessages();
-        {% if task %}
-            var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
-            var opener = new unisubs.widget.SubtitleDialogOpener(
-                '{{ task.team_video.video.video_id }}',
-                '{{ task.team_video.video.get_video_url }}',
-                videoSource, null, null
-            );
-            opener.showStartDialog();
-
-          // trigger open dialog here 
-        {% endif %}
-        });
-    </script>
-{% endblock %}

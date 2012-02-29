@@ -62,11 +62,14 @@ unisubs.translate.Dialog.prototype.createDom = function() {
     this.enterState_(unisubs.translate.Dialog.State_.TRANSLATE);
 };
 unisubs.translate.Dialog.prototype.showGuidelines_ = function() {
-    if (!unisubs.guidelines['translate']) {
-        return;
-    }
+    if (!unisubs.guidelines['translate']) var s = unisubs.subtitle.Dialog.State_;
+    // the same dialog can be used in transcribing or review approval, which guidelines should we use?
+    var guideline = this.reviewOrApprovalType_ ? this.getTeamGuidelineForReview() : unisubs.guidelines['translate'];
 
-    var guidelinesPanel = new unisubs.GuidelinesPanel(unisubs.guidelines['translate']);
+    if (!guideline) {
+        return;
+    } 
+    var guidelinesPanel = new unisubs.GuidelinesPanel(guideline);
     this.showTemporaryPanel(guidelinesPanel);
     this.displayingGuidelines_ = true;
 
@@ -112,7 +115,9 @@ unisubs.translate.Dialog.prototype.enterDocument = function() {
         if (this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL){
             func = this.serverModel_.fetchApproveData;
         }
-        func(unisubs.task_id, function(body) {
+        
+        // make sure we retain the correct scope
+        func.call(this.serverModel_, unisubs.task_id, function(body) {
             that.onNotesFetched_(body);
         });
     }

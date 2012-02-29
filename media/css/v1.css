@@ -1903,14 +1903,26 @@ pre.dump code {
   padding-top: 2em;
 }
 
-#teams .context #signin-join {
+#teams .context .join.button {
   display: block;
   margin: 1em;
+}
+#teams .context .join.button img {
+  max-height: 24px;
+  margin-left: 4px;
+}
+#teams .context .join.button * {
+  vertical-align: middle;
 }
 
 #teams .context .notation {
   clear: both;
-  padding-top: 2em;
+  padding-top: 4em;
+}
+
+#teams .context .join .notation {
+  padding-top: 0;
+  margin: -0.5em 1.5em 0;
 }
 
 #teams .context .notation.policy {

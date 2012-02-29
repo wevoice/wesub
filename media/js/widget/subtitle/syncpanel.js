@@ -95,7 +95,7 @@ unisubs.subtitle.SyncPanel.prototype.createRightPanelInternal = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var reviewOrApproval = true;
     var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
-        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
+        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_, true);
     var keySpecs;
     if (! internalComponents){
         internalComponents = {

@@ -109,7 +109,7 @@ unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var reviewOrApproval = true;
     var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
-        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
+        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_, true);
     var KC = goog.events.KeyCodes;
     var keySpecs = [];
     if (! internalComponents){
@@ -148,7 +148,7 @@ unisubs.subtitle.TranscribePanel.prototype.createRightPanel_ = function() {
     return new unisubs.subtitle.TranscribeRightPanel(
             this.serverModel_, internalComponents['helpContents'],
             internalComponents['extraHelp'], keySpecs , true, "Done?", this.nextButtonText_, 
-            reviewOrApproval, this.bodyInput_);
+            this.reviewOrApprovalType_, this.bodyInput_);
 
 };
 unisubs.subtitle.TranscribePanel.prototype.enterDocument = function() {

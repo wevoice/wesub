@@ -121,7 +121,7 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var reviewOrApproval = true;
     var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
-        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_);
+        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_, !Boolean(this.originalSubtitles_));
     if (! internalComponents){
         reviewOrApproval = false;
         var title = "Edit Title & Description";
