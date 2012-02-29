@@ -10,7 +10,12 @@
     <li class="unisubs-facebook-like"><iframe src="https://www.facebook.com/plugins/like.php?href={{ share_panel_permalink|urlencode }}&layout=button_count&show_faces=false&width=150&action=like&colorscheme=light&height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:150px; height:25px; padding: .45em .25em;" allowTransparency="true"></iframe></li>
     {% endif %}
 </ul>
-<p><a href="#embed-modal" class="open-modal">Get Embed Code</a></p>
+<p>
+    <a href="#embed-modal" class="open-modal">{% trans 'Get Embed Code' %}</a>
+    {% if language.get_language_display and not language.is_original %}
+        (with {{ language.get_language_display }} subtitles)
+    {% endif %}
+</p>
 <div class="bootstrap">
     <div id="embed-modal" class="modal">
         <div class="modal-header">
