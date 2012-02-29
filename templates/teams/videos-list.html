@@ -95,6 +95,7 @@
                     <span class="inner">{% trans 'Videos with' %}</span>
                     <select name="lang-filter" id="lang-filter">
                         <option value="{{ request.path }}{% query_string request.GET lang='' page='' %}" id="lang-opt-any">{% trans 'any' %}</option>
+                        <option value="{{ request.path }}{% query_string request.GET lang='none' page='' %}" id="lang-opt-none">{% trans 'no' %}</option>
                         {% for code, name in language_choices %}
                             <option id="lang-opt-{{ code }}" {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code page='' %}">{{ name }}</option>
                         {% endfor %}
