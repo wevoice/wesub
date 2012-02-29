@@ -369,18 +369,9 @@ class Rpc(BaseRpc):
                       completed=None, forked=False, new_description=None,
                       task_id=None, task_notes=None, task_approved=None, task_type=None):
         # TODO: lock all this in a transaction please!
-        
         language = session.language
         # if this belongs to a task finish it:
-        if task_id:
-            res = {
-                "review": self._finish_review,
-                "approve": self._finish_approve
-            }[task_type](request, task_id, task_notes, task_approved)
-            # if the task did not succeeded, just bail out
-            if not res.get('response', 'ok'):
-                return res
-                
+               
             
         new_version = None
         if subtitles is not None and \
@@ -476,6 +467,16 @@ class Rpc(BaseRpc):
                 )
                 for task in tasks:
                     task.complete()
+        if task_id:
+            res = {
+                "review": self._finish_review,
+                "approve": self._finish_approve
+            }[task_type](request, task_id, task_notes, task_approved,
+                         new_version=new_version)
+            # if the task did not succeeded, just bail out
+            if not res.get('response', 'ok'):
+                return res
+  
         return {
             'user_message': user_message,
             'response': 'ok' }
@@ -638,9 +639,11 @@ class Rpc(BaseRpc):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
 
-    def _finish_review(self, request, task_id=None, body=None, approved=None):
+    def _finish_review(self, request, task_id=None, body=None,
+                       approved=None, new_version=None):
         """
-        Should be called as a first step when finishing subs in a task.
+        If the task performer has edited this version, then we need to
+        set the task's version to the new one that he has edited.
         """
         data = {'task': task_id, 'body': body, 'approved': approved}
 
@@ -650,6 +653,9 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
+            # if there is a new version, set that as the tasks's one
+            if new_version:
+                task.subtitle_version = new_version
             task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
@@ -674,9 +680,11 @@ class Rpc(BaseRpc):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
 
-    def _finish_approve(self, request, task_id=None, body=None, approved=None):
+    def _finish_approve(self, request, task_id=None, body=None,
+                        approved=None, new_version=None):
         """
-        Should be called as a first step before saving subs in a task.
+        If the task performer has edited this version, then we need to
+        set the task's version to the new one that he has edited.
         """
         data = {'task': task_id, 'body': body, 'approved': approved}
 
@@ -686,6 +694,9 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
+            # if there is a new version, set that as the tasks's one
+            if new_version:
+                task.subtitle_version = new_version
             task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
