@@ -850,14 +850,18 @@ def language_summary(language, team_video=-1, user=None):
         'dependent': language.is_dependent(),
         'subtitle_count': language.subtitle_count,
         'in_progress': language.is_writelocked,
-        'disabled': False }
+        'disabled_from': False,
+        'disabled_to': False }
 
     if team_video:
         tasks = team_video.task_set.incomplete().filter(language=language.language)
         if tasks:
             task = tasks[0]
             if user and user != task.assignee:
-                summary['disabled'] = True
+                summary['disabled_to'] = True
+
+    if not language.latest_version():
+        summary['disabled_from'] = True
 
     if language.is_dependent():
         summary['percent_done'] = language.percent_done
