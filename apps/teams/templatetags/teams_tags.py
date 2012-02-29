@@ -242,13 +242,6 @@ def team_video_in_progress_list(team_video_search_record):
         'languages': langs
         }
 
-
-@register.inclusion_tag('teams/_join_button.html', takes_context=True)
-def render_team_join(context, team, button_size="huge"):
-    context['team'] = team
-    context['button_size'] = button_size
-    return context
-
 @tag(register, [Variable(), Constant("as"), Name()])
 def team_projects(context, team, varname):
     """

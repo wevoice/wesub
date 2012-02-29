@@ -1901,7 +1901,11 @@ pre.dump {
 }
 #teams .context .notation {
     clear: both;
-    padding-top: 2em;
+    padding-top: 4em;
+}
+#teams .context .join .notation {
+    padding-top: 0;
+    margin: -.5em 1.5em 0;
 }
 #teams .context .notation.policy {
     margin-bottom: 1em;
