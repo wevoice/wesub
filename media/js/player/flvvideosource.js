@@ -58,3 +58,14 @@ unisubs.player.FlvVideoSource.prototype.getVideoConfig = function() {
 unisubs.player.FlvVideoSource.prototype.setVideoConfig = function(config) {
     this.videoConfig_ = config;
 };
+
+unisubs.player.FlvVideoSource.prototype.sizeFromConfig = function() {
+    if (this.videoConfig_ && this.videoConfig_['width'] && 
+        this.videoConfig_['height']) {
+        return new goog.math.Size(
+            parseInt(this.videoConfig_['width']), parseInt(this.videoConfig_['height']));
+    }
+    else {
+        return null;
+    }
+};
