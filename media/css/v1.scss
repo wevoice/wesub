@@ -659,10 +659,10 @@ div.hidden {
     }
 
     .admin-controls {
-        background: #F3F6F8;
+        background: hsla(0%, 0%, 0%, .55);
         border: none;
         bottom: .6em;
-        @include opacity(1.0);
+        opacity: 1;
         right: 1em;
         text-shadow: 1px 1px 1px #444;
 

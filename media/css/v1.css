@@ -698,12 +698,9 @@ div.hidden {
   background-image: linear-gradient(#678ca3, #486f87);
 }
 .v1 .listing.videos > li .admin-controls {
-  background: #F3F6F8;
+  background: rgba(0, 0, 0, 0.55);
   border: none;
   bottom: .6em;
-  -khtml-opacity: 1;
-  -moz-opacity: 1;
-  filter: alpha(opacity=1);
   opacity: 1;
   right: 1em;
   text-shadow: 1px 1px 1px #444;
