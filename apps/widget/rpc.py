@@ -511,6 +511,8 @@ class Rpc(BaseRpc):
         else:
             return None
 
+        # TODO: Dedupe this and Task._find_previous_assignee
+
         # Find the assignee.
         #
         # For now, we'll assign the review/approval task to whomever did
