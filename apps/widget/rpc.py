@@ -371,8 +371,8 @@ class Rpc(BaseRpc):
         # TODO: lock all this in a transaction please!
         language = session.language
         # if this belongs to a task finish it:
-               
-            
+
+
         new_version = None
         if subtitles is not None and \
                 (len(subtitles) > 0 or language.latest_version(public_only=False) is not None):
@@ -437,7 +437,7 @@ class Rpc(BaseRpc):
                               "They will not be submitted for publishing "
                               "until they've been completed.")
         under_moderation = language.video.is_moderated
-        
+
         _user_can_publish =  True
         team_video_set = language.video.teamvideo_set
         if under_moderation and team_video_set.exists():
@@ -476,7 +476,7 @@ class Rpc(BaseRpc):
             # if the task did not succeeded, just bail out
             if not res.get('response', 'ok'):
                 return res
-  
+
         return {
             'user_message': user_message,
             'response': 'ok' }
@@ -662,6 +662,7 @@ class Rpc(BaseRpc):
                 task.complete()
 
             task.subtitle_version.language.release_writelock()
+            task.subtitle_version.language.followers.add(request.user)
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
                 user_message =  'These subtitles have been accepted and your notes have been sent to the author.'
