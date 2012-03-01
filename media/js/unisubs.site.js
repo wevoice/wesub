@@ -35,7 +35,7 @@ var Site = function(Site) {
 
             /*
              * TODO: The modules in this section need to be
-             * pulled out into individual sub-views and only
+             * pulled out into site.Utils and only
              * initialized on pages that use them.
              */
             if ($('.abbr').length) {
@@ -175,6 +175,7 @@ var Site = function(Site) {
 
         },
         members_list: function() {
+            // This calls the obj instance and probably shouldn't.
             site.Utils.resetLangFilter();
         },
         video_view: function() {
