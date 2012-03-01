@@ -200,7 +200,7 @@ class Rpc(BaseRpc):
             'general_settings': general_settings }
 
 
-    def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode):
+    def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode, is_edit):
         """Check whether the a team prevents the user from editing the subs.
 
         Returns a dict appropriate for sending back if the user should be
@@ -222,7 +222,7 @@ class Rpc(BaseRpc):
                 return { "can_edit": False, "locked_by": str(task.assignee or task.team) }
 
         # Check that the team's policies don't prevent the action.
-        if mode not in ['review', 'approve']:
+        if not is_edit and mode not in ['review', 'approve']:
             if is_translation:
                 can_edit = can_create_and_edit_translations(user, team_video, language_code)
             else:
@@ -253,14 +253,6 @@ class Rpc(BaseRpc):
             request, video_id, language_code,
             subtitle_language_pk, base_language)
 
-        # Check for team-related locking.
-        locked = self._check_team_video_locking(request.user, video_id,
-                                                language_code,
-                                                is_translation=bool(base_language_pk),
-                                                mode=mode)
-        if locked:
-            return locked
-
         if not can_edit:
             return { "can_edit": False,
                      "locked_by" : language.writelock_owner_name }
@@ -273,8 +265,16 @@ class Rpc(BaseRpc):
         if not version_for_subs:
             version_for_subs = self._create_version_from_session(session)
             version_no = 0
+            is_edit = False
         else:
             version_no = version_for_subs.version_no + 1
+            is_edit = True
+
+        locked = self._check_team_video_locking(request.user, video_id,
+                        language_code, bool(base_language_pk), mode, is_edit)
+        if locked:
+            return locked
+
         subtitles = self._subtitles_dict(
             version_for_subs, version_no, base_language_pk is None)
         return_dict = { "can_edit" : True,
