@@ -62,7 +62,6 @@
 @mixin opacity($op) {
     -khtml-opacity: $op;
     -moz-opacity: $op;
-    filter: alpha(opacity=$op);
     opacity: $op;
 }
 @mixin box-right {
@@ -563,12 +562,11 @@ div.hidden {
             form {
                 padding: 0;
             }
-
         }
         &:hover {
             .admin-controls {
-                display: block;
                 @include opacity(1.0);
+                display: block;
             }
         }
 

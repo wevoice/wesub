@@ -6,6 +6,8 @@
     {% include_bundle "widget-css"%}
 {% endblock %}
 
+{% block html_attrs %}id="tasks"{% endblock %}
+
 {% block scripts %}
     {{ block.super }}
     {% include "utils/chosenify.html" %}

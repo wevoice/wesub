@@ -223,6 +223,8 @@ var Site = function(Site) {
             }
 
             unisubs.messaging.simplemessage.displayPendingMessages();
+        },
+        tasks: function() {
         }
     };
 };

@@ -523,7 +523,6 @@ div.hidden {
   border-radius: 2px;
   -khtml-opacity: 0.6;
   -moz-opacity: 0.6;
-  filter: alpha(opacity=0.6);
   opacity: 0.6;
   background: #f3f6f8;
   background-image: -moz-gradient(center top, #f3f6f8 0%, #dce2e5 100%);
@@ -538,7 +537,6 @@ div.hidden {
   display: block;
   -khtml-opacity: 1;
   -moz-opacity: 1;
-  filter: alpha(opacity=1);
   opacity: 1;
 }
 .v1 .listing > li .admin-controls li {
@@ -582,7 +580,6 @@ div.hidden {
 .v1 .listing > li .admin-controls:hover {
   -khtml-opacity: 1;
   -moz-opacity: 1;
-  filter: alpha(opacity=1);
   opacity: 1;
   display: block;
 }
@@ -590,11 +587,10 @@ div.hidden {
   padding: 0;
 }
 .v1 .listing > li:hover .admin-controls {
-  display: block;
   -khtml-opacity: 1;
   -moz-opacity: 1;
-  filter: alpha(opacity=1);
   opacity: 1;
+  display: block;
 }
 .v1 .listing > li .assignee-choice {
   background: #dce2e5;
@@ -737,13 +733,11 @@ div.hidden {
 .v1 .listing.messages > li {
   -khtml-opacity: 0.5;
   -moz-opacity: 0.5;
-  filter: alpha(opacity=0.5);
   opacity: 0.5;
 }
 .v1 .listing.messages > li.unread {
   -khtml-opacity: 1;
   -moz-opacity: 1;
-  filter: alpha(opacity=1);
   opacity: 1;
 }
 .v1 .listing.messages > li p a {
@@ -1312,7 +1306,6 @@ body#teams div.edit-team-video form fieldset a {
 .v1 .view.new-message form div.disabled {
   -khtml-opacity: 0.3;
   -moz-opacity: 0.3;
-  filter: alpha(opacity=0.3);
   opacity: 0.3;
 }
 
