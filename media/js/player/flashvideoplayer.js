@@ -123,6 +123,29 @@ unisubs.player.FlashVideoPlayer.prototype.isDecorated = function() {
     return this.decorated_;
 };
 
+unisubs.player.FlashVideoPlayer.prototype.createDom = function() {
+    unisubs.player.FlashVideoPlayer.superClass_.createDom.call(this);
+    var sizeFromConfig = this.videoSource_.sizeFromConfig();
+    if (!this.forDialog_ && sizeFromConfig)
+        this.playerSize_ = sizeFromConfig;
+    else
+        this.playerSize_ = this.forDialog_ ?
+        unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+        unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+    this.setDimensionsKnownInternal();
+};
+
+unisubs.player.FlashVideoPlayer.prototype.sizeFromConfig = function() {
+    if (this.videoConfig_ && this.videoConfig_['width'] && 
+        this.videoConfig_['height']) {
+        return new goog.math.Size(
+            parseInt(this.videoConfig_['width']), parseInt(this.videoConfig_['height']));
+    }
+    else {
+        return null;
+    }
+};
+
 unisubs.player.FlashVideoPlayer.prototype.getVideoElements = function() {
     var objectAndEmbed = null;
     if (this.decorated_) {
@@ -143,4 +166,8 @@ unisubs.player.FlashVideoPlayer.prototype.getVideoElements = function() {
     }
     else
         return [];
+};
+
+unisubs.player.FlashVideoPlayer.prototype.getVideoSize = function() {
+    return goog.style.getSize(this.getElement());
 };

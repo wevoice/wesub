@@ -292,7 +292,7 @@ unisubs.player.FlvVideoPlayer.prototype.needsIFrame = function() {
 };
 
 unisubs.player.FlvVideoPlayer.prototype.getVideoSize = function() {
-    return this.playerSize;
+    return this.playerSize_;
 };
 
 unisubs.player.FlvVideoPlayer.prototype.disposeInternal = function() {
