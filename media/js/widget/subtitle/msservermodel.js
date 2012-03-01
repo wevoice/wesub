@@ -181,6 +181,10 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
     if (this.taskApproved != undefined){
         atLeastOneThingChanged = true;
     }
+    // if the save and exit button was created, we must pass this as a value
+    if (! this.taskApproved && this.taskId ){
+        this.taskApproved = unisubs.Dialog.MODERATION_OUTCOMES.SAVE_FOR_LATER;
+    }
     args['task_approved'] = this.taskApproved;
 
     args['task_type'] = this.taskType;
