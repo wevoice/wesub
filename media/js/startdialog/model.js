@@ -1,19 +1,19 @@
 // Universal Subtitles, universalsubtitles.org
-// 
-// Copyright (C) 2010 Participatory Culture Foundation
-// 
+//
+// Copyright (C) 2012 Participatory Culture Foundation
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see 
+// along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.startdialog.Model');
@@ -31,8 +31,8 @@ unisubs.startdialog.Model = function(json, opt_langState) {
     this.limitLanguages_ = json['limit_languages'];
     goog.array.removeDuplicates(this.myLanguages_);
     this.myLanguages_ = goog.array.filter(
-        this.myLanguages_, function(l) { 
-            return !!unisubs.languageNameForCode(l); 
+        this.myLanguages_, function(l) {
+            return !!unisubs.languageNameForCode(l);
         });
     this.originalLanguage_ = json['original_language'];
     this.videoLanguages_ = new unisubs.startdialog.VideoLanguages(
@@ -46,15 +46,15 @@ unisubs.startdialog.Model = function(json, opt_langState) {
     this.selectedOriginalLanguage_ = null;
     if (opt_langState){
         // with a pk we can know for sure that we need one english in particular
-        // (if there are +1 with the same lang code) 
+        // (if there are +1 with the same lang code)
         if (opt_langState.LANGUAGE_PK){
             this.selectedLanguage_ = this.toLanguages_.forKey(
-                opt_langState.LANGUAGE+opt_langState.LANGUAGE_PK); 
+                opt_langState.LANGUAGE+opt_langState.LANGUAGE_PK);
         } else {
             this.selectedLanguage_ = this.toLanguages_.forLangCode(
-                opt_langState.LANGUAGE); 
+                opt_langState.LANGUAGE);
         }
-       
+
     }
 };
 
@@ -105,7 +105,7 @@ unisubs.startdialog.Model.prototype.bestLanguages = function(toLangCode, fromLan
         toLangCode, fromLangCode);
     if (!videoLanguage)
         return null;
-    return [this.toLanguages_.forVideoLanguage(videoLanguage), 
+    return [this.toLanguages_.forVideoLanguage(videoLanguage),
             videoLanguage.getStandardLang()];
 };
 
@@ -128,16 +128,16 @@ unisubs.startdialog.Model.prototype.fromLanguages = function() {
     });
     possibleFromLanguages = goog.array.filter(
         possibleFromLanguages,
-        function(vl) { 
-            return (vl.DEPENDENT && vl.PERCENT_DONE > 0) || 
-                (!vl.DEPENDENT && vl.SUBTITLE_COUNT > 0); 
+        function(vl) {
+            return (vl.DEPENDENT && vl.PERCENT_DONE > 0) ||
+                (!vl.DEPENDENT && vl.SUBTITLE_COUNT > 0);
         });
     var myLanguages = new goog.structs.Set(this.myLanguages_);
     goog.array.sort(
         possibleFromLanguages,
         function(a, b) {
             return goog.array.defaultCompare(
-                myLanguages.contains(a.LANGUAGE) ? 0 : 1, 
+                myLanguages.contains(a.LANGUAGE) ? 0 : 1,
                 myLanguages.contains(b.LANGUAGE) ? 0 : 1);
         });
     return possibleFromLanguages;

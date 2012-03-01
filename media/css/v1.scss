@@ -37,7 +37,7 @@
     border-top-right-radius: $topRight;
 }
 @mixin vertical-gradient($start: #000, $stop: #FFF) {
-    background-color: ($start + $stop) / 2;
+    background: $start;
     background-image: -moz-gradient(center top, $start 0%, $stop 100%);
     background-image: -moz-linear-gradient(center top, $start 0%, $stop 100%);
     background-image: -ms-linear-gradient($start, $stop);
@@ -558,6 +558,7 @@ div.hidden {
             }
             &:hover {
                 @include opacity(1.0);
+                display: block;
             }
             form {
                 padding: 0;
@@ -567,6 +568,7 @@ div.hidden {
         &:hover {
             .admin-controls {
                 display: block;
+                @include opacity(1.0);
             }
         }
 
@@ -657,10 +659,10 @@ div.hidden {
     }
 
     .admin-controls {
-        background: hsla(0%, 0%, 0%, .55);
+        background: #F3F6F8;
         border: none;
         bottom: .6em;
-        opacity: 1;
+        @include opacity(1.0);
         right: 1em;
         text-shadow: 1px 1px 1px #444;
 
@@ -697,10 +699,10 @@ div.hidden {
     }
 }
 .v1 .listing.messages > li {
-    opacity: .5;
+    @include opacity(0.5);
 
     &.unread {
-        opacity: 1;
+        @include opacity(1.0);
     }
     p {
         a {
@@ -1253,7 +1255,7 @@ body#teams div.edit-team-video form fieldset a {
         float: left;
     }
     div.disabled {
-        opacity: .3;
+        @include opacity(0.3);
     }
 }
 

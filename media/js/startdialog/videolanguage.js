@@ -1,19 +1,19 @@
 // Universal Subtitles, universalsubtitles.org
-// 
-// Copyright (C) 2010 Participatory Culture Foundation
-// 
+//
+// Copyright (C) 2012 Participatory Culture Foundation
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see 
+// along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.startdialog.VideoLanguage');
@@ -30,11 +30,12 @@ unisubs.startdialog.VideoLanguage = function(json) {
     this.STANDARD_PK = json['standard_pk'];
     this.SUBTITLE_COUNT = json['subtitle_count'];
     this.IN_PROGRESS = json['in_progress'];
-    this.DISABLED = json['disabled'];
+    this.DISABLED_FROM = json['disabled_from'];
+    this.DISABLED_TO = json['disabled_to'];
 };
 
 unisubs.startdialog.VideoLanguage.prototype.languageName = function() {
-    return this.LANGUAGE ? 
+    return this.LANGUAGE ?
         unisubs.languageNameForCode(this.LANGUAGE) : "Original";
 };
 
@@ -47,14 +48,14 @@ unisubs.startdialog.VideoLanguage.prototype.toString = function() {
         name += " (" + this.PERCENT_DONE + "%)";
     }
 
-    name += ((this.IN_PROGRESS || this.DISABLED) ? " (in progress)" : "");
+    name += (this.IN_PROGRESS ? " (in progress)" : "");
 
     return name;
 };
 
 unisubs.startdialog.VideoLanguage.prototype.completionStatus = function() {
     return "(" +
-        (this.DEPENDENT ? (this.PERCENT_DONE + "%") : 
+        (this.DEPENDENT ? (this.PERCENT_DONE + "%") :
          (this.SUBTITLE_COUNT + " lines")) + ")";
 };
 
@@ -62,7 +63,7 @@ unisubs.startdialog.VideoLanguage.prototype.setAll = function(all) {
     this.allLangs_ = all;
     if (this.STANDARD_PK)
         this.standardLang_ = goog.array.find(
-            this.allLangs_, 
+            this.allLangs_,
             function(lang) { return lang.PK == this.STANDARD_PK; },
             this);
 };
@@ -92,8 +93,8 @@ unisubs.startdialog.VideoLanguage.prototype.isDependable = function() {
         return this.IS_COMPLETE;
 };
 
-unisubs.startdialog.VideoLanguage.prototype.canBenefitFromTranslation = 
-    function(toTranslateFrom) 
+unisubs.startdialog.VideoLanguage.prototype.canBenefitFromTranslation =
+    function(toTranslateFrom)
 {
     if (!this.DEPENDENT)
         return false;
