@@ -1488,16 +1488,16 @@ class VideoTypeRegistrarTest(TestCase):
 class TestFeedsSubmit(TestCase):
 
     # this rss feed is broken. FIXME TODO
-    # def test_video_feed_submit(self):
-    #    old_count = Video.objects.count()
-    #    data = {
-    #        'feed_url': u'http://vimeo.com/channels/beeple/videos/rss'
-    #    }
-    #    response = self.client.post(reverse('videos:create_from_feed'), data)
-    #    self.assertRedirects(response, reverse('videos:create'))
-    #    self.assertNotEqual(old_count, Video.objects.count())
+    def test_video_feed_submit(self):
+        old_count = Video.objects.count()
+        data = {
+            'feed_url': u'http://blip.tv/day9tv/rss'
+        }
+        response = self.client.post(reverse('videos:create_from_feed'), data)
+        self.assertRedirects(response, reverse('videos:create'))
+        self.assertNotEqual(old_count, Video.objects.count())
 
-    def test_inorrect_video_feed_submit(self):
+    def test_incorrect_video_feed_submit(self):
         data = {
             'feed_url': u'http://blip.tv/anyone-but-he/?skin=rss'
         }
@@ -1506,7 +1506,6 @@ class TestFeedsSubmit(TestCase):
         self.assertTrue(response.context['youtube_form'].errors['feed_url'])
 
     def test_empty_feed_submit(self):
-        import urllib2
         import feedparser
         from StringIO import StringIO
 
@@ -1547,6 +1546,35 @@ class TestFeedsSubmit(TestCase):
 
         feedparser._open_resource = base_open_resource
 
+    def test_feed_form_with_youtube(self):
+        youtube_user = u"http://www.youtube.com/user/SymbalooTutorials"
+        feed_url = u"https://gdata.youtube.com/feeds/api/users/SymbalooTutorials/uploads"
+        old_count = Video.objects.count()
+
+        data = {
+            'youtube_user_url': youtube_user,
+            'save_feed': '1'
+        }
+
+        response = self.client.post(reverse('videos:create_from_feed'), data)
+        self.assertRedirects(response, reverse('videos:create'))
+        # we actually imported something
+        self.assertTrue(Video.objects.count() > old_count)
+        # and that thing are 10 videos
+        self.assertEquals(Video.objects.count(), old_count + 10)
+
+        video_feed = VideoFeed.objects.get(url=feed_url)
+        self.assertIsNotNone(video_feed)
+
+        # submit again, so we can see that we are saving more videos
+        response = self.client.post(reverse('videos:create_from_feed'), data)
+        self.assertEquals(Video.objects.count(), old_count + 20)
+
+        # submit a third time - by default, youtube just
+        # returns 25 videos on a feed
+        response = self.client.post(reverse('videos:create_from_feed'), data)
+        self.assertEquals(Video.objects.count(), old_count + 25)
+        
 from apps.videos.types.brigthcove  import BrightcoveVideoType
 
 class BrightcoveVideoTypeTest(TestCase):

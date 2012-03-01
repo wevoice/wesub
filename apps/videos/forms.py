@@ -465,8 +465,11 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         feed_parser = FeedParser(url)
         entry = ''
 
+        video_feed = self.get_feed_url(url)
+        since = video_feed.last_link if video_feed else None
+
         try:
-            for vt, info, entry in feed_parser.items():
+            for vt, info, entry in feed_parser.items(since=since):
                 if vt:
                     self.video_types.append((vt, info))
 
@@ -501,12 +504,19 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
     def save_feed_url(self, feed_url, last_entry_url):
         try:
-            VideoFeed.objects.get(url=feed_url)
+            vf = VideoFeed.objects.get(url=feed_url)
         except VideoFeed.DoesNotExist:
             vf = VideoFeed(url=feed_url)
-            vf.user = self.user
-            vf.last_link = last_entry_url
-            vf.save()
+
+        vf.user = self.user
+        vf.last_link = last_entry_url
+        vf.save()
+
+    def get_feed_url(self, feed_url):
+        try:
+            return VideoFeed.objects.get(url=feed_url)
+        except VideoFeed.DoesNotExist:
+            return None
 
     def save(self):
         if self.cleaned_data.get('save_feed'):
