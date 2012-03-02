@@ -18,7 +18,7 @@
 
 var Site = function(Site) {
     /*
-     * This is the master javascript file for
+     * This is the master JavaScript file for
      * the Universal Subtitles website.
      */
 
@@ -74,6 +74,51 @@ var Site = function(Site) {
                             $('select#id_user').removeAttr('disabled').trigger('liszt:updated');
                         }
                     }
+                }
+            });
+        },
+        messagesDeleteAndSend: function() {
+            $('.messages .delete').click(function(){
+                if (confirm(window.DELETE_MESSAGE_CONFIRM)){
+                    var $this = $(this);
+                    MessagesApi.remove($this.attr('message_id'), function(response){
+                        if (response.error){
+                            $.jGrowl.error(response.error);
+                        } else {
+                            $this.parents('li.message').fadeOut('fast', function() {
+                                $(this).remove();
+                            });
+                        }
+                    });
+                }
+                return false;
+            });
+            $('#send-message-form').ajaxForm({
+                type: 'RPC',
+                api: {
+                    submit: MessagesApi.send
+                },
+                success: function(data, resp, $form){
+                    if (data.errors) {
+                        for (key in data.errors){
+                            var $field = $('input[name="'+key+'"]', $form);
+                            var error = '<p class="error_list">'+data.errors[key]+'</p>';
+                            if ($field.length){
+                                $field.before(error);
+                            }else{
+                                $('.global-errors', $form).prepend(error);
+                            }
+                        }
+                    } else {
+                        if (resp.status) {
+                            $.jGrowl(window.MESSAGE_SUCCESSFULLY_SENT);
+                        }
+                        $('a.close', '#msg_modal').click();
+                        $form.clearForm();
+                    }
+                },
+                beforeSubmit: function(formData, $form, options){
+                    $('p.error_list', $form).remove();
                 }
             });
         },
@@ -425,7 +470,6 @@ var Site = function(Site) {
 
         // Messages
         messages_list: function() {
-            var DEFAULT_AVATAR_URL = window.STATIC_URL + 'images/default_thumb_small.png';
             var reply_msg_data;
             $.metadata.setType('attr', 'data');
 
@@ -434,49 +478,6 @@ var Site = function(Site) {
             } else {
                 reply_msg_data = window.REPLY_MSG_DATA;
             }
-            $('.messages .delete').click(function(){
-                if (confirm(window.DELETE_MESSAGE_CONFIRM)){
-                    var $this = $(this);
-                    MessagesApi.remove($this.attr('message_id'), function(response){
-                        if (response.error){
-                            $.jGrowl.error(response.error);
-                        } else {
-                            $this.parents('li.message').fadeOut('fast', function() {
-                                $(this).remove();
-                            });
-                        }
-                    });
-                }
-                return false;
-            });
-            $('#send-message-form').ajaxForm({
-                type: 'RPC',
-                api: {
-                    submit: MessagesApi.send
-                },
-                success: function(data, resp, $form){
-                    if (data.errors) {
-                        for (key in data.errors){
-                            var $field = $('input[name="'+key+'"]', $form);
-                            var error = '<p class="error_list">'+data.errors[key]+'</p>';
-                            if ($field.length){
-                                $field.before(error);
-                            }else{
-                                $('.global-errors', $form).prepend(error);
-                            }
-                        }
-                    } else {
-                        if (resp.status) {
-                            $.jGrowl(window.MESSAGE_SUCCESSFULLY_SENT);
-                        }
-                        $('a.close', '#msg_modal').click();
-                        $form.clearForm();
-                    }
-                },
-                beforeSubmit: function(formData, $form, options){
-                    $('p.error_list', $form).remove();
-                }
-            });
             function set_message_data(data, $modal) {
                 $('#message_form_id_user').val(data['author-id']);
                 $('.author-username', $modal).html(data['author-username']);
@@ -515,6 +516,11 @@ var Site = function(Site) {
                 set_message_data(data, $('#msg_modal'));
                 return false;
             });
+
+            that.Utils.messagesDeleteAndSend();
+        },
+        messages_sent: function() {
+            that.Utils.messagesDeleteAndSend();
         }
     };
 };
