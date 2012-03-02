@@ -906,13 +906,6 @@ class SubtitleLanguage(models.Model):
             return False
         return True
 
-    def is_dependable(self):
-        if self.is_dependent():
-            dep_lang = self.standard_language
-            return dep_lang and dep_lang.is_complete and self.percent_done > 10
-        else:
-            return self.is_complete
-
     def get_widget_url(self, mode=None, task_id=None):
         # duplicates unisubs.widget.SubtitleDialogOpener.prototype.openDialogOrRedirect_
         video = self.video
