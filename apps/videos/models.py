@@ -295,9 +295,6 @@ class Video(models.Model):
 
         return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
-    @models.permalink
-    def video_link(self):
-        return ('videos:history', [self.video_id])
 
     def get_team_video(self):
         """Return the TeamVideo object for this video, or None if there isn't one."""
@@ -344,7 +341,7 @@ class Video(models.Model):
                           .replace('#', '-')
                           .replace('&', '-'))
 
-    def _get_absolute_url(self, locale=None, video_id=None):
+    def _get_absolute_url(self,  video_id=None):
         """
         NOTE: this method is used in videos.search_indexes.VideoSearchResult
         to prevent duplication of code in search result and in DB-query result
@@ -880,7 +877,7 @@ class SubtitleLanguage(models.Model):
         if self.is_dependent():
             if self.percent_done != 100:
                 return False
-            standard_lang = self.real_standard_language()
+            standard_lang = self.standard_language
             if not standard_lang or not standard_lang.is_complete:
                 return False
         subtitles = self.latest_subtitles(public_only=public_only)
@@ -893,25 +890,9 @@ class SubtitleLanguage(models.Model):
             return False
         return True
 
-    def real_standard_language(self):
-        if self.standard_language:
-            return self.standard_language
-        elif self.is_dependent():
-            # This should only be needed temporarily until data is more cleaned up.
-            # in other words, self.standard_language should never be None for a dependent SL
-            try:
-                self.standard_language = self.video.subtitle_language()
-                self.save()
-                return self.standard_language
-            except IntegrityError:
-                logger.error(
-                    "Subtitle Language {0} is dependent but has no acceptable "
-                    "standard_language".format(self.id))
-        return None
-
     def is_dependable(self):
         if self.is_dependent():
-            dep_lang = self.real_standard_language()
+            dep_lang = self.standard_language
             return dep_lang and dep_lang.is_complete and self.percent_done > 10
         else:
             return self.is_complete
@@ -1088,7 +1069,7 @@ class SubtitleLanguage(models.Model):
             return None
 
         translation_count = self.nonblank_subtitle_count(public_only=False)
-        real_standard_language = self.real_standard_language()
+        real_standard_language = self.standard_language
 
         if real_standard_language:
             subtitle_count = real_standard_language.nonblank_subtitle_count(public_only=True)
@@ -1329,7 +1310,7 @@ class SubtitleVersion(SubtitleCollection):
         return self.language.video;
 
     def _get_standard_collection(self, public_only=True):
-        standard_language = self.language.real_standard_language()
+        standard_language = self.language.standard_language
         if standard_language:
             return standard_language.latest_version(public_only=public_only)
 

@@ -1,4 +1,28 @@
+// Universal Subtitles, universalsubtitles.org
+// 
+// Copyright (C) 2012 Participatory Culture Foundation
+// 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+// 
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see 
+// http://www.gnu.org/licenses/agpl-3.0.html.
+
 var Site = function(Site) {
+    /*
+     * This is the master javascript file for
+     * the Universal Subtitles website.
+     */
+
+    var that = this;
 
     this.init = function() {
 
@@ -18,10 +42,47 @@ var Site = function(Site) {
 
     };
     this.Utils = {
-        resetLangFilter: function() {
-            $select = $('select#lang-filter');
-            if (window.request_get_lang) {
-                $opt = $('option[id="lang-opt-' + window.request_get_lang + '"]');
+        /*
+         * These are reusable utilities that are
+         * usually run on multiple pages. If you
+         * find duplicate code that runs on multiple
+         * pages, it should be converted to a
+         * utility function in this object and
+         * called from each of the specific views,
+         * like this:
+         *     
+         *     that.Utils.chosenify();
+         *
+         */
+
+        chosenify: function() {
+            $('select', '.v1 .content').filter(function() {
+                return !$(this).parents('div').hasClass('ajaxChosen');
+            }).chosen().change(function() {
+                $select = $(this);
+
+                // New message
+                if ($('body').hasClass('new-message')) {
+                    $option = $('option:selected', $select);
+
+                    if ($select.attr('id') === 'id_team') {
+                        if ($option.val() !== '') {
+                            $('div.recipient, div.or').addClass('disabled');
+                            $('select#id_user').attr('disabled', 'disabled').trigger('liszt:updated');
+                        } else {
+                            $('div.recipient, div.or').removeClass('disabled');
+                            $('select#id_user').removeAttr('disabled').trigger('liszt:updated');
+                        }
+                    }
+                }
+            });
+        },
+        resetLangFilter: function($select) {
+            if (typeof $select == 'undefined') {
+                $select = $('select#lang-filter');
+            }
+            if (window.REQUEST_GET_LANG) {
+                $opt = $('option[id="lang-opt-' + window.REQUEST_GET_LANG + '"]');
             } else {
                 $opt = $('option[id="lang-opt-any"]');
             }
@@ -31,11 +92,24 @@ var Site = function(Site) {
         }
     };
     this.Views = {
+        /*
+         * Each of these views runs on a specific
+         * page on the Universal Subtitles site
+         * (except for base, which runs on every
+         * page that extends base.html)
+         *
+         * Adding a view is as simple as adding an
+         * ID attribute to the specific page's <html>
+         * element, and adding the corresponding view
+         * below.
+         */
+
+        // Global
         base: function() {
 
             /*
-             * TODO: The modules in this section need to be
-             * pulled out into site.Utils and only
+             * TODO: The modules in this section need to
+             * be pulled out into that.Utils and only
              * initialized on pages that use them.
              */
             if ($('.abbr').length) {
@@ -171,16 +245,9 @@ var Site = function(Site) {
             window.addCSRFHeader = addCSRFHeader;
             addCSRFHeader($);
         },
-        home: function() {
 
-        },
-        members_list: function() {
-            // This calls the obj instance and probably shouldn't.
-            site.Utils.resetLangFilter();
-        },
+        // Public
         video_view: function() {
-            $('.tabs').tabs();
-
             $('.add_subtitles').click(function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
@@ -222,9 +289,133 @@ var Site = function(Site) {
                 opener.showStartDialog();
             }
 
+            $('.tabs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
-        tasks: function() {
+
+        // Teams
+        team_applications: function() {
+            that.Utils.chosenify();
+        },
+        team_members_list: function() {
+            that.Utils.resetLangFilter();
+            that.Utils.chosenify();
+        },
+        team_tasks: function() {
+            $('a.action-assign').click(function(e) {
+
+                $('div.assignee-choice').hide();
+
+                $form = $(e.target).parents('.admin-controls').siblings('form.assign-form');
+
+                $assignee_choice = $form.children('div.assignee-choice');
+                $assignee_choice.fadeIn('fast');
+
+                if (!window.begin_typing_trans) {
+                    window.begin_typing_trans = $('option.begin-typing-trans').eq(0).text();
+                }
+                $select = $form.find('select');
+                $select.children('option').remove();
+                $select.append('<option value="">-----</option>');
+                $select.append('<option value="">' + window.begin_typing_trans + '</option>');
+                $select.trigger('liszt:updated');
+
+                $chzn_container = $assignee_choice.find('.chzn-container');
+                $chzn_container.css('width', '100%');
+
+                $chzn_drop = $chzn_container.find('.chzn-drop');
+                $chzn_drop.css('width', '99%');
+
+                $chzn_input = $chzn_drop.find('input');
+                $chzn_input.css('width', '82%');
+
+                return false;
+            });
+            $('.assignee-choice a.cancel').click(function(e) {
+                $(e.target).parents('.assignee-choice').fadeOut('fast');
+                return false;
+            });
+            $('a.action-assign-submit').click(function(e) {
+                $(e.target).closest('form').submit();
+                return false;
+            });
+            $('a.assign-and-perform').click(function(e) {
+                var $target = $(e.target);
+                $target.text('Loading...');
+
+                $.ajax({
+                    url: window.ASSIGN_TASK_AJAX_URL,
+                    type: 'POST',
+                    data: {
+                        task: $target.attr('data-id'),
+                        assignee: window.ASSIGNEE
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        $target.hide();
+
+                        $li = $target.parent().siblings('li.hidden-perform-link');
+                        $li.show();
+
+                        $link = $li.children('a.perform');
+                        $link.text('Loading...');
+                        if ($link.attr('href') !== '') {
+                            window.location = $link.attr('href');
+                        } else {
+                            $link.click();
+                        }
+                    }
+                });
+
+                return false;
+            });
+            $('div.member-ajax-chosen select', '.v1 .content').ajaxChosen({
+                method: 'GET',
+                url: '/en/teams/' + window.TEAM_SLUG + '/members/search/',
+                dataType: 'json'
+            }, function (data) {
+                var terms = {};
+                $.each(data.results, function (i, val) {
+                    var can_perform_task = data.results[i][2];
+
+                    if (can_perform_task) {
+                        terms[data.results[i][0]] = data.results[i][1];
+                    }
+                });
+                return terms;
+            });
+
+            unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
+            that.Utils.resetLangFilter($('select#id_task_language'));
+            that.Utils.chosenify();
+        },
+        team_videos_list: function() {
+            $form = $('form', 'div#remove-modal');
+
+            $('a.remove-video').click(function() {
+                $form.attr('action', $(this).siblings('form').attr('action'));
+            });
+            $form.submit(function() {
+                var $checked = $('input[name="del-opt"]:checked', 'div#remove-modal');
+                if ($checked.val() == 'total-destruction') {
+                    $form.attr('action', $form.attr('action').replace('remove', 'delete'));
+                    if (confirm('Are you sure you want to permanently delete this video? This action is irreversible.')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                } else {
+                    if (confirm('All open tasks for this video will be aborted, and in-progress subtitles will be published. Do you want to proceed?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            });
+
+            that.Utils.resetLangFilter();
+            that.Utils.chosenify();
         }
     };
 };

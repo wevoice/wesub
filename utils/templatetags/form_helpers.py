@@ -1,9 +1,8 @@
-import urlparse
 from django import template
-register = template.Library()
-
-
 from django.forms.widgets import CheckboxInput
+
+
+register = template.Library()
 
 @register.inclusion_tag("_form_field.html")
 def smart_field_render(field):
@@ -17,6 +16,7 @@ def smart_field_render(field):
     {% load form_helpers %}
 
     {% smart_field_render form.my_field %}'
+
     """
 
     widget_class = field.form.fields[field.name].widget.__class__
@@ -25,6 +25,7 @@ def smart_field_render(field):
         CheckboxInput : 'checkbox'
     }
     widget_type= widget_types.get(widget_class, "")
+
     return {
         "field": field,
         "widget_type": widget_type

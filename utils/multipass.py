@@ -43,7 +43,7 @@ class MultiPass(object):
         """
         aes = EVP.Cipher("aes_128_cbc", key=self.secret,
             iv=self.iv, op=1)
-        
+
         raw_string = json.dumps(data)
         raw_string = self.handle_xor(raw_string)
         v = aes.update(raw_string)
@@ -64,7 +64,7 @@ class MultiPass(object):
 
         if 'expires' in obj:
             expires_utc = parser.parse(obj['expires'])
-            limit_time = datetime.now(tz=tzutc()) - timedelta(minutes=10) 
+            limit_time = datetime.now(tz=tzutc()) - timedelta(minutes=10)
             if limit_time > expires_utc:
                 raise Exception("Expired!")
 

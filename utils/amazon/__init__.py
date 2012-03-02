@@ -9,20 +9,19 @@
 #    AWS_SECRET_ACCESS_KEY - String
 #
 # ########################################################
+import os
+from StringIO import StringIO
 
-from django.db import models
-from django.conf import settings
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.exception import BotoClientError, BotoServerError
+from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
-from fields import S3EnabledImageField, S3EnabledFileField
-from django.core.mail import mail_admins
 from sentry.client.models import client
-from utils import DEFAULT_PROTOCOL
-from StringIO import StringIO
-import os
+
+from fields import S3EnabledImageField, S3EnabledFileField
+
 
 __all__ = ['S3EnabledImageField', 'S3EnabledFileField', 'S3Storage']
 
@@ -50,12 +49,12 @@ class S3Storage(FileSystemStorage):
 
     def _open(self, name, mode='rb'):
         class S3File(File):
-            
+
             def __init__(self, key, mode):
                 self.key = key
                 self._file = None
                 self._mode = mode
-                
+
             @property
             def file(self):
                 if self._file is None:
@@ -63,19 +62,19 @@ class S3Storage(FileSystemStorage):
                     if 'r' in self._mode:
                         self.key.get_contents_to_file(self._file)
                         self._file.seek(0)
-                return self._file            
-            
+                return self._file
+
             def size(self):
                 return self.key.size
-            
+
             def read(self, *args, **kwargs):
                 return self.key.read(*args, **kwargs)
-            
+
             def write(self, content):
                 self.key.set_contents_from_string(content)
-            
+
             def close(self):
-                self.key.close()  
+                self.key.close()
         return S3File(Key(self.bucket, name), mode)
 
     def _save(self, name, content):
@@ -114,17 +113,17 @@ class S3Storage(FileSystemStorage):
 
     def size(self, name):
         return self.bucket.get_key(name).size
-    
+
     def url(self, name):
         # we cannot use bucketname.amazonaws... since then the bucket
         # name will be part of the domain, and our ssl certificate
         # won't match that
         name = name.replace('\\', '/')
         return "%s%s" % (settings.MEDIA_URL, name)
-    
+
     def get_available_name(self, name):
         return name
-    
+
     @classmethod
     def create_default_storage(cls):
         if settings.USE_AMAZON_S3:

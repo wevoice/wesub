@@ -639,7 +639,7 @@ class TeamVideo(models.Model):
     def link_to_page(self):
         if self.all_languages:
             return self.video.get_absolute_url()
-        return self.video.video_link()
+        return reverse('videos:history', [self.video.video_id])
 
     @models.permalink
     def get_absolute_url(self):
@@ -677,14 +677,14 @@ class TeamVideo(models.Model):
             if sl1.percent_done == 0:
                 return 0
             elif sl0.is_dependent():
-                l_dep0 = sl0.real_standard_language()
-                l_dep1 = sl1.real_standard_language()
+                l_dep0 = sl0.standard_language
+                l_dep1 = sl1.standard_language
                 if l_dep0 and l_dep1 and l_dep0.id == l_dep1.id:
                     return sl1.percent_done
                 else:
                     return -1
             else:
-                l_dep1 = sl1.real_standard_language()
+                l_dep1 = sl1.standard_language
                 return sl1.percent_done if \
                     l_dep1 and l_dep1.id == sl0.id else -1
         else:
