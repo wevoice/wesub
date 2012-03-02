@@ -509,6 +509,11 @@ class Video(models.Model):
         SubtitleLanguage will be returned.  In this case the value will be
         cached in-object.
 
+        This method can produce surprising results if the video has more
+        than one subtitle language with the same code. This is an artifact
+        of when we did not allow this. In this case, we return the
+        language with the most subtitles.
+
         """
         try:
             if language_code is None:
