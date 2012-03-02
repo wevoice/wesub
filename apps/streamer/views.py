@@ -30,7 +30,7 @@ def youtubedemo(request):
     return render_to_response(
         'streamer/youtubedemo.html',
         { 'js_use_compiled': settings.COMPRESS_MEDIA,
-          'videoid': v.video_id,
+          'video': v,
           'subs': subs,
           'scripts': scripts },
         context_instance=RequestContext(request))

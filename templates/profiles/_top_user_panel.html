@@ -18,11 +18,9 @@
                 <li>
                     <a href="{% url messages:index %}">
                     {% trans "Messages" %}
-                    {% with user.unread_messages.count as new_msg_count %}
-                        {% if new_msg_count %}
-                            <span class="message_count">{{ user.unread_messages.count }}</span>
-                        {% endif %}
-                    {% endwith %}
+                    {% if user.unread_messages_count %}
+                        <span class="message_count">{{ user.unread_messages_count }}</span>
+                    {% endif %}
                     </a>
                 </li>
                 <li>

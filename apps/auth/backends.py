@@ -1,12 +1,35 @@
-from auth.models import CustomUser as User
-from django.contrib.auth.models import User as AuthUser
+# Universal Subtitles, universalsubtitles.org
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see
+# http://www.gnu.org/licenses/agpl-3.0.html.
+import random
+from urllib import urlopen
+
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.models import User as AuthUser
+from django.core.files.base import ContentFile
 
+from auth.models import CustomUser as User
 from socialauth.lib import oauthtwitter
-from socialauth.models import OpenidProfile as UserAssociation, TwitterUserProfile, FacebookUserProfile, AuthMeta
+from socialauth.models import (
+    OpenidProfile as UserAssociation, TwitterUserProfile, FacebookUserProfile,
+    AuthMeta
+)
 
-import random
 
 TWITTER_CONSUMER_KEY = getattr(settings, 'TWITTER_CONSUMER_KEY', '')
 TWITTER_CONSUMER_SECRET = getattr(settings, 'TWITTER_CONSUMER_SECRET', '')
@@ -17,7 +40,7 @@ FACEBOOK_REST_SERVER = getattr(settings, 'FACEBOOK_REST_SERVER', 'http://api.fac
 class CustomUserBackend(ModelBackend):
     supports_object_permissions = False
     supports_anonymous_user = False
-    
+
     def authenticate(self, username=None, password=None):
         try:
             user = User.objects.get(username=username, is_active=True)
@@ -25,7 +48,7 @@ class CustomUserBackend(ModelBackend):
                 return user
         except User.DoesNotExist:
             return None
-        
+
     def get_user(self, user_id):
         try:
             return User.objects.get(pk=user_id)
@@ -35,7 +58,7 @@ class CustomUserBackend(ModelBackend):
 class OpenIdBackend(object):
     supports_object_permissions = False
     supports_anonymous_user = False
-        
+
     def authenticate(self, openid_key, request, provider):
         try:
             assoc = UserAssociation.objects.get(openid_key = openid_key)
@@ -59,12 +82,12 @@ class OpenIdBackend(object):
                         email = request.openid.ax.get('email')
                     except KeyError:
                         pass
-                    
-                    try:                      
+
+                    try:
                         nickname = request.openid.ax.get('nickname')
                     except KeyError:
                         pass
-                    
+
             if nickname is None :
                 if email:
                     nickname = email.split('@')[0]
@@ -83,7 +106,7 @@ class OpenIdBackend(object):
             else:
                 user = User.objects.create_user(nickname,email or '')
             user.save()
- 
+
             #create openid association
             assoc = UserAssociation()
             assoc.openid_key = openid_key
@@ -95,12 +118,12 @@ class OpenIdBackend(object):
             if valid_username:
                 assoc.is_username_valid = True
             assoc.save()
- 
+
             #Create AuthMeta
             auth_meta = AuthMeta(user = user, provider = provider)
             auth_meta.save()
             return user
- 
+
     def get_user(self, user_id):
         try:
             user = User.objects.get(pk = user_id)
@@ -108,13 +131,11 @@ class OpenIdBackend(object):
         except User.DoesNotExist:
             return None
 
-from urllib import urlopen
-from django.core.files.base import ContentFile
 
 class TwitterBackend(object):
     supports_object_permissions = False
     supports_anonymous_user = False
-        
+
     def authenticate(self, access_token):
         '''authenticates the token by requesting user information from twitter
         '''
@@ -128,13 +149,13 @@ class TwitterBackend(object):
 
         screen_name = userinfo.screen_name
         img_url = userinfo.profile_image_url
-        
+
         try:
             user_profile = TwitterUserProfile.objects.get(screen_name = screen_name)
             if user_profile.user.is_active:
                 return user_profile.user
             else:
-                return        
+                return
         except TwitterUserProfile.DoesNotExist:
             #Create new user
             same_name_count = User.objects.filter(username__startswith = screen_name).count()
@@ -143,12 +164,12 @@ class TwitterBackend(object):
             else:
                 username = screen_name
             username = '@'+username
-            
+
             name_count = AuthUser.objects.filter(username__startswith = username).count()
-                
+
             if name_count:
                 username = '%s%s'%(username, name_count + 1)
-                            
+
             user = User(username =  username)
             temp_password = User.objects.make_random_password(length=12)
             user.set_password(temp_password)
@@ -161,7 +182,7 @@ class TwitterBackend(object):
             if img_url:
                 img = ContentFile(urlopen(img_url).read())
                 name = img_url.split('/')[-1]
-                user.picture.save(name, img, False)            
+                user.picture.save(name, img, False)
             #user.email = '%s@twitteruser.%s.com'%(userinfo.screen_name, settings.SITE_NAME)
             user.save()
             userprofile = TwitterUserProfile(user = user, screen_name = screen_name)
@@ -179,7 +200,7 @@ class TwitterBackend(object):
             return User.objects.get(pk=user_id)
         except:
             return None
-        
+
 
 class FacebookBackend(object):
     supports_object_permissions = False
@@ -193,7 +214,7 @@ class FacebookBackend(object):
 
         username = user_info['first_name']
         try:
-            user_profile = FacebookUserProfile.objects.get(user__is_active=True, facebook_uid=user_info['uid'])
+            user_profile = FacebookUserProfile.objects.get(facebook_uid=user_info['uid'])
             if user_profile.user.is_active:
                 return user_profile.user
             else:

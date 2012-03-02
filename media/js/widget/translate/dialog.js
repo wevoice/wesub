@@ -26,7 +26,7 @@ unisubs.translate.Dialog = function(opener,
                                      serverModel,
                                      videoSource, 
                                      subtitleState, 
-                                     standardSubState) {
+                                     standardSubState, reviewOrApprovalType) {
     unisubs.Dialog.call(this, videoSource);
     unisubs.SubTracker.getInstance().start(true);
     this.opener_ = opener;
@@ -36,33 +36,40 @@ unisubs.translate.Dialog = function(opener,
     this.serverModel_ = serverModel;
     this.serverModel_.init();
     this.saved_ = false;
+    this.rightPanelListener_ = new goog.events.EventHandler(this);
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
+    // if this is a review approve dialog, we must fetch saved notes for this task if available
+    // but we should only do it when the dialog laods the first time
+    // (else as users move back and forward between panels we might
+    // overwrite their notes). This is what this flag is for
+    this.notesFectched_ = false;
+    if ( !Boolean(this.reviewOrApprovalType_)){
+       this.notesFectched_ = true; 
+    }
 };
-goog.inherits(unisubs.translate.Dialog, unisubs.Dialog);
+goog.inherits(unisubs.translate.Dialog, unisubs.subtitle.Dialog);
+
+unisubs.translate.Dialog.State_ = {
+    TRANSLATE: 0,
+    EDIT_METADATA: 1
+    
+};
+
 unisubs.translate.Dialog.prototype.createDom = function() {
     unisubs.translate.Dialog.superClass_.createDom.call(this);
-    this.translationPanel_ = new unisubs.translate.TranslationPanel(
-        this.serverModel_.getCaptionSet(), this.standardSubState_);
-    this.getCaptioningAreaInternal().addChild(
-        this.translationPanel_, true);
-    var rightPanel = this.createRightPanel_();
-    this.setRightPanelInternal(rightPanel);
-    this.getHandler().
-        listen(
-            rightPanel, unisubs.RightPanel.EventType.DONE,
-            this.handleDoneKeyPress_).
-        listen(
-            rightPanel, unisubs.RightPanel.EventType.SAVEANDEXIT,
-            this.handleSaveAndExitKeyPress_);
-    goog.dom.classes.add(this.getContentElement(),
-                         'unisubs-modal-widget-translate');
+    this.setDraggable(false);
     this.showGuidelines_();
+    this.enterState_(unisubs.translate.Dialog.State_.TRANSLATE);
 };
 unisubs.translate.Dialog.prototype.showGuidelines_ = function() {
-    if (!unisubs.guidelines['translate']) {
-        return;
-    }
+    if (!unisubs.guidelines['translate']) var s = unisubs.subtitle.Dialog.State_;
+    // the same dialog can be used in transcribing or review approval, which guidelines should we use?
+    var guideline = this.reviewOrApprovalType_ ? this.getTeamGuidelineForReview() : unisubs.guidelines['translate'];
 
-    var guidelinesPanel = new unisubs.GuidelinesPanel(unisubs.guidelines['translate']);
+    if (!guideline) {
+        return;
+    } 
+    var guidelinesPanel = new unisubs.GuidelinesPanel(guideline);
     this.showTemporaryPanel(guidelinesPanel);
     this.displayingGuidelines_ = true;
 
@@ -74,52 +81,62 @@ unisubs.translate.Dialog.prototype.showGuidelines_ = function() {
         });
     });
 };
-unisubs.translate.Dialog.prototype.createRightPanel_ = function() {
-    var title = this.subtitleState_.VERSION > 0 ? 
-        "Editing Translation" : "Adding a New Translation";
-    var helpContents = new unisubs.RightPanel.HelpContents(
-        title,
-        [["Thanks for volunteering to translate! Your translation will be available to ",
-"everyone  watching the video in our widget."].join(''),
-         ["Please translate each line, one by one, in the white  ", 
-          "space below each line."].join(''),
-         ["If you need to rearrange the order of words or split a phrase ",
-          "differently, that's okay."].join(''),
-         ["As you're translating, you can use the \"TAB\" key to advance to ",
-          "the next line, and \"Shift-TAB\" to go back."].join('')
-        ]);
-    var extraHelp = [
-        ["Google Translate", "http://translate.google.com/"],
-        ["List of dictionaries", "http://yourdictionary.com/languages.html"],
-        ["Firefox spellcheck dictionaries", 
-         "https://addons.mozilla.org/en-US/firefox/browse/type:3"]
-    ];
-    return new unisubs.translate.TranslationRightPanel(
-        this,
-        this.serverModel_, helpContents, extraHelp, [], false, "Done?", 
-        "Submit final translation", "Resources for Translators");
-};
+
 unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
     e.preventDefault();
-    this.saveWork(true);
+    this.saveWork(false);
 };
+
 unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
-    this.saveWork(true);
     event.preventDefault();
+    if (this.state_ == unisubs.translate.Dialog.State_.EDIT_METADATA)
+        this.saveWork(true);
+    else
+        this.enterState_(unisubs.translate.Dialog.State_.EDIT_METADATA)
 };
+
 unisubs.translate.Dialog.prototype.isWorkSaved = function() {
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();
 };
+
 unisubs.translate.Dialog.prototype.enterDocument = function() {
-    unisubs.translate.Dialog.superClass_.enterDocument.call(this);
+    // this is where we listen to the dialog close button
+    unisubs.subtitle.Dialog.superClass_.enterDocument.call(this);
     unisubs.Dialog.translationDialogOpen = true;
     var that = this;
     this.getRightPanelInternal().showDownloadLink(
         function() {
             return that.makeJsonSubs();
         });
+
+    if (this.reviewOrApprovalType_ && !this.notesFectched_){
+        var func  = this.serverModel_.fetchReviewData ;
+        var that = this;
+        if (this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL){
+            func = this.serverModel_.fetchApproveData;
+        }
+        
+        // make sure we retain the correct scope
+        func.call(this.serverModel_, unisubs.task_id, function(body) {
+            that.onNotesFetched_(body);
+        });
+    }
 };
+
+
+unisubs.translate.Dialog.prototype.onNotesFetched_ = function(body) {
+    if( this.currentSubtitlePanel_ && this.currentSubtitlePanel_.setNotesContent_){
+        this.currentSubtitlePanel_.setNotesContent_(body);
+    }
+}
+
 unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
+    if (goog.array.isEmpty(
+        this.serverModel_.captionSet_.nonblankSubtitles())){
+        // there are no subs here, close dialog or back to subtitling
+        this.showEmptySubsDialog();
+        return;
+    }
     var that = this;
     this.getRightPanelInternal().showLoading(true);
     this.serverModel_.finish(
@@ -137,6 +154,26 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
                     goog.bind(that.saveWorkInternal, that, closeAfterSave));
         });
 };
+
+unisubs.translate.Dialog.prototype.showGuidelinesForState_ = function(state) {
+    this.setState_(state);
+}
+
+unisubs.Dialog.prototype.setVisible = function(visible) {
+    if (visible) {
+        unisubs.Dialog.superClass_.setVisible.call(this, true);
+        goog.dom.getDocumentScrollElement().scrollTop = 0;
+    }
+    else {
+        if (this.isWorkSaved()) {
+            this.hideDialogImpl_();
+        }
+        else {
+            this.showSaveWorkDialog_();
+        }
+    }
+};
+
 unisubs.translate.Dialog.prototype.onWorkSaved = function() {
     if (this.finishFailDialog_) {
         this.finishFailDialog_.setVisible(false);
@@ -152,6 +189,100 @@ unisubs.translate.Dialog.prototype.disposeInternal = function() {
     unisubs.translate.Dialog.superClass_.disposeInternal.call(this);
     this.serverModel_.dispose();
 };
+
+unisubs.translate.Dialog.prototype.enterState_ = function(state) {
+    this.showGuidelinesForState_(state);
+};
+
+unisubs.translate.Dialog.prototype.suspendKeyEvents_ = function(suspended) {
+    this.keyEventsSuspended_ = suspended;
+    if (this.currentSubtitlePanel_ && this.currentSubtitlePanel_.suspendKeyEvents)
+        this.currentSubtitlePanel_.suspendKeyEvents(suspended);
+};
+
+unisubs.translate.Dialog.prototype.setState_ = function(state) {
+    this.state_ = state;
+
+    this.suspendKeyEvents_(false);
+
+    var s = unisubs.translate.Dialog.State_;
+
+    this.setExtraClass_();
+
+    var nextSubPanel = this.makeCurrentStateSubtitlePanel_();
+    var captionPanel = this.getCaptioningAreaInternal();
+    captionPanel.removeChildren(true);
+    captionPanel.addChild(nextSubPanel, true);
+
+    var rightPanel = nextSubPanel.getRightPanel();
+    this.setRightPanelInternal(rightPanel);
+
+    this.getTimelinePanelInternal().removeChildren(true);
+
+    if (this.currentSubtitlePanel_ && this.currentSubtitlePanel_.getNotesContent_){
+       var currentNoteContent =  this.currentSubtitlePanel_.getNotesContent_();
+       if (nextSubPanel  && nextSubPanel.setNotesContent_){
+           nextSubPanel.setNotesContent_(currentNoteContent)
+       }
+    }
+    
+    this.disposeCurrentPanels_();
+    this.currentSubtitlePanel_ = nextSubPanel;
+
+    var et = unisubs.RightPanel.EventType;
+    this.rightPanelListener_.
+        listen(
+            rightPanel, et.LEGENDKEY, this.handleLegendKeyPress_).
+        listen(
+            rightPanel, et.DONE, this.handleDoneKeyPress_).
+        listen(
+            rightPanel, et.SAVEANDEXIT, this.handleSaveAndExitKeyPress_).
+        listen(
+            rightPanel, et.GOTOSTEP, this.handleGoToStep_);
+    var backButtonText = null;
+    if (state == s.EDIT_METADATA ){
+        backButtonText = "Back to Translation";
+    }
+    if (backButtonText){
+        rightPanel.showBackLink(backButtonText);
+        this.rightPanelListener_.listen(
+            rightPanel, et.BACK, this.handleBackKeyPress_);
+
+    }
+    
+    var videoPlayer = this.getVideoPlayerInternal();
+    if (this.isInDocument()) {
+        if (!videoPlayer.isPaused()){
+            videoPlayer.pause();
+        }
+        if(videoPlayer.getPlayheadTime()){
+            videoPlayer.setPlayheadTime(0);
+            videoPlayer.pause();
+        }
+    }
+};
+unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
+    var s = unisubs.translate.Dialog.State_;
+    
+    if (this.state_ == s.TRANSLATE){
+        this.translationPanel_ =  new unisubs.translate.TranslationPanel(
+            this.serverModel_.getCaptionSet(), this.standardSubState_, this, 
+            this.reviewOrApprovalType_, this.serverModel_);
+        return this.translationPanel_; 
+    }
+    else if (this.state_ == s.EDIT_METADATA)
+        return new unisubs.editmetadata.Panel(
+            this.serverModel_.getCaptionSet(),
+            this.getVideoPlayerInternal(),
+            this.serverModel_,
+            this.captionManager_,
+            this.standardSubState_ ,
+            false,
+            this.reviewOrApprovalType_,
+            this
+        );
+};
+
 /**
  * Tries translate subtitles with BingTranslator
  */
@@ -191,4 +322,16 @@ unisubs.translate.Dialog.prototype.forkImpl_ = function() {
     this.opener_.openSubtitlingDialog(
         this.serverModel_,
         this.subtitleState_);
+};
+
+unisubs.translate.Dialog.prototype.disposeCurrentPanels_ = function() {
+    if (this.currentSubtitlePanel_) {
+        this.currentSubtitlePanel_.dispose();
+        this.currentSubtitlePanel_ = null;
+    }
+    this.rightPanelListener_.removeAll();
+    if (this.timelineSubtitleSet_ != null) {
+        this.timelineSubtitleSet_.dispose();
+        this.timelineSubtitleSet_ = null;
+    }
 };

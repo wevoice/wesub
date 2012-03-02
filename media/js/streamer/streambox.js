@@ -70,7 +70,7 @@ unisubs.streamer.StreamBox.prototype.decorateInternal = function(elem) {
     this.videoTab_ = new unisubs.streamer.StreamerVideoTab(
         goog.dom.getElement("unisubs-logo"));
     var subSpans = goog.dom.getElementsByTagNameAndClass(
-        'span', 'unisubs-sub', elem);
+        'p', 'unisubs-transcript-paragraph', elem);
     this.makeSubsAndSubMap_(subSpans);
     this.streamBoxSearch_ = new unisubs.streamer.StreamBoxSearch();
     var searchContainer = goog.dom.getElementsByTagNameAndClass(
@@ -85,22 +85,50 @@ unisubs.streamer.StreamBox.prototype.getVideoTab = function() {
     return this.videoTab_;
 };
 
+/*
+* Creates the actual dom nodes for subtitles.
+* @param  A two dimensional array of subs, groupped by paragraps, such as:
+* [
+  [sub1, sub2, sub3] // this is the first paragraph
+  [sub4, sub5, sub6, sub7, sub8, sub9] 
+]
+*/
+unisubs.streamer.StreamBox.prototype.createSubsEls_ = function(subs){
+    var paragraphs = [];
+    var currentParagraph;
+    goog.array.forEach(subs, function(sub, index){
+        
+        var startParagraph = index == 0 || sub['start_of_paragraph'];
+        if (startParagraph){
+            currentParagraph = []
+            paragraphs.push(currentParagraph)
+        }
+        currentParagraph.push(sub);
+        
+    });
+    var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
+    var els = goog.array.map(paragraphs, function(thisParagraph, index){
+        var lines = goog.array.map(thisParagraph, function(sub){
+            return span  = $d(
+                'span', 
+                { 'className': 'unisubs-sub',
+                  'id': 'usub-a-' + sub['subtitle_id'] },
+                sub['text']  );
 
+        });
+        var args = goog.array.concat(["p", null] , lines);
+        return $d.apply(null, args);
+        
+    });
+    return els;
+}
 
 /**
  * @param {Array} subtitles json subs from server
  */
 unisubs.streamer.StreamBox.prototype.setSubtitles = function(subtitles) {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    var subSpans = goog.array.map(
-        subtitles,
-        function(s) {
-            return $d(
-                'span', 
-                { 'className': 'unisubs-sub',
-                  'id': 'usub-a-' + s['subtitle_id'] },
-                s['text']);
-        });
+    var subSpans = this.createSubsEls_(subtitles);
     goog.dom.removeChildren(this.transcriptElem_);
     var elems = [];
     for (var i = 0; i < subSpans.length; i++) {
@@ -143,7 +171,15 @@ unisubs.streamer.StreamBox.prototype.showResyncButton_ = function(show) {
     unisubs.style.setVisibility(this.resyncButton_, show);
 };
 
-unisubs.streamer.StreamBox.prototype.makeSubsAndSubMap_ = function(subSpans) {
+unisubs.streamer.StreamBox.prototype.makeSubsAndSubMap_ = function(paragraphs) {
+    var subSpans = [];
+    // get all span span elements for this transcript
+    goog.array.forEach(paragraphs, function(p){
+        var nodes = goog.dom.getElementsByTagNameAndClass("span", null, p)
+        for (var i = 0 ;i < nodes.length; i++){
+            subSpans.push(nodes[i]);
+        }
+    });
     this.subs_ = goog.array.map(
         subSpans, function(s) { 
             return new unisubs.streamer.StreamSub(s); 

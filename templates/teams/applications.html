@@ -6,13 +6,24 @@
     {{ team }} {% trans 'Team Aplications' %} | Universal Subtitles
 {% endblock %}
 
+{% block scripts %}
+    {% include "utils/chosenify.html" %}
+    <script type="text/javascript">
+        $(function() {
+            $select = $("select#lang-filter, select#role-filter", ".tools");
+            $select.change(function(e) {
+                window.location = $(this).children('option:selected').attr('value');
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block view_content %}
 
-    {% with "members" as current %}
-        {% include 'teams/_tabs.html' %}
-    {% endwith %}
-
-    <div class="view grid_9 alpha">
+    <div class="view grid_8 omega">
+        {% with 'members' as current %}
+            {% include 'teams/_tabs.html' %}
+        {% endwith %}
 
         {% if applications_list %}
             {% if is_paginated %}{% paginator %}{% endif %}
@@ -48,13 +59,6 @@
         {% else %}
             <p class="empty">{% trans "There are no applications right now" %}...</p>
         {% endif %}
-    </div>
-
-    <div class="controls grid_3 omega">
-        {% with "applicants" as current %}
-            {% include "teams/_filters_members.html" %}
-        {% endwith %}
-        {% include "teams/_actions.html" %}
     </div>
     
 {% endblock %}

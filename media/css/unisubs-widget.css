@@ -681,6 +681,9 @@ span.unisubs-widget {
     padding: 3px !important;
     width: 350px !important;
 }
+textarea.unisubs-descriptionField{
+   height:140px !important
+}
 .unisubs-whats {
     color: #999 !important;
     display: block !important;
@@ -964,6 +967,7 @@ ul.unisubs-titlesList {
 ul.unisubs-titlesList li.active {
     background: #caf3ff !important
 }
+
 ul.unisubs-titlesList li {
     border-bottom: 1px solid #ccc !important;
     font-weight: bold !important;
@@ -1004,12 +1008,25 @@ ul.unisubs-titlesList li:hover .unisubs-timestamp {
     padding-right: 9px !important;
     padding-top: 0px !important;
 }
-.unisubs-sub-delete, .unisubs-sub-insert {
+.unisubs-sub-delete, .unisubs-sub-insert, .unisubs-sub-paragraph {
     cursor: pointer !important;
     cursor: hand !important;
     position: absolute !important;
     top: 0px !important;
 }
+
+.unisubs-sub-paragraph {
+    background: url("../images/paragraph-marker.png") 0 0 no-repeat !important;
+    height: 28px !important;
+    left: 8px !important;
+    top: -5px !important;
+    width: 30px !important;
+}
+
+.unisubs-sub-paragraph.selected{
+    background: url("../images/paragraph-marker.png") 0 -57px no-repeat !important ;
+}
+
 .unisubs-sub-insert:active {
     background: url("../images/add-title.png") 0 0 no-repeat !important
 }
@@ -2214,8 +2231,10 @@ a.unisubs-openid span {
     padding: 15px !important;
     position: absolute !important;
     top: 0 !important;
-    text-align: center !important;
     width: 842px !important;
+}
+.unisubs-howtopanel div {
+    text-align: center !important;
 }
 .unisubs-guidelinespanel .unisubs-done, .unisubs-howtopanel .unisubs-done {
     display: block !important;
@@ -2518,6 +2537,14 @@ div.unisubs-dropdown {
     text-decoration: none !important;
     text-shadow: 0 0 0 !important;
 }
+.unisubs-dropdown .unisubs-actions .unisubs-moderated p {
+    color: #aaa !important;
+    margin: 10px 20px !important;
+}
+.unisubs-dropdown .unisubs-actions .unisubs-moderated p a {
+    display: inline !important;
+    padding: 0 !important;
+}
 .unisubs-dropdown .unisubs-addTranslation {
     background: url("../images/dropdown_icons.png") 19px 7px no-repeat !important;
     color: #a9c712 !important;
@@ -2778,7 +2805,7 @@ div.unisubs-transcript span {
     -moz-border-radius: 4px !important;
     -webkit-border-radius: 4px !important;
     border-radius: 4px !important;
-    margin: -4px -4px !important;
+    margin: -4px -2px !important;
     padding: 4px 4px !important;
 }
 .unisubs-right div a.widget-button {

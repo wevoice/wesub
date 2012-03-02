@@ -2,6 +2,23 @@
     jQuery(document).ready(function() {
         $("select", ".v1 .content").filter(function() {
             return !$(this).parents('div').hasClass('ajaxChosen');
-        }).chosen();
+        }).chosen().change(function() {
+            $select = $(this);
+
+            // New message
+            if ($('body').hasClass('new-message')) {
+                $option = $('option:selected', $select);
+
+                if ($select.attr('id') === 'id_team') {
+                    if ($option.val() !== '') {
+                        $('div.recipient, div.or').addClass('disabled');
+                        $('select#id_user').attr('disabled', 'disabled').trigger('liszt:updated');
+                    } else {
+                        $('div.recipient, div.or').removeClass('disabled');
+                        $('select#id_user').removeAttr('disabled').trigger('liszt:updated');
+                    }
+                }
+            }
+        });
     });
 </script>

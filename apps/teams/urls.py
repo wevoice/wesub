@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,7 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import url, patterns
 from teams.rpc import rpc_router
 
 urlpatterns = patterns('teams.views',
@@ -28,7 +28,6 @@ urlpatterns = patterns('teams.views',
     url(r'^tasks/perform/$', 'perform_task', name='perform_task'),
     url('^invite/accept/(?P<invite_pk>\d+)/$', 'accept_invite', name='accept_invite'),
     url('^invite/deny/(?P<invite_pk>\d+)/$', 'accept_invite', {'accept': False}, name='deny_invite'),
-    url('^complete/(?P<slug>[-\w]+)/$', 'completed_videos', name='completed_videos'),
     url('^join_team/(?P<slug>[-\w]+)/$', 'join_team', name='join_team'),
     url('^leave_team/(?P<slug>[-\w]+)/$', 'leave_team', name='leave_team'),
     url('^highlight/(?P<slug>[-\w]+)/$', 'highlight', name='highlight'),
@@ -40,9 +39,12 @@ urlpatterns = patterns('teams.views',
     url('^add/videos/(?P<slug>[-\w]+)/$', 'add_videos', name='add_videos'),
     url('^edit/video/(?P<team_video_pk>\d+)/$', 'team_video', name='team_video'),
     url('^remove/video/(?P<team_video_pk>\d+)/$', 'remove_video', name='remove_video'),
+    # this acutally deletes videos and all of it's data. For good, watch out
+    url('^delete/video/(?P<team_video_pk>\d+)/$', 'delete_video', name='delete_video'),
     url('^remove/members/(?P<slug>[-\w]+)/(?P<user_pk>\d+)/$', 'remove_member', name='remove_member'),
     url('^(?P<slug>[-\w]+)/?$', 'detail', name='detail'),
     url('^(?P<slug>[-\w]+)/members/$', 'detail_members', name='detail_members'),
+    url('^(?P<slug>[-\w]+)/members/role-saved/$', 'role_saved', name='role_saved'),
     url('^(?P<slug>[-\w]+)/members/invite/$', 'invite_members', name='invite_members'),
     url('^(?P<slug>[-\w]+)/members/search/$', 'search_members', name='search_members'),
     url('^(?P<slug>[-\w]+)/members/(?P<role>[-\w]+)/$', 'detail_members', name='detail_members_role'),
@@ -63,6 +65,11 @@ urlpatterns = patterns('teams.views',
     url('^(?P<slug>[-\w]+)/settings/projects/(?P<project_slug>[-\w]+)/$', 'edit_project', name='edit_project'),
     # just /p/ will bring all videos on any projects
     url('^(?P<slug>[-\w]+)/p/(?P<project_slug>[-\w]+)?/?$', 'detail', name='project_video_list'),
+    # TODO: Review these...
+    url('^(?P<slug>[-\w]+)/p/(?P<project_slug>[-\w]+)/tasks/?$', 'team_tasks', name='project_tasks'),
+    url('^(?P<slug>[-\w]+)/third-party-accounts/$', 'third_party_accounts', name='third-party-accounts'),
+    url('^(?P<slug>[-\w]+)/unpublish/$', 'unpublish', name='unpublish'),
+    url('^(?P<slug>[-\w]+)/auto-captions-status/$', 'auto_captions_status', name='auto-captions-status'),
 )
 
 urlpatterns += patterns('',

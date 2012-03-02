@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Universal Subtitles, universalsubtitles.org
 # 
 # Copyright (C) 2010 Participatory Culture Foundation
@@ -24,125 +25,30 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 def rel(*x):
     return os.path.join(PROJECT_ROOT, *x)
 
-gettext_noop = lambda s: s
-
+# Rebuild the language dicts to support more languages.
 from django.conf import global_settings
-#: see doc/i18n
+from libs.unilangs import get_language_code_mapping
 
+# We use a custom format for our language labels:
+# Translated Language Name (Native Name)
+#
+# For example: if you are an English user you'll see something like:
+# French (Français)
+language_choices = [(code,
+                     u'%s (%s)' % (lc.name(), lc.native_name()))
+                    for code, lc in get_language_code_mapping('unisubs').items()]
+
+global_settings.LANGUAGES = ALL_LANGUAGES = language_choices
+
+# Languages representing metadata
 METADATA_LANGUAGES = (
     ('meta-tw', 'Metadata: Twitter'),
     ('meta-geo', 'Metadata: Geo'),
     ('meta-wiki', 'Metadata: Wikipedia'),
 )
 
-ALL_LANGUAGES = list(global_settings.LANGUAGES)
-ALL_LANGUAGES.extend(METADATA_LANGUAGES)
-ALL_LANGUAGES = dict(ALL_LANGUAGES)
-
-
-
-ALL_LANGUAGES['af'] = gettext_noop(u'Afrikaans')
-ALL_LANGUAGES['aka'] = gettext_noop(u'Akan')
-ALL_LANGUAGES['amh'] = gettext_noop(u'Amharic')
-ALL_LANGUAGES['as'] = gettext_noop(u'Assamese')
-ALL_LANGUAGES['ase'] = gettext_noop(u'American Sign Language')
-ALL_LANGUAGES['ast'] = gettext_noop(u'Asturian')
-ALL_LANGUAGES['ay'] = gettext_noop(u'Aymara')
-ALL_LANGUAGES['bam'] = gettext_noop(u'Bambara')
-ALL_LANGUAGES['be'] = gettext_noop(u'Belarusian')
-ALL_LANGUAGES['ber'] = gettext_noop(u'Berber')
-ALL_LANGUAGES['bi'] = gettext_noop(u'Bislama')
-ALL_LANGUAGES['bnt'] = gettext_noop(u'Ibibio')
-ALL_LANGUAGES['bo'] = gettext_noop(u'Tibetan')
-ALL_LANGUAGES['br'] = gettext_noop(u'Breton')
-ALL_LANGUAGES['ceb'] = gettext_noop(u'Cebuan')
-ALL_LANGUAGES['cr'] = gettext_noop(u'Cree')
-ALL_LANGUAGES['ee'] = gettext_noop(u'Ewe')
-ALL_LANGUAGES['en-gb'] = gettext_noop(u'English, British')
-ALL_LANGUAGES['eo'] = gettext_noop(u'Esperanto')
-ALL_LANGUAGES['eo'] = gettext_noop(u'Esperanto')
-ALL_LANGUAGES['es-ar'] = gettext_noop(u'Spanish, Argentinian')
-ALL_LANGUAGES['es-mx'] = gettext_noop(u'Spanish, Mexican')
-ALL_LANGUAGES['es-ni'] = gettext_noop(u'Spanish, Nicaraguan')
-ALL_LANGUAGES['fil'] = gettext_noop(u'Filipino')
-ALL_LANGUAGES['fr-ca'] = gettext_noop(u'French, Canadian')
-ALL_LANGUAGES['ful'] = gettext_noop(u'Fula')
-ALL_LANGUAGES['gu'] = gettext_noop(u'Gujarati')
-ALL_LANGUAGES['hai'] = gettext_noop(u'Haida')
-ALL_LANGUAGES['hau'] = gettext_noop(u'Hausa')
-ALL_LANGUAGES['ht'] = gettext_noop(u'Creole, Haitian')
-ALL_LANGUAGES['hy'] = gettext_noop(u'Armenian')
-ALL_LANGUAGES['ibo'] = gettext_noop(u'Igbo')
-ALL_LANGUAGES['ilo'] = gettext_noop(u'Ilocano')
-ALL_LANGUAGES['iro'] = gettext_noop(u'Iroquoian languages')
-ALL_LANGUAGES['iu'] = gettext_noop(u'Inuktitut')
-ALL_LANGUAGES['ka'] = gettext_noop(u'Georgian')
-ALL_LANGUAGES['kau'] = gettext_noop(u'Kanuri')
-ALL_LANGUAGES['kik'] = gettext_noop(u'Gikuyu')
-ALL_LANGUAGES['kin'] = gettext_noop(u'Kinyarwanda')
-ALL_LANGUAGES['kk'] = gettext_noop(u'Kazakh')
-ALL_LANGUAGES['kon'] = gettext_noop(u'Kongo')
-ALL_LANGUAGES['kw'] = gettext_noop(u'Cornish')
-ALL_LANGUAGES['ky'] = gettext_noop(u'Kyrgyz')
-ALL_LANGUAGES['lin'] = gettext_noop(u'Lingala')
-ALL_LANGUAGES['lkt'] = gettext_noop(u'Lakota')
-ALL_LANGUAGES['lo'] = gettext_noop(u'Lao')
-ALL_LANGUAGES['lua'] = gettext_noop(u'Luba-Kasai')
-ALL_LANGUAGES['luo'] = gettext_noop(u'Luo')
-ALL_LANGUAGES['luy'] = gettext_noop(u'Luhya')
-ALL_LANGUAGES['ml'] = gettext_noop(u'Malayalam')
-ALL_LANGUAGES['mlg'] = gettext_noop(u'Malagasy')
-ALL_LANGUAGES['mnk'] = gettext_noop(u'Mandinka')
-ALL_LANGUAGES['moh'] = gettext_noop(u'Mohawk')
-ALL_LANGUAGES['mos'] = gettext_noop(u'Mossi')
-ALL_LANGUAGES['mr'] = gettext_noop(u'Marathi')
-ALL_LANGUAGES['ms'] = gettext_noop(u'Malay')
-ALL_LANGUAGES['mt'] = gettext_noop(u'Maltese')
-ALL_LANGUAGES['my'] = gettext_noop(u'Burmese')
-ALL_LANGUAGES['nb'] = gettext_noop(u'Norwegian, Bokmal')
-ALL_LANGUAGES['ne'] = gettext_noop(u'Nepali')
-ALL_LANGUAGES['nn'] = gettext_noop(u'Norwegian, Nynorsk')
-ALL_LANGUAGES['nso'] = gettext_noop(u'Northern Sotho')
-ALL_LANGUAGES['nya'] = gettext_noop(u'Chewa')
-ALL_LANGUAGES['oc'] = gettext_noop(u'Occitan')
-ALL_LANGUAGES['oji'] = gettext_noop(u'Anishinaabe')
-ALL_LANGUAGES['or'] = gettext_noop(u'Oriya')
-ALL_LANGUAGES['orm'] = gettext_noop(u'Oromo')
-ALL_LANGUAGES['ps'] = gettext_noop(u'Pashto')
-ALL_LANGUAGES['pt-br'] = gettext_noop(u'Portuguese, Brazilian')
-ALL_LANGUAGES['que'] = gettext_noop(u'Quechua')
-ALL_LANGUAGES['rup'] = gettext_noop(u'Macedo (Aromanian) Romanian')
-ALL_LANGUAGES['sh'] = gettext_noop(u'Serbo-Croatian')
-ALL_LANGUAGES['si'] = gettext_noop(u'Sinhala')
-ALL_LANGUAGES['sna'] = gettext_noop(u'Shona')
-ALL_LANGUAGES['som'] = gettext_noop(u'Somali')
-ALL_LANGUAGES['sot'] = gettext_noop(u'Sotho')
-ALL_LANGUAGES['sr-latn'] = gettext_noop(u'Serbian, Latin')
-ALL_LANGUAGES['swa'] = gettext_noop(u'Swahili')
-ALL_LANGUAGES['tir'] = gettext_noop(u'Tigrinya')
-ALL_LANGUAGES['tl'] = gettext_noop(u'Tagalog')
-ALL_LANGUAGES['tlh'] = gettext_noop(u'Klingon')
-ALL_LANGUAGES['tsn'] = gettext_noop(u'Tswana')
-ALL_LANGUAGES['umb'] = gettext_noop(u'Umbundu')
-ALL_LANGUAGES['uz'] = gettext_noop(u'Uzbek')
-ALL_LANGUAGES['wol'] = gettext_noop(u'Wolof')
-ALL_LANGUAGES['xho'] = gettext_noop(u'Xhosa')
-ALL_LANGUAGES['yi'] = gettext_noop(u'Yiddish')
-ALL_LANGUAGES['yor'] = gettext_noop(u'Yoruba')
-ALL_LANGUAGES['zh'] = gettext_noop(u'Chinese, Yue')
-ALL_LANGUAGES['zh-cn'] = gettext_noop(u'Chinese, Simplified')
-ALL_LANGUAGES['zh-tw'] = gettext_noop(u'Chinese, Traditional')
-ALL_LANGUAGES['zul'] = gettext_noop(u'Zulu')
-
-if ALL_LANGUAGES.get('no', None):
-    del ALL_LANGUAGES['no']
-    
-full_langs = dict(ALL_LANGUAGES.items())
-ALL_LANGUAGES = tuple(i for i in ALL_LANGUAGES.items())
-# this has to be set after all languages have been appended
-global_settings.LANGUAGES = tuple(i for i in full_langs.items())
-# languages that more people speak, and therefore
-# are it's translators are not as rare
+# languages that more people speak, and therefore their translators are not as
+# rare
 LINGUA_FRANCAS = ["en", "en-gb"]
 
 DEBUG = True
@@ -240,7 +146,6 @@ JS_CORE = \
      'js/streamer/streamsub.js', 
      'js/streamer/streamervideotab.js', 
      'js/streamer/streamerdecorator.js', 
-     'js/requestdialog.js',
      'js/widget/videotab.js',
      'js/widget/hangingvideotab.js',
      'js/widget/subtitle/editablecaption.js',
@@ -271,17 +176,15 @@ JS_DIALOG = \
     ['js/subtracker.js',
      'js/srtwriter.js',
      'js/widget/unsavedwarning.js',
+     'js/widget/emptysubswarningdialog.js',
      'js/widget/droplockdialog.js',
      'js/finishfaildialog/dialog.js',
      'js/finishfaildialog/errorpanel.js',
      'js/finishfaildialog/reattemptuploadpanel.js',
      'js/finishfaildialog/copydialog.js',
-     'js/widget/reviewsubtitles/dialog.js',
-     'js/widget/reviewsubtitles/reviewsubtitlespanel.js',
-     'js/widget/reviewsubtitles/reviewsubtitlesrightpanel.js',
-     'js/widget/approvesubtitles/dialog.js',
-     'js/widget/approvesubtitles/approvesubtitlespanel.js',
-     'js/widget/approvesubtitles/approvesubtitlesrightpanel.js',
+     'js/widget/editmetadata/dialog.js',
+     'js/widget/editmetadata/panel.js',
+     'js/widget/editmetadata/editmetadatarightpanel.js',
      'js/widget/subtitle/dialog.js',
      'js/widget/subtitle/msservermodel.js',
      'js/widget/subtitle/subtitlewidget.js',
@@ -321,6 +224,7 @@ JS_DIALOG = \
      'js/widget/translate/translationpanel.js',
      'js/widget/translate/translationlist.js',
      'js/widget/translate/translationwidget.js',
+     'js/widget/translate/descriptiontranslationwidget.js',
      'js/widget/translate/translationrightpanel.js',
      'js/widget/translate/forkdialog.js',
      'js/widget/translate/titletranslationwidget.js']
@@ -371,24 +275,6 @@ JS_BASE_DEPENDENCIES = [
     'flowplayer/flowplayer-3.2.6.min.js',
 ]
 
-JS_MODERATION_DASHBOARD =  [
-    "js/jquery-1.4.3.js",
-    "js/jquery-ui-1.8.16.custom.min.js",
-    "js/jgrowl/jquery.jgrowl.js",
-    "js/jalerts/jquery.alerts.js",
-    "js/jquery.form.js",
-    "js/jquery.metadata.js",
-    "js/jquery.mod.js",
-    "js/jquery.rpc.js",
-    "js/jquery.input_replacement.min.js",
-    'js/closure-library/closure/goog/base.js',    
-    'js/closure-dependencies.js',    
-    "js/messages.js",
-    "js/jquery.address-1.4.fixed.js",
-    "js/jquery.ajax-paginator.js",
-    "js/moderation/simplewarning.js",
-    "js/moderation/confirmrejectiondialog.js",
-    ]
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -462,47 +348,52 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 INSTALLED_APPS = (
+    # this needs to be first, yay for app model loading mess
     'auth',
-    'django.contrib.auth',
-    'localeurl',
-    'socialauth',
-    'openid_consumer',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.sitemaps',
+    # django stock apps
     'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
     'django.contrib.markup',
+    'django.contrib.sessions',
+    'django.contrib.sitemaps',
+    'django.contrib.sites',
     'django.contrib.webdesign',
+    # third party apps
     'django_extensions',
-    'profiles',
-    'sorl.thumbnail',
-    'videos',
-    'teams',
-    'widget',
-    'uslogging',
-    'south',
+    'djcelery',
     'haystack',
-    'comments',
-    'messages',
-    'statistic',
-    'search',
-    'utils',
-    'targetter',
-    'livesettings',
     'indexer',
+    'livesettings',
     'paging',
+    'rosetta',
     'sentry',
     'sentry.client',
-    'djcelery',
-    'rosetta',
-    'testhelpers',
-    'unisubs_compressor',
-    'subrequests',
+    'sorl.thumbnail',
+    'south',
+    'tastypie',
+    # third party apps forked on our repo
+    'localeurl',
+    'openid_consumer',
+    'socialauth',
+    # our apps
+    'accountlinker',
+    'comments',
     'doorman',
     'icanhaz',
-    'tastypie',
+    'messages',
+    'profiles',
+    'search',
+    'statistic',
+    'streamer',
+    'teams',
+    'testhelpers',
     'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
+    'unisubs_compressor',
+    'uslogging',
+    'utils',
+    'videos',
+    'widget',
 )
 
 # Celery settings
@@ -523,7 +414,7 @@ CELERY_RESULT_BACKEND = 'redis'
 BROKER_BACKEND = 'kombu_backends.amazonsqs.Transport'
 BROKER_USER = AWS_ACCESS_KEY_ID = ""
 BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY = ""
-BROKER_VHOST = AWS_QUEUE_PREFIX = 'UNISUB' #Prefix for queues, should be DEV or STAGING 
+BROKER_HOST = "localhost"
 BROKER_POOL_LIMIT = 10
 
 #################
@@ -535,6 +426,7 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/api2'),
     re.compile('^/jstest'),
     re.compile('^/sitemap.*.xml'),
+    re.compile('^/accountlinker/youtube-oauth-callback/'),
     #re.compile('^/crossdomain.xml'),
 )
 
@@ -676,7 +568,6 @@ MEDIA_BUNDLES = {
         "type":"css",
         "files":(
                "css/unisubs-widget.css" ,
-               "css/nyroModal.css",
                "css/dev.css"
          ),
         },
@@ -691,7 +582,6 @@ MEDIA_BUNDLES = {
     "home":{
         "type":"css",
         "files":(
-            "css/nyroModal.css",
             "css/unisubs-widget.css",
          ),
         },
@@ -699,7 +589,6 @@ MEDIA_BUNDLES = {
          "type":"css",
          "files":(
             "css/new_index.css",
-             "css/nyroModal.css",
              "css/unisubs-widget.css",
           ),
          },
@@ -795,6 +684,7 @@ MEDIA_BUNDLES = {
               "js/messages.js",
               "js/libs/chosen.jquery.min.js",
               "js/libs/chosen.ajax.jquery.js",
+              "js/unisubs.site.js",
             ],
         "closure_deps": "",
         "include_flash_deps": False,
@@ -817,12 +707,6 @@ MEDIA_BUNDLES = {
                 "js/testing/testing.js",
                 "js/testing/timerstub.js",
             ]
-    },
-    "js-moderation-dashboard":{
-        "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
-        "closure_deps": "js/closure-dependencies.js",
-        "files": JS_MODERATION_DASHBOARD,
     },
     "css-teams-settings-panel":{
         "type":"css",
@@ -855,9 +739,8 @@ MEDIA_BUNDLES = {
 }
 
 
+# this is used in our feature swither app, doorman, empty for now
 FEATURE_FLAGS  = {
-    "MODERATION" : False,
-    "REQUESTS": False,
 }
 
 _INTEGRATION_PATH = os.path.join(PROJECT_ROOT, 'unisubs-integration')
@@ -882,6 +765,7 @@ RUN_LOCALLY = False
 try:
     import debug_toolbar
 
+    EVERYONE_CAN_DEBUG = False
     INSTALLED_APPS += ('debug_toolbar',)
     MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
@@ -895,11 +779,12 @@ try:
     )
 
     def custom_show_toolbar(request):
-        if request.user.is_staff and '__debug__/m/' in request.path:
-            return True
+        from django.conf import settings
+        can_debug = settings.EVERYONE_CAN_DEBUG or request.user.is_staff
 
-        if request.user.is_staff and 'debug_toolbar' in request.GET:
-            return True
+        if can_debug:
+            if '__debug__/m/' in request.path or 'debug_toolbar' in request.GET:
+                return True
 
         return False
 

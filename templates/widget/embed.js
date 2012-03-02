@@ -119,7 +119,7 @@
 {% if COMPRESS_MEDIA %}
         css.href = '{{STATIC_URL}}{% url_for "widget-css" %}';
 {% else %}
-        css.href = '{{STATIC_URL_BASE}}css/unisubs-widget.css';
+        css.href = '{{STATIC_URL}}css/unisubs-widget.css';
 {% endif %}
         css.media = 'screen';
         head.appendChild(css);

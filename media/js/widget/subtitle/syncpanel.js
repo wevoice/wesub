@@ -27,7 +27,9 @@ goog.provide('unisubs.subtitle.SyncPanel');
  *     with start_time set.
  */
 unisubs.subtitle.SyncPanel = function(subtitles, videoPlayer,
-                                       serverModel, captionManager) {
+                                       serverModel, captionManager,
+                                      reviewOrApprovalType
+                                     ) {
     goog.ui.Component.call(this);
     /**
      * @type {unisubs.subtitle.EditableCaptionSet}
@@ -45,6 +47,16 @@ unisubs.subtitle.SyncPanel = function(subtitles, videoPlayer,
     this.downPlayheadTime_ = -1;
     this.downHeld_ = false;
     this.keyEventsSuspended_ = false;
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
+    if (this.reviewOrApprovalType_){
+
+        this.numSteps_ = 2;
+        this.currentStep_ = 0;
+    }else{
+        this.numSteps_ = 4;
+        this.currentStep_ = 1;
+    }
+
 };
 goog.inherits(unisubs.subtitle.SyncPanel, goog.ui.Component);
 
@@ -80,22 +92,39 @@ unisubs.subtitle.SyncPanel.prototype.getRightPanel = function() {
     return this.rightPanel_;
 };
 unisubs.subtitle.SyncPanel.prototype.createRightPanelInternal = function() {
-    var helpContents = new unisubs.RightPanel.HelpContents(
-        "Syncing",
-        ["Congratulations, you finished the hard part (all that typing)!",
-         ["Now, to line up your subtitles to the video, tap the DOWN ARROW right ",
-          "when each subtitle should appear."].join(''),
-         "Tap DOWN to begin, tap it for the first subtitle, and so on.",
-         ["Don't worry about small mistakes. We can correct them in the ",
-          "next step. If you need to start over, click \"restart\" ",
-          "below."].join('')],
-        3, 1);
-    var extraHelp = 
-        ["Press play, then tap this button or the down arrow when the next subtitle should appear."];
+    var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
+    var reviewOrApproval = true;
+    var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
+        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_, true);
+    var keySpecs;
+    if (! internalComponents){
+        internalComponents = {
+
+       
+            'helpContents': new unisubs.RightPanel.HelpContents(
+                "Syncing",
+                ["Congratulations, you finished the hard part (all that typing)!",
+                 ["Now, to line up your subtitles to the video, tap the DOWN ARROW right ",
+                  "when each subtitle should appear."].join(''),
+                 "Tap DOWN to begin, tap it for the first subtitle, and so on.",
+                 ["Don't worry about small mistakes. We can correct them in the ",
+                  "next step. If you need to start over, click \"restart\" ",
+                  "below."].join('')],
+                this.numSteps_, this.currentStep_),
+            'extraHelp': 
+            ["Press play, then tap this button or the down arrow when the next subtitle should appear."]
+        }
+        keySpecs = this.makeKeySpecsInternal()
+    }else{
+        
+        keySpecs = [];
+        this.bodyInput_ = internalComponents['bodyInput'];
+        
+    }
     return new unisubs.RightPanel(
-        this.serverModel, helpContents, extraHelp,
-        this.makeKeySpecsInternal(), true, "Done?",
-        "Next Step: Reviewing");
+        this.serverModel_, internalComponents['helpContents'],
+            internalComponents['extraHelp'], keySpecs, true, "Done?",
+        "Next Step: Subtitle info");
 };
 unisubs.subtitle.SyncPanel.prototype.makeKeySpecsInternal = function() {
     var KC = goog.events.KeyCodes;
@@ -206,7 +235,18 @@ unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
     }
 };
 unisubs.subtitle.SyncPanel.prototype.currentlyEditingSubtitle_ = function() {
-    return this.subtitleList_.isCurrentlyEditing();
+    var inSublist =  this.subtitleList_.isCurrentlyEditing() ;
+    if (inSublist){
+        return true;
+    }
+    // focus could be on the review notes text area
+    // TODO: use this as an authoritative way to determine if subs are being edited
+    if (document.activeElement ){
+        var tagName  = document.activeElement.tagName.toLowerCase() ;
+        if (tagName  == 'input' || tagName == 'textarea'){
+            return true;
+        }
+    }
 };
 unisubs.subtitle.SyncPanel.prototype.captionReached_ = function(event) {
     var editableCaption = event.caption;

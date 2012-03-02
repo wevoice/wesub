@@ -46,7 +46,6 @@ elif INSTALLATION == STAGING:
     SITE_ID = 14
     SITE_NAME = 'unisubsstaging'
     REDIS_DB = "2"
-    AWS_QUEUE_PREFIX = 'STAGING'
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
     EMAIL_SUBJECT_PREFIX = '[usubs-staging]'
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
@@ -55,7 +54,6 @@ elif INSTALLATION == PRODUCTION:
     SITE_ID = 8
     SITE_NAME = 'unisubs'
     REDIS_DB = "1"
-    AWS_QUEUE_PREFIX = 'PRODUCTION'
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
     EMAIL_SUBJECT_PREFIX = '[usubs-production]'
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'

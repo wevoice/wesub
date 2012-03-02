@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body_attrs %}class="video_view v1"{% endblock %}
 
-{% load widget i18n media_compressor moderation doorman %}
+{% load widget i18n media_compressor doorman %}
 
 {% block css %}
   {{ block.super }}
@@ -13,13 +13,13 @@
     <script type="text/javascript">
         jQuery(function($){
             var IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
-            if (IS_AUTHENTICATED){
+            if (IS_AUTHENTICATED && '{{rollback_allowed}}' == 'True')
                 $('#rollback').click(function(){
                     if ( ! confirm('Subtitles will be rolled back to a previous version')){
                         return false;
                     }                    
                 });                
-            }else{
+            }else {
                 $('#rollback, .new_edit').click(function(){
                     alert('You need to log in to do that.');
                     return false;
@@ -43,11 +43,6 @@
         });
     </script>
     {% include_bundle "unisubs-onsite-compiled" 0 %}
-    {% switch_feature MODERATION %}
-        {% if user_can_moderate %}
-           {% include_bundle "js-moderation-dashboard" 0 %}
-        {% endif %}
-    {% endswitch_feature %}
 
 {% endblock %}
 
@@ -135,7 +130,7 @@
                 </li>
             {% endif %}
         </ul>
-        {% if next_version %}
+        {% if next_version and rollback_allowed %}
             <div class="tools">
                 <a href="{% url videos:rollback version.pk %}" class="button" id="rollback">
                     {% trans 'Roll back to this version' %}
@@ -143,7 +138,7 @@
             </div>
         {% endif %}
         {% if next_version %}
-            <p class="active-filters">
+            <p class="view-notice">
                 {% blocktrans with language.language_display as lang and version.user as user and version.datetime_started|date:"j F Y (H:i)" as date %}
                 This is an old revision, edited by {{ user }} on {{ date }}. It may
                 differ significantly from the current revision.
@@ -179,16 +174,5 @@
       <li><a href="{{ language.get_absolute_url }}">{{ language.language_display }} {% trans 'Subtitles' %}</a></li>
     
 {% endcomment %}
-{% endblock %}
-
-{% block bottom_scripts %}
-    {% if user_can_moderate %}
-<script>
-    $(window).load(function(){
-              window.UNISUBS_MOD_REPLACE_HTML_BUTTON = true;
-    {% include 'moderation/moderation-buttons.js' %}
-  });
-</script>
-{% endif %}
 {% endblock %}
 

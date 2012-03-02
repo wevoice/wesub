@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.core.cache import cache
+
 TIMEOUT = 60 * 60 * 24 * 5 # 5 days
 
 

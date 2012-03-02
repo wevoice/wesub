@@ -25,12 +25,13 @@ goog.provide('unisubs.subtitle.SubtitleList');
  */
 unisubs.subtitle.SubtitleList = function(videoPlayer, captionSet,
                                           displayTimes, opt_showBeginMessage,
-                                          readOnly) {
+                                          readOnly, displayParagraphMarkers) {
     goog.ui.Component.call(this);
     this.videoPlayer_ = videoPlayer;
     this.captionSet_ = captionSet;
     this.readOnly_ = readOnly;
     this.displayTimes_ = displayTimes;
+    this.displayParagraphMarkers = displayParagraphMarkers;
     this.currentActiveSubtitle_ = null;
     /**
      * A map of captionID to unisubs.subtitle.SubtitleWidget
@@ -140,7 +141,9 @@ unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ =
         this.captionSet_,
         goog.bind(this.setCurrentlyEditing_, this),
         this.displayTimes_,
-        this.readOnly_);
+        this.readOnly_,
+        this.displayParagraphMarkers
+    );
 };
 /**
  *

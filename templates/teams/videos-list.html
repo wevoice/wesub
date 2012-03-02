@@ -1,9 +1,9 @@
 {% extends "teams/base.html" %}
 
-{% load i18n utils_tags query_string teams_tags paginator profiles_tags widget markup media_compressor %}
+{% load i18n utils_tags query_string teams_tags paginator profiles_tags markup media_compressor %}
 
 {% block title %}
-    {{ team }} | Universal Subtitles
+    {% trans 'Videos' %} - {{ team }} | Universal Subtitles
 {% endblock %}
 
 {% block css %}
@@ -24,20 +24,42 @@
         var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
 
         $(function() {
-            $select = $("select#lang-filter", ".controls");
-            $select.change(function(e) {
-                window.location = $(this).children('option:selected').attr('value');
+            $form = $('form', 'div#remove-modal');
+            $('a.remove-video').click(function() {
+                $form.attr('action', $(this).siblings('form').attr('action'));
             });
 
-            $('.remove-video').click(function(e) {
-                e.preventDefault();
+            $form.submit(function() {
+                var $checked = $('input[name="del-opt"]:checked', 'div#remove-modal');
+                if ($checked.val() == 'total-destruction') {
+                    $form.attr('action', $form.attr('action').replace('remove', 'delete'));
 
-                resp = confirm('Are you sure you want to delete this team video?');
-                if (resp) {
-                    $(this).siblings('form').submit();
+                    if (confirm("Are you sure you want to permanently delete this video? This action is irreversible.")) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                } else {
+                    if (confirm("All open tasks for this video will be aborted, and in-progress subtitles will be published. Do you want to proceed?")) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
                 }
-                return false;
             });
+
+            // Handle weird back-button issue with browsers.
+            $select = $('select#lang-filter');
+            {% if request.GET.lang %}
+                $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
+            {% else %}
+                $opt = $('option[id="lang-opt-any"]');
+            {% endif %}
+            $select.children().removeAttr('selected');
+            $opt.attr('selected', 'selected');
+            $select.trigger('liszt:updated');
         });
     </script>
 {% endblock %}
@@ -48,63 +70,67 @@
 
 {% block view_content %}
 
-    {% with "videos" as current %}
-        {% include "teams/_tabs.html" %}
-    {% endwith %}
+    <div class="grid_8 view omega">
+        {% with "videos" as current %}
+            {% if not project %}
+                {% include 'teams/_tabs.html' %}
+            {% else %}
+                {% include 'teams/_tabs_projects.html' %}
+            {% endif %}
+        {% endwith %}
 
-    <div class="view grid_9 alpha">
         <div class="tools group">
+            {% include "teams/_search.html" %}
             {% if can_add_video %}
                 <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
-            {% endif %}
-            <div class="sort_button">
-                <div class="arrow">
+            {% endif %}  
+            <a href="#filter" id="sort-filter">
+                {% trans 'Filter and Sort' %}
+                <span></span>
+            </a>
+        </div>
+        <div class="filters group {% if filtered or request.GET.sort %}active{% endif %}">
+            <p>
+                <div class="filter-chunk">
+                    <span class="inner">{% trans 'Videos with' %}</span>
+                    <select name="lang-filter" id="lang-filter">
+                        <option value="{{ request.path }}{% query_string request.GET lang='' page='' %}" id="lang-opt-any">{% trans 'any' %}</option>
+                        <option value="{{ request.path }}{% query_string request.GET lang='none' page='' %}" id="lang-opt-none">{% trans 'no' %}</option>
+                        {% for code, name in language_choices %}
+                            <option id="lang-opt-{{ code }}" {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code page='' %}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <span>{% trans 'subtitles' %}</span>
                 </div>
-                <span class="sort_label">{% trans 'Sort by' %} <strong>{{ order_name }}</strong></span>
-                <ul>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=name">{% trans 'Name, A-Z' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-name">{% trans 'Name, Z-A' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-time">{% trans 'Time, Newest' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=time">{% trans 'Time, Oldest' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=-subs">{% trans 'Subtitles, Most' %}</a>
-                    </li>
-                    <li>
-                        <a href="{% if query %}?q={{ query }}&amp;{% else %}?{% endif %}sort=subs">{% trans 'Subtitles, Least' %}</a>
-                    </li>
-                </ul>
-            </div>
+                <div class="filter-chunk">
+                    <span class="inner">{% trans 'sorted by' %}</span>
+                    <select name="sort">
+                        <option {% if request.GET.sort == 'name' %}selected="selected"{% endif %} value="{% query_string request.GET sort='name' page='' %}">
+                            {% trans 'name, a-z' %}
+                        </option>
+                        <option {% if request.GET.sort == '-name' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-name' page='' %}">
+                            {% trans 'name, z-a' %}
+                        </option>
+                        <option {% if request.GET.sort == '-time' or not request.GET.sort %}selected="selected"{% endif %} value="{% query_string request.GET sort='-time' page='' %}">
+                            {% trans 'time, newest' %}
+                        </option>
+                        <option {% if request.GET.sort == 'time' %}selected="selected"{% endif %} value="{% query_string request.GET sort='time' page='' %}">
+                            {% trans 'time, oldest' %}
+                        </option>
+                        <option {% if request.GET.sort == '-subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-subs' page='' %}">
+                            {% trans 'most subtitles' %}
+                        </option>
+                        <option {% if request.GET.sort == 'subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='subs' page='' %}">
+                            {% trans 'least subtitles' %}
+                        </option>
+                    </select>
+                </div>
+            </p>
+            {% if filtered or request.GET.sort %}
+                <a href="{% url teams:detail team.slug %}" class="clear-filters">{% trans 'Clear' %}</a>
+            {% endif %}
         </div>
 
-        {% if filtered %}
-            <p class="active-filters">
-                {% trans 'Showing videos' %}
-                    {% if request.GET.q %}
-                        {% trans 'matching' %} <strong>&ldquo;{{ request.GET.q }}&rdquo;</strong>
-                    {% endif %}
-                    {% if request.GET.lang %}
-                        {% trans 'in' %} <strong>{{ request.GET.lang|lang_name_from_code }}</strong>
-                    {% endif %}
-                    {% if project %}
-                        {% trans 'in project' %} <strong>{{ project }}</strong>
-                    {% endif %}
-                    ({{ current_videos_count }} {% trans 'result' %}{{ current_videos_count|pluralize }})
-                <a href="{{ team.get_absolute_url }}" class="clear-filters">{% trans 'Clear all filters' %}</a>
-            </p>
-        {% endif %}
-
-        {% if not team.page_content and team.video %}
-            {% widget widget_params %}
-        {% endif %}
-        
         {% if team_video_md_list %}
             <ul class="videos listing">
                 {% with team|is_team_member:request.user as user_is_team_member %}
@@ -115,23 +141,44 @@
             </ul>
             {% if is_paginated %}{% paginator %}{% endif %}
         {% else %}
-            <p class="empty">{% trans "Sorry, no videos here" %}...</p>
+            <p class="empty">
+                {% trans "Sorry, no videos here" %}
+                ...
+            </p>
         {% endif %}
     </div>
 
-    <div class="controls grid_3 omega">
-        {% include "teams/_filters_videos.html" %}
-        <div class="refine">
-            <h4>{% trans "Search and Filter" %}</h4>
-            {% include "teams/_search.html" %}
-            <select name="lang-filter" id="lang-filter">
-                <option value="{% query_string request.GET lang='' %}">All languages</option>
-                {% for code, name in language_choices %}
-                    <option {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code %}">{{ name }}</option>
-                {% endfor %}
-            </select>
+    <div class="bootstrap">
+        <div class="modal" id="remove-modal">
+            <div class="modal-header">
+                <a href="#" class="close">x</a>
+                <h3>{% trans 'Remove video' %}</h3>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="">
+                    <fieldset>
+                        <p>{% blocktrans %}You can choose to remove the video from the {{ team }} team or to delete the video (and all of its subtitles) from the system entirely. What would you like to do?{% endblocktrans %}</p>
+                        <label class="radio">
+                            <input type="radio" name="del-opt" value="team-removal" checked="checked">
+                            {% blocktrans %}Just remove the video from the team (it will remain on Universal Subtitles but will no longer be subject to permissions and worfklows).{% endblocktrans %}
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="del-opt" value="total-destruction">
+                            {% trans "Delete the video entirely." %}
+                        </label>
+                    </fieldset>
+
+                    {% csrf_token %}
+
+                    <input type="hidden" name="next" value="{{ request.path }}" />
+                    <input type="hidden" name="subtitle_version" value="" />
+
+                    <div class="modal-footer">
+                        <input type="submit" class="btn danger" value="{% trans "Delete" %}" />
+                    </div>
+                </form>
+            </div>
         </div>
-        {% include "teams/_actions.html" %}
     </div>
 
 {% endblock %}

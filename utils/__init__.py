@@ -44,6 +44,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.models import Site
 import inspect
 
+DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
+
 try:
     import oboe
 except ImportError:
@@ -134,7 +136,8 @@ def send_templated_email(to, subject, body_template, body_dict,
              situations where you must send the email, for example on
              password retrivals.
     """
-    from auth.models import CustomUser as User
+    from auth.models import CustomUser 
+    from django.contrib.auth.models import User
     to_unchecked = to
     if not isinstance(to_unchecked, list):
         to_unchecked = [to]
@@ -144,16 +147,18 @@ def send_templated_email(to, subject, body_template, body_dict,
     # retrivals, else users that have opted out of email notifications
     # can never recover their passowrd
     for recipient in to_unchecked:
-        if isinstance(recipient, User):
+        if isinstance(recipient, User) or isinstance(recipient, CustomUser):
+            if not bool(recipient.email):
+                continue
             if check_user_preference is False or  recipient.notify_by_email:
-                to.append(u"%s <%s>" % (recipient, recipient.email))
+                to.append(recipient.email)
         else:
             to.append(recipient)
     if not from_email: from_email = settings.DEFAULT_FROM_EMAIL
 
     body_dict['STATIC_URL_BASE'] = settings.STATIC_URL_BASE
     body_dict['domain'] = Site.objects.get_current().domain
-    body_dict['url_base'] = "http://" + Site.objects.get_current().domain
+    body_dict['url_base'] = "%s://%s" % (DEFAULT_PROTOCOL,  Site.objects.get_current().domain)
     message = render_to_string(body_template, body_dict)
     bcc = settings.EMAIL_BCC_LIST
     email = EmailMessage(subject, message, from_email, to, bcc=bcc)

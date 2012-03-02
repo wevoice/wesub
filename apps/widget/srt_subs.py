@@ -1,29 +1,26 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
-"""
-Functionality for generating srt files.
-"""
+"""Functionality for generating srt files."""
 
 import StringIO
 
 def captions_and_translations_to_srt(captions_and_translations):
-    # TODO: note this loads the entire string into memory, which will not 
+    # TODO: note this loads the entire string into memory, which will not
     # scale beautifully. In future, possibly stream directly to response.
     output = StringIO.StringIO()
     for i in range(len(captions_and_translations)):
@@ -35,7 +32,7 @@ def captions_and_translations_to_srt(captions_and_translations):
     return srt
 
 def captions_to_srt(subtitles):
-    # TODO: note this loads the entire string into memory, which will not 
+    # TODO: note this loads the entire string into memory, which will not
     # scale beautifully. In future, possibly stream directly to response.
     output = StringIO.StringIO()
     for i in range(len(subtitles)):
@@ -46,7 +43,7 @@ def captions_to_srt(subtitles):
 
 def translation_to_srt(translation, video_caption, index, output):
     subtitle_to_srt_impl(video_caption.caption_text if translation is None \
-                         else translation.translation_text, 
+                         else translation.translation_text,
                          video_caption, index, output)
 
 def subtitle_to_srt(video_caption, index, output):
@@ -88,7 +85,7 @@ import codecs
 
 class BaseSubtitles(object):
     file_type = ''
-    
+
     def __init__(self, subtitles, video=None, line_delimiter=u'\n', sl=None):
         """
         Use video for extra data in subtitles like Title
@@ -102,28 +99,28 @@ class BaseSubtitles(object):
             self.title = sl and sl.get_title_display() or video.title
         else:
             self.title = u""
-        
+
     def __unicode__(self):
         raise Exception('Should return subtitles')
-    
+
     @classmethod
     def isnumber(cls, val):
         return isinstance(val, (int, long, float))
-    
+
     @classmethod
     def create(cls, sv, video=None, sl=None):
         sl = sl or sv.language
         video = video or sl.video
-        
+
         subtitles = []
-        
+
         for item in sv.subtitles():
             subtitles.append(item.for_generator())
-        
-        return cls(subtitles, video, sl=sl)        
-        
+
+        return cls(subtitles, video, sl=sl)
+
 class GenerateSubtitlesHandlerClass(dict):
-    
+
     def register(self, handler, type=None):
         self[type or handler.file_type] = handler
 
@@ -133,7 +130,7 @@ class MGSubtitles(BaseSubtitles):
 
     def __unicode__(self):
         output = []
-        
+
         for item in self.subtitles:
             output.append(u'[[[%s]]]' % item['id'])
             output.append(item['text'].replace(u'[[[', u'').replace(u']]]', u''))
@@ -150,7 +147,7 @@ class SRTSubtitles(BaseSubtitles):
 
     def __unicode__(self):
         output = []
-        
+
         i = 1
         for item in self.subtitles:
             if self.isnumber(item['start']) and self.isnumber(item['end']):
@@ -183,7 +180,7 @@ class SBVSubtitles(BaseSubtitles):
 
     def __unicode__(self):
         output = []
-        
+
         for item in self.subtitles:
             if self.isnumber(item['start']) and self.isnumber(item['end']):
                 start = self.format_time(item['start'])
@@ -191,13 +188,13 @@ class SBVSubtitles(BaseSubtitles):
                 output.append(u'%s,%s' % (start, end))
                 output.append(item['text'].strip())
                 output.append(u'')
-        
+
         return self.line_delimiter.join(output)
 
     def format_time(self, time):
         hours = int(floor(time / 3600))
         if hours < 0:
-            hours = 9        
+            hours = 9
         minutes = int(floor(time % 3600 / 60))
         seconds = int(time % 60)
         fr_seconds = int(time % 1 * 1000)
@@ -210,7 +207,7 @@ class TXTSubtitles(BaseSubtitles):
 
     def __init__(self, subtitles, video, line_delimiter=u'\r\n\r\n', sl=None):
         super(TXTSubtitles, self).__init__(subtitles, video, line_delimiter)
-        
+
     def __unicode__(self):
         output = []
         for item in self.subtitles:
@@ -219,21 +216,21 @@ class TXTSubtitles(BaseSubtitles):
         return self.line_delimiter.join(output)
 
 GenerateSubtitlesHandler.register(TXTSubtitles)
-    
+
 class SSASubtitles(BaseSubtitles):
     file_type = 'ssa'
-    
+
     def __unicode__(self):
         #add BOM to fix python default behaviour, because players don't play without it
         return u''.join([unicode(codecs.BOM_UTF8, "utf8"), self._start(), self._content(), self._end()])
-    
+
     def _start(self):
         ld = self.line_delimiter
         return u'[Script Info]%sTitle: %s%s' % (ld, self.title, ld)
-    
+
     def _end(self):
         return u''
-    
+
     def format_time(self, time):
         hours = int(floor(time / 3600))
         if hours < 0:
@@ -242,10 +239,10 @@ class SSASubtitles(BaseSubtitles):
         seconds = int(time % 60)
         fr_seconds = int(time % 1 * 100)
         return u'%i:%02i:%02i.%02i' % (hours, minutes, seconds, fr_seconds)
-    
+
     def _clean_text(self, text):
         return text.replace('\n', ' ')
-        
+
     def _content(self):
         dl = self.line_delimiter
         output = []
@@ -263,22 +260,22 @@ class SSASubtitles(BaseSubtitles):
 GenerateSubtitlesHandler.register(SSASubtitles)
 
 from lxml import etree
-import re 
+import re
 
 class TTMLSubtitles(BaseSubtitles):
     file_type = 'xml'
     remove_re = re.compile(u'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]')
-    
+
     def __unicode__(self):
         return (u'<?xml version="1.0" encoding="UTF-8"?>%s' % self.line_delimiter)\
             +etree.tounicode(self.xml_node(), pretty_print=True)
-    
+
     def _get_attributes(self, item):
         attrib = {}
         attrib['begin'] = self.format_time(item['start'])
         attrib['dur'] = self.format_time(item['end']-item['start'])
         return attrib
-    
+
     def xml_node(self):
         tt = etree.Element('tt', nsmap={None: 'http://www.w3.org/2006/04/ttaf1', 'tts': 'http://www.w3.org/2006/04/ttaf1#styling'})
         etree.SubElement(tt, 'head')
@@ -290,7 +287,7 @@ class TTMLSubtitles(BaseSubtitles):
                 p = etree.SubElement(div, 'p', attrib=attrib)
                 p.text = self.remove_re.sub('', item['text'].strip())
         return tt
-    
+
     def format_time(self, time):
         hours = int(floor(time / 3600))
         if hours < 0:
@@ -299,7 +296,7 @@ class TTMLSubtitles(BaseSubtitles):
         seconds = int(time % 60)
         fr_seconds = int(time % 1 * 100)
         return u'%02i:%02i:%02i.%02i' % (hours, minutes, seconds, fr_seconds)
-    
+
 GenerateSubtitlesHandler.register(TTMLSubtitles, 'ttml')
 
 class DFXPSubtitles(TTMLSubtitles):
@@ -310,5 +307,5 @@ class DFXPSubtitles(TTMLSubtitles):
         attrib['begin'] = self.format_time(item['start'])
         attrib['end'] = self.format_time(item['end'])
         return attrib
-    
+
 GenerateSubtitlesHandler.register(DFXPSubtitles, 'dfxp')

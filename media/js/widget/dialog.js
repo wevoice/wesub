@@ -99,18 +99,15 @@ unisubs.Dialog.prototype.enterDocument = function() {
                goog.Timer.TICK,
                this.idleTimerTick_);
 };
-
 unisubs.Dialog.prototype.userIsNotIdle_ = function() {
     this.minutesIdle_ = 0;
 };
-
 unisubs.Dialog.prototype.idleTimerTick_ = function() {
     this.minutesIdle_++;
     if (this.minutesIdle_ >= unisubs.Dialog.MINUTES_TILL_WARNING) {
         this.showIdleWarning_();
     }
 };
-
 unisubs.Dialog.prototype.showIdleWarning_ = function() {
     this.idleTimer_.stop();
     if (this.ignoreLock_) {
@@ -128,7 +125,6 @@ unisubs.Dialog.prototype.showIdleWarning_ = function() {
         this.dropLockDialogHidden_);
     dropLockDialog.setVisible(true);
 };
-
 unisubs.Dialog.prototype.dropLockDialogHidden_ = function(e) {
     var dialog = e.target;
     if (dialog.didLoseSession())
@@ -161,7 +157,6 @@ unisubs.Dialog.prototype.hideTemporaryPanel = function() {
         this.temporaryPanel_ = null;
     }
 };
-
 unisubs.Dialog.prototype.getVideoPlayerInternal = function() {
     return this.videoPlayer_;
 };
@@ -249,6 +244,14 @@ unisubs.Dialog.prototype.setDropDownContentsInternal = function(dropDownContents
 unisubs.Dialog.prototype.getDropDownContents = function() {
     return this.dropDownContents_;
 };
+unisubs.Dialog.prototype.showEmptySubsDialog = function() {
+    var that = this;
+    var dialog = new unisubs.widget.EmptySubsWarningDialog(function(){
+            that.hideDialogImpl_(false);
+    })
+    dialog.setVisible(true);
+
+}
 unisubs.Dialog.prototype.showSaveWorkDialog_ = function() {
     var that = this;
     var unsavedWarning = new unisubs.UnsavedWarning(function(submit) {
@@ -260,7 +263,6 @@ unisubs.Dialog.prototype.showSaveWorkDialog_ = function() {
     });
     unsavedWarning.setVisible(true);
 };
-
 unisubs.Dialog.prototype.getServerModel = goog.abstractMethod;
 
 /**
@@ -271,7 +273,6 @@ unisubs.Dialog.prototype.hideToFork = function() {
     // because of a fork. so skip releasing the lock and changing the location.
     unisubs.Dialog.superClass_.setVisible.call(this, false);
 };
-
 unisubs.Dialog.prototype.hideDialogImpl_ = function() {
     var serverModel = this.getServerModel();
     if (serverModel){
@@ -286,11 +287,32 @@ unisubs.Dialog.prototype.hideDialogImpl_ = function() {
     }
     unisubs.Dialog.superClass_.setVisible.call(this, false);
 };
-
 unisubs.Dialog.prototype.makeJsonSubs = goog.abstractMethod;
-
 unisubs.Dialog.prototype.disposeInternal = function() {
     unisubs.Dialog.superClass_.disposeInternal.call(this);
     this.videoPlayer_.dispose();
     this.idleTimer_.dispose();
 };
+
+unisubs.Dialog.REVIEW_OR_APPROVAL = {
+    REVIEW: 1,
+    APPROVAL: 2
+};
+unisubs.Dialog.MODERATION_OUTCOMES = {
+    APPROVED: 20,
+    SAVE_FOR_LATER: 10,
+    SEND_BACK: 30
+};
+
+unisubs.Dialog.prototype.getTeamGuidelineForReview = function () {
+    var name = this.isApproval() ? 'approval' : 'review'; 
+    return unisubs.guidelines[name];
+}
+
+unisubs.Dialog.prototype.isApproval = function(){
+    return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL;
+}
+
+unisubs.Dialog.prototype.isReview = function(){
+    return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.REVIEW;
+}

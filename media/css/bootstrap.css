@@ -1967,7 +1967,7 @@
   z-index: 12000;
 }
 .bootstrap .modal .close {
-  margin-top: 7px;
+  margin-top: 11px;
 }
 .bootstrap .modal.fade {
   -moz-transition: opacity 0.3s linear, top 0.3s ease-out;

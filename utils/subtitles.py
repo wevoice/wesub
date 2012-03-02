@@ -376,7 +376,7 @@ class SrtSubtitleParser(SubtitleParser):
     _clean_pattern = re.compile(r'\{.*?\}', re.DOTALL)
     
     def __init__(self, subtitles):
-        pattern = r'\d+\n'
+        pattern = r'\d+\s*?\n'
         pattern += r'(?P<s_hour>\d{2}):(?P<s_min>\d{2}):(?P<s_sec>\d{2})(,(?P<s_secfr>\d*))?'
         pattern += r' --> '
         pattern += r'(?P<e_hour>\d{2}):(?P<e_min>\d{2}):(?P<e_sec>\d{2})(,(?P<e_secfr>\d*))?'

@@ -1,12 +1,28 @@
+# Universal Subtitles, universalsubtitles.org
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see
+# http://www.gnu.org/licenses/agpl-3.0.html.
+
 from httplib2 import Http
 from urllib import urlencode
 
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import ugettext_lazy as _
 
-
-from teams.models import Team, TeamNotificationSetting
-from utils.language_codes import LanguageCode, get_language_list
 from utils import send_templated_email
+from libs.unilangs import LanguageCode
 from videos.models import Video
 
 import sentry_logger

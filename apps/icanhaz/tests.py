@@ -8,7 +8,6 @@ from teams.search_indexes import TeamVideoLanguagesIndex
 from auth.models import CustomUser as User
 from videos.models import Video
 from videos.search_indexes import VideoIndex
-from videos.tasks import video_changed_tasks
 from apps.icanhaz.models import VideoVisibilityPolicy
 
 # FIXME move the reset solr to a common test util packages
@@ -42,17 +41,17 @@ class BasicDataTest(TestCase):
             user.save()
 
 class BusinessLogic(BasicDataTest):
-    
+
     def test_has_owner(self):
         self.assertFalse(VideoVisibilityPolicy.objects.video_has_owner(self.video))
-        policy = VideoVisibilityPolicy.objects.create_for_video(
+        VideoVisibilityPolicy.objects.create_for_video(
             self.video,
             VideoVisibilityPolicy.SITE_VISIBILITY_PUBLIC,
             self.superuser,
-            
+
             )
         self.assertTrue(VideoVisibilityPolicy.objects.video_has_owner(self.video))
-        
+
     def test_belongs_to_team(self):
         policy = VideoVisibilityPolicy.objects.create_for_video(
             self.video,
@@ -71,27 +70,25 @@ class BusinessLogic(BasicDataTest):
         self.assertTrue(policy.belongs_to_team)
 
     def test_create_one_only_per_video(self):
-        policy = VideoVisibilityPolicy.objects.create_for_video(
+        VideoVisibilityPolicy.objects.create_for_video(
             self.video,
             VideoVisibilityPolicy.SITE_VISIBILITY_PUBLIC,
             owner = self.superuser
         )
         with self.assertRaises(Exception):
-            policy = VideoVisibilityPolicy.objects.create_for_video(
+            VideoVisibilityPolicy.objects.create_for_video(
                 self.video,
                 VideoVisibilityPolicy.SITE_VISIBILITY_PUBLIC,
                 self.team1,
             )
         with self.assertRaises(Exception):
-            policy = VideoVisibilityPolicy.objects.create_for_video(
+            VideoVisibilityPolicy.objects.create_for_video(
                 self.video,
                 VideoVisibilityPolicy.SITE_VISIBILITY_PUBLIC,
                 self.superuser,
                 )
 
     def test_user_can_see_user(self):
-
-        video = Video.objects.all()[0]
         # video with no policy should be visible to all
         self.assertTrue(VideoVisibilityPolicy.objects.user_can_see( self.regular_user, self.video))
         policy = VideoVisibilityPolicy.objects.create_for_video(
@@ -101,7 +98,7 @@ class BusinessLogic(BasicDataTest):
         )
         # super users should always be able to see them
         self.assertTrue(VideoVisibilityPolicy.objects.user_can_see(self.superuser2, self.video ))
-        # regular users not 
+        # regular users not
         self.assertFalse(VideoVisibilityPolicy.objects.user_can_see(self.regular_user, self.video))
         policy.delete()
         policy = VideoVisibilityPolicy.objects.create_for_video(
@@ -122,11 +119,11 @@ class BusinessLogic(BasicDataTest):
         )
         # super users should always be able to see them
         self.assertTrue(VideoVisibilityPolicy.objects.user_can_see(self.superuser2, self.video ))
-        # regular users not 
+        # regular users not
         self.assertFalse(VideoVisibilityPolicy.objects.user_can_see(self.regular_user, self.video))
         self.assertFalse(VideoVisibilityPolicy.objects.user_can_see(self.regular_user, self.video), "bad=lkey")
         self.assertTrue(VideoVisibilityPolicy.objects.user_can_see(self.regular_user, self.video, policy.site_secret_key))
-        
+
 
     def test_can_create_for_video(self):
         self.assertTrue(
@@ -155,17 +152,17 @@ class BusinessLogic(BasicDataTest):
             VideoVisibilityPolicy.objects.can_create_for_video(video, self.regular_user))
         self.assertFalse(
             VideoVisibilityPolicy.objects.can_create_for_video(video, self.team2))
-        
+
     def test_updates_video_model(self):
         self.assertTrue(self.video.is_public)
-        policy = VideoVisibilityPolicy.objects.create_for_video(
+        VideoVisibilityPolicy.objects.create_for_video(
             self.video,
             VideoVisibilityPolicy.SITE_VISIBILITY_PRIVATE_OWNER,
             self.regular_user,
         )
         video = refresh(self.video)
         self.assertFalse(video.is_public)
-        
+
     def test_updates_video_model_delete(self):
         self.assertTrue(self.video.is_public)
         policy = VideoVisibilityPolicy.objects.create_for_video(
@@ -178,9 +175,9 @@ class BusinessLogic(BasicDataTest):
         policy.delete()
         video = refresh(self.video)
         self.assertTrue(video.is_public)
-        
-        
-        
+
+
+
 class WidgetBusinessLogicTest(BasicDataTest):
     def test_no_policy_widget_ok(self):
         pass
@@ -199,17 +196,16 @@ class WidgetBusinessLogicTest(BasicDataTest):
     def test_from_referral(self):
         # not implemented yet
         pass
-       
+
 class ViewTest(BasicDataTest):
-
-
     def test_private_video_closes_public_url(self):
         video_url = reverse("videos:history",
                             kwargs={'video_id':self.video.video_id})
-        response = self.client.get(video_url)
+
+        response = self.client.get(video_url, follow=True)
         self.assertEqual(response.status_code, 200)
         # moderate the video th
-        policy = VideoVisibilityPolicy.objects.create_for_video(
+        VideoVisibilityPolicy.objects.create_for_video(
             self.video,
             VideoVisibilityPolicy.SITE_VISIBILITY_PRIVATE_WITH_KEY,
             self.superuser,
@@ -220,10 +216,10 @@ class ViewTest(BasicDataTest):
     def test_private_video_with_secret_url_for_owner(self):
         video_url = reverse("videos:history",
                             kwargs={'video_id':self.video.video_id})
-        response = self.client.get(video_url)
+        response = self.client.get(video_url, follow=True)
         self.assertEqual(response.status_code, 200)
         # moderate the video th
-        policy = VideoVisibilityPolicy.objects.create_for_video(
+        VideoVisibilityPolicy.objects.create_for_video(
             self.video,
             VideoVisibilityPolicy.SITE_VISIBILITY_PRIVATE_WITH_KEY,
             self.regular_user)
@@ -233,30 +229,29 @@ class ViewTest(BasicDataTest):
                 username=self.regular_user.username,
                 password=self.regular_user.username ))
         # login in as owner should give us access
-        response = self.client.get(video_url)
+        response = self.client.get(video_url, follow=True)
         self.assertEqual(response.status_code, 200)
 
         video_url_secret = reverse("videos:history",
                             kwargs={'video_id':self.video.policy.site_secret_key})
 
         # owner should also see the secret url
-        response = self.client.get(video_url_secret)
+        response = self.client.get(video_url_secret, follow=True)
         self.assertEqual(response.status_code, 200)
 
         # other users should see the secret url as well
         self.client.logout()
-        response = self.client.get(video_url_secret)
+        response = self.client.get(video_url_secret, follow=True)
         self.assertEqual(response.status_code, 200)
-        
-        
 
     def test_private_video_with_secret_url_for_teams(self):
         video_url = reverse("videos:history",
                             kwargs={'video_id':self.video.video_id})
-        response = self.client.get(video_url)
+        response = self.client.get(video_url, follow=True)
         self.assertEqual(response.status_code, 200)
+
         # moderate the video for team
-        policy = VideoVisibilityPolicy.objects.create_for_video(
+        VideoVisibilityPolicy.objects.create_for_video(
             self.video,
             VideoVisibilityPolicy.SITE_VISIBILITY_PRIVATE_WITH_KEY,
             self.team1,
@@ -264,45 +259,47 @@ class ViewTest(BasicDataTest):
         response = self.client.get(video_url)
         self.assertEqual(response.status_code, 403)
         self.client.login(username=self.team1_member.user.username, password=self.team1_member.user.username )
-        # 
-        response = self.client.get(video_url)
+        #
+        response = self.client.get(video_url, follow=True)
         self.assertEqual(response.status_code, 200)
 
         video_url_secret = reverse("videos:history",
                             kwargs={'video_id':self.video.policy.site_secret_key})
 
         # owner should also see the secret url
-        response = self.client.get(video_url_secret)
+        response = self.client.get(video_url_secret, follow=True)
         self.assertEqual(response.status_code, 200)
 
         # other users should see the secret url as well
         self.client.logout()
-        response = self.client.get(video_url_secret)
+        response = self.client.get(video_url_secret, follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_private_video_without_secret_url_for_teams(self):
         video_url = reverse("videos:history",
                             kwargs={'video_id':self.video.video_id})
-        response = self.client.get(video_url)
+        response = self.client.get(video_url, follow=True)
         self.assertEqual(response.status_code, 200)
+
         # moderate the video for team
-        policy = VideoVisibilityPolicy.objects.create_for_video(
+        VideoVisibilityPolicy.objects.create_for_video(
             self.video,
             VideoVisibilityPolicy.SITE_VISIBILITY_PRIVATE_OWNER,
             self.team1,
         )
         response = self.client.get(video_url)
         self.assertEqual(response.status_code, 403)
-        self.client.login(username=self.team1_member.user.username, password=self.team1_member.user.username )
-        # 
-        response = self.client.get(video_url)
+        self.client.login(username=self.team1_member.user.username,
+                          password=self.team1_member.user.username)
+
+        response = self.client.get(video_url, follow=True)
         self.assertEqual(response.status_code, 200)
 
         video_url_secret = reverse("videos:history",
                             kwargs={'video_id':self.video.policy.site_secret_key})
 
         # owner should also see the secret url
-        response = self.client.get(video_url_secret)
+        response = self.client.get(video_url_secret, follow=True)
         self.assertEqual(response.status_code, 200)
 
         # other users should not see the secret url
@@ -311,49 +308,44 @@ class ViewTest(BasicDataTest):
         self.assertEqual(response.status_code, 403)
 
     def test_widget_sharing_not_available_when_widget_hidden(self):
-        video_url = reverse("videos:history",                            
+        video_url = reverse("videos:history",
+                            kwargs={'video_id':self.video.video_id})
+        response = self.client.get(video_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['shows_widget_sharing'])
+
+        video_url = reverse("videos:video",
                             kwargs={'video_id':self.video.video_id})
         response = self.client.get(video_url)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context['shows_widget_sharing'])
 
-
-        video_url = reverse("videos:video",                            
-                            kwargs={'video_id':self.video.video_id})
-                
-        response = self.client.get(video_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['shows_widget_sharing'])
-
-        
         # moderate the video for team
-        policy = VideoVisibilityPolicy.objects.create_for_video(
+        VideoVisibilityPolicy.objects.create_for_video(
             self.video,
             VideoVisibilityPolicy.SITE_VISIBILITY_PUBLIC,
             self.team1,
             VideoVisibilityPolicy.WIDGET_VISIBILITY_HIDDEN
         )
 
-        video_url = reverse("videos:history",                            
+        video_url = reverse("videos:history",
                             kwargs={'video_id':self.video.video_id})
-        response = self.client.get(video_url)
+        response = self.client.get(video_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context['shows_widget_sharing'])
 
-
-        video_url = reverse("videos:video",                            
+        video_url = reverse("videos:video",
                             kwargs={'video_id':self.video.video_id})
-                
         response = self.client.get(video_url)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context['shows_widget_sharing'], True)
-                
+
 class WidgetTest(BasicDataTest):
 
     def test_videos_without_policy(self):
         logic = VideoVisibilityPolicy.objects
         self.assertTrue(logic.can_show_widget(self.video))
-        
+
     def test_public_widget(self):
         logic = VideoVisibilityPolicy.objects
         policy = VideoVisibilityPolicy.objects.create_for_video(
@@ -368,7 +360,7 @@ class WidgetTest(BasicDataTest):
 
     def test_private_widget_hidden(self):
         logic = VideoVisibilityPolicy.objects
-        policy = VideoVisibilityPolicy.objects.create_for_video(
+        VideoVisibilityPolicy.objects.create_for_video(
             self.video,
             VideoVisibilityPolicy.SITE_VISIBILITY_PUBLIC,
             self.team1,
@@ -486,7 +478,6 @@ class WidgetRPCTest(BasicDataTest):
         self.assertTrue(len(data.keys()) > 0)
 
 
-
 class TestListingVisibilities(BasicDataTest):
 
     def setUp(self):
@@ -496,7 +487,7 @@ class TestListingVisibilities(BasicDataTest):
             video=self.video,
             added_by=self.team1_member.user)
 
-    def _in_solr(self, video): 
+    def _in_solr(self, video):
         return video.video_id in [x.video_id for x in VideoIndex.public()]
 
     def _tv_in_solr(self, tv, user):
@@ -505,7 +496,7 @@ class TestListingVisibilities(BasicDataTest):
         else:
             results = TeamVideoLanguagesIndex.results()
         return tv.video.video_id in [x.video_id for x in results]
-        
+
     def test_hidden_video_no_solr(self):
         reset_solr()
         self.assertTrue(self._in_solr( self.video))
@@ -520,7 +511,7 @@ class TestListingVisibilities(BasicDataTest):
         self.video = refresh(self.video)
         reset_solr()
         self.assertFalse(self._in_solr( self.video))
-        
+
 
     def test_visibility_for_teams_members(self):
         tv, created = TeamVideo.objects.get_or_create(video=self.video, team=self.team1)

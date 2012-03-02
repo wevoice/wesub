@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,27 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
-
 from django import forms
-from messages.models import Message
-from auth.models import CustomUser as User, UserLanguage
-from utils.forms import AjaxForm
 from django.utils.translation import ugettext_lazy as _, ugettext
-from teams.models import Team
-from django.db.models import Count
-from utils.translation import get_simple_languages_list
 
-from teams.permissions import can_message_all_members
+from auth.models import CustomUser as User
+from messages.models import Message
+from teams.models import Team
+from utils.forms import AjaxForm
+
 
 class SendMessageForm(forms.ModelForm, AjaxForm):
-
     class Meta:
         model = Message
         fields = ('user', 'subject', 'content')
@@ -57,84 +46,8 @@ class SendMessageForm(forms.ModelForm, AjaxForm):
         commit and obj.save()
         return obj
 
-class SendTeamMessageForm(forms.ModelForm, AjaxForm):
-    team = forms.ModelChoiceField(queryset=Team.objects.all(), widget = forms.HiddenInput())
-    languages = forms.MultipleChoiceField(label=_('Only send to speakers of...'),
-                  widget=forms.CheckboxSelectMultiple(attrs={'class': 'langs'}),
-                  required=False)
-
-    class Meta:
-        model = Message
-        fields = ('subject', 'content')
-
-    def __init__(self, author, *args, **kwargs):
-        self.author = author
-        if 'team' in kwargs.get('initial', {}):
-            self.team = kwargs['initial']['team']
-            kwargs['initial']['team'] = self.team.pk
-        else:
-            self.team = None
-
-        super(SendTeamMessageForm, self).__init__(*args, **kwargs)
-
-        if self.team:
-            self.fields['languages'].choices = self._get_language_choise(self.team)
-        else:
-            self.fields['languages'].choices = get_simple_languages_list()
-
-    def _get_language_choise(self, team):
-        choices = []
-
-        languages = dict(get_simple_languages_list())
-
-        langs = UserLanguage.objects.exclude(user=self.author) \
-            .filter(user__teams=team).values_list('language') \
-            .annotate(Count('language'))
-
-        for lang, count in langs:
-            name = '%s(%s)' % (languages[lang], count)
-            choices.append((lang, name))
-
-        return choices
-
-    def clean_team(self):
-        team = self.cleaned_data['team']
-
-        # TODO: integrate with per project messaging
-        if can_message_all_members(team, self.author):
-            raise forms.ValidationError(_(u'You are not manager of this team.'))
-
-        return team
-
-    def clean(self):
-        if not self.author.is_authenticated():
-            raise forms.ValidationError(_(u'You should be authenticated to write messages'))
-        return self.cleaned_data
-
-    def save(self):
-        messages = []
-
-        team = self.cleaned_data['team']
-        languages = self.cleaned_data['languages']
-
-        members = team.users.exclude(pk=self.author.pk)
-
-        if languages:
-            members = members.filter(userlanguage__language__in=languages).distinct()
-
-        for user in members:
-            message = Message(user=user)
-            message.author = self.author
-            message.content = self.cleaned_data['content']
-            message.subject = self.cleaned_data['subject']
-            message.object = team
-            message.save()
-            messages.append(message)
-
-        return messages
 
 class TeamAdminPageMessageForm(forms.ModelForm):
-
     class Meta:
         model = Message
         fields = ('subject', 'content')
@@ -172,9 +85,7 @@ class NewMessageForm(forms.Form):
 
         # This isn't the fastest way to do this, but it's the simplest, and
         # performance probably won't be an issue here.
-        user_teams = author.teams.all()
-        messageable_team_ids = [t.id for t in user_teams if can_message_all_members(t, author)]
-        self.fields['team'].queryset = author.teams.filter(id__in=messageable_team_ids)
+        self.fields['team'].queryset = author.messageable_teams()
 
 
     def clean(self):

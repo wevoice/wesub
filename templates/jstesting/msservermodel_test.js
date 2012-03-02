@@ -19,7 +19,6 @@ function makeJsonSubs() {
     }
     return jsonSubs;
 }
-
 function makeJsonTranslations() {
     var jsonSubs = [];
     for (var i = 0; i < 100; i++) {
@@ -30,25 +29,20 @@ function makeJsonTranslations() {
     }
     return jsonSubs;
 }
-
 function makeEditableCaptionSet(opt_notComplete) {
     return new unisubs.subtitle.EditableCaptionSet(
         makeJsonSubs(), !opt_notComplete);
 }
-
 function makeTransCaptionSet() {
     return new unisubs.subtitle.EditableCaptionSet(
         makeJsonTranslations());
 }
-
 function successCallback() {
     
 }
-
 function failureCallback() {
 
 }
-
 function setUp() {
     unisubs.REPORT_ANALYTICS = false;
     unisubs.SubTracker.getInstance().start(false);
@@ -57,7 +51,6 @@ function setUp() {
     goog.Timer = unisubs.testing.TimerStub;
     unisubs.Rpc.call = unisubs.testing.rpcCallStub;
 }
-
 function makeServerModel(forTrans) {
     var editableCaptionSet = forTrans ? 
         makeTransCaptionSet() : makeEditableCaptionSet();
@@ -71,7 +64,6 @@ function makeServerModel(forTrans) {
         editableCaptionSet);
     _serverModel.init();
 }
-
 function testWorkDone() {
     makeServerModel(false);
     var captionSet = _serverModel.getCaptionSet();
@@ -85,7 +77,6 @@ function testWorkDone() {
     caption.setText('   ' + oldText + '   ');
     assertFalse(_serverModel.anySubtitlingWorkDone());
 }
-
 function testMakeSubsBlank() {
     makeServerModel(false);
     // if all subs are blank, zero-length subs will be saved.
@@ -101,19 +92,16 @@ function testMakeSubsBlank() {
     assertEquals(undefined, args['new_title']);
     assertEquals(undefined, args['completed']);
 }
-
 function testFinishedNoChanges() {
     makeServerModel(false);
     _serverModel.finish(successCallback, failureCallback);
     assertEquals(0, unisubs.testing.calls.length);
 }
-
 function testFinishedNoChanges2() {
     makeServerModel(false);
     _serverModel.finish(successCallback, failureCallback);
     assertEquals(0, unisubs.testing.calls.length);
 }
-
 function testFinishedOnlyChange() {
     makeServerModel(false);
     _serverModel.getCaptionSet().completed = false;
@@ -125,7 +113,6 @@ function testFinishedOnlyChange() {
     assertEquals(undefined, args['new_title']);
     assertEquals(false, args['completed']);
 }
-
 function testFork() {
     makeServerModel(true);
     var stdSubsJson = {
@@ -144,7 +131,6 @@ function testFork() {
     var args = call.args;
     assertEquals(true, args['forked']);
 }
-
 function testForkCloseThenOpen() {
     makeServerModel(true);
     var stdSubsJson = {

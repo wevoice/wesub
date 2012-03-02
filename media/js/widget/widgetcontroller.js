@@ -1,19 +1,19 @@
 // Universal Subtitles, universalsubtitles.org
-// 
-// Copyright (C) 2010 Participatory Culture Foundation
-// 
+//
+// Copyright (C) 2011 Participatory Culture Foundation
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see 
+// along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.widget.WidgetController');
@@ -53,8 +53,8 @@ unisubs.widget.WidgetController.prototype.initializeState = function(result) {
 /**
  * @param {function(unisubs.subtitle.EditableCaption)} strategy
  */
-unisubs.widget.WidgetController.prototype.setCaptionDisplayStrategy = 
-    function(strategy) 
+unisubs.widget.WidgetController.prototype.setCaptionDisplayStrategy =
+    function(strategy)
 {
     this.captionDisplayStrategy_ = strategy;
 };
@@ -70,9 +70,9 @@ unisubs.widget.WidgetController.prototype.initializeStateImpl_ = function(result
     }
 
     var dropDownContents = new unisubs.widget.DropDownContents(
-        result['drop_down_contents'], 
+        result['drop_down_contents'],
         result['my_languages'],
-        result["is_moderated"]);
+        result['is_moderated']);
     var subtitleState = unisubs.widget.SubtitleState.fromJSON(
         result['subtitles']);
 
@@ -91,8 +91,8 @@ unisubs.widget.WidgetController.prototype.initializeStateImpl_ = function(result
     popupMenu.dispatchLanguageSelection_(null);
 
     this.playController_ = new unisubs.widget.PlayController(
-        videoID, this.videoPlayer_.getVideoSource(), this.videoPlayer_, 
-        this.videoTab_, popupMenu, subtitleState);
+        videoID, this.videoPlayer_.getVideoSource(), this.videoPlayer_,
+        this.videoTab_, popupMenu, subtitleState, result['is_moderated']);
     this.playController_.setParentEventTarget(this);
 
     var videoPlayer = this.videoPlayer_;
@@ -104,12 +104,12 @@ unisubs.widget.WidgetController.prototype.initializeStateImpl_ = function(result
     this.playController_.setCaptionDisplayStrategy(captionDisplayStrategy);
 
     this.subtitleController_ = new unisubs.widget.SubtitleController(
-        videoID, this.videoURL_, 
+        videoID, this.videoURL_,
         this.playController_, this.videoTab_, popupMenu);
 };
 
 /**
- * Sets parameters that the widget needs to function: username, 
+ * Sets parameters that the widget needs to function: username,
  * embed version, writelock expiration, languages, and metadata languages.
  * @param {Object} settings
  */
@@ -117,11 +117,11 @@ unisubs.widget.WidgetController.makeGeneralSettings = function(settings) {
     if (settings['username'])
         unisubs.currentUsername = settings['username'];
     unisubs.embedVersion = settings['embed_version'];
-    unisubs.LOCK_EXPIRATION = 
+    unisubs.LOCK_EXPIRATION =
         settings["writelock_expiration"];
     unisubs.languages = settings['languages'];
     unisubs.metadataLanguages = settings['metadata_languages'];
-    var sortFn = function(a, b) { 
+    var sortFn = function(a, b) {
         return a[1] > b[1] ? 1 : a[1] < b[1] ? -1 : 0
     };
     goog.array.sort(unisubs.languages, sortFn);

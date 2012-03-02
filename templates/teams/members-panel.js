@@ -76,13 +76,15 @@
                 projects,
                 languages,
                 this.hide);
-            displayFeedbackMessage('Member saved.', 'success');
-           return false;
+            return false;
         },
         hide:function(e){
             this.el.remove();
             $('div.well').remove();
             $('html').unbind('click.modal');
+            if (window.roleSavedURL) {
+                window.location = window.roleSavedURL;
+            }
             return false;
         }
     });

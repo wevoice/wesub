@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -25,8 +25,6 @@ Currently we support:
 Messages models will trigger an email to be sent if
 the user has allowed email notifications
 """
-import datetime
-import urllib
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -37,14 +35,19 @@ from sentry.client.models import client
 from celery.task import task
 
 from auth.models import CustomUser as User
+from localeurl.utils import universal_url
+
+from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
+     REVIEWED_AND_PENDING_APPROVAL, REVIEWED_AND_SENT_BACK
+
 
 from utils import send_templated_email
 from utils import get_object_or_none
-from utils.translation import SUPPORTED_LANGUAGES_DICT
+from utils.translation import get_language_label
 
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
-        
+
 @task()
 def send_new_message_notification(message_id):
     from messages.models import Message
@@ -126,7 +129,7 @@ def application_sent(application_pk):
             "note":application.note,
             "user":m.user,
         }
-        body = render_to_string(template_name,context) 
+        body = render_to_string(template_name,context)
         subject  = ugettext(u'%s is applying for team %s') % (application.user, application.team.name)
         if m.user.notify_by_message:
             msg = Message()
@@ -138,11 +141,11 @@ def application_sent(application_pk):
             msg.save()
         send_templated_email(m.user, subject, "messages/email/application-sent-email.html", context)
     return True
-        
+
 
 @task()
 def team_application_denied(application_pk):
-    
+
     if getattr(settings, "MESSAGES_DISABLED", False):
         return
     from messages.models import Message
@@ -189,7 +192,7 @@ def team_member_new(member_pk):
             "role":member.role,
             "url_base":get_url_base(),
         }
-        body = render_to_string("messages/team-new-member.txt",context) 
+        body = render_to_string("messages/team-new-member.txt",context)
         subject = ugettext("%s team has a new member" % (member.team))
         if m.user.notify_by_message:
             msg = Message()
@@ -201,7 +204,7 @@ def team_member_new(member_pk):
         template_name = "messages/email/team-new-member.html"
         send_templated_email(m.user, subject, template_name, context)
 
-        
+
     # now send welcome mail to the new member
     template_name = "messages/team-welcome.txt"
     context = {
@@ -210,7 +213,7 @@ def team_member_new(member_pk):
        "role":member.role,
        "user":member.user,
     }
-    body = render_to_string(template_name,context) 
+    body = render_to_string(template_name,context)
 
     msg = Message()
     msg.subject = ugettext("You've joined the %s team!" % (member.team))
@@ -245,7 +248,7 @@ def team_member_leave(team_pk, user_pk):
             "user":m.user,
             "url_base":get_url_base(),
         }
-        body = render_to_string("messages/team-member-left.txt",context) 
+        body = render_to_string("messages/team-member-left.txt",context)
         if m.user.notify_by_message:
             msg = Message()
             msg.subject = subject
@@ -255,7 +258,7 @@ def team_member_leave(team_pk, user_pk):
             msg.save()
         send_templated_email(m.user, subject, "messages/email/team-member-left.html", context)
 
-        
+
     context = {
         "team":team,
         "user":user,
@@ -272,7 +275,7 @@ def team_member_leave(team_pk, user_pk):
         msg.save()
     template_name = "messages/email/team-member-you-have-left.html"
     send_templated_email(user, subject, template_name, context)
-    
+
 @task()
 def email_confirmed(user_pk):
     from messages.models import Message
@@ -302,9 +305,9 @@ def team_task_assigned(task_pk):
     task_type = Task.TYPE_NAMES[task.type]
     subject = ugettext(u"You have a new task assignment on Universal Subtitles!")
     user = task.assignee
-    task_language  = None
+    task_language = None
     if task.language:
-        task_language = SUPPORTED_LANGUAGES_DICT[task.language]
+        task_language = get_language_label(task.language)
     context = {
         "team":task.team,
         "user":user,
@@ -322,9 +325,272 @@ def team_task_assigned(task_pk):
         msg.user = user
         msg.object = task.team
         msg.save()
-        
+
     template_name = "messages/email/team-task-assigned.html"
-    email_res =  send_templated_email(user, subject, template_name, context)
+    email_res = send_templated_email(user, subject, template_name, context)
     return msg, email_res
-        
-    
+
+
+def _reviewed_notification(task_pk, status):
+    from teams.models import Task
+    from videos.models import Action
+    from messages.models import Message
+    try:
+        task = Task.objects.select_related(
+            "team_video__video", "team_video", "assignee").get(
+                pk=task_pk)
+    except Task.DoesNotExist:
+        return False
+
+
+    subject = ugettext(u"Your subtitles have been reviewed")
+    if status == REVIEWED_AND_PUBLISHED:
+        subject += ugettext(" and published")
+    user = task.subtitle_version.user
+    task_language = get_language_label(task.language)
+    reviewer = task.assignee
+    video = task.team_video.video
+    subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
+        'video_id': video.video_id,
+        'lang': task.language,
+        'lang_id': task.subtitle_version.language.pk,
+
+    }))
+    reviewer_message_url = "%s%s?user=%s" % (
+        get_url_base(), reverse("messages:new"), reviewer.username)
+
+    context = {
+        "team":task.team,
+        "title": task.subtitle_version.language.get_title(),
+        "user":user,
+        "task_language": task_language,
+        "url_base":get_url_base(),
+        "task":task,
+        "reviewer":reviewer,
+        "note":task.body,
+        "reviewed_and_pending_approval": status == REVIEWED_AND_PENDING_APPROVAL,
+        "sent_back": status == REVIEWED_AND_SENT_BACK,
+        "reviewed_and_published": status == REVIEWED_AND_PUBLISHED,
+        "subs_url": subs_url,
+        "reviewer_message_url": reviewer_message_url,
+    }
+    if user.notify_by_message:
+        template_name = "messages/team-task-reviewed.txt"
+        msg = Message()
+        msg.subject = subject
+        msg.content = render_to_string(template_name,context)
+        msg.user = user
+        msg.object = task.team
+        msg.save()
+
+    template_name = "messages/email/team-task-reviewed.html"
+    email_res =  send_templated_email(user, subject, template_name, context)
+    Action.create_reviewed_video_handler(task.subtitle_version, reviewer)
+    return msg, email_res
+
+@task
+def reviewed_and_published(task_pk):
+    return _reviewed_notification(task_pk, REVIEWED_AND_PUBLISHED)
+
+@task
+def reviewed_and_pending_approval(task_pk):
+    return _reviewed_notification(task_pk, REVIEWED_AND_PENDING_APPROVAL)
+
+@task
+def reviewed_and_sent_back(task_pk):
+    return _reviewed_notification(task_pk, REVIEWED_AND_SENT_BACK)
+
+@task
+def approved_notification(task_pk, published=False):
+    """
+    On approval, it can be sent back (published=False) or
+    approved and published
+    """
+    from teams.models import Task
+    from videos.models import Action
+    from messages.models import Message
+    try:
+        task = Task.objects.select_related(
+            "team_video__video", "team_video", "assignee", "subtitle_version").get(
+                pk=task_pk)
+    except Task.DoesNotExist:
+        return False
+    # some tasks are being created without subtitles version, see
+    # https://unisubs.sifterapp.com/projects/12298/issues/552092/comments
+    if not task.subtitle_version:
+        return False
+
+    if published:
+        subject = ugettext(u"Your subtitles have been approved and published!")
+        template_txt = "messages/team-task-approved-published.txt"
+        template_html ="messages/email/team-task-approved-published.html"
+    else:
+
+        template_txt = "messages/team-task-approved-sentback.txt"
+        template_html ="messages/email/team-task-approved-sentback.html"
+        subject = ugettext(u"Your subtitles have been declined")
+    user = task.subtitle_version.user
+    task_language = get_language_label(task.language)
+    reviewer = task.assignee
+    video = task.team_video.video
+    subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
+        'video_id': video.video_id,
+        'lang': task.language,
+        'lang_id': task.subtitle_version.language.pk,
+
+    }))
+    reviewer_message_url = "%s%s?user=%s" % (
+        get_url_base(), reverse("messages:new"), reviewer.username)
+
+    context = {
+        "team":task.team,
+        "title": task.subtitle_version.language.get_title(),
+        "user":user,
+        "task_language": task_language,
+        "url_base":get_url_base(),
+        "task":task,
+        "reviewer":reviewer,
+        "note":task.body,
+        "subs_url": subs_url,
+        "reviewer_message_url": reviewer_message_url,
+    }
+    if user.notify_by_message:
+        template_name = template_txt
+        msg = Message()
+        msg.subject = subject
+        msg.content = render_to_string(template_name,context)
+        msg.user = user
+        msg.object = task.team
+        msg.save()
+
+    template_name = template_html
+    email_res =  send_templated_email(user, subject, template_name, context)
+    Action.create_rejected_video_handler(task.subtitle_version, reviewer)
+    return msg, email_res
+
+@task
+def send_reject_notification(task_pk, sent_back):
+    raise NotImplementedError()
+    from teams.models import Task
+    from videos.models import Action
+    from messages.models import Message
+    try:
+        task = Task.objects.select_related(
+            "team_video__video", "team_video", "assignee", "subtitle_version").get(
+                pk=task_pk)
+    except Task.DoesNotExist:
+        return False
+
+    subject = ugettext(u"Your subtitles have been declined")
+    user = task.subtitle_version.user
+    task_language = get_language_label(task.language)
+    reviewer = task.assignee
+    video = task.team_video.video
+    subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
+        'video_id': video.video_id,
+        'lang': task.language,
+        'lang_id': task.subtitle_version.language.pk,
+
+    }))
+    reviewer_message_url = "%s%s?user=%s" % (
+        get_url_base(), reverse("messages:new"), reviewer.username)
+
+    context = {
+        "team":task.team,
+        "title": task.subtitle_version.language.get_title(),
+        "user":user,
+        "task_language": task_language,
+        "url_base":get_url_base(),
+        "task":task,
+        "reviewer":reviewer,
+        "note":task.body,
+        "sent_back": sent_back,
+        "subs_url": subs_url,
+        "reviewer_message_url": reviewer_message_url,
+    }
+    if user.notify_by_message:
+        template_name = "messages/team-task-rejected.txt"
+        msg = Message()
+        msg.subject = subject
+        msg.content = render_to_string(template_name,context)
+        msg.user = user
+        msg.object = task.team
+        msg.save()
+
+    template_name = "messages/email/team-task-rejected.html"
+    email_res =  send_templated_email(user, subject, template_name, context)
+    Action.create_rejected_video_handler(task.subtitle_version, reviewer)
+    return msg, email_res
+
+COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
+SUBJECT_EMAIL_VIDEO_COMMENTED = "%s left a comment on the video %s"
+@task
+def send_video_comment_notification(comment_pk,  version_pk=None):
+    """
+    Comments can be attached to a video (appear in the videos:video (info)) page) OR
+                                  sublanguage (appear in the videos:translation_history  page)
+    Approval / Reviews notes are also stored as comments.
+
+    """
+    from comments.models import Comment
+    from videos.models import Video, SubtitleLanguage, SubtitleVersion
+    try:
+        comment = Comment.objects.get(pk=comment_pk)
+    except Comment.DoesNotExist:
+        return
+    version = None
+    if version_pk:
+        try:
+            version = SubtitleVersion.objects.get(pk=version_pk)
+        except SubtitleVersion.DoesNotExist:
+            pass
+    ct = comment.content_object
+    if isinstance( ct, Video):
+        video = ct
+        version = None
+        language = None
+    elif isinstance(ct, SubtitleLanguage ):
+        video = ct.video
+        language = ct
+
+    domain = Site.objects.get_current().domain
+    if language:
+        language_url = universal_url("videos:translation_history", kwargs={
+            "video_id": video.video_id,
+            "lang": language.language,
+            "lang_id": language.pk,
+        })
+    else:
+        language_url = None
+    if version:
+        version_url = universal_url("videos:revision", kwargs={
+            "pk": version.pk,
+        })
+    else:
+        version_url = None
+
+    subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % (comment.user.username, video.title_display())
+
+    followers = set(video.notification_list(comment.user))
+    if language:
+        followers.update(language.notification_list(comment.user))
+    for user in followers:
+        send_templated_email(
+            user,
+            subject,
+            "messages/email/comment-notification.html",
+            {
+                "video": video,
+                "user": user,
+                "hash": user.hash_for_video(video.video_id),
+                "commenter": unicode(comment.user),
+                "commenter_url": comment.user.get_absolute_url(),
+                "version_url":version_url,
+                "language_url":language_url,
+                "domain":domain,
+                "version": version,
+                "body": comment.content,
+                "STATIC_URL": settings.STATIC_URL,
+            },
+            fail_silently=not settings.DEBUG)
+

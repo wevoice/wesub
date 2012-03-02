@@ -38,7 +38,7 @@ def format_time(time):
 
 
 class EffectiveSubtitle:
-    def __init__(self, subtitle_id, text, start_time, end_time, sub_order, pk):
+    def __init__(self, subtitle_id, text, start_time, end_time, sub_order, pk, start_of_paragraph=False):
         self.subtitle_id = subtitle_id
         self.text = text
         if start_time is None:
@@ -50,6 +50,7 @@ class EffectiveSubtitle:
         self.end_time = end_time 
         self.sub_order = sub_order
         self.pk = pk
+        self.start_of_paragraph = start_of_paragraph
     
     def for_json(self):
         return {
@@ -57,6 +58,7 @@ class EffectiveSubtitle:
             'text': self.text,
             'start_time': self.start_time,
             'end_time': self.end_time,
+            'start_of_paragraph': self.start_of_paragraph,
             'sub_order': self.sub_order 
         }
 
@@ -68,7 +70,8 @@ class EffectiveSubtitle:
             'text': self.text,
             'start': self.start_time,
             'end': self.end_time,
-            'id': self.pk
+            'id': self.pk,
+            'start_of_paragraph': self.start_of_paragraph,
         }
 
     def has_same_timing(self, subtitle):
@@ -83,7 +86,9 @@ class EffectiveSubtitle:
             subtitle.start_time,
             subtitle.end_time,
             subtitle.subtitle_order,
-            subtitle.pk)
+            subtitle.pk,
+            subtitle.start_of_paragraph,
+        )
 
     @classmethod
     def for_dependent_translation(cls, subtitle, translation):
@@ -93,7 +98,9 @@ class EffectiveSubtitle:
             subtitle.start_time,
             subtitle.end_time,
             subtitle.subtitle_order,
-            subtitle.pk)
+            subtitle.pk,
+            subtitle.start_of_paragraph,
+        )
 
     def duplicate_for(self, draft):
         from videos.models import Subtitle
@@ -103,7 +110,9 @@ class EffectiveSubtitle:
             subtitle_order=self.sub_order,
             subtitle_text=self.text,
             start_time=self.start_time,
-            end_time=self.end_time)
+            end_time=self.end_time,
+            start_of_paragraph = self.start_of_paragraph,
+        )
 
     def display_time(self):
         t = self.start_time

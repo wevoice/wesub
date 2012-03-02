@@ -1,35 +1,33 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
 from django.conf.global_settings import LANGUAGES
-from django.utils import translation
+
 from videos import models
-from django.conf import settings
-from uuid import uuid4
-import widget
+
 
 LANGUAGES_MAP = dict(LANGUAGES)
 
 class BaseRpc:
-    def _make_subtitles_dict(self, subtitles, language_code, language_pk, is_original, is_complete, version, is_latest, is_forked, base_language, title):
+    def _make_subtitles_dict(self, subtitles, language_code, language_pk, is_original, is_complete, version, is_latest, is_forked, base_language, title, description):
         return {
             'subtitles': subtitles,
             'language_code': language_code,
+            'language_name': LANGUAGES_MAP[language_code],
             'language_pk': language_pk,
             'is_original': is_original,
             'is_complete': is_complete,
@@ -38,7 +36,8 @@ class BaseRpc:
             'forked': is_forked,
             'base_language': base_language and base_language.language,
             'base_language_pk': base_language and base_language.pk,
-            'title': title
+            'title': title,
+            'description': description,
             }
 
     def get_my_user_info(self, request):

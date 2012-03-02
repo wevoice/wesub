@@ -6,6 +6,8 @@
     {% trans 'Compose a Message' %} | Universal Subtitles
 {% endblock %}
 
+{% block body-class %}new-message {{ block.super }}{% endblock %}
+
 {% block main_content %}
 
     {% include "utils/chosenify.html" %}
@@ -27,29 +29,34 @@
 
                 {{ form.non_field_errors }}
 
-                <label for="">Recipient</label>
-                {{ form.errors.user }}
-                <div class="ajaxChosen">
-                    <select id="id_user" name="user">
-                        <option value="">-----</option>
-                        <option value="">Begin typing to search.</option>
-                        {% if selected_user %}
-                            <option selected="selected" value="{{ selected_user.id }}">{{ selected_user.username }}
-                                {% if selected_user.get_full_name %}
-                                    ({{ selected_user.get_full_name }})
+                <div class="group">
+                    <div class="recipient">
+                        <label for="">Recipient</label>
+                        {{ form.errors.user }}
+                        <div class="ajaxChosen">
+                            <select id="id_user" name="user">
+                                <option value="">-----</option>
+                                <option value="">Begin typing to search.</option>
+                                {% if selected_user %}
+                                    <option selected="selected" value="{{ selected_user.id }}">{{ selected_user.username }}
+                                        {% if selected_user.get_full_name %}
+                                            ({{ selected_user.get_full_name }})
+                                        {% endif %}
+                                    </option>
                                 {% endif %}
-                            </option>
-                        {% endif %}
-                    </select>
+                            </select>
+                        </div>
+                    </div>
+
+                    {% if not request.GET.user and request.user.messageable_teams %}
+                        <div class="or">-- or --</div>
+                        <div class="team">
+                            <label for="id_team">Team</label>
+                            {{ form.errors.team }}
+                            {{ form.team }}
+                        </div>
+                    {% endif %}
                 </div>
-
-                {% if request.user.teams.all %}
-                    <div class="or" style="margin: 10px 0 0 0; text-align: center; font-weight: bold;">-- or --</div>
-
-                    <label for="id_team">Team</label>
-                    {{ form.errors.team }}
-                    {{ form.team }}
-                {% endif %}
 
                 <label for="id_subject">Subject</label>
                 {{ form.errors.subject }}

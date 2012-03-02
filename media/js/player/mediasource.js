@@ -144,7 +144,7 @@ unisubs.player.MediaSource.videoSourceForURL = function(videoURL, opt_videoConfi
         var videoIDExtract = /dailymotion.com\/video\/([0-9a-z]+)/i.exec(videoURL);
         if (videoIDExtract)
             return new unisubs.player.DailymotionVideoSource(
-                videoIDExtract[1], videoURL);
+                videoIDExtract[1], videoURL, opt_videoConfig);
     }
     else if (/^\s*https?:\/\/([^\.]+\.)?blip\.tv/.test(videoURL) &&
              !blipFileGetRegex.test(videoURL)) {

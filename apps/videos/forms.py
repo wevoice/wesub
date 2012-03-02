@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django import forms
@@ -33,11 +33,11 @@ from math_captcha.forms import MathCaptchaForm
 from django.utils.safestring import mark_safe
 from django.db.models import ObjectDoesNotExist
 from videos.types import video_type_registrar, VideoTypeError
+from videos.types.youtube import yt_service
 from videos.models import VideoUrl
 from utils.forms import AjaxForm, EmailListField, UsernameListField
-from gdata.youtube.service import YouTubeService
 from videos.tasks import video_changed_tasks
-from utils.translation import get_languages_list
+from utils.translation import get_language_choices
 from utils.forms import StripRegexField, FeedURLField
 from videos.feed_parser import FeedParser, FeedParserError
 from utils.forms import ReCaptchaField
@@ -49,13 +49,13 @@ KB_SIZELIMIT = 512
 
 class TranscriptionFileForm(forms.Form, AjaxForm):
     txtfile = forms.FileField()
-    
+
     def clean_txtfile(self):
         f = self.cleaned_data['txtfile']
-        
+
         if f.name.split('.')[-1] != 'txt':
             raise forms.ValidationError(_('File should have txt format'))
-        
+
         if f.size > KB_SIZELIMIT * 1024:
             raise forms.ValidationError(_(
                     u'File size should be less {0} kb'.format(KB_SIZELIMIT)))
@@ -69,7 +69,7 @@ class TranscriptionFileForm(forms.Form, AjaxForm):
         except DjangoUnicodeDecodeError:
             raise forms.ValidationError(_(u'Can\'t encode file. It should have utf8 encoding.'))
         f.seek(0)
-                
+
         return f
 
     def clean_subtitles(self):
@@ -93,19 +93,19 @@ class TranscriptionFileForm(forms.Form, AjaxForm):
         return subtitles
 
 class CreateVideoUrlForm(forms.ModelForm):
-    
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(CreateVideoUrlForm, self).__init__(*args, **kwargs)
         self.fields['video'].widget = forms.HiddenInput()
-    
+
     class Meta:
         model = VideoUrl
         fields = ('url', 'video')
-        
+
     def clean_url(self):
         url = self.cleaned_data['url']
-        
+
         try:
             video_type = video_type_registrar.video_type_for_url(url)
 
@@ -116,23 +116,23 @@ class CreateVideoUrlForm(forms.ModelForm):
 
         except VideoTypeError, e:
             raise forms.ValidationError(e)
-        
+
         if not video_type:
             raise forms.ValidationError(mark_safe(_(u"""Universal Subtitles does not support that website or video format.
 If you'd like to us to add support for a new site or format, or if you
 think there's been some mistake, <a
-href="mailto:%s">contact us</a>!""") % settings.FEEDBACK_EMAIL)) 
-        self._video_type = video_type            
+href="mailto:%s">contact us</a>!""") % settings.FEEDBACK_EMAIL))
+        self._video_type = video_type
         return video_type.convert_to_video_url()
-    
+
     def clean(self):
         data = super(CreateVideoUrlForm, self).clean()
         video = data.get('video')
         if video and not video.allow_video_urls_edit and not self.user.has_perm('videos.add_videourl'):
             raise forms.ValidationError(_('You have not permission add video URL for this video'))
-        
+
         return self.cleaned_data
-        
+
     def save(self, commit=True):
         obj = super(CreateVideoUrlForm, self).save(False)
         obj.type = self._video_type.abbreviation
@@ -140,13 +140,13 @@ href="mailto:%s">contact us</a>!""") % settings.FEEDBACK_EMAIL))
         obj.videoid = self._video_type.video_id or ''
         commit and obj.save()
         return obj
-    
+
     def get_errors(self):
         output = {}
         for key, value in self.errors.items():
             output[key] = '/n'.join([force_unicode(i) for i in value])
         return output
-    
+
 class SubtitlesUploadBaseForm(forms.Form):
     language = forms.ChoiceField(choices=ALL_LANGUAGES, initial='en')
     video_language = forms.ChoiceField(required=False, choices=ALL_LANGUAGES, initial='en')
@@ -155,14 +155,40 @@ class SubtitlesUploadBaseForm(forms.Form):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(SubtitlesUploadBaseForm, self).__init__(*args, **kwargs)
-        self.fields['language'].choices = get_languages_list()
-        self.fields['video_language'].choices = get_languages_list()
-        
+        self.fields['language'].choices = get_language_choices()
+        self.fields['video_language'].choices = get_language_choices()
+
     def clean_video(self):
         video = self.cleaned_data['video']
         if video.is_writelocked:
             raise forms.ValidationError(_(u'Somebody is subtitling this video right now. Try later.'))
         return video
+
+    def clean(self):
+        video = self.cleaned_data['video']
+        language = self.cleaned_data['language']
+
+        team_video = video.get_team_video()
+        if team_video:
+            msg = _(u"Uploading subtitles in this language was forbidden by team %s which moderates the video.") % team_video.team
+
+            incomplete_tasks = team_video.task_set.incomplete().filter(language__in=[language, ''])
+
+            # If there are any incomplete tasks open they should block the
+            # uploading of subtitles, unless the user is assigned to that task.
+            if self.user and self.user.is_authenticated():
+                incomplete_tasks = incomplete_tasks.exclude(assignee=self.user)
+
+            if incomplete_tasks.exists():
+                raise forms.ValidationError(msg)
+
+            # However, approve/review will still block upload as before.
+            # TODO: Remove this restriction.
+            workflow = team_video.get_workflow()
+            if workflow.approve_allowed or workflow.review_allowed:
+                raise forms.ValidationError(msg)
+
+        return self.cleaned_data
 
     def _save_original_language(self, video, video_language):
         original_language = video.subtitle_language()
@@ -183,14 +209,14 @@ class SubtitlesUploadBaseForm(forms.Form):
                 try:
                     language_exists = video.subtitlelanguage_set.exclude(pk=original_language.pk) \
                         .get(language=video_language)
-                    
-                    latest_version = original_language.latest_version() 
-                    
+
+                    latest_version = original_language.latest_version()
+
                     if latest_version:
                         last_no = latest_version.version_no
                     else:
                         last_no = 0
-                        
+
                     for version in language_exists.subtitleversion_set.all():
                         version.language = original_language
                         last_no += 1
@@ -200,7 +226,7 @@ class SubtitlesUploadBaseForm(forms.Form):
                     language_exists.delete()
                 except ObjectDoesNotExist:
                     pass
-                
+
                 original_language.language = video_language
                 original_language.save()
         else:
@@ -236,17 +262,25 @@ class SubtitlesUploadBaseForm(forms.Form):
 
     def save_subtitles(self, parser, video=None, language=None, update_video=True):
         video = video or self.cleaned_data['video']
-        
+
         if not video.has_original_language():
             self._save_original_language(
                 video, self.cleaned_data['video_language'])
-        
+
         if language:
             self._sl_created = False
             language = language
         else:
             language, self._sl_created = self._find_appropriate_language(video, self.cleaned_data['language'])
         language = save_subtitle(video, language, parser, self.user, update_video)
+
+        # If there are any outstanding tasks for this language, associate the
+        # new version with them.
+        team_video = video.get_team_video()
+        if team_video:
+            outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
+            new_version = language.latest_version(public_only=False)
+            outstanding_tasks.update(subtitle_version=new_version, language=language.language)
 
         return language
 
@@ -255,11 +289,11 @@ class SubtitlesUploadBaseForm(forms.Form):
         for key, value in self.errors.items():
             output[key] = '/n'.join([force_unicode(i) for i in value])
         return output
-    
+
 class SubtitlesUploadForm(SubtitlesUploadBaseForm):
     subtitles = forms.FileField()
     is_complete = forms.BooleanField(initial=True, required=False)
-    
+
     def clean_subtitles(self):
         subtitles = self.cleaned_data['subtitles']
         if subtitles.size > KB_SIZELIMIT * 1024:
@@ -279,7 +313,7 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
             raise forms.ValidationError(e)
         subtitles.seek(0)
         return subtitles
-    
+
     def _get_parser(self, filename):
         end = filename.split('.')[-1].lower()
         if end == 'srt':
@@ -292,11 +326,11 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
             return SbvSubtitleParser
         if end == 'dfxp':
             return DfxpSubtitleParser
-        
+
     def save(self):
         subtitles = self.cleaned_data['subtitles']
         text = subtitles.read()
-        parser = self._get_parser(subtitles.name)(force_unicode(text, chardet.detect(text)['encoding']))        
+        parser = self._get_parser(subtitles.name)(force_unicode(text, chardet.detect(text)['encoding']))
         sl = self.save_subtitles(parser, update_video=False)
         is_complete = self.cleaned_data.get('is_complete')
         sl.is_complete = is_complete
@@ -309,24 +343,24 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
         sl.save()
         video_changed_tasks.delay(sl.video_id, sl.latest_version().id)
         return sl
- 
+
 class PasteTranscriptionForm(SubtitlesUploadBaseForm):
     subtitles = forms.CharField()
 
     def save(self):
         subtitles = self.cleaned_data['subtitles']
-        parser = TxtSubtitleParser(subtitles)       
+        parser = TxtSubtitleParser(subtitles)
         language = self.save_subtitles(parser)
         if language.is_original:
             language.video.subtitlelanguage_set.exclude(pk=language.pk).update(is_forked=True)
         return language
-    
+
 class UserTestResultForm(forms.ModelForm):
-    
+
     class Meta:
         model = UserTestResult
         exclude = ('browser',)
-        
+
     def save(self, request):
         obj = super(UserTestResultForm, self).save(False)
         obj.browser = request.META.get('HTTP_USER_AGENT', 'empty HTTP_USER_AGENT')
@@ -336,17 +370,17 @@ class UserTestResultForm(forms.ModelForm):
 class VideoForm(forms.Form):
     # url validation is within the clean method
     video_url = forms.URLField(verify_exists=False)
-    
+
     def __init__(self, user=None, *args, **kwargs):
         if user and not user.is_authenticated():
             user = None
         self.user = user
         super(VideoForm, self).__init__(*args, **kwargs)
         self.fields['video_url'].widget.attrs['class'] = 'main_video_form_field'
-    
+
     def clean_video_url(self):
         video_url = self.cleaned_data['video_url']
-        
+
         if video_url:
             try:
                 video_type = video_type_registrar.video_type_for_url(video_url)
@@ -355,13 +389,13 @@ class VideoForm(forms.Form):
             if not video_type:
                 for d in video_type_registrar.domains:
                     if d in video_url:
-                        raise forms.ValidationError(mark_safe(_(u"""Please try again with a link to a video page. 
+                        raise forms.ValidationError(mark_safe(_(u"""Please try again with a link to a video page.
                         <a href="mailto:%s">Contact us</a> if there's a problem.""") % settings.FEEDBACK_EMAIL))
-                    
+
                 raise forms.ValidationError(mark_safe(_(u"""You must link to a video on a compatible site (like YouTube) or directly to a
                     video file that works with HTML5 browsers. For example: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v
                     <a href="mailto:%s">Contact us</a> if there's a problem.""") % settings.FEEDBACK_EMAIL))
-                             
+
             else:
                 self._video_type = video_type
                 # we need to use the cannonical url as the user provided might need
@@ -373,7 +407,7 @@ class VideoForm(forms.Form):
                     raise forms.ValidationError(_(u'This URL appears to be a broken link.'))
 
         return video_url
-    
+
     def save(self):
         video_url = self.cleaned_data['video_url']
         obj, created = Video.get_or_create_for_url(video_url, self._video_type, self.user)
@@ -384,64 +418,67 @@ youtube_user_url_re = re.compile(r'^(http://)?(www.)?youtube.com/user/(?P<userna
 
 class AddFromFeedForm(forms.Form, AjaxForm):
     VIDEOS_LIMIT = 10
-    
+
     youtube_feed_url_pattern =  'https://gdata.youtube.com/feeds/api/users/%s/uploads'
     usernames = UsernameListField(required=False, label=_(u'Youtube usernames'), help_text=_(u'Enter usernames separated by comma.'))
-    youtube_user_url = StripRegexField(youtube_user_url_re, required=False, label=_(u'Youtube page link.'), 
+    youtube_user_url = StripRegexField(youtube_user_url_re, required=False, label=_(u'Youtube page link.'),
                                        help_text=_(u'For example: http://www.youtube.com/user/username'))
     feed_url = FeedURLField(required=False, help_text=_(u'Supported: Youtube, Vimeo, Blip or Dailymotion. Only supported sites added.'))
     save_feed = forms.BooleanField(required=False, label=_(u'Save feed'), help_text=_(u'Choose this if you wish to add videos from this feed in the future. Only valid RSS feeds will be saved.'))
-    
+
     def __init__(self, user, *args, **kwargs):
         if not user.is_authenticated():
             user = None
         self.user = user
         super(AddFromFeedForm, self).__init__(*args, **kwargs)
-        
-        self.yt_service = YouTubeService()
+
+        self.yt_service = yt_service
         self.video_types = [] #tuples: (video_type, video_info)
         self.feed_urls = [] #tuples: (feed_url, last_saved_entry_url)
-        self.video_limit_routreach = False 
-        
+        self.video_limit_routreach = False
+
     def clean_feed_url(self):
         url = self.cleaned_data.get('feed_url', '')
-        
+
         if url:
             self.parse_feed_url(url)
-                
+
         return url
-    
+
     def clean_youtube_user_url(self):
         url = self.cleaned_data.get('youtube_user_url', '').strip()
-        
+
         if url:
             username = youtube_user_url_re.match(url).groupdict()['username']
             url = self.youtube_feed_url_pattern % str(username)
             self.parse_feed_url(url)
         return url
-        
+
     def clean_usernames(self):
         usernames = self.cleaned_data.get('usernames', [])
         for username in usernames:
             url = self.youtube_feed_url_pattern % str(username)
             self.parse_feed_url(url)
         return usernames
-    
+
     def parse_feed_url(self, url):
         feed_parser = FeedParser(url)
         entry = ''
-        
+
+        video_feed = self.get_feed_url(url)
+        since = video_feed.last_link if video_feed else None
+
         try:
-            for vt, info, entry in feed_parser.items():
+            for vt, info, entry in feed_parser.items(since=since):
                 if vt:
                     self.video_types.append((vt, info))
 
                 if self.VIDEOS_LIMIT and len(self.video_types) >= self.VIDEOS_LIMIT:
                     self.video_limit_routreach = True
-                    break  
-            
+                    break
+
             invalid_feed = False
-            
+
             if hasattr(feed_parser.feed, 'version') and feed_parser.feed.version:
                 try:
                     self.feed_urls.append((url, entry and entry['link']))
@@ -452,10 +489,10 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
             if invalid_feed:
                 raise forms.ValidationError(_(u'Sorry, we could not find a valid feed at the URL you provided. Please check the URL and try again.'))
-                
+
         except FeedParserError, e:
-            raise forms.ValidationError(e) 
-    
+            raise forms.ValidationError(e)
+
     def success_message(self):
         if not self.video_limit_routreach:
             return _(u"%(count)s videos have been added")
@@ -467,12 +504,19 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
     def save_feed_url(self, feed_url, last_entry_url):
         try:
-            VideoFeed.objects.get(url=feed_url)
+            vf = VideoFeed.objects.get(url=feed_url)
         except VideoFeed.DoesNotExist:
             vf = VideoFeed(url=feed_url)
-            vf.user = self.user
-            vf.last_link = last_entry_url
-            vf.save()
+
+        vf.user = self.user
+        vf.last_link = last_entry_url
+        vf.save()
+
+    def get_feed_url(self, feed_url):
+        try:
+            return VideoFeed.objects.get(url=feed_url)
+        except VideoFeed.DoesNotExist:
+            return None
 
     def save(self):
         if self.cleaned_data.get('save_feed'):
@@ -490,13 +534,13 @@ class FeedbackForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea())
     error = forms.CharField(required=False, widget=forms.HiddenInput)
     captcha = ReCaptchaField(label=_(u'captcha'))
-    
+
     def __init__(self, *args, **kwargs):
         hide_captcha = kwargs.pop('hide_captcha', False)
         super(FeedbackForm, self).__init__(*args, **kwargs)
         if hide_captcha:
             del self.fields['captcha']
-    
+
     def send(self, request):
         email = self.cleaned_data['email']
         message = self.cleaned_data['message']
@@ -521,7 +565,7 @@ class FeedbackForm(forms.Form):
             subject = settings.FEEDBACK_SUBJECT
         EmailMessage(subject, message, email, \
                          feedback_emails, headers=headers, bcc=bcc).send()
-        
+
         if email:
             headers = {'Reply-To': settings.FEEDBACK_RESPONSE_EMAIL}
             body = render_to_string(settings.FEEDBACK_RESPONSE_TEMPLATE, {})
@@ -529,20 +573,20 @@ class FeedbackForm(forms.Form):
                          settings.FEEDBACK_RESPONSE_EMAIL, [email], headers=headers, bcc=bcc)
             email.content_subtype = 'html'
             email.send()
-                     
+
     def get_errors(self):
-        from django.utils.encoding import force_unicode        
+        from django.utils.encoding import force_unicode
         output = {}
         for key, value in self.errors.items():
             output[key] = '/n'.join([force_unicode(i) for i in value])
         return output
-    
+
 class EmailFriendForm(MathCaptchaForm):
     from_email = forms.EmailField(label='From')
     to_emails = EmailListField(label='To')
     subject = forms.CharField()
     message = forms.CharField(widget=forms.Textarea())
-    
+
     def send(self):
         subject = self.cleaned_data['subject']
         message = self.cleaned_data['message']

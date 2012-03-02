@@ -1,43 +1,63 @@
-from celery.task import task
-from django.utils import simplejson as json
-from django.utils.http import urlquote_plus
+# Universal Subtitles, universalsubtitles.org
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see
+# http://www.gnu.org/licenses/agpl-3.0.html.
+import logging
 import urllib
-from utils import send_templated_email
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.db.models import ObjectDoesNotExist
-from celery.signals import task_failure
-from haystack import site
-from videos.models import VideoFeed, SubtitleLanguage, Video
-from sentry.client.models import client
+from urllib import urlopen
+
 from celery.decorators import periodic_task
 from celery.schedules import crontab
+from celery.signals import task_failure
+from celery.task import task
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.files.base import ContentFile
-from urllib import urlopen
-import logging
-from sentry.client.handlers import SentryHandler 
+from django.db.models import ObjectDoesNotExist
+from django.utils import simplejson as json
+from django.utils.http import urlquote_plus
+from haystack import site
+from sentry.client.handlers import SentryHandler
+from sentry.client.models import client
 
-celery_logger = logging.getLogger('celery.task') 
-celery_logger.addHandler(SentryHandler())  
-def process_failure_signal(exception, traceback, sender, task_id,  
-                           signal, args, kwargs, einfo, **kw):  
+from utils import send_templated_email, DEFAULT_PROTOCOL
+from videos.models import VideoFeed, SubtitleLanguage, Video
+
+
+celery_logger = logging.getLogger('celery.task')
+celery_logger.addHandler(SentryHandler())
+def process_failure_signal(exception, traceback, sender, task_id,
+                           signal, args, kwargs, einfo, **kw):
     exc_info = (type(exception), exception, traceback)
     try:
         celery_logger.error(
-            'Celery job exception: %s(%s)' % (exception.__class__.__name__, exception),  
-            exc_info=exc_info,  
-            extra={  
-                'data': {  
-                    'task_id': task_id,  
-                    'sender': sender,  
-                    'args': args,  
-                    'kwargs': kwargs,  
-                }  
-            }  
+            'Celery job exception: %s(%s)' % (exception.__class__.__name__, exception),
+            exc_info=exc_info,
+            extra={
+                'data': {
+                    'task_id': task_id,
+                    'sender': sender,
+                    'args': args,
+                    'kwargs': kwargs,
+                }
+            }
         )
     except:
         pass
-task_failure.connect(process_failure_signal)  
+task_failure.connect(process_failure_signal)
 
 @periodic_task(run_every=crontab(hour=3, day_of_week=1))
 def cleanup():
@@ -46,16 +66,16 @@ def cleanup():
     from django.contrib.sessions.models import Session
     from djcelery.models import TaskState
     from auth.models import EmailConfirmation
-    
+
     EmailConfirmation.objects.delete_expired_confirmations()
-    
+
     now = datetime.datetime.now()
     Session.objects.filter(expire_date__lt=now).delete()
-    
+
     d = now - datetime.timedelta(days=31)
     TaskState.objects.filter(tstamp__lt=d).delete()
     transaction.commit_unless_managed()
-    
+
 @task
 def save_thumbnail_in_s3(video_id):
     try:
@@ -66,11 +86,11 @@ def save_thumbnail_in_s3(video_id):
     if video.thumbnail and not video.s3_thumbnail:
         content = ContentFile(urlopen(video.thumbnail).read())
         video.s3_thumbnail.save(video.thumbnail.split('/')[-1], content)
-        
+
 @periodic_task(run_every=crontab(minute=0, hour=1))
 def update_from_feed(*args, **kwargs):
     for feed in VideoFeed.objects.all():
-        update_video_feed.delay(feed.pk)    
+        update_video_feed.delay(feed.pk)
 
 @task
 def update_subtitles_fetched_counter_for_sl(sl_pk):
@@ -98,9 +118,9 @@ def add(a, b):
 def test_task(n):
     if not n:
         print '.'
-    
+
     from time import sleep
-    
+
     for i in xrange(n):
         print '.',
         sleep(0.5)
@@ -118,12 +138,12 @@ def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager
     from videos.models import Video
     from teams.models import TeamVideo
-    
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         _send_notification(new_version_id)
         _check_alarm(new_version_id)
         _detect_language(new_version_id)
+        _update_captions_in_original_service(new_version_id)
 
     video = Video.objects.get(pk=video_pk)
     if video.teamvideo_set.count() > 0:
@@ -131,24 +151,24 @@ def video_changed_tasks(video_pk, new_version_id=None):
         tv_search_index.backend.update(
             tv_search_index,
             list(video.teamvideo_set.all()))
-    
+
     video.update_search_index()
-    
+
 @task()
 def send_change_title_email(video_id, user_id, old_title, new_title):
     from videos.models import Video
     from auth.models import CustomUser as User
-    
+
     domain = Site.objects.get_current().domain
-    
+
     try:
         video = Video.objects.get(id=video_id)
         user = user_id and User.objects.get(id=user_id)
     except ObjectDoesNotExist:
         return
-    
+
     users = video.notification_list(user)
-    
+
     for obj in users:
         subject = u'Video\'s title changed on Universal Subtitles'
         context = {
@@ -161,19 +181,19 @@ def send_change_title_email(video_id, user_id, old_title, new_title):
             'new_title': new_title,
             "STATIC_URL": settings.STATIC_URL,
         }
-        send_templated_email(obj, subject, 
+        send_templated_email(obj, subject,
                              'videos/email_title_changed.html',
-                             context, fail_silently=not settings.DEBUG)       
-    
+                             context, fail_silently=not settings.DEBUG)
+
 def _send_notification(version_id):
     from videos.models import SubtitleVersion
-    
+
     try:
         version = SubtitleVersion.objects.get(id=version_id)
     except SubtitleVersion.DoesNotExist:
         return
 
-    if version.result_of_rollback:
+    if version.result_of_rollback or not version.is_public:
         return
 
     version.notification_sent = True
@@ -182,12 +202,12 @@ def _send_notification(version_id):
         _send_letter_translation_start(version)
     else:
         if version.text_change or version.time_change:
-            _send_letter_caption(version)        
+            _send_letter_caption(version)
 
 def _check_alarm(version_id):
     from videos.models import SubtitleVersion
     from videos import alarms
-    
+
     try:
         version = SubtitleVersion.objects.get(id=version_id)
     except SubtitleVersion.DoesNotExist:
@@ -195,11 +215,11 @@ def _check_alarm(version_id):
 
     alarms.check_subtitle_version(version)
     alarms.check_other_languages_changes(version)
-    alarms.check_language_name(version)    
+    alarms.check_language_name(version)
 
 def _detect_language(version_id):
     from videos.models import SubtitleVersion, SubtitleLanguage
-    
+
     try:
         version = SubtitleVersion.objects.get(id=version_id)
     except SubtitleVersion.DoesNotExist:
@@ -220,7 +240,7 @@ def _detect_language(version_id):
                 SubtitleLanguage.objects.get(video=language.video, language=r['responseData']['language'])
             except SubtitleLanguage.DoesNotExist:
                 language.language = r['responseData']['language']
-                language.save()  
+                language.save()
 
 def _send_letter_translation_start(translation_version):
     domain = Site.objects.get_current().domain
@@ -230,7 +250,7 @@ def _send_letter_translation_start(translation_version):
         context = {
             'version': translation_version,
             'domain': domain,
-            'video_url': 'http://%s%s' % (domain, video.get_absolute_url()),
+            'video_url': '%s://%s%s' % (DEFAULT_PROTOCOL, domain, video.get_absolute_url()),
             'user': user,
             'language': language,
             'video': video,
@@ -239,7 +259,7 @@ def _send_letter_translation_start(translation_version):
         }
         subject = 'New %s translation by %s of "%s"' % \
             (language.language_display(), translation_version.user.__unicode__(), video.__unicode__())
-        send_templated_email(user, subject, 
+        send_templated_email(user, subject,
                              'videos/email_start_notification.html',
                              context, fail_silently=not settings.DEBUG)
 
@@ -287,7 +307,7 @@ def _send_letter_caption(caption_version):
     from videos.models import SubtitleVersion
 
     domain = Site.objects.get_current().domain
-    
+
     language = caption_version.language
     video = language.video
     qs = SubtitleVersion.objects.filter(language=language) \
@@ -315,24 +335,67 @@ def _send_letter_caption(caption_version):
 
     followers = set(video.notification_list(caption_version.user))
     followers.update(language.notification_list(caption_version.user))
-    
+
     for item in qs:
         if item.user and item.user in followers:
             context['your_version'] = item
             context['user'] = item.user
             context['hash'] = item.user.hash_for_video(context['video'].video_id)
             context['user_is_rtl'] = item.user.guess_is_rtl()
-            send_templated_email(item.user, subject, 
+            send_templated_email(item.user, subject,
                                  'videos/email_notification.html',
                                  context, fail_silently=not settings.DEBUG)
 
             followers.discard(item.user)
-    
+
     for user in followers:
         context['user'] = user
         context['hash'] = user.hash_for_video(context['video'].video_id)
         context['user_is_rtl'] = user.guess_is_rtl()
-        send_templated_email(user, subject, 
+        send_templated_email(user, subject,
                              'videos/email_notification_non_editors.html',
-                             context, fail_silently=not settings.DEBUG)        
+                             context, fail_silently=not settings.DEBUG)
+
+
+
+def _update_captions_in_original_service(version_pk):
+    """Push the latest caption set for this version to the original video provider.
+
+    Only Youtube is supported right now.
+
+    In order for this to work we the version must be published, synced and have
+    a ThirdPartyAccount object for the same service and the username matching
+    the username for the video url.
+
+    """
+    from videos.models import SubtitleVersion
+    from accountlinker.models import ThirdPartyAccount
+    from .videos.types import UPDATE_VERSION_ACTION
+    try:
+        version = SubtitleVersion.objects.select_related("language", "language__video").get(pk=version_pk)
+    except SubtitleVersion.DoesNotExist:
+        return
+    ThirdPartyAccount.objects.mirror_on_third_party(
+        version.video, version.language, UPDATE_VERSION_ACTION, version)
+
+def _delete_captions_in_original_service(language_pk):
+    """Delete the given subtitle language in the original video provider.
+
+    Only Youtube is supported right now.
+
+    In order for this to work we the version must be have a ThirdPartyAccount
+    object for the same service and the username matching the username for the
+    video url.
+
+    """
+    from videos.models import SubtitleLanguage
+    from .videos.types import DELETE_LANGUAGE_ACTION
+    from accountlinker.models import ThirdPartyAccount
+    try:
+        language = SubtitleLanguage.objects.select_related("video").get(pk=language_pk)
+    except SubtitleLanguage.DoesNotExist:
+        return
+    ThirdPartyAccount.objects.mirror_on_third_party(
+        language.video, language.language, DELETE_LANGUAGE_ACTION)
+
 

@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -127,4 +127,3 @@ RULES[ROLE_CONTRIBUTOR] =  set((
 #: a contributor cannot assign a manager nor admin. Each row bellow can
 #: assign roles to it's right (higher index)
 ROLES_ORDER = [ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR]
-

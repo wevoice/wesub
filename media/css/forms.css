@@ -209,8 +209,10 @@ p.checkbox label {
 .main_video_form p {
     clear: both;
     float: left;
-    font-size: 13px;
-    padding: 0 0 0 207px;
+    font-size: 12px;
+    margin-left: 208px;
+    width: 650px;
+    line-height: 1.5em;
 }
 .begin {
     background: url(../images/begin.png) left top no-repeat;

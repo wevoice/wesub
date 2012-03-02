@@ -1,4 +1,5 @@
 {% extends "streamer/streamerdemobase.html" %}
+{% load streamer_tags %}
 {% block content %}
     <p>
         Note this page contains a &lt;div class=&quot;unisubs-substreamer&quot;&gt; element directly underneath the video.
@@ -26,9 +27,8 @@
             </div>
         </div>
         <div class="unisubs-transcript">
-            {% for sub in subs %}
-                <span class="unisubs-sub" id="usub-{{videoid}}-{{sub.subtitle_id}}">{{sub.text}}</span>
-            {% endfor %}
+          <p>
+            {% render_transcript video subs %}
         </div>
     </div>
 {% endblock %}

@@ -1,19 +1,19 @@
 // Universal Subtitles, universalsubtitles.org
-// 
-// Copyright (C) 2010 Participatory Culture Foundation
-// 
+//
+// Copyright (C) 2012 Participatory Culture Foundation
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see 
+// along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.startdialog.ToLanguages');
@@ -95,25 +95,21 @@ unisubs.startdialog.ToLanguages.prototype.makeToLanguages_ = function() {
     toLanguages = this.filterLangs_(toLanguages);
     return toLanguages;
 };
-
 unisubs.startdialog.ToLanguages.prototype.getToLanguages = function() {
     if (!this.toLanguages_)
         this.toLanguages_ = this.makeToLanguages_();
     return this.toLanguages_;
 };
-
 unisubs.startdialog.ToLanguages.prototype.forLangCode = function(langCode){
     return goog.array.find(this.getToLanguages(), function(o) {
         return o.LANGUAGE == langCode;
     });
 };
-
 unisubs.startdialog.ToLanguages.prototype.forVideoLanguage = function(videoLanguage) {
     return goog.array.find(this.getToLanguages(), function(tl) {
         return tl.VIDEO_LANGUAGE && tl.VIDEO_LANGUAGE.PK == videoLanguage.PK;
     });
 };
-
 unisubs.startdialog.ToLanguages.prototype.forKey = function(key) {
     if (!this.keyMap_) {
         this.keyMap_ = {};
@@ -123,13 +119,12 @@ unisubs.startdialog.ToLanguages.prototype.forKey = function(key) {
     }
     return this.keyMap_[key];
 };
-
 unisubs.startdialog.ToLanguages.prototype.addMissingVideoLangs_ = function(toLanguages) {
     var pkSet = new goog.structs.Set(
         goog.array.map(
             goog.array.filter(
-                toLanguages, 
-                function(tl) {  
+                toLanguages,
+                function(tl) {
                     return !!tl.VIDEO_LANGUAGE;
                 }),
             function(tl) {
@@ -141,7 +136,6 @@ unisubs.startdialog.ToLanguages.prototype.addMissingVideoLangs_ = function(toLan
                 toLanguages.push(new unisubs.startdialog.ToLanguage(11, vl));
         });
 };
-
 unisubs.startdialog.ToLanguages.prototype.addMissingLangs_ = function(toLanguages) {
     var langSet = new goog.structs.Set(
         goog.array.map(
@@ -154,7 +148,6 @@ unisubs.startdialog.ToLanguages.prototype.addMissingLangs_ = function(toLanguage
                 toLanguages.push(new unisubs.startdialog.ToLanguage(11, null, l[0]));
         });
 };
-
 unisubs.startdialog.ToLanguages.prototype.filterLangs_ = function(toLanguages) {
     var validLangSet;
     if (this.initialLanguageState_ && this.initialLanguageState_['FORCE']) {
@@ -171,7 +164,6 @@ unisubs.startdialog.ToLanguages.prototype.filterLangs_ = function(toLanguages) {
         });
     }
 };
-
 unisubs.startdialog.ToLanguages.prototype.createMyLanguageToLangs_ = function(lang) {
     var toLangs = [];
     var videoLanguages = this.videoLanguages_.findForLanguage(lang);
@@ -181,7 +173,7 @@ unisubs.startdialog.ToLanguages.prototype.createMyLanguageToLangs_ = function(la
         videoLanguages,
         function(vl) {
             toLangs.push(this.createMyLanguageToLang_(vl, lang));
-        }, 
+        },
         this);
     return toLangs;
 };
@@ -201,10 +193,7 @@ unisubs.startdialog.ToLanguages.prototype.createMyLanguageToLang_ = function(vid
     else
         return new unisubs.startdialog.ToLanguage(10, videoLanguage, lang);
 };
-
-unisubs.startdialog.ToLanguages.prototype.createNonEmptyDepToLang_ = 
-    function(videoLanguage, partial, ranking) 
-{
+unisubs.startdialog.ToLanguages.prototype.createNonEmptyDepToLang_ = function(videoLanguage, partial, ranking) {
     if (videoLanguage && videoLanguage.isDependentAndNonempty(partial)) {
         var fromLanguages = [];
         for (var i = 0; i < this.myLanguages_.length; i++) {
@@ -214,8 +203,8 @@ unisubs.startdialog.ToLanguages.prototype.createNonEmptyDepToLang_ =
                 fromLanguages,
                 goog.array.map(
                     possiblyFromLanguages,
-                    function(l) { 
-                        return videoLanguage.canBenefitFromTranslation(l); 
+                    function(l) {
+                        return videoLanguage.canBenefitFromTranslation(l);
                     }));
         }
         if (fromLanguages.length > 0)
@@ -224,12 +213,11 @@ unisubs.startdialog.ToLanguages.prototype.createNonEmptyDepToLang_ =
     }
     return null;
 };
-
 unisubs.startdialog.ToLanguages.prototype.createEmptyToLang_ = function(videoLanguage, lang) {
     if (!videoLanguage || videoLanguage.isEmpty()) {
         var fromLanguages = [];
         for (var i = 0; i < this.myLanguages_.length; i++) {
-            var possiblyFromLanguages = 
+            var possiblyFromLanguages =
                 this.videoLanguages_.findForLanguage(this.myLanguages_[i]);
             fromLanguages = goog.array.concat(
                 fromLanguages,
@@ -243,7 +231,6 @@ unisubs.startdialog.ToLanguages.prototype.createEmptyToLang_ = function(videoLan
     }
     return null;
 };
-
 unisubs.startdialog.ToLanguages.prototype.createIncompleteIndToLang_ = function(videoLanguage) {
     if (videoLanguage && !videoLanguage.DEPENDENT && !videoLanguage.IS_COMPLETE)
         return new unisubs.startdialog.ToLanguage(3, videoLanguage);

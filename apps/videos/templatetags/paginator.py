@@ -16,7 +16,7 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django import template
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 
 register = template.Library()
 
@@ -28,7 +28,11 @@ def paginate(items, per_page, page):
     if page == 'last':
         page = paginator.num_pages
 
-    page_obj = paginator.page(page)
+    try:
+        page_obj = paginator.page(page)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        page_obj = paginator.page(paginator.num_pages)
 
     return page_obj.object_list, {
         'page': page,

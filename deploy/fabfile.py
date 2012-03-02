@@ -104,14 +104,12 @@ def local(*args, **kwargs):
 #:- memechached and solr for `dev`
 #:- media compilation on all environments
 DEV_HOST = 'dev.universalsubtitles.org:2191'
-#: Environment where celeryd and solr run for staging
-#: - solr, celeryd and memcached for staging and production
-ADMIN_HOST = 'pcf-us-admin.pculture.org:2191'
+
 
 def _create_env(username, hosts, s3_bucket,
                 installation_dir, static_dir, name,
                 memcached_bounce_cmd,
-                admin_dir, celeryd_host, celeryd_proj_root,
+                admin_dir, admin_host, celeryd_host, celeryd_proj_root,
                 separate_uslogging_db=False,
                 celeryd_bounce_cmd="",
                 web_dir=None):
@@ -124,6 +122,7 @@ def _create_env(username, hosts, s3_bucket,
     env.installation_name = name
     env.memcached_bounce_cmd = memcached_bounce_cmd
     env.admin_dir = admin_dir
+    env.admin_host = admin_host
     env.separate_uslogging_db = separate_uslogging_db
     env.celeryd_bounce_cmd=celeryd_bounce_cmd
     env.celeryd_host = celeryd_host
@@ -138,12 +137,13 @@ def staging(username):
                 installation_dir      = 'universalsubtitles.staging',
                 static_dir            = '/var/static/staging',
                 name                  = 'staging',
-                memcached_bounce_cmd  = '/etc/init.d/memcached-staging restart',
+                memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                 admin_dir             = '/usr/local/universalsubtitles.staging',
-                celeryd_host          = ADMIN_HOST,
+                admin_host            = 'pcf-us-adminstg.pculture.org:2191',
+                celeryd_host          = 'pcf-us-adminstg.pculture.org:2191',
                 celeryd_proj_root     = 'universalsubtitles.staging',
                 separate_uslogging_db = True,
-                celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
+                celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
 
 def dev(username):
     _create_env(username              = username,
@@ -154,12 +154,13 @@ def dev(username):
                 name                  = 'dev',
                 memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                 admin_dir             = None,
+                admin_host            = 'dev.universalsubtitles.org:2191',
                 celeryd_host          = DEV_HOST,
                 celeryd_proj_root     = 'universalsubtitles.dev',
                 separate_uslogging_db = False,
                 celeryd_bounce_cmd    = "/etc/init.d/celeryd.dev restart &&  /etc/init.d/celeryevcam.dev start")
 
-def unisubs(username):
+def production(username):
     _create_env(username              = username,
                 hosts                 = ['pcf-us-cluster1.pculture.org:2191',
                                         'pcf-us-cluster2.pculture.org:2191'],
@@ -169,15 +170,13 @@ def unisubs(username):
                 name                  =  None,
                 memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                 admin_dir             = '/usr/local/universalsubtitles',
-                celeryd_host          = ADMIN_HOST,
+                admin_host            = 'pcf-us-admin.pculture.org:2191',
+                celeryd_host          = 'pcf-us-admin.pculture.org:2191',
                 celeryd_proj_root     = 'universalsubtitles',
                 separate_uslogging_db = True,
                 celeryd_bounce_cmd    = "/etc/init.d/celeryd restart  && /etc/init.d/celeryevcam start ")
 
 def temp(username):
-    
-    global ADMIN_HOST
-    ADMIN_HOST = "pcf-us-admintmp.pculture.org:2191"
     _create_env(username              = username,
                 hosts                 = ['pcf-us-tmp1.pculture.org:2191',],
                 s3_bucket             = 's3.temp.universalsubtitles.org',
@@ -186,7 +185,8 @@ def temp(username):
                 name                  = 'staging',
                 memcached_bounce_cmd  = '/etc/init.d/memcached-staging restart',
                 admin_dir             = '/usr/local/universalsubtitles.staging',
-                celeryd_host          = ADMIN_HOST,
+                admin_host            = 'pcf-us-admintmp.pculture.org:2191',
+                celeryd_host          = 'pcf-us-admintmp.pculture.org:2191',
                 celeryd_proj_root     = 'universalsubtitles.staging',
                 separate_uslogging_db = True,
                 celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
@@ -292,7 +292,7 @@ def _execute_on_all_hosts(cmd):
     env.host_string = DEV_HOST
     cmd(env.static_dir)
     if env.admin_dir is not None:
-        env.host_string = ADMIN_HOST
+        env.host_string = env.admin_host
         cmd(env.admin_dir)
 
 def switch_branch(branch_name):
@@ -338,11 +338,25 @@ def _git_pull():
     run('chmod g+w -R .git 2> /dev/null; /bin/true')
     _clear_permissions('.')
 
-def _git_checkout(commit):
-    run('git fetch')
-    run('git checkout --force %s' % commit)
-    run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    run('chmod g+w -R .git 2> /dev/null; /bin/true')
+def _git_checkout(commit, as_sudo=False):
+    cmd = run
+    if as_sudo:
+        cmd = sudo
+    cmd('git fetch')
+    cmd('git checkout --force %s' % commit)
+    cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _clear_permissions('.')
+
+def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
+    cmd = run
+    if as_sudo:
+        cmd = sudo
+    cmd('git fetch')
+    cmd('git checkout %s' % branch)
+    cmd('git reset --hard %s' % commit)
+    cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
     _clear_permissions('.')
 
 
@@ -378,12 +392,19 @@ def remove_disabled():
         env.host_string = host
         run('rm {0}/unisubs/disabled'.format(env.web_dir))
         
-def _update_integration(dir):
-    '''Actually update the integration repo on a single host.'''
+def _update_integration(dir, as_sudo=True):
+    '''
+    Actually update the integration repo on a single host.
+    Has to be run as root, else all users on all servers must have 
+    the right key for the private repo.
+    '''
 
     with cd(os.path.join(dir, 'unisubs', 'unisubs-integration')):
         with settings(warn_only=True):
-            _git_checkout(_get_optional_repo_version(dir, 'unisubs-integration'))
+            _git_checkout_branch_and_reset(
+                _get_optional_repo_version(dir, 'unisubs-integration'), 
+                as_sudo=as_sudo
+            )
 
 def update_integration():
     '''Update the integration repo to the version recorded in the site repo.
@@ -413,13 +434,15 @@ def update_web():
     breakage
     """
     if env.admin_dir is not None:
-        env.host_string = ADMIN_HOST
+        env.host_string = env.admin_host
         with cd(os.path.join(env.admin_dir, 'unisubs')):
             _git_pull()
+            _update_integration(env.admin_dir)
     for host in env.web_hosts:
         env.host_string = host
         with cd('{0}/unisubs'.format(env.web_dir)):
             _git_pull()
+            _update_integration(env.web_dir)
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -print0 | xargs -0 rm")
     _bounce_celeryd()
@@ -430,23 +453,7 @@ def update_web():
         _reload_app_server()
 
 def bounce_memcached():
-    '''Bounce the memcached server (purging the cache)
-
-    Should be done by the end of each deploy
-
-    '''
-    with Output("Bouncing memcached"):
-        if env.admin_dir:
-            env.host_string = ADMIN_HOST
-        else:
-            env.host_string = DEV_HOST
-        sudo(env.memcached_bounce_cmd, pty=False)
-
-def update_solr_schema():
-    '''Update the Solr schema and rebuild the index.
-
-    The rebuilding will be done asynchronously with screen and an email will
-    be sent when it finishes.
+=======
 
     '''
     with Output("Updating Solr schema"):
@@ -476,7 +483,7 @@ def update_solr_schema():
 
 def _bounce_celeryd():
     if env.admin_dir:
-        env.host_string = ADMIN_HOST
+        env.host_string = env.admin_host
     else:
         env.host_string = DEV_HOST
     if bool(env.celeryd_bounce_cmd):
@@ -586,7 +593,7 @@ def test_memcached():
         alphanum = string.letters+string.digits
         host_set = set([(h, env.web_dir,) for h in env.web_hosts])
         if env.admin_dir:
-            host_set.add((ADMIN_HOST, env.admin_dir,))
+            host_set.add((env.admin_host, env.admin_dir,))
         for host in host_set:
             random_string = ''.join(
                 [alphanum[random.randint(0, len(alphanum)-1)]

@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,15 +17,14 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django import template
-from teams.models import Team, TeamVideo, Project, TeamMember, Workflow
+from teams.models import Team, TeamVideo, Project, TeamMember, Workflow, Task
 from django.db.models import Count
-from django.db.models import Q
-from videos.models import Action, Video
+from videos.models import Video
 from apps.widget import video_cache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
-from django.utils.http import urlquote
+from django.utils.http import urlencode, urlquote
 from widget.views import base_widget_params
 
 from templatetag_sugar.register import tag
@@ -39,11 +38,12 @@ from apps.teams.permissions import (
     can_assign_task as _can_assign_task,
     can_delete_task as _can_delete_task,
     can_remove_video as _can_remove_video,
+    can_approve as _can_approve,
 )
 from apps.teams.permissions import (
-    roles_user_can_assign, can_invite, can_add_video_somewhere, can_create_tasks,
-    can_create_task_subtitle, can_create_task_translate, can_create_task_review,
-    can_create_task_approve
+    can_invite, can_add_video_somewhere,
+    can_create_tasks, can_create_task_subtitle, can_create_task_translate,
+    can_create_and_edit_subtitles, can_create_and_edit_translations
 )
 
 
@@ -98,7 +98,32 @@ def is_team_manager(team, user):
 def is_team_member(team, user):
     if not user.is_authenticated():
         return False
-    return team.is_member(user)
+
+    # We cache this here because we need to use it all over the place and
+    # there's no point in making 3+ queries to the DB when one will do.
+    if not hasattr(user, '_cached_teammember_status'):
+        user._cached_teammember_status = {}
+
+    if team.pk not in user._cached_teammember_status:
+        user._cached_teammember_status[team.pk] = team.is_member(user)
+
+    return user._cached_teammember_status[team.pk]
+
+@register.filter
+def user_role(team, user):
+    member = TeamMember.objects.get(team=team,user=user)
+    return member.role
+
+@register.filter
+def user_tasks_count(team, user):
+    tasks = Task.objects.filter(team=team,assignee=user,deleted=False,completed=None)
+    return tasks.count()
+
+@register.filter
+def user_project_tasks_count(project, user):
+    team = project.team
+    tasks = Task.objects.filter(team=team,assignee=user,team_video__project=project,deleted=False,completed=None)
+    return tasks.count()
 
 @register.inclusion_tag('teams/_team_select.html', takes_context=True)
 def team_select(context, team):
@@ -110,12 +135,23 @@ def team_select(context, team):
         'can_create_team': DEV_OR_STAGING or (user.is_superuser and user.is_active)
     }
 
-@register.inclusion_tag('teams/_team_activity.html', takes_context=True)
-def team_activity(context, team):
-    action_qs = Action.objects.for_team(team)[:ACTIONS_ON_PAGE]
-    context['videos_actions'] = action_qs
 
-    return context
+@tag(register, [])
+def share_panel_email_url(context):
+    project = context.get('project')
+    team = context.get('team')
+
+    if not project:
+        message = 'Check out the "%s" team on Universal Subtitles: %s' % (team.name, team.get_site_url())
+        share_panel_email_url = reverse('videos:email_friend')
+        share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
+    else:
+        message = 'Check out the "%s" project on Universal Subtitles: %s' % (project.name, project.get_site_url())
+        share_panel_email_url = reverse('videos:email_friend')
+        share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
+
+    return share_panel_email_url
+
 
 @register.inclusion_tag('teams/_team_add_video_select.html', takes_context=True)
 def team_add_video_select(context):
@@ -133,14 +169,15 @@ def team_add_video_select(context):
     return context
 
 @register.inclusion_tag('videos/_team_list.html')
-def render_belongs_to_team_list(video):
+def render_belongs_to_team_list(video, user):
     teams =  []
-    for t in list(video.team_set.filter(is_visible=True)):
-        if video.moderated_by == t:
-            t.moderates =True
-            teams.insert(0, t)
-        else:
-            teams.append(t)
+    for t in list(video.team_set.filter()):
+        if t.is_visible or user in t.users.all():
+            if video.moderated_by == t:
+                t.moderates =True
+                teams.insert(0, t)
+            else:
+                teams.append(t)
     return {"teams": teams}
 
 
@@ -204,18 +241,6 @@ def team_video_in_progress_list(team_video_search_record):
     return  {
         'languages': langs
         }
-
-@register.inclusion_tag('teams/_join_button.html', takes_context=True)
-def render_team_join(context, team, button_size="huge"):
-    context['team'] = team
-    context['button_size'] = button_size
-    return context
-
-@register.inclusion_tag('teams/_leave_button.html', takes_context=True)
-def render_team_leave(context, team, button_size="huge"):
-    context['team'] = team
-    context['button_size'] = button_size
-    return context
 
 @tag(register, [Variable(), Constant("as"), Name()])
 def team_projects(context, team, varname):
@@ -298,22 +323,41 @@ def members(team, countOnly=False):
     return qs
 
 @register.filter
-def get_assignable_roles(team, user):
-    roles = roles_user_can_assign(team, user)
-    verbose_roles = [x for x in TeamMember.ROLES if x[0] in roles]
-    return verbose_roles
+def can_leave_team(team, user):
+    """Return True if the user can leave the team, else return False."""
 
+    try:
+        member = TeamMember.objects.get(team=team, user=user)
+    except TeamMember.DoesNotExist:
+        return False
 
-def _can_create_any_task(context, team_video, user):
+    if not team.members.exclude(pk=member.pk).exists():
+        False
+
+    is_last_owner = (
+        member.role == TeamMember.ROLE_OWNER
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exclude(pk=member.pk).exists()
+    )
+    if is_last_owner:
+        return False
+
+    is_last_admin = (
+        member.role == TeamMember.ROLE_ADMIN
+        and not team.members.filter(role=TeamMember.ROLE_ADMIN).exclude(pk=member.pk).exists()
+        and not team.members.filter(role=TeamMember.ROLE_OWNER).exists()
+    )
+    if is_last_admin:
+        return False
+
+    return True
+
+@tag(register, [Variable(), Variable()])
+def can_create_any_task_for_teamvideo(context, team_video, user):
     workflows = context.get('team_workflows')
 
     if can_create_task_subtitle(team_video, user, workflows):
         result = True
     elif can_create_task_translate(team_video, user, workflows):
-        result = True
-    elif can_create_task_review(team_video, user, workflows):
-        result = True
-    elif can_create_task_approve(team_video, user, workflows):
         result = True
     else:
         result = False
@@ -321,15 +365,6 @@ def _can_create_any_task(context, team_video, user):
     context['user_can_create_any_task'] = result
 
     return ''
-
-@tag(register, [Variable(), Variable()])
-def can_create_any_task_for_record(context, search_record, user):
-    team_video = _get_team_video_from_search_record(search_record)
-    return _can_create_any_task(context, team_video, user)
-
-@tag(register, [Variable(), Variable()])
-def can_create_any_task_for_teamvideo(context, team_video, user):
-    return _can_create_any_task(context, team_video, user)
 
 
 @register.filter
@@ -374,4 +409,71 @@ def can_assign_task(task, user):
 @register.filter
 def can_delete_task(task, user):
     return _can_delete_task(task, user)
+
+
+@register.filter
+def can_create_subtitles_for(user, video):
+    """Return True if the user can create original subtitles for this video.
+
+    Safe to use with anonymous users as well as non-team videos.
+
+    Usage:
+
+        {% if request.user|can_create_subtitles_for:video %}
+            ...
+        {% endif %}
+
+    """
+    team_video = video.get_team_video()
+
+    if not team_video:
+        return True
+    else:
+        return can_create_and_edit_subtitles(user, team_video)
+@register.filter
+def can_create_translations_for(user, video):
+    """Return True if the user can create translations for this video.
+
+    Safe to use with anonymous users as well as non-team videos.
+
+    Usage:
+
+        {% if request.user|can_create_translations_for:video %}
+            ...
+        {% endif %}
+
+    """
+    team_video = video.get_team_video()
+
+    if not team_video:
+        return True
+    else:
+        return can_create_and_edit_translations(user, team_video)
+
+@register.filter
+def can_unpublish(user, video):
+    """Return True if the user can unpublish subtitles for this video.
+
+    Safe to use with anonymous users as well as non-team videos.
+
+    Usage:
+
+        {% if request.user|can_unpublish:video %}
+            ...
+        {% endif %}
+
+    """
+    team_video = video.get_team_video()
+
+    if not team_video:
+        return False
+
+    workflow = Workflow.get_for_team_video(team_video)
+    if not workflow:
+        return False
+
+    if workflow.approve_enabled:
+        return _can_approve(team_video, user)
+
+    return False
 

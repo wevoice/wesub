@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
@@ -53,13 +53,11 @@ from utils.decorators import never_in_prod
 from utils.translation import get_user_languages_from_request
 from django.utils.http import urlquote_plus
 from videos.tasks import video_changed_tasks
-from videos.search_indexes import VideoSearchResult, VideoIndex
+from videos.search_indexes import VideoIndex
 import datetime
 from icanhaz.models import VideoVisibilityPolicy
 from videos.decorators import get_video_revision, get_video_from_code
-from doorman import feature_is_on
 
-from apps.teams.moderation import user_can_moderate, get_pending_count
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -207,20 +205,20 @@ def video(request, video, video_url=None, title=None):
     context = widget.add_onsite_js_files({})
     context['video'] = video
     original = video.subtitle_language()
-    if original:
-        original.pending_moderation_count =  get_pending_count(video.subtitle_language())
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    translations = list(video.subtitlelanguage_set.filter(had_version=True) \
-        .filter(is_original=False).select_related('video'))
+    # we want a list of translations that had at least with version with subtitles
+    # this will not filter subtitleversion's whos subtitles are empty
+    translations = video.subtitlelanguage_set.exclude(subtitle_count=0)
+    if original:
+        # a video might have more than 1 is_original sl, in which case
+        # we guess the right one above, but still manage to include the others
+        # bellow
+        translations = translations.exclude(pk=original.pk)
+    translations = list(translations)
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations
 
-    context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
-    if context["user_can_moderate"]:
-        # FIXME: use  amore efficient count
-        for l in translations:
-            l.pending_moderation_count = get_pending_count(l)
 
     context['widget_params'] = _widget_params(
         request, video, language=None,
@@ -253,27 +251,11 @@ def _get_related_task(request):
         except Task.DoesNotExist:
             return
 
-def video_list(request):
-    qs = Video.objects.filter(is_subtitled=True)
-    ordering = request.GET.get('o')
-    order_type = request.GET.get('ot')
-    extra_context = {}
-    order_fields = ['languages_count', 'widget_views_count', 'subtitles_fetched_count', 'was_subtitled']
-    if ordering in order_fields and order_type in ['asc', 'desc']:
-        qs = qs.order_by(('-' if order_type == 'desc' else '')+ordering)
-        extra_context['ordering'] = ordering
-        extra_context['order_type'] = order_type
-    else:
-        qs = qs.order_by('-widget_views_count')
-    return object_list(request, queryset=qs,
-                       paginate_by=50,
-                       template_name='videos/video_list.html',
-                       template_object_name='video',
-                       extra_context=extra_context)
 
 def actions_list(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
-    qs = Action.objects.filter(video=video)
+    qs = Action.objects.for_video(video, request.user)
+
     extra_context = {
         'video': video
     }
@@ -326,7 +308,6 @@ def paste_transcription(request):
 
 @login_required
 def upload_transcription_file(request):
-    from django.utils.encoding import force_unicode, DjangoUnicodeDecodeError
     output = {}
     form = TranscriptionFileForm(request.POST, request.FILES)
     if form.is_valid():
@@ -414,6 +395,13 @@ def legacy_history(request ,video, lang=None):
 
 @get_video_from_code
 def history(request, video, lang=None, lang_id=None):
+    if not lang:
+        return HttpResponseRedirect(video.get_absolute_url(video_id=video._video_id_used))
+    elif lang == 'unknown':
+        # A hacky workaround for now.
+        # This should go away when we stop allowing for blank SubtitleLanguages.
+        lang = ''
+
     video.update_view_counter()
 
     context = widget.add_onsite_js_files({})
@@ -438,7 +426,7 @@ def history(request, video, lang=None, lang_id=None):
         else:
             raise Http404
 
-    qs = language.subtitleversion_set.select_related('user')
+    qs = language.subtitleversion_set.not_restricted_by_moderation().select_related('user')
     ordering, order_type = request.GET.get('o'), request.GET.get('ot')
     order_fields = {
         'date': 'datetime_started',
@@ -453,29 +441,21 @@ def history(request, video, lang=None, lang_id=None):
 
     context['video'] = video
     original = video.subtitle_language()
-    if original:
-        original.pending_moderation_count =  get_pending_count(video.subtitle_language())
     translations = list(video.subtitlelanguage_set.filter(is_original=False) \
         .filter(had_version=True).select_related('video'))
 
     context["user_can_moderate"] = False
-    if feature_is_on("MODERATION"):
-        context["user_can_moderate"] = user_can_moderate(video, request.user)
-        if context["user_can_moderate"]:
-                # FIXME: use  amore efficient count
-            for l in translations:
-                l.pending_moderation_count = get_pending_count(l)
 
     translations.sort(key=lambda f: f.get_language_display())
     context['translations'] = translations
-    context['last_version'] = language.latest_version(public_only=False)
+    context['last_version'] = language.last_version
     context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
     context['edit_url'] = language.get_widget_url()
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
 
     context['task'] =  _get_related_task(request)
-    _add_share_panel_context_for_history(context, video, lang)
+    _add_share_panel_context_for_history(context, video, language)
     return object_list(request, queryset=qs, allow_empty=True,
                        paginate_by=settings.REVISIONS_ONPAGE,
                        page=request.GET.get('page', 1),
@@ -514,20 +494,19 @@ def revision(request,  version):
     context['language'] = language
 
     context["user_can_moderate"] = False
-    if feature_is_on("MODERATION"):
-        context["user_can_moderate"] = user_can_moderate(video, request.user)
     context['widget_params'] = _widget_params(request, \
             language.video, version.version_no, language, size=(289,173))
     context['latest_version'] = language.latest_version()
     version.ordered_subtitles()
-
+    context['rollback_allowed'] = not version.video.is_moderated
     return render_to_response('videos/revision.html', context,
                               context_instance=RequestContext(request))
 
 @login_required
 @get_video_revision
 def rollback(request, version):
-
+    if version.video.is_moderated:
+        return HttpResponseForbidden("Moderated videos cannot be rollbacked, they need to be unpublished")
     is_writelocked = version.language.is_writelocked
     if is_writelocked:
         messages.error(request, u'Can not rollback now, because someone is editing subtitles.')
@@ -596,7 +575,7 @@ def diffing(request, first_version, second_pk):
     context['first_version'] = first_version
     context['second_version'] = second_version
     context['latest_version'] = language.latest_version()
-    context["user_can_moderate"] = user_can_moderate(video, request.user)
+    context['rollback_allowed'] = not video.is_moderated
     context['widget0_params'] = \
         _widget_params(request, video,
                        first_version.version_no)
@@ -661,7 +640,7 @@ def video_url_make_primary(request):
             else:
                 VideoUrl.objects.filter(video=obj.video).update(primary=False)
                 obj.primary = True
-                obj.save()
+                obj.save(updates_timestamp=False)
         except VideoUrl.DoesNotExist:
             output['error'] = ugettext('Object does not exist')
     return HttpResponse(json.dumps(output))
@@ -719,12 +698,12 @@ def subscribe_to_updates(request):
     data = urllib.urlencode({'email': email_address})
     req = urllib2.Request(
         'http://pcf8.pculture.org/interspire/form.php?form=3', data)
-    response = urllib2.urlopen(req)
+    urllib2.urlopen(req)
     return HttpResponse('ok', 'text/plain')
 
 def test_celery(request):
     from videos.tasks import add
-    r = add.delay(1, 2)
+    add.delay(1, 2)
     return HttpResponse('Hello, from Amazon SQS backend for Celery!')
 
 @staff_member_required

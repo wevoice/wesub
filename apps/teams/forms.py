@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,27 +15,26 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import re
+
+from django import forms
+from django.conf import settings
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User
-from django import forms
 from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
-from django.utils.translation import ugettext_lazy as _
-from utils.validators import MaxFileSizeValidator
-from django.conf import settings
-from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS
-from videos.forms import AddFromFeedForm
-from django.utils.safestring import mark_safe
+from teams.permissions import (
+    roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
+    can_assign_task, can_unpublish_subs
+)
+from teams.permissions_const import ROLE_NAMES
 from utils.forms import ErrorableModelForm
-import re
-from utils.translation import get_languages_list
 from utils.forms.unisub_video_form import UniSubBoundVideoField
-from teams.permissions import can_assign_task
-
-from apps.teams.moderation import add_moderation, remove_moderation
-from apps.teams.permissions import roles_user_can_invite, can_delete_task, can_add_video, can_perform_task
-from apps.teams.permissions_const import ROLE_NAMES
-
-from doorman import feature_is_on
+from utils.translation import get_language_choices
+from utils.validators import MaxFileSizeValidator
+from videos.forms import AddFromFeedForm
+from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion
 
 
 class EditTeamVideoForm(forms.ModelForm):
@@ -62,56 +61,9 @@ class EditTeamVideoForm(forms.ModelForm):
 
 
         self.fields['project'].queryset = self.instance.team.project_set.all()
-        if feature_is_on("MODERATION"):
-            self.should_add_moderation = self.should_remove_moderation = False
-
-            if self.instance:
-                video  = self.instance.video
-                team = self.instance.team
-
-                if video and team:
-                    who_owns = video.moderated_by
-                    is_ours = who_owns and who_owns == team
-                    is_moderated = False
-                    if who_owns and not is_ours:
-                        self.is_moderated_by_other_team = who_owns
-                        # should write about moderation
-                        pass
-                    else:
-                        if is_ours:
-                            is_moderated = True
-                        self.fields['is_moderated'] = forms.BooleanField(
-                            label=_("Moderate subtitles"),
-                            initial=is_moderated,
-                            required=False
-                        )
-
+        
     def clean(self, *args, **kwargs):
         super(EditTeamVideoForm, self).clean(*args, **kwargs)
-
-        if feature_is_on("MODERATION"):
-            should_moderate = self.cleaned_data.get("is_moderated", False)
-            if self.instance:
-
-                team = self.instance.team
-                video = self.instance.video
-                who_owns = video.moderated_by
-                is_ours = who_owns and who_owns == team
-                if should_moderate:
-                    if  is_ours:
-                    # do nothing, we are good!
-                        pass
-                    elif  who_owns:
-                        self._errors['is_moderated'] = self.error_class([u"This video is already moderated by team %s" % who_owns])
-                        del self.cleaned_data['is_moderated']
-                    else:
-                        self.should_add_moderation = True
-                else:
-                    if not who_owns:
-                        # do nothing we are good!
-                        pass
-                    elif is_ours:
-                        self.should_remove_moderation = True
 
         return self.cleaned_data
 
@@ -119,22 +71,6 @@ class EditTeamVideoForm(forms.ModelForm):
         obj = super(EditTeamVideoForm, self).save(*args, **kwargs)
 
         video = obj.video
-        team = obj.team
-
-        if feature_is_on("MODERATION"):
-            if self.should_add_moderation:
-                try:
-                    add_moderation(video, team, self.user)
-                except Exception ,e:
-                    raise
-                    self._errors["should_moderate"] = [e]
-            elif self.should_remove_moderation:
-
-                    try:
-                        remove_moderation(video, team, self.user)
-                    except Exception ,e:
-                        raise
-                        self._errors["should_moderate"] = [e]
 
         author = self.cleaned_data['author'].strip()
         creation_date = VideoMetadata.date_to_string(self.cleaned_data['creation_date'])
@@ -206,7 +142,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.fields['project'].choices = [(p.pk, p) for p in ordered_projects]
 
         writable_langs = team.get_writable_langs()
-        self.fields['language'].choices = [c for c in get_languages_list(True)
+        self.fields['language'].choices = [c for c in get_language_choices(True)
                                            if c[0] in writable_langs]
 
     def clean_video_url(self):
@@ -225,6 +161,10 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         video = self.fields['video_url'].video
 
         if video:
+            if TeamVideo.objects.filter(video=video, team__deleted=False).exists():
+                msg = _(u'This video already belongs to a team.')
+                self._errors['video_url'] = self.error_class([msg])
+
             original_sl = video.subtitle_language()
 
             if (original_sl and not original_sl.language) and not language:
@@ -328,7 +268,8 @@ Enter a link to any compatible video, or to any video page on our site.''')
 
 
 class TaskCreateForm(ErrorableModelForm):
-    type = forms.TypedChoiceField(choices=Task.TYPE_CHOICES, coerce=int)
+    choices = [(10, 'Transcribe'), Task.TYPE_CHOICES[1]]
+    type = forms.TypedChoiceField(choices=choices, coerce=int)
     language = forms.ChoiceField(choices=(), required=False)
     assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
@@ -340,14 +281,15 @@ class TaskCreateForm(ErrorableModelForm):
 
         team_user_ids = team.members.values_list('user', flat=True)
 
-        langs = [l for l in get_languages_list(True) if l[0] in team.get_writable_langs()]
+        langs = [l for l in get_language_choices(with_empty=True)
+                 if l[0] in team.get_writable_langs()]
         self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
 
     def _check_task_creation_subtitle(self, tasks, cleaned_data):
         if self.team_video.subtitles_finished():
-            self.add_error(_(u"This video has already been subtitled."),
+            self.add_error(_(u"This video has already been transcribed."),
                            'type', cleaned_data)
             return
 
@@ -358,7 +300,7 @@ class TaskCreateForm(ErrorableModelForm):
 
     def _check_task_creation_translate(self, tasks, cleaned_data):
         if not self.team_video.subtitles_finished():
-            self.add_error(_(u"No one has subtitled this video yet, so it can't be translated."),
+            self.add_error(_(u"No one has transcribed this video yet, so it can't be translated."),
                            'type', cleaned_data)
             return
 
@@ -367,29 +309,6 @@ class TaskCreateForm(ErrorableModelForm):
             self.add_error(_(u"This language already has a complete set of subtitles."),
                            'language', cleaned_data)
             return
-
-    def _check_task_creation_review(self, tasks, cleaned_data):
-        if not self.subtitle_language or not self.subtitle_language.is_complete_and_synced():
-            self.add_error(_(u"Subtitles in that language have not been completed yet, so they can't be reviewed."),
-                           'type', cleaned_data)
-            return
-
-    def _check_task_creation_approve(self, tasks, cleaned_data):
-        if not self.subtitle_language or not self.subtitle_language.is_complete_and_synced():
-            self.add_error(_(u"Subtitles in that language have not been completed yet, so they can't be approved."),
-                           'type', cleaned_data)
-            return
-
-        workflow = Workflow.get_for_team_video(self.team_video)
-
-        if workflow.review_enabled:
-            review_tasks = [t for t in tasks if t.type == Task.TYPE_IDS['Review']
-                                                and t.completed]
-
-            if not review_tasks:
-                self.add_error(_(u"These subtitles must be reviewed before being approved."),
-                               'type', cleaned_data)
-                return
 
 
     def clean(self):
@@ -417,13 +336,12 @@ class TaskCreateForm(ErrorableModelForm):
 
         type_name = Task.TYPE_NAMES[type]
 
-        self.subtitle_language = (team_video.video.subtitle_language(lang)
-                                  if type_name in ('Review', 'Approve') else None)
+        if type_name == 'Translate':
+            if lang == '':
+                self.add_error(_(u"You must select a language for a Translate task."))
 
         {'Subtitle': self._check_task_creation_subtitle,
          'Translate': self._check_task_creation_translate,
-         'Review': self._check_task_creation_review,
-         'Approve': self._check_task_creation_approve,
         }[type_name](existing_tasks, cd)
 
         return cd
@@ -446,22 +364,38 @@ class TaskAssignForm(forms.Form):
         self.fields['task'].queryset = team.task_set.incomplete()
 
 
-    def clean(self):
-        task = self.cleaned_data['task']
+    def clean_assignee(self):
         assignee = self.cleaned_data['assignee']
 
-        if not can_assign_task(task, self.user) and self.user != assignee:
-            raise forms.ValidationError(_(
-                u'You do not have permission to assign this task.'))
+        if assignee:
+            member = self.team.members.get(user=assignee)
+            if member.has_max_tasks():
+                raise forms.ValidationError(_(
+                    u'That user has already been assigned the maximum number of tasks.'))
 
-        if not can_perform_task(assignee, task):
-            raise forms.ValidationError(_(
-                u'This user cannot perform that task'))
+        return assignee
+
+    def clean(self):
+        task = self.cleaned_data['task']
+        assignee = self.cleaned_data.get('assignee', -1)
+
+        if assignee != -1:
+            if not can_assign_task(task, self.user) and self.user != assignee:
+                raise forms.ValidationError(_(
+                    u'You do not have permission to assign this task.'))
+
+            if assignee is None:
+                return self.cleaned_data
+            else:
+                if not can_perform_task(assignee, task):
+                    raise forms.ValidationError(_(
+                        u'This user cannot perform that task.'))
 
         return self.cleaned_data
 
 class TaskDeleteForm(forms.Form):
     task = forms.ModelChoiceField(queryset=Task.objects.all())
+    discard_subs = forms.BooleanField(required=False)
 
     def __init__(self, team, user, *args, **kwargs):
         super(TaskDeleteForm, self).__init__(*args, **kwargs)
@@ -517,7 +451,8 @@ class PermissionsForm(forms.ModelForm):
     class Meta:
         model = Team
         fields = ('membership_policy', 'video_policy', 'subtitle_policy',
-                  'translate_policy', 'task_assign_policy', 'workflow_enabled')
+                  'translate_policy', 'task_assign_policy', 'workflow_enabled',
+                  'max_tasks_per_member', 'task_expiration',)
 
 
 class LanguagesForm(forms.Form):
@@ -528,8 +463,8 @@ class LanguagesForm(forms.Form):
         super(LanguagesForm, self).__init__(*args, **kwargs)
 
         self.team = team
-        self.fields['preferred'].choices = get_languages_list(True)
-        self.fields['blacklisted'].choices = get_languages_list(True)
+        self.fields['preferred'].choices = get_language_choices(True)
+        self.fields['blacklisted'].choices = get_language_choices(True)
 
     def clean(self):
         preferred = set(self.cleaned_data['preferred'])
@@ -591,4 +526,44 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ('name', 'description', 'workflow_enabled')
+
+
+class UnpublishForm(forms.Form):
+    subtitle_version = forms.ModelChoiceField(queryset=SubtitleVersion.objects.all())
+
+    should_delete = forms.BooleanField(
+            label=_(u'Would you like to delete these subtitles completely?'),
+            required=False)
+
+    scope = forms.ChoiceField(
+            label=_(u'What would you like to unpublish?'),
+            choices=(
+                ('version',    _(u'This version (and any later version) for this language.')),
+                ('dependents', _(u'All versions for this language and any dependent languages.'))))
+
+
+    def __init__(self, user, team, *args, **kwargs):
+        super(UnpublishForm, self).__init__(*args, **kwargs)
+
+        self.user = user
+        self.team = team
+
+    def clean(self):
+        subtitle_version = self.cleaned_data.get('subtitle_version')
+        if not subtitle_version:
+            return self.cleaned_data
+
+        team_video = subtitle_version.language.video.get_team_video()
+
+        if not team_video:
+            raise forms.ValidationError(_(
+                u"These subtitles are not under a team's control."))
+
+        if not can_unpublish_subs(team_video, self.user, subtitle_version.language.language):
+            raise forms.ValidationError(_(
+                u'You do not have permission to unpublish these subtitles.'))
+
+        return self.cleaned_data
+
+
 

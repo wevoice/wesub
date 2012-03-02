@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.db.models import Q
 from teams.models import Team, MembershipNarrowing, Workflow, TeamMember, Task
 
 from teams.permissions_const import (
@@ -130,9 +129,9 @@ def roles_user_can_assign(team, user, to_user=None):
         return ROLES_ORDER[1:]
     elif user_role == ROLE_ADMIN:
         if to_user:
-            if get_role(get_member(to_user, team)) == ROLE_OWNER:
+            if get_role(get_member(to_user, team)) == ROLE_OWNER or get_role(get_member(to_user, team)) == ROLE_ADMIN:
                 return []
-        return ROLES_ORDER[1:]
+        return ROLES_ORDER[2:]
     else:
         return []
 
@@ -153,7 +152,6 @@ def roles_user_can_invite(team, user):
         return [ROLE_CONTRIBUTOR]
 
 def save_role(team, member, role, projects, languages, user=None):
-
     languages = languages or []
 
     if can_assign_role(team, user, role, member.user):
@@ -192,47 +190,43 @@ def add_narrowing_to_member(member, project=None, language=None, added_by=None):
 
 
 def _add_project_narrowings(member, project_pks, author):
+    """Add narrowings on the given member for the given project PKs.
+
+    Marks them as having come from the given author.
+
+    """
     for project_pk in project_pks:
         project = member.team.project_set.get(pk=project_pk)
         MembershipNarrowing(project=project, member=member, added_by=author).save()
 
 def _del_project_narrowings(member, project_pks):
+    """Delete any narrowings on the given member for the given project PKs."""
     project_narrowings = member.narrowings.filter(project__isnull=False)
 
     for project_pk in project_pks:
         project_narrowings.filter(project=project_pk).delete()
 
 def _add_language_narrowings(member, languages, author):
+    """Add narrowings on the given member for the given language code strings.
+
+    Marks them as having come from the given author.
+
+    """
     for language in languages:
         MembershipNarrowing(language=language, member=member, added_by=author).save()
 
 def _del_language_narrowings(member, languages):
+    """Delete any narrowings on the given member for the given language code strings."""
     for language in languages:
         MembershipNarrowing.objects.filter(language=language, member=member).delete()
 
 
-def can_set_language_narrowings(team, user, target):
-    # role = get_role_for_target(user, team)
-    target_role = get_role(get_member(target, team))
-
-    if target_role not in [ROLE_MANAGER]:
-        return False
-
-    return True
-
-def can_set_project_narrowings(team, user, target):
-    # role = get_role_for_target(user, team)
-    target_role = get_role(get_member(target, team))
-
-    if target_role not in [ROLE_MANAGER, ROLE_ADMIN]:
-        return False
-
-    return True
-
-
 def set_narrowings(member, project_pks, languages, author=None):
+    """Add and delete any narrowings necessary to match the given set for the given member."""
+
     if author:
         author = TeamMember.objects.get(team=member.team, user=author)
+
     # Projects
     existing_projects = set(narrowing.project.pk for narrowing in
                             member.narrowings.filter(project__isnull=False))
@@ -360,6 +354,15 @@ def can_remove_video(team_video, user):
 
     return role in _perms_equal_or_greater(role_required)
 
+def can_delete_video(team_video, user):
+    """
+    Returns whether the give user can delete the original video
+    and all of it's data.
+    """
+    role = get_role_for_target(user, team_video.team)
+
+    return role in [ROLE_ADMIN, ROLE_OWNER]
+
 def can_edit_video(team_video, user):
     """Return whether the given user can edit the given video."""
 
@@ -417,12 +420,37 @@ def can_change_video_settings(user, team_video):
     role = get_role_for_target(user, team_video.team, team_video.project, None)
     return role in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]
 
-def can_review(team_video, user, lang=None):
+
+def can_review_own_subtitles(role, team_video):
+    '''Return True if a user with the given role can review their own subtitles.
+
+    This is a hacky special case.  When the following is true:
+
+    * The user is an owner.
+    * There is an admin and there is only one (admin or owner) for the team.
+
+    Then we let that admin/owner review their own subtitles.  Otherwise no
+    one can review their own subs.
+
+    '''
+
+    if role == ROLE_OWNER:
+        return True
+
+    if role == ROLE_ADMIN:
+        admin_owner_count = team_video.team.members.filter(
+            user__is_active=True, role__in=(ROLE_ADMIN, ROLE_OWNER)
+        ).count()
+
+        if admin_owner_count == 1:
+            return True
+
+    return False
+
+def can_review(team_video, user, lang=None, allow_own=False):
     workflow = Workflow.get_for_team_video(team_video)
     role = get_role_for_target(user, team_video.team, team_video.project, lang)
 
-    # For now, don't allow review if it's disabled in the workflow.
-    # TODO: Change this to allow one-off reviews?
     if not workflow.review_allowed:
         return False
 
@@ -432,7 +460,24 @@ def can_review(team_video, user, lang=None):
         30: ROLE_ADMIN,
     }[workflow.review_allowed]
 
-    return role in _perms_equal_or_greater(role_req)
+    # Check that the user has the correct role.
+    if role not in _perms_equal_or_greater(role_req):
+        return False
+
+    # Users cannot review their own subtitles, unless we're specifically
+    # overriding that restriction in the arguments.
+    if allow_own:
+        return True
+
+    # Users usually cannot review their own subtitles.
+    subtitle_version = team_video.video.latest_version(language_code=lang, public_only=False)
+    if lang and subtitle_version.user == user:
+        if can_review_own_subtitles(role, team_video):
+            return True
+        else:
+            return False
+
+    return True
 
 def can_approve(team_video, user, lang=None):
     workflow = Workflow.get_for_team_video(team_video)
@@ -448,14 +493,17 @@ def can_approve(team_video, user, lang=None):
 
     return role in _perms_equal_or_greater(role_req)
 
+
 def can_message_all_members(team, user):
+    """Return whether the user has permission to message all members of the given team."""
     role = get_role_for_target(user, team)
     return role in [ROLE_ADMIN, ROLE_OWNER]
 
 def can_edit_project(team, user, project):
-    # when checking for the permission to create a project
-    # project will be none
+    """Return whether the user has permission to edit the details of the given project."""
     if project and project.is_default_project:
+        # when checking for the permission to create a project
+        # project will be none
         return False
 
     role = get_role_for_target(user, team, project, None)
@@ -486,13 +534,53 @@ def can_create_and_edit_translations(user, team_video, lang=None):
     return role in _perms_equal_or_greater(role_req, include_outsiders=True)
 
 
+def can_publish_edits_immediately(team_video, user, lang):
+    """Return whether the user has permission to publish subtitle edits immediately.
+
+    This may be the case when review/approval is not required, or when it is but
+    the user is someone who can do it themselves.
+
+    lang should be a language code string.
+
+    """
+    workflow = Workflow.get_for_team_video(team_video)
+
+    if workflow.approve_allowed:
+        return can_approve(team_video, user, lang)
+
+    if workflow.review_allowed:
+        return can_review(team_video, user, lang)
+
+    return True
+
+
+def can_unpublish_subs(team_video, user, lang):
+    """Return whether the user has permission to unpublish subtitles.
+
+    lang should be a language code string.
+
+    """
+    workflow = Workflow.get_for_team_video(team_video)
+
+    if workflow.approve_allowed:
+        return can_approve(team_video, user, lang)
+
+    if workflow.review_allowed:
+        return can_review(team_video, user, lang, allow_own=True)
+
+    return False
+
+
 # Task permissions
 def can_create_tasks(team, user, project=None):
+    """Return whether the given user has permission to create tasks at all."""
+
     # for now, use the same logic as assignment
     return can_assign_tasks(team, user, project)
 
 def can_delete_tasks(team, user, project=None, lang=None):
-    # for now, use the same logic as assignment, minus contributors
+    """Return whether the given user has permission to delete tasks at all."""
+
     role = get_role_for_target(user, team, project, lang)
     if role == ROLE_CONTRIBUTOR:
         return False
@@ -551,7 +639,21 @@ def can_delete_task(task, user):
 
     team, project, lang = task.team, task.team_video.project, task.language
 
-    return can_delete_tasks(team, user, project, lang) and can_perform_task(user, task)
+    can_delete = can_delete_tasks(team, user, project, lang)
+
+    # Allow stray review tasks to be deleted.
+    if task.type == Task.TYPE_IDS['Review']:
+        workflow = Workflow.get_for_team_video(task.team_video)
+        if not workflow.review_allowed:
+            return can_delete
+
+    # Allow stray approve tasks to be deleted.
+    if task.type == Task.TYPE_IDS['Approve']:
+        workflow = Workflow.get_for_team_video(task.team_video)
+        if not workflow.approve_allowed:
+            return can_delete
+
+    return can_delete and can_perform_task(user, task)
 
 
 def _user_can_create_task_subtitle(user, team_video):
@@ -574,41 +676,6 @@ def _user_can_create_task_translate(user, team_video):
         20: ROLE_MANAGER,
         30: ROLE_ADMIN,
     }[team_video.team.task_assign_policy]
-
-    return role in _perms_equal_or_greater(role_req)
-
-def _user_can_create_task_review(user, team_video, workflows=None):
-    workflow = Workflow.get_for_team_video(team_video, workflows)
-
-    if not workflow.review_enabled:
-        # TODO: Allow users to create on-the-fly review tasks even if reviewing
-        #       is not enabled in the workflow?
-        return False
-
-    # TODO: Take language into account here
-    role = get_role_for_target(user, team_video.team, team_video.project, None)
-
-    role_req = {
-        10: ROLE_CONTRIBUTOR,
-        20: ROLE_MANAGER,
-        30: ROLE_ADMIN,
-    }[workflow.review_allowed]
-
-    return role in _perms_equal_or_greater(role_req)
-
-def _user_can_create_task_approve(user, team_video, workflows=None):
-    workflow = Workflow.get_for_team_video(team_video, workflows)
-
-    if not workflow.approve_enabled:
-        return False
-
-    # TODO: Take language into account here
-    role = get_role_for_target(user, team_video.team, team_video.project, None)
-
-    role_req = {
-        10: ROLE_MANAGER,
-        20: ROLE_ADMIN,
-    }[workflow.approve_allowed]
 
     return role in _perms_equal_or_greater(role_req)
 
@@ -679,78 +746,4 @@ def can_create_task_translate(team_video, user=None, workflows=None):
 
     # TODO: Order this for individual users?
     return list(candidate_languages - existing_translate_languages - existing_languages)
-
-def can_create_task_review(team_video, user=None, workflows=None):
-    """Return a list of languages for which a review task can be created for the given video.
-
-    If a user is given, filter that list to contain only languages the user can
-    create tasks for.
-
-    A review task can be created for a given language iff:
-
-    * There is a set of complete subtitles for that language.
-    * There are no open translation tasks for that language.
-    * There are no review tasks for that language.
-    * There are no approve tasks for that language.
-    * The user has permission to create the review task.
-
-    Languages are returned as strings (language codes like 'en').
-
-    """
-    if user and not _user_can_create_task_review(user, team_video, workflows):
-        return []
-
-    # Find all languages that have a complete set of subtitles.
-    # These are the ones we *might* be able to create a review task for.
-    candidate_langs = set(sl.language for sl in team_video.video.completed_subtitle_languages())
-
-    # Find all the languages that have a task which prevents a review task creation.
-    existing_task_langs = set(team_video.task_set.not_deleted().filter(
-            Q(completed=None, type=Task.TYPE_IDS['Translate']) # Incomplete Translate tasks
-          | Q(type=Task.TYPE_IDS['Review'])                    # Any Review task
-          | Q(type=Task.TYPE_IDS['Approve'])                   # Any Approve task
-    ).values_list('language', flat=True))
-
-    # Return the candidate languages that don't have a review-preventing task.
-    return list(candidate_langs - existing_task_langs)
-
-def can_create_task_approve(team_video, user=None, workflows=None):
-    """Return a list of languages for which an approve task can be created for the given video.
-
-    If a user is given, filter that list to contain only languages the user can
-    create tasks for.
-
-    An approve task can be created for a given language iff:
-
-    * If reviewing is enabled in the workflow:
-        * There is a review task marked as accepted for that language.
-    * If reviewing is NOT enabled in the workflow:
-        * There is a set of complete subtitles for that language.
-    * There are no open translation tasks for that language.
-    * There are no approve tasks for that language.
-    * The user has permission to create the approve task.
-
-    Languages are returned as strings (language codes like 'en').
-
-    """
-    if user and not _user_can_create_task_approve(user, team_video, workflows):
-        return []
-
-    tasks = team_video.task_set
-
-    # Find all languages we *might* be able to create an approve task for.
-    workflow = Workflow.get_for_team_video(team_video, workflows)
-    if workflow.review_enabled:
-        candidate_langs = set(t.language for t in tasks.complete_review('Approved'))
-    else:
-        candidate_langs = set(sl.language for sl in team_video.video.completed_subtitle_languages())
-
-    # Find all the languages that have a task which prevents an approve task creation.
-    existing_task_langs = set(team_video.task_set.not_deleted().filter(
-            Q(completed=None, type=Task.TYPE_IDS['Translate']) # Incomplete Translate tasks
-          | Q(type=Task.TYPE_IDS['Approve'])                   # Any Approve task
-    ).values_list('language', flat=True))
-
-    # Return the candidate languages that don't have a review-preventing task.
-    return list(candidate_langs - existing_task_langs)
 

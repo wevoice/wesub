@@ -1,6 +1,6 @@
 // Universal Subtitles, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2011 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -41,7 +41,6 @@ goog.inherits(unisubs.widget.DropDown, goog.ui.Component);
 unisubs.widget.DropDown.Selection = {
     ADD_LANGUAGE: "add_language",
     IMPROVE_SUBTITLES: "improve_subtitles",
-    REQUEST_SUBTITLES: "request_subtitles",
     SUBTITLE_HOMEPAGE: "subtitle_homepage",
     DOWNLOAD_SUBTITLES: "download_subtitles",
     CREATE_ACCOUNT: "create_account",
@@ -57,13 +56,12 @@ unisubs.widget.DropDown.prototype.hasSubtitles = function() {
 };
 unisubs.widget.DropDown.prototype.setStats_ = function(dropDownContents) {
     this.videoLanguages_ = dropDownContents.LANGUAGES;
-    this.shouldShowRequestLink_ = dropDownContents.shouldShowRequestLink();
     this.isModerated_ = dropDownContents.IS_MODERATED;
 };
 
 unisubs.widget.DropDown.prototype.isModerated = function() {
     return this.isModerated_;
-}
+};
 
 unisubs.widget.DropDown.prototype.updateContents = function(dropDownContents) {
     this.setStats_(dropDownContents);
@@ -77,7 +75,7 @@ unisubs.widget.DropDown.prototype.setCurrentSubtitleState = function(subtitleSta
     this.subtitleState_ = subtitleState;
     this.setCurrentLangClassName_();
     unisubs.style.showElement(this.improveSubtitlesLink_, !!subtitleState);
-    goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href = 
+    goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href =
         this.createDownloadSRTURL_();
 };
 
@@ -116,37 +114,21 @@ unisubs.widget.DropDown.prototype.updateSubtitleStats_ = function() {
 
     goog.dom.setTextContent(
         this.addTranslationAnchor_,
-        this.subtitleCount_ == 0 ?
+        this.subtitleCount_ === 0 ?
             'Add New Subtitles' : 'Add New Translation');
 
     goog.dom.setTextContent(
         this.subCountSpan_, '(' + this.subtitleCount_ + ' lines)');
 
     if (!this.forStreamer_) {
-        // As Maggie pointed out, the "Subtitles off" link really has no 
+        // As Maggie pointed out, the "Subtitles off" link really has no
         // meaning in the streamer.
         goog.dom.append(
-            this.languageList_, 
+            this.languageList_,
             this.subtitlesOff_);
     }
 
-    if (this.shouldShowRequestLink_) {
-        this.addLanguageListRequestLink_($d);
-    }
-
     this.addVideoLanguagesLinks_($d);
-};
-
-unisubs.widget.DropDown.prototype.addLanguageListRequestLink_ = function($d) {
-// still not showing request stuff, lol.
-/*
-    this.languageListRequestLink_ = 
-        $d('a', {'href': '#', 'className': 'requestsubs'}, "request subtitles");
-    var li = $d('li', 'request',
-                "Don't see the language you want? Please ",
-                this.languageListRequestLink_, "!");
-    goog.dom.append(this.languageList_, li);
-*/
 };
 
 unisubs.widget.DropDown.prototype.addVideoLanguagesLinks_ = function($d) {
@@ -162,8 +144,8 @@ unisubs.widget.DropDown.prototype.addVideoLanguagesLinks_ = function($d) {
                   data.completionStatus()));
         var linkLi = $d('li', null, link);
         this.videoLanguagesLinks_.push(
-            { link: link, 
-              linkLi: linkLi, 
+            { link: link,
+              linkLi: linkLi,
               videoLanguage: data});
         goog.dom.append(this.languageList_, linkLi);
     }
@@ -173,9 +155,6 @@ unisubs.widget.DropDown.prototype.createActionList_ = function($d) {
     this.actions_ = $d('div', {'className': 'unisubs-actions'});
     this.createActionLinks_($d);
     this.actions_.appendChild(this.unisubsLink_);
-    if (this.isModerated_){
-        this.actions_.appendChild($d('h4', null, 'SUBS ARE MODERATED'));
-    }
     this.actions_.appendChild($d('h4', null, 'THIS VIDEO'));
     this.actions_.appendChild(this.videoActions_);
     this.actions_.appendChild($d('h4', null, 'MY SETTINGS'));
@@ -188,14 +167,14 @@ unisubs.widget.DropDown.prototype.createSubtitleHomepageURL_ = function() {
 
 unisubs.widget.DropDown.prototype.createDownloadSRTURL_ = function(lang_pk) {
     var uri = new goog.Uri(unisubs.siteURL());
-    uri.setPath("/widget/download_" + 
+    uri.setPath("/widget/download_" +
                (unisubs.IS_NULL ? "null_" : "") + "srt/");
-    uri.setParameterValue("video_id", this.videoID_);               
+    uri.setParameterValue("video_id", this.videoID_);
 
     if (this.subtitleState_ && this.subtitleState_.LANGUAGE_PK){
-       uri.setParameterValue('lang_pk', this.subtitleState_.LANGUAGE_PK); 
+       uri.setParameterValue('lang_pk', this.subtitleState_.LANGUAGE_PK);
     }
-       
+
     return uri.toString();
 };
 
@@ -212,10 +191,6 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
     this.improveSubtitlesLink_ =
         $d('li', 'unisubs-improveSubtitles',
            $d('a', {'href': '#'}, 'Improve These Subtitles'));
-    // this is hidden throught the css on unisubs-widget.css
-    this.requestSubtitlesLink_ =
-        $d('li', 'unisubs-requestSubtitles',
-           $d('a', {'href': '#'}, 'Request Subtitles'));
    this.subtitleHomepageLink_ =
         $d('li', 'unisubs-subtitleHomepage',
            $d('a', {'href': this.createSubtitleHomepageURL_()},
@@ -224,6 +199,14 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
         $d('li', 'unisubs-downloadSubtitles',
            $d('a', {'href': this.createDownloadSRTURL_()},
               'Download Subtitles'));
+
+    this.moderatedNotice_ =
+        $d('li', 'unisubs-moderated',
+           $d('p', null,
+                'These subtitles are moderated. Visit the ',
+                $d('a', {'href': unisubs.getVideoHomepageURL(this.videoID_)},
+                    'video page'),
+                ' to contribute.'));
 
     this.createAccountLink_ =
         $d('li', 'unisubs-createAccount',
@@ -237,28 +220,59 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
     this.logoutLink_ =
         $d('li', null,
            $d('a', {'href': '#'}, 'Logout'));
-    this.getEmbedCodeLink_ = 
+    this.getEmbedCodeLink_ =
         $d('li', null,
            $d('a', {'href': unisubs.getSubtitleHomepageURL(this.videoID_)}, 'Get Embed Code'));
 };
 
-unisubs.widget.DropDown.prototype.updateActions_ = function() {
+unisubs.widget.DropDown.prototype.moderatedResponseReceived_ = function(jsonResult) {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
+
+    if (jsonResult['can_subtitle'] || jsonResult['can_translate']) {
+        goog.dom.insertChildAt(this.videoActions_, this.addLanguageLink_, 0);
+    } else {
+        var e = $d('li', 'unisubs-moderated',
+           $d('p', null,
+              'These subtitles are moderated. You do not have permission to add a language.'));
+        goog.dom.insertChildAt(this.videoActions_, e, 0);
+    }
+};
+unisubs.widget.DropDown.prototype.addModeratedActionLinks_ = function() {
+    unisubs.Rpc.call(
+        'can_user_edit_video',
+        { 'video_id': this.videoID_ },
+        goog.bind(this.moderatedResponseReceived_, this));
+};
+unisubs.widget.DropDown.prototype.addModeratedNotice_ = function() {
+    this.videoActions_.appendChild(this.moderatedNotice_);
+};
+unisubs.widget.DropDown.prototype.addActionLinks_ = function() {
+    this.videoActions_.appendChild(this.addLanguageLink_);
+    this.videoActions_.appendChild(this.improveSubtitlesLink_);
+};
+unisubs.widget.DropDown.prototype.updateActions_ = function() {
     this.getDomHelper().removeChildren(this.videoActions_);
     this.getDomHelper().removeChildren(this.settingsActions_);
 
-    // FIXME: this should use goog.dom.append and turn into one line.
-    this.videoActions_.appendChild(this.addLanguageLink_);
     this.videoActions_.appendChild(this.improveSubtitlesLink_);
-// still not showing request link
-//    this.videoActions_.appendChild(this.requestSubtitlesLink_);
-    this.videoActions_.appendChild(this.subtitleHomepageLink_);
-    this.videoActions_.appendChild(this.getEmbedCodeLink_);    
-    this.videoActions_.appendChild(this.downloadSubtitlesLink_);
-    
-    if (unisubs.currentUsername == null)
+    if (this.isModerated()) {
+        if (unisubs.isEmbeddedInDifferentDomain()) {
+            this.addModeratedNotice_();
+        } else {
+            this.addModeratedActionLinks_();
+        }
+    } else {
+        this.addActionLinks_();
+    }
+
+    goog.dom.append(this.videoActions_,
+                    this.subtitleHomepageLink_,
+                    this.getEmbedCodeLink_,
+                    this.downloadSubtitlesLink_);
+
+    if (unisubs.currentUsername === null) {
         this.settingsActions_.appendChild(this.createAccountLink_);
-    else {
+    } else {
         goog.dom.setTextContent(
             goog.dom.getFirstElementChild(this.usernameLink_),
             unisubs.currentUsername);
@@ -279,8 +293,6 @@ unisubs.widget.DropDown.prototype.enterDocument = function() {
                goog.bind(this.menuItemClicked_, this, s.ADD_LANGUAGE)).
         listen(this.improveSubtitlesLink_, click,
                goog.bind(this.menuItemClicked_, this, s.IMPROVE_SUBTITLES)).
-        listen(this.requestSubtitlesLink_, click,
-               goog.bind(this.menuItemClicked_, this, s.REQUEST_SUBTITLES)).
         listen(this.subtitleHomepageLink_, click,
                goog.bind(this.menuItemClicked_, this, s.SUBTITLE_HOMEPAGE)).
         listen(this.downloadSubtitlesLink_, click,
@@ -301,11 +313,6 @@ unisubs.widget.DropDown.prototype.enterDocument = function() {
         listen(this.getDomHelper().getDocument(),
                goog.events.EventType.MOUSEDOWN,
                this.onDocClick_, true);
-    if (this.languageListRequestLink_) {
-        this.getHandler().listen(
-            this.languageListRequestLink_, click, 
-            goog.bind(this.menuItemClicked_, this, s.REQUEST_SUBTITLES));
-    }
 
     // Webkit doesn't fire a mousedown event when opening the context menu,
     // but we need one to update menu visibility properly. So in Safari handle
@@ -326,11 +333,10 @@ unisubs.widget.DropDown.prototype.addLanguageLinkListeners_ = function() {
     goog.array.forEach(this.videoLanguagesLinks_,
         function(tLink) {
             that.languageClickHandler_.listen(tLink.link, 'click',
-                goog.bind(
-                    that.languageSelected_, 
-                    that, 
-                    tLink.videoLanguage
-                ));
+               goog.bind(
+                    that.languageSelected_,
+                    that,
+                    tLink.videoLanguage));
         });
 };
 
@@ -358,9 +364,9 @@ unisubs.widget.DropDown.prototype.menuItemClicked_ = function(type, e) {
     else if (type == s.DOWNLOAD_SUBTITLES){
         window.open(goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href);
     }
-        
+
     else if (type == s.ADD_LANGUAGE || type == s.IMPROVE_SUBTITLES ||
-             type == s.REQUEST_SUBTITLES || type == s.SUBTITLES_OFF)
+             type == s.SUBTITLES_OFF)
         this.dispatchEvent(type);
 
     this.hide();
@@ -368,14 +374,14 @@ unisubs.widget.DropDown.prototype.menuItemClicked_ = function(type, e) {
 
 unisubs.widget.DropDown.prototype.languageSelected_ = function(videoLanguage, e) {
     if (e){
-        e.preventDefault();        
+        e.preventDefault();
     }
     this.dispatchLanguageSelection_(videoLanguage);
-    goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href = 
+    goog.dom.getFirstElementChild(this.downloadSubtitlesLink_).href =
         this.createDownloadSRTURL_();
 };
 
-unisubs.widget.DropDown.prototype.dispatchLanguageSelection_ = function(videoLanguage) {    
+unisubs.widget.DropDown.prototype.dispatchLanguageSelection_ = function(videoLanguage) {
     this.dispatchEvent(
         new unisubs.widget.DropDown.LanguageSelectedEvent(videoLanguage));
 };

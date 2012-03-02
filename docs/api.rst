@@ -131,26 +131,26 @@ Represents the subtitle set for a given video language.
 
 Fetching subtitles for a given language::
     
-   GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
-   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/
-   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/111111/
+   GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/subtitles/?format=srt
+   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/subtitles/?format=dfxp
+   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/111111/subtitles/?format=ssa
    
 Available parameters
    
-   * `sub_format`: The format to return the subtitles in. Supports all the formats the regular website does: rst, ssa, txt, dfxp, ttml. Optional - defaults to rst
+   * `format`: The format to return the subtitles in. Supports all the formats the regular website does: rst, ssa, txt, dfxp, ttml.
    * `version`: the numeric version number to fetch.  Versions are listed in the VideoLanguageResouce request. 
        
    If no version is specified, the latest public version will be returned. For videos that are not under moderation it will be the latest one. For videos under moderation only the latest published version is returned. If no version has been accepted in review, no subtitles will be returned.    
    
 Creating new subtitles for a language::
 
-   POST  https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
-   POST https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/
+   POST  https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/subtitles/
+   POST https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/subtitles/
     
 Parameters:
      
    * `subtitles`: The subtitles to submit
-   * `sub_format`: The format used to parse the subs. The same formats as for fetching subtitles are accepted. Optional - defaults to `rst`.
+   * `sub_format`: The format used to parse the subs. The same formats as for fetching subtitles are accepted. Optional - defaults to `srt`.
         
    This will create a new subtitle version with the new subtitles.
 

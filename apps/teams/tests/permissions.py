@@ -1,6 +1,6 @@
 # Universal Subtitles, universalsubtitles.org
 #
-# Copyright (C) 2011 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,7 @@ from apps.teams.models import Team, TeamVideo, TeamMember, Workflow, Task
 from auth.models import CustomUser as User
 from contextlib import contextmanager
 from apps.testhelpers import views as helpers
-from utils.translation import SUPPORTED_LANGUAGES_DICT
+from utils.translation import SUPPORTED_LANGUAGE_CODES
 
 from apps.teams.permissions_const import *
 from apps.teams.permissions import (
@@ -35,11 +35,11 @@ from apps.teams.permissions import (
     can_create_task_translate, can_join_team, can_edit_video, can_approve,
     roles_user_can_invite, can_add_video_somewhere, can_assign_tasks,
     can_create_and_edit_translations, save_role, can_remove_video,
-    can_delete_team
+    can_delete_team, can_delete_video
 )
 
 
-TOTAL_LANGS = len(SUPPORTED_LANGUAGES_DICT)
+TOTAL_LANGS = len(SUPPORTED_LANGUAGE_CODES)
 
 
 def _set_subtitles(team_video, language, original, complete, translations=[]):
@@ -123,7 +123,7 @@ class TestRules(BaseTestPermission):
         # Admins can do anything except assign owners and changing owners' roles.
         with self.role(ROLE_ADMIN):
             self.assertItemsEqual(roles_user_can_assign(team, user, None), [
-                ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+                ROLE_MANAGER, ROLE_CONTRIBUTOR
             ])
             self.assertItemsEqual(roles_user_can_assign(team, user, self.owner.user), [])
 
@@ -340,6 +340,19 @@ class TestRules(BaseTestPermission):
                 self.assertFalse(can_remove_video(self.nonproject_video, user))
 
         self.assertFalse(can_remove_video(self.nonproject_video, self.outsider))
+
+    def test_can_delete_video(self):
+        user, team = self.user, self.team
+
+
+        for r in [ ROLE_ADMIN, ROLE_OWNER]:
+            with self.role(r):
+                self.assertTrue(can_delete_video(self.nonproject_video, user))
+        for r in [ ROLE_MANAGER, ROLE_CONTRIBUTOR]:
+            with self.role(r):
+                self.assertFalse(can_delete_video(self.nonproject_video, user))
+
+        self.assertFalse(can_delete_video(self.nonproject_video, self.outsider))
 
 
     def test_can_view_settings_tab(self):

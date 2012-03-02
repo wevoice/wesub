@@ -1,21 +1,64 @@
 {% load i18n teams_tags %}
 
 {% if not team|is_team_member:user %}
-    {% if user.is_authenticated %}
-        {% if team.is_open %}
-            {% render_team_join team %}
-        {% endif %}
-        {% if team.is_by_application %}
-            {% if not team|has_applicant:user %}
-                {% include "teams/_application_form.html" %}
+    <div class="join">
+        {% if user.is_authenticated %}
+            {% if team.is_open %}
+                {% if team.auth_provider and user.partner != team.auth_provider.code %}
+                    <a href="{% url logout %}?next={{ team.auth_provider.url }}" class="join button primary reduced">
+                        {% trans 'Join via' %}
+                        {% if team.auth_provider.image_url %}
+                            <img src="{{ team.auth_provider.image_url }}" alt="{{ team.auth_provider.verbose_name }}"/>
+                        {% else %}
+                            {{ team.auth_provider.verbose_name }}
+                        {% endif %}
+                    </a>
+                    <p class="notation">
+                        {% trans 'You will be logged out and new account will be created via' %}
+                        {{ team.auth_provider.verbose_name }}
+                    </p>
+                {% else %}
+                    <a id="join" class="join button primary" onclick="return confirm('{% trans "Do you really wish to join this team?" %}')" href="{% url teams:join_team team.slug %}">{% trans "Join this team now!" %}</a>
+                {% endif %}
+            {% endif %}
+            {% if team.is_by_application %}
+                {% if team.auth_provider and user.partner != team.auth_provider.code %}
+                    <a href="{% url logout %}?next={{ team.auth_provider.url }}" class="join button primary reduced">
+                        {% trans 'Login via' %}
+                        {% if team.auth_provider.image_url %}
+                            <img src="{{ team.auth_provider.image_url }}" alt="{{ team.auth_provider.verbose_name }}"/>
+                        {% else %}
+                            {{ team.auth_provider.verbose_name }}
+                        {% endif %}
+                        {% trans 'to apply' %}
+                    </a>
+                    <p class="notation">
+                        {% trans 'You will be logged out and new account will be created via' %}
+                        {{ team.auth_provider.verbose_name }}
+                    </p>
+                {% else %}
+                    {% if not team|has_applicant:user %}
+                        {% include "teams/_application_form.html" %}
+                    {% else %}
+                        <p class="action-replacement">{% trans "Your application is pending" %}</p>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% else %}
+            {% if team.auth_provider %}
+                <a href="{{ team.auth_provider.url }}" class="join button primary reduced">
+                    {% trans 'Join via' %}
+                    {% if team.auth_provider.image_url %}
+                        <img src="{{ team.auth_provider.image_url }}" alt="{{ team.auth_provider.verbose_name }}"/>
+                    {% else %}
+                        {{ team.auth_provider.verbose_name }}
+                    {% endif %}
+                </a>
             {% else %}
-                <p class="action-replacement">{% trans "Your application is pending" %}</p>
+                <a id="signin-join" class="join button primary" href="{% url auth:login %}?next={% url teams:join_team team.slug %}">{% trans "Join Team" %}</a>
             {% endif %}
         {% endif %}
-    {% else %}
-        <a id="signin-join" class="button primary" href="{% url auth:login %}?next={{ request.path_info|urlencode }}">{% trans "Sign in to Join Team" %}</a>
-    {% endif %}
-{% endif %} 
-  
+    </div>
+{% endif %}
 
-<p class="notation">{% trans "Want to create your own captioning and translation team? Contact Dean Jansen" %}, <a href="mailto:dean@pculture.org">dean@pculture.org</a></p>
+<p class="notation">{% trans "Want to create your own subtitling team? Contact Dean Jansen" %}, <a href="mailto:dean@pculture.org">dean@pculture.org</a></p>

@@ -109,13 +109,11 @@ unisubs.widget.Widget.prototype.decorateInternal = function(el) {
     unisubs.widget.Widget.superClass_.decorateInternal.call(this, el);
     this.addWidget_(el);
 };
-
 unisubs.widget.Widget.prototype.createVideoPlayer_ = function(videoSource) {
     this.videoPlayer_ = videoSource.createPlayer();
     this.addChildAt(this.videoPlayer_, 0, true);
     this.setVideoDimensions_();
 };
-
 unisubs.widget.Widget.prototype.findVideoSource_ = function() {
     if (this.alternateVideoURLs_ && this.alternateVideoURLs_.length > 0) {
         var mainVideoSpec = this.videoURL_;
@@ -129,10 +127,7 @@ unisubs.widget.Widget.prototype.findVideoSource_ = function() {
         return unisubs.player.MediaSource.videoSourceForURL(
             this.videoURL_, this.videoConfig_);
 };
-
-unisubs.widget.Widget.prototype.isVideoSourceImmediatelyUsable_ =
-    function()
-{
+unisubs.widget.Widget.prototype.isVideoSourceImmediatelyUsable_ = function() {
     if (this.videoSource_ instanceof unisubs.player.BlipTVPlaceholder)
         return false;
     if (this.forceFormat_ || goog.isDefAndNotNull(this.alternateVideoURLs_))
@@ -142,15 +137,11 @@ unisubs.widget.Widget.prototype.isVideoSourceImmediatelyUsable_ =
                 || unisubs.player.supportsVideo();
     }
 };
-
-unisubs.widget.Widget.prototype.addVideoLoadingPlaceholder_ =
-    function(el)
-{
+unisubs.widget.Widget.prototype.addVideoLoadingPlaceholder_ = function(el) {
     this.videoPlaceholder_ = this.getDomHelper().createDom(
         'div', 'unisubs-videoLoading', 'Loading...');
     goog.dom.appendChild(el, this.videoPlaceholder_);
 };
-
 unisubs.widget.Widget.prototype.addWidget_ = function(el) {
     try {
         this.videoSource_ = this.findVideoSource_();
@@ -195,7 +186,6 @@ unisubs.widget.Widget.prototype.addWidget_ = function(el) {
         window.location.href,
         this.videoSource_.getVideoURL());
 };
-
 unisubs.widget.Widget.prototype.showWidgetError_ = function() {
     // call to show_widget timed out.
     if (!this.isVideoSourceImmediatelyUsable_()) {
@@ -212,7 +202,6 @@ unisubs.widget.Widget.prototype.showWidgetError_ = function() {
         this.videoTab_.showError();
     }
 };
-
 unisubs.widget.Widget.prototype.initializeState_ = function(result) {
     if (result && !result["error_msg"]) {
         if (!this.isVideoSourceImmediatelyUsable_()) {
@@ -233,11 +222,10 @@ unisubs.widget.Widget.prototype.initializeState_ = function(result) {
         this.initializeStateTab_(result);
     }
 };
-
 unisubs.widget.Widget.prototype.initializeStateTab_ = function(result) {
     if (!result || result["error_msg"]) {
         // this happens, for example, for private youtube videos.
-        this.videoTab_.showError(result["error_msg"]);
+        this.videoTab_.showError(result && result["error_msg"]);
         return;
     }
 
@@ -255,7 +243,6 @@ unisubs.widget.Widget.prototype.initializeStateTab_ = function(result) {
             goog.bind(subController_.openNewLanguageDialog,
                       subController_));
 };
-
 unisubs.widget.Widget.prototype.initializeStateStreamer_ = function(result) {
     var subtitleState = unisubs.widget.SubtitleState.fromJSON(
         result['subtitles']);
@@ -263,12 +250,10 @@ unisubs.widget.Widget.prototype.initializeStateStreamer_ = function(result) {
     unisubs.streamer.StreamerDecorator.makeStreamer(
         this.videoPlayer_, this.streamBox_, result);
 };
-
 unisubs.widget.Widget.prototype.enterDocument = function() {
     unisubs.widget.Widget.superClass_.enterDocument.call(this);
     this.setVideoDimensions_();
 };
-
 unisubs.widget.Widget.prototype.setVideoDimensions_ = function() {
     if (!this.isInDocument() || !this.videoPlayer_)
         return;
@@ -280,7 +265,6 @@ unisubs.widget.Widget.prototype.setVideoDimensions_ = function() {
             unisubs.player.AbstractVideoPlayer.EventType.DIMENSIONS_KNOWN,
             this.videoDimensionsKnown_);
 };
-
 unisubs.widget.Widget.prototype.videoDimensionsKnown_ = function() {
     unisubs.style.setWidth(
         this.getElement(),
@@ -309,24 +293,19 @@ unisubs.widget.Widget.prototype.selectMenuItem = function(selection, opt_languag
     }
 
 };
-
 unisubs.widget.Widget.prototype.playAt = function(time) {
     this.videoPlayer_.setPlayheadTime(time);
     this.videoPlayer_.play();
 };
-
 unisubs.widget.Widget.prototype.play = function() {
     this.videoPlayer_.play();
 };
-
 unisubs.widget.Widget.prototype.pause = function() {
     this.videoPlayer_.pause();
 };
-
 unisubs.widget.Widget.prototype.openMenu = function (){
     this.controller_.openMenu();
 }
-
 unisubs.widget.Widget.exportJSSameDomain_ = function(){
 
     goog.exportSymbol(
@@ -358,7 +337,6 @@ unisubs.widget.Widget.exportJSSameDomain_ = function(){
     goog.exportSymbol(
         "mirosubs.video.supportsWebM", unisubs.player.supportsWebM);
 };
-
 unisubs.widget.Widget.exportJSCrossDomain_ = function(){
         if (!unisubs.widget.CrossDomainEmbed){
             unisubs.widget.CrossDomainEmbed = {};
@@ -381,7 +359,6 @@ unisubs.widget.Widget.exportJSCrossDomain_ = function(){
             unisubs.widget.CrossDomainEmbed.embed);
 
 };
-
 unisubs.widget.Widget.exportFireKeySequence = function() {
     goog.exportSymbol(
         'unisubs.widget.fireKeySequence',

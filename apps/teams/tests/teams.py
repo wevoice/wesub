@@ -12,18 +12,17 @@ from django.test import TestCase
 
 from auth.models import CustomUser as User
 from apps.teams import tasks
+from apps.teams import moderation_const as MODERATION
 from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
-    Team, Invite, TeamVideo, Application, TeamMember, TeamVideoLanguage,
-    TeamLanguagePreference
+    Team, Invite, TeamVideo, Application, TeamMember, TeamLanguagePreference
 )
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage
 from messages.models import Message
 from widget.tests import create_two_sub_session, RequestMockup
 
-LANGUAGEPAIR_RE = re.compile(r"([a-zA-Z\-]+)_([a-zA-Z_\-]+)_(.*)")
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
 
 
@@ -145,122 +144,6 @@ class TestTasks(TestCase):
         tv = TeamVideo(team=self.team, video=self.sl.video, added_by=self.team.users.all()[:1].get())
         tv.save()
 
-class TeamDetailMetadataTest(TestCase):
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-
-    def setUp(self):
-
-        fix_teams_roles()
-        self.auth = {
-            "username": u"admin",
-            "password": u"admin"
-        }
-        self.user = User.objects.get(username=self.auth["username"])
-
-    def test_update_lp_no_dependent(self):
-        tv = TeamVideo.objects.get(id=2)
-        # this video starts with no languages.
-        self.assertEquals(0, len(tv.searchable_language_pairs()))
-        sl = SubtitleLanguage(
-            language='en',
-            is_original=True,
-            is_forked=False,
-            is_complete=False,
-            video=tv.video)
-        sl.save()
-        tv = TeamVideo.objects.get(id=2)
-        self.assertEquals(0, len(tv.searchable_language_pairs()))
-        sl = tv.video.subtitle_language('en')
-        sl.is_complete = True
-        sl.save()
-        tv = TeamVideo.objects.get(id=2)
-        lps = tv.searchable_language_pairs()
-        self.assertEquals(len(settings.ALL_LANGUAGES) - 1, len(lps))
-        # we expect each string to end in "_0" to indicate zero completion.
-        for lp in lps:
-            self.assertEquals("0", LANGUAGEPAIR_RE.match(lp).group(3))
-
-    def test_update_lp_with_dep(self):
-        tv = TeamVideo.objects.get(id=2)
-        sl = SubtitleLanguage(
-            language='en',
-            is_original=True,
-            is_forked=False,
-            is_complete=True,
-            video=tv.video)
-        sl.save()
-        dl = SubtitleLanguage(
-            language='es',
-            is_original=False,
-            is_forked=False,
-            percent_done=40,
-            standard_language=sl,
-            video=tv.video)
-        dl.save()
-        tv = TeamVideo.objects.get(id=2)
-        lps = tv.searchable_language_pairs()
-        self.assertEquals(len(settings.ALL_LANGUAGES) * 2 - 3, len(lps))
-        for lp in lps:
-            match = LANGUAGEPAIR_RE.match(lp)
-            if match.group(1) == 'en':
-                if match.group(2) == 'es':
-                    self.assertEquals('M', match.group(3))
-                else:
-                    self.assertEquals('0', match.group(3))
-            elif match.group(1) == 'es':
-                self.assertEquals('0', match.group(3))
-
-    def test_update_lp_for_sl(self):
-        tv = TeamVideo.objects.get(id=2)
-        sl = SubtitleLanguage(
-            language='en',
-            is_original=True,
-            is_forked=False,
-            is_complete=True,
-            video=tv.video)
-        sl.save()
-        dl = SubtitleLanguage(
-            language='es',
-            is_original=False,
-            is_forked=False,
-            percent_done=40,
-            standard_language=sl,
-            video=tv.video)
-        dl.save()
-        tv = TeamVideo.objects.get(id=2)
-        dl = SubtitleLanguage.objects.get(id=dl.id)
-        dl.percent_done = 50
-        dl.save()
-        lps = tv.searchable_language_pairs()
-        self.assertEquals(len(settings.ALL_LANGUAGES) * 2 - 3, len(lps))
-        for lp in lps:
-            match = LANGUAGEPAIR_RE.match(lp)
-            if match.group(1) == 'en':
-                if match.group(2) == 'es':
-                    self.assertEquals("M", match.group(3))
-                else:
-                    self.assertEquals("0", match.group(3))
-            elif match.group(1) == 'es':
-                self.assertEquals("0", match.group(3))
-
-    def test_update_sl(self):
-        tv = TeamVideo.objects.get(id=2)
-        sublang = SubtitleLanguage(
-            language='en',
-            is_original=True,
-            is_forked=False,
-            is_complete=False,
-            video=tv.video)
-        sublang.save()
-        sls = tv.searchable_languages()
-        self.assertEquals(len(settings.ALL_LANGUAGES), len(sls))
-        sublang = SubtitleLanguage.objects.get(id=sublang.id)
-        sublang.is_complete = True
-        sublang.save()
-        tv = TeamVideo.objects.get(id=2)
-        sls =  tv.searchable_languages()
-        self.assertEquals(len(settings.ALL_LANGUAGES) - 1, len(sls))
-
 class TeamsTest(TestCase):
 
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
@@ -361,9 +244,9 @@ class TeamsTest(TestCase):
         return response.context['team_video_md_list']
 
     def _complete_search_record_list(self, team):
-        url = reverse("teams:completed_videos", kwargs={"slug": team.slug})
+        url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url)
-        return response.context['team_video_list']
+        return response.context['team_video_md_list']
 
     def test_team_join_leave(self):
         team = Team.objects.get(pk=1)
@@ -414,14 +297,29 @@ class TeamsTest(TestCase):
         #this test can fail only on MySQL
         team = Team.objects.get(pk=1)
         tv = team.teamvideo_set.exclude(video__subtitlelanguage__language='')[:1].get()
-        TeamVideoLanguage.update(tv)
-        self.assertNotEqual(tv.languages.count(), 0)
+        # create a few languages with subs
+        from videos.tests import create_langs_and_versions
+        video = tv.video
+        video.is_public = False
+        video.moderated_by = team
+        video.save()
+        langs = ["en" ,"es", 'fr', 'pt_br']
+        versions = create_langs_and_versions(video, langs)
+        for v in versions:
+            v.moderation_status = MODERATION.WAITING_MODERATION
         tv.delete()
         try:
             TeamVideo.objects.get(pk=tv.pk)
             self.fail()
         except TeamVideo.DoesNotExist:
             pass
+        video = refresh_obj(video)
+        for lang in langs:
+            l = video.subtitle_language(lang)
+            self.assertTrue(l.version())
+            self.assertTrue(l.has_version)
+        self.assertTrue(video.is_public)
+        self.assertEqual(video.moderated_by, None)
 
     def test_complete_contents(self):
         request = RequestMockup(User.objects.all()[0])
@@ -698,7 +596,7 @@ class TeamsTest(TestCase):
         url = reverse("teams:add_video", kwargs={"slug": team.slug})
         response = self.client.post(url, data)
         self.assertEqual(tv_len+1, team.teamvideo_set.count())
-        self.assertRedirects(response, reverse("teams:team_video", kwargs={"team_video_pk": 3}))
+        self.assertRedirects(response, reverse("teams:detail", kwargs={"slug": team.slug}))
 
         #-------edit team video -----------------
         team = Team.objects.get(pk=1)
@@ -787,10 +685,6 @@ class TeamsTest(TestCase):
         self.failUnlessEqual(response.status_code, 302)
 
         self.assertFalse(team.is_member(user2))
-
-        url = reverse("teams:completed_videos", kwargs={"slug": team.slug})
-        response = self.client.post(url)
-        self.failUnlessEqual(response.status_code, 200)
 
         url = reverse("teams:videos_actions", kwargs={"slug": team.slug})
         response = self.client.post(url)

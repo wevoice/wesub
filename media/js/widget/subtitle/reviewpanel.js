@@ -22,9 +22,14 @@ goog.provide('unisubs.subtitle.ReviewPanel');
 * @extends unisubs.subtitle.SyncPanel
 */
 unisubs.subtitle.ReviewPanel = function(subtitles, videoPlayer,
-                                         serverModel, captionManager) {
+                                         serverModel, captionManager, reviewOrApprovalType, dialog) {
     unisubs.subtitle.SyncPanel.call(this, subtitles, videoPlayer,
                                      serverModel, captionManager);
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
+    this.numSteps_ = 4;
+    this.currentStep_ = 3;
+    this.nextButtonText_ = "Submit your work";
+    this.dialog_ = dialog;
 };
 goog.inherits(unisubs.subtitle.ReviewPanel, unisubs.subtitle.SyncPanel);
 /**
@@ -33,18 +38,31 @@ goog.inherits(unisubs.subtitle.ReviewPanel, unisubs.subtitle.SyncPanel);
 unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal =
     function()
 {
-    var helpContents = new unisubs.RightPanel.HelpContents(
-        "Review and make corrections",
-        null, 3, 2);
-    helpContents.html =
+    var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
+    var keySpecs = [];
+    var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(
+        $d, this.reviewOrApprovalType_, this.numSteps_, this.currentStep_, false);
+    if (! internalComponents){
+        keySpecs = this.makeKeySpecsInternal();
+        internalComponents = {
+            'helpContents': new unisubs.RightPanel.HelpContents(
+                "Check your work", [],
+                this.numSteps_, this.currentStep_)
+        }
+        
+        internalComponents['helpContents'].html =
         "<p>Watch the video one more time and correct any mistakes in text or timing. Tips for making high quality subtitles:</p>" +
         "<ul>" +
         "<li>Include text that appears in the video (signs, etc.)</li>" +
         "<li>Include important sounds in [brackets]</li>" +
         "<li>It's best to split subtitles at the end of a sentence or a long phrase.</li>" +
         "</ul>";
+
+     }else{
+        this.bodyInput_ = internalComponents['bodyInput'];
+    }
     return new unisubs.subtitle.ReviewRightPanel(
-        this.serverModel, helpContents, [],
-        this.makeKeySpecsInternal(), false, "Done?",
-        "Submit your work");
+        this.dialog_, this.serverModel, internalComponents['helpContents'], 
+        internalComponents['extraHelp'], keySpecs , false, "Done?", 
+        this.nextButtonText_,  this.reviewOrApprovalType_ , this.bodyInput_);
 };
