@@ -2,16 +2,16 @@
 Big shout out to Michael Richardson and Fernando Takai for this class.
 https://bitbucket.org/fernandotakai/tender-multipass/src/0a8c0020e7bb/tender_multipass.py
 """
-
-import sys
 import base64
 import hashlib
+from datetime import datetime, timedelta
 from itertools import izip, cycle
+
 import simplejson as json
+from M2Crypto import EVP
 from dateutil import parser
 from dateutil.tz import tzutc
-from datetime import datetime, timedelta
-from M2Crypto import EVP
+
 
 class MultiPass(object):
     def __init__(self, site_key, api_key):
@@ -69,3 +69,4 @@ class MultiPass(object):
                 raise Exception("Expired!")
 
         return obj
+
