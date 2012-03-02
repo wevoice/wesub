@@ -295,9 +295,6 @@ class Video(models.Model):
 
         return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
-    @models.permalink
-    def video_link(self):
-        return ('videos:history', [self.video_id])
 
     def get_team_video(self):
         """Return the TeamVideo object for this video, or None if there isn't one."""
