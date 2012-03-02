@@ -6,31 +6,20 @@
     {% include_bundle "widget-css"%}
 {% endblock %}
 
-{% block html_attrs %}id="tasks"{% endblock %}
+{% block html_attrs %}id="team_tasks"{% endblock %}
 
 {% block scripts %}
     {{ block.super }}
     {% include "utils/chosenify.html" %}
-
     {% include_bundle "unisubs-offsite-compiled" %}
     {% include_bundle "js-teams" %}
-
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
-        unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
-
-        $(function() {
-            // Handle weird back-button issue with browsers.
-            $select = $('select#id_task_language');
-            {% if request.GET.lang %}
-                $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
-            {% else %}
-                $opt = $('option[id="lang-opt-any"]');
-            {% endif %}
-            $select.children().removeAttr('selected');
-            $opt.attr('selected', 'selected');
-            $select.trigger('liszt:updated');
-        });
+        window.WIDGET_SETTINGS = {{ widget_settings|to_json|safe }};
+        window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
+        window.ASSIGN_TASK_AJAX_URL = '{% url teams:assign_task_ajax slug=team.slug %}';
+        window.ASSIGNEE = '{% firstof request.user.id -1 %}';
+        window.TEAM_SLUG = '{{ team.slug }}';
     </script>
 {% endblock %}
 
@@ -162,9 +151,6 @@
                                 {% with task.subtitle_version as version %}
                                     <p>
                                         {% trans 'Subtitles' %}:
-                                        {% comment %}
-                                            <a href="{{ task.subtitle_version.language.get_absolute_url }}">{% trans 'draft' %}</a>
-                                        {% endcomment %}
                                         {% if version.language.is_original %}
                                             {% trans 'transcribed' %}
                                         {% else %}
@@ -322,100 +308,6 @@
 
         {% if is_paginated %}{% paginator %}{% endif %}
     </div>
-
-    <script type="text/javascript">
-        $(function() {
-
-            $('a.action-assign').click(function(e) {
-
-                $('div.assignee-choice').hide();
-
-                $form = $(e.target).parents('.admin-controls').siblings('form.assign-form');
-
-                $assignee_choice = $form.children('div.assignee-choice');
-                $assignee_choice.fadeIn('fast');
-
-                // Reset select options on rebuild.
-                if (!window.begin_typing_trans) {
-                    window.begin_typing_trans = $('option.begin-typing-trans').eq(0).text();
-                }
-                $select = $form.find('select');
-                $select.children('option').remove();
-                $select.append('<option value="">-----</option>');
-                $select.append('<option value="">' + window.begin_typing_trans + '</option>');
-                $select.trigger('liszt:updated');
-
-                $chzn_container = $assignee_choice.find('.chzn-container');
-                $chzn_container.css('width', '100%')
-
-                $chzn_drop = $chzn_container.find('.chzn-drop')
-                $chzn_drop.css('width', '99%')
-
-                $chzn_input = $chzn_drop.find('input')
-                $chzn_input.css('width', '82%');
-
-                return false;
-            });
-            $('.assignee-choice a.cancel').click(function(e) {
-                $(e.target).parents('.assignee-choice').fadeOut('fast');
-                return false;
-            });
-
-            $('a.action-assign-submit').click(function(e) {
-                $(e.target).closest('form').submit();
-                return false;
-            });
-
-            $('a.assign-and-perform').click(function(e) {
-                var $target = $(e.target);
-                $target.text('Loading...');
-
-                $.ajax({
-                    url: '{% url teams:assign_task_ajax slug=team.slug %}',
-                    type: 'POST',
-                    data: {
-                        task: $target.attr('data-id'),
-                        assignee: {% firstof request.user.id -1 %}
-                    },
-                    success: function(data, textStatus, jqXHR) {
-                        $target.hide();
-
-                        $li = $target.parent().siblings('li.hidden-perform-link');
-                        $li.show();
-
-                        $link = $li.children('a.perform');
-                        $link.text('Loading...');
-                        if ($link.attr('href') !== '') {
-                            window.location = $link.attr('href');
-                        } else {
-                            $link.click();
-                        }
-                    }
-                });
-
-                return false;
-            });
-
-            $("div.member-ajax-chosen select", ".v1 .content").ajaxChosen({
-                method: 'GET',
-                url: '/en/teams/{{ team.slug }}/members/search/',
-                dataType: 'json'
-            }, function (data) {
-                var terms = {};
-
-                $.each(data.results, function (i, val) {
-                    var can_perform_task = data.results[i][2];
-
-                    if (can_perform_task) {
-                        terms[data.results[i][0]] = data.results[i][1];
-                    }
-                });
-
-                return terms;
-            });
-        });
-    </script>
-
     <script id="IMAGE_PRELOADER" type="text/html">
         <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
     </script>
