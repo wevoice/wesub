@@ -63,9 +63,8 @@ def add_general_settings(request, dict):
         dict['username'] = request.user.username
 
 class Rpc(BaseRpc):
-    def log_session(self, request, draft_pk, log):
+    def log_session(self, request,  log):
         dialog_log = WidgetDialogLog(
-            draft_pk=draft_pk,
             browser_id=request.browser_id,
             log=log)
         dialog_log.save()

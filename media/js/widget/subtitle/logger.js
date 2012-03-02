@@ -21,13 +21,12 @@ goog.provide('unisubs.subtitle.Logger');
 /**
  * @constructor
  */
-unisubs.subtitle.Logger = function(draftPK) {
+unisubs.subtitle.Logger = function() {
     this.logs_ = [goog.json.serialize({
         'date': unisubs.dateString(),
-        'draft_pk': draftPK })];
+        })];
     this.totalSize_ = 0;
     this.sizeExceeded_ = false;
-    this.draftPK_ = draftPK;
     this.jsonSubs_ = null;
 };
 
@@ -64,9 +63,6 @@ unisubs.subtitle.Logger.prototype.getContents = function() {
     return '[' + this.logs_.join(',') + ']';
 };
 
-unisubs.subtitle.Logger.prototype.getDraftPK = function() {
-    return this.draftPK_;
-};
 
 unisubs.subtitle.Logger.prototype.getJsonSubs = function() {
      return goog.array.map(this.jsonSubs_,
