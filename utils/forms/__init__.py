@@ -5,8 +5,11 @@ from django.core import validators
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 
+from utils.forms.recapcha import ReCaptchaField
 from utils.validators import UniSubURLValidator
 
+
+assert ReCaptchaField # Shut up, Pyflakes.
 
 class AjaxForm(object):
     def get_errors(self):
