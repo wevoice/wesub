@@ -839,7 +839,7 @@ class Rpc(BaseRpc):
         language = version.language
         base_language = None
         if language.is_dependent() and not version.is_forked and not force_forked:
-            base_language = language.real_standard_language()
+            base_language = language.standard_language
         version_no = version.version_no if forced_version_no is None else forced_version_no
         is_latest = False
         latest_version = language.latest_version()
@@ -890,8 +890,8 @@ def language_summary(language, team_video=-1, user=None):
 
     if language.is_dependent():
         summary['percent_done'] = language.percent_done
-        if language.real_standard_language():
-            summary['standard_pk'] = language.real_standard_language().pk
+        if language.standard_language:
+            summary['standard_pk'] = language.standard_language.pk
     else:
         summary['is_complete'] = language.is_complete
 
