@@ -416,6 +416,11 @@ var Site = function(Site) {
 
             that.Utils.resetLangFilter();
             that.Utils.chosenify();
+        },
+
+        // Profile
+        profile_dashboard: function() {
+            unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
         }
     };
 };
