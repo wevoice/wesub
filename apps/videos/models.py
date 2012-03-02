@@ -509,6 +509,11 @@ class Video(models.Model):
         SubtitleLanguage will be returned.  In this case the value will be
         cached in-object.
 
+        This method can produce surprising results if the video has more
+        than one subtitle language with the same code. This is an artifact
+        of when we did not allow this. In this case, we return the
+        language with the most subtitles.
+
         """
         try:
             if language_code is None:
@@ -869,9 +874,20 @@ class SubtitleLanguage(models.Model):
         return self.video.description
 
     def is_dependent(self):
+        """
+        AKA is this language a translation? Stand alone languages must
+        either be an original one, or a forked one.
+        """
         return not self.is_original and not self.is_forked
 
     def is_complete_and_synced(self, public_only=True):
+        """
+        For transcripts, this means the user marked it as completed.
+        For translations, the original language must be marked as completed.
+
+        We consider a set of subs where the very last has no end time
+        to be synced, as that is a convention for 'until end of time'.
+        """
         if not self.is_dependent() and not self.is_complete:
             return False
         if self.is_dependent():
@@ -889,13 +905,6 @@ class SubtitleLanguage(models.Model):
         if not is_synced_value(subtitles[-1].start_time):
             return False
         return True
-
-    def is_dependable(self):
-        if self.is_dependent():
-            dep_lang = self.standard_language
-            return dep_lang and dep_lang.is_complete and self.percent_done > 10
-        else:
-            return self.is_complete
 
     def get_widget_url(self, mode=None, task_id=None):
         # duplicates unisubs.widget.SubtitleDialogOpener.prototype.openDialogOrRedirect_
