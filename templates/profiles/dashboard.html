@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block body_attrs %}id="dashboard" class="v1"{% endblock %}
+{% block html_attrs %}id="profile_dashboard"{% endblock %}
 
 {% block title %}{% trans "Dashboard" %} | {{ user_info }} | Universal Subtitles{% endblock %}
 
@@ -17,7 +18,7 @@
     {% include_bundle "js-teams" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
-        unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
+        window.WIDGET_SETTINGS = {{ widget_settings|to_json|safe }};
     </script>
 {% endblock %}
 
