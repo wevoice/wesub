@@ -421,6 +421,101 @@ var Site = function(Site) {
         // Profile
         profile_dashboard: function() {
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
+        },
+
+        // Messages
+
+        messages_list: function() {
+            var DEFAULT_AVATAR_URL = window.STATIC_URL + 'images/default_thumb_small.png';
+            var reply_msg_data;
+            $.metadata.setType('attr', 'data');
+
+            if (!window.REPLY_MSG_DATA) {
+                reply_msg_data = null;
+            } else {
+                reply_msg_data = window.REPLY_MSG_DATA;
+            }
+            $('.messages .delete').click(function(){
+                if (confirm(window.DELETE_MESSAGE_CONFIRM)){
+                    var $this = $(this);
+                    MessagesApi.remove($this.attr('message_id'), function(response){
+                        if (response.error){
+                            $.jGrowl.error(response.error);
+                        } else {
+                            $this.parents('li.message').fadeOut('fast', function() {
+                                $(this).remove();
+                            });
+                        }
+                    });
+                }
+                return false;
+            });
+            $('#send-message-form').ajaxForm({
+                type: 'RPC',
+                api: {
+                    submit: MessagesApi.send
+                },
+                success: function(data, resp, $form){
+                    if (data.errors) {
+                        for (key in data.errors){
+                            var $field = $('input[name="'+key+'"]', $form);
+                            var error = '<p class="error_list">'+data.errors[key]+'</p>';
+                            if ($field.length){
+                                $field.before(error);
+                            }else{
+                                $('.global-errors', $form).prepend(error);
+                            }
+                        }
+                    } else {
+                        if (resp.status) {
+                            $.jGrowl(window.MESSAGE_SUCCESSFULLY_SENT);
+                        }
+                        $('a.close', '#msg_modal').click();
+                        $form.clearForm();
+                    }
+                },
+                beforeSubmit: function(formData, $form, options){
+                    $('p.error_list', $form).remove();
+                }
+            });
+            function set_message_data(data, $modal) {
+                $('#message_form_id_user').val(data['author-id']);
+                $('.author-username', $modal).html(data['author-username']);
+                $('.message-content', $modal).html(data['message-content']);
+                $('.message-subject').html(data['message-subject-display']);
+                $('#message_form_id_subject').val('Re: '+data['message-subject']);
+
+                if (data['can-reply']) {
+                    $('.reply-container textarea', $modal).val('');
+                }
+                return false;
+            }
+            if (reply_msg_data){
+                set_message_data(reply_msg_data, $('#msg_modal'));
+            }
+            $('.reply').bind('click', function() {
+                set_message_data($(this).metadata(), $('msg_modal'));
+            });
+            $('.mark-read').bind('click', function(event) {
+                var $link = $(this);
+                var data = $link.metadata();
+
+                if (!data['is-read']) {
+                    MessagesApi.mark_as_read(data['id'], function(response) {
+                        if (response.error) {
+                            $.jGrowl.error(response.error);
+                        } else {
+                            $li = $link.parents('li.message');
+                            $li.removeClass('unread');
+                            $li.find('span.unread').remove();
+                            data['is-read'] = true;
+                            $link.parent().remove();
+                        }
+                    });
+                }
+                set_message_data(data, $('#msg_modal'));
+                return false;
+            });
         }
     };
 };
