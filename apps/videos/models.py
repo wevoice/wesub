@@ -341,7 +341,7 @@ class Video(models.Model):
                           .replace('#', '-')
                           .replace('&', '-'))
 
-    def _get_absolute_url(self, locale=None, video_id=None):
+    def _get_absolute_url(self,  video_id=None):
         """
         NOTE: this method is used in videos.search_indexes.VideoSearchResult
         to prevent duplication of code in search result and in DB-query result
