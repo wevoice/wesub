@@ -869,9 +869,20 @@ class SubtitleLanguage(models.Model):
         return self.video.description
 
     def is_dependent(self):
+        """
+        AKA is this language a translation? Stand alone languages must
+        either be an original one, or a forked one.
+        """
         return not self.is_original and not self.is_forked
 
     def is_complete_and_synced(self, public_only=True):
+        """
+        For transcripts, this means the user marked it as completed.
+        For translations, the original language must be marked as completed.
+
+        We consider a set of subs where the very last has no end time
+        to be synced, as that is a convention for 'until end of time'.
+        """
         if not self.is_dependent() and not self.is_complete:
             return False
         if self.is_dependent():
