@@ -1157,7 +1157,6 @@ p.view-more a:after {
   background-image: linear-gradient(top, #f0f0f0, #fafafa 5%, #fafafa 95%, #f0f0f0);
   border-bottom: 1px solid #dce2e5;
   border-top: 1px solid #dce2e5;
-  float: left;
   margin: 0 0 2em;
   padding: 1.5em 0;
   width: 100%;
