@@ -23,7 +23,7 @@ goog.provide('unisubs.subtitle.Logger');
  */
 unisubs.subtitle.Logger = function() {
     this.logs_ = [goog.json.serialize({
-        'date': unisubs.dateString(),
+        'date': unisubs.dateString()
         })];
     this.totalSize_ = 0;
     this.sizeExceeded_ = false;
