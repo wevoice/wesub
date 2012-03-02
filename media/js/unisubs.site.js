@@ -424,7 +424,6 @@ var Site = function(Site) {
         },
 
         // Messages
-
         messages_list: function() {
             var DEFAULT_AVATAR_URL = window.STATIC_URL + 'images/default_thumb_small.png';
             var reply_msg_data;
