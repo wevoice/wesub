@@ -1,4 +1,26 @@
+// Universal Subtitles, universalsubtitles.org
+// 
+// Copyright (C) 2012 Participatory Culture Foundation
+// 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+// 
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see 
+// http://www.gnu.org/licenses/agpl-3.0.html.
+
 var Site = function(Site) {
+    /*
+     * This is the master javascript file for
+     * the Universal Subtitles website.
+     */
 
     var that = this;
 
@@ -20,6 +42,19 @@ var Site = function(Site) {
 
     };
     this.Utils = {
+        /*
+         * These are reusable utilities that are
+         * usually run on multiple pages. If you
+         * find duplicate code that runs on multiple
+         * pages, it should be converted to a
+         * utility function in this object and
+         * called from each of the specific views,
+         * like this:
+         *     
+         *     that.Utils.chosenify();
+         *
+         */
+
         chosenify: function() {
             $('select', '.v1 .content').filter(function() {
                 return !$(this).parents('div').hasClass('ajaxChosen');
@@ -57,11 +92,24 @@ var Site = function(Site) {
         }
     };
     this.Views = {
+        /*
+         * Each of these views runs on a specific
+         * page on the Universal Subtitles site
+         * (except for base, which runs on every
+         * page that extends base.html)
+         *
+         * Adding a view is as simple as adding an
+         * ID attribute to the specific page's <html>
+         * element, and adding the corresponding view
+         * below.
+         */
+
+        // Global
         base: function() {
 
             /*
-             * TODO: The modules in this section need to be
-             * pulled out into site.Utils and only
+             * TODO: The modules in this section need to
+             * be pulled out into that.Utils and only
              * initialized on pages that use them.
              */
             if ($('.abbr').length) {
