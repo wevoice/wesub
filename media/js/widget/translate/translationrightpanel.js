@@ -30,19 +30,24 @@ unisubs.translate.TranslationRightPanel = function(dialog,
                                                     showRestart,
                                                     doneStrongText,
                                                     doneText,
-                                                    extraHelpHeader) {
+                                                    extraHelpHeader,
+                                                    isReviewOrApproval ) {
     unisubs.RightPanel.call(this, serverModel, helpContents, extraHelp,
                              legendKeySpecs,
                              showRestart, doneStrongText, doneText);
     this.extraHelpHeader_ = extraHelpHeader;
     this.dialog_ = dialog;
     this.showSaveExit = false;
+    this.isReviewOrApproval_ = isReviewOrApproval;
 };
 goog.inherits(unisubs.translate.TranslationRightPanel, unisubs.RightPanel);
 
 unisubs.translate.TranslationRightPanel.prototype.appendExtraHelpInternal =
     function($d, el)
 {
+    if (this.isReviewOrApproval_){
+        return;
+    }
     var extraDiv = $d('div', 'unisubs-extra unisubs-translationResources');
     extraDiv.appendChild($d('h3', {'className': 'unisubs-resources'}, this.extraHelpHeader_));
 
@@ -81,17 +86,26 @@ unisubs.translate.TranslationRightPanel.prototype.appendExtraHelpInternal =
     el.appendChild(ul);
 };
 
+unisubs.translate.TranslationRightPanel.prototype.appendMiddleContentsInternal = function($d, el) {
+
+}
+
 unisubs.translate.TranslationRightPanel.prototype.enterDocument = function() {
     unisubs.translate.TranslationRightPanel.superClass_.enterDocument.call(this);
     
     var handler = this.getHandler();
-    
-    handler.listen(
+    if (this.changeTimingLink_){
+        // when reviewing / approving this link will not be present
+        handler.listen(
         this.changeTimingLink_,
         'click',
         this.changeTimingClicked_);
-    
-    handler.listen(this.autoTranslateLink_, 'click', this.autoTranslateClicked_)
+    }
+   
+    if (this.autoTranslateLink_){
+        // when reviewing / approving this link will not be present
+        handler.listen(this.autoTranslateLink_, 'click', this.autoTranslateClicked_)
+    }
 };
 
 unisubs.translate.TranslationRightPanel.prototype.autoTranslateClicked_ = function(e){

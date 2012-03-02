@@ -8,9 +8,8 @@
 
 {% block scripts %}
     {{ block.super }}
-    <script src="{% url messages:rpc_api %}" type="text/javascript"></script>       
+    <script src="{% url messages:rpc_api %}" type="text/javascript"></script>
     <script src="{{ STATIC_URL }}js/jquery.metadata.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/unisubs.modal.js" type="text/javascript"></script>
     <script type="text/javascript">
         jQuery(function($){
             var DEFAULT_AVATAR_URL = '{{ STATIC_URL }}images/default_thumb_small.png';
@@ -20,7 +19,7 @@
             var reply_msg_data = {{ reply_msg.json_data|safe }};
             {% endif %}
             $.metadata.setType("attr", "data");
-            
+
             $('.messages .delete').click(function(){
                 if (confirm("{% trans 'Do you really wish to delete this message?' %}")){
                     var $this = $(this);
@@ -36,7 +35,7 @@
                 }
                 return false;
             });
-            
+
             $('#send-message-form').ajaxForm({
                 type: 'RPC',
                 api: {
@@ -64,22 +63,22 @@
                 beforeSubmit: function(formData, $form, options){
                     $('p.error_list', $form).remove();
                 }
-            });    
-            
+            });
+
             function set_message_data(data, $modal){
                 $('#message_form_id_user').val(data['author-id']);
                 $('.author-username', $modal).html(data['author-username']);
                 $('.message-content', $modal).html(data['message-content']);
                 $('.message-subject').html(data['message-subject-display']);
                 $('#message_form_id_subject').val('Re: '+data['message-subject']);
-                
+
                 if (data['can-reply']) {
                     $('.reply-container textarea', $modal).val('');
                 } else {
                     return false;
                 }
             }
-            
+
             if (reply_msg_data){
                 set_message_data(reply_msg_data, $('#msg_modal'));
             };
@@ -87,11 +86,11 @@
             $('.reply').bind('click', function() {
                 set_message_data($(this).metadata(), $('msg_modal'));
             });
-            
+
             $('.mark-read').bind('click', function(event){
                 var $link = $(this);
                 var data = $link.metadata();
-                
+
                 if (!data['is-read']){
                     MessagesApi.mark_as_read(data['id'], function(response){
                         if (response.error){
@@ -105,7 +104,7 @@
                         }
                     });
                 };
-                
+
                 set_message_data(data, $('#msg_modal'));
 
                 return false;
@@ -131,7 +130,7 @@
         </div>
     {% if message_list %}
         {% if is_paginated %}{% paginator %}{% endif %}
-        
+
         <ul class="listing messages">
             <p class="view-notice">
                 You <strong>are {% if not user_info.notify_by_email %}not {% endif %}receiving</strong> message notifications via email. <a href="{% url profiles:edit %}">Edit preferences</a>.
@@ -141,7 +140,7 @@
                     <h3>
                         {{ msg }}
                     </h3>
-                
+
                     {% if msg.author %}
                         <p>
                             From <a href="{{ msg.author.get_absolute_url }}">{{ msg.author }}</a>
@@ -176,7 +175,7 @@
                 </li>
             {% endfor %}
         </ul>
-        
+
         {% if is_paginated %}{% paginator %}{% endif %}
         {% else %}
             <p class="empty">
@@ -206,7 +205,7 @@
                             #message_form_id_content {
                                 max-width: 355px;
                             }
-                        </style>              
+                        </style>
                         {{ send_message_form.as_p }}
                     </div>
                 </div>

@@ -53,7 +53,7 @@ body {
   -webkit-border-radius: 3px;
   background-clip: padding-box;
   border-radius: 3px;
-  background-color: #115d7f;
+  background: #136aa1;
   background-image: -moz-gradient(center top, #136aa1 0%, #0f517a 100%);
   background-image: -moz-linear-gradient(center top, #136aa1 0%, #0f517a 100%);
   background-image: -ms-linear-gradient(#136aa1, #0f517a);
@@ -63,7 +63,7 @@ body {
   background-image: linear-gradient(#136aa1, #0f517a);
 }
 .v1 .button:hover, .v1 .content button:hover, .v1 .form-container button:hover, .v1 .submit input:hover {
-  background-color: #0f557f;
+  background: #136aa1;
   background-image: -moz-gradient(center top, #136aa1 0%, #0c4061 100%);
   background-image: -moz-linear-gradient(center top, #136aa1 0%, #0c4061 100%);
   background-image: -ms-linear-gradient(#136aa1, #0c4061);
@@ -86,7 +86,7 @@ body {
   border-color: #dce2e5;
   color: #678ca3;
   text-shadow: none;
-  background-color: #7f7f7f;
+  background: white;
   background-image: -moz-gradient(center top, white 0%, #dce2e5 100%);
   background-image: -moz-linear-gradient(center top, white 0%, #dce2e5 100%);
   background-image: -ms-linear-gradient(white, #dce2e5);
@@ -98,7 +98,7 @@ body {
 .v1 .button.reduced:hover, .v1 .button.cancel:hover, .v1 .content button.reduced:hover, .v1 .content button.cancel:hover, .v1 .form-container button.reduced:hover, .v1 .form-container button.cancel:hover, .v1 .submit input.reduced:hover, .v1 .submit input.cancel:hover {
   border-color: #b7c3c9;
   color: #486f87;
-  background-color: #7f7f7f;
+  background: #f3f6f8;
   background-image: -moz-gradient(center top, #f3f6f8 0%, #dce2e5 100%);
   background-image: -moz-linear-gradient(center top, #f3f6f8 0%, #dce2e5 100%);
   background-image: -ms-linear-gradient(#f3f6f8, #dce2e5);
@@ -112,7 +112,7 @@ body {
   float: left;
   margin: 0 .5em 0 0;
   text-shadow: 1px 1px 1px #700C22;
-  background-color: #7f112c;
+  background: #a11332;
   background-image: -moz-gradient(center top, #a11332 0%, #7a0f26 100%);
   background-image: -moz-linear-gradient(center top, #a11332 0%, #7a0f26 100%);
   background-image: -ms-linear-gradient(#a11332, #7a0f26);
@@ -122,7 +122,7 @@ body {
   background-image: linear-gradient(#a11332, #7a0f26);
 }
 .v1 .button.delete:hover, .v1 .content button.delete:hover, .v1 .form-container button.delete:hover, .v1 .submit input.delete:hover {
-  background-color: #7f0f28;
+  background: #a11332;
   background-image: -moz-gradient(center top, #a11332 0%, #610c1e 100%);
   background-image: -moz-linear-gradient(center top, #a11332 0%, #610c1e 100%);
   background-image: -ms-linear-gradient(#a11332, #610c1e);
@@ -134,7 +134,7 @@ body {
 .v1 .button.save, .v1 .content button.save, .v1 .form-container button.save, .v1 .submit input.save {
   border-color: #4F7A0F;
   text-shadow: 1px 1px 1px #4F7A0F;
-  background-color: #5c7f11;
+  background: #69a113;
   background-image: -moz-gradient(center top, #69a113 0%, #4f7a0f 100%);
   background-image: -moz-linear-gradient(center top, #69a113 0%, #4f7a0f 100%);
   background-image: -ms-linear-gradient(#69a113, #4f7a0f);
@@ -144,7 +144,7 @@ body {
   background-image: linear-gradient(#69a113, #4f7a0f);
 }
 .v1 .button.save:hover, .v1 .content button.save:hover, .v1 .form-container button.save:hover, .v1 .submit input.save:hover {
-  background-color: #587f10;
+  background: #69a113;
   background-image: -moz-gradient(center top, #69a113 0%, #476e0d 100%);
   background-image: -moz-linear-gradient(center top, #69a113 0%, #476e0d 100%);
   background-image: -ms-linear-gradient(#69a113, #476e0d);
@@ -327,7 +327,7 @@ div.hidden {
 .v1 .view .tools .button:hover, .v1 .view .tools button:hover {
   border-color: #b7c3c9;
   color: #486f87;
-  background-color: #7f7f7f;
+  background: #f3f6f8;
   background-image: -moz-gradient(center top, #f3f6f8 0%, #dce2e5 100%);
   background-image: -moz-linear-gradient(center top, #f3f6f8 0%, #dce2e5 100%);
   background-image: -ms-linear-gradient(#f3f6f8, #dce2e5);
@@ -523,9 +523,8 @@ div.hidden {
   border-radius: 2px;
   -khtml-opacity: 0.6;
   -moz-opacity: 0.6;
-  filter: alpha(opacity=0.6);
   opacity: 0.6;
-  background-color: #7f7f7f;
+  background: #f3f6f8;
   background-image: -moz-gradient(center top, #f3f6f8 0%, #dce2e5 100%);
   background-image: -moz-linear-gradient(center top, #f3f6f8 0%, #dce2e5 100%);
   background-image: -ms-linear-gradient(#f3f6f8, #dce2e5);
@@ -538,7 +537,6 @@ div.hidden {
   display: block;
   -khtml-opacity: 1;
   -moz-opacity: 1;
-  filter: alpha(opacity=1);
   opacity: 1;
 }
 .v1 .listing > li .admin-controls li {
@@ -557,7 +555,7 @@ div.hidden {
 }
 .v1 .listing > li .admin-controls li a:hover {
   color: #486f87;
-  background-color: #7f7f7f;
+  background: #f3f6f8;
   background-image: -moz-gradient(center top, #f3f6f8 0%, #b7c3c9 100%);
   background-image: -moz-linear-gradient(center top, #f3f6f8 0%, #b7c3c9 100%);
   background-image: -ms-linear-gradient(#f3f6f8, #b7c3c9);
@@ -582,13 +580,16 @@ div.hidden {
 .v1 .listing > li .admin-controls:hover {
   -khtml-opacity: 1;
   -moz-opacity: 1;
-  filter: alpha(opacity=1);
   opacity: 1;
+  display: block;
 }
 .v1 .listing > li .admin-controls form {
   padding: 0;
 }
 .v1 .listing > li:hover .admin-controls {
+  -khtml-opacity: 1;
+  -moz-opacity: 1;
+  opacity: 1;
   display: block;
 }
 .v1 .listing > li .assignee-choice {
@@ -683,7 +684,7 @@ div.hidden {
   -moz-box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.35);
   -webkit-box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.35);
   box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.35);
-  background-color: #577d7f;
+  background: #678ca3;
   background-image: -moz-gradient(center top, #678ca3 0%, #486f87 100%);
   background-image: -moz-linear-gradient(center top, #678ca3 0%, #486f87 100%);
   background-image: -ms-linear-gradient(#678ca3, #486f87);
@@ -730,9 +731,13 @@ div.hidden {
 }
 
 .v1 .listing.messages > li {
-  opacity: .5;
+  -khtml-opacity: 0.5;
+  -moz-opacity: 0.5;
+  opacity: 0.5;
 }
 .v1 .listing.messages > li.unread {
+  -khtml-opacity: 1;
+  -moz-opacity: 1;
   opacity: 1;
 }
 .v1 .listing.messages > li p a {
@@ -1299,7 +1304,9 @@ body#teams div.edit-team-video form fieldset a {
   float: left;
 }
 .v1 .view.new-message form div.disabled {
-  opacity: .3;
+  -khtml-opacity: 0.3;
+  -moz-opacity: 0.3;
+  opacity: 0.3;
 }
 
 /* Video view */
@@ -1540,7 +1547,7 @@ ol.subtitles li .quiet {
   -webkit-border-radius: 3px;
   background-clip: padding-box;
   border-radius: 3px;
-  background-color: #7f7f7f;
+  background: white;
   background-image: -moz-gradient(center top, white 0%, #eeeeee 100%);
   background-image: -moz-linear-gradient(center top, white 0%, #eeeeee 100%);
   background-image: -ms-linear-gradient(white, #eeeeee);
@@ -1613,7 +1620,7 @@ ol.subtitles li .quiet {
   border-bottom-right-radius: 3px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
-  background-color: #7f7f7f;
+  background: white;
   background-image: -moz-gradient(center top, white 0%, #f3f6f8 100%);
   background-image: -moz-linear-gradient(center top, white 0%, #f3f6f8 100%);
   background-image: -ms-linear-gradient(white, #f3f6f8);
@@ -1903,14 +1910,26 @@ pre.dump code {
   padding-top: 2em;
 }
 
-#teams .context #signin-join {
+#teams .context .join.button {
   display: block;
   margin: 1em;
+}
+#teams .context .join.button img {
+  max-height: 24px;
+  margin-left: 4px;
+}
+#teams .context .join.button * {
+  vertical-align: middle;
 }
 
 #teams .context .notation {
   clear: both;
-  padding-top: 2em;
+  padding-top: 4em;
+}
+
+#teams .context .join .notation {
+  padding-top: 0;
+  margin: -0.5em 1.5em 0;
 }
 
 #teams .context .notation.policy {

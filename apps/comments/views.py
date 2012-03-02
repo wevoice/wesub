@@ -24,7 +24,7 @@ from models import Comment
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from apps.comments.notifications import notify_comment_by_email
+from messages.tasks import send_video_comment_notification
 
 @login_required
 def post(request):
@@ -33,7 +33,7 @@ def post(request):
     if form.is_valid():
         obj = form.save(request.user)
         output['success'] = True
-        notify_comment_by_email(obj)
+        send_video_comment_notification(obj.pk)
     else:
         output['errors'] = form.get_errors()
         

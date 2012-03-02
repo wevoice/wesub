@@ -264,7 +264,7 @@ class Video(models.Model):
         if self.thumbnail:
             return self.thumbnail
 
-        return ''
+        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
     def get_small_thumbnail(self):
         """Return a URL to a small version of this video's thumbnail, or '' if there isn't one.
@@ -278,8 +278,22 @@ class Video(models.Model):
 
         if self.small_thumbnail:
             return self.small_thumbnail
+        return "%simages/video-no-thumbnail-small.png" % settings.STATIC_URL
 
-        return ''
+    def get_medium_thumbnail(self):
+        """Return a URL to a medium version of this video's thumbnail, or '' if there isn't one.
+
+        This may be an absolute or relative URL, depending on whether the
+        thumbnail is stored in our media folder or on S3.
+
+        """
+        if self.s3_thumbnail:
+            return self.s3_thumbnail.thumb_url(290, 165)
+
+        if self.thumbnail:
+            return self.thumbnail
+
+        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
     @models.permalink
     def video_link(self):

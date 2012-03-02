@@ -23,7 +23,7 @@ class java::package_debian(
   file { "/var/local/sun-java6.preseed":
     content => template("${module_name}/sun-java6.preseed"),
   }
-  package { 'java':
+  package { 'openjdk-6-jre':
     ensure => $version,
     name   => $distribution,
     responsefile => "/var/local/sun-java6.preseed",

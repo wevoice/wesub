@@ -5,8 +5,8 @@ Hi {{ user }},
 {% if custom_message %}
 {{ custom_message.data }}
 {% endif %}
-{% if invite.note %}
-        {{ invite.note }}
+{% if note %}
+        {{ note }}
 {% endif %}
 
 

@@ -22,15 +22,19 @@ goog.provide('unisubs.subtitle.TranscribeRightPanel');
 * @extends unisubs.RightPanel
 */
 unisubs.subtitle.TranscribeRightPanel = function(serverModel,
-                                                  helpContents,
-                                                  extraHelp,
-                                                  legendKeySpecs,
-                                                  showRestart,
-                                                  doneStrongText,
-                                                  doneText) {
+                                                 helpContents,
+                                                 extraHelp,
+                                                 legendKeySpecs,
+                                                 showRestart,
+                                                 doneStrongText,
+                                                 doneText,
+                                                 isReviewOrApproval,
+                                                 bodyInput) {
     unisubs.RightPanel.call(this, serverModel, helpContents, extraHelp,
                              legendKeySpecs,
                              showRestart, doneStrongText, doneText);
+    
+    this.isReviewOrApproval_ = isReviewOrApproval;
 };
 goog.inherits(unisubs.subtitle.TranscribeRightPanel, unisubs.RightPanel);
 
@@ -49,6 +53,9 @@ unisubs.subtitle.TranscribeRightPanel.prototype.playModeText_ = function(playMod
 unisubs.subtitle.TranscribeRightPanel.prototype.appendLegendContentsInternal =
     function($d, legendDiv)
 {
+    if(this.isReviewOrApproval_){
+        return;
+    }
     unisubs.subtitle.TranscribeRightPanel.superClass_
         .appendLegendContentsInternal.call(this, $d, legendDiv);
     this.playModeSelect_ = $d('select');
@@ -76,6 +83,9 @@ unisubs.subtitle.TranscribeRightPanel.prototype.appendLegendContentsInternal =
 
 unisubs.subtitle.TranscribeRightPanel.prototype.enterDocument = function() {
     unisubs.subtitle.TranscribeRightPanel.superClass_.enterDocument.call(this);
+    if(this.isReviewOrApproval_){
+        return;
+    }
     this.getHandler().listen(this.playModeSelect_,
                              goog.events.EventType.CHANGE,
                              this.playModeChanged_);

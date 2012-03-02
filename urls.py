@@ -87,7 +87,6 @@ urlpatterns = patterns(
     (r'statistic/', include('statistic.urls', namespace='statistic')),
     (r'streamer/', include('streamer.urls', namespace='streamer')),
     url(r'^search/', include('search.urls', 'search')),
-    url(r'^email-testing/', include('emails_example.urls', 'emails_example')),
     url(r'^counter/$', 'videos.views.counter', name="counter"),
     url(r'^uslogging/', include('uslogging.urls', 'uslogging')),
     url(r'^services/$', 'django.views.generic.simple.direct_to_template',

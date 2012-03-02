@@ -15,9 +15,6 @@
 
     <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
     {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
-    <script src="{{ STATIC_URL }}js/jquery.tabs.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/unisubs.modal.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/unisubs.abbr.js" type="text/javascript"></script>
     <script type="text/javascript">
         //create url template
         var DIFFING_URL = function() {
@@ -348,12 +345,8 @@
                                         {% trans 'This version only' %}
                                     </label>
                                     <label class="radio">
-                                        <input type="radio" name="scope" value="language">
-                                        {% trans 'All versions for this language' %}
-                                    </label>
-                                    <label class="radio">
                                         <input type="radio" name="scope" value="dependents">
-                                        {% trans 'This language and all dependent languages' %}
+                                        {% trans 'This entire language and all dependent languages' %}
                                     </label>
                                 </fieldset>
 

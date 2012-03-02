@@ -16,7 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from teams.models import TeamVideo, TeamVideoLanguage
+from teams.models import TeamVideo
 from datetime import datetime
 
 def update_metadata(video_pk):
@@ -34,7 +34,6 @@ def update_metadata(video_pk):
     _update_languages_count(video)
     _update_complete_date(video)
     _invalidate_cache(video)
-    _recalculate_team_detail_metadata(video)
 
 def _update_forked(video):
     for sl in video.subtitlelanguage_set.all():
@@ -160,12 +159,6 @@ def _update_complete_date(video):
 def _invalidate_cache(video):
     from widget import video_cache
     video_cache.invalidate_cache(video.video_id)
-
-def _recalculate_team_detail_metadata(video):
-    team_videos = TeamVideo.objects.filter(video=video)
-    for team_video in team_videos:
-        team_video.update_team_video_language_pairs()
-        TeamVideoLanguage.update(team_video)
 
 
 def _update_is_public(video):

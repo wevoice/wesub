@@ -26,20 +26,32 @@ goog.provide('unisubs.editmetadata.RightPanel');
 unisubs.editmetadata.RightPanel = function(dialog, 
                                            serverModel, 
                                            helpContents, 
+                                           extraHelp,
                                            legendKeySpecs, 
                                            showRestart, 
                                            doneStrongText, 
-                                           doneText) {
-    unisubs.RightPanel.call(this, serverModel, helpContents, null,
+                                           doneText, 
+                                           reviewOrApprovalType,
+                                           notesInput,
+                                           inSubtitlingDialog
+                                          ) {
+    unisubs.RightPanel.call(this,  serverModel, helpContents, extraHelp,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
-    this.showSaveExit = false;
+    this.showSaveExit = true;
     this.showDoneButton = true;
+    if (reviewOrApprovalType ){
+        this.showDoneButton = false;
+    }    
     this.helpContents = helpContents;
     // TODO: See if there's a way to avoid the circular reference here.
     this.dialog_ = dialog;
+    this.reviewOrApprovalType_ = reviewOrApprovalType;
+    this.inSubtitlingDialog_ = inSubtitlingDialog;
+    this.notesInput_ = notesInput;
 };
 goog.inherits(unisubs.editmetadata.RightPanel, unisubs.RightPanel);
+
 
 unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function($d, el) {
     var helpHeadingDiv = $d('div', 'unisubs-help-heading');
@@ -68,12 +80,84 @@ unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function(
         div.innerHTML = this.helpContents_.html;
         el.appendChild(div);
     }
-    else
+    else{
         goog.array.forEach(this.helpContents_.paragraphs, function(p) {
             el.appendChild($d('p', null, p));
         });
+    }
+    
+    // FIXME : check if not needed when not in review mode
+    if (false && this.showDoneButton){
+        
+        var stepsDiv = $d('div', 'unisubs-steps', this.loginDiv_);
+        this.doneAnchor_ = this.createDoneAnchor_($d);
+        stepsDiv.appendChild(this.doneAnchor_);
+        el.appendChild(stepsDiv);
+        
+        this.getHandler().listen(this.doneAnchor_, 'click', this.doneClicked_);
+    }
+};
+
+// FIXME: remove duplication from the subtitle.reviewpanel
+unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
+    if (e){
+        e.preventDefault();
+    }
+    var dialog = this.dialog_;
+    var that = this;
+    
+    var actionName = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ? 
+        'approve' : 'review';
+    var successCallback = function(serverMsg) {
+        unisubs.subtitle.OnSavedDialog.show(serverMsg, function() {
+            dialog.onWorkSaved(true);
+        }, actionName);
+    };
+
+    var failureCallback = function(opt_status) {
+        if (dialog.finishFailDialog_) {
+            dialog.finishFailDialog_.failedAgain(opt_status);
+        } else {
+            dialog.finishFailDialog_ = unisubs.finishfaildialog.Dialog.show(
+                that.serverModel_.getCaptionSet(), opt_status,
+                goog.bind(dialog.saveWorkInternal, dialog, false));
+        }
+    };
+
+    // set the servel models vars to finishe this, the taskId and taskType were
+    // set when retrieving the task data
+    this.serverModel_.setTaskNotes(goog.dom.forms.getValue(this.notesInput_));
+    this.serverModel_.setTaskApproved(approvalCode)
+    this.serverModel_.finish(successCallback, failureCallback);
+
+};
+
+unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
+    if (!this.reviewOrApprovalType_ ){
+        // for the subtitling dialog, we need the button to advance to the next painel
+        return;
+    }
+    this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
+    this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
+    var buttonText = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ? 
+        'Approve' : 'Accept';
+    this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, buttonText);
+
+    el.appendChild(this.sendBackButton_);
+    el.appendChild(this.saveForLaterButton_);
+    el.appendChild(this.approveButton_);
+
+    var handler = this.getHandler();
+    var that = this;
+    handler.listen(this.sendBackButton_, 'click', function(e){
+        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SEND_BACK);
+    });
+    handler.listen(this.saveForLaterButton_, 'click', function(e){
+        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SAVE_FOR_LATER);
+    });
+    handler.listen(this.approveButton_, 'click', function(e){
+        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED);
+    });
 };
 
 
-unisubs.editmetadata.RightPanel.prototype.finish = function(approved) {
-};

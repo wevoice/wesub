@@ -3,7 +3,7 @@
 {% load i18n utils_tags query_string teams_tags paginator profiles_tags markup media_compressor %}
 
 {% block title %}
-    {{ team }} | Universal Subtitles
+    {% trans 'Videos' %} - {{ team }} | Universal Subtitles
 {% endblock %}
 
 {% block css %}
@@ -19,8 +19,6 @@
     {% include_bundle "unisubs-onsite-compiled" %}
 
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/unisubs.filters.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/unisubs.modal.js" type="text/javascript"></script>
 
     <script type="text/javascript">
         var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
@@ -52,13 +50,16 @@
                 }
             });
 
+            // Handle weird back-button issue with browsers.
+            $select = $('select#lang-filter');
             {% if request.GET.lang %}
-                $select = $('select#lang-filter');
                 $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
-                $select.children().removeAttr('selected');
-                $opt.attr('selected', 'selected');
-                $select.trigger('liszt:updated');
+            {% else %}
+                $opt = $('option[id="lang-opt-any"]');
             {% endif %}
+            $select.children().removeAttr('selected');
+            $opt.attr('selected', 'selected');
+            $select.trigger('liszt:updated');
         });
     </script>
 {% endblock %}
@@ -91,13 +92,15 @@
         <div class="filters group {% if filtered or request.GET.sort %}active{% endif %}">
             <p>
                 <div class="filter-chunk">
-                    <span class="inner">{% trans 'Videos with subtitles in' %}</span>
+                    <span class="inner">{% trans 'Videos with' %}</span>
                     <select name="lang-filter" id="lang-filter">
-                        <option value="{{ request.path }}{% query_string request.GET lang='' page='' %}">{% trans 'all languages' %}</option>
+                        <option value="{{ request.path }}{% query_string request.GET lang='' page='' %}" id="lang-opt-any">{% trans 'any' %}</option>
+                        <option value="{{ request.path }}{% query_string request.GET lang='none' page='' %}" id="lang-opt-none">{% trans 'no' %}</option>
                         {% for code, name in language_choices %}
                             <option id="lang-opt-{{ code }}" {% if request.GET.lang == code %}selected="selected"{% endif %} value="{% query_string request.GET lang=code page='' %}">{{ name }}</option>
                         {% endfor %}
                     </select>
+                    <span>{% trans 'subtitles' %}</span>
                 </div>
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'sorted by' %}</span>
@@ -115,10 +118,10 @@
                             {% trans 'time, oldest' %}
                         </option>
                         <option {% if request.GET.sort == '-subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-subs' page='' %}">
-                            {% trans 'subtitles, most' %}
+                            {% trans 'most subtitles' %}
                         </option>
                         <option {% if request.GET.sort == 'subs' %}selected="selected"{% endif %} value="{% query_string request.GET sort='subs' page='' %}">
-                            {% trans 'subtitles, least' %}
+                            {% trans 'least subtitles' %}
                         </option>
                     </select>
                 </div>

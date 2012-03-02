@@ -8,14 +8,16 @@
 <h2 class="main-title">
     <a href="" title="permalink">{{ project }}</a>
 </h2>
-<div id="description"{% if project.description|length > 300 %} class="abbr collapsed"{% endif %}>
-    <div>
-        {{ project.description|urlize|linebreaks }}
+{% if project.description %}
+    <div id="description"{% if project.description|length > 300 %} class="abbr collapsed"{% endif %}>
+        <div>
+            {{ project.description|urlize|linebreaks }}
+        </div>
+        {% if project.description|length > 300 %}
+            <a class="expand" href="#">{% trans 'Show all' %} ↓</a>
+        {% endif %}
     </div>
-    {% if project.description|length > 300 %}
-        <a class="expand" href="#">{% trans 'Show all' %} ↓</a>
-    {% endif %}
-</div>
+{% endif %}
 <ul class="metrics">
     <li>
         <div>
