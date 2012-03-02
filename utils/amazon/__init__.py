@@ -12,13 +12,15 @@
 import os
 from StringIO import StringIO
 
-from boto.exception import BotoClientError, BotoServerError
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
+from boto.exception import BotoClientError, BotoServerError
 from django.conf import settings
-from django.core.files import File
 from django.core.files.storage import FileSystemStorage
+from django.core.files import File
 from sentry.client.models import client
+
+from fields import S3EnabledImageField, S3EnabledFileField
 
 
 __all__ = ['S3EnabledImageField', 'S3EnabledFileField', 'S3Storage']
