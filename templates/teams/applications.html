@@ -6,8 +6,9 @@
     {{ team }} {% trans 'Team Aplications' %} | Universal Subtitles
 {% endblock %}
 
+{% block html_attrs %}id="team_applications"{% endblock %}
+
 {% block scripts %}
-    {% include "utils/chosenify.html" %}
     <script type="text/javascript">
         $(function() {
             $select = $("select#lang-filter, select#role-filter", ".tools");

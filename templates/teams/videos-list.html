@@ -15,7 +15,6 @@
 
 {% block scripts %}
     {{ block.super }}
-    {% include "utils/chosenify.html" %}
     {% include_bundle "unisubs-onsite-compiled" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">

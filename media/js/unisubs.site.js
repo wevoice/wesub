@@ -20,6 +20,28 @@ var Site = function(Site) {
 
     };
     this.Utils = {
+        chosenify: function() {
+            $('select', '.v1 .content').filter(function() {
+                return !$(this).parents('div').hasClass('ajaxChosen');
+            }).chosen().change(function() {
+                $select = $(this);
+
+                // New message
+                if ($('body').hasClass('new-message')) {
+                    $option = $('option:selected', $select);
+
+                    if ($select.attr('id') === 'id_team') {
+                        if ($option.val() !== '') {
+                            $('div.recipient, div.or').addClass('disabled');
+                            $('select#id_user').attr('disabled', 'disabled').trigger('liszt:updated');
+                        } else {
+                            $('div.recipient, div.or').removeClass('disabled');
+                            $('select#id_user').removeAttr('disabled').trigger('liszt:updated');
+                        }
+                    }
+                }
+            });
+        },
         resetLangFilter: function($select) {
             if (typeof $select == 'undefined') {
                 $select = $('select#lang-filter');
@@ -175,8 +197,61 @@ var Site = function(Site) {
             window.addCSRFHeader = addCSRFHeader;
             addCSRFHeader($);
         },
+
+        // Public
+        video_view: function() {
+            $('.add_subtitles').click(function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
+                return false;
+            });
+            $('.add-translation-behavior').click(function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
+                return false;
+            });
+            $('.edit-title').click( function() {
+                $('#edit-title-dialog .title-input').val($('.title-container').html());
+            });
+            $('#edit-title-dialog .save-title').click(function() {
+                var title = $('#edit-title-dialog .title-input').val();
+                if (title) {
+                    $('.title-container').html(title).hide().fadeIn();
+                    VideosApi.change_title_video(window.VIDEO_ID, title, function(response) {
+                        if (response.error) {
+                            $.jGrowl.error(response.error);
+                        } else {
+                            $('.title-container').html(title);
+                            document.title = title + ' | Universal Subtitles';
+                        }
+                    });
+                    $('#edit-title-dialog').modClose();
+                } else {
+                    $.jGrowl.error(window.TITLE_ERROR);
+                }
+            });
+            if (window.TASK) {
+                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
+                var opener = new unisubs.widget.SubtitleDialogOpener(
+                                     window.TASK_TEAM_VIDEO_ID,
+                                     window.TASK_TEAM_VIDEO_URL,
+                                     videoSource,
+                                     null,
+                                     null);
+                opener.showStartDialog();
+            }
+
+            $('.tabs').tabs();
+            unisubs.messaging.simplemessage.displayPendingMessages();
+        },
+
+        // Teams
+        team_applications: function() {
+            that.Utils.chosenify();
+        },
         team_members_list: function() {
             that.Utils.resetLangFilter();
+            that.Utils.chosenify();
         },
         team_tasks: function() {
             $('a.action-assign').click(function(e) {
@@ -263,6 +338,7 @@ var Site = function(Site) {
 
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             that.Utils.resetLangFilter($('select#id_task_language'));
+            that.Utils.chosenify();
         },
         team_videos_list: function() {
             $form = $('form', 'div#remove-modal');
@@ -291,50 +367,7 @@ var Site = function(Site) {
             });
 
             that.Utils.resetLangFilter();
-        },
-        video_view: function() {
-            $('.add_subtitles').click(function() {
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
-                return false;
-            });
-            $('.add-translation-behavior').click(function() {
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
-                return false;
-            });
-            $('.edit-title').click( function() {
-                $('#edit-title-dialog .title-input').val($('.title-container').html());
-            });
-            $('#edit-title-dialog .save-title').click(function() {
-                var title = $('#edit-title-dialog .title-input').val();
-                if (title) {
-                    $('.title-container').html(title).hide().fadeIn();
-                    VideosApi.change_title_video(window.VIDEO_ID, title, function(response) {
-                        if (response.error) {
-                            $.jGrowl.error(response.error);
-                        } else {
-                            $('.title-container').html(title);
-                            document.title = title + ' | Universal Subtitles';
-                        }
-                    });
-                    $('#edit-title-dialog').modClose();
-                } else {
-                    $.jGrowl.error(window.TITLE_ERROR);
-                }
-            });
-            if (window.TASK) {
-                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
-                var opener = new unisubs.widget.SubtitleDialogOpener(
-                                     window.TASK_TEAM_VIDEO_ID,
-                                     window.TASK_TEAM_VIDEO_URL,
-                                     videoSource,
-                                     null,
-                                     null);
-                opener.showStartDialog();
-            }
-            $('.tabs').tabs();
-            unisubs.messaging.simplemessage.displayPendingMessages();
+            that.Utils.chosenify();
         }
     };
 };

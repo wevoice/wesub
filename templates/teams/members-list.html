@@ -16,7 +16,6 @@
 {% endblock %}
 
 {% block scripts %}
-    {% include "utils/chosenify.html" %}
     {{ block.super }}
     {% if assignable_roles %}
         {% include_bundle "js-teams" %}
