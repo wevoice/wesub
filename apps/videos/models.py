@@ -877,7 +877,7 @@ class SubtitleLanguage(models.Model):
         if self.is_dependent():
             if self.percent_done != 100:
                 return False
-            standard_lang = self.real_standard_language()
+            standard_lang = self.standard_language
             if not standard_lang or not standard_lang.is_complete:
                 return False
         subtitles = self.latest_subtitles(public_only=public_only)
@@ -908,7 +908,7 @@ class SubtitleLanguage(models.Model):
 
     def is_dependable(self):
         if self.is_dependent():
-            dep_lang = self.real_standard_language()
+            dep_lang = self.standard_language
             return dep_lang and dep_lang.is_complete and self.percent_done > 10
         else:
             return self.is_complete
@@ -1085,7 +1085,7 @@ class SubtitleLanguage(models.Model):
             return None
 
         translation_count = self.nonblank_subtitle_count(public_only=False)
-        real_standard_language = self.real_standard_language()
+        real_standard_language = self.standard_language
 
         if real_standard_language:
             subtitle_count = real_standard_language.nonblank_subtitle_count(public_only=True)
@@ -1326,7 +1326,7 @@ class SubtitleVersion(SubtitleCollection):
         return self.language.video;
 
     def _get_standard_collection(self, public_only=True):
-        standard_language = self.language.real_standard_language()
+        standard_language = self.language.standard_language
         if standard_language:
             return standard_language.latest_version(public_only=public_only)
 
