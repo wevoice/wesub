@@ -1,18 +1,15 @@
-try:
-    import json as json
-except ImportError:    
-    import simplejson as json
-import time
-import datetime
+import datetime, time
+import json
+import logging
 
-from django.db import models
-from django.core.serializers.json import DateTimeAwareJSONEncoder
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
-from django.utils.functional import Promise, wraps
-from django.utils.encoding import force_unicode
+from django.core.serializers.json import DateTimeAwareJSONEncoder
+from django.db import models
 from django.http import HttpResponse
-import logging
+from django.utils.encoding import force_unicode
+from django.utils.functional import Promise, wraps
+
 
 class LazyEncoder(DateTimeAwareJSONEncoder):
     def default(self, obj):
@@ -34,10 +31,8 @@ def _json_response(data, response=None):
     """
 
     final_data = {}
-    suc = True
     final_data['data'] = data
     final_data['success'] = False
-    suc = False
     errors = None
     if isinstance(data, dict):
         errors = data.pop('errors', None)
@@ -62,21 +57,22 @@ def to_json(view):
             if isinstance(res, HttpResponse):
                 res = res.content
             return _json_response(res, response)
-        except SuspiciousOperation, exception:
+        except SuspiciousOperation:
             return _json_errors("Forbiden")
-        except Exception, exception:
+        except Exception:
             logging.exception("Error on view %s" % view.__name__)
             if True or  settings.DEBUG:
                 import sys, traceback
                 (exc_type, exc_info, tb) = sys.exc_info()
                 message = "%s\n" % exc_type.__name__
                 message += "%s\n\n" % exc_info
-                message += "TRACEBACK:\n"    
+                message += "TRACEBACK:\n"
                 for tb in traceback.format_tb(tb):
                     message += "%s\n" % tb
             else:
                 message = "something is wrong"
             return _json_errors([message])
+
     return wraps(view)(wrapper)
 
 def post_required(view):
@@ -84,4 +80,6 @@ def post_required(view):
         if request.method != 'POST':
             return {'errors':['POST REQUIRED']}
         return view(request, *args, **kwargs)
+
     return wraps(view)(wrapper)
+
