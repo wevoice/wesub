@@ -24,7 +24,7 @@
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         window.roleSavedURL = '{% url teams:role_saved team.slug %}';
-        window.request_get_lang = '{{ request.GET.lang }}';
+        window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
     </script>
 {% endblock %}
 

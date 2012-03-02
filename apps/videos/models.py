@@ -295,9 +295,6 @@ class Video(models.Model):
 
         return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
-    @models.permalink
-    def video_link(self):
-        return ('videos:history', [self.video_id])
 
     def get_team_video(self):
         """Return the TeamVideo object for this video, or None if there isn't one."""
@@ -344,7 +341,7 @@ class Video(models.Model):
                           .replace('#', '-')
                           .replace('&', '-'))
 
-    def _get_absolute_url(self, locale=None, video_id=None):
+    def _get_absolute_url(self,  video_id=None):
         """
         NOTE: this method is used in videos.search_indexes.VideoSearchResult
         to prevent duplication of code in search result and in DB-query result

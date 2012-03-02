@@ -1,5 +1,7 @@
 var Site = function(Site) {
 
+    var that = this;
+
     this.init = function() {
 
         // Global cached jQuery objects
@@ -18,10 +20,12 @@ var Site = function(Site) {
 
     };
     this.Utils = {
-        resetLangFilter: function() {
-            $select = $('select#lang-filter');
-            if (window.request_get_lang) {
-                $opt = $('option[id="lang-opt-' + window.request_get_lang + '"]');
+        resetLangFilter: function($select) {
+            if (typeof $select == 'undefined') {
+                $select = $('select#lang-filter');
+            }
+            if (window.REQUEST_GET_LANG) {
+                $opt = $('option[id="lang-opt-' + window.REQUEST_GET_LANG + '"]');
             } else {
                 $opt = $('option[id="lang-opt-any"]');
             }
@@ -171,16 +175,10 @@ var Site = function(Site) {
             window.addCSRFHeader = addCSRFHeader;
             addCSRFHeader($);
         },
-        home: function() {
-
-        },
         members_list: function() {
-            // This calls the obj instance and probably shouldn't.
-            site.Utils.resetLangFilter();
+            that.Utils.resetLangFilter();
         },
         video_view: function() {
-            $('.tabs').tabs();
-
             $('.add_subtitles').click(function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
@@ -222,9 +220,94 @@ var Site = function(Site) {
                 opener.showStartDialog();
             }
 
+            $('.tabs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
         tasks: function() {
+            $('a.action-assign').click(function(e) {
+
+                $('div.assignee-choice').hide();
+
+                $form = $(e.target).parents('.admin-controls').siblings('form.assign-form');
+
+                $assignee_choice = $form.children('div.assignee-choice');
+                $assignee_choice.fadeIn('fast');
+
+                if (!window.begin_typing_trans) {
+                    window.begin_typing_trans = $('option.begin-typing-trans').eq(0).text();
+                }
+                $select = $form.find('select');
+                $select.children('option').remove();
+                $select.append('<option value="">-----</option>');
+                $select.append('<option value="">' + window.begin_typing_trans + '</option>');
+                $select.trigger('liszt:updated');
+
+                $chzn_container = $assignee_choice.find('.chzn-container');
+                $chzn_container.css('width', '100%');
+
+                $chzn_drop = $chzn_container.find('.chzn-drop');
+                $chzn_drop.css('width', '99%');
+
+                $chzn_input = $chzn_drop.find('input');
+                $chzn_input.css('width', '82%');
+
+                return false;
+            });
+            $('.assignee-choice a.cancel').click(function(e) {
+                $(e.target).parents('.assignee-choice').fadeOut('fast');
+                return false;
+            });
+            $('a.action-assign-submit').click(function(e) {
+                $(e.target).closest('form').submit();
+                return false;
+            });
+            $('a.assign-and-perform').click(function(e) {
+                var $target = $(e.target);
+                $target.text('Loading...');
+
+                $.ajax({
+                    url: window.ASSIGN_TASK_AJAX_URL,
+                    type: 'POST',
+                    data: {
+                        task: $target.attr('data-id'),
+                        assignee: window.ASSIGNEE
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        $target.hide();
+
+                        $li = $target.parent().siblings('li.hidden-perform-link');
+                        $li.show();
+
+                        $link = $li.children('a.perform');
+                        $link.text('Loading...');
+                        if ($link.attr('href') !== '') {
+                            window.location = $link.attr('href');
+                        } else {
+                            $link.click();
+                        }
+                    }
+                });
+
+                return false;
+            });
+            $('div.member-ajax-chosen select', '.v1 .content').ajaxChosen({
+                method: 'GET',
+                url: '/en/teams/' + window.TEAM_SLUG + '/members/search/',
+                dataType: 'json'
+            }, function (data) {
+                var terms = {};
+                $.each(data.results, function (i, val) {
+                    var can_perform_task = data.results[i][2];
+
+                    if (can_perform_task) {
+                        terms[data.results[i][0]] = data.results[i][1];
+                    }
+                });
+                return terms;
+            });
+
+            unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
+            that.Utils.resetLangFilter($('select#id_task_language'));
         }
     };
 };

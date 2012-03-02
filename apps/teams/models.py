@@ -639,7 +639,7 @@ class TeamVideo(models.Model):
     def link_to_page(self):
         if self.all_languages:
             return self.video.get_absolute_url()
-        return self.video.video_link()
+        return reverse('videos:history', [self.video.video_id])
 
     @models.permalink
     def get_absolute_url(self):
