@@ -453,7 +453,23 @@ def update_web():
         _reload_app_server()
 
 def bounce_memcached():
-=======
+    '''Bounce the memcached server (purging the cache)
+
+    Should be done by the end of each deploy
+
+    '''
+    with Output("Bouncing memcached"):
+        if env.admin_dir:
+            env.host_string = env.admin_host
+        else:
+            env.host_string = DEV_HOST
+        sudo(env.memcached_bounce_cmd, pty=False)
+
+def update_solr_schema():
+    '''Update the Solr schema and rebuild the index.
+
+    The rebuilding will be done asynchronously with screen and an email will
+    be sent when it finishes.
 
     '''
     with Output("Updating Solr schema"):
