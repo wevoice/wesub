@@ -175,7 +175,7 @@ var Site = function(Site) {
             window.addCSRFHeader = addCSRFHeader;
             addCSRFHeader($);
         },
-        members_list: function() {
+        team_members_list: function() {
             that.Utils.resetLangFilter();
         },
         video_view: function() {
@@ -223,7 +223,7 @@ var Site = function(Site) {
             $('.tabs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
-        tasks: function() {
+        team_tasks: function() {
             $('a.action-assign').click(function(e) {
 
                 $('div.assignee-choice').hide();
@@ -308,6 +308,34 @@ var Site = function(Site) {
 
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             that.Utils.resetLangFilter($('select#id_task_language'));
+        },
+        team_videos_list: function() {
+            $form = $('form', 'div#remove-modal');
+
+            $('a.remove-video').click(function() {
+                $form.attr('action', $(this).siblings('form').attr('action'));
+            });
+            $form.submit(function() {
+                var $checked = $('input[name="del-opt"]:checked', 'div#remove-modal');
+                if ($checked.val() == 'total-destruction') {
+                    $form.attr('action', $form.attr('action').replace('remove', 'delete'));
+                    if (confirm('Are you sure you want to permanently delete this video? This action is irreversible.')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                } else {
+                    if (confirm('All open tasks for this video will be aborted, and in-progress subtitles will be published. Do you want to proceed?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            });
+
+            that.Utils.resetLangFilter();
         }
     };
 };
