@@ -229,6 +229,10 @@ unisubs.subtitle.MSServerModel.prototype.finish =
         true);
 };
 
+unisubs.subtitle.MSServerModel.prototype.setComplete = function(isComplete){
+    this.captionSet_.completed = isComplete;
+}
+
 unisubs.subtitle.MSServerModel.prototype.fetchReviewData = function(taskId, successCallback) {
     var that = this;
     unisubs.Rpc.call(
