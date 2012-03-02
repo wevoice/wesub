@@ -1108,7 +1108,7 @@ models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=Subt
 
 
 # SubtitleCollection
-# (parent class of SubtitleVersion and SubtitleDraft)
+# (parent class of SubtitleVersion 
 class SubtitleCollection(models.Model):
     is_forked=models.BooleanField(default=False)
     # should not be changed directly, but using teams.moderation. as those will take care
@@ -1540,42 +1540,6 @@ def has_viewable_draft(version, user):
     return user.pk in users
 
 
-# SubtitleDraft
-class SubtitleDraft(SubtitleCollection):
-    language = models.ForeignKey(SubtitleLanguage)
-    # null iff there is no SubtitleVersion yet.
-    parent_version = models.ForeignKey(SubtitleVersion, null=True)
-    datetime_started = models.DateTimeField()
-    user = models.ForeignKey(User, null=True)
-    browser_id = models.CharField(max_length=128, blank=True)
-    title = models.CharField(max_length=2048, blank=True)
-    last_saved_packet = models.PositiveIntegerField(default=0)
-
-    @property
-    def version_no(self):
-        return 0 if self.parent_version is None else \
-            self.parent_version.version_no + 1
-
-    @property
-    def video(self):
-        return self.language.video
-
-    def _get_standard_collection(self, public_only=True):
-        if self.language.standard_language:
-            return self.language.standard_language.latest_version(public_only=public_only)
-        else:
-            return self.language.video.latest_version(public_only=public_only)
-
-    def is_dependent(self):
-        return not self.language.is_original and not self.is_forked
-
-    def matches_request(self, request):
-        if request.user.is_authenticated() and self.user and \
-                self.user.pk == request.user.pk:
-            return True
-        else:
-            return request.browser_id == self.browser_id
-
 
 # Subtitle
 class SubtitleManager(models.Manager):
@@ -1585,7 +1549,6 @@ class SubtitleManager(models.Manager):
 
 class Subtitle(models.Model):
     version = models.ForeignKey(SubtitleVersion, null=True)
-    draft = models.ForeignKey(SubtitleDraft, null=True)
     subtitle_id = models.CharField(max_length=32, blank=True)
     subtitle_order = models.FloatField(null=True)
     subtitle_text = models.CharField(max_length=1024, blank=True)
@@ -1599,15 +1562,14 @@ class Subtitle(models.Model):
 
     class Meta:
         ordering = ['subtitle_order']
-        unique_together = (('version', 'subtitle_id'), ('draft', 'subtitle_id'),)
+        unique_together = (('version', 'subtitle_id'),)
 
     @property
     def is_synced(self):
         return is_synced(self)
 
-    def duplicate_for(self, version=None, draft=None):
+    def duplicate_for(self, version=None):
         return Subtitle(version=version,
-                        draft=draft,
                         start_of_paragraph = self.start_of_paragraph,
                         subtitle_id=self.subtitle_id,
                         subtitle_order=self.subtitle_order,
