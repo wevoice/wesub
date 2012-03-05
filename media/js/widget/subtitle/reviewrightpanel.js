@@ -1,6 +1,6 @@
 // Universal Subtitles, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -30,8 +30,7 @@ unisubs.subtitle.ReviewRightPanel = function(dialog,
                                              doneStrongText,
                                              doneText,
                                              reviewOrApprovalType,
-                                             notesInput_
-                                            ) {
+                                             notesInput_) {
     unisubs.RightPanel.call(this, serverModel, helpContents, extraHelp,
                              legendKeySpecs,
                              showRestart, doneStrongText, doneText);
@@ -59,7 +58,7 @@ unisubs.subtitle.ReviewRightPanel.prototype.finish = function(e, approvalCode) {
     }
     var dialog = this.dialog_;
     var that = this;
-    var actionName = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ? 
+    var actionName = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ?
         'approve' : 'review';
     var successCallback = function(serverMsg) {
         unisubs.subtitle.OnSavedDialog.show(serverMsg, function() {
@@ -79,22 +78,20 @@ unisubs.subtitle.ReviewRightPanel.prototype.finish = function(e, approvalCode) {
     var onCompletedCallback = function( isComplete){
         this.serverModel_.setComplete(isComplete);
         this.serverModel_.finish(successCallback, failureCallback);
-    }
+    };
     // set the servel models vars to finishe this, the taskId and taskType were
     // set when retrieving the task data
     this.serverModel_.setTaskNotes(goog.dom.forms.getValue(this.notesInput_));
-    this.serverModel_.setTaskApproved(approvalCode)
+    this.serverModel_.setTaskApproved(approvalCode);
     // if approving and on original subs, we should prompt the user if the subs
     // are completed
     if (approvalCode == unisubs.Dialog.MODERATION_OUTCOMES.APPROVED &&
-        this.inSubtitlingDialog_
-       ){
-        // we default to true, since the review is approving, most likely it 
+        this.inSubtitlingDialog_) {
+        // we default to true, since the review is approving, most likely it
         // will be complete
         unisubs.subtitle.CompletedDialog.show(
-            true, goog.bind(onCompletedCallback, this));    
-        // 
-    }else{
+            true, goog.bind(onCompletedCallback, this));
+    } else {
         this.serverModel_.finish(successCallback, failureCallback);
     }
 };
@@ -105,24 +102,19 @@ unisubs.subtitle.ReviewRightPanel.prototype.appendCustomButtonsInternal = functi
         // for the subtitling dialog, we need the button to advance to the next painel
         return;
     }
-    var buttonText = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ? 
+    var buttonText = this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL ?
         'Approve' : 'Accept';
 
     this.sendBackButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Send Back');
-    this.saveForLaterButton_ = $d('a', {'class': 'unisubs-done widget-button'}, 'Save for Later');
     this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, buttonText);
 
     el.appendChild(this.sendBackButton_);
-    el.appendChild(this.saveForLaterButton_);
     el.appendChild(this.approveButton_);
 
     var handler = this.getHandler();
     var that = this;
     handler.listen(this.sendBackButton_, 'click', function(e){
         that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SEND_BACK);
-    });
-    handler.listen(this.saveForLaterButton_, 'click', function(e){
-        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SAVE_FOR_LATER);
     });
     handler.listen(this.approveButton_, 'click', function(e){
         that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED);

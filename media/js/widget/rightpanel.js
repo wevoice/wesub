@@ -248,7 +248,7 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
     this.showLoading(false);
     this.doneAnchor_ = this.createDoneAnchor_($d);
     var stepsDiv = $d('div', 'unisubs-steps', this.loginDiv_);
-    
+
 
 
     this.backAnchor_ = this.createBackAnchor_($d, el);
@@ -265,7 +265,7 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
     }
 
     this.downloadLink_ = $d(
-        'a', {'href':'#', 'className':'unisubs-download-subs'}, 
+        'a', {'href':'#', 'className':'unisubs-download-subs'},
         'Download subtitles');
     goog.style.showElement(this.downloadLink_, false);
     goog.dom.append(stepsDiv, this.downloadLink_);
@@ -277,7 +277,7 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
     if (this.showDoneButton) {
         goog.dom.append(stepsDiv, this.doneAnchor_);
         this.getHandler().listen(this.doneAnchor_, 'click', this.doneClicked_);
-    } 
+    }
 
     if (this.showSaveExit) {
         var saveAndExitAnchor = $d(
@@ -424,7 +424,7 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
     // return as a json literal, else the closure compiler will mangle this
     var bodyInput = $d('textarea', {'class': 'unisubs-review-notes', 'id': 'unisubs-review-notes', 'name': 'notes'});
 
-    
+
     var title = isOriginal? "Review subtitles": "Review this translation";
     var helpContents = new unisubs.RightPanel.HelpContents(title, [
         $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
@@ -453,7 +453,7 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
         'helpContents' : helpContents ,
         'extraHelp' :  [
         ]
-    }
+    };
 }
 
 /* Since all panels might use this under approval, we abstract them here.
@@ -462,7 +462,7 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
 */
 unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, currentStep, isOriginal){
     // return as a json literal, else the closure compiler will mangle this
-    
+
     var title = isOriginal? "Approve subtitles": "Approve this translation";
     var bodyInput = $d('textarea', {'class': 'unisubs-approve-notes', 'id': 'unisubs-approve-notes', 'name': 'notes'});
 
@@ -501,7 +501,7 @@ unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, cu
 
 unisubs.RightPanel.createInternalContentsReviewOrApproval = function($d, reviewOrApprovalType, numSteps, currentStep, isOriginal){
     if (reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL.REVIEW){
-        return unisubs.RightPanel.createInternalContentsForReview($d, numSteps, currentStep, isOriginal)
+        return unisubs.RightPanel.createInternalContentsForReview($d, numSteps, currentStep, isOriginal);
     }else if(reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL){
         return unisubs.RightPanel.createInternalContentsForApproval($d, numSteps, currentStep, isOriginal);
     }

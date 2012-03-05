@@ -1,6 +1,6 @@
 // Universal Subtitles, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -48,8 +48,8 @@ unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal =
             'helpContents': new unisubs.RightPanel.HelpContents(
                 "Check your work", [],
                 this.numSteps_, this.currentStep_)
-        }
-        
+        };
+
         internalComponents['helpContents'].html =
         "<p>Watch the video one more time and correct any mistakes in text or timing. Tips for making high quality subtitles:</p>" +
         "<ul>" +
@@ -62,7 +62,7 @@ unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal =
         this.bodyInput_ = internalComponents['bodyInput'];
     }
     return new unisubs.subtitle.ReviewRightPanel(
-        this.dialog_, this.serverModel, internalComponents['helpContents'], 
-        internalComponents['extraHelp'], keySpecs , false, "Done?", 
+        this.dialog_, this.serverModel, internalComponents['helpContents'],
+        internalComponents['extraHelp'], keySpecs , false, "Done?",
         this.nextButtonText_,  this.reviewOrApprovalType_ , this.bodyInput_);
 };
