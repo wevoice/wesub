@@ -183,7 +183,8 @@ unisubs.player.AbstractVideoPlayer.prototype.resumeLoadingInternal = function(pl
  */
 unisubs.player.AbstractVideoPlayer.prototype.setDimensionsKnownInternal = function() {
     this.dimensionsKnown_ = true;
-    unisubs.style.setSize(this.getElement(), this.getVideoSize());
+    var size = this.getVideoSize();
+    unisubs.style.setSize(this.getElement(), size.width, size.height);
     this.dispatchEvent(
         unisubs.player.AbstractVideoPlayer.EventType.DIMENSIONS_KNOWN);
 };
