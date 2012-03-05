@@ -213,7 +213,6 @@ def _check_alarm(version_id):
     except SubtitleVersion.DoesNotExist:
         return
 
-    alarms.check_subtitle_version(version)
     alarms.check_other_languages_changes(version)
     alarms.check_language_name(version)
 

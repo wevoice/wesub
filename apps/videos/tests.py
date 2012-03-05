@@ -1825,16 +1825,6 @@ class TestAlert(TestCase):
         v.save()
         return v
 
-    def test_lose_alert(self):
-        v = self._new_version()
-
-        s = self.latest_version.subtitle_set.all()[0]
-        s.duplicate_for(v).save()
-
-        alarms.check_subtitle_version(v)
-
-        self.assertEquals(len(mail.outbox), 2)
-
     def test_other_languages_changes(self):
         v = self._new_version()
         l = SubtitleLanguage(video=self.video, language='ru', is_original=False)
