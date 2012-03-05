@@ -130,7 +130,7 @@ def application_sent(application_pk):
             "user":m.user,
         }
         body = render_to_string(template_name,context)
-        subject  = ugettext(u'%s is applying for team %s') % (application.user, application.team.name)
+        subject  = ugettext(u'%(user)s is applying for team %(team)s') % dict(user=application.user, team=application.team.name)
         if m.user.notify_by_message:
             msg = Message()
             msg.subject = subject
@@ -240,7 +240,7 @@ def team_member_leave(team_pk, user_pk):
     # notify  admins and owners through messages
     notifiable = TeamMember.objects.filter( team=team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
-    subject = ugettext(u"%s has left the %s team" % (user, team))
+    subject = ugettext(u"%(user)s has left the %(team)s team" % dict(user=user, team=team))
     for m in notifiable:
         context = {
             "parting_member": user,

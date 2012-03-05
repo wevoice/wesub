@@ -1780,8 +1780,8 @@ class ActionRenderer(object):
         return msg % self._base_kwargs(item)
 
     def render_MEMBER_JOINED(self, item):
-        msg = _("joined the %s team as a %s" % (
-             item.team, item.member.role))
+        msg = _("joined the %(team)s team as a %(role)s" % dict(
+             team=item.team, role=item.member.role))
         return msg
 
     def render_MEMBER_LEFT(self, item):

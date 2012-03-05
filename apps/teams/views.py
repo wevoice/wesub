@@ -312,18 +312,18 @@ def create(request):
             messages.success(request, _("""
                 Your team has been created. Here are some next steps:
                 <ul>
-                    <li><a href="%s">Edit team members' permissions</a></li>
-                    <li><a href="%s">Activate and customize workflows for your team</a></li>
-                    <li><a href="%s">Create and customize projects</a></li>
-                    <li><a href="%s">Edit language preferences</a></li>
-                    <li><a href="%s">Customize instructions to caption makers and translators</a></li>
+                    <li><a href="%(edit)s">Edit team members' permissions</a></li>
+                    <li><a href="%(activate)s">Activate and customize workflows for your team</a></li>
+                    <li><a href="%(create)s">Create and customize projects</a></li>
+                    <li><a href="%(lang)s">Edit language preferences</a></li>
+                    <li><a href="%(custom)s">Customize instructions to caption makers and translators</a></li>
                 </ul>
-                """ % (
-                    reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
-                    reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
-                    reverse("teams:settings_projects", kwargs={"slug": team.slug}),
-                    reverse("teams:settings_languages", kwargs={"slug": team.slug}),
-                    reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
+                """ % dict(
+                    edit=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                    activate=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                    create=reverse("teams:settings_projects", kwargs={"slug": team.slug}),
+                    lang=reverse("teams:settings_languages", kwargs={"slug": team.slug}),
+                    custom=reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
                 )))
             return redirect(reverse("teams:settings_basic", kwargs={"slug":team.slug}))
     else:
