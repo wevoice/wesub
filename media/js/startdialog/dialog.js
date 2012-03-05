@@ -151,7 +151,10 @@ unisubs.startdialog.Dialog.prototype.moderatedResponseReceived_ = function(jsonR
         // * A user can translate, but not subtitle.
         // * This video cannot be translated (yet).
         var m = new unisubs.startdialog.Model(this.startDialogJson_, this.initialLanguageState_);
-        var subtitleOnly = m.fromLanguages().length === 0;
+        var enabledFromLanguages = goog.array.filter(m.fromLanguages(), function(vl) {
+            return !vl.DISABLED_FROM;
+        });
+        var subtitleOnly = enabledFromLanguages.length === 0;
 
         if (subtitleOnly) {
             this.buildPermissionDeniedMessage_();
