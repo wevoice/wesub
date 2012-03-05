@@ -47,7 +47,7 @@ unisubs.subtitle.TranscribeRightPanel.prototype.playModeText_ = function(playMod
     else if (playMode == pm.AUTOPAUSE)
         return "Recommended: magical autopause (just keep typing!)";
     else if (playMode == pm.PLAY_STOP)
-        return "Beginner: play 8 seconds, then pause";
+        return "Beginner: play 4 seconds, then pause";
 };
 
 unisubs.subtitle.TranscribeRightPanel.prototype.appendLegendContentsInternal =
@@ -96,8 +96,8 @@ unisubs.subtitle.TranscribeRightPanel.prototype.setButtonText_ = function() {
     if (this.playModeSelect_.value ==
         unisubs.subtitle.TranscribePanel.PlayMode.PLAY_STOP) {
         this.setButtonTextInternal(kc.TAB, unisubs.RightPanel.KeySpec.Modifier.SHIFT,
-                                   "Re-play last 8 seconds");
-        this.setButtonTextInternal(kc.TAB, 0, "Play next 8 seconds");
+                                   "Re-play last 4 seconds");
+        this.setButtonTextInternal(kc.TAB, 0, "Play next 4 seconds");
         this.enableButtonClassInternal(kc.TAB, 0, '-beginner', true);
     }
     else {

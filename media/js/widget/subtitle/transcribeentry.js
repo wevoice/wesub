@@ -32,7 +32,7 @@ unisubs.subtitle.TranscribeEntry = function(videoPlayer) {
         unisubs.subtitle.TranscribeEntry.P * 1000);
     this.typingPauseTimer_ = new goog.Timer(
         unisubs.subtitle.TranscribeEntry.S * 1000);
-    this.playStopTimer_ = new goog.Timer(8000);
+    this.playStopTimer_ = new goog.Timer(4000);
 };
 goog.inherits(unisubs.subtitle.TranscribeEntry, goog.ui.Component);
 

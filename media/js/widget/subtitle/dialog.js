@@ -457,7 +457,7 @@ unisubs.subtitle.Dialog.prototype.showHowToForState_ = function(state) {
 unisubs.subtitle.Dialog.prototype.skipBack_ = function() {
     var videoPlayer = this.getVideoPlayerInternal();
     var now = videoPlayer.getPlayheadTime();
-    videoPlayer.setPlayheadTime(Math.max(now - 8, 0));
+    videoPlayer.setPlayheadTime(Math.max(now - 4, 0));
     videoPlayer.play();
 };
 unisubs.subtitle.Dialog.prototype.togglePause_ = function() {

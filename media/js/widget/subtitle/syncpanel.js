@@ -136,7 +136,7 @@ unisubs.subtitle.SyncPanel.prototype.makeKeySpecsInternal = function() {
             'unisubs-play', 'unisubs-tab', 'tab', 'Play/Pause', KC.TAB, 0),
         new unisubs.RightPanel.KeySpec(
             'unisubs-skip', 'unisubs-control', 'shift\n+\ntab',
-            'Skip Back 8 Seconds', KC.TAB,
+            'Skip Back 4 Seconds', KC.TAB,
             unisubs.RightPanel.KeySpec.Modifier.SHIFT)
     ];
 
