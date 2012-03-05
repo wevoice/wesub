@@ -295,9 +295,6 @@ class Video(models.Model):
 
         return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
-    @models.permalink
-    def video_link(self):
-        return ('videos:history', [self.video_id])
 
     def get_team_video(self):
         """Return the TeamVideo object for this video, or None if there isn't one."""
@@ -344,7 +341,7 @@ class Video(models.Model):
                           .replace('#', '-')
                           .replace('&', '-'))
 
-    def _get_absolute_url(self, locale=None, video_id=None):
+    def _get_absolute_url(self,  video_id=None):
         """
         NOTE: this method is used in videos.search_indexes.VideoSearchResult
         to prevent duplication of code in search result and in DB-query result
@@ -511,6 +508,11 @@ class Video(models.Model):
         If None is passed as a language_code, the original language
         SubtitleLanguage will be returned.  In this case the value will be
         cached in-object.
+
+        This method can produce surprising results if the video has more
+        than one subtitle language with the same code. This is an artifact
+        of when we did not allow this. In this case, we return the
+        language with the most subtitles.
 
         """
         try:
@@ -872,15 +874,26 @@ class SubtitleLanguage(models.Model):
         return self.video.description
 
     def is_dependent(self):
+        """
+        AKA is this language a translation? Stand alone languages must
+        either be an original one, or a forked one.
+        """
         return not self.is_original and not self.is_forked
 
     def is_complete_and_synced(self, public_only=True):
+        """
+        For transcripts, this means the user marked it as completed.
+        For translations, the original language must be marked as completed.
+
+        We consider a set of subs where the very last has no end time
+        to be synced, as that is a convention for 'until end of time'.
+        """
         if not self.is_dependent() and not self.is_complete:
             return False
         if self.is_dependent():
             if self.percent_done != 100:
                 return False
-            standard_lang = self.real_standard_language()
+            standard_lang = self.standard_language
             if not standard_lang or not standard_lang.is_complete:
                 return False
         subtitles = self.latest_subtitles(public_only=public_only)
@@ -892,29 +905,6 @@ class SubtitleLanguage(models.Model):
         if not is_synced_value(subtitles[-1].start_time):
             return False
         return True
-
-    def real_standard_language(self):
-        if self.standard_language:
-            return self.standard_language
-        elif self.is_dependent():
-            # This should only be needed temporarily until data is more cleaned up.
-            # in other words, self.standard_language should never be None for a dependent SL
-            try:
-                self.standard_language = self.video.subtitle_language()
-                self.save()
-                return self.standard_language
-            except IntegrityError:
-                logger.error(
-                    "Subtitle Language {0} is dependent but has no acceptable "
-                    "standard_language".format(self.id))
-        return None
-
-    def is_dependable(self):
-        if self.is_dependent():
-            dep_lang = self.real_standard_language()
-            return dep_lang and dep_lang.is_complete and self.percent_done > 10
-        else:
-            return self.is_complete
 
     def get_widget_url(self, mode=None, task_id=None):
         # duplicates unisubs.widget.SubtitleDialogOpener.prototype.openDialogOrRedirect_
@@ -1088,7 +1078,7 @@ class SubtitleLanguage(models.Model):
             return None
 
         translation_count = self.nonblank_subtitle_count(public_only=False)
-        real_standard_language = self.real_standard_language()
+        real_standard_language = self.standard_language
 
         if real_standard_language:
             subtitle_count = real_standard_language.nonblank_subtitle_count(public_only=True)
@@ -1118,7 +1108,7 @@ models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=Subt
 
 
 # SubtitleCollection
-# (parent class of SubtitleVersion and SubtitleDraft)
+# (parent class of SubtitleVersion 
 class SubtitleCollection(models.Model):
     is_forked=models.BooleanField(default=False)
     # should not be changed directly, but using teams.moderation. as those will take care
@@ -1329,7 +1319,7 @@ class SubtitleVersion(SubtitleCollection):
         return self.language.video;
 
     def _get_standard_collection(self, public_only=True):
-        standard_language = self.language.real_standard_language()
+        standard_language = self.language.standard_language
         if standard_language:
             return standard_language.latest_version(public_only=public_only)
 
@@ -1550,42 +1540,6 @@ def has_viewable_draft(version, user):
     return user.pk in users
 
 
-# SubtitleDraft
-class SubtitleDraft(SubtitleCollection):
-    language = models.ForeignKey(SubtitleLanguage)
-    # null iff there is no SubtitleVersion yet.
-    parent_version = models.ForeignKey(SubtitleVersion, null=True)
-    datetime_started = models.DateTimeField()
-    user = models.ForeignKey(User, null=True)
-    browser_id = models.CharField(max_length=128, blank=True)
-    title = models.CharField(max_length=2048, blank=True)
-    last_saved_packet = models.PositiveIntegerField(default=0)
-
-    @property
-    def version_no(self):
-        return 0 if self.parent_version is None else \
-            self.parent_version.version_no + 1
-
-    @property
-    def video(self):
-        return self.language.video
-
-    def _get_standard_collection(self, public_only=True):
-        if self.language.standard_language:
-            return self.language.standard_language.latest_version(public_only=public_only)
-        else:
-            return self.language.video.latest_version(public_only=public_only)
-
-    def is_dependent(self):
-        return not self.language.is_original and not self.is_forked
-
-    def matches_request(self, request):
-        if request.user.is_authenticated() and self.user and \
-                self.user.pk == request.user.pk:
-            return True
-        else:
-            return request.browser_id == self.browser_id
-
 
 # Subtitle
 class SubtitleManager(models.Manager):
@@ -1595,7 +1549,6 @@ class SubtitleManager(models.Manager):
 
 class Subtitle(models.Model):
     version = models.ForeignKey(SubtitleVersion, null=True)
-    draft = models.ForeignKey(SubtitleDraft, null=True)
     subtitle_id = models.CharField(max_length=32, blank=True)
     subtitle_order = models.FloatField(null=True)
     subtitle_text = models.CharField(max_length=1024, blank=True)
@@ -1609,15 +1562,14 @@ class Subtitle(models.Model):
 
     class Meta:
         ordering = ['subtitle_order']
-        unique_together = (('version', 'subtitle_id'), ('draft', 'subtitle_id'),)
+        unique_together = (('version', 'subtitle_id'),)
 
     @property
     def is_synced(self):
         return is_synced(self)
 
-    def duplicate_for(self, version=None, draft=None):
+    def duplicate_for(self, version=None):
         return Subtitle(version=version,
-                        draft=draft,
                         start_of_paragraph = self.start_of_paragraph,
                         subtitle_id=self.subtitle_id,
                         subtitle_order=self.subtitle_order,

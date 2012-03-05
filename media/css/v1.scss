@@ -62,7 +62,6 @@
 @mixin opacity($op) {
     -khtml-opacity: $op;
     -moz-opacity: $op;
-    filter: alpha(opacity=$op);
     opacity: $op;
 }
 @mixin box-right {
@@ -563,12 +562,11 @@ div.hidden {
             form {
                 padding: 0;
             }
-
         }
         &:hover {
             .admin-controls {
-                display: block;
                 @include opacity(1.0);
+                display: block;
             }
         }
 
@@ -1097,7 +1095,6 @@ p.view-more {
     background-image: linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
     border-bottom: 1px solid $fainter;
     border-top: 1px solid $fainter;
-    float: left;
     margin: 0 0 2em;
     padding: 1.5em 0;
     width: 100%;

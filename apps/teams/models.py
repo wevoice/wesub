@@ -639,7 +639,7 @@ class TeamVideo(models.Model):
     def link_to_page(self):
         if self.all_languages:
             return self.video.get_absolute_url()
-        return self.video.video_link()
+        return reverse('videos:history', [self.video.video_id])
 
     @models.permalink
     def get_absolute_url(self):
@@ -664,35 +664,6 @@ class TeamVideo(models.Model):
             sub_lang = self.video.subtitle_language()
             setattr(self, 'original_language_code', None if not sub_lang else sub_lang.language)
         return getattr(self, 'original_language_code')
-
-    def _calculate_percent_complete(self, sl0, sl1):
-        # maybe move this to Video model in future.
-        if not sl0 or not sl0.is_dependable():
-            return -1
-        if not sl1:
-            return 0
-        if sl1.language == self._original_language():
-            return -1
-        if sl1.is_dependent():
-            if sl1.percent_done == 0:
-                return 0
-            elif sl0.is_dependent():
-                l_dep0 = sl0.real_standard_language()
-                l_dep1 = sl1.real_standard_language()
-                if l_dep0 and l_dep1 and l_dep0.id == l_dep1.id:
-                    return sl1.percent_done
-                else:
-                    return -1
-            else:
-                l_dep1 = sl1.real_standard_language()
-                return sl1.percent_done if \
-                    l_dep1 and l_dep1.id == sl0.id else -1
-        else:
-            sl1_subtitle_count = 0
-            latest_version = sl1.latest_version()
-            if latest_version:
-                sl1_subtitle_count = latest_version.subtitle_set.count()
-            return 0 if sl1_subtitle_count == 0 else -1
 
     def save(self, *args, **kwargs):
         if not hasattr(self, "project"):
@@ -1488,6 +1459,32 @@ class Task(models.Model):
                  'Approve': self._complete_approve,
         }[Task.TYPE_NAMES[self.type]]()
 
+    def _find_previous_assignee(self, type):
+        """Find the previous assignee for a new task for this video.
+
+        For now, we'll assign the review/approval task to whomever did it last
+        time (if it was indeed done), but only if they're still eligible to
+        perform it now.
+
+        """
+        from teams.permissions import can_review, can_approve
+
+        if type == 'Approve':
+            type = Task.TYPE_IDS['Approve']
+            can_do = can_approve
+        elif type == 'Review':
+            type = Task.TYPE_IDS['Review']
+            can_do = can_review
+
+        last_task = self.team_video.task_set.complete().filter(
+            language=self.language, type=type
+        ).order_by('-completed')[:1]
+
+        if last_task:
+            candidate = last_task[0].assignee
+            if candidate and can_do(self.team_video, candidate, self.language):
+                return candidate
+
     def _complete_subtitle(self):
         """Handle the messy details of completing a subtitle task."""
         subtitle_version = self.team_video.video.latest_version(public_only=False)
@@ -1495,12 +1492,14 @@ class Task(models.Model):
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
-                        language=self.language, type=Task.TYPE_IDS['Review'])
+                        language=self.language, type=Task.TYPE_IDS['Review'],
+                        assignee=self._find_previous_assignee('Review'))
             task.save()
         elif self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
-                        language=self.language, type=Task.TYPE_IDS['Approve'])
+                        language=self.language, type=Task.TYPE_IDS['Approve'],
+                        assignee=self._find_previous_assignee('Approve'))
             task.save()
         else:
             # Subtitle task is done, and there is no approval or review
@@ -1522,13 +1521,15 @@ class Task(models.Model):
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
-                        language=self.language, type=Task.TYPE_IDS['Review'])
+                        language=self.language, type=Task.TYPE_IDS['Review'],
+                        assignee=self._find_previous_assignee('Review'))
             task.save()
         elif self.workflow.approve_enabled:
             # The review step may be disabled.  If so, we check the approve step.
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
-                        language=self.language, type=Task.TYPE_IDS['Approve'])
+                        language=self.language, type=Task.TYPE_IDS['Approve'],
+                        assignee=self._find_previous_assignee('Approve'))
             task.save()
         else:
             # Translation task is done, and there is no approval or review
@@ -1555,7 +1556,8 @@ class Task(models.Model):
             if self.approved == Task.APPROVED_IDS['Approved']:
                 task = Task(team=self.team, team_video=self.team_video,
                             subtitle_version=self.subtitle_version,
-                            language=self.language, type=Task.TYPE_IDS['Approve'])
+                            language=self.language, type=Task.TYPE_IDS['Approve'],
+                            assignee=self._find_previous_assignee('Approve'))
                 task.save()
                 # approval review
                 notifier.reviewed_and_pending_approval.delay(self.pk)

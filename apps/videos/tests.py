@@ -1684,6 +1684,8 @@ class TestPercentComplete(TestCase):
         translation.language = lang_code
         translation.is_original = False
         translation.is_forked = forked
+        if not forked:
+           translation.standard_language = self.video.subtitle_language()
         translation.save()
 
         self.translation = translation
@@ -2249,6 +2251,8 @@ def _create_trans( video, latest_version=None, lang_code=None, forked=False):
         translation.language = lang_code
         translation.is_original = False
         translation.is_forked = forked
+        if not forked:
+            translation.standard_language = video.subtitle_language()
         translation.save()
         v = SubtitleVersion()
         v.language = translation

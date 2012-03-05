@@ -1,16 +1,17 @@
 import datetime, time
 import json as json
-from django.http import HttpResponse
-from django.core.urlresolvers import reverse
-from inspect import getargspec
 from Cookie import SimpleCookie
-from django.utils.datastructures import MultiValueDict
+from inspect import getargspec
 from urllib import urlencode, quote
-from django.utils.encoding import smart_str
-from django.db import models
+
 from django.core.serializers.json import DateTimeAwareJSONEncoder
+from django.core.urlresolvers import reverse
+from django.db import models
+from django.http import HttpResponse
+from django.utils.datastructures import MultiValueDict
+from django.utils.encoding import smart_str, force_unicode
 from django.utils.functional import Promise
-from django.utils.encoding import force_unicode
+
 
 class LazyEncoder(DateTimeAwareJSONEncoder):
     """
@@ -36,13 +37,13 @@ class RpcMultiValueDict(MultiValueDict):
     """
     Just allow pass not list values and get only dict as argument
     """
-    
+
     def __init__(self, key_to_list_mapping={}):
         for key, value in key_to_list_mapping.items():
             if not isinstance(value, (list, tuple)):
                 key_to_list_mapping[key] = [value]
-            
-        super(MultiValueDict, self).__init__(key_to_list_mapping)    
+
+        super(MultiValueDict, self).__init__(key_to_list_mapping)
 
     def urlencode(self, safe=None):
         output = []
@@ -82,10 +83,11 @@ class Msg(RpcResponse):
 
 class RpcHttpResponse(RpcResponse):
     """
-    This is vrapper for method's reponse, which allow save some modification of HTTP response.
-    For example set COOKIES. This should be flexible and useful for in future.
+    This is wrapper for method's reponse, which allow save some modification of
+    HTTP response.  For example set COOKIES. This should be flexible and useful
+    for in future.
     """
-    
+
     def __init__(self, *args, **kwargs):
         super(RpcHttpResponse, self).__init__(*args, **kwargs)
         self.cookies = SimpleCookie()
@@ -104,24 +106,24 @@ class RpcHttpResponse(RpcResponse):
         if secure:
             self.cookies[key]['secure'] = True
 
-#for jQuery.Rpc
+# For jQuery.Rpc
 class RpcRouter(object):
     """
     Router for jQuery.Rpc calls.
-    """    
+    """
     def __init__(self, url, actions={}, enable_buffer=True, max_retries=0):
         self.url = url
         self.actions = actions
         self.enable_buffer = enable_buffer
         self.max_retries = max_retries
-        
+
     def __call__(self, request, *args, **kwargs):
         """
         This method is view that receive requests from Ext.Direct.
-        """        
+        """
         user = request.user
         POST = request.POST
-        
+
         if POST.get('extAction'):
             #Forms with upload not supported yet
             requests = {
@@ -131,7 +133,7 @@ class RpcRouter(object):
                 'upload': POST.get('rpcUpload') == 'true',
                 'tid': POST.get('rpcTID')
             }
-    
+
             if requests['upload']:
                 requests['data'].append(request.FILES)
                 output = json.dumps(self.call_action(requests, user))
@@ -142,61 +144,61 @@ class RpcRouter(object):
                 requests = json.loads(request.POST.keys()[0])
             except (ValueError, KeyError, IndexError):
                 requests = []
-            
+
         if not isinstance(requests, list):
                 requests = [requests]
-        
+
         response = HttpResponse('', mimetype="application/json")
-            
+
         output = []
-        
+
         for rd in requests:
             mr = self.call_action(rd, request, *args, **kwargs)
-            
+
             #This looks like a little ugly
             if 'result' in mr and isinstance(mr['result'], RpcHttpResponse):
                 for key, val in mr['result'].cookies.items():
                     response.set_cookie(key, val.value, val['max-age'], val['expires'], val['path'],
                                         val['domain'], val['secure'])
                 mr['result'] = dict(mr['result'])
-                
+
             output.append(mr)
         response.content = json.dumps(output, cls=LazyEncoder)
-            
-        return response 
-    
+
+        return response
+
     def action_extra_kwargs(self, action, request, *args, **kwargs):
         """
         Check maybe this action get some extra arguments from request
-        """  
+        """
         if hasattr(action, '_extra_kwargs'):
             return action._extra_kwargs(request, *args, **kwargs)
         return {}
-    
+
     def method_extra_kwargs(self, method, request, *args, **kwargs):
         """
         Check maybe this method get some extra arguments from request
-        """  
+        """
         if hasattr(method, '_extra_kwargs'):
             return method._extra_kwargs(request, *args, **kwargs)
         return {}
-        
+
     def extra_kwargs(self, request, *args, **kwargs):
         """
-        For all method in ALL actions we add request.user to arguments. 
+        For all method in ALL actions we add request.user to arguments.
         You can add something else, request for example.
         For adding extra arguments for one action use action_extra_kwargs.
-        """        
+        """
         return {
             'user': request.user
         }
-        
+
     def api(self, request, *args, **kwargs):
         """
         This method is view that send js for provider initialization.
         Just set this in template after ExtJs including:
-        <script src="{% url api_url_name %}"></script>  
-        """        
+        <script src="{% url api_url_name %}"></script>
+        """
         obj = json.dumps(self, cls=RpcRouterJSONEncoder, url_args=args, url_kwargs=kwargs)
         return HttpResponse('jQuery.Rpc.addProvider(%s)' % obj, mimetype="text/javascript")
 
@@ -205,7 +207,7 @@ class RpcRouter(object):
         This method checks parameters of Ext.Direct request and call method of action.
         It checks arguments number, method existing, handle RpcExceptionEvent and send
         exception event for Ext.Direct.
-        """        
+        """
         method = rd['method']
 
         if not rd['action'] in self.actions:
@@ -216,9 +218,9 @@ class RpcRouter(object):
                 'method': method,
                 'message': 'Undefined action'
             }
-        
+
         action = self.actions[rd['action']]
-        
+
         if not hasattr(action, method):
             return {
                 'tid': rd['tid'],
@@ -227,9 +229,9 @@ class RpcRouter(object):
                 'method': method,
                 'message': 'Undefined method'
             }
-                    
+
         func = getattr(action, method)
-        
+
         args = []
         for val in (rd.get('data') or []):
             if isinstance(val, dict):
@@ -239,13 +241,13 @@ class RpcRouter(object):
         extra_kwargs = self.extra_kwargs(request, *args, **kwargs)
         extra_kwargs.update(self.action_extra_kwargs(action, request, *args, **kwargs))
         extra_kwargs.update(self.method_extra_kwargs(func, request, *args, **kwargs))
-        
+
         func_args, varargs, varkw, func_defaults = getargspec(func)
         func_args.remove('self') #TODO: or cls for classmethod
         for name in extra_kwargs.keys():
             if name in func_args:
                 func_args.remove(name)
-        
+
         required_args_count = len(func_args) - len(func_defaults or [])
         if (required_args_count - len(args)) > 0 or (not varargs and len(args) > len(func_args)):
             return {
@@ -255,7 +257,7 @@ class RpcRouter(object):
                 'method': method,
                 'message': 'Incorrect arguments number'
             }
-        
+
         try:
             return {
                 'tid': rd['tid'],
@@ -271,27 +273,23 @@ class RpcRouter(object):
                 'action': rd['action'],
                 'method': method,
                 'message': unicode(e)
-            }  
+            }
 
 class RpcRouterJSONEncoder(json.JSONEncoder):
-    """
-    JSON Encoder for RpcRouter
-    """
-    
     def __init__(self, url_args, url_kwargs, *args, **kwargs):
         self.url_args = url_args
         self.url_kwargs = url_kwargs
         super(RpcRouterJSONEncoder, self).__init__(*args, **kwargs)
-    
+
     def _encode_action(self, o):
         output = []
         for method in dir(o):
             if not method.startswith('_'):
                 #f = getattr(o, method)
                 data = dict(name=method)
-                output.append(data) 
-        return output        
-    
+                output.append(data)
+        return output
+
     def default(self, o):
         if isinstance(o, RpcRouter):
             output = {
@@ -309,6 +307,6 @@ class RpcRouterJSONEncoder(json.JSONEncoder):
 def add_request_to_kwargs(func):
     def extra_kwargs_func(request, *args, **kwargs):
         return dict(request=request)
-    
+
     func._extra_kwargs = extra_kwargs_func
     return func

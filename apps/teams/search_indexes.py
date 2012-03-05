@@ -43,7 +43,6 @@ class TeamVideoLanguagesIndex(SearchIndex):
     video_url = CharField(indexed=False)
     original_language = CharField()
     original_language_display = CharField(indexed=False)
-    has_lingua_franca = BooleanField()
     absolute_url = CharField(indexed=False)
     project_pk = IntegerField(indexed=True)
     task_count = IntegerField()
@@ -91,11 +90,6 @@ class TeamVideoLanguagesIndex(SearchIndex):
         else:
             self.prepared_data['original_language_display'] = ''
             self.prepared_data['original_language'] = ''
-        self.prepared_data['has_lingua_franca'] = \
-            bool(set(settings.LINGUA_FRANCAS) &
-                 set([sl.language for sl in
-                      obj.video.subtitlelanguage_set.all() if
-                      sl.is_dependable()]))
         self.prepared_data['absolute_url'] = obj.get_absolute_url()
         self.prepared_data['thumbnail'] = obj.get_thumbnail()
         self.prepared_data['title'] = unicode(obj)

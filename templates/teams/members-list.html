@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body_attrs %}id="teams" class="v1"{% endblock %}
-{% block html_attrs %}id="members_list"{% endblock %}
+{% block html_attrs %}id="team_members_list"{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -16,7 +16,6 @@
 {% endblock %}
 
 {% block scripts %}
-    {% include "utils/chosenify.html" %}
     {{ block.super }}
     {% if assignable_roles %}
         {% include_bundle "js-teams" %}
@@ -24,7 +23,7 @@
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         window.roleSavedURL = '{% url teams:role_saved team.slug %}';
-        window.request_get_lang = '{{ request.GET.lang }}';
+        window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
     </script>
 {% endblock %}
 

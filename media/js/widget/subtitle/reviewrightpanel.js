@@ -76,12 +76,27 @@ unisubs.subtitle.ReviewRightPanel.prototype.finish = function(e, approvalCode) {
                 goog.bind(dialog.saveWorkInternal, dialog, false));
         }
     };
-
+    var onCompletedCallback = function( isComplete){
+        this.serverModel_.setComplete(isComplete);
+        this.serverModel_.finish(successCallback, failureCallback);
+    }
     // set the servel models vars to finishe this, the taskId and taskType were
     // set when retrieving the task data
     this.serverModel_.setTaskNotes(goog.dom.forms.getValue(this.notesInput_));
     this.serverModel_.setTaskApproved(approvalCode)
-    this.serverModel_.finish(successCallback, failureCallback);
+    // if approving and on original subs, we should prompt the user if the subs
+    // are completed
+    if (approvalCode == unisubs.Dialog.MODERATION_OUTCOMES.APPROVED &&
+        this.inSubtitlingDialog_
+       ){
+        // we default to true, since the review is approving, most likely it 
+        // will be complete
+        unisubs.subtitle.CompletedDialog.show(
+            true, goog.bind(onCompletedCallback, this));    
+        // 
+    }else{
+        this.serverModel_.finish(successCallback, failureCallback);
+    }
 };
 
 // FIXME: dupliaction with editmetadatarightpanel

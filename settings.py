@@ -47,9 +47,6 @@ METADATA_LANGUAGES = (
     ('meta-wiki', 'Metadata: Wikipedia'),
 )
 
-# languages that more people speak, and therefore their translators are not as
-# rare
-LINGUA_FRANCAS = ["en", "en-gb"]
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
