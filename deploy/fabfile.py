@@ -512,7 +512,7 @@ def update_solr_schema():
     with Output("Updating Solr schema (and rebuilding the index)"):
         if env.admin_dir:
             # staging and production
-            env.host_string = ADMIN_HOST
+            env.host_string = env.admin_host
             dir = env.admin_dir
             python_exe = '{0}/env/bin/python'.format(env.admin_dir)
             with cd(os.path.join(dir, 'unisubs')):
@@ -532,7 +532,7 @@ def update_solr_schema():
                 run('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/testing/conf/schema.xml'.format(python_exe))
             sudo('service tomcat6 restart')
 
-        run('screen -d -m sh -c "{0} {1} rebuild_index_ordered --noinput --settings=unisubs_settings | mail -s Solr_index_rebuilt_on_{2}  universalsubtitles-dev@pculture.org"'.format(python_exe, os.path.join(dir, 'unisubs', 'manage.py'), env.host_string))
+        run('screen -d -m sh -c "{0} {1} rebuild_index_ordered --noinput --settings=unisubs_settings | mail -s Solr_index_rebuilt_on_{2} universalsubtitles-dev@pculture.org"'.format(python_exe, os.path.join(dir, 'unisubs', 'manage.py'), env.host_string))
 
 
 def bounce_memcached():
