@@ -47,6 +47,7 @@ celerybeat-schedule
 /media/docs/*
 /media/video/thumbnail/*
 user-data/teams/*
+user-data/teams
 user-data/video
 apps/services
 apps/servicesauth
