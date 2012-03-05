@@ -86,14 +86,18 @@ unisubs.player.AbstractVideoPlayer.DIALOG_SIZE = new goog.math.Size(400, 300);
 unisubs.player.AbstractVideoPlayer.prototype.createDom = function() {
     this.setElementInternal(this.getDomHelper().createElement('span'));
     goog.dom.classes.add(this.getElement(), 'unisubs-videoplayer');
-    var sizeFromConfig = this.videoSource_.sizeFromConfig();
-    if (!this.forDialog_ && sizeFromConfig)
-        this.playerSize_ = sizeFromConfig;
-    else
-        this.playerSize_ = this.forDialog_ ?
-        unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
-        unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+    if (this.videoSource_ && this.videoSource_.sizeFromConfig){
+        var sizeFromConfig = this.videoSource_.sizeFromConfig();
+        if (!this.forDialog_ && sizeFromConfig)
+            this.playerSize_ = sizeFromConfig;
+        else{
+            this.playerSize_ = this.forDialog_ ?
+            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+        }
     this.setDimensionsKnownInternal();
+
+    }
 
 };
 
