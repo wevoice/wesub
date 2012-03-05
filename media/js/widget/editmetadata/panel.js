@@ -157,7 +157,6 @@ unisubs.editmetadata.Panel.prototype.getNotesContent_ = function(){
 }
 
 unisubs.editmetadata.Panel.prototype.setNotesContent_ = function(newContent){
-    console.log("settings notes content", newContent)
     if (this.bodyInput_){
         this.bodyInput_.value = newContent;
         return true;
