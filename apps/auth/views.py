@@ -136,7 +136,7 @@ def render_login(request, user_creation_form, login_form, redirect_to):
 
 def make_redirect_to(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
-    if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
+    if not redirect_to or '//' in redirect_to:
         return '/'
     else:
         return redirect_to
