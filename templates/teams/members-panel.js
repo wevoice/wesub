@@ -1,6 +1,6 @@
 (function(){
 
-    var EDIT_SELECTOR = ".edit-role";
+    var EDIT_SELECTOR = '.edit-role';
 
     var EditRoleDialog = Class.$extend({
         __init__:function(pk, username, teamSlug){
@@ -8,6 +8,7 @@
             this.username = username;
             this.teamSlug = teamSlug;
             this.hide = _.bind(this.hide, this);
+            this.hideAndRedirect = _.bind(this.hideAndRedirect, this);
             this.save = _.bind(this.save, this);
             this.show = _.bind(this.show, this);
         },
@@ -31,8 +32,8 @@
             $select = $('select', this.el);
 
             $('.chzn-select', this.el).chosen();
-            $("a.action-save", this.el).click(this.save);
-            $("a.action-close", this.el).click(function() {
+            $('a.action-save', this.el).click(this.save);
+            $('a.action-close', this.el).click(function() {
                 hideEdit($target);
             });
 
@@ -68,19 +69,25 @@
         },
         save: function(e){
             e.preventDefault();
-            var languages = $("select.langs", this.el) .val();
-            var projects = $("select.projects", this.el) .val();
-            var role = $("select.roles", this.el).val();
+            var languages = $('select.langs', this.el) .val();
+            var projects = $('select.projects', this.el) .val();
+            var role = $('select.roles', this.el).val();
             TeamsApiV2.save_role(
                 this.teamSlug,
                 this.pk,
                 role,
                 projects,
                 languages,
-                this.hide);
+                this.hideAndRedirect);
             return false;
         },
-        hide:function(e){
+        hide: function(e){
+            this.el.remove();
+            $('div.well').remove();
+            $('html').unbind('click.modal');
+            return false;
+        },
+        hideAndRedirect: function(e) {
             this.el.remove();
             $('div.well').remove();
             $('html').unbind('click.modal');
@@ -90,22 +97,15 @@
             return false;
         }
     });
-    function onEditClicked(e){
+
+    $('a.edit-role').click(function(e) {
+        console.log(e.target);
         e.preventDefault();
-        var pk = $(e.target).data("member-pk");
-        var username = $(e.target).data("member-username");
-        var teamSlug = $(e.target).data("team-slug");
+        var pk = $(e.target).data('member-pk');
+        var username = $(e.target).data('member-username');
+        var teamSlug = $(e.target).data('team-slug');
         var dialog = new EditRoleDialog(pk, username, teamSlug);
         dialog.loadInfo();
-    }
-    function bootstrapButton(el){
-        $(el).click(function(e){
-            onEditClicked(e);
-            return false;
-        });
-    }
-
-    $(EDIT_SELECTOR).each(function(i,o){
-        bootstrapButton(o);
+        return false;
     });
 })();
