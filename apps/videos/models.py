@@ -48,6 +48,7 @@ from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_u
 from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
+from utils.panslugify import pan_slugify
 
 from apps.teams.moderation_const import (
     WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED, REJECTED
@@ -332,14 +333,8 @@ class Video(models.Model):
         NOTE: this method is used in videos.search_indexes.VideoSearchResult to
         prevent duplication of code in search result and in DB-query result.
 
-        TODO: Just use slugify() instead?
-
         """
-        return (self.title.replace('/', '-')
-                          .replace("'", '-')
-                          .replace('?', '-')
-                          .replace('#', '-')
-                          .replace('&', '-'))
+        return pan_slugify(self.title)
 
     def _get_absolute_url(self,  video_id=None):
         """
