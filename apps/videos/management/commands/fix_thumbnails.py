@@ -43,7 +43,9 @@ class Command(BaseCommand):
                 print video.s3_thumbnail, 
                 try:
                     create_thumbnails(video.s3_thumbnail, video.s3_thumbnail.file, (260, 165))
-                    create_thumbnails(video.s3_thumbnail, video.s3_thumbnail.file, (120, 90))
+                    # must be refreshed, else the data stream is consumed
+                    video = Video.objects.get(pk=video.pk)
+                    create_thumbnails(video.s3_thumbnail, video.s3_thumbnail.file, (120, 90 ))
                     print 'FIXED'
                 except S3ResponseError:
                     video.s3_thumbnail = ''
