@@ -49,7 +49,6 @@ unisubs.subtitle.SyncPanel = function(subtitles, videoPlayer,
     this.keyEventsSuspended_ = false;
     this.reviewOrApprovalType_ = reviewOrApprovalType;
     if (this.reviewOrApprovalType_){
-
         this.numSteps_ = 2;
         this.currentStep_ = 0;
     }else{
@@ -121,10 +120,15 @@ unisubs.subtitle.SyncPanel.prototype.createRightPanelInternal = function() {
         this.bodyInput_ = internalComponents['bodyInput'];
         
     }
-    return new unisubs.RightPanel(
+    var panel = new unisubs.RightPanel(
         this.serverModel_, internalComponents['helpContents'],
             internalComponents['extraHelp'], keySpecs, true, "Done?",
         "Next Step: Subtitle info");
+    if (this.reviewOrApprovalType_){
+        // we never allow to stop a review midway, makes life complicated
+        panel.showSaveExit = false;
+    }
+    return panel;
 };
 unisubs.subtitle.SyncPanel.prototype.makeKeySpecsInternal = function() {
     var KC = goog.events.KeyCodes;
