@@ -42,7 +42,7 @@ class Command(BaseCommand):
             for video in Video.objects.exclude(s3_thumbnail=''):
                 print video.s3_thumbnail, 
                 try:
-                    create_thumbnails(video.s3_thumbnail, video.s3_thumbnail.file, (260, 165))
+                    create_thumbnails(video.s3_thumbnail, video.s3_thumbnail.file, (290, 165))
                     # must be refreshed, else the data stream is consumed
                     video = Video.objects.get(pk=video.pk)
                     create_thumbnails(video.s3_thumbnail, video.s3_thumbnail.file, (120, 90 ))
