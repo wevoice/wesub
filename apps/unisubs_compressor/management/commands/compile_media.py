@@ -72,6 +72,14 @@ NO_UNIQUE_URL = (
 #        "no-cache": True 
 #    },
     {
+        "name": "images/video-no-thumbnail-medium.png",
+        "no-cache": True,
+    },
+    {
+        "name": "images/video-no-thumbnail-small.png",
+        "no-cache": True,
+    },
+    {
         "name": "js/unisubs-widgetizer.js",
         "no-cache": True
     }, {
