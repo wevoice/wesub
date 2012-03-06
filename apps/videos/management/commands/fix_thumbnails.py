@@ -42,7 +42,8 @@ class Command(BaseCommand):
             for video in Video.objects.exclude(s3_thumbnail=''):
                 print video.s3_thumbnail, 
                 try:
-                    create_thumbnails(video.s3_thumbnail, video.s3_thumbnail.file)
+                    create_thumbnails(video.s3_thumbnail, video.s3_thumbnail.file, (260, 165))
+                    create_thumbnails(video.s3_thumbnail, video.s3_thumbnail.file, (120, 90))
                     print 'FIXED'
                 except S3ResponseError:
                     video.s3_thumbnail = ''
