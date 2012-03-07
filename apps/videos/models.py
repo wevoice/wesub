@@ -142,7 +142,12 @@ class Video(models.Model):
     was_subtitled = models.BooleanField(default=False, db_index=True)
     thumbnail = models.CharField(max_length=500, blank=True)
     small_thumbnail = models.CharField(max_length=500, blank=True)
-    s3_thumbnail = S3EnabledImageField(blank=True, upload_to='video/thumbnail/')
+    s3_thumbnail = S3EnabledImageField(
+        blank=True,
+        upload_to='video/thumbnail/',
+        thumb_sizes=(
+            (290,165),
+            (120,90),))
     edited = models.DateTimeField(null=True, editable=False)
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, null=True, blank=True)
