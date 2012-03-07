@@ -650,15 +650,14 @@ class TeamVideo(models.Model):
         if self.thumbnail:
             return self.thumbnail.thumb_url(290, 165)
 
-        if self.video.thumbnail:
-            th = self.video.get_medium_thumbnail()
-            if th:
-                return th
+        video_thumb = self.video.get_thumbnail(fallback=False)
+        if video_thumb:
+            return video_thumb
 
         if self.team.logo:
             return self.team.logo_thumbnail()
 
-        return ''
+        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL_BASE
 
     def _original_language(self):
         if not hasattr(self, 'original_language_code'):

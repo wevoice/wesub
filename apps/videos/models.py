@@ -252,11 +252,13 @@ class Video(models.Model):
             from sentry.client.models import client
             client.create_from_exception()
 
-    def get_thumbnail(self):
-        """Return a URL to this video's thumbnail, or '' if there isn't one.
+    def get_thumbnail(self, fallback=True):
+        """Return a URL to this video's thumbnail.
 
         This may be an absolute or relative URL, depending on whether the
         thumbnail is stored in our media folder or on S3.
+
+        If fallback is True, it will fallback to the default thumbnail
 
         """
         if self.s3_thumbnail:
@@ -264,8 +266,8 @@ class Video(models.Model):
 
         if self.thumbnail:
             return self.thumbnail
-
-        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
+        if fallback:
+            return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL_BASE
 
     def get_small_thumbnail(self):
         """Return a URL to a small version of this video's thumbnail, or '' if there isn't one.
@@ -279,7 +281,7 @@ class Video(models.Model):
 
         if self.small_thumbnail:
             return self.small_thumbnail
-        return "%simages/video-no-thumbnail-small.png" % settings.STATIC_URL
+        return "%simages/video-no-thumbnail-small.png" % settings.STATIC_URL_BASE
 
     def get_medium_thumbnail(self):
         """Return a URL to a medium version of this video's thumbnail, or '' if there isn't one.
