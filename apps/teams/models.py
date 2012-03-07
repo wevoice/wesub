@@ -621,7 +621,8 @@ class TeamVideo(models.Model):
                     u'caption or subtitle this video. Adding a note makes '
                     u'volunteers more likely to help out!'))
     thumbnail = S3EnabledImageField(upload_to='teams/video_thumbnails/', null=True, blank=True,
-        help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'))
+        help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'),
+                                    thumb_sizes=((290,165), (120,90),))
     all_languages = models.BooleanField(_('Need help with all languages'), default=False,
         help_text=_(u'If you check this, other languages will not be displayed.'))
     added_by = models.ForeignKey(User)

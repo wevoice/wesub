@@ -29,12 +29,14 @@ from teams.permissions import (
     can_assign_task, can_unpublish_subs
 )
 from teams.permissions_const import ROLE_NAMES
+from utils.amazon.fields import create_thumbnails
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.translation import get_language_choices
 from utils.validators import MaxFileSizeValidator
 from videos.forms import AddFromFeedForm
-from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion
+from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion, Video
+from videos.search_indexes import VideoIndex
 
 
 class EditTeamVideoForm(forms.ModelForm):
@@ -77,6 +79,10 @@ class EditTeamVideoForm(forms.ModelForm):
 
         self._save_metadata(video, 'Author', author)
         self._save_metadata(video, 'Creation Date', creation_date)
+        # store the uploaded thumb on the video itself
+        # TODO: simply remove the teamvideo.thumbnail image
+        video.s3_thumbnail.save(obj.thumbnail.name, obj.thumbnail.file)
+        VideoIndex(Video).update_object(video)
 
     def _save_metadata(self, video, meta, content):
         '''Save a single piece of metadata for the given video.
