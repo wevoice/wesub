@@ -1473,34 +1473,24 @@ def restrict_versions(version_qs, user, subtitle_language):
     This will realize the queryset into a list, so do any other filtering you
     might need before you call this function.
 
-    TODO: Different logic for rejected vs waiting_moderation?
-
     """
+    from teams.permissions import get_member
+
+    versions = list(version_qs)
+
+    # Videos that don't have team videos aren't moderated, so all versions
+    # should be viewable.
     team_video = subtitle_language.video.get_team_video()
-
     if not team_video:
-        return False
+        return versions
 
-    def _version_viewable(version):
-        # Versions not under moderation can always be viewed.
-        if version.is_public:
-            return True
+    # Members can always view all versions for their team's videos.
+    member = get_member(user, team_video.team)
+    if member:
+        return versions
 
-        # Otherwise the version is moderated.
-        # Non-logged-in users can never see it.
-        if not user or not user.is_authenticated() or user.is_anonymous:
-            return False
-
-        # Subtitle authors can view their own drafts.
-        if not version.user.is_anonymous and user.pk == version.user.pk:
-            return True
-
-        # Anyone reviewing/approving this version can view its drafts.
-        users = (version.task_set.all_review_or_approve()
-                                 .values_list('assignee__id', flat=True))
-        return user.pk in users
-
-    return filter(_version_viewable, version_qs)
+    # Non-members can only see public versions.
+    return filter(lambda v: v.is_public, version_qs)
 
 def has_viewable_draft(version, user):
     """Return whether the given version has draft subtitles viewable by the user.
