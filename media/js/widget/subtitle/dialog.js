@@ -1,6 +1,6 @@
 // Universal Subtitles, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -23,9 +23,7 @@ goog.provide('unisubs.subtitle.Dialog');
  * @param {unisubs.subtitle.ServerModel} serverModel
  * @param {unisubs.widget.SubtitleState} subtitles existing subtitles
  */
-unisubs.subtitle.Dialog = function(videoSource, serverModel,
-                                    subtitles, opt_opener,
-                                    opt_skipFinished, reviewOrApprovalType) {
+unisubs.subtitle.Dialog = function(videoSource, serverModel, subtitles, opt_opener, opt_skipFinished, reviewOrApprovalType) {
     unisubs.Dialog.call(this, videoSource);
     unisubs.SubTracker.getInstance().start(false);
     this.serverModel_ = serverModel;
@@ -38,7 +36,7 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel,
     this.serverModel_ = serverModel;
     this.serverModel_.init();
     /**
-     * @type {?boolean} True iff we pass into FINISHED state.
+     * @type {?boolean} True if we pass into FINISHED state.
      */
     this.saved_ = false;
     /**
@@ -65,8 +63,8 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel,
     if ( !Boolean(this.reviewOrApprovalType_)){
        this.notesFectched_ = true; 
     }
-
 };
+
 goog.inherits(unisubs.subtitle.Dialog, unisubs.Dialog);
 
 /**
@@ -81,7 +79,6 @@ unisubs.subtitle.Dialog.State_ = {
     FINISHED: 4
     
 };
-
 
 unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
