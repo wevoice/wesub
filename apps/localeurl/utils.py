@@ -14,6 +14,9 @@ DOMAIN_MAP = dict(localeurl.settings.DOMAINS)
 DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
 from django.contrib.sites.models import Site
 
+import logging
+logger = logging.getLogger("localeurl")
+
 def is_locale_independent(path):
     """
     Returns whether the path is locale-independent.
@@ -115,8 +118,8 @@ def universal_url( *args, **kwargs):
     protocol = DEFAULT_PROTOCOL
     try:
         original = urlresolvers.reverse(*args, **kwargs)
-    except Exception, e:
-        print e
+    except Exception :
+        logger.exception("Failed to resolve universal url") 
     return "%s://%s%s" % (protocol, Site.objects.get_current().domain,
                      strip_path(original)[1])
     
