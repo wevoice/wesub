@@ -16,12 +16,13 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import re
+from urllib import urlopen
 
 from django import forms
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-
+from django.core.files.base import ContentFile
 from auth.models import CustomUser as User
 from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
 from teams.permissions import (
@@ -82,7 +83,9 @@ class EditTeamVideoForm(forms.ModelForm):
         # store the uploaded thumb on the video itself
         # TODO: simply remove the teamvideo.thumbnail image
         if obj.thumbnail:
-            video.s3_thumbnail.save(obj.thumbnail.name, obj.thumbnail.file)
+            content = ContentFile(obj.thumbnail.read())
+            name = obj.thumbnail.url.split('/')[-1]
+            video.s3_thumbnail.save(name, content)
             VideoIndex(Video).update_object(video)
 
     def _save_metadata(self, video, meta, content):
