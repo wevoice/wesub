@@ -7,11 +7,27 @@
             <img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail">
         </a>
         <a href="{% url videos:video video_id=search_record.video_id %}" class="languages">
-            {% if search_record.video_completed_langs %}
-                {{ search_record.video_completed_langs|length }} {% trans 'language' %}{{ search_record.video_completed_langs|length|pluralize }}
-            {% else %}
-                {% trans "No subtitles yet" %}
-            {% endif %}
+            {% with num_total=search_record.num_total_subs num_complete=search_record.num_completed_subs %}
+                {% if num_total %}
+                    {% blocktrans count num_total as num %}
+                        {{ num }} language
+                    {% plural %}
+                        {{ num }} languages
+                    {% endblocktrans %}
+
+                    {% if num_complete %}
+                        {% blocktrans count num_complete as num %}
+                            ({{ num }} completed language)
+                            {% plural %}
+                            ({{ num }} completed languages)
+                        {% endblocktrans %}
+                    {% else %}
+                        (no completed languages)
+                    {% endif %}
+                {% else %}
+                    {% trans "No subtitles yet" %}
+                {% endif %}
+            {% endwith %}
         </a>
         {% if user_is_team_member %}
             {% if search_record.task_count %}
