@@ -419,7 +419,8 @@ class Team(models.Model):
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
 
-    def get_videos_for_languages_haystack(self, language=None, num_completed_subs=None, project=None, user=None, query=None, sort=None):
+    def get_videos_for_languages_haystack(self, language=None, num_completed_subs=None,
+                                          project=None, user=None, query=None, sort=None):
         from teams.search_indexes import TeamVideoLanguagesIndex
 
         is_member = (user and user.is_authenticated()
