@@ -81,8 +81,9 @@ class EditTeamVideoForm(forms.ModelForm):
         self._save_metadata(video, 'Creation Date', creation_date)
         # store the uploaded thumb on the video itself
         # TODO: simply remove the teamvideo.thumbnail image
-        video.s3_thumbnail.save(obj.thumbnail.name, obj.thumbnail.file)
-        VideoIndex(Video).update_object(video)
+        if obj.thumbnail and obj.thumnail.file:
+            video.s3_thumbnail.save(obj.thumbnail.name, obj.thumbnail.file)
+            VideoIndex(Video).update_object(video)
 
     def _save_metadata(self, video, meta, content):
         '''Save a single piece of metadata for the given video.
