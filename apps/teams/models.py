@@ -419,7 +419,7 @@ class Team(models.Model):
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
 
-    def get_videos_for_languages_haystack(self, language=None, num_completed_subs=None,
+    def get_videos_for_languages_haystack(self, language=None, num_completed_langs=None,
                                           project=None, user=None, query=None, sort=None):
         from teams.search_indexes import TeamVideoLanguagesIndex
 
@@ -441,14 +441,14 @@ class Team(models.Model):
         if language:
             qs = qs.filter(video_completed_langs=language)
 
-        if num_completed_subs != None:
-            qs = qs.filter(num_completed_subs=num_completed_subs)
+        if num_completed_langs != None:
+            qs = qs.filter(num_completed_langs=num_completed_langs)
 
         qs = qs.order_by({
              'name':  'video_title_exact',
             '-name': '-video_title_exact',
-             'subs':  'num_completed_subs',
-            '-subs': '-num_completed_subs',
+             'subs':  'num_completed_langs',
+            '-subs': '-num_completed_langs',
              'time':  'team_video_create_date',
             '-time': '-team_video_create_date',
         }.get(sort or '-time'))

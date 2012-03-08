@@ -377,7 +377,6 @@ class Rpc(BaseRpc):
         language = session.language
         # if this belongs to a task finish it:
 
-
         new_version = None
         if subtitles is not None and \
                 (len(subtitles) > 0 or language.latest_version(public_only=False) is not None):
@@ -391,8 +390,8 @@ class Rpc(BaseRpc):
             self._save_subtitles(
                 new_version.subtitle_set, subtitles, new_version.is_forked)
 
-        # if any of the language attributes have changed (title , descr
-        # compleltedness) we must trigger the api notification.
+        # if any of the language attributes have changed (title, descr,
+        # completedness) we must trigger the api notification.
         must_trigger_api_language_edited = False
         language.release_writelock()
         if completed is not None:
@@ -411,7 +410,7 @@ class Rpc(BaseRpc):
             must_trigger_api_language_edited = True
         language.save()
 
-        if must_trigger_api_language_edited :
+        if must_trigger_api_language_edited:
             language.video.save()
             api_language_edited.send(language)
 
