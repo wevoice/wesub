@@ -1822,12 +1822,8 @@ pre.dump {
 }
 
 /* Crazytown */
-#teams .backnav {
+#teams .backnav, #teams .backnav a {
     color: $light; 
-
-    a {
-        color: $darkest;
-    }
 }
 #teams div.header {
     min-height: 0;

@@ -1850,11 +1850,8 @@ pre.dump code {
 }
 
 /* Crazytown */
-#teams .backnav {
+#teams .backnav, #teams .backnav a {
   color: #7692a3;
-}
-#teams .backnav a {
-  color: #2f3c45;
 }
 
 #teams div.header {
