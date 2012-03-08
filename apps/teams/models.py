@@ -1488,7 +1488,8 @@ class Task(models.Model):
 
     def _complete_subtitle(self):
         """Handle the messy details of completing a subtitle task."""
-        subtitle_version = self.team_video.video.latest_version(public_only=False)
+        subtitle_version = self.team_video.video.latest_version(
+                                language_code=self.language, public_only=False)
 
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
@@ -1517,7 +1518,8 @@ class Task(models.Model):
 
     def _complete_translate(self):
         """Handle the messy details of completing a translate task."""
-        subtitle_version = self.team_video.video.latest_version(language_code=self.language, public_only=False)
+        subtitle_version = self.team_video.video.latest_version(
+                                language_code=self.language, public_only=False)
 
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,

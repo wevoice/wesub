@@ -480,9 +480,8 @@ class Rpc(BaseRpc):
             if not res.get('response', 'ok'):
                 return res
 
-        return {
-            'user_message': user_message,
-            'response': 'ok' }
+        return { 'user_message': user_message,
+                 'response': 'ok' }
 
     def _save_subtitles(self, subtitle_set, json_subs, forked):
         for s in json_subs:
