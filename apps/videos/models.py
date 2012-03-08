@@ -48,6 +48,7 @@ from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_u
 from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
+from utils.panslugify import pan_slugify
 
 from apps.teams.moderation_const import (
     WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED, REJECTED
@@ -141,7 +142,12 @@ class Video(models.Model):
     was_subtitled = models.BooleanField(default=False, db_index=True)
     thumbnail = models.CharField(max_length=500, blank=True)
     small_thumbnail = models.CharField(max_length=500, blank=True)
-    s3_thumbnail = S3EnabledImageField(blank=True, upload_to='video/thumbnail/')
+    s3_thumbnail = S3EnabledImageField(
+        blank=True,
+        upload_to='video/thumbnail/',
+        thumb_sizes=(
+            (290,165),
+            (120,90),))
     edited = models.DateTimeField(null=True, editable=False)
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, null=True, blank=True)
@@ -251,11 +257,13 @@ class Video(models.Model):
             from sentry.client.models import client
             client.create_from_exception()
 
-    def get_thumbnail(self):
-        """Return a URL to this video's thumbnail, or '' if there isn't one.
+    def get_thumbnail(self, fallback=True):
+        """Return a URL to this video's thumbnail.
 
         This may be an absolute or relative URL, depending on whether the
         thumbnail is stored in our media folder or on S3.
+
+        If fallback is True, it will fallback to the default thumbnail
 
         """
         if self.s3_thumbnail:
@@ -263,8 +271,8 @@ class Video(models.Model):
 
         if self.thumbnail:
             return self.thumbnail
-
-        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
+        if fallback:
+            return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL_BASE
 
     def get_small_thumbnail(self):
         """Return a URL to a small version of this video's thumbnail, or '' if there isn't one.
@@ -278,7 +286,7 @@ class Video(models.Model):
 
         if self.small_thumbnail:
             return self.small_thumbnail
-        return "%simages/video-no-thumbnail-small.png" % settings.STATIC_URL
+        return "%simages/video-no-thumbnail-small.png" % settings.STATIC_URL_BASE
 
     def get_medium_thumbnail(self):
         """Return a URL to a medium version of this video's thumbnail, or '' if there isn't one.
@@ -332,14 +340,8 @@ class Video(models.Model):
         NOTE: this method is used in videos.search_indexes.VideoSearchResult to
         prevent duplication of code in search result and in DB-query result.
 
-        TODO: Just use slugify() instead?
-
         """
-        return (self.title.replace('/', '-')
-                          .replace("'", '-')
-                          .replace('?', '-')
-                          .replace('#', '-')
-                          .replace('&', '-'))
+        return pan_slugify(self.title)
 
     def _get_absolute_url(self,  video_id=None):
         """
@@ -1478,34 +1480,24 @@ def restrict_versions(version_qs, user, subtitle_language):
     This will realize the queryset into a list, so do any other filtering you
     might need before you call this function.
 
-    TODO: Different logic for rejected vs waiting_moderation?
-
     """
+    from teams.permissions import get_member
+
+    versions = list(version_qs)
+
+    # Videos that don't have team videos aren't moderated, so all versions
+    # should be viewable.
     team_video = subtitle_language.video.get_team_video()
-
     if not team_video:
-        return False
+        return versions
 
-    def _version_viewable(version):
-        # Versions not under moderation can always be viewed.
-        if version.is_public:
-            return True
+    # Members can always view all versions for their team's videos.
+    member = get_member(user, team_video.team)
+    if member:
+        return versions
 
-        # Otherwise the version is moderated.
-        # Non-logged-in users can never see it.
-        if not user or not user.is_authenticated() or user.is_anonymous:
-            return False
-
-        # Subtitle authors can view their own drafts.
-        if not version.user.is_anonymous and user.pk == version.user.pk:
-            return True
-
-        # Anyone reviewing/approving this version can view its drafts.
-        users = (version.task_set.all_review_or_approve()
-                                 .values_list('assignee__id', flat=True))
-        return user.pk in users
-
-    return filter(_version_viewable, version_qs)
+    # Non-members can only see public versions.
+    return filter(lambda v: v.is_public, version_qs)
 
 def has_viewable_draft(version, user):
     """Return whether the given version has draft subtitles viewable by the user.

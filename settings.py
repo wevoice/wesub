@@ -35,7 +35,7 @@ from libs.unilangs import get_language_code_mapping
 # For example: if you are an English user you'll see something like:
 # French (Français)
 language_choices = [(code,
-                     u'%s (%s)' % (lc.name(), lc.native_name()))
+                     u'%s' % lc.name())
                     for code, lc in get_language_code_mapping('unisubs').items()]
 
 global_settings.LANGUAGES = ALL_LANGUAGES = language_choices

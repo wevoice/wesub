@@ -90,8 +90,8 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     def delete_model(self, request, obj):
         video = obj.video
         super(SubtitleLanguageAdmin, self).delete_model(request, obj)
-        video_changed_tasks.delay(video)
-    
+        video_changed_tasks.delay(video.pk)
+
     def versions(self, obj):
         version_qs = obj.subtitleversion_set.all()
         link_tpl = '<a href="%s">#%s</a>'

@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+
 from django.conf import settings
+from django.db.models import Count
 from haystack import site
 from haystack.backends import SQ
 from haystack.indexes import (
@@ -72,6 +74,15 @@ class TeamVideoLanguagesIndex(SearchIndex):
     is_public = BooleanField()
     owned_by_team_id = IntegerField(null=True)
 
+    # All subtitle languages containing at least one version are included in the total count.
+    num_total_subs = IntegerField()
+
+    # Completed languages are languages which have at least one version that is:
+    #
+    # * Public
+    # * Covers all dialog
+    # * Fully synced
+    # * Fully translated, if a translation
     num_completed_subs = IntegerField()
 
     def prepare(self, obj):
@@ -102,6 +113,11 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['team_video_create_date'] = obj.created
 
         completed_sls = obj.video.completed_subtitle_languages()
+        all_sls = (obj.video.subtitlelanguage_set
+                            .annotate(num_versions=Count('subtitleversion'))
+                            .filter(num_versions__gt=0))
+
+        self.prepared_data['num_total_subs'] = all_sls.count()
         self.prepared_data['num_completed_subs'] = len(completed_sls)
 
         self.prepared_data['video_completed_langs'] = \

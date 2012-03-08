@@ -419,7 +419,8 @@ class Team(models.Model):
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
 
-    def get_videos_for_languages_haystack(self, language=None, num_completed_subs=None, project=None, user=None, query=None, sort=None):
+    def get_videos_for_languages_haystack(self, language=None, num_completed_subs=None,
+                                          project=None, user=None, query=None, sort=None):
         from teams.search_indexes import TeamVideoLanguagesIndex
 
         is_member = (user and user.is_authenticated()
@@ -621,7 +622,8 @@ class TeamVideo(models.Model):
                     u'caption or subtitle this video. Adding a note makes '
                     u'volunteers more likely to help out!'))
     thumbnail = S3EnabledImageField(upload_to='teams/video_thumbnails/', null=True, blank=True,
-        help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'))
+        help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'),
+                                    thumb_sizes=((290,165), (120,90),))
     all_languages = models.BooleanField(_('Need help with all languages'), default=False,
         help_text=_(u'If you check this, other languages will not be displayed.'))
     added_by = models.ForeignKey(User)
@@ -649,15 +651,14 @@ class TeamVideo(models.Model):
         if self.thumbnail:
             return self.thumbnail.thumb_url(290, 165)
 
-        if self.video.thumbnail:
-            th = self.video.get_medium_thumbnail()
-            if th:
-                return th
+        video_thumb = self.video.get_thumbnail(fallback=False)
+        if video_thumb:
+            return video_thumb
 
         if self.team.logo:
             return self.team.logo_thumbnail()
 
-        return ''
+        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL_BASE
 
     def _original_language(self):
         if not hasattr(self, 'original_language_code'):

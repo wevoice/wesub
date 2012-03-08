@@ -3,11 +3,12 @@ Hi {{ user }},
 
 {{ inviter }} has invited you to become a {{ role }} for the team {{team.name}} ( {{url_base}}{% url teams:detail slug=team.slug %} ) on Universal Subtitles. Lucky you!
 {% if custom_message %}
-{{ custom_message.data }}
+{{ custom_message }}
 {% endif %}
 {% if note %}
         {{ note }}
 {% endif %}
+
 
 
 To accept this invitation and join the team:

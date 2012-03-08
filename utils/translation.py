@@ -24,19 +24,9 @@ def _only_supported_languages(language_codes):
     return [code for code in language_codes if code in SUPPORTED_LANGUAGE_CODES]
 
 
-def get_language_choices_short(with_empty=False):
-    """Return a list of language code choices labeled with only the translated name.
+def get_language_choices(with_empty=False):
+    """Return a list of language code choices labeled appropriately."""
 
-    This does NOT include the native name of a language in the label, like the
-    get_language_choices function.
-
-    This function should probably not be used, if we want a consistent display
-    across the site.
-
-    Right now it's only used on the Search page for the left column, because it
-    looks ugly with the full names there.
-
-    """
     cache_key = 'simple-langs-cache-%s' % get_language()
     languages = cache.get(cache_key)
 
@@ -54,42 +44,10 @@ def get_language_choices_short(with_empty=False):
 
     return languages
 
-def get_language_choices(with_empty=False):
-    """Return a list of language code choices labeled in the standard manner.
-
-    That last bit is the important part.  As an example, the "French" option
-    will look like this when being viewed by an English user:
-
-        French (Français)
-
-    And will look like this when viewed by a French user:
-
-        Français (Français)
-
-    These lists are built and cached once per user language.
-
-    """
-    cache_key = 'langs-cache-%s' % get_language()
-    languages = cache.get(cache_key)
-
-    if not languages:
-        languages = []
-
-        for code in SUPPORTED_LANGUAGE_CODES:
-            languages.append((code, get_language_label(code)))
-
-        languages.sort(key=lambda item: item[1])
-        cache.set(cache_key, languages, 60*60)
-
-    if with_empty:
-        languages = [('', '---------')] + languages
-
-    return languages
-
 def get_language_label(code):
     """Return the translated, human-readable label for the given language code."""
     lc = LanguageCode(code, 'unisubs')
-    return u'%s (%s)' % (_(lc.name()), lc.native_name())
+    return u'%s' % _(lc.name())
 
 
 def get_user_languages_from_request(request):
