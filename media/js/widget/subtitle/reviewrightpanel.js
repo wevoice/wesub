@@ -17,20 +17,12 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.subtitle.ReviewRightPanel');
+
 /**
 * @constructor
 * @extends unisubs.RightPanel
 */
-unisubs.subtitle.ReviewRightPanel = function(dialog,
-                                             serverModel,
-                                             helpContents,
-                                             extraHelp,
-                                             legendKeySpecs,
-                                             showRestart,
-                                             doneStrongText,
-                                             doneText,
-                                             reviewOrApprovalType,
-                                             notesInput_) {
+unisubs.subtitle.ReviewRightPanel = function(dialog, serverModel, helpContents, extraHelp, legendKeySpecs, showRestart, doneStrongText, doneText, reviewOrApprovalType, notesInput_) {
     unisubs.RightPanel.call(this, serverModel, helpContents, extraHelp,
                              legendKeySpecs,
                              showRestart, doneStrongText, doneText);
@@ -39,6 +31,7 @@ unisubs.subtitle.ReviewRightPanel = function(dialog,
     this.notesInput_ = notesInput_;
     this.dialog_ = dialog;
 };
+
 goog.inherits(unisubs.subtitle.ReviewRightPanel, unisubs.RightPanel);
 
 unisubs.subtitle.ReviewRightPanel.prototype.appendMiddleContentsInternal = function($d, el) {
@@ -50,8 +43,7 @@ unisubs.subtitle.ReviewRightPanel.prototype.appendMiddleContentsInternal = funct
     el.appendChild(this.makeExtra_($d,
         'Double click any subtitle to edit text. Rollover subtitles and use buttons to tweak time, add / remove subtitles.'));
 };
-
-// FIXME: dupliaction with editmetadatarightpanel
+// FIXME: duplication with editmetadatarightpanel
 unisubs.subtitle.ReviewRightPanel.prototype.finish = function(e, approvalCode) {
     if (e){
         e.preventDefault();
@@ -95,8 +87,7 @@ unisubs.subtitle.ReviewRightPanel.prototype.finish = function(e, approvalCode) {
         this.serverModel_.finish(successCallback, failureCallback);
     }
 };
-
-// FIXME: dupliaction with editmetadatarightpanel
+// FIXME: duplication with editmetadatarightpanel
 unisubs.subtitle.ReviewRightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
     if (!this.reviewOrApprovalType_ ){
         // for the subtitling dialog, we need the button to advance to the next painel
@@ -120,8 +111,6 @@ unisubs.subtitle.ReviewRightPanel.prototype.appendCustomButtonsInternal = functi
         that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED);
     });
 };
-
-
 unisubs.subtitle.ReviewRightPanel.prototype.makeExtra_ = function($d, text) {
     return $d('div', 'unisubs-extra unisubs-extra-left',
               $d('p', null, text),
