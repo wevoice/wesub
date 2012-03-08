@@ -150,6 +150,9 @@
                                 {% with task.subtitle_version as version %}
                                     <p>
                                         {% trans 'Subtitles' %}:
+                                        <a href="{{ task.subtitle_version.get_absolute_url }}">
+                                            {% trans 'draft' %}
+                                        </a>
                                         {% if version.language.is_original %}
                                             {% trans 'transcribed' %}
                                         {% else %}
