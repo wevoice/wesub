@@ -1410,7 +1410,6 @@ body#teams div.edit-team-video form fieldset a {
     }
 
     #description {
-        color: $dark;
         line-height: 150%;
 
         p {
@@ -1492,6 +1491,10 @@ body#teams div.edit-team-video form fieldset a {
                 }
             }
         }
+    }
+
+    .notation {
+        color: inherit;
     }
 }
 ol.subtitles {
