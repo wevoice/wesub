@@ -75,7 +75,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
     owned_by_team_id = IntegerField(null=True)
 
     # All subtitle languages containing at least one version are included in the total count.
-    num_total_subs = IntegerField()
+    num_total_langs = IntegerField()
 
     # Completed languages are languages which have at least one version that is:
     #
@@ -83,7 +83,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
     # * Covers all dialog
     # * Fully synced
     # * Fully translated, if a translation
-    num_completed_subs = IntegerField()
+    num_completed_langs = IntegerField()
 
     def prepare(self, obj):
         self.prepared_data = super(TeamVideoLanguagesIndex, self).prepare(obj)
@@ -117,8 +117,8 @@ class TeamVideoLanguagesIndex(SearchIndex):
                             .annotate(num_versions=Count('subtitleversion'))
                             .filter(num_versions__gt=0))
 
-        self.prepared_data['num_total_subs'] = all_sls.count()
-        self.prepared_data['num_completed_subs'] = len(completed_sls)
+        self.prepared_data['num_total_langs'] = all_sls.count()
+        self.prepared_data['num_completed_langs'] = len(completed_sls)
 
         self.prepared_data['video_completed_langs'] = \
             [sl.language for sl in completed_sls]

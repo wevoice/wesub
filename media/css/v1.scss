@@ -464,10 +464,15 @@ div.hidden {
 
                 h4 {
                     padding: .25em 0;
+
+                    a {
+                        color: $lighter;
+                    }
                 }
                 &.due {
                     font-size: 11px;
                 }
+
             }
 
             a {
@@ -1405,7 +1410,6 @@ body#teams div.edit-team-video form fieldset a {
     }
 
     #description {
-        color: $dark;
         line-height: 150%;
 
         p {
@@ -1487,6 +1491,10 @@ body#teams div.edit-team-video form fieldset a {
                 }
             }
         }
+    }
+
+    .notation {
+        color: inherit;
     }
 }
 ol.subtitles {
@@ -1814,12 +1822,8 @@ pre.dump {
 }
 
 /* Crazytown */
-#teams .backnav {
+#teams .backnav, #teams .backnav a {
     color: $light; 
-
-    a {
-        color: $darkest;
-    }
 }
 #teams div.header {
     min-height: 0;

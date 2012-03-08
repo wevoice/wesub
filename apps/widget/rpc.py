@@ -352,8 +352,7 @@ class Rpc(BaseRpc):
 
     def finished_subtitles(self, request, session_pk, subtitles=None,
                            new_title=None, completed=None,
-                           forked=False,
-                           throw_exception=False, new_description=None,
+                           forked=False, throw_exception=False, new_description=None,
                            task_id=None, task_notes=None, task_approved=None, task_type=None):
         session = SubtitlingSession.objects.get(pk=session_pk)
         if not request.user.is_authenticated():
@@ -377,7 +376,6 @@ class Rpc(BaseRpc):
         language = session.language
         # if this belongs to a task finish it:
 
-
         new_version = None
         if subtitles is not None and \
                 (len(subtitles) > 0 or language.latest_version(public_only=False) is not None):
@@ -391,8 +389,8 @@ class Rpc(BaseRpc):
             self._save_subtitles(
                 new_version.subtitle_set, subtitles, new_version.is_forked)
 
-        # if any of the language attributes have changed (title , descr
-        # compleltedness) we must trigger the api notification.
+        # if any of the language attributes have changed (title, descr,
+        # completedness) we must trigger the api notification.
         must_trigger_api_language_edited = False
         language.release_writelock()
         if completed is not None:
@@ -411,7 +409,7 @@ class Rpc(BaseRpc):
             must_trigger_api_language_edited = True
         language.save()
 
-        if must_trigger_api_language_edited :
+        if must_trigger_api_language_edited:
             language.video.save()
             api_language_edited.send(language)
 
@@ -482,9 +480,8 @@ class Rpc(BaseRpc):
             if not res.get('response', 'ok'):
                 return res
 
-        return {
-            'user_message': user_message,
-            'response': 'ok' }
+        return { 'user_message': user_message,
+                 'response': 'ok' }
 
     def _save_subtitles(self, subtitle_set, json_subs, forked):
         for s in json_subs:

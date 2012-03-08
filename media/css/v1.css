@@ -470,6 +470,9 @@ div.hidden {
 .v1 .listing > li .actions li h4 {
   padding: .25em 0;
 }
+.v1 .listing > li .actions li h4 a {
+  color: #a0b2bd;
+}
 .v1 .listing > li .actions li.due {
   font-size: 11px;
 }
@@ -1431,7 +1434,6 @@ body#teams div.edit-team-video form fieldset a {
   width: 289px !important;
 }
 .v1 .context #description {
-  color: #486f87;
   line-height: 150%;
 }
 .v1 .context #description p {
@@ -1497,6 +1499,9 @@ body#teams div.edit-team-video form fieldset a {
 }
 .v1 .context ul.buttons li a.email {
   background: url("../images/share_icons.png") no-repeat 5px -67px;
+}
+.v1 .context .notation {
+  color: inherit;
 }
 
 ol.subtitles {
@@ -1845,11 +1850,8 @@ pre.dump code {
 }
 
 /* Crazytown */
-#teams .backnav {
+#teams .backnav, #teams .backnav a {
   color: #7692a3;
-}
-#teams .backnav a {
-  color: #2f3c45;
 }
 
 #teams div.header {
