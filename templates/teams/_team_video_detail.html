@@ -50,7 +50,7 @@
     </div>
 
     <h3>
-        <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.video_title|truncatewords:9 }}</a>
+        <a href="{% url videos:video video_id=search_record.video_id %}">{{ search_record.title|truncatewords:9 }}</a>
     </h3>
 
     <script type="text/javascript">
