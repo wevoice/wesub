@@ -200,7 +200,7 @@ class Rpc(BaseRpc):
             'general_settings': general_settings }
 
 
-    def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode):
+    def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode, is_edit):
         """Check whether the a team prevents the user from editing the subs.
 
         Returns a dict appropriate for sending back if the user should be
@@ -222,7 +222,7 @@ class Rpc(BaseRpc):
                 return { "can_edit": False, "locked_by": str(task.assignee or task.team) }
 
         # Check that the team's policies don't prevent the action.
-        if mode not in ['review', 'approve']:
+        if not is_edit and mode not in ['review', 'approve']:
             if is_translation:
                 can_edit = can_create_and_edit_translations(user, team_video, language_code)
             else:
@@ -253,14 +253,6 @@ class Rpc(BaseRpc):
             request, video_id, language_code,
             subtitle_language_pk, base_language)
 
-        # Check for team-related locking.
-        locked = self._check_team_video_locking(request.user, video_id,
-                                                language_code,
-                                                is_translation=bool(base_language_pk),
-                                                mode=mode)
-        if locked:
-            return locked
-
         if not can_edit:
             return { "can_edit": False,
                      "locked_by" : language.writelock_owner_name }
@@ -273,8 +265,16 @@ class Rpc(BaseRpc):
         if not version_for_subs:
             version_for_subs = self._create_version_from_session(session)
             version_no = 0
+            is_edit = False
         else:
             version_no = version_for_subs.version_no + 1
+            is_edit = True
+
+        locked = self._check_team_video_locking(request.user, video_id,
+                        language_code, bool(base_language_pk), mode, is_edit)
+        if locked:
+            return locked
+
         subtitles = self._subtitles_dict(
             version_for_subs, version_no, base_language_pk is None)
         return_dict = { "can_edit" : True,
@@ -348,7 +348,8 @@ class Rpc(BaseRpc):
     def finished_subtitles(self, request, session_pk, subtitles=None,
                            new_title=None, completed=None,
                            forked=False,
-                           throw_exception=False, new_description=None):
+                           throw_exception=False, new_description=None,
+                           task_id=None, task_notes=None, task_approved=None, task_type=None):
         session = SubtitlingSession.objects.get(pk=session_pk)
         if not request.user.is_authenticated():
             return { 'response': 'not_logged_in' }
@@ -361,11 +362,17 @@ class Rpc(BaseRpc):
             raise Exception('purposeful exception for testing')
 
         return self.save_finished(
-            request.user, session, subtitles, new_title, completed, forked, new_description)
+            request, request.user, session, subtitles, new_title, completed,
+            forked, new_description, task_id, task_notes, task_approved, task_type)
 
-    def save_finished(self, user, session, subtitles, new_title=None,
-                      completed=None, forked=False, new_description=None):
+    def save_finished(self, request, user, session, subtitles, new_title=None,
+                      completed=None, forked=False, new_description=None,
+                      task_id=None, task_notes=None, task_approved=None, task_type=None):
+        # TODO: lock all this in a transaction please!
         language = session.language
+        # if this belongs to a task finish it:
+
+
         new_version = None
         if subtitles is not None and \
                 (len(subtitles) > 0 or language.latest_version(public_only=False) is not None):
@@ -430,7 +437,7 @@ class Rpc(BaseRpc):
                               "They will not be submitted for publishing "
                               "until they've been completed.")
         under_moderation = language.video.is_moderated
-        
+
         _user_can_publish =  True
         team_video_set = language.video.teamvideo_set
         if under_moderation and team_video_set.exists():
@@ -460,6 +467,16 @@ class Rpc(BaseRpc):
                 )
                 for task in tasks:
                     task.complete()
+        if task_id:
+            res = {
+                "review": self._finish_review,
+                "approve": self._finish_approve
+            }[task_type](request, task_id, task_notes, task_approved,
+                         new_version=new_version)
+            # if the task did not succeeded, just bail out
+            if not res.get('response', 'ok'):
+                return res
+
         return {
             'user_message': user_message,
             'response': 'ok' }
@@ -493,6 +510,8 @@ class Rpc(BaseRpc):
             can_do = can_review
         else:
             return None
+
+        # TODO: Dedupe this and Task._find_previous_assignee
 
         # Find the assignee.
         #
@@ -622,7 +641,12 @@ class Rpc(BaseRpc):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
 
-    def finish_review(self, request, task_id=None, body=None, approved=None):
+    def _finish_review(self, request, task_id=None, body=None,
+                       approved=None, new_version=None):
+        """
+        If the task performer has edited this version, then we need to
+        set the task's version to the new one that he has edited.
+        """
         data = {'task': task_id, 'body': body, 'approved': approved}
 
         form = FinishReviewForm(request, data)
@@ -631,15 +655,19 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
+            # if there is a new version, set that as the tasks's one
+            if new_version:
+                task.subtitle_version = new_version
             task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
                 task.complete()
 
             task.subtitle_version.language.release_writelock()
+            task.subtitle_version.language.followers.add(request.user)
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                user_message =  'These subtitles have been approved and your notes have been sent to the author.'
+                user_message =  'These subtitles have been accepted and your notes have been sent to the author.'
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
                 user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
             else:
@@ -655,7 +683,12 @@ class Rpc(BaseRpc):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
 
-    def finish_approve(self, request, task_id=None, body=None, approved=None):
+    def _finish_approve(self, request, task_id=None, body=None,
+                        approved=None, new_version=None):
+        """
+        If the task performer has edited this version, then we need to
+        set the task's version to the new one that he has edited.
+        """
         data = {'task': task_id, 'body': body, 'approved': approved}
 
         form = FinishApproveForm(request, data)
@@ -664,6 +697,9 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
+            # if there is a new version, set that as the tasks's one
+            if new_version:
+                task.subtitle_version = new_version
             task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
@@ -828,14 +864,18 @@ def language_summary(language, team_video=-1, user=None):
         'dependent': language.is_dependent(),
         'subtitle_count': language.subtitle_count,
         'in_progress': language.is_writelocked,
-        'disabled': False }
+        'disabled_from': False,
+        'disabled_to': False }
 
     if team_video:
         tasks = team_video.task_set.incomplete().filter(language=language.language)
         if tasks:
             task = tasks[0]
             if user and user != task.assignee:
-                summary['disabled'] = True
+                summary['disabled_to'] = True
+
+    if not language.latest_version():
+        summary['disabled_from'] = True
 
     if language.is_dependent():
         summary['percent_done'] = language.percent_done

@@ -16,12 +16,13 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import re
+from urllib import urlopen
 
 from django import forms
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-
+from django.core.files.base import ContentFile
 from auth.models import CustomUser as User
 from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
 from teams.permissions import (
@@ -29,12 +30,14 @@ from teams.permissions import (
     can_assign_task, can_unpublish_subs
 )
 from teams.permissions_const import ROLE_NAMES
+from utils.amazon.fields import create_thumbnails
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
-from utils.translation import get_languages_list
+from utils.translation import get_language_choices
 from utils.validators import MaxFileSizeValidator
 from videos.forms import AddFromFeedForm
-from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion
+from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion, Video
+from videos.search_indexes import VideoIndex
 
 
 class EditTeamVideoForm(forms.ModelForm):
@@ -77,6 +80,13 @@ class EditTeamVideoForm(forms.ModelForm):
 
         self._save_metadata(video, 'Author', author)
         self._save_metadata(video, 'Creation Date', creation_date)
+        # store the uploaded thumb on the video itself
+        # TODO: simply remove the teamvideo.thumbnail image
+        if obj.thumbnail:
+            content = ContentFile(obj.thumbnail.read())
+            name = obj.thumbnail.url.split('/')[-1]
+            video.s3_thumbnail.save(name, content)
+            VideoIndex(Video).update_object(video)
 
     def _save_metadata(self, video, meta, content):
         '''Save a single piece of metadata for the given video.
@@ -142,7 +152,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         self.fields['project'].choices = [(p.pk, p) for p in ordered_projects]
 
         writable_langs = team.get_writable_langs()
-        self.fields['language'].choices = [c for c in get_languages_list(True)
+        self.fields['language'].choices = [c for c in get_language_choices(True)
                                            if c[0] in writable_langs]
 
     def clean_video_url(self):
@@ -281,7 +291,8 @@ class TaskCreateForm(ErrorableModelForm):
 
         team_user_ids = team.members.values_list('user', flat=True)
 
-        langs = [l for l in get_languages_list(True) if l[0] in team.get_writable_langs()]
+        langs = [l for l in get_language_choices(with_empty=True)
+                 if l[0] in team.get_writable_langs()]
         self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
@@ -462,8 +473,8 @@ class LanguagesForm(forms.Form):
         super(LanguagesForm, self).__init__(*args, **kwargs)
 
         self.team = team
-        self.fields['preferred'].choices = get_languages_list(True)
-        self.fields['blacklisted'].choices = get_languages_list(True)
+        self.fields['preferred'].choices = get_language_choices(True)
+        self.fields['blacklisted'].choices = get_language_choices(True)
 
     def clean(self):
         preferred = set(self.cleaned_data['preferred'])
@@ -538,7 +549,6 @@ class UnpublishForm(forms.Form):
             label=_(u'What would you like to unpublish?'),
             choices=(
                 ('version',    _(u'This version (and any later version) for this language.')),
-                ('language',   _(u'All versions for this language.')),
                 ('dependents', _(u'All versions for this language and any dependent languages.'))))
 
 

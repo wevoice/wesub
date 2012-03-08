@@ -6,6 +6,8 @@
     {% include_bundle "widget-css"%}
 {% endblock %}
 
+{% block html_attrs %}id="tasks"{% endblock %}
+
 {% block scripts %}
     {{ block.super }}
     {% include "utils/chosenify.html" %}
@@ -14,25 +16,26 @@
     {% include_bundle "js-teams" %}
 
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/unisubs.filters.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/unisubs.modal.js" type="text/javascript"></script>
     <script type="text/javascript">
         unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
 
-        {% if request.GET.lang %}
-            $(function() {
-                $select = $('select#id_task_language');
+        $(function() {
+            // Handle weird back-button issue with browsers.
+            $select = $('select#id_task_language');
+            {% if request.GET.lang %}
                 $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
-                $select.children().removeAttr('selected');
-                $opt.attr('selected', 'selected');
-                $select.trigger('liszt:updated');
-            });
-        {% endif %}
+            {% else %}
+                $opt = $('option[id="lang-opt-any"]');
+            {% endif %}
+            $select.children().removeAttr('selected');
+            $opt.attr('selected', 'selected');
+            $select.trigger('liszt:updated');
+        });
     </script>
 {% endblock %}
 
 {% block title %}
-    {{ team }} {% trans 'Tasks' %} | Universal Subtitles
+    {% trans 'Tasks' %} - {{ team }} | Universal Subtitles
 {% endblock %}
 
 {% block view_content %}
@@ -77,7 +80,7 @@
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'tasks for' %}</span>
                     <select id="id_task_language" name="language" class="lang-filter chosen">
-                        <option value="{{ request.path }}{% query_string request.GET lang="" page='' %}">{% trans 'all languages' %}</option>
+                        <option id="lang-opt-any" value="{{ request.path }}{% query_string request.GET lang="" page='' %}">{% trans 'all languages' %}</option>
                         {% for language in languages %}
                             <option id="lang-opt-{{ language.code }}" value="{% query_string request.GET lang=language.code page='' %}"
                                 {% if request.GET.lang == language.code %}
@@ -172,7 +175,7 @@
                                         {% if task.get_type_display == 'Approve' %}
                                             {% with task.get_reviewer as reviewer %}
                                                 {% if reviewer %},
-                                                    reviewed by {{ reviewer }}.
+                                                    reviewed by <a href="{{ reviewer.get_absolute_url }}">{{ reviewer }}</a>.
                                                 {% endif %}
                                             {% endwith %}
                                         {% endif %}
@@ -180,7 +183,7 @@
                                 {% endwith %}
                             {% endif %} 
 
-                            <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.video.thumbnail }}" alt="{{ task.team_video.title }}"></a>
+                            <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                             <ul class="actions">
                                 <li>
                                     <h4>

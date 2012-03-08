@@ -102,6 +102,46 @@ When I say what's the relation,
 is it greater than or is
 '''
 
+SRT_TEXT_WITH_TRAILING_SPACE = u'''1 
+00:00:10,000 --> 00:00:14,000
+Merci. Félicitations aux étudiants 
+[de l'association Libertés Numériques -- NdR]
+
+
+
+2 
+00:00:14,100 --> 00:00:16,000
+d’avoir organisé cette réunion.
+
+
+
+3 
+00:00:16,100 --> 00:00:19,900
+Ils ont eu raison, non seulement 
+à cause de la célébrité de Richard
+
+
+
+4
+00:00:20,000 --> 00:00:22,200
+mais aussi parce que les sujets 
+nous intéressent beaucoup. 
+
+
+
+5
+00:00:22,300 --> 00:00:25,000
+Ils nous intéressent particulièrement 
+ici à Sciences Po 
+
+
+
+6
+00:00:25,100 --> 00:00:29,200
+puisque nous essayons d’abord 
+d’étudier les controverses
+'''
+
 
 TXT_TEXT = u'''Here is sub 1.
 
@@ -295,6 +335,24 @@ class SubtitleParserTest(TestCase):
         self.assertEqual(-1, result[1]['start_time'])
         self.assertEqual(-1, result[1]['end_time'])
         self.assertEqual('Here is sub 2.', result[1]['subtitle_text'])
+
+    def test_srt_with_trailing_spaces(self):
+        parser = SrtSubtitleParser(SRT_TEXT_WITH_TRAILING_SPACE)
+        result = list(parser)
+
+        self.assertEqual(6, len(result))
+
+        # making sure that the lines that have trailing spaces are
+        # being parsed
+        self._assert_sub(
+            result[0], 10.0, 14.0,
+            u'Merci. Félicitations aux étudiants \n[de l\'association Libertés Numériques -- NdR]')
+        self._assert_sub(
+            result[1], 14.1, 16,
+            u'd’avoir organisé cette réunion.')
+        self._assert_sub(                       
+            result[2], 16.1, 19.9,
+            u'Ils ont eu raison, non seulement \nà cause de la célébrité de Richard')
 
 class WebUseTest(TestCase):
     def _make_objects(self):
@@ -887,9 +945,6 @@ class ViewsTest(WebUseTest):
         # with blank language codes.
         self.assertEqual(response.status_code, 302)
 
-    def test_video_list(self):
-        self._simple_test('videos:list')
-        self._simple_test('videos:list', data={'o': 'languages_count', 'ot': 'desc'})
 
     def test_bliptv_twice(self):
         VIDEO_FILE = 'http://blip.tv/file/get/Kipkay-AirDusterOfficeWeaponry223.m4v'
@@ -1433,16 +1488,16 @@ class VideoTypeRegistrarTest(TestCase):
 class TestFeedsSubmit(TestCase):
 
     # this rss feed is broken. FIXME TODO
-    # def test_video_feed_submit(self):
-    #    old_count = Video.objects.count()
-    #    data = {
-    #        'feed_url': u'http://vimeo.com/channels/beeple/videos/rss'
-    #    }
-    #    response = self.client.post(reverse('videos:create_from_feed'), data)
-    #    self.assertRedirects(response, reverse('videos:create'))
-    #    self.assertNotEqual(old_count, Video.objects.count())
+    def test_video_feed_submit(self):
+        old_count = Video.objects.count()
+        data = {
+            'feed_url': u'http://blip.tv/day9tv/rss'
+        }
+        response = self.client.post(reverse('videos:create_from_feed'), data)
+        self.assertRedirects(response, reverse('videos:create'))
+        self.assertNotEqual(old_count, Video.objects.count())
 
-    def test_inorrect_video_feed_submit(self):
+    def test_incorrect_video_feed_submit(self):
         data = {
             'feed_url': u'http://blip.tv/anyone-but-he/?skin=rss'
         }
@@ -1451,7 +1506,6 @@ class TestFeedsSubmit(TestCase):
         self.assertTrue(response.context['youtube_form'].errors['feed_url'])
 
     def test_empty_feed_submit(self):
-        import urllib2
         import feedparser
         from StringIO import StringIO
 
@@ -1492,6 +1546,35 @@ class TestFeedsSubmit(TestCase):
 
         feedparser._open_resource = base_open_resource
 
+    def test_feed_form_with_youtube(self):
+        youtube_user = u"http://www.youtube.com/user/SymbalooTutorials"
+        feed_url = u"https://gdata.youtube.com/feeds/api/users/SymbalooTutorials/uploads"
+        old_count = Video.objects.count()
+
+        data = {
+            'youtube_user_url': youtube_user,
+            'save_feed': '1'
+        }
+
+        response = self.client.post(reverse('videos:create_from_feed'), data)
+        self.assertRedirects(response, reverse('videos:create'))
+        # we actually imported something
+        self.assertTrue(Video.objects.count() > old_count)
+        # and that thing are 10 videos
+        self.assertEquals(Video.objects.count(), old_count + 10)
+
+        video_feed = VideoFeed.objects.get(url=feed_url)
+        self.assertIsNotNone(video_feed)
+
+        # submit again, so we can see that we are saving more videos
+        response = self.client.post(reverse('videos:create_from_feed'), data)
+        self.assertEquals(Video.objects.count(), old_count + 20)
+
+        # submit a third time - by default, youtube just
+        # returns 25 videos on a feed
+        response = self.client.post(reverse('videos:create_from_feed'), data)
+        self.assertEquals(Video.objects.count(), old_count + 25)
+        
 from apps.videos.types.brigthcove  import BrightcoveVideoType
 
 class BrightcoveVideoTypeTest(TestCase):

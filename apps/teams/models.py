@@ -33,12 +33,13 @@ from haystack.query import SQ
 import teams.moderation_const as MODERATION
 from apps.comments.models import Comment
 from auth.models import CustomUser as User
+from auth.providers import get_authentication_provider
 from messages import tasks as notifier
 from messages.models import Message
 from teams.moderation_const import WAITING_MODERATION
 from teams.permissions_const import (
-    TEAM_PERMISSIONS, PROJECT_PERMISSIONS, LANG_PERMISSIONS, ROLE_OWNER,
-    ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+    TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
+    ROLE_CONTRIBUTOR
 )
 from teams.tasks import update_one_team_video
 from utils import DEFAULT_PROTOCOL
@@ -137,6 +138,9 @@ class Team(models.Model):
     is_moderated = models.BooleanField(default=False)
     header_html_text = models.TextField(blank=True, default='', help_text=_(u"HTML that appears at the top of the teams page."))
     last_notification_time = models.DateTimeField(editable=False, default=datetime.datetime.now)
+
+    auth_provider_code = models.CharField(_(u'authentication provider code'),
+            max_length=24, blank=True, default="")
 
     # Enabling Features
     projects_enabled = models.BooleanField(default=False)
@@ -247,6 +251,17 @@ class Team(models.Model):
         """
         return Workflow.get_for_target(self.id, 'team')
 
+    @property
+    def auth_provider(self):
+        """Return the authentication provider class for this Team, or None.
+
+        No DB queries are used, so this is safe to call many times.
+
+        """
+        if not self.auth_provider_code:
+            return None
+        else:
+            return get_authentication_provider(self.auth_provider_code)
 
     # Thumbnails
     def logo_thumbnail(self):
@@ -404,7 +419,7 @@ class Team(models.Model):
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
 
-    def get_videos_for_languages_haystack(self, language, project=None, user=None, query=None, sort=None):
+    def get_videos_for_languages_haystack(self, language=None, num_completed_subs=None, project=None, user=None, query=None, sort=None):
         from teams.search_indexes import TeamVideoLanguagesIndex
 
         is_member = (user and user.is_authenticated()
@@ -425,6 +440,9 @@ class Team(models.Model):
         if language:
             qs = qs.filter(video_completed_langs=language)
 
+        if num_completed_subs != None:
+            qs = qs.filter(num_completed_subs=num_completed_subs)
+
         qs = qs.order_by({
              'name':  'video_title_exact',
             '-name': '-video_title_exact',
@@ -435,56 +453,6 @@ class Team(models.Model):
         }.get(sort or '-time'))
 
         return qs
-
-    def get_videos_for_languages(self, languages, CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS):
-        from utils.multi_query_set import TeamMultyQuerySet
-        languages.extend([l[:l.find('-')] for l in languages if l.find('-') > -1])
-
-        langs_pairs = []
-
-        for l1 in languages:
-            for l0 in languages:
-                if not l1 == l0:
-                    langs_pairs.append('%s_%s' % (l1, l0))
-
-        qs = TeamVideoLanguagePair.objects.filter(language_pair__in=langs_pairs, team=self) \
-            .select_related('team_video', 'team_video__video')
-        lqs = TeamVideoLanguage.objects.filter(team=self).select_related('team_video', 'team_video__video')
-
-        qs1 = qs.filter(percent_complete__gt=0,percent_complete__lt=100)
-        qs2 = qs.filter(percent_complete=0)
-        qs3 = lqs.filter(is_original=True, is_complete=False, language__in=languages).order_by("is_lingua_franca")
-        qs4 = lqs.filter(is_original=False, forked=True, is_complete=False, language__in=languages)
-        mqs = TeamMultyQuerySet(qs1, qs2, qs3, qs4)
-
-        total_count = TeamVideo.objects.filter(team=self).count()
-
-        additional = TeamVideoLanguagePair.objects.none()
-        all_videos = TeamVideo.objects.filter(team=self).select_related('video')
-
-        if total_count == 0:
-            mqs = all_videos
-        else:
-            if  total_count < CUTTOFF_DUPLICATES_NUM_VIDEOS_ON_TEAMS:
-                additional = all_videos.exclude(pk__in=[x.id for x in mqs ])
-            else:
-                additional = all_videos
-            mqs = TeamMultyQuerySet(qs1, qs2, qs3, qs4 , additional)
-
-        return {
-            'qs': qs,
-            'lqs': lqs,
-            'qs1': qs1,
-            'qs2': qs2,
-            'qs3': qs3,
-            'qs4': qs4,
-            'videos':mqs,
-            'videos_count': len(mqs),
-            'additional_count': additional.count(),
-            'additional': additional[:50],
-            'lqs': lqs,
-            'qs': qs,
-            }
 
 
     # Projects
@@ -653,7 +621,8 @@ class TeamVideo(models.Model):
                     u'caption or subtitle this video. Adding a note makes '
                     u'volunteers more likely to help out!'))
     thumbnail = S3EnabledImageField(upload_to='teams/video_thumbnails/', null=True, blank=True,
-        help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'))
+        help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'),
+                                    thumb_sizes=((290,165), (120,90),))
     all_languages = models.BooleanField(_('Need help with all languages'), default=False,
         help_text=_(u'If you check this, other languages will not be displayed.'))
     added_by = models.ForeignKey(User)
@@ -679,17 +648,16 @@ class TeamVideo(models.Model):
 
     def get_thumbnail(self):
         if self.thumbnail:
-            return self.thumbnail.thumb_url(100, 100)
+            return self.thumbnail.thumb_url(290, 165)
 
-        if self.video.thumbnail:
-            th = self.video.get_thumbnail()
-            if th:
-                return th
+        video_thumb = self.video.get_thumbnail(fallback=False)
+        if video_thumb:
+            return video_thumb
 
         if self.team.logo:
             return self.team.logo_thumbnail()
 
-        return ''
+        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL_BASE
 
     def _original_language(self):
         if not hasattr(self, 'original_language_code'):
@@ -725,102 +693,6 @@ class TeamVideo(models.Model):
             if latest_version:
                 sl1_subtitle_count = latest_version.subtitle_set.count()
             return 0 if sl1_subtitle_count == 0 else -1
-
-    def _update_team_video_language_pair(self, lang0, sl0, lang1, sl1):
-        percent_complete = self._calculate_percent_complete(sl0, sl1)
-        if sl1 is not None:
-            tvlps = TeamVideoLanguagePair.objects.filter(
-                team_video=self,
-                subtitle_language_0=sl0,
-                subtitle_language_1=sl1)
-        else:
-            tvlps = TeamVideoLanguagePair.objects.filter(
-                team_video=self,
-                subtitle_language_0__language=lang0,
-                language_1=lang1)
-        tvlp = None if len(tvlps) == 0 else tvlps[0]
-        if not tvlp and percent_complete != -1:
-            tvlp = TeamVideoLanguagePair(
-                team_video=self,
-                team=self.team,
-                video=self.video,
-                language_0=lang0,
-                subtitle_language_0=sl0,
-                language_1=lang1,
-                subtitle_language_1=sl1,
-                language_pair='{0}_{1}'.format(lang0, lang1),
-                percent_complete=percent_complete)
-            tvlp.save()
-        elif tvlp and percent_complete != -1:
-            tvlp.percent_complete = percent_complete
-            tvlp.save()
-        elif tvlp and percent_complete == -1:
-            tvlp.delete()
-
-    def _make_lp(self, lang0, sl0, lang1, sl1):
-        percent_complete = self._calculate_percent_complete(sl0, sl1)
-        if percent_complete == -1:
-            return None
-        else:
-            return "{0}_{1}_{2}".format(
-                lang0, lang1, "M" if percent_complete > 0 else "0")
-
-    def _update_tvlp_for_languages(self, lang0, lang1, langs):
-        sl0_list = langs.get(lang0, [])
-        sl1_list = langs.get(lang1, [])
-        if len(sl1_list) == 0:
-            sl1_list = [None]
-        for sl0 in sl0_list:
-            for sl1 in sl1_list:
-                self._update_team_video_language_pair(lang0, sl0, lang1, sl1)
-
-    def _add_lps_for_languages(self, lang0, lang1, langs, lps):
-        sl0_list = langs.get(lang0, [])
-        sl1_list = langs.get(lang1, [])
-        if len(sl1_list) == 0:
-            sl1_list = [None]
-        for sl0 in sl0_list:
-            for sl1 in sl1_list:
-                lp = self._make_lp(lang0, sl0, lang1, sl1)
-                if lp:
-                    lps.append(lp)
-
-    def update_team_video_language_pairs(self, lang_code_list=None):
-        TeamVideoLanguagePair.objects.filter(team_video=self).delete()
-        if lang_code_list is None:
-            lang_code_list = [item[0] for item in settings.ALL_LANGUAGES]
-        langs = self.video.subtitle_language_dict()
-        for lang0, sl0_list in langs.items():
-            for lang1 in lang_code_list:
-                if lang0 == lang1:
-                    continue
-                self._update_tvlp_for_languages(lang0, lang1, langs)
-
-    def searchable_language_pairs(self):
-        lps = []
-        lang_code_list = [item[0] for item in settings.ALL_LANGUAGES]
-        langs = self.video.subtitle_language_dict()
-        for lang0, sl0_list in langs.items():
-            for lang1 in lang_code_list:
-                if lang0 == lang1:
-                    continue
-                self._add_lps_for_languages(lang0, lang1, langs, lps)
-        return lps
-
-    def _add_searchable_language(self, language, sublang_dict, sls):
-        complete_sublangs = []
-        if language in sublang_dict:
-            complete_sublangs = [sl for sl in sublang_dict[language] if
-                                 not sl.is_dependent() and sl.is_complete]
-        if len(complete_sublangs) == 0:
-            sls.append("S_{0}".format(language))
-
-    def searchable_languages(self):
-        sls = []
-        langs = self.video.subtitle_language_dict()
-        for lang in settings.ALL_LANGUAGES:
-            self._add_searchable_language(lang[0], langs, sls)
-        return sls
 
     def save(self, *args, **kwargs):
         if not hasattr(self, "project"):
@@ -968,124 +840,6 @@ post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.
 post_delete.connect(team_video_rm_video_moderation, TeamVideo, dispatch_uid="teams.teamvideo.team_video_rm_video_moderation")
 
 
-# TeamVideoLanguage
-class TeamVideoLanguage(models.Model):
-    team_video = models.ForeignKey(TeamVideo, related_name='languages')
-    video = models.ForeignKey(Video)
-    language = models.CharField(max_length=16, choices=ALL_LANGUAGES,  null=False, blank=False, db_index=True)
-    subtitle_language = models.ForeignKey(SubtitleLanguage, null=True)
-    team = models.ForeignKey(Team)
-    is_original = models.BooleanField(default=False, db_index=True)
-    forked = models.BooleanField(default=True, db_index=True)
-    is_complete = models.BooleanField(default=False, db_index=True)
-    percent_done = models.IntegerField(default=0, db_index=True)
-    is_lingua_franca = models.BooleanField(default=False, db_index=True)
-
-    class Meta:
-        unique_together = (('team_video', 'subtitle_language'),)
-
-    def __unicode__(self):
-        return "video: %s - %s" % (self.video.pk, self.get_language_display())
-
-    @classmethod
-    def _save_tvl_for_sl(cls, tv, sl):
-        tvl = cls(
-            team_video=tv,
-            video=tv.video,
-            language=sl.language,
-            subtitle_language=sl,
-            team=tv.team,
-            is_original=sl.is_original,
-            forked=sl.is_forked,
-            is_complete=sl.is_complete,
-            percent_done=sl.percent_done)
-        tvl.save()
-
-    @classmethod
-    def _save_tvl_for_l(cls, tv, lang):
-        tvl = cls(
-            team_video=tv,
-            video=tv.video,
-            language=lang,
-            subtitle_language=None,
-            team=tv.team,
-            is_original=False,
-            forked=True,
-            is_complete=False,
-            percent_done=0)
-        tvl.save()
-
-    @classmethod
-    def _update_for_language(cls, tv, language, sublang_dict):
-        if language in sublang_dict:
-            sublangs = sublang_dict[language]
-            for sublang in sublangs:
-                    cls._save_tvl_for_sl(tv, sublang)
-        else:
-            cls._save_tvl_for_l(tv, language)
-
-    @classmethod
-    def update(cls, tv):
-        cls.objects.filter(team_video=tv).delete()
-
-        sublang_dict = tv.video.subtitle_language_dict()
-        for lang in settings.ALL_LANGUAGES:
-            cls._update_for_language(tv, lang[0], sublang_dict)
-
-    @classmethod
-    def update_for_language(cls, tv, language):
-        cls.objects.filter(team_video=tv, language=language).delete()
-        cls._update_for_language(
-            tv, language, tv.video.subtitle_language_dict())
-
-    def save(self, *args, **kwargs):
-        self.is_lingua_franca = self.language in settings.LINGUA_FRANCAS
-        return super(TeamVideoLanguage, self).save(*args, **kwargs)
-
-
-    def is_checked_out(self, ignore_user=None):
-        '''Return whether this language is checked out in a task.
-
-        If a user is given, checkouts by that user will be ignored.  This
-        provides a way to ask "can user X check out or work on this task?".
-
-        This is similar to the writelocking done on Videos and
-        SubtitleLanguages.
-
-        '''
-        tasks = self.team_video.task_set.filter(
-                # Find all tasks for this video which:
-                deleted=False,           # - Aren't deleted
-                assignee__isnull=False,  # - Are assigned to someone
-                language=self.language,  # - Apply to this language
-                completed__isnull=True,  # - Are unfinished
-        )
-        if ignore_user:
-            tasks = tasks.exclude(assignee=ignore_user)
-
-        return tasks.exists()
-
-    class Meta:
-        permissions = LANG_PERMISSIONS
-
-
-# TeamVideoLanguagePair
-class TeamVideoLanguagePair(models.Model):
-    team_video = models.ForeignKey(TeamVideo)
-    team = models.ForeignKey(Team)
-    video = models.ForeignKey(Video)
-
-    # language_0 and subtitle_language_0 are the potential standards.
-    language_0 = models.CharField(max_length=16, choices=ALL_LANGUAGES, db_index=True)
-    subtitle_language_0 = models.ForeignKey(
-        SubtitleLanguage, null=False, related_name="team_video_language_pairs_0")
-
-    language_1 = models.CharField(max_length=16, choices=ALL_LANGUAGES, db_index=True)
-    subtitle_language_1 = models.ForeignKey(
-        SubtitleLanguage, null=True, related_name="team_video_language_pairs_1")
-
-    language_pair = models.CharField(db_index=True, max_length=16)
-    percent_complete = models.IntegerField(db_index=True, default=0)
 
 
 # TeamMember
@@ -1630,13 +1384,16 @@ class Task(models.Model):
         """Add a comment on the SubtitleLanguage for this task with the body as content."""
         if self.body.strip():
             lang_ct = ContentType.objects.get_for_model(SubtitleLanguage)
-            Comment(
+            comment = Comment(
                 content=self.body,
                 object_pk=self.subtitle_version.language.pk,
                 content_type=lang_ct,
                 submit_date=self.completed,
                 user=self.assignee,
-            ).save()
+            )
+            comment.save()
+            notifier.send_video_comment_notification(comment.pk,
+                                    version_pk=self.subtitle_version.pk)
 
     def future(self):
         """Return whether this task expires in the future."""
@@ -1731,6 +1488,32 @@ class Task(models.Model):
                  'Approve': self._complete_approve,
         }[Task.TYPE_NAMES[self.type]]()
 
+    def _find_previous_assignee(self, type):
+        """Find the previous assignee for a new task for this video.
+
+        For now, we'll assign the review/approval task to whomever did it last
+        time (if it was indeed done), but only if they're still eligible to
+        perform it now.
+
+        """
+        from teams.permissions import can_review, can_approve
+
+        if type == 'Approve':
+            type = Task.TYPE_IDS['Approve']
+            can_do = can_approve
+        elif type == 'Review':
+            type = Task.TYPE_IDS['Review']
+            can_do = can_review
+
+        last_task = self.team_video.task_set.complete().filter(
+            language=self.language, type=type
+        ).order_by('-completed')[:1]
+
+        if last_task:
+            candidate = last_task[0].assignee
+            if candidate and can_do(self.team_video, candidate, self.language):
+                return candidate
+
     def _complete_subtitle(self):
         """Handle the messy details of completing a subtitle task."""
         subtitle_version = self.team_video.video.latest_version(public_only=False)
@@ -1738,12 +1521,14 @@ class Task(models.Model):
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
-                        language=self.language, type=Task.TYPE_IDS['Review'])
+                        language=self.language, type=Task.TYPE_IDS['Review'],
+                        assignee=self._find_previous_assignee('Review'))
             task.save()
         elif self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
-                        language=self.language, type=Task.TYPE_IDS['Approve'])
+                        language=self.language, type=Task.TYPE_IDS['Approve'],
+                        assignee=self._find_previous_assignee('Approve'))
             task.save()
         else:
             # Subtitle task is done, and there is no approval or review
@@ -1765,13 +1550,15 @@ class Task(models.Model):
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
-                        language=self.language, type=Task.TYPE_IDS['Review'])
+                        language=self.language, type=Task.TYPE_IDS['Review'],
+                        assignee=self._find_previous_assignee('Review'))
             task.save()
         elif self.workflow.approve_enabled:
             # The review step may be disabled.  If so, we check the approve step.
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
-                        language=self.language, type=Task.TYPE_IDS['Approve'])
+                        language=self.language, type=Task.TYPE_IDS['Approve'],
+                        assignee=self._find_previous_assignee('Approve'))
             task.save()
         else:
             # Translation task is done, and there is no approval or review
@@ -1798,7 +1585,8 @@ class Task(models.Model):
             if self.approved == Task.APPROVED_IDS['Approved']:
                 task = Task(team=self.team, team_video=self.team_video,
                             subtitle_version=self.subtitle_version,
-                            language=self.language, type=Task.TYPE_IDS['Approve'])
+                            language=self.language, type=Task.TYPE_IDS['Approve'],
+                            assignee=self._find_previous_assignee('Approve'))
                 task.save()
                 # approval review
                 notifier.reviewed_and_pending_approval.delay(self.pk)
@@ -1896,6 +1684,10 @@ class Task(models.Model):
 
 
     def save(self, update_team_video_index=True, *args, **kwargs):
+        if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']):
+            assert self.subtitle_version, \
+                   "Review and Approve tasks must have a subtitle_version!"
+
         result = super(Task, self).save(*args, **kwargs)
         if update_team_video_index:
             update_one_team_video.delay(self.team_video.pk)

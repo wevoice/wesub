@@ -55,6 +55,11 @@ unisubs.subtitle.MSServerModel = function(
         goog.Timer.TICK,
         goog.bind(this.timerTick_, this));
     unisubs.subtitle.MSServerModel.currentInstance = this;
+    // task attributes for both review / approve
+    this.taskId = null;
+    this.taskNotes = null;
+    this.taskApproved = null;
+    this.taskType = null;
 };
 goog.inherits(unisubs.subtitle.MSServerModel, goog.Disposable);
 
@@ -169,6 +174,20 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
     if (window['UNISUBS_THROW_EXCEPTION']) {
         args['throw_exception'] = true;
     }
+    // add task arguments, if they are all null, it will be harmless on the 
+    // backend
+    args['task_id'] = this.taskId;
+    args['task_notes'] = this.taskNotes;
+    if (this.taskApproved != undefined){
+        atLeastOneThingChanged = true;
+    }
+    // if the save and exit button was created, we must pass this as a value
+    if (! this.taskApproved && this.taskId ){
+        this.taskApproved = unisubs.Dialog.MODERATION_OUTCOMES.SAVE_FOR_LATER;
+    }
+    args['task_approved'] = this.taskApproved;
+
+    args['task_type'] = this.taskType;
     return atLeastOneThingChanged ? args : null;
 };
 
@@ -210,7 +229,12 @@ unisubs.subtitle.MSServerModel.prototype.finish =
         true);
 };
 
+unisubs.subtitle.MSServerModel.prototype.setComplete = function(isComplete){
+    this.captionSet_.completed = isComplete;
+}
+
 unisubs.subtitle.MSServerModel.prototype.fetchReviewData = function(taskId, successCallback) {
+    var that = this;
     unisubs.Rpc.call(
         'fetch_review_data',
         {'task_id': taskId},
@@ -220,6 +244,8 @@ unisubs.subtitle.MSServerModel.prototype.fetchReviewData = function(taskId, succ
                 alert('Problem fetching review data. Response: ' + result["response"]);
                 failureCallback(200);
             } else {
+                that.taskId = taskId;
+                that.taskType = 'review';
                 successCallback(result['body']);
             }
         }, function(opt_status) {
@@ -228,6 +254,7 @@ unisubs.subtitle.MSServerModel.prototype.fetchReviewData = function(taskId, succ
 
 };
 unisubs.subtitle.MSServerModel.prototype.fetchApproveData = function(taskId, successCallback) {
+    var that = this;
     unisubs.Rpc.call(
         'fetch_approve_data',
         {'task_id': taskId},
@@ -237,6 +264,8 @@ unisubs.subtitle.MSServerModel.prototype.fetchApproveData = function(taskId, suc
                 alert('Problem fetching approval data. Response: ' + result["response"]);
                 failureCallback(200);
             } else {
+                that.taskId = taskId;
+                that.taskType = 'approve';
                 successCallback(result['body']);
             }
         }, function(opt_status) {
@@ -244,55 +273,18 @@ unisubs.subtitle.MSServerModel.prototype.fetchApproveData = function(taskId, suc
         }, true);
 
 };
-
-unisubs.subtitle.MSServerModel.prototype.finishReview = function(data, successCallback, failureCallback) {
-    var that = this;
-    unisubs.Rpc.call(
-        'finish_review',
-        data,
-        function(result) {
-            if (result['response'] != 'ok') {
-                // this should never happen.
-                alert('Problem saving review. Response: ' +
-                      result["response"]);
-                failureCallback(200);
-            } else {
-                that.finished_ = true;
-                if (successCallback) {
-                    successCallback(result["user_message"]);
-                }
-            }
-        }, function(opt_status) {
-            if (failureCallback) {
-                failureCallback(opt_status);
-            }
-        }, true);
-
-};
-unisubs.subtitle.MSServerModel.prototype.finishApprove = function(data, successCallback, failureCallback) {
-    var that = this;
-    unisubs.Rpc.call(
-        'finish_approve',
-        data,
-        function(result) {
-            if (result['response'] != 'ok') {
-                // this should never happen.
-                alert('Problem saving approval. Response: ' +
-                      result["response"]);
-                failureCallback(200);
-            } else {
-                that.finished_ = true;
-                if (successCallback) {
-                    successCallback(result["user_message"]);
-                }
-            }
-        }, function(opt_status) {
-            if (failureCallback) {
-                failureCallback(opt_status);
-            }
-        }, true);
-
-};
+/** 
+* Store the review notes. This should get called by the proper panel before calling finish
+*/
+unisubs.subtitle.MSServerModel.prototype.setTaskNotes = function(notes) {
+    this.taskNotes = notes;
+}
+/** 
+* Store the review /approval status. This should get called by the proper panel before calling finish
+*/
+unisubs.subtitle.MSServerModel.prototype.setTaskApproved  = function(approvalCode) {
+    this.taskApproved = approvalCode;
+}
 
 unisubs.subtitle.MSServerModel.prototype.getEmbedCode = function() {
     return [

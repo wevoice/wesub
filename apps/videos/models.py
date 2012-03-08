@@ -141,7 +141,12 @@ class Video(models.Model):
     was_subtitled = models.BooleanField(default=False, db_index=True)
     thumbnail = models.CharField(max_length=500, blank=True)
     small_thumbnail = models.CharField(max_length=500, blank=True)
-    s3_thumbnail = S3EnabledImageField(blank=True, upload_to='video/thumbnail/')
+    s3_thumbnail = S3EnabledImageField(
+        blank=True,
+        upload_to='video/thumbnail/',
+        thumb_sizes=(
+            (290,165),
+            (120,90),))
     edited = models.DateTimeField(null=True, editable=False)
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, null=True, blank=True)
@@ -251,11 +256,13 @@ class Video(models.Model):
             from sentry.client.models import client
             client.create_from_exception()
 
-    def get_thumbnail(self):
-        """Return a URL to this video's thumbnail, or '' if there isn't one.
+    def get_thumbnail(self, fallback=True):
+        """Return a URL to this video's thumbnail.
 
         This may be an absolute or relative URL, depending on whether the
         thumbnail is stored in our media folder or on S3.
+
+        If fallback is True, it will fallback to the default thumbnail
 
         """
         if self.s3_thumbnail:
@@ -263,8 +270,8 @@ class Video(models.Model):
 
         if self.thumbnail:
             return self.thumbnail
-
-        return ''
+        if fallback:
+            return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL_BASE
 
     def get_small_thumbnail(self):
         """Return a URL to a small version of this video's thumbnail, or '' if there isn't one.
@@ -278,8 +285,22 @@ class Video(models.Model):
 
         if self.small_thumbnail:
             return self.small_thumbnail
+        return "%simages/video-no-thumbnail-small.png" % settings.STATIC_URL_BASE
 
-        return ''
+    def get_medium_thumbnail(self):
+        """Return a URL to a medium version of this video's thumbnail, or '' if there isn't one.
+
+        This may be an absolute or relative URL, depending on whether the
+        thumbnail is stored in our media folder or on S3.
+
+        """
+        if self.s3_thumbnail:
+            return self.s3_thumbnail.thumb_url(290, 165)
+
+        if self.thumbnail:
+            return self.thumbnail
+
+        return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
     @models.permalink
     def video_link(self):

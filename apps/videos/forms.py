@@ -37,7 +37,7 @@ from videos.types.youtube import yt_service
 from videos.models import VideoUrl
 from utils.forms import AjaxForm, EmailListField, UsernameListField
 from videos.tasks import video_changed_tasks
-from utils.translation import get_languages_list
+from utils.translation import get_language_choices
 from utils.forms import StripRegexField, FeedURLField
 from videos.feed_parser import FeedParser, FeedParserError
 from utils.forms import ReCaptchaField
@@ -155,8 +155,8 @@ class SubtitlesUploadBaseForm(forms.Form):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(SubtitlesUploadBaseForm, self).__init__(*args, **kwargs)
-        self.fields['language'].choices = get_languages_list()
-        self.fields['video_language'].choices = get_languages_list()
+        self.fields['language'].choices = get_language_choices()
+        self.fields['video_language'].choices = get_language_choices()
 
     def clean_video(self):
         video = self.cleaned_data['video']
@@ -170,14 +170,20 @@ class SubtitlesUploadBaseForm(forms.Form):
 
         team_video = video.get_team_video()
         if team_video:
-            msg = _(u"Uploading subtitles in this language was forbidden by team %s which moderates the video." % team_video.team)
+            msg = _(u"Uploading subtitles in this language was forbidden by team %s which moderates the video.") % team_video.team
 
-            if team_video.task_set.incomplete().filter(language=language).exists():
+            incomplete_tasks = team_video.task_set.incomplete().filter(language__in=[language, ''])
+
+            # If there are any incomplete tasks open they should block the
+            # uploading of subtitles, unless the user is assigned to that task.
+            if self.user and self.user.is_authenticated():
+                incomplete_tasks = incomplete_tasks.exclude(assignee=self.user)
+
+            if incomplete_tasks.exists():
                 raise forms.ValidationError(msg)
 
-            if team_video.task_set.incomplete_subtitle().exists():
-                raise forms.ValidationError(msg)
-
+            # However, approve/review will still block upload as before.
+            # TODO: Remove this restriction.
             workflow = team_video.get_workflow()
             if workflow.approve_allowed or workflow.review_allowed:
                 raise forms.ValidationError(msg)
@@ -267,6 +273,14 @@ class SubtitlesUploadBaseForm(forms.Form):
         else:
             language, self._sl_created = self._find_appropriate_language(video, self.cleaned_data['language'])
         language = save_subtitle(video, language, parser, self.user, update_video)
+
+        # If there are any outstanding tasks for this language, associate the
+        # new version with them.
+        team_video = video.get_team_video()
+        if team_video:
+            outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
+            new_version = language.latest_version(public_only=False)
+            outstanding_tasks.update(subtitle_version=new_version, language=language.language)
 
         return language
 
@@ -451,8 +465,11 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         feed_parser = FeedParser(url)
         entry = ''
 
+        video_feed = self.get_feed_url(url)
+        since = video_feed.last_link if video_feed else None
+
         try:
-            for vt, info, entry in feed_parser.items():
+            for vt, info, entry in feed_parser.items(since=since):
                 if vt:
                     self.video_types.append((vt, info))
 
@@ -487,12 +504,19 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
     def save_feed_url(self, feed_url, last_entry_url):
         try:
-            VideoFeed.objects.get(url=feed_url)
+            vf = VideoFeed.objects.get(url=feed_url)
         except VideoFeed.DoesNotExist:
             vf = VideoFeed(url=feed_url)
-            vf.user = self.user
-            vf.last_link = last_entry_url
-            vf.save()
+
+        vf.user = self.user
+        vf.last_link = last_entry_url
+        vf.save()
+
+    def get_feed_url(self, feed_url):
+        try:
+            return VideoFeed.objects.get(url=feed_url)
+        except VideoFeed.DoesNotExist:
+            return None
 
     def save(self):
         if self.cleaned_data.get('save_feed'):

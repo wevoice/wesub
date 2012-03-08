@@ -25,7 +25,7 @@ class java {
     path => ["/bin", "/usr/bin"], require => Package["debconf-utils"],
   }
 
-  package { "sun-java6-jre":
+  package { "openjdk-6-jre":
     ensure => latest,
     require => [ File["partner.list"], Exec["agree-to-jre-license"], Exec["apt-get-update"] ],
   }

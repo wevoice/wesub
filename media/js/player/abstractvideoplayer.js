@@ -86,6 +86,19 @@ unisubs.player.AbstractVideoPlayer.DIALOG_SIZE = new goog.math.Size(400, 300);
 unisubs.player.AbstractVideoPlayer.prototype.createDom = function() {
     this.setElementInternal(this.getDomHelper().createElement('span'));
     goog.dom.classes.add(this.getElement(), 'unisubs-videoplayer');
+    if (this.videoSource_ && this.videoSource_.sizeFromConfig){
+        var sizeFromConfig = this.videoSource_.sizeFromConfig();
+        if (!this.forDialog_ && sizeFromConfig)
+            this.playerSize_ = sizeFromConfig;
+        else{
+            this.playerSize_ = this.forDialog_ ?
+            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+        }
+    this.setDimensionsKnownInternal();
+
+    }
+
 };
 
 unisubs.player.AbstractVideoPlayer.prototype.getPlayheadFn = function() {
@@ -170,7 +183,8 @@ unisubs.player.AbstractVideoPlayer.prototype.resumeLoadingInternal = function(pl
  */
 unisubs.player.AbstractVideoPlayer.prototype.setDimensionsKnownInternal = function() {
     this.dimensionsKnown_ = true;
-    unisubs.style.setSize(this.getElement(), this.getVideoSize());
+    var size = this.getVideoSize();
+    unisubs.style.setSize(this.getElement(), size.width, size.height);
     this.dispatchEvent(
         unisubs.player.AbstractVideoPlayer.EventType.DIMENSIONS_KNOWN);
 };

@@ -37,7 +37,7 @@
     border-top-right-radius: $topRight;
 }
 @mixin vertical-gradient($start: #000, $stop: #FFF) {
-    background-color: ($start + $stop) / 2;
+    background: $start;
     background-image: -moz-gradient(center top, $start 0%, $stop 100%);
     background-image: -moz-linear-gradient(center top, $start 0%, $stop 100%);
     background-image: -ms-linear-gradient($start, $stop);
@@ -62,7 +62,6 @@
 @mixin opacity($op) {
     -khtml-opacity: $op;
     -moz-opacity: $op;
-    filter: alpha(opacity=$op);
     opacity: $op;
 }
 @mixin box-right {
@@ -558,14 +557,15 @@ div.hidden {
             }
             &:hover {
                 @include opacity(1.0);
+                display: block;
             }
             form {
                 padding: 0;
             }
-
         }
         &:hover {
             .admin-controls {
+                @include opacity(1.0);
                 display: block;
             }
         }
@@ -697,10 +697,10 @@ div.hidden {
     }
 }
 .v1 .listing.messages > li {
-    opacity: .5;
+    @include opacity(0.5);
 
     &.unread {
-        opacity: 1;
+        @include opacity(1.0);
     }
     p {
         a {
@@ -1253,7 +1253,7 @@ body#teams div.edit-team-video form fieldset a {
         float: left;
     }
     div.disabled {
-        opacity: .3;
+        @include opacity(0.3);
     }
 }
 
@@ -1886,13 +1886,26 @@ pre.dump {
     clear: both;
     padding-top: 2em;
 }
-#teams .context #signin-join {
+#teams .context .join.button {
     display: block;
     margin: 1em;
+
+    img {
+        max-height: 24px;
+        margin-left: 4px;
+    }
+
+    * {
+        vertical-align: middle;
+    }
 }
 #teams .context .notation {
     clear: both;
-    padding-top: 2em;
+    padding-top: 4em;
+}
+#teams .context .join .notation {
+    padding-top: 0;
+    margin: -.5em 1.5em 0;
 }
 #teams .context .notation.policy {
     margin-bottom: 1em;

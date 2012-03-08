@@ -34,7 +34,7 @@ unisubs.player.FlvVideoPlayer = function(videoSource, opt_forDialog) {
     /**
      * @protected
      */
-    this.playerSize = null;
+    this.playerSize_ = null;
     this.player_ = null;
     /**
      * 
@@ -52,9 +52,9 @@ unisubs.player.FlvVideoPlayer.prototype.createDom = function() {
     unisubs.player.FlvVideoPlayer.superClass_.createDom.call(this);
     var sizeFromConfig = this.sizeFromConfig_();
     if (!this.forDialog_ && sizeFromConfig)
-        this.playerSize = sizeFromConfig;
+        this.playerSize_ = sizeFromConfig;
     else
-        this.playerSize = this.forDialog_ ?
+        this.playerSize_ = this.forDialog_ ?
         unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
         unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
 };
@@ -70,8 +70,8 @@ unisubs.player.FlvVideoPlayer.prototype.enterDocument = function() {
         this.setDimensionsKnownInternal();
         var flashEmbedParams = {
             'src': unisubs.staticURL() + 'flowplayer/flowplayer-3.2.7.swf',
-            'width': this.playerSize.width + '',
-            'height': this.playerSize.height + '',
+            'width': this.playerSize_.width + '',
+            'height': this.playerSize_.height + '',
             'wmode': 'opaque'
         };
         var that = this;
@@ -131,10 +131,10 @@ unisubs.player.FlvVideoPlayer.prototype.exitDocument = function() {
 unisubs.player.FlvVideoPlayer.prototype.swfFinishedLoading_ = function() {
     unisubs.style.setSize(
         goog.dom.getFirstElementChild(this.player_['getParent']()), 
-        this.playerSize);
+        this.playerSize_);
     unisubs.style.setSize(
         goog.dom.getElement(this.elementID_),
-        this.playerSize);
+        this.playerSize_);
     this.swfLoaded_ = true;
     goog.array.forEach(this.commands_, function(c) { c(); });
     this.commands_ = [];
@@ -292,7 +292,7 @@ unisubs.player.FlvVideoPlayer.prototype.needsIFrame = function() {
 };
 
 unisubs.player.FlvVideoPlayer.prototype.getVideoSize = function() {
-    return this.playerSize;
+    return this.playerSize_;
 };
 
 unisubs.player.FlvVideoPlayer.prototype.disposeInternal = function() {

@@ -20,8 +20,9 @@ from django.core.urlresolvers import reverse
 from auth.models import CustomUser as User
 from django.conf import settings
 from django.test import TestCase
+from utils.panslugify import pan_slugify
 
-from apps.teams.models import Team, TeamMember, TeamVideo
+from apps.teams.models import Team, TeamMember, TeamVideo, Project
 from apps.videos.models import Video, VIDEO_TYPE_YOUTUBE, VideoUrl
 
 class ViewsTests(TestCase):
@@ -94,6 +95,34 @@ class ViewsTests(TestCase):
         self.assertEqual(team.name, u"New team")
         self.assertEqual(team.description, u"testing")
         self.assertTrue(team.is_visible)
+
+    def test_create_project(self):
+        team = self._create_base_team()
+        self.client.login(**self.auth)
+
+        url = reverse("teams:add_project", kwargs={"slug": team.slug})
+
+        data = {
+            "name": u"Test Project",
+            "description": u"Test Project",
+            "review_allowed": u"0",
+            "approve_allowed": u"0",
+        }
+
+        response = self.client.post(url, data)
+        self.failUnlessEqual(response.status_code, 302)
+
+        slug = pan_slugify(data['name'])
+
+        project = Project.objects.get(slug=slug)
+        self.assertEqual(project.name, data['name'])
+        self.assertEqual(project.description, data['description'])
+
+        # creating a duplicated project results in error
+        response = self.client.post(url, data)
+        self.failUnlessEqual(response.status_code, 200)
+        messages = [m.message for m in list(response.context['messages'])]
+        self.assertIn(u"There's already a project with this name", messages)
 
     def test_delete_video(self):
         video_url = Video.objects.all()[0].get_video_url()

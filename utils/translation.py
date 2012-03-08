@@ -1,135 +1,163 @@
+# -*- coding: utf-8 -*-
 import time
+
 from django.conf import settings
 from django.core.cache import cache
 from django.utils import simplejson as json
 from django.utils.http import cookie_date
-from django.utils.translation import get_language, get_language_info, ugettext as _, ugettext_lazy
-from translation_names import ORIGINAL_LANGUAGE_NAMES
+from django.utils.translation import (
+    get_language, get_language_info, ugettext as _
+)
+from django.utils.translation.trans_real import parse_accept_lang_header
 
-SUPPORTED_LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
-SUPPORTED_LANGUAGES_DICT_LAZY = dict((k, ugettext_lazy(v))
-                                     for k, v in settings.ALL_LANGUAGES)
+from libs.unilangs import get_language_name_mapping, LanguageCode
 
-def get_simple_languages_list(with_empty=False):
-    cache_key = 'simple-langs-cache-%s' % get_language() 
-    languages = cache.get(cache_key)   
-    if not languages:
-        languages = []
-        
-        for val, name in settings.ALL_LANGUAGES:
-            languages.append((val, _(name)))
-        languages.sort(key=lambda item: item[1])
-        cache.set(cache_key, languages, 60*60)
-    if with_empty:
-        languages = [('', '---------')]+languages
-    return languages
-   
-def get_languages_list(with_empty=False):
-    cache_key = 'langs-cache-%s' % get_language() 
-    
+
+# A set of all language codes we support.
+SUPPORTED_LANGUAGE_CODES = set(get_language_name_mapping('unisubs').keys())
+
+
+def _only_supported_languages(language_codes):
+    """Filter the given list of language codes to contain only codes we support."""
+
+    # TODO: Figure out the codec issue here.
+    return [code for code in language_codes if code in SUPPORTED_LANGUAGE_CODES]
+
+
+def get_language_choices_short(with_empty=False):
+    """Return a list of language code choices labeled with only the translated name.
+
+    This does NOT include the native name of a language in the label, like the
+    get_language_choices function.
+
+    This function should probably not be used, if we want a consistent display
+    across the site.
+
+    Right now it's only used on the Search page for the left column, because it
+    looks ugly with the full names there.
+
+    """
+    cache_key = 'simple-langs-cache-%s' % get_language()
     languages = cache.get(cache_key)
 
     if not languages:
         languages = []
-        
-        for val, name in settings.ALL_LANGUAGES:
-            if val in ORIGINAL_LANGUAGE_NAMES:
-                name = u'%s (%s)' % (_(name), ORIGINAL_LANGUAGE_NAMES[val])
-            else:
-                name = _(name)
-            languages.append((val, name))
+
+        for code, name in get_language_name_mapping('unisubs').items():
+            languages.append((code, _(name)))
+
         languages.sort(key=lambda item: item[1])
         cache.set(cache_key, languages, 60*60)
+
     if with_empty:
-        languages = [('', '---------')]+languages
+        languages = [('', '---------')] + languages
 
     return languages
 
-from django.utils.translation.trans_real import parse_accept_lang_header
-from django.utils import translation
+def get_language_choices(with_empty=False):
+    """Return a list of language code choices labeled in the standard manner.
 
-def get_user_languages_from_request(request, only_supported=False, with_names=False):
+    That last bit is the important part.  As an example, the "French" option
+    will look like this when being viewed by an English user:
+
+        French (Français)
+
+    And will look like this when viewed by a French user:
+
+        Français (Français)
+
+    These lists are built and cached once per user language.
+
+    """
+    cache_key = 'langs-cache-%s' % get_language()
+    languages = cache.get(cache_key)
+
+    if not languages:
+        languages = []
+
+        for code in SUPPORTED_LANGUAGE_CODES:
+            languages.append((code, get_language_label(code)))
+
+        languages.sort(key=lambda item: item[1])
+        cache.set(cache_key, languages, 60*60)
+
+    if with_empty:
+        languages = [('', '---------')] + languages
+
+    return languages
+
+def get_language_label(code):
+    """Return the translated, human-readable label for the given language code."""
+    lc = LanguageCode(code, 'unisubs')
+    return u'%s (%s)' % (_(lc.name()), lc.native_name())
+
+
+def get_user_languages_from_request(request):
+    """Return a list of our best guess at languages that request.user speaks."""
     languages = []
+
     if request.user.is_authenticated():
-        languages = [l.language for l in request.user.get_languages()]    
+        languages = [l.language for l in request.user.get_languages()]
 
     if not languages:
         languages = languages_from_request(request)
 
-    if only_supported:
-        languages_to_remove = []
-        for item in languages:
-            if not item in SUPPORTED_LANGUAGES_DICT and \
-                not item.split('-')[0] in SUPPORTED_LANGUAGES_DICT:
-                    languages_to_remove.append(item)
-        for item in languages_to_remove:
-            languages.remove(item)
-
-    return with_names and languages_with_names(languages) or languages
+    return _only_supported_languages(languages)
 
 def set_user_languages_to_cookie(response, languages):
     max_age = 60*60*24
     response.set_cookie(
         settings.USER_LANGUAGES_COOKIE_NAME,
-        json.dumps(languages), 
+        json.dumps(languages),
         max_age=max_age,
         expires=cookie_date(time.time() + max_age))
 
 def get_user_languages_from_cookie(request):
     try:
         langs = json.loads(request.COOKIES.get(settings.USER_LANGUAGES_COOKIE_NAME, '[]'))
-        for l in langs:
-            if not l in SUPPORTED_LANGUAGES_DICT:
-                langs.remove(l)
-        return langs
+        return _only_supported_languages(langs)
     except (TypeError, ValueError):
         return []
 
-def languages_from_request(request, only_supported=False, with_names=False):
+
+def languages_from_request(request):
     languages = []
-    
+
     for l in get_user_languages_from_cookie(request):
         if not l in languages:
             languages.append(l)
-    
+
     if not languages:
-        trans_lang = translation.get_language()
+        trans_lang = get_language()
         if not trans_lang in languages:
             languages.append(trans_lang)
-        
+
         if hasattr(request, 'session'):
             lang_code = request.session.get('django_language', None)
             if lang_code is not None and not lang_code in languages:
                 languages.append(lang_code)
-                
+
         cookie_lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
         if cookie_lang_code and not cookie_lang_code in languages:
             languages.append(cookie_lang_code)
-            
-        accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')        
+
+        accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
         for lang, val in parse_accept_lang_header(accept):
             if lang and lang != '*' and not lang in languages:
                 languages.append(lang)
-            
-    if only_supported:
-        for item in languages:
-            if not item in SUPPORTED_LANGUAGES_DICT:
-                languages.remove(item)
-    
-    return with_names and languages_with_names(languages) or languages
 
-def languages_with_names(langs):
-    output = {}
-    for l in langs:
-        try:
-            output[l] = _(SUPPORTED_LANGUAGES_DICT[l])
-        except KeyError:
-            try:
-                l = l.split('-')[0]
-                output[l] = _(SUPPORTED_LANGUAGES_DICT[l])
-            except KeyError:
-                pass
-    return output
+    return _only_supported_languages(languages)
+
+def languages_with_labels(langs):
+    """Return a dict of language codes to language labels for the given seq of codes.
+
+    These codes must be in the internal unisubs format.
+
+    The labels will be in the standard label format.
+
+    """
+    return dict([code, get_language_label(code)] for code in langs)
+
 
 def is_rtl(lang):
     try:

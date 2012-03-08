@@ -45,20 +45,26 @@ class FeedParser(object):
         self.feed = feedparser.parse(feed_url)
         self.parser = None
         
-    def items(self, reverse=False, until=False, ignore_error=False):
+    def items(self, reverse=False, until=False, since=False, ignore_error=False):
         """
         Iterator witch parse every entry and return VideoType instance if possible and
         additional info. Iterate entries from the most old to the newest 
         """
+
         if reverse:
             entries = self.feed['entries']
         else:
             entries = self.feed['entries'][::-1]
-            
+
+        if since or until:
+            links = [entry.link for entry in entries]
+
+            since_index = self._get_index(links, since, default=0)
+            last_index = self._get_index(links, until, default=len(links))
+
+            entries = entries[since_index+1:last_index]
+
         for entry in entries:
-            if until and entry.link == until:
-                break
-            
             vt, info, entry = None, {}, entry
             
             if self.parser:
@@ -99,6 +105,15 @@ class FeedParser(object):
             raise VideoTypeParseError(e)
         except gaierror:
             raise FeedParserError(_(u'Feed is unavailable now.'))
+
+    def _get_index(self, lst, value, default):
+        if not value:
+            return default
+
+        try:
+            return lst.index(value)
+        except ValueError:
+            return default
         
 class BaseFeedEntryParser(object):
     

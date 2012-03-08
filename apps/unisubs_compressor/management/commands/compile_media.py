@@ -30,7 +30,8 @@ from deploy.git_helpers import get_current_commit_hash
 
 from apps import widget
 
-LAST_COMMIT_GUID = get_current_commit_hash()
+# on vagrant .git is a symlink and this needts to be ran before media compilation ;(
+LAST_COMMIT_GUID = get_current_commit_hash() or settings.LAST_COMMIT_GUID.split('/')[-1]
 
 def _make_version_debug_string():
     """
@@ -71,6 +72,14 @@ NO_UNIQUE_URL = (
 #        "no-cache": True 
 #    },
     {
+        "name": "images/video-no-thumbnail-medium.png",
+        "no-cache": True,
+    },
+    {
+        "name": "images/video-no-thumbnail-small.png",
+        "no-cache": True,
+    },
+    {
         "name": "js/unisubs-widgetizer.js",
         "no-cache": True
     }, {
@@ -101,7 +110,11 @@ def get_cache_base_url():
     return "%s%s/%s" % (settings.STATIC_URL_BASE, settings.COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID)
 
 def get_cache_dir():
-    return os.path.join(settings.STATIC_ROOT, settings.COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID)
+    # on vagrant this is a symlink
+    return os.path.realpath(
+        os.path.join(
+            settings.STATIC_ROOT,
+            settings.COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID))
 
 def sorted_ls(path):
     """
@@ -122,7 +135,7 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
 
         optparse.make_option('--checks-version',
-            action='store_true', dest='test_str_version', default=True,
+            action='store_true', dest='test_str_version', default=False,
             help="Check that we outputed the version string for comopiled files."),
 
 
@@ -367,7 +380,7 @@ class Command(BaseCommand):
         targets = [os.path.join(base, x) for x 
                    in sorted_ls("media/static-cache/")
                    if x.startswith(".") is False and x != LAST_COMMIT_GUID ][:-num_to_keep]
-        [shutil.rmtree(t) for t in targets ]
+        [shutil.rmtree(os.path.realpath(t)) for t in targets if os.path.exists(t)]
 
     def _copy_temp_dir_to_cache_dir(self):
         cache_dir = get_cache_dir()
@@ -379,8 +392,10 @@ class Command(BaseCommand):
         if os.path.exists(cache_dir):
             shutil.rmtree(cache_dir)
         for filename in os.listdir(self.temp_dir):
-            shutil.move(os.path.join(self.temp_dir, filename), 
-                        os.path.join(cache_dir, filename))
+            from_path = os.path.join(self.temp_dir, filename)
+            to_path = os.path.join(cache_dir, filename)
+            shutil.move(from_path,  to_path)
+                        
 
     def _copy_files_with_public_urls_from_cache_dir_to_static_dir(self):
         cache_dir = get_cache_dir()

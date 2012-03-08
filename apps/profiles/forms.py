@@ -24,7 +24,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from auth.models import CustomUser as User, UserLanguage
 from utils.forms import AjaxForm
-from utils.translation import get_languages_list, set_user_languages_to_cookie
+from utils.translation import get_language_choices, set_user_languages_to_cookie
 from utils.validators import MaxFileSizeValidator
 
 
@@ -41,7 +41,7 @@ class SelectLanguageForm(forms.Form):
 
     def __init__(self, *args, **kwrags):
         super(SelectLanguageForm, self).__init__(*args, **kwrags)
-        lc = get_languages_list(True)
+        lc = get_language_choices(True)
 
         for i in xrange(1, 10):
             self.fields['language%s' % i].choices = lc
@@ -71,7 +71,7 @@ class UserLanguageForm(forms.ModelForm):
 
     def __init__(self, *args, **kwrags):
         super(UserLanguageForm, self).__init__(*args, **kwrags)
-        self.fields['language'].choices = get_languages_list(True)
+        self.fields['language'].choices = get_language_choices(True)
 
 class UserLanguagelineFormSet(BaseInlineFormSet):
 
@@ -150,7 +150,7 @@ class EditUserForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EditUserForm, self).__init__(*args, **kwargs)
         self.fields['email'].required = True
-        self.fields['preferred_language'].choices = get_languages_list(True)
+        self.fields['preferred_language'].choices = get_language_choices(True)
 
     class Meta:
         model = User
