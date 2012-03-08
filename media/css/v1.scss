@@ -464,10 +464,15 @@ div.hidden {
 
                 h4 {
                     padding: .25em 0;
+
+                    a {
+                        color: $lighter;
+                    }
                 }
                 &.due {
                     font-size: 11px;
                 }
+
             }
 
             a {

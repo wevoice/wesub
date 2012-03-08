@@ -470,6 +470,9 @@ div.hidden {
 .v1 .listing > li .actions li h4 {
   padding: .25em 0;
 }
+.v1 .listing > li .actions li h4 a {
+  color: #a0b2bd;
+}
 .v1 .listing > li .actions li.due {
   font-size: 11px;
 }

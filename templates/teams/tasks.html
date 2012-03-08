@@ -177,7 +177,9 @@
                                             {% if task.assignee == user %}
                                                 {% trans 'me' %}
                                             {% else %}
-                                                {{ task.assignee }}
+                                                <a href="{{ task.assignee.get_absolute_url }}" title="View {{ task.assignee }}'s profile">
+                                                    {{ task.assignee }}
+                                                </a>
                                             {% endif %}
                                         {% else %}
                                             {% trans 'Unassigned' %}
