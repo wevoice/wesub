@@ -7,7 +7,7 @@
             <img src="{{ search_record.thumbnail }}" alt="{{ search_record.title }} thumbnail">
         </a>
         <a href="{% url videos:video video_id=search_record.video_id %}" class="languages">
-            {% with num_total=search_record.num_total_subs num_complete=search_record.num_completed_subs %}
+            {% with num_total=search_record.num_total_langs num_complete=search_record.num_completed_langs %}
                 {% if num_total %}
                     {% blocktrans count num_total as num %}
                         {{ num }} language
