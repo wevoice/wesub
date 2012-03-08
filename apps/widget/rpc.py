@@ -352,8 +352,7 @@ class Rpc(BaseRpc):
 
     def finished_subtitles(self, request, session_pk, subtitles=None,
                            new_title=None, completed=None,
-                           forked=False,
-                           throw_exception=False, new_description=None,
+                           forked=False, throw_exception=False, new_description=None,
                            task_id=None, task_notes=None, task_approved=None, task_type=None):
         session = SubtitlingSession.objects.get(pk=session_pk)
         if not request.user.is_authenticated():
