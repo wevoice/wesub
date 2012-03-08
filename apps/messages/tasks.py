@@ -98,7 +98,6 @@ def team_invitation_sent(invite_pk):
             TeamMember.ROLE_CONTRIBUTOR: data['messages_invite'],
         }
         team_default_message = mapping.get(invite.role, None)
-    return 
     context = {
         'invite': invite,
         'role': invite.role,
