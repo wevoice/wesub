@@ -524,7 +524,7 @@ unisubs.subtitle.Dialog.prototype.disposeCurrentPanels_ = function() {
         this.currentSubtitlePanel_ = null;
     }
     this.rightPanelListener_.removeAll();
-    if (this.timelineSubtitleSet_ !== null) {
+    if (this.timelineSubtitleSet_) {
         this.timelineSubtitleSet_.dispose();
         this.timelineSubtitleSet_ = null;
     }
