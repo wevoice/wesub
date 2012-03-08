@@ -220,6 +220,16 @@ div.hidden {
   display: none;
 }
 
+ul.list-collapsible li.hidden {
+  display: none;
+}
+ul.list-collapsible li.expand span.less {
+  display: none;
+}
+ul.list-collapsible.expanded li.hidden {
+  display: block;
+}
+
 /* Tabs */
 .show-border {
   border-bottom-width: 2px;

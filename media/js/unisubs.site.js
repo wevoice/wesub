@@ -134,6 +134,27 @@ var Site = function(Site) {
             $select.children().removeAttr('selected');
             $opt.attr('selected', 'selected');
             $select.trigger('liszt:updated');
+        },
+        collapsibleLists: function($lists) {
+            $.each($lists, function() {
+                $list = $(this);
+                $anchor = $('li.expand a', $list);
+                $anchorTextShowAll = $anchor.children('span.all').text();
+                $anchorTextShowLess = $anchor.children('span.less').text();
+
+                $anchor.click(function(e) {
+                    if ($list.hasClass('expanded')) {
+                        $anchor.text($anchorTextShowAll);
+                        $list.removeClass('expanded');
+                        $list.addClass('collapsed');
+                    } else {
+                        $anchor.text($anchorTextShowLess);
+                        $list.removeClass('collapsed');
+                        $list.addClass('expanded');
+                    }
+                    e.preventDefault();
+                });
+            });
         }
     };
     this.Views = {
@@ -284,6 +305,11 @@ var Site = function(Site) {
             if (window.OLD_MODAL) {
                 $.mod();
                 $.metadata.setType("attr", "data");
+            }
+
+            $listsCollapsible = $('ul.list-collapsible');
+            if ($listsCollapsible.length) {
+                that.Utils.collapsibleLists($listsCollapsible);
             }
 
             window.usStartTime = (new Date()).getTime();
