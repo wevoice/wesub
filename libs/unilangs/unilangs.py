@@ -332,6 +332,7 @@ def _generate_initial_data():
         'ug': (gettext_noop(u'Uighur'), u'Oyghurque'),
         'uk': (gettext_noop(u'Ukrainian'), u'Українська'),
         'umb': (gettext_noop(u'Umbundu'), u'Umbundu'),
+        'ug': (gettext_noop(u'Uyghur'), u'ئۇيغۇر'),
         'ur': (gettext_noop(u'Urdu'), u'اڙدو'),
         'uz': (gettext_noop(u'Uzbek'), u'O‘zbek'),
         've': (gettext_noop(u'Venda'), u'Venda'),
