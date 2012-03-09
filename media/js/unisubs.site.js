@@ -491,6 +491,61 @@ var Site = function(Site) {
             that.Utils.resetLangFilter();
             that.Utils.chosenify();
         },
+        team_settings_permissions: function() {
+            $workflow = $('#id_workflow_enabled');
+            
+            // Fields to watch
+            $subperm = $('#id_subtitle_policy');
+            $transperm = $('#id_translate_policy');
+            $revperm = $('#id_review_allowed');
+            $appperm = $('#id_approve_allowed');
+
+            // Inspect/observe the workflow checkbox
+            if ($workflow.attr('checked')) {
+                $('.v1 .workflow').show();
+            }
+            $workflow.change(function() {
+                if ($workflow.attr('checked')) {
+                    $('.v1 .workflow').show();
+                    $revperm.trigger('change');
+                    $appperm.trigger('change');
+                } else {
+                    $('.v1 .workflow').hide();
+                    $('#review-step').hide();
+                    $('#approve-step').hide();
+                }
+            });
+
+            // Observe the permissions fields
+            $subperm.change(function() {
+                $('#perm-sub').html($subperm.children('option:selected').html());
+            });
+            $transperm.change(function() {
+                $('#perm-trans').html($transperm.children('option:selected').html());
+            });
+            $revperm.change(function() {
+                if ($revperm.children('option:selected').val() !== '0') {
+                    $('#review-step').show();
+                    $('#perm-rev').html($revperm.children('option:selected').html());
+                } else {
+                    $('#review-step').hide();
+                }
+            });
+            $appperm.change(function() {
+                if($appperm.children('option:selected').val() !== '0') {
+                    $('#approve-step').show();
+                    $('#perm-app').html($appperm.children('option:selected').html());
+                } else {
+                    $('#approve-step').hide();
+                }
+            });
+
+            // Load state
+            $subperm.trigger('change');
+            $transperm.trigger('change');
+            $revperm.trigger('change');
+            $appperm.trigger('change');
+        },
 
         // Profile
         profile_dashboard: function() {
