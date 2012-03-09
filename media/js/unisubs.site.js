@@ -137,18 +137,18 @@ var Site = function(Site) {
         },
         collapsibleLists: function($lists) {
             $.each($lists, function() {
-                $list = $(this);
-                $anchor = $('li.expand a', $list);
-                $anchorTextShowAll = $anchor.children('span.all').text();
-                $anchorTextShowLess = $anchor.children('span.less').text();
+                var $list = $(this);
+                var $anchor = $('li.expand a', $list);
+                var anchorTextShowAll = $anchor.children('span.all').text();
+                var anchorTextShowLess = $anchor.children('span.less').text();
 
                 $anchor.click(function(e) {
                     if ($list.hasClass('expanded')) {
-                        $anchor.text($anchorTextShowAll);
+                        $anchor.text(anchorTextShowAll);
                         $list.removeClass('expanded');
                         $list.addClass('collapsed');
                     } else {
-                        $anchor.text($anchorTextShowLess);
+                        $anchor.text(anchorTextShowLess);
                         $list.removeClass('collapsed');
                         $list.addClass('expanded');
                     }
@@ -546,6 +546,9 @@ var Site = function(Site) {
             $revperm.trigger('change');
             $appperm.trigger('change');
         },
+        team_settings_languages: function() {
+            that.Utils.chosenify();
+        },
 
         // Profile
         profile_dashboard: function() {
@@ -605,6 +608,28 @@ var Site = function(Site) {
         },
         messages_sent: function() {
             that.Utils.messagesDeleteAndSend();
+        },
+        messages_new: function() {
+            that.Utils.chosenify();
+
+            $('.ajaxChosen select').ajaxChosen({
+                method: 'GET',
+                url: '/en/messages/users/search/',
+                dataType: 'json'
+            }, function (data) {
+                var terms = {};
+
+                $.each(data.results, function (i, val) {
+                    if (data.results[i][2] !== '') {
+                        var name = ' (' + data.results[i][2] + ')';
+                    } else {
+                        var name = '';
+                    }
+                    terms[data.results[i][0]] = data.results[i][1] + name;
+                });
+
+                return terms;
+            });
         }
     };
 };
