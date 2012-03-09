@@ -8,6 +8,8 @@ Vagrant::Config.run do |config|
 
   config.vm.share_folder "unisubs", "/opt/unisubs", "."
 
+  config.vm.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/unisubs", 1]
+
   config.vm.provision :puppet do |puppet|
     puppet.manifests_path = "puppet"
     puppet.module_path = "puppet/modules"
