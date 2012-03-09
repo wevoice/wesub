@@ -3,9 +3,10 @@
     var EDIT_SELECTOR = '.edit-role';
 
     var EditRoleDialog = Class.$extend({
-        __init__:function(pk, username, teamSlug){
+        __init__:function(pk, username, fullname, teamSlug){
             this.pk = pk;
             this.username = username;
+            this.fullname = fullname;
             this.teamSlug = teamSlug;
             this.hide = _.bind(this.hide, this);
             this.hideAndRedirect = _.bind(this.hideAndRedirect, this);
@@ -20,6 +21,7 @@
         },
         show: function(res){
             res['username'] = this.username;
+            res['fullname'] = this.fullname;
             this.el = ich.editRoleDialog(res);
             hideEdit = this.hide;
             $body = $('body');
@@ -103,8 +105,9 @@
         e.preventDefault();
         var pk = $(e.target).data('member-pk');
         var username = $(e.target).data('member-username');
+        var fullname = $(e.target).data('member-fullname');
         var teamSlug = $(e.target).data('team-slug');
-        var dialog = new EditRoleDialog(pk, username, teamSlug);
+        var dialog = new EditRoleDialog(pk, username, fullname, teamSlug);
         dialog.loadInfo();
         return false;
     });

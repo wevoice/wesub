@@ -113,10 +113,10 @@
                         {% if member in assignable_roles %}
                             <ul class="admin-controls">
                                 <li>
-                                    <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" data-member-username="{{member.user.username}}">{% trans 'Edit' %}</a>
+                                    <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" data-member-username="{{member.user.username}}" data-member-fullname="{{ member.user }}">{% trans 'Edit' %}</a>
                                 </li>
                                 <li>
-                                <a onclick="return confirm('{% trans 'Are you sure you want to remove this member from the team?' %}');" href="{% url teams:remove_member slug=team.slug user_pk=member.user.pk %}" class="delete">{% trans 'Remove' %}</a>
+                                    <a onclick="return confirm('{% trans 'Are you sure you want to remove this member from the team?' %}');" href="{% url teams:remove_member slug=team.slug user_pk=member.user.pk %}" class="delete">{% trans 'Remove' %}</a>
                                 </li>
                             </ul>
                         {% endif %}
@@ -134,7 +134,7 @@
                 <div class="modal">
                     <div class="modal-header">
                         <a href="#" class="close action-close">x</a>
-                        <h3>Edit {{username}}'s role</h3>
+                        <h3>Edit {{fullname}} ({{username}})'s role</h3>
                     </div>
                     <div class="modal-body">
                         <div class="field clearfix">
