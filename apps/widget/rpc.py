@@ -63,6 +63,7 @@ def add_general_settings(request, dict):
         dict['username'] = request.user.username
 
 class Rpc(BaseRpc):
+    # Logging
     def log_session(self, request,  log):
         dialog_log = WidgetDialogLog(
             browser_id=request.browser_id,
@@ -348,6 +349,7 @@ class Rpc(BaseRpc):
             return { 'response': 'cannot_resume' }
 
 
+    # Locking
     def release_lock(self, request, session_pk):
         language = SubtitlingSession.objects.get(pk=session_pk).language
         if language.can_writelock(request):
@@ -368,6 +370,7 @@ class Rpc(BaseRpc):
             return { 'response': 'ok' }
 
 
+    # Permissions
     def can_user_edit_video(self, request, video_id):
         """Return a dictionary of information about what the user can do with this video.
 
@@ -389,6 +392,7 @@ class Rpc(BaseRpc):
                  'can_translate': can_translate, }
 
 
+    # Finishing and Saving
     def _get_user_message_for_save(self, user, language, is_complete):
         """Return the message that should be sent to the user regarding this save.
 
@@ -467,6 +471,23 @@ class Rpc(BaseRpc):
             if error:
                 return error
 
+    def _save_subtitles(self, subtitle_set, json_subs, forked):
+        """Create Subtitle objects into the given queryset from the JSON subtitles."""
+
+        for s in json_subs:
+            if not forked:
+                subtitle_set.create(
+                    subtitle_id=s['subtitle_id'],
+                    subtitle_text=s['text'])
+            else:
+                subtitle_set.create(
+                    subtitle_id=s['subtitle_id'],
+                    subtitle_text=s['text'],
+                    start_time=s['start_time'],
+                    end_time=s['end_time'],
+                    subtitle_order=s['sub_order'],
+                    start_of_paragraph=s.get('start_of_paragraph', False))
+
     def _get_new_version_for_save(self, subtitles, language, session, user, forked):
         """Return a new subtitle version for this save, or None if not needed."""
 
@@ -521,31 +542,6 @@ class Rpc(BaseRpc):
             language.video.save()
             api_language_edited.send(language)
 
-    def finished_subtitles(self, request, session_pk, subtitles=None,
-                           new_title=None, completed=None,
-                           forked=False, throw_exception=False, new_description=None,
-                           task_id=None, task_notes=None, task_approved=None, task_type=None):
-        """Called when a user has finished a set of subtitles and they should be saved.
-
-        TODO: Rename this to something verby, like "finish_subtitles".
-
-        """
-        session = SubtitlingSession.objects.get(pk=session_pk)
-
-        if not request.user.is_authenticated():
-            return { 'response': 'not_logged_in' }
-        if not session.language.can_writelock(request):
-            return { "response" : "unlockable" }
-        if not session.matches_request(request):
-            return { "response" : "does not match request" }
-
-        if throw_exception:
-            raise Exception('purposeful exception for testing')
-
-        return self.save_finished(
-            request, request.user, session, subtitles, new_title, completed,
-            forked, new_description, task_id, task_notes, task_approved, task_type)
-
     def save_finished(self, request, user, session, subtitles, new_title=None,
                       completed=None, forked=False, new_description=None,
                       task_id=None, task_notes=None, task_approved=None, task_type=None):
@@ -579,21 +575,30 @@ class Rpc(BaseRpc):
 
         return { 'response': 'ok', 'user_message': user_message }
 
-    def _save_subtitles(self, subtitle_set, json_subs, forked):
-        for s in json_subs:
-            if not forked:
-                subtitle_set.create(
-                    subtitle_id=s['subtitle_id'],
-                    subtitle_text=s['text'])
-            else:
-                subtitle_set.create(
-                    subtitle_id=s['subtitle_id'],
-                    subtitle_text=s['text'],
-                    start_time=s['start_time'],
-                    end_time=s['end_time'],
-                    subtitle_order=s['sub_order'],
-                    start_of_paragraph=s.get('start_of_paragraph', False),
-                )
+    def finished_subtitles(self, request, session_pk, subtitles=None,
+                           new_title=None, completed=None,
+                           forked=False, throw_exception=False, new_description=None,
+                           task_id=None, task_notes=None, task_approved=None, task_type=None):
+        """Called when a user has finished a set of subtitles and they should be saved.
+
+        TODO: Rename this to something verby, like "finish_subtitles".
+
+        """
+        session = SubtitlingSession.objects.get(pk=session_pk)
+
+        if not request.user.is_authenticated():
+            return { 'response': 'not_logged_in' }
+        if not session.language.can_writelock(request):
+            return { "response" : "unlockable" }
+        if not session.matches_request(request):
+            return { "response" : "does not match request" }
+
+        if throw_exception:
+            raise Exception('purposeful exception for testing')
+
+        return self.save_finished(
+            request, request.user, session, subtitles, new_title, completed,
+            forked, new_description, task_id, task_notes, task_approved, task_type)
 
 
     def _get_review_or_approve_task(self, team_video, subtitle_language):
@@ -735,6 +740,7 @@ class Rpc(BaseRpc):
         return session
 
 
+    # Review
     def fetch_review_data(self, request, task_id):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
@@ -771,6 +777,7 @@ class Rpc(BaseRpc):
             return {'error_msg': _(u'\n'.join(flatten_errorlists(form.errors)))}
 
 
+    # Approval
     def fetch_approve_data(self, request, task_id):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
