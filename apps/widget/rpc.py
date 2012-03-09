@@ -90,6 +90,57 @@ class Rpc(BaseRpc):
         return { 'response': 'ok' }
 
 
+    # Widget
+    def _check_visibility_policy_for_widget(self, request, video_id):
+        """Return an error if the user cannot see the widget, None otherwise."""
+
+        visibility_policy = video_cache.get_visibility_policies(video_id)
+
+        if visibility_policy.get('widget', None) != VideoVisibilityPolicy.WIDGET_VISIBILITY_PUBLIC:
+            can_show = VideoVisibilityPolicy.objects.can_show_widget(
+                video_id, referer=request.META.get('referer'), user=request.user)
+
+            if not can_show:
+                return {"error_msg": _("Video embedding disabled by owner")}
+
+    def _get_video_urls_for_widget(self, video_url, video_id):
+        """Return the video URLs, 'cleaned' video id, and error."""
+
+        try:
+            video_urls = video_cache.get_video_urls(video_id)
+        except models.Video.DoesNotExist:
+            video_cache.invalidate_video_id(video_url)
+
+            try:
+                video_id = video_cache.get_video_id(video_url)
+            except Exception as e:
+                return None, None, {"error_msg": unicode(e)}
+
+            video_urls = video_cache.get_video_urls(video_id)
+
+        return video_urls, video_id, None
+
+    def _get_subtitles_for_widget(self, request, base_state, video_id, is_remote):
+        # keeping both forms valid as backwards compatibility layer
+        lang_code = base_state and base_state.get("language_code", base_state.get("language", None))
+
+        if base_state is not None and lang_code is not None:
+            lang_pk = base_state.get('language_pk', None)
+
+            if lang_pk is  None:
+                lang_pk = video_cache.pk_for_default_language(video_id, lang_code)
+
+            return self._autoplay_subtitles(request.user, video_id, lang_pk,
+                                            base_state.get('revision', None))
+        else:
+            if is_remote:
+                autoplay_language = self._find_remote_autoplay_language(request)
+                language_pk = video_cache.pk_for_default_language(video_id, autoplay_language)
+
+                if autoplay_language is not None:
+                    return self._autoplay_subtitles(request.user, video_id,
+                                                    language_pk, None)
+
     def show_widget(self, request, video_url, is_remote, base_state=None, additional_video_urls=None):
         try:
             video_id = video_cache.get_video_id(video_url)
@@ -99,64 +150,36 @@ class Rpc(BaseRpc):
 
         if video_id is None:
             return None
-        visibility_policy = video_cache.get_visibility_policies(video_id)
-        if visibility_policy.get('widget', None) != VideoVisibilityPolicy.WIDGET_VISIBILITY_PUBLIC:
-            if not VideoVisibilityPolicy.objects.can_show_widget(
-                video_id,
-                referer=request.META.get('referer'),
-                user=request.user):
-                return {"error_msg": _("Video embedding disabled by owner")}
-        try:
-            video_urls = video_cache.get_video_urls(video_id)
-        except models.Video.DoesNotExist:
-            video_cache.invalidate_video_id(video_url)
-            try:
-                video_id = video_cache.get_video_id(video_url)
-            except Exception as e:
-                return {"error_msg": unicode(e)}
-            video_urls = video_cache.get_video_urls(video_id)
 
-        return_value = {
+        error = self._check_visibility_policy_for_widget(request, video_id)
+        if error:
+            return error
+
+        video_urls, video_id, error = self._get_video_urls_for_widget(video_url, video_id)
+        if error:
+            return error
+
+        resp = {
             'video_id' : video_id,
             'subtitles': None,
+            'video_urls': video_urls,
+            'is_moderated': video_cache.get_is_moderated(video_id),
         }
-        return_value['video_urls']= video_urls
-        return_value['is_moderated'] = video_cache.get_is_moderated(video_id)
         if additional_video_urls is not None:
             for url in additional_video_urls:
                 video_cache.associate_extra_url(url, video_id)
 
-        add_general_settings(request, return_value)
+        add_general_settings(request, resp)
+
         if request.user.is_authenticated():
-            return_value['username'] = request.user.username
+            resp['username'] = request.user.username
 
-        return_value['drop_down_contents'] = \
-            video_cache.get_video_languages(video_id)
+        resp['drop_down_contents'] = video_cache.get_video_languages(video_id)
+        resp['my_languages'] = get_user_languages_from_request(request)
+        resp['subtitles'] = self._get_subtitles_for_widget(request, base_state,
+                                                           video_id, is_remote)
+        return resp
 
-        return_value['my_languages'] = \
-            get_user_languages_from_request(request)
-
-        # keeping both forms valid as backwards compatibility layer
-        lang_code = base_state and base_state.get("language_code", base_state.get("language", None))
-        if base_state is not None and lang_code is not None:
-            lang_pk = base_state.get('language_pk', None)
-            if lang_pk is  None:
-                lang_pk = video_cache.pk_for_default_language(video_id, lang_code)
-            subtitles = self._autoplay_subtitles(
-                request.user, video_id,
-                lang_pk,
-                base_state.get('revision', None))
-            return_value['subtitles'] = subtitles
-        else:
-            if is_remote:
-                autoplay_language = self._find_remote_autoplay_language(request)
-                language_pk = video_cache.pk_for_default_language(video_id, autoplay_language)
-                if autoplay_language is not None:
-                    subtitles = self._autoplay_subtitles(
-                        request.user, video_id, language_pk, None)
-                    return_value['subtitles'] = subtitles
-
-        return return_value
 
     def track_subtitle_play(self, request, video_id):
         st_widget_view_statistic_update.delay(video_id=video_id)
@@ -202,6 +225,7 @@ class Rpc(BaseRpc):
             'general_settings': general_settings }
 
 
+    # Start Editing
     def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode, is_edit):
         """Check whether the a team prevents the user from editing the subs.
 
@@ -324,6 +348,7 @@ class Rpc(BaseRpc):
         return return_dict
 
 
+    # Resume Editing
     def resume_editing(self, request, session_pk):
         session = SubtitlingSession.objects.get(pk=session_pk)
         if session.language.can_writelock(request) and \
