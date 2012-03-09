@@ -221,6 +221,21 @@ body {
 div.hidden {
     display: none;
 }
+ul.list-collapsible {
+    li.hidden {
+        display: none;
+    }
+    li.expand {
+        span.less {
+            display: none;
+        }
+    }
+    &.expanded {
+        li.hidden {
+            display: block;
+        }
+    }
+}
 
 /* Tabs */
 .show-border {
