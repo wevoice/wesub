@@ -88,6 +88,7 @@ class Rpc(BaseRpc):
                 })
         return { 'response': 'ok' }
 
+
     def show_widget(self, request, video_url, is_remote, base_state=None, additional_video_urls=None):
         try:
             video_id = video_cache.get_video_id(video_url)
@@ -231,6 +232,39 @@ class Rpc(BaseRpc):
             if not can_edit:
                 return { "can_edit": False, "locked_by": str(team_video.team) }
 
+    def _get_version_to_edit(self, language, session):
+        """Return a version (and other info) that should be edited.
+
+        When subtitles are going to be created or edited for a given language,
+        we need to have a "base" version to work with.  This function returns
+        this base version along with its number and a flag specifying whether it
+        is an edit (as opposed to a brand new set of subtitles).
+
+        """
+        version_for_subs = language.version(public_only=False)
+
+        if not version_for_subs:
+            version_for_subs = self._create_version_from_session(session)
+            version_no = 0
+            is_edit = False
+        else:
+            version_no = version_for_subs.version_no + 1
+            is_edit = True
+
+        return version_for_subs, version_no, is_edit
+
+    def _get_base_language(self, language_code, original_language_code, base_language_pk):
+        """Return the subtitle language to use as a base (and its pk), if any."""
+        if language_code == original_language_code:
+            base_language_pk = None
+
+        if base_language_pk is not None:
+            base_language = models.SubtitleLanguage.objects.get(pk=base_language_pk)
+        else:
+            base_language = None
+
+        return base_language, base_language_pk
+
     def start_editing(self, request, video_id, language_code,
                       subtitle_language_pk=None, base_language_pk=None,
                       original_language_code=None, mode=None):
@@ -242,50 +276,50 @@ class Rpc(BaseRpc):
         """
         # TODO: remove whenever blank SubtitleLanguages become illegal.
         self._fix_blank_original(video_id)
-        if language_code == original_language_code:
-            base_language_pk = None
-        base_language = None
-        if base_language_pk is not None:
-            base_language = models.SubtitleLanguage.objects.get(
-                pk=base_language_pk)
 
-        language, can_edit = self._get_language_for_editing(
-            request, video_id, language_code,
-            subtitle_language_pk, base_language)
+        # Find the subtitle language to use as a base for these edits, if any.
+        base_language, base_language_pk = self._get_base_language(
+            language_code, original_language_code, base_language_pk)
 
-        if not can_edit:
-            return { "can_edit": False,
-                     "locked_by" : language.writelock_owner_name }
+        # Find the subtitle language we'll be editing (if available).
+        language, locked = self._get_language_for_editing(
+            request, video_id, language_code, subtitle_language_pk, base_language)
+        if locked:
+            return locked
 
-        session = self._make_subtitling_session(
-            request, language, base_language)
+        # Create the subtitling session and subtitle version for these edits.
+        session = self._make_subtitling_session(request, language, base_language)
+        version_for_subs, version_no, is_edit = self._get_version_to_edit(language, session)
 
-        version_for_subs = language.version(public_only=False)
-
-        if not version_for_subs:
-            version_for_subs = self._create_version_from_session(session)
-            version_no = 0
-            is_edit = False
-        else:
-            version_no = version_for_subs.version_no + 1
-            is_edit = True
-
-        locked = self._check_team_video_locking(request.user, video_id,
-                        language_code, bool(base_language_pk), mode, is_edit)
+        # Ensure that the user is not blocked from editing this video by team
+        # permissions.
+        locked = self._check_team_video_locking(
+            request.user, video_id, language_code, bool(base_language_pk), mode, is_edit)
         if locked:
             return locked
 
         subtitles = self._subtitles_dict(
             version_for_subs, version_no, base_language_pk is None)
-        return_dict = { "can_edit" : True,
-                        "session_pk" : session.pk,
-                        "subtitles" : subtitles }
+        return_dict = { "can_edit": True,
+                        "session_pk": session.pk,
+                        "subtitles": subtitles }
+
+        # If this is a translation, include the subtitles it's based on in the response.
         if base_language:
-            return_dict['original_subtitles'] = \
-                self._subtitles_dict(base_language.latest_version())
+            original_subtitles = self._subtitles_dict(base_language.latest_version())
+            return_dict['original_subtitles'] = original_subtitles
+
+        # If we know the original language code for this video, make sure it's
+        # saved and there's a SubtitleLanguage for it in the database.
+        #
+        # Remember: the "original language" is the language of the video, NOT
+        # the language these subs are a translation of (if any).
         if original_language_code:
             self._save_original_language(video_id, original_language_code)
+
+        # Writelock this language for this video before we successfully return.
         video_cache.writelock_add_lang(video_id, language.language)
+
         return return_dict
 
 
@@ -746,9 +780,9 @@ class Rpc(BaseRpc):
         else:
             return language.standard_language != base_language
 
-    def _get_language_for_editing(
-        self, request, video_id, language_code,
-        subtitle_language_pk=None, base_language=None):
+    def _get_language_for_editing(self, request, video_id, language_code,
+                                  subtitle_language_pk=None, base_language=None):
+        """Return the subtitle language to edit or a lock response."""
 
         video = models.Video.objects.get(video_id=video_id)
 
@@ -763,6 +797,7 @@ class Rpc(BaseRpc):
                 editable = language.can_writelock(request)
         else:
             create_new = True
+
         if create_new:
             standard_language = self._find_base_language(base_language)
             forked = standard_language is None
@@ -775,12 +810,18 @@ class Rpc(BaseRpc):
                     'is_forked': forked,
                     'writelock_session_key': '' })
             editable = created or language.can_writelock(request)
+
         if editable:
             language.writelock(request)
             language.save()
+
             if create_new:
                 api_language_new.send(language)
-        return language, editable
+
+            return language, None
+        else:
+            return None, { "can_edit": False,
+                           "locked_by": language.writelock_owner_name }
 
     def _fix_blank_original(self, video_id):
         # TODO: remove this method as soon as blank SubtitleLanguages
