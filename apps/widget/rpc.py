@@ -347,6 +347,7 @@ class Rpc(BaseRpc):
         else:
             return { 'response': 'cannot_resume' }
 
+
     def release_lock(self, request, session_pk):
         language = SubtitlingSession.objects.get(pk=session_pk).language
         if language.can_writelock(request):
@@ -377,18 +378,160 @@ class Rpc(BaseRpc):
         team_video = video.get_team_video()
 
         if not team_video:
-            return {'response': 'ok', 'can_subtitle': True, 'can_translate': True}
+            can_subtitle = True
+            can_translate = True
         else:
-            return {'response': 'ok',
-                    'can_subtitle': can_create_and_edit_subtitles(request.user, team_video),
-                    'can_translate': can_create_and_edit_translations(request.user, team_video)}
+            can_subtitle = can_create_and_edit_subtitles(request.user, team_video)
+            can_translate = can_create_and_edit_translations(request.user, team_video)
 
+        return { 'response': 'ok',
+                 'can_subtitle': can_subtitle,
+                 'can_translate': can_translate, }
+
+
+    def _get_user_message_for_save(self, user, language, is_complete):
+        """Return the message that should be sent to the user regarding this save.
+
+        This may be a message saying that the save was successful, or an error message.
+
+        The message displayed to the user  has a complex requirement / outcomes
+        1) Subs will go live in a moment. Works for unmoderated subs and for D and H
+        D. Transcript, post-publish edit by moderator with the power to approve. Will go live immediately.
+        H. Translation, post-publish edit by moderator with the power to approve. Will go live immediately.
+        2) Subs must be completed before being submitted to moderators. Works for A and E
+        A. Transcript, incomplete (checkbox not ticked). Must be completed before being submitted to moderators.
+        E. Translation, incomplete (some lines missing). Must be completed before being submitted to moderators.
+        3) Subs will be submitted for review/approval. Works for B, C, F, and G
+        B. Transcript, complete (checkbox ticked). Will be submitted to moderators promptly for approval or rejection.
+        C. Transcript, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
+        F. Translation, complete (all the lines filled). Will be submitted to moderators promptly for approval or rejection.
+        G. Translation, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
+
+        TODO: Localize this?
+
+        """
+        message_will_be_live_soon = "Your changes have been saved. It may take a moment for your subtitles to appear."
+        message_will_be_submited = ("This video is moderated by %s."
+                                    "Your changes will be reviewed by the "
+                                    "team's moderators.")
+        message_incomplete = ("These subtitles are incomplete. "
+                              "They will not be submitted for publishing "
+                              "until they've been completed.")
+
+        under_moderation = language.video.is_moderated
+
+        _user_can_publish =  True
+        team_video = language.video.get_team_video()
+        if under_moderation and team_video:
+            # videos are only supposed to have one team video
+            _user_can_publish = can_publish_edits_immediately(team_video, user, language.language)
+
+        # this is case 1
+        if under_moderation and not _user_can_publish:
+            if is_complete:
+                # case 3
+                return message_will_be_submited % language.video.moderated_by.name
+            else:
+                # case 2
+                return message_incomplete
+        else:
+            return message_will_be_live_soon
+
+    def _complete_tasks_for_save(self, request, language, new_version, is_complete,
+                                 task_id, task_type, task_notes, task_approved):
+        """Complete any tasks for this save.  Might return an error."""
+
+        # If we've just saved a completed subtitle language, we may need to
+        # complete a subtitle or translation task.
+        if is_complete:
+            team_video = language.video.get_team_video()
+            if team_video:
+                tasks = team_video.task_set.incomplete().filter(
+                    type__in=(Task.TYPE_IDS['Subtitle'],
+                              Task.TYPE_IDS['Translate']),
+                    language=language.language
+                )
+                for task in tasks:
+                    task.complete()
+
+        # If the user is specifically performing a review/approve task we should
+        # handle it.
+        if task_id:
+            if task_type == 'review':
+                finish = self._finish_review
+            elif task_type == 'approve':
+                finish = self._finish_approve
+
+            error = finish(request, task_id, task_notes, task_approved,
+                           new_version=new_version)
+            if error:
+                return error
+
+    def _get_new_version_for_save(self, subtitles, language, session, user, forked):
+        """Return a new subtitle version for this save, or None if not needed."""
+
+        new_version = None
+
+        should_create_new_version = (
+            subtitles is not None
+            and (len(subtitles) > 0
+                 or language.latest_version(public_only=False) is not None))
+
+        if should_create_new_version:
+            new_version = self._create_version_from_session(session, user, forked)
+            new_version.save()
+
+            if hasattr(new_version, 'task_to_save'):
+                new_version.task_to_save.subtitle_version = new_version
+                new_version.task_to_save.save()
+
+            self._save_subtitles(
+                new_version.subtitle_set, subtitles, new_version.is_forked)
+
+        return new_version
+
+    def _update_language_attributes_for_save(self, language, completed, new_title, new_description):
+        """Update the attributes of the language as necessary and save it.
+
+        Will also send the appropriate API notification if needed.
+
+        """
+        must_trigger_api_language_edited = False
+
+        if completed is not None:
+            if language.is_complete != completed:
+                must_trigger_api_language_edited = True
+            language.is_complete = completed
+
+        if new_title is not None:
+            language.title = new_title
+            if language.is_original:
+                language.video.title = language.title
+            must_trigger_api_language_edited = True
+
+        if new_description is not None:
+            language.description = new_description
+            if language.is_original:
+                language.video.description = language.description
+            must_trigger_api_language_edited = True
+
+        language.save()
+
+        if must_trigger_api_language_edited:
+            language.video.save()
+            api_language_edited.send(language)
 
     def finished_subtitles(self, request, session_pk, subtitles=None,
                            new_title=None, completed=None,
                            forked=False, throw_exception=False, new_description=None,
                            task_id=None, task_notes=None, task_approved=None, task_type=None):
+        """Called when a user has finished a set of subtitles and they should be saved.
+
+        TODO: Rename this to something verby, like "finish_subtitles".
+
+        """
         session = SubtitlingSession.objects.get(pk=session_pk)
+
         if not request.user.is_authenticated():
             return { 'response': 'not_logged_in' }
         if not session.language.can_writelock(request):
@@ -407,115 +550,34 @@ class Rpc(BaseRpc):
                       completed=None, forked=False, new_description=None,
                       task_id=None, task_notes=None, task_approved=None, task_type=None):
         # TODO: lock all this in a transaction please!
+
         language = session.language
-        # if this belongs to a task finish it:
 
-        new_version = None
-        if subtitles is not None and \
-                (len(subtitles) > 0 or language.latest_version(public_only=False) is not None):
-            new_version = self._create_version_from_session(session, user, forked)
-            new_version.save()
+        new_version = self._get_new_version_for_save(
+            subtitles, language, session, user, forked)
 
-            if hasattr(new_version, 'task_to_save'):
-                new_version.task_to_save.subtitle_version = new_version
-                new_version.task_to_save.save()
-
-            self._save_subtitles(
-                new_version.subtitle_set, subtitles, new_version.is_forked)
-
-        # if any of the language attributes have changed (title, descr,
-        # completedness) we must trigger the api notification.
-        must_trigger_api_language_edited = False
         language.release_writelock()
-        if completed is not None:
-            language.is_complete = completed
-            if language.is_complete != completed:
-                must_trigger_api_language_edited = True
-        if new_title is not None:
-            language.title = new_title
-            if language.is_original:
-                language.video.title = language.title
-            must_trigger_api_language_edited = True
-        if new_description is not None:
-            language.description = new_description
-            if language.is_original:
-                language.video.description = language.description
-            must_trigger_api_language_edited = True
-        language.save()
 
-        if must_trigger_api_language_edited:
-            language.video.save()
-            api_language_edited.send(language)
+        self._update_language_attributes_for_save(
+            language, completed, new_title, new_description)
 
-        if new_version is not None:
+        if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)
             api_subtitles_edited.send(new_version)
         else:
             video_changed_tasks.delay(language.video.id)
             api_video_edited.send(language.video)
 
-        # The message displayed to the user  has a complex requirement /  outcomes
-        # 1) Subs will go live in a moment. Works for unmoderated subs and for D and H
-        # D. Transcript, post-publish edit by moderator with the power to approve. Will go live immediately.
-        # H. Translation, post-publish edit by moderator with the power to approve. Will go live immediately.
-        # 2) Subs must be completed before being submitted to moderators. Works for A and E
-        # A. Transcript, incomplete (checkbox not ticked). Must be completed before being submitted to moderators.
-        # E. Translation, incomplete (some lines missing). Must be completed before being submitted to moderators.
-        # 3) Subs will be submitted for review/approval. Works for B, C, F, and G
-        # B. Transcript, complete (checkbox ticked). Will be submitted to moderators promptly for approval or rejection.
-        # C. Transcript, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
-        # F. Translation, complete (all the lines filled). Will be submitted to moderators promptly for approval or rejection.
-        # G. Translation, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
-        message_will_be_live_soon = "Your changes have been saved. It may take a moment for your subtitles to appear."
-        message_will_be_submited = ("This video is moderated by %s."
-                                    "Your changes will be reviewed by the "
-                                    "team's moderators.")
-        message_incomplete = ("These subtitles are incomplete. "
-                              "They will not be submitted for publishing "
-                              "until they've been completed.")
-        under_moderation = language.video.is_moderated
-
-        _user_can_publish =  True
-        team_video_set = language.video.teamvideo_set
-        if under_moderation and team_video_set.exists():
-            # videos are only supposed to have one team video
-            _user_can_publish = can_publish_edits_immediately(team_video_set.all()[0], user, language.language)
         is_complete = language.is_complete or language.calculate_percent_done() == 100
-        # this is case 1
-        if under_moderation and _user_can_publish is False:
-            if is_complete:
-                # case 3
-                user_message = message_will_be_submited % ( language.video.moderated_by.name)
-            else:
-                # case 2
-                user_message = message_incomplete
-        else:
-            user_message = message_will_be_live_soon
+        user_message = self._get_user_message_for_save(user, language, is_complete)
 
-        # If we've just saved a completed subtitle language, we may need to
-        # complete a subtitle or translation task.
-        if is_complete:
-            team_video = language.video.get_team_video()
-            if team_video:
-                tasks = team_video.task_set.incomplete().filter(
-                    type__in=(Task.TYPE_IDS['Subtitle'],
-                              Task.TYPE_IDS['Translate']),
-                    language=language.language
-                )
-                for task in tasks:
-                    task.complete()
-        if task_id:
-            res = {
-                "review": self._finish_review,
-                "approve": self._finish_approve
-            }[task_type](request, task_id, task_notes, task_approved,
-                         new_version=new_version)
-            # if the task did not succeeded, just bail out
-            if not res.get('response', 'ok'):
-                return res
+        error = self._complete_tasks_for_save(
+                request, language, new_version, is_complete, task_id, task_type,
+                task_notes, task_approved)
+        if error:
+            return error
 
-        return { 'user_message': user_message,
-                 'response': 'ok' }
+        return { 'response': 'ok', 'user_message': user_message }
 
     def _save_subtitles(self, subtitle_set, json_subs, forked):
         for s in json_subs:
@@ -691,9 +753,11 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
-            # if there is a new version, set that as the tasks's one
+
+            # If there is a new version, update the task's version.
             if new_version:
                 task.subtitle_version = new_version
+
             task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
@@ -702,15 +766,7 @@ class Rpc(BaseRpc):
             task.subtitle_version.language.release_writelock()
             task.subtitle_version.language.followers.add(request.user)
 
-            if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                user_message =  'These subtitles have been accepted and your notes have been sent to the author.'
-            elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
-                user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
-            else:
-                user_message =  'Your notes have been saved.'
-
             video_changed_tasks.delay(task.team_video.video_id)
-            return {'response': 'ok', 'user_message': user_message}
         else:
             return {'error_msg': _(u'\n'.join(flatten_errorlists(form.errors)))}
 
@@ -733,7 +789,8 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
-            # if there is a new version, set that as the tasks's one
+
+            # If there is a new version, update the task's version.
             if new_version:
                 task.subtitle_version = new_version
             task.save()
@@ -744,16 +801,11 @@ class Rpc(BaseRpc):
             task.subtitle_version.language.release_writelock()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                user_message =  'These subtitles have been approved and your notes have been sent to the author.'
                 api_subtitles_approved.send(task.subtitle_version)
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
-                user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
                 api_subtitles_rejected.send(task.subtitle_version)
-            else:
-                user_message =  'Your notes have been saved.'
 
             video_changed_tasks.delay(task.team_video.video_id)
-            return {'response': 'ok', 'user_message': user_message}
         else:
             return {'error_msg': _(u'\n'.join(flatten_errorlists(form.errors)))}
 
