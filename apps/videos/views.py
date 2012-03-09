@@ -131,19 +131,6 @@ def volunteer_category(request, category):
     return render_to_response('videos/volunteer_%s.html' %(category),
                               context_instance=RequestContext(request))
 
-def bug(request):
-    from widget.rpc import add_general_settings
-    context = widget.add_config_based_js_files({}, settings.JS_API, 'unisubs-api.js')
-    context['all_videos'] = Video.objects.count()
-    try:
-        context['video_url_obj'] = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE)[:1].get()
-    except VideoUrl.DoesNotExist:
-        raise Http404
-    general_settings = {}
-    add_general_settings(request, general_settings)
-    context['general_settings'] = json.dumps(general_settings)
-    return render_to_response('bug.html', context,
-                              context_instance=RequestContext(request))
 
 def create(request):
     video_form = VideoForm(request.user, request.POST or None)
