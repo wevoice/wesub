@@ -120,6 +120,14 @@ class Rpc(BaseRpc):
 
         return video_urls, video_id, None
 
+    def _find_remote_autoplay_language(self, request):
+        language = None
+        if not request.user.is_authenticated() or request.user.preferred_language == '':
+            language = translation.get_language_from_request(request)
+        else:
+            language = request.user.preferred_language
+        return language if language != '' else None
+
     def _get_subtitles_for_widget(self, request, base_state, video_id, is_remote):
         # keeping both forms valid as backwards compatibility layer
         lang_code = base_state and base_state.get("language_code", base_state.get("language", None))
@@ -181,18 +189,13 @@ class Rpc(BaseRpc):
         return resp
 
 
+    # Statistics
     def track_subtitle_play(self, request, video_id):
         st_widget_view_statistic_update.delay(video_id=video_id)
         return { 'response': 'ok' }
 
-    def _find_remote_autoplay_language(self, request):
-        language = None
-        if not request.user.is_authenticated() or request.user.preferred_language == '':
-            language = translation.get_language_from_request(request)
-        else:
-            language = request.user.preferred_language
-        return language if language != '' else None
 
+    # Start Dialog (aka "Subtitle Into" Dialog)
     def fetch_start_dialog_contents(self, request, video_id):
         my_languages = get_user_languages_from_request(request)
         my_languages.extend([l[:l.find('-')] for l in my_languages if l.find('-') > -1])
@@ -215,6 +218,8 @@ class Rpc(BaseRpc):
             'limit_languages': writable_langs,
             'is_moderated': video.is_moderated, }
 
+
+    # Fetch Video ID and Settings
     def fetch_video_id_and_settings(self, request, video_id):
         is_original_language_subtitled = self._subtitle_count(video_id) > 0
         general_settings = {}
