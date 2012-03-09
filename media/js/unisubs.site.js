@@ -336,21 +336,24 @@ var Site = function(Site) {
                 var title = $('#edit-title-dialog .title-input').val();
                 if (title) {
                     $('.title-container').html(title).hide().fadeIn();
-                    VideosApi.change_title_video(window.VIDEO_ID, title, function(response) {
-                        if (response.error) {
-                            $.jGrowl.error(response.error);
-                        } else {
-                            $('.title-container').html(title);
-                            document.title = title + ' | Universal Subtitles';
+                    VideosApi.change_title_video(window.VIDEO_ID, title,
+                        function(response) {
+                            if (response.error) {
+                                $.jGrowl.error(response.error);
+                            } else {
+                                $('.title-container').html(title);
+                                document.title = title + ' | Universal Subtitles';
+                            }
                         }
-                    });
+                    );
                     $('#edit-title-dialog').modClose();
                 } else {
                     $.jGrowl.error(window.TITLE_ERROR);
                 }
             });
             if (window.TASK) {
-                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
+                var videoSource = unisubs.player.MediaSource.videoSourceForURL(
+                        '{{ task.team_video.video.get_video_url }}');
                 var opener = new unisubs.widget.SubtitleDialogOpener(
                                      window.TASK_TEAM_VIDEO_ID,
                                      window.TASK_TEAM_VIDEO_URL,
