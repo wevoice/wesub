@@ -137,18 +137,18 @@ var Site = function(Site) {
         },
         collapsibleLists: function($lists) {
             $.each($lists, function() {
-                $list = $(this);
-                $anchor = $('li.expand a', $list);
-                $anchorTextShowAll = $anchor.children('span.all').text();
-                $anchorTextShowLess = $anchor.children('span.less').text();
+                var $list = $(this);
+                var $anchor = $('li.expand a', $list);
+                var anchorTextShowAll = $anchor.children('span.all').text();
+                var anchorTextShowLess = $anchor.children('span.less').text();
 
                 $anchor.click(function(e) {
                     if ($list.hasClass('expanded')) {
-                        $anchor.text($anchorTextShowAll);
+                        $anchor.text(anchorTextShowAll);
                         $list.removeClass('expanded');
                         $list.addClass('collapsed');
                     } else {
-                        $anchor.text($anchorTextShowLess);
+                        $anchor.text(anchorTextShowLess);
                         $list.removeClass('collapsed');
                         $list.addClass('expanded');
                     }
