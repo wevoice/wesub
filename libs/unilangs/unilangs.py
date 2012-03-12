@@ -727,7 +727,6 @@ def _add_unisubs():
         'nd': 'nd',
         'ne': 'ne',
         'ng': 'ng',
-        'no': 'no',
         'nr': 'nr',
         'nso': 'nso',
         'nv': 'nv',

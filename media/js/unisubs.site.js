@@ -306,6 +306,60 @@ var Site = function(Site) {
                 $.mod();
                 $.metadata.setType("attr", "data");
             }
+            if ($('#language_modal').length) {
+                var cookies_are_enabled = function() {
+                    document.cookie = 'testcookie';
+                    return (document.cookie.indexOf('testcookie') != -1) ? true : false;
+                };
+                ProfileApi.get_user_languages(function(r) {
+                    if (!r) {
+                        return;
+                    }
+                    $('.language_bar span').remove();
+                    var h = '';
+                    for (l in r) {
+                        h += '<span>'+ r[l] + '</span>, ';
+                    }
+                    $('.language_bar a').before('<span class="selected_language">' + h.slice(0,-2) + '</span>');
+                });
+                if (cookies_are_enabled()) {
+                    var $w = $('#language_modal');
+                    $w.find('.submit_button').click(function() {
+                        var values = {};
+                        var has_value = false;
+                        $('select', $w).each(function(i, item) {
+                            var $item = $(item);
+                            values[$item.attr('name')] = $item.val();
+                            if (!has_value && $item.val()) {
+                                has_value = true;
+                            }
+                        });
+                        if (!has_value) {
+                            $.jGrowl.error(window.LANGUAGE_SELECT_ERROR);
+                        } else {
+                            $w.html(window.LANGUAGE_SELECT_SAVING);
+                            ProfileApi.select_languages(values, function() {
+                                    window.location.reload(true);
+                                }, function() {
+                                    $w.modClose();
+                                }
+                            );
+                        }
+                        return false;
+                    });
+                    $w.find('.close_button').click(function() {
+                        $w.modClose();
+                        return false;
+                    });
+                    if (window.FORCE_ASK) {
+                        $w.mod({closeable: false});
+                    } else {
+                        $w.find('.close_button').show();
+                    }
+                } else {
+                    $('#lang_select_btn').hide();
+                }
+            }
 
             $listsCollapsible = $('ul.list-collapsible');
             if ($listsCollapsible.length) {
