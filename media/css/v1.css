@@ -21,6 +21,12 @@ body {
 .v1 .bootstrap div.modal {
   display: none;
 }
+.v1 .bootstrap div.modal div.plain-text {
+  margin-bottom: 0;
+}
+.v1 .bootstrap div.modal div.plain-text label {
+  padding-top: 0;
+}
 
 .v1 .logo {
   margin: 1em 0 2em;
