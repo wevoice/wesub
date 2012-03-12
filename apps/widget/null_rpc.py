@@ -74,7 +74,8 @@ class NullRpc(BaseRpc):
                       language_code,
                       subtitle_language_pk=None,
                       base_language_pk=None,
-                      original_language_code=None):
+                      original_language_code=None,
+                      mode=None):
         return {
             "can_edit": True,
             "subtitles": self._subtitles_dict() }
