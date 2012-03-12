@@ -7,19 +7,15 @@
 {% endblock %}
 
 {% block body-class %}new-message {{ block.super }}{% endblock %}
+{% block html_attrs %}id="messages_new"{% endblock %}
 
 {% block main_content %}
-
-    {% include "utils/chosenify.html" %}
-
     <h2>
         {% trans 'Messages' %}
     </h2>
-
     {% with 'messages' as current %}
         {% include 'profiles/_tabs.html' %}
     {% endwith %}
-
     <div class="view grid_9 alpha new-message">
         <form action="" method="post">
             {% csrf_token %}
@@ -79,25 +75,4 @@
             <li><a href="{% url messages:sent %}">{% trans "Sent" %}</a></li>
         </ul>
     </div>
-
-    <script type="text/javascript">
-        $(".ajaxChosen select").ajaxChosen({
-            method: 'GET',
-            url: '/en/messages/users/search/',
-            dataType: 'json'
-        }, function (data) {
-            var terms = {};
-
-            $.each(data.results, function (i, val) {
-                if (data.results[i][2] !== '') {
-                    var name = ' (' + data.results[i][2] + ')';
-                } else {
-                    var name = '';
-                }
-                terms[data.results[i][0]] = data.results[i][1] + name;
-            });
-
-            return terms;
-        });
-    </script>
 {% endblock %}

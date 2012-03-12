@@ -63,6 +63,7 @@ def add_general_settings(request, dict):
         dict['username'] = request.user.username
 
 class Rpc(BaseRpc):
+    # Logging
     def log_session(self, request,  log):
         dialog_log = WidgetDialogLog(
             browser_id=request.browser_id,
@@ -88,77 +89,36 @@ class Rpc(BaseRpc):
                 })
         return { 'response': 'ok' }
 
-    def show_widget(self, request, video_url, is_remote, base_state=None, additional_video_urls=None):
-        try:
-            video_id = video_cache.get_video_id(video_url)
-        except Exception as e:
-            # for example, private youtube video or private widgets
-            return {"error_msg": unicode(e)}
 
-        if video_id is None:
-            return None
+    # Widget
+    def _check_visibility_policy_for_widget(self, request, video_id):
+        """Return an error if the user cannot see the widget, None otherwise."""
+
         visibility_policy = video_cache.get_visibility_policies(video_id)
+
         if visibility_policy.get('widget', None) != VideoVisibilityPolicy.WIDGET_VISIBILITY_PUBLIC:
-            if not VideoVisibilityPolicy.objects.can_show_widget(
-                video_id,
-                referer=request.META.get('referer'),
-                user=request.user):
+            can_show = VideoVisibilityPolicy.objects.can_show_widget(
+                video_id, referer=request.META.get('referer'), user=request.user)
+
+            if not can_show:
                 return {"error_msg": _("Video embedding disabled by owner")}
+
+    def _get_video_urls_for_widget(self, video_url, video_id):
+        """Return the video URLs, 'cleaned' video id, and error."""
+
         try:
             video_urls = video_cache.get_video_urls(video_id)
         except models.Video.DoesNotExist:
             video_cache.invalidate_video_id(video_url)
+
             try:
                 video_id = video_cache.get_video_id(video_url)
             except Exception as e:
-                return {"error_msg": unicode(e)}
+                return None, None, {"error_msg": unicode(e)}
+
             video_urls = video_cache.get_video_urls(video_id)
 
-        return_value = {
-            'video_id' : video_id,
-            'subtitles': None,
-        }
-        return_value['video_urls']= video_urls
-        return_value['is_moderated'] = video_cache.get_is_moderated(video_id)
-        if additional_video_urls is not None:
-            for url in additional_video_urls:
-                video_cache.associate_extra_url(url, video_id)
-
-        add_general_settings(request, return_value)
-        if request.user.is_authenticated():
-            return_value['username'] = request.user.username
-
-        return_value['drop_down_contents'] = \
-            video_cache.get_video_languages(video_id)
-
-        return_value['my_languages'] = \
-            get_user_languages_from_request(request)
-
-        # keeping both forms valid as backwards compatibility layer
-        lang_code = base_state and base_state.get("language_code", base_state.get("language", None))
-        if base_state is not None and lang_code is not None:
-            lang_pk = base_state.get('language_pk', None)
-            if lang_pk is  None:
-                lang_pk = video_cache.pk_for_default_language(video_id, lang_code)
-            subtitles = self._autoplay_subtitles(
-                request.user, video_id,
-                lang_pk,
-                base_state.get('revision', None))
-            return_value['subtitles'] = subtitles
-        else:
-            if is_remote:
-                autoplay_language = self._find_remote_autoplay_language(request)
-                language_pk = video_cache.pk_for_default_language(video_id, autoplay_language)
-                if autoplay_language is not None:
-                    subtitles = self._autoplay_subtitles(
-                        request.user, video_id, language_pk, None)
-                    return_value['subtitles'] = subtitles
-
-        return return_value
-
-    def track_subtitle_play(self, request, video_id):
-        st_widget_view_statistic_update.delay(video_id=video_id)
-        return { 'response': 'ok' }
+        return video_urls, video_id, None
 
     def _find_remote_autoplay_language(self, request):
         language = None
@@ -168,6 +128,74 @@ class Rpc(BaseRpc):
             language = request.user.preferred_language
         return language if language != '' else None
 
+    def _get_subtitles_for_widget(self, request, base_state, video_id, is_remote):
+        # keeping both forms valid as backwards compatibility layer
+        lang_code = base_state and base_state.get("language_code", base_state.get("language", None))
+
+        if base_state is not None and lang_code is not None:
+            lang_pk = base_state.get('language_pk', None)
+
+            if lang_pk is  None:
+                lang_pk = video_cache.pk_for_default_language(video_id, lang_code)
+
+            return self._autoplay_subtitles(request.user, video_id, lang_pk,
+                                            base_state.get('revision', None))
+        else:
+            if is_remote:
+                autoplay_language = self._find_remote_autoplay_language(request)
+                language_pk = video_cache.pk_for_default_language(video_id, autoplay_language)
+
+                if autoplay_language is not None:
+                    return self._autoplay_subtitles(request.user, video_id,
+                                                    language_pk, None)
+
+    def show_widget(self, request, video_url, is_remote, base_state=None, additional_video_urls=None):
+        try:
+            video_id = video_cache.get_video_id(video_url)
+        except Exception as e:
+            # for example, private youtube video or private widgets
+            return {"error_msg": unicode(e)}
+
+        if video_id is None:
+            return None
+
+        error = self._check_visibility_policy_for_widget(request, video_id)
+        if error:
+            return error
+
+        video_urls, video_id, error = self._get_video_urls_for_widget(video_url, video_id)
+        if error:
+            return error
+
+        resp = {
+            'video_id' : video_id,
+            'subtitles': None,
+            'video_urls': video_urls,
+            'is_moderated': video_cache.get_is_moderated(video_id),
+        }
+        if additional_video_urls is not None:
+            for url in additional_video_urls:
+                video_cache.associate_extra_url(url, video_id)
+
+        add_general_settings(request, resp)
+
+        if request.user.is_authenticated():
+            resp['username'] = request.user.username
+
+        resp['drop_down_contents'] = video_cache.get_video_languages(video_id)
+        resp['my_languages'] = get_user_languages_from_request(request)
+        resp['subtitles'] = self._get_subtitles_for_widget(request, base_state,
+                                                           video_id, is_remote)
+        return resp
+
+
+    # Statistics
+    def track_subtitle_play(self, request, video_id):
+        st_widget_view_statistic_update.delay(video_id=video_id)
+        return { 'response': 'ok' }
+
+
+    # Start Dialog (aka "Subtitle Into" Dialog)
     def fetch_start_dialog_contents(self, request, video_id):
         my_languages = get_user_languages_from_request(request)
         my_languages.extend([l[:l.find('-')] for l in my_languages if l.find('-') > -1])
@@ -190,6 +218,8 @@ class Rpc(BaseRpc):
             'limit_languages': writable_langs,
             'is_moderated': video.is_moderated, }
 
+
+    # Fetch Video ID and Settings
     def fetch_video_id_and_settings(self, request, video_id):
         is_original_language_subtitled = self._subtitle_count(video_id) > 0
         general_settings = {}
@@ -200,6 +230,7 @@ class Rpc(BaseRpc):
             'general_settings': general_settings }
 
 
+    # Start Editing
     def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode, is_edit):
         """Check whether the a team prevents the user from editing the subs.
 
@@ -231,6 +262,39 @@ class Rpc(BaseRpc):
             if not can_edit:
                 return { "can_edit": False, "locked_by": str(team_video.team) }
 
+    def _get_version_to_edit(self, language, session):
+        """Return a version (and other info) that should be edited.
+
+        When subtitles are going to be created or edited for a given language,
+        we need to have a "base" version to work with.  This function returns
+        this base version along with its number and a flag specifying whether it
+        is an edit (as opposed to a brand new set of subtitles).
+
+        """
+        version_for_subs = language.version(public_only=False)
+
+        if not version_for_subs:
+            version_for_subs = self._create_version_from_session(session)
+            version_no = 0
+            is_edit = False
+        else:
+            version_no = version_for_subs.version_no + 1
+            is_edit = True
+
+        return version_for_subs, version_no, is_edit
+
+    def _get_base_language(self, language_code, original_language_code, base_language_pk):
+        """Return the subtitle language to use as a base (and its pk), if any."""
+        if language_code == original_language_code:
+            base_language_pk = None
+
+        if base_language_pk is not None:
+            base_language = models.SubtitleLanguage.objects.get(pk=base_language_pk)
+        else:
+            base_language = None
+
+        return base_language, base_language_pk
+
     def start_editing(self, request, video_id, language_code,
                       subtitle_language_pk=None, base_language_pk=None,
                       original_language_code=None, mode=None):
@@ -242,53 +306,54 @@ class Rpc(BaseRpc):
         """
         # TODO: remove whenever blank SubtitleLanguages become illegal.
         self._fix_blank_original(video_id)
-        if language_code == original_language_code:
-            base_language_pk = None
-        base_language = None
-        if base_language_pk is not None:
-            base_language = models.SubtitleLanguage.objects.get(
-                pk=base_language_pk)
 
-        language, can_edit = self._get_language_for_editing(
-            request, video_id, language_code,
-            subtitle_language_pk, base_language)
+        # Find the subtitle language to use as a base for these edits, if any.
+        base_language, base_language_pk = self._get_base_language(
+            language_code, original_language_code, base_language_pk)
 
-        if not can_edit:
-            return { "can_edit": False,
-                     "locked_by" : language.writelock_owner_name }
+        # Find the subtitle language we'll be editing (if available).
+        language, locked = self._get_language_for_editing(
+            request, video_id, language_code, subtitle_language_pk, base_language)
+        if locked:
+            return locked
 
-        session = self._make_subtitling_session(
-            request, language, base_language)
+        # Create the subtitling session and subtitle version for these edits.
+        session = self._make_subtitling_session(request, language, base_language)
+        version_for_subs, version_no, is_edit = self._get_version_to_edit(language, session)
 
-        version_for_subs = language.version(public_only=False)
-
-        if not version_for_subs:
-            version_for_subs = self._create_version_from_session(session)
-            version_no = 0
-            is_edit = False
-        else:
-            version_no = version_for_subs.version_no + 1
-            is_edit = True
-
-        locked = self._check_team_video_locking(request.user, video_id,
-                        language_code, bool(base_language_pk), mode, is_edit)
+        # Ensure that the user is not blocked from editing this video by team
+        # permissions.
+        locked = self._check_team_video_locking(
+            request.user, video_id, language_code, bool(base_language_pk), mode, is_edit)
         if locked:
             return locked
 
         subtitles = self._subtitles_dict(
             version_for_subs, version_no, base_language_pk is None)
-        return_dict = { "can_edit" : True,
-                        "session_pk" : session.pk,
-                        "subtitles" : subtitles }
+        return_dict = { "can_edit": True,
+                        "session_pk": session.pk,
+                        "subtitles": subtitles }
+
+        # If this is a translation, include the subtitles it's based on in the response.
         if base_language:
-            return_dict['original_subtitles'] = \
-                self._subtitles_dict(base_language.latest_version())
+            original_subtitles = self._subtitles_dict(base_language.latest_version())
+            return_dict['original_subtitles'] = original_subtitles
+
+        # If we know the original language code for this video, make sure it's
+        # saved and there's a SubtitleLanguage for it in the database.
+        #
+        # Remember: the "original language" is the language of the video, NOT
+        # the language these subs are a translation of (if any).
         if original_language_code:
             self._save_original_language(video_id, original_language_code)
+
+        # Writelock this language for this video before we successfully return.
         video_cache.writelock_add_lang(video_id, language.language)
+
         return return_dict
 
 
+    # Resume Editing
     def resume_editing(self, request, session_pk):
         session = SubtitlingSession.objects.get(pk=session_pk)
         if session.language.can_writelock(request) and \
@@ -313,6 +378,8 @@ class Rpc(BaseRpc):
         else:
             return { 'response': 'cannot_resume' }
 
+
+    # Locking
     def release_lock(self, request, session_pk):
         language = SubtitlingSession.objects.get(pk=session_pk).language
         if language.can_writelock(request):
@@ -333,6 +400,7 @@ class Rpc(BaseRpc):
             return { 'response': 'ok' }
 
 
+    # Permissions
     def can_user_edit_video(self, request, video_id):
         """Return a dictionary of information about what the user can do with this video.
 
@@ -343,95 +411,39 @@ class Rpc(BaseRpc):
         team_video = video.get_team_video()
 
         if not team_video:
-            return {'response': 'ok', 'can_subtitle': True, 'can_translate': True}
+            can_subtitle = True
+            can_translate = True
         else:
-            return {'response': 'ok',
-                    'can_subtitle': can_create_and_edit_subtitles(request.user, team_video),
-                    'can_translate': can_create_and_edit_translations(request.user, team_video)}
+            can_subtitle = can_create_and_edit_subtitles(request.user, team_video)
+            can_translate = can_create_and_edit_translations(request.user, team_video)
+
+        return { 'response': 'ok',
+                 'can_subtitle': can_subtitle,
+                 'can_translate': can_translate, }
 
 
-    def finished_subtitles(self, request, session_pk, subtitles=None,
-                           new_title=None, completed=None,
-                           forked=False, throw_exception=False, new_description=None,
-                           task_id=None, task_notes=None, task_approved=None, task_type=None):
-        session = SubtitlingSession.objects.get(pk=session_pk)
-        if not request.user.is_authenticated():
-            return { 'response': 'not_logged_in' }
-        if not session.language.can_writelock(request):
-            return { "response" : "unlockable" }
-        if not session.matches_request(request):
-            return { "response" : "does not match request" }
+    # Finishing and Saving
+    def _get_user_message_for_save(self, user, language, is_complete):
+        """Return the message that should be sent to the user regarding this save.
 
-        if throw_exception:
-            raise Exception('purposeful exception for testing')
+        This may be a message saying that the save was successful, or an error message.
 
-        return self.save_finished(
-            request, request.user, session, subtitles, new_title, completed,
-            forked, new_description, task_id, task_notes, task_approved, task_type)
+        The message displayed to the user  has a complex requirement / outcomes
+        1) Subs will go live in a moment. Works for unmoderated subs and for D and H
+        D. Transcript, post-publish edit by moderator with the power to approve. Will go live immediately.
+        H. Translation, post-publish edit by moderator with the power to approve. Will go live immediately.
+        2) Subs must be completed before being submitted to moderators. Works for A and E
+        A. Transcript, incomplete (checkbox not ticked). Must be completed before being submitted to moderators.
+        E. Translation, incomplete (some lines missing). Must be completed before being submitted to moderators.
+        3) Subs will be submitted for review/approval. Works for B, C, F, and G
+        B. Transcript, complete (checkbox ticked). Will be submitted to moderators promptly for approval or rejection.
+        C. Transcript, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
+        F. Translation, complete (all the lines filled). Will be submitted to moderators promptly for approval or rejection.
+        G. Translation, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
 
-    def save_finished(self, request, user, session, subtitles, new_title=None,
-                      completed=None, forked=False, new_description=None,
-                      task_id=None, task_notes=None, task_approved=None, task_type=None):
-        # TODO: lock all this in a transaction please!
-        language = session.language
-        # if this belongs to a task finish it:
+        TODO: Localize this?
 
-        new_version = None
-        if subtitles is not None and \
-                (len(subtitles) > 0 or language.latest_version(public_only=False) is not None):
-            new_version = self._create_version_from_session(session, user, forked)
-            new_version.save()
-
-            if hasattr(new_version, 'task_to_save'):
-                new_version.task_to_save.subtitle_version = new_version
-                new_version.task_to_save.save()
-
-            self._save_subtitles(
-                new_version.subtitle_set, subtitles, new_version.is_forked)
-
-        # if any of the language attributes have changed (title, descr,
-        # completedness) we must trigger the api notification.
-        must_trigger_api_language_edited = False
-        language.release_writelock()
-        if completed is not None:
-            language.is_complete = completed
-            if language.is_complete != completed:
-                must_trigger_api_language_edited = True
-        if new_title is not None:
-            language.title = new_title
-            if language.is_original:
-                language.video.title = language.title
-            must_trigger_api_language_edited = True
-        if new_description is not None:
-            language.description = new_description
-            if language.is_original:
-                language.video.description = language.description
-            must_trigger_api_language_edited = True
-        language.save()
-
-        if must_trigger_api_language_edited:
-            language.video.save()
-            api_language_edited.send(language)
-
-        if new_version is not None:
-            video_changed_tasks.delay(language.video.id, new_version.id)
-            api_subtitles_edited.send(new_version)
-        else:
-            video_changed_tasks.delay(language.video.id)
-            api_video_edited.send(language.video)
-
-        # The message displayed to the user  has a complex requirement /  outcomes
-        # 1) Subs will go live in a moment. Works for unmoderated subs and for D and H
-        # D. Transcript, post-publish edit by moderator with the power to approve. Will go live immediately.
-        # H. Translation, post-publish edit by moderator with the power to approve. Will go live immediately.
-        # 2) Subs must be completed before being submitted to moderators. Works for A and E
-        # A. Transcript, incomplete (checkbox not ticked). Must be completed before being submitted to moderators.
-        # E. Translation, incomplete (some lines missing). Must be completed before being submitted to moderators.
-        # 3) Subs will be submitted for review/approval. Works for B, C, F, and G
-        # B. Transcript, complete (checkbox ticked). Will be submitted to moderators promptly for approval or rejection.
-        # C. Transcript, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
-        # F. Translation, complete (all the lines filled). Will be submitted to moderators promptly for approval or rejection.
-        # G. Translation, post-publish edit by contributor. Will be submitted to moderators promptly for approval or rejection.
+        """
         message_will_be_live_soon = "Your changes have been saved. It may take a moment for your subtitles to appear."
         message_will_be_submited = ("This video is moderated by %s."
                                     "Your changes will be reviewed by the "
@@ -439,24 +451,29 @@ class Rpc(BaseRpc):
         message_incomplete = ("These subtitles are incomplete. "
                               "They will not be submitted for publishing "
                               "until they've been completed.")
+
         under_moderation = language.video.is_moderated
 
         _user_can_publish =  True
-        team_video_set = language.video.teamvideo_set
-        if under_moderation and team_video_set.exists():
+        team_video = language.video.get_team_video()
+        if under_moderation and team_video:
             # videos are only supposed to have one team video
-            _user_can_publish = can_publish_edits_immediately(team_video_set.all()[0], user, language.language)
-        is_complete = language.is_complete or language.calculate_percent_done() == 100
+            _user_can_publish = can_publish_edits_immediately(team_video, user, language.language)
+
         # this is case 1
-        if under_moderation and _user_can_publish is False:
+        if under_moderation and not _user_can_publish:
             if is_complete:
                 # case 3
-                user_message = message_will_be_submited % ( language.video.moderated_by.name)
+                return message_will_be_submited % language.video.moderated_by.name
             else:
                 # case 2
-                user_message = message_incomplete
+                return message_incomplete
         else:
-            user_message = message_will_be_live_soon
+            return message_will_be_live_soon
+
+    def _complete_tasks_for_save(self, request, language, new_version, is_complete,
+                                 task_id, task_type, task_notes, task_approved):
+        """Complete any tasks for this save.  Might return an error."""
 
         # If we've just saved a completed subtitle language, we may need to
         # complete a subtitle or translation task.
@@ -470,20 +487,23 @@ class Rpc(BaseRpc):
                 )
                 for task in tasks:
                     task.complete()
-        if task_id:
-            res = {
-                "review": self._finish_review,
-                "approve": self._finish_approve
-            }[task_type](request, task_id, task_notes, task_approved,
-                         new_version=new_version)
-            # if the task did not succeeded, just bail out
-            if not res.get('response', 'ok'):
-                return res
 
-        return { 'user_message': user_message,
-                 'response': 'ok' }
+        # If the user is specifically performing a review/approve task we should
+        # handle it.
+        if task_id:
+            if task_type == 'review':
+                finish = self._finish_review
+            elif task_type == 'approve':
+                finish = self._finish_approve
+
+            error = finish(request, task_id, task_notes, task_approved,
+                           new_version=new_version)
+            if error:
+                return error
 
     def _save_subtitles(self, subtitle_set, json_subs, forked):
+        """Create Subtitle objects into the given queryset from the JSON subtitles."""
+
         for s in json_subs:
             if not forked:
                 subtitle_set.create(
@@ -496,8 +516,119 @@ class Rpc(BaseRpc):
                     start_time=s['start_time'],
                     end_time=s['end_time'],
                     subtitle_order=s['sub_order'],
-                    start_of_paragraph=s.get('start_of_paragraph', False),
-                )
+                    start_of_paragraph=s.get('start_of_paragraph', False))
+
+    def _get_new_version_for_save(self, subtitles, language, session, user, forked):
+        """Return a new subtitle version for this save, or None if not needed."""
+
+        new_version = None
+
+        should_create_new_version = (
+            subtitles is not None
+            and (len(subtitles) > 0
+                 or language.latest_version(public_only=False) is not None))
+
+        if should_create_new_version:
+            new_version = self._create_version_from_session(session, user, forked)
+            new_version.save()
+
+            if hasattr(new_version, 'task_to_save'):
+                new_version.task_to_save.subtitle_version = new_version
+                new_version.task_to_save.save()
+
+            self._save_subtitles(
+                new_version.subtitle_set, subtitles, new_version.is_forked)
+
+        return new_version
+
+    def _update_language_attributes_for_save(self, language, completed, new_title, new_description):
+        """Update the attributes of the language as necessary and save it.
+
+        Will also send the appropriate API notification if needed.
+
+        """
+        must_trigger_api_language_edited = False
+
+        if completed is not None:
+            if language.is_complete != completed:
+                must_trigger_api_language_edited = True
+            language.is_complete = completed
+
+        if new_title is not None:
+            language.title = new_title
+            if language.is_original:
+                language.video.title = language.title
+            must_trigger_api_language_edited = True
+
+        if new_description is not None:
+            language.description = new_description
+            if language.is_original:
+                language.video.description = language.description
+            must_trigger_api_language_edited = True
+
+        language.save()
+
+        if must_trigger_api_language_edited:
+            language.video.save()
+            api_language_edited.send(language)
+
+    def save_finished(self, request, user, session, subtitles, new_title=None,
+                      completed=None, forked=False, new_description=None,
+                      task_id=None, task_notes=None, task_approved=None, task_type=None):
+        # TODO: lock all this in a transaction please!
+
+        language = session.language
+
+        new_version = self._get_new_version_for_save(
+            subtitles, language, session, user, forked)
+
+        language.release_writelock()
+
+        self._update_language_attributes_for_save(
+            language, completed, new_title, new_description)
+
+        if new_version:
+            video_changed_tasks.delay(language.video.id, new_version.id)
+            api_subtitles_edited.send(new_version)
+        else:
+            video_changed_tasks.delay(language.video.id)
+            api_video_edited.send(language.video)
+
+        is_complete = language.is_complete or language.calculate_percent_done() == 100
+        user_message = self._get_user_message_for_save(user, language, is_complete)
+
+        error = self._complete_tasks_for_save(
+                request, language, new_version, is_complete, task_id, task_type,
+                task_notes, task_approved)
+        if error:
+            return error
+
+        return { 'response': 'ok', 'user_message': user_message }
+
+    def finished_subtitles(self, request, session_pk, subtitles=None,
+                           new_title=None, completed=None,
+                           forked=False, throw_exception=False, new_description=None,
+                           task_id=None, task_notes=None, task_approved=None, task_type=None):
+        """Called when a user has finished a set of subtitles and they should be saved.
+
+        TODO: Rename this to something verby, like "finish_subtitles".
+
+        """
+        session = SubtitlingSession.objects.get(pk=session_pk)
+
+        if not request.user.is_authenticated():
+            return { 'response': 'not_logged_in' }
+        if not session.language.can_writelock(request):
+            return { "response" : "unlockable" }
+        if not session.matches_request(request):
+            return { "response" : "does not match request" }
+
+        if throw_exception:
+            raise Exception('purposeful exception for testing')
+
+        return self.save_finished(
+            request, request.user, session, subtitles, new_title, completed,
+            forked, new_description, task_id, task_notes, task_approved, task_type)
 
 
     def _get_review_or_approve_task(self, team_video, subtitle_language):
@@ -639,6 +770,7 @@ class Rpc(BaseRpc):
         return session
 
 
+    # Review
     def fetch_review_data(self, request, task_id):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
@@ -657,9 +789,11 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
-            # if there is a new version, set that as the tasks's one
+
+            # If there is a new version, update the task's version.
             if new_version:
                 task.subtitle_version = new_version
+
             task.save()
 
             if task.approved in Task.APPROVED_FINISHED_IDS:
@@ -668,19 +802,12 @@ class Rpc(BaseRpc):
             task.subtitle_version.language.release_writelock()
             task.subtitle_version.language.followers.add(request.user)
 
-            if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                user_message =  'These subtitles have been accepted and your notes have been sent to the author.'
-            elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
-                user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
-            else:
-                user_message =  'Your notes have been saved.'
-
             video_changed_tasks.delay(task.team_video.video_id)
-            return {'response': 'ok', 'user_message': user_message}
         else:
             return {'error_msg': _(u'\n'.join(flatten_errorlists(form.errors)))}
 
 
+    # Approval
     def fetch_approve_data(self, request, task_id):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
@@ -699,7 +826,8 @@ class Rpc(BaseRpc):
             task = form.cleaned_data['task']
             task.body = form.cleaned_data['body']
             task.approved = form.cleaned_data['approved']
-            # if there is a new version, set that as the tasks's one
+
+            # If there is a new version, update the task's version.
             if new_version:
                 task.subtitle_version = new_version
             task.save()
@@ -710,16 +838,11 @@ class Rpc(BaseRpc):
             task.subtitle_version.language.release_writelock()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                user_message =  'These subtitles have been approved and your notes have been sent to the author.'
                 api_subtitles_approved.send(task.subtitle_version)
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
-                user_message =  'These subtitles have been rejected and your notes have been sent to the author.'
                 api_subtitles_rejected.send(task.subtitle_version)
-            else:
-                user_message =  'Your notes have been saved.'
 
             video_changed_tasks.delay(task.team_video.video_id)
-            return {'response': 'ok', 'user_message': user_message}
         else:
             return {'error_msg': _(u'\n'.join(flatten_errorlists(form.errors)))}
 
@@ -746,9 +869,9 @@ class Rpc(BaseRpc):
         else:
             return language.standard_language != base_language
 
-    def _get_language_for_editing(
-        self, request, video_id, language_code,
-        subtitle_language_pk=None, base_language=None):
+    def _get_language_for_editing(self, request, video_id, language_code,
+                                  subtitle_language_pk=None, base_language=None):
+        """Return the subtitle language to edit or a lock response."""
 
         video = models.Video.objects.get(video_id=video_id)
 
@@ -763,6 +886,7 @@ class Rpc(BaseRpc):
                 editable = language.can_writelock(request)
         else:
             create_new = True
+
         if create_new:
             standard_language = self._find_base_language(base_language)
             forked = standard_language is None
@@ -775,12 +899,18 @@ class Rpc(BaseRpc):
                     'is_forked': forked,
                     'writelock_session_key': '' })
             editable = created or language.can_writelock(request)
+
         if editable:
             language.writelock(request)
             language.save()
+
             if create_new:
                 api_language_new.send(language)
-        return language, editable
+
+            return language, None
+        else:
+            return None, { "can_edit": False,
+                           "locked_by": language.writelock_owner_name }
 
     def _fix_blank_original(self, video_id):
         # TODO: remove this method as soon as blank SubtitleLanguages

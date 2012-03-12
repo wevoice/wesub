@@ -137,18 +137,18 @@ var Site = function(Site) {
         },
         collapsibleLists: function($lists) {
             $.each($lists, function() {
-                $list = $(this);
-                $anchor = $('li.expand a', $list);
-                $anchorTextShowAll = $anchor.children('span.all').text();
-                $anchorTextShowLess = $anchor.children('span.less').text();
+                var $list = $(this);
+                var $anchor = $('li.expand a', $list);
+                var anchorTextShowAll = $anchor.children('span.all').text();
+                var anchorTextShowLess = $anchor.children('span.less').text();
 
                 $anchor.click(function(e) {
                     if ($list.hasClass('expanded')) {
-                        $anchor.text($anchorTextShowAll);
+                        $anchor.text(anchorTextShowAll);
                         $list.removeClass('expanded');
                         $list.addClass('collapsed');
                     } else {
-                        $anchor.text($anchorTextShowLess);
+                        $anchor.text(anchorTextShowLess);
                         $list.removeClass('collapsed');
                         $list.addClass('expanded');
                     }
@@ -336,21 +336,24 @@ var Site = function(Site) {
                 var title = $('#edit-title-dialog .title-input').val();
                 if (title) {
                     $('.title-container').html(title).hide().fadeIn();
-                    VideosApi.change_title_video(window.VIDEO_ID, title, function(response) {
-                        if (response.error) {
-                            $.jGrowl.error(response.error);
-                        } else {
-                            $('.title-container').html(title);
-                            document.title = title + ' | Universal Subtitles';
+                    VideosApi.change_title_video(window.VIDEO_ID, title,
+                        function(response) {
+                            if (response.error) {
+                                $.jGrowl.error(response.error);
+                            } else {
+                                $('.title-container').html(title);
+                                document.title = title + ' | Universal Subtitles';
+                            }
                         }
-                    });
+                    );
                     $('#edit-title-dialog').modClose();
                 } else {
                     $.jGrowl.error(window.TITLE_ERROR);
                 }
             });
             if (window.TASK) {
-                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.team_video.video.get_video_url }}');
+                var videoSource = unisubs.player.MediaSource.videoSourceForURL(
+                        '{{ task.team_video.video.get_video_url }}');
                 var opener = new unisubs.widget.SubtitleDialogOpener(
                                      window.TASK_TEAM_VIDEO_ID,
                                      window.TASK_TEAM_VIDEO_URL,
@@ -488,6 +491,64 @@ var Site = function(Site) {
             that.Utils.resetLangFilter();
             that.Utils.chosenify();
         },
+        team_settings_permissions: function() {
+            $workflow = $('#id_workflow_enabled');
+            
+            // Fields to watch
+            $subperm = $('#id_subtitle_policy');
+            $transperm = $('#id_translate_policy');
+            $revperm = $('#id_review_allowed');
+            $appperm = $('#id_approve_allowed');
+
+            // Inspect/observe the workflow checkbox
+            if ($workflow.attr('checked')) {
+                $('.v1 .workflow').show();
+            }
+            $workflow.change(function() {
+                if ($workflow.attr('checked')) {
+                    $('.v1 .workflow').show();
+                    $revperm.trigger('change');
+                    $appperm.trigger('change');
+                } else {
+                    $('.v1 .workflow').hide();
+                    $('#review-step').hide();
+                    $('#approve-step').hide();
+                }
+            });
+
+            // Observe the permissions fields
+            $subperm.change(function() {
+                $('#perm-sub').html($subperm.children('option:selected').html());
+            });
+            $transperm.change(function() {
+                $('#perm-trans').html($transperm.children('option:selected').html());
+            });
+            $revperm.change(function() {
+                if ($revperm.children('option:selected').val() !== '0') {
+                    $('#review-step').show();
+                    $('#perm-rev').html($revperm.children('option:selected').html());
+                } else {
+                    $('#review-step').hide();
+                }
+            });
+            $appperm.change(function() {
+                if($appperm.children('option:selected').val() !== '0') {
+                    $('#approve-step').show();
+                    $('#perm-app').html($appperm.children('option:selected').html());
+                } else {
+                    $('#approve-step').hide();
+                }
+            });
+
+            // Load state
+            $subperm.trigger('change');
+            $transperm.trigger('change');
+            $revperm.trigger('change');
+            $appperm.trigger('change');
+        },
+        team_settings_languages: function() {
+            that.Utils.chosenify();
+        },
 
         // Profile
         profile_dashboard: function() {
@@ -547,6 +608,28 @@ var Site = function(Site) {
         },
         messages_sent: function() {
             that.Utils.messagesDeleteAndSend();
+        },
+        messages_new: function() {
+            that.Utils.chosenify();
+
+            $('.ajaxChosen select').ajaxChosen({
+                method: 'GET',
+                url: '/en/messages/users/search/',
+                dataType: 'json'
+            }, function (data) {
+                var terms = {};
+
+                $.each(data.results, function (i, val) {
+                    if (data.results[i][2] !== '') {
+                        var name = ' (' + data.results[i][2] + ')';
+                    } else {
+                        var name = '';
+                    }
+                    terms[data.results[i][0]] = data.results[i][1] + name;
+                });
+
+                return terms;
+            });
         }
     };
 };

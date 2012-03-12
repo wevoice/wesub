@@ -8,6 +8,13 @@ The full documentation can be found at
 Quick Start
 -----------
 
+Universal Subtitles uses [Vagrant][] to make it easy to get started.  If you've
+never used Vagrant before we highly recommend going through its [quick start
+guide][vagrant-guide] to learn how it works.
+
+[Vagrant]: http://vagrantup.com/
+[vagrant-guide]: http://vagrantup.com/docs/getting-started/index.html
+
 To run the development version:
 
 1. Git clone the repository:
