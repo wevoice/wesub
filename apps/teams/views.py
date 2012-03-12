@@ -1378,7 +1378,10 @@ def edit_project(request, slug, project_slug):
             form = ProjectForm(request.POST, instance=project)
             workflow_form = WorkflowForm(request.POST, instance=workflow)
 
-            if form.is_valid() and workflow_form.is_valid():
+            # if the project doesn't have workflow enabled, the workflow form
+            # is going to fail to validate (workflow is None)
+            # there's probably a better way of doing this...
+            if form.is_valid() and workflow_form.is_valid if project.workflow_enabled else form.is_valid():
                 form.save()
 
                 if project.workflow_enabled:
@@ -1389,6 +1392,7 @@ def edit_project(request, slug, project_slug):
 
                 messages.success(request, _(u'Project saved.'))
                 return HttpResponseRedirect(project_list_url)
+
     else:
         form = ProjectForm(instance=project)
         workflow_form = WorkflowForm(instance=workflow)
