@@ -97,10 +97,10 @@
                             {% trans 'date, oldest' %}
                         </option>
                         {% if team.task_expiration != None %}
-                            <option {% if request.GET.sort == '-expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-expires' page='' %}">
+                            <option {% if request.GET.sort == 'expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='expires' page='' %}">
                                 {% trans 'time left, least' %}
                             </option>
-                            <option {% if request.GET.sort == 'expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='expires' page='' %}">
+                            <option {% if request.GET.sort == '-expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-expires' page='' %}">
                                 {% trans 'time left, most' %}
                             </option>
                         {% endif %}
