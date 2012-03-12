@@ -451,7 +451,6 @@ def settings_projects(request, slug):
 
     return { 'team': team, 'projects': projects, }
 
-
 def _set_languages(team, codes_preferred, codes_blacklisted):
     tlps = TeamLanguagePreference.objects.for_team(team)
 
@@ -790,7 +789,6 @@ def deny_application(request, slug, user_pk):
 
     return redirect('teams:applications', team.pk)
 
-
 @render_to('teams/invite_members.html')
 @login_required
 def invite_members(request, slug):
@@ -895,7 +893,6 @@ def highlight(request, slug, highlight=True):
     item.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-
 def _member_search_result(member, team, task_id, team_video_id, task_type, task_lang):
     result = [member.user.id, u'%s (%s)' % (member.user, member.user.username)]
 
@@ -961,7 +958,6 @@ def _get_or_create_workflow(team_slug, project_id, team_video_id):
         workflow = Workflow(team=team, project=project, team_video=team_video)
 
     return workflow
-
 
 def _task_languages(team, user):
     languages = filter(None, Task.objects.filter(team=team, deleted=False)
@@ -1072,14 +1068,12 @@ def _order_tasks(request, tasks):
 
     return tasks
 
-
 def _get_task_filters(request):
     return { 'language': request.GET.get('lang'),
              'type': request.GET.get('type'),
              'team_video': request.GET.get('team_video'),
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
-
 
 @render_to('teams/tasks.html')
 def team_tasks(request, slug, project_slug=None):
@@ -1268,7 +1262,6 @@ def delete_task(request, slug):
 
     return HttpResponseRedirect(next)
 
-
 def assign_task(request, slug):
     '''Assign a task to the given user, or unassign it if null/None.'''
     team = get_object_or_404(Team, slug=slug)
@@ -1456,7 +1449,6 @@ def _create_task_after_unpublishing(subtitle_version):
 
     return task
 
-
 def _propagate_unpublish_to_external_services(language_pk):
     """Push the 'unpublishing' of subs to third-party providers for the given language.
 
@@ -1517,7 +1509,6 @@ def _propagate_unpublish_to_tasks(team_video, language_pk, language_code):
 
     tasks_to_delete.update(deleted=True)
 
-
 def unpublish(request, slug):
     team = get_object_or_404(Team, slug=slug)
 
@@ -1559,7 +1550,6 @@ def unpublish(request, slug):
     messages.success(request, _(u'Successfully unpublished subtitles.'))
     return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
 
-
 @login_required
 def delete_video(request, team_video_pk):
     """
@@ -1600,7 +1590,6 @@ def delete_video(request, team_video_pk):
     else:
         messages.success(request, msg)
         return HttpResponseRedirect(next)
-
 
 @login_required
 def auto_captions_status(request, slug):
