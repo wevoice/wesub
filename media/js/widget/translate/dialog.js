@@ -95,15 +95,10 @@ unisubs.translate.Dialog.prototype.enterDocument = function() {
     // this is where we listen to the dialog close button
     unisubs.subtitle.Dialog.superClass_.enterDocument.call(this);
     unisubs.Dialog.translationDialogOpen = true;
-    var that = this;
-    this.getRightPanelInternal().showDownloadLink(
-        function() {
-            return that.makeJsonSubs();
-        });
 
     if (this.reviewOrApprovalType_ && !this.notesFectched_){
         var func  = this.serverModel_.fetchReviewData ;
-        that = this;
+        var that = this;
         if (this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL){
             func = this.serverModel_.fetchApproveData;
         }
@@ -242,6 +237,12 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
             videoPlayer.pause();
         }
     }
+
+    var that = this;
+    this.getRightPanelInternal().showDownloadLink(
+        function() {
+            return that.makeJsonSubs();
+        });
 };
 unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
     var s = unisubs.translate.Dialog.State_;
