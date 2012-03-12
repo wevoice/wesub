@@ -374,7 +374,7 @@ unisubs.subtitle.Dialog.prototype.saveWorkImpl_ = function(closeAfterSave, isCom
 unisubs.subtitle.Dialog.prototype.enterState_ = function(state) {
     var skipHowto = unisubs.UserSettings.getBooleanValue(unisubs.UserSettings.Settings.SKIP_HOWTO_VIDEO);
 
-    if (!skipHowto) {
+    if ((!this.reviewOrApprovalType_) && (!skipHowto)) {
         this.showHowToForState_(state);
     } else {
         this.showGuidelinesForState_(state);
