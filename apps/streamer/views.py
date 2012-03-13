@@ -22,9 +22,11 @@ from videos import models
 from django.conf import settings
 import widget
 
+DEFAULT_DEMO_URL = "http://www.youtube.com/v/jbkSRLYSojo?"
+
 def youtubedemo(request):
-    v, created = models.Video.get_or_create_for_url(
-        'http://www.youtube.com/v/1lxm-e0hMTw')
+    url = request.GET.get("url", DEFAULT_DEMO_URL )
+    v, created = models.Video.get_or_create_for_url(url)
     subs = v.subtitles()
     scripts = [widget.full_path(s) for s in settings.JS_WIDGETIZER[:-1]]
     return render_to_response(
@@ -32,15 +34,20 @@ def youtubedemo(request):
         { 'js_use_compiled': settings.COMPRESS_MEDIA,
           'video': v,
           'subs': subs,
+          'url':url,
           'scripts': scripts },
         context_instance=RequestContext(request))
 
 def youtubenotranscriptdemo(request):
     scripts = [widget.full_path(s) for s in settings.JS_WIDGETIZER[:-1]]
+    url = request.GET.get("url", DEFAULT_DEMO_URL )
     return render_to_response(
         'streamer/youtubenotranscriptdemo.html',
         { 'js_use_compiled': settings.COMPRESS_MEDIA,
-          'scripts': scripts },
+          'scripts': scripts,
+          'url': url,
+
+      },
         context_instance=RequestContext(request))
 
 def overlayytdemo(request):
