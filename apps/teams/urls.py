@@ -39,8 +39,6 @@ urlpatterns = patterns('teams.views',
     url('^add/videos/(?P<slug>[-\w]+)/$', 'add_videos', name='add_videos'),
     url('^edit/video/(?P<team_video_pk>\d+)/$', 'team_video', name='team_video'),
     url('^remove/video/(?P<team_video_pk>\d+)/$', 'remove_video', name='remove_video'),
-    # this acutally deletes videos and all of it's data. For good, watch out
-    url('^delete/video/(?P<team_video_pk>\d+)/$', 'delete_video', name='delete_video'),
     url('^remove/members/(?P<slug>[-\w]+)/(?P<user_pk>\d+)/$', 'remove_member', name='remove_member'),
     url('^(?P<slug>[-\w]+)/?$', 'detail', name='detail'),
     url('^(?P<slug>[-\w]+)/members/$', 'detail_members', name='detail_members'),
