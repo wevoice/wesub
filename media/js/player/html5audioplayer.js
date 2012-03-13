@@ -25,6 +25,7 @@ goog.provide('unisubs.player.Html5AudioPlayer');
  */
 unisubs.player.Html5AudioPlayer = function(mediaSource, opt_forDialog) {
     unisubs.player.Html5MediaPlayer.call(this, mediaSource);    
+    this.mediaConfig_ = mediaSource.mediaConfig_;
     this.forDialog_ = !!opt_forDialog;
 };
 
@@ -38,16 +39,24 @@ unisubs.player.Html5AudioPlayer.prototype.createDom = function() {
     this.setElementInternal(containingDiv);
     // FIXME: duplicated in FlashAudioPlayer
 
-    unisubs.style.setSize(
-        containingDiv,
-        this.forDialog_ ? 
-            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
-            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
-    unisubs.style.setSize(
-        this.mediaElem,
-        this.forDialog_ ? 
-            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
-            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
+    if (this.mediaConfig_ && this.mediaConfig_['width'] && this.mediaConfig_['height']) {
+        var size = new goog.math.Size(
+            parseInt(this.mediaConfig_['width'], 0), parseInt(this.mediaConfig_['height'], 0));
+        unisubs.style.setSize(containingDiv, size);
+        unisubs.style.setSize(this.mediaElem, size);
+    }
+    else {
+        unisubs.style.setSize(
+            containingDiv,
+            this.forDialog_ ? 
+                unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+                unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
+        unisubs.style.setSize(
+            this.mediaElem,
+            this.forDialog_ ? 
+                unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+                unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
+    }
 };
 unisubs.player.Html5AudioPlayer.prototype.createAudioElement_ = function($d) {
     var params = { 'autobuffer': 'true' };
