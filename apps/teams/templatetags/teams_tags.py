@@ -38,6 +38,8 @@ from apps.teams.permissions import (
     can_assign_task as _can_assign_task,
     can_delete_task as _can_delete_task,
     can_remove_video as _can_remove_video,
+    can_delete_video as _can_delete_video,
+    can_delete_video_in_team as _can_delete_video_in_team,
     can_approve as _can_approve,
 )
 from apps.teams.permissions import (
@@ -83,6 +85,14 @@ def can_edit_video(search_record, user):
 @register.filter
 def can_remove_video(tv, user):
     return _can_remove_video(tv, user)
+
+@register.filter
+def can_delete_video(tv, user):
+    return _can_delete_video(tv, user)
+
+@register.filter
+def can_delete_video_in_team(user, team):
+    return _can_delete_video_in_team(team, user)
 
 @register.filter
 def can_add_tasks(team, user):

@@ -360,7 +360,15 @@ def can_delete_video(team_video, user):
     Currently only team owners have this permission.
 
     """
-    role = get_role_for_target(user, team_video.team)
+    return can_delete_video_in_team(team_video.team, user)
+
+def can_delete_video_in_team(team, user):
+    """Returns whether the give user can delete a team video from unisubs entirely.
+
+    Currently only team owners have this permission.
+
+    """
+    role = get_role_for_target(user, team)
 
     return role in [ROLE_OWNER]
 

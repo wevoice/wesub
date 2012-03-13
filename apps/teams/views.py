@@ -626,7 +626,7 @@ def remove_video(request, team_video_pk):
                            _(u'Request must be a POST request.'))
 
     next = request.POST.get('next', reverse('teams:user_teams'))
-    wants_delete = request.POST.get('del-opt')
+    wants_delete = request.POST.get('del-opt') == 'total-destruction'
 
     if wants_delete:
         if not can_delete_video(team_video, request.user):

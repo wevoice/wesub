@@ -122,7 +122,11 @@
                             {% blocktrans %}Just remove the video from the team (it will remain on Universal Subtitles but will no longer be subject to permissions and worfklows).{% endblocktrans %}
                         </label>
                         <label class="radio">
-                            <input type="radio" name="del-opt" value="total-destruction">
+                            <input type="radio" name="del-opt" value="total-destruction"
+                                   {% if not request.user|can_delete_video_in_team:team %}
+                                       disabled="disabled"
+                                   {% endif %}
+                            >
                             {% trans "Delete the video entirely." %}
                         </label>
                     </fieldset>
@@ -130,7 +134,6 @@
                     {% csrf_token %}
 
                     <input type="hidden" name="next" value="{{ request.path }}" />
-                    <input type="hidden" name="subtitle_version" value="" />
 
                     <div class="modal-footer">
                         <input type="submit" class="btn danger" value="{% trans "Delete" %}" />
