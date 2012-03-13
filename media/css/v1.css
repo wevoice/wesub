@@ -1264,6 +1264,11 @@ body#teams div.edit-team-video form fieldset a {
   padding: .5em 0;
 }
 
+/* Global */
+div#language_picker select {
+  width: 220px;
+}
+
 /* Profile */
 #profile.v1 h2, #dashboard.v1 h2 {
   line-height: 1.75em;
