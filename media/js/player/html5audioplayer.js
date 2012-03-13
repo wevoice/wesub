@@ -38,23 +38,16 @@ unisubs.player.Html5AudioPlayer.prototype.createDom = function() {
     this.setElementInternal(containingDiv);
     // FIXME: duplicated in FlashAudioPlayer
 
-    if (this.videoConfig_ && this.videoConfig_['width'] && 
-        this.videoConfig_['height']) {
-        return new goog.math.Size(
-            parseInt(this.videoConfig_['width'], 0), parseInt(this.videoConfig_['height'], 0));
-    }
-    else {
-        unisubs.style.setSize(
-            containingDiv,
-            this.forDialog_ ? 
-                unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
-                unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
-        unisubs.style.setSize(
-            this.mediaElem,
-            this.forDialog_ ? 
-                unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
-                unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
-    }
+    unisubs.style.setSize(
+        containingDiv,
+        this.forDialog_ ? 
+            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
+    unisubs.style.setSize(
+        this.mediaElem,
+        this.forDialog_ ? 
+            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
 };
 unisubs.player.Html5AudioPlayer.prototype.createAudioElement_ = function($d) {
     var params = { 'autobuffer': 'true' };
