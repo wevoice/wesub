@@ -101,7 +101,6 @@
     });
 
     $('a.edit-role').click(function(e) {
-        console.log(e.target);
         e.preventDefault();
         var pk = $(e.target).data('member-pk');
         var username = $(e.target).data('member-username');

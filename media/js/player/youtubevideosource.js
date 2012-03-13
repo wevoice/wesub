@@ -31,15 +31,11 @@ unisubs.player.YoutubeVideoSource = function(youtubeVideoID, opt_videoConfig) {
     this.uuid_ = unisubs.randomString();
     this.videoConfig_ = opt_videoConfig;
 };
-
 unisubs.player.YoutubeVideoSource.extractVideoID = function(videoURL) {
     var videoIDExtract = /(?:v[\/=]|embed\/)([0-9a-zA-Z\-\_]+)/i.exec(videoURL);
     return videoIDExtract ? videoIDExtract[1] : null;
-}
-
-unisubs.player.YoutubeVideoSource.forURL = 
-    function(videoURL, opt_videoConfig) 
-{
+};
+unisubs.player.YoutubeVideoSource.forURL = function(videoURL, opt_videoConfig) {
     var videoID = unisubs.player.YoutubeVideoSource.extractVideoID(videoURL);
     if (videoID)
         return new unisubs.player.YoutubeVideoSource(
@@ -47,18 +43,13 @@ unisubs.player.YoutubeVideoSource.forURL =
     else
         return null;
 };
-
 unisubs.player.YoutubeVideoSource.isYoutube = function(videoURL) {
-    return /^\s*https?:\/\/([^\.]+\.)?youtube/i.test(videoURL);
+    return (/^\s*https?:\/\/([^\.]+\.)?youtube/i).test(videoURL);
 };
-
 unisubs.player.YoutubeVideoSource.prototype.createPlayer = function() {
     return this.createPlayerInternal(false);
 };
-
-unisubs.player.YoutubeVideoSource.prototype.createControlledPlayer = 
-    function() 
-{
+unisubs.player.YoutubeVideoSource.prototype.createControlledPlayer = function() {
     return new unisubs.player.ControlledVideoPlayer(this.createPlayerInternal(true));
 };
 
@@ -75,30 +66,25 @@ unisubs.player.YoutubeVideoSource.prototype.createPlayerInternal = function(forD
 unisubs.player.YoutubeVideoSource.prototype.getYoutubeVideoID = function() {
     return this.youtubeVideoID_;
 };
-
 unisubs.player.YoutubeVideoSource.prototype.getUUID = function() {
     return this.uuid_;
 };
-
 unisubs.player.YoutubeVideoSource.prototype.getVideoConfig = function() {
     return this.videoConfig_;
 };
-
 unisubs.player.YoutubeVideoSource.prototype.setVideoConfig = function(config) {
     this.videoConfig_ = config;
 };
-
 unisubs.player.YoutubeVideoSource.prototype.sizeFromConfig = function() {
     if (this.videoConfig_ && this.videoConfig_['width'] && 
         this.videoConfig_['height']) {
         return new goog.math.Size(
-            parseInt(this.videoConfig_['width']), parseInt(this.videoConfig_['height']));
+            parseInt(this.videoConfig_['width'], 0), parseInt(this.videoConfig_['height'], 0));
     }
     else {
         return null;
     }
 };
-
 unisubs.player.YoutubeVideoSource.prototype.getVideoURL = function() {
     return "http://www.youtube.com/watch?v=" + this.youtubeVideoID_;
 };
