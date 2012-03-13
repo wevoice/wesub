@@ -344,11 +344,10 @@ class TestRules(BaseTestPermission):
     def test_can_delete_video(self):
         user, team = self.user, self.team
 
-
-        for r in [ ROLE_ADMIN, ROLE_OWNER]:
+        for r in [ROLE_OWNER]:
             with self.role(r):
                 self.assertTrue(can_delete_video(self.nonproject_video, user))
-        for r in [ ROLE_MANAGER, ROLE_CONTRIBUTOR]:
+        for r in [ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR]:
             with self.role(r):
                 self.assertFalse(can_delete_video(self.nonproject_video, user))
 
