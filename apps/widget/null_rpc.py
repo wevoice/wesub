@@ -76,9 +76,8 @@ class NullRpc(BaseRpc):
                       base_language_pk=None,
                       original_language_code=None,
                       mode=None):
-        return {
-            "can_edit": True,
-            "subtitles": self._subtitles_dict() }
+        return { "can_edit": True,
+                 "subtitles": self._subtitles_dict() }
 
     def release_lock(self, request, session_pk):
         return { 'response': 'ok' }
@@ -87,11 +86,9 @@ class NullRpc(BaseRpc):
         return { 'response': 'ok' }
 
     def finished_subtitles(self, request, packets):
-        response = self.save_subtitles(
-            request,  packets)
+        response = self.save_subtitles(request,  packets)
         if response['response'] == 'ok':
-            response['drop_down_contents'] = \
-                self._drop_down_contents(None)
+            response['drop_down_contents'] = self._drop_down_contents(None)
         return response
 
     def fetch_subtitles(self, request, video_id, language_code=None):

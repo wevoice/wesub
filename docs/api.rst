@@ -2,7 +2,7 @@
 Api2 Documentation
 ==================
 
-This is the documentation of v2 of Universal Subtitle's API. 
+This is the documentation of v2 of Universal Subtitle's API. Please contact us if you’d like to use the Universal Subtitles API for commercial purposes.
 
 The v1 of the API is deprecated, but can still be accessed through http://www.universalsubtitles.org/api/1.0/documentation/ . Users should migrate to the v2 of the API. If you're missing a feature on the api, please `let us know <https://universalsubtitles.tenderapp.com/>`_ .
 
