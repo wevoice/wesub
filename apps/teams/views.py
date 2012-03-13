@@ -54,7 +54,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_review, can_approve,
-    can_delete_video,
+    can_delete_video, can_remove_video
 )
 from teams.search_indexes import TeamVideoLanguagesIndex
 from teams.signals import api_teamvideo_new
@@ -612,34 +612,43 @@ def team_video(request, team_video_pk):
 @render_to_json
 @login_required
 def remove_video(request, team_video_pk):
-    team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
-
-    if request.method != 'POST':
-        error = _(u'Request must be a POST request.')
-
-        if request.is_ajax():
-            return { 'success': False, 'error': error }
-        else:
-            messages.error(request, error)
-            return HttpResponseRedirect(reverse('teams:user_teams'))
-
-    next = request.POST.get('next', reverse('teams:user_teams'))
-
-    if not can_add_video(team_video.team, request.user, team_video.project):
-        error = _(u'You can\'t remove that video.')
-
+    def _error_resp(request, next, error):
         if request.is_ajax():
             return { 'success': False, 'error': error }
         else:
             messages.error(request, error)
             return HttpResponseRedirect(next)
 
+    team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
+
+    if request.method != 'POST':
+        return _error_resp(request, reverse('teams:user_teams'),
+                           _(u'Request must be a POST request.'))
+
+    next = request.POST.get('next', reverse('teams:user_teams'))
+    wants_delete = request.POST.get('del-opt') == 'total-destruction'
+
+    if wants_delete:
+        if not can_delete_video(team_video, request.user):
+            return _error_resp(request, next,
+                               _(u"You can't delete that video."))
+    else:
+        if not can_remove_video(team_video, request.user):
+            return _error_resp(request, next,
+                               _(u"You can't remove that video."))
+
     for task in team_video.task_set.all():
         task.delete()
 
+    video = team_video.video
+
     team_video.delete()
 
-    msg = _(u'Video has been removed from the team.')
+    if wants_delete:
+        video.delete()
+        msg = _(u'Video has been deleted from Universal Subtitles.')
+    else:
+        msg = _(u'Video has been removed from the team.')
 
     if request.is_ajax():
         return { 'success': True }
@@ -1549,47 +1558,6 @@ def unpublish(request, slug):
 
     messages.success(request, _(u'Successfully unpublished subtitles.'))
     return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
-
-@login_required
-def delete_video(request, team_video_pk):
-    """
-    Not only deletes the team video but actually deletes the original
-    video, be very careful!
-    """
-    if request.method != 'POST':
-        error = _(u'Request must be a POST request.')
-
-        if request.is_ajax():
-            return { 'success': False, 'error': error }
-        else:
-            messages.error(request, error)
-            return HttpResponseForbidden(reverse('teams:user_teams'))
-
-    next = request.POST.get('next', reverse('teams:user_teams'))
-
-    team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
-    if not can_delete_video(team_video, request.user):
-        error = _(u'You can\'t remove that video.')
-
-        if request.is_ajax():
-            return { 'success': False, 'error': error }
-        else:
-            messages.error(request, error)
-            return HttpResponseForbidden(next)
-
-    for task in team_video.task_set.all():
-        task.delete()
-
-    video = team_video.video
-    team_video.delete()
-    video.delete()
-    msg = _(u'Video has been deleted')
-
-    if request.is_ajax():
-        return { 'success': True }
-    else:
-        messages.success(request, msg)
-        return HttpResponseRedirect(next)
 
 @login_required
 def auto_captions_status(request, slug):

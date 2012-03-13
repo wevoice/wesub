@@ -1446,7 +1446,7 @@ div#language_picker select {
 .v1 .context #widget_div {
   padding-bottom: 1.5em;
 }
-.v1 .context video, .v1 .context object, .v1 .context .unisubs-widget span.unisubs-videoplayer {
+.v1 .context video, .v1 .context object, .v1 .context .unisubs-widget span.unisubs-videoplayer, .v1 .context audio {
   height: 173px !important;
   width: 289px !important;
 }

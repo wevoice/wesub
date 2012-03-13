@@ -113,30 +113,36 @@
                 <a href="#" class="close">x</a>
                 <h3>{% trans 'Remove video' %}</h3>
             </div>
-            <div class="modal-body">
-                <form method="POST" action="">
+            
+            <form method="POST" action="">
+                <div class="modal-body">
                     <fieldset>
-                        <p>{% blocktrans %}You can choose to remove the video from the {{ team }} team or to delete the video (and all of its subtitles) from the system entirely. What would you like to do?{% endblocktrans %}</p>
-                        <label class="radio">
-                            <input type="radio" name="del-opt" value="team-removal" checked="checked">
-                            {% blocktrans %}Just remove the video from the team (it will remain on Universal Subtitles but will no longer be subject to permissions and worfklows).{% endblocktrans %}
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="del-opt" value="total-destruction">
-                            {% trans "Delete the video entirely." %}
-                        </label>
+                        {% if not request.user|can_delete_video_in_team:team %}
+                            <p>{% blocktrans %}You are removing this video from the {{ team }} team.{% endblocktrans %}</p>
+                            <p class="notation">{% blocktrans %}It will remain on Universal Subtitles but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted.{% endblocktrans %}</p>
+                        {% else %}
+                            <p>{% blocktrans %}You can choose to remove the video from the {{ team }} team or to delete the video (and all of its subtitles) from the system entirely. What would you like to do?{% endblocktrans %}</p>
+                            <label class="radio">
+                                <input type="radio" name="del-opt" value="team-removal" checked="checked">
+                                {% blocktrans %}Just remove the video from the team.{% endblocktrans %}
+                            </label>
+                            <p class="notation">{% blocktrans %}It will remain on Universal Subtitles but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted.{% endblocktrans %}</p>
+                            <label class="radio">
+                                <input type="radio" name="del-opt" value="total-destruction">
+                                {% trans "Delete the video entirely." %}
+                            </label>
+                        {% endif %}
                     </fieldset>
 
                     {% csrf_token %}
 
                     <input type="hidden" name="next" value="{{ request.path }}" />
-                    <input type="hidden" name="subtitle_version" value="" />
+                </div>
 
-                    <div class="modal-footer">
-                        <input type="submit" class="btn danger" value="{% trans "Delete" %}" />
-                    </div>
-                </form>
-            </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn danger" value="{% trans "Remove" %}" />
+                </div>
+            </form>
         </div>
     </div>
 

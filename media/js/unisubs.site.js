@@ -525,18 +525,15 @@ var Site = function(Site) {
             $form.submit(function() {
                 var $checked = $('input[name="del-opt"]:checked', 'div#remove-modal');
                 if ($checked.val() == 'total-destruction') {
-                    $form.attr('action', $form.attr('action').replace('remove', 'delete'));
                     if (confirm('Are you sure you want to permanently delete this video? This action is irreversible.')) {
                         return true;
-                    }
-                    else {
+                    } else {
                         return false;
                     }
                 } else {
                     if (confirm('All open tasks for this video will be aborted, and in-progress subtitles will be published. Do you want to proceed?')) {
                         return true;
-                    }
-                    else {
+                    } else {
                         return false;
                     }
                 }

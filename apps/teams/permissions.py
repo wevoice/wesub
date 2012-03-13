@@ -342,7 +342,7 @@ def can_add_video_somewhere(team, user):
                for project in team.project_set.all())
 
 def can_remove_video(team_video, user):
-    """Return whether the given user can remove the given video."""
+    """Return whether the given user can remove the given team video."""
 
     role = get_role_for_target(user, team_video.team, team_video.project)
 
@@ -355,13 +355,22 @@ def can_remove_video(team_video, user):
     return role in _perms_equal_or_greater(role_required)
 
 def can_delete_video(team_video, user):
-    """
-    Returns whether the give user can delete the original video
-    and all of it's data.
-    """
-    role = get_role_for_target(user, team_video.team)
+    """Returns whether the give user can delete a team video from unisubs entirely.
 
-    return role in [ROLE_ADMIN, ROLE_OWNER]
+    Currently only team owners have this permission.
+
+    """
+    return can_delete_video_in_team(team_video.team, user)
+
+def can_delete_video_in_team(team, user):
+    """Returns whether the give user can delete a team video from unisubs entirely.
+
+    Currently only team owners have this permission.
+
+    """
+    role = get_role_for_target(user, team)
+
+    return role in [ROLE_OWNER]
 
 def can_edit_video(team_video, user):
     """Return whether the given user can edit the given video."""
