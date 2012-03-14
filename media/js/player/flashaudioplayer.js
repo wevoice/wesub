@@ -23,15 +23,24 @@ goog.provide('unisubs.player.FlashAudioPlayer');
  */
 unisubs.player.FlashAudioPlayer = function(mediaSource, opt_forDialog) {
     unisubs.player.FlvVideoPlayer.call(this, mediaSource, opt_forDialog);
+    this.mediaConfig_ = mediaSource.mediaConfig_;
     this.forDialog_ = !!opt_forDialog;
 };
+
 goog.inherits(unisubs.player.FlashAudioPlayer, unisubs.player.FlvVideoPlayer);
 
 unisubs.player.FlashAudioPlayer.prototype.createDom = function() {
     unisubs.player.FlashAudioPlayer.superClass_.createDom.call(this);
-    this.playerSize = this.forDialog_ ? 
-        unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
-        unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+
+    if (this.mediaConfig_ && this.mediaConfig_['width'] && this.mediaConfig_['height']) {
+        this.playerSize_ = new goog.math.Size(
+            parseInt(this.mediaConfig_['width'], 0), parseInt(this.mediaConfig_['height'], 0));
+    }
+    else {
+        this.playerSize_ = this.forDialog_ ? 
+            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+    }
 };
 
 /**
