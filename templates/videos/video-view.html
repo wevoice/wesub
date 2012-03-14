@@ -106,9 +106,9 @@
         {% if video.subtitle_language or translations %}
             <div>
                 <div>
-                    <ul id="subtitles-menu" {% if video.languages_count > 15 %} class="list-collapsible"{% endif %}>
+                    <ul id="subtitles-menu" {% if video.languages_count > 14 %} class="list-collapsible"{% endif %}>
                         {% include 'videos/_left_navigation.html' %}
-                        {% if video.languages_count > 15 %}
+                        {% if video.languages_count > 14 %}
                             <li class="expand">
                                 <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
                             </li>
