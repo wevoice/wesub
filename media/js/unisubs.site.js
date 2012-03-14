@@ -213,7 +213,6 @@ var Site = function(Site) {
             }
             if ($('a.open-modal').length) {
                 $('a.open-modal').live('click',function(e){
-                    e.preventDefault();
                     $target = $($(this).attr('href'));
                     $target.show();
 
@@ -225,6 +224,7 @@ var Site = function(Site) {
                     $('html').bind('click.modal', function() {
                         closeModal($target);
                     });
+                    e.preventDefault();
                 });
                 $('.action-close, .close', '.bootstrap').click(function(){
                     closeModal($(this).parents('.modal'));
@@ -671,10 +671,11 @@ var Site = function(Site) {
                 var terms = {};
 
                 $.each(data.results, function (i, val) {
+                    var name;
                     if (data.results[i][2] !== '') {
-                        var name = ' (' + data.results[i][2] + ')';
+                        name = ' (' + data.results[i][2] + ')';
                     } else {
-                        var name = '';
+                        name = '';
                     }
                     terms[data.results[i][0]] = data.results[i][1] + name;
                 });
