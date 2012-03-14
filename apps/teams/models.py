@@ -772,6 +772,7 @@ def team_video_delete(sender, instance, **kwargs):
         video.save()
 
         metadata_manager.update_metadata(video.pk)
+        video.update_search_index()
     except Video.DoesNotExist:
         pass
 
@@ -810,8 +811,6 @@ post_save.connect(team_video_autocreate_task, TeamVideo, dispatch_uid='teams.tea
 post_save.connect(team_video_add_video_moderation, TeamVideo, dispatch_uid='teams.teamvideo.team_video_add_video_moderation')
 post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.team_video_delete")
 post_delete.connect(team_video_rm_video_moderation, TeamVideo, dispatch_uid="teams.teamvideo.team_video_rm_video_moderation")
-
-
 
 
 # TeamMember
