@@ -116,8 +116,10 @@ class TeamVideoLanguagesIndex(SearchIndex):
         all_sls = (obj.video.subtitlelanguage_set
                             .annotate(num_versions=Count('subtitleversion'))
                             .filter(num_versions__gt=0))
+        all_sls = [sl for sl in all_sls
+                   if not sl.latest_version(public_only=False).is_all_blank()]
 
-        self.prepared_data['num_total_langs'] = all_sls.count()
+        self.prepared_data['num_total_langs'] = len(all_sls)
         self.prepared_data['num_completed_langs'] = len(completed_sls)
 
         self.prepared_data['video_completed_langs'] = \
