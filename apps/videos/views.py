@@ -275,7 +275,7 @@ def upload_subtitles(request):
         except Exception, e:
             #trying find out one error on dev-server. hope this should help
             transaction.rollback()
-            raise e
+            raise
     else:
         output['errors'] = form.get_errors()
         transaction.rollback()
