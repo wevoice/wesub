@@ -27,7 +27,11 @@ def run_locally(request):
 
 def current_site(request):
     try:
-        return { 'current_site': Site.objects.get_current() }
+        site = Site.objects.get_current() 
+        return {
+            'BASE_URL': "%s://%s"  % (settings.DEFAULT_PROTOCOL , site.domain),
+            'current_site': site,
+        }
     except Site.DoesNotExist:
         return { 'current_site': '' }
 
