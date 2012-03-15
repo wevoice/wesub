@@ -60,7 +60,7 @@
             <h1><a href="/">Universal Subtitles</a></h1>
             <div id="bar_right">
                 <div id="bar_search">
-                    <form method="get" action="{% url search:index %}">
+                    <form method="get" action="{{BASE_URL}}{% url search:index %}">
                         <input type="text" name="q" />
                     </form>
                 </div>

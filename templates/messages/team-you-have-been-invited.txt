@@ -3,7 +3,7 @@ Hi {{ user }},
 
 {{ inviter }} has invited you to become a {{ role }} for the team {{team.name}} ( {{url_base}}{% url teams:detail slug=team.slug %} ) on Universal Subtitles. Lucky you!
 {% if custom_message %}
-{{ custom_message }}
+{{ custom_message|safe }}
 {% endif %}
 {% if note %}
         {{ note }}
