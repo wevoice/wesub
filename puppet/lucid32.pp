@@ -21,7 +21,9 @@ class lucid32 {
     path => $venv,
     owner => "vagrant",
     group => "vagrant"; } ->
-  class { 'unisubs::db': } ->
+  class { 'unisubs::db':
+    require => Class["aptitude"];
+  } ->
   class { 'solr': 
     require => Package["curl"],
   } ->
