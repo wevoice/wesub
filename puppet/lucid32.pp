@@ -1,3 +1,6 @@
+Exec {
+  path => "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+}
 class lucid32 {
   $projectdir = "/opt/unisubs"
   $extrasdir = "/opt/extras"
@@ -45,6 +48,12 @@ class lucid32 {
   package { "git-core": ensure => "installed", }
   package { "swig": ensure => "installed", }
   package { "vim": ensure => "installed", }
+
+  class { "redis::server":
+    version => "2.4.8",
+    bind => "127.0.0.1",
+    port => 6379,
+  }
 }
 
 class { "lucid32": }
