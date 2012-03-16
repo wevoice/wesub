@@ -115,3 +115,8 @@ function pmtd {
 
 # on login, drop us on the working directory with the venv activated
 cd /opt/unisubs/ && source /opt/extras/venv/bin/activate
+
+# ps-grep
+function psg {
+    ps auxww | grep --color=always $* | grep -v grep | sed -e 's/  */ /g' | cut -d' ' -f 2,11-
+}
