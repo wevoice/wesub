@@ -1167,7 +1167,7 @@ class SubtitleVersionManager(models.Manager):
     def new_version(self, parser, language, user,
                     translated_from=None, note="", timestamp=None):
         version_no = 0
-        version = language.version()
+        version = language.version(public_only=False)
         forked = not translated_from
         if version is not None:
             version_no = version.version_no + 1
