@@ -366,7 +366,7 @@ var Site = function(Site) {
                     $this.parents('.note').hide();
                     var d = new Date();
                     d.setTime(d.getTime() + 60*60*24*365*1000);
-                    document.cookie = window.COOKIE;
+                    document.cookie = window.COOKIE + d.toUTCString();
                     return false;
                 });
             }
