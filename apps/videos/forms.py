@@ -15,36 +15,37 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
-from django import forms
-from videos.models import Video, UserTestResult, SubtitleLanguage, VideoFeed
-from django.core.mail import EmailMessage, send_mail
-from django.conf import settings
-from datetime import datetime
-from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
 import re
-from utils import SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser, \
-    SubtitleParserError, SbvSubtitleParser, TxtSubtitleParser, DfxpSubtitleParser
-from utils.subtitles import save_subtitle
-from django.utils.encoding import force_unicode, DjangoUnicodeDecodeError
+from datetime import datetime
+
 import chardet
-from math_captcha.forms import MathCaptchaForm
-from django.utils.safestring import mark_safe
+from django import forms
+from django.conf import settings
+from django.core.mail import EmailMessage, send_mail
 from django.db.models import ObjectDoesNotExist
+from django.template.loader import render_to_string
+from django.utils.encoding import force_unicode, DjangoUnicodeDecodeError
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
+from math_captcha.forms import MathCaptchaForm
+
+from teams.models import Task
+from teams.moderation_const import UNMODERATED, WAITING_MODERATION
+from teams.permissions import can_create_and_edit_subtitles
+from utils import (
+    SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser,
+    SubtitleParserError, SbvSubtitleParser, TxtSubtitleParser,
+    DfxpSubtitleParser
+)
+from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
+from utils.http import url_exists
+from utils.subtitles import save_subtitle
+from utils.translation import get_language_choices
+from videos.feed_parser import FeedParser, FeedParserError
+from videos.models import Video, UserTestResult, SubtitleLanguage, VideoFeed, VideoUrl
+from videos.tasks import video_changed_tasks
 from videos.types import video_type_registrar, VideoTypeError
 from videos.types.youtube import yt_service
-from videos.models import VideoUrl
-from utils.forms import AjaxForm, EmailListField, UsernameListField
-from videos.tasks import video_changed_tasks
-from utils.translation import get_language_choices
-from utils.forms import StripRegexField, FeedURLField
-from videos.feed_parser import FeedParser, FeedParserError
-from utils.forms import ReCaptchaField
-from utils.http import url_exists
-from teams.models import Task
-from teams.permissions import can_create_and_edit_subtitles
-from teams.moderation_const import UNMODERATED, WAITING_MODERATION
 
 
 ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
