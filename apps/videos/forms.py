@@ -385,7 +385,7 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
         sl.is_complete = is_complete
 
         latest_version = sl.latest_version()
-        if latest_version and len(latest_version.subtitles) > 0:
+        if latest_version and len(latest_version.subtitles()) > 0:
             # this will eventually get updated on the async test
             # but if it takes too long on html file uplods
             # then users will not see the language added which is very
