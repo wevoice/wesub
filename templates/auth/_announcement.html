@@ -6,14 +6,7 @@
     <div></div>
     <a href="#" class="hide-announcement">{% trans "Hide" %}</a>
     <script type="text/javascript">
-        $('.note .hide-announcement').click(function(){
-            var $this = $(this);
-            $this.parents('.note').hide();
-            var d = new Date()
-            d.setTime(d.getTime() + 60*60*24*365*1000)
-            document.cookie = '{{ cookie_name }}={{ date|urlencode }}; path=/; expires='+d.toUTCString();
-            return false;
-        });
+        window.COOKIE = '{{ cookie_name }}={{ date|urlencode }}; path=/; expires='+d.toUTCString();
     </script>
 </div>
 {% endif %}
