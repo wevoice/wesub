@@ -994,7 +994,7 @@ class ViewsTest(WebUseTest):
         language = self.video.subtitle_language(language_code)
         version = language.latest_version(public_only=True)
         self.assertEqual(len(version.subtitles()), 2)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 2)
         self.assertIn(self.user.email, mail.outbox[0].to[0])
         self.assertTrue(self.video.followers.filter(pk=user1.pk).exists())
 
