@@ -31,13 +31,7 @@ goog.provide('unisubs.RightPanel');
  * @param {string} doneStrongText
  * @param {string} doneText
  */
-unisubs.RightPanel = function(serverModel,
-                               helpContents,
-                               extraHelp,
-                               legendKeySpecs,
-                               showRestart,
-                               doneStrongText,
-                               doneText) {
+unisubs.RightPanel = function(serverModel, helpContents, extraHelp, legendKeySpecs, showRestart, doneStrongText, doneText) {
     goog.ui.Component.call(this);
     this.serverModel_ = serverModel;
     this.helpContents_ = helpContents;
@@ -74,7 +68,9 @@ unisubs.RightPanel = function(serverModel,
      */
     this.mouseDownKeyCode_ = null;
 };
+
 goog.inherits(unisubs.RightPanel, goog.ui.Component);
+
 unisubs.RightPanel.EventType = {
     LEGENDKEY : 'legend',
     RESTART : 'restart',
@@ -109,7 +105,6 @@ unisubs.RightPanel.prototype.showBackLink = function(linkText) {
     unisubs.style.showElement(this.backAnchor_, true);
     goog.dom.setTextContent(this.backAnchor_, linkText);
 };
-
 unisubs.RightPanel.prototype.appendHelpContentsInternal = function($d, el) {
     var helpHeadingDiv = $d('div', 'unisubs-help-heading');
     el.appendChild(helpHeadingDiv);
@@ -179,15 +174,12 @@ unisubs.RightPanel.prototype.setButtonTextInternal = function(keyCode, modifiers
             spec.textSpan, opt_text ? opt_text : spec.legendText);
 };
 
-unisubs.RightPanel.prototype.enableButtonClassInternal =
-    function (keyCode, modifiers, classSuffix, enable)
-{
+unisubs.RightPanel.prototype.enableButtonClassInternal = function (keyCode, modifiers, classSuffix, enable) {
     var spec = this.findSpec_(keyCode, modifiers);
     if (spec)
         goog.dom.classes.enable(
             spec.div, spec.divClass + classSuffix, enable);
 };
-
 unisubs.RightPanel.prototype.appendLegendContentsInternal = function($d, legendDiv) {
     var et = goog.events.EventType;
     for (var i = 0; i < this.legendKeySpecs_.length; i++) {
@@ -231,7 +223,7 @@ unisubs.RightPanel.prototype.createBackAnchor_ = function($d, el) {
     unisubs.style.showElement(anchor, false);
     return anchor;
 
-}
+};
 unisubs.RightPanel.prototype.createDoneAnchor_ = function($d) {
     return $d('a', {'className':'unisubs-done', 'href':'#'},
                           $d('span', null,
@@ -239,8 +231,7 @@ unisubs.RightPanel.prototype.createDoneAnchor_ = function($d) {
                              $d('strong', null, this.doneStrongText_),
                              goog.dom.createTextNode(" "),
                              goog.dom.createTextNode(this.doneText_)));
-}
-
+};
 unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
     this.loginDiv_ = $d('div');
     this.loadingGif_ = $d('img',
@@ -248,7 +239,7 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
     this.showLoading(false);
     this.doneAnchor_ = this.createDoneAnchor_($d);
     var stepsDiv = $d('div', 'unisubs-steps', this.loginDiv_);
-    
+
 
 
     this.backAnchor_ = this.createBackAnchor_($d, el);
@@ -265,7 +256,7 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
     }
 
     this.downloadLink_ = $d(
-        'a', {'href':'#', 'className':'unisubs-download-subs'}, 
+        'a', {'href':'#', 'className':'unisubs-download-subs'},
         'Download subtitles');
     goog.style.showElement(this.downloadLink_, false);
     goog.dom.append(stepsDiv, this.downloadLink_);
@@ -277,7 +268,7 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
     if (this.showDoneButton) {
         goog.dom.append(stepsDiv, this.doneAnchor_);
         this.getHandler().listen(this.doneAnchor_, 'click', this.doneClicked_);
-    } 
+    }
 
     if (this.showSaveExit) {
         var saveAndExitAnchor = $d(
@@ -304,7 +295,7 @@ unisubs.RightPanel.prototype.legendKeyMousedown_ = function(keyCode, modifiers, 
     this.mouseDownKeyCode_ = keyCode;
 };
 unisubs.RightPanel.prototype.legendKeyMouseup_ = function(keyCode, modifiers, event) {
-    if (this.mouseDownKeyCode_ != null) {
+    if (this.mouseDownKeyCode_) {
         this.mouseDownKeyCode_ = null;
         this.dispatchEvent(
             new unisubs.RightPanel.LegendKeyEvent(keyCode, modifiers, 'mouseup'));
@@ -332,7 +323,7 @@ unisubs.RightPanel.prototype.getDoneAnchor = function() {
 unisubs.RightPanel.prototype.updateLoginState = function() {
     goog.dom.removeChildren(this.loginDiv_);
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    if (this.serverModel_ && this.serverModel_.currentUsername() == null) {
+    if (this.serverModel_ && !this.serverModel_.currentUsername()) {
         var loginLink = $d('a', {'href':'#'}, "LOGIN");
         this.loginDiv_.appendChild(
             $d('div', 'unisubs-needLogin',
@@ -342,21 +333,17 @@ unisubs.RightPanel.prototype.updateLoginState = function() {
         this.getHandler().listen(loginLink, 'click', this.loginClicked_);
     }
 };
-
 unisubs.RightPanel.prototype.appendsNotesForReview = function(jsonSubsFn) {
 
-}
-
+};
 unisubs.RightPanel.prototype.showDownloadLink = function(jsonSubsFn) {
     goog.style.showElement(this.downloadLink_, true);
     this.jsonSubsFn_ = jsonSubsFn;
 };
-
 unisubs.RightPanel.prototype.downloadClicked_ = function(e) {
     e.preventDefault();
     unisubs.finishfaildialog.CopyDialog.showForSubs(this.jsonSubsFn_());
 };
-
 unisubs.RightPanel.prototype.loginClicked_ = function(event) {
     this.serverModel_.logIn();
     event.preventDefault();
@@ -379,12 +366,11 @@ unisubs.RightPanel.HelpContents = function(header, paragraphs, opt_numSteps, opt
     // set html to override paragraphs with custom html.
     this.html = null;
 };
+
 /**
 * @constructor
 */
-unisubs.RightPanel.KeySpec = function(divClass, spanClass,
-                                       keyText, legendText,
-                                       keyCode, modifiers) {
+unisubs.RightPanel.KeySpec = function(divClass, spanClass, keyText, legendText, keyCode, modifiers) {
     this.divClass = divClass;
     this.spanClass = spanClass;
     this.keyText = keyText;
@@ -408,6 +394,7 @@ unisubs.RightPanel.LegendKeyEvent = function(keyCode, modifiers, eventType) {
     this.modifiers = modifiers;
     this.keyEventType = eventType;
 };
+
 /**
 * @constructor
 */
@@ -424,7 +411,7 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
     // return as a json literal, else the closure compiler will mangle this
     var bodyInput = $d('textarea', {'class': 'unisubs-review-notes', 'id': 'unisubs-review-notes', 'name': 'notes'});
 
-    
+
     var title = isOriginal? "Review subtitles": "Review this translation";
     var helpContents = new unisubs.RightPanel.HelpContents(title, [
         $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
@@ -453,8 +440,8 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
         'helpContents' : helpContents ,
         'extraHelp' :  [
         ]
-    }
-}
+    };
+};
 
 /* Since all panels might use this under approval, we abstract them here.
 * Returns a json object with the title, help contents and extraHelp needed to populate this
@@ -462,7 +449,7 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
 */
 unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, currentStep, isOriginal){
     // return as a json literal, else the closure compiler will mangle this
-    
+
     var title = isOriginal? "Approve subtitles": "Approve this translation";
     var bodyInput = $d('textarea', {'class': 'unisubs-approve-notes', 'id': 'unisubs-approve-notes', 'name': 'notes'});
 
@@ -497,11 +484,10 @@ unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, cu
         'extraHelp' : [
         ]
     };
-}
-
+};
 unisubs.RightPanel.createInternalContentsReviewOrApproval = function($d, reviewOrApprovalType, numSteps, currentStep, isOriginal){
     if (reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL.REVIEW){
-        return unisubs.RightPanel.createInternalContentsForReview($d, numSteps, currentStep, isOriginal)
+        return unisubs.RightPanel.createInternalContentsForReview($d, numSteps, currentStep, isOriginal);
     }else if(reviewOrApprovalType == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL){
         return unisubs.RightPanel.createInternalContentsForApproval($d, numSteps, currentStep, isOriginal);
     }

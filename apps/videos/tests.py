@@ -1684,6 +1684,8 @@ class TestPercentComplete(TestCase):
         translation.language = lang_code
         translation.is_original = False
         translation.is_forked = forked
+        if not forked:
+           translation.standard_language = self.video.subtitle_language()
         translation.save()
 
         self.translation = translation
@@ -1824,16 +1826,6 @@ class TestAlert(TestCase):
         v.version_no = lv and lv.version_no+1 or 1
         v.save()
         return v
-
-    def test_lose_alert(self):
-        v = self._new_version()
-
-        s = self.latest_version.subtitle_set.all()[0]
-        s.duplicate_for(v).save()
-
-        alarms.check_subtitle_version(v)
-
-        self.assertEquals(len(mail.outbox), 2)
 
     def test_other_languages_changes(self):
         v = self._new_version()
@@ -2259,6 +2251,8 @@ def _create_trans( video, latest_version=None, lang_code=None, forked=False):
         translation.language = lang_code
         translation.is_original = False
         translation.is_forked = forked
+        if not forked:
+            translation.standard_language = video.subtitle_language()
         translation.save()
         v = SubtitleVersion()
         v.language = translation

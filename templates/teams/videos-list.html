@@ -6,6 +6,8 @@
     {% trans 'Videos' %} - {{ team }} | Universal Subtitles
 {% endblock %}
 
+{% block html_attrs %}id="team_videos_list"{% endblock %}
+
 {% block css %}
     {{ block.super }}
     {% include_bundle "widget-css"%}
@@ -13,54 +15,11 @@
 
 {% block scripts %}
     {{ block.super }}
-
-    {% include "utils/chosenify.html" %}
-
     {% include_bundle "unisubs-onsite-compiled" %}
-
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
-
     <script type="text/javascript">
-        var GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
-
-        $(function() {
-            $form = $('form', 'div#remove-modal');
-            $('a.remove-video').click(function() {
-                $form.attr('action', $(this).siblings('form').attr('action'));
-            });
-
-            $form.submit(function() {
-                var $checked = $('input[name="del-opt"]:checked', 'div#remove-modal');
-                if ($checked.val() == 'total-destruction') {
-                    $form.attr('action', $form.attr('action').replace('remove', 'delete'));
-
-                    if (confirm("Are you sure you want to permanently delete this video? This action is irreversible.")) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                } else {
-                    if (confirm("All open tasks for this video will be aborted, and in-progress subtitles will be published. Do you want to proceed?")) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-            });
-
-            // Handle weird back-button issue with browsers.
-            $select = $('select#lang-filter');
-            {% if request.GET.lang %}
-                $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
-            {% else %}
-                $opt = $('option[id="lang-opt-any"]');
-            {% endif %}
-            $select.children().removeAttr('selected');
-            $opt.attr('selected', 'selected');
-            $select.trigger('liszt:updated');
-        });
+        window.GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
+        window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
     </script>
 {% endblock %}
 
@@ -154,30 +113,36 @@
                 <a href="#" class="close">x</a>
                 <h3>{% trans 'Remove video' %}</h3>
             </div>
-            <div class="modal-body">
-                <form method="POST" action="">
+            
+            <form method="POST" action="">
+                <div class="modal-body">
                     <fieldset>
-                        <p>{% blocktrans %}You can choose to remove the video from the {{ team }} team or to delete the video (and all of its subtitles) from the system entirely. What would you like to do?{% endblocktrans %}</p>
-                        <label class="radio">
-                            <input type="radio" name="del-opt" value="team-removal" checked="checked">
-                            {% blocktrans %}Just remove the video from the team (it will remain on Universal Subtitles but will no longer be subject to permissions and worfklows).{% endblocktrans %}
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="del-opt" value="total-destruction">
-                            {% trans "Delete the video entirely." %}
-                        </label>
+                        {% if not request.user|can_delete_video_in_team:team %}
+                            <p>{% blocktrans %}You are removing this video from the {{ team }} team.{% endblocktrans %}</p>
+                            <p class="notation">{% blocktrans %}It will remain on Universal Subtitles but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted.{% endblocktrans %}</p>
+                        {% else %}
+                            <p>{% blocktrans %}You can choose to remove the video from the {{ team }} team or to delete the video (and all of its subtitles) from the system entirely. What would you like to do?{% endblocktrans %}</p>
+                            <label class="radio">
+                                <input type="radio" name="del-opt" value="team-removal" checked="checked">
+                                {% blocktrans %}Just remove the video from the team.{% endblocktrans %}
+                            </label>
+                            <p class="notation">{% blocktrans %}It will remain on Universal Subtitles but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted.{% endblocktrans %}</p>
+                            <label class="radio">
+                                <input type="radio" name="del-opt" value="total-destruction">
+                                {% trans "Delete the video entirely." %}
+                            </label>
+                        {% endif %}
                     </fieldset>
 
                     {% csrf_token %}
 
                     <input type="hidden" name="next" value="{{ request.path }}" />
-                    <input type="hidden" name="subtitle_version" value="" />
+                </div>
 
-                    <div class="modal-footer">
-                        <input type="submit" class="btn danger" value="{% trans "Delete" %}" />
-                    </div>
-                </form>
-            </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn danger" value="{% trans "Remove" %}" />
+                </div>
+            </form>
         </div>
     </div>
 

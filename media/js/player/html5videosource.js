@@ -51,28 +51,20 @@ unisubs.player.Html5VideoSource.forURL = function(videoURL, opt_videoConfig) {
     else
         return null;
 };
-
 unisubs.player.Html5VideoSource.prototype.isBestVideoSource = function() {
     if (this.videoType_ == unisubs.player.Html5VideoType.H264 && 
         (unisubs.player.supportsOgg() || unisubs.player.supportsWebM()))
         return false;
     return unisubs.player.supportsVideoType(this.videoType_);
 };
-
 unisubs.player.Html5VideoSource.prototype.createPlayer = function() {
     return this.createPlayer_(false);
 };
-
-unisubs.player.Html5VideoSource.prototype.createControlledPlayer = 
-    function() 
-{
+unisubs.player.Html5VideoSource.prototype.createControlledPlayer = function() {
     return new unisubs.player.ControlledVideoPlayer(
         this.createPlayer_(true));
 };
-
-unisubs.player.Html5VideoSource.prototype.createPlayer_ = 
-    function(forSubDialog) 
-{
+unisubs.player.Html5VideoSource.prototype.createPlayer_ = function(forSubDialog) {
     if (this.videoType_ == unisubs.player.Html5VideoType.H264 && 
         !unisubs.player.supportsH264())
         return new unisubs.player.FlvVideoPlayer(this, forSubDialog);
@@ -84,29 +76,23 @@ unisubs.player.Html5VideoSource.prototype.createPlayer_ =
             newSource, forSubDialog);
     }
 };
-
 unisubs.player.Html5VideoSource.prototype.getFlvURL = function() {
     if (this.videoType_ != unisubs.player.Html5VideoType.H264)
         throw new Error();
     return this.videoURL_;
 };
-
 unisubs.player.Html5VideoSource.prototype.getVideoURL = function() {
     return this.videoURL_;
 };
-
 unisubs.player.Html5VideoSource.prototype.getVideoType = function() {
     return this.videoType_;
 };
-
 unisubs.player.Html5VideoSource.prototype.getVideoConfig = function() {
     return this.videoConfig_;
 };
-
 unisubs.player.Html5VideoSource.prototype.setVideoConfig = function(config) {
     this.videoConfig_ = config;
 };
-
 unisubs.player.Html5VideoSource.prototype.getAlternateURLs = function() {
     if (this.alternateSources_)
         return goog.array.map(
@@ -115,7 +101,6 @@ unisubs.player.Html5VideoSource.prototype.getAlternateURLs = function() {
     else
         return [];
 };
-
 unisubs.player.Html5VideoSource.prototype.setAlternateSources = function(sources) {
     this.alternateSources_ = sources;
 };

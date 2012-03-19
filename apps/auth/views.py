@@ -92,22 +92,6 @@ def create_user(request):
     else:
         return render_login(request, form, AuthenticationForm(label_suffix=""), redirect_to)
 
-@staff_member_required
-def user_list(request):
-    langs = request.GET.get('langs', None)
-    if not langs:
-        return render_to_response(
-            'auth/user_list.html',
-            context_instance=RequestContext(request))
-    else:
-        langs = re.split('[, ]+', langs)
-        users = User.objects.filter(userlanguage__language__in=langs).distinct()
-        return render_to_response(
-            'auth/user_list.csv',
-            {'users': users},
-            context_instance=RequestContext(request),
-            mimetype="text/plain")
-
 @login_required
 def delete_user(request):
     if request.POST.get('delete'):
@@ -152,7 +136,7 @@ def render_login(request, user_creation_form, login_form, redirect_to):
 
 def make_redirect_to(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
-    if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
+    if not redirect_to or '//' in redirect_to:
         return '/'
     else:
         return redirect_to

@@ -85,25 +85,33 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
+# Unisubs-specific stuff ------------------------------------------------------
 export PYTHONDONTWRITEBYTECODE=1
+
 alias cu='cd /opt/unisubs'
 alias cv='cd /opt/unisubs'
 alias so='source venv/bin/activate'
+alias go='cu && so && ./dev-runserver.sh plus'
+alias d='./dev-runserver.sh plus'
+alias us='sudo deploy/update_solr_schema_vagrant.sh'
+alias clean_unisubs_messages='rm /tmp/unisubs-messages/*.log'
+
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
-alias go='cu && so && ./dev-runserver.sh plus'
+
 export PATH=~/bin:$PATH
+
 function pm {
     python manage.py $* --settings=dev_settings
 }
 function pmt {
     python manage.py test $* --settings=dev_settings_test
 }
-
-alias clean_unisubs_messages='rm /tmp/unisubs-messages/*.log'
+function pmtd {
+    python manage.py test $* --settings=dev_settings_test 2>&1 | discoball -o '.+Error:.*' '.+Exception: .+' 'line \d+'
+}
 
 # on login, drop us on the working directory with the venv activated
 cd /opt/unisubs/ && source /opt/extras/venv/bin/activate
-alias d='./dev-runserver.sh plus'

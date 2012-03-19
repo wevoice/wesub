@@ -16,12 +16,12 @@
     </div>
 {% endif %}
 {% if projects|length > 0 %}
-    <div id="projects-list" {% if projects|length > 6 %} class="collapsed"{% endif %}>
+    <div id="projects-list">
         <div>
             <h4>{% trans 'Projects' %} ({{ projects|length }})</h4>
-            <ul>
+            <ul {% if projects|length > 6 %} class="list-collapsible"{% endif %}>
                 {% for project in projects %}
-                    <li>
+                    <li {% if forloop.counter > 6 %} class="hidden"{% endif %}>
                         <a href="{% url teams:project_video_list slug=team.slug,project_slug=project.slug %}{% query_string request.GET %}">
                             {{ project }}
                             <span class="count">
@@ -31,11 +31,13 @@
                         </a>
                     </li>
                 {% endfor %}
+                {% if projects|length > 6 %}
+                    <li class="expand">
+                        <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
-        {% if projects|length > 6 %}
-            <a class="expand" href="#">{% trans 'Show all' %} ↓</a>
-        {% endif %}
     </div>
 {% endif %}
 <ul class="metrics">
@@ -88,6 +90,12 @@
                     <a href="{% url teams:team_tasks team.slug %}?lang={{ l.language }}">{% trans 'Tasks for' %} {{ l.get_language_display }}</a>
                 </li>
                 {% endfor %}
+            {% else %}
+                <li class="set-languages">
+                    {% blocktrans %}
+                        See tasks in <a href="#" data-modal="language_modal">your languages</a>
+                    {% endblocktrans %}
+                </li>
             {% endif %}
         {% endwith %}
         <li>

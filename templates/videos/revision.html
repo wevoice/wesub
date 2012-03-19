@@ -108,6 +108,9 @@
             <li class="current">
                 <a href="{% url videos:revision pk=version.pk %}">
                     Revision {{ version.version_no }}
+                    {% if not next_version %}
+                        ({% trans 'latest' %})
+                    {% endif %}
                 </a>
             </li>
             {% if next_version and next_version != latest_version %}
@@ -120,10 +123,10 @@
                     </a>       
                 </li>
             {% endif %}
-            {% if next_version or prev_version %}
+            {% if next_version %}
                 <li>
                     <a href="{{ latest_version.get_absolute_url }}">
-                        {% blocktrans with version.version_no as version_no and latest_version.version_no as latest_version_no %}
+                        {% blocktrans with latest_version.version_no as latest_version_no %}
                         Revision {{ latest_version_no }} (latest)
                         {% endblocktrans %}
                     </a>              

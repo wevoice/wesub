@@ -76,7 +76,7 @@ def _copy_subtitles(fromlang, tolang, maxout=None):
     version.save()
     i = 0
     for x in fromlang.version().subtitle_set.all():
-        s = x.duplicate_for(version=version, draft=None)
+        s = x.duplicate_for(version=version)
         s.subtitle_text = "Sub %s for lang (%s)" % (i, tolang.language)
         s.save()
         i += 1

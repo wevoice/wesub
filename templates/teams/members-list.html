@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body_attrs %}id="teams" class="v1"{% endblock %}
-{% block html_attrs %}id="members_list"{% endblock %}
+{% block html_attrs %}id="team_members_list"{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -16,7 +16,6 @@
 {% endblock %}
 
 {% block scripts %}
-    {% include "utils/chosenify.html" %}
     {{ block.super }}
     {% if assignable_roles %}
         {% include_bundle "js-teams" %}
@@ -24,7 +23,7 @@
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
         window.roleSavedURL = '{% url teams:role_saved team.slug %}';
-        window.request_get_lang = '{{ request.GET.lang }}';
+        window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
     </script>
 {% endblock %}
 
@@ -114,10 +113,10 @@
                         {% if member in assignable_roles %}
                             <ul class="admin-controls">
                                 <li>
-                                    <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" >{% trans 'Edit' %}</a>
+                                    <a class="edit-role" data-team-slug="{{team.slug}}" data-member-pk="{{member.pk}}" data-member-username="{{member.user.username}}" data-member-fullname="{{ member.user }}">{% trans 'Edit' %}</a>
                                 </li>
                                 <li>
-                                <a onclick="return confirm('{% trans 'Are you sure you want to remove this member from the team?' %}');" href="{% url teams:remove_member slug=team.slug user_pk=member.user.pk %}" class="delete">{% trans 'Remove' %}</a>
+                                    <a onclick="return confirm('{% trans 'Are you sure you want to remove this member from the team?' %}');" href="{% url teams:remove_member slug=team.slug user_pk=member.user.pk %}" class="delete">{% trans 'Remove' %}</a>
                                 </li>
                             </ul>
                         {% endif %}
@@ -135,9 +134,13 @@
                 <div class="modal">
                     <div class="modal-header">
                         <a href="#" class="close action-close">x</a>
-                        <h3>Edit member role</h3>
+                        <h3>Edit member's role</h3>
                     </div>
                     <div class="modal-body">
+                        <div class="field clearfix plain-text">
+                            <label>Member:</label>
+                            <p>{{fullname}} ({{username}})</p>
+                        </div>
                         <div class="field clearfix">
                             <label for="roles">Role:</label>
                             <select class="roles" id="roles">

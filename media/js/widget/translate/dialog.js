@@ -22,11 +22,7 @@ goog.provide('unisubs.translate.Dialog');
  * @constructor
  * 
  */
-unisubs.translate.Dialog = function(opener, 
-                                     serverModel,
-                                     videoSource, 
-                                     subtitleState, 
-                                     standardSubState, reviewOrApprovalType) {
+unisubs.translate.Dialog = function(opener, serverModel, videoSource, subtitleState, standardSubState, reviewOrApprovalType) {
     unisubs.Dialog.call(this, videoSource);
     unisubs.SubTracker.getInstance().start(true);
     this.opener_ = opener;
@@ -47,12 +43,12 @@ unisubs.translate.Dialog = function(opener,
        this.notesFectched_ = true; 
     }
 };
+
 goog.inherits(unisubs.translate.Dialog, unisubs.subtitle.Dialog);
 
 unisubs.translate.Dialog.State_ = {
     TRANSLATE: 0,
     EDIT_METADATA: 1
-    
 };
 
 unisubs.translate.Dialog.prototype.createDom = function() {
@@ -81,33 +77,24 @@ unisubs.translate.Dialog.prototype.showGuidelines_ = function() {
         });
     });
 };
-
 unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
     e.preventDefault();
     this.saveWork(false);
 };
-
 unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
     event.preventDefault();
     if (this.state_ == unisubs.translate.Dialog.State_.EDIT_METADATA)
         this.saveWork(true);
     else
-        this.enterState_(unisubs.translate.Dialog.State_.EDIT_METADATA)
+        this.enterState_(unisubs.translate.Dialog.State_.EDIT_METADATA);
 };
-
 unisubs.translate.Dialog.prototype.isWorkSaved = function() {
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();
 };
-
 unisubs.translate.Dialog.prototype.enterDocument = function() {
     // this is where we listen to the dialog close button
     unisubs.subtitle.Dialog.superClass_.enterDocument.call(this);
     unisubs.Dialog.translationDialogOpen = true;
-    var that = this;
-    this.getRightPanelInternal().showDownloadLink(
-        function() {
-            return that.makeJsonSubs();
-        });
 
     if (this.reviewOrApprovalType_ && !this.notesFectched_){
         var func  = this.serverModel_.fetchReviewData ;
@@ -122,14 +109,11 @@ unisubs.translate.Dialog.prototype.enterDocument = function() {
         });
     }
 };
-
-
 unisubs.translate.Dialog.prototype.onNotesFetched_ = function(body) {
     if( this.currentSubtitlePanel_ && this.currentSubtitlePanel_.setNotesContent_){
         this.currentSubtitlePanel_.setNotesContent_(body);
     }
-}
-
+};
 unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
     if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles())){
@@ -143,7 +127,7 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
         function(serverMsg){
             unisubs.subtitle.OnSavedDialog.show(serverMsg, function(){
                 that.onWorkSaved(closeAfterSave);
-            })
+            });
         },
         function(opt_status) {
             if (that.finishFailDialog_)
@@ -154,11 +138,9 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
                     goog.bind(that.saveWorkInternal, that, closeAfterSave));
         });
 };
-
 unisubs.translate.Dialog.prototype.showGuidelinesForState_ = function(state) {
     this.setState_(state);
-}
-
+};
 unisubs.Dialog.prototype.setVisible = function(visible) {
     if (visible) {
         unisubs.Dialog.superClass_.setVisible.call(this, true);
@@ -173,7 +155,6 @@ unisubs.Dialog.prototype.setVisible = function(visible) {
         }
     }
 };
-
 unisubs.translate.Dialog.prototype.onWorkSaved = function() {
     if (this.finishFailDialog_) {
         this.finishFailDialog_.setVisible(false);
@@ -183,23 +164,19 @@ unisubs.translate.Dialog.prototype.onWorkSaved = function() {
     this.getRightPanelInternal().showLoading(false);
     this.saved_ = true;
     this.setVisible(false);
-}
-
+};
 unisubs.translate.Dialog.prototype.disposeInternal = function() {
     unisubs.translate.Dialog.superClass_.disposeInternal.call(this);
     this.serverModel_.dispose();
 };
-
 unisubs.translate.Dialog.prototype.enterState_ = function(state) {
     this.showGuidelinesForState_(state);
 };
-
 unisubs.translate.Dialog.prototype.suspendKeyEvents_ = function(suspended) {
     this.keyEventsSuspended_ = suspended;
     if (this.currentSubtitlePanel_ && this.currentSubtitlePanel_.suspendKeyEvents)
         this.currentSubtitlePanel_.suspendKeyEvents(suspended);
 };
-
 unisubs.translate.Dialog.prototype.setState_ = function(state) {
     this.state_ = state;
 
@@ -222,7 +199,7 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
     if (this.currentSubtitlePanel_ && this.currentSubtitlePanel_.getNotesContent_){
        var currentNoteContent =  this.currentSubtitlePanel_.getNotesContent_();
        if (nextSubPanel  && nextSubPanel.setNotesContent_){
-           nextSubPanel.setNotesContent_(currentNoteContent)
+           nextSubPanel.setNotesContent_(currentNoteContent);
        }
     }
     
@@ -260,6 +237,12 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
             videoPlayer.pause();
         }
     }
+
+    var that = this;
+    this.getRightPanelInternal().showDownloadLink(
+        function() {
+            return that.makeJsonSubs();
+        });
 };
 unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
     var s = unisubs.translate.Dialog.State_;
@@ -279,8 +262,7 @@ unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.standardSubState_ ,
             false,
             this.reviewOrApprovalType_,
-            this
-        );
+            this);
 };
 
 /**
@@ -292,29 +274,23 @@ unisubs.translate.Dialog.prototype.translateViaBing = function(){
     this.translationPanel_.getTranslationList().translateViaBing(
         this.standardSubState_.LANGUAGE, this.subtitleState_.LANGUAGE);
 };
-
 unisubs.translate.Dialog.prototype.getStandardLanguage = function(){
     return this.standardSubState_.LANGUAGE;
 };
-
 unisubs.translate.Dialog.prototype.getSubtitleLanguage = function(){
     return this.subtitleState_.LANGUAGE;
 };
-
 unisubs.translate.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;
-}
-
+};
 unisubs.translate.Dialog.prototype.makeJsonSubs =  function (){
     return this.serverModel_.getCaptionSet().makeJsonSubs();
 };
-
 unisubs.translate.Dialog.prototype.forkAndClose = function() {
     var dialog = new unisubs.translate.ForkDialog(
         goog.bind(this.forkImpl_, this));
     dialog.setVisible(true);
 };
-
 unisubs.translate.Dialog.prototype.forkImpl_ = function() {
     this.subtitleState_.fork();
     this.serverModel_.fork(this.standardSubState_);
@@ -323,14 +299,13 @@ unisubs.translate.Dialog.prototype.forkImpl_ = function() {
         this.serverModel_,
         this.subtitleState_);
 };
-
 unisubs.translate.Dialog.prototype.disposeCurrentPanels_ = function() {
     if (this.currentSubtitlePanel_) {
         this.currentSubtitlePanel_.dispose();
         this.currentSubtitlePanel_ = null;
     }
     this.rightPanelListener_.removeAll();
-    if (this.timelineSubtitleSet_ != null) {
+    if (this.timelineSubtitleSet_) {
         this.timelineSubtitleSet_.dispose();
         this.timelineSubtitleSet_ = null;
     }

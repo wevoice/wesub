@@ -37,6 +37,7 @@ media/sass/.sass-cache
 media/static-cache
 media/teams/*
 media/videos/*
+deploy/fabric.log
 disabled
 server_local_settings.py
 /mediabundles_list.py

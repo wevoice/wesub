@@ -48,6 +48,7 @@ from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_u
 from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
+from utils.panslugify import pan_slugify
 
 from apps.teams.moderation_const import (
     WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED, REJECTED
@@ -302,9 +303,6 @@ class Video(models.Model):
 
         return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
-    @models.permalink
-    def video_link(self):
-        return ('videos:history', [self.video_id])
 
     def get_team_video(self):
         """Return the TeamVideo object for this video, or None if there isn't one."""
@@ -342,16 +340,10 @@ class Video(models.Model):
         NOTE: this method is used in videos.search_indexes.VideoSearchResult to
         prevent duplication of code in search result and in DB-query result.
 
-        TODO: Just use slugify() instead?
-
         """
-        return (self.title.replace('/', '-')
-                          .replace("'", '-')
-                          .replace('?', '-')
-                          .replace('#', '-')
-                          .replace('&', '-'))
+        return pan_slugify(self.title)
 
-    def _get_absolute_url(self, locale=None, video_id=None):
+    def _get_absolute_url(self,  video_id=None):
         """
         NOTE: this method is used in videos.search_indexes.VideoSearchResult
         to prevent duplication of code in search result and in DB-query result
@@ -518,6 +510,11 @@ class Video(models.Model):
         If None is passed as a language_code, the original language
         SubtitleLanguage will be returned.  In this case the value will be
         cached in-object.
+
+        This method can produce surprising results if the video has more
+        than one subtitle language with the same code. This is an artifact
+        of when we did not allow this. In this case, we return the
+        language with the most subtitles.
 
         """
         try:
@@ -879,15 +876,26 @@ class SubtitleLanguage(models.Model):
         return self.video.description
 
     def is_dependent(self):
+        """
+        AKA is this language a translation? Stand alone languages must
+        either be an original one, or a forked one.
+        """
         return not self.is_original and not self.is_forked
 
     def is_complete_and_synced(self, public_only=True):
+        """
+        For transcripts, this means the user marked it as completed.
+        For translations, the original language must be marked as completed.
+
+        We consider a set of subs where the very last has no end time
+        to be synced, as that is a convention for 'until end of time'.
+        """
         if not self.is_dependent() and not self.is_complete:
             return False
         if self.is_dependent():
             if self.percent_done != 100:
                 return False
-            standard_lang = self.real_standard_language()
+            standard_lang = self.standard_language
             if not standard_lang or not standard_lang.is_complete:
                 return False
         subtitles = self.latest_subtitles(public_only=public_only)
@@ -899,29 +907,6 @@ class SubtitleLanguage(models.Model):
         if not is_synced_value(subtitles[-1].start_time):
             return False
         return True
-
-    def real_standard_language(self):
-        if self.standard_language:
-            return self.standard_language
-        elif self.is_dependent():
-            # This should only be needed temporarily until data is more cleaned up.
-            # in other words, self.standard_language should never be None for a dependent SL
-            try:
-                self.standard_language = self.video.subtitle_language()
-                self.save()
-                return self.standard_language
-            except IntegrityError:
-                logger.error(
-                    "Subtitle Language {0} is dependent but has no acceptable "
-                    "standard_language".format(self.id))
-        return None
-
-    def is_dependable(self):
-        if self.is_dependent():
-            dep_lang = self.real_standard_language()
-            return dep_lang and dep_lang.is_complete and self.percent_done > 10
-        else:
-            return self.is_complete
 
     def get_widget_url(self, mode=None, task_id=None):
         # duplicates unisubs.widget.SubtitleDialogOpener.prototype.openDialogOrRedirect_
@@ -1095,7 +1080,7 @@ class SubtitleLanguage(models.Model):
             return None
 
         translation_count = self.nonblank_subtitle_count(public_only=False)
-        real_standard_language = self.real_standard_language()
+        real_standard_language = self.standard_language
 
         if real_standard_language:
             subtitle_count = real_standard_language.nonblank_subtitle_count(public_only=True)
@@ -1125,7 +1110,7 @@ models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=Subt
 
 
 # SubtitleCollection
-# (parent class of SubtitleVersion and SubtitleDraft)
+# (parent class of SubtitleVersion 
 class SubtitleCollection(models.Model):
     is_forked=models.BooleanField(default=False)
     # should not be changed directly, but using teams.moderation. as those will take care
@@ -1182,7 +1167,7 @@ class SubtitleVersionManager(models.Manager):
     def new_version(self, parser, language, user,
                     translated_from=None, note="", timestamp=None):
         version_no = 0
-        version = language.version()
+        version = language.version(public_only=False)
         forked = not translated_from
         if version is not None:
             version_no = version.version_no + 1
@@ -1336,7 +1321,7 @@ class SubtitleVersion(SubtitleCollection):
         return self.language.video;
 
     def _get_standard_collection(self, public_only=True):
-        standard_language = self.language.real_standard_language()
+        standard_language = self.language.standard_language
         if standard_language:
             return standard_language.latest_version(public_only=public_only)
 
@@ -1495,34 +1480,24 @@ def restrict_versions(version_qs, user, subtitle_language):
     This will realize the queryset into a list, so do any other filtering you
     might need before you call this function.
 
-    TODO: Different logic for rejected vs waiting_moderation?
-
     """
+    from teams.permissions import get_member
+
+    versions = list(version_qs)
+
+    # Videos that don't have team videos aren't moderated, so all versions
+    # should be viewable.
     team_video = subtitle_language.video.get_team_video()
-
     if not team_video:
-        return False
+        return versions
 
-    def _version_viewable(version):
-        # Versions not under moderation can always be viewed.
-        if version.is_public:
-            return True
+    # Members can always view all versions for their team's videos.
+    member = get_member(user, team_video.team)
+    if member:
+        return versions
 
-        # Otherwise the version is moderated.
-        # Non-logged-in users can never see it.
-        if not user or not user.is_authenticated() or user.is_anonymous:
-            return False
-
-        # Subtitle authors can view their own drafts.
-        if not version.user.is_anonymous and user.pk == version.user.pk:
-            return True
-
-        # Anyone reviewing/approving this version can view its drafts.
-        users = (version.task_set.all_review_or_approve()
-                                 .values_list('assignee__id', flat=True))
-        return user.pk in users
-
-    return filter(_version_viewable, version_qs)
+    # Non-members can only see public versions.
+    return filter(lambda v: v.is_public, version_qs)
 
 def has_viewable_draft(version, user):
     """Return whether the given version has draft subtitles viewable by the user.
@@ -1557,42 +1532,6 @@ def has_viewable_draft(version, user):
     return user.pk in users
 
 
-# SubtitleDraft
-class SubtitleDraft(SubtitleCollection):
-    language = models.ForeignKey(SubtitleLanguage)
-    # null iff there is no SubtitleVersion yet.
-    parent_version = models.ForeignKey(SubtitleVersion, null=True)
-    datetime_started = models.DateTimeField()
-    user = models.ForeignKey(User, null=True)
-    browser_id = models.CharField(max_length=128, blank=True)
-    title = models.CharField(max_length=2048, blank=True)
-    last_saved_packet = models.PositiveIntegerField(default=0)
-
-    @property
-    def version_no(self):
-        return 0 if self.parent_version is None else \
-            self.parent_version.version_no + 1
-
-    @property
-    def video(self):
-        return self.language.video
-
-    def _get_standard_collection(self, public_only=True):
-        if self.language.standard_language:
-            return self.language.standard_language.latest_version(public_only=public_only)
-        else:
-            return self.language.video.latest_version(public_only=public_only)
-
-    def is_dependent(self):
-        return not self.language.is_original and not self.is_forked
-
-    def matches_request(self, request):
-        if request.user.is_authenticated() and self.user and \
-                self.user.pk == request.user.pk:
-            return True
-        else:
-            return request.browser_id == self.browser_id
-
 
 # Subtitle
 class SubtitleManager(models.Manager):
@@ -1602,7 +1541,6 @@ class SubtitleManager(models.Manager):
 
 class Subtitle(models.Model):
     version = models.ForeignKey(SubtitleVersion, null=True)
-    draft = models.ForeignKey(SubtitleDraft, null=True)
     subtitle_id = models.CharField(max_length=32, blank=True)
     subtitle_order = models.FloatField(null=True)
     subtitle_text = models.CharField(max_length=1024, blank=True)
@@ -1616,15 +1554,14 @@ class Subtitle(models.Model):
 
     class Meta:
         ordering = ['subtitle_order']
-        unique_together = (('version', 'subtitle_id'), ('draft', 'subtitle_id'),)
+        unique_together = (('version', 'subtitle_id'),)
 
     @property
     def is_synced(self):
         return is_synced(self)
 
-    def duplicate_for(self, version=None, draft=None):
+    def duplicate_for(self, version=None):
         return Subtitle(version=version,
-                        draft=draft,
                         start_of_paragraph = self.start_of_paragraph,
                         subtitle_id=self.subtitle_id,
                         subtitle_order=self.subtitle_order,
@@ -1835,8 +1772,8 @@ class ActionRenderer(object):
         return msg % self._base_kwargs(item)
 
     def render_MEMBER_JOINED(self, item):
-        msg = _("joined the %s team as a %s" % (
-             item.team, item.member.role))
+        msg = _("joined the %(team)s team as a %(role)s" % dict(
+             team=item.team, role=item.member.role))
         return msg
 
     def render_MEMBER_LEFT(self, item):

@@ -169,16 +169,17 @@
                 ({{ video.languages_count }})
             {% endif %}
         </h3>
-
-        <div{% if video.languages_count > 15 %} class="abbr collapsed"{% endif %}>
+        <div>
             <div>
-                <ul id="subtitles-menu">
+                <ul id="subtitles-menu" {% if video.languages_count > 14 %} class="list-collapsible"{% endif %}>
                     {% include 'videos/_left_navigation.html' %}
+                    {% if video.languages_count > 15 %}
+                        <li class="expand">
+                            <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
-            {% if video.languages_count > 15 %}
-                <a class="expand" href="#">Show all ↓</a>
-            {% endif %}
         </div>
     </div>
     <div class="grid_8 view omega">

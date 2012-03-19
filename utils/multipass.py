@@ -2,16 +2,16 @@
 Big shout out to Michael Richardson and Fernando Takai for this class.
 https://bitbucket.org/fernandotakai/tender-multipass/src/0a8c0020e7bb/tender_multipass.py
 """
-
-import sys
 import base64
 import hashlib
+from datetime import datetime, timedelta
 from itertools import izip, cycle
+
 import simplejson as json
+from M2Crypto import EVP
 from dateutil import parser
 from dateutil.tz import tzutc
-from datetime import datetime, timedelta
-from M2Crypto import EVP
+
 
 class MultiPass(object):
     def __init__(self, site_key, api_key):
@@ -43,7 +43,7 @@ class MultiPass(object):
         """
         aes = EVP.Cipher("aes_128_cbc", key=self.secret,
             iv=self.iv, op=1)
-        
+
         raw_string = json.dumps(data)
         raw_string = self.handle_xor(raw_string)
         v = aes.update(raw_string)
@@ -64,8 +64,9 @@ class MultiPass(object):
 
         if 'expires' in obj:
             expires_utc = parser.parse(obj['expires'])
-            limit_time = datetime.now(tz=tzutc()) - timedelta(minutes=10) 
+            limit_time = datetime.now(tz=tzutc()) - timedelta(minutes=10)
             if limit_time > expires_utc:
                 raise Exception("Expired!")
 
         return obj
+

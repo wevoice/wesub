@@ -419,7 +419,8 @@ class Team(models.Model):
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
 
-    def get_videos_for_languages_haystack(self, language=None, num_completed_subs=None, project=None, user=None, query=None, sort=None):
+    def get_videos_for_languages_haystack(self, language=None, num_completed_langs=None,
+                                          project=None, user=None, query=None, sort=None):
         from teams.search_indexes import TeamVideoLanguagesIndex
 
         is_member = (user and user.is_authenticated()
@@ -440,14 +441,14 @@ class Team(models.Model):
         if language:
             qs = qs.filter(video_completed_langs=language)
 
-        if num_completed_subs != None:
-            qs = qs.filter(num_completed_subs=num_completed_subs)
+        if num_completed_langs != None:
+            qs = qs.filter(num_completed_langs=num_completed_langs)
 
         qs = qs.order_by({
              'name':  'video_title_exact',
             '-name': '-video_title_exact',
-             'subs':  'num_completed_subs',
-            '-subs': '-num_completed_subs',
+             'subs':  'num_completed_langs',
+            '-subs': '-num_completed_langs',
              'time':  'team_video_create_date',
             '-time': '-team_video_create_date',
         }.get(sort or '-time'))
@@ -640,7 +641,7 @@ class TeamVideo(models.Model):
     def link_to_page(self):
         if self.all_languages:
             return self.video.get_absolute_url()
-        return self.video.video_link()
+        return reverse('videos:history', [self.video.video_id])
 
     @models.permalink
     def get_absolute_url(self):
@@ -664,35 +665,6 @@ class TeamVideo(models.Model):
             sub_lang = self.video.subtitle_language()
             setattr(self, 'original_language_code', None if not sub_lang else sub_lang.language)
         return getattr(self, 'original_language_code')
-
-    def _calculate_percent_complete(self, sl0, sl1):
-        # maybe move this to Video model in future.
-        if not sl0 or not sl0.is_dependable():
-            return -1
-        if not sl1:
-            return 0
-        if sl1.language == self._original_language():
-            return -1
-        if sl1.is_dependent():
-            if sl1.percent_done == 0:
-                return 0
-            elif sl0.is_dependent():
-                l_dep0 = sl0.real_standard_language()
-                l_dep1 = sl1.real_standard_language()
-                if l_dep0 and l_dep1 and l_dep0.id == l_dep1.id:
-                    return sl1.percent_done
-                else:
-                    return -1
-            else:
-                l_dep1 = sl1.real_standard_language()
-                return sl1.percent_done if \
-                    l_dep1 and l_dep1.id == sl0.id else -1
-        else:
-            sl1_subtitle_count = 0
-            latest_version = sl1.latest_version()
-            if latest_version:
-                sl1_subtitle_count = latest_version.subtitle_set.count()
-            return 0 if sl1_subtitle_count == 0 else -1
 
     def save(self, *args, **kwargs):
         if not hasattr(self, "project"):
@@ -800,6 +772,7 @@ def team_video_delete(sender, instance, **kwargs):
         video.save()
 
         metadata_manager.update_metadata(video.pk)
+        video.update_search_index()
     except Video.DoesNotExist:
         pass
 
@@ -838,8 +811,6 @@ post_save.connect(team_video_autocreate_task, TeamVideo, dispatch_uid='teams.tea
 post_save.connect(team_video_add_video_moderation, TeamVideo, dispatch_uid='teams.teamvideo.team_video_add_video_moderation')
 post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.team_video_delete")
 post_delete.connect(team_video_rm_video_moderation, TeamVideo, dispatch_uid="teams.teamvideo.team_video_rm_video_moderation")
-
-
 
 
 # TeamMember
@@ -1516,7 +1487,8 @@ class Task(models.Model):
 
     def _complete_subtitle(self):
         """Handle the messy details of completing a subtitle task."""
-        subtitle_version = self.team_video.video.latest_version(public_only=False)
+        subtitle_version = self.team_video.video.latest_version(
+                                language_code=self.language, public_only=False)
 
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
@@ -1545,7 +1517,8 @@ class Task(models.Model):
 
     def _complete_translate(self):
         """Handle the messy details of completing a translate task."""
-        subtitle_version = self.team_video.video.latest_version(language_code=self.language, public_only=False)
+        subtitle_version = self.team_video.video.latest_version(
+                                language_code=self.language, public_only=False)
 
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,

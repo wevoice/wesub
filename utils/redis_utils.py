@@ -1,9 +1,12 @@
-from redis import Redis
-from django.conf import settings
-from utils import catch_exception, LogExceptionsMetaclass
-from redis.exceptions import RedisError
 from inspect import ismethod
+
+from django.conf import settings
 from django.utils.functional import update_wrapper
+from redis import Redis
+from redis.exceptions import RedisError
+
+from utils import LogExceptionsMetaclass
+
 
 REDIS_HOST = getattr(settings, 'REDIS_HOST', 'localhost')
 REDIS_PORT = getattr(settings, 'REDIS_PORT', 6379)
@@ -12,11 +15,11 @@ IGNORE_REDIS = getattr(settings, 'IGNORE_REDIS', False) and settings.DEBUG
 
 class LogConnection(Redis):
     __metaclass__ = LogExceptionsMetaclass
-    
+
     __log_exceptions = RedisError
     __log_exceptions_logger_name = 'redis'
     __log_exceptions_ignore = True
-    
+
 default_connection = LogConnection(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, socket_timeout=5)
 
 class RedisCounterField(Exception):
@@ -46,14 +49,14 @@ class RedisKey(object):
 
     def __str__(self):
         return "%s -> %s" % (self.redis_key, self.val)
-    
-    def __getattr__(self, name):     
+
+    def __getattr__(self, name):
         if hasattr(self.r, name):
             method = getattr(self.r, name)
             if ismethod(method):
                 return redis_key_wrapper(method, self.redis_key)
         raise AttributeError
-    
+
     def set_val(self, val):
         if IGNORE_REDIS:
             return
@@ -62,7 +65,7 @@ class RedisKey(object):
 
     def get_val(self):
         if IGNORE_REDIS:
-            return        
+            return
         return self.r.get(self.redis_key)
 
     val = property(get_val, set_val)
@@ -86,7 +89,7 @@ class RedisSimpleField(object):
         # generate unique redis key for object
         #self.redis_key = u"%s:%s:%s" % (self.class_name, self.field_name, self.instance_id)
         # setup redis connection credentials
-        
+
 
     def contribute_to_class(self, cls, name):
         self.field_name = name
@@ -100,11 +103,11 @@ class RedisSimpleField(object):
             instance_id = obj.pk
         self.add_to_changed_set(instance_id)
         return u"%s:%s:%s" % (self.class_name, self.field_name, instance_id)
-    
+
     def add_to_changed_set(self, instance_id):
         if self.changed_set:
             self.changed_set.sadd(instance_id)
-        
+
     def __set__(self, obj, val):
         RedisKey(self.redis_key(obj), self.r).val = val
 

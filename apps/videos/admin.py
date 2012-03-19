@@ -90,8 +90,8 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     def delete_model(self, request, obj):
         video = obj.video
         super(SubtitleLanguageAdmin, self).delete_model(request, obj)
-        video_changed_tasks.delay(video)
-    
+        video_changed_tasks.delay(video.pk)
+
     def versions(self, obj):
         version_qs = obj.subtitleversion_set.all()
         link_tpl = '<a href="%s">#%s</a>'
@@ -107,7 +107,7 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     list_display = ['video', 'language', 'version_no', 'note', 'timeline_changes',
                     'text_changes', 'datetime_started', 'moderation_status']
     list_filter = []
-    raw_id_fields = ['language', 'user']
+    raw_id_fields = ['language', 'user', 'forked_from']
     search_fields = ['language__video__title', 'language__video__video_id', 'language__language']
 
     def has_delete_permission(self, request, obj=None):
