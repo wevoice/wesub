@@ -22,7 +22,7 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
 from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
-    VideoUrl, AlreadyEditingException
+    VideoUrl, AlreadyEditingException, restrict_versions
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
     SubtitlesUploadForm, PasteTranscriptionForm, CreateVideoUrlForm, TranscriptionFileForm, \
     AddFromFeedForm
@@ -192,7 +192,7 @@ def video(request, video, video_url=None, title=None):
     context = widget.add_onsite_js_files({})
     context['video'] = video
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    context['translations'] = _get_translations(video)
+    context['translations'] = _get_translations(video, request.user)
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
 
     context['widget_params'] = _widget_params(
@@ -415,7 +415,7 @@ def history(request, video, lang=None, lang_id=None):
         context['ordering'], context['order_type'] = ordering, order_type
 
     context['video'] = video
-    context['translations'] = _get_translations(video)
+    context['translations'] = _get_translations(video, request.user)
     context["user_can_moderate"] = False
     context['last_version'] = language.last_version
     context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
@@ -718,16 +718,11 @@ def reset_metadata(request, video_id):
     video_changed_tasks.delay(video.id)
     return HttpResponse('ok')
 
-def _get_translations(video):
+def _get_translations(video, user):
     original = video.subtitle_language()
-    # we want a list of translations that had at least with version with subtitles
-    # this will not filter subtitleversion's whos subtitles are empty
     translations = video.subtitlelanguage_set.exclude(subtitle_count=0)
     if original:
-        # a video might have more than 1 is_original sl, in which case
-        # we guess the right one above, but still manage to include the others
-        # bellow
         translations = translations.exclude(pk=original.pk)
-    translations = list(translations)
+    translations = restrict_versions(translations, user, original)
     translations.sort(key=lambda f: f.get_language_display())
     return translations
