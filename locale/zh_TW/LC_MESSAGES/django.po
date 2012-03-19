@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-19 11:02-0500\n"
+"POT-Creation-Date: 2012-03-19 13:02-0500\n"
 "PO-Revision-Date: 2012-03-19 12:25+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.net/projects/p/"
@@ -1467,29 +1467,29 @@ msgstr ""
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "稍後片刻，現有字幕馬上就會匯入"
 
-#: apps/videos/views.py:267
+#: apps/videos/views.py:255
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "感謝您的上傳，需要幾分鐘後才會顯示您的字幕"
 
-#: apps/videos/views.py:269
+#: apps/videos/views.py:257
 msgid "Your changes have been saved."
 msgstr "您的修改已經儲存"
 
-#: apps/videos/views.py:626
+#: apps/videos/views.py:608
 msgid "You have not permission change this URL"
 msgstr "您未獲准修改此URL"
 
-#: apps/videos/views.py:632 apps/videos/views.py:652
+#: apps/videos/views.py:614 apps/videos/views.py:634
 msgid "Object does not exist"
 msgstr "物件不存在"
 
-#: apps/videos/views.py:645
+#: apps/videos/views.py:627
 msgid "You have not permission delete this URL"
 msgstr "您未獲准刪除此URL"
 
-#: apps/videos/views.py:648
+#: apps/videos/views.py:630
 msgid "You cann't remove original URL"
 msgstr "您無法移除原始URL\t"
 

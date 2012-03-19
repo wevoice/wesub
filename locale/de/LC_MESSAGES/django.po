@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-19 11:01-0500\n"
+"POT-Creation-Date: 2012-03-19 13:01-0500\n"
 "PO-Revision-Date: 2012-03-19 12:25+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: German (http://www.transifex.net/projects/p/"
@@ -1476,7 +1476,7 @@ msgstr ""
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Vorhandene Untertitel werden in ein paar Minuten importiert."
 
-#: apps/videos/views.py:267
+#: apps/videos/views.py:255
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
@@ -1484,23 +1484,23 @@ msgstr ""
 "Danke für das Hochladen. Es wird eine Minute oder so dauern bis Ihre "
 "Untertitel erscheinen."
 
-#: apps/videos/views.py:269
+#: apps/videos/views.py:257
 msgid "Your changes have been saved."
 msgstr "Ihre Änderungen wurden gespeichert"
 
-#: apps/videos/views.py:626
+#: apps/videos/views.py:608
 msgid "You have not permission change this URL"
 msgstr "Du bist nicht berechtigt, diese URL zu ändern."
 
-#: apps/videos/views.py:632 apps/videos/views.py:652
+#: apps/videos/views.py:614 apps/videos/views.py:634
 msgid "Object does not exist"
 msgstr "Objekt existiert nicht"
 
-#: apps/videos/views.py:645
+#: apps/videos/views.py:627
 msgid "You have not permission delete this URL"
 msgstr "Du bist nicht berechtigt, diese URL zu löschen."
 
-#: apps/videos/views.py:648
+#: apps/videos/views.py:630
 msgid "You cann't remove original URL"
 msgstr "Du kannst die Ursprungs-URL nicht entfernen"
 
