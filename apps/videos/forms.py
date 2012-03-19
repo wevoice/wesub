@@ -316,6 +316,7 @@ class SubtitlesUploadBaseForm(forms.Form):
                 outstanding_tasks.update(subtitle_version=new_version,
                                          language=language.language)
             else:
+                task_type = None
                 if new_version.is_synced():
                     if workflow.review_allowed:
                         task_type = Task.TYPE_IDS['Review']
@@ -324,10 +325,11 @@ class SubtitlesUploadBaseForm(forms.Form):
                 else:
                     task_type = Task.TYPE_IDS['Subtitle']
 
-                task = Task(team=team_video.team, team_video=team_video,
-                            language=language.language, type=task_type,
-                            subtitle_version=new_version)
-                task.save()
+                if task_type:
+                    task = Task(team=team_video.team, team_video=team_video,
+                                language=language.language, type=task_type,
+                                subtitle_version=new_version)
+                    task.save()
 
         return language
 
