@@ -43,7 +43,7 @@ from utils.subtitles import save_subtitle
 from utils.translation import get_language_choices
 from videos.feed_parser import FeedParser, FeedParserError
 from videos.models import Video, UserTestResult, SubtitleLanguage, VideoFeed, VideoUrl
-from videos.tasks import video_changed_tasks
+from videos.tasks import video_changed_tasks, import_videos_from_feeds
 from videos.types import video_type_registrar, VideoTypeError
 from videos.types.youtube import yt_service
 
@@ -498,8 +498,7 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         super(AddFromFeedForm, self).__init__(*args, **kwargs)
 
         self.yt_service = yt_service
-        self.video_types = [] #tuples: (video_type, video_info)
-        self.feed_urls = [] #tuples: (feed_url, last_saved_entry_url)
+        self.urls = []
         self.video_limit_routreach = False
 
     def clean_feed_url(self):
@@ -517,82 +516,33 @@ class AddFromFeedForm(forms.Form, AjaxForm):
             username = youtube_user_url_re.match(url).groupdict()['username']
             url = self.youtube_feed_url_pattern % str(username)
             self.parse_feed_url(url)
+
         return url
 
     def clean_usernames(self):
         usernames = self.cleaned_data.get('usernames', [])
+        
         for username in usernames:
             url = self.youtube_feed_url_pattern % str(username)
             self.parse_feed_url(url)
+
         return usernames
 
     def parse_feed_url(self, url):
         feed_parser = FeedParser(url)
-        entry = ''
 
-        video_feed = self.get_feed_url(url)
-        since = video_feed.last_link if video_feed else None
+        if not hasattr(feed_parser.feed, 'version') or not feed_parser.feed.version:
+            raise forms.ValidationError(_(u'Sorry, we could not find a valid feed at the URL you provided. Please check the URL and try again.'))
 
-        try:
-            for vt, info, entry in feed_parser.items(since=since):
-                if vt:
-                    self.video_types.append((vt, info))
-
-                if self.VIDEOS_LIMIT and len(self.video_types) >= self.VIDEOS_LIMIT:
-                    self.video_limit_routreach = True
-                    break
-
-            invalid_feed = False
-
-            if hasattr(feed_parser.feed, 'version') and feed_parser.feed.version:
-                try:
-                    self.feed_urls.append((url, entry and entry['link']))
-                except KeyError:
-                    invalid_feed = True
-            else:
-                invalid_feed = True
-
-            if invalid_feed:
-                raise forms.ValidationError(_(u'Sorry, we could not find a valid feed at the URL you provided. Please check the URL and try again.'))
-
-        except FeedParserError, e:
-            raise forms.ValidationError(e)
+        self.urls.append(url)
 
     def success_message(self):
-        if not self.video_limit_routreach:
-            return _(u"%(count)s videos have been added")
-        else:
-            return _(u"%(count)s videos have been added. "
-                     u"To add the remaining videos from this feed, "
-                     u"submit this feed again and make sure to "
-                     u'check "Save feed" box.')
-
-    def save_feed_url(self, feed_url, last_entry_url):
-        try:
-            vf = VideoFeed.objects.get(url=feed_url)
-        except VideoFeed.DoesNotExist:
-            vf = VideoFeed(url=feed_url)
-
-        vf.user = self.user
-        vf.last_link = last_entry_url
-        vf.save()
-
-    def get_feed_url(self, feed_url):
-        try:
-            return VideoFeed.objects.get(url=feed_url)
-        except VideoFeed.DoesNotExist:
-            return None
+        return _(u"The videos are being added in the background. "
+                 u"If you are logged in, you will receive a message when it's done")
 
     def save(self):
-        if self.cleaned_data.get('save_feed'):
-            for feed_url, last_entry_url in self.feed_urls:
-                self.save_feed_url(feed_url, last_entry_url)
-
-        videos = []
-        for vt, info in self.video_types:
-            videos.append(Video.get_or_create_for_url(vt=vt, user=self.user))
-
-        return videos
+        user_id = self.user.id if self.user else None
+        import_videos_from_feeds.delay(self.urls, user_id)
 
 class FeedbackForm(forms.Form):
     email = forms.EmailField(required=False)

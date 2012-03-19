@@ -308,6 +308,28 @@ def email_confirmed(user_pk):
     return True
 
 @task()
+def videos_imported_message(user_pk, imported_videos):
+    from messages.models import Message
+    user = User.objects.get(pk=user_pk)
+    subject = "Your videos were imported!"
+    url = "%s%s" % (get_url_base(), reverse("profiles:my_videos"))
+    context = {"user": user, 
+               "imported_videos": imported_videos,
+               "my_videos_url": url}
+
+    if user.notify_by_message:
+        body = render_to_string("messages/videos-imported.txt", context)
+        message  = Message(
+            user=user,
+            subject=subject,
+            content=body
+        )
+        message.save()
+    template_name = "messages/email/videos-imported.html"
+    send_templated_email(user, subject, template_name, context)
+    return True
+
+@task()
 def team_task_assigned(task_pk):
     from teams.models import Task
     from messages.models import Message

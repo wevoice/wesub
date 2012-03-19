@@ -160,8 +160,8 @@ create.csrf_exempt = True
 def create_from_feed(request):
     form = AddFromFeedForm(request.user, request.POST or None)
     if form.is_valid():
-        videos = form.save()
-        messages.success(request, form.success_message() % {'count': len(videos)})
+        form.save()
+        messages.success(request, form.success_message())
         return redirect('videos:create')
     context = {
         'video_form': VideoForm(),
