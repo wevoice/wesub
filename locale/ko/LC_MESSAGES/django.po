@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-19 11:01-0500\n"
+"POT-Creation-Date: 2012-03-19 13:01-0500\n"
 "PO-Revision-Date: 2012-03-19 12:25+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.net/projects/p/"
@@ -1494,30 +1494,30 @@ msgstr ""
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "몇 분 안에 기존 자막을 불러올 것입니다."
 
-#: apps/videos/views.py:267
+#: apps/videos/views.py:255
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr ""
 "업로드 해주셔서 감사합니다. 귀하의 자막이 나타나는데는 잠시 시간이 걸립니다."
 
-#: apps/videos/views.py:269
+#: apps/videos/views.py:257
 msgid "Your changes have been saved."
 msgstr "변경 내용이 저장되었습니다."
 
-#: apps/videos/views.py:626
+#: apps/videos/views.py:608
 msgid "You have not permission change this URL"
 msgstr "당신은 이 URL을 변경할 권한이 없습니다."
 
-#: apps/videos/views.py:632 apps/videos/views.py:652
+#: apps/videos/views.py:614 apps/videos/views.py:634
 msgid "Object does not exist"
 msgstr "개체가 존재하지 않습니다."
 
-#: apps/videos/views.py:645
+#: apps/videos/views.py:627
 msgid "You have not permission delete this URL"
 msgstr "이 URL을 삭제할 권한이 없습니다."
 
-#: apps/videos/views.py:648
+#: apps/videos/views.py:630
 msgid "You cann't remove original URL"
 msgstr "원래 URL을 제거할 수 없습니다."
 
