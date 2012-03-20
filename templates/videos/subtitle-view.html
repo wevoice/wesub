@@ -259,6 +259,9 @@
                             <h3>
                                 <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
                                 <a href="{% url videos:revision pk=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                {% if item.moderation_status == 'waiting_moderation' %}
+                                    (draft)
+                                {% endif %}
                             </h3>
                             {% if item.user %}
                                 <p>{% trans "by" %} <a href="{% url profiles:profile item.user.pk %}">{{ item.user }}</a></p>
