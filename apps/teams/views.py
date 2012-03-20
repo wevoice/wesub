@@ -1260,7 +1260,7 @@ def delete_task(request, slug):
 
             if task.get_type_display() in ['Review', 'Approve']:
                 # TODO: Handle subtitle/translate tasks here too?
-                if not form.cleaned_data['discard_subs']:
+                if not form.cleaned_data['discard_subs'] and task.subtitle_version:
                     task.subtitle_version.moderation_status = MODERATION.APPROVED
                     task.subtitle_version.save()
                     metadata_manager.update_metadata(video.pk)
