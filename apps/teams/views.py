@@ -1071,7 +1071,9 @@ def _order_tasks(request, tasks):
     elif sort == '-created':
         tasks = tasks.order_by('-created')
     elif sort == 'expires':
-        tasks = tasks.order_by('expiration_date')
+        null_expirations = tasks.filter(expiration_date=None)
+        has_expirations = tasks.exclude(expiration_date=None)
+        tasks = list(has_expirations.order_by('expiration_date')) + list(null_expirations)
     elif sort == '-expires':
         tasks = tasks.order_by('-expiration_date')
 
