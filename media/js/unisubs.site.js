@@ -382,6 +382,66 @@ var Site = function(Site) {
         },
 
         // Public
+        subtitle_view: function() {
+            var DIFFING_URL = function() {
+                var url = window.DIFFING_URL;
+                return url.replace(/11111/, '<<first_pk>>').replace(/22222/, '<<second_pk>>');
+            }();
+            function get_compare_link(first_pk, second_pk) {
+                return DIFFING_URL.replace(/<<first_pk>>/, first_pk).replace(/<<second_pk>>/, second_pk);
+            }
+            $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
+            $('.version_checkbox', '.revisions').change( function() {
+                var $this = $(this);
+                var checked_length = $('.version_checkbox:checked').length;
+
+                if ($this.attr('checked') && (checked_length > 2)) {
+                    $this.attr('checked', '');
+                }
+            });
+            $('.compare_versions_button').click( function() {
+                var $checked = $('.version_checkbox:checked');
+                if ($checked.length !== 2) {
+                    alert(window.SELECT_REVISIONS_TRANS);
+                } else {
+                    var url = get_compare_link($checked[0].value, $checked[1].value);
+                    window.location.replace(url);
+                }
+            });
+            $('.tabs').tabs();
+            $('#add_subtitles').click( function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
+                return false;
+            });
+            $('.add-translation-behavior').click( function(e) {
+                e.preventDefault();
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
+                return false;
+            });
+            $('.time_link').click( function() {
+                widget_widget_div.playAt(parseFloat(
+                $(this).find('.data').text()));
+                return false;
+            });
+            var SL_ID = window.LANGUAGE_ID;
+            unisubs.messaging.simplemessage.displayPendingMessages();
+            $('#edit_subtitles_button').click( function(e) {
+                if (!(localStorage && localStorage.getItem)) {
+                    alert("Sorry, you'll need to upgrade your browser to use the subtitling dialog.");
+                    e.preventDefault();
+                }
+            });
+            if (window.TASK) {
+                var videoSource = unisubs.player.MediaSource.videoSourceForURL(window.TASK_TEAM_VIDEO_URL);
+                var opener = new unisubs.widget.SubtitleDialogOpener(
+                    window.TASK_TEAM_VIDEO_ID,
+                    window.TASK_TEAM_VIDEO_URL,
+                    videoSource, null, null);
+                opener.showStartDialog();
+            }
+        },
         video_view: function() {
             $('.add_subtitles').click(function() {
                 widget_widget_div.selectMenuItem(
@@ -417,7 +477,7 @@ var Site = function(Site) {
             });
             if (window.TASK) {
                 var videoSource = unisubs.player.MediaSource.videoSourceForURL(
-                        '{{ task.team_video.video.get_video_url }}');
+                        window.TASK_TEAM_VIDEO_URL);
                 var opener = new unisubs.widget.SubtitleDialogOpener(
                                      window.TASK_TEAM_VIDEO_ID,
                                      window.TASK_TEAM_VIDEO_URL,

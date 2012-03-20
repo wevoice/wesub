@@ -50,7 +50,6 @@ elif INSTALLATION == STAGING:
     EMAIL_SUBJECT_PREFIX = '[usubs-staging]'
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 elif INSTALLATION == PRODUCTION:
-    SEARCH_INDEXING_HOUR_STARTS = 8
     SITE_ID = 8
     SITE_NAME = 'unisubs'
     REDIS_DB = "1"

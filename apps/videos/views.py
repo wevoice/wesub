@@ -424,7 +424,7 @@ def history(request, video, lang=None, lang_id=None):
 
     context['video'] = video
     context['translations'] = _get_translations(video)
-    context["user_can_moderate"] = False
+    context['user_can_moderate'] = False
     context['last_version'] = language.last_version
     context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
