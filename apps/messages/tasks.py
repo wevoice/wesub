@@ -394,6 +394,12 @@ def _reviewed_notification(task_pk, status):
     reviewer_message_url = "%s%s?user=%s" % (
         get_url_base(), reverse("messages:new"), reviewer.username)
 
+    reviewer_profile_url = "%s%s" % (get_url_base(), reverse("profiles:profile", kwargs={'user_id': reviewer.id}))
+    perform_task_url = "%s%s" % (get_url_base(), reverse("teams:perform_task", kwargs={
+        'slug': task.team.slug,
+        'task_pk': task_pk
+    }))
+
     context = {
         "team":task.team,
         "title": task.subtitle_version.language.get_title(),
@@ -408,6 +414,8 @@ def _reviewed_notification(task_pk, status):
         "reviewed_and_published": status == REVIEWED_AND_PUBLISHED,
         "subs_url": subs_url,
         "reviewer_message_url": reviewer_message_url,
+        "reviewer_profile_url": reviewer_profile_url,
+        "perform_task_url": perform_task_url,
     }
     if user.notify_by_message:
         template_name = "messages/team-task-reviewed.txt"
