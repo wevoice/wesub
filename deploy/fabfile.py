@@ -157,9 +157,8 @@ def _create_env(username, hosts, s3_bucket,
 def staging(username):
     with Output("Configuring task(s) to run on STAGING"):
         _create_env(username              = username,
-                    hosts                 = ['pcf-us-staging1.pculture.org:2191',
-                                            'pcf-us-staging2.pculture.org:2191',
-                                            'pcf-us-staging3.pculture.org:2191'],
+                    hosts                 = ['pcf-us-staging3.pculture.org:2191',
+                                            'pcf-us-staging4.pculture.org:2191'],
                     s3_bucket             = 's3.staging.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles.staging',
                     static_dir            = '/var/static/staging',
