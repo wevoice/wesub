@@ -334,6 +334,7 @@ def switch_branch(branch_name):
 def _remove_pip_package(base_dir, package_name):
     with cd(os.path.join(base_dir, 'unisubs', 'deploy')):
         run('yes y | {0}/env/bin/pip uninstall {1}'.format(base_dir, package_name), pty=True)
+        _clear_permissions(os.path.join(base_dir, 'env'))
 
 def remove_pip_package(package_egg_name):
     with Output("Removing pip package '{0}'".format(package_egg_name)):
@@ -345,7 +346,8 @@ def _update_environment(base_dir, flags=''):
         _git_pull()
         run('export PIP_REQUIRE_VIRTUALENV=true')
         # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
-        sudo('yes i | {0}/env/bin/pip install {1} -E {0}/env/ -r requirements.txt'.format(base_dir, flags), pty=True)
+        run('yes i | {0}/env/bin/pip install {1} -E {0}/env/ -r requirements.txt'.format(base_dir, flags), pty=True)
+        _clear_permissions(os.path.join(base_dir, 'env'))
 
 def update_environment(flags=''):
     with Output("Updating virtualenv"):
