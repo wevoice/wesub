@@ -312,6 +312,16 @@ def can_rename_team(team, user):
     role = get_role_for_target(user, team)
     return role == ROLE_OWNER
 
+def can_request_auto_transcription(team, user):
+    """Return whether the given user can request for third parties
+    to transcribe team  video.
+
+    Only team owners can request transcriptions.
+
+    """
+    role = get_role_for_target(user, team)
+    return role == ROLE_OWNER
+
 def can_delete_team(team, user):
     """Return whether the given user can delete the given team.
 
