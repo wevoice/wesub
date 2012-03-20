@@ -1490,7 +1490,6 @@ class TestFeedsSubmit(TestCase):
     def setUp(self):
         self.client.login(username='admin', password='admin')
 
-    # this rss feed is broken. FIXME TODO
     def test_video_feed_submit(self):
         old_count = Video.objects.count()
         data = {
@@ -1499,15 +1498,6 @@ class TestFeedsSubmit(TestCase):
         response = self.client.post(reverse('videos:create_from_feed'), data)
         self.assertRedirects(response, reverse('videos:create'))
         self.assertNotEqual(old_count, Video.objects.count())
-
-    # this is not working for now
-    #def test_incorrect_video_feed_submit(self):
-        #data = {
-            #'feed_url': u'http://blip.tv/anyone-but-he/?skin=rss'
-        #}
-        #response = self.client.post(reverse('videos:create_from_feed'), data)
-        #self.assertEqual(response.status_code, 200)
-        #self.assertTrue(response.context['youtube_form'].errors['feed_url'])
 
     def test_empty_feed_submit(self):
         import feedparser
