@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Cheng-Chia Tseng <pswo10680@gmail.com>, 2011.
 # Hsin-Cheng Lin <shiaoshinm@gmail.com>, 2011, 2012.
@@ -9,11 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-19 13:02-0500\n"
-"PO-Revision-Date: 2012-03-19 12:25+0000\n"
+"POT-Creation-Date: 2012-03-20 01:32-0500\n"
+"PO-Revision-Date: 2012-03-20 06:45+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.net/projects/p/"
-"universalsubtitles/language/zh_TW/)\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.net/projects/p/universalsubtitles/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -464,8 +463,8 @@ msgstr "影片網址"
 
 #: apps/teams/forms.py:111
 msgid ""
-"Enter the URL of any compatible video or any video on our site. You can also "
-"browse the site and use the 'Add Video to Team' menu."
+"Enter the URL of any compatible video or any video on our site. You can also"
+" browse the site and use the 'Add Video to Team' menu."
 msgstr "在我們的網站輸入任何影片的網址，您也可以使用'加入影片至團隊'選項"
 
 #: apps/teams/forms.py:119
@@ -497,9 +496,7 @@ msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
 "appear. To add the remaining videos from this feed, submit this feed again "
 "and make sure to check \"Save feed\" box."
-msgstr ""
-"%(count)s部影片已經加入，稍待片刻，影片馬上就會顯示。若要加入此feed中剩下的影"
-"片，請再送出一次，並記得勾選\"儲存feed\""
+msgstr "%(count)s部影片已經加入，稍待片刻，影片馬上就會顯示。若要加入此feed中剩下的影片，請再送出一次，並記得勾選\"儲存feed\""
 
 #: apps/teams/forms.py:255
 msgid "Team intro video URL"
@@ -508,13 +505,9 @@ msgstr "團隊介紹影片網址"
 #: apps/teams/forms.py:257
 msgid ""
 "You can put an optional video\n"
-"on your team homepage that explains what your team is about, to attract "
-"volunteers.\n"
+"on your team homepage that explains what your team is about, to attract volunteers.\n"
 "Enter a link to any compatible video, or to any video page on our site."
-msgstr ""
-"您可以決定是否在團隊首頁\n"
-"提供影片，介紹您的團隊內容以吸引志工。\n"
-"輸入外部影片連結，或是已在我們網站上的影片。"
+msgstr "您可以決定是否在團隊首頁\n提供影片，介紹您的團隊內容以吸引志工。\n輸入外部影片連結，或是已在我們網站上的影片。"
 
 #: apps/teams/forms.py:262
 msgid "Team URL: http://universalsubtitles.org/teams/"
@@ -721,7 +714,7 @@ msgid "task expiration (days)"
 msgstr ""
 
 #: apps/teams/models.py:178 templates/profiles/_top_user_panel.html:33
-#: templates/profiles/dashboard.html:91 templates/teams/teams-list.html:6
+#: templates/profiles/dashboard.html:94 templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "團隊"
 
@@ -729,8 +722,7 @@ msgstr "團隊"
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
-msgstr ""
-"藉此處說明為何您或您的團隊需要對這部影片配字幕。增加註解能讓大家更樂意幫忙！"
+msgstr "藉此處說明為何您或您的團隊需要對這部影片配字幕。增加註解能讓大家更樂意幫忙！"
 
 #: apps/teams/models.py:625
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
@@ -844,16 +836,11 @@ msgid ""
 "\n"
 "                Your team has been created. Here are some next steps:\n"
 "                <ul>\n"
-"                    <li><a href=\"%(edit)s\">Edit team members' permissions</"
-"a></li>\n"
-"                    <li><a href=\"%(activate)s\">Activate and customize "
-"workflows for your team</a></li>\n"
-"                    <li><a href=\"%(create)s\">Create and customize "
-"projects</a></li>\n"
-"                    <li><a href=\"%(lang)s\">Edit language preferences</a></"
-"li>\n"
-"                    <li><a href=\"%(custom)s\">Customize instructions to "
-"caption makers and translators</a></li>\n"
+"                    <li><a href=\"%(edit)s\">Edit team members' permissions</a></li>\n"
+"                    <li><a href=\"%(activate)s\">Activate and customize workflows for your team</a></li>\n"
+"                    <li><a href=\"%(create)s\">Create and customize projects</a></li>\n"
+"                    <li><a href=\"%(lang)s\">Edit language preferences</a></li>\n"
+"                    <li><a href=\"%(custom)s\">Customize instructions to caption makers and translators</a></li>\n"
 "                </ul>\n"
 "                "
 msgstr ""
@@ -1026,11 +1013,11 @@ msgstr "警告用Email"
 msgid "File should have txt format"
 msgstr "檔案應包含文字格式"
 
-#: apps/videos/forms.py:65 apps/videos/forms.py:83 apps/videos/forms.py:348
+#: apps/videos/forms.py:65 apps/videos/forms.py:83 apps/videos/forms.py:350
 msgid "File size should be less {0} kb"
 msgstr "檔案應小於 {0} kb"
 
-#: apps/videos/forms.py:70 apps/videos/forms.py:91 apps/videos/forms.py:356
+#: apps/videos/forms.py:70 apps/videos/forms.py:91 apps/videos/forms.py:358
 msgid "Can not detect file encoding"
 msgstr "無法偵測檔案編碼"
 
@@ -1042,11 +1029,11 @@ msgstr "無法編碼，此檔案須用utf8編碼"
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "無效格式。請上傳 *.srt, *.ssa, *.sbv 或是 *.xml (TTML  format)"
 
-#: apps/videos/forms.py:93 apps/videos/forms.py:358
+#: apps/videos/forms.py:93 apps/videos/forms.py:360
 msgid "Incorrect subtitles format"
 msgstr "字幕格式不正確"
 
-#: apps/videos/forms.py:119 apps/videos/forms.py:472 utils/validators.py:38
+#: apps/videos/forms.py:119 apps/videos/forms.py:474 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "此URL連結損壞"
 
@@ -1057,11 +1044,7 @@ msgid ""
 "If you'd like to us to add support for a new site or format, or if you\n"
 "think there's been some mistake, <a\n"
 "href=\"mailto:%s\">contact us</a>!"
-msgstr ""
-"Universal Subtitles不支援此網站或其影片格式，\n"
-"如果希望我們增加此網站或格式的支援，\n"
-"或者有哪裡出了問題，請<a\n"
-"href=\"mailto:%s\">聯絡我們</a>!"
+msgstr "Universal Subtitles不支援此網站或其影片格式，\n如果希望我們增加此網站或格式的支援，\n或者有哪裡出了問題，請<a\nhref=\"mailto:%s\">聯絡我們</a>!"
 
 #: apps/videos/forms.py:136
 msgid "You have not permission add video URL for this video"
@@ -1078,85 +1061,76 @@ msgid ""
 "moderates the video."
 msgstr ""
 
-#: apps/videos/forms.py:351
-msgid "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
+#: apps/videos/forms.py:353
+msgid ""
+"Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr "格式錯誤。上傳.srt、.ssa、.sbv、.dfxp或.xml (TTML  格式)"
 
-#: apps/videos/forms.py:457
+#: apps/videos/forms.py:459
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
-"                        <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
+"                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr ""
 
-#: apps/videos/forms.py:460 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:462 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
-"You must link to a video on a compatible site (like YouTube) or directly to "
-"a\n"
-"                    video file that works with HTML5 browsers. For example: "
-"http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
-"                    <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
-msgstr ""
-"請連結至我們支援的影音網站 (如YouTube)，\n"
-"                    或是可以在HTML5瀏覽器上撥放的影音檔案。例如：http://"
-"mysite.com/myvideo.ogg 或是 http://mysite.com/myipadvideo.m4v\n"
-"                    若有問題請<a href=\"mailto:%s\">連絡我們</a>"
+"You must link to a video on a compatible site (like YouTube) or directly to a\n"
+"                    video file that works with HTML5 browsers. For example: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
+"                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
+msgstr "請連結至我們支援的影音網站 (如YouTube)，\n                    或是可以在HTML5瀏覽器上撥放的影音檔案。例如：http://mysite.com/myvideo.ogg 或是 http://mysite.com/myipadvideo.m4v\n                    若有問題請<a href=\"mailto:%s\">連絡我們</a>"
 
-#: apps/videos/forms.py:488
+#: apps/videos/forms.py:490
 msgid "Youtube usernames"
 msgstr "Youtube使用者名稱"
 
-#: apps/videos/forms.py:488
+#: apps/videos/forms.py:490
 msgid "Enter usernames separated by comma."
 msgstr "用逗號分隔多個使用者名稱"
 
-#: apps/videos/forms.py:489
+#: apps/videos/forms.py:491
 msgid "Youtube page link."
 msgstr "Youtube頁面連結."
 
-#: apps/videos/forms.py:490
+#: apps/videos/forms.py:492
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "例如：http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:491
+#: apps/videos/forms.py:493
 msgid ""
 "Supported: Youtube, Vimeo, Blip or Dailymotion. Only supported sites added."
 msgstr "支援網站：Youtube, Vimeo, Blip 或 Dailymotion。只有支援網站會顯示出來"
 
-#: apps/videos/forms.py:492
+#: apps/videos/forms.py:494
 msgid "Save feed"
 msgstr "儲存Feed"
 
-#: apps/videos/forms.py:492
+#: apps/videos/forms.py:494
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr "選項代表未來您想透過此Feed來加入影片，請使用有效的RSS feed"
 
-#: apps/videos/forms.py:556
+#: apps/videos/forms.py:558
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr "抱歉，您所提供的網址找不到有效的feed。請確認網址後再試一次"
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:565
 #, python-format
 msgid "%(count)s videos have been added"
 msgstr "%(count)s部影片已經加入"
 
-#: apps/videos/forms.py:565
+#: apps/videos/forms.py:567
 #, python-format
 msgid ""
 "%(count)s videos have been added. To add the remaining videos from this "
 "feed, submit this feed again and make sure to check \"Save feed\" box."
-msgstr ""
-"%(count)s部影片已經加入。若要加入此feed其餘的影片，需要再送出feed一次，並記得"
-"勾選\"儲存feed\""
+msgstr "%(count)s部影片已經加入。若要加入此feed其餘的影片，需要再送出feed一次，並記得勾選\"儲存feed\""
 
-#: apps/videos/forms.py:601
+#: apps/videos/forms.py:603
 msgid "captcha"
 msgstr "captcha"
 
@@ -1194,18 +1168,14 @@ msgstr ""
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"  <a href=\"%(video_url)s\">%(video_name)s</a>退回的<a href=\"%(language_url)"
-"s\">%(language)s</a>字幕"
+msgstr "  <a href=\"%(video_url)s\">%(video_name)s</a>退回的<a href=\"%(language_url)s\">%(language)s</a>字幕"
 
 #: apps/videos/models.py:1702
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"  <a href=\"%(video_url)s\">%(video_name)s</a>批准的<a href=\"%(language_url)"
-"s\">%(language)s</a>字幕"
+msgstr "  <a href=\"%(video_url)s\">%(video_name)s</a>批准的<a href=\"%(language_url)s\">%(language)s</a>字幕"
 
 #: apps/videos/models.py:1707
 #, python-format
@@ -1232,18 +1202,14 @@ msgstr " <a href=\"%(video_url)s\">%(video_name)s</a> 標題以更改"
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"<a href=\"%(video_url)s\">%(video_name)s</a> 關於 <a href=\"%(comments_url)s"
-"\">%(language)s 字幕</a>的評論"
+msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> 關於 <a href=\"%(comments_url)s\">%(language)s 字幕</a>的評論"
 
 #: apps/videos/models.py:1734
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"<a href=\"%(video_url)s\">%(video_name)s</a> 關於 <a href=\"%(comments_url)s"
-"\">%(language)s 字幕</a>的評論已加入"
+msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> 關於 <a href=\"%(comments_url)s\">%(language)s 字幕</a>的評論已加入"
 
 #: apps/videos/models.py:1737
 #, python-format
@@ -1258,38 +1224,30 @@ msgstr " <a href=\"%(video_url)s\">%(video_name)s</a>的評論已加入"
 #: apps/videos/models.py:1747
 #, python-format
 msgid ""
-"started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
-"\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"為<a href=\"%(video_url)s\">%(video_name)s</a>建立了<a href=\"%(language_url)"
-"s\">%(language)s 的字幕</a>"
+"started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
+"href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "為<a href=\"%(video_url)s\">%(video_name)s</a>建立了<a href=\"%(language_url)s\">%(language)s 的字幕</a>"
 
 #: apps/videos/models.py:1749
 #, python-format
 msgid ""
-"<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
-"\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"為<a href=\"%(video_url)s\">%(video_name)s</a>的 <a href=\"%(language_url)s"
-"\">%(language)s 字幕</a>已建立"
+"<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a "
+"href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "為<a href=\"%(video_url)s\">%(video_name)s</a>的 <a href=\"%(language_url)s\">%(language)s 字幕</a>已建立"
 
 #: apps/videos/models.py:1760
 #, python-format
 msgid ""
-"edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
-"\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"為<a href=\"%(video_url)s\">%(video_name)s</a>編輯了<a href=\"%(language_url)"
-"s\">%(language)s 的字幕</a>"
+"edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
+"href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "為<a href=\"%(video_url)s\">%(video_name)s</a>編輯了<a href=\"%(language_url)s\">%(language)s 的字幕</a>"
 
 #: apps/videos/models.py:1762
 #, python-format
 msgid ""
-"<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
-"\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
-"<a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%(language_url)s\">%"
-"(language)s 字幕</a>已編輯"
+"<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a "
+"href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%(language_url)s\">%(language)s 字幕</a>已編輯"
 
 #: apps/videos/models.py:1768
 #, python-format
@@ -1364,9 +1322,7 @@ msgstr ""
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
 "system. You can't add it as a secondary URL."
-msgstr ""
-"此URL已經 <a href=\"%(url)s\">存在</a> 在我們的影片系統裡，您無法將之新增為第"
-"二個URL"
+msgstr "此URL已經 <a href=\"%(url)s\">存在</a> 在我們的影片系統裡，您無法將之新增為第二個URL"
 
 #: apps/videos/rpc.py:54 apps/videos/rpc.py:70
 msgid "You have not permission"
@@ -1456,12 +1412,9 @@ msgstr "發現此影片已有%(language_name)s字幕"
 #: apps/videos/views.py:148
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
-"share the video with friends, or get an embed code for your site.  To add "
-"or\n"
+"share the video with friends, or get an embed code for your site.  To add or\n"
 "improve subtitles, click the button below the video."
-msgstr ""
-"這裡是您的影片字幕工作區。您可以將影片分享給朋友，或為您的網站取得嵌入代"
-"碼。  按下影片下方按鈕開始新增或是修改字幕"
+msgstr "這裡是您的影片字幕工作區。您可以將影片分享給朋友，或為您的網站取得嵌入代碼。  按下影片下方按鈕開始新增或是修改字幕"
 
 #: apps/videos/views.py:153
 msgid "Existing subtitles will be imported in a few minutes."
@@ -1511,11 +1464,8 @@ msgstr "影片為提供"
 #, python-format
 msgid ""
 "Please try again with a link to a video page. \n"
-"                        <a href=\"mailto:%s\">Contact us</a> if there's a "
-"problem."
-msgstr ""
-"請使用連至影片頁面的連結，再試一次 \n"
-"                        若有問題請<a href=\"mailto:%s\">連絡我們</a>"
+"                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
+msgstr "請使用連至影片頁面的連結，再試一次 \n                        若有問題請<a href=\"mailto:%s\">連絡我們</a>"
 
 #: apps/videos/types/youtube.py:45
 msgid "Private video"
@@ -1611,11 +1561,10 @@ msgstr "您尚未在設定檔指定任何語言，或翻譯目錄尚未自動生
 #: libs/rosetta/templates/rosetta/languages.html:57
 #, python-format
 msgid ""
-"Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N documentation</"
-"a> for a guide on how to set up internationalization for your project."
-msgstr ""
-"請參考<a href=\"%(i18n_doc_link)s\">Django's I18N documentation</a>對如何將專"
-"案國際化的說明"
+"Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N "
+"documentation</a> for a guide on how to set up internationalization for your"
+" project."
+msgstr "請參考<a href=\"%(i18n_doc_link)s\">Django's I18N documentation</a>對如何將專案國際化的說明"
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
 msgid "Pick another file"
@@ -1638,9 +1587,7 @@ msgstr "唯讀檔案：編輯完成時才能下載檔案！"
 msgid ""
 "Some items in your last translation block couldn't be saved: this usually "
 "happens when the catalog file changes on disk after you last loaded it."
-msgstr ""
-"上一個翻譯格中有某些東西無法儲存：通常是因為上次載入之後，磁碟上的目錄檔案有"
-"所更改"
+msgstr "上一個翻譯格中有某些東西無法儲存：通常是因為上次載入之後，磁碟上的目錄檔案有所更改"
 
 #: libs/rosetta/templates/rosetta/pofile.html:28
 #, python-format
@@ -2273,366 +2220,370 @@ msgid "Mohawk"
 msgstr "莫霍克語"
 
 #: libs/unilangs/unilangs.py:260
+msgid "Manipuri"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:261
 msgid "Mossi"
 msgstr "莫西語"
 
-#: libs/unilangs/unilangs.py:261
+#: libs/unilangs/unilangs.py:262
 msgid "Marathi"
 msgstr "馬拉地語"
 
-#: libs/unilangs/unilangs.py:262
+#: libs/unilangs/unilangs.py:263
 msgid "Malay"
 msgstr "馬來語"
 
-#: libs/unilangs/unilangs.py:263
+#: libs/unilangs/unilangs.py:264
 msgid "Maltese"
 msgstr "Maltese"
 
-#: libs/unilangs/unilangs.py:264
+#: libs/unilangs/unilangs.py:265
 msgid "Burmese"
 msgstr "缅甸語"
 
-#: libs/unilangs/unilangs.py:265
+#: libs/unilangs/unilangs.py:266
 msgid "Hokkien"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:266
+#: libs/unilangs/unilangs.py:267
 msgid "Naurunan"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:267
+#: libs/unilangs/unilangs.py:268
 msgid "Norwegian Bokmal"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:268
+#: libs/unilangs/unilangs.py:269
 msgid "North Ndebele"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:269
+#: libs/unilangs/unilangs.py:270
 msgid "Nepali"
 msgstr "尼泊爾語"
 
-#: libs/unilangs/unilangs.py:270
+#: libs/unilangs/unilangs.py:271
 msgid "Ndonga"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:271
+#: libs/unilangs/unilangs.py:272
 msgid "Dutch"
 msgstr "Dutch"
 
-#: libs/unilangs/unilangs.py:272
+#: libs/unilangs/unilangs.py:273
 msgid "Norwegian Nynorsk"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:273
+#: libs/unilangs/unilangs.py:274
 msgid "Norwegian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:274
+#: libs/unilangs/unilangs.py:275
 msgid "Southern Ndebele"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:275
+#: libs/unilangs/unilangs.py:276
 msgid "Northern Sotho"
 msgstr "北索托語"
 
-#: libs/unilangs/unilangs.py:276
+#: libs/unilangs/unilangs.py:277
 msgid "Navajo"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:277
+#: libs/unilangs/unilangs.py:278
 msgid "Chewa"
 msgstr "齊切瓦語"
 
-#: libs/unilangs/unilangs.py:278
+#: libs/unilangs/unilangs.py:279
 msgid "Occitan"
 msgstr "奧克語"
 
-#: libs/unilangs/unilangs.py:279
+#: libs/unilangs/unilangs.py:280
 msgid "Ojibwe"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:280
+#: libs/unilangs/unilangs.py:281
 msgid "Oriya"
 msgstr "奧里亞語"
 
-#: libs/unilangs/unilangs.py:281
+#: libs/unilangs/unilangs.py:282
 msgid "Oromo"
 msgstr "奧儸莫-庫希特語"
 
-#: libs/unilangs/unilangs.py:282
+#: libs/unilangs/unilangs.py:283
 msgid "Ossetian, Ossetic"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:283
+#: libs/unilangs/unilangs.py:284
 msgid "Punjabi"
 msgstr "旁遮普語"
 
-#: libs/unilangs/unilangs.py:284
+#: libs/unilangs/unilangs.py:285
 msgid "Pali"
 msgstr "Pali"
 
-#: libs/unilangs/unilangs.py:285
+#: libs/unilangs/unilangs.py:286
 msgid "Polish"
 msgstr "Polish"
 
-#: libs/unilangs/unilangs.py:286
+#: libs/unilangs/unilangs.py:287
 msgid "Pashto"
 msgstr "Pashto"
 
-#: libs/unilangs/unilangs.py:287
+#: libs/unilangs/unilangs.py:288
 msgid "Portuguese"
 msgstr "Portuguese"
 
-#: libs/unilangs/unilangs.py:288
+#: libs/unilangs/unilangs.py:289
 msgid "Portuguese, Brazilian"
 msgstr "巴西-葡萄牙語"
 
-#: libs/unilangs/unilangs.py:289
+#: libs/unilangs/unilangs.py:290
 msgid "Quechua"
 msgstr "蓋丘亞語"
 
-#: libs/unilangs/unilangs.py:290
+#: libs/unilangs/unilangs.py:291
 msgid "Romansh"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:291
+#: libs/unilangs/unilangs.py:292
 msgid "Romanian"
 msgstr "Romanian"
 
-#: libs/unilangs/unilangs.py:292
+#: libs/unilangs/unilangs.py:293
 msgid "Russian"
 msgstr "Russian"
 
-#: libs/unilangs/unilangs.py:293
+#: libs/unilangs/unilangs.py:294
 msgid "Rundi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:294
+#: libs/unilangs/unilangs.py:295
 msgid "Macedo"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:295
+#: libs/unilangs/unilangs.py:296
 msgid "Rusyn"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:296
+#: libs/unilangs/unilangs.py:297
 msgid "Sanskrit"
 msgstr "Sanskrit"
 
-#: libs/unilangs/unilangs.py:297
+#: libs/unilangs/unilangs.py:298
 msgid "Sardinian"
 msgstr "Sardinian"
 
-#: libs/unilangs/unilangs.py:298
+#: libs/unilangs/unilangs.py:299
 msgid "Sindhi"
 msgstr "Sindhi"
 
-#: libs/unilangs/unilangs.py:299
+#: libs/unilangs/unilangs.py:300
 msgid "Northern Sami"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:300
+#: libs/unilangs/unilangs.py:301
 msgid "Sango"
 msgstr "Sango"
 
-#: libs/unilangs/unilangs.py:301
+#: libs/unilangs/unilangs.py:302
 msgid "Serbo-Croatian"
 msgstr "Serbo-Croatian"
 
-#: libs/unilangs/unilangs.py:302
+#: libs/unilangs/unilangs.py:303
 msgid "Sinhala"
 msgstr "僧伽羅語"
 
-#: libs/unilangs/unilangs.py:303
+#: libs/unilangs/unilangs.py:304
 msgid "Slovak"
 msgstr "Slovak"
 
-#: libs/unilangs/unilangs.py:304
+#: libs/unilangs/unilangs.py:305
 msgid "Slovenian"
 msgstr "Slovenian"
 
-#: libs/unilangs/unilangs.py:305
+#: libs/unilangs/unilangs.py:306
 msgid "Samoan"
 msgstr "Samoan"
 
-#: libs/unilangs/unilangs.py:306
+#: libs/unilangs/unilangs.py:307
 msgid "Shona"
 msgstr "紹納語"
 
-#: libs/unilangs/unilangs.py:307
+#: libs/unilangs/unilangs.py:308
 msgid "Somali"
 msgstr "索馬利語"
 
-#: libs/unilangs/unilangs.py:308
+#: libs/unilangs/unilangs.py:309
 msgid "Sotho"
 msgstr "索托語"
 
-#: libs/unilangs/unilangs.py:309
+#: libs/unilangs/unilangs.py:310
 msgid "Albanian"
 msgstr "Albanian"
 
-#: libs/unilangs/unilangs.py:310
+#: libs/unilangs/unilangs.py:311
 msgid "Serbian"
 msgstr "Serbian"
 
-#: libs/unilangs/unilangs.py:311
+#: libs/unilangs/unilangs.py:312
 msgid "Serbian, Latin"
 msgstr "塞爾維亞語，拉丁美洲"
 
-#: libs/unilangs/unilangs.py:312
+#: libs/unilangs/unilangs.py:313
 msgid "Swati"
 msgstr "Swati"
 
-#: libs/unilangs/unilangs.py:313
+#: libs/unilangs/unilangs.py:314
 msgid "Sundanese"
 msgstr "Sundanese"
 
-#: libs/unilangs/unilangs.py:314
+#: libs/unilangs/unilangs.py:315
 msgid "Swedish"
 msgstr "Swedish"
 
-#: libs/unilangs/unilangs.py:315
+#: libs/unilangs/unilangs.py:316
 msgid "Swahili"
 msgstr "史瓦西里語"
 
-#: libs/unilangs/unilangs.py:316
+#: libs/unilangs/unilangs.py:317
 msgid "Tamil"
 msgstr "Tamil"
 
-#: libs/unilangs/unilangs.py:317
+#: libs/unilangs/unilangs.py:318
 msgid "Tetum"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:318
+#: libs/unilangs/unilangs.py:319
 msgid "Telugu"
 msgstr "Telugu"
 
-#: libs/unilangs/unilangs.py:319
+#: libs/unilangs/unilangs.py:320
 msgid "Tajik"
 msgstr "Tajik"
 
-#: libs/unilangs/unilangs.py:320
+#: libs/unilangs/unilangs.py:321
 msgid "Thai"
 msgstr "Thai"
 
-#: libs/unilangs/unilangs.py:321
+#: libs/unilangs/unilangs.py:322
 msgid "Tigrinya"
 msgstr "提格力尼亞語"
 
-#: libs/unilangs/unilangs.py:322
+#: libs/unilangs/unilangs.py:323
 msgid "Turkmen"
 msgstr "Turkmen"
 
-#: libs/unilangs/unilangs.py:323
+#: libs/unilangs/unilangs.py:324
 msgid "Tagalog"
 msgstr "Tagalog"
 
-#: libs/unilangs/unilangs.py:324
+#: libs/unilangs/unilangs.py:325
 msgid "Klingon"
 msgstr "Klingon"
 
-#: libs/unilangs/unilangs.py:325
+#: libs/unilangs/unilangs.py:326
 msgid "Tonga"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:326
+#: libs/unilangs/unilangs.py:327
 msgid "Turkish"
 msgstr "Turkish"
 
-#: libs/unilangs/unilangs.py:327
+#: libs/unilangs/unilangs.py:328
 msgid "Tsonga"
 msgstr "Tsonga"
 
-#: libs/unilangs/unilangs.py:328
+#: libs/unilangs/unilangs.py:329
 msgid "Tswana"
 msgstr "茨瓦納語"
 
-#: libs/unilangs/unilangs.py:329
+#: libs/unilangs/unilangs.py:330
 msgid "Tartar"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:330
+#: libs/unilangs/unilangs.py:331
 msgid "Twi"
 msgstr "Twi"
 
-#: libs/unilangs/unilangs.py:331
+#: libs/unilangs/unilangs.py:332
 msgid "Tahitian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:332
+#: libs/unilangs/unilangs.py:333
 msgid "Uighur"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:333
+#: libs/unilangs/unilangs.py:334
 msgid "Ukrainian"
 msgstr "Ukrainian"
 
-#: libs/unilangs/unilangs.py:334
+#: libs/unilangs/unilangs.py:335
 msgid "Umbundu"
 msgstr "姆邦杜語"
 
-#: libs/unilangs/unilangs.py:335
+#: libs/unilangs/unilangs.py:336
 msgid "Uyghur"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:336
+#: libs/unilangs/unilangs.py:337
 msgid "Urdu"
 msgstr "烏爾都語"
 
-#: libs/unilangs/unilangs.py:337
+#: libs/unilangs/unilangs.py:338
 msgid "Uzbek"
 msgstr "Uzbek"
 
-#: libs/unilangs/unilangs.py:338
+#: libs/unilangs/unilangs.py:339
 msgid "Venda"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:339
+#: libs/unilangs/unilangs.py:340
 msgid "Vietnamese"
 msgstr "Vietnamese"
 
-#: libs/unilangs/unilangs.py:340
+#: libs/unilangs/unilangs.py:341
 msgid "Volapuk"
 msgstr "Volapuk"
 
-#: libs/unilangs/unilangs.py:341
+#: libs/unilangs/unilangs.py:342
 msgid "Walloon"
 msgstr "Walloon"
 
-#: libs/unilangs/unilangs.py:342
+#: libs/unilangs/unilangs.py:343
 msgid "Wolof"
 msgstr "沃洛夫語"
 
-#: libs/unilangs/unilangs.py:343
+#: libs/unilangs/unilangs.py:344
 msgid "Xhosa"
 msgstr "科薩語"
 
-#: libs/unilangs/unilangs.py:344
+#: libs/unilangs/unilangs.py:345
 msgid "Yiddish"
 msgstr "意第緒語"
 
-#: libs/unilangs/unilangs.py:345
+#: libs/unilangs/unilangs.py:346
 msgid "Yoruba"
 msgstr "優魯巴語"
 
-#: libs/unilangs/unilangs.py:346
+#: libs/unilangs/unilangs.py:347
 msgid "Zhuang, Chuang"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:347
+#: libs/unilangs/unilangs.py:348
 msgid "Chinese, Yue"
 msgstr "粵語"
 
-#: libs/unilangs/unilangs.py:348
+#: libs/unilangs/unilangs.py:349
 msgid "Chinese, Simplified"
 msgstr "簡體中文"
 
-#: libs/unilangs/unilangs.py:349
+#: libs/unilangs/unilangs.py:350
 msgid "Chinese, Traditional"
 msgstr "繁體中文"
 
-#: libs/unilangs/unilangs.py:350
+#: libs/unilangs/unilangs.py:351
 msgid "Zulu"
 msgstr "祖魯語"
 
@@ -2711,8 +2662,8 @@ msgstr "警告：不要嵌入這些影片--它們有可能出錯！"
 
 #: templates/_testing_widget.html:16
 msgid ""
-"Warning #2: These subtitles are non-permanent and should not be relied on -- "
-"someone could change them."
+"Warning #2: These subtitles are non-permanent and should not be relied on --"
+" someone could change them."
 msgstr "警告#2：這些非官方字幕未經認可，不應盡信--任何人都可以修改它"
 
 #: templates/_testing_widget.html:17
@@ -2724,95 +2675,67 @@ msgid ""
 "\n"
 "            <h2>About Universal Subtitles</h2>\n"
 "            <p>\n"
-"                Universal Subtitles gives individuals, communities, and "
-"larger organizations the power \n"
-"                to overcome accessibility and language barriers for online "
-"video. The tools are free \n"
-"                and open source and make the work of subtitling and "
-"translating video simpler, more \n"
+"                Universal Subtitles gives individuals, communities, and larger organizations the power \n"
+"                to overcome accessibility and language barriers for online video. The tools are free \n"
+"                and open source and make the work of subtitling and translating video simpler, more \n"
 "                appealing, and, most of all, more collaborative.\n"
 "            </p>\n"
 "            <p>\n"
 "                The benefits of captioning and subtitling are immense:\n"
 "                <ul>\n"
-"                    <li>Captions make videos accessible for viewers who are "
-"deaf or hard of hearing</li>\n"
-"                    <li>Translations make it possible for all of us to watch "
-"video in languages that we don't speak</li>\n"
-"                    <li>Video creators get: better SEO, more views, access "
-"to a far bigger (potentially multilingual and global) audience, "
-"accessibility for deaf and hard of hearing viewers, and more</li>\n"
+"                    <li>Captions make videos accessible for viewers who are deaf or hard of hearing</li>\n"
+"                    <li>Translations make it possible for all of us to watch video in languages that we don't speak</li>\n"
+"                    <li>Video creators get: better SEO, more views, access to a far bigger (potentially multilingual and global) audience, accessibility for deaf and hard of hearing viewers, and more</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
 "                Universal Subtitles is composed of three main parts:\n"
 "                <ul>\n"
-"                    <li>A subtitle creation and viewing tool (aka the widget)"
-"</li>\n"
+"                    <li>A subtitle creation and viewing tool (aka the widget)</li>\n"
 "                    <li>A collaborative subtitling website</li>\n"
 "                    <li>An open protocol for subtitle search/delivery</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
-"                Everything we do is available under the open source <a href="
-"\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
+"                Everything we do is available under the open source <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
 "            </p>\n"
 "            <h2>Our Organization</h2>\n"
 "            <p>\n"
-"                <a href=\"http://www.pculture.org/\">Participatory Culture "
-"Foundation</a> \n"
-"                is a non-profit organization building free and open tools "
-"for more a democratic and \n"
-"                decentralized media. Other projects of ours include <a href="
-"\"http://www.getmiro.com/\">Miro</a>, \n"
-"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video "
-"Converter</a>, \n"
-"                <a href=\"http://www.mirocommunity.org/\">Miro Community</"
-"a>, and \n"
-"                <a href=\"http://www.openvideoalliance.org/\">Open Video "
-"Alliance</a>.\n"
+"                <a href=\"http://www.pculture.org/\">Participatory Culture Foundation</a> \n"
+"                is a non-profit organization building free and open tools for more a democratic and \n"
+"                decentralized media. Other projects of ours include <a href=\"http://www.getmiro.com/\">Miro</a>, \n"
+"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video Converter</a>, \n"
+"                <a href=\"http://www.mirocommunity.org/\">Miro Community</a>, and \n"
+"                <a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n"
 "            </p>\n"
 "            <p>\n"
-"                Universal Subtitles is a featured project of <a href="
-"\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
-"                and the Mozilla Foundation has provided development "
-"support.  \n"
-"                Open Society Institute and the MacArthur Foundation are also "
-"financial supporters.\n"
+"                Universal Subtitles is a featured project of <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
+"                and the Mozilla Foundation has provided development support.  \n"
+"                Open Society Institute and the MacArthur Foundation are also financial supporters.\n"
 "            </p>\n"
 "            <p>\n"
-"                Software development for Universal Subtitles is being done "
-"in partnership with \n"
+"                Software development for Universal Subtitles is being done in partnership with \n"
 "                <br/><a href=\"http://www.8planes.com/\">8 Planes</a>.\n"
 "            </p>\n"
 "            <h2>What's Coming Next?</h2>\n"
 "            <p>\n"
-"                We are currently in the alpha stages of this website and the "
-"subtitling tool-- that means we're just getting started! But we've opened up "
-"the site so that we can begin testing and get early feedback.\n"
-"                Many very important features are missing. Here's some of "
-"what we'll be working on in the coming months:\n"
+"                We are currently in the alpha stages of this website and the subtitling tool-- that means we're just getting started! But we've opened up the site so that we can begin testing and get early feedback.\n"
+"                Many very important features are missing. Here's some of what we'll be working on in the coming months:\n"
 "                <ul>\n"
 "                    <li>Better support for non-latin character sets</li>\n"
-"                    <li>A volunteer page and request center, where people "
-"can ask for captions and subtitles</li>\n"
-"                    <li>Machine translation option once subtitles have been "
-"transcribed</li>\n"
-"                    <li>Better keyboard accessibility for site and widget</"
-"li>\n"
+"                    <li>A volunteer page and request center, where people can ask for captions and subtitles</li>\n"
+"                    <li>Machine translation option once subtitles have been transcribed</li>\n"
+"                    <li>Better keyboard accessibility for site and widget</li>\n"
 "                    <li>Subtitle ratings and flagging</li>\n"
 "                    <li>Better community website features</li>\n"
-"                    <li>Better video browsing on our site, for finding "
-"interesting content</li>\n"
+"                    <li>Better video browsing on our site, for finding interesting content</li>\n"
 "                    <li>Compliance with emerging timed text standards</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
-"                Are there other features that are particular important to "
-"your use? \n"
+"                Are there other features that are particular important to your use? \n"
 "                We'd love to hear from you.<br/>\n"
-"                Email us: <a href=\"mailto:feedback@universalsubtitles.org"
-"\">universalsubtitles@pculture.org</a>\n"
+"                Email us: <a href=\"mailto:feedback@universalsubtitles.org\">universalsubtitles@pculture.org</a>\n"
 "            </p>\n"
 "        "
 msgstr ""
@@ -2847,11 +2770,9 @@ msgstr "登入"
 
 #: templates/base.html:100
 msgid ""
-"Universal Subtitles is a project of <a href=\"http://participatoryculture."
-"org/\">PCF</a>."
-msgstr ""
-"Universal Subtitles為<a href=\"http://participatoryculture.org/\">PCF</a>的其"
-"中一項專案"
+"Universal Subtitles is a project of <a "
+"href=\"http://participatoryculture.org/\">PCF</a>."
+msgstr "Universal Subtitles為<a href=\"http://participatoryculture.org/\">PCF</a>的其中一項專案"
 
 #: templates/base.html:103 templates/profiles/view_profile.html:68
 msgid "About"
@@ -2889,16 +2810,10 @@ msgstr "Universal Subtitles編輯器展示版"
 msgid ""
 "\n"
 "        <strong>What's this?</strong> The video below is for \n"
-"        demonstration purposes &mdash; try clicking the 'Subtitle Me' "
-"button!\n"
+"        demonstration purposes &mdash; try clicking the 'Subtitle Me' button!\n"
 "        Don't worry, nothing you do will be saved.\n"
 "        "
-msgstr ""
-"\n"
-"        <strong>這是什麼？</strong>下方影片是作為\n"
-"        展示用途使用 — 按下'Subtitle Me'按鈕試試看。\n"
-"        別擔心，您的所有動作都不會儲存。\n"
-"        "
+msgstr "\n        <strong>這是什麼？</strong>下方影片是作為\n        展示用途使用 — 按下'Subtitle Me'按鈕試試看。\n        別擔心，您的所有動作都不會儲存。\n        "
 
 #: templates/demo.html:45
 msgid ""
@@ -2906,11 +2821,7 @@ msgid ""
 "        <strong>Got feedback?</strong> Use the form at the bottom of \n"
 "        this page to give us your feedback, bugs, and opinions.\n"
 "        "
-msgstr ""
-"\n"
-"        <strong>有好點子？</strong>利用頁面底下的表格\n"
-"        讓我們知道您的意見、看法和問題。\n"
-"        "
+msgstr "\n        <strong>有好點子？</strong>利用頁面底下的表格\n        讓我們知道您的意見、看法和問題。\n        "
 
 #: templates/demo.html:51
 msgid ""
@@ -2919,12 +2830,7 @@ msgid ""
 "        version of our community website that will enable basic \n"
 "        collaboration on subtitles and translations. Stay tuned!\n"
 "        "
-msgstr ""
-"\n"
-"        <strong>未來規劃？</strong>我們正在製作社群\n"
-"        網站的alpha版本，提供基本的字幕協作功能。\n"
-"        有空常來！\n"
-"        "
+msgstr "\n        <strong>未來規劃？</strong>我們正在製作社群\n        網站的alpha版本，提供基本的字幕協作功能。\n        有空常來！\n        "
 
 #: templates/dmca.html:6
 msgid "Copyright Infringement Notification"
@@ -2933,77 +2839,44 @@ msgstr "版權侵害聲明"
 #: templates/dmca.html:9
 msgid ""
 "\n"
-"To file a copyright infringement notification with us, you will need to send "
-"a\n"
-"written communication that includes substantially the following (please "
-"consult\n"
+"To file a copyright infringement notification with us, you will need to send a\n"
+"written communication that includes substantially the following (please consult\n"
 "your legal counsel or see Section 512(c)(3) of the Copyright Act to confirm\n"
 "these requirements):\n"
-msgstr ""
-"\n"
-"若要提交版權侵害聲明，您需要上傳書面信函，主要內容需包含以下要件(請諮詢您的法"
-"律顧問或參閱著作權法第512條(c)(3)以確認下述要求)：\n"
+msgstr "\n若要提交版權侵害聲明，您需要上傳書面信函，主要內容需包含以下要件(請諮詢您的法律顧問或參閱著作權法第512條(c)(3)以確認下述要求)：\n"
 
 #: templates/dmca.html:18
 msgid ""
 "\n"
-"A physical or electronic signature of a person authorized to act on behalf "
-"of\n"
+"A physical or electronic signature of a person authorized to act on behalf of\n"
 "the owner of an exclusive right that is allegedly infringed.\n"
-"Identification of the copyrighted work claimed to have been infringed, or, "
-"if\n"
+"Identification of the copyrighted work claimed to have been infringed, or, if\n"
 "multiple copyrighted works at a single online site are covered by a single\n"
 "notification, a representative list of such works at that site.\n"
-"Identification of the material that is claimed to be infringing or to be "
-"the\n"
-"subject of infringing activity and that is to be removed or access to which "
-"is\n"
+"Identification of the material that is claimed to be infringing or to be the\n"
+"subject of infringing activity and that is to be removed or access to which is\n"
 "to be disabled, and information reasonably sufficient to permit the service\n"
-"provider to locate the material. Providing URLs in the body of an email is "
-"the\n"
+"provider to locate the material. Providing URLs in the body of an email is the\n"
 "best way to help us locate content quickly.\n"
-"Information reasonably sufficient to permit the service provider to contact "
-"the\n"
-"complaining party, such as an address, telephone number, and, if available, "
-"an\n"
+"Information reasonably sufficient to permit the service provider to contact the\n"
+"complaining party, such as an address, telephone number, and, if available, an\n"
 "electronic mail address at which the complaining party may be contacted.\n"
-"A statement that the complaining party has a good faith belief that use of "
-"the\n"
-"material in the manner complained of is not authorized by the copyright "
-"owner,\n"
+"A statement that the complaining party has a good faith belief that use of the\n"
+"material in the manner complained of is not authorized by the copyright owner,\n"
 "its agent, or the law.\n"
 "A statement that the information in the notification is accurate, and under\n"
-"penalty of perjury, that the complaining party is authorized to act on "
-"behalf\n"
+"penalty of perjury, that the complaining party is authorized to act on behalf\n"
 "of the owner of an exclusive right that is allegedly infringed.\n"
 "Such written notice should be sent to our designated agent as follows:\n"
-msgstr ""
-"\n"
-"－本人之實體或電子簽名授權，用以代表權利受侵害者。\n"
-"－指明遭受侵權之版權著作，若一份聲明在單一線上網站中涵蓋有複數份之著作，需提"
-"交其清單。\n"
-"－指明侵權或成為侵權活動對象之內容，鑑於內容可能已遭移除或無法連結，需提供足"
-"夠資訊予服務提供商以便確認內容位置。最好的方式是在email內文中提供相關URL，以"
-"協助我們找到內容來源。\n"
-"－提供充足資訊，使服務提供商得以聯絡申訴方，包含地址、電話號碼，或可連繫申訴"
-"方之電子郵件信箱。\n"
-"－聲明文件，敘明申訴方有足夠理由相信，所控之內容使用方式並未經著作權人、其代"
-"理人、或法律所授權。\n"
-"－聲明文件，敘明本聲明資訊的正確性，且了解偽證罪處罰之基礎下，申訴方有權代表"
-"權利受侵害人採取法律行動。\n"
-"－上述通知應送至下列指定代理人：\n"
+msgstr "\n－本人之實體或電子簽名授權，用以代表權利受侵害者。\n－指明遭受侵權之版權著作，若一份聲明在單一線上網站中涵蓋有複數份之著作，需提交其清單。\n－指明侵權或成為侵權活動對象之內容，鑑於內容可能已遭移除或無法連結，需提供足夠資訊予服務提供商以便確認內容位置。最好的方式是在email內文中提供相關URL，以協助我們找到內容來源。\n－提供充足資訊，使服務提供商得以聯絡申訴方，包含地址、電話號碼，或可連繫申訴方之電子郵件信箱。\n－聲明文件，敘明申訴方有足夠理由相信，所控之內容使用方式並未經著作權人、其代理人、或法律所授權。\n－聲明文件，敘明本聲明資訊的正確性，且了解偽證罪處罰之基礎下，申訴方有權代表權利受侵害人採取法律行動。\n－上述通知應送至下列指定代理人：\n"
 
 #: templates/dmca.html:55
 msgid ""
 "\n"
-"Please also note that under Section 512(f) any person who knowingly "
-"materially\n"
+"Please also note that under Section 512(f) any person who knowingly materially\n"
 "misrepresents that material or activity is infringing may be subject to\n"
 "liability.\n"
-msgstr ""
-"\n"
-"另請注意根據第512條(f)項，對於內容或活動之版權侵害，蓄意謊報者，可能承擔法律"
-"責任。\n"
+msgstr "\n另請注意根據第512條(f)項，對於內容或活動之版權侵害，蓄意謊報者，可能承擔法律責任。\n"
 
 #: templates/dmca.html:63
 msgid "Counter-Notification"
@@ -3014,16 +2887,10 @@ msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. "
-"Please\n"
-"also be advised that we enforce a policy that provides for the termination "
-"in\n"
+"disabled by mistake or misidentification may be subject to liability. Please\n"
+"also be advised that we enforce a policy that provides for the termination in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
-msgstr ""
-"\n"
-"請注意在著作權法案第512條(f)項規範下，對於物件或行為蓄意謊報侵權因而使移除或"
-"遭關閉者，可能承擔法律責任。另請注意在適當情況下，我們有權將屢次侵權者的帳號"
-"移除。\n"
+msgstr "\n請注意在著作權法案第512條(f)項規範下，對於物件或行為蓄意謊報侵權因而使移除或遭關閉者，可能承擔法律責任。另請注意在適當情況下，我們有權將屢次侵權者的帳號移除。\n"
 
 #: templates/dmca.html:75
 msgid "How do I file a DMCA counter notice?"
@@ -3033,40 +2900,27 @@ msgstr "如何提出DMCA抗辯？"
 msgid ""
 "\n"
 "The process for counter-notifications is governed by Section 512(g) of the\n"
-"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca."
-"pdf\n"
-msgstr ""
-"\n"
-"抗辯處理過程受數位千禧年著作權法第512條(g)項所管轄： http://www.copyright."
-"gov/legislation/dmca.pdf\n"
+"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca.pdf\n"
+msgstr "\n抗辯處理過程受數位千禧年著作權法第512條(g)項所管轄： http://www.copyright.gov/legislation/dmca.pdf\n"
 
 #: templates/dmca.html:82
 msgid ""
 "\n"
 "To file a counter notification with us, you must provide a written\n"
 "communication that sets forth the items specified below.\n"
-msgstr ""
-"\n"
-"若要向我們提交抗辯，您必須提供書面資料，並闡明下述各項。\n"
+msgstr "\n若要向我們提交抗辯，您必須提供書面資料，並闡明下述各項。\n"
 
 #: templates/dmca.html:87
 msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. "
-"Please\n"
-"also be advised that we enforce a policy that provides for the termination "
-"in\n"
+"disabled by mistake or misidentification may be subject to liability. Please\n"
+"also be advised that we enforce a policy that provides for the termination in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
 "Accordingly, if you are not sure whether certain material infringes the\n"
 "copyrights of others, we suggest that you first contact an attorney.\n"
-msgstr ""
-"\n"
-"請注意在著作權法案第512條(f)項規範下，對於物件或行為蓄意謊報侵權因而使移除或"
-"遭關閉者，可能承擔法律責任。另請注意在適當情況下，我們有權將屢次侵權者的帳號"
-"移除。\n"
-"據此，如果您並不確定部分內容是否侵害他人之著作權，我們建議您先諮詢律師。\n"
+msgstr "\n請注意在著作權法案第512條(f)項規範下，對於物件或行為蓄意謊報侵權因而使移除或遭關閉者，可能承擔法律責任。另請注意在適當情況下，我們有權將屢次侵權者的帳號移除。\n據此，如果您並不確定部分內容是否侵害他人之著作權，我們建議您先諮詢律師。\n"
 
 #: templates/dmca.html:99
 msgid "Elements of Counter-Notification"
@@ -3076,55 +2930,30 @@ msgstr "抗辯要項"
 msgid ""
 "\n"
 "A sample counter notification may be found at:\n"
-"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability "
-"to\n"
-"process your counter notification, please use the following format "
-"(including\n"
+"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability to\n"
+"process your counter notification, please use the following format (including\n"
 "section numbers):\n"
-msgstr ""
-"\n"
-"抗辯範例可在此取得：\n"
-"http://www.chillingeffects.org/dmca/counter512.pdf. 為加速處理的程序，請使用"
-"下列之格式(含條碼)：\n"
+msgstr "\n抗辯範例可在此取得：\nhttp://www.chillingeffects.org/dmca/counter512.pdf. 為加速處理的程序，請使用下列之格式(含條碼)：\n"
 
 #: templates/dmca.html:109
 msgid ""
 "\n"
-"Identify the specific URLs of material that Miro Guide has removed or to "
-"which\n"
+"Identify the specific URLs of material that Miro Guide has removed or to which\n"
 "Miro Guide has disabled access.\n"
-"Provide your full name, address, telephone number, and email address, and "
-"the\n"
+"Provide your full name, address, telephone number, and email address, and the\n"
 "username of your Miro Guide account.\n"
-"Provide a statement that you consent to the jurisdiction of Federal "
-"District\n"
+"Provide a statement that you consent to the jurisdiction of Federal District\n"
 "Court for the judicial district in which your address is located (or San\n"
-"Francisco County, California if your address is outside of the United "
-"States),\n"
+"Francisco County, California if your address is outside of the United States),\n"
 "and that you will accept service of process from the person who provided\n"
 "notification under subsection (c)(1)(C) or an agent of such person.\n"
-"Include the following statement: \"I swear, under penalty of perjury, that "
-"I\n"
-"have a good faith belief that the material was removed or disabled as a "
-"result\n"
-"of a mistake or misidentification of the material to be removed or disabled."
-"\"\n"
+"Include the following statement: \"I swear, under penalty of perjury, that I\n"
+"have a good faith belief that the material was removed or disabled as a result\n"
+"of a mistake or misidentification of the material to be removed or disabled.\"\n"
 "Sign the notice. If you are providing notice by e-mail, a scanned physical\n"
 "signature or a valid electronic signature will be accepted.\n"
 "Send the written communication to the following address:\n"
-msgstr ""
-"\n"
-"－指明遭Miro Guide移除或停用連結之內容URL。\n"
-"－提供您的全名、地址、電話號碼及email信箱，以及您的Miro Guide帳號。\n"
-"－提供您的同意聲明，接受地址所在司法區之聯邦地區法院之管轄(若您的地址不在美國"
-"境內，則為加州舊金山郡)，且接受出示分款 (c)(1)(C) 其人或其代理人所送達之訴訟"
-"文書。\n"
-"－包含下列聲明：\"I swear, under penalty of perjury, that I\n"
-"have a good faith belief that the material was removed or disabled as a "
-"result of a mistake or misidentification of the material to be removed or "
-"disabled.\"\n"
-"－簽署聲明。若經由電子郵件傳遞，實體簽名掃描檔、或是有效之電子簽名亦可。\n"
-"－將書面聲明送至下列位址：\n"
+msgstr "\n－指明遭Miro Guide移除或停用連結之內容URL。\n－提供您的全名、地址、電話號碼及email信箱，以及您的Miro Guide帳號。\n－提供您的同意聲明，接受地址所在司法區之聯邦地區法院之管轄(若您的地址不在美國境內，則為加州舊金山郡)，且接受出示分款 (c)(1)(C) 其人或其代理人所送達之訴訟文書。\n－包含下列聲明：\"I swear, under penalty of perjury, that I\nhave a good faith belief that the material was removed or disabled as a result of a mistake or misidentification of the material to be removed or disabled.\"\n－簽署聲明。若經由電子郵件傳遞，實體簽名掃描檔、或是有效之電子簽名亦可。\n－將書面聲明送至下列位址：\n"
 
 #: templates/dmca.html:141
 msgid "What happens next?"
@@ -3133,50 +2962,31 @@ msgstr "接下來會如何處理？"
 #: templates/dmca.html:143
 msgid ""
 "\n"
-"After we receive your counter-notification, we will forward it to the party "
-"who\n"
-"submitted the original claim of copyright infringement. Please note that "
-"when\n"
-"we forward the counter-notification, it includes your personal information. "
-"By\n"
+"After we receive your counter-notification, we will forward it to the party who\n"
+"submitted the original claim of copyright infringement. Please note that when\n"
+"we forward the counter-notification, it includes your personal information. By\n"
 "submitting a counter-notification, you consent to having your information\n"
-"revealed in this way. We will not forward the counter-notification to any "
-"party\n"
+"revealed in this way. We will not forward the counter-notification to any party\n"
 "other than the original claimant.\n"
-msgstr ""
-"\n"
-"收到您的抗辯聲明後，我們會將其轉寄至原著作權申訴方。請注意當聲明轉發時，內容"
-"將包含您的個人資料。提出抗辯聲明即表示您同意個人資料以此種方式揭露。我們不會"
-"將抗辯聲明轉寄給申訴方以外的第三者。\n"
+msgstr "\n收到您的抗辯聲明後，我們會將其轉寄至原著作權申訴方。請注意當聲明轉發時，內容將包含您的個人資料。提出抗辯聲明即表示您同意個人資料以此種方式揭露。我們不會將抗辯聲明轉寄給申訴方以外的第三者。\n"
 
 #: templates/dmca.html:153
 msgid ""
 "\n"
-"After we send out the counter-notification, the claimant must then notify "
-"us\n"
+"After we send out the counter-notification, the claimant must then notify us\n"
 "within 10 days that he or she has filed an action seeking a court order to\n"
-"restrain you from engaging in infringing activity relating to the material "
-"on\n"
-"the Miro Guide. If we receive such notification we will be unable to "
-"restore\n"
+"restrain you from engaging in infringing activity relating to the material on\n"
+"the Miro Guide. If we receive such notification we will be unable to restore\n"
 "the material. If we do not receive such notification, we may reinstate the\n"
 "material.\n"
-msgstr ""
-"\n"
-"自轉送抗辯聲明後，申訴方需於10天內通知我們以就Miro Guide上遭侵權之內容展開行"
-"動以阻止您的侵權行為。我們若是收到此通知便無法回復內容，反之亦然。\n"
+msgstr "\n自轉送抗辯聲明後，申訴方需於10天內通知我們以就Miro Guide上遭侵權之內容展開行動以阻止您的侵權行為。我們若是收到此通知便無法回復內容，反之亦然。\n"
 
 #: templates/dmca.html:163
 msgid ""
 "\n"
-"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE "
-"IS\n"
-"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES "
-"ONLY.\n"
-msgstr ""
-"\n"
-"免責聲明：我們並非您的律師，此處所提供之資訊並非法律諮詢。此處資訊僅供參考之"
-"用。\n"
+"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE IS\n"
+"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES ONLY.\n"
+msgstr "\n免責聲明：我們並非您的律師，此處所提供之資訊並非法律諮詢。此處資訊僅供參考之用。\n"
 
 #: templates/embed_page.html:24
 msgid "Add collaborative subtitling to every video on your site"
@@ -3189,16 +2999,9 @@ msgstr "只需在您的頁面上加入一行代碼："
 #: templates/embed_page.html:32
 msgid ""
 "\n"
-"            You can add it just before the <code>&lt;/head&gt;</code> or "
-"<code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/"
-"unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
+"            You can add it just before the <code>&lt;/head&gt;</code> or <code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
 "        "
-msgstr ""
-"\n"
-"            代碼可以加在<code></head></code>或<code></body></code>標籤之前"
-"(<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-"
-"guide\">觀看使用說明</a>)。\n"
-"        "
+msgstr "\n            代碼可以加在<code></head></code>或<code></body></code>標籤之前(<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">觀看使用說明</a>)。\n        "
 
 #: templates/embed_page.html:37
 msgid "This lets you and visitors to your site"
@@ -3235,15 +3038,10 @@ msgstr "Mozilla Drumbeat的特色專案"
 #: templates/embed_page.html:66
 msgid ""
 "\n"
-"        A \"subtitle me\" or \"choose language\" button will appear across "
-"all compatible videos. \n"
+"        A \"subtitle me\" or \"choose language\" button will appear across all compatible videos. \n"
 "        Users can click to activate (or create) subtitles.\n"
 "        "
-msgstr ""
-"\n"
-"        \"製作字幕\"或\"選擇語言\"按鈕會出現在所有支援的影片。 \n"
-"        使用者可以按鈕來啟動(或製作)字幕。\n"
-"        "
+msgstr "\n        \"製作字幕\"或\"選擇語言\"按鈕會出現在所有支援的影片。 \n        使用者可以按鈕來啟動(或製作)字幕。\n        "
 
 #: templates/embed_page.html:77
 msgid "This code is experimental. If you run into problems, please"
@@ -3273,9 +3071,7 @@ msgstr "字幕的好處在哪？"
 msgid ""
 "Who is the Participatory Culture Foundation and why are they making "
 "Universal Subtitles?"
-msgstr ""
-"Participatory Culture Foundation是什麼組織？為什麼他們要推出Universal "
-"Subtitles？"
+msgstr "Participatory Culture Foundation是什麼組織？為什麼他們要推出Universal Subtitles？"
 
 #: templates/faq.html:23 templates/faq.html.py:78
 msgid ""
@@ -3321,11 +3117,9 @@ msgstr "哪裡可以下載.SRT或其他格式的字幕？"
 
 #: templates/faq.html:33 templates/faq.html.py:149
 msgid ""
-"It says \"Someone else is currently editing these subtitles\" and I can't do "
-"anything.  How long will this last for?  Why does it happen?"
-msgstr ""
-"網站顯示\"有人正在編輯這份字幕\"而禁止使用，  請問會持續多久？  為什麼會有這"
-"個問題？"
+"It says \"Someone else is currently editing these subtitles\" and I can't do"
+" anything.  How long will this last for?  Why does it happen?"
+msgstr "網站顯示\"有人正在編輯這份字幕\"而禁止使用，  請問會持續多久？  為什麼會有這個問題？"
 
 #: templates/faq.html:34 templates/faq.html.py:159
 msgid "Why can't I change the timing on a translation?"
@@ -3333,14 +3127,14 @@ msgstr "為什麼我不能更改翻譯的時間標記？"
 
 #: templates/faq.html:35 templates/faq.html.py:170
 msgid ""
-"How do old revisions work? What if somebody makes a change to my work that I "
-"don't approve of?"
+"How do old revisions work? What if somebody makes a change to my work that I"
+" don't approve of?"
 msgstr "如何使用舊的修改版本？如果有人修改了我的檔案而我不認同該怎麼辦？"
 
 #: templates/faq.html:36 templates/faq.html.py:186
 msgid ""
-"How do I add the Universal Subtitles &quot;embed all videos&quot; code to my "
-"site?"
+"How do I add the Universal Subtitles &quot;embed all videos&quot; code to my"
+" site?"
 msgstr "該如何將Universal Subtitles\"嵌入所有影片\"的程式碼加入我的網站？"
 
 #: templates/faq.html:37 templates/faq.html.py:199
@@ -3350,61 +3144,22 @@ msgstr "嘿，你們沒有列出我的語言！"
 #: templates/faq.html:45
 msgid ""
 "\n"
-"      \t\tUniversal Subtitles is an easy way for anyone to add subtitles, "
-"captions, \n"
-"\t\t\tor translate nearly any video on the web. It works in a "
-"collaborative \n"
-"\t\t\tWikipedia-like fashion. The software is free and open source and can "
-"be used and \n"
-"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center"
-"\">improved by anyone</a>.\n"
+"      \t\tUniversal Subtitles is an easy way for anyone to add subtitles, captions, \n"
+"\t\t\tor translate nearly any video on the web. It works in a collaborative \n"
+"\t\t\tWikipedia-like fashion. The software is free and open source and can be used and \n"
+"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center\">improved by anyone</a>.\n"
 "\t\t"
-msgstr ""
-"\n"
-"      <span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>Universal Subtitles 讓任何人都能輕"
-"鬆加入字幕 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" "
-"title=\"Tab\">»</span>或翻譯網路上任何影片。使用類似Wikipedia的 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" "
-"title=\"Tab\">»</span>協作方式，軟體免費且開源，能夠讓任何人使用和\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" "
-"title=\"Tab\">»</span><a href=\"http://wiki.github.com/pculture/unisubs/dev-"
-"center\">改進</a>\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>"
+msgstr "\n      <span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>Universal Subtitles 讓任何人都能輕鬆加入字幕 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>或翻譯網路上任何影片。使用類似Wikipedia的 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>協作方式，軟體免費且開源，能夠讓任何人使用和\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><a href=\"http://wiki.github.com/pculture/unisubs/dev-center\">改進</a>\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>"
 
 #: templates/faq.html:56
 msgid ""
 "\n"
-"      \t\tYou're welcome to try our <a href=\"http://universalsubtitles.org/"
-"demo/\">demo</a> \n"
+"      \t\tYou're welcome to try our <a href=\"http://universalsubtitles.org/demo/\">demo</a> \n"
 "\t\t\tto see how the software works. You can also \n"
-"\t\t\t<a href=\"http://universalsubtitles.org/videos/create\">begin "
-"subtitling</a> \n"
+"\t\t\t<a href=\"http://universalsubtitles.org/videos/create\">begin subtitling</a> \n"
 "\t\t\ta video you have already posted on the web.\t\n"
 "\t\t"
-msgstr ""
-"\n"
-"      <span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>歡迎您來嘗試我們的<a href="
-"\"http://universalsubtitles.org/demo/\">測試版</a> \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" "
-"title=\"Tab\">»</span>欲了解軟體如何運作，您可以直接開始 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" "
-"title=\"Tab\">»</span><a href=\"http://universalsubtitles.org/videos/create"
-"\">製作字幕</a>， \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" "
-"title=\"Tab\">»</span>為您的網路影片加上字幕。<span class=\"whitespace other"
-"\" title=\"Tab\">»</span>\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>"
+msgstr "\n      <span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>歡迎您來嘗試我們的<a href=\"http://universalsubtitles.org/demo/\">測試版</a> \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>欲了解軟體如何運作，您可以直接開始 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><a href=\"http://universalsubtitles.org/videos/create\">製作字幕</a>， \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>為您的網路影片加上字幕。<span class=\"whitespace other\" title=\"Tab\">»</span>\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>"
 
 #: templates/faq.html:66
 msgid "VVideo subtitles are a gold mine of untapped potential."
@@ -3417,8 +3172,8 @@ msgstr "字幕讓失聰或是聽障人士能夠欣賞影片 "
 
 #: templates/faq.html:69
 msgid ""
-"Translations make it possible for all of us to watch video in languages that "
-"we don't speak"
+"Translations make it possible for all of us to watch video in languages that"
+" we don't speak"
 msgstr "字幕翻譯讓使用其他語言的人也能夠觀賞影片"
 
 #: templates/faq.html:70
@@ -3426,27 +3181,21 @@ msgid ""
 "Video creators get: better SEO, more views, access to a far bigger "
 "(potentially multilingual and global) audience, accessibility for deaf and "
 "hard of hearing viewers, and more"
-msgstr ""
-"對影片製作人來說：影片搜尋可見度增加、更多人觀看、更寬泛的(全世界各語系)觀眾"
-"群，協助失聰或是聽障人士...等等"
+msgstr "對影片製作人來說：影片搜尋可見度增加、更多人觀看、更寬泛的(全世界各語系)觀眾群，協助失聰或是聽障人士...等等"
 
 #: templates/faq.html:75
 msgid ""
-"he Participatory Culture Foundation is a 501c3 non-profit organization whose "
-"mission is to build a fairer, more open, and more democratic media space. "
+"he Participatory Culture Foundation is a 501c3 non-profit organization whose"
+" mission is to build a fairer, more open, and more democratic media space. "
 "PCF saw a gap in the marketplace for more open and collaborative subtitling "
 "&mdash; Universal Subtitles is helping to fill that need."
-msgstr ""
-"Participatory Culture Foundation為一 501c3 非營利組織，致力於提供更加公平、開"
-"放、民主的媒體空間。PCF發現市面上存在對開放協作字幕的需求 &mdash；Universal "
-"Subtitles則協助填補這樣的需求"
+msgstr "Participatory Culture Foundation為一 501c3 非營利組織，致力於提供更加公平、開放、民主的媒體空間。PCF發現市面上存在對開放協作字幕的需求 &mdash；Universal Subtitles則協助填補這樣的需求"
 
 #: templates/faq.html:79
 msgid ""
 "Yes, we are working on a solution for making closed captions [including "
 "information about sounds and music], as well as subtitles/translations."
-msgstr ""
-"是的，我們正在進行closed captions[包括音效及音樂等資訊]及字幕/翻譯的解決方案"
+msgstr "是的，我們正在進行closed captions[包括音效及音樂等資訊]及字幕/翻譯的解決方案"
 
 #: templates/faq.html:83
 msgid ""
@@ -3456,274 +3205,124 @@ msgstr "我們會盡可能支援大多數的語言/字符集"
 #: templates/faq.html:88
 msgid ""
 "\n"
-"      \tThe site and tools are available in a number of languages (set your "
-"language \n"
-"\t\tin your browser preferences and we’ll take care of the rest). We’re "
-"always looking for \n"
-"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-"
-"translateable-looking-for-translators/\">volunteer translators</a> \n"
+"      \tThe site and tools are available in a number of languages (set your language \n"
+"\t\tin your browser preferences and we’ll take care of the rest). We’re always looking for \n"
+"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-translators/\">volunteer translators</a> \n"
 "\t\tto help improve and add more languages.\n"
 "\t  "
-msgstr ""
-"\n"
-"      <span class=\"whitespace other\" title=\"Tab\">»</span>本網站和應用工具"
-"支援數種語言(請設定您的 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>瀏覽器語言偏好，我們會搞定剩下"
-"的)。我們一直在尋找 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span><a href=\"http://blog."
-"universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-"
-"translators/\">翻譯志工</a> \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>協助我們改進並增加更多語言的支"
-"援。\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span>  "
+msgstr "\n      <span class=\"whitespace other\" title=\"Tab\">»</span>本網站和應用工具支援數種語言(請設定您的 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>瀏覽器語言偏好，我們會搞定剩下的)。我們一直在尋找 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-translators/\">翻譯志工</a> \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>協助我們改進並增加更多語言的支援。\n<span class=\"whitespace other\" title=\"Tab\">»</span>  "
 
 #: templates/faq.html:99
 msgid ""
 "\n"
-"\t      For a single video, use our site. For multiple videos on your "
-"website, use \n"
-"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> "
-"in your \n"
+"\t      For a single video, use our site. For multiple videos on your website, use \n"
+"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> in your \n"
 "\t\t  website’s template inside the &lt;head&gt; tags.\n"
 "\t\t"
-msgstr ""
-"\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span>      單一影片，您可以"
-"使用我們的網站功能；若是您的網站上的多數影片，可以把 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>  <a href=\"http://"
-"universalsubtitles.org/en/get-code/\">此程式碼</a> 嵌入\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>  網站模板的<head>標籤當中。\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>"
+msgstr "\n<span class=\"whitespace other\" title=\"Tab\">»</span>      單一影片，您可以使用我們的網站功能；若是您的網站上的多數影片，可以把 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  <a href=\"http://universalsubtitles.org/en/get-code/\">此程式碼</a> 嵌入\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  網站模板的<head>標籤當中。\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>"
 
 #: templates/faq.html:108
 msgid ""
-"For our subtitling widget and community website, we're using the <a href="
-"\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
-msgstr ""
-"我們的字幕widget以及社群網站使用<a href=\"http://en.wikipedia.org/wiki/"
-"Affero_General_Public_License\">AGPL</a>授權"
+"For our subtitling widget and community website, we're using the <a "
+"href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
+msgstr "我們的字幕widget以及社群網站使用<a href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>授權"
 
 #: templates/faq.html:112
 msgid ""
 "Please do! If you're interested in coding and development, please visit our "
 "<a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">developer "
 "center</a>."
-msgstr ""
-"當然歡迎！如果您對程式及開發有興趣，請到我們的 &lt;a href=\"http://wiki."
-"github.com/8planes/mirosubs/dev-center\"&gt;開發中心&lt;/a&gt;"
+msgstr "當然歡迎！如果您對程式及開發有興趣，請到我們的 &lt;a href=\"http://wiki.github.com/8planes/mirosubs/dev-center\"&gt;開發中心&lt;/a&gt;"
 
 #: templates/faq.html:117
 msgid ""
 "\n"
 "\t\tIf you're interested in general involvement, please see our \n"
-"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla "
-"Drumbeat page</a>. \n"
+"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla Drumbeat page</a>. \n"
 "\t\tIf you have a specific idea, please get in touch: \n"
-"\t\t<a href=\"mailto:universalsubtitles@pculture.org"
-"\">universalsubtitles@pculture.org</a> \n"
-"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next "
-"question for details).\n"
+"\t\t<a href=\"mailto:universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n"
+"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next question for details).\n"
 "\t\t"
-msgstr ""
-"\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>若是對一般性參與有興趣，請到我們"
-"的 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span><a href=\"https://www.drumbeat."
-"org/project/universal-subtitles\">Mozilla Drumbeat 頁面</a>。 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>如果您有什麼好點子，請連絡： \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span><a href=\"mailto:"
-"universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>身為 501c3 非營利網站，我們也接受"
-"捐款(相關細節請看下一篇問題)。\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>"
+msgstr "\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>若是對一般性參與有興趣，請到我們的 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla Drumbeat 頁面</a>。 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>如果您有什麼好點子，請連絡： \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><a href=\"mailto:universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>身為 501c3 非營利網站，我們也接受捐款(相關細節請看下一篇問題)。\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>"
 
 #: templates/faq.html:128
 msgid ""
 "\n"
-"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/"
-"contribute/universalsubtitles\">donate here</a> (through the Mozilla "
-"Drumbeat project).\n"
+"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">donate here</a> (through the Mozilla Drumbeat project).\n"
 "\t\t"
-msgstr ""
-"\n"
-"      <span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>非常歡迎！您可以捐款到<a href="
-"\"https://donate.mozilla.org/page/contribute/universalsubtitles\">這裡</a> "
-"(經由Mozilla Drumbeat專案)。\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>"
+msgstr "\n      <span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>非常歡迎！您可以捐款到<a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">這裡</a> (經由Mozilla Drumbeat專案)。\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>"
 
 #: templates/faq.html:135
 msgid ""
 "The Mozilla Foundation has provided Universal Subtitles with seed funding, "
-"community support, and fundraising support through <a href=\"http://www."
-"drumbeat.org/about\">Drumbeat</a>. Drumbeat is a movement to keep the web "
-"open for the next 100 years, and Universal Subtitles is a featured project!"
-msgstr ""
-"Mozilla基金會透過<a href=\"http://www.drumbeat.org/about\">Drumbeat</a>為"
-"Universal Subtitles提供了種子基金、社群以及募款協助。Drumbeat運動希望讓網路在"
-"接下來的100年都能保持開放，而Universal Subtitles是其中的一項專案"
+"community support, and fundraising support through <a "
+"href=\"http://www.drumbeat.org/about\">Drumbeat</a>. Drumbeat is a movement "
+"to keep the web open for the next 100 years, and Universal Subtitles is a "
+"featured project!"
+msgstr "Mozilla基金會透過<a href=\"http://www.drumbeat.org/about\">Drumbeat</a>為Universal Subtitles提供了種子基金、社群以及募款協助。Drumbeat運動希望讓網路在接下來的100年都能保持開放，而Universal Subtitles是其中的一項專案"
 
 #: templates/faq.html:140
 msgid ""
 "\n"
-"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, ."
-"TXT, and TTML \n"
-"     \t formats on the page for that language (<a href=\"http://"
-"universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
-"\t\t Click \"Download Subtitles\" button in the lower right to the left from "
-"\"Edit Subtitles\" \n"
+"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, .TXT, and TTML \n"
+"     \t formats on the page for that language (<a href=\"http://universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
+"\t\t Click \"Download Subtitles\" button in the lower right to the left from \"Edit Subtitles\" \n"
 "\t\t button and choose the desired file format from the drop-down list.\n"
 "       "
-msgstr ""
-"\n"
-"     <span class=\"whitespace other\" title=\"Tab\">»</span>當影片提供字幕"
-"時，您可以用以下格式下載字幕：.SRT、.SSA、.SBV、.TXT和TTML \n"
-"     <span class=\"whitespace other\" title=\"Tab\">»</span>此語言頁面的格式 "
-"(<a href=\"http://universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">範例</"
-"a>) \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>按下頁面右下方，\"編輯字幕\"左邊的"
-"\"下載字幕\"  \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>按鈕，在下拉選單中選擇檔案格式。\n"
-"       "
+msgstr "\n     <span class=\"whitespace other\" title=\"Tab\">»</span>當影片提供字幕時，您可以用以下格式下載字幕：.SRT、.SSA、.SBV、.TXT和TTML \n     <span class=\"whitespace other\" title=\"Tab\">»</span>此語言頁面的格式 (<a href=\"http://universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">範例</a>) \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>按下頁面右下方，\"編輯字幕\"左邊的\"下載字幕\"  \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>按鈕，在下拉選單中選擇檔案格式。\n       "
 
 #: templates/faq.html:151
 msgid ""
 "\n"
-"        The system currently only allows one user to edit subtitles for any "
-"given video \n"
-"        at a time. So, if someone else is already editing subtitles for the "
-"video when \n"
+"        The system currently only allows one user to edit subtitles for any given video \n"
+"        at a time. So, if someone else is already editing subtitles for the video when \n"
 "        you try to edit the subtitles, you'll get this message.\n"
 "        "
-msgstr ""
-"\n"
-"        目前系統一次只允許一位使用者編輯影片 \n"
-"        ，因此如果您打算編輯字幕的時候，正好 \n"
-"        有其他人佔用，就會出現這段訊息。\n"
-"        "
+msgstr "\n        目前系統一次只允許一位使用者編輯影片 \n        ，因此如果您打算編輯字幕的時候，正好 \n        有其他人佔用，就會出現這段訊息。\n        "
 
 #: templates/faq.html:161
 msgid ""
 "\n"
-"        You can. Go to the translation editor and click “Change subtitle "
-"timing”. \n"
-"\t\tOnly do this if the timing on the original language really cannot "
-"match \n"
-"\t\tthe language you’re translating into. Otherwise, improvements in the "
-"original \n"
+"        You can. Go to the translation editor and click “Change subtitle timing”. \n"
+"\t\tOnly do this if the timing on the original language really cannot match \n"
+"\t\tthe language you’re translating into. Otherwise, improvements in the original \n"
 "\t\twill automatically cascade.\n"
 "        "
-msgstr ""
-"\n"
-"        沒問題。打開翻譯編輯器，選擇\"修改字幕時間標記\" \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>只有在原先的字幕時間標記和 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>您翻譯的語言無法吻合時才修改。否"
-"則，對原始字幕的修改 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>會自動傳遞。\n"
-"        "
+msgstr "\n        沒問題。打開翻譯編輯器，選擇\"修改字幕時間標記\" \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>只有在原先的字幕時間標記和 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>您翻譯的語言無法吻合時才修改。否則，對原始字幕的修改 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>會自動傳遞。\n        "
 
 #: templates/faq.html:172
 msgid ""
 "\n"
 "        Each set of subtitles or translation has a full revision history. \n"
-"\t\tJust click on the tab on the subtitle page in you will see a list of "
-"revisions. \n"
-"\t\tYou can use the checkboxes on the left and the \"compare revisions\" "
-"button \n"
-"\t\tto see the difference between two revisions. Or you can click on any one "
-"revision, \n"
+"\t\tJust click on the tab on the subtitle page in you will see a list of revisions. \n"
+"\t\tYou can use the checkboxes on the left and the \"compare revisions\" button \n"
+"\t\tto see the difference between two revisions. Or you can click on any one revision, \n"
 "\t\tand edit based on that revision or roll back to that revision.\n"
 "        <br/><br/>\n"
 "        If the current version is blank, but there are older revisions, \n"
-"\t\tit make sense to check those older revisions before starting from "
-"scratch, \n"
+"\t\tit make sense to check those older revisions before starting from scratch, \n"
 "\t\tbecause there could be useful work in an older revision.\n"
 "        "
-msgstr ""
-"\n"
-"        每一組字幕翻譯都有完整的修訂歷程。 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>在字幕頁面點一下按鈕就可以看到每次"
-"修訂的列表。 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>您可以使用左邊的勾選方框加上\"修訂"
-"比較\"按鈕 \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>來比較兩份修訂之間的差異。或者直接"
-"按下任一次修訂， \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>在此修訂的基礎上編輯字幕，或是回溯"
-"到此次修訂。\n"
-"        <br/><br/>\n"
-"        如果目前的版本一片空白，而有另一個舊的版本， \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>那您可以先確認一下舊版本的內容，不"
-"要急著從頭來過， \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>而且舊的版本裡面可能有某些內容會有"
-"幫助。\n"
-"        "
+msgstr "\n        每一組字幕翻譯都有完整的修訂歷程。 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>在字幕頁面點一下按鈕就可以看到每次修訂的列表。 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>您可以使用左邊的勾選方框加上\"修訂比較\"按鈕 \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>來比較兩份修訂之間的差異。或者直接按下任一次修訂， \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>在此修訂的基礎上編輯字幕，或是回溯到此次修訂。\n        <br/><br/>\n        如果目前的版本一片空白，而有另一個舊的版本， \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>那您可以先確認一下舊版本的內容，不要急著從頭來過， \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>而且舊的版本裡面可能有某些內容會有幫助。\n        "
 
 #: templates/faq.html:188
 msgid ""
 "\n"
-"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this "
-"page</a> \n"
+"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this page</a> \n"
 "\t\t  and double click on the code in the white box to select it all.  \n"
-"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your "
-"clipboard.  \n"
+"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your clipboard.  \n"
 "\t\t  Then start editing the headers in your site or blog theme, \n"
-"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/"
-"head&gt; \n"
+"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/head&gt; \n"
 "\t\t  tags in your blog theme.  \n"
 "        "
-msgstr ""
-"\n"
-"          前往<a href=\"http://universalsubtitles.org/get-code/\">這個頁面</"
-"a> \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>  連按兩下以全選白色框中的程式"
-"碼。  \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>  在您的瀏覽器的功能列或右鍵選單選"
-"擇編輯 > 複製，把程式碼抓到您的剪貼簿中。  \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>  接下來在您的網站或是部落格模板中"
-"編輯headers內容\n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>  將剛才複製的程式碼貼到 <head> "
-"跟 </head> \n"
-"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
-"\"whitespace other\" title=\"Tab\">»</span>  這兩個標籤之間。  \n"
-"        "
+msgstr "\n          前往<a href=\"http://universalsubtitles.org/get-code/\">這個頁面</a> \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  連按兩下以全選白色框中的程式碼。  \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  在您的瀏覽器的功能列或右鍵選單選擇編輯 > 複製，把程式碼抓到您的剪貼簿中。  \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  接下來在您的網站或是部落格模板中編輯headers內容\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  將剛才複製的程式碼貼到 <head> 跟 </head> \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  這兩個標籤之間。  \n        "
 
 #: templates/faq.html:201
 msgid ""
 "\n"
 "          Sorry about that.  Just contact us and we’ll be happy to add it.\n"
 "        "
-msgstr ""
-"\n"
-"          非常抱歉。  請聯絡我們，我們會非常樂意把它加進去\n"
-"        "
+msgstr "\n          非常抱歉。  請聯絡我們，我們會非常樂意把它加進去\n        "
 
 #: templates/feedback_response.html:3
 msgid ""
@@ -3792,8 +3391,7 @@ msgstr "徵求志工"
 #: templates/index.html:41
 msgid ""
 "\n"
-"            Our deaf and hard of hearing users and non-profits request help "
-"for videos that need captions or translations. \n"
+"            Our deaf and hard of hearing users and non-profits request help for videos that need captions or translations. \n"
 "        "
 msgstr ""
 
@@ -3808,9 +3406,7 @@ msgstr "完整的字幕解決方案"
 #: templates/index.html:50
 msgid ""
 "\n"
-"            Increase viewership with transcription, captioning, and "
-"translation services, and flexible API and integration options. Improve SEO, "
-"reach a global audience, and build a managed volunteer community.\n"
+"            Increase viewership with transcription, captioning, and translation services, and flexible API and integration options. Improve SEO, reach a global audience, and build a managed volunteer community.\n"
 "        "
 msgstr ""
 
@@ -3884,8 +3480,8 @@ msgstr "新增帳號"
 
 #: templates/index_old.html:29
 msgid ""
-"It's powered by viewers and other volunteers: it's collaborative editing and "
-"translation, like a wiki."
+"It's powered by viewers and other volunteers: it's collaborative editing and"
+" translation, like a wiki."
 msgstr "透過觀眾以及志工來運作：線上編輯以及翻譯協作，就像wiki一樣"
 
 #: templates/index_old.html:30
@@ -3896,9 +3492,7 @@ msgstr "新增帳號"
 msgid ""
 "The fastest way to add subtitle functionality to a single video or a whole "
 "site. Super easy to integrate with no software to install."
-msgstr ""
-"將字幕功能加入單一影片或是網站整體最快的方式。整合方式超簡單，無需額外安裝軟"
-"體"
+msgstr "將字幕功能加入單一影片或是網站整體最快的方式。整合方式超簡單，無需額外安裝軟體"
 
 #: templates/index_old.html:32
 msgid "Free, open-source, and non-profit!"
@@ -3926,8 +3520,8 @@ msgstr "對每個網頁或網站上的影片"
 
 #: templates/index_old.html:73
 msgid ""
-"paste this single line of code into your page header and every video will be "
-"subtitle enabled"
+"paste this single line of code into your page header and every video will be"
+" subtitle enabled"
 msgstr "將這一行程式碼貼到你的頁面header裡，這樣每部影片都會啟用字幕功能"
 
 #: templates/index_old.html:77
@@ -3947,9 +3541,7 @@ msgid ""
 "We've built the easiest way to subtitle videos. Add our subtitling widget "
 "toyour video (or your site) and click the \"subtitle me\" button. The rest "
 "is simple! Totally free, and no software to download."
-msgstr ""
-"我們提供製作字幕最簡單的方式。把字幕工具加到您的影片(或網站)，按下\"製作字幕"
-"\"按鈕之後輕鬆搞定！完全免費，無需下載軟體。"
+msgstr "我們提供製作字幕最簡單的方式。把字幕工具加到您的影片(或網站)，按下\"製作字幕\"按鈕之後輕鬆搞定！完全免費，無需下載軟體。"
 
 #: templates/index_old.html:96
 msgid "Add translations"
@@ -3958,21 +3550,12 @@ msgstr "加入翻譯"
 #: templates/index_old.html:98
 msgid ""
 "\n"
-"          Once subtitles exist, any viewer can add a translation in any "
-"language.  No\n"
-"          need for robotic machine translations that confuse viewers.  "
-"Universal\n"
-"          Subtitles lets you collect high-quality translations from your "
-"viewer\n"
+"          Once subtitles exist, any viewer can add a translation in any language.  No\n"
+"          need for robotic machine translations that confuse viewers.  Universal\n"
+"          Subtitles lets you collect high-quality translations from your viewer\n"
 "          community.\n"
 "          "
-msgstr ""
-"\n"
-"          當字幕完成時，任何人都可以將其翻譯成\n"
-"          別的語言。不必使用詞不達意的機器翻譯  \n"
-"          Universal Subtitles讓觀眾集體幫您完成高\n"
-"          品質的翻譯。\n"
-"          "
+msgstr "\n          當字幕完成時，任何人都可以將其翻譯成\n          別的語言。不必使用詞不達意的機器翻譯  \n          Universal Subtitles讓觀眾集體幫您完成高\n          品質的翻譯。\n          "
 
 #: templates/index_old.html:108
 msgid "Get volunteer help"
@@ -3981,21 +3564,12 @@ msgstr "取得志工協助"
 #: templates/index_old.html:110
 msgid ""
 "\n"
-"          Your viewers (and members of our subtitling community) can improve "
-"any\n"
-"          subtitles or translation. That way subtitles are constantly "
-"getting better -\n"
-"          like an article on wikipedia. We mobilize your international "
-"audience to make\n"
+"          Your viewers (and members of our subtitling community) can improve any\n"
+"          subtitles or translation. That way subtitles are constantly getting better -\n"
+"          like an article on wikipedia. We mobilize your international audience to make\n"
 "          your videos more accessible.\n"
 "        "
-msgstr ""
-"\n"
-"          您的觀眾(以及字幕社群的成員)能夠增進每份字\n"
-"          幕和翻譯的品質，讓字幕逐漸進步 - 就像一篇\n"
-"          wikipedia上的文章。我們驅動世界各地的觀眾\n"
-"          讓您的影片更平易近人。\n"
-"        "
+msgstr "\n          您的觀眾(以及字幕社群的成員)能夠增進每份字\n          幕和翻譯的品質，讓字幕逐漸進步 - 就像一篇\n          wikipedia上的文章。我們驅動世界各地的觀眾\n          讓您的影片更平易近人。\n        "
 
 #: templates/index_old.html:122
 msgid "It’s free with no software to download"
@@ -4009,16 +3583,10 @@ msgstr "將我們的程式碼嵌入您的影片"
 msgid ""
 "\n"
 "    Submit your video, and get an embed code to post in your site. \n"
-"    When the page loads, our subtitle tools will display underneath your "
-"video \n"
+"    When the page loads, our subtitle tools will display underneath your video \n"
 "    (as a small, simple button)\n"
 "    "
-msgstr ""
-"\n"
-"    上傳您的影片，取得嵌入代碼來加進您的網站 \n"
-"    當頁面載入時，我們的字幕工具會顯示在您的影片下方 \n"
-"    (一個小巧簡單的按鈕)\n"
-"    "
+msgstr "\n    上傳您的影片，取得嵌入代碼來加進您的網站 \n    當頁面載入時，我們的字幕工具會顯示在您的影片下方 \n    (一個小巧簡單的按鈕)\n    "
 
 #: templates/index_old.html:132
 msgid "Subtitling tools open in your page."
@@ -4028,13 +3596,10 @@ msgstr "在您的頁面開啟字幕工具"
 msgid ""
 "\n"
 "      When someone clicks the “subtitle me” button, \n"
-"      a subtitling interface appears on your page (most users never leave "
-"your site). \n"
+"      a subtitling interface appears on your page (most users never leave your site). \n"
 "      Subtitles they create are then visible to other users, on your site.\n"
 "      "
-msgstr ""
-"\n"
-"新增"
+msgstr "\n新增"
 
 #: templates/index_old.html:142
 msgid "How it works"
@@ -4044,17 +3609,10 @@ msgstr "如何運作"
 msgid ""
 "\n"
 "      You add our widget to your videos.  Then you and your viewers can add\n"
-"      subtitles.  We save the subtitles on our site.  And each video has its "
-"own collaboration space on our site\n"
+"      subtitles.  We save the subtitles on our site.  And each video has its own collaboration space on our site\n"
 "      where people can track changes, and give feedback.\n"
 "    "
-msgstr ""
-"\n"
-"      在您的影片中使用我們的小工具。  您和您的觀眾就可以加入\n"
-"      字幕。  作好的字幕會存在我們的網站，  每部影片在網站上都會有專屬的協作"
-"頁面\n"
-"      在專屬頁面中可以追蹤修改紀錄，並且提供意見回饋。\n"
-"    "
+msgstr "\n      在您的影片中使用我們的小工具。  您和您的觀眾就可以加入\n      字幕。  作好的字幕會存在我們的網站，  每部影片在網站上都會有專屬的協作頁面\n      在專屬頁面中可以追蹤修改紀錄，並且提供意見回饋。\n    "
 
 #: templates/index_old.html:149
 msgid "Try the demo"
@@ -4124,10 +3682,7 @@ msgid ""
 "The event is being organized by The Participatory Culture Foundation, "
 "developers of the Universal Subtitles project. We expect roughly 40 "
 "participants."
-msgstr ""
-"在紐約，開放字幕設計高峰會將全球字幕界相關人士集合在一場高度專注/目標導向的會"
-"議。本次活動是由 Participatory Culture Foundation，Universal Subtitles專案的"
-"開發者所組織，預計有約40名參與者與會"
+msgstr "在紐約，開放字幕設計高峰會將全球字幕界相關人士集合在一場高度專注/目標導向的會議。本次活動是由 Participatory Culture Foundation，Universal Subtitles專案的開發者所組織，預計有約40名參與者與會"
 
 #: templates/opensubtitles2010.html:34
 msgid "Meeting Goals"
@@ -4137,18 +3692,14 @@ msgstr "會議目標"
 msgid ""
 "<strong>Connect</strong> major stakeholders from projects, organizations, "
 "and movements that have open subtitling needs or focus."
-msgstr ""
-"<strong>聯繫</strong>\n"
-"專注於開放式字幕、或是對開放式字幕有興趣的專案、組織及運動的相關人士\n"
+msgstr "<strong>聯繫</strong>\n專注於開放式字幕、或是對開放式字幕有興趣的專案、組織及運動的相關人士\n"
 
 #: templates/opensubtitles2010.html:41
 msgid ""
 "<strong>Identify ways</strong> to solve stakeholder subtitling needs and be "
 "aware of existing technology that can be leveraged. Find logical places for "
 "collaboration/cooperation."
-msgstr ""
-"<strong>尋找方法</strong>來解決字幕需求，關注能夠發揮影響力的現有科技，尋找合"
-"理的協作/合作方式"
+msgstr "<strong>尋找方法</strong>來解決字幕需求，關注能夠發揮影響力的現有科技，尋找合理的協作/合作方式"
 
 #: templates/opensubtitles2010.html:44
 msgid ""
@@ -4167,10 +3718,7 @@ msgid ""
 "accessibility advocates, open source developers, educational leaders, and "
 "other individuals and organizations with a stake in the subtitling world. "
 "We'll make a roster available when the event draws closer."
-msgstr ""
-"與會人員包括：影像工作者、製片、使用者、主流影片分享網站的代表、標準制定專"
-"家、無障礙工作者、開放源始碼開發人員、教育界權威人士、以及其他與字幕製作休戚"
-"與共的個人與組織。我們會在活動近期將名冊公開"
+msgstr "與會人員包括：影像工作者、製片、使用者、主流影片分享網站的代表、標準制定專家、無障礙工作者、開放源始碼開發人員、教育界權威人士、以及其他與字幕製作休戚與共的個人與組織。我們會在活動近期將名冊公開"
 
 #: templates/opensubtitles2010.html:57
 msgid ""
@@ -4192,19 +3740,10 @@ msgstr "地點"
 
 #: templates/opensubtitles2010.html:68
 msgid ""
-"The summit will be held at the beautiful Open Plans penthouse in Soho, which "
-"is located at 148 Lafayette St, Floor 12, New York City. (<a href=\"http://"
-"maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor"
-"+12,+New+York+City&sll=40.701809,-"
-"73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,"
-"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
-msgstr ""
-"會議將在蘇活區美麗的Open Plans Penthouse舉行，地址：148 Lafayette St, Floor "
-"12, New York City。(<a href=\"http://maps.google.com/maps?"
-"f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York"
-"+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148"
-"+Lafayette+St,+New+York,+10013&ll=40.718575,-"
-"74.000988&spn=0.03669,0.090895&z=14\">觀看地圖</a>)"
+"The summit will be held at the beautiful Open Plans penthouse in Soho, which"
+" is located at 148 Lafayette St, Floor 12, New York City. (<a "
+"href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
+msgstr "會議將在蘇活區美麗的Open Plans Penthouse舉行，地址：148 Lafayette St, Floor 12, New York City。(<a href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">觀看地圖</a>)"
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
@@ -4213,31 +3752,15 @@ msgstr "原油"
 #: templates/opensubtitles2010.html:75
 msgid ""
 "\n"
-"            The focus of this summit is increased availability and better "
-"usability for captions and subtitles, \n"
+"            The focus of this summit is increased availability and better usability for captions and subtitles, \n"
 "            which are both sorely needed. It comes at a critical time, \n"
-"            as internet video usage is skyrocketing&mdash;people who rely on "
-"captions are threatened to be left behind. \n"
+"            as internet video usage is skyrocketing&mdash;people who rely on captions are threatened to be left behind. \n"
 "            New users from every culture are coming online en masse; \n"
-"            standardizing and ubiquitizing the technology can make potential "
-"audiences exponentially larger and messages can cross cultural boundaries "
-"more easily. \n"
-"            More captions will also make it simpler for computers to "
-"process, index, \n"
+"            standardizing and ubiquitizing the technology can make potential audiences exponentially larger and messages can cross cultural boundaries more easily. \n"
+"            More captions will also make it simpler for computers to process, index, \n"
 "            and make sense of the ever growing sea of online video.\n"
 "           "
-msgstr ""
-"\n"
-"            這場高峰會關注的焦點，在於讓字幕更為普及和提升其使用性， \n"
-"            而兩者同樣都有著迫切的需求 \n"
-"            急速成長的線上影片使得字幕的發展進入重要時刻；需要字幕輔助的人們"
-"被忽略了\n"
-"            來自不同文化的網路新手大量的湧入線上； \n"
-"            將這項技術普及並且標準化能夠讓潛在觀眾群快速成長，同時資訊也能更"
-"容易地跨越文化隔閡。\n"
-"            開放式的字幕也能讓電腦用更簡易的方式去處理、索引， \n"
-"            甚至\"理解\"網路上以海量增加的影片\n"
-"           "
+msgstr "\n            這場高峰會關注的焦點，在於讓字幕更為普及和提升其使用性， \n            而兩者同樣都有著迫切的需求 \n            急速成長的線上影片使得字幕的發展進入重要時刻；需要字幕輔助的人們被忽略了\n            來自不同文化的網路新手大量的湧入線上； \n            將這項技術普及並且標準化能夠讓潛在觀眾群快速成長，同時資訊也能更容易地跨越文化隔閡。\n            開放式的字幕也能讓電腦用更簡易的方式去處理、索引， \n            甚至\"理解\"網路上以海量增加的影片\n           "
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
@@ -4250,14 +3773,10 @@ msgstr "組織"
 #: templates/opensubtitles2010.html:95
 msgid ""
 "The <a href=\"http://www.participatoryculture.org/\">Participatory Culture "
-"Foundation</a> is organizing the summit. Their most recent project, <a href="
-"\"http://universalsubtitles.org/\">Universal Subtitles</a>, makes open "
+"Foundation</a> is organizing the summit. Their most recent project, <a "
+"href=\"http://universalsubtitles.org/\">Universal Subtitles</a>, makes open "
 "source and collaborative subtitling and translation easy."
-msgstr ""
-"<a href=\"http://www.participatoryculture.org/\">Participatory Culture "
-"Foundation</a>負責組織這場高峰會，它們最近的專案，<a href=\"http://"
-"universalsubtitles.org/\">Universal Subtitles</a>，讓開源協作式字幕以及翻譯變"
-"得更簡單"
+msgstr "<a href=\"http://www.participatoryculture.org/\">Participatory Culture Foundation</a>負責組織這場高峰會，它們最近的專案，<a href=\"http://universalsubtitles.org/\">Universal Subtitles</a>，讓開源協作式字幕以及翻譯變得更簡單"
 
 #: templates/opensubtitles2010.html:99
 msgid "Facilitators"
@@ -4266,12 +3785,10 @@ msgstr "協同"
 #: templates/opensubtitles2010.html:100
 msgid ""
 "<a href=\"http://www.aspirationtech.org/\">Aspiration</a> is providing "
-"facilitation and agenda design. Aspiration believes that face-to-face events "
-"are the most powerful way to facilitate interaction, build networks, and "
+"facilitation and agenda design. Aspiration believes that face-to-face events"
+" are the most powerful way to facilitate interaction, build networks, and "
 "collaborate."
-msgstr ""
-"<a href=\"http://www.aspirationtech.org/\">Aspiration</a>提供協助與議程規劃，"
-"Aspiration相信在互動、拓展人脈與協作時，面對面的溝通交流是最有力的方式"
+msgstr "<a href=\"http://www.aspirationtech.org/\">Aspiration</a>提供協助與議程規劃，Aspiration相信在互動、拓展人脈與協作時，面對面的溝通交流是最有力的方式"
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
@@ -4279,11 +3796,9 @@ msgstr "贊助"
 
 #: templates/opensubtitles2010.html:104
 msgid ""
-"The summit has been generously funded by the <a href=\"http://www.soros.org/"
-"\">Open Society Institute</a>."
-msgstr ""
-"本高峰會感謝<a href=\"http://www.soros.org/\">Open Society Institute</a>慷慨"
-"的捐助"
+"The summit has been generously funded by the <a "
+"href=\"http://www.soros.org/\">Open Society Institute</a>."
+msgstr "本高峰會感謝<a href=\"http://www.soros.org/\">Open Society Institute</a>慷慨的捐助"
 
 #: templates/opensubtitles2010.html:113
 msgid ""
@@ -4298,31 +3813,16 @@ msgstr "企業服務"
 #: templates/services.html:12
 msgid ""
 "\n"
-"            <strong>Make your videos more global and more popular.</strong> "
-"Transcripts, captions, and translations dramatically increase video "
-"viewership.\n"
+"            <strong>Make your videos more global and more popular.</strong> Transcripts, captions, and translations dramatically increase video viewership.\n"
 "          "
-msgstr ""
-"\n"
-"            <strong>讓您的影片無遠弗屆、更受歡迎</strong> 謄錄、字幕和翻譯讓"
-"影片觸角更加廣泛\n"
-"          "
+msgstr "\n            <strong>讓您的影片無遠弗屆、更受歡迎</strong> 謄錄、字幕和翻譯讓影片觸角更加廣泛\n          "
 
 #: templates/services.html:17
 msgid ""
 "\n"
-"            Universal Subtitles is the most powerful subtitling platform in "
-"the world. We can help you build an <strong>active and engaged volunteer "
-"community</strong> and you can take advantage of <strong>professional "
-"transcription and translation services</strong>, all in one unified "
-"workflow.\n"
+"            Universal Subtitles is the most powerful subtitling platform in the world. We can help you build an <strong>active and engaged volunteer community</strong> and you can take advantage of <strong>professional transcription and translation services</strong>, all in one unified workflow.\n"
 "          "
-msgstr ""
-"\n"
-"            Universal Subtitles，世界上最強大的字幕製作平台。我們能幫您打造"
-"<strong>積極參與的志工社群</strong>，並擁有<strong>專業字幕服務</strong>的優"
-"勢，完美整合工作流程。\n"
-"          "
+msgstr "\n            Universal Subtitles，世界上最強大的字幕製作平台。我們能幫您打造<strong>積極參與的志工社群</strong>，並擁有<strong>專業字幕服務</strong>的優勢，完美整合工作流程。\n          "
 
 #: templates/services.html:23
 msgid "Interested?"
@@ -4331,14 +3831,9 @@ msgstr "感興趣嗎？"
 #: templates/services.html:25
 msgid ""
 "\n"
-"            To learn more about our services, please contact Dean Jansen, <a "
-"href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
+"            To learn more about our services, please contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
 "          "
-msgstr ""
-"\n"
-"            想更瞭解我們的服務，請聯絡Dean Jansen，<a href=\"mailto:"
-"dean@pculture.org\">dean@pculture.org</a>\n"
-"          "
+msgstr "\n            想更瞭解我們的服務，請聯絡Dean Jansen，<a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n          "
 
 #: templates/services.html:31
 msgid "What Can Universal Subtitles Do?"
@@ -4351,15 +3846,9 @@ msgstr "組織翻譯團隊"
 #: templates/services.html:36
 msgid ""
 "\n"
-"          Build a powerful volunteer translation and captioning team around "
-"your content. A video that lots of people want to watch is a video that fans "
-"will want to translate and share around the world.\n"
+"          Build a powerful volunteer translation and captioning team around your content. A video that lots of people want to watch is a video that fans will want to translate and share around the world.\n"
 "        "
-msgstr ""
-"\n"
-"          為您的影片內容建立強而有力的翻譯/字幕志工團隊。一部受到歡迎的影片，"
-"能夠激發愛好者們翻譯，並且推廣到全世界。\n"
-"        "
+msgstr "\n          為您的影片內容建立強而有力的翻譯/字幕志工團隊。一部受到歡迎的影片，能夠激發愛好者們翻譯，並且推廣到全世界。\n        "
 
 #: templates/services.html:42
 msgid "Crowdsource with Professional Review"
@@ -4368,14 +3857,9 @@ msgstr "群眾外包加上專業校對"
 #: templates/services.html:44
 msgid ""
 "\n"
-"            Engage a crowd and use professional quality assurance. This "
-"balances amazingly low cost with professional level quality.\n"
+"            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality.\n"
 "          "
-msgstr ""
-"\n"
-"            群眾參與，加上專業品質的保證，在超低成本與精美品質之間取得一個平"
-"衡點。\n"
-"          "
+msgstr "\n            群眾參與，加上專業品質的保證，在超低成本與精美品質之間取得一個平衡點。\n          "
 
 #: templates/services.html:50
 msgid "Professional 1-Click Services"
@@ -4384,15 +3868,9 @@ msgstr "專業而有效率的服務"
 #: templates/services.html:52
 msgid ""
 "\n"
-"            Access professional services including: captions, translations, "
-"and quality control. These services, when mixed with volunteer "
-"contributions, give you ultimate flexibility.\n"
+"            Access professional services including: captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
 "          "
-msgstr ""
-"\n"
-"            專業服務包括：字幕、翻譯，以及品質控管。這些服務加上志工協助，讓"
-"您能靈活運用。\n"
-"          "
+msgstr "\n            專業服務包括：字幕、翻譯，以及品質控管。這些服務加上志工協助，讓您能靈活運用。\n          "
 
 #: templates/services.html:60
 msgid "Work with Any Video Platform"
@@ -4401,15 +3879,9 @@ msgstr "整合各種影音平台"
 #: templates/services.html:62
 msgid ""
 "\n"
-"            Universal Subtitles works with all the most popular video "
-"hosting services and video players. Integrate and embed videos with "
-"subtitles without changing your current publishing workflow.\n"
+"            Universal Subtitles works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
 "          "
-msgstr ""
-"\n"
-"            Universal Subtitles支援所有知名的線上影音服務及播放器，將網站影片"
-"整合字幕而不影響您的作品出版流程。\n"
-"          "
+msgstr "\n            Universal Subtitles支援所有知名的線上影音服務及播放器，將網站影片整合字幕而不影響您的作品出版流程。\n          "
 
 #: templates/services.html:68
 msgid "Improve Your SEO"
@@ -4418,15 +3890,9 @@ msgstr "提升搜尋能見度"
 #: templates/services.html:70
 msgid ""
 "\n"
-"            Rank higher in Google and other search engines by helping them "
-"index full transcripts for all of your videos. Searchable videos are found "
-"more often.\n"
+"            Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
 "          "
-msgstr ""
-"\n"
-"            讓Google和其他搜尋引擎將您的影片字幕編入索引，爭取曝光率。容易搜"
-"尋代表更高的影片可見度。\n"
-"          "
+msgstr "\n            讓Google和其他搜尋引擎將您的影片字幕編入索引，爭取曝光率。容易搜尋代表更高的影片可見度。\n          "
 
 #: templates/services.html:76
 msgid "Flexible Integration"
@@ -4435,14 +3901,9 @@ msgstr "彈性整合服務"
 #: templates/services.html:78
 msgid ""
 "\n"
-"            Need seamless subtitles on your custom video player? Want 1-"
-"click features integrated into your back-end or CMS? We can help.\n"
+"            Need seamless subtitles on your custom video player? Want 1-click features integrated into your back-end or CMS? We can help.\n"
 "          "
-msgstr ""
-"\n"
-"            您的影片撥放器需要流暢的字幕？ 需要將一步操作功能整合到您的後台或"
-"是內容管理系統？我們能夠幫助您。\n"
-"          "
+msgstr "\n            您的影片撥放器需要流暢的字幕？ 需要將一步操作功能整合到您的後台或是內容管理系統？我們能夠幫助您。\n          "
 
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:7
 msgid "Universal Subtitles"
@@ -4469,14 +3930,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "您確定要永久移除您的個人資料？"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:79
-#: templates/messages/sent.html:51 templates/teams/tasks.html:237
+#: templates/messages/sent.html:51 templates/teams/tasks.html:245
 msgid "Delete"
 msgstr "刪除"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:294 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:302 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:369
 msgid "Cancel"
 msgstr "取消"
@@ -4583,11 +4044,9 @@ msgstr "字幕查詢協定"
 
 #: templates/jsdemo/home.html:40
 msgid ""
-"An open standard to let Firefox extensions, desktop video players, websites, "
-"browsers--any client--find and retrieve subtitles for any video."
-msgstr ""
-"一個讓Firefox應用程式、桌面影片播放器、網站、瀏覽器--所有客戶端--都能搜尋並取"
-"得影片字幕的開放標準"
+"An open standard to let Firefox extensions, desktop video players, websites,"
+" browsers--any client--find and retrieve subtitles for any video."
+msgstr "一個讓Firefox應用程式、桌面影片播放器、網站、瀏覽器--所有客戶端--都能搜尋並取得影片字幕的開放標準"
 
 #: templates/jsdemo/home.html:50
 msgid "Get updates and find out first when we launch"
@@ -4669,12 +4128,9 @@ msgid ""
 "\n"
 "        You have %(msg_count)s new messages.\n"
 "    "
-msgstr ""
-"\n"
-"        您有%(msg_count)s澤新訊息\n"
-"    "
+msgstr "\n        您有%(msg_count)s澤新訊息\n    "
 
-#: templates/messages/_messages.html:7 templates/profiles/dashboard.html:67
+#: templates/messages/_messages.html:7 templates/profiles/dashboard.html:70
 #: templates/videos/_recent_activity.html:11
 msgid "View all"
 msgstr "檢視全部"
@@ -4750,15 +4206,11 @@ msgid ""
 "\n"
 "Thanks for joining Universal Subtitles!<br/>\n"
 "\n"
-"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, "
-"please click the following link to confirm your email address (%(email)s):"
-"<br/></p>\n"
+"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, please click the following link to confirm your email address (%(email)s):<br/></p>\n"
 "\n"
 "<p><a href=\"%(activate_url)s\">confirm email</a></p>\n"
 "\n"
-"<p>If you believe you've received this message in error, we apologize—feel "
-"free to ignore it. If you have any concerns, please contact us at "
-"feedback@universalsubtitles.org.</p>\n"
+"<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@universalsubtitles.org.</p>\n"
 "\n"
 "Thanks, <br/>\n"
 "The Universal Subtitles team\n"
@@ -4769,9 +4221,7 @@ msgstr ""
 msgid ""
 "\n"
 "%(author)s has just sent you a message on Universal Subtitles:\n"
-msgstr ""
-"\n"
-"%(author)s剛剛寄給您一封訊息：\n"
+msgstr "\n%(author)s剛剛寄給您一封訊息：\n"
 
 #: templates/messages/email/message_received.html:14
 msgid "Reply to this message"
@@ -4794,7 +4244,7 @@ msgid "Overview"
 msgstr ""
 
 #: templates/profiles/_filters_dashboard.html:8
-#: templates/profiles/dashboard.html:67
+#: templates/profiles/dashboard.html:70
 msgid "Recent Activity"
 msgstr ""
 
@@ -4806,9 +4256,7 @@ msgstr ""
 msgid ""
 "It looks like you logged in without submitting an email. We need an email "
 "address to notify you (for example, when others edit your work)."
-msgstr ""
-"您似乎並沒有登記email，我們需要一個電子郵件位置來寄送通知(例如有人在修改您的"
-"字幕)"
+msgstr "您似乎並沒有登記email，我們需要一個電子郵件位置來寄送通知(例如有人在修改您的字幕)"
 
 #: templates/profiles/_require_email_dialog.html:8
 msgid "Please enter a valid e-mail address"
@@ -4894,7 +4342,7 @@ msgid "Subtitles into"
 msgstr "SUBTITLES INTO"
 
 #: templates/profiles/dashboard.html:55 templates/teams/tasks.html:144
-#: templates/teams/tasks.html.py:152 templates/videos/diffing.html:95
+#: templates/teams/tasks.html.py:160 templates/videos/diffing.html:95
 #: templates/videos/subtitle-view.html:191
 #: templates/videos/subtitle-view.html:236
 msgid "Subtitles"
@@ -4905,19 +4353,19 @@ msgstr "字幕"
 msgid "for"
 msgstr ""
 
-#: templates/profiles/dashboard.html:73
+#: templates/profiles/dashboard.html:76
 msgid "Sorry, no activity yet."
 msgstr ""
 
-#: templates/profiles/dashboard.html:80
+#: templates/profiles/dashboard.html:83
 msgid "Alerts"
 msgstr ""
 
-#: templates/profiles/dashboard.html:97 templates/teams/teams-list.html:107
+#: templates/profiles/dashboard.html:100 templates/teams/teams-list.html:107
 msgid "Do you really wish to leave this team?"
 msgstr "您想要離開此團隊嗎？"
 
-#: templates/profiles/dashboard.html:97
+#: templates/profiles/dashboard.html:100
 msgid "leave team"
 msgstr ""
 
@@ -5134,8 +4582,7 @@ msgstr "%(site_name)s 團隊"
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr ""
-"忘記您的密碼？在下方輸入您的Email密碼，我們會寄信告訴您如何設定新的密碼。"
+msgstr "忘記您的密碼？在下方輸入您的Email密碼，我們會寄信告訴您如何設定新的密碼。"
 
 #: templates/registration/password_reset_form.html:17
 msgid "E-mail address:"
@@ -5164,10 +4611,7 @@ msgid_plural ""
 "\n"
 "              %(number)s languages\n"
 "          "
-msgstr[0] ""
-"\n"
-"              %(number)s種語言\n"
-"          "
+msgstr[0] "\n              %(number)s種語言\n          "
 
 #: templates/search/_video_item.html:24
 msgid "lines"
@@ -5199,10 +4643,7 @@ msgid ""
 "\n"
 "                Search Results for %(query)s\n"
 "            "
-msgstr ""
-"\n"
-"                %(query)s的搜尋結果\n"
-"            "
+msgstr "\n                %(query)s的搜尋結果\n            "
 
 #: templates/search/search.html:143 templates/videos/featured_videos.html:50
 #: templates/videos/popular_videos.html:85
@@ -5337,7 +4778,7 @@ msgstr "月"
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
 #: templates/teams/_context_team.html:47 templates/teams/tasks.html:117
-#: templates/teams/tasks.html.py:147 templates/videos/video-view.html:134
+#: templates/teams/tasks.html.py:148 templates/videos/video-view.html:134
 msgid "Video"
 msgstr "影片"
 
@@ -5413,10 +4854,7 @@ msgstr "語言能力"
 #, python-format
 msgid ""
 "\n"
-"                                No formal language training is required to "
-"translate for %(team)s. But we do ask that all translators are confident in "
-"their translation abilities. Please make sure your profile has your "
-"language\n"
+"                                No formal language training is required to translate for %(team)s. But we do ask that all translators are confident in their translation abilities. Please make sure your profile has your language\n"
 "                            "
 msgstr ""
 
@@ -5431,9 +4869,7 @@ msgstr "註明清楚"
 #: templates/teams/_application_form.html:29
 msgid ""
 "\n"
-"                                We request that each new applicant does at "
-"least one full set of subtitles within the first week of joining. Aside from "
-"that, it’s up to you!\n"
+"                                We request that each new applicant does at least one full set of subtitles within the first week of joining. Aside from that, it’s up to you!\n"
 "                            "
 msgstr ""
 
@@ -5445,9 +4881,7 @@ msgstr "關於您"
 #, python-format
 msgid ""
 "\n"
-"                        Tell us a little bit about yourself and why you’re "
-"interested in translating with %(team)s. This should be 3-5 sentences, no "
-"longer!\n"
+"                        Tell us a little bit about yourself and why you’re interested in translating with %(team)s. This should be 3-5 sentences, no longer!\n"
 "                    "
 msgstr ""
 
@@ -5514,8 +4948,7 @@ msgstr ""
 #: templates/teams/_context_team.html:95
 msgid ""
 "\n"
-"                        See tasks in <a href=\"#\" data-modal="
-"\"language_modal\">your languages</a>\n"
+"                        See tasks in <a href=\"#\" data-modal=\"language_modal\">your languages</a>\n"
 "                    "
 msgstr ""
 
@@ -5548,7 +4981,7 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr "您也可以邀請其他語言的朋友來幫忙"
 
 #: templates/teams/_perform_task_link.html:4
-#: templates/teams/_perform_task_link.html:24 templates/teams/tasks.html:209
+#: templates/teams/_perform_task_link.html:24 templates/teams/tasks.html:217
 msgid "Perform Task"
 msgstr ""
 
@@ -5765,7 +5198,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:298
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:306
 msgid "Begin typing to search"
 msgstr ""
 
@@ -5795,13 +5228,9 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"            %(team_name)s needs your help subtitling and translating the "
-"following new videos:\n"
+"            %(team_name)s needs your help subtitling and translating the following new videos:\n"
 "        "
-msgstr ""
-"\n"
-"            %(team_name)s 需要您協助在這部新影片加上字幕和翻譯：\n"
-"        "
+msgstr "\n            %(team_name)s 需要您協助在這部新影片加上字幕和翻譯：\n        "
 
 #: templates/teams/email_new_video.html:13
 msgid "Or you can visit the team page to see the latest work"
@@ -5815,15 +5244,10 @@ msgstr "新影片加入時，不要再收到新通知"
 #, python-format
 msgid ""
 "\n"
-"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</"
-"a> \n"
+"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n"
 "            team has added new videos, and they need your help:\n"
 "        "
-msgstr ""
-"\n"
-"           <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n"
-"            團隊新增加影片，他們需要您的幫助：\n"
-"        "
+msgstr "\n           <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n            團隊新增加影片，他們需要您的幫助：\n        "
 
 #: templates/teams/email_new_videos.html:20
 msgid "Thank you!"
@@ -5943,8 +5367,8 @@ msgstr ""
 
 #: templates/teams/settings-guidelines.html:28
 msgid ""
-"Customize the messages sent to your users. The text you enter will accompany "
-"the default system message."
+"Customize the messages sent to your users. The text you enter will accompany"
+" the default system message."
 msgstr ""
 
 #: templates/teams/settings-guidelines.html:31
@@ -6171,7 +5595,7 @@ msgstr ""
 msgid "anyone"
 msgstr ""
 
-#: templates/teams/tasks.html:86 templates/teams/tasks.html.py:181
+#: templates/teams/tasks.html:86 templates/teams/tasks.html.py:189
 msgid "me"
 msgstr ""
 
@@ -6203,51 +5627,51 @@ msgstr ""
 msgid "Clear all filters and search terms"
 msgstr ""
 
-#: templates/teams/tasks.html:154
+#: templates/teams/tasks.html:162
 msgid "draft"
 msgstr ""
 
-#: templates/teams/tasks.html:157
+#: templates/teams/tasks.html:165
 msgid "transcribed"
 msgstr ""
 
-#: templates/teams/tasks.html:159 templates/videos/subtitle-view.html:76
+#: templates/teams/tasks.html:167 templates/videos/subtitle-view.html:76
 msgid "translated"
 msgstr ""
 
-#: templates/teams/tasks.html:179
+#: templates/teams/tasks.html:187
 msgid "Assigned to"
 msgstr ""
 
-#: templates/teams/tasks.html:188
+#: templates/teams/tasks.html:196
 msgid "Unassigned"
 msgstr ""
 
-#: templates/teams/tasks.html:228
+#: templates/teams/tasks.html:236
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:230
+#: templates/teams/tasks.html:238
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:246
+#: templates/teams/tasks.html:254
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:255
+#: templates/teams/tasks.html:263
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:259
+#: templates/teams/tasks.html:267
 msgid "Delete these subtitles permanently"
 msgstr ""
 
-#: templates/teams/tasks.html:301
+#: templates/teams/tasks.html:309
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:310
+#: templates/teams/tasks.html:318
 msgid "Sorry, no tasks here."
 msgstr ""
 
@@ -6322,9 +5746,7 @@ msgstr "建立一個團隊"
 #: templates/teams/teams-list.html:129
 msgid ""
 "\n"
-"                Want to create your own captioning and translation team? "
-"Contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</"
-"a>\n"
+"                Want to create your own captioning and translation team? Contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
 "            "
 msgstr ""
 
@@ -6414,7 +5836,8 @@ msgid "Sorry, no activity yet"
 msgstr "抱歉，尚無事件"
 
 #: templates/videos/_error_feedback_form.html:7
-msgid "Please let us know what you were doing when you encountered this error."
+msgid ""
+"Please let us know what you were doing when you encountered this error."
 msgstr "請告訴我們，碰上這個問題的時候您在做什麼？"
 
 #: templates/videos/_error_feedback_form.html:9
@@ -6434,12 +5857,14 @@ msgid "How are you using Universal Subtitles?  What would make it better?"
 msgstr "您如何使用Universal Subtitles？  如何讓它更好？"
 
 #: templates/videos/_feedback_form.html:8
-msgid "Please let us know if you have any comments, questions, or suggestions!"
+msgid ""
+"Please let us know if you have any comments, questions, or suggestions!"
 msgstr "告訴我們您的評論、問題或任何建議！"
 
 #: templates/videos/_feedback_form.html:9
 msgid ""
-"Note: we read/speak English best, but try to read/respond to anything we can."
+"Note: we read/speak English best, but try to read/respond to anything we "
+"can."
 msgstr "注意：我們擅長使用英語，但是也盡力嘗試用其他語言來讀寫"
 
 #: templates/videos/_feedback_form.html:13
@@ -6588,30 +6013,19 @@ msgstr "送出自串"
 #: templates/videos/_paste_transcription.html:118
 msgid ""
 "\n"
-"            Paste a transcript into the space below.  How you enter "
-"subtitles here \n"
+"            Paste a transcript into the space below.  How you enter subtitles here \n"
 "            determines how they display on the screen.<br/>\n"
 "            1) Hit enter twice to separate each subtitle;<br/> \n"
 "            2) You cannot submit subtitles longer than 3 lines (2 is best).\n"
 "            "
-msgstr ""
-"\n"
-"            將字串貼在下面的空白，  您輸入字幕的方式 \n"
-"            會影響螢幕呈現的結果。<br/>\n"
-"            1) 按enter鍵兩次來區分每段字幕<br/> \n"
-"            2) 您無法輸入超過3行字幕(以2行為佳)\n"
-"            "
+msgstr "\n            將字串貼在下面的空白，  您輸入字幕的方式 \n            會影響螢幕呈現的結果。<br/>\n            1) 按enter鍵兩次來區分每段字幕<br/> \n            2) 您無法輸入超過3行字幕(以2行為佳)\n            "
 
 #: templates/videos/_paste_transcription.html:126
 msgid ""
 "\n"
-"            Some of your subtitles take up more than two lines and will not "
-"display correctly.\n"
+"            Some of your subtitles take up more than two lines and will not display correctly.\n"
 "            "
-msgstr ""
-"\n"
-"            您的部分字幕超過兩行，可能會不正確顯示。\n"
-"            "
+msgstr "\n            您的部分字幕超過兩行，可能會不正確顯示。\n            "
 
 #: templates/videos/_paste_transcription.html:136
 msgid "Upload TXT file"
@@ -6656,16 +6070,10 @@ msgstr "上傳字幕"
 #: templates/videos/_upload_subtitles.html:10
 msgid ""
 "\n"
-"              Our site accepts SRT, SSA, SBV, DFXP and TTML format. Only "
-"files ending in .srt, .ssa, .sbv, .dfxp\n"
+"              Our site accepts SRT, SSA, SBV, DFXP and TTML format. Only files ending in .srt, .ssa, .sbv, .dfxp\n"
 "              or .xml (for TTML) are accepted. Or you can\n"
 "              "
-msgstr ""
-"\n"
-"              網站接受SRT、SSA、SBV、DFXP及TTML格式，檔案結尾必須是.srt、."
-"ssa、.sbv、.dfxp、\n"
-"              或.xml (TTML)。或者您可以\n"
-"              "
+msgstr "\n              網站接受SRT、SSA、SBV、DFXP及TTML格式，檔案結尾必須是.srt、.ssa、.sbv、.dfxp、\n              或.xml (TTML)。或者您可以\n              "
 
 #: templates/videos/_upload_subtitles.html:15
 msgid "paste in a transcript"
@@ -6682,11 +6090,9 @@ msgstr "上傳"
 
 #: templates/videos/_upload_subtitles.html:45
 msgid ""
-"If you believe your subtitle file is compatible, <a href='mailto:"
-"feedback@universalsubtitles.org'>send it to us</a>"
-msgstr ""
-"若您認為該字幕檔是相容的，<a href='mailto:feedback@universalsubtitles.org'>請"
-"將它寄給我們</a>"
+"If you believe your subtitle file is compatible, <a "
+"href='mailto:feedback@universalsubtitles.org'>send it to us</a>"
+msgstr "若您認為該字幕檔是相容的，<a href='mailto:feedback@universalsubtitles.org'>請將它寄給我們</a>"
 
 #: templates/videos/_video.html:23
 msgid "view"
@@ -6735,19 +6141,15 @@ msgstr "重複影片URLs讓您把同一份字幕連結到多部影片。可能�
 #: templates/videos/_video_url_panel.html:48
 msgid ""
 "Two versions of the same video exist on Youtube.  You do not want subtitle "
-"volunteers to duplicate their work, so you add both versions to the multiple "
-"URLs pane."
-msgstr ""
-"這部影片在Youtube上有兩個版本，  您不希望字幕人員重複工作，因此把兩個版本都加"
-"入重複URL頁面。"
+"volunteers to duplicate their work, so you add both versions to the multiple"
+" URLs pane."
+msgstr "這部影片在Youtube上有兩個版本，  您不希望字幕人員重複工作，因此把兩個版本都加入重複URL頁面。"
 
 #: templates/videos/_video_url_panel.html:49
 msgid ""
-"You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the "
-"subtitles you make to work on all of those versions."
-msgstr ""
-"您將影片放在Youtube、Vimeo、Blip和Dailymotion，而您希望字幕在每個版本都能夠使"
-"用。"
+"You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the"
+" subtitles you make to work on all of those versions."
+msgstr "您將影片放在Youtube、Vimeo、Blip和Dailymotion，而您希望字幕在每個版本都能夠使用。"
 
 #: templates/videos/_video_url_panel.html:50
 msgid ""
@@ -6755,10 +6157,7 @@ msgid ""
 "(HTML5/Ogg for free software users, or HTML5/h264 to iPad users).  If you "
 "add these URLs, our embed code will automatically fall back to whatever "
 "format is necessary for the browser."
-msgstr ""
-"您希望影片在不同瀏覽器上能夠提供不同版本(免費軟體用戶使用HTML5/Ogg，或iPad用"
-"戶使用HTML5/h264)。  如果您加入這些URLs，我們的嵌入代碼會自動判斷適當的瀏覽器"
-"對應格式。"
+msgstr "您希望影片在不同瀏覽器上能夠提供不同版本(免費軟體用戶使用HTML5/Ogg，或iPad用戶使用HTML5/h264)。  如果您加入這些URLs，我們的嵌入代碼會自動判斷適當的瀏覽器對應格式。"
 
 #: templates/videos/_video_url_panel.html:52
 msgid "Tip: double check that there are no timing problems."
@@ -6791,8 +6190,7 @@ msgstr "您未受任正"
 msgid ""
 "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-"
 "matching videos or videos where subtitles fail to display correctly."
-msgstr ""
-"刪除此URL？  警告：無法回復，只在影片不同或字幕顯示不正確時才刪除這些URL。"
+msgstr "刪除此URL？  警告：無法回復，只在影片不同或字幕顯示不正確時才刪除這些URL。"
 
 #: templates/videos/_watch_page.html:11
 msgid "No video found"
@@ -6805,23 +6203,13 @@ msgstr "沒有活動"
 #: templates/videos/create.html:10
 msgid ""
 "\n"
-"        \"Sorry, we couldn't identify the video at the link you sent.  "
-"Perhaps\n"
+"        \"Sorry, we couldn't identify the video at the link you sent.  Perhaps\n"
 "        it's a link we don't recognize, or perhaps you've linked to a page\n"
-"        that has multiple videos.  Try entering a different link to the "
-"video\n"
+"        that has multiple videos.  Try entering a different link to the video\n"
 "        you want to submit.  If you think there's been some mistake,\n"
-"        <a href=\"mailto:feedback@universalsubtitles.org\">contact us</a>!"
-"\"\n"
+"        <a href=\"mailto:feedback@universalsubtitles.org\">contact us</a>!\"\n"
 "        "
-msgstr ""
-"\n"
-"        \"抱歉，我們沒辦法從您提供的連結確認到任何影片。  或許\n"
-"        我們不支援這個連結，或者您所提供的頁面\n"
-"        有多部影片。  需要提供其他的網址來連結\n"
-"        到您的影片  如果有問題，請\n"
-"        <a href=\"mailto:feedback@universalsubtitles.org\">聯絡我們</a>！\"\n"
-"        "
+msgstr "\n        \"抱歉，我們沒辦法從您提供的連結確認到任何影片。  或許\n        我們不支援這個連結，或者您所提供的頁面\n        有多部影片。  需要提供其他的網址來連結\n        到您的影片  如果有問題，請\n        <a href=\"mailto:feedback@universalsubtitles.org\">聯絡我們</a>！\"\n        "
 
 #: templates/videos/create.html:22
 msgid "Subtitle a Video"
@@ -6869,26 +6257,17 @@ msgstr "您必須先登入"
 #, python-format
 msgid ""
 "\n"
-"            Comparing revision (#%(second_version_no)s) to revision (#%"
-"(version_no)s)\n"
+"            Comparing revision (#%(second_version_no)s) to revision (#%(version_no)s)\n"
 "            "
-msgstr ""
-"\n"
-"            比較修訂版本 (#%(second_version_no)s) 和 (#%(version_no)s)\n"
-"            "
+msgstr "\n            比較修訂版本 (#%(second_version_no)s) 和 (#%(version_no)s)\n            "
 
 #: templates/videos/diffing.html:81
 #, python-format
 msgid ""
 "\n"
-"            Comparing revision (#%(second_version_no)s) to current revision "
-"(#%(version_no)s)\n"
+"            Comparing revision (#%(second_version_no)s) to current revision (#%(version_no)s)\n"
 "            "
-msgstr ""
-"\n"
-"            比較修訂版本 (#%(second_version_no)s) 與現有版本 (#%(version_no)"
-"s)\n"
-"            "
+msgstr "\n            比較修訂版本 (#%(second_version_no)s) 與現有版本 (#%(version_no)s)\n            "
 
 #: templates/videos/diffing.html:100
 msgid "Revision History"
@@ -6904,10 +6283,7 @@ msgid ""
 "\n"
 "            Revision #%(version_no)s by %(user)s\n"
 "            "
-msgstr ""
-"\n"
-"            由 %(user)s 所做的修訂 #%(version_no)s\n"
-"            "
+msgstr "\n            由 %(user)s 所做的修訂 #%(version_no)s\n            "
 
 #: templates/videos/diffing.html:125 templates/videos/diffing.html.py:182
 msgid "Submit a new edit based on this version"
@@ -6948,49 +6324,24 @@ msgstr "寄給朋友！"
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s%(video_url)"
-"s\">%(v)s</a></b> \n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
-"%(u)s</a></b>. \n"
-"                These changes went live immediately.  %(text_change)s of the "
-"text and\n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n"
+"                These changes went live immediately.  %(text_change)s of the text and\n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
-msgstr ""
-"\n"
-"            您為&lt;b&gt;&lt;a href=\"http://%(domain)s%(video_url)s\"&gt;%"
-"(v)s&lt;/a&gt;&lt;/b&gt;所製作的 \n"
-"             &lt;b&gt;&lt;a href=\"http://%(domain)s%(language_url)s\"&gt;%"
-"(lang)s字幕&lt;/a&gt;&lt;/b&gt;\n"
-"            已由&lt;b&gt;&lt;a href=\"http://%(domain)s%(user_url)s\"&gt;%(u)"
-"s&lt;/a&gt;&lt;/b&gt;所修改。 \n"
-"            這些修訂立即生效。  文字%(text_change)s及時間標記\n"
-"            %(time_change)s已調整。\n"
-"            "
+msgstr "\n            您為&lt;b&gt;&lt;a href=\"http://%(domain)s%(video_url)s\"&gt;%(v)s&lt;/a&gt;&lt;/b&gt;所製作的 \n             &lt;b&gt;&lt;a href=\"http://%(domain)s%(language_url)s\"&gt;%(lang)s字幕&lt;/a&gt;&lt;/b&gt;\n            已由&lt;b&gt;&lt;a href=\"http://%(domain)s%(user_url)s\"&gt;%(u)s&lt;/a&gt;&lt;/b&gt;所修改。 \n            這些修訂立即生效。  文字%(text_change)s及時間標記\n            %(time_change)s已調整。\n            "
 
 #: templates/videos/email_notification.html:17
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s%(video_url)"
-"s\">%(v)s</a></b> \n"
-"                were changed. These changes went live immediately. %"
-"(text_change)s of the text and \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
+"                were changed. These changes went live immediately. %(text_change)s of the text and \n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
-msgstr ""
-"\n"
-"            您為&lt;b&gt;&lt;a href=\"http://%(domain)s%(video_url)s\"&gt;%"
-"(v)s&lt;/a&gt;&lt;/b&gt;所製作的 \n"
-"            b&gt;&lt;a href=\"http://%(domain)s%(language_url)s\"&gt;%(lang)"
-"s 字幕&lt;/a&gt;&lt;/b&gt; \n"
-"            已被修改，這些修訂立即生效。 文字%(text_change)s及 \n"
-"            時間標記%(time_change)s已調整。\n"
-"            "
+msgstr "\n            您為&lt;b&gt;&lt;a href=\"http://%(domain)s%(video_url)s\"&gt;%(v)s&lt;/a&gt;&lt;/b&gt;所製作的 \n            b&gt;&lt;a href=\"http://%(domain)s%(language_url)s\"&gt;%(lang)s 字幕&lt;/a&gt;&lt;/b&gt; \n            已被修改，這些修訂立即生效。 文字%(text_change)s及 \n            時間標記%(time_change)s已調整。\n            "
 
 #: templates/videos/email_notification.html:26
 #: templates/videos/email_notification_non_editors.html:23
@@ -7020,45 +6371,21 @@ msgstr "新版文字"
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)"
-"s</a></b>\n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
-"%(u)s</a></b>. These changes went live immediately. %(change_percent)s of "
-"the timing was changed.  \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. These changes went live immediately. %(change_percent)s of the timing was changed.  \n"
 "                "
-msgstr ""
-"\n"
-"            影片&lt;b&gt;&lt;a href=\"http://%(domain)s%(video_url)s\"&gt;%"
-"(v)s&lt;/a&gt;&lt;/b&gt;的 \n"
-"            &lt;b&gt;&lt;a href=\"http://%(domain)s%(language_url)s\"&gt;%"
-"(lang)s 字幕&lt;/a&gt;&lt;/b&gt;\n"
-"            已由&lt;b&gt;&lt;a href=\"http://%(domain)s%(user_url)s\"&gt;%(u)"
-"s&lt;/a&gt;&lt;/b&gt;所修改，這些修訂立即生效。%(change_percent)s的時間標記已"
-"調整  \n"
-"            "
+msgstr "\n            影片&lt;b&gt;&lt;a href=\"http://%(domain)s%(video_url)s\"&gt;%(v)s&lt;/a&gt;&lt;/b&gt;的 \n            &lt;b&gt;&lt;a href=\"http://%(domain)s%(language_url)s\"&gt;%(lang)s 字幕&lt;/a&gt;&lt;/b&gt;\n            已由&lt;b&gt;&lt;a href=\"http://%(domain)s%(user_url)s\"&gt;%(u)s&lt;/a&gt;&lt;/b&gt;所修改，這些修訂立即生效。%(change_percent)s的時間標記已調整  \n            "
 
 #: templates/videos/email_notification_non_editors.html:15
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
-"subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)"
-"s</a></b>\n"
-"                were changed. These changes went live immediately. %"
-"(change_percent)s of the timing was changed.             \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
+"                were changed. These changes went live immediately. %(change_percent)s of the timing was changed.             \n"
 "                "
-msgstr ""
-"\n"
-"            影片&lt;b&gt;&lt;a href=\"http://%(domain)s%(video_url)s\"&gt;%"
-"(v)s&lt;/a&gt;&lt;/b&gt;的 \n"
-"            &lt;b&gt;&lt;a href=\"http://%(domain)s%(language_url)s\"&gt;%"
-"(lang)s 字幕&lt;/a&gt;&lt;/b&gt;\n"
-"            已經修改。這些修訂立即生效。%(change_percent)s的時間標記已調"
-"整             \n"
-"            "
+msgstr "\n            影片&lt;b&gt;&lt;a href=\"http://%(domain)s%(video_url)s\"&gt;%(v)s&lt;/a&gt;&lt;/b&gt;的 \n            &lt;b&gt;&lt;a href=\"http://%(domain)s%(language_url)s\"&gt;%(lang)s 字幕&lt;/a&gt;&lt;/b&gt;\n            已經修改。這些修訂立即生效。%(change_percent)s的時間標記已調整             \n            "
 
 #: templates/videos/email_start_notification.html:7
 msgid "Dear"
@@ -7068,16 +6395,15 @@ msgstr "親愛的"
 #, python-format
 msgid ""
 "\n"
-"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has "
-"just started a %(language)s \n"
+"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has just started a %(language)s \n"
 "    translation of your video <a href=\"%(video_url)s\">%(video)s</a>\n"
 "\t"
 msgstr ""
 
 #: templates/videos/email_start_notification.html:13
 msgid ""
-"You can review the translation and thank them for their contribution on this "
-"page:"
+"You can review the translation and thank them for their contribution on this"
+" page:"
 msgstr "你可以在此頁面檢視翻譯，並感謝他們的付出："
 
 #: templates/videos/email_start_notification.html:14
@@ -7123,14 +6449,9 @@ msgstr "影片頁面"
 #: templates/videos/email_title_changed.html:20
 msgid ""
 "\n"
-"    and click 'edit title' to update it. If you're unable to edit the title, "
-"click 'Help' in the main menu to submit a support request.\n"
+"    and click 'edit title' to update it. If you're unable to edit the title, click 'Help' in the main menu to submit a support request.\n"
 "    "
-msgstr ""
-"\n"
-"    按下 '編輯標題' 來更新，若是無法修改，在主選單點選 'Help' 送出協助要"
-"求。\n"
-"    "
+msgstr "\n    按下 '編輯標題' 來更新，若是無法修改，在主選單點選 'Help' 送出協助要求。\n    "
 
 #: templates/videos/email_video_url_add.html:7
 msgid "A new video URL for"
@@ -7244,8 +6565,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                This is an old revision, edited by %(user)s on %(date)s. It "
-"may\n"
+"                This is an old revision, edited by %(user)s on %(date)s. It may\n"
 "                differ significantly from the current revision.\n"
 "                "
 msgstr ""
@@ -7330,8 +6650,7 @@ msgstr ""
 #: templates/videos/subtitle-view.html:275
 msgid ""
 "\n"
-"                        The most recent revision for this language is blank, "
-"but there are older\n"
+"                        The most recent revision for this language is blank, but there are older\n"
 "                        revisions that contain subtitles.\n"
 "                        "
 msgstr ""
@@ -7485,8 +6804,8 @@ msgstr ""
 
 #: templates/videos/video-view.html:159
 msgid ""
-"Subtitles for this video are moderated. If it belongs to a team, try joining "
-"the team to contribute."
+"Subtitles for this video are moderated. If it belongs to a team, try joining"
+" the team to contribute."
 msgstr ""
 
 #: templates/videos/video-view.html:186
@@ -7534,8 +6853,8 @@ msgstr "內部錯誤"
 #: utils/validators.py:13
 #, python-format
 msgid ""
-"Please keep filesize under %(required_size)s. Current filesize %"
-"(current_size)s"
+"Please keep filesize under %(required_size)s. Current filesize "
+"%(current_size)s"
 msgstr "檔案大小請勿超過 %(required_size)s。目前檔案大小 %(current_size)s"
 
 #: utils/forms/__init__.py:75
@@ -7544,8 +6863,8 @@ msgstr "請用逗號分隔email信箱"
 
 #: utils/forms/__init__.py:83
 msgid ""
-"Enter valid usernames separated by commas. Username can contain only a-z, A-"
-"Z and 0-9."
+"Enter valid usernames separated by commas. Username can contain only a-z, "
+"A-Z and 0-9."
 msgstr "輸入有效的用戶名稱，並用逗點區分。用戶名稱只含a-z、A-Z 和 0-9。"
 
 #: utils/forms/unisub_video_form.py:62
