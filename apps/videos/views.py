@@ -149,6 +149,14 @@ def create(request):
 share the video with friends, or get an embed code for your site.  To add or
 improve subtitles, click the button below the video.'''))
 
+        url_obj = video.videourl_set.filter(primary=True).all()[:1].get()
+        if url_obj.type != 'Y':
+            # Check for all types except for Youtube
+            if not url_obj.effective_url.startswith('https'):
+                messages.warning(request, message=_(u'''You have submitted a video
+                that is served over http.  Your browser may display mixed
+                content warnings.'''))
+
         if video_form.created:
             messages.info(request, message=_(u'''Existing subtitles will be imported in a few minutes.'''))
         return redirect(video.get_absolute_url())
