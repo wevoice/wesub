@@ -41,6 +41,7 @@ from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
     ROLE_CONTRIBUTOR
 )
+from videos.tasks import upload_subtitles_to_original_service
 from teams.tasks import update_one_team_video
 from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField
@@ -1540,7 +1541,9 @@ class Task(models.Model):
             metadata_manager.update_metadata(self.team_video.video.pk)
 
             if self.workflow.autocreate_translate:
-                _create_translation_tasks(self.team_video, self.subtitle_version)
+                _create_translation_tasks(self.team_video, subtitle_version)
+
+            upload_subtitles_to_original_service.delay(subtitle_version.pk)
 
     def _complete_translate(self):
         """Handle the messy details of completing a translate task."""
@@ -1569,6 +1572,7 @@ class Task(models.Model):
             # We need to make sure this is updated correctly here.
             from apps.videos import metadata_manager
             metadata_manager.update_metadata(self.team_video.video.pk)
+            upload_subtitles_to_original_service.delay(subtitle_version.pk)
 
             task = None
 
@@ -1610,6 +1614,7 @@ class Task(models.Model):
 
                 # non approval review
                 notifier.reviewed_and_published.delay(self.pk)
+                upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
             else:
                 # Send the subtitles back for improvement.
                 self._send_back()
@@ -1630,6 +1635,7 @@ class Task(models.Model):
             # But only if we haven't already.
             if self.workflow.autocreate_translate:
                 _create_translation_tasks(self.team_video, self.subtitle_version)
+            upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
         else:
             # Send the subtitles back for improvement.
             self._send_back(sends_notification=False)
