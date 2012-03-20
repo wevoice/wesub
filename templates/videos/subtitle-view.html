@@ -230,8 +230,13 @@
                     </p>
                 {% else %}
                     <p class="empty">
-                        {% trans 'No subtitles available yet.' %}
-                        <a href="#" id="add_subtitles">{% trans 'Make some!' %}</a>
+                        {% if revision_list|length > 0 %}
+                            {% trans 'These subtitles are in progress.' %}
+                            <a href="#" id="add_subtitles">{% trans 'Make more?' %}</a>
+                        {% else %}
+                            {% trans 'No subtitles available yet.' %}
+                            <a href="#" id="add_subtitles">{% trans 'Make some!' %}</a>
+                        {% endif %}
                     </p>
                 {% endif %}
             {% endif %}
