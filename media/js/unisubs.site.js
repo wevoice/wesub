@@ -213,7 +213,6 @@ var Site = function(Site) {
             }
             if ($('a.open-modal').length) {
                 $('a.open-modal').live('click',function(e){
-                    e.preventDefault();
                     $target = $($(this).attr('href'));
                     $target.show();
 
@@ -225,6 +224,7 @@ var Site = function(Site) {
                     $('html').bind('click.modal', function() {
                         closeModal($target);
                     });
+                    e.preventDefault();
                 });
                 $('.action-close, .close', '.bootstrap').click(function(){
                     closeModal($(this).parents('.modal'));
@@ -359,6 +359,16 @@ var Site = function(Site) {
                 } else {
                     $('#lang_select_btn').hide();
                 }
+            }
+            if ($('div.note').length) {
+                $('.note .hide-announcement').click(function() {
+                    var $this = $(this);
+                    $this.parents('.note').hide();
+                    var d = new Date();
+                    d.setTime(d.getTime() + 60*60*24*365*1000);
+                    document.cookie = window.COOKIE + d.toUTCString();
+                    return false;
+                });
             }
 
             $listsCollapsible = $('ul.list-collapsible');
@@ -671,10 +681,11 @@ var Site = function(Site) {
                 var terms = {};
 
                 $.each(data.results, function (i, val) {
+                    var name;
                     if (data.results[i][2] !== '') {
-                        var name = ' (' + data.results[i][2] + ')';
+                        name = ' (' + data.results[i][2] + ')';
                     } else {
-                        var name = '';
+                        name = '';
                     }
                     terms[data.results[i][0]] = data.results[i][1] + name;
                 });

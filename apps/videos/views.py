@@ -21,7 +21,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRespons
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
-from videos.models import Video, VIDEO_TYPE_YOUTUBE, Action, SubtitleLanguage, SubtitleVersion,  \
+from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
     VideoUrl, AlreadyEditingException
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
     SubtitlesUploadForm, PasteTranscriptionForm, CreateVideoUrlForm, TranscriptionFileForm, \
@@ -191,20 +191,8 @@ def video(request, video, video_url=None, title=None):
     # TODO: make this more pythonic, prob using kwargs
     context = widget.add_onsite_js_files({})
     context['video'] = video
-    original = video.subtitle_language()
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    # we want a list of translations that had at least with version with subtitles
-    # this will not filter subtitleversion's whos subtitles are empty
-    translations = video.subtitlelanguage_set.exclude(subtitle_count=0)
-    if original:
-        # a video might have more than 1 is_original sl, in which case
-        # we guess the right one above, but still manage to include the others
-        # bellow
-        translations = translations.exclude(pk=original.pk)
-    translations = list(translations)
-    translations.sort(key=lambda f: f.get_language_display())
-    context['translations'] = translations
-
+    context['translations'] = _get_translations(video)
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
 
     context['widget_params'] = _widget_params(
@@ -275,7 +263,7 @@ def upload_subtitles(request):
         except Exception, e:
             #trying find out one error on dev-server. hope this should help
             transaction.rollback()
-            raise e
+            raise
     else:
         output['errors'] = form.get_errors()
         transaction.rollback()
@@ -427,14 +415,8 @@ def history(request, video, lang=None, lang_id=None):
         context['ordering'], context['order_type'] = ordering, order_type
 
     context['video'] = video
-    original = video.subtitle_language()
-    translations = list(video.subtitlelanguage_set.filter(is_original=False) \
-        .filter(had_version=True).select_related('video'))
-
+    context['translations'] = _get_translations(video)
     context["user_can_moderate"] = False
-
-    translations.sort(key=lambda f: f.get_language_display())
-    context['translations'] = translations
     context['last_version'] = language.last_version
     context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
@@ -736,3 +718,11 @@ def reset_metadata(request, video_id):
     video_changed_tasks.delay(video.id)
     return HttpResponse('ok')
 
+def _get_translations(video):
+    original = video.subtitle_language()
+    translations = video.subtitlelanguage_set.exclude(subtitle_count=0)
+    if original:
+        translations = translations.exclude(pk=original.pk)
+    translations = list(translations)
+    translations.sort(key=lambda f: f.get_language_display())
+    return translations

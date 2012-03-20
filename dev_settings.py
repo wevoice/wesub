@@ -70,6 +70,9 @@ CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 # 3. >>> ./dev-runserver
 # 4. >>> python manage.py celerycam #this is optional. It allow see in admin-interface tasks running
 
+CACHE_PREFIX = 'unisubsdevsettings'
+CACHE_TIMEOUT = 0
+
 COMPRESS_MEDIA = not DEBUG
 
 try:

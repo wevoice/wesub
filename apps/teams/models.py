@@ -1200,10 +1200,10 @@ class TaskManager(models.Manager):
         return self.not_deleted().filter(completed__isnull=False)
 
 
-    def _type(self, type, completed, approved=None):
-        """Return a QS of tasks that are not deleted and are of the given type.
+    def _type(self, types, completed=None, approved=None):
+        """Return a QS of tasks that are not deleted and are one of the given types.
 
-        type should be a string matching a label in Task.TYPE_CHOICES.
+        types should be a list of strings matching a label in Task.TYPE_CHOICES.
 
         completed should be one of:
 
@@ -1215,7 +1215,8 @@ class TaskManager(models.Manager):
         Task.APPROVED_CHOICES.
 
         """
-        qs = self.not_deleted().filter(type=Task.TYPE_IDS[type])
+        type_ids = [Task.TYPE_IDS[type] for type in types]
+        qs = self.not_deleted().filter(type__in=type_ids)
 
         if completed == False:
             qs = qs.filter(completed=None)
@@ -1230,28 +1231,36 @@ class TaskManager(models.Manager):
 
     def incomplete_subtitle(self):
         """Return a QS of subtitle tasks that are not deleted or completed."""
-        return self._type('Subtitle', False)
+        return self._type(['Subtitle'], False)
 
     def incomplete_translate(self):
         """Return a QS of translate tasks that are not deleted or completed."""
-        return self._type('Translate', False)
+        return self._type(['Translate'], False)
 
     def incomplete_review(self):
         """Return a QS of review tasks that are not deleted or completed."""
-        return self._type('Review', False)
+        return self._type(['Review'], False)
 
     def incomplete_approve(self):
         """Return a QS of approve tasks that are not deleted or completed."""
-        return self._type('Approve', False)
+        return self._type(['Approve'], False)
+
+    def incomplete_subtitle_or_translate(self):
+        """Return a QS of subtitle or translate tasks that are not deleted or completed."""
+        return self._type(['Subtitle', 'Translate'], False)
+
+    def incomplete_review_or_approve(self):
+        """Return a QS of review or approve tasks that are not deleted or completed."""
+        return self._type(['Review', 'Approve'], False)
 
 
     def complete_subtitle(self):
         """Return a QS of subtitle tasks that are not deleted, but are completed."""
-        return self._type('Subtitle', True)
+        return self._type(['Subtitle'], True)
 
     def complete_translate(self):
         """Return a QS of translate tasks that are not deleted, but are completed."""
-        return self._type('Translate', True)
+        return self._type(['Translate'], True)
 
     def complete_review(self, approved=None):
         """Return a QS of review tasks that are not deleted, but are completed.
@@ -1261,7 +1270,7 @@ class TaskManager(models.Manager):
         Task.APPROVED_CHOICES, like 'Rejected'.
 
         """
-        return self._type('Review', True, approved)
+        return self._type(['Review'], True, approved)
 
     def complete_approve(self, approved=None):
         """Return a QS of approve tasks that are not deleted, but are completed.
@@ -1271,29 +1280,47 @@ class TaskManager(models.Manager):
         Task.APPROVED_CHOICES, like 'Rejected'.
 
         """
-        return self._type('Approve', True, approved)
+        return self._type(['Approve'], True, approved)
+
+    def complete_subtitle_or_translate(self):
+        """Return a QS of subtitle or translate tasks that are not deleted, but are completed."""
+        return self._type(['Subtitle', 'Translate'], True)
+
+    def complete_review_or_approve(self, approved=None):
+        """Return a QS of review or approve tasks that are not deleted, but are completed.
+
+        If approved is given the tasks are further filtered on their .approved
+        attribute.  It must be a string matching one of the labels in
+        Task.APPROVED_CHOICES, like 'Rejected'.
+
+        """
+        return self._type(['Review', 'Approve'], True, approved)
 
 
     def all_subtitle(self):
         """Return a QS of subtitle tasks that are not deleted."""
-        return self._type('Subtitle', None)
+        return self._type(['Subtitle'])
 
     def all_translate(self):
         """Return a QS of translate tasks that are not deleted."""
-        return self._type('Translate', None)
+        return self._type(['Translate'])
 
     def all_review(self):
         """Return a QS of review tasks that are not deleted."""
-        return self._type('Review', None)
+        return self._type(['Review'])
 
     def all_approve(self):
         """Return a QS of tasks that are not deleted."""
-        return self._type('Approve', None)
+        return self._type(['Approve'])
+
+    def all_subtitle_or_translate(self):
+        """Return a QS of subtitle or translate tasks that are not deleted."""
+        return self._type(['Subtitle', 'Translate'])
 
     def all_review_or_approve(self):
         """Return a QS of review or approve tasks that are not deleted."""
-        return self.not_deleted().filter(type__in=(Task.TYPE_IDS['Review'],
-                                                   Task.TYPE_IDS['Approve']))
+        return self._type(['Review', 'Approve'])
+
 
 class Task(models.Model):
     TYPE_CHOICES = (

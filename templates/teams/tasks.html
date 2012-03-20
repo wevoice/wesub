@@ -1,5 +1,5 @@
 {% extends "teams/base.html" %}
-{% load to_json i18n teams_tags paginator media_compressor verbatim_templatetag query_string utils_tags %}
+{% load to_json i18n teams_tags paginator media_compressor verbatim_templatetag query_string utils_tags videos_tags %}
 
 {% block css %}
     {{ block.super }}
@@ -144,7 +144,15 @@
                                     {% trans 'Subtitles' %}
                                 {% endif %}
                             </h3>
-                            <p>{% trans "Video" %}: <a href="{{ task.team_video.video.get_absolute_url }}">{{ task.team_video|truncatewords:6 }}</a></p>
+                            <p>
+                                {% trans "Video" %}:
+                                <a href="{{ task.team_video.video.get_absolute_url }}">
+                                    {{ task.team_video|truncatewords:4 }}
+                                </a>
+                                {% if task.team_video.video.duration %}
+                                    ({{ task.team_video.video.duration|format_duration }})
+                                {% endif %}
+                            </p>
 
                             {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
                                 {% with task.subtitle_version as version %}
