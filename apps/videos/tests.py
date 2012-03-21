@@ -23,21 +23,17 @@ from django.test import TestCase
 from videos.models import Video, Action, VIDEO_TYPE_YOUTUBE, UserTestResult, \
     SubtitleLanguage, VideoUrl, VideoFeed, Subtitle
 from apps.auth.models import CustomUser as User
-from utils import SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
+from utils import SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
 from django.core.urlresolvers import reverse
 from django.core import mail
-from videos.forms import SubtitlesUploadForm, VideoForm
+from videos.forms import VideoForm
 from videos.tasks import video_changed_tasks
 from apps.videos import metadata_manager
 from apps.widget import video_cache
 import math_captcha
 import os
-from django.db.models import ObjectDoesNotExist, Q
-from django.core.management import call_command
-from django.core import mail
-from videos.rpc import VideosApiClass
+from django.db.models import ObjectDoesNotExist
 from widget.tests import RequestMockup
-from widget.srt_subs import SRTSubtitles
 from django.core.cache import cache
 
 
