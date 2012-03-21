@@ -190,7 +190,7 @@ class BusinessLogicTest(TestCase):
 
             "title": "c" }
 
-        videos = _create_videos([data], [])
+        _create_videos([data], [])
         v = Video.objects.get(title='c')
 
         en = v.subtitle_language('en')
@@ -203,16 +203,8 @@ class BusinessLogicTest(TestCase):
             self.assertEqual(ens.end_time, frs.end_time)
         self.assertFalse(fr.is_forked)
         # now, for on uploade
-        d = {
-            'language': fr.language,
-            'video_language': 'en',
-            'video': v.pk,
-            'subtitles': open(os.path.join(os.path.dirname(__file__), 'fixtures/test.srt')),
-            'is_complete': True
-            }
         self.client.login(**self.auth)
         from widget.rpc import Rpc
-        from widget.tests import RequestMockup, NotAuthenticatedUser
 
         rpc = Rpc()
         request = RequestMockup(user=self.user)
@@ -501,7 +493,6 @@ class UploadSubtitlesTest(WebUseTest):
         session = create_two_sub_dependent_session(request)
         video_pk = session.language.video.pk
         video = Video.objects.get(pk=video_pk)
-        original_en = video.subtitlelanguage_set.filter(language='en').all()[0]
 
         self._login()
         data = self._make_data(lang='en', video_pk=video_pk)
@@ -542,8 +533,6 @@ class UploadSubtitlesTest(WebUseTest):
         translated = video.subtitlelanguage_set.all().filter(language='es')[0]
         self.assertFalse(translated.is_forked)
         self.assertEquals(False, translated.latest_version(public_only=True).is_forked)
-
-        trans_subs = translated.version().subtitle_set.all()
 
         self._login()
         data = self._make_data(lang='en', video_pk=video.pk)
@@ -1005,7 +994,7 @@ class ViewsTest(WebUseTest):
             "language": language_code,
             "video_language": u"en"
         }
-        response = self.client.post(reverse("videos:paste_transcription"), data)
+        self.client.post(reverse("videos:paste_transcription"), data)
         language = self.video.subtitle_language(language_code)
         version = language.latest_version(public_only=True)
         self.assertEqual(len(version.subtitles()), 2)
@@ -1106,7 +1095,6 @@ class ViewsTest(WebUseTest):
                 subtitle_order=i,
                 subtitle_text="%s lala" % i
             )
-        new_version_sub_count = len(new_v.subtitles())
         self._login()
         self.client.get(reverse('videos:rollback', args=[v.id]), {})
         last_v  = SubtitleLanguage.objects.get(id=lang.id).latest_version(public_only=True)
@@ -1213,7 +1201,6 @@ class YoutubeVideoTypeTest(TestCase):
 
     def test_set_values(self):
         youtbe_url = 'http://www.youtube.com/watch?v=_ShmidkrcY0'
-        vt = self.vt(youtbe_url)
 
         video, created = Video.get_or_create_for_url(youtbe_url)
         vu = video.videourl_set.all()[:1].get()
@@ -1367,7 +1354,6 @@ class DailymotionVideoTypeTest(TestCase):
 
     def test_type(self):
         url = 'http://www.dailymotion.com/video/x7u2ww_juliette-drums_lifestyle#hp-b-l'
-        vt = self.vt(url)
 
         video, created = Video.get_or_create_for_url(url)
         vu = video.videourl_set.all()[:1].get()
@@ -1383,7 +1369,6 @@ class DailymotionVideoTypeTest(TestCase):
         self.assertFalse(self.vt.matches_video_url('http://www.dailymotion.com'))
 
     def test_type1(self):
-        from videos.types import VideoTypeError
         url = u'http://www.dailymotion.com/video/edit/xjhzgb_projet-de-maison-des-services-a-fauquembergues_news'
         vt = self.vt(url)
         try:
@@ -1559,7 +1544,7 @@ class BrightcoveVideoTypeTest(TestCase):
         self.assertEqual(vt.video_id, '956115196001')
 
 
-from videos.models import SubtitleLanguage, SubtitleVersion, Subtitle
+from videos.models import SubtitleVersion
 from datetime import datetime
 
 class TestTasks(TestCase):
@@ -1934,7 +1919,7 @@ class TestModelsSaving(TestCase):
         """
         lang = SubtitleLanguage(language="pt", video=self.video, standard_language=self.video.subtitle_language(), is_forked=False)
         lang.save()
-        v1 = create_version(lang, [
+        create_version(lang, [
                 {
                    "subtitle_order" : 1,
                    "subtitle_text": "t1",
@@ -1968,7 +1953,7 @@ class TestModelsSaving(TestCase):
         u.set_password("admin")
         u.save()
         from widget.rpc import Rpc
-        from widget.tests import RequestMockup, NotAuthenticatedUser
+        from widget.tests import RequestMockup
 
         rpc = Rpc()
         self.client.login(**{"username":"admin", "password":"admin"})
@@ -2162,7 +2147,7 @@ class TestTemplateTags(TestCase):
         l = SubtitleLanguage(video=v, has_version=True)
         l.save()
         from videos.templatetags.subtitles_tags import language_url
-        lurl = language_url(None, l)
+        language_url(None, l)
 
 
 class TestMetadataManager(TestCase):
