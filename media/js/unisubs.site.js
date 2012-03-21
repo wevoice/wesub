@@ -586,6 +586,17 @@ var Site = function(Site) {
             that.Utils.resetLangFilter($('select#id_task_language'));
             that.Utils.chosenify();
         },
+        team_video_edit: function() {
+            that.Utils.chosenify();
+
+            var $move_form = $('form.move-video');
+
+            $move_form.submit(function() {
+                var $selected = $('select#id_team option:selected', $move_form);
+                $('input[name="team_video"]', $move_form).val($selected.val());
+                $('input[name="team"]', $move_form).val($selected.data('team-pk'));
+            });
+        },
         team_videos_list: function() {
             $form = $('form', 'div#remove-modal');
 

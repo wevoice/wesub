@@ -965,6 +965,9 @@ p.view-more a:after {
 .v1 form {
   padding: 1em 0;
 }
+.v1 form h3 {
+  line-height: 20px;
+}
 .v1 form .form-title {
   margin: 1em 0 0 0;
 }
@@ -1220,11 +1223,24 @@ input[name="thumbnail-clear"] {
   margin: 12px 4px 12px 0 !important;
 }
 
-body#teams div.edit-team-video form fieldset a {
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 240px;
+form.move-video {
+  background: #ECF0F1;
+  padding: 20px;
+  -moz-background-clip: padding-box;
+  -moz-border-radius: 10px;
+  -webkit-background-clip: padding-box;
+  -webkit-border-radius: 10px;
+  background-clip: padding-box;
+  border-radius: 10px;
+}
+form.move-video fieldset {
+  padding-bottom: 0;
+}
+form.move-video fieldset select {
+  width: auto;
+}
+form.move-video div.submit {
+  margin-top: 10px;
 }
 
 /* Dashboard */
