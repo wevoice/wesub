@@ -1223,26 +1223,6 @@ input[name="thumbnail-clear"] {
   margin: 12px 4px 12px 0 !important;
 }
 
-form.move-video {
-  background: #ECF0F1;
-  padding: 20px;
-  -moz-background-clip: padding-box;
-  -moz-border-radius: 10px;
-  -webkit-background-clip: padding-box;
-  -webkit-border-radius: 10px;
-  background-clip: padding-box;
-  border-radius: 10px;
-}
-form.move-video fieldset {
-  padding-bottom: 0;
-}
-form.move-video fieldset select {
-  width: auto;
-}
-form.move-video div.submit {
-  margin-top: 10px;
-}
-
 /* Dashboard */
 #dashboard .featured {
   margin-bottom: 4em;
@@ -2056,4 +2036,22 @@ pre.dump code {
 
 #teams .view .filters.active {
   display: block;
+}
+
+#teams form.edit-video fieldset {
+  padding-bottom: 0;
+}
+
+#teams form.move-video {
+  border-top: 10px solid #ECF0F1;
+  margin-top: 15px;
+}
+#teams form.move-video fieldset {
+  padding-bottom: 0;
+}
+#teams form.move-video fieldset select {
+  width: auto;
+}
+#teams form.move-video div.submit {
+  margin-top: 10px;
 }

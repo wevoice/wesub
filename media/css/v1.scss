@@ -1174,22 +1174,6 @@ label[for="id_thumbnail"] {
 input[name="thumbnail-clear"] {
     margin: 12px 4px 12px 0 !important;
 }
-form.move-video {
-    background: #ECF0F1;
-    padding: 20px;
-    @include border-radius(10px);
-
-    fieldset {
-        padding-bottom: 0;
-
-        select {
-            width: auto;
-        }
-    }
-    div.submit {
-        margin-top: 10px;
-    }
-}
 
 /* Dashboard */
 #dashboard {
@@ -2051,4 +2035,24 @@ pre.dump {
 }
 #teams .view .filters.active {
     display: block;
+}
+#teams form.edit-video {
+    fieldset {
+        padding-bottom: 0;
+    }
+}
+#teams form.move-video {
+    border-top: 10px solid #ECF0F1;
+    margin-top: 15px;
+
+    fieldset {
+        padding-bottom: 0;
+
+        select {
+            width: auto;
+        }
+    }
+    div.submit {
+        margin-top: 10px;
+    }
 }
