@@ -22,7 +22,7 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
 from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
-    VideoUrl, AlreadyEditingException
+    VideoUrl, AlreadyEditingException, restrict_versions
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
     SubtitlesUploadForm, PasteTranscriptionForm, CreateVideoUrlForm, TranscriptionFileForm, \
     AddFromFeedForm
@@ -409,7 +409,7 @@ def history(request, video, lang=None, lang_id=None):
         else:
             raise Http404
 
-    qs = language.subtitleversion_set.not_restricted_by_moderation().select_related('user')
+    qs = language.subtitleversion_set.select_related('user')
     ordering, order_type = request.GET.get('o'), request.GET.get('ot')
     order_fields = {
         'date': 'datetime_started',
@@ -433,12 +433,10 @@ def history(request, video, lang=None, lang_id=None):
 
     context['task'] =  _get_related_task(request)
     _add_share_panel_context_for_history(context, video, language)
-    return object_list(request, queryset=qs, allow_empty=True,
-                       paginate_by=settings.REVISIONS_ONPAGE,
-                       page=request.GET.get('page', 1),
-                       template_name='videos/subtitle-view.html',
-                       template_object_name='revision',
-                       extra_context=context)
+
+    context['revision_list'] = restrict_versions(qs, request.user, language)
+
+    return render_to_response("videos/subtitle-view.html", context, context_instance=RequestContext(request))
 
 def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):
     primary_url = video_url or video.get_video_url()

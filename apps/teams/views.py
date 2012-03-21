@@ -1094,7 +1094,13 @@ def _order_tasks(request, tasks):
     elif sort == '-created':
         tasks = tasks.order_by('-created')
     elif sort == 'expires':
-        tasks = tasks.order_by('expiration_date')
+        # Unfortunately, MySQL puts NULL records to the top, here.
+        # In this sorting instance, we convert the two querysets to
+        # lists and combine them, forcing the NULL records to the bottom.
+        # Alternative would be to write custom SQL to drop the NULLs.
+        null_expirations = tasks.filter(expiration_date=None)
+        has_expirations = tasks.exclude(expiration_date=None)
+        tasks = list(has_expirations.order_by('expiration_date')) + list(null_expirations)
     elif sort == '-expires':
         tasks = tasks.order_by('-expiration_date')
 
@@ -1281,7 +1287,7 @@ def delete_task(request, slug):
 
             if task.get_type_display() in ['Review', 'Approve']:
                 # TODO: Handle subtitle/translate tasks here too?
-                if not form.cleaned_data['discard_subs']:
+                if not form.cleaned_data['discard_subs'] and task.subtitle_version:
                     task.subtitle_version.moderation_status = MODERATION.APPROVED
                     task.subtitle_version.save()
                     metadata_manager.update_metadata(video.pk)

@@ -211,15 +211,9 @@ def import_videos_from_feeds(urls, user_id=None):
     if user:
         notifier.videos_imported_message.delay(user_id, len(videos))
 
-def _save_video_feed(url, last_entry, user=None):
-    try:
-        vf = VideoFeed.objects.get(url=url)
-    except VideoFeed.DoesNotExist:
-        vf = VideoFeed(url=url)
-
-    vf.user = user
-    vf.last_link = last_entry
-    vf.save()
+@task()
+def upload_subtitles_to_original_service(version_pk):
+    _update_captions_in_original_service(version_pk)
 
 def _send_notification(version_id):
     from videos.models import SubtitleVersion
@@ -433,6 +427,13 @@ def _delete_captions_in_original_service(language_pk):
     ThirdPartyAccount.objects.mirror_on_third_party(
         language.video, language.language, DELETE_LANGUAGE_ACTION)
 
-def _parse_feed_url(self, url):
-    feed_parser = FeedParser(url)
-    return [(vt, info, entry) for vt, info, entry in feed_parser.items() if vt]
+def _save_video_feed(feed_url, last_entry_url, user):
+    """ Creates or updates a videofeed given some url """
+    try:
+        vf = VideoFeed.objects.get(url=feed_url)
+    except VideoFeed.DoesNotExist:
+        vf = VideoFeed(url=feed_url)
+
+    vf.user = user
+    vf.last_link = last_entry_url
+    vf.save()

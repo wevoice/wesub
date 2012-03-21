@@ -140,7 +140,7 @@
         <ul class="tabs">
             <li class="current"><a href="#transcripts-tab">{% trans "Subtitles" %}</a></li>
             <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{{ language|get_comment_count }}</span></a></li>
-            <li class="hascount"><a href="#revisions-tab">{% trans "Revisions" %}<span>{{ hits }}</span></a></li>
+            <li class="hascount"><a href="#revisions-tab">{% trans "Revisions" %}<span>{{ revision_list|length }}</span></a></li>
         </ul>
         <div class="tab" id="transcripts-tab">
             <div class="tools">
@@ -230,8 +230,13 @@
                     </p>
                 {% else %}
                     <p class="empty">
-                        {% trans 'No subtitles yet.' %}
-                        <a href="#" id="add_subtitles">{% trans 'Make some!' %}</a>
+                        {% if revision_list|length > 0 %}
+                            {% trans 'These subtitles are in progress.' %}
+                            <a href="#" id="add_subtitles">{% trans 'Make more?' %}</a>
+                        {% else %}
+                            {% trans 'No subtitles available yet.' %}
+                            <a href="#" id="add_subtitles">{% trans 'Make some!' %}</a>
+                        {% endif %}
                     </p>
                 {% endif %}
             {% endif %}
@@ -256,10 +261,12 @@
                 <ul class="listing revisions">
                     {% for item in revision_list %}
                         <li>
-                            Mod status: {{ item.moderation_status }}
                             <h3>
                                 <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
                                 <a href="{% url videos:revision pk=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                {% if item.moderation_status == 'waiting_moderation' %}
+                                    (draft)
+                                {% endif %}
                             </h3>
                             {% if item.user %}
                                 <p>{% trans "by" %} <a href="{% url profiles:profile item.user.pk %}">{{ item.user }}</a></p>
