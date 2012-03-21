@@ -1071,6 +1071,10 @@ def _order_tasks(request, tasks):
     elif sort == '-created':
         tasks = tasks.order_by('-created')
     elif sort == 'expires':
+        # Unfortunately, MySQL puts NULL records to the top, here.
+        # In this sorting instance, we convert the two querysets to
+        # lists and combine them, forcing the NULL records to the bottom.
+        # Alternative would be to write custom SQL to drop the NULLs.
         null_expirations = tasks.filter(expiration_date=None)
         has_expirations = tasks.exclude(expiration_date=None)
         tasks = list(has_expirations.order_by('expiration_date')) + list(null_expirations)
