@@ -1,0 +1,28 @@
+{% load i18n %}
+
+{% if user.is_authenticated and teams %}
+    <p>{% trans "Move this video to another one of your teams" %}:</p>
+    <div class="sort_button">
+        <div class='arrow'></div>
+        <span class="sort_label">
+            <strong>{% trans 'Choose a team' %}</strong>
+        </span>
+        <ul>
+            {% for team in teams %}
+                <li>
+                    {# TODO: Make this look nice, Nick. #}
+                    <form action="{% url teams:move_video %}" method="POST">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="team_video" value="{{ team_video.pk }}" />
+                        <input type="hidden" name="team" value="{{ team.pk }}" />
+                        <input type="hidden" name="next" value="{{ request.path }}" />
+
+                        <a href="#" onclick="">{{ team }}</a>
+                        <input type="submit" class="submit" value="go" name="" />
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

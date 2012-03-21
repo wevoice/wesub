@@ -42,7 +42,7 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm
+    UnpublishForm, MoveTeamVideoForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -560,6 +560,29 @@ def add_video(request, slug):
         'form': form,
         'team': team
     }
+
+@login_required
+def move_video(request):
+    form = MoveTeamVideoForm(request.user, request.POST)
+
+    if form.is_valid():
+        team_video = form.cleaned_data['team_video']
+        team = form.cleaned_data['team']
+
+        # For now, we'll just delete any tasks associated with the moved video.
+        team_video.task_set.update(deleted=True)
+
+        # We move the video by just switching the team, instead of deleting and
+        # recreating it.
+        team_video.team = team
+        team_video.save()
+
+        messages.success(request, _(u'The video has been moved to the new team.'))
+    else:
+        for e in flatten_errorlists(form.errors):
+            messages.error(request, e)
+
+    return HttpResponseRedirect(request.POST.get('next', '/'))
 
 @render_to('teams/add_videos.html')
 @login_required

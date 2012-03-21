@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import re
-from urllib import urlopen
 
 from django import forms
 from django.conf import settings
@@ -27,10 +26,9 @@ from auth.models import CustomUser as User
 from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
-    can_assign_task, can_unpublish_subs
+    can_assign_task, can_unpublish_subs, can_remove_video
 )
 from teams.permissions_const import ROLE_NAMES
-from utils.amazon.fields import create_thumbnails
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.translation import get_language_choices
@@ -105,6 +103,35 @@ class EditTeamVideoForm(forms.ModelForm):
             if content:
                 VideoMetadata(video=video, metadata_type=meta_type_id,
                               content=content).save()
+
+class MoveTeamVideoForm(forms.Form):
+    team_video = forms.ModelChoiceField(queryset=TeamVideo.objects.all(),
+                                        required=True)
+    team = forms.ModelChoiceField(queryset=Team.objects.all(),
+                                  required=True)
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(MoveTeamVideoForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        team_video = self.cleaned_data.get('team_video')
+        team = self.cleaned_data.get('team')
+
+        if not team_video or not team:
+            return
+
+        if team_video.team.pk == team.pk:
+            raise forms.ValidationError(u"That video is already in that team.")
+
+        if not can_add_video(team, self.user):
+            raise forms.ValidationError(u"You can't add videos to that team.")
+
+        if not can_remove_video(team_video, self.user):
+            raise forms.ValidationError(u"You can't remove that video from its team.")
+
+        return self.cleaned_data
+
 
 class BaseVideoBoundForm(forms.ModelForm):
     video_url = UniSubBoundVideoField(label=_('Video URL'), verify_exists=True,

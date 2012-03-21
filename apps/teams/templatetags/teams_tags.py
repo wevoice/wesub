@@ -178,6 +178,19 @@ def team_add_video_select(context):
         context['teams'] = [team for team in qs if can_add_video_somewhere(team, user)]
     return context
 
+@register.inclusion_tag('teams/_team_move_video_select.html', takes_context=True)
+def team_move_video_select(context):
+    user = context['user']
+    if user.is_authenticated():
+        team_video = context['video'].get_team_video()
+        if team_video:
+            qs = Team.objects.filter(users=user)
+            context['teams'] = [team for team in qs
+                                if can_add_video_somewhere(team, user)
+                                and can_remove_video(team_video, user)
+                                and team.pk != team_video.team.pk]
+    return context
+
 @register.inclusion_tag('videos/_team_list.html')
 def render_belongs_to_team_list(video, user):
     teams =  []
