@@ -595,6 +595,12 @@ var Site = function(Site) {
                 var $selected = $('select#id_team option:selected', $move_form);
                 $('input[name="team_video"]', $move_form).val($selected.val());
                 $('input[name="team"]', $move_form).val($selected.data('team-pk'));
+
+                if (confirm("Warning: if you move this video, it will lose all tasks associated with it (the activity will be retained, however). Proceed?")) {
+                    return true;
+                } else {
+                    return false;
+                }
             });
         },
         team_videos_list: function() {
