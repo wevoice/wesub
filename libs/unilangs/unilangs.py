@@ -346,8 +346,8 @@ def _generate_initial_data():
         'yor': (gettext_noop(u'Yoruba'), u'Yorùbá'),
         'za': (gettext_noop(u'Zhuang, Chuang'), u'Cuengh'),
         'zh': (gettext_noop(u'Chinese, Yue'), u'中文'),
-        'zh-cn': (gettext_noop(u'Chinese, Simplified'), u'简体字'),
-        'zh-tw': (gettext_noop(u'Chinese, Traditional'), u'簡體字'),
+        'zh-cn': (gettext_noop(u'Chinese, Simplified'), u'简体中文'),
+        'zh-tw': (gettext_noop(u'Chinese, Traditional'), u'繁體中文'),
         'zul': (gettext_noop(u'Zulu'), u'isiZulu'),
     })
 
