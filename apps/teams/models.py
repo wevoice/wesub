@@ -1621,7 +1621,9 @@ class Task(models.Model):
                 # Send the subtitles back for improvement.
                 self._send_back()
 
-        self.subtitle_version.set_reviewed_by(self.assignee)
+        if self.assignee:
+            # TODO: See if we can eliminate the need for this if check.
+            self.subtitle_version.set_reviewed_by(self.assignee)
 
         return task
 
@@ -1645,7 +1647,9 @@ class Task(models.Model):
             # Send the subtitles back for improvement.
             self._send_back(sends_notification=False)
 
-        self.subtitle_version.set_approved_by(self.assignee)
+        if self.assignee:
+            # TODO: See if we can eliminate the need for this if check.
+            self.subtitle_version.set_approved_by(self.assignee)
 
         notifier.approved_notification.delay(self.pk, approval)
 
