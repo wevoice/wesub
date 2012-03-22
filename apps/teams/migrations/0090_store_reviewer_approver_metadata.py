@@ -5,7 +5,7 @@ from south.v2 import DataMigration
 from django.db import models
 
 class Migration(DataMigration):
-    
+
     def forwards(self, orm):
         "Write your forwards methods here."
         SubtitleVersionMetadata = orm['videos.SubtitleVersionMetadata']
@@ -41,11 +41,11 @@ class Migration(DataMigration):
                             key=101) # Can't use custom attributes either, lol.
             v.data = task.assignee.pk
             v.save()
-    
-    
+
+
     def backwards(self, orm):
         "Write your backwards methods here."
-    
+
     models = {
         'accountlinker.thirdpartyaccount': {
             'Meta': {'unique_together': "(('type', 'username'),)", 'object_name': 'ThirdPartyAccount'},
@@ -421,5 +421,5 @@ class Migration(DataMigration):
             'videoid': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'})
         }
     }
-    
+
     complete_apps = ['videos', 'teams']
