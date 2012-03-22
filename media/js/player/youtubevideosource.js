@@ -32,7 +32,7 @@ unisubs.player.YoutubeVideoSource = function(youtubeVideoID, opt_videoConfig) {
     this.videoConfig_ = opt_videoConfig;
 };
 unisubs.player.YoutubeVideoSource.extractVideoID = function(videoURL) {
-    var videoIDExtract = /(?:v[\/=]|embed\/)([0-9a-zA-Z\-\_]+)/i.exec(videoURL);
+    var videoIDExtract = /(?:v[\/=]|embed\/|youtu\.be\/)([0-9a-zA-Z\-\_]+)/i.exec(videoURL);
     return videoIDExtract ? videoIDExtract[1] : null;
 };
 unisubs.player.YoutubeVideoSource.forURL = function(videoURL, opt_videoConfig) {
@@ -44,7 +44,7 @@ unisubs.player.YoutubeVideoSource.forURL = function(videoURL, opt_videoConfig) {
         return null;
 };
 unisubs.player.YoutubeVideoSource.isYoutube = function(videoURL) {
-    return (/^\s*https?:\/\/([^\.]+\.)?youtube/i).test(videoURL);
+    return (/^\s*https?:\/\/([^\.]+\.)?youtu\.?be/i).test(videoURL);
 };
 unisubs.player.YoutubeVideoSource.prototype.createPlayer = function() {
     return this.createPlayerInternal(false);
