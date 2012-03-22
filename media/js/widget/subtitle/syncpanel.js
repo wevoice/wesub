@@ -225,8 +225,7 @@ unisubs.subtitle.SyncPanel.prototype.downReleased_ = function() {
 };
 unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
     var answer =
-        confirm("Are you sure you want to start over? All timestamps " +
-                "will be deleted.");
+        confirm("Are you sure you want to start over?");
     if (answer) {
         this.videoPlayer_.setPlayheadTime(0);
     }

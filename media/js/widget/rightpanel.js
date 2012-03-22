@@ -415,14 +415,8 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
     var title = isOriginal? "Review subtitles": "Review this translation";
     var helpContents = new unisubs.RightPanel.HelpContents(title, [
         $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
-        $d('p', {}, "Once you're finished reviewing, you can either ",
-           $d('strong', {}, "send the subtitles back"),
-           " to their creator for additional work, or ",
-           $d('strong', {}, "approve"),
-           " them to be published. ",
-           "If you're unable to complete the task at this time, you can also ",
-           $d('strong', {}, "save this task"),
-           " for later."),
+        $d('p', {}, "To make changes, use the controls on each subtitle to add, edit, or delete lines or to change their timing. You can also use the keyboard shortcuts shown below."),
+        $d('p', {}, "If you are unable to complete the review now, click the red 'x' at the top right of this panel. You can restart this task again later."),
         $d('div', {'className': 'unisubs-extra'},
            $d('p', {}, "Enter review notes here. ",
               "They will be sent to all previous contributors ",
@@ -457,14 +451,8 @@ unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, cu
 
     var helpContents = new unisubs.RightPanel.HelpContents(title, [
         $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
-        $d('p', {}, "Once you're finished reviewing, you can either ",
-                    $d('strong', {}, "send the subtitles back"),
-                    " to their creator for additional work, or ",
-                    $d('strong', {}, "approve"),
-                    " them to be published. ",
-                    "If you're unable to complete the task at this time, you can also ",
-                    $d('strong', {}, "save this task"),
-                    " for later."),
+        $d('p', {}, "To make changes, use the controls on each subtitle to add, edit, or delete lines or to change their timing. You can also use the keyboard shortcuts shown below."),
+        $d('p', {}, "If you are unable to complete the review now, click the red 'x' at the top right of this panel. You can restart this task again later."),
         $d('div', {'className': 'unisubs-extra'},
             $d('p', {}, "Enter review notes here. ",
                         "They will be sent to all previous contributors ",
