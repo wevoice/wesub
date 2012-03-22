@@ -17,12 +17,12 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.subtitle.ReviewPanel');
+
 /**
 * @constructor
 * @extends unisubs.subtitle.SyncPanel
 */
-unisubs.subtitle.ReviewPanel = function(subtitles, videoPlayer,
-                                         serverModel, captionManager, reviewOrApprovalType, dialog) {
+unisubs.subtitle.ReviewPanel = function(subtitles, videoPlayer, serverModel, captionManager, reviewOrApprovalType, dialog) {
     unisubs.subtitle.SyncPanel.call(this, subtitles, videoPlayer,
                                      serverModel, captionManager);
     this.reviewOrApprovalType_ = reviewOrApprovalType;
@@ -31,13 +31,13 @@ unisubs.subtitle.ReviewPanel = function(subtitles, videoPlayer,
     this.nextButtonText_ = "Submit your work";
     this.dialog_ = dialog;
 };
+
 goog.inherits(unisubs.subtitle.ReviewPanel, unisubs.subtitle.SyncPanel);
+
 /**
  * @override
  */
-unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal =
-    function()
-{
+unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var keySpecs = [];
     var internalComponents = unisubs.RightPanel.createInternalContentsReviewOrApproval(

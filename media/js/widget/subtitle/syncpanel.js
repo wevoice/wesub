@@ -209,9 +209,9 @@ unisubs.subtitle.SyncPanel.prototype.downReleased_ = function() {
         var nextSub = null;
         if ((this.downSub_ === undefined || this.downSub_ === null) && this.subtitles_.count() > 0)
             nextSub = this.subtitles_.caption(0);
-        if (this.downSub_ !== null || this.downSub_ !== undefined)
+        if (this.downSub_ !== null && this.downSub_ !== undefined)
             nextSub = this.downSub_.getNextCaption();
-        if (nextSub !== null || nextSub !== undefined)
+        if (nextSub !== null && nextSub !== undefined)
             nextSub.setStartTime(playheadTime);
     }
     else if (this.downSub_.isShownAt(playheadTime) &&
@@ -249,7 +249,7 @@ unisubs.subtitle.SyncPanel.prototype.currentlyEditingSubtitle_ = function() {
 unisubs.subtitle.SyncPanel.prototype.captionReached_ = function(event) {
     var editableCaption = event.caption;
     this.subtitleList_.clearActiveWidget();
-    if (editableCaption !== null || editableCaption !== undefined)
+    if (editableCaption !== null && editableCaption !== undefined)
         this.subtitleList_.setActiveWidget(editableCaption.getCaptionID());
 };
 unisubs.subtitle.SyncPanel.prototype.disposeInternal = function() {
