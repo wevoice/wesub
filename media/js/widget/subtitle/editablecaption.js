@@ -44,6 +44,7 @@ unisubs.subtitle.EditableCaption = function(opt_subOrder, opt_jsonCaption) {
     this.previousCaption_ = null;
     this.nextCaption_ = null;
 };
+
 goog.inherits(unisubs.subtitle.EditableCaption, goog.events.EventTarget);
 
 unisubs.subtitle.EditableCaption.prototype.fork = function(jsonSub) {
@@ -52,7 +53,6 @@ unisubs.subtitle.EditableCaption.prototype.fork = function(jsonSub) {
     this.json['end_time'] = jsonSub['end_time'];
     this.json['start_of_paragraph'] = jsonSub['start_of_paragraph'];
 };
-
 unisubs.subtitle.EditableCaption.orderCompare = function(a, b) {
     return a.getSubOrder() - b.getSubOrder();
 };
@@ -68,7 +68,8 @@ unisubs.subtitle.EditableCaption.isTimeUndefined = function(v){
     return !goog.isDefAndNotNull(v) || 
         v == unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
         v == unisubs.subtitle.EditableCaption.TIME_UNDEFINED_SERVER || false;
-}
+};
+
 unisubs.subtitle.EditableCaption.CHANGE = 'captionchanged';
 
 /**
@@ -80,21 +81,18 @@ unisubs.subtitle.EditableCaption.MIN_LENGTH = 0.5;
  * @param {unisubs.subtitle.EditableCaption} caption Previous caption in list.
  *
  */
-unisubs.subtitle.EditableCaption.prototype.setPreviousCaption =
-    function(caption)
-{
+unisubs.subtitle.EditableCaption.prototype.setPreviousCaption = function(caption) {
     this.previousCaption_ = caption;
 };
 unisubs.subtitle.EditableCaption.prototype.getPreviousCaption = function() {
     return this.previousCaption_;
 };
+
 /**
  * @param {unisubs.subtitle.EditableCaption} caption Next caption in list.
  *
  */
-unisubs.subtitle.EditableCaption.prototype.setNextCaption =
-    function(caption)
-{
+unisubs.subtitle.EditableCaption.prototype.setNextCaption = function(caption) {
     this.nextCaption_ = caption;
 };
 unisubs.subtitle.EditableCaption.prototype.getNextCaption = function() {
@@ -118,11 +116,9 @@ unisubs.subtitle.EditableCaption.prototype.setText = function(text, opt_dontTrac
 unisubs.subtitle.EditableCaption.prototype.getText = function() {
     return this.json['text'];
 };
-
 unisubs.subtitle.EditableCaption.prototype.getStartOfParagraph = function(){
     return this.json['start_of_paragraph'];
 }
-
 unisubs.subtitle.EditableCaption.prototype.setStartOfParagraph = function(val, opt_dontTrack){
     if (this.json['start_of_paragraph'] != Boolean(val)){
         this.json['start_of_paragraph'] = Boolean(val);
@@ -130,26 +126,19 @@ unisubs.subtitle.EditableCaption.prototype.setStartOfParagraph = function(val, o
     }
     return this.json['start_of_paragraph'];
 }
-
-
 unisubs.subtitle.EditableCaption.prototype.toggleStartOfParagraph = function(){
     return this.setStartOfParagraph(!this.getStartOfParagraph(), true);
 }
-
 unisubs.subtitle.EditableCaption.prototype.getTrimmedText = function() {
     return goog.string.trim(this.json['text']);
 };
-unisubs.subtitle.EditableCaption.prototype.setStartTime =
-    function(startTime)
-{
+unisubs.subtitle.EditableCaption.prototype.setStartTime = function(startTime) {
     var previousStartTime = this.getStartTime();
     this.setStartTime_(startTime);
     this.changed_(previousStartTime == 
                   unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
 };
-unisubs.subtitle.EditableCaption.prototype.setStartTime_ =
-    function(startTime)
-{
+unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
     startTime = Math.max(startTime, this.getMinStartTime());
     this.json['start_time'] = startTime;
     if (this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED &&
@@ -171,15 +160,11 @@ unisubs.subtitle.EditableCaption.prototype.getStartTime = function() {
         return unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
     }
 };
-unisubs.subtitle.EditableCaption.prototype.setEndTime =
-    function(endTime)
-{
+unisubs.subtitle.EditableCaption.prototype.setEndTime = function(endTime) {
     this.setEndTime_(endTime);
     this.changed_(false);
 };
-unisubs.subtitle.EditableCaption.prototype.setEndTime_ =
-    function(endTime)
-{
+unisubs.subtitle.EditableCaption.prototype.setEndTime_ = function(endTime) {
     this.json['end_time'] = endTime;
     if (this.getStartTime() > endTime -
         unisubs.subtitle.EditableCaption.MIN_LENGTH)
@@ -190,16 +175,6 @@ unisubs.subtitle.EditableCaption.prototype.setEndTime_ =
         unisubs.subtitle.EditableCaption.TIME_UNDEFINED &&
         this.nextCaption_.getStartTime() < endTime)
         this.nextCaption_.setStartTime(endTime);
-};
-/**
- * Clears times. Does not issue a CHANGE event.
- */
-unisubs.subtitle.EditableCaption.prototype.clearTimes = function() {
-    if (this.getStartTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
-        this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
-        this.json['start_time'] = unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
-        this.json['end_time'] = unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
-    }
 };
 unisubs.subtitle.EditableCaption.prototype.getEndTime = function() {
     if (goog.isDefAndNotNull(this.json['end_time'])) {
@@ -251,16 +226,13 @@ unisubs.subtitle.EditableCaption.prototype.needsSync = function() {
         this.getEndTime() == unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
 }
 
-unisubs.subtitle.EditableCaption.prototype.changed_ =
-    function(timesFirstAssigned, opt_dontTrack)
-{
+unisubs.subtitle.EditableCaption.prototype.changed_ = function(timesFirstAssigned, opt_dontTrack) {
     if (!opt_dontTrack)
         unisubs.SubTracker.getInstance().trackEdit(this.getCaptionID());
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaption.ChangeEvent(
             timesFirstAssigned));
 };
-
 unisubs.subtitle.EditableCaption.adjustUndefinedTiming = function(json) {
     if (!json['start_time'] || json['start_time'] == unisubs.subtitle.EditableCaption.TIME_UNDEFINED){
         json['start_time'] = unisubs.subtitle.EditableCaption.TIME_UNDEFINED_SERVER;
@@ -270,7 +242,6 @@ unisubs.subtitle.EditableCaption.adjustUndefinedTiming = function(json) {
     }
     return json;
 };
-
 unisubs.subtitle.EditableCaption.toJsonArray = function(editableCaptions) {
     return goog.array.map(
         editableCaptions, 
@@ -285,7 +256,6 @@ unisubs.subtitle.EditableCaption.toIDArray = function(editableCaptions) {
             return ec.getCaptionID();
         });
 };
-
 
 /**
  * @constructor
