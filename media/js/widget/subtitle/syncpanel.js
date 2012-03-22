@@ -228,7 +228,6 @@ unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
         confirm("Are you sure you want to start over? All timestamps " +
                 "will be deleted.");
     if (answer) {
-        this.subtitles_.clearTimes();
         this.videoPlayer_.setPlayheadTime(0);
     }
 };
