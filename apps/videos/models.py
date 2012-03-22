@@ -703,7 +703,7 @@ class Video(models.Model):
           'creation_date': datetime(...), }
 
         '''
-        meta = dict([(VIDEO_META_TYPE_VARS[md.metadata_type], md.content)
+        meta = dict([(VIDEO_META_TYPE_VARS[md.key], md.data)
                      for md in self.videometadata_set.all()])
 
         meta['creation_date'] = VideoMetadata.string_to_date(meta.get('creation_date'))
@@ -741,15 +741,15 @@ models.signals.m2m_changed.connect(User.video_followers_change_handler, sender=V
 # VideoMetadata
 class VideoMetadata(models.Model):
     video = models.ForeignKey(Video)
-    metadata_type = models.PositiveIntegerField(choices=VIDEO_META_CHOICES)
-    content = models.CharField(max_length=255)
+    key = models.PositiveIntegerField(choices=VIDEO_META_CHOICES)
+    data = models.CharField(max_length=255)
 
     created = models.DateTimeField(editable=False, auto_now_add=True)
     modified = models.DateTimeField(editable=False, auto_now=True)
 
     @classmethod
     def add_metadata_type(cls, num, readable_name):
-        """Add a new metadata_type choice.
+        """Add a new key choice.
 
         These can't be added at class creation time because some of those types
         live on the integration repo and therefore can't be referenced from
@@ -759,7 +759,8 @@ class VideoMetadata(models.Model):
         never allow it to overwrite a key with a different name.
 
         """
-        field = VideoMetadata._meta.get_field_by_name("metadata_type")[0]
+        field = VideoMetadata._meta.get_field_by_name('key')[0]
+
         choices = field.choices
         for x in choices:
             if x[0] == num and x[1] != readable_name:
@@ -769,6 +770,7 @@ class VideoMetadata(models.Model):
             elif x[0] == num and x[1] == readable_name:
                 return
         choices = choices + ((num, readable_name,),)
+
         # public attr is read only
         global VIDEO_META_CHOICES
         VIDEO_META_CHOICES = field._choices = choices
@@ -780,12 +782,12 @@ class VideoMetadata(models.Model):
         verbose_name_plural = 'video metadata'
 
     def __unicode__(self):
-        content = self.content
-        if len(content) > 30:
-            content = content[:30] + '...'
+        data = self.data
+        if len(data) > 30:
+            data = data[:30] + '...'
         return u'%s - %s: %s' % (self.video,
-                                 self.get_metadata_type_display(),
-                                 content)
+                                 self.get_key_display(),
+                                 data)
 
     @classmethod
     def date_to_string(cls, d):
@@ -1219,9 +1221,7 @@ class SubtitleVersionManager(models.Manager):
             if metadata:
                 for name, value in metadata.items():
                     SubtitleMetadata(
-                        subtitle=caption,
-                        metadata_type=name,
-                        content=value
+                        subtitle=caption, key=name, data=value
                     ).save()
         return version
 
@@ -1690,8 +1690,8 @@ SUBTITLE_META_CHOICES = (
 
 class SubtitleMetadata(models.Model):
     subtitle = models.ForeignKey(Subtitle)
-    metadata_type = models.PositiveIntegerField(choices=SUBTITLE_META_CHOICES)
-    content = models.CharField(max_length=255)
+    key = models.PositiveIntegerField(choices=SUBTITLE_META_CHOICES)
+    data = models.CharField(max_length=255)
 
     created = models.DateTimeField(editable=False, auto_now_add=True)
     modified = models.DateTimeField(editable=False, auto_now=True)

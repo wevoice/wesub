@@ -101,8 +101,8 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
                 for name, value in metadata.items():
                     SubtitleMetadata(
                         subtitle=caption,
-                        metadata_type=name,
-                        content=value
+                        key=name,
+                        data=value
                     ).save()
     version = version or old_version
     if version.is_forked != as_forked:

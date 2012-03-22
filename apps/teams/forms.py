@@ -60,9 +60,8 @@ class EditTeamVideoForm(forms.ModelForm):
 
         super(EditTeamVideoForm, self).__init__(*args, **kwargs)
 
-
         self.fields['project'].queryset = self.instance.team.project_set.all()
-        
+
     def clean(self, *args, **kwargs):
         super(EditTeamVideoForm, self).clean(*args, **kwargs)
 
@@ -86,7 +85,7 @@ class EditTeamVideoForm(forms.ModelForm):
             video.s3_thumbnail.save(name, content)
             VideoIndex(Video).update_object(video)
 
-    def _save_metadata(self, video, meta, content):
+    def _save_metadata(self, video, meta, data):
         '''Save a single piece of metadata for the given video.
 
         The metadata is only saved if necessary (i.e. it's not blank OR it's blank
@@ -96,13 +95,12 @@ class EditTeamVideoForm(forms.ModelForm):
         meta_type_id = VIDEO_META_TYPE_IDS[meta]
 
         try:
-            meta = VideoMetadata.objects.get(video=video, metadata_type=meta_type_id)
-            meta.content = content
+            meta = VideoMetadata.objects.get(video=video, key=meta_type_id)
+            meta.data = data
             meta.save()
         except VideoMetadata.DoesNotExist:
-            if content:
-                VideoMetadata(video=video, metadata_type=meta_type_id,
-                              content=content).save()
+            if data:
+                VideoMetadata(video=video, key=meta_type_id, data=data).save()
 
 class MoveTeamVideoForm(forms.Form):
     team_video = forms.ModelChoiceField(queryset=TeamVideo.objects.all(),
