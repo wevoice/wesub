@@ -26,10 +26,7 @@ goog.provide('unisubs.subtitle.SyncPanel');
  * @param {unisubs.CaptionManager} Caption manager, already containing subtitles
  *     with start_time set.
  */
-unisubs.subtitle.SyncPanel = function(subtitles, videoPlayer,
-                                       serverModel, captionManager,
-                                      reviewOrApprovalType
-                                     ) {
+unisubs.subtitle.SyncPanel = function(subtitles, videoPlayer, serverModel, captionManager, reviewOrApprovalType) {
     goog.ui.Component.call(this);
     /**
      * @type {unisubs.subtitle.EditableCaptionSet}
@@ -57,6 +54,7 @@ unisubs.subtitle.SyncPanel = function(subtitles, videoPlayer,
     }
 
 };
+
 goog.inherits(unisubs.subtitle.SyncPanel, goog.ui.Component);
 
 unisubs.subtitle.SyncPanel.prototype.enterDocument = function() {
@@ -105,16 +103,16 @@ unisubs.subtitle.SyncPanel.prototype.createRightPanelInternal = function() {
                 ["Congratulations, you finished the hard part (all that typing)!",
                  ["Now, to line up your subtitles to the video, tap the DOWN ARROW right ",
                   "when each subtitle should appear."].join(''),
-                 "Tap DOWN to begin, tap it for the first subtitle, and so on.",
+                 "Press TAB to begin, press DOWN for the first subtitle, and DOWN for each subtitle after that.",
                  ["Don't worry about small mistakes. We can correct them in the ",
                   "next step. If you need to start over, click \"restart\" ",
                   "below."].join('')],
                 this.numSteps_, this.currentStep_),
             'extraHelp': 
             ["Press play, then tap this button or the down arrow when the next subtitle should appear."]
-        }
-        keySpecs = this.makeKeySpecsInternal()
-    }else{
+        };
+        keySpecs = this.makeKeySpecsInternal();
+    } else {
         
         keySpecs = [];
         this.bodyInput_ = internalComponents['bodyInput'];
@@ -186,7 +184,7 @@ unisubs.subtitle.SyncPanel.prototype.handleKeyUp_ = function(event) {
 };
 unisubs.subtitle.SyncPanel.prototype.spacePressed_ = function() {
     this.videoPlayer_.togglePause();
-}
+};
 unisubs.subtitle.SyncPanel.prototype.downPressed_ = function() {
     if (this.videoPlayer_.isPlaying()) {
         if (this.downHeld_)
@@ -199,25 +197,21 @@ unisubs.subtitle.SyncPanel.prototype.downPressed_ = function() {
         this.downSub_ =
             this.subtitles_.findLastForTime(this.downPlayheadTime_);
     }
-    else if (this.videoPlayer_.isPaused() && !this.videoStarted_) {
-        this.videoPlayer_.play();
-        this.videoStarted_ = true;
-    }
 };
 unisubs.subtitle.SyncPanel.prototype.downReleased_ = function() {
     this.captionManager_.disableCaptionEvents(false);
     this.downHeld_ = false;
     var playheadTime = this.videoPlayer_.getPlayheadTime();
 
-    if (this.downSub_ == null ||
+    if (!this.downSub_ ||
         !this.downSub_.isShownAt(this.downPlayheadTime_)) {
         // pressed down before first sub or in between subs.
         var nextSub = null;
-        if (this.downSub_ == null && this.subtitles_.count() > 0)
+        if (!this.downSub_ && this.subtitles_.count() > 0)
             nextSub = this.subtitles_.caption(0);
         if (this.downSub_)
             nextSub = this.downSub_.getNextCaption();
-        if (nextSub != null)
+        if (nextSub)
             nextSub.setStartTime(playheadTime);
     }
     else if (this.downSub_.isShownAt(playheadTime) &&
@@ -255,7 +249,7 @@ unisubs.subtitle.SyncPanel.prototype.currentlyEditingSubtitle_ = function() {
 unisubs.subtitle.SyncPanel.prototype.captionReached_ = function(event) {
     var editableCaption = event.caption;
     this.subtitleList_.clearActiveWidget();
-    if (editableCaption != null)
+    if (editableCaption)
         this.subtitleList_.setActiveWidget(editableCaption.getCaptionID());
 };
 unisubs.subtitle.SyncPanel.prototype.disposeInternal = function() {
