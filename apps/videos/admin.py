@@ -130,8 +130,8 @@ class SubtitleVersionMetadataAdmin(admin.ModelAdmin):
     list_display = ['video', 'subtitle_version', 'key']
     list_filter = ['key', 'created', 'modified']
     raw_id_fields = ['subtitle_version']
-    search_fields = ['subtitle_version__language__video__video__video_id',
-                     'subtitle_version__language__video__video__title']
+    search_fields = ['subtitle_version__language__video__video_id',
+                     'subtitle_version__language__video__title']
 
     def video(self, obj):
         return obj.subtitle_version.language.video.title
