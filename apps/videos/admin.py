@@ -66,10 +66,10 @@ class VideoAdmin(admin.ModelAdmin):
         update_search_index.delay(obj.__class__, obj.pk)
 
 class VideoMetadataAdmin(admin.ModelAdmin):
-    list_display = ['video', 'metadata_type', 'content']
-    list_filter = ['metadata_type', 'created', 'modified']
+    list_display = ['video', 'key', 'data']
+    list_filter = ['key', 'created', 'modified']
     search_fields = ['video__video_id', 'video__title', 'video__user__username',
-                     'content']
+                     'data']
     raw_id_fields = ['video']
 
 class SubtitleVersionInline(admin.TabularInline):
