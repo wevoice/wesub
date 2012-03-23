@@ -72,7 +72,11 @@ unisubs.timeline.Timeline.prototype.enterDocument = function() {
         listen(
             this.timelineInner_,
             unisubs.timeline.TimeRowUL.DOUBLECLICK,
-            this.timeRowDoubleClick_)
+            this.timeRowDoubleClick_).
+        listen(
+            this.subtitleSet_,
+            unisubs.timeline.SubtitleSet.CLEAR_TIMES,
+            this.reset_);
     this.initTime_();
 };
 unisubs.timeline.Timeline.prototype.timeRowDoubleClick_ = function(e) {

@@ -212,6 +212,7 @@ function testProgressToOpenEndPlusOne() {
     assertEquals(3, MS_dispatchedCaptions[2].getCaptionID());
 }
 
+
 function testProgressToEndTwice() {
     setUpForInitialCaptions([captionJSON(0.5, 2, 1, 1), 
                              captionJSON(2, 3, 2, 2), 
@@ -224,6 +225,21 @@ function testProgressToEndTwice() {
     sendEvents(4.5);
     assertEquals(4, MS_dispatchedCaptions.length);
     assertNull(MS_dispatchedCaptions[3]);
+}
+
+function testClearTimes() {
+    setUpForInitialCaptions([captionJSON(0.5, 2, 1, 1), 
+                             captionJSON(2, 3, 2, 2), 
+                             captionJSON(3, 4, 3, 3)]);
+    sendEvents(0.3);
+    sendEvents(1.3);
+    sendEvents(2.3);
+    assertEquals(2, MS_dispatchedCaptions.length);
+
+    MS_editableCaptionSet.clearTimes();
+
+    assertEquals(3, MS_dispatchedCaptions.length);
+    assertNull(MS_dispatchedCaptions[2]);
 }
 
 function testInsertSub() {

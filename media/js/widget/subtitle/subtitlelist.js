@@ -105,6 +105,10 @@ unisubs.subtitle.SubtitleList.prototype.enterDocument = function() {
             this.captionsCleared_).
         listen(
             this.captionSet_,
+            et.CLEAR_TIMES,
+            this.captionTimesCleared_).
+        listen(
+            this.captionSet_,
             et.ADD,
             this.captionInserted_).
         listen(
@@ -124,6 +128,10 @@ unisubs.subtitle.SubtitleList.prototype.captionDeleted_ = function(e) {
     var widget = this.subtitleMap_[e.caption.getCaptionID()];
     delete this.subtitleMap_[e.caption.getCaptionID()];
     this.removeChild(widget, true);
+};
+unisubs.subtitle.SubtitleList.prototype.captionTimesCleared_ = function(e) {
+    var subtitleWidgets = goog.object.getValues(this.subtitleMap_);
+    goog.array.forEach(subtitleWidgets, function(w) { w.clearTimes(); });
 };
 unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ =
     function(editableCaption)
