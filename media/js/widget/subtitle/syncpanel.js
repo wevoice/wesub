@@ -227,8 +227,13 @@ unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
     var answer =
         confirm("Are you sure you want to start over?");
     if (answer) {
-        this.subtitles_.clearTimes();
-        this.videoPlayer_.setPlayheadTime(0);
+        if (this.reviewOrApprovalType_) {
+            // Reset subtitles back to where they were before this task began.
+            this.videoPlayer_.setPlayheadTime(0);
+        } else {
+            this.subtitles_.clearTimes();
+            this.videoPlayer_.setPlayheadTime(0);
+        }
     }
 };
 unisubs.subtitle.SyncPanel.prototype.currentlyEditingSubtitle_ = function() {
