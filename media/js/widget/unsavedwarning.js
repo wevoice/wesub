@@ -40,10 +40,10 @@ unisubs.UnsavedWarning.prototype.createDom = function() {
 
     var discardLinkText, submitLinkText, warningTitle, warningDescription;
     if (unisubs.mode === 'review' || unisubs.mode === 'approve') {
-        discardLinkText = 'Discard notes';
-        submitLinkText = 'Save notes';
-        warningTitle = 'Save notes?';
-        warningDescription = 'Would you like to save your notes? If so, they will be saved as comments (visible to the general public and sent to contributors).';
+        discardLinkText = 'Discard changes and exit';
+        submitLinkText = '';
+        warningTitle = 'Really exit?';
+        warningDescription = 'If you exit now, your notes will be discarded and all changes will be lost.';
     } else {
         discardLinkText = 'Discard';
         submitLinkText = 'Submit subtitles';

@@ -34,10 +34,7 @@ goog.provide('unisubs.subtitle.MSServerModel');
  * @param {string} videoURL url for the video
  * @param {unisubs.subtitle.EditableCaptionSet} editableCaptionSet
  */
-unisubs.subtitle.MSServerModel = function(
-    sessionPK, videoID, videoURL,
-    editableCaptionSet)
-{
+unisubs.subtitle.MSServerModel = function( sessionPK, videoID, videoURL, editableCaptionSet) {
     goog.Disposable.call(this);
     this.sessionPK_ = sessionPK;
     this.videoID_ = videoID;
@@ -61,6 +58,7 @@ unisubs.subtitle.MSServerModel = function(
     this.taskApproved = null;
     this.taskType = null;
 };
+
 goog.inherits(unisubs.subtitle.MSServerModel, goog.Disposable);
 
 unisubs.subtitle.MSServerModel.currentInstance = null;
@@ -70,6 +68,7 @@ unisubs.subtitle.MSServerModel.currentInstance = null;
  * Set by unisubs.EmbeddableWidget when widget first loads.
  * @type {string}
  */
+
 unisubs.subtitle.MSServerModel.EMBED_JS_URL = null;
 
 /**
@@ -78,18 +77,15 @@ unisubs.subtitle.MSServerModel.EMBED_JS_URL = null;
 unisubs.subtitle.MSServerModel.prototype.fetchInitialSubs_ = function() {
     return unisubs.widget.SavedSubtitles.fetchInitial();
 };
-
 unisubs.subtitle.MSServerModel.prototype.init = function() {
     if (!this.initialized_) {
         this.initialized_ = true;
         this.startTimer();
     }
 };
-
 unisubs.subtitle.MSServerModel.prototype.startTimer = function() {
     this.timer_.start();
 };
-
 unisubs.subtitle.MSServerModel.prototype.timerTick_ = function(e) {
     unisubs.Rpc.call(
         'regain_lock',
@@ -111,14 +107,12 @@ unisubs.subtitle.MSServerModel.prototype.timerTick_ = function(e) {
         this.saveSubsLocally_();
     }
 };
-
 unisubs.subtitle.MSServerModel.prototype.saveSubsLocally_ = function() {
     // for 2k subs, this takes about 20-40ms on FF and Chrome on my Macbook.
     var savedSubs = new unisubs.widget.SavedSubtitles(
         this.sessionPK_, this.captionSet_);
     unisubs.widget.SavedSubtitles.saveLatest(savedSubs);
 };
-
 unisubs.subtitle.MSServerModel.prototype.anySubtitlingWorkDone = function() {
     var initialSubs = this.fetchInitialSubs_();
     return !initialSubs.CAPTION_SET.identicalTo(this.captionSet_);
@@ -190,11 +184,7 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
     args['task_type'] = this.taskType;
     return atLeastOneThingChanged ? args : null;
 };
-
-unisubs.subtitle.MSServerModel.prototype.finish =
-    function(successCallback, failureCallback,
-             opt_cancelCallback)
-{
+unisubs.subtitle.MSServerModel.prototype.finish = function(successCallback, failureCallback, opt_cancelCallback) {
     goog.asserts.assert(this.initialized_);
     goog.asserts.assert(!this.finished_);
 
@@ -228,11 +218,9 @@ unisubs.subtitle.MSServerModel.prototype.finish =
         },
         true);
 };
-
 unisubs.subtitle.MSServerModel.prototype.setComplete = function(isComplete){
     this.captionSet_.completed = isComplete;
-}
-
+};
 unisubs.subtitle.MSServerModel.prototype.fetchReviewData = function(taskId, successCallback) {
     var that = this;
     unisubs.Rpc.call(
@@ -273,19 +261,20 @@ unisubs.subtitle.MSServerModel.prototype.fetchApproveData = function(taskId, suc
         }, true);
 
 };
+
 /** 
 * Store the review notes. This should get called by the proper panel before calling finish
 */
 unisubs.subtitle.MSServerModel.prototype.setTaskNotes = function(notes) {
     this.taskNotes = notes;
-}
+};
+
 /** 
 * Store the review /approval status. This should get called by the proper panel before calling finish
 */
 unisubs.subtitle.MSServerModel.prototype.setTaskApproved  = function(approvalCode) {
     this.taskApproved = approvalCode;
-}
-
+};
 unisubs.subtitle.MSServerModel.prototype.getEmbedCode = function() {
     return [
         '<sc',
@@ -298,37 +287,29 @@ unisubs.subtitle.MSServerModel.prototype.getEmbedCode = function() {
         '})\n',
         '</script>'].join('');
 };
-
 unisubs.subtitle.MSServerModel.prototype.stopTimer = function() {
     this.timer_.stop();
 };
-
 unisubs.subtitle.MSServerModel.prototype.disposeInternal = function() {
     unisubs.subtitle.MSServerModel.superClass_.disposeInternal.call(this);
     this.stopTimer();
     this.timer_.dispose();
 };
-
 unisubs.subtitle.MSServerModel.prototype.currentUsername = function() {
     return unisubs.currentUsername;
 };
-
 unisubs.subtitle.MSServerModel.prototype.logIn = function() {
     unisubs.login();
 };
-
 unisubs.subtitle.MSServerModel.prototype.getPermalink = function() {
     return unisubs.getVideoHomepageURL(this.videoID_);
 };
-
 unisubs.subtitle.MSServerModel.prototype.getVideoID = function() {
     return this.videoID_;
 };
-
 unisubs.subtitle.MSServerModel.prototype.getCaptionSet = function() {
     return this.captionSet_;
 };
-
 unisubs.subtitle.MSServerModel.prototype.getSessionPK = function() {
     return this.sessionPK_;
 };
