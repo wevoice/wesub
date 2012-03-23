@@ -227,6 +227,7 @@ unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
     var answer =
         confirm("Are you sure you want to start over?");
     if (answer) {
+        this.subtitles_.clearTimes();
         this.videoPlayer_.setPlayheadTime(0);
     }
 };
