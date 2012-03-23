@@ -250,8 +250,19 @@ def migrate(app_name=''):
                 run('{0}/env/bin/python manage.py migrate uslogging '
                     '--database=uslogging --settings=unisubs_settings'.format(
                         env.static_dir))
-            run('yes no | {0}/env/bin/python manage.py migrate {1} --settings=unisubs_settings'.format(
-                    env.static_dir, app_name))
+
+            manage_cmd = 'yes no | {0}/env/bin/python -u manage.py migrate {1} --settings=unisubs_settings 2>&1'.format(env.static_dir, app_name)
+            timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
+            log_cmd = WRITE_LOG % 'database_migrations'
+
+            cmd = (
+                "screen sh -c $'" +
+                    manage_cmd +
+                    timestamp_cmd +
+                    log_cmd + 
+                "'"
+            )
+            run(cmd)
 
 def run_command(command):
     '''Run a python manage.py command'''
