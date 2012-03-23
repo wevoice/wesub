@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-22 01:32-0500\n"
+"POT-Creation-Date: 2012-03-23 01:32-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -449,50 +449,50 @@ msgstr ""
 msgid "User"
 msgstr ""
 
-#: apps/teams/forms.py:47 apps/teams/forms.py:151
+#: apps/teams/forms.py:47 apps/teams/forms.py:149
 #: libs/rosetta/templates/rosetta/languages.html:12
 #: templates/teams/_context_team.html:65
 msgid "Project"
 msgstr ""
 
-#: apps/teams/forms.py:51 apps/teams/forms.py:155
+#: apps/teams/forms.py:51 apps/teams/forms.py:153
 msgid "Let's keep things tidy, shall we?"
 msgstr ""
 
-#: apps/teams/forms.py:137
+#: apps/teams/forms.py:135
 msgid "Video URL"
 msgstr ""
 
-#: apps/teams/forms.py:138
+#: apps/teams/forms.py:136
 msgid ""
 "Enter the URL of any compatible video or any video on our site. You can also"
 " browse the site and use the 'Add Video to Team' menu."
 msgstr ""
 
-#: apps/teams/forms.py:146
+#: apps/teams/forms.py:144
 msgid "Video language"
 msgstr ""
 
-#: apps/teams/forms.py:148
+#: apps/teams/forms.py:146
 msgid "It will be saved only if video does not exist in our database."
 msgstr ""
 
-#: apps/teams/forms.py:202
+#: apps/teams/forms.py:200
 msgid "This video already belongs to a team."
 msgstr ""
 
-#: apps/teams/forms.py:208
+#: apps/teams/forms.py:206
 msgid "Set original language for this video."
 msgstr ""
 
-#: apps/teams/forms.py:261
+#: apps/teams/forms.py:259
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
 "appear."
 msgstr ""
 
-#: apps/teams/forms.py:264
+#: apps/teams/forms.py:262
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
@@ -500,94 +500,94 @@ msgid ""
 "and make sure to check \"Save feed\" box."
 msgstr ""
 
-#: apps/teams/forms.py:282
+#: apps/teams/forms.py:280
 msgid "Team intro video URL"
 msgstr ""
 
-#: apps/teams/forms.py:284
+#: apps/teams/forms.py:282
 msgid ""
 "You can put an optional video\n"
 "on your team homepage that explains what your team is about, to attract volunteers.\n"
 "Enter a link to any compatible video, or to any video page on our site."
 msgstr ""
 
-#: apps/teams/forms.py:289
+#: apps/teams/forms.py:287
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr ""
 
-#: apps/teams/forms.py:329
+#: apps/teams/forms.py:327
 msgid "This video has already been transcribed."
 msgstr ""
 
-#: apps/teams/forms.py:334
+#: apps/teams/forms.py:332
 msgid "Subtitling of this video is already in progress."
 msgstr ""
 
-#: apps/teams/forms.py:340
+#: apps/teams/forms.py:338
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr ""
 
-#: apps/teams/forms.py:346
+#: apps/teams/forms.py:344
 msgid "This language already has a complete set of subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:365
+#: apps/teams/forms.py:363
 msgid "There is already a task in progress for that video/language."
 msgstr ""
 
-#: apps/teams/forms.py:378
+#: apps/teams/forms.py:376
 msgid "You must select a language for a Translate task."
 msgstr ""
 
-#: apps/teams/forms.py:411
+#: apps/teams/forms.py:409
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr ""
 
-#: apps/teams/forms.py:422
+#: apps/teams/forms.py:420
 msgid "You do not have permission to assign this task."
 msgstr ""
 
-#: apps/teams/forms.py:429
+#: apps/teams/forms.py:427
 msgid "This user cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:450
+#: apps/teams/forms.py:448
 msgid "You do not have permission to delete this task."
 msgstr ""
 
-#: apps/teams/forms.py:511
+#: apps/teams/forms.py:509
 msgid "You cannot blacklist a preferred language."
 msgstr ""
 
-#: apps/teams/forms.py:535 apps/teams/forms.py:537
+#: apps/teams/forms.py:533 apps/teams/forms.py:535
 msgid "User does not exist!"
 msgstr ""
 
-#: apps/teams/forms.py:544
+#: apps/teams/forms.py:542
 msgid "User is already a member of this team!"
 msgstr ""
 
-#: apps/teams/forms.py:572 templates/videos/subtitle-view.html:314
+#: apps/teams/forms.py:570 templates/videos/subtitle-view.html:314
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
-#: apps/teams/forms.py:576 templates/videos/subtitle-view.html:302
+#: apps/teams/forms.py:574 templates/videos/subtitle-view.html:302
 msgid "What would you like to unpublish?"
 msgstr ""
 
-#: apps/teams/forms.py:578
+#: apps/teams/forms.py:576
 msgid "This version (and any later version) for this language."
 msgstr ""
 
-#: apps/teams/forms.py:579
+#: apps/teams/forms.py:577
 msgid "All versions for this language and any dependent languages."
 msgstr ""
 
-#: apps/teams/forms.py:597
+#: apps/teams/forms.py:595
 msgid "These subtitles are not under a team's control."
 msgstr ""
 
-#: apps/teams/forms.py:601
+#: apps/teams/forms.py:599
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
@@ -1150,7 +1150,7 @@ msgstr ""
 msgid "Views"
 msgstr ""
 
-#: apps/videos/models.py:1034
+#: apps/videos/models.py:1036
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
