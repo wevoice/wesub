@@ -41,6 +41,7 @@ unisubs.UnsavedWarning.prototype.createDom = function() {
     var discardLinkText, submitLinkText, warningTitle, warningDescription;
     if (unisubs.mode === 'review' || unisubs.mode === 'approve') {
         discardLinkText = 'Discard changes and exit';
+        submitLinkText = '';
         warningTitle = 'Really exit?';
         warningDescription = 'If you exit now, your notes will be discarded and all changes will be lost.';
     } else {
