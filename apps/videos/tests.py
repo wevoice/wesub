@@ -16,25 +16,38 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
 import json
-
-from django.test import TestCase
-from videos.models import Video, Action, VIDEO_TYPE_YOUTUBE, UserTestResult, \
-    SubtitleLanguage, VideoUrl, VideoFeed, Subtitle
-from apps.auth.models import CustomUser as User
-from utils import SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
-from django.core.urlresolvers import reverse
-from django.core import mail
-from videos.forms import VideoForm
-from videos.tasks import video_changed_tasks
-from apps.videos import metadata_manager
-from apps.widget import video_cache
-import math_captcha
 import os
-from django.db.models import ObjectDoesNotExist
-from widget.tests import RequestMockup
+from datetime import datetime
+
+import math_captcha
+from django.conf import settings
+from django.core import mail
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.db.models import ObjectDoesNotExist
+from django.test import TestCase
+
+from apps.auth.models import CustomUser as User
+from apps.videos import metadata_manager
+from apps.videos.types.brigthcove  import BrightcoveVideoType
+from apps.widget import video_cache
+from utils import SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
+from videos import alarms
+from videos.feed_parser import FeedParser
+from videos.forms import VideoForm
+from videos.models import Video, Action, VIDEO_TYPE_YOUTUBE, UserTestResult, SubtitleLanguage, VideoUrl, VideoFeed, Subtitle, SubtitleVersion
+from videos.tasks import video_changed_tasks
+from videos.types import video_type_registrar, VideoTypeError
+from videos.types.base import VideoType, VideoTypeRegistrar
+from videos.types.bliptv import BlipTvVideoType
+from videos.types.dailymotion import DailymotionVideoType
+from videos.types.flv import FLVVideoType
+from videos.types.htmlfive import HtmlFiveVideoType
+from videos.types.mp3 import Mp3VideoType
+from videos.types.vimeo import VimeoVideoType
+from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
+from widget.tests import RequestMockup
 
 
 math_captcha.forms.math_clean = lambda form: None
@@ -1173,7 +1186,6 @@ class ViewsTest(WebUseTest):
             self.assertEqual(response.status_code, 200)
 
 #Testings VideoType classes
-from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
 
 class YoutubeVideoTypeTest(TestCase):
 
@@ -1261,7 +1273,6 @@ class YoutubeVideoTypeTest(TestCase):
 #                self.assertTrue(len(subtitles))
 #                self.assertTrue(subtitles[5].start_time and subtitles[5].end_time)
 
-from videos.types.htmlfive import HtmlFiveVideoType
 
 class HtmlFiveVideoTypeTest(TestCase):
 
@@ -1290,7 +1301,6 @@ class HtmlFiveVideoTypeTest(TestCase):
         self.assertFalse(self.vt.matches_video_url('http://someurl.com/video.flv'))
         self.assertFalse(self.vt.matches_video_url('http://someurl.com/ogv.video'))
 
-from videos.types.mp3 import Mp3VideoType
 class Mp3VideoTypeTest(TestCase):
 
     def setUp(self):
@@ -1311,7 +1321,6 @@ class Mp3VideoTypeTest(TestCase):
         self.assertTrue(self.vt.matches_video_url('http://someurl.com/audio.mp3'))
         self.assertFalse(self.vt.matches_video_url('http://someurl.com/mp3.audio'))
 
-from videos.types.bliptv import BlipTvVideoType
 
 class BlipTvVideoTypeTest(TestCase):
 
@@ -1345,7 +1354,6 @@ class BlipTvVideoTypeTest(TestCase):
         video, created = Video.get_or_create_for_url(url)
         #self.assertTrue(video)
 
-from videos.types.dailymotion import DailymotionVideoType
 
 class DailymotionVideoTypeTest(TestCase):
 
@@ -1377,7 +1385,6 @@ class DailymotionVideoTypeTest(TestCase):
         except VideoTypeError:
             pass
 
-from videos.types.flv import FLVVideoType
 
 class FLVVideoTypeTest(TestCase):
 
@@ -1406,7 +1413,6 @@ class FLVVideoTypeTest(TestCase):
         video_url = video.videourl_set.all()[0]
         self.assertEqual(self.vt.abbreviation, video_url.type)
 
-from videos.types.vimeo import VimeoVideoType
 
 class VimeoVideoTypeTest(TestCase):
 
@@ -1443,8 +1449,6 @@ class VimeoVideoTypeTest(TestCase):
         self.assertEqual(vu.videoid, '22070806')
         self.assertTrue(self.vt.video_url(vu))
 
-from videos.types.base import VideoType, VideoTypeRegistrar
-from videos.types import video_type_registrar, VideoTypeError
 
 class VideoTypeRegistrarTest(TestCase):
 
@@ -1521,7 +1525,6 @@ class TestFeedsSubmit(TestCase):
 
         feedparser._open_resource = base_open_resource
 
-from apps.videos.types.brigthcove  import BrightcoveVideoType
 
 class BrightcoveVideoTypeTest(TestCase):
 
@@ -1544,8 +1547,6 @@ class BrightcoveVideoTypeTest(TestCase):
         self.assertEqual(vt.video_id, '956115196001')
 
 
-from videos.models import SubtitleVersion
-from datetime import datetime
 
 class TestTasks(TestCase):
 
@@ -1751,8 +1752,6 @@ class TestPercentComplete(TestCase):
         self.video.subtitlelanguage_set.all().filter(percent_done=100).delete()
         self.assertFalse(self.video.is_complete)
 
-from videos import alarms
-from django.conf import settings
 
 class TestAlert(TestCase):
 
@@ -2040,7 +2039,6 @@ class TestVideoForm(TestCase):
     def test_dailymotion_urls(self):
         self._test_urls(self.daily_motion_urls)
 
-from videos.feed_parser import FeedParser
 
 class TestFeedParser(TestCase):
     #TODO: add test for MediaFeedEntryParser. I just can't find RSS link for it
