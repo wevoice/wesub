@@ -122,7 +122,7 @@ unisubs.subtitle.MSServerModel.prototype.setPristineSubtitles = function(pristin
 };
 unisubs.subtitle.MSServerModel.prototype.getPristineSubtitles = function() {
     return this.pristineSubtitlesJSON;
-}
+};
 
 /**
  * @param {unisubs.widget.SubtitleState} standardSubState SubtitleState for original language subs
