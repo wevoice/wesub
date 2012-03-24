@@ -411,23 +411,42 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
     // return as a json literal, else the closure compiler will mangle this
     var bodyInput = $d('textarea', {'class': 'unisubs-review-notes', 'id': 'unisubs-review-notes', 'name': 'notes'});
 
-
     var title = isOriginal? "Review subtitles": "Review this translation";
-    var helpContents = new unisubs.RightPanel.HelpContents(title, [
-        $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
-        $d('p', {}, "To make changes, use the controls on each subtitle to add, edit, or delete lines or to change their timing. You can also use the keyboard shortcuts shown below."),
-        $d('p', {}, "If you are unable to complete the review now, click the red 'x' at the top right of this panel. You can restart this task again later."),
-        $d('div', {'className': 'unisubs-extra'},
-           $d('p', {}, "Enter review notes here. ",
-              "They will be sent to all previous contributors ",
-              "and posted as a ",
-              $d('em', {}, "public comment"),
-              " to the subtitles."),
-           $d('span', {'className': 'unisubs-spanarrow'})),
 
-        $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
-        bodyInput
-    ], numSteps, currentStep);
+    var helpContents;
+    if (isOriginal) {
+        // We're reviewing subtitles.
+        helpContents = new unisubs.RightPanel.HelpContents(title, [
+            $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
+            $d('p', {}, "To make changes, use the controls on each subtitle to add, edit, or delete lines or to change their timing. You can also use the keyboard shortcuts shown below."),
+            $d('p', {}, "If you are unable to complete the review now, click the red 'x' at the top right of this panel. You can restart this task again later."),
+            $d('div', {'className': 'unisubs-extra'},
+               $d('p', {}, "Enter review notes here. ",
+                  "They will be sent to all previous contributors ",
+                  "and posted as a ",
+                  $d('em', {}, "public comment"),
+                  " to the subtitles."),
+               $d('span', {'className': 'unisubs-spanarrow'})),
+
+            $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
+            bodyInput
+        ], numSteps, currentStep);
+    } else {
+        // We're reviewing a translation.
+        helpContents = new unisubs.RightPanel.HelpContents(title, [
+            $d('p', {}, "Review the translation for accuracy and make changes to the translated text, if necessary. If you are unable to complete the review now, click the red 'x' at the top right of this panel. You can restart this task again later."),
+            $d('div', {'className': 'unisubs-extra'},
+               $d('p', {}, "Enter review notes here. ",
+                  "They will be sent to all previous contributors ",
+                  "and posted as a ",
+                  $d('em', {}, "public comment"),
+                  " to the subtitles."),
+               $d('span', {'className': 'unisubs-spanarrow'})),
+
+            $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
+            bodyInput
+        ], numSteps, currentStep);
+    }
 
     return  {
         'bodyInput': bodyInput,
@@ -447,24 +466,40 @@ unisubs.RightPanel.createInternalContentsForApproval = function($d, numSteps, cu
     var title = isOriginal? "Approve subtitles": "Approve this translation";
     var bodyInput = $d('textarea', {'class': 'unisubs-approve-notes', 'id': 'unisubs-approve-notes', 'name': 'notes'});
 
+    var helpContents;
+    if (isOriginal) {
+        // We're reviewing subtitles.
+        helpContents = new unisubs.RightPanel.HelpContents(title, [
+            $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
+            $d('p', {}, "To make changes, use the controls on each subtitle to add, edit, or delete lines or to change their timing. You can also use the keyboard shortcuts shown below."),
+            $d('p', {}, "If you are unable to complete the review now, click the red 'x' at the top right of this panel. You can restart this task again later."),
+            $d('div', {'className': 'unisubs-extra'},
+               $d('p', {}, "Enter review notes here. ",
+                  "They will be sent to all previous contributors ",
+                  "and posted as a ",
+                  $d('em', {}, "public comment"),
+                  " to the subtitles."),
+               $d('span', {'className': 'unisubs-spanarrow'})),
 
+            $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
+            bodyInput
+        ], numSteps, currentStep);
+    } else {
+        // We're reviewing a translation.
+        helpContents = new unisubs.RightPanel.HelpContents(title, [
+            $d('p', {}, "Review the translation for accuracy and make changes to the translated text, if necessary. If you are unable to complete the review now, click the red 'x' at the top right of this panel. You can restart this task again later."),
+            $d('div', {'className': 'unisubs-extra'},
+               $d('p', {}, "Enter review notes here. ",
+                  "They will be sent to all previous contributors ",
+                  "and posted as a ",
+                  $d('em', {}, "public comment"),
+                  " to the subtitles."),
+               $d('span', {'className': 'unisubs-spanarrow'})),
 
-    var helpContents = new unisubs.RightPanel.HelpContents(title, [
-        $d('p', {}, "Play the video and review the subtitles for both accuracy and timing."),
-        $d('p', {}, "To make changes, use the controls on each subtitle to add, edit, or delete lines or to change their timing. You can also use the keyboard shortcuts shown below."),
-        $d('p', {}, "If you are unable to complete the review now, click the red 'x' at the top right of this panel. You can restart this task again later."),
-        $d('div', {'className': 'unisubs-extra'},
-            $d('p', {}, "Enter review notes here. ",
-                        "They will be sent to all previous contributors ",
-                        "and posted as a ",
-                        $d('em', {}, "public comment"),
-                        " to the subtitles."),
-            $d('span', {'className': 'unisubs-spanarrow'})),
-
-        $d('label', {'class': 'unisubs-approve-notes-label', 'for': 'unisubs-approve-notes'}, 'Notes'),
-        bodyInput
-
-    ], numSteps, currentStep);
+            $d('label', {'class': 'unisubs-review-notes-label', 'for': 'unisubs-review-notes'}, 'Notes'),
+            bodyInput
+        ], numSteps, currentStep);
+    }
 
     return {
         'bodyInput': bodyInput,
