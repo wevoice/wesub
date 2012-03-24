@@ -459,9 +459,9 @@ span.unisubs-widget {
 }
 .unisubs-steps {
     bottom: 46px !important;
+    clear: both !important;;
     height: 122px !important;
     margin-left: 2px !important;
-    position: absolute !important;
     text-shadow: 0 0 0 !important;
     width: 420px !important;
 }

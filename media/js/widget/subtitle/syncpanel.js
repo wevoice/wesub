@@ -113,7 +113,7 @@ unisubs.subtitle.SyncPanel.prototype.createRightPanelInternal = function() {
         keySpecs = this.makeKeySpecsInternal();
     } else {
         
-        keySpecs = [];
+        keySpecs = this.makeKeySpecsInternal();
         this.bodyInput_ = internalComponents['bodyInput'];
         
     }
