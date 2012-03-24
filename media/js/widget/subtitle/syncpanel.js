@@ -231,8 +231,7 @@ unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
         confirm("Are you sure you want to start over?");
     if (answer) {
         if (this.reviewOrApprovalType_) {
-            // TODO: Make this work.
-            //var subtitlesJSON = this.serverModel.pristineSubtitlesJSON;
+            console.log(this.serverModel.getPristineSubtitles());
             //var captionSetFresh = new unisubs.subtitle.EditableCaptionSet(
                 //subtitles.SUBTITLES, subtitles.IS_COMPLETE, 
                 //subtitles.TITLE, false, subtitles.DESCRIPTION,

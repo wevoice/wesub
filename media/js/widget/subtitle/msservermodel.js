@@ -119,6 +119,9 @@ unisubs.subtitle.MSServerModel.prototype.anySubtitlingWorkDone = function() {
 };
 unisubs.subtitle.MSServerModel.prototype.setPristineSubtitles = function(pristineSubtitlesJSON) {
     this.pristineSubtitlesJSON = pristineSubtitlesJSON;
+};
+unisubs.subtitle.MSServerModel.prototype.getPristineSubtitles = function() {
+    return this.pristineSubtitlesJSON;
 }
 
 /**
