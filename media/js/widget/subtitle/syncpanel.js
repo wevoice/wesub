@@ -70,8 +70,7 @@ unisubs.subtitle.SyncPanel.prototype.createDom = function() {
     unisubs.subtitle.SyncPanel.superClass_.createDom.call(this);
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     this.getElement().appendChild(this.contentElem_ = $d('div'));
-    this.addChild(this.subtitleList_ = new unisubs.subtitle.SubtitleList(
-        this.videoPlayer_, this.subtitles_, true, false, false), true);
+    this.populateSubtitles(this.subtitles_);
 };
 unisubs.subtitle.SyncPanel.prototype.getRightPanel = function() {
     if (!this.rightPanel_) {
@@ -143,6 +142,10 @@ unisubs.subtitle.SyncPanel.prototype.makeKeySpecsInternal = function() {
     ];
 
 };
+unisubs.subtitle.SyncPanel.prototype.populateSubtitles = function(subtitles) {
+    this.addChild(this.subtitleList_ = new unisubs.subtitle.SubtitleList(
+        this.videoPlayer_, subtitles, true, false, false), true);
+}
 unisubs.subtitle.SyncPanel.prototype.suspendKeyEvents = function(suspended) {
     this.keyEventsSuspended_ = suspended;
 };
@@ -228,7 +231,7 @@ unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
         confirm("Are you sure you want to start over?");
     if (answer) {
         if (this.reviewOrApprovalType_) {
-            // Reset subtitles back to where they were before this task began.
+            this.populateSubtitles('');
             this.videoPlayer_.setPlayheadTime(0);
         } else {
             this.subtitles_.clearTimes();
