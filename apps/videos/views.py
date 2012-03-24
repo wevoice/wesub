@@ -425,7 +425,6 @@ def history(request, video, lang=None, lang_id=None):
     context['video'] = video
     context['translations'] = _get_translations(video)
     context['user_can_moderate'] = False
-    context['last_version'] = language.last_version
     context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
     context['edit_url'] = language.get_widget_url()
@@ -435,6 +434,7 @@ def history(request, video, lang=None, lang_id=None):
     _add_share_panel_context_for_history(context, video, language)
 
     context['revision_list'] = restrict_versions(qs, request.user, language)
+    context['last_version'] = context['revision_list'][0] if context['revision_list'] else None
 
     return render_to_response("videos/subtitle-view.html", context, context_instance=RequestContext(request))
 

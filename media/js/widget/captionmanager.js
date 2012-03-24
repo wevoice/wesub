@@ -60,10 +60,11 @@ unisubs.CaptionManager.CAPTIONS_FINISHED = 'captionsfinished';
 
 unisubs.CaptionManager.prototype.captionSetUpdate_ = function(event) {
     var et = unisubs.subtitle.EditableCaptionSet.EventType;
-    if (event.type == et.CLEAR_ALL) {
-        this.captions_ = [];
-            this.currentCaptionIndex_ = -1;
-        this.dispatchCaptionEvent_(null);
+    if (event.type == et.CLEAR_ALL ||
+        event.type == et.CLEAR_TIMES) {
+	this.captions_ = [];
+        this.currentCaptionIndex_ = -1;
+	this.dispatchCaptionEvent_(null);
     }
     else if (event.type == et.ADD) {
         var caption = event.caption;

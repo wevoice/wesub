@@ -44,6 +44,10 @@ function MS_removeSubListener(event) {
     MS_subtitleUpdateCount++;
 }
 
+function MS_clearListener(event) {
+    
+}
+
 /* helper functions */
 function captionJSON(start_time, end_time, caption_id, sub_order) {
     return {'start_time' : start_time, 
@@ -72,6 +76,10 @@ function createSet(existingCaptions) {
     var subsToDisplay = subtitleSet.getSubsToDisplay();
     for (var i = 0; i < subsToDisplay.length; i++)
         listenToSubtitle(subsToDisplay[i]);
+    MS_eventHandler.listen(
+        subtitleSet, 
+        unisubs.timeline.SubtitleSet.CLEAR_TIMES,
+        MS_clearListener);
     MS_eventHandler.listen(
         subtitleSet,
         unisubs.timeline.SubtitleSet.DISPLAY_NEW,

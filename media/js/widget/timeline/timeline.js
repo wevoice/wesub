@@ -1,6 +1,6 @@
 // Universal Subtitles, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -35,7 +35,9 @@ unisubs.timeline.Timeline = function(spacing, subtitleSet, videoPlayer, readOnly
     this.videoPlayer_ = videoPlayer;
     this.readOnly_ = readOnly;
 };
+
 goog.inherits(unisubs.timeline.Timeline, goog.ui.Component);
+
 unisubs.timeline.Timeline.prototype.createDom = function() {
     unisubs.timeline.Timeline.superClass_.createDom.call(this);
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
@@ -47,6 +49,7 @@ unisubs.timeline.Timeline.prototype.createDom = function() {
     this.addChild(this.timelineInner_, true);
     el.appendChild($d('div', 'marker'));
 };
+
 /**
  * Useful for when times are cleared.
  */
@@ -72,7 +75,11 @@ unisubs.timeline.Timeline.prototype.enterDocument = function() {
         listen(
             this.timelineInner_,
             unisubs.timeline.TimeRowUL.DOUBLECLICK,
-            this.timeRowDoubleClick_)
+            this.timeRowDoubleClick_).
+        listen(
+            this.subtitleSet_,
+            unisubs.timeline.SubtitleSet.CLEAR_TIMES,
+            this.reset_);
     this.initTime_();
 };
 unisubs.timeline.Timeline.prototype.timeRowDoubleClick_ = function(e) {

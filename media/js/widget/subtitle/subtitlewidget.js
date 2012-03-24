@@ -262,6 +262,9 @@ unisubs.subtitle.SubtitleWidget.prototype.switchToView_ = function() {
     this.showingTextarea_ = false;
     this.setEditing_(false, false);
 };
+unisubs.subtitle.SubtitleWidget.prototype.clearTimes = function() {
+    unisubs.style.setVisibility(this.contentElement_, false);
+};
 unisubs.subtitle.SubtitleWidget.prototype.updateValues_ = function() {
     if (this.editing_)
         return;

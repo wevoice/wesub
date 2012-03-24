@@ -180,66 +180,84 @@
                     </div>
                 {% endif %}
             </div>
-            {% if last_version.has_subtitles %}
-                <p class="view-notice">
-                    {% if language.is_dependent %}
-                        {% trans "Subtitles" %}
-                        {% trans 'translated from' %}
-                        {{ language.standard_language }}.
-                    {% endif %}
-                    {% trans "Showing" %}
-                    <strong>{% trans "Revision" %} {{ last_version.version_no }}</strong>,
-                    {% trans "created" %}
-                    <strong>{{ last_version.revision_time }}</strong>
-                    {% trans "by" %}
-                    <a href="{{ last_version.user.profile_url}}" title="View {{ last_version.user }}'s profile">
-                        <strong>{{ last_version.user }}</strong>
-                    </a>.
-                </p>
-                <ol class="subtitles">
-                    {% for item in last_version.ordered_subtitles %}
-                    <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
-                        {% if item.display_time %}
-                        <div class="timing">
-                            <a class="time_link" href="#" title="Play video here">
-                                <span class="data">{{ item.start_time }}</span>
-                                {{ item.display_time }}
-                                {% if item.display_end_time %}
-                                –
-                                {{ item.display_end_time }}
-                                {% endif %}
-                            </a>
-                        </div>
-                        {% else %}
-                        <div class="timing">
-                            {% trans 'Not Synced' %}
-                        </div>
+            {% if last_version %}
+                {% if last_version.has_subtitles %}
+                    <p class="view-notice">
+                        {% if language.is_dependent %}
+                            {% trans "Subtitles" %}
+                            {% trans 'translated from' %}
+                            {{ language.standard_language }}.
                         {% endif %}
-                        {{ item.text|linebreaksbr }}{% if item.start_of_paragraph %}<p class='quiet'>¶</p>{% endif %} 
-                    </li>
-                    {% endfor %}
-                </ol>
+                        {% trans "Showing" %}
+                        <strong>{% trans "Revision" %} {{ last_version.version_no }}</strong>,
+                        {% trans "created" %}
+                        <strong>{{ last_version.revision_time }}</strong>
+                        {% trans "by" %}
+                        <a href="{{ last_version.user.profile_url}}" title="View {{ last_version.user }}'s profile">
+                            <strong>{{ last_version.user }}</strong>
+                        </a>.
+                    </p>
+                    <ol class="subtitles">
+                        {% for item in last_version.ordered_subtitles %}
+                        <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
+                            {% if item.display_time %}
+                            <div class="timing">
+                                <a class="time_link" href="#" title="Play video here">
+                                    <span class="data">{{ item.start_time }}</span>
+                                    {{ item.display_time }}
+                                    {% if item.display_end_time %}
+                                    –
+                                    {{ item.display_end_time }}
+                                    {% endif %}
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="timing">
+                                {% trans 'Not Synced' %}
+                            </div>
+                            {% endif %}
+                            {{ item.text|linebreaksbr }}{% if item.start_of_paragraph %}<p class='quiet'>¶</p>{% endif %} 
+                        </li>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    {% if revision_list|length > 1 %}
+                        <p class="empty">
+                            {% blocktrans %}
+                            The most recent revision for this language is blank, but there are older
+                            revisions that contain subtitles.
+                            {% endblocktrans %}
+                            <a href="#revisions-tab" class="link_to_tab">{% trans 'View revision history' %}</a>
+                        </p>
+                    {% else %}
+                        <p class="empty">
+                            {% if revision_list|length > 0 %}
+                                {% trans 'These subtitles are in progress.' %}
+                                <a href="#" id="add_subtitles">{% trans 'Make more?' %}</a>
+                            {% else %}
+                                {% trans 'No subtitles available yet.' %}
+                                <a href="#" id="add_subtitles">{% trans 'Make some!' %}</a>
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                {% endif %}
             {% else %}
-                {% if revision_list|length > 1 %}
+                {% if language.subtitleversion_set.exists %}
                     <p class="empty">
                         {% blocktrans %}
-                        The most recent revision for this language is blank, but there are older
-                        revisions that contain subtitles.
+                            This language contains subtitles that are still waiting to be moderated.  Check back later.
                         {% endblocktrans %}
-                        <a href="#revisions-tab" class="link_to_tab">{% trans 'View revision history' %}</a>
                     </p>
                 {% else %}
                     <p class="empty">
-                        {% if revision_list|length > 0 %}
-                            {% trans 'These subtitles are in progress.' %}
-                            <a href="#" id="add_subtitles">{% trans 'Make more?' %}</a>
-                        {% else %}
-                            {% trans 'No subtitles available yet.' %}
-                            <a href="#" id="add_subtitles">{% trans 'Make some!' %}</a>
-                        {% endif %}
+                        {% blocktrans %}
+                            No subtitles have been added for this language yet.
+                        {% endblocktrans %}
                     </p>
                 {% endif %}
+
             {% endif %}
+
         </div>
         <div class="tab" id="comments-tab" style="display:none;">
             <h3>{% trans "Leave a comment" %}</h3>

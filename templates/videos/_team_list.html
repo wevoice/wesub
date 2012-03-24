@@ -2,16 +2,11 @@
 
 {% if teams %}
     <div class="video-tools grid_4 omega">
-            <h3>{% trans "Collaborate" %}</h3>
-            <p>
-                {% trans "This video belongs to the following team" %}:
-            </p>
-        <ul>
+        <h3>{% trans "Collaborate" %}</h3>
         {% for team in teams %}
-            <li>
-                <a href="{% url teams:detail slug=team.slug %}">{{team.name}}</a>
-            </li>
+            <p>
+                {% trans 'Return to' %} <a href="{% url teams:detail slug=team.slug %}">{{team.name}}</a> {% trans 'Translation Project' %}.
+            </p>
         {% endfor %}
-        </ul>
     </div>
 {% endif %}
