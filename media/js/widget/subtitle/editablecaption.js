@@ -41,6 +41,8 @@ unisubs.subtitle.EditableCaption = function(opt_subOrder, opt_jsonCaption) {
             'sub_order' : opt_subOrder,
             'start_of_paragraph': false
         };
+    this.json['original_start_time'] = this.json['start_time'];
+    this.json['original_end_time'] = this.json['end_time'];
     this.previousCaption_ = null;
     this.nextCaption_ = null;
 };
@@ -199,6 +201,19 @@ unisubs.subtitle.EditableCaption.prototype.clearTimes = function() {
         this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
         this.json['start_time'] = unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
         this.json['end_time'] = unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
+    }
+};
+unisubs.subtitle.EditableCaption.prototype.resetTimes = function() {
+    if (this.getStartTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
+        this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
+
+        var previousStartTime = this.json['start_time'];
+        this.setStartTime_(this.json['original_start_time']);
+        this.changed_(previousStartTime == unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
+
+        var previousEndTime = this.json['end_time'];
+        this.setEndTime_(this.json['original_end_time']);
+        this.changed_(previousEndTime == unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
     }
 };
 unisubs.subtitle.EditableCaption.prototype.getEndTime = function() {

@@ -212,7 +212,6 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         }
         var serverModel = new unisubs.subtitle.MSServerModel(
             sessionPK, this.videoID_, this.videoURL_, captionSet);
-        serverModel.setPristineSubtitles(result['subtitles']);
         var dialog ;
         if (unisubs.mode == 'review') {
             dialog = this.openSubtitleModerationDialog(serverModel, subtitles, originalSubtitles, 

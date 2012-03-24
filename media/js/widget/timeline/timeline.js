@@ -78,6 +78,10 @@ unisubs.timeline.Timeline.prototype.enterDocument = function() {
             this.timeRowDoubleClick_).
         listen(
             this.subtitleSet_,
+            unisubs.timeline.SubtitleSet.RESET_TIMES,
+            this.reset_).
+        listen(
+            this.subtitleSet_,
             unisubs.timeline.SubtitleSet.CLEAR_TIMES,
             this.reset_);
     this.initTime_();

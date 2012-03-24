@@ -37,7 +37,7 @@ unisubs.timeline.SubtitleSet = function(editableCaptionSet, videoPlayer) {
             this.captionChange_).
         listen(
             this.editableCaptionSet_,
-            [et.CLEAR_TIMES, et.ADD, et.DELETE],
+            [et.CLEAR_TIMES, et.RESET_TIMES, et.ADD, et.DELETE],
             this.subsEdited_);
 };
 
@@ -45,6 +45,7 @@ goog.inherits(unisubs.timeline.SubtitleSet, goog.events.EventTarget);
 
 unisubs.timeline.SubtitleSet.DISPLAY_NEW = 'displaynew';
 unisubs.timeline.SubtitleSet.CLEAR_TIMES = 'cleartimes';
+unisubs.timeline.SubtitleSet.RESET_TIMES = 'resettimes';
 unisubs.timeline.SubtitleSet.REMOVE = 'remove';
 
 unisubs.timeline.SubtitleSet.prototype.getSubsToDisplay = function() {
@@ -70,6 +71,10 @@ unisubs.timeline.SubtitleSet.prototype.subsEdited_ = function(e) {
     if (e.type == et.CLEAR_TIMES) {
         this.createSubsToDisplay_();
         this.dispatchEvent(unisubs.timeline.SubtitleSet.CLEAR_TIMES);
+    }
+    if (e.type == et.RESET_TIMES) {
+        this.createSubsToDisplay_();
+        this.dispatchEvent(unisubs.timeline.SubtitleSet.RESET_TIMES);
     }
     else if (e.type == et.ADD) {
         this.insertCaption_(e.caption);
