@@ -18,7 +18,6 @@
 
 goog.provide('unisubs.editmetadata.RightPanel');
 
-
 /**
  * @constructor
  * @extends unisubs.RightPanel
@@ -51,8 +50,8 @@ unisubs.editmetadata.RightPanel = function(dialog,
     this.inSubtitlingDialog_ = inSubtitlingDialog;
     this.notesInput_ = notesInput;
 };
-goog.inherits(unisubs.editmetadata.RightPanel, unisubs.RightPanel);
 
+goog.inherits(unisubs.editmetadata.RightPanel, unisubs.RightPanel);
 
 unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function($d, el) {
     var helpHeadingDiv = $d('div', 'unisubs-help-heading');
@@ -146,7 +145,6 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
     }
 
 };
-
 unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function($d, el) {
     if (!this.reviewOrApprovalType_ ){
         // for the subtitling dialog, we need the button to advance to the next painel
@@ -169,5 +167,3 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
         that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED);
     });
 };
-
-
