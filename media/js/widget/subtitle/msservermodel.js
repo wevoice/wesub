@@ -117,10 +117,8 @@ unisubs.subtitle.MSServerModel.prototype.anySubtitlingWorkDone = function() {
     var initialSubs = this.fetchInitialSubs_();
     return !initialSubs.CAPTION_SET.identicalTo(this.captionSet_);
 };
-unisubs.subtitle.MSServerModel.prototype.setPristineCaptions = function(captions) {
-    this.captionSetFresh_ = captions;
-    console.log('saved captionSetFresh');
-    console.log(this.captionSetFresh_);
+unisubs.subtitle.MSServerModel.prototype.setPristineSubtitles = function(pristineSubtitlesJSON) {
+    this.pristineSubtitlesJSON = pristineSubtitlesJSON;
 }
 
 /**

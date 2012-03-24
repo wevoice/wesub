@@ -231,8 +231,13 @@ unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
         confirm("Are you sure you want to start over?");
     if (answer) {
         if (this.reviewOrApprovalType_) {
-            console.log(this.serverModel.captionSetFresh_);
-            this.populateSubtitles(this.serverModel.captionSetFresh_);
+            // TODO: Make this work.
+            //var subtitlesJSON = this.serverModel.pristineSubtitlesJSON;
+            //var captionSetFresh = new unisubs.subtitle.EditableCaptionSet(
+                //subtitles.SUBTITLES, subtitles.IS_COMPLETE, 
+                //subtitles.TITLE, false, subtitles.DESCRIPTION,
+                //subtitles.LANGUAGE_NAME);
+            //this.populateSubtitles(captionSetFresh);
             this.videoPlayer_.setPlayheadTime(0);
         } else {
             this.subtitles_.clearTimes();
