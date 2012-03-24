@@ -117,6 +117,12 @@ unisubs.subtitle.MSServerModel.prototype.anySubtitlingWorkDone = function() {
     var initialSubs = this.fetchInitialSubs_();
     return !initialSubs.CAPTION_SET.identicalTo(this.captionSet_);
 };
+unisubs.subtitle.MSServerModel.prototype.setPristineSubtitles = function(pristineSubtitlesJSON) {
+    this.pristineSubtitlesJSON = pristineSubtitlesJSON;
+};
+unisubs.subtitle.MSServerModel.prototype.getPristineSubtitles = function() {
+    return this.pristineSubtitlesJSON;
+};
 
 /**
  * @param {unisubs.widget.SubtitleState} standardSubState SubtitleState for original language subs
