@@ -457,7 +457,7 @@ unisubs.RightPanel.createInternalContentsForReview = function($d, numSteps, curr
         // We're reviewing a translation.
 
         if (currentStep === 0) {
-            // We're on the first step (review / edit / sync subtitles).
+            // We're on the first step (review translation).
 
             helpContents = new unisubs.RightPanel.HelpContents(title, [
                 $d('p', {}, "Review the translation for accuracy and make changes to the translated text, if necessary. If you are unable to complete the review now, click the red 'x' at the top right of this panel. You can restart this task again later."),
