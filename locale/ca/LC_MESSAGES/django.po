@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-24 01:32-0500\n"
-"PO-Revision-Date: 2012-03-24 06:46+0000\n"
+"POT-Creation-Date: 2012-03-25 01:32-0500\n"
+"PO-Revision-Date: 2012-03-25 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.net/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -6095,12 +6095,12 @@ msgid "Collaborate"
 msgstr "Col·laborar"
 
 #: templates/videos/_team_list.html:8
-msgid "Return to"
+msgid "Visit"
 msgstr ""
 
 #: templates/videos/_team_list.html:8
 msgid "Translation Project"
-msgstr ""
+msgstr "Projecte de traducció"
 
 #: templates/videos/_upload_subtitles.html:2
 msgid "upload"
@@ -6698,7 +6698,7 @@ msgid ""
 "                            The most recent revision for this language is blank, but there are older\n"
 "                            revisions that contain subtitles.\n"
 "                            "
-msgstr ""
+msgstr "\nLa revisió més recent d'aquest idioma està buida, però n'hi ha de més antigues que contenen subtítols."
 
 #: templates/videos/subtitle-view.html:230
 msgid "View revision history"
@@ -6725,14 +6725,14 @@ msgid ""
 "\n"
 "                            This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
 "                        "
-msgstr ""
+msgstr "\nAquest idioma conté subtítols que encara estan esperant a ser moderats. Verifiqueu-ho més endavant."
 
 #: templates/videos/subtitle-view.html:253
 msgid ""
 "\n"
 "                            No subtitles have been added for this language yet.\n"
 "                        "
-msgstr ""
+msgstr "\nEncara no s'han afegit subtítols a aquest idioma."
 
 #: templates/videos/subtitle-view.html:263
 #: templates/videos/video-view.html:179
