@@ -152,9 +152,18 @@ class YoutubeVideoType(VideoType):
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_video_id(self.url)
-        self.entry = self._get_entry(self.video_id)
+
+    @property
+    def entry(self):
+        if not hasattr(self, "_entry"):
+            self._entry = self._get_entry(self.video_id)
+
+        return self._entry
+
+    @property
+    def username(self):
         author = self.entry.author[0]
-        self.username = author.name.text
+        return author.name.text
 
     @property
     def video_id(self):
