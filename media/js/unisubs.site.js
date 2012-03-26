@@ -596,7 +596,7 @@ var Site = function(Site) {
                 $('input[name="team_video"]', $move_form).val($selected.val());
                 $('input[name="team"]', $move_form).val($selected.data('team-pk'));
 
-                if (confirm("Warning: if you move this video, it will lose all tasks associated with it (the activity will be retained, however). Proceed?")) {
+                if (confirm("WARNING:\n\nIf you move this video it will lose all tasks associated with it (the activity will be retained, however).\n\nAll subtitles currently waiting for moderation will be made public.\n\nProceed?")) {
                     return true;
                 } else {
                     return false;
