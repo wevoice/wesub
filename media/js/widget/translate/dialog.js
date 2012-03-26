@@ -91,7 +91,7 @@ unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
 unisubs.translate.Dialog.prototype.isWorkSaved = function() {
     if (this.reviewOrApprovalType_) {
         if (this.currentSubtitlePanel_.getNotesContent_() !== '') {
-            return false;
+            return this.saved_;
         }
     }
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();

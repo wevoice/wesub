@@ -316,7 +316,7 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
 unisubs.subtitle.Dialog.prototype.isWorkSaved = function() {
     if (this.reviewOrApprovalType_) {
         if (this.getNotesContent_(this.currentSubtitlePanel_) !== '') {
-            return false;
+            return this.saved_;
         }
     }
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();
