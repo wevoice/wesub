@@ -230,12 +230,12 @@ def nf(username):
                     s3_bucket             = 's3.nf.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles.nf',
                     static_dir            = '/var/static/nf',
-                    name                  = 'nl',
+                    name                  = 'nf',
                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                     admin_dir             = '/usr/local/universalsubtitles.nf',
                     admin_host            = 'pcf-us-adminnf.pculture.org:2191',
                     celeryd_host          = 'pcf-us-adminnf.pculture.org:2191',
-                    celeryd_proj_root     = 'universalsubtitles.nl',
+                    celeryd_proj_root     = 'universalsubtitles.nf',
                     separate_uslogging_db = True,
                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
 
