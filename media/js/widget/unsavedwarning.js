@@ -38,7 +38,7 @@ unisubs.UnsavedWarning.prototype.createDom = function() {
     var e = this.getElement();
     e.className = 'unisubs-warning';
 
-    var discardLinkText, submitLinkText, warningTitle, warningDescription;
+    var discardLinkText, submitLinkText, warningTitle, warningDescription, cancelLinkText;
     if (unisubs.mode === 'review' || unisubs.mode === 'approve') {
         discardLinkText = 'Discard changes and exit';
         submitLinkText = '';
@@ -51,24 +51,33 @@ unisubs.UnsavedWarning.prototype.createDom = function() {
         warningDescription = 'Do you want to save your work for others to build on? If you were messing around or testing, please discard.';
     }
 
+    cancelLinkText = 'Cancel';
+
     e.appendChild($d('h2', null, warningTitle));
     e.appendChild($d('p', null, warningDescription));
     this.discardLink_ = $d('a', {'className': 'unisubs-link', 'href':'#'}, discardLinkText);
     this.submitLink_ = $d('a', {'className': 'unisubs-link', 'href': '#'}, submitLinkText);
-    e.appendChild($d('div', 'unisubs-buttons', this.discardLink_, this.submitLink_));
+    this.cancelLink_ = $d('a', {'className': 'unisubs-link', 'href': '#'}, cancelLinkText);
+    e.appendChild($d('div', 'unisubs-buttons', this.cancelLink_, this.discardLink_, this.submitLink_));
 };
 unisubs.UnsavedWarning.prototype.enterDocument = function() {
     unisubs.UnsavedWarning.superClass_.enterDocument.call(this);
     this.getHandler().
+        listen(this.cancelLink_, 'click', this.linkClicked_).
         listen(this.discardLink_, 'click', this.linkClicked_).
         listen(this.submitLink_, 'click', this.linkClicked_);
 };
 unisubs.UnsavedWarning.prototype.linkClicked_ = function(e) {
     e.preventDefault();
     this.submitChosen_ = e.target == this.submitLink_;
-    this.setVisible(false);    
+    this.cancelChosen_ = e.target == this.cancelLink_;
+    this.setVisible(false);
 };
 unisubs.UnsavedWarning.prototype.setVisible = function(visible) {
+    if (this.cancelChosen_) {
+        unisubs.UnsavedWarning.superClass_.setVisible.call(this, visible);
+        return false;
+    }
     if (!visible)
         this.callback_(this.submitChosen_);
     unisubs.UnsavedWarning.superClass_.setVisible.call(this, visible);
