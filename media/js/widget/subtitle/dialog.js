@@ -314,6 +314,11 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
         this.enterState_(this.nextState_());
 };
 unisubs.subtitle.Dialog.prototype.isWorkSaved = function() {
+    if (this.reviewOrApprovalType_) {
+        if (this.getNotesContent_(this.currentSubtitlePanel_) !== '') {
+            return false;
+        }
+    }
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();
 };
 unisubs.subtitle.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
