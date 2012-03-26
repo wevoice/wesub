@@ -223,6 +223,22 @@ def temp(username):
                     separate_uslogging_db = True,
                     celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
 
+def nf(username):
+    with Output("Configuring task(s) to run on NF env"):
+        _create_env(username              = username,
+                    hosts                 = ['nf.universalsubtitles.org:2191'],
+                    s3_bucket             = 's3.nf.universalsubtitles.org',
+                    installation_dir      = 'universalsubtitles.nf',
+                    static_dir            = '/var/static/nf',
+                    name                  = 'nl',
+                    memcached_bounce_cmd  = '/etc/init.d/memcached restart',
+                    admin_dir             = '/usr/local/universalsubtitles.nf',
+                    admin_host            = 'pcf-us-adminnf.pculture.org:2191',
+                    celeryd_host          = 'pcf-us-adminnf.pculture.org:2191',
+                    celeryd_proj_root     = 'universalsubtitles.nl',
+                    separate_uslogging_db = True,
+                    celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
+
 
 def syncdb():
     """Run python manage.py syncdb for the main and logging databases"""
