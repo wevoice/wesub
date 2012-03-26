@@ -71,7 +71,7 @@ from videos import metadata_manager
 from videos.tasks import (
     _update_captions_in_original_service, _delete_captions_in_original_service
 )
-from videos.models import Action, VideoUrl, SubtitleLanguage
+from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 
@@ -576,6 +576,22 @@ def move_video(request):
         # recreating it.
         team_video.team = team
         team_video.save()
+
+        # We need to make any as-yet-unmoderated versions public.
+        # TODO: Dedupe this and the team video delete signal.
+        video = team_video.video
+
+        SubtitleVersion.objects.filter(language__video=video).update(
+            moderation_status=MODERATION.UNMODERATED)
+
+        video.is_public = True
+        video.moderated_by = None
+        video.save()
+
+        # Update all Solr data.
+        metadata_manager.update_metadata(video.pk)
+        video.update_search_index()
+        update_one_team_video(team_video.pk)
 
         messages.success(request, _(u'The video has been moved to the new team.'))
     else:
