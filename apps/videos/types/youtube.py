@@ -189,7 +189,7 @@ class YoutubeVideoType(VideoType):
         if self.entry.media.duration:
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
-            video_obj.thumbnail = self.entry.media.thumbnail[-1].url
+            video_obj.thumbnail = self.entry.media.thumbnail[0].url
         video_obj.small_thumbnail = 'http://i.ytimg.com/vi/%s/default.jpg' % self.video_id
         video_obj.save()
 
