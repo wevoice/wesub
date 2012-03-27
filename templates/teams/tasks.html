@@ -147,7 +147,7 @@
                             <p>
                                 {% trans "Video" %}:
                                 <a href="{{ task.team_video.video.get_absolute_url }}">
-                                    {{ task.team_video|truncatewords:4 }}
+                                    {{ task.team_video|truncatewords:12 }}
                                 </a>
                                 {% if task.team_video.video.duration %}
                                     ({{ task.team_video.video.duration|format_duration }})
