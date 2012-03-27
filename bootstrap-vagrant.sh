@@ -18,6 +18,52 @@ pip install -r requirements.txt
 pip install -r requirements-test.txt
 cd ..
 
+# Create a base settings_local.py ---------------------------------------------
+cat > settings_local.py <<EOF
+# This setting lets non-admin accounts view the Django Debug Toolbar.
+# Useful for development when you're debugging queries made for non-admins.
+EVERYONE_CAN_DEBUG = True
+
+# Change this to True to tell unisubs to load the compressed version of the
+# static media.  You'll still need to actually compress the media yourself.
+COMPRESS_MEDIA = False
+
+DEFAULT_PROTOCOL = 'http'
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+
+# Sent emails will be stored in files in this folder.
+EMAIL_FILE_PATH = '/tmp/unisubsdevemails'
+
+# Basic Celery settings for Vagrant.  Shouldn't need to touch these.
+CELERY_IGNORE_RESULT = True
+CELERY_ALWAYS_EAGER = True
+CELERY_RESULT_BACKEND = "redis"
+CELERY_REDIS_HOST = "localhost"
+CELERY_REDIS_PORT = 6379
+CELERY_REDIS_DB = 0
+BROKER_POOL_LIMIT = 10
+
+# Uncomment to enable RabbitMQ-based Celery:
+# CELERY_ALWAYS_EAGER = False
+# CELERY_RESULT_BACKEND = "amqp"
+# BROKER_BACKEND = 'amqplib'
+# BROKER_HOST = "localhost"
+# BROKER_PORT = 5672
+# BROKER_USER = "usrmquser"
+# BROKER_PASSWORD = "usrmqpassword"
+# BROKER_VHOST = "ushost"
+
+# Change this to True to work in "offline" mode (don't try to load things like
+# Google Analytics, etc).
+RUN_LOCALLY = False
+
+# Just leave these here for now.
+# TODO: Get rid of these.
+SPEAKERTEXT_API_TOKEN = ""
+SPEAKERTEXT_PASSWORD = ""
+EOF
+
 # Set up the DB ---------------------------------------------------------------
 python manage.py syncdb --all --settings=dev_settings --noinput
 python manage.py migrate --fake --settings=dev_settings

@@ -35,7 +35,7 @@ from sentry.client.models import client
 
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from videos.models import VideoFeed, SubtitleLanguage, Video
-
+from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
 celery_logger.addHandler(SentryHandler())
@@ -184,6 +184,36 @@ def send_change_title_email(video_id, user_id, old_title, new_title):
         send_templated_email(obj, subject,
                              'videos/email_title_changed.html',
                              context, fail_silently=not settings.DEBUG)
+
+@task()
+def import_videos_from_feeds(urls, user_id=None):
+    from auth.models import CustomUser as User
+    from messages import tasks as notifier
+
+    try:
+        user = user_id and User.objects.get(id=user_id)
+    except ObjectDoesNotExist:
+        user = None
+
+    videos = []
+    last_entry = dict()
+
+    for url in urls:
+        feed_parser = FeedParser(url)
+
+        for vt, info, entry in feed_parser.items():
+            if not vt: continue
+            videos.append(Video.get_or_create_for_url(vt=vt, user=user))
+            last_entry = entry
+        else:
+            _save_video_feed(url, last_entry.get('link', ''), user)
+
+    if user:
+        notifier.videos_imported_message.delay(user_id, len(videos))
+
+@task()
+def upload_subtitles_to_original_service(version_pk):
+    _update_captions_in_original_service(version_pk)
 
 def _send_notification(version_id):
     from videos.models import SubtitleVersion
@@ -397,4 +427,13 @@ def _delete_captions_in_original_service(language_pk):
     ThirdPartyAccount.objects.mirror_on_third_party(
         language.video, language.language, DELETE_LANGUAGE_ACTION)
 
+def _save_video_feed(feed_url, last_entry_url, user):
+    """ Creates or updates a videofeed given some url """
+    try:
+        vf = VideoFeed.objects.get(url=feed_url)
+    except VideoFeed.DoesNotExist:
+        vf = VideoFeed(url=feed_url)
 
+    vf.user = user
+    vf.last_link = last_entry_url
+    vf.save()

@@ -200,3 +200,114 @@ class ViewsTests(TestCase):
         self.assertTrue(TeamVideo.objects.filter(pk=tv.pk).exists())
         self.assertTrue(VideoUrl.objects.filter(url=video_url).exists())
 
+
+    def test_move_video_allowed(self):
+        '''Check that moving works when the user has permission.'''
+        video_pk = Video.objects.all()[0].pk
+
+        # Convenient functions for pulling models fresh from the DB.
+        get_video = lambda: Video.objects.get(pk=video_pk)
+        get_team_video = lambda: get_video().get_team_video()
+
+        old_team = Team.objects.get(pk=1)
+        new_team = Team.objects.get(pk=2)
+
+        # Create a member that's an admin of BOTH teams.
+        # This member should be able to move the video.
+        member = self._create_member(old_team, TeamMember.ROLE_ADMIN)
+        self._create_member(new_team, TeamMember.ROLE_ADMIN, member.user)
+
+        self._create_team_video(get_video().get_video_url(), old_team, member.user)
+
+        self.assertEqual(get_team_video().team.pk, old_team.pk,
+                         "Video did not start in the correct team.")
+
+        # Move the video.
+        self.client.login(username=member.user.username,
+                          password=member.user.username)
+        url = reverse("teams:move_video")
+        response = self.client.post(url, {'team_video': get_team_video().pk,
+                                          'team': new_team.pk,})
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(get_team_video().team.pk, new_team.pk,
+                         "Video was not moved to the new team.")
+
+    def test_move_video_disallowed_old(self):
+        '''Check that moving does not work when the user is blocked by the old team.'''
+        video_pk = Video.objects.all()[0].pk
+
+        get_video = lambda: Video.objects.get(pk=video_pk)
+        get_team_video = lambda: get_video().get_team_video()
+
+        old_team = Team.objects.get(pk=1)
+        new_team = Team.objects.get(pk=2)
+
+        # Create a member that's a contributor to the old/current team.
+        # This member should NOT be able to move the video because they cannot
+        # remove it from the first team.
+        member = self._create_member(old_team, TeamMember.ROLE_CONTRIBUTOR)
+        self._create_member(new_team, TeamMember.ROLE_ADMIN, member.user)
+
+        self._create_team_video(get_video().get_video_url(), old_team, member.user)
+
+        self.assertEqual(get_team_video().team.pk, old_team.pk,
+                         "Video did not start in the correct team.")
+
+        # Try to move the video.
+        self.client.login(username=member.user.username,
+                          password=member.user.username)
+        url = reverse("teams:move_video")
+        response = self.client.post(url, {'team_video': get_team_video().pk,
+                                          'team': new_team.pk,})
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(get_team_video().team.pk, old_team.pk,
+                         "Video did not stay in the old team.")
+
+    def test_move_video_disallowed_new(self):
+        '''Check that moving does not work when the user is blocked by the new team.'''
+        video_pk = Video.objects.all()[0].pk
+
+        get_video = lambda: Video.objects.get(pk=video_pk)
+        get_team_video = lambda: get_video().get_team_video()
+
+        old_team = Team.objects.get(pk=1)
+        new_team = Team.objects.get(pk=2)
+
+        # Create a member that's a contributor to the new/target team.
+        # This member should NOT be able to move the video because they cannot
+        # add it to the second team.
+        member = self._create_member(old_team, TeamMember.ROLE_ADMIN)
+        self._create_member(new_team, TeamMember.ROLE_CONTRIBUTOR, member.user)
+
+        self._create_team_video(get_video().get_video_url(), old_team, member.user)
+
+        self.assertEqual(get_team_video().team.pk, old_team.pk,
+                         "Video did not start in the correct team.")
+
+        # Try to move the video.
+        self.client.login(username=member.user.username,
+                          password=member.user.username)
+        url = reverse("teams:move_video")
+        response = self.client.post(url, {'team_video': get_team_video().pk,
+                                          'team': new_team.pk,})
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(get_team_video().team.pk, old_team.pk,
+                         "Video did not stay in the old team.")
+
+
+    def _create_team_video(self, video_url, team, user):
+        v, c = Video.get_or_create_for_url(video_url)
+        tv, c = TeamVideo.objects.get_or_create(video=v, team=team,
+                                                defaults={'added_by': user})
+        return tv
+
+    def _create_member(self, team, role, user=None):
+        if not user:
+            user = User.objects.create(username='test' + role)
+            user.set_password('test' + role)
+            user.save()
+        return TeamMember.objects.create(user=user, role=role, team=team)
+

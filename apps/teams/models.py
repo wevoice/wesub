@@ -41,6 +41,7 @@ from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
     ROLE_CONTRIBUTOR
 )
+from videos.tasks import upload_subtitles_to_original_service
 from teams.tasks import update_one_team_video
 from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField
@@ -1200,10 +1201,10 @@ class TaskManager(models.Manager):
         return self.not_deleted().filter(completed__isnull=False)
 
 
-    def _type(self, type, completed, approved=None):
-        """Return a QS of tasks that are not deleted and are of the given type.
+    def _type(self, types, completed=None, approved=None):
+        """Return a QS of tasks that are not deleted and are one of the given types.
 
-        type should be a string matching a label in Task.TYPE_CHOICES.
+        types should be a list of strings matching a label in Task.TYPE_CHOICES.
 
         completed should be one of:
 
@@ -1215,7 +1216,8 @@ class TaskManager(models.Manager):
         Task.APPROVED_CHOICES.
 
         """
-        qs = self.not_deleted().filter(type=Task.TYPE_IDS[type])
+        type_ids = [Task.TYPE_IDS[type] for type in types]
+        qs = self.not_deleted().filter(type__in=type_ids)
 
         if completed == False:
             qs = qs.filter(completed=None)
@@ -1230,28 +1232,36 @@ class TaskManager(models.Manager):
 
     def incomplete_subtitle(self):
         """Return a QS of subtitle tasks that are not deleted or completed."""
-        return self._type('Subtitle', False)
+        return self._type(['Subtitle'], False)
 
     def incomplete_translate(self):
         """Return a QS of translate tasks that are not deleted or completed."""
-        return self._type('Translate', False)
+        return self._type(['Translate'], False)
 
     def incomplete_review(self):
         """Return a QS of review tasks that are not deleted or completed."""
-        return self._type('Review', False)
+        return self._type(['Review'], False)
 
     def incomplete_approve(self):
         """Return a QS of approve tasks that are not deleted or completed."""
-        return self._type('Approve', False)
+        return self._type(['Approve'], False)
+
+    def incomplete_subtitle_or_translate(self):
+        """Return a QS of subtitle or translate tasks that are not deleted or completed."""
+        return self._type(['Subtitle', 'Translate'], False)
+
+    def incomplete_review_or_approve(self):
+        """Return a QS of review or approve tasks that are not deleted or completed."""
+        return self._type(['Review', 'Approve'], False)
 
 
     def complete_subtitle(self):
         """Return a QS of subtitle tasks that are not deleted, but are completed."""
-        return self._type('Subtitle', True)
+        return self._type(['Subtitle'], True)
 
     def complete_translate(self):
         """Return a QS of translate tasks that are not deleted, but are completed."""
-        return self._type('Translate', True)
+        return self._type(['Translate'], True)
 
     def complete_review(self, approved=None):
         """Return a QS of review tasks that are not deleted, but are completed.
@@ -1261,7 +1271,7 @@ class TaskManager(models.Manager):
         Task.APPROVED_CHOICES, like 'Rejected'.
 
         """
-        return self._type('Review', True, approved)
+        return self._type(['Review'], True, approved)
 
     def complete_approve(self, approved=None):
         """Return a QS of approve tasks that are not deleted, but are completed.
@@ -1271,29 +1281,47 @@ class TaskManager(models.Manager):
         Task.APPROVED_CHOICES, like 'Rejected'.
 
         """
-        return self._type('Approve', True, approved)
+        return self._type(['Approve'], True, approved)
+
+    def complete_subtitle_or_translate(self):
+        """Return a QS of subtitle or translate tasks that are not deleted, but are completed."""
+        return self._type(['Subtitle', 'Translate'], True)
+
+    def complete_review_or_approve(self, approved=None):
+        """Return a QS of review or approve tasks that are not deleted, but are completed.
+
+        If approved is given the tasks are further filtered on their .approved
+        attribute.  It must be a string matching one of the labels in
+        Task.APPROVED_CHOICES, like 'Rejected'.
+
+        """
+        return self._type(['Review', 'Approve'], True, approved)
 
 
     def all_subtitle(self):
         """Return a QS of subtitle tasks that are not deleted."""
-        return self._type('Subtitle', None)
+        return self._type(['Subtitle'])
 
     def all_translate(self):
         """Return a QS of translate tasks that are not deleted."""
-        return self._type('Translate', None)
+        return self._type(['Translate'])
 
     def all_review(self):
         """Return a QS of review tasks that are not deleted."""
-        return self._type('Review', None)
+        return self._type(['Review'])
 
     def all_approve(self):
         """Return a QS of tasks that are not deleted."""
-        return self._type('Approve', None)
+        return self._type(['Approve'])
+
+    def all_subtitle_or_translate(self):
+        """Return a QS of subtitle or translate tasks that are not deleted."""
+        return self._type(['Subtitle', 'Translate'])
 
     def all_review_or_approve(self):
         """Return a QS of review or approve tasks that are not deleted."""
-        return self.not_deleted().filter(type__in=(Task.TYPE_IDS['Review'],
-                                                   Task.TYPE_IDS['Approve']))
+        return self._type(['Review', 'Approve'])
+
 
 class Task(models.Model):
     TYPE_CHOICES = (
@@ -1513,7 +1541,9 @@ class Task(models.Model):
             metadata_manager.update_metadata(self.team_video.video.pk)
 
             if self.workflow.autocreate_translate:
-                _create_translation_tasks(self.team_video, self.subtitle_version)
+                _create_translation_tasks(self.team_video, subtitle_version)
+
+            upload_subtitles_to_original_service.delay(subtitle_version.pk)
 
     def _complete_translate(self):
         """Handle the messy details of completing a translate task."""
@@ -1542,6 +1572,7 @@ class Task(models.Model):
             # We need to make sure this is updated correctly here.
             from apps.videos import metadata_manager
             metadata_manager.update_metadata(self.team_video.video.pk)
+            upload_subtitles_to_original_service.delay(subtitle_version.pk)
 
             task = None
 
@@ -1549,13 +1580,15 @@ class Task(models.Model):
 
     def _complete_review(self):
         """Handle the messy details of completing a review task."""
+        approval = self.approved == Task.APPROVED_IDS['Approved']
+
         self._add_comment()
 
         task = None
         if self.workflow.approve_enabled:
             # Approval is enabled, so if the reviewer thought these subtitles
             # were good we create the next task.
-            if self.approved == Task.APPROVED_IDS['Approved']:
+            if approval:
                 task = Task(team=self.team, team_video=self.team_video,
                             subtitle_version=self.subtitle_version,
                             language=self.language, type=Task.TYPE_IDS['Approve'],
@@ -1575,7 +1608,7 @@ class Task(models.Model):
             # determines whether the subtitles go public.
             self._set_version_moderation_status()
 
-            if self.approved == Task.APPROVED_IDS['Approved']:
+            if approval:
                 # If the subtitles are okay, go ahead and autocreate translation
                 # tasks if necessary.
                 if self.workflow.autocreate_translate:
@@ -1583,14 +1616,21 @@ class Task(models.Model):
 
                 # non approval review
                 notifier.reviewed_and_published.delay(self.pk)
+                upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
             else:
                 # Send the subtitles back for improvement.
                 self._send_back()
+
+        if self.assignee:
+            # TODO: See if we can eliminate the need for this if check.
+            self.subtitle_version.set_reviewed_by(self.assignee)
 
         return task
 
     def _complete_approve(self):
         """Handle the messy details of completing an approve task."""
+        approval = self.approved == Task.APPROVED_IDS['Approved']
+
         self._add_comment()
 
         # If we manage to get here, the ruling on this Approve task determines
@@ -1598,15 +1638,20 @@ class Task(models.Model):
         self._set_version_moderation_status()
 
         # If the subtitles are okay, go ahead and autocreate translation tasks.
-        is_ok = self.approved == Task.APPROVED_IDS['Approved']
-        if is_ok:
+        if approval:
             # But only if we haven't already.
             if self.workflow.autocreate_translate:
                 _create_translation_tasks(self.team_video, self.subtitle_version)
+            upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
         else:
             # Send the subtitles back for improvement.
             self._send_back(sends_notification=False)
-        notifier.approved_notification.delay(self.pk, is_ok)
+
+        if self.assignee:
+            # TODO: See if we can eliminate the need for this if check.
+            self.subtitle_version.set_approved_by(self.assignee)
+
+        notifier.approved_notification.delay(self.pk, approval)
 
 
     def get_perform_url(self):

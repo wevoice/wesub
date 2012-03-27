@@ -42,7 +42,7 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm
+    UnpublishForm, MoveTeamVideoForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -71,7 +71,7 @@ from videos import metadata_manager
 from videos.tasks import (
     _update_captions_in_original_service, _delete_captions_in_original_service
 )
-from videos.models import Action, VideoUrl, SubtitleLanguage
+from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 
@@ -560,6 +560,45 @@ def add_video(request, slug):
         'form': form,
         'team': team
     }
+
+@login_required
+def move_video(request):
+    form = MoveTeamVideoForm(request.user, request.POST)
+
+    if form.is_valid():
+        team_video = form.cleaned_data['team_video']
+        team = form.cleaned_data['team']
+
+        # For now, we'll just delete any tasks associated with the moved video.
+        team_video.task_set.update(deleted=True)
+
+        # We move the video by just switching the team, instead of deleting and
+        # recreating it.
+        team_video.team = team
+        team_video.save()
+
+        # We need to make any as-yet-unmoderated versions public.
+        # TODO: Dedupe this and the team video delete signal.
+        video = team_video.video
+
+        SubtitleVersion.objects.filter(language__video=video).update(
+            moderation_status=MODERATION.UNMODERATED)
+
+        video.is_public = True
+        video.moderated_by = None
+        video.save()
+
+        # Update all Solr data.
+        metadata_manager.update_metadata(video.pk)
+        video.update_search_index()
+        update_one_team_video(team_video.pk)
+
+        messages.success(request, _(u'The video has been moved to the new team.'))
+    else:
+        for e in flatten_errorlists(form.errors):
+            messages.error(request, e)
+
+    return HttpResponseRedirect(request.POST.get('next', '/'))
 
 @render_to('teams/add_videos.html')
 @login_required
@@ -1071,7 +1110,13 @@ def _order_tasks(request, tasks):
     elif sort == '-created':
         tasks = tasks.order_by('-created')
     elif sort == 'expires':
-        tasks = tasks.order_by('expiration_date')
+        # Unfortunately, MySQL puts NULL records to the top, here.
+        # In this sorting instance, we convert the two querysets to
+        # lists and combine them, forcing the NULL records to the bottom.
+        # Alternative would be to write custom SQL to drop the NULLs.
+        null_expirations = tasks.filter(expiration_date=None)
+        has_expirations = tasks.exclude(expiration_date=None)
+        tasks = list(has_expirations.order_by('expiration_date')) + list(null_expirations)
     elif sort == '-expires':
         tasks = tasks.order_by('-expiration_date')
 
@@ -1258,7 +1303,7 @@ def delete_task(request, slug):
 
             if task.get_type_display() in ['Review', 'Approve']:
                 # TODO: Handle subtitle/translate tasks here too?
-                if not form.cleaned_data['discard_subs']:
+                if not form.cleaned_data['discard_subs'] and task.subtitle_version:
                     task.subtitle_version.moderation_status = MODERATION.APPROVED
                     task.subtitle_version.save()
                     metadata_manager.update_metadata(video.pk)

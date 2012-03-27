@@ -89,6 +89,11 @@ unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
         this.enterState_(unisubs.translate.Dialog.State_.EDIT_METADATA);
 };
 unisubs.translate.Dialog.prototype.isWorkSaved = function() {
+    if (this.reviewOrApprovalType_) {
+        if (this.currentSubtitlePanel_.getNotesContent_() !== '') {
+            return this.saved_;
+        }
+    }
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();
 };
 unisubs.translate.Dialog.prototype.enterDocument = function() {

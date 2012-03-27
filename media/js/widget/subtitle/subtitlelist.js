@@ -1,6 +1,6 @@
 // Universal Subtitles, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -17,15 +17,14 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.subtitle.SubtitleList');
+
  /**
  * @constructor
  * @extends goog.ui.Component
  *
  * @param {unisubs.subtitle.EditableCaptionSet} captionSet
  */
-unisubs.subtitle.SubtitleList = function(videoPlayer, captionSet,
-                                          displayTimes, opt_showBeginMessage,
-                                          readOnly, displayParagraphMarkers) {
+unisubs.subtitle.SubtitleList = function(videoPlayer, captionSet, displayTimes, opt_showBeginMessage, readOnly, displayParagraphMarkers) {
     goog.ui.Component.call(this);
     this.videoPlayer_ = videoPlayer;
     this.captionSet_ = captionSet;
@@ -47,7 +46,9 @@ unisubs.subtitle.SubtitleList = function(videoPlayer, captionSet,
     this.lastSub_ = null;
     this.lastSubMouseHandler_ = new goog.events.EventHandler(this);
 };
+
 goog.inherits(unisubs.subtitle.SubtitleList, goog.ui.Component);
+
 unisubs.subtitle.SubtitleList.prototype.createDom = function() {
     var dh = this.getDomHelper();
     var $d = goog.bind(dh.createDom, dh);
@@ -133,9 +134,7 @@ unisubs.subtitle.SubtitleList.prototype.captionTimesCleared_ = function(e) {
     var subtitleWidgets = goog.object.getValues(this.subtitleMap_);
     goog.array.forEach(subtitleWidgets, function(w) { w.clearTimes(); });
 };
-unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ =
-    function(editableCaption)
-{
+unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ = function(editableCaption) {
     return new unisubs.subtitle.SubtitleWidget(
         editableCaption,
         this.captionSet_,
@@ -145,14 +144,13 @@ unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ =
         this.displayParagraphMarkers
     );
 };
+
 /**
  *
  * @param {unisubs.subtitle.EditableCaption} subtitle
  *
  */
-unisubs.subtitle.SubtitleList.prototype.addSubtitle =
-    function(subtitle, opt_scrollDown, opt_dontSetLastSub)
-{
+unisubs.subtitle.SubtitleList.prototype.addSubtitle = function(subtitle, opt_scrollDown, opt_dontSetLastSub) {
     if (this.showingBeginMessage_) {
         goog.dom.removeChildren(this.getElement());
         goog.dom.classes.remove(this.getElement(), 'unisubs-beginTab');
@@ -226,6 +224,7 @@ unisubs.subtitle.SubtitleList.prototype.clearActiveWidget = function() {
         this.currentActiveSubtitle_ = null;
     }
 };
+
 /**
  * @param {boolean} taller
  */
@@ -251,11 +250,7 @@ unisubs.subtitle.SubtitleList.prototype.scrollToCaption = function(captionID) {
             subtitleWidget.getElement(),
             this.getElement(), true);
 };
-unisubs.subtitle.SubtitleList.prototype.setCurrentlyEditing_ =
-    function(editing, timeChanged, subtitleWidget)
-{
-    this.currentlyEditing_ = editing;
-    if (editing) {
+unisubs.subtitle.SubtitleList.prototype.setCurrentlyEditing_ = function(editing, timeChanged, subtitleWidget) { this.currentlyEditing_ = editing; if (editing) {
         this.videoPlayer_.pause();
     }
     else {
@@ -268,5 +263,3 @@ unisubs.subtitle.SubtitleList.prototype.setCurrentlyEditing_ =
 unisubs.subtitle.SubtitleList.prototype.isCurrentlyEditing = function() {
     return this.currentlyEditing_;
 };
-
-

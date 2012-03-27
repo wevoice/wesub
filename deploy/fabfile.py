@@ -25,6 +25,9 @@ from fabric.context_managers import settings
 from fabric.utils import fastprint
 
 
+ADD_TIMESTAMPS = """ | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }' """
+WRITE_LOG = """ | tee /tmp/%s.log """
+
 # Output Management -----------------------------------------------------------
 PASS_THROUGH = ('sudo password: ', 'Sorry, try again.')
 class CustomFile(file):
@@ -157,9 +160,8 @@ def _create_env(username, hosts, s3_bucket,
 def staging(username):
     with Output("Configuring task(s) to run on STAGING"):
         _create_env(username              = username,
-                    hosts                 = ['pcf-us-staging1.pculture.org:2191',
-                                            'pcf-us-staging2.pculture.org:2191',
-                                            'pcf-us-staging3.pculture.org:2191'],
+                    hosts                 = ['pcf-us-staging3.pculture.org:2191',
+                                            'pcf-us-staging4.pculture.org:2191'],
                     s3_bucket             = 's3.staging.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles.staging',
                     static_dir            = '/var/static/staging',
@@ -248,8 +250,19 @@ def migrate(app_name=''):
                 run('{0}/env/bin/python manage.py migrate uslogging '
                     '--database=uslogging --settings=unisubs_settings'.format(
                         env.static_dir))
-            run('yes no | {0}/env/bin/python manage.py migrate {1} --settings=unisubs_settings'.format(
-                    env.static_dir, app_name))
+
+            manage_cmd = 'yes no | {0}/env/bin/python -u manage.py migrate {1} --settings=unisubs_settings 2>&1'.format(env.static_dir, app_name)
+            timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
+            log_cmd = WRITE_LOG % 'database_migrations'
+
+            cmd = (
+                "screen sh -c $'" +
+                    manage_cmd +
+                    timestamp_cmd +
+                    log_cmd + 
+                "'"
+            )
+            run(cmd)
 
 def run_command(command):
     '''Run a python manage.py command'''
@@ -335,6 +348,7 @@ def switch_branch(branch_name):
 def _remove_pip_package(base_dir, package_name):
     with cd(os.path.join(base_dir, 'unisubs', 'deploy')):
         run('yes y | {0}/env/bin/pip uninstall {1}'.format(base_dir, package_name), pty=True)
+        _clear_permissions(os.path.join(base_dir, 'env'))
 
 def remove_pip_package(package_egg_name):
     with Output("Removing pip package '{0}'".format(package_egg_name)):
@@ -346,7 +360,8 @@ def _update_environment(base_dir, flags=''):
         _git_pull()
         run('export PIP_REQUIRE_VIRTUALENV=true')
         # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
-        sudo('yes i | {0}/env/bin/pip install {1} -E {0}/env/ -r requirements.txt'.format(base_dir, flags), pty=True)
+        run('yes i | {0}/env/bin/pip install {1} -E {0}/env/ -r requirements.txt'.format(base_dir, flags), pty=True)
+        _clear_permissions(os.path.join(base_dir, 'env'))
 
 def update_environment(flags=''):
     with Output("Updating virtualenv"):
@@ -532,8 +547,33 @@ def update_solr_schema():
                 run('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/testing/conf/schema.xml'.format(python_exe))
             sudo('service tomcat6 restart')
 
-        run('screen -d -m sh -c "{0} {1} rebuild_index_ordered --noinput --settings=unisubs_settings 2>&1 | mail -s Solr_index_rebuilt_on_{2} universalsubtitles-dev@pculture.org"'.format(python_exe, os.path.join(dir, 'unisubs', 'manage.py'), env.host_string))
+        # Fly, you fools!
 
+        managepy_file = os.path.join(dir, 'unisubs', 'manage.py')
+
+        # The -u here is for "unbuffered" so the lines get outputted immediately.
+        manage_cmd = '%s -u %s rebuild_index_ordered --noinput --settings=unisubs_settings 2>&1' % (python_exe, managepy_file)
+        mail_cmd = ' | mail -s Solr_index_rebuilt_on_%s universalsubtitles-dev@pculture.org' % env.host_string
+        log_cmd = WRITE_LOG % 'solr_reindexing'
+
+        # The single quotes in the ack command needs to be escaped, because
+        # we're in a single quoted ANSI C-style string from the sh -c in the
+        # screen command.
+        #
+        # We can't use a double quoted string for the sh -c call because of the
+        # $0 in the ack script.
+        timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
+
+        cmd = (
+            "screen -d -m sh -c $'" +
+                manage_cmd +
+                timestamp_cmd +
+                log_cmd +
+                mail_cmd +
+            "'"
+        )
+
+        run(cmd, pty=False)
 
 def bounce_memcached():
     '''Bounce the memcached server (purging the cache).

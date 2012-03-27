@@ -1,0 +1,21 @@
+{% load i18n %}
+
+{% if user.is_authenticated and teams %}
+    <form class="move-video settings" action="{% url teams:move_video %}" method="POST">
+        <h3>{% trans "Move video to one of your other teams?" %}</h3>
+        <fieldset>
+            <select name="team" id="id_team">
+                {% for team in teams %}
+                    <option value="{{ team_video.pk }}" data-team-pk="{{ team.pk }}">{{ team }}</option>
+                {% endfor %}
+            </select>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}" />
+            <input type="hidden" name="team_video" value="" />
+            <input type="hidden" name="team" value="" />
+        </fieldset>
+        <div class="submit">
+            <button type="submit">Move video</button>
+        </div>
+    </form>
+{% endif %}

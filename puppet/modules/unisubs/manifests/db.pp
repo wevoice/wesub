@@ -1,5 +1,7 @@
 class unisubs::db {
-  class { 'mysql': }
+  class { 'mysql': 
+    require => Class["aptitude"];
+  }
   class { 'mysql::python':
     require => Class['mysql'];
   }

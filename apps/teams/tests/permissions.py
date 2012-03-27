@@ -55,7 +55,7 @@ def _set_subtitles(team_video, language, original, complete, translations=[]):
 class BaseTestPermission(TestCase):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
-        self.team  = Team.objects.all()[0]
+        self.team = Team.objects.get(pk=1)
         self.team.video_policy = Team.VP_MANAGER
         self.video = self.team.videos.all()[0]
 

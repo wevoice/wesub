@@ -190,3 +190,40 @@ Parameters:
   * `create_login_token` : If sent the response will also include a url that when clicked will login the recently created user. This URL expires in 2 hours
   
 The response also includes the 'api_key' for that user. If clients wish to make requests on behalf of this newly created user through the api, they must hold on to this key, since it won't be returned in the detailed view.  
+
+VideoUrlResource
+------------
+
+One can list, update, delete and add new video urls to an existing video.
+
+Listing video urls::
+
+    GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/urls/
+
+Video URL datail::
+
+    GET https://www.universalsubtitles.org/api2/partners/users/[video-id]/urls/[url-id]/
+
+Where the url-id can be fetched from the list of urls.
+    
+Updating video-urls ::
+
+    PUT https://www.universalsubtitles.org/api2/partners/users/[video-id]/urls/[url-id]/
+    
+Creating video-urls ::
+
+    POST https://www.universalsubtitles.org/api2/partners/users/[video-id]/urls/
+
+
+Parameters for creating or updating:
+
+  * `url`: Any URL that works for the regular site (mp4 files, youtube, vimeo, etc) can be used. Note that the url cannot be in use by another video.
+  * `primary`:  A boolean. If true this is the url the will be displayed first if multiple are presents. A video must have one primary URL. If you add / change the primary status of a url, all other urls for that video will have primary set to false. If this is the only url present it will always be set to true.
+  * `original`: If this is the first url for the video.
+
+To delete a url ::
+
+
+    DELETE https://www.universalsubtitles.org/api2/partners/users/[video-id]/urls/[url-id]/
+
+If this is the only URL for a video, the request will fail. A video must have at least one URL.

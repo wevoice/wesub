@@ -1,10 +1,11 @@
 Hi {{ user }},
 
 <p>Your {{ task_language }} subtitles for the video “{{ title }}” have been reviewed
-by {{ reviewer }} from the {{ team.name }} team.</p>
+by <a href="{{ reviewer_message_url }}">{{ reviewer }}</a> from the {{ team.name }} team.</p>
 <p>
 {% if sent_back %}
 The subtitles have been sent back to you for additional work and/or corrections.
+<a href="{{ perform_task_url }}">Perform this task.</a><br/>
 {% endif %}
 {% if reviewed_and_pending_approval %}
 The subtitles passed review and have been submitted for approval.

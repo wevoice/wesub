@@ -213,7 +213,6 @@ var Site = function(Site) {
             }
             if ($('a.open-modal').length) {
                 $('a.open-modal').live('click',function(e){
-                    e.preventDefault();
                     $target = $($(this).attr('href'));
                     $target.show();
 
@@ -225,6 +224,7 @@ var Site = function(Site) {
                     $('html').bind('click.modal', function() {
                         closeModal($target);
                     });
+                    e.preventDefault();
                 });
                 $('.action-close, .close', '.bootstrap').click(function(){
                     closeModal($(this).parents('.modal'));
@@ -360,6 +360,16 @@ var Site = function(Site) {
                     $('#lang_select_btn').hide();
                 }
             }
+            if ($('div.note').length) {
+                $('.note .hide-announcement').click(function() {
+                    var $this = $(this);
+                    $this.parents('.note').hide();
+                    var d = new Date();
+                    d.setTime(d.getTime() + 60*60*24*365*1000);
+                    document.cookie = window.COOKIE + d.toUTCString();
+                    return false;
+                });
+            }
 
             $listsCollapsible = $('ul.list-collapsible');
             if ($listsCollapsible.length) {
@@ -372,6 +382,66 @@ var Site = function(Site) {
         },
 
         // Public
+        subtitle_view: function() {
+            var DIFFING_URL = function() {
+                var url = window.DIFFING_URL;
+                return url.replace(/11111/, '<<first_pk>>').replace(/22222/, '<<second_pk>>');
+            }();
+            function get_compare_link(first_pk, second_pk) {
+                return DIFFING_URL.replace(/<<first_pk>>/, first_pk).replace(/<<second_pk>>/, second_pk);
+            }
+            $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
+            $('.version_checkbox', '.revisions').change( function() {
+                var $this = $(this);
+                var checked_length = $('.version_checkbox:checked').length;
+
+                if ($this.attr('checked') && (checked_length > 2)) {
+                    $this.attr('checked', '');
+                }
+            });
+            $('.compare_versions_button').click( function() {
+                var $checked = $('.version_checkbox:checked');
+                if ($checked.length !== 2) {
+                    alert(window.SELECT_REVISIONS_TRANS);
+                } else {
+                    var url = get_compare_link($checked[0].value, $checked[1].value);
+                    window.location.replace(url);
+                }
+            });
+            $('.tabs').tabs();
+            $('#add_subtitles').click( function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
+                return false;
+            });
+            $('.add-translation-behavior').click( function(e) {
+                e.preventDefault();
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
+                return false;
+            });
+            $('.time_link').click( function() {
+                widget_widget_div.playAt(parseFloat(
+                $(this).find('.data').text()));
+                return false;
+            });
+            var SL_ID = window.LANGUAGE_ID;
+            unisubs.messaging.simplemessage.displayPendingMessages();
+            $('#edit_subtitles_button').click( function(e) {
+                if (!(localStorage && localStorage.getItem)) {
+                    alert("Sorry, you'll need to upgrade your browser to use the subtitling dialog.");
+                    e.preventDefault();
+                }
+            });
+            if (window.TASK) {
+                var videoSource = unisubs.player.MediaSource.videoSourceForURL(window.TASK_TEAM_VIDEO_URL);
+                var opener = new unisubs.widget.SubtitleDialogOpener(
+                    window.TASK_TEAM_VIDEO_ID,
+                    window.TASK_TEAM_VIDEO_URL,
+                    videoSource, null, null);
+                opener.showStartDialog();
+            }
+        },
         video_view: function() {
             $('.add_subtitles').click(function() {
                 widget_widget_div.selectMenuItem(
@@ -407,7 +477,7 @@ var Site = function(Site) {
             });
             if (window.TASK) {
                 var videoSource = unisubs.player.MediaSource.videoSourceForURL(
-                        '{{ task.team_video.video.get_video_url }}');
+                        window.TASK_TEAM_VIDEO_URL);
                 var opener = new unisubs.widget.SubtitleDialogOpener(
                                      window.TASK_TEAM_VIDEO_ID,
                                      window.TASK_TEAM_VIDEO_URL,
@@ -515,6 +585,23 @@ var Site = function(Site) {
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             that.Utils.resetLangFilter($('select#id_task_language'));
             that.Utils.chosenify();
+        },
+        team_video_edit: function() {
+            that.Utils.chosenify();
+
+            var $move_form = $('form.move-video');
+
+            $move_form.submit(function() {
+                var $selected = $('select#id_team option:selected', $move_form);
+                $('input[name="team_video"]', $move_form).val($selected.val());
+                $('input[name="team"]', $move_form).val($selected.data('team-pk'));
+
+                if (confirm("WARNING:\n\nIf you move this video it will lose all tasks associated with it (the activity will be retained, however).\n\nAll subtitles currently waiting for moderation will be made public.\n\nProceed?")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
         },
         team_videos_list: function() {
             $form = $('form', 'div#remove-modal');
@@ -671,10 +758,11 @@ var Site = function(Site) {
                 var terms = {};
 
                 $.each(data.results, function (i, val) {
+                    var name;
                     if (data.results[i][2] !== '') {
-                        var name = ' (' + data.results[i][2] + ')';
+                        name = ' (' + data.results[i][2] + ')';
                     } else {
-                        var name = '';
+                        name = '';
                     }
                     terms[data.results[i][0]] = data.results[i][1] + name;
                 });
