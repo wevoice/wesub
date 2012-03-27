@@ -189,7 +189,9 @@ class YoutubeVideoType(VideoType):
         if self.entry.media.duration:
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
-            video_obj.thumbnail = self.entry.media.thumbnail[-1].url
+            # max here will return the thumbnail with the biggest height
+            thumbnail = max([(int(t.height), t) for t in self.entry.media.thumbnail]) 
+            video_obj.thumbnail = thumbnail[1].url
         video_obj.small_thumbnail = 'http://i.ytimg.com/vi/%s/default.jpg' % self.video_id
         video_obj.save()
 
