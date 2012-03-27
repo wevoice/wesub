@@ -616,7 +616,7 @@ class Project(models.Model):
 # TeamVideo
 class TeamVideo(models.Model):
     team = models.ForeignKey(Team)
-    video = models.ForeignKey(Video)
+    video = models.OneToOneField(Video)
     title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True,
         help_text=_(u'Use this space to explain why you or your team need to '

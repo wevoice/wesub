@@ -306,8 +306,12 @@ class Video(models.Model):
 
     def get_team_video(self):
         """Return the TeamVideo object for this video, or None if there isn't one."""
-        tvs = self.teamvideo_set.select_related('team')[:1]
-        return tvs[0] if tvs else None
+        from teams.models import TeamVideo
+
+        try:
+            return self.teamvideo
+        except TeamVideo.DoesNotExist:
+            return None
 
 
     def thumbnail_link(self):
