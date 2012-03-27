@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-26 01:32-0500\n"
+"POT-Creation-Date: 2012-03-27 01:32-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -568,7 +568,7 @@ msgstr ""
 msgid "User is already a member of this team!"
 msgstr ""
 
-#: apps/teams/forms.py:570 templates/videos/subtitle-view.html:332
+#: apps/teams/forms.py:570 templates/videos/subtitle-view.html:334
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
@@ -768,7 +768,7 @@ msgstr ""
 msgid "You are already a member of this team."
 msgstr ""
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:870
+#: apps/teams/rpc.py:50 apps/teams/views.py:886
 msgid "You are now a member of this team."
 msgstr ""
 
@@ -858,7 +858,7 @@ msgid "You do not have permission to delete this team."
 msgstr ""
 
 #: apps/teams/views.py:352 apps/teams/views.py:388 apps/teams/views.py:416
-#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1439
+#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1455
 msgid "You do not have permission to edit this team."
 msgstr ""
 
@@ -874,141 +874,141 @@ msgstr ""
 msgid "You can't add that video to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:580
+#: apps/teams/views.py:596
 msgid "The video has been moved to the new team."
 msgstr ""
 
-#: apps/teams/views.py:593
+#: apps/teams/views.py:609
 msgid "You can't add videos to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:612
+#: apps/teams/views.py:628
 msgid "You can't edit this video."
 msgstr ""
 
-#: apps/teams/views.py:621
+#: apps/teams/views.py:637
 msgid "Video has been updated."
 msgstr ""
 
-#: apps/teams/views.py:649
+#: apps/teams/views.py:665
 msgid "Request must be a POST request."
 msgstr ""
 
-#: apps/teams/views.py:657
+#: apps/teams/views.py:673
 msgid "You can't delete that video."
 msgstr ""
 
-#: apps/teams/views.py:661
+#: apps/teams/views.py:677
 msgid "You can't remove that video."
 msgstr ""
 
-#: apps/teams/views.py:672
+#: apps/teams/views.py:688
 msgid "Video has been deleted from Universal Subtitles."
 msgstr ""
 
-#: apps/teams/views.py:674
+#: apps/teams/views.py:690
 msgid "Video has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:761
+#: apps/teams/views.py:777
 msgid "Member has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:764
+#: apps/teams/views.py:780
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 
-#: apps/teams/views.py:767
+#: apps/teams/views.py:783
 msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
-#: apps/teams/views.py:798
+#: apps/teams/views.py:814
 msgid "Application approved."
 msgstr ""
 
-#: apps/teams/views.py:800 apps/teams/views.py:818
+#: apps/teams/views.py:816 apps/teams/views.py:834
 msgid "Application does not exist."
 msgstr ""
 
-#: apps/teams/views.py:802
+#: apps/teams/views.py:818
 msgid "You can't approve applications."
 msgstr ""
 
-#: apps/teams/views.py:816
+#: apps/teams/views.py:832
 msgid "Application denied."
 msgstr ""
 
-#: apps/teams/views.py:820
+#: apps/teams/views.py:836
 msgid "You can't deny applications."
 msgstr ""
 
-#: apps/teams/views.py:830
+#: apps/teams/views.py:846
 msgid "You cannot invite people to this team."
 msgstr ""
 
-#: apps/teams/views.py:866
+#: apps/teams/views.py:882
 msgid "You cannot join this team."
 msgstr ""
 
-#: apps/teams/views.py:917
+#: apps/teams/views.py:933
 msgid "You have left this team."
 msgstr ""
 
-#: apps/teams/views.py:1121
+#: apps/teams/views.py:1137
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1239 apps/teams/views.py:1242
+#: apps/teams/views.py:1255 apps/teams/views.py:1258
 msgid "You are not allowed to perform this task."
 msgstr ""
 
-#: apps/teams/views.py:1297
+#: apps/teams/views.py:1313
 msgid "Task deleted."
 msgstr ""
 
-#: apps/teams/views.py:1299
+#: apps/teams/views.py:1315
 msgid "You cannot delete this task."
 msgstr ""
 
-#: apps/teams/views.py:1318
+#: apps/teams/views.py:1334
 msgid "Task assigned."
 msgstr ""
 
-#: apps/teams/views.py:1320
+#: apps/teams/views.py:1336
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1342
+#: apps/teams/views.py:1358
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1366
+#: apps/teams/views.py:1382
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1378
+#: apps/teams/views.py:1394
 msgid "Project added."
 msgstr ""
 
-#: apps/teams/views.py:1395
+#: apps/teams/views.py:1411
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1406
+#: apps/teams/views.py:1422
 msgid "Project deleted."
 msgstr ""
 
-#: apps/teams/views.py:1424
+#: apps/teams/views.py:1440
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1555
+#: apps/teams/views.py:1571
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1588
+#: apps/teams/views.py:1604
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -4093,7 +4093,7 @@ msgstr ""
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
 #: templates/teams/tasks.html:302 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:345
+#: templates/videos/subtitle-view.html:347
 msgid "Cancel"
 msgstr ""
 
@@ -6844,12 +6844,12 @@ msgid "Revisions"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:148
-#: templates/videos/subtitle-view.html:346
+#: templates/videos/subtitle-view.html:348
 msgid "Unpublish"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:151
-#: templates/videos/subtitle-view.html:361
+#: templates/videos/subtitle-view.html:363
 msgid "Edit Subtitles"
 msgstr ""
 
@@ -6953,7 +6953,13 @@ msgstr ""
 msgid "This entire language and all dependent languages"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:335
+#: templates/videos/subtitle-view.html:329
+msgid ""
+"Note: Any dependent languages will be unavailable until this language is "
+"reapproved."
+msgstr ""
+
+#: templates/videos/subtitle-view.html:337
 msgid ""
 "Yes, delete these subtitles instead of sending them back for editing/review"
 msgstr ""
