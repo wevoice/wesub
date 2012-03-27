@@ -425,7 +425,7 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/jstest'),
     re.compile('^/sitemap.*.xml'),
     re.compile('^/accountlinker/youtube-oauth-callback/'),
-    #re.compile('^/crossdomain.xml'),
+    re.compile('^/crossdomain.xml'),
 )
 
 #Haystack configuration
