@@ -223,7 +223,7 @@ body {
     width: 150px;
     @include box-right;
 }
-div.hidden {
+div.hidden, form.hidden {
     display: none;
 }
 ul.list-collapsible {

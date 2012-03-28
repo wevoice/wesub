@@ -529,6 +529,10 @@ var Site = function(Site) {
 
                 return false;
             });
+            $('a.action-decline').click(function(e) {
+                $('form', this).submit();
+                e.preventDefault();
+            });
             $('.assignee-choice a.cancel').click(function(e) {
                 $(e.target).parents('.assignee-choice').fadeOut('fast');
                 return false;
