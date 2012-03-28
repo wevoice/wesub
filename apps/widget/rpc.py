@@ -533,8 +533,13 @@ class Rpc(BaseRpc):
             new_version.save()
 
             if hasattr(new_version, 'task_to_save'):
-                new_version.task_to_save.subtitle_version = new_version
-                new_version.task_to_save.save()
+                task = new_version.task_to_save
+                task.subtitle_version = new_version
+
+                if task.get_type_display() in ['Review', 'Approve']:
+                    task.review_base_version = new_version
+
+                task.save()
 
             self._save_subtitles(
                 new_version.subtitle_set, subtitles, new_version.is_forked)
