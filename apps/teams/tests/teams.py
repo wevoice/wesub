@@ -866,7 +866,7 @@ class TeamsDetailQueryTest(TestCase):
         team, created = Team.objects.get_or_create(slug='arthur')
         team.videos.all().delete()
         from utils import multi_query_set as mq
-        created_tvs = [TeamVideo.objects.get_or_create(team=team, added_by=User.objects.all()[0], video=self._create_rdm_video(x) )[0] for x in xrange(0,20)]
+        created_tvs = [TeamVideo.objects.get_or_create(team=team, added_by=User.objects.all()[0], video=self._create_rdm_video(x) )[0] for x in xrange(10,30)]
         created_pks = [x.pk for x in created_tvs]
         multi = mq.MultiQuerySet(*[TeamVideo.objects.filter(pk=x) for x in created_pks])
         self.assertTrue([x.pk for x in multi] == created_pks)
