@@ -36,13 +36,8 @@ unisubs.editmetadata.RightPanel = function(dialog,
     unisubs.RightPanel.call(this,  serverModel, helpContents, extraHelp,
                             legendKeySpecs, showRestart, doneStrongText, doneText);
 
-    this.showDoneButton = true;
-    if (reviewOrApprovalType){
-        this.showDoneButton = false;
-        this.showSaveExit = false;
-    } else {
-        this.showSaveExit = true;
-    }
+    this.showSaveExit = true;
+    this.showDoneButton = !reviewOrApprovalType;
     this.helpContents = helpContents;
     // TODO: See if there's a way to avoid the circular reference here.
     this.dialog_ = dialog;
