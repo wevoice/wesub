@@ -146,11 +146,11 @@ def video_changed_tasks(video_pk, new_version_id=None):
         _update_captions_in_original_service(new_version_id)
 
     video = Video.objects.get(pk=video_pk)
-    if video.teamvideo_set.count() > 0:
+
+    tv = video.get_team_video()
+    if tv:
         tv_search_index = site.get_index(TeamVideo)
-        tv_search_index.backend.update(
-            tv_search_index,
-            list(video.teamvideo_set.all()))
+        tv_search_index.backend.update(tv_search_index, [tv])
 
     video.update_search_index()
 
