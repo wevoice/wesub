@@ -1702,7 +1702,7 @@ class Task(models.Model):
 
 
     def save(self, update_team_video_index=True, *args, **kwargs):
-        if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']):
+        if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:
             assert self.subtitle_version, \
                    "Review and Approve tasks must have a subtitle_version!"
 
