@@ -473,6 +473,7 @@ span.unisubs-widget {
     width: auto !important;
 }
 .unisubs-saveandexit {
+    clear: both;
     font-size: 15px;
     padding: 0 24px;
     text-align: center;

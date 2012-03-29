@@ -54,8 +54,8 @@ def _execute_video_task(video, event_name):
     tvs =  list( TeamVideo.objects.filter(video=video, team__notification_settings__isnull=False))
     for tv in tvs:
         team_tasks.api_notify_on_video_activity.delay(
-            tvs.team.pk,
-            tvs.video.video_id,
+            tv.team.pk,
+            tv.video.video_id,
             event_name
             )
     

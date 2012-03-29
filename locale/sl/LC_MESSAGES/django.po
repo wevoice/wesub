@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-28 01:32-0500\n"
+"POT-Creation-Date: 2012-03-29 01:32-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -852,7 +852,7 @@ msgid "You do not have permission to delete this team."
 msgstr ""
 
 #: apps/teams/views.py:352 apps/teams/views.py:388 apps/teams/views.py:416
-#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1455
+#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1463
 msgid "You do not have permission to edit this team."
 msgstr ""
 
@@ -964,45 +964,49 @@ msgstr ""
 msgid "You cannot delete this task."
 msgstr ""
 
-#: apps/teams/views.py:1334
+#: apps/teams/views.py:1340
+msgid "Task declined."
+msgstr ""
+
+#: apps/teams/views.py:1342
 msgid "Task assigned."
 msgstr ""
 
-#: apps/teams/views.py:1336
+#: apps/teams/views.py:1344
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1358
+#: apps/teams/views.py:1366
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1382
+#: apps/teams/views.py:1390
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1394
+#: apps/teams/views.py:1402
 msgid "Project added."
 msgstr ""
 
-#: apps/teams/views.py:1411
+#: apps/teams/views.py:1419
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1422
+#: apps/teams/views.py:1430
 msgid "Project deleted."
 msgstr ""
 
-#: apps/teams/views.py:1440
+#: apps/teams/views.py:1448
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1571
+#: apps/teams/views.py:1579
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1604
+#: apps/teams/views.py:1612
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1489,7 +1493,7 @@ msgstr ""
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:807 apps/widget/rpc.py:847
+#: apps/widget/rpc.py:812 apps/widget/rpc.py:852
 msgid "\n"
 msgstr ""
 
@@ -3946,14 +3950,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr ""
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:81
-#: templates/messages/sent.html:51 templates/teams/tasks.html:245
+#: templates/messages/sent.html:51 templates/teams/tasks.html:264
 msgid "Delete"
 msgstr ""
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:302 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:318 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:347
 msgid "Cancel"
 msgstr ""
@@ -5248,7 +5252,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:306
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:322
 msgid "Begin typing to search"
 msgstr ""
 
@@ -5697,31 +5701,35 @@ msgstr ""
 msgid "Unassigned"
 msgstr ""
 
-#: templates/teams/tasks.html:236
+#: templates/teams/tasks.html:235
+msgid "Decline"
+msgstr ""
+
+#: templates/teams/tasks.html:255
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:238
+#: templates/teams/tasks.html:257
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:254
+#: templates/teams/tasks.html:273
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:263
+#: templates/teams/tasks.html:282
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:267
+#: templates/teams/tasks.html:286
 msgid "Delete these subtitles permanently"
 msgstr ""
 
-#: templates/teams/tasks.html:309
+#: templates/teams/tasks.html:325
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:318
+#: templates/teams/tasks.html:334
 msgid "Sorry, no tasks here."
 msgstr ""
 

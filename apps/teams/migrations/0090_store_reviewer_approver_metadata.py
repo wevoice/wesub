@@ -8,6 +8,7 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         "Write your forwards methods here."
+        SubtitleVersion = orm['videos.SubtitleVersion']
         SubtitleVersionMetadata = orm['videos.SubtitleVersionMetadata']
 
         # We can't use custom Managers in South migrations, so we need to do
@@ -34,13 +35,16 @@ class Migration(DataMigration):
                                                 assignee__isnull=False,
                                                 subtitle_version__isnull=False)
         for task in approve_tasks:
-            # We can't use custom model methods in South migrations, so we need
-            # to duplicate set_reviewed_by()'s logic.
-            v, created = SubtitleVersionMetadata.objects.get_or_create(
-                            subtitle_version=task.subtitle_version,
-                            key=101) # Can't use custom attributes either, lol.
-            v.data = task.assignee.pk
-            v.save()
+            try:
+                # We can't use custom model methods in South migrations, so we need
+                # to duplicate set_reviewed_by()'s logic.
+                v, created = SubtitleVersionMetadata.objects.get_or_create(
+                                subtitle_version=task.subtitle_version,
+                                key=101) # Can't use custom attributes either, lol.
+                v.data = task.assignee.pk
+                v.save()
+            except SubtitleVersion.DoesNotExist:
+                pass
 
 
     def backwards(self, orm):
