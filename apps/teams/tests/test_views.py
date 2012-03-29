@@ -233,6 +233,9 @@ class ViewsTests(TestCase):
         self.assertEqual(get_team_video().team.pk, new_team.pk,
                          "Video was not moved to the new team.")
 
+        self.assertEqual(get_team_video().project.team, new_team,
+                         "Video ended up with a project for the first team")
+
     def test_move_video_disallowed_old(self):
         '''Check that moving does not work when the user is blocked by the old team.'''
         video_pk = Video.objects.all()[0].pk
