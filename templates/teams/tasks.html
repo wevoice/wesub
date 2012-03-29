@@ -226,10 +226,10 @@
 
                             </ul>
 
-                            {% with can_delete=task|can_delete_task:user can_assign=task|can_assign_task:user %}
-                                {% if can_delete or can_assign %}
+                            {% with can_delete=task|can_delete_task:user can_assign=task|can_assign_task:user can_decline=task|can_decline_task:user %}
+                                {% if can_delete or can_assign or can_decline %}
                                     <ul class="admin-controls">
-                                        {% if can_assign and task.assignee and task.assignee == request.user %}
+                                        {% if can_decline %}
                                             <li>
                                                 <a class="action-decline" href="#">
                                                     {% trans 'Decline' %}
