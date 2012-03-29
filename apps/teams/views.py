@@ -593,6 +593,10 @@ def move_video(request):
         video.update_search_index()
         update_one_team_video(team_video.pk)
 
+        if video.policy and video.policy.belongs_to_team:
+            video.policy.object_id = team.pk
+            video.policy.save(updates_metadata=False) 
+            
         messages.success(request, _(u'The video has been moved to the new team.'))
     else:
         for e in flatten_errorlists(form.errors):
