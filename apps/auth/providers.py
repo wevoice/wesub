@@ -66,7 +66,7 @@ class AuthenticationProvider(object):
     code = None
     verbose_name = None
 
-    def url(self, member, next=None):
+    def url(self):
         """Return the URL someone should be sent to where they will log in."""
         assert False, "Not Implemented"
 
@@ -79,7 +79,7 @@ class SampleAuthProvider(AuthenticationProvider):
     code = 'sample'
     verbose_name = 'Sample Provider'
 
-    def url(self, next=None):
+    def url(self):
         return 'http://example.com/'
 
     def image_url(self):
