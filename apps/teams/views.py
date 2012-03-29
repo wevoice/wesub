@@ -575,6 +575,8 @@ def move_video(request):
         # We move the video by just switching the team, instead of deleting and
         # recreating it.
         team_video.team = team
+        # projects are always team dependent:
+        team_video.project = None
         team_video.save()
 
         # We need to make any as-yet-unmoderated versions public.
