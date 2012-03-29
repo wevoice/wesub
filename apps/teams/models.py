@@ -1351,6 +1351,35 @@ class Task(models.Model):
     assignee = models.ForeignKey(User, blank=True, null=True)
     subtitle_version = models.ForeignKey(SubtitleVersion, blank=True, null=True)
 
+    # The original source version being reviewed or approved.
+    #
+    # For example, if person A creates two versions while working on a subtitle
+    # task:
+    #
+    #  v1  v2
+    # --o---o
+    #   s   s
+    #
+    # and then the reviewer and approver make some edits
+    #
+    #  v1  v2  v3  v4  v5
+    # --o---o---o---o---o
+    #   s   s   r   r   a
+    #       *
+    #
+    # the review_base_version will be v2.  Once approved, if an edit is made it
+    # needs to be approved as well, and the same thing happens:
+    #
+    #  v1  v2  v3  v4  v5  v6  v7
+    # --o---o---o---o---o---o---o
+    #   s   s   r   r   a   e   a
+    #                       *
+    #
+    # This is used when rejecting versions, and may be used elsewhere in the
+    # future as well.
+    review_base_version = models.ForeignKey(SubtitleVersion, blank=True,
+                                            null=True, related_name='tasks_based_on')
+
     deleted = models.BooleanField(default=False)
 
     public = models.BooleanField(default=False)
@@ -1451,14 +1480,24 @@ class Task(models.Model):
         NOTE: This function does not modify the *current* task in any way.
 
         """
-        previous_task = Task.objects.complete().filter(
-            team_video=self.team_video, language=self.language, team=self.team,
-            type__in=(Task.TYPE_IDS['Subtitle'], Task.TYPE_IDS['Translate'])
-        ).order_by('-completed')[:1]
-
-        if previous_task:
-            assignee = previous_task[0].assignee
+        if self.review_base_version:
+            # Hopefully we have a valid base version saved and can send it back
+            # to the author of that version.
+            assignee = self.review_base_version.user
         else:
+            # Otherwise we'll guess based on the last sub/trans task.
+            previous_task = Task.objects.complete().filter(
+                team_video=self.team_video, language=self.language, team=self.team,
+                type__in=(Task.TYPE_IDS['Subtitle'], Task.TYPE_IDS['Translate'])
+            ).order_by('-completed')[:1]
+
+            if previous_task:
+                assignee = previous_task[0].assignee
+            else:
+                assignee = None
+
+        # The target assignee may have left the team in the mean time.
+        if not self.team.members.filter(user=assignee).exists():
             assignee = None
 
         if self.subtitle_version.language.is_original:
@@ -1488,7 +1527,10 @@ class Task(models.Model):
         }[Task.TYPE_NAMES[self.type]]()
 
     def _find_previous_assignee(self, type):
-        """Find the previous assignee for a new task for this video.
+        """Find the previous assignee for a new review/approve task for this video.
+
+        NOTE: This is different than finding out the person to send a task back
+              to!  This is for saying "who reviewed this task last time?".
 
         For now, we'll assign the review/approval task to whomever did it last
         time (if it was indeed done), but only if they're still eligible to
@@ -1503,6 +1545,8 @@ class Task(models.Model):
         elif type == 'Review':
             type = Task.TYPE_IDS['Review']
             can_do = can_review
+        else:
+            return None
 
         last_task = self.team_video.task_set.complete().filter(
             language=self.language, type=type
@@ -1521,12 +1565,14 @@ class Task(models.Model):
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
+                        review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'],
                         assignee=self._find_previous_assignee('Review'))
             task.save()
         elif self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
+                        review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'],
                         assignee=self._find_previous_assignee('Approve'))
             task.save()
@@ -1553,6 +1599,7 @@ class Task(models.Model):
         if self.workflow.review_enabled:
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
+                        review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'],
                         assignee=self._find_previous_assignee('Review'))
             task.save()
@@ -1560,6 +1607,7 @@ class Task(models.Model):
             # The review step may be disabled.  If so, we check the approve step.
             task = Task(team=self.team, team_video=self.team_video,
                         subtitle_version=subtitle_version,
+                        review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'],
                         assignee=self._find_previous_assignee('Approve'))
             task.save()
@@ -1591,6 +1639,7 @@ class Task(models.Model):
             if approval:
                 task = Task(team=self.team, team_video=self.team_video,
                             subtitle_version=self.subtitle_version,
+                            review_base_version=self.subtitle_version,
                             language=self.language, type=Task.TYPE_IDS['Approve'],
                             assignee=self._find_previous_assignee('Approve'))
                 task.save()
@@ -1702,7 +1751,7 @@ class Task(models.Model):
 
 
     def save(self, update_team_video_index=True, *args, **kwargs):
-        if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']):
+        if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:
             assert self.subtitle_version, \
                    "Review and Approve tasks must have a subtitle_version!"
 

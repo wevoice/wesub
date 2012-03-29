@@ -322,6 +322,10 @@ unisubs.subtitle.Dialog.prototype.isWorkSaved = function() {
     return this.saved_ || !this.serverModel_.anySubtitlingWorkDone();
 };
 unisubs.subtitle.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
+    var notes = this.getNotesContent_(this.currentSubtitlePanel_);
+    if (notes !== '') {
+        this.serverModel_.setTaskNotes(notes);
+    }
     if (this.captionSet_.needsSync()) {
         this.saveWorkImpl_(closeAfterSave, false);
     } else if (goog.array.isEmpty(

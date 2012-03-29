@@ -5,8 +5,13 @@
         <h3>{% trans "Collaborate" %}</h3>
         {% for team in teams %}
             <p>
-                {% trans 'Visit' %} <a href="{% url teams:detail slug=team.slug %}">{{team.name}}</a> {% trans 'Translation Project' %}.
+                {% trans 'Visit' %} <a href="{% url teams:detail slug=team.slug %}">{{team.name}} {% trans 'Translation Project' %}</a>.
             </p>
         {% endfor %}
+        {% if team_video.task_set.all %}
+            <p>
+                View <a href="{% url teams:team_tasks slug=team_video.team.slug %}?team_video={{ team_video.pk }}">tasks for this video</a>.
+            </p>
+        {% endif %}
     </div>
 {% endif %}

@@ -1326,12 +1326,20 @@ def assign_task(request, slug):
         task = form.cleaned_data['task']
         assignee = form.cleaned_data['assignee']
 
+        if task.assignee == request.user:
+            was_mine = True
+        else:
+            was_mine = False
+
         task.assignee = assignee
         task.set_expiration()
         task.save()
         notifier.team_task_assigned.delay(task.pk)
 
-        messages.success(request, _('Task assigned.'))
+        if task.assignee is None and was_mine:
+            messages.success(request, _('Task declined.'))
+        else:
+            messages.success(request, _('Task assigned.'))
     else:
         messages.error(request, _('You cannot assign this task.'))
 

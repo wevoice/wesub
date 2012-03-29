@@ -218,7 +218,7 @@ body {
   width: 120px;
 }
 
-div.hidden {
+div.hidden, form.hidden {
   display: none;
 }
 

@@ -234,7 +234,7 @@
                                                 <a class="action-decline" href="#">
                                                     {% trans 'Decline' %}
 
-                                                    <form action="{% url teams:assign_task slug=team.slug %}" method="post">
+                                                    <form class="hidden" action="{% url teams:assign_task slug=team.slug %}" method="post">
                                                         {% csrf_token %}
 
                                                         <input type="hidden" name="next"
