@@ -194,7 +194,8 @@ def production(username):
     with Output("Configuring task(s) to run on PRODUCTION"):
         _create_env(username              = username,
                     hosts                 = ['pcf-us-cluster3.pculture.org:2191',
-                                            'pcf-us-cluster4.pculture.org:2191'],
+                                             'pcf-us-cluster4.pculture.org:2191',
+                                            'pcf-us-cluster5.pculture.org:2191'],
                     s3_bucket             = 's3.www.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles',
                     static_dir            = '/var/static/production',
