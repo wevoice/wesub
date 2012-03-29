@@ -90,7 +90,7 @@ unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
 };
 unisubs.translate.Dialog.prototype.isWorkSaved = function() {
     if (this.reviewOrApprovalType_) {
-        if (this.currentSubtitlePanel_.getNotesContent_() !== '') {
+        if (this.getNotesContent_(this.currentSubtitlePanel_) !== '') {
             return this.saved_;
         }
     }
@@ -120,6 +120,10 @@ unisubs.translate.Dialog.prototype.onNotesFetched_ = function(body) {
     }
 };
 unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
+    var notes = this.getNotesContent_(this.currentSubtitlePanel_);
+    if (notes !== '') {
+        this.serverModel_.setTaskNotes(notes);
+    }
     if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles())){
         // there are no subs here, close dialog or back to subtitling
