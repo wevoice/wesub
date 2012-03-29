@@ -742,6 +742,17 @@ def _create_translation_tasks(team_video, subtitle_version):
                     language=lang, type=Task.TYPE_IDS['Translate'])
         task.save()
 
+def autocreate_tasks(team_video):
+    workflow = Workflow.get_for_team_video(team_video)
+    if workflow.autocreate_subtitle:
+        existing_subtitles = team_video.video.completed_subtitle_languages(public_only=True)
+        if not existing_subtitles:
+            Task(team=team_video.team, team_video=team_video,
+                 subtitle_version=None, language='',
+                 type=Task.TYPE_IDS['Subtitle']
+            ).save()
+        else:
+            _create_translation_tasks(team_video, existing_subtitles[0].latest_version())
 
 def team_video_save(sender, instance, created, **kwargs):
     """Update the Solr index for this team video.
@@ -781,14 +792,7 @@ def team_video_delete(sender, instance, **kwargs):
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     """Create subtitle/translation tasks for a newly added TeamVideo, if necessary."""
     if created and not raw:
-        workflow = Workflow.get_for_team_video(instance)
-        if workflow.autocreate_subtitle:
-            existing_subtitles = instance.video.completed_subtitle_languages(public_only=True)
-            if not existing_subtitles:
-                Task(team=instance.team, team_video=instance, subtitle_version=None,
-                    language='', type=Task.TYPE_IDS['Subtitle']).save()
-            else:
-                _create_translation_tasks(instance, existing_subtitles[0].latest_version())
+        autocreate_tasks(instance)
 
 def team_video_add_video_moderation(sender, instance, created, raw, **kwargs):
     """Set the .moderated_by attribute on a newly created TeamVideo's Video, if necessary."""

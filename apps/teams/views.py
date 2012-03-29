@@ -46,7 +46,7 @@ from teams.forms import (
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference
+    Setting, TeamLanguagePreference, autocreate_tasks
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -592,6 +592,9 @@ def move_video(request):
         metadata_manager.update_metadata(video.pk)
         video.update_search_index()
         update_one_team_video(team_video.pk)
+
+        # Create any necessary tasks.
+        autocreate_tasks(team_video)
 
         messages.success(request, _(u'The video has been moved to the new team.'))
     else:
