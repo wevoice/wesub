@@ -650,8 +650,17 @@ def can_assign_task(task, user):
     """
     team, project, lang = task.team, task.team_video.project, task.language
 
-
     return can_assign_tasks(team, user, project, lang) and can_perform_task(user, task)
+
+def can_decline_task(task, user):
+    """Return whether the given user can decline the given task.
+
+    Users can decline tasks iff:
+
+    * The task is assigned to them.
+
+    """
+    return task.assignee and task.assignee == user
 
 def can_delete_task(task, user):
     """Return whether the given user can delete the given task."""

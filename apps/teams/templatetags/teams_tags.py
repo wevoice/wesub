@@ -36,6 +36,7 @@ from apps.teams.permissions import (
     can_rename_team as _can_rename_team,
     can_perform_task as _can_perform_task,
     can_assign_task as _can_assign_task,
+    can_decline_task as _can_decline_task,
     can_delete_task as _can_delete_task,
     can_remove_video as _can_remove_video,
     can_delete_video as _can_delete_video,
@@ -427,6 +428,10 @@ def can_perform_task(task, user):
 @register.filter
 def can_assign_task(task, user):
     return _can_assign_task(task, user)
+
+@register.filter
+def can_decline_task(task, user):
+    return _can_decline_task(task, user)
 
 @register.filter
 def can_delete_task(task, user):

@@ -415,9 +415,20 @@ class TaskAssignForm(forms.Form):
         assignee = self.cleaned_data.get('assignee', -1)
 
         if assignee != -1:
-            if not can_assign_task(task, self.user) and self.user != assignee:
-                raise forms.ValidationError(_(
-                    u'You do not have permission to assign this task.'))
+            # There are a bunch of edge cases here that we need to check.
+            unassigning_from_self      = (not assignee) and task.assignee.id == self.user.id
+            assigning_to_self          = assignee and self.user.id == assignee.id
+            can_assign_to_other_people = can_assign_task(task, self.user)
+
+            # Users can always unassign a task from themselves.
+            if not unassigning_from_self:
+                # They can also assign a task TO themselves, assuming they can
+                # perform it (which is checked further down).
+                if not assigning_to_self:
+                    # Otherwise they must have assign permissions in the team.
+                    if not can_assign_to_other_people:
+                        raise forms.ValidationError(_(
+                            u'You do not have permission to assign this task.'))
 
             if assignee is None:
                 return self.cleaned_data
