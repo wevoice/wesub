@@ -15,13 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-import base64, re
+import base64
 from urllib2 import URLError
 
 import facebook.djangofb as facebook
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import (
     REDIRECT_FIELD_NAME, get_backends, login as stock_login, authenticate,
     logout, login as auth_login
@@ -39,8 +38,9 @@ from oauth import oauth
 
 from auth.forms import CustomUserCreationForm
 from auth.models import (
-    UserLanguage, CustomUser as User, EmailConfirmation, LoginToken
+    UserLanguage, EmailConfirmation, LoginToken
 )
+from auth.providers import get_authentication_provider
 from socialauth.lib import oauthtwitter2 as oauthtwitter
 from socialauth.models import (
     AuthMeta, OpenidProfile, TwitterUserProfile, FacebookUserProfile
@@ -127,10 +127,12 @@ def login_post(request):
 
 def render_login(request, user_creation_form, login_form, redirect_to):
     redirect_to = redirect_to or '/'
+    ted_auth = get_authentication_provider('ted')
     return render_to_response(
         'auth/login.html', {
             'creation_form': user_creation_form,
             'login_form' : login_form,
+            'ted_auth': ted_auth,
             REDIRECT_FIELD_NAME: redirect_to,
             }, context_instance=RequestContext(request))
 
