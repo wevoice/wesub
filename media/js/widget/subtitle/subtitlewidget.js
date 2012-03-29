@@ -86,9 +86,11 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
     if (!this.displayTimes_) {
         goog.dom.classes.add(this.titleElem_, 'unisubs-title-notime');
         unisubs.style.showElement(this.contentElement_, false);
-        var timeElement = $d('span', {'className': 'unisubs-timestamp-time'}, 
-                            unisubs.formatTime(this.subtitle_.getStartTime()));
-        this.titleElem_.appendChild(timeElement);
+        if(this.subtitle_.getStartTime() > -1){
+            var timeElement = $d('span', {'className': 'unisubs-timestamp-time'}, 
+                                unisubs.formatTime(this.subtitle_.getStartTime()));
+            this.titleElem_.appendChild(timeElement);
+        }
     }
     else {
         this.timeSpinner_ = new unisubs.Spinner(
