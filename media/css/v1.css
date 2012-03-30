@@ -786,6 +786,28 @@ ul.list-collapsible.expanded li.hidden {
 .v1 .listing.tasks > li form.assign-form {
   padding: 0;
 }
+.v1 .listing.tasks > li.disabled {
+  padding-right: 0;
+}
+.v1 .listing.tasks > li.disabled h3, .v1 .listing.tasks > li.disabled p, .v1 .listing.tasks > li.disabled a, .v1 .listing.tasks > li.disabled ul {
+  opacity: .2;
+}
+.v1 .listing.tasks > li.disabled ul.actions, .v1 .listing.tasks > li.disabled ul.admin-controls {
+  display: none !important;
+}
+.v1 .listing.tasks > li.disabled div.cannot-perform-disabled {
+  background: #F2DEDE;
+  border: 1px solid #EED3D7;
+  color: #B94A48;
+  margin-bottom: 10px;
+  padding: 10px;
+  -moz-background-clip: padding-box;
+  -moz-border-radius: 5px;
+  -webkit-background-clip: padding-box;
+  -webkit-border-radius: 5px;
+  background-clip: padding-box;
+  border-radius: 5px;
+}
 
 .v1 .listing.teams > li {
   padding-right: 150px;
