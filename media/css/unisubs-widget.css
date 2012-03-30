@@ -1276,6 +1276,11 @@ ul.unisubs-titlesList.unisubs-beginTab .unisubs-beginTabLi {
     margin-right: 65px !important;
     padding: 10px !important;
 }
+.unisubs-title span, .unisubs-description span {
+    color: #C0C0C0;
+    display: block;
+    text-transform: uppercase;
+}
 .unisubs-title:hover {
 
 }
