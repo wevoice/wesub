@@ -124,6 +124,16 @@
                 {% with member.has_max_tasks as has_max_tasks %}
                     {% for task in tasks %}
                         <li>
+                            {% with task.subtitle_version.language.standard_language as translated_from %}
+                                {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
+                                    {% if translated_from and not translated_from.had_version %}
+                                        <b>DISABLED</b>
+                                        <br/>
+                                        <b>This task cannot be performed until the original language ({{ translated_from.get_language_display }}) is finished.</b>
+                                    {% endif %}
+                                {% endif %}
+                            {% endwith %}
+
                             <h3>
                                 {% if task.get_type_display == "Subtitle" %}
                                     {% trans 'Transcribe' %}
