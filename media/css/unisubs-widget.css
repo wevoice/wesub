@@ -1197,11 +1197,12 @@ ul.unisubs-titlesList.unisubs-beginTab .unisubs-beginTabLi {
     padding: 110px 0px !important;
     text-align: center !important;
 }
-.unisubs-titlesList .unisubs-title-notime .unisubs-timestamp-time {
+.unisubs-titlesList .unisubs-timestamp-time-fixed {
     font-weight: normal !important;
     color: #888 !important;
     padding: 10px !important;
     font-size: 10px !important;
+    float: right !important;
 }
 .unisubs-timestamp {
     .top: -4px !important;
