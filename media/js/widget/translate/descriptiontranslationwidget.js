@@ -36,7 +36,7 @@ unisubs.translate.DescriptionTranslationWidget.prototype.createDom = function() 
         $d('li', null,
            $d('div', null,
               $d('span', 'unisubs-description unisubs-description-notime',
-                  $d('span', null, 'Description: '),
+                  $d('span', 'meta', 'Description: '),
                   this.originalVideoDescription_),
               this.loadingIndicator_ = $d('span', 'unisubs-loading-indicator', 'loading...')
            ),
