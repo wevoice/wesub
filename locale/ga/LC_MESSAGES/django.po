@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-29 01:32-0500\n"
+"POT-Creation-Date: 2012-03-30 01:32-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,7 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: apps/auth/admin.py:78 templates/auth/_announcement.html:7
+#: apps/auth/admin.py:79 templates/auth/_announcement.html:7
 #: templates/messages/_messages.html:8 templates/videos/create.html:63
 msgid "Hide"
 msgstr ""
@@ -543,51 +543,51 @@ msgstr ""
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr ""
 
-#: apps/teams/forms.py:420
+#: apps/teams/forms.py:431
 msgid "You do not have permission to assign this task."
 msgstr ""
 
-#: apps/teams/forms.py:427
+#: apps/teams/forms.py:438
 msgid "This user cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:448
+#: apps/teams/forms.py:459
 msgid "You do not have permission to delete this task."
 msgstr ""
 
-#: apps/teams/forms.py:509
+#: apps/teams/forms.py:520
 msgid "You cannot blacklist a preferred language."
 msgstr ""
 
-#: apps/teams/forms.py:533 apps/teams/forms.py:535
+#: apps/teams/forms.py:544 apps/teams/forms.py:546
 msgid "User does not exist!"
 msgstr ""
 
-#: apps/teams/forms.py:542
+#: apps/teams/forms.py:553
 msgid "User is already a member of this team!"
 msgstr ""
 
-#: apps/teams/forms.py:570 templates/videos/subtitle-view.html:334
+#: apps/teams/forms.py:581 templates/videos/subtitle-view.html:334
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
-#: apps/teams/forms.py:574 templates/videos/subtitle-view.html:320
+#: apps/teams/forms.py:585 templates/videos/subtitle-view.html:320
 msgid "What would you like to unpublish?"
 msgstr ""
 
-#: apps/teams/forms.py:576
+#: apps/teams/forms.py:587
 msgid "This version (and any later version) for this language."
 msgstr ""
 
-#: apps/teams/forms.py:577
+#: apps/teams/forms.py:588
 msgid "All versions for this language and any dependent languages."
 msgstr ""
 
-#: apps/teams/forms.py:595
+#: apps/teams/forms.py:606
 msgid "These subtitles are not under a team's control."
 msgstr ""
 
-#: apps/teams/forms.py:599
+#: apps/teams/forms.py:610
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
@@ -738,20 +738,20 @@ msgstr ""
 msgid "If you check this, other languages will not be displayed."
 msgstr ""
 
-#: apps/teams/models.py:835 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:839 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr ""
 
-#: apps/teams/models.py:836 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:840 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr ""
 
-#: apps/teams/models.py:837 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:841 apps/teams/permissions_const.py:44
 #: templates/base.html:116
 msgid "Admin"
 msgstr ""
 
-#: apps/teams/models.py:838 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:842 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr ""
 
@@ -767,7 +767,7 @@ msgstr ""
 msgid "You are already a member of this team."
 msgstr ""
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:886
+#: apps/teams/rpc.py:50 apps/teams/views.py:895
 msgid "You are now a member of this team."
 msgstr ""
 
@@ -852,7 +852,7 @@ msgid "You do not have permission to delete this team."
 msgstr ""
 
 #: apps/teams/views.py:352 apps/teams/views.py:388 apps/teams/views.py:416
-#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1463
+#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1472
 msgid "You do not have permission to edit this team."
 msgstr ""
 
@@ -868,149 +868,149 @@ msgstr ""
 msgid "You can't add that video to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:596
+#: apps/teams/views.py:605
 msgid "The video has been moved to the new team."
 msgstr ""
 
-#: apps/teams/views.py:609
+#: apps/teams/views.py:618
 msgid "You can't add videos to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:628
+#: apps/teams/views.py:637
 msgid "You can't edit this video."
 msgstr ""
 
-#: apps/teams/views.py:637
+#: apps/teams/views.py:646
 msgid "Video has been updated."
 msgstr ""
 
-#: apps/teams/views.py:665
+#: apps/teams/views.py:674
 msgid "Request must be a POST request."
 msgstr ""
 
-#: apps/teams/views.py:673
+#: apps/teams/views.py:682
 msgid "You can't delete that video."
 msgstr ""
 
-#: apps/teams/views.py:677
+#: apps/teams/views.py:686
 msgid "You can't remove that video."
 msgstr ""
 
-#: apps/teams/views.py:688
+#: apps/teams/views.py:697
 msgid "Video has been deleted from Universal Subtitles."
 msgstr ""
 
-#: apps/teams/views.py:690
+#: apps/teams/views.py:699
 msgid "Video has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:777
+#: apps/teams/views.py:786
 msgid "Member has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:780
+#: apps/teams/views.py:789
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 
-#: apps/teams/views.py:783
+#: apps/teams/views.py:792
 msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
-#: apps/teams/views.py:814
+#: apps/teams/views.py:823
 msgid "Application approved."
 msgstr ""
 
-#: apps/teams/views.py:816 apps/teams/views.py:834
+#: apps/teams/views.py:825 apps/teams/views.py:843
 msgid "Application does not exist."
 msgstr ""
 
-#: apps/teams/views.py:818
+#: apps/teams/views.py:827
 msgid "You can't approve applications."
 msgstr ""
 
-#: apps/teams/views.py:832
+#: apps/teams/views.py:841
 msgid "Application denied."
 msgstr ""
 
-#: apps/teams/views.py:836
+#: apps/teams/views.py:845
 msgid "You can't deny applications."
 msgstr ""
 
-#: apps/teams/views.py:846
+#: apps/teams/views.py:855
 msgid "You cannot invite people to this team."
 msgstr ""
 
-#: apps/teams/views.py:882
+#: apps/teams/views.py:891
 msgid "You cannot join this team."
 msgstr ""
 
-#: apps/teams/views.py:933
+#: apps/teams/views.py:942
 msgid "You have left this team."
 msgstr ""
 
-#: apps/teams/views.py:1137
+#: apps/teams/views.py:1146
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1255 apps/teams/views.py:1258
+#: apps/teams/views.py:1264 apps/teams/views.py:1267
 msgid "You are not allowed to perform this task."
 msgstr ""
 
-#: apps/teams/views.py:1313
+#: apps/teams/views.py:1322
 msgid "Task deleted."
 msgstr ""
 
-#: apps/teams/views.py:1315
+#: apps/teams/views.py:1324
 msgid "You cannot delete this task."
 msgstr ""
 
-#: apps/teams/views.py:1340
+#: apps/teams/views.py:1349
 msgid "Task declined."
 msgstr ""
 
-#: apps/teams/views.py:1342
+#: apps/teams/views.py:1351
 msgid "Task assigned."
 msgstr ""
 
-#: apps/teams/views.py:1344
+#: apps/teams/views.py:1353
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1366
+#: apps/teams/views.py:1375
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1390
+#: apps/teams/views.py:1399
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1402
+#: apps/teams/views.py:1411
 msgid "Project added."
 msgstr ""
 
-#: apps/teams/views.py:1419
+#: apps/teams/views.py:1428
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1430
+#: apps/teams/views.py:1439
 msgid "Project deleted."
 msgstr ""
 
-#: apps/teams/views.py:1448
+#: apps/teams/views.py:1457
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1579
+#: apps/teams/views.py:1588
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1612
+#: apps/teams/views.py:1621
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
-#: apps/teams/templatetags/teams_tags.py:235
+#: apps/teams/templatetags/teams_tags.py:237
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr ""
@@ -3981,11 +3981,11 @@ msgstr ""
 msgid "You can also login using"
 msgstr ""
 
-#: templates/auth/login.html:24
+#: templates/auth/login.html:25
 msgid "Create an Account"
 msgstr ""
 
-#: templates/auth/login.html:28
+#: templates/auth/login.html:29
 msgid "Create Account"
 msgstr ""
 
