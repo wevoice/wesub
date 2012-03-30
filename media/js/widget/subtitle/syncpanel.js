@@ -231,7 +231,7 @@ unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {
         confirm("Are you sure you want to start over?");
     if (answer) {
         if (this.reviewOrApprovalType_) {
-            this.subtitles_.resetTimes();
+            this.subtitles_.resetSubs();
             this.videoPlayer_.setPlayheadTime(0);
         } else {
             this.subtitles_.clearTimes();
