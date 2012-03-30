@@ -51,7 +51,7 @@ unisubs.GuidelinesPanel.prototype.createDom = function() {
     el.appendChild(this.guidelineEl_);
 
     this.skipGuidelinesSpan_ = $d('span', 'goog-checkbox-unchecked');
-    el.appendChild($d('div', null, this.skipGuidelinesSpan_,
+    el.appendChild($d('div', 'skip-guidelines', this.skipGuidelinesSpan_,
                       goog.dom.createTextNode('Always skip these guidelines')));
 
     this.continueLink_ = $d('a', {'className': 'unisubs-done', 'href': '#'},

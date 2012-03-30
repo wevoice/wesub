@@ -1016,6 +1016,13 @@ ul.unisubs-titlesList li:hover .unisubs-timestamp {
     top: 0px !important;
 }
 
+div.skip-guidelines {
+    text-align: center;
+}
+div.skip-guidelines span {
+    margin-right: 8px !important;
+}
+
 .unisubs-sub-paragraph {
     background: url("../images/paragraph-marker.png") 0 0 no-repeat !important;
     height: 28px !important;
