@@ -2265,6 +2265,19 @@ a.unisubs-openid span {
 .unisubs-guidelinespanel, .unisubs-guidelinespanel h2, .unisubs-howtopanel, .unisubs-howtopanel h2, .unisubs-howtopanel .unisubs-videoDiv {
     text-shadow: 0 0 0 !important;
 }
+.unisubs-guidelinespanel h2 {
+    text-align: center;
+}
+.unisubs-guidelinespanel div {
+    color: #C0C0C0;
+    font: normal 14px/18px Helvetica;
+    margin: 25px auto;
+    width: 600px;
+}
+.unisubs-guidelinespanel div a {
+    color: #C0C0C0;
+    text-decoration: underline;
+}
 .unisubs-howto-videocontainer {
     margin: 36px auto 20px !important;
     position: relative !important;
