@@ -390,6 +390,14 @@ unisubs.subtitle.Dialog.prototype.enterState_ = function(state) {
     }
 };
 unisubs.subtitle.Dialog.prototype.showGuidelinesForState_ = function(state) {
+    var skipGuidelines = unisubs.UserSettings.getBooleanValue(
+                            unisubs.UserSettings.Settings.ALWAYS_SKIP_GUIDELINES);
+
+    if(skipGuidelines){
+        this.setState_(state);
+        return;
+    }
+
     var s = unisubs.subtitle.Dialog.State_;
     // the same dialog can be used in transcribing or review approval, which guidelines should we use?
     var guideline = this.reviewOrApprovalType_ ? this.getTeamGuidelineForReview() : unisubs.guidelines['subtitle'];

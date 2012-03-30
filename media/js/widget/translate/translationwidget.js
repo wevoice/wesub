@@ -52,8 +52,6 @@ unisubs.translate.TranslationWidget.prototype.getSubJson = function() {
 unisubs.translate.TranslationWidget.prototype.createDom = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
 
-    console.log(this.subtitle_);
-
     this.setElementInternal(
         $d('li', null,
            $d('div', null,
