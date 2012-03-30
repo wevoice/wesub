@@ -87,7 +87,7 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
         goog.dom.classes.add(this.titleElem_, 'unisubs-title-notime');
         unisubs.style.showElement(this.contentElement_, false);
         if(this.subtitle_.getStartTime() > -1){
-            var timeElement = $d('span', {'className': 'unisubs-timestamp-time'}, 
+            var timeElement = $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
                                 unisubs.formatTime(this.subtitle_.getStartTime()));
             this.titleElem_.appendChild(timeElement);
         }
