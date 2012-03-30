@@ -55,6 +55,8 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
     this.setElementInternal(
         $d('li', null,
            $d('div', null,
+              $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
+                         unisubs.formatTime(this.subtitle_['start_time'])),
               $d('span', 'unisubs-title unisubs-title-notime', this.subtitle_['text']),
               this.loadingIndicator_ = $d('span', 'unisubs-loading-indicator', 'loading...')
            ),

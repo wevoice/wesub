@@ -68,7 +68,7 @@ goog.inherits(unisubs.subtitle.EditableCaptionSet, goog.events.EventTarget);
 unisubs.subtitle.EditableCaptionSet.EventType = {
     CLEAR_ALL: 'clearall',
     CLEAR_TIMES: 'cleartimes',
-    RESET_TIMES: 'resettimes',
+    RESET_SUBS: 'resetsubs',
     ADD: 'addsub',
     DELETE: 'deletesub'
 };
@@ -112,11 +112,11 @@ unisubs.subtitle.EditableCaptionSet.prototype.clearTimes = function() {
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.CLEAR_TIMES);
 };
-unisubs.subtitle.EditableCaptionSet.prototype.resetTimes = function() {
-    goog.array.forEach(this.captions_, function(c) { c.resetTimes(); });
+unisubs.subtitle.EditableCaptionSet.prototype.resetSubs = function() {
+    goog.array.forEach(this.captions_, function(c) { c.resetSub(); });
 
     this.dispatchEvent(
-        unisubs.subtitle.EditableCaptionSet.EventType.RESET_TIMES);
+        unisubs.subtitle.EditableCaptionSet.EventType.RESET_SUBS);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
     return this.captions_.length;

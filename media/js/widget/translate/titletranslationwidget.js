@@ -35,7 +35,9 @@ unisubs.translate.TitleTranslationWidget.prototype.createDom = function() {
     this.setElementInternal(
         $d('li', null,
            $d('div', null,
-              $d('span', 'unisubs-title unisubs-title-notime', 'Title: ' + this.originalVideoTitle_ ),
+              $d('span', 'unisubs-title unisubs-title-notime',
+                  $d('span', null, 'Title: '),
+                  this.originalVideoTitle_ ),
               this.loadingIndicator_ = $d('span', 'unisubs-loading-indicator', 'loading...')
            ),
            this.translateInput_ = $d('textarea', 'unisubs-translateField')
