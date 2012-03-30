@@ -50,6 +50,10 @@ unisubs.GuidelinesPanel.prototype.createDom = function() {
     this.guidelineEl_ = $d('div', null, goog.dom.htmlToDocumentFragment(this.guidelineText_));
     el.appendChild(this.guidelineEl_);
 
+    this.skipGuidelinesSpan_ = $d('span', 'goog-checkbox-unchecked');
+    el.appendChild($d('div', null, this.skipGuidelinesSpan_,
+                      goog.dom.createTextNode('Always skip these guidelines')));
+
     this.continueLink_ = $d('a', {'className': 'unisubs-done', 'href': '#'},
                             $d('span', null, 'Continue'));
     el.appendChild(this.continueLink_);
@@ -57,6 +61,20 @@ unisubs.GuidelinesPanel.prototype.createDom = function() {
 
 unisubs.GuidelinesPanel.prototype.enterDocument = function() {
     unisubs.GuidelinesPanel.superClass_.enterDocument.call(this);
+
+    if (!this.skipGuidelinesCheckbox_){
+        this.skipGuidelinesCheckbox_ = new goog.ui.Checkbox();
+        this.skipGuidelinesCheckbox_.decorate(this.skipGuidelinesSpan_);
+        this.skipGuidelinesCheckbox_.setLabel(
+            this.skipGuidelinesCheckbox_.getElement().parentNode);
+        this.skipGuidelinesCheckbox_.setChecked(goog.ui.Checkbox.State.UNCHECKED);
+        window.guide = this.skipGuidelinesCheckbox_;
+    }
+
+    this.getHandler().listen(this.skipGuidelinesCheckbox_,
+                             goog.ui.Component.EventType.CHANGE,
+                             this.skipGuidelinesCheckboxChanged_);
+
     this.getHandler().listen(this.continueLink_, 'click', this.continue_);
 };
 
@@ -70,3 +88,9 @@ unisubs.GuidelinesPanel.prototype.disposeInternal = function() {
 };
 
 unisubs.GuidelinesPanel.prototype.stopVideo = function() {};
+
+unisubs.GuidelinesPanel.prototype.skipGuidelinesCheckboxChanged_ = function(){
+    unisubs.UserSettings.setBooleanValue(
+        unisubs.UserSettings.Settings.ALWAYS_SKIP_GUIDELINES,
+        this.skipGuidelinesCheckbox_.isChecked());
+}
