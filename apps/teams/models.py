@@ -729,7 +729,7 @@ def _create_translation_tasks(team_video, subtitle_version):
 
         # Don't create tasks for languages that already have one.
         # Doesn't matter if it's complete or not.
-        task_exists = Task.objects.filter(
+        task_exists = Task.objects.not_deleted().filter(
             team=team_video.team, team_video=team_video, language=lang,
             type=Task.TYPE_IDS['Translate']
         ).exists()
@@ -744,15 +744,25 @@ def _create_translation_tasks(team_video, subtitle_version):
 
 def autocreate_tasks(team_video):
     workflow = Workflow.get_for_team_video(team_video)
-    if workflow.autocreate_subtitle:
-        existing_subtitles = team_video.video.completed_subtitle_languages(public_only=True)
-        if not existing_subtitles:
-            Task(team=team_video.team, team_video=team_video,
-                 subtitle_version=None, language='',
-                 type=Task.TYPE_IDS['Subtitle']
-            ).save()
-        else:
-            _create_translation_tasks(team_video, existing_subtitles[0].latest_version())
+    existing_subtitles = team_video.video.completed_subtitle_languages(public_only=True)
+
+    # We may need to create a transcribe task, if there are no existing subs.
+    if workflow.autocreate_subtitle and not existing_subtitles:
+        Task(team=team_video.team, team_video=team_video,
+                subtitle_version=None, language='',
+                type=Task.TYPE_IDS['Subtitle']
+        ).save()
+
+    # If there are existing subtitles, we may need to create translate tasks.
+    #
+    # TODO: This sets the "source version" for the translations to an arbitrary
+    #       language's version.  In practice this probably won't be a problem
+    #       because most teams will transcribe one language and then send to a
+    #       new team for translation, but we can probably be smarter about this
+    #       if we spend some time.
+    if workflow.autocreate_translate and existing_subtitles:
+        _create_translation_tasks(team_video, existing_subtitles[0].latest_version())
+
 
 def team_video_save(sender, instance, created, **kwargs):
     """Update the Solr index for this team video.

@@ -575,6 +575,7 @@ def move_video(request):
         # We move the video by just switching the team, instead of deleting and
         # recreating it.
         team_video.team = team
+
         # projects are always team dependent:
         team_video.project = team.default_project
         team_video.save()
@@ -600,8 +601,8 @@ def move_video(request):
 
         if video.policy and video.policy.belongs_to_team:
             video.policy.object_id = team.pk
-            video.policy.save(updates_metadata=False) 
-            
+            video.policy.save(updates_metadata=False)
+
         messages.success(request, _(u'The video has been moved to the new team.'))
     else:
         for e in flatten_errorlists(form.errors):
