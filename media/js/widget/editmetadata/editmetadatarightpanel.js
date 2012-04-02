@@ -94,7 +94,7 @@ unisubs.editmetadata.RightPanel.prototype.appendHelpContentsInternal = function(
 };
 
 // FIXME: remove duplication from the subtitle.reviewpanel
-unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
+unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode, saveForLater) {
     if (e) {
         e.preventDefault();
     }
@@ -121,7 +121,7 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
 
     var onCompletedCallback = function( isComplete){
         this.serverModel_.setComplete(isComplete);
-        this.serverModel_.finish(successCallback, failureCallback);
+        this.serverModel_.finish(successCallback, failureCallback, null, saveForLater);
     };
     // set the servel models vars to finish this, the taskId and taskType were
     // set when retrieving the task data
@@ -136,7 +136,7 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode) {
         unisubs.subtitle.CompletedDialog.show(
             true, goog.bind(onCompletedCallback, this));
     } else {
-        this.serverModel_.finish(successCallback, failureCallback);
+        this.serverModel_.finish(successCallback, failureCallback, null, saveForLater);
     }
 
 };
@@ -156,9 +156,9 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
     var handler = this.getHandler();
     var that = this;
     handler.listen(this.sendBackButton_, 'click', function(e){
-        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SEND_BACK);
+        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SEND_BACK, false);
     });
     handler.listen(this.approveButton_, 'click', function(e){
-        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED);
+        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED, false);
     });
 };

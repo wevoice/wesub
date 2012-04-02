@@ -471,33 +471,40 @@ class Rpc(BaseRpc):
         else:
             return message_will_be_live_soon
 
-    def _complete_tasks_for_save(self, request, language, new_version, is_complete,
-                                 task_id, task_type, task_notes, task_approved):
-        """Complete any tasks for this save.  Might return an error."""
+    def _save_tasks_for_save(self, request, save_for_later, language,
+                             new_version, is_complete, task_id, task_type,
+                             task_notes, task_approved):
+        """Handle any outstanding tasks for this save.  May return an error.
 
-        # If we've just saved a completed subtitle language, we may need to
-        # complete a subtitle or translation task.
-        if is_complete:
-            team_video = language.video.get_team_video()
-            if team_video:
-                tasks = team_video.task_set.incomplete().filter(
-                    type__in=(Task.TYPE_IDS['Subtitle'],
-                              Task.TYPE_IDS['Translate']),
-                    language=language.language
-                )
-                for task in tasks:
-                    task.complete()
+        save_for_later is the most important argument here.  It determines
+        whether any tasks will actually be completed.
+
+        """
+
+        if not save_for_later:
+            # If we've just saved a completed subtitle language, we may need to
+            # complete a subtitle or translation task.
+            if is_complete:
+                team_video = language.video.get_team_video()
+                if team_video:
+                    tasks = team_video.task_set.incomplete().filter(
+                        type__in=(Task.TYPE_IDS['Subtitle'],
+                                Task.TYPE_IDS['Translate']),
+                        language=language.language
+                    )
+                    for task in tasks:
+                        task.complete()
 
         # If the user is specifically performing a review/approve task we should
         # handle it.
         if task_id:
             if task_type == 'review':
-                finish = self._finish_review
+                handle = self._save_review
             elif task_type == 'approve':
-                finish = self._finish_approve
+                handle = self._save_approve
 
-            error = finish(request, task_id, task_notes, task_approved,
-                           new_version=new_version)
+            error = handle(request, save_for_later, task_id, task_notes,
+                           task_approved, new_version=new_version)
             if error:
                 return error
 
@@ -579,7 +586,8 @@ class Rpc(BaseRpc):
 
     def save_finished(self, request, user, session, subtitles, new_title=None,
                       completed=None, forked=False, new_description=None,
-                      task_id=None, task_notes=None, task_approved=None, task_type=None):
+                      task_id=None, task_notes=None, task_approved=None,
+                      task_type=None, save_for_later=None):
         # TODO: lock all this in a transaction please!
 
         language = session.language
@@ -602,18 +610,19 @@ class Rpc(BaseRpc):
         is_complete = language.is_complete or language.calculate_percent_done() == 100
         user_message = self._get_user_message_for_save(user, language, is_complete)
 
-        error = self._complete_tasks_for_save(
-                request, language, new_version, is_complete, task_id, task_type,
-                task_notes, task_approved)
+        error = self._save_tasks_for_save(
+                request, save_for_later, language, new_version, is_complete,
+                task_id, task_type, task_notes, task_approved)
         if error:
             return error
 
         return { 'response': 'ok', 'user_message': user_message }
 
     def finished_subtitles(self, request, session_pk, subtitles=None,
-                           new_title=None, completed=None,
-                           forked=False, throw_exception=False, new_description=None,
-                           task_id=None, task_notes=None, task_approved=None, task_type=None):
+                           new_title=None, completed=None, forked=False,
+                           throw_exception=False, new_description=None,
+                           task_id=None, task_notes=None, task_approved=None,
+                           task_type=None, save_for_later=None):
         """Called when a user has finished a set of subtitles and they should be saved.
 
         TODO: Rename this to something verby, like "finish_subtitles".
@@ -633,7 +642,8 @@ class Rpc(BaseRpc):
 
         return self.save_finished(
             request, request.user, session, subtitles, new_title, completed,
-            forked, new_description, task_id, task_notes, task_approved, task_type)
+            forked, new_description, task_id, task_notes, task_approved,
+            task_type, save_for_later)
 
 
     def _get_review_or_approve_task(self, team_video, subtitle_language):
@@ -780,8 +790,8 @@ class Rpc(BaseRpc):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
 
-    def _finish_review(self, request, task_id=None, body=None,
-                       approved=None, new_version=None):
+    def _save_review(self, request, save_for_later, task_id=None, body=None,
+                     approved=None, new_version=None):
         """
         If the task performer has edited this version, then we need to
         set the task's version to the new one that he has edited.
@@ -801,8 +811,9 @@ class Rpc(BaseRpc):
 
             task.save()
 
-            if task.approved in Task.APPROVED_FINISHED_IDS:
-                task.complete()
+            if not save_for_later:
+                if task.approved in Task.APPROVED_FINISHED_IDS:
+                    task.complete()
 
             task.subtitle_version.language.release_writelock()
             task.subtitle_version.language.followers.add(request.user)
@@ -817,8 +828,8 @@ class Rpc(BaseRpc):
         task = Task.objects.get(pk=task_id)
         return {'response': 'ok', 'body': task.body}
 
-    def _finish_approve(self, request, task_id=None, body=None,
-                        approved=None, new_version=None):
+    def _save_approve(self, request, save_for_later, task_id=None, body=None,
+                      approved=None, new_version=None):
         """
         If the task performer has edited this version, then we need to
         set the task's version to the new one that he has edited.
@@ -837,8 +848,9 @@ class Rpc(BaseRpc):
                 task.subtitle_version = new_version
             task.save()
 
-            if task.approved in Task.APPROVED_FINISHED_IDS:
-                task.complete()
+            if not save_for_later:
+                if task.approved in Task.APPROVED_FINISHED_IDS:
+                    task.complete()
 
             task.subtitle_version.language.release_writelock()
 
