@@ -85,7 +85,7 @@ class StaticSitemap(Sitemap):
 
     def items(self):
         pages = [
-            AS(reverse('services_page', kwargs={'locale': ''})), #Services
+            AS(reverse('enterprise_page', kwargs={'locale': ''})), #Enterprise
             AS(reverse('faq_page', kwargs={'locale': ''})), #FAQ
             # Add more static pages
         ]
