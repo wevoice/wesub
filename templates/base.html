@@ -6,7 +6,7 @@
 <html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="en" lang="en" {% block html_attrs %}{% endblock %} class="base">
 
 <head>
-    <title>{% block title %}Universal Subtitles - {% trans 'Transcribe, caption, translate, and subtitle videos.' %}{% endblock %}</title>
+    <title>{% block title %}Amara - {% trans 'Universal subtitling: caption, translate, subtitle and transcribe video.' %}{% endblock %}</title>
 
     <meta charset="utf-8" />
     {% if not current_site.name == 'unisubs' %}
@@ -57,7 +57,7 @@
     {% require_email_dialog %}
     <div id="main_bar">
         <div id="bar_wrap" class="clearfix">
-            <h1><a href="/">Universal Subtitles</a></h1>
+            <h1><a href="/">Amara</a></h1>
             <div id="bar_right">
                 <div id="bar_search">
                     <form method="get" action="{{BASE_URL}}{% url search:index %}">
