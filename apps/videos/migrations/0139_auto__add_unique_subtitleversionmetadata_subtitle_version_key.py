@@ -5,21 +5,19 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-
+    
     def forwards(self, orm):
-        db.rename_column('videos_videometadata', 'metadata_type', 'key')
-        db.rename_column('videos_videometadata', 'content', 'data')
-        db.rename_column('videos_subtitlemetadata', 'metadata_type', 'key')
-        db.rename_column('videos_subtitlemetadata', 'content', 'data')
-
-
+        
+        # Adding unique constraint on 'SubtitleVersionMetadata', fields ['subtitle_version', 'key']
+        db.create_unique('videos_subtitleversionmetadata', ['subtitle_version_id', 'key'])
+    
+    
     def backwards(self, orm):
-        db.rename_column('videos_videometadata', 'key', 'metadata_type')
-        db.rename_column('videos_videometadata', 'data', 'content')
-        db.rename_column('videos_subtitlemetadata', 'key', 'metadata_type')
-        db.rename_column('videos_subtitlemetadata', 'data', 'content')
-
-
+        
+        # Removing unique constraint on 'SubtitleVersionMetadata', fields ['subtitle_version', 'key']
+        db.delete_unique('videos_subtitleversionmetadata', ['subtitle_version_id', 'key'])
+    
+    
     models = {
         'accountlinker.thirdpartyaccount': {
             'Meta': {'unique_together': "(('type', 'username'),)", 'object_name': 'ThirdPartyAccount'},
@@ -164,7 +162,7 @@ class Migration(SchemaMigration):
             'team': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.Team']"}),
             'thumbnail': ('utils.amazon.fields.S3EnabledImageField', [], {'max_length': '100', 'thumb_options': "{'upscale': True, 'crop': 'smart'}", 'null': 'True', 'thumb_sizes': '((290, 165), (120, 90))', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'blank': 'True'}),
-            'video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.Video']"})
+            'video': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['videos.Video']", 'unique': 'True'})
         },
         'videos.action': {
             'Meta': {'object_name': 'Action'},
@@ -214,8 +212,8 @@ class Migration(SchemaMigration):
         },
         'videos.subtitlemetadata': {
             'Meta': {'object_name': 'SubtitleMetadata'},
-            'data': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'data': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'key': ('django.db.models.fields.PositiveIntegerField', [], {}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
@@ -238,6 +236,7 @@ class Migration(SchemaMigration):
             'version_no': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'})
         },
         'videos.subtitleversionmetadata': {
+            'Meta': {'unique_together': "(('key', 'subtitle_version'),)", 'object_name': 'SubtitleVersionMetadata'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'data': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -295,8 +294,8 @@ class Migration(SchemaMigration):
         },
         'videos.videometadata': {
             'Meta': {'object_name': 'VideoMetadata'},
-            'data': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'data': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'key': ('django.db.models.fields.PositiveIntegerField', [], {}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
@@ -316,5 +315,5 @@ class Migration(SchemaMigration):
             'videoid': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'})
         }
     }
-
+    
     complete_apps = ['videos']
