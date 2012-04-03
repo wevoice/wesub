@@ -637,6 +637,24 @@ def can_perform_task_for(user, type, team_video, language):
 def can_perform_task(user, task):
     """Return whether the given user can perform the given task."""
 
+    # Hacky check to account for the following case:
+    #
+    # * Reviewer A is reviewing v1 of subs by user B.
+    # * A makes some changes and saves for later, resulting in v2 by A.
+    # * The review task now points at v2, which is authored by A, which means
+    #   that A is now trying to review their own subs, which is not allowed.
+    #
+    # For now we're just special-casing this and saying that someone can perform
+    # a review of their own subs if they're already assigned to the task.
+    #
+    # This doesn't handle all the possible edge cases, but it's good enough for
+    # right now.
+    #
+    # TODO: Remove this hack once we get the "origin" of versions in place.
+    if task.get_type_display() in ['Review', 'Approve']:
+        if task.assignee == user:
+            return True
+
     return can_perform_task_for(user, task.type, task.team_video, task.language)
 
 def can_assign_task(task, user):
