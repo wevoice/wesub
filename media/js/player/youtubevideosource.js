@@ -88,3 +88,29 @@ unisubs.player.YoutubeVideoSource.prototype.sizeFromConfig = function() {
 unisubs.player.YoutubeVideoSource.prototype.getVideoURL = function() {
     return "http://www.youtube.com/watch?v=" + this.youtubeVideoID_;
 };
+
+/**
+* Checks if this video url is indeed for this MediaSource type, returns a
+* mediaSource subclass if it is, null if it isn't
+*/
+unisubs.player.YoutubeVideoSource.getMediaSource = function(videoURL, opt_videoConfig) {
+    if (unisubs.player.YoutubeVideoSource.isYoutube(videoURL)) {
+        var videoSource = null;
+        if (!window['swfobject']["hasFlashPlayerVersion"]("9")) {
+            videoSource = unisubs.player.YTIFrameVideoSource.forURL(
+                videoURL, opt_videoConfig);
+        }
+        else {
+            videoSource = unisubs.player.YoutubeVideoSource.forURL(
+                videoURL, opt_videoConfig);
+        }
+        if (videoSource != null){
+            console.log("found youtube video source")
+            return videoSource;
+        }
+    }
+    return null;
+}
+
+// add this mediaSource to our registry
+unisubs.player.MediaSource.addMediaSource(unisubs.player.YoutubeVideoSource.getMediaSource);

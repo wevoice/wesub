@@ -124,3 +124,17 @@ unisubs.player.BrightcoveVideoSource.EMBED_SOURCE = "http://c.brightcove.com/ser
 unisubs.player.BrightcoveVideoSource.prototype.toString = function() {
     return "BrightcoveVideoSource " + this.videoID_;
 }
+
+/**
+* Checks if this video url is indeed for this MediaSource type, returns a
+* mediaSource subclass if it is, null if it isn't
+*/
+unisubs.player.BrightcoveVideoSource.getMediaSource = function(videoURL, opt_videoConfig) {
+    if (unisubs.player.BrightcoveVideoSource.isBrightcove(videoURL)) {
+        return unisubs.player.BrightcoveVideoSource.forURL(videoURL);
+    }
+    return null;
+}
+
+// add this mediaSource to our registry
+unisubs.player.MediaSource.addMediaSource(unisubs.player.BrightcoveVideoSource.getMediaSource);

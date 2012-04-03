@@ -62,3 +62,19 @@ unisubs.player.VimeoVideoSource.prototype.getVideoConfig = function() {
 unisubs.player.VimeoVideoSource.prototype.getVideoURL = function() {
     return this.videoURL_;
 };
+/**
+* Checks if this video url is indeed for this MediaSource type, returns a
+* mediaSource subclass if it is, null if it isn't
+*/
+unisubs.player.VimeoVideoSource.getMediaSource = function(videoURL, opt_videoConfig) {
+    if (/^\s*https?:\/\/([^\.]+\.)?vimeo/.test(videoURL)) {
+        var videoIDExtract = /vimeo.com\/([0-9]+)/i.exec(videoURL);
+        if (videoIDExtract)
+            return new unisubs.player.VimeoVideoSource(
+                videoIDExtract[1], videoURL, opt_videoConfig);
+    }
+    return null;
+}
+
+// add this mediaSource to our registry
+unisubs.player.MediaSource.addMediaSource(unisubs.player.VimeoVideoSource.getMediaSource);

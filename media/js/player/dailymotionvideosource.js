@@ -67,3 +67,20 @@ unisubs.player.DailymotionVideoSource.prototype.getUUID = function() {
 unisubs.player.DailymotionVideoSource.prototype.getVideoURL = function() {
     return this.videoURL_;
 };
+
+/**
+* Checks if this video url is indeed for this MediaSource type, returns a
+* mediaSource subclass if it is, null if it isn't
+*/
+unisubs.player.DailymotionVideoSource.getMediaSource = function(videoURL, opt_videoConfig) {
+    if (/^\s*https?:\/\/([^\.]+\.)?dailymotion/.test(videoURL)) {
+        var videoIDExtract = /dailymotion.com\/video\/([0-9a-z]+)/i.exec(videoURL);
+        if (videoIDExtract)
+            return new unisubs.player.DailymotionVideoSource(
+                videoIDExtract[1], videoURL, opt_videoConfig);
+    }
+    return null;
+}
+
+// add this mediaSource to our registry
+unisubs.player.MediaSource.addMediaSource(unisubs.player.DailymotionVideoSource.getMediaSource);
