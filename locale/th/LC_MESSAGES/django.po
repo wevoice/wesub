@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-02 07:21-0500\n"
+"POT-Creation-Date: 2012-04-03 01:33-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1490,7 +1490,7 @@ msgstr ""
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:812 apps/widget/rpc.py:852
+#: apps/widget/rpc.py:823 apps/widget/rpc.py:864
 msgid "\n"
 msgstr ""
 
@@ -2684,9 +2684,9 @@ msgstr ""
 #: templates/about.html:22
 msgid ""
 "\n"
-"            <h2>About Universal Subtitles</h2>\n"
+"            <h2>About Amara</h2>\n"
 "            <p>\n"
-"                Universal Subtitles gives individuals, communities, and larger organizations the power \n"
+"                Amara gives individuals, communities, and larger organizations the power \n"
 "                to overcome accessibility and language barriers for online video. The tools are free \n"
 "                and open source and make the work of subtitling and translating video simpler, more \n"
 "                appealing, and, most of all, more collaborative.\n"
@@ -2700,7 +2700,7 @@ msgid ""
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
-"                Universal Subtitles is composed of three main parts:\n"
+"                Amara is composed of three main parts:\n"
 "                <ul>\n"
 "                    <li>A subtitle creation and viewing tool (aka the widget)</li>\n"
 "                    <li>A collaborative subtitling website</li>\n"
@@ -2720,39 +2720,20 @@ msgid ""
 "                <a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n"
 "            </p>\n"
 "            <p>\n"
-"                Universal Subtitles is a featured project of <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
+"                Amara is a featured project of <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
 "                and the Mozilla Foundation has provided development support.  \n"
 "                Open Society Institute and the MacArthur Foundation are also financial supporters.\n"
 "            </p>\n"
+"            <h2>Publisher and Enterprise Services</h2>\n"
 "            <p>\n"
-"                Software development for Universal Subtitles is being done in partnership with \n"
-"                <br/><a href=\"http://www.8planes.com/\">8 Planes</a>.\n"
-"            </p>\n"
-"            <h2>What's Coming Next?</h2>\n"
-"            <p>\n"
-"                We are currently in the alpha stages of this website and the subtitling tool-- that means we're just getting started! But we've opened up the site so that we can begin testing and get early feedback.\n"
-"                Many very important features are missing. Here's some of what we'll be working on in the coming months:\n"
-"                <ul>\n"
-"                    <li>Better support for non-latin character sets</li>\n"
-"                    <li>A volunteer page and request center, where people can ask for captions and subtitles</li>\n"
-"                    <li>Machine translation option once subtitles have been transcribed</li>\n"
-"                    <li>Better keyboard accessibility for site and widget</li>\n"
-"                    <li>Subtitle ratings and flagging</li>\n"
-"                    <li>Better community website features</li>\n"
-"                    <li>Better video browsing on our site, for finding interesting content</li>\n"
-"                    <li>Compliance with emerging timed text standards</li>\n"
-"                </ul>\n"
-"            </p>\n"
-"            <p>\n"
-"                Are there other features that are particular important to your use? \n"
-"                We'd love to hear from you.<br/>\n"
-"                Email us: <a href=\"mailto:feedback@universalsubtitles.org\">universalsubtitles@pculture.org</a>\n"
+"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/services/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
 "            </p>\n"
 "        "
 msgstr ""
 
 #: templates/base.html:9
-msgid "Transcribe, caption, translate, and subtitle videos."
+msgid ""
+"Universal subtitling: caption, translate, subtitle and transcribe video."
 msgstr ""
 
 #: templates/base.html:68
@@ -2768,7 +2749,7 @@ msgid "Volunteer"
 msgstr ""
 
 #: templates/base.html:71
-msgid "Services"
+msgid "Enterprise"
 msgstr ""
 
 #: templates/base.html:72
@@ -2781,8 +2762,7 @@ msgstr ""
 
 #: templates/base.html:100
 msgid ""
-"Universal Subtitles is a project of <a "
-"href=\"http://participatoryculture.org/\">PCF</a>."
+"Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
 msgstr ""
 
 #: templates/base.html:103 templates/profiles/view_profile.html:68
@@ -3060,6 +3040,105 @@ msgstr ""
 
 #: templates/embed_page.html:78
 msgid "let us know"
+msgstr ""
+
+#: templates/enterprise.html:8
+msgid "Enterprise Services"
+msgstr ""
+
+#: templates/enterprise.html:12
+msgid ""
+"\n"
+"            <strong>Make your videos more global and more popular.</strong> Transcripts, captions, and translations dramatically increase video viewership.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:17
+msgid ""
+"\n"
+"            Amara is the most powerful subtitling platform in the world. We can help you build an <strong>active and engaged volunteer community</strong> and you can take advantage of <strong>professional transcription and translation services</strong>, all in one unified workflow.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:23
+msgid "Interested?"
+msgstr ""
+
+#: templates/enterprise.html:25
+msgid ""
+"\n"
+"            To learn more about our services, please contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:31
+msgid "What Can Amara Do?"
+msgstr ""
+
+#: templates/enterprise.html:34
+msgid "Build a Translation Team"
+msgstr ""
+
+#: templates/enterprise.html:36
+msgid ""
+"\n"
+"          Build a powerful volunteer translation and captioning team around your content. A video that lots of people want to watch is a video that fans will want to translate and share around the world.\n"
+"        "
+msgstr ""
+
+#: templates/enterprise.html:42
+msgid "Crowdsource with Professional Review"
+msgstr ""
+
+#: templates/enterprise.html:44
+msgid ""
+"\n"
+"            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:50
+msgid "Professional 1-Click Services"
+msgstr ""
+
+#: templates/enterprise.html:52
+msgid ""
+"\n"
+"            Access professional services including: captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:60
+msgid "Work with Any Video Platform"
+msgstr ""
+
+#: templates/enterprise.html:62
+msgid ""
+"\n"
+"            Amara works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:68
+msgid "Improve Your SEO"
+msgstr ""
+
+#: templates/enterprise.html:70
+msgid ""
+"\n"
+"            Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:76
+msgid "Flexible Integration"
+msgstr ""
+
+#: templates/enterprise.html:78
+msgid ""
+"\n"
+"            Need seamless subtitles on your custom video player? Want 1-click features integrated into your back-end or CMS? We can help.\n"
+"          "
 msgstr ""
 
 #: templates/faq.html:16
@@ -3425,56 +3504,56 @@ msgstr ""
 msgid "See our enterprise services."
 msgstr ""
 
-#: templates/index.html:83
+#: templates/index.html:77
 msgid "6 key benefits"
 msgstr ""
 
-#: templates/index.html:84
+#: templates/index.html:78
 msgid ""
 "The largest, most powerful captioning and translation platform in the world."
 msgstr ""
 
-#: templates/index.html:91
+#: templates/index.html:85
 msgid "Mozilla Example"
 msgstr ""
 
-#: templates/index.html:97
+#: templates/index.html:91
 msgid "Khan Integration"
 msgstr ""
 
-#: templates/index.html:103
+#: templates/index.html:97
 msgid "Drupal Example"
 msgstr ""
 
-#: templates/index.html:109
+#: templates/index.html:103
 msgid "Al Jazeera Team"
 msgstr ""
 
-#: templates/index.html:115
+#: templates/index.html:109
 msgid "NewsHour Team"
 msgstr ""
 
-#: templates/index.html:121
+#: templates/index.html:115
 msgid "More Popular"
 msgstr ""
 
-#: templates/index.html:122
+#: templates/index.html:116
 msgid "Most Popular Today"
 msgstr ""
 
-#: templates/index.html:124
+#: templates/index.html:118
 msgid "Top this month"
 msgstr ""
 
-#: templates/index.html:125
+#: templates/index.html:119
 msgid "Top all-time"
 msgstr ""
 
-#: templates/index.html:132
+#: templates/index.html:126
 msgid "More Featured"
 msgstr ""
 
-#: templates/index.html:133 templates/videos/featured_videos.html:36
+#: templates/index.html:127 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
 msgstr ""
@@ -3815,105 +3894,6 @@ msgstr ""
 msgid ""
 "Special thanks to <a href=\"http://openplans.org/\">Open Plans</a> for "
 "providing meeting space!"
-msgstr ""
-
-#: templates/services.html:8
-msgid "Enterprise Services"
-msgstr ""
-
-#: templates/services.html:12
-msgid ""
-"\n"
-"            <strong>Make your videos more global and more popular.</strong> Transcripts, captions, and translations dramatically increase video viewership.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:17
-msgid ""
-"\n"
-"            Universal Subtitles is the most powerful subtitling platform in the world. We can help you build an <strong>active and engaged volunteer community</strong> and you can take advantage of <strong>professional transcription and translation services</strong>, all in one unified workflow.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:23
-msgid "Interested?"
-msgstr ""
-
-#: templates/services.html:25
-msgid ""
-"\n"
-"            To learn more about our services, please contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
-"          "
-msgstr ""
-
-#: templates/services.html:31
-msgid "What Can Universal Subtitles Do?"
-msgstr ""
-
-#: templates/services.html:34
-msgid "Build a Translation Team"
-msgstr ""
-
-#: templates/services.html:36
-msgid ""
-"\n"
-"          Build a powerful volunteer translation and captioning team around your content. A video that lots of people want to watch is a video that fans will want to translate and share around the world.\n"
-"        "
-msgstr ""
-
-#: templates/services.html:42
-msgid "Crowdsource with Professional Review"
-msgstr ""
-
-#: templates/services.html:44
-msgid ""
-"\n"
-"            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:50
-msgid "Professional 1-Click Services"
-msgstr ""
-
-#: templates/services.html:52
-msgid ""
-"\n"
-"            Access professional services including: captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:60
-msgid "Work with Any Video Platform"
-msgstr ""
-
-#: templates/services.html:62
-msgid ""
-"\n"
-"            Universal Subtitles works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:68
-msgid "Improve Your SEO"
-msgstr ""
-
-#: templates/services.html:70
-msgid ""
-"\n"
-"            Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:76
-msgid "Flexible Integration"
-msgstr ""
-
-#: templates/services.html:78
-msgid ""
-"\n"
-"            Need seamless subtitles on your custom video player? Want 1-click features integrated into your back-end or CMS? We can help.\n"
-"          "
 msgstr ""
 
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:7
