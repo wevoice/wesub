@@ -416,6 +416,7 @@ def _reviewed_notification(task_pk, status):
         "reviewer_profile_url": reviewer_profile_url,
         "perform_task_url": perform_task_url,
     }
+    msg = None
     if user.notify_by_message:
         template_name = "messages/team-task-reviewed.txt"
         msg = Message()
@@ -496,6 +497,7 @@ def approved_notification(task_pk, published=False):
         "subs_url": subs_url,
         "reviewer_message_url": reviewer_message_url,
     }
+    msg = None
     if user.notify_by_message:
         template_name = template_txt
         msg = Message()
@@ -550,6 +552,7 @@ def send_reject_notification(task_pk, sent_back):
         "subs_url": subs_url,
         "reviewer_message_url": reviewer_message_url,
     }
+    msg = None
     if user.notify_by_message:
         template_name = "messages/team-task-rejected.txt"
         msg = Message()
