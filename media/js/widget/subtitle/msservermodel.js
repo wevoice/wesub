@@ -187,7 +187,7 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
     args['task_type'] = this.taskType;
     return atLeastOneThingChanged ? args : null;
 };
-unisubs.subtitle.MSServerModel.prototype.finish = function(successCallback, failureCallback, opt_cancelCallback) {
+unisubs.subtitle.MSServerModel.prototype.finish = function(successCallback, failureCallback, opt_cancelCallback, saveForLater) {
     goog.asserts.assert(this.initialized_);
     goog.asserts.assert(!this.finished_);
 
@@ -197,6 +197,8 @@ unisubs.subtitle.MSServerModel.prototype.finish = function(successCallback, fail
 
     var that = this;
     var args = this.makeFinishArgs_();
+    args['save_for_later'] = saveForLater;  // TODO: Pass this in a more elegant way?
+
     if (goog.isNull(args)) { // no changes.
         successCallback("Saved"); // TODO: is this the right ux?
         return;
