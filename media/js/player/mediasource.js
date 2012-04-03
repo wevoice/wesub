@@ -157,7 +157,7 @@ unisubs.player.MediaSource.videoSourceForURL = function(videoURL, opt_videoConfi
         return unisubs.player.BrightcoveVideoSource.forURL(videoURL);
     }
     else if (unisubs.player.MP3Source.isMP3URL(videoURL)) {
-        return unisubs.player.MP3Source.forURL(videoURL);
+        return unisubs.player.MP3Source.forURL(videoURL, opt_videoConfig);
     }
     else {
         var videoSource = 

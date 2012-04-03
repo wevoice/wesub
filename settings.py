@@ -21,6 +21,7 @@
 import os, sys
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+DEFAULT_PROTOCOL  = 'https'
 
 def rel(*x):
     return os.path.join(PROJECT_ROOT, *x)
@@ -35,7 +36,7 @@ from libs.unilangs import get_language_code_mapping
 # For example: if you are an English user you'll see something like:
 # French (Français)
 language_choices = [(code,
-                     u'%s (%s)' % (lc.name(), lc.native_name()))
+                     u'%s' % lc.name())
                     for code, lc in get_language_code_mapping('unisubs').items()]
 
 global_settings.LANGUAGES = ALL_LANGUAGES = language_choices
@@ -47,9 +48,6 @@ METADATA_LANGUAGES = (
     ('meta-wiki', 'Metadata: Wikipedia'),
 )
 
-# languages that more people speak, and therefore their translators are not as
-# rare
-LINGUA_FRANCAS = ["en", "en-gb"]
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -427,7 +425,7 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile('^/jstest'),
     re.compile('^/sitemap.*.xml'),
     re.compile('^/accountlinker/youtube-oauth-callback/'),
-    #re.compile('^/crossdomain.xml'),
+    re.compile('^/crossdomain.xml'),
 )
 
 #Haystack configuration

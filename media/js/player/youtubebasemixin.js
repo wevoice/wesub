@@ -120,9 +120,7 @@ unisubs.player.YoutubeBaseMixin.prototype.getPlayheadTime = function() {
         return 0;
     }
 };
-
-unisubs.player.YoutubeBaseMixin.prototype.setPlayheadTime = function(playheadTime, skipsUpdateEvent)
-{
+unisubs.player.YoutubeBaseMixin.prototype.setPlayheadTime = function(playheadTime, skipsUpdateEvent) {
     if (this.player_) {
         this.player_['seekTo'](playheadTime, true);
         if (!skipsUpdateEvent) {

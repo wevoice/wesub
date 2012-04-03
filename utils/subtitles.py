@@ -1,54 +1,53 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
-from django.utils import simplejson as json
-from django.db.models import ObjectDoesNotExist
-from datetime import datetime
-import re
 import random
+import re
+from datetime import datetime
 from uuid import uuid4
+from xml.dom.minidom import parseString
+from xml.parsers.expat import ExpatError
+
+from django.db.models import ObjectDoesNotExist
+from django.utils import simplejson as json
+from django.utils.html import strip_tags
 from lxml import etree
+
 from utils.html import unescape as unescape_html
 
+
 # see video.models.Subtitle..start_time
-MAX_SUB_TIME = (60 * 60 * 99) -1 
+MAX_SUB_TIME = (60 * 60 * 99) -1
 
 def is_version_same(version, parser):
     if not version:
         return False
-    
+
     subtitles = list(parser)
-    
+
     if version.subtitle_set.count() != len(subtitles):
         return False
-    
+
     for item in zip(subtitles, list(version.subtitle_set.all())):
         if item[0]['subtitle_text'] != item[1].subtitle_text or \
             item[0]['start_time'] != item[1].start_time or \
             item[0]['end_time'] != item[1].end_time:
                 return False
-            
+
     return True
 
 def save_subtitle(video, language, parser, user=None, update_video=True,
@@ -61,9 +60,9 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
         as_forked = True
     video._make_writelock(user, key)
     video.save()
-    
+
     try:
-        old_version = language.subtitleversion_set.all()[:1].get()    
+        old_version = language.subtitleversion_set.all()[:1].get()
         version_no = old_version.version_no + 1
     except ObjectDoesNotExist:
         old_version = None
@@ -84,7 +83,7 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
 
         for i, item in enumerate(parser):
             id = int(random.random()*10e12)
-                
+
             while id in ids:
                 id = int(random.random()*10e12)
             ids.append(id)
@@ -97,13 +96,13 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
             caption.subtitle_id = str(id)
             caption.subtitle_order = i+1
             caption.save()
-            
+
             if metadata:
                 for name, value in metadata.items():
                     SubtitleMetadata(
                         subtitle=caption,
-                        metadata_type=name,
-                        content=value
+                        key=name,
+                        data=value
                     ).save()
     version = version or old_version
     if version.is_forked != as_forked:
@@ -120,28 +119,29 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
         [t.fork(from_version=old_version, user=user) for t in translations]
     if update_video:
         video_changed_tasks.delay(video.id, None if version is None else version.id)
-        
-    return language  
-            
+
+    return language
+
+
 class SubtitleParserError(Exception):
     pass
-    
+
 class SubtitleParser(object):
-    
+
     def __init__(self, subtitles, pattern, flags=[]):
         self.subtitles = subtitles
         self.pattern = pattern
         self._pattern = re.compile(pattern, *flags)
-        
+
     def __iter__(self):
         return self._result_iter()
-    
+
     def __len__(self):
         return len(self._pattern.findall(self.subtitles))
-    
+
     def __nonzero__(self):
         return bool(self._pattern.search(self.subtitles))
-     
+
     def _result_iter(self):
         """
         Should iterate over items like this:
@@ -157,46 +157,48 @@ class SubtitleParser(object):
 
     def _get_data(self, match):
         return match.groupdict()
-    
+
     def _get_matches(self):
         return self._pattern.finditer(self.subtitles)
     _matches = property(_get_matches)
+
 
 class TxtSubtitleParser(SubtitleParser):
     _linebreak_re = re.compile(r"\n\n|\r\n\r\n|\r\r")
 
     def __init__(self, subtitles, linebreak_re=_linebreak_re):
         self.subtitles = linebreak_re.split(subtitles)
-        
+
     def __len__(self):
         return len(self.subtitles)
-    
+
     def __nonzero__(self):
-        return bool(self.subtitles)      
-    
+        return bool(self.subtitles)
+
     def _result_iter(self):
         for item in self.subtitles:
             output = {}
             output['start_time'] = -1
             output['end_time'] = -1
-            output['subtitle_text'] = item      
-            yield output  
+            output['subtitle_text'] = item
+            yield output
+
 
 class YoutubeXMLParser(SubtitleParser):
-    
+
     def __init__(self, xml):
         if not isinstance(xml, etree._Element):
             xml = etree.fromstring(xml)
-        
+
         self.xml = xml
         self.subtitles = xml.xpath('text')
 
     def __len__(self):
         return len(self.subtitles)
-    
+
     def __nonzero__(self):
         return bool(self.subtitles)
-    
+
     def _result_iter(self):
         for i, item in enumerate(self.subtitles):
             try:
@@ -214,9 +216,9 @@ class YoutubeXMLParser(SubtitleParser):
 
         output['subtitle_text'] = item.text and unescape_html(item.text) or u''
         return output
-        
+
 class YoutubeSubtitleParser(SubtitleParser):
-    
+
     def __init__(self, data):
         try:
             data = json.loads(data)
@@ -229,14 +231,14 @@ class YoutubeSubtitleParser(SubtitleParser):
             self.language = data['language']
         else:
             self.subtitles = []
-            self.language = None            
-    
+            self.language = None
+
     def __len__(self):
         return len(self.subtitles)
-    
+
     def __nonzero__(self):
         return bool(self.subtitles)
-    
+
     def _result_iter(self):
         for item in self.subtitles:
             yield self._get_data(item)
@@ -247,10 +249,7 @@ class YoutubeSubtitleParser(SubtitleParser):
         output['end_time'] = (item['start_ms'] + item['dur_ms']) / 1000.
         output['subtitle_text'] = item['text']
         return output
- 
-from xml.dom.minidom import parseString
-from xml.parsers.expat import ExpatError
-from django.utils.html import strip_tags
+
 
 class STSubtitleParser(SubtitleParser):
 
@@ -263,16 +262,16 @@ class STSubtitleParser(SubtitleParser):
 
     def __len__(self):
         return len(self.nodes)
-    
+
     def __nonzero__(self):
         return bool(len(self.nodes))
-    
+
     def _get_time(self, val):
         try:
             return int(val) / 1000.
         except ValueError:
             return -1
-    
+
     def _get_data(self, node):
 
         output = {
@@ -282,99 +281,99 @@ class STSubtitleParser(SubtitleParser):
         output['end_time'] = self._get_time(node.getAttribute('end_timestamp'))
 
         return output
-        
+
     def _result_iter(self):
         for item in self.nodes:
             yield self._get_data(item)
-            
+
 class TtmlSubtitleParser(SubtitleParser):
-    
+
     def __init__(self, subtitles):
         try:
             dom = parseString(subtitles.encode('utf8'))
             self.nodes = dom.getElementsByTagName('body')[0].getElementsByTagName('p')
         except (ExpatError, IndexError):
             raise SubtitleParserError('Incorrect format of TTML subtitles')
-        
+
     def __len__(self):
         return len(self.nodes)
-    
+
     def __nonzero__(self):
         return bool(len(self.nodes))
-    
+
     def _get_time(self, begin, dur):
         if not begin or not dur:
             return -1
-        
+
         try:
             hour, min, sec = begin.split(':')
-            
+
             start = int(hour)*60*60 + int(min)*60 + float(sec)
             if start > MAX_SUB_TIME:
                 return -1
-            
+
             d_hour, d_min, d_sec = dur.split(':')
             end = start + int(d_hour)*60*60 + int(d_min)*60 + float(d_sec)
         except ValueError:
             return -1
-        
+
         return start, end
-        
+
     def _get_data(self, node):
         output = {
             'subtitle_text': unescape_html(strip_tags(node.toxml()))
-        }        
+        }
         output['start_time'], output['end_time'] = \
             self._get_time(node.getAttribute('begin'), node.getAttribute('dur'))
         return output
-        
+
     def _result_iter(self):
         for item in self.nodes:
             yield self._get_data(item)
 
 class DfxpSubtitleParser(SubtitleParser):
-    
+
     def __init__(self, subtitles):
         try:
             dom = parseString(subtitles.encode('utf8'))
             self.nodes = dom.getElementsByTagName('body')[0].getElementsByTagName('p')
         except (ExpatError, IndexError):
             raise SubtitleParserError('Incorrect format of TTML subtitles')
-        
+
     def __len__(self):
         return len(self.nodes)
-    
+
     def __nonzero__(self):
         return bool(len(self.nodes))
-    
+
     def _get_time(self, t):
         try:
             hour, min, sec = t.split(':')
-            
+
             start = int(hour)*60*60 + int(min)*60 + float(sec)
             if start > MAX_SUB_TIME:
                 return -1
         except ValueError:
             return -1
-        
+
         return start
-        
+
     def _get_data(self, node):
         output = {
             'subtitle_text': unescape_html(strip_tags(node.toxml()))
-        }        
+        }
         output['start_time'] = self._get_time(node.getAttribute('begin'))
         output['end_time'] = self._get_time(node.getAttribute('end'))
-        
+
         return output
-        
+
     def _result_iter(self):
         for item in self.nodes:
             yield self._get_data(item)
 
 class SrtSubtitleParser(SubtitleParser):
     _clean_pattern = re.compile(r'\{.*?\}', re.DOTALL)
-    
+
     def __init__(self, subtitles):
         pattern = r'\d+\s*?\n'
         pattern += r'(?P<s_hour>\d{2}):(?P<s_min>\d{2}):(?P<s_sec>\d{2})(,(?P<s_secfr>\d*))?'
@@ -385,12 +384,12 @@ class SrtSubtitleParser(SubtitleParser):
         super(SrtSubtitleParser, self).__init__(subtitles, pattern, [re.DOTALL])
         #replace \r\n to \n and fix end of last subtitle
         self.subtitles = self.subtitles.replace('\r\n', '\n')+u'\n\n'
-    
+
     def _get_time(self, hour, min, sec, secfr):
         if secfr is None:
             secfr = '0'
         return int(hour)*60*60+int(min)*60+int(sec)+float('.'+secfr)
-    
+
     def _get_data(self, match):
         r = match.groupdict()
         output = {}
@@ -411,7 +410,7 @@ class SbvSubtitleParser(SrtSubtitleParser):
         super(SrtSubtitleParser, self).__init__(subtitles, pattern, [re.DOTALL])
         #replace \r\n to \n and fix end of last subtitle
         self.subtitles = self.subtitles.replace('\r\n', '\n')+u'\n\n'
-        
+
 class SsaSubtitleParser(SrtSubtitleParser):
     def __init__(self, file):
         pattern = r'Dialogue: [\w=]+,' #Dialogue: <Marked> or <Layer>,
@@ -421,7 +420,7 @@ class SsaSubtitleParser(SrtSubtitleParser):
         pattern += r'[\w ]*,' #<Character name>,
         pattern += r'\d{4},\d{4},\d{4},' #<MarginL>,<MarginR>,<MarginV>,
         pattern += r'[\w ]*,' #<Efect>,
-        pattern += r'(?:\{.*?\})?(?P<text>.+?)\n' #[{<Override control codes>}]<Text> 
+        pattern += r'(?:\{.*?\})?(?P<text>.+?)\n' #[{<Override control codes>}]<Text>
         super(SrtSubtitleParser, self).__init__(file, pattern, [re.DOTALL])
         #replace \r\n to \n and fix end of last subtitle
         self.subtitles = self.subtitles.replace('\r\n', '\n')+u'\n'

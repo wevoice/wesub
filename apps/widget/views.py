@@ -122,9 +122,9 @@ def onsite_widget(request):
         if not 'effectiveVideoURL' in config:
             config['effectiveVideoURL'] = video.get_video_url()
 
-        team_videos = list(video.teamvideo_set.all().select_related('team')[:1])
-        if team_videos:
-            team = team_videos[0].team
+        tv = video.get_team_video()
+        if tv:
+            team = tv.team
 
             config['guidelines'] = dict(
                     [(s.key_name.split('_', 1)[-1],
@@ -235,7 +235,7 @@ def save_emailed_translations(request):
         user = CustomUser.objects.get(pk=request.POST['user_pk'])
         subs = json.loads(request.POST['sub_text'])
         rpc_views.save_finished(user, session, subs)
-        return redirect(session.language.video.video_link())
+        return redirect(reverse('videos:history', [session.language.video.video_id]))
 
 def base_widget_params(request, extra_params={}):
     params = {}

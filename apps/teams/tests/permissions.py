@@ -55,7 +55,7 @@ def _set_subtitles(team_video, language, original, complete, translations=[]):
 class BaseTestPermission(TestCase):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
-        self.team  = Team.objects.all()[0]
+        self.team = Team.objects.get(pk=1)
         self.team.video_policy = Team.VP_MANAGER
         self.video = self.team.videos.all()[0]
 
@@ -344,11 +344,10 @@ class TestRules(BaseTestPermission):
     def test_can_delete_video(self):
         user, team = self.user, self.team
 
-
-        for r in [ ROLE_ADMIN, ROLE_OWNER]:
+        for r in [ROLE_OWNER]:
             with self.role(r):
                 self.assertTrue(can_delete_video(self.nonproject_video, user))
-        for r in [ ROLE_MANAGER, ROLE_CONTRIBUTOR]:
+        for r in [ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR]:
             with self.role(r):
                 self.assertFalse(can_delete_video(self.nonproject_video, user))
 

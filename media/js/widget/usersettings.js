@@ -26,7 +26,8 @@ unisubs.UserSettings = {};
 
 unisubs.UserSettings.Settings = {
     SKIP_HOWTO_VIDEO: 'skiphowto',
-    VIDEO_SPEED_MODE: 'videospeedmode'
+    VIDEO_SPEED_MODE: 'videospeedmode',
+    ALWAYS_SKIP_GUIDELINES: 'skipguidelines'
 };
 
 unisubs.UserSettings.setBooleanValue = function(setting, value) {

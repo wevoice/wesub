@@ -126,7 +126,8 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
                      'assignee__last_name', 'team_video__title',
                      'team_video__video__title')
-    raw_id_fields = ('team_video', 'team', 'assignee', 'subtitle_version')
+    raw_id_fields = ('team_video', 'team', 'assignee', 'subtitle_version',
+                     'review_base_version')
     ordering = ('-created',)
 
     def is_complete(self, o):

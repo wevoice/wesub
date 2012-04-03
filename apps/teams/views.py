@@ -42,11 +42,11 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm
+    UnpublishForm, MoveTeamVideoForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference
+    Setting, TeamLanguagePreference, autocreate_tasks
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -54,7 +54,7 @@ from teams.permissions import (
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
     can_perform_task_for, can_delete_team, can_review, can_approve,
-    can_delete_video,
+    can_delete_video, can_remove_video
 )
 from teams.search_indexes import TeamVideoLanguagesIndex
 from teams.signals import api_teamvideo_new
@@ -71,7 +71,7 @@ from videos import metadata_manager
 from videos.tasks import (
     _update_captions_in_original_service, _delete_captions_in_original_service
 )
-from videos.models import Action, VideoUrl, SubtitleLanguage
+from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 
@@ -169,7 +169,7 @@ def detail(request, slug, project_slug=None, languages=None):
              language, user=request.user, project=project, query=query, sort=sort)
     else:
         qs = team.get_videos_for_languages_haystack(
-             num_completed_subs=0, user=request.user, project=project, query=query, sort=sort)
+             num_completed_langs=0, user=request.user, project=project, query=query, sort=sort)
 
     extra_context = widget.add_onsite_js_files({})
 
@@ -312,18 +312,18 @@ def create(request):
             messages.success(request, _("""
                 Your team has been created. Here are some next steps:
                 <ul>
-                    <li><a href="%s">Edit team members' permissions</a></li>
-                    <li><a href="%s">Activate and customize workflows for your team</a></li>
-                    <li><a href="%s">Create and customize projects</a></li>
-                    <li><a href="%s">Edit language preferences</a></li>
-                    <li><a href="%s">Customize instructions to caption makers and translators</a></li>
+                    <li><a href="%(edit)s">Edit team members' permissions</a></li>
+                    <li><a href="%(activate)s">Activate and customize workflows for your team</a></li>
+                    <li><a href="%(create)s">Create and customize projects</a></li>
+                    <li><a href="%(lang)s">Edit language preferences</a></li>
+                    <li><a href="%(custom)s">Customize instructions to caption makers and translators</a></li>
                 </ul>
-                """ % (
-                    reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
-                    reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
-                    reverse("teams:settings_projects", kwargs={"slug": team.slug}),
-                    reverse("teams:settings_languages", kwargs={"slug": team.slug}),
-                    reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
+                """ % dict(
+                    edit=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                    activate=reverse("teams:settings_permissions", kwargs={"slug": team.slug}),
+                    create=reverse("teams:settings_projects", kwargs={"slug": team.slug}),
+                    lang=reverse("teams:settings_languages", kwargs={"slug": team.slug}),
+                    custom=reverse("teams:settings_guidelines", kwargs={"slug": team.slug}),
                 )))
             return redirect(reverse("teams:settings_basic", kwargs={"slug":team.slug}))
     else:
@@ -451,7 +451,6 @@ def settings_projects(request, slug):
 
     return { 'team': team, 'projects': projects, }
 
-
 def _set_languages(team, codes_preferred, codes_blacklisted):
     tlps = TeamLanguagePreference.objects.for_team(team)
 
@@ -562,6 +561,55 @@ def add_video(request, slug):
         'team': team
     }
 
+@login_required
+def move_video(request):
+    form = MoveTeamVideoForm(request.user, request.POST)
+
+    if form.is_valid():
+        team_video = form.cleaned_data['team_video']
+        team = form.cleaned_data['team']
+
+        # For now, we'll just delete any tasks associated with the moved video.
+        team_video.task_set.update(deleted=True)
+
+        # We move the video by just switching the team, instead of deleting and
+        # recreating it.
+        team_video.team = team
+
+        # projects are always team dependent:
+        team_video.project = team.default_project
+        team_video.save()
+
+        # We need to make any as-yet-unmoderated versions public.
+        # TODO: Dedupe this and the team video delete signal.
+        video = team_video.video
+
+        SubtitleVersion.objects.filter(language__video=video).update(
+            moderation_status=MODERATION.UNMODERATED)
+
+        video.is_public = True
+        video.moderated_by = None
+        video.save()
+
+        # Update all Solr data.
+        metadata_manager.update_metadata(video.pk)
+        video.update_search_index()
+        update_one_team_video(team_video.pk)
+
+        # Create any necessary tasks.
+        autocreate_tasks(team_video)
+
+        if video.policy and video.policy.belongs_to_team:
+            video.policy.object_id = team.pk
+            video.policy.save(updates_metadata=False)
+
+        messages.success(request, _(u'The video has been moved to the new team.'))
+    else:
+        for e in flatten_errorlists(form.errors):
+            messages.error(request, e)
+
+    return HttpResponseRedirect(request.POST.get('next', '/'))
+
 @render_to('teams/add_videos.html')
 @login_required
 def add_videos(request, slug):
@@ -613,34 +661,43 @@ def team_video(request, team_video_pk):
 @render_to_json
 @login_required
 def remove_video(request, team_video_pk):
-    team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
-
-    if request.method != 'POST':
-        error = _(u'Request must be a POST request.')
-
-        if request.is_ajax():
-            return { 'success': False, 'error': error }
-        else:
-            messages.error(request, error)
-            return HttpResponseRedirect(reverse('teams:user_teams'))
-
-    next = request.POST.get('next', reverse('teams:user_teams'))
-
-    if not can_add_video(team_video.team, request.user, team_video.project):
-        error = _(u'You can\'t remove that video.')
-
+    def _error_resp(request, next, error):
         if request.is_ajax():
             return { 'success': False, 'error': error }
         else:
             messages.error(request, error)
             return HttpResponseRedirect(next)
 
+    team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
+
+    if request.method != 'POST':
+        return _error_resp(request, reverse('teams:user_teams'),
+                           _(u'Request must be a POST request.'))
+
+    next = request.POST.get('next', reverse('teams:user_teams'))
+    wants_delete = request.POST.get('del-opt') == 'total-destruction'
+
+    if wants_delete:
+        if not can_delete_video(team_video, request.user):
+            return _error_resp(request, next,
+                               _(u"You can't delete that video."))
+    else:
+        if not can_remove_video(team_video, request.user):
+            return _error_resp(request, next,
+                               _(u"You can't remove that video."))
+
     for task in team_video.task_set.all():
         task.delete()
 
+    video = team_video.video
+
     team_video.delete()
 
-    msg = _(u'Video has been removed from the team.')
+    if wants_delete:
+        video.delete()
+        msg = _(u'Video has been deleted from Universal Subtitles.')
+    else:
+        msg = _(u'Video has been removed from the team.')
 
     if request.is_ajax():
         return { 'success': True }
@@ -790,7 +847,6 @@ def deny_application(request, slug, user_pk):
 
     return redirect('teams:applications', team.pk)
 
-
 @render_to('teams/invite_members.html')
 @login_required
 def invite_members(request, slug):
@@ -895,7 +951,6 @@ def highlight(request, slug, highlight=True):
     item.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-
 def _member_search_result(member, team, task_id, team_video_id, task_type, task_lang):
     result = [member.user.id, u'%s (%s)' % (member.user, member.user.username)]
 
@@ -961,7 +1016,6 @@ def _get_or_create_workflow(team_slug, project_id, team_video_id):
         workflow = Workflow(team=team, project=project, team_video=team_video)
 
     return workflow
-
 
 def _task_languages(team, user):
     languages = filter(None, Task.objects.filter(team=team, deleted=False)
@@ -1066,12 +1120,17 @@ def _order_tasks(request, tasks):
     elif sort == '-created':
         tasks = tasks.order_by('-created')
     elif sort == 'expires':
-        tasks = tasks.order_by('expiration_date')
+        # Unfortunately, MySQL puts NULL records to the top, here.
+        # In this sorting instance, we convert the two querysets to
+        # lists and combine them, forcing the NULL records to the bottom.
+        # Alternative would be to write custom SQL to drop the NULLs.
+        null_expirations = tasks.filter(expiration_date=None)
+        has_expirations = tasks.exclude(expiration_date=None)
+        tasks = list(has_expirations.order_by('expiration_date')) + list(null_expirations)
     elif sort == '-expires':
         tasks = tasks.order_by('-expiration_date')
 
     return tasks
-
 
 def _get_task_filters(request):
     return { 'language': request.GET.get('lang'),
@@ -1079,7 +1138,6 @@ def _get_task_filters(request):
              'team_video': request.GET.get('team_video'),
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
-
 
 @render_to('teams/tasks.html')
 def team_tasks(request, slug, project_slug=None):
@@ -1255,7 +1313,7 @@ def delete_task(request, slug):
 
             if task.get_type_display() in ['Review', 'Approve']:
                 # TODO: Handle subtitle/translate tasks here too?
-                if not form.cleaned_data['discard_subs']:
+                if not form.cleaned_data['discard_subs'] and task.subtitle_version:
                     task.subtitle_version.moderation_status = MODERATION.APPROVED
                     task.subtitle_version.save()
                     metadata_manager.update_metadata(video.pk)
@@ -1268,7 +1326,6 @@ def delete_task(request, slug):
 
     return HttpResponseRedirect(next)
 
-
 def assign_task(request, slug):
     '''Assign a task to the given user, or unassign it if null/None.'''
     team = get_object_or_404(Team, slug=slug)
@@ -1279,12 +1336,20 @@ def assign_task(request, slug):
         task = form.cleaned_data['task']
         assignee = form.cleaned_data['assignee']
 
+        if task.assignee == request.user:
+            was_mine = True
+        else:
+            was_mine = False
+
         task.assignee = assignee
         task.set_expiration()
         task.save()
         notifier.team_task_assigned.delay(task.pk)
 
-        messages.success(request, _('Task assigned.'))
+        if task.assignee is None and was_mine:
+            messages.success(request, _('Task declined.'))
+        else:
+            messages.success(request, _('Task assigned.'))
     else:
         messages.error(request, _('You cannot assign this task.'))
 
@@ -1378,7 +1443,10 @@ def edit_project(request, slug, project_slug):
             form = ProjectForm(request.POST, instance=project)
             workflow_form = WorkflowForm(request.POST, instance=workflow)
 
-            if form.is_valid() and workflow_form.is_valid():
+            # if the project doesn't have workflow enabled, the workflow form
+            # is going to fail to validate (workflow is None)
+            # there's probably a better way of doing this...
+            if form.is_valid() and workflow_form.is_valid if project.workflow_enabled else form.is_valid():
                 form.save()
 
                 if project.workflow_enabled:
@@ -1389,6 +1457,7 @@ def edit_project(request, slug, project_slug):
 
                 messages.success(request, _(u'Project saved.'))
                 return HttpResponseRedirect(project_list_url)
+
     else:
         form = ProjectForm(instance=project)
         workflow_form = WorkflowForm(instance=workflow)
@@ -1418,12 +1487,9 @@ def _create_task_after_unpublishing(subtitle_version):
     team_video = subtitle_version.language.video.get_team_video()
     lang = subtitle_version.language.language
 
-    # If there's already an open review/approval task for this language, it
-    # means we just unpublished multiple versions in a row and can ignore this.
-    open_task_exists = (
-            team_video.task_set.incomplete_review().filter(language=lang).exists()
-         or team_video.task_set.incomplete_approve().filter(language=lang).exists()
-    )
+    # If there's already an open task for this language we don't need another.
+    open_task_exists = team_video.task_set.incomplete().filter(language=lang).exists()
+
     if open_task_exists:
         return None
 
@@ -1451,7 +1517,6 @@ def _create_task_after_unpublishing(subtitle_version):
     task.save()
 
     return task
-
 
 def _propagate_unpublish_to_external_services(language_pk):
     """Push the 'unpublishing' of subs to third-party providers for the given language.
@@ -1513,7 +1578,6 @@ def _propagate_unpublish_to_tasks(team_video, language_pk, language_code):
 
     tasks_to_delete.update(deleted=True)
 
-
 def unpublish(request, slug):
     team = get_object_or_404(Team, slug=slug)
 
@@ -1554,49 +1618,6 @@ def unpublish(request, slug):
 
     messages.success(request, _(u'Successfully unpublished subtitles.'))
     return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
-
-
-@login_required
-def delete_video(request, team_video_pk):
-    """
-    Not only deletes the team video but actually deletes the original
-    video, be very careful!
-    """
-    if request.method != 'POST':
-        error = _(u'Request must be a POST request.')
-
-        if request.is_ajax():
-            return { 'success': False, 'error': error }
-        else:
-            messages.error(request, error)
-            return HttpResponseForbidden(reverse('teams:user_teams'))
-
-    next = request.POST.get('next', reverse('teams:user_teams'))
-
-    team_video = get_object_or_404(TeamVideo, pk=team_video_pk)
-    if not can_delete_video(team_video, request.user):
-        error = _(u'You can\'t remove that video.')
-
-        if request.is_ajax():
-            return { 'success': False, 'error': error }
-        else:
-            messages.error(request, error)
-            return HttpResponseForbidden(next)
-
-    for task in team_video.task_set.all():
-        task.delete()
-
-    video = team_video.video
-    team_video.delete()
-    video.delete()
-    msg = _(u'Video has been deleted')
-
-    if request.is_ajax():
-        return { 'success': True }
-    else:
-        messages.success(request, msg)
-        return HttpResponseRedirect(next)
-
 
 @login_required
 def auto_captions_status(request, slug):

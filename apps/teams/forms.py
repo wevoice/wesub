@@ -21,12 +21,12 @@ from django import forms
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-
+from django.core.files.base import ContentFile
 from auth.models import CustomUser as User
 from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
-    can_assign_task, can_unpublish_subs
+    can_assign_task, can_unpublish_subs, can_remove_video
 )
 from teams.permissions_const import ROLE_NAMES
 from utils.forms import ErrorableModelForm
@@ -34,7 +34,8 @@ from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.translation import get_language_choices
 from utils.validators import MaxFileSizeValidator
 from videos.forms import AddFromFeedForm
-from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion
+from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion, Video
+from videos.search_indexes import VideoIndex
 
 
 class EditTeamVideoForm(forms.ModelForm):
@@ -59,9 +60,8 @@ class EditTeamVideoForm(forms.ModelForm):
 
         super(EditTeamVideoForm, self).__init__(*args, **kwargs)
 
-
         self.fields['project'].queryset = self.instance.team.project_set.all()
-        
+
     def clean(self, *args, **kwargs):
         super(EditTeamVideoForm, self).clean(*args, **kwargs)
 
@@ -77,8 +77,15 @@ class EditTeamVideoForm(forms.ModelForm):
 
         self._save_metadata(video, 'Author', author)
         self._save_metadata(video, 'Creation Date', creation_date)
+        # store the uploaded thumb on the video itself
+        # TODO: simply remove the teamvideo.thumbnail image
+        if obj.thumbnail:
+            content = ContentFile(obj.thumbnail.read())
+            name = obj.thumbnail.url.split('/')[-1]
+            video.s3_thumbnail.save(name, content)
+            VideoIndex(Video).update_object(video)
 
-    def _save_metadata(self, video, meta, content):
+    def _save_metadata(self, video, meta, data):
         '''Save a single piece of metadata for the given video.
 
         The metadata is only saved if necessary (i.e. it's not blank OR it's blank
@@ -88,13 +95,41 @@ class EditTeamVideoForm(forms.ModelForm):
         meta_type_id = VIDEO_META_TYPE_IDS[meta]
 
         try:
-            meta = VideoMetadata.objects.get(video=video, metadata_type=meta_type_id)
-            meta.content = content
+            meta = VideoMetadata.objects.get(video=video, key=meta_type_id)
+            meta.data = data
             meta.save()
         except VideoMetadata.DoesNotExist:
-            if content:
-                VideoMetadata(video=video, metadata_type=meta_type_id,
-                              content=content).save()
+            if data:
+                VideoMetadata(video=video, key=meta_type_id, data=data).save()
+
+class MoveTeamVideoForm(forms.Form):
+    team_video = forms.ModelChoiceField(queryset=TeamVideo.objects.all(),
+                                        required=True)
+    team = forms.ModelChoiceField(queryset=Team.objects.all(),
+                                  required=True)
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(MoveTeamVideoForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        team_video = self.cleaned_data.get('team_video')
+        team = self.cleaned_data.get('team')
+
+        if not team_video or not team:
+            return
+
+        if team_video.team.pk == team.pk:
+            raise forms.ValidationError(u"That video is already in that team.")
+
+        if not can_add_video(team, self.user):
+            raise forms.ValidationError(u"You can't add videos to that team.")
+
+        if not can_remove_video(team_video, self.user):
+            raise forms.ValidationError(u"You can't remove that video from its team.")
+
+        return self.cleaned_data
+
 
 class BaseVideoBoundForm(forms.ModelForm):
     video_url = UniSubBoundVideoField(label=_('Video URL'), verify_exists=True,
@@ -380,9 +415,20 @@ class TaskAssignForm(forms.Form):
         assignee = self.cleaned_data.get('assignee', -1)
 
         if assignee != -1:
-            if not can_assign_task(task, self.user) and self.user != assignee:
-                raise forms.ValidationError(_(
-                    u'You do not have permission to assign this task.'))
+            # There are a bunch of edge cases here that we need to check.
+            unassigning_from_self      = (not assignee) and task.assignee.id == self.user.id
+            assigning_to_self          = assignee and self.user.id == assignee.id
+            can_assign_to_other_people = can_assign_task(task, self.user)
+
+            # Users can always unassign a task from themselves.
+            if not unassigning_from_self:
+                # They can also assign a task TO themselves, assuming they can
+                # perform it (which is checked further down).
+                if not assigning_to_self:
+                    # Otherwise they must have assign permissions in the team.
+                    if not can_assign_to_other_people:
+                        raise forms.ValidationError(_(
+                            u'You do not have permission to assign this task.'))
 
             if assignee is None:
                 return self.cleaned_data

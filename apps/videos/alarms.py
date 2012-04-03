@@ -24,38 +24,6 @@ def send_alarm_email(version, type):
         send_mail(subject, message, from_email=settings.SERVER_EMAIL, recipient_list=ALARM_EMAIL,
                   fail_silently=True)
 
-
-def check_subtitle_version(version):
-    if not ALARM_EMAIL:
-        return
-
-    prev_version = version.prev_version()
-
-    if not prev_version:
-        return
-    
-    ###########################
-    cur_ver_len = version.subtitle_set.count()
-    prev_ver_len = prev_version.subtitle_set.count()
-
-    if prev_ver_len == 0:
-        return 
-     
-    if (float(cur_ver_len) / prev_ver_len) <= 0.7:
-        send_alarm_email(version, u'A translation loses more than 30% of its lines')
-    
-    ############################
-    cur_ver_len = version.subtitle_set.filter(Q(start_time__isnull=False), \
-                                               Q(end_time__isnull=False)).count()
-    prev_ver_len = prev_version.subtitle_set.filter(Q(start_time__isnull=False), \
-                                               Q(end_time__isnull=False)).count()    
-    
-    if prev_ver_len == 0:
-        return
-    
-    if (float(cur_ver_len) / prev_ver_len) <= 0.7:
-        send_alarm_email(version, u'A translation loses more than 30% of its syncing information')
-
 def check_other_languages_changes(version, ignore_statistic=False):
     if not ALARM_EMAIL:
         return

@@ -79,13 +79,25 @@ def send_new_message_notification(message_id):
     }
     send_templated_email(user, subject, "messages/email/message_received.html", context)
 
+
 @task()
 def team_invitation_sent(invite_pk):
     from messages.models import Message
-    from teams.models import Invite, Setting
+    from teams.models import Invite, Setting, TeamMember
     invite = Invite.objects.get(pk=invite_pk)
-    team_default_message = get_object_or_none(Setting, team=invite.team,
-                                     key=Setting.KEY_IDS['messages_invite'])
+    # does this team have a custom message for this?
+    team_default_message = None
+    messages = Setting.objects.messages().filter(team=invite.team)
+    if messages.exists():
+        data = {}
+        for m in messages:
+            data[m.get_key_display()] = m.data
+        mapping = {
+            TeamMember.ROLE_ADMIN: data['messages_admin'],
+            TeamMember.ROLE_MANAGER: data['messages_manager'],
+            TeamMember.ROLE_CONTRIBUTOR: data['messages_invite'],
+        }
+        team_default_message = mapping.get(invite.role, None)
     context = {
         'invite': invite,
         'role': invite.role,
@@ -94,10 +106,11 @@ def team_invitation_sent(invite_pk):
         "team": invite.team,
         "invite_pk": invite_pk,
         'note': invite.note,
-        'team_default_message': team_default_message,
+        'custom_message': team_default_message,
         'url_base': get_url_base(),
     }
     title = ugettext(u"You've been invited to team %s on Universal Subtitles" % invite.team.name)
+    
     if invite.user.notify_by_message:
         body = render_to_string("messages/team-you-have-been-invited.txt", context)
         msg = Message()
@@ -130,7 +143,7 @@ def application_sent(application_pk):
             "user":m.user,
         }
         body = render_to_string(template_name,context)
-        subject  = ugettext(u'%s is applying for team %s') % (application.user, application.team.name)
+        subject  = ugettext(u'%(user)s is applying for team %(team)s') % dict(user=application.user, team=application.team.name)
         if m.user.notify_by_message:
             msg = Message()
             msg.subject = subject
@@ -240,7 +253,7 @@ def team_member_leave(team_pk, user_pk):
     # notify  admins and owners through messages
     notifiable = TeamMember.objects.filter( team=team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
-    subject = ugettext(u"%s has left the %s team" % (user, team))
+    subject = ugettext(u"%(user)s has left the %(team)s team" % dict(user=user, team=team))
     for m in notifiable:
         context = {
             "parting_member": user,
@@ -293,6 +306,27 @@ def email_confirmed(user_pk):
     template_name = "messages/email/email-confirmed.html"
     send_templated_email(user, subject, template_name, context )
     return True
+
+@task()
+def videos_imported_message(user_pk, imported_videos):
+    from messages.models import Message
+    user = User.objects.get(pk=user_pk)
+    subject = _(u"Your videos were imported!")
+    url = "%s%s" % (get_url_base(), reverse("profiles:my_videos"))
+    context = {"user": user, 
+               "imported_videos": imported_videos,
+               "my_videos_url": url}
+
+    if user.notify_by_message:
+        body = render_to_string("messages/videos-imported.txt", context)
+        message  = Message(
+            user=user,
+            subject=subject,
+            content=body
+        )
+        message.save()
+    template_name = "messages/email/videos-imported.html"
+    send_templated_email(user, subject, template_name, context)
 
 @task()
 def team_task_assigned(task_pk):
@@ -359,6 +393,12 @@ def _reviewed_notification(task_pk, status):
     reviewer_message_url = "%s%s?user=%s" % (
         get_url_base(), reverse("messages:new"), reviewer.username)
 
+    reviewer_profile_url = "%s%s" % (get_url_base(), reverse("profiles:profile", kwargs={'user_id': reviewer.id}))
+    perform_task_url = "%s%s" % (get_url_base(), reverse("teams:perform_task", kwargs={
+        'slug': task.team.slug,
+        'task_pk': task_pk
+    }))
+
     context = {
         "team":task.team,
         "title": task.subtitle_version.language.get_title(),
@@ -373,6 +413,8 @@ def _reviewed_notification(task_pk, status):
         "reviewed_and_published": status == REVIEWED_AND_PUBLISHED,
         "subs_url": subs_url,
         "reviewer_message_url": reviewer_message_url,
+        "reviewer_profile_url": reviewer_profile_url,
+        "perform_task_url": perform_task_url,
     }
     if user.notify_by_message:
         template_name = "messages/team-task-reviewed.txt"

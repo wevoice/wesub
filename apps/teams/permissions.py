@@ -312,6 +312,16 @@ def can_rename_team(team, user):
     role = get_role_for_target(user, team)
     return role == ROLE_OWNER
 
+def can_request_auto_transcription(team, user):
+    """Return whether the given user can request for third parties
+    to transcribe team  video.
+
+    Only team owners can request transcriptions.
+
+    """
+    role = get_role_for_target(user, team)
+    return role == ROLE_OWNER
+
 def can_delete_team(team, user):
     """Return whether the given user can delete the given team.
 
@@ -342,7 +352,7 @@ def can_add_video_somewhere(team, user):
                for project in team.project_set.all())
 
 def can_remove_video(team_video, user):
-    """Return whether the given user can remove the given video."""
+    """Return whether the given user can remove the given team video."""
 
     role = get_role_for_target(user, team_video.team, team_video.project)
 
@@ -355,13 +365,22 @@ def can_remove_video(team_video, user):
     return role in _perms_equal_or_greater(role_required)
 
 def can_delete_video(team_video, user):
-    """
-    Returns whether the give user can delete the original video
-    and all of it's data.
-    """
-    role = get_role_for_target(user, team_video.team)
+    """Returns whether the give user can delete a team video from unisubs entirely.
 
-    return role in [ROLE_ADMIN, ROLE_OWNER]
+    Currently only team owners have this permission.
+
+    """
+    return can_delete_video_in_team(team_video.team, user)
+
+def can_delete_video_in_team(team, user):
+    """Returns whether the give user can delete a team video from unisubs entirely.
+
+    Currently only team owners have this permission.
+
+    """
+    role = get_role_for_target(user, team)
+
+    return role in [ROLE_OWNER]
 
 def can_edit_video(team_video, user):
     """Return whether the given user can edit the given video."""
@@ -618,6 +637,24 @@ def can_perform_task_for(user, type, team_video, language):
 def can_perform_task(user, task):
     """Return whether the given user can perform the given task."""
 
+    # Hacky check to account for the following case:
+    #
+    # * Reviewer A is reviewing v1 of subs by user B.
+    # * A makes some changes and saves for later, resulting in v2 by A.
+    # * The review task now points at v2, which is authored by A, which means
+    #   that A is now trying to review their own subs, which is not allowed.
+    #
+    # For now we're just special-casing this and saying that someone can perform
+    # a review of their own subs if they're already assigned to the task.
+    #
+    # This doesn't handle all the possible edge cases, but it's good enough for
+    # right now.
+    #
+    # TODO: Remove this hack once we get the "origin" of versions in place.
+    if task.get_type_display() in ['Review', 'Approve']:
+        if task.assignee == user:
+            return True
+
     return can_perform_task_for(user, task.type, task.team_video, task.language)
 
 def can_assign_task(task, user):
@@ -631,8 +668,17 @@ def can_assign_task(task, user):
     """
     team, project, lang = task.team, task.team_video.project, task.language
 
-
     return can_assign_tasks(team, user, project, lang) and can_perform_task(user, task)
+
+def can_decline_task(task, user):
+    """Return whether the given user can decline the given task.
+
+    Users can decline tasks iff:
+
+    * The task is assigned to them.
+
+    """
+    return task.assignee and task.assignee == user
 
 def can_delete_task(task, user):
     """Return whether the given user can delete the given task."""

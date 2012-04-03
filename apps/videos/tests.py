@@ -16,29 +16,51 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-
+import feedparser
 import json
-
-from django.test import TestCase
-from videos.models import Video, Action, VIDEO_TYPE_YOUTUBE, UserTestResult, \
-    SubtitleLanguage, VideoUrl, VideoFeed, Subtitle
-from apps.auth.models import CustomUser as User
-from utils import SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
-from django.core.urlresolvers import reverse
-from django.core import mail
-from videos.forms import SubtitlesUploadForm, VideoForm
-from videos.tasks import video_changed_tasks
-from apps.videos import metadata_manager
-from apps.widget import video_cache
-import math_captcha
 import os
-from django.db.models import ObjectDoesNotExist, Q
-from django.core.management import call_command
+from datetime import datetime
+from StringIO import StringIO
+
+import math_captcha
+from django.conf import settings
 from django.core import mail
-from videos.rpc import VideosApiClass
-from widget.tests import RequestMockup
-from widget.srt_subs import SRTSubtitles
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.db.models import ObjectDoesNotExist
+from django.test import TestCase
+
+from apps.auth.models import CustomUser as User
+from testhelpers.views import _create_videos
+from utils import SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
+from videos import metadata_manager, alarms
+from videos.feed_parser import FeedParser
+from videos.forms import VideoForm
+from videos.models import (
+    Video, Action, VIDEO_TYPE_YOUTUBE, UserTestResult, SubtitleLanguage,
+    VideoUrl, VideoFeed, Subtitle, SubtitleVersion, VIDEO_TYPE_HTML5,
+    VIDEO_TYPE_BRIGHTCOVE
+)
+from videos.rpc import VideosApiClass
+from videos.share_utils import _make_email_url
+from videos.tasks import video_changed_tasks, send_change_title_email
+from videos.types import video_type_registrar, VideoTypeError
+from videos.types.base import VideoType, VideoTypeRegistrar
+from videos.types.bliptv import BlipTvVideoType
+from videos.types.brigthcove  import BrightcoveVideoType
+from videos.types.dailymotion import DailymotionVideoType
+from videos.types.flv import FLVVideoType
+from videos.types.htmlfive import HtmlFiveVideoType
+from videos.types.mp3 import Mp3VideoType
+from videos.types.vimeo import VimeoVideoType
+from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
+from vidscraper.sites import blip
+from widget import video_cache
+from widget.rpc import Rpc
+from widget.tests import (
+    create_two_sub_dependent_session, create_two_sub_session, RequestMockup,
+    NotAuthenticatedUser
+)
 
 
 math_captcha.forms.math_clean = lambda form: None
@@ -152,8 +174,7 @@ And, sub 3.
 
 class GenericTest(TestCase):
     def test_languages(self):
-        from settings import ALL_LANGUAGES
-        langs = [l[1] for l in ALL_LANGUAGES]
+        langs = [l[1] for l in settings.ALL_LANGUAGES]
         langs_set = set(langs)
         self.assertEqual(len(langs), len(langs_set))
 
@@ -173,7 +194,6 @@ class BusinessLogicTest(TestCase):
         we should have french on v2 as a dependent language of en
         addign a sub to en should make french have that sub as well
         """
-        from apps.testhelpers.views import _create_videos
         data = {
             "url": "http://www.example.com/sdf.mp4",
             "langs": [
@@ -194,7 +214,7 @@ class BusinessLogicTest(TestCase):
 
             "title": "c" }
 
-        videos = _create_videos([data], [])
+        _create_videos([data], [])
         v = Video.objects.get(title='c')
 
         en = v.subtitle_language('en')
@@ -207,16 +227,7 @@ class BusinessLogicTest(TestCase):
             self.assertEqual(ens.end_time, frs.end_time)
         self.assertFalse(fr.is_forked)
         # now, for on uploade
-        d = {
-            'language': fr.language,
-            'video_language': 'en',
-            'video': v.pk,
-            'subtitles': open(os.path.join(os.path.dirname(__file__), 'fixtures/test.srt')),
-            'is_complete': True
-            }
         self.client.login(**self.auth)
-        from widget.rpc import Rpc
-        from widget.tests import RequestMockup, NotAuthenticatedUser
 
         rpc = Rpc()
         request = RequestMockup(user=self.user)
@@ -234,7 +245,7 @@ class BusinessLogicTest(TestCase):
                      'end_time': 3.4,
                      'sub_order': 4.0}]
         rpc.finished_subtitles(request, session_pk, inserted, forked=True);
-       #
+
         fr = refresh_obj(fr)
         self.assertEquals(fr.subtitleversion_set.all().count(), 2)
         self.assertTrue(fr.is_forked)
@@ -258,7 +269,6 @@ class BusinessLogicTest(TestCase):
 
 
 class SubtitleParserTest(TestCase):
-
     def _assert_sub(self, sub, start_time, end_time, sub_text):
         self.assertEqual(sub['start_time'], start_time)
         self.assertEqual(sub['end_time'], end_time)
@@ -350,7 +360,7 @@ class SubtitleParserTest(TestCase):
         self._assert_sub(
             result[1], 14.1, 16,
             u'd’avoir organisé cette réunion.')
-        self._assert_sub(                       
+        self._assert_sub(
             result[2], 16.1, 19.9,
             u'Ils ont eu raison, non seulement \nà cause de la célébrité de Richard')
 
@@ -370,11 +380,9 @@ class WebUseTest(TestCase):
         self.client.login(**self.auth)
 
 class UploadSubtitlesTest(WebUseTest):
-
     fixtures = ['test.json']
 
     def _make_data(self, lang='ru', video_pk=None):
-        import os
         if video_pk is None:
             video_pk = self.video.id
         return {
@@ -387,7 +395,6 @@ class UploadSubtitlesTest(WebUseTest):
 
 
     def _make_altered_data(self, video=None, language_code='ru', subs_filename='test_altered.srt'):
-        import os
         video = video or self.video
         return {
             'language': language_code,
@@ -427,12 +434,12 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertTrue(language.has_version)
         self.assertTrue(language.had_version)
         self.assertEqual(language.is_complete, data['is_complete'])
-# FIXME: why should these be false?
-#        self.assertFalse(video.is_subtitled)
-#        self.assertFalse(video.was_subtitled)
+        # FIXME: why should these be false?
+        # self.assertFalse(video.is_subtitled)
+        # self.assertFalse(video.was_subtitled)
         metadata_manager.update_metadata(video.pk)
         language = refresh_obj(language)
-        # two of the test srts end up being empty, so the subtitle_count 
+        # two of the test srts end up being empty, so the subtitle_count
         # should be real
         self.assertEquals(30, language.subtitle_count)
         self.assertEquals(0, language.percent_done)
@@ -500,12 +507,10 @@ class UploadSubtitlesTest(WebUseTest):
 
     def test_upload_over_translated(self):
         # for https://www.pivotaltracker.com/story/show/11804745
-        from widget.tests import create_two_sub_dependent_session, RequestMockup
         request = RequestMockup(User.objects.all()[0])
         session = create_two_sub_dependent_session(request)
         video_pk = session.language.video.pk
         video = Video.objects.get(pk=video_pk)
-        original_en = video.subtitlelanguage_set.filter(language='en').all()[0]
 
         self._login()
         data = self._make_data(lang='en', video_pk=video_pk)
@@ -516,7 +521,6 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertEqual(2, video.subtitlelanguage_set.count())
 
     def test_upload_over_empty_translated(self):
-        from widget.tests import create_two_sub_session, RequestMockup
         request = RequestMockup(User.objects.all()[0])
         session = create_two_sub_session(request)
         video_pk = session.language.video.pk
@@ -539,15 +543,12 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertEqual(response.status_code, 200)
 
     def test_upload_forks(self):
-        from widget.tests import create_two_sub_dependent_session, RequestMockup
         request = RequestMockup(User.objects.all()[0])
         session = create_two_sub_dependent_session(request)
         video = session.video
         translated = video.subtitlelanguage_set.all().filter(language='es')[0]
         self.assertFalse(translated.is_forked)
         self.assertEquals(False, translated.latest_version(public_only=True).is_forked)
-
-        trans_subs = translated.version().subtitle_set.all()
 
         self._login()
         data = self._make_data(lang='en', video_pk=video.pk)
@@ -571,6 +572,7 @@ class UploadSubtitlesTest(WebUseTest):
             self.assertTrue(bool(new_sub.end_time))
             self.assertTrue(old_sub.start_time is None)
             self.assertTrue(old_sub.end_time is None)
+
         # now change the translated
         sub_0= original_subs[1]
         sub_0.start_time = 1.0
@@ -579,7 +581,6 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertNotEqual(sub_0.start_time , original_subs[0].start_time)
 
     def test_upload_respects_lock(self):
-        from widget.tests import create_two_sub_dependent_session, RequestMockup
         request = RequestMockup(User.objects.all()[0])
         session = create_two_sub_dependent_session(request)
         video = session.video
@@ -598,7 +599,6 @@ class UploadSubtitlesTest(WebUseTest):
     def test_translations_get_order_after_fork(self):
           # we create en -> es
           # new es has no time data, but does have order
-          from widget.tests import create_two_sub_dependent_session, RequestMockup
           request = RequestMockup(User.objects.all()[0])
           session = create_two_sub_dependent_session(request)
           video = session.video
@@ -721,8 +721,6 @@ class UploadSubtitlesTest(WebUseTest):
         subs = language.latest_version().subtitles()
         self.assertEquals(7.071, subs[2].start_time)
 
-        from widget.rpc import Rpc
-        from widget.tests import RequestMockup, NotAuthenticatedUser
         request = RequestMockup(NotAuthenticatedUser())
         rpc = Rpc()
         subs = rpc.fetch_subtitles(request, self.video.video_id, language.pk)
@@ -733,7 +731,6 @@ class UploadSubtitlesTest(WebUseTest):
 
 class Html5ParseTest(TestCase):
     def _assert(self, start_url, end_url):
-        from videos.models import VIDEO_TYPE_HTML5
         video, created = Video.get_or_create_for_url(start_url)
         vu = video.videourl_set.all()[:1].get()
         self.assertEquals(VIDEO_TYPE_HTML5, vu.type)
@@ -770,7 +767,6 @@ class Html5ParseTest(TestCase):
             'http://a59.video2.blip.tv/8410006747301/Miropcf-AboutUniversalSubtitles847.mp4')
 
 class VideoTest(TestCase):
-
     def setUp(self):
         self.user = User.objects.all()[0]
         self.youtube_video = 'http://www.youtube.com/watch?v=pQ9qX8lcaBQ'
@@ -793,7 +789,7 @@ class VideoTest(TestCase):
         video, created = Video.get_or_create_for_url(start_url)
         video_url = video.get_video_url()
         video_pk = video.pk
-         #
+
         cache_id_1 = video_cache.get_video_id(video_url)
         self.assertTrue(cache_id_1)
         video.delete()
@@ -811,8 +807,6 @@ class RpcTest(TestCase):
     fixtures = ['test.json']
 
     def setUp(self):
-        from videos.rpc import VideosApiClass
-
         self.rpc = VideosApiClass()
         self.user = User.objects.get(username='admin')
         self.video = Video.objects.get(video_id='iGzkk7nwWX8F')
@@ -825,14 +819,12 @@ class RpcTest(TestCase):
         video = Video.objects.get(pk=self.video.pk)
         self.assertEqual(video.title, title)
         try:
-            Action.objects.get(video=self.video, \
-                               new_video_title=title, \
+            Action.objects.get(video=self.video, new_video_title=title,
                                action_type=Action.CHANGE_TITLE)
         except Action.DoesNotExist:
             self.fail()
 
 class ViewsTest(WebUseTest):
-
     fixtures = ['test.json']
 
     def setUp(self):
@@ -860,7 +852,6 @@ class ViewsTest(WebUseTest):
         }
         response = self.client.post(reverse('videos:feedback'), data)
         self.assertEqual(response.status_code, 200)
-        #self.assertEquals(len(mail.outbox), 2)
 
     def test_create(self):
         self._login()
@@ -875,11 +866,13 @@ class ViewsTest(WebUseTest):
         self.assertEqual(response.status_code, 302)
 
         try:
-            video = Video.objects.get(videourl__videoid='osexbB_hX4g', videourl__type=VIDEO_TYPE_YOUTUBE)
+            video = Video.objects.get(videourl__videoid='osexbB_hX4g',
+                                      videourl__type=VIDEO_TYPE_YOUTUBE)
         except Video.DoesNotExist:
             self.fail()
 
-        self.assertEqual(response['Location'], 'http://testserver' + video.get_absolute_url())
+        self.assertEqual(response['Location'], 'http://testserver' +
+                                               video.get_absolute_url())
 
         len_before = Video.objects.count()
         data = {
@@ -888,7 +881,8 @@ class ViewsTest(WebUseTest):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len_before, Video.objects.count())
-        self.assertEqual(response['Location'], 'http://testserver' + video.get_absolute_url())
+        self.assertEqual(response['Location'], 'http://testserver' +
+                                               video.get_absolute_url())
 
     def test_video_url_create(self):
         self._login()
@@ -914,24 +908,21 @@ class ViewsTest(WebUseTest):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_video_url_remove(self):
-        #TODO: write tests
+        # TODO: write tests
         pass
 
     def test_video(self):
-        return
         self.video.title = 'title'
         self.video.save()
-        url = self.video.get_absolute_url('en')
-        response = self.client.get(url)
+        response = self.client.get(self.video.get_absolute_url(), follow=True)
         self.assertEqual(response.status_code, 200)
 
         self.video.title = ''
         self.video.save()
-        response = self.client.get(self.video.get_absolute_url('en'))
+        response = self.client.get(self.video.get_absolute_url(), follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_access_video_page_no_original(self):
-        from widget.tests import create_two_sub_session
         request = RequestMockup(User.objects.all()[0])
         session = create_two_sub_session(request)
         video_pk = session.language.video.pk
@@ -948,7 +939,6 @@ class ViewsTest(WebUseTest):
 
     def test_bliptv_twice(self):
         VIDEO_FILE = 'http://blip.tv/file/get/Kipkay-AirDusterOfficeWeaponry223.m4v'
-        from vidscraper.sites import blip
         old_video_file_url = blip.video_file_url
         blip.video_file_url = lambda x: VIDEO_FILE
         Video.get_or_create_for_url('http://blip.tv/file/4395490')
@@ -957,15 +947,15 @@ class ViewsTest(WebUseTest):
         Video.get_or_create_for_url(VIDEO_FILE)
 
     def test_legacy_history(self):
-        #TODO: write tests
+        # TODO: write tests
         pass
 
     def test_stop_notification(self):
-        #TODO: write tests
+        # TODO: write tests
         pass
 
     def test_subscribe_to_updates(self):
-        #TODO: write test
+        # TODO: write test
         pass
 
     def test_paste_transcription(self):
@@ -994,7 +984,7 @@ class ViewsTest(WebUseTest):
         language = self.video.subtitle_language(language_code)
         version = language.latest_version(public_only=True)
         self.assertEqual(len(version.subtitles()), 2)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 2)
         self.assertIn(self.user.email, mail.outbox[0].to[0])
         self.assertTrue(self.video.followers.filter(pk=user1.pk).exists())
 
@@ -1009,7 +999,7 @@ class ViewsTest(WebUseTest):
             "language": language_code,
             "video_language": u"en"
         }
-        response = self.client.post(reverse("videos:paste_transcription"), data)
+        self.client.post(reverse("videos:paste_transcription"), data)
         language = self.video.subtitle_language(language_code)
         version = language.latest_version(public_only=True)
         self.assertEqual(len(version.subtitles()), 2)
@@ -1036,8 +1026,6 @@ class ViewsTest(WebUseTest):
         self.assertEqual(response.status_code, 302)
         self.assertEquals(len(mail.outbox), 1)
 
-        #----------------------------------------
-        from videos.share_utils import _make_email_url
         msg = u'Hey-- just found a version of this video ("Tú - Jennifer Lopez") with captions: http://unisubs.example.com:8000/en/videos/OcuMvG3LrypJ/'
         url = _make_email_url(msg)
         response = self.client.get(url)
@@ -1049,13 +1037,17 @@ class ViewsTest(WebUseTest):
     def test_history(self):
         # Redirect for now, until we remove the concept of SubtitleLanguages
         # with blank language codes.
-        self._simple_test('videos:history', [self.video.video_id], status=302)
-        self._simple_test('videos:history', [self.video.video_id], data={'o': 'user', 'ot': 'asc'}, status=302)
+        self._simple_test('videos:history',
+            [self.video.video_id], status=302)
+
+        self._simple_test('videos:history',
+            [self.video.video_id], data={'o': 'user', 'ot': 'asc'}, status=302)
 
         sl = self.video.subtitlelanguage_set.all()[:1].get()
         sl.language = 'en'
         sl.save()
-        self._simple_test('videos:translation_history', [self.video.video_id, sl.language, sl.id])
+        self._simple_test('videos:translation_history',
+            [self.video.video_id, sl.language, sl.id])
 
     def test_revision(self):
         version = self.video.version()
@@ -1080,7 +1072,8 @@ class ViewsTest(WebUseTest):
         v.is_forked = True
         v.save()
 
-        new_v = SubtitleVersion(language=lang, version_no=v.version_no+1, datetime_started=datetime.now())
+        new_v = SubtitleVersion(language=lang, version_no=v.version_no+1,
+                                datetime_started=datetime.now())
         new_v.save()
         lang = SubtitleLanguage.objects.get(id=lang.id)
 
@@ -1100,8 +1093,8 @@ class ViewsTest(WebUseTest):
         num_subs = len(v.subtitles())
         v.is_forked  = True
         v.save()
-        new_v = SubtitleVersion(language=lang,
-                                version_no=v.version_no+1, datetime_started=datetime.now())
+        new_v = SubtitleVersion(language=lang, version_no=v.version_no+1,
+                                datetime_started=datetime.now())
         new_v.save()
         for i in xrange(0,20):
             s, created = Subtitle.objects.get_or_create(
@@ -1110,10 +1103,10 @@ class ViewsTest(WebUseTest):
                 subtitle_order=i,
                 subtitle_text="%s lala" % i
             )
-        new_version_sub_count = len(new_v.subtitles())
         self._login()
         self.client.get(reverse('videos:rollback', args=[v.id]), {})
-        last_v  = SubtitleLanguage.objects.get(id=lang.id).latest_version(public_only=True)
+        last_v  = (SubtitleLanguage.objects.get(id=lang.id)
+                                           .latest_version(public_only=True))
         final_num_subs = len(last_v.subtitles())
         self.assertEqual(final_num_subs, num_subs)
 
@@ -1169,15 +1162,6 @@ class ViewsTest(WebUseTest):
     def test_policy_page(self):
         self._simple_test('policy_page')
 
-# FIXME: temporary for https://www.pivotaltracker.com/story/show/17619883
-#    def test_volunteer_page(self):
-#        self._login()
-#        url = reverse('videos:volunteer_page')
-#        self._simple_test('videos:volunteer_page')
-#
-#        response = self.client.post(url)
-#        self.assertEqual(response.status_code, 200)
-#
     def test_volunteer_page_category(self):
         self._login()
         categories = ['featured', 'popular', 'requested', 'latest']
@@ -1188,11 +1172,8 @@ class ViewsTest(WebUseTest):
             response = self.client.post(url)
             self.assertEqual(response.status_code, 200)
 
-#Testings VideoType classes
-from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
 
 class YoutubeVideoTypeTest(TestCase):
-
     def setUp(self):
         self.vt = YoutubeVideoType
         self.data = [{
@@ -1217,7 +1198,6 @@ class YoutubeVideoTypeTest(TestCase):
 
     def test_set_values(self):
         youtbe_url = 'http://www.youtube.com/watch?v=_ShmidkrcY0'
-        vt = self.vt(youtbe_url)
 
         video, created = Video.get_or_create_for_url(youtbe_url)
         vu = video.videourl_set.all()[:1].get()
@@ -1261,27 +1241,7 @@ class YoutubeVideoTypeTest(TestCase):
         self.assertTrue(len(subtitles))
         self.assertEqual(subtitles[-1].text, u'Thanks.')
 
-# FIXME: this video is private on youtube, so this test fails.
-#    def test_subtitle_saving(self):
-#        url = u'http://www.youtube.com/watch?v=63c5p_8hiho'
-#
-#        vt = self.vt(url)
-#
-#        video, created = Video.get_or_create_for_url(url)
-#
-#        langs = video.subtitlelanguage_set.all()
-#        self.assertEqual(len(langs), 8)
-#
-#        for sl in langs:
-#            if sl.language:
-#                subtitles = sl.latest_subtitles()
-#                self.assertTrue(len(subtitles))
-#                self.assertTrue(subtitles[5].start_time and subtitles[5].end_time)
-
-from videos.types.htmlfive import HtmlFiveVideoType
-
 class HtmlFiveVideoTypeTest(TestCase):
-
     def setUp(self):
         self.vt = HtmlFiveVideoType
 
@@ -1307,9 +1267,7 @@ class HtmlFiveVideoTypeTest(TestCase):
         self.assertFalse(self.vt.matches_video_url('http://someurl.com/video.flv'))
         self.assertFalse(self.vt.matches_video_url('http://someurl.com/ogv.video'))
 
-from videos.types.mp3 import Mp3VideoType
 class Mp3VideoTypeTest(TestCase):
-
     def setUp(self):
         self.vt = Mp3VideoType
 
@@ -1328,10 +1286,7 @@ class Mp3VideoTypeTest(TestCase):
         self.assertTrue(self.vt.matches_video_url('http://someurl.com/audio.mp3'))
         self.assertFalse(self.vt.matches_video_url('http://someurl.com/mp3.audio'))
 
-from videos.types.bliptv import BlipTvVideoType
-
 class BlipTvVideoTypeTest(TestCase):
-
     def setUp(self):
         self.vt = BlipTvVideoType
 
@@ -1360,18 +1315,13 @@ class BlipTvVideoTypeTest(TestCase):
         #this test is for ticket: https://www.pivotaltracker.com/story/show/12996607
         url = 'http://blip.tv/file/5006677/'
         video, created = Video.get_or_create_for_url(url)
-        #self.assertTrue(video)
-
-from videos.types.dailymotion import DailymotionVideoType
 
 class DailymotionVideoTypeTest(TestCase):
-
     def setUp(self):
         self.vt = DailymotionVideoType
 
     def test_type(self):
         url = 'http://www.dailymotion.com/video/x7u2ww_juliette-drums_lifestyle#hp-b-l'
-        vt = self.vt(url)
 
         video, created = Video.get_or_create_for_url(url)
         vu = video.videourl_set.all()[:1].get()
@@ -1387,7 +1337,6 @@ class DailymotionVideoTypeTest(TestCase):
         self.assertFalse(self.vt.matches_video_url('http://www.dailymotion.com'))
 
     def test_type1(self):
-        from videos.types import VideoTypeError
         url = u'http://www.dailymotion.com/video/edit/xjhzgb_projet-de-maison-des-services-a-fauquembergues_news'
         vt = self.vt(url)
         try:
@@ -1396,10 +1345,7 @@ class DailymotionVideoTypeTest(TestCase):
         except VideoTypeError:
             pass
 
-from videos.types.flv import FLVVideoType
-
 class FLVVideoTypeTest(TestCase):
-
     def setUp(self):
         self.vt = FLVVideoType
 
@@ -1425,10 +1371,7 @@ class FLVVideoTypeTest(TestCase):
         video_url = video.videourl_set.all()[0]
         self.assertEqual(self.vt.abbreviation, video_url.type)
 
-from videos.types.vimeo import VimeoVideoType
-
 class VimeoVideoTypeTest(TestCase):
-
     def setUp(self):
         self.vt = VimeoVideoType
 
@@ -1462,11 +1405,8 @@ class VimeoVideoTypeTest(TestCase):
         self.assertEqual(vu.videoid, '22070806')
         self.assertTrue(self.vt.video_url(vu))
 
-from videos.types.base import VideoType, VideoTypeRegistrar
-from videos.types import video_type_registrar, VideoTypeError
 
 class VideoTypeRegistrarTest(TestCase):
-
     def test_base(self):
         registrar = VideoTypeRegistrar()
 
@@ -1483,11 +1423,14 @@ class VideoTypeRegistrarTest(TestCase):
         self.assertEqual(type, None)
         type = video_type_registrar.video_type_for_url('http://youtube.com/v=UOtJUmiUZ08')
         self.assertTrue(isinstance(type, YoutubeVideoType))
-        self.assertRaises(VideoTypeError, video_type_registrar.video_type_for_url, 'http://youtube.com/v=100500')
+        self.assertRaises(VideoTypeError, video_type_registrar.video_type_for_url,
+                          'http://youtube.com/v=100500')
+
 
 class TestFeedsSubmit(TestCase):
+    def setUp(self):
+        self.client.login(username='admin', password='admin')
 
-    # this rss feed is broken. FIXME TODO
     def test_video_feed_submit(self):
         old_count = Video.objects.count()
         data = {
@@ -1497,18 +1440,7 @@ class TestFeedsSubmit(TestCase):
         self.assertRedirects(response, reverse('videos:create'))
         self.assertNotEqual(old_count, Video.objects.count())
 
-    def test_incorrect_video_feed_submit(self):
-        data = {
-            'feed_url': u'http://blip.tv/anyone-but-he/?skin=rss'
-        }
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['youtube_form'].errors['feed_url'])
-
     def test_empty_feed_submit(self):
-        import feedparser
-        from StringIO import StringIO
-
         base_open_resource = feedparser._open_resource
 
         def _open_resource_mock(*args, **kwargs):
@@ -1546,44 +1478,12 @@ class TestFeedsSubmit(TestCase):
 
         feedparser._open_resource = base_open_resource
 
-    def test_feed_form_with_youtube(self):
-        youtube_user = u"http://www.youtube.com/user/SymbalooTutorials"
-        feed_url = u"https://gdata.youtube.com/feeds/api/users/SymbalooTutorials/uploads"
-        old_count = Video.objects.count()
-
-        data = {
-            'youtube_user_url': youtube_user,
-            'save_feed': '1'
-        }
-
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertRedirects(response, reverse('videos:create'))
-        # we actually imported something
-        self.assertTrue(Video.objects.count() > old_count)
-        # and that thing are 10 videos
-        self.assertEquals(Video.objects.count(), old_count + 10)
-
-        video_feed = VideoFeed.objects.get(url=feed_url)
-        self.assertIsNotNone(video_feed)
-
-        # submit again, so we can see that we are saving more videos
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertEquals(Video.objects.count(), old_count + 20)
-
-        # submit a third time - by default, youtube just
-        # returns 25 videos on a feed
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertEquals(Video.objects.count(), old_count + 25)
-        
-from apps.videos.types.brigthcove  import BrightcoveVideoType
 
 class BrightcoveVideoTypeTest(TestCase):
-
     def setUp(self):
         self.vt = BrightcoveVideoType
 
     def test_type(self):
-        from apps.videos.models import VIDEO_TYPE_BRIGHTCOVE
         url  = 'http://link.brightcove.com/services/player/bcpid955357260001?bckey=AQ~~,AAAA3ijeRPk~,jc2SmUL6QMyqTwfTFhUbWr3dg6Oi980j&bctid=956115196001'
         video, created = Video.get_or_create_for_url(url)
         vu = video.videourl_set.all()[:1].get()
@@ -1598,11 +1498,7 @@ class BrightcoveVideoTypeTest(TestCase):
         self.assertEqual(vt.video_id, '956115196001')
 
 
-from videos.models import SubtitleLanguage, SubtitleVersion, Subtitle
-from datetime import datetime
-
 class TestTasks(TestCase):
-
     fixtures = ['test.json']
 
     def setUp(self):
@@ -1618,11 +1514,9 @@ class TestTasks(TestCase):
         self.video.followers.add(self.latest_version.user)
 
     def test_send_change_title_email(self):
-        from videos.tasks import send_change_title_email
-
         user = User.objects.all()[:1].get()
 
-        self.assertFalse(self.video.followers.count() == 1 \
+        self.assertFalse(self.video.followers.count() == 1
                          and self.video.followers.all()[:1].get() == user)
 
         old_title = self.video.title
@@ -1630,21 +1524,20 @@ class TestTasks(TestCase):
         self.video.title = new_title
         self.video.save()
 
-        result = send_change_title_email.delay(self.video.id, user.id, old_title, new_title)
+        result = send_change_title_email.delay(self.video.id, user.id,
+                                               old_title, new_title)
         if result.failed():
             self.fail(result.traceback)
         self.assertEqual(len(mail.outbox), 1)
 
-        #test anonymous editing
         mail.outbox = []
-        result = send_change_title_email.delay(self.video.id, None, old_title, new_title)
+        result = send_change_title_email.delay(self.video.id, None, old_title,
+                                               new_title)
         if result.failed():
             self.fail(result.traceback)
         self.assertEqual(len(mail.outbox), 1)
 
     def test_notification_sending(self):
-        from videos.tasks import video_changed_tasks
-
         latest_version = self.language.latest_version()
 
         v = SubtitleVersion()
@@ -1675,7 +1568,6 @@ class TestTasks(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
 class TestPercentComplete(TestCase):
-
     fixtures = ['test.json']
 
     def _create_trans(self, latest_version=None, lang_code=None, forked=False):
@@ -1684,6 +1576,8 @@ class TestPercentComplete(TestCase):
         translation.language = lang_code
         translation.is_original = False
         translation.is_forked = forked
+        if not forked:
+           translation.standard_language = self.video.subtitle_language()
         translation.save()
 
         self.translation = translation
@@ -1710,7 +1604,6 @@ class TestPercentComplete(TestCase):
         self.translation = self._create_trans(latest_version, 'uk')
 
     def test_percent_done(self):
-        from videos.tasks import video_changed_tasks
         video_changed_tasks.delay(self.translation.video.id)
         translation = SubtitleLanguage.objects.get(id=self.translation.id)
         self.assertEqual(translation.percent_done, 100)
@@ -1718,7 +1611,6 @@ class TestPercentComplete(TestCase):
     def test_delete_from_original(self):
         latest_version = self.original_language.latest_version()
         latest_version.subtitle_set.all()[:1].get().delete()
-        from videos.tasks import video_changed_tasks
         video_changed_tasks.delay(self.translation.video.id)
         translation = SubtitleLanguage.objects.get(id=self.translation.id)
         self.assertEqual(translation.percent_done, 100)
@@ -1734,7 +1626,6 @@ class TestPercentComplete(TestCase):
         s.end_time = 51
         s.save()
 
-        from videos.tasks import video_changed_tasks
         video_changed_tasks.delay(self.translation.video.id)
         translation = SubtitleLanguage.objects.get(id=self.translation.id)
         self.assertEqual(translation.percent_done, 4/5.*100)
@@ -1742,14 +1633,12 @@ class TestPercentComplete(TestCase):
     def test_delete_all(self):
         for s in self.translation_version.subtitle_set.all():
             s.delete()
-        from videos.tasks import video_changed_tasks
         video_changed_tasks.delay(self.translation.video.id)
         translation = SubtitleLanguage.objects.get(id=self.translation.id)
         self.assertEqual(translation.percent_done, 0)
 
     def test_delete_from_translation(self):
         self.translation_version.subtitle_set.all()[:1].get().delete()
-        from videos.tasks import video_changed_tasks
         video_changed_tasks.delay(self.translation.video.id)
         translation = SubtitleLanguage.objects.get(id=self.translation.id)
         self.assertEqual(translation.percent_done, 75)
@@ -1766,7 +1655,6 @@ class TestPercentComplete(TestCase):
             s.subtitle_text = "what %i" % i
             s.save()
 
-        from videos.tasks import video_changed_tasks
         video_changed_tasks.delay(self.translation.video.id)
         translation = SubtitleLanguage.objects.get(id=self.translation.id)
         # 1% reflects https://www.pivotaltracker.com/story/show/16013319
@@ -1775,24 +1663,12 @@ class TestPercentComplete(TestCase):
     def test_count_as_complete(self):
         self.assertFalse(self.video.complete_date)
         # set the original lang as complete, should be completed
-        from videos.tasks import video_changed_tasks
         video_changed_tasks.delay(self.translation.video.id)
         translation = SubtitleLanguage.objects.get(id=self.translation.id)
         self.assertEqual(translation.percent_done, 100)
         self.assertTrue(translation.is_complete)
         self.translation.save()
 
-#    def test_video_complete_forked_complete(self):
-#        self.original_language = self.video.subtitle_language()
-#        latest_version = self.original_language.latest_version()
-#        new_lang = self._create_trans(latest_version, 'pt', True)
-#        self.assertFalse(self.video.is_complete)
-# FIXME: this is not complete because the complete language
-# has no subtitles.
-#        new_lang.is_complete = True
-#        new_lang.save()
-#        metadata_manager.update_metadata(self.video.pk)
-#        self.assertTrue(self.video.is_complete)
 
     def test_video_0_subs_are_never_complete(self):
         self.original_language = self.video.subtitle_language()
@@ -1803,11 +1679,8 @@ class TestPercentComplete(TestCase):
         self.video.subtitlelanguage_set.all().filter(percent_done=100).delete()
         self.assertFalse(self.video.is_complete)
 
-from videos import alarms
-from django.conf import settings
 
 class TestAlert(TestCase):
-
     fixtures = ['test.json']
 
     def setUp(self):
@@ -1824,16 +1697,6 @@ class TestAlert(TestCase):
         v.version_no = lv and lv.version_no+1 or 1
         v.save()
         return v
-
-    def test_lose_alert(self):
-        v = self._new_version()
-
-        s = self.latest_version.subtitle_set.all()[0]
-        s.duplicate_for(v).save()
-
-        alarms.check_subtitle_version(v)
-
-        self.assertEquals(len(mail.outbox), 2)
 
     def test_other_languages_changes(self):
         v = self._new_version()
@@ -1981,7 +1844,7 @@ class TestModelsSaving(TestCase):
         """
         lang = SubtitleLanguage(language="pt", video=self.video, standard_language=self.video.subtitle_language(), is_forked=False)
         lang.save()
-        v1 = create_version(lang, [
+        create_version(lang, [
                 {
                    "subtitle_order" : 1,
                    "subtitle_text": "t1",
@@ -2015,7 +1878,7 @@ class TestModelsSaving(TestCase):
         u.set_password("admin")
         u.save()
         from widget.rpc import Rpc
-        from widget.tests import RequestMockup, NotAuthenticatedUser
+        from widget.tests import RequestMockup
 
         rpc = Rpc()
         self.client.login(**{"username":"admin", "password":"admin"})
@@ -2102,7 +1965,6 @@ class TestVideoForm(TestCase):
     def test_dailymotion_urls(self):
         self._test_urls(self.daily_motion_urls)
 
-from videos.feed_parser import FeedParser
 
 class TestFeedParser(TestCase):
     #TODO: add test for MediaFeedEntryParser. I just can't find RSS link for it
@@ -2180,12 +2042,9 @@ class TestTemplateTags(TestCase):
             "username": u"admin",
             "password": u"admin"
         }
-        from apps.testhelpers.views import _create_videos#, _create_team_videos
         fixture_path = os.path.join(settings.PROJECT_ROOT, "apps", "videos", "fixtures", "teams-list.json")
         data = json.load(open(fixture_path))
         self.videos = _create_videos(data, [])
-        #self.team, created = Team.objects.get_or_create(name="test-team", slug="test-team")
-        #self.tvs = _create_team_videos( self.team, self.videos, [self.user])
 
     def test_complete_indicator(self):
         from apps.videos.templatetags.subtitles_tags import complete_indicator
@@ -2209,13 +2068,13 @@ class TestTemplateTags(TestCase):
         l = SubtitleLanguage(video=v, has_version=True)
         l.save()
         from videos.templatetags.subtitles_tags import language_url
-        lurl = language_url(None, l)
+        language_url(None, l)
 
 
 class TestMetadataManager(TestCase):
 
     fixtures = ['staging_users.json', 'staging_videos.json']
-    
+
     def test_subtitles_count(self):
         v = Video.objects.all()[0]
         lang = SubtitleLanguage(language='en', video=v, is_forked=True)
@@ -2227,7 +2086,7 @@ class TestMetadataManager(TestCase):
                    "subtitle_id": "id1",
                     'start_time': 1,
                     'end_time': 2,
-                    
+
                  },
                   {
                    "subtitle_order" : 2,
@@ -2259,6 +2118,8 @@ def _create_trans( video, latest_version=None, lang_code=None, forked=False):
         translation.language = lang_code
         translation.is_original = False
         translation.is_forked = forked
+        if not forked:
+            translation.standard_language = video.subtitle_language()
         translation.save()
         v = SubtitleVersion()
         v.language = translation
@@ -2299,12 +2160,46 @@ def create_version(lang, subs=None, user=None):
     return version
 
 
+class TestSubtitleMetadata(TestCase):
+    fixtures = ['staging_users.json', 'staging_videos.json']
+
+    def test_reviewed_by_setting(self):
+        version = SubtitleVersion.objects.all()[0]
+        user = User.objects.all()[0]
+
+        self.assertEqual(version.get_reviewed_by(), None,
+            "Version's reviewed_by metadata is not originally None.")
+
+        version_pk = version.pk
+        version.set_reviewed_by(user)
+
+        version = SubtitleVersion.objects.get(pk=version_pk)
+
+        self.assertEqual(version.get_reviewed_by().pk, user.pk,
+            "Version's reviewed_by metadata is not the correct User.")
+
+    def test_approved_by_setting(self):
+        version = SubtitleVersion.objects.all()[0]
+        user = User.objects.all()[0]
+
+        self.assertEqual(version.get_approved_by(), None,
+            "Version's approved_by metadata is not originally None.")
+
+        version_pk = version.pk
+        version.set_approved_by(user)
+
+        version = SubtitleVersion.objects.get(pk=version_pk)
+
+        self.assertEqual(version.get_approved_by().pk, user.pk,
+            "Version's approved_by metadata is not the correct User.")
+
+
 def create_langs_and_versions(video, langs, user=None):
     versions = []
     for lang in langs:
         l, c = SubtitleLanguage.objects.get_or_create(language=lang, video=video, is_forked=True)
         versions.append(create_version(l))
     return versions
-    
+
 def refresh_obj(m):
     return m.__class__._default_manager.get(pk=m.pk)

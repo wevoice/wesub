@@ -37,8 +37,8 @@ unisubs.translate.TranslationRightPanel = function(dialog,
                              showRestart, doneStrongText, doneText);
     this.extraHelpHeader_ = extraHelpHeader;
     this.dialog_ = dialog;
-    this.showSaveExit = false;
     this.isReviewOrApproval_ = isReviewOrApproval;
+    this.showSaveExit = true;
 };
 goog.inherits(unisubs.translate.TranslationRightPanel, unisubs.RightPanel);
 

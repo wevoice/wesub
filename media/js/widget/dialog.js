@@ -46,6 +46,7 @@ unisubs.Dialog = function(videoSource) {
     this.minutesIdle_ = 0;
     this.ignoreLock_ = unisubs.mode === 'review';
 };
+
 goog.inherits(unisubs.Dialog, goog.ui.Dialog);
 
 /* @const {int}
@@ -145,6 +146,7 @@ unisubs.Dialog.prototype.showTemporaryPanel = function(panel) {
     this.temporaryPanel_ = panel;
     this.addChild(panel, true);
 };
+
 /**
  * Hides and disposes the panel displayed in showTemporaryPanel.
  * @protected
@@ -180,28 +182,35 @@ unisubs.Dialog.prototype.getBottomPanelContainerInternal = function() {
 unisubs.Dialog.prototype.updateLoginState = function() {
     this.rightPanel_.updateLoginState();
 };
+
 /**
  * Returns true if there's no work, or if there has been work
  * but it was saved.
  * @protected
  */
 unisubs.Dialog.prototype.isWorkSaved = goog.abstractMethod;
+
 /**
  * This corresponds to the finish button. It is not called during periodic saves.
  * @protected
- * @param {boolean} closeAfterSave
+ * @param {boolean} closeAfterSave Whether the dialog should be closed after a
+ *                                 successful save.
+ * @param {boolean} saveForLater Passed when this save is a "save for later"
+ *                               type of save.  Currently used only to determine
+ *                               whether to "complete" a task.
  */
-unisubs.Dialog.prototype.saveWork = function(closeAfterSave) {
+unisubs.Dialog.prototype.saveWork = function(closeAfterSave, saveForLater) {
     unisubs.Tracker.getInstance().trackPageview('Submits_final_work_in_widget');
     if (unisubs.IS_NULL) {
         this.saved_ = true;
-        var message = "Congratulations, you have completed a demo. There is a web full of videos waiting for your translations, enjoy!";
+        var message = "Congratulations, you have completed a demo. There is a web " +
+                      "full of videos waiting for your translations, enjoy!";
         //This should likely have a nicer modal
         alert(message);
         this.setVisible(false);
         return;
     }
-    if (unisubs.currentUsername == null && !unisubs.isLoginAttemptInProgress())
+    if (unisubs.currentUsername == null && !unisubs.isLoginAttemptInProgress()) {
         unisubs.login(function(loggedIn) {
             if (!loggedIn) {
                 alert("We had a problem logging you in. You might want to check " +
@@ -210,10 +219,11 @@ unisubs.Dialog.prototype.saveWork = function(closeAfterSave) {
                       "of the dialog and email them to widget-logs@universalsubtitles.org.");
             }
         });
-    else
-        this.saveWorkInternal(closeAfterSave);
+    } else {
+        this.saveWorkInternal(closeAfterSave, saveForLater);
+    }
 };
-unisubs.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
+unisubs.Dialog.prototype.saveWorkInternal = function(closeAfterSave, saveForLater) {
     goog.abstractMethod();
 };
 unisubs.Dialog.prototype.onBeforeWindowUnload_ = function(event) {
@@ -234,6 +244,7 @@ unisubs.Dialog.prototype.setVisible = function(visible) {
         }
     }
 };
+
 /**
  * @protected
  * @param {unisubs.widget.DropDownContents} dropDownContents
@@ -263,6 +274,7 @@ unisubs.Dialog.prototype.showSaveWorkDialog_ = function() {
     });
     unsavedWarning.setVisible(true);
 };
+
 unisubs.Dialog.prototype.getServerModel = goog.abstractMethod;
 
 /**
@@ -287,13 +299,14 @@ unisubs.Dialog.prototype.hideDialogImpl_ = function() {
     }
     unisubs.Dialog.superClass_.setVisible.call(this, false);
 };
+
 unisubs.Dialog.prototype.makeJsonSubs = goog.abstractMethod;
+
 unisubs.Dialog.prototype.disposeInternal = function() {
     unisubs.Dialog.superClass_.disposeInternal.call(this);
     this.videoPlayer_.dispose();
     this.idleTimer_.dispose();
 };
-
 unisubs.Dialog.REVIEW_OR_APPROVAL = {
     REVIEW: 1,
     APPROVAL: 2
@@ -303,16 +316,13 @@ unisubs.Dialog.MODERATION_OUTCOMES = {
     SAVE_FOR_LATER: 10,
     SEND_BACK: 30
 };
-
 unisubs.Dialog.prototype.getTeamGuidelineForReview = function () {
     var name = this.isApproval() ? 'approval' : 'review'; 
     return unisubs.guidelines[name];
 }
-
 unisubs.Dialog.prototype.isApproval = function(){
     return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL;
 }
-
 unisubs.Dialog.prototype.isReview = function(){
     return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.REVIEW;
 }

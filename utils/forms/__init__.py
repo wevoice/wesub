@@ -1,13 +1,17 @@
-from django.utils.encoding import force_unicode    
-from django import forms
-from django.core import validators
-from utils.validators import UniSubURLValidator
-from django.utils.translation import ugettext_lazy as _
-from utils.forms.recapcha import ReCaptchaField
 import re
 
+from django import forms
+from django.core import validators
+from django.utils.encoding import force_unicode
+from django.utils.translation import ugettext_lazy as _
+
+from utils.forms.recapcha import ReCaptchaField
+from utils.validators import UniSubURLValidator
+
+
+assert ReCaptchaField # Shut up, Pyflakes.
+
 class AjaxForm(object):
-    
     def get_errors(self):
         output = {}
         for key, value in self.errors.items():
@@ -15,13 +19,12 @@ class AjaxForm(object):
         return output
 
 class StripRegexField(forms.RegexField):
-
     def to_python(self, value):
         value = super(StripRegexField, self).to_python(value)
         return value.strip()
 
 class StripURLField(forms.URLField):
-    
+
     def to_python(self, value):
         value = super(StripURLField, self).to_python(value)
         return value.strip()
@@ -33,10 +36,9 @@ class FeedURLValidator(validators.URLValidator):
         r'localhost|' #localhost...
         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
         r'(?::\d+)?' # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)    
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 class FeedURLField(forms.URLField):
-
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
             validator_user_agent=validators.URL_VALIDATOR_USER_AGENT, *args, **kwargs):
         forms.CharField.__init__(self,max_length, min_length, *args,
@@ -46,9 +48,8 @@ class FeedURLField(forms.URLField):
     def to_python(self, value):
         value = super(FeedURLField, self).to_python(value)
         return value.strip()
-    
+
 class UniSubURLField(StripURLField):
-    
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
             validator_user_agent=validators.URL_VALIDATOR_USER_AGENT, *args, **kwargs):
         super(forms.URLField, self).__init__(max_length, min_length, *args,
@@ -56,7 +57,6 @@ class UniSubURLField(StripURLField):
         self.validators.append(UniSubURLValidator(verify_exists=verify_exists, validator_user_agent=validator_user_agent))
 
 class ListField(forms.RegexField):
-
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(ListField, self).__init__(self.pattern, max_length, min_length, *args, **kwargs)
 
@@ -66,7 +66,7 @@ class ListField(forms.RegexField):
             value = value.replace(' ', '')
         value = super(ListField, self).clean(value)
         return [item for item in value.strip(',').split(',') if item]
-        
+
 email_list_re = re.compile(
     r"""^(([-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*")@(?:[A-Z0-9]+(?:-*[A-Z0-9]+)*\.)+[A-Z]{2,6},)+$""", re.IGNORECASE)
 
@@ -75,7 +75,7 @@ class EmailListField(ListField):
         'invalid': _(u'Enter valid e-mail addresses separated by commas.')
     }
     pattern = email_list_re
-    
+
 username_list_re = re.compile(r'^([A-Z0-9]+,)+$', re.IGNORECASE)
 
 class UsernameListField(ListField):
@@ -124,6 +124,7 @@ def flatten_errorlists(errorlists):
     '''Return a list of the errors (just the text) in any field.'''
     errors = []
     for field, errorlist in errorlists.items():
-        errors += ['%s: %s' % (field, error) for error in errorlist]
+        label = '' if field == '__all__' else ('%s: ' % field)
+        errors += ['%s%s' % (label, error) for error in errorlist]
 
     return errors

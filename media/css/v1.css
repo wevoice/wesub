@@ -21,9 +21,11 @@ body {
 .v1 .bootstrap div.modal {
   display: none;
 }
-
-.v1 .logo {
-  margin: 1em 0 2em;
+.v1 .bootstrap div.modal div.plain-text {
+  margin-bottom: 0;
+}
+.v1 .bootstrap div.modal div.plain-text label {
+  padding-top: 0;
 }
 
 .v1 .notation {
@@ -216,8 +218,18 @@ body {
   width: 120px;
 }
 
-div.hidden {
+div.hidden, form.hidden {
   display: none;
+}
+
+ul.list-collapsible li.hidden {
+  display: none;
+}
+ul.list-collapsible li.expand span.less {
+  display: none;
+}
+ul.list-collapsible.expanded li.hidden {
+  display: block;
 }
 
 /* Tabs */
@@ -469,6 +481,9 @@ div.hidden {
 }
 .v1 .listing > li .actions li h4 {
   padding: .25em 0;
+}
+.v1 .listing > li .actions li h4 a {
+  color: #a0b2bd;
 }
 .v1 .listing > li .actions li.due {
   font-size: 11px;
@@ -771,6 +786,28 @@ div.hidden {
 .v1 .listing.tasks > li form.assign-form {
   padding: 0;
 }
+.v1 .listing.tasks > li.disabled {
+  padding-right: 0;
+}
+.v1 .listing.tasks > li.disabled h3, .v1 .listing.tasks > li.disabled p, .v1 .listing.tasks > li.disabled a, .v1 .listing.tasks > li.disabled ul {
+  opacity: .2;
+}
+.v1 .listing.tasks > li.disabled ul.actions, .v1 .listing.tasks > li.disabled ul.admin-controls {
+  display: none !important;
+}
+.v1 .listing.tasks > li.disabled div.cannot-perform-disabled {
+  background: #F2DEDE;
+  border: 1px solid #EED3D7;
+  color: #B94A48;
+  margin-bottom: 10px;
+  padding: 10px;
+  -moz-background-clip: padding-box;
+  -moz-border-radius: 5px;
+  -webkit-background-clip: padding-box;
+  -webkit-border-radius: 5px;
+  background-clip: padding-box;
+  border-radius: 5px;
+}
 
 .v1 .listing.teams > li {
   padding-right: 150px;
@@ -949,6 +986,9 @@ p.view-more a:after {
 /* Forms */
 .v1 form {
   padding: 1em 0;
+}
+.v1 form h3 {
+  line-height: 20px;
 }
 .v1 form .form-title {
   margin: 1em 0 0 0;
@@ -1157,7 +1197,6 @@ p.view-more a:after {
   background-image: linear-gradient(top, #f0f0f0, #fafafa 5%, #fafafa 95%, #f0f0f0);
   border-bottom: 1px solid #dce2e5;
   border-top: 1px solid #dce2e5;
-  float: left;
   margin: 0 0 2em;
   padding: 1.5em 0;
   width: 100%;
@@ -1206,13 +1245,6 @@ input[name="thumbnail-clear"] {
   margin: 12px 4px 12px 0 !important;
 }
 
-body#teams div.edit-team-video form fieldset a {
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 240px;
-}
-
 /* Dashboard */
 #dashboard .featured {
   margin-bottom: 4em;
@@ -1248,6 +1280,11 @@ body#teams div.edit-team-video form fieldset a {
   border-bottom: 1px solid #dce2e5;
   margin-bottom: 0;
   padding: .5em 0;
+}
+
+/* Global */
+div#language_picker select {
+  width: 220px;
 }
 
 /* Profile */
@@ -1427,12 +1464,11 @@ body#teams div.edit-team-video form fieldset a {
 .v1 .context #widget_div {
   padding-bottom: 1.5em;
 }
-.v1 .context video, .v1 .context object, .v1 .context .unisubs-widget span.unisubs-videoplayer {
+.v1 .context video, .v1 .context object, .v1 .context .unisubs-widget span.unisubs-videoplayer, .v1 .context audio {
   height: 173px !important;
   width: 289px !important;
 }
 .v1 .context #description {
-  color: #486f87;
   line-height: 150%;
 }
 .v1 .context #description p {
@@ -1498,6 +1534,9 @@ body#teams div.edit-team-video form fieldset a {
 }
 .v1 .context ul.buttons li a.email {
   background: url("../images/share_icons.png") no-repeat 5px -67px;
+}
+.v1 .context .notation {
+  color: inherit;
 }
 
 ol.subtitles {
@@ -1846,11 +1885,8 @@ pre.dump code {
 }
 
 /* Crazytown */
-#teams .backnav {
+#teams .backnav, #teams .backnav a {
   color: #7692a3;
-}
-#teams .backnav a {
-  color: #2f3c45;
 }
 
 #teams div.header {
@@ -2022,4 +2058,22 @@ pre.dump code {
 
 #teams .view .filters.active {
   display: block;
+}
+
+#teams form.edit-video fieldset {
+  padding-bottom: 0;
+}
+
+#teams form.move-video {
+  border-top: 10px solid #ECF0F1;
+  margin-top: 15px;
+}
+#teams form.move-video fieldset {
+  padding-bottom: 0;
+}
+#teams form.move-video fieldset select {
+  width: auto;
+}
+#teams form.move-video div.submit {
+  margin-top: 10px;
 }

@@ -36,8 +36,11 @@ from apps.teams.permissions import (
     can_rename_team as _can_rename_team,
     can_perform_task as _can_perform_task,
     can_assign_task as _can_assign_task,
+    can_decline_task as _can_decline_task,
     can_delete_task as _can_delete_task,
     can_remove_video as _can_remove_video,
+    can_delete_video as _can_delete_video,
+    can_delete_video_in_team as _can_delete_video_in_team,
     can_approve as _can_approve,
 )
 from apps.teams.permissions import (
@@ -83,6 +86,14 @@ def can_edit_video(search_record, user):
 @register.filter
 def can_remove_video(tv, user):
     return _can_remove_video(tv, user)
+
+@register.filter
+def can_delete_video(tv, user):
+    return _can_delete_video(tv, user)
+
+@register.filter
+def can_delete_video_in_team(user, team):
+    return _can_delete_video_in_team(team, user)
 
 @register.filter
 def can_add_tasks(team, user):
@@ -168,9 +179,23 @@ def team_add_video_select(context):
         context['teams'] = [team for team in qs if can_add_video_somewhere(team, user)]
     return context
 
+@register.inclusion_tag('teams/_team_move_video_select.html', takes_context=True)
+def team_move_video_select(context):
+    user = context['user']
+    if user.is_authenticated():
+        team_video = context['team_video']
+        if team_video:
+            qs = Team.objects.filter(users=user)
+            context['teams'] = [team for team in qs
+                                if can_add_video_somewhere(team, user)
+                                and can_remove_video(team_video, user)
+                                and team.pk != team_video.team.pk]
+    return context
+
 @register.inclusion_tag('videos/_team_list.html')
-def render_belongs_to_team_list(video, user):
+def render_belongs_to_team_list(team_video, user):
     teams =  []
+    video = team_video.video
     for t in list(video.team_set.filter()):
         if t.is_visible or user in t.users.all():
             if video.moderated_by == t:
@@ -178,7 +203,7 @@ def render_belongs_to_team_list(video, user):
                 teams.insert(0, t)
             else:
                 teams.append(t)
-    return {"teams": teams}
+    return {"teams": teams, "team_video": team_video}
 
 
 @register.inclusion_tag('teams/_team_video_detail.html', takes_context=True)
@@ -203,8 +228,6 @@ def complete_team_video_detail(context, team_video_search_record):
 
 @register.inclusion_tag('teams/_team_video_lang_detail.html', takes_context=True)
 def team_video_lang_detail(context, lang, team):
-    #from utils.orm import load_related_fk
-
     context['team_video'] = team.teamvideo_set.select_related('video').get(video__id=lang.video_id)
     context['lang'] = lang
     return context
@@ -405,6 +428,10 @@ def can_perform_task(task, user):
 @register.filter
 def can_assign_task(task, user):
     return _can_assign_task(task, user)
+
+@register.filter
+def can_decline_task(task, user):
+    return _can_decline_task(task, user)
 
 @register.filter
 def can_delete_task(task, user):

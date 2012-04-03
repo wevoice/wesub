@@ -1,6 +1,6 @@
 # See the end of http://docs.python.org/library/collections.html
+# http://code.activestate.com/recipes/576694/
 
-## {{{ http://code.activestate.com/recipes/576694/ (r7)
 import collections
 
 KEY, PREV, NEXT = range(3)

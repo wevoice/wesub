@@ -17,8 +17,8 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 
+from context_processors import current_site
 from videos.search_indexes import VideoIndex
-from videos.models import Video
 from search.forms import SearchForm
 from search.rpc import SearchApiClass
 from utils.rpc import RpcRouter
@@ -33,8 +33,9 @@ rpc_router = RpcRouter('search:rpc_router', {
 
 @render_to('search/search.html')
 def index(request):
+    site = current_site(request)
     if request.GET:
-        return HttpResponseRedirect('%s#/?%s' % (reverse('search:index'), urlencode(request.GET)))
+        return HttpResponseRedirect(site['BASE_URL'] + '%s#/?%s' % (reverse('search:index'), urlencode(request.GET)))
     return {
         'form': SearchForm(sqs=VideoIndex.public())
     }

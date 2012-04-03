@@ -5,6 +5,7 @@ from pprint import pformat
 
 try:
     from django.utils.safestring import mark_safe
+    assert mark_safe # Shut up, Pyflakes.
 except ImportError: # v0.96 and 0.97-pre-autoescaping compat
     def mark_safe(x): return x
 

@@ -1,6 +1,6 @@
 // Universal Subtitles, universalsubtitles.org
 // 
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -26,7 +26,9 @@ unisubs.timeline.SubPanel = function(spacing) {
     goog.ui.Component.call(this);
     this.pixelsPerSecond_ = unisubs.timeline.TimeRowUL.PX_PER_TICK / spacing;    
 };
+
 goog.inherits(unisubs.timeline.SubPanel, goog.ui.Component);
+
 unisubs.timeline.SubPanel.prototype.createDom = function() {
     unisubs.timeline.SubPanel.superClass_.createDom.call(this);
     this.getElement().className = 'unisubs-subpanel';

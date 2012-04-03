@@ -1,6 +1,6 @@
 {% extends "profiles/base.html" %}
 
-{% load to_json i18n messages_tags media_compressor recent_activity auth_tags profiles_tags teams_tags %}
+{% load to_json i18n messages_tags media_compressor recent_activity auth_tags profiles_tags teams_tags videos_tags %}
 
 {% block css %}
     {{ block.super }}
@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block body_attrs %}id="dashboard" class="v1"{% endblock %}
+{% block html_attrs %}id="profile_dashboard"{% endblock %}
 
 {% block title %}{% trans "Dashboard" %} | {{ user_info }} | Universal Subtitles{% endblock %}
 
@@ -17,7 +18,7 @@
     {% include_bundle "js-teams" %}
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
-        unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
+        window.WIDGET_SETTINGS = {{ widget_settings|to_json|safe }};
     </script>
 {% endblock %}
 
@@ -55,8 +56,11 @@
                             {% endif %}
                             {% trans 'for' %}
                             <a href="{{ task.team_video.video.get_absolute_url }}" title="View video"><em>{{ task.team_video|truncatewords:8 }}</em></a>
+                            {% if task.team_video.video.duration %}
+                                ({{ task.team_video.video.duration|format_duration }})
+                            {% endif %}
 
-                            <br />({% include "teams/_perform_task_link.html" %})
+                            <br />{% include "teams/_perform_task_link.html" %}
 
                         </p>
                     </li>

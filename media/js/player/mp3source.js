@@ -27,48 +27,38 @@ goog.provide('unisubs.player.MP3Source');
  *
  * @constructor
  */
-unisubs.player.MP3Source = function(mp3url) {
+unisubs.player.MP3Source = function(mp3url, opt_videoConfig) {
     this.mp3URL_ = mp3url;
+    this.mediaConfig_ = opt_videoConfig;
 };
-
-unisubs.player.MP3Source.forURL = function(url) {
+unisubs.player.MP3Source.forURL = function(url, opt_videoConfig) {
     if (unisubs.player.MP3Source.isMP3URL(url)) {
-        return new unisubs.player.MP3Source(url);
+        return new unisubs.player.MP3Source(url, opt_videoConfig);
     }
     else {
         return null;
     }
 };
-
 unisubs.player.MP3Source.isMP3URL = function(url) {
-    return /\.mp3$/i.test(url);
+    return (/\.mp3$/i).test(url);
 };
-
 unisubs.player.MP3Source.prototype.isBestVideoSource = function() {
     return true;
 };
-
 unisubs.player.MP3Source.prototype.createPlayer = function() {
     return this.createPlayer_(false);
 };
-
-unisubs.player.MP3Source.prototype.createControlledPlayer = 
-    function() 
-{
+unisubs.player.MP3Source.prototype.createControlledPlayer = function() {
     return new unisubs.player.ControlledVideoPlayer(
         this.createPlayer_(true));
 };
-
 unisubs.player.MP3Source.prototype.canPlayAudioNatively_ = function() {
     // FIXME: minor duplication with unisubs.player.supports_
     var audio = goog.dom.createElement('audio');
     return !!(audio['canPlayType'] && 
               audio['canPlayType']('audio/mpeg').replace(/no/, ''));
 };
-
-unisubs.player.MP3Source.prototype.createPlayer_ = 
-    function(forSubDialog) 
-{
+unisubs.player.MP3Source.prototype.createPlayer_ = function(forSubDialog) {
     if (this.canPlayAudioNatively_()) {
         return new unisubs.player.Html5AudioPlayer(this, forSubDialog);
     }
@@ -76,15 +66,12 @@ unisubs.player.MP3Source.prototype.createPlayer_ =
         return new unisubs.player.FlashAudioPlayer(this, forSubDialog);
     }
 };
-
 unisubs.player.MP3Source.prototype.getVideoURL = function() {
     return this.mp3URL_;
 };
-
 unisubs.player.MP3Source.prototype.getFlvURL = function() {
     return this.getVideoURL();
 };
-
 unisubs.player.MP3Source.prototype.getVideoConfig = function() {
     return null;
 };

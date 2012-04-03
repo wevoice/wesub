@@ -17,6 +17,7 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide('unisubs.timeline.SubtitleSet');
+
 /**
 * @constructor
 * @param {unisubs.subtitle.EditableCaptionSet} editableCaptionSet
@@ -36,19 +37,20 @@ unisubs.timeline.SubtitleSet = function(editableCaptionSet, videoPlayer) {
             this.captionChange_).
         listen(
             this.editableCaptionSet_,
-            [et.CLEAR_TIMES, et.ADD, et.DELETE],
+            [et.CLEAR_TIMES, et.RESET_SUBS, et.ADD, et.DELETE],
             this.subsEdited_);
 };
+
 goog.inherits(unisubs.timeline.SubtitleSet, goog.events.EventTarget);
 
 unisubs.timeline.SubtitleSet.DISPLAY_NEW = 'displaynew';
 unisubs.timeline.SubtitleSet.CLEAR_TIMES = 'cleartimes';
+unisubs.timeline.SubtitleSet.RESET_SUBS = 'resetsubs';
 unisubs.timeline.SubtitleSet.REMOVE = 'remove';
 
 unisubs.timeline.SubtitleSet.prototype.getSubsToDisplay = function() {
     return this.subsToDisplay_;
 };
-
 unisubs.timeline.SubtitleSet.prototype.createSubsToDisplay_ = function() {
     if (this.subsToDisplay_)
         this.disposeSubsToDisplay_();
@@ -64,12 +66,15 @@ unisubs.timeline.SubtitleSet.prototype.createSubsToDisplay_ = function() {
         this.subsToDisplay_[i].setNextSubtitle(
             this.subsToDisplay_[i + 1]);
 };
-
 unisubs.timeline.SubtitleSet.prototype.subsEdited_ = function(e) {
     var et = unisubs.subtitle.EditableCaptionSet.EventType;
     if (e.type == et.CLEAR_TIMES) {
         this.createSubsToDisplay_();
         this.dispatchEvent(unisubs.timeline.SubtitleSet.CLEAR_TIMES);
+    }
+    if (e.type == et.RESET_SUBS) {
+        this.createSubsToDisplay_();
+        this.dispatchEvent(unisubs.timeline.SubtitleSet.RESET_SUBS);
     }
     else if (e.type == et.ADD) {
         this.insertCaption_(e.caption);
@@ -78,7 +83,6 @@ unisubs.timeline.SubtitleSet.prototype.subsEdited_ = function(e) {
         this.deleteCaption_(e.caption);
     }
 };
-
 unisubs.timeline.SubtitleSet.prototype.deleteCaption_ = function(caption) {
     var subOrder = caption.getSubOrder();
     var index = goog.array.binarySearch(
@@ -111,7 +115,6 @@ unisubs.timeline.SubtitleSet.prototype.deleteCaption_ = function(caption) {
                 new unisubs.timeline.SubtitleSet.DisplayNewEvent(nextSub));
     }
 };
-
 unisubs.timeline.SubtitleSet.prototype.insertCaption_ = function(caption) {
     if (!this.isInsertable_(caption))
         return;
@@ -140,14 +143,12 @@ unisubs.timeline.SubtitleSet.prototype.insertCaption_ = function(caption) {
     this.dispatchEvent(
         new unisubs.timeline.SubtitleSet.DisplayNewEvent(newSub));
 };
-
 unisubs.timeline.SubtitleSet.prototype.isInsertable_ = function(caption) {
     return caption.getStartTime() != -1 ||
         caption.getPreviousCaption() == null ||
         (caption.getPreviousCaption() != null &&
          caption.getPreviousCaption().getStartTime() != -1);
 };
-
 unisubs.timeline.SubtitleSet.prototype.captionChange_ = function(e) {
     if (e.timesFirstAssigned && e.target.getNextCaption() != null) {
         var newSub = new unisubs.timeline.Subtitle(
@@ -162,15 +163,12 @@ unisubs.timeline.SubtitleSet.prototype.captionChange_ = function(e) {
             new unisubs.timeline.SubtitleSet.DisplayNewEvent(newSub));
     }
 };
-
 unisubs.timeline.SubtitleSet.prototype.getEditableCaptionSet = function() {
     return this.editableCaptionSet_;
 };
-
 unisubs.timeline.SubtitleSet.prototype.disposeSubsToDisplay_ = function() {
     goog.array.forEach(this.subsToDisplay_, function(s) { s.dispose(); });
 };
-
 unisubs.timeline.SubtitleSet.prototype.disposeInternal = function() {
     unisubs.timeline.SubtitleSet.superClass_.disposeInternal.call(this);
     this.eventHandler_.dispose();

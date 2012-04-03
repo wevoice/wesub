@@ -15,13 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-import base64, re
+import base64
 from urllib2 import URLError
 
 import facebook.djangofb as facebook
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import (
     REDIRECT_FIELD_NAME, get_backends, login as stock_login, authenticate,
     logout, login as auth_login
@@ -39,8 +38,9 @@ from oauth import oauth
 
 from auth.forms import CustomUserCreationForm
 from auth.models import (
-    UserLanguage, CustomUser as User, EmailConfirmation, LoginToken
+    UserLanguage, EmailConfirmation, LoginToken
 )
+from auth.providers import get_authentication_provider
 from socialauth.lib import oauthtwitter2 as oauthtwitter
 from socialauth.models import (
     AuthMeta, OpenidProfile, TwitterUserProfile, FacebookUserProfile
@@ -92,22 +92,6 @@ def create_user(request):
     else:
         return render_login(request, form, AuthenticationForm(label_suffix=""), redirect_to)
 
-@staff_member_required
-def user_list(request):
-    langs = request.GET.get('langs', None)
-    if not langs:
-        return render_to_response(
-            'auth/user_list.html',
-            context_instance=RequestContext(request))
-    else:
-        langs = re.split('[, ]+', langs)
-        users = User.objects.filter(userlanguage__language__in=langs).distinct()
-        return render_to_response(
-            'auth/user_list.csv',
-            {'users': users},
-            context_instance=RequestContext(request),
-            mimetype="text/plain")
-
 @login_required
 def delete_user(request):
     if request.POST.get('delete'):
@@ -143,16 +127,18 @@ def login_post(request):
 
 def render_login(request, user_creation_form, login_form, redirect_to):
     redirect_to = redirect_to or '/'
+    ted_auth = get_authentication_provider('ted')
     return render_to_response(
         'auth/login.html', {
             'creation_form': user_creation_form,
             'login_form' : login_form,
+            'ted_auth': ted_auth,
             REDIRECT_FIELD_NAME: redirect_to,
             }, context_instance=RequestContext(request))
 
 def make_redirect_to(request):
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
-    if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
+    if not redirect_to or '//' in redirect_to:
         return '/'
     else:
         return redirect_to

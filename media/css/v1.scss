@@ -107,10 +107,15 @@ body {
 .v1 .bootstrap {
     div.modal {
         display: none;
+
+        div.plain-text {
+            margin-bottom: 0;
+
+            label {
+                padding-top: 0;
+            }
+        }
     }
-}
-.v1 .logo {
-    margin: 1em 0 2em;
 }
 .v1 .notation {
     color: $light;
@@ -218,8 +223,23 @@ body {
     width: 150px;
     @include box-right;
 }
-div.hidden {
+div.hidden, form.hidden {
     display: none;
+}
+ul.list-collapsible {
+    li.hidden {
+        display: none;
+    }
+    li.expand {
+        span.less {
+            display: none;
+        }
+    }
+    &.expanded {
+        li.hidden {
+            display: block;
+        }
+    }
 }
 
 /* Tabs */
@@ -464,10 +484,15 @@ div.hidden {
 
                 h4 {
                     padding: .25em 0;
+
+                    a {
+                        color: $lighter;
+                    }
                 }
                 &.due {
                     font-size: 11px;
                 }
+
             }
 
             a {
@@ -741,6 +766,25 @@ div.hidden {
         padding: 0;
     }
 
+    &.disabled {
+        padding-right: 0;
+
+        h3, p, a, ul {
+            opacity: .2;
+        }
+        ul.actions, ul.admin-controls {
+            display: none !important;
+        }
+        div.cannot-perform-disabled {
+            background: #F2DEDE;
+            border: 1px solid #EED3D7;
+            color: #B94A48;
+            margin-bottom: 10px;
+            padding: 10px;
+            @include border-radius;
+        }
+    }
+
 }
 .v1 .listing.teams > li {
     padding-right: 150px;
@@ -906,10 +950,12 @@ p.view-more {
 .v1 form {
     padding: 1em 0;
 
+    h3 {
+        line-height: 20px;
+    }
     .form-title {
         margin: 1em 0 0 0;
     }
-
     fieldset {
         padding-bottom: 3em;
 
@@ -958,7 +1004,6 @@ p.view-more {
             height: 5em;
         }
     }
-
     p {
         color: inherit;
     }
@@ -1095,7 +1140,6 @@ p.view-more {
     background-image: linear-gradient(top, hsla(0, 0%, 94%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 98%, 1) 95%, hsla(0, 0%, 94%, 1));
     border-bottom: 1px solid $fainter;
     border-top: 1px solid $fainter;
-    float: left;
     margin: 0 0 2em;
     padding: 1.5em 0;
     width: 100%;
@@ -1149,12 +1193,6 @@ label[for="id_thumbnail"] {
 input[name="thumbnail-clear"] {
     margin: 12px 4px 12px 0 !important;
 }
-body#teams div.edit-team-video form fieldset a {
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 240px;
-}
 
 /* Dashboard */
 #dashboard {
@@ -1200,6 +1238,13 @@ body#teams div.edit-team-video form fieldset a {
     border-bottom: 1px solid $fainter;
     margin-bottom: 0;
     padding: .5em 0;
+}
+
+/* Global */
+div#language_picker {
+    select {
+        width: 220px;
+    }
 }
 
 /* Profile */
@@ -1400,13 +1445,12 @@ body#teams div.edit-team-video form fieldset a {
         padding-bottom: 1.5em;
     }
 
-    video, object, .unisubs-widget span.unisubs-videoplayer {
+    video, object, .unisubs-widget span.unisubs-videoplayer, audio {
         height: 173px !important;
         width: 289px !important;
     }
 
     #description {
-        color: $dark;
         line-height: 150%;
 
         p {
@@ -1488,6 +1532,10 @@ body#teams div.edit-team-video form fieldset a {
                 }
             }
         }
+    }
+
+    .notation {
+        color: inherit;
     }
 }
 ol.subtitles {
@@ -1815,12 +1863,8 @@ pre.dump {
 }
 
 /* Crazytown */
-#teams .backnav {
+#teams .backnav, #teams .backnav a {
     color: $light; 
-
-    a {
-        color: $darkest;
-    }
 }
 #teams div.header {
     min-height: 0;
@@ -2010,4 +2054,24 @@ pre.dump {
 }
 #teams .view .filters.active {
     display: block;
+}
+#teams form.edit-video {
+    fieldset {
+        padding-bottom: 0;
+    }
+}
+#teams form.move-video {
+    border-top: 10px solid #ECF0F1;
+    margin-top: 15px;
+
+    fieldset {
+        padding-bottom: 0;
+
+        select {
+            width: auto;
+        }
+    }
+    div.submit {
+        margin-top: 10px;
+    }
 }

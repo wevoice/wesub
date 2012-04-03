@@ -26,9 +26,7 @@ goog.provide('unisubs.editmetadata.Panel');
  * @param {unisubs.CaptionManager} Caption manager, already containing subtitles
  *     with start_time set.
  */
-unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, 
-                                      captionManager, originalSubtitles, 
-                                      inSubtitlingDialog, reviewOrApprovalType, dialog) {
+unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel, captionManager, originalSubtitles, inSubtitlingDialog, reviewOrApprovalType, dialog) {
     goog.ui.Component.call(this);
     /**
      * @type {unisubs.subtitle.EditableCaptionSet}
@@ -57,6 +55,7 @@ unisubs.editmetadata.Panel = function(subtitles, videoPlayer, serverModel,
     this.inSubtitlingDialog_  = inSubtitlingDialog;
     this.reviewOrApprovalType_ = reviewOrApprovalType;
 };
+
 goog.inherits(unisubs.editmetadata.Panel, goog.ui.Component);
 
 unisubs.editmetadata.Panel.prototype.enterDocument = function() {
@@ -96,7 +95,6 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     this.descriptionTranslationWidget_.setTranslation(description);
     this.titleTranslationWidget_.setTranslation(title);
 };
-
 unisubs.editmetadata.Panel.prototype.getRightPanel = function() {
    if (!this.rightPanel_) {
         this.rightPanel_ = this.createRightPanel_();
@@ -104,19 +102,16 @@ unisubs.editmetadata.Panel.prototype.getRightPanel = function() {
     }
     return this.rightPanel_;
 
-}
-
+};
 unisubs.editmetadata.Panel.prototype.disposeInternal = function() {
     unisubs.editmetadata.Panel.superClass_.disposeInternal.call(this);
     if (this.rightPanel_) {
         this.rightPanel_.dispose();
     }
 };
-
 unisubs.editmetadata.Panel.prototype.suspendKeyEvents = function(suspended) {
     this.keyEventsSuspended_ = suspended;
 };
-
 unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     var reviewOrApproval = true;
@@ -132,9 +127,9 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
         internalComponents = {
         'helpContents' : helpContents,
         'extraHelp' : []
-        }
+        };
 
-    }else{
+    } else {
         this.bodyInput_ = internalComponents['bodyInput'];
     }
     
@@ -146,21 +141,16 @@ unisubs.editmetadata.Panel.prototype.createRightPanel_ = function(numSteps) {
 
 
 };
-
-
-
 unisubs.editmetadata.Panel.prototype.getNotesContent_ = function(){
     if (this.bodyInput_){
         return  this.bodyInput_.value;
     }
     return null;
-}
-
+};
 unisubs.editmetadata.Panel.prototype.setNotesContent_ = function(newContent){
     if (this.bodyInput_){
         this.bodyInput_.value = newContent;
         return true;
     }
     return null;
-}
-
+};

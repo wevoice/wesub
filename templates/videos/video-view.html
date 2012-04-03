@@ -27,7 +27,7 @@
     {% endblock %}
 
 {% block title %}
-    "{{ video.title_display }}" | Universal Subtitles
+    {{ video.title_display }} with subtitles | Amara
 {% endblock %}
 
 {% block opengraph-head %}
@@ -104,15 +104,17 @@
             {% endif %}
         </h3>
         {% if video.subtitle_language or translations %}
-            <div{% if video.languages_count > 15 %} class="abbr collapsed"{% endif %}>
+            <div>
                 <div>
-                    <ul id="subtitles-menu">
+                    <ul id="subtitles-menu" {% if video.languages_count > 14 %} class="list-collapsible"{% endif %}>
                         {% include 'videos/_left_navigation.html' %}
+                        {% if video.languages_count > 14 %}
+                            <li class="expand">
+                                <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
-                {% if video.languages_count > 15 %}
-                    <a class="expand" href="#">Show all ↓</a>
-                {% endif %}
             </div>
         {% else %}
             {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
@@ -161,7 +163,7 @@
                 </div>
                 {% with video.get_team_video as team_video %}
                     {% if team_video %}
-                        {% render_belongs_to_team_list video user %}
+                        {% render_belongs_to_team_list team_video user %}
                     {% else %}
                         {% if user.managed_teams %}
                             <div class="video-tools grid_4 omega">

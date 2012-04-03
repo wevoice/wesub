@@ -5,9 +5,9 @@
     {{ team }} {% trans 'Settings' %} | Universal Subtitles
 {% endblock %}
 
-{% block view_content %}
-    {% include "utils/chosenify.html" %}
+{% block html_attrs %}id="team_settings_languages"{% endblock %}
 
+{% block view_content %}
     <div class="view grid_8 omega">
         {% with 'settings' as current %}
             {% include 'teams/_tabs.html' %}

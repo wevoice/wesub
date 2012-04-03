@@ -18,6 +18,24 @@
         }
     }, 
     {
+        "pk": 2, 
+        "model": "teams.team", 
+        "fields": {
+            "is_visible": true, 
+            "video": null, 
+            "description": "Another team for testing", 
+            "created": "2010-11-11 12:52:09", 
+            "points": 0, 
+            "membership_policy": 4, 
+            "video_policy": 2, 
+            "task_assign_policy": 20, 
+            "highlight": false, 
+            "logo": "", 
+            "slug": "second", 
+            "name": "Second Test Team"
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "teams.project", 
         "fields": {
@@ -39,6 +57,18 @@
             "modified": "2010-11-11 10:52:09", 
             "team": 1,
             "slug": "test"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "teams.project", 
+        "fields": {
+            "name": "_root", 
+            "description": "Another team for testing", 
+            "created": "2010-11-11 13:52:09", 
+            "modified": "2010-11-11 13:52:09", 
+            "team": 2,
+            "slug": "_root"
         }
     }, 
     {

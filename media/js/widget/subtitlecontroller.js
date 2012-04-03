@@ -67,7 +67,7 @@ unisubs.widget.SubtitleController.prototype.videoAnchorClicked_ =
     e.preventDefault();
     unisubs.Tracker.getInstance().trackPageview('videoTabClicked');
     var resumeEditingRecord = null;
-    if (unisubs.supportsLocalStorage()) {
+    if (!unisubs.IS_NULL && unisubs.supportsLocalStorage()) {
         resumeEditingRecord = unisubs.widget.ResumeEditingRecord.fetch();
     }
     var that = this;

@@ -1,4 +1,5 @@
-"""
+"""Templatetag for adding raw content in Django templates easily.
+
 jQuery templates use constructs like:
 
     {{if condition}} print something{{/if}}
@@ -9,18 +10,18 @@ because Django thinks {{ and }} mean something.
 Wrap {% verbatim %} and {% endverbatim %} around those
 blocks of jQuery templates and this will try its best
 to output the contents with no changes.
+
 """
 
 from django import template
 
+
 register = template.Library()
 
-
 class VerbatimNode(template.Node):
-
     def __init__(self, text):
         self.text = text
-    
+
     def render(self, context):
         return self.text
 

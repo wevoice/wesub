@@ -47,9 +47,8 @@ unisubs.Widgetizer = function() {
         uri.getDomain(),
         uri.toString());
 };
+
 goog.addSingletonGetter(unisubs.Widgetizer);
-
-
 
 /**
  * Converts all videos in the page to unisubs widgets.
@@ -80,7 +79,6 @@ unisubs.Widgetizer.prototype.onLoaded_ = function() {
         goog.bind(this.findAndWidgetizeElements_, this));
     this.widgetizeAttemptTimer_.start();
 };
-
 unisubs.Widgetizer.prototype.unisubsPlayerReady_ = function(code, args) {
     var videoPlayer;
     if (code == "y") {
@@ -99,7 +97,6 @@ unisubs.Widgetizer.prototype.unisubsPlayerReady_ = function(code, args) {
         this.decorateVideoPlayer_(videoPlayer);
     }
 };
-
 unisubs.Widgetizer.prototype.initListenedPlayers_ = function() {
     goog.array.forEach(
         window["unisubsReady"],
@@ -116,7 +113,6 @@ unisubs.Widgetizer.prototype.initListenedPlayers_ = function() {
             }, this);
     }
 };
-
 unisubs.Widgetizer.prototype.findAndWidgetizeElements_ = function() {
     this.widgetizeAttemptCount_++;
     if (this.widgetizeAttemptCount_ > 5) {
@@ -137,7 +133,6 @@ unisubs.Widgetizer.prototype.findAndWidgetizeElements_ = function() {
     }
     goog.array.forEach(videoPlayers, this.decorateVideoPlayer_, this);
 };
-
 unisubs.Widgetizer.prototype.decorateVideoPlayer_ = function(videoPlayer) {
     if (unisubs.usingStreamer()) {
         unisubs.streamer.StreamerDecorator.decorate(videoPlayer);
@@ -146,7 +141,6 @@ unisubs.Widgetizer.prototype.decorateVideoPlayer_ = function(videoPlayer) {
         unisubs.widget.WidgetDecorator.decorate(videoPlayer);
     }
 };
-
 unisubs.Widgetizer.prototype.addHeadCss = function() {
     if (!window.MiroCSSLoading) {
         window.MiroCSSLoading = true;

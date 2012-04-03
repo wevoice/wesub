@@ -1,31 +1,31 @@
-import urllib
-import sys
-import os
-import re
 import mimetypes
+import os, re, sys, urllib
 import warnings
 from copy import copy
-from urlparse import urlparse, urlunparse, urlsplit
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from urlparse import urlparse, urlsplit
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import got_request_exception
+from django.db import close_connection
 from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
-from django.test import signals
-from django.utils.functional import curry
+from django.test import signals as test_signals
+from django.test.utils import ContextList
 from django.utils.encoding import smart_str
+from django.utils.functional import curry
 from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
-from django.db import transaction, close_connection
-from django.test.utils import ContextList
+
+try:
+    from cStringIO import StringIO
+    assert StringIO # Shut up, Pyflakes.
+except ImportError:
+    from StringIO import StringIO
+
 
 __all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
 
@@ -65,7 +65,6 @@ class ClientHandler(BaseHandler):
         super(ClientHandler, self).__init__(*args, **kwargs)
 
     def __call__(self, environ):
-        from django.conf import settings
         from django.core import signals
 
         # Set up middleware if needed. We couldn't do this earlier, because
@@ -378,7 +377,7 @@ class Client(RequestFactory):
         # callback function.
         data = {}
         on_template_render = curry(store_rendered_templates, data)
-        signals.template_rendered.connect(on_template_render, dispatch_uid="template-render")
+        test_signals.template_rendered.connect(on_template_render, dispatch_uid="template-render")
         # Capture exceptions created by the handler.
         got_request_exception.connect(self.store_exc_info, dispatch_uid="request-exception")
         try:
@@ -435,7 +434,7 @@ class Client(RequestFactory):
 
             return response
         finally:
-            signals.template_rendered.disconnect(dispatch_uid="template-render")
+            test_signals.template_rendered.disconnect(dispatch_uid="template-render")
             got_request_exception.disconnect(dispatch_uid="request-exception")
 
     def get(self, path, data={}, follow=False, **extra):

@@ -21,8 +21,8 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRespons
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
-from videos.models import Video, VIDEO_TYPE_YOUTUBE, Action, SubtitleLanguage, SubtitleVersion,  \
-    VideoUrl, AlreadyEditingException
+from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
+    VideoUrl, AlreadyEditingException, restrict_versions
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
     SubtitlesUploadForm, PasteTranscriptionForm, CreateVideoUrlForm, TranscriptionFileForm, \
     AddFromFeedForm
@@ -131,19 +131,6 @@ def volunteer_category(request, category):
     return render_to_response('videos/volunteer_%s.html' %(category),
                               context_instance=RequestContext(request))
 
-def bug(request):
-    from widget.rpc import add_general_settings
-    context = widget.add_config_based_js_files({}, settings.JS_API, 'unisubs-api.js')
-    context['all_videos'] = Video.objects.count()
-    try:
-        context['video_url_obj'] = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE)[:1].get()
-    except VideoUrl.DoesNotExist:
-        raise Http404
-    general_settings = {}
-    add_general_settings(request, general_settings)
-    context['general_settings'] = json.dumps(general_settings)
-    return render_to_response('bug.html', context,
-                              context_instance=RequestContext(request))
 
 def create(request):
     video_form = VideoForm(request.user, request.POST or None)
@@ -162,6 +149,14 @@ def create(request):
 share the video with friends, or get an embed code for your site.  To add or
 improve subtitles, click the button below the video.'''))
 
+        url_obj = video.videourl_set.filter(primary=True).all()[:1].get()
+        if url_obj.type != 'Y':
+            # Check for all types except for Youtube
+            if not url_obj.effective_url.startswith('https'):
+                messages.warning(request, message=_(u'''You have submitted a video
+                that is served over http.  Your browser may display mixed
+                content warnings.'''))
+
         if video_form.created:
             messages.info(request, message=_(u'''Existing subtitles will be imported in a few minutes.'''))
         return redirect(video.get_absolute_url())
@@ -173,8 +168,8 @@ create.csrf_exempt = True
 def create_from_feed(request):
     form = AddFromFeedForm(request.user, request.POST or None)
     if form.is_valid():
-        videos = form.save()
-        messages.success(request, form.success_message() % {'count': len(videos)})
+        form.save()
+        messages.success(request, form.success_message())
         return redirect('videos:create')
     context = {
         'video_form': VideoForm(),
@@ -204,20 +199,8 @@ def video(request, video, video_url=None, title=None):
     # TODO: make this more pythonic, prob using kwargs
     context = widget.add_onsite_js_files({})
     context['video'] = video
-    original = video.subtitle_language()
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    # we want a list of translations that had at least with version with subtitles
-    # this will not filter subtitleversion's whos subtitles are empty
-    translations = video.subtitlelanguage_set.exclude(subtitle_count=0)
-    if original:
-        # a video might have more than 1 is_original sl, in which case
-        # we guess the right one above, but still manage to include the others
-        # bellow
-        translations = translations.exclude(pk=original.pk)
-    translations = list(translations)
-    translations.sort(key=lambda f: f.get_language_display())
-    context['translations'] = translations
-
+    context['translations'] = _get_translations(video)
     context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
 
     context['widget_params'] = _widget_params(
@@ -288,7 +271,7 @@ def upload_subtitles(request):
         except Exception, e:
             #trying find out one error on dev-server. hope this should help
             transaction.rollback()
-            raise e
+            raise
     else:
         output['errors'] = form.get_errors()
         transaction.rollback()
@@ -426,7 +409,7 @@ def history(request, video, lang=None, lang_id=None):
         else:
             raise Http404
 
-    qs = language.subtitleversion_set.not_restricted_by_moderation().select_related('user')
+    qs = language.subtitleversion_set.select_related('user')
     ordering, order_type = request.GET.get('o'), request.GET.get('ot')
     order_fields = {
         'date': 'datetime_started',
@@ -440,15 +423,8 @@ def history(request, video, lang=None, lang_id=None):
         context['ordering'], context['order_type'] = ordering, order_type
 
     context['video'] = video
-    original = video.subtitle_language()
-    translations = list(video.subtitlelanguage_set.filter(is_original=False) \
-        .filter(had_version=True).select_related('video'))
-
-    context["user_can_moderate"] = False
-
-    translations.sort(key=lambda f: f.get_language_display())
-    context['translations'] = translations
-    context['last_version'] = language.last_version
+    context['translations'] = _get_translations(video)
+    context['user_can_moderate'] = False
     context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
     context['edit_url'] = language.get_widget_url()
@@ -456,12 +432,11 @@ def history(request, video, lang=None, lang_id=None):
 
     context['task'] =  _get_related_task(request)
     _add_share_panel_context_for_history(context, video, language)
-    return object_list(request, queryset=qs, allow_empty=True,
-                       paginate_by=settings.REVISIONS_ONPAGE,
-                       page=request.GET.get('page', 1),
-                       template_name='videos/subtitle-view.html',
-                       template_object_name='revision',
-                       extra_context=context)
+
+    context['revision_list'] = restrict_versions(qs, request.user, language)
+    context['last_version'] = context['revision_list'][0] if context['revision_list'] else None
+
+    return render_to_response("videos/subtitle-view.html", context, context_instance=RequestContext(request))
 
 def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):
     primary_url = video_url or video.get_video_url()
@@ -749,3 +724,11 @@ def reset_metadata(request, video_id):
     video_changed_tasks.delay(video.id)
     return HttpResponse('ok')
 
+def _get_translations(video):
+    original = video.subtitle_language()
+    translations = video.subtitlelanguage_set.exclude(subtitle_count=0)
+    if original:
+        translations = translations.exclude(pk=original.pk)
+    translations = list(translations)
+    translations.sort(key=lambda f: f.get_language_display())
+    return translations

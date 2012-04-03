@@ -5,6 +5,8 @@
     {{ team }} {% trans 'Settings' %} | Universal Subtitles
 {% endblock %}
 
+{% block html_attrs %}id="team_settings_permissions"{% endblock %}
+
 {% block view_content %}
 
     <div class="view grid_8 omega">
@@ -61,7 +63,7 @@
                 {{ form.translate_policy }}
             </fieldset>
 
-            <div id="summary">
+            <div id="summary" class="group">
                 <h4>{% trans 'How your subtitles will get published <em>(configure below)</em>' %}</h4>
                 <div class="grid_2">
                     <h5>{% trans 'Transcribed' %}</h5>
@@ -117,64 +119,6 @@
             </div>
         </form>
     </div>
-
-    <script type="text/javascript">
-        $(window).load(function(){
-            $workflow = $('#id_workflow_enabled');
-            
-            // Fields to watch
-            $subperm = $('#id_subtitle_policy');
-            $transperm = $('#id_translate_policy');
-            $revperm = $('#id_review_allowed');
-            $appperm = $('#id_approve_allowed');
-
-            // Inspect/observe the workflow checkbox
-            if ($workflow.attr('checked')) {
-                $('.v1 .workflow').show();
-            }
-            $workflow.change(function() {
-                if ($workflow.attr('checked')) {
-                    $('.v1 .workflow').show();
-                    $revperm.trigger('change');
-                    $appperm.trigger('change');
-                } else {
-                    $('.v1 .workflow').hide();
-                    $('#review-step').hide();
-                    $('#approve-step').hide();
-                }
-            });
-
-            // Observe the permissions fields
-            $subperm.change(function() {
-                $('#perm-sub').html($subperm.children('option:selected').html());
-            });
-            $transperm.change(function() {
-                $('#perm-trans').html($transperm.children('option:selected').html());
-            });
-            $revperm.change(function() {
-                if($revperm.children('option:selected').val() != 0){
-                    $('#review-step').show();
-                    $('#perm-rev').html($revperm.children('option:selected').html());
-                } else {
-                    $('#review-step').hide();
-                }
-            });
-            $appperm.change(function() {
-                if($appperm.children('option:selected').val() != 0){
-                    $('#approve-step').show();
-                    $('#perm-app').html($appperm.children('option:selected').html());
-                } else {
-                    $('#approve-step').hide();
-                }
-            });
-
-            // Load state
-            $subperm.trigger('change');
-            $transperm.trigger('change');
-            $revperm.trigger('change');
-            $appperm.trigger('change');
-        });
-    </script>
 
     <script id="IMAGE_PRELOADER" type="text/html">
         <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>

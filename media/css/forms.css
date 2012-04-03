@@ -466,7 +466,11 @@ input#email_friend_id_from_email, input#email_friend_id_to_emails, input#email_f
     background: url(../images/social_login.png) 0px 0px no-repeat
 }
 #facebook {
-    background: url(../images/social_login.png) -102px 0px no-repeat
+    background: url(../images/social_login.png) -102px 0px no-repeat;
+}
+#ted {
+    background: url('../images/social_login_ted.png') 0 0 no-repeat;
+    margin-top: 10px;
 }
 #google {
     background: url(../images/social_login.png) -204px 0px no-repeat

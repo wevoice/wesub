@@ -102,10 +102,9 @@ class EffectiveSubtitle:
             subtitle.start_of_paragraph,
         )
 
-    def duplicate_for(self, draft):
+    def duplicate_for(self):
         from videos.models import Subtitle
         return Subtitle(
-            draft=draft,
             subtitle_id=self.subtitle_id,
             subtitle_order=self.sub_order,
             subtitle_text=self.text,

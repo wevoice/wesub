@@ -122,10 +122,10 @@ unisubs.editmetadata.Dialog.prototype.isWorkSaved = function() {
     return this.saved_ || false;
 };
 
-unisubs.editmetadata.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
+unisubs.editmetadata.Dialog.prototype.saveWorkInternal = function(closeAfterSave, saveForLater) {
     var that = this;
     this.getRightPanelInternal().showLoading(true);
-    this.getRightPanelInternal().finish('In Progress');
+    this.getRightPanelInternal().finish('In Progress', saveForLater);
 };
 
 unisubs.editmetadata.Dialog.prototype.onWorkSaved = function(closeAfterSave){

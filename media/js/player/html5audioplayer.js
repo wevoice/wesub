@@ -25,29 +25,39 @@ goog.provide('unisubs.player.Html5AudioPlayer');
  */
 unisubs.player.Html5AudioPlayer = function(mediaSource, opt_forDialog) {
     unisubs.player.Html5MediaPlayer.call(this, mediaSource);    
+    this.mediaConfig_ = mediaSource.mediaConfig_;
     this.forDialog_ = !!opt_forDialog;
 };
-goog.inherits(unisubs.player.Html5AudioPlayer,
-              unisubs.player.Html5MediaPlayer);
+
+goog.inherits(unisubs.player.Html5AudioPlayer, unisubs.player.Html5MediaPlayer);
 
 unisubs.player.Html5AudioPlayer.prototype.createDom = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     this.mediaElem = this.createAudioElement_($d);
     var containingDiv = $d('div', 'unisubs-audio-player', this.mediaElem);
+
     this.setElementInternal(containingDiv);
     // FIXME: duplicated in FlashAudioPlayer
-    unisubs.style.setSize(
-        containingDiv,
-        this.forDialog_ ? 
-            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
-            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
-    unisubs.style.setSize(
-        this.mediaElem,
-        this.forDialog_ ? 
-            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
-            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
-};
 
+    if (this.mediaConfig_ && this.mediaConfig_['width'] && this.mediaConfig_['height']) {
+        var size = new goog.math.Size(
+            parseInt(this.mediaConfig_['width'], 0), parseInt(this.mediaConfig_['height'], 0));
+        unisubs.style.setSize(containingDiv, size);
+        unisubs.style.setSize(this.mediaElem, size);
+    }
+    else {
+        unisubs.style.setSize(
+            containingDiv,
+            this.forDialog_ ? 
+                unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+                unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
+        unisubs.style.setSize(
+            this.mediaElem,
+            this.forDialog_ ? 
+                unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+                unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE);
+    }
+};
 unisubs.player.Html5AudioPlayer.prototype.createAudioElement_ = function($d) {
     var params = { 'autobuffer': 'true' };
     if (!this.forDialog_) {
@@ -55,13 +65,11 @@ unisubs.player.Html5AudioPlayer.prototype.createAudioElement_ = function($d) {
     }
     return $d('audio', params, $d('source', {'src': this.mediaSource.getVideoURL() }));
 };
-
 unisubs.player.Html5AudioPlayer.prototype.stopLoadingInternal = function() {
     // TODO: replace this with an actual URL
     this.mediaElem['src'] = '';
     return true;
 };
-
 unisubs.player.Html5AudioPlayer.prototype.getVideoSize = function() {
     return goog.style.getSize(this.getElement());
 };

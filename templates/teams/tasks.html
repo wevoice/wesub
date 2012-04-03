@@ -1,36 +1,24 @@
 {% extends "teams/base.html" %}
-{% load to_json i18n teams_tags paginator media_compressor verbatim_templatetag query_string utils_tags %}
+{% load to_json i18n teams_tags paginator media_compressor verbatim_templatetag query_string utils_tags videos_tags %}
 
 {% block css %}
     {{ block.super }}
     {% include_bundle "widget-css"%}
 {% endblock %}
 
-{% block html_attrs %}id="tasks"{% endblock %}
+{% block html_attrs %}id="team_tasks"{% endblock %}
 
 {% block scripts %}
     {{ block.super }}
-    {% include "utils/chosenify.html" %}
-
     {% include_bundle "unisubs-offsite-compiled" %}
     {% include_bundle "js-teams" %}
-
     <script src="{% url teams:rpc_api %}" type="text/javascript"></script>
     <script type="text/javascript">
-        unisubs.widget.WidgetController.makeGeneralSettings({{ widget_settings|to_json|safe }});
-
-        $(function() {
-            // Handle weird back-button issue with browsers.
-            $select = $('select#id_task_language');
-            {% if request.GET.lang %}
-                $opt = $('option[id="lang-opt-{{ request.GET.lang }}"]');
-            {% else %}
-                $opt = $('option[id="lang-opt-any"]');
-            {% endif %}
-            $select.children().removeAttr('selected');
-            $opt.attr('selected', 'selected');
-            $select.trigger('liszt:updated');
-        });
+        window.WIDGET_SETTINGS = {{ widget_settings|to_json|safe }};
+        window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
+        window.ASSIGN_TASK_AJAX_URL = '{% url teams:assign_task_ajax slug=team.slug %}';
+        window.ASSIGNEE = '{% firstof request.user.id -1 %}';
+        window.TEAM_SLUG = '{{ team.slug }}';
     </script>
 {% endblock %}
 
@@ -109,10 +97,10 @@
                             {% trans 'date, oldest' %}
                         </option>
                         {% if team.task_expiration != None %}
-                            <option {% if request.GET.sort == '-expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-expires' page='' %}">
+                            <option {% if request.GET.sort == 'expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='expires' page='' %}">
                                 {% trans 'time left, least' %}
                             </option>
-                            <option {% if request.GET.sort == 'expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='expires' page='' %}">
+                            <option {% if request.GET.sort == '-expires' %}selected="selected"{% endif %} value="{% query_string request.GET sort='-expires' page='' %}">
                                 {% trans 'time left, most' %}
                             </option>
                         {% endif %}
@@ -135,184 +123,219 @@
             <ul class="tasks listing">
                 {% with member.has_max_tasks as has_max_tasks %}
                     {% for task in tasks %}
-                        <li>
-                            <h3>
-                                {% if task.get_type_display == "Subtitle" %}
-                                    {% trans 'Transcribe' %}
-                                {% else %}
-                                    {{ task.get_type_display }}
-                                    {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
-                                        {% if task.subtitle_version.language.is_original %}
-                                            {% trans 'Original' %}
-                                        {% endif %}
-                                    {% endif %}
-                                {% endif %}
-                                {% if task.get_type_display == "Translate" %}
-                                    {% trans 'Subtitles into' %} {{ task.get_language_display }}
-                                {% else %}
-                                    {% if task.get_language_display %}
-                                        {{ task.get_language_display }}
-                                    {% endif %}
-                                    {% trans 'Subtitles' %}
-                                {% endif %}
-                            </h3>
-                            <p>{% trans "Video" %}: <a href="{{ task.team_video.video.get_absolute_url }}">{{ task.team_video|truncatewords:6 }}</a></p>
+                        {% with task.subtitle_version.language.standard_language as translated_from %}
+                            <li
+                                {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
+                                    {% if translated_from and not translated_from.had_version %}
+                                        class="disabled">
+                                        <div class="cannot-perform-disabled">This task cannot be performed until the original language ({{ translated_from.get_language_display }}) is finished.</div>
+                                    {% else %}>{% endif %}
+                                {% else %}>{% endif %}
 
-                            {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
-                                {% with task.subtitle_version as version %}
-                                    <p>
-                                        {% trans 'Subtitles' %}:
-                                        {% comment %}
-                                            <a href="{{ task.subtitle_version.language.get_absolute_url }}">{% trans 'draft' %}</a>
-                                        {% endcomment %}
-                                        {% if version.language.is_original %}
-                                            {% trans 'transcribed' %}
-                                        {% else %}
-                                            {% trans 'translated' %}
-                                        {% endif %}
-                                        by
-                                        <a href="{{ version.user.get_absolute_url }}" title="View {{ version.user }}'s profile">{{ version.user }}</a>
-                                        {% if task.get_type_display == 'Approve' %}
-                                            {% with task.get_reviewer as reviewer %}
-                                                {% if reviewer %},
-                                                    reviewed by <a href="{{ reviewer.get_absolute_url }}">{{ reviewer }}</a>.
-                                                {% endif %}
-                                            {% endwith %}
-                                        {% endif %}
-                                    </p>
-                                {% endwith %}
-                            {% endif %} 
-
-                            <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
-                            <ul class="actions">
-                                <li>
-                                    <h4>
-                                        {% if task.assignee %}
-                                            {% trans 'Assigned to' %}
-                                            {% if task.assignee == user %}
-                                                {% trans 'me' %}
-                                            {% else %}
-                                                {{ task.assignee }}
+                                <h3>
+                                    {% if task.get_type_display == "Subtitle" %}
+                                        {% trans 'Transcribe' %}
+                                    {% else %}
+                                        {{ task.get_type_display }}
+                                        {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
+                                            {% if task.subtitle_version.language.is_original %}
+                                                {% trans 'Original' %}
                                             {% endif %}
-                                        {% else %}
-                                            {% trans 'Unassigned' %}
                                         {% endif %}
-                                    </h4>
-                                </li>
-                                {% if task.expiration_date != None %}
-                                    {% if task.future %}
-                                        <li class="due">Due in {{ task.expiration_date|timeuntil }}</li>
-                                    {% else %}
-                                        <li class="due">Overdue by {{ task.expiration_date|timesince }}</li>
                                     {% endif %}
-                                {% endif %}
-
-                                {% if task|can_perform_task:user %}
-                                    {% if task.assignee == user %}
-                                        <li>
-                                            {% include "teams/_perform_task_link.html" %}
-                                        </li>
+                                    {% if task.get_type_display == "Translate" %}
+                                        {% trans 'Subtitles into' %} {{ task.get_language_display }}
                                     {% else %}
-                                        {% if not has_max_tasks and task.assignee == None %}
+                                        {% if task.get_language_display %}
+                                            {{ task.get_language_display }}
+                                        {% endif %}
+                                        {% trans 'Subtitles' %}
+                                    {% endif %}
+                                </h3>
+                                <p>
+                                    {% trans "Video" %}:
+                                    <a href="{{ task.team_video.video.get_absolute_url }}">
+                                        {{ task.team_video|truncatewords:12 }}
+                                    </a>
+                                    {% if task.team_video.video.duration %}
+                                        ({{ task.team_video.video.duration|format_duration }})
+                                    {% endif %}
+                                </p>
+
+                                {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
+                                    {% with task.subtitle_version as version %}
+                                        <p>
+                                            {% trans 'Subtitles' %}:
+                                            <a href="{{ task.subtitle_version.get_absolute_url }}">
+                                                {% trans 'draft' %}
+                                            </a>
+                                            {% if version.language.is_original %}
+                                                {% trans 'transcribed' %}
+                                            {% else %}
+                                                {% trans 'translated' %}
+                                            {% endif %}
+                                            by
+                                            <a href="{{ version.user.get_absolute_url }}" title="View {{ version.user }}'s profile">{{ version.user }}</a>
+                                            {% if task.get_type_display == 'Approve' %}
+                                                {% with task.get_reviewer as reviewer %}
+                                                    {% if reviewer %},
+                                                        reviewed by <a href="{{ reviewer.get_absolute_url }}">{{ reviewer }}</a>.
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% endif %}
+                                        </p>
+                                    {% endwith %}
+                                {% endif %} 
+
+                                <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
+                                <ul class="actions">
+                                    <li>
+                                        <h4>
+                                            {% if task.assignee %}
+                                                {% trans 'Assigned to' %}
+                                                {% if task.assignee == user %}
+                                                    {% trans 'me' %}
+                                                {% else %}
+                                                    <a href="{{ task.assignee.get_absolute_url }}" title="View {{ task.assignee }}'s profile">
+                                                        {{ task.assignee }}
+                                                    </a>
+                                                {% endif %}
+                                            {% else %}
+                                                {% trans 'Unassigned' %}
+                                            {% endif %}
+                                        </h4>
+                                    </li>
+                                    {% if task.expiration_date != None %}
+                                        {% if task.future %}
+                                            <li class="due">Due in {{ task.expiration_date|timeuntil }}</li>
+                                        {% else %}
+                                            <li class="due">Overdue by {{ task.expiration_date|timesince }}</li>
+                                        {% endif %}
+                                    {% endif %}
+
+                                    {% if task|can_perform_task:user %}
+                                        {% if task.assignee == user %}
                                             <li>
-                                                <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
-                                                    {% trans 'Perform Task' %}
-                                                </a>
-                                            </li>
-                                            <li class="hidden-perform-link" style="display: none;">
                                                 {% include "teams/_perform_task_link.html" %}
                                             </li>
+                                        {% else %}
+                                            {% if not has_max_tasks and task.assignee == None %}
+                                                <li>
+                                                    <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
+                                                        {% trans 'Perform Task' %}
+                                                    </a>
+                                                </li>
+                                                <li class="hidden-perform-link" style="display: none;">
+                                                    {% include "teams/_perform_task_link.html" %}
+                                                </li>
+                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
-                                {% endif %}
 
-                            </ul>
+                                </ul>
 
-                            {% with can_delete=task|can_delete_task:user can_assign=task|can_assign_task:user %}
-                                {% if can_delete or can_assign %}
-                                    <ul class="admin-controls">
-                                        {% if can_assign %}
-                                            <li>
-                                                <a class="action-assign" href="#">
-                                                    {% if task.assignee %}
-                                                        {% trans 'Reassign' %}
-                                                    {% else %}
-                                                        {% trans 'Assign' %}
-                                                    {% endif %}
-                                                </a>
-                                            </li>
-                                        {% endif %}
+                                {% with can_delete=task|can_delete_task:user can_assign=task|can_assign_task:user can_decline=task|can_decline_task:user %}
+                                    {% if can_delete or can_assign or can_decline %}
+                                        <ul class="admin-controls">
+                                            {% if can_decline %}
+                                                <li>
+                                                    <a class="action-decline" href="#">
+                                                        {% trans 'Decline' %}
+
+                                                        <form class="hidden" action="{% url teams:assign_task slug=team.slug %}" method="post">
+                                                            {% csrf_token %}
+
+                                                            <input type="hidden" name="next"
+                                                                   value="{{ request.path }}{% query_string request.GET %}" />
+
+                                                            <input type="hidden" name="task" value="{{ task.id }}" />
+                                                            <input type="hidden" name="assignee" value="" />
+
+                                                            <input type="submit" class="submit" value="decline" name="" />
+                                                        </form>
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                            {% if can_assign %}
+                                                <li>
+                                                    <a class="action-assign" href="#">
+                                                        {% if task.assignee %}
+                                                            {% trans 'Reassign' %}
+                                                        {% else %}
+                                                            {% trans 'Assign' %}
+                                                        {% endif %}
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                            {% if can_delete %}
+                                                <li>
+                                                    <a class="action-delete open-modal" href="#delete-task-{{ task.pk }}">{% trans 'Delete' %}</a>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
                                         {% if can_delete %}
-                                            <li>
-                                                <a class="action-delete open-modal" href="#delete-task-{{ task.pk }}">{% trans 'Delete' %}</a>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
-                                    {% if can_delete %}
-                                        <div class="bootstrap">
-                                            <div class="modal" id="delete-task-{{ task.pk }}">
-                                                <div class="modal-header">
-                                                    <a href="#" class="close">x</a>
-                                                    <h3>{% trans 'Delete task' %}</h3>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form action="{% url teams:delete_task slug=team.slug %}" method="post">
-                                                        <fieldset>
-                                                            {% if task.get_type_display == "Review" or task.get_type_display == "Approve" %}
-                                                                <p>What would you like to do with the subtitles for this task?</p>
-                                                                <label class="radio" for="id_discard_subs_no_{{ task.pk }}">
-                                                                    <input checked="checked" type="radio" name="discard_subs" value="0" id="id_discard_subs_no_{{ task.pk }}"/>
-                                                                    {% trans "Publish these subtitles immediately" %}
-                                                                </label>
-                                                                <label class="radio" for="id_discard_subs_yes_{{ task.pk }}">
-                                                                    <input type="radio" name="discard_subs" value="1" id="id_discard_subs_yes_{{ task.pk }}"/>
-                                                                    {% trans "Delete these subtitles permanently" %}
-                                                                </label>
-                                                            {% else %}
-                                                                <p>Are you sure you want to delete this task?</p>
-                                                                <input type="hidden" name="discard_subs" value="0" />
-                                                            {% endif %}
-                                                        </fieldset>
+                                            <div class="bootstrap">
+                                                <div class="modal" id="delete-task-{{ task.pk }}">
+                                                    <div class="modal-header">
+                                                        <a href="#" class="close">x</a>
+                                                        <h3>{% trans 'Delete task' %}</h3>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="{% url teams:delete_task slug=team.slug %}" method="post">
+                                                            <fieldset>
+                                                                {% if task.get_type_display == "Review" or task.get_type_display == "Approve" %}
+                                                                    <p>What would you like to do with the subtitles for this task?</p>
+                                                                    <label class="radio" for="id_discard_subs_no_{{ task.pk }}">
+                                                                        <input checked="checked" type="radio" name="discard_subs" value="0" id="id_discard_subs_no_{{ task.pk }}"/>
+                                                                        {% trans "Publish these subtitles immediately" %}
+                                                                    </label>
+                                                                    <label class="radio" for="id_discard_subs_yes_{{ task.pk }}">
+                                                                        <input type="radio" name="discard_subs" value="1" id="id_discard_subs_yes_{{ task.pk }}"/>
+                                                                        {% trans "Delete these subtitles permanently" %}
+                                                                    </label>
+                                                                {% else %}
+                                                                    <p>Are you sure you want to delete this task?</p>
+                                                                    <input type="hidden" name="discard_subs" value="0" />
+                                                                {% endif %}
+                                                            </fieldset>
 
-                                                        {% csrf_token %}
+                                                            {% csrf_token %}
 
-                                                        <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
-                                                        <input type="hidden" name="task" value="{{ task.pk }}" />
+                                                            <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+                                                            <input type="hidden" name="task" value="{{ task.pk }}" />
 
-                                                        <div class="modal-footer">
-                                                            <input type="submit" class="btn danger" value="Delete task" />
-                                                        </div>
-                                                    </form>
+                                                            <div class="modal-footer">
+                                                                <input type="submit" class="btn danger" value="Delete task" />
+                                                            </div>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        {% endif %}
                                     {% endif %}
-                                {% endif %}
-                            {% endwith %}
+                                {% endwith %}
 
-                            {% if task|can_assign_task:user %}
-                                <form class="assign-form" action="{% url teams:assign_task slug=team.slug %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+                                {% if task|can_assign_task:user %}
+                                    <form class="assign-form" action="{% url teams:assign_task slug=team.slug %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
 
-                                    <input type="hidden" name="task" value="{{ task.id }}" />
-                                    <input type="hidden" name="task_type" value="{{ task.type }}" />
-                                    <input type="hidden" name="task_lang" value="{{ task.language }}" />
-                                    <input type="hidden" name="team_video" value="{{ task.team_video }}" />
+                                        <input type="hidden" name="task" value="{{ task.id }}" />
 
-                                    <div class="assignee-choice" style="display: none;">
-                                        <a class="cancel" href="#">{% trans 'Cancel' %}</a>
-                                        <div class="member-ajax-chosen">
-                                            <select name="assignee">
-                                                <option value="">-----</option>
-                                                <option value="" class="begin-typing-trans">{% trans 'Begin typing to search' %}</option>
-                                            </select>
+                                        <div class="assignee-choice" style="display: none;">
+                                            <a class="cancel" href="#">{% trans 'Cancel' %}</a>
+                                            <div class="member-ajax-chosen">
+                                                <select name="assignee">
+                                                    <option value="">-----</option>
+                                                    <option value="" class="begin-typing-trans">{% trans 'Begin typing to search' %}</option>
+                                                </select>
+                                            </div>
+                                            <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">{% trans 'Assign to User' %}</a>
                                         </div>
-                                        <a class="button action-assign-submit" href="{% url teams:assign_task slug=team.slug %}">{% trans 'Assign to User' %}</a>
-                                    </div>
-                                </form>
-                            {% endif %}
-                        </li>
+                                    </form>
+                                {% endif %}
+                            </li>
+                        {% endwith %}
                     {% endfor %}
                 {% endwith %}
             </ul>
@@ -322,100 +345,6 @@
 
         {% if is_paginated %}{% paginator %}{% endif %}
     </div>
-
-    <script type="text/javascript">
-        $(function() {
-
-            $('a.action-assign').click(function(e) {
-
-                $('div.assignee-choice').hide();
-
-                $form = $(e.target).parents('.admin-controls').siblings('form.assign-form');
-
-                $assignee_choice = $form.children('div.assignee-choice');
-                $assignee_choice.fadeIn('fast');
-
-                // Reset select options on rebuild.
-                if (!window.begin_typing_trans) {
-                    window.begin_typing_trans = $('option.begin-typing-trans').eq(0).text();
-                }
-                $select = $form.find('select');
-                $select.children('option').remove();
-                $select.append('<option value="">-----</option>');
-                $select.append('<option value="">' + window.begin_typing_trans + '</option>');
-                $select.trigger('liszt:updated');
-
-                $chzn_container = $assignee_choice.find('.chzn-container');
-                $chzn_container.css('width', '100%')
-
-                $chzn_drop = $chzn_container.find('.chzn-drop')
-                $chzn_drop.css('width', '99%')
-
-                $chzn_input = $chzn_drop.find('input')
-                $chzn_input.css('width', '82%');
-
-                return false;
-            });
-            $('.assignee-choice a.cancel').click(function(e) {
-                $(e.target).parents('.assignee-choice').fadeOut('fast');
-                return false;
-            });
-
-            $('a.action-assign-submit').click(function(e) {
-                $(e.target).closest('form').submit();
-                return false;
-            });
-
-            $('a.assign-and-perform').click(function(e) {
-                var $target = $(e.target);
-                $target.text('Loading...');
-
-                $.ajax({
-                    url: '{% url teams:assign_task_ajax slug=team.slug %}',
-                    type: 'POST',
-                    data: {
-                        task: $target.attr('data-id'),
-                        assignee: {% firstof request.user.id -1 %}
-                    },
-                    success: function(data, textStatus, jqXHR) {
-                        $target.hide();
-
-                        $li = $target.parent().siblings('li.hidden-perform-link');
-                        $li.show();
-
-                        $link = $li.children('a.perform');
-                        $link.text('Loading...');
-                        if ($link.attr('href') !== '') {
-                            window.location = $link.attr('href');
-                        } else {
-                            $link.click();
-                        }
-                    }
-                });
-
-                return false;
-            });
-
-            $("div.member-ajax-chosen select", ".v1 .content").ajaxChosen({
-                method: 'GET',
-                url: '/en/teams/{{ team.slug }}/members/search/',
-                dataType: 'json'
-            }, function (data) {
-                var terms = {};
-
-                $.each(data.results, function (i, val) {
-                    var can_perform_task = data.results[i][2];
-
-                    if (can_perform_task) {
-                        terms[data.results[i][0]] = data.results[i][1];
-                    }
-                });
-
-                return terms;
-            });
-        });
-    </script>
-
     <script id="IMAGE_PRELOADER" type="text/html">
         <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
     </script>

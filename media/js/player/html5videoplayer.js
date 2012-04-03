@@ -34,8 +34,7 @@ goog.inherits(unisubs.player.Html5VideoPlayer,
  */
 unisubs.player.Html5VideoPlayer.prototype.createDom = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    if (unisubs.player.supportsVideoType(
-        this.mediaSource.getVideoType())) {
+    if (unisubs.player.supportsVideoType(this.mediaSource.getVideoType())) {
         this.mediaElem = this.createVideoElement_($d);
         this.setElementInternal(this.mediaElem);
         if (this.forDialog)

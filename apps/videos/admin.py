@@ -19,7 +19,7 @@
 from django.contrib import admin
 from videos.models import (
     Video, SubtitleLanguage, SubtitleVersion, VideoFeed, VideoMetadata,
-    VideoUrl
+    VideoUrl, SubtitleVersionMetadata
 )
 from videos.tasks import video_changed_tasks
 
@@ -66,10 +66,10 @@ class VideoAdmin(admin.ModelAdmin):
         update_search_index.delay(obj.__class__, obj.pk)
 
 class VideoMetadataAdmin(admin.ModelAdmin):
-    list_display = ['video', 'metadata_type', 'content']
-    list_filter = ['metadata_type', 'created', 'modified']
+    list_display = ['video', 'key', 'data']
+    list_filter = ['key', 'created', 'modified']
     search_fields = ['video__video_id', 'video__title', 'video__user__username',
-                     'content']
+                     'data']
     raw_id_fields = ['video']
 
 class SubtitleVersionInline(admin.TabularInline):
@@ -90,8 +90,8 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     def delete_model(self, request, obj):
         video = obj.video
         super(SubtitleLanguageAdmin, self).delete_model(request, obj)
-        video_changed_tasks.delay(video)
-    
+        video_changed_tasks.delay(video.pk)
+
     def versions(self, obj):
         version_qs = obj.subtitleversion_set.all()
         link_tpl = '<a href="%s">#%s</a>'
@@ -107,7 +107,7 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     list_display = ['video', 'language', 'version_no', 'note', 'timeline_changes',
                     'text_changes', 'datetime_started', 'moderation_status']
     list_filter = []
-    raw_id_fields = ['language', 'user']
+    raw_id_fields = ['language', 'user', 'forked_from']
     search_fields = ['language__video__title', 'language__video__video_id', 'language__language']
 
     def has_delete_permission(self, request, obj=None):
@@ -126,6 +126,16 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
             return '%s %%' % int(obj.text_change * 100)
         return "0 %"
 
+class SubtitleVersionMetadataAdmin(admin.ModelAdmin):
+    list_display = ['video', 'subtitle_version', 'key']
+    list_filter = ['key', 'created', 'modified']
+    raw_id_fields = ['subtitle_version']
+    search_fields = ['subtitle_version__language__video__video_id',
+                     'subtitle_version__language__video__title']
+
+    def video(self, obj):
+        return obj.subtitle_version.language.video.title
+
 class SubtitleAdmin(admin.ModelAdmin):
     list_display = ['version', 'subtitle_id', 'subtitle_order', 'subtitle_text', 'start_time', 'end_time']
 
@@ -135,6 +145,7 @@ class VideoFeedAdmin(admin.ModelAdmin):
 
 #admin.site.register(Subtitle, SubtitleAdmin)
 admin.site.register(SubtitleVersion, SubtitleVersionAdmin)
+admin.site.register(SubtitleVersionMetadata, SubtitleVersionMetadataAdmin)
 admin.site.register(Video, VideoAdmin)
 admin.site.register(VideoMetadata, VideoMetadataAdmin)
 admin.site.register(SubtitleLanguage, SubtitleLanguageAdmin)
