@@ -31,6 +31,7 @@ from apps.auth.models import CustomUser as User
 from apps.messages.forms import SendMessageForm, NewMessageForm
 from apps.messages.models import Message
 from apps.messages.rpc import MessagesApiClass
+from apps.messages.tasks import send_new_message_notification
 from utils import render_to_json, render_to
 from utils.rpc import RpcRouter
 
@@ -104,16 +105,20 @@ def new(request):
 
         if form.is_valid():
             if form.cleaned_data['user']:
-                Message(user=form.cleaned_data['user'], author=request.user,
+                m = Message(user=form.cleaned_data['user'], author=request.user,
                         content=form.cleaned_data['content'],
-                        subject=form.cleaned_data['subject']).save()
+                        subject=form.cleaned_data['subject'])
+                m.save()
+                send_new_message_notification.delay(m.pk)
             elif form.cleaned_data['team']:
                 # TODO: Move this into a task for performance?
                 for member in form.cleaned_data['team'].members.all():
                     if member.user != request.user:
-                        Message(user=member.user, author=request.user,
+                        m = Message(user=member.user, author=request.user,
                                 content=form.cleaned_data['content'],
-                                subject=form.cleaned_data['subject']).save()
+                                subject=form.cleaned_data['subject'])
+                        m.save()
+                        send_new_message_notification.delay(m.pk)
 
             messages.success(request, _(u'Message sent.'))
             return HttpResponseRedirect(reverse('messages:index'))
