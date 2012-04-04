@@ -490,7 +490,7 @@ class AddFromFeedForm(forms.Form, AjaxForm):
     usernames = UsernameListField(required=False, label=_(u'Youtube usernames'), help_text=_(u'Enter usernames separated by comma.'))
     youtube_user_url = StripRegexField(youtube_user_url_re, required=False, label=_(u'Youtube page link.'),
                                        help_text=_(u'For example: http://www.youtube.com/user/username'))
-    feed_url = FeedURLField(required=False, help_text=_(u'Supported: Youtube, Vimeo, Blip or Dailymotion. Only supported sites added.'))
+    feed_url = FeedURLField(required=False, help_text=_(u'Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added.'))
     save_feed = forms.BooleanField(required=False, label=_(u'Save feed'), help_text=_(u'Choose this if you wish to add videos from this feed in the future. Only valid RSS feeds will be saved.'))
 
     def __init__(self, user, *args, **kwargs):

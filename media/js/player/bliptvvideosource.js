@@ -16,7 +16,7 @@
 // along with this program.  If not, see 
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-goog.provide('unisubs.player.BlipTvVideoSource');
+goog.provide('unisubs.player.BliptvVideoSource');
 
 /**
  * @constructor
@@ -62,3 +62,21 @@ unisubs.player.BlipTvVideoSource.prototype.getVideoConfig = function() {
 unisubs.player.BlipTvVideoSource.prototype.getVideoURL = function() {
     return this.videoURL_;
 };
+
+/**
+* Checks if this video url is indeed for this MediaSource type, returns a
+* mediaSource subclass if it is, null if it isn't
+* @param {string} youtubeVideoID Youtube video id
+* @param {Object.<string, *>=} opt_videoConfig Params to use for 
+*     youtube query string, plus optional 'width' and 'height' 
+*     parameters.
+*/
+unisubs.player.BliptvVideoSource.getMediaSource = function(videoURL, opt_videoConfig) {
+    if(/^\s*https?:\/\/([^\.]+\.)?blip\.tv/.test(videoURL)){
+        return new unisubs.player.BlipTvVideoSource("", videoURL, opt_videoConfig);
+    }
+    return null;
+}
+
+// add this mediaSource to our registry
+unisubs.player.MediaSource.addMediaSource(unisubs.player.BliptvVideoSource.getMediaSource);

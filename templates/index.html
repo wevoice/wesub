@@ -50,7 +50,7 @@
         {% blocktrans %}
             Increase viewership with transcription, captioning, and translation services, and flexible API and integration options. Improve SEO, reach a global audience, and build a managed volunteer community.
         {% endblocktrans %}
-        <a href="{% url services_page %}">{% trans "See our enterprise services." %}</a>
+        <a href="{% url enterprise_page %}">{% trans "See our enterprise services." %}</a>
         </p>
     </div>
 </div>
@@ -64,23 +64,17 @@
                     base_state: {},
                     video_config: {
                     poster: "https://s3.amazonaws.com/s3.www.universalsubtitles.org/images/about-poster.png",
-                    style: "width:470px;height:353px;",
+                    style: "width:460px;height:348px;",
                     play_to_click: true
                 },
-                video_url: "https://blip.tv/file/get/Miropcf-AboutUniversalSubtitles847.ogv",
-                alternate_video_urls: [{
-                    url: "https://blip.tv/file/get/Miropcf-AboutUniversalSubtitles715.mp4", 
-                    config: {
-                        poster: "https://s3.amazonaws.com/s3.www.universalsubtitles.org/images/about-poster.png",
-                        play_to_click: true
-                    }
-                }, "http://www.youtube.com/watch?v=Y2IJb1YnAmQ"]});
+                video_url: "http://www.youtube.com/watch?v=Y2IJb1YnAmQ",
+                alternate_video_urls: []});
         </script>
     {% endblock %}
 </div>
 <div class="clearfix"></div>
 <div id="benefits" class="clearfix">
-    <a class="button" href="{% url services_page %}#benefits">{% trans "6 key benefits" %}</a>
+    <a class="button" href="{% url enterprise_page %}#benefits">{% trans "6 key benefits" %}</a>
     <h2>{% trans "The largest, most powerful captioning and translation platform in the world." %}</h2>
 </div>
 <div id="partners">

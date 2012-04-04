@@ -86,12 +86,12 @@ unisubs.translate.Dialog.prototype.showGuidelines_ = function() {
 };
 unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
     e.preventDefault();
-    this.saveWork(false);
+    this.saveWork(false, true);
 };
 unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
     event.preventDefault();
     if (this.state_ == unisubs.translate.Dialog.State_.EDIT_METADATA)
-        this.saveWork(true);
+        this.saveWork(true, false);
     else
         this.enterState_(unisubs.translate.Dialog.State_.EDIT_METADATA);
 };
@@ -126,11 +126,12 @@ unisubs.translate.Dialog.prototype.onNotesFetched_ = function(body) {
         this.currentSubtitlePanel_.setNotesContent_(body);
     }
 };
-unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
+unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave, saveForLater) {
     var notes = this.getNotesContent_(this.currentSubtitlePanel_);
     if (notes !== '') {
         this.serverModel_.setTaskNotes(notes);
     }
+
     if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles())){
         // there are no subs here, close dialog or back to subtitling
@@ -152,7 +153,9 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
                 that.finishFailDialog_ = unisubs.finishfaildialog.Dialog.show(
                     that.serverModel_.getCaptionSet(), opt_status,
                     goog.bind(that.saveWorkInternal, that, closeAfterSave));
-        });
+        },
+        null,
+        saveForLater);
 };
 unisubs.translate.Dialog.prototype.showGuidelinesForState_ = function(state) {
     this.setState_(state);

@@ -588,7 +588,7 @@ def move_video(request):
             moderation_status=MODERATION.UNMODERATED)
 
         video.is_public = True
-        video.moderated_by = None
+        video.moderated_by = team if team.moderates_videos() else None
         video.save()
 
         # Update all Solr data.
@@ -1487,12 +1487,9 @@ def _create_task_after_unpublishing(subtitle_version):
     team_video = subtitle_version.language.video.get_team_video()
     lang = subtitle_version.language.language
 
-    # If there's already an open review/approval task for this language, it
-    # means we just unpublished multiple versions in a row and can ignore this.
-    open_task_exists = (
-            team_video.task_set.incomplete_review().filter(language=lang).exists()
-         or team_video.task_set.incomplete_approve().filter(language=lang).exists()
-    )
+    # If there's already an open task for this language we don't need another.
+    open_task_exists = team_video.task_set.incomplete().filter(language=lang).exists()
+
     if open_task_exists:
         return None
 

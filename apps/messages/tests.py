@@ -21,6 +21,7 @@ import json, random
 from datetime import datetime
 
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 from apps.auth.models import CustomUser as User
 from apps.auth.models import EmailConfirmation
 from django.core import mail
@@ -384,4 +385,16 @@ class MessageTest(TestCase):
         
         self.assertEqual(len(mail.outbox), 2)
 
+    def test_send_message_view(self):
+        to_user = User.objects.filter(notify_by_email=True)[0]
+        user, c = User.objects.get_or_create(username='username')
+        user.notify_by_email = True
+        user.set_password('username')
+        user.save()
+        mail.outbox = []
+        self.client.login(username='username', password='username')
+        self.client.post(reverse('messages:new'), {"user":to_user.pk, "subject": "hey", 'content':'test'})
+        self.assertEqual(len(mail.outbox), 1)
+        m = mail.outbox[0]
+        self.assertTrue(to_user.email in m.to)
         

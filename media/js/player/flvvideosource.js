@@ -69,3 +69,17 @@ unisubs.player.FlvVideoSource.prototype.sizeFromConfig = function() {
         return null;
     }
 };
+
+/**
+* Checks if this video url is indeed for this MediaSource type, returns a
+* mediaSource subclass if it is, null if it isn't
+*/
+unisubs.player.FlvVideoSource.getMediaSource = function(videoURL, opt_videoConfig) {
+    if (/\.flv$|\.mov$/i.test(videoURL)) {
+        return new unisubs.player.FlvVideoSource(videoURL, opt_videoConfig);
+    }
+    return null;
+}
+
+// add this mediaSource to our registry
+unisubs.player.MediaSource.addMediaSource(unisubs.player.FlvVideoSource.getMediaSource);

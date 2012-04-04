@@ -766,6 +766,25 @@ ul.list-collapsible {
         padding: 0;
     }
 
+    &.disabled {
+        padding-right: 0;
+
+        h3, p, a, ul {
+            opacity: .2;
+        }
+        ul.actions, ul.admin-controls {
+            display: none !important;
+        }
+        div.cannot-perform-disabled {
+            background: #F2DEDE;
+            border: 1px solid #EED3D7;
+            color: #B94A48;
+            margin-bottom: 10px;
+            padding: 10px;
+            @include border-radius;
+        }
+    }
+
 }
 .v1 .listing.teams > li {
     padding-right: 150px;

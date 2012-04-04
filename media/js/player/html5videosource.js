@@ -104,3 +104,17 @@ unisubs.player.Html5VideoSource.prototype.getAlternateURLs = function() {
 unisubs.player.Html5VideoSource.prototype.setAlternateSources = function(sources) {
     this.alternateSources_ = sources;
 };
+
+/**
+* Checks if this video url is indeed for this MediaSource type, returns a
+* mediaSource subclass if it is, null if it isn't.
+* This is the only class that we don't register, since it's used as a fallack from
+* the others and it needs to run last
+*/
+unisubs.player.Html5VideoSource.getMediaSource = function(videoURL, opt_videoConfig) {
+    var videoSource = 
+        unisubs.player.Html5VideoSource.forURL(videoURL, opt_videoConfig);
+    if (videoSource != null)
+        return videoSource;
+    return null;
+}

@@ -193,19 +193,24 @@ unisubs.Dialog.prototype.isWorkSaved = goog.abstractMethod;
 /**
  * This corresponds to the finish button. It is not called during periodic saves.
  * @protected
- * @param {boolean} closeAfterSave
+ * @param {boolean} closeAfterSave Whether the dialog should be closed after a
+ *                                 successful save.
+ * @param {boolean} saveForLater Passed when this save is a "save for later"
+ *                               type of save.  Currently used only to determine
+ *                               whether to "complete" a task.
  */
-unisubs.Dialog.prototype.saveWork = function(closeAfterSave) {
+unisubs.Dialog.prototype.saveWork = function(closeAfterSave, saveForLater) {
     unisubs.Tracker.getInstance().trackPageview('Submits_final_work_in_widget');
     if (unisubs.IS_NULL) {
         this.saved_ = true;
-        var message = "Congratulations, you have completed a demo. There is a web full of videos waiting for your translations, enjoy!";
+        var message = "Congratulations, you have completed a demo. There is a web " +
+                      "full of videos waiting for your translations, enjoy!";
         //This should likely have a nicer modal
         alert(message);
         this.setVisible(false);
         return;
     }
-    if (unisubs.currentUsername == null && !unisubs.isLoginAttemptInProgress())
+    if (unisubs.currentUsername == null && !unisubs.isLoginAttemptInProgress()) {
         unisubs.login(function(loggedIn) {
             if (!loggedIn) {
                 alert("We had a problem logging you in. You might want to check " +
@@ -214,10 +219,11 @@ unisubs.Dialog.prototype.saveWork = function(closeAfterSave) {
                       "of the dialog and email them to widget-logs@universalsubtitles.org.");
             }
         });
-    else
-        this.saveWorkInternal(closeAfterSave);
+    } else {
+        this.saveWorkInternal(closeAfterSave, saveForLater);
+    }
 };
-unisubs.Dialog.prototype.saveWorkInternal = function(closeAfterSave) {
+unisubs.Dialog.prototype.saveWorkInternal = function(closeAfterSave, saveForLater) {
     goog.abstractMethod();
 };
 unisubs.Dialog.prototype.onBeforeWindowUnload_ = function(event) {

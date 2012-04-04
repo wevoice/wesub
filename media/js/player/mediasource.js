@@ -29,6 +29,12 @@ goog.provide('unisubs.player.MediaSource');
  */
 unisubs.player.MediaSource = function() {};
 
+/** 
+* A global registry of media source types. See #videoSourceForUrl
+*
+*/
+unisubs.player.MediaSource.SourceRegistry = []
+
 /**
  * Creates a player for the page, not the widget.
  * @return {unisubs.player.AbstractVideoPlayer} 
@@ -115,63 +121,36 @@ unisubs.player.MediaSource.html5VideoSource_ = function(videoSources, videoType)
 };
 
 /**
- * Returns null if we can't get VideoSource without asking the server
- * for more info.
- *
- */
+ * Tries to guess the video source of a given URL, if successful will return the correct mediasource
+*  subclass
+*/
 unisubs.player.MediaSource.videoSourceForURL = function(videoURL, opt_videoConfig) {
-    var blipFileGetRegex = /^\s*https?:\/\/([^\.]+\.)*blip\.tv\/file\/get\//;
-    if (unisubs.player.YoutubeVideoSource.isYoutube(videoURL)) {
-        var videoSource = null;
-        if (!window['swfobject']["hasFlashPlayerVersion"]("9")) {
-            videoSource = unisubs.player.YTIFrameVideoSource.forURL(
-                videoURL, opt_videoConfig);
+    var mediaSource = null;
+    for (var i=0; i < unisubs.player.MediaSource.SourceRegistry.length; i++){
+        var source = unisubs.player.MediaSource.SourceRegistry[i](videoURL, opt_videoConfig);
+        if (source){
+            mediaSource = source;
+            break;
         }
-        else {
-            videoSource = unisubs.player.YoutubeVideoSource.forURL(
-                videoURL, opt_videoConfig);
-        }
-        if (videoSource != null)
-            return videoSource;
     }
-    else if (/^\s*https?:\/\/([^\.]+\.)?vimeo/.test(videoURL)) {
-        var videoIDExtract = /vimeo.com\/([0-9]+)/i.exec(videoURL);
-        if (videoIDExtract)
-            return new unisubs.player.VimeoVideoSource(
-                videoIDExtract[1], videoURL, opt_videoConfig);
+    // The Html5VideoSource is always our last resource
+    if (!mediaSource){
+        mediaSource = unisubs.player.Html5VideoSource.getMediaSource (videoURL, opt_videoConfig);
     }
-    else if (/^\s*https?:\/\/([^\.]+\.)?dailymotion/.test(videoURL)) {
-        var videoIDExtract = /dailymotion.com\/video\/([0-9a-z]+)/i.exec(videoURL);
-        if (videoIDExtract)
-            return new unisubs.player.DailymotionVideoSource(
-                videoIDExtract[1], videoURL, opt_videoConfig);
+    if (mediaSource){
+        return mediaSource;
     }
-    else if (/^\s*https?:\/\/([^\.]+\.)?blip\.tv/.test(videoURL) &&
-             !blipFileGetRegex.test(videoURL)) {
-        return new unisubs.player.BlipTvVideoSource("", videoURL, opt_videoConfig);
-    }
-    else if (/\.flv$|\.mov$/i.test(videoURL)) {
-        return new unisubs.player.FlvVideoSource(videoURL, opt_videoConfig);
-    }
-    else if (unisubs.player.BrightcoveVideoSource.isBrightcove(videoURL)) {
-        return unisubs.player.BrightcoveVideoSource.forURL(videoURL);
-    }
-    else if (unisubs.player.MP3Source.isMP3URL(videoURL)) {
-        return unisubs.player.MP3Source.forURL(videoURL, opt_videoConfig);
-    }
-    else {
-        var videoSource = 
-            unisubs.player.Html5VideoSource.forURL(videoURL, opt_videoConfig);
-        if (videoSource != null)
-            return videoSource;
-    }
-    
     throw new Error("Unrecognized video url " + videoURL);
 };
 
 /**
- * @deprecated Use unisubs.player.YoutubeVideoSource.isYoutube
- */
-unisubs.player.MediaSource.isYoutube = function(videoURL) {
-    return unisubs.player.YoutubeVideoSource.isYoutube(videoURL);
+ * Adds a media source function to the global SourceRegistry
+*/
+unisubs.player.MediaSource.addMediaSource = function(mediaSourceFunc) {
+    // no need to add this twice 
+    if( goog.array.indexOf(unisubs.player.MediaSource.SourceRegistry, mediaSourceFunc) > - 1){
+        return false;
+    }
+    unisubs.player.MediaSource.SourceRegistry.push(mediaSourceFunc);
+    return true;
 };

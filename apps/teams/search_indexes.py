@@ -91,7 +91,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['team_video_pk'] = obj.id
         self.prepared_data['video_pk'] = obj.video.id
         self.prepared_data['video_id'] = obj.video.video_id
-        self.prepared_data['video_title'] = obj.video.title
+        self.prepared_data['video_title'] = obj.video.title.strip()
         self.prepared_data['video_url'] = obj.video.get_video_url()
         original_sl = obj.video.subtitle_language()
         if original_sl:
@@ -103,7 +103,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
             self.prepared_data['original_language'] = ''
         self.prepared_data['absolute_url'] = obj.get_absolute_url()
         self.prepared_data['thumbnail'] = obj.get_thumbnail()
-        self.prepared_data['title'] = unicode(obj)
+        self.prepared_data['title'] = unicode(obj).strip()
         self.prepared_data['description'] = obj.description
         self.prepared_data['is_complete'] = obj.video.complete_date is not None
         self.prepared_data['video_complete_date'] = obj.video.complete_date

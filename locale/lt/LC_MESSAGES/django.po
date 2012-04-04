@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-30 01:32-0500\n"
+"POT-Creation-Date: 2012-04-04 01:32-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -738,20 +738,20 @@ msgstr ""
 msgid "If you check this, other languages will not be displayed."
 msgstr ""
 
-#: apps/teams/models.py:839 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:849 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr ""
 
-#: apps/teams/models.py:840 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:850 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr ""
 
-#: apps/teams/models.py:841 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:851 apps/teams/permissions_const.py:44
 #: templates/base.html:116
 msgid "Admin"
 msgstr ""
 
-#: apps/teams/models.py:842 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:852 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr ""
 
@@ -767,7 +767,7 @@ msgstr ""
 msgid "You are already a member of this team."
 msgstr ""
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:895
+#: apps/teams/rpc.py:50 apps/teams/views.py:896
 msgid "You are now a member of this team."
 msgstr ""
 
@@ -852,7 +852,7 @@ msgid "You do not have permission to delete this team."
 msgstr ""
 
 #: apps/teams/views.py:352 apps/teams/views.py:388 apps/teams/views.py:416
-#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1472
+#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1473
 msgid "You do not have permission to edit this team."
 msgstr ""
 
@@ -868,145 +868,145 @@ msgstr ""
 msgid "You can't add that video to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:605
+#: apps/teams/views.py:606
 msgid "The video has been moved to the new team."
 msgstr ""
 
-#: apps/teams/views.py:618
+#: apps/teams/views.py:619
 msgid "You can't add videos to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:637
+#: apps/teams/views.py:638
 msgid "You can't edit this video."
 msgstr ""
 
-#: apps/teams/views.py:646
+#: apps/teams/views.py:647
 msgid "Video has been updated."
 msgstr ""
 
-#: apps/teams/views.py:674
+#: apps/teams/views.py:675
 msgid "Request must be a POST request."
 msgstr ""
 
-#: apps/teams/views.py:682
+#: apps/teams/views.py:683
 msgid "You can't delete that video."
 msgstr ""
 
-#: apps/teams/views.py:686
+#: apps/teams/views.py:687
 msgid "You can't remove that video."
 msgstr ""
 
-#: apps/teams/views.py:697
+#: apps/teams/views.py:698
 msgid "Video has been deleted from Universal Subtitles."
 msgstr ""
 
-#: apps/teams/views.py:699
+#: apps/teams/views.py:700
 msgid "Video has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:786
+#: apps/teams/views.py:787
 msgid "Member has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:789
+#: apps/teams/views.py:790
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 
-#: apps/teams/views.py:792
+#: apps/teams/views.py:793
 msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
-#: apps/teams/views.py:823
+#: apps/teams/views.py:824
 msgid "Application approved."
 msgstr ""
 
-#: apps/teams/views.py:825 apps/teams/views.py:843
+#: apps/teams/views.py:826 apps/teams/views.py:844
 msgid "Application does not exist."
 msgstr ""
 
-#: apps/teams/views.py:827
+#: apps/teams/views.py:828
 msgid "You can't approve applications."
 msgstr ""
 
-#: apps/teams/views.py:841
+#: apps/teams/views.py:842
 msgid "Application denied."
 msgstr ""
 
-#: apps/teams/views.py:845
+#: apps/teams/views.py:846
 msgid "You can't deny applications."
 msgstr ""
 
-#: apps/teams/views.py:855
+#: apps/teams/views.py:856
 msgid "You cannot invite people to this team."
 msgstr ""
 
-#: apps/teams/views.py:891
+#: apps/teams/views.py:892
 msgid "You cannot join this team."
 msgstr ""
 
-#: apps/teams/views.py:942
+#: apps/teams/views.py:943
 msgid "You have left this team."
 msgstr ""
 
-#: apps/teams/views.py:1146
+#: apps/teams/views.py:1147
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1264 apps/teams/views.py:1267
+#: apps/teams/views.py:1265 apps/teams/views.py:1268
 msgid "You are not allowed to perform this task."
 msgstr ""
 
-#: apps/teams/views.py:1322
+#: apps/teams/views.py:1323
 msgid "Task deleted."
 msgstr ""
 
-#: apps/teams/views.py:1324
+#: apps/teams/views.py:1325
 msgid "You cannot delete this task."
 msgstr ""
 
-#: apps/teams/views.py:1349
+#: apps/teams/views.py:1350
 msgid "Task declined."
 msgstr ""
 
-#: apps/teams/views.py:1351
+#: apps/teams/views.py:1352
 msgid "Task assigned."
 msgstr ""
 
-#: apps/teams/views.py:1353
+#: apps/teams/views.py:1354
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1375
+#: apps/teams/views.py:1376
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1399
+#: apps/teams/views.py:1400
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1411
+#: apps/teams/views.py:1412
 msgid "Project added."
 msgstr ""
 
-#: apps/teams/views.py:1428
+#: apps/teams/views.py:1429
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1439
+#: apps/teams/views.py:1440
 msgid "Project deleted."
 msgstr ""
 
-#: apps/teams/views.py:1457
+#: apps/teams/views.py:1458
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1588
+#: apps/teams/views.py:1586
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1621
+#: apps/teams/views.py:1619
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1492,7 +1492,7 @@ msgstr ""
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:812 apps/widget/rpc.py:852
+#: apps/widget/rpc.py:823 apps/widget/rpc.py:864
 msgid "\n"
 msgstr ""
 
@@ -1633,7 +1633,7 @@ msgid "Go"
 msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:134 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:142 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:59
 msgid "Original"
 msgstr ""
@@ -2690,9 +2690,9 @@ msgstr ""
 #: templates/about.html:22
 msgid ""
 "\n"
-"            <h2>About Universal Subtitles</h2>\n"
+"            <h2>About Amara</h2>\n"
 "            <p>\n"
-"                Universal Subtitles gives individuals, communities, and larger organizations the power \n"
+"                Amara gives individuals, communities, and larger organizations the power \n"
 "                to overcome accessibility and language barriers for online video. The tools are free \n"
 "                and open source and make the work of subtitling and translating video simpler, more \n"
 "                appealing, and, most of all, more collaborative.\n"
@@ -2706,7 +2706,7 @@ msgid ""
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
-"                Universal Subtitles is composed of three main parts:\n"
+"                Amara is composed of three main parts:\n"
 "                <ul>\n"
 "                    <li>A subtitle creation and viewing tool (aka the widget)</li>\n"
 "                    <li>A collaborative subtitling website</li>\n"
@@ -2726,39 +2726,20 @@ msgid ""
 "                <a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n"
 "            </p>\n"
 "            <p>\n"
-"                Universal Subtitles is a featured project of <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
+"                Amara is a featured project of <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
 "                and the Mozilla Foundation has provided development support.  \n"
 "                Open Society Institute and the MacArthur Foundation are also financial supporters.\n"
 "            </p>\n"
+"            <h2>Publisher and Enterprise Services</h2>\n"
 "            <p>\n"
-"                Software development for Universal Subtitles is being done in partnership with \n"
-"                <br/><a href=\"http://www.8planes.com/\">8 Planes</a>.\n"
-"            </p>\n"
-"            <h2>What's Coming Next?</h2>\n"
-"            <p>\n"
-"                We are currently in the alpha stages of this website and the subtitling tool-- that means we're just getting started! But we've opened up the site so that we can begin testing and get early feedback.\n"
-"                Many very important features are missing. Here's some of what we'll be working on in the coming months:\n"
-"                <ul>\n"
-"                    <li>Better support for non-latin character sets</li>\n"
-"                    <li>A volunteer page and request center, where people can ask for captions and subtitles</li>\n"
-"                    <li>Machine translation option once subtitles have been transcribed</li>\n"
-"                    <li>Better keyboard accessibility for site and widget</li>\n"
-"                    <li>Subtitle ratings and flagging</li>\n"
-"                    <li>Better community website features</li>\n"
-"                    <li>Better video browsing on our site, for finding interesting content</li>\n"
-"                    <li>Compliance with emerging timed text standards</li>\n"
-"                </ul>\n"
-"            </p>\n"
-"            <p>\n"
-"                Are there other features that are particular important to your use? \n"
-"                We'd love to hear from you.<br/>\n"
-"                Email us: <a href=\"mailto:feedback@universalsubtitles.org\">universalsubtitles@pculture.org</a>\n"
+"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/services/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
 "            </p>\n"
 "        "
 msgstr ""
 
 #: templates/base.html:9
-msgid "Transcribe, caption, translate, and subtitle videos."
+msgid ""
+"Universal subtitling: caption, translate, subtitle and transcribe video."
 msgstr ""
 
 #: templates/base.html:68
@@ -2774,7 +2755,7 @@ msgid "Volunteer"
 msgstr ""
 
 #: templates/base.html:71
-msgid "Services"
+msgid "Enterprise"
 msgstr ""
 
 #: templates/base.html:72
@@ -2787,8 +2768,7 @@ msgstr ""
 
 #: templates/base.html:100
 msgid ""
-"Universal Subtitles is a project of <a "
-"href=\"http://participatoryculture.org/\">PCF</a>."
+"Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
 msgstr ""
 
 #: templates/base.html:103 templates/profiles/view_profile.html:68
@@ -3066,6 +3046,105 @@ msgstr ""
 
 #: templates/embed_page.html:78
 msgid "let us know"
+msgstr ""
+
+#: templates/enterprise.html:8
+msgid "Enterprise Services"
+msgstr ""
+
+#: templates/enterprise.html:12
+msgid ""
+"\n"
+"            <strong>Make your videos more global and more popular.</strong> Transcripts, captions, and translations dramatically increase video viewership.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:17
+msgid ""
+"\n"
+"            Amara is the most powerful subtitling platform in the world. We can help you build an <strong>active and engaged volunteer community</strong> and you can take advantage of <strong>professional transcription and translation services</strong>, all in one unified workflow.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:23
+msgid "Interested?"
+msgstr ""
+
+#: templates/enterprise.html:25
+msgid ""
+"\n"
+"            To learn more about our services, please contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:31
+msgid "What Can Amara Do?"
+msgstr ""
+
+#: templates/enterprise.html:34
+msgid "Build a Translation Team"
+msgstr ""
+
+#: templates/enterprise.html:36
+msgid ""
+"\n"
+"          Build a powerful volunteer translation and captioning team around your content. A video that lots of people want to watch is a video that fans will want to translate and share around the world.\n"
+"        "
+msgstr ""
+
+#: templates/enterprise.html:42
+msgid "Crowdsource with Professional Review"
+msgstr ""
+
+#: templates/enterprise.html:44
+msgid ""
+"\n"
+"            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:50
+msgid "Professional 1-Click Services"
+msgstr ""
+
+#: templates/enterprise.html:52
+msgid ""
+"\n"
+"            Access professional services including: captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:60
+msgid "Work with Any Video Platform"
+msgstr ""
+
+#: templates/enterprise.html:62
+msgid ""
+"\n"
+"            Amara works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:68
+msgid "Improve Your SEO"
+msgstr ""
+
+#: templates/enterprise.html:70
+msgid ""
+"\n"
+"            Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:76
+msgid "Flexible Integration"
+msgstr ""
+
+#: templates/enterprise.html:78
+msgid ""
+"\n"
+"            Need seamless subtitles on your custom video player? Want 1-click features integrated into your back-end or CMS? We can help.\n"
+"          "
 msgstr ""
 
 #: templates/faq.html:16
@@ -3431,56 +3510,56 @@ msgstr ""
 msgid "See our enterprise services."
 msgstr ""
 
-#: templates/index.html:83
+#: templates/index.html:77
 msgid "6 key benefits"
 msgstr ""
 
-#: templates/index.html:84
+#: templates/index.html:78
 msgid ""
 "The largest, most powerful captioning and translation platform in the world."
 msgstr ""
 
-#: templates/index.html:91
+#: templates/index.html:85
 msgid "Mozilla Example"
 msgstr ""
 
-#: templates/index.html:97
+#: templates/index.html:91
 msgid "Khan Integration"
 msgstr ""
 
-#: templates/index.html:103
+#: templates/index.html:97
 msgid "Drupal Example"
 msgstr ""
 
-#: templates/index.html:109
+#: templates/index.html:103
 msgid "Al Jazeera Team"
 msgstr ""
 
-#: templates/index.html:115
+#: templates/index.html:109
 msgid "NewsHour Team"
 msgstr ""
 
-#: templates/index.html:121
+#: templates/index.html:115
 msgid "More Popular"
 msgstr ""
 
-#: templates/index.html:122
+#: templates/index.html:116
 msgid "Most Popular Today"
 msgstr ""
 
-#: templates/index.html:124
+#: templates/index.html:118
 msgid "Top this month"
 msgstr ""
 
-#: templates/index.html:125
+#: templates/index.html:119
 msgid "Top all-time"
 msgstr ""
 
-#: templates/index.html:132
+#: templates/index.html:126
 msgid "More Featured"
 msgstr ""
 
-#: templates/index.html:133 templates/videos/featured_videos.html:36
+#: templates/index.html:127 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
 msgstr ""
@@ -3823,105 +3902,6 @@ msgid ""
 "providing meeting space!"
 msgstr ""
 
-#: templates/services.html:8
-msgid "Enterprise Services"
-msgstr ""
-
-#: templates/services.html:12
-msgid ""
-"\n"
-"            <strong>Make your videos more global and more popular.</strong> Transcripts, captions, and translations dramatically increase video viewership.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:17
-msgid ""
-"\n"
-"            Universal Subtitles is the most powerful subtitling platform in the world. We can help you build an <strong>active and engaged volunteer community</strong> and you can take advantage of <strong>professional transcription and translation services</strong>, all in one unified workflow.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:23
-msgid "Interested?"
-msgstr ""
-
-#: templates/services.html:25
-msgid ""
-"\n"
-"            To learn more about our services, please contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
-"          "
-msgstr ""
-
-#: templates/services.html:31
-msgid "What Can Universal Subtitles Do?"
-msgstr ""
-
-#: templates/services.html:34
-msgid "Build a Translation Team"
-msgstr ""
-
-#: templates/services.html:36
-msgid ""
-"\n"
-"          Build a powerful volunteer translation and captioning team around your content. A video that lots of people want to watch is a video that fans will want to translate and share around the world.\n"
-"        "
-msgstr ""
-
-#: templates/services.html:42
-msgid "Crowdsource with Professional Review"
-msgstr ""
-
-#: templates/services.html:44
-msgid ""
-"\n"
-"            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:50
-msgid "Professional 1-Click Services"
-msgstr ""
-
-#: templates/services.html:52
-msgid ""
-"\n"
-"            Access professional services including: captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:60
-msgid "Work with Any Video Platform"
-msgstr ""
-
-#: templates/services.html:62
-msgid ""
-"\n"
-"            Universal Subtitles works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:68
-msgid "Improve Your SEO"
-msgstr ""
-
-#: templates/services.html:70
-msgid ""
-"\n"
-"            Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
-"          "
-msgstr ""
-
-#: templates/services.html:76
-msgid "Flexible Integration"
-msgstr ""
-
-#: templates/services.html:78
-msgid ""
-"\n"
-"            Need seamless subtitles on your custom video player? Want 1-click features integrated into your back-end or CMS? We can help.\n"
-"          "
-msgstr ""
-
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:7
 msgid "Universal Subtitles"
 msgstr ""
@@ -3947,14 +3927,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr ""
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:81
-#: templates/messages/sent.html:51 templates/teams/tasks.html:264
+#: templates/messages/sent.html:51 templates/teams/tasks.html:272
 msgid "Delete"
 msgstr ""
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:318 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:326 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:347
 msgid "Cancel"
 msgstr ""
@@ -4366,17 +4346,17 @@ msgid "Open Tasks"
 msgstr ""
 
 #: templates/profiles/dashboard.html:45 templates/teams/tasks.html:58
-#: templates/teams/tasks.html.py:129
+#: templates/teams/tasks.html.py:137
 msgid "Transcribe"
 msgstr ""
 
 #: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:139
+#: templates/teams/tasks.html:147
 msgid "Subtitles into"
 msgstr ""
 
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:144
-#: templates/teams/tasks.html.py:160 templates/videos/diffing.html:95
+#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:152
+#: templates/teams/tasks.html.py:168 templates/videos/diffing.html:95
 #: templates/videos/subtitle-view.html:141
 #: templates/videos/subtitle-view.html:187
 msgid "Subtitles"
@@ -4814,7 +4794,7 @@ msgstr ""
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
 #: templates/teams/_context_team.html:47 templates/teams/tasks.html:117
-#: templates/teams/tasks.html.py:148 templates/videos/video-view.html:134
+#: templates/teams/tasks.html.py:156 templates/videos/video-view.html:134
 msgid "Video"
 msgstr ""
 
@@ -5017,7 +4997,7 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr ""
 
 #: templates/teams/_perform_task_link.html:4
-#: templates/teams/_perform_task_link.html:24 templates/teams/tasks.html:217
+#: templates/teams/_perform_task_link.html:24 templates/teams/tasks.html:225
 msgid "Perform Task"
 msgstr ""
 
@@ -5244,7 +5224,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:322
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:330
 msgid "Begin typing to search"
 msgstr ""
 
@@ -5641,7 +5621,7 @@ msgstr ""
 msgid "anyone"
 msgstr ""
 
-#: templates/teams/tasks.html:86 templates/teams/tasks.html.py:189
+#: templates/teams/tasks.html:86 templates/teams/tasks.html.py:197
 msgid "me"
 msgstr ""
 
@@ -5673,55 +5653,55 @@ msgstr ""
 msgid "Clear all filters and search terms"
 msgstr ""
 
-#: templates/teams/tasks.html:162
+#: templates/teams/tasks.html:170
 msgid "draft"
 msgstr ""
 
-#: templates/teams/tasks.html:165
+#: templates/teams/tasks.html:173
 msgid "transcribed"
 msgstr ""
 
-#: templates/teams/tasks.html:167 templates/videos/subtitle-view.html:35
+#: templates/teams/tasks.html:175 templates/videos/subtitle-view.html:35
 msgid "translated"
 msgstr ""
 
-#: templates/teams/tasks.html:187
+#: templates/teams/tasks.html:195
 msgid "Assigned to"
 msgstr ""
 
-#: templates/teams/tasks.html:196
+#: templates/teams/tasks.html:204
 msgid "Unassigned"
 msgstr ""
 
-#: templates/teams/tasks.html:235
+#: templates/teams/tasks.html:243
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:255
+#: templates/teams/tasks.html:263
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:257
+#: templates/teams/tasks.html:265
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:273
+#: templates/teams/tasks.html:281
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:282
+#: templates/teams/tasks.html:290
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:286
+#: templates/teams/tasks.html:294
 msgid "Delete these subtitles permanently"
 msgstr ""
 
-#: templates/teams/tasks.html:325
+#: templates/teams/tasks.html:333
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:334
+#: templates/teams/tasks.html:343
 msgid "Sorry, no tasks here."
 msgstr ""
 
@@ -6231,8 +6211,9 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:61
 msgid ""
-"Add a URL for another version of the exact same video. Useful many versions "
-"of the same video exist, or when there are different formats (like HTML5)"
+"Add a URL for another version of the exact same video. Useful when many "
+"versions of the same video exist, or when there are different formats (like "
+"HTML5)"
 msgstr ""
 
 #: templates/videos/_video_url_panel.html:74
