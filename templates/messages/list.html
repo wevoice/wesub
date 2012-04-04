@@ -56,15 +56,17 @@
                         </p>
                     {% endif %}
                     <p>{{ msg.get_content|safe }}</p>
-                    <a class="thumb" href="{{ msg.author.get_absolute_url }}" title="View {{ msg.author }}'s profile">
-                        {% with msg.author.small_avatar as author_avatar_url %}
-                            {% if author_avatar_url %}
-                                <img src="{{ author_avatar_url }}" alt="{{ msg.author }}"/>
-                            {% else %}
-                                <img src="{{ STATIC_URL }}/images/default_thumb_small.png" alt="{{ msg.author }}"/>
-                            {% endif %}
-                        {% endwith %}
-                    </a>
+                    {% if msg.author %}
+                        <a class="thumb" href="{{ msg.author.get_absolute_url }}" title="View {{ msg.author }}'s profile">
+                            {% with msg.author.small_avatar as author_avatar_url %}
+                                {% if author_avatar_url %}
+                                    <img src="{{ author_avatar_url }}" alt="{{ msg.author }}"/>
+                                {% else %}
+                                    <img src="{{ STATIC_URL }}/images/default_thumb_small.png" alt="{{ msg.author }}"/>
+                                {% endif %}
+                            {% endwith %}
+                        </a>
+                    {% endif %}
                     <span class="timestamp">{% if not msg.read %}<span class="unread">Unread</span>{% endif %}{{ msg.created|timesince }} {% trans 'ago' %}</span>
                     <ul class="admin-controls">
                         {% if not msg.read %}

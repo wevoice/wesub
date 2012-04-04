@@ -115,6 +115,7 @@ class VideoIndex(CelerySearchIndex):
         self.prepared_data['month_views'] = obj.views['month']
         self.prepared_data['year_views'] = obj.views['year']
         self.prepared_data['today_views'] = obj.views['today']
+        self.prepared_data['title'] = unicode(obj).strip()
         self.prepared_data['is_public'] = VideoVisibilityPolicy.objects.video_is_public(obj)
         return self.prepared_data
 
@@ -169,7 +170,7 @@ class SubtitleLanguageIndex(CelerySearchIndex):
 
     def prepare(self, obj):
         self.prepared_data = super(SubtitleLanguageIndex, self).prepare(obj)
-        self.prepared_data['title'] = obj.video.__unicode__()
+        self.prepared_data['title'] = obj.video.__unicode__().strip()
         self.prepared_data['language'] = obj.language_display()
         return self.prepared_data
 

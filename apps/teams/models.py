@@ -740,7 +740,12 @@ def _create_translation_tasks(team_video, subtitle_version):
         task = Task(team=team_video.team, team_video=team_video,
                     subtitle_version=subtitle_version,
                     language=lang, type=Task.TYPE_IDS['Translate'])
-        task.save()
+        # we should only update the team video after all tasks for
+        # this video are saved, else we end up with a lot of
+        # wasted tasks
+        task.save(update_team_video_index=False)
+
+    update_one_team_video.delay(team_video.pk)
 
 def autocreate_tasks(team_video):
     workflow = Workflow.get_for_team_video(team_video)
@@ -948,6 +953,25 @@ class MembershipNarrowing(models.Model):
         else:
             return u"Permission restriction for %s to language %s " % (self.member, self.language)
 
+
+    def save(self, *args, **kwargs):
+        # Cannot have duplicate narrowings for a language.
+        if self.language:
+            duplicate_exists = MembershipNarrowing.objects.filter(
+                member=self.member, language=self.language
+            ).exclude(id=self.id).exists()
+
+            assert not duplicate_exists, "Duplicate language narrowing detected!"
+
+        # Cannot have duplicate narrowings for a project.
+        if self.project:
+            duplicate_exists = MembershipNarrowing.objects.filter(
+                member=self.member, project=self.project
+            ).exclude(id=self.id).exists()
+
+            assert not duplicate_exists, "Duplicate project narrowing detected!"
+
+        return super(MembershipNarrowing, self).save(*args, **kwargs)
 
 # Application
 class Application(models.Model):

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n media_compressor feedback recent_activity widget i18n announcement_tags messages_tags profiles_tags %}
+{% load i18n media_compressor feedback recent_activity widget i18n announcement_tags messages_tags profiles_tags teams_tags %}
 {% block body_attrs %}id="index"{% endblock %}
 
 {% block css %}
@@ -79,33 +79,45 @@
 </div>
 <div id="partners">
     <ul class="clearfix">
+        {% if 'ted'|team_is_visible %}
+         <li>
+          <a target="_blank" href="http://www.universalsubtitles.org/en/teams/ted/">
+              <span style="height: 83px; display: block; padding-top: 36px;">
+                <img src="{{ STATIC_URL }}images/partners/ted.png" alt="{% trans 'TED Team' %}"/>
+              </span>
+              <span class="url">{% trans "TED Team" %}</span>
+          </a>
+         </li>
+        {% endif %}
         <li>
-        <a target="_blank" href="http://mozillalabs.com/chromeless/?p=26">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_mozilla.png"/></span>
+        <a target="_blank" href="http://www.universalsubtitles.org/en/videos/FhK0RB0fPhUs/info/the-mozilla-story/">
+            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_mozilla.png" alt="{% trans 'Mozilla Example' %}"/></span>
             <span class="url">{% trans "Mozilla Example" %}</span>
         </a>
         </li>
         <li>
         <a target="_blank" href="http://gigaom.com/video/khan-academy-universal-subtitles/">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_khan.png"/></span>
+            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_khan.png" alt="{% trans 'Khan Integration' %}"/></span>
             <span class="url">{% trans "Khan Integration" %}</span>
         </a>
         </li>
         <li>
         <a target="_blank" href="http://drupal.org/drupal-7.0#video">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_drupal.png"/></span>
+            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_drupal.png" alt="{% trans 'Drupal Example' %}"/></span>
             <span class="url">{% trans "Drupal Example" %}</span>
         </a>
         </li>
+        {% if not 'ted'|team_is_visible %}
         <li>
         <a target="_blank" href="http://www.universalsubtitles.org/en/teams/al-jazeera/">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_aj.png"/></span>
+            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_aj.png" alt="{% trans 'Al Jazeera Team' %}"/></span>
             <span class="url">{% trans "Al Jazeera Team" %}</span>
         </a>
         </li>
+        {% endif %}
         <li>
         <a target="_blank" href="http://www.universalsubtitles.org/en/teams/newshour">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_pbs.png"/></span>
+            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_pbs.png" alt="{% trans 'Newshour Team' %}"/></span>
             <span class="url">{% trans "NewsHour Team" %}</span>
         </a>
         </li>

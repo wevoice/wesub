@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load i18n %}
+{% load i18n teams_tags %}
 
 
 {% block main_content %}
@@ -137,14 +137,14 @@
   </div>
   <div id="services-partners">
     <ul>
-      {% comment %}
+      {% if 'ted'|team_is_visible %}
          <li>
           <a href="http://www.universalsubtitles.org/en/teams/ted/">
-            <img src=""/>
+              <img src="{{ STATIC_URL }}images/partners/ted.png"/>
           </a>
           <p><a href="http://www.universalsubtitles.org/en/teams/ted/">TED</a></p>
          </li>
-      {% endcomment %}
+      {% endif %}
       <li>
         <a href="http://blog.universalsubtitles.org/translating-state-of-the-union-2011/"><img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="PBS" /></a>
         <p><a href="http://www.universalsubtitles.org/en/teams/newshour">PBS NewsHour</a><p>

@@ -95,7 +95,11 @@
                         return success();
                     }
                 };
-                return $.ajax(options);
+                if (window.chosenAjaxInProgress) {
+                    window.chosenAjaxInProgress.abort();
+                }
+                window.chosenAjaxInProgress = $.ajax(options);
+                return window.chosenAjaxInProgress;
             });
         };
     })(jQuery);
