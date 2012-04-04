@@ -591,6 +591,14 @@ def move_video(request):
         video.is_public = True
         video.moderated_by = team if team.moderates_videos() else None
         video.save()
+        
+        # make sure we end up with a policy that belong to the team
+        # we're moving into, else it won't come up in the team video
+        # page
+        if video.policy and video.policy.belongs_to_team:
+            video.policy.object_id = team.pk
+            video.policy.save(updates_metadata=False)
+
 
         # Update all Solr data.
         metadata_manager.update_metadata(video.pk)
@@ -600,10 +608,8 @@ def move_video(request):
         # Create any necessary tasks.
         autocreate_tasks(team_video)
 
-        if video.policy and video.policy.belongs_to_team:
-            video.policy.object_id = team.pk
-            video.policy.save(updates_metadata=False)
-
+        # fire a http notification that a new video has hit this team:
+        api_teamvideo_new.send(team_video)
         messages.success(request, _(u'The video has been moved to the new team.'))
     else:
         for e in flatten_errorlists(form.errors):
