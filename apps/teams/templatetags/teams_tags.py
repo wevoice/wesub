@@ -512,3 +512,27 @@ def can_unpublish(user, video):
 
     return False
 
+@register.filter
+def can_delete_subtitles_for(user, video):
+    """Return True if the user can delete subtitles for this video.
+
+    Usage:
+
+        {% if request.user|can_delete_subtitles_for:video %}
+            ...
+        {% endif %}
+
+    """
+    team_video = video.get_team_video()
+
+    if not team_video:
+        return False
+
+    team = team_video.team
+    member = TeamMember.objects.get(team=team,user=user)
+    allowed_users = owners_and_admins(team)
+
+    if member in allowed_users:
+        return True
+    else:
+        return False
