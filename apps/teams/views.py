@@ -584,8 +584,9 @@ def move_video(request):
         # TODO: Dedupe this and the team video delete signal.
         video = team_video.video
 
-        SubtitleVersion.objects.filter(language__video=video).update(
-            moderation_status=MODERATION.UNMODERATED)
+        SubtitleVersion.objects.filter(language__video=video).exclude(
+            moderation_status=MODERATION.APPROVED).update(
+                moderation_status=MODERATION.UNMODERATED)
 
         video.is_public = True
         video.moderated_by = team if team.moderates_videos() else None
