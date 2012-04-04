@@ -740,7 +740,12 @@ def _create_translation_tasks(team_video, subtitle_version):
         task = Task(team=team_video.team, team_video=team_video,
                     subtitle_version=subtitle_version,
                     language=lang, type=Task.TYPE_IDS['Translate'])
-        task.save()
+        # we should only update the team video after all tasks for
+        # this video are saved, else we end up with a lot of
+        # wasted tasks
+        task.save(update_team_video_index=False)
+
+    update_one_team_video.delay(team_video.pk)
 
 def autocreate_tasks(team_video):
     workflow = Workflow.get_for_team_video(team_video)
