@@ -48,24 +48,24 @@ unisubs.HowToVideoPanel.CONTINUE = 'continue';
 unisubs.HowToVideoPanel.VideoChoice = {
     TRANSCRIBE: {
         videos: {
-            ogg: 'http://blip.tv/file/get/Miropcf-tutorialstep1573.ogv',
-            h264: 'http://blip.tv/file/get/Miropcf-tutorialstep1328.mp4',
+            ogg: 'https://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-1.ogv',
+            h264: 'http://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-1.mp4',
             yt: '0MCpmace_lc'
         },
         image: 'howto-step1.png'
     },
     SYNC: {
         videos: {
-            ogg: 'http://blip.tv/file/get/Miropcf-tutorialstep2876.ogv',
-            h264: 'http://blip.tv/file/get/Miropcf-tutorialstep2530.mp4',
+            ogg: 'http://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-2.ogv',
+            h264: 'http://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-2.mp4',
             yt: 'bkwiFF-I2nI'
         },
         image: 'howto-step2.png'
     },
     REVIEW: {
         videos: {
-            ogg: 'http://blip.tv/file/get/Miropcf-tutorialstep3571.ogv',
-            h264: 'http://blip.tv/file/get/Miropcf-tutorialstep3146.mp4',
+            ogg: 'http://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-3.ogv',
+            h264: 'http://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-3.mp4',
             yt: 'Y5vGEGKMkMk'
         },
         image: 'howto-step3.png'
