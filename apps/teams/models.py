@@ -954,6 +954,25 @@ class MembershipNarrowing(models.Model):
             return u"Permission restriction for %s to language %s " % (self.member, self.language)
 
 
+    def save(self, *args, **kwargs):
+        # Cannot have duplicate narrowings for a language.
+        if self.language:
+            duplicate_exists = MembershipNarrowing.objects.filter(
+                member=self.member, language=self.language
+            ).exclude(id=self.id).exists()
+
+            assert not duplicate_exists, "Duplicate language narrowing detected!"
+
+        # Cannot have duplicate narrowings for a project.
+        if self.project:
+            duplicate_exists = MembershipNarrowing.objects.filter(
+                member=self.member, project=self.project
+            ).exclude(id=self.id).exists()
+
+            assert not duplicate_exists, "Duplicate project narrowing detected!"
+
+        return super(MembershipNarrowing, self).save(*args, **kwargs)
+
 # Application
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
