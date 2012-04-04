@@ -9,6 +9,12 @@
   margin-bottom: .5em;
 }
 
+#services p.subhead {
+  font-size: 1.2em;
+  padding: .5em 0 1em;
+  color: #52686E;
+}
+
 #services .row {
   float: left;
   margin: 1em -25px 2em 0;
@@ -60,7 +66,7 @@
 
 #services > h2 {
   font-size: 18px;
-  padding-top: 1em;
+  padding-top: 2em;
 }
 
 #services-partners {
