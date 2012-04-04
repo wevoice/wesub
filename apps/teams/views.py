@@ -588,7 +588,7 @@ def move_video(request):
             moderation_status=MODERATION.UNMODERATED)
 
         video.is_public = True
-        video.moderated_by = None
+        video.moderated_by = team if team.moderates_videos() else None
         video.save()
 
         # Update all Solr data.
