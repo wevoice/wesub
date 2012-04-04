@@ -146,6 +146,14 @@ def team_select(context, team):
         'can_create_team': DEV_OR_STAGING or (user.is_superuser and user.is_active)
     }
 
+@register.filter
+def team_is_visible(team_slug):
+    try:
+        team = Team.objects.get(slug=team_slug)
+    except Team.DoesNotExist:
+        return False
+    if team.is_visible:
+        return True
 
 @tag(register, [])
 def share_panel_email_url(context):
