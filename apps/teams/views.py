@@ -604,6 +604,8 @@ def move_video(request):
             video.policy.object_id = team.pk
             video.policy.save(updates_metadata=False)
 
+        # fire a http notification that a new video has hit this team:
+        api_teamvideo_new.send(team_video)
         messages.success(request, _(u'The video has been moved to the new team.'))
     else:
         for e in flatten_errorlists(form.errors):
