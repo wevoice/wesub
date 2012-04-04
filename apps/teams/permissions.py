@@ -512,6 +512,15 @@ def can_approve(team_video, user, lang=None):
 
     return role in _perms_equal_or_greater(role_req)
 
+def can_delete_subs(team_video, user, lang=None):
+    """Return whether the user has permission to delete subtitles.
+
+    lang should be a language code string.
+
+    """
+    role = get_role_for_target(user, team_video.team, team_video.project, lang)
+    return can_unpublish_subs(team_video, user, lang) and role in [ROLE_ADMIN, ROLE_OWNER]
+
 
 def can_message_all_members(team, user):
     """Return whether the user has permission to message all members of the given team."""

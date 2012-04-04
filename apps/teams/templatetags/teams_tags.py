@@ -42,6 +42,7 @@ from apps.teams.permissions import (
     can_delete_video as _can_delete_video,
     can_delete_video_in_team as _can_delete_video_in_team,
     can_approve as _can_approve,
+    can_delete_subs as _can_delete_subs,
 )
 from apps.teams.permissions import (
     can_invite, can_add_video_somewhere,
@@ -528,11 +529,4 @@ def can_delete_subtitles_for(user, video):
     if not team_video:
         return False
 
-    team = team_video.team
-    member = TeamMember.objects.get(team=team,user=user)
-    allowed_users = owners_and_admins(team)
-
-    if member in allowed_users:
-        return True
-    else:
-        return False
+    return _can_delete_subs(team_video, user)
