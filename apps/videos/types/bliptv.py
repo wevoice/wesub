@@ -20,44 +20,76 @@ from videos.types.base import VideoType
 from vidscraper.sites import blip
 from django.utils.html import strip_tags
 
+import urllib2
+import simplejson
+
+import re
+
 class BlipTvVideoType(VideoType):
 
     abbreviation = 'B'
     name = 'Blip.tv'  
     site = 'blip.tv'
+
+    pattern = re.compile(r"^https?://blip.tv/(?P<subsite>[a-zA-Z0-9]+)/(?P<file_id>[a-zA-Z0-9-]+)/?")
     
     def __init__(self, url):
         self.url = url
-        self.videoid  = self.file_id = self._get_file_id(url)
-        self.shortmem = blip.get_shortmem(url)
-    
-    @property
-    def video_id(self):
-        return self.file_id
+        self.subsite, self.file_id = self._parse_url()
+        self.json = self._fetch_json()
     
     def convert_to_video_url(self):
-        return self.scrape_best_file_url()
+        return "http://blip.tv/%s/%s" % (self.subsite, self.file_id)
+
+    @property
+    def video_id(self):
+        if self.json and 'embedLookup' in self.json:
+            return self.json['embedLookup']
+        else:
+            return None
 
     @classmethod
     def matches_video_url(cls, url):
-        return blip.BLIP_REGEX.match(url)
+        return cls.pattern.match(url)
 
     def create_kwars(self):
-        return {
-            'videoid': self.file_id
-        }
+        return {'videoid': self.video_id}
 
     def set_values(self, video_obj):
-        video_obj.title = unicode(blip.scrape_title(self.url, self.shortmem))
-        video_obj.thumbnail = blip.get_thumbnail_url(self.url, self.shortmem)
-        #video_obj.description = strip_tags(blip.scrape_description(self.url, self.shortmem))
+        json = self.json
+
+        if 'title' in json:
+            video_obj.title = unicode(json['title'])
+        
+        if 'description' in json:
+            video_obj.description = unicode(json['description'])
+
+        if 'media' in json:
+            video_obj.duration = int(json['media']['duration'])
+
+        if 'thumbnailUrl' in json:
+            video_obj.thumbnail = json['thumbnailUrl']
+
+        video_obj.save()
+
         return video_obj
 
-    def _get_file_id(self, video_url):
-        return blip.BLIP_REGEX.match(video_url).groupdict()['file_id']
+    def _parse_url(self):
+        matches = self.pattern.match(self.url).groupdict()
+        return matches['subsite'], matches['file_id']
 
-    def scrape_best_file_url(self):
-        if not hasattr(self, '_file_url'):
-            self._file_url = blip.video_file_url(self.file_id)
-        return self._file_url
+    def _fetch_json(self):
+        # bliptv just knows how to return jsonp. argh.
+        url = self.url + "?skin=json&callback="
 
+        try:
+            jsonp = urllib2.urlopen(url).read().strip()
+        except Exception:
+            return {}
+
+        # strip the json parentesis. argh.
+        if jsonp.endswith(');'):
+            jsonp = jsonp[1:-2]
+
+        json = simplejson.loads(jsonp)
+        return json[0].get('Post', {}) if len(json) > 0 else None
