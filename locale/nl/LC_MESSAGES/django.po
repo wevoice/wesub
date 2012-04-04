@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-03 01:33-0500\n"
-"PO-Revision-Date: 2012-04-03 06:47+0000\n"
+"POT-Creation-Date: 2012-04-04 01:32-0500\n"
+"PO-Revision-Date: 2012-04-04 06:45+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Dutch (http://www.transifex.net/projects/p/universalsubtitles/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -3236,7 +3236,7 @@ msgstr ""
 
 #: templates/faq.html:37 templates/faq.html.py:199
 msgid "Hey, you don’t list my language!"
-msgstr ""
+msgstr "Hey, mijn taal staat er niet bij!"
 
 #: templates/faq.html:45
 msgid ""
@@ -3265,7 +3265,7 @@ msgstr ""
 #: templates/faq.html:68
 msgid ""
 "Captions make videos accessible for viewers who are deaf or hard of hearing "
-msgstr ""
+msgstr "Ondertiteling maakt video toegankelijk voor dove of hardhorende kijkers."
 
 #: templates/faq.html:69
 msgid ""
@@ -3278,7 +3278,7 @@ msgid ""
 "Video creators get: better SEO, more views, access to a far bigger "
 "(potentially multilingual and global) audience, accessibility for deaf and "
 "hard of hearing viewers, and more"
-msgstr ""
+msgstr "Video makers krijgen: Betere SEO, meer views, toegang tot een veel groter (potentieel meertalig en wereldwijd) publiek, toegankelijkheid voor dove of hardhorende kijkers en meer"
 
 #: templates/faq.html:75
 msgid ""
@@ -3942,7 +3942,7 @@ msgstr "Annuleer"
 
 #: templates/auth/login.html:9
 msgid "Login to Your Existing Account"
-msgstr ""
+msgstr "Log in op jouw bestaande account."
 
 #: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
 msgid "Login"
@@ -6203,8 +6203,9 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:61
 msgid ""
-"Add a URL for another version of the exact same video. Useful many versions "
-"of the same video exist, or when there are different formats (like HTML5)"
+"Add a URL for another version of the exact same video. Useful when many "
+"versions of the same video exist, or when there are different formats (like "
+"HTML5)"
 msgstr ""
 
 #: templates/videos/_video_url_panel.html:74
@@ -6607,7 +6608,7 @@ msgstr ""
 #: templates/videos/stop_notification.html:9
 #, python-format
 msgid "Notifications to %(u)s stopped for %(video)s."
-msgstr ""
+msgstr "Notificaties naar %(u)s zijn gestopt voor %(video)s."
 
 #: templates/videos/subtitle-view.html:22
 msgid "Select two revisions to compare, please"
@@ -6792,7 +6793,7 @@ msgstr "Taak 2"
 
 #: templates/videos/test_form_page.html:30
 msgid "Try fixing errors on the video (or just get back in and make an edit)"
-msgstr ""
+msgstr "Probeer fouten uit de video te halen (of ga gewoon terug en bewerk iets)"
 
 #: templates/videos/test_form_page.html:35
 msgid "Task 3"

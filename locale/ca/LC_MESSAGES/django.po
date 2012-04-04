@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-03 01:33-0500\n"
-"PO-Revision-Date: 2012-04-03 06:47+0000\n"
+"POT-Creation-Date: 2012-04-04 01:32-0500\n"
+"PO-Revision-Date: 2012-04-04 06:45+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.net/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -727,7 +727,7 @@ msgstr "Equips"
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
-msgstr "Utilitzeu aquest espai per explicar per què vosaltres o el vostre equip necessita titular o subtitular aquest vídeo. Afegiu una nota que faça més probable que els voluntaris vulguen cooperar!"
+msgstr "Utilitzeu aquest espai per explicar per què vosaltres o el vostre equip necessita etiquetar o subtitular aquest vídeo. Afegiu una nota que faça més probable que els voluntaris vulguen cooperar!"
 
 #: apps/teams/models.py:626
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
@@ -848,7 +848,7 @@ msgid ""
 "                    <li><a href=\"%(custom)s\">Customize instructions to caption makers and translators</a></li>\n"
 "                </ul>\n"
 "                "
-msgstr "\nEl vostre equip ha estat creat. Ací teniu els següents passos:\n<ul>\n<li><a href=\"%(edit)s\">Modificar permisos dels membres de l'equip </a></li>\n<li><a href=\"%(activate)s\">Activar i personalitzar els fluxos de treball del vostre equip</a></li>\n<li><a href=\"%(create)s\">Crear i personalitzar projectes</a></li>\n<li><a href=\"%(lang)s\">Modificar les preferències d'idioma</a></li>\n<li><a href=\"%(custom)s\">Personalitzar les instruccions per als creadors de subtítols i traductors</a></li>\n</ul>"
+msgstr "\nEl vostre equip ha estat creat. Ací teniu els següents passos:\n<ul>\n<li><a href=\"%(edit)s\">Modificar permisos dels membres de l'equip </a></li>\n<li><a href=\"%(activate)s\">Activar i personalitzar els fluxos de treball del vostre equip</a></li>\n<li><a href=\"%(create)s\">Crear i personalitzar projectes</a></li>\n<li><a href=\"%(lang)s\">Modificar les preferències d'idioma</a></li>\n<li><a href=\"%(custom)s\">Personalitzar les instruccions per als creadors d'etiquetes i traductors</a></li>\n</ul>"
 
 #: apps/teams/views.py:338
 msgid "You do not have permission to delete this team."
@@ -2665,7 +2665,7 @@ msgstr "Ens agradaria que ens ajudareu a provar el nostre giny"
 
 #: templates/_testing_widget.html:5
 msgid "Just launch our feedback form and try captioning a video"
-msgstr "Només omple la sol·licitud i proveu a subtitular un vídeo  "
+msgstr "Només omple la sol·licitud i proveu a etiquetar un vídeo  "
 
 #: templates/_testing_widget.html:7
 msgid "Test the Widget"
@@ -2735,12 +2735,12 @@ msgid ""
 "                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/services/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
 "            </p>\n"
 "        "
-msgstr ""
+msgstr "\n<h2>Quant a Amara</h2>\n\n<p>\nAmara dona la possibilitat a persones, comunitats i grans organitzacions l'accessibilitat i eliminació de barreres als vídeos en línia. Aquestes eines són gratuïtes i de codi obert i fan del subtitulat i la traducció de vídeo, un treball més simple, atractiu i sobretot més col·laborador.\n</p>\n<p>\nEls beneficis d'etiquetar i subtitular són enormes:\n<ul>\n<li>Els etiquetats fan els vídeos accessibles als espectadors sords o amb deficiència auditiva</li>\n<li>Les traduccions permeten a tots nosaltres vorer vídeos en idiomes que no entenem</li>\n<li>Els creadors de vídeo obtenen: Millor posicionament als cercadors, més espectadors, accés a una major (potencialment multilingüe i global) audiència, accessibilitat per a sords i espectadors amb deficiència auditiva, i més coses</li>\n</ul>\n</p>\n\n<p>\nAmara està formada principalment per tres parts:\n<ul>\n<li>Una eina per a crear i visualitzar subtítols (giny)</li>\n<li>Una web de subtitulat col·laboradora</li>\n<li>Un protocol obert de recerca i lliurament de subtítols</li>\n</ul>\n</p>\n\n<p>\nQualssevol cosa que fem esta disponible sota la llicència de codi obert <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a>.\n</p>\n<h2>La nostra Organització</h2>\n\n<p>\n<a href=\"http://www.pculture.org/\">Fundació Participatory Culture</a> és una organització sense ànim de lucre amb eines gratuïtes i obertes per a un sistema multimèdia més democràtic i descentralitzat. Altres dels nostres projectes inclouen <a href=\"http://www.getmiro.com/\">Miro</a>, \n<a href=\"http://www.mirovideoconverter.com/\">Conversor de vídeo Miro</a>,\n<a href=\"http://www.mirocommunity.org/\">Comunitat Miro</a>, and \n<a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n</p>\n\n<p>\nAmara està involucrat al projecte <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \ni la Fundació Mozilla ha donat suport de desenvolupament.\nL'Institut Open Society i la Fundació MacArthur també han donat suport financer.\n</p>\n\n<h2>Editors i serveis empresarials</h2>\n<p>\nAmara ofereix un conjunt de serveis i eines professionals que permeten als editors i les plataformes de vídeo crear i gestionar subtítols amb una alta qualitat. Amb Amara, podeu construir una comunitat de voluntaris que subtitulen el vostre contingut, integrar-ho amb serveis professionals, i fer ús d'un sistema de control potent i de qualitat. Per a conèixer més sobre aquesta eina, visiteu els nostres  <a href=\"http://www.universalsubtitles.org/en/services/\">serveis per a empreses</a>  i contacteu amb Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n</p>"
 
 #: templates/base.html:9
 msgid ""
 "Universal subtitling: caption, translate, subtitle and transcribe video."
-msgstr ""
+msgstr "Subtitulat Universal: etiquetar, traduir, subtitular, transcriure vídeo."
 
 #: templates/base.html:68
 msgid "Subtitle Videos"
@@ -2756,7 +2756,7 @@ msgstr "Voluntariat"
 
 #: templates/base.html:71
 msgid "Enterprise"
-msgstr ""
+msgstr "Empresa"
 
 #: templates/base.html:72
 msgid "Help"
@@ -2769,7 +2769,7 @@ msgstr "Ingressar"
 #: templates/base.html:100
 msgid ""
 "Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
-msgstr ""
+msgstr "Amara és un projecte de <a href=\"http://participatoryculture.org/\">PCF</a>."
 
 #: templates/base.html:103 templates/profiles/view_profile.html:68
 msgid "About"
@@ -3057,14 +3057,14 @@ msgid ""
 "\n"
 "            <strong>Make your videos more global and more popular.</strong> Transcripts, captions, and translations dramatically increase video viewership.\n"
 "          "
-msgstr "\n<strong>Feu els vostres vídeos més universals i populars.</strong> Les transcripcions, llegendes, i les traduccions incrementaran exponencialment la seva audiència."
+msgstr "\n<strong>Feu els vostres vídeos més universals i populars.</strong> Les transcripcions, etiquetes, i les traduccions incrementaran exponencialment la seva audiència."
 
 #: templates/enterprise.html:17
 msgid ""
 "\n"
 "            Amara is the most powerful subtitling platform in the world. We can help you build an <strong>active and engaged volunteer community</strong> and you can take advantage of <strong>professional transcription and translation services</strong>, all in one unified workflow.\n"
 "          "
-msgstr ""
+msgstr "\nAmara és la plataforma de subtitulat més completa del món. Podem ajudar-vos construint una <strong>comunitat de voluntaris activa  i compromesa</strong>  i podreu obtindre avantatges com <strong> serveis de transcripcions i traduccions professionals</strong>, tot en un mateix flux de treball."
 
 #: templates/enterprise.html:23
 msgid "Interested?"
@@ -3079,7 +3079,7 @@ msgstr "\nPer a conèixer més dels nostres serveis, sisplau contacteu amb Dean 
 
 #: templates/enterprise.html:31
 msgid "What Can Amara Do?"
-msgstr ""
+msgstr "Què pot fer Amara?"
 
 #: templates/enterprise.html:34
 msgid "Build a Translation Team"
@@ -3090,7 +3090,7 @@ msgid ""
 "\n"
 "          Build a powerful volunteer translation and captioning team around your content. A video that lots of people want to watch is a video that fans will want to translate and share around the world.\n"
 "        "
-msgstr "\nConstruïu un potent equip de voluntaris de traducció i subtitulat per als vostres continguts. Un vídeo que el vol veure molta gent és un vídeo que serà traduït i compartit arreu del món pels seus fans."
+msgstr "\nConstruïu un potent equip de voluntaris de traducció i etiquetat per als vostres continguts. Un vídeo que el vol veure molta gent és un vídeo que serà traduït i compartit arreu del món pels seus fans."
 
 #: templates/enterprise.html:42
 msgid "Crowdsource with Professional Review"
@@ -3112,7 +3112,7 @@ msgid ""
 "\n"
 "            Access professional services including: captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
 "          "
-msgstr "\nL'accés als serveis professionals inclouen: subtitulat, traduccions, i control de qualitat. Que, junt a les contribucions del voluntariat, us oferirà una màxima flexibilitat."
+msgstr "\nL'accés als serveis professionals inclouen: etiquetats, traduccions, i control de qualitat. Que, junt a les contribucions del voluntariat, us oferirà una màxima flexibilitat."
 
 #: templates/enterprise.html:60
 msgid "Work with Any Video Platform"
@@ -3123,7 +3123,7 @@ msgid ""
 "\n"
 "            Amara works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
 "          "
-msgstr ""
+msgstr "\nAmara treballa amb els serveis d'allotjament i reproductors de vídeo més populars. Integreu i incrusteu vídeos amb subtítols sense canviar el vostre flux de treball de publicació."
 
 #: templates/enterprise.html:68
 msgid "Improve Your SEO"
@@ -3173,7 +3173,7 @@ msgstr "Què és la Participatory Culture Foundation i per què ha creat Univers
 msgid ""
 "Will Universal Subtitles support closed captions for the deaf and hard of "
 "hearing?"
-msgstr "Admetrà Universal Subtitles subtítols codificats per a les persones sordes o amb discapacitat auditiva?"
+msgstr "Admetrà Universal Subtitles etiquetes codificats per a les persones sordes o amb discapacitat auditiva?"
 
 #: templates/faq.html:24 templates/faq.html.py:82
 msgid "Will your subtitles support my language or characterset?"
@@ -3264,7 +3264,7 @@ msgstr "Els subtítols als vídeos són una mina d'or sense explotar."
 #: templates/faq.html:68
 msgid ""
 "Captions make videos accessible for viewers who are deaf or hard of hearing "
-msgstr "Les llegendes fan accessibles als vídeos per als espectadors sords o amb deficiències auditives."
+msgstr "Les etiquetes fan accessibles als vídeos per als espectadors sords o amb deficiències auditives."
 
 #: templates/faq.html:69
 msgid ""
@@ -3291,7 +3291,7 @@ msgstr "La Participatory Culture Foundation és una organització sense ànim de
 msgid ""
 "Yes, we are working on a solution for making closed captions [including "
 "information about sounds and music], as well as subtitles/translations."
-msgstr "Sí, estem treballant per a crear llegendes més representatives [incloent informació sobre sons i música], així com subtítols/traduccions."
+msgstr "Sí, estem treballant per a crear etiquetes més representatives [incloent informació sobre sons i música], així com subtítols/traduccions."
 
 #: templates/faq.html:83
 msgid ""
@@ -3504,7 +3504,7 @@ msgid ""
 "\n"
 "            Increase viewership with transcription, captioning, and translation services, and flexible API and integration options. Improve SEO, reach a global audience, and build a managed volunteer community.\n"
 "        "
-msgstr "\nIncrementeu l'audiència amb els serveis de transcripció, etiquetat i traducció i una API flexible amb opcions d'integració. Millora el posicionament als cercadors, assolint una audiència més global, i construeix i gestiona una comunitat de voluntaris."
+msgstr "\nIncrementeu l'audiència amb els serveis de transcripció, etiquetat i traducció i una API flexible amb opcions d'integració. Milloreu el posicionament als cercadors, assolint una audiència més global, i construïu i gestioneu una comunitat de voluntaris."
 
 #: templates/index.html:53
 msgid "See our enterprise services."
@@ -3553,7 +3553,7 @@ msgstr "Top d'aquest més"
 
 #: templates/index.html:119
 msgid "Top all-time"
-msgstr "Tot des de sempre"
+msgstr "Top des de sempre"
 
 #: templates/index.html:126
 msgid "More Featured"
@@ -3856,7 +3856,7 @@ msgid ""
 "            More captions will also make it simpler for computers to process, index, \n"
 "            and make sense of the ever growing sea of online video.\n"
 "           "
-msgstr "\n            L'objectiu de la cimera és una major disponibilitat i una major usabilitat de les llegendes i subtítols,ambdós molt necessaris. \nHa arribat un moment crític en el que l'ús de vídeos a Internet s'ha disparat i les persones que depenen dels subtítols corren perill de quedar-se enrere. Els nous usuaris de totes les cultures estan arribant massivament. La normalització i omnipresència de la tecnologia pot fer que els usuaris potencials cresquen de manera exponencial i que els missatges puguen superar les barreres culturals amb la major facilitat. Un major nombre de llegendes ajudaria als ordinadors a processar, indexar i donar sentit  a, cada volta major, font de vídeos en línia."
+msgstr "\n            L'objectiu de la cimera és una major disponibilitat i una major usabilitat de les etiquetes i subtítols,ambdós molt necessaris. \nHa arribat un moment crític en el que l'ús de vídeos a Internet s'ha disparat i les persones que depenen dels subtítols corren perill de quedar-se enrere. Els nous usuaris de totes les cultures estan arribant massivament. La normalització i omnipresència de la tecnologia pot fer que els usuaris potencials cresquen de manera exponencial i que els missatges puguen superar les barreres culturals amb la major facilitat. Un major nombre d'etiquetes ajudaria als ordinadors a processar, indexar i donar sentit  a, cada volta major, font de vídeos en línia."
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
@@ -3973,7 +3973,7 @@ msgstr "abans"
 
 #: templates/jsdemo/home.html:16
 msgid "Subtitles and Captions for Every Video on the Web"
-msgstr "Subtítols i llegendes per a tots els vídeos a la Web"
+msgstr "Subtítols i etiquetes per a tots els vídeos a la Web"
 
 #: templates/jsdemo/home.html:19
 msgid "The Problem"
@@ -3993,7 +3993,7 @@ msgstr "La nostra missió"
 msgid ""
 "We're trying to make captioning, subtitling, and translating video publicly "
 "accessible in a way that's free and open, just like the Web."
-msgstr "Estem intentant fer llegendes, subtítols i traduccions d'una manera més lliure i oberta, com la mateixa web."
+msgstr "Estem intentant fer etiquetes, subtítols i traduccions d'una manera més lliure i oberta, com la mateixa web."
 
 #: templates/jsdemo/home.html:21
 msgid "Learn More"
@@ -4710,7 +4710,7 @@ msgstr "TOTAL"
 
 #: templates/statistic/index.html:83
 msgid "Total number of videos captioned"
-msgstr "Número total de vídeos subtitulats"
+msgstr "Número total de vídeos etiquetats"
 
 #: templates/statistic/index.html:90
 msgid "Tweets"
@@ -6202,9 +6202,10 @@ msgstr "Afegir una altra URL per aquest vídeo"
 
 #: templates/videos/_video_url_panel.html:61
 msgid ""
-"Add a URL for another version of the exact same video. Useful many versions "
-"of the same video exist, or when there are different formats (like HTML5)"
-msgstr "Afegiu una URL per a altra versió del mateix vídeo.  És útil quan existeixen vàries versions del mateix vídeo o quan estan en diferents formats (com HTML5)"
+"Add a URL for another version of the exact same video. Useful when many "
+"versions of the same video exist, or when there are different formats (like "
+"HTML5)"
+msgstr ""
 
 #: templates/videos/_video_url_panel.html:74
 msgid "Add"

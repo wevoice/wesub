@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-03 01:33-0500\n"
+"POT-Creation-Date: 2012-04-04 01:32-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6359,8 +6359,9 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:61
 msgid ""
-"Add a URL for another version of the exact same video. Useful many versions "
-"of the same video exist, or when there are different formats (like HTML5)"
+"Add a URL for another version of the exact same video. Useful when many "
+"versions of the same video exist, or when there are different formats (like "
+"HTML5)"
 msgstr ""
 
 #: templates/videos/_video_url_panel.html:74
