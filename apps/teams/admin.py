@@ -144,7 +144,7 @@ class TeamLanguagePreferenceAdmin(admin.ModelAdmin):
 class MembershipNarrowingAdmin(admin.ModelAdmin):
     list_display = ('member', 'team', 'project', 'language')
     list_filter = ('created', 'modified')
-    raw_id_fields = ('member', 'project')
+    raw_id_fields = ('member', 'project', 'added_by')
     ordering = ('-created',)
     search_fields = ('member__team__name', 'member__user__username')
 
