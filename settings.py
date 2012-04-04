@@ -128,6 +128,8 @@ JS_CORE = \
      'js/player/brightcovevideoplayer.js',
      'js/player/flvvideosource.js',
      'js/player/bliptvplaceholder.js',
+     'js/player/bliptvvideoplayer.js',
+     'js/player/bliptvvideosource.js',
      'js/player/controlledvideoplayer.js',
      'js/player/vimeovideosource.js',
      'js/player/vimeovideoplayer.js',

@@ -148,7 +148,7 @@ unisubs.player.MediaSource.videoSourceForURL = function(videoURL, opt_videoConfi
     }
     else if (/^\s*https?:\/\/([^\.]+\.)?blip\.tv/.test(videoURL) &&
              !blipFileGetRegex.test(videoURL)) {
-        return new unisubs.player.BlipTVPlaceholder(videoURL);
+        return new unisubs.player.BlipTvVideoSource("", videoURL, opt_videoConfig);
     }
     else if (/\.flv$|\.mov$/i.test(videoURL)) {
         return new unisubs.player.FlvVideoSource(videoURL, opt_videoConfig);
