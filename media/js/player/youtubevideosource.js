@@ -105,7 +105,6 @@ unisubs.player.YoutubeVideoSource.getMediaSource = function(videoURL, opt_videoC
                 videoURL, opt_videoConfig);
         }
         if (videoSource != null){
-            console.log("found youtube video source")
             return videoSource;
         }
     }
