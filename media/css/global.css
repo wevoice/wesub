@@ -218,7 +218,7 @@
     width: 960px;
 }
 #main_bar h1 a {
-    background: url(../images/amara-logo.png) 0 0 no-repeat;
+    background: url(../images/amara-logo.png) 0 1px no-repeat;
     display: block;
     float: left;
     height: 28px;
@@ -227,7 +227,7 @@
     width: 205px;
 }
 #main_bar h1 a:hover {
-    background-position: 0 -29px
+    background-position: 0 -28px
 }
 #menu #dropdown h4 {
     color: #444;
