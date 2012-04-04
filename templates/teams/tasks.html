@@ -153,7 +153,7 @@
                                     {% endif %}
                                 </h3>
                                 <p>
-                                    {% trans "Video" %}:
+                                    <strong>{% trans "Video" %}:</strong>
                                     <a href="{{ task.team_video.video.get_absolute_url }}">
                                         {{ task.team_video|truncatewords:12 }}
                                     </a>
@@ -165,21 +165,27 @@
                                 {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
                                     {% with task.subtitle_version as version %}
                                         <p>
-                                            {% trans 'Subtitles' %}:
+                                            <strong>{% trans 'Subtitles' %}:</strong>
                                             <a href="{{ task.subtitle_version.get_absolute_url }}">
-                                                {% trans 'draft' %}
+                                                {% trans 'latest draft' %}
                                             </a>
-                                            {% if version.language.is_original %}
-                                                {% trans 'transcribed' %}
-                                            {% else %}
-                                                {% trans 'translated' %}
+                                            {% if task.get_reviewer != version.user %}
+                                                {% if version.language.is_original %}
+                                                    {% trans 'transcribed' %}
+                                                {% else %}
+                                                    {% trans 'translated' %}
+                                                {% endif %}
+                                                by
+                                                <a href="{{ version.user.get_absolute_url }}" title="View {{ version.user }}'s profile">{{ version.user }}</a>
                                             {% endif %}
-                                            by
-                                            <a href="{{ version.user.get_absolute_url }}" title="View {{ version.user }}'s profile">{{ version.user }}</a>
                                             {% if task.get_type_display == 'Approve' %}
                                                 {% with task.get_reviewer as reviewer %}
-                                                    {% if reviewer %},
-                                                        reviewed by <a href="{{ reviewer.get_absolute_url }}">{{ reviewer }}</a>.
+                                                    {% if reviewer %}
+                                                        {% trans 'reviewed' %}
+                                                        {% if reviewer = version.user %}
+                                                            {% trans 'and edited' %}
+                                                        {% endif %}
+                                                        {% trans 'by' %} <a href="{{ reviewer.get_absolute_url }}">{{ reviewer }}</a>.
                                                     {% endif %}
                                                 {% endwith %}
                                             {% endif %}
