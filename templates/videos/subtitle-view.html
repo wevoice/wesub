@@ -330,13 +330,15 @@
                                     </label>
                                 </fieldset>
 
-                                <fieldset>
-                                    <h5>{% trans 'Would you like to delete these subtitles completely?' %}</h5>
-                                    <label class="checkbox">
-                                        <input type="checkbox" name="should_delete" value="1">
-                                        {% trans 'Yes, delete these subtitles instead of sending them back for editing/review' %}
-                                    </label>
-                                </fieldset>
+                                {% if request.user|can_delete_subtitles_for:video %}
+                                    <fieldset>
+                                        <h5>{% trans 'Would you like to delete these subtitles completely?' %}</h5>
+                                        <label class="checkbox">
+                                            <input type="checkbox" name="should_delete" value="1">
+                                            {% trans 'Yes, delete these subtitles instead of sending them back for editing/review' %}
+                                        </label>
+                                    </fieldset>
+                                {% endif %}
 
                                 {% csrf_token %}
 
