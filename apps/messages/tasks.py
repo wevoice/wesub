@@ -509,7 +509,7 @@ def approved_notification(task_pk, published=False):
 
     template_name = template_html
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_rejected_video_handler(task.subtitle_version, reviewer)
+    Action.create_approved_video_handler(task.subtitle_version, reviewer)
     return msg, email_res
 
 @task

@@ -52,11 +52,15 @@
         </li>
         {% with user.get_languages as langs %}
             {% if langs %}
-                {% for l in langs %}
                 <li>
-                    <a href="{% url teams:team_tasks team.slug %}?lang={{ l.language }}">{% trans 'Tasks for' %} {{ l.get_language_display }}</a>
+                    <a href="{% url teams:project_tasks slug=team.slug, project_slug=project.slug %}?lang=mine">{% trans 'Tasks in my languages' %}</a>
                 </li>
-                {% endfor %}
+            {% else %}
+                <li class="set-languages">
+                    {% blocktrans %}
+                        See tasks in <a href="#" data-modal="language_modal">your languages</a>
+                    {% endblocktrans %}
+                </li>
             {% endif %}
         {% endwith %}
         <li>

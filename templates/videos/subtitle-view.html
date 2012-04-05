@@ -144,7 +144,7 @@
         </ul>
         <div class="tab" id="transcripts-tab">
             <div class="tools">
-                {% if request.user|can_unpublish:video %}
+                {% if request.user|can_unpublish:video and last_version.is_public %}
                     <a href="#unpublish-modal" class="button open-modal">{% trans 'Unpublish' %}</a>
                 {% endif %}
                 {% if language.is_original and request.user|can_create_subtitles_for:video or not language.is_original and request.user|can_create_translations_for:video %}
