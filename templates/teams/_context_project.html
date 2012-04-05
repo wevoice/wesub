@@ -53,7 +53,7 @@
         {% with user.get_languages as langs %}
             {% if langs %}
                 <li>
-                    <a href="{% url teams:project_tasks team.slug %}?lang=mine">{% trans 'Tasks in my languages' %}</a>
+                    <a href="{% url teams:project_tasks slug=team.slug, project_slug=project.slug %}?lang=mine">{% trans 'Tasks in my languages' %}</a>
                 </li>
             {% else %}
                 <li class="set-languages">
