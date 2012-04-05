@@ -1094,7 +1094,10 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        tasks = tasks.filter(language=filters['language'])
+        if filters.get('language') == 'mine':
+            tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
+        else:
+            tasks = tasks.filter(language=filters['language'])
 
     if filters.get('q'):
         terms = get_terms(filters['q'])
