@@ -46,6 +46,9 @@ goog.inherits(unisubs.HowToVideoPanel, goog.ui.Component);
 
 unisubs.HowToVideoPanel.CONTINUE = 'continue';
 unisubs.HowToVideoPanel.VideoChoice = {
+    // If storing OGV files on S3, make sure you upload the videos with the correct headers:
+    // http://supergeekery.com/geekblog/comments/why_isnt_ogg_video_playing_in_firefox_from_amazon_s3
+    // Content-Type: video/ogg
     TRANSCRIBE: {
         videos: {
             ogg: 'http://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-1.ogv',
