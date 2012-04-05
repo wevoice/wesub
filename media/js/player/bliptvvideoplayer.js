@@ -231,11 +231,11 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
         switch(newState) {
             case 'playing':
                 that.isPlaying_ = true;
-                this.dispatchEvent(et.PLAY);
+                that.dispatchEvent(et.PLAY);
                 break;
             case "paused":
                 that.isPlaying_ = false;
-                this.dispatchEvent(et.PAUSE);
+                that.dispatchEvent(et.PAUSE);
                 break;
         }
     };
