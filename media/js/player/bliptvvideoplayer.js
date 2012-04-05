@@ -17,7 +17,6 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 goog.provide("unisubs.player.BlipTvVideoPlayer");
-goog.require("goog.async.Delay");
 
 /**
  * @constructor
@@ -45,7 +44,6 @@ unisubs.player.BlipTvVideoPlayer = function(videoSource, opt_forDialog){
 
     this.swfEmbedded_ = false;
     this.delayer_ = null;
-    window.player = this;
 
     this.isPlaying_ = false;
 }
@@ -64,12 +62,13 @@ unisubs.player.BlipTvVideoPlayer.prototype.createDom = function() {
     goog.dom.classes.add(this.getElement(), 'unisubs-videoplayer');
 
     var sizeFromConfig = this.sizeFromConfig_();
-    if (!this.forDialog_ && sizeFromConfig)
+    if (!this.forDialog_ && sizeFromConfig){
         this.playerSize_ = sizeFromConfig;
-    else
+    } else {
         this.playerSize_ = this.forDialog_ ?
         unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
-        unisubs.player.BlipTvVideoPlayer.DEFAULT_SIZE;
+        unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+    }
 
 };
 
@@ -82,11 +81,12 @@ unisubs.player.BlipTvVideoPlayer.prototype.enterDocument = function(){
 
     var that = this;
 
+    console.log(this.videoSource_.videoURL_);
     var jsonp = new goog.net.Jsonp(this.videoSource_.videoURL_ + "?skin=json");
     jsonp.send({}, function(response){
         var post = response[0]['Post'];
-        that.duration_ = parseInt(post.media.duration);
-        that.embedSWF_(post.embedUrl);
+        that.duration_ = parseInt(post['media']['duration']);
+        that.embedSWF_(post['embedUrl']);
     })
 
 }
@@ -205,14 +205,8 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
 
     if(!this.player_.addJScallback){
         this.callback_ = goog.bind(this.swfReady_, this);
-        this.delayer_ = new goog.async.Delay(this.callback_, 500);
-        this.delayer_.start();
+        setTimeout(this.callback_, 500)
         return;
-    } else {
-        if(this.delayer_){
-            this.delayer_.dispose();
-            this.callback_ = null;
-        }
     }
 
     this.swfLoaded_ = true;
@@ -245,7 +239,7 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
     var onCurrentTimeChange = "onCurrentTimeCha" + randomString;
 
     window[onCurrentTimeChange] = function(time){
-        that.currentTime_ = Math.floor(time);
+        that.currentTime_ = time;
         that.sendTimeUpdateInternal();
     };
     this.player_.addJScallback("current_time_change", "window." + onCurrentTimeChange);
