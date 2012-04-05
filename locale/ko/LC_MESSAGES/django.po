@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-04 01:32-0500\n"
-"PO-Revision-Date: 2012-04-04 06:45+0000\n"
+"POT-Creation-Date: 2012-04-05 01:32-0500\n"
+"PO-Revision-Date: 2012-04-05 06:47+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.net/projects/p/universalsubtitles/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -276,15 +276,15 @@ msgstr ""
 msgid " and published"
 msgstr ""
 
-#: apps/messages/tasks.py:466
+#: apps/messages/tasks.py:467
 msgid "Your subtitles have been approved and published!"
 msgstr ""
 
-#: apps/messages/tasks.py:473 apps/messages/tasks.py:526
+#: apps/messages/tasks.py:474 apps/messages/tasks.py:528
 msgid "Your subtitles have been declined"
 msgstr ""
 
-#: apps/messages/views.py:118
+#: apps/messages/views.py:123
 msgid "Message sent."
 msgstr ""
 
@@ -569,7 +569,7 @@ msgstr ""
 msgid "User is already a member of this team!"
 msgstr ""
 
-#: apps/teams/forms.py:581 templates/videos/subtitle-view.html:334
+#: apps/teams/forms.py:581 templates/videos/subtitle-view.html:335
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
@@ -740,20 +740,20 @@ msgstr "모든 언어에 도움이 필요합니다"
 msgid "If you check this, other languages will not be displayed."
 msgstr "당신이 이것을 선택하면, 다른 언어는 표시되지 않습니다."
 
-#: apps/teams/models.py:849 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:854 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "소유자"
 
-#: apps/teams/models.py:850 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:855 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "관리자"
 
-#: apps/teams/models.py:851 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:856 apps/teams/permissions_const.py:44
 #: templates/base.html:116
 msgid "Admin"
 msgstr "관리자"
 
-#: apps/teams/models.py:852 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:857 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "기여자"
 
@@ -769,7 +769,7 @@ msgstr "팀이 존재하지 않습니다."
 msgid "You are already a member of this team."
 msgstr "당신은 이미 이 팀의 멤버입니다."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:896
+#: apps/teams/rpc.py:50 apps/teams/views.py:903
 msgid "You are now a member of this team."
 msgstr "이제 이 팀의 멤버입니다."
 
@@ -854,7 +854,7 @@ msgid "You do not have permission to delete this team."
 msgstr ""
 
 #: apps/teams/views.py:352 apps/teams/views.py:388 apps/teams/views.py:416
-#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1473
+#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1480
 msgid "You do not have permission to edit this team."
 msgstr ""
 
@@ -870,149 +870,149 @@ msgstr ""
 msgid "You can't add that video to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:606
+#: apps/teams/views.py:613
 msgid "The video has been moved to the new team."
 msgstr ""
 
-#: apps/teams/views.py:619
+#: apps/teams/views.py:626
 msgid "You can't add videos to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:638
+#: apps/teams/views.py:645
 msgid "You can't edit this video."
 msgstr "이 동영상을 편집할 수 없습니다."
 
-#: apps/teams/views.py:647
+#: apps/teams/views.py:654
 msgid "Video has been updated."
 msgstr "동영상이 업데이트 되었습니다."
 
-#: apps/teams/views.py:675
+#: apps/teams/views.py:682
 msgid "Request must be a POST request."
 msgstr "요청은  POST request 야 합니다."
 
-#: apps/teams/views.py:683
+#: apps/teams/views.py:690
 msgid "You can't delete that video."
 msgstr ""
 
-#: apps/teams/views.py:687
+#: apps/teams/views.py:694
 msgid "You can't remove that video."
 msgstr "동영상을 삭제 할 수 없습니다."
 
-#: apps/teams/views.py:698
+#: apps/teams/views.py:705
 msgid "Video has been deleted from Universal Subtitles."
 msgstr ""
 
-#: apps/teams/views.py:700
+#: apps/teams/views.py:707
 msgid "Video has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:787
+#: apps/teams/views.py:794
 msgid "Member has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:790
+#: apps/teams/views.py:797
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 
-#: apps/teams/views.py:793
+#: apps/teams/views.py:800
 msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
-#: apps/teams/views.py:824
+#: apps/teams/views.py:831
 msgid "Application approved."
 msgstr "신청 승인."
 
-#: apps/teams/views.py:826 apps/teams/views.py:844
+#: apps/teams/views.py:833 apps/teams/views.py:851
 msgid "Application does not exist."
 msgstr "신청서가 존재하지 않습니다."
 
-#: apps/teams/views.py:828
+#: apps/teams/views.py:835
 msgid "You can't approve applications."
 msgstr "지원 내용을 승인할 수 없습니다."
 
-#: apps/teams/views.py:842
+#: apps/teams/views.py:849
 msgid "Application denied."
 msgstr "신청서가 거부되었습니다."
 
-#: apps/teams/views.py:846
+#: apps/teams/views.py:853
 msgid "You can't deny applications."
 msgstr "지원 내용을 거부할 수 없습니다."
 
-#: apps/teams/views.py:856
+#: apps/teams/views.py:863
 msgid "You cannot invite people to this team."
 msgstr "팀에 인원을 초대할 수 없습니다."
 
-#: apps/teams/views.py:892
+#: apps/teams/views.py:899
 msgid "You cannot join this team."
 msgstr "팀에 가입할 수 없습니다."
 
-#: apps/teams/views.py:943
+#: apps/teams/views.py:950
 msgid "You have left this team."
 msgstr "당신은 이 팀을 나갔습니다."
 
-#: apps/teams/views.py:1147
+#: apps/teams/views.py:1154
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1265 apps/teams/views.py:1268
+#: apps/teams/views.py:1272 apps/teams/views.py:1275
 msgid "You are not allowed to perform this task."
 msgstr "이 작업을 할 수 있도록 허락되지 않았습니다."
 
-#: apps/teams/views.py:1323
+#: apps/teams/views.py:1330
 msgid "Task deleted."
 msgstr ""
 
-#: apps/teams/views.py:1325
+#: apps/teams/views.py:1332
 msgid "You cannot delete this task."
 msgstr ""
 
-#: apps/teams/views.py:1350
+#: apps/teams/views.py:1357
 msgid "Task declined."
 msgstr ""
 
-#: apps/teams/views.py:1352
+#: apps/teams/views.py:1359
 msgid "Task assigned."
 msgstr ""
 
-#: apps/teams/views.py:1354
+#: apps/teams/views.py:1361
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1376
+#: apps/teams/views.py:1383
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1400
+#: apps/teams/views.py:1407
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1412
+#: apps/teams/views.py:1419
 msgid "Project added."
 msgstr ""
 
-#: apps/teams/views.py:1429
+#: apps/teams/views.py:1436
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1440
+#: apps/teams/views.py:1447
 msgid "Project deleted."
 msgstr ""
 
-#: apps/teams/views.py:1458
+#: apps/teams/views.py:1465
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1586
+#: apps/teams/views.py:1593
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1619
+#: apps/teams/views.py:1626
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
-#: apps/teams/templatetags/teams_tags.py:237
+#: apps/teams/templatetags/teams_tags.py:246
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "누군가 이 비디오에 자막 만드는 것을 도와줄 수 있을까요? %(url)s"
@@ -1110,9 +1110,8 @@ msgid "For example: http://www.youtube.com/user/username"
 msgstr "예: http://www.youtube.com/user/username"
 
 #: apps/videos/forms.py:493
-msgid ""
-"Supported: Youtube, Vimeo, Blip or Dailymotion. Only supported sites added."
-msgstr "지원: Youtube, Vimeo, Blip or Dailymotion. 지원이 가능한 사이트만 추가되었습니다."
+msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
+msgstr ""
 
 #: apps/videos/forms.py:494
 msgid "Save feed"
@@ -2796,8 +2795,8 @@ msgid "Rosetta"
 msgstr "로제타"
 
 #: templates/demo.html:23
-msgid "Universal Subtitles Editor Demo"
-msgstr "Universal Subtitles 편집기 데모"
+msgid "Amara Editor Demo"
+msgstr ""
 
 #: templates/demo.html:27
 msgid ""
@@ -3048,100 +3047,172 @@ msgstr "우리에게 알려주세요."
 msgid "Enterprise Services"
 msgstr "기업 서비스"
 
-#: templates/enterprise.html:12
+#: templates/enterprise.html:10
 msgid ""
 "\n"
-"            <strong>Make your videos more global and more popular.</strong> Transcripts, captions, and translations dramatically increase video viewership.\n"
-"          "
-msgstr "\n            <strong>여러분의 동영상을 보다 널리 알리세요.</strong> 대본, 자막, 번역은 동영상 조회수를 크게 높일 수 있습니다. "
-
-#: templates/enterprise.html:17
-msgid ""
-"\n"
-"            Amara is the most powerful subtitling platform in the world. We can help you build an <strong>active and engaged volunteer community</strong> and you can take advantage of <strong>professional transcription and translation services</strong>, all in one unified workflow.\n"
+"            To be global, to be accessible, and to be searchable, videos need subtitles. Amara, powered by Universal Subtitles, is the most flexible and powerful subtitle creation and management platform in the world.\n"
 "          "
 msgstr ""
 
-#: templates/enterprise.html:23
+#: templates/enterprise.html:15
+msgid ""
+"\n"
+"            Our enterprise platform offers an unmatched ability to manage a subtitle creation and editing process and to reach outstanding levels of quality.  Build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through a powerful API.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:19
 msgid "Interested?"
 msgstr "관심을 가지고 계신가요?"
 
-#: templates/enterprise.html:25
+#: templates/enterprise.html:21
 msgid ""
 "\n"
-"            To learn more about our services, please contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
-"          "
-msgstr "\n            서비스에 대한 더 자세한 안내는 Dean Jansen에게 문의하세요. <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n          "
-
-#: templates/enterprise.html:31
-msgid "What Can Amara Do?"
+"        To learn more about our services, please contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
+"      "
 msgstr ""
 
-#: templates/enterprise.html:34
+#: templates/enterprise.html:25
+msgid "Who Uses Amara?"
+msgstr ""
+
+#: templates/enterprise.html:26
+msgid ""
+"Whatever your subtitle needs are, Amara makes it easier to create great "
+"subtitles at a very low cost."
+msgstr ""
+
+#: templates/enterprise.html:29
+msgid "Companies"
+msgstr ""
+
+#: templates/enterprise.html:31
+msgid ""
+"\n"
+"          Corporations need to communicate with their staff and their customers around the world, and video is becoming a major part of that process.  With Amara, companies make it possible for staff, customers, and contractors to translate videos, make them searchable, and share them, publicly or privately.  \n"
+"        "
+msgstr ""
+
+#: templates/enterprise.html:37
+msgid "Video Publishers"
+msgstr ""
+
+#: templates/enterprise.html:39
+msgid ""
+"\n"
+"          Anyone who makes video can reach more people with subtitles.  Video publishers use Amara to build volunteer communities with the people who watch their videos, translating them for the world and reaching more viewers.\n"
+"        "
+msgstr ""
+
+#: templates/enterprise.html:45
+msgid "Universities"
+msgstr ""
+
+#: templates/enterprise.html:47
+msgid ""
+"\n"
+"          As online education explodes in popularity, subtitles are essential to making courses accessible and international.  Colleges and universities are using Amara to make their rapidly growing video resources succeed.\n"
+"        "
+msgstr ""
+
+#: templates/enterprise.html:55
+msgid "Non-Profit Organizations"
+msgstr ""
+
+#: templates/enterprise.html:57
+msgid ""
+"\n"
+"          Non-profit organizations use Amara to help build and manage volunteer communities to caption and translate their videos into dozens of languages.  Before Amara, the cost of professional subtitling would have made this impossible.\n"
+"        "
+msgstr ""
+
+#: templates/enterprise.html:63
+msgid "Video Platforms"
+msgstr ""
+
+#: templates/enterprise.html:65
+msgid ""
+"\n"
+"          Video hosting platforms are using Amara to empower their publishers and reach a more global audience.  By connecting publishers directly to Amara, subtitling happens at a level that was never possible before.\n"
+"        "
+msgstr ""
+
+#: templates/enterprise.html:71
+msgid "Amara Does What No Other Platform Can"
+msgstr ""
+
+#: templates/enterprise.html:73
+msgid ""
+"\n"
+"        Amara is the world's largest subtitle platform and has been winning awards because it transforms subtitle creation and management.  What was once prohibitively expensive and complicated, becomes possible and even easy.\n"
+"      "
+msgstr ""
+
+#: templates/enterprise.html:79
 msgid "Build a Translation Team"
 msgstr "번역팀 만들기"
 
-#: templates/enterprise.html:36
+#: templates/enterprise.html:81
 msgid ""
 "\n"
-"          Build a powerful volunteer translation and captioning team around your content. A video that lots of people want to watch is a video that fans will want to translate and share around the world.\n"
+"          For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible with video.  Quickly build a powerful, high-quality volunteer translation and captioning team around your content and make it global.\n"
 "        "
-msgstr "\n여러분의 비디오에 자막을 달고 번역을 할 자원봉사팀을 만드세요. 많은 사람이 보기를 원하는 한 편의 비디오를 팬들은 번역하기를 원하고 세상에 퍼트리기를 원합니다."
+msgstr ""
 
-#: templates/enterprise.html:42
-msgid "Crowdsource with Professional Review"
-msgstr "전문적인 리뷰로 협업하기"
+#: templates/enterprise.html:87
+msgid "Integrate Professional Services"
+msgstr ""
 
-#: templates/enterprise.html:44
+#: templates/enterprise.html:89
 msgid ""
 "\n"
-"            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality.\n"
-"          "
-msgstr "\n일반 대중과의 교류와 전문적인 질적 보증. 놀라울 정도의 낮은 비용과 전문적인 수준의 질이 균형을 이룹니다."
-
-#: templates/enterprise.html:50
-msgid "Professional 1-Click Services"
-msgstr "전문적인 원클릭 서비스"
-
-#: templates/enterprise.html:52
-msgid ""
-"\n"
-"            Access professional services including: captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
-"          "
-msgstr "\n자막,번역,그리고 품질 관리등과 같은 전문적인 서비스 이용가능합니다. 이 서비스들은 자발적인 자원봉사자들과 함께 할 수 있고 최상의 유연성을 제공합니다."
-
-#: templates/enterprise.html:60
-msgid "Work with Any Video Platform"
-msgstr "어떤 동영상 플랫폼과도 동작을 합니다."
-
-#: templates/enterprise.html:62
-msgid ""
-"\n"
-"            Amara works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
+"            Access professional services including paid captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
 "          "
 msgstr ""
 
-#: templates/enterprise.html:68
+#: templates/enterprise.html:95
+msgid "Crowdsource with Professional Review"
+msgstr "전문적인 리뷰로 협업하기"
+
+#: templates/enterprise.html:97
+msgid ""
+"\n"
+"            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality assurance.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:105
+msgid "Work with Any Video Platform"
+msgstr "어떤 동영상 플랫폼과도 동작을 합니다."
+
+#: templates/enterprise.html:107
+msgid ""
+"\n"
+"            Universal Subtitles works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
+"          "
+msgstr ""
+
+#: templates/enterprise.html:113
 msgid "Improve Your SEO"
 msgstr "검색엔진최적화를 향상 시킬 수 있습니다. "
 
-#: templates/enterprise.html:70
+#: templates/enterprise.html:115
 msgid ""
 "\n"
 "            Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
 "          "
 msgstr "\n검색이 가능한 동영상들은 더 자주 보여지고, 여러분들의 동영상의 내용을 검색할 수 있도록 하면 구글이나 다른 검색엔진 검색결과의 상위에 노출 됩니다."
 
-#: templates/enterprise.html:76
-msgid "Flexible Integration"
-msgstr "유연한 통합"
+#: templates/enterprise.html:121
+msgid "Flexible API and Integration"
+msgstr ""
 
-#: templates/enterprise.html:78
+#: templates/enterprise.html:123
 msgid ""
 "\n"
-"            Need seamless subtitles on your custom video player? Want 1-click features integrated into your back-end or CMS? We can help.\n"
+"            Need seamless subtitles on your custom video player? Want 1-click features integrated into your back-end or CMS? We can help.     \n"
 "          "
-msgstr "\n별도의 비디오 플레이어에 원할한 자막이 필요하신가요? 벡엔드 시스템이나 컨텐츠 관리 시스템에 원클릭 기능이 필요하신가요? 우리가 도움을 드릴 수 있습니다."
+msgstr ""
 
 #: templates/faq.html:16
 msgid "Frequently Asked Questions"
@@ -3515,47 +3586,55 @@ msgid ""
 "The largest, most powerful captioning and translation platform in the world."
 msgstr "세계에서 가장 크고 뛰어난 캡션, 자막 번역 플랫폼"
 
-#: templates/index.html:85
+#: templates/index.html:86 templates/index.html.py:88
+msgid "TED Team"
+msgstr ""
+
+#: templates/index.html:94 templates/index.html.py:95
 msgid "Mozilla Example"
 msgstr "모질라의 예"
 
-#: templates/index.html:91
+#: templates/index.html:100 templates/index.html.py:101
 msgid "Khan Integration"
 msgstr "Khan Integration"
 
-#: templates/index.html:97
+#: templates/index.html:106 templates/index.html.py:107
 msgid "Drupal Example"
 msgstr "Drupal의 예"
 
-#: templates/index.html:103
+#: templates/index.html:113 templates/index.html.py:114
 msgid "Al Jazeera Team"
 msgstr "알 자리라 팀"
 
-#: templates/index.html:109
+#: templates/index.html:120
+msgid "Newshour Team"
+msgstr ""
+
+#: templates/index.html:121
 msgid "NewsHour Team"
 msgstr ""
 
-#: templates/index.html:115
+#: templates/index.html:127
 msgid "More Popular"
 msgstr "인기있는 동영상 더보기"
 
-#: templates/index.html:116
+#: templates/index.html:128
 msgid "Most Popular Today"
 msgstr "오늘 가장 인기 있는 동영상"
 
-#: templates/index.html:118
+#: templates/index.html:130
 msgid "Top this month"
 msgstr "이번달에 최고인기"
 
-#: templates/index.html:119
+#: templates/index.html:131
 msgid "Top all-time"
 msgstr "최고 인기"
 
-#: templates/index.html:126
+#: templates/index.html:138
 msgid "More Featured"
 msgstr "선택된 동영상 더보기"
 
-#: templates/index.html:127 templates/videos/featured_videos.html:36
+#: templates/index.html:139 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
 msgstr "추천 동영상"
@@ -3922,16 +4001,16 @@ msgstr "확인 메일 다시 보내기"
 msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "영구적으로 프로필을 삭제하시겠습니까?"
 
-#: templates/auth/delete_user.html:13 templates/messages/list.html:81
-#: templates/messages/sent.html:51 templates/teams/tasks.html:272
+#: templates/auth/delete_user.html:13 templates/messages/list.html:83
+#: templates/messages/sent.html:51 templates/teams/tasks.html:278
 msgid "Delete"
 msgstr "삭제"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:326 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:347
+#: templates/teams/tasks.html:332 templates/videos/_feedback_form.html:25
+#: templates/videos/subtitle-view.html:349
 msgid "Cancel"
 msgstr "취소"
 
@@ -3951,15 +4030,15 @@ msgstr "비밀 번호를 잊으셨습니까?"
 msgid "You can also login using"
 msgstr "당신은 또한 이것을 사용하여 로그인하실 수 있습니다."
 
-#: templates/auth/login.html:25
+#: templates/auth/login.html:27
 msgid "Create an Account"
 msgstr "계정 만들기"
 
-#: templates/auth/login.html:29
+#: templates/auth/login.html:31
 msgid "Create Account"
 msgstr "계정 만들기"
 
-#: templates/comments/_item.html:3 templates/messages/list.html:68
+#: templates/comments/_item.html:3 templates/messages/list.html:70
 #: templates/messages/sent.html:48 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
 #: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:115
@@ -4144,29 +4223,29 @@ msgstr "메시지가 성공적으로 전송되었습니다."
 msgid "Compose"
 msgstr ""
 
-#: templates/messages/list.html:72
+#: templates/messages/list.html:74
 msgid "Mark Read"
 msgstr ""
 
-#: templates/messages/list.html:77
+#: templates/messages/list.html:79
 msgid "Reply"
 msgstr "답변"
 
-#: templates/messages/list.html:91
+#: templates/messages/list.html:93
 msgid "You have no messages."
 msgstr "메시지가 없습니다."
 
-#: templates/messages/list.html:98 templates/messages/new.html:74
+#: templates/messages/list.html:100 templates/messages/new.html:74
 #: templates/messages/sent.html:66
 msgid "Inbox"
 msgstr "편지함"
 
-#: templates/messages/list.html:99 templates/messages/new.html:75
+#: templates/messages/list.html:101 templates/messages/new.html:75
 #: templates/messages/sent.html:67
 msgid "Sent"
 msgstr "보내기"
 
-#: templates/messages/list.html:122
+#: templates/messages/list.html:124
 msgid "Send Message"
 msgstr "메시지 보내기"
 
@@ -4989,7 +5068,7 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr "당신은 또한 다른 언어를 구사하는 도와줄 친구를 초대할 수 있습니다."
 
 #: templates/teams/_perform_task_link.html:4
-#: templates/teams/_perform_task_link.html:24 templates/teams/tasks.html:225
+#: templates/teams/_perform_task_link.html:24 templates/teams/tasks.html:231
 msgid "Perform Task"
 msgstr ""
 
@@ -5210,7 +5289,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:330
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:336
 msgid "Begin typing to search"
 msgstr ""
 
@@ -5607,7 +5686,7 @@ msgstr ""
 msgid "anyone"
 msgstr ""
 
-#: templates/teams/tasks.html:86 templates/teams/tasks.html.py:197
+#: templates/teams/tasks.html:86 templates/teams/tasks.html.py:203
 msgid "me"
 msgstr ""
 
@@ -5640,54 +5719,67 @@ msgid "Clear all filters and search terms"
 msgstr ""
 
 #: templates/teams/tasks.html:170
-msgid "draft"
+msgid "latest draft"
 msgstr ""
 
-#: templates/teams/tasks.html:173
+#: templates/teams/tasks.html:174
 msgid "transcribed"
 msgstr ""
 
-#: templates/teams/tasks.html:175 templates/videos/subtitle-view.html:35
+#: templates/teams/tasks.html:176 templates/videos/subtitle-view.html:35
 msgid "translated"
 msgstr ""
 
-#: templates/teams/tasks.html:195
+#: templates/teams/tasks.html:184
+msgid "reviewed"
+msgstr ""
+
+#: templates/teams/tasks.html:186
+msgid "and edited"
+msgstr ""
+
+#: templates/teams/tasks.html:188 templates/videos/subtitle-view.html:195
+#: templates/videos/subtitle-view.html:290
+msgid "by"
+msgstr ""
+
+#: templates/teams/tasks.html:201
 msgid "Assigned to"
 msgstr ""
 
-#: templates/teams/tasks.html:204
+#: templates/teams/tasks.html:210
 msgid "Unassigned"
 msgstr ""
 
-#: templates/teams/tasks.html:243
+#: templates/teams/tasks.html:249
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:263
+#: templates/teams/tasks.html:269
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:265
+#: templates/teams/tasks.html:271
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:281
+#: templates/teams/tasks.html:287
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:296
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:294
+#: templates/teams/tasks.html:300
 msgid "Delete these subtitles permanently"
 msgstr ""
 
-#: templates/teams/tasks.html:333
+#: templates/teams/tasks.html:339
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:343
+#: templates/teams/tasks.html:349
 msgid "Sorry, no tasks here."
 msgstr ""
 
@@ -6637,12 +6729,12 @@ msgid "Revisions"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:148
-#: templates/videos/subtitle-view.html:348
+#: templates/videos/subtitle-view.html:350
 msgid "Unpublish"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:151
-#: templates/videos/subtitle-view.html:363
+#: templates/videos/subtitle-view.html:365
 msgid "Edit Subtitles"
 msgstr "자막 편집"
 
@@ -6661,11 +6753,6 @@ msgstr "수정"
 
 #: templates/videos/subtitle-view.html:193
 msgid "created"
-msgstr ""
-
-#: templates/videos/subtitle-view.html:195
-#: templates/videos/subtitle-view.html:290
-msgid "by"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:226
@@ -6749,7 +6836,7 @@ msgid ""
 "reapproved."
 msgstr ""
 
-#: templates/videos/subtitle-view.html:337
+#: templates/videos/subtitle-view.html:338
 msgid ""
 "Yes, delete these subtitles instead of sending them back for editing/review"
 msgstr ""
