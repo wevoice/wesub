@@ -131,7 +131,7 @@ unisubs.player.BlipTvVideoPlayer.prototype.videoEndedInternal = function(){
 
 unisubs.player.BlipTvVideoPlayer.prototype.playInternal = function(){
     if(this.player_){
-        this.player_.sendEvent("play");
+        this.player_['sendEvent']("play");
     } else {
         this.commands_.push(goog.bind(this.playInternal, this));
     }
@@ -139,7 +139,7 @@ unisubs.player.BlipTvVideoPlayer.prototype.playInternal = function(){
 
 unisubs.player.BlipTvVideoPlayer.prototype.pauseInternal = function(){
     if(this.player_){
-        this.player_.sendEvent("pause");
+        this.player_['sendEvent']("pause");
     } else {
         this.commands_.push(goog.bind(this.pauseInternal, this));
     }
@@ -159,7 +159,7 @@ unisubs.player.BlipTvVideoPlayer.prototype.getPlayheadTimeInternal = function(){
 
 unisubs.player.BlipTvVideoPlayer.prototype.setPlayheadTime = function(playheadTime){
     if (this.player_) {
-        this.player_.sendEvent("seek", playheadTime);
+        this.player_['sendEvent']("seek", playheadTime);
         this.sendTimeUpdateInternal();
     } else {
         this.commands_.push(goog.bind(this.setPlayheadTime, this, playheadTime));
@@ -189,7 +189,7 @@ unisubs.player.BlipTvVideoPlayer.prototype.getVolume = function(index){
 
 unisubs.player.BlipTvVideoPlayer.prototype.setVolume = function(volume){
     if(this.player_){
-        this.player_.sendEvent("volume", volume);
+        this.player_['sendEvent']("volume", volume);
         this.volume_ = volume;
     } else {
         this.commands_.push(goog.bind(this.setVolume, this));
@@ -202,12 +202,16 @@ unisubs.player.BlipTvVideoPlayer.prototype.getVideoSize = function(index){
 
 unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
     this.player_ = goog.dom.$(this.playerElemID_);
+    console.log(!this.player_['addJScallback']);
+    console.log(this.player_['addJScallback']);
 
-    if(!this.player_.addJScallback){
+    if(!this.player_['addJScallback']){
         this.callback_ = goog.bind(this.swfReady_, this);
         setTimeout(this.callback_, 500)
         return;
     }
+
+    console.log("player is ready");
 
     this.swfLoaded_ = true;
 
@@ -226,6 +230,7 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
             case 'playing':
                 that.isPlaying_ = true;
                 that.dispatchEvent(et.PLAY);
+                console.log("playing");
                 break;
             case "paused":
                 that.isPlaying_ = false;
@@ -234,7 +239,8 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
         }
     };
 
-    this.player_.addJScallback("player_state_change", "window." + onPlayerStateChange);
+    console.log("window." + onPlayerStateChange);
+    this.player_['addJScallback']("player_state_change", "window." + onPlayerStateChange);
 
     var onCurrentTimeChange = "onCurrentTimeCha" + randomString;
 
@@ -242,7 +248,9 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
         that.currentTime_ = time;
         that.sendTimeUpdateInternal();
     };
-    this.player_.addJScallback("current_time_change", "window." + onCurrentTimeChange);
+
+    console.log("window." + onCurrentTimeChange);
+    this.player_['addJScallback']("current_time_change", "window." + onCurrentTimeChange);
 
     var onVideoEnded = "onVideoEnde" + randomString;
 
@@ -250,9 +258,9 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
         that.ended_ = true;
         that.dispatchEndedEvent();
     };
-    this.player_.addJScallback("complete", "window." + onVideoEnded);
+    this.player_['addJScallback']("complete", "window." + onVideoEnded);
 
-    this.player_.sendEvent("volume", this.volume_);
+    this.player_['sendEvent']("volume", this.volume_);
 }
 
 unisubs.player.BlipTvVideoPlayer.prototype.sizeFromConfig_ = function() {
