@@ -48,7 +48,7 @@ unisubs.HowToVideoPanel.CONTINUE = 'continue';
 unisubs.HowToVideoPanel.VideoChoice = {
     TRANSCRIBE: {
         videos: {
-            ogg: 'https://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-1.ogv',
+            ogg: 'http://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-1.ogv',
             h264: 'http://s3.www.universalsubtitles.org.s3.amazonaws.com/howto/step-1.mp4',
             yt: '0MCpmace_lc'
         },
