@@ -42,6 +42,7 @@ from apps.teams.permissions import (
     can_delete_video as _can_delete_video,
     can_delete_video_in_team as _can_delete_video_in_team,
     can_approve as _can_approve,
+    can_delete_subs as _can_delete_subs,
 )
 from apps.teams.permissions import (
     can_invite, can_add_video_somewhere,
@@ -146,6 +147,14 @@ def team_select(context, team):
         'can_create_team': DEV_OR_STAGING or (user.is_superuser and user.is_active)
     }
 
+@register.filter
+def team_is_visible(team_slug):
+    try:
+        team = Team.objects.get(slug=team_slug)
+    except Team.DoesNotExist:
+        return False
+    if team.is_visible:
+        return True
 
 @tag(register, [])
 def share_panel_email_url(context):
@@ -504,3 +513,20 @@ def can_unpublish(user, video):
 
     return False
 
+@register.filter
+def can_delete_subtitles_for(user, video):
+    """Return True if the user can delete subtitles for this video.
+
+    Usage:
+
+        {% if request.user|can_delete_subtitles_for:video %}
+            ...
+        {% endif %}
+
+    """
+    team_video = video.get_team_video()
+
+    if not team_video:
+        return False
+
+    return _can_delete_subs(team_video, user)

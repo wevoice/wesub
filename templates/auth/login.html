@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load i18n teams_tags %}
 
 {% block body_attrs %}id="login"{% endblock %}
 
@@ -19,7 +19,9 @@
     <a class="provider" id="open-id" href="{% url socialauth_openid_login %}?next={{ next }}">openid</a>
     <a class="provider" id="google" href="{% url socialauth_google_login %}?next={{ next }}">gmail</a>
     <a class="provider" id="facebook" href="{% url auth:facebook_login %}?next={{ next }}">facebook</a>
-    <a class="provider" id="ted" href="{{ ted_auth.url }}">ted</a>
+    {% if 'ted'|team_is_visible %}
+      <a class="provider" id="ted" href="{{ ted_auth.url }}">ted</a>
+    {% endif %}
 </div>
 <div class="right_column">
 <h2>{% trans 'Create an Account' %}</h2>
