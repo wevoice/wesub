@@ -50,8 +50,6 @@ unisubs.player.BlipTvVideoPlayer = function(videoSource, opt_forDialog){
 
 goog.inherits(unisubs.player.BlipTvVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
-unisubs.player.BlipTvVideoPlayer.DIALOG_SIZE = new goog.math.Size(400, 400);
-
 unisubs.player.BlipTvVideoPlayer.prototype.logger_ = 
     goog.debug.Logger.getLogger('unisubs.player.BlipTvVideoPlayer');
 
@@ -81,6 +79,12 @@ unisubs.player.BlipTvVideoPlayer.prototype.enterDocument = function(){
 
     var that = this;
 
+    // this jsonp calls is needed because we only know the real url of the
+    // video and that doesn't provide any way to find the embedUrl
+    // (something like http://blip.tv/play/hdljgvKTGAI).
+    // We also use this call to find the duration of the video (no method
+    // on the player that returns that).
+    // It's not clean but it works.
     var jsonp = new goog.net.Jsonp(this.videoSource_.videoURL_ + "?skin=json");
     jsonp.send({}, function(response){
         var post = response[0]['Post'];
@@ -99,7 +103,10 @@ unisubs.player.BlipTvVideoPlayer.prototype.embedSWF_ = function(embedUrl){
     var videoDiv = this.getDomHelper().createDom("div");
     videoDiv.id = unisubs.randomString();
     this.getElement().appendChild(videoDiv);
+
+    // wmode must be opaque so we can render things on top of the flash player
     var params = {'allowScriptAccess': 'always', 'enablejs': 'true', "wmode": "opaque"};
+
     var atts = { 'id': this.playerElemID_,
                  'style': unisubs.style.setSizeInString(
                   '', this.playerSize_) };
@@ -170,6 +177,9 @@ unisubs.player.BlipTvVideoPlayer.prototype.getDuration = function(){
     return this.duration_;
 }
 
+// We need to implement those, but i have no idea how, since bliptv
+// doesn't have a good method to know who many bytes were buffered.
+//
 //unisubs.player.BlipTvVideoPlayer.prototype.getBufferedLength = function(){
     //return this.player_ ? 1 : 0;
 //}
@@ -202,6 +212,9 @@ unisubs.player.BlipTvVideoPlayer.prototype.getVideoSize = function(index){
 unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
     this.player_ = goog.dom.$(this.playerElemID_);
 
+    // here we need to wait until the player is ready
+    // to accept callbacks. and bliptv player doesn't
+    // have an "callback" to know when the player is ready
     if(!this.player_['addJScallback']){
         this.callback_ = goog.bind(this.swfReady_, this);
         setTimeout(this.callback_, 500)
@@ -224,6 +237,7 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
         switch(newState) {
             case 'playing':
                 that.isPlaying_ = true;
+                // this is needed so the tab -> play 4s work
                 that.dispatchEvent(et.PLAY);
                 break;
             case "paused":
@@ -237,6 +251,8 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
 
     var onCurrentTimeChange = "onCurrentTimeCha" + randomString;
 
+    // FIXME this doesn't work as good as the timer method.
+    // maybe we can change.
     window[onCurrentTimeChange] = function(time){
         that.currentTime_ = time;
         that.sendTimeUpdateInternal();
@@ -252,6 +268,8 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
     };
     this.player_['addJScallback']("complete", "window." + onVideoEnded);
 
+    // we also don't have a method to *get* volume
+    // so we set to a known value (0.5)
     this.player_['sendEvent']("volume", this.volume_);
 }
 
