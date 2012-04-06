@@ -81,7 +81,6 @@ unisubs.player.BlipTvVideoPlayer.prototype.enterDocument = function(){
 
     var that = this;
 
-    console.log(this.videoSource_.videoURL_);
     var jsonp = new goog.net.Jsonp(this.videoSource_.videoURL_ + "?skin=json");
     jsonp.send({}, function(response){
         var post = response[0]['Post'];
@@ -202,16 +201,12 @@ unisubs.player.BlipTvVideoPlayer.prototype.getVideoSize = function(index){
 
 unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
     this.player_ = goog.dom.$(this.playerElemID_);
-    console.log(!this.player_['addJScallback']);
-    console.log(this.player_['addJScallback']);
 
     if(!this.player_['addJScallback']){
         this.callback_ = goog.bind(this.swfReady_, this);
         setTimeout(this.callback_, 500)
         return;
     }
-
-    console.log("player is ready");
 
     this.swfLoaded_ = true;
 
@@ -230,7 +225,6 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
             case 'playing':
                 that.isPlaying_ = true;
                 that.dispatchEvent(et.PLAY);
-                console.log("playing");
                 break;
             case "paused":
                 that.isPlaying_ = false;
@@ -239,7 +233,6 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
         }
     };
 
-    console.log("window." + onPlayerStateChange);
     this.player_['addJScallback']("player_state_change", "window." + onPlayerStateChange);
 
     var onCurrentTimeChange = "onCurrentTimeCha" + randomString;
@@ -249,7 +242,6 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
         that.sendTimeUpdateInternal();
     };
 
-    console.log("window." + onCurrentTimeChange);
     this.player_['addJScallback']("current_time_change", "window." + onCurrentTimeChange);
 
     var onVideoEnded = "onVideoEnde" + randomString;
