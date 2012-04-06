@@ -650,12 +650,12 @@ class Rpc(BaseRpc):
         lang = subtitle_language.language
         workflow = Workflow.get_for_team_video(team_video)
 
-        if workflow.approve_allowed:
-            type = Task.TYPE_IDS['Approve']
-            can_do = can_approve
-        elif workflow.review_allowed:
+        if workflow.review_allowed:
             type = Task.TYPE_IDS['Review']
             can_do = can_review
+        elif workflow.approve_allowed:
+            type = Task.TYPE_IDS['Approve']
+            can_do = can_approve
         else:
             return None
 
