@@ -1,8 +1,7 @@
-================
 Deployment Guide
 ================
 
-For staging:
+For staging::
 
     fab staging:<username> add_disabled
     fab staging:<username> refresh_db
@@ -20,11 +19,12 @@ The basic sequence::
     # if and only if we have updates to sole indexes
     fab <server> update_solr_schema
 
-Things to keep in mind:
-    - Rebuilding the solr index is pretty slow, so it will run on a screen session, if you need to check it, just logge back to the server and open it on screen
-
+.. note:: Rebuilding the solr index is pretty slow, so it will run on a screen
+    session, if you need to check it, just log back to the server and open
+    it on screen.
 
 Fabric commands
-===============
+---------------
+
 .. automodule:: deploy.fabfile
     :members:
