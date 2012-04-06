@@ -106,25 +106,25 @@ unisubs.player.AbstractVideoPlayer.prototype.getPlayheadFn = function() {
 };
 unisubs.player.AbstractVideoPlayer.prototype.isPaused = function() {
     if (this.isLoadingStopped_)
-	throw new "can't check if paused, loading is stopped";
+	throw new Error("can't check if paused, loading is stopped");
     return this.isPausedInternal();
 };
 unisubs.player.AbstractVideoPlayer.prototype.isPausedInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.isPlaying = function() {
     if (this.isLoadingStopped_)
-	throw new "can't check if playing, loading is stopped";
+	throw new Error("can't check if playing, loading is stopped");
     return this.isPlayingInternal();
 };
 unisubs.player.AbstractVideoPlayer.prototype.isPlayingInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.videoEnded = function() {
     if (this.isLoadingStopped_)
-	throw new "can't check if video ended, loading is stopped";
+	throw new Error("can't check if video ended, loading is stopped");
     return this.videoEndedInternal();
 };
 unisubs.player.AbstractVideoPlayer.prototype.videoEndedInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.play = function(opt_suppressEvent) {
     if (this.isLoadingStopped_)
-	throw new "can't play, loading is stopped";
+	throw new Error("can't play, loading is stopped");
     if (!opt_suppressEvent)
         this.dispatchEvent(
             unisubs.player.AbstractVideoPlayer.EventType.PLAY_CALLED);
@@ -133,7 +133,7 @@ unisubs.player.AbstractVideoPlayer.prototype.play = function(opt_suppressEvent) 
 unisubs.player.AbstractVideoPlayer.prototype.playInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.pause = function(opt_suppressEvent) {
     if (this.isLoadingStopped_)
-	throw new "can't pause, loading is stopped";
+	throw new Error("can't pause, loading is stopped");
     if (!opt_suppressEvent)
         this.dispatchEvent(
             unisubs.player.AbstractVideoPlayer.EventType.PAUSE_CALLED);
@@ -142,7 +142,7 @@ unisubs.player.AbstractVideoPlayer.prototype.pause = function(opt_suppressEvent)
 unisubs.player.AbstractVideoPlayer.prototype.pauseInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.togglePause = function() {
     if (this.isLoadingStopped_)
-	throw new "can't toggle pause, loading is stopped";
+	throw new Error("can't toggle pause, loading is stopped");
 
     if (!this.isPlaying())
         this.play();
