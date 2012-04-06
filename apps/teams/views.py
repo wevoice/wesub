@@ -1586,7 +1586,7 @@ def unpublish(request, slug):
     update_one_team_video(team_video.pk)
 
     messages.success(request, _(u'Successfully unpublished subtitles.'))
-    api_subtitles_rejected(version)
+    api_subtitles_rejected.send(version)
     return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
 
 @login_required
