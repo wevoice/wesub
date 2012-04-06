@@ -57,7 +57,7 @@ from teams.permissions import (
     can_delete_video, can_remove_video
 )
 from teams.search_indexes import TeamVideoLanguagesIndex
-from teams.signals import api_teamvideo_new
+from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
     update_video_moderation, update_one_team_video
@@ -1586,6 +1586,7 @@ def unpublish(request, slug):
     update_one_team_video(team_video.pk)
 
     messages.success(request, _(u'Successfully unpublished subtitles.'))
+    api_subtitles_rejected(version)
     return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
 
 @login_required
