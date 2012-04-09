@@ -162,7 +162,8 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
     });
 
     if(this.serverModel_.getCaptionSet().needsSync()){
-        // disable the button
+        this.approveButton_.style.display = 'none';
+        alert("There are unsynced subtitles. You need to sync them before you can approve (Click 'Back to Sync').");
     } else {
         // if the captions needs sync, we don't need to
         // listen for the click event since the button
