@@ -57,7 +57,7 @@ from teams.permissions import (
     can_delete_video, can_remove_video
 )
 from teams.search_indexes import TeamVideoLanguagesIndex
-from teams.signals import api_teamvideo_new
+from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
     update_video_moderation, update_one_team_video
@@ -568,48 +568,7 @@ def move_video(request):
     if form.is_valid():
         team_video = form.cleaned_data['team_video']
         team = form.cleaned_data['team']
-
-        # For now, we'll just delete any tasks associated with the moved video.
-        team_video.task_set.update(deleted=True)
-
-        # We move the video by just switching the team, instead of deleting and
-        # recreating it.
-        team_video.team = team
-
-        # projects are always team dependent:
-        team_video.project = team.default_project
-        team_video.save()
-
-        # We need to make any as-yet-unmoderated versions public.
-        # TODO: Dedupe this and the team video delete signal.
-        video = team_video.video
-
-        SubtitleVersion.objects.filter(language__video=video).exclude(
-            moderation_status=MODERATION.APPROVED).update(
-                moderation_status=MODERATION.UNMODERATED)
-
-        video.is_public = True
-        video.moderated_by = team if team.moderates_videos() else None
-        video.save()
-        
-        # make sure we end up with a policy that belong to the team
-        # we're moving into, else it won't come up in the team video
-        # page
-        if video.policy and video.policy.belongs_to_team:
-            video.policy.object_id = team.pk
-            video.policy.save(updates_metadata=False)
-
-
-        # Update all Solr data.
-        metadata_manager.update_metadata(video.pk)
-        video.update_search_index()
-        update_one_team_video(team_video.pk)
-
-        # Create any necessary tasks.
-        autocreate_tasks(team_video)
-
-        # fire a http notification that a new video has hit this team:
-        api_teamvideo_new.send(team_video)
+        team_video.move_to(team)
         messages.success(request, _(u'The video has been moved to the new team.'))
     else:
         for e in flatten_errorlists(form.errors):
@@ -1627,6 +1586,7 @@ def unpublish(request, slug):
     update_one_team_video(team_video.pk)
 
     messages.success(request, _(u'Successfully unpublished subtitles.'))
+    api_subtitles_rejected.send(version)
     return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
 
 @login_required

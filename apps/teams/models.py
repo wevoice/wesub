@@ -711,6 +711,56 @@ class TeamVideo(models.Model):
         """Return the appropriate Workflow for this TeamVideo."""
         return Workflow.get_for_team_video(self)
 
+    def move_to(self, new_team):
+        """
+        Moves this TeamVideo to a new team.
+        This method expects you to have run the correct permissions checks.
+        """
+        # these imports are here to avoid circular imports, hacky
+        from teams.signals import api_teamvideo_new
+        from videos import metadata_manager
+        # For now, we'll just delete any tasks associated with the moved video.
+        self.task_set.update(deleted=True)
+
+        # We move the video by just switching the team, instead of deleting and
+        # recreating it.
+        self.team = new_team
+
+        # projects are always team dependent:
+        self.project = new_team.default_project
+        self.save()
+
+        # We need to make any as-yet-unmoderated versions public.
+        # TODO: Dedupe this and the team video delete signal.
+        video = self.video
+
+        SubtitleVersion.objects.filter(language__video=video).exclude(
+            moderation_status=MODERATION.APPROVED).update(
+                moderation_status=MODERATION.UNMODERATED)
+
+        video.is_public = True
+        video.moderated_by = new_team if new_team.moderates_videos() else None
+        video.save()
+        
+        # make sure we end up with a policy that belong to the team
+        # we're moving into, else it won't come up in the team video
+        # page
+        if video.policy and video.policy.belongs_to_team:
+            video.policy.object_id = new_team.pk
+            video.policy.save(updates_metadata=False)
+
+
+        # Update all Solr data.
+        metadata_manager.update_metadata(video.pk)
+        video.update_search_index()
+        update_one_team_video(self.pk)
+
+        # Create any necessary tasks.
+        autocreate_tasks(self)
+
+        # fire a http notification that a new video has hit this team:
+        api_teamvideo_new.send(self)
+
 
 def _create_translation_tasks(team_video, subtitle_version):
     """Create any translation tasks that should be autocreated for this video.
