@@ -162,11 +162,12 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
     });
 
     if(this.serverModel_.getCaptionSet().needsSync()){
-        // disable the button
+        this.approveButton_.style.display = 'none';
     } else {
         // if the captions needs sync, we don't need to
         // listen for the click event since the button
         // is going to be disabled
+        this.approveButton_.style.display = 'block';
         handler.listen(this.approveButton_, 'click', function(e){
             that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED, false);
         });
