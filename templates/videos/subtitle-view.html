@@ -65,11 +65,7 @@
         <h2 class="main-title">
             <a href="{{ video.get_absolute_url }}" title="View video">
                 ←
-                {% if language.title %}
-                    {{ language.title }}
-                {% else %}
-                    {{ video }}
-                {% endif %}
+                {{ language.get_title_display }}
             </a>
         </h2>
         {% widget widget_params %}

@@ -1034,7 +1034,7 @@ class TestRpc(TestCase):
         title = 'new title'
         rpc.finished_subtitles(request_1, session_pk, new_title=title)
         language = SubtitlingSession.objects.get(id=session_pk).language
-        self.assertEquals(title, language.title)
+        self.assertEquals(title, language.get_title())
 
     def test_youtube_ei_failure(self):
         import sentry_logger
