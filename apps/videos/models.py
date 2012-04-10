@@ -209,30 +209,33 @@ class Video(models.Model):
 
         return self._video_views_statistic
 
-    def title_display(self):
+    def title_display(self, truncate=True):
         v = self.latest_version()
-        if v:
-            return v.title
 
-        try:
-            url = self.videourl_set.all()[:1].get().url
-            if not url:
-                return 'No title'
-        except models.ObjectDoesNotExist:
-            return 'No title'
-
-        url = url.strip('/')
-
-        if url.startswith('http://'):
-            url = url[7:]
-
-        parts = url.split('/')
-        if len(parts) > 1:
-            title = '%s/.../%s' % (parts[0], parts[-1])
+        if v and v.title and v.title.strip():
+            title = v.title
+        elif self.title and self.title.strip():
+            title = self.title
         else:
-            title = url
+            try:
+                url = self.videourl_set.all()[:1].get().url
+                if not url:
+                    return 'No title'
+            except models.ObjectDoesNotExist:
+                return 'No title'
 
-        if title > 35:
+            url = url.strip('/')
+
+            if url.startswith('http://'):
+                url = url[7:]
+
+            parts = url.split('/')
+            if len(parts) > 1:
+                title = '%s/.../%s' % (parts[0], parts[-1])
+            else:
+                title = url
+
+        if truncate and len(title) > 35:
             title = title[:35] + '...'
 
         return title

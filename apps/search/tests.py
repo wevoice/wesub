@@ -1,19 +1,19 @@
 # Universal Subtitles, universalsubtitles.org
-# 
-# Copyright (C) 2010 Participatory Culture Foundation
-# 
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.test import TestCase
@@ -34,7 +34,7 @@ def reset_solr():
     sb = backend.SearchBackend()
     sb.clear()
     call_command('update_index')
-    
+
 class TestSearch(TestCase):
     fixtures = ['staging_users.json', 'staging_videos.json']
     titles = (
@@ -48,103 +48,103 @@ class TestSearch(TestCase):
         u"My Blackberry Is Not Working! - The One Ronnie, Preview - BBC One",
         u"Cher and Dawn French's Lookalikes - The Graham Norton Show preview - BBC One",
         u"Cute cheetah cub attacked by wild warthog - Cheetahs - BBC Earth"
-    )    
-    
+    )
+
     def setUp(self):
         self.user = User.objects.all()[0]
         reset_solr()
-    
+
     def test_query_clean(self):
         video = Video.objects.all()[0]
         video.title = u"Cher BBC and Dawn French's Lookalikes"
         video.save()
         reset_solr()
         rpc = SearchApiClass()
-        
+
         rdata = RpcMultiValueDict(dict(q=u'?BBC'))
         result = rpc.search(rdata, self.user, testing=True)['sqs']
-        self.assertTrue(len(result))        
-    
+        self.assertTrue(len(result))
+
     def test_views(self):
         url = reverse('search:index')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        
+
         url = reverse('search:rpc_api')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)        
-    
+        self.assertEqual(response.status_code, 200)
+
     def test_search_index_updating(self):
         reset_solr()
         rpc = SearchApiClass()
-        
+
         for title in self.titles:
             rdata = RpcMultiValueDict(dict(q=title))
             video = Video.objects.all()[0]
             video.title = title
             video.save()
             video.update_search_index()
-            
+
             result = rpc.search(rdata, self.user, testing=True)['sqs']
             self.assertTrue(video in [item.object for item in result], title)
-    
+
     def test_empty_query(self):
         rpc = SearchApiClass()
-        
+
         rdata = RpcMultiValueDict(dict(q=u''))
         rpc.search(rdata, self.user, testing=True)['sqs']
 
         rdata = RpcMultiValueDict(dict(q=u' '))
         rpc.search(rdata, self.user, testing=True)['sqs']
-    
+
     def test_filtering(self):
         self.assertTrue(Video.objects.count())
         for video in Video.objects.all():
             video_changed_tasks.delay(video.pk)
-        
+
         reset_solr()
-        
+
         rpc = SearchApiClass()
-        
+
         rdata = RpcMultiValueDict(dict(q=u' ', video_lang='en'))
         result = rpc.search(rdata, self.user, testing=True)['sqs']
-        
+
         self.assertTrue(len(result))
         for video in VideoIndex.public():
             if video.video_language == 'en':
                 self.assertTrue(video.object in [item.object for item in result])
-        
+
         rdata = RpcMultiValueDict(dict(q=u' ', langs='en'))
         result = rpc.search(rdata, self.user, testing=True)['sqs']
-        
+
         self.assertTrue(len(result))
         for video in VideoIndex.public():
             if video.languages and 'en' in video.languages:
-                self.assertTrue(video.object in [item.object for item in result])        
-            
+                self.assertTrue(video.object in [item.object for item in result])
+
     def test_rpc(self):
         rpc = SearchApiClass()
         rdata = RpcMultiValueDict(dict(q=u'BBC'))
-        
+
         for title in self.titles:
             video = Video.objects.all()[0]
             video.title = title
             video.save()
             reset_solr()
-            
+
             result = rpc.search(rdata, self.user, testing=True)['sqs']
             self.assertTrue(video in [item.object for item in result], title)
-        
+
     def test_search(self):
         reset_solr()
         sqs = VideoIndex.public()
         qs = Video.objects.exclude(title='')
         self.assertTrue(qs.count())
-        
+
         for video in qs:
             result = SearchForm.apply_query(video.title, sqs)
             self.assertTrue(video in [item.object for item in result])
-            
+
     def test_search1(self):
         for title in self.titles:
             video = Video.objects.all()[0]
@@ -152,12 +152,12 @@ class TestSearch(TestCase):
             video.title = title
             video.save()
             reset_solr()
-            
+
             result = SearchForm.apply_query(video.title, sqs)
             self.assertTrue(video in [item.object for item in result], u"Failed to find video by title: %s" % title)
-            
+
             result = SearchForm.apply_query(u'BBC', sqs)
-            self.assertTrue(video in [item.object for item in result], u"Failed to find video by 'BBC' with title: %s" % title)              
+            self.assertTrue(video in [item.object for item in result], u"Failed to find video by 'BBC' with title: %s" % title)
 
     def test_search_relevance(self):
         reset_solr()
