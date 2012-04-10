@@ -31,7 +31,7 @@ from apps.auth.models import CustomUser as User
 from apps.messages.forms import SendMessageForm, NewMessageForm
 from apps.messages.models import Message
 from apps.messages.rpc import MessagesApiClass
-from apps.messages.tasks import send_new_message_notification
+from messages.tasks import send_new_message_notification
 from utils import render_to_json, render_to
 from utils.rpc import RpcRouter
 

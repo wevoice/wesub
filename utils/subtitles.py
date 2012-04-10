@@ -31,7 +31,7 @@ from utils.html import unescape as unescape_html
 
 
 # see video.models.Subtitle..start_time
-MAX_SUB_TIME = (60 * 60 * 99) -1
+MAX_SUB_TIME = (60 * 60 * 100) - 1
 
 def is_version_same(version, parser):
     if not version:
