@@ -209,7 +209,7 @@ class Video(models.Model):
 
         return self._video_views_statistic
 
-    def title_display(self):
+    def title_display(self, truncate=True):
         v = self.latest_version()
 
         if v and v.title and v.title.strip():
@@ -235,7 +235,7 @@ class Video(models.Model):
             else:
                 title = url
 
-        if len(title) > 35:
+        if truncate and len(title) > 35:
             title = title[:35] + '...'
 
         return title
