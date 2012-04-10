@@ -17,8 +17,8 @@
                 $('#rollback').click(function(){
                     if ( ! confirm('Subtitles will be rolled back to a previous version')){
                         return false;
-                    }                    
-                });                
+                    }
+                });
             }else {
                 $('#rollback, .new_edit').click(function(){
                     alert('You need to log in to do that.');
@@ -39,7 +39,7 @@
                 widget_widget_div.playAt(parseFloat(
                     $(this).find('.data').text()));
                 return false;
-            });          
+            });
         });
     </script>
     {% include_bundle "unisubs-onsite-compiled" 0 %}
@@ -79,15 +79,11 @@
                 </a>
             </li>
         </ul>
-        
+
         <h3>Video</h3>
         <h4>
             <a href="{{ video.get_absolute_url }}" title="View video">
-                {% if language.title %}
-                    {{ language.title }}
-                {% else %}
-                    {{ video }}
-                {% endif %}
+                {{ language.get_title_display }}
             </a>
         </h4>
         {% widget widget_params %}
@@ -120,7 +116,7 @@
                         Revision {{ next_version_no }}
                         {% endblocktrans %}
                         →
-                    </a>       
+                    </a>
                 </li>
             {% endif %}
             {% if next_version %}
@@ -129,7 +125,7 @@
                         {% blocktrans with latest_version.version_no as latest_version_no %}
                         Revision {{ latest_version_no }} (latest)
                         {% endblocktrans %}
-                    </a>              
+                    </a>
                 </li>
             {% endif %}
         </ul>
@@ -175,7 +171,7 @@
 {% comment %}
 
       <li><a href="{{ language.get_absolute_url }}">{{ language.language_display }} {% trans 'Subtitles' %}</a></li>
-    
+
 {% endcomment %}
 {% endblock %}
 
