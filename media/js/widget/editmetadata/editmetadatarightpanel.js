@@ -150,26 +150,34 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
         'Approve' : 'Accept';
     this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, buttonText);
 
-    el.appendChild(this.sendBackButton_);
-    el.appendChild(this.approveButton_);
-
     var handler = this.getHandler();
-    var that = this;
 
+    if(this.serverModel_.getCaptionSet().needsSync()) {
+        this.needsSyncWarning_ = $d('p', {},
+                                    $d('div', {'class': 'unisubs-needs-sync unisubs-extra'}, 
+                                        $d('p', {}, 'The draft has unsynced / untranslated lines and cannot be approved / accepted. You can complete it or send back.'),
+                                        $d('span', {'class': 'unisubs-spanarrow'}, '')
+                                    )
+                                );
 
-    handler.listen(this.sendBackButton_, 'click', function(e){
-        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SEND_BACK, false);
-    });
+        this.approveButton_.style.opacity = '0.3';
+        el.appendChild(this.needsSyncWarning_);
+        el.appendChild(this.sendBackButton_);
+        el.appendChild(this.approveButton_);
 
-    if(this.serverModel_.getCaptionSet().needsSync()){
-        this.approveButton_.style.display = 'none';
-        alert("There are unsynced subtitles. You need to sync them before you can approve (Click 'Back to Sync').");
     } else {
-        // if the captions needs sync, we don't need to
-        // listen for the click event since the button
-        // is going to be disabled
+
+        el.appendChild(this.sendBackButton_);
+        el.appendChild(this.approveButton_);
+
         handler.listen(this.approveButton_, 'click', function(e){
             that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED, false);
         });
     }
+
+    var that = this;
+
+    handler.listen(this.sendBackButton_, 'click', function(e){
+        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SEND_BACK, false);
+    });
 };
