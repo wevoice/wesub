@@ -333,7 +333,7 @@ class Command(BaseCommand):
                 final_path = os.path.join(self.temp_dir, offset_path)
                 final_dir = os.path.dirname(final_path)
                 if os.path.exists(final_dir) is False:
-                    os.mkdir(final_dir)
+                    os.makedirs(final_dir)
                 shutil.copyfile(original_path, final_path)
 
     def _output_embed_to_dir(self, output_dir, version=''):
