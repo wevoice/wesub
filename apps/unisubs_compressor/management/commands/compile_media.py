@@ -316,7 +316,25 @@ class Command(BaseCommand):
                 shutil.copytree(original_path,
                          dest,
                          ignore=shutil.ignore_patterns(*SKIP_COPING_ON))
-         # we need to copy all js, ideally this can be refactored in other libs
+                
+    def _copy_integration_root_to_temp_dir(self):
+        """
+        We 'merge' whatever is on unisubs-integration/media to
+        project-root/media. This allows partners to have their own
+        media compiled for deployment.
+        Also see how unisusb-integration/integration_settings.py
+        injects the dependencies for media compilation.
+        """
+        mr = os.path.join(settings.INTEGRATION_PATH , "media")
+        for (dirpath, dirnames, filenames) in os.walk(mr):
+            for file_name in filenames:
+                original_path = os.path.join(dirpath, file_name)
+                offset_path = original_path[len(mr):]
+                final_path = os.path.join(settings.MEDIA_ROOT , offset_path)
+                final_dir = os.dirname(final_path)
+                if os.path.exists(final_dir) is False:
+                    os.mkdir(final_dir)
+                shutil.copyfile(original_path, final_path)
 
     def _output_embed_to_dir(self, output_dir, version=''):
         file_name = 'embed{0}.js'.format(version)
@@ -442,6 +460,8 @@ class Command(BaseCommand):
 
         os.chdir(settings.PROJECT_ROOT)
         self._copy_static_root_to_temp_dir() 
+        if settings.USE_INTEGRATION:
+            self._copy_integration_root_to_temp_dir()
         self._compile_conf_and_embed_js()
         self._compile_media_bundles(restrict_bundles, args)
             

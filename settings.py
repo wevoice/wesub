@@ -527,7 +527,27 @@ ROSETTA_EXCLUDED_APPLICATIONS = (
     'rosetta'
 )
 
+
+# this is used in our feature swither app, doorman, empty for now
+FEATURE_FLAGS  = {
+}
+
+INTEGRATION_PATH = os.path.join(PROJECT_ROOT, 'unisubs-integration')
+USE_INTEGRATION = os.path.exists(INTEGRATION_PATH)
+if USE_INTEGRATION:
+    sys.path.append(INTEGRATION_PATH)
+
+if USE_INTEGRATION:
+    for dirname in os.listdir(INTEGRATION_PATH):
+        if os.path.isfile(os.path.join(INTEGRATION_PATH, dirname, '__init__.py')):
+            INSTALLED_APPS += (dirname,)
+    
+    try:
+        from integration_settings import *
+    except ImportError:
+        pass
 # paths from MEDIA URL
+# this needs to run after the integration player has loaded
 MEDIA_BUNDLES = {
 
     "base": {
@@ -738,20 +758,6 @@ MEDIA_BUNDLES = {
     }
 }
 
-
-# this is used in our feature swither app, doorman, empty for now
-FEATURE_FLAGS  = {
-}
-
-_INTEGRATION_PATH = os.path.join(PROJECT_ROOT, 'unisubs-integration')
-_USE_INTEGRATION = os.path.exists(_INTEGRATION_PATH)
-if _USE_INTEGRATION:
-    sys.path.append(_INTEGRATION_PATH)
-
-if _USE_INTEGRATION:
-    for dirname in os.listdir(_INTEGRATION_PATH):
-        if os.path.isfile(os.path.join(_INTEGRATION_PATH, dirname, '__init__.py')):
-            INSTALLED_APPS += (dirname,)
 
 EMAIL_BACKEND = "utils.safemail.InternalOnlyBackend"
 EMAIL_FILE_PATH = '/tmp/unisubs-messages'
