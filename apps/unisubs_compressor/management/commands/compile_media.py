@@ -330,7 +330,7 @@ class Command(BaseCommand):
             for file_name in filenames:
                 original_path = os.path.join(dirpath, file_name)
                 offset_path = original_path[len(mr) + 1:]
-                final_path = os.path.join(self.STATIC_ROOT, offset_path)
+                final_path = os.path.join(settings.STATIC_ROOT, offset_path)
                 final_dir = os.path.dirname(final_path)
                 if os.path.exists(final_dir) is False:
                     os.makedirs(final_dir)
