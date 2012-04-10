@@ -155,10 +155,21 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
 
     var handler = this.getHandler();
     var that = this;
+
+
     handler.listen(this.sendBackButton_, 'click', function(e){
         that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SEND_BACK, false);
     });
-    handler.listen(this.approveButton_, 'click', function(e){
-        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED, false);
-    });
+
+    if(this.serverModel_.getCaptionSet().needsSync()){
+        this.approveButton_.style.display = 'none';
+        alert("There are unsynced subtitles. You need to sync them before you can approve (Click 'Back to Sync').");
+    } else {
+        // if the captions needs sync, we don't need to
+        // listen for the click event since the button
+        // is going to be disabled
+        handler.listen(this.approveButton_, 'click', function(e){
+            that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED, false);
+        });
+    }
 };
