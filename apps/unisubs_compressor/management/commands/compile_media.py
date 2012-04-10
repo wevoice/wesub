@@ -329,7 +329,7 @@ class Command(BaseCommand):
         for (dirpath, dirnames, filenames) in os.walk(mr):
             for file_name in filenames:
                 original_path = os.path.join(dirpath, file_name)
-                offset_path = original_path[len(mr):]
+                offset_path = original_path[len(mr) + 1:]
                 final_path = os.path.join(self.temp_dir, offset_path)
                 final_dir = os.path.dirname(final_path)
                 if os.path.exists(final_dir) is False:
