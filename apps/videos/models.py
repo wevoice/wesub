@@ -369,16 +369,25 @@ class Video(models.Model):
 
     get_absolute_url = _get_absolute_url
 
+    def get_primary_videourl_obj(self):
+        """Return the primary video URL for this video if one exists, otherwise None.
+
+        This will return a VideoUrl object.
+
+        """
+        try:
+            return self.videourl_set.filter(primary=True).all()[:1].get()
+        except models.ObjectDoesNotExist:
+            return None
+            
     def get_video_url(self):
         """Return the primary video URL for this video if one exists, otherwise None.
 
         This will return a string of an actual URL, not a VideoUrl.
 
         """
-        try:
-            return self.videourl_set.filter(primary=True).all()[:1].get().effective_url
-        except models.ObjectDoesNotExist:
-            pass
+        vurl = self.get_primary_videourl_obj()
+        return vurl.effective_url if vurl else None
 
     @classmethod
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
