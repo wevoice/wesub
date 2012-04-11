@@ -209,30 +209,33 @@ class Video(models.Model):
 
         return self._video_views_statistic
 
-    def title_display(self):
+    def title_display(self, truncate=True):
         v = self.latest_version()
-        if v:
-            return v.title
 
-        try:
-            url = self.videourl_set.all()[:1].get().url
-            if not url:
-                return 'No title'
-        except models.ObjectDoesNotExist:
-            return 'No title'
-
-        url = url.strip('/')
-
-        if url.startswith('http://'):
-            url = url[7:]
-
-        parts = url.split('/')
-        if len(parts) > 1:
-            title = '%s/.../%s' % (parts[0], parts[-1])
+        if v and v.title and v.title.strip():
+            title = v.title
+        elif self.title and self.title.strip():
+            title = self.title
         else:
-            title = url
+            try:
+                url = self.videourl_set.all()[:1].get().url
+                if not url:
+                    return 'No title'
+            except models.ObjectDoesNotExist:
+                return 'No title'
 
-        if title > 35:
+            url = url.strip('/')
+
+            if url.startswith('http://'):
+                url = url[7:]
+
+            parts = url.split('/')
+            if len(parts) > 1:
+                title = '%s/.../%s' % (parts[0], parts[-1])
+            else:
+                title = url
+
+        if truncate and len(title) > 35:
             title = title[:35] + '...'
 
         return title
@@ -366,16 +369,25 @@ class Video(models.Model):
 
     get_absolute_url = _get_absolute_url
 
+    def get_primary_videourl_obj(self):
+        """Return the primary video URL for this video if one exists, otherwise None.
+
+        This will return a VideoUrl object.
+
+        """
+        try:
+            return self.videourl_set.filter(primary=True).all()[:1].get()
+        except models.ObjectDoesNotExist:
+            return None
+            
     def get_video_url(self):
         """Return the primary video URL for this video if one exists, otherwise None.
 
         This will return a string of an actual URL, not a VideoUrl.
 
         """
-        try:
-            return self.videourl_set.filter(primary=True).all()[:1].get().effective_url
-        except models.ObjectDoesNotExist:
-            pass
+        vurl = self.get_primary_videourl_obj()
+        return vurl.effective_url if vurl else None
 
     @classmethod
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
@@ -853,7 +865,7 @@ class SubtitleLanguage(models.Model):
         """
         return self.get_title() or self.video.title
 
-    def get_title(self):
+    def get_title(self, public_only=True):
         """Return the title for this language.
 
         Tries to use the following (in order):
@@ -862,10 +874,10 @@ class SubtitleLanguage(models.Model):
         * The video's title.
 
         """
-        v = self.latest_version()
+        v = self.latest_version(public_only=public_only)
         return v.title if v else self.video.title
 
-    def get_description(self):
+    def get_description(self, public_only=True):
         """Return the description for this language.
 
         Tries to use the following (in order):
@@ -874,7 +886,7 @@ class SubtitleLanguage(models.Model):
         * The video's description.
 
         """
-        v = self.latest_version()
+        v = self.latest_version(public_only=public_only)
         return v.description if v else self.video.description
 
 

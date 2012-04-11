@@ -542,8 +542,10 @@ class Rpc(BaseRpc):
         previous_version = language.latest_version(public_only=False)
 
         title_changed = (previous_version
+                         and new_title is not None
                          and new_title != previous_version.title)
         desc_changed = (previous_version
+                        and new_description is not None
                         and new_description != previous_version.description)
         subtitles_changed = (
             subtitles is not None
@@ -1022,8 +1024,8 @@ class Rpc(BaseRpc):
             is_latest,
             version.is_forked or force_forked,
             base_language,
-            language.get_title(),
-            language.get_description()
+            language.get_title(public_only=False),
+            language.get_description(public_only=False)
         )
 
 

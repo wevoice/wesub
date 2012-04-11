@@ -149,6 +149,9 @@ class YoutubeVideoType(VideoType):
     name = 'Youtube'
     site = 'youtube.com'
 
+    # changing this will cause havock, let's talks about this first
+    URL_TEMPLATE = 'http://www.youtube.com/watch?v=%s'
+    
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_video_id(self.url)
@@ -170,7 +173,7 @@ class YoutubeVideoType(VideoType):
         an actual VideoURL object, therefore the if statement
         """
         if obj.videoid:
-            return 'http://www.youtube.com/watch?v=%s' % obj.videoid
+            return YoutubeVideoType.url_from_id(obj.videoid)
         else:
             return obj.url
 
@@ -211,6 +214,10 @@ class YoutubeVideoType(VideoType):
             err = e[0].get('body', 'Undefined error')
             raise VideoTypeError('Youtube error: %s' % err)
 
+    @classmethod
+    def url_from_id(cls, video_id):
+        return YoutubeVideoType.URL_TEMPLATE % video_id
+        
     @classmethod
     def _get_video_id(cls, video_url):
         for pattern in cls._url_patterns:
