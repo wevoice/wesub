@@ -856,7 +856,7 @@ class SubtitleLanguage(models.Model):
         """
         return self.get_title() or self.video.title
 
-    def get_title(self):
+    def get_title(self, public_only=True):
         """Return the title for this language.
 
         Tries to use the following (in order):
@@ -865,10 +865,10 @@ class SubtitleLanguage(models.Model):
         * The video's title.
 
         """
-        v = self.latest_version()
+        v = self.latest_version(public_only=public_only)
         return v.title if v else self.video.title
 
-    def get_description(self):
+    def get_description(self, public_only=True):
         """Return the description for this language.
 
         Tries to use the following (in order):
@@ -877,7 +877,7 @@ class SubtitleLanguage(models.Model):
         * The video's description.
 
         """
-        v = self.latest_version()
+        v = self.latest_version(public_only=public_only)
         return v.description if v else self.video.description
 
 
