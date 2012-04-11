@@ -79,7 +79,7 @@ class Command(BaseCommand):
             raise Exception('Database is empty to test Solr')
         
         # failing on nf, will check later
-        sqs_count = SearchQuerySet().filter.count()#(content=video.title)
+        sqs_count = SearchQuerySet().count()#(content=video.title)
         #sqs = SearchQuerySet().filter(content=video.title)
         assert sqs_count, 'Solr is unavailable. Can\'t find video'
         
