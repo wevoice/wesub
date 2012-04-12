@@ -112,6 +112,15 @@ unisubs.subtitle.EditableCaptionSet.prototype.clearTimes = function() {
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.CLEAR_TIMES);
 };
+unisubs.subtitle.EditableCaptionSet.prototype.needsTranslation = function() {
+    var needsTranslation = false;
+    goog.array.forEach(this.captions_, function(c) {
+        if (c.getText() === '') {
+            needsTranslation = true;
+        }
+    });
+    return needsTranslation;
+};
 unisubs.subtitle.EditableCaptionSet.prototype.resetSubs = function() {
     goog.array.forEach(this.captions_, function(c) { c.resetSub(); });
 

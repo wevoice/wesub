@@ -114,7 +114,10 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
         return False
 
     def video(self, obj):
-        return obj.language.video
+        if obj.language.video:
+            return obj.language.video.title
+        else:
+            return None
 
     def timeline_changes(self, obj):
         if obj.time_change:

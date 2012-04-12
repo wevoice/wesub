@@ -152,7 +152,9 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
 
     var handler = this.getHandler();
 
-    if(this.serverModel_.getCaptionSet().needsSync()) {
+    if (this.serverModel_.getCaptionSet().needsSync() ||
+        this.serverModel_.getCaptionSet().needsTranslation()) {
+
         this.needsSyncWarning_ = $d('p', {},
                                     $d('div', {'class': 'unisubs-needs-sync unisubs-extra'}, 
                                         $d('p', {}, 'The draft has unsynced / untranslated lines and cannot be approved / accepted. You can complete it or send back.'),
