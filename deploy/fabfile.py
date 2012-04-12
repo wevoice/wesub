@@ -365,7 +365,7 @@ def switch_branch(branch_name):
 def _remove_pip_package(base_dir, package_name):
     with cd(os.path.join(base_dir, 'unisubs', 'deploy')):
         run('yes y | {0}/env/bin/pip uninstall {1}'.format(base_dir, package_name), pty=True)
-        _clear_permissions(os.path.join(base_dir, 'env'))
+        #_clear_permissions(os.path.join(base_dir, 'env'))
 
 def remove_pip_package(package_egg_name):
     with Output("Removing pip package '{0}'".format(package_egg_name)):
@@ -378,7 +378,7 @@ def _update_environment(base_dir, flags=''):
         run('export PIP_REQUIRE_VIRTUALENV=true')
         # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
         run('yes i | {0}/env/bin/pip install {1} -E {0}/env/ -r requirements.txt'.format(base_dir, flags), pty=True)
-        _clear_permissions(os.path.join(base_dir, 'env'))
+        #_clear_permissions(os.path.join(base_dir, 'env'))
 
 def update_environment(flags=''):
     with Output("Updating virtualenv"):
@@ -404,9 +404,9 @@ def clear_permissions():
 def _git_pull():
     run('git checkout --force')
     run('git pull --ff-only')
-    run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    run('chmod g+w -R .git 2> /dev/null; /bin/true')
-    _clear_permissions('.')
+    #run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    #run('chmod g+w -R .git 2> /dev/null; /bin/true')
+    #_clear_permissions('.')
 
 def _git_checkout(commit, as_sudo=False):
     cmd = run
@@ -414,9 +414,9 @@ def _git_checkout(commit, as_sudo=False):
         cmd = sudo
     cmd('git fetch')
     cmd('git checkout --force %s' % commit)
-    cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
-    _clear_permissions('.')
+    #cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    #cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    #_clear_permissions('.')
 
 def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
     cmd = run
@@ -425,9 +425,9 @@ def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
     cmd('git fetch')
     cmd('git checkout %s' % branch)
     cmd('git reset --hard %s' % commit)
-    cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
-    _clear_permissions('.')
+    #cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    #cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    #_clear_permissions('.')
 
 
 def _get_optional_repo_version(dir, repo):
@@ -682,7 +682,7 @@ def _update_static(dir):
         media_dir = '{0}/unisubs/media/'.format(dir)
         python_exe = '{0}/env/bin/python'.format(dir)
         _git_pull()
-        _clear_permissions(media_dir)
+        #_clear_permissions(media_dir)
         run('{0} manage.py  compile_media --settings=unisubs_settings'.format(python_exe))
 
 def update_static():
