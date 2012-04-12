@@ -404,9 +404,9 @@ def clear_permissions():
 def _git_pull():
     run('git checkout --force')
     run('git pull --ff-only')
-    #run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    #run('chmod g+w -R .git 2> /dev/null; /bin/true')
-    #_clear_permissions('.')
+    run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    run('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _clear_permissions('.')
 
 def _git_checkout(commit, as_sudo=False):
     cmd = run
@@ -414,9 +414,9 @@ def _git_checkout(commit, as_sudo=False):
         cmd = sudo
     cmd('git fetch')
     cmd('git checkout --force %s' % commit)
-    #cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    #cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
-    #_clear_permissions('.')
+    cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _clear_permissions('.')
 
 def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
     cmd = run
@@ -425,9 +425,9 @@ def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
     cmd('git fetch')
     cmd('git checkout %s' % branch)
     cmd('git reset --hard %s' % commit)
-    #cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    #cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
-    #_clear_permissions('.')
+    cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _clear_permissions('.')
 
 
 def _get_optional_repo_version(dir, repo):
