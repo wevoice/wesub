@@ -1,6 +1,6 @@
 {% load escapejs %}
 
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 // 
 // Copyright (C) 2010 Participatory Culture Foundation
 // 

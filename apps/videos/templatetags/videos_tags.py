@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -63,11 +63,11 @@ def write_video_type_js(video):
 @register.simple_tag
 def title_for_video(video, language=None):
     if not language:
-        return "%s | Universal Subtitles" % video.title_display()
+        return "%s | Amara" % video.title_display()
     elif  language.is_original:
-        return "%s  with subtitles | Universal Subtitles " % language.get_title_display()
+        return "%s  with subtitles | Amara " % language.get_title_display()
     else:
-        return "%s  with %s subtitles | Universal Subtitles " % (language.get_title_display() , language.get_language_display())
+        return "%s  with %s subtitles | Amara " % (language.get_title_display() , language.get_language_display())
 
 from django.template.defaulttags import URLNode
 class VideoURLNode(URLNode):

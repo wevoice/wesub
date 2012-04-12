@@ -2,10 +2,10 @@
 Api2 Documentation
 ==================
 
-This is the documentation of v2 of Universal Subtitle's API. Please contact us if you’d like to use the Universal Subtitles API for commercial purposes.
+This is the documentation of v2 of Amara's API. Please contact us
+if you’d like to use the Amara API for commercial purposes.
 
 The v1 of the API is deprecated, but can still be accessed through http://www.universalsubtitles.org/api/1.0/documentation/ . Users should migrate to the v2 of the API. If you're missing a feature on the api, please `let us know <https://universalsubtitles.tenderapp.com/>`_ .
-
 
 Authentication
 ===============
@@ -56,17 +56,15 @@ The following resources are available to end users:
 VideoResource
 -------------
 
-Represents a video on Universal Subtitles.
+Represents a video on Amara.
 
 Listing videos
 
     GET https://www.universalsubtitles.org/api2/partners/videos/
 
 Parameters:
-   
-  * `video_url`: list only videos with the given URL, useful for finding out information about a video already on Universal Subtitles.
-  * `order_by`: Applies sorting to the video list. Possible values:
-
+    * `video_url`: list only videos with the given URL, useful for finding out information about a video already on Amara.
+    * `order_by`: Applies sorting to the video list. Possible values:
     * `title`: ascending
     * `-title`: descending
     * `created`: older videos first
@@ -77,8 +75,7 @@ Creating Videos::
   POST https://www.universalsubtitles.org/api2/partners/videos/
    
 Parameters:
-  
-  * `video_url` : The url for the video. Any url that Universal Subtitles accepts will work here. You can send the URL for a file (e.g. http:///www.example.com/my-video.ogv) , or a link to one of our accepted providers (youtube, vimeo, dailymotion, blip.tv)
+  * `video_url` : The url for the video. Any url that Amara accepts will work here. You can send the URL for a file (e.g. http:///www.example.com/my-video.ogv) , or a link to one of our accepted providers (youtube, vimeo, dailymotion, blip.tv)
   * `title` : The title for the video
   * `description` : About this video
   * `duration` : Duration in seconds
@@ -100,8 +97,9 @@ Updating a video object::
 With the same parameters for creation. Note that through out our system, a video cannot have it's URLs changed. So you can change other video attributes (title, description) but the URL sent must be the same original one.
 
 VideoLanguageResource
----------------------
-Represents a language for a given video on Universal Subtitles.
+~~~~~~~~~~~~~~~~~~~~~
+
+Represents a language for a given video on Amara.
 
 Listing video languages::
 
@@ -156,8 +154,10 @@ Parameters:
 
 
 LanguageResource
-================
-Represents a listing of all available languages on the Universal Subtitles platform.
+~~~~~~~~~~~~~~~~
+
+Represents a listing of all available languages on the Amara
+platform.
 
 Listing available languages::
 

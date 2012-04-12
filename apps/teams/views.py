@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -661,7 +661,7 @@ def remove_video(request, team_video_pk):
 
     if wants_delete:
         video.delete()
-        msg = _(u'Video has been deleted from Universal Subtitles.')
+        msg = _(u'Video has been deleted from Amara.')
     else:
         msg = _(u'Video has been removed from the team.')
 
