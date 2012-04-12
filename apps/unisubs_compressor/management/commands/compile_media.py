@@ -334,7 +334,13 @@ class Command(BaseCommand):
                 final_dir = os.path.dirname(final_path)
                 if os.path.exists(final_dir) is False:
                     os.makedirs(final_dir)
-                shutil.copyfile(original_path, final_path)
+                if os.path.exists(final_path):
+                    os.remove(final_path)
+                try:
+                    shutil.copy(original_path, final_path)
+                except shutil.Error:
+                    # if the files haven't changed this will be raised
+                    pass
 
     def _output_embed_to_dir(self, output_dir, version=''):
         file_name = 'embed{0}.js'.format(version)
