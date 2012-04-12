@@ -23,6 +23,7 @@ team, they can have one of the following roles:
     * Everything that a contributor can do
 * Admin
     * Assign new managers
+    * Delete subtitles
     * Everything that a manager can do
 * Owner
     * Everything
