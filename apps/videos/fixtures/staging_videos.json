@@ -383,6 +383,8 @@
             "datetime_started": "2010-11-11 10:24:15", 
             "time_change": 1.0, 
             "text_change": 1.0, 
+            "title": "version id 1 title",
+            "description": "version id 1 description",
             "user": 9998
         }
     }, 
@@ -398,6 +400,8 @@
             "datetime_started": "2010-11-11 10:24:40", 
             "time_change": null, 
             "text_change": null, 
+            "title": "version id 2 title",
+            "description": "version id 2 description",
             "user": 10000
         }
     }, 
@@ -413,6 +417,8 @@
             "datetime_started": "2010-11-11 10:27:32", 
             "time_change": 1.0, 
             "text_change": 1.0, 
+            "title": "version id 3 title",
+            "description": "version id 3 description",
             "user": 9998
         }
     }, 
