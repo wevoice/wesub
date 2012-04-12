@@ -1053,7 +1053,7 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        if filters.get('language') == 'mine':
+        if filters.get('language') == 'mine' and request.user.is_authenticated():
             tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
         else:
             tasks = tasks.filter(language=filters['language'])
