@@ -39,6 +39,7 @@ from simplejson.decoder import JSONDecodeError
 import widget
 from auth.models import CustomUser
 from teams.models import Task
+from teams.permissions import get_member
 from uslogging.models import WidgetDialogCall
 from utils import DEFAULT_PROTOCOL
 from videos import models
@@ -278,7 +279,16 @@ def download_subtitles(request, handler=SSASubtitles):
         except ObjectDoesNotExist:
             raise Http404
 
-    version = language and language.version()
+    # Non-team videos don't require moderation
+    team_video = video.get_team_video()
+    # Members can see all versions
+    member = get_member(request.user, team_video.team)
+
+    if team_video or member:
+        version = language and language.version(public_only=False)
+    else:
+        version = language and language.version()
+
     if not version:
         raise Http404
 
