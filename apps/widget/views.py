@@ -284,7 +284,7 @@ def download_subtitles(request, handler=SSASubtitles):
     # Members can see all versions
     member = get_member(request.user, team_video.team)
 
-    if team_video or member:
+    if team_video and member:
         version = language and language.version(public_only=False)
     else:
         version = language and language.version()
