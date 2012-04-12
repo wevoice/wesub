@@ -19,7 +19,7 @@ Contents:
    permissions
    i18n
    api
-
+   apps
 
 Indices and tables
 ==================
