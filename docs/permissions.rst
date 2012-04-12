@@ -54,7 +54,7 @@ something like this:
 Workflows
 ---------
 
-A team can choose their own worflow to effciently manage their videos,
+A team can choose their own workflow to efficiently manage their videos,
 translations and volunteers.  When you are setting up a workflow for your team,
 you can decide how certain actions will be performed.  For example:
 
@@ -63,7 +63,7 @@ you can decide how certain actions will be performed.  For example:
 * Who can assign tasks?
 * How many tasks a user can have at a time?
 * How many days should a user get to complete a task?
-* Who can transribe subtitles?
+* Who can transcribe subtitles?
 * Who can translate subtitles?
 * Is there a review process?
 * Is there an approval process?
