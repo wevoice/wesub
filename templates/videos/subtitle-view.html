@@ -30,9 +30,9 @@
 
 {% block title %}
     {% if language.is_original %}
-        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
+        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
     {% else %}
-        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
+        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
     {% endif %}
 {% endblock %}
 
@@ -47,7 +47,7 @@
         <meta property="og:image" content="{{ STATIC_URL }}images/small_logo.png" />
     {% endif %}
 
-    <meta property="og:site_name" content="Universal Subtitles"/>
+    <meta property="og:site_name" content="Amara"/>
     <meta property="og:description" content="{% title_for_video video language %}"/>
 {% endblock  %}
 

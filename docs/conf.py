@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Universal Subtitles documentation build configuration file, created by
+# Amara documentation build configuration file, created by
 # sphinx-quickstart on Mon Jul 25 14:58:38 2011.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Universal Subtitles'
+project = u'Amara'
 copyright = u'2011, Participatory Culture Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -178,7 +178,7 @@ htmlhelp_basename = 'UniversalSubtitlesdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'UniversalSubtitles.tex', u'Universal Subtitles Documentation',
+  ('index', 'UniversalSubtitles.tex', u'Amara Documentation',
    u'Participatory Culture Foundation', 'manual'),
 ]
 
@@ -211,7 +211,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'universalsubtitles', u'Universal Subtitles Documentation',
+    ('index', 'universalsubtitles', u'Amara Documentation',
      [u'Participatory Culture Foundation'], 1)
 ]
 

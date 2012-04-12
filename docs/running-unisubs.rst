@@ -1,5 +1,5 @@
 ===========================
-Running Universal Subtitles
+Running Amara
 ===========================
 
 To run the development version:
@@ -107,7 +107,7 @@ To run the development version:
 Using vagrant
 -------------
 
-Universal Subtitles uses `Vagrant <http://vagrantup.com/>`_ to make it easy to
+Amara uses `Vagrant <http://vagrantup.com/>`_ to make it easy to
 get started.  If you've never used Vagrant before we highly recommend going
 through its `quick start guide
 <http://vagrantup.com/docs/getting-started/index.html>`_ to learn how it works.
