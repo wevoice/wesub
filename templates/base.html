@@ -69,7 +69,7 @@
                     <li><a href="{% url videos:watch_page %}">{% trans 'Watch' %}</a></li>
                     <li><a href="http://blog.universalsubtitles.org/volunteer/">{% trans "Volunteer" %}</a></li>
                     <li><a href="{% url enterprise_page %}">{% trans "Enterprise" %}</a></li>
-                    <li><a href="#" id="help_link"><span>{% trans 'Help' %}</span></a></li>
+                    <li><a href="http://support.universalsubtitles.org/">{% trans 'Help' %}</a></li>
                     {% if user.is_authenticated %}
                         <li id="me_menu">{% top_user_panel %}</li>
                     {% else %}
@@ -129,13 +129,6 @@
     {% block bottom_scripts %}{% endblock %}
 
     {% if not DEBUG and not RUN_LOCALLY %}
-        <script type="text/javascript" charset="utf-8">
-            Tender = {
-                hideToggle: true,
-                widgetToggles: [document.getElementById('help_link')]
-            }
-        </script>
-        <script src="https://universalsubtitles.tenderapp.com/tender_widget.js" type="text/javascript"></script>
         <script type="text/javascript">
             var _gaq = _gaq || [];
             _gaq.push(['_setAccount', '{{ GOOGLE_ANALYTICS_NUMBER }}']);

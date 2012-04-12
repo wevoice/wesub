@@ -334,6 +334,8 @@ class Command(BaseCommand):
                 final_dir = os.path.dirname(final_path)
                 if os.path.exists(final_dir) is False:
                     os.makedirs(final_dir)
+                if os.path.exists(final_path):
+                    os.remove(final_path)
                 try:
                     shutil.copy(original_path, final_path)
                 except shutil.Error:
