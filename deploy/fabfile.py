@@ -682,7 +682,7 @@ def _update_static(dir):
         media_dir = '{0}/unisubs/media/'.format(dir)
         python_exe = '{0}/env/bin/python'.format(dir)
         _git_pull()
-        #_clear_permissions(media_dir)
+        _clear_permissions(media_dir)
         run('{0} manage.py  compile_media --settings=unisubs_settings'.format(python_exe))
 
 def update_static():
