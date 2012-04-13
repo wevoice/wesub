@@ -1333,7 +1333,9 @@ class SubtitleVersion(SubtitleCollection):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('videos:revision', [self.pk])
+        return ('videos:subtitleversion_detail',
+                [self.video.video_id, self.language.language, self.language.pk,
+                 self.pk])
 
     def is_dependent(self):
         return not self.language.is_original and not self.is_forked
