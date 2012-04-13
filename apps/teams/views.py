@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -661,7 +661,7 @@ def remove_video(request, team_video_pk):
 
     if wants_delete:
         video.delete()
-        msg = _(u'Video has been deleted from Universal Subtitles.')
+        msg = _(u'Video has been deleted from Amara.')
     else:
         msg = _(u'Video has been removed from the team.')
 
@@ -1053,7 +1053,7 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        if filters.get('language') == 'mine':
+        if filters.get('language') == 'mine' and request.user.is_authenticated():
             tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
         else:
             tasks = tasks.filter(language=filters['language'])

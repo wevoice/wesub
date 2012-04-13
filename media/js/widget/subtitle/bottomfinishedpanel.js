@@ -1,6 +1,6 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -49,7 +49,7 @@ unisubs.subtitle.BottomFinishedPanel.prototype.createDom = function() {
                $d('a',
                   {'className': 'unisubs-goBack',
                    'href': this.permalink_},
-                  "Go to Universal Subtitles video homepage"));
+                  "Go to Amara video homepage"));
         elem.appendChild(otherDiv);
     }
     elem.appendChild(transBox);

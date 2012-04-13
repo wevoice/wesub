@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -855,16 +855,6 @@ class SubtitleLanguage(models.Model):
                     if s.text.strip()])
 
 
-    def get_title_display(self):
-        """Return a suitable title to display to a user for this language.
-
-        This will use the most specific title if it's present, but if it's blank
-        it will fall back to the less-specific-but-at-least-it-exists video
-        title instead.
-
-        """
-        return self.get_title() or self.video.title
-
     def get_title(self, public_only=True):
         """Return the title for this language.
 
@@ -877,6 +867,16 @@ class SubtitleLanguage(models.Model):
         v = self.latest_version(public_only=public_only)
         return v.title if v else self.video.title
 
+    def get_title_display(self):
+        """Return a suitable title to display to a user for this language.
+
+        This will use the most specific title if it's present, but if it's blank
+        it will fall back to the less-specific-but-at-least-it-exists video
+        title instead.
+
+        """
+        return self.get_title() or self.video.title
+
     def get_description(self, public_only=True):
         """Return the description for this language.
 
@@ -888,6 +888,16 @@ class SubtitleLanguage(models.Model):
         """
         v = self.latest_version(public_only=public_only)
         return v.description if v else self.video.description
+
+    def get_description_display(self):
+        """Return a suitable description to display to a user for this language.
+
+        This will use the most specific description if it's present, but if it's
+        blank it will fall back to the less-specific-but-at-least-it-exists
+        video description instead.
+
+        """
+        return self.get_description() or self.video.description
 
 
     def is_dependent(self):

@@ -1,6 +1,6 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -137,13 +137,14 @@ class Command(BaseCommand):
         optparse.make_option('--checks-version',
             action='store_true', dest='test_str_version', default=False,
             help="Check that we outputed the version string for comopiled files."),
-
-
         optparse.make_option('--keeps-previous',
             action='store_true', dest='keeps_previous', default=False,
             help="Will remove older static media builds."),
+        optparse.make_option('--compilation-level',
+            action='store', dest='compilation_level', default='ADVANCED_OPTIMIZATIONS',
+            help="How aggressive is compilation. Possible values: ADVANCED_OPTIMIZATIONS, WHITESPACE_ONLY and SIMPLE_OPTIMIZATIONS"),
         )
-    
+   
     def _append_version_for_debug(self, descriptor, file_type):
         """
         We append the /*unisubs.static_version="{{commit guid}"*/ to the end of the
@@ -193,7 +194,7 @@ class Command(BaseCommand):
         extra_defines = bundle_settings.get("extra_defines", None)
         include_flash_deps = bundle_settings.get("include_flash_deps", True)
         closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
-        optimization_type = bundle_settings.get("optimizations", "ADVANCED_OPTIMIZATIONS")
+        optimization_type = bundle_settings.get("optimizations", self.compilation_level)
 
         logging.info("Starting {0}".format(output_file_name))
 
@@ -291,8 +292,8 @@ class Command(BaseCommand):
         with open(uncompiled_file_name, 'w') as f:
             f.write(rendered)
         cmd_str = ("java -jar {0} --js {1} --js_output_file {2} "
-                   "--compilation_level ADVANCED_OPTIMIZATIONS").format(
-            COMPILER_PATH, uncompiled_file_name, file_name)
+                   "--compilation_level {3}").format(
+            COMPILER_PATH, uncompiled_file_name, file_name, self.compilation_level)
         call_command(cmd_str)
         os.remove(uncompiled_file_name)
 
@@ -462,6 +463,7 @@ class Command(BaseCommand):
         self.verbosity = int(options.get('verbosity'))
         self.test_str_version = bool(options.get('test_str_version'))
         self.keeps_previous = bool(options.get('keeps_previous'))
+        self.compilation_level = options.get('compilation_level')
         restrict_bundles = bool(args)
 
         os.chdir(settings.PROJECT_ROOT)

@@ -1,4 +1,4 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 // 
 // Copyright (C) 2012 Participatory Culture Foundation
 // 
@@ -19,7 +19,7 @@
 var Site = function(Site) {
     /*
      * This is the master JavaScript file for
-     * the Universal Subtitles website.
+     * the Amara website.
      */
 
     var that = this;
@@ -160,7 +160,7 @@ var Site = function(Site) {
     this.Views = {
         /*
          * Each of these views runs on a specific
-         * page on the Universal Subtitles site
+         * page on the Amara site
          * (except for base, which runs on every
          * page that extends base.html)
          *
@@ -466,7 +466,7 @@ var Site = function(Site) {
                                 $.jGrowl.error(response.error);
                             } else {
                                 $('.title-container').html(title);
-                                document.title = title + ' | Universal Subtitles';
+                                document.title = title + ' | Amara';
                             }
                         }
                     );

@@ -1,6 +1,6 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 //
-// Copyright (C) 2011 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -152,7 +152,9 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
 
     var handler = this.getHandler();
 
-    if(this.serverModel_.getCaptionSet().needsSync()) {
+    if (this.serverModel_.getCaptionSet().needsSync() ||
+        this.serverModel_.getCaptionSet().needsTranslation()) {
+
         this.needsSyncWarning_ = $d('p', {},
                                     $d('div', {'class': 'unisubs-needs-sync unisubs-extra'}, 
                                         $d('p', {}, 'The draft has unsynced / untranslated lines and cannot be approved / accepted. You can complete it or send back.'),

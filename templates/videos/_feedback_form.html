@@ -3,7 +3,7 @@
   <div class="feedback_bg">
   <form method="post" action="{% block action %}{% url videos:feedback %}{% endblock %}" id="feedback_form">
       {% csrf_token %}
-  <h2>{% block form_title %}{% trans 'How are you using Universal Subtitles?  What would make it better?' %}{% endblock %}</h2>
+  <h2>{% block form_title %}{% trans 'How are you using Amara?  What would make it better?' %}{% endblock %}</h2>
   {% block hidden_fields %}{% endblock %}
   <p>{% trans 'Please let us know if you have any comments, questions, or suggestions!' %}</p>
   <p>{% trans 'Note: we read/speak English best, but try to read/respond to anything we can.' %}</p>

@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block title %}
-    {% trans 'Tasks' %} - {{ team }} | Universal Subtitles
+    {% trans 'Tasks' %} - {{ team }} | Amara
 {% endblock %}
 
 {% block view_content %}
@@ -69,7 +69,9 @@
                     <span class="inner">{% trans 'tasks for' %}</span>
                     <select id="id_task_language" name="language" class="lang-filter chosen">
                         <option id="lang-opt-any" value="{{ request.path }}{% query_string request.GET lang="" page='' %}">{% trans 'all languages' %}</option>
-                        <option id="lang-opt-mine" value="{{ request.path }}{% query_string request.GET lang="mine" page='' %}">{% trans 'my languages' %}</option>
+                        {% if request.user.is_authenticated %}
+                            <option id="lang-opt-mine" value="{{ request.path }}{% query_string request.GET lang="mine" page='' %}">{% trans 'my languages' %}</option>
+                        {% endif %}
                         {% for language in languages %}
                             <option id="lang-opt-{{ language.code }}" value="{% query_string request.GET lang=language.code page='' %}"
                                 {% if request.GET.lang == language.code %}
