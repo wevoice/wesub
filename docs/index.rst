@@ -27,6 +27,7 @@ Contents:
    i18n
    api
    apps
+   data
 
 Contributing
 ------------
