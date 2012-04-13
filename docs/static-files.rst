@@ -11,8 +11,8 @@ The static files pipeline for unisubs has two goals:
 - Each new release won't be cached by clients, since the URLS for each release
   are unique
 
-Quick how to
-------------
+Quick Start
+-----------
 
 1. When in development with ``DEBUG = True`` all media will not be compressed.
    Else you can controle this with the ``COMPRESS_MEDIA`` setting.
@@ -20,7 +20,7 @@ Quick how to
    new bundle if you need a specific collection of media (see bellow)
 3. If it's a new bundle add the include in the template (see bellow)
 
-When you want to test the compiled version
+When you want to test the compiled version:
 
 1. Set ``DEBUG`` to false
 2. Run the ``compile_config``, ``compile_statwidgetconfig``, ``compile_media``
@@ -28,20 +28,20 @@ When you want to test the compiled version
 3. Run ``deploy/create_commit_file``
 4. Run the ``compile_media`` command
 
-Compilation / Minification
+Compilation & Minification
 --------------------------
 
 ``settings.py`` has a ``MEDIA_BUNDLES`` dictionary. Each key sets an id (a
 unique name for the bundle), with the following properties:
 
-- `type`: Can be `css` or `js` for now
-- `files`: a sequence of files to be processed. Files will be processed in
+- **type**: Can be ``'css'`` or ``'js'`` for now
+- **files**: a sequence of files to be processed. Files will be processed in
   the order in which they're are defined on the bundle. They're path should be
   relative to the STATIC_URL (i.e. unisubs/media)
-- `closure_deps`: File (inside js) that holds the closure dependencies list.
-- `debug`: If true will include the closure-debug-dependencies.js.
-- `include_flash_deps`: boolean
-- `optimizations`: defaults to closure's more agreesive mode
+- **closure_deps**: File (inside js) that holds the closure dependencies list.
+- **debug**: If true will include the ``closure-debug-dependencies.js``.
+- **include_flash_deps**: boolean
+- **optimizations**: defaults to closure's more agreesive mode
   (``ADVANCED_OPTIMIZATIONS``) else can be set to ``SIMPLE_OPTIMIZATIONS``.
 
 Files will be concatenated in the order in which they are defined.
@@ -56,7 +56,9 @@ In Templates
 ------------
 
 In templates, instead of liking to the the individual css or js files, you'd
-simply::
+simply:
+
+.. code-block:: django
 
     {% load  media_compressor %}
     {% include_bundle "[bundle name - the key in MEDIA_BUNDLE]" %}
@@ -70,7 +72,7 @@ Compiling
 
 Compiling should be done with ::
 
-  $ manage.py compile_media --settings=[settings file] [bundle-name(s)]
+    $ manage.py compile_media --settings=[settings file] [bundle-name(s)]
 
 If you pass one or more bundle names as arguments to the command it will only
 compile those bundles (useful for testing / debugging), else all bundles will
@@ -80,16 +82,16 @@ also the ``deploy/create_commit_file.py`` before doing so.
 When the ``--verbosity`` param is set to 2, ``compile_media`` will output the
 cmd_strings passed to the compilers.
 
-Dir layout
-----------
+Directory layout
+----------------
 
 Inside ``MEDIA_ROOT`` media will be compiled to ``static-cache/[hash of latest
 git commit]/``. For example,
 ``MEDIA_ROOT/static-cache/21a1bbcc/js/unisubs-onsite-compiled.js``.
 
-In this way we use one unique identifier for each revision, in fact, we relly
-on the one the scm gives us, which has the added benefit of making it easier to
-troubleshoot revisions and if the links are correct.
+This way we use one unique identifier for each revision, in fact, we relly on
+the one git gives us, which has the added benefit of making it easier to
+troubleshoot revisions and verify that links are correct.
 
 Static cache is never in source control and should not be the storage path for
 anything. Its sole purpose is to be a disposable place where media can be
@@ -100,40 +102,35 @@ Relevant Settings
 
 These need to be defined in ``settings.py``:
 
-STATIC_URL
-~~~~~~~~~~
+.. attribute:: STATIC_URL
 
-Since the location of media is no longer static, the ``STATIC_URL`` takes into
-consideration the new directory layout. Every time a new git version is running
-and ``deploy/create_commit_file.py`` is ran, the ``STATIC_URL`` will change
-(and) therefore you need to restart the sever/reload app coder for that to take
-effect.
+    Since the location of media is no longer static, the ``STATIC_URL`` takes
+    into consideration the new directory layout. Every time a new git version
+    is running and ``deploy/create_commit_file.py`` is ran, the ``STATIC_URL``
+    will change (and) therefore you need to restart the sever/reload app coder
+    for that to take effect.
 
-COMPRESS_YUI_BINARY
-~~~~~~~~~~~~~~~~~~~
+.. attribute:: COMPRESS_YUI_BINARY
 
-The path, relative to the unisubs dir where the YUI compressor jar lives(``java
--jar ./css-compression/yuicompressor-2.4.6.jar``)
+    The path, relative to the unisubs dir where the YUI compressor jar
+    lives(``java -jar ./css-compression/yuicompressor-2.4.6.jar``)
 
-COMPRESS_MEDIA
-~~~~~~~~~~~~~~
+.. attribute:: COMPRESS_MEDIA
 
-When true media will be compressd / packed, Both CSS and JS. The default value
-for this is the oposite of ``DEBUG``.
+    When true media will be compressd / packed, Both CSS and JS. The default
+    value for this is the oposite of ``DEBUG``.
 
-COMPRESS_OUTPUT_NAME
-~~~~~~~~~~~~~~~~~~~~
+.. attribute:: COMPRESS_OUTPUT_NAME
 
-The directory that holds the root to the static cache, i.e. where all compiled
-and version specific media will be copyed to (see dir layout above). Defaults
-to 'static-cache'.
+    The directory that holds the root to the static cache, i.e. where all
+    compiled and version specific media will be copyed to (see dir layout
+    above). Defaults to 'static-cache'.
 
-STATIC_URL_BASE
-~~~~~~~~~~~~~~~
+.. attribute:: STATIC_URL_BASE
 
-This is the media url before appending the commit hash. This is useful in
-places where you need the media base to an external stable url , for example on
-the embed and widgetizer (which never change).
+    This is the media url before appending the commit hash. This is useful in
+    places where you need the media base to an external stable url , for example on
+    the embed and widgetizer (which never change).
 
 Serving Media
 -------------
