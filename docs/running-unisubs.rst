@@ -1,6 +1,11 @@
-===========================
 Running Amara
-===========================
+=============
+
+You have two options when running Amara.  Install it directly on your machine,
+or inside a Vagrant virtual machine.
+
+Directly
+--------
 
 To run the development version:
 
@@ -27,7 +32,7 @@ To run the development version:
    $ mkvirtualenv unisubs
    $ workon unisubs
 
-5. run::
+5. Run::
 
     $ easy_install -U setuptools
     $ easy_install pip
