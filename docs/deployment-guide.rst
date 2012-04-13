@@ -22,9 +22,3 @@ The basic sequence::
 .. note:: Rebuilding the solr index is pretty slow, so it will run on a screen
     session, if you need to check it, just log back to the server and open
     it on screen.
-
-Fabric commands
----------------
-
-.. automodule:: deploy.fabfile
-    :members:
