@@ -2788,7 +2788,7 @@ msgstr "Protezione dei dati"
 
 #: templates/base.html:109
 msgid "Terms of Service"
-msgstr "Condizioni di uitlizzazioni"
+msgstr "Condizioni di utilizzo"
 
 #: templates/base.html:119
 msgid "Sentry"
