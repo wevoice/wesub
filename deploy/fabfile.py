@@ -768,10 +768,20 @@ def test_email(to_address):
 
 
 def build_docs():
+    """
+    Builds the documentation using sphinx.
+    If the environment uses s3, will also uplaod the generated docs
+    dir to the root of the bucket.
+    """
     with Output("Generating documentation"):
         env.host_string = DEV_HOST
         with cd(os.path.join(env.static_dir, 'unisubs')):
             run('%s/env/bin/sphinx-build docs/ media/docs/' % (env.static_dir))
+        if env.s3_bucket is not None:
+            with cd(os.path.join(env.static_dir, 'unisubs')):
+                python_exe = '{0}/env/bin/python'.format(env.static_dir)
+                run('{0} manage.py  upload_docs --settings=unisubs_settings'.format(python_exe))
+
 
 
 def _get_settings_values(dir, *settings_name):
