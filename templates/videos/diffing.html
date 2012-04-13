@@ -132,6 +132,17 @@
 
         </div>
 
+        <div class="meta">
+            <p {% if first_version.title != second_version.title %}class="changed"{% endif %}>
+                <strong>{% trans "Title:" %}</strong>
+                {{ second_version.title }}
+            </p>
+            <p {% if first_version.description != second_version.description %}class="changed"{% endif %}>
+                <strong>{% trans "Description:" %}</strong>
+                {{ second_version.description|urlize|linebreaks }}
+            </p>
+        </div>
+
         <table cellpadding="0" cellspacing="0">
           {% for item in captions %}
             <tr {% cycle 'class="even"' '' %}>
@@ -186,6 +197,17 @@
                     {% trans 'Roll back to version' %} (#{{ first_version.version_no }})
                 </a>
             {% endif %}
+         </div>
+
+         <div class="meta">
+             <p {% if first_version.title != second_version.title %}class="changed"{% endif %}>
+                 <strong>{% trans "Title:" %}</strong>
+                 {{ first_version.title }}
+             </p>
+             <p {% if first_version.description != second_version.description %}class="changed"{% endif %}>
+                 <strong>{% trans "Description:" %}</strong>
+                 {{ first_version.description|urlize|linebreaks }}
+             </p>
          </div>
 
         <table cellpadding="0" cellspacing="0">

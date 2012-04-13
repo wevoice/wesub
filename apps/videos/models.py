@@ -707,6 +707,29 @@ class Video(models.Model):
         return self._cached_policy
 
 
+    def get_title_display(self):
+        """Return a suitable title to display to a user for this video.
+
+        This will use the most specific title if it's present, but if it's blank
+        it will fall back to the less-specific-but-at-least-it-exists video
+        title instead.
+
+        """
+        l = self.subtitle_language()
+        return l.get_title_display() if l else self.title
+
+    def get_description_display(self):
+        """Return a suitable description to display to a user for this video.
+
+        This will use the most specific description if it's present, but if it's
+        blank it will fall back to the less-specific-but-at-least-it-exists
+        video description instead.
+
+        """
+        l = self.subtitle_language()
+        return l.get_description_display() if l else self.description
+
+
     @property
     def is_moderated(self):
         return bool(self.moderated_by_id)

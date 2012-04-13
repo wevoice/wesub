@@ -64,6 +64,12 @@
             <li>
                 <strong>Date:</strong> {{ version.datetime_started|date:"j F Y (H:i)" }}
             </li>
+            <li>
+                <strong>Title:</strong> {{ version.title }}
+            </li>
+            <li>
+                <strong>Description:</strong> {{ version.description|urlize|linebreaks }}
+            </li>
         </ul>
 
         <h3>Subtitles</h3>
