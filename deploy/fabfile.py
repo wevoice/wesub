@@ -683,7 +683,7 @@ def _update_static(dir, compilation_level):
         python_exe = '{0}/env/bin/python'.format(dir)
         _git_pull()
         #_clear_permissions(media_dir)
-        run('{0} manage.py  compile_media --compilation_level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
+        run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
 
 def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
     """Recompile static media and upload the results to S3"""
