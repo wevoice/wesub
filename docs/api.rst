@@ -1,6 +1,5 @@
-==================
-Api2 Documentation
-==================
+API Documentation
+=================
 
 This is the documentation of v2 of Amara's API. Please contact us
 if you’d like to use the Amara API for commercial purposes.

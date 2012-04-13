@@ -1333,7 +1333,9 @@ class SubtitleVersion(SubtitleCollection):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('videos:revision', [self.pk])
+        return ('videos:subtitleversion_detail',
+                [self.video.video_id, self.language.language, self.language.pk,
+                 self.pk])
 
     def is_dependent(self):
         return not self.language.is_original and not self.is_forked
@@ -1422,10 +1424,10 @@ class SubtitleVersion(SubtitleCollection):
 
         last_version = self.language.latest_version(public_only=False)
         new_version_no = last_version.version_no + 1
-        new_version = cls(language=lang, version_no=new_version_no, \
-                              datetime_started=datetime.now(), user=user, note=note,
-                          is_forked=self.is_forked,
-                          result_of_rollback=True)
+        new_version = cls(language=lang, version_no=new_version_no,
+                          datetime_started=datetime.now(), user=user, note=note,
+                          is_forked=self.is_forked, result_of_rollback=True,
+                          title=self.title, description=self.description)
         new_version.save()
 
         for item in self.subtitle_set.all():
