@@ -1551,18 +1551,21 @@ ol.subtitles li {
 ol.subtitles li:hover {
   background-color: #f3f6f8;
 }
-ol.subtitles li .timing {
+ol.subtitles li .timing, ol.subtitles li .field {
   position: absolute;
   top: 1em;
   left: 1em;
   width: 75px;
 }
-ol.subtitles li .timing a {
+ol.subtitles li .timing a, ol.subtitles li .field a {
   color: #7692a3;
   text-decoration: none;
 }
-ol.subtitles li .timing .data {
+ol.subtitles li .timing .data, ol.subtitles li .field .data {
   display: none;
+}
+ol.subtitles li .field {
+  font-weight: bold;
 }
 ol.subtitles li .quiet {
   color: #a0b2bd;

@@ -1551,7 +1551,7 @@ ol.subtitles {
             background-color: $faintest;
         }
 
-        .timing {
+        .timing, .field {
             position: absolute;
             top: 1em; left: 1em;
             width: 75px;
@@ -1564,6 +1564,10 @@ ol.subtitles {
             .data {
                 display: none;
             }
+        }
+
+        .field {
+            font-weight: bold;
         }
 
         .quiet {
