@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -64,9 +64,9 @@ def send_new_message_notification(message_id):
         return
 
     if message.author:
-        subject = _(u"New message from %(author)s on Universal Subtitles: %(subject)s")
+        subject = _(u"New message from %(author)s on Amara: %(subject)s")
     else:
-        subject = _("New message on Universal Subtitles: %(subject)s")
+        subject = _("New message on Amara: %(subject)s")
     subject = subject % {
         'author': message.author,
         'subject': message.subject
@@ -109,7 +109,7 @@ def team_invitation_sent(invite_pk):
         'custom_message': team_default_message,
         'url_base': get_url_base(),
     }
-    title = ugettext(u"You've been invited to team %s on Universal Subtitles" % invite.team.name)
+    title = ugettext(u"You've been invited to team %s on Amara" % invite.team.name)
     
     if invite.user.notify_by_message:
         body = render_to_string("messages/team-you-have-been-invited.txt", context)
@@ -337,7 +337,7 @@ def team_task_assigned(task_pk):
     except Task.DoesNotExist:
         return False
     task_type = Task.TYPE_NAMES[task.type]
-    subject = ugettext(u"You have a new task assignment on Universal Subtitles!")
+    subject = ugettext(u"You have a new task assignment on Amara!")
     user = task.assignee
     task_language = None
     if task.language:
@@ -608,8 +608,11 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
     else:
         language_url = None
     if version:
-        version_url = universal_url("videos:revision", kwargs={
-            "pk": version.pk,
+        version_url = universal_url("videos:subtitleversion_detail", kwargs={
+            'video': version.video.video_id,
+            'lang': version.language.language,
+            'lang_id': version.language.pk,
+            'version_id': version.pk,
         })
     else:
         version_url = None

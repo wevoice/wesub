@@ -1,6 +1,6 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -102,7 +102,7 @@ unisubs.subtitle.SharePanel.prototype.focusEmbed_ = function() {
 };
 
 unisubs.subtitle.SharePanel.EMAIL_TEXT =
-    "I just added subtitles to this video using the Universal Subtitles alpha.\n\n" +
+    "I just added subtitles to this video using the Amara alpha.\n\n" +
     "It's still experimental and just for testing, but if you'd like to " +
     "check it out or try it yourself, here's the link: LINK";
 

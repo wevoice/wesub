@@ -1,6 +1,11 @@
-===========================
-Running Universal Subtitles
-===========================
+Running Amara
+=============
+
+You have two options when running Amara.  Install it directly on your machine,
+or inside a Vagrant virtual machine.
+
+Directly
+--------
 
 To run the development version:
 
@@ -27,7 +32,7 @@ To run the development version:
    $ mkvirtualenv unisubs
    $ workon unisubs
 
-5. run::
+5. Run::
 
     $ easy_install -U setuptools
     $ easy_install pip
@@ -107,7 +112,7 @@ To run the development version:
 Using vagrant
 -------------
 
-Universal Subtitles uses `Vagrant <http://vagrantup.com/>`_ to make it easy to
+Amara uses `Vagrant <http://vagrantup.com/>`_ to make it easy to
 get started.  If you've never used Vagrant before we highly recommend going
 through its `quick start guide
 <http://vagrantup.com/docs/getting-started/index.html>`_ to learn how it works.

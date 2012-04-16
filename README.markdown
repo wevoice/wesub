@@ -1,14 +1,17 @@
-This repository is the code for the [Universal Subtitles][] project.
+Amara
+=====
+
+This repository is the source code for the [Amara][] project.
 
 The full documentation can be found at
-<http://dev.universalsubtitles.org/site-docs/>.
+http://amara.readthedocs.org/en/latest/index.html
 
-[Universal Subtitles]: http://universalsubtitles.org
+[Amara]: http://universalsubtitles.org
 
 Quick Start
 -----------
 
-Universal Subtitles uses [Vagrant][] to make it easy to get started.  If you've
+Amara uses [Vagrant][] to make it easy to get started.  If you've
 never used Vagrant before we highly recommend going through its [quick start
 guide][vagrant-guide] to learn how it works.
 

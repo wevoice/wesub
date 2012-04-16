@@ -2846,3 +2846,9 @@ div.unisubs-transcript span {
     cursor: pointer;
     width: 113px !important;
 }
+.unisubs-needs-sync p {
+    color: #DA605D !important;
+}
+.unisubs-needs-sync .unisubs-spanarrow {
+    left: 171px !important;
+}

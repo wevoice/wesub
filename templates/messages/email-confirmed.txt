@@ -1,5 +1,5 @@
 Hi {{ user }},
 
-Thanks for verifying your email address. Your Universal Subtitles account is now fully activated!
+Thanks for verifying your email address. Your Amara account is now fully activated!
 
 Happy subtitling!

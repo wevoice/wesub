@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -209,29 +209,33 @@ class Video(models.Model):
 
         return self._video_views_statistic
 
-    def title_display(self):
-        if self.title:
-            return self.title
+    def title_display(self, truncate=True):
+        v = self.latest_version()
 
-        try:
-            url = self.videourl_set.all()[:1].get().url
-            if not url:
-                return 'No title'
-        except models.ObjectDoesNotExist:
-            return 'No title'
-
-        url = url.strip('/')
-
-        if url.startswith('http://'):
-            url = url[7:]
-
-        parts = url.split('/')
-        if len(parts) > 1:
-            title = '%s/.../%s' % (parts[0], parts[-1])
+        if v and v.title and v.title.strip():
+            title = v.title
+        elif self.title and self.title.strip():
+            title = self.title
         else:
-            title = url
+            try:
+                url = self.videourl_set.all()[:1].get().url
+                if not url:
+                    return 'No title'
+            except models.ObjectDoesNotExist:
+                return 'No title'
 
-        if title > 35:
+            url = url.strip('/')
+
+            if url.startswith('http://'):
+                url = url[7:]
+
+            parts = url.split('/')
+            if len(parts) > 1:
+                title = '%s/.../%s' % (parts[0], parts[-1])
+            else:
+                title = url
+
+        if truncate and len(title) > 35:
             title = title[:35] + '...'
 
         return title
@@ -365,16 +369,25 @@ class Video(models.Model):
 
     get_absolute_url = _get_absolute_url
 
+    def get_primary_videourl_obj(self):
+        """Return the primary video URL for this video if one exists, otherwise None.
+
+        This will return a VideoUrl object.
+
+        """
+        try:
+            return self.videourl_set.filter(primary=True).all()[:1].get()
+        except models.ObjectDoesNotExist:
+            return None
+            
     def get_video_url(self):
         """Return the primary video URL for this video if one exists, otherwise None.
 
         This will return a string of an actual URL, not a VideoUrl.
 
         """
-        try:
-            return self.videourl_set.filter(primary=True).all()[:1].get().effective_url
-        except models.ObjectDoesNotExist:
-            pass
+        vurl = self.get_primary_videourl_obj()
+        return vurl.effective_url if vurl else None
 
     @classmethod
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
@@ -694,6 +707,29 @@ class Video(models.Model):
         return self._cached_policy
 
 
+    def get_title_display(self):
+        """Return a suitable title to display to a user for this video.
+
+        This will use the most specific title if it's present, but if it's blank
+        it will fall back to the less-specific-but-at-least-it-exists video
+        title instead.
+
+        """
+        l = self.subtitle_language()
+        return l.get_title_display() if l else self.title
+
+    def get_description_display(self):
+        """Return a suitable description to display to a user for this video.
+
+        This will use the most specific description if it's present, but if it's
+        blank it will fall back to the less-specific-but-at-least-it-exists
+        video description instead.
+
+        """
+        l = self.subtitle_language()
+        return l.get_description_display() if l else self.description
+
+
     @property
     def is_moderated(self):
         return bool(self.moderated_by_id)
@@ -825,14 +861,10 @@ class SubtitleLanguage(models.Model):
     created = models.DateTimeField()
     subtitles_fetched_count = models.IntegerField(default=0, editable=False)
     followers = models.ManyToManyField(User, blank=True, related_name='followed_languages', editable=False)
-    title = models.CharField(max_length=2048, blank=True)
     percent_done = models.IntegerField(default=0, editable=False)
     standard_language = models.ForeignKey('self', null=True, blank=True, editable=False)
 
     subtitles_fetched_counter = RedisSimpleField()
-
-    description = models.TextField(blank=True, null=True)
-
 
     class Meta:
         unique_together = (('video', 'language', 'standard_language'),)
@@ -840,46 +872,56 @@ class SubtitleLanguage(models.Model):
     def __unicode__(self):
         return self.language_display()
 
+
     def nonblank_subtitle_count(self, public_only=False):
         return len([s for s in self.latest_subtitles(public_only=public_only)
                     if s.text.strip()])
 
+
+    def get_title(self, public_only=True):
+        """Return the title for this language.
+
+        Tries to use the following (in order):
+
+        * The latest version's title.
+        * The video's title.
+
+        """
+        v = self.latest_version(public_only=public_only)
+        return v.title if v else self.video.title
+
     def get_title_display(self):
+        """Return a suitable title to display to a user for this language.
+
+        This will use the most specific title if it's present, but if it's blank
+        it will fall back to the less-specific-but-at-least-it-exists video
+        title instead.
+
+        """
         return self.get_title() or self.video.title
 
-    def get_title(self):
-        """
-        Tries to get the tile, cascading through:
-           - The language's title
-           - The original language's title (in case it's a translation)
-           - The video's title as a fallback
-        """
-        if self.title:
-            return self.title
-        # some data in production has ciclyc dependencies for this, e.g
-        # lang.a.standard_language = b
-        # b.standard_language =a
-        # not sure how this got here, but it has to be fixed and worked around
-        elif self.standard_language and self.standard_language.standard_language != self:
-            return self.standard_language.get_title()
-        return self.video.title
+    def get_description(self, public_only=True):
+        """Return the description for this language.
 
-    def get_description(self):
+        Tries to use the following (in order):
+
+        * The latest version's description.
+        * The video's description.
+
         """
-        Tries to get the tile, cascading through:
-           - The language's description
-           - The original language's description (in case it's a translation)
-           - The video's description as a fallback
+        v = self.latest_version(public_only=public_only)
+        return v.description if v else self.video.description
+
+    def get_description_display(self):
+        """Return a suitable description to display to a user for this language.
+
+        This will use the most specific description if it's present, but if it's
+        blank it will fall back to the less-specific-but-at-least-it-exists
+        video description instead.
+
         """
-        if self.description:
-            return self.description
-        # some data in production has ciclyc dependencies for this, e.g
-        # lang.a.standard_language = b
-        # b.standard_language =a
-        # not sure how this got here, but it has to be fixed and worked around
-        elif self.standard_language and self.standard_language.standard_language != self:
-            return self.standard_language.get_description()
-        return self.video.description
+        return self.get_description() or self.video.description
+
 
     def is_dependent(self):
         """
@@ -987,7 +1029,7 @@ class SubtitleLanguage(models.Model):
         if version_no is None:
             return self.latest_version(public_only)
         try:
-            return self._filter_public( self.subtitleversion_set.filter(version_no=version_no), public_only)[0]
+            return self._filter_public(self.subtitleversion_set.filter(version_no=version_no), public_only)[0]
         except (models.ObjectDoesNotExist, IndexError):
             pass
 
@@ -1247,12 +1289,15 @@ class SubtitleVersion(SubtitleCollection):
     result_of_rollback = models.BooleanField(default=False)
     forked_from = models.ForeignKey("self", blank=True, null=True)
 
-    objects = SubtitleVersionManager()
+    title = models.CharField(max_length=2048, blank=True)
+    description = models.TextField(blank=True, null=True)
 
+    objects = SubtitleVersionManager()
 
     class Meta:
         ordering = ['-version_no']
         unique_together = (('language', 'version_no'),)
+
 
     def __unicode__(self):
         return u'%s #%s' % (self.language, self.version_no)
@@ -1288,7 +1333,9 @@ class SubtitleVersion(SubtitleCollection):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('videos:revision', [self.pk])
+        return ('videos:subtitleversion_detail',
+                [self.video.video_id, self.language.language, self.language.pk,
+                 self.pk])
 
     def is_dependent(self):
         return not self.language.is_original and not self.is_forked
@@ -1377,10 +1424,10 @@ class SubtitleVersion(SubtitleCollection):
 
         last_version = self.language.latest_version(public_only=False)
         new_version_no = last_version.version_no + 1
-        new_version = cls(language=lang, version_no=new_version_no, \
-                              datetime_started=datetime.now(), user=user, note=note,
-                          is_forked=self.is_forked,
-                          result_of_rollback=True)
+        new_version = cls(language=lang, version_no=new_version_no,
+                          datetime_started=datetime.now(), user=user, note=note,
+                          is_forked=self.is_forked, result_of_rollback=True,
+                          title=self.title, description=self.description)
         new_version.save()
 
         for item in self.subtitle_set.all():
@@ -1491,7 +1538,6 @@ class SubtitleVersion(SubtitleCollection):
     def set_approved_by(self, user):
         """Set the User that approved this version."""
         self._set_metadata('approved_by', user.pk)
-
 
 
 def update_followers(sender, instance, created, **kwargs):
@@ -1637,7 +1683,7 @@ class Subtitle(models.Model):
 
     def duplicate_for(self, version=None):
         return Subtitle(version=version,
-                        start_of_paragraph = self.start_of_paragraph,
+                        start_of_paragraph=self.start_of_paragraph,
                         subtitle_id=self.subtitle_id,
                         subtitle_order=self.subtitle_order,
                         subtitle_text=self.subtitle_text,
@@ -1672,10 +1718,14 @@ class Subtitle(models.Model):
                 self.end_time = caption_dict['end_time']
 
     def save(self, *args, **kwargs):
-        if not self.is_synced:
-            self.start_time = self.end_time = None
-        elif not is_synced_value(self.end_time):
+        # Normalize start_time and end_time to None (separately) if either is
+        # not a valid time.
+        if not is_synced_value(self.start_time):
+            self.start_time = None
+
+        if not is_synced_value(self.end_time):
             self.end_time = None
+
         return super(Subtitle, self).save(*args, **kwargs)
 
     def __unicode__(self):

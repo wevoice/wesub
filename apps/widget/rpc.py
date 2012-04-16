@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -525,18 +525,39 @@ class Rpc(BaseRpc):
                     subtitle_order=s['sub_order'],
                     start_of_paragraph=s.get('start_of_paragraph', False))
 
-    def _get_new_version_for_save(self, subtitles, language, session, user, forked):
+    def _copy_subtitles(self, source_version, dest_version):
+        """Copy the Subtitle objects from one version to another, unchanged.
+
+        Used when the title or description of some subs is changed but the
+        actual subtitles remain the same.
+
+        """
+        for s in source_version.subtitle_set.all():
+            s.duplicate_for(dest_version).save()
+
+    def _get_new_version_for_save(self, subtitles, language, session, user, forked, new_title, new_description):
         """Return a new subtitle version for this save, or None if not needed."""
 
         new_version = None
+        previous_version = language.latest_version(public_only=False)
+
+        title_changed = (previous_version
+                         and new_title is not None
+                         and new_title != previous_version.title)
+        desc_changed = (previous_version
+                        and new_description is not None
+                        and new_description != previous_version.description)
+        subtitles_changed = (
+            subtitles is not None
+            and (len(subtitles) > 0 or previous_version is not None)
+        )
 
         should_create_new_version = (
-            subtitles is not None
-            and (len(subtitles) > 0
-                 or language.latest_version(public_only=False) is not None))
+            subtitles_changed or title_changed or desc_changed)
 
         if should_create_new_version:
-            new_version = self._create_version_from_session(session, user, forked)
+            new_version = self._create_version_from_session(
+                session, user, forked, new_title, new_description)
             new_version.save()
 
             if hasattr(new_version, 'task_to_save'):
@@ -548,12 +569,15 @@ class Rpc(BaseRpc):
 
                 task.save()
 
-            self._save_subtitles(
-                new_version.subtitle_set, subtitles, new_version.is_forked)
+            if subtitles_changed:
+                self._save_subtitles(
+                    new_version.subtitle_set, subtitles, new_version.is_forked)
+            else:
+                self._copy_subtitles(previous_version, new_version)
 
         return new_version
 
-    def _update_language_attributes_for_save(self, language, completed, new_title, new_description):
+    def _update_language_attributes_for_save(self, language, completed):
         """Update the attributes of the language as necessary and save it.
 
         Will also send the appropriate API notification if needed.
@@ -565,18 +589,6 @@ class Rpc(BaseRpc):
             if language.is_complete != completed:
                 must_trigger_api_language_edited = True
             language.is_complete = completed
-
-        if new_title is not None:
-            language.title = new_title
-            if language.is_original:
-                language.video.title = language.title
-            must_trigger_api_language_edited = True
-
-        if new_description is not None:
-            language.description = new_description
-            if language.is_original:
-                language.video.description = language.description
-            must_trigger_api_language_edited = True
 
         language.save()
 
@@ -593,12 +605,12 @@ class Rpc(BaseRpc):
         language = session.language
 
         new_version = self._get_new_version_for_save(
-            subtitles, language, session, user, forked)
+            subtitles, language, session, user, forked, new_title,
+            new_description)
 
         language.release_writelock()
 
-        self._update_language_attributes_for_save(
-            language, completed, new_title, new_description)
+        self._update_language_attributes_for_save(language, completed)
 
         if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)
@@ -732,7 +744,7 @@ class Rpc(BaseRpc):
 
         return UNMODERATED, None
 
-    def _create_version_from_session(self, session, user=None, forked=False):
+    def _create_version_from_session(self, session, user=None, forked=False, new_title=None, new_description=None):
         latest_version = session.language.version(public_only=False)
         forked_from = (forked and latest_version) or None
 
@@ -749,6 +761,20 @@ class Rpc(BaseRpc):
 
         if user is not None:
             kwargs['user'] = user
+
+        if new_title is not None:
+            kwargs['title'] = new_title
+        elif latest_version:
+            kwargs['title'] = latest_version.title
+        else:
+            kwargs['title'] = session.language.video.title
+
+        if new_description is not None:
+            kwargs['description'] = new_description
+        elif latest_version:
+            kwargs['description'] = latest_version.description
+        else:
+            kwargs['description'] = session.language.video.description
 
         version = models.SubtitleVersion(**kwargs)
 
@@ -998,8 +1024,8 @@ class Rpc(BaseRpc):
             is_latest,
             version.is_forked or force_forked,
             base_language,
-            language.get_title(),
-            language.get_description()
+            language.get_title(public_only=False),
+            language.get_description(public_only=False)
         )
 
 

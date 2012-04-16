@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -124,8 +124,10 @@ class BaseNotification(object):
         h = Http()
         if basic_auth_username and basic_auth_password:
             h.add_credentials(basic_auth_username, basic_auth_password)
+            
+        project = self.video.get_team_video().project.slug
         data = dict(event=self.event_name, api_url=self.api_url,
-                    video_id=self.video_id, team=self.team.slug)
+                    video_id=self.video_id, team=self.team.slug, project=project)
         if self.language_code:
             data.update({"language_code":self.language_code} )
         data = urlencode(data)

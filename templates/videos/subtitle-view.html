@@ -25,14 +25,16 @@
             window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
             window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
         {% endif %}
+        window.IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
+        window.ROLLBACK_ALLOWED = '{{ rollback_allowed }}' == 'True';
     </script>
 {% endblock %}
 
 {% block title %}
     {% if language.is_original %}
-        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
+        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
     {% else %}
-        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
+        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
     {% endif %}
 {% endblock %}
 
@@ -47,7 +49,7 @@
         <meta property="og:image" content="{{ STATIC_URL }}images/small_logo.png" />
     {% endif %}
 
-    <meta property="og:site_name" content="Universal Subtitles"/>
+    <meta property="og:site_name" content="Amara"/>
     <meta property="og:description" content="{% title_for_video video language %}"/>
 {% endblock  %}
 
@@ -65,11 +67,7 @@
         <h2 class="main-title">
             <a href="{{ video.get_absolute_url }}" title="View video">
                 ←
-                {% if language.title %}
-                    {{ language.title }}
-                {% else %}
-                    {{ video }}
-                {% endif %}
+                {{ language.get_title_display }}
             </a>
         </h2>
         {% widget widget_params %}
@@ -197,6 +195,17 @@
                             <strong>{{ last_version.user }}</strong>
                         </a>.
                     </p>
+
+                    <p>
+                        <strong>{% trans "Title:" %}</strong>
+                        {{ last_version.title }}
+                    </p>
+
+                    <p>
+                        <strong>{% trans "Description:" %}</strong>
+                        {{ last_version.description|urlize|linebreaks }}
+                    </p>
+
                     <ol class="subtitles">
                         {% for item in last_version.ordered_subtitles %}
                         <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
@@ -281,7 +290,7 @@
                         <li>
                             <h3>
                                 <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
-                                <a href="{% url videos:revision pk=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang=item.language.language,lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
                                 {% if item.moderation_status == 'waiting_moderation' %}
                                     (draft)
                                 {% endif %}
@@ -304,6 +313,14 @@
             {% endif %}
         </div>
     </div>
+
+    {% if next_version and rollback_allowed %}
+        <div class="tools">
+            <a href="{% url videos:rollback last_version.pk %}" class="button" id="rollback">
+                {% trans 'Roll back to this version' %}
+            </a>
+        </div>
+    {% endif %}
 
     {% if request.user|can_unpublish:video %}
         {% with video.get_team_video as team_video %}

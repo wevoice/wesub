@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -376,8 +376,9 @@ def legacy_history(request ,video, lang=None):
             'lang': language.language,
             }))
 
+
 @get_video_from_code
-def history(request, video, lang=None, lang_id=None):
+def history(request, video, lang=None, lang_id=None, version_id=None):
     if not lang:
         return HttpResponseRedirect(video.get_absolute_url(video_id=video._video_id_used))
     elif lang == 'unknown':
@@ -433,10 +434,26 @@ def history(request, video, lang=None, lang_id=None):
     context['task'] =  _get_related_task(request)
     _add_share_panel_context_for_history(context, video, language)
 
-    context['revision_list'] = restrict_versions(qs, request.user, language)
-    context['last_version'] = context['revision_list'][0] if context['revision_list'] else None
+    versions = restrict_versions(qs, request.user, language)
+    context['revision_list'] = versions
+
+    if versions:
+        if version_id:
+            try:
+                version = [v for v in versions if v.id == int(version_id)][0]
+            except IndexError:
+                raise Http404
+        else:
+            version = versions[0]
+    else:
+        version = None
+
+    context['rollback_allowed'] = version and not version.video.is_moderated
+    context['last_version'] = version
+    context['next_version'] = version.next_version() if version else None
 
     return render_to_response("videos/subtitle-view.html", context, context_instance=RequestContext(request))
+
 
 def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):
     primary_url = video_url or video.get_video_url()
@@ -456,26 +473,6 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
         params['video_config'] = {"width":size[0], "height":size[1]}
 
     return base_widget_params(request, params)
-
-@get_video_revision
-def revision(request,  version):
-
-    context = widget.add_onsite_js_files({})
-    context['video'] = version.video
-    context['version'] = version
-    context['next_version'] = version.next_version()
-    context['prev_version'] = version.prev_version()
-    language = version.language
-    context['language'] = language
-
-    context["user_can_moderate"] = False
-    context['widget_params'] = _widget_params(request, \
-            language.video, version.version_no, language, size=(289,173))
-    context['latest_version'] = language.latest_version()
-    version.ordered_subtitles()
-    context['rollback_allowed'] = not version.video.is_moderated
-    return render_to_response('videos/revision.html', context,
-                              context_instance=RequestContext(request))
 
 @login_required
 @get_video_revision
