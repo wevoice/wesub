@@ -155,6 +155,36 @@ var Site = function(Site) {
                     e.preventDefault();
                 });
             });
+        },
+        truncateTextBlocks: function(blocks, maxHeight) {
+            // Takes a list of jQuery objects and sets up
+            // a nice truncate-by-height UI.
+            blocks.each(function() {
+                var $block = $(this);
+
+                if ($block.height() > maxHeight) {
+                    $block.addClass('truncated');
+                    $block.height(maxHeight);
+
+                    $block.after('<a href="#" class="truncated-expand">Expand</a>');
+
+                    var $anc = $('a.truncated-expand', $block.parent());
+                    $anc.click(function() {
+
+                        if ($block.height() !== maxHeight) {
+                            $block.height(maxHeight);
+                            $anc.text('Expand');
+                            $anc.removeClass('expanded');
+                        } else {
+                            $block.height('auto');
+                            $anc.text('Collapse');
+                            $anc.addClass('expanded');
+                        }
+                        
+                        return false;
+                    });
+                }
+            });
         }
     };
     this.Views = {
@@ -453,6 +483,9 @@ var Site = function(Site) {
                     return false;
                 });
             }
+
+            // Truncate descriptions taller than 90px.
+            that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
             $('.add_subtitles').click(function() {
