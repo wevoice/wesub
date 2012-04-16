@@ -1551,7 +1551,10 @@ ol.subtitles li {
 ol.subtitles li:hover {
   background-color: #f3f6f8;
 }
-ol.subtitles li .timing {
+ol.subtitles li.description:hover, ol.subtitles li.title:hover {
+  background-color: inherit;
+}
+ol.subtitles li .timing, ol.subtitles li .field {
   position: absolute;
   top: 1em;
   left: 1em;
@@ -1882,6 +1885,37 @@ pre.dump code {
   -moz-box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
   -webkit-box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Truncate text */
+.truncated {
+  overflow: hidden;
+  position: relative;
+  z-index: 50;
+}
+
+a.truncated-expand {
+  background: #F3F6F8;
+  display: block;
+  margin-top: 10px;
+  padding: 8px 10px;
+  position: relative;
+  z-index: 51;
+  -moz-box-shadow: -6px -23px 17px white;
+  -webkit-box-shadow: -6px -23px 17px white;
+  box-shadow: -6px -23px 17px white;
+  -moz-background-clip: padding-box;
+  -moz-border-radius: 5px;
+  -webkit-background-clip: padding-box;
+  -webkit-border-radius: 5px;
+  background-clip: padding-box;
+  border-radius: 5px;
+}
+a.truncated-expand.expanded {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
 }
 
 /* Crazytown */

@@ -205,6 +205,16 @@
                     </p>
 
                     <ol class="subtitles">
+                        <li class="title">
+                            <div class="field">{% trans "Title:" %}</div>
+                            {{ last_version.title }}
+                        </li>
+                        <li class="description">
+                            <div class="field">{% trans "Description:" %}</div>
+                            <div class="description">
+                                {{ last_version.description|urlize|linebreaks }}
+                            </div>
+                        </li>
                         {% for item in last_version.ordered_subtitles %}
                         <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
                             {% if item.display_time %}
