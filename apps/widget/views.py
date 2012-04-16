@@ -279,15 +279,18 @@ def download_subtitles(request, handler=SSASubtitles):
         except ObjectDoesNotExist:
             raise Http404
 
-    # Non-team videos don't require moderation
     team_video = video.get_team_video()
-    # Members can see all versions
-    member = get_member(request.user, team_video.team)
 
-    if team_video and member:
+    if not team_video:
+        # Non-team videos don't require moderation
         version = language and language.version(public_only=False)
     else:
-        version = language and language.version()
+        # Members can see all versions
+        member = get_member(request.user, team_video.team)
+        if member:
+            version = language and language.version(public_only=False)
+        else:
+            version = language and language.version()
 
     if not version:
         raise Http404
