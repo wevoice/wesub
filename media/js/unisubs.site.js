@@ -742,6 +742,10 @@ var Site = function(Site) {
         // Profile
         profile_dashboard: function() {
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
+            $('a.action-decline').click(function() {
+                $(this).siblings('form').submit();
+                return false;
+            });
         },
 
         // Messages
