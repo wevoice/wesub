@@ -19,6 +19,7 @@ Contents:
    permissions
    i18n
    api
+   teams-callbacks
 
 
 Indices and tables
