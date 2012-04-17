@@ -484,7 +484,6 @@ var Site = function(Site) {
                 });
             }
 
-            // Truncate descriptions taller than 90px.
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
@@ -534,6 +533,9 @@ var Site = function(Site) {
 
             $('.tabs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
+        },
+        diffing: function() {
+            that.Utils.truncateTextBlocks($('div.description'), 90);
         },
 
         // Teams

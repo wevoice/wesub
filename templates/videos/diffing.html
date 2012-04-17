@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block body_attrs %}id="video"{% endblock %}
+{% block html_attrs %}id="diffing"{% endblock %}
 
 {% load widget i18n media_compressor doorman %}
 
@@ -139,7 +141,9 @@
             </p>
             <p {% if first_version.description != second_version.description %}class="changed"{% endif %}>
                 <strong>{% trans "Description:" %}</strong>
-                {{ second_version.description|urlize|linebreaks }}
+                <div class="description">
+                    {{ second_version.description|urlize|linebreaks }}
+                </div>
             </p>
         </div>
 
@@ -206,7 +210,9 @@
              </p>
              <p {% if first_version.description != second_version.description %}class="changed"{% endif %}>
                  <strong>{% trans "Description:" %}</strong>
-                 {{ first_version.description|urlize|linebreaks }}
+                 <div class="description">
+                     {{ first_version.description|urlize|linebreaks }}
+                 </div>
              </p>
          </div>
 
