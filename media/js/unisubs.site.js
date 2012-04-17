@@ -484,7 +484,6 @@ var Site = function(Site) {
                 });
             }
 
-            // Truncate descriptions taller than 90px.
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
@@ -534,6 +533,9 @@ var Site = function(Site) {
 
             $('.tabs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
+        },
+        diffing: function() {
+            that.Utils.truncateTextBlocks($('div.description'), 90);
         },
 
         // Teams
@@ -740,6 +742,10 @@ var Site = function(Site) {
         // Profile
         profile_dashboard: function() {
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
+            $('a.action-decline').click(function() {
+                $(this).siblings('form').submit();
+                return false;
+            });
         },
 
         // Messages

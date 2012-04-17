@@ -1,6 +1,6 @@
 {% extends "profiles/base.html" %}
 
-{% load to_json i18n messages_tags media_compressor recent_activity auth_tags profiles_tags teams_tags videos_tags %}
+{% load to_json i18n messages_tags media_compressor recent_activity auth_tags profiles_tags teams_tags query_string videos_tags %}
 
 {% block css %}
     {{ block.super }}
@@ -61,8 +61,19 @@
                             {% endif %}
 
                             <br />{% include "teams/_perform_task_link.html" %}
-
                         </p>
+                        {% with can_decline=task|can_decline_task:user %}
+                            {% if can_decline %}
+                                <a href="#" class="action-decline">{% trans 'Decline Task' %}</a>
+                                <form class="hidden" action="{% url teams:assign_task slug=task.team.slug %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
+                                    <input type="hidden" name="task" value="{{ task.id }}" />
+                                    <input type="hidden" name="assignee" value="" />
+                                    <input type="submit" class="submit" value="Decline Task" name="" />
+                                </form>
+                            {% endif %}
+                        {% endwith %}
                     </li>
                 {% endfor %}
             </ul>

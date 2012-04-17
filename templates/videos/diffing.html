@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block body_attrs %}id="video"{% endblock %}
+{% block html_attrs %}id="diffing"{% endblock %}
 
 {% load widget i18n media_compressor doorman %}
 
@@ -133,14 +135,16 @@
         </div>
 
         <div class="meta">
-            <p {% if first_version.title != second_version.title %}class="changed"{% endif %}>
+            <div {% if first_version.title != second_version.title %}class="changed"{% endif %}>
                 <strong>{% trans "Title:" %}</strong>
                 {{ second_version.title }}
-            </p>
-            <p {% if first_version.description != second_version.description %}class="changed"{% endif %}>
+            </div>
+            <div {% if first_version.description != second_version.description %}class="changed"{% endif %}>
                 <strong>{% trans "Description:" %}</strong>
-                {{ second_version.description|urlize|linebreaks }}
-            </p>
+                <div class="description">
+                    {{ second_version.description|urlize|linebreaks }}
+                </div>
+            </div>
         </div>
 
         <table cellpadding="0" cellspacing="0">
@@ -200,14 +204,16 @@
          </div>
 
          <div class="meta">
-             <p {% if first_version.title != second_version.title %}class="changed"{% endif %}>
+             <div {% if first_version.title != second_version.title %}class="changed"{% endif %}>
                  <strong>{% trans "Title:" %}</strong>
                  {{ first_version.title }}
-             </p>
-             <p {% if first_version.description != second_version.description %}class="changed"{% endif %}>
+             </div>
+             <div {% if first_version.description != second_version.description %}class="changed"{% endif %}>
                  <strong>{% trans "Description:" %}</strong>
-                 {{ first_version.description|urlize|linebreaks }}
-             </p>
+                 <div class="description">
+                     {{ first_version.description|urlize|linebreaks }}
+                 </div>
+             </div>
          </div>
 
         <table cellpadding="0" cellspacing="0">

@@ -47,5 +47,5 @@ def send_error_report(date=None):
         return 
     data = errorreport._error_report_data(date)
     message = render_to_string("internal/error-report.txt", data)
-    subject = date.strftime("Errors for universal subtitles for %Y/%M/%d")
+    subject = date.strftime("Errors for Amara for %Y/%M/%d")
     send_mail(subject, message, "unisubs error bot", recipients)
