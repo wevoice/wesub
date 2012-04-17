@@ -1061,12 +1061,13 @@ class SubtitleLanguage(models.Model):
     def translations(self):
         return SubtitleLanguage.objects.filter(video=self.video, is_original=False, is_forked=False)
 
-    def fork(self, from_version=None, user=None, result_of_rollback=False, attach_to_language=None):
+    def fork(self, from_version=None, user=None, result_of_rollback=False,
+             attach_to_language=None, bypass_writelock=False):
         """
-        If this a dependent and non write locked language,
-        then will fork it, making all it's subs timing not
-        depend on anything else.
-        If locked, will throw an AlreadyEditingException .
+        If this a dependent language, fork it, making all it's subs
+        timing not depend on the original source.
+        If locked, will throw an AlreadyEditingException
+        unless you pass bypass_writelock.
         If attach_to_language is passed, we will copy those
         subs to a new language, else self will be used
         """
@@ -1078,7 +1079,7 @@ class SubtitleLanguage(models.Model):
                 return
             original_subs = self.standard_language.latest_version().subtitle_set.all()
 
-        if self.is_writelocked:
+        if self.is_writelocked and not bypass_writelock:
             raise AlreadyEditingException(_("Sorry, you cannot upload subtitles right now because someone is editing the language you are uploading or a translation of it"))
         try:
             old_version = self.subtitleversion_set.all()[:1].get()
