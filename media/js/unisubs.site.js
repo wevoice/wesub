@@ -1,19 +1,19 @@
 // Amara, universalsubtitles.org
-// 
+//
 // Copyright (C) 2012 Participatory Culture Foundation
-// 
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see 
+// along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 var Site = function(Site) {
@@ -50,7 +50,7 @@ var Site = function(Site) {
          * utility function in this object and
          * called from each of the specific views,
          * like this:
-         *     
+         *
          *     that.Utils.chosenify();
          *
          */
@@ -155,6 +155,36 @@ var Site = function(Site) {
                     e.preventDefault();
                 });
             });
+        },
+        truncateTextBlocks: function(blocks, maxHeight) {
+            // Takes a list of jQuery objects and sets up
+            // a nice truncate-by-height UI.
+            blocks.each(function() {
+                var $block = $(this);
+
+                if ($block.height() > maxHeight) {
+                    $block.addClass('truncated');
+                    $block.height(maxHeight);
+
+                    $block.after('<a href="#" class="truncated-expand">Expand</a>');
+
+                    var $anc = $('a.truncated-expand', $block.parent());
+                    $anc.click(function() {
+
+                        if ($block.height() !== maxHeight) {
+                            $block.height(maxHeight);
+                            $anc.text('Expand');
+                            $anc.removeClass('expanded');
+                        } else {
+                            $block.height('auto');
+                            $anc.text('Collapse');
+                            $anc.addClass('expanded');
+                        }
+                        
+                        return false;
+                    });
+                }
+            });
         }
     };
     this.Views = {
@@ -230,7 +260,7 @@ var Site = function(Site) {
                     closeModal($(this).parents('.modal'));
                     return false;
                 });
-                function closeModal(e) { 
+                function closeModal(e) {
                     e.hide();
                     $('body div.well').remove();
                     $('html').unbind('click.modal');
@@ -239,7 +269,7 @@ var Site = function(Site) {
             $.fn.tabs = function(options){
                 this.each(function(){
                     var $this = $(this);
-                    
+
                     var $last_active_tab = $($('li.current a', $this).attr('href'));
                     $('a', $this).add($('a.link_to_tab')).click(function(){
                         var href = $(this).attr('href');
@@ -249,7 +279,7 @@ var Site = function(Site) {
                         $('a[href='+href+']', $this).parent('li').addClass('current');
                         document.location.hash = href.split('-')[0];
                         return false;
-                    });            
+                    });
                 });
                 if (document.location.hash){
                     var tab_name = document.location.hash.split('-', 1);
@@ -258,7 +288,7 @@ var Site = function(Site) {
                         document.location.href = document.location.href;
                     }
                 }
-                return this;        
+                return this;
             };
             function addCSRFHeader($){
                 /* Django will guard against csrf even on XHR requests, so we need to read
@@ -441,6 +471,20 @@ var Site = function(Site) {
                     videoSource, null, null);
                 opener.showStartDialog();
             }
+            if (window.IS_AUTHENTICATED && window.ROLLBACK_ALLOWED) {
+                $('#rollback').click(function() {
+                    if (!confirm('Subtitles will be rolled back to a previous version')){
+                        return false;
+                    }
+                });
+            } else {
+                $('#rollback, .new_edit').click(function() {
+                    alert('You need to log in to do that.');
+                    return false;
+                });
+            }
+
+            that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
             $('.add_subtitles').click(function() {
@@ -489,6 +533,9 @@ var Site = function(Site) {
 
             $('.tabs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
+        },
+        diffing: function() {
+            that.Utils.truncateTextBlocks($('div.description'), 90);
         },
 
         // Teams
@@ -635,7 +682,7 @@ var Site = function(Site) {
         },
         team_settings_permissions: function() {
             $workflow = $('#id_workflow_enabled');
-            
+
             // Fields to watch
             $subperm = $('#id_subtitle_policy');
             $transperm = $('#id_translate_policy');

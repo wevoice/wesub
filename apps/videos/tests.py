@@ -1049,10 +1049,6 @@ class ViewsTest(WebUseTest):
         self._simple_test('videos:translation_history',
             [self.video.video_id, sl.language, sl.id])
 
-    def test_revision(self):
-        version = self.video.version()
-        self._simple_test('videos:revision', [version.id])
-
     def _test_rollback(self):
         #TODO: Seems like roll back is not getting called (on models)
         self._login()

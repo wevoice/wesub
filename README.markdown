@@ -1,7 +1,10 @@
-This repository is the code for the [Amara][] project.
+Amara
+=====
+
+This repository is the source code for the [Amara][] project.
 
 The full documentation can be found at
-<http://dev.universalsubtitles.org/site-docs/>.
+http://amara.readthedocs.org/en/latest/index.html
 
 [Amara]: http://universalsubtitles.org
 

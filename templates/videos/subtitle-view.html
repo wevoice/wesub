@@ -25,6 +25,8 @@
             window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
             window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
         {% endif %}
+        window.IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
+        window.ROLLBACK_ALLOWED = '{{ rollback_allowed }}' == 'True';
     </script>
 {% endblock %}
 
@@ -194,17 +196,17 @@
                         </a>.
                     </p>
 
-                    <p>
-                        <strong>{% trans "Title:" %}</strong>
-                        {{ last_version.title }}
-                    </p>
-
-                    <p>
-                        <strong>{% trans "Description:" %}</strong>
-                        {{ last_version.description|urlize|linebreaks }}
-                    </p>
-
                     <ol class="subtitles">
+                        <li class="title">
+                            <div class="field">{% trans "Title:" %}</div>
+                            {{ last_version.title }}
+                        </li>
+                        <li class="description">
+                            <div class="field">{% trans "Description:" %}</div>
+                            <div class="description">
+                                {{ last_version.description|urlize|linebreaks }}
+                            </div>
+                        </li>
                         {% for item in last_version.ordered_subtitles %}
                         <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
                             {% if item.display_time %}
@@ -288,7 +290,7 @@
                         <li>
                             <h3>
                                 <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
-                                <a href="{% url videos:revision pk=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang=item.language.language,lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
                                 {% if item.moderation_status == 'waiting_moderation' %}
                                     (draft)
                                 {% endif %}
@@ -311,6 +313,14 @@
             {% endif %}
         </div>
     </div>
+
+    {% if next_version and rollback_allowed %}
+        <div class="tools">
+            <a href="{% url videos:rollback last_version.pk %}" class="button" id="rollback">
+                {% trans 'Roll back to this version' %}
+            </a>
+        </div>
+    {% endif %}
 
     {% if request.user|can_unpublish:video %}
         {% with video.get_team_video as team_video %}

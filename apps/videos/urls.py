@@ -45,7 +45,6 @@ urlpatterns = patterns(
     url(r'^demo/$', 'demo', name='demo'),
     url(r'^activities/(?P<video_id>(\w|-)+)/$', 'actions_list', name='actions_list'),
     url(r'^stop_notification/(?P<video_id>(\w|-)+)/$', 'stop_notification', name='stop_notification'),
-    url(r'^(?P<video_id>(\w|-)+/)?revision/(?P<pk>\d+)/$', 'revision', name='revision'),
     url(r'^(?P<video_id>(\w|-)+/)?rollback/(?P<pk>\d+)/$', 'rollback', name='rollback'),
     url(r'^(?P<video_id>(\w|-)+/)?diffing/(?P<pk>\d+)/(?P<second_pk>\d+)/$', 'diffing', name='diffing'),
     url(r'^test/$', 'test_form_page', name='test_form_page'),
@@ -59,6 +58,7 @@ urlpatterns = patterns(
     url(r'^(?P<video_id>(\w|-)+)/info/(?P<title>[^/]+)/$', 'video', name='video_with_title'),
     url(r'^(?P<video_id>(\w|-)+)/url/(?P<video_url>\d+)/$', 'video', name='video_url'),
     url(r'^(?P<video_id>(\w|-)+)/(?P<lang>[\w\-]+)/(?P<lang_id>[\d]+)/$', 'history', name='translation_history'),
+    url(r'^(?P<video_id>(\w|-)+)/(?P<lang>[\w\-]+)/(?P<lang_id>[\d]+)/(?P<version_id>[\d]+)/$', 'history', name='subtitleversion_detail'),
     url(r'^(?P<video_id>(\w|-)+)/(?P<lang>[\w\-]+)/$', 'legacy_history', name='translation_history_legacy'),
     url(r'(?P<video_id>(\w|-)+)/staff/delete/$', 'video_staff_delete', name='video_staff_delete'),
 )

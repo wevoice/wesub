@@ -1061,12 +1061,13 @@ class SubtitleLanguage(models.Model):
     def translations(self):
         return SubtitleLanguage.objects.filter(video=self.video, is_original=False, is_forked=False)
 
-    def fork(self, from_version=None, user=None, result_of_rollback=False, attach_to_language=None):
+    def fork(self, from_version=None, user=None, result_of_rollback=False,
+             attach_to_language=None, bypass_writelock=False):
         """
-        If this a dependent and non write locked language,
-        then will fork it, making all it's subs timing not
-        depend on anything else.
-        If locked, will throw an AlreadyEditingException .
+        If this a dependent language, fork it, making all it's subs
+        timing not depend on the original source.
+        If locked, will throw an AlreadyEditingException
+        unless you pass bypass_writelock.
         If attach_to_language is passed, we will copy those
         subs to a new language, else self will be used
         """
@@ -1078,7 +1079,7 @@ class SubtitleLanguage(models.Model):
                 return
             original_subs = self.standard_language.latest_version().subtitle_set.all()
 
-        if self.is_writelocked:
+        if self.is_writelocked and not bypass_writelock:
             raise AlreadyEditingException(_("Sorry, you cannot upload subtitles right now because someone is editing the language you are uploading or a translation of it"))
         try:
             old_version = self.subtitleversion_set.all()[:1].get()
@@ -1333,7 +1334,9 @@ class SubtitleVersion(SubtitleCollection):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('videos:revision', [self.pk])
+        return ('videos:subtitleversion_detail',
+                [self.video.video_id, self.language.language, self.language.pk,
+                 self.pk])
 
     def is_dependent(self):
         return not self.language.is_original and not self.is_forked
@@ -1422,10 +1425,10 @@ class SubtitleVersion(SubtitleCollection):
 
         last_version = self.language.latest_version(public_only=False)
         new_version_no = last_version.version_no + 1
-        new_version = cls(language=lang, version_no=new_version_no, \
-                              datetime_started=datetime.now(), user=user, note=note,
-                          is_forked=self.is_forked,
-                          result_of_rollback=True)
+        new_version = cls(language=lang, version_no=new_version_no,
+                          datetime_started=datetime.now(), user=user, note=note,
+                          is_forked=self.is_forked, result_of_rollback=True,
+                          title=self.title, description=self.description)
         new_version.save()
 
         for item in self.subtitle_set.all():
@@ -1757,10 +1760,12 @@ class SubtitleMetadata(models.Model):
 from django.template.loader import render_to_string
 
 class ActionRenderer(object):
+
     def __init__(self, template_name):
         self.template_name = template_name
 
     def render(self, item):
+        
         if item.action_type == Action.ADD_VIDEO:
             info = self.render_ADD_VIDEO(item)
         elif item.action_type == Action.CHANGE_TITLE:
@@ -1785,7 +1790,10 @@ class ActionRenderer(object):
             info = self.render_MEMBER_LEFT(item)
         elif item.action_type == Action.REVIEW_VERSION:
             info = self.render_REVIEW_VERSION(item)
-
+        elif item.action_type == Action.ACCEPT_VERSION:
+            info = self.render_ACCEPT_VERSION(item)
+        elif item.action_type == Action.DECLINE_VERSION:
+            info = self.render_DECLINE_VERSION(item)
         else:
             info = ''
 
@@ -1815,6 +1823,11 @@ class ActionRenderer(object):
         msg = _('  reviewed <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
 
+    def render_ACCEPT_VERSION(self, item):
+        kwargs = self._base_kwargs(item)
+        msg = _('  accepted <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        return msg
+
     def render_REJECT_VERSION(self, item):
         kwargs = self._base_kwargs(item)
         msg = _('  rejected <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
@@ -1823,6 +1836,11 @@ class ActionRenderer(object):
     def render_APPROVE_VERSION(self, item):
         kwargs = self._base_kwargs(item)
         msg = _('  approved <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        return msg
+
+    def render_DECLINE_VERSION(self, item):
+        kwargs = self._base_kwargs(item)
+        msg = _('  declined <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
 
     def render_ADD_VIDEO(self, item):
@@ -1952,6 +1970,8 @@ class Action(models.Model):
     REJECT_VERSION = 10
     MEMBER_LEFT = 11
     REVIEW_VERSION = 12
+    ACCEPT_VERSION = 13
+    DECLINE_VERSION = 14
     TYPES = (
         (ADD_VIDEO, _(u'add video')),
         (CHANGE_TITLE, _(u'change title')),
@@ -1965,6 +1985,8 @@ class Action(models.Model):
         (MEMBER_LEFT, _(u'remove contributor')),
         (REJECT_VERSION, _(u'reject version')),
         (REVIEW_VERSION, _(u'review version')),
+        (ACCEPT_VERSION, _(u'accept version')),
+        (DECLINE_VERSION, _(u'decline version')),
     )
 
     renderer = ActionRenderer('videos/_action_tpl.html')
@@ -2130,6 +2152,24 @@ class Action(models.Model):
         obj.language = version.language
         obj.user = moderator
         obj.action_type = cls.REVIEW_VERSION
+        obj.created = datetime.now()
+        obj.save()
+
+    @classmethod
+    def create_accepted_video_handler(cls, version, moderator,  **kwargs):
+        obj = cls(video=version.video)
+        obj.language = version.language
+        obj.user = moderator
+        obj.action_type = cls.ACCEPT_VERSION
+        obj.created = datetime.now()
+        obj.save()
+
+    @classmethod
+    def create_declined_video_handler(cls, version, moderator,  **kwargs):
+        obj = cls(video=version.video)
+        obj.language = version.language
+        obj.user = moderator
+        obj.action_type = cls.DECLINE_VERSION
         obj.created = datetime.now()
         obj.save()
 

@@ -46,9 +46,3 @@ In regular python code
 
     if feature_is_on('MODERATION', request):
         # do something here
-
-API
----
-
-.. automodule:: doorman
-    :members:

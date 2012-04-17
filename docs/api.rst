@@ -1,6 +1,5 @@
-==================
-Api2 Documentation
-==================
+API Documentation
+=================
 
 This is the documentation of v2 of Amara's API. Please contact us
 if you’d like to use the Amara API for commercial purposes.
@@ -230,7 +229,7 @@ Listing video urls::
 
     GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/urls/
 
-Video URL datail::
+Video URL detail::
 
     GET https://www.universalsubtitles.org/api2/partners/users/[video-id]/urls/[url-id]/
 
@@ -258,3 +257,18 @@ To delete a url ::
 
 If this is the only URL for a video, the request will fail. A video must have
 at least one URL.
+
+TeamResource
+~~~~~~~~~~~~
+
+One can list existing teams:
+
+::
+
+    GET https://www.universalsubtitles.org/api2/partners/teams/
+
+Once can view a detail for a team:
+
+::
+
+    GET https://www.universalsubtitles.org/api2/partners/teams/[team-slug]/
