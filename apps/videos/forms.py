@@ -41,12 +41,11 @@ from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexF
 from utils.http import url_exists
 from utils.subtitles import save_subtitle
 from utils.translation import get_language_choices
-from videos.feed_parser import FeedParser, FeedParserError
-from videos.models import Video, UserTestResult, SubtitleLanguage, VideoFeed, VideoUrl
+from videos.feed_parser import FeedParser
+from videos.models import Video, UserTestResult, SubtitleLanguage, VideoUrl
 from videos.tasks import video_changed_tasks, import_videos_from_feeds
 from videos.types import video_type_registrar, VideoTypeError
 from videos.types.youtube import yt_service
-
 
 ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
 KB_SIZELIMIT = 512
@@ -341,7 +340,7 @@ class SubtitlesUploadBaseForm(forms.Form):
 
 class SubtitlesUploadForm(SubtitlesUploadBaseForm):
     subtitles = forms.FileField()
-    is_complete = forms.BooleanField(initial=True, required=False)
+    is_complete = forms.BooleanField(initial=False, required=False)
 
     def clean_subtitles(self):
         subtitles = self.cleaned_data['subtitles']
@@ -395,6 +394,21 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
             sl.had_version = sl.has_version = True
 
         sl.save()
+
+        video = self.cleaned_data['video']
+        language = self.cleaned_data['language']
+        is_complete = self.cleaned_data['is_complete']
+
+        if is_complete:
+            team_video = video.get_team_video()
+
+            if team_video:
+                tasks = team_video.task_set.incomplete()\
+                                           .filter(language__in=[language, ''])\
+                                           .filter(type=Task.TYPE_IDS['Subtitle'])
+
+                if tasks.exists():
+                    tasks[0].complete()
 
         if latest_version:
             video_changed_tasks.delay(sl.video_id, sl.latest_version().id)
