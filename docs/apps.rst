@@ -1,7 +1,7 @@
 Django apps
 ===========
 
-Here is a list of pluggable Django apps that Universal Subtitles is using.  All
+Here is a list of pluggable Django apps that Amara is using.  All
 of these apps are contained in the ``apps/`` directory.
 
 .. warning:: The ``apps/`` directory is added to the Python path so you can
@@ -9,7 +9,7 @@ of these apps are contained in the ``apps/`` directory.
     ``from apps.vides.models import Video``.
 
 * account linker
-    Universal Subtitles allows you to publish your finished subtitles back to
+    Amara allows you to publish your finished subtitles back to
     YouTube via their API.  This app handles that.
 
 * auth
@@ -55,7 +55,7 @@ of these apps are contained in the ``apps/`` directory.
     Custom static file compressor
 
 * uslogging
-    Universal subtitles logging, errors on widgets
+    Amara logging, errors on widgets
 
 * videos
     Transcription, translation, video management

@@ -1,7 +1,7 @@
 The permission system
 =====================
 
-The permission system in Universal subtitles is very flexible to allow for the
+The permission system in Amara is very flexible to allow for the
 needs of different teams.  This document will give you a high level overview of
 what is possible.  You should read this before trying to understand the source
 code.
