@@ -336,6 +336,15 @@ class DfxpSubtitleParser(SubtitleParser):
     def __init__(self, subtitles):
         try:
             dom = parseString(subtitles.encode('utf8'))
+            
+            t = dom.getElementsByTagName('tt')[0]
+            
+            self.tickRate = 0;
+            
+            for attr in t.attributes.values():
+                if attr.localName == "tickRate":
+                    self.tickRate = int(attr.value)
+                        
             self.nodes = dom.getElementsByTagName('body')[0].getElementsByTagName('p')
         except (ExpatError, IndexError):
             raise SubtitleParserError('Incorrect format of TTML subtitles')
@@ -348,11 +357,17 @@ class DfxpSubtitleParser(SubtitleParser):
 
     def _get_time(self, t):
         try:
-            hour, min, sec = t.split(':')
-
-            start = int(hour)*60*60 + int(min)*60 + float(sec)
-            if start > MAX_SUB_TIME:
-                return -1
+            if t.endswith('t'):
+                ticks = int(t.split('t')[0])
+            
+                start = ticks / float(self.tickRate)
+            
+            else:
+                hour, min, sec = t.split(':')
+            
+                start = int(hour)*60*60 + int(min)*60 + float(sec)
+                if start > MAX_SUB_TIME:
+                    return -1
         except ValueError:
             return -1
 
