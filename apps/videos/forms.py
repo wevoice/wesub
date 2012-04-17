@@ -403,9 +403,7 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
             team_video = video.get_team_video()
 
             if team_video:
-                tasks = team_video.task_set.incomplete()\
-                                           .filter(language__in=[language, ''])\
-                                           .filter(type=Task.TYPE_IDS['Subtitle'])
+                tasks = team_video.task_set.incomplete_subtitle().filter(language__in=[language, ''])
 
                 if tasks.exists():
                     tasks[0].complete()
