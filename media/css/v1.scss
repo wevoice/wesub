@@ -1551,7 +1551,11 @@ ol.subtitles {
             background-color: $faintest;
         }
 
-        .timing {
+        &.description:hover, &.title:hover {
+            background-color: inherit;
+        }
+
+        .timing, .field {
             position: absolute;
             top: 1em; left: 1em;
             width: 75px;
@@ -1564,6 +1568,10 @@ ol.subtitles {
             .data {
                 display: none;
             }
+        }
+
+        .field {
+            font-weight: bold;
         }
 
         .quiet {
@@ -1859,6 +1867,30 @@ pre.dump {
         padding: 18px 15px;
         @include border-radius();
         @include box-shadow(1px, 1px, 3px, rgba(0, 0, 0, .4));
+    }
+}
+
+/* Truncate text */
+.truncated {
+    overflow: hidden;
+    position: relative;
+    z-index: 50;
+}
+a.truncated-expand {
+    background: #F3F6F8;
+    display: block;
+    margin-top: 10px;
+    padding: 8px 10px;
+    position: relative;
+    z-index: 51;
+    @include box-shadow(-6px, -23px, 17px, white);
+    @include border-radius();
+
+    &.expanded {
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        -o-box-shadow: none;
+        box-shadow: none;
     }
 }
 

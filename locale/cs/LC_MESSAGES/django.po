@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-16 01:34-0500\n"
+"POT-Creation-Date: 2012-04-17 01:33-0500\n"
 "PO-Revision-Date: 2012-04-14 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Czech (http://www.transifex.net/projects/p/universalsubtitles/"
@@ -1537,11 +1537,11 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Napište nám</a>, pokud jste "
 "narazili na problém."
 
-#: apps/videos/types/youtube.py:45
+#: apps/videos/types/youtube.py:47
 msgid "Private video"
 msgstr "Soukromé video"
 
-#: apps/videos/types/youtube.py:46
+#: apps/videos/types/youtube.py:48
 msgid "Undefined error"
 msgstr "Nedefinovaná chyba"
 
@@ -6985,7 +6985,7 @@ msgid "Roll back to version"
 msgstr "Vrátit zpět na verzi"
 
 #: templates/videos/diffing.html:137 templates/videos/diffing.html.py:204
-#: templates/videos/subtitle-view.html:200
+#: templates/videos/subtitle-view.html:201
 msgid "Title:"
 msgstr ""
 

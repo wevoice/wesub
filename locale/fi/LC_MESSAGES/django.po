@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-16 01:39-0500\n"
+"POT-Creation-Date: 2012-04-17 01:38-0500\n"
 "PO-Revision-Date: 2012-04-14 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Finnish (http://www.transifex.net/projects/p/"
@@ -1503,11 +1503,11 @@ msgstr ""
 "                        <a href=\"mailto:%s\"Ota yhteys tukeen</a> ongelmen "
 "ilmetessä."
 
-#: apps/videos/types/youtube.py:45
+#: apps/videos/types/youtube.py:47
 msgid "Private video"
 msgstr ""
 
-#: apps/videos/types/youtube.py:46
+#: apps/videos/types/youtube.py:48
 msgid "Undefined error"
 msgstr ""
 
@@ -6656,7 +6656,7 @@ msgid "Roll back to version"
 msgstr "Palauta versioon"
 
 #: templates/videos/diffing.html:137 templates/videos/diffing.html.py:204
-#: templates/videos/subtitle-view.html:200
+#: templates/videos/subtitle-view.html:201
 msgid "Title:"
 msgstr ""
 
