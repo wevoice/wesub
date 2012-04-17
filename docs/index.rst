@@ -28,6 +28,7 @@ Contents:
    api
    apps
    data
+   teams-callbacks
 
 Contributing
 ------------
