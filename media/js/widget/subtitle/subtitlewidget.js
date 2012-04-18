@@ -280,8 +280,7 @@ unisubs.subtitle.SubtitleWidget.prototype.updateValues_ = function() {
         if (time != -1)
             this.timeSpinner_.setValue(time);
     }
-    goog.dom.setTextContent(this.titleElemInner_,
-                            this.subtitle_.getText());
+    this.titleElemInner_.innerHTML = this.subtitle_.getText().replace("\n", "<br/>");
 };
 unisubs.subtitle.SubtitleWidget.prototype.disposeEventHandlers_ = function() {
     if (this.keyHandler_) {
