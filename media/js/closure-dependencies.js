@@ -24,6 +24,7 @@ goog.require("goog.events.BrowserEvent");
 goog.require("goog.ui.Button");
 goog.require("goog.dom.forms");
 goog.require("goog.ui.LabelInput");
+goog.require("goog.ui.Textarea");
 goog.require("goog.net.XhrIo");
 goog.require("goog.net.Jsonp");
 goog.require('goog.positioning.Corner');

@@ -249,7 +249,7 @@ unisubs.subtitle.SubtitleWidget.prototype.switchToEditMode = function() {
 
 };
 unisubs.subtitle.SubtitleWidget.prototype.handleKey_ = function(event) {
-    if (event.keyCode == goog.events.KeyCodes.ENTER) {
+    if (event.keyCode == goog.events.KeyCodes.ENTER && !event.shiftKey) {
         this.switchToView_();
         event.stopPropagation();
         event.preventDefault();
