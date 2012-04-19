@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -170,7 +170,7 @@ def send_change_title_email(video_id, user_id, old_title, new_title):
     users = video.notification_list(user)
 
     for obj in users:
-        subject = u'Video\'s title changed on Universal Subtitles'
+        subject = u'Video\'s title changed on Amara'
         context = {
             'user': obj,
             'domain': domain,
@@ -360,7 +360,7 @@ def _send_letter_caption(caption_version):
         "STATIC_URL": settings.STATIC_URL,
     }
 
-    subject = u'New edits to "%s" by %s on Universal Subtitles' % (language.video, caption_version.user)
+    subject = u'New edits to "%s" by %s on Amara' % (language.video, caption_version.user)
 
     followers = set(video.notification_list(caption_version.user))
     followers.update(language.notification_list(caption_version.user))

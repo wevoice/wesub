@@ -1,6 +1,6 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 //
-// Copyright (C) 2011 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -183,7 +183,7 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
     this.settingsActions_ = $d('ul', null);
 
     this.unisubsLink_ =
-        $d('h5', 'unisubs-uniLogo', 'Universal Subtitles');
+        $d('h5', 'unisubs-uniLogo', 'Amara');
     this.addTranslationAnchor_ =
         $d('a', {'href': '#'}, '');
     this.addLanguageLink_ =

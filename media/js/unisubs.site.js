@@ -1,4 +1,4 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 // 
 // Copyright (C) 2012 Participatory Culture Foundation
 // 
@@ -19,7 +19,7 @@
 var Site = function(Site) {
     /*
      * This is the master JavaScript file for
-     * the Universal Subtitles website.
+     * the Amara website.
      */
 
     var that = this;
@@ -155,12 +155,42 @@ var Site = function(Site) {
                     e.preventDefault();
                 });
             });
+        },
+        truncateTextBlocks: function(blocks, maxHeight) {
+            // Takes a list of jQuery objects and sets up
+            // a nice truncate-by-height UI.
+            blocks.each(function() {
+                var $block = $(this);
+
+                if ($block.height() > maxHeight) {
+                    $block.addClass('truncated');
+                    $block.height(maxHeight);
+
+                    $block.after('<a href="#" class="truncated-expand">Expand</a>');
+
+                    var $anc = $('a.truncated-expand', $block.parent());
+                    $anc.click(function() {
+
+                        if ($block.height() !== maxHeight) {
+                            $block.height(maxHeight);
+                            $anc.text('Expand');
+                            $anc.removeClass('expanded');
+                        } else {
+                            $block.height('auto');
+                            $anc.text('Collapse');
+                            $anc.addClass('expanded');
+                        }
+                        
+                        return false;
+                    });
+                }
+            });
         }
     };
     this.Views = {
         /*
          * Each of these views runs on a specific
-         * page on the Universal Subtitles site
+         * page on the Amara site
          * (except for base, which runs on every
          * page that extends base.html)
          *
@@ -441,6 +471,20 @@ var Site = function(Site) {
                     videoSource, null, null);
                 opener.showStartDialog();
             }
+            if (window.IS_AUTHENTICATED && window.ROLLBACK_ALLOWED) {
+                $('#rollback').click(function() {
+                    if (!confirm('Subtitles will be rolled back to a previous version')){
+                        return false;
+                    }
+                });
+            } else {
+                $('#rollback, .new_edit').click(function() {
+                    alert('You need to log in to do that.');
+                    return false;
+                });
+            }
+
+            that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
             $('.add_subtitles').click(function() {
@@ -466,7 +510,7 @@ var Site = function(Site) {
                                 $.jGrowl.error(response.error);
                             } else {
                                 $('.title-container').html(title);
-                                document.title = title + ' | Universal Subtitles';
+                                document.title = title + ' | Amara';
                             }
                         }
                     );
@@ -489,6 +533,9 @@ var Site = function(Site) {
 
             $('.tabs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
+        },
+        diffing: function() {
+            that.Utils.truncateTextBlocks($('div.description'), 90);
         },
 
         // Teams
@@ -695,6 +742,10 @@ var Site = function(Site) {
         // Profile
         profile_dashboard: function() {
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
+            $('a.action-decline').click(function() {
+                $(this).siblings('form').submit();
+                return false;
+            });
         },
 
         // Messages

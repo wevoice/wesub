@@ -41,7 +41,7 @@
     <meta property="og:image" content="{{ STATIC_URL }}images/small_logo.png" />
     {% endif %}
 
-    <meta property="og:site_name" content="Universal Subtitles"/>
+    <meta property="og:site_name" content="Amara"/>
     <meta property="og:description"
           content="{% title_for_video video %}"/>
 {% endblock  %}
@@ -58,14 +58,16 @@
         <h2 class="main-title">
             <a href="{{share_panel_permalink}}" title="Video permalink">{{ video }}</a>
         </h2>
-        <div id="description"{% if video.description|length > 300 %} class="abbr collapsed"{% endif %}>
-            <div>
-                {{ video.description|urlize|linebreaks }}
+        {% with video.get_description_display as description %}
+            <div id="description"{% if description|length > 300 %} class="abbr collapsed"{% endif %}>
+                <div>
+                    {{ description|urlize|linebreaks }}
+                </div>
+                {% if description|length > 300 %}
+                    <a class="expand" href="#">Show all ↓</a>
+                {% endif %}
             </div>
-            {% if video.description|length > 300 %}
-                <a class="expand" href="#">Show all ↓</a>
-            {% endif %}
-        </div>
+        {% endwith %}
         <ul class="metrics">
             <li>
                 <div>

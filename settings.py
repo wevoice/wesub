@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -64,7 +64,7 @@ MANAGERS = ADMINS
 
 P3P_COMPACT = 'CP="CURa ADMa DEVa OUR IND DSP CAO COR"'
 
-DEFAULT_FROM_EMAIL = '"Universal Subtitles" <feedback@universalsubtitles.org>'
+DEFAULT_FROM_EMAIL = '"Amara" <feedback@universalsubtitles.org>'
 WIDGET_LOG_EMAIL = 'widget-logs@universalsubtitles.org'
 
 DATABASES = {
@@ -473,8 +473,8 @@ REVISIONS_ONPAGE = 20
 FEEDBACK_EMAIL = 'socmedia@pculture.org'
 FEEDBACK_EMAILS = [FEEDBACK_EMAIL]
 FEEDBACK_ERROR_EMAIL = 'universalsubtitles-errors@pculture.org'
-FEEDBACK_SUBJECT = 'Universal Subtitles Feedback'
-FEEDBACK_RESPONSE_SUBJECT = 'Thanks for trying Universal Subtitles'
+FEEDBACK_SUBJECT = 'Amara Feedback'
+FEEDBACK_RESPONSE_SUBJECT = 'Thanks for trying Amara'
 FEEDBACK_RESPONSE_EMAIL = 'universalsubtitles@pculture.org'
 FEEDBACK_RESPONSE_TEMPLATE = 'feedback_response.html'
 

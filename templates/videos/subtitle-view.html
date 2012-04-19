@@ -30,9 +30,9 @@
 
 {% block title %}
     {% if language.is_original %}
-        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
+        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
     {% else %}
-        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Universal Subtitles
+        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
     {% endif %}
 {% endblock %}
 
@@ -47,7 +47,7 @@
         <meta property="og:image" content="{{ STATIC_URL }}images/small_logo.png" />
     {% endif %}
 
-    <meta property="og:site_name" content="Universal Subtitles"/>
+    <meta property="og:site_name" content="Amara"/>
     <meta property="og:description" content="{% title_for_video video language %}"/>
 {% endblock  %}
 
@@ -65,11 +65,7 @@
         <h2 class="main-title">
             <a href="{{ video.get_absolute_url }}" title="View video">
                 ←
-                {% if language.title %}
-                    {{ language.title }}
-                {% else %}
-                    {{ video }}
-                {% endif %}
+                {{ language.get_title_display }}
             </a>
         </h2>
         {% widget widget_params %}
@@ -197,7 +193,28 @@
                             <strong>{{ last_version.user }}</strong>
                         </a>.
                     </p>
+
+                    <p>
+                        <strong>{% trans "Title:" %}</strong>
+                        {{ last_version.title }}
+                    </p>
+
+                    <p>
+                        <strong>{% trans "Description:" %}</strong>
+                        {{ last_version.description|urlize|linebreaks }}
+                    </p>
+
                     <ol class="subtitles">
+                        <li class="title">
+                            <div class="field">{% trans "Title:" %}</div>
+                            {{ last_version.title }}
+                        </li>
+                        <li class="description">
+                            <div class="field">{% trans "Description:" %}</div>
+                            <div class="description">
+                                {{ last_version.description|urlize|linebreaks }}
+                            </div>
+                        </li>
                         {% for item in last_version.ordered_subtitles %}
                         <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
                             {% if item.display_time %}

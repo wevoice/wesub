@@ -18,13 +18,13 @@
           </div>
         {% endif %}
         
-        <h3>Video's title changed on Universal Subtitles</h3>
+        <h3>Video's title changed on Amara</h3>
         
         <form method="post" action="{% url emails_example:send_email %}">
             <div>
             {% csrf_token %}
             <input type="hidden" value="1" name="type">
-            Subject: <input name="subject" value="Video's title changed on Universal Subtitles" />
+            Subject: <input name="subject" value="Video's title changed on Amara" />
             <br/>
             Email: <input name="email" />
             <br/>
@@ -40,7 +40,7 @@
             <div>
             {% csrf_token %}
             <input type="hidden" value="2" name="type">
-            Subject: <input name="subject" value="Video's title changed on Universal Subtitles" />
+            Subject: <input name="subject" value="Video's title changed on Amara" />
             <br/>
             Email: <input name="email" />
             <br/>
@@ -56,7 +56,7 @@
             <div>
             {% csrf_token %}
             <input type="hidden" value="3" name="type">
-            Subject: <input name="subject" value="Video's title changed on Universal Subtitles" />
+            Subject: <input name="subject" value="Video's title changed on Amara" />
             <br/>
             Email: <input name="email" />
             <br/>
@@ -72,7 +72,7 @@
             <div>
             {% csrf_token %}
             <input type="hidden" value="3" name="type">
-            Subject: <input name="subject" value="Video's subtitles changed on Universal Subtitles" />
+            Subject: <input name="subject" value="Video's subtitles changed on Amara" />
             <br/>
             Email: <input name="email" />
             <br/>
@@ -87,7 +87,7 @@
             <div>
             {% csrf_token %}
             <input type="hidden" value="3" name="type">
-            Subject: <input name="subject" value="Video's subtitles changed on Universal Subtitles (non-editor)" />
+            Subject: <input name="subject" value="Video's subtitles changed on Amara (non-editor)" />
             <br/>
             Email: <input name="email" />
             <br/>

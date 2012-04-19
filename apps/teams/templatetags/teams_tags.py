@@ -1,4 +1,4 @@
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
 #
@@ -162,11 +162,11 @@ def share_panel_email_url(context):
     team = context.get('team')
 
     if not project:
-        message = 'Check out the "%s" team on Universal Subtitles: %s' % (team.name, team.get_site_url())
+        message = 'Check out the "%s" team on Amara: %s' % (team.name, team.get_site_url())
         share_panel_email_url = reverse('videos:email_friend')
         share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
     else:
-        message = 'Check out the "%s" project on Universal Subtitles: %s' % (project.name, project.get_site_url())
+        message = 'Check out the "%s" project on Amara: %s' % (project.name, project.get_site_url())
         share_panel_email_url = reverse('videos:email_friend')
         share_panel_email_url = "%s?%s" % (share_panel_email_url, urlencode({'text': message}))
 

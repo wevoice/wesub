@@ -1,4 +1,4 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 // 
 // Copyright (C) 2012 Participatory Culture Foundation
 // 

@@ -1,5 +1,5 @@
 ===========================
-Running Universal Subtitles
+Running Amara
 ===========================
 
 To run the development version:
@@ -96,5 +96,20 @@ To run the development version:
     CELERY_ALWAYS_EAGER = True
   
 
+Using vagrant
+-------------
 
-   
+Amara uses `Vagrant <http://vagrantup.com/>`_ to make it easy to
+get started.  If you've never used Vagrant before we highly recommend going
+through its `quick start guide
+<http://vagrantup.com/docs/getting-started/index.html>`_ to learn how it works.
+
+To run the development version:
+
+1. Clone the git repository ::
+
+        git clone git://github.com/pculture/unisubs.git unisubs
+
+   Now the entire project will be in the ``unisubs/`` directory.
+
+2. Install VirtualBox and vagrant if you don't have them yet. Then type::

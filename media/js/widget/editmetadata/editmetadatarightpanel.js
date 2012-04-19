@@ -1,6 +1,6 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 //
-// Copyright (C) 2011 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -150,15 +150,36 @@ unisubs.editmetadata.RightPanel.prototype.appendCustomButtonsInternal = function
         'Approve' : 'Accept';
     this.approveButton_ = $d('a', {'class': 'unisubs-done widget-button'}, buttonText);
 
-    el.appendChild(this.sendBackButton_);
-    el.appendChild(this.approveButton_);
-
     var handler = this.getHandler();
+
+    if (this.serverModel_.getCaptionSet().needsSync() ||
+        this.serverModel_.getCaptionSet().needsTranslation()) {
+
+        this.needsSyncWarning_ = $d('p', {},
+                                    $d('div', {'class': 'unisubs-needs-sync unisubs-extra'}, 
+                                        $d('p', {}, 'The draft has unsynced / untranslated lines and cannot be approved / accepted. You can complete it or send back.'),
+                                        $d('span', {'class': 'unisubs-spanarrow'}, '')
+                                    )
+                                );
+
+        this.approveButton_.style.opacity = '0.3';
+        el.appendChild(this.needsSyncWarning_);
+        el.appendChild(this.sendBackButton_);
+        el.appendChild(this.approveButton_);
+
+    } else {
+
+        el.appendChild(this.sendBackButton_);
+        el.appendChild(this.approveButton_);
+
+        handler.listen(this.approveButton_, 'click', function(e){
+            that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED, false);
+        });
+    }
+
     var that = this;
+
     handler.listen(this.sendBackButton_, 'click', function(e){
         that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.SEND_BACK, false);
-    });
-    handler.listen(this.approveButton_, 'click', function(e){
-        that.finish(e, unisubs.Dialog.MODERATION_OUTCOMES.APPROVED, false);
     });
 };

@@ -1,6 +1,6 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 // 
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -57,7 +57,7 @@ unisubs.Extension.prototype.addElementToPage_ = function(enabled) {
     this.enabledSpan_ = $d('span', null, this.enabledSpanText_());
     this.element_ = $d('div', 'unisubs-extension' + 
                        (enabled ? ' unisubs-extension-enabled' : ''),
-                       $d('span', null, 'Universal Subtitles Addon '),
+                       $d('span', null, 'Amara Addon '),
                        this.enabledSpan_,
                        $d('span', null, ' '),
                        this.enableLink_,
@@ -106,7 +106,7 @@ unisubs.Extension.prototype.enabledSpanText_ = function() {
 
 unisubs.Extension.prototype.createReportProblemLink_ = function($d) {
     var message = 
-        'I had a problem with the Universal Subtitles Firefox ' +
+        'I had a problem with the Amara Firefox ' +
         'extension on this page: ' + 
         window.location.href;
     var uri = new goog.Uri(unisubs.Config.siteConfig['siteURL'] + 

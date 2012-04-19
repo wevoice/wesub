@@ -1,6 +1,6 @@
-// Universal Subtitles, universalsubtitles.org
+// Amara, universalsubtitles.org
 //
-// Copyright (C) 2010 Participatory Culture Foundation
+// Copyright (C) 2012 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -29,8 +29,8 @@ goog.provide('unisubs.subtitle.MSServerModel');
  * @constructor
  * @implements {unisubs.subtitle.ServerModel}
  * @extends {goog.Disposable}
- * @param {string} sessionPK Universal Subtitles subtitling session primary key
- * @param {string} videoID Universal Subtitles video id
+ * @param {string} sessionPK Amara subtitling session primary key
+ * @param {string} videoID Amara video id
  * @param {string} videoURL url for the video
  * @param {unisubs.subtitle.EditableCaptionSet} editableCaptionSet
  */

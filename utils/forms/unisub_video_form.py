@@ -1,7 +1,7 @@
 
-# Universal Subtitles, universalsubtitles.org
+# Amara, universalsubtitles.org
 # 
-# Copyright (C) 2010 Participatory Culture Foundation
+# Copyright (C) 2012 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -85,7 +85,7 @@ class UniSubBoundVideoField(UniSubURLField):
                 raise forms.ValidationError(e)
 
             if not self.video:
-                raise forms.ValidationError(mark_safe(_(u"""Universal Subtitles does not support that website or video format.
+                raise forms.ValidationError(mark_safe(_(u"""Amara does not support that website or video format.
 If you'd like to us to add support for a new site or format, or if you
 think there's been some mistake, <a
 href="mailto:%s">contact us</a>!""") % settings.FEEDBACK_EMAIL))
