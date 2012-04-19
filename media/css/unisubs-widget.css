@@ -1406,11 +1406,14 @@ li span.unisubs-title textarea {
     border-bottom: 1px solid #999 !important;
     border-top: 1px solid #eee !important;
 }
-.unisubs-transcribeControls input.trans {
+.unisubs-transcribeControls textarea.trans {
     font-size: 13px !important;
     margin: 10px !important;
     padding: 5px !important;
     width: 91% !important;
+   /* This also get's set with js on trascribeentry.js , if you */
+   /* change this value, you should change there as well */
+    min-height: 31px !important;
 }
 .unisubs-widget li.unisubs-transcribeHelp {
     background: #eee !important;

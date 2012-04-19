@@ -6,13 +6,14 @@
 # Chris Harris <praisebe4him@gmail.com>, 2012.
 # Hiroko  <hirokotgsr@gmail.com>, 2012.
 #   <mazenko89@gmail.com>, 2012.
+# Shungo Haraguchi <>, 2012.
 # zzz zzz <atsuhiro.yorozuya@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-17 01:36-0500\n"
-"PO-Revision-Date: 2012-04-14 06:46+0000\n"
+"POT-Creation-Date: 2012-04-19 01:37-0500\n"
+"PO-Revision-Date: 2012-04-18 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Japanese (http://www.transifex.net/projects/p/"
 "universalsubtitles/language/ja/)\n"
@@ -82,7 +83,7 @@ msgstr "翻訳を編集する"
 
 #: apps/auth/models.py:385
 msgid "understand enough"
-msgstr ""
+msgstr "十分に理解"
 
 #: apps/auth/models.py:386
 msgid "understand 99%"
@@ -184,7 +185,7 @@ msgstr ""
 
 #: apps/messages/forms.py:40
 msgid "You should be authenticated to write messages"
-msgstr ""
+msgstr "メッセージを書くには認証が必要です。"
 
 #: apps/messages/forms.py:58
 msgid "This message is from site administrator."
@@ -208,12 +209,12 @@ msgstr "[題名なし]"
 
 #: apps/messages/models.py:125
 msgid "You should enter subject or message."
-msgstr ""
+msgstr "題名もしくは本文を入力してください。"
 
 #: apps/messages/rpc.py:27 apps/messages/rpc.py:43 apps/messages/rpc.py:51
 #: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:43
 msgid "You should be authenticated."
-msgstr ""
+msgstr "認証が必要です。"
 
 #: apps/messages/rpc.py:35
 msgid "Message does not exist."
@@ -280,11 +281,11 @@ msgstr ""
 msgid " and published"
 msgstr ""
 
-#: apps/messages/tasks.py:467
+#: apps/messages/tasks.py:477
 msgid "Your subtitles have been approved and published!"
 msgstr ""
 
-#: apps/messages/tasks.py:474 apps/messages/tasks.py:528
+#: apps/messages/tasks.py:484 apps/messages/tasks.py:538
 msgid "Your subtitles have been declined"
 msgstr ""
 
@@ -294,7 +295,7 @@ msgstr ""
 
 #: apps/openid_consumer/views.py:94
 msgid "i-names are not supported"
-msgstr ""
+msgstr "i-nameはサポートされていません。"
 
 #: apps/openid_consumer/views.py:100
 msgid "The OpenID was invalid"
@@ -479,11 +480,11 @@ msgstr ""
 
 #: apps/teams/forms.py:144
 msgid "Video language"
-msgstr ""
+msgstr "ビデオ言語"
 
 #: apps/teams/forms.py:146
 msgid "It will be saved only if video does not exist in our database."
-msgstr ""
+msgstr "データベースにビデオが存在しない場合のみ保存されます。"
 
 #: apps/teams/forms.py:200
 msgid "This video already belongs to a team."
@@ -510,7 +511,7 @@ msgstr ""
 
 #: apps/teams/forms.py:280
 msgid "Team intro video URL"
-msgstr ""
+msgstr "チーム紹介ビデオURL"
 
 #: apps/teams/forms.py:282
 msgid ""
@@ -522,7 +523,7 @@ msgstr ""
 
 #: apps/teams/forms.py:287
 msgid "Team URL: http://universalsubtitles.org/teams/"
-msgstr ""
+msgstr "チームURL: http://universalsubtitles.org/teams/"
 
 #: apps/teams/forms.py:327
 msgid "This video has already been transcribed."
@@ -655,7 +656,7 @@ msgstr "ロゴ"
 
 #: apps/teams/models.py:125
 msgid "publicly Visible?"
-msgstr ""
+msgstr "公開？"
 
 #: apps/teams/models.py:126 templates/search/search.html:145
 #: templates/teams/project_list.html:10
@@ -690,7 +691,7 @@ msgstr ""
 
 #: apps/teams/models.py:140
 msgid "HTML that appears at the top of the teams page."
-msgstr ""
+msgstr "チームページのトップに表示されるHTML"
 
 #: apps/teams/models.py:143
 msgid "authentication provider code"
@@ -698,11 +699,11 @@ msgstr ""
 
 #: apps/teams/models.py:151
 msgid "membership policy"
-msgstr ""
+msgstr "メンバーシップ・ポリシー"
 
 #: apps/teams/models.py:154
 msgid "video policy"
-msgstr ""
+msgstr "ビデオ・ポリシー"
 
 #: apps/teams/models.py:157
 msgid "task assignment policy"
@@ -725,7 +726,7 @@ msgid "task expiration (days)"
 msgstr ""
 
 #: apps/teams/models.py:179 templates/profiles/_top_user_panel.html:33
-#: templates/profiles/dashboard.html:94 templates/teams/teams-list.html:6
+#: templates/profiles/dashboard.html:105 templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "チーム"
 
@@ -740,11 +741,11 @@ msgstr ""
 
 #: apps/teams/models.py:626
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
-msgstr ""
+msgstr "いくつかのサイトからは自動的にサムネイルを取得します。例）Youtube"
 
 #: apps/teams/models.py:628
 msgid "Need help with all languages"
-msgstr ""
+msgstr "全ての言語で助けが必要です。"
 
 #: apps/teams/models.py:629
 msgid "If you check this, other languages will not be displayed."
@@ -935,7 +936,7 @@ msgstr ""
 
 #: apps/teams/views.py:790
 msgid "Application approved."
-msgstr ""
+msgstr "申し込みが承認されました。"
 
 #: apps/teams/views.py:792 apps/teams/views.py:810
 msgid "Application does not exist."
@@ -1030,41 +1031,44 @@ msgstr ""
 #: apps/teams/templatetags/teams_tags.py:246
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
-msgstr ""
+msgstr "ビデオの翻訳を手伝ってくれませんか？%(url)s"
 
 #: apps/videos/admin.py:32
 msgid "Email for alert"
 msgstr ""
 
-#: apps/videos/forms.py:61
+#: apps/videos/forms.py:60
 msgid "File should have txt format"
-msgstr ""
+msgstr "ファイルはtxtフォーマットである必要があります。"
 
-#: apps/videos/forms.py:65 apps/videos/forms.py:83 apps/videos/forms.py:350
+#: apps/videos/forms.py:64 apps/videos/forms.py:82 apps/videos/forms.py:349
 msgid "File size should be less {0} kb"
-msgstr ""
+msgstr "ファイルサイズは {0} kb以下である必要があります。"
 
-#: apps/videos/forms.py:70 apps/videos/forms.py:91 apps/videos/forms.py:358
+#: apps/videos/forms.py:69 apps/videos/forms.py:90 apps/videos/forms.py:357
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/videos/forms.py:74
+#: apps/videos/forms.py:73
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr ""
+"ファイルを変換できません。UTF8エンコードが含まれている可能性があります。"
 
-#: apps/videos/forms.py:86
+#: apps/videos/forms.py:85
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr ""
+"不適切なフォーマットです。 .srt, .ssa, .sbv あるいは .xml (TTML  フォーマッ"
+"ト)にてアップロードください。"
 
-#: apps/videos/forms.py:93 apps/videos/forms.py:360
+#: apps/videos/forms.py:92 apps/videos/forms.py:359
 msgid "Incorrect subtitles format"
 msgstr "字幕フォーマットが正しくありません"
 
-#: apps/videos/forms.py:119 apps/videos/forms.py:474 utils/validators.py:38
+#: apps/videos/forms.py:118 apps/videos/forms.py:486 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr ""
 
-#: apps/videos/forms.py:125 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:124 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1073,26 +1077,26 @@ msgid ""
 "href=\"mailto:%s\">contact us</a>!"
 msgstr ""
 
-#: apps/videos/forms.py:136
+#: apps/videos/forms.py:135
 msgid "You have not permission add video URL for this video"
 msgstr "あなたは、このビデオにビデオURLを追加する権限はありません。"
 
-#: apps/videos/forms.py:168
+#: apps/videos/forms.py:167
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "他の人が現在このビデオを扱っています。また後で送信ください。"
 
-#: apps/videos/forms.py:177
+#: apps/videos/forms.py:176
 #, python-format
 msgid ""
 "Uploading subtitles in this language was forbidden by team %s which "
 "moderates the video."
 msgstr ""
 
-#: apps/videos/forms.py:353
+#: apps/videos/forms.py:352
 msgid "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr ""
 
-#: apps/videos/forms.py:459
+#: apps/videos/forms.py:471
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1100,7 +1104,7 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:462 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:474 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1111,49 +1115,49 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:490
+#: apps/videos/forms.py:502
 msgid "Youtube usernames"
 msgstr ""
 
-#: apps/videos/forms.py:490
+#: apps/videos/forms.py:502
 msgid "Enter usernames separated by comma."
 msgstr ""
 
-#: apps/videos/forms.py:491
+#: apps/videos/forms.py:503
 msgid "Youtube page link."
 msgstr "Youtube ページのリンク"
 
-#: apps/videos/forms.py:492
+#: apps/videos/forms.py:504
 msgid "For example: http://www.youtube.com/user/username"
 msgstr ""
 
-#: apps/videos/forms.py:493
+#: apps/videos/forms.py:505
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:494
+#: apps/videos/forms.py:506
 msgid "Save feed"
 msgstr ""
 
-#: apps/videos/forms.py:494
+#: apps/videos/forms.py:506
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr ""
 
-#: apps/videos/forms.py:537
+#: apps/videos/forms.py:549
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr ""
 
-#: apps/videos/forms.py:542
+#: apps/videos/forms.py:554
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:553
+#: apps/videos/forms.py:565
 msgid "captcha"
 msgstr ""
 
@@ -1173,7 +1177,7 @@ msgstr ""
 msgid "Views"
 msgstr ""
 
-#: apps/videos/models.py:1082
+#: apps/videos/models.py:1083
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
@@ -1181,168 +1185,190 @@ msgstr ""
 "ごめんなさい、誰かが同じ言語でアップロードか翻訳をおこなっているので、あなた"
 "の字幕をアップロードする事ができません。"
 
-#: apps/videos/models.py:1817
+#: apps/videos/models.py:1823
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1822
+#: apps/videos/models.py:1828
+#, python-format
+msgid ""
+"  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
+"href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+
+#: apps/videos/models.py:1833
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1827
+#: apps/videos/models.py:1838
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1832
+#: apps/videos/models.py:1843
+#, python-format
+msgid ""
+"  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
+"href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+
+#: apps/videos/models.py:1848
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1834
+#: apps/videos/models.py:1850
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr ""
 
-#: apps/videos/models.py:1840
+#: apps/videos/models.py:1856
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1842
+#: apps/videos/models.py:1858
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1857
+#: apps/videos/models.py:1873
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1859
+#: apps/videos/models.py:1875
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1862
+#: apps/videos/models.py:1878
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1864
+#: apps/videos/models.py:1880
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1872
+#: apps/videos/models.py:1888
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1874
+#: apps/videos/models.py:1890
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1885
+#: apps/videos/models.py:1901
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1887
+#: apps/videos/models.py:1903
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1893
+#: apps/videos/models.py:1909
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1895
+#: apps/videos/models.py:1911
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1900
+#: apps/videos/models.py:1916
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr ""
 
-#: apps/videos/models.py:1905
+#: apps/videos/models.py:1921
 #, python-format
 msgid "left the %s team"
 msgstr ""
 
-#: apps/videos/models.py:1958
+#: apps/videos/models.py:1976
 msgid "add video"
 msgstr ""
 
-#: apps/videos/models.py:1959
+#: apps/videos/models.py:1977
 msgid "change title"
 msgstr ""
 
-#: apps/videos/models.py:1960
+#: apps/videos/models.py:1978
 msgid "comment"
 msgstr ""
 
-#: apps/videos/models.py:1961
+#: apps/videos/models.py:1979
 msgid "add version"
 msgstr ""
 
-#: apps/videos/models.py:1962
+#: apps/videos/models.py:1980
 msgid "add translation"
 msgstr ""
 
-#: apps/videos/models.py:1963
+#: apps/videos/models.py:1981
 msgid "add video url"
 msgstr ""
 
-#: apps/videos/models.py:1964
+#: apps/videos/models.py:1982
 msgid "request subtitles"
 msgstr ""
 
-#: apps/videos/models.py:1965
+#: apps/videos/models.py:1983
 msgid "approve version"
 msgstr ""
 
-#: apps/videos/models.py:1966
+#: apps/videos/models.py:1984
 msgid "add contributor"
 msgstr ""
 
-#: apps/videos/models.py:1967
+#: apps/videos/models.py:1985
 msgid "remove contributor"
 msgstr ""
 
-#: apps/videos/models.py:1968
+#: apps/videos/models.py:1986
 msgid "reject version"
 msgstr ""
 
-#: apps/videos/models.py:1969
+#: apps/videos/models.py:1987
 msgid "review version"
 msgstr ""
 
-#: apps/videos/models.py:2193
+#: apps/videos/models.py:1988
+msgid "accept version"
+msgstr ""
+
+#: apps/videos/models.py:1989
+msgid "decline version"
+msgstr ""
+
+#: apps/videos/models.py:2231
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -2610,11 +2636,11 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:349
 msgid "Chinese, Simplified"
-msgstr "中国語、簡易"
+msgstr "中国語、簡体"
 
 #: libs/unilangs/unilangs.py:350
 msgid "Chinese, Traditional"
-msgstr ""
+msgstr "中国語、繁体"
 
 #: libs/unilangs/unilangs.py:351
 msgid "Zulu"
@@ -4235,8 +4261,8 @@ msgstr "アカウントを作成する"
 #: templates/comments/_item.html:3 templates/messages/list.html:70
 #: templates/messages/sent.html:48 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
-#: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:115
-#: templates/videos/diffing.html.py:181
+#: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:117
+#: templates/videos/diffing.html.py:185
 msgid "ago"
 msgstr ""
 
@@ -4297,6 +4323,8 @@ msgid ""
 "A simple way to create and add captions to almost any video on the web "
 "(without having to transcode or re-upload videos)."
 msgstr ""
+"web上のほとんど全てのビデオに(変換や再アップロード無しで)簡単に字幕を付加する"
+"ことができます。"
 
 #: templates/jsdemo/home.html:35
 msgid "Community Site"
@@ -4322,7 +4350,7 @@ msgstr ""
 
 #: templates/jsdemo/home.html:50
 msgid "Get updates and find out first when we launch"
-msgstr ""
+msgstr "アップデート情報を取得してローンチ時期を知ろう"
 
 #: templates/jsdemo/home.html:55
 msgid "Get Updates!"
@@ -4402,7 +4430,7 @@ msgid ""
 "    "
 msgstr ""
 
-#: templates/messages/_messages.html:7 templates/profiles/dashboard.html:70
+#: templates/messages/_messages.html:7 templates/profiles/dashboard.html:81
 #: templates/videos/_recent_activity.html:11
 msgid "View all"
 msgstr "すべて見る"
@@ -4538,7 +4566,7 @@ msgid "Overview"
 msgstr ""
 
 #: templates/profiles/_filters_dashboard.html:8
-#: templates/profiles/dashboard.html:70
+#: templates/profiles/dashboard.html:81
 msgid "Recent Activity"
 msgstr ""
 
@@ -4638,7 +4666,7 @@ msgid "Subtitles into"
 msgstr ""
 
 #: templates/profiles/dashboard.html:55 templates/teams/tasks.html:155
-#: templates/teams/tasks.html.py:171 templates/videos/diffing.html:95
+#: templates/teams/tasks.html.py:171 templates/videos/diffing.html:97
 #: templates/videos/subtitle-view.html:139
 #: templates/videos/subtitle-view.html:185
 msgid "Subtitles"
@@ -4649,19 +4677,23 @@ msgstr "字幕"
 msgid "for"
 msgstr ""
 
-#: templates/profiles/dashboard.html:76
+#: templates/profiles/dashboard.html:67
+msgid "Decline Task"
+msgstr ""
+
+#: templates/profiles/dashboard.html:87
 msgid "Sorry, no activity yet."
 msgstr ""
 
-#: templates/profiles/dashboard.html:83
+#: templates/profiles/dashboard.html:94
 msgid "Alerts"
 msgstr ""
 
-#: templates/profiles/dashboard.html:100 templates/teams/teams-list.html:107
+#: templates/profiles/dashboard.html:111 templates/teams/teams-list.html:107
 msgid "Do you really wish to leave this team?"
 msgstr ""
 
-#: templates/profiles/dashboard.html:100
+#: templates/profiles/dashboard.html:111
 msgid "leave team"
 msgstr ""
 
@@ -5319,7 +5351,7 @@ msgstr ""
 
 #: templates/teams/_tabs.html:16 templates/videos/video-view.html:138
 msgid "Activity"
-msgstr ""
+msgstr "アクティビティー"
 
 #: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
 #: templates/teams/_team_video_detail.html:48
@@ -6249,7 +6281,7 @@ msgstr "リトマス回帰テスト"
 
 #: templates/videos/_feedback_form.html:40
 msgid "For new testers, we have"
-msgstr ""
+msgstr "初心者テスターには"
 
 #: templates/videos/_feedback_form.html:40
 msgid "a getting started guide"
@@ -6596,15 +6628,15 @@ msgstr ""
 msgid "Or Submit Multiple Videos"
 msgstr ""
 
-#: templates/videos/diffing.html:39
+#: templates/videos/diffing.html:41
 msgid "Subtitles will be rolled back to a previous version"
 msgstr "サブタイトルは以前のバージョンに戻されます。"
 
-#: templates/videos/diffing.html:45
+#: templates/videos/diffing.html:47
 msgid "You need to log in to do that."
 msgstr "実施するには、ログインをする必要があります。"
 
-#: templates/videos/diffing.html:77
+#: templates/videos/diffing.html:79
 #, python-format
 msgid ""
 "\n"
@@ -6613,7 +6645,7 @@ msgid ""
 "            "
 msgstr ""
 
-#: templates/videos/diffing.html:81
+#: templates/videos/diffing.html:83
 #, python-format
 msgid ""
 "\n"
@@ -6622,15 +6654,15 @@ msgid ""
 "            "
 msgstr ""
 
-#: templates/videos/diffing.html:100
+#: templates/videos/diffing.html:102
 msgid "Revision History"
 msgstr "改訂履歴"
 
-#: templates/videos/diffing.html:104
+#: templates/videos/diffing.html:106
 msgid "Comparing Revision"
 msgstr "改訂の比較"
 
-#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:178
+#: templates/videos/diffing.html:114 templates/videos/diffing.html.py:182
 #, python-format
 msgid ""
 "\n"
@@ -6638,25 +6670,25 @@ msgid ""
 "            "
 msgstr ""
 
-#: templates/videos/diffing.html:125 templates/videos/diffing.html.py:193
+#: templates/videos/diffing.html:127 templates/videos/diffing.html.py:197
 msgid "Submit a new edit based on this version"
 msgstr "このバージョンに基づいた新たな変更を登録する。"
 
-#: templates/videos/diffing.html:129 templates/videos/diffing.html.py:197
+#: templates/videos/diffing.html:131 templates/videos/diffing.html.py:201
 msgid "Roll back to version"
 msgstr ""
 
-#: templates/videos/diffing.html:137 templates/videos/diffing.html.py:204
+#: templates/videos/diffing.html:139 templates/videos/diffing.html.py:208
 #: templates/videos/subtitle-view.html:201
 msgid "Title:"
 msgstr ""
 
-#: templates/videos/diffing.html:141 templates/videos/diffing.html.py:208
+#: templates/videos/diffing.html:143 templates/videos/diffing.html.py:212
 #: templates/videos/subtitle-view.html:205
 msgid "Description:"
 msgstr ""
 
-#: templates/videos/diffing.html:165 templates/videos/diffing.html.py:233
+#: templates/videos/diffing.html:169 templates/videos/diffing.html.py:239
 #: templates/videos/subtitle-view.html:225
 msgid "Not Synced"
 msgstr "同期していません。"
@@ -7077,7 +7109,7 @@ msgstr "タスク1"
 
 #: templates/videos/test_form_page.html:24
 msgid "Try creating subtitles on the following"
-msgstr ""
+msgstr "以下で字幕を作ってみてください"
 
 #: templates/videos/test_form_page.html:25
 #: templates/videos/test_form_page.html:31
@@ -7094,7 +7126,7 @@ msgstr "タスク2"
 
 #: templates/videos/test_form_page.html:30
 msgid "Try fixing errors on the video (or just get back in and make an edit)"
-msgstr ""
+msgstr "ビデオのエラーを直してください(もしくは一旦戻って編集を行ってください)"
 
 #: templates/videos/test_form_page.html:35
 msgid "Task 3"
@@ -7102,7 +7134,7 @@ msgstr "タスク3"
 
 #: templates/videos/test_form_page.html:36
 msgid "Translate the video (fake it if you’re not bilingual!)"
-msgstr ""
+msgstr "ビデオを翻訳してください(バイリンガルでない場合はごまかして！)"
 
 #: templates/videos/test_form_page.html:42
 msgid "optional: get updates about Amara"
@@ -7114,15 +7146,15 @@ msgstr "申し込む！"
 
 #: templates/videos/test_form_page.html:67
 msgid "Simple Instructions"
-msgstr ""
+msgstr "簡単なインストラクション"
 
 #: templates/videos/test_form_page.html:73
 msgid "All tasks 2 & 3 are optional (but we recommend trying them all)."
-msgstr ""
+msgstr "タスク2と3はオプションです(全て行うことを推奨しますが)。"
 
 #: templates/videos/test_form_page.html:74
 msgid "That’s it!"
-msgstr ""
+msgstr "正解"
 
 #: templates/videos/video-view.html:22
 msgid "Enter non-empty title"

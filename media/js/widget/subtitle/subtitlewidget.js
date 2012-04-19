@@ -249,7 +249,7 @@ unisubs.subtitle.SubtitleWidget.prototype.switchToEditMode = function() {
 
 };
 unisubs.subtitle.SubtitleWidget.prototype.handleKey_ = function(event) {
-    if (event.keyCode == goog.events.KeyCodes.ENTER) {
+    if (event.keyCode == goog.events.KeyCodes.ENTER && !event.shiftKey) {
         this.switchToView_();
         event.stopPropagation();
         event.preventDefault();
@@ -280,8 +280,7 @@ unisubs.subtitle.SubtitleWidget.prototype.updateValues_ = function() {
         if (time != -1)
             this.timeSpinner_.setValue(time);
     }
-    goog.dom.setTextContent(this.titleElemInner_,
-                            this.subtitle_.getText());
+    this.titleElemInner_.innerHTML = this.subtitle_.getText().replace("\n", "<br/>");
 };
 unisubs.subtitle.SubtitleWidget.prototype.disposeEventHandlers_ = function() {
     if (this.keyHandler_) {
