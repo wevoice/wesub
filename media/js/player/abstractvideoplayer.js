@@ -86,17 +86,18 @@ unisubs.player.AbstractVideoPlayer.DIALOG_SIZE = new goog.math.Size(400, 300);
 unisubs.player.AbstractVideoPlayer.prototype.createDom = function() {
     this.setElementInternal(this.getDomHelper().createElement('span'));
     goog.dom.classes.add(this.getElement(), 'unisubs-videoplayer');
+
     if (this.videoSource_ && this.videoSource_.sizeFromConfig){
         var sizeFromConfig = this.videoSource_.sizeFromConfig();
-        if (!this.forDialog_ && sizeFromConfig)
+        if (!this.forDialog_ && sizeFromConfig){
             this.playerSize_ = sizeFromConfig;
-        else{
+        } else {
             this.playerSize_ = this.forDialog_ ?
             unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
             unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
         }
-    this.setDimensionsKnownInternal();
 
+        this.setDimensionsKnownInternal();
     }
 
 };
@@ -105,26 +106,33 @@ unisubs.player.AbstractVideoPlayer.prototype.getPlayheadFn = function() {
     return goog.bind(this.getPlayheadTime, this);
 };
 unisubs.player.AbstractVideoPlayer.prototype.isPaused = function() {
-    if (this.isLoadingStopped_)
-	throw new "can't check if paused, loading is stopped";
+    if (this.isLoadingStopped_){
+	    throw new Error("can't check if paused, loading is stopped");
+    }
     return this.isPausedInternal();
 };
 unisubs.player.AbstractVideoPlayer.prototype.isPausedInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.isPlaying = function() {
-    if (this.isLoadingStopped_)
-	throw new "can't check if playing, loading is stopped";
+    if (this.isLoadingStopped_){
+	    throw new Error("can't check if playing, loading is stopped");
+    }
+    
     return this.isPlayingInternal();
 };
 unisubs.player.AbstractVideoPlayer.prototype.isPlayingInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.videoEnded = function() {
-    if (this.isLoadingStopped_)
-	throw new "can't check if video ended, loading is stopped";
+    if (this.isLoadingStopped_) {
+	    throw new Error("can't check if video ended, loading is stopped");
+    }
+    
     return this.videoEndedInternal();
 };
 unisubs.player.AbstractVideoPlayer.prototype.videoEndedInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.play = function(opt_suppressEvent) {
-    if (this.isLoadingStopped_)
-	throw new "can't play, loading is stopped";
+    if (this.isLoadingStopped_){
+	    throw new Error("can't play, loading is stopped");
+    }
+
     if (!opt_suppressEvent)
         this.dispatchEvent(
             unisubs.player.AbstractVideoPlayer.EventType.PLAY_CALLED);
@@ -132,22 +140,27 @@ unisubs.player.AbstractVideoPlayer.prototype.play = function(opt_suppressEvent) 
 };
 unisubs.player.AbstractVideoPlayer.prototype.playInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.pause = function(opt_suppressEvent) {
-    if (this.isLoadingStopped_)
-	throw new "can't pause, loading is stopped";
-    if (!opt_suppressEvent)
-        this.dispatchEvent(
-            unisubs.player.AbstractVideoPlayer.EventType.PAUSE_CALLED);
+    if (this.isLoadingStopped_){
+    	throw new Error("can't pause, loading is stopped");
+    }
+
+    if (!opt_suppressEvent){
+        this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PAUSE_CALLED);
+    }
+
     this.pauseInternal();
 };
 unisubs.player.AbstractVideoPlayer.prototype.pauseInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.togglePause = function() {
-    if (this.isLoadingStopped_)
-	throw new "can't toggle pause, loading is stopped";
+    if (this.isLoadingStopped_) {
+	    throw new Error("can't toggle pause, loading is stopped");
+    }
 
-    if (!this.isPlaying())
+    if (!this.isPlaying()) {
         this.play();
-    else
+    } else {
         this.pause();
+    }
 };
 unisubs.player.AbstractVideoPlayer.prototype.isLoadingStopped = function() {
   return this.isLoadingStopped_;  
@@ -160,18 +173,19 @@ unisubs.player.AbstractVideoPlayer.prototype.setLoadingStopped = function(isLoad
 };
 unisubs.player.AbstractVideoPlayer.prototype.stopLoading = function() {
     if (!this.isLoadingStopped_) {
-	this.pause();
-	this.storedPlayheadTime_ = this.getPlayheadTime();
-	if (this.stopLoadingInternal()) {
-	    this.isLoadingStopped_ = true;
-	}
+        this.pause();
+        this.storedPlayheadTime_ = this.getPlayheadTime();
+
+        if (this.stopLoadingInternal()) {
+            this.isLoadingStopped_ = true;
+        }
     }
 };
 unisubs.player.AbstractVideoPlayer.prototype.stopLoadingInternal = goog.abstractMethod;
 unisubs.player.AbstractVideoPlayer.prototype.resumeLoading = function() {
     if (this.isLoadingStopped_) {
-	this.resumeLoadingInternal(this.storedPlayheadTime_);
-	this.storedPlayheadTime_ = null;
+        this.resumeLoadingInternal(this.storedPlayheadTime_);
+        this.storedPlayheadTime_ = null;
     }
 };
 unisubs.player.AbstractVideoPlayer.prototype.resumeLoadingInternal = function(playheadTime) {
@@ -216,21 +230,21 @@ unisubs.player.AbstractVideoPlayer.prototype.areDimensionsKnown = function() {
     return this.dimensionsKnown_;
 };
 unisubs.player.AbstractVideoPlayer.prototype.getPlayheadTime = function() {
-    if (this.isLoadingStopped_)
-	return this.storedPlayheadTime_;
-    return this.getPlayheadTimeInternal();
+    return this.isLoadingStopped_ ? this.storedPlayheadTime_ : this.getPlayheadTimeInternal();
 };
+
 unisubs.player.AbstractVideoPlayer.prototype.getPlayheadTimeInternal = goog.abstractMethod;
 /**
  * 
  *
  */
-unisubs.player.AbstractVideoPlayer.prototype.playWithNoUpdateEvents = 
-    function(timeToStart, secondsToPlay) 
-{
+unisubs.player.AbstractVideoPlayer.prototype.playWithNoUpdateEvents = function(timeToStart, secondsToPlay) {
     this.noUpdateEvents_ = true;
-    if (this.noUpdatePreTime_ == null)
+
+    if (this.noUpdatePreTime_ == null) {
         this.noUpdatePreTime_ = this.getPlayheadTime();
+    }
+
     this.setPlayheadTime(timeToStart);
     this.play();
     this.noUpdateStartTime_ = timeToStart;
@@ -242,16 +256,11 @@ unisubs.player.AbstractVideoPlayer.prototype.playWithNoUpdateEvents =
 unisubs.player.AbstractVideoPlayer.prototype.dispatchEndedEvent = function() {
     this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PLAY_ENDED);
 };
-unisubs.player.AbstractVideoPlayer.prototype.sendTimeUpdateInternal = 
-    function() 
-{
-    if (!this.noUpdateEvents_)
-        this.dispatchEvent(
-            unisubs.player.AbstractVideoPlayer.EventType.TIMEUPDATE);
-    else {
-        if (this.ignoreTimeUpdate_)
-            return;
-        if (this.getPlayheadTime() >= this.noUpdateEndTime_) {
+unisubs.player.AbstractVideoPlayer.prototype.sendTimeUpdateInternal = function() {
+    if (!this.noUpdateEvents_) {
+        this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.TIMEUPDATE);
+    } else {
+        if (!this.ignoreTimeUpdate_ && this.getPlayheadTime() >= this.noUpdateEndTime_) {
             this.ignoreTimeUpdate_ = true;
             this.setPlayheadTime(this.noUpdatePreTime_);
             this.noUpdatePreTime_ = null;

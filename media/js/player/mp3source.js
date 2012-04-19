@@ -75,3 +75,17 @@ unisubs.player.MP3Source.prototype.getFlvURL = function() {
 unisubs.player.MP3Source.prototype.getVideoConfig = function() {
     return null;
 };
+
+/**
+* Checks if this video url is indeed for this MediaSource type, returns a
+* mediaSource subclass if it is, null if it isn't
+*/
+unisubs.player.MP3Source.getMediaSource = function(videoURL, opt_videoConfig) {
+    if (unisubs.player.MP3Source.isMP3URL(videoURL)) {
+        return unisubs.player.MP3Source.forURL(videoURL, opt_videoConfig);
+    }
+    return null;
+}
+
+// add this mediaSource to our registry
+unisubs.player.MediaSource.addMediaSource(unisubs.player.MP3Source.getMediaSource);

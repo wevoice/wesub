@@ -1782,7 +1782,7 @@ class Task(models.Model):
             upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
         else:
             # Send the subtitles back for improvement.
-            self._send_back(sends_notification=False)
+            self._send_back()
 
         if self.assignee:
             # TODO: See if we can eliminate the need for this if check.

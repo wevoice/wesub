@@ -1049,10 +1049,6 @@ class ViewsTest(WebUseTest):
         self._simple_test('videos:translation_history',
             [self.video.video_id, sl.language, sl.id])
 
-    def test_revision(self):
-        version = self.video.version()
-        self._simple_test('videos:revision', [version.id])
-
     def _test_rollback(self):
         #TODO: Seems like roll back is not getting called (on models)
         self._login()
@@ -1291,29 +1287,30 @@ class BlipTvVideoTypeTest(TestCase):
         self.vt = BlipTvVideoType
 
     def test_type(self):
-        url = 'http://blip.tv/file/4297824?utm_source=featured_ep&utm_medium=featured_ep'
+        url = 'http://blip.tv/day9tv/day-9-daily-438-p3-build-orders-made-easy-newbie-tuesday-6066868'
         video, created = Video.get_or_create_for_url(url)
         vu = video.videourl_set.all()[:1].get()
 
-        self.assertEqual(vu.videoid, '4297824')
+        # this is the id used to embed videos
+        self.assertEqual(vu.videoid, 'hdljgvKmGAI')
         self.assertTrue(video.title)
         self.assertTrue(video.thumbnail)
         self.assertTrue(vu.url)
 
         self.assertTrue(self.vt.matches_video_url(url))
-        self.assertTrue(self.vt.matches_video_url('http://blip.tv/file/4297824'))
+        self.assertTrue(self.vt.matches_video_url('http://blip.tv/day9tv/day-9-daily-438-p3-build-orders-made-easy-newbie-tuesday-6066868'))
         self.assertFalse(self.vt.matches_video_url('http://blip.tv'))
         self.assertFalse(self.vt.matches_video_url(''))
 
     def test_video_title(self):
-        url = 'http://blip.tv/file/4914074'
+        url = 'http://blip.tv/day9tv/day-9-daily-100-my-life-of-starcraft-3505715'
         video, created = Video.get_or_create_for_url(url)
         #really this should be jsut not failed
         self.assertTrue(video.get_absolute_url())
 
     def test_creating(self):
-        #this test is for ticket: https://www.pivotaltracker.com/story/show/12996607
-        url = 'http://blip.tv/file/5006677/'
+        # this test is for ticket: https://www.pivotaltracker.com/story/show/12996607
+        url = 'http://blip.tv/day9tv/day-9-daily-1-flash-vs-hero-3515432'
         video, created = Video.get_or_create_for_url(url)
 
 class DailymotionVideoTypeTest(TestCase):

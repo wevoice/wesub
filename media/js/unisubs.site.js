@@ -50,7 +50,7 @@ var Site = function(Site) {
          * utility function in this object and
          * called from each of the specific views,
          * like this:
-         *     
+         *
          *     that.Utils.chosenify();
          *
          */
@@ -260,7 +260,7 @@ var Site = function(Site) {
                     closeModal($(this).parents('.modal'));
                     return false;
                 });
-                function closeModal(e) { 
+                function closeModal(e) {
                     e.hide();
                     $('body div.well').remove();
                     $('html').unbind('click.modal');
@@ -269,7 +269,7 @@ var Site = function(Site) {
             $.fn.tabs = function(options){
                 this.each(function(){
                     var $this = $(this);
-                    
+
                     var $last_active_tab = $($('li.current a', $this).attr('href'));
                     $('a', $this).add($('a.link_to_tab')).click(function(){
                         var href = $(this).attr('href');
@@ -279,7 +279,7 @@ var Site = function(Site) {
                         $('a[href='+href+']', $this).parent('li').addClass('current');
                         document.location.hash = href.split('-')[0];
                         return false;
-                    });            
+                    });
                 });
                 if (document.location.hash){
                     var tab_name = document.location.hash.split('-', 1);
@@ -288,7 +288,7 @@ var Site = function(Site) {
                         document.location.href = document.location.href;
                     }
                 }
-                return this;        
+                return this;
             };
             function addCSRFHeader($){
                 /* Django will guard against csrf even on XHR requests, so we need to read
@@ -682,7 +682,7 @@ var Site = function(Site) {
         },
         team_settings_permissions: function() {
             $workflow = $('#id_workflow_enabled');
-            
+
             // Fields to watch
             $subperm = $('#id_subtitle_policy');
             $transperm = $('#id_translate_policy');
