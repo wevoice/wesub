@@ -1477,6 +1477,10 @@ class Task(models.Model):
     completed = models.DateTimeField(blank=True, null=True)
     expiration_date = models.DateTimeField(blank=True, null=True)
 
+    # Arbitrary priority for tasks. Some teams might calculate this
+    # on complex criteria and expect us to be able to sort tasks on it.
+    # Higher numbers mean higher priority
+    priority = models.PositiveIntegerField(blank=True, default=0, db_index=True)
     # Review and Approval -specific fields
     approved = models.PositiveIntegerField(choices=APPROVED_CHOICES,
                                            null=True, blank=True)
