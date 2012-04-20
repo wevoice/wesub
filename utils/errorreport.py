@@ -77,4 +77,5 @@ def _error_report_data(date=None):
         })
     data['today_errors'] = today_errors_data
     data['today_errors_count'] = today_errors.count()
+    data['base_url'] = Site.objects.get_current().domain
     return data
