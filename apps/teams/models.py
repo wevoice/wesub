@@ -711,7 +711,7 @@ class TeamVideo(models.Model):
         """Return the appropriate Workflow for this TeamVideo."""
         return Workflow.get_for_team_video(self)
 
-    def move_to(self, new_team):
+    def move_to(self, new_team, project=None):
         """
         Moves this TeamVideo to a new team.
         This method expects you to have run the correct permissions checks.
@@ -727,7 +727,11 @@ class TeamVideo(models.Model):
         self.team = new_team
 
         # projects are always team dependent:
-        self.project = new_team.default_project
+        if project:
+            self.project = project
+        else:
+            self.project = new_team.default_project
+
         self.save()
 
         # We need to make any as-yet-unmoderated versions public.

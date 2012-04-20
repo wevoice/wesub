@@ -232,6 +232,15 @@ ul.list-collapsible.expanded li.hidden {
   display: block;
 }
 
+a.button-clean {
+  display: inline-block;
+  margin-top: 0 !important;
+}
+
+div.fix-chosen div.chzn-container {
+  width: auto !important;
+}
+
 /* Tabs */
 .show-border {
   border-bottom-width: 2px;

@@ -108,6 +108,10 @@ class MoveTeamVideoForm(forms.Form):
     team = forms.ModelChoiceField(queryset=Team.objects.all(),
                                   required=True)
 
+    # Should this queryset be Project.objects.filter(team=team) ?
+    project = forms.ModelChoiceField(queryset=Project.objects.all(),
+                                     required=False)
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(MoveTeamVideoForm, self).__init__(*args, **kwargs)

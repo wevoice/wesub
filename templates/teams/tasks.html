@@ -132,8 +132,9 @@
                                     {% if translated_from and not translated_from.had_version %}
                                         class="disabled">
                                         <div class="cannot-perform-disabled">This task cannot be performed until the original language ({{ translated_from.get_language_display }}) is finished.</div>
-                                    {% else %}>{% endif %}
-                                {% else %}>{% endif %}
+                                    {% endif %}
+                                {% endif %}
+                                >
 
                                 <h3>
                                     {% if task.get_type_display == "Subtitle" %}
