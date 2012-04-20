@@ -57,5 +57,24 @@ def _error_report_data(date=None):
     data['new_errors'] = new_errors_data
     data['errors_count'] = errors.count()
     data['new_errors_count'] = new_errors.count()
-    data['base_url'] = Site.objects.get_current().domain
+    today_errors = _errors_seen_on(date, last_seen=True).exclude(id__in=[x.id for x in new_errors])
+    today_errors_data = []
+    for error in today_errors:
+        today_errors_data.append ( {
+            'message': error.message,
+            'pk': error.pk,
+            "total_count": error.message_set.count(),
+            "today_count": error.message_set.filter(
+                datetime__day=date.day,
+                datetime__month=date.month,
+                datetime__year=date.year,
+            ).count(),
+            "last_week_count":error.message_set.filter(
+                datetime__gte=last_week,
+                datetime__lte=date,
+
+            ).count()
+        })
+    data['today_errors'] = today_errors_data
+    data['today_errors_count'] = today_errors.count()
     return data
