@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-20 01:32-0500\n"
-"PO-Revision-Date: 2012-04-20 06:46+0000\n"
+"POT-Creation-Date: 2012-04-21 01:32-0500\n"
+"PO-Revision-Date: 2012-04-21 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Czech (http://www.transifex.net/projects/p/universalsubtitles/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -452,50 +452,50 @@ msgstr "Tým"
 msgid "User"
 msgstr "Uživatel"
 
-#: apps/teams/forms.py:47 apps/teams/forms.py:149
+#: apps/teams/forms.py:47 apps/teams/forms.py:153
 #: libs/rosetta/templates/rosetta/languages.html:12
 #: templates/teams/_context_team.html:65
 msgid "Project"
 msgstr "Projekt"
 
-#: apps/teams/forms.py:51 apps/teams/forms.py:153
+#: apps/teams/forms.py:51 apps/teams/forms.py:157
 msgid "Let's keep things tidy, shall we?"
 msgstr ""
 
-#: apps/teams/forms.py:135
+#: apps/teams/forms.py:139
 msgid "Video URL"
 msgstr "URL videa"
 
-#: apps/teams/forms.py:136
+#: apps/teams/forms.py:140
 msgid ""
 "Enter the URL of any compatible video or any video on our site. You can also"
 " browse the site and use the 'Add Video to Team' menu."
 msgstr "Vložte URL jakéhokoli kompatibilního videa nebo videa na naší stránce. Můžete také procházet stránku a použít menu ‚Přidat video do týmu."
 
-#: apps/teams/forms.py:144
+#: apps/teams/forms.py:148
 msgid "Video language"
 msgstr "Jazyk videa"
 
-#: apps/teams/forms.py:146
+#: apps/teams/forms.py:150
 msgid "It will be saved only if video does not exist in our database."
 msgstr "Bude uloženo, pouze pokud video již není v naší databázi."
 
-#: apps/teams/forms.py:200
+#: apps/teams/forms.py:204
 msgid "This video already belongs to a team."
 msgstr ""
 
-#: apps/teams/forms.py:206
+#: apps/teams/forms.py:210
 msgid "Set original language for this video."
 msgstr "Nastavte zdrojový jazyk tohoto videa."
 
-#: apps/teams/forms.py:259
+#: apps/teams/forms.py:263
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
 "appear."
 msgstr ""
 
-#: apps/teams/forms.py:262
+#: apps/teams/forms.py:266
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
@@ -503,94 +503,94 @@ msgid ""
 "and make sure to check \"Save feed\" box."
 msgstr ""
 
-#: apps/teams/forms.py:280
+#: apps/teams/forms.py:284
 msgid "Team intro video URL"
 msgstr "URL videa představení týmu"
 
-#: apps/teams/forms.py:282
+#: apps/teams/forms.py:286
 msgid ""
 "You can put an optional video\n"
 "on your team homepage that explains what your team is about, to attract volunteers.\n"
 "Enter a link to any compatible video, or to any video page on our site."
 msgstr ""
 
-#: apps/teams/forms.py:287
+#: apps/teams/forms.py:291
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr "URL týmu: http://universalsubtitles.org/teams/"
 
-#: apps/teams/forms.py:327
+#: apps/teams/forms.py:331
 msgid "This video has already been transcribed."
 msgstr ""
 
-#: apps/teams/forms.py:332
+#: apps/teams/forms.py:336
 msgid "Subtitling of this video is already in progress."
 msgstr "Video se už nahrává."
 
-#: apps/teams/forms.py:338
+#: apps/teams/forms.py:342
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr ""
 
-#: apps/teams/forms.py:344
+#: apps/teams/forms.py:348
 msgid "This language already has a complete set of subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:363
+#: apps/teams/forms.py:367
 msgid "There is already a task in progress for that video/language."
 msgstr "Úkol pro toto video/jazyk uz existuje."
 
-#: apps/teams/forms.py:376
+#: apps/teams/forms.py:380
 msgid "You must select a language for a Translate task."
 msgstr ""
 
-#: apps/teams/forms.py:409
+#: apps/teams/forms.py:413
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr ""
 
-#: apps/teams/forms.py:431
+#: apps/teams/forms.py:435
 msgid "You do not have permission to assign this task."
 msgstr "Nemáte právo přiřadit tento úkol."
 
-#: apps/teams/forms.py:438
+#: apps/teams/forms.py:442
 msgid "This user cannot perform that task."
 msgstr "Tento uživatel nemůže provést tento úkol."
 
-#: apps/teams/forms.py:459
+#: apps/teams/forms.py:463
 msgid "You do not have permission to delete this task."
 msgstr "Nemáte práva na smazání tohoto úkolu."
 
-#: apps/teams/forms.py:520
+#: apps/teams/forms.py:524
 msgid "You cannot blacklist a preferred language."
 msgstr "Nemůžete zakázat preferovaný jazyk."
 
-#: apps/teams/forms.py:544 apps/teams/forms.py:546
+#: apps/teams/forms.py:548 apps/teams/forms.py:550
 msgid "User does not exist!"
 msgstr "Uživatel neexistuje!"
 
-#: apps/teams/forms.py:553
+#: apps/teams/forms.py:557
 msgid "User is already a member of this team!"
 msgstr "Uživatel je již členem tohoto týmu!"
 
-#: apps/teams/forms.py:581 templates/videos/subtitle-view.html:354
+#: apps/teams/forms.py:585 templates/videos/subtitle-view.html:354
 msgid "Would you like to delete these subtitles completely?"
 msgstr "Opravdu chcete smazat tyto celé titulky?"
 
-#: apps/teams/forms.py:585 templates/videos/subtitle-view.html:339
+#: apps/teams/forms.py:589 templates/videos/subtitle-view.html:339
 msgid "What would you like to unpublish?"
 msgstr "Co chcete odpublikovat?"
 
-#: apps/teams/forms.py:587
+#: apps/teams/forms.py:591
 msgid "This version (and any later version) for this language."
 msgstr ""
 
-#: apps/teams/forms.py:588
+#: apps/teams/forms.py:592
 msgid "All versions for this language and any dependent languages."
 msgstr ""
 
-#: apps/teams/forms.py:606
+#: apps/teams/forms.py:610
 msgid "These subtitles are not under a team's control."
 msgstr ""
 
-#: apps/teams/forms.py:610
+#: apps/teams/forms.py:614
 msgid "You do not have permission to unpublish these subtitles."
 msgstr "Nemáte oprávnění odpublikovat tyto titulky."
 
@@ -741,20 +741,20 @@ msgstr "Potřebuji pomoc se všemi jazyky"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Když toto zaškrtnete, ostatní jazyky nebudou zobrazeny."
 
-#: apps/teams/models.py:904 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:908 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "vlastník"
 
-#: apps/teams/models.py:905 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:909 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Správce"
 
-#: apps/teams/models.py:906 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:910 apps/teams/permissions_const.py:44
 #: templates/base.html:116
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:907 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:911 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Přispěvatel"
 
@@ -770,7 +770,7 @@ msgstr "Tým neexistuje"
 msgid "You are already a member of this team."
 msgstr "Již jste členem tohoto týmu."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:862
+#: apps/teams/rpc.py:50 apps/teams/views.py:863
 msgid "You are now a member of this team."
 msgstr "Nyní jste členem tohoto týmu."
 
@@ -855,7 +855,7 @@ msgid "You do not have permission to delete this team."
 msgstr "Nemáte oprávnění smazat tento tým."
 
 #: apps/teams/views.py:352 apps/teams/views.py:388 apps/teams/views.py:416
-#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1442
+#: apps/teams/views.py:449 apps/teams/views.py:504 apps/teams/views.py:1443
 msgid "You do not have permission to edit this team."
 msgstr "Nemáte oprávnění měnit tento tým."
 
@@ -871,145 +871,145 @@ msgstr ""
 msgid "You can't add that video to this team/project."
 msgstr "Nemůžete přidat toto video tomuto týmu."
 
-#: apps/teams/views.py:572
+#: apps/teams/views.py:573
 msgid "The video has been moved to the new team."
 msgstr "Toto video bylo přesunuto novému týmu."
 
-#: apps/teams/views.py:585
+#: apps/teams/views.py:586
 msgid "You can't add videos to this team/project."
 msgstr "Nemůžete přidávat videa tomuto týmu."
 
-#: apps/teams/views.py:604
+#: apps/teams/views.py:605
 msgid "You can't edit this video."
 msgstr "Nemůžete měnit toto video."
 
-#: apps/teams/views.py:613
+#: apps/teams/views.py:614
 msgid "Video has been updated."
 msgstr "Video bylo aktualizováno."
 
-#: apps/teams/views.py:641
+#: apps/teams/views.py:642
 msgid "Request must be a POST request."
 msgstr "Žádost musí být POST žádost."
 
-#: apps/teams/views.py:649
+#: apps/teams/views.py:650
 msgid "You can't delete that video."
 msgstr "Nemůžete smazat toto video."
 
-#: apps/teams/views.py:653
+#: apps/teams/views.py:654
 msgid "You can't remove that video."
 msgstr "Nemůžete smazat toto video."
 
-#: apps/teams/views.py:664
+#: apps/teams/views.py:665
 msgid "Video has been deleted from Amara."
 msgstr ""
 
-#: apps/teams/views.py:666
+#: apps/teams/views.py:667
 msgid "Video has been removed from the team."
 msgstr "Video bylo smazáno z tohoto týmu."
 
-#: apps/teams/views.py:753
+#: apps/teams/views.py:754
 msgid "Member has been removed from the team."
 msgstr "Člen byl odstraněn z týmu."
 
-#: apps/teams/views.py:756
+#: apps/teams/views.py:757
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 
-#: apps/teams/views.py:759
+#: apps/teams/views.py:760
 msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
-#: apps/teams/views.py:790
+#: apps/teams/views.py:791
 msgid "Application approved."
 msgstr "Žádost schválena."
 
-#: apps/teams/views.py:792 apps/teams/views.py:810
+#: apps/teams/views.py:793 apps/teams/views.py:811
 msgid "Application does not exist."
 msgstr "Žádost neexistuje."
 
-#: apps/teams/views.py:794
+#: apps/teams/views.py:795
 msgid "You can't approve applications."
 msgstr "Nemůžete schvalovat žádosti."
 
-#: apps/teams/views.py:808
+#: apps/teams/views.py:809
 msgid "Application denied."
 msgstr "Žádost zamítnuta."
 
-#: apps/teams/views.py:812
+#: apps/teams/views.py:813
 msgid "You can't deny applications."
 msgstr "Nemůžete odmítat žádosti."
 
-#: apps/teams/views.py:822
+#: apps/teams/views.py:823
 msgid "You cannot invite people to this team."
 msgstr "Nemůžete zvát lidi do tohoto týmu."
 
-#: apps/teams/views.py:858
+#: apps/teams/views.py:859
 msgid "You cannot join this team."
 msgstr "Nemůžete se přidat do tohoto týmu."
 
-#: apps/teams/views.py:909
+#: apps/teams/views.py:910
 msgid "You have left this team."
 msgstr "Opustili jste tento tým."
 
-#: apps/teams/views.py:1116
+#: apps/teams/views.py:1117
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1234 apps/teams/views.py:1237
+#: apps/teams/views.py:1235 apps/teams/views.py:1238
 msgid "You are not allowed to perform this task."
 msgstr "Nemůžete provést tuto úlohu."
 
-#: apps/teams/views.py:1292
+#: apps/teams/views.py:1293
 msgid "Task deleted."
 msgstr "Úkol smazán."
 
-#: apps/teams/views.py:1294
+#: apps/teams/views.py:1295
 msgid "You cannot delete this task."
 msgstr "Nemůžete smazat tento úkol."
 
-#: apps/teams/views.py:1319
+#: apps/teams/views.py:1320
 msgid "Task declined."
 msgstr "Úkol odmítnut."
 
-#: apps/teams/views.py:1321
+#: apps/teams/views.py:1322
 msgid "Task assigned."
 msgstr "Úkol přiřazen."
 
-#: apps/teams/views.py:1323
+#: apps/teams/views.py:1324
 msgid "You cannot assign this task."
 msgstr "Nemůžete přiřadit tento úkol."
 
-#: apps/teams/views.py:1345
+#: apps/teams/views.py:1346
 msgid "Invalid assignment attempt."
 msgstr "Pokus o neplatné přiřazení."
 
-#: apps/teams/views.py:1369
+#: apps/teams/views.py:1370
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1381
+#: apps/teams/views.py:1382
 msgid "Project added."
 msgstr "Projekt přidán."
 
-#: apps/teams/views.py:1398
+#: apps/teams/views.py:1399
 msgid "You cannot edit that project."
 msgstr "Nemůžete měnit tento projekt."
 
-#: apps/teams/views.py:1409
+#: apps/teams/views.py:1410
 msgid "Project deleted."
 msgstr "Projekt smazán."
 
-#: apps/teams/views.py:1427
+#: apps/teams/views.py:1428
 msgid "Project saved."
 msgstr "Projekt uložen."
 
-#: apps/teams/views.py:1555
+#: apps/teams/views.py:1556
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1588
+#: apps/teams/views.py:1589
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1661,7 +1661,7 @@ msgid "Go"
 msgstr "Přejít"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:145 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:146 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:61
 msgid "Original"
 msgstr "Originál"
@@ -4019,14 +4019,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Jste si jisti, že chcete nastálo odstranit váš profil?"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:281
+#: templates/messages/sent.html:51 templates/teams/tasks.html:282
 msgid "Delete"
 msgstr "Smazat"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:335 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:336 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:368
 msgid "Cancel"
 msgstr "Storno"
@@ -4438,17 +4438,17 @@ msgid "Open Tasks"
 msgstr "Otevřené úlohy"
 
 #: templates/profiles/dashboard.html:45 templates/teams/tasks.html:58
-#: templates/teams/tasks.html.py:140
+#: templates/teams/tasks.html.py:141
 msgid "Transcribe"
 msgstr "Přepsat"
 
 #: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:150
+#: templates/teams/tasks.html:151
 msgid "Subtitles into"
 msgstr ""
 
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:155
-#: templates/teams/tasks.html.py:171 templates/videos/diffing.html:97
+#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:156
+#: templates/teams/tasks.html.py:172 templates/videos/diffing.html:97
 #: templates/videos/subtitle-view.html:139
 #: templates/videos/subtitle-view.html:185
 msgid "Subtitles"
@@ -4890,7 +4890,7 @@ msgstr "Měsíc"
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
 #: templates/teams/_context_team.html:47 templates/teams/tasks.html:120
-#: templates/teams/tasks.html.py:159 templates/videos/video-view.html:136
+#: templates/teams/tasks.html.py:160 templates/videos/video-view.html:136
 msgid "Video"
 msgstr "Video"
 
@@ -5094,7 +5094,7 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr "Můžete také pozvat přátele, kteří mluví jinými jazyky, aby pomohli."
 
 #: templates/teams/_perform_task_link.html:4
-#: templates/teams/_perform_task_link.html:24 templates/teams/tasks.html:234
+#: templates/teams/_perform_task_link.html:24 templates/teams/tasks.html:235
 msgid "Perform Task"
 msgstr "Proveď úkol"
 
@@ -5153,8 +5153,20 @@ msgid ""
 "        "
 msgstr ""
 
-#: templates/teams/_team_move_video_select.html:5
+#: templates/teams/_team_move_video_select.html:6
 msgid "Move video to one of your other teams?"
+msgstr ""
+
+#: templates/teams/_team_move_video_select.html:27
+#: templates/teams/_team_move_video_select.html:51
+msgid "Move video"
+msgstr ""
+
+#: templates/teams/_team_move_video_select.html:32
+msgid ""
+"You are about to move this video to a new team.<br /><strong>If you proceed,"
+" all open tasks will be deleted and existing drafts will be "
+"published.</strong>"
 msgstr ""
 
 #: templates/teams/_team_select.html:6
@@ -5321,7 +5333,7 @@ msgstr "Jaký jazyk je potřeba?"
 msgid "Who should do it?"
 msgstr "Kdo to má udělat?"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:339
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:340
 msgid "Begin typing to search"
 msgstr "Pro vyhledávání začněte psát"
 
@@ -5722,7 +5734,7 @@ msgstr "přiřazen"
 msgid "anyone"
 msgstr "komukoliv"
 
-#: templates/teams/tasks.html:89 templates/teams/tasks.html.py:206
+#: templates/teams/tasks.html:89 templates/teams/tasks.html.py:207
 msgid "me"
 msgstr "mě"
 
@@ -5754,68 +5766,68 @@ msgstr "zbývajícího času, nejvíce"
 msgid "Clear all filters and search terms"
 msgstr ""
 
-#: templates/teams/tasks.html:173
+#: templates/teams/tasks.html:174
 msgid "latest draft"
 msgstr "nejnovější koncept"
 
-#: templates/teams/tasks.html:177
+#: templates/teams/tasks.html:178
 msgid "transcribed"
 msgstr "přepsáno"
 
-#: templates/teams/tasks.html:179 templates/videos/subtitle-view.html:37
+#: templates/teams/tasks.html:180 templates/videos/subtitle-view.html:37
 msgid "translated"
 msgstr "přeloženo"
 
-#: templates/teams/tasks.html:187
+#: templates/teams/tasks.html:188
 msgid "reviewed"
 msgstr "zkontrolováno"
 
-#: templates/teams/tasks.html:189
+#: templates/teams/tasks.html:190
 msgid "and edited"
 msgstr "a opraveno"
 
-#: templates/teams/tasks.html:191 templates/videos/subtitle-view.html:193
+#: templates/teams/tasks.html:192 templates/videos/subtitle-view.html:193
 #: templates/videos/subtitle-view.html:299
 msgid "by"
 msgstr " "
 
-#: templates/teams/tasks.html:204
+#: templates/teams/tasks.html:205
 msgid "Assigned to"
 msgstr "Přiřazeno"
 
-#: templates/teams/tasks.html:213
+#: templates/teams/tasks.html:214
 msgid "Unassigned"
 msgstr ""
 
-#: templates/teams/tasks.html:252
+#: templates/teams/tasks.html:253
 msgid "Decline"
 msgstr "Odmítnout"
 
-#: templates/teams/tasks.html:272
+#: templates/teams/tasks.html:273
 msgid "Reassign"
 msgstr "Přiřadit"
 
-#: templates/teams/tasks.html:274
+#: templates/teams/tasks.html:275
 msgid "Assign"
 msgstr "Přiřadit"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:291
 msgid "Delete task"
 msgstr "Smazat úkol"
 
-#: templates/teams/tasks.html:299
+#: templates/teams/tasks.html:300
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:303
+#: templates/teams/tasks.html:304
 msgid "Delete these subtitles permanently"
 msgstr ""
 
-#: templates/teams/tasks.html:342
+#: templates/teams/tasks.html:343
 msgid "Assign to User"
 msgstr "Přiřadit uživateli"
 
-#: templates/teams/tasks.html:352
+#: templates/teams/tasks.html:353
 msgid "Sorry, no tasks here."
 msgstr ""
 
