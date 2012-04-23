@@ -1516,7 +1516,7 @@ class Task(models.Model):
                 user=self.assignee,
             )
             comment.save()
-            notifier.send_video_comment_notification(comment.pk,
+            notifier.send_video_comment_notification.delay(comment.pk,
                                     version_pk=self.subtitle_version.pk)
 
     def future(self):
