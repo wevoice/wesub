@@ -776,13 +776,7 @@ def video_delete_handler(sender, instance, **kwargs):
 
 def video_post_delete_handler(sender, instance, **kwargs):
     if sender == Video:
-        from teams.tasks import api_notify_on_video_activity
         Action.delete_video_handler(instance)
-        team_video = instance.get_team_video()
-        if not team_video:
-            return
-        api_notify_on_video_activity.delay(team_video.team.pk, instance.pk,
-                'delete')
 
 
 models.signals.pre_save.connect(create_video_id, sender=Video)
