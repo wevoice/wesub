@@ -56,8 +56,10 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
     from videos.tasks import video_changed_tasks
 
     key = str(uuid4()).replace('-', '')
+
     if language.is_original:
         as_forked = True
+
     video._make_writelock(user, key)
     video.save()
 
@@ -67,16 +69,28 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
     except ObjectDoesNotExist:
         old_version = None
         version_no = 0
+
     version = None
+
     if not is_version_same(old_version, parser):
         forked_from = as_forked and translated_from and translated_from.version()
+
+        if old_version and old_version.title and old_version.description:
+            title = old_version.title
+            description = old_version.description
+        else:
+            title = video.get_title_display()
+            description = video.get_description_display()
+
         version = SubtitleVersion(
             language=language, version_no=version_no,
             datetime_started=datetime.now(), user=user,
             note=u'Uploaded', is_forked=as_forked, time_change=1, text_change=1,
-            forked_from=forked_from)
+            forked_from=forked_from, title=title, description=description)
+
         if len(parser) > 0:
             version.has_version = True
+
         version.save()
 
         ids = []
@@ -86,6 +100,7 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
 
             while id in ids:
                 id = int(random.random()*10e12)
+
             ids.append(id)
 
             metadata = item.pop('metadata', None)
@@ -104,19 +119,25 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
                         key=name,
                         data=value
                     ).save()
+
     version = version or old_version
+
     if version.is_forked != as_forked:
         version.is_forked = as_forked
         version.save()
+
     if version.user != user:
         # we might be only uptading the user , as in per bulk imports
         version.user = user
         version.save()
+
     language.video.release_writelock()
     language.video.save()
+
     if forks:
         translations = video.subtitlelanguage_set.filter(standard_language=language)
         [t.fork(from_version=old_version, user=user) for t in translations]
+
     if update_video:
         video_changed_tasks.delay(video.id, None if version is None else version.id)
 
