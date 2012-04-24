@@ -24,7 +24,7 @@ from django.utils.translation import ugettext_lazy as _
 from messages.forms import TeamAdminPageMessageForm
 from teams.models import (
     Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing,
-    Project, TeamLanguagePreference
+    Project, TeamLanguagePreference, TeamNotificationSetting
 )
 from videos.models import SubtitleLanguage
 
@@ -176,3 +176,4 @@ admin.site.register(TeamLanguagePreference, TeamLanguagePreferenceAdmin)
 admin.site.register(MembershipNarrowing, MembershipNarrowingAdmin)
 admin.site.register(Setting, SettingAdmin)
 admin.site.register(Project, ProjectAdmin)
+admin.site.register(TeamNotificationSetting)

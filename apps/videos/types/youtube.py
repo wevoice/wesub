@@ -111,6 +111,8 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
         version_no = 0
 
     version = SubtitleVersion(language=language)
+    version.title = video.title
+    version.description = video.description
     version.version_no = version_no
     version.datetime_started = datetime.now()
     version.user = User.get_anonymous()

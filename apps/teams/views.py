@@ -568,7 +568,8 @@ def move_video(request):
     if form.is_valid():
         team_video = form.cleaned_data['team_video']
         team = form.cleaned_data['team']
-        team_video.move_to(team)
+        project = form.cleaned_data['project']
+        team_video.move_to(team, project)
         messages.success(request, _(u'The video has been moved to the new team.'))
     else:
         for e in flatten_errorlists(form.errors):

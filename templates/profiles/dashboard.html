@@ -75,6 +75,10 @@
                             {% endif %}
                         {% endwith %}
                     </li>
+                {% empty %}
+                    <li>
+                        <p>You have no open tasks assigned to you.</p>
+                    </li>
                 {% endfor %}
             </ul>
 

@@ -31,7 +31,7 @@ from math_captcha.forms import MathCaptchaForm
 
 from teams.models import Task
 from teams.moderation_const import UNMODERATED, WAITING_MODERATION
-from teams.permissions import can_create_and_edit_subtitles
+from teams.permissions import can_create_and_edit_subtitles, can_assign_task, can_create_and_edit_translations
 from utils import (
     SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser,
     SubtitleParserError, SbvSubtitleParser, TxtSubtitleParser,
@@ -172,18 +172,18 @@ class SubtitlesUploadBaseForm(forms.Form):
         language = self.cleaned_data['language']
 
         team_video = video.get_team_video()
-        if team_video:
-            msg = _(u"Uploading subtitles in this language was forbidden by team %s which moderates the video.") % team_video.team
 
+        if team_video:
             blocking_tasks = team_video.task_set.incomplete_subtitle_or_translate().filter(language__in=[language, ''])
 
-            # If there are any incomplete tasks open they should block the
-            # uploading of subtitles, unless the user is assigned to that task.
-            if self.user and self.user.is_authenticated():
-                blocking_tasks = blocking_tasks.exclude(assignee=self.user)
-
             if blocking_tasks.exists():
-                raise forms.ValidationError(msg + "hello")
+                task = blocking_tasks.get()
+
+                # only block if the user can't assign the task
+                # aka he can't do himself or he can't actually
+                # assign it to himself.
+                if not can_assign_task(task, self.user):
+                    raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because work on this language is already in progress."))
 
             # Now we know that there are no transcribe/translate tasks that
             # should block this upload.
@@ -195,14 +195,18 @@ class SubtitlesUploadBaseForm(forms.Form):
             blocking_tasks = team_video.task_set.incomplete_review_or_approve().filter(language=language)
 
             if blocking_tasks.exists():
-                raise forms.ValidationError(msg + "test")
+                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because a draft for this language is already in moderation."))
 
             # There are no tasks for this video that should block the upload.
             # The last thing to check is that the team's transcription policy doesn't block this.
-            #
-            # TODO: Support uploading subtitles as a translation?
-            if not can_create_and_edit_subtitles(self.user, team_video, language):
-                raise forms.ValidationError(msg + "wa")
+            # if the video is complete (aka has been transcribed) we check if the user can
+            # upload translations. if not, subtitles
+            if video.is_complete:
+                if not can_create_and_edit_translations(self.user, team_video, language):
+                    raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because this language is moderated and you don't have sufficient permission."))
+            else:
+                if not can_create_and_edit_subtitles(self.user, team_video, language):
+                    raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because this language is moderated and you don't have sufficient permission."))
 
         return self.cleaned_data
 
@@ -403,10 +407,15 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
             team_video = video.get_team_video()
 
             if team_video:
-                tasks = team_video.task_set.incomplete_subtitle().filter(language__in=[language, ''])
+                tasks = team_video.task_set.incomplete_subtitle_or_translate().filter(language__in=[language, ''])
 
                 if tasks.exists():
-                    tasks[0].complete()
+                    task = tasks.get()
+
+                    if not task.assignee and self.user:
+                        task.assignee = self.user
+
+                    task.complete()
 
         if latest_version:
             video_changed_tasks.delay(sl.video_id, sl.latest_version().id)

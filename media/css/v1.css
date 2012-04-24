@@ -232,6 +232,15 @@ ul.list-collapsible.expanded li.hidden {
   display: block;
 }
 
+a.button-clean {
+  display: inline-block;
+  margin-top: 0 !important;
+}
+
+div.fix-chosen div.chzn-container {
+  width: auto !important;
+}
+
 /* Tabs */
 .show-border {
   border-bottom-width: 2px;
@@ -402,6 +411,14 @@ ul.list-collapsible.expanded li.hidden {
   text-decoration: none;
   top: 0;
   left: 152px;
+}
+
+.v1 .grid_9.alpha .tools {
+  margin: 0 -20px 0 0;
+  padding-right: 10px;
+}
+.v1 .grid_9.alpha .tools .sort_button {
+  margin-top: 0;
 }
 
 /* Listings */
