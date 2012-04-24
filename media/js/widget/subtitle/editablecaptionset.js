@@ -122,7 +122,20 @@ unisubs.subtitle.EditableCaptionSet.prototype.needsTranslation = function() {
     return needsTranslation;
 };
 unisubs.subtitle.EditableCaptionSet.prototype.resetSubs = function() {
-    goog.array.forEach(this.captions_, function(c) { c.resetSub(); });
+
+    var that = this;
+
+    goog.array.forEach(this.captions_, function(c) {
+
+        // If the caption's original text is empty, just delete it.
+        // Otherwise, reset the text and the start/end times.
+        if (c.json['original_text'] === '') {
+            that.deleteCaption(c);
+        } else {
+            c.resetSub();
+        }
+
+    });
 
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.RESET_SUBS);

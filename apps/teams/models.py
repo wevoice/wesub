@@ -711,7 +711,7 @@ class TeamVideo(models.Model):
         """Return the appropriate Workflow for this TeamVideo."""
         return Workflow.get_for_team_video(self)
 
-    def move_to(self, new_team):
+    def move_to(self, new_team, project=None):
         """
         Moves this TeamVideo to a new team.
         This method expects you to have run the correct permissions checks.
@@ -727,7 +727,11 @@ class TeamVideo(models.Model):
         self.team = new_team
 
         # projects are always team dependent:
-        self.project = new_team.default_project
+        if project:
+            self.project = project
+        else:
+            self.project = new_team.default_project
+
         self.save()
 
         # We need to make any as-yet-unmoderated versions public.
@@ -1477,6 +1481,10 @@ class Task(models.Model):
     completed = models.DateTimeField(blank=True, null=True)
     expiration_date = models.DateTimeField(blank=True, null=True)
 
+    # Arbitrary priority for tasks. Some teams might calculate this
+    # on complex criteria and expect us to be able to sort tasks on it.
+    # Higher numbers mean higher priority
+    priority = models.PositiveIntegerField(blank=True, default=0, db_index=True)
     # Review and Approval -specific fields
     approved = models.PositiveIntegerField(choices=APPROVED_CHOICES,
                                            null=True, blank=True)
@@ -1508,7 +1516,7 @@ class Task(models.Model):
                 user=self.assignee,
             )
             comment.save()
-            notifier.send_video_comment_notification(comment.pk,
+            notifier.send_video_comment_notification.delay(comment.pk,
                                     version_pk=self.subtitle_version.pk)
 
     def future(self):

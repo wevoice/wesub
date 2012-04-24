@@ -642,16 +642,39 @@ var Site = function(Site) {
 
             var $move_form = $('form.move-video');
 
-            $move_form.submit(function() {
-                var $selected = $('select#id_team option:selected', $move_form);
-                $('input[name="team_video"]', $move_form).val($selected.val());
-                $('input[name="team"]', $move_form).val($selected.data('team-pk'));
+            $('a#move-video').click(function() {
+                var $selected_team = $('select#id_team option:selected', $move_form);
+                var $selected_team_projects = $('#team-projects-' + $selected_team.data('team-pk'));
+                var $selected_team_projects_select = $('select', $selected_team_projects);
+                $('div.team-projects').hide();
 
-                if (confirm("WARNING:\n\nIf you move this video it will lose all tasks associated with it (the activity will be retained, however).\n\nAll subtitles currently waiting for moderation will be made public.\n\nProceed?")) {
-                    return true;
-                } else {
-                    return false;
+                if ($selected_team_projects_select.children('option').length) {
+                    $selected_team_projects.show();
                 }
+            });
+
+            $move_form.submit(function() {
+                var $selected_team = $('select#id_team option:selected', $move_form);
+                $('input[name="team_video"]', $move_form).val($selected_team.val());
+                $('input[name="team"]', $move_form).val($selected_team.data('team-pk'));
+
+                var $selected_team_projects = $('#team-projects-' + $selected_team.data('team-pk'));
+                var $selected_team_projects_select = $('select', $selected_team_projects);
+
+                // This team has projects. Grab the selected one.
+                if ($selected_team_projects_select.children('option').length) {
+                    var $selected_project = $('option:selected', $selected_team_projects_select).val();
+                    $('input[name="project"]', $move_form).val($selected_project);
+                } else {
+                    $('input[name="project"]', $move_form).val('');
+                }
+            });
+
+            var $move_modal_form = $('div#move-modal form');
+
+            $move_modal_form.submit(function() {
+                $move_form.submit();
+                return false;
             });
         },
         team_videos_list: function() {

@@ -146,7 +146,7 @@
                     <a href="#unpublish-modal" class="button open-modal">{% trans 'Unpublish' %}</a>
                 {% endif %}
                 {% if language.is_original and request.user|can_create_subtitles_for:video or not language.is_original and request.user|can_create_translations_for:video %}
-                    <a id="edit_subtitles_button" href="{{edit_url}}" class="button">{% trans 'Edit Subtitles' %}</a>
+                    <a id="edit_subtitles_button" class="button{% if not last_version.is_public %} disabled" title="Editing drafts is not permitted"{% else %}" href="{{edit_url}}"{% endif %}>{% trans 'Edit Subtitles' %}</a>
                 {% endif %}
                 {% if last_version.subtitles %}
                     <div class="sort_button action">
@@ -180,7 +180,10 @@
             </div>
             {% if last_version %}
                 {% if last_version.has_subtitles %}
-                    <p class="view-notice">
+                    <p class="view-notice{% if not last_version.is_public %} draft">
+                            <em>{% trans 'Draft only' %}</em>
+                        {% else %}">
+                        {% endif %}
                         {% if language.is_dependent %}
                             {% trans "Subtitles" %}
                             {% trans 'translated from' %}
@@ -315,11 +318,13 @@
     </div>
 
     {% if next_version and rollback_allowed %}
-        <div class="tools">
-            <a href="{% url videos:rollback last_version.pk %}" class="button" id="rollback">
-                {% trans 'Roll back to this version' %}
-            </a>
-        </div>
+        {% if next_version.moderation_status != 'waiting_moderation' %}
+            <div class="tools">
+                <a href="{% url videos:rollback last_version.pk %}" class="button" id="rollback">
+                    {% trans 'Roll back to this version' %}
+                </a>
+            </div>
+        {% endif %}
     {% endif %}
 
     {% if request.user|can_unpublish:video %}

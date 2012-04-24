@@ -296,6 +296,30 @@ Example response:
         "workflow_enabled": false
     }
 
+Policy values
++++++++++++++
+
+Membership policy:
+
+* ``Open``
+* ``Application``
+* ``Invitation by any team member``
+* ``Invitation by manager``
+* ``Invitation by admin``
+
+Video policy:
+
+* ``Any team member``
+* ``Managers and admins``
+* ``Admins only``
+
+Task assign policy:
+
+* ``Anyone``
+* ``Any team member``
+* ``Only managers and admins``
+* ``Only admins``
+
 Creating teams
 ++++++++++++++
 
@@ -314,3 +338,68 @@ For example
         https://www.universalsubtitles.org/api2/partners/teams/
 
 You can use the same fields that you get back when requesting a team detail.
+
+Example response:
+
+::
+
+    GET https://www.universalsubtitles.org/api2/partners/teams/test/
+
+    {
+        "created": "2012-04-18T09:26:59",
+        "deleted": false,
+        "description": "",
+        "header_html_text": "",
+        "is_moderated: false",
+        "is_visible: true",
+        "logo: null",
+        "max_tasks_per_member": null,
+        "membership_policy: ""Open",
+        "name: "test","
+        "projects_enabled": false,
+        "resource_uri: "/"api2/partners/teams/test/",
+        "slug: "test","
+        "subtitle_policy": "Anyone",
+        "task_assign_policy": "Any team member",
+        "task_expiration: null",
+        "translate_policy: "Anyone"",
+        "video_policy: "Any team member",
+        "workflow_enabled": false
+    }
+
+Creating teams
+++++++++++++++
+
+::
+
+    POST https://www.universalsubtitles.org/api2/partners/teams/
+
+For example
+
+.. code-block:: bash
+
+    curl -i -X POST -H "Accept: application/json" \
+        -H "X-api-username: username" -H "X-apikey: your-api-key" \
+        -H "Content-Type: application/json" \
+        --data '{"name": "Team name", "slug": "team-name"}' \
+        https://www.universalsubtitles.org/api2/partners/teams/
+
+You can use the same fields that you get back when requesting a team detail.
+
+Updating items
+++++++++++++++
+::
+
+    PUT https://www.universalsubtitles.org/api2/partners/teams/[team-slug]/
+
+
+For example
+
+.. code-block:: bash
+
+    curl -i -X PUT -H "Accept: application/json" \
+        -H "X-api-username: username" -H "X-apikey: your-api-key" \
+        -H "Content-Type: application/json" \
+        --data '{"name": "My team name"}' \
+        https://www.universalsubtitles.org/api2/partners/teams/test/
+

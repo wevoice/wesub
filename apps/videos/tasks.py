@@ -407,7 +407,8 @@ def _update_captions_in_original_service(version_pk):
     ThirdPartyAccount.objects.mirror_on_third_party(
         version.video, version.language, UPDATE_VERSION_ACTION, version)
 
-def _delete_captions_in_original_service(language_pk):
+@task
+def delete_captions_in_original_service(language_pk):
     """Delete the given subtitle language in the original video provider.
 
     Only Youtube is supported right now.
@@ -424,8 +425,29 @@ def _delete_captions_in_original_service(language_pk):
         language = SubtitleLanguage.objects.select_related("video").get(pk=language_pk)
     except SubtitleLanguage.DoesNotExist:
         return
+    
     ThirdPartyAccount.objects.mirror_on_third_party(
         language.video, language.language, DELETE_LANGUAGE_ACTION)
+
+@task
+def delete_captions_in_original_service_by_code(language_code, video_pk):
+    """ This is used for the case where the language is totally unpublished
+    and we can't get the SubtitleLanguage (but we still know the language_code
+    and the video_pk).
+
+    TODO: maybe we can just use this version?
+    """
+    from videos.models import Video
+    from .videos.types import DELETE_LANGUAGE_ACTION
+    from accountlinker.models import ThirdPartyAccount
+
+    try:
+        video = Video.objects.get(pk=video_pk)
+    except Video.DoesNotExist:
+        return
+
+    ThirdPartyAccount.objects.mirror_on_third_party(
+        video, language_code, DELETE_LANGUAGE_ACTION)
 
 def _save_video_feed(feed_url, last_entry_url, user):
     """ Creates or updates a videofeed given some url """
