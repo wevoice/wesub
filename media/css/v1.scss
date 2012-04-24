@@ -439,6 +439,18 @@ div.fix-chosen div.chzn-container {
         float: right;
     }
 }
+.v1 .view p.view-notice.draft {
+    background-color: #ffcbc7;
+    color: #CA4C43;  
+
+    em {
+        font-style: normal;
+        font-weight: bold;
+        padding-right: 1.5em;
+        text-transform: uppercase;
+        color: #a33d36;
+    }
+}
 .v1 .listing {
     clear: both;
     padding: 0;
