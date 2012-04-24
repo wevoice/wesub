@@ -413,6 +413,14 @@ div.fix-chosen div.chzn-container {
   left: 152px;
 }
 
+.v1 .grid_9.alpha .tools {
+  margin: 0 -20px 0 0;
+  padding-right: 10px;
+}
+.v1 .grid_9.alpha .tools .sort_button {
+  margin-top: 0;
+}
+
 /* Listings */
 .v1 .view p.view-notice {
   background-color: #f3f6f8;

@@ -29,7 +29,7 @@ from teams.models import Task, Workflow
 from teams.moderation_const import UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
-    can_publish_edits_immediately, can_review, can_approve
+    can_publish_edits_immediately, can_review, can_approve, can_assign_task
 )
 from teams.signals import (
     api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
@@ -249,7 +249,10 @@ class Rpc(BaseRpc):
         tasks = team_video.task_set.incomplete().filter(language=language_code)
         if tasks:
             task = tasks[0]
-            if not user.is_authenticated() or user != task.assignee:
+            # can_assign verify if the user has permission to either
+            # 1. assign the task to himself
+            # 2. do the task himself (the task is assigned to him)
+            if not user.is_authenticated() or not can_assign_task(task, user):
                 return { "can_edit": False, "locked_by": str(task.assignee or task.team) }
 
         # Check that the team's policies don't prevent the action.
