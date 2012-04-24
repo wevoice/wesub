@@ -110,6 +110,8 @@
                     {% endif %}
 
                 </li>
+                {% empty %}
+                    <p class="empty">{% trans 'Sorry, no teams found.' %}</p>
                 {% endfor %}
             </ul>
         {% if is_paginated %}{% paginator %}{% endif %}

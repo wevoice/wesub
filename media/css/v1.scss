@@ -418,6 +418,15 @@ div.fix-chosen div.chzn-container {
     }
 }
 
+.v1 .grid_9.alpha .tools {
+    margin: 0 -20px 0 0;
+    padding-right: 10px;
+
+    .sort_button {
+        margin-top: 0;
+    }
+}
+
 /* Listings */
 .v1 .view p.view-notice {
     background-color: $faintest;
@@ -428,6 +437,18 @@ div.fix-chosen div.chzn-container {
 
     a.clear-filters {
         float: right;
+    }
+}
+.v1 .view p.view-notice.draft {
+    background-color: #ffcbc7;
+    color: #CA4C43;  
+
+    em {
+        font-style: normal;
+        font-weight: bold;
+        padding-right: 1.5em;
+        text-transform: uppercase;
+        color: #a33d36;
     }
 }
 .v1 .listing {
