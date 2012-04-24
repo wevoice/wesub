@@ -183,7 +183,7 @@ class SubtitlesUploadBaseForm(forms.Form):
                 # aka he can't do himself or he can't actually
                 # assign it to himself.
                 if not can_assign_task(task, self.user):
-                    raise forms.ValidationError(_(u"You cannot upload subtitles in this language because there are team tasks for it (and you are not allowed to do them)"))
+                    raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because work on this language is already in progress."))
 
             # Now we know that there are no transcribe/translate tasks that
             # should block this upload.
@@ -195,7 +195,7 @@ class SubtitlesUploadBaseForm(forms.Form):
             blocking_tasks = team_video.task_set.incomplete_review_or_approve().filter(language=language)
 
             if blocking_tasks.exists():
-                raise forms.ValidationError(_(u"You cannot upload subtitles in this language because the last draft is being reviewed on team %s" % team_video.team))
+                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because a draft for this language is already in moderation."))
 
             # There are no tasks for this video that should block the upload.
             # The last thing to check is that the team's transcription policy doesn't block this.
@@ -203,10 +203,10 @@ class SubtitlesUploadBaseForm(forms.Form):
             # upload translations. if not, subtitles
             if video.is_complete:
                 if not can_create_and_edit_translations(self.user, team_video, language):
-                    raise forms.ValidationError(_(u"You cannot upload a translation for this language because you don't have enough permissions on team %s" % team_video.team))
+                    raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because this language is moderated and you don't have sufficient permission."))
             else:
                 if not can_create_and_edit_subtitles(self.user, team_video, language):
-                    raise forms.ValidationError(_(u"You cannot upload subtitles for this language because you don't have enough permissions on team %s" % team_video.team))
+                    raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because this language is moderated and you don't have sufficient permission."))
 
         return self.cleaned_data
 
