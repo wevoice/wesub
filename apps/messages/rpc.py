@@ -20,6 +20,7 @@ from django.utils.translation import ugettext as _
 
 from messages.forms import SendMessageForm
 from messages.models import Message
+from messages.tasks import send_new_message_notification
 
 class MessagesApiClass(object):
     def remove(self, message_id, user):
@@ -52,7 +53,9 @@ class MessagesApiClass(object):
 
         form = SendMessageForm(user, rdata)
         if form.is_valid():
-            form.save()
+            m = form.save()
+            
+            send_new_message_notification.delay(m.pk)
         else:
             return dict(errors=form.get_errors())
 
