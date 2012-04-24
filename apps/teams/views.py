@@ -69,7 +69,8 @@ from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
 from videos import metadata_manager
 from videos.tasks import (
-    _update_captions_in_original_service, _delete_captions_in_original_service
+    upload_subtitles_to_original_service, delete_captions_in_original_service,
+    delete_captions_in_original_service_by_code
 )
 from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
@@ -1488,7 +1489,7 @@ def _create_task_after_unpublishing(subtitle_version):
 
     return task
 
-def _propagate_unpublish_to_external_services(language_pk):
+def _propagate_unpublish_to_external_services(language_pk, language_code, video):
     """Push the 'unpublishing' of subs to third-party providers for the given language.
 
     The unpublishing must be fully complete before this function is called.
@@ -1497,10 +1498,7 @@ def _propagate_unpublish_to_external_services(language_pk):
     try:
         language = SubtitleLanguage.objects.get(pk=language_pk)
     except SubtitleLanguage.DoesNotExist:
-        # TODO: Handle the edge case of deletions of entire languages.  We can't
-        #       deal with this now because the unpublishing runs asynchronously
-        #       and the versions/languages will be deleted by the
-        #       time the task runs.
+        delete_captions_in_original_service_by_code.delay(language_code, video.pk)
         return
 
     # Find the latest public version to determine what kind of third-party call
@@ -1510,7 +1508,7 @@ def _propagate_unpublish_to_external_services(language_pk):
     if latest_version:
         # There's a latest version that's still public, so third-party services
         # should use that one.
-        _update_captions_in_original_service(latest_version.pk)
+        upload_subtitles_to_original_service.delay(latest_version.pk)
     else:
         # There's no latest version that's still public, but we know the
         # language still exists.
@@ -1520,7 +1518,7 @@ def _propagate_unpublish_to_external_services(language_pk):
         #
         # In this case we should delete the subs from the external service
         # entirely, since we know that all the subs we have are bad.
-        _delete_captions_in_original_service(language_pk)
+        delete_captions_in_original_service.delay(language_pk)
 
 def _propagate_unpublish_to_tasks(team_video, language_pk, language_code):
     """Push the 'unpublishing' of a language to any tasks applying to it.
@@ -1558,6 +1556,7 @@ def unpublish(request, slug):
 
     version = form.cleaned_data['subtitle_version']
     team_video = version.language.video.get_team_video()
+    video = version.language.video
     scope = form.cleaned_data['scope']
     should_delete = form.cleaned_data['should_delete']
     language = version.language
@@ -1577,7 +1576,7 @@ def unpublish(request, slug):
         assert False, 'Invalid scope.'
 
     for language_pk, language_code, version_for_task in results:
-        _propagate_unpublish_to_external_services(language_pk)
+        _propagate_unpublish_to_external_services(language_pk, language_code, video)
         _propagate_unpublish_to_tasks(team_video, language_pk, language_code)
 
         if version_for_task:
