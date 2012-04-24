@@ -353,6 +353,12 @@ div.fix-chosen div.chzn-container {
         }
     }
 
+    .button.disabled:hover {
+        border-color: transparent;
+        background: transparent;
+        color: $light;
+    }
+
     h2 {
         color: inherit;
         display: inline;

@@ -357,6 +357,11 @@ div.fix-chosen div.chzn-container {
   background-image: -webkit-linear-gradient(#f3f6f8, #dce2e5);
   background-image: linear-gradient(#f3f6f8, #dce2e5);
 }
+.v1 .view .tools .button.disabled:hover {
+  border-color: transparent;
+  background: transparent;
+  color: #7692a3;
+}
 .v1 .view .tools h2 {
   color: inherit;
   display: inline;
