@@ -47,6 +47,8 @@ DEFAULT_BUCKET = '' # special note: should be blank for dev.
 #EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = '/tmp/unisubs-messages'
 
+EMAIL_NOTIFICATION_RECEIVERS = (INSERT EMAIL NOTIFICATION RECEIVERS)
+
 FACEBOOK_API_KEY = FACEBOOK_APP_ID = 'INSERT FACEBOOK APP ID'
 FACEBOOK_SECRET_KEY = 'INSERT FACEBOOK SECRET KEY'
 
