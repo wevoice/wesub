@@ -589,26 +589,32 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
     """
     from comments.models import Comment
     from videos.models import Video, SubtitleLanguage, SubtitleVersion
+    
     try:
         comment = Comment.objects.get(pk=comment_pk)
     except Comment.DoesNotExist:
         return
+
     version = None
+    
     if version_pk:
         try:
             version = SubtitleVersion.objects.get(pk=version_pk)
         except SubtitleVersion.DoesNotExist:
             pass
+    
     ct = comment.content_object
-    if isinstance( ct, Video):
+    
+    if isinstance(ct, Video):
         video = ct
         version = None
         language = None
-    elif isinstance(ct, SubtitleLanguage ):
+    elif isinstance(ct, SubtitleLanguage):
         video = ct.video
         language = ct
 
     domain = Site.objects.get_current().domain
+    
     if language:
         language_url = universal_url("videos:translation_history", kwargs={
             "video_id": video.video_id,
@@ -617,6 +623,7 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
         })
     else:
         language_url = None
+    
     if version:
         version_url = universal_url("videos:subtitleversion_detail", kwargs={
             'video_id': version.video.video_id,
@@ -630,8 +637,10 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
     subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % (comment.user.username, video.title_display())
 
     followers = set(video.notification_list(comment.user))
+
     if language:
         followers.update(language.notification_list(comment.user))
+
     for user in followers:
         send_templated_email(
             user,
