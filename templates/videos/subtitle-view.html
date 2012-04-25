@@ -157,22 +157,22 @@
                         </span>
                         <ul>
                             <li>
-                                <a href="{% url widget:download_srt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">SRT</a>
+                            <a href="{% url widget:download_srt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">SRT</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_ssa %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">SSA</a>
+                                <a href="{% url widget:download_ssa %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">SSA</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_ttml %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">TTML</a>
+                                <a href="{% url widget:download_ttml %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">TTML</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_txt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">TXT</a>
+                                <a href="{% url widget:download_txt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">TXT</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_sbv %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">SBV</a>
+                                <a href="{% url widget:download_sbv %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">SBV</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_dxfp %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">DFXP</a>
+                                <a href="{% url widget:download_dxfp %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">DFXP</a>
                             </li>
                         </ul>
                     </div>
