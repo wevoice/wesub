@@ -49,10 +49,10 @@ The endpoint for the api is the environment base URL +  ``/api2/partners/``.
 Possible environments:
 
 * Staging: https://staging.universalsubtitles.org/
-* Production: https://www.universalsubtitles.org/
+* Production: /
 
 Therefore, most clients should be making requests against:
-https://www.universalsubtitles.org/api2/partners/
+/api2/partners/
 
 All API requests should go through https. The staging environment might need
 HTTP basic auth, please contact us to request credentials.  When basic auth is
@@ -73,34 +73,29 @@ VideoResource
 
 Represents a video on Amara.
 
-Listing videos::
+Listing videos
 
-    GET https://www.universalsubtitles.org/api2/partners/videos/
+.. http:get:: /api2/partners/videos/
 
-Parameters:
+    :query video_url:  list only videos with the given URL, useful for finding out information about a video already on Amara.
+    :query team:       Only show videos that belong to a team identified by ``slug``.
+    :query project:    Only show videos that belong to a project with the given slug.
+        Passing in ``null`` will return only videos that don't belong to a project.
+    :query order_by:   Applies sorting to the video list. Possible values:
 
-  * `video_url`: list only videos with the given URL, useful for finding out information about a video already on Amara.
-  * `order_by`: Applies sorting to the video list. Possible values:
+        * `title`: ascending
+        * `-title`: descending
+        * `created`: older videos first
+        * `-created` : newer videos
 
-    * `title`: ascending
-    * `-title`: descending
-    * `created`: older videos first
-    * `-created` : newer videos
+Creating Videos:
 
-  * `team`: Only show videos that belong to a team identified by ``slug``.
-  * `project`: Only show videos that belong to a project with the given slug.
-    Passing in ``null`` will return only videos that don't belong to a project.
+.. http:post:: /api2/partners/videos/
 
-Creating Videos::
-
-  POST https://www.universalsubtitles.org/api2/partners/videos/
-
-Parameters:
-
-  * `video_url` : The url for the video. Any url that Amara accepts will work here. You can send the URL for a file (e.g. http:///www.example.com/my-video.ogv) , or a link to one of our accepted providers (youtube, vimeo, dailymotion, blip.tv)
-  * `title` : The title for the video
-  * `description` : About this video
-  * `duration` : Duration in seconds
+    :form video_url: The url for the video. Any url that Amara accepts will work here. You can send the URL for a file (e.g. http:///www.example.com/my-video.ogv) , or a link to one of our accepted providers (youtube, vimeo, dailymotion, blip.tv)
+    :form title: The title for the video
+    :form description: About this video
+    :form duration: Duration in seconds
 
 When submitting URLs of external providers (i.e. youtube, vimeo), the metadata
 (title, description, duration) can be fetched from them. If you're submitting a
@@ -110,16 +105,16 @@ the original provider.
 
 Information about a specific video can be retrieved from the URL:
 
-Video Detail::
+Video Detail:
 
-  GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/
+.. http:get:: /api2/partners/videos/[video-id]/
 
-The video listing resource already returns a `resource_uri` for each video to
+The video listing resource already returns a ``resource_uri`` for each video to
 be used when retrieving the details.
 
-Updating a video object::
+Updating a video object:
 
-   PUT https://www.universalsubtitles.org/api2/partners/videos/[video-id]/
+.. http:put:: /api2/partners/videos/[video-id]/
 
 With the same parameters for creation. Note that through out our system, a
 video cannot have it's URLs changed. So you can change other video attributes
@@ -130,58 +125,60 @@ VideoLanguageResource
 
 Represents a language for a given video on Amara.
 
-Listing video languages::
+Listing video languages:
 
-      GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/
+.. http:get:: /api2/partners/videos/[video-id]/languages/
 
-Creating Video Languages::
+Creating Video Languages:
 
-     POST https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/
+.. http:post:: /api2/partners/videos/[video-id]/languages/
 
-Parameters:
-  * `language_code` : The language code (e.g 'en' or 'pt-br') to create. To list available languages, see `LanguageResource`
-  * `title` : The title for the video localized to this language - optional
-  * `description` : Localized description for this language - optional.
-  * `is_original` : Boolean indicating if this is the original language for the video. - optional - defaults to false.
-  * `is_complete` : Boolean indicating if the complete subtitling set is available for this language - optional, defaults to false.
-  * TODO: implement language dependency (create a English version from French, for example)
+    :form language_code: The language code (e.g 'en' or 'pt-br') to create. 
+    :form title: The title for the video localized to this language - optional
+    :form description: Localized description for this language - optional.
+    :form is_original: Boolean indicating if this is the original language for the video. - optional - defaults to false.
+    :form is_complete: Boolean indicating if the complete subtitling set is available for this language - optional, defaults to false.
 
-Information about a specific video language can be retrieved from the URL::
+.. seealso::  To list available languages, see ``Language Resource``.
 
-   GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/
+Information about a specific video language can be retrieved from the URL:
 
-Where the language identifier can be the language code (e.g. 'en') or the
-numeric ID returned from calls to listing languages.
+.. http:get:: /api2/partners/videos/[video-id]/languages/[lang-identifier]/
+
+    :param lang-identifier: language identifier can be the language code (e.g. ``en``) or the
+        numeric ID returned from calls to listing languages.
 
 SubtitlesResource
 ~~~~~~~~~~~~~~~~~
 
 Represents the subtitle set for a given video language.
 
-Fetching subtitles for a given language::
+Fetching subtitles for a given language:
 
-   GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/subtitles/?format=srt
-   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/subtitles/?format=dfxp
-   GET https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/111111/subtitles/?format=ssa
+.. http:get:: /api2/partners/videos/[video-id]/languages/[lang-identifier]/subtitles/?format=srt
+.. http:get:: /api2/partners/videos/asfssd/languages/en/subtitles/?format=dfxp
+.. http:get:: /api2/partners/videos/asfssd/languages/111111/subtitles/?format=ssa
 
-Available parameters
+    :query format: The format to return the subtitles in. Supports all the
+        formats the regular website does: rst, ssa, txt, dfxp, ttml.
+    :query version: the numeric version number to fetch.  Versions are listed in the
+        VideoLanguageResouce request.
 
-   * `format`: The format to return the subtitles in. Supports all the formats the regular website does: rst, ssa, txt, dfxp, ttml.
-   * `version`: the numeric version number to fetch.  Versions are listed in the VideoLanguageResouce request.
+If no version is specified, the latest public version will be returned. For
+videos that are not under moderation it will be the latest one. For videos
+under moderation only the latest published version is returned. If no version
+has been accepted in review, no subtitles will be returned.
 
-   If no version is specified, the latest public version will be returned. For videos that are not under moderation it will be the latest one. For videos under moderation only the latest published version is returned. If no version has been accepted in review, no subtitles will be returned.
+Creating new subtitles for a language:
 
-Creating new subtitles for a language::
+.. http:post:: /api2/partners/videos/[video-id]/languages/[lang-identifier]/subtitles/
+.. http:post:: /api2/partners/videos/asfssd/languages/en/subtitles/
 
-   POST  https://www.universalsubtitles.org/api2/partners/videos/[video-id]/languages/[lang-identifier]/subtitles/
-   POST https://www.universalsubtitles.org/api2/partners/videos/asfssd/languages/en/subtitles/
+    :query subtitles: The subtitles to submit
+    :query sub_format: The format used to parse the subs. The same formats as
+        for fetching subtitles are accepted. Optional - defaults to ``srt``.
 
-Parameters:
-
-   * `subtitles`: The subtitles to submit
-   * `sub_format`: The format used to parse the subs. The same formats as for fetching subtitles are accepted. Optional - defaults to `srt`.
-
-   This will create a new subtitle version with the new subtitles.
+This will create a new subtitle version with the new subtitles.
 
 
 LanguageResource
@@ -190,35 +187,33 @@ LanguageResource
 Represents a listing of all available languages on the Amara
 platform.
 
-Listing available languages::
+Listing available languages:
 
-   GET https://www.universalsubtitles.org/api2/partners/languages/
+.. http:get:: /api2/partners/languages/
 
 UserResource
 ~~~~~~~~~~~~
 
 One can list and create new users through the API.
 
-Listing users::
+Listing users:
 
-    GET https://www.universalsubtitles.org/api2/partners/users/
+.. http:get:: /api2/partners/users/
 
-User datail::
+User datail:
 
-    GET https://www.universalsubtitles.org/api2/partners/users/[username]/
+.. http:get:: /api2/partners/users/[username]/
 
-Creating Users::
+Creating Users:
 
-    POST https://www.universalsubtitles.org/api2/partners/users/
+.. http:post:: /api2/partners/users/
 
-Parameters:
-
-  * `username`: the username for later login.  30 chars or fewer alphanumeric chars, @, _ and - are accepted.
-  * `email`: A valid email address
-  * `password`: any number of chars, all chars allowed.
-  * `first_name`: Any chars, max 30 chars. Optional.
-  * `last_name`: Any chars, max 30 chars. Optional.
-  * `create_login_token` : If sent the response will also include a url that when clicked will login the recently created user. This URL expires in 2 hours
+    :form username: the username for later login.  30 chars or fewer alphanumeric chars, @, _ and - are accepted.
+    :form email: A valid email address
+    :form password: any number of chars, all chars allowed.
+    :form first_name: Any chars, max 30 chars. Optional.
+    :form last_name: Any chars, max 30 chars. Optional.
+    :form create_login_token: If sent the response will also include a url that when clicked will login the recently created user. This URL expires in 2 hours
 
 The response also includes the 'api_key' for that user. If clients wish to make
 requests on behalf of this newly created user through the api, they must hold
@@ -229,35 +224,36 @@ VideoUrlResource
 
 One can list, update, delete and add new video urls to an existing video.
 
-Listing video urls::
+Listing video urls
 
-    GET https://www.universalsubtitles.org/api2/partners/videos/[video-id]/urls/
+.. http:get:: /api2/partners/videos/[video-id]/urls/
 
-Video URL detail::
+Video URL detail:
 
-    GET https://www.universalsubtitles.org/api2/partners/users/[video-id]/urls/[url-id]/
+.. http:get:: /api2/partners/users/[video-id]/urls/[url-id]/
 
 Where the url-id can be fetched from the list of urls.
 
-Updating video-urls ::
+Updating video-urls:
 
-    PUT https://www.universalsubtitles.org/api2/partners/users/[video-id]/urls/[url-id]/
+.. http:put:: /api2/partners/users/[video-id]/urls/[url-id]/
 
-Creating video-urls ::
+Creating video-urls:
 
-    POST https://www.universalsubtitles.org/api2/partners/users/[video-id]/urls/
+.. http:post:: /api2/partners/users/[video-id]/urls/
 
+    :form url: Any URL that works for the regular site (mp4 files, youtube, vimeo,
+        etc) can be used. Note that the url cannot be in use by another video.
+    :form primary:  A boolean. If true this is the url the will be displayed first
+        if multiple are presents. A video must have one primary URL. If you add /
+        change the primary status of a url, all other urls for that video will have
+        primary set to false. If this is the only url present it will always be set
+        to true.
+    :form original: If this is the first url for the video.
 
-Parameters for creating or updating:
+To delete a url:
 
-  * `url`: Any URL that works for the regular site (mp4 files, youtube, vimeo, etc) can be used. Note that the url cannot be in use by another video.
-  * `primary`:  A boolean. If true this is the url the will be displayed first if multiple are presents. A video must have one primary URL. If you add / change the primary status of a url, all other urls for that video will have primary set to false. If this is the only url present it will always be set to true.
-  * `original`: If this is the first url for the video.
-
-To delete a url ::
-
-
-    DELETE https://www.universalsubtitles.org/api2/partners/users/[video-id]/urls/[url-id]/
+.. http:delete:: /api2/partners/users/[video-id]/urls/[url-id]/
 
 If this is the only URL for a video, the request will fail. A video must have
 at least one URL.
@@ -267,22 +263,18 @@ TeamResource
 
 One can list existing teams:
 
-::
-
-    GET https://www.universalsubtitles.org/api2/partners/teams/
+.. http:get:: /api2/partners/teams/
 
 Once can view a detail for a team:
 
-::
-
-    GET https://www.universalsubtitles.org/api2/partners/teams/[team-slug]/
-
+.. http:get:: /api2/partners/teams/[team-slug]/
 
 Example response:
 
-::
+.. http:get:: /api2/partners/teams/test/
 
-    GET https://www.universalsubtitles.org/api2/partners/teams/test/
+.. sourcecode:: http
+
 
     {
         "created": "2012-04-18T09:26:59",
@@ -333,9 +325,7 @@ Task assign policy:
 Creating teams
 ++++++++++++++
 
-::
-
-    POST https://www.universalsubtitles.org/api2/partners/teams/
+.. http:post:: /api2/partners/teams/
 
 For example
 
@@ -345,15 +335,16 @@ For example
         -H "X-api-username: username" -H "X-apikey: your-api-key" \
         -H "Content-Type: application/json" \
         --data '{"name": "Team name", "slug": "team-name"}' \
-        https://www.universalsubtitles.org/api2/partners/teams/
+        http://host/api2/partners/teams/
 
 You can use the same fields that you get back when requesting a team detail.
 
 Example response:
 
-::
 
-    GET https://www.universalsubtitles.org/api2/partners/teams/test/
+.. http:get:: /api2/partners/teams/test/
+
+::
 
     {
         "created": "2012-04-18T09:26:59",
@@ -380,9 +371,7 @@ Example response:
 Creating teams
 ++++++++++++++
 
-::
-
-    POST https://www.universalsubtitles.org/api2/partners/teams/
+.. http:post:: /api2/partners/teams/
 
 For example
 
@@ -392,16 +381,14 @@ For example
         -H "X-api-username: username" -H "X-apikey: your-api-key" \
         -H "Content-Type: application/json" \
         --data '{"name": "Team name", "slug": "team-name"}' \
-        https://www.universalsubtitles.org/api2/partners/teams/
+        http://host/api2/partners/teams/
 
 You can use the same fields that you get back when requesting a team detail.
 
 Updating items
 ++++++++++++++
-::
 
-    PUT https://www.universalsubtitles.org/api2/partners/teams/[team-slug]/
-
+.. http:put:: /api2/partners/teams/[team-slug]/
 
 For example
 
@@ -411,5 +398,4 @@ For example
         -H "X-api-username: username" -H "X-apikey: your-api-key" \
         -H "Content-Type: application/json" \
         --data '{"name": "My team name"}' \
-        https://www.universalsubtitles.org/api2/partners/teams/test/
-
+        https://host/api2/partners/teams/test/

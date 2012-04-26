@@ -40,7 +40,6 @@ django-extensions==0.4.1
 django-debug-toolbar==0.8.3
 # This can be commented out if you're using sqlite
 MySQL_python>=1.2.2
-Sphinx==1.1.3
 # pyfacebook needs to be forked as not do fight with oboeware
 vendor/pyfacebook-1.0a2.tar.gz
 vendor/Unidecode-0.04.9.tar.gz
