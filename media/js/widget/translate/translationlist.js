@@ -26,10 +26,11 @@ goog.provide('unisubs.translate.TranslationList');
  * @extends {goog.ui.Component}
  * @constructor
  */
-unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, baseLanguageTitle) {
+unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, baseLanguageTitle, dialog) {
     goog.ui.Component.call(this);
     this.captionSet_ = captionSet;
     this.baseLanguageTitle_ = baseLanguageTitle || '';
+    this.dialog_ = dialog;
     /**
      * Array of subtitles in json format
      */
@@ -62,7 +63,7 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
                 editableCaption = this.captionSet_.addNewDependentTranslation(
                     subtitle['sub_order'], subtitle['subtitle_id']);
             w = new unisubs.translate.TranslationWidget(
-                subtitle, editableCaption);
+                subtitle, editableCaption, this.dialog_);
             this.addChild(w, true);
             this.translationWidgets_.push(w);
         },

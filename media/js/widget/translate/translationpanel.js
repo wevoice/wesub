@@ -18,10 +18,6 @@
 
 goog.provide('unisubs.translate.TranslationPanel');
 
-// FIXME: I think that since the latest translation changes, this class no 
-//     longer really does anything. Probably just go straight to TranslationList
-//     instead of using this as an intermediary.
-
 /**
  *
  *
@@ -60,7 +56,8 @@ unisubs.translate.TranslationPanel.prototype.createDom = function() {
         new unisubs.translate.TranslationList(
             this.captionSet_,
             this.standardSubState_.SUBTITLES,
-            this.standardSubState_.TITLE);
+            this.standardSubState_.TITLE,
+            this.dialog_);
     this.addChild(this.translationList_, true);
     this.translationList_.getElement().className =
         "unisubs-titlesList";

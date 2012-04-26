@@ -24,9 +24,11 @@ goog.provide('unisubs.translate.TranslationWidget');
  * @param {unisubs.subtitle.EditableCaption} translation
  */
 unisubs.translate.TranslationWidget = function(subtitle,
-                                                translation) {
+                                               translation,
+                                               dialog) {
     goog.ui.Component.call(this);
     this.subtitle_ = subtitle;
+    this.dialog_ = dialog;
     /**
      * @type {unisubs.subtitle.EditableCaption}
      */
@@ -76,6 +78,9 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
 
 unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event) {
     this.onFocusText_ = this.translateInput_.value;
+
+    this.dialog_.getVideoPlayerInternal().setPlayheadTime(this.subtitle_['start_time']);
+    this.dialog_.getVideoPlayerInternal().pause();
 };
 
 unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) {

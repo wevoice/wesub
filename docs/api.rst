@@ -87,6 +87,10 @@ Parameters:
     * `created`: older videos first
     * `-created` : newer videos
 
+  * `team`: Only show videos that belong to a team identified by ``slug``.
+  * `project`: Only show videos that belong to a project with the given slug.
+    Passing in ``null`` will return only videos that don't belong to a project.
+
 Creating Videos::
 
   POST https://www.universalsubtitles.org/api2/partners/videos/
