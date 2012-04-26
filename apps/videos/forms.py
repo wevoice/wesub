@@ -422,7 +422,7 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
                 if tasks.exists():
                     task = tasks.get()
 
-                    if not task.assignee and self.user:
+                    if not task.assignee and self.user and can_assign_task(task, self.user):
                         task.assignee = self.user
 
                     task.complete()
