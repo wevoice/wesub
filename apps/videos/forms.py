@@ -30,8 +30,11 @@ from django.utils.translation import ugettext_lazy as _
 from math_captcha.forms import MathCaptchaForm
 
 from teams.models import Task
-from teams.moderation_const import UNMODERATED, WAITING_MODERATION
-from teams.permissions import can_create_and_edit_subtitles, can_assign_task, can_create_and_edit_translations
+from teams.moderation_const import UNMODERATED, WAITING_MODERATION, APPROVED
+from teams.permissions import (
+        can_create_and_edit_subtitles, can_assign_task,
+        can_create_and_edit_translations, can_approve
+)
 from utils import (
     SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser,
     SubtitleParserError, SbvSubtitleParser, TxtSubtitleParser,
@@ -303,6 +306,7 @@ class SubtitlesUploadBaseForm(forms.Form):
             language = language
         else:
             language, self._sl_created = self._find_appropriate_language(video, self.cleaned_data['language'])
+            
         language = save_subtitle(video, language, parser, self.user, update_video)
 
         # If there are any outstanding tasks for this language, associate the
@@ -315,15 +319,20 @@ class SubtitlesUploadBaseForm(forms.Form):
 
             # Determine if we need to moderate these subtitles and create a
             # review/approve task for them.
-            # TODO: Possibly allow edits to pass through automatically.
             workflow = team_video.get_workflow()
-            if workflow.review_allowed or workflow.approve_allowed:
+            # user can bypass moderation if:
+            # 1) he is a moderator and 
+            # 2) it's a post-publish edit
+            can_bypass_moderation = not self._sl_created and can_approve(team_video, self.user)
+
+            if can_bypass_moderation:
+                new_version.moderate = APPROVED
+            elif workflow.review_allowed or workflow.approve_allowed:
                 new_version.moderation_status = WAITING_MODERATION
             else:
                 new_version.moderation_status = UNMODERATED
 
             new_version.save()
-
 
             if update_tasks:
                 outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
@@ -331,8 +340,13 @@ class SubtitlesUploadBaseForm(forms.Form):
                 if outstanding_tasks.exists():
                     outstanding_tasks.update(subtitle_version=new_version,
                                              language=language.language)
-                else:
+
+                # we just need to create review/approve/subtitle if the language
+                # is a new one or, if it's a post-publish edit, if the user can't
+                # approve subtitles by himself.
+                elif not can_bypass_moderation:
                     task_type = None
+
                     if new_version.is_synced():
                         if workflow.review_allowed:
                             task_type = Task.TYPE_IDS['Review']
