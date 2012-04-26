@@ -1554,11 +1554,8 @@ def update_followers(sender, instance, created, **kwargs):
     user = instance.user
     lang = instance.language
     if created and user and user.notify_by_email:
-        if not SubtitleVersion.objects.filter(user=user).exists():
-            #If user edited before it should be in followers, or removed yourself,
-            #so we should not add again
-            lang.followers.add(instance.user)
-            lang.video.followers.add(instance.user)
+        lang.followers.add(instance.user)
+        lang.video.followers.add(instance.user)
 
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)
