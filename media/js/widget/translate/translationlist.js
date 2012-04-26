@@ -35,6 +35,7 @@ unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, 
      * Array of subtitles in json format
      */
     this.baseLanguageSubtitles_ = baseLanguageSubtitles;
+
     goog.array.sort(
         this.baseLanguageSubtitles_,
         function(a, b) {
@@ -55,6 +56,11 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var map = this.captionSet_.makeMap();
 
+    this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(this.baseLanguageSubtitles_);
+    this.captionManager_ =
+        new unisubs.CaptionManager(
+            this.dialog_.getVideoPlayerInternal(), baseLanguageCaptionSet_);
+
     goog.array.forEach(
         this.baseLanguageSubtitles_,
         function(subtitle) {
@@ -68,6 +74,14 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
             this.translationWidgets_.push(w);
         },
         this);
+};
+
+unisubs.translate.TranslationList.prototype.enterDocument = function() {
+    unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
+    var handler = this.getHandler();
+    handler.listen(this.captionManager_,
+                   unisubs.CaptionManager.CAPTION,
+                   this.captionReached_);
 };
 
 /**
@@ -113,4 +127,9 @@ unisubs.translate.TranslationList.prototype.translateViaBing = function(fromLang
 
     needTranslating.length && translateWidgets(needTranslating, fromLang, toLang, 
         this.translateCallback_);
+};
+
+unisubs.translate.TranslationList.prototype.captionReached_ = function(event) {
+    this.dialog_.getVideoPlayerInternal().showCaptionText(
+        (event.caption ? event.caption.getText() : ""));
 };

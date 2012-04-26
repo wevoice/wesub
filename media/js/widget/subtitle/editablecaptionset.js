@@ -76,9 +76,7 @@ unisubs.subtitle.EditableCaptionSet.EventType = {
 /**
  * Always in ascending order by start time.
  */
-unisubs.subtitle.EditableCaptionSet.prototype.captionsWithTimes =
-    function()
-{
+unisubs.subtitle.EditableCaptionSet.prototype.captionsWithTimes = function() {
     return goog.array.filter(
         this.captions_, function(c) { return c.getStartTime() != -1; });
 };

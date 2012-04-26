@@ -27,7 +27,7 @@ goog.provide('unisubs.translate.TranslationPanel');
  */
 unisubs.translate.TranslationPanel = function(captionSet,
                                                standardSubState, dialog, reviewOrApprovalType, serverModel) {
-    this.captionSet_ = captionSet
+    this.captionSet_ = captionSet;
     this.standardSubState_ = standardSubState;
     goog.ui.Component.call(this);
     this.contentElem_ = null;
