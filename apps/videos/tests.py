@@ -2244,15 +2244,12 @@ class FollowTest(WebUseTest):
 
         youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
         video, created = Video.get_or_create_for_url(youtube_url)
-
-        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
-
         language = SubtitleLanguage.objects.get(language='en')
         version = SubtitleVersion(language=language, user=self.user,
                 datetime_started=datetime.now(), version_no=10)
         version.save()
 
-        self.assertTrue(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(language.followers.filter(pk=self.user.pk).exists())
 
     def test_review_subs(self):
         """
@@ -2281,12 +2278,12 @@ class FollowTest(WebUseTest):
                 )
 
         sl = video.subtitle_language(lang['lang_code'])
-        self.assertEquals(0, sl.followers.count())
+        self.assertEquals(1, sl.followers.count())
         latest = video.latest_version(language_code='en')
         latest.set_reviewed_by(self.user)
         latest.save()
 
-        self.assertEquals(1, sl.followers.count())
+        self.assertEquals(2, sl.followers.count())
 
     def test_approve_not(self):
         """
@@ -2315,9 +2312,9 @@ class FollowTest(WebUseTest):
                 )
 
         sl = video.subtitle_language(lang['lang_code'])
-        self.assertEquals(0, sl.followers.count())
+        self.assertEquals(1, sl.followers.count())
         latest = video.latest_version(language_code='en')
         latest.set_approved_by(self.user)
         latest.save()
 
-        self.assertEquals(0, sl.followers.count())
+        self.assertEquals(1, sl.followers.count())
