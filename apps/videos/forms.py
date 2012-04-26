@@ -291,7 +291,7 @@ class SubtitlesUploadBaseForm(forms.Form):
         language.save()
         return language, created
 
-    def save_subtitles(self, parser, video=None, language=None, update_video=True):
+    def save_subtitles(self, parser, video=None, language=None, update_video=True, update_tasks=True):
         video = video or self.cleaned_data['video']
 
         if not video.has_original_language():
@@ -324,26 +324,28 @@ class SubtitlesUploadBaseForm(forms.Form):
 
             new_version.save()
 
-            outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
 
-            if outstanding_tasks.exists():
-                outstanding_tasks.update(subtitle_version=new_version,
-                                         language=language.language)
-            else:
-                task_type = None
-                if new_version.is_synced():
-                    if workflow.review_allowed:
-                        task_type = Task.TYPE_IDS['Review']
-                    elif workflow.approve_allowed:
-                        task_type = Task.TYPE_IDS['Approve']
+            if update_tasks:
+                outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
+
+                if outstanding_tasks.exists():
+                    outstanding_tasks.update(subtitle_version=new_version,
+                                             language=language.language)
                 else:
-                    task_type = Task.TYPE_IDS['Subtitle']
+                    task_type = None
+                    if new_version.is_synced():
+                        if workflow.review_allowed:
+                            task_type = Task.TYPE_IDS['Review']
+                        elif workflow.approve_allowed:
+                            task_type = Task.TYPE_IDS['Approve']
+                    else:
+                        task_type = Task.TYPE_IDS['Subtitle']
 
-                if task_type:
-                    task = Task(team=team_video.team, team_video=team_video,
-                                language=language.language, type=task_type,
-                                subtitle_version=new_version)
-                    task.save()
+                    if task_type:
+                        task = Task(team=team_video.team, team_video=team_video,
+                                    language=language.language, type=task_type,
+                                    subtitle_version=new_version)
+                        task.save()
 
         return language
 
@@ -392,12 +394,13 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
 
     def save(self):
         subtitles = self.cleaned_data['subtitles']
+        is_complete = self.cleaned_data.get('is_complete')
+
         text = subtitles.read()
         parser = self._get_parser(subtitles.name)(
                         force_unicode(text, chardet.detect(text)['encoding']))
-        sl = self.save_subtitles(parser, update_video=False)
+        sl = self.save_subtitles(parser, update_video=False, update_tasks=is_complete)
 
-        is_complete = self.cleaned_data.get('is_complete')
         sl.is_complete = is_complete
 
         latest_version = sl.latest_version()
@@ -412,7 +415,6 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
 
         video = self.cleaned_data['video']
         language = self.cleaned_data['language']
-        is_complete = self.cleaned_data['is_complete']
 
         if is_complete:
             team_video = video.get_team_video()
