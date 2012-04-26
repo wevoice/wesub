@@ -192,7 +192,8 @@ class SubtitlesUploadBaseForm(forms.Form):
                 # only block if the user can't assign the task
                 # aka he can't do himself or he can't actually
                 # assign it to himself.
-                if not can_assign_task(task, self.user):
+                # also block if the task is assigned to another user
+                if (task.assignee and task.assignee != self.user) or (not task.assignee and not can_assign_task(task, self.user)):
                     raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because work on this language is already in progress."))
 
             # Now we know that there are no transcribe/translate tasks that
