@@ -171,6 +171,16 @@ class SubtitlesUploadBaseForm(forms.Form):
         video = self.cleaned_data['video']
         language = self.cleaned_data['language']
 
+        subtitle_language = video.subtitlelanguage_set.filter(language=language) 
+
+        # first verify if this language for this video already exists.
+        # if exists, verify if it's not writelocked
+        if subtitle_language.exists():
+            sl = subtitle_language[0]
+            
+            if sl.is_writelocked and sl.writelock_owner != self.user:
+                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because there's already another user editing it."))
+
         team_video = video.get_team_video()
 
         if team_video:
