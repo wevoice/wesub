@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-25 07:08-0500\n"
-"PO-Revision-Date: 2012-04-25 12:22+0000\n"
+"POT-Creation-Date: 2012-04-26 01:32-0500\n"
+"PO-Revision-Date: 2012-04-26 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Bosnian (http://www.transifex.net/projects/p/universalsubtitles/language/bs/)\n"
 "MIME-Version: 1.0\n"
@@ -4473,6 +4473,10 @@ msgstr ""
 msgid "Decline Task"
 msgstr ""
 
+#: templates/profiles/dashboard.html:80
+msgid "You have no open tasks assigned to you."
+msgstr ""
+
 #: templates/profiles/dashboard.html:91
 msgid "Sorry, no activity yet."
 msgstr ""
@@ -6762,6 +6766,10 @@ msgstr ""
 #: templates/videos/subtitle-view.html:146
 #: templates/videos/subtitle-view.html:372
 msgid "Unpublish"
+msgstr ""
+
+#: templates/videos/subtitle-view.html:149
+msgid "Editing drafts is not permitted"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:149
