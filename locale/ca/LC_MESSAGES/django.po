@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-25 07:08-0500\n"
-"PO-Revision-Date: 2012-04-25 12:22+0000\n"
+"POT-Creation-Date: 2012-04-26 01:32-0500\n"
+"PO-Revision-Date: 2012-04-26 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.net/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -1071,19 +1071,19 @@ msgstr "Algú està subtitulant aquest vídeo ara. Proveu-ho més tard"
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
-msgstr ""
+msgstr "Ho lamentem, no podem carregar els vostres subtítols perquè ja n'hi ha un treball en marxa en aquest idioma."
 
 #: apps/videos/forms.py:198
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
-msgstr ""
+msgstr "Ho lamentem, no podem carregar els vostres subtítols perquè s'està moderant un esborrany per a aquest idioma."
 
 #: apps/videos/forms.py:206 apps/videos/forms.py:209
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have sufficient permission."
-msgstr ""
+msgstr "Ho lamentem, no podem carregar els vostres subtítols perquè aquest idioma està moderat i no teniu els permisos necessaris."
 
 #: apps/videos/forms.py:356
 msgid ""
@@ -4470,6 +4470,10 @@ msgstr "per a"
 msgid "Decline Task"
 msgstr "Rebutjar tasca"
 
+#: templates/profiles/dashboard.html:80
+msgid "You have no open tasks assigned to you."
+msgstr ""
+
 #: templates/profiles/dashboard.html:91
 msgid "Sorry, no activity yet."
 msgstr "Ho lamentem, no hi ha activitat."
@@ -5898,7 +5902,7 @@ msgstr "Deixar equip"
 
 #: templates/teams/teams-list.html:114
 msgid "Sorry, no teams found."
-msgstr ""
+msgstr "Ho lamentem, no s'han trobat equips."
 
 #: templates/teams/teams-list.html:122
 msgid "Search and Filter"
@@ -6754,6 +6758,10 @@ msgid "Unpublish"
 msgstr "Sense publicar"
 
 #: templates/videos/subtitle-view.html:149
+msgid "Editing drafts is not permitted"
+msgstr ""
+
+#: templates/videos/subtitle-view.html:149
 #: templates/videos/subtitle-view.html:387
 msgid "Edit Subtitles"
 msgstr "Edita els subtítols"
@@ -6764,7 +6772,7 @@ msgstr "Descarregat"
 
 #: templates/videos/subtitle-view.html:184
 msgid "Draft only"
-msgstr ""
+msgstr "Només esborranys"
 
 #: templates/videos/subtitle-view.html:189
 msgid "translated from"
