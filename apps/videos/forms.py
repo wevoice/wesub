@@ -359,6 +359,10 @@ class SubtitlesUploadBaseForm(forms.Form):
                         task = Task(team=team_video.team, team_video=team_video,
                                     language=language.language, type=task_type,
                                     subtitle_version=new_version)
+                        
+                        if not self._sl_created:
+                            task.assignee = task._find_previous_assignee(Task.TYPE_NAMES[task_type])
+                            
                         task.save()
 
         return language
