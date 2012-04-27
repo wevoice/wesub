@@ -1485,6 +1485,7 @@ def _create_task_after_unpublishing(subtitle_version):
     task = Task(team=team_video.team, team_video=team_video,
                 assignee=assignee, language=lang, type=type,
                 subtitle_version=subtitle_version)
+    task.set_expiration()
     task.save()
 
     return task
