@@ -33,7 +33,8 @@ from teams.models import Task
 from teams.moderation_const import UNMODERATED, WAITING_MODERATION, APPROVED
 from teams.permissions import (
         can_create_and_edit_subtitles, can_assign_task,
-        can_create_and_edit_translations, can_approve
+        can_create_and_edit_translations, can_approve,
+        can_publish_edits_immediately
 )
 from utils import (
     SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser,
@@ -323,7 +324,7 @@ class SubtitlesUploadBaseForm(forms.Form):
             # user can bypass moderation if:
             # 1) he is a moderator and 
             # 2) it's a post-publish edit
-            can_bypass_moderation = not self._sl_created and can_approve(team_video, self.user)
+            can_bypass_moderation = not self._sl_created and can_publish_edits_immediately(team_video, self.user, language.language)
 
             if can_bypass_moderation:
                 new_version.moderate = APPROVED
