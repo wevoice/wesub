@@ -428,7 +428,17 @@ def _reviewed_notification(task_pk, status):
 
     template_name = "messages/email/team-task-reviewed.html"
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_reviewed_video_handler(task.subtitle_version, reviewer)
+
+    if status == REVIEWED_AND_SENT_BACK:
+        if task.type == Task.TYPE_IDS['Review']:
+            Action.create_declined_video_handler(task.subtitle_version, reviewer)
+        else:
+            Action.create_rejected_video_handler(task.subtitle_version, reviewer)
+    elif status == REVIEWED_AND_PUBLISHED:
+        Action.create_approved_video_handler(task.subtitle_version, reviewer)
+    elif status == REVIEWED_AND_PENDING_APPROVAL:
+        Action.create_accepted_video_handler(task.subtitle_version, reviewer)
+
     return msg, email_res
 
 @task
@@ -608,8 +618,11 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
     else:
         language_url = None
     if version:
-        version_url = universal_url("videos:revision", kwargs={
-            "pk": version.pk,
+        version_url = universal_url("videos:subtitleversion_detail", kwargs={
+            'video_id': version.video.video_id,
+            'lang': version.language.language,
+            'lang_id': version.language.pk,
+            'version_id': version.pk,
         })
     else:
         version_url = None

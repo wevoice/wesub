@@ -1,10 +1,32 @@
+# Amara, universalsubtitles.org
+#
+# Copyright (C) 2012 Participatory Culture Foundation
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see
+# http://www.gnu.org/licenses/agpl-3.0.html.
+
+
 import datetime
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+
 from celery.decorators import periodic_task
-from celery.task import task
 from celery.schedules import crontab
+from celery.task import task
+
 from utils import send_templated_email
 
 from utils import errorreport
@@ -26,5 +48,6 @@ def send_error_report(date=None):
         return 
     data = errorreport._error_report_data(date)
     message = render_to_string("internal/error-report.txt", data)
-    subject = date.strftime("Errors for Amara for %Y/%M/%d")
+    subject_prefix = "Errors for Amara (%s) on " %  settings.SITE_NAME
+    subject = date.strftime(subject_prefix + "%Y/%m/%d" ) 
     send_mail(subject, message, "unisubs error bot", recipients)

@@ -108,6 +108,10 @@ class MoveTeamVideoForm(forms.Form):
     team = forms.ModelChoiceField(queryset=Team.objects.all(),
                                   required=True)
 
+    # Should this queryset be Project.objects.filter(team=team) ?
+    project = forms.ModelChoiceField(queryset=Project.objects.all(),
+                                     required=False)
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(MoveTeamVideoForm, self).__init__(*args, **kwargs)
@@ -416,7 +420,7 @@ class TaskAssignForm(forms.Form):
 
         if assignee != -1:
             # There are a bunch of edge cases here that we need to check.
-            unassigning_from_self      = (not assignee) and task.assignee.id == self.user.id
+            unassigning_from_self      = (not assignee) and task.assignee and task.assignee.id == self.user.id
             assigning_to_self          = assignee and self.user.id == assignee.id
             can_assign_to_other_people = can_assign_task(task, self.user)
 

@@ -45,8 +45,7 @@ EMBED_HEIGHT = 344
 
 def get_shortmem(url):
     shortmem = {}
-    file_id = BLIP_REGEX.match(url).groupdict()['file_id']
-    rss_url = 'http://blip.tv/file/%s?skin=rss' % file_id
+    rss_url = '%s?skin=rss' % url
     parsed = feedparser.parse(rss_url)
     if 'entries' not in parsed or not parsed.entries:
         shortmem['feed_item'] = None
@@ -73,14 +72,7 @@ def _fp_get(shortmem, key):
 @parse_feed
 @returns_unicode
 def get_thumbnail_url(url, shortmem={}):
-    if _fp_get(shortmem, 'thumbnail_src'):
-        return 'http://a.images.blip.tv/%s' % (
-            _fp_get(shortmem, 'thumbnail_src'),)
-    elif _fp_get(shortmem, 'smallthumbnail'):
-        return _fp_get(shortmem, 'smallthumbnail')
-    else:
-        return _fp_get(shortmem, 'picture')
-
+    return shortmem['feed_item']['media_thumbnail'][0]['url']
 
 @parse_feed
 @returns_unicode
@@ -134,7 +126,7 @@ def scrape_publish_date(url, shortmem={}):
 def get_embed(url, shortmem={}, width=EMBED_WIDTH, height=EMBED_HEIGHT):
     file_id = BLIP_REGEX.match(url).groupdict()['file_id']
     oembed_get_dict = {
-            'url': 'http://blip.tv/file/%s' % file_id,
+            'url': 'http://blip.tv/play/%s' % file_id,
             'width': EMBED_WIDTH,
             'height': EMBED_HEIGHT}
 
@@ -235,7 +227,8 @@ def _best_by_height(media_contents, type_fn):
     return best and best.getAttribute('url')
 
 BLIP_REGEX = re.compile(
-    r'^https?://(?P<subsite>[a-zA-Z]+\.)?blip.tv/file/(?P<file_id>\d+)')
+    r'^https?://blip.tv/(?P<subsite>[a-zA-Z0-9]+)/(?P<file_id>[a-zA-Z0-9-]+)/?'        
+)
 SUITE = {
     'regex': BLIP_REGEX,
     'funcs': {

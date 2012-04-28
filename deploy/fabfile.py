@@ -677,26 +677,26 @@ def test_memcached():
 
 
 # Static Media
-def _update_static(dir):
+def _update_static(dir, compilation_level):
     with cd(os.path.join(dir, 'unisubs')):
         media_dir = '{0}/unisubs/media/'.format(dir)
         python_exe = '{0}/env/bin/python'.format(dir)
         _git_pull()
         #_clear_permissions(media_dir)
-        run('{0} manage.py  compile_media --settings=unisubs_settings'.format(python_exe))
+        run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
 
-def update_static():
+def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
     """Recompile static media and upload the results to S3"""
 
     with Output("Recompiling and uploading static media"):
         env.host_string = DEV_HOST
         if env.s3_bucket is not None:
             with cd(os.path.join(env.static_dir, 'unisubs')):
-                _update_static(env.static_dir)
+                _update_static(env.static_dir, compilation_level)
                 python_exe = '{0}/env/bin/python'.format(env.static_dir)
                 run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
         else:
-            _update_static(env.web_dir)
+            _update_static(env.web_dir, compilation_level)
 
 
 def update():
@@ -768,10 +768,20 @@ def test_email(to_address):
 
 
 def build_docs():
+    """
+    Builds the documentation using sphinx.
+    If the environment uses s3, will also uplaod the generated docs
+    dir to the root of the bucket.
+    """
     with Output("Generating documentation"):
         env.host_string = DEV_HOST
         with cd(os.path.join(env.static_dir, 'unisubs')):
             run('%s/env/bin/sphinx-build docs/ media/docs/' % (env.static_dir))
+        if env.s3_bucket is not None:
+            with cd(os.path.join(env.static_dir, 'unisubs')):
+                python_exe = '{0}/env/bin/python'.format(env.static_dir)
+                run('{0} manage.py  upload_docs --settings=unisubs_settings'.format(python_exe))
+
 
 
 def _get_settings_values(dir, *settings_name):

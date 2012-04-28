@@ -137,13 +137,14 @@ class Command(BaseCommand):
         optparse.make_option('--checks-version',
             action='store_true', dest='test_str_version', default=False,
             help="Check that we outputed the version string for comopiled files."),
-
-
         optparse.make_option('--keeps-previous',
             action='store_true', dest='keeps_previous', default=False,
             help="Will remove older static media builds."),
+        optparse.make_option('--compilation-level',
+            action='store', dest='compilation_level', default='ADVANCED_OPTIMIZATIONS',
+            help="How aggressive is compilation. Possible values: ADVANCED_OPTIMIZATIONS, WHITESPACE_ONLY and SIMPLE_OPTIMIZATIONS"),
         )
-    
+   
     def _append_version_for_debug(self, descriptor, file_type):
         """
         We append the /*unisubs.static_version="{{commit guid}"*/ to the end of the
@@ -193,7 +194,7 @@ class Command(BaseCommand):
         extra_defines = bundle_settings.get("extra_defines", None)
         include_flash_deps = bundle_settings.get("include_flash_deps", True)
         closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
-        optimization_type = bundle_settings.get("optimizations", "ADVANCED_OPTIMIZATIONS")
+        optimization_type = bundle_settings.get("optimizations", self.compilation_level)
 
         logging.info("Starting {0}".format(output_file_name))
 
@@ -291,8 +292,8 @@ class Command(BaseCommand):
         with open(uncompiled_file_name, 'w') as f:
             f.write(rendered)
         cmd_str = ("java -jar {0} --js {1} --js_output_file {2} "
-                   "--compilation_level ADVANCED_OPTIMIZATIONS").format(
-            COMPILER_PATH, uncompiled_file_name, file_name)
+                   "--compilation_level {3}").format(
+            COMPILER_PATH, uncompiled_file_name, file_name, self.compilation_level)
         call_command(cmd_str)
         os.remove(uncompiled_file_name)
 
@@ -316,7 +317,31 @@ class Command(BaseCommand):
                 shutil.copytree(original_path,
                          dest,
                          ignore=shutil.ignore_patterns(*SKIP_COPING_ON))
-         # we need to copy all js, ideally this can be refactored in other libs
+                
+    def _copy_integration_root_to_temp_dir(self):
+        """
+        We 'merge' whatever is on unisubs-integration/media to
+        project-root/media. This allows partners to have their own
+        media compiled for deployment.
+        Also see how unisusb-integration/integration_settings.py
+        injects the dependencies for media compilation.
+        """
+        mr = os.path.join(settings.INTEGRATION_PATH , "media")
+        for (dirpath, dirnames, filenames) in os.walk(mr):
+            for file_name in filenames:
+                original_path = os.path.join(dirpath, file_name)
+                offset_path = original_path[len(mr) + 1:]
+                final_path = os.path.join(settings.STATIC_ROOT, offset_path)
+                final_dir = os.path.dirname(final_path)
+                if os.path.exists(final_dir) is False:
+                    os.makedirs(final_dir)
+                if os.path.exists(final_path):
+                    os.remove(final_path)
+                try:
+                    shutil.copy(original_path, final_path)
+                except shutil.Error:
+                    # if the files haven't changed this will be raised
+                    pass
 
     def _output_embed_to_dir(self, output_dir, version=''):
         file_name = 'embed{0}.js'.format(version)
@@ -438,10 +463,13 @@ class Command(BaseCommand):
         self.verbosity = int(options.get('verbosity'))
         self.test_str_version = bool(options.get('test_str_version'))
         self.keeps_previous = bool(options.get('keeps_previous'))
+        self.compilation_level = options.get('compilation_level')
         restrict_bundles = bool(args)
 
         os.chdir(settings.PROJECT_ROOT)
         self._copy_static_root_to_temp_dir() 
+        if settings.USE_INTEGRATION:
+            self._copy_integration_root_to_temp_dir()
         self._compile_conf_and_embed_js()
         self._compile_media_bundles(restrict_bundles, args)
             

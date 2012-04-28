@@ -39,12 +39,14 @@ goog.inherits(unisubs.subtitle.TranscribeEntry, goog.ui.Component);
 unisubs.subtitle.TranscribeEntry.P = 4;
 unisubs.subtitle.TranscribeEntry.R = 3;
 unisubs.subtitle.TranscribeEntry.S = 1;
+// in pixels, js resizes the widget dinamically
+unisubs.subtitle.TranscribeEntry.LINE_HEIGHT = 31;
 
 unisubs.subtitle.TranscribeEntry.prototype.createDom = function() {
     unisubs.subtitle.TranscribeEntry.superClass_.createDom.call(this);
     this.getElement().setAttribute('class', 'unisubs-transcribeControls');
-    this.addChild(this.labelInput_ = new goog.ui.LabelInput(
-        'Type subtitle and press enter'), true);
+    this.addChild(this.labelInput_ = new goog.ui.Textarea(), true);
+    this.labelInput_.getElement().placeholder= 'Type subtitle and press enter';
     this.labelInput_.LABEL_CLASS_NAME = 'unisubs-label-input-label';
     goog.dom.classes.add(this.labelInput_.getElement(), 'trans');
 };
@@ -78,14 +80,15 @@ unisubs.subtitle.TranscribeEntry.prototype.startPlaying_ = function() {
 };
 unisubs.subtitle.TranscribeEntry.prototype.focus = function() {
     if (this.labelInput_.getValue() == '')
-        this.labelInput_.focusAndSelect();
+        this.labelInput_.setFocused();
     else
         this.labelInput_.getElement().focus();
 };
 unisubs.subtitle.TranscribeEntry.prototype.handleKey_ = function(event) {
-    if (event.keyCode == goog.events.KeyCodes.ENTER) {
+    if (event.keyCode == goog.events.KeyCodes.ENTER && !event.shiftKey) {
         event.preventDefault();
         this.addNewTitle_();
+        
     }
     else if (event.keyCode != goog.events.KeyCodes.TAB &&
              this.playMode_ == unisubs.subtitle.TranscribePanel.PlayMode.AUTOPAUSE) {
@@ -96,7 +99,17 @@ unisubs.subtitle.TranscribeEntry.prototype.handleKey_ = function(event) {
             this.continuouslyTyping_ = true;
         }
     }
+    // resize the text area according to the number of lines
+    var value = this.labelInput_.getValue();
+    var numLines = value.split("\n").length  || value.split("\r").length ;
+    if (numLines > 2){
+        numLines -= 1;
+    }
+    var height = unisubs.subtitle.TranscribeEntry.LINE_HEIGHT * numLines;
+    unisubs.style.setProperty(this.labelInput_.getElement(), "height",  height + "px");
+
 };
+
 unisubs.subtitle.TranscribeEntry.prototype.continuousTypingTimerTick_ = function() {
     // P seconds since continuous typing was started.
     this.continuousTypingTimer_.stop();
@@ -143,9 +156,10 @@ unisubs.subtitle.TranscribeEntry.prototype.addNewTitle_ = function() {
     // FIXME: accessing private member of goog.ui.LabelInput
     this.labelInput_.label_ = '';
     this.labelInput_.setValue('');
-    this.labelInput_.focusAndSelect();
+    this.labelInput_.setFocused();
     this.dispatchEvent(new unisubs.subtitle.TranscribeEntry
                        .NewTitleEvent(value));
+    this.getElement().rows = 1;
 };
 unisubs.subtitle.TranscribeEntry.prototype.issueLengthWarning_ =
     function(breakable)

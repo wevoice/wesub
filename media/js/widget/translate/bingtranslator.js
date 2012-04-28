@@ -20,10 +20,6 @@
 goog.provide('unisubs.translate.BingTranslator');
 goog.provide('unisubs.translate.BingTranslator.Transaction');
 
-/**
- * @private
- */
-unisubs.translate.BingTranslator.Transaction.transactionId_ = 0;
 
 /**
  * @constructor
@@ -34,6 +30,11 @@ unisubs.translate.BingTranslator.Transaction = function() {
     this.actions_ = [];
     this.withError_ = false;
 };
+
+/**
+ * @private
+ */
+unisubs.translate.BingTranslator.Transaction.transactionId_ = 0;
 
 unisubs.translate.BingTranslator.Transaction.prototype.add = function(toTranslate, fromLang, toLang, widgets, callback){
     if (toTranslate.length > 0){

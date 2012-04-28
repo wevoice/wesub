@@ -36,6 +36,8 @@ from base import VideoType, VideoTypeError
 from utils import YoutubeXMLParser
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 
+from libs.unilangs.unilangs import LanguageCode
+
 
 logger = logging.getLogger("youtube")
 
@@ -60,8 +62,9 @@ yt_service = get_youtube_service()
 def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import Video
 
-    lc = lang.get('lang_code')
-    #lc  = LanguageCode(lc.lower(), "unisubs").encode("unisubs")
+    yt_lc = lang.get('lang_code')
+    lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+
     if not lc in SUPPORTED_LANGUAGE_CODES:
         logger.warn("Youtube import did not find language code", extra={
             "data":{
@@ -79,7 +82,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import SubtitleLanguage, SubtitleVersion, Subtitle
 
     url = u'http://www.youtube.com/api/timedtext?v=%s&lang=%s&name=%s'
-    url = url % (youtube_id, lc, urlquote(lang.get('name', u'')))
+    url = url % (youtube_id, yt_lc, urlquote(lang.get('name', u'')))
 
     xml = YoutubeVideoType._get_response_from_youtube(url)
 
@@ -108,6 +111,8 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
         version_no = 0
 
     version = SubtitleVersion(language=language)
+    version.title = video.title
+    version.description = video.description
     version.version_no = version_no
     version.datetime_started = datetime.now()
     version.user = User.get_anonymous()
@@ -245,7 +250,6 @@ class YoutubeVideoType(VideoType):
         try:
             return etree.fromstring(content)
         except etree.XMLSyntaxError:
-            print url
             logger.error("Youtube subtitles error. Failed to parse response.", extra={
                     'data': {
                         "url": url,
@@ -295,7 +299,7 @@ class YoutubeVideoType(VideoType):
 
     def delete_subtitles(self, language, third_party_account):
         bridge = self._get_bridge(third_party_account)
-        bridge.delete_subtitles()
+        bridge.delete_subtitles(language)
 
 
 class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
@@ -329,7 +333,6 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
              }
         }
         """
-        import atom
         entry = self.GetVideoEntry(video_id=self.youtube_video_id)
         caption_track = entry.get_link(rel= 'http://gdata.youtube.com/schemas/2007#video.captionTracks')
         captions_feed = self.get_feed(caption_track.href,  desired_class=gdata.youtube.data.CaptionFeed)
@@ -352,17 +355,30 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         This subs should be synced! Else we upload might fail.
         """
         from widget.srt_subs import GenerateSubtitlesHandler
-        handler = GenerateSubtitlesHandler.get('srt')
+
         lang = subtitle_version.language.language
+
+        try:
+            lc = LanguageCode(lang.lower(), "unisubs")
+            lang = lc.encode("youtube")
+        except KeyError:
+            logger.error("Couldn't encode LC %s to youtube" % lang)
+            return
+
+        handler = GenerateSubtitlesHandler.get('srt')
         subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
         content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
         title = subtitle_version.language.get_title()
+
         if hasattr(self, "captions") is False:
             self._get_captions_info()
+
         # we cant just update, we need to check if it already exists... if so, we delete it
         if lang in self.captions:
             res = self._delete_track(self.captions[lang]['track'])
+
         res = self.create_track(self.youtube_video_id, title, lang, content, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
+
         return res
 
     def _delete_track(self, track):
@@ -375,7 +391,16 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         Smart enought to determine if this video already has such subs
 
         """
+        try:
+            lc = LanguageCode(language, "unisubs")
+            lang = lc.encode("youtube")
+        except KeyError:
+            logger.error("Couldn't encode LC %s to youtube" % language)
+            return
+
         if hasattr(self, "captions") is False:
             self._get_captions_info()
-        if language in self.captions:
-            self._delete_track(self.captions[language]['track'])
+        if lang in self.captions:
+            self._delete_track(self.captions[lang]['track'])
+        else:
+            logger.error("Couldn't find LC %s in youtube" % lang)

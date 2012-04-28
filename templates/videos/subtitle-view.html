@@ -25,6 +25,8 @@
             window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
             window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
         {% endif %}
+        window.IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
+        window.ROLLBACK_ALLOWED = '{{ rollback_allowed }}' == 'True';
     </script>
 {% endblock %}
 
@@ -144,7 +146,7 @@
                     <a href="#unpublish-modal" class="button open-modal">{% trans 'Unpublish' %}</a>
                 {% endif %}
                 {% if language.is_original and request.user|can_create_subtitles_for:video or not language.is_original and request.user|can_create_translations_for:video %}
-                    <a id="edit_subtitles_button" href="{{edit_url}}" class="button">{% trans 'Edit Subtitles' %}</a>
+                    <a id="edit_subtitles_button" class="button{% if not last_version.is_public and not can_edit %} disabled" title="Editing drafts is not permitted"{% else %}" href="{{edit_url}}"{% endif %}>{% trans 'Edit Subtitles' %}</a>
                 {% endif %}
                 {% if last_version.subtitles %}
                     <div class="sort_button action">
@@ -178,7 +180,8 @@
             </div>
             {% if last_version %}
                 {% if last_version.has_subtitles %}
-                    <p class="view-notice">
+                    <p class="view-notice{% if not last_version.is_public %} draft{% endif %}">
+                        {% if not last_version.is_public %}<em>{% trans 'Draft only' %}</em>{% endif %}
                         {% if language.is_dependent %}
                             {% trans "Subtitles" %}
                             {% trans 'translated from' %}
@@ -192,16 +195,6 @@
                         <a href="{{ last_version.user.profile_url}}" title="View {{ last_version.user }}'s profile">
                             <strong>{{ last_version.user }}</strong>
                         </a>.
-                    </p>
-
-                    <p>
-                        <strong>{% trans "Title:" %}</strong>
-                        {{ last_version.title }}
-                    </p>
-
-                    <p>
-                        <strong>{% trans "Description:" %}</strong>
-                        {{ last_version.description|urlize|linebreaks }}
                     </p>
 
                     <ol class="subtitles">
@@ -298,7 +291,7 @@
                         <li>
                             <h3>
                                 <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
-                                <a href="{% url videos:revision pk=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang=item.language.language,lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
                                 {% if item.moderation_status == 'waiting_moderation' %}
                                     (draft)
                                 {% endif %}
@@ -321,6 +314,16 @@
             {% endif %}
         </div>
     </div>
+
+    {% if next_version and rollback_allowed %}
+        {% if next_version.moderation_status != 'waiting_moderation' %}
+            <div class="tools">
+                <a href="{% url videos:rollback last_version.pk %}" class="button" id="rollback">
+                    {% trans 'Roll back to this version' %}
+                </a>
+            </div>
+        {% endif %}
+    {% endif %}
 
     {% if request.user|can_unpublish:video %}
         {% with video.get_team_video as team_video %}

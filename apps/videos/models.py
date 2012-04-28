@@ -773,8 +773,16 @@ def create_video_id(sender, instance, **kwargs):
 def video_delete_handler(sender, instance, **kwargs):
     video_cache.invalidate_cache(instance.video_id)
 
+
+def video_post_delete_handler(sender, instance, **kwargs):
+    if sender == Video:
+        Action.delete_video_handler(instance)
+
+
 models.signals.pre_save.connect(create_video_id, sender=Video)
 models.signals.pre_delete.connect(video_delete_handler, sender=Video)
+models.signals.post_delete.connect(video_post_delete_handler, sender=Video,
+        dispatch_uid='action')
 models.signals.m2m_changed.connect(User.video_followers_change_handler, sender=Video.followers.through)
 
 
@@ -1334,7 +1342,9 @@ class SubtitleVersion(SubtitleCollection):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('videos:revision', [self.pk])
+        return ('videos:subtitleversion_detail',
+                [self.video.video_id, self.language.language, self.language.pk,
+                 self.pk])
 
     def is_dependent(self):
         return not self.language.is_original and not self.is_forked
@@ -1532,6 +1542,7 @@ class SubtitleVersion(SubtitleCollection):
 
     def set_reviewed_by(self, user):
         """Set the User that reviewed this version."""
+        self.language.followers.add(user)
         self._set_metadata('reviewed_by', user.pk)
 
     def set_approved_by(self, user):
@@ -1758,10 +1769,12 @@ class SubtitleMetadata(models.Model):
 from django.template.loader import render_to_string
 
 class ActionRenderer(object):
+
     def __init__(self, template_name):
         self.template_name = template_name
 
     def render(self, item):
+        
         if item.action_type == Action.ADD_VIDEO:
             info = self.render_ADD_VIDEO(item)
         elif item.action_type == Action.CHANGE_TITLE:
@@ -1786,7 +1799,10 @@ class ActionRenderer(object):
             info = self.render_MEMBER_LEFT(item)
         elif item.action_type == Action.REVIEW_VERSION:
             info = self.render_REVIEW_VERSION(item)
-
+        elif item.action_type == Action.ACCEPT_VERSION:
+            info = self.render_ACCEPT_VERSION(item)
+        elif item.action_type == Action.DECLINE_VERSION:
+            info = self.render_DECLINE_VERSION(item)
         else:
             info = ''
 
@@ -1816,6 +1832,11 @@ class ActionRenderer(object):
         msg = _('  reviewed <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
 
+    def render_ACCEPT_VERSION(self, item):
+        kwargs = self._base_kwargs(item)
+        msg = _('  accepted <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        return msg
+
     def render_REJECT_VERSION(self, item):
         kwargs = self._base_kwargs(item)
         msg = _('  rejected <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
@@ -1824,6 +1845,11 @@ class ActionRenderer(object):
     def render_APPROVE_VERSION(self, item):
         kwargs = self._base_kwargs(item)
         msg = _('  approved <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        return msg
+
+    def render_DECLINE_VERSION(self, item):
+        kwargs = self._base_kwargs(item)
+        msg = _('  declined <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
 
     def render_ADD_VIDEO(self, item):
@@ -1953,6 +1979,9 @@ class Action(models.Model):
     REJECT_VERSION = 10
     MEMBER_LEFT = 11
     REVIEW_VERSION = 12
+    ACCEPT_VERSION = 13
+    DECLINE_VERSION = 14
+    DELETE_VIDEO = 15
     TYPES = (
         (ADD_VIDEO, _(u'add video')),
         (CHANGE_TITLE, _(u'change title')),
@@ -1966,6 +1995,9 @@ class Action(models.Model):
         (MEMBER_LEFT, _(u'remove contributor')),
         (REJECT_VERSION, _(u'reject version')),
         (REVIEW_VERSION, _(u'review version')),
+        (ACCEPT_VERSION, _(u'accept version')),
+        (DECLINE_VERSION, _(u'decline version')),
+        (DELETE_VIDEO, _(u'delete video')),
     )
 
     renderer = ActionRenderer('videos/_action_tpl.html')
@@ -2099,6 +2131,14 @@ class Action(models.Model):
         obj.save()
 
     @classmethod
+    def delete_video_handler(cls, video, user=None):
+        action = cls(video=video)
+        action.action_type = cls.DELETE_VIDEO
+        action.user = user
+        action.created = datetime.now()
+        action.save()
+
+    @classmethod
     def create_video_url_handler(cls, sender, instance, created, **kwargs):
         if created and instance.video_id and sender.objects.filter(video=instance.video).count() > 1:
             obj = cls(video=instance.video)
@@ -2131,6 +2171,24 @@ class Action(models.Model):
         obj.language = version.language
         obj.user = moderator
         obj.action_type = cls.REVIEW_VERSION
+        obj.created = datetime.now()
+        obj.save()
+
+    @classmethod
+    def create_accepted_video_handler(cls, version, moderator,  **kwargs):
+        obj = cls(video=version.video)
+        obj.language = version.language
+        obj.user = moderator
+        obj.action_type = cls.ACCEPT_VERSION
+        obj.created = datetime.now()
+        obj.save()
+
+    @classmethod
+    def create_declined_video_handler(cls, version, moderator,  **kwargs):
+        obj = cls(video=version.video)
+        obj.language = version.language
+        obj.user = moderator
+        obj.action_type = cls.DECLINE_VERSION
         obj.created = datetime.now()
         obj.save()
 

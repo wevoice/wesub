@@ -12,6 +12,7 @@ deploy/src/*
 .venv
 closure-library
 jsunit
+docs/_build
 media/profile_images
 media/pictures
 media/CACHE

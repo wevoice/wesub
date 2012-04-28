@@ -31,6 +31,7 @@ from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 
 from apps.auth.models import CustomUser as User
+from teams.models import Team, TeamVideo, Workflow, TeamMember
 from testhelpers.views import _create_videos
 from utils import SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
 from videos import metadata_manager, alarms
@@ -1049,10 +1050,6 @@ class ViewsTest(WebUseTest):
         self._simple_test('videos:translation_history',
             [self.video.video_id, sl.language, sl.id])
 
-    def test_revision(self):
-        version = self.video.version()
-        self._simple_test('videos:revision', [version.id])
-
     def _test_rollback(self):
         #TODO: Seems like roll back is not getting called (on models)
         self._login()
@@ -1291,29 +1288,30 @@ class BlipTvVideoTypeTest(TestCase):
         self.vt = BlipTvVideoType
 
     def test_type(self):
-        url = 'http://blip.tv/file/4297824?utm_source=featured_ep&utm_medium=featured_ep'
+        url = 'http://blip.tv/day9tv/day-9-daily-438-p3-build-orders-made-easy-newbie-tuesday-6066868'
         video, created = Video.get_or_create_for_url(url)
         vu = video.videourl_set.all()[:1].get()
 
-        self.assertEqual(vu.videoid, '4297824')
+        # this is the id used to embed videos
+        self.assertEqual(vu.videoid, 'hdljgvKmGAI')
         self.assertTrue(video.title)
         self.assertTrue(video.thumbnail)
         self.assertTrue(vu.url)
 
         self.assertTrue(self.vt.matches_video_url(url))
-        self.assertTrue(self.vt.matches_video_url('http://blip.tv/file/4297824'))
+        self.assertTrue(self.vt.matches_video_url('http://blip.tv/day9tv/day-9-daily-438-p3-build-orders-made-easy-newbie-tuesday-6066868'))
         self.assertFalse(self.vt.matches_video_url('http://blip.tv'))
         self.assertFalse(self.vt.matches_video_url(''))
 
     def test_video_title(self):
-        url = 'http://blip.tv/file/4914074'
+        url = 'http://blip.tv/day9tv/day-9-daily-100-my-life-of-starcraft-3505715'
         video, created = Video.get_or_create_for_url(url)
         #really this should be jsut not failed
         self.assertTrue(video.get_absolute_url())
 
     def test_creating(self):
-        #this test is for ticket: https://www.pivotaltracker.com/story/show/12996607
-        url = 'http://blip.tv/file/5006677/'
+        # this test is for ticket: https://www.pivotaltracker.com/story/show/12996607
+        url = 'http://blip.tv/day9tv/day-9-daily-1-flash-vs-hero-3515432'
         video, created = Video.get_or_create_for_url(url)
 
 class DailymotionVideoTypeTest(TestCase):
@@ -2203,3 +2201,123 @@ def create_langs_and_versions(video, langs, user=None):
 
 def refresh_obj(m):
     return m.__class__._default_manager.get(pk=m.pk)
+
+
+class FollowTest(WebUseTest):
+
+    fixtures = ['test.json']
+
+    def setUp(self):
+        self._make_objects()
+        self.vt = YoutubeVideoType
+        self.data = [{
+            'url': 'http://www.youtube.com/watch#!v=UOtJUmiUZ08&feature=featured&videos=Qf8YDn9mbGs',
+            'video_id': 'UOtJUmiUZ08'
+        },{
+            'url': 'http://www.youtube.com/v/6Z5msRdai-Q',
+            'video_id': '6Z5msRdai-Q'
+        },{
+            'url': 'http://www.youtube.com/watch?v=woobL2yAxD4',
+            'video_id': 'woobL2yAxD4'
+        },{
+            'url': 'http://www.youtube.com/watch?v=woobL2yAxD4&amp;playnext=1&amp;videos=9ikUhlPnCT0&amp;feature=featured',
+            'video_id': 'woobL2yAxD4'
+        }]
+        self.shorter_url = "http://youtu.be/HaAVZ2yXDBo"
+        cache.clear()
+
+    def test_create_video(self):
+        """
+        When a video is created, the submitter should follow that video.
+        """
+        self._login()
+        video, created = Video.get_or_create_for_url(
+                video_url="http://example.com/123.mp4", user=self.user)
+
+        self.assertTrue(video.followers.filter(pk=self.user.pk).exists())
+
+    def test_create_edit_subs(self):
+        """
+        When you create/edit subtitles, you should follow that language.
+        """
+        self._login()
+
+        youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
+        video, created = Video.get_or_create_for_url(youtube_url)
+
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+
+        language = SubtitleLanguage.objects.get(language='en')
+        version = SubtitleVersion(language=language, user=self.user,
+                datetime_started=datetime.now(), version_no=10)
+        version.save()
+
+        self.assertTrue(video.followers.filter(pk=self.user.pk).exists())
+
+    def test_review_subs(self):
+        """
+        When you review a set of subtitles, you should follow that language.
+        """
+        self._login()
+        youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
+
+        vt = self.vt(youtube_url)
+        video, created = Video.get_or_create_for_url(youtube_url)
+
+        lang = vt.get_subtitled_languages()[0]
+
+        language = SubtitleLanguage.objects.get(language='en')
+        version = SubtitleVersion(language=language,
+                datetime_started=datetime.now(), version_no=10)
+        version.save()
+
+        team, created = Team.objects.get_or_create(name='name', slug='slug')
+        TeamMember.objects.create(team=team, user=self.user,
+                role=TeamMember.ROLE_OWNER)
+        team_video, _= TeamVideo.objects.get_or_create(team=team, video=video,
+                added_by=self.user)
+        Workflow.objects.create(team=team, team_video=team_video,
+                review_allowed=30
+                )
+
+        sl = video.subtitle_language(lang['lang_code'])
+        self.assertEquals(0, sl.followers.count())
+        latest = video.latest_version(language_code='en')
+        latest.set_reviewed_by(self.user)
+        latest.save()
+
+        self.assertEquals(1, sl.followers.count())
+
+    def test_approve_not(self):
+        """
+        When you approve subtitles, you should *not* follow anything.
+        """
+        self._login()
+        youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
+
+        vt = self.vt(youtube_url)
+        video, created = Video.get_or_create_for_url(youtube_url)
+
+        lang = vt.get_subtitled_languages()[0]
+
+        language = SubtitleLanguage.objects.get(language='en')
+        version = SubtitleVersion(language=language,
+                datetime_started=datetime.now(), version_no=10)
+        version.save()
+
+        team, created = Team.objects.get_or_create(name='name', slug='slug')
+        TeamMember.objects.create(team=team, user=self.user,
+                role=TeamMember.ROLE_OWNER)
+        team_video, _= TeamVideo.objects.get_or_create(team=team, video=video,
+                added_by=self.user)
+        Workflow.objects.create(team=team, team_video=team_video,
+                review_allowed=30
+                )
+
+        sl = video.subtitle_language(lang['lang_code'])
+        self.assertEquals(0, sl.followers.count())
+        latest = video.latest_version(language_code='en')
+        latest.set_approved_by(self.user)
+        latest.save()
+
+        self.assertEquals(0, sl.followers.count())
