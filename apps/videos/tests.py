@@ -1537,12 +1537,17 @@ class TestTasks(TestCase):
 
     def test_notification_sending(self):
         latest_version = self.language.latest_version()
+        latest_version.title = 'Old title'
+        latest_version.description = 'Old description'
+        latest_version.save()
 
         v = SubtitleVersion()
         v.language = self.language
         v.datetime_started = datetime.now()
         v.version_no = latest_version.version_no+1
         v.user = User.objects.all()[0]
+        v.title = 'New title'
+        v.description = 'New description'
         v.save()
 
         for s in latest_version.subtitle_set.all():
@@ -1564,6 +1569,13 @@ class TestTasks(TestCase):
             self.fail(result.traceback)
 
         self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+        self.assertTrue('New description' in email.body)
+        self.assertTrue('Old description' in email.body)
+        self.assertTrue('New title' in email.body)
+        self.assertTrue('Old title' in email.body)
+
 
 class TestPercentComplete(TestCase):
     fixtures = ['test.json']

@@ -346,7 +346,23 @@ def _send_letter_caption(caption_version):
 
     most_recent_version = qs[0]
     captions = _make_caption_data(caption_version, most_recent_version)
+
+    title = {
+        'new_title': caption_version.title,
+        'old_title': most_recent_version.title,
+        'has_changed': caption_version.title != most_recent_version.title
+    }
+
+    description = {
+        'new_description': caption_version.description,
+        'old_description': most_recent_version.description,
+        'has_changed': caption_version.description !=
+            most_recent_version.description
+    }
+
     context = {
+        'title': title,
+        'description': description,
         'version': caption_version,
         'domain': domain,
         'translation': not language.is_original,
