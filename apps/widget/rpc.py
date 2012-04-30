@@ -737,6 +737,7 @@ class Rpc(BaseRpc):
             if not can_publish_edits_immediately(team_video, user, sl.language):
                 task = self._get_review_or_approve_task(team_video, sl)
                 if task:
+                    task.set_expiration()
                     return WAITING_MODERATION, task
         else:
             # Otherwise we're dealing with a new set of subtitles for this
