@@ -252,7 +252,7 @@ class Rpc(BaseRpc):
             # can_assign verify if the user has permission to either
             # 1. assign the task to himself
             # 2. do the task himself (the task is assigned to him)
-            if not user.is_authenticated() or (task.assignee != user and not can_assign_task(task, user)):
+            if not user.is_authenticated() or (not task.assignee and not can_assign_task(task, user)):
                 return { "can_edit": False, "locked_by": str(task.assignee or task.team) }
 
         # Check that the team's policies don't prevent the action.
