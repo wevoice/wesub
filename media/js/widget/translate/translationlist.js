@@ -56,7 +56,8 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var map = this.captionSet_.makeMap();
 
-    this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_;
+    // For some reason, YouTube video sources don't set the videoURL_ var. Ugh.
+    this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_ || '';
 
     if (this.videoURL_.indexOf('vimeo.com') === -1) {
         this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(this.baseLanguageSubtitles_);
@@ -83,7 +84,7 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 unisubs.translate.TranslationList.prototype.enterDocument = function() {
     unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
     var handler = this.getHandler();
-    if (this.videoURL_ === -1) {
+    if (this.videoURL_.indexOf('vimeo.com') === -1) {
         handler.listen(this.captionManager_,
                        unisubs.CaptionManager.CAPTION,
                        this.captionReached_);

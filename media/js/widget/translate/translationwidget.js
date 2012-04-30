@@ -29,7 +29,8 @@ unisubs.translate.TranslationWidget = function(subtitle,
     goog.ui.Component.call(this);
     this.subtitle_ = subtitle;
     this.dialog_ = dialog;
-    this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_;
+    this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_ || '';
+
     /**
      * @type {unisubs.subtitle.EditableCaption}
      */
