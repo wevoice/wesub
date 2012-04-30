@@ -14,6 +14,8 @@ test -L user-data/pictures || ln -s ../../extras/pictures user-data/pictures
 # Install requirements --------------------------------------------------------
 source venv/bin/activate
 cd deploy
+# Hack until we can think of a better solution
+pip install vendor/pycrypto-2.1.0.tar.gz
 pip install -r requirements.txt
 pip install -r requirements-test.txt
 cd ..
