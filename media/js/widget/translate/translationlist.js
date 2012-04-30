@@ -59,7 +59,7 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
     this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(this.baseLanguageSubtitles_);
     this.captionManager_ =
         new unisubs.CaptionManager(
-            this.dialog_.getVideoPlayerInternal(), baseLanguageCaptionSet_);
+            this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
 
     goog.array.forEach(
         this.baseLanguageSubtitles_,
