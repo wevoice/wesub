@@ -47,6 +47,7 @@ unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, 
     this.translationWidgets_ = [];
     this.titleTranslationWidget_ = null;
 };
+
 goog.inherits(unisubs.translate.TranslationList, goog.ui.Component);
 
 unisubs.translate.TranslationList.prototype.createDom = function() {
@@ -85,6 +86,12 @@ unisubs.translate.TranslationList.prototype.enterDocument = function() {
     unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
     var handler = this.getHandler();
     if (this.videoURL_.indexOf('vimeo.com') === -1) {
+
+        // Start loading the video.
+        this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
+        this.dialog_.getVideoPlayerInternal().pause();
+
+        // Setup listening for video + subtitles.
         handler.listen(this.captionManager_,
                        unisubs.CaptionManager.CAPTION,
                        this.captionReached_);
@@ -98,9 +105,7 @@ unisubs.translate.TranslationList.prototype.enterDocument = function() {
  * @param {?string} error happened while translating
  */
 unisubs.translate.TranslationList.prototype.translateCallback_ = function(translations, widgets, error) {
-    if (error) {
-        
-    } else {
+    if (!error) {
         goog.array.forEach(translations, function(text, i) {
             widgets[i].setTranslationContent(text);
         });
@@ -119,7 +124,7 @@ unisubs.translate.TranslationList.prototype.translateViaBing = function(fromLang
 
     if (this.titleTranslationWidget_ && this.titleTranslationWidget_.isEmpty()) {
         needTranslating.push(this.titleTranslationWidget_);
-    };
+    }
     
     goog.array.forEach(this.translationWidgets_, function(w) {
         if (w.isEmpty()) {
