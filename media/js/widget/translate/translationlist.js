@@ -56,10 +56,14 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var map = this.captionSet_.makeMap();
 
-    this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(this.baseLanguageSubtitles_);
-    this.captionManager_ =
-        new unisubs.CaptionManager(
-            this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
+    this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_;
+
+    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+        this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(this.baseLanguageSubtitles_);
+        this.captionManager_ =
+            new unisubs.CaptionManager(
+                this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
+    }
 
     goog.array.forEach(
         this.baseLanguageSubtitles_,
@@ -79,9 +83,11 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 unisubs.translate.TranslationList.prototype.enterDocument = function() {
     unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
     var handler = this.getHandler();
-    handler.listen(this.captionManager_,
-                   unisubs.CaptionManager.CAPTION,
-                   this.captionReached_);
+    if (this.videoURL_ === -1) {
+        handler.listen(this.captionManager_,
+                       unisubs.CaptionManager.CAPTION,
+                       this.captionReached_);
+    }
 };
 
 /**
