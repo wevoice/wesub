@@ -144,6 +144,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
 unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
     return this.captions_[index];
 };
+unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
+    var subMap = this.makeMap();
+    return subMap[id];
+};
 unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
     return goog.array.map(this.captions_, function(c) { return c.json; });
 };

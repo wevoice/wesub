@@ -25,8 +25,7 @@ goog.provide('unisubs.translate.TranslationPanel');
  * @param {unisubs.subtitle.EditableCaptionSet} captionSet
  * @param {unisubs.subtitle.SubtitleState} standardSubState
  */
-unisubs.translate.TranslationPanel = function(captionSet,
-                                               standardSubState, dialog, reviewOrApprovalType, serverModel) {
+unisubs.translate.TranslationPanel = function(captionSet, standardSubState, dialog, reviewOrApprovalType, serverModel) {
     this.captionSet_ = captionSet;
     this.standardSubState_ = standardSubState;
     goog.ui.Component.call(this);
@@ -41,6 +40,7 @@ unisubs.translate.TranslationPanel = function(captionSet,
     this.currentStep_ = 0 ; 
 
 };
+
 goog.inherits(unisubs.translate.TranslationPanel, goog.ui.Component);
 
 unisubs.translate.TranslationPanel.prototype.getContentElement = function() {
@@ -65,16 +65,13 @@ unisubs.translate.TranslationPanel.prototype.createDom = function() {
 unisubs.translate.TranslationPanel.prototype.getTranslationList = function(){
     return this.translationList_;
 };
-unisubs.translate.TranslationPanel.prototype.getRightPanel =
-    function(serverModel)
-{
+unisubs.translate.TranslationPanel.prototype.getRightPanel = function(serverModel) {
     if (!this.rightPanel_) {
         this.rightPanel_ = this.createRightPanel_();
         //this.listenToRightPanel_();
     }
     return this.rightPanel_;
 };
-
 unisubs.translate.TranslationPanel.prototype.createRightPanel_ = function(){
     
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
@@ -94,9 +91,8 @@ unisubs.translate.TranslationPanel.prototype.createRightPanel_ = function(){
             ["Firefox spellcheck dictionaries", 
              "https://addons.mozilla.org/en-US/firefox/browse/type:3"]
         ]
-        }
-
-    }else{
+        };
+    } else{
         this.bodyInput_ = internalComponents['bodyInput'];
     }
     
@@ -107,24 +103,20 @@ unisubs.translate.TranslationPanel.prototype.createRightPanel_ = function(){
 
 
 
-}
-
+};
 unisubs.translate.TranslationPanel.prototype.getNotesContent_ = function(){
     if (this.bodyInput_){
         return  this.bodyInput_.value;
     }
     return null;
-}
-
+};
 unisubs.translate.TranslationPanel.prototype.setNotesContent_ = function(newContent){
     if (this.bodyInput_){
         this.bodyInput_.value = newContent;
         return true;
     }
     return null;
-}
-
-
+};
 unisubs.translate.TranslationPanel.prototype.createTranslationHelpContents_ = function(title) {
    var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     return new unisubs.RightPanel.HelpContents(

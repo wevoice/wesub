@@ -23,9 +23,7 @@ goog.provide('unisubs.translate.TranslationWidget');
  * @param {Object.<string, *>} subtitle Base language subtitle in json format
  * @param {unisubs.subtitle.EditableCaption} translation
  */
-unisubs.translate.TranslationWidget = function(subtitle,
-                                               translation,
-                                               dialog) {
+unisubs.translate.TranslationWidget = function(subtitle, translation, dialog) {
     goog.ui.Component.call(this);
     this.subtitle_ = subtitle;
     this.dialog_ = dialog;
@@ -36,24 +34,20 @@ unisubs.translate.TranslationWidget = function(subtitle,
      */
     this.translation_ = translation;
 };
+
 goog.inherits(unisubs.translate.TranslationWidget, goog.ui.Component);
 
 unisubs.translate.TranslationWidget.prototype.getSubtitle = function(){
     return this.subtitle_;
 };
-
-unisubs.translate.TranslationWidget.prototype.getOriginalValue = function(){
-    return this.subtitle_.text;
-};
-
 unisubs.translate.TranslationWidget.prototype.getSubJson = function() {
     return {
         'subtitle_id': this.getCaptionID(),
         'text': this.translateInput_.value
     };
 };
-
 unisubs.translate.TranslationWidget.prototype.createDom = function() {
+
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
 
     this.setElementInternal(
@@ -70,6 +64,9 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
     
     this.getHandler()
         .listen(
+            this.translateInput_, goog.events.EventType.KEYUP,
+            goog.bind(this.inputKeyUp_, this, true))
+        .listen(
             this.translateInput_, goog.events.EventType.BLUR,
             goog.bind(this.inputLostFocus_, this, true))
         .listen(
@@ -77,7 +74,6 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
             this.inputGainedFocus_);
     this.translateInput_.value = this.translation_ ? this.translation_.getText() : '';
 };
-
 unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event) {
     this.onFocusText_ = this.translateInput_.value;
 
@@ -86,7 +82,27 @@ unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event
         this.dialog_.getVideoPlayerInternal().pause();
     }
 };
+unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
+    this.onKeyUpText_ = this.translateInput_.value;
 
+    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+        var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
+        var editableCaption = editableCaptionSet.captionByID(this.subtitle_.subtitle_id);
+
+        if (this.onKeyUpText_ !== '') {
+            editableCaption.setText(this.onKeyUpText_);
+            this.dialog_.getVideoPlayerInternal().showCaptionText(this.onKeyUpText_);
+            this.textHasBeenChanged_ = true;
+        } else {
+            if (this.textHasBeenChanged_) {
+                var originalText = editableCaption.getOriginalText();
+                editableCaption.setText(originalText);
+                this.dialog_.getVideoPlayerInternal().showCaptionText(originalText);
+                this.textHasBeenChanged_ = false;
+            }
+        }
+    }
+}
 unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) {
     var value = goog.string.trim(this.translateInput_.value);
     var edited = value != this.onFocusText_;
@@ -98,19 +114,15 @@ unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) 
     }
     this.translation_.setText(value);
 };
-
-
 unisubs.translate.TranslationWidget.prototype.setTranslationContent = function(value){
     this.translateInput_.value = value;
     this.inputLostFocus_(false);
 };
-
 unisubs.translate.TranslationWidget.prototype.setEnabled = function(enabled) {
     this.translateInput_.disabled = !enabled;
     if (!enabled)
         this.translateInput_.value = '';
 };
-
 unisubs.translate.TranslationWidget.prototype.getCaptionID = function() {
     return this.subtitle_['subtitle_id'];
 };
@@ -126,7 +138,6 @@ unisubs.translate.TranslationWidget.prototype.isEmpty = function(){
 unisubs.translate.TranslationWidget.prototype.showLoadingIndicator = function(){
     unisubs.style.showElement(this.loadingIndicator_, true);
 };
-
 unisubs.translate.TranslationWidget.prototype.hideLoadingIndicator = function(){
     unisubs.style.showElement(this.loadingIndicator_, false);
 };
