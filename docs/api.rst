@@ -12,20 +12,21 @@ if you’d like to use the Amara API for commercial purposes.
 Authentication
 --------------
 
-Before interacting with the api, you must have an API key. In order to get one,
+Before interacting with the API, you must have an API key. In order to get one,
 create a user on the Amara website, then go to the `edit profile
 <http://www.universalsubtitles.org/en/profiles/edit/>`_ page. At the bottom of
 the page you will find a "Generate new key" button . Clicking on it will fetch
 your user the needed API key.
 
-Every request must have the username and the api keys as headers. For example::
+Every request must have the username and the API keys as headers. For example::
 
    X-api-username: my_username_here
    X-apikey: my_api_key_here
 
 So a sample request would look like this::
 
-   $ curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key'  https://staging.universalsubtitles.org/api2/partners/videos/
+   $ curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key' \
+    https://staging.universalsubtitles.org/api2/partners/videos/
 
 Data Formats
 ------------
@@ -44,21 +45,23 @@ variable ``format=json``.
 API endpoint
 ------------
 
-The endpoint for the api is the environment base URL +  ``/api2/partners/``.
+The endpoint for the API is the environment base URL +  ``/api2/partners/``.
 
 Possible environments:
 
-* Staging: https://staging.universalsubtitles.org/
-* Production: /
+* Staging: ``https://staging.universalsubtitles.org/``
+* Production: ``https://www.universalsubtitles.org/``
 
 Therefore, most clients should be making requests against:
-/api2/partners/
+``https://www.universalsubtitles.org/api2/partners/``
 
 All API requests should go through https. The staging environment might need
 HTTP basic auth, please contact us to request credentials.  When basic auth is
 needed on staging, you end up with a request like this::
 
-    $ curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key' --user basic_auth_username:basic_auth_password https://staging.universalsubtitles.org/api2/partners/videos/
+    $ curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key' \
+        --user basic_auth_username:basic_auth_password \
+        https://staging.universalsubtitles.org/api2/partners/videos/
 
 If you're under a partnership, you might have a different base URL. Please
 contact us if you're not sure.
@@ -66,10 +69,75 @@ contact us if you're not sure.
 Available Resources
 -------------------
 
+All resources share a common structure when it comes to the basic data
+operations.
+
+* ``GET`` request is used to viewing data
+* ``POST`` request is used for creating new items
+* ``PUT`` request is used for updating existing items
+* ``DELETE`` request is used for deleting existing items
+
+For example, in order to request a list of teams the user is current on, you
+would issue the following request:
+
+.. http:get:: /api2/partners/teams/
+
+To view a detail of the ``test`` team, you could do:
+
+.. http:get:: /api2/partners/teams/test/
+
+    Example response
+
+    .. sourcecode:: http
+
+        {
+            "created": "2012-04-18T09:26:59",
+            "deleted": false,
+            "description": "",
+            "header_html_text": "",
+            "is_moderated: false",
+            "is_visible: true",
+            "logo: null",
+            "max_tasks_per_member": null,
+            "membership_policy: ""Open",
+            "name: "test","
+            "projects_enabled": false,
+            "resource_uri: "/"api2/partners/teams/test/",
+            "slug: "test","
+            "subtitle_policy": "Anyone",
+            "task_assign_policy": "Any team member",
+            "task_expiration: null",
+            "translate_policy: "Anyone"",
+            "video_policy: "Any team member",
+            "workflow_enabled": false
+        }
+
+Here is an example of creating a new team via ``curl``.
+
+.. code-block:: bash
+
+    curl -i -X POST -H "Accept: application/json" \
+        -H "X-api-username: username" -H "X-apikey: your-api-key" \
+        -H "Content-Type: application/json" \
+        --data '{"name": "Team name", "slug": "team-name"}' \
+        http://host/api2/partners/teams/
+
+You can use the same fields that you get back when requesting a team detail.
+
+To update a team, you could issue a request like this:
+
+.. code-block:: bash
+
+    curl -i -X PUT -H "Accept: application/json" \
+        -H "X-api-username: username" -H "X-apikey: your-api-key" \
+        -H "Content-Type: application/json" \
+        --data '{"name": "My team name"}' \
+        https://host/api2/partners/teams/test/
+
 The following resources are available to end users:
 
-VideoResource
-~~~~~~~~~~~~~
+Video Resource
+~~~~~~~~~~~~~~
 
 Represents a video on Amara.
 
@@ -120,8 +188,34 @@ With the same parameters for creation. Note that through out our system, a
 video cannot have it's URLs changed. So you can change other video attributes
 (title, description) but the URL sent must be the same original one.
 
-VideoLanguageResource
-~~~~~~~~~~~~~~~~~~~~~
+Moving videos between teams
++++++++++++++++++++++++++++
+
+In order to move a video from one team to another, you can make a request to
+change the video where you change the ``team`` value in the Video Resource.
+
+In order to move the video from *Team A* to *Team B*, you would make the
+following request.
+
+.. code-block:: bash
+
+    curl -i -X PUT -H "Accept: application/json" \
+        -H "X-api-username: username" -H "X-apikey: your-api-key" \
+        -H "Content-Type: application/json" \
+        --data '{"team": "team_b"}' \
+        https://host/api2/partners/videos/video-id/
+
+Please note that the value that is sent as the ``team`` is the team's slug.
+The user making the change must have permission to remove a video from the
+originating team and permission to add a video to the target team.
+
+Setting the ``team`` value to ``null`` will remove it from its current team.
+
+A similar mechanism can be used to change what project a given video is filed
+under.
+
+Video Language Resource
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Represents a language for a given video on Amara.
 
@@ -148,8 +242,8 @@ Information about a specific video language can be retrieved from the URL:
     :param lang-identifier: language identifier can be the language code (e.g. ``en``) or the
         numeric ID returned from calls to listing languages.
 
-SubtitlesResource
-~~~~~~~~~~~~~~~~~
+Subtitles Resource
+~~~~~~~~~~~~~~~~~~
 
 Represents the subtitle set for a given video language.
 
@@ -181,8 +275,8 @@ Creating new subtitles for a language:
 This will create a new subtitle version with the new subtitles.
 
 
-LanguageResource
-~~~~~~~~~~~~~~~~
+Language Resource
+~~~~~~~~~~~~~~~~~
 
 Represents a listing of all available languages on the Amara
 platform.
@@ -191,8 +285,8 @@ Listing available languages:
 
 .. http:get:: /api2/partners/languages/
 
-UserResource
-~~~~~~~~~~~~
+User Resource
+~~~~~~~~~~~~~
 
 One can list and create new users through the API.
 
@@ -219,8 +313,8 @@ The response also includes the 'api_key' for that user. If clients wish to make
 requests on behalf of this newly created user through the api, they must hold
 on to this key, since it won't be returned in the detailed view.
 
-VideoUrlResource
-~~~~~~~~~~~~~~~~
+Video Url Resource
+~~~~~~~~~~~~~~~~~~
 
 One can list, update, delete and add new video urls to an existing video.
 
@@ -258,45 +352,28 @@ To delete a url:
 If this is the only URL for a video, the request will fail. A video must have
 at least one URL.
 
-TeamResource
-~~~~~~~~~~~~
+Team Resource
+~~~~~~~~~~~~~
 
-One can list existing teams:
+You can list existing teams:
 
 .. http:get:: /api2/partners/teams/
 
-Once can view a detail for a team:
+You can view details for an existing team:
 
 .. http:get:: /api2/partners/teams/[team-slug]/
 
-Example response:
+Creating a team:
 
-.. http:get:: /api2/partners/teams/test/
+.. http:post:: /api2/partners/teams/
 
-.. sourcecode:: http
+Updating a team:
 
+.. http:put:: /api2/partners/teams/[team-slug]/
 
-    {
-        "created": "2012-04-18T09:26:59",
-        "deleted": false,
-        "description": "",
-        "header_html_text": "",
-        "is_moderated: false",
-        "is_visible: true",
-        "logo: null",
-        "max_tasks_per_member": null,
-        "membership_policy: ""Open",
-        "name: "test","
-        "projects_enabled": false,
-        "resource_uri: "/"api2/partners/teams/test/",
-        "slug: "test","
-        "subtitle_policy": "Anyone",
-        "task_assign_policy": "Any team member",
-        "task_expiration: null",
-        "translate_policy: "Anyone"",
-        "video_policy: "Any team member",
-        "workflow_enabled": false
-    }
+Deleting a team:
+
+.. http:delete:: /api2/partners/teams/[team-slug]/
 
 Policy values
 +++++++++++++
@@ -322,80 +399,46 @@ Task assign policy:
 * ``Only managers and admins``
 * ``Only admins``
 
-Creating teams
-++++++++++++++
+Project Resource
+~~~~~~~~~~~~~~~~
 
-.. http:post:: /api2/partners/teams/
+List all projects for a given team:
 
-For example
+.. http:get:: /api2/partners/teams/[team-slug]/projects/
 
-.. code-block:: bash
+Project detail:
 
-    curl -i -X POST -H "Accept: application/json" \
-        -H "X-api-username: username" -H "X-apikey: your-api-key" \
-        -H "Content-Type: application/json" \
-        --data '{"name": "Team name", "slug": "team-name"}' \
-        http://host/api2/partners/teams/
+.. http:get:: /api2/partners/teams/[team-slug]/projects/[project-slug]/
 
-You can use the same fields that you get back when requesting a team detail.
+Create a new project:
 
-Example response:
+.. http:post:: /api2/partners/teams/[team-slug]/projects/
 
-
-.. http:get:: /api2/partners/teams/test/
+Example payload for creating a new project:
 
 ::
 
     {
-        "created": "2012-04-18T09:26:59",
-        "deleted": false,
-        "description": "",
-        "header_html_text": "",
-        "is_moderated: false",
-        "is_visible: true",
-        "logo: null",
-        "max_tasks_per_member": null,
-        "membership_policy: ""Open",
-        "name: "test","
-        "projects_enabled": false,
-        "resource_uri: "/"api2/partners/teams/test/",
-        "slug: "test","
-        "subtitle_policy": "Anyone",
-        "task_assign_policy": "Any team member",
-        "task_expiration: null",
-        "translate_policy: "Anyone"",
-        "video_policy: "Any team member",
-        "workflow_enabled": false
+        "name": "Project name",
+        "slug": "project-slug",
+        "description": "This is an example project.",
+        "guidelines": "Only post family-friendly videos."
     }
 
-Creating teams
-++++++++++++++
+.. note:: You can only create projects for a specific team.
 
-.. http:post:: /api2/partners/teams/
+Update an existing project:
 
-For example
+.. http:put:: /api2/partners/teams/[team-slug]/projects/[project-slug]/
 
-.. code-block:: bash
+For example, to change the project's name:
 
-    curl -i -X POST -H "Accept: application/json" \
-        -H "X-api-username: username" -H "X-apikey: your-api-key" \
-        -H "Content-Type: application/json" \
-        --data '{"name": "Team name", "slug": "team-name"}' \
-        http://host/api2/partners/teams/
+::
 
-You can use the same fields that you get back when requesting a team detail.
+    {
+        "name": "Project"
+    }
 
-Updating items
-++++++++++++++
+Delete a project:
 
-.. http:put:: /api2/partners/teams/[team-slug]/
-
-For example
-
-.. code-block:: bash
-
-    curl -i -X PUT -H "Accept: application/json" \
-        -H "X-api-username: username" -H "X-apikey: your-api-key" \
-        -H "Content-Type: application/json" \
-        --data '{"name": "My team name"}' \
-        https://host/api2/partners/teams/test/
+.. http:delete:: /api2/partners/teams/[team-slug]/projects/[project-slug]/
