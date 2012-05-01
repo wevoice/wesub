@@ -375,6 +375,9 @@ Deleting a team:
 
 .. http:delete:: /api2/partners/teams/[team-slug]/
 
+.. note:: You can only create new teams if you have been granted this
+    privilege.  Contact us if you require a partner account.
+
 Policy values
 +++++++++++++
 
