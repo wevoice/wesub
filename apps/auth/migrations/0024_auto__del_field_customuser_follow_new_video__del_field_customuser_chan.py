@@ -7,37 +7,11 @@ from django.db import models
 class Migration(SchemaMigration):
     
     def forwards(self, orm):
-        
-        # Deleting field 'CustomUser.follow_new_video'
-        db.delete_column('auth_customuser', 'follow_new_video')
-
-        # Deleting field 'CustomUser.changes_notification'
-        db.delete_column('auth_customuser', 'changes_notification')
-
-        # Adding field 'CustomUser.notify_by_email'
-        db.add_column('auth_customuser', 'notify_by_email', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True), keep_default=False)
-
-        # Adding field 'CustomUser.notify_by_message'
-        db.add_column('auth_customuser', 'notify_by_message', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True), keep_default=False)
-
         # Adding field 'CustomUser.is_partner'
         db.add_column('auth_customuser', 'is_partner', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True), keep_default=False)
     
     
     def backwards(self, orm):
-        
-        # Adding field 'CustomUser.follow_new_video'
-        db.add_column('auth_customuser', 'follow_new_video', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True), keep_default=False)
-
-        # Adding field 'CustomUser.changes_notification'
-        db.add_column('auth_customuser', 'changes_notification', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True), keep_default=False)
-
-        # Deleting field 'CustomUser.notify_by_email'
-        db.delete_column('auth_customuser', 'notify_by_email')
-
-        # Deleting field 'CustomUser.notify_by_message'
-        db.delete_column('auth_customuser', 'notify_by_message')
-
         # Deleting field 'CustomUser.is_partner'
         db.delete_column('auth_customuser', 'is_partner')
     
