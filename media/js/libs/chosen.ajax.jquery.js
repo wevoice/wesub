@@ -86,12 +86,13 @@
                         return $("<option />", {'value': value, 'html': text}).appendTo(select);
                     });
                     var rem = field.attr('value');
+
                     select.trigger("liszt:updated");
                     field.attr('value', rem);
-
                     field.keyup();
 
                     if (typeof success !== "undefined" && success !== null) {
+                        field.keyup();
                         return success();
                     }
                 };

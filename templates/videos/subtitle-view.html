@@ -180,10 +180,8 @@
             </div>
             {% if last_version %}
                 {% if last_version.has_subtitles %}
-                    <p class="view-notice{% if not last_version.is_public %} draft">
-                            <em>{% trans 'Draft only' %}</em>
-                        {% else %}">
-                        {% endif %}
+                    <p class="view-notice{% if not last_version.is_public %} draft{% endif %}">
+                        {% if not last_version.is_public %}<em>{% trans 'Draft only' %}</em>{% endif %}
                         {% if language.is_dependent %}
                             {% trans "Subtitles" %}
                             {% trans 'translated from' %}
