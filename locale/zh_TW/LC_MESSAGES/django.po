@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-30 05:51-0500\n"
+"POT-Creation-Date: 2012-05-01 01:33-0500\n"
 "PO-Revision-Date: 2012-04-27 10:32+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.net/projects/p/"
@@ -4778,7 +4778,7 @@ msgid "You have no sent messages."
 msgstr "您沒有已送出訊息"
 
 #: templates/messages/email/comment-notification.html:28
-#: templates/videos/email_notification.html:28
+#: templates/videos/email_notification.html:38
 #: templates/videos/email_notification_non_editors.html:24
 msgid "Stop watching for changes on this video"
 msgstr "不再關注這部影片得更動"
@@ -7113,26 +7113,26 @@ msgstr ""
 "            時間標記%(time_change)s已調整。\n"
 "            "
 
-#: templates/videos/email_notification.html:26
+#: templates/videos/email_notification.html:36
 #: templates/videos/email_notification_non_editors.html:23
 msgid "Compare the new version to the last version"
 msgstr "比較新版本與前一個版本"
 
-#: templates/videos/email_notification.html:27
+#: templates/videos/email_notification.html:37
 msgid "Compare your work to the new version"
 msgstr "您的字幕與新版本比較"
 
-#: templates/videos/email_notification.html:36
+#: templates/videos/email_notification.html:46
 #: templates/videos/email_notification_non_editors.html:32
 msgid "Old Text"
 msgstr "舊版文字"
 
-#: templates/videos/email_notification.html:39
+#: templates/videos/email_notification.html:49
 #: templates/videos/email_notification_non_editors.html:35
 msgid "Changes to Subtitle Text"
 msgstr "字幕文字的更動"
 
-#: templates/videos/email_notification.html:42
+#: templates/videos/email_notification.html:52
 #: templates/videos/email_notification_non_editors.html:38
 msgid "New Text"
 msgstr "新版文字"

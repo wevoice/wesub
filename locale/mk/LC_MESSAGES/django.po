@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-30 06:00-0500\n"
+"POT-Creation-Date: 2012-05-01 01:42-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4458,7 +4458,7 @@ msgid "You have no sent messages."
 msgstr ""
 
 #: templates/messages/email/comment-notification.html:28
-#: templates/videos/email_notification.html:28
+#: templates/videos/email_notification.html:38
 #: templates/videos/email_notification_non_editors.html:24
 msgid "Stop watching for changes on this video"
 msgstr ""
@@ -6726,26 +6726,26 @@ msgid ""
 "                "
 msgstr ""
 
-#: templates/videos/email_notification.html:26
+#: templates/videos/email_notification.html:36
 #: templates/videos/email_notification_non_editors.html:23
 msgid "Compare the new version to the last version"
 msgstr ""
 
-#: templates/videos/email_notification.html:27
+#: templates/videos/email_notification.html:37
 msgid "Compare your work to the new version"
 msgstr ""
 
-#: templates/videos/email_notification.html:36
+#: templates/videos/email_notification.html:46
 #: templates/videos/email_notification_non_editors.html:32
 msgid "Old Text"
 msgstr ""
 
-#: templates/videos/email_notification.html:39
+#: templates/videos/email_notification.html:49
 #: templates/videos/email_notification_non_editors.html:35
 msgid "Changes to Subtitle Text"
 msgstr ""
 
-#: templates/videos/email_notification.html:42
+#: templates/videos/email_notification.html:52
 #: templates/videos/email_notification_non_editors.html:38
 msgid "New Text"
 msgstr ""

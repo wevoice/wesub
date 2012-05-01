@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-30 05:49-0500\n"
+"POT-Creation-Date: 2012-05-01 01:31-0500\n"
 "PO-Revision-Date: 2012-04-27 10:32+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.net/projects/p/"
@@ -4790,7 +4790,7 @@ msgid "You have no sent messages."
 msgstr "보내 메시지가 없습니다."
 
 #: templates/messages/email/comment-notification.html:28
-#: templates/videos/email_notification.html:28
+#: templates/videos/email_notification.html:38
 #: templates/videos/email_notification_non_editors.html:24
 msgid "Stop watching for changes on this video"
 msgstr "이 비디오에 대한 변경 사항 시청 중지"
@@ -7140,26 +7140,26 @@ msgstr ""
 "                %(time_change)s of the timing was changed.\n"
 "                "
 
-#: templates/videos/email_notification.html:26
+#: templates/videos/email_notification.html:36
 #: templates/videos/email_notification_non_editors.html:23
 msgid "Compare the new version to the last version"
 msgstr "지난 버전과 새로운 버전을 비교"
 
-#: templates/videos/email_notification.html:27
+#: templates/videos/email_notification.html:37
 msgid "Compare your work to the new version"
 msgstr "내 버전과 새로운 버전을 비교"
 
-#: templates/videos/email_notification.html:36
+#: templates/videos/email_notification.html:46
 #: templates/videos/email_notification_non_editors.html:32
 msgid "Old Text"
 msgstr "오래된 글"
 
-#: templates/videos/email_notification.html:39
+#: templates/videos/email_notification.html:49
 #: templates/videos/email_notification_non_editors.html:35
 msgid "Changes to Subtitle Text"
 msgstr "자막 텍스트로 변경"
 
-#: templates/videos/email_notification.html:42
+#: templates/videos/email_notification.html:52
 #: templates/videos/email_notification_non_editors.html:38
 msgid "New Text"
 msgstr "새 텍스트"
