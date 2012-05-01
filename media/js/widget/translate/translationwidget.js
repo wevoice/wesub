@@ -40,6 +40,9 @@ goog.inherits(unisubs.translate.TranslationWidget, goog.ui.Component);
 unisubs.translate.TranslationWidget.prototype.getSubtitle = function(){
     return this.subtitle_;
 };
+unisubs.translate.TranslationWidget.prototype.getOriginalValue = function(){
+    return this.subtitle_.text;
+};
 unisubs.translate.TranslationWidget.prototype.getSubJson = function() {
     return {
         'subtitle_id': this.getCaptionID(),

@@ -380,7 +380,7 @@ def _reviewed_notification(task_pk, status):
     subject = ugettext(u"Your subtitles have been reviewed")
     if status == REVIEWED_AND_PUBLISHED:
         subject += ugettext(" and published")
-    user = task.subtitle_version.user
+    user = task.review_base_version.user
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
