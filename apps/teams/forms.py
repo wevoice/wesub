@@ -108,7 +108,6 @@ class MoveTeamVideoForm(forms.Form):
     team = forms.ModelChoiceField(queryset=Team.objects.all(),
                                   required=True)
 
-    # Should this queryset be Project.objects.filter(team=team) ?
     project = forms.ModelChoiceField(queryset=Project.objects.all(),
                                      required=False)
 
@@ -119,9 +118,13 @@ class MoveTeamVideoForm(forms.Form):
     def clean(self):
         team_video = self.cleaned_data.get('team_video')
         team = self.cleaned_data.get('team')
+        project = self.cleaned_data.get('project')
 
         if not team_video or not team:
             return
+
+        if project.team != team:
+            raise forms.ValidationError(u"That project does not belong to that team.")
 
         if team_video.team.pk == team.pk:
             raise forms.ValidationError(u"That video is already in that team.")
