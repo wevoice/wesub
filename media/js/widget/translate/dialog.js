@@ -30,6 +30,7 @@ unisubs.translate.Dialog = function(opener, serverModel, videoSource, subtitleSt
     this.standardSubState_ = standardSubState;
 
     this.serverModel_ = serverModel;
+
     this.serverModel_.init();
 
     this.saved_ = false;
@@ -281,6 +282,7 @@ unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
             this.serverModel_.getCaptionSet(),
             this.getVideoPlayerInternal(),
             this.serverModel_,
+            this.captionManager_,
             this.standardSubState_ ,
             false,
             this.reviewOrApprovalType_,
