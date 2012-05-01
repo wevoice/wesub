@@ -781,11 +781,11 @@ def _create_translation_tasks(team_video, subtitle_version):
         if sl and sl.is_complete_and_synced():
             continue
 
-        # Don't create tasks for languages that already have one.
+        # Don't create tasks for languages that already have one.  This includes
+        # review/approve tasks and such.
         # Doesn't matter if it's complete or not.
         task_exists = Task.objects.not_deleted().filter(
-            team=team_video.team, team_video=team_video, language=lang,
-            type=Task.TYPE_IDS['Translate']
+            team=team_video.team, team_video=team_video, language=lang
         ).exists()
         if task_exists:
             continue
