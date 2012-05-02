@@ -28,6 +28,7 @@ from celery.schedules import crontab
 from celery.task import task
 
 from utils import send_templated_email
+
 from utils import errorreport
 
 @task

@@ -810,6 +810,5 @@ def can_create_project(user, team):
 def can_delete_project(user, team, project):
     return can_edit_project(team, user, project)
 
-
 def can_create_team(user):
     return user.is_partner

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-01 01:39-0500\n"
+"POT-Creation-Date: 2012-05-02 06:19-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,57 +50,57 @@ msgstr ""
 msgid "Hide"
 msgstr ""
 
-#: apps/auth/models.py:97
+#: apps/auth/models.py:98
 msgid "Retired user"
 msgstr ""
 
-#: apps/auth/models.py:324
+#: apps/auth/models.py:325
 msgid "Add comment"
 msgstr ""
 
-#: apps/auth/models.py:325
+#: apps/auth/models.py:326
 msgid "Start subtitles"
 msgstr ""
 
-#: apps/auth/models.py:326
+#: apps/auth/models.py:327
 msgid "Start translation"
 msgstr ""
 
-#: apps/auth/models.py:327
+#: apps/auth/models.py:328
 msgid "Edit subtitles"
 msgstr ""
 
-#: apps/auth/models.py:328
+#: apps/auth/models.py:329
 msgid "Edit translation"
 msgstr ""
 
-#: apps/auth/models.py:385
+#: apps/auth/models.py:386
 msgid "understand enough"
 msgstr ""
 
-#: apps/auth/models.py:386
+#: apps/auth/models.py:387
 msgid "understand 99%"
 msgstr ""
 
-#: apps/auth/models.py:387
+#: apps/auth/models.py:388
 msgid "write like a native"
 msgstr ""
 
-#: apps/auth/models.py:392
+#: apps/auth/models.py:393
 msgid "follow requests in language"
 msgstr ""
 
-#: apps/auth/models.py:407
+#: apps/auth/models.py:408
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr ""
 
-#: apps/auth/models.py:505
+#: apps/auth/models.py:506
 msgid "e-mail confirmation"
 msgstr ""
 
-#: apps/auth/models.py:506
+#: apps/auth/models.py:507
 msgid "e-mail confirmations"
 msgstr ""
 
@@ -449,50 +449,50 @@ msgstr ""
 msgid "User"
 msgstr ""
 
-#: apps/teams/forms.py:47 apps/teams/forms.py:153
+#: apps/teams/forms.py:47 apps/teams/forms.py:156
 #: libs/rosetta/templates/rosetta/languages.html:12
 #: templates/teams/_context_team.html:65
 msgid "Project"
 msgstr ""
 
-#: apps/teams/forms.py:51 apps/teams/forms.py:157
+#: apps/teams/forms.py:51 apps/teams/forms.py:160
 msgid "Let's keep things tidy, shall we?"
 msgstr ""
 
-#: apps/teams/forms.py:139
+#: apps/teams/forms.py:142
 msgid "Video URL"
 msgstr ""
 
-#: apps/teams/forms.py:140
+#: apps/teams/forms.py:143
 msgid ""
 "Enter the URL of any compatible video or any video on our site. You can also "
 "browse the site and use the 'Add Video to Team' menu."
 msgstr ""
 
-#: apps/teams/forms.py:148
+#: apps/teams/forms.py:151
 msgid "Video language"
 msgstr ""
 
-#: apps/teams/forms.py:150
+#: apps/teams/forms.py:153
 msgid "It will be saved only if video does not exist in our database."
 msgstr ""
 
-#: apps/teams/forms.py:204
+#: apps/teams/forms.py:207
 msgid "This video already belongs to a team."
 msgstr ""
 
-#: apps/teams/forms.py:210
+#: apps/teams/forms.py:213
 msgid "Set original language for this video."
 msgstr ""
 
-#: apps/teams/forms.py:263
+#: apps/teams/forms.py:266
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
 "appear."
 msgstr ""
 
-#: apps/teams/forms.py:266
+#: apps/teams/forms.py:269
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
@@ -500,11 +500,11 @@ msgid ""
 "and make sure to check \"Save feed\" box."
 msgstr ""
 
-#: apps/teams/forms.py:284
+#: apps/teams/forms.py:287
 msgid "Team intro video URL"
 msgstr ""
 
-#: apps/teams/forms.py:286
+#: apps/teams/forms.py:289
 msgid ""
 "You can put an optional video\n"
 "on your team homepage that explains what your team is about, to attract "
@@ -512,83 +512,83 @@ msgid ""
 "Enter a link to any compatible video, or to any video page on our site."
 msgstr ""
 
-#: apps/teams/forms.py:291
+#: apps/teams/forms.py:294
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr ""
 
-#: apps/teams/forms.py:331
+#: apps/teams/forms.py:334
 msgid "This video has already been transcribed."
 msgstr ""
 
-#: apps/teams/forms.py:336
+#: apps/teams/forms.py:339
 msgid "Subtitling of this video is already in progress."
 msgstr ""
 
-#: apps/teams/forms.py:342
+#: apps/teams/forms.py:345
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr ""
 
-#: apps/teams/forms.py:348
+#: apps/teams/forms.py:351
 msgid "This language already has a complete set of subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:367
+#: apps/teams/forms.py:370
 msgid "There is already a task in progress for that video/language."
 msgstr ""
 
-#: apps/teams/forms.py:380
+#: apps/teams/forms.py:383
 msgid "You must select a language for a Translate task."
 msgstr ""
 
-#: apps/teams/forms.py:413
+#: apps/teams/forms.py:416
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr ""
 
-#: apps/teams/forms.py:435
+#: apps/teams/forms.py:438
 msgid "You do not have permission to assign this task."
 msgstr ""
 
-#: apps/teams/forms.py:442
+#: apps/teams/forms.py:445
 msgid "This user cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:463
+#: apps/teams/forms.py:466
 msgid "You do not have permission to delete this task."
 msgstr ""
 
-#: apps/teams/forms.py:524
+#: apps/teams/forms.py:527
 msgid "You cannot blacklist a preferred language."
 msgstr ""
 
-#: apps/teams/forms.py:548 apps/teams/forms.py:550
+#: apps/teams/forms.py:551 apps/teams/forms.py:553
 msgid "User does not exist!"
 msgstr ""
 
-#: apps/teams/forms.py:557
+#: apps/teams/forms.py:560
 msgid "User is already a member of this team!"
 msgstr ""
 
-#: apps/teams/forms.py:585 templates/videos/subtitle-view.html:357
+#: apps/teams/forms.py:588 templates/videos/subtitle-view.html:355
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
-#: apps/teams/forms.py:589 templates/videos/subtitle-view.html:342
+#: apps/teams/forms.py:592 templates/videos/subtitle-view.html:340
 msgid "What would you like to unpublish?"
 msgstr ""
 
-#: apps/teams/forms.py:591
+#: apps/teams/forms.py:594
 msgid "This version (and any later version) for this language."
 msgstr ""
 
-#: apps/teams/forms.py:592
+#: apps/teams/forms.py:595
 msgid "All versions for this language and any dependent languages."
 msgstr ""
 
-#: apps/teams/forms.py:610
+#: apps/teams/forms.py:613
 msgid "These subtitles are not under a team's control."
 msgstr ""
 
-#: apps/teams/forms.py:614
+#: apps/teams/forms.py:617
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
@@ -739,20 +739,20 @@ msgstr ""
 msgid "If you check this, other languages will not be displayed."
 msgstr ""
 
-#: apps/teams/models.py:908 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:909 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr ""
 
-#: apps/teams/models.py:909 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:910 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr ""
 
-#: apps/teams/models.py:910 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:911 apps/teams/permissions_const.py:44
 #: templates/base.html:116
 msgid "Admin"
 msgstr ""
 
-#: apps/teams/models.py:911 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:912 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr ""
 
@@ -1025,35 +1025,35 @@ msgstr ""
 msgid "Email for alert"
 msgstr ""
 
-#: apps/videos/forms.py:63
+#: apps/videos/forms.py:64
 msgid "File should have txt format"
 msgstr ""
 
-#: apps/videos/forms.py:67 apps/videos/forms.py:85 apps/videos/forms.py:380
+#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:385
 msgid "File size should be less {0} kb"
 msgstr ""
 
-#: apps/videos/forms.py:72 apps/videos/forms.py:93 apps/videos/forms.py:388
+#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:393
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/videos/forms.py:76
+#: apps/videos/forms.py:77
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr ""
 
-#: apps/videos/forms.py:88
+#: apps/videos/forms.py:89
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr ""
 
-#: apps/videos/forms.py:95 apps/videos/forms.py:390
+#: apps/videos/forms.py:96 apps/videos/forms.py:395
 msgid "Incorrect subtitles format"
 msgstr ""
 
-#: apps/videos/forms.py:121 apps/videos/forms.py:522 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:527 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr ""
 
-#: apps/videos/forms.py:127 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:128 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1062,43 +1062,43 @@ msgid ""
 "href=\"mailto:%s\">contact us</a>!"
 msgstr ""
 
-#: apps/videos/forms.py:138
+#: apps/videos/forms.py:139
 msgid "You have not permission add video URL for this video"
 msgstr ""
 
-#: apps/videos/forms.py:170
+#: apps/videos/forms.py:171
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr ""
 
-#: apps/videos/forms.py:185
+#: apps/videos/forms.py:186
 msgid ""
 "Sorry, we can't upload your subtitles because there's already another user "
 "editing it."
 msgstr ""
 
-#: apps/videos/forms.py:200
+#: apps/videos/forms.py:201
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr ""
 
-#: apps/videos/forms.py:212
+#: apps/videos/forms.py:213
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/videos/forms.py:220 apps/videos/forms.py:223
+#: apps/videos/forms.py:221 apps/videos/forms.py:224
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:383
+#: apps/videos/forms.py:388
 msgid "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr ""
 
-#: apps/videos/forms.py:507
+#: apps/videos/forms.py:512
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1106,7 +1106,7 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:510 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:515 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1117,49 +1117,49 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:538
+#: apps/videos/forms.py:543
 msgid "Youtube usernames"
 msgstr ""
 
-#: apps/videos/forms.py:538
+#: apps/videos/forms.py:543
 msgid "Enter usernames separated by comma."
 msgstr ""
 
-#: apps/videos/forms.py:539
+#: apps/videos/forms.py:544
 msgid "Youtube page link."
 msgstr ""
 
-#: apps/videos/forms.py:540
+#: apps/videos/forms.py:545
 msgid "For example: http://www.youtube.com/user/username"
 msgstr ""
 
-#: apps/videos/forms.py:541
+#: apps/videos/forms.py:546
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:542
+#: apps/videos/forms.py:547
 msgid "Save feed"
 msgstr ""
 
-#: apps/videos/forms.py:542
+#: apps/videos/forms.py:547
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr ""
 
-#: apps/videos/forms.py:585
+#: apps/videos/forms.py:590
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr ""
 
-#: apps/videos/forms.py:590
+#: apps/videos/forms.py:595
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:601
+#: apps/videos/forms.py:606
 msgid "captcha"
 msgstr ""
 
@@ -1544,7 +1544,7 @@ msgstr ""
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:852 apps/widget/rpc.py:893
+#: apps/widget/rpc.py:853 apps/widget/rpc.py:894
 msgid "\n"
 msgstr ""
 
@@ -2382,274 +2382,278 @@ msgid "Ossetian, Ossetic"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:284
-msgid "Punjabi"
+msgid "Papiamento"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:285
-msgid "Pali"
+msgid "Punjabi"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:286
-msgid "Polish"
+msgid "Pali"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:287
-msgid "Pashto"
+msgid "Polish"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:288
-msgid "Portuguese"
+msgid "Pashto"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:289
-msgid "Portuguese, Brazilian"
+msgid "Portuguese"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:290
-msgid "Quechua"
+msgid "Portuguese, Brazilian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:291
-msgid "Romansh"
+msgid "Quechua"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:292
-msgid "Romanian"
+msgid "Romansh"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:293
-msgid "Russian"
+msgid "Romanian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:294
-msgid "Rundi"
+msgid "Russian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:295
-msgid "Macedo"
+msgid "Rundi"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:296
-msgid "Rusyn"
+msgid "Macedo"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:297
-msgid "Sanskrit"
+msgid "Rusyn"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:298
-msgid "Sardinian"
+msgid "Sanskrit"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:299
-msgid "Sindhi"
+msgid "Sardinian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:300
-msgid "Northern Sami"
+msgid "Sindhi"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:301
-msgid "Sango"
+msgid "Northern Sami"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:302
-msgid "Serbo-Croatian"
+msgid "Sango"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:303
-msgid "Sinhala"
+msgid "Serbo-Croatian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:304
-msgid "Slovak"
+msgid "Sinhala"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:305
-msgid "Slovenian"
+msgid "Slovak"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:306
-msgid "Samoan"
+msgid "Slovenian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:307
-msgid "Shona"
+msgid "Samoan"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:308
-msgid "Somali"
+msgid "Shona"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:309
-msgid "Sotho"
+msgid "Somali"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:310
-msgid "Albanian"
+msgid "Sotho"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:311
-msgid "Serbian"
+msgid "Albanian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:312
-msgid "Serbian, Latin"
+msgid "Serbian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:313
-msgid "Swati"
+msgid "Serbian, Latin"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:314
-msgid "Sundanese"
+msgid "Swati"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:315
-msgid "Swedish"
+msgid "Sundanese"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:316
-msgid "Swahili"
+msgid "Swedish"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:317
-msgid "Tamil"
+msgid "Swahili"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:318
-msgid "Tetum"
+msgid "Tamil"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:319
-msgid "Telugu"
+msgid "Tetum"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:320
-msgid "Tajik"
+msgid "Telugu"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:321
-msgid "Thai"
+msgid "Tajik"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:322
-msgid "Tigrinya"
+msgid "Thai"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:323
-msgid "Turkmen"
+msgid "Tigrinya"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:324
-msgid "Tagalog"
+msgid "Turkmen"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:325
-msgid "Klingon"
+msgid "Tagalog"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:326
-msgid "Tonga"
+msgid "Klingon"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:327
-msgid "Turkish"
+msgid "Tonga"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:328
-msgid "Tsonga"
+msgid "Turkish"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:329
-msgid "Tswana"
+msgid "Tsonga"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:330
-msgid "Tartar"
+msgid "Tswana"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:331
-msgid "Twi"
+msgid "Tartar"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:332
-msgid "Tahitian"
+msgid "Twi"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:333
-msgid "Uighur"
+msgid "Tahitian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:334
-msgid "Ukrainian"
+msgid "Uighur"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:335
-msgid "Umbundu"
+msgid "Ukrainian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:336
-msgid "Uyghur"
+msgid "Umbundu"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:337
-msgid "Urdu"
+msgid "Uyghur"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:338
-msgid "Uzbek"
+msgid "Urdu"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:339
-msgid "Venda"
+msgid "Uzbek"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:340
-msgid "Vietnamese"
+msgid "Venda"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:341
-msgid "Volapuk"
+msgid "Vietnamese"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:342
-msgid "Walloon"
+msgid "Volapuk"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:343
-msgid "Wolof"
+msgid "Walloon"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:344
-msgid "Xhosa"
+msgid "Wolof"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:345
-msgid "Yiddish"
+msgid "Xhosa"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:346
-msgid "Yoruba"
+msgid "Yiddish"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:347
-msgid "Zhuang, Chuang"
+msgid "Yoruba"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:348
-msgid "Chinese, Yue"
+msgid "Zhuang, Chuang"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:349
-msgid "Chinese, Simplified"
+msgid "Chinese, Yue"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:350
-msgid "Chinese, Traditional"
+msgid "Chinese, Simplified"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:351
+msgid "Chinese, Traditional"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:352
 msgid "Zulu"
 msgstr ""
 
@@ -4201,7 +4205,7 @@ msgstr ""
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
 #: templates/teams/tasks.html:340 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:371
+#: templates/videos/subtitle-view.html:369
 msgid "Cancel"
 msgstr ""
 
@@ -4630,7 +4634,7 @@ msgstr ""
 #: templates/profiles/dashboard.html:55 templates/teams/tasks.html:160
 #: templates/teams/tasks.html.py:176 templates/videos/diffing.html:97
 #: templates/videos/subtitle-view.html:139
-#: templates/videos/subtitle-view.html:188
+#: templates/videos/subtitle-view.html:186
 msgid "Subtitles"
 msgstr ""
 
@@ -5620,7 +5624,7 @@ msgid "Filter and Sort"
 msgstr ""
 
 #: templates/teams/members-list.html:53
-#: templates/videos/subtitle-view.html:192
+#: templates/videos/subtitle-view.html:190
 msgid "Showing"
 msgstr ""
 
@@ -5976,8 +5980,8 @@ msgstr ""
 msgid "and edited"
 msgstr ""
 
-#: templates/teams/tasks.html:196 templates/videos/subtitle-view.html:196
-#: templates/videos/subtitle-view.html:302
+#: templates/teams/tasks.html:196 templates/videos/subtitle-view.html:194
+#: templates/videos/subtitle-view.html:300
 msgid "by"
 msgstr ""
 
@@ -6660,17 +6664,17 @@ msgid "Roll back to version"
 msgstr ""
 
 #: templates/videos/diffing.html:139 templates/videos/diffing.html.py:208
-#: templates/videos/subtitle-view.html:204
+#: templates/videos/subtitle-view.html:202
 msgid "Title:"
 msgstr ""
 
 #: templates/videos/diffing.html:143 templates/videos/diffing.html.py:212
-#: templates/videos/subtitle-view.html:208
+#: templates/videos/subtitle-view.html:206
 msgid "Description:"
 msgstr ""
 
 #: templates/videos/diffing.html:169 templates/videos/diffing.html.py:239
-#: templates/videos/subtitle-view.html:228
+#: templates/videos/subtitle-view.html:226
 msgid "Not Synced"
 msgstr ""
 
@@ -6949,7 +6953,7 @@ msgid "View Subtitles"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:140
-#: templates/videos/subtitle-view.html:277
+#: templates/videos/subtitle-view.html:275
 #: templates/videos/video-view.html:137 templates/videos/video-view.html:183
 msgid "Comments"
 msgstr ""
@@ -6959,12 +6963,12 @@ msgid "Revisions"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:146
-#: templates/videos/subtitle-view.html:372
+#: templates/videos/subtitle-view.html:370
 msgid "Unpublish"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:149
-#: templates/videos/subtitle-view.html:387
+#: templates/videos/subtitle-view.html:385
 msgid "Edit Subtitles"
 msgstr ""
 
@@ -6976,20 +6980,20 @@ msgstr ""
 msgid "Draft only"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:189
+#: templates/videos/subtitle-view.html:187
 msgid "translated from"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:193
-#: templates/videos/subtitle-view.html:296
+#: templates/videos/subtitle-view.html:191
+#: templates/videos/subtitle-view.html:294
 msgid "Revision"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:194
+#: templates/videos/subtitle-view.html:192
 msgid "created"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:238
+#: templates/videos/subtitle-view.html:236
 msgid ""
 "\n"
 "                            The most recent revision for this language is "
@@ -6998,27 +7002,27 @@ msgid ""
 "                            "
 msgstr ""
 
-#: templates/videos/subtitle-view.html:242
+#: templates/videos/subtitle-view.html:240
 msgid "View revision history"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:247
+#: templates/videos/subtitle-view.html:245
 msgid "These subtitles are in progress."
 msgstr ""
 
-#: templates/videos/subtitle-view.html:248
+#: templates/videos/subtitle-view.html:246
 msgid "Make more?"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:250
+#: templates/videos/subtitle-view.html:248
 msgid "No subtitles available yet."
 msgstr ""
 
-#: templates/videos/subtitle-view.html:251
+#: templates/videos/subtitle-view.html:249
 msgid "Make some!"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:259
+#: templates/videos/subtitle-view.html:257
 msgid ""
 "\n"
 "                            This language contains subtitles that are still "
@@ -7026,7 +7030,7 @@ msgid ""
 "                        "
 msgstr ""
 
-#: templates/videos/subtitle-view.html:265
+#: templates/videos/subtitle-view.html:263
 msgid ""
 "\n"
 "                            No subtitles have been added for this language "
@@ -7034,50 +7038,50 @@ msgid ""
 "                        "
 msgstr ""
 
-#: templates/videos/subtitle-view.html:275
+#: templates/videos/subtitle-view.html:273
 #: templates/videos/video-view.html:181
 msgid "Leave a comment"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:284
+#: templates/videos/subtitle-view.html:282
 msgid "Compare Revisions"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:308
+#: templates/videos/subtitle-view.html:306
 msgid "Timing"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:309
+#: templates/videos/subtitle-view.html:307
 msgid "Text"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:315
+#: templates/videos/subtitle-view.html:313
 msgid "No subtitles for this language."
 msgstr ""
 
-#: templates/videos/subtitle-view.html:324
+#: templates/videos/subtitle-view.html:322
 msgid "Roll back to this version"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:337
+#: templates/videos/subtitle-view.html:335
 msgid "Unpublish subtitles"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:345
+#: templates/videos/subtitle-view.html:343
 msgid "This version only"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:349
+#: templates/videos/subtitle-view.html:347
 msgid "This entire language and all dependent languages"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:351
+#: templates/videos/subtitle-view.html:349
 msgid ""
 "Note: Any dependent languages will be unavailable until this language is "
 "reapproved."
 msgstr ""
 
-#: templates/videos/subtitle-view.html:360
+#: templates/videos/subtitle-view.html:358
 msgid ""
 "Yes, delete these subtitles instead of sending them back for editing/review"
 msgstr ""

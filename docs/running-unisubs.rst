@@ -1,15 +1,10 @@
+===========================
 Running Amara
-=============
-
-You have two options when running Amara.  Install it directly on your machine,
-or inside a Vagrant virtual machine.
-
-Directly
---------
+===========================
 
 To run the development version:
 
-1. Clone the git repository::
+1. Git clone the repository::
 
        git clone git://github.com/8planes/unisubs.git unisubs
 
@@ -112,45 +107,5 @@ To run the development version:
 Using vagrant
 -------------
 
-Amara uses `Vagrant <http://vagrantup.com/>`_ to make it easy to
-get started.  If you've never used Vagrant before we highly recommend going
-through its `quick start guide
-<http://vagrantup.com/docs/getting-started/index.html>`_ to learn how it works.
 
-To run the development version:
-
-1. Clone the git repository ::
-
-        git clone git://github.com/pculture/unisubs.git unisubs
-
-   Now the entire project will be in the ``unisubs/`` directory.
-
-2. Install VirtualBox and vagrant if you don't have them yet. Then type::
-
-        vagrant up
-
-   This is going to create a vm and provision it. It should take 10-15 minutes.
-   Remember what mom said: a watched pot never boils.
-
-3. Switch over to your vagrant vm with::
-
-        vagrant ssh
-
-   By default our ``~/.bashrc`` file will automatically move you to the shared
-   folder and activate the virtualenv.
-
-   Now run following command::
-
-        ./bootstrap-vagrant.sh
-
-   It's safe to run ``bootstrap-vagrant.sh`` multiple times if something goes
-   wrong (like PyPi goes down).
-
-4. Add ``unisubs.example.com`` to your hosts file, pointing at ``127.0.0.1``.  This
-   is necessary for Twitter and Facebook oauth to work correctly.
-
-5. In your vagrant vm (the one you switched to in step 3), run the site with::
-
-        ./dev-runserver.sh
-
-   You can access the site at http://unisubs.example.com:8000.
+   
