@@ -295,7 +295,7 @@ class SubtitlesUploadBaseForm(forms.Form):
         language.save()
         return language, created
 
-    def save_subtitles(self, parser, video=None, language=None, update_video=True, update_tasks=True):
+    def save_subtitles(self, parser, video=None, language=None, update_video=True, is_complete=True):
         video = video or self.cleaned_data['video']
 
         if not video.has_original_language():
@@ -335,36 +335,37 @@ class SubtitlesUploadBaseForm(forms.Form):
 
             new_version.save()
 
-            if update_tasks:
-                outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
+            outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
 
-                if outstanding_tasks.exists():
-                    outstanding_tasks.update(subtitle_version=new_version,
-                                             language=language.language)
-
+            if is_complete and outstanding_tasks.exists():
+                outstanding_tasks.update(subtitle_version=new_version,
+                                         language=language.language)
+            elif not can_bypass_moderation:
                 # we just need to create review/approve/subtitle if the language
                 # is a new one or, if it's a post-publish edit, if the user can't
                 # approve subtitles by himself.
-                elif not can_bypass_moderation:
-                    task_type = None
+                task_type = None
 
-                    if new_version.is_synced():
-                        if workflow.review_allowed:
-                            task_type = Task.TYPE_IDS['Review']
-                        elif workflow.approve_allowed:
-                            task_type = Task.TYPE_IDS['Approve']
+                if new_version.is_synced() and is_complete:
+                    if workflow.review_allowed:
+                        task_type = Task.TYPE_IDS['Review']
+                    elif workflow.approve_allowed:
+                        task_type = Task.TYPE_IDS['Approve']
+                else:
+                    task_type = Task.TYPE_IDS['Subtitle']
+
+                if task_type:
+                    task = Task(team=team_video.team, team_video=team_video,
+                                language=language.language, type=task_type,
+                                subtitle_version=new_version)
+
+                    if not self._sl_created:
+                        task.assignee = task._find_previous_assignee(Task.TYPE_NAMES[task_type])
                     else:
-                        task_type = Task.TYPE_IDS['Subtitle']
-
-                    if task_type:
-                        task = Task(team=team_video.team, team_video=team_video,
-                                    language=language.language, type=task_type,
-                                    subtitle_version=new_version)
+                        if task_type == Task.TYPE_IDS['Subtitle']:
+                            task.assignee = self.user
                         
-                        if not self._sl_created:
-                            task.assignee = task._find_previous_assignee(Task.TYPE_NAMES[task_type])
-                            
-                        task.save()
+                    task.save()
 
         return language
 
@@ -418,7 +419,7 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
         text = subtitles.read()
         parser = self._get_parser(subtitles.name)(
                         force_unicode(text, chardet.detect(text)['encoding']))
-        sl = self.save_subtitles(parser, update_video=False, update_tasks=is_complete)
+        sl = self.save_subtitles(parser, update_video=False, is_complete=is_complete)
 
         sl.is_complete = is_complete
 
