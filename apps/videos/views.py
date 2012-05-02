@@ -269,12 +269,16 @@ def upload_subtitles(request):
             output['errors'] = {"_all__":[force_unicode(e.msg)]}
             transaction.rollback()
         except Exception, e:
-            #trying find out one error on dev-server. hope this should help
+            output['errors'] = {"_all__":[force_unicode(e)]}
             transaction.rollback()
-            raise
+
     else:
         output['errors'] = form.get_errors()
         transaction.rollback()
+
+    if transaction.is_dirty():
+        transaction.rollback()
+
     return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
 
 @login_required
