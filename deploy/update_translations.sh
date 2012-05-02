@@ -34,8 +34,8 @@ python manage.py makemessages -d djangojs -i deploy\* -i media\js\closure-librar
 echo "pushing to transifex"
 tx push --source
 
-echo "pulling from transiflex"
-tx pull &&  \
+echo "pulling from transilex"
+tx pull
 
 echo "compiling messages"
 python manage.py compilemessages
