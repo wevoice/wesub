@@ -1,10 +1,32 @@
 #!/bin/bash
 
+# Abort if any error
 set -e
 
 date
-git pull
 
+# Git pull from Transifex with retries
+successful_pull=""
+set +e
+
+for retry in 1 2 3 4 5; do
+   git pull
+
+   if [ "$?" == "0" ]; then
+      successful_pull="true"
+      break
+   fi
+
+   sleep 120
+done
+set -e
+
+if [ "$successful_pull" != "true" ]; then
+   echo "unable to git pull"
+   exit 1
+fi
+
+echo "makemessages"
 cd ..
 python manage.py makemessages -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
 python manage.py makemessages -d djangojs -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
