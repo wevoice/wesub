@@ -251,7 +251,7 @@ class Rpc(BaseRpc):
             message = _(u"Sorry, these subtitles are privately moderated.")
 
         # Check that there are no open tasks for this action.
-        tasks = team_video.task_set.incomplete().filter(language=language_code)
+        tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
 
         if tasks:
             task = tasks[0]
