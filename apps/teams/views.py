@@ -1247,7 +1247,7 @@ def _delete_subtitle_version(version):
 
     # We also want to delete all draft subs leading up to this version.
     for v in sl.subtitleversion_set.filter(version_no__lt=n).order_by('-version_no'):
-        if version.is_public:
+        if v.is_public:
             break
         v.delete()
 
