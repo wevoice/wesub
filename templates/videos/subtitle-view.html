@@ -27,6 +27,14 @@
         {% endif %}
         window.IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
         window.ROLLBACK_ALLOWED = '{{ rollback_allowed }}' == 'True';
+        {% if video.team_set.all.0 %}
+            {% if video.team_set.all.0.is_private %}
+                window.VIDEO_TEAM_NAME = 'Private';
+            {% else %}
+                window.VIDEO_TEAM_NAME = '{{ video.team_set.all.0 }}';
+                window.VIDEO_TEAM_URL = '{{ video.team_set.all.0.get_absolute_url }}';
+            {% endif %}
+        {% endif %}
     </script>
 {% endblock %}
 
