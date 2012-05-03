@@ -299,7 +299,15 @@
                         <li>
                             <h3>
                                 <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
-                                <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang=item.language.language,lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+
+                                {% if not item.language.language %}
+                                    {# Hack to work around SubtitleLanguages with blank language attributes. #}
+                                    {# Once those are gone we can remove this. #}
+                                    <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang="unknown",lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                {% else %}
+                                    <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang=item.language.language,lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                {% endif %}
+
                                 {% if item.moderation_status == 'waiting_moderation' %}
                                     (draft)
                                 {% endif %}
