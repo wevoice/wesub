@@ -285,12 +285,10 @@ class Rpc(BaseRpc):
         if not version_for_subs:
             version_for_subs = self._create_version_from_session(session)
             version_no = 0
-            is_edit = False
         else:
             version_no = version_for_subs.version_no + 1
-            is_edit = True
 
-        return version_for_subs, version_no, is_edit
+        return version_for_subs, version_no
 
     def _get_base_language(self, language_code, original_language_code, base_language_pk):
         """Return the subtitle language to use as a base (and its pk), if any."""
@@ -323,19 +321,26 @@ class Rpc(BaseRpc):
         # Find the subtitle language we'll be editing (if available).
         language, locked = self._get_language_for_editing(
             request, video_id, language_code, subtitle_language_pk, base_language)
+
         if locked:
             return locked
-
-        # Create the subtitling session and subtitle version for these edits.
-        session = self._make_subtitling_session(request, language, base_language)
-        version_for_subs, version_no, is_edit = self._get_version_to_edit(language, session)
 
         # Ensure that the user is not blocked from editing this video by team
         # permissions.
         locked = self._check_team_video_locking(
-            request.user, video_id, language_code, bool(base_language_pk), mode, is_edit)
+            request.user, video_id, language_code, bool(base_language_pk), 
+            mode, bool(language.version(public_only=False)))
+
         if locked:
             return locked
+
+        # just lock the video *after* we verify if team moderation happened
+        language.writelock(request)
+        language.save()
+
+        # Create the subtitling session and subtitle version for these edits.
+        session = self._make_subtitling_session(request, language, base_language)
+        version_for_subs, version_no = self._get_version_to_edit(language, session)
 
         subtitles = self._subtitles_dict(
             version_for_subs, version_no, base_language_pk is None)
@@ -954,9 +959,6 @@ class Rpc(BaseRpc):
             editable = created or language.can_writelock(request)
 
         if editable:
-            language.writelock(request)
-            language.save()
-
             if create_new:
                 api_language_new.send(language)
 
