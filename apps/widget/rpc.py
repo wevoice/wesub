@@ -245,15 +245,21 @@ class Rpc(BaseRpc):
             # If there's no team video to worry about, just bail early.
             return None
 
+        if team_video.team.is_visible:
+            message = _(u"These subtitles are moderated. See the %s team page for information on how to contribute." % str(team_video.team))
+        else:
+            message = _(u"Sorry, these subtitles are privately moderated.")
+
         # Check that there are no open tasks for this action.
         tasks = team_video.task_set.incomplete().filter(language=language_code)
+
         if tasks:
             task = tasks[0]
             # can_assign verify if the user has permission to either
             # 1. assign the task to himself
             # 2. do the task himself (the task is assigned to him)
             if not user.is_authenticated() or (not task.assignee and not can_assign_task(task, user)):
-                return { "can_edit": False, "locked_by": str(task.assignee or task.team) }
+                return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
 
         # Check that the team's policies don't prevent the action.
         if not is_edit and mode not in ['review', 'approve']:
@@ -263,7 +269,7 @@ class Rpc(BaseRpc):
                 can_edit = can_create_and_edit_subtitles(user, team_video, language_code)
 
             if not can_edit:
-                return { "can_edit": False, "locked_by": str(team_video.team) }
+                return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
 
     def _get_version_to_edit(self, language, session):
         """Return a version (and other info) that should be edited.

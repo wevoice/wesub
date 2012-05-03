@@ -229,10 +229,12 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         this.onDialogOpened_(dialog);
     }
     else {
-        var username = 
-            (result['locked_by'] == 
-             'anonymous' ? 'Someone else' : ('The user ' + result['locked_by']));
-        alert(username + ' is currently editing these subtitles. Please wait and try again later.');
+        if(!result['message']){
+            var username =  (result['locked_by'] == 'anonymous' ? 'Someone else' : ('The user ' + result['locked_by']));
+            alert(username + ' is currently editing these subtitles. Please wait and try again later.');
+        } else {
+            alert(result['message']);
+        }
         if (goog.isDefAndNotNull(unisubs.returnURL))
             window.location.replace(unisubs.returnURL);
     }
