@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-02 06:11-0500\n"
+"POT-Creation-Date: 2012-05-03 01:30-0500\n"
 "PO-Revision-Date: 2012-05-02 10:53+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Italian (http://www.transifex.net/projects/p/"
@@ -1064,11 +1064,11 @@ msgstr "Email per notifica"
 msgid "File should have txt format"
 msgstr "Il file dovrebbe avere il formato txt"
 
-#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:385
+#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:386
 msgid "File size should be less {0} kb"
 msgstr "Il file dovrebbe fare meno di {0} kb"
 
-#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:393
+#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:394
 msgid "Can not detect file encoding"
 msgstr "La codificazione del file non è identificabile"
 
@@ -1080,11 +1080,11 @@ msgstr "Il file non può essere codificato. Dovrebbe essere codificato in utf8."
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "Formato errato. Carica .srt, .ssa, .sbv or .xml (formato TTML)"
 
-#: apps/videos/forms.py:96 apps/videos/forms.py:395
+#: apps/videos/forms.py:96 apps/videos/forms.py:396
 msgid "Incorrect subtitles format"
 msgstr "Sottotitoli in formato errato"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:527 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:528 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Questo URL sembra un link rotto."
 
@@ -1133,11 +1133,11 @@ msgid ""
 "you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:388
+#: apps/videos/forms.py:389
 msgid "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr "Formato errato. Carichi .srt, .ssa, .sbv, .dfxp o .xml (formato TTML)"
 
-#: apps/videos/forms.py:512
+#: apps/videos/forms.py:513
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1145,7 +1145,7 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:515 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:516 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1162,32 +1162,32 @@ msgstr ""
 "m4v\n"
 "                    <a href=\"mailto:%s\">Contattaci</a> se c'è un problema."
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Youtube usernames"
 msgstr "Nomi utenti YouTube"
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Enter usernames separated by comma."
 msgstr "Inserisca i nomi utenti, separati da virgole."
 
-#: apps/videos/forms.py:544
+#: apps/videos/forms.py:545
 msgid "Youtube page link."
 msgstr "link a pagina YouTube."
 
-#: apps/videos/forms.py:545
+#: apps/videos/forms.py:546
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Ad esempio http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:547
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 "Supportati: Youtube, Vimeo, o Dailymotion. Aggiunti solo i siti supportati."
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid "Save feed"
 msgstr "Salva il feed"
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
@@ -1195,7 +1195,7 @@ msgstr ""
 "Scelga questo se vuol aggiungere video da questo flusso in futuro. Soltanto "
 "i flussi RSS validi verranno salvati."
 
-#: apps/videos/forms.py:590
+#: apps/videos/forms.py:591
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
@@ -1203,13 +1203,13 @@ msgstr ""
 "Ci spiace, non abbiamo potuto reperire un feed valido all'URL che hai "
 "fornito. Per favore, verifica l'URL e riprova."
 
-#: apps/videos/forms.py:595
+#: apps/videos/forms.py:596
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:606
+#: apps/videos/forms.py:607
 msgid "captcha"
 msgstr "captcha"
 
@@ -1574,19 +1574,19 @@ msgstr ""
 msgid "Your changes have been saved."
 msgstr "I tuoi cambiamenti sono stati salvati."
 
-#: apps/videos/views.py:622
+#: apps/videos/views.py:626
 msgid "You have not permission change this URL"
 msgstr "Non sei autorizzare a modificare questo URL"
 
-#: apps/videos/views.py:628 apps/videos/views.py:648
+#: apps/videos/views.py:632 apps/videos/views.py:652
 msgid "Object does not exist"
 msgstr "L'oggetto non esiste"
 
-#: apps/videos/views.py:641
+#: apps/videos/views.py:645
 msgid "You have not permission delete this URL"
 msgstr "Non sei autorizzato a cancellare questo URL"
 
-#: apps/videos/views.py:644
+#: apps/videos/views.py:648
 msgid "You cann't remove original URL"
 msgstr "Non puoi togliere l'URL originale"
 

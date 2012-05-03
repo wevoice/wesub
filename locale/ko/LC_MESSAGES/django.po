@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-02 06:12-0500\n"
+"POT-Creation-Date: 2012-05-03 01:32-0500\n"
 "PO-Revision-Date: 2012-05-02 10:53+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.net/projects/p/"
@@ -1050,11 +1050,11 @@ msgstr "경보에 대한 이메일"
 msgid "File should have txt format"
 msgstr "파일은 txt 포맷이어야 합니다."
 
-#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:385
+#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:386
 msgid "File size should be less {0} kb"
 msgstr "파일 크기는 {0}kb보다 작아야 합니다."
 
-#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:393
+#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:394
 msgid "Can not detect file encoding"
 msgstr "파일 인코딩을 찾을 수 없음"
 
@@ -1066,11 +1066,11 @@ msgstr "파일을 인코딩할 수 없습니다. utf8 인코딩이 있어야 합
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "잘못된 포맷입니다. .srt, .ssa, .sbv .xml(TTML 포맷)을 업로드 하세요. "
 
-#: apps/videos/forms.py:96 apps/videos/forms.py:395
+#: apps/videos/forms.py:96 apps/videos/forms.py:396
 msgid "Incorrect subtitles format"
 msgstr "잘못된 자막 포맷입니다."
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:527 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:528 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "확인할 수 없는 주소입니다."
 
@@ -1116,13 +1116,13 @@ msgid ""
 "you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:388
+#: apps/videos/forms.py:389
 msgid "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr ""
 "잘못된 형식입니다. .srt, .ssa, .sbv, .dfxp or .xml (TTML  format) 형식으로 업"
 "로드 하세요."
 
-#: apps/videos/forms.py:512
+#: apps/videos/forms.py:513
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1130,7 +1130,7 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:515 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:516 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1145,31 +1145,31 @@ msgstr ""
 "com/myvideo.ogg 또는 http://mysite.com/myipadvideo.m4v\n"
 "만약 문제가 있다면 <a href=\"mailto:%s\">문의해 주세요.</a> "
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Youtube usernames"
 msgstr "YouTube 사용자 이름"
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Enter usernames separated by comma."
 msgstr "사용자 이름을 쉼표로 구분해서 입력해 주세요."
 
-#: apps/videos/forms.py:544
+#: apps/videos/forms.py:545
 msgid "Youtube page link."
 msgstr "Youtube 페이지 링크"
 
-#: apps/videos/forms.py:545
+#: apps/videos/forms.py:546
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "예: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:547
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid "Save feed"
 msgstr "피드 저장"
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
@@ -1177,7 +1177,7 @@ msgstr ""
 "나중에 이 피드로 부터 동영상을 추가하기를 원한다면 선택하세요. 오직 유효한 피"
 "드만 저장이 됩니다."
 
-#: apps/videos/forms.py:590
+#: apps/videos/forms.py:591
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
@@ -1185,13 +1185,13 @@ msgstr ""
 "죄송합니다, 우리는 당신이 제공하는 URL에서 유효한 피드를 찾을 수 없습니다. "
 "URL을 확인하고 다시 시도해 주세요."
 
-#: apps/videos/forms.py:595
+#: apps/videos/forms.py:596
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:606
+#: apps/videos/forms.py:607
 msgid "captcha"
 msgstr "보안 문자"
 
@@ -1552,19 +1552,19 @@ msgstr ""
 msgid "Your changes have been saved."
 msgstr "변경 내용이 저장되었습니다."
 
-#: apps/videos/views.py:622
+#: apps/videos/views.py:626
 msgid "You have not permission change this URL"
 msgstr "당신은 이 URL을 변경할 권한이 없습니다."
 
-#: apps/videos/views.py:628 apps/videos/views.py:648
+#: apps/videos/views.py:632 apps/videos/views.py:652
 msgid "Object does not exist"
 msgstr "개체가 존재하지 않습니다."
 
-#: apps/videos/views.py:641
+#: apps/videos/views.py:645
 msgid "You have not permission delete this URL"
 msgstr "이 URL을 삭제할 권한이 없습니다."
 
-#: apps/videos/views.py:644
+#: apps/videos/views.py:648
 msgid "You cann't remove original URL"
 msgstr "원래 URL을 제거할 수 없습니다."
 
