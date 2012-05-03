@@ -123,7 +123,7 @@ class MoveTeamVideoForm(forms.Form):
         if not team_video or not team:
             return
 
-        if project.team != team:
+        if project and project.team != team:
             raise forms.ValidationError(u"That project does not belong to that team.")
 
         if team_video.team.pk == team.pk:
