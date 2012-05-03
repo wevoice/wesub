@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-02 06:18-0500\n"
+"POT-Creation-Date: 2012-05-03 01:40-0500\n"
 "PO-Revision-Date: 2012-05-02 10:53+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.net/projects/p/"
@@ -1057,11 +1057,11 @@ msgstr "邮件提醒"
 msgid "File should have txt format"
 msgstr "文件应该是TXT格式"
 
-#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:385
+#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:386
 msgid "File size should be less {0} kb"
 msgstr "文件大小应该小于 {0} kb"
 
-#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:393
+#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:394
 msgid "Can not detect file encoding"
 msgstr "不能检测编码"
 
@@ -1073,11 +1073,11 @@ msgstr "不能编码文件，它应该是utf8编码"
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "不正确的格式。请上传 .srt, .ssa, .sbv 或者 .xml（TTML 格式）"
 
-#: apps/videos/forms.py:96 apps/videos/forms.py:395
+#: apps/videos/forms.py:96 apps/videos/forms.py:396
 msgid "Incorrect subtitles format"
 msgstr "不正确的字幕格式"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:527 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:528 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "这个URL似乎是个坏的链接"
 
@@ -1122,11 +1122,11 @@ msgid ""
 "you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:388
+#: apps/videos/forms.py:389
 msgid "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr "不正确的格式。上传srt，ssa，sbv，dfxp或者xml（TTML 格式）"
 
-#: apps/videos/forms.py:512
+#: apps/videos/forms.py:513
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1137,7 +1137,7 @@ msgstr ""
 "                        请再次尝试视频页面的链接<a href=\"mailto:%s"
 "\">Contact us</a>"
 
-#: apps/videos/forms.py:515 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:516 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1148,49 +1148,49 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Youtube usernames"
 msgstr "Youtube用户名"
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Enter usernames separated by comma."
 msgstr "输入用户名，以逗号隔开"
 
-#: apps/videos/forms.py:544
+#: apps/videos/forms.py:545
 msgid "Youtube page link."
 msgstr "Youtube页面链接"
 
-#: apps/videos/forms.py:545
+#: apps/videos/forms.py:546
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "例如: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:547
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr "支持Youtube，Vimeo或者Dailymotion。仅支持的网站添加。"
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid "Save feed"
 msgstr "保存源"
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr "如果将来你想从此源添加视频，请选择。仅可用RSS源。"
 
-#: apps/videos/forms.py:590
+#: apps/videos/forms.py:591
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr "抱歉，我们没能在你提供的源链接中找到可用源。请查看链接后再次尝试"
 
-#: apps/videos/forms.py:595
+#: apps/videos/forms.py:596
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr "视频已经加入后台。如果你已登录，你将会在它完成时收到一条信息"
 
-#: apps/videos/forms.py:606
+#: apps/videos/forms.py:607
 msgid "captcha"
 msgstr "验证码"
 
@@ -1541,19 +1541,19 @@ msgstr "感谢你的上传。大约1分钟后会显示你的字幕"
 msgid "Your changes have been saved."
 msgstr "你的变更已经保存"
 
-#: apps/videos/views.py:622
+#: apps/videos/views.py:626
 msgid "You have not permission change this URL"
 msgstr "你没有被允许更改这个URL"
 
-#: apps/videos/views.py:628 apps/videos/views.py:648
+#: apps/videos/views.py:632 apps/videos/views.py:652
 msgid "Object does not exist"
 msgstr "对象不存在"
 
-#: apps/videos/views.py:641
+#: apps/videos/views.py:645
 msgid "You have not permission delete this URL"
 msgstr "你没有被允许删除这个URL"
 
-#: apps/videos/views.py:644
+#: apps/videos/views.py:648
 msgid "You cann't remove original URL"
 msgstr "你不能移除源URL"
 

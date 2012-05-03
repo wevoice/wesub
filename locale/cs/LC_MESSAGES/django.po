@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-02 06:14-0500\n"
+"POT-Creation-Date: 2012-05-03 01:34-0500\n"
 "PO-Revision-Date: 2012-05-02 10:53+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Czech (http://www.transifex.net/projects/p/universalsubtitles/"
@@ -1043,11 +1043,11 @@ msgstr "Email pro upozornění"
 msgid "File should have txt format"
 msgstr "Soubor by měl být formátu txt"
 
-#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:385
+#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:386
 msgid "File size should be less {0} kb"
 msgstr "Velikost souboru by měla být menší než {0} kb"
 
-#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:393
+#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:394
 msgid "Can not detect file encoding"
 msgstr "Nelze rozpoznat kódování souboru"
 
@@ -1059,11 +1059,11 @@ msgstr "Nemohu enkódovat soubor. Měl by mít kódování utf8."
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "Neplatný formát. Nahrajte .srt., .ssa, .sbv nebo .xml (formát  TTML)"
 
-#: apps/videos/forms.py:96 apps/videos/forms.py:395
+#: apps/videos/forms.py:96 apps/videos/forms.py:396
 msgid "Incorrect subtitles format"
 msgstr "Neplatný formát titulků"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:527 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:528 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Toto URL vypadá jako špatný link."
 
@@ -1109,11 +1109,11 @@ msgid ""
 "you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:388
+#: apps/videos/forms.py:389
 msgid "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr ""
 
-#: apps/videos/forms.py:512
+#: apps/videos/forms.py:513
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1121,7 +1121,7 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:515 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:516 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1138,49 +1138,49 @@ msgstr ""
 "                    <a href=\"mailto:%s\">Napište nám</a>, pokud narazíte na "
 "problém."
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Youtube usernames"
 msgstr "Přihlašovací jména na YouTube"
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Enter usernames separated by comma."
 msgstr "Vložte uživatelská jména oddělená čárkami."
 
-#: apps/videos/forms.py:544
+#: apps/videos/forms.py:545
 msgid "Youtube page link."
 msgstr "Odkaz na stránku na YouTube."
 
-#: apps/videos/forms.py:545
+#: apps/videos/forms.py:546
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Například: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:547
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid "Save feed"
 msgstr "Uložit zdroj"
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr ""
 
-#: apps/videos/forms.py:590
+#: apps/videos/forms.py:591
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr ""
 
-#: apps/videos/forms.py:595
+#: apps/videos/forms.py:596
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:606
+#: apps/videos/forms.py:607
 msgid "captcha"
 msgstr "captcha"
 
@@ -1537,19 +1537,19 @@ msgstr "Děkujeme za upload. Za zhruba minutu se titulky objeví."
 msgid "Your changes have been saved."
 msgstr "Vaše změny byly uloženy"
 
-#: apps/videos/views.py:622
+#: apps/videos/views.py:626
 msgid "You have not permission change this URL"
 msgstr "Nemáte oprávnění změnit tuto URL"
 
-#: apps/videos/views.py:628 apps/videos/views.py:648
+#: apps/videos/views.py:632 apps/videos/views.py:652
 msgid "Object does not exist"
 msgstr "Objekt neexistuje"
 
-#: apps/videos/views.py:641
+#: apps/videos/views.py:645
 msgid "You have not permission delete this URL"
 msgstr "Nemáte oprávnění smazat tuto URL"
 
-#: apps/videos/views.py:644
+#: apps/videos/views.py:648
 msgid "You cann't remove original URL"
 msgstr "Nemůžete odstranit původní URL"
 

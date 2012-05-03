@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-02 06:21-0500\n"
+"POT-Creation-Date: 2012-05-03 01:43-0500\n"
 "PO-Revision-Date: 2012-05-02 10:53+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Croatian (http://www.transifex.net/projects/p/"
@@ -1053,11 +1053,11 @@ msgstr "Pošalji email za alarm"
 msgid "File should have txt format"
 msgstr "Datoteka mora biti u txt formatu"
 
-#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:385
+#: apps/videos/forms.py:68 apps/videos/forms.py:86 apps/videos/forms.py:386
 msgid "File size should be less {0} kb"
 msgstr "Veličina datoteke trebala bi biti manja od {0} kb"
 
-#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:393
+#: apps/videos/forms.py:73 apps/videos/forms.py:94 apps/videos/forms.py:394
 msgid "Can not detect file encoding"
 msgstr "Nemoguće detektirati kodiranje datoteke"
 
@@ -1069,11 +1069,11 @@ msgstr "Nemoguće kodirati datoteku. Mora imati utf8 kodiranje."
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "Neispravan format. Učitajte srt, .ssa, .sbv ili .xml (TTML  format)"
 
-#: apps/videos/forms.py:96 apps/videos/forms.py:395
+#: apps/videos/forms.py:96 apps/videos/forms.py:396
 msgid "Incorrect subtitles format"
 msgstr "Neispravan format titlova"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:527 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:528 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Čini se da ovaj URL nema ispravnu poveznicu."
 
@@ -1118,12 +1118,12 @@ msgid ""
 "you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:388
+#: apps/videos/forms.py:389
 msgid "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr ""
 "Neispravan format. Učitajte .srt, .ssa, .sbv, .dfxp ili .xml (TTML  format)"
 
-#: apps/videos/forms.py:512
+#: apps/videos/forms.py:513
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1131,7 +1131,7 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:515 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:516 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1148,31 +1148,31 @@ msgstr ""
 "                    <a href=\"mailto:%s\">Kontaktirajte nas</a> ukoliko "
 "naiđete na problem."
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Youtube usernames"
 msgstr "Youtube korisnička imena"
 
-#: apps/videos/forms.py:543
+#: apps/videos/forms.py:544
 msgid "Enter usernames separated by comma."
 msgstr "Upišite korisnička imena odvojena zarezima."
 
-#: apps/videos/forms.py:544
+#: apps/videos/forms.py:545
 msgid "Youtube page link."
 msgstr "Youtube poveznica"
 
-#: apps/videos/forms.py:545
+#: apps/videos/forms.py:546
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Na primjer: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:547
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid "Save feed"
 msgstr "Spremi kanal"
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:548
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
@@ -1180,7 +1180,7 @@ msgstr ""
 "Odaberite ovo ukoliko ubuduće želite dodavati videozapise iz ovoga kanala. "
 "Spremit će se samo valjani RSS slijedovi."
 
-#: apps/videos/forms.py:590
+#: apps/videos/forms.py:591
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
@@ -1188,13 +1188,13 @@ msgstr ""
 "Oprostite, nismo bili u mogućnosti pronaći valjani kanal na URL-u koji ste "
 "upisali. Molimo, provjerite URL i pokušajte ponovno."
 
-#: apps/videos/forms.py:595
+#: apps/videos/forms.py:596
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:606
+#: apps/videos/forms.py:607
 msgid "captcha"
 msgstr "captcha"
 
@@ -1557,19 +1557,19 @@ msgstr ""
 msgid "Your changes have been saved."
 msgstr "Vaše izmjene su sačuvane."
 
-#: apps/videos/views.py:622
+#: apps/videos/views.py:626
 msgid "You have not permission change this URL"
 msgstr "Nemate dozvolu za izmjenu ovog URL"
 
-#: apps/videos/views.py:628 apps/videos/views.py:648
+#: apps/videos/views.py:632 apps/videos/views.py:652
 msgid "Object does not exist"
 msgstr "Objekt ne postoji"
 
-#: apps/videos/views.py:641
+#: apps/videos/views.py:645
 msgid "You have not permission delete this URL"
 msgstr "Nemate dozvolu za brisanje ovog URL"
 
-#: apps/videos/views.py:644
+#: apps/videos/views.py:648
 msgid "You cann't remove original URL"
 msgstr "Ne možete ukloniti originalni URL"
 
