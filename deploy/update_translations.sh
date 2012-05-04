@@ -10,13 +10,17 @@ successful_pull=""
 set +e
 
 for retry in 1 2 3 4 5; do
+   set -x
    git pull
+   rc="$?"
 
-   if [ "$?" == "0" ]; then
+   if [ "$rc" == "0" ]; then
       successful_pull="true"
       break
    fi
 
+   set +x
+   echo "git pull returned $rc, retrying..."
    sleep 120
 done
 set -e
