@@ -450,7 +450,7 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
 
                     task.complete()
 
-        if latest_version:
+        if latest_version and sl.latest_version():
             video_changed_tasks.delay(sl.video_id, sl.latest_version().id)
         else:
             video_changed_tasks.delay(sl.video_id)

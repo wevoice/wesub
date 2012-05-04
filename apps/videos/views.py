@@ -271,6 +271,8 @@ def upload_subtitles(request):
         except Exception, e:
             output['errors'] = {"_all__":[force_unicode(e)]}
             transaction.rollback()
+            from sentry.client.models import client
+            client.create_from_exception()
 
     else:
         output['errors'] = form.get_errors()
