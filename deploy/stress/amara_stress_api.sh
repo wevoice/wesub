@@ -2,6 +2,9 @@
 
 # USAGE: $0 <api user name> <api key> <partner> <file containing video ids one-per-line>
 
+# Note: when run from multiple concurrent windows, this can stress app server CPU
+
+
 #------------------------------
 # Constants
 host="staging.universalsubtitles.org"
@@ -37,7 +40,7 @@ cat $filename | while read line; do
       exit 1
    fi
 
-   if [ -z "`echo $result | grep subtitle`" ]; then
+   if [ -z "$result" -o -z "`echo $result | grep total_count`" ]; then
       echo "FAILURE IN RESULT STRING ON TRIAL $i"
       echo "$curl -H \"X-api-username: $api_user\" -H \"X-apikey: $api_key\" $url"
       echo " "
