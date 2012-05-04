@@ -11,12 +11,14 @@ set +e
 
 for retry in 1 2 3 4 5; do
    git pull
+   rc="$?"
 
-   if [ "$?" == "0" ]; then
+   if [ "$rc" = "0" ]; then
       successful_pull="true"
       break
    fi
 
+   echo "git pull returned $rc, retrying..."
    sleep 120
 done
 set -e
@@ -51,3 +53,5 @@ date
 
 git push 
 # in order for this to work, you must have a ~/.transifexrc file (kept out of source control since it requires a passwords)
+
+exit

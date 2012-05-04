@@ -103,13 +103,16 @@
                             {% endif %}
                         {% endif %}
                         <a href="{{ member.user.get_absolute_url }}" class="thumb"><img src="{{ member.user.avatar }}" alt="{{ member.user }} avatar"></a>
-                        {% if member.user != user %}
-                            <ul class="actions">
+                        <ul class="actions">
+                            {% if member.user != user %}
                                 <li>
                                     <a href="{% url messages:new %}?user={{ member.user.username }}">Send a message</a>
                                 </li>
-                            </ul>
-                        {% endif %}
+                            {% endif %}
+                            <li>
+                                <a href="{% url teams:team_tasks team.slug %}?assignee={{ member.user.username }}">{% trans 'Assignments' %}</a>
+                            </li>
+                        </ul>
                         {% if member in assignable_roles %}
                             <ul class="admin-controls">
                                 <li>

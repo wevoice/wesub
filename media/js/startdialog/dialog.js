@@ -126,12 +126,20 @@ unisubs.startdialog.Dialog.prototype.buildStartDialogContents_ = function() {
     this.maybeShowWarning_();
 };
 unisubs.startdialog.Dialog.prototype.buildPermissionDeniedMessage_ = function() {
-    this.contentDiv_.innerHTML = (
-        "<p>Subtitles for this video are moderated.</p>" +
-        "<p>You do not have permission to subtitle this video.</p>" +
-        "<p>Please visit the " +
-        "<a href='" + unisubs.getVideoHomepageURL(this.videoID_) + "'>video page</a> " +
-        "to contribute.</p>" );
+    if (window.VIDEO_TEAM_NAME) {
+        if (window.VIDEO_TEAM_NAME === 'Private') {
+            this.contentDiv_.innerHTML = (
+                "<p>Subtitles for this video are privately moderated.</p>");
+        } else {
+            this.contentDiv_.innerHTML = (
+                "<p>Subtitles for this video are moderated by the " + window.VIDEO_TEAM_NAME + " team.</p>" +
+                "<p>Learn more on the <a href=" + window.VIDEO_TEAM_URL + ">team's home page</a>.</p>" );
+        }
+    } else {
+        this.contentDiv_.innerHTML = (
+            "<p>These subtitles are moderated by a volunteer team.</p>" +
+            "<p>View the video on <a href=" + unisubs.getVideoHomepageURL(this.videoID_) + ">Amara's website</a> to learn more:</p>");
+    }
 };
 unisubs.startdialog.Dialog.prototype.buildModeratedMessage_ = function() {
     this.contentDiv_.innerHTML = (
