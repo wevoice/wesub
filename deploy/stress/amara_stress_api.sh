@@ -13,7 +13,7 @@ curl="curl --insecure --progress-bar"
 api_user="$1"
 api_key="$2"
 partner="$3"
-ntrials=$4
+ntrials="$4"
 
 if [ -z "$partner" ]; then
    echo "USAGE: $0 <api user name> <api key> <partner> [ <num trials> ]"
