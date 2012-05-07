@@ -29,8 +29,12 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
+from django.contrib.contenttypes.models import ContentType
 
+from comments.forms import CommentForm
+from comments.models import Comment
 from apps.auth.models import CustomUser as User
+from messages.models import Message
 from teams.models import Team, TeamVideo, Workflow, TeamMember
 from testhelpers.views import _create_videos
 from utils import SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
@@ -1500,6 +1504,7 @@ class TestTasks(TestCase):
     fixtures = ['test.json']
 
     def setUp(self):
+        self.user = User.objects.get(pk=2)
         self.video = Video.objects.all()[:1].get()
         self.language = self.video.subtitle_language()
         self.latest_version = self.language.latest_version(public_only=True)
@@ -1536,16 +1541,96 @@ class TestTasks(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_notification_sending(self):
+        """
+        Make the system send updates only on the object being followed
+        (language vs. video).
+
+        The following is taken directly from the ticket
+        -----------------------------------------------
+
+        1. Followers of a video (submitter + anyone who chose to follow the
+            video) should:
+
+            * Be listed as followers for each language of this video
+            * Get notifications about any changes made to the video or any of
+                the related languages.
+            * Get notifications about any comments left on the video or any of
+                the related videos.
+
+        2. Followers of a language (followers of language +
+            transcriber(s)/translator(s) + editor(s) + anyone who chose to
+            follow the language) should:
+
+            * Get notifications about any changes made to the subtitles in
+                this language, but not in any other language for the same video.
+            * Get notifications about comments made on the subtitles in this
+                language, but not in any other language for the video, nor on
+                the video as a whole entity.
+
+        ----------------------------------------------------------------------
+
+        Since this is such a complex and long test, let's talk about what we
+        are going to do in more detail.
+
+        1.  Make sure there are no comments or messages present in our database
+        2.  Make sure that the main video's user wants emails but not messages
+        3.  Create a second language for the video
+        4.  Create a user that will only follow the second language
+        5.  Create a new subtitle version
+        6.  Clear mailbox
+        7.  Spin off a ``video_changed_tasks`` celery task for the new version
+        8.  Make sure the correct number of emails is sent out
+        9.  Make sure edited title and description are present in the body of
+            the email.
+        10. Make sure that all followers of the video get notified when a video
+            is edited.  Submitter shouldn't be in followers.  Check for emails
+            and messages separately.
+        11. Make sure that the correct number of ``Message`` instances was
+            created, and that it was created for the correct users.
+        12. Make sure that all followers of a language are notified.
+        13. Reset mailbox
+        14. Make sure that followers get notified when a new comment is made.
+        """
+
+        # Video is submitted by self.user (pk 2, admin@mail.net)
+        # The submitter is automatically added to followers via the
+        # ``Video.get_or_create_for_url`` method.  Here we do that by hand.
+        self.assertEquals(0, Message.objects.count())
+        self.assertEquals(0, Comment.objects.count())
+        self.video.user = self.user
+        self.video.user.notify_by_email = True
+        self.video.user.notify_by_message = False
+        self.video.user.save()
+        self.video.followers.add(self.user)
+        self.video.save()
+
+        # Create a user that only follows the language
+        user_language_only = User.objects.create(username='languageonly',
+                email='dude@gmail.com', notify_by_email=True,
+                notify_by_message=True)
+
+        # Create a user that will make the edits
+        user_edit_maker = User.objects.create(username='editmaker',
+                email='maker@gmail.com', notify_by_email=True,
+                notify_by_message=True)
+
         latest_version = self.language.latest_version()
+        latest_version.language.followers.clear()
+        latest_version.language.followers.add(user_language_only)
         latest_version.title = 'Old title'
         latest_version.description = 'Old description'
         latest_version.save()
+
+        # Create another language
+        lan2 = SubtitleLanguage.objects.create(video=self.video, language='cz')
+        lan2.followers.add(user_language_only)
+        self.assertEquals(2, SubtitleLanguage.objects.count())
 
         v = SubtitleVersion()
         v.language = self.language
         v.datetime_started = datetime.now()
         v.version_no = latest_version.version_no+1
-        v.user = User.objects.all()[0]
+        v.user = user_edit_maker
         v.title = 'New title'
         v.description = 'New description'
         v.save()
@@ -1562,19 +1647,91 @@ class TestTasks(TestCase):
         s.end_time = 51
         s.save()
 
-        result = video_changed_tasks.delay(v.video.id, v.id)
-        self.assertEqual(len(mail.outbox), 1)
+        # Clear the box because the above generates some emails
+        mail.outbox = []
 
-        if result.failed():
-            self.fail(result.traceback)
+        # Kick it off
+        video_changed_tasks.delay(v.video.id, v.id)
 
-        self.assertEqual(len(mail.outbox), 1)
+        # --------------------------------------------------------------------
+
+        # There should be 3 emails (3 video followers)
+        self.assertEqual(len(mail.outbox), 3)
 
         email = mail.outbox[0]
+        tos = [item for sublist in mail.outbox for item in sublist.to]
+
         self.assertTrue('New description' in email.body)
         self.assertTrue('Old description' in email.body)
         self.assertTrue('New title' in email.body)
         self.assertTrue('Old title' in email.body)
+
+        # Make sure that all followers of the video got notified
+        # Excluding the author of the new version
+        excludes = list(User.objects.filter(email__in=[v.user.email]).all())
+        self.assertEquals(1, len(excludes))
+        followers = self.video.notification_list(excludes)
+        self.assertTrue(excludes[0].notify_by_email and
+                excludes[0].notify_by_message)
+        self.assertTrue(followers.filter(pk=self.video.user.pk).exists())
+
+        for follower in followers:
+            self.assertTrue(follower.email in tos)
+
+        self.assertTrue(self.user.notify_by_email)
+        self.assertTrue(self.user.email in tos)
+
+        # Refresh objects
+        self.user = User.objects.get(pk=self.user.pk)
+        self.video = Video.objects.get(pk=self.video.pk)
+
+        # Messages sent?
+        self.assertFalse(self.video.user.notify_by_message)
+        self.assertFalse(User.objects.get(pk=self.video.user.pk).notify_by_message)
+        followers = self.video.followers.filter(
+                notify_by_message=True).exclude(pk__in=[e.pk for e in excludes])
+
+        self.assertEquals(followers.count(), 1)
+        self.assertNotEquals(followers[0].pk, self.user.pk)
+
+        self.assertEquals(followers.count(), Message.objects.count())
+        for follower in followers:
+            self.assertTrue(Message.objects.filter(user=follower).exists())
+
+        language_follower_email = None
+        for email in mail.outbox:
+            if user_language_only.email in email.to:
+                language_follower_email = email
+                break
+
+        self.assertFalse(language_follower_email is None)
+
+        # --------------------------------------------------------------------
+        # Now test comment notifications
+
+        mail.outbox = []
+
+        form =  CommentForm(self.video, {
+            'content': 'Text',
+            'object_pk': self.video.pk,
+            'content_type': ContentType.objects.get_for_model(self.video).pk
+            })
+        form.save(self.user, commit=True)
+
+        self.assertEquals(1, Comment.objects.count())
+        self.assertEqual(len(mail.outbox), 2)
+
+        emails = []
+        for e in mail.outbox:
+            for a in e.to:
+                emails.append(a)
+
+        followers = self.video.followers.filter(notify_by_email=True)
+        self.assertEquals(emails.sort(), [f.email for f in followers].sort())
+
+        followers = self.video.followers.filter(notify_by_email=False)
+        for follower in followers:
+            self.assertFalse(follower.email in emails)
 
 
 class TestPercentComplete(TestCase):

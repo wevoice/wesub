@@ -580,7 +580,7 @@ def send_reject_notification(task_pk, sent_back):
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
 SUBJECT_EMAIL_VIDEO_COMMENTED = "%s left a comment on the video %s"
 @task
-def send_video_comment_notification(comment_pk,  version_pk=None):
+def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     """
     Comments can be attached to a video (appear in the videos:video (info)) page) OR
                                   sublanguage (appear in the videos:translation_history  page)
@@ -589,11 +589,14 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
     """
     from comments.models import Comment
     from videos.models import Video, SubtitleLanguage, SubtitleVersion
-    
-    try:
-        comment = Comment.objects.get(pk=comment_pk)
-    except Comment.DoesNotExist:
-        return
+
+    if not isinstance(comment_pk_or_instance, Comment):
+        try:
+            comment = Comment.objects.get(pk=comment_pk_or_instance)
+        except Comment.DoesNotExist:
+            return
+    else:
+        comment = comment_pk_or_instance
 
     version = None
     
