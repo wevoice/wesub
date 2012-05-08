@@ -666,17 +666,21 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
             },
             fail_silently=not settings.DEBUG)
 
-    exclude = list(video.followers.filter(notify_by_message=False))
-    message_followers = video.notification_list(exclude)
 
     if language:
         obj = language
         object_pk = language.pk
         content_type = ContentType.objects.get_for_model(language)
+        exclude = list(language.followers.filter(notify_by_message=False))
+        exclude.append(comment.user)
+        message_followers = language.notification_list(exclude)
     else:
         obj = video
         object_pk = video.pk
         content_type = ContentType.objects.get_for_model(video)
+        exclude = list(video.followers.filter(notify_by_message=False))
+        exclude.append(comment.user)
+        message_followers = video.notification_list(exclude)
 
     for user in message_followers:
         Message.objects.create(user=user, subject=subject, object_pk=object_pk,

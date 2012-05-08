@@ -1714,6 +1714,7 @@ class TestTasks(TestCase):
         Message.objects.all().delete()
         mail.outbox = []
 
+        # Video comment first
         form =  CommentForm(self.video, {
             'content': 'Text',
             'object_pk': self.video.pk,
@@ -1736,7 +1737,13 @@ class TestTasks(TestCase):
         for follower in followers:
             self.assertFalse(follower.email in emails)
 
-        # Test comments on languages
+        followers = self.video.followers.filter(notify_by_message=True)
+        self.assertEquals(followers.count(), Message.objects.count())
+        for message in Message.objects.all():
+            self.assertTrue(isinstance(message.object, Video))
+            self.assertTrue(message.user in list(followers))
+
+        # And now test comments on languages
         Message.objects.all().delete()
         mail.outbox = []
 
@@ -1750,10 +1757,15 @@ class TestTasks(TestCase):
         self.assertEquals(Message.objects.count(),
                 self.language.followers.filter(notify_by_message=True).count())
 
-        messages = Message.objects.all()
-        for message in messages:
+        followers = self.language.followers.filter(notify_by_message=True)
+
+        # The author of the comment shouldn't get a message
+        self.assertFalse(Message.objects.filter(user=self.user).exists())
+
+        for message in Message.objects.all():
             self.assertTrue(isinstance(message.object,
                 SubtitleLanguage))
+            self.assertTrue(message.user in list(followers))
 
 
 class TestPercentComplete(TestCase):
