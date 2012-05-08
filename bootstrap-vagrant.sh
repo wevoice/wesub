@@ -64,6 +64,9 @@ RUN_LOCALLY = False
 # TODO: Get rid of these.
 SPEAKERTEXT_API_TOKEN = ""
 SPEAKERTEXT_PASSWORD = ""
+
+# Host of the Riemann server.
+RIEMANN_HOST = '10.10.10.44'
 EOF
 
 # Set up the DB ---------------------------------------------------------------
