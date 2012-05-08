@@ -23,7 +23,7 @@ from django.conf import settings
 
 try:
     # from bernhard import Client
-    from riemanned import RiemannClient as Client
+    from riemann import RiemannClient as Client
 except ImportError:
     # Just use a dummy client if we don't have a Riemann client installed.
     class Client(object):
