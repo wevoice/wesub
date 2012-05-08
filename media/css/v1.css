@@ -1935,7 +1935,7 @@ pre.dump code {
 .truncated {
   overflow: hidden;
   position: relative;
-  z-index: 50;
+  z-index: 1;
 }
 
 a.truncated-expand {
@@ -1944,7 +1944,7 @@ a.truncated-expand {
   margin-top: 10px;
   padding: 8px 10px;
   position: relative;
-  z-index: 51;
+  z-index: 2;
   -moz-box-shadow: -6px -23px 17px white;
   -webkit-box-shadow: -6px -23px 17px white;
   box-shadow: -6px -23px 17px white;
