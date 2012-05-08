@@ -25,7 +25,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.utils import simplejson as json
@@ -42,7 +42,7 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm, MoveTeamVideoForm
+    UnpublishForm, MoveTeamVideoForm, UploadDraftForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -1177,6 +1177,7 @@ def team_tasks(request, slug, project_slug=None):
         'widget_settings': widget_settings,
         'filtered': filtered,
         'member': member,
+        'upload_draft_form': UploadDraftForm()
     }
 
     context.update(pagination_info)
@@ -1345,6 +1346,26 @@ def assign_task_ajax(request, slug):
     else:
         return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
 
+def upload_draft(request, slug):
+
+    if request.POST:
+        form = UploadDraftForm(request.POST)
+
+        if form.is_valid():
+
+            team = get_object_or_404(Team, slug=slug)
+            task = form.cleaned_data['task']
+            draft = form.cleaned_data['draft']
+
+            # Parse the file, etc.
+
+            messages.success(request, _(u"Draft uploaded successfully."))
+        else:
+            messages.error(request, _(u"There was a problem uploading that draft."))
+
+        return HttpResponseRedirect(reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+    else:
+        return HttpResponseBadRequest()
 
 # Projects
 def project_list(request, slug):

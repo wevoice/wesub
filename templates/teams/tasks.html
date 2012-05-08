@@ -251,7 +251,11 @@
                                                     {% if not has_max_tasks and task.assignee == None %}
                                                         <li>
                                                             <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
-                                                                {% trans 'Start now' %}
+                                                                {% if task.subtitle_version %}
+                                                                    {% trans 'Resume' %}
+                                                                {% else %}
+                                                                    {% trans 'Start now' %}
+                                                                {% endif %}
                                                             </a>
                                                         </li>
                                                         <li class="hidden-perform-link" style="display: none;">
@@ -265,7 +269,7 @@
                                                     </li>
                                                 {% endif %}
                                                 <li>
-                                                    <a href="">Upload draft</a>
+                                                    <a href="#upload-draft" class="open-modal upload-draft-button" data-task="{{ task.pk }}">Upload draft</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -383,6 +387,31 @@
         {% endif %}
 
         {% if is_paginated %}{% paginator %}{% endif %}
+
+        <div class="bootstrap">
+            <div class="modal" id="upload-draft">
+                <form action="{% url teams:upload_draft slug=team.slug %}" method="post" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <a href="#" class="close">x</a>
+                        <h3>{% trans 'Upload draft' %}</h3>
+                    </div>
+                    <div class="modal-body">
+                        <label for="id_draft">
+                            Draft:
+                        </label>
+                        {{ upload_draft_form.draft }}
+                        <div class="hidden">
+                            {{ upload_draft_form.task }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {% csrf_token %}
+                        <input type="submit" class="btn primary" value="Upload draft" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
     <script id="IMAGE_PRELOADER" type="text/html">
         <img class="placeholder" width="256" height1="30" src="{{ STATIC_URL }}images/ajax-loader.gif"/>
