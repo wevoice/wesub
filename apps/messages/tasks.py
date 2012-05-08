@@ -30,6 +30,7 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.template.loader import render_to_string
+from django.contrib.contenttypes.models import ContentType
 
 from sentry.client.models import client
 from celery.task import task
@@ -41,6 +42,7 @@ from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
      REVIEWED_AND_PENDING_APPROVAL, REVIEWED_AND_SENT_BACK
 
 
+from messages.models import Message
 from utils import send_templated_email
 from utils import get_object_or_none
 from utils.translation import get_language_label
@@ -664,3 +666,28 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
             },
             fail_silently=not settings.DEBUG)
 
+    exclude = list(video.followers.filter(notify_by_message=False))
+    message_followers = video.notification_list(exclude)
+
+    if language:
+        obj = language
+        object_pk = language.pk
+        content_type = ContentType.objects.get_for_model(language)
+    else:
+        obj = video
+        object_pk = video.pk
+        content_type = ContentType.objects.get_for_model(video)
+
+    for user in message_followers:
+        Message.objects.create(user=user, subject=subject, object_pk=object_pk,
+                content_type=content_type, object=obj,
+                content=render_to_string('messages/new-comment.html', {
+                    "video": video,
+                    "commenter": unicode(comment.user),
+                    "commenter_url": comment.user.get_absolute_url(),
+                    "version_url":version_url,
+                    "language_url":language_url,
+                    "domain":domain,
+                    "version": version,
+                    "body": comment.content
+                }))

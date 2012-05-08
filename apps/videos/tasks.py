@@ -393,6 +393,7 @@ def _send_letter_caption(caption_version):
                                  'videos/email_notification.html',
                                  context, fail_silently=not settings.DEBUG)
             if item.user.notify_by_message:
+                # TODO: Add body
                 Message.objects.create(user=item.user, subject=subject,
                         content='')
 

@@ -1507,6 +1507,8 @@ class TestTasks(TestCase):
         self.user = User.objects.get(pk=2)
         self.video = Video.objects.all()[:1].get()
         self.language = self.video.subtitle_language()
+        self.language.language = 'en'
+        self.language.save()
         self.latest_version = self.language.latest_version(public_only=True)
 
         self.latest_version.user.notify_by_email = True
@@ -1709,6 +1711,7 @@ class TestTasks(TestCase):
         # --------------------------------------------------------------------
         # Now test comment notifications
 
+        Message.objects.all().delete()
         mail.outbox = []
 
         form =  CommentForm(self.video, {
@@ -1732,6 +1735,25 @@ class TestTasks(TestCase):
         followers = self.video.followers.filter(notify_by_email=False)
         for follower in followers:
             self.assertFalse(follower.email in emails)
+
+        # Test comments on languages
+        Message.objects.all().delete()
+        mail.outbox = []
+
+        form =  CommentForm(self.language, {
+            'content': 'Text',
+            'object_pk': self.language.pk,
+            'content_type': ContentType.objects.get_for_model(self.language).pk
+            })
+        form.save(self.user, commit=True)
+
+        self.assertEquals(Message.objects.count(),
+                self.language.followers.filter(notify_by_message=True).count())
+
+        messages = Message.objects.all()
+        for message in messages:
+            self.assertTrue(isinstance(message.object,
+                SubtitleLanguage))
 
 
 class TestPercentComplete(TestCase):
