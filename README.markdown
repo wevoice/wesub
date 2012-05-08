@@ -120,3 +120,21 @@ need to run (while the virtualenv is activated):
     pip install bpython
 
 Now when you run `pm shell` it will use bpython automatically.
+
+### Metrics
+
+If you want to collect metrics when developing locally (just out of curiosity,
+or if you want to add some of your own and test them) you'll need to set up the
+amara-metrics Vagrant box:
+
+    git clone git://github.com/pculture/amara-metrics.git metrics
+    cd metrics
+    vagrant up
+
+Then add the following line to `/etc/hosts` on your local (host) machine:
+
+    10.10.10.44	graphite.example.com
+
+Now load a few pages to generate some stats, then point your browser at
+<http://graphite.example.com> to see the Graphite dashboard.  The stats should
+be under `unisubs` (which is the hostname of the Vagrant VM).
