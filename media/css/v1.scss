@@ -1908,7 +1908,7 @@ pre.dump {
 .truncated {
     overflow: hidden;
     position: relative;
-    z-index: 50;
+    z-index: 1;
 }
 a.truncated-expand {
     background: #F3F6F8;
@@ -1916,7 +1916,7 @@ a.truncated-expand {
     margin-top: 10px;
     padding: 8px 10px;
     position: relative;
-    z-index: 51;
+    z-index: 2;
     @include box-shadow(-6px, -23px, 17px, white);
     @include border-radius();
 
