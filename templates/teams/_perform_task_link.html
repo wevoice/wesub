@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if task.get_type_display == "Subtitle" or task.get_type_display == "Translate"%}
-    <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Perform Task" %}</a>
+    <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Start now" %}</a>
 
     <script type="text/javascript">
         $('.perform-task-{{ task.pk }}').click(function() {
@@ -21,5 +21,5 @@
         });
     </script>
 {% else %}
-    <a class="perform" href="{{ task.get_widget_url }}">{% trans "Perform Task" %}</a>
+    <a class="perform" href="{{ task.get_widget_url }}">{% trans "Start now" %}</a>
 {% endif %}

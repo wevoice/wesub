@@ -182,7 +182,7 @@
                                     {% endif %}
                                 </p>
 
-                                {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
+                                {% if task.subtitle_version %}
                                     {% with task.subtitle_version as version %}
                                         <p>
                                             <strong>{% trans 'Subtitles' %}:</strong>
@@ -240,22 +240,35 @@
                                     {% endif %}
 
                                     {% if task|can_perform_task:user %}
-                                        {% if task.assignee == user %}
-                                            <li>
-                                                {% include "teams/_perform_task_link.html" %}
-                                            </li>
-                                        {% else %}
-                                            {% if not has_max_tasks and task.assignee == None %}
+                                        <div class="action-group perform-task">
+                                            <h5 class="trigger">{% trans 'Perform Task' %}</h5>
+                                            <ul>
+                                                {% if task.assignee == user %}
+                                                    <li>
+                                                        {% include "teams/_perform_task_link.html" %}
+                                                    </li>
+                                                {% else %}
+                                                    {% if not has_max_tasks and task.assignee == None %}
+                                                        <li>
+                                                            <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
+                                                                {% trans 'Start now' %}
+                                                            </a>
+                                                        </li>
+                                                        <li class="hidden-perform-link" style="display: none;">
+                                                            {% include "teams/_perform_task_link.html" %}
+                                                        </li>
+                                                    {% endif %}
+                                                {% endif %}
+                                                {% if task.subtitle_version %}
+                                                    <li>
+                                                        <a href="">{% trans 'Download draft' %}</a>
+                                                    </li>
+                                                {% endif %}
                                                 <li>
-                                                    <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
-                                                        {% trans 'Perform Task' %}
-                                                    </a>
+                                                    <a href="">Upload draft</a>
                                                 </li>
-                                                <li class="hidden-perform-link" style="display: none;">
-                                                    {% include "teams/_perform_task_link.html" %}
-                                                </li>
-                                            {% endif %}
-                                        {% endif %}
+                                            </ul>
+                                        </div>
                                     {% endif %}
 
                                 </ul>
@@ -310,7 +323,7 @@
                                                         <form action="{% url teams:delete_task slug=team.slug %}" method="post">
                                                             <fieldset>
                                                                 {% if task.get_type_display == "Review" or task.get_type_display == "Approve" %}
-                                                                    <p>What would you like to do with the subtitles for this task?</p>
+                                                                    <p>{% trans 'What would you like to do with the subtitles for this task?' %}</p>
                                                                     <label class="radio" for="id_discard_subs_no_{{ task.pk }}">
                                                                         <input checked="checked" type="radio" name="discard_subs" value="0" id="id_discard_subs_no_{{ task.pk }}"/>
                                                                         {% trans "Publish these subtitles immediately" %}
