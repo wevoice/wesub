@@ -137,7 +137,6 @@ class MoveTeamVideoForm(forms.Form):
 
         return self.cleaned_data
 
-
 class BaseVideoBoundForm(forms.ModelForm):
     video_url = UniSubBoundVideoField(label=_('Video URL'), verify_exists=True,
         help_text=_("Enter the URL of any compatible video or any video on our site. You can also browse the site and use the 'Add Video to Team' menu."))
@@ -272,7 +271,6 @@ class AddTeamVideosFromFeedForm(AddFromFeedForm):
                      u"submit this feed again and make sure to "
                      u'check "Save feed" box.')
 
-
 class CreateTeamForm(BaseVideoBoundForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
 
@@ -307,7 +305,6 @@ Enter a link to any compatible video, or to any video page on our site.''')
         team.save()
         TeamMember.objects.create_first_member(team=team, user=user)
         return team
-
 
 class TaskCreateForm(ErrorableModelForm):
     choices = [(10, 'Transcribe'), Task.TYPE_CHOICES[1]]
@@ -467,7 +464,6 @@ class TaskDeleteForm(forms.Form):
 
         return task
 
-
 class GuidelinesMessagesForm(forms.Form):
     messages_invite = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
     messages_manager = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
@@ -477,7 +473,6 @@ class GuidelinesMessagesForm(forms.Form):
     guidelines_subtitle = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
     guidelines_translate = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
     guidelines_review = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-
 
 class RenameableSettingsForm(forms.ModelForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
@@ -493,7 +488,6 @@ class SettingsForm(forms.ModelForm):
         model = Team
         fields = ('description', 'logo', 'is_visible')
 
-
 class WorkflowForm(forms.ModelForm):
     class Meta:
         model = Workflow
@@ -506,7 +500,6 @@ class PermissionsForm(forms.ModelForm):
         fields = ('membership_policy', 'video_policy', 'subtitle_policy',
                   'translate_policy', 'task_assign_policy', 'workflow_enabled',
                   'max_tasks_per_member', 'task_expiration',)
-
 
 class LanguagesForm(forms.Form):
     preferred = forms.MultipleChoiceField(required=False, choices=())
@@ -527,7 +520,6 @@ class LanguagesForm(forms.Form):
             raise forms.ValidationError(_(u'You cannot blacklist a preferred language.'))
 
         return self.cleaned_data
-
 
 class InviteForm(forms.Form):
     user_id = forms.CharField(required=False, widget=forms.Select)
@@ -574,12 +566,10 @@ class InviteForm(forms.Form):
 
         notifier.team_invitation_sent.delay(invite.pk)
 
-
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ('name', 'description', 'workflow_enabled')
-
 
 class UnpublishForm(forms.Form):
     subtitle_version = forms.ModelChoiceField(queryset=SubtitleVersion.objects.all())
@@ -618,5 +608,9 @@ class UnpublishForm(forms.Form):
 
         return self.cleaned_data
 
+class UploadDraftForm(forms.Form):
+    draft = forms.FileField(required=True)
+    task = forms.CharField(required=True)
 
-
+    def clean(self):
+        return self.cleaned_data

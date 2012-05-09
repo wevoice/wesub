@@ -633,6 +633,10 @@ var Site = function(Site) {
                 return terms;
             });
 
+            $('a.upload-draft-button').click(function() {
+                $('input#id_task').val($(this).data('task'));
+            });
+
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             that.Utils.resetLangFilter($('select#id_task_language'));
             that.Utils.chosenify();
