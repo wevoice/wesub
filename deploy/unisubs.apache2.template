@@ -2,6 +2,7 @@
     ServerAdmin sysadmin@pculture.org
 
     ServerName INSERT_SUBDOMAIN.universalsubtitles.org
+    ServerAlias INSERT_SUBDOMAIN.amarasubtitles.org
 
     # Extra alias for dev only
     #ServerAlias wdev.universalsubtitles.org
