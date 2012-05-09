@@ -33,6 +33,7 @@ from haystack import site
 from sentry.client.handlers import SentryHandler
 from sentry.client.models import client
 
+from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from videos.models import VideoFeed, SubtitleLanguage, Video
 from videos.feed_parser import FeedParser
@@ -383,13 +384,18 @@ def _send_letter_caption(caption_version):
 
     for item in qs:
         if item.user and item.user in followers:
-            context['your_version'] = item
-            context['user'] = item.user
-            context['hash'] = item.user.hash_for_video(context['video'].video_id)
-            context['user_is_rtl'] = item.user.guess_is_rtl()
-            send_templated_email(item.user, subject,
+            if item.user.notify_by_email:
+                context['your_version'] = item
+                context['user'] = item.user
+                context['hash'] = item.user.hash_for_video(context['video'].video_id)
+                context['user_is_rtl'] = item.user.guess_is_rtl()
+                send_templated_email(item.user, subject,
                                  'videos/email_notification.html',
                                  context, fail_silently=not settings.DEBUG)
+            if item.user.notify_by_message:
+                # TODO: Add body
+                Message.objects.create(user=item.user, subject=subject,
+                        content='')
 
             followers.discard(item.user)
 
