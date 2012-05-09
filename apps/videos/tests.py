@@ -1568,30 +1568,6 @@ class TestTasks(TestCase):
             * Get notifications about comments made on the subtitles in this
                 language, but not in any other language for the video, nor on
                 the video as a whole entity.
-
-        ----------------------------------------------------------------------
-
-        Since this is such a complex and long test, let's talk about what we
-        are going to do in more detail.
-
-        1.  Make sure there are no comments or messages present in our database
-        2.  Make sure that the main video's user wants emails but not messages
-        3.  Create a second language for the video
-        4.  Create a user that will only follow the second language
-        5.  Create a new subtitle version
-        6.  Clear mailbox
-        7.  Spin off a ``video_changed_tasks`` celery task for the new version
-        8.  Make sure the correct number of emails is sent out
-        9.  Make sure edited title and description are present in the body of
-            the email.
-        10. Make sure that all followers of the video get notified when a video
-            is edited.  Submitter shouldn't be in followers.  Check for emails
-            and messages separately.
-        11. Make sure that the correct number of ``Message`` instances was
-            created, and that it was created for the correct users.
-        12. Make sure that all followers of a language are notified.
-        13. Reset mailbox
-        14. Make sure that followers get notified when a new comment is made.
         """
 
         # Video is submitted by self.user (pk 2, admin@mail.net)
