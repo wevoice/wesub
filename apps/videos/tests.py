@@ -1611,6 +1611,10 @@ class TestTasks(TestCase):
                 email='dude@gmail.com', notify_by_email=True,
                 notify_by_message=True)
 
+        user_language2_only = User.objects.create(username='languageonly2',
+                email='dude2@gmail.com', notify_by_email=True,
+                notify_by_message=True)
+
         # Create a user that will make the edits
         user_edit_maker = User.objects.create(username='editmaker',
                 email='maker@gmail.com', notify_by_email=True,
@@ -1625,7 +1629,7 @@ class TestTasks(TestCase):
 
         # Create another language
         lan2 = SubtitleLanguage.objects.create(video=self.video, language='cz')
-        lan2.followers.add(user_language_only)
+        lan2.followers.add(user_language2_only)
         self.assertEquals(2, SubtitleLanguage.objects.count())
 
         v = SubtitleVersion()
@@ -1657,8 +1661,18 @@ class TestTasks(TestCase):
 
         # --------------------------------------------------------------------
 
-        # There should be 3 emails (3 video followers)
-        self.assertEqual(len(mail.outbox), 3)
+        # How many emails should we have?
+        # * The submitter
+        # * All video followers who want emails
+        # * All followers of the language being changed
+        # * Minus the change author
+        #
+        # In our case that is: languageonly, adam, admin
+        people = set(self.video.followers.filter(notify_by_email=True))
+        people.update(self.language.followers.filter(notify_by_email=True))
+
+        number = len(list(people)) - 1  # for the editor
+        self.assertEqual(len(mail.outbox), number)
 
         email = mail.outbox[0]
         tos = [item for sublist in mail.outbox for item in sublist.to]
@@ -1762,10 +1776,15 @@ class TestTasks(TestCase):
         # The author of the comment shouldn't get a message
         self.assertFalse(Message.objects.filter(user=self.user).exists())
 
+        lan2 = SubtitleLanguage.objects.get(pk=lan2.pk)
+        lan2_followers = lan2.followers.all()
+
         for message in Message.objects.all():
             self.assertTrue(isinstance(message.object,
                 SubtitleLanguage))
             self.assertTrue(message.user in list(followers))
+            self.assertFalse(message.user in list(lan2_followers))
+
 
 
 class TestPercentComplete(TestCase):

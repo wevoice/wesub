@@ -379,7 +379,7 @@ def _send_letter_caption(caption_version):
 
     subject = u'New edits to "%s" by %s on Amara' % (language.video, caption_version.user)
 
-    followers = set(video.notification_list_all(caption_version.user))
+    followers = set(video.notification_list(caption_version.user))
     followers.update(language.notification_list(caption_version.user))
 
     for item in qs:
