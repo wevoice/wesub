@@ -299,7 +299,7 @@ class YoutubeVideoType(VideoType):
 
     def delete_subtitles(self, language, third_party_account):
         bridge = self._get_bridge(third_party_account)
-        bridge.delete_subtitles()
+        bridge.delete_subtitles(language)
 
 
 class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
@@ -391,7 +391,16 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         Smart enought to determine if this video already has such subs
 
         """
+        try:
+            lc = LanguageCode(language, "unisubs")
+            lang = lc.encode("youtube")
+        except KeyError:
+            logger.error("Couldn't encode LC %s to youtube" % language)
+            return
+
         if hasattr(self, "captions") is False:
             self._get_captions_info()
-        if language in self.captions:
-            self._delete_track(self.captions[language]['track'])
+        if lang in self.captions:
+            self._delete_track(self.captions[lang]['track'])
+        else:
+            logger.error("Couldn't find LC %s in youtube" % lang)

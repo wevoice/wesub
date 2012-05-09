@@ -1,18 +1,10 @@
-Amara documentation
-======================
+.. Amara documentation master file, created by
+   sphinx-quickstart on Mon Jul 25 14:58:38 2011.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-Amara is a open source, video transcription and translation tool.  It allows
-you to translate any video on the web and share it with others.  Transcribing
-online video will give you better SEO and a wider audience.
-
-`Amara live <https://www.universalsubtitles.org>`_
-
-Amara is a large web application implemented in Python using the `Django
-<https://www.djangoproject.com>`_ framework.  Large portions of the interactive
-functionality are implemented in `Google Closure
-<https://developers.google.com/closure/>`_.
-
-Amara is a project of `PCF <http://pculture.org>`_.
+Welcome to Amara's documentation!
+===============================================
 
 Contents:
 

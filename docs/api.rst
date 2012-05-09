@@ -4,10 +4,7 @@ API Documentation
 This is the documentation of v2 of Amara's API. Please contact us
 if you’d like to use the Amara API for commercial purposes.
 
-.. note:: The v1 of the API is deprecated, but can still be accessed through
-    http://www.universalsubtitles.org/api/1.0/documentation/ . Users should migrate
-    to the v2 of the API. If you're missing a feature on the API, please `let us
-    know <https://universalsubtitles.tenderapp.com/>`_ .
+The v1 of the API is deprecated, but can still be accessed through http://www.universalsubtitles.org/api/1.0/documentation/ . Users should migrate to the v2 of the API. If you're missing a feature on the api, please `let us know <https://universalsubtitles.tenderapp.com/>`_ .
 
 Authentication
 --------------
@@ -78,21 +75,18 @@ Listing videos::
     GET https://www.universalsubtitles.org/api2/partners/videos/
 
 Parameters:
-
-  * `video_url`: list only videos with the given URL, useful for finding out information about a video already on Amara.
-  * `order_by`: Applies sorting to the video list. Possible values:
-
+    * `video_url`: list only videos with the given URL, useful for finding out information about a video already on Amara.
+    * `order_by`: Applies sorting to the video list. Possible values:
     * `title`: ascending
     * `-title`: descending
     * `created`: older videos first
     * `-created` : newer videos
-
+          
 Creating Videos::
-
+  
   POST https://www.universalsubtitles.org/api2/partners/videos/
-
+   
 Parameters:
-
   * `video_url` : The url for the video. Any url that Amara accepts will work here. You can send the URL for a file (e.g. http:///www.example.com/my-video.ogv) , or a link to one of our accepted providers (youtube, vimeo, dailymotion, blip.tv)
   * `title` : The title for the video
   * `description` : About this video

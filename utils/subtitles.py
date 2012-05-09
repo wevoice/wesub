@@ -75,12 +75,8 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
     if not is_version_same(old_version, parser):
         forked_from = as_forked and translated_from and translated_from.version()
 
-        if old_version and old_version.title and old_version.description:
-            title = old_version.title
-            description = old_version.description
-        else:
-            title = video.get_title_display()
-            description = video.get_description_display()
+        title = old_version.title if old_version and old_version.title else video.get_title_display()
+        description = old_version.description if old_version and old_version.description else video.get_description_display()
 
         version = SubtitleVersion(
             language=language, version_no=version_no,

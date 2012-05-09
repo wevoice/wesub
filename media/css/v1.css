@@ -357,6 +357,11 @@ div.fix-chosen div.chzn-container {
   background-image: -webkit-linear-gradient(#f3f6f8, #dce2e5);
   background-image: linear-gradient(#f3f6f8, #dce2e5);
 }
+.v1 .view .tools .button.disabled:hover {
+  border-color: transparent;
+  background: transparent;
+  color: #7692a3;
+}
 .v1 .view .tools h2 {
   color: inherit;
   display: inline;
@@ -436,6 +441,18 @@ div.fix-chosen div.chzn-container {
 }
 .v1 .view p.view-notice a.clear-filters {
   float: right;
+}
+
+.v1 .view p.view-notice.draft {
+  background-color: #ffcbc7;
+  color: #CA4C43;
+}
+.v1 .view p.view-notice.draft em {
+  font-style: normal;
+  font-weight: bold;
+  padding-right: 1.5em;
+  text-transform: uppercase;
+  color: #a33d36;
 }
 
 .v1 .listing {
@@ -1911,7 +1928,7 @@ pre.dump code {
 .truncated {
   overflow: hidden;
   position: relative;
-  z-index: 50;
+  z-index: 1;
 }
 
 a.truncated-expand {
@@ -1920,7 +1937,7 @@ a.truncated-expand {
   margin-top: 10px;
   padding: 8px 10px;
   position: relative;
-  z-index: 51;
+  z-index: 2;
   -moz-box-shadow: -6px -23px 17px white;
   -webkit-box-shadow: -6px -23px 17px white;
   box-shadow: -6px -23px 17px white;

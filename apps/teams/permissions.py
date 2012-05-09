@@ -802,3 +802,10 @@ def can_create_task_translate(team_video, user=None, workflows=None):
     # TODO: Order this for individual users?
     return list(candidate_languages - existing_translate_languages - existing_languages)
 
+
+def can_create_project(user, team):
+    return can_edit_project(team, user, None)
+
+
+def can_delete_project(user, team, project):
+    return can_edit_project(team, user, project)

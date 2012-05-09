@@ -252,7 +252,7 @@ class Rpc(BaseRpc):
             # can_assign verify if the user has permission to either
             # 1. assign the task to himself
             # 2. do the task himself (the task is assigned to him)
-            if not user.is_authenticated() or not can_assign_task(task, user):
+            if not user.is_authenticated() or (not task.assignee and not can_assign_task(task, user)):
                 return { "can_edit": False, "locked_by": str(task.assignee or task.team) }
 
         # Check that the team's policies don't prevent the action.
@@ -737,6 +737,7 @@ class Rpc(BaseRpc):
             if not can_publish_edits_immediately(team_video, user, sl.language):
                 task = self._get_review_or_approve_task(team_video, sl)
                 if task:
+                    task.set_expiration()
                     return WAITING_MODERATION, task
         else:
             # Otherwise we're dealing with a new set of subtitles for this

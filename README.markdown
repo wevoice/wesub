@@ -1,7 +1,4 @@
-Amara
-=====
-
-This repository is the source code for the [Amara][] project.
+This repository is the code for the [Amara][] project.
 
 The full documentation can be found at
 http://amara.readthedocs.org/en/latest/index.html

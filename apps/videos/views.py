@@ -269,12 +269,18 @@ def upload_subtitles(request):
             output['errors'] = {"_all__":[force_unicode(e.msg)]}
             transaction.rollback()
         except Exception, e:
-            #trying find out one error on dev-server. hope this should help
+            output['errors'] = {"_all__":[force_unicode(e)]}
             transaction.rollback()
-            raise
+            from sentry.client.models import client
+            client.create_from_exception()
+
     else:
         output['errors'] = form.get_errors()
         transaction.rollback()
+
+    if transaction.is_dirty():
+        transaction.rollback()
+
     return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
 
 @login_required
@@ -379,6 +385,8 @@ def legacy_history(request ,video, lang=None):
 
 @get_video_from_code
 def history(request, video, lang=None, lang_id=None, version_id=None):
+    from teams.models import Task
+
     if not lang:
         return HttpResponseRedirect(video.get_absolute_url(video_id=video._video_id_used))
     elif lang == 'unknown':
@@ -451,6 +459,15 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['rollback_allowed'] = version and not version.video.is_moderated
     context['last_version'] = version
     context['next_version'] = version.next_version() if version else None
+    context['can_edit'] = False
+
+    if request.user.is_authenticated():
+        # user can only edit a subtitle draft if he
+        # has a subtitle/translate task assigned to him
+        tasks = Task.objects.incomplete_subtitle_or_translate()\
+                            .filter(team_video=video.get_team_video(), assignee=request.user, language=language.language)
+
+        context['can_edit'] = tasks.exists()
 
     return render_to_response("videos/subtitle-view.html", context, context_instance=RequestContext(request))
 
