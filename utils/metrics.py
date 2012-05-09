@@ -39,16 +39,19 @@ except ImportError:
 # performance becomes an issue.
 c = Client(getattr(settings, 'RIEMANN_HOST', '127.0.0.1'))
 host = socket.gethostname()
-
+ENABLED = getattr(settings, 'ENABLE_METRICS', False)
 
 def send(service, tag, metric=None):
     data = {'host': host, 'service': service, 'tags': [tag]}
+
     if metric:
         data['metric'] = metric
-    try:
-        c.send(data)
-    except:
-        pass
+
+    if ENABLED:
+        try:
+            c.send(data)
+        except:
+            pass
 
 
 class Metric(object):

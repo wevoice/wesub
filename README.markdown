@@ -135,6 +135,9 @@ Then add the following line to `/etc/hosts` on your local (host) machine:
 
     10.10.10.44	graphite.example.com
 
+Finally, turn on metric reporting by changing the `ENABLE_METRICS` setting in
+`settings_local.py` to `True`.
+
 Now load a few pages to generate some stats, then point your browser at
 <http://graphite.example.com> to see the Graphite dashboard.  The stats should
 be under `unisubs` (which is the hostname of the Vagrant VM).
