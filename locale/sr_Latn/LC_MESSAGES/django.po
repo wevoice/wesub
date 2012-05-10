@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-09 01:34-0500\n"
+"POT-Creation-Date: 2012-05-10 01:33-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -214,72 +214,72 @@ msgstr ""
 msgid "Message does not exist."
 msgstr ""
 
-#: apps/messages/tasks.py:67
+#: apps/messages/tasks.py:69
 #, python-format
 msgid "New message from %(author)s on Amara: %(subject)s"
 msgstr ""
 
-#: apps/messages/tasks.py:69
+#: apps/messages/tasks.py:71
 #, python-format
 msgid "New message on Amara: %(subject)s"
 msgstr ""
 
-#: apps/messages/tasks.py:112
+#: apps/messages/tasks.py:114
 #, python-format
 msgid "You've been invited to team %s on Amara"
 msgstr ""
 
-#: apps/messages/tasks.py:146
+#: apps/messages/tasks.py:148
 #, python-format
 msgid "%(user)s is applying for team %(team)s"
 msgstr ""
 
-#: apps/messages/tasks.py:176
+#: apps/messages/tasks.py:178
 #, python-format
 msgid "Your application to join the %s team has been declined"
 msgstr ""
 
-#: apps/messages/tasks.py:209
+#: apps/messages/tasks.py:211
 #, python-format
 msgid "%s team has a new member"
 msgstr ""
 
-#: apps/messages/tasks.py:232
+#: apps/messages/tasks.py:234
 #, python-format
 msgid "You've joined the %s team!"
 msgstr ""
 
-#: apps/messages/tasks.py:256
+#: apps/messages/tasks.py:258
 #, python-format
 msgid "%(user)s has left the %(team)s team"
 msgstr ""
 
-#: apps/messages/tasks.py:280
+#: apps/messages/tasks.py:282
 #, python-format
 msgid "You've left the %s team!"
 msgstr ""
 
-#: apps/messages/tasks.py:314
+#: apps/messages/tasks.py:316
 msgid "Your videos were imported!"
 msgstr ""
 
-#: apps/messages/tasks.py:340
+#: apps/messages/tasks.py:342
 msgid "You have a new task assignment on Amara!"
 msgstr ""
 
-#: apps/messages/tasks.py:380
+#: apps/messages/tasks.py:382
 msgid "Your subtitles have been reviewed"
 msgstr ""
 
-#: apps/messages/tasks.py:382
+#: apps/messages/tasks.py:384
 msgid " and published"
 msgstr ""
 
-#: apps/messages/tasks.py:477
+#: apps/messages/tasks.py:479
 msgid "Your subtitles have been approved and published!"
 msgstr ""
 
-#: apps/messages/tasks.py:484 apps/messages/tasks.py:538
+#: apps/messages/tasks.py:486 apps/messages/tasks.py:540
 msgid "Your subtitles have been declined"
 msgstr ""
 
