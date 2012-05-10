@@ -619,6 +619,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
         language = ct
 
     domain = Site.objects.get_current().domain
+    protocol = getattr(settings, 'DEFAULT_PROTOCOL', 'https')
     
     if language:
         language_url = universal_url("videos:translation_history", kwargs={
@@ -692,6 +693,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
                     "version_url":version_url,
                     "language_url":language_url,
                     "domain":domain,
+                    "protocol": protocol,
                     "version": version,
                     "body": comment.content
                 }))

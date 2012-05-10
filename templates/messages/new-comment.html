@@ -1,9 +1,3 @@
-<p><a href="http://{{ domain }}{{ commenter_url }}">{{ commenter }}</a> commented on "{{video.title_display}}."</p>
+{{ commenter }} commented on "{{video.title_display}}.
 
-{% if is_rejection  %}
-<p>A version of <a href="{{language_url}}">{{ version.language.language }}</a> subtitles, <a href="{{version_url}}">{{ version.version_no }}</a>, was declined.</p>
-{% endif %}
-
-<blockquote style="margin:20px; padding-left: 20px; border-left: 4px solid #aaa; color: #777;">
-    {{body|linebreaks}}
-</blockquote>
+{{ protocol }}://{{ domain }}{{ video.get_absolute_url }}
