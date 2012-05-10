@@ -502,7 +502,7 @@ def _notify(subj, msg, audience='sysadmin@pculture.org'):
 
     old_host = env.host_string
     env.host_string = mail_from_host
-    run("echo \'{1}\' | mailx -s \'{0}\' {2}".format(subj, msg, audience))
+    run("echo '{1}' | mailx -s '{0}' {2}".format(subj, msg, audience))
     env.host_string = old_host
 
 def update_web():
