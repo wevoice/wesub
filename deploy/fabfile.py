@@ -537,7 +537,8 @@ def update_web():
     test_services()
     reload_app_servers()
     
-    _notify("Amara {0} deployment".format(env.installation_name), "Deployed by {0} to {1} at {2} UTC".format(env.user,  env.installation_name, datetime.utcnow()))
+    if env.installation_name != 'dev' or env.user != 'jenkins':
+        _notify("Amara {0} deployment".format(env.installation_name), "Deployed by {0} to {1} at {2} UTC".format(env.user,  env.installation_name, datetime.utcnow()))
 
 # Services
 def update_solr_schema():
