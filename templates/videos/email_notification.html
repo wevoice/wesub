@@ -22,6 +22,16 @@
                 {% endblocktrans %}<br/>        
             {% endif %}
         </p>
+        {% if title.has_changed %}
+            <p style="font-size: 12px;">
+            The title was changed from <b>{{ title.old_title }}</b> to <b>{{ title.new_title }}</b>.
+            </p>
+        {% endif %}
+        {% if description.has_changed %}
+            <p style="font-size: 12px;">
+            The description was changed from <b>{{ description.old_description }}</b> to <b>{{ description.new_description }}</b>.
+            </p>
+        {% endif %}
         <ul>
           <li><a href="http://{{ domain }}{% filter rmlocale %}{% url videos:diffing version.pk last_version.pk %}{% endfilter %}">{% trans 'Compare the new version to the last version' %}</a>.</li>
           <li><a href="http://{{ domain }}{% filter rmlocale %}{% url videos:diffing version.pk your_version.pk %}{% endfilter %}">{% trans 'Compare your work to the new version' %}</a>.</li>

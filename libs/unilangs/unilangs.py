@@ -939,7 +939,9 @@ def _add_youtube():
         'zh-HK': 'zh',
         'zh-Hans': 'zh-cn',
         'zh-Hant': 'zh-tw',
-        'zh-SG': 'zh',
+# we need to fix unilangs what to do when
+# two dialects point to the same main language
+#       'zh-SG': 'zh',
         'zh-TW': 'zh-tw',
         'zu': 'zul'})
 

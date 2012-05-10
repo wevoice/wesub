@@ -262,6 +262,7 @@ def download_subtitles(request, handler=SSASubtitles):
     #FIXME: use GenerateSubtitlesHandler
     video_id = request.GET.get('video_id')
     lang_id = request.GET.get('lang_pk')
+    revision = request.GET.get('revision', None)
 
     if not video_id:
         #if video_id == None, Video.objects.get raise exception. Better show 404
@@ -283,14 +284,14 @@ def download_subtitles(request, handler=SSASubtitles):
 
     if not team_video:
         # Non-team videos don't require moderation
-        version = language and language.version(public_only=False)
+        version = language and language.version(public_only=False, version_no=revision)
     else:
         # Members can see all versions
         member = get_member(request.user, team_video.team)
         if member:
-            version = language and language.version(public_only=False)
+            version = language and language.version(public_only=False, version_no=revision)
         else:
-            version = language and language.version()
+            version = language and language.version(version_no=revision)
 
     if not version:
         raise Http404

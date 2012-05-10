@@ -86,6 +86,7 @@ class CustomUser(BaseUser):
     # which partner created this user? For now it' only a string, at
     # some point we'll need to model partners better
     partner = models.CharField(blank=True, null=True, max_length=32, db_index=True)
+    is_partner = models.BooleanField(default=False)
 
     objects = UserManager()
 

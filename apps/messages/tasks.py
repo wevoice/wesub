@@ -30,6 +30,7 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.template.loader import render_to_string
+from django.contrib.contenttypes.models import ContentType
 
 from sentry.client.models import client
 from celery.task import task
@@ -41,6 +42,7 @@ from teams.moderation_const import REVIEWED_AND_PUBLISHED, \
      REVIEWED_AND_PENDING_APPROVAL, REVIEWED_AND_SENT_BACK
 
 
+from messages.models import Message
 from utils import send_templated_email
 from utils import get_object_or_none
 from utils.translation import get_language_label
@@ -380,7 +382,7 @@ def _reviewed_notification(task_pk, status):
     subject = ugettext(u"Your subtitles have been reviewed")
     if status == REVIEWED_AND_PUBLISHED:
         subject += ugettext(" and published")
-    user = task.subtitle_version.user
+    user = task.review_base_version.user
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
@@ -580,7 +582,7 @@ def send_reject_notification(task_pk, sent_back):
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
 SUBJECT_EMAIL_VIDEO_COMMENTED = "%s left a comment on the video %s"
 @task
-def send_video_comment_notification(comment_pk,  version_pk=None):
+def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     """
     Comments can be attached to a video (appear in the videos:video (info)) page) OR
                                   sublanguage (appear in the videos:translation_history  page)
@@ -589,26 +591,35 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
     """
     from comments.models import Comment
     from videos.models import Video, SubtitleLanguage, SubtitleVersion
-    try:
-        comment = Comment.objects.get(pk=comment_pk)
-    except Comment.DoesNotExist:
-        return
+
+    if not isinstance(comment_pk_or_instance, Comment):
+        try:
+            comment = Comment.objects.get(pk=comment_pk_or_instance)
+        except Comment.DoesNotExist:
+            return
+    else:
+        comment = comment_pk_or_instance
+
     version = None
+    
     if version_pk:
         try:
             version = SubtitleVersion.objects.get(pk=version_pk)
         except SubtitleVersion.DoesNotExist:
             pass
+    
     ct = comment.content_object
-    if isinstance( ct, Video):
+    
+    if isinstance(ct, Video):
         video = ct
         version = None
         language = None
-    elif isinstance(ct, SubtitleLanguage ):
+    elif isinstance(ct, SubtitleLanguage):
         video = ct.video
         language = ct
 
     domain = Site.objects.get_current().domain
+    
     if language:
         language_url = universal_url("videos:translation_history", kwargs={
             "video_id": video.video_id,
@@ -617,6 +628,7 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
         })
     else:
         language_url = None
+    
     if version:
         version_url = universal_url("videos:subtitleversion_detail", kwargs={
             'video_id': version.video.video_id,
@@ -630,8 +642,10 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
     subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % (comment.user.username, video.title_display())
 
     followers = set(video.notification_list(comment.user))
+
     if language:
         followers.update(language.notification_list(comment.user))
+
     for user in followers:
         send_templated_email(
             user,
@@ -652,3 +666,32 @@ def send_video_comment_notification(comment_pk,  version_pk=None):
             },
             fail_silently=not settings.DEBUG)
 
+
+    if language:
+        obj = language
+        object_pk = language.pk
+        content_type = ContentType.objects.get_for_model(language)
+        exclude = list(language.followers.filter(notify_by_message=False))
+        exclude.append(comment.user)
+        message_followers = language.notification_list(exclude)
+    else:
+        obj = video
+        object_pk = video.pk
+        content_type = ContentType.objects.get_for_model(video)
+        exclude = list(video.followers.filter(notify_by_message=False))
+        exclude.append(comment.user)
+        message_followers = video.notification_list(exclude)
+
+    for user in message_followers:
+        Message.objects.create(user=user, subject=subject, object_pk=object_pk,
+                content_type=content_type, object=obj,
+                content=render_to_string('messages/new-comment.html', {
+                    "video": video,
+                    "commenter": unicode(comment.user),
+                    "commenter_url": comment.user.get_absolute_url(),
+                    "version_url":version_url,
+                    "language_url":language_url,
+                    "domain":domain,
+                    "version": version,
+                    "body": comment.content
+                }))

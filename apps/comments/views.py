@@ -24,16 +24,14 @@ from models import Comment
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from messages.tasks import send_video_comment_notification
 
 @login_required
 def post(request):
     output = dict(success=False)
     form = CommentForm(None, request.POST)
     if form.is_valid():
-        obj = form.save(request.user)
+        form.save(request.user)
         output['success'] = True
-        send_video_comment_notification(obj.pk)
     else:
         output['errors'] = form.get_errors()
         

@@ -26,14 +26,16 @@ goog.provide('unisubs.translate.TranslationList');
  * @extends {goog.ui.Component}
  * @constructor
  */
-unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, baseLanguageTitle) {
+unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, baseLanguageTitle, dialog) {
     goog.ui.Component.call(this);
     this.captionSet_ = captionSet;
     this.baseLanguageTitle_ = baseLanguageTitle || '';
+    this.dialog_ = dialog;
     /**
      * Array of subtitles in json format
      */
     this.baseLanguageSubtitles_ = baseLanguageSubtitles;
+
     goog.array.sort(
         this.baseLanguageSubtitles_,
         function(a, b) {
@@ -45,6 +47,7 @@ unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, 
     this.translationWidgets_ = [];
     this.titleTranslationWidget_ = null;
 };
+
 goog.inherits(unisubs.translate.TranslationList, goog.ui.Component);
 
 unisubs.translate.TranslationList.prototype.createDom = function() {
@@ -54,6 +57,16 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var map = this.captionSet_.makeMap();
 
+    // For some reason, YouTube video sources don't set the videoURL_ var. Ugh.
+    this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_ || '';
+
+    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+        this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(this.baseLanguageSubtitles_);
+        this.captionManager_ =
+            new unisubs.CaptionManager(
+                this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
+    }
+
     goog.array.forEach(
         this.baseLanguageSubtitles_,
         function(subtitle) {
@@ -62,11 +75,27 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
                 editableCaption = this.captionSet_.addNewDependentTranslation(
                     subtitle['sub_order'], subtitle['subtitle_id']);
             w = new unisubs.translate.TranslationWidget(
-                subtitle, editableCaption);
+                subtitle, editableCaption, this.dialog_);
             this.addChild(w, true);
             this.translationWidgets_.push(w);
         },
         this);
+};
+
+unisubs.translate.TranslationList.prototype.enterDocument = function() {
+    unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
+    var handler = this.getHandler();
+    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+
+        // Start loading the video.
+        this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
+        this.dialog_.getVideoPlayerInternal().pause();
+
+        // Setup listening for video + subtitles.
+        handler.listen(this.captionManager_,
+                       unisubs.CaptionManager.CAPTION,
+                       this.captionReached_);
+    }
 };
 
 /**
@@ -76,9 +105,7 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
  * @param {?string} error happened while translating
  */
 unisubs.translate.TranslationList.prototype.translateCallback_ = function(translations, widgets, error) {
-    if (error) {
-        
-    } else {
+    if (!error) {
         goog.array.forEach(translations, function(text, i) {
             widgets[i].setTranslationContent(text);
         });
@@ -97,7 +124,7 @@ unisubs.translate.TranslationList.prototype.translateViaBing = function(fromLang
 
     if (this.titleTranslationWidget_ && this.titleTranslationWidget_.isEmpty()) {
         needTranslating.push(this.titleTranslationWidget_);
-    };
+    }
     
     goog.array.forEach(this.translationWidgets_, function(w) {
         if (w.isEmpty()) {
@@ -112,4 +139,9 @@ unisubs.translate.TranslationList.prototype.translateViaBing = function(fromLang
 
     needTranslating.length && translateWidgets(needTranslating, fromLang, toLang, 
         this.translateCallback_);
+};
+
+unisubs.translate.TranslationList.prototype.captionReached_ = function(event) {
+    this.dialog_.getVideoPlayerInternal().showCaptionText(
+        (event.caption ? event.caption.getText() : ""));
 };
