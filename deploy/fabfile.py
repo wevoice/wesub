@@ -499,9 +499,12 @@ def update_integration():
 
 def _notify(subj, msg, audience='sysadmin@pculture.org'):
     mail_from_host = 'pcf-us-dev.pculture.org:2191'
+
+    old_host = env.host_string
     env.host_string = mail_from_host
     run("echo \'{1}\' | mailx -s \'{0}\' {2}".format(subj, msg, audience))
-    
+    env.host_string = old_host
+
 def update_web():
     """
     This is how code gets reloaded:
