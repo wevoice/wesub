@@ -389,6 +389,7 @@ INSTALLED_APPS = (
     'streamer',
     'teams',
     'testhelpers',
+    'thirdpartyaccounts',
     'unisubs', #dirty hack to fix http://code.djangoproject.com/ticket/5494 ,
     'unisubs_compressor',
     'uslogging',
@@ -453,9 +454,9 @@ VIMEO_API_SECRET = None
 
 AUTHENTICATION_BACKENDS = (
    'auth.backends.CustomUserBackend',
+   'thirdpartyaccounts.auth_backends.CustomUserAuthBackend',
+   'thirdpartyaccounts.auth_backends.TwitterAuthBackend',
    'auth.backends.OpenIdBackend',
-   'auth.backends.TwitterBackend',
-   'auth.backends.FacebookBackend',
    'django.contrib.auth.backends.ModelBackend',
 )
 

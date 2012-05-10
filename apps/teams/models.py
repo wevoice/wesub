@@ -1028,6 +1028,7 @@ class MembershipNarrowing(models.Model):
 
         return super(MembershipNarrowing, self).save(*args, **kwargs)
 
+
 # Application
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
