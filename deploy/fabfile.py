@@ -18,6 +18,7 @@
 from __future__ import with_statement
 
 import os, sys, string, random
+from datetime import datetime
 
 import fabric.colors as colors
 from fabric.api import run, sudo, env, cd, local as _local
@@ -496,7 +497,11 @@ def update_integration():
     with Output("Updating nested unisubs-integration repositories"):
         _execute_on_all_hosts(_update_integration)
 
-
+def _notify(subj, msg, audience='sysadmin@pculture.org'):
+    mail_from_host = 'pcf-us-dev.pculture.org:2191'
+    env.host_string = mail_from_host
+    run("echo \'{1}\' | mailx -s \'{0}\' {2}".format(subj, msg, audience))
+    
 def update_web():
     """
     This is how code gets reloaded:
@@ -531,7 +536,8 @@ def update_web():
     bounce_memcached()
     test_services()
     reload_app_servers()
-
+    
+    _notify("Amara {0} deployment".format(env.installation_name), "Deployed by {0} to {1} at {2} UTC".format(env.user,  env.installation_name, datetime.utcnow()))
 
 # Services
 def update_solr_schema():
