@@ -90,7 +90,7 @@ unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
 
     if (this.videoURL_.indexOf('vimeo.com') === -1) {
         var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
-        var editableCaption = editableCaptionSet.captionByID(this.subtitle_.subtitle_id);
+        var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
 
         if (this.onKeyUpText_ !== '') {
             editableCaption.setText(this.onKeyUpText_);
