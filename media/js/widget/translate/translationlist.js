@@ -61,7 +61,14 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
     this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_ || '';
 
     if (this.videoURL_.indexOf('vimeo.com') === -1) {
-        this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(this.baseLanguageSubtitles_);
+
+        if (this.dialog_.reviewOrApprovalType_) {
+            this.baseLanguageCaptionSet_ = this.captionSet_;
+        } else {
+            this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
+                    this.baseLanguageSubtitles_);
+        }
+
         this.captionManager_ =
             new unisubs.CaptionManager(
                 this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
