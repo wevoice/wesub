@@ -1328,12 +1328,8 @@ class SubtitleVersion(SubtitleCollection):
             #but some bug happen, I've no idea why
             Action.create_caption_handler(self, self.datetime_started)
             if self.user:
-                video = self.language.video
-                has_other_versions = SubtitleVersion.objects.filter(language__video=video) \
-                    .filter(user=self.user).exclude(pk=self.pk).exists()
-
-                if not has_other_versions:
-                    video.followers.add(self.user)
+                self.language.video.followers.remove(self.user)
+                self.language.followers.add(self.user)
 
     def changed_from(self, other_subs):
         my_subs = self.subtitles()
@@ -1524,6 +1520,13 @@ class SubtitleVersion(SubtitleCollection):
     def is_public(self):
         return self.moderation_status in [APPROVED, UNMODERATED]
 
+    @property
+    def is_translation(self):
+        return self.is_dependent()
+
+    @property
+    def is_transcription(self):
+        return not self.is_dependent()
 
     # Metadata
     def _get_metadata(self, key):
