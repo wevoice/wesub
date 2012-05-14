@@ -1301,10 +1301,12 @@ class TestCaching(TestCase):
 
             num = len(connection.queries)
 
-            rpc.show_widget(request_2,
+            response = rpc.show_widget(request_2,
                 'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
                 False)
 
+            self.assertTrue(0 < len(response['languages']))
+            self.assertTrue(0 != num)
             self.assertEquals(num, len(connection.queries))
 
         except Exception, e:
