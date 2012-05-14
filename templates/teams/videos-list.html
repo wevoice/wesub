@@ -101,7 +101,11 @@
             {% if is_paginated %}{% paginator %}{% endif %}
         {% else %}
             <p class="empty">
-                {% trans "Sorry, no videos here" %}
+                {% if is_indexing %}
+                    {% trans "Rebuilding video index" %}
+                {% else %}
+                    {% trans "Sorry, no videos here" %}
+                {% endif %}
                 ...
             </p>
         {% endif %}
