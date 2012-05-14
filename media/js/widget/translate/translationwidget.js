@@ -80,10 +80,8 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
 unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event) {
     this.onFocusText_ = this.translateInput_.value;
 
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
-        this.dialog_.getVideoPlayerInternal().setPlayheadTime(this.subtitle_['start_time']);
-        this.dialog_.getVideoPlayerInternal().pause();
-    }
+    this.dialog_.getVideoPlayerInternal().setPlayheadTime(this.subtitle_['start_time']);
+    this.dialog_.getVideoPlayerInternal().pause();
 };
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
     this.onKeyUpText_ = this.translateInput_.value;
