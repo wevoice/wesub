@@ -59,7 +59,7 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'html5') {
+    if (videoPlayerType !== 'vimeo') {
 
         if (this.dialog_.reviewOrApprovalType_) {
             this.baseLanguageCaptionSet_ = this.captionSet_;
@@ -93,7 +93,7 @@ unisubs.translate.TranslationList.prototype.enterDocument = function() {
     var handler = this.getHandler();
     var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'html5') {
+    if (videoPlayerType !== 'vimeo') {
 
         // Start loading the video.
         this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);

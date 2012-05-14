@@ -88,7 +88,7 @@ unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
 
     var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'html5') {
+    if (videoPlayerType !== 'vimeo') {
         var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
         var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
 
