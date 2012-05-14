@@ -1269,7 +1269,7 @@ class SubtitleVersionManager(models.Manager):
                 while id in ids:
                     id = int(random.random()*10e12)
 
-            ids.append(id)
+            ids.add(id)
 
             metadata = item.pop('metadata', None)
 
