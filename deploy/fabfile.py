@@ -801,6 +801,17 @@ def get_settings_values(*settings_names):
     _execute_on_all_hosts(lambda dir: _get_settings_values(dir, *settings_names))
 
 
+def test_access(is_sudo=False):
+    """
+    Makes sure the user can connect to all relevant hosts.
+    If any value is passed as an argument, makes sure the user can
+    connect and sudo on all hosts.
+    """
+    run_command = run
+    if is_sudo:
+        run_command = sudo
+    _execute_on_all_hosts(lambda dir: run_command('date'))
+
 try:
     from local_env import *
     def local (username):
