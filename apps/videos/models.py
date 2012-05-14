@@ -1231,7 +1231,7 @@ class SubtitleVersionManager(models.Manager):
         if version is not None:
             version_no = version.version_no + 1
 
-        forked = bool(translated_from)
+        forked = not bool(translated_from)
 
         version = SubtitleVersion(
                 language=language, version_no=version_no, note=note,
