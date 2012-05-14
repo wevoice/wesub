@@ -859,7 +859,8 @@ class SubtitleLanguage(models.Model):
 
     # has_version: Is there more than one version, and does the latest version
     # have more than 0 subtitles?
-    has_version = models.BooleanField(default=False, editable=False)
+    has_version = models.BooleanField(default=False, editable=False,
+            db_index=True)
 
     # had_version: Is there more than one version, and did some previous version
     # have more than 0 subtitles?
