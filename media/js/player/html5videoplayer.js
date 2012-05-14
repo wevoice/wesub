@@ -25,6 +25,7 @@ goog.provide('unisubs.player.Html5VideoPlayer');
  */
 unisubs.player.Html5VideoPlayer = function(videoSource, forDialog) {
     unisubs.player.Html5MediaPlayer.call(this, videoSource, forDialog);
+    this.videoPlayerType_ = 'html5';
 };
 goog.inherits(unisubs.player.Html5VideoPlayer,
               unisubs.player.Html5MediaPlayer);

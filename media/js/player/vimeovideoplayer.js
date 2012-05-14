@@ -57,6 +57,8 @@ unisubs.player.VimeoVideoPlayer = function(videoSource, opt_forDialog) {
     this.swfEmbedded_ = false;
     this.timeUpdateTimer_ = new goog.Timer(
         unisubs.player.AbstractVideoPlayer.TIMEUPDATE_INTERVAL);
+
+    this.videoPlayerType_ = 'vimeo';
 };
 goog.inherits(unisubs.player.VimeoVideoPlayer, unisubs.player.AbstractVideoPlayer);
 

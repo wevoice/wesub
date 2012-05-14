@@ -29,6 +29,7 @@ unisubs.player.JWVideoPlayer = function(videoSource) {
     this.timeListener_ = 'jwtime' + unisubs.randomString();
     this.playheadTime_ = 0;
     unisubs.player.JWVideoPlayer.players_.push(this);
+    this.videoPlayerType_ = 'jw';
 };
 goog.inherits(unisubs.player.JWVideoPlayer, 
               unisubs.player.FlashVideoPlayer);
