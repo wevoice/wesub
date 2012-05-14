@@ -96,6 +96,7 @@ unisubs.translate.TranslationList.prototype.enterDocument = function() {
 
         // Start loading the video.
         this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
+        this.dialog_.getVideoPlayerInternal().play();
         this.dialog_.getVideoPlayerInternal().pause();
 
         // Setup listening for video + subtitles.
