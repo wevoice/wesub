@@ -8,7 +8,14 @@
             {% endwith %}
         {% endif %}
     {% empty %}
-        <h3 style="color: #788b90; padding: 20px 0 20px 5px; clear:both;">{% trans "No video found" %}</h3>
+        <p class="empty">
+            {% if is_indexing %}
+                {% trans 'Rebuilding video index' %}
+            {% else %}
+                {% trans 'No videos found' %}
+            {% endif %}
+            ...
+        </p>
     {% endfor %}
 </ul><!--// video_list -->
 
