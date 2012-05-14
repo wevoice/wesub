@@ -99,6 +99,12 @@
                         $('.search-page').show();
                         $('#sidebar').html(data.sidebar);
                         callback.call(this, data);
+
+                        // Override default 'no videos' text if we 
+                        // think we're currently reindexing Solr
+                        if(data.is_indexing){
+                            $('.video_list .empty').html('Rebuilding video index...');
+                        }
                     }, this);
                 },
             });

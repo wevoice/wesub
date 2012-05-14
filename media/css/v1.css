@@ -183,7 +183,7 @@ body {
   margin-bottom: 2em;
 }
 
-.v1 .view .empty {
+p.empty {
   clear: both;
   color: #678ca3;
   font-size: 18px;

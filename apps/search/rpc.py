@@ -54,9 +54,13 @@ class SearchApiClass(object):
         output = render_page(rdata.get('page', 1), qs, 20, display_views=display_views)
         output['sidebar'] = render_to_string('search/_sidebar.html', dict(form=form, rdata=rdata))
 
+        # Assume we're currently indexing if the number of public
+        # indexed vids differs from the count of video objects by
+        # more than 1000
+        is_indexing = Video.objects.all().count() - VideoIndex.public().count() > 1000
+        output['is_indexing'] = is_indexing
+
         if testing:
             output['sqs'] = qs
 
         return output
-
-
