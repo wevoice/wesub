@@ -57,10 +57,9 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var map = this.captionSet_.makeMap();
 
-    // For some reason, YouTube video sources don't set the videoURL_ var. Ugh.
-    this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_ || '';
+    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'html5') {
 
         if (this.dialog_.reviewOrApprovalType_) {
             this.baseLanguageCaptionSet_ = this.captionSet_;
@@ -92,7 +91,9 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 unisubs.translate.TranslationList.prototype.enterDocument = function() {
     unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
     var handler = this.getHandler();
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
+
+    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'html5') {
 
         // Start loading the video.
         this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);

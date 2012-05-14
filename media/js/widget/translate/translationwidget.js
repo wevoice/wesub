@@ -86,7 +86,9 @@ unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
     this.onKeyUpText_ = this.translateInput_.value;
 
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
+
+    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'html5') {
         var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
         var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
 
