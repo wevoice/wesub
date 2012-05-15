@@ -1510,6 +1510,8 @@ class SubtitleVersion(SubtitleCollection):
 
     def is_synced(self):
         subtitles = self.subtitles()
+        if len(subtitles) == 0:
+            return False
         if len([s for s in subtitles[:-1] if not s.has_complete_timing()]) > 0:
             return False
         if not is_synced_value(subtitles[-1].start_time):
