@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-14 01:36-0500\n"
+"POT-Creation-Date: 2012-05-15 01:36-0500\n"
 "PO-Revision-Date: 2012-05-09 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Basque (http://www.transifex.net/projects/p/"
@@ -1193,7 +1193,7 @@ msgstr ""
 msgid "Views"
 msgstr ""
 
-#: apps/videos/models.py:1091
+#: apps/videos/models.py:1092
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
