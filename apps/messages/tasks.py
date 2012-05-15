@@ -580,7 +580,7 @@ def send_reject_notification(task_pk, sent_back):
     return msg, email_res
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
-SUBJECT_EMAIL_VIDEO_COMMENTED = "%s left a comment on the video %s"
+SUBJECT_EMAIL_VIDEO_COMMENTED = _(u"%(user)s left a comment on the video %(title)s")
 @task
 def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     """
@@ -640,7 +640,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     else:
         version_url = None
 
-    subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % (comment.user.username, video.title_display())
+    subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=str(comment.user), title=video.title_display())
 
     followers = set(video.notification_list(comment.user))
 

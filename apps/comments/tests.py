@@ -85,8 +85,8 @@ class CommentEmailTests(TestCase):
         send_video_comment_notification(self.comment.pk)
         self.assertEqual(len(mail.outbox), num_followers)
         email = mail.outbox[0]
-        self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % (self.comment.user.username,
-                                                                          self.video.title_display()))
+        self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=self.comment.user.username,
+                                                                          title=self.video.title_display()))
         return None
 
     def test_email_content(self):
@@ -109,8 +109,8 @@ class CommentEmailTests(TestCase):
         followers = set(self.video.notification_list(self.logged_user))
         self.assertEqual(len(mail.outbox), len(followers))
         email = mail.outbox[0]
-        self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % (self.comment.user.username,
-                                                                          self.video.title_display()))
+        self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=str(self.comment.user),
+                                                                          title=self.video.title_display()))
 
     def test_comment_view_for_language(self):
         num_followers = 2
@@ -122,6 +122,6 @@ class CommentEmailTests(TestCase):
         followers.update(lang.notification_list(self.logged_user))
         self.assertEqual(len(mail.outbox), len(followers))
         email = mail.outbox[0]
-        self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % (self.comment.user.username,
-                                                                          self.video.title_display()))
+        self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=self.comment.user.username,
+                                                                          title=self.video.title_display()))
         
