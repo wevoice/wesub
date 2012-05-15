@@ -184,13 +184,13 @@ class SubtitlesUploadBaseForm(forms.Form):
             sl = subtitle_language[0]
 
             if sl.is_writelocked and sl.writelock_owner != self.user:
-                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because there's already another user editing it."))
+                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because work on this language is already in progress."))
 
             # we can't let the user upload a subtitle to a language that already
             # have dependents. that will fork the dependents and make everything break.
             # see sifter #1075
             if video.subtitlelanguage_set.filter(standard_language=sl).exists():
-                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles - this language has dependents and it's going to fork them."))
+                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because the language you've chosen has dependents."))
 
         team_video = video.get_team_video()
 
