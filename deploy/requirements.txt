@@ -50,5 +50,4 @@ vendor/django-tastypie-0.9.11.tar.gz
 # this should be commented until we are sure we want to deploy this to prod
 #vendor/oboe-0.4.1.0.tar.gz
 vendor/requests-v0.9.1.0-0.tar.gz
-
--e git+git://github.com/gleicon/pyriemann.git@cd9f67d506#egg=riemann
+bernhard==0.0.2
