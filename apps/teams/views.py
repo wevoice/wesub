@@ -1180,7 +1180,7 @@ def team_tasks(request, slug, project_slug=None):
         'widget_settings': widget_settings,
         'filtered': filtered,
         'member': member,
-        'upload_draft_form': UploadDraftForm()
+        'upload_draft_form': UploadDraftForm(user=request.user)
     }
 
     context.update(pagination_info)
@@ -1349,23 +1349,19 @@ def assign_task_ajax(request, slug):
     else:
         return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
 
+import logging
 def upload_draft(request, slug):
 
     if request.POST:
-        form = UploadDraftForm(request.POST)
+        form = UploadDraftForm(request.user, request.POST, request.FILES)
 
         if form.is_valid():
-
-            team = get_object_or_404(Team, slug=slug)
-            task = form.cleaned_data['task']
-            draft = form.cleaned_data['draft']
-
-            # Parse the file, etc.
-
+            form.save()
             messages.success(request, _(u"Draft uploaded successfully."))
         else:
             messages.error(request, _(u"There was a problem uploading that draft."))
 
+        logging.error(form.errors)
         return HttpResponseRedirect(reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
     else:
         return HttpResponseBadRequest()

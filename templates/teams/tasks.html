@@ -270,10 +270,39 @@
                                                 {% endif %}
                                                 {% if task.assignee == user %}
                                                     <li>
-                                                        <a href="#upload-draft" class="open-modal upload-draft-button" data-task="{{ task.pk }}">Upload draft</a>
+                                                    <a href="#upload-draft-{{task.id}}" class="open-modal upload-draft-button" data-task="{{ task.pk }}">Upload draft</a>
                                                     </li>
                                                 {% endif %}
                                             </ul>
+                                            <div class="bootstrap">
+                                                <div class="modal" id="upload-draft-{{task.id}}" style="display: none">
+                                                    <form action="{% url teams:upload_draft slug=team.slug %}" method="post" enctype="multipart/form-data">
+                                                        <div class="modal-header">
+                                                            <a href="#" class="close">x</a>
+                                                            <h3>{% trans 'Upload draft' %}</h3>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            {% if not task.language %}
+                                                            <div class="ajaxChosen">
+                                                                <label>{% trans 'Language' %}</label>
+                                                                {{ upload_draft_form.language }}
+                                                            </div>
+                                                            {% endif %}
+                                                            <label for="id_draft">
+                                                                {% trans 'Draft:' %}
+                                                            </label>
+                                                            {{ upload_draft_form.draft }}
+                                                            <div class="hidden">
+                                                                <input type="hidden" name="task" id="task_id" value="{{ task.id }}" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            {% csrf_token %}
+                                                            <input type="submit" class="btn primary" value="Upload draft" />
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
                                         </div>
                                     {% endif %}
 
@@ -389,30 +418,6 @@
         {% endif %}
 
         {% if is_paginated %}{% paginator %}{% endif %}
-
-        <div class="bootstrap">
-            <div class="modal" id="upload-draft">
-                <form action="{% url teams:upload_draft slug=team.slug %}" method="post" enctype="multipart/form-data">
-                    <div class="modal-header">
-                        <a href="#" class="close">x</a>
-                        <h3>{% trans 'Upload draft' %}</h3>
-                    </div>
-                    <div class="modal-body">
-                        <label for="id_draft">
-                            Draft:
-                        </label>
-                        {{ upload_draft_form.draft }}
-                        <div class="hidden">
-                            {{ upload_draft_form.task }}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        {% csrf_token %}
-                        <input type="submit" class="btn primary" value="Upload draft" />
-                    </div>
-                </form>
-            </div>
-        </div>
 
     </div>
     <script id="IMAGE_PRELOADER" type="text/html">
