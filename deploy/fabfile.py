@@ -379,7 +379,7 @@ def _update_environment(base_dir, flags=''):
         _git_pull()
         run('export PIP_REQUIRE_VIRTUALENV=true')
         # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
-        run('yes i | {0}/env/bin/pip install {1} -E {0}/env/ -r requirements.txt'.format(base_dir, flags), pty=True)
+        run('yes i | {0}/env/bin/pip install {1} -r requirements.txt'.format(base_dir, flags), pty=True)
         #_clear_permissions(os.path.join(base_dir, 'env'))
 
 def update_environment(flags=''):
