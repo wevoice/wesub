@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-15 01:34-0500\n"
+"POT-Creation-Date: 2012-05-16 01:35-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -280,6 +280,11 @@ msgstr ""
 
 #: apps/messages/tasks.py:486 apps/messages/tasks.py:540
 msgid "Your subtitles have been declined"
+msgstr ""
+
+#: apps/messages/tasks.py:583
+#, python-format
+msgid "%(user)s left a comment on the video %(title)s"
 msgstr ""
 
 #: apps/messages/views.py:123
@@ -1193,194 +1198,194 @@ msgid ""
 "language you are uploading or a translation of it"
 msgstr ""
 
-#: apps/videos/models.py:1842
+#: apps/videos/models.py:1844
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1847
+#: apps/videos/models.py:1849
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1852
+#: apps/videos/models.py:1854
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1857
+#: apps/videos/models.py:1859
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1862
+#: apps/videos/models.py:1864
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1867
+#: apps/videos/models.py:1869
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1869
+#: apps/videos/models.py:1871
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr ""
 
-#: apps/videos/models.py:1875
+#: apps/videos/models.py:1877
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1877
+#: apps/videos/models.py:1879
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1892
+#: apps/videos/models.py:1894
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1894
+#: apps/videos/models.py:1896
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1897
+#: apps/videos/models.py:1899
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1899
+#: apps/videos/models.py:1901
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1907
+#: apps/videos/models.py:1909
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1909
+#: apps/videos/models.py:1911
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1920
+#: apps/videos/models.py:1922
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1922
+#: apps/videos/models.py:1924
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1928
+#: apps/videos/models.py:1930
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1930
+#: apps/videos/models.py:1932
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1935
+#: apps/videos/models.py:1937
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr ""
 
-#: apps/videos/models.py:1940
+#: apps/videos/models.py:1942
 #, python-format
 msgid "left the %s team"
 msgstr ""
 
-#: apps/videos/models.py:1996
+#: apps/videos/models.py:1998
 msgid "add video"
 msgstr ""
 
-#: apps/videos/models.py:1997
+#: apps/videos/models.py:1999
 msgid "change title"
 msgstr ""
 
-#: apps/videos/models.py:1998
+#: apps/videos/models.py:2000
 msgid "comment"
 msgstr ""
 
-#: apps/videos/models.py:1999
+#: apps/videos/models.py:2001
 msgid "add version"
 msgstr ""
 
-#: apps/videos/models.py:2000
+#: apps/videos/models.py:2002
 msgid "add translation"
 msgstr ""
 
-#: apps/videos/models.py:2001
+#: apps/videos/models.py:2003
 msgid "add video url"
 msgstr ""
 
-#: apps/videos/models.py:2002
+#: apps/videos/models.py:2004
 msgid "request subtitles"
 msgstr ""
 
-#: apps/videos/models.py:2003
+#: apps/videos/models.py:2005
 msgid "approve version"
 msgstr ""
 
-#: apps/videos/models.py:2004
+#: apps/videos/models.py:2006
 msgid "add contributor"
 msgstr ""
 
-#: apps/videos/models.py:2005
+#: apps/videos/models.py:2007
 msgid "remove contributor"
 msgstr ""
 
-#: apps/videos/models.py:2006
+#: apps/videos/models.py:2008
 msgid "reject version"
 msgstr ""
 
-#: apps/videos/models.py:2007
+#: apps/videos/models.py:2009
 msgid "review version"
 msgstr ""
 
-#: apps/videos/models.py:2008
+#: apps/videos/models.py:2010
 msgid "accept version"
 msgstr ""
 
-#: apps/videos/models.py:2009
+#: apps/videos/models.py:2011
 msgid "decline version"
 msgstr ""
 
-#: apps/videos/models.py:2010
+#: apps/videos/models.py:2012
 msgid "delete video"
 msgstr ""
 
-#: apps/videos/models.py:2260
+#: apps/videos/models.py:2262
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -4477,7 +4482,7 @@ msgid "You have no sent messages."
 msgstr ""
 
 #: templates/messages/email/comment-notification.html:28
-#: templates/videos/email_notification.html:38
+#: templates/videos/email_notification.html:29
 #: templates/videos/email_notification_non_editors.html:24
 msgid "Stop watching for changes on this video"
 msgstr ""
@@ -6773,28 +6778,46 @@ msgid ""
 "                "
 msgstr ""
 
-#: templates/videos/email_notification.html:36
+#: templates/videos/email_notification.html:27
 #: templates/videos/email_notification_non_editors.html:23
 msgid "Compare the new version to the last version"
 msgstr ""
 
-#: templates/videos/email_notification.html:37
+#: templates/videos/email_notification.html:28
 msgid "Compare your work to the new version"
 msgstr ""
 
-#: templates/videos/email_notification.html:46
+#: templates/videos/email_notification.html:38
+#: templates/videos/email_notification.html:66
+#: templates/videos/email_notification.html:94
 #: templates/videos/email_notification_non_editors.html:32
+#: templates/videos/email_notification_non_editors.html:60
+#: templates/videos/email_notification_non_editors.html:88
 msgid "Old Text"
 msgstr ""
 
-#: templates/videos/email_notification.html:49
+#: templates/videos/email_notification.html:41
 #: templates/videos/email_notification_non_editors.html:35
-msgid "Changes to Subtitle Text"
+msgid "Changes to title"
 msgstr ""
 
-#: templates/videos/email_notification.html:52
+#: templates/videos/email_notification.html:44
+#: templates/videos/email_notification.html:72
+#: templates/videos/email_notification.html:100
 #: templates/videos/email_notification_non_editors.html:38
+#: templates/videos/email_notification_non_editors.html:66
+#: templates/videos/email_notification_non_editors.html:94
 msgid "New Text"
+msgstr ""
+
+#: templates/videos/email_notification.html:69
+#: templates/videos/email_notification_non_editors.html:63
+msgid "Changes to description"
+msgstr ""
+
+#: templates/videos/email_notification.html:97
+#: templates/videos/email_notification_non_editors.html:91
+msgid "Changes to Subtitle Text"
 msgstr ""
 
 #: templates/videos/email_notification_non_editors.html:9
