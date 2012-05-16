@@ -265,7 +265,7 @@
                                                 {% endif %}
                                                 {% if task.subtitle_version %}
                                                     <li>
-                                                        <a href="">{% trans 'Download draft' %}</a>
+                                                    <a href="#download-draft-{{task.id}}" class="open-modal upload-draft-button">{% trans 'Download draft' %}</a>
                                                     </li>
                                                 {% endif %}
                                                 {% if task.assignee == user %}
@@ -301,6 +301,37 @@
                                                             <input type="submit" class="btn primary" value="Upload draft" />
                                                         </div>
                                                     </form>
+                                                </div>
+                                            </div>
+                                            <div class="bootstrap">
+                                                <div class="modal" id="download-draft-{{task.id}}" style="display: none">
+                                                    <div class="sort_button action">
+                                                        <div class='arrow'>
+                                                        </div>
+                                                        <span class="sort_label">
+                                                            <strong>{% trans 'Download' %}</strong>
+                                                        </span>
+                                                        <ul>
+                                                            <li>
+                                                            <a href="{% url teams:download_draft slug=team.slug task_pk=task.id type='srt' %}">SRT</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{% url teams:download_draft slug=team.slug task_pk=task.id type='ssa' %}">SSA</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{% url teams:download_draft slug=team.slug task_pk=task.id type='ttml' %}">TTML</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{% url teams:download_draft slug=team.slug task_pk=task.id type='txt' %}">TXT</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{% url teams:download_draft slug=team.slug task_pk=task.id type='sbv' %}">SBV</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{% url teams:download_draft slug=team.slug task_pk=task.id type='dfxp' %}">DFXP</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

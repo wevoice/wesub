@@ -30,6 +30,7 @@ from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import iri_to_uri
 from django.views.generic.list_detail import object_list
 
 import teams.moderation_const as MODERATION
@@ -75,6 +76,7 @@ from videos.tasks import (
 from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
+from widget.srt_subs import GenerateSubtitlesHandler
 
 
 import sentry_logger # Magical import to make Sentry's error recording happen.
@@ -1363,6 +1365,40 @@ def upload_draft(request, slug):
         return HttpResponseRedirect(reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
     else:
         return HttpResponseBadRequest()
+
+# copied a lot of those from widget/views.py:download_subtitles
+# we need to make them share some code. for sure.
+def download_draft(request, slug, task_pk, type="srt"):
+    task = Task.objects.get(pk=task_pk)
+    team = get_object_or_404(Team,slug=slug)
+
+    if task.team != team:
+        return HttpResponseForbidden(_(u'You are not allowed to download this transcript.'))
+
+    if type not in GenerateSubtitlesHandler:
+        raise Http404
+
+    subtitle = GenerateSubtitlesHandler[type].create(task.subtitle_version)
+    response = HttpResponse(unicode(subtitle), mimetype="text/plain")
+    original_filename = '%s.%s' % (task.subtitle_version.video.lang_filename(task.language), subtitle.file_type)
+
+    if not 'HTTP_USER_AGENT' in request.META or u'WebKit' in request.META['HTTP_USER_AGENT']:
+        # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
+        filename_header = 'filename=%s' % original_filename.encode('utf-8')
+    elif u'MSIE' in request.META['HTTP_USER_AGENT']:
+        try:
+            original_filename.encode('ascii')
+        except UnicodeEncodeError:
+            original_filename = 'subtitles.' + subtitle.file_type
+
+        filename_header = 'filename=%s' % original_filename
+    else:
+        # For others like Firefox, we follow RFC2231 (encoding extension in HTTP headers).
+        filename_header = 'filename*=UTF-8\'\'%s' % iri_to_uri(original_filename.encode('utf-8'))
+
+    response['Content-Disposition'] = 'attachment; ' + filename_header
+
+    return response
 
 # Projects
 def project_list(request, slug):

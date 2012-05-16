@@ -481,7 +481,10 @@ class Video(models.Model):
 
         """
         name = self.filename
-        lang = language.language or u'original'
+        if not isinstance(language, basestring):
+            lang = language.language or u'original'
+        else:
+            lang = language
         return u'%s.%s' % (name, lang)
 
     @property
