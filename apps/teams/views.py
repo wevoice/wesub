@@ -1349,7 +1349,6 @@ def assign_task_ajax(request, slug):
     else:
         return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
 
-import logging
 def upload_draft(request, slug):
 
     if request.POST:
@@ -1361,7 +1360,6 @@ def upload_draft(request, slug):
         else:
             messages.error(request, _(u"There was a problem uploading that draft."))
 
-        logging.error(form.errors)
         return HttpResponseRedirect(reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
     else:
         return HttpResponseBadRequest()
