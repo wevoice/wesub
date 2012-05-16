@@ -88,6 +88,11 @@
                         <option value="{{ request.path }}{% query_string request.GET assignee='' page='' %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
                         <option value="{% query_string request.GET assignee='me' page='' %}" {% if request.GET.assignee == 'me' %}selected="selected"{% endif %}>{% trans 'me' %}</option>
                         <option value="{% query_string request.GET assignee='none' page='' %}" {% if request.GET.assignee == 'none' %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
+                        {% with request.GET.assignee as assigned %}
+                            {% if assigned and assigned != 'none' and assigned != 'me' %}
+                                <option value="{% query_string request.GET assignee=assigned page='' %}" selected="selected">{{ assigned }}</option>
+                            {% endif %}
+                        {% endwith %}
                     </select>
                 </div>
                 <div class="filter-chunk">

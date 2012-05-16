@@ -26,7 +26,9 @@ goog.provide('unisubs.CaptionManager');
  */
 unisubs.CaptionManager = function(videoPlayer, captionSet) {
     goog.events.EventTarget.call(this);
+
     this.captions_ = captionSet.captionsWithTimes();
+
     this.binaryCompare_ = function(time, caption) {
 	return time - caption.getStartTime();
     };

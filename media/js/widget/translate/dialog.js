@@ -30,7 +30,9 @@ unisubs.translate.Dialog = function(opener, serverModel, videoSource, subtitleSt
     this.standardSubState_ = standardSubState;
 
     this.serverModel_ = serverModel;
+
     this.serverModel_.init();
+
     this.saved_ = false;
     this.rightPanelListener_ = new goog.events.EventHandler(this);
     this.reviewOrApprovalType_ = reviewOrApprovalType;
@@ -268,8 +270,11 @@ unisubs.translate.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
     
     if (this.state_ == s.TRANSLATE){
         this.translationPanel_ =  new unisubs.translate.TranslationPanel(
-            this.serverModel_.getCaptionSet(), this.standardSubState_, this, 
-            this.reviewOrApprovalType_, this.serverModel_);
+            this.serverModel_.getCaptionSet(),
+            this.standardSubState_,
+            this, 
+            this.reviewOrApprovalType_,
+            this.serverModel_);
         return this.translationPanel_; 
     }
     else if (this.state_ == s.EDIT_METADATA)
@@ -328,4 +333,8 @@ unisubs.translate.Dialog.prototype.disposeCurrentPanels_ = function() {
         this.timelineSubtitleSet_.dispose();
         this.timelineSubtitleSet_ = null;
     }
+};
+unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
+    var c = event.caption;
+    this.getVideoPlayerInternal().showCaptionText(c ? c.getText() : '');
 };

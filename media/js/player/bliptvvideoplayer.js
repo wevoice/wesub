@@ -46,6 +46,8 @@ unisubs.player.BlipTvVideoPlayer = function(videoSource, opt_forDialog){
     this.delayer_ = null;
 
     this.isPlaying_ = false;
+
+    this.videoPlayerType_ = 'bliptv';
 }
 
 goog.inherits(unisubs.player.BlipTvVideoPlayer, unisubs.player.AbstractVideoPlayer);

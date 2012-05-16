@@ -29,6 +29,7 @@ unisubs.player.FlashVideoPlayer = function(videoSource) {
     this.decorateAttemptCount_ = 0;
     this.decorated_ = false;
     this.successfullyDecorated_ = false;
+    this.videoPlayerType_ = 'flash';
 };
 goog.inherits(unisubs.player.FlashVideoPlayer,
               unisubs.player.AbstractVideoPlayer);

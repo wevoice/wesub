@@ -23,6 +23,7 @@ goog.provide('unisubs.player.WistiaVideoPlayer');
  */
 unisubs.player.WistiaVideoPlayer = function() {
     unisubs.player.FlashVideoPlayer.call(this, null);
+    this.videoPlayerType_ = 'wistia';
 };
 goog.inherits(unisubs.player.WistiaVideoPlayer,
               unisubs.player.FlashVideoPlayer);

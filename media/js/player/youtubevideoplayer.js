@@ -48,6 +48,8 @@ unisubs.player.YoutubeVideoPlayer = function(videoSource, opt_forDialog) {
         unisubs.player.AbstractVideoPlayer.TIMEUPDATE_INTERVAL);
     goog.mixin(unisubs.player.YoutubeVideoPlayer.prototype,
                unisubs.player.YoutubeBaseMixin.prototype);
+
+    this.videoPlayerType_ = 'youtube';
 };
 goog.inherits(unisubs.player.YoutubeVideoPlayer, unisubs.player.FlashVideoPlayer);
 

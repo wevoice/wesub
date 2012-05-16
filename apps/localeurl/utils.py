@@ -120,6 +120,7 @@ def universal_url( *args, **kwargs):
         original = urlresolvers.reverse(*args, **kwargs)
     except Exception :
         logger.exception("Failed to resolve universal url") 
+        return
     return "%s://%s%s" % (protocol, Site.objects.get_current().domain,
                      strip_path(original)[1])
     

@@ -859,7 +859,8 @@ class SubtitleLanguage(models.Model):
 
     # has_version: Is there more than one version, and does the latest version
     # have more than 0 subtitles?
-    has_version = models.BooleanField(default=False, editable=False)
+    has_version = models.BooleanField(default=False, editable=False,
+            db_index=True)
 
     # had_version: Is there more than one version, and did some previous version
     # have more than 0 subtitles?
@@ -1318,12 +1319,8 @@ class SubtitleVersion(SubtitleCollection):
             #but some bug happen, I've no idea why
             Action.create_caption_handler(self, self.datetime_started)
             if self.user:
-                video = self.language.video
-                has_other_versions = SubtitleVersion.objects.filter(language__video=video) \
-                    .filter(user=self.user).exclude(pk=self.pk).exists()
-
-                if not has_other_versions:
-                    video.followers.add(self.user)
+                self.language.video.followers.remove(self.user)
+                self.language.followers.add(self.user)
 
     def changed_from(self, other_subs):
         my_subs = self.subtitles()
@@ -1514,6 +1511,13 @@ class SubtitleVersion(SubtitleCollection):
     def is_public(self):
         return self.moderation_status in [APPROVED, UNMODERATED]
 
+    @property
+    def is_translation(self):
+        return self.is_dependent()
+
+    @property
+    def is_transcription(self):
+        return not self.is_dependent()
 
     # Metadata
     def _get_metadata(self, key):
@@ -1554,11 +1558,8 @@ def update_followers(sender, instance, created, **kwargs):
     user = instance.user
     lang = instance.language
     if created and user and user.notify_by_email:
-        if not SubtitleVersion.objects.filter(user=user).exists():
-            #If user edited before it should be in followers, or removed yourself,
-            #so we should not add again
-            lang.followers.add(instance.user)
-            lang.video.followers.add(instance.user)
+        lang.followers.add(instance.user)
+        lang.video.followers.add(instance.user)
 
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)

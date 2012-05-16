@@ -165,22 +165,22 @@
                         </span>
                         <ul>
                             <li>
-                                <a href="{% url widget:download_srt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">SRT</a>
+                            <a href="{% url widget:download_srt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">SRT</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_ssa %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">SSA</a>
+                                <a href="{% url widget:download_ssa %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">SSA</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_ttml %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">TTML</a>
+                                <a href="{% url widget:download_ttml %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">TTML</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_txt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">TXT</a>
+                                <a href="{% url widget:download_txt %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">TXT</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_sbv %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">SBV</a>
+                                <a href="{% url widget:download_sbv %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">SBV</a>
                             </li>
                             <li>
-                                <a href="{% url widget:download_dxfp %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}">DFXP</a>
+                                <a href="{% url widget:download_dxfp %}?video_id={{ video.video_id }}{% if not language.is_original %}&lang_pk={{ language.pk }}{% endif %}&revision={{ last_version.version_no }}">DFXP</a>
                             </li>
                         </ul>
                     </div>
@@ -299,7 +299,15 @@
                         <li>
                             <h3>
                                 <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
-                                <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang=item.language.language,lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+
+                                {% if not item.language.language %}
+                                    {# Hack to work around SubtitleLanguages with blank language attributes. #}
+                                    {# Once those are gone we can remove this. #}
+                                    <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang="unknown",lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                {% else %}
+                                    <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang=item.language.language,lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                {% endif %}
+
                                 {% if item.moderation_status == 'waiting_moderation' %}
                                     (draft)
                                 {% endif %}

@@ -1,8 +1,9 @@
-1Amara00:00:03,018
+1
+00:00:00,004 --> 00:00:03,018
 We started Universal Subtitles because we believe
 
 2
-00:00:03,01Amara
+00:00:03,018 --> 00:00:06,075
 every video on the web should be subtitle-able.
 
 3
@@ -37,7 +38,7 @@ After that, tap on your keyboard to sync them with the video.
 00:00:44,071 --> 00:00:47,052
 Then you're done— we give you an embed code for the video
 
-Amara> 00:00:49,089
+00:00:47,052 --> 00:00:49,089
 that you can put on any website
 
 12

@@ -53,6 +53,7 @@ unisubs.player.AbstractVideoPlayer = function(videoSource) {
             'players length is now ' + unisubs.player.AbstractVideoPlayer.players.length);
     }
 };
+
 goog.inherits(unisubs.player.AbstractVideoPlayer, goog.ui.Component);
 unisubs.player.AbstractVideoPlayer.PROGRESS_INTERVAL = 500;
 unisubs.player.AbstractVideoPlayer.TIMEUPDATE_INTERVAL = 80;
@@ -76,12 +77,12 @@ unisubs.player.AbstractVideoPlayer.players = [];
  * Used for flash-based video players that don't have a size specified.
  */
 unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE = new goog.math.Size(480, 360);
+
 /**
  *
  * Used for all video players in the dialog.
  */
 unisubs.player.AbstractVideoPlayer.DIALOG_SIZE = new goog.math.Size(400, 300);
-
 
 unisubs.player.AbstractVideoPlayer.prototype.createDom = function() {
     this.setElementInternal(this.getDomHelper().createElement('span'));
@@ -101,7 +102,6 @@ unisubs.player.AbstractVideoPlayer.prototype.createDom = function() {
     }
 
 };
-
 unisubs.player.AbstractVideoPlayer.prototype.getPlayheadFn = function() {
     return goog.bind(this.getPlayheadTime, this);
 };
@@ -111,7 +111,9 @@ unisubs.player.AbstractVideoPlayer.prototype.isPaused = function() {
     }
     return this.isPausedInternal();
 };
+
 unisubs.player.AbstractVideoPlayer.prototype.isPausedInternal = goog.abstractMethod;
+
 unisubs.player.AbstractVideoPlayer.prototype.isPlaying = function() {
     if (this.isLoadingStopped_){
 	    throw new Error("can't check if playing, loading is stopped");
@@ -119,7 +121,9 @@ unisubs.player.AbstractVideoPlayer.prototype.isPlaying = function() {
     
     return this.isPlayingInternal();
 };
+
 unisubs.player.AbstractVideoPlayer.prototype.isPlayingInternal = goog.abstractMethod;
+
 unisubs.player.AbstractVideoPlayer.prototype.videoEnded = function() {
     if (this.isLoadingStopped_) {
 	    throw new Error("can't check if video ended, loading is stopped");
@@ -127,7 +131,9 @@ unisubs.player.AbstractVideoPlayer.prototype.videoEnded = function() {
     
     return this.videoEndedInternal();
 };
+
 unisubs.player.AbstractVideoPlayer.prototype.videoEndedInternal = goog.abstractMethod;
+
 unisubs.player.AbstractVideoPlayer.prototype.play = function(opt_suppressEvent) {
     if (this.isLoadingStopped_){
 	    throw new Error("can't play, loading is stopped");
@@ -138,7 +144,9 @@ unisubs.player.AbstractVideoPlayer.prototype.play = function(opt_suppressEvent) 
             unisubs.player.AbstractVideoPlayer.EventType.PLAY_CALLED);
     this.playInternal();
 };
+
 unisubs.player.AbstractVideoPlayer.prototype.playInternal = goog.abstractMethod;
+
 unisubs.player.AbstractVideoPlayer.prototype.pause = function(opt_suppressEvent) {
     if (this.isLoadingStopped_){
     	throw new Error("can't pause, loading is stopped");
@@ -150,7 +158,9 @@ unisubs.player.AbstractVideoPlayer.prototype.pause = function(opt_suppressEvent)
 
     this.pauseInternal();
 };
+
 unisubs.player.AbstractVideoPlayer.prototype.pauseInternal = goog.abstractMethod;
+
 unisubs.player.AbstractVideoPlayer.prototype.togglePause = function() {
     if (this.isLoadingStopped_) {
 	    throw new Error("can't toggle pause, loading is stopped");
@@ -165,6 +175,7 @@ unisubs.player.AbstractVideoPlayer.prototype.togglePause = function() {
 unisubs.player.AbstractVideoPlayer.prototype.isLoadingStopped = function() {
   return this.isLoadingStopped_;  
 };
+
 /**
  * @protected
  */
@@ -181,7 +192,9 @@ unisubs.player.AbstractVideoPlayer.prototype.stopLoading = function() {
         }
     }
 };
+
 unisubs.player.AbstractVideoPlayer.prototype.stopLoadingInternal = goog.abstractMethod;
+
 unisubs.player.AbstractVideoPlayer.prototype.resumeLoading = function() {
     if (this.isLoadingStopped_) {
         this.resumeLoadingInternal(this.storedPlayheadTime_);
@@ -191,6 +204,7 @@ unisubs.player.AbstractVideoPlayer.prototype.resumeLoading = function() {
 unisubs.player.AbstractVideoPlayer.prototype.resumeLoadingInternal = function(playheadTime) {
     goog.abstractMethod();
 };
+
 /**
  * @protected
  * Must be called by subclasses once they know their dimensions.
@@ -234,6 +248,7 @@ unisubs.player.AbstractVideoPlayer.prototype.getPlayheadTime = function() {
 };
 
 unisubs.player.AbstractVideoPlayer.prototype.getPlayheadTimeInternal = goog.abstractMethod;
+
 /**
  * 
  *
@@ -250,12 +265,14 @@ unisubs.player.AbstractVideoPlayer.prototype.playWithNoUpdateEvents = function(t
     this.noUpdateStartTime_ = timeToStart;
     this.noUpdateEndTime_ = timeToStart + secondsToPlay;
 };
+
 /**
  * @protected
  */
 unisubs.player.AbstractVideoPlayer.prototype.dispatchEndedEvent = function() {
     this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PLAY_ENDED);
 };
+
 unisubs.player.AbstractVideoPlayer.prototype.sendTimeUpdateInternal = function() {
     if (!this.noUpdateEvents_) {
         this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.TIMEUPDATE);
@@ -269,29 +286,35 @@ unisubs.player.AbstractVideoPlayer.prototype.sendTimeUpdateInternal = function()
             this.noUpdateEvents_ = false;
         }
     }
-}
+};
+
 /**
  * @returns {number} video duration in seconds. Returns 0 if duration isn't
  *     available yet.
  */
 unisubs.player.AbstractVideoPlayer.prototype.getDuration = goog.abstractMethod;
+
 /**
  * @returns {int} Number of buffered ranges.
  */
 unisubs.player.AbstractVideoPlayer.prototype.getBufferedLength = goog.abstractMethod;
+
 /**
  * @returns {number} Start of buffered range with index
  */
 unisubs.player.AbstractVideoPlayer.prototype.getBufferedStart = function(index) {
     goog.abstractMethod();
 };
+
 unisubs.player.AbstractVideoPlayer.prototype.getBufferedEnd = function(index) {
     goog.abstractMethod();
 };
+
 /**
  * @return {number} 0.0 to 1.0
  */
 unisubs.player.AbstractVideoPlayer.prototype.getVolume = goog.abstractMethod;
+
 /**
  * @return {Array.<Element>} Video elements on the page represented by this player.
  *     Sometimes for a flash-based player, this is two elements: the object and the
@@ -310,23 +333,20 @@ unisubs.player.AbstractVideoPlayer.prototype.videoElementsContain = function(ele
 unisubs.player.AbstractVideoPlayer.prototype.setVolume = function(volume) {
     this.rememberVolume_(volume);
 };
-
 unisubs.player.AbstractVideoPlayer.prototype.rememberVolume_ = function (volume){
     unisubs.UserSettings.setFloatValue(unisubs.player.AbstractVideoPlayer.VOLUME_SETTING_NAME, volume)
 }
-
 unisubs.player.AbstractVideoPlayer.prototype.fetchLastSetVolume_ = function (volume){
     return unisubs.UserSettings.getFloatValue(unisubs.player.AbstractVideoPlayer.VOLUME_SETTING_NAME,  1)
 }
-
 unisubs.player.AbstractVideoPlayer.prototype.restorePreviousVolume_ = function (){
     var vol = this.fetchLastSetVolume_();
     this.setVolume(vol);
 }
-
 unisubs.player.AbstractVideoPlayer.prototype.getVideoSource = function() {
     return this.videoSource_;
 };
+
 /*
  * @param {Number} playheadTime The time (in seconds) to move the playhead to.
  * @param {bool=} skipsUpdateEvent If true will not dispatch the event 

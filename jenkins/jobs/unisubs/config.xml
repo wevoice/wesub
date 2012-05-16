@@ -132,7 +132,7 @@ nosetests sel_js_unittests.py sg_64_submit.py:subgroup_64.test_534 sg_88_teams.p
     <hudson.plugins.ircbot.IrcPublisher>
       <targets>
         <hudson.plugins.im.GroupChatIMMessageTarget>
-          <name>#universalsubtitles</name>
+          <name>#amara</name>
           <password></password>
         </hudson.plugins.im.GroupChatIMMessageTarget>
       </targets>

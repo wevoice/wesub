@@ -36,7 +36,7 @@ from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
 from messages.models import Message
-from teams.moderation_const import WAITING_MODERATION
+from teams.moderation_const import WAITING_MODERATION, UNMODERATED
 from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
     ROLE_CONTRIBUTOR
@@ -1601,6 +1601,9 @@ class Task(models.Model):
             type = Task.TYPE_IDS['Subtitle']
         else:
             type = Task.TYPE_IDS['Translate']
+
+        self.subtitle_version.moderation_status = UNMODERATED
+        self.subtitle_version.save()
 
         task = Task(team=self.team, team_video=self.team_video,
                     subtitle_version=self.subtitle_version,

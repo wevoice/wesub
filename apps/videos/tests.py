@@ -29,8 +29,12 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
+from django.contrib.contenttypes.models import ContentType
 
+from comments.forms import CommentForm
+from comments.models import Comment
 from apps.auth.models import CustomUser as User
+from messages.models import Message
 from teams.models import Team, TeamVideo, Workflow, TeamMember
 from testhelpers.views import _create_videos
 from utils import SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser
@@ -543,44 +547,6 @@ class UploadSubtitlesTest(WebUseTest):
         response = self.client.post(reverse('videos:upload_subtitles'), data)
         self.assertEqual(response.status_code, 200)
 
-    def test_upload_forks(self):
-        request = RequestMockup(User.objects.all()[0])
-        session = create_two_sub_dependent_session(request)
-        video = session.video
-        translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-        self.assertFalse(translated.is_forked)
-        self.assertEquals(False, translated.latest_version(public_only=True).is_forked)
-
-        self._login()
-        data = self._make_data(lang='en', video_pk=video.pk)
-        translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-        trans_subs_before = list(translated.version().subtitle_set.all())
-
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-
-        translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-        self.assertTrue(translated.is_forked)
-
-        original_subs = video.subtitlelanguage_set.get(language='en').version().subtitle_set.all()
-
-        trans_subs_after = translated.version().subtitle_set.all()
-        # we want to make sure we did not have a time data
-        # but we do now, and text hasn't changed
-        for old_sub, new_sub in zip(trans_subs_before, trans_subs_after):
-            self.assertEqual(old_sub.subtitle_text, new_sub.subtitle_text)
-            self.assertTrue(bool(new_sub.start_time))
-            self.assertTrue(bool(new_sub.end_time))
-            self.assertTrue(old_sub.start_time is None)
-            self.assertTrue(old_sub.end_time is None)
-
-        # now change the translated
-        sub_0= original_subs[1]
-        sub_0.start_time = 1.0
-        sub_0.save()
-        original_subs = video.subtitlelanguage_set.get(language='en').version().subtitle_set.all()
-        self.assertNotEqual(sub_0.start_time , original_subs[0].start_time)
-
     def test_upload_respects_lock(self):
         request = RequestMockup(User.objects.all()[0])
         session = create_two_sub_dependent_session(request)
@@ -596,39 +562,6 @@ class UploadSubtitlesTest(WebUseTest):
         data = json.loads(response.content[10:-11])
         self.assertFalse(data['success'])
 
-
-    def test_translations_get_order_after_fork(self):
-          # we create en -> es
-          # new es has no time data, but does have order
-          request = RequestMockup(User.objects.all()[0])
-          session = create_two_sub_dependent_session(request)
-          video = session.video
-          translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-          for sub in translated.version().subtitle_set.all():
-              self.assertTrue(sub.start_time is None)
-              self.assertTrue(sub.end_time is None)
-              self.assertTrue(sub.subtitle_order is None)
-          for sub in video.subtitle_language().version().subtitle_set.all():
-              self.assertTrue(sub.start_time is not  None)
-              self.assertTrue(sub.end_time is not None)
-              self.assertTrue(sub.subtitle_order is not None)
-          # we upload a new english
-          data = self._make_data(lang='en', video_pk=video.pk)
-          self._login()
-
-          response = self.client.post(reverse('videos:upload_subtitles'), data)
-          self.assertTrue (len(video.version().subtitles()) > len(translated.version().subtitles()))
-          self.assertEqual(response.status_code, 200)
-          # now es is forked, which means that it must have timing data AND keep the same ordering from
-          translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-          self.assertTrue(translated.is_forked)
-          translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-          subs_trans  = translated.version().subtitle_set.all()
-          for sub in subs_trans:
-              self.assertTrue(sub.start_time is not None)
-              self.assertTrue(sub.end_time is not None)
-              self.assertTrue(sub.subtitle_order is not None)
-              self.assertTrue(sub.subtitle_id is not None)
 
     def test_upload_then_rollback_preservs_dependends(self):
         self._login()
@@ -987,7 +920,6 @@ class ViewsTest(WebUseTest):
         self.assertEqual(len(version.subtitles()), 2)
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn(self.user.email, mail.outbox[0].to[0])
-        self.assertTrue(self.video.followers.filter(pk=user1.pk).exists())
 
     def test_paste_transcription_windows(self):
         self._login()
@@ -1500,8 +1432,11 @@ class TestTasks(TestCase):
     fixtures = ['test.json']
 
     def setUp(self):
+        self.user = User.objects.get(pk=2)
         self.video = Video.objects.all()[:1].get()
         self.language = self.video.subtitle_language()
+        self.language.language = 'en'
+        self.language.save()
         self.latest_version = self.language.latest_version(public_only=True)
 
         self.latest_version.user.notify_by_email = True
@@ -1536,13 +1471,78 @@ class TestTasks(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_notification_sending(self):
+        """
+        Make the system send updates only on the object being followed
+        (language vs. video).
+
+        The following is taken directly from the ticket
+        -----------------------------------------------
+
+        1. Followers of a video (submitter + anyone who chose to follow the
+            video) should:
+
+            * Be listed as followers for each language of this video
+            * Get notifications about any changes made to the video or any of
+                the related languages.
+            * Get notifications about any comments left on the video or any of
+                the related videos.
+
+        2. Followers of a language (followers of language +
+            transcriber(s)/translator(s) + editor(s) + anyone who chose to
+            follow the language) should:
+
+            * Get notifications about any changes made to the subtitles in
+                this language, but not in any other language for the same video.
+            * Get notifications about comments made on the subtitles in this
+                language, but not in any other language for the video, nor on
+                the video as a whole entity.
+        """
+
+        # Video is submitted by self.user (pk 2, admin@mail.net)
+        # The submitter is automatically added to followers via the
+        # ``Video.get_or_create_for_url`` method.  Here we do that by hand.
+        self.assertEquals(0, Message.objects.count())
+        self.assertEquals(0, Comment.objects.count())
+        self.video.user = self.user
+        self.video.user.notify_by_email = True
+        self.video.user.notify_by_message = False
+        self.video.user.save()
+        self.video.followers.add(self.user)
+        self.video.save()
+
+        # Create a user that only follows the language
+        user_language_only = User.objects.create(username='languageonly',
+                email='dude@gmail.com', notify_by_email=True,
+                notify_by_message=True)
+
+        user_language2_only = User.objects.create(username='languageonly2',
+                email='dude2@gmail.com', notify_by_email=True,
+                notify_by_message=True)
+
+        # Create a user that will make the edits
+        user_edit_maker = User.objects.create(username='editmaker',
+                email='maker@gmail.com', notify_by_email=True,
+                notify_by_message=True)
+
         latest_version = self.language.latest_version()
+        latest_version.language.followers.clear()
+        latest_version.language.followers.add(user_language_only)
+        latest_version.title = 'Old title'
+        latest_version.description = 'Old description'
+        latest_version.save()
+
+        # Create another language
+        lan2 = SubtitleLanguage.objects.create(video=self.video, language='cz')
+        lan2.followers.add(user_language2_only)
+        self.assertEquals(2, SubtitleLanguage.objects.count())
 
         v = SubtitleVersion()
         v.language = self.language
         v.datetime_started = datetime.now()
         v.version_no = latest_version.version_no+1
-        v.user = User.objects.all()[0]
+        v.user = user_edit_maker
+        v.title = 'New title'
+        v.description = 'New description'
         v.save()
 
         for s in latest_version.subtitle_set.all():
@@ -1557,13 +1557,139 @@ class TestTasks(TestCase):
         s.end_time = 51
         s.save()
 
-        result = video_changed_tasks.delay(v.video.id, v.id)
+        # Clear the box because the above generates some emails
+        mail.outbox = []
+
+        # Kick it off
+        video_changed_tasks.delay(v.video.id, v.id)
+
+        # --------------------------------------------------------------------
+
+        # How many emails should we have?
+        # * The submitter
+        # * All video followers who want emails
+        # * All followers of the language being changed
+        # * Minus the change author
+        #
+        # In our case that is: languageonly, adam, admin
+        people = set(self.video.followers.filter(notify_by_email=True))
+        people.update(self.language.followers.filter(notify_by_email=True))
+
+        number = len(list(people)) - 1  # for the editor
+        self.assertEqual(len(mail.outbox), number)
+
+        email = mail.outbox[0]
+        tos = [item for sublist in mail.outbox for item in sublist.to]
+
+        self.assertTrue('New description' in email.body)
+        self.assertTrue('Old description' in email.body)
+        self.assertTrue('New title' in email.body)
+        self.assertTrue('Old title' in email.body)
+
+        # Make sure that all followers of the video got notified
+        # Excluding the author of the new version
+        excludes = list(User.objects.filter(email__in=[v.user.email]).all())
+        self.assertEquals(1, len(excludes))
+        followers = self.video.notification_list(excludes)
+        self.assertTrue(excludes[0].notify_by_email and
+                excludes[0].notify_by_message)
+        self.assertTrue(followers.filter(pk=self.video.user.pk).exists())
+
+        for follower in followers:
+            self.assertTrue(follower.email in tos)
+
+        self.assertTrue(self.user.notify_by_email)
+        self.assertTrue(self.user.email in tos)
+
+        # Refresh objects
+        self.user = User.objects.get(pk=self.user.pk)
+        self.video = Video.objects.get(pk=self.video.pk)
+
+        # Messages sent?
+        self.assertFalse(self.video.user.notify_by_message)
+        self.assertFalse(User.objects.get(pk=self.video.user.pk).notify_by_message)
+        followers = self.video.followers.filter(
+                notify_by_message=True).exclude(pk__in=[e.pk for e in excludes])
+
+        self.assertEquals(followers.count(), 1)
+        self.assertNotEquals(followers[0].pk, self.user.pk)
+
+        self.assertEquals(followers.count(), Message.objects.count())
+        for follower in followers:
+            self.assertTrue(Message.objects.filter(user=follower).exists())
+
+        language_follower_email = None
+        for email in mail.outbox:
+            if user_language_only.email in email.to:
+                language_follower_email = email
+                break
+
+        self.assertFalse(language_follower_email is None)
+
+        # --------------------------------------------------------------------
+        # Now test comment notifications
+
+        Message.objects.all().delete()
+        mail.outbox = []
+
+        # Video comment first
+        form =  CommentForm(self.video, {
+            'content': 'Text',
+            'object_pk': self.video.pk,
+            'content_type': ContentType.objects.get_for_model(self.video).pk
+            })
+        form.save(self.user, commit=True)
+
+        self.assertEquals(1, Comment.objects.count())
         self.assertEqual(len(mail.outbox), 1)
 
-        if result.failed():
-            self.fail(result.traceback)
+        emails = []
+        for e in mail.outbox:
+            for a in e.to:
+                emails.append(a)
 
-        self.assertEqual(len(mail.outbox), 1)
+        followers = self.video.followers.filter(notify_by_email=True)
+        self.assertEquals(emails.sort(), [f.email for f in followers].sort())
+
+        followers = self.video.followers.filter(notify_by_email=False)
+        for follower in followers:
+            self.assertFalse(follower.email in emails)
+
+        followers = self.video.followers.filter(notify_by_message=True)
+        self.assertEquals(followers.count(), Message.objects.count())
+        for message in Message.objects.all():
+            self.assertTrue(isinstance(message.object, Video))
+            self.assertTrue(message.user in list(followers))
+
+        # And now test comments on languages
+        Message.objects.all().delete()
+        mail.outbox = []
+
+        form =  CommentForm(self.language, {
+            'content': 'Text',
+            'object_pk': self.language.pk,
+            'content_type': ContentType.objects.get_for_model(self.language).pk
+            })
+        form.save(self.user, commit=True)
+
+        self.assertEquals(Message.objects.count(),
+                self.language.followers.filter(notify_by_message=True).count())
+
+        followers = self.language.followers.filter(notify_by_message=True)
+
+        # The author of the comment shouldn't get a message
+        self.assertFalse(Message.objects.filter(user=self.user).exists())
+
+        lan2 = SubtitleLanguage.objects.get(pk=lan2.pk)
+        lan2_followers = lan2.followers.all()
+
+        for message in Message.objects.all():
+            self.assertTrue(isinstance(message.object,
+                SubtitleLanguage))
+            self.assertTrue(message.user in list(followers))
+            self.assertFalse(message.user in list(lan2_followers))
+
+
 
 class TestPercentComplete(TestCase):
     fixtures = ['test.json']
@@ -2238,21 +2364,69 @@ class FollowTest(WebUseTest):
 
     def test_create_edit_subs(self):
         """
-        When you create/edit subtitles, you should follow that language.
+        Trascriber, translator should follow language, not video.
         """
         self._login()
 
         youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
         video, created = Video.get_or_create_for_url(youtube_url)
+        self.assertEquals(2, SubtitleLanguage.objects.count())
+        SubtitleVersion.objects.all().delete()
 
-        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        # Create a transcription
 
         language = SubtitleLanguage.objects.get(language='en')
+        language.is_original = True
+        language.save()
+        self.assertFalse(language.followers.filter(pk=self.user.pk).exists())
+
         version = SubtitleVersion(language=language, user=self.user,
-                datetime_started=datetime.now(), version_no=10)
+                datetime_started=datetime.now(), version_no=0,
+                is_forked=False)
         version.save()
 
-        self.assertTrue(video.followers.filter(pk=self.user.pk).exists())
+        # Trascription author follows language, not video
+        self.assertTrue(version.is_transcription)
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(language.followers.filter(pk=self.user.pk).exists())
+
+        # Create a translation
+        czech = SubtitleLanguage.objects.create(language='cz', is_original=False,
+                video=video)
+        self.assertEquals(3, SubtitleLanguage.objects.count())
+
+        version = SubtitleVersion(language=czech, user=self.user,
+                datetime_started=datetime.now(), version_no=0,
+                is_forked=False)
+        version.save()
+
+        # Translation creator follows language, not video
+        self.assertTrue(version.is_translation)
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(czech.followers.filter(pk=self.user.pk).exists())
+
+        # Now editing --------------------------------------------------------
+
+        self.assertNotEquals(language.pk, czech.pk)
+        video.followers.clear()
+        language.followers.clear()
+        czech.followers.clear()
+
+        version = SubtitleVersion(language=language, user=self.user,
+                datetime_started=datetime.now(), version_no=1,
+                is_forked=False)
+        version.save()
+
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(language.followers.filter(pk=self.user.pk).exists())
+
+        version = SubtitleVersion(language=czech, user=self.user,
+                datetime_started=datetime.now(), version_no=1,
+                is_forked=False)
+        version.save()
+
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(czech.followers.filter(pk=self.user.pk).exists())
 
     def test_review_subs(self):
         """
@@ -2281,12 +2455,12 @@ class FollowTest(WebUseTest):
                 )
 
         sl = video.subtitle_language(lang['lang_code'])
-        self.assertEquals(0, sl.followers.count())
+        self.assertEquals(1, sl.followers.count())
         latest = video.latest_version(language_code='en')
         latest.set_reviewed_by(self.user)
         latest.save()
 
-        self.assertEquals(1, sl.followers.count())
+        self.assertEquals(2, sl.followers.count())
 
     def test_approve_not(self):
         """
@@ -2315,9 +2489,9 @@ class FollowTest(WebUseTest):
                 )
 
         sl = video.subtitle_language(lang['lang_code'])
-        self.assertEquals(0, sl.followers.count())
+        self.assertEquals(1, sl.followers.count())
         latest = video.latest_version(language_code='en')
         latest.set_approved_by(self.user)
         latest.save()
 
-        self.assertEquals(0, sl.followers.count())
+        self.assertEquals(1, sl.followers.count())

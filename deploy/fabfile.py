@@ -195,7 +195,9 @@ def production(username):
         _create_env(username              = username,
                     hosts                 = ['pcf-us-cluster3.pculture.org:2191',
                                              'pcf-us-cluster4.pculture.org:2191',
-                                            'pcf-us-cluster5.pculture.org:2191'],
+                                             'pcf-us-cluster5.pculture.org:2191',
+                                             'pcf-us-cluster6.pculture.org:2191',
+                                             'pcf-us-cluster7.pculture.org:2191'],
                     s3_bucket             = 's3.www.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles',
                     static_dir            = '/var/static/production',
@@ -377,7 +379,7 @@ def _update_environment(base_dir, flags=''):
         _git_pull()
         run('export PIP_REQUIRE_VIRTUALENV=true')
         # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
-        run('yes i | {0}/env/bin/pip install {1} -E {0}/env/ -r requirements.txt'.format(base_dir, flags), pty=True)
+        run('yes i | {0}/env/bin/pip install {1} -r requirements.txt'.format(base_dir, flags), pty=True)
         #_clear_permissions(os.path.join(base_dir, 'env'))
 
 def update_environment(flags=''):
@@ -798,6 +800,17 @@ def get_settings_values(*settings_names):
     """
     _execute_on_all_hosts(lambda dir: _get_settings_values(dir, *settings_names))
 
+
+def test_access(is_sudo=False):
+    """
+    Makes sure the user can connect to all relevant hosts.
+    If any value is passed as an argument, makes sure the user can
+    connect and sudo on all hosts.
+    """
+    run_command = run
+    if is_sudo:
+        run_command = sudo
+    _execute_on_all_hosts(lambda dir: run_command('date'))
 
 try:
     from local_env import *

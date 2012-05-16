@@ -26,6 +26,6 @@ def url_exists(url):
 
     """
     try:
-        return 200 <= requests.head(url).status_code < 400
+        return 200 <= requests.head(url, timeout=10.0).status_code < 400
     except requests.ConnectionError:
         return False
