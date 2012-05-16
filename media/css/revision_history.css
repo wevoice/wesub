@@ -198,3 +198,7 @@ a.next_edit, a.previous_edit {
     float: right;
     margin-right: 20px;
 }
+#diffing .content .meta {
+    margin: 0 0 2em 0;
+    width: 100%;
+}

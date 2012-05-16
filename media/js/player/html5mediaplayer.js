@@ -186,7 +186,7 @@ unisubs.player.Html5MediaPlayer.prototype.getPlayheadTimeInternal = function() {
 
 unisubs.player.Html5MediaPlayer.prototype.setPlayheadTime = function(playheadTime, skipsUpdateEvent) {
     try {
-        this.mediaElem["currentTime"] = playheadTime;
+        this.mediaElem["currentTime"] = playheadTime + .000001;
     } catch(e) {
         // this might fail if we have not loaded metadata yet
     }
