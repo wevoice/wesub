@@ -561,9 +561,21 @@ class Rpc(BaseRpc):
         if should_create_new_version:
             new_version = self._create_version_from_session(
                 session, user, forked, new_title, new_description)
+
             new_version.save()
 
-            if hasattr(new_version, 'task_to_save'):
+            if subtitles_changed:
+                self._save_subtitles(
+                    new_version.subtitle_set, subtitles, new_version.is_forked)
+            else:
+                self._copy_subtitles(previous_version, new_version)
+
+            # this is really really hackish.
+            # TODO: clean all this mess on a friday
+            if not new_version.language.is_complete_and_synced(public_only=False):
+                new_version.moderation_status = UNMODERATED
+                new_version.save()
+            elif hasattr(new_version, 'task_to_save'):
                 task = new_version.task_to_save
                 task.subtitle_version = new_version
 
@@ -571,12 +583,6 @@ class Rpc(BaseRpc):
                     task.review_base_version = new_version
 
                 task.save()
-
-            if subtitles_changed:
-                self._save_subtitles(
-                    new_version.subtitle_set, subtitles, new_version.is_forked)
-            else:
-                self._copy_subtitles(previous_version, new_version)
 
         return new_version
 
