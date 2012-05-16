@@ -57,6 +57,8 @@ unisubs.player.VimeoVideoPlayer = function(videoSource, opt_forDialog) {
     this.swfEmbedded_ = false;
     this.timeUpdateTimer_ = new goog.Timer(
         unisubs.player.AbstractVideoPlayer.TIMEUPDATE_INTERVAL);
+
+    this.videoPlayerType_ = 'vimeo';
 };
 goog.inherits(unisubs.player.VimeoVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
@@ -193,10 +195,11 @@ unisubs.player.VimeoVideoPlayer.prototype.playInternal = function() {
         this.commands_.push(goog.bind(this.playInternal, this));
 };
 unisubs.player.VimeoVideoPlayer.prototype.pauseInternal = function() {
-    if (this.swfLoaded_)
+    if (this.swfLoaded_) {
         this.player_['api_pause']();
-    else
+    } else {
         this.commands_.push(goog.bind(this.pauseInternal, this));
+    }
 };
 
 unisubs.player.VimeoVideoPlayer.prototype.stopLoadingInternal = function() {

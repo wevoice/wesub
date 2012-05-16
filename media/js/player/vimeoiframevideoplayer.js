@@ -24,8 +24,7 @@ goog.provide('unisubs.player.VimeoIFrameVideoPlayer');
  * @param {boolean=} opt_forDialog
  */
 unisubs.player.VimeoIFrameVideoPlayer = function(videoSource, opt_forDialog) {
-    
-
+    this.videoPlayerType_ = 'vimeoiframe';
 };
 goog.inherits(unisubs.player.VimeoIFrameVideoPlayer, unisubs.player.AbstractVideoPlayer);
 

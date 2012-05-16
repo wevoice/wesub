@@ -44,6 +44,8 @@ unisubs.player.FlvVideoPlayer = function(videoSource, opt_forDialog) {
         unisubs.player.AbstractVideoPlayer.PROGRESS_INTERVAL);
     this.timeUpdateTimer_ = new goog.Timer(
         unisubs.player.AbstractVideoPlayer.TIMEUPDATE_INTERVAL);
+
+    this.videoPlayerType_ = 'flv';
 };
 goog.inherits(unisubs.player.FlvVideoPlayer,
               unisubs.player.AbstractVideoPlayer);

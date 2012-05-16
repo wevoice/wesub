@@ -183,7 +183,7 @@ body {
   margin-bottom: 2em;
 }
 
-.v1 .view .empty {
+p.empty {
   clear: both;
   color: #678ca3;
   font-size: 18px;
@@ -1935,7 +1935,7 @@ pre.dump code {
 .truncated {
   overflow: hidden;
   position: relative;
-  z-index: 1;
+  z-index: 0;
 }
 
 a.truncated-expand {
@@ -1944,7 +1944,7 @@ a.truncated-expand {
   margin-top: 10px;
   padding: 8px 10px;
   position: relative;
-  z-index: 2;
+  z-index: 1;
   -moz-box-shadow: -6px -23px 17px white;
   -webkit-box-shadow: -6px -23px 17px white;
   box-shadow: -6px -23px 17px white;

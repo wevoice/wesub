@@ -80,7 +80,9 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
 unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event) {
     this.onFocusText_ = this.translateInput_.value;
 
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
+
+    if (videoPlayerType !== 'vimeo') {
         this.dialog_.getVideoPlayerInternal().setPlayheadTime(this.subtitle_['start_time']);
         this.dialog_.getVideoPlayerInternal().pause();
     }
@@ -88,9 +90,11 @@ unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
     this.onKeyUpText_ = this.translateInput_.value;
 
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
+
+    if (videoPlayerType !== 'vimeo') {
         var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
-        var editableCaption = editableCaptionSet.captionByID(this.subtitle_.subtitle_id);
+        var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
 
         if (this.onKeyUpText_ !== '') {
             editableCaption.setText(this.onKeyUpText_);

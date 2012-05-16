@@ -57,11 +57,17 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var map = this.captionSet_.makeMap();
 
-    // For some reason, YouTube video sources don't set the videoURL_ var. Ugh.
-    this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_ || '';
+    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
-        this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(this.baseLanguageSubtitles_);
+    if (videoPlayerType !== 'vimeo') {
+
+        if (this.dialog_.reviewOrApprovalType_) {
+            this.baseLanguageCaptionSet_ = this.captionSet_;
+        } else {
+            this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
+                    this.baseLanguageSubtitles_);
+        }
+
         this.captionManager_ =
             new unisubs.CaptionManager(
                 this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
@@ -85,10 +91,15 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 unisubs.translate.TranslationList.prototype.enterDocument = function() {
     unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
     var handler = this.getHandler();
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
+
+    if (videoPlayerType !== 'vimeo') {
 
         // Start loading the video.
         this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
+        if (videoPlayerType === 'html5') {
+            this.dialog_.getVideoPlayerInternal().play();
+        }
         this.dialog_.getVideoPlayerInternal().pause();
 
         // Setup listening for video + subtitles.
