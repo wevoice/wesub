@@ -82,7 +82,7 @@ unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event
 
     var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-    if (videoPlayerType !== 'vimeo') {
+    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv') {
         this.dialog_.getVideoPlayerInternal().setPlayheadTime(this.subtitle_['start_time']);
         this.dialog_.getVideoPlayerInternal().pause();
     }
@@ -92,7 +92,7 @@ unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
 
     var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-    if (videoPlayerType !== 'vimeo') {
+    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv') {
         var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
         var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
 
