@@ -991,7 +991,6 @@ class ViewsTest(WebUseTest):
         self.assertEqual(len(version.subtitles()), 2)
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn(self.user.email, mail.outbox[0].to[0])
-        self.assertTrue(self.video.followers.filter(pk=user1.pk).exists())
 
     def test_paste_transcription_windows(self):
         self._login()
@@ -1713,7 +1712,7 @@ class TestTasks(TestCase):
         form.save(self.user, commit=True)
 
         self.assertEquals(1, Comment.objects.count())
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 1)
 
         emails = []
         for e in mail.outbox:
@@ -2436,18 +2435,69 @@ class FollowTest(WebUseTest):
 
     def test_create_edit_subs(self):
         """
-        When you create/edit subtitles, you should follow that language.
+        Trascriber, translator should follow language, not video.
         """
         self._login()
 
         youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
         video, created = Video.get_or_create_for_url(youtube_url)
+        self.assertEquals(2, SubtitleLanguage.objects.count())
+        SubtitleVersion.objects.all().delete()
+
+        # Create a transcription
+
         language = SubtitleLanguage.objects.get(language='en')
+        language.is_original = True
+        language.save()
+        self.assertFalse(language.followers.filter(pk=self.user.pk).exists())
+
         version = SubtitleVersion(language=language, user=self.user,
-                datetime_started=datetime.now(), version_no=10)
+                datetime_started=datetime.now(), version_no=0,
+                is_forked=False)
         version.save()
 
+        # Trascription author follows language, not video
+        self.assertTrue(version.is_transcription)
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
         self.assertTrue(language.followers.filter(pk=self.user.pk).exists())
+
+        # Create a translation
+        czech = SubtitleLanguage.objects.create(language='cz', is_original=False,
+                video=video)
+        self.assertEquals(3, SubtitleLanguage.objects.count())
+
+        version = SubtitleVersion(language=czech, user=self.user,
+                datetime_started=datetime.now(), version_no=0,
+                is_forked=False)
+        version.save()
+
+        # Translation creator follows language, not video
+        self.assertTrue(version.is_translation)
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(czech.followers.filter(pk=self.user.pk).exists())
+
+        # Now editing --------------------------------------------------------
+
+        self.assertNotEquals(language.pk, czech.pk)
+        video.followers.clear()
+        language.followers.clear()
+        czech.followers.clear()
+
+        version = SubtitleVersion(language=language, user=self.user,
+                datetime_started=datetime.now(), version_no=1,
+                is_forked=False)
+        version.save()
+
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(language.followers.filter(pk=self.user.pk).exists())
+
+        version = SubtitleVersion(language=czech, user=self.user,
+                datetime_started=datetime.now(), version_no=1,
+                is_forked=False)
+        version.save()
+
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(czech.followers.filter(pk=self.user.pk).exists())
 
     def test_review_subs(self):
         """

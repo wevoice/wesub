@@ -1267,3 +1267,49 @@ class TestSubtitlesGenerator(TestCase):
         self.assertTrue(unicode(TXTSubtitles(subtitles, self.video)))
 
 
+class TestCaching(TestCase):
+    fixtures = ['test_widget.json']
+
+    def setUp(self):
+        self.user_0 = CustomUser.objects.get(pk=3)
+        self.user_1 = CustomUser.objects.get(pk=4)
+        self.video_pk = 12
+        video_cache.invalidate_video_id(
+            'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv')
+
+    def test_get_from_cache(self):
+        """
+        Make sure that once the cache is warm, the number of database queries
+        remains constant.
+        """
+        from django.db import connection
+
+        try:
+            settings.DEBUG = True
+
+            request_0 = RequestMockup(self.user_0)
+            request_1 = RequestMockup(self.user_0)
+            request_2 = RequestMockup(self.user_0)
+
+            rpc.show_widget(request_0,
+                'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
+                False)
+
+            rpc.show_widget(request_1,
+                'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
+                False)
+
+            num = len(connection.queries)
+
+            response = rpc.show_widget(request_2,
+                'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
+                False)
+
+            self.assertTrue(0 < len(response['languages']))
+            self.assertTrue(0 != num)
+            self.assertEquals(num, len(connection.queries))
+
+        except Exception, e:
+            raise e
+        finally:
+            settings.DEBUG = False
