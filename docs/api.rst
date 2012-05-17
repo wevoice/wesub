@@ -25,8 +25,8 @@ Every request must have the username and the API keys as headers. For example::
 
 So a sample request would look like this::
 
-   $ curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key' \
-    https://staging.universalsubtitles.org/api2/partners/videos/
+    $ curl -H 'X-api-username: my_username_here' -H 'X-apikey: my_api_key_here' \
+        https://staging.universalsubtitles.org/api2/partners/videos/
 
 Data Formats
 ------------
@@ -59,7 +59,7 @@ All API requests should go through https. The staging environment might need
 HTTP basic auth, please contact us to request credentials.  When basic auth is
 needed on staging, you end up with a request like this::
 
-    $ curl  -H 'X-api-username: site_username' -H 'X-apikey: the_apy_key' \
+    $ curl -H 'X-api-username: my_username_here' -H 'X-apikey: my_api_key_here' \
         --user basic_auth_username:basic_auth_password \
         https://staging.universalsubtitles.org/api2/partners/videos/
 
@@ -86,38 +86,38 @@ To view a detail of the ``test`` team, you could do:
 
 .. http:get:: /api2/partners/teams/test/
 
-    Example response
+Example response
 
-    .. sourcecode:: http
+.. code-block:: json
 
-        {
-            "created": "2012-04-18T09:26:59",
-            "deleted": false,
-            "description": "",
-            "header_html_text": "",
-            "is_moderated: false",
-            "is_visible: true",
-            "logo: null",
-            "max_tasks_per_member": null,
-            "membership_policy: ""Open",
-            "name: "test","
-            "projects_enabled": false,
-            "resource_uri: "/"api2/partners/teams/test/",
-            "slug: "test","
-            "subtitle_policy": "Anyone",
-            "task_assign_policy": "Any team member",
-            "task_expiration: null",
-            "translate_policy: "Anyone"",
-            "video_policy: "Any team member",
-            "workflow_enabled": false
-        }
+    {
+        "created": "2012-04-18T09:26:59",
+        "deleted": false,
+        "description": "",
+        "header_html_text": "",
+        "is_moderated": false,
+        "is_visible": true,
+        "logo": null,
+        "max_tasks_per_member": null,
+        "membership_policy": "Open",
+        "name": "test",
+        "projects_enabled": false,
+        "resource_uri": "/api2/partners/teams/test/",
+        "slug": "test",
+        "subtitle_policy": "Anyone",
+        "task_assign_policy": "Any team member",
+        "task_expiration": null,
+        "translate_policy": "Anyone",
+        "video_policy": "Any team member",
+        "workflow_enabled": false
+    }
 
 Here is an example of creating a new team via ``curl``.
 
 .. code-block:: bash
 
     curl -i -X POST -H "Accept: application/json" \
-        -H "X-api-username: username" -H "X-apikey: your-api-key" \
+        -H 'X-api-username: my_username_here' -H 'X-apikey: my_api_key_here' \
         -H "Content-Type: application/json" \
         --data '{"name": "Team name", "slug": "team-name"}' \
         http://host/api2/partners/teams/
@@ -129,10 +129,14 @@ To update a team, you could issue a request like this:
 .. code-block:: bash
 
     curl -i -X PUT -H "Accept: application/json" \
-        -H "X-api-username: username" -H "X-apikey: your-api-key" \
+        -H 'X-api-username: my_username_here' -H 'X-apikey: my_api_key_here' \
         -H "Content-Type: application/json" \
         --data '{"name": "My team name"}' \
         https://host/api2/partners/teams/test/
+
+.. warning:: The above example only includes the ``name`` field for
+    illustration. When sending a ``PUT`` request, always include all fields.
+    For a list of all fields, see the response to a ``GET`` request.
 
 The following resources are available to end users:
 
@@ -161,8 +165,7 @@ Creating Videos:
 .. http:post:: /api2/partners/videos/
 
     :form video_url: The url for the video. Any url that Amara accepts will work here. You can send the URL for a file (e.g. http:///www.example.com/my-video.ogv) , or a link to one of our accepted providers (youtube, vimeo, dailymotion, blip.tv)
-    :form title: The title for the video
-    :form description: About this video
+    :form title: The title for the video :form description: About this video
     :form duration: Duration in seconds
 
 When submitting URLs of external providers (i.e. youtube, vimeo), the metadata
@@ -200,7 +203,7 @@ following request.
 .. code-block:: bash
 
     curl -i -X PUT -H "Accept: application/json" \
-        -H "X-api-username: username" -H "X-apikey: your-api-key" \
+        -H 'X-api-username: my_username_here' -H 'X-apikey: my_api_key_here' \
         -H "Content-Type: application/json" \
         --data '{"team": "team_b"}' \
         https://host/api2/partners/videos/video-id/
@@ -213,6 +216,31 @@ Setting the ``team`` value to ``null`` will remove it from its current team.
 
 A similar mechanism can be used to change what project a given video is filed
 under.
+
+
+Example response:
+
+.. code-block:: json
+
+
+    {
+        "all_urls": [
+            "http://vimeo.com/4951380"
+        ],
+        "created": "2012-05-15T06:05:14",
+        "description": "Concierto Grupo NOMOI \n(Torrevieja 17/05/2009)\nProyecto TRANSMOSFERA\nAcci\u00f3n interactiva de m\u00fasica, teatro e imagen.\nJuan Pablo Zaragoza - V\u00eddeo y Guitarra sintetizada\nJos\u00e9 Mar\u00eda Pastor - Electr\u00f3nica\nRaul Ferrandez - Voz y acci\u00f3n teatral",
+        "duration": null,
+        "id": "PUuHIcJ5mq5S",
+        "languages": [],
+        "original_language": null,
+        "project": null,
+        "resource_uri": "/api2/partners/videos/PUuHIcJ5mq5S/",
+        "site_url": "http://unisubs.example.com:8000/videos/PUuHIcJ5mq5S/info/",
+        "team": null,
+        "thumbnail": "http://b.vimeocdn.com/ts/142/595/14259507_640.jpg",
+        "title": "Concierto NOMOI (Torrevieja 17/05/2009)"
+    }
+
 
 Video Language Resource
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -227,7 +255,7 @@ Creating Video Languages:
 
 .. http:post:: /api2/partners/videos/[video-id]/languages/
 
-    :form language_code: The language code (e.g 'en' or 'pt-br') to create. 
+    :form language_code: The language code (e.g 'en' or 'pt-br') to create.
     :form title: The title for the video localized to this language - optional
     :form description: Localized description for this language - optional.
     :form is_original: Boolean indicating if this is the original language for the video. - optional - defaults to false.
@@ -241,6 +269,36 @@ Information about a specific video language can be retrieved from the URL:
 
     :param lang-identifier: language identifier can be the language code (e.g. ``en``) or the
         numeric ID returned from calls to listing languages.
+
+Example response:
+
+.. code-block:: json
+
+    {
+        "completion": "100%",
+        "created": "2012-05-17T12:25:54",
+        "description": "",
+        "id": "8",
+        "is_original": false,
+        "is_translation": false,
+        "language_code": "cs",
+        "num_versions": 1,
+        "original_language_code": "en",
+        "percent_done": 0,
+        "resource_uri": "/api2/partners/videos/Myn4j5OI7BxL/languages/8/",
+        "site_url": "http://unisubs.example.com:8000/videos/Myn4j5OI7BxL/cs/8/",
+        "subtitle_count": 11,
+        "title": "\"Postcard From 1952\" - Explosions in The Sky",
+        "versions": [
+            {
+                "author": "honza",
+                "status": "published",
+                "text_change": "1.0",
+                "time_change": "1.0",
+                "version_no": 0
+            }
+        ]
+    }
 
 Subtitles Resource
 ~~~~~~~~~~~~~~~~~~
@@ -312,6 +370,22 @@ Creating Users:
 The response also includes the 'api_key' for that user. If clients wish to make
 requests on behalf of this newly created user through the api, they must hold
 on to this key, since it won't be returned in the detailed view.
+
+Example response:
+
+.. code-block:: json
+
+    {
+        "avatar": "http://www.gravatar.com/avatar/947b2f9a76cd39f5c7b7c8ad3a36?s=100&d=mm",
+        "biography": "The guy with a boring name.",
+        "first_name": "John",
+        "full_name": "John Smith",
+        "homepage": "http://example.com",
+        "last_name": "Smith",
+        "num_videos": 8,
+        "resource_uri": "/api2/partners/users/jsmith/",
+        "username": "jsmith"
+    }
 
 Video Url Resource
 ~~~~~~~~~~~~~~~~~~
@@ -401,6 +475,32 @@ Task assign policy:
 * ``Any team member``
 * ``Only managers and admins``
 * ``Only admins``
+
+Example response
+
+.. code-block:: json
+
+    {
+        "created": "2012-04-18T09:26:59",
+        "deleted": false,
+        "description": "",
+        "header_html_text": "",
+        "is_moderated": false,
+        "is_visible": true,
+        "logo": null,
+        "max_tasks_per_member": null,
+        "membership_policy": "Open",
+        "name": "test",
+        "projects_enabled": false,
+        "resource_uri": "/api2/partners/teams/test/",
+        "slug": "test",
+        "subtitle_policy": "Anyone",
+        "task_assign_policy": "Any team member",
+        "task_expiration": null,
+        "translate_policy": "Anyone",
+        "video_policy": "Any team member",
+        "workflow_enabled": false
+    }
 
 Project Resource
 ~~~~~~~~~~~~~~~~
