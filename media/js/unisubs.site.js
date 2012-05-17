@@ -57,7 +57,13 @@ var Site = function(Site) {
 
         chosenify: function() {
             $('select', '.v1 .content').filter(function() {
-                return !$(this).parents('div').hasClass('ajaxChosen');
+                if ($(this).parents('div').hasClass('ajaxChosen')) {
+                    return false;
+                }
+                if ($(this).parents('div').hasClass('no-chosen')) {
+                    return false;
+                }
+                return true;
             }).chosen().change(function() {
                 $select = $(this);
 
@@ -409,6 +415,12 @@ var Site = function(Site) {
             window.usStartTime = (new Date()).getTime();
             window.addCSRFHeader = addCSRFHeader;
             addCSRFHeader($);
+
+            if ($('select.goto').length) {
+                $('select.goto').change(function(e) {
+                    window.location = $(this).children('option:selected').attr('value');
+                });
+            }
         },
 
         // Public
