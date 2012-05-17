@@ -22,8 +22,7 @@ from contextlib import contextmanager
 from django.conf import settings
 
 try:
-    # from bernhard import Client
-    from riemann import RiemannClient as Client
+    from bernhard import Client, UDPTransport
 except ImportError:
     # Just use a dummy client if we don't have a Riemann client installed.
     class Client(object):
@@ -33,16 +32,31 @@ except ImportError:
         def send(self, *args, **kwargs):
             pass
 
+    UDPTransport = None
 
 
-# Currently uses a TCP transport, but we can switch to a UDP transport if
-# performance becomes an issue.
-c = Client(getattr(settings, 'RIEMANN_HOST', '127.0.0.1'))
-host = socket.gethostname()
+HOST = socket.gethostname()
 ENABLED = getattr(settings, 'ENABLE_METRICS', False)
+RIEMANN_HOST = getattr(settings, 'RIEMANN_HOST', '127.0.0.1')
+
+c = Client(RIEMANN_HOST, transport=UDPTransport)
+
+def find_environment_tag():
+    env = getattr(settings, 'INSTALLATION', None)
+
+    if env == getattr(settings, 'DEV', -1):
+        return 'dev'
+    if env == getattr(settings, 'STAGING', -1):
+        return 'staging'
+    if env == getattr(settings, 'PRODUCTION', -1):
+        return 'production'
+    else:
+        return 'unknown'
+
+ENV_TAG = find_environment_tag()
 
 def send(service, tag, metric=None):
-    data = {'host': host, 'service': service, 'tags': [tag]}
+    data = {'host': HOST, 'service': service, 'tags': [tag, ENV_TAG]}
 
     if metric:
         data['metric'] = metric

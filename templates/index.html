@@ -131,7 +131,7 @@
         <a href="{% url videos:popular_videos %}#?sort=total">{% trans "Top all-time" %}</a>
     </p>
     {% with popular_videos as video_list %}
-        {% include 'videos/_watch_page.html' with display_views='today' %}
+        {% include 'videos/_watch_page.html' %}
     {% endwith %}    
 </div>
 <div id="featured-videos" class="featured">

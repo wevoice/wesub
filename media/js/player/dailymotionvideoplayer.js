@@ -57,6 +57,8 @@ unisubs.player.DailymotionVideoPlayer = function(videoSource, opt_chromeless, op
         unisubs.player.AbstractVideoPlayer.PROGRESS_INTERVAL);
     this.timeUpdateTimer_ = new goog.Timer(
         unisubs.player.AbstractVideoPlayer.TIMEUPDATE_INTERVAL);
+
+    this.videoPlayerType_ = 'dailymotion';
 };
 goog.inherits(unisubs.player.DailymotionVideoPlayer, unisubs.player.AbstractVideoPlayer);
 

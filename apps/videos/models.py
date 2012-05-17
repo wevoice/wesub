@@ -240,6 +240,12 @@ class Video(models.Model):
 
         return title
 
+    def title_display_unabridged(self):
+        """
+        This is just a wrapper around ``title_display`` for use in templates
+        """
+        return self.title_display(False)
+
     def update_view_counter(self):
         """Queue a Celery task that will increment the number of views for this video."""
         try:
@@ -481,7 +487,10 @@ class Video(models.Model):
 
         """
         name = self.filename
-        lang = language.language or u'original'
+        if not isinstance(language, basestring):
+            lang = language.language or u'original'
+        else:
+            lang = language
         return u'%s.%s' % (name, lang)
 
     @property
