@@ -9,6 +9,7 @@ import os
 from django.db import connection
 from django.core.validators import validate_ipv4_address
 from django.core.exceptions import ValidationError
+from utils.metrics import ManualTimer
 
 class SaveUserIp(object):
 
@@ -28,6 +29,8 @@ class ResponseTimeMiddleware(object):
     Writes the time this request took to process, as a cookie in the
     response. In order for it to work, it must be the very first
     middleware in settings.py
+
+    Also records the response time and sends it along to Riemann.
     """
     def process_request(self, request):
         request.init_time = time.time()
@@ -36,9 +39,12 @@ class ResponseTimeMiddleware(object):
     def process_response(self, request, response):
         if hasattr(request, "init_time"):
             delta = time.time() - request.init_time
-            response.set_cookie('response_time', str(delta * 1000))
+            ms = delta * 1000
+            response.set_cookie('response_time', str(ms))
+            ManualTimer('response-time').record(ms)
+
         return response
-        
+
 class P3PHeaderMiddleware(object):
     def process_response(self, request, response):
         response['P3P'] = settings.P3P_COMPACT
@@ -51,7 +57,7 @@ if hasattr(random, 'SystemRandom'):
     randrange = random.SystemRandom().randrange
 else:
     randrange = random.randrange
-    
+
 _MAX_CSRF_KEY = 18446744073709551616L     # 2 << 63
 
 UUID_COOKIE_NAME = getattr(settings, 'UUID_COOKIE_NAME', 'unisub-user-uuid')
@@ -62,13 +68,13 @@ def _get_new_csrf_key():
                 % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY)).hexdigest()
 
 class UserUUIDMiddleware(object):
-    
+
     def process_request(self, request):
         try:
             request.browser_id = request.COOKIES[UUID_COOKIE_NAME]
         except KeyError:
             # No cookie or it is empty, so create one.  This will be sent with the next
-            # response.            
+            # response.
             if not hasattr(request, 'browser_id'):
                 request.browser_id = _get_new_csrf_key()
 
@@ -79,13 +85,13 @@ class UserUUIDMiddleware(object):
                 max_age = 60 * 60 * 24 * 365
                 response.set_cookie(
                     UUID_COOKIE_NAME,
-                    browser_id, 
+                    browser_id,
                     max_age=max_age,
                     expires=cookie_date(time.time() + max_age),
                     domain=UUID_COOKIE_DOMAIN)
         # Content varies with the CSRF cookie, so set the Vary header.
         patch_vary_headers(response, ('Cookie',))
-        return response            
+        return response
 
 def _terminal_width():
     """
@@ -147,7 +153,7 @@ from debug_toolbar.middleware import DebugToolbarMiddleware
 import debug_toolbar
 
 class SupeuserDebugToolbarMiddleware(DebugToolbarMiddleware):
-    
+
     def _show_toolbar(self, request):
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', None)
         if x_forwarded_for:

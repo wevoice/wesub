@@ -64,6 +64,10 @@ RUN_LOCALLY = False
 # TODO: Get rid of these.
 SPEAKERTEXT_API_TOKEN = ""
 SPEAKERTEXT_PASSWORD = ""
+
+# Metrics
+RIEMANN_HOST = '10.10.10.44'
+ENABLE_METRICS = False
 EOF
 
 # Set up the DB ---------------------------------------------------------------
