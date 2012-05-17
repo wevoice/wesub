@@ -87,11 +87,11 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
         },
         this);
 };
-
 unisubs.translate.TranslationList.prototype.enterDocument = function() {
     unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
     var handler = this.getHandler();
     var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
+    var that = this;
 
     if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv') {
 
@@ -106,6 +106,16 @@ unisubs.translate.TranslationList.prototype.enterDocument = function() {
         handler.listen(this.captionManager_,
                        unisubs.CaptionManager.CAPTION,
                        this.captionReached_);
+
+        // Update the captionSet that the video is listening to
+        // to match the proper mix of translated / original subtitles.
+        goog.array.forEach(this.captionSet_.captions_, function(c) {
+            if (c.getText() !== '') {
+                var subOrder = c.getSubOrder();
+                var captionToUpdate = that.baseLanguageCaptionSet_.findSubIndex_(subOrder);
+                that.baseLanguageCaptionSet_.caption(captionToUpdate).setText(c.getText());
+            }
+        });
     }
 };
 
