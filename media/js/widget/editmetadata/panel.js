@@ -93,7 +93,7 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     if (!this.inSubtitlingDialog_){
         var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-        if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv') {
+        if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
 
             if (this.dialog_.reviewOrApprovalType_) {
                 this.baseLanguageCaptionSet_ = this.captionSet_;
@@ -116,7 +116,7 @@ unisubs.editmetadata.Panel.prototype.enterDocument = function() {
     if (!this.inSubtitlingDialog_){
         var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-        if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv') {
+        if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
 
             var that = this;
             var captionSet = this.dialog_.translationPanel_.translationList_.captionSet_;
