@@ -129,6 +129,7 @@ unisubs.translate.TranslationList.prototype.translateCallback_ = function(transl
     if (!error) {
         goog.array.forEach(translations, function(text, i) {
             widgets[i].setTranslationContent(text);
+            widgets[i].cloneToCaptionManager(true);
         });
     }
 };

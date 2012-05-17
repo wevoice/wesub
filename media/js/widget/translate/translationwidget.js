@@ -89,27 +89,8 @@ unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event
 };
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
     this.onKeyUpText_ = this.translateInput_.value;
-
-    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
-
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
-        var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
-        var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
-
-        if (this.onKeyUpText_ !== '') {
-            editableCaption.setText(this.onKeyUpText_);
-            this.dialog_.getVideoPlayerInternal().showCaptionText(this.onKeyUpText_);
-            this.textHasBeenChanged_ = true;
-        } else {
-            if (this.textHasBeenChanged_) {
-                var originalText = editableCaption.getOriginalText();
-                editableCaption.setText(originalText);
-                this.dialog_.getVideoPlayerInternal().showCaptionText(originalText);
-                this.textHasBeenChanged_ = false;
-            }
-        }
-    }
-}
+    this.cloneToCaptionManager();
+};
 unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) {
     var value = goog.string.trim(this.translateInput_.value);
     var edited = value != this.onFocusText_;
@@ -124,6 +105,32 @@ unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) 
 unisubs.translate.TranslationWidget.prototype.setTranslationContent = function(value){
     this.translateInput_.value = value;
     this.inputLostFocus_(false);
+};
+unisubs.translate.TranslationWidget.prototype.cloneToCaptionManager = function(dontShowNow){
+    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
+
+    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
+        var currentText = this.translateInput_.value;
+        var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
+        var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
+
+        if (currentText !== '') {
+            editableCaption.setText(currentText);
+            if (!dontShowNow) {
+                this.dialog_.getVideoPlayerInternal().showCaptionText(currentText);
+            }
+            this.textHasBeenChanged_ = true;
+        } else {
+            if (this.textHasBeenChanged_) {
+                var originalText = editableCaption.getOriginalText();
+                editableCaption.setText(originalText);
+                if (!dontShowNow) {
+                    this.dialog_.getVideoPlayerInternal().showCaptionText(originalText);
+                }
+                this.textHasBeenChanged_ = false;
+            }
+        }
+    }
 };
 unisubs.translate.TranslationWidget.prototype.setEnabled = function(enabled) {
     this.translateInput_.disabled = !enabled;
