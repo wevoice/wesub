@@ -118,13 +118,13 @@ LOGGING = {
 }
 
 
-SENTRY_ON = True
+SENTRY_ON = not DEBUG
 
 if SENTRY_ON:
     # Change this to your local sentry dsn
     # You can find it under the account tab
     # Also, make sure that the host is `localhost` and the port is `9000`
-    SENTRY_DSN = "change this to your local dsn"
+    SENTRY_DSN = ""
     SENTRY_DEBUG = False
 
     MIDDLEWARE_CLASSES = (
