@@ -96,15 +96,19 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
         if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
 
             if (this.dialog_.reviewOrApprovalType_) {
-                this.baseLanguageCaptionSet_ = this.captionSet_;
+                if (this.dialog_.translationPanel_) {
+                    this.baseLanguageCaptionSet_ = this.dialog_.translationPanel_.translationList_.captionSet_;
+                }
             } else {
                 this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
                     this.dialog_.translationPanel_.translationList_.baseLanguageSubtitles_);
             }
 
-            this.captionManager_ =
-                new unisubs.CaptionManager(
-                    this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
+            if (this.dialog_.translationPanel_) {
+                this.captionManager_ =
+                    new unisubs.CaptionManager(
+                        this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
+            }
         }
     }
 };
