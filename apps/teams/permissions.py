@@ -687,7 +687,7 @@ def can_decline_task(task, user):
     * The task is assigned to them.
 
     """
-    return task.assignee and task.assignee == user
+    return task.assignee_id == user.id
 
 def can_delete_task(task, user):
     """Return whether the given user can delete the given task."""
@@ -809,3 +809,6 @@ def can_create_project(user, team):
 
 def can_delete_project(user, team, project):
     return can_edit_project(team, user, project)
+
+def can_create_team(user):
+    return user.is_partner

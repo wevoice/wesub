@@ -128,7 +128,7 @@ unisubs.subtitle.SharePanel.prototype.facebookLinkClicked_ = function(e) {
 };
 
 unisubs.subtitle.SharePanel.SHORT_MESSAGE_PREFIX_ =
-    'Just added #subtitles to this video using the @universalsubs alpha';
+    'Just added #subtitles to this video using the @amarasubs alpha';
 
 unisubs.subtitle.SharePanel.prototype.makeFacebookURL_ = function() {
     var queryData = new goog.Uri.QueryData();

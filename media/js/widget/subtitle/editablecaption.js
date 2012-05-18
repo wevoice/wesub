@@ -116,6 +116,9 @@ unisubs.subtitle.EditableCaption.prototype.setText = function(text, opt_dontTrac
     this.json['text'] = text;
     this.changed_(false, opt_dontTrack);
 };
+unisubs.subtitle.EditableCaption.prototype.getOriginalText = function() {
+    return this.json['original_text'];
+};
 unisubs.subtitle.EditableCaption.prototype.getText = function() {
     return this.json['text'];
 };

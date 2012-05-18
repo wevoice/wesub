@@ -34,7 +34,7 @@ from django.views.generic.list_detail import object_list
 
 import teams.moderation_const as MODERATION
 import widget
-from apps.auth.models import UserLanguage
+from apps.auth.models import UserLanguage, CustomUser as User
 from apps.videos.templatetags.paginator import paginate
 from messages import tasks as notifier
 from teams.forms import (
@@ -1081,8 +1081,10 @@ def _tasks_list(request, team, project, filters, user):
             tasks = tasks.filter(assignee=user)
         elif assignee == 'none':
             tasks = tasks.filter(assignee=None)
-        elif assignee:
+        elif assignee and assignee.isdigit():
             tasks = tasks.filter(assignee=int(assignee))
+        elif assignee:
+            tasks = tasks.filter(assignee=User.objects.get(username=assignee))
 
     return tasks.select_related('team_video__video', 'team_video__team', 'assignee', 'team', 'team_video__project')
 
@@ -1141,8 +1143,11 @@ def team_tasks(request, slug, project_slug=None):
             filters['assignee'] = team.members.get(user=request.user)
         elif filters['assignee'] == 'none':
             filters['assignee'] == None
-        else:
+        elif filters['assignee'].isdigit():
             filters['assignee'] = team.members.get(user=filters['assignee'])
+        else:
+            filters['assignee'] = team.members.get(user=User.objects.get(username=filters['assignee']))
+
         filtered = filtered + 1
 
     if filters.get('language'):

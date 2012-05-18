@@ -25,6 +25,7 @@ goog.provide('unisubs.player.Html5VideoPlayer');
  */
 unisubs.player.Html5VideoPlayer = function(videoSource, forDialog) {
     unisubs.player.Html5MediaPlayer.call(this, videoSource, forDialog);
+    this.videoPlayerType_ = 'html5';
 };
 goog.inherits(unisubs.player.Html5VideoPlayer,
               unisubs.player.Html5MediaPlayer);
@@ -57,7 +58,7 @@ unisubs.player.Html5VideoPlayer.prototype.createDom = function() {
 unisubs.player.Html5VideoPlayer.prototype.createVideoElement_ = 
     function($d) 
 {
-    var params = { 'autobuffer': 'true' };
+    var params = { 'preload': 'auto' };
     if (!this.forDialog) {
         if (this.mediaSource.getVideoConfig()) {
             var config = this.mediaSource.getVideoConfig();

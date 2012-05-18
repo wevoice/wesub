@@ -35,10 +35,7 @@ goog.provide('unisubs.subtitle.EditableCaptionSet');
  *     when deserializing an EditableCaptionSet from memory after a finish failure. It means that 
  *     during the failed editing session, the EditableCaptionSet got forked.
  */
-unisubs.subtitle.EditableCaptionSet = function(existingJsonCaptions, opt_completed, 
-                                               opt_title, opt_forkedDuringEdits, 
-                                               opt_description, opt_languageName)
-{
+unisubs.subtitle.EditableCaptionSet = function(existingJsonCaptions, opt_completed, opt_title, opt_forkedDuringEdits, opt_description, opt_languageName) {
     goog.events.EventTarget.call(this);
     var that = this;
     var c;
@@ -63,6 +60,7 @@ unisubs.subtitle.EditableCaptionSet = function(existingJsonCaptions, opt_complet
     this.forkedDuringEdits_ = !!opt_forkedDuringEdits;
     this.languageName = opt_languageName;
 };
+
 goog.inherits(unisubs.subtitle.EditableCaptionSet, goog.events.EventTarget);
 
 unisubs.subtitle.EditableCaptionSet.EventType = {
@@ -76,18 +74,15 @@ unisubs.subtitle.EditableCaptionSet.EventType = {
 /**
  * Always in ascending order by start time.
  */
-unisubs.subtitle.EditableCaptionSet.prototype.captionsWithTimes =
-    function()
-{
+unisubs.subtitle.EditableCaptionSet.prototype.captionsWithTimes = function() {
     return goog.array.filter(
         this.captions_, function(c) { return c.getStartTime() != -1; });
 };
+
 /**
  * Always in ascending order by start time.
  */
-unisubs.subtitle.EditableCaptionSet.prototype.timelineCaptions =
-    function()
-{
+unisubs.subtitle.EditableCaptionSet.prototype.timelineCaptions = function() {
     return goog.array.filter(
         this.captions_,
         function(c) {
@@ -146,6 +141,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
 unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
     return this.captions_[index];
 };
+unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
+    var subMap = this.makeMap();
+    return subMap[id];
+};
 unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
     return goog.array.map(this.captions_, function(c) { return c.json; });
 };
@@ -163,10 +162,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
             return false;
     return true;
 };
-
-unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation = 
-    function(subOrder, subtitleID)
-{
+unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation = function(subOrder, subtitleID) {
     var c = new unisubs.subtitle.EditableCaption(
         null, 
         { 'subtitle_id': subtitleID,
@@ -176,15 +172,12 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation =
     return c;
 };
 
-
 /**
  *
  * @param {Number} nextSubOrder The next subtitle's subOrder
  *     (returned by EditableCaption#getSubOrder())
  */
-unisubs.subtitle.EditableCaptionSet.prototype.insertCaption =
-    function(nextSubOrder)
-{
+unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(nextSubOrder) {
     var index = this.findSubIndex_(nextSubOrder);
     var nextSub = this.captions_[index];
     prevSub = nextSub.getPreviousCaption();
@@ -207,9 +200,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.insertCaption =
             c));
     return c;
 };
-unisubs.subtitle.EditableCaptionSet.prototype.setTimesOnInsertedSub_ =
-    function(insertedSub, prevSub, nextSub)
-{
+unisubs.subtitle.EditableCaptionSet.prototype.setTimesOnInsertedSub_ = function(insertedSub, prevSub, nextSub) {
     var startTime = -1, endTime = -1;
     if (nextSub.getStartTime() != -1) {
         startTime = nextSub.getStartTime();
@@ -224,6 +215,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.setTimesOnInsertedSub_ =
             insertedSub.setEndTime(endTime);
     }
 };
+
 /**
  *
  * @param {unisubs.subtitle.EditableCaption} caption
@@ -272,6 +264,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispa
     }
     return c;
 };
+
 /**
  * Find the last subtitle with a start time at or before time.
  * @param {number} time
@@ -279,9 +272,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispa
  *     sub start time, or last subtitle with start time
  *     at or before playheadTime.
  */
-unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime =
-    function(time)
-{
+unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
     var i;
     // TODO: write unit test then get rid of linear search in future.
     for (i = 0; i < this.captions_.length; i++)
@@ -300,9 +291,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime =
  * @param {unisubs.subtitle.EditableCaptionSet.EventType} type of event
  * @param {unisubs.subtitle.EditableCaption} Caption the event applies to.
  */
-unisubs.subtitle.EditableCaptionSet.CaptionEvent =
-    function(type, caption)
-{
+unisubs.subtitle.EditableCaptionSet.CaptionEvent = function(type, caption) {
     this.type = type;
     /**
      * @type {unisubs.subtitle.EditableCaption}
@@ -337,11 +326,9 @@ unisubs.subtitle.EditableCaptionSet.prototype.fork = function(originalSubtitleSt
         unisubs.subtitle.EditableCaption.orderCompare);
     this.forkedDuringEdits_ = true;
 };
-
 unisubs.subtitle.EditableCaptionSet.prototype.wasForkedDuringEdits = function() {
     return this.forkedDuringEdits_;
 };
-
 unisubs.subtitle.EditableCaptionSet.prototype.makeMap = function() {
     var map = {};
     goog.array.forEach(

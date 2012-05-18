@@ -36,6 +36,7 @@ unisubs.player.YTIFrameVideoPlayer = function(videoSource, opt_forDialog) {
         'unisubs.player.YTIFrameVideoPlayer');
     goog.mixin(unisubs.player.YTIFrameVideoPlayer.prototype,
                unisubs.player.YoutubeBaseMixin.prototype);
+    this.videoPlayerType_ = 'ytiframe';
 };
 goog.inherits(unisubs.player.YTIFrameVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
