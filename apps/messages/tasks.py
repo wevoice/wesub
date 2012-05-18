@@ -32,7 +32,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from django.template.loader import render_to_string
 from django.contrib.contenttypes.models import ContentType
 
-from raven.contrib.django.models import get_client
+from raven.contrib.django.models import client
 
 from celery.task import task
 
@@ -47,9 +47,6 @@ from messages.models import Message
 from utils import send_templated_email
 from utils import get_object_or_none
 from utils.translation import get_language_label
-
-
-client = get_client()
 
 
 def get_url_base():

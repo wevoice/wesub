@@ -30,14 +30,13 @@ from django.db.models import ObjectDoesNotExist
 from django.utils import simplejson as json
 from django.utils.http import urlquote_plus
 from haystack import site
-from raven.contrib.django.models import get_client
+from raven.contrib.django.models import client
 
 from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from videos.models import VideoFeed, SubtitleLanguage, Video
 from videos.feed_parser import FeedParser
 
-client = get_client()
 celery_logger = logging.getLogger('celery.task')
 
 

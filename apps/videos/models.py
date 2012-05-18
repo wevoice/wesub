@@ -53,9 +53,7 @@ from utils.panslugify import pan_slugify
 from apps.teams.moderation_const import (
     WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED, REJECTED
 )
-from raven.contrib.django.models import get_client
-
-client = get_client()
+from raven.contrib.django.models import client
 
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)

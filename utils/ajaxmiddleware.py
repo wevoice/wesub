@@ -6,9 +6,8 @@ from django.db.models.base import ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
 
-from raven.contrib.django.models import get_client
+from raven.contrib.django.models import client
 
-client = get_client()
 
 class AjaxErrorMiddleware(object):
     '''Return AJAX errors to the browser in a sensible way.

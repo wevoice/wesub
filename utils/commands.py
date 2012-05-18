@@ -1,7 +1,5 @@
 from django.core.management.base import BaseCommand
-from raven.contrib.django.models import get_client
-
-client = get_client()
+from raven.contrib.django.models import client
 
 
 class ErrorHandlingCommand(BaseCommand):

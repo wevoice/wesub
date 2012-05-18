@@ -35,7 +35,7 @@ python-memcached
 feedparser
 lxml==2.3
 django-sentry
-raven
+raven==1.7.0
 vendor/indifex-transifex-client-0.5.tar.gz
 django-extensions==0.4.1
 # do we really need this in prod?

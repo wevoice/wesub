@@ -18,10 +18,7 @@ from boto.exception import BotoClientError, BotoServerError
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
-from raven.contrib.django.models import get_client
-
-client = get_client()
-
+from raven.contrib.django.models import client
 from fields import S3EnabledImageField, S3EnabledFileField
 
 
