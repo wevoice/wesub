@@ -118,7 +118,7 @@ LOGGING = {
 }
 
 
-SENTRY_ON = not DEBUG
+SENTRY_ON = False
 
 if SENTRY_ON:
     # Change this to your local sentry dsn
