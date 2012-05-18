@@ -42,6 +42,7 @@ from teams.models import Task
 from teams.permissions import get_member
 from uslogging.models import WidgetDialogCall
 from utils import DEFAULT_PROTOCOL
+from utils.metrics import Meter
 from videos import models
 from widget.models import SubtitlingSession
 from widget.null_rpc import NullRpc
@@ -337,6 +338,7 @@ def _is_loggable(method):
 
 @csrf_exempt
 def rpc(request, method_name, null=False):
+    Meter('widget-rpc-calls').inc()
     if method_name[:1] == '_':
         return HttpResponseServerError('cant call private method')
     _log_call(request.browser_id, method_name, request.POST.copy())
@@ -391,6 +393,7 @@ def xd_rpc(request, method_name, null=False):
                               context_instance = RequestContext(request))
 
 def jsonp(request, method_name, null=False):
+    Meter('widget-jsonp-calls').inc()
     _log_call(request.browser_id, method_name, request.GET.copy())
     callback = request.GET.get('callback', 'callback')
     args = { 'request' : request }
