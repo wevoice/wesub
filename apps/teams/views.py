@@ -1357,8 +1357,14 @@ def upload_draft(request, slug):
         form = UploadDraftForm(request.user, request.POST, request.FILES)
 
         if form.is_valid():
-            form.save()
-            messages.success(request, _(u"Draft uploaded successfully."))
+            try:
+                form.save()
+            except Exception, e:
+                import logging
+                logging.exception('error')
+                messages.error(request, _(u"Sorry, the subtitles don't match the lines, so we can't upload them."))
+            else:
+                messages.success(request, _(u"Draft uploaded successfully."))
         else:
             messages.error(request, _(u"There was a problem uploading that draft."))
 
