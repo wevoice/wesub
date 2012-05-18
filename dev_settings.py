@@ -124,6 +124,7 @@ if SENTRY_ON:
     # Change this to your local sentry dsn
     # You can find it under the account tab
     # Also, make sure that the host is `localhost` and the port is `9000`
+    # and not `unisubs.example.com`.
     SENTRY_DSN = ""
     SENTRY_DEBUG = False
 

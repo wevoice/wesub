@@ -14,14 +14,19 @@ are logged.  Regular Django logging goes to sentry as well.
 7.  Navigate the menus and find your server's DSN string
 8.  Open ``dev_settings.py`` and paste your string to ``SENTRY_DSN``.  Change
     the host to ``localhost``.
-9.  Start your development server
-10. Profit
+9.  Turn ``DEBUG`` off.
+10. Start your development server
+11. Profit
+
+.. note:: If you have been using Vagrant to develop Amara for a while, you will
+    have to halt your VM and start it again to properly forward your ports.
+    The sentry server runs on port 9000 and has to be opened up to the host
+    machine.
 
 Resources
 ---------
 
 You might find these helpful when playing with Sentry:
-
 
 * `Sentry docs <http://sentry.readthedocs.org/en/latest/index.html>`_
 * `Sentry source <https://github.com/dcramer/sentry>`_
