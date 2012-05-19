@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-18 01:40-0500\n"
+"POT-Creation-Date: 2012-05-19 01:38-0500\n"
 "PO-Revision-Date: 2012-05-17 06:49+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.net/projects/p/"
@@ -218,76 +218,76 @@ msgstr "你需要授权"
 msgid "Message does not exist."
 msgstr "消息不存在"
 
-#: apps/messages/tasks.py:69
+#: apps/messages/tasks.py:71
 #, python-format
 msgid "New message from %(author)s on Amara: %(subject)s"
 msgstr "来自Amara %(author)s ： %(subject)s 的新消息"
 
-#: apps/messages/tasks.py:71
+#: apps/messages/tasks.py:73
 #, python-format
 msgid "New message on Amara: %(subject)s"
 msgstr "来自%(subject)s 的新消息"
 
-#: apps/messages/tasks.py:114
+#: apps/messages/tasks.py:116
 #, python-format
 msgid "You've been invited to team %s on Amara"
 msgstr "你已邀请加入 Amara的  %s 组"
 
-#: apps/messages/tasks.py:148
+#: apps/messages/tasks.py:150
 #, python-format
 msgid "%(user)s is applying for team %(team)s"
 msgstr "%(user)s 申请 team %(team)s"
 
-#: apps/messages/tasks.py:178
+#: apps/messages/tasks.py:180
 #, python-format
 msgid "Your application to join the %s team has been declined"
 msgstr "你加入 %s 组 的申请被拒"
 
-#: apps/messages/tasks.py:211
+#: apps/messages/tasks.py:213
 #, python-format
 msgid "%s team has a new member"
 msgstr "%s 组有了一个新成员"
 
-#: apps/messages/tasks.py:234
+#: apps/messages/tasks.py:236
 #, python-format
 msgid "You've joined the %s team!"
 msgstr "你已经加入 %s 组!"
 
-#: apps/messages/tasks.py:258
+#: apps/messages/tasks.py:260
 #, python-format
 msgid "%(user)s has left the %(team)s team"
 msgstr "%(user)s 已离开 %(team)s 小组"
 
-#: apps/messages/tasks.py:282
+#: apps/messages/tasks.py:284
 #, python-format
 msgid "You've left the %s team!"
 msgstr "你已离开 %s 小组！"
 
-#: apps/messages/tasks.py:316
+#: apps/messages/tasks.py:318
 msgid "Your videos were imported!"
 msgstr "你的视频已导入"
 
-#: apps/messages/tasks.py:342
+#: apps/messages/tasks.py:344
 msgid "You have a new task assignment on Amara!"
 msgstr ""
 
-#: apps/messages/tasks.py:382
+#: apps/messages/tasks.py:384
 msgid "Your subtitles have been reviewed"
 msgstr "你的字幕已被评审"
 
-#: apps/messages/tasks.py:384
+#: apps/messages/tasks.py:386
 msgid " and published"
 msgstr " 并发布"
 
-#: apps/messages/tasks.py:479
+#: apps/messages/tasks.py:481
 msgid "Your subtitles have been approved and published!"
 msgstr "你的字幕已评审并发布！"
 
-#: apps/messages/tasks.py:486 apps/messages/tasks.py:540
+#: apps/messages/tasks.py:488 apps/messages/tasks.py:542
 msgid "Your subtitles have been declined"
 msgstr "你的字幕已被拒"
 
-#: apps/messages/tasks.py:583
+#: apps/messages/tasks.py:585
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr ""
@@ -451,7 +451,7 @@ msgstr "特色组"
 msgid "Unfeature teams"
 msgstr "非特色组"
 
-#: apps/teams/admin.py:78 apps/teams/admin.py:111 apps/teams/models.py:178
+#: apps/teams/admin.py:78 apps/teams/admin.py:111 apps/teams/models.py:181
 msgid "Team"
 msgstr "队"
 
@@ -627,136 +627,136 @@ msgstr "不能检测编码"
 msgid "Incorrect subtitles format"
 msgstr "不正确的字幕格式"
 
-#: apps/teams/models.py:87
+#: apps/teams/models.py:90
 msgid "Open"
 msgstr "打开"
 
-#: apps/teams/models.py:88 libs/rosetta/templates/rosetta/languages.html:28
+#: apps/teams/models.py:91 libs/rosetta/templates/rosetta/languages.html:28
 msgid "Application"
 msgstr "申请"
 
-#: apps/teams/models.py:89
+#: apps/teams/models.py:92
 msgid "Invitation by any team member"
 msgstr "被任何小组成员邀请"
 
-#: apps/teams/models.py:90
+#: apps/teams/models.py:93
 msgid "Invitation by manager"
 msgstr "管理员邀请"
 
-#: apps/teams/models.py:91
+#: apps/teams/models.py:94
 msgid "Invitation by admin"
 msgstr "被管理员邀请"
 
-#: apps/teams/models.py:98
+#: apps/teams/models.py:101
 msgid "Any team member"
 msgstr "任何组成员"
 
-#: apps/teams/models.py:99
+#: apps/teams/models.py:102
 msgid "Managers and admins"
 msgstr "负责人和管理人"
 
-#: apps/teams/models.py:100
+#: apps/teams/models.py:103
 msgid "Admins only"
 msgstr "仅管理人"
 
-#: apps/teams/models.py:120
+#: apps/teams/models.py:123
 msgid "name"
 msgstr "名称"
 
-#: apps/teams/models.py:121
+#: apps/teams/models.py:124
 msgid "slug"
 msgstr ""
 
-#: apps/teams/models.py:122
+#: apps/teams/models.py:125
 msgid "description"
 msgstr "描述"
 
-#: apps/teams/models.py:122
+#: apps/teams/models.py:125
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
 msgstr "所有URL会转换为链接。不支持换行符和HTML"
 
-#: apps/teams/models.py:124
+#: apps/teams/models.py:127
 msgid "logo"
 msgstr "标志"
 
-#: apps/teams/models.py:125
+#: apps/teams/models.py:128
 msgid "publicly Visible?"
 msgstr "公开可见？"
 
-#: apps/teams/models.py:126 templates/search/search.html:151
+#: apps/teams/models.py:129 templates/search/search.html:151
 #: templates/teams/project_list.html:10
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
 msgstr "视频"
 
-#: apps/teams/models.py:127
+#: apps/teams/models.py:130
 msgid "users"
 msgstr "用户"
 
-#: apps/teams/models.py:130
+#: apps/teams/models.py:133
 msgid "third party accounts"
 msgstr "第三方帐户"
 
-#: apps/teams/models.py:133
+#: apps/teams/models.py:136
 msgid "applicants"
 msgstr ""
 
-#: apps/teams/models.py:136
+#: apps/teams/models.py:139
 msgid "Intro Video"
 msgstr "介绍视频"
 
-#: apps/teams/models.py:138
+#: apps/teams/models.py:141
 msgid "Page content"
 msgstr "页面内容"
 
-#: apps/teams/models.py:138
+#: apps/teams/models.py:141
 msgid "You can use markdown. This will replace Description."
 msgstr "你可以使用标注。那样会替换描述。"
 
-#: apps/teams/models.py:140
+#: apps/teams/models.py:143
 msgid "HTML that appears at the top of the teams page."
 msgstr "出现在组页面顶部的HTML"
 
-#: apps/teams/models.py:143
+#: apps/teams/models.py:146
 msgid "authentication provider code"
 msgstr "验证提供者代码"
 
-#: apps/teams/models.py:151
+#: apps/teams/models.py:154
 msgid "membership policy"
 msgstr "成员策略"
 
-#: apps/teams/models.py:154
+#: apps/teams/models.py:157
 msgid "video policy"
 msgstr "视频策略"
 
-#: apps/teams/models.py:157
+#: apps/teams/models.py:160
 msgid "task assignment policy"
 msgstr "任务标注政策"
 
-#: apps/teams/models.py:160
+#: apps/teams/models.py:163
 msgid "subtitling policy"
 msgstr "字幕制作政策"
 
-#: apps/teams/models.py:163
+#: apps/teams/models.py:166
 msgid "translation policy"
 msgstr "翻译政策"
 
-#: apps/teams/models.py:166
+#: apps/teams/models.py:169
 msgid "maximum tasks per member"
 msgstr "每个成员的最大任务数"
 
-#: apps/teams/models.py:168
+#: apps/teams/models.py:171
 msgid "task expiration (days)"
 msgstr "任务有效期(天)"
 
-#: apps/teams/models.py:179 templates/profiles/_top_user_panel.html:33
+#: apps/teams/models.py:182 templates/profiles/_top_user_panel.html:33
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "队"
 
-#: apps/teams/models.py:622
+#: apps/teams/models.py:625
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -764,32 +764,32 @@ msgstr ""
 "用这个空间说明你和你的小组为什么给这个视频创建字幕。添加注解让志愿者更多的提"
 "供帮助"
 
-#: apps/teams/models.py:626
+#: apps/teams/models.py:629
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr ""
 
-#: apps/teams/models.py:628
+#: apps/teams/models.py:631
 msgid "Need help with all languages"
 msgstr "所有的语言都需要帮助"
 
-#: apps/teams/models.py:629
+#: apps/teams/models.py:632
 msgid "If you check this, other languages will not be displayed."
 msgstr ""
 
-#: apps/teams/models.py:909 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:912 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "拥有者"
 
-#: apps/teams/models.py:910 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:913 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "管理员"
 
-#: apps/teams/models.py:911 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:914 apps/teams/permissions_const.py:44
 #: templates/base.html:116
 msgid "Admin"
 msgstr "管理"
 
-#: apps/teams/models.py:912 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:915 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "贡献者"
 
@@ -805,7 +805,7 @@ msgstr "组不存在"
 msgid "You are already a member of this team."
 msgstr "你已经是组成员"
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:869
+#: apps/teams/rpc.py:50 apps/teams/views.py:867
 msgid "You are now a member of this team."
 msgstr "你现在是组中的一员"
 
@@ -852,25 +852,25 @@ msgstr "你不能给那个成员分配角色"
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "新的 %(team)s 视频已准备好编辑字幕！"
 
-#: apps/teams/views.py:120 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:118 templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "姓名"
 
-#: apps/teams/views.py:121 templates/teams/teams-list.html:47
+#: apps/teams/views.py:119 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "最新"
 
-#: apps/teams/views.py:122 templates/teams/teams-list.html:44
+#: apps/teams/views.py:120 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr ""
 
-#: apps/teams/views.py:256
+#: apps/teams/views.py:254
 msgid "Member saved."
 msgstr "成员已保存"
 
-#: apps/teams/views.py:318
+#: apps/teams/views.py:316
 #, python-format
 msgid ""
 "\n"
@@ -902,172 +902,172 @@ msgstr ""
 "                </ul>\n"
 "                "
 
-#: apps/teams/views.py:344
+#: apps/teams/views.py:342
 msgid "You do not have permission to delete this team."
 msgstr "你没有权限删除此组"
 
-#: apps/teams/views.py:358 apps/teams/views.py:394 apps/teams/views.py:422
-#: apps/teams/views.py:455 apps/teams/views.py:510 apps/teams/views.py:1497
+#: apps/teams/views.py:356 apps/teams/views.py:392 apps/teams/views.py:420
+#: apps/teams/views.py:453 apps/teams/views.py:508 apps/teams/views.py:1495
 msgid "You do not have permission to edit this team."
 msgstr "你没有权限编辑此组"
 
-#: apps/teams/views.py:381 apps/teams/views.py:440 apps/teams/views.py:525
+#: apps/teams/views.py:379 apps/teams/views.py:438 apps/teams/views.py:523
 msgid "Settings saved."
 msgstr "设定已保存"
 
-#: apps/teams/views.py:407
+#: apps/teams/views.py:405
 msgid "Guidelines and messages updated."
 msgstr "指南及信息已保存"
 
-#: apps/teams/views.py:544
+#: apps/teams/views.py:542
 msgid "You can't add that video to this team/project."
 msgstr "你不能把这个视频添加至此小组／项目"
 
-#: apps/teams/views.py:579
+#: apps/teams/views.py:577
 msgid "The video has been moved to the new team."
 msgstr "此视频已移动至一个新组"
 
-#: apps/teams/views.py:592
+#: apps/teams/views.py:590
 msgid "You can't add videos to this team/project."
 msgstr "你不能添加视频至小组／项目"
 
-#: apps/teams/views.py:611
+#: apps/teams/views.py:609
 msgid "You can't edit this video."
 msgstr "你不能编辑此视频"
 
-#: apps/teams/views.py:620
+#: apps/teams/views.py:618
 msgid "Video has been updated."
 msgstr "视频已经更新"
 
-#: apps/teams/views.py:648
+#: apps/teams/views.py:646
 msgid "Request must be a POST request."
 msgstr "请求必须是一个POST请求"
 
-#: apps/teams/views.py:656
+#: apps/teams/views.py:654
 msgid "You can't delete that video."
 msgstr ""
 
-#: apps/teams/views.py:660
+#: apps/teams/views.py:658
 msgid "You can't remove that video."
 msgstr "你不能移除视频"
 
-#: apps/teams/views.py:671
+#: apps/teams/views.py:669
 msgid "Video has been deleted from Amara."
 msgstr "视频已从Amara删除。"
 
-#: apps/teams/views.py:673
+#: apps/teams/views.py:671
 msgid "Video has been removed from the team."
 msgstr "视频已从此组移除"
 
-#: apps/teams/views.py:760
+#: apps/teams/views.py:758
 msgid "Member has been removed from the team."
 msgstr "成员已从此组移除"
 
-#: apps/teams/views.py:763
+#: apps/teams/views.py:761
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "使用“离开此组”按钮，离开此小组"
 
-#: apps/teams/views.py:766
+#: apps/teams/views.py:764
 msgid "You don't have permission to remove this member from the team."
 msgstr "你没有权限将成员移除此小组"
 
-#: apps/teams/views.py:797
+#: apps/teams/views.py:795
 msgid "Application approved."
 msgstr "申请已通过"
 
-#: apps/teams/views.py:799 apps/teams/views.py:817
+#: apps/teams/views.py:797 apps/teams/views.py:815
 msgid "Application does not exist."
 msgstr "申请不存在"
 
-#: apps/teams/views.py:801
+#: apps/teams/views.py:799
 msgid "You can't approve applications."
 msgstr "你不能批准申请"
 
-#: apps/teams/views.py:815
+#: apps/teams/views.py:813
 msgid "Application denied."
 msgstr "需要申请"
 
-#: apps/teams/views.py:819
+#: apps/teams/views.py:817
 msgid "You can't deny applications."
 msgstr "你不能拒绝申请"
 
-#: apps/teams/views.py:829
+#: apps/teams/views.py:827
 msgid "You cannot invite people to this team."
 msgstr "你不能邀请别人到此组"
 
-#: apps/teams/views.py:865
+#: apps/teams/views.py:863
 msgid "You cannot join this team."
 msgstr "你不能加入此组"
 
-#: apps/teams/views.py:916
+#: apps/teams/views.py:914
 msgid "You have left this team."
 msgstr "你已经离开此组"
 
-#: apps/teams/views.py:1119
+#: apps/teams/views.py:1117
 msgid "You cannot view this team's tasks."
 msgstr "你不能查看此小组的任务"
 
-#: apps/teams/views.py:1241 apps/teams/views.py:1244
+#: apps/teams/views.py:1239 apps/teams/views.py:1242
 msgid "You are not allowed to perform this task."
 msgstr "你没有执行此任务的权限"
 
-#: apps/teams/views.py:1299
+#: apps/teams/views.py:1297
 msgid "Task deleted."
 msgstr "任务已删除"
 
-#: apps/teams/views.py:1301
+#: apps/teams/views.py:1299
 msgid "You cannot delete this task."
 msgstr "你不能删除此任务"
 
-#: apps/teams/views.py:1326
+#: apps/teams/views.py:1324
 msgid "Task declined."
 msgstr ""
 
-#: apps/teams/views.py:1328
+#: apps/teams/views.py:1326
 msgid "Task assigned."
 msgstr "任务已标记"
 
-#: apps/teams/views.py:1330
+#: apps/teams/views.py:1328
 msgid "You cannot assign this task."
 msgstr "你不能标记此任务"
 
-#: apps/teams/views.py:1352
+#: apps/teams/views.py:1350
 msgid "Invalid assignment attempt."
 msgstr "不可标记"
 
-#: apps/teams/views.py:1361
+#: apps/teams/views.py:1359
 msgid "Draft uploaded successfully."
 msgstr ""
 
-#: apps/teams/views.py:1363
+#: apps/teams/views.py:1361
 msgid "There was a problem uploading that draft."
 msgstr ""
 
-#: apps/teams/views.py:1376
+#: apps/teams/views.py:1374
 msgid "You are not allowed to download this transcript."
 msgstr ""
 
-#: apps/teams/views.py:1424
+#: apps/teams/views.py:1422
 msgid "There's already a project with this name"
 msgstr "已有同名项目存在"
 
-#: apps/teams/views.py:1436
+#: apps/teams/views.py:1434
 msgid "Project added."
 msgstr "项目已添加"
 
-#: apps/teams/views.py:1453
+#: apps/teams/views.py:1451
 msgid "You cannot edit that project."
 msgstr "你不能编辑此项目"
 
-#: apps/teams/views.py:1464
+#: apps/teams/views.py:1462
 msgid "Project deleted."
 msgstr "项目已删除"
 
-#: apps/teams/views.py:1482
+#: apps/teams/views.py:1480
 msgid "Project saved."
 msgstr "项目已保存"
 
-#: apps/teams/views.py:1608
+#: apps/teams/views.py:1606
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
@@ -1075,7 +1075,7 @@ msgstr ""
 "无效的撤消请求\n"
 "错误：\n"
 
-#: apps/teams/views.py:1642
+#: apps/teams/views.py:1640
 msgid "Successfully unpublished subtitles."
 msgstr "成功撤销字幕发布"
 
@@ -1213,29 +1213,29 @@ msgstr "视频已经加入后台。如果你已登录，你将会在它完成时
 msgid "captcha"
 msgstr "验证码"
 
-#: apps/videos/models.py:134
+#: apps/videos/models.py:135
 msgid "in seconds"
 msgstr "几秒内"
 
-#: apps/videos/models.py:158
+#: apps/videos/models.py:159
 msgid "Sub.fetched"
 msgstr ""
 
-#: apps/videos/models.py:160
+#: apps/videos/models.py:161
 msgid "Widget views"
 msgstr "工具查看"
 
-#: apps/videos/models.py:162
+#: apps/videos/models.py:163
 msgid "Views"
 msgstr "查看"
 
-#: apps/videos/models.py:1101
+#: apps/videos/models.py:1100
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
 msgstr "抱歉，你现在不能上传字幕，因为某人正在编辑你上传或者翻译的这个语言"
 
-#: apps/videos/models.py:1853
+#: apps/videos/models.py:1852
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1244,14 +1244,14 @@ msgstr ""
 "  已评审视频<a href=\"%(video_url)s\">%(video_name)s</a>的 <a href=\"%"
 "(language_url)s\">%(language)s</a>字幕"
 
-#: apps/videos/models.py:1858
+#: apps/videos/models.py:1857
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1863
+#: apps/videos/models.py:1862
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1260,7 +1260,7 @@ msgstr ""
 "  拒绝  <a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%"
 "(language_url)s\">%(language)s</a> 字幕"
 
-#: apps/videos/models.py:1868
+#: apps/videos/models.py:1867
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1269,34 +1269,34 @@ msgstr ""
 "  通过<a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%(language_url)"
 "s\">%(language)s</a> 字幕"
 
-#: apps/videos/models.py:1873
+#: apps/videos/models.py:1872
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1878
+#: apps/videos/models.py:1877
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "添加视频 <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1880
+#: apps/videos/models.py:1879
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> 视频已添加"
 
-#: apps/videos/models.py:1886
+#: apps/videos/models.py:1885
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>已变更的标题"
 
-#: apps/videos/models.py:1888
+#: apps/videos/models.py:1887
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>的标题已改变"
 
-#: apps/videos/models.py:1903
+#: apps/videos/models.py:1902
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1305,7 +1305,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%(comments_url)s\">%"
 "(language)s 字幕</a>已评注"
 
-#: apps/videos/models.py:1905
+#: apps/videos/models.py:1904
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1314,17 +1314,17 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%(comments_url)s\">%"
 "(language)s 字幕</a>已添加评注"
 
-#: apps/videos/models.py:1908
+#: apps/videos/models.py:1907
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> 的评注"
 
-#: apps/videos/models.py:1910
+#: apps/videos/models.py:1909
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "添加至<a href=\"%(video_url)s\">%(video_name)s</a>的评注"
 
-#: apps/videos/models.py:1918
+#: apps/videos/models.py:1917
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1333,108 +1333,108 @@ msgstr ""
 "启动  <a href=\"%(video_url)s\">%(video_name)s</a> 的<a href=\"%"
 "(language_url)s\">%(language)s subtitles</a>"
 
-#: apps/videos/models.py:1920
+#: apps/videos/models.py:1919
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1931
+#: apps/videos/models.py:1930
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1933
+#: apps/videos/models.py:1932
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1939
+#: apps/videos/models.py:1938
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "添加新的链接给 <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1941
+#: apps/videos/models.py:1940
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "为 <a href=\"%(video_url)s\">%(video_name)s</a>添加的新链接"
 
-#: apps/videos/models.py:1946
+#: apps/videos/models.py:1945
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "作为%(role)s 加入 %(team)s 小组"
 
-#: apps/videos/models.py:1951
+#: apps/videos/models.py:1950
 #, python-format
 msgid "left the %s team"
 msgstr "离开 %s 小组"
 
-#: apps/videos/models.py:2007
+#: apps/videos/models.py:2006
 msgid "add video"
 msgstr "添加视频"
 
-#: apps/videos/models.py:2008
+#: apps/videos/models.py:2007
 msgid "change title"
 msgstr "更改标题"
 
-#: apps/videos/models.py:2009
+#: apps/videos/models.py:2008
 msgid "comment"
 msgstr "评论"
 
-#: apps/videos/models.py:2010
+#: apps/videos/models.py:2009
 msgid "add version"
 msgstr "添加版本"
 
-#: apps/videos/models.py:2011
+#: apps/videos/models.py:2010
 msgid "add translation"
 msgstr "添加翻译"
 
-#: apps/videos/models.py:2012
+#: apps/videos/models.py:2011
 msgid "add video url"
 msgstr "添加视频url"
 
-#: apps/videos/models.py:2013
+#: apps/videos/models.py:2012
 msgid "request subtitles"
 msgstr ""
 
-#: apps/videos/models.py:2014
+#: apps/videos/models.py:2013
 msgid "approve version"
 msgstr "批准此版本"
 
-#: apps/videos/models.py:2015
+#: apps/videos/models.py:2014
 msgid "add contributor"
 msgstr "添加贡献者"
 
-#: apps/videos/models.py:2016
+#: apps/videos/models.py:2015
 msgid "remove contributor"
 msgstr "移除贡献者"
 
-#: apps/videos/models.py:2017
+#: apps/videos/models.py:2016
 msgid "reject version"
 msgstr "拒绝此版本"
 
-#: apps/videos/models.py:2018
+#: apps/videos/models.py:2017
 msgid "review version"
 msgstr "回顾版本"
 
-#: apps/videos/models.py:2019
+#: apps/videos/models.py:2018
 msgid "accept version"
 msgstr ""
 
-#: apps/videos/models.py:2020
+#: apps/videos/models.py:2019
 msgid "decline version"
 msgstr ""
 
-#: apps/videos/models.py:2021
+#: apps/videos/models.py:2020
 msgid "delete video"
 msgstr ""
 
-#: apps/videos/models.py:2271
+#: apps/videos/models.py:2270
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1528,7 +1528,7 @@ msgstr "嘿！-- 只要找到%(video_title)s: %(url)s的 %(language)s 字幕 "
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "只要找此视频的一个%(language_name)s的字幕版本"
 
-#: apps/videos/views.py:158
+#: apps/videos/views.py:159
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1536,7 +1536,7 @@ msgid ""
 "improve subtitles, click the button below the video."
 msgstr ""
 
-#: apps/videos/views.py:166
+#: apps/videos/views.py:167
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
@@ -1546,33 +1546,33 @@ msgstr ""
 "                它使用http服务.  你的浏览器将会显示各种\n"
 "                内容警示。"
 
-#: apps/videos/views.py:171
+#: apps/videos/views.py:172
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr ""
 
-#: apps/videos/views.py:273
+#: apps/videos/views.py:274
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "感谢你的上传。大约1分钟后会显示你的字幕"
 
-#: apps/videos/views.py:275
+#: apps/videos/views.py:276
 msgid "Your changes have been saved."
 msgstr "你的变更已经保存"
 
-#: apps/videos/views.py:638
+#: apps/videos/views.py:639
 msgid "You have not permission change this URL"
 msgstr "你没有被允许更改这个URL"
 
-#: apps/videos/views.py:644 apps/videos/views.py:664
+#: apps/videos/views.py:645 apps/videos/views.py:665
 msgid "Object does not exist"
 msgstr "对象不存在"
 
-#: apps/videos/views.py:657
+#: apps/videos/views.py:658
 msgid "You have not permission delete this URL"
 msgstr "你没有被允许删除这个URL"
 
-#: apps/videos/views.py:660
+#: apps/videos/views.py:661
 msgid "You cann't remove original URL"
 msgstr "你不能移除源URL"
 
@@ -1629,7 +1629,7 @@ msgstr ""
 msgid "\n"
 msgstr "\n"
 
-#: apps/widget/views.py:105
+#: apps/widget/views.py:106
 msgid "That task has already been completed."
 msgstr "任务已完成"
 
@@ -7618,12 +7618,12 @@ msgstr "更多最新视频"
 msgid "Help Subtitle Videos"
 msgstr "帮助字幕视频"
 
-#: utils/ajaxmiddleware.py:26
+#: utils/ajaxmiddleware.py:27
 #, python-format
 msgid "Required parameter missing: %s"
 msgstr "缺少所需参数：%s"
 
-#: utils/ajaxmiddleware.py:69
+#: utils/ajaxmiddleware.py:70
 msgid "Internal error"
 msgstr "内部错误"
 
