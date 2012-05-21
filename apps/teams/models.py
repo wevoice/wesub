@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import datetime
+import logging
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -49,6 +50,8 @@ from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
 
+
+logger = logging.getLogger(__name__)
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
@@ -1558,11 +1561,12 @@ class Task(models.Model):
                "Tried to set version moderation status from an un-ruled-upon task."
 
         if self.approved == Task.APPROVED_IDS['Approved']:
-            self.subtitle_version.moderation_status = MODERATION.APPROVED
+            moderation_status = MODERATION.APPROVED
         else:
-            self.subtitle_version.moderation_status = MODERATION.REJECTED
+            moderation_status = MODERATION.REJECTED
 
-        self.subtitle_version.save()
+        SubtitleVersion.objects.filter(pk=self.subtitle_version.pk).update(
+                moderation_status=moderation_status)
 
     def _send_back(self, sends_notification=True):
         """Handle "rejection" of this task.
@@ -2138,9 +2142,6 @@ class TeamNotificationSetting(models.Model):
     objects = TeamNotificationSettingManager()
 
     def get_notification_class(self):
-        # move this import to the module level and test_settings break. Fun.
-        import sentry_logger
-        logger = sentry_logger.logging.getLogger("teams.models")
         try:
             from notificationclasses import NOTIFICATION_CLASS_MAP
 

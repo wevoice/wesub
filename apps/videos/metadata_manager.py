@@ -18,54 +18,60 @@
 
 from teams.models import TeamVideo
 from datetime import datetime
+from utils.metrics import Meter, Timer
 
 def update_metadata(video_pk):
     from videos.models import Video
-    video = Video.objects.get(pk=video_pk)
-    video.edited = datetime.now()
-    video.save()
-    _update_is_public(video)
-    _update_forked(video)
-    _update_changes(video)
-    _update_subtitle_counts(video)
-    _update_percent_done(video)
-    _update_has_had_version(video)
-    _update_is_was_subtitled(video)
-    _update_languages_count(video)
-    _update_complete_date(video)
-    _invalidate_cache(video)
+    with Timer('metadata-update-time'):
+        video = Video.objects.get(pk=video_pk)
+        video.edited = datetime.now()
+        video.save()
+        _update_is_public(video)
+        _update_forked(video)
+        _update_changes(video)
+        _update_subtitle_counts(video)
+        _update_percent_done(video)
+        _update_has_had_version(video)
+        _update_is_was_subtitled(video)
+        _update_languages_count(video)
+        _update_complete_date(video)
+        _invalidate_cache(video)
 
 def _update_forked(video):
     for sl in video.subtitlelanguage_set.all():
+        # This metrics is incremented here arbitrarily.  It could be done in any
+        # of the other many _update_* functions that loop over the language set.
+        Meter('language-metadata-update').inc()
         if sl.latest_version() and \
                 sl.latest_version().is_forked != sl.is_forked:
             sl.is_forked = sl.latest_version().is_forked
             sl.save()
 
 def _update_changes(video):
+    from videos.models import SubtitleVersion
     for sl in video.subtitlelanguage_set.all():
         last_version = None
         versions = sl.subtitleversion_set.order_by('version_no').all()
         for version in versions:
             if version.text_change is None or version.time_change is None:
-                _update_changes_on_version(version, last_version)
-                version.save()
+                time_change, text_change = _update_changes_on_version(version, last_version)
+                SubtitleVersion.objects.filter(pk=version.pk).update(
+                        time_change=time_change, text_change=text_change)
             last_version = version
 
 def _update_changes_on_version(version, last_version):
     new_subtitles = version.subtitles()
     subs_length = len(new_subtitles)
-    if not last_version:
-        version.time_change = 1
-        version.text_change = 1
-        return
-    if subs_length == 0:
-        old_subs_length = last_version.subtitle_set.count()
-        version.time_change = 0 if old_subs_length == 0 else 1
-        version.text_change = version.time_change
-        return
 
-    _update_changes_on_nonzero_version(version, last_version)
+    if not last_version:
+        return 1, 1
+    elif subs_length == 0:
+        old_subs_length = last_version.subtitle_set.count()
+        time_change = 0 if old_subs_length == 0 else 1
+        text_change = version.time_change
+        return time_change, text_change
+    else:
+        return _update_changes_on_nonzero_version(version, last_version)
 
 def _update_changes_on_nonzero_version(version, last_version):
     subtitles = version.subtitles()
@@ -73,6 +79,7 @@ def _update_changes_on_nonzero_version(version, last_version):
                            for item in last_version.subtitles()])
     time_count_changed, text_count_changed = 0, 0
     new_subtitles_ids = set()
+
     for subtitle in subtitles:
         new_subtitles_ids.add(subtitle.subtitle_id)
         if subtitle.subtitle_id in last_subtitles:
@@ -84,13 +91,17 @@ def _update_changes_on_nonzero_version(version, last_version):
         else:
             time_count_changed += 1
             text_count_changed += 1
+
     for subtitle_id in last_subtitles.keys():
         if subtitle_id not in new_subtitles_ids:
             text_count_changed += 1
             time_count_changed += 1
+
     subs_length = len(subtitles)
-    version.time_change = min(time_count_changed / 1. / subs_length, 1)
-    version.text_change = min(text_count_changed / 1. / subs_length, 1)
+    time_change = min(time_count_changed / 1. / subs_length, 1)
+    text_change = min(text_count_changed / 1. / subs_length, 1)
+
+    return time_change, text_change
 
 def _update_subtitle_counts(video):
     from videos.models import Subtitle

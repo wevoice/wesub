@@ -30,8 +30,7 @@ from django.db.models import ObjectDoesNotExist
 from django.utils import simplejson as json
 from django.utils.http import urlquote_plus
 from haystack import site
-from sentry.client.handlers import SentryHandler
-from sentry.client.models import client
+from raven.contrib.django.models import client
 
 from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
@@ -39,7 +38,8 @@ from videos.models import VideoFeed, SubtitleLanguage, Video
 from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
-celery_logger.addHandler(SentryHandler())
+
+
 def process_failure_signal(exception, traceback, sender, task_id,
                            signal, args, kwargs, einfo, **kw):
     exc_info = (type(exception), exception, traceback)
@@ -108,7 +108,7 @@ def update_video_feed(video_feed_id):
         video_feed.update()
     except VideoFeed:
         msg = '**update_video_feed**. VideoFeed does not exist. ID: %s' % video_feed_id
-        client.create_from_text(msg, logger='celery')
+        client.captureMessage(msg)
 
 @task(ignore_result=False)
 def add(a, b):

@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   running-unisubs
+   running-amara
    static-files
    deployment-guide
    feature-flags
