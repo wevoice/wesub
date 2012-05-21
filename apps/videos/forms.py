@@ -338,7 +338,7 @@ class SubtitlesUploadBaseForm(forms.Form):
 
             if can_bypass_moderation:
                 new_version.moderate = APPROVED
-            elif workflow.review_allowed or workflow.approve_allowed:
+            elif workflow.review_allowed or workflow.approve_allowed and is_complete:
                 new_version.moderation_status = WAITING_MODERATION
             else:
                 new_version.moderation_status = UNMODERATED
@@ -347,7 +347,7 @@ class SubtitlesUploadBaseForm(forms.Form):
 
             outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
 
-            if is_complete and outstanding_tasks.exists():
+            if outstanding_tasks.exists():
                 outstanding_tasks.update(subtitle_version=new_version,
                                          language=language.language)
             elif not can_bypass_moderation:
