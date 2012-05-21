@@ -65,6 +65,7 @@ from teams.tasks import (
 )
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
+from utils.metrics import time as timefn
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
@@ -148,6 +149,7 @@ def index(request, my_teams=False):
                        template_object_name='teams',
                        extra_context=extra_context)
 
+@timefn
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
@@ -234,8 +236,9 @@ def detail(request, slug, project_slug=None, languages=None):
         Workflow.objects.filter(team=team.id)
                         .select_related('project', 'team', 'team_video'))
 
-    is_indexing = team.videos.all().count != extra_context['current_videos_count']
-    extra_context['is_indexing'] = is_indexing
+    if not filtered and not query:
+        is_indexing = team.videos.all().count != extra_context['current_videos_count']
+        extra_context['is_indexing'] = is_indexing
 
     if is_editor:
         team_video_ids = [record.team_video_pk for record in team_video_md_list]
@@ -678,6 +681,7 @@ def remove_video(request, team_video_pk):
 
 
 # Members
+@timefn
 @render_to('teams/members-list.html')
 def detail_members(request, slug, role=None):
     q = request.REQUEST.get('q')
@@ -1109,6 +1113,7 @@ def _get_task_filters(request):
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
 
+@timefn
 @render_to('teams/tasks.html')
 def team_tasks(request, slug, project_slug=None):
     team = Team.get(slug, request.user)
