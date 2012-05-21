@@ -1558,11 +1558,12 @@ class Task(models.Model):
                "Tried to set version moderation status from an un-ruled-upon task."
 
         if self.approved == Task.APPROVED_IDS['Approved']:
-            self.subtitle_version.moderation_status = MODERATION.APPROVED
+            moderation_status = MODERATION.APPROVED
         else:
-            self.subtitle_version.moderation_status = MODERATION.REJECTED
+            moderation_status = MODERATION.REJECTED
 
-        self.subtitle_version.save()
+        SubtitleVersion.objects.filter(pk=self.subtitle_version.pk).update(
+                moderation_status=moderation_status)
 
     def _send_back(self, sends_notification=True):
         """Handle "rejection" of this task.

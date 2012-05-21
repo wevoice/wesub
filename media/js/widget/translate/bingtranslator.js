@@ -16,10 +16,8 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-
 goog.provide('unisubs.translate.BingTranslator');
 goog.provide('unisubs.translate.BingTranslator.Transaction');
-
 
 /**
  * @constructor
@@ -80,7 +78,6 @@ unisubs.translate.BingTranslator.Transaction.prototype.getCallback_ = function(w
         }
     };
 };
-
 unisubs.translate.BingTranslator.Transaction.prototype.start = function(){
     for (var i=0, len=this.actions_.length; i<len; i++) {
         unisubs.translate.BingTranslator.translate.apply(null, this.actions_[i]);
@@ -178,8 +175,7 @@ unisubs.translate.BingTranslator.effectiveTextLength_ = function(texts) {
  * @param {string} toLang Language code for language of result
  * @param {function(Array.<string>, Array.<unisubs.translate.TranslationWidget>, ?string)} callback
  */
-unisubs.translate.BingTranslator.translateWidgets =
-function(needTranslating, fromLang, toLang, callback) {
+unisubs.translate.BingTranslator.translateWidgets = function(needTranslating, fromLang, toLang, callback) {
     var ml = unisubs.translate.BingTranslator.QUERY_MAX_LENGTH_;
     var effectiveLen = unisubs.translate.BingTranslator.effectiveTextLength_;
 

@@ -255,6 +255,7 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
         }
         if(videoPlayer.getPlayheadTime()){
             videoPlayer.setPlayheadTime(0);
+            videoPlayer.showCaptionText('');
             videoPlayer.pause();
         }
     }
