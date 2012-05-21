@@ -723,6 +723,9 @@ class Rpc(BaseRpc):
         team_video = subtitle_version.video.get_team_video()
         language = subtitle_version.language.language
 
+        if not team_video:
+            return
+
         transcribe_task = team_video.task_set.incomplete_subtitle_or_translate()\
                                      .filter(language=language)
 
