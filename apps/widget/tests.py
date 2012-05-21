@@ -37,7 +37,6 @@ from django.core.urlresolvers import reverse
 from widget import video_cache
 from datetime import datetime, timedelta
 from django.conf import settings
-from sentry.models import Message
 
 class FakeDatetime(object):
     def __init__(self, now):
@@ -975,13 +974,7 @@ class TestRpc(TestCase):
         from utils.requestfactory import RequestFactory
         rf = RequestFactory()
         request = rf.get("/")
-
-        num_messages = Message.objects.all().count()
-        self.assertEquals(0, num_messages)
-
         rpc.log_youtube_ei_failure(request, "/test-page")
-        new_num_messages = Message.objects.all().count()
-        self.assertEquals(num_messages + 1, new_num_messages)
 
     def test_start_editing_null(self):
         request = RequestMockup(self.user_0)

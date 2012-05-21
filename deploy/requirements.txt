@@ -34,7 +34,6 @@ vendor/boto-2.1.0-0.tar.gz
 python-memcached
 feedparser
 lxml==2.3
-django-sentry
 raven==1.8.2
 vendor/indifex-transifex-client-0.5.tar.gz
 django-extensions==0.4.1
