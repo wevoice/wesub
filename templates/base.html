@@ -116,7 +116,7 @@
                     <li><a target="_blank" href="{% url admin:index %}">{% trans 'Admin' %}</a></li>
                 {% endif %}
                 {% if user.is_superuser %}
-                    <li><a target="_blank" href="{% url sentry %}">{% trans 'Sentry' %}</a></li>
+                    <li><a target="_blank" href="http://sentry.pculture.org:9000">{% trans 'Sentry' %}</a></li>
                 {% endif %}
                 {% if user|can_translate %}
                     <li><a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a></li>

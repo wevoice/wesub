@@ -21,7 +21,6 @@ import datetime
 from storages.backends import s3boto
 try:
     from boto.s3 import Key
-    from sentry.models import Message, GroupedMessage, FilterValue
 except:
     from boto.s3 import key
     Key = key.Key
