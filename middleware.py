@@ -1,15 +1,19 @@
+import os
+import random
 import time
 
+import debug_toolbar
+from debug_toolbar.middleware import DebugToolbarMiddleware
 from django.conf import settings
-import random
-from django.utils.hashcompat import sha_constructor
-from django.utils.cache import patch_vary_headers
-from django.utils.http import cookie_date
-import os
-from django.db import connection
-from django.core.validators import validate_ipv4_address
 from django.core.exceptions import ValidationError
-from utils.metrics import ManualTimer
+from django.core.validators import validate_ipv4_address
+from django.db import connection
+from django.utils.cache import patch_vary_headers
+from django.utils.hashcompat import sha_constructor
+from django.utils.http import cookie_date
+
+from utils.metrics import ManualTimer, Timer
+
 
 class SaveUserIp(object):
 
@@ -149,8 +153,6 @@ class ExceptionLoggingMiddleware(object):
         import traceback
         print traceback.format_exc()
 
-from debug_toolbar.middleware import DebugToolbarMiddleware
-import debug_toolbar
 
 class SupeuserDebugToolbarMiddleware(DebugToolbarMiddleware):
 
