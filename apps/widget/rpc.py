@@ -575,10 +575,10 @@ class Rpc(BaseRpc):
             if not new_version.language.is_complete_and_synced(public_only=False):
                 new_version.moderation_status = UNMODERATED
                 new_version.save()
+                self._create_transcribe_task(new_version, user)
             elif hasattr(new_version, 'task_to_save'):
                 task = new_version.task_to_save
                 task.subtitle_version = new_version
-
                 if task.get_type_display() in ['Review', 'Approve']:
                     task.review_base_version = new_version
 
@@ -704,6 +704,28 @@ class Rpc(BaseRpc):
         # saved until much later, a few functions away.
         return Task(team=team_video.team, team_video=team_video,
                     assignee=assignee, language=lang, type=type)
+
+    def _create_transcribe_task(self, subtitle_version, user):
+        """ Verifies if it's possible to create a transcribe/translate task (if there's
+        no other transcribe/translate task) and tries to assign to user. """
+
+        team_video = subtitle_version.video.get_team_video()
+        language = subtitle_version.language
+        
+        transcribe_task = team_video.task_set.incomplete_subtitle_or_translate()\
+                                     .filter(language=subtitle_version.language)
+
+        if transcribe_task.exists():
+            task = transcribe_task[0]
+            return
+
+        task = Task(team=team_video.team, team_video=team_video,
+                    language=language, type=Task.TYPE_IDS['Subtitle'])
+
+        if can_create_and_edit_subtitles(user, team_video):
+            task.assignee = user
+
+        task.save()
 
     def _moderate_session(self, session, user):
         """Return the right moderation_status for a version based on the given session.
