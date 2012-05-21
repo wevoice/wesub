@@ -109,26 +109,28 @@ unisubs.translate.TranslationWidget.prototype.setTranslationContent = function(v
 unisubs.translate.TranslationWidget.prototype.cloneToCaptionManager = function(dontShowNow){
     var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
-        var currentText = this.translateInput_.value;
-        var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
-        var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
+    var currentText = this.translateInput_.value;
+    var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
+    var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
 
-        if (currentText !== '') {
-            editableCaption.setText(currentText);
-            if (!dontShowNow) {
+    if (currentText !== '') {
+        editableCaption.setText(currentText);
+        if (!dontShowNow) {
+            if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
                 this.dialog_.getVideoPlayerInternal().showCaptionText(currentText);
             }
-            this.textHasBeenChanged_ = true;
-        } else {
-            if (this.textHasBeenChanged_) {
-                var originalText = editableCaption.getOriginalText();
-                editableCaption.setText(originalText);
-                if (!dontShowNow) {
+        }
+        this.textHasBeenChanged_ = true;
+    } else {
+        if (this.textHasBeenChanged_) {
+            var originalText = editableCaption.getOriginalText();
+            editableCaption.setText(originalText);
+            if (!dontShowNow) {
+                if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
                     this.dialog_.getVideoPlayerInternal().showCaptionText(originalText);
                 }
-                this.textHasBeenChanged_ = false;
             }
+            this.textHasBeenChanged_ = false;
         }
     }
 };

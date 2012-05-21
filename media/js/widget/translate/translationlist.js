@@ -59,19 +59,16 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
-
-        if (this.dialog_.reviewOrApprovalType_) {
-            this.baseLanguageCaptionSet_ = this.captionSet_;
-        } else {
-            this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
-                    this.baseLanguageSubtitles_);
-        }
-
-        this.captionManager_ =
-            new unisubs.CaptionManager(
-                this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
+    if (this.dialog_.reviewOrApprovalType_) {
+        this.baseLanguageCaptionSet_ = this.captionSet_;
+    } else {
+        this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
+                this.baseLanguageSubtitles_);
     }
+
+    this.captionManager_ =
+        new unisubs.CaptionManager(
+            this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
 
     goog.array.forEach(
         this.baseLanguageSubtitles_,
@@ -93,30 +90,27 @@ unisubs.translate.TranslationList.prototype.enterDocument = function() {
     var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
     var that = this;
 
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
-
-        // Start loading the video.
-        this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
-        if (videoPlayerType === 'html5') {
-            this.dialog_.getVideoPlayerInternal().play();
-        }
-        this.dialog_.getVideoPlayerInternal().pause();
-
-        // Setup listening for video + subtitles.
-        handler.listen(this.captionManager_,
-                       unisubs.CaptionManager.CAPTION,
-                       this.captionReached_);
-
-        // Update the captionSet that the video is listening to
-        // to match the proper mix of translated / original subtitles.
-        goog.array.forEach(this.captionSet_.captions_, function(c) {
-            if (c.getText() !== '') {
-                var subOrder = c.getSubOrder();
-                var captionToUpdate = that.baseLanguageCaptionSet_.findSubIndex_(subOrder);
-                that.baseLanguageCaptionSet_.caption(captionToUpdate).setText(c.getText());
-            }
-        });
+    // Start loading the video.
+    this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
+    if (videoPlayerType === 'html5') {
+        this.dialog_.getVideoPlayerInternal().play();
     }
+    this.dialog_.getVideoPlayerInternal().pause();
+
+    // Setup listening for video + subtitles.
+    handler.listen(this.captionManager_,
+                   unisubs.CaptionManager.CAPTION,
+                   this.captionReached_);
+
+    // Update the captionSet that the video is listening to
+    // to match the proper mix of translated / original subtitles.
+    goog.array.forEach(this.captionSet_.captions_, function(c) {
+        if (c.getText() !== '') {
+            var subOrder = c.getSubOrder();
+            var captionToUpdate = that.baseLanguageCaptionSet_.findSubIndex_(subOrder);
+            that.baseLanguageCaptionSet_.caption(captionToUpdate).setText(c.getText());
+        }
+    });
 };
 
 /**
