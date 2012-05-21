@@ -18,7 +18,7 @@ from utils.metrics import ManualTimer, Timer
 SECTIONS = {
     'widget': 'widget',
     'api': 'api-v1',
-    'apiv2': 'api-v2',
+    'api2': 'api-v2',
     'teams': 'teams',
 }
 
