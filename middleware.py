@@ -168,3 +168,32 @@ class SupeuserDebugToolbarMiddleware(DebugToolbarMiddleware):
                     or not settings.DEBUG:
             return False
         return True
+
+# I'm so sorry about this.
+import django.db.backends.mysql.base
+from django.db.backends.mysql.base import CursorWrapper as _CursorWrapper
+
+class MetricsCursorWrapper(_CursorWrapper):
+    def execute(self, query, params=None):
+        with Timer('db-query-time'):
+            return super(MetricsCursorWrapper, self).execute(query, params)
+
+    def executemany(self, query, params_list):
+        start = time.time()
+
+        try:
+            return super(MetricsCursorWrapper, self).executemany(query, params_list)
+        finally:
+            end = time.time()
+            delta = end - start
+            ms = delta * 1000
+
+            # This is an ugly hack to get at least a rough measurement of query
+            # times for executemany() queries.
+            ms_per_query = ms / len(params_list)
+
+            for _ in xrange(len(params_list)):
+                ManualTimer('db-query-time').record(ms_per_query)
+
+django.db.backends.mysql.base.CursorWrapper = MetricsCursorWrapper
+
