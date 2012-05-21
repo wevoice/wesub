@@ -117,22 +117,6 @@ LOGGING = {
     },
 }
 
-
-SENTRY_ON = False
-
-if SENTRY_ON:
-    # Change this to your local sentry dsn
-    # You can find it under the account tab
-    # Also, make sure that the host is `localhost` and the port is `9000`
-    # and not `unisubs.example.com`.
-    SENTRY_DSN = ""
-    SENTRY_DEBUG = False
-
-    MIDDLEWARE_CLASSES = (
-        'raven.contrib.django.middleware.SentryResponseErrorIdMiddleware',
-        'raven.contrib.django.middleware.Sentry404CatchMiddleware',
-        ) + MIDDLEWARE_CLASSES
-
 try:
     from settings_local import *
 except ImportError:
