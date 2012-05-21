@@ -15,6 +15,14 @@ from django.utils.http import cookie_date
 from utils.metrics import ManualTimer, Timer
 
 
+SECTIONS = {
+    'widget': 'widget',
+    'api': 'api-v1',
+    'apiv2': 'api-v2',
+    'teams': 'teams',
+}
+
+
 class SaveUserIp(object):
 
     def process_request(self, request):
@@ -29,23 +37,47 @@ class SaveUserIp(object):
                 pass
 
 class ResponseTimeMiddleware(object):
-    """
-    Writes the time this request took to process, as a cookie in the
-    response. In order for it to work, it must be the very first
-    middleware in settings.py
+    """Middleware for recording response times.
+
+    Writes the time this request took to process, as a cookie in the response.
+    In order for it to work, it must be the very first middleware in settings.py
 
     Also records the response time and sends it along to Riemann.
+
+    If the request was for a section of the site we want to track, sends that
+    information to Riemann as well.
+
     """
     def process_request(self, request):
         request.init_time = time.time()
+
+        # Tracking the section of the site isn't trivial, because sometimes we
+        # have the language prefix, like "/en/foo".
+        paths = request.path.lstrip('/').split('/')[:2]
+        p1 = paths[0] if len(paths) >= 1 else None
+        p2 = paths[1] if len(paths) >= 2 else None
+
+        if p1 in SECTIONS:
+            request._metrics_section = SECTIONS[paths[0]]
+        elif p2 in SECTIONS:
+            request._metrics_section = SECTIONS[paths[1]]
+        else:
+            request._metrics_section = None
+
         return None
 
     def process_response(self, request, response):
         if hasattr(request, "init_time"):
             delta = time.time() - request.init_time
             ms = delta * 1000
+
             response.set_cookie('response_time', str(ms))
+
             ManualTimer('response-time').record(ms)
+
+            if request._metrics_section:
+                label = 'site-sections.%s-response-time' % request._metrics_section
+                ManualTimer(label).record(ms)
 
         return response
 
