@@ -359,7 +359,6 @@ INSTALLED_APPS = (
     'django.contrib.sitemaps',
     'django.contrib.sites',
     'django.contrib.webdesign',
-    'django.contrib.flatpages',
     # third party apps
     'django_extensions',
     'djcelery',
@@ -773,7 +772,7 @@ try:
 
     EVERYONE_CAN_DEBUG = False
     INSTALLED_APPS += ('debug_toolbar',)
-    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware','django.contrib.flatpages.middleware.FlatpageFallbackMiddleware')
+    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
     DEBUG_TOOLBAR_PANELS = (
         'debug_toolbar.panels.timer.TimerDebugPanel',
