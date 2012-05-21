@@ -66,8 +66,8 @@ needed on staging, you end up with a request like this::
 If you're under a partnership, you might have a different base URL. Please
 contact us if you're not sure.
 
-Available Resources
--------------------
+API interaction overview
+------------------------
 
 All resources share a common structure when it comes to the basic data
 operations.
@@ -112,6 +112,20 @@ Example response
         "workflow_enabled": false
     }
 
+Many of the available resources will allow you to filter the response by a
+certain field.  Filters are specified as GET parameters on the request.  For
+example, if you wanted to view all videos belong to a team called
+"butterfly-club", you could do:
+
+.. http:get:: /api2/partners/videos?team=butterfly-club
+
+In addition to filters, you can request that the response is ordered in some
+way.  To order videos by title, you would do
+
+.. http:get:: /api2/partners/videos?order_by=title
+
+Each resource section will contain a list of relevant options.
+
 Here is an example of creating a new team via ``curl``.
 
 .. code-block:: bash
@@ -137,6 +151,9 @@ To update a team, you could issue a request like this:
 .. warning:: The above example only includes the ``name`` field for
     illustration. When sending a ``PUT`` request, always include all fields.
     For a list of all fields, see the response to a ``GET`` request.
+
+Available Resources
+-------------------
 
 The following resources are available to end users:
 

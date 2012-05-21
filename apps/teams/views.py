@@ -79,8 +79,6 @@ from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
 
 
-import sentry_logger # Magical import to make Sentry's error recording happen.
-assert sentry_logger # It's okay, Pyflakes.  Trust me.
 logger = logging.getLogger("teams.views")
 
 

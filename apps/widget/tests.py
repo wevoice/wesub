@@ -972,8 +972,6 @@ class TestRpc(TestCase):
         self.assertEquals(title, language.get_title())
 
     def test_youtube_ei_failure(self):
-        import sentry_logger
-        assert sentry_logger # Shut up, Pyflakes.
         from utils.requestfactory import RequestFactory
         rf = RequestFactory()
         request = rf.get("/")
