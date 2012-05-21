@@ -234,8 +234,9 @@ def detail(request, slug, project_slug=None, languages=None):
         Workflow.objects.filter(team=team.id)
                         .select_related('project', 'team', 'team_video'))
 
-    is_indexing = team.videos.all().count != extra_context['current_videos_count']
-    extra_context['is_indexing'] = is_indexing
+    if not filtered and not query:
+        is_indexing = team.videos.all().count != extra_context['current_videos_count']
+        extra_context['is_indexing'] = is_indexing
 
     if is_editor:
         team_video_ids = [record.team_video_pk for record in team_video_md_list]
