@@ -35,8 +35,17 @@ except ImportError:
     UDPTransport = None
 
 
+# Ugly hack to check if we're running the test suite.  If so we shouldn't report
+# metrics.
+from django.core import mail
+
+if hasattr(mail, 'outbox'):
+    RUNNING_TESTS = True
+else:
+    RUNNING_TESTS = False
+
 HOST = socket.gethostname()
-ENABLED = getattr(settings, 'ENABLE_METRICS', False)
+ENABLED = (not RUNNING_TESTS) and getattr(settings, 'ENABLE_METRICS', False)
 RIEMANN_HOST = getattr(settings, 'RIEMANN_HOST', '127.0.0.1')
 
 c = Client(RIEMANN_HOST, transport=UDPTransport)
