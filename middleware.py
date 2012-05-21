@@ -208,7 +208,9 @@ from django.db.backends.mysql.base import CursorWrapper as _CursorWrapper
 
 class MetricsCursorWrapper(_CursorWrapper):
     def _query_type(self, query):
-        if query.startswith('SELECT COUNT(*)'):
+        if not query:
+            return 'UNKNOWN'
+        elif query.startswith('SELECT COUNT(*) '):
             return 'COUNT'
         elif query.startswith('SELECT '):
             return 'SELECT'
