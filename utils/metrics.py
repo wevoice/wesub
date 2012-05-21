@@ -16,8 +16,10 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import socket, time
+import socket
+import time as _time
 from contextlib import contextmanager
+from functools import wraps
 
 from django.conf import settings
 
@@ -96,13 +98,47 @@ class Histogram(Metric):
 
 @contextmanager
 def Timer(name):
-    start = time.time()
+    start = _time.time()
 
     try:
         yield
     finally:
-        ms = (time.time() - start) * 1000
+        ms = (_time.time() - start) * 1000
         send(name, 'timer', ms)
+
+
+def time(f):
+    '''Report the running time of the decorated function to Riemann.
+
+    The metric name will be generated automatically from the function
+    module/name.  This may cause issues if the function is run from two separate
+    import paths.  Python is dumb sometimes.
+
+    '''
+    # Ugly hack to help normalize our crazy module names.
+    path = f.__module__
+    if path.startswith('apps.'):
+        path = path[5:]
+
+    name = 'functions.' + f.__module__ + '.' + f.__name__
+
+    @wraps(f)
+    def timed_f(*args, **kwargs):
+        with Timer(name):
+            return f(*args, **kwargs)
+
+    return timed_f
+
+def time_as(name):
+    '''Report the running time of the decorated function to Riemann with the given name.'''
+    def time_wrapper(f):
+        @wraps(f)
+        def timed_f(*args, **kwargs):
+            with Timer(name):
+                return f(*args, **kwargs)
+        return timed_f
+    return time_wrapper
+
 
 class ManualTimer(Metric):
     def record(self, value):
