@@ -96,6 +96,14 @@ class Histogram(Metric):
     def record(self, value):
         send(self.name, 'histogram', value)
 
+class Gauge(Metric):
+    def __init__(self, name):
+        return super(Gauge, self).__init__('gauges.' + name)
+
+    def report(self, value):
+        send(self.name, 'gauge', value)
+
+
 @contextmanager
 def Timer(name):
     start = _time.time()
