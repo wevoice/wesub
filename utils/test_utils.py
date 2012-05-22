@@ -3,9 +3,13 @@ import urlparse
 
 REQUEST_CALLBACKS = []
 
-class Response(object):
+class Response(dict):
+
     status = 200
     content = ""
+
+    def __getitem__(self, key):
+        return getattr(self, key)
 
 def reset_requests():
     global REQUEST_CALLBACKS
