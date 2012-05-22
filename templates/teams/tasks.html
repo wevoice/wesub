@@ -268,11 +268,9 @@
                                                     <a href="#download-draft-{{task.id}}" class="open-modal upload-draft-button">{% trans 'Download draft' %}</a>
                                                     </li>
                                                 {% endif %}
-                                                {% if task.assignee == user %}
-                                                    <li>
+                                                <li>
                                                     <a href="#upload-draft-{{task.id}}" class="open-modal upload-draft-button" data-task="{{ task.pk }}">Upload draft</a>
-                                                    </li>
-                                                {% endif %}
+                                                </li>
                                             </ul>
                                             <div class="bootstrap">
                                                 <div class="modal" id="upload-draft-{{task.id}}" style="display: none">
