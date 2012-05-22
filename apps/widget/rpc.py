@@ -573,9 +573,7 @@ class Rpc(BaseRpc):
             # this is really really hackish.
             # TODO: clean all this mess on a friday
             if not new_version.language.is_complete_and_synced(public_only=False):
-                new_version.moderation_status = UNMODERATED
-                new_version.save()
-                self._create_transcribe_task(new_version, user)
+                self._moderate_incomplete_version(new_version, user)
             elif hasattr(new_version, 'task_to_save'):
                 task = new_version.task_to_save
                 task.subtitle_version = new_version
@@ -705,19 +703,27 @@ class Rpc(BaseRpc):
         return Task(team=team_video.team, team_video=team_video,
                     assignee=assignee, language=lang, type=type)
 
-    def _create_transcribe_task(self, subtitle_version, user):
+    def _moderate_incomplete_version(self, subtitle_version, user):
         """ Verifies if it's possible to create a transcribe/translate task (if there's
-        no other transcribe/translate task) and tries to assign to user. """
+        no other transcribe/translate task) and tries to assign to user. 
+        Also, if the video belongs to a team, change its status.
+        """
 
         team_video = subtitle_version.video.get_team_video()
-        language = subtitle_version.language
-        
+
+        if not team_video:
+            return
+
+        language = subtitle_version.language.language
         transcribe_task = team_video.task_set.incomplete_subtitle_or_translate()\
                                      .filter(language=subtitle_version.language)
 
         if transcribe_task.exists():
             task = transcribe_task[0]
             return
+
+        subtitle_version.moderation_status = WAITING_MODERATION
+        subtitle_version.save()
 
         task = Task(team=team_video.team, team_video=team_video,
                     language=language, type=Task.TYPE_IDS['Subtitle'])
