@@ -721,10 +721,13 @@ class Rpc(BaseRpc):
         no other transcribe/translate task) and tries to assign to user. """
 
         team_video = subtitle_version.video.get_team_video()
-        language = subtitle_version.language
-        
+        language = subtitle_version.language.language
+
+        if not team_video:
+            return
+
         transcribe_task = team_video.task_set.incomplete_subtitle_or_translate()\
-                                     .filter(language=subtitle_version.language)
+                                     .filter(language=language)
 
         if transcribe_task.exists():
             task = transcribe_task[0]

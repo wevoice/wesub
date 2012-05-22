@@ -201,16 +201,37 @@ class SupeuserDebugToolbarMiddleware(DebugToolbarMiddleware):
             return False
         return True
 
+
 # I'm so sorry about this.
 import django.db.backends.mysql.base
 from django.db.backends.mysql.base import CursorWrapper as _CursorWrapper
 
 class MetricsCursorWrapper(_CursorWrapper):
+    def _query_type(self, query):
+        if not query:
+            return 'UNKNOWN'
+        elif query.startswith('SELECT COUNT(*) '):
+            return 'COUNT'
+        elif query.startswith('SELECT '):
+            return 'SELECT'
+        elif query.startswith('DELETE '):
+            return 'DELETE'
+        elif query.startswith('INSERT '):
+            return 'INSERT'
+        elif query.startswith('UPDATE '):
+            return 'UPDATE'
+        else:
+            return 'OTHER'
+
     def execute(self, query, params=None):
+        op = self._query_type(query)
+
         with Timer('db-query-time'):
-            return super(MetricsCursorWrapper, self).execute(query, params)
+            with Timer('db-query-time.%s' % op):
+                return super(MetricsCursorWrapper, self).execute(query, params)
 
     def executemany(self, query, params_list):
+        op = self._query_type(query)
         start = time.time()
 
         try:
@@ -226,6 +247,7 @@ class MetricsCursorWrapper(_CursorWrapper):
 
             for _ in xrange(len(params_list)):
                 ManualTimer('db-query-time').record(ms_per_query)
+                ManualTimer('db-query-time.%s' % op).record(ms_per_query)
 
 django.db.backends.mysql.base.CursorWrapper = MetricsCursorWrapper
 
