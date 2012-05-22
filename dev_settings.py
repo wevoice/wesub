@@ -79,8 +79,8 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'root': {
-        'level': 'WARNING',
-        'handlers': ['sentry'],
+        'level': 'ERROR',
+        'handlers': ['console'],
     },
     'formatters': {
         'verbose': {
@@ -88,10 +88,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'sentry': {
-            'level': 'WARNING',
-            'class': 'raven.contrib.django.handlers.SentryHandler',
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -101,7 +97,7 @@ LOGGING = {
     'loggers': {
         'django.db.backends': {
             'level': 'ERROR',
-            'handlers': ['sentry'],
+            'handlers': ['console'],
             'propagate': False,
         },
         'raven': {
