@@ -1065,7 +1065,8 @@ class Rpc(BaseRpc):
             version.is_forked or force_forked,
             base_language,
             language.get_title(public_only=False),
-            language.get_description(public_only=False)
+            language.get_description(public_only=False),
+            language.is_rtl()
         )
 
 

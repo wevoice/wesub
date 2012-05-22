@@ -965,6 +965,9 @@ ul.unisubs-titlesList {
     padding: 0 !important;
     position: relative !important;
 }
+ul.isRTL textarea.unisubs-translateField {
+    direction: rtl;
+}
 ul.unisubs-titlesList li.active {
     background: #caf3ff !important
 }
