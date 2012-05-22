@@ -21,5 +21,6 @@ def store_request_call(url, **kwargs):
     for k,v in data.items():
         data[k] = v[0]
     global REQUEST_CALLBACKS
-    REQUEST_CALLBACKS.append([url, method, data])
+    if not '/solr' in url:
+        REQUEST_CALLBACKS.append([url, method, data])
     return Response(), ""
