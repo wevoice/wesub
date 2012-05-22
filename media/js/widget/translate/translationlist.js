@@ -91,7 +91,9 @@ unisubs.translate.TranslationList.prototype.enterDocument = function() {
     var that = this;
 
     // Start loading the video.
-    this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
+    if (videoPlayerType !== 'vimeo') {
+        this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
+    }
     if (videoPlayerType === 'html5') {
         this.dialog_.getVideoPlayerInternal().play();
     }
