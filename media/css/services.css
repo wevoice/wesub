@@ -23,20 +23,15 @@
             padding: 1em 0;
             text-decoration: none;
             border-bottom: 1px solid #eaeaea;
-            color: #555;
         }
 
         #services .alpha ul li a:hover {
             color: #1573AD;
         }
 
-#services .omega li {
+#services .omega > ul > li {
     display: none;
 }
-
-    #services .omega li:first-child {
-        display: block;
-    }
 
     #services .omega h3 {
         padding: 1em 0 1em;
@@ -46,3 +41,8 @@
         line-height: 175%;
         margin-bottom: 2em;
     }
+
+.page-footer {
+    clear: both;
+    text-align: center;
+}

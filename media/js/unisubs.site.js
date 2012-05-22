@@ -868,8 +868,8 @@ var Site = function(Site) {
         enterprise: function() {
             $('.alpha li a').click(function(e) {
                 var tab = $(this).attr('href');
-                
-                history.pushState({ path: this.path }, '', tab)
+
+                history.pushState(null, '', tab)
                 changeTab(tab);
 
                 return false;
@@ -882,10 +882,9 @@ var Site = function(Site) {
             })
 
             var changeTab = function(tab) {
-                $('.omega li').hide();
-
-                if(tab == '') {
-                    $('.omega ul li:first-child').show();
+                $('.tab-content > li').hide();
+                if(tab.indexOf("/") != -1 || tab == '') {
+                    $('.tab-content > li:first-child').show();
                 } else {
                     $('#' + tab).show();
                 }
