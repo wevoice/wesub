@@ -23,6 +23,17 @@ are logged.  Regular Django logging goes to sentry as well.
     The sentry server runs on port 9000 and has to be opened up to the host
     machine.
 
+You may have to add the following to your local settings
+
+.. code-block:: python
+
+    SENTRY_DSN = "your local dsn"
+    SENTRY_DEBUG = False
+    MIDDLEWARE_CLASSES = (
+        'raven.contrib.django.middleware.SentryResponseErrorIdMiddleware',
+        'raven.contrib.django.middleware.Sentry404CatchMiddleware',
+        ) + MIDDLEWARE_CLASSES
+
 Resources
 ---------
 
