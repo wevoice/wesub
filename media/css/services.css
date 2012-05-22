@@ -1,89 +1,48 @@
 #services {
-  position: relative;
-  width: 770px;
+    padding: 4em 0;
 }
 
-#services h1 {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: .5em;
+#services .alpha h3 {
+    font-size: 14px;
+    font-weight: normal;
+    text-transform: uppercase;
+    color: #999;
 }
 
-#services p.subhead {
-  font-size: 1.2em;
-  padding: .5em 0 1em;
-  color: #52686E;
+#services .alpha ul {
+    padding: 0;
+    margin-bottom: 3em;
 }
 
-#services .row {
-  float: left;
-  margin: 1em -25px 2em 0;
+    #services .alpha ul li {
+        padding: 0;
+    }
+
+        #services .alpha ul li a {
+            display: block;
+            padding: 1em 0;
+            text-decoration: none;
+            border-bottom: 1px solid #eaeaea;
+            color: #555;
+        }
+
+        #services .alpha ul li a:hover {
+            color: #1573AD;
+        }
+
+#services .omega li {
+    display: none;
 }
 
-#services .row .feature {
-  width: 505px;
-  background-color: #0f517a;
-  color: #ECF3F5;
-  -moz-border-radius: 8px;
-  -webkit-border-radius: 8px;
-  border-radius: 8px;
-  -moz-box-shadow: 1px -1px 1px #fff;
-  -webkit-box-shadow: 1px -1px 1px #fff;
-  box-shadow: 1px -1px 1px #fff;
-}
+    #services .omega li:first-child {
+        display: block;
+    }
 
-#services .row .feature p {
-  float: left;
-  width: 215px;
-  margin: 25px;
-  line-height: 200%;
-  padding: 6px 0;
-}
+    #services .omega h3 {
+        padding: 1em 0 1em;
+    }
 
-#services .row .feature p.headline {
-  margin-right:0;
-  padding: 0;
-  font-size: 18px;
-}
-
-#services .row .feature p.headline strong {
-  color: #fff;
-  text-shadow: 1px 1px 1px #32484E;
-}
-
-#services .row div {
-  float: left;
-  width: 240px;
-  margin-right: 25px;
-}
-#services .row h3, #services .row h2 {
-  line-height: 125%;
-  color: #52686E;
-}
-#services .row p {
-  line-height: 175%;
-}
-
-#services > h2 {
-  font-size: 18px;
-  padding-top: 2em;
-}
-
-#services-partners {
-  position: absolute;
-  top:3em;
-  right:0;
-}
-
-#services-partners li {
-  text-align: center;
-  margin: 1em 0;
-}
-
-#services-partners li p {
-  margin: .5em 0;
-}
-
-#recognition img {
-  margin: 1em 2em 1em 0;
-}
+    #services .omega p {
+        line-height: 175%;
+        margin-bottom: 2em;
+    }

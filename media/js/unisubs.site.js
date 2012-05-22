@@ -863,6 +863,33 @@ var Site = function(Site) {
 
                 return terms;
             });
+        },
+
+        enterprise: function() {
+            $('.alpha li a').click(function(e) {
+                var tab = $(this).attr('href');
+                
+                history.pushState({ path: this.path }, '', tab)
+                changeTab(tab);
+
+                return false;
+            });
+            $(window).bind('popstate', function() {
+                var path = location.pathname;
+                tab = path.substr(path.lastIndexOf('/') + 1);
+
+                changeTab(tab);
+            })
+
+            var changeTab = function(tab) {
+                $('.omega li').hide();
+
+                if(tab == '') {
+                    $('.omega ul li:first-child').show();
+                } else {
+                    $('#' + tab).show();
+                }
+            }
         }
     };
 };
