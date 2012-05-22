@@ -20,7 +20,7 @@ import urllib
 from urllib import urlopen
 
 from celery.decorators import periodic_task
-from celery.schedules import crontab
+from celery.schedules import crontab, timedelta
 from celery.signals import task_failure
 from celery.task import task
 from django.conf import settings
@@ -35,7 +35,8 @@ from sentry.client.models import client
 
 from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
-from videos.models import VideoFeed, SubtitleLanguage, Video
+from utils.metrics import Gauge
+from videos.models import VideoFeed, SubtitleLanguage, Video, Subtitle, SubtitleVersion
 from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
@@ -217,8 +218,6 @@ def upload_subtitles_to_original_service(version_pk):
     _update_captions_in_original_service(version_pk)
 
 def _send_notification(version_id):
-    from videos.models import SubtitleVersion
-
     try:
         version = SubtitleVersion.objects.get(id=version_id)
     except SubtitleVersion.DoesNotExist:
@@ -481,3 +480,15 @@ def _save_video_feed(feed_url, last_entry_url, user):
     vf.user = user
     vf.last_link = last_entry_url
     vf.save()
+
+
+@periodic_task(run_every=timedelta(seconds=5))
+def gauge_videos():
+    Gauge('videos.Video').report(Video.objects.count())
+    Gauge('videos.SubtitleVersion').report(SubtitleVersion.objects.count())
+    Gauge('videos.SubtitleLanguage').report(SubtitleLanguage.objects.count())
+
+@periodic_task(run_every=timedelta(seconds=(60*5)))
+def gauge_videos_long():
+    Gauge('videos.Subtitle').report(Subtitle.objects.count())
+
