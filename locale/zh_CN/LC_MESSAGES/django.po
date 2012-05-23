@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-22 01:32-0500\n"
-"PO-Revision-Date: 2012-05-22 06:46+0000\n"
+"POT-Creation-Date: 2012-05-23 01:33-0500\n"
+"PO-Revision-Date: 2012-05-23 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.net/projects/p/universalsubtitles/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -278,15 +278,15 @@ msgstr "你的字幕已被评审"
 msgid " and published"
 msgstr " 并发布"
 
-#: apps/messages/tasks.py:481
+#: apps/messages/tasks.py:486
 msgid "Your subtitles have been approved and published!"
 msgstr "你的字幕已评审并发布！"
 
-#: apps/messages/tasks.py:488 apps/messages/tasks.py:542
+#: apps/messages/tasks.py:493 apps/messages/tasks.py:547
 msgid "Your subtitles have been declined"
 msgstr "你的字幕已被拒"
 
-#: apps/messages/tasks.py:585
+#: apps/messages/tasks.py:590
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr ""
@@ -403,7 +403,7 @@ msgstr "排序"
 
 #: apps/search/forms.py:38
 msgid "Subtitled Into"
-msgstr ""
+msgstr "编辑字幕至"
 
 #: apps/search/forms.py:39 apps/search/forms.py:41
 msgid "Left blank for any language"
@@ -693,7 +693,7 @@ msgstr "第三方帐户"
 
 #: apps/teams/models.py:136
 msgid "applicants"
-msgstr ""
+msgstr "申请人"
 
 #: apps/teams/models.py:139
 msgid "Intro Video"
@@ -764,7 +764,7 @@ msgstr "所有的语言都需要帮助"
 
 #: apps/teams/models.py:632
 msgid "If you check this, other languages will not be displayed."
-msgstr ""
+msgstr "如果选中此项，其他语言将不能显示"
 
 #: apps/teams/models.py:912 apps/teams/permissions_const.py:45
 msgid "Owner"
@@ -837,7 +837,7 @@ msgstr "组成员角色已变更"
 msgid "You cannot assign that role to that member."
 msgstr "你不能给那个成员分配角色"
 
-#: apps/teams/tasks.py:75
+#: apps/teams/tasks.py:76
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "新的 %(team)s 视频已准备好编辑字幕！"
@@ -854,7 +854,7 @@ msgstr "最新"
 
 #: apps/teams/views.py:121 templates/teams/teams-list.html:44
 msgid "Most Members"
-msgstr ""
+msgstr "大多数成员"
 
 #: apps/teams/views.py:257
 msgid "Member saved."
@@ -1356,7 +1356,7 @@ msgstr "添加视频url"
 
 #: apps/videos/models.py:2012
 msgid "request subtitles"
-msgstr ""
+msgstr "请求字幕"
 
 #: apps/videos/models.py:2013
 msgid "approve version"
@@ -1570,7 +1570,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:895 apps/widget/rpc.py:936
+#: apps/widget/rpc.py:898 apps/widget/rpc.py:939
 msgid "\n"
 msgstr "\n"
 
@@ -1629,11 +1629,11 @@ msgstr "翻译"
 #: libs/rosetta/templates/rosetta/languages.html:32
 #: libs/rosetta/templates/rosetta/pofile.html:57
 msgid "Fuzzy"
-msgstr ""
+msgstr "模糊"
 
 #: libs/rosetta/templates/rosetta/languages.html:33
 msgid "Obsolete"
-msgstr ""
+msgstr "废弃"
 
 #: libs/rosetta/templates/rosetta/languages.html:34
 msgid "File"
@@ -1659,7 +1659,7 @@ msgstr "请参考 <a href=\"%(i18n_doc_link)s\">Django's I18N文档</a>了解如
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
 msgid "Pick another file"
-msgstr ""
+msgstr "挑选其他文件"
 
 #: libs/rosetta/templates/rosetta/pofile.html:9
 msgid "Download this catalog"
@@ -1699,7 +1699,7 @@ msgstr "仅已翻译"
 
 #: libs/rosetta/templates/rosetta/pofile.html:34
 msgid "Fuzzy only"
-msgstr ""
+msgstr "仅模糊"
 
 #: libs/rosetta/templates/rosetta/pofile.html:42
 #: templates/search/_search_form.html:31
@@ -1724,7 +1724,7 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/pofile.html:75
 #: libs/rosetta/templates/rosetta/pofile.html:93
 msgid "Context hint"
-msgstr ""
+msgstr "上下文提示"
 
 #: libs/rosetta/templates/rosetta/pofile.html:90
 msgid "Contextual hint"
@@ -1738,7 +1738,7 @@ msgstr "建议"
 #, python-format
 msgid "%(more_count)s more"
 msgid_plural "%(more_count)s more"
-msgstr[0] ""
+msgstr[0] "%(more_count)s 更多"
 
 #: libs/rosetta/templates/rosetta/pofile.html:123
 msgid "Save and translate next block"
@@ -1756,7 +1756,7 @@ msgstr "显示中"
 #, python-format
 msgid "%(hits)s/%(message_number)s message"
 msgid_plural "%(hits)s/%(message_number)s messages"
-msgstr[0] ""
+msgstr[0] "%(hits)s/%(message_number)s 信息"
 
 #: libs/unilangs/unilangs.py:122
 msgid "Afar"
@@ -2456,7 +2456,7 @@ msgstr "隆迪语"
 
 #: libs/unilangs/unilangs.py:296
 msgid "Macedo"
-msgstr ""
+msgstr "马赛多"
 
 #: libs/unilangs/unilangs.py:297
 msgid "Rusyn"
@@ -2753,7 +2753,7 @@ msgstr "测试插件"
 msgid ""
 "Warning: These videos should not be embeded--there is a good possibility "
 "they will break at some point!"
-msgstr ""
+msgstr "警告:这些视频不应该内嵌--它们很可能会在某些播放点崩溃！"
 
 #: templates/_testing_widget.html:16
 msgid ""
@@ -2822,7 +2822,7 @@ msgstr ""
 
 #: templates/base.html:68
 msgid "Subtitle Videos"
-msgstr ""
+msgstr "给视频添加字幕"
 
 #: templates/base.html:69
 msgid "Watch"
@@ -2855,7 +2855,7 @@ msgstr "关于"
 
 #: templates/base.html:104
 msgid "Jobs"
-msgstr ""
+msgstr "工作"
 
 #: templates/base.html:107
 msgid "Contact Us"
@@ -3116,175 +3116,411 @@ msgstr "此代码是实验性的，如果你运行中出现问题，请"
 msgid "let us know"
 msgstr "让我们知晓"
 
-#: templates/enterprise.html:8
-msgid "Enterprise Services"
-msgstr "企业级服务"
-
-#: templates/enterprise.html:10
-msgid ""
-"\n"
-"            To be global, to be accessible, and to be searchable, videos need subtitles. Amara, is the most flexible and powerful subtitle creation and management platform in the world.\n"
-"          "
+#: templates/enterprise.html:11
+msgid "Features & Benefits"
 msgstr ""
 
-#: templates/enterprise.html:15
-msgid ""
-"\n"
-"            Our enterprise platform offers an unmatched ability to manage a subtitle creation and editing process and to reach outstanding levels of quality.  Build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through a powerful API.\n"
-"          "
+#: templates/enterprise.html:13
+msgid "Amara Platform"
+msgstr ""
+
+#: templates/enterprise.html:14
+msgid "Global Reach"
+msgstr ""
+
+#: templates/enterprise.html:15 templates/enterprise.html.py:135
+msgid "Quality Control"
+msgstr ""
+
+#: templates/enterprise.html:16 templates/enterprise.html.py:157
+msgid "Automated Workflows"
+msgstr ""
+
+#: templates/enterprise.html:17 templates/enterprise.html.py:192
+msgid "Subtitle Management"
 msgstr ""
 
 #: templates/enterprise.html:19
-msgid "Interested?"
-msgstr "有兴趣吗？"
+msgid "Advanced Security"
+msgstr ""
 
-#: templates/enterprise.html:21
-msgid ""
-"\n"
-"        To learn more about our services, please contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
-"      "
-msgstr "\n        要了解更多我们的服务, 请联系Dean Jansen <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>⏎\n      "
+#: templates/enterprise.html:20 templates/enterprise.html.py:221
+msgid "API Integration"
+msgstr ""
 
-#: templates/enterprise.html:25
-msgid "Who Uses Amara?"
-msgstr "谁使用Amara？"
+#: templates/enterprise.html:23
+msgid "Customers"
+msgstr ""
 
-#: templates/enterprise.html:26
-msgid ""
-"Whatever your subtitle needs are, Amara makes it easier to create great "
-"subtitles at a very low cost."
-msgstr "无论你的字幕需求如何，Amara能够以极低的成本创建优秀的字幕"
-
-#: templates/enterprise.html:29
+#: templates/enterprise.html:25 templates/enterprise.html.py:230
 msgid "Companies"
 msgstr "公司"
 
-#: templates/enterprise.html:31
-msgid ""
-"\n"
-"          Corporations need to communicate with their staff and their customers around the world, and video is becoming a major part of that process.  With Amara, companies make it possible for staff, customers, and contractors to translate videos, make them searchable, and share them, publicly or privately.  \n"
-"        "
-msgstr ""
-
-#: templates/enterprise.html:37
-msgid "Video Publishers"
-msgstr "视频发行商"
-
-#: templates/enterprise.html:39
-msgid ""
-"\n"
-"          Anyone who makes video can reach more people with subtitles.  Video publishers use Amara to build volunteer communities with the people who watch their videos, translating them for the world and reaching more viewers.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise.html:45
+#: templates/enterprise.html:26 templates/enterprise.html.py:236
 msgid "Universities"
 msgstr "大学"
 
-#: templates/enterprise.html:47
-msgid ""
-"\n"
-"          As online education explodes in popularity, subtitles are essential to making courses accessible and international.  Colleges and universities are using Amara to make their rapidly growing video resources succeed.\n"
-"        "
+#: templates/enterprise.html:27 templates/enterprise.html.py:242
+msgid "Publishers"
 msgstr ""
 
-#: templates/enterprise.html:55
-msgid "Non-Profit Organizations"
-msgstr "非盈利组织"
+#: templates/enterprise.html:28 templates/enterprise.html.py:252
+msgid "Government"
+msgstr ""
+
+#: templates/enterprise.html:34
+msgid "The World’s Most Advanced Platform for Subtitles"
+msgstr ""
+
+#: templates/enterprise.html:36
+msgid ""
+"\n"
+"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:42
+msgid "World-class Users"
+msgstr ""
+
+#: templates/enterprise.html:50
+msgid "Award-Winning Technology"
+msgstr ""
 
 #: templates/enterprise.html:57
-msgid ""
-"\n"
-"          Non-profit organizations use Amara to help build and manage volunteer communities to caption and translate their videos into dozens of languages.  Before Amara, the cost of professional subtitling would have made this impossible.\n"
-"        "
+msgid "Unmatched Functionality and Control"
 msgstr ""
 
-#: templates/enterprise.html:63
-msgid "Video Platforms"
-msgstr "视频平台"
-
-#: templates/enterprise.html:65
-msgid ""
-"\n"
-"          Video hosting platforms are using Amara to empower their publishers and reach a more global audience.  By connecting publishers directly to Amara, subtitling happens at a level that was never possible before.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise.html:71
-msgid "Amara Does What No Other Platform Can"
-msgstr "Amara所作的是其他平台不能做的"
-
-#: templates/enterprise.html:73
-msgid ""
-"\n"
-"        Amara is the world's largest subtitle platform and has been winning awards because it transforms subtitle creation and management.  What was once prohibitively expensive and complicated, becomes possible and even easy.\n"
-"      "
-msgstr ""
-
-#: templates/enterprise.html:79
+#: templates/enterprise.html:61
 msgid "Build a Translation Team"
 msgstr "组建一个翻译组"
+
+#: templates/enterprise.html:63
+msgid ""
+"\n"
+"                For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible for captions and subtitles.  With Amara, you can accomplish the seemingly impossible task of translating your videos into dozens of languages.  Quickly build a powerful, high-quality volunteer translation and captioning team that makes your content truly global.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:67
+msgid "Security and Managed Workflows"
+msgstr ""
+
+#: templates/enterprise.html:69
+msgid ""
+"\n"
+"                Create the right workflows for your content and coordinate your efforts-- whether your video is completely private, restricted to premium subscribers, or public on the web.  You always control who has access to your subtitles and when to involve staff, contractors, or volunteers.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:73
+msgid "Powerful API and Publishing Integration"
+msgstr ""
+
+#: templates/enterprise.html:75
+msgid ""
+"\n"
+"                Our API helps companies tightly integrate Amara with their existing publishing and distribution workflow.  By making subtitles key part of your process, you build a global audience.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:79 templates/enterprise.html.py:124
+msgid "Professional Services"
+msgstr ""
 
 #: templates/enterprise.html:81
 msgid ""
 "\n"
-"          For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible with video.  Quickly build a powerful, high-quality volunteer translation and captioning team around your content and make it global.\n"
-"        "
+"                Access professional services including paid captions, translations, and quality control.  Or use your own staff and contractors and use Amara to coordinate their work remotely.\n"
+"            "
 msgstr ""
 
-#: templates/enterprise.html:87
-msgid "Integrate Professional Services"
-msgstr "专业整合服务"
-
-#: templates/enterprise.html:89
-msgid ""
-"\n"
-"            Access professional services including paid captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
-"          "
-msgstr ""
-
-#: templates/enterprise.html:95
+#: templates/enterprise.html:85
 msgid "Crowdsource with Professional Review"
 msgstr ""
 
-#: templates/enterprise.html:97
+#: templates/enterprise.html:87
 msgid ""
 "\n"
-"            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality assurance.\n"
-"          "
+"                Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality assurance.\n"
+"            "
 msgstr ""
 
-#: templates/enterprise.html:105
+#: templates/enterprise.html:93
 msgid "Work with Any Video Platform"
 msgstr "同任意视频平台一起协作"
 
-#: templates/enterprise.html:107
+#: templates/enterprise.html:95
 msgid ""
 "\n"
-"            Amara works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
-"          "
+"                Amara works with all the most popular video hosting services and video players, and adapts easily to your own custom player. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
+"            "
 msgstr ""
 
-#: templates/enterprise.html:113
-msgid "Improve Your SEO"
-msgstr "改进你的SEO"
+#: templates/enterprise.html:99
+msgid "Subtitles Improve SEO"
+msgstr ""
+
+#: templates/enterprise.html:101
+msgid ""
+"\n"
+"                Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:106
+msgid "Build a Global Reach"
+msgstr ""
+
+#: templates/enterprise.html:110
+msgid ""
+"\n"
+"                Amara is the premiere platform for taking video content global. Whether you’re working with volunteer translators, engaging your own staff, or hiring professionals, you can easily manage the end-to-end process.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:114
+msgid "Volunteer Subtitle Creation"
+msgstr ""
 
 #: templates/enterprise.html:115
 msgid ""
 "\n"
-"            Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
-"          "
+"                Amara currently supports some of the largest volunteer video translation efforts on the planet. Our technology makes captioning, subtitling, and translating very easy, fun, and engaging which enables ongoing, massive, collaborations.\n"
+"            "
 msgstr ""
 
-#: templates/enterprise.html:121
-msgid "Flexible API and Integration"
-msgstr "灵活的API和整合"
+#: templates/enterprise.html:119
+msgid "Private Crowd Subtitle Creation"
+msgstr ""
 
-#: templates/enterprise.html:123
+#: templates/enterprise.html:120
 msgid ""
 "\n"
-"            Need seamless subtitles on your custom video player? Want 1-click features integrated into your back-end or CMS? We can help.     \n"
-"          "
+"                If you have a workforce, student group, or any other non-public crowd, you can limit access for captioning, translating, and subtitling OR reviewing the work of peers, volunteers, or professionals.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:125
+msgid ""
+"\n"
+"                Selectively engage professionals for captioning or subtitling into nearly any language, or even to help with Quality Control. All completed work is centralized on Amara, ready for incremental quality control and quick deployment.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:129
+msgid "Hybrid Approach"
+msgstr ""
+
+#: templates/enterprise.html:130
+msgid ""
+"\n"
+"                Mix and match these different approaches on the initial (subtitle authoring) pass, as well as subsequent review passes (for Quality Control). This is an advantage that you only get with Amara, a fully featured solution that manages the process end to end.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:139
+msgid ""
+"\n"
+"                Amara’s Flexible Workflows offer several ways to ensure outstanding quality for your subtitles.  Whether you use internal staff, outside contractors, professional services, or a volunteer community -- you’ll be able to create, review, and approve workflows that meet your needs.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:143
+msgid "Examples of QC processes:"
+msgstr ""
+
+#: templates/enterprise.html:145
+msgid ""
+"\n"
+"                    Have your contractors work inside your Amara account and then require staff review before subtitles go live.\n"
+"                "
+msgstr ""
+
+#: templates/enterprise.html:148
+msgid ""
+"\n"
+"                    Some universities use paid captioning services to quickly caption lecture videos and then invite experts in the university community to fix any mistakes with proper names or technical terms.\n"
+"                "
+msgstr ""
+
+#: templates/enterprise.html:151
+msgid ""
+"\n"
+"                    Volunteer teams can self-manage and reach very high quality by requiring peer review of subtitles before they are published.  More senior members of the community can be promoted to a moderator role.\n"
+"                "
+msgstr ""
+
+#: templates/enterprise.html:161
+msgid ""
+"\n"
+"                Workflows enable automating the flow of content through different authoring groups, including: volunteers, private crowds (staff, employees, students, etc), and professionals. They can be used for both first pass (authoring), as well as subsequent review passes for Quality Control.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:165
+msgid ""
+"\n"
+"                Different workflows can be chained together to create an unlimited number of highly flexible configurations. The Amara team can help you determine the best workflow for your subtitle processes and integrate it with your existing publishing platform.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:169
+msgid "Contractors with Staff Review"
+msgstr ""
+
+#: templates/enterprise.html:170
+msgid ""
+"\n"
+"                Use captioning and transcription contractors to create your subtitles, then require staff review and approval before they are published back to your server. Remember, no one sees your subtitles until YOU publish it.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:174
+msgid "Crowdsourced subtitles, followed by staff review"
+msgstr ""
+
+#: templates/enterprise.html:175
+msgid ""
+"\n"
+"                In many cases, organizations want to leverage the power of the crowd, but don’t want to leave any chance for poor quality captions or subtitles to appear on their content. This workflow keeps videos private until a staff member has approved the subtitles.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:181
+msgid "Professionally created English captions, crowd translation"
+msgstr ""
+
+#: templates/enterprise.html:182
+msgid ""
+"\n"
+"                Amara offers professional- quality captions at very low cost with quick turn-around times. English can often be done in less than a day.  Once English is completed, it’s a snap to request translations from volunteers or staff. We have seen videos translated into multiple languages in just days -- through a volunteer crowd.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:186
+msgid "Crowd translations, with professional quality-control"
+msgstr ""
+
+#: templates/enterprise.html:187
+#, python-format
+msgid ""
+"\n"
+"                Amara is, quite simply, the most cost-effective way to get professional-level quality for foreign language video subtitles. By leveraging professional quality review, you can expect to pay roughly 75%% less than the market price for traditional professional subtitles.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:194
+msgid ""
+"\n"
+"                At its core, Amara is the definitive platform for managing captions and subtitles.  Whether you are creating, revising, or translating subtitles -- you can choose to centralize the management -- or divide up your content, and delegate responsibilities and control.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:198
+msgid "Import"
+msgstr ""
+
+#: templates/enterprise.html:199
+msgid ""
+"\n"
+"                Your videos are never uploaded to our server (learn more about our Security Model), so you actually import pointers to existing video files—whether you’re hosting on your own server, YouTube, Vimeo, other video hosting service, or combination thereof. Import these video pointers via graphical interface or API, plus we can import a wide variety of subtitle and transcript formats in case you have pre-existing data.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:203
+msgid "Process > Author > QC"
+msgstr ""
+
+#: templates/enterprise.html:204
+msgid ""
+"\n"
+"                Flexible workflows make creating Global Content simple; your organization can harness the power of volunteers, private crowds, and/or professional service providers for content creation and Quality Control.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:208
+msgid "Deploy"
+msgstr ""
+
+#: templates/enterprise.html:209
+msgid ""
+"\n"
+"                Use the Amara API to bring completed subtitle data and metadata into your own backend or publishing platform\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:214
+msgid "A Revolutionary Video Security Model"
+msgstr ""
+
+#: templates/enterprise.html:216
+msgid ""
+"\n"
+"                You always maintain control of your video, because it never leaves your server.  Amara doesn’t require any video uploading, so your existing security policy is always in full effect. We support OAuth, which means your users never need to log in twice—they can see your video and authenticate with both organizations at the same time. Amara makes your subtitles available from the cloud, so you can: deploy just in time via our API; cache on your server and get pinged when there are updates; or use our embeddable subtitle widget.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:223
+msgid ""
+"\n"
+"                Amara’s powerful API allows flexible integration with your existing publishing workflow.  By connecting your backend system directly to Amara, you can import and export subtitles, manage processing, and import completed subtitles directly back into your own system.  If you use a custom video player, importing subtitles via API lets your company fully control subtitle display and use of the transcript on your website.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:227
+msgid "Amara API Documentation"
+msgstr ""
+
+#: templates/enterprise.html:231
+msgid ""
+"\n"
+"                Corporations need to communicate with their staff and their customers around the world, and video is becoming a major part of that process. With Amara, companies make it possible for staff, customers, and contractors to caption and translate videos, make them searchable, and share them publicly or privately.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:237
+msgid ""
+"\n"
+"                Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:243
+msgid ""
+"\n"
+"                As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:247
+msgid ""
+"\n"
+"                Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:253
+msgid ""
+"\n"
+"                In governments around the world, making video accessible is often a legal requirement, not an option.  Amara makes it much easier to coordinate captioning and translation efforts, so that every citizen gains access.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:261
+msgid "Get started with Amara"
+msgstr ""
+
+#: templates/enterprise.html:262
+msgid "Contact Dean Jansen"
+msgstr ""
+
+#: templates/enterprise.html:265
+msgid "EMEA organizations"
+msgstr ""
+
+#: templates/enterprise.html:266
+msgid "Contact Rob Shaw"
 msgstr ""
 
 #: templates/faq.html:16
@@ -3500,7 +3736,7 @@ msgid ""
 "\t\t Click \"Download Subtitles\" button in the lower right to the left from \"Edit Subtitles\" \n"
 "\t\t button and choose the desired file format from the drop-down list.\n"
 "       "
-msgstr ""
+msgstr "\n     \t 当字幕存在时, 你可以str,ssa,sbv,txt以及ttml格式下载当前所在页面使用的语言字幕\n     \t (<a href=\"http://universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">范例</a>). \n\t\t 点击 \"下载字幕\" 按钮， 就在 \"编辑字幕\" 的下级菜单的右边\n\t\t 并从下拉列表中选择所需的文件格式.\n       "
 
 #: templates/faq.html:151
 msgid ""
@@ -3613,7 +3849,7 @@ msgstr "你自己添加字幕或者邀请观看者帮忙。"
 
 #: templates/index.html:34
 msgid "Full site integration"
-msgstr ""
+msgstr "全站集成"
 
 #: templates/index.html:39
 msgid "Volunteers Needed"
@@ -3628,7 +3864,7 @@ msgstr ""
 
 #: templates/index.html:44
 msgid "Start volunteering."
-msgstr ""
+msgstr "开始志愿活动"
 
 #: templates/index.html:48
 msgid "Complete Subtitling Solutions"
@@ -3868,7 +4104,7 @@ msgstr "它由一个遵守501(c)3条款的非盈利志愿者社区建立。"
 
 #: templates/index_old.html:158
 msgid "find out how to volunteer"
-msgstr ""
+msgstr "明白如何成为志愿者"
 
 #: templates/index_old.html:160
 msgid "The code is free and open source"
@@ -4069,14 +4305,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "你确定要永久删除你的配置？"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:367
+#: templates/messages/sent.html:51 templates/teams/tasks.html:365
 msgid "Delete"
 msgstr "删除"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:421 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:419 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:385
 msgid "Cancel"
 msgstr "取消"
@@ -4175,7 +4411,7 @@ msgstr "社区网站"
 msgid ""
 "An online community for collaboratively subtitling and translating the "
 "world's videos (like a Wikipedia for subtitles)."
-msgstr ""
+msgstr "一个为全世界的视频进行协作字幕翻译的在线社区(字幕版的维基百科)。"
 
 #: templates/jsdemo/home.html:39
 msgid "Subtitle Lookup Protocol"
@@ -4189,7 +4425,7 @@ msgstr "一个让Firefox插件、桌面视频播放器、网站、浏览器--任
 
 #: templates/jsdemo/home.html:50
 msgid "Get updates and find out first when we launch"
-msgstr ""
+msgstr "获得更新并在我们启动项目的时候找到我们"
 
 #: templates/jsdemo/home.html:55
 msgid "Get Updates!"
@@ -4267,7 +4503,7 @@ msgid ""
 "\n"
 "        You have %(msg_count)s new messages.\n"
 "    "
-msgstr ""
+msgstr "\n        你有 %(msg_count)s 个新消息.\n    "
 
 #: templates/messages/_messages.html:7 templates/profiles/dashboard.html:85
 #: templates/videos/_recent_activity.html:11
@@ -4395,16 +4631,16 @@ msgstr "用户细节"
 
 #: templates/profiles/_filters_dashboard.html:5
 msgid "Overview"
-msgstr ""
+msgstr "总览"
 
 #: templates/profiles/_filters_dashboard.html:8
 #: templates/profiles/dashboard.html:85
 msgid "Recent Activity"
-msgstr ""
+msgstr "近期活跃"
 
 #: templates/profiles/_filters_dashboard.html:11
 msgid "My Videos"
-msgstr ""
+msgstr "我的视频"
 
 #: templates/profiles/_require_email_dialog.html:7
 msgid ""
@@ -4474,7 +4710,7 @@ msgstr "没有活动"
 #: templates/profiles/_video_detail.html:8
 #: templates/teams/members-list.html:102
 msgid "language"
-msgstr ""
+msgstr "语言"
 
 #: templates/profiles/_video_detail.html:10
 #: templates/teams/_team_video_detail.html:28
@@ -4483,12 +4719,12 @@ msgstr "还没有字幕"
 
 #: templates/profiles/dashboard.html:38
 msgid "Open Tasks"
-msgstr ""
+msgstr "开放任务"
 
 #: templates/profiles/dashboard.html:45 templates/teams/tasks.html:58
 #: templates/teams/tasks.html.py:157
 msgid "Transcribe"
-msgstr ""
+msgstr "转录"
 
 #: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
 #: templates/teams/tasks.html:167
@@ -4517,7 +4753,7 @@ msgstr ""
 
 #: templates/profiles/dashboard.html:91
 msgid "Sorry, no activity yet."
-msgstr ""
+msgstr "抱歉，还没有活跃"
 
 #: templates/profiles/dashboard.html:98
 msgid "Alerts"
@@ -4618,7 +4854,7 @@ msgstr "我的视频"
 
 #: templates/profiles/view_profile.html:56
 msgid "Member since"
-msgstr ""
+msgstr "成员始自"
 
 #: templates/profiles/view_profile.html:62
 msgid "Homepage"
@@ -4773,7 +5009,7 @@ msgid_plural ""
 "\n"
 "              %(number)s languages\n"
 "          "
-msgstr[0] ""
+msgstr[0] "\n              %(number)s 种语言\n          "
 
 #: templates/search/_video_item.html:24
 msgid "lines"
@@ -5022,7 +5258,7 @@ msgstr ""
 
 #: templates/teams/_application_form.html:24
 msgid "proficiency"
-msgstr ""
+msgstr "熟练"
 
 #: templates/teams/_application_form.html:24
 msgid "specified"
@@ -5105,23 +5341,23 @@ msgstr "视频"
 #: templates/videos/subtitle-view.html:135
 #: templates/videos/video-view.html:123
 msgid "Show less"
-msgstr ""
+msgstr "显示少量"
 
 #: templates/teams/_context_team.html:53
 msgid "Member"
-msgstr ""
+msgstr "成员"
 
 #: templates/teams/_context_team.html:83
 msgid "My tasks"
-msgstr ""
+msgstr "我的任务"
 
 #: templates/teams/_context_team.html:100
 msgid "All available tasks"
-msgstr ""
+msgstr "所有可用任务"
 
 #: templates/teams/_filters_videos.html:7
 msgid "All videos"
-msgstr ""
+msgstr "所有视频"
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "According to your"
@@ -5155,7 +5391,7 @@ msgstr ""
 
 #: templates/teams/_subnav_settings.html:5 templates/teams/create.html:43
 msgid "Team Details"
-msgstr ""
+msgstr "小组详情"
 
 #: templates/teams/_subnav_settings.html:13
 #: templates/teams/settings-permissions.html:92
@@ -5382,7 +5618,7 @@ msgstr "需要哪些语言"
 msgid "Who should do it?"
 msgstr "谁应该做"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:425
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:423
 msgid "Begin typing to search"
 msgstr "键入以搜索"
 
@@ -5398,15 +5634,15 @@ msgstr "没有允许你给此视频添加可用任务"
 
 #: templates/teams/create_task.html:83
 msgid "Selected Video"
-msgstr ""
+msgstr "已选择的视频"
 
 #: templates/teams/create_task.html:100
 msgid "New task form"
-msgstr ""
+msgstr "新任务来自"
 
 #: templates/teams/create_task.html:103
 msgid "Back to tasks list"
-msgstr ""
+msgstr "回到任务列表"
 
 #: templates/teams/email_new_video.html:7
 #, python-format
@@ -5447,7 +5683,7 @@ msgstr ""
 
 #: templates/teams/invite_members.html:29
 msgid "Begin typing to search."
-msgstr ""
+msgstr "输入搜索"
 
 #: templates/teams/invite_members.html:32
 msgid "Amara username of the user you want to invite."
@@ -5455,19 +5691,19 @@ msgstr "你想邀请的Amara用户名"
 
 #: templates/teams/invite_members.html:36
 msgid "Invite Details"
-msgstr ""
+msgstr "邀请详情"
 
 #: templates/teams/invite_members.html:39
 msgid "Include a message"
-msgstr ""
+msgstr "包含一条信息"
 
 #: templates/teams/invite_members.html:43
 msgid "Assign a role"
-msgstr ""
+msgstr "指派角色"
 
 #: templates/teams/invite_members.html:45
 msgid "Role to be assigned to the user if they accept your invitation."
-msgstr ""
+msgstr "如果用户接受你的邀请，应该给他分配一个角色"
 
 #: templates/teams/invite_members.html:49
 msgid "Send Invites"
@@ -5476,36 +5712,36 @@ msgstr "发送邀请"
 #: templates/teams/members-list.html:47 templates/teams/tasks.html:48
 #: templates/teams/videos-list.html:47
 msgid "Filter and Sort"
-msgstr ""
+msgstr "过滤并排序"
 
 #: templates/teams/members-list.html:53
 #: templates/videos/subtitle-view.html:198
 msgid "Showing"
-msgstr ""
+msgstr "显示"
 
 #: templates/teams/members-list.html:55
 msgid "all members"
-msgstr ""
+msgstr "所有成员"
 
 #: templates/teams/members-list.html:56
 msgid "admins"
-msgstr ""
+msgstr "核心管理员"
 
 #: templates/teams/members-list.html:57
 msgid "managers"
-msgstr ""
+msgstr "管理者"
 
 #: templates/teams/members-list.html:58
 msgid "contributor"
-msgstr ""
+msgstr "贡献者"
 
 #: templates/teams/members-list.html:62
 msgid "speaking"
-msgstr ""
+msgstr "说话"
 
 #: templates/teams/members-list.html:64 templates/teams/tasks.html:71
 msgid "all languages"
-msgstr ""
+msgstr "所有语言"
 
 #: templates/teams/members-list.html:72 templates/teams/tasks.html:119
 #: templates/teams/tasks.html.py:126 templates/teams/tasks.html:133
@@ -5519,7 +5755,7 @@ msgstr ""
 
 #: templates/teams/members-list.html:77
 msgid "open applications"
-msgstr ""
+msgstr "开放应用"
 
 #: templates/teams/members-list.html:82
 msgid "Sorry, no members found."
@@ -5527,7 +5763,7 @@ msgstr "抱歉，没有找到成员"
 
 #: templates/teams/members-list.html:92
 msgid "Me"
-msgstr ""
+msgstr "我"
 
 #: templates/teams/members-list.html:101 templates/teams/members-list.html:102
 msgid "and"
@@ -5535,7 +5771,7 @@ msgstr "和"
 
 #: templates/teams/members-list.html:101
 msgid "project"
-msgstr ""
+msgstr "项目"
 
 #: templates/teams/members-list.html:113
 msgid "Assignments"
@@ -5543,16 +5779,16 @@ msgstr ""
 
 #: templates/teams/members-list.html:122
 msgid "Are you sure you want to remove this member from the team?"
-msgstr ""
+msgstr "你确定要将此成员移出小组？"
 
 #: templates/teams/settings-guidelines.html:5
 #: templates/teams/settings-guidelines.html:44
 msgid "Guidelines"
-msgstr ""
+msgstr "指南"
 
 #: templates/teams/settings-guidelines.html:25
 msgid "Custom messages"
-msgstr ""
+msgstr "自定义信息"
 
 #: templates/teams/settings-guidelines.html:28
 msgid ""
@@ -5562,63 +5798,63 @@ msgstr ""
 
 #: templates/teams/settings-guidelines.html:31
 msgid "When a member is invited to join the team"
-msgstr ""
+msgstr "当成员被邀请加入小组时"
 
 #: templates/teams/settings-guidelines.html:34
 msgid "When a member applies to join the team"
-msgstr ""
+msgstr "当成员申请加入小组时"
 
 #: templates/teams/settings-guidelines.html:37
 msgid "When a member is given the Manager role"
-msgstr ""
+msgstr "当成员授予管理者角色时"
 
 #: templates/teams/settings-guidelines.html:40
 msgid "When a member is given the Admin role"
-msgstr ""
+msgstr "当成员授予核心管理员角色时"
 
 #: templates/teams/settings-guidelines.html:47
 msgid "Add guidelines to be displayed to your users when completing tasks."
-msgstr ""
+msgstr "添加指南以便在你的用户完成任务时显示"
 
 #: templates/teams/settings-guidelines.html:50
 msgid "When transcribing"
-msgstr ""
+msgstr "当转录时"
 
 #: templates/teams/settings-guidelines.html:53
 msgid "When translating"
-msgstr ""
+msgstr "当翻译时"
 
 #: templates/teams/settings-guidelines.html:56
 msgid "When reviewing"
-msgstr ""
+msgstr "当审核时"
 
 #: templates/teams/settings-languages.html:27
 msgid "Preferred Languages"
-msgstr ""
+msgstr "偏好语言"
 
 #: templates/teams/settings-languages.html:28
 msgid "Translation tasks will be auto-created for these languages"
-msgstr ""
+msgstr "翻译任务将为这些语种自动生成"
 
 #: templates/teams/settings-languages.html:33
 msgid "Blacklisted Languages"
-msgstr ""
+msgstr "列入黑名单的语言"
 
 #: templates/teams/settings-languages.html:34
 msgid "Will not be shown when creating or performing tasks"
-msgstr ""
+msgstr "创建或呈现任务时将不会显示"
 
 #: templates/teams/settings-permissions.html:27
 msgid "Team Management"
-msgstr ""
+msgstr "小组管理"
 
 #: templates/teams/settings-permissions.html:28
 msgid "How can users join your team?"
-msgstr ""
+msgstr "用户如何加入你的小组？"
 
 #: templates/teams/settings-permissions.html:31
 msgid "Who can add/remove videos?"
-msgstr ""
+msgstr "谁可以添加/删除视频？"
 
 #: templates/teams/settings-permissions.html:37
 msgid "Manage subtitling and translation work for your videos"
@@ -5840,7 +6076,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:196 templates/videos/subtitle-view.html:45
 msgid "translated"
-msgstr ""
+msgstr "已翻译"
 
 #: templates/teams/tasks.html:204
 msgid "reviewed"
@@ -5857,72 +6093,72 @@ msgstr ""
 
 #: templates/teams/tasks.html:221
 msgid "Assigned to"
-msgstr ""
+msgstr "已分配"
 
 #: templates/teams/tasks.html:230
 msgid "Unassigned"
-msgstr ""
+msgstr "未分配"
 
 #: templates/teams/tasks.html:244
 msgid "Perform Task"
-msgstr ""
+msgstr "平台任务"
 
-#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:308
+#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:306
 msgid "Download draft"
 msgstr ""
 
-#: templates/teams/tasks.html:282
+#: templates/teams/tasks.html:280
 msgid "Upload draft"
 msgstr ""
 
-#: templates/teams/tasks.html:287
+#: templates/teams/tasks.html:285
 #: templates/videos/_paste_transcription.html:146
 #: templates/videos/_upload_subtitles.html:23
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr "语言"
 
-#: templates/teams/tasks.html:292
-msgid "Draft:"
+#: templates/teams/tasks.html:290
+msgid "File:"
 msgstr ""
 
-#: templates/teams/tasks.html:338
+#: templates/teams/tasks.html:336
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:358
+#: templates/teams/tasks.html:356
 msgid "Reassign"
-msgstr ""
+msgstr "重新分配"
 
-#: templates/teams/tasks.html:360
+#: templates/teams/tasks.html:358
 msgid "Assign"
-msgstr ""
+msgstr "分配"
 
-#: templates/teams/tasks.html:376
+#: templates/teams/tasks.html:374
 msgid "Delete task"
-msgstr ""
+msgstr "删除任务"
 
-#: templates/teams/tasks.html:382
+#: templates/teams/tasks.html:380
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:385
+#: templates/teams/tasks.html:383
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:389
+#: templates/teams/tasks.html:387
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:428
+#: templates/teams/tasks.html:426
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:438
+#: templates/teams/tasks.html:436
 msgid "Sorry, no tasks here."
-msgstr ""
+msgstr "抱歉，这里没有任务"
 
 #: templates/teams/team_video.html:6
 msgid "Edit team video"
@@ -6265,7 +6501,7 @@ msgstr ""
 
 #: templates/videos/_paste_transcription.html:114
 msgid "Submit a Transcript"
-msgstr ""
+msgstr "提交一个副本"
 
 #: templates/videos/_paste_transcription.html:118
 msgid ""
@@ -6352,7 +6588,7 @@ msgstr "如果你相信你的字幕文件兼容，<a href='mailto:feedback@unive
 #: templates/videos/_video.html:23
 msgid "view"
 msgid_plural "views"
-msgstr[0] ""
+msgstr[0] "观看"
 
 #: templates/videos/_video.html:26
 msgid "Added"
@@ -6499,11 +6735,11 @@ msgstr "自动提交视频"
 
 #: templates/videos/create.html:49
 msgid "Let's Go!"
-msgstr ""
+msgstr "开始！"
 
 #: templates/videos/create.html:55 templates/videos/create.html.py:65
 msgid "Or Submit Multiple Videos"
-msgstr ""
+msgstr "或者提交多个视频"
 
 #: templates/videos/diffing.html:41
 msgid "Subtitles will be rolled back to a previous version"
@@ -6712,7 +6948,7 @@ msgstr "视频标题"
 
 #: templates/videos/email_title_changed.html:10
 msgid "has been changed by"
-msgstr ""
+msgstr "更改者"
 
 #: templates/videos/email_title_changed.html:13
 msgid "has been changed"
@@ -6743,7 +6979,7 @@ msgstr "新添加URL给"
 
 #: templates/videos/email_video_url_add.html:9
 msgid "was submitted by"
-msgstr ""
+msgstr "提交者"
 
 #: templates/videos/email_video_url_add.html:13
 msgid "Anonymous"
@@ -6753,7 +6989,7 @@ msgstr "匿名"
 msgid ""
 "Please check to make sure the new URL features the exact same video, and "
 "that subtitle timing is correct:"
-msgstr ""
+msgstr "请检查以确保新的URL链接的是完全一样的视频，并且字幕时间正确"
 
 #: templates/videos/email_video_url_add.html:21
 msgid "View the new video URL"
@@ -6803,7 +7039,7 @@ msgstr "这一年"
 #: templates/videos/popular_videos.html:68 templates/videos/volunteer.html:68
 #: templates/videos/watch.html:50
 msgid "All Time"
-msgstr ""
+msgstr "所有时间"
 
 #: templates/videos/stop_notification.html:9
 #, python-format
@@ -7005,7 +7241,7 @@ msgstr "任务3"
 
 #: templates/videos/test_form_page.html:36
 msgid "Translate the video (fake it if you’re not bilingual!)"
-msgstr ""
+msgstr "翻译此视频(如果你翻译不了请复制原翻译)"
 
 #: templates/videos/test_form_page.html:42
 msgid "optional: get updates about Amara"

@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-22 01:32-0500\n"
-"PO-Revision-Date: 2012-05-22 06:46+0000\n"
+"POT-Creation-Date: 2012-05-23 01:33-0500\n"
+"PO-Revision-Date: 2012-05-23 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: French (http://www.transifex.net/projects/p/universalsubtitles/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -279,15 +279,15 @@ msgstr ""
 msgid " and published"
 msgstr " et publiés"
 
-#: apps/messages/tasks.py:481
+#: apps/messages/tasks.py:486
 msgid "Your subtitles have been approved and published!"
 msgstr "Vos sous-titres ont été approuvés et publiés!"
 
-#: apps/messages/tasks.py:488 apps/messages/tasks.py:542
+#: apps/messages/tasks.py:493 apps/messages/tasks.py:547
 msgid "Your subtitles have been declined"
 msgstr "Vos sous-titres ont été refusés"
 
-#: apps/messages/tasks.py:585
+#: apps/messages/tasks.py:590
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr ""
@@ -838,7 +838,7 @@ msgstr "Role du membre modifié."
 msgid "You cannot assign that role to that member."
 msgstr "Vous ne pouvez pas assigner ce rôle à ce membre."
 
-#: apps/teams/tasks.py:75
+#: apps/teams/tasks.py:76
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Nouvelles vidéos %(team)s prêtes à être sous-titrées!"
@@ -1572,7 +1572,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:895 apps/widget/rpc.py:936
+#: apps/widget/rpc.py:898 apps/widget/rpc.py:939
 msgid "\n"
 msgstr ""
 
@@ -3120,175 +3120,411 @@ msgstr ""
 msgid "let us know"
 msgstr ""
 
-#: templates/enterprise.html:8
-msgid "Enterprise Services"
+#: templates/enterprise.html:11
+msgid "Features & Benefits"
 msgstr ""
 
-#: templates/enterprise.html:10
-msgid ""
-"\n"
-"            To be global, to be accessible, and to be searchable, videos need subtitles. Amara, is the most flexible and powerful subtitle creation and management platform in the world.\n"
-"          "
+#: templates/enterprise.html:13
+msgid "Amara Platform"
 msgstr ""
 
-#: templates/enterprise.html:15
-msgid ""
-"\n"
-"            Our enterprise platform offers an unmatched ability to manage a subtitle creation and editing process and to reach outstanding levels of quality.  Build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through a powerful API.\n"
-"          "
+#: templates/enterprise.html:14
+msgid "Global Reach"
+msgstr ""
+
+#: templates/enterprise.html:15 templates/enterprise.html.py:135
+msgid "Quality Control"
+msgstr ""
+
+#: templates/enterprise.html:16 templates/enterprise.html.py:157
+msgid "Automated Workflows"
+msgstr ""
+
+#: templates/enterprise.html:17 templates/enterprise.html.py:192
+msgid "Subtitle Management"
 msgstr ""
 
 #: templates/enterprise.html:19
-msgid "Interested?"
+msgid "Advanced Security"
 msgstr ""
 
-#: templates/enterprise.html:21
-msgid ""
-"\n"
-"        To learn more about our services, please contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>\n"
-"      "
+#: templates/enterprise.html:20 templates/enterprise.html.py:221
+msgid "API Integration"
 msgstr ""
 
-#: templates/enterprise.html:25
-msgid "Who Uses Amara?"
+#: templates/enterprise.html:23
+msgid "Customers"
 msgstr ""
 
-#: templates/enterprise.html:26
-msgid ""
-"Whatever your subtitle needs are, Amara makes it easier to create great "
-"subtitles at a very low cost."
-msgstr ""
-
-#: templates/enterprise.html:29
+#: templates/enterprise.html:25 templates/enterprise.html.py:230
 msgid "Companies"
 msgstr ""
 
-#: templates/enterprise.html:31
-msgid ""
-"\n"
-"          Corporations need to communicate with their staff and their customers around the world, and video is becoming a major part of that process.  With Amara, companies make it possible for staff, customers, and contractors to translate videos, make them searchable, and share them, publicly or privately.  \n"
-"        "
-msgstr ""
-
-#: templates/enterprise.html:37
-msgid "Video Publishers"
-msgstr ""
-
-#: templates/enterprise.html:39
-msgid ""
-"\n"
-"          Anyone who makes video can reach more people with subtitles.  Video publishers use Amara to build volunteer communities with the people who watch their videos, translating them for the world and reaching more viewers.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise.html:45
+#: templates/enterprise.html:26 templates/enterprise.html.py:236
 msgid "Universities"
 msgstr ""
 
-#: templates/enterprise.html:47
-msgid ""
-"\n"
-"          As online education explodes in popularity, subtitles are essential to making courses accessible and international.  Colleges and universities are using Amara to make their rapidly growing video resources succeed.\n"
-"        "
+#: templates/enterprise.html:27 templates/enterprise.html.py:242
+msgid "Publishers"
 msgstr ""
 
-#: templates/enterprise.html:55
-msgid "Non-Profit Organizations"
+#: templates/enterprise.html:28 templates/enterprise.html.py:252
+msgid "Government"
+msgstr ""
+
+#: templates/enterprise.html:34
+msgid "The World’s Most Advanced Platform for Subtitles"
+msgstr ""
+
+#: templates/enterprise.html:36
+msgid ""
+"\n"
+"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:42
+msgid "World-class Users"
+msgstr ""
+
+#: templates/enterprise.html:50
+msgid "Award-Winning Technology"
 msgstr ""
 
 #: templates/enterprise.html:57
-msgid ""
-"\n"
-"          Non-profit organizations use Amara to help build and manage volunteer communities to caption and translate their videos into dozens of languages.  Before Amara, the cost of professional subtitling would have made this impossible.\n"
-"        "
+msgid "Unmatched Functionality and Control"
+msgstr ""
+
+#: templates/enterprise.html:61
+msgid "Build a Translation Team"
 msgstr ""
 
 #: templates/enterprise.html:63
-msgid "Video Platforms"
-msgstr ""
-
-#: templates/enterprise.html:65
 msgid ""
 "\n"
-"          Video hosting platforms are using Amara to empower their publishers and reach a more global audience.  By connecting publishers directly to Amara, subtitling happens at a level that was never possible before.\n"
-"        "
+"                For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible for captions and subtitles.  With Amara, you can accomplish the seemingly impossible task of translating your videos into dozens of languages.  Quickly build a powerful, high-quality volunteer translation and captioning team that makes your content truly global.\n"
+"            "
 msgstr ""
 
-#: templates/enterprise.html:71
-msgid "Amara Does What No Other Platform Can"
+#: templates/enterprise.html:67
+msgid "Security and Managed Workflows"
+msgstr ""
+
+#: templates/enterprise.html:69
+msgid ""
+"\n"
+"                Create the right workflows for your content and coordinate your efforts-- whether your video is completely private, restricted to premium subscribers, or public on the web.  You always control who has access to your subtitles and when to involve staff, contractors, or volunteers.\n"
+"            "
 msgstr ""
 
 #: templates/enterprise.html:73
-msgid ""
-"\n"
-"        Amara is the world's largest subtitle platform and has been winning awards because it transforms subtitle creation and management.  What was once prohibitively expensive and complicated, becomes possible and even easy.\n"
-"      "
+msgid "Powerful API and Publishing Integration"
 msgstr ""
 
-#: templates/enterprise.html:79
-msgid "Build a Translation Team"
+#: templates/enterprise.html:75
+msgid ""
+"\n"
+"                Our API helps companies tightly integrate Amara with their existing publishing and distribution workflow.  By making subtitles key part of your process, you build a global audience.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:79 templates/enterprise.html.py:124
+msgid "Professional Services"
 msgstr ""
 
 #: templates/enterprise.html:81
 msgid ""
 "\n"
-"          For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible with video.  Quickly build a powerful, high-quality volunteer translation and captioning team around your content and make it global.\n"
-"        "
+"                Access professional services including paid captions, translations, and quality control.  Or use your own staff and contractors and use Amara to coordinate their work remotely.\n"
+"            "
 msgstr ""
 
-#: templates/enterprise.html:87
-msgid "Integrate Professional Services"
-msgstr ""
-
-#: templates/enterprise.html:89
-msgid ""
-"\n"
-"            Access professional services including paid captions, translations, and quality control. These services, when mixed with volunteer contributions, give you ultimate flexibility.\n"
-"          "
-msgstr ""
-
-#: templates/enterprise.html:95
+#: templates/enterprise.html:85
 msgid "Crowdsource with Professional Review"
 msgstr ""
 
-#: templates/enterprise.html:97
+#: templates/enterprise.html:87
 msgid ""
 "\n"
-"            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality assurance.\n"
-"          "
+"                Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality assurance.\n"
+"            "
 msgstr ""
 
-#: templates/enterprise.html:105
+#: templates/enterprise.html:93
 msgid "Work with Any Video Platform"
 msgstr ""
 
-#: templates/enterprise.html:107
+#: templates/enterprise.html:95
 msgid ""
 "\n"
-"            Amara works with all the most popular video hosting services and video players. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
-"          "
+"                Amara works with all the most popular video hosting services and video players, and adapts easily to your own custom player. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
+"            "
 msgstr ""
 
-#: templates/enterprise.html:113
-msgid "Improve Your SEO"
+#: templates/enterprise.html:99
+msgid "Subtitles Improve SEO"
+msgstr ""
+
+#: templates/enterprise.html:101
+msgid ""
+"\n"
+"                Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:106
+msgid "Build a Global Reach"
+msgstr ""
+
+#: templates/enterprise.html:110
+msgid ""
+"\n"
+"                Amara is the premiere platform for taking video content global. Whether you’re working with volunteer translators, engaging your own staff, or hiring professionals, you can easily manage the end-to-end process.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:114
+msgid "Volunteer Subtitle Creation"
 msgstr ""
 
 #: templates/enterprise.html:115
 msgid ""
 "\n"
-"            Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
-"          "
+"                Amara currently supports some of the largest volunteer video translation efforts on the planet. Our technology makes captioning, subtitling, and translating very easy, fun, and engaging which enables ongoing, massive, collaborations.\n"
+"            "
 msgstr ""
 
-#: templates/enterprise.html:121
-msgid "Flexible API and Integration"
+#: templates/enterprise.html:119
+msgid "Private Crowd Subtitle Creation"
 msgstr ""
 
-#: templates/enterprise.html:123
+#: templates/enterprise.html:120
 msgid ""
 "\n"
-"            Need seamless subtitles on your custom video player? Want 1-click features integrated into your back-end or CMS? We can help.     \n"
-"          "
+"                If you have a workforce, student group, or any other non-public crowd, you can limit access for captioning, translating, and subtitling OR reviewing the work of peers, volunteers, or professionals.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:125
+msgid ""
+"\n"
+"                Selectively engage professionals for captioning or subtitling into nearly any language, or even to help with Quality Control. All completed work is centralized on Amara, ready for incremental quality control and quick deployment.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:129
+msgid "Hybrid Approach"
+msgstr ""
+
+#: templates/enterprise.html:130
+msgid ""
+"\n"
+"                Mix and match these different approaches on the initial (subtitle authoring) pass, as well as subsequent review passes (for Quality Control). This is an advantage that you only get with Amara, a fully featured solution that manages the process end to end.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:139
+msgid ""
+"\n"
+"                Amara’s Flexible Workflows offer several ways to ensure outstanding quality for your subtitles.  Whether you use internal staff, outside contractors, professional services, or a volunteer community -- you’ll be able to create, review, and approve workflows that meet your needs.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:143
+msgid "Examples of QC processes:"
+msgstr ""
+
+#: templates/enterprise.html:145
+msgid ""
+"\n"
+"                    Have your contractors work inside your Amara account and then require staff review before subtitles go live.\n"
+"                "
+msgstr ""
+
+#: templates/enterprise.html:148
+msgid ""
+"\n"
+"                    Some universities use paid captioning services to quickly caption lecture videos and then invite experts in the university community to fix any mistakes with proper names or technical terms.\n"
+"                "
+msgstr ""
+
+#: templates/enterprise.html:151
+msgid ""
+"\n"
+"                    Volunteer teams can self-manage and reach very high quality by requiring peer review of subtitles before they are published.  More senior members of the community can be promoted to a moderator role.\n"
+"                "
+msgstr ""
+
+#: templates/enterprise.html:161
+msgid ""
+"\n"
+"                Workflows enable automating the flow of content through different authoring groups, including: volunteers, private crowds (staff, employees, students, etc), and professionals. They can be used for both first pass (authoring), as well as subsequent review passes for Quality Control.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:165
+msgid ""
+"\n"
+"                Different workflows can be chained together to create an unlimited number of highly flexible configurations. The Amara team can help you determine the best workflow for your subtitle processes and integrate it with your existing publishing platform.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:169
+msgid "Contractors with Staff Review"
+msgstr ""
+
+#: templates/enterprise.html:170
+msgid ""
+"\n"
+"                Use captioning and transcription contractors to create your subtitles, then require staff review and approval before they are published back to your server. Remember, no one sees your subtitles until YOU publish it.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:174
+msgid "Crowdsourced subtitles, followed by staff review"
+msgstr ""
+
+#: templates/enterprise.html:175
+msgid ""
+"\n"
+"                In many cases, organizations want to leverage the power of the crowd, but don’t want to leave any chance for poor quality captions or subtitles to appear on their content. This workflow keeps videos private until a staff member has approved the subtitles.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:181
+msgid "Professionally created English captions, crowd translation"
+msgstr ""
+
+#: templates/enterprise.html:182
+msgid ""
+"\n"
+"                Amara offers professional- quality captions at very low cost with quick turn-around times. English can often be done in less than a day.  Once English is completed, it’s a snap to request translations from volunteers or staff. We have seen videos translated into multiple languages in just days -- through a volunteer crowd.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:186
+msgid "Crowd translations, with professional quality-control"
+msgstr ""
+
+#: templates/enterprise.html:187
+#, python-format
+msgid ""
+"\n"
+"                Amara is, quite simply, the most cost-effective way to get professional-level quality for foreign language video subtitles. By leveraging professional quality review, you can expect to pay roughly 75%% less than the market price for traditional professional subtitles.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:194
+msgid ""
+"\n"
+"                At its core, Amara is the definitive platform for managing captions and subtitles.  Whether you are creating, revising, or translating subtitles -- you can choose to centralize the management -- or divide up your content, and delegate responsibilities and control.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:198
+msgid "Import"
+msgstr ""
+
+#: templates/enterprise.html:199
+msgid ""
+"\n"
+"                Your videos are never uploaded to our server (learn more about our Security Model), so you actually import pointers to existing video files—whether you’re hosting on your own server, YouTube, Vimeo, other video hosting service, or combination thereof. Import these video pointers via graphical interface or API, plus we can import a wide variety of subtitle and transcript formats in case you have pre-existing data.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:203
+msgid "Process > Author > QC"
+msgstr ""
+
+#: templates/enterprise.html:204
+msgid ""
+"\n"
+"                Flexible workflows make creating Global Content simple; your organization can harness the power of volunteers, private crowds, and/or professional service providers for content creation and Quality Control.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:208
+msgid "Deploy"
+msgstr ""
+
+#: templates/enterprise.html:209
+msgid ""
+"\n"
+"                Use the Amara API to bring completed subtitle data and metadata into your own backend or publishing platform\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:214
+msgid "A Revolutionary Video Security Model"
+msgstr ""
+
+#: templates/enterprise.html:216
+msgid ""
+"\n"
+"                You always maintain control of your video, because it never leaves your server.  Amara doesn’t require any video uploading, so your existing security policy is always in full effect. We support OAuth, which means your users never need to log in twice—they can see your video and authenticate with both organizations at the same time. Amara makes your subtitles available from the cloud, so you can: deploy just in time via our API; cache on your server and get pinged when there are updates; or use our embeddable subtitle widget.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:223
+msgid ""
+"\n"
+"                Amara’s powerful API allows flexible integration with your existing publishing workflow.  By connecting your backend system directly to Amara, you can import and export subtitles, manage processing, and import completed subtitles directly back into your own system.  If you use a custom video player, importing subtitles via API lets your company fully control subtitle display and use of the transcript on your website.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:227
+msgid "Amara API Documentation"
+msgstr ""
+
+#: templates/enterprise.html:231
+msgid ""
+"\n"
+"                Corporations need to communicate with their staff and their customers around the world, and video is becoming a major part of that process. With Amara, companies make it possible for staff, customers, and contractors to caption and translate videos, make them searchable, and share them publicly or privately.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:237
+msgid ""
+"\n"
+"                Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:243
+msgid ""
+"\n"
+"                As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:247
+msgid ""
+"\n"
+"                Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:253
+msgid ""
+"\n"
+"                In governments around the world, making video accessible is often a legal requirement, not an option.  Amara makes it much easier to coordinate captioning and translation efforts, so that every citizen gains access.\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:261
+msgid "Get started with Amara"
+msgstr ""
+
+#: templates/enterprise.html:262
+msgid "Contact Dean Jansen"
+msgstr ""
+
+#: templates/enterprise.html:265
+msgid "EMEA organizations"
+msgstr ""
+
+#: templates/enterprise.html:266
+msgid "Contact Rob Shaw"
 msgstr ""
 
 #: templates/faq.html:16
@@ -4073,14 +4309,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Êtes-vous sure de vouloir définitivement détruire votre profil ?"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:367
+#: templates/messages/sent.html:51 templates/teams/tasks.html:365
 msgid "Delete"
 msgstr "Détruire"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:421 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:419 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:385
 msgid "Cancel"
 msgstr "Annuler"
@@ -5391,7 +5627,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:425
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:423
 msgid "Begin typing to search"
 msgstr ""
 
@@ -5876,60 +6112,60 @@ msgstr ""
 msgid "Perform Task"
 msgstr ""
 
-#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:308
+#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:306
 msgid "Download draft"
 msgstr ""
 
-#: templates/teams/tasks.html:282
+#: templates/teams/tasks.html:280
 msgid "Upload draft"
 msgstr "Télécharger le projet"
 
-#: templates/teams/tasks.html:287
+#: templates/teams/tasks.html:285
 #: templates/videos/_paste_transcription.html:146
 #: templates/videos/_upload_subtitles.html:23
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr "Langue"
 
-#: templates/teams/tasks.html:292
-msgid "Draft:"
+#: templates/teams/tasks.html:290
+msgid "File:"
 msgstr ""
 
-#: templates/teams/tasks.html:338
+#: templates/teams/tasks.html:336
 msgid "Decline"
 msgstr "Refuser"
 
-#: templates/teams/tasks.html:358
+#: templates/teams/tasks.html:356
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:360
+#: templates/teams/tasks.html:358
 msgid "Assign"
 msgstr "Assigner"
 
-#: templates/teams/tasks.html:376
+#: templates/teams/tasks.html:374
 msgid "Delete task"
 msgstr "Supprimer la tache"
 
-#: templates/teams/tasks.html:382
+#: templates/teams/tasks.html:380
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:385
+#: templates/teams/tasks.html:383
 msgid "Publish these subtitles immediately"
 msgstr "Publier ces sous-titres immédiatement"
 
-#: templates/teams/tasks.html:389
+#: templates/teams/tasks.html:387
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:428
+#: templates/teams/tasks.html:426
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:438
+#: templates/teams/tasks.html:436
 msgid "Sorry, no tasks here."
 msgstr "Désolé, pas de tache ici."
 
