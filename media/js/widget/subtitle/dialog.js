@@ -323,12 +323,14 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
             // If there are captions, make sure each captions has timing data.
             goog.array.forEach(this.captionSet_.captions_, function(c) {
                 if (c.getStartTime() === -1 || c.getEndTime() === -1) {
-                    alert('You have unsynced captions. You must sync all captions before you can submit.');
                     halt = true;
                 }
             });
 
-            if (halt === true) { return false; }
+            if (halt === true) {
+                alert('You have unsynced captions. You must sync all captions before you can submit.');
+                return false;
+            }
         }
 
         this.saveWork(false, false);
