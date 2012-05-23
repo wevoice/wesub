@@ -262,7 +262,7 @@ class Rpc(BaseRpc):
                     return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
 
         # Check that the team's policies don't prevent the action.
-        if not is_edit and mode not in ['review', 'approve']:
+        if mode not in ['review', 'approve']:
             if is_translation:
                 can_edit = can_create_and_edit_translations(user, team_video, language_code)
             else:
