@@ -65,6 +65,10 @@ class ResponseTimeMiddleware(object):
         else:
             request._metrics_section = None
 
+        if request._metrics_section:
+            label = 'site-sections.%s-response-time' % request._metrics_section
+            Meter(label).inc()
+
         return None
 
     def process_response(self, request, response):
