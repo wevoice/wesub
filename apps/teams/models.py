@@ -1872,9 +1872,12 @@ class Task(models.Model):
         if self.subtitle_version:
             return self.subtitle_version
 
-        video = Video.objects.get(teamvideo=self.team_video_id)
-        language = video.subtitle_language(self.language)
-        return language.version(public_only=False) if language else None
+        if not hasattr(self, "_subtitle_version"):
+            video = Video.objects.get(teamvideo=self.team_video_id)
+            language = video.subtitle_language(self.language)
+            self._subtitle_version = language.version(public_only=False) if language else None
+
+        return self._subtitle_version
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:
