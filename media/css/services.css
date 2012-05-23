@@ -1,48 +1,90 @@
 #services {
     padding: 4em 0;
+    color: #2F3C45;
 }
 
-#services .alpha h3 {
+#services .menu, #services .view {
+    margin-bottom: 3em;
+}
+
+#services .menu h3 {
     font-size: 14px;
     font-weight: normal;
     text-transform: uppercase;
     color: #999;
 }
 
-#services .alpha ul {
+#services .menu ul {
     padding: 0;
     margin-bottom: 3em;
 }
 
-    #services .alpha ul li {
+    #services .menu ul li {
         padding: 0;
     }
 
-        #services .alpha ul li a {
+        #services .menu ul li a {
             display: block;
             padding: 1em 0;
             text-decoration: none;
             border-bottom: 1px solid #eaeaea;
         }
 
-        #services .alpha ul li a:hover {
+        #services .menu ul li a:hover {
             color: #1573AD;
         }
 
-#services .omega > ul > li {
+#services .tab-content > li {
     display: none;
 }
 
-    #services .omega h3 {
+    #services .tab-content h3 {
         padding: 1em 0 1em;
     }
 
-    #services .omega p {
+    #services .tab-content p, #services .tab-content ul {
         line-height: 175%;
         margin-bottom: 2em;
     }
 
+    #services .tab-content ul li {
+        list-style-type: disc;
+    }
+
+    #services .tab-content img.screen {
+        float: right;
+        margin: 1em 0 2em 2em;
+        padding: 5px;
+        -moz-box-shadow: 0px 0px 10px -2px #888;
+        -webkit-box-shadow: 0px 0px 10px -2px #888;
+        box-shadow: 0px 0px 10px -2px #888;
+    }
+
+    #services .tab-content img.screen.left {
+        float: left;
+        margin: 0 2em 2em 0;
+    }
+
+#recognition {
+    margin-bottom: 4em;
+}
+
+#recognition * {
+    vertical-align: middle;
+}
+
+#recognition a {
+    text-decoration: none;
+}
+
+#recognition img {
+    width: 75px;
+    margin-right: 10px;
+}
+
 .page-footer {
+    padding: 2em 0;
     clear: both;
     text-align: center;
+    border-top: 1px solid #ddd;
 }
