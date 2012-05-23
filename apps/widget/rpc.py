@@ -258,8 +258,8 @@ class Rpc(BaseRpc):
             # can_assign verify if the user has permission to either
             # 1. assign the task to himself
             # 2. do the task himself (the task is assigned to him)
-            if not user.is_authenticated() or (not task.assignee and not can_assign_task(task, user)):
-                return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
+            if not user.is_authenticated() or (task.assignee and task.assignee != user) or (not task.assignee and not can_assign_task(task, user)):
+                    return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
 
         # Check that the team's policies don't prevent the action.
         if not is_edit and mode not in ['review', 'approve']:
@@ -584,9 +584,7 @@ class Rpc(BaseRpc):
             # this is really really hackish.
             # TODO: clean all this mess on a friday
             if not new_version.language.is_complete_and_synced(public_only=False):
-                new_version.moderation_status = UNMODERATED
-                new_version.save()
-                self._create_transcribe_task(new_version, user)
+                self._moderate_incomplete_version(new_version, user)
             elif hasattr(new_version, 'task_to_save'):
                 task = new_version.task_to_save
                 task.subtitle_version = new_version
@@ -716,22 +714,27 @@ class Rpc(BaseRpc):
         return Task(team=team_video.team, team_video=team_video,
                     assignee=assignee, language=lang, type=type)
 
-    def _create_transcribe_task(self, subtitle_version, user):
+    def _moderate_incomplete_version(self, subtitle_version, user):
         """ Verifies if it's possible to create a transcribe/translate task (if there's
-        no other transcribe/translate task) and tries to assign to user. """
+        no other transcribe/translate task) and tries to assign to user. 
+        Also, if the video belongs to a team, change its status.
+        """
 
         team_video = subtitle_version.video.get_team_video()
-        language = subtitle_version.language.language
 
         if not team_video:
             return
 
+        language = subtitle_version.language.language
         transcribe_task = team_video.task_set.incomplete_subtitle_or_translate()\
                                      .filter(language=language)
 
         if transcribe_task.exists():
             task = transcribe_task[0]
             return
+
+        subtitle_version.moderation_status = WAITING_MODERATION
+        subtitle_version.save()
 
         task = Task(team=team_video.team, team_video=team_video,
                     language=language, type=Task.TYPE_IDS['Subtitle'])

@@ -334,11 +334,11 @@ class SubtitlesUploadBaseForm(forms.Form):
             # user can bypass moderation if:
             # 1) he is a moderator and 
             # 2) it's a post-publish edit
-            can_bypass_moderation = not self._sl_created and can_publish_edits_immediately(team_video, self.user, language.language)
+            can_bypass_moderation = is_complete and not self._sl_created and can_publish_edits_immediately(team_video, self.user, language.language)
 
             if can_bypass_moderation:
                 new_version.moderate = APPROVED
-            elif workflow.review_allowed or workflow.approve_allowed and is_complete:
+            elif (workflow.review_allowed or workflow.approve_allowed) and is_complete:
                 new_version.moderation_status = WAITING_MODERATION
             else:
                 new_version.moderation_status = UNMODERATED
