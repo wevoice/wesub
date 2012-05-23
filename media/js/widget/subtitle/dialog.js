@@ -311,6 +311,26 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
     }
 
     if (this.state_ == unisubs.subtitle.Dialog.State_.REVIEW) {
+
+        // Make sure this subtitle set has captions.
+        if (this.captionSet_.captions_.length === 0) {
+            alert('You must create captions in order to submit.');
+            return false;
+        } else {
+
+            var halt = false;
+
+            // If there are captions, make sure each captions has timing data.
+            goog.array.forEach(this.captionSet_.captions_, function(c) {
+                if (c.getStartTime() === -1 || c.getEndTime() === -1) {
+                    alert('You have unsynced captions. You must sync all captions before you can submit.');
+                    halt = true;
+                }
+            });
+
+            if (halt === true) { return false; }
+        }
+
         this.saveWork(false, false);
     } else {
         this.enterState_(this.nextState_());
