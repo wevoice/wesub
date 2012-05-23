@@ -1387,9 +1387,11 @@ def download_draft(request, slug, task_pk, type="srt"):
     if type not in GenerateSubtitlesHandler:
         raise Http404
 
-    subtitle = GenerateSubtitlesHandler[type].create(task.subtitle_version)
+    subtitle_version = task.get_subtitle_version()
+
+    subtitle = GenerateSubtitlesHandler[type].create(subtitle_version)
     response = HttpResponse(unicode(subtitle), mimetype="text/plain")
-    original_filename = '%s.%s' % (task.subtitle_version.video.lang_filename(task.language), subtitle.file_type)
+    original_filename = '%s.%s' % (subtitle_version.video.lang_filename(task.language), subtitle.file_type)
 
     if not 'HTTP_USER_AGENT' in request.META or u'WebKit' in request.META['HTTP_USER_AGENT']:
         # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.

@@ -263,7 +263,7 @@
                                                         </li>
                                                     {% endif %}
                                                 {% endif %}
-                                                {% if task.subtitle_version %}
+                                                {% if task.get_subtitle_version %}
                                                     <li>
                                                     <a href="#download-draft-{{task.id}}" class="open-modal upload-draft-button">{% trans 'Download draft' %}</a>
                                                     </li>
