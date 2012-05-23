@@ -283,7 +283,7 @@ class Rpc(BaseRpc):
         version_for_subs = language.version(public_only=False)
 
         if not version_for_subs:
-            version_for_subs = self._create_version_from_session(session)
+            version_for_subs, _ = self._create_version_from_session(session)
             version_no = 0
         else:
             version_no = version_for_subs.version_no + 1
@@ -376,7 +376,7 @@ class Rpc(BaseRpc):
             # FIXME: Duplication between this and start_editing.
             version_for_subs = session.language.version()
             if not version_for_subs:
-                version_for_subs = self._create_version_from_session(session)
+                version_for_subs, _ = self._create_version_from_session(session)
                 version_no = 0
             else:
                 version_no = version_for_subs.version_no + 1
@@ -570,7 +570,7 @@ class Rpc(BaseRpc):
             subtitles_changed or title_changed or desc_changed)
 
         if should_create_new_version:
-            new_version = self._create_version_from_session(
+            new_version, should_create_task = self._create_version_from_session(
                 session, user, forked, new_title, new_description)
 
             new_version.save()
@@ -585,13 +585,8 @@ class Rpc(BaseRpc):
             # TODO: clean all this mess on a friday
             if not new_version.language.is_complete_and_synced(public_only=False):
                 self._moderate_incomplete_version(new_version, user)
-            elif hasattr(new_version, 'task_to_save'):
-                task = new_version.task_to_save
-                task.subtitle_version = new_version
-                if task.get_type_display() in ['Review', 'Approve']:
-                    task.review_base_version = new_version
-
-                task.save()
+            elif should_create_task:
+                self._create_review_or_approve_task(new_version)
 
         return new_version
 
@@ -676,8 +671,9 @@ class Rpc(BaseRpc):
             task_type, save_for_later)
 
 
-    def _get_review_or_approve_task(self, team_video, subtitle_language):
-        lang = subtitle_language.language
+    def _create_review_or_approve_task(self, subtitle_version):
+        team_video = subtitle_version.video.get_team_video()
+        lang = subtitle_version.language.language
         workflow = Workflow.get_for_team_video(team_video)
 
         if workflow.review_allowed:
@@ -706,13 +702,16 @@ class Rpc(BaseRpc):
             if candidate and can_do(team_video, candidate, lang):
                 assignee = candidate
 
-        # This is just terrible.
-        #
-        # We have to create a task here, but we need to have the
-        # subtitle_version to do it correctly, and that doesn't get
-        # saved until much later, a few functions away.
-        return Task(team=team_video.team, team_video=team_video,
+        task = Task(team=team_video.team, team_video=team_video,
                     assignee=assignee, language=lang, type=type)
+
+        task.set_expiration()
+        task.subtitle_version = subtitle_version
+
+        if task.get_type_display() in ['Review', 'Approve']:
+            task.review_base_version = subtitle_version
+
+        task.save()
 
     def _moderate_incomplete_version(self, subtitle_version, user):
         """ Verifies if it's possible to create a transcribe/translate task (if there's
@@ -730,7 +729,6 @@ class Rpc(BaseRpc):
                                      .filter(language=language)
 
         if transcribe_task.exists():
-            task = transcribe_task[0]
             return
 
         subtitle_version.moderation_status = WAITING_MODERATION
@@ -760,7 +758,7 @@ class Rpc(BaseRpc):
         team_video = sl.video.get_team_video()
 
         if not team_video:
-            return UNMODERATED, None
+            return UNMODERATED, False
 
         # If there are any open team tasks for this video/language, it needs to
         # be kept under moderation.
@@ -774,30 +772,25 @@ class Rpc(BaseRpc):
                     if not task.language:
                         task.language = sl.language
                         task.save()
-            return WAITING_MODERATION, None
+            return WAITING_MODERATION, False
 
         if sl.has_version:
             # If there are already active subtitles for this language, we're
             # dealing with an edit.
             if not can_publish_edits_immediately(team_video, user, sl.language):
-                task = self._get_review_or_approve_task(team_video, sl)
-                if task:
-                    task.set_expiration()
-                    return WAITING_MODERATION, task
+                return WAITING_MODERATION, True
         else:
             # Otherwise we're dealing with a new set of subtitles for this
             # language.
-            task = self._get_review_or_approve_task(team_video, sl)
-            if task:
-                return WAITING_MODERATION, task
+            return WAITING_MODERATION, True
 
-        return UNMODERATED, None
+        return UNMODERATED, False
 
     def _create_version_from_session(self, session, user=None, forked=False, new_title=None, new_description=None):
         latest_version = session.language.version(public_only=False)
         forked_from = (forked and latest_version) or None
 
-        moderation_status, task = self._moderate_session(session, user)
+        moderation_status, should_create_task = self._moderate_session(session, user)
 
         kwargs = dict(language=session.language,
                       version_no=(0 if latest_version is None
@@ -827,12 +820,7 @@ class Rpc(BaseRpc):
 
         version = models.SubtitleVersion(**kwargs)
 
-        if task:
-            # We may have a task that needs to be saved *after* this version is
-            # saved.
-            version.task_to_save = task
-
-        return version
+        return version, should_create_task
 
     def fetch_subtitles(self, request, video_id, language_pk):
         cache = video_cache.get_subtitles_dict(
