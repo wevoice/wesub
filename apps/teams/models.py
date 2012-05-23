@@ -1859,6 +1859,22 @@ class Task(models.Model):
             limit = datetime.timedelta(days=self.team.task_expiration)
             self.expiration_date = datetime.datetime.now() + limit
 
+    def get_subtitle_version(self):
+        """ Gets the subtitle version related to this task.
+        If the task has a subtitle_version attached, return it and
+        if not, try to find it throught the subtitle language of the video.
+
+        Note: we need this since we don't attach incomplete subtitle_version
+        to the task (and if we do we need to set the status to unmoderated and
+        that causes the version to get published).
+        """
+
+        if self.subtitle_version:
+            return self.subtitle_version
+
+        video = Video.objects.get(teamvideo=self.team_video_id)
+        language = video.subtitle_language(self.language)
+        return language.version(public_only=False) if language else None
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:
