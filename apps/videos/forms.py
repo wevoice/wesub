@@ -446,18 +446,23 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
         video = self.cleaned_data['video']
         language = self.cleaned_data['language']
 
-        if is_complete:
-            team_video = video.get_team_video()
+        team_video = video.get_team_video()
 
-            if team_video:
-                tasks = team_video.task_set.incomplete_subtitle_or_translate().filter(language__in=[language, ''])
+        if team_video:
+            tasks = team_video.task_set.incomplete_subtitle_or_translate().filter(language__in=[language, ''])
 
-                if tasks.exists():
-                    task = tasks.get()
+            if tasks.exists():
+                task = tasks.get()
 
-                    if not task.assignee and self.user and can_assign_task(task, self.user):
-                        task.assignee = self.user
+                if not task.assignee and self.user and can_assign_task(task, self.user):
+                    task.assignee = self.user
 
+                    # we save only if is_complete because
+                    # .complete() actually saves the task too
+                    if not is_complete:
+                        task.save()
+
+                if is_complete:
                     task.complete()
 
         if latest_version and sl.latest_version():
