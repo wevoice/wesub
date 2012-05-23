@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if task.get_type_display == "Subtitle" or task.get_type_display == "Translate"%}
-    {% if task.subtitle_version %}
+    {% if task.get_subtitle_version %}
         <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Resume" %}</a>
     {% else %}
         <a class="perform perform-task-{{ task.pk }}" href="">{% trans "Start now" %}</a>
@@ -25,7 +25,7 @@
         });
     </script>
 {% else %}
-    {% if task.subtitle_version %}
+    {% if task.get_subtitle_version %}
         <a class="perform" href="{{ task.get_widget_url }}">{% trans "Resume" %}</a>
     {% else %}
         <a class="perform" href="{{ task.get_widget_url }}">{% trans "Start now" %}</a>
