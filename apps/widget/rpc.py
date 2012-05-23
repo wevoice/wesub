@@ -46,6 +46,8 @@ from widget.base_rpc import BaseRpc
 from widget.forms import  FinishReviewForm, FinishApproveForm
 from widget.models import SubtitlingSession
 
+from functools import partial
+
 
 yt_logger = logging.getLogger("youtube-ei-error")
 
@@ -678,7 +680,7 @@ class Rpc(BaseRpc):
 
         if workflow.review_allowed:
             type = Task.TYPE_IDS['Review']
-            can_do = can_review
+            can_do = partial(can_review, allow_own=True)
         elif workflow.approve_allowed:
             type = Task.TYPE_IDS['Approve']
             can_do = can_approve

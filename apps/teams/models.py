@@ -50,6 +50,7 @@ from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
 
+from functools import partial
 
 logger = logging.getLogger(__name__)
 
@@ -1656,7 +1657,7 @@ class Task(models.Model):
             can_do = can_approve
         elif type == 'Review':
             type = Task.TYPE_IDS['Review']
-            can_do = can_review
+            can_do = partial(can_review, allow_own=True)
         else:
             return None
 
