@@ -7,7 +7,9 @@
 {% block main_content %}
   <div id="services" class="content container_12 clearfix">
 
-    <div class="grid_2 alpha menu push_1">
+    <h1><img src="{{ STATIC_URL }}images/enterprise/header.png" alt="Amara enterprise"/></h1>
+
+    <div class="grid_2 alpha menu">
         <h3>{% trans 'Features & Benefits' %}</h3>
         <ul>
             <li><a href="{% url enterprise_page %}">{% trans 'Amara Platform' %}</a></li>
@@ -28,7 +30,7 @@
             <li><a href="government">{% trans 'Government' %}</a></li>
         </ul>
     </div>
-    <div class="grid_8 omega view push_1">
+    <div class="grid_10 omega view">
       <ul class="tab-content">
         <li id="amara-platform">
             <h2>{% trans 'The World’s Most Advanced Platform for Subtitles' %}</h2>
@@ -37,16 +39,16 @@
                 Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API.
             {% endblocktrans %}</p>
 
-            <div class="grid_8 alpha omega" id="recognition">
-                <div class="grid_4 alpha">
+            <div class="grid_10 alpha omega" id="recognition">
+                <div class="grid_5 alpha">
                     <h3>{% trans 'World-class Users' %}</h3>
                         <a href="http://www.universalsubtitles.org/en/teams/ted/">
                           <img src="{{ STATIC_URL }}images/partners/ted.png" alt="TED team"/>
                         </a>
                         <a href="http://www.universalsubtitles.org/en/teams/newshour"><img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="PBS" /></a>
-                        <a href="http://mozillalabs.com/chromeless/?p=26"><img src="{{ STATIC_URL }}images/partners/new_partner_mozilla.png" alt="Mozilla" /></a>
+                        <a href="http://www.khanacademy.org/contribute"><img src="{{ STATIC_URL }}images/partners/new_partner_khan_alt.png" alt="Khan Academy" /></a>
                 </div>
-                <div class="grid_4 omega">
+                <div class="grid_5 omega">
                     <h3>{% trans 'Award-Winning Technology' %}</h3>
                     <a href="/about#fcc-award"><img src="{{ STATIC_URL }}images/awards/fcc.png" alt="FCC Award Advancement in Accessibility"/></a>
                     <a href="/about#tech-award"><img src="{{ STATIC_URL }}images/awards/tech_awards.png" alt="Tech Awards 2011"/></a>
@@ -207,7 +209,7 @@
 
             <h3>{% trans 'Deploy' %}</h3>
             <p>{% blocktrans %}
-                Use the Amara API to bring completed subtitle data and metadata into your own backend or publishing platform
+                Use the Amara API to bring completed subtitle data and metadata into your own backend or publishing platform.
             {% endblocktrans %}</p>
         </li>
         <li id="advanced-security">
@@ -255,15 +257,9 @@
             {% endblocktrans %}</p>
         </li>
       </ul>
-    </div>
-    <div class="page-footer grid_12">
-        <div class="grid_3 push_3">
+        <div class="page-footer">
             <h3>{% trans 'Get started with Amara' %}</h3>
-            <p>{% trans 'Contact Dean Jansen' %}<br /><a href="mailto:dean@pculture.org">dean@pculture.org</a></p>
-        </div>
-        <div class="grid_3 push_3">
-            <h3>{% trans 'EMEA organizations' %}</h3>
-            <p>{% trans 'Contact Rob Shaw' %}<br /><a href="mailto:rshaw@pculture.org">rshaw@pculture.org</a></p>
+            <p>{% trans 'Be in touch at' %}<br /><a href="mailto:enterprise@amara.org">enterprise@amara.org</a></p>
         </div>
     </div>
 {% endblock %}

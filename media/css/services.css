@@ -1,6 +1,14 @@
 #services {
-    padding: 4em 0;
+    padding: 0;
     color: #2F3C45;
+    font-size: 13px;
+}
+
+#services h1 {
+    text-align: center;
+    padding: 2em 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 2em;
 }
 
 #services .menu, #services .view {
@@ -30,13 +38,21 @@
             border-bottom: 1px solid #eaeaea;
         }
 
+        #services .menu ul li a.active {
+            color: #999;
+        }
+
         #services .menu ul li a:hover {
-            color: #1573AD;
+            color: #999;
         }
 
 #services .tab-content > li {
     display: none;
 }
+
+    #services .tab-content > li:first-child {
+        display: block;
+    }
 
     #services .tab-content h3 {
         padding: 1em 0 1em;
@@ -78,13 +94,13 @@
 }
 
 #recognition img {
-    width: 75px;
-    margin-right: 10px;
+    width: 100px;
+    margin-right: 20px;
 }
 
 .page-footer {
+    margin-top: 2em;
     padding: 2em 0;
-    clear: both;
     text-align: center;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #eee;
 }

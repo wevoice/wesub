@@ -872,6 +872,9 @@ var Site = function(Site) {
                 history.pushState(null, '', tab)
                 changeTab(tab);
 
+                $(this).parents('.menu').find('a').removeClass('active');
+                $(this).addClass('active');
+
                 return false;
             });
             $(window).bind('popstate', function() {
