@@ -1212,6 +1212,7 @@ def create_task(request, slug, team_video_pk):
             if task.type == Task.TYPE_IDS['Subtitle']:
                 task.language = ''
 
+            # TODO: Remove this?
             if task.type in [Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']]:
                 task.approved = Task.APPROVED_IDS['In Progress']
                 task.subtitle_version = task.team_video.video.latest_version(language_code=task.language)

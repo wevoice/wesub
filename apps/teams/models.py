@@ -748,7 +748,7 @@ class TeamVideo(models.Model):
         video.is_public = True
         video.moderated_by = new_team if new_team.moderates_videos() else None
         video.save()
-        
+
         # make sure we end up with a policy that belong to the team
         # we're moving into, else it won't come up in the team video
         # page
@@ -812,8 +812,8 @@ def autocreate_tasks(team_video):
     if workflow.autocreate_subtitle and not existing_subtitles:
         if not team_video.task_set.not_deleted().exists():
             Task(team=team_video.team, team_video=team_video,
-                    subtitle_version=None, language='',
-                    type=Task.TYPE_IDS['Subtitle']
+                 subtitle_version=None, language='',
+                 type=Task.TYPE_IDS['Subtitle']
             ).save()
 
     # If there are existing subtitles, we may need to create translate tasks.
@@ -1478,6 +1478,7 @@ class Task(models.Model):
 
     deleted = models.BooleanField(default=False)
 
+    # TODO: Remove this field.
     public = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -1606,6 +1607,7 @@ class Task(models.Model):
         else:
             type = Task.TYPE_IDS['Translate']
 
+        # TODO: Shouldn't this be WAITING_MODERATION?
         self.subtitle_version.moderation_status = UNMODERATED
         self.subtitle_version.save()
 
@@ -1697,6 +1699,7 @@ class Task(models.Model):
             metadata_manager.update_metadata(self.team_video.video.pk)
 
             if self.workflow.autocreate_translate:
+                # TODO: Switch to autocreate_task?
                 _create_translation_tasks(self.team_video, subtitle_version)
 
             upload_subtitles_to_original_service.delay(subtitle_version.pk)

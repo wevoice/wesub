@@ -331,6 +331,7 @@ class TaskCreateForm(ErrorableModelForm):
         self.user = user
         self.team_video = team_video
 
+        # TODO: This is bad for teams with 10k members.
         team_user_ids = team.members.values_list('user', flat=True)
 
         langs = [l for l in get_language_choices(with_empty=True)
@@ -373,6 +374,7 @@ class TaskCreateForm(ErrorableModelForm):
         team_video = self.team_video
         project, team = team_video.project, team_video.team
 
+        # TODO: Manager method?
         existing_tasks = list(Task.objects.filter(deleted=False, language=lang,
                                                   team_video=team_video))
 
@@ -388,6 +390,7 @@ class TaskCreateForm(ErrorableModelForm):
 
         type_name = Task.TYPE_NAMES[type]
 
+        # TODO: Move into _check_task_creation_translate()?
         if type_name == 'Translate':
             if lang == '':
                 self.add_error(_(u"You must select a language for a Translate task."))

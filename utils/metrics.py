@@ -108,6 +108,11 @@ class Gauge(Metric):
 def Timer(name):
     start = _time.time()
 
+    # We fire a Meter for the metric here, because otherwise the "events/sec"
+    # are recorded when they *end* instead of when they begin.  For longer
+    # events this is a bad thing.
+    Meter(name).inc()
+
     try:
         yield
     finally:
