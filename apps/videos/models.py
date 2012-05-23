@@ -1231,7 +1231,7 @@ class SubtitleVersionManager(models.Manager):
         return self.get_query_set().exclude(moderation_status__in=[WAITING_MODERATION, REJECTED])
 
     def new_version(self, parser, language, user,
-                    translated_from=None, note="", timestamp=None):
+                    translated_from=None, note="", timestamp=None, moderation_status=None):
 
         version_no = 0
         version = language.version(public_only=False)
@@ -1248,6 +1248,10 @@ class SubtitleVersionManager(models.Manager):
         version.is_forked = forked
         version.datetime_started = timestamp or datetime.now()
         version.user = user
+
+        if moderation_status and moderation_status in (WAITING_MODERATION, UNMODERATED):
+            version.moderation_status = moderation_status
+
         version.save()
 
         ids = set()

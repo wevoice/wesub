@@ -47,6 +47,8 @@ from utils import (
     SubtitleParserError, SbvSubtitleParser, DfxpSubtitleParser
 )
 
+from apps.teams.moderation_const import WAITING_MODERATION
+
 ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
 
 class EditTeamVideoForm(forms.ModelForm):
@@ -702,18 +704,21 @@ class UploadDraftForm(forms.Form):
             if language and language.has_version:
                 version = language.latest_version(public_only=False)
             else:
+                version = None
+
                 if not language:
                     language = self._save_new_language(video, video_language)
-                    version = None
 
         # if there isn't a version we don't need to check this
         # since it's the first upload for this version
         if version and version.subtitle_set.count() != len(self._parser):
             raise Exception("We are strict and your subtitles are bad")
 
-        # save the new version, but if the version
-        version = SubtitleVersion.objects.new_version(self._parser, language, self.user)
+        # we need to set the moderation_status to WAITING_MODERATION
+        # so the version is not public. At the same time, we cannot
+        # set task.subtitle_version, otherwise the task will get
+        # blocked. :(
+        version = SubtitleVersion.objects.new_version(self._parser, language, self.user, moderation_status=WAITING_MODERATION)
 
-        task.subtitle_version = version
         task.language = video_language
         task.save()
