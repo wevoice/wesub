@@ -182,11 +182,11 @@
                                     {% endif %}
                                 </p>
 
-                                {% if task.subtitle_version %}
-                                    {% with task.subtitle_version as version %}
+                                {% if task.get_subtitle_version %}
+                                    {% with task.get_subtitle_version as version %}
                                         <p>
                                             <strong>{% trans 'Subtitles' %}:</strong>
-                                            <a href="{{ task.subtitle_version.get_absolute_url }}">
+                                            <a href="{{ version.get_absolute_url }}">
                                                 {% trans 'latest draft' %}
                                             </a>
                                             {% if task.get_reviewer != version.user %}
@@ -251,7 +251,7 @@
                                                     {% if not has_max_tasks and task.assignee == None %}
                                                         <li>
                                                             <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
-                                                                {% if task.subtitle_version %}
+                                                                {% if task.get_subtitle_version %}
                                                                     {% trans 'Resume' %}
                                                                 {% else %}
                                                                     {% trans 'Start now' %}
