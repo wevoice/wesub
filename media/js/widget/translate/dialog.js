@@ -92,10 +92,28 @@ unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
 };
 unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
     event.preventDefault();
-    if (this.state_ == unisubs.translate.Dialog.State_.EDIT_METADATA)
+    if (this.state_ == unisubs.translate.Dialog.State_.EDIT_METADATA) {
+
+        // Make sure each new caption has text.
+        var halt = false;
+
+        goog.array.forEach(this.translationPanel_.captionSet_.captions_, function(c) {
+            if (c.getText() === '') {
+                halt = true;
+            }
+        });
+
+        if (halt === true) {
+            alert('You have untranslated captions. You must translate all captions in order to submit.');
+            return false;
+        }
+
         this.saveWork(true, false);
-    else
+
+    }
+    else {
         this.enterState_(unisubs.translate.Dialog.State_.EDIT_METADATA);
+    }
 };
 unisubs.translate.Dialog.prototype.isWorkSaved = function() {
     if (this.reviewOrApprovalType_) {
