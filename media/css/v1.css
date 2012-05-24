@@ -916,6 +916,10 @@ p.view-more a:after {
   content: ' →';
 }
 
+div.upload-draft-modal div.modal-body {
+  padding: 40px 15px;
+}
+
 /* Controls */
 .v1 .controls {
   background-color: #fff;
