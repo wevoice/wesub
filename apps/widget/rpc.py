@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 from icanhaz.models import VideoVisibilityPolicy
 from statistic.tasks import st_widget_view_statistic_update
 from teams.models import Task, Workflow
-from teams.moderation_const import UNMODERATED, WAITING_MODERATION
+from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
     can_publish_edits_immediately, can_review, can_approve, can_assign_task
@@ -779,14 +779,18 @@ class Rpc(BaseRpc):
         if sl.has_version:
             # If there are already active subtitles for this language, we're
             # dealing with an edit.
-            if not can_publish_edits_immediately(team_video, user, sl.language):
+            if can_publish_edits_immediately(team_video, user, sl.language):
+                # The user may have the rights to immediately publish edits to
+                # subtitles.  If that's the case we mark them as approved and
+                # don't need a task.
+                return APPROVED, False
+            else:
+                # Otherwise it's an edit that needs to be reviewed/approved.
                 return WAITING_MODERATION, True
         else:
             # Otherwise we're dealing with a new set of subtitles for this
             # language.
             return WAITING_MODERATION, True
-
-        return UNMODERATED, False
 
     def _create_version_from_session(self, session, user=None, forked=False, new_title=None, new_description=None):
         latest_version = session.language.version(public_only=False)
