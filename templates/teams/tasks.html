@@ -275,7 +275,7 @@
                                                 {% endif %}
                                             </ul>
                                             <div class="bootstrap">
-                                                <div class="modal" id="upload-draft-{{task.id}}" style="display: none">
+                                                <div class="modal upload-draft-modal" id="upload-draft-{{task.id}}" style="display: none">
                                                     <form action="{% url teams:upload_draft slug=team.slug %}" method="post" enctype="multipart/form-data">
                                                         <div class="modal-header">
                                                             <a href="#" class="close">x</a>
