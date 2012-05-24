@@ -330,6 +330,7 @@ class SubtitlesUploadBaseForm(forms.Form):
             # user can bypass moderation if:
             # 1) he is a moderator and
             # 2) it's a post-publish edit
+            # 3) subtitle is complete
             can_bypass_moderation = (
                 is_complete
                 and not self._sl_created
@@ -338,7 +339,7 @@ class SubtitlesUploadBaseForm(forms.Form):
 
             if can_bypass_moderation:
                 new_version.moderate = APPROVED
-            elif (workflow.review_allowed or workflow.approve_allowed) and is_complete:
+            elif workflow.review_allowed or workflow.approve_allowed:
                 new_version.moderation_status = WAITING_MODERATION
             else:
                 new_version.moderation_status = UNMODERATED
@@ -348,8 +349,9 @@ class SubtitlesUploadBaseForm(forms.Form):
             outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
 
             if outstanding_tasks.exists():
-                outstanding_tasks.update(subtitle_version=new_version,
-                                         language=language.language)
+                if new_version.moderation_status != WAITING_MODERATION:
+                    outstanding_tasks.update(subtitle_version=new_version,
+                                             language=language.language)
             elif not can_bypass_moderation:
                 # we just need to create review/approve/subtitle if the language
                 # is a new one or, if it's a post-publish edit, if the user can't
