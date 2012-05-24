@@ -634,6 +634,12 @@ class UploadDraftForm(forms.Form):
         super(UploadDraftForm, self).__init__(*args, **kwargs)
         self.fields['language'].choices = get_language_choices()
 
+    def clean_task(self):
+        task = self.cleaned_data['task']
+
+        if not can_perform_task(self.user, task):
+            raise forms.ValidationError(_(u'You cannot perform that task.'))
+
     def clean_draft(self):
         subtitles = self.cleaned_data['draft']
 
@@ -658,7 +664,6 @@ class UploadDraftForm(forms.Form):
             if not self._parser:
                 raise forms.ValidationError(_(u'Incorrect subtitles format'))
         except SubtitleParserError, e:
-            logging.exception("Wat")
             raise forms.ValidationError(e)
 
         subtitles.seek(0)
@@ -691,10 +696,7 @@ class UploadDraftForm(forms.Form):
         task = self.cleaned_data['task']
         video = task.team_video.video
 
-        if can_perform_task(self.user, task):
-            task.assignee = self.user
-        else:
-            raise forms.ValidationError(_(u'You cannot perform that task.'))
+        task.assignee = self.user
 
         if task.language:
             video_language = task.language
