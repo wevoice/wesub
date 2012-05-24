@@ -640,6 +640,8 @@ class UploadDraftForm(forms.Form):
         if not can_perform_task(self.user, task):
             raise forms.ValidationError(_(u'You cannot perform that task.'))
 
+        return task
+
     def clean_draft(self):
         subtitles = self.cleaned_data['draft']
 
