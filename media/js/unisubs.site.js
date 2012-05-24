@@ -874,7 +874,8 @@ var Site = function(Site) {
 
                 $(this).parents('.menu').find('a').removeClass('active');
                 $(this).addClass('active');
-
+                
+                $("html, body").animate({ scrollTop: 0 }, "slow");
                 return false;
             });
             $(window).bind('popstate', function() {
