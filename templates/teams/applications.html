@@ -39,7 +39,7 @@
                         </h3>
                         <p>
                         {% if item.note %}
-                            {{ item.note|truncatewords:15|urlize }}
+                            {{ item.note|urlize }}
                         {% endif %}
                         </p>
                         <a href="{{ item.user.get_absolute_url }}" class="thumb"><img src="{{ item.user.avatar }}" alt="{{ item.user }} avatar"></a>
