@@ -338,6 +338,11 @@ def migrate_fake(app_name):
             run('yes no | {0}/env/bin/python manage.py migrate {1} 0001 --fake --settings=unisubs_settings'.format(env.static_dir, app_name))
 
 def refresh_db():
+    # Should really be checking for 'production'
+    if env.installation_name is None:
+        Output("Cannot refresh production database")
+        return
+      
     with Output("Refreshing database"):
         add_disabled()
         stop_celeryd()
