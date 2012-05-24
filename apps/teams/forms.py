@@ -691,6 +691,11 @@ class UploadDraftForm(forms.Form):
         task = self.cleaned_data['task']
         video = task.team_video.video
 
+        if can_perform_task(self.user, task):
+            task.assignee = self.user
+        else:
+            raise forms.ValidationError(_(u'You cannot perform that task.'))
+
         if task.language:
             video_language = task.language
         else:
