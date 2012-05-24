@@ -176,7 +176,7 @@ class SubtitlesUploadBaseForm(forms.Form):
         video = self.cleaned_data['video']
         language = self.cleaned_data['language']
 
-        subtitle_language = video.subtitlelanguage_set.filter(language=language) 
+        subtitle_language = video.subtitlelanguage_set.filter(language=language)
 
         # first verify if this language for this video already exists.
         # if exists, verify if it's not writelocked
@@ -317,7 +317,7 @@ class SubtitlesUploadBaseForm(forms.Form):
             language = language
         else:
             language, self._sl_created = self._find_appropriate_language(video, self.cleaned_data['language'])
-            
+
         language = save_subtitle(video, language, parser, self.user, update_video)
 
         # If there are any outstanding tasks for this language, associate the
@@ -332,9 +332,13 @@ class SubtitlesUploadBaseForm(forms.Form):
             # review/approve task for them.
             workflow = team_video.get_workflow()
             # user can bypass moderation if:
-            # 1) he is a moderator and 
+            # 1) he is a moderator and
             # 2) it's a post-publish edit
-            can_bypass_moderation = is_complete and not self._sl_created and can_publish_edits_immediately(team_video, self.user, language.language)
+            can_bypass_moderation = (
+                is_complete
+                and not self._sl_created
+                and can_publish_edits_immediately(team_video, self.user,
+                                                  language.language))
 
             if can_bypass_moderation:
                 new_version.moderate = APPROVED
@@ -374,7 +378,7 @@ class SubtitlesUploadBaseForm(forms.Form):
                     else:
                         if task_type == Task.TYPE_IDS['Subtitle']:
                             task.assignee = self.user
-                        
+
                     task.save()
 
         return language
@@ -592,7 +596,7 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
     def clean_usernames(self):
         usernames = self.cleaned_data.get('usernames', [])
-        
+
         for username in usernames:
             url = self.youtube_feed_url_pattern % str(username)
             self.parse_feed_url(url)
