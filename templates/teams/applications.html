@@ -51,6 +51,11 @@
                                 <li>
                                     <a href="{% url teams:deny_application team.slug item.user.pk %}">{% trans 'Deny' %}</a>
                                 </li>
+                                <li>
+                                    <a href="{% url messages:new %}?user={{ item.user.username }}">
+                                        {% trans 'Send a message' %}
+                                    </a>
+                                </li>
                             </ul>
                         {% endif %}
                     </li>
