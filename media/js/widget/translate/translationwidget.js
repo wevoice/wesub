@@ -84,7 +84,7 @@ unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event
     var videoPlayerType = videoPlayer.videoPlayerType_;
 
     if (videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
-        videoPlayer.setPlayheadTime(this.subtitle_['start_time'], true);
+        videoPlayer.setPlayheadTime(this.subtitle_['start_time']);
     }
 };
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
