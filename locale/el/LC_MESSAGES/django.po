@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-24 01:34-0500\n"
+"POT-Creation-Date: 2012-05-25 01:36-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -597,21 +597,25 @@ msgstr ""
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:642 apps/videos/forms.py:68 apps/videos/forms.py:86
-#: apps/videos/forms.py:396
+#: apps/teams/forms.py:641
+msgid "You cannot perform that task."
+msgstr ""
+
+#: apps/teams/forms.py:650 apps/videos/forms.py:68 apps/videos/forms.py:86
+#: apps/videos/forms.py:398
 msgid "File size should be less {0} kb"
 msgstr ""
 
-#: apps/teams/forms.py:647 apps/videos/forms.py:399
+#: apps/teams/forms.py:655 apps/videos/forms.py:401
 msgid "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr ""
 
-#: apps/teams/forms.py:654 apps/videos/forms.py:73 apps/videos/forms.py:94
-#: apps/videos/forms.py:404
+#: apps/teams/forms.py:662 apps/videos/forms.py:73 apps/videos/forms.py:94
+#: apps/videos/forms.py:406
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/teams/forms.py:659 apps/videos/forms.py:96 apps/videos/forms.py:406
+#: apps/teams/forms.py:667 apps/videos/forms.py:96 apps/videos/forms.py:408
 msgid "Incorrect subtitles format"
 msgstr ""
 
@@ -1076,7 +1080,7 @@ msgstr ""
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr ""
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:543 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:545 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr ""
 
@@ -1097,31 +1101,31 @@ msgstr ""
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr ""
 
-#: apps/videos/forms.py:187 apps/videos/forms.py:211
+#: apps/videos/forms.py:185 apps/videos/forms.py:209
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr ""
 
-#: apps/videos/forms.py:196
+#: apps/videos/forms.py:194
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr ""
 
-#: apps/videos/forms.py:223
+#: apps/videos/forms.py:221
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/videos/forms.py:231 apps/videos/forms.py:234
+#: apps/videos/forms.py:227 apps/videos/forms.py:230
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:528
+#: apps/videos/forms.py:530
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1129,7 +1133,7 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:531 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:533 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1140,49 +1144,49 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:559
+#: apps/videos/forms.py:561
 msgid "Youtube usernames"
 msgstr ""
 
-#: apps/videos/forms.py:559
+#: apps/videos/forms.py:561
 msgid "Enter usernames separated by comma."
 msgstr ""
 
-#: apps/videos/forms.py:560
+#: apps/videos/forms.py:562
 msgid "Youtube page link."
 msgstr ""
 
-#: apps/videos/forms.py:561
+#: apps/videos/forms.py:563
 msgid "For example: http://www.youtube.com/user/username"
 msgstr ""
 
-#: apps/videos/forms.py:562
+#: apps/videos/forms.py:564
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:565
 msgid "Save feed"
 msgstr ""
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:565
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr ""
 
-#: apps/videos/forms.py:606
+#: apps/videos/forms.py:608
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr ""
 
-#: apps/videos/forms.py:611
+#: apps/videos/forms.py:613
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:622
+#: apps/videos/forms.py:624
 msgid "captcha"
 msgstr ""
 
@@ -1578,7 +1582,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:888 apps/widget/rpc.py:929
+#: apps/widget/rpc.py:892 apps/widget/rpc.py:933
 msgid "\n"
 msgstr ""
 
@@ -3235,7 +3239,7 @@ msgstr ""
 msgid "Universities"
 msgstr ""
 
-#: templates/enterprise.html:29 templates/enterprise.html.py:244
+#: templates/enterprise.html:29 templates/enterprise.html.py:248
 msgid "Publishers"
 msgstr ""
 
@@ -3651,17 +3655,6 @@ msgstr ""
 #: templates/enterprise.html:239
 msgid ""
 "\n"
-"                Any organization that creates video can reach more people "
-"with subtitles, and Amara provides the most options and flexibility to "
-"caption and translate your videos. Many video publishers use Amara to create "
-"volunteer communities -- engaging the people who watch their videos to "
-"caption and translate them for the world, ultimately reaching more viewers.\n"
-"            "
-msgstr ""
-
-#: templates/enterprise.html:245
-msgid ""
-"\n"
 "                As online education explodes in popularity, subtitles are "
 "essential to making courses accessible and international. Colleges and "
 "universities are using Amara to make their rapidly growing video resources "
@@ -3669,12 +3662,23 @@ msgid ""
 "            "
 msgstr ""
 
-#: templates/enterprise.html:249
+#: templates/enterprise.html:243
 msgid ""
 "\n"
 "                Khan Academy—one of the largest and fastest growing online "
 "education sites in the world—uses Amara to translate every video on their "
 "website, into dozens of languages\n"
+"            "
+msgstr ""
+
+#: templates/enterprise.html:249
+msgid ""
+"\n"
+"                Any organization that creates video can reach more people "
+"with subtitles, and Amara provides the most options and flexibility to "
+"caption and translate your videos. Many video publishers use Amara to create "
+"volunteer communities -- engaging the people who watch their videos to "
+"caption and translate them for the world, ultimately reaching more viewers.\n"
 "            "
 msgstr ""
 
@@ -4527,14 +4531,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr ""
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:365
+#: templates/messages/sent.html:51 templates/teams/tasks.html:367
 msgid "Delete"
 msgstr ""
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:419 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:421 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:385
 msgid "Cancel"
 msgstr ""
@@ -5787,7 +5791,11 @@ msgstr ""
 msgid "Deny"
 msgstr ""
 
-#: templates/teams/applications.html:61
+#: templates/teams/applications.html:56
+msgid "Send a message"
+msgstr ""
+
+#: templates/teams/applications.html:66
 msgid "There are no applications right now"
 msgstr ""
 
@@ -5860,7 +5868,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:423
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:425
 msgid "Begin typing to search"
 msgstr ""
 
@@ -6347,60 +6355,60 @@ msgstr ""
 msgid "Perform Task"
 msgstr ""
 
-#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:306
+#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:308
 msgid "Download draft"
 msgstr ""
 
-#: templates/teams/tasks.html:280
+#: templates/teams/tasks.html:282
 msgid "Upload draft"
 msgstr ""
 
-#: templates/teams/tasks.html:285
+#: templates/teams/tasks.html:287
 #: templates/videos/_paste_transcription.html:146
 #: templates/videos/_upload_subtitles.html:23
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr ""
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:292
 msgid "File:"
 msgstr ""
 
-#: templates/teams/tasks.html:336
+#: templates/teams/tasks.html:338
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:356
+#: templates/teams/tasks.html:358
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:358
+#: templates/teams/tasks.html:360
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:374
+#: templates/teams/tasks.html:376
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:380
+#: templates/teams/tasks.html:382
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:383
+#: templates/teams/tasks.html:385
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:387
+#: templates/teams/tasks.html:389
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:426
+#: templates/teams/tasks.html:428
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:436
+#: templates/teams/tasks.html:438
 msgid "Sorry, no tasks here."
 msgstr ""
 

@@ -3,12 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Mohammad Dashtizadeh <mohammad@dashtizadeh.net>, 2012.
+#   <mohammad@dashtizadeh.net>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-24 01:32-0500\n"
-"PO-Revision-Date: 2012-05-24 06:46+0000\n"
+"POT-Creation-Date: 2012-05-25 01:34-0500\n"
+"PO-Revision-Date: 2012-05-25 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Persian (http://www.transifex.net/projects/p/universalsubtitles/language/fa/)\n"
 "MIME-Version: 1.0\n"
@@ -21,34 +23,34 @@ msgstr ""
 #: templates/statistic/users_statistic.html:12
 #: templates/teams/invite_members.html:25
 msgid "Username"
-msgstr ""
+msgstr "نام‌ کاربری"
 
 #: apps/auth/admin.py:34
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
-msgstr ""
+msgstr "ضروری. 30 کارکتر یا کمتر. کارکترهای عدد و الفبایی (فقط حروف، عدد و آندراسکور)"
 
 #: apps/auth/admin.py:35
 msgid "This value must contain only letters, numbers and underscores."
-msgstr ""
+msgstr "ورودی می‌بایست فقط از حروف، اعداد و آندراسکور تشکیل شده باشد."
 
 #: apps/auth/admin.py:36
 msgid "Password"
-msgstr ""
+msgstr "رمز عبور"
 
 #: apps/auth/admin.py:37
 msgid "Password confirmation"
-msgstr ""
+msgstr "تائیدیه‌ی رمزعبور"
 
 #: apps/auth/admin.py:38
 msgid "Email"
-msgstr ""
+msgstr "پست الکترونیک"
 
 #: apps/auth/admin.py:79 templates/auth/_announcement.html:7
 #: templates/messages/_messages.html:8 templates/videos/create.html:63
 msgid "Hide"
-msgstr ""
+msgstr "پنهان"
 
 #: apps/auth/models.py:98
 msgid "Retired user"
@@ -56,35 +58,35 @@ msgstr ""
 
 #: apps/auth/models.py:325
 msgid "Add comment"
-msgstr ""
+msgstr "اضافه‌کردن نظر"
 
 #: apps/auth/models.py:326
 msgid "Start subtitles"
-msgstr ""
+msgstr "شروع زیرنویس"
 
 #: apps/auth/models.py:327
 msgid "Start translation"
-msgstr ""
+msgstr "شروع ترجمه"
 
 #: apps/auth/models.py:328
 msgid "Edit subtitles"
-msgstr ""
+msgstr "ویرایش زیرنویس"
 
 #: apps/auth/models.py:329
 msgid "Edit translation"
-msgstr ""
+msgstr "ویرایش ترجمه"
 
 #: apps/auth/models.py:386
 msgid "understand enough"
-msgstr ""
+msgstr "فهمیدن کافی"
 
 #: apps/auth/models.py:387
 msgid "understand 99%"
-msgstr ""
+msgstr "فهمیدن 99%"
 
 #: apps/auth/models.py:388
 msgid "write like a native"
-msgstr ""
+msgstr "نوشتن مشابه زبان مادری"
 
 #: apps/auth/models.py:393
 msgid "follow requests in language"
@@ -110,7 +112,7 @@ msgstr ""
 
 #: apps/auth/views.py:63
 msgid "Email is confirmed."
-msgstr ""
+msgstr "پست الکترونیک تائید شد."
 
 #: apps/auth/views.py:75
 msgid "Confirmation email was sent."
@@ -122,7 +124,7 @@ msgstr ""
 
 #: apps/auth/views.py:110
 msgid "Your account was deleted."
-msgstr ""
+msgstr "حساب شما حذف شد."
 
 #: apps/auth/templatetags/auth_tags.py:30
 msgid "Fill email field, please."
@@ -130,7 +132,7 @@ msgstr ""
 
 #: apps/auth/templatetags/auth_tags.py:32
 msgid "Confirm your email, please."
-msgstr ""
+msgstr "لطفاً پست الکترونیک خود را تائید کنید."
 
 #: apps/comments/forms.py:53
 msgid "You car reply only comments for same object"
@@ -146,7 +148,7 @@ msgstr ""
 
 #: apps/icanhaz/models.py:191
 msgid "Public"
-msgstr ""
+msgstr "عمومی"
 
 #: apps/icanhaz/models.py:192
 msgid "Only with secret url"
@@ -158,7 +160,7 @@ msgstr ""
 
 #: apps/icanhaz/models.py:208
 msgid "public"
-msgstr ""
+msgstr "عمومی"
 
 #: apps/icanhaz/models.py:209
 msgid "no embeding allowed"
@@ -170,7 +172,7 @@ msgstr ""
 
 #: apps/icanhaz/views.py:43
 msgid "Settings saved!"
-msgstr ""
+msgstr "تنظیمات ذخیره شد!"
 
 #: apps/icanhaz/views.py:51
 msgid "Please correct the errors bellow!"
@@ -198,20 +200,20 @@ msgstr ""
 
 #: apps/messages/models.py:70
 msgid "[no subject]"
-msgstr ""
+msgstr "[بدون موضوع]"
 
 #: apps/messages/models.py:119
 msgid "You should enter subject or message."
-msgstr ""
+msgstr "شما باید موضوع یا پیام را وارد کنید."
 
 #: apps/messages/rpc.py:28 apps/messages/rpc.py:44 apps/messages/rpc.py:52
 #: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:43
 msgid "You should be authenticated."
-msgstr ""
+msgstr "شما باید تائید شوید."
 
 #: apps/messages/rpc.py:36
 msgid "Message does not exist."
-msgstr ""
+msgstr "پیام وجود ندارد."
 
 #: apps/messages/tasks.py:71
 #, python-format
@@ -289,7 +291,7 @@ msgstr ""
 
 #: apps/messages/views.py:123
 msgid "Message sent."
-msgstr ""
+msgstr "پیام ارسال شد."
 
 #: apps/openid_consumer/views.py:94
 msgid "i-names are not supported"
@@ -305,7 +307,7 @@ msgstr ""
 
 #: apps/openid_consumer/views.py:163
 msgid "Setup needed"
-msgstr ""
+msgstr "نیازمند راه‌اندازی"
 
 #: apps/openid_consumer/templates/openid_consumer/failure.html:7
 #: apps/openid_consumer/templates/openid_consumer/failure.html:13
@@ -319,41 +321,41 @@ msgstr ""
 #: templates/openid_consumer/signin.html:12
 #: templates/openid_consumer/signin.html:31
 msgid "Sign in with your OpenID"
-msgstr ""
+msgstr "ورود با OpenID"
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
 #: templates/openid_consumer/signin.html:18
 msgid "Sign in"
-msgstr ""
+msgstr "ورود"
 
 #: apps/profiles/forms.py:98
 msgid "This user has not email"
-msgstr ""
+msgstr "این کاربر پست الکترونیک ندارد"
 
 #: apps/profiles/forms.py:103
 msgid "You are not authenticated."
-msgstr ""
+msgstr "شما تائید نشده‌اید."
 
 #: apps/profiles/forms.py:110
 #, python-format
 msgid "Personal message from %(sender)s on universalsubtitles.org"
-msgstr ""
+msgstr "پیغام خصوصی از %(sender)s در universalsubtitles.org"
 
 #: apps/profiles/forms.py:148
 msgid "Confirm new password:"
-msgstr ""
+msgstr "تائید رمزعبور جدید"
 
 #: apps/profiles/forms.py:165
 msgid "Invalid password."
-msgstr ""
+msgstr "رمزعبور نامعتبر است."
 
 #: apps/profiles/forms.py:167
 msgid "The two passwords did not match."
-msgstr ""
+msgstr "دو رمزعبور یکسان نیستند."
 
 #: apps/profiles/rpc.py:50
 msgid "Your email was updated."
-msgstr ""
+msgstr "پست الکترونیک شما بروز شد."
 
 #: apps/profiles/views.py:61
 msgid ""
@@ -363,7 +365,7 @@ msgstr ""
 
 #: apps/profiles/views.py:144
 msgid "Your profile has been updated."
-msgstr ""
+msgstr "نمایه‌ی شما بروز شد."
 
 #: apps/search/forms.py:28
 msgid "Relevance"
@@ -371,23 +373,23 @@ msgstr ""
 
 #: apps/search/forms.py:29
 msgid "Most languages"
-msgstr ""
+msgstr "اغلب زبان‌ها"
 
 #: apps/search/forms.py:30
 msgid "Views Today"
-msgstr ""
+msgstr "نمایش امروز"
 
 #: apps/search/forms.py:31
 msgid "Views This Week"
-msgstr ""
+msgstr "نمایش این هفته"
 
 #: apps/search/forms.py:32
 msgid "Views This Month"
-msgstr ""
+msgstr "نمایش این ماه"
 
 #: apps/search/forms.py:33
 msgid "Total Views"
-msgstr ""
+msgstr "تمامی ‌نمایش‌ها"
 
 #: apps/search/forms.py:35
 msgid "query"
@@ -411,7 +413,7 @@ msgstr ""
 
 #: apps/search/forms.py:63 apps/search/forms.py:99
 msgid "All Languages"
-msgstr ""
+msgstr "تمامی زبان‌ها"
 
 #: apps/statistic/models.py:47 apps/statistic/models.py:48
 msgid "Subtitle fetch statistic"
@@ -436,7 +438,7 @@ msgstr ""
 
 #: apps/teams/admin.py:60
 msgid "Send message"
-msgstr ""
+msgstr "ارسال پیام"
 
 #: apps/teams/admin.py:64
 msgid "Feature teams"
@@ -448,11 +450,11 @@ msgstr ""
 
 #: apps/teams/admin.py:78 apps/teams/admin.py:111 apps/teams/models.py:182
 msgid "Team"
-msgstr ""
+msgstr "تیم"
 
 #: apps/teams/admin.py:84
 msgid "User"
-msgstr ""
+msgstr "کاربر"
 
 #: apps/teams/forms.py:60 apps/teams/forms.py:168
 #: libs/rosetta/templates/rosetta/languages.html:12
@@ -466,7 +468,7 @@ msgstr ""
 
 #: apps/teams/forms.py:154
 msgid "Video URL"
-msgstr ""
+msgstr "آدرس فیلم"
 
 #: apps/teams/forms.py:155
 msgid ""
@@ -476,7 +478,7 @@ msgstr ""
 
 #: apps/teams/forms.py:163
 msgid "Video language"
-msgstr ""
+msgstr "زبان ویدئو"
 
 #: apps/teams/forms.py:165
 msgid "It will be saved only if video does not exist in our database."
@@ -596,24 +598,28 @@ msgstr ""
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:642 apps/videos/forms.py:68 apps/videos/forms.py:86
-#: apps/videos/forms.py:396
+#: apps/teams/forms.py:641
+msgid "You cannot perform that task."
+msgstr ""
+
+#: apps/teams/forms.py:650 apps/videos/forms.py:68 apps/videos/forms.py:86
+#: apps/videos/forms.py:398
 msgid "File size should be less {0} kb"
 msgstr ""
 
-#: apps/teams/forms.py:647 apps/videos/forms.py:399
+#: apps/teams/forms.py:655 apps/videos/forms.py:401
 msgid ""
 "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr ""
 
-#: apps/teams/forms.py:654 apps/videos/forms.py:73 apps/videos/forms.py:94
-#: apps/videos/forms.py:404
+#: apps/teams/forms.py:662 apps/videos/forms.py:73 apps/videos/forms.py:94
+#: apps/videos/forms.py:406
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/teams/forms.py:659 apps/videos/forms.py:96 apps/videos/forms.py:406
+#: apps/teams/forms.py:667 apps/videos/forms.py:96 apps/videos/forms.py:408
 msgid "Incorrect subtitles format"
-msgstr ""
+msgstr "نوع زیرنویس صحیح نیست"
 
 #: apps/teams/models.py:91
 msgid "Open"
@@ -649,7 +655,7 @@ msgstr ""
 
 #: apps/teams/models.py:124
 msgid "name"
-msgstr ""
+msgstr "نام"
 
 #: apps/teams/models.py:125
 msgid "slug"
@@ -657,7 +663,7 @@ msgstr ""
 
 #: apps/teams/models.py:126
 msgid "description"
-msgstr ""
+msgstr "توضیحات"
 
 #: apps/teams/models.py:126
 msgid ""
@@ -666,7 +672,7 @@ msgstr ""
 
 #: apps/teams/models.py:128
 msgid "logo"
-msgstr ""
+msgstr "نشان"
 
 #: apps/teams/models.py:129
 msgid "publicly Visible?"
@@ -677,11 +683,11 @@ msgstr ""
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
-msgstr ""
+msgstr "فیلم‌ها"
 
 #: apps/teams/models.py:131
 msgid "users"
-msgstr ""
+msgstr "کاربران"
 
 #: apps/teams/models.py:134
 msgid "third party accounts"
@@ -697,7 +703,7 @@ msgstr ""
 
 #: apps/teams/models.py:142
 msgid "Page content"
-msgstr ""
+msgstr "مطالب صفحه"
 
 #: apps/teams/models.py:142
 msgid "You can use markdown. This will replace Description."
@@ -742,7 +748,7 @@ msgstr ""
 #: apps/teams/models.py:183 templates/profiles/_top_user_panel.html:33
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
-msgstr ""
+msgstr "تیم‌ها"
 
 #: apps/teams/models.py:626
 msgid ""
@@ -773,7 +779,7 @@ msgstr ""
 #: apps/teams/models.py:915 apps/teams/permissions_const.py:44
 #: templates/base.html:116
 msgid "Admin"
-msgstr ""
+msgstr "مدیر"
 
 #: apps/teams/models.py:916 apps/teams/permissions_const.py:47
 msgid "Contributor"
@@ -807,7 +813,7 @@ msgstr ""
 
 #: apps/teams/rpc.py:66
 msgid "Team does not exist."
-msgstr ""
+msgstr "تیم وجود ندارد."
 
 #: apps/teams/rpc.py:69
 msgid "You are not manager of this team."
@@ -819,7 +825,7 @@ msgstr ""
 
 #: apps/teams/rpc.py:77
 msgid "Team member does not exist."
-msgstr ""
+msgstr "اعضای تیم وجود ندارند."
 
 #: apps/teams/rpc.py:80
 msgid "You can't promote yourself."
@@ -846,7 +852,7 @@ msgstr ""
 
 #: apps/teams/views.py:120 templates/teams/teams-list.html:47
 msgid "Newest"
-msgstr ""
+msgstr "جدیدترین"
 
 #: apps/teams/views.py:121 templates/teams/teams-list.html:44
 msgid "Most Members"
@@ -914,7 +920,7 @@ msgstr ""
 
 #: apps/teams/views.py:657
 msgid "You can't delete that video."
-msgstr ""
+msgstr "شما نمی‌توانید این ویدئو را حذف کنید."
 
 #: apps/teams/views.py:661
 msgid "You can't remove that video."
@@ -962,11 +968,11 @@ msgstr ""
 
 #: apps/teams/views.py:831
 msgid "You cannot invite people to this team."
-msgstr ""
+msgstr "شما نمی‌توانید کسی را به این تیم دعوت کنید."
 
 #: apps/teams/views.py:867
 msgid "You cannot join this team."
-msgstr ""
+msgstr "شما نمی‌توانید به این تیم بپیوندید."
 
 #: apps/teams/views.py:918
 msgid "You have left this team."
@@ -1034,11 +1040,11 @@ msgstr ""
 
 #: apps/teams/views.py:1476
 msgid "Project deleted."
-msgstr ""
+msgstr "پروژه افزوده شد."
 
 #: apps/teams/views.py:1494
 msgid "Project saved."
-msgstr ""
+msgstr "پروژه ذخیره شد."
 
 #: apps/teams/views.py:1620
 msgid ""
@@ -1071,7 +1077,7 @@ msgstr ""
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr ""
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:543 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:545 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr ""
 
@@ -1090,40 +1096,40 @@ msgstr ""
 
 #: apps/videos/forms.py:171
 msgid "Somebody is subtitling this video right now. Try later."
-msgstr ""
+msgstr "شخصی هم‌اکنون در حال زیرنویس این فیلم می‌باشد. لطفاً بعداً مراجعه بفرمائید."
 
-#: apps/videos/forms.py:187 apps/videos/forms.py:211
+#: apps/videos/forms.py:185 apps/videos/forms.py:209
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr ""
 
-#: apps/videos/forms.py:196
+#: apps/videos/forms.py:194
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr ""
 
-#: apps/videos/forms.py:223
+#: apps/videos/forms.py:221
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/videos/forms.py:231 apps/videos/forms.py:234
+#: apps/videos/forms.py:227 apps/videos/forms.py:230
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:528
+#: apps/videos/forms.py:530
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr ""
 
-#: apps/videos/forms.py:531 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:533 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
@@ -1131,49 +1137,49 @@ msgid ""
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr ""
 
-#: apps/videos/forms.py:559
+#: apps/videos/forms.py:561
 msgid "Youtube usernames"
-msgstr ""
+msgstr "نام‌کاربری یوتوب"
 
-#: apps/videos/forms.py:559
+#: apps/videos/forms.py:561
 msgid "Enter usernames separated by comma."
 msgstr ""
 
-#: apps/videos/forms.py:560
-msgid "Youtube page link."
-msgstr ""
-
-#: apps/videos/forms.py:561
-msgid "For example: http://www.youtube.com/user/username"
-msgstr ""
-
 #: apps/videos/forms.py:562
+msgid "Youtube page link."
+msgstr "آدرس صفحه‌ی یوتوب"
+
+#: apps/videos/forms.py:563
+msgid "For example: http://www.youtube.com/user/username"
+msgstr "به عنوان مثال: http://www.youtube.com/user/username"
+
+#: apps/videos/forms.py:564
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:565
 msgid "Save feed"
 msgstr ""
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:565
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr ""
 
-#: apps/videos/forms.py:606
+#: apps/videos/forms.py:608
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr ""
 
-#: apps/videos/forms.py:611
+#: apps/videos/forms.py:613
 msgid ""
 "The videos are being added in the background. If you are logged in, you will"
 " receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:622
+#: apps/videos/forms.py:624
 msgid "captcha"
 msgstr ""
 
@@ -1191,7 +1197,7 @@ msgstr ""
 
 #: apps/videos/models.py:163
 msgid "Views"
-msgstr ""
+msgstr "نمایش‌ها"
 
 #: apps/videos/models.py:1100
 msgid ""
@@ -1332,11 +1338,11 @@ msgstr ""
 
 #: apps/videos/models.py:2011
 msgid "change title"
-msgstr ""
+msgstr "تغییر عنوان"
 
 #: apps/videos/models.py:2012
 msgid "comment"
-msgstr ""
+msgstr "نظرات"
 
 #: apps/videos/models.py:2013
 msgid "add version"
@@ -1344,7 +1350,7 @@ msgstr ""
 
 #: apps/videos/models.py:2014
 msgid "add translation"
-msgstr ""
+msgstr "افزودن ترجمه"
 
 #: apps/videos/models.py:2015
 msgid "add video url"
@@ -1372,7 +1378,7 @@ msgstr ""
 
 #: apps/videos/models.py:2021
 msgid "review version"
-msgstr ""
+msgstr "مرور نسخه"
 
 #: apps/videos/models.py:2022
 msgid "accept version"
@@ -1411,7 +1417,7 @@ msgstr ""
 
 #: apps/videos/rpc.py:329
 msgid "Title can't be changed for this video"
-msgstr ""
+msgstr "عنوان این ویدئو قابل تغییر نیست."
 
 #: apps/videos/rpc.py:333 apps/videos/rpc.py:351
 msgid "Title was changed success"
@@ -1427,7 +1433,7 @@ msgstr ""
 
 #: apps/videos/rpc.py:362 apps/videos/rpc.py:378
 msgid "Video does not exist."
-msgstr ""
+msgstr "فیلم وجود ندارد."
 
 #: apps/videos/rpc.py:369
 msgid "You are following this video now."
@@ -1504,7 +1510,7 @@ msgstr ""
 
 #: apps/videos/views.py:276
 msgid "Your changes have been saved."
-msgstr ""
+msgstr "تغییرات شما ذخیره شد."
 
 #: apps/videos/views.py:639
 msgid "You have not permission change this URL"
@@ -1566,7 +1572,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:888 apps/widget/rpc.py:929
+#: apps/widget/rpc.py:892 apps/widget/rpc.py:933
 msgid "\n"
 msgstr ""
 
@@ -1590,7 +1596,7 @@ msgstr ""
 #: templates/statistic/logger_model_admin.html:18
 #: templates/statistic/log_methods/changelist_view.html:18
 msgid "Home"
-msgstr ""
+msgstr "خانه"
 
 #: libs/rosetta/templates/rosetta/languages.html:11
 #: templates/statistic/log_methods/changelist_view.html:37
@@ -1604,7 +1610,7 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/languages.html:15
 #: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:57
 msgid "All"
-msgstr ""
+msgstr "همه"
 
 #: libs/rosetta/templates/rosetta/languages.html:29
 msgid "Progress"
@@ -1615,12 +1621,12 @@ msgstr ""
 #: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:20
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
-msgstr ""
+msgstr "پیام‌ها"
 
 #: libs/rosetta/templates/rosetta/languages.html:31
 #: templates/teams/settings-permissions.html:72
 msgid "Translated"
-msgstr ""
+msgstr "ترجمه‌شده"
 
 #: libs/rosetta/templates/rosetta/languages.html:32
 #: libs/rosetta/templates/rosetta/pofile.html:57
@@ -1683,7 +1689,7 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:31
 msgid "Display:"
-msgstr ""
+msgstr "نمایش:"
 
 #: libs/rosetta/templates/rosetta/pofile.html:32
 msgid "Untranslated only"
@@ -1700,7 +1706,7 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/pofile.html:42
 #: templates/search/_search_form.html:31
 msgid "Search"
-msgstr ""
+msgstr "جستجو"
 
 #: libs/rosetta/templates/rosetta/pofile.html:44
 msgid "Go"
@@ -1760,7 +1766,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:123
 msgid "Abkhazian"
-msgstr ""
+msgstr "آبخازی"
 
 #: libs/unilangs/unilangs.py:124
 msgid "Avestan"
@@ -1784,7 +1790,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:129
 msgid "Arabic"
-msgstr ""
+msgstr "عربی"
 
 #: libs/unilangs/unilangs.py:130
 msgid "Assamese"
@@ -1820,11 +1826,11 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:138
 msgid "Belarusian"
-msgstr ""
+msgstr "بلاروسی"
 
 #: libs/unilangs/unilangs.py:139
 msgid "Berber"
-msgstr ""
+msgstr "بربر"
 
 #: libs/unilangs/unilangs.py:140
 msgid "Bulgarian"
@@ -1852,7 +1858,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:146
 msgid "Breton"
-msgstr ""
+msgstr "برتون"
 
 #: libs/unilangs/unilangs.py:147
 msgid "Bosnian"
@@ -1908,7 +1914,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:160
 msgid "German"
-msgstr ""
+msgstr "آلمانی"
 
 #: libs/unilangs/unilangs.py:161
 msgid "Divehi"
@@ -1928,11 +1934,11 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:165
 msgid "Greek"
-msgstr ""
+msgstr "یونانی"
 
 #: libs/unilangs/unilangs.py:166
 msgid "English"
-msgstr ""
+msgstr "انگلیسی"
 
 #: libs/unilangs/unilangs.py:167
 msgid "English, British"
@@ -1968,7 +1974,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:175
 msgid "Persian"
-msgstr ""
+msgstr "فارسی"
 
 #: libs/unilangs/unilangs.py:176
 msgid "Fulah"
@@ -2120,7 +2126,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:213
 msgid "Italian"
-msgstr ""
+msgstr "ایتالیایی"
 
 #: libs/unilangs/unilangs.py:214
 msgid "Inuktitut"
@@ -2128,7 +2134,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:215
 msgid "Japanese"
-msgstr ""
+msgstr "ژاپنی"
 
 #: libs/unilangs/unilangs.py:216
 msgid "Javanese"
@@ -2188,7 +2194,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:230
 msgid "Kurdish"
-msgstr ""
+msgstr "کردی"
 
 #: libs/unilangs/unilangs.py:231
 msgid "Komi"
@@ -2252,7 +2258,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:246
 msgid "Latvian"
-msgstr ""
+msgstr "لتونیایی"
 
 #: libs/unilangs/unilangs.py:247
 msgid "Metadata: Geo"
@@ -2272,11 +2278,11 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:251
 msgid "Marshallese"
-msgstr ""
+msgstr "مارشالی"
 
 #: libs/unilangs/unilangs.py:252
 msgid "Maori"
-msgstr ""
+msgstr "مائوری"
 
 #: libs/unilangs/unilangs.py:253
 msgid "Macedonian"
@@ -2284,7 +2290,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:254
 msgid "Malayalam"
-msgstr ""
+msgstr "ارسال!"
 
 #: libs/unilangs/unilangs.py:255
 msgid "Malagasy"
@@ -2324,7 +2330,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:264
 msgid "Maltese"
-msgstr ""
+msgstr "مالتی"
 
 #: libs/unilangs/unilangs.py:265
 msgid "Burmese"
@@ -2408,15 +2414,15 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:285
 msgid "Punjabi"
-msgstr ""
+msgstr "پنجابی"
 
 #: libs/unilangs/unilangs.py:286
 msgid "Pali"
-msgstr ""
+msgstr "پالی"
 
 #: libs/unilangs/unilangs.py:287
 msgid "Polish"
-msgstr ""
+msgstr "لهستانی"
 
 #: libs/unilangs/unilangs.py:288
 msgid "Pashto"
@@ -2424,7 +2430,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:289
 msgid "Portuguese"
-msgstr ""
+msgstr "پرتغالی"
 
 #: libs/unilangs/unilangs.py:290
 msgid "Portuguese, Brazilian"
@@ -2440,7 +2446,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:293
 msgid "Romanian"
-msgstr ""
+msgstr "رومانیایی"
 
 #: libs/unilangs/unilangs.py:294
 msgid "Russian"
@@ -2512,7 +2518,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:311
 msgid "Albanian"
-msgstr ""
+msgstr "آلبانی"
 
 #: libs/unilangs/unilangs.py:312
 msgid "Serbian"
@@ -2532,7 +2538,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:316
 msgid "Swedish"
-msgstr ""
+msgstr "سوئدی"
 
 #: libs/unilangs/unilangs.py:317
 msgid "Swahili"
@@ -2552,7 +2558,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:321
 msgid "Tajik"
-msgstr ""
+msgstr "تاجیکی"
 
 #: libs/unilangs/unilangs.py:322
 msgid "Thai"
@@ -2608,7 +2614,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:335
 msgid "Ukrainian"
-msgstr ""
+msgstr "اوکراینی"
 
 #: libs/unilangs/unilangs.py:336
 msgid "Umbundu"
@@ -2620,7 +2626,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:338
 msgid "Urdu"
-msgstr ""
+msgstr "اردو"
 
 #: libs/unilangs/unilangs.py:339
 msgid "Uzbek"
@@ -2680,15 +2686,15 @@ msgstr ""
 
 #: templates/_paginator.html:4 templates/_paginator.html.py:6
 msgid "Previous"
-msgstr ""
+msgstr "قبلی"
 
 #: templates/_paginator.html:28 templates/_paginator.html.py:30
 msgid "Next"
-msgstr ""
+msgstr "بعدی"
 
 #: templates/_share_widget.html:4
 msgid "Share your subtitles"
-msgstr ""
+msgstr "اشتراک‌گذاری زیرنویس شما"
 
 #: templates/_share_widget.html:6
 msgid "Now everyone can watch the video with subtitles-- try it!"
@@ -2702,32 +2708,32 @@ msgstr ""
 #: templates/teams/_context_project.html:75
 #: templates/teams/_context_team.html:108
 msgid "Post to Facebook"
-msgstr ""
+msgstr "ارسال به فیس‌بوک"
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
 #: templates/teams/_context_project.html:76
 #: templates/teams/_context_team.html:109
 msgid "Post to Twitter"
-msgstr ""
+msgstr "ارسال به توئیتر"
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
 #: templates/teams/_context_project.html:77
 #: templates/teams/_context_team.html:110
 msgid "Email to friends"
-msgstr ""
+msgstr "ارسال به دوستان"
 
 #: templates/_share_widget.html:16
 msgid "Embed Code"
-msgstr ""
+msgstr "کد با تنظیمات دلخواه شما"
 
 #: templates/_share_widget.html:24
 msgid "Permalink"
-msgstr ""
+msgstr "لینک ثابت"
 
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:73
 #: templates/teams/_context_team.html:106
 msgid "Share"
-msgstr ""
+msgstr "اشتراک‌گذاری"
 
 #: templates/_sharing_widget.html:14
 msgid "Get Embed Code"
@@ -2818,7 +2824,7 @@ msgstr ""
 
 #: templates/base.html:68
 msgid "Subtitle Videos"
-msgstr ""
+msgstr "زیرنویس ویدئو‌ها"
 
 #: templates/base.html:69
 msgid "Watch"
@@ -2834,11 +2840,11 @@ msgstr ""
 
 #: templates/base.html:72
 msgid "Help"
-msgstr ""
+msgstr "راهنما"
 
 #: templates/base.html:76
 msgid "Sign In"
-msgstr ""
+msgstr "ورود"
 
 #: templates/base.html:100
 msgid ""
@@ -2847,7 +2853,7 @@ msgstr ""
 
 #: templates/base.html:103 templates/profiles/view_profile.html:68
 msgid "About"
-msgstr ""
+msgstr "درباره"
 
 #: templates/base.html:104
 msgid "Jobs"
@@ -2855,11 +2861,11 @@ msgstr ""
 
 #: templates/base.html:107
 msgid "Contact Us"
-msgstr ""
+msgstr "ارتباط با ما"
 
 #: templates/base.html:108
 msgid "Privacy Policy"
-msgstr ""
+msgstr "سیاست حفظ حریم شخصی کاربران"
 
 #: templates/base.html:109
 msgid "Terms of Service"
@@ -2875,7 +2881,7 @@ msgstr ""
 
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
-msgstr ""
+msgstr "ویرایش‌گر Amara نسخه‌ی آزمایشی"
 
 #: templates/demo.html:27
 msgid ""
@@ -3150,13 +3156,13 @@ msgstr ""
 
 #: templates/enterprise.html:27 templates/enterprise.html.py:232
 msgid "Companies"
-msgstr ""
+msgstr "شرکت‌ها"
 
 #: templates/enterprise.html:28 templates/enterprise.html.py:238
 msgid "Universities"
-msgstr ""
+msgstr "دانشگاه‌ها"
 
-#: templates/enterprise.html:29 templates/enterprise.html.py:244
+#: templates/enterprise.html:29 templates/enterprise.html.py:248
 msgid "Publishers"
 msgstr ""
 
@@ -3189,7 +3195,7 @@ msgstr ""
 
 #: templates/enterprise.html:63
 msgid "Build a Translation Team"
-msgstr ""
+msgstr "ساخت یک تیم ترجمه"
 
 #: templates/enterprise.html:65
 msgid ""
@@ -3478,21 +3484,21 @@ msgstr ""
 #: templates/enterprise.html:239
 msgid ""
 "\n"
-"                Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
+"                As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
 "            "
 msgstr ""
 
-#: templates/enterprise.html:245
+#: templates/enterprise.html:243
 msgid ""
 "\n"
-"                As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
+"                Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages\n"
 "            "
 msgstr ""
 
 #: templates/enterprise.html:249
 msgid ""
 "\n"
-"                Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages\n"
+"                Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
 "            "
 msgstr ""
 
@@ -3517,7 +3523,7 @@ msgstr ""
 
 #: templates/faq.html:19 templates/faq.html.py:43
 msgid "What is Amara?"
-msgstr ""
+msgstr "Amara چیست؟"
 
 #: templates/faq.html:20 templates/faq.html.py:54
 msgid "How can I use Amara?"
@@ -3546,15 +3552,15 @@ msgstr ""
 
 #: templates/faq.html:26 templates/faq.html.py:97
 msgid "How can I add subtitles to my video?"
-msgstr ""
+msgstr "چگونه می‌توانم زیرنویس را به ویدئویم اضافه کنم؟"
 
 #: templates/faq.html:27 templates/faq.html.py:107
 msgid "What open source license do you use?"
-msgstr ""
+msgstr "چه مدرک متن‌بازی استفاده می‌کنید؟"
 
 #: templates/faq.html:28 templates/faq.html.py:111
 msgid "I'm a developer, can I help out?"
-msgstr ""
+msgstr "من یک توسعه‌دهنده هستم، می‌توانم کمک کنم؟"
 
 #: templates/faq.html:29 templates/faq.html.py:115
 msgid "Can non-technical people get involved with the project?"
@@ -3570,7 +3576,7 @@ msgstr ""
 
 #: templates/faq.html:32 templates/faq.html.py:138
 msgid "Where can I download subtitles in .SRT or other formats?"
-msgstr ""
+msgstr "کجا می‌توانم زیرنویس‌ها را در فرمت .SRT یا دیگر فرمت‌ها دانلود کنم؟"
 
 #: templates/faq.html:33 templates/faq.html.py:149
 msgid ""
@@ -3594,7 +3600,7 @@ msgstr ""
 
 #: templates/faq.html:37 templates/faq.html.py:199
 msgid "Hey, you don’t list my language!"
-msgstr ""
+msgstr "آهای، شما زبان من را در لیست ندارید!"
 
 #: templates/faq.html:45
 msgid ""
@@ -3795,7 +3801,7 @@ msgstr ""
 
 #: templates/feedback_response.html:12
 msgid "Best"
-msgstr ""
+msgstr "بهترین"
 
 #: templates/feedback_response.html:16
 msgid ""
@@ -3880,7 +3886,7 @@ msgstr ""
 
 #: templates/index.html:86 templates/index.html.py:88
 msgid "TED Team"
-msgstr ""
+msgstr "تیم TED"
 
 #: templates/index.html:94 templates/index.html.py:95
 msgid "Mozilla Example"
@@ -3929,7 +3935,7 @@ msgstr ""
 #: templates/index.html:139 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
-msgstr ""
+msgstr "ویدئو‌های ویژه"
 
 #: templates/index_old.html:26
 msgid "Easily caption and translate your videos, with help from your viewers."
@@ -3997,7 +4003,7 @@ msgstr ""
 
 #: templates/index_old.html:91
 msgid "Add subtitles"
-msgstr ""
+msgstr "اضافه‌کردن زیرنویس"
 
 #: templates/index_old.html:92
 msgid ""
@@ -4008,7 +4014,7 @@ msgstr ""
 
 #: templates/index_old.html:96
 msgid "Add translations"
-msgstr ""
+msgstr "اضافه‌کردن ترجمه‌ها"
 
 #: templates/index_old.html:98
 msgid ""
@@ -4066,7 +4072,7 @@ msgstr ""
 
 #: templates/index_old.html:142
 msgid "How it works"
-msgstr ""
+msgstr "چگونه کار می‌کند؟"
 
 #: templates/index_old.html:144
 msgid ""
@@ -4110,7 +4116,7 @@ msgstr ""
 
 #: templates/index_old.html:162
 msgid "It's 100% web-based, there’s no software to download."
-msgstr ""
+msgstr "بصورت کاملاً تحت وب؛ بدون نیاز به هیچ‌گونه بارگذاری نرم‌افزار."
 
 #: templates/index_old.html:163
 msgid ""
@@ -4132,7 +4138,7 @@ msgstr ""
 
 #: templates/index_old.html:172 templates/jsdemo/home.html:113
 msgid "Donate Now"
-msgstr ""
+msgstr "هم‌اکنون کمک کنید"
 
 #: templates/opensubtitles2010.html:8 templates/opensubtitles2010.html:26
 msgid "Open Subtitles Design Summit"
@@ -4190,7 +4196,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:62
 msgid "When"
-msgstr ""
+msgstr "چه زمانی"
 
 #: templates/opensubtitles2010.html:63
 msgid "September 29th and 30th, beginning at 9am on both days."
@@ -4198,7 +4204,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:67
 msgid "Where"
-msgstr ""
+msgstr "کجا"
 
 #: templates/opensubtitles2010.html:68
 msgid ""
@@ -4209,7 +4215,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
-msgstr ""
+msgstr "چرا"
 
 #: templates/opensubtitles2010.html:75
 msgid ""
@@ -4254,7 +4260,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
-msgstr ""
+msgstr "حامیان"
 
 #: templates/opensubtitles2010.html:104
 msgid ""
@@ -4274,15 +4280,15 @@ msgstr ""
 
 #: templates/admin/base_site.html:12
 msgid "View site"
-msgstr ""
+msgstr "نمایش سایت"
 
 #: templates/admin/base_site.html:13
 msgid "Edit settings"
-msgstr ""
+msgstr "ویرایش تنظیمات"
 
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
-msgstr ""
+msgstr "ارسال"
 
 #: templates/auth/_email_confirmation_notification.html:6
 msgid "Resend confirmation email"
@@ -4290,20 +4296,20 @@ msgstr ""
 
 #: templates/auth/delete_user.html:9
 msgid "Are you sure that you want to permanently delete your profile?"
-msgstr ""
+msgstr "آیا شما از حذفِ نمایه‌ی خود مطمئنید؟"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:365
+#: templates/messages/sent.html:51 templates/teams/tasks.html:367
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:419 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:421 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:385
 msgid "Cancel"
-msgstr ""
+msgstr "لغو"
 
 #: templates/auth/login.html:9
 msgid "Login to Your Existing Account"
@@ -4311,11 +4317,11 @@ msgstr ""
 
 #: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
 msgid "Login"
-msgstr ""
+msgstr "ورود"
 
 #: templates/auth/login.html:14
 msgid "Forgot password?"
-msgstr ""
+msgstr "رمز عبور را فراموش کرده‌اید؟"
 
 #: templates/auth/login.html:17
 msgid "You can also login using"
@@ -4323,11 +4329,11 @@ msgstr ""
 
 #: templates/auth/login.html:27
 msgid "Create an Account"
-msgstr ""
+msgstr "ساخت یک حساب"
 
 #: templates/auth/login.html:31
 msgid "Create Account"
-msgstr ""
+msgstr "ساخت حساب"
 
 #: templates/comments/_item.html:3 templates/messages/list.html:70
 #: templates/messages/sent.html:48 templates/videos/_action_tpl.html:9
@@ -4363,7 +4369,7 @@ msgstr ""
 
 #: templates/jsdemo/home.html:21
 msgid "Learn More"
-msgstr ""
+msgstr "ادامه مطلب"
 
 #: templates/jsdemo/home.html:24
 msgid "Right now"
@@ -4421,11 +4427,11 @@ msgstr ""
 
 #: templates/jsdemo/home.html:60
 msgid "Please enter a valid email address"
-msgstr ""
+msgstr "لطفاً پست الکترونیک معتبر وارد کنید."
 
 #: templates/jsdemo/home.html:93
 msgid "Please enter your email address."
-msgstr ""
+msgstr "لطفاً پست الکترونیک خود را وارد کنید."
 
 #: templates/jsdemo/home.html:121
 msgid "Check out the widget"
@@ -4441,7 +4447,7 @@ msgstr ""
 
 #: templates/livesettings/site_settings.html:48
 msgid "Documentation"
-msgstr ""
+msgstr "مستندات"
 
 #: templates/livesettings/site_settings.html:48
 msgid "Change password"
@@ -4496,11 +4502,11 @@ msgstr ""
 #: templates/messages/_messages.html:7 templates/profiles/dashboard.html:85
 #: templates/videos/_recent_activity.html:11
 msgid "View all"
-msgstr ""
+msgstr "نمایش همه"
 
 #: templates/messages/list.html:6
 msgid "My Messages"
-msgstr ""
+msgstr "پیام‌های من"
 
 #: templates/messages/list.html:20
 msgid "Do you really wish to delete this message?"
@@ -4508,11 +4514,11 @@ msgstr ""
 
 #: templates/messages/list.html:21
 msgid "The message has been successfully sent."
-msgstr ""
+msgstr "پیام با موفقیت ارسال شد."
 
 #: templates/messages/list.html:38
 msgid "Compose"
-msgstr ""
+msgstr "نوشتن"
 
 #: templates/messages/list.html:74
 msgid "Mark Read"
@@ -4520,11 +4526,11 @@ msgstr ""
 
 #: templates/messages/list.html:79
 msgid "Reply"
-msgstr ""
+msgstr "پاسخ"
 
 #: templates/messages/list.html:93
 msgid "You have no messages."
-msgstr ""
+msgstr "شما هیچ پیامی ندارید."
 
 #: templates/messages/list.html:100 templates/messages/new.html:74
 #: templates/messages/sent.html:66
@@ -4538,15 +4544,15 @@ msgstr ""
 
 #: templates/messages/list.html:124
 msgid "Send Message"
-msgstr ""
+msgstr "ارسال پیام"
 
 #: templates/messages/new.html:6
 msgid "Compose a Message"
-msgstr ""
+msgstr "نوشتن یک پیام"
 
 #: templates/messages/sent.html:6
 msgid "Sent Messages"
-msgstr ""
+msgstr "ارسال پیام‌ها"
 
 #: templates/messages/sent.html:42 templates/messages/sent.html.py:44
 msgid "Avatar"
@@ -4619,12 +4625,12 @@ msgstr ""
 
 #: templates/profiles/_filters_dashboard.html:5
 msgid "Overview"
-msgstr ""
+msgstr "بازنگری"
 
 #: templates/profiles/_filters_dashboard.html:8
 #: templates/profiles/dashboard.html:85
 msgid "Recent Activity"
-msgstr ""
+msgstr "آخرین فعالیت‌ها"
 
 #: templates/profiles/_filters_dashboard.html:11
 msgid "My Videos"
@@ -4638,41 +4644,41 @@ msgstr ""
 
 #: templates/profiles/_require_email_dialog.html:8
 msgid "Please enter a valid e-mail address"
-msgstr ""
+msgstr "لطفاً یک پستِ الکترونیک معتبر وارد کنید"
 
 #: templates/profiles/_require_email_dialog.html:10
 msgid "Enter valid email please."
-msgstr ""
+msgstr "لطفاً یک پستِ الکترونیک معتبر وارد کنید"
 
 #: templates/profiles/_select_language_dialog.html:4
 #: templates/search/search.html:154 templates/videos/featured_videos.html:55
 #: templates/videos/popular_videos.html:90
 msgid "Loading..."
-msgstr ""
+msgstr "در حال بارگذاری ..."
 
 #: templates/profiles/_select_language_dialog.html:5
 msgid "Select your Languages"
-msgstr ""
+msgstr "انتخاب زبان"
 
 #: templates/profiles/_select_language_dialog.html:10
 msgid "Select at least one language."
-msgstr ""
+msgstr "حداقل یک زبان را انتخاب کنید."
 
 #: templates/profiles/_select_language_dialog.html:11
 msgid "Saving your language settings..."
-msgstr ""
+msgstr "ذخیره تنظیمات زبان ..."
 
 #: templates/profiles/_select_language_dialog.html:15
 msgid "We really need your help!"
-msgstr ""
+msgstr "ما واقعاً نیازمند کمک شما هستیم!"
 
 #: templates/profiles/_select_language_dialog.html:16
 msgid "What languages do you speak?"
-msgstr ""
+msgstr "به چه زبانی صحبت می‌کنید؟"
 
 #: templates/profiles/_select_language_dialog.html:29
 msgid "Submit"
-msgstr ""
+msgstr "ارسال"
 
 #: templates/profiles/_tabs.html:6 templates/profiles/_top_user_panel.html:16
 msgid "Profile"
@@ -4685,7 +4691,7 @@ msgstr ""
 
 #: templates/profiles/_top_user_panel.html:27
 msgid "Logout"
-msgstr ""
+msgstr "خروج"
 
 #: templates/profiles/_user_videos_activity.html:4
 msgid "Edits to my videos"
@@ -4693,12 +4699,12 @@ msgstr ""
 
 #: templates/profiles/_user_videos_activity.html:10
 msgid "No Activity"
-msgstr ""
+msgstr "بدون فعالیت"
 
 #: templates/profiles/_video_detail.html:8
 #: templates/teams/members-list.html:102
 msgid "language"
-msgstr ""
+msgstr "زبان"
 
 #: templates/profiles/_video_detail.html:10
 #: templates/teams/_team_video_detail.html:28
@@ -4724,7 +4730,7 @@ msgstr ""
 #: templates/videos/subtitle-view.html:147
 #: templates/videos/subtitle-view.html:194
 msgid "Subtitles"
-msgstr ""
+msgstr "زیرنویس‌ها"
 
 #: templates/profiles/dashboard.html:57 templates/teams/members-list.html:101
 #: templates/teams/members-list.html:102
@@ -4753,11 +4759,11 @@ msgstr ""
 
 #: templates/profiles/dashboard.html:115
 msgid "leave team"
-msgstr ""
+msgstr "ترک تیم"
 
 #: templates/profiles/edit_profile.html:5
 msgid "Edit My Profile"
-msgstr ""
+msgstr "تغییر نمایه‌ی من"
 
 #: templates/profiles/edit_profile.html:16
 msgid "Do you really want delete your picture?"
@@ -4768,15 +4774,15 @@ msgstr ""
 #: templates/videos/_paste_transcription.html:158
 #: templates/videos/_video_url_panel.html:77
 msgid "Saving..."
-msgstr ""
+msgstr "در حال ذخیره..."
 
 #: templates/profiles/edit_profile.html:51
 msgid "Edit Your Profile"
-msgstr ""
+msgstr "ویرایش نمایه‌ی شما"
 
 #: templates/profiles/edit_profile.html:64
 msgid "Personal Info"
-msgstr ""
+msgstr "اطلاعات شخصی"
 
 #: templates/profiles/edit_profile.html:65
 msgid "Will be displayed publicly"
@@ -4784,19 +4790,19 @@ msgstr ""
 
 #: templates/profiles/edit_profile.html:83
 msgid "remove picture"
-msgstr ""
+msgstr "حذف عکس"
 
 #: templates/profiles/edit_profile.html:88
 msgid "Upload picture"
-msgstr ""
+msgstr "بارگزاری عکس"
 
 #: templates/profiles/edit_profile.html:92
 msgid "Account Details"
-msgstr ""
+msgstr "جزئیات حساب"
 
 #: templates/profiles/edit_profile.html:107
 msgid "Notifications"
-msgstr ""
+msgstr "اطلاعیه‌ها"
 
 #: templates/profiles/edit_profile.html:110
 msgid "Send notifications to my UniversalSubtitles.org message inbox"
@@ -4808,20 +4814,20 @@ msgstr ""
 
 #: templates/profiles/edit_profile.html:116
 msgid "Language Info"
-msgstr ""
+msgstr "اطلاعات زبان"
 
 #: templates/profiles/edit_profile.html:133
 msgid "Languages I Know"
-msgstr ""
+msgstr "زبانی که من می‌دانم"
 
 #: templates/profiles/edit_profile.html:138
 #: templates/profiles/edit_profile.html:155
 msgid "Remove Language"
-msgstr ""
+msgstr "حذف زبان"
 
 #: templates/profiles/edit_profile.html:169
 msgid "Add Language"
-msgstr ""
+msgstr "اضافه‌کردن زبان"
 
 #: templates/profiles/edit_profile.html:173
 msgid "Developer Info"
@@ -4830,23 +4836,23 @@ msgstr ""
 #: templates/profiles/edit_profile.html:183
 #: templates/teams/settings-permissions.html:118
 msgid "Save Changes"
-msgstr ""
+msgstr "ذخیره تغییرات"
 
 #: templates/profiles/edit_profile.html:186
 msgid "Permanently Delete Your Profile"
-msgstr ""
+msgstr "برای همیشه مشخصات خودتان را حذف کنید"
 
 #: templates/profiles/my_videos.html:6 templates/profiles/my_videos.html:22
 msgid "My videos"
-msgstr ""
+msgstr "فیلم‌های من"
 
 #: templates/profiles/view_profile.html:56
 msgid "Member since"
-msgstr ""
+msgstr "تاریخ عضویت:"
 
 #: templates/profiles/view_profile.html:62
 msgid "Homepage"
-msgstr ""
+msgstr "صفحه‌ی اصلی"
 
 #: templates/profiles/view_profile.html:70
 msgid "<i>User has not submitted a bio.</i>"
@@ -4867,7 +4873,7 @@ msgstr ""
 
 #: templates/profiles/view_profile.html:130
 msgid "Edit user"
-msgstr ""
+msgstr "ویرایش کاربر"
 
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:6
@@ -4889,7 +4895,7 @@ msgstr ""
 
 #: templates/registration/password_reset_complete.html:14
 msgid "Log in"
-msgstr ""
+msgstr "ورود"
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
@@ -4897,7 +4903,7 @@ msgstr ""
 
 #: templates/registration/password_reset_confirm.html:12
 msgid "Enter new password"
-msgstr ""
+msgstr "رمزعبور جدید را وارد کنید"
 
 #: templates/registration/password_reset_confirm.html:14
 msgid ""
@@ -4907,15 +4913,15 @@ msgstr ""
 
 #: templates/registration/password_reset_confirm.html:19
 msgid "New password:"
-msgstr ""
+msgstr "رمزعبور جدید:"
 
 #: templates/registration/password_reset_confirm.html:21
 msgid "Confirm password:"
-msgstr ""
+msgstr "تائید رمزعبور:"
 
 #: templates/registration/password_reset_confirm.html:22
 msgid "Change my password"
-msgstr ""
+msgstr "تغییر رمزعبورِ من"
 
 #: templates/registration/password_reset_confirm.html:31
 msgid "Password reset unsuccessful"
@@ -4957,7 +4963,7 @@ msgstr ""
 
 #: templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
-msgstr ""
+msgstr "بابت استفاده از سایتِ ما متشکریم."
 
 #: templates/registration/password_reset_email.html:13
 #, python-format
@@ -4972,7 +4978,7 @@ msgstr ""
 
 #: templates/registration/password_reset_form.html:17
 msgid "E-mail address:"
-msgstr ""
+msgstr "پستِ الکترونیک:"
 
 #: templates/registration/password_reset_form.html:18
 msgid "Reset my password"
@@ -5001,7 +5007,7 @@ msgstr[0] ""
 
 #: templates/search/_video_item.html:24
 msgid "lines"
-msgstr ""
+msgstr "خطوط"
 
 #: templates/search/_video_item.html:34
 msgid "Plays (this week)"
@@ -5038,16 +5044,16 @@ msgstr ""
 
 #: templates/statistic/index.html:26
 msgid "Users statistic"
-msgstr ""
+msgstr "آمار کاربر"
 
 #: templates/statistic/index.html:27
 #: templates/statistic/videos_statistic.html:6
 msgid "Videos statistic"
-msgstr ""
+msgstr "آمار فیلم‌ها"
 
 #: templates/statistic/index.html:28
 msgid "Languages statistic"
-msgstr ""
+msgstr "آمار زبان‌ها"
 
 #: templates/statistic/index.html:73
 #: templates/statistic/language_statistic.html:31
@@ -5058,19 +5064,19 @@ msgstr ""
 #: templates/statistic/language_statistic.html:32
 #: templates/statistic/languages_statistic.html:37
 msgid "day"
-msgstr ""
+msgstr "روز"
 
 #: templates/statistic/index.html:75
 #: templates/statistic/language_statistic.html:33
 #: templates/statistic/languages_statistic.html:38
 msgid "week"
-msgstr ""
+msgstr "هفته"
 
 #: templates/statistic/index.html:76
 #: templates/statistic/language_statistic.html:34
 #: templates/statistic/languages_statistic.html:39
 msgid "month"
-msgstr ""
+msgstr "ماه"
 
 #: templates/statistic/index.html:77
 #: templates/statistic/language_statistic.html:35
@@ -5078,7 +5084,7 @@ msgstr ""
 #: templates/statistic/users_statistic.html:16
 #: templates/statistic/videos_statistic.html:16
 msgid "TOTAL"
-msgstr ""
+msgstr "کل"
 
 #: templates/statistic/index.html:83
 msgid "Total number of videos captioned"
@@ -5086,30 +5092,30 @@ msgstr ""
 
 #: templates/statistic/index.html:90
 msgid "Tweets"
-msgstr ""
+msgstr "تویئت"
 
 #: templates/statistic/index.html:97
 msgid "Facebook shares"
-msgstr ""
+msgstr "اشتراک‌های فیس‌بوک"
 
 #: templates/statistic/index.html:104
 msgid "Email shares"
-msgstr ""
+msgstr "اشتراک‌های ایمیلی"
 
 #: templates/statistic/language_statistic.html:25
 msgid "Language statistic for "
-msgstr ""
+msgstr "آمار زبان برای "
 
 #: templates/statistic/language_statistic.html:26
 #: templates/statistic/languages_statistic.html:31
 #: templates/statistic/users_statistic.html:7
 #: templates/statistic/videos_statistic.html:7
 msgid "General statistic"
-msgstr ""
+msgstr "آمار عمومی"
 
 #: templates/statistic/language_statistic.html:41
 msgid "Videos count"
-msgstr ""
+msgstr "نمایش فیلم‌ها"
 
 #: templates/statistic/language_statistic.html:48
 msgid "Subtitles views count"
@@ -5125,48 +5131,48 @@ msgstr ""
 
 #: templates/statistic/languages_statistic.html:36
 msgid "Lanuage"
-msgstr ""
+msgstr "زبان"
 
 #: templates/statistic/log_entry_model_admin.html:37
 #: templates/statistic/logger_model_admin.html:37
 msgid "Date"
-msgstr ""
+msgstr "زمان"
 
 #: templates/statistic/log_entry_model_admin.html:38
 #: templates/statistic/logger_model_admin.html:38
 msgid "Count"
-msgstr ""
+msgstr "تعداد"
 
 #: templates/statistic/log_entry_model_admin.html:39
 #: templates/statistic/logger_model_admin.html:39
 msgid "Time(sec)"
-msgstr ""
+msgstr "زمان (ثانیه)"
 
 #: templates/statistic/users_statistic.html:6
 msgid "Activity statistic"
-msgstr ""
+msgstr "آمار فعالیت"
 
 #: templates/statistic/users_statistic.html:13
 #: templates/statistic/videos_statistic.html:13
 msgid "Day"
-msgstr ""
+msgstr "روز"
 
 #: templates/statistic/users_statistic.html:14
 #: templates/statistic/videos_statistic.html:14
 msgid "Week"
-msgstr ""
+msgstr "هفته"
 
 #: templates/statistic/users_statistic.html:15
 #: templates/statistic/videos_statistic.html:15
 msgid "Month"
-msgstr ""
+msgstr "ماه"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
 #: templates/teams/_context_team.html:47 templates/teams/tasks.html:125
 #: templates/teams/tasks.html.py:176 templates/videos/video-view.html:144
 msgid "Video"
-msgstr ""
+msgstr "فیلم"
 
 #: templates/statistic/log_methods/changelist_view.html:39
 msgid "By logger"
@@ -5174,7 +5180,7 @@ msgstr ""
 
 #: templates/statistic/log_methods/changelist_view.html:41
 msgid "all"
-msgstr ""
+msgstr "همه"
 
 #: templates/statistic/log_methods/changelist_view.html:55
 msgid "Class"
@@ -5218,7 +5224,7 @@ msgstr ""
 
 #: templates/teams/_actions.html:58
 msgid "Join Team"
-msgstr ""
+msgstr "پیوستن به تیم"
 
 #: templates/teams/_actions.html:64
 msgid "Want to create your own subtitling team? Contact "
@@ -5322,7 +5328,7 @@ msgstr ""
 #: templates/teams/_context_team.html:29
 #: templates/videos/test_form_page.html:24
 msgid "video"
-msgstr ""
+msgstr "فیلم"
 
 #: templates/teams/_context_team.html:36
 #: templates/teams/_context_team.html:127
@@ -5345,7 +5351,7 @@ msgstr ""
 
 #: templates/teams/_filters_videos.html:7
 msgid "All videos"
-msgstr ""
+msgstr "تمامی ویدئوها"
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "According to your"
@@ -5370,7 +5376,7 @@ msgstr ""
 #: templates/teams/_perform_task_link.html:5
 #: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:255
 msgid "Resume"
-msgstr ""
+msgstr "رزومه"
 
 #: templates/teams/_perform_task_link.html:7
 #: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:257
@@ -5389,7 +5395,7 @@ msgstr ""
 #: templates/teams/_tabs.html:6 templates/teams/_tabs_projects.html:6
 #: templates/teams/videos-list.html:6
 msgid "Videos"
-msgstr ""
+msgstr "فیلم‌ها"
 
 #: templates/teams/_tabs.html:11 templates/teams/members-list.html:6
 msgid "Members"
@@ -5397,7 +5403,7 @@ msgstr ""
 
 #: templates/teams/_tabs.html:16 templates/videos/video-view.html:146
 msgid "Activity"
-msgstr ""
+msgstr "فعالیت"
 
 #: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
 #: templates/teams/_team_video_detail.html:48
@@ -5421,7 +5427,7 @@ msgstr ""
 
 #: templates/teams/_team_add_video_select.html:8
 msgid "Choose a team"
-msgstr ""
+msgstr "انتخاب یک تیم"
 
 #: templates/teams/_team_message.html:4
 #, python-format
@@ -5502,7 +5508,7 @@ msgstr ""
 #: templates/teams/members-list.html:122 templates/teams/videos-list.html:147
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
-msgstr ""
+msgstr "حذف"
 
 #: templates/teams/add_video.html:6 templates/teams/add_videos.html:6
 msgid "Team video"
@@ -5533,13 +5539,17 @@ msgstr ""
 msgid "Deny"
 msgstr ""
 
-#: templates/teams/applications.html:61
+#: templates/teams/applications.html:56
+msgid "Send a message"
+msgstr ""
+
+#: templates/teams/applications.html:66
 msgid "There are no applications right now"
 msgstr ""
 
 #: templates/teams/base.html:43
 msgid "Edit team"
-msgstr ""
+msgstr "ویرایش تیم"
 
 #: templates/teams/create.html:6
 msgid "Create team"
@@ -5547,11 +5557,11 @@ msgstr ""
 
 #: templates/teams/create.html:23 templates/teams/create.html.py:65
 msgid "Create a team"
-msgstr ""
+msgstr "سایت یک تیم"
 
 #: templates/teams/create.html:28 templates/teams/teams-list.html:23
 msgid "All Teams"
-msgstr ""
+msgstr "تمامی تیم‌ها"
 
 #: templates/teams/create.html:33 templates/teams/teams-list.html:6
 #: templates/teams/teams-list.html.py:29
@@ -5560,7 +5570,7 @@ msgstr ""
 
 #: templates/teams/create.html:51
 msgid "Display Settings"
-msgstr ""
+msgstr "تنظیمات نمایش"
 
 #: templates/teams/create.html:57
 msgid "Create Team"
@@ -5568,7 +5578,7 @@ msgstr ""
 
 #: templates/teams/create.html:69
 msgid "Back to teams"
-msgstr ""
+msgstr "بازگشت به تیم‌ها"
 
 #: templates/teams/create.html:71
 msgid "Back to my teams"
@@ -5606,7 +5616,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:423
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:425
 msgid "Begin typing to search"
 msgstr ""
 
@@ -5663,7 +5673,7 @@ msgstr ""
 
 #: templates/teams/invite_members.html:6 templates/teams/members-list.html:45
 msgid "Invite Members"
-msgstr ""
+msgstr "دعوت از کاربران"
 
 #: templates/teams/invite_members.html:23
 msgid "Recipient"
@@ -5695,7 +5705,7 @@ msgstr ""
 
 #: templates/teams/invite_members.html:49
 msgid "Send Invites"
-msgstr ""
+msgstr "ارسال دعوت‌نامه"
 
 #: templates/teams/members-list.html:47 templates/teams/tasks.html:48
 #: templates/teams/videos-list.html:47
@@ -5729,7 +5739,7 @@ msgstr ""
 
 #: templates/teams/members-list.html:64 templates/teams/tasks.html:71
 msgid "all languages"
-msgstr ""
+msgstr "تمامی زبان‌ها"
 
 #: templates/teams/members-list.html:72 templates/teams/tasks.html:119
 #: templates/teams/tasks.html.py:126 templates/teams/tasks.html:133
@@ -5751,7 +5761,7 @@ msgstr ""
 
 #: templates/teams/members-list.html:92
 msgid "Me"
-msgstr ""
+msgstr "من"
 
 #: templates/teams/members-list.html:101 templates/teams/members-list.html:102
 msgid "and"
@@ -5888,7 +5898,7 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:61
 msgid "Who can translate subtitles?"
-msgstr ""
+msgstr "چه کسی زیرنویس‌ها را ترجمه کرده‌ است؟"
 
 #: templates/teams/settings-permissions.html:62
 msgid "i.e. translate text from an original subtitle into a new language"
@@ -5904,7 +5914,7 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:71
 msgid "or ..."
-msgstr ""
+msgstr "یا ..."
 
 #: templates/teams/settings-permissions.html:77
 msgid "Reviewed"
@@ -5916,7 +5926,7 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:87
 msgid "Published"
-msgstr ""
+msgstr "نمایش داده شده"
 
 #: templates/teams/settings-permissions.html:93
 msgid "Workflows enable you to add moderation steps and automate tasks"
@@ -5955,16 +5965,16 @@ msgstr ""
 #: templates/teams/settings-projects-edit.html:24
 #: templates/teams/settings-projects.html:20
 msgid "Add Project"
-msgstr ""
+msgstr "افزودن پروژه"
 
 #: templates/teams/settings-projects-add.html:26
 msgid "Add new project"
-msgstr ""
+msgstr "افزودن پروژه‌ی جدید"
 
 #: templates/teams/settings-projects-add.html:32
 #: templates/teams/settings-projects-edit.html:40
 msgid "Description"
-msgstr ""
+msgstr "توضیحات"
 
 #: templates/teams/settings-projects-add.html:40
 msgid ""
@@ -5978,7 +5988,7 @@ msgstr ""
 
 #: templates/teams/settings-projects-edit.html:34
 msgid "Edit Project"
-msgstr ""
+msgstr "ویرایش پروژه"
 
 #: templates/teams/settings-projects-edit.html:76
 msgid "Are you sure you want to delete this project?"
@@ -5990,19 +6000,19 @@ msgstr ""
 
 #: templates/teams/tasks.html:44
 msgid "Add Task"
-msgstr ""
+msgstr "افزودن وظیفه"
 
 #: templates/teams/tasks.html:59
 msgid "Translate"
-msgstr ""
+msgstr "ترجمه"
 
 #: templates/teams/tasks.html:69
 msgid "tasks for"
-msgstr ""
+msgstr "وظیفه برای"
 
 #: templates/teams/tasks.html:73
 msgid "my languages"
-msgstr ""
+msgstr "زبان‌های من"
 
 #: templates/teams/tasks.html:86
 msgid "assigned to"
@@ -6010,27 +6020,27 @@ msgstr ""
 
 #: templates/teams/tasks.html:88
 msgid "anyone"
-msgstr ""
+msgstr "هرکسی"
 
 #: templates/teams/tasks.html:89 templates/teams/tasks.html.py:223
 msgid "me"
-msgstr ""
+msgstr "من"
 
 #: templates/teams/tasks.html:90
 msgid "no one"
-msgstr ""
+msgstr "هیج‌کس"
 
 #: templates/teams/tasks.html:99 templates/teams/videos-list.html:65
 msgid "sorted by"
-msgstr ""
+msgstr "مرتب‌سازی بر اساس"
 
 #: templates/teams/tasks.html:102
 msgid "date, newest"
-msgstr ""
+msgstr "تاریخ، جدید‌ترین"
 
 #: templates/teams/tasks.html:105
 msgid "date, oldest"
-msgstr ""
+msgstr "تاریخ، قدیمی‌ترین"
 
 #: templates/teams/tasks.html:109
 msgid "time left, least"
@@ -6064,7 +6074,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:196 templates/videos/subtitle-view.html:45
 msgid "translated"
-msgstr ""
+msgstr "ترجمه‌شده"
 
 #: templates/teams/tasks.html:204
 msgid "reviewed"
@@ -6077,7 +6087,7 @@ msgstr ""
 #: templates/teams/tasks.html:208 templates/videos/subtitle-view.html:202
 #: templates/videos/subtitle-view.html:316
 msgid "by"
-msgstr ""
+msgstr "توسط"
 
 #: templates/teams/tasks.html:221
 msgid "Assigned to"
@@ -6091,60 +6101,60 @@ msgstr ""
 msgid "Perform Task"
 msgstr ""
 
-#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:306
+#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:308
 msgid "Download draft"
-msgstr ""
+msgstr "دانلود پیش‌نویس"
 
-#: templates/teams/tasks.html:280
+#: templates/teams/tasks.html:282
 msgid "Upload draft"
-msgstr ""
+msgstr "بارگذاری پیش‌نویس"
 
-#: templates/teams/tasks.html:285
+#: templates/teams/tasks.html:287
 #: templates/videos/_paste_transcription.html:146
 #: templates/videos/_upload_subtitles.html:23
 #: templates/videos/video-view.html:101
 msgid "Language"
-msgstr ""
+msgstr "زبان"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:292
 msgid "File:"
 msgstr ""
 
-#: templates/teams/tasks.html:336
+#: templates/teams/tasks.html:338
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:356
+#: templates/teams/tasks.html:358
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:358
+#: templates/teams/tasks.html:360
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:374
+#: templates/teams/tasks.html:376
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:380
+#: templates/teams/tasks.html:382
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:383
+#: templates/teams/tasks.html:385
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:387
+#: templates/teams/tasks.html:389
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:426
+#: templates/teams/tasks.html:428
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:436
+#: templates/teams/tasks.html:438
 msgid "Sorry, no tasks here."
 msgstr ""
 
@@ -6154,7 +6164,7 @@ msgstr ""
 
 #: templates/teams/team_video.html:27 templates/videos/video-view.html:211
 msgid "Edit video"
-msgstr ""
+msgstr "ویرایش ویدئو"
 
 #: templates/teams/team_video.html:40
 msgid "This video is being moderated by team"
@@ -6166,19 +6176,19 @@ msgstr ""
 
 #: templates/teams/teams-list.html:41
 msgid "Sort by"
-msgstr ""
+msgstr "مرتب‌سازی بر اساس"
 
 #: templates/teams/teams-list.html:64
 msgid "My team"
-msgstr ""
+msgstr "تیم من"
 
 #: templates/teams/teams-list.html:67
 msgid "Private"
-msgstr ""
+msgstr "خصوصی"
 
 #: templates/teams/teams-list.html:74
 msgid "No description..."
-msgstr ""
+msgstr "بدون توضیحات..."
 
 #: templates/teams/teams-list.html:81 templates/teams/teams-list.html.py:87
 #, python-format
@@ -6206,7 +6216,7 @@ msgstr[0] ""
 
 #: templates/teams/teams-list.html:107
 msgid "Leave team"
-msgstr ""
+msgstr "ترک تیم"
 
 #: templates/teams/teams-list.html:114
 msgid "Sorry, no teams found."
@@ -6229,7 +6239,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:44
 msgid "Add Video"
-msgstr ""
+msgstr "افزودن ویدئو"
 
 #: templates/teams/videos-list.html:54
 msgid "Videos with"
@@ -6314,7 +6324,7 @@ msgstr ""
 
 #: templates/teams/videos_actions.html:28
 msgid "Sorry, no activity yet"
-msgstr ""
+msgstr "متاسفم، هنوز فعالیتی انجام نشده است."
 
 #: templates/videos/_error_feedback_form.html:7
 msgid ""
@@ -6350,11 +6360,11 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:13
 msgid "Your email:"
-msgstr ""
+msgstr "پستِ الکترونیک شما:"
 
 #: templates/videos/_feedback_form.html:16
 msgid "Your Feedback"
-msgstr ""
+msgstr "بازخورد شما"
 
 #: templates/videos/_feedback_form.html:26
 msgid "Send feedback"
@@ -6362,7 +6372,7 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:26
 msgid "Send Feedback"
-msgstr ""
+msgstr "ارسال بازخورد"
 
 #: templates/videos/_feedback_form.html:35
 #: templates/videos/_paste_transcription.html:113
@@ -6398,7 +6408,7 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:54
 msgid "Enter feedback please."
-msgstr ""
+msgstr "لطفاً بازخورد خود را وارد نمائید."
 
 #: templates/videos/_follow_video_button.html:37
 msgid "✓ Following"
@@ -6451,7 +6461,7 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:145
 msgid "Follow "
-msgstr ""
+msgstr "دنبال‌کردن "
 
 #: templates/videos/_follow_video_button.html:149
 msgid ""
@@ -6481,7 +6491,7 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:202
 msgid "✓ Click to Follow"
-msgstr ""
+msgstr "✓ برای دنبال کردن کلیک کنید"
 
 #: templates/videos/_get_counter.html:3
 msgid "Get counter code:"
@@ -6524,7 +6534,7 @@ msgstr ""
 #: templates/videos/_paste_transcription.html:163
 #: templates/videos/_upload_subtitles.html:36
 msgid "Login to upload subtitles"
-msgstr ""
+msgstr "ورود به بخش بارگزاری زیرنویس‌ها"
 
 #: templates/videos/_team_list.html:5 templates/videos/video-view.html:180
 msgid "Collaborate"
@@ -6532,7 +6542,7 @@ msgstr ""
 
 #: templates/videos/_team_list.html:8
 msgid "Visit"
-msgstr ""
+msgstr "بازدید"
 
 #: templates/videos/_team_list.html:8
 msgid "Translation Project"
@@ -6540,11 +6550,11 @@ msgstr ""
 
 #: templates/videos/_upload_subtitles.html:2
 msgid "upload"
-msgstr ""
+msgstr "بارگذاری"
 
 #: templates/videos/_upload_subtitles.html:6
 msgid "Upload Subtitles"
-msgstr ""
+msgstr "بارگزاری زیرنویس‌ها"
 
 #: templates/videos/_upload_subtitles.html:10
 msgid ""
@@ -6561,11 +6571,11 @@ msgstr ""
 #: templates/videos/_upload_subtitles.html:29
 #, python-format
 msgid "This subtitle file is 100% complete"
-msgstr ""
+msgstr "این زیرنویس به اتمام رسیده است."
 
 #: templates/videos/_upload_subtitles.html:31
 msgid "Upload"
-msgstr ""
+msgstr "بارگذاری"
 
 #: templates/videos/_upload_subtitles.html:45
 msgid ""
@@ -6580,7 +6590,7 @@ msgstr[0] ""
 
 #: templates/videos/_video.html:26
 msgid "Added"
-msgstr ""
+msgstr "اضافه شده"
 
 #: templates/videos/_video.html:33
 #, python-format
@@ -6609,7 +6619,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:44
 msgid "Learn more"
-msgstr ""
+msgstr "ادامه مطلب"
 
 #: templates/videos/_video_url_panel.html:46
 msgid ""
@@ -6655,7 +6665,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:74
 msgid "Add"
-msgstr ""
+msgstr "افزودن"
 
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
@@ -6678,7 +6688,7 @@ msgstr ""
 
 #: templates/videos/_watch_page.html:15
 msgid "No videos found"
-msgstr ""
+msgstr "هیچ ویدئویی یافت نشد"
 
 #: templates/videos/actions_list.html:21
 msgid "There are no activities."
@@ -6697,11 +6707,11 @@ msgstr ""
 
 #: templates/videos/create.html:22
 msgid "Subtitle a Video"
-msgstr ""
+msgstr "زیرنویس یک فیلم"
 
 #: templates/videos/create.html:25
 msgid "Begin"
-msgstr ""
+msgstr "شروع"
 
 #: templates/videos/create.html:28
 msgid ""
@@ -6715,7 +6725,7 @@ msgstr ""
 
 #: templates/videos/create.html:37
 msgid "for example"
-msgstr ""
+msgstr "برای مثال"
 
 #: templates/videos/create.html:45
 msgid "Automatically submit videos"
@@ -6808,7 +6818,7 @@ msgstr ""
 
 #: templates/videos/email_friend.html:10
 msgid "Send to Friend!"
-msgstr ""
+msgstr "ارسال به دوست!"
 
 #: templates/videos/email_notification.html:9
 #, python-format
@@ -6863,7 +6873,7 @@ msgstr ""
 #: templates/videos/email_notification_non_editors.html:66
 #: templates/videos/email_notification_non_editors.html:94
 msgid "New Text"
-msgstr ""
+msgstr "متن جدید"
 
 #: templates/videos/email_notification.html:69
 #: templates/videos/email_notification_non_editors.html:63
@@ -6897,7 +6907,7 @@ msgstr ""
 
 #: templates/videos/email_start_notification.html:7
 msgid "Dear"
-msgstr ""
+msgstr "عزیز"
 
 #: templates/videos/email_start_notification.html:8
 #, python-format
@@ -6932,7 +6942,7 @@ msgstr ""
 
 #: templates/videos/email_title_changed.html:7
 msgid "The title of the video"
-msgstr ""
+msgstr "عنوان ویدئو"
 
 #: templates/videos/email_title_changed.html:10
 msgid "has been changed by"
@@ -6967,11 +6977,11 @@ msgstr ""
 
 #: templates/videos/email_video_url_add.html:9
 msgid "was submitted by"
-msgstr ""
+msgstr "ارسال شده توسط"
 
 #: templates/videos/email_video_url_add.html:13
 msgid "Anonymous"
-msgstr ""
+msgstr "ناشناس"
 
 #: templates/videos/email_video_url_add.html:15
 msgid ""
@@ -6995,39 +7005,39 @@ msgstr ""
 #: templates/videos/latest_videos.html:20 templates/videos/volunteer.html:114
 #: templates/videos/volunteer_latest.html:21 templates/videos/watch.html:107
 msgid "Latest Videos"
-msgstr ""
+msgstr "آخرین ویدئو‌ها"
 
 #: templates/videos/popular_videos.html:59 templates/videos/volunteer.html:59
 #: templates/videos/watch.html:41
 msgid "Popular Videos"
-msgstr ""
+msgstr "ویدئو‌های محبوب"
 
 #: templates/videos/popular_videos.html:61
 #: templates/videos/popular_videos.html:65 templates/videos/volunteer.html:61
 #: templates/videos/volunteer.html.py:65 templates/videos/watch.html:43
 #: templates/videos/watch.html.py:47
 msgid "This Week"
-msgstr ""
+msgstr "این هفته"
 
 #: templates/videos/popular_videos.html:64 templates/videos/volunteer.html:64
 #: templates/videos/watch.html:46
 msgid "Today"
-msgstr ""
+msgstr "امروز"
 
 #: templates/videos/popular_videos.html:66 templates/videos/volunteer.html:66
 #: templates/videos/watch.html:48
 msgid "This Month"
-msgstr ""
+msgstr "این ماه"
 
 #: templates/videos/popular_videos.html:67 templates/videos/volunteer.html:67
 #: templates/videos/watch.html:49
 msgid "This Year"
-msgstr ""
+msgstr "این سال"
 
 #: templates/videos/popular_videos.html:68 templates/videos/volunteer.html:68
 #: templates/videos/watch.html:50
 msgid "All Time"
-msgstr ""
+msgstr "تمامی اوقات"
 
 #: templates/videos/stop_notification.html:9
 #, python-format
@@ -7045,15 +7055,15 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:96 templates/videos/video-view.html:83
 msgid "View"
-msgstr ""
+msgstr "نمایش"
 
 #: templates/videos/subtitle-view.html:102 templates/videos/video-view.html:89
 msgid "Follower"
-msgstr ""
+msgstr "دنبال‌کنندگان"
 
 #: templates/videos/subtitle-view.html:108 templates/videos/video-view.html:95
 msgid "Comment"
-msgstr ""
+msgstr "نظرات"
 
 #: templates/videos/subtitle-view.html:114
 msgid "Line"
@@ -7062,13 +7072,13 @@ msgstr ""
 #: templates/videos/subtitle-view.html:124
 #: templates/videos/video-view.html:111
 msgid "View Subtitles"
-msgstr ""
+msgstr "نمایش زیرنویس‌ها"
 
 #: templates/videos/subtitle-view.html:148
 #: templates/videos/subtitle-view.html:283
 #: templates/videos/video-view.html:145 templates/videos/video-view.html:191
 msgid "Comments"
-msgstr ""
+msgstr "نظرات"
 
 #: templates/videos/subtitle-view.html:149
 msgid "Revisions"
@@ -7082,29 +7092,29 @@ msgstr ""
 #: templates/videos/subtitle-view.html:157
 #: templates/videos/subtitle-view.html:401
 msgid "Edit Subtitles"
-msgstr ""
+msgstr "ویرایش زیرنویس"
 
 #: templates/videos/subtitle-view.html:164
 msgid "Download"
-msgstr ""
+msgstr "دریافت"
 
 #: templates/videos/subtitle-view.html:192
 msgid "Draft only"
-msgstr ""
+msgstr "فقط پیش‌نویس"
 
 #: templates/videos/subtitle-view.html:195
 msgid "translated from"
-msgstr ""
+msgstr "ترجمه‌شده از"
 
 #: templates/videos/subtitle-view.html:199
 #: templates/videos/subtitle-view.html:306
 #: templates/videos/subtitle-view.html:308
 msgid "Revision"
-msgstr ""
+msgstr "تجدید نظر"
 
 #: templates/videos/subtitle-view.html:200
 msgid "created"
-msgstr ""
+msgstr "ساخته‌شده"
 
 #: templates/videos/subtitle-view.html:244
 msgid ""
@@ -7151,7 +7161,7 @@ msgstr ""
 #: templates/videos/subtitle-view.html:281
 #: templates/videos/video-view.html:189
 msgid "Leave a comment"
-msgstr ""
+msgstr "ارسال نظر"
 
 #: templates/videos/subtitle-view.html:290
 msgid "Compare Revisions"
@@ -7163,11 +7173,11 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:323
 msgid "Text"
-msgstr ""
+msgstr "متن"
 
 #: templates/videos/subtitle-view.html:329
 msgid "No subtitles for this language."
-msgstr ""
+msgstr "زیرنویسی برای این زبان وجود ندارد."
 
 #: templates/videos/subtitle-view.html:338
 msgid "Roll back to this version"
@@ -7198,11 +7208,11 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:18
 msgid "Your Email"
-msgstr ""
+msgstr "پست الکترونیک شما"
 
 #: templates/videos/test_form_page.html:23
 msgid "Task 1"
-msgstr ""
+msgstr "وظیفه 1"
 
 #: templates/videos/test_form_page.html:24
 msgid "Try creating subtitles on the following"
@@ -7217,7 +7227,7 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:29
 msgid "Task 2"
-msgstr ""
+msgstr "وظیفه 2"
 
 #: templates/videos/test_form_page.html:30
 msgid "Try fixing errors on the video (or just get back in and make an edit)"
@@ -7237,7 +7247,7 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:45
 msgid "Submit!"
-msgstr ""
+msgstr "ارسال!"
 
 #: templates/videos/test_form_page.html:67
 msgid "Simple Instructions"
@@ -7253,7 +7263,7 @@ msgstr ""
 
 #: templates/videos/video-view.html:22
 msgid "Enter non-empty title"
-msgstr ""
+msgstr "عنوان نباید خالی باشد!"
 
 #: templates/videos/video-view.html:60
 msgid ""
@@ -7291,7 +7301,7 @@ msgstr ""
 
 #: templates/videos/video-view.html:162
 msgid "Start a new translation"
-msgstr ""
+msgstr "شروع یک ترجمه‌ی جدید"
 
 #: templates/videos/video-view.html:169
 msgid ""
@@ -7301,7 +7311,7 @@ msgstr ""
 
 #: templates/videos/video-view.html:196
 msgid "View all activity"
-msgstr ""
+msgstr "نمایش تمام فعالیت‌ها"
 
 #: templates/videos/volunteer.html:18
 msgid "Contribute Subtitles"
@@ -7364,7 +7374,7 @@ msgstr ""
 
 #: utils/forms/unisub_video_form.py:67
 msgid "Videos does not exist."
-msgstr ""
+msgstr "ویدئو وجود ندارد."
 
 #: utils/forms/unisub_video_form.py:70
 msgid "Incorrect URL."
@@ -7372,4 +7382,4 @@ msgstr ""
 
 #: utils/templatetags/utils_tags.py:49
 msgid "more..."
-msgstr ""
+msgstr "ادامه ..."

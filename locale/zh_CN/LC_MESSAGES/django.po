@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-24 01:32-0500\n"
-"PO-Revision-Date: 2012-05-24 06:46+0000\n"
+"POT-Creation-Date: 2012-05-25 01:34-0500\n"
+"PO-Revision-Date: 2012-05-25 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.net/projects/p/universalsubtitles/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -289,7 +289,7 @@ msgstr "你的字幕已被拒"
 #: apps/messages/tasks.py:590
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
-msgstr ""
+msgstr "%(user)s 在视频 video %(title)s留下了一段评论 "
 
 #: apps/messages/views.py:123
 msgid "Message sent."
@@ -600,22 +600,26 @@ msgstr "这些字幕没有纳入小组控制中"
 msgid "You do not have permission to unpublish these subtitles."
 msgstr "你没有撤销这些字幕的发布的权限"
 
-#: apps/teams/forms.py:642 apps/videos/forms.py:68 apps/videos/forms.py:86
-#: apps/videos/forms.py:396
+#: apps/teams/forms.py:641
+msgid "You cannot perform that task."
+msgstr ""
+
+#: apps/teams/forms.py:650 apps/videos/forms.py:68 apps/videos/forms.py:86
+#: apps/videos/forms.py:398
 msgid "File size should be less {0} kb"
 msgstr "文件大小应该小于 {0} kb"
 
-#: apps/teams/forms.py:647 apps/videos/forms.py:399
+#: apps/teams/forms.py:655 apps/videos/forms.py:401
 msgid ""
 "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr "不正确的格式。上传srt，ssa，sbv，dfxp或者xml（TTML 格式）"
 
-#: apps/teams/forms.py:654 apps/videos/forms.py:73 apps/videos/forms.py:94
-#: apps/videos/forms.py:404
+#: apps/teams/forms.py:662 apps/videos/forms.py:73 apps/videos/forms.py:94
+#: apps/videos/forms.py:406
 msgid "Can not detect file encoding"
 msgstr "不能检测编码"
 
-#: apps/teams/forms.py:659 apps/videos/forms.py:96 apps/videos/forms.py:406
+#: apps/teams/forms.py:667 apps/videos/forms.py:96 apps/videos/forms.py:408
 msgid "Incorrect subtitles format"
 msgstr "不正确的字幕格式"
 
@@ -1010,19 +1014,19 @@ msgstr "不可标记"
 
 #: apps/teams/views.py:1369
 msgid "Sorry, the subtitles don't match the lines, so we can't upload them."
-msgstr ""
+msgstr "抱歉，字幕行间不匹配，所以我们不能上传"
 
 #: apps/teams/views.py:1371
 msgid "Draft uploaded successfully."
-msgstr ""
+msgstr "草稿成功上传"
 
 #: apps/teams/views.py:1373
 msgid "There was a problem uploading that draft."
-msgstr ""
+msgstr "上传草稿时遇到了一个问题"
 
 #: apps/teams/views.py:1386
 msgid "You are not allowed to download this transcript."
-msgstr ""
+msgstr "不允许你下载此副本"
 
 #: apps/teams/views.py:1436
 msgid "There's already a project with this name"
@@ -1075,7 +1079,7 @@ msgstr "不能编码文件，它应该是utf8编码"
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "不正确的格式。请上传 .srt, .ssa, .sbv 或者 .xml（TTML 格式）"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:543 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:545 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "这个URL似乎是个坏的链接"
 
@@ -1096,38 +1100,38 @@ msgstr "你没有被允许给这个视频添加URL"
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "现在有人这个视频字幕。稍后再试。"
 
-#: apps/videos/forms.py:187 apps/videos/forms.py:211
+#: apps/videos/forms.py:185 apps/videos/forms.py:209
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
-msgstr ""
+msgstr "抱歉，我们不能上传你的字幕，因为基于此语种的工作已经在进行。"
 
-#: apps/videos/forms.py:196
+#: apps/videos/forms.py:194
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
-msgstr ""
+msgstr "抱歉，我们不能上传此语种的字幕，因为这会毁了为此语种制作的字幕翻译"
 
-#: apps/videos/forms.py:223
+#: apps/videos/forms.py:221
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
-msgstr ""
+msgstr "抱歉，我们不能上传你的字幕，因为此语言的一个草稿已经在调整中。"
 
-#: apps/videos/forms.py:231 apps/videos/forms.py:234
+#: apps/videos/forms.py:227 apps/videos/forms.py:230
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have sufficient permission."
-msgstr ""
+msgstr "抱歉，我们不能上传你的字幕，因为此语种正在调整，并且你没有足够的权限"
 
-#: apps/videos/forms.py:528
+#: apps/videos/forms.py:530
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "如果仍然有问题，\n                        请再次尝试视频页面的链接<a href=\"mailto:%s\">Contact us</a>"
 
-#: apps/videos/forms.py:531 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:533 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
@@ -1135,49 +1139,49 @@ msgid ""
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "你的视频链接必须在一个兼容的网站(如YouTube)\n                    或者直接使用能够在HTML5浏览器播放的视频文件. 例如: http://mysite.com/myvideo.ogg 或 http://mysite.com/myipadvideo.m4v\n                    如果有问题<a href=\"mailto:%s\">联系我们</a>."
 
-#: apps/videos/forms.py:559
+#: apps/videos/forms.py:561
 msgid "Youtube usernames"
 msgstr "Youtube用户名"
 
-#: apps/videos/forms.py:559
+#: apps/videos/forms.py:561
 msgid "Enter usernames separated by comma."
 msgstr "输入用户名，以逗号隔开"
 
-#: apps/videos/forms.py:560
+#: apps/videos/forms.py:562
 msgid "Youtube page link."
 msgstr "Youtube页面链接"
 
-#: apps/videos/forms.py:561
+#: apps/videos/forms.py:563
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "例如: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:562
+#: apps/videos/forms.py:564
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr "支持Youtube，Vimeo或者Dailymotion。仅支持的网站添加。"
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:565
 msgid "Save feed"
 msgstr "保存源"
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:565
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr "如果将来你想从此源添加视频，请选择。仅可用RSS源。"
 
-#: apps/videos/forms.py:606
+#: apps/videos/forms.py:608
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr "抱歉，我们没能在你提供的源链接中找到可用源。请查看链接后再次尝试"
 
-#: apps/videos/forms.py:611
+#: apps/videos/forms.py:613
 msgid ""
 "The videos are being added in the background. If you are logged in, you will"
 " receive a message when it's done"
 msgstr "视频已经加入后台。如果你已登录，你将会在它完成时收到一条信息"
 
-#: apps/videos/forms.py:622
+#: apps/videos/forms.py:624
 msgid "captcha"
 msgstr "验证码"
 
@@ -1215,7 +1219,7 @@ msgstr "  已评审视频<a href=\"%(video_url)s\">%(video_name)s</a>的 <a href
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
+msgstr "  已接受 <a href=\"%(language_url)s\">%(language)s</a>  <a href=\"%(video_url)s\">%(video_name)s</a>的字幕"
 
 #: apps/videos/models.py:1866
 #, python-format
@@ -1236,7 +1240,7 @@ msgstr "  通过<a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%(langu
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
+msgstr "  已拒绝 <a href=\"%(language_url)s\">%(language)s</a>  <a href=\"%(video_url)s\">%(video_name)s</a>的字幕"
 
 #: apps/videos/models.py:1881
 #, python-format
@@ -1380,15 +1384,15 @@ msgstr "回顾版本"
 
 #: apps/videos/models.py:2022
 msgid "accept version"
-msgstr ""
+msgstr "接受译文"
 
 #: apps/videos/models.py:2023
 msgid "decline version"
-msgstr ""
+msgstr "拒绝译文"
 
 #: apps/videos/models.py:2024
 msgid "delete video"
-msgstr ""
+msgstr "删除视频"
 
 #: apps/videos/models.py:2274
 #, python-format
@@ -1564,13 +1568,13 @@ msgstr "拥有者禁用视频嵌入"
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
-msgstr ""
+msgstr "这些字幕正在调整中。参见 %s 小组页面以获得如何贡献的信息。"
 
 #: apps/widget/rpc.py:253
 msgid "Sorry, these subtitles are privately moderated."
-msgstr ""
+msgstr "抱歉，这些字幕是私有的。"
 
-#: apps/widget/rpc.py:888 apps/widget/rpc.py:929
+#: apps/widget/rpc.py:892 apps/widget/rpc.py:933
 msgid "\n"
 msgstr "\n"
 
@@ -2408,7 +2412,7 @@ msgstr "奥塞特语"
 
 #: libs/unilangs/unilangs.py:284
 msgid "Papiamento"
-msgstr ""
+msgstr "帕皮阿门托语"
 
 #: libs/unilangs/unilangs.py:285
 msgid "Punjabi"
@@ -3118,39 +3122,39 @@ msgstr "让我们知晓"
 
 #: templates/enterprise.html:13
 msgid "Features & Benefits"
-msgstr ""
+msgstr "特性和收益"
 
 #: templates/enterprise.html:15
 msgid "Amara Platform"
-msgstr ""
+msgstr "Amara平台"
 
 #: templates/enterprise.html:16
 msgid "Global Reach"
-msgstr ""
+msgstr "全世界接触"
 
 #: templates/enterprise.html:17 templates/enterprise.html.py:137
 msgid "Quality Control"
-msgstr ""
+msgstr "质量控制"
 
 #: templates/enterprise.html:18 templates/enterprise.html.py:159
 msgid "Automated Workflows"
-msgstr ""
+msgstr "自动工作流"
 
 #: templates/enterprise.html:19 templates/enterprise.html.py:194
 msgid "Subtitle Management"
-msgstr ""
+msgstr "字幕管理"
 
 #: templates/enterprise.html:21
 msgid "Advanced Security"
-msgstr ""
+msgstr "先进的安全性"
 
 #: templates/enterprise.html:22 templates/enterprise.html.py:223
 msgid "API Integration"
-msgstr ""
+msgstr "API集成"
 
 #: templates/enterprise.html:25
 msgid "Customers"
-msgstr ""
+msgstr "客户"
 
 #: templates/enterprise.html:27 templates/enterprise.html.py:232
 msgid "Companies"
@@ -3160,36 +3164,36 @@ msgstr "公司"
 msgid "Universities"
 msgstr "大学"
 
-#: templates/enterprise.html:29 templates/enterprise.html.py:244
+#: templates/enterprise.html:29 templates/enterprise.html.py:248
 msgid "Publishers"
-msgstr ""
+msgstr "出版商"
 
 #: templates/enterprise.html:30 templates/enterprise.html.py:254
 msgid "Government"
-msgstr ""
+msgstr "政府"
 
 #: templates/enterprise.html:36
 msgid "The World’s Most Advanced Platform for Subtitles"
-msgstr ""
+msgstr "世界最高级的字幕平台"
 
 #: templates/enterprise.html:38
 msgid ""
 "\n"
 "                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API.\n"
 "            "
-msgstr ""
+msgstr "\n                我们的企业级平台提供无与伦比的管理字幕创作，编辑流程，保持高质量字幕的同时明显降低成本的能力。  你有全面的灵活性: 建立志愿者社区, 整合付费的字幕翻译服务, 管理内部职员或承包者, 并通过我们强大的API与你的内嵌及分发平台直接整合.\n            "
 
 #: templates/enterprise.html:44
 msgid "World-class Users"
-msgstr ""
+msgstr "世界级的用户"
 
 #: templates/enterprise.html:52
 msgid "Award-Winning Technology"
-msgstr ""
+msgstr "备受赞誉的技术"
 
 #: templates/enterprise.html:59
 msgid "Unmatched Functionality and Control"
-msgstr ""
+msgstr "无与伦比的功能和控制"
 
 #: templates/enterprise.html:63
 msgid "Build a Translation Team"
@@ -3200,11 +3204,11 @@ msgid ""
 "\n"
 "                For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible for captions and subtitles.  With Amara, you can accomplish the seemingly impossible task of translating your videos into dozens of languages.  Quickly build a powerful, high-quality volunteer translation and captioning team that makes your content truly global.\n"
 "            "
-msgstr ""
+msgstr "\n                多年来, 像Mozilla, Twitter, 和Facebook这样的公司组织志愿者社区翻译他们的站点.  Amara让字幕成为可能.  使用Amara, 你可以完成将视频翻译为多种语言--这样近乎不可能的任务. 迅速的建立高质量的翻译小组，让你的内容真正的全球化.\n            "
 
 #: templates/enterprise.html:69
 msgid "Security and Managed Workflows"
-msgstr ""
+msgstr "安全性和管理工作流"
 
 #: templates/enterprise.html:71
 msgid ""
@@ -3215,18 +3219,18 @@ msgstr ""
 
 #: templates/enterprise.html:75
 msgid "Powerful API and Publishing Integration"
-msgstr ""
+msgstr "强大的API及发布整合"
 
 #: templates/enterprise.html:77
 msgid ""
 "\n"
 "                Our API helps companies tightly integrate Amara with their existing publishing and distribution workflow.  By making subtitles key part of your process, you build a global audience.\n"
 "            "
-msgstr ""
+msgstr "\n                我们的API帮助公司将Amara同他们现有的发布、分发工作流紧密的整合.  通过制作字幕这样的关键流程，你也建立了同全球观众接触的通道.\n            "
 
 #: templates/enterprise.html:81 templates/enterprise.html.py:126
 msgid "Professional Services"
-msgstr ""
+msgstr "专业服务"
 
 #: templates/enterprise.html:83
 msgid ""
@@ -3259,7 +3263,7 @@ msgstr ""
 
 #: templates/enterprise.html:101
 msgid "Subtitles Improve SEO"
-msgstr ""
+msgstr "字幕改进SEO"
 
 #: templates/enterprise.html:103
 msgid ""
@@ -3270,7 +3274,7 @@ msgstr ""
 
 #: templates/enterprise.html:108
 msgid "Build a Global Reach"
-msgstr ""
+msgstr "接触全球"
 
 #: templates/enterprise.html:112
 msgid ""
@@ -3281,7 +3285,7 @@ msgstr ""
 
 #: templates/enterprise.html:116
 msgid "Volunteer Subtitle Creation"
-msgstr ""
+msgstr "志愿字幕创作"
 
 #: templates/enterprise.html:117
 msgid ""
@@ -3328,7 +3332,7 @@ msgstr ""
 
 #: templates/enterprise.html:145
 msgid "Examples of QC processes:"
-msgstr ""
+msgstr "质量管理流程的例子："
 
 #: templates/enterprise.html:147
 msgid ""
@@ -3389,7 +3393,7 @@ msgstr ""
 
 #: templates/enterprise.html:183
 msgid "Professionally created English captions, crowd translation"
-msgstr ""
+msgstr "专业的创建英语字幕，众多的翻译"
 
 #: templates/enterprise.html:184
 msgid ""
@@ -3400,7 +3404,7 @@ msgstr ""
 
 #: templates/enterprise.html:188
 msgid "Crowd translations, with professional quality-control"
-msgstr ""
+msgstr "紧密协作的翻译，并带有专业的质量控制"
 
 #: templates/enterprise.html:189
 #, python-format
@@ -3419,7 +3423,7 @@ msgstr ""
 
 #: templates/enterprise.html:200
 msgid "Import"
-msgstr ""
+msgstr "导入"
 
 #: templates/enterprise.html:201
 msgid ""
@@ -3430,7 +3434,7 @@ msgstr ""
 
 #: templates/enterprise.html:205
 msgid "Process > Author > QC"
-msgstr ""
+msgstr "流程 > 作者 > 质量控制"
 
 #: templates/enterprise.html:206
 msgid ""
@@ -3441,18 +3445,18 @@ msgstr ""
 
 #: templates/enterprise.html:210
 msgid "Deploy"
-msgstr ""
+msgstr "部署"
 
 #: templates/enterprise.html:211
 msgid ""
 "\n"
 "                Use the Amara API to bring completed subtitle data and metadata into your own backend or publishing platform.\n"
 "            "
-msgstr ""
+msgstr "\n                使用Amara API获取完整的字幕数据集元数据至你自己的后端或者发布平台.\n            "
 
 #: templates/enterprise.html:216
 msgid "A Revolutionary Video Security Model"
-msgstr ""
+msgstr "一个革命性的视频安全模型"
 
 #: templates/enterprise.html:218
 msgid ""
@@ -3470,7 +3474,7 @@ msgstr ""
 
 #: templates/enterprise.html:229
 msgid "Amara API Documentation"
-msgstr ""
+msgstr "Amara API 文档"
 
 #: templates/enterprise.html:233
 msgid ""
@@ -3482,21 +3486,21 @@ msgstr ""
 #: templates/enterprise.html:239
 msgid ""
 "\n"
-"                Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
+"                As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
 "            "
 msgstr ""
 
-#: templates/enterprise.html:245
+#: templates/enterprise.html:243
 msgid ""
 "\n"
-"                As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
+"                Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages\n"
 "            "
 msgstr ""
 
 #: templates/enterprise.html:249
 msgid ""
 "\n"
-"                Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages\n"
+"                Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
 "            "
 msgstr ""
 
@@ -3509,11 +3513,11 @@ msgstr ""
 
 #: templates/enterprise.html:261
 msgid "Get started with Amara"
-msgstr ""
+msgstr "开始使用Amara"
 
 #: templates/enterprise.html:262
 msgid "Be in touch at"
-msgstr ""
+msgstr "保持联系"
 
 #: templates/faq.html:16
 msgid "Frequently Asked Questions"
@@ -4297,14 +4301,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "你确定要永久删除你的配置？"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:365
+#: templates/messages/sent.html:51 templates/teams/tasks.html:367
 msgid "Delete"
 msgstr "删除"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:419 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:421 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:385
 msgid "Cancel"
 msgstr "取消"
@@ -4520,7 +4524,7 @@ msgstr ""
 
 #: templates/messages/list.html:74
 msgid "Mark Read"
-msgstr ""
+msgstr "标记已读"
 
 #: templates/messages/list.html:79
 msgid "Reply"
@@ -4546,7 +4550,7 @@ msgstr "发送消息"
 
 #: templates/messages/new.html:6
 msgid "Compose a Message"
-msgstr ""
+msgstr "写消息"
 
 #: templates/messages/sent.html:6
 msgid "Sent Messages"
@@ -4581,14 +4585,14 @@ msgid ""
 "\n"
 "Thanks, <br/>\n"
 "The Amara team\n"
-msgstr ""
+msgstr "嗨,\n\n感谢加入Amara!<br/>\n\n<p>如果你创建了 \"%(user)s\" 在 universalsubtitles.org上的用户账号, 请点击下面的链接验证你的邮箱 (%(email)s):<br/></p>\n\n<p><a href=\"%(activate_url)s\">验证邮件</a></p>\n\n<p>如果你确信错误的收到了此邮件, 我们很抱歉—请忽略它.如果你关心这封邮件请联系 feedback@universalsubtitles.org.</p>\n\n谢谢, <br/>\nThe Amara team\n"
 
 #: templates/messages/email/message_received.html:7
 #, python-format
 msgid ""
 "\n"
 "%(author)s has just sent you a message on Amara:\n"
-msgstr ""
+msgstr "\n%(author)s 刚刚在Amara给你发送了一条信息:\n"
 
 #: templates/messages/email/message_received.html:14
 msgid "Reply to this message"
@@ -4737,11 +4741,11 @@ msgstr ""
 
 #: templates/profiles/dashboard.html:67
 msgid "Decline Task"
-msgstr ""
+msgstr "谢绝任务"
 
 #: templates/profiles/dashboard.html:80
 msgid "You have no open tasks assigned to you."
-msgstr ""
+msgstr "没有开放任务分配给你"
 
 #: templates/profiles/dashboard.html:91
 msgid "Sorry, no activity yet."
@@ -4749,7 +4753,7 @@ msgstr "抱歉，还没有活跃"
 
 #: templates/profiles/dashboard.html:98
 msgid "Alerts"
-msgstr ""
+msgstr "警告"
 
 #: templates/profiles/dashboard.html:115 templates/teams/teams-list.html:107
 msgid "Do you really wish to leave this team?"
@@ -4757,7 +4761,7 @@ msgstr "你真的想退出此组？"
 
 #: templates/profiles/dashboard.html:115
 msgid "leave team"
-msgstr ""
+msgstr "离开小组"
 
 #: templates/profiles/edit_profile.html:5
 msgid "Edit My Profile"
@@ -4765,7 +4769,7 @@ msgstr "编辑我的简介"
 
 #: templates/profiles/edit_profile.html:16
 msgid "Do you really want delete your picture?"
-msgstr ""
+msgstr "你真的想删除你的图片吗？"
 
 #: templates/profiles/edit_profile.html:40
 #: templates/videos/_paste_transcription.html:106
@@ -4784,7 +4788,7 @@ msgstr "个人资料"
 
 #: templates/profiles/edit_profile.html:65
 msgid "Will be displayed publicly"
-msgstr ""
+msgstr "将会公开显示"
 
 #: templates/profiles/edit_profile.html:83
 msgid "remove picture"
@@ -4796,19 +4800,19 @@ msgstr "上载图片"
 
 #: templates/profiles/edit_profile.html:92
 msgid "Account Details"
-msgstr ""
+msgstr "帐户详情"
 
 #: templates/profiles/edit_profile.html:107
 msgid "Notifications"
-msgstr ""
+msgstr "通知"
 
 #: templates/profiles/edit_profile.html:110
 msgid "Send notifications to my UniversalSubtitles.org message inbox"
-msgstr ""
+msgstr "发送通知到我的站内消息收件箱"
 
 #: templates/profiles/edit_profile.html:113
 msgid "Send an email notification for each message received"
-msgstr ""
+msgstr "把每条收到的消息发送成一封邮件通知"
 
 #: templates/profiles/edit_profile.html:116
 msgid "Language Info"
@@ -4829,7 +4833,7 @@ msgstr "添加语言"
 
 #: templates/profiles/edit_profile.html:173
 msgid "Developer Info"
-msgstr ""
+msgstr "开发者信息"
 
 #: templates/profiles/edit_profile.html:183
 #: templates/teams/settings-permissions.html:118
@@ -4867,11 +4871,11 @@ msgstr "成员关系"
 
 #: templates/profiles/view_profile.html:121
 msgid "Profile deleted by user."
-msgstr ""
+msgstr "资料已被用户删除"
 
 #: templates/profiles/view_profile.html:130
 msgid "Edit user"
-msgstr ""
+msgstr "编辑用户"
 
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:6
@@ -5222,11 +5226,11 @@ msgstr ""
 
 #: templates/teams/_actions.html:58
 msgid "Join Team"
-msgstr ""
+msgstr "加入小组"
 
 #: templates/teams/_actions.html:64
 msgid "Want to create your own subtitling team? Contact "
-msgstr ""
+msgstr "想要创建自己的字幕组?联系 "
 
 #: templates/teams/_application_form.html:4
 msgid "Apply to Join"
@@ -5293,12 +5297,12 @@ msgstr "视频页"
 #: templates/videos/subtitle-view.html:135
 #: templates/videos/video-view.html:123
 msgid "Show all"
-msgstr ""
+msgstr "显示所有"
 
 #: templates/teams/_context_project.html:31
 #: templates/teams/_context_team.html:59
 msgid "Task"
-msgstr ""
+msgstr "任务"
 
 #: templates/teams/_context_project.html:56
 #: templates/teams/_context_team.html:89
@@ -5315,13 +5319,13 @@ msgstr ""
 
 #: templates/teams/_context_project.html:94
 msgid "Other"
-msgstr ""
+msgstr "其他"
 
 #: templates/teams/_context_project.html:94
 #: templates/teams/_context_team.html:21
 #: templates/teams/_subnav_settings.html:21
 msgid "Projects"
-msgstr ""
+msgstr "项目"
 
 #: templates/teams/_context_team.html:29
 #: templates/videos/test_form_page.html:24
@@ -5374,12 +5378,12 @@ msgstr "你也可以要求你的朋友帮助翻译其他语言"
 #: templates/teams/_perform_task_link.html:5
 #: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:255
 msgid "Resume"
-msgstr ""
+msgstr "简历"
 
 #: templates/teams/_perform_task_link.html:7
 #: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:257
 msgid "Start now"
-msgstr ""
+msgstr "即刻开始"
 
 #: templates/teams/_subnav_settings.html:5 templates/teams/create.html:43
 msgid "Team Details"
@@ -5443,14 +5447,14 @@ msgstr "移动视频至你的另外一组？"
 #: templates/teams/_team_move_video_select.html:27
 #: templates/teams/_team_move_video_select.html:51
 msgid "Move video"
-msgstr ""
+msgstr "移动视频"
 
 #: templates/teams/_team_move_video_select.html:32
 msgid ""
 "You are about to move this video to a new team.<br /><strong>If you proceed,"
 " all open tasks will be deleted and existing drafts will be "
 "published.</strong>"
-msgstr ""
+msgstr "你即将移动此视频至新组。<br /><strong>如果你继续, 所有的开放任务会被删除，并且现存的草稿将会发布.</strong>"
 
 #: templates/teams/_team_select.html:6
 msgid "Managing"
@@ -5537,7 +5541,11 @@ msgstr "通过"
 msgid "Deny"
 msgstr "拒绝"
 
-#: templates/teams/applications.html:61
+#: templates/teams/applications.html:56
+msgid "Send a message"
+msgstr ""
+
+#: templates/teams/applications.html:66
 msgid "There are no applications right now"
 msgstr "目前没有应用"
 
@@ -5610,7 +5618,7 @@ msgstr "需要哪些语言"
 msgid "Who should do it?"
 msgstr "谁应该做"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:423
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:425
 msgid "Begin typing to search"
 msgstr "键入以搜索"
 
@@ -5767,7 +5775,7 @@ msgstr "项目"
 
 #: templates/teams/members-list.html:113
 msgid "Assignments"
-msgstr ""
+msgstr "分配"
 
 #: templates/teams/members-list.html:122
 msgid "Are you sure you want to remove this member from the team?"
@@ -5850,7 +5858,7 @@ msgstr "谁可以添加/删除视频？"
 
 #: templates/teams/settings-permissions.html:37
 msgid "Manage subtitling and translation work for your videos"
-msgstr ""
+msgstr "管理你的视频字幕翻译工作"
 
 #: templates/teams/settings-permissions.html:39
 msgid "Who can create and assign tasks?"
@@ -5943,7 +5951,7 @@ msgstr ""
 #: templates/teams/settings-permissions.html:106
 #: templates/teams/settings-projects-add.html:54
 msgid "manage languages"
-msgstr ""
+msgstr "语言管理"
 
 #: templates/teams/settings-permissions.html:109
 #: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:61
@@ -5953,7 +5961,7 @@ msgstr "回顾"
 #: templates/teams/settings-permissions.html:112
 #: templates/teams/settings-projects-add.html:60
 msgid "Approval"
-msgstr ""
+msgstr "批准"
 
 #: templates/teams/settings-projects-add.html:18
 #: templates/teams/settings-projects-edit.html:24
@@ -6047,16 +6055,16 @@ msgstr ""
 #: templates/teams/tasks.html:119 templates/teams/tasks.html.py:126
 #: templates/teams/tasks.html:133
 msgid "Clear all filters, sorts, and search terms"
-msgstr ""
+msgstr "清除所有过滤，排序以及查找项"
 
 #: templates/teams/tasks.html:131
 msgid "NOTE:"
-msgstr ""
+msgstr "注意："
 
 #: templates/teams/tasks.html:132
 msgid ""
 "When sorting by expiration date, tasks without an expiration are not shown."
-msgstr ""
+msgstr "当以有效期排序时，不会显示没有设置有效期的任务"
 
 #: templates/teams/tasks.html:190
 msgid "latest draft"
@@ -6095,60 +6103,60 @@ msgstr "未分配"
 msgid "Perform Task"
 msgstr "平台任务"
 
-#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:306
+#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:308
 msgid "Download draft"
-msgstr ""
+msgstr "下载草稿"
 
-#: templates/teams/tasks.html:280
+#: templates/teams/tasks.html:282
 msgid "Upload draft"
-msgstr ""
+msgstr "上传草稿"
 
-#: templates/teams/tasks.html:285
+#: templates/teams/tasks.html:287
 #: templates/videos/_paste_transcription.html:146
 #: templates/videos/_upload_subtitles.html:23
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr "语言"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:292
 msgid "File:"
-msgstr ""
+msgstr "文件："
 
-#: templates/teams/tasks.html:336
+#: templates/teams/tasks.html:338
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:356
+#: templates/teams/tasks.html:358
 msgid "Reassign"
 msgstr "重新分配"
 
-#: templates/teams/tasks.html:358
+#: templates/teams/tasks.html:360
 msgid "Assign"
 msgstr "分配"
 
-#: templates/teams/tasks.html:374
+#: templates/teams/tasks.html:376
 msgid "Delete task"
 msgstr "删除任务"
 
-#: templates/teams/tasks.html:380
+#: templates/teams/tasks.html:382
 msgid "What would you like to do with the subtitles for this task?"
-msgstr ""
+msgstr "对于此字幕的任务，你打算做什么？"
 
-#: templates/teams/tasks.html:383
+#: templates/teams/tasks.html:385
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:387
+#: templates/teams/tasks.html:389
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
-msgstr ""
+msgstr "永久删除字幕(自上个发布版本以来的所有草稿)"
 
-#: templates/teams/tasks.html:426
+#: templates/teams/tasks.html:428
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:436
+#: templates/teams/tasks.html:438
 msgid "Sorry, no tasks here."
 msgstr "抱歉，这里没有任务"
 
@@ -6214,7 +6222,7 @@ msgstr ""
 
 #: templates/teams/teams-list.html:114
 msgid "Sorry, no teams found."
-msgstr ""
+msgstr "抱歉，没有找到小组"
 
 #: templates/teams/teams-list.html:122
 msgid "Search and Filter"
@@ -6229,7 +6237,7 @@ msgid ""
 "\n"
 "                Want to create your own subtitling team? Contact <a href=\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
 "            "
-msgstr ""
+msgstr "\n                想创建自己的字幕组? 联系 <a href=\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n            "
 
 #: templates/teams/videos-list.html:44
 msgid "Add Video"
@@ -6279,7 +6287,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:105
 msgid "Rebuilding video index. Please try again in a few minutes"
-msgstr ""
+msgstr "重建视频索引中，请几分钟后重试"
 
 #: templates/teams/videos-list.html:107
 msgid "Sorry, no videos here"
@@ -6447,7 +6455,7 @@ msgstr "未跟进所有语言"
 
 #: templates/videos/_follow_video_button.html:142
 msgid "You will receive notifications when anyone edits "
-msgstr ""
+msgstr "当有人编辑时你将收到通知 "
 
 #: templates/videos/_follow_video_button.html:144
 msgid " subtitles for this video. You can stop these emails at any time."
@@ -6455,17 +6463,17 @@ msgstr " 此视频的字幕。你可以随时停止这些电子邮件"
 
 #: templates/videos/_follow_video_button.html:145
 msgid "Follow "
-msgstr ""
+msgstr "跟进 "
 
 #: templates/videos/_follow_video_button.html:149
 msgid ""
 "You will receive notifications when anyone edits any subtitles for this "
 "video. You can stop these emails at any time."
-msgstr ""
+msgstr "任何人编辑此视频的字幕时你将收到通知，你可以随时停止收取这些邮件"
 
 #: templates/videos/_follow_video_button.html:150
 msgid "Follow this video"
-msgstr ""
+msgstr "跟进此视频"
 
 #: templates/videos/_follow_video_button.html:158
 msgid "Follow all languages"
@@ -6481,15 +6489,15 @@ msgstr "需要授权"
 
 #: templates/videos/_follow_video_button.html:200
 msgid "x Stop Following"
-msgstr ""
+msgstr "x 停止跟进"
 
 #: templates/videos/_follow_video_button.html:202
 msgid "✓ Click to Follow"
-msgstr ""
+msgstr "✓ 点击跟进"
 
 #: templates/videos/_get_counter.html:3
 msgid "Get counter code:"
-msgstr ""
+msgstr "获得计数器代码"
 
 #: templates/videos/_paste_transcription.html:114
 msgid "Submit a Transcript"
@@ -6503,7 +6511,7 @@ msgid ""
 "            1) Hit enter twice to separate each subtitle;<br/> \n"
 "            2) You cannot submit subtitles longer than 3 lines (2 is best).\n"
 "            "
-msgstr ""
+msgstr "\n            请粘帖副本在下面的空白处.  你在字幕中如何换行 \n            取决于它们在屏幕上如何显示.<br/>\n            1) 敲击换行键两次以便将两个字幕分开;<br/> \n            2) 你不能提交超过3行的字幕(最好2行).\n            "
 
 #: templates/videos/_paste_transcription.html:126
 msgid ""
@@ -6678,11 +6686,11 @@ msgstr "删除此 URL? 警告:这不能复原. 仅删除不匹配的视频或者
 
 #: templates/videos/_watch_page.html:13
 msgid "Rebuilding video index. Please try again a bit later"
-msgstr ""
+msgstr "重建视频索引中，请晚些重试"
 
 #: templates/videos/_watch_page.html:15
 msgid "No videos found"
-msgstr ""
+msgstr "没找到视频"
 
 #: templates/videos/actions_list.html:21
 msgid "There are no activities."
@@ -6858,7 +6866,7 @@ msgstr "旧文本"
 #: templates/videos/email_notification.html:41
 #: templates/videos/email_notification_non_editors.html:35
 msgid "Changes to title"
-msgstr ""
+msgstr "标题的变更"
 
 #: templates/videos/email_notification.html:44
 #: templates/videos/email_notification.html:72
@@ -6872,7 +6880,7 @@ msgstr "新文本"
 #: templates/videos/email_notification.html:69
 #: templates/videos/email_notification_non_editors.html:63
 msgid "Changes to description"
-msgstr ""
+msgstr "描述的变更"
 
 #: templates/videos/email_notification.html:97
 #: templates/videos/email_notification_non_editors.html:91
@@ -7094,7 +7102,7 @@ msgstr "下载"
 
 #: templates/videos/subtitle-view.html:192
 msgid "Draft only"
-msgstr ""
+msgstr "仅草稿"
 
 #: templates/videos/subtitle-view.html:195
 msgid "translated from"

@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-24 01:32-0500\n"
-"PO-Revision-Date: 2012-05-24 06:46+0000\n"
+"POT-Creation-Date: 2012-05-25 01:34-0500\n"
+"PO-Revision-Date: 2012-05-25 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Esperanto (http://www.transifex.net/projects/p/universalsubtitles/language/eo/)\n"
 "MIME-Version: 1.0\n"
@@ -602,22 +602,26 @@ msgstr ""
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:642 apps/videos/forms.py:68 apps/videos/forms.py:86
-#: apps/videos/forms.py:396
+#: apps/teams/forms.py:641
+msgid "You cannot perform that task."
+msgstr ""
+
+#: apps/teams/forms.py:650 apps/videos/forms.py:68 apps/videos/forms.py:86
+#: apps/videos/forms.py:398
 msgid "File size should be less {0} kb"
 msgstr "Dosiergrandeco devas esti malpli granda ol {0} kb"
 
-#: apps/teams/forms.py:647 apps/videos/forms.py:399
+#: apps/teams/forms.py:655 apps/videos/forms.py:401
 msgid ""
 "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr ""
 
-#: apps/teams/forms.py:654 apps/videos/forms.py:73 apps/videos/forms.py:94
-#: apps/videos/forms.py:404
+#: apps/teams/forms.py:662 apps/videos/forms.py:73 apps/videos/forms.py:94
+#: apps/videos/forms.py:406
 msgid "Can not detect file encoding"
 msgstr "Ne povas detekti la signaro-kodon"
 
-#: apps/teams/forms.py:659 apps/videos/forms.py:96 apps/videos/forms.py:406
+#: apps/teams/forms.py:667 apps/videos/forms.py:96 apps/videos/forms.py:408
 msgid "Incorrect subtitles format"
 msgstr "Malbona subteksta dosierspeco!"
 
@@ -1075,9 +1079,9 @@ msgstr "Ne povas enkodigi dosieron. Devas havi utf8-enkodigon."
 
 #: apps/videos/forms.py:89
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
-msgstr "Nekorekta formato. Alŝutu .srt"
+msgstr "Nekorekta formato. Alŝutu .srt, .ssa, .sbv aŭ .xml (TTML-formato)"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:543 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:545 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr ""
 
@@ -1098,38 +1102,38 @@ msgstr "Vi ne rajtas aldoni filman URL-ligilon por tiu filmo."
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Iu alia nun subtekstigas ĉi tiun filmon.  Reprovu poste."
 
-#: apps/videos/forms.py:187 apps/videos/forms.py:211
+#: apps/videos/forms.py:185 apps/videos/forms.py:209
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr ""
 
-#: apps/videos/forms.py:196
+#: apps/videos/forms.py:194
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr ""
 
-#: apps/videos/forms.py:223
+#: apps/videos/forms.py:221
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/videos/forms.py:231 apps/videos/forms.py:234
+#: apps/videos/forms.py:227 apps/videos/forms.py:230
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:528
+#: apps/videos/forms.py:530
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr ""
 
-#: apps/videos/forms.py:531 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:533 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
@@ -1137,49 +1141,49 @@ msgid ""
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "Vi devas ligi al filmo de konforma retejo (ekz \"YouTube\") aŭ senpere al filma dosiero konforma al HTML5-navigiloj. Ekzemple: http://mysite.com/myvideo.ogg aŭ http://mysite.com/myipadvideo.m4v <a href=\"mailto:%s\">Kontaktu nin</a> se vi spertas problemon."
 
-#: apps/videos/forms.py:559
+#: apps/videos/forms.py:561
 msgid "Youtube usernames"
 msgstr "Salutnomo je \"YouTube\""
 
-#: apps/videos/forms.py:559
+#: apps/videos/forms.py:561
 msgid "Enter usernames separated by comma."
 msgstr ""
 
-#: apps/videos/forms.py:560
+#: apps/videos/forms.py:562
 msgid "Youtube page link."
 msgstr "Ligilo al paĝo de \"YouTube\""
 
-#: apps/videos/forms.py:561
+#: apps/videos/forms.py:563
 msgid "For example: http://www.youtube.com/user/username"
 msgstr ""
 
-#: apps/videos/forms.py:562
+#: apps/videos/forms.py:564
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:565
 msgid "Save feed"
 msgstr "Registru la fluon"
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:565
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr ""
 
-#: apps/videos/forms.py:606
+#: apps/videos/forms.py:608
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr ""
 
-#: apps/videos/forms.py:611
+#: apps/videos/forms.py:613
 msgid ""
 "The videos are being added in the background. If you are logged in, you will"
 " receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:622
+#: apps/videos/forms.py:624
 msgid "captcha"
 msgstr ""
 
@@ -1573,7 +1577,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:888 apps/widget/rpc.py:929
+#: apps/widget/rpc.py:892 apps/widget/rpc.py:933
 msgid "\n"
 msgstr ""
 
@@ -1606,37 +1610,37 @@ msgstr "Filtrilo"
 
 #: libs/rosetta/templates/rosetta/languages.html:13
 msgid "Third party"
-msgstr ""
+msgstr "Ekstera liveranto"
 
 #: libs/rosetta/templates/rosetta/languages.html:15
 #: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:57
 msgid "All"
-msgstr ""
+msgstr "Ĉio"
 
 #: libs/rosetta/templates/rosetta/languages.html:29
 msgid "Progress"
-msgstr ""
+msgstr "Progreso"
 
 #: libs/rosetta/templates/rosetta/languages.html:30
 #: templates/messages/new.html:14 templates/messages/sent.html:23
 #: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:20
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
-msgstr ""
+msgstr "Mesaĝoj"
 
 #: libs/rosetta/templates/rosetta/languages.html:31
 #: templates/teams/settings-permissions.html:72
 msgid "Translated"
-msgstr ""
+msgstr "Tradukita"
 
 #: libs/rosetta/templates/rosetta/languages.html:32
 #: libs/rosetta/templates/rosetta/pofile.html:57
 msgid "Fuzzy"
-msgstr ""
+msgstr "Malpreciza"
 
 #: libs/rosetta/templates/rosetta/languages.html:33
 msgid "Obsolete"
-msgstr ""
+msgstr "Neaktuala"
 
 #: libs/rosetta/templates/rosetta/languages.html:34
 msgid "File"
@@ -1644,13 +1648,13 @@ msgstr "Dosiero"
 
 #: libs/rosetta/templates/rosetta/languages.html:55
 msgid "Nothing to translate!"
-msgstr "Nenio tradukebla!"
+msgstr "Nenio tradukota!"
 
 #: libs/rosetta/templates/rosetta/languages.html:56
 msgid ""
 "You haven't specified any languages in your settings file, or haven't yet "
 "generated a batch of translation catalogs."
-msgstr ""
+msgstr "Vi ne indikis lingvon en via agord-dosiero, aŭ ankoraŭ ne produktis aron da tradukaj katalogoj."
 
 #: libs/rosetta/templates/rosetta/languages.html:57
 #, python-format
@@ -1658,7 +1662,7 @@ msgid ""
 "Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N "
 "documentation</a> for a guide on how to set up internationalization for your"
 " project."
-msgstr ""
+msgstr "Bonvolu rilati al <a href=\"%(i18n_doc_link)s\">I18N-Dokumentaro de Ĝango</a> kiel gvido pri difino de internaciigo por via projekto."
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
 msgid "Pick another file"
@@ -1675,26 +1679,26 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:23
 msgid "File is read-only: download the file when done editing!"
-msgstr ""
+msgstr "Dosiero nurlega: elŝutu la dosieron kiam redakto pretas!"
 
 #: libs/rosetta/templates/rosetta/pofile.html:24
 msgid ""
 "Some items in your last translation block couldn't be saved: this usually "
 "happens when the catalog file changes on disk after you last loaded it."
-msgstr ""
+msgstr "Kelkaj elementoj en via lasta traduk-bloko ne povis esti registritaj: tio kutime okazas kiam la memorigita katalog-dosiero ŝangiĝas post vi laste ŝarĝis ĝin."
 
 #: libs/rosetta/templates/rosetta/pofile.html:28
 #, python-format
 msgid "Translate into %(rosetta_i18n_lang_name)s"
-msgstr ""
+msgstr "Traduku al %(rosetta_i18n_lang_name)s"
 
 #: libs/rosetta/templates/rosetta/pofile.html:31
 msgid "Display:"
-msgstr ""
+msgstr "Montri:"
 
 #: libs/rosetta/templates/rosetta/pofile.html:32
 msgid "Untranslated only"
-msgstr ""
+msgstr "Nur tradukita"
 
 #: libs/rosetta/templates/rosetta/pofile.html:33
 msgid "Translated only"
@@ -1702,7 +1706,7 @@ msgstr "Nur tradukita"
 
 #: libs/rosetta/templates/rosetta/pofile.html:34
 msgid "Fuzzy only"
-msgstr ""
+msgstr "Nur nepreciza"
 
 #: libs/rosetta/templates/rosetta/pofile.html:42
 #: templates/search/_search_form.html:31
@@ -1711,7 +1715,7 @@ msgstr "Serĉi"
 
 #: libs/rosetta/templates/rosetta/pofile.html:44
 msgid "Go"
-msgstr ""
+msgstr "Ek"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
 #: templates/teams/tasks.html:162 templates/videos/_video_url_panel.html:19
@@ -1721,21 +1725,21 @@ msgstr "Originala"
 
 #: libs/rosetta/templates/rosetta/pofile.html:58
 msgid "Occurrences(s)"
-msgstr ""
+msgstr "Eltrovita(j)"
 
 #: libs/rosetta/templates/rosetta/pofile.html:72
 #: libs/rosetta/templates/rosetta/pofile.html:75
 #: libs/rosetta/templates/rosetta/pofile.html:93
 msgid "Context hint"
-msgstr ""
+msgstr "Kunteksta indiko"
 
 #: libs/rosetta/templates/rosetta/pofile.html:90
 msgid "Contextual hint"
-msgstr ""
+msgstr "Kunteksta indiko"
 
 #: libs/rosetta/templates/rosetta/pofile.html:100
 msgid "suggest"
-msgstr ""
+msgstr "Sugesto"
 
 #: libs/rosetta/templates/rosetta/pofile.html:111
 #, python-format
@@ -2689,11 +2693,11 @@ msgstr "Zulua"
 
 #: templates/_paginator.html:4 templates/_paginator.html.py:6
 msgid "Previous"
-msgstr ""
+msgstr "Antaŭa"
 
 #: templates/_paginator.html:28 templates/_paginator.html.py:30
 msgid "Next"
-msgstr ""
+msgstr "Sekvanta"
 
 #: templates/_share_widget.html:4
 msgid "Share your subtitles"
@@ -2872,15 +2876,15 @@ msgstr "Privateca politiko"
 
 #: templates/base.html:109
 msgid "Terms of Service"
-msgstr ""
+msgstr "Uz-kontrakto"
 
 #: templates/base.html:119
 msgid "Sentry"
-msgstr ""
+msgstr "Gardi"
 
 #: templates/base.html:122
 msgid "Rosetta"
-msgstr ""
+msgstr "Roseta"
 
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
@@ -2904,7 +2908,7 @@ msgstr ""
 
 #: templates/dmca.html:6
 msgid "Copyright Infringement Notification"
-msgstr ""
+msgstr "Indiko pri kopirajta malobeo"
 
 #: templates/dmca.html:9
 msgid ""
@@ -2913,7 +2917,7 @@ msgid ""
 "written communication that includes substantially the following (please consult\n"
 "your legal counsel or see Section 512(c)(3) of the Copyright Act to confirm\n"
 "these requirements):\n"
-msgstr ""
+msgstr "\nPor registri indikilon pri kopirajta malobeo ĉe ni, vi sendu skribitan komunikon kiu inkludas samsubstance la sekvonta (bonvolu demandu al via leĝa konsilisto aŭ vidu sekcion 512(c)(3) de la Kopirajta Akto por konfirmi tiun necesaĵojn):\n"
 
 #: templates/dmca.html:18
 msgid ""
@@ -2938,7 +2942,7 @@ msgid ""
 "penalty of perjury, that the complaining party is authorized to act on behalf\n"
 "of the owner of an exclusive right that is allegedly infringed.\n"
 "Such written notice should be sent to our designated agent as follows:\n"
-msgstr ""
+msgstr "\nFizikan aŭ ciferan subskribon de persono rajtigita por agi anstataŭ la posedanto de ekskluziva rajto, kiu estas nerespektita.\nIdentigon de la kopirajtaĵo reklamaciita kiel nerespektita, aŭ, se estas pluraj kopirajtaĵoj ĉe ununura retejo inkluzivotaj en unu indikilo, identigo de reprezentiva listo de tiuj verkoj en la retejo.\nIdentigon de la rimedoj reklamaciitaj kiel nerespektitaj aŭ de la subjekto de malrespekta aktivado, kiu estu forlasota aŭ kies alirebleco estu malpermesota, kaj informoj racie sufiĉa por ke la oferanto de la servo povos situigi la rimedon. Doni la ligil-adreson en la korpo de la mesaĝo estas la plej bona maniero helpi nin rapide situigi tiun rimedon.\nInformon racie sufiĉa por ke la oferanto de la servo povu kontakti la plendantan partion, ekzemple adreso, telefon-numero kaj - se disponeblas - retmesaĝ-adreso, por kontakti la plendantan partion.\nAserton ke la plendanta partio havas fidindan kredon ke uzo de la rimedo, uzita tiamaniere kiel ĝi plendas, ne estas permesita laŭ la kopirajto de la posedanto, de ĝia peranto aŭ de la leĝo.\nAserton ke la informo en la indikilo estas ĝusta kaj - kontraŭ akuzo de ĵurrompo - ke la plendanta partio rajtas agi anstataŭ la posedanto de eksluzivaj rajtoj, kiuj estas laŭesprime nerespektitaj.\nTia skribita indikilo estu sendita al nia nomigita peranto, kiel sekvas:\n"
 
 #: templates/dmca.html:55
 msgid ""
@@ -3083,7 +3087,7 @@ msgstr ""
 
 #: templates/embed_page.html:44
 msgid "Find subtitles created by others"
-msgstr "Trovi kreitaj subtekstojn de aliuloj"
+msgstr "Trovi subtekstojn kreitaj de aliuloj"
 
 #: templates/embed_page.html:47
 msgid "Add translations and improve other's work"
@@ -3091,7 +3095,7 @@ msgstr "Aldonu tradukojn kaj plibonigu laboron de aliuloj"
 
 #: templates/embed_page.html:50
 msgid "Make your videos searchable and accessible"
-msgstr "Faru viajn videojn troveblaj kaj atingeblaj"
+msgstr "Farigu viajn filmojn troveblaj kaj atingeblaj"
 
 #: templates/embed_page.html:53
 msgid "Bring your videos to an international audience"
@@ -3165,7 +3169,7 @@ msgstr ""
 msgid "Universities"
 msgstr ""
 
-#: templates/enterprise.html:29 templates/enterprise.html.py:244
+#: templates/enterprise.html:29 templates/enterprise.html.py:248
 msgid "Publishers"
 msgstr ""
 
@@ -3487,21 +3491,21 @@ msgstr ""
 #: templates/enterprise.html:239
 msgid ""
 "\n"
-"                Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
+"                As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
 "            "
 msgstr ""
 
-#: templates/enterprise.html:245
+#: templates/enterprise.html:243
 msgid ""
 "\n"
-"                As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
+"                Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages\n"
 "            "
 msgstr ""
 
 #: templates/enterprise.html:249
 msgid ""
 "\n"
-"                Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages\n"
+"                Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
 "            "
 msgstr ""
 
@@ -3638,7 +3642,7 @@ msgstr ""
 msgid ""
 "Translations make it possible for all of us to watch video in languages that"
 " we don't speak"
-msgstr "Tradukoj ebligas ĉiujn spekti faritajn videojn de aliaj lingvoj ke ni ne konas"
+msgstr "Tradukoj ebligas ĉiujn spekti filmojn en aliaj lingvoj kiuj ni ne scipovas"
 
 #: templates/faq.html:70
 msgid ""
@@ -3942,45 +3946,45 @@ msgstr ""
 
 #: templates/index_old.html:26
 msgid "Easily caption and translate your videos, with help from your viewers."
-msgstr ""
+msgstr "Facile subtitoligu kaj traduku viajn filmojn, helpe de iliaj spektantoj."
 
 #: templates/index_old.html:28
 msgid ""
 "Increase video views by reaching global audiences and being accessible to "
 "the deaf and hard-of-hearing."
-msgstr ""
+msgstr "Plialtigu la nombron de spektoj, atingante tutmondan aŭdantaron, inkluzive de surduloj kaj preskaŭsurdoloj."
 
 #: templates/index_old.html:29
 msgid ""
 "It's powered by viewers and other volunteers: it's collaborative editing and"
 " translation, like a wiki."
-msgstr ""
+msgstr "Ĝi funkcias dank'al spektantoj kaj aliaj volontuloj: estas kunlaborema redakto kaj traduko, kiel vikio."
 
 #: templates/index_old.html:30
 msgid "It's the world's easiest subtitle creator - type and tap."
-msgstr ""
+msgstr "Estas la plej facile kreilo de subtitoloj en la mondo - tajpu kaj klaku."
 
 #: templates/index_old.html:31
 msgid ""
 "The fastest way to add subtitle functionality to a single video or a whole "
 "site. Super easy to integrate with no software to install."
-msgstr ""
+msgstr "La maniero plej rapida aldoni subtitolojn al filmo aŭ tuta retejo. Ege facile por enmeti, sen instalo de programo."
 
 #: templates/index_old.html:32
 msgid "Free, open-source, and non-profit!"
-msgstr ""
+msgstr "Senpaga, malfermitkoda kaj senprofita!"
 
 #: templates/index_old.html:35
 msgid "videos use"
-msgstr ""
+msgstr "filma uzo"
 
 #: templates/index_old.html:62
 msgid "Add this subtitle tab to a video in seconds."
-msgstr ""
+msgstr "Aldonu tiun subtitolan langeton al video post sekundoj."
 
 #: templates/index_old.html:65
 msgid "For an individual video"
-msgstr ""
+msgstr "Por individua filmo"
 
 #: templates/index_old.html:68
 msgid "enter a video URL to enable and then embed anywhere"
@@ -3988,13 +3992,13 @@ msgstr ""
 
 #: templates/index_old.html:71
 msgid "For every video on a page or site"
-msgstr ""
+msgstr "Por ĉiu filmo ĉe paĝo aŭ retejo"
 
 #: templates/index_old.html:73
 msgid ""
 "paste this single line of code into your page header and every video will be"
 " subtitle enabled"
-msgstr ""
+msgstr "kopigluu tiun solan kodlinion en paĝokapan blokon por efektivigi subtitolojn"
 
 #: templates/index_old.html:77
 msgid "Amara works with these video sites and formats"
@@ -4006,7 +4010,7 @@ msgstr ""
 
 #: templates/index_old.html:91
 msgid "Add subtitles"
-msgstr ""
+msgstr "Aldonu subtitolojn"
 
 #: templates/index_old.html:92
 msgid ""
@@ -4027,7 +4031,7 @@ msgid ""
 "          Subtitles lets you collect high-quality translations from your viewer\n"
 "          community.\n"
 "          "
-msgstr ""
+msgstr "\nDe kiam estas subtitoloj, iu ajn spektanto povas aldoni tradukon en iun ajn lingvon. Ne necesas aŭtomata tradukilo kiuj konfuzigas spektantoj. Universalaj subtitoloj lasas kolekti alt-kvalitajn tradukojn de viaj spektantaro."
 
 #: templates/index_old.html:108
 msgid "Get volunteer help"
@@ -4041,15 +4045,15 @@ msgid ""
 "          like an article on wikipedia. We mobilize your international audience to make\n"
 "          your videos more accessible.\n"
 "        "
-msgstr ""
+msgstr "\nViaj spektantoj (kaj membroj de via subtitoliganta grupo) povas plibonigi ĉiujn subtitolojn aŭ tradukoj. Tiel, subtitoloj konstante pliboniĝas, kiel artikolo ĉe Vikipedio. Ni disponigas vian internacian spektantaro por igi viajn filmojn pli alireblaj."
 
 #: templates/index_old.html:122
 msgid "It’s free with no software to download"
-msgstr ""
+msgstr "Estas senpage kaj sen programo instalota"
 
 #: templates/index_old.html:123
 msgid "Add our embed code to your videos."
-msgstr ""
+msgstr "Aldonu enkorpigota kodo en viajn filmojn."
 
 #: templates/index_old.html:124
 msgid ""
@@ -4058,11 +4062,11 @@ msgid ""
 "    When the page loads, our subtitle tools will display underneath your video \n"
 "    (as a small, simple button)\n"
 "    "
-msgstr ""
+msgstr "\nSendu cian filmon, kaj ricevu kodon enkorpigotan ĉe vian retejon. Kiam la paĝo aperas, nia subtitoligilo montriĝos sub via filmo (kiel malgranda, simpla butono)"
 
 #: templates/index_old.html:132
 msgid "Subtitling tools open in your page."
-msgstr "Malfermataj subtekstiloj  en la paĝo"
+msgstr "Subtekstigiloj aperas en la paĝo"
 
 #: templates/index_old.html:133
 msgid ""
@@ -4071,7 +4075,7 @@ msgid ""
 "      a subtitling interface appears on your page (most users never leave your site). \n"
 "      Subtitles they create are then visible to other users, on your site.\n"
 "      "
-msgstr ""
+msgstr "\nKiam iu klakas la butonon subtitoligu min\", subtitola interfaco aperas ĉe via paĝo (plimulto el uzantoj neniam forlasas vian retejon). Subtitoloj, kiujn ili kreas tuj videblas al aliaj uzantoj, ĉe via retejo."
 
 #: templates/index_old.html:142
 msgid "How it works"
@@ -4088,7 +4092,7 @@ msgstr ""
 
 #: templates/index_old.html:149
 msgid "Try the demo"
-msgstr ""
+msgstr "Provu prov-version"
 
 #: templates/index_old.html:156
 msgid "Why Amara is different"
@@ -4097,25 +4101,25 @@ msgstr ""
 #: templates/index_old.html:158
 msgid ""
 "It's built by a 501(c)3 nonprofit working with a community of volunteers"
-msgstr ""
+msgstr "Kunmetita de 501(c)3 senprofita, laborante kun volontula komunumo"
 
 #: templates/index_old.html:158
 msgid "find out how to volunteer"
-msgstr ""
+msgstr "malkovru kiel partopreni"
 
 #: templates/index_old.html:160
 msgid "The code is free and open source"
-msgstr ""
+msgstr "La kodo estas senpaga kaj malfermita"
 
 #: templates/index_old.html:160
 msgid "get the source code"
-msgstr ""
+msgstr "akiru la font-kodon"
 
 #: templates/index_old.html:161
 msgid ""
 "It's built using Javascript and HTML5 instead of proprietary software like "
 "Flash"
-msgstr "Ĝi estas konstruita kun Javascript kaj HTML5 anstataŭ mallibera programo kiel Flash"
+msgstr "Ĝi estas konstruita per \"Javascript\" kaj \"HTML5\" anstataŭ mallibera programo kiel \"Flash\""
 
 #: templates/index_old.html:162
 msgid "It's 100% web-based, there’s no software to download."
@@ -4125,11 +4129,11 @@ msgstr "Ĝi estas 100% ttt-a, ne estas programo por elŝuti."
 msgid ""
 "You don't have to host your video with us, and you're not dependent on any "
 "one video host, platform, or format."
-msgstr ""
+msgstr "Vi ne devas gastigi vian filmon ĉe ni kaj vi ne dependas de iu ajn gastiganto, platformo, nek formato."
 
 #: templates/index_old.html:164
 msgid "People are free to add subtitles to any video"
-msgstr "Homoj estas libera por aldoni subtekstojn al iu ajn video"
+msgstr "Homoj estas liberaj por aldoni subtekstojn al iu ajn filmo"
 
 #: templates/index_old.html:170 templates/jsdemo/home.html:112
 msgid "Mozilla will double your donation!"
@@ -4302,14 +4306,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr ""
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:365
+#: templates/messages/sent.html:51 templates/teams/tasks.html:367
 msgid "Delete"
 msgstr ""
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:419 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:421 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:385
 msgid "Cancel"
 msgstr "Nuligi"
@@ -4462,7 +4466,7 @@ msgstr ""
 
 #: templates/livesettings/site_settings.html:52
 msgid "Edit Site Settings"
-msgstr "Ŝanĝi Retaj Agordoj"
+msgstr "Ŝanĝi Retajn Agordojn"
 
 #: templates/livesettings/site_settings.html:59
 msgid "Livesettings are disabled for this site."
@@ -4475,8 +4479,8 @@ msgstr ""
 #: templates/livesettings/site_settings.html:66
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Bonvolu korekti la eraron malsupre."
-msgstr[1] "Bonvolu korekti la erarojn malsupre."
+msgstr[0] "Bonvolu korekti la sekvontan eraron."
+msgstr[1] "Bonvolu korekti la sekvontajn erarojn."
 
 #: templates/livesettings/site_settings.html:82
 #, python-format
@@ -4678,7 +4682,7 @@ msgstr "Ni vere bezonas vian helpon!"
 
 #: templates/profiles/_select_language_dialog.html:16
 msgid "What languages do you speak?"
-msgstr "Kiujn lingvojn vi parolas?"
+msgstr "Kiujn lingvojn vi scipovas?"
 
 #: templates/profiles/_select_language_dialog.html:29
 msgid "Submit"
@@ -5547,7 +5551,11 @@ msgstr ""
 msgid "Deny"
 msgstr ""
 
-#: templates/teams/applications.html:61
+#: templates/teams/applications.html:56
+msgid "Send a message"
+msgstr ""
+
+#: templates/teams/applications.html:66
 msgid "There are no applications right now"
 msgstr ""
 
@@ -5570,7 +5578,7 @@ msgstr ""
 #: templates/teams/create.html:33 templates/teams/teams-list.html:6
 #: templates/teams/teams-list.html.py:29
 msgid "My Teams"
-msgstr "Miaj Teamoj"
+msgstr "Miaj Skipoj"
 
 #: templates/teams/create.html:51
 msgid "Display Settings"
@@ -5620,7 +5628,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:423
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:425
 msgid "Begin typing to search"
 msgstr ""
 
@@ -6105,60 +6113,60 @@ msgstr ""
 msgid "Perform Task"
 msgstr ""
 
-#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:306
+#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:308
 msgid "Download draft"
 msgstr ""
 
-#: templates/teams/tasks.html:280
+#: templates/teams/tasks.html:282
 msgid "Upload draft"
 msgstr ""
 
-#: templates/teams/tasks.html:285
+#: templates/teams/tasks.html:287
 #: templates/videos/_paste_transcription.html:146
 #: templates/videos/_upload_subtitles.html:23
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr "Lingvo"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:292
 msgid "File:"
 msgstr ""
 
-#: templates/teams/tasks.html:336
+#: templates/teams/tasks.html:338
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:356
+#: templates/teams/tasks.html:358
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:358
+#: templates/teams/tasks.html:360
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:374
+#: templates/teams/tasks.html:376
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:380
+#: templates/teams/tasks.html:382
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:383
+#: templates/teams/tasks.html:385
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:387
+#: templates/teams/tasks.html:389
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:426
+#: templates/teams/tasks.html:428
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:436
+#: templates/teams/tasks.html:438
 msgid "Sorry, no tasks here."
 msgstr ""
 
@@ -6442,7 +6450,7 @@ msgstr ""
 msgid ""
 " subtitles for this video are edited. You can choose to follow again at any "
 "time."
-msgstr ""
+msgstr "Subtitoloj de tiu filmo estas redaktataj. Vi povas elekti denove sekvi iam ajn."
 
 #: templates/videos/_follow_video_button.html:92
 msgid "Stop following "
@@ -6455,7 +6463,7 @@ msgstr " subtekstoj"
 
 #: templates/videos/_follow_video_button.html:104
 msgid "Unfollow all languages"
-msgstr ""
+msgstr "Ne plu sekvi ĉiuj lingvojn"
 
 #: templates/videos/_follow_video_button.html:142
 msgid "You will receive notifications when anyone edits "
@@ -6481,15 +6489,15 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:158
 msgid "Follow all languages"
-msgstr ""
+msgstr "Sekvi ĉiujn lingvojn"
 
 #: templates/videos/_follow_video_button.html:175
 msgid "You must log in to follow a video."
-msgstr ""
+msgstr "Vi ensalutu por sekvi filmon."
 
 #: templates/videos/_follow_video_button.html:176
 msgid "Authentication required"
-msgstr ""
+msgstr "Ensaluto estas necesa"
 
 #: templates/videos/_follow_video_button.html:200
 msgid "x Stop Following"
@@ -6627,7 +6635,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:44
 msgid "Learn more"
-msgstr "Lerni pli"
+msgstr "Lernu pli"
 
 #: templates/videos/_video_url_panel.html:46
 msgid ""
