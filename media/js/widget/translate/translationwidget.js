@@ -80,11 +80,11 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
 unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event) {
     this.onFocusText_ = this.translateInput_.value;
 
-    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
+    var videoPlayer = this.dialog_.getVideoPlayerInternal();
+    var videoPlayerType = videoPlayer.videoPlayerType_;
 
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
-        this.dialog_.getVideoPlayerInternal().setPlayheadTime(this.subtitle_['start_time']);
-        this.dialog_.getVideoPlayerInternal().pause();
+    if (videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
+        videoPlayer.setPlayheadTime(this.subtitle_['start_time']);
     }
 };
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
@@ -116,7 +116,7 @@ unisubs.translate.TranslationWidget.prototype.cloneToCaptionManager = function(d
     if (currentText !== '') {
         editableCaption.setText(currentText);
         if (!dontShowNow) {
-            if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
+            if (videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
                 this.dialog_.getVideoPlayerInternal().showCaptionText(currentText);
             }
         }
@@ -126,7 +126,7 @@ unisubs.translate.TranslationWidget.prototype.cloneToCaptionManager = function(d
             var originalText = editableCaption.getOriginalText();
             editableCaption.setText(originalText);
             if (!dontShowNow) {
-                if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
+                if (videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
                     this.dialog_.getVideoPlayerInternal().showCaptionText(originalText);
                 }
             }
