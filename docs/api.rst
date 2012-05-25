@@ -536,7 +536,7 @@ Create a new project:
 
 Example payload for creating a new project:
 
-::
+.. code-block:: json
 
     {
         "name": "Project name",
@@ -553,7 +553,7 @@ Update an existing project:
 
 For example, to change the project's name:
 
-::
+.. code-block:: json
 
     {
         "name": "Project"
@@ -562,3 +562,37 @@ For example, to change the project's name:
 Delete a project:
 
 .. http:delete:: /api2/partners/teams/[team-slug]/projects/[project-slug]/
+
+Task Resource
+~~~~~~~~~~~~~
+
+List all tasks for a given team:
+
+.. http:get:: /api2/partners/teams/[team-slug]/tasks/
+
+Task detail:
+
+.. http:get:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
+
+Create a new project:
+
+.. http:post:: /api2/partners/teams/[team-slug]/tasks/
+
+Update an existing task:
+
+.. http:put:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
+
+
+An example response:
+
+.. code-block:: json
+
+    {
+        "approved": null,
+        "assignee": "honza",
+        "language": "en",
+        "priority": 1,
+        "resource_uri": "/api2/partners/teams/honza2/tasks/3/",
+        "type": "Subtitle",
+        "video_id": "Myn4j5OI7BxL"
+    }
