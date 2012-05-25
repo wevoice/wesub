@@ -589,10 +589,10 @@ An example response:
 
     {
         "approved": null,
-        "assignee": "honza",
+        "assignee": "johnsmith",
         "language": "en",
         "priority": 1,
-        "resource_uri": "/api2/partners/teams/honza2/tasks/3/",
+        "resource_uri": "/api2/partners/teams/all-star/tasks/3/",
         "type": "Subtitle",
         "video_id": "Myn4j5OI7BxL"
     }
