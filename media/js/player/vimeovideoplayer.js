@@ -233,7 +233,7 @@ unisubs.player.VimeoVideoPlayer.prototype.onVimeoPlayerReady_ = function(swf_id)
     var onPauseFn = "onVimeoPau" + randomString;
     window[onPauseFn] = function(swfID) {
         that.isPlaying_ = false;
-        that.timeUpdatetimer_.stop();
+        that.timeUpdateTimer_.stop();
     };
     this.player_['api_addEventListener']('onPause', onPauseFn);
 };
