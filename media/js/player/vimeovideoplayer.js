@@ -236,7 +236,20 @@ unisubs.player.VimeoVideoPlayer.prototype.onVimeoPlayerReady_ = function(swf_id)
         that.timeUpdateTimer_.stop();
     };
     this.player_['api_addEventListener']('onPause', onPauseFn);
+    var onSeekFn = "onVimeoSeek" + randomString;
+    window[onSeekFn] = function(data) {
+        that.onPlayerSeeked(data)
+    };
+
+    this.player_['api_addEventListener']('seek', onSeekFn);
 };
+
+/**
+* @param playheadTime Time (in secondds) of the current playhead time
+**/
+unisubs.player.VimeoVideoPlayer.prototype.onPlayerSeeked = function (playheadTime){
+    // do something with the playhead time
+}
 unisubs.player.VimeoVideoPlayer.prototype.getVideoSize = function() {
     return this.playerSize_;
 };
