@@ -157,13 +157,44 @@ unisubs.player.VimeoVideoPlayer.prototype.setVolume = function(volume) {
     else
         this.commands_.push(goog.bind(this.setVolume, this, volume));
 };
-unisubs.player.VimeoVideoPlayer.prototype.setPlayheadTime = function(playheadTime) {
+unisubs.player.VimeoVideoPlayer.prototype.setPlayheadTime = function(playheadTime, pauseAfter) {
     if (this.player_) {
         this.player_['api_seekTo'](playheadTime);
+
+        if (pauseAfter) {
+            console.log('Setting this.pauseAt_ to ' + playheadTime);
+            this.pauseAt_ = playheadTime;
+        }
+
         this.sendTimeUpdateInternal();
     }
     else
         this.commands_.push(goog.bind(this.setPlayheadTime, this, playheadTime));
+};
+unisubs.player.VimeoVideoPlayer.prototype.sendTimeUpdateInternal = function() {
+    if (!this.noUpdateEvents_) {
+        this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.TIMEUPDATE);
+
+        if (this.pauseAt_) {
+            console.log('this.pauseAt_ is ' + this.pauseAt_);
+            console.log('this.getPlayheadTimeInternal() is ' + this.getPlayheadTimeInternal());
+            if (this.pauseAt_ === this.getPlayheadTimeInternal()) {
+                this.pause();
+                this.pauseAt_ = false;
+
+                console.log('We paused at ' + this.getPlayheadTime());
+            }
+        }
+    } else {
+        if (!this.ignoreTimeUpdate_ && this.getPlayheadTime() >= this.noUpdateEndTime_) {
+            this.ignoreTimeUpdate_ = true;
+            this.setPlayheadTime(this.noUpdatePreTime_);
+            this.noUpdatePreTime_ = null;
+            this.pause();
+            this.ignoreTimeUpdate_ = false;
+            this.noUpdateEvents_ = false;
+        }
+    }
 };
 unisubs.player.VimeoVideoPlayer.prototype.getVideoSize = function() {
     return new goog.math.Size(unisubs.player.VimeoVideoPlayer.WIDTH,
