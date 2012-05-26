@@ -5,13 +5,13 @@
 # Translators:
 # Antón Méixome <certima@certima.net>, 2012.
 # <meixome@certima.net>, 2011.
-#   <meixome@certima.net>, 2011.
+#   <meixome@certima.net>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-25 01:34-0500\n"
-"PO-Revision-Date: 2012-05-25 06:48+0000\n"
+"POT-Creation-Date: 2012-05-26 01:32-0500\n"
+"PO-Revision-Date: 2012-05-26 06:47+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Galician (http://www.transifex.net/projects/p/universalsubtitles/language/gl/)\n"
 "MIME-Version: 1.0\n"
@@ -46,7 +46,7 @@ msgstr "Confirmación de contrasinal"
 
 #: apps/auth/admin.py:38
 msgid "Email"
-msgstr "Correo electr"
+msgstr "Correo el."
 
 #: apps/auth/admin.py:79 templates/auth/_announcement.html:7
 #: templates/messages/_messages.html:8 templates/videos/create.html:63
@@ -601,7 +601,7 @@ msgstr "Non ten permiso para despublicar os subtítulos."
 
 #: apps/teams/forms.py:641
 msgid "You cannot perform that task."
-msgstr ""
+msgstr "Non pode realizar esa tarefa."
 
 #: apps/teams/forms.py:650 apps/videos/forms.py:68 apps/videos/forms.py:86
 #: apps/videos/forms.py:398
@@ -1089,7 +1089,7 @@ msgid ""
 "If you'd like to us to add support for a new site or format, or if you\n"
 "think there's been some mistake, <a\n"
 "href=\"mailto:%s\">contact us</a>!"
-msgstr "Amara non soporta o formato dese sitio web ou dese vídeo.\nIf you'd like to us to add support for a new site or format, or if you\nthink there's been some mistake, <a\nhref=\"mailto:%s\">contact us</a>!"
+msgstr "Amara non é compatíbel co formato dese sitio web ou dese vídeo.\nSe lle gustaría que engdiramos a compatibilidade cun novo sitio ou formato, ou se pensa\npensa que hai algún erro, <a\nhref=\"mailto:%s\">contacte con nós</a>!"
 
 #: apps/videos/forms.py:139
 msgid "You have not permission add video URL for this video"
@@ -1128,7 +1128,7 @@ msgstr "Non podemos enviar os seus subtítulos porque este idioma está moderado
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
-msgstr "Please try again with a link to a video page.\n                        <a href=\"mailto:%s\">Contacta con nós</a> se tes problemas"
+msgstr "Tente outra vez cunha ligazón a unha páxina de vídeo.\n                        <a href=\"mailto:%s\">Contacte con nós</a> se ten problemas"
 
 #: apps/videos/forms.py:533 apps/videos/types/forms.py:21
 #, python-format
@@ -1136,7 +1136,7 @@ msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
 "                    video file that works with HTML5 browsers. For example: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
-msgstr "You must link to a video on a compatible site (like YouTube) or directly to a\n                    arquivo de vídeo traballa con navegadores HTML5 For example: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n                    <a href=\"mailto:%s\">Contacta con nós</a> se tes problemas"
+msgstr "Debe facer unnha ligazón a un vídeo ou a un sitio compatíbel (como YouTube) ou directamente a\n                    un ficheiro de vídeo que funcione con navegadores HTML5. Por exemplo: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n                    <a href=\"mailto:%s\">Contacte con nós</a> se ten problemas"
 
 #: apps/videos/forms.py:561
 msgid "Youtube usernames"
@@ -1239,7 +1239,7 @@ msgstr "  aceptados <a href=\"%(language_url)s\">%(language)s</a> os subtítulos
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "  declinados <a href=\"%(language_url)s\">%(language)s</a> os subtítulos para <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "  declináronse <a href=\"%(language_url)s\">%(language)s</a> os subtítulos para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1881
 #, python-format
@@ -1542,14 +1542,14 @@ msgstr[1] "%(count)s liñas"
 
 #: apps/videos/types/dailymotion.py:85
 msgid "Video is unavailable"
-msgstr "O vídeo non está dispoñibel"
+msgstr "O vídeo non está dispoñíbel"
 
 #: apps/videos/types/forms.py:18
 #, python-format
 msgid ""
 "Please try again with a link to a video page. \n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
-msgstr "Please try again with a link to a video page. \n                        <a href=\"mailto:%s\">Contacta con nós</a> se tes problemas"
+msgstr "Ténteo outra vez cunha ligazón a unha páxina de vídeos. \n                        <a href=\"mailto:%s\">Contacte con nós</a> se ten problemas."
 
 #: apps/videos/types/youtube.py:47
 msgid "Private video"
@@ -1561,7 +1561,7 @@ msgstr "Erro indefinido"
 
 #: apps/widget/rpc.py:106
 msgid "Video embedding disabled by owner"
-msgstr "Ligazón de vídeo deshabilitado polo propietario"
+msgstr "Incorporación de vídeo desactivada polo propietario"
 
 #: apps/widget/rpc.py:251
 #, python-format
@@ -1651,7 +1651,7 @@ msgstr "Nada que traducir!"
 msgid ""
 "You haven't specified any languages in your settings file, or haven't yet "
 "generated a batch of translation catalogs."
-msgstr "Non especificou ningún idioma no ficheiro de ferramentas, ou inda non xerou un ficheiro de lotes de catálogo de tradución."
+msgstr "Non especificou ningún idioma no ficheiro de ferramentas, ou aínda non xerou un ficheiro de lotes de catálogo de tradución."
 
 #: libs/rosetta/templates/rosetta/languages.html:57
 #, python-format
@@ -1659,7 +1659,7 @@ msgid ""
 "Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N "
 "documentation</a> for a guide on how to set up internationalization for your"
 " project."
-msgstr "Please refírase a<a href=\"%(i18n_doc_link)s\">Django's I18N documentación</a> para a guía de como hai que activar a internacionalización do proxecto. "
+msgstr "Please vaia a<a href=\"%(i18n_doc_link)s\">Django's I18N documentación</a> para a guía de como hai que activar a internacionalizacióndo proxecto. "
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
 msgid "Pick another file"
@@ -1676,13 +1676,13 @@ msgstr "Progreso: %(percent_translated)s%%"
 
 #: libs/rosetta/templates/rosetta/pofile.html:23
 msgid "File is read-only: download the file when done editing!"
-msgstr "Ficheiro só de lectura: descargar o ficheiro cando se fagan as modificacións "
+msgstr "Ficheiro que só permite lectura: descargar o ficheiro cando remate a edición!"
 
 #: libs/rosetta/templates/rosetta/pofile.html:24
 msgid ""
 "Some items in your last translation block couldn't be saved: this usually "
 "happens when the catalog file changes on disk after you last loaded it."
-msgstr "Algúns dos elementos do último bloque de tradución non se pode gravar: isto pasa cando "
+msgstr "Algúns dos elementos do último bloque de tradución non se poden gravar: isto pasa cando se o ficheiro do catálogo cambia no disco despois de que fose cargado."
 
 #: libs/rosetta/templates/rosetta/pofile.html:28
 #, python-format
@@ -3283,130 +3283,130 @@ msgid ""
 "\n"
 "                Amara is the premiere platform for taking video content global. Whether you’re working with volunteer translators, engaging your own staff, or hiring professionals, you can easily manage the end-to-end process.\n"
 "            "
-msgstr ""
+msgstr "\n                Amara é a primeira plataforma para facer o contido de vídeo global. Se está traballando con tradutores voluntarios, involucrando o seu propio persoal persoal ou contratando profesionais, facilmente pode xestionar o proceso de principio a fin.\n            "
 
 #: templates/enterprise.html:116
 msgid "Volunteer Subtitle Creation"
-msgstr ""
+msgstr "Creación de subtitulación por voluntariado"
 
 #: templates/enterprise.html:117
 msgid ""
 "\n"
 "                Amara currently supports some of the largest volunteer video translation efforts on the planet. Our technology makes captioning, subtitling, and translating very easy, fun, and engaging which enables ongoing, massive, collaborations.\n"
 "            "
-msgstr ""
+msgstr "\n                Amara da apoio a algúns dos maiores esforzos de tradución de vídeo do planeta. A nosa tecnoloxía fai da descrición, subtitulación e tradución algo moi fácil, divertido, e reforzando a colaboración máis actual, masiva.\n            "
 
 #: templates/enterprise.html:121
 msgid "Private Crowd Subtitle Creation"
-msgstr ""
+msgstr "Creación de grupos de subtitulación privados"
 
 #: templates/enterprise.html:122
 msgid ""
 "\n"
 "                If you have a workforce, student group, or any other non-public crowd, you can limit access for captioning, translating, and subtitling OR reviewing the work of peers, volunteers, or professionals.\n"
 "            "
-msgstr ""
+msgstr "\n                Se ten un grupo de traballo, un grupo de estudanes ou calquera outro grupo non público, pode limitar o acceso de descrición, tradución ou subtitulación OU revisión do traballo por pares, voluntariado ou profesionais.\n            "
 
 #: templates/enterprise.html:127
 msgid ""
 "\n"
 "                Selectively engage professionals for captioning or subtitling into nearly any language, or even to help with Quality Control. All completed work is centralized on Amara, ready for incremental quality control and quick deployment.\n"
 "            "
-msgstr ""
+msgstr "\n                Selectivamente dedique profesionais para descrición ou subtitulación in practicamente calquera idioma ou mesmo para axudar no control de calidade. Todo o traballo completado está centralizado en Amara, a punto para un control incremental de calidade e un rápido despregamento.\n            "
 
 #: templates/enterprise.html:131
 msgid "Hybrid Approach"
-msgstr ""
+msgstr "Aproximación híbrida"
 
 #: templates/enterprise.html:132
 msgid ""
 "\n"
 "                Mix and match these different approaches on the initial (subtitle authoring) pass, as well as subsequent review passes (for Quality Control). This is an advantage that you only get with Amara, a fully featured solution that manages the process end to end.\n"
 "            "
-msgstr ""
+msgstr "\n                Mestura e emparella estas aproximacións diferentes nos pasos iniciais (autoría de subtitulación), así como os seguintes pasos (do control de calidade). Isto é unha vantaxe que só se consegue con Amara, unha solución plenamente funcional que xestiona o proceso de principio a fin.\n            "
 
 #: templates/enterprise.html:141
 msgid ""
 "\n"
 "                Amara’s Flexible Workflows offer several ways to ensure outstanding quality for your subtitles.  Whether you use internal staff, outside contractors, professional services, or a volunteer community -- you’ll be able to create, review, and approve workflows that meet your needs.\n"
 "            "
-msgstr ""
+msgstr "\n                Os flexíbeis fluxos de traballo de Amara ofrecen varias posibilidades para asegurar unha calidade fóra de serie para os subtítulos. Cando dedique persoal propio, contratistas externos, servizos profesionais ou unha comunidade de voluntariado -- poderá crear, revisar e aprobar fluxos que coincidan coas súas necesidades."
 
 #: templates/enterprise.html:145
 msgid "Examples of QC processes:"
-msgstr ""
+msgstr "Exemplos de procesos de control de calidade:"
 
 #: templates/enterprise.html:147
 msgid ""
 "\n"
 "                    Have your contractors work inside your Amara account and then require staff review before subtitles go live.\n"
 "                "
-msgstr ""
+msgstr "\n                    Ten contratistas traballando dentro da súa conta Amara e require, daquela, que o seu persoal propio o revise antes de que os subtítulos sexan públicos."
 
 #: templates/enterprise.html:150
 msgid ""
 "\n"
 "                    Some universities use paid captioning services to quickly caption lecture videos and then invite experts in the university community to fix any mistakes with proper names or technical terms.\n"
 "                "
-msgstr ""
+msgstr "\n                    Algunhas universidades usan servizos de descrición de pago para crear lecturas de descrición de vídeos e, logo, convidar a expertos propios a arranxar calquera erro con palabras apropiadas ou termos técnicos."
 
 #: templates/enterprise.html:153
 msgid ""
 "\n"
 "                    Volunteer teams can self-manage and reach very high quality by requiring peer review of subtitles before they are published.  More senior members of the community can be promoted to a moderator role.\n"
 "                "
-msgstr ""
+msgstr "\n                    Os equipos de voluntariado poden autoxestionarse e acadar moi unha moi alta calidade solicitando revisión por pares de subtítulos antes de publicalos. Os membros veteráns da comunidade poden ser promovidos a un rol de moderación."
 
 #: templates/enterprise.html:163
 msgid ""
 "\n"
 "                Workflows enable automating the flow of content through different authoring groups, including: volunteers, private crowds (staff, employees, students, etc), and professionals. They can be used for both first pass (authoring), as well as subsequent review passes for Quality Control.\n"
 "            "
-msgstr ""
+msgstr "\n                Os fluxos de traballo automatizan o fluxo de contido a través de diferentes grupos de autores: voluntarios, grupos privados (persoal propio, empregados, estudantes, etc.) e profesionais. Poden usarse tanto para os primeiros pasos (proceso de autoría) como para os consecutivos pasos de revisión e control de calidade."
 
 #: templates/enterprise.html:167
 msgid ""
 "\n"
 "                Different workflows can be chained together to create an unlimited number of highly flexible configurations. The Amara team can help you determine the best workflow for your subtitle processes and integrate it with your existing publishing platform.\n"
 "            "
-msgstr ""
+msgstr "\n                Os diferentes fluxos de traballo pódense encadear xuntos para crear un ilimitado número de configuracións altamente flexíbeis. O equipo Amara pode axudalo a determinar o mellor fluxo de traballo para o seu proceso de subtitulación e integralo xunto coa súa plataforma de publicación."
 
 #: templates/enterprise.html:171
 msgid "Contractors with Staff Review"
-msgstr ""
+msgstr "Contratistas con revisión por persoal propio"
 
 #: templates/enterprise.html:172
 msgid ""
 "\n"
 "                Use captioning and transcription contractors to create your subtitles, then require staff review and approval before they are published back to your server. Remember, no one sees your subtitles until YOU publish it.\n"
 "            "
-msgstr ""
+msgstr "\n                Use contratistas para descrición e transcrición ao crear os seus subtítulos, logo pídalle ao seu persoal a revisión e aprobación antes de que se publique no seu servidor. Lembre, ninguén ve os subtítulos ata que VOSTEDE os publique.\n            "
 
 #: templates/enterprise.html:176
 msgid "Crowdsourced subtitles, followed by staff review"
-msgstr ""
+msgstr "Subtitulación colectiva, seguida de revisión por persoal propio."
 
 #: templates/enterprise.html:177
 msgid ""
 "\n"
 "                In many cases, organizations want to leverage the power of the crowd, but don’t want to leave any chance for poor quality captions or subtitles to appear on their content. This workflow keeps videos private until a staff member has approved the subtitles.\n"
 "            "
-msgstr ""
+msgstr "\n                Nalgúns casos, as organizacións queren aproveitar o potencial colectivo pero non queren deixar ningunha opción de que descricións ou subitítulos de pobre calidade poidan aparecer nos seus contidos. Este fluxo de traballo retén os vídeos como privados ata que un membro do persoal aprobe os subtítulos."
 
 #: templates/enterprise.html:183
 msgid "Professionally created English captions, crowd translation"
-msgstr ""
+msgstr "Descricións creadas profesionalmente en inglés, tradución colectiva"
 
 #: templates/enterprise.html:184
 msgid ""
 "\n"
 "                Amara offers professional- quality captions at very low cost with quick turn-around times. English can often be done in less than a day.  Once English is completed, it’s a snap to request translations from volunteers or staff. We have seen videos translated into multiple languages in just days -- through a volunteer crowd.\n"
 "            "
-msgstr ""
+msgstr "\n                Amara ofrece descrición profesional - a moi baixo custo con rápidos ciclos-. O inglés adoita poderse facer nun día. Unha vez o inglés feito, non é precipitado solicitar a tradución por parte dos voluntarios ou do propio persoal. Temos visto videos traducidos en varios idiomas en poucos días - mediante un grupo de voluntariado.\n            "
 
 #: templates/enterprise.html:188
 msgid "Crowd translations, with professional quality-control"
-msgstr ""
+msgstr "Traducións colectivas, con control de calidade profesional"
 
 #: templates/enterprise.html:189
 #, python-format
@@ -3414,104 +3414,104 @@ msgid ""
 "\n"
 "                Amara is, quite simply, the most cost-effective way to get professional-level quality for foreign language video subtitles. By leveraging professional quality review, you can expect to pay roughly 75%% less than the market price for traditional professional subtitles.\n"
 "            "
-msgstr ""
+msgstr "\n                Amara é, para dicilo simplemente, o camiño máis eficaz en termos de custo- eficiencia para obter subtítulos de nivel de calidade profesional en idiomas «estranxeiros». Apoiándose na revisión profesional, pode supoñer un aforro que ronde un 75%% menos que o prezo do mercado para subtitulación profesional tradicional.\n            "
 
 #: templates/enterprise.html:196
 msgid ""
 "\n"
 "                At its core, Amara is the definitive platform for managing captions and subtitles.  Whether you are creating, revising, or translating subtitles -- you can choose to centralize the management -- or divide up your content, and delegate responsibilities and control.\n"
 "            "
-msgstr ""
+msgstr "\n                Esta é a clave, Amara é a plataforma definitiva para a xestión de descricións e subtítulos. Cando está creando, revisando ou traducindo subtítulos -- pode escollar entre centralizar a xestión -- ou dividir o seu contido e delegar responsabilidades e control."
 
 #: templates/enterprise.html:200
 msgid "Import"
-msgstr ""
+msgstr "Importar"
 
 #: templates/enterprise.html:201
 msgid ""
 "\n"
 "                Your videos are never uploaded to our server (learn more about our Security Model), so you actually import pointers to existing video files—whether you’re hosting on your own server, YouTube, Vimeo, other video hosting service, or combination thereof. Import these video pointers via graphical interface or API, plus we can import a wide variety of subtitle and transcript formats in case you have pre-existing data.\n"
 "            "
-msgstr ""
+msgstr "\n                Os seus vídeos nunca serán subidos ao seu servidor (lea sobre o noso modelo de seguranza), de modo que agora importará enderezos a vídeos existentes -cando os teña aloxados no seu propio servidor, YouTube, Vimeto ou outro servizo de de hospedaxe, ou combinación de varios deles. Importe eses enderezos a vídeos a través da súa interface gráfica ou API, ademais de que podemos importar unha ampla variedade de subtítulos en formatos de transcrición en cado de ter datos preexistentes."
 
 #: templates/enterprise.html:205
 msgid "Process > Author > QC"
-msgstr ""
+msgstr "Proceso > Autor > CC"
 
 #: templates/enterprise.html:206
 msgid ""
 "\n"
 "                Flexible workflows make creating Global Content simple; your organization can harness the power of volunteers, private crowds, and/or professional service providers for content creation and Quality Control.\n"
 "            "
-msgstr ""
+msgstr "\n                Os fluxos flexíbeis de traballo fan a creación de contido global algo simple; a súa organización pode manexar a potencia dos voluntarios, grupos privados e/ou fornecedores de servizos profesionais para a creación de contido e control de calidade.\n            "
 
 #: templates/enterprise.html:210
 msgid "Deploy"
-msgstr ""
+msgstr "Despregamento"
 
 #: templates/enterprise.html:211
 msgid ""
 "\n"
 "                Use the Amara API to bring completed subtitle data and metadata into your own backend or publishing platform.\n"
 "            "
-msgstr ""
+msgstr "\n                Use a API de Amara API para levar datos e metadatos completos de subtitulación á súa infraestrutura ou plataforma de publicación."
 
 #: templates/enterprise.html:216
 msgid "A Revolutionary Video Security Model"
-msgstr ""
+msgstr "Un modelo de seguranza de vídeo revolucionario"
 
 #: templates/enterprise.html:218
 msgid ""
 "\n"
 "                You always maintain control of your video, because it never leaves your server.  Amara doesn’t require any video uploading, so your existing security policy is always in full effect. We support OAuth, which means your users never need to log in twice—they can see your video and authenticate with both organizations at the same time. Amara makes your subtitles available from the cloud, so you can: deploy just in time via our API; cache on your server and get pinged when there are updates; or use our embeddable subtitle widget.\n"
 "            "
-msgstr ""
+msgstr "\n                Sempre manterá o control do seu vídeo, porque nunca deixa o seu servidor. Amara non require que cargue o vídeo en ningures, así que a súa estratexia de seguranza terá plenos efectos. Somos compatíbeis con OAuth, o que significa que os usuaris non necesitan nunca rexistrarse dúas veces -poden ver o seu vídeo e autenticarse con ambas organizacións ao mesmo tempo. Amara fai os seus subtítulos dispoñíbeis na nube, así que pode: despregar a demanda a nosa API; usar unha copia evanescente no seu servidor e obter avisos de cando haxa actualizacións; ou usar o noso trebello de subtitulación incorporábel."
 
 #: templates/enterprise.html:225
 msgid ""
 "\n"
 "                Amara’s powerful API allows flexible integration with your existing publishing workflow.  By connecting your backend system directly to Amara, you can import and export subtitles, manage processing, and import completed subtitles directly back into your own system.  If you use a custom video player, importing subtitles via API lets your company fully control subtitle display and use of the transcript on your website.\n"
 "            "
-msgstr ""
+msgstr "\n                A potente API de Amara permite unha integración flexíbel co seu fluxo de publicación. Ao conectar a súa infraestrutura directamente a Amara, pode importar e exportar subtítulos, xestionar o procesamento e importar os subtítulos completados directamente ao seu propio sistema. Se usar un reprodutor personalizado, a importación de subtítulo a través da API permítelle á súa compañía un control total da presentación e uso de transcricións no seu sitio web."
 
 #: templates/enterprise.html:229
 msgid "Amara API Documentation"
-msgstr ""
+msgstr "Documentación da API Amara"
 
 #: templates/enterprise.html:233
 msgid ""
 "\n"
 "                Corporations need to communicate with their staff and their customers around the world, and video is becoming a major part of that process. With Amara, companies make it possible for staff, customers, and contractors to caption and translate videos, make them searchable, and share them publicly or privately.\n"
 "            "
-msgstr ""
+msgstr "\n                As empresar necesitan comunicar co seu persoal e os seus clientes de todo o mundo, e o vídeo está chegando á maior parte deses procesos. Con Amara, as compañías fan posíbel para o seu persoal, clientes e contratistas a descrición e tradución de vídeos, facelos atopábeis na rede e compartilos pública ou privadamente."
 
 #: templates/enterprise.html:239
 msgid ""
 "\n"
 "                As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
 "            "
-msgstr ""
+msgstr "\n                Así como a educación en conexión explota en popularidade, os subtítulos son esenciais para facer clases accesíbeis e internacionais. Colexios e universidades están a usar Amara para facer accesíbeis á lectura de calquera uns recursos que medran rapidamente.\n            "
 
 #: templates/enterprise.html:243
 msgid ""
 "\n"
 "                Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages\n"
 "            "
-msgstr ""
+msgstr "\n                A Academia Khan —un dos sitios de educación en conexión entre as de maior e máis rápido crecemento— usa Amara para traducir cada vídeo do seu sitio web, en ducias de idiomas"
 
 #: templates/enterprise.html:249
 msgid ""
 "\n"
 "                Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
 "            "
-msgstr ""
+msgstr "\n                Calquera organización que crea vídeo pode chegar a máis público con subtítulos e Amara fornece case todas as opcións e a flebilidade para descrición de tradución dos seus vídeos. Moitos videoeditores usan Amara para crear comunidades de voluntarios --sumando á xente que quere ver os seus vídeos para describilos e traducilos para o mundo, e finalmente acadar máis espectadores."
 
 #: templates/enterprise.html:255
 msgid ""
 "\n"
 "                In governments around the world, making video accessible is often a legal requirement, not an option.  Amara makes it much easier to coordinate captioning and translation efforts, so that every citizen gains access.\n"
 "            "
-msgstr ""
+msgstr "\n                Para gobernos de todo o mundo, facer vídeos accesíbeis vai sendo un requirimento legal, non unha opción. Amara fai moito máis doado coordinar os esforzos de descrición e tradución de modo que todos os cidadáns teñan acceso.\n            "
 
 #: templates/enterprise.html:261
 msgid "Get started with Amara"
@@ -3614,7 +3614,7 @@ msgid ""
 "\t\t\tWikipedia-like fashion. The software is free and open source and can be used and \n"
 "\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center\">improved by anyone</a>.\n"
 "\t\t"
-msgstr ""
+msgstr "\n      \t\tAmara é un modo doado para calquera de engadir subtítulos, descrición, \n\t\t\tou traducir practicamente calquera vídeo na Web. Funciona de modo colaborativo \n\t\t\tao xeito da Wikipedia. O software é libre e de código aberto e pode ser usado e \n\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center\">mellorado por calquera</a>.\n\t\t"
 
 #: templates/faq.html:56
 msgid ""
@@ -3624,29 +3624,29 @@ msgid ""
 "\t\t\t<a href=\"http://universalsubtitles.org/videos/create\">begin subtitling</a> \n"
 "\t\t\ta video you have already posted on the web.\t\n"
 "\t\t"
-msgstr ""
+msgstr "\n      \t\tDámoslle a benvida a probar a nosa <a href=\"http://universalsubtitles.org/demo/\">demo</a> \n\t\t\tpara que vexa como traballa o software. Tamén pode \n\t\t\t<a href=\"http://universalsubtitles.org/videos/create\">comezar a subtitulación</a> \n\t\t\tdun vídeo que xa teña publicado na Web.\t"
 
 #: templates/faq.html:66
 msgid "VVideo subtitles are a gold mine of untapped potential."
-msgstr ""
+msgstr "A subtitulación de vídeo é unha mina de ouro de potencial sen explotar."
 
 #: templates/faq.html:68
 msgid ""
 "Captions make videos accessible for viewers who are deaf or hard of hearing "
-msgstr ""
+msgstr "As descricións fan os vídeos accesíbeis para espectadores que teñen deficiencias auditivas ou son xordos"
 
 #: templates/faq.html:69
 msgid ""
 "Translations make it possible for all of us to watch video in languages that"
 " we don't speak"
-msgstr ""
+msgstr "As traducións fan posíbel para todos nós ver vídeos en idiomas que non falamos"
 
 #: templates/faq.html:70
 msgid ""
 "Video creators get: better SEO, more views, access to a far bigger "
 "(potentially multilingual and global) audience, accessibility for deaf and "
 "hard of hearing viewers, and more"
-msgstr ""
+msgstr "Os videocreadores obteñen: mellor SEO, máis visualizacións, acceso a unha maior (potencialmente multilingüe e global) audiencia, accesibilidade para persoas xordas ou con deficiencias auditivas e moito máis"
 
 #: templates/faq.html:75
 msgid ""
@@ -3654,18 +3654,18 @@ msgid ""
 " mission is to build a fairer, more open, and more democratic media space. "
 "PCF saw a gap in the marketplace for more open and collaborative subtitling "
 "&mdash; Amara is helping to fill that need."
-msgstr ""
+msgstr "A Participatory Culture Foundation é unha organización sen ánimo de lucro segundo a norma 501c3 coa misión de construír un espazo para o contido multimedia máis xusto, máis aberto e moito máis democrático. A PCF salva a fenda no que hai no mercado para acceder á subtitulación de modo máis aberto e colaborativo &mdash; Amara axuda a cubrir esa necesidade."
 
 #: templates/faq.html:79
 msgid ""
 "Yes, we are working on a solution for making closed captions [including "
 "information about sounds and music], as well as subtitles/translations."
-msgstr ""
+msgstr "Si, estamos traballando nunha solución para facer descricións depuradas [que inclúe información sobre sons e música] así como subtítulos/traducións."
 
 #: templates/faq.html:83
 msgid ""
 "We will be working to support as many languages/charactersets as possible."
-msgstr ""
+msgstr "Seguiremos traballando para admitir tantos idiomas/conxuntos de caracteres como sexa posíbel."
 
 #: templates/faq.html:88
 msgid ""
@@ -3675,7 +3675,7 @@ msgid ""
 "\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-translators/\">volunteer translators</a> \n"
 "\t\tto help improve and add more languages.\n"
 "\t  "
-msgstr ""
+msgstr "\n      \tO sito e as ferramentas están dispoñíbeis nun certo numero de idiomas (configure o seu idioma \n\t\tnas preferencias do seu navegador e nós ocupámonos do resto). Sempre estamos buscando \n\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-translators/\">tradutores voluntarios</a> \n\t\tpara axudar a mellorar e engadir máis idiomas."
 
 #: templates/faq.html:99
 msgid ""
@@ -3684,20 +3684,20 @@ msgid ""
 "\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> in your \n"
 "\t\t  website’s template inside the &lt;head&gt; tags.\n"
 "\t\t"
-msgstr ""
+msgstr "\n\t      Para un único vídeo, use o noso sitio. Para ter moitos vídeos no seu sitio web, use \n\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">este código</a> no modelo de deseño do seu sitio web, dentro das etiquetas &lt;head&gt;."
 
 #: templates/faq.html:108
 msgid ""
 "For our subtitling widget and community website, we're using the <a "
 "href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
-msgstr ""
+msgstr "Para o noso trebello de subtitulación e sitio web da comunidade, estamos a usar a licenza <a href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
 
 #: templates/faq.html:112
 msgid ""
 "Please do! If you're interested in coding and development, please visit our "
 "<a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">developer "
 "center</a>."
-msgstr ""
+msgstr "Fágao! Se está interesado en codificar ou desenvolver, visite o noso <a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">centro de desenvolvemento</a>."
 
 #: templates/faq.html:117
 msgid ""
@@ -3708,14 +3708,14 @@ msgid ""
 "\t\t<a href=\"mailto:universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n"
 "\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next question for details).\n"
 "\t\t"
-msgstr ""
+msgstr "\n\t\tSe está interesado nunha participación xeral, vexa a nosa páxina \n\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla Drumbeat</a>. \n\t\tSe ten unha idea específica, contacte: \n\t\t<a href=\"mailto:universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n\t\tE como unha organización sen ánimo de lucro, segundo a norma 501c3, aceptamos doazóns (vexa a seguinte resposta para os detalles)."
 
 #: templates/faq.html:128
 msgid ""
 "\n"
 "      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">donate here</a> (through the Mozilla Drumbeat project).\n"
 "\t\t"
-msgstr ""
+msgstr "\n      \t\tSi e si! Pode <a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">doar aquí</a> (a través do proxecto Mozilla Drumbeat).\n\t\t"
 
 #: templates/faq.html:135
 msgid ""
@@ -3724,7 +3724,7 @@ msgid ""
 "href=\"http://www.drumbeat.org/about\">Drumbeat</a>. Drumbeat is a movement "
 "to keep the web open for the next 100 years, and Amara is a featured "
 "project!"
-msgstr ""
+msgstr "A Fundación Mozilla proporcionou fondos de inicio a Amara, apoio da comunidade e apoio para a fundación a través de <a href=\"http://www.drumbeat.org/about\">Drumbeat</a>. Drumbeat é un movemento para manter a Web aberta os vindeiros 100 anos, e Amara é un proxecto salientábel."
 
 #: templates/faq.html:140
 msgid ""
@@ -3734,7 +3734,7 @@ msgid ""
 "\t\t Click \"Download Subtitles\" button in the lower right to the left from \"Edit Subtitles\" \n"
 "\t\t button and choose the desired file format from the drop-down list.\n"
 "       "
-msgstr ""
+msgstr "\n     \t Cando os subtítulos existen, pode descargalos en formatos .SRT, .SSA, .SBV, .TXT, e TTML \n     \t desde a páxina para ese idioma (<a href=\"http://universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">exemplo</a>). \n\t\t Faga clic no botón \"Descargar subtítulos\" no recanto inferior dereito á esquerda do botón \n\t\t e escolla o formato desexado dos da lista despregábel."
 
 #: templates/faq.html:151
 msgid ""
@@ -3743,7 +3743,7 @@ msgid ""
 "        at a time. So, if someone else is already editing subtitles for the video when \n"
 "        you try to edit the subtitles, you'll get this message.\n"
 "        "
-msgstr ""
+msgstr "\n        Actualmente o sistema só permite editar subtítulos a un usuario á vez en calquera \n        vídeo. Así, se alguén máis está xa editando subtítulos cando vostede intenta \n        editar, obterá esta mensaxe.\n        "
 
 #: templates/faq.html:161
 msgid ""
@@ -3753,7 +3753,7 @@ msgid ""
 "\t\tthe language you’re translating into. Otherwise, improvements in the original \n"
 "\t\twill automatically cascade.\n"
 "        "
-msgstr ""
+msgstr "\n        Pode. Vaia ao editor de tradución e prema “Cambiar o minutado do subtítulo”. \n\t\tFágao só se o minutado no idioma orixinal realmente non coincide \n\t\tco do idioma ao que vostede estea traducindo. Dito doutro xeito, As melloras no orixinal \n\t\tproducirán un efecto en cadea."
 
 #: templates/faq.html:172
 msgid ""
@@ -3780,245 +3780,245 @@ msgid ""
 "\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/head&gt; \n"
 "\t\t  tags in your blog theme.  \n"
 "        "
-msgstr ""
+msgstr "\n          Vaia a <a href=\"http://universalsubtitles.org/get-code/\">esta páxina</a> \n\t\t  e faga dobre clic no código da caixa branca para seleccionalo todo.  \n\t\t  Vaia a Editar > Copiar, no menú do seu navegador para copiar o código no seu portapapeis.  \n\t\t  Logo comece a editar as cabeceiras no seu sitio tema do seu blog, \n\t\t  e pegue o script nalgún sito entre as &lt;head&gt; e o &lt;/head&gt; \n\t\t  do tema do seu blog.  "
 
 #: templates/faq.html:201
 msgid ""
 "\n"
 "          Sorry about that.  Just contact us and we’ll be happy to add it.\n"
 "        "
-msgstr ""
+msgstr "\n          Descúlpenos. Contacte con nós e estaremos encantados de engadilo.\n        "
 
 #: templates/feedback_response.html:3
 msgid ""
 "Thanks for getting in touch! We love hearing your ideas, bugs, feedback, "
 "opinions and such."
-msgstr ""
+msgstr "Grazas por estar á man! Gústanos escoitar as súas ideas, informes de erros, comentarios, opinións e demais."
 
 #: templates/feedback_response.html:6
 msgid "Stay tuned as the project evolves!"
-msgstr ""
+msgstr "Permaneza atento a como evoluciona o proxecto!"
 
 #: templates/feedback_response.html:9
 msgid "Announcement Signup"
-msgstr ""
+msgstr "Rexistro para anuncios"
 
 #: templates/feedback_response.html:12
 msgid "Best"
-msgstr ""
+msgstr "O mellor"
 
 #: templates/feedback_response.html:16
 msgid ""
 "PS. We do our best to respond to all questions, but please be patient -- we "
 "get a lot of email"
-msgstr ""
+msgstr "PS. Facémolo o mellor que sabemos ao responder a todas as preguntas pero por favor, sexa paciente -- temos un montón de correo"
 
 #: templates/index.html:18
 msgid "The easiest way to caption and translate any video."
-msgstr ""
+msgstr "O camiño máis doado para describir e traducir calquera vídeo."
 
 #: templates/index.html:19
 msgid "Subtitles make videos more powerful, more global, and more searchable."
-msgstr ""
+msgstr "Os subtítulos fan os vídeos máis potentes, máis globais e máis atopábeis."
 
 #: templates/index.html:24
 msgid "Subtitle a Video Now"
-msgstr ""
+msgstr "Subtitular un vídeo agora"
 
 #: templates/index.html:26
 msgid "Subtitle"
-msgstr ""
+msgstr "Subtítulo"
 
 #: templates/index.html:27
 msgid "Works with YouTube, Vimeo, HTML5, and more."
-msgstr ""
+msgstr "Funciona con YouTube, Vimeo, HTML5 e máis."
 
 #: templates/index.html:30
 msgid "Features"
-msgstr ""
+msgstr "Características salientábeis"
 
 #: templates/index.html:32
 msgid "Embed the video anywhere"
-msgstr ""
+msgstr "Incorporar este vídeo nalgures"
 
 #: templates/index.html:33
 msgid "Add subtitles yourself or ask viewers to help."
-msgstr ""
+msgstr "Engadir subtítulos por si mesmo ou pedirlles aos espectadores axuda."
 
 #: templates/index.html:34
 msgid "Full site integration"
-msgstr ""
+msgstr "Integración total no sitio"
 
 #: templates/index.html:39
 msgid "Volunteers Needed"
-msgstr ""
+msgstr "Necesítanse voluntarios"
 
 #: templates/index.html:41
 msgid ""
 "\n"
 "            Our deaf and hard of hearing users and non-profits request help for videos that need captions or translations. \n"
 "        "
-msgstr ""
+msgstr "\n            Os nosos usuarios xordos e deficientes auditivos e as organizacións sen ánimo de lucro solicitan a nosa axuda para vídeos que necesitan descrición ou traducións. \n        "
 
 #: templates/index.html:44
 msgid "Start volunteering."
-msgstr ""
+msgstr "Iniciar voluntariado."
 
 #: templates/index.html:48
 msgid "Complete Subtitling Solutions"
-msgstr ""
+msgstr "Solucións completas de voluntariado"
 
 #: templates/index.html:50
 msgid ""
 "\n"
 "            Increase viewership with transcription, captioning, and translation services, and flexible API and integration options. Improve SEO, reach a global audience, and build a managed volunteer community.\n"
 "        "
-msgstr ""
+msgstr "\n            Aumente a visibilidade con transcrición, descrición e servizos de tradución , cunha API flexíbel e opcións de integración. Mellore o seu SEO, alcance e audiencia global e constrúa unha comunidade xestionada por voluntarios.\n        "
 
 #: templates/index.html:53
 msgid "See our enterprise services."
-msgstr ""
+msgstr "Vexa os nosos servizos empresariais."
 
 #: templates/index.html:77
-msgid "6 key benefits"
+msgid "For Enterprise"
 msgstr ""
 
 #: templates/index.html:78
 msgid ""
 "The largest, most powerful captioning and translation platform in the world."
-msgstr ""
+msgstr "A maior e máis potente plataforma para descrición e tradución do mundo."
 
 #: templates/index.html:86 templates/index.html.py:88
 msgid "TED Team"
-msgstr ""
+msgstr "Equipo TED"
 
 #: templates/index.html:94 templates/index.html.py:95
 msgid "Mozilla Example"
-msgstr ""
+msgstr "Exemplo Mozilla"
 
 #: templates/index.html:100 templates/index.html.py:101
 msgid "Khan Integration"
-msgstr ""
+msgstr "Integración Khan"
 
 #: templates/index.html:106 templates/index.html.py:107
 msgid "Drupal Example"
-msgstr ""
+msgstr "Exemplo Drupal"
 
 #: templates/index.html:113 templates/index.html.py:114
 msgid "Al Jazeera Team"
-msgstr ""
+msgstr "Equipo Al Jazeera"
 
 #: templates/index.html:120
 msgid "Newshour Team"
-msgstr ""
+msgstr "Equipo Newshour"
 
 #: templates/index.html:121
 msgid "NewsHour Team"
-msgstr ""
+msgstr "Equipo Newshour"
 
 #: templates/index.html:127
 msgid "More Popular"
-msgstr ""
+msgstr "O máis popular"
 
 #: templates/index.html:128
 msgid "Most Popular Today"
-msgstr ""
+msgstr "O máis popular de hoxe"
 
 #: templates/index.html:130
 msgid "Top this month"
-msgstr ""
+msgstr "Primeiro este mes"
 
 #: templates/index.html:131
 msgid "Top all-time"
-msgstr ""
+msgstr "Primeiro de todos os tempos"
 
 #: templates/index.html:138
 msgid "More Featured"
-msgstr ""
+msgstr "Máis destacado"
 
 #: templates/index.html:139 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
-msgstr ""
+msgstr "Vídeos destacados"
 
 #: templates/index_old.html:26
 msgid "Easily caption and translate your videos, with help from your viewers."
-msgstr ""
+msgstr "Doada descrición e tradución dos seus vídeos, con axuda dos seus espectadores."
 
 #: templates/index_old.html:28
 msgid ""
 "Increase video views by reaching global audiences and being accessible to "
 "the deaf and hard-of-hearing."
-msgstr ""
+msgstr "Aumente as visualizacións do vídeo acadando audiencia global e sendo accesíbeis para persoas xordas e deficientes auditivos."
 
 #: templates/index_old.html:29
 msgid ""
 "It's powered by viewers and other volunteers: it's collaborative editing and"
 " translation, like a wiki."
-msgstr ""
+msgstr "Feito por espectadores e outros voluntarios: trátase de edición e tradución colaborativa coma un wiki."
 
 #: templates/index_old.html:30
 msgid "It's the world's easiest subtitle creator - type and tap."
-msgstr ""
+msgstr "É o creador de subtítulos máis doado do mundo - escriba e libere."
 
 #: templates/index_old.html:31
 msgid ""
 "The fastest way to add subtitle functionality to a single video or a whole "
 "site. Super easy to integrate with no software to install."
-msgstr ""
+msgstr "O camiño máis rápido para engadir funcionalidade de subtitulado a un único vídeo ou a un sitio enteiro. Superdoado de integrar sen software que instalar."
 
 #: templates/index_old.html:32
 msgid "Free, open-source, and non-profit!"
-msgstr ""
+msgstr "Libre, código aberto e sen ánimo de lucro!"
 
 #: templates/index_old.html:35
 msgid "videos use"
-msgstr ""
+msgstr "uso dos vídeos"
 
 #: templates/index_old.html:62
 msgid "Add this subtitle tab to a video in seconds."
-msgstr ""
+msgstr "Engadir esta lapela de subtítulo a un vídeo en segundos."
 
 #: templates/index_old.html:65
 msgid "For an individual video"
-msgstr ""
+msgstr "Para un vídeo concreto"
 
 #: templates/index_old.html:68
 msgid "enter a video URL to enable and then embed anywhere"
-msgstr ""
+msgstr "introduza un enderezo URL para activar e incorporar nalgures"
 
 #: templates/index_old.html:71
 msgid "For every video on a page or site"
-msgstr ""
+msgstr "Para calquera vídeo nunha páxina ou sitio"
 
 #: templates/index_old.html:73
 msgid ""
 "paste this single line of code into your page header and every video will be"
 " subtitle enabled"
-msgstr ""
+msgstr "pegue esta simple liña de código na cabeceira da súa páxina e todos os vídeos terán a subtitulación activada."
 
 #: templates/index_old.html:77
 msgid "Amara works with these video sites and formats"
-msgstr ""
+msgstr "Amara funciona con estes sitios de video e formatos"
 
 #: templates/index_old.html:89
 msgid "With Amara, you can:"
-msgstr ""
+msgstr "Con Amara, pode:"
 
 #: templates/index_old.html:91
 msgid "Add subtitles"
-msgstr ""
+msgstr "Engadir subtítulos"
 
 #: templates/index_old.html:92
 msgid ""
 "We've built the easiest way to subtitle videos. Add our subtitling widget "
 "toyour video (or your site) and click the \"subtitle me\" button. The rest "
 "is simple! Totally free, and no software to download."
-msgstr ""
+msgstr "Fixemos o método máis doado para subtitular vídeos. Engada o noso trebello de subtitulación ao seu vídeo (ou o seu sitio) e prema o botón «Subtitúleme». O resto é simple! Totalmente de balde, e sen descargar ningún software."
 
 #: templates/index_old.html:96
 msgid "Add translations"
-msgstr ""
+msgstr "Engadir traducións"
 
 #: templates/index_old.html:98
 msgid ""
@@ -4028,11 +4028,11 @@ msgid ""
 "          Subtitles lets you collect high-quality translations from your viewer\n"
 "          community.\n"
 "          "
-msgstr ""
+msgstr "\n          Unha vez que os subtítulos existen, calquera espectador pode engadir unha tradución en calquera idioma.  Sen necesidade de máquinas de tradución automáticas que confunden o espectador. Universal Subtitles permítelle recoller traducións de alta calidade da súa comunidade de espectadores."
 
 #: templates/index_old.html:108
 msgid "Get volunteer help"
-msgstr ""
+msgstr "Obter axuda de voluntariado"
 
 #: templates/index_old.html:110
 msgid ""
@@ -4042,15 +4042,15 @@ msgid ""
 "          like an article on wikipedia. We mobilize your international audience to make\n"
 "          your videos more accessible.\n"
 "        "
-msgstr ""
+msgstr "\n          Os seus espectadores (e os membros da súa comunidade de subtitulación) poden\n          mellorar calquera subtitulado ou tradución. Desa maneira os subtítulos estaán constantemente mellorando -como un artigo da wikipedia. Mobilizamos a súa audiencia internacional para facer os seus vídeos máis accesíbeis.\n        "
 
 #: templates/index_old.html:122
 msgid "It’s free with no software to download"
-msgstr ""
+msgstr "É de balde sen software que teña que instalar"
 
 #: templates/index_old.html:123
 msgid "Add our embed code to your videos."
-msgstr ""
+msgstr "Engadir ou incorporar código aos seus vídeos."
 
 #: templates/index_old.html:124
 msgid ""
@@ -4063,7 +4063,7 @@ msgstr "\n    Submit your video, and get an embed code to post in your site. \n 
 
 #: templates/index_old.html:132
 msgid "Subtitling tools open in your page."
-msgstr ""
+msgstr "As ferramentas de subtitulación abren na súa páxina."
 
 #: templates/index_old.html:133
 msgid ""
@@ -4076,7 +4076,7 @@ msgstr "\n      When someone clicks the “subtitle me” button, \n      a subt
 
 #: templates/index_old.html:142
 msgid "How it works"
-msgstr ""
+msgstr "Como funciona"
 
 #: templates/index_old.html:144
 msgid ""
@@ -4085,7 +4085,7 @@ msgid ""
 "      subtitles.  We save the subtitles on our site.  And each video has its own collaboration space on our site\n"
 "      where people can track changes, and give feedback.\n"
 "    "
-msgstr ""
+msgstr "\n      Vostede engade o noso trebello ao seus vídeos. Logo, vostede e os seus espectadores\n      poden engadir subtítulos. Nós gardamos os subtítulos no noso sitio. E cada vídeo ten o seu propio espazo de colaboración no noso sitio onde a xente pode seguir os cambios e facernos comentarios."
 
 #: templates/index_old.html:149
 msgid "Try the demo"
@@ -4164,24 +4164,24 @@ msgstr "Obxectivos do encontro"
 msgid ""
 "<strong>Connect</strong> major stakeholders from projects, organizations, "
 "and movements that have open subtitling needs or focus."
-msgstr ""
+msgstr "<strong>Conectar</strong> cos grandes axentes dos proxectos, organizacións e movementos que teñen necesidades de subtitulación aberta ou que están enfocados a ela."
 
 #: templates/opensubtitles2010.html:41
 msgid ""
 "<strong>Identify ways</strong> to solve stakeholder subtitling needs and be "
 "aware of existing technology that can be leveraged. Find logical places for "
 "collaboration/cooperation."
-msgstr ""
+msgstr "<strong>Atopar camiños</strong> para resolver as necesidades de subtitulación deses axentes estar ao día da tecnoloxía existente na que se pode apoiar. Atope lugares apropiados para a colaboración/cooperación."
 
 #: templates/opensubtitles2010.html:44
 msgid ""
 "<strong>Move towards</strong> standardizing solutions and pushing forward "
 "the state of the art in open subtiting."
-msgstr ""
+msgstr "<strong>Avance</strong> con solución estandarizadas e mellore o estado da artes en subtitulación aberta."
 
 #: templates/opensubtitles2010.html:53
 msgid "Participants"
-msgstr ""
+msgstr "Participantes"
 
 #: templates/opensubtitles2010.html:55
 msgid ""
@@ -4190,36 +4190,36 @@ msgid ""
 "accessibility advocates, open source developers, educational leaders, and "
 "other individuals and organizations with a stake in the subtitling world. "
 "We'll make a roster available when the event draws closer."
-msgstr ""
+msgstr "Os participantes poden ser: videocreadores e produtores, usuarios finais, representantes de grandes servizos de hospedaxe de vídeo, enxeñeiros de estándares, activistas da accesibilidade, desenvolvedores de software de fonte aberta, líderes educativos e outros individuos e organizacións cunha posición no mundo da subtitulación. Faremos unha lista dispoñíbel cando o acto estea máis próximo. "
 
 #: templates/opensubtitles2010.html:57
 msgid ""
 "Attendees are selected by invitation; however, if you or your organization "
 "would like to participate, please contact:"
-msgstr ""
+msgstr "Os asistentes selecciónanse por invitación; no entanto, se a vostede ou á súa organización lle gustaría participar, contacte:"
 
 #: templates/opensubtitles2010.html:62
 msgid "When"
-msgstr ""
+msgstr "Cando"
 
 #: templates/opensubtitles2010.html:63
 msgid "September 29th and 30th, beginning at 9am on both days."
-msgstr ""
+msgstr "29 e 30 de setembro, desde as 9am ambos días."
 
 #: templates/opensubtitles2010.html:67
 msgid "Where"
-msgstr ""
+msgstr "Onde"
 
 #: templates/opensubtitles2010.html:68
 msgid ""
 "The summit will be held at the beautiful Open Plans penthouse in Soho, which"
 " is located at 148 Lafayette St, Floor 12, New York City. (<a "
 "href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
-msgstr ""
+msgstr "O encontro terá lugar no fermoso Open Plans penthouse do Soho, que está localizado no 148 Lafayette St, Floor 12, New York City. (<a href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
-msgstr ""
+msgstr "Por que"
 
 #: templates/opensubtitles2010.html:75
 msgid ""
@@ -4236,11 +4236,11 @@ msgstr "\n            The focus of this summit is increased availability and bet
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
-msgstr ""
+msgstr "Organizadores, cooperadores, patrocinadores"
 
 #: templates/opensubtitles2010.html:94
 msgid "Organizers"
-msgstr ""
+msgstr "Organizadores"
 
 #: templates/opensubtitles2010.html:95
 msgid ""
@@ -4248,11 +4248,11 @@ msgid ""
 "Foundation</a> is organizing the summit. Their most recent project, <a "
 "href=\"http://universalsubtitles.org/\">Amara</a>, makes open source and "
 "collaborative subtitling and translation easy."
-msgstr ""
+msgstr "A <a href=\"http://www.participatoryculture.org/\">Participatory Culture Foundation</a> é a organizadora do encontro. O seu máis recente proxecto, <a href=\"http://universalsubtitles.org/\">Amara</a>, fai do código de fonte aberta e da colaboración e tradución en subtitulación algo doado."
 
 #: templates/opensubtitles2010.html:99
 msgid "Facilitators"
-msgstr ""
+msgstr "Cooperadores"
 
 #: templates/opensubtitles2010.html:100
 msgid ""
@@ -4260,23 +4260,23 @@ msgid ""
 "facilitation and agenda design. Aspiration believes that face-to-face events"
 " are the most powerful way to facilitate interaction, build networks, and "
 "collaborate."
-msgstr ""
+msgstr "<a href=\"http://www.aspirationtech.org/\">Aspiration</a> está fornecendo colaboración e deseño da axenda. Aspiration cre que os encontros cara a cara son a máis poderosa maneira de facilitar a interacción, construción de redes e colaborar."
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
-msgstr ""
+msgstr "Patrocinadores"
 
 #: templates/opensubtitles2010.html:104
 msgid ""
 "The summit has been generously funded by the <a "
 "href=\"http://www.soros.org/\">Open Society Institute</a>."
-msgstr ""
+msgstr "O encontro foi xenerosamente patrocinado por <a href=\"http://www.soros.org/\">Open Society Institute</a>."
 
 #: templates/opensubtitles2010.html:113
 msgid ""
 "Special thanks to <a href=\"http://openplans.org/\">Open Plans</a> for "
 "providing meeting space!"
-msgstr ""
+msgstr "Agradecemento especial para <a href=\"http://openplans.org/\">Open Plans</a> por fornecer espazo para a reunión!"
 
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:7
 msgid "Amara"
@@ -5550,7 +5550,7 @@ msgstr "Denegar"
 
 #: templates/teams/applications.html:56
 msgid "Send a message"
-msgstr ""
+msgstr "Enviar unha mensaxe"
 
 #: templates/teams/applications.html:66
 msgid "There are no applications right now"

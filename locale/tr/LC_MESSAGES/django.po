@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-25 01:34-0500\n"
-"PO-Revision-Date: 2012-05-25 06:48+0000\n"
+"POT-Creation-Date: 2012-05-26 01:32-0500\n"
+"PO-Revision-Date: 2012-05-26 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Turkish (http://www.transifex.net/projects/p/universalsubtitles/language/tr/)\n"
 "MIME-Version: 1.0\n"
@@ -3878,7 +3878,7 @@ msgid "See our enterprise services."
 msgstr ""
 
 #: templates/index.html:77
-msgid "6 key benefits"
+msgid "For Enterprise"
 msgstr ""
 
 #: templates/index.html:78
@@ -5238,11 +5238,11 @@ msgstr ""
 
 #: templates/teams/_application_form.html:11
 msgid "Apply to"
-msgstr ""
+msgstr "Başvurmak"
 
 #: templates/teams/_application_form.html:19
 msgid "Language skill"
-msgstr ""
+msgstr "Dil becerisi"
 
 #: templates/teams/_application_form.html:21
 #, python-format
@@ -5254,11 +5254,11 @@ msgstr ""
 
 #: templates/teams/_application_form.html:24
 msgid "proficiency"
-msgstr ""
+msgstr "yetkinlik, beceri"
 
 #: templates/teams/_application_form.html:24
 msgid "specified"
-msgstr ""
+msgstr "belirtilen"
 
 #: templates/teams/_application_form.html:29
 msgid ""
@@ -5285,11 +5285,11 @@ msgstr ""
 
 #: templates/teams/_complete_team_video_detail.html:8
 msgid "Completed Languages"
-msgstr ""
+msgstr "Tamamlanmış diller"
 
 #: templates/teams/_complete_team_video_detail.html:14
 msgid "Video Page"
-msgstr ""
+msgstr "Video Sayfası\nGörüntü Sayfası"
 
 #: templates/teams/_context_project.html:17
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
@@ -5357,15 +5357,15 @@ msgstr ""
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "According to your"
-msgstr ""
+msgstr "Sizin -e göre"
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "language choices"
-msgstr ""
+msgstr "dil seçimi"
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "there don't appear to be videos you can translate."
-msgstr ""
+msgstr "çevirebileceğiniz videolar görünmüyor."
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "But check back soon! There may soon be translations for you to review."

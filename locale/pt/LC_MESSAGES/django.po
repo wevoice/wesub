@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Gustavo Silva <gtns1994@hotmail.com>, 2011.
+# joao cunha jeronimo <joaocunhajeronimo@gmail.com>, 2012.
 # Wilson Jesus <uilson.rj@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-25 01:34-0500\n"
-"PO-Revision-Date: 2012-05-25 06:48+0000\n"
+"POT-Creation-Date: 2012-05-26 01:32-0500\n"
+"PO-Revision-Date: 2012-05-26 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Portuguese (http://www.transifex.net/projects/p/universalsubtitles/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -50,7 +51,7 @@ msgstr "Email"
 #: apps/auth/admin.py:79 templates/auth/_announcement.html:7
 #: templates/messages/_messages.html:8 templates/videos/create.html:63
 msgid "Hide"
-msgstr ""
+msgstr "Esconder"
 
 #: apps/auth/models.py:98
 msgid "Retired user"
@@ -78,15 +79,15 @@ msgstr "Editar tradução"
 
 #: apps/auth/models.py:386
 msgid "understand enough"
-msgstr ""
+msgstr "Compreendo o suficiente"
 
 #: apps/auth/models.py:387
 msgid "understand 99%"
-msgstr ""
+msgstr "Compreendo 99%"
 
 #: apps/auth/models.py:388
 msgid "write like a native"
-msgstr ""
+msgstr "Escrevo como língua materna"
 
 #: apps/auth/models.py:393
 msgid "follow requests in language"
@@ -96,7 +97,7 @@ msgstr ""
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
-msgstr ""
+msgstr "Esta é a data em que começam a exibir anúncio. E apenas o último será exibido."
 
 #: apps/auth/models.py:506
 msgid "e-mail confirmation"
@@ -124,7 +125,7 @@ msgstr ""
 
 #: apps/auth/views.py:110
 msgid "Your account was deleted."
-msgstr ""
+msgstr "A sua conta foi eliminada."
 
 #: apps/auth/templatetags/auth_tags.py:30
 msgid "Fill email field, please."
@@ -180,7 +181,7 @@ msgstr ""
 
 #: apps/messages/forms.py:40
 msgid "You should be authenticated to write messages"
-msgstr ""
+msgstr "Deve estar autenticado para escrever mensagens"
 
 #: apps/messages/forms.py:58
 msgid "This message is from site administrator."
@@ -200,20 +201,20 @@ msgstr ""
 
 #: apps/messages/models.py:70
 msgid "[no subject]"
-msgstr ""
+msgstr "[sem assunto]"
 
 #: apps/messages/models.py:119
 msgid "You should enter subject or message."
-msgstr ""
+msgstr "Deve inserir um assunto ou mensagem."
 
 #: apps/messages/rpc.py:28 apps/messages/rpc.py:44 apps/messages/rpc.py:52
 #: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:43
 msgid "You should be authenticated."
-msgstr ""
+msgstr "Deve estar autenticado."
 
 #: apps/messages/rpc.py:36
 msgid "Message does not exist."
-msgstr ""
+msgstr "A mensagem não existe"
 
 #: apps/messages/tasks.py:71
 #, python-format
@@ -295,26 +296,26 @@ msgstr ""
 
 #: apps/openid_consumer/views.py:94
 msgid "i-names are not supported"
-msgstr ""
+msgstr "i-nomes não são suportados"
 
 #: apps/openid_consumer/views.py:100
 msgid "The OpenID was invalid"
-msgstr ""
+msgstr "O OpenID não era válido"
 
 #: apps/openid_consumer/views.py:159
 msgid "The request was cancelled"
-msgstr ""
+msgstr "O pedido foi cancelado"
 
 #: apps/openid_consumer/views.py:163
 msgid "Setup needed"
-msgstr ""
+msgstr "Configuração necessária"
 
 #: apps/openid_consumer/templates/openid_consumer/failure.html:7
 #: apps/openid_consumer/templates/openid_consumer/failure.html:13
 #: apps/openid_consumer/templates/openid_consumer/failure.html:28
 #: apps/openid_consumer/templates/openid_consumer/failure.html:33
 msgid "OpenID failed"
-msgstr ""
+msgstr "OpenID falhou"
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:12
 #: apps/openid_consumer/templates/openid_consumer/signin.html:27
@@ -355,17 +356,17 @@ msgstr "As duas palavras-passe não coincidem. "
 
 #: apps/profiles/rpc.py:50
 msgid "Your email was updated."
-msgstr ""
+msgstr "O seu email foi actualizado"
 
 #: apps/profiles/views.py:61
 msgid ""
 "File server unavailable. Try later. You can edit some other information "
 "without any problem."
-msgstr ""
+msgstr "Servidor de ficheiros não está disponível. Tente mais tarde. Pode editar qualquer outra informação sem problema."
 
 #: apps/profiles/views.py:144
 msgid "Your profile has been updated."
-msgstr ""
+msgstr "O seu perfil foi actualizado"
 
 #: apps/search/forms.py:28
 msgid "Relevance"
@@ -373,7 +374,7 @@ msgstr ""
 
 #: apps/search/forms.py:29
 msgid "Most languages"
-msgstr ""
+msgstr "Mais línguas"
 
 #: apps/search/forms.py:30
 msgid "Views Today"
@@ -393,7 +394,7 @@ msgstr ""
 
 #: apps/search/forms.py:35
 msgid "query"
-msgstr ""
+msgstr "pergunta"
 
 #: apps/search/forms.py:37
 msgid "Sort By"
@@ -405,7 +406,7 @@ msgstr ""
 
 #: apps/search/forms.py:39 apps/search/forms.py:41
 msgid "Left blank for any language"
-msgstr ""
+msgstr "Deixado em branco para qualquer linguagem"
 
 #: apps/search/forms.py:40
 msgid "Video In"
@@ -442,11 +443,11 @@ msgstr ""
 
 #: apps/teams/admin.py:64
 msgid "Feature teams"
-msgstr ""
+msgstr "Equipas em destaque"
 
 #: apps/teams/admin.py:68
 msgid "Unfeature teams"
-msgstr ""
+msgstr "Equipas não destacadas"
 
 #: apps/teams/admin.py:78 apps/teams/admin.py:111 apps/teams/models.py:182
 msgid "Team"
@@ -454,13 +455,13 @@ msgstr ""
 
 #: apps/teams/admin.py:84
 msgid "User"
-msgstr ""
+msgstr "Utilizador"
 
 #: apps/teams/forms.py:60 apps/teams/forms.py:168
 #: libs/rosetta/templates/rosetta/languages.html:12
 #: templates/teams/_context_team.html:65
 msgid "Project"
-msgstr ""
+msgstr "Projecto"
 
 #: apps/teams/forms.py:64 apps/teams/forms.py:172
 msgid "Let's keep things tidy, shall we?"
@@ -468,21 +469,21 @@ msgstr ""
 
 #: apps/teams/forms.py:154
 msgid "Video URL"
-msgstr ""
+msgstr "URL do vídeo"
 
 #: apps/teams/forms.py:155
 msgid ""
 "Enter the URL of any compatible video or any video on our site. You can also"
 " browse the site and use the 'Add Video to Team' menu."
-msgstr ""
+msgstr "Introduza o URL de qualquer vídeo compatível ou de qualquer vídeo no seu website. Pode também navegar pelo site e usar o menu  'Adicionar vídeo a equipa'."
 
 #: apps/teams/forms.py:163
 msgid "Video language"
-msgstr ""
+msgstr "Língua do vídeo"
 
 #: apps/teams/forms.py:165
 msgid "It will be saved only if video does not exist in our database."
-msgstr ""
+msgstr "Apenas será salvo se o vídeo não existir na nossa base de dados."
 
 #: apps/teams/forms.py:219
 msgid "This video already belongs to a team."
@@ -509,7 +510,7 @@ msgstr ""
 
 #: apps/teams/forms.py:298
 msgid "Team intro video URL"
-msgstr ""
+msgstr "URL do vídeo da introdução da equipa"
 
 #: apps/teams/forms.py:300
 msgid ""
@@ -520,7 +521,7 @@ msgstr ""
 
 #: apps/teams/forms.py:305
 msgid "Team URL: http://universalsubtitles.org/teams/"
-msgstr ""
+msgstr "URL da equipa: http://universalsubtitles.org/teams/"
 
 #: apps/teams/forms.py:345
 msgid "This video has already been transcribed."
@@ -615,7 +616,7 @@ msgstr ""
 #: apps/teams/forms.py:662 apps/videos/forms.py:73 apps/videos/forms.py:94
 #: apps/videos/forms.py:406
 msgid "Can not detect file encoding"
-msgstr ""
+msgstr "Impossível detecter codificação do ficheiro"
 
 #: apps/teams/forms.py:667 apps/videos/forms.py:96 apps/videos/forms.py:408
 msgid "Incorrect subtitles format"
@@ -623,11 +624,11 @@ msgstr "Formato de legendas incorreto"
 
 #: apps/teams/models.py:91
 msgid "Open"
-msgstr ""
+msgstr "Abrir"
 
 #: apps/teams/models.py:92 libs/rosetta/templates/rosetta/languages.html:28
 msgid "Application"
-msgstr ""
+msgstr "Applicação"
 
 #: apps/teams/models.py:93
 msgid "Invitation by any team member"
@@ -635,7 +636,7 @@ msgstr ""
 
 #: apps/teams/models.py:94
 msgid "Invitation by manager"
-msgstr ""
+msgstr "Convite do gestor"
 
 #: apps/teams/models.py:95
 msgid "Invitation by admin"
@@ -655,7 +656,7 @@ msgstr ""
 
 #: apps/teams/models.py:124
 msgid "name"
-msgstr ""
+msgstr "nome"
 
 #: apps/teams/models.py:125
 msgid "slug"
@@ -663,7 +664,7 @@ msgstr ""
 
 #: apps/teams/models.py:126
 msgid "description"
-msgstr ""
+msgstr "descrição"
 
 #: apps/teams/models.py:126
 msgid ""
@@ -672,7 +673,7 @@ msgstr ""
 
 #: apps/teams/models.py:128
 msgid "logo"
-msgstr ""
+msgstr "logotipo"
 
 #: apps/teams/models.py:129
 msgid "publicly Visible?"
@@ -719,7 +720,7 @@ msgstr ""
 
 #: apps/teams/models.py:155
 msgid "membership policy"
-msgstr ""
+msgstr "política de filiação"
 
 #: apps/teams/models.py:158
 msgid "video policy"
@@ -852,7 +853,7 @@ msgstr ""
 
 #: apps/teams/views.py:120 templates/teams/teams-list.html:47
 msgid "Newest"
-msgstr ""
+msgstr "Mais recente"
 
 #: apps/teams/views.py:121 templates/teams/teams-list.html:44
 msgid "Most Members"
@@ -1433,27 +1434,27 @@ msgstr ""
 
 #: apps/videos/rpc.py:362 apps/videos/rpc.py:378
 msgid "Video does not exist."
-msgstr ""
+msgstr "Vídeos não existem."
 
 #: apps/videos/rpc.py:369
 msgid "You are following this video now."
-msgstr ""
+msgstr "Está a seguir este vídeo, agora."
 
 #: apps/videos/rpc.py:385
 msgid "You stopped following this video now."
-msgstr ""
+msgstr "Parou de seguir este vídeo."
 
 #: apps/videos/rpc.py:394 apps/videos/rpc.py:407
 msgid "Subtitles does not exist."
-msgstr ""
+msgstr "Legendas não existem."
 
 #: apps/videos/rpc.py:398
 msgid "You are following this subtitles now."
-msgstr ""
+msgstr "Está a seguir estas legendas, agora."
 
 #: apps/videos/rpc.py:411
 msgid "You stopped following this subtitles now."
-msgstr ""
+msgstr "Parou de seguir estas legendas."
 
 #: apps/videos/share_utils.py:52
 msgid "Just found a version of this video with subtitles"
@@ -1514,19 +1515,19 @@ msgstr ""
 
 #: apps/videos/views.py:639
 msgid "You have not permission change this URL"
-msgstr ""
+msgstr "Não tem permissão para mudar este URL"
 
 #: apps/videos/views.py:645 apps/videos/views.py:665
 msgid "Object does not exist"
-msgstr ""
+msgstr "Objecto não existe"
 
 #: apps/videos/views.py:658
 msgid "You have not permission delete this URL"
-msgstr ""
+msgstr "Não tem permissão para apagar este URL"
 
 #: apps/videos/views.py:661
 msgid "You cann't remove original URL"
-msgstr ""
+msgstr "Não pode remover um URL original"
 
 #: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
@@ -1536,8 +1537,8 @@ msgstr ""
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)s Linha"
+msgstr[1] "%(count)s Linhas"
 
 #: apps/videos/types/dailymotion.py:85
 msgid "Video is unavailable"
@@ -1552,11 +1553,11 @@ msgstr ""
 
 #: apps/videos/types/youtube.py:47
 msgid "Private video"
-msgstr ""
+msgstr "Vídeo privado"
 
 #: apps/videos/types/youtube.py:48
 msgid "Undefined error"
-msgstr ""
+msgstr "Erro indefinido"
 
 #: apps/widget/rpc.py:106
 msgid "Video embedding disabled by owner"
@@ -1584,7 +1585,7 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/languages.html:4
 #: libs/rosetta/templates/rosetta/languages.html:6
 msgid "Language selection"
-msgstr ""
+msgstr "Selecção de linguagem"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
@@ -1602,55 +1603,55 @@ msgstr "Início"
 #: libs/rosetta/templates/rosetta/languages.html:11
 #: templates/statistic/log_methods/changelist_view.html:37
 msgid "Filter"
-msgstr ""
+msgstr "Filtro"
 
 #: libs/rosetta/templates/rosetta/languages.html:13
 msgid "Third party"
-msgstr ""
+msgstr "Terceiros"
 
 #: libs/rosetta/templates/rosetta/languages.html:15
 #: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:57
 msgid "All"
-msgstr ""
+msgstr "Tudo"
 
 #: libs/rosetta/templates/rosetta/languages.html:29
 msgid "Progress"
-msgstr ""
+msgstr "Progresso"
 
 #: libs/rosetta/templates/rosetta/languages.html:30
 #: templates/messages/new.html:14 templates/messages/sent.html:23
 #: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:20
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
-msgstr ""
+msgstr "Mensagens"
 
 #: libs/rosetta/templates/rosetta/languages.html:31
 #: templates/teams/settings-permissions.html:72
 msgid "Translated"
-msgstr ""
+msgstr "Traduzido"
 
 #: libs/rosetta/templates/rosetta/languages.html:32
 #: libs/rosetta/templates/rosetta/pofile.html:57
 msgid "Fuzzy"
-msgstr ""
+msgstr "Confuso"
 
 #: libs/rosetta/templates/rosetta/languages.html:33
 msgid "Obsolete"
-msgstr ""
+msgstr "Obsoleto"
 
 #: libs/rosetta/templates/rosetta/languages.html:34
 msgid "File"
-msgstr ""
+msgstr "Ficheiro"
 
 #: libs/rosetta/templates/rosetta/languages.html:55
 msgid "Nothing to translate!"
-msgstr ""
+msgstr "Nada para traduzir"
 
 #: libs/rosetta/templates/rosetta/languages.html:56
 msgid ""
 "You haven't specified any languages in your settings file, or haven't yet "
 "generated a batch of translation catalogs."
-msgstr ""
+msgstr "Não especificou nenhuma linguagem no seu ficheiro de configurações ou ainda não gerou um batch (arquivo de lote) ou catálogos de tradução"
 
 #: libs/rosetta/templates/rosetta/languages.html:57
 #, python-format
@@ -1658,15 +1659,15 @@ msgid ""
 "Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N "
 "documentation</a> for a guide on how to set up internationalization for your"
 " project."
-msgstr ""
+msgstr "Por favor, consulte <a href=\"%(i18n_doc_link)s\"> documentação Django's I18N </a>, um guia completo de como configurar a internacionalização para o seu projecto."
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
 msgid "Pick another file"
-msgstr ""
+msgstr "Escolha outro ficheiro"
 
 #: libs/rosetta/templates/rosetta/pofile.html:9
 msgid "Download this catalog"
-msgstr ""
+msgstr "Descarregue este catálogo"
 
 #: libs/rosetta/templates/rosetta/pofile.html:21
 #, python-format
@@ -1675,43 +1676,43 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:23
 msgid "File is read-only: download the file when done editing!"
-msgstr ""
+msgstr "Ficheiro é apenas de leitura: descarregue o ficheiro quando tiver terminado a edição!"
 
 #: libs/rosetta/templates/rosetta/pofile.html:24
 msgid ""
 "Some items in your last translation block couldn't be saved: this usually "
 "happens when the catalog file changes on disk after you last loaded it."
-msgstr ""
+msgstr "Alguns itens no seu último bloco de tradução não puderam ser salvos: isto costuma acontecer quando o ficheiro de catálogo é alterado no disco depois do seu último carregamento."
 
 #: libs/rosetta/templates/rosetta/pofile.html:28
 #, python-format
 msgid "Translate into %(rosetta_i18n_lang_name)s"
-msgstr ""
+msgstr "Traduza para  %(rosetta_i18n_lang_name)s"
 
 #: libs/rosetta/templates/rosetta/pofile.html:31
 msgid "Display:"
-msgstr ""
+msgstr "Mostrar:"
 
 #: libs/rosetta/templates/rosetta/pofile.html:32
 msgid "Untranslated only"
-msgstr ""
+msgstr "Não traduzido, apenas"
 
 #: libs/rosetta/templates/rosetta/pofile.html:33
 msgid "Translated only"
-msgstr ""
+msgstr "Traduzido, apenas"
 
 #: libs/rosetta/templates/rosetta/pofile.html:34
 msgid "Fuzzy only"
-msgstr ""
+msgstr "Confuso, apenas"
 
 #: libs/rosetta/templates/rosetta/pofile.html:42
 #: templates/search/_search_form.html:31
 msgid "Search"
-msgstr ""
+msgstr "Procurar"
 
 #: libs/rosetta/templates/rosetta/pofile.html:44
 msgid "Go"
-msgstr ""
+msgstr "Ir"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
 #: templates/teams/tasks.html:162 templates/videos/_video_url_panel.html:19
@@ -1721,47 +1722,47 @@ msgstr "Original"
 
 #: libs/rosetta/templates/rosetta/pofile.html:58
 msgid "Occurrences(s)"
-msgstr ""
+msgstr "Ocorrência(s)"
 
 #: libs/rosetta/templates/rosetta/pofile.html:72
 #: libs/rosetta/templates/rosetta/pofile.html:75
 #: libs/rosetta/templates/rosetta/pofile.html:93
 msgid "Context hint"
-msgstr ""
+msgstr "Pista de contexto"
 
 #: libs/rosetta/templates/rosetta/pofile.html:90
 msgid "Contextual hint"
-msgstr ""
+msgstr "Pista contextual"
 
 #: libs/rosetta/templates/rosetta/pofile.html:100
 msgid "suggest"
-msgstr ""
+msgstr "sugira"
 
 #: libs/rosetta/templates/rosetta/pofile.html:111
 #, python-format
 msgid "%(more_count)s more"
 msgid_plural "%(more_count)s more"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(more_count)s mais"
+msgstr[1] "%(more_count)s mais"
 
 #: libs/rosetta/templates/rosetta/pofile.html:123
 msgid "Save and translate next block"
-msgstr ""
+msgstr "Salvar e traduzir o próximo bloco"
 
 #: libs/rosetta/templates/rosetta/pofile.html:127
 msgid "Skip to page:"
-msgstr ""
+msgstr "Saltar para a página:"
 
 #: libs/rosetta/templates/rosetta/pofile.html:140
 msgid "Displaying:"
-msgstr ""
+msgstr "Mostrando:"
 
 #: libs/rosetta/templates/rosetta/pofile.html:144
 #, python-format
 msgid "%(hits)s/%(message_number)s message"
 msgid_plural "%(hits)s/%(message_number)s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(hits)s/%(message_number)s mensagem"
+msgstr[1] "%(hits)s/%(message_number)s mensagens"
 
 #: libs/unilangs/unilangs.py:122
 msgid "Afar"
@@ -1801,7 +1802,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:131
 msgid "American Sign Language"
-msgstr ""
+msgstr "Linguagem Gestual Americana"
 
 #: libs/unilangs/unilangs.py:132
 msgid "Asturian"
@@ -1945,11 +1946,11 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:167
 msgid "English, British"
-msgstr ""
+msgstr "Inglês, Britânico"
 
 #: libs/unilangs/unilangs.py:168
 msgid "Esperanto"
-msgstr ""
+msgstr "Esperanto"
 
 #: libs/unilangs/unilangs.py:169
 msgid "Spanish"
@@ -1957,7 +1958,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:170
 msgid "Spanish, Argentinian"
-msgstr ""
+msgstr "Espanhol, da Argentina"
 
 #: libs/unilangs/unilangs.py:171
 msgid "Spanish, Mexican"
@@ -2065,7 +2066,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:197
 msgid "Creole, Haitian"
-msgstr ""
+msgstr "Criôlo, do Haiti"
 
 #: libs/unilangs/unilangs.py:198
 msgid "Hungarian"
@@ -2357,7 +2358,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:270
 msgid "Nepali"
-msgstr ""
+msgstr "Nepalês"
 
 #: libs/unilangs/unilangs.py:271
 msgid "Ndonga"
@@ -2417,7 +2418,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:285
 msgid "Punjabi"
-msgstr ""
+msgstr "Punjabi"
 
 #: libs/unilangs/unilangs.py:286
 msgid "Pali"
@@ -2629,7 +2630,7 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:338
 msgid "Urdu"
-msgstr ""
+msgstr "Urdu"
 
 #: libs/unilangs/unilangs.py:339
 msgid "Uzbek"
@@ -2677,11 +2678,11 @@ msgstr ""
 
 #: libs/unilangs/unilangs.py:350
 msgid "Chinese, Simplified"
-msgstr ""
+msgstr "Chinês, Simplificado"
 
 #: libs/unilangs/unilangs.py:351
 msgid "Chinese, Traditional"
-msgstr ""
+msgstr "Chinês, Tradicional"
 
 #: libs/unilangs/unilangs.py:352
 msgid "Zulu"
@@ -2689,11 +2690,11 @@ msgstr ""
 
 #: templates/_paginator.html:4 templates/_paginator.html.py:6
 msgid "Previous"
-msgstr ""
+msgstr "Anterior"
 
 #: templates/_paginator.html:28 templates/_paginator.html.py:30
 msgid "Next"
-msgstr ""
+msgstr "Próximo"
 
 #: templates/_share_widget.html:4
 msgid "Share your subtitles"
@@ -3800,7 +3801,7 @@ msgstr "Mantenha-se ao corrente à medida que o projeto evolui!"
 
 #: templates/feedback_response.html:9
 msgid "Announcement Signup"
-msgstr ""
+msgstr "Registo de anúncio"
 
 #: templates/feedback_response.html:12
 msgid "Best"
@@ -3879,7 +3880,7 @@ msgid "See our enterprise services."
 msgstr ""
 
 #: templates/index.html:77
-msgid "6 key benefits"
+msgid "For Enterprise"
 msgstr ""
 
 #: templates/index.html:78
@@ -4145,7 +4146,7 @@ msgstr "Doar Agora"
 
 #: templates/opensubtitles2010.html:8 templates/opensubtitles2010.html:26
 msgid "Open Subtitles Design Summit"
-msgstr ""
+msgstr "Cimeira de desenho de legendas \"livres\""
 
 #: templates/opensubtitles2010.html:28
 msgid ""
@@ -4157,26 +4158,26 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:34
 msgid "Meeting Goals"
-msgstr ""
+msgstr "Objectivos da Reunião"
 
 #: templates/opensubtitles2010.html:37
 msgid ""
 "<strong>Connect</strong> major stakeholders from projects, organizations, "
 "and movements that have open subtitling needs or focus."
-msgstr ""
+msgstr "<strong>Ligar</strong> principais stakeholders dos projectos, organizações e movimentos que possuam uma necessidade ou foco na legendagem livre"
 
 #: templates/opensubtitles2010.html:41
 msgid ""
 "<strong>Identify ways</strong> to solve stakeholder subtitling needs and be "
 "aware of existing technology that can be leveraged. Find logical places for "
 "collaboration/cooperation."
-msgstr ""
+msgstr "<strong>Identificar</strong> dar resposta às necessidades de legendagem dos stakeholders e estar consciente da tecnologia existente que pode ser alavancada. Encontrar sítios lógicos para colaboração/cooperação"
 
 #: templates/opensubtitles2010.html:44
 msgid ""
 "<strong>Move towards</strong> standardizing solutions and pushing forward "
 "the state of the art in open subtiting."
-msgstr ""
+msgstr "<strong>Avançar</strong> padronização de soluções e fazer progredir o estado da arte na legendagem livre."
 
 #: templates/opensubtitles2010.html:53
 msgid "Participants"
@@ -4189,13 +4190,13 @@ msgid ""
 "accessibility advocates, open source developers, educational leaders, and "
 "other individuals and organizations with a stake in the subtitling world. "
 "We'll make a roster available when the event draws closer."
-msgstr ""
+msgstr "Participantes englobarão: criadores de vídeo, utilizadores finais, representantes dos principais serviços de alojamento de vídeo, engenheiros de padrões, defensores da acessibilidade, programadores open source, lideres da educação e outros indivíduos e organizações com interesse no mundo da legendagem. Disponibilizaremos uma lista quando o evento estiver próximo."
 
 #: templates/opensubtitles2010.html:57
 msgid ""
 "Attendees are selected by invitation; however, if you or your organization "
 "would like to participate, please contact:"
-msgstr ""
+msgstr "Participantes são seleccionados por convite; contudo, se a sua organização gostaria de participar, por favor contacte:"
 
 #: templates/opensubtitles2010.html:62
 msgid "When"
@@ -4214,7 +4215,7 @@ msgid ""
 "The summit will be held at the beautiful Open Plans penthouse in Soho, which"
 " is located at 148 Lafayette St, Floor 12, New York City. (<a "
 "href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
-msgstr ""
+msgstr "A cimeira será realizada na bela Open Plans penthouse em Soho, que se encontra em 148 Layfayette St, Floor 12, New York City.  (<a href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
@@ -4231,11 +4232,11 @@ msgid ""
 "            More captions will also make it simpler for computers to process, index, \n"
 "            and make sense of the ever growing sea of online video.\n"
 "           "
-msgstr ""
+msgstr "\nO objectivo desta cimeira é maior disponibilidade e melhor usabilidade das legendas"
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
-msgstr ""
+msgstr "Organizadores, Facilitadores, Patrocinadores"
 
 #: templates/opensubtitles2010.html:94
 msgid "Organizers"
@@ -4251,7 +4252,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:99
 msgid "Facilitators"
-msgstr ""
+msgstr "Facilitadores"
 
 #: templates/opensubtitles2010.html:100
 msgid ""
@@ -4259,7 +4260,7 @@ msgid ""
 "facilitation and agenda design. Aspiration believes that face-to-face events"
 " are the most powerful way to facilitate interaction, build networks, and "
 "collaborate."
-msgstr ""
+msgstr "<a href=\"http://www.aspirationtech.org/\">Aspiração</a> é fornecer facilitação e desenho de agenda. Aspiração acredita que eventos cara a cara são a forma mais poderosa de proporcionar interacção, construir redes de conhecimento e colaborar."
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
@@ -4269,13 +4270,13 @@ msgstr "Patrocinadores"
 msgid ""
 "The summit has been generously funded by the <a "
 "href=\"http://www.soros.org/\">Open Society Institute</a>."
-msgstr ""
+msgstr "A cimeira foi, generosamente, financiada pela <a href=\"http://www.soros.org/\">Open Society Institute</a>."
 
 #: templates/opensubtitles2010.html:113
 msgid ""
 "Special thanks to <a href=\"http://openplans.org/\">Open Plans</a> for "
 "providing meeting space!"
-msgstr ""
+msgstr "Um especial obrigado à <a href=\"http://openplans.org/\">Open Plans</a> por fornecer o espaço para o encontro!"
 
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:7
 msgid "Amara"
@@ -4344,7 +4345,7 @@ msgstr ""
 #: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:107
 #: templates/videos/diffing.html.py:172
 msgid "ago"
-msgstr ""
+msgstr "atrás"
 
 #: templates/jsdemo/home.html:16
 msgid "Subtitles and Captions for Every Video on the Web"
@@ -4412,13 +4413,13 @@ msgstr "Uma comunidade online para traduzir e legendar colaborativamente os víd
 
 #: templates/jsdemo/home.html:39
 msgid "Subtitle Lookup Protocol"
-msgstr ""
+msgstr "Protocolo de pesquisa de legendas"
 
 #: templates/jsdemo/home.html:40
 msgid ""
 "An open standard to let Firefox extensions, desktop video players, websites,"
 " browsers--any client--find and retrieve subtitles for any video."
-msgstr ""
+msgstr "Um padrão aberto para permitir que extensões do Firefox, leitores de vídeo, websites, browsers--qualquer cliente--consiga obter legendas para qualquer vídeo"
 
 #: templates/jsdemo/home.html:50
 msgid "Get updates and find out first when we launch"
@@ -4506,7 +4507,7 @@ msgstr ""
 #: templates/messages/_messages.html:7 templates/profiles/dashboard.html:85
 #: templates/videos/_recent_activity.html:11
 msgid "View all"
-msgstr ""
+msgstr "ver todos"
 
 #: templates/messages/list.html:6
 msgid "My Messages"
@@ -4734,7 +4735,7 @@ msgstr ""
 #: templates/videos/subtitle-view.html:147
 #: templates/videos/subtitle-view.html:194
 msgid "Subtitles"
-msgstr ""
+msgstr "Legendas"
 
 #: templates/profiles/dashboard.html:57 templates/teams/members-list.html:101
 #: templates/teams/members-list.html:102
@@ -4907,86 +4908,86 @@ msgstr "Confirmação de redefinição de palavra-passe"
 
 #: templates/registration/password_reset_confirm.html:12
 msgid "Enter new password"
-msgstr ""
+msgstr "Inserir nova palavra-passe"
 
 #: templates/registration/password_reset_confirm.html:14
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr ""
+msgstr "Por favor, introduza a sua nova palavra-passe duas vezes para que possamos verificar que a escreveu correctamente"
 
 #: templates/registration/password_reset_confirm.html:19
 msgid "New password:"
-msgstr ""
+msgstr "Nova palavra-passe:"
 
 #: templates/registration/password_reset_confirm.html:21
 msgid "Confirm password:"
-msgstr ""
+msgstr "Confirmar palavra-passe:"
 
 #: templates/registration/password_reset_confirm.html:22
 msgid "Change my password"
-msgstr ""
+msgstr "Mudar palavra-passe:"
 
 #: templates/registration/password_reset_confirm.html:31
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Palavra-passe não foi restaurada com sucesso"
 
 #: templates/registration/password_reset_confirm.html:33
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr ""
+msgstr "O link para restaurar a palavra-passe era inválido, possivelmente porque já tinha sido usado.\nPor favor peça para restaurar a palavra-passe novamente"
 
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr ""
+msgstr "Palavra-passe restaurada com sucesso"
 
 #: templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr ""
+msgstr "Enviámos, para o e-mail que submeteu, instruções para definir a Palavra-passe. Deve receber o e-mail em breve."
 
 #: templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
+msgstr "Está a receber este e-mail porque pediu para restaurar a sua palavra-passe."
 
 #: templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr ""
+msgstr "Para a sua conta de utlizador em %(site_name)s"
 
 #: templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Por favor prossiga para a seguinte página e escolha uma nova palavra-passe:"
 
 #: templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
-msgstr ""
+msgstr "O seu nome de utilizador, para o caso de se ter esquecido:"
 
 #: templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
-msgstr ""
+msgstr "Obrigado por usar o nosso site!"
 
 #: templates/registration/password_reset_email.html:13
 #, python-format
 msgid "The %(site_name)s team"
-msgstr ""
+msgstr "A equipa %(site_name)s"
 
 #: templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr ""
+msgstr "Esqueceu-se da palavra-passe? Introduza o seu email, abaixo, e enviaremos um e-mail com instruções para definir uma nova."
 
 #: templates/registration/password_reset_form.html:17
 msgid "E-mail address:"
-msgstr ""
+msgstr "Endereço de e-mail:"
 
 #: templates/registration/password_reset_form.html:18
 msgid "Reset my password"
-msgstr ""
+msgstr "restaurar a minha palavra-passe"
 
 #: templates/search/_search_form.html:12
 msgid "Search videos"
@@ -5141,7 +5142,7 @@ msgstr ""
 #: templates/statistic/log_entry_model_admin.html:37
 #: templates/statistic/logger_model_admin.html:37
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: templates/statistic/log_entry_model_admin.html:38
 #: templates/statistic/logger_model_admin.html:38
@@ -5177,7 +5178,7 @@ msgstr ""
 #: templates/teams/_context_team.html:47 templates/teams/tasks.html:125
 #: templates/teams/tasks.html.py:176 templates/videos/video-view.html:144
 msgid "Video"
-msgstr ""
+msgstr "Vídeo"
 
 #: templates/statistic/log_methods/changelist_view.html:39
 msgid "By logger"
@@ -5185,7 +5186,7 @@ msgstr ""
 
 #: templates/statistic/log_methods/changelist_view.html:41
 msgid "all"
-msgstr ""
+msgstr "todos"
 
 #: templates/statistic/log_methods/changelist_view.html:55
 msgid "Class"
@@ -5333,7 +5334,7 @@ msgstr ""
 #: templates/teams/_context_team.html:29
 #: templates/videos/test_form_page.html:24
 msgid "video"
-msgstr ""
+msgstr "Vídeo"
 
 #: templates/teams/_context_team.html:36
 #: templates/teams/_context_team.html:127
@@ -5408,7 +5409,7 @@ msgstr ""
 
 #: templates/teams/_tabs.html:16 templates/videos/video-view.html:146
 msgid "Activity"
-msgstr ""
+msgstr "Actividade"
 
 #: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
 #: templates/teams/_team_video_detail.html:48
@@ -6339,11 +6340,11 @@ msgstr ""
 #: templates/videos/_error_feedback_form.html:7
 msgid ""
 "Please let us know what you were doing when you encountered this error."
-msgstr ""
+msgstr "Pro favor, diga-nos o que estava a fazer quando encontrou este erro."
 
 #: templates/videos/_error_feedback_form.html:9
 msgid "Sorry, the page you requested was not found."
-msgstr ""
+msgstr "lamentamos, a página que pediu não foi encontrada."
 
 #: templates/videos/_feature_video.html:12
 msgid "Unfeature video"
@@ -6360,7 +6361,7 @@ msgstr ""
 #: templates/videos/_feedback_form.html:8
 msgid ""
 "Please let us know if you have any comments, questions, or suggestions!"
-msgstr ""
+msgstr "Por favor, informe-nos se tiver algum comentário, pergunta ou sugestão!"
 
 #: templates/videos/_feedback_form.html:9
 msgid ""
@@ -6370,11 +6371,11 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:13
 msgid "Your email:"
-msgstr ""
+msgstr "O seu email:"
 
 #: templates/videos/_feedback_form.html:16
 msgid "Your Feedback"
-msgstr ""
+msgstr "O seu comentário:"
 
 #: templates/videos/_feedback_form.html:26
 msgid "Send feedback"
@@ -6382,7 +6383,7 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:26
 msgid "Send Feedback"
-msgstr ""
+msgstr "Enviar comentário"
 
 #: templates/videos/_feedback_form.html:35
 #: templates/videos/_paste_transcription.html:113
@@ -6394,31 +6395,31 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:37
 msgid "Thank you for your feedback."
-msgstr ""
+msgstr "Obrigado pelo seu comentário."
 
 #: templates/videos/_feedback_form.html:38
 msgid "If you would like to perform some additional testing"
-msgstr ""
+msgstr "Se quiser realizar algum teste adicional"
 
 #: templates/videos/_feedback_form.html:39
 msgid "please go to our"
-msgstr ""
+msgstr "por favor, para para o nosso"
 
 #: templates/videos/_feedback_form.html:39
 msgid "Litmus regression tests"
-msgstr ""
+msgstr "testes de regressão Litmus"
 
 #: templates/videos/_feedback_form.html:40
 msgid "For new testers, we have"
-msgstr ""
+msgstr "Para novos técnicos de testes, temos"
 
 #: templates/videos/_feedback_form.html:40
 msgid "a getting started guide"
-msgstr ""
+msgstr "um guia de \"como começar\""
 
 #: templates/videos/_feedback_form.html:54
 msgid "Enter feedback please."
-msgstr ""
+msgstr "Insira comentário, por favor."
 
 #: templates/videos/_follow_video_button.html:37
 msgid "✓ Following"
@@ -6446,7 +6447,7 @@ msgstr ""
 msgid ""
 " subtitles for this video are edited. You can choose to follow again at any "
 "time."
-msgstr ""
+msgstr "As legendas deste vídeo estão editadas. Pode escolher seguir outra vez, a qualquer momento"
 
 #: templates/videos/_follow_video_button.html:92
 msgid "Stop following "
@@ -6459,7 +6460,7 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:104
 msgid "Unfollow all languages"
-msgstr ""
+msgstr "Deixar de seguir todas as línguas"
 
 #: templates/videos/_follow_video_button.html:142
 msgid "You will receive notifications when anyone edits "
@@ -6544,7 +6545,7 @@ msgstr ""
 #: templates/videos/_paste_transcription.html:163
 #: templates/videos/_upload_subtitles.html:36
 msgid "Login to upload subtitles"
-msgstr ""
+msgstr "iniciar sessão para carregar legendas"
 
 #: templates/videos/_team_list.html:5 templates/videos/video-view.html:180
 msgid "Collaborate"
@@ -6564,7 +6565,7 @@ msgstr ""
 
 #: templates/videos/_upload_subtitles.html:6
 msgid "Upload Subtitles"
-msgstr ""
+msgstr "carregar legendas"
 
 #: templates/videos/_upload_subtitles.html:10
 msgid ""
@@ -6591,7 +6592,7 @@ msgstr ""
 msgid ""
 "If you believe your subtitle file is compatible, <a "
 "href='mailto:feedback@universalsubtitles.org'>send it to us</a>"
-msgstr ""
+msgstr "Se acha que o ficheiro de legendas é compatível,  <a href='mailto:feedback@universalsubtitles.org'>envie-nos o ficheiro</a>"
 
 #: templates/videos/_video.html:23
 msgid "view"
@@ -6704,7 +6705,7 @@ msgstr ""
 
 #: templates/videos/actions_list.html:21
 msgid "There are no activities."
-msgstr ""
+msgstr "Não há actividades."
 
 #: templates/videos/create.html:10
 msgid ""
@@ -6723,7 +6724,7 @@ msgstr "Legendar um vídeo"
 
 #: templates/videos/create.html:25
 msgid "Begin"
-msgstr ""
+msgstr "Começar"
 
 #: templates/videos/create.html:28
 msgid ""
@@ -6753,11 +6754,11 @@ msgstr ""
 
 #: templates/videos/diffing.html:41
 msgid "Subtitles will be rolled back to a previous version"
-msgstr ""
+msgstr "Legendas serão revertidas para uma versão anterior"
 
 #: templates/videos/diffing.html:47
 msgid "You need to log in to do that."
-msgstr ""
+msgstr "Precisa de iniciar a sessão para fazer isso"
 
 #: templates/videos/diffing.html:69
 #, python-format
@@ -6777,11 +6778,11 @@ msgstr ""
 
 #: templates/videos/diffing.html:92
 msgid "Revision History"
-msgstr ""
+msgstr "histórico de revisão"
 
 #: templates/videos/diffing.html:96
 msgid "Comparing Revision"
-msgstr ""
+msgstr "Comparar revisão"
 
 #: templates/videos/diffing.html:104 templates/videos/diffing.html.py:169
 #, python-format
@@ -6789,11 +6790,11 @@ msgid ""
 "\n"
 "            Revision #%(version_no)s by %(user)s\n"
 "            "
-msgstr ""
+msgstr "\nRevisão #%(version_no)s por %(user)s\n            "
 
 #: templates/videos/diffing.html:118 templates/videos/diffing.html.py:185
 msgid "Roll back to version"
-msgstr ""
+msgstr "Reverter para versão"
 
 #: templates/videos/diffing.html:126 templates/videos/diffing.html.py:192
 #: templates/videos/subtitle-view.html:210
@@ -6808,11 +6809,11 @@ msgstr ""
 #: templates/videos/diffing.html:156 templates/videos/diffing.html.py:223
 #: templates/videos/subtitle-view.html:234
 msgid "Not Synced"
-msgstr ""
+msgstr "Não sincronizado"
 
 #: templates/videos/email_base.html:94
 msgid "Don't send any more emails about this particular video."
-msgstr ""
+msgstr "Não envie mais emails acerca deste vídeo em particular"
 
 #: templates/videos/email_base.html:104
 msgid ""
@@ -6822,15 +6823,15 @@ msgstr ""
 
 #: templates/videos/email_base.html:106
 msgid "My profile / preferences"
-msgstr ""
+msgstr "O meu perfil / preferências "
 
 #: templates/videos/email_friend.html:6
 msgid "Email this to a friend"
-msgstr ""
+msgstr "Enviar por email para um amigo"
 
 #: templates/videos/email_friend.html:10
 msgid "Send to Friend!"
-msgstr ""
+msgstr "Enviar para um amigo!"
 
 #: templates/videos/email_notification.html:9
 #, python-format
@@ -6919,7 +6920,7 @@ msgstr ""
 
 #: templates/videos/email_start_notification.html:7
 msgid "Dear"
-msgstr ""
+msgstr "Caro"
 
 #: templates/videos/email_start_notification.html:8
 #, python-format
@@ -6934,19 +6935,19 @@ msgstr ""
 msgid ""
 "You can review the translation and thank them for their contribution on this"
 " page:"
-msgstr ""
+msgstr "Pode rever a tradução e agradecer-lhes pela sua contribuição nesta página:"
 
 #: templates/videos/email_start_notification.html:14
 msgid "Translation homepage"
-msgstr ""
+msgstr "Página de tradução"
 
 #: templates/videos/email_start_notification.html:17
 msgid "Thanks for your great work,"
-msgstr ""
+msgstr "Obrigado pelo seu fantástico trabalho,"
 
 #: templates/videos/email_start_notification.html:19
 msgid "Sincerely"
-msgstr ""
+msgstr "Atenciosamente"
 
 #: templates/videos/email_start_notification.html:20
 msgid "The Amara Community"
@@ -6993,7 +6994,7 @@ msgstr ""
 
 #: templates/videos/email_video_url_add.html:13
 msgid "Anonymous"
-msgstr ""
+msgstr "Anónimo"
 
 #: templates/videos/email_video_url_add.html:15
 msgid ""
@@ -7054,7 +7055,7 @@ msgstr ""
 #: templates/videos/stop_notification.html:9
 #, python-format
 msgid "Notifications to %(u)s stopped for %(video)s."
-msgstr ""
+msgstr "Notificações para %(u)s pararam parar %(video)s."
 
 #: templates/videos/subtitle-view.html:22
 msgid "Select two revisions to compare, please"
@@ -7154,7 +7155,7 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:257
 msgid "Make some!"
-msgstr ""
+msgstr "Faz algum!"
 
 #: templates/videos/subtitle-view.html:265
 msgid ""
@@ -7185,7 +7186,7 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:323
 msgid "Text"
-msgstr ""
+msgstr "Texto"
 
 #: templates/videos/subtitle-view.html:329
 msgid "No subtitles for this language."
@@ -7220,7 +7221,7 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:18
 msgid "Your Email"
-msgstr ""
+msgstr "O seu Email"
 
 #: templates/videos/test_form_page.html:23
 msgid "Task 1"
@@ -7228,14 +7229,14 @@ msgstr "1ª Tarefa"
 
 #: templates/videos/test_form_page.html:24
 msgid "Try creating subtitles on the following"
-msgstr ""
+msgstr "Tente criar legendas no seguinte"
 
 #: templates/videos/test_form_page.html:25
 #: templates/videos/test_form_page.html:31
 #: templates/videos/test_form_page.html:37
 #: templates/videos/test_form_page.html:57
 msgid "how was it? were the instructions clear? what would improve it?"
-msgstr ""
+msgstr "Como correu? As instruções eram claras? O que é que podia melhorar?"
 
 #: templates/videos/test_form_page.html:29
 msgid "Task 2"
@@ -7243,7 +7244,7 @@ msgstr "2ª Tarefa"
 
 #: templates/videos/test_form_page.html:30
 msgid "Try fixing errors on the video (or just get back in and make an edit)"
-msgstr ""
+msgstr "Tenta corrigir erros no vídeo (ou regressa e faz uma edição)"
 
 #: templates/videos/test_form_page.html:35
 msgid "Task 3"
@@ -7251,7 +7252,7 @@ msgstr "3ª Tarefa"
 
 #: templates/videos/test_form_page.html:36
 msgid "Translate the video (fake it if you’re not bilingual!)"
-msgstr ""
+msgstr "Traduz o vídeo (finge, se não fores bilíngue)"
 
 #: templates/videos/test_form_page.html:42
 msgid "optional: get updates about Amara"
@@ -7263,15 +7264,15 @@ msgstr "Submeter!"
 
 #: templates/videos/test_form_page.html:67
 msgid "Simple Instructions"
-msgstr ""
+msgstr "Instruções simples"
 
 #: templates/videos/test_form_page.html:73
 msgid "All tasks 2 & 3 are optional (but we recommend trying them all)."
-msgstr ""
+msgstr "Todas as tarefas 2 & 3 são opcionais (mas recomendamos que tentem todas)"
 
 #: templates/videos/test_form_page.html:74
 msgid "That’s it!"
-msgstr ""
+msgstr "Já está!"
 
 #: templates/videos/video-view.html:22
 msgid "Enter non-empty title"
@@ -7382,15 +7383,15 @@ msgstr ""
 
 #: utils/forms/unisub_video_form.py:62
 msgid "This URL does not contain video id."
-msgstr ""
+msgstr "Este URL não contém um id de vídeo."
 
 #: utils/forms/unisub_video_form.py:67
 msgid "Videos does not exist."
-msgstr ""
+msgstr "Vídeos não existem."
 
 #: utils/forms/unisub_video_form.py:70
 msgid "Incorrect URL."
-msgstr ""
+msgstr "URL incorrecto."
 
 #: utils/templatetags/utils_tags.py:49
 msgid "more..."

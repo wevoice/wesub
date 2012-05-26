@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-25 01:34-0500\n"
-"PO-Revision-Date: 2012-05-25 06:48+0000\n"
+"POT-Creation-Date: 2012-05-26 01:32-0500\n"
+"PO-Revision-Date: 2012-05-26 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.net/projects/p/universalsubtitles/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -92,7 +92,7 @@ msgstr "像本地人一样写作"
 
 #: apps/auth/models.py:393
 msgid "follow requests in language"
-msgstr ""
+msgstr "跟进语种的请求"
 
 #: apps/auth/models.py:408
 msgid ""
@@ -138,7 +138,7 @@ msgstr "请确认你的电邮。"
 
 #: apps/comments/forms.py:53
 msgid "You car reply only comments for same object"
-msgstr ""
+msgstr "你只能回复来自同一对象的评论"
 
 #: apps/icanhaz/forms.py:23
 msgid "Only me"
@@ -1491,7 +1491,7 @@ msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add or\n"
 "improve subtitles, click the button below the video."
-msgstr ""
+msgstr "这里有为你的视频而设的字幕工作区. 你可以\n同朋友分享视频, 或者获得嵌入你站点的代码.  要添加或者\n改进字幕, 点击视频下方的按钮."
 
 #: apps/videos/views.py:167
 msgid ""
@@ -1502,7 +1502,7 @@ msgstr "你已经提交了一个视频⏎\n                它使用http服务. 
 
 #: apps/videos/views.py:172
 msgid "Existing subtitles will be imported in a few minutes."
-msgstr ""
+msgstr "现有的字幕将在一小会儿后导入"
 
 #: apps/videos/views.py:274
 msgid ""
@@ -1672,7 +1672,7 @@ msgstr "下载这个目录"
 #: libs/rosetta/templates/rosetta/pofile.html:21
 #, python-format
 msgid "Progress: %(percent_translated)s%%"
-msgstr ""
+msgstr "进度: %(percent_translated)s%%"
 
 #: libs/rosetta/templates/rosetta/pofile.html:23
 msgid "File is read-only: download the file when done editing!"
@@ -3070,7 +3070,7 @@ msgid ""
 "\n"
 "            You can add it just before the <code>&lt;/head&gt;</code> or <code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
 "        "
-msgstr ""
+msgstr "\n            你可以在 <code>&lt;/head&gt;</code> 或者 <code>&lt;/body&gt;</code> 标签前添加 (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n        "
 
 #: templates/embed_page.html:37
 msgid "This lets you and visitors to your site"
@@ -3241,7 +3241,7 @@ msgstr ""
 
 #: templates/enterprise.html:87
 msgid "Crowdsource with Professional Review"
-msgstr ""
+msgstr "带有专业评审的众包"
 
 #: templates/enterprise.html:89
 msgid ""
@@ -3856,7 +3856,7 @@ msgid ""
 "\n"
 "            Our deaf and hard of hearing users and non-profits request help for videos that need captions or translations. \n"
 "        "
-msgstr ""
+msgstr "\n            我们的聋哑、听力障碍用户以及非盈利性组织请求帮助翻译视频字幕. \n        "
 
 #: templates/index.html:44
 msgid "Start volunteering."
@@ -3878,8 +3878,8 @@ msgid "See our enterprise services."
 msgstr "查看我们的企业服务"
 
 #: templates/index.html:77
-msgid "6 key benefits"
-msgstr "6个重要的好处"
+msgid "For Enterprise"
+msgstr ""
 
 #: templates/index.html:78
 msgid ""
@@ -3904,7 +3904,7 @@ msgstr "Drupal范例"
 
 #: templates/index.html:113 templates/index.html.py:114
 msgid "Al Jazeera Team"
-msgstr ""
+msgstr "半岛电视台小组"
 
 #: templates/index.html:120
 msgid "Newshour Team"
@@ -3912,7 +3912,7 @@ msgstr ""
 
 #: templates/index.html:121
 msgid "NewsHour Team"
-msgstr ""
+msgstr "NewsHour 小组"
 
 #: templates/index.html:127
 msgid "More Popular"
@@ -5250,7 +5250,7 @@ msgid ""
 "\n"
 "                                No formal language training is required to translate for %(team)s. But we do ask that all translators are confident in their translation abilities. Please make sure your profile has your language\n"
 "                            "
-msgstr ""
+msgstr "\n                                为 %(team)s 做翻译不需要正式的语言训练. 但我们确实要求所有的翻译者确信有翻译能力. 请确保你的概况信息种设置了你的语种\n                            "
 
 #: templates/teams/_application_form.html:24
 msgid "proficiency"
@@ -5892,15 +5892,15 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:57
 msgid "Who can transcribe subtitles?"
-msgstr ""
+msgstr "谁能改编字幕？"
 
 #: templates/teams/settings-permissions.html:58
 msgid "i.e. transcribe from video and perform time-alignment"
-msgstr ""
+msgstr "例如从视频中改编以校准字幕 and perform time-alignment"
 
 #: templates/teams/settings-permissions.html:61
 msgid "Who can translate subtitles?"
-msgstr ""
+msgstr "谁能翻译字幕"
 
 #: templates/teams/settings-permissions.html:62
 msgid "i.e. translate text from an original subtitle into a new language"
@@ -5920,15 +5920,15 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:77
 msgid "Reviewed"
-msgstr ""
+msgstr "已评审"
 
 #: templates/teams/settings-permissions.html:82
 msgid "Approved"
-msgstr ""
+msgstr "已批准"
 
 #: templates/teams/settings-permissions.html:87
 msgid "Published"
-msgstr ""
+msgstr "已发布"
 
 #: templates/teams/settings-permissions.html:93
 msgid "Workflows enable you to add moderation steps and automate tasks"
@@ -5937,11 +5937,11 @@ msgstr ""
 #: templates/teams/settings-permissions.html:94
 #: templates/teams/settings-projects-add.html:42
 msgid "Enable workflows"
-msgstr ""
+msgstr "启用工作流"
 
 #: templates/teams/settings-permissions.html:101
 msgid "Automatically create transcription tasks"
-msgstr ""
+msgstr "自动创建改编任务"
 
 #: templates/teams/settings-permissions.html:106
 #: templates/teams/settings-projects-add.html:54

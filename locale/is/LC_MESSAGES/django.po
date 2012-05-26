@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-25 01:32-0500\n"
+"POT-Creation-Date: 2012-05-26 01:30-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4091,7 +4091,7 @@ msgid "See our enterprise services."
 msgstr ""
 
 #: templates/index.html:77
-msgid "6 key benefits"
+msgid "For Enterprise"
 msgstr ""
 
 #: templates/index.html:78

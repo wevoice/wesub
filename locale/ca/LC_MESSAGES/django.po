@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-25 01:34-0500\n"
-"PO-Revision-Date: 2012-05-25 06:48+0000\n"
+"POT-Creation-Date: 2012-05-26 01:32-0500\n"
+"PO-Revision-Date: 2012-05-26 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.net/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -601,7 +601,7 @@ msgstr "No teniu permisos per a deixar de publicar aquests subtítols."
 
 #: apps/teams/forms.py:641
 msgid "You cannot perform that task."
-msgstr ""
+msgstr "No podeu realitzar eixa tasca."
 
 #: apps/teams/forms.py:650 apps/videos/forms.py:68 apps/videos/forms.py:86
 #: apps/videos/forms.py:398
@@ -3454,7 +3454,7 @@ msgid ""
 "\n"
 "                Use the Amara API to bring completed subtitle data and metadata into your own backend or publishing platform.\n"
 "            "
-msgstr ""
+msgstr "\nUtilitzeu l'API d'Amara per a dur les dades i metadades d'un subtítol complet al vostre propi processador dorsal o plataforma de publicació. "
 
 #: templates/enterprise.html:216
 msgid "A Revolutionary Video Security Model"
@@ -3519,7 +3519,7 @@ msgstr "Comenceu amb Amara"
 
 #: templates/enterprise.html:262
 msgid "Be in touch at"
-msgstr ""
+msgstr "Estigueu en contacte a"
 
 #: templates/faq.html:16
 msgid "Frequently Asked Questions"
@@ -3880,8 +3880,8 @@ msgid "See our enterprise services."
 msgstr "Mireu els nostres serveis empresarials."
 
 #: templates/index.html:77
-msgid "6 key benefits"
-msgstr "6 avantatges clau"
+msgid "For Enterprise"
+msgstr ""
 
 #: templates/index.html:78
 msgid ""
@@ -5550,7 +5550,7 @@ msgstr "Denegar"
 
 #: templates/teams/applications.html:56
 msgid "Send a message"
-msgstr ""
+msgstr "Enviar un missatge"
 
 #: templates/teams/applications.html:66
 msgid "There are no applications right now"

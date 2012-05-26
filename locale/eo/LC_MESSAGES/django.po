@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-25 01:34-0500\n"
-"PO-Revision-Date: 2012-05-25 06:48+0000\n"
+"POT-Creation-Date: 2012-05-26 01:32-0500\n"
+"PO-Revision-Date: 2012-05-26 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Esperanto (http://www.transifex.net/projects/p/universalsubtitles/language/eo/)\n"
 "MIME-Version: 1.0\n"
@@ -454,7 +454,7 @@ msgstr "Malreliefigi teamojn."
 
 #: apps/teams/admin.py:78 apps/teams/admin.py:111 apps/teams/models.py:182
 msgid "Team"
-msgstr "Teamo"
+msgstr "Skipo"
 
 #: apps/teams/admin.py:84
 msgid "User"
@@ -687,7 +687,7 @@ msgstr "publike videbla?"
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
-msgstr "videoj"
+msgstr "filmoj"
 
 #: apps/teams/models.py:131
 msgid "users"
@@ -703,11 +703,11 @@ msgstr "kandidatoj"
 
 #: apps/teams/models.py:140
 msgid "Intro Video"
-msgstr "enkonduka filmeto"
+msgstr "Enkonduka Filmo"
 
 #: apps/teams/models.py:142
 msgid "Page content"
-msgstr "enhavo de paĝo"
+msgstr "Enhavo de paĝo"
 
 #: apps/teams/models.py:142
 msgid "You can use markdown. This will replace Description."
@@ -715,7 +715,7 @@ msgstr ""
 
 #: apps/teams/models.py:144
 msgid "HTML that appears at the top of the teams page."
-msgstr "HTML, kiu aperas supre de la teama paĝo."
+msgstr "HTML, kiu aperas supre de la skipa paĝo."
 
 #: apps/teams/models.py:147
 msgid "authentication provider code"
@@ -752,7 +752,7 @@ msgstr ""
 #: apps/teams/models.py:183 templates/profiles/_top_user_panel.html:33
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
-msgstr "Teamoj"
+msgstr "Skipoj"
 
 #: apps/teams/models.py:626
 msgid ""
@@ -770,7 +770,7 @@ msgstr "Bezonas helpon kun ĉiuj lingvoj"
 
 #: apps/teams/models.py:633
 msgid "If you check this, other languages will not be displayed."
-msgstr "Se vi selektas ĉi tion, vi ne vidos aliajn lingvojn."
+msgstr "Se vi elektas ĉi tion, vi ne vidos aliajn lingvojn."
 
 #: apps/teams/models.py:913 apps/teams/permissions_const.py:45
 msgid "Owner"
@@ -778,7 +778,7 @@ msgstr ""
 
 #: apps/teams/models.py:914 apps/teams/permissions_const.py:46
 msgid "Manager"
-msgstr ""
+msgstr "Mastrumanto"
 
 #: apps/teams/models.py:915 apps/teams/permissions_const.py:44
 #: templates/base.html:116
@@ -795,11 +795,11 @@ msgstr ""
 
 #: apps/teams/rpc.py:40
 msgid "Team does not exist"
-msgstr "Teamo ne ekzistas."
+msgstr "Skipo ne ekzistas."
 
 #: apps/teams/rpc.py:44
 msgid "You are already a member of this team."
-msgstr "Vi estas jam membro de ĉi tiu teamo."
+msgstr "Vi estas jam membro de ĉi tiu skipo."
 
 #: apps/teams/rpc.py:50 apps/teams/views.py:871
 msgid "You are now a member of this team."
@@ -1063,7 +1063,7 @@ msgstr ""
 #: apps/teams/templatetags/teams_tags.py:246
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
-msgstr "Ĉu iu povus helpi al mi traduki ĉi tiujn filmetojn? %(url)s"
+msgstr "Ĉu iu povus helpi al mi traduki ĉi tiujn filmojn? %(url)s"
 
 #: apps/videos/admin.py:32
 msgid "Email for alert"
@@ -1071,7 +1071,7 @@ msgstr "Retpoŝto por atentigo"
 
 #: apps/videos/forms.py:64
 msgid "File should have txt format"
-msgstr "Dosieroj devas havi txt-formaton"
+msgstr "Dosieroj devas esti txt-formata"
 
 #: apps/videos/forms.py:77
 msgid "Can't encode file. It should have utf8 encoding."
@@ -2950,11 +2950,11 @@ msgid ""
 "Please also note that under Section 512(f) any person who knowingly materially\n"
 "misrepresents that material or activity is infringing may be subject to\n"
 "liability.\n"
-msgstr ""
+msgstr "\nBonvolu ankaŭ noti ke, laŭ Sekcio 512(f), iu kiu konscie kaj konkrete misreprezentas tiun rimedon aŭ aktivadon, malrespektas kaj sekve kompensdevos.\n"
 
 #: templates/dmca.html:63
 msgid "Counter-Notification"
-msgstr ""
+msgstr "Kontraŭ-indiko"
 
 #: templates/dmca.html:65
 msgid ""
@@ -2968,7 +2968,7 @@ msgstr ""
 
 #: templates/dmca.html:75
 msgid "How do I file a DMCA counter notice?"
-msgstr ""
+msgstr "Kiel registri kontraŭ-indikon al DCMA?"
 
 #: templates/dmca.html:77
 msgid ""
@@ -2998,7 +2998,7 @@ msgstr ""
 
 #: templates/dmca.html:99
 msgid "Elements of Counter-Notification"
-msgstr ""
+msgstr "Elementoj por kontraŭ-indikon"
 
 #: templates/dmca.html:101
 msgid ""
@@ -3064,7 +3064,7 @@ msgstr ""
 
 #: templates/embed_page.html:24
 msgid "Add collaborative subtitling to every video on your site"
-msgstr ""
+msgstr "Aldonu kunlaborajn subtitolojn al ĉiu filme ĉe via retejo"
 
 #: templates/embed_page.html:28
 msgid "Just drop one line of code into your page:"
@@ -3079,11 +3079,11 @@ msgstr ""
 
 #: templates/embed_page.html:37
 msgid "This lets you and visitors to your site"
-msgstr ""
+msgstr "Tio kondukas vin kaj viaj vizitantoj al via retejon"
 
 #: templates/embed_page.html:41
 msgid "Create subtitles for any compatible video"
-msgstr ""
+msgstr "Kreŭ subtitolojn por ĉiu kongrua filmo"
 
 #: templates/embed_page.html:44
 msgid "Find subtitles created by others"
@@ -3103,7 +3103,7 @@ msgstr ""
 
 #: templates/embed_page.html:58
 msgid "Proud to be a"
-msgstr ""
+msgstr "Fiere estas"
 
 #: templates/embed_page.html:58
 msgid "Featured Mozilla Drumbeat Project"
@@ -3599,7 +3599,7 @@ msgstr "Kial mi ne povas retempigi tradukatajn subtekstojn?"
 msgid ""
 "How do old revisions work? What if somebody makes a change to my work that I"
 " don't approve of?"
-msgstr ""
+msgstr "Kie estas la antaŭaj versioj? Kio okazos se iu ŝanĝas mian laboron iel, tiel neaprobitan de mi?"
 
 #: templates/faq.html:36 templates/faq.html.py:186
 msgid "How do I add the Amara &quot;embed all videos&quot; code to my site?"
@@ -3607,7 +3607,7 @@ msgstr ""
 
 #: templates/faq.html:37 templates/faq.html.py:199
 msgid "Hey, you don’t list my language!"
-msgstr ""
+msgstr "Nu! vi ne listigis mian lingvon!"
 
 #: templates/faq.html:45
 msgid ""
@@ -3631,12 +3631,12 @@ msgstr ""
 
 #: templates/faq.html:66
 msgid "VVideo subtitles are a gold mine of untapped potential."
-msgstr ""
+msgstr "Filmaj subtitoloj estas potenca, neuzita or-mino."
 
 #: templates/faq.html:68
 msgid ""
 "Captions make videos accessible for viewers who are deaf or hard of hearing "
-msgstr ""
+msgstr "Apudskribaĵoj alireblas vidantoj surdaj aŭ malbon-aŭdantaj"
 
 #: templates/faq.html:69
 msgid ""
@@ -3883,7 +3883,7 @@ msgid "See our enterprise services."
 msgstr ""
 
 #: templates/index.html:77
-msgid "6 key benefits"
+msgid "For Enterprise"
 msgstr ""
 
 #: templates/index.html:78
@@ -4308,7 +4308,7 @@ msgstr ""
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
 #: templates/messages/sent.html:51 templates/teams/tasks.html:367
 msgid "Delete"
-msgstr ""
+msgstr "Forigu"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
@@ -4320,7 +4320,7 @@ msgstr "Nuligi"
 
 #: templates/auth/login.html:9
 msgid "Login to Your Existing Account"
-msgstr ""
+msgstr "Ensalutu vian Ekzistantan Konton"
 
 #: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
 msgid "Login"
@@ -4332,7 +4332,7 @@ msgstr "Ĉu vi forgesis la pasvorton?"
 
 #: templates/auth/login.html:17
 msgid "You can also login using"
-msgstr ""
+msgstr "Ankaŭ eblas saluti per"
 
 #: templates/auth/login.html:27
 msgid "Create an Account"
@@ -4454,7 +4454,7 @@ msgstr "Provu la provoversio"
 
 #: templates/livesettings/site_settings.html:48
 msgid "Documentation"
-msgstr ""
+msgstr "Help-dokumentoj"
 
 #: templates/livesettings/site_settings.html:48
 msgid "Change password"
@@ -4462,7 +4462,7 @@ msgstr "Ŝanĝi pasvorton"
 
 #: templates/livesettings/site_settings.html:48
 msgid "Log out"
-msgstr ""
+msgstr "Elsalutu"
 
 #: templates/livesettings/site_settings.html:52
 msgid "Edit Site Settings"
@@ -4489,15 +4489,15 @@ msgstr ""
 
 #: templates/livesettings/site_settings.html:108
 msgid "Update Settings"
-msgstr ""
+msgstr "Ĝisdatigaj Agordoj"
 
 #: templates/livesettings/site_settings.html:109
 msgid "Uncollapse all"
-msgstr ""
+msgstr "Aperigu ĉion"
 
 #: templates/livesettings/site_settings.html:113
 msgid "You don't have permission to edit values."
-msgstr ""
+msgstr "Vi ne rajtas ŝanĝi valorojn"
 
 #: templates/messages/_messages.html:4
 #, python-format
@@ -4564,7 +4564,7 @@ msgstr "Senditaj Mesaĝoj"
 
 #: templates/messages/sent.html:42 templates/messages/sent.html.py:44
 msgid "Avatar"
-msgstr ""
+msgstr "Avataro"
 
 #: templates/messages/sent.html:60
 msgid "You have no sent messages."
@@ -4648,15 +4648,15 @@ msgstr ""
 msgid ""
 "It looks like you logged in without submitting an email. We need an email "
 "address to notify you (for example, when others edit your work)."
-msgstr ""
+msgstr "Ŝajnas ke vi ensalutis sen registri retmesaĝadreson. Ni bezonas adreson por indiki vin (ekzemple kiam aliaj redaktas vian laboron)."
 
 #: templates/profiles/_require_email_dialog.html:8
 msgid "Please enter a valid e-mail address"
-msgstr ""
+msgstr "Bonvolu skribi validan retpoŝtan adreson"
 
 #: templates/profiles/_require_email_dialog.html:10
 msgid "Enter valid email please."
-msgstr ""
+msgstr "Bonvolu skribi validan retpoŝtan adreson"
 
 #: templates/profiles/_select_language_dialog.html:4
 #: templates/search/search.html:154 templates/videos/featured_videos.html:55
@@ -4674,7 +4674,7 @@ msgstr "Elektu almenaŭ unu lingvon."
 
 #: templates/profiles/_select_language_dialog.html:11
 msgid "Saving your language settings..."
-msgstr ""
+msgstr "Registrante viajn lingvajn agordojn..."
 
 #: templates/profiles/_select_language_dialog.html:15
 msgid "We really need your help!"
@@ -4782,7 +4782,7 @@ msgstr ""
 #: templates/videos/_paste_transcription.html:158
 #: templates/videos/_video_url_panel.html:77
 msgid "Saving..."
-msgstr ""
+msgstr "Registrante..."
 
 #: templates/profiles/edit_profile.html:51
 msgid "Edit Your Profile"
@@ -4798,7 +4798,7 @@ msgstr ""
 
 #: templates/profiles/edit_profile.html:83
 msgid "remove picture"
-msgstr ""
+msgstr "Forigu bildojn"
 
 #: templates/profiles/edit_profile.html:88
 msgid "Upload picture"
@@ -4848,15 +4848,15 @@ msgstr ""
 
 #: templates/profiles/edit_profile.html:186
 msgid "Permanently Delete Your Profile"
-msgstr ""
+msgstr "Finfare forigu vian profilon"
 
 #: templates/profiles/my_videos.html:6 templates/profiles/my_videos.html:22
 msgid "My videos"
-msgstr ""
+msgstr "Miaj filmoj"
 
 #: templates/profiles/view_profile.html:56
 msgid "Member since"
-msgstr ""
+msgstr "Membro ekde"
 
 #: templates/profiles/view_profile.html:62
 msgid "Homepage"
@@ -5016,7 +5016,7 @@ msgstr[1] "\n              %(number)s lingvoj\n          "
 
 #: templates/search/_video_item.html:24
 msgid "lines"
-msgstr ""
+msgstr "linioj"
 
 #: templates/search/_video_item.html:34
 msgid "Plays (this week)"
@@ -5053,16 +5053,16 @@ msgstr ""
 
 #: templates/statistic/index.html:26
 msgid "Users statistic"
-msgstr ""
+msgstr "Uzanta statistiko"
 
 #: templates/statistic/index.html:27
 #: templates/statistic/videos_statistic.html:6
 msgid "Videos statistic"
-msgstr ""
+msgstr "Filma statistiko"
 
 #: templates/statistic/index.html:28
 msgid "Languages statistic"
-msgstr ""
+msgstr "Lingva statistiko"
 
 #: templates/statistic/index.html:73
 #: templates/statistic/language_statistic.html:31
@@ -5073,19 +5073,19 @@ msgstr ""
 #: templates/statistic/language_statistic.html:32
 #: templates/statistic/languages_statistic.html:37
 msgid "day"
-msgstr ""
+msgstr "tago"
 
 #: templates/statistic/index.html:75
 #: templates/statistic/language_statistic.html:33
 #: templates/statistic/languages_statistic.html:38
 msgid "week"
-msgstr ""
+msgstr "semajno"
 
 #: templates/statistic/index.html:76
 #: templates/statistic/language_statistic.html:34
 #: templates/statistic/languages_statistic.html:39
 msgid "month"
-msgstr ""
+msgstr "monato"
 
 #: templates/statistic/index.html:77
 #: templates/statistic/language_statistic.html:35
@@ -5093,38 +5093,38 @@ msgstr ""
 #: templates/statistic/users_statistic.html:16
 #: templates/statistic/videos_statistic.html:16
 msgid "TOTAL"
-msgstr ""
+msgstr "ENTUTE"
 
 #: templates/statistic/index.html:83
 msgid "Total number of videos captioned"
-msgstr ""
+msgstr "Tuta kvanto da filmoj subtitoligitaj"
 
 #: templates/statistic/index.html:90
 msgid "Tweets"
-msgstr ""
+msgstr "Pepaĵoj"
 
 #: templates/statistic/index.html:97
 msgid "Facebook shares"
-msgstr ""
+msgstr "Komunigi per \"Facebook\""
 
 #: templates/statistic/index.html:104
 msgid "Email shares"
-msgstr ""
+msgstr "Komunigi per retmesaĝo"
 
 #: templates/statistic/language_statistic.html:25
 msgid "Language statistic for "
-msgstr ""
+msgstr "Lingva statistiko por"
 
 #: templates/statistic/language_statistic.html:26
 #: templates/statistic/languages_statistic.html:31
 #: templates/statistic/users_statistic.html:7
 #: templates/statistic/videos_statistic.html:7
 msgid "General statistic"
-msgstr ""
+msgstr "Ĝenerala statistiko"
 
 #: templates/statistic/language_statistic.html:41
 msgid "Videos count"
-msgstr ""
+msgstr "Nombro da filmoj"
 
 #: templates/statistic/language_statistic.html:48
 msgid "Subtitles views count"
@@ -5136,11 +5136,11 @@ msgstr ""
 
 #: templates/statistic/languages_statistic.html:25
 msgid "Language statistic"
-msgstr ""
+msgstr "Lingva statistiko"
 
 #: templates/statistic/languages_statistic.html:36
 msgid "Lanuage"
-msgstr ""
+msgstr "Lingvo"
 
 #: templates/statistic/log_entry_model_admin.html:37
 #: templates/statistic/logger_model_admin.html:37
@@ -5159,7 +5159,7 @@ msgstr ""
 
 #: templates/statistic/users_statistic.html:6
 msgid "Activity statistic"
-msgstr ""
+msgstr "Aktiveco-statistiko"
 
 #: templates/statistic/users_statistic.html:13
 #: templates/statistic/videos_statistic.html:13
@@ -5193,7 +5193,7 @@ msgstr "ĉiuj"
 
 #: templates/statistic/log_methods/changelist_view.html:55
 msgid "Class"
-msgstr ""
+msgstr "Klaso"
 
 #: templates/statistic/log_methods/changelist_view.html:56
 msgid "Method"
@@ -5201,7 +5201,7 @@ msgstr "Metodo"
 
 #: templates/statistic/log_methods/changelist_view.html:57
 msgid "Value"
-msgstr ""
+msgstr "Valoro"
 
 #: templates/teams/_actions.html:9 templates/teams/_actions.html.py:50
 msgid "Join via"
@@ -5217,7 +5217,7 @@ msgstr ""
 
 #: templates/teams/_actions.html:21
 msgid "Join this team now!"
-msgstr ""
+msgstr "Nun aniĝu la skipon!"
 
 #: templates/teams/_actions.html:27
 msgid "Login via"
@@ -5465,7 +5465,7 @@ msgstr ""
 
 #: templates/teams/_team_select.html:6
 msgid "Managing"
-msgstr ""
+msgstr "Mastrumi"
 
 #: templates/teams/_team_select.html:15
 msgid "Add new team"
@@ -5524,7 +5524,7 @@ msgstr ""
 
 #: templates/teams/add_video.html:6 templates/teams/add_videos.html:6
 msgid "Team video"
-msgstr ""
+msgstr "Skipa filmo"
 
 #: templates/teams/add_video.html:23
 msgid "Add video"
@@ -5545,7 +5545,7 @@ msgstr ""
 
 #: templates/teams/applications.html:49 templates/teams/tasks.html:64
 msgid "Approve"
-msgstr ""
+msgstr "Aprobi"
 
 #: templates/teams/applications.html:52
 msgid "Deny"
@@ -5660,15 +5660,15 @@ msgid ""
 "\n"
 "            %(team_name)s needs your help subtitling and translating the following new videos:\n"
 "        "
-msgstr ""
+msgstr "\n%(team_name)s bezonas vian helpon por subtitoligi kaj traduki la sekvontajn novajn filmojn:"
 
 #: templates/teams/email_new_video.html:13
 msgid "Or you can visit the team page to see the latest work"
-msgstr ""
+msgstr "Aŭ vi povas viziti la skipan paĝon por vidi la ĵusan laboron"
 
 #: templates/teams/email_new_video.html:17
 msgid "Stop receiving new notifications when a new video is added."
-msgstr ""
+msgstr "Ne plu ricevi novajn indikojn kiam nova filmo estas aldonita."
 
 #: templates/teams/email_new_videos.html:7
 #, python-format
@@ -5966,7 +5966,7 @@ msgstr ""
 #: templates/teams/settings-permissions.html:109
 #: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:61
 msgid "Review"
-msgstr ""
+msgstr "Provlegi"
 
 #: templates/teams/settings-permissions.html:112
 #: templates/teams/settings-projects-add.html:60
@@ -6172,7 +6172,7 @@ msgstr ""
 
 #: templates/teams/team_video.html:6
 msgid "Edit team video"
-msgstr ""
+msgstr "Redakti skipan filmon"
 
 #: templates/teams/team_video.html:27 templates/videos/video-view.html:211
 msgid "Edit video"
@@ -6184,7 +6184,7 @@ msgstr ""
 
 #: templates/teams/teams-list.html:18
 msgid "Team Directory"
-msgstr ""
+msgstr "Skipejo"
 
 #: templates/teams/teams-list.html:41
 msgid "Sort by"
@@ -6242,7 +6242,7 @@ msgstr ""
 
 #: templates/teams/teams-list.html:127
 msgid "Start a Team"
-msgstr ""
+msgstr "Komencu Skipon"
 
 #: templates/teams/teams-list.html:131
 msgid ""
@@ -6370,7 +6370,7 @@ msgstr "Bonvole sendi komentojn, demandojn, proponojn!"
 msgid ""
 "Note: we read/speak English best, but try to read/respond to anything we "
 "can."
-msgstr ""
+msgstr "Notu: ni plej bone scipovas la anglan, tamen ni provas legi kaj respondi al ĉion, kion ni ricevas."
 
 #: templates/videos/_feedback_form.html:13
 msgid "Your email:"
@@ -6534,16 +6534,16 @@ msgstr ""
 
 #: templates/videos/_paste_transcription.html:136
 msgid "Upload TXT file"
-msgstr ""
+msgstr "Alŝuti TXT-dosieron"
 
 #: templates/videos/_paste_transcription.html:150
 #: templates/videos/_upload_subtitles.html:25
 msgid "Video Language"
-msgstr ""
+msgstr "Lingvo de la filmo"
 
 #: templates/videos/_paste_transcription.html:157
 msgid "Submit Transcript"
-msgstr ""
+msgstr "Sendi transskribaĵon"
 
 #: templates/videos/_paste_transcription.html:163
 #: templates/videos/_upload_subtitles.html:36
@@ -6580,7 +6580,7 @@ msgstr ""
 
 #: templates/videos/_upload_subtitles.html:15
 msgid "paste in a transcript"
-msgstr ""
+msgstr "glui transskribaĵon"
 
 #: templates/videos/_upload_subtitles.html:29
 #, python-format
@@ -6622,7 +6622,7 @@ msgstr[1] ""
 
 #: templates/videos/_video_url_panel.html:6
 msgid "Add new URL"
-msgstr ""
+msgstr "Aldoni novan ligilon"
 
 #: templates/videos/_video_url_panel.html:16
 #: templates/videos/_video_url_panel.html:109
@@ -6641,7 +6641,7 @@ msgstr "Lernu pli"
 msgid ""
 "Multiple video URLs let you link multiple videos to a single set of "
 "subtitles. Some example uses:"
-msgstr ""
+msgstr "Ligilo al multaj filmoj lasas vin ligi plurajn filmojn al ununura aro da subtitoloj. Jen ekzemploj pri uzo:"
 
 #: templates/videos/_video_url_panel.html:48
 msgid ""
@@ -6654,7 +6654,7 @@ msgstr ""
 msgid ""
 "You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the"
 " subtitles you make to work on all of those versions."
-msgstr ""
+msgstr "Vi alŝutas filmojn en \"YouTube\", \"Vimeo\", \"Blip\" kaj \"Dailymotion\", kaj vi deziras ke tiuj subtitoloj funkciu en ĉiuj tiuj versioj."
 
 #: templates/videos/_video_url_panel.html:50
 msgid ""
@@ -6666,7 +6666,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:52
 msgid "Tip: double check that there are no timing problems."
-msgstr ""
+msgstr "Konsileto: dufoje kontrolu ĉu ekzistas problemoj pri tempumo."
 
 #: templates/videos/_video_url_panel.html:59
 msgid "Add another URL for this video"
@@ -6690,13 +6690,13 @@ msgstr ""
 #: templates/videos/_video_url_panel.html:121
 #: templates/videos/_video_url_panel.html:141
 msgid "You are not authenticated"
-msgstr ""
+msgstr "Vi estas ensalutita"
 
 #: templates/videos/_video_url_panel.html:130
 msgid ""
 "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-"
 "matching videos or videos where subtitles fail to display correctly."
-msgstr ""
+msgstr "Forigu tiun ligilon? Atentu: tio ne estas malfarebla. Nur forigu ligilojn al filmoj ne taŭgaj aŭ en kiuj subtitoloj ne bone aperas."
 
 #: templates/videos/_watch_page.html:13
 msgid "Rebuilding video index. Please try again a bit later"
@@ -6745,15 +6745,15 @@ msgstr "ekzemple"
 
 #: templates/videos/create.html:45
 msgid "Automatically submit videos"
-msgstr ""
+msgstr "Aŭtomate sendi filmojn"
 
 #: templates/videos/create.html:49
 msgid "Let's Go!"
-msgstr ""
+msgstr "Ek nun!"
 
 #: templates/videos/create.html:55 templates/videos/create.html.py:65
 msgid "Or Submit Multiple Videos"
-msgstr ""
+msgstr "Aŭ sendi Multajn Filmojn"
 
 #: templates/videos/diffing.html:41
 msgid "Subtitles will be rolled back to a previous version"
@@ -6875,7 +6875,7 @@ msgstr ""
 #: templates/videos/email_notification_non_editors.html:60
 #: templates/videos/email_notification_non_editors.html:88
 msgid "Old Text"
-msgstr ""
+msgstr "Malnova Teksto"
 
 #: templates/videos/email_notification.html:41
 #: templates/videos/email_notification_non_editors.html:35
@@ -6889,7 +6889,7 @@ msgstr ""
 #: templates/videos/email_notification_non_editors.html:66
 #: templates/videos/email_notification_non_editors.html:94
 msgid "New Text"
-msgstr ""
+msgstr "Nova Teksto"
 
 #: templates/videos/email_notification.html:69
 #: templates/videos/email_notification_non_editors.html:63
@@ -6899,7 +6899,7 @@ msgstr ""
 #: templates/videos/email_notification.html:97
 #: templates/videos/email_notification_non_editors.html:91
 msgid "Changes to Subtitle Text"
-msgstr ""
+msgstr "Ŝanĝu Subtitolan Tekston"
 
 #: templates/videos/email_notification_non_editors.html:9
 #, python-format
@@ -6958,19 +6958,19 @@ msgstr ""
 
 #: templates/videos/email_title_changed.html:7
 msgid "The title of the video"
-msgstr ""
+msgstr "Titolo de la filmo"
 
 #: templates/videos/email_title_changed.html:10
 msgid "has been changed by"
-msgstr ""
+msgstr "estis ŝanĝita de"
 
 #: templates/videos/email_title_changed.html:13
 msgid "has been changed"
-msgstr ""
+msgstr "estis ŝanĝita"
 
 #: templates/videos/email_title_changed.html:16
 msgid "The new title is"
-msgstr ""
+msgstr "Nova titolo estas"
 
 #: templates/videos/email_title_changed.html:18
 msgid "If this is incorrect, go to "
@@ -6989,11 +6989,11 @@ msgstr ""
 
 #: templates/videos/email_video_url_add.html:7
 msgid "A new video URL for"
-msgstr ""
+msgstr "Nova ligilo al filmo por"
 
 #: templates/videos/email_video_url_add.html:9
 msgid "was submitted by"
-msgstr ""
+msgstr "estis sendita de"
 
 #: templates/videos/email_video_url_add.html:13
 msgid "Anonymous"
@@ -7003,15 +7003,15 @@ msgstr "Sennoma"
 msgid ""
 "Please check to make sure the new URL features the exact same video, and "
 "that subtitle timing is correct:"
-msgstr ""
+msgstr "Bonvolu kontroli, ke la nova ligilo ligas la tutsaman filmon kaj ke la tempumo ĝustas:"
 
 #: templates/videos/email_video_url_add.html:21
 msgid "View the new video URL"
-msgstr ""
+msgstr "Vidu la ligilon al la nova filmo"
 
 #: templates/videos/email_video_url_add.html:22
 msgid "View the original video URL"
-msgstr ""
+msgstr "Vidu la originalan ligilon al la filmo"
 
 #: templates/videos/featured_videos.html:32
 #: templates/videos/popular_videos.html:55 templates/videos/watch.html:18
@@ -7142,7 +7142,7 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:248
 msgid "View revision history"
-msgstr ""
+msgstr "Vidu revizia historio"
 
 #: templates/videos/subtitle-view.html:253
 msgid "These subtitles are in progress."
