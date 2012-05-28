@@ -111,10 +111,6 @@ def update_video_feed(video_feed_id):
         msg = '**update_video_feed**. VideoFeed does not exist. ID: %s' % video_feed_id
         client.captureMessage(msg)
 
-@task(ignore_result=False)
-def add(a, b):
-    print "TEST TASK FOR CELERY. EXECUTED WITH ARGUMENTS: %s %s" % (a, b)
-    return (a, b, a+b)
 
 @task
 def test_task(n):

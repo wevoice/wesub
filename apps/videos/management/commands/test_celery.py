@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.core.management.base import BaseCommand
-from videos.tasks import add
+from testhelpers.tasks import add
 from optparse import make_option
 import time
 
