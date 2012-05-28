@@ -1043,10 +1043,18 @@ def get_language_code_mapping(standard):
     return dict((code, LanguageCode(code, standard))
                 for code in TO_INTERNAL.get(standard))
 
-
 def _debug_missing_languages(standard):
     """Return a list of all the languages missing from the given standard."""
     return [(internal_code, name)
             for internal_code, name in INTERNAL_NAMES.items()
             if internal_code not in FROM_INTERNAL]
 
+def _debug_missing_language_codes(standard, reference_standard='unisubs'):
+    """
+    Return a list of all the languages codes missing from the given standard
+    """
+    unisubs_langs  = set(get_language_code_mapping(reference_standard).keys())
+    standard_langs = set()
+    [standard_langs.add(LanguageCode(lc, standard).encode(reference_standard)) \
+     for lc in get_language_code_mapping(standard).keys()]
+    return list(unisubs_langs.difference(standard_langs))
