@@ -582,6 +582,24 @@ Update an existing task:
 
 .. http:put:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
 
+Fields
+++++++
+
+* ``approved`` - If the team supports workflows, you can set the stage in which
+  the task finds itself.
+    * ``In Progress``
+    * ``Approved``
+    * ``Rejected``
+* ``assignee`` - The username of the user that this task will be assigned to
+* ``language``
+* ``priority`` - An arbitrary integer denoting priority level; each team can
+  set their own policy regarging priority of tasks
+* ``video_id`` - The unique identifier of the video this task relates to
+* ``type`` - Type of the task
+    * ``Subtitle``
+    * ``Translate``
+    * ``Review``
+    * ``Approve``
 
 An example response:
 
