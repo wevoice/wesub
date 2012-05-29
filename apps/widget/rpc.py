@@ -707,8 +707,6 @@ class Rpc(BaseRpc):
         task = Task(team=team_video.team, team_video=team_video,
                     assignee=assignee, language=lang, type=type)
 
-<<<<<<< HEAD
-=======
         task.set_expiration()
         task.subtitle_version = subtitle_version
 
@@ -716,8 +714,7 @@ class Rpc(BaseRpc):
             task.review_base_version = subtitle_version
 
         task.save()
-
->>>>>>> dev
+        
     def _moderate_incomplete_version(self, subtitle_version, user):
         """ Verifies if it's possible to create a transcribe/translate task (if there's
         no other transcribe/translate task) and tries to assign to user. 
@@ -731,16 +728,9 @@ class Rpc(BaseRpc):
 
         language = subtitle_version.language.language
         transcribe_task = team_video.task_set.incomplete_subtitle_or_translate()\
-<<<<<<< HEAD
-                                     .filter(language=subtitle_version.language)
-
-        if transcribe_task.exists():
-            task = transcribe_task[0]
-=======
                                      .filter(language=language)
 
         if transcribe_task.exists():
->>>>>>> dev
             return
 
         subtitle_version.moderation_status = WAITING_MODERATION
