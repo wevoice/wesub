@@ -93,22 +93,19 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     if (!this.inSubtitlingDialog_){
         var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-        if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
-
-            if (this.dialog_.reviewOrApprovalType_) {
-                if (this.dialog_.translationPanel_) {
-                    this.baseLanguageCaptionSet_ = this.dialog_.translationPanel_.translationList_.captionSet_;
-                }
-            } else {
-                this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
-                    this.dialog_.translationPanel_.translationList_.baseLanguageSubtitles_);
-            }
-
+        if (this.dialog_.reviewOrApprovalType_) {
             if (this.dialog_.translationPanel_) {
-                this.captionManager_ =
-                    new unisubs.CaptionManager(
-                        this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
+                this.baseLanguageCaptionSet_ = this.dialog_.translationPanel_.translationList_.captionSet_;
             }
+        } else {
+            this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
+                this.dialog_.translationPanel_.translationList_.baseLanguageSubtitles_);
+        }
+
+        if (this.dialog_.translationPanel_) {
+            this.captionManager_ =
+                new unisubs.CaptionManager(
+                    this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
         }
     }
 };
@@ -120,33 +117,23 @@ unisubs.editmetadata.Panel.prototype.enterDocument = function() {
     if (!this.inSubtitlingDialog_){
         var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
 
-        if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
+        var that = this;
+        var captionSet = this.dialog_.translationPanel_.translationList_.captionSet_;
 
-            var that = this;
-            var captionSet = this.dialog_.translationPanel_.translationList_.captionSet_;
+        // Setup listening for video + subtitles.
+        handler.listen(this.captionManager_,
+                       unisubs.CaptionManager.CAPTION,
+                       this.dialog_.translationPanel_.translationList_.captionReached_);
 
-            // Start loading the video.
-            this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
-            if (videoPlayerType === 'html5') {
-                this.dialog_.getVideoPlayerInternal().play();
+        // Update the captionSet that the video is listening to
+        // to match the proper mix of translated / original subtitles.
+        goog.array.forEach(captionSet.captions_, function(c) {
+            if (c.getText() !== '') {
+                var subOrder = c.getSubOrder();
+                var captionToUpdate = that.baseLanguageCaptionSet_.findSubIndex_(subOrder);
+                that.baseLanguageCaptionSet_.caption(captionToUpdate).setText(c.getText());
             }
-            this.dialog_.getVideoPlayerInternal().pause();
-
-            // Setup listening for video + subtitles.
-            handler.listen(this.captionManager_,
-                           unisubs.CaptionManager.CAPTION,
-                           this.dialog_.translationPanel_.translationList_.captionReached_);
-
-            // Update the captionSet that the video is listening to
-            // to match the proper mix of translated / original subtitles.
-            goog.array.forEach(captionSet.captions_, function(c) {
-                if (c.getText() !== '') {
-                    var subOrder = c.getSubOrder();
-                    var captionToUpdate = that.baseLanguageCaptionSet_.findSubIndex_(subOrder);
-                    that.baseLanguageCaptionSet_.caption(captionToUpdate).setText(c.getText());
-                }
-            });
-        }
+        });
     }
 };
 unisubs.editmetadata.Panel.prototype.getRightPanel = function() {

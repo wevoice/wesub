@@ -64,6 +64,7 @@ rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
 })
 
+
 def index(request):
     context = widget.add_onsite_js_files({})
     context['all_videos'] = Video.objects.count()
@@ -281,7 +282,7 @@ def upload_subtitles(request):
         except Exception, e:
             output['errors'] = {"_all__":[force_unicode(e)]}
             transaction.rollback()
-            from sentry.client.models import client
+            from raven.contrib.django.models import client
             client.create_from_exception()
 
     else:

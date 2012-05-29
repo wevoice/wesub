@@ -10,27 +10,14 @@
     #ServerAlias wstaging.universalsubtitles.org
 
     LogLevel warn
+    LogFormat "%h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %D" combined_w_timing
 
-    CustomLog "|/usr/bin/cronolog /var/log/apache2/INSERT_SUBDOMAIN.universalsubtitles.org/access.log" combined
+    CustomLog "|/usr/bin/cronolog /var/log/apache2/INSERT_SUBDOMAIN.universalsubtitles.org/access.log" combined_w_timing
     ErrorLog "|/usr/bin/cronolog /var/log/apache2/INSERT_SUBDOMAIN.universalsubtitles.org/error.log"
 
     WSGIDaemonProcess unisubs-INSERT_SITE_NAME user=www-data group=pcf-web processes=8 threads=25 maximum-requests=10000
     WSGIProcessGroup unisubs-INSERT_SITE_NAME
 
     WSGIScriptAlias / /var/www/INSERT_SITE_DIRECTORY/unisubs/deploy/unisubs.wsgi
-
-    Alias /site_media /var/www/INSERT_SITE_DIRECTORY/unisubs/media/
-    <Location "/site_media">
-        SetHandler None
-        Order allow,deny
-        Allow from all
-    </Location>
-
-    Alias /media /var/www/INSERT_SITE_DIRECTORY/env/lib/python2.6/site-packages/django/contrib/admin/media/
-    <Location "/media">
-        SetHandler None
-        Order allow,deny
-        Allow from all
-    </Location>
 
 </VirtualHost>

@@ -12,7 +12,7 @@ from django.utils.cache import patch_vary_headers
 from django.utils.hashcompat import sha_constructor
 from django.utils.http import cookie_date
 
-from utils.metrics import ManualTimer, Timer
+from utils.metrics import ManualTimer, Meter, Timer
 
 
 SECTIONS = {
@@ -50,6 +50,7 @@ class ResponseTimeMiddleware(object):
     """
     def process_request(self, request):
         request.init_time = time.time()
+        Meter('requests.started').inc()
 
         # Tracking the section of the site isn't trivial, because sometimes we
         # have the language prefix, like "/en/foo".
@@ -64,12 +65,18 @@ class ResponseTimeMiddleware(object):
         else:
             request._metrics_section = None
 
+        if request._metrics_section:
+            label = 'site-sections.%s-response-time' % request._metrics_section
+            Meter(label).inc()
+
         return None
 
     def process_response(self, request, response):
         if hasattr(request, "init_time"):
             delta = time.time() - request.init_time
             ms = delta * 1000
+
+            Meter('requests.completed').inc()
 
             response.set_cookie('response_time', str(ms))
 

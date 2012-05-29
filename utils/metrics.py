@@ -96,9 +96,22 @@ class Histogram(Metric):
     def record(self, value):
         send(self.name, 'histogram', value)
 
+class Gauge(Metric):
+    def __init__(self, name):
+        return super(Gauge, self).__init__('gauges.' + name)
+
+    def report(self, value):
+        send(self.name, 'gauge', value)
+
+
 @contextmanager
 def Timer(name):
     start = _time.time()
+
+    # We fire a Meter for the metric here, because otherwise the "events/sec"
+    # are recorded when they *end* instead of when they begin.  For longer
+    # events this is a bad thing.
+    Meter(name).inc()
 
     try:
         yield

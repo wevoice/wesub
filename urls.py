@@ -24,7 +24,6 @@ from django.template import RequestContext, loader
 from sitemaps import sitemaps, sitemap_view, sitemap_index
 from socialauth.models import (AuthMeta, OpenidProfile, TwitterUserProfile,
      FacebookUserProfile)
-import sentry_logger
 
 admin.autodiscover()
 
@@ -56,8 +55,6 @@ urlpatterns = patterns('',
         name='js_i18n_catalog'),
     url(r'^$',
         'videos.views.index'),
-    url(r'^sentry/',
-        include('sentry.web.urls')),
     url(r'^comments/',
         include('comments.urls', namespace='comments')),
     url(r'^messages/',
@@ -112,7 +109,7 @@ urlpatterns = patterns('',
         'videos.views.counter', name="counter"),
     url(r'^uslogging/',
         include('uslogging.urls', 'uslogging')),
-    url(r'^enterprise/$', 'django.views.generic.simple.direct_to_template',
+    url(r'^enterprise/[\w-]*$', 'django.views.generic.simple.direct_to_template',
         {'template': 'enterprise.html'}, 'enterprise_page'),
     url(r'^solutions/ngo/$', 'django.views.generic.simple.direct_to_template',
         {'template': 'solutions/ngo.html'}, 'solutions_page'),

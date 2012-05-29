@@ -57,7 +57,13 @@ var Site = function(Site) {
 
         chosenify: function() {
             $('select', '.v1 .content').filter(function() {
-                return !$(this).parents('div').hasClass('ajaxChosen');
+                if ($(this).parents('div').hasClass('ajaxChosen')) {
+                    return false;
+                }
+                if ($(this).parents('div').hasClass('no-chosen')) {
+                    return false;
+                }
+                return true;
             }).chosen().change(function() {
                 $select = $(this);
 
@@ -409,6 +415,12 @@ var Site = function(Site) {
             window.usStartTime = (new Date()).getTime();
             window.addCSRFHeader = addCSRFHeader;
             addCSRFHeader($);
+
+            if ($('select.goto').length) {
+                $('select.goto').change(function(e) {
+                    window.location = $(this).children('option:selected').attr('value');
+                });
+            }
         },
 
         // Public
@@ -633,6 +645,10 @@ var Site = function(Site) {
                 return terms;
             });
 
+            $('a.upload-draft-button').click(function() {
+                $('input#id_task').val($(this).data('task'));
+            });
+
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             that.Utils.resetLangFilter($('select#id_task_language'));
             that.Utils.chosenify();
@@ -847,6 +863,36 @@ var Site = function(Site) {
 
                 return terms;
             });
+        },
+
+        enterprise: function() {
+            $('.alpha li a').click(function(e) {
+                var tab = $(this).attr('href');
+
+                history.pushState(null, '', tab)
+                changeTab(tab);
+
+                $(this).parents('.menu').find('a').removeClass('active');
+                $(this).addClass('active');
+                
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                return false;
+            });
+            $(window).bind('popstate', function() {
+                var path = location.pathname;
+                tab = path.substr(path.lastIndexOf('/') + 1);
+
+                changeTab(tab);
+            })
+
+            var changeTab = function(tab) {
+                $('.tab-content > li').hide();
+                if(tab.indexOf("/") != -1 || tab == '') {
+                    $('.tab-content > li:first-child').show();
+                } else {
+                    $('#' + tab).show();
+                }
+            }
         }
     };
 };

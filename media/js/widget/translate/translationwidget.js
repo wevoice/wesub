@@ -79,13 +79,7 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
 };
 unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event) {
     this.onFocusText_ = this.translateInput_.value;
-
-    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
-
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
-        this.dialog_.getVideoPlayerInternal().setPlayheadTime(this.subtitle_['start_time']);
-        this.dialog_.getVideoPlayerInternal().pause();
-    }
+    this.dialog_.getVideoPlayerInternal().showCaptionText(this.onFocusText_ || this.getOriginalValue());
 };
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
     this.onKeyUpText_ = this.translateInput_.value;
@@ -107,29 +101,13 @@ unisubs.translate.TranslationWidget.prototype.setTranslationContent = function(v
     this.inputLostFocus_(false);
 };
 unisubs.translate.TranslationWidget.prototype.cloneToCaptionManager = function(dontShowNow){
-    var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;
+    var currentText = this.translateInput_.value;
+    var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
+    var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
 
-    if (videoPlayerType !== 'vimeo' && videoPlayerType !== 'flv' && videoPlayerType !== 'dailymotion') {
-        var currentText = this.translateInput_.value;
-        var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
-        var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
-
-        if (currentText !== '') {
-            editableCaption.setText(currentText);
-            if (!dontShowNow) {
-                this.dialog_.getVideoPlayerInternal().showCaptionText(currentText);
-            }
-            this.textHasBeenChanged_ = true;
-        } else {
-            if (this.textHasBeenChanged_) {
-                var originalText = editableCaption.getOriginalText();
-                editableCaption.setText(originalText);
-                if (!dontShowNow) {
-                    this.dialog_.getVideoPlayerInternal().showCaptionText(originalText);
-                }
-                this.textHasBeenChanged_ = false;
-            }
-        }
+    editableCaption.setText(currentText || editableCaption.getOriginalText());
+    if (!dontShowNow) {
+        this.dialog_.getVideoPlayerInternal().showCaptionText(currentText || editableCaption.getOriginalText());
     }
 };
 unisubs.translate.TranslationWidget.prototype.setEnabled = function(enabled) {

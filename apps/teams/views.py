@@ -18,6 +18,7 @@
 import logging
 import random
 
+from django.db import transaction
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -25,11 +26,12 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
 
 import teams.moderation_const as MODERATION
@@ -42,7 +44,7 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm, MoveTeamVideoForm
+    UnpublishForm, MoveTeamVideoForm, UploadDraftForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -76,9 +78,9 @@ from videos.tasks import (
 from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
+from widget.srt_subs import GenerateSubtitlesHandler
 
-import sentry_logger # Magical import to make Sentry's error recording happen.
-assert sentry_logger # It's okay, Pyflakes.  Trust me.
+
 logger = logging.getLogger("teams.views")
 
 
@@ -235,8 +237,9 @@ def detail(request, slug, project_slug=None, languages=None):
         Workflow.objects.filter(team=team.id)
                         .select_related('project', 'team', 'team_video'))
 
-    is_indexing = team.videos.all().count != extra_context['current_videos_count']
-    extra_context['is_indexing'] = is_indexing
+    if not filtered and not query:
+        is_indexing = team.videos.all().count() != extra_context['current_videos_count']
+        extra_context['is_indexing'] = is_indexing
 
     if is_editor:
         team_video_ids = [record.team_video_pk for record in team_video_md_list]
@@ -1183,6 +1186,7 @@ def team_tasks(request, slug, project_slug=None):
         'widget_settings': widget_settings,
         'filtered': filtered,
         'member': member,
+        'upload_draft_form': UploadDraftForm(user=request.user)
     }
 
     context.update(pagination_info)
@@ -1209,6 +1213,7 @@ def create_task(request, slug, team_video_pk):
             if task.type == Task.TYPE_IDS['Subtitle']:
                 task.language = ''
 
+            # TODO: Remove this?
             if task.type in [Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']]:
                 task.approved = Task.APPROVED_IDS['In Progress']
                 task.subtitle_version = task.team_video.video.latest_version(language_code=task.language)
@@ -1351,6 +1356,70 @@ def assign_task_ajax(request, slug):
     else:
         return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
 
+@login_required
+@transaction.commit_manually
+def upload_draft(request, slug):
+
+    if request.POST:
+        form = UploadDraftForm(request.user, request.POST, request.FILES)
+
+        if form.is_valid():
+            try:
+                form.save()
+            except Exception:
+                messages.error(request, _(u"Sorry, the subtitles don't match the lines, so we can't upload them."))
+                transaction.rollback()
+            else:
+                messages.success(request, _(u"Draft uploaded successfully."))
+                transaction.commit()
+        else:
+            for key, value in form.errors.items():
+                messages.error(request, _('/n'.join([force_unicode(i) for i in value])))
+
+            transaction.rollback()
+
+        if transaction.is_dirty():
+            transaction.rollback()
+
+        return HttpResponseRedirect(reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+    else:
+        return HttpResponseBadRequest()
+
+# copied a lot of those from widget/views.py:download_subtitles
+# we need to make them share some code. for sure.
+def download_draft(request, slug, task_pk, type="srt"):
+    task = Task.objects.get(pk=task_pk)
+    team = get_object_or_404(Team,slug=slug)
+
+    if task.team != team:
+        return HttpResponseForbidden(_(u'You are not allowed to download this transcript.'))
+
+    if type not in GenerateSubtitlesHandler:
+        raise Http404
+
+    subtitle_version = task.get_subtitle_version()
+
+    subtitle = GenerateSubtitlesHandler[type].create(subtitle_version)
+    response = HttpResponse(unicode(subtitle), mimetype="text/plain")
+    original_filename = '%s.%s' % (subtitle_version.video.lang_filename(task.language), subtitle.file_type)
+
+    if not 'HTTP_USER_AGENT' in request.META or u'WebKit' in request.META['HTTP_USER_AGENT']:
+        # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
+        filename_header = 'filename=%s' % original_filename.encode('utf-8')
+    elif u'MSIE' in request.META['HTTP_USER_AGENT']:
+        try:
+            original_filename.encode('ascii')
+        except UnicodeEncodeError:
+            original_filename = 'subtitles.' + subtitle.file_type
+
+        filename_header = 'filename=%s' % original_filename
+    else:
+        # For others like Firefox, we follow RFC2231 (encoding extension in HTTP headers).
+        filename_header = 'filename*=UTF-8\'\'%s' % iri_to_uri(original_filename.encode('utf-8'))
+
+    response['Content-Disposition'] = 'attachment; ' + filename_header
+
+    return response
 
 # Projects
 def project_list(request, slug):

@@ -36,7 +36,7 @@ def current_site(request):
         return { 'current_site': '' }
 
 def current_commit(request):
-    return {'LAST_COMMIT_GUID': settings.LAST_COMMIT_GUID}
+    return {'LAST_COMMIT_GUID': settings.LAST_COMMIT_GUID.split("/")[-1]}
 
 def custom(request):
     return {

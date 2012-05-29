@@ -17,10 +17,12 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import re
 
+import chardet
 from django import forms
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_unicode
 from django.core.files.base import ContentFile
 from auth.models import CustomUser as User
 from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
@@ -34,9 +36,20 @@ from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.translation import get_language_choices
 from utils.validators import MaxFileSizeValidator
 from videos.forms import AddFromFeedForm
-from videos.models import VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion, Video
+from videos.models import (
+        VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion, 
+        Video, SubtitleLanguage
+)
 from videos.search_indexes import VideoIndex
 
+from utils import (
+    SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser,
+    SubtitleParserError, SbvSubtitleParser, DfxpSubtitleParser
+)
+
+from apps.teams.moderation_const import WAITING_MODERATION
+
+ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
 
 class EditTeamVideoForm(forms.ModelForm):
     author = forms.CharField(max_length=255, required=False)
@@ -108,7 +121,6 @@ class MoveTeamVideoForm(forms.Form):
     team = forms.ModelChoiceField(queryset=Team.objects.all(),
                                   required=True)
 
-    # Should this queryset be Project.objects.filter(team=team) ?
     project = forms.ModelChoiceField(queryset=Project.objects.all(),
                                      required=False)
 
@@ -119,9 +131,13 @@ class MoveTeamVideoForm(forms.Form):
     def clean(self):
         team_video = self.cleaned_data.get('team_video')
         team = self.cleaned_data.get('team')
+        project = self.cleaned_data.get('project')
 
         if not team_video or not team:
             return
+
+        if project and project.team != team:
+            raise forms.ValidationError(u"That project does not belong to that team.")
 
         if team_video.team.pk == team.pk:
             raise forms.ValidationError(u"That video is already in that team.")
@@ -133,7 +149,6 @@ class MoveTeamVideoForm(forms.Form):
             raise forms.ValidationError(u"You can't remove that video from its team.")
 
         return self.cleaned_data
-
 
 class BaseVideoBoundForm(forms.ModelForm):
     video_url = UniSubBoundVideoField(label=_('Video URL'), verify_exists=True,
@@ -269,7 +284,6 @@ class AddTeamVideosFromFeedForm(AddFromFeedForm):
                      u"submit this feed again and make sure to "
                      u'check "Save feed" box.')
 
-
 class CreateTeamForm(BaseVideoBoundForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
 
@@ -305,7 +319,6 @@ Enter a link to any compatible video, or to any video page on our site.''')
         TeamMember.objects.create_first_member(team=team, user=user)
         return team
 
-
 class TaskCreateForm(ErrorableModelForm):
     choices = [(10, 'Transcribe'), Task.TYPE_CHOICES[1]]
     type = forms.TypedChoiceField(choices=choices, coerce=int)
@@ -318,6 +331,7 @@ class TaskCreateForm(ErrorableModelForm):
         self.user = user
         self.team_video = team_video
 
+        # TODO: This is bad for teams with 10k members.
         team_user_ids = team.members.values_list('user', flat=True)
 
         langs = [l for l in get_language_choices(with_empty=True)
@@ -360,6 +374,7 @@ class TaskCreateForm(ErrorableModelForm):
         team_video = self.team_video
         project, team = team_video.project, team_video.team
 
+        # TODO: Manager method?
         existing_tasks = list(Task.objects.filter(deleted=False, language=lang,
                                                   team_video=team_video))
 
@@ -375,6 +390,7 @@ class TaskCreateForm(ErrorableModelForm):
 
         type_name = Task.TYPE_NAMES[type]
 
+        # TODO: Move into _check_task_creation_translate()?
         if type_name == 'Translate':
             if lang == '':
                 self.add_error(_(u"You must select a language for a Translate task."))
@@ -464,7 +480,6 @@ class TaskDeleteForm(forms.Form):
 
         return task
 
-
 class GuidelinesMessagesForm(forms.Form):
     messages_invite = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
     messages_manager = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
@@ -474,7 +489,6 @@ class GuidelinesMessagesForm(forms.Form):
     guidelines_subtitle = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
     guidelines_translate = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
     guidelines_review = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-
 
 class RenameableSettingsForm(forms.ModelForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
@@ -490,7 +504,6 @@ class SettingsForm(forms.ModelForm):
         model = Team
         fields = ('description', 'logo', 'is_visible')
 
-
 class WorkflowForm(forms.ModelForm):
     class Meta:
         model = Workflow
@@ -503,7 +516,6 @@ class PermissionsForm(forms.ModelForm):
         fields = ('membership_policy', 'video_policy', 'subtitle_policy',
                   'translate_policy', 'task_assign_policy', 'workflow_enabled',
                   'max_tasks_per_member', 'task_expiration',)
-
 
 class LanguagesForm(forms.Form):
     preferred = forms.MultipleChoiceField(required=False, choices=())
@@ -524,7 +536,6 @@ class LanguagesForm(forms.Form):
             raise forms.ValidationError(_(u'You cannot blacklist a preferred language.'))
 
         return self.cleaned_data
-
 
 class InviteForm(forms.Form):
     user_id = forms.CharField(required=False, widget=forms.Select)
@@ -571,12 +582,10 @@ class InviteForm(forms.Form):
 
         notifier.team_invitation_sent.delay(invite.pk)
 
-
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ('name', 'description', 'workflow_enabled')
-
 
 class UnpublishForm(forms.Form):
     subtitle_version = forms.ModelChoiceField(queryset=SubtitleVersion.objects.all())
@@ -615,5 +624,118 @@ class UnpublishForm(forms.Form):
 
         return self.cleaned_data
 
+class UploadDraftForm(forms.Form):
+    draft = forms.FileField(required=True)
+    task = forms.ModelChoiceField(Task.objects, required=True)
+    language = forms.ChoiceField(required=False, choices=ALL_LANGUAGES, initial='en')
 
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(UploadDraftForm, self).__init__(*args, **kwargs)
+        self.fields['language'].choices = get_language_choices()
 
+    def clean_task(self):
+        task = self.cleaned_data['task']
+
+        if not can_perform_task(self.user, task):
+            raise forms.ValidationError(_(u'You cannot perform that task.'))
+
+        return task
+
+    def clean_draft(self):
+        subtitles = self.cleaned_data['draft']
+
+        if subtitles.size > 512 * 1024:
+            raise forms.ValidationError(_(
+                    u'File size should be less {0} kb'.format(512)))
+
+        parts = subtitles.name.split('.')
+
+        if len(parts) < 1 or not parts[-1].lower() in ['srt', 'ass', 'ssa', 'xml', 'sbv', 'dfxp']:
+            raise forms.ValidationError(_(u'Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)'))
+
+        try:
+            text = subtitles.read()
+            encoding = chardet.detect(text)['encoding']
+        
+            if not encoding:
+                raise forms.ValidationError(_(u'Can not detect file encoding'))
+
+            self._parser = self._get_parser(subtitles.name)(force_unicode(text, encoding))
+        
+            if not self._parser:
+                raise forms.ValidationError(_(u'Incorrect subtitles format'))
+        except SubtitleParserError, e:
+            raise forms.ValidationError(e)
+
+        subtitles.seek(0)
+        
+        return subtitles
+    
+    def _get_parser(self, filename):
+        end = filename.split('.')[-1].lower()
+        if end == 'srt':
+            return SrtSubtitleParser
+        if end in ['ass', 'ssa']:
+            return SsaSubtitleParser
+        if end == 'xml':
+            return TtmlSubtitleParser
+        if end == 'sbv':
+            return SbvSubtitleParser
+        if end == 'dfxp':
+            return DfxpSubtitleParser
+
+    def _save_new_language(self, video, lang_code):
+        language = SubtitleLanguage()
+        language.language = lang_code
+        language.is_original = True
+        language.video = video
+        language.save()
+
+        return language
+
+    def save(self):
+        from videos.tasks import video_changed_tasks
+
+        task = self.cleaned_data['task']
+        video = task.team_video.video
+
+        task.assignee = self.user
+
+        if task.language:
+            video_language = task.language
+        else:
+            video_language = self.cleaned_data['language']
+        
+        if task.subtitle_version:
+            # we already had a version, that means
+            # it's a review/approve or a continue
+            version = task.subtitle_version
+            language = task.subtitle_version.language
+        else:
+            language = video.subtitle_language(video_language)
+
+            if language and language.has_version:
+                version = language.latest_version(public_only=False)
+            else:
+                version = None
+
+                if not language:
+                    language = self._save_new_language(video, video_language)
+
+        # if there isn't a version we don't need to check this
+        # since it's the first upload for this version
+        if version and version.subtitle_set.count() != len(self._parser):
+            raise Exception("We are strict and your subtitles are bad")
+
+        # we need to set the moderation_status to WAITING_MODERATION
+        # so the version is not public. At the same time, we cannot
+        # set task.subtitle_version, otherwise the task will get
+        # blocked. :(
+        version = SubtitleVersion.objects.new_version(self._parser, language, self.user, moderation_status=WAITING_MODERATION)
+
+        task.language = video_language
+        task.save()
+
+        # we created a new subtitle version let's fire a notification
+        video_changed_tasks.delay(video.id, version.id)

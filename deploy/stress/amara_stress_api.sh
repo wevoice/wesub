@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# USAGE: $0 <api user name> <api key> <partner> [ <num trials> ]
+# USAGE: $0 <api user name> <api key> <partner> <file containing video ids one-per-line>
+
+# Note: when run from multiple concurrent windows, this can stress app server CPU
 
 
 #------------------------------
@@ -13,15 +15,11 @@ curl="curl --insecure --progress-bar"
 api_user="$1"
 api_key="$2"
 partner="$3"
-ntrials=$4
+filename="$4"
 
-if [ -z "$partner" ]; then
-   echo "USAGE: $0 <api user name> <api key> <partner> [ <num trials> ]"
+if [ -z "$filename" -o ! -r "$filename" ]; then
+   echo "USAGE: $0 <api user name> <api key> <partner> <file containing video ids one-per-line>"
    exit 1
-fi
-
-if [ -z "$ntrials" ]; then
-   ntrials="20"
 fi
 
 # This URL does not appear to reproduce failure
@@ -29,10 +27,12 @@ fi
 
 #------------------------------
 # Stress API
-for (( i = 1; i <= $ntrials; i++ )); do
-   echo "`date`: Trial $i"
+i=1
+cat $filename | while read line; do
+   video_id=`echo $line | awk '{print $1}'`
+   echo "`date`: Trial $i video ID $video_id"
 
-   url="https://$host/api2/$partner/videos/$i/languages/?format=json&offset=0&limit=100"
+   url="https://$host/api2/$partner/videos/$video_id/languages/?format=json&offset=0&limit=1000"
    result=`$curl -H "X-api-username: $api_user" -H "X-apikey: $api_key" $url`
 
    if [ "$?" != "0" ]; then
@@ -40,7 +40,7 @@ for (( i = 1; i <= $ntrials; i++ )); do
       exit 1
    fi
 
-   if [ -z "`echo $result | grep subtitle`" ]; then
+   if [ -z "$result" -o -z "`echo $result | grep total_count`" ]; then
       echo "FAILURE IN RESULT STRING ON TRIAL $i"
       echo "$curl -H \"X-api-username: $api_user\" -H \"X-apikey: $api_key\" $url"
       echo " "
@@ -49,5 +49,6 @@ for (( i = 1; i <= $ntrials; i++ )); do
    fi
 
    result=""
+   i=`expr $i + 1`
 done
 

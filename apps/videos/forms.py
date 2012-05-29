@@ -176,21 +176,19 @@ class SubtitlesUploadBaseForm(forms.Form):
         video = self.cleaned_data['video']
         language = self.cleaned_data['language']
 
-        subtitle_language = video.subtitlelanguage_set.filter(language=language) 
+        subtitle_language = video.subtitle_language(language)
 
         # first verify if this language for this video already exists.
         # if exists, verify if it's not writelocked
-        if subtitle_language.exists():
-            sl = subtitle_language[0]
-
-            if sl.is_writelocked and sl.writelock_owner != self.user:
+        if subtitle_language:
+            if subtitle_language.is_writelocked and subtitle_language.writelock_owner != self.user:
                 raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because work on this language is already in progress."))
 
             # we can't let the user upload a subtitle to a language that already
             # have dependents. that will fork the dependents and make everything break.
             # see sifter #1075
-            if video.subtitlelanguage_set.filter(standard_language=sl).exists():
-                for language in video.subtitlelanguage_set.filter(standard_language=sl):
+            if video.subtitlelanguage_set.filter(standard_language=subtitle_language).exists():
+                for language in video.subtitlelanguage_set.filter(standard_language=subtitle_language):
                     # if it exists, let's verify if the version is not empty
                     if language.latest_subtitles(public_only=False):
                         raise forms.ValidationError(_(u"Sorry, we cannot upload subtitles for this language because this would ruin translations made from it"))
@@ -224,13 +222,11 @@ class SubtitlesUploadBaseForm(forms.Form):
 
             # There are no tasks for this video that should block the upload.
             # The last thing to check is that the team's transcription policy doesn't block this.
-            # if the video is complete (aka has been transcribed) we check if the user can
-            # upload translations. if not, subtitles
-            if video.is_complete:
-                if not can_create_and_edit_translations(self.user, team_video, language):
+            if subtitle_language and subtitle_language.is_original:
+                if not can_create_and_edit_subtitles(self.user, team_video, language):
                     raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because this language is moderated and you don't have sufficient permission."))
             else:
-                if not can_create_and_edit_subtitles(self.user, team_video, language):
+                if not can_create_and_edit_translations(self.user, team_video, language):
                     raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because this language is moderated and you don't have sufficient permission."))
 
         return self.cleaned_data
@@ -317,7 +313,7 @@ class SubtitlesUploadBaseForm(forms.Form):
             language = language
         else:
             language, self._sl_created = self._find_appropriate_language(video, self.cleaned_data['language'])
-            
+
         language = save_subtitle(video, language, parser, self.user, update_video)
 
         # If there are any outstanding tasks for this language, associate the
@@ -332,9 +328,14 @@ class SubtitlesUploadBaseForm(forms.Form):
             # review/approve task for them.
             workflow = team_video.get_workflow()
             # user can bypass moderation if:
-            # 1) he is a moderator and 
+            # 1) he is a moderator and
             # 2) it's a post-publish edit
-            can_bypass_moderation = not self._sl_created and can_publish_edits_immediately(team_video, self.user, language.language)
+            # 3) subtitle is complete
+            can_bypass_moderation = (
+                is_complete
+                and not self._sl_created
+                and can_publish_edits_immediately(team_video, self.user,
+                                                  language.language))
 
             if can_bypass_moderation:
                 new_version.moderate = APPROVED
@@ -347,9 +348,10 @@ class SubtitlesUploadBaseForm(forms.Form):
 
             outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
 
-            if is_complete and outstanding_tasks.exists():
-                outstanding_tasks.update(subtitle_version=new_version,
-                                         language=language.language)
+            if outstanding_tasks.exists():
+                if new_version.moderation_status != WAITING_MODERATION:
+                    outstanding_tasks.update(subtitle_version=new_version,
+                                             language=language.language)
             elif not can_bypass_moderation:
                 # we just need to create review/approve/subtitle if the language
                 # is a new one or, if it's a post-publish edit, if the user can't
@@ -374,7 +376,7 @@ class SubtitlesUploadBaseForm(forms.Form):
                     else:
                         if task_type == Task.TYPE_IDS['Subtitle']:
                             task.assignee = self.user
-                        
+
                     task.save()
 
         return language
@@ -446,18 +448,23 @@ class SubtitlesUploadForm(SubtitlesUploadBaseForm):
         video = self.cleaned_data['video']
         language = self.cleaned_data['language']
 
-        if is_complete:
-            team_video = video.get_team_video()
+        team_video = video.get_team_video()
 
-            if team_video:
-                tasks = team_video.task_set.incomplete_subtitle_or_translate().filter(language__in=[language, ''])
+        if team_video:
+            tasks = team_video.task_set.incomplete_subtitle_or_translate().filter(language__in=[language, ''])
 
-                if tasks.exists():
-                    task = tasks.get()
+            if tasks.exists():
+                task = tasks.get()
 
-                    if not task.assignee and self.user and can_assign_task(task, self.user):
-                        task.assignee = self.user
+                if not task.assignee and self.user and can_assign_task(task, self.user):
+                    task.assignee = self.user
 
+                    # we save only if is_complete because
+                    # .complete() actually saves the task too
+                    if not is_complete:
+                        task.save()
+
+                if is_complete:
                     task.complete()
 
         if latest_version and sl.latest_version():
@@ -587,7 +594,7 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
     def clean_usernames(self):
         usernames = self.cleaned_data.get('usernames', [])
-        
+
         for username in usernames:
             url = self.youtube_feed_url_pattern % str(username)
             self.parse_feed_url(url)

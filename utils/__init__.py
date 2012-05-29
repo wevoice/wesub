@@ -168,7 +168,8 @@ def send_templated_email(to, subject, body_template, body_dict,
 
     return email.send(fail_silently)
 
-from sentry.client.models import client
+from raven.contrib.django.models import client
+
 
 def catch_exception(exceptions, subject="", default=None, ignore=False):
     """

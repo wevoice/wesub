@@ -248,6 +248,21 @@ a.button-clean {
 div.fix-chosen div.chzn-container {
     width: auto !important;
 }
+.action-group {
+    position: relative;
+
+    .trigger {
+        cursor: pointer;
+    }
+
+    ul {
+        display: none;
+    }
+
+    &:hover ul {
+        display: block;
+    }
+}
 
 /* Tabs */
 .show-border {
@@ -565,37 +580,23 @@ div.fix-chosen div.chzn-container {
         }
 
         .admin-controls {
-            border: 1px solid $lighter;
-            bottom: 1em; right: 0;
-            display: none;
-            float: left;
-            padding: 0;
             position: absolute;
-            @include border-radius(2px);
-            @include opacity(0.6);
-            @include vertical-gradient($faintest, $fainter);
+            bottom: .5em; right: 0;
+            padding: .5em 0;
+            display: none;
 
-            &.selected {
-                display: block;
-                @include opacity(1.0);
-            }
             li {
-                display: block;
-                float: left;
                 padding: 0;
+                display: inline;
 
                 a {
-                    border-left: 1px solid $lighter;
-                    color: $normal;
+                    padding: 0 .25em;
                     cursor: pointer;
-                    display: block;
-                    float: left;
-                    padding: 5px 7px;
                     text-decoration: none;
+                    color: $lighter;
 
                     &:hover {
-                        color: $dark;
-                        @include vertical-gradient($faintest, $faint);
+                        color: $normal;
                     }
 
                     &.disabled {
@@ -614,19 +615,12 @@ div.fix-chosen div.chzn-container {
                     margin: 5px 7px;
                 }
             }
-            &:hover {
-                @include opacity(1.0);
-                display: block;
-            }
             form {
                 padding: 0;
             }
         }
-        &:hover {
-            .admin-controls {
-                @include opacity(1.0);
-                display: block;
-            }
+        &:hover .admin-controls {
+            display: block;
         }
 
         .assignee-choice {
@@ -722,6 +716,7 @@ div.fix-chosen div.chzn-container {
         opacity: 1;
         right: 1em;
         text-shadow: 1px 1px 1px #444;
+        padding: .5em;
 
         a {
             border: none;
@@ -777,7 +772,7 @@ div.fix-chosen div.chzn-container {
     }
 }
 .v1 .listing.tasks > li {
-    min-height: 6.5em;
+    min-height: 5.5em;
     padding-left: 110px;
 
     .done {
@@ -816,6 +811,41 @@ div.fix-chosen div.chzn-container {
             margin-bottom: 10px;
             padding: 10px;
             @include border-radius;
+        }
+    }
+
+    .perform-task {
+
+        .trigger {
+            text-align: right;
+            padding-right: 16px;
+            background: url('../images/chosen-sprite.png') no-repeat 138px -4px;
+            color: $lighter;
+        }
+
+        ul {
+            position: absolute;
+            top: 15px; right: 0;
+            padding: 0;
+            background: #fff;
+            @include border-radius(3px);
+            @include box-shadow(0px, 1px, 5px, #777);
+            z-index: 1000;
+
+            a {
+                text-align: left;
+                padding: .75em 1em;
+
+                &:after {
+                    content: '';
+                }
+
+                &:hover {
+                    background: $fainter;
+                    color: $darker;
+                }
+
+            }
         }
     }
 
@@ -888,6 +918,11 @@ p.view-more {
         &:after {
             content: ' →';
         }
+    }
+}
+div.upload-draft-modal {
+    div.modal-body {
+        padding: 40px 15px;
     }
 }
 
@@ -1580,6 +1615,7 @@ ol.subtitles {
         margin-left: -10px;
         padding: 1em 1em 1em 120px;
         position: relative;
+        z-index: 1;
 
         &:hover {
             background-color: $faintest;
@@ -1615,6 +1651,9 @@ ol.subtitles {
             top: 1em;
         }
     }
+}
+div#rollback-button {
+    padding: 20px 12px;
 }
 
 /* Overrides */
