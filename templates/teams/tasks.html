@@ -307,13 +307,14 @@
                                                 <div class="modal" id="download-draft-{{task.id}}" style="display: none">
                                                     <div class="modal-header">
                                                         <a href="#" class="close">x</a>
-                                                        <h3>{% trans 'Download draft' %}</h3>
+                                                        <h3>{% trans 'Download a draft' %}</h3>
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="fix-chosen">
                                                             <div class="no-chosen">
+                                                                <p>Download a draft of these subtitles so you can work offline.</p>
                                                                 <select class="goto">
-                                                                    <option value="">Select type</option>
+                                                                    <option value="">Select a format</option>
                                                                     <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='srt' %}">SRT</option>
                                                                     <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='ssa' %}">SSA</option>
                                                                     <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='ttml' %}">TTML</option>
