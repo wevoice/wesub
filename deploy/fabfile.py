@@ -276,9 +276,6 @@ def migrate(app_name=''):
         with cd(os.path.join(env.static_dir, 'unisubs')):
             _git_pull()
             if env.separate_uslogging_db:
-                run('{0}/env/bin/python manage.py migrate sentry '
-                    '--database=uslogging --settings=unisubs_settings'.format(
-                        env.static_dir))
                 run('{0}/env/bin/python manage.py migrate uslogging '
                     '--database=uslogging --settings=unisubs_settings'.format(
                         env.static_dir))
