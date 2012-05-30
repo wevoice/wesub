@@ -596,6 +596,10 @@ Update an existing task:
 
 .. http:put:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
 
+Delete an existing task:
+
+.. http:delete:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
+
 Fields
 ++++++
 
