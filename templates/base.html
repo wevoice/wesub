@@ -103,7 +103,7 @@
             <a href="/about">{% trans 'About' %}</a>
             <a href="http://www.pculture.org/pcf/jobs/">{% trans 'Jobs' %}</a>
             <a href="http://www.facebook.com/pages/Universal-Subtitles/112574762094219">Facebook</a> 
-            <a href="http://twitter.com/universalsubs">Twitter</a>
+            <a href="http://twitter.com/amarasubs">Twitter</a>
             <a href="mailto:universalsubtitles@pculture.org">{% trans 'Contact Us' %}</a>
             <a href="http://www.pculture.org/pcf/websites-privacy/">{% trans 'Privacy Policy' %}</a>
             <a href="{% url terms_page %}">{% trans 'Terms of Service' %}</a>
@@ -116,7 +116,7 @@
                     <li><a target="_blank" href="{% url admin:index %}">{% trans 'Admin' %}</a></li>
                 {% endif %}
                 {% if user.is_superuser %}
-                    <li><a target="_blank" href="{% url sentry %}">{% trans 'Sentry' %}</a></li>
+                    <li><a target="_blank" href="http://sentry.pculture.org:9000">{% trans 'Sentry' %}</a></li>
                 {% endif %}
                 {% if user|can_translate %}
                     <li><a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a></li>

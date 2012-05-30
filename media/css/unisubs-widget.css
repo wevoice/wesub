@@ -965,6 +965,9 @@ ul.unisubs-titlesList {
     padding: 0 !important;
     position: relative !important;
 }
+ul.isRTL textarea.unisubs-translateField {
+    direction: rtl;
+}
 ul.unisubs-titlesList li.active {
     background: #caf3ff !important
 }
@@ -2255,6 +2258,7 @@ a.unisubs-openid span {
     position: absolute !important;
     top: 0 !important;
     width: 842px !important;
+    z-index: 1 !important;
 }
 .unisubs-howtopanel div {
     text-align: center !important;

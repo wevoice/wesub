@@ -43,7 +43,7 @@
     <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <browser class="hudson.plugins.git.browser.GithubWeb">
-      <url>https://github.com/8planes/mirosubs/</url>
+      <url>https://github.com/pculture/unisubs/</url>
     </browser>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
@@ -87,7 +87,7 @@ bash ./hudson_test.sh test_staging_settings</command>
     <hudson.plugins.ircbot.IrcPublisher>
       <targets>
         <hudson.plugins.im.GroupChatIMMessageTarget>
-          <name>#universalsubtitles</name>
+          <name>#amara</name>
           <password></password>
         </hudson.plugins.im.GroupChatIMMessageTarget>
       </targets>

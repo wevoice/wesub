@@ -57,15 +57,16 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var map = this.captionSet_.makeMap();
 
-    // For some reason, YouTube video sources don't set the videoURL_ var. Ugh.
-    this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_ || '';
-
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
-        this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(this.baseLanguageSubtitles_);
-        this.captionManager_ =
-            new unisubs.CaptionManager(
-                this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
+    if (this.dialog_.reviewOrApprovalType_) {
+        this.baseLanguageCaptionSet_ = this.captionSet_;
+    } else {
+        this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
+                this.baseLanguageSubtitles_);
     }
+
+    this.captionManager_ =
+        new unisubs.CaptionManager(
+            this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
 
     goog.array.forEach(
         this.baseLanguageSubtitles_,
@@ -81,21 +82,25 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
         },
         this);
 };
-
 unisubs.translate.TranslationList.prototype.enterDocument = function() {
     unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
     var handler = this.getHandler();
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
+    var that = this;
 
-        // Start loading the video.
-        this.dialog_.getVideoPlayerInternal().setPlayheadTime(0);
-        this.dialog_.getVideoPlayerInternal().pause();
+    // Setup listening for video + subtitles.
+    handler.listen(this.captionManager_,
+                   unisubs.CaptionManager.CAPTION,
+                   this.captionReached_);
 
-        // Setup listening for video + subtitles.
-        handler.listen(this.captionManager_,
-                       unisubs.CaptionManager.CAPTION,
-                       this.captionReached_);
-    }
+    // Update the captionSet that the video is listening to
+    // to match the proper mix of translated / original subtitles.
+    goog.array.forEach(this.captionSet_.captions_, function(c) {
+        if (c.getText() !== '') {
+            var subOrder = c.getSubOrder();
+            var captionToUpdate = that.baseLanguageCaptionSet_.findSubIndex_(subOrder);
+            that.baseLanguageCaptionSet_.caption(captionToUpdate).setText(c.getText());
+        }
+    });
 };
 
 /**
@@ -108,6 +113,7 @@ unisubs.translate.TranslationList.prototype.translateCallback_ = function(transl
     if (!error) {
         goog.array.forEach(translations, function(text, i) {
             widgets[i].setTranslationContent(text);
+            widgets[i].cloneToCaptionManager(true);
         });
     }
 };

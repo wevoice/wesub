@@ -53,6 +53,7 @@ from utils.panslugify import pan_slugify
 from apps.teams.moderation_const import (
     WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED, REJECTED
 )
+from raven.contrib.django.models import client
 
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)
@@ -240,13 +241,18 @@ class Video(models.Model):
 
         return title
 
+    def title_display_unabridged(self):
+        """
+        This is just a wrapper around ``title_display`` for use in templates
+        """
+        return self.title_display(False)
+
     def update_view_counter(self):
         """Queue a Celery task that will increment the number of views for this video."""
         try:
             st_video_view_handler_update.delay(video_id=self.video_id)
         except:
-            from sentry.client.models import client
-            client.create_from_exception()
+            client.captureException()
 
     def update_subtitles_fetched(self, lang=None):
         """Queue a Celery task that will increment the number of times this video's subtitles were fetched."""
@@ -258,8 +264,7 @@ class Video(models.Model):
 
                 update_subtitles_fetched_counter_for_sl.delay(sl_pk=lang.pk)
         except:
-            from sentry.client.models import client
-            client.create_from_exception()
+            client.captureException()
 
     def get_thumbnail(self, fallback=True):
         """Return a URL to this video's thumbnail.
@@ -481,7 +486,10 @@ class Video(models.Model):
 
         """
         name = self.filename
-        lang = language.language or u'original'
+        if not isinstance(language, basestring):
+            lang = language.language or u'original'
+        else:
+            lang = language
         return u'%s.%s' % (name, lang)
 
     @property
@@ -859,7 +867,8 @@ class SubtitleLanguage(models.Model):
 
     # has_version: Is there more than one version, and does the latest version
     # have more than 0 subtitles?
-    has_version = models.BooleanField(default=False, editable=False)
+    has_version = models.BooleanField(default=False, editable=False,
+            db_index=True)
 
     # had_version: Is there more than one version, and did some previous version
     # have more than 0 subtitles?
@@ -1222,45 +1231,64 @@ class SubtitleVersionManager(models.Manager):
         return self.get_query_set().exclude(moderation_status__in=[WAITING_MODERATION, REJECTED])
 
     def new_version(self, parser, language, user,
-                    translated_from=None, note="", timestamp=None):
+                    translated_from=None, note="", timestamp=None, moderation_status=None):
+
         version_no = 0
         version = language.version(public_only=False)
-        forked = not translated_from
+
         if version is not None:
             version_no = version.version_no + 1
-        if translated_from is not None:
-            forked = False
+            title = version.title
+            description = version.description
+        else:
+            video = language.video
+            title = video.get_title_display()
+            description = video.get_description_display()
+
+        forked = not bool(translated_from)
+
         version = SubtitleVersion(
                 language=language, version_no=version_no, note=note,
                 is_forked=forked, time_change=1, text_change=1,
-                datetime_started=datetime.now())
+                title=title, description=description)
+
         version.is_forked = forked
-        version.has_version = True
         version.datetime_started = timestamp or datetime.now()
-        version.user=user
+        version.user = user
+
+        if moderation_status and moderation_status in (WAITING_MODERATION, UNMODERATED):
+            version.moderation_status = moderation_status
+
         version.save()
 
-        ids = []
+        ids = set()
 
         original_subs = None
+
         if translated_from and translated_from.version():
             original_subs = list(translated_from.version().subtitle_set.order_by("subtitle_order"))
+
         for i, item in enumerate(parser):
             original_sub  = None
+
             if translated_from and len(original_subs) > i:
-                original_sub  = original_subs[i ]
+                original_sub  = original_subs[i]
+
                 if original_sub.start_time != item['start_time'] or \
                    original_sub.end_time != item['end_time']:
                     raise Exception("No apparent match between original: %s and %s" % (original_sub, item))
+
             if original_sub:
                id = original_sub.subtitle_id
                order = original_sub.subtitle_order
             else:
                 id = int(random.random()*10e12)
                 order = i +1
+
                 while id in ids:
                     id = int(random.random()*10e12)
-            ids.append(id)
+
+            ids.add(id)
 
             metadata = item.pop('metadata', None)
 
@@ -1278,6 +1306,7 @@ class SubtitleVersionManager(models.Manager):
                     SubtitleMetadata(
                         subtitle=caption, key=name, data=value
                     ).save()
+
         return version
 
 class SubtitleVersion(SubtitleCollection):
@@ -1318,12 +1347,8 @@ class SubtitleVersion(SubtitleCollection):
             #but some bug happen, I've no idea why
             Action.create_caption_handler(self, self.datetime_started)
             if self.user:
-                video = self.language.video
-                has_other_versions = SubtitleVersion.objects.filter(language__video=video) \
-                    .filter(user=self.user).exclude(pk=self.pk).exists()
-
-                if not has_other_versions:
-                    video.followers.add(self.user)
+                self.language.video.followers.remove(self.user)
+                self.language.followers.add(self.user)
 
     def changed_from(self, other_subs):
         my_subs = self.subtitles()
@@ -1504,6 +1529,8 @@ class SubtitleVersion(SubtitleCollection):
 
     def is_synced(self):
         subtitles = self.subtitles()
+        if len(subtitles) == 0:
+            return False
         if len([s for s in subtitles[:-1] if not s.has_complete_timing()]) > 0:
             return False
         if not is_synced_value(subtitles[-1].start_time):
@@ -1514,6 +1541,13 @@ class SubtitleVersion(SubtitleCollection):
     def is_public(self):
         return self.moderation_status in [APPROVED, UNMODERATED]
 
+    @property
+    def is_translation(self):
+        return self.is_dependent()
+
+    @property
+    def is_transcription(self):
+        return not self.is_dependent()
 
     # Metadata
     def _get_metadata(self, key):

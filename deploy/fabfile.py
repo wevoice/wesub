@@ -141,6 +141,8 @@ def _create_env(username, hosts, s3_bucket,
                 memcached_bounce_cmd,
                 admin_dir, admin_host, celeryd_host, celeryd_proj_root,
                 separate_uslogging_db=False,
+                celeryd_start_cmd="",
+                celeryd_stop_cmd="",
                 celeryd_bounce_cmd="",
                 web_dir=None):
     env.user = username
@@ -154,6 +156,8 @@ def _create_env(username, hosts, s3_bucket,
     env.admin_dir = admin_dir
     env.admin_host = admin_host
     env.separate_uslogging_db = separate_uslogging_db
+    env.celeryd_start_cmd=celeryd_start_cmd
+    env.celeryd_stop_cmd=celeryd_stop_cmd
     env.celeryd_bounce_cmd=celeryd_bounce_cmd
     env.celeryd_host = celeryd_host
     env.celeryd_proj_root = celeryd_proj_root
@@ -173,6 +177,8 @@ def staging(username):
                     celeryd_host          = 'pcf-us-adminstg.pculture.org:2191',
                     celeryd_proj_root     = 'universalsubtitles.staging',
                     separate_uslogging_db = True,
+                    celeryd_start_cmd     = "/etc/init.d/celeryd start",
+                    celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
 
 def dev(username):
@@ -189,6 +195,8 @@ def dev(username):
                     celeryd_host          = DEV_HOST,
                     celeryd_proj_root     = 'universalsubtitles.dev',
                     separate_uslogging_db = False,
+                    celeryd_start_cmd     = "/etc/init.d/celeryd.dev start",
+                    celeryd_stop_cmd      = "/etc/init.d/celeryd.dev stop",
                     celeryd_bounce_cmd    = "/etc/init.d/celeryd.dev restart &&  /etc/init.d/celeryevcam.dev start")
 
 def production(username):
@@ -196,7 +204,7 @@ def production(username):
         _create_env(username              = username,
                     hosts                 = ['pcf-us-cluster3.pculture.org:2191',
                                              'pcf-us-cluster4.pculture.org:2191',
-                                            'pcf-us-cluster5.pculture.org:2191'],
+                                             'pcf-us-cluster5.pculture.org:2191'],
                     s3_bucket             = 's3.www.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles',
                     static_dir            = '/var/static/production',
@@ -207,6 +215,8 @@ def production(username):
                     celeryd_host          = 'pcf-us-admin.pculture.org:2191',
                     celeryd_proj_root     = 'universalsubtitles',
                     separate_uslogging_db = True,
+                    celeryd_start_cmd     = "/etc/init.d/celeryd start",
+                    celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart  && /etc/init.d/celeryevcam start ")
 
 def temp(username):
@@ -223,6 +233,8 @@ def temp(username):
                     celeryd_host          = 'pcf-us-admintmp.pculture.org:2191',
                     celeryd_proj_root     = 'universalsubtitles.staging',
                     separate_uslogging_db = True,
+                    celeryd_start_cmd     = "/etc/init.d/celeryd.staging start",
+                    celeryd_stop_cmd      = "/etc/init.d/celeryd.staging stop",
                     celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
 
 def nf(username):
@@ -239,6 +251,8 @@ def nf(username):
                     celeryd_host          = 'pcf-us-adminnf.pculture.org:2191',
                     celeryd_proj_root     = 'universalsubtitles.nf',
                     separate_uslogging_db = True,
+                    celeryd_start_cmd     = "/etc/init.d/celeryd start",
+                    celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
 
 
@@ -262,9 +276,6 @@ def migrate(app_name=''):
         with cd(os.path.join(env.static_dir, 'unisubs')):
             _git_pull()
             if env.separate_uslogging_db:
-                run('{0}/env/bin/python manage.py migrate sentry '
-                    '--database=uslogging --settings=unisubs_settings'.format(
-                        env.static_dir))
                 run('{0}/env/bin/python manage.py migrate uslogging '
                     '--database=uslogging --settings=unisubs_settings'.format(
                         env.static_dir))
@@ -324,14 +335,25 @@ def migrate_fake(app_name):
             run('yes no | {0}/env/bin/python manage.py migrate {1} 0001 --fake --settings=unisubs_settings'.format(env.static_dir, app_name))
 
 def refresh_db():
+    # Should really be checking for 'production'
+    if env.installation_name is None:
+        Output("Cannot refresh production database")
+        return
+      
     with Output("Refreshing database"):
+        add_disabled()
+        stop_celeryd()
+        
         env.host_string = env.web_hosts[0]
-        sudo('/scripts/univsubs_reset_db.sh {0}'.format(env.installation_name))
-        sudo('/scripts/univsubs_refresh_db.sh {0}'.format(env.installation_name))
+        sudo('/scripts/amara_reset_db.sh {0}'.format(env.installation_name))
+        sudo('/scripts/amara_refresh_db.sh {0}'.format(env.installation_name))
         promote_django_admins()
         bounce_memcached()
         run('{0}/env/bin/python manage.py fix_static_files '
             '--settings=unisubs_settings'.format(env.static_dir))
+            
+        start_celeryd()
+        removed_disabled()
 
 
 def _execute_on_all_hosts(cmd):
@@ -378,7 +400,7 @@ def _update_environment(base_dir, flags=''):
         _git_pull()
         run('export PIP_REQUIRE_VIRTUALENV=true')
         # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
-        run('yes i | {0}/env/bin/pip install {1} -E {0}/env/ -r requirements.txt'.format(base_dir, flags), pty=True)
+        run('yes i | {0}/env/bin/pip install {1} -r requirements.txt'.format(base_dir, flags), pty=True)
         #_clear_permissions(os.path.join(base_dir, 'env'))
 
 def update_environment(flags=''):
@@ -616,13 +638,29 @@ def bounce_memcached():
         sudo(env.memcached_bounce_cmd, pty=False)
 
 
-def _bounce_celeryd():
+def _do_celeryd(cmd):
     if env.admin_dir:
         env.host_string = env.admin_host
     else:
         env.host_string = DEV_HOST
-    if bool(env.celeryd_bounce_cmd):
-        sudo(env.celeryd_bounce_cmd, pty=False)
+    if bool(cmd):
+        sudo(cmd, pty=False)
+
+def start_celeryd():
+    """Start the celeryd workers
+
+    """
+    with Output("Starting celeryd"):
+        _do_celeryd(env.celeryd_start_cmd)
+
+def stop_celeryd():
+    """Stop the celeryd workers safely
+
+    This should allow them to finish the task they're working on.
+
+    """
+    with Output("Stopping celeryd"):
+        _do_celeryd(env.celeryd_stop_cmd)
 
 def bounce_celeryd():
     """Bounce the celeryd workers safely
@@ -632,7 +670,7 @@ def bounce_celeryd():
 
     """
     with Output("Bouncing celeryd"):
-        _bounce_celeryd()
+        _do_celeryd(env.celeryd_bounce_cmd)
 
 
 def test_celeryd():
@@ -808,6 +846,17 @@ def get_settings_values(*settings_names):
     """
     _execute_on_all_hosts(lambda dir: _get_settings_values(dir, *settings_names))
 
+
+def test_access(is_sudo=False):
+    """
+    Makes sure the user can connect to all relevant hosts.
+    If any value is passed as an argument, makes sure the user can
+    connect and sudo on all hosts.
+    """
+    run_command = run
+    if is_sudo:
+        run_command = sudo
+    _execute_on_all_hosts(lambda dir: run_command('date'))
 
 try:
     from local_env import *

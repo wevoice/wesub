@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from celery.decorators import periodic_task
-from celery.schedules import crontab
+from celery.schedules import crontab, timedelta
 from celery.task import task
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from haystack import site
 
 from utils import send_templated_email
+from utils.metrics import Gauge
 from widget.video_cache import (
     invalidate_cache as invalidate_video_cache,
     invalidate_video_moderation
@@ -131,3 +132,10 @@ def api_notify_on_video_activity(team_pk, video_id,event_name):
     TeamNotificationSetting.objects.notify_team(
         team_pk, video_id, event_name)
 
+
+@periodic_task(run_every=timedelta(seconds=5))
+def gauge_teams():
+    from teams.models import Task, Team, TeamMember
+    Gauge('teams.Task').report(Task.objects.count())
+    Gauge('teams.Team').report(Team.objects.count())
+    Gauge('teams.TeamMember').report(TeamMember.objects.count())

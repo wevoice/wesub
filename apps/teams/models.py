@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import datetime
+import logging
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -36,7 +37,7 @@ from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
 from messages.models import Message
-from teams.moderation_const import WAITING_MODERATION
+from teams.moderation_const import WAITING_MODERATION, UNMODERATED
 from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
     ROLE_CONTRIBUTOR
@@ -49,6 +50,9 @@ from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
 
+from functools import partial
+
+logger = logging.getLogger(__name__)
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
@@ -745,7 +749,7 @@ class TeamVideo(models.Model):
         video.is_public = True
         video.moderated_by = new_team if new_team.moderates_videos() else None
         video.save()
-        
+
         # make sure we end up with a policy that belong to the team
         # we're moving into, else it won't come up in the team video
         # page
@@ -809,8 +813,8 @@ def autocreate_tasks(team_video):
     if workflow.autocreate_subtitle and not existing_subtitles:
         if not team_video.task_set.not_deleted().exists():
             Task(team=team_video.team, team_video=team_video,
-                    subtitle_version=None, language='',
-                    type=Task.TYPE_IDS['Subtitle']
+                 subtitle_version=None, language='',
+                 type=Task.TYPE_IDS['Subtitle']
             ).save()
 
     # If there are existing subtitles, we may need to create translate tasks.
@@ -1476,6 +1480,7 @@ class Task(models.Model):
 
     deleted = models.BooleanField(default=False)
 
+    # TODO: Remove this field.
     public = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -1559,11 +1564,12 @@ class Task(models.Model):
                "Tried to set version moderation status from an un-ruled-upon task."
 
         if self.approved == Task.APPROVED_IDS['Approved']:
-            self.subtitle_version.moderation_status = MODERATION.APPROVED
+            moderation_status = MODERATION.APPROVED
         else:
-            self.subtitle_version.moderation_status = MODERATION.REJECTED
+            moderation_status = MODERATION.REJECTED
 
-        self.subtitle_version.save()
+        SubtitleVersion.objects.filter(pk=self.subtitle_version.pk).update(
+                moderation_status=moderation_status)
 
     def _send_back(self, sends_notification=True):
         """Handle "rejection" of this task.
@@ -1602,6 +1608,10 @@ class Task(models.Model):
             type = Task.TYPE_IDS['Subtitle']
         else:
             type = Task.TYPE_IDS['Translate']
+
+        # TODO: Shouldn't this be WAITING_MODERATION?
+        self.subtitle_version.moderation_status = UNMODERATED
+        self.subtitle_version.save()
 
         task = Task(team=self.team, team_video=self.team_video,
                     subtitle_version=self.subtitle_version,
@@ -1648,7 +1658,7 @@ class Task(models.Model):
             can_do = can_approve
         elif type == 'Review':
             type = Task.TYPE_IDS['Review']
-            can_do = can_review
+            can_do = partial(can_review, allow_own=True)
         else:
             return None
 
@@ -1691,6 +1701,7 @@ class Task(models.Model):
             metadata_manager.update_metadata(self.team_video.video.pk)
 
             if self.workflow.autocreate_translate:
+                # TODO: Switch to autocreate_task?
                 _create_translation_tasks(self.team_video, subtitle_version)
 
             upload_subtitles_to_original_service.delay(subtitle_version.pk)
@@ -1853,6 +1864,25 @@ class Task(models.Model):
             limit = datetime.timedelta(days=self.team.task_expiration)
             self.expiration_date = datetime.datetime.now() + limit
 
+    def get_subtitle_version(self):
+        """ Gets the subtitle version related to this task.
+        If the task has a subtitle_version attached, return it and
+        if not, try to find it throught the subtitle language of the video.
+
+        Note: we need this since we don't attach incomplete subtitle_version
+        to the task (and if we do we need to set the status to unmoderated and
+        that causes the version to get published).
+        """
+
+        if self.subtitle_version:
+            return self.subtitle_version
+
+        if not hasattr(self, "_subtitle_version"):
+            video = Video.objects.get(teamvideo=self.team_video_id)
+            language = video.subtitle_language(self.language)
+            self._subtitle_version = language.version(public_only=False) if language else None
+
+        return self._subtitle_version
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:
@@ -2136,9 +2166,6 @@ class TeamNotificationSetting(models.Model):
     objects = TeamNotificationSettingManager()
 
     def get_notification_class(self):
-        # move this import to the module level and test_settings break. Fun.
-        import sentry_logger
-        logger = sentry_logger.logging.getLogger("teams.models")
         try:
             from notificationclasses import NOTIFICATION_CLASS_MAP
 

@@ -38,7 +38,6 @@ unisubs.translate.TranslationPanel = function(captionSet, standardSubState, dial
     this.numSteps_ = 2;
     // zero indexed
     this.currentStep_ = 0 ; 
-
 };
 
 goog.inherits(unisubs.translate.TranslationPanel, goog.ui.Component);
@@ -59,8 +58,12 @@ unisubs.translate.TranslationPanel.prototype.createDom = function() {
             this.standardSubState_.TITLE,
             this.dialog_);
     this.addChild(this.translationList_, true);
-    this.translationList_.getElement().className =
-        "unisubs-titlesList";
+
+    if (this.translationList_.captionSet_.languageIsRTL) {
+        this.translationList_.getElement().className = "unisubs-titlesList isRTL";
+    } else {
+        this.translationList_.getElement().className = "unisubs-titlesList";
+    }
 };
 unisubs.translate.TranslationPanel.prototype.getTranslationList = function(){
     return this.translationList_;

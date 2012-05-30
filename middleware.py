@@ -1,15 +1,27 @@
+import os
+import random
 import time
 
+import debug_toolbar
+from debug_toolbar.middleware import DebugToolbarMiddleware
 from django.conf import settings
-import random
-from django.utils.hashcompat import sha_constructor
-from django.utils.cache import patch_vary_headers
-from django.utils.http import cookie_date
-import os
-from django.db import connection
-from django.core.validators import validate_ipv4_address
 from django.core.exceptions import ValidationError
-from utils.metrics import ManualTimer
+from django.core.validators import validate_ipv4_address
+from django.db import connection
+from django.utils.cache import patch_vary_headers
+from django.utils.hashcompat import sha_constructor
+from django.utils.http import cookie_date
+
+from utils.metrics import ManualTimer, Meter, Timer
+
+
+SECTIONS = {
+    'widget': 'widget',
+    'api': 'api-v1',
+    'api2': 'api-v2',
+    'teams': 'teams',
+}
+
 
 class SaveUserIp(object):
 
@@ -25,23 +37,54 @@ class SaveUserIp(object):
                 pass
 
 class ResponseTimeMiddleware(object):
-    """
-    Writes the time this request took to process, as a cookie in the
-    response. In order for it to work, it must be the very first
-    middleware in settings.py
+    """Middleware for recording response times.
+
+    Writes the time this request took to process, as a cookie in the response.
+    In order for it to work, it must be the very first middleware in settings.py
 
     Also records the response time and sends it along to Riemann.
+
+    If the request was for a section of the site we want to track, sends that
+    information to Riemann as well.
+
     """
     def process_request(self, request):
         request.init_time = time.time()
+        Meter('requests.started').inc()
+
+        # Tracking the section of the site isn't trivial, because sometimes we
+        # have the language prefix, like "/en/foo".
+        paths = request.path.lstrip('/').split('/')[:2]
+        p1 = paths[0] if len(paths) >= 1 else None
+        p2 = paths[1] if len(paths) >= 2 else None
+
+        if p1 in SECTIONS:
+            request._metrics_section = SECTIONS[paths[0]]
+        elif p2 in SECTIONS:
+            request._metrics_section = SECTIONS[paths[1]]
+        else:
+            request._metrics_section = None
+
+        if request._metrics_section:
+            label = 'site-sections.%s-response-time' % request._metrics_section
+            Meter(label).inc()
+
         return None
 
     def process_response(self, request, response):
         if hasattr(request, "init_time"):
             delta = time.time() - request.init_time
             ms = delta * 1000
+
+            Meter('requests.completed').inc()
+
             response.set_cookie('response_time', str(ms))
+
             ManualTimer('response-time').record(ms)
+
+            if request._metrics_section:
+                label = 'site-sections.%s-response-time' % request._metrics_section
+                ManualTimer(label).record(ms)
 
         return response
 
@@ -149,8 +192,6 @@ class ExceptionLoggingMiddleware(object):
         import traceback
         print traceback.format_exc()
 
-from debug_toolbar.middleware import DebugToolbarMiddleware
-import debug_toolbar
 
 class SupeuserDebugToolbarMiddleware(DebugToolbarMiddleware):
 
@@ -166,3 +207,54 @@ class SupeuserDebugToolbarMiddleware(DebugToolbarMiddleware):
                     or not settings.DEBUG:
             return False
         return True
+
+
+# I'm so sorry about this.
+import django.db.backends.mysql.base
+from django.db.backends.mysql.base import CursorWrapper as _CursorWrapper
+
+class MetricsCursorWrapper(_CursorWrapper):
+    def _query_type(self, query):
+        if not query:
+            return 'UNKNOWN'
+        elif query.startswith('SELECT COUNT(*) '):
+            return 'COUNT'
+        elif query.startswith('SELECT '):
+            return 'SELECT'
+        elif query.startswith('DELETE '):
+            return 'DELETE'
+        elif query.startswith('INSERT '):
+            return 'INSERT'
+        elif query.startswith('UPDATE '):
+            return 'UPDATE'
+        else:
+            return 'OTHER'
+
+    def execute(self, query, params=None):
+        op = self._query_type(query)
+
+        with Timer('db-query-time'):
+            with Timer('db-query-time.%s' % op):
+                return super(MetricsCursorWrapper, self).execute(query, params)
+
+    def executemany(self, query, params_list):
+        op = self._query_type(query)
+        start = time.time()
+
+        try:
+            return super(MetricsCursorWrapper, self).executemany(query, params_list)
+        finally:
+            end = time.time()
+            delta = end - start
+            ms = delta * 1000
+
+            # This is an ugly hack to get at least a rough measurement of query
+            # times for executemany() queries.
+            ms_per_query = ms / len(params_list)
+
+            for _ in xrange(len(params_list)):
+                ManualTimer('db-query-time').record(ms_per_query)
+                ManualTimer('db-query-time.%s' % op).record(ms_per_query)
+
+django.db.backends.mysql.base.CursorWrapper = MetricsCursorWrapper
+

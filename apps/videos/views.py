@@ -47,6 +47,7 @@ from statistic.models import EmailShareStatistic
 import urllib, urllib2
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from videos.rpc import VideosApiClass
 from utils.rpc import RpcRouter
 from utils.decorators import never_in_prod
@@ -63,6 +64,7 @@ rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
 })
 
+
 def index(request):
     context = widget.add_onsite_js_files({})
     context['all_videos'] = Video.objects.count()
@@ -73,11 +75,20 @@ def index(request):
 
 def watch_page(request):
 
+    # Assume we're currently indexing if the number of public
+    # indexed vids differs from the count of video objects by
+    # more than 1000
+    is_indexing = cache.get('is_indexing')
+    if is_indexing is None:
+        is_indexing = Video.objects.all().count() - VideoIndex.public().count() > 1000
+        cache.set('is_indexing', is_indexing, 300)
+
     context = {
         'featured_videos': VideoIndex.get_featured_videos()[:VideoIndex.IN_ROW],
         'popular_videos': VideoIndex.get_popular_videos()[:VideoIndex.IN_ROW],
         'latest_videos': VideoIndex.get_latest_videos()[:VideoIndex.IN_ROW*3],
-        'popular_display_views': 'week'
+        'popular_display_views': 'week',
+        'is_indexing': is_indexing
     }
     return render_to_response('videos/watch.html', context,
                               context_instance=RequestContext(request))
@@ -271,7 +282,7 @@ def upload_subtitles(request):
         except Exception, e:
             output['errors'] = {"_all__":[force_unicode(e)]}
             transaction.rollback()
-            from sentry.client.models import client
+            from raven.contrib.django.models import client
             client.create_from_exception()
 
     else:

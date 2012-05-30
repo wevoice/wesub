@@ -24,6 +24,7 @@ from videos.models import Video
 from django.template.loader import render_to_string
 from videos.rpc import render_page
 from django.template import RequestContext
+from django.core.cache import cache
 
 class SearchApiClass(object):
 
@@ -54,9 +55,17 @@ class SearchApiClass(object):
         output = render_page(rdata.get('page', 1), qs, 20, display_views=display_views)
         output['sidebar'] = render_to_string('search/_sidebar.html', dict(form=form, rdata=rdata))
 
+        # Assume we're currently indexing if the number of public
+        # indexed vids differs from the count of video objects by
+        # more than 1000
+        is_indexing = cache.get('is_indexing')
+        if is_indexing is None:
+            is_indexing = Video.objects.all().count() - VideoIndex.public().count() > 1000
+            cache.set('is_indexing', is_indexing, 300)
+
+        output['is_indexing'] = is_indexing
+
         if testing:
             output['sqs'] = qs
 
         return output
-
-

@@ -37,7 +37,6 @@ from django.core.urlresolvers import reverse
 from widget import video_cache
 from datetime import datetime, timedelta
 from django.conf import settings
-from sentry.models import Message
 
 class FakeDatetime(object):
     def __init__(self, now):
@@ -110,71 +109,6 @@ class TestRpc(TestCase):
         self.video_pk = 12
         video_cache.invalidate_video_id(
             'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv')
-
-
-
-    def test_new_trans_on_fork_creates_new(self):
-        # for https://www.pivotaltracker.com/story/show/13248955
-        request = RequestMockup(self.user_0)
-        session = create_two_sub_dependent_session(request)
-        video_pk = session.video.pk
-        video = Video.objects.get(pk=video_pk)
-
-        self.client.login(**{"username":"admin", "password":"admin"})
-        data = {
-            'language': 'en',
-            'video_language': 'en',
-            'video': video_pk,
-            'subtitles': open(os.path.join(settings.PROJECT_ROOT, "apps", "videos", 'fixtures/test.srt')),
-            'is_complete': True
-            }
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-        # now spanish is forked:
-        original_spanish = video.subtitlelanguage_set.get(language='es')
-        base_language = video.subtitle_language()
-        num_langs = video.subtitlelanguage_set.all().count()
-        self.assertEqual(2, num_langs)
-        self.assertNotEqual(2, len(base_language.latest_subtitles()))
-
-        sub_pk = original_spanish.pk
-        return_value = rpc.start_editing(
-            request,
-            video.video_id,
-            "es",
-            subtitle_language_pk=sub_pk,
-            base_language_pk=base_language.pk
-        )
-        session_pk = return_value['session_pk']
-        inserted = [{'subtitle_id': 'aa',
-                     'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
-                     'sub_order': 1.0}]
-        rpc.finished_subtitles(request, session_pk, inserted);
-
-        video = Video.objects.get(pk=video_pk)
-        self.assertEqual(video.subtitlelanguage_set.all().count(), 3)
-
-        return_value = rpc.start_editing(
-            request,
-            video.video_id,
-            "es",
-            subtitle_language_pk=sub_pk,
-            base_language_pk=base_language.pk
-        )
-
-        session_pk = return_value['session_pk']
-        inserted = [{'subtitle_id': 'aa',
-                     'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
-                     'sub_order': 1.0}]
-        rpc.finished_subtitles(request, session_pk, inserted);
-
-        video = Video.objects.get(pk=video_pk)
-        self.assertEqual(video.subtitlelanguage_set.all().count(), 3)
-
 
     def test_actions_for_subtitle_edit(self):
         request = RequestMockup(self.user_0)
@@ -1037,18 +971,10 @@ class TestRpc(TestCase):
         self.assertEquals(title, language.get_title())
 
     def test_youtube_ei_failure(self):
-        import sentry_logger
-        assert sentry_logger # Shut up, Pyflakes.
         from utils.requestfactory import RequestFactory
         rf = RequestFactory()
         request = rf.get("/")
-
-        num_messages = Message.objects.all().count()
-        self.assertEquals(0, num_messages)
-
         rpc.log_youtube_ei_failure(request, "/test-page")
-        new_num_messages = Message.objects.all().count()
-        self.assertEquals(num_messages + 1, new_num_messages)
 
     def test_start_editing_null(self):
         request = RequestMockup(self.user_0)
@@ -1267,3 +1193,49 @@ class TestSubtitlesGenerator(TestCase):
         self.assertTrue(unicode(TXTSubtitles(subtitles, self.video)))
 
 
+class TestCaching(TestCase):
+    fixtures = ['test_widget.json']
+
+    def setUp(self):
+        self.user_0 = CustomUser.objects.get(pk=3)
+        self.user_1 = CustomUser.objects.get(pk=4)
+        self.video_pk = 12
+        video_cache.invalidate_video_id(
+            'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv')
+
+    def test_get_from_cache(self):
+        """
+        Make sure that once the cache is warm, the number of database queries
+        remains constant.
+        """
+        from django.db import connection
+
+        try:
+            settings.DEBUG = True
+
+            request_0 = RequestMockup(self.user_0)
+            request_1 = RequestMockup(self.user_0)
+            request_2 = RequestMockup(self.user_0)
+
+            rpc.show_widget(request_0,
+                'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
+                False)
+
+            rpc.show_widget(request_1,
+                'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
+                False)
+
+            num = len(connection.queries)
+
+            response = rpc.show_widget(request_2,
+                'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
+                False)
+
+            self.assertTrue(0 < len(response['languages']))
+            self.assertTrue(0 != num)
+            self.assertEquals(num, len(connection.queries))
+
+        except Exception, e:
+            raise e
+        finally:
+            settings.DEBUG = False

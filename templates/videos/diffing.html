@@ -48,16 +48,6 @@
                     return false;
                 });
             }
-            $('#edit_0').click(function() {
-                widget_widget_div_0.selectMenuItem(
-                    unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
-                return false;
-            });
-            $('#edit_1').click(function() {
-                widget_widget_div_1.selectMenuItem(
-                    unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
-                return false;
-            });
             $('.time_link_0').click(function() {
                 widget_widget_div_0.playAt(parseFloat(
                     $(this).find('.data').text()));
@@ -123,9 +113,6 @@
         <div class="clear tall">&nbsp;</div>
 
         <div class="revision_buttons">
-            <a href="#" class="new_edit">
-                {% trans 'Submit a new edit based on this version' %} (#{{ second_version.version_no }})
-            </a>
             {% if second_version.next_version and rollback_allowed %}
                 <a href="{% url videos:rollback second_version.pk %}" class="roll_back">
                     {% trans 'Roll back to version' %} (#{{ second_version.version_no }})
@@ -193,9 +180,6 @@
 
 
         <div class="revision_buttons">
-            <a href="#" class="new_edit" id="edit_0">
-                {% trans 'Submit a new edit based on this version' %} (#{{ first_version.version_no }})
-            </a>
             {% if first_version.next_version and rollback_allowed %}
                 <a href="{% url videos:rollback first_version.pk %}" class="roll_back">
                     {% trans 'Roll back to version' %} (#{{ first_version.version_no }})

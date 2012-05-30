@@ -79,33 +79,12 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
 };
 unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event) {
     this.onFocusText_ = this.translateInput_.value;
-
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
-        this.dialog_.getVideoPlayerInternal().setPlayheadTime(this.subtitle_['start_time']);
-        this.dialog_.getVideoPlayerInternal().pause();
-    }
+    this.dialog_.getVideoPlayerInternal().showCaptionText(this.onFocusText_ || this.getOriginalValue());
 };
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
     this.onKeyUpText_ = this.translateInput_.value;
-
-    if (this.videoURL_.indexOf('vimeo.com') === -1) {
-        var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
-        var editableCaption = editableCaptionSet.captionByID(this.subtitle_.subtitle_id);
-
-        if (this.onKeyUpText_ !== '') {
-            editableCaption.setText(this.onKeyUpText_);
-            this.dialog_.getVideoPlayerInternal().showCaptionText(this.onKeyUpText_);
-            this.textHasBeenChanged_ = true;
-        } else {
-            if (this.textHasBeenChanged_) {
-                var originalText = editableCaption.getOriginalText();
-                editableCaption.setText(originalText);
-                this.dialog_.getVideoPlayerInternal().showCaptionText(originalText);
-                this.textHasBeenChanged_ = false;
-            }
-        }
-    }
-}
+    this.cloneToCaptionManager();
+};
 unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) {
     var value = goog.string.trim(this.translateInput_.value);
     var edited = value != this.onFocusText_;
@@ -120,6 +99,16 @@ unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) 
 unisubs.translate.TranslationWidget.prototype.setTranslationContent = function(value){
     this.translateInput_.value = value;
     this.inputLostFocus_(false);
+};
+unisubs.translate.TranslationWidget.prototype.cloneToCaptionManager = function(dontShowNow){
+    var currentText = this.translateInput_.value;
+    var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
+    var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
+
+    editableCaption.setText(currentText || editableCaption.getOriginalText());
+    if (!dontShowNow) {
+        this.dialog_.getVideoPlayerInternal().showCaptionText(currentText || editableCaption.getOriginalText());
+    }
 };
 unisubs.translate.TranslationWidget.prototype.setEnabled = function(enabled) {
     this.translateInput_.disabled = !enabled;

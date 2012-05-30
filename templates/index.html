@@ -74,7 +74,7 @@
 </div>
 <div class="clearfix"></div>
 <div id="benefits" class="clearfix">
-    <a class="button" href="{% url enterprise_page %}#benefits">{% trans "6 key benefits" %}</a>
+    <a class="button" href="{% url enterprise_page %}">{% trans "For Enterprise" %}</a>
     <h2>{% trans "The largest, most powerful captioning and translation platform in the world." %}</h2>
 </div>
 <div id="partners">
@@ -131,7 +131,7 @@
         <a href="{% url videos:popular_videos %}#?sort=total">{% trans "Top all-time" %}</a>
     </p>
     {% with popular_videos as video_list %}
-        {% include 'videos/_watch_page.html' with display_views='today' %}
+        {% include 'videos/_watch_page.html' %}
     {% endwith %}    
 </div>
 <div id="featured-videos" class="featured">

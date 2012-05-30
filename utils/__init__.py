@@ -16,12 +16,6 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.http import HttpResponse, Http404
@@ -43,6 +37,7 @@ import traceback, sys
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.models import Site
 import inspect
+from utils.metrics import Meter
 
 DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
 
@@ -168,9 +163,13 @@ def send_templated_email(to, subject, body_template, body_dict,
             oboe.Context.log('email', 'info', backtrace=False,**{"template":body_template})
         except Exception, e:
             print >> sys.stderr, "Oboe error: %s" % e
+
+    Meter('templated-emails-sent').inc()
+
     return email.send(fail_silently)
 
-from sentry.client.models import client
+from raven.contrib.django.models import client
+
 
 def catch_exception(exceptions, subject="", default=None, ignore=False):
     """

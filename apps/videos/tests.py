@@ -547,44 +547,6 @@ class UploadSubtitlesTest(WebUseTest):
         response = self.client.post(reverse('videos:upload_subtitles'), data)
         self.assertEqual(response.status_code, 200)
 
-    def test_upload_forks(self):
-        request = RequestMockup(User.objects.all()[0])
-        session = create_two_sub_dependent_session(request)
-        video = session.video
-        translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-        self.assertFalse(translated.is_forked)
-        self.assertEquals(False, translated.latest_version(public_only=True).is_forked)
-
-        self._login()
-        data = self._make_data(lang='en', video_pk=video.pk)
-        translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-        trans_subs_before = list(translated.version().subtitle_set.all())
-
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-
-        translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-        self.assertTrue(translated.is_forked)
-
-        original_subs = video.subtitlelanguage_set.get(language='en').version().subtitle_set.all()
-
-        trans_subs_after = translated.version().subtitle_set.all()
-        # we want to make sure we did not have a time data
-        # but we do now, and text hasn't changed
-        for old_sub, new_sub in zip(trans_subs_before, trans_subs_after):
-            self.assertEqual(old_sub.subtitle_text, new_sub.subtitle_text)
-            self.assertTrue(bool(new_sub.start_time))
-            self.assertTrue(bool(new_sub.end_time))
-            self.assertTrue(old_sub.start_time is None)
-            self.assertTrue(old_sub.end_time is None)
-
-        # now change the translated
-        sub_0= original_subs[1]
-        sub_0.start_time = 1.0
-        sub_0.save()
-        original_subs = video.subtitlelanguage_set.get(language='en').version().subtitle_set.all()
-        self.assertNotEqual(sub_0.start_time , original_subs[0].start_time)
-
     def test_upload_respects_lock(self):
         request = RequestMockup(User.objects.all()[0])
         session = create_two_sub_dependent_session(request)
@@ -600,39 +562,6 @@ class UploadSubtitlesTest(WebUseTest):
         data = json.loads(response.content[10:-11])
         self.assertFalse(data['success'])
 
-
-    def test_translations_get_order_after_fork(self):
-          # we create en -> es
-          # new es has no time data, but does have order
-          request = RequestMockup(User.objects.all()[0])
-          session = create_two_sub_dependent_session(request)
-          video = session.video
-          translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-          for sub in translated.version().subtitle_set.all():
-              self.assertTrue(sub.start_time is None)
-              self.assertTrue(sub.end_time is None)
-              self.assertTrue(sub.subtitle_order is None)
-          for sub in video.subtitle_language().version().subtitle_set.all():
-              self.assertTrue(sub.start_time is not  None)
-              self.assertTrue(sub.end_time is not None)
-              self.assertTrue(sub.subtitle_order is not None)
-          # we upload a new english
-          data = self._make_data(lang='en', video_pk=video.pk)
-          self._login()
-
-          response = self.client.post(reverse('videos:upload_subtitles'), data)
-          self.assertTrue (len(video.version().subtitles()) > len(translated.version().subtitles()))
-          self.assertEqual(response.status_code, 200)
-          # now es is forked, which means that it must have timing data AND keep the same ordering from
-          translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-          self.assertTrue(translated.is_forked)
-          translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-          subs_trans  = translated.version().subtitle_set.all()
-          for sub in subs_trans:
-              self.assertTrue(sub.start_time is not None)
-              self.assertTrue(sub.end_time is not None)
-              self.assertTrue(sub.subtitle_order is not None)
-              self.assertTrue(sub.subtitle_id is not None)
 
     def test_upload_then_rollback_preservs_dependends(self):
         self._login()
@@ -987,11 +916,8 @@ class ViewsTest(WebUseTest):
         self.failUnlessEqual(response.status_code, 200)
 
         language = self.video.subtitle_language(language_code)
-        version = language.latest_version(public_only=True)
+        version = language.latest_version(public_only=False)
         self.assertEqual(len(version.subtitles()), 2)
-        self.assertEqual(len(mail.outbox), 2)
-        self.assertIn(self.user.email, mail.outbox[0].to[0])
-        self.assertTrue(self.video.followers.filter(pk=user1.pk).exists())
 
     def test_paste_transcription_windows(self):
         self._login()
@@ -1713,7 +1639,7 @@ class TestTasks(TestCase):
         form.save(self.user, commit=True)
 
         self.assertEquals(1, Comment.objects.count())
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 1)
 
         emails = []
         for e in mail.outbox:
@@ -2436,18 +2362,69 @@ class FollowTest(WebUseTest):
 
     def test_create_edit_subs(self):
         """
-        When you create/edit subtitles, you should follow that language.
+        Trascriber, translator should follow language, not video.
         """
         self._login()
 
         youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
         video, created = Video.get_or_create_for_url(youtube_url)
+        self.assertEquals(2, SubtitleLanguage.objects.count())
+        SubtitleVersion.objects.all().delete()
+
+        # Create a transcription
+
         language = SubtitleLanguage.objects.get(language='en')
+        language.is_original = True
+        language.save()
+        self.assertFalse(language.followers.filter(pk=self.user.pk).exists())
+
         version = SubtitleVersion(language=language, user=self.user,
-                datetime_started=datetime.now(), version_no=10)
+                datetime_started=datetime.now(), version_no=0,
+                is_forked=False)
         version.save()
 
+        # Trascription author follows language, not video
+        self.assertTrue(version.is_transcription)
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
         self.assertTrue(language.followers.filter(pk=self.user.pk).exists())
+
+        # Create a translation
+        czech = SubtitleLanguage.objects.create(language='cz', is_original=False,
+                video=video)
+        self.assertEquals(3, SubtitleLanguage.objects.count())
+
+        version = SubtitleVersion(language=czech, user=self.user,
+                datetime_started=datetime.now(), version_no=0,
+                is_forked=False)
+        version.save()
+
+        # Translation creator follows language, not video
+        self.assertTrue(version.is_translation)
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(czech.followers.filter(pk=self.user.pk).exists())
+
+        # Now editing --------------------------------------------------------
+
+        self.assertNotEquals(language.pk, czech.pk)
+        video.followers.clear()
+        language.followers.clear()
+        czech.followers.clear()
+
+        version = SubtitleVersion(language=language, user=self.user,
+                datetime_started=datetime.now(), version_no=1,
+                is_forked=False)
+        version.save()
+
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(language.followers.filter(pk=self.user.pk).exists())
+
+        version = SubtitleVersion(language=czech, user=self.user,
+                datetime_started=datetime.now(), version_no=1,
+                is_forked=False)
+        version.save()
+
+        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
+        self.assertTrue(czech.followers.filter(pk=self.user.pk).exists())
 
     def test_review_subs(self):
         """

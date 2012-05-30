@@ -27,6 +27,15 @@ body {
 .v1 .bootstrap div.modal div.plain-text label {
   padding-top: 0;
 }
+.v1 .bootstrap .upload-draft-modal label {
+  width: auto;
+}
+.v1 .bootstrap .upload-draft-modal p {
+  margin-bottom: 2em;
+}
+.v1 .bootstrap .upload-draft-modal p.notation {
+  margin: 0;
+}
 
 .v1 .notation {
   color: #7692a3;
@@ -183,7 +192,7 @@ body {
   margin-bottom: 2em;
 }
 
-.v1 .view .empty {
+p.empty {
   clear: both;
   color: #678ca3;
   font-size: 18px;
@@ -914,6 +923,10 @@ p.view-more a {
 }
 p.view-more a:after {
   content: ' →';
+}
+
+div.upload-draft-modal div.modal-body {
+  padding: 40px 15px;
 }
 
 /* Controls */
@@ -1935,7 +1948,7 @@ pre.dump code {
 .truncated {
   overflow: hidden;
   position: relative;
-  z-index: 1;
+  z-index: 0;
 }
 
 a.truncated-expand {
@@ -1944,7 +1957,7 @@ a.truncated-expand {
   margin-top: 10px;
   padding: 8px 10px;
   position: relative;
-  z-index: 2;
+  z-index: 1;
   -moz-box-shadow: -6px -23px 17px white;
   -webkit-box-shadow: -6px -23px 17px white;
   box-shadow: -6px -23px 17px white;

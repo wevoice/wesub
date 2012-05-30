@@ -32,7 +32,8 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from django.template.loader import render_to_string
 from django.contrib.contenttypes.models import ContentType
 
-from sentry.client.models import client
+from raven.contrib.django.models import client
+
 from celery.task import task
 
 from auth.models import CustomUser as User
@@ -46,6 +47,7 @@ from messages.models import Message
 from utils import send_templated_email
 from utils import get_object_or_none
 from utils.translation import get_language_label
+
 
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
@@ -382,7 +384,12 @@ def _reviewed_notification(task_pk, status):
     subject = ugettext(u"Your subtitles have been reviewed")
     if status == REVIEWED_AND_PUBLISHED:
         subject += ugettext(" and published")
-    user = task.review_base_version.user
+
+    if task.review_base_version:
+        user = task.review_base_version.user
+    else:
+        user = task.subtitle_version.user
+
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
@@ -580,7 +587,7 @@ def send_reject_notification(task_pk, sent_back):
     return msg, email_res
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
-SUBJECT_EMAIL_VIDEO_COMMENTED = "%s left a comment on the video %s"
+SUBJECT_EMAIL_VIDEO_COMMENTED = _(u"%(user)s left a comment on the video %(title)s")
 @task
 def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     """
@@ -640,7 +647,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     else:
         version_url = None
 
-    subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % (comment.user.username, video.title_display())
+    subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=str(comment.user), title=video.title_display())
 
     followers = set(video.notification_list(comment.user))
 

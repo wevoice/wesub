@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   running-unisubs
+   running-amara
    static-files
    deployment-guide
    feature-flags
@@ -31,7 +31,7 @@ open a pull request.
 
 Before working on a sizeable feature, please do run it by us in our IRC
 channel.  We don't want you to waste your time working on something we don't
-really want.  We are at ``#universalsubtitles`` on freenode.
+really want.  We are at ``#amara`` on freenode.
 
 License
 -------
