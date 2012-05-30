@@ -570,6 +570,20 @@ List all tasks for a given team:
 
 .. http:get:: /api2/partners/teams/[team-slug]/tasks/
 
+    :query assignee: Show only tasks assigned to a user identified by their
+        ``username``.
+    :query priority: Show only tasks with a given priority
+    :query type: Show only tasks of a given type
+    :query video_id: Show only tasks that pertain to a given video
+    :query order_by: Apply sorting to the task list.  Possible values:
+
+        * ``created``   Creation date
+        * ``-created``  Creation date (descending)
+        * ``priority``  Priority
+        * ``-priority`` Priority (descending)
+        * ``type``      Task type (details below)
+        * ``-type``     Task type (descending)
+
 Task detail:
 
 .. http:get:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
