@@ -95,6 +95,7 @@ unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) 
             unisubs.SubTracker.getInstance().trackEdit(this.getCaptionID());
     }
     this.translation_.setText(value);
+    this.dialog_.getVideoPlayerInternal().showCaptionText('');
 };
 unisubs.translate.TranslationWidget.prototype.setTranslationContent = function(value){
     this.translateInput_.value = value;

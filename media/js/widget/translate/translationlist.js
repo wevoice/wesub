@@ -57,17 +57,6 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var map = this.captionSet_.makeMap();
 
-    if (this.dialog_.reviewOrApprovalType_) {
-        this.baseLanguageCaptionSet_ = this.captionSet_;
-    } else {
-        this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
-                this.baseLanguageSubtitles_);
-    }
-
-    this.captionManager_ =
-        new unisubs.CaptionManager(
-            this.dialog_.getVideoPlayerInternal(), this.baseLanguageCaptionSet_);
-
     goog.array.forEach(
         this.baseLanguageSubtitles_,
         function(subtitle) {
