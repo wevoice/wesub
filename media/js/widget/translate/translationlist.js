@@ -82,26 +82,6 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
         },
         this);
 };
-unisubs.translate.TranslationList.prototype.enterDocument = function() {
-    unisubs.translate.TranslationList.superClass_.enterDocument.call(this);
-    var handler = this.getHandler();
-    var that = this;
-
-    // Setup listening for video + subtitles.
-    handler.listen(this.captionManager_,
-                   unisubs.CaptionManager.CAPTION,
-                   this.captionReached_);
-
-    // Update the captionSet that the video is listening to
-    // to match the proper mix of translated / original subtitles.
-    goog.array.forEach(this.captionSet_.captions_, function(c) {
-        if (c.getText() !== '') {
-            var subOrder = c.getSubOrder();
-            var captionToUpdate = that.baseLanguageCaptionSet_.findSubIndex_(subOrder);
-            that.baseLanguageCaptionSet_.caption(captionToUpdate).setText(c.getText());
-        }
-    });
-};
 
 /**
  * Callback that is called by aut-translator
@@ -113,7 +93,6 @@ unisubs.translate.TranslationList.prototype.translateCallback_ = function(transl
     if (!error) {
         goog.array.forEach(translations, function(text, i) {
             widgets[i].setTranslationContent(text);
-            widgets[i].cloneToCaptionManager(true);
         });
     }
 };

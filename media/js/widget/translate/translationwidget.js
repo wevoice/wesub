@@ -83,7 +83,7 @@ unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event
 };
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
     this.onKeyUpText_ = this.translateInput_.value;
-    this.cloneToCaptionManager();
+    this.dialog_.getVideoPlayerInternal().showCaptionText(this.onKeyUpText_ || this.getOriginalValue());
 };
 unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) {
     var value = goog.string.trim(this.translateInput_.value);
@@ -99,16 +99,6 @@ unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) 
 unisubs.translate.TranslationWidget.prototype.setTranslationContent = function(value){
     this.translateInput_.value = value;
     this.inputLostFocus_(false);
-};
-unisubs.translate.TranslationWidget.prototype.cloneToCaptionManager = function(dontShowNow){
-    var currentText = this.translateInput_.value;
-    var editableCaptionSet = this.dialog_.translationPanel_.getTranslationList().baseLanguageCaptionSet_;
-    var editableCaption = editableCaptionSet.captionByID(this.subtitle_['subtitle_id']);
-
-    editableCaption.setText(currentText || editableCaption.getOriginalText());
-    if (!dontShowNow) {
-        this.dialog_.getVideoPlayerInternal().showCaptionText(currentText || editableCaption.getOriginalText());
-    }
 };
 unisubs.translate.TranslationWidget.prototype.setEnabled = function(enabled) {
     this.translateInput_.disabled = !enabled;
