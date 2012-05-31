@@ -75,7 +75,7 @@ from videos.tasks import (
     upload_subtitles_to_original_service, delete_captions_in_original_service,
     delete_captions_in_original_service_by_code
 )
-from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion
+from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion, Video
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
@@ -238,7 +238,10 @@ def detail(request, slug, project_slug=None, languages=None):
                         .select_related('project', 'team', 'team_video'))
 
     if not filtered and not query:
-        is_indexing = team.videos.all().count() != extra_context['current_videos_count']
+        if project:
+            is_indexing = project.videos_count != extra_context['current_videos_count']
+        else:
+            is_indexing = team.videos.all().count() != extra_context['current_videos_count']
         extra_context['is_indexing'] = is_indexing
 
     if is_editor:
@@ -1091,7 +1094,7 @@ def _tasks_list(request, team, project, filters, user):
         elif assignee:
             tasks = tasks.filter(assignee=User.objects.get(username=assignee))
 
-    return tasks.select_related('team_video__video', 'team_video__team', 'assignee', 'team', 'team_video__project')
+    return tasks
 
 def _order_tasks(request, tasks):
     sort = request.GET.get('sort', '-created')
@@ -1141,6 +1144,23 @@ def team_tasks(request, slug, project_slug=None):
     category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
+    # We pull out the task IDs here for performance.  It's ugly, I know.
+    #
+    # MySQL doesn't use the ideal indexes when you try to filter and
+    # select_related all the various stuff, but if you split the process into
+    # two queries they'll both be fast.
+    #
+    # Thanks, MySQL.
+    task_ids = list(tasks.values_list('id', flat=True))
+    tasks = Task.objects.filter(id__in=task_ids).select_related(
+            'team_video__video',
+            'team_video__team',
+            'team_video__project',
+            'assignee',
+            'team',
+            'subtitle_version__language__standard_language',
+            'subtitle_version__user')
+
     if filters.get('team_video'):
         filters['team_video'] = TeamVideo.objects.get(pk=filters['team_video'])
 
@@ -1166,7 +1186,9 @@ def team_tasks(request, slug, project_slug=None):
     from apps.widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
 
-    video_pks = [t.team_video.video_id for t in tasks]
+    team_video_pks = [t.team_video_id for t in tasks]
+    video_pks = Video.objects.filter(teamvideo__in=team_video_pks).values_list('id', flat=True)
+
     video_urls = dict([(vu.video_id, vu.effective_url) for vu in
                        VideoUrl.objects.filter(video__in=video_pks, primary=True)])
 

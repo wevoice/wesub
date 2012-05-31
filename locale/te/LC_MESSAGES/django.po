@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-30 01:32-0500\n"
-"PO-Revision-Date: 2012-05-30 06:45+0000\n"
+"POT-Creation-Date: 2012-05-31 01:32-0500\n"
+"PO-Revision-Date: 2012-05-31 06:46+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Telugu (http://www.transifex.net/projects/p/universalsubtitles/language/te/)\n"
 "MIME-Version: 1.0\n"
@@ -605,21 +605,21 @@ msgid "You cannot perform that task."
 msgstr ""
 
 #: apps/teams/forms.py:650 apps/videos/forms.py:68 apps/videos/forms.py:86
-#: apps/videos/forms.py:398
+#: apps/videos/forms.py:421
 msgid "File size should be less {0} kb"
 msgstr ""
 
-#: apps/teams/forms.py:655 apps/videos/forms.py:401
+#: apps/teams/forms.py:655 apps/videos/forms.py:424
 msgid ""
 "Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)"
 msgstr ""
 
 #: apps/teams/forms.py:662 apps/videos/forms.py:73 apps/videos/forms.py:94
-#: apps/videos/forms.py:406
+#: apps/videos/forms.py:429
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/teams/forms.py:667 apps/videos/forms.py:96 apps/videos/forms.py:408
+#: apps/teams/forms.py:667 apps/videos/forms.py:96 apps/videos/forms.py:431
 msgid "Incorrect subtitles format"
 msgstr ""
 
@@ -799,7 +799,7 @@ msgstr ""
 msgid "You are already a member of this team."
 msgstr "మీరు ఇప్పటికీ ఈ జట్టులో సభ్యులు."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:872
+#: apps/teams/rpc.py:50 apps/teams/views.py:875
 msgid "You are now a member of this team."
 msgstr "మీరు ఇప్పుడు ఈ జట్టులో సభ్యులు."
 
@@ -860,11 +860,11 @@ msgstr "కొత్తవి"
 msgid "Most Members"
 msgstr ""
 
-#: apps/teams/views.py:258
+#: apps/teams/views.py:261
 msgid "Member saved."
 msgstr ""
 
-#: apps/teams/views.py:320
+#: apps/teams/views.py:323
 #, python-format
 msgid ""
 "\n"
@@ -879,182 +879,182 @@ msgid ""
 "                "
 msgstr ""
 
-#: apps/teams/views.py:346
+#: apps/teams/views.py:349
 msgid "You do not have permission to delete this team."
 msgstr ""
 
-#: apps/teams/views.py:360 apps/teams/views.py:396 apps/teams/views.py:424
-#: apps/teams/views.py:457 apps/teams/views.py:512 apps/teams/views.py:1518
+#: apps/teams/views.py:363 apps/teams/views.py:399 apps/teams/views.py:427
+#: apps/teams/views.py:460 apps/teams/views.py:515 apps/teams/views.py:1523
 msgid "You do not have permission to edit this team."
 msgstr ""
 
-#: apps/teams/views.py:383 apps/teams/views.py:442 apps/teams/views.py:527
+#: apps/teams/views.py:386 apps/teams/views.py:445 apps/teams/views.py:530
 msgid "Settings saved."
 msgstr ""
 
-#: apps/teams/views.py:409
+#: apps/teams/views.py:412
 msgid "Guidelines and messages updated."
 msgstr ""
 
-#: apps/teams/views.py:546
+#: apps/teams/views.py:549
 msgid "You can't add that video to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:581
+#: apps/teams/views.py:584
 msgid "The video has been moved to the new team."
 msgstr ""
 
-#: apps/teams/views.py:594
+#: apps/teams/views.py:597
 msgid "You can't add videos to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:613
+#: apps/teams/views.py:616
 msgid "You can't edit this video."
 msgstr ""
 
-#: apps/teams/views.py:622
+#: apps/teams/views.py:625
 msgid "Video has been updated."
 msgstr ""
 
-#: apps/teams/views.py:650
+#: apps/teams/views.py:653
 msgid "Request must be a POST request."
 msgstr ""
 
-#: apps/teams/views.py:658
+#: apps/teams/views.py:661
 msgid "You can't delete that video."
 msgstr ""
 
-#: apps/teams/views.py:662
+#: apps/teams/views.py:665
 msgid "You can't remove that video."
 msgstr ""
 
-#: apps/teams/views.py:673
+#: apps/teams/views.py:676
 msgid "Video has been deleted from Amara."
 msgstr ""
 
-#: apps/teams/views.py:675
+#: apps/teams/views.py:678
 msgid "Video has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:763
+#: apps/teams/views.py:766
 msgid "Member has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:766
+#: apps/teams/views.py:769
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 
-#: apps/teams/views.py:769
+#: apps/teams/views.py:772
 msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
-#: apps/teams/views.py:800
+#: apps/teams/views.py:803
 msgid "Application approved."
 msgstr ""
 
-#: apps/teams/views.py:802 apps/teams/views.py:820
+#: apps/teams/views.py:805 apps/teams/views.py:823
 msgid "Application does not exist."
 msgstr ""
 
-#: apps/teams/views.py:804
+#: apps/teams/views.py:807
 msgid "You can't approve applications."
 msgstr ""
 
-#: apps/teams/views.py:818
+#: apps/teams/views.py:821
 msgid "Application denied."
 msgstr ""
 
-#: apps/teams/views.py:822
+#: apps/teams/views.py:825
 msgid "You can't deny applications."
 msgstr ""
 
-#: apps/teams/views.py:832
+#: apps/teams/views.py:835
 msgid "You cannot invite people to this team."
 msgstr ""
 
-#: apps/teams/views.py:868
+#: apps/teams/views.py:871
 msgid "You cannot join this team."
 msgstr ""
 
-#: apps/teams/views.py:919
+#: apps/teams/views.py:922
 msgid "You have left this team."
 msgstr ""
 
-#: apps/teams/views.py:1123
+#: apps/teams/views.py:1126
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1246 apps/teams/views.py:1249
+#: apps/teams/views.py:1251 apps/teams/views.py:1254
 msgid "You are not allowed to perform this task."
 msgstr ""
 
-#: apps/teams/views.py:1304
+#: apps/teams/views.py:1309
 msgid "Task deleted."
 msgstr ""
 
-#: apps/teams/views.py:1306
+#: apps/teams/views.py:1311
 msgid "You cannot delete this task."
 msgstr ""
 
-#: apps/teams/views.py:1331
+#: apps/teams/views.py:1336
 msgid "Task declined."
 msgstr ""
 
-#: apps/teams/views.py:1333
+#: apps/teams/views.py:1338
 msgid "Task assigned."
 msgstr ""
 
-#: apps/teams/views.py:1335
+#: apps/teams/views.py:1340
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1357
+#: apps/teams/views.py:1362
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1370
+#: apps/teams/views.py:1375
 msgid "Sorry, the subtitles don't match the lines, so we can't upload them."
 msgstr ""
 
-#: apps/teams/views.py:1373
+#: apps/teams/views.py:1378
 msgid "Draft uploaded successfully."
 msgstr ""
 
-#: apps/teams/views.py:1377
+#: apps/teams/views.py:1382
 msgid "/n"
 msgstr ""
 
-#: apps/teams/views.py:1395
+#: apps/teams/views.py:1400
 msgid "You are not allowed to download this transcript."
 msgstr ""
 
-#: apps/teams/views.py:1445
+#: apps/teams/views.py:1450
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1457
+#: apps/teams/views.py:1462
 msgid "Project added."
 msgstr ""
 
-#: apps/teams/views.py:1474
+#: apps/teams/views.py:1479
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1485
+#: apps/teams/views.py:1490
 msgid "Project deleted."
 msgstr ""
 
-#: apps/teams/views.py:1503
+#: apps/teams/views.py:1508
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1629
+#: apps/teams/views.py:1634
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1663
+#: apps/teams/views.py:1668
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1079,7 +1079,7 @@ msgstr ""
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr ""
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:545 utils/validators.py:38
+#: apps/videos/forms.py:122 apps/videos/forms.py:549 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr ""
 
@@ -1124,14 +1124,14 @@ msgid ""
 " you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:530
+#: apps/videos/forms.py:534
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr ""
 
-#: apps/videos/forms.py:533 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:537 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
@@ -1139,49 +1139,49 @@ msgid ""
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr ""
 
-#: apps/videos/forms.py:561
+#: apps/videos/forms.py:565
 msgid "Youtube usernames"
 msgstr ""
 
-#: apps/videos/forms.py:561
+#: apps/videos/forms.py:565
 msgid "Enter usernames separated by comma."
 msgstr ""
 
-#: apps/videos/forms.py:562
+#: apps/videos/forms.py:566
 msgid "Youtube page link."
 msgstr ""
 
-#: apps/videos/forms.py:563
+#: apps/videos/forms.py:567
 msgid "For example: http://www.youtube.com/user/username"
 msgstr ""
 
-#: apps/videos/forms.py:564
+#: apps/videos/forms.py:568
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:565
+#: apps/videos/forms.py:569
 msgid "Save feed"
 msgstr ""
 
-#: apps/videos/forms.py:565
+#: apps/videos/forms.py:569
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr ""
 
-#: apps/videos/forms.py:608
+#: apps/videos/forms.py:612
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr ""
 
-#: apps/videos/forms.py:613
+#: apps/videos/forms.py:617
 msgid ""
 "The videos are being added in the background. If you are logged in, you will"
 " receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:624
+#: apps/videos/forms.py:628
 msgid "captcha"
 msgstr ""
 
@@ -4304,14 +4304,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr ""
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:367
+#: templates/messages/sent.html:51 templates/teams/tasks.html:370
 msgid "Delete"
 msgstr "తొలగించు"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:421 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:424 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:385
 msgid "Cancel"
 msgstr "రద్దుచేయి"
@@ -5626,7 +5626,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:425
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:428
 msgid "Begin typing to search"
 msgstr ""
 
@@ -6111,60 +6111,74 @@ msgstr ""
 msgid "Perform Task"
 msgstr ""
 
-#: templates/teams/tasks.html:268 templates/teams/tasks.html.py:308
+#: templates/teams/tasks.html:268
 msgid "Download draft"
 msgstr ""
 
 #: templates/teams/tasks.html:282
-msgid "Upload draft"
+msgid "Upload a draft"
 msgstr ""
 
-#: templates/teams/tasks.html:287
+#: templates/teams/tasks.html:285
+msgid ""
+"Note: Uploading a draft will not complete the task—you will still need to "
+"step through the onsite editor to verify timing and metadata."
+msgstr ""
+
+#: templates/teams/tasks.html:288
 #: templates/videos/_paste_transcription.html:146
 #: templates/videos/_upload_subtitles.html:23
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr "భాష"
 
-#: templates/teams/tasks.html:292
+#: templates/teams/tasks.html:293
 msgid "File:"
 msgstr ""
 
-#: templates/teams/tasks.html:338
+#: templates/teams/tasks.html:296
+msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .xml (for TTML)"
+msgstr ""
+
+#: templates/teams/tasks.html:310
+msgid "Download a draft"
+msgstr ""
+
+#: templates/teams/tasks.html:341
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:358
+#: templates/teams/tasks.html:361
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:360
+#: templates/teams/tasks.html:363
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:376
+#: templates/teams/tasks.html:379
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:382
+#: templates/teams/tasks.html:385
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:385
+#: templates/teams/tasks.html:388
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:389
+#: templates/teams/tasks.html:392
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:428
+#: templates/teams/tasks.html:431
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:438
+#: templates/teams/tasks.html:441
 msgid "Sorry, no tasks here."
 msgstr ""
 
