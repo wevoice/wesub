@@ -707,11 +707,11 @@ class UploadDraftForm(forms.Form):
         else:
             video_language = self.cleaned_data['language']
         
-        if task.subtitle_version:
+        if task.get_subtitle_version():
             # we already had a version, that means
             # it's a review/approve or a continue
-            version = task.subtitle_version
-            language = task.subtitle_version.language
+            version = task.get_subtitle_version()
+            language = task.get_subtitle_version().language
         else:
             language = video.subtitle_language(video_language)
 
