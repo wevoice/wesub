@@ -1088,7 +1088,7 @@ def _tasks_list(request, team, project, filters, user):
         elif assignee:
             tasks = tasks.filter(assignee=User.objects.get(username=assignee))
 
-    return tasks.select_related('team_video__video', 'team_video__team', 'assignee', 'team', 'team_video__project')
+    return tasks
 
 def _order_tasks(request, tasks):
     sort = request.GET.get('sort', '-created')
@@ -1137,6 +1137,23 @@ def team_tasks(request, slug, project_slug=None):
                          _tasks_list(request, team, project, filters, user))
     category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
+
+    # We pull out the task IDs here for performance.  It's ugly, I know.
+    #
+    # MySQL doesn't use the ideal indexes when you try to filter and
+    # select_related all the various stuff, but if you split the process into
+    # two queries they'll both be fast.
+    #
+    # Thanks, MySQL.
+    task_ids = list(tasks.values_list('id', flat=True))
+    tasks = Task.objects.filter(id__in=task_ids).select_related(
+            'team_video__video',
+            'team_video__team',
+            'team_video__project',
+            'assignee',
+            'team',
+            'subtitle_version__language__standard_language',
+            'subtitle_version__user')
 
     if filters.get('team_video'):
         filters['team_video'] = TeamVideo.objects.get(pk=filters['team_video'])
