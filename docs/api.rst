@@ -561,6 +561,25 @@ Example response
         "workflow_enabled": false
     }
 
+Team Member Resource
+~~~~~~~~~~~~~~~~~~~~
+
+You can list existing members of a team:
+
+.. http:get:: /api2/partners/teams/[team-slug]/members/
+
+Updating a team member (e.g. changing their role):
+
+.. http:put:: /api2/partners/teams/[team-slug]/members/[username]/
+
+Roles
++++++
+
+* ``owner``
+* ``admin``
+* ``manager``
+* ``contributor``
+
 Project Resource
 ~~~~~~~~~~~~~~~~
 
