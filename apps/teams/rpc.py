@@ -49,11 +49,12 @@ class TeamsApiClass(object):
             TeamMember(team=team, user=user).save()
             return Msg(_(u'You are now a member of this team.'))
         elif team.is_by_application():
+
+            if msg == '':
+                return Error(_(u'The "About you" field is required in order to apply.'))
+
             application, created = Application.objects.get_or_create(team=team, user=user)
             application.note = msg
-
-            if application.note == '':
-                return Error(_(u'The "About you" field is required in order to apply.'))
 
             application.save()
             notifier.application_sent.delay(application.pk)
