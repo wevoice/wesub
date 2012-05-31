@@ -47,6 +47,8 @@ unisubs.translate.Dialog = function(opener, serverModel, videoSource, subtitleSt
     if ( !Boolean(this.reviewOrApprovalType_)){
        this.notesFectched_ = true; 
     }
+
+    this.alreadySaving_ = false;
 };
 
 goog.inherits(unisubs.translate.Dialog, unisubs.subtitle.Dialog);
@@ -91,7 +93,10 @@ unisubs.translate.Dialog.prototype.showGuidelines_ = function() {
 };
 unisubs.translate.Dialog.prototype.handleSaveAndExitKeyPress_ = function(e) {
     e.preventDefault();
-    this.saveWork(false, true);
+    var that = this;
+    setTimeout(function(){
+        that.saveWork(false, true);
+    }, 1500);
 };
 unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
     event.preventDefault();
@@ -156,6 +161,12 @@ unisubs.translate.Dialog.prototype.onNotesFetched_ = function(body) {
     }
 };
 unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave, saveForLater) {
+    if(this.alreadySaving_){
+        return;
+    }
+
+    this.alreadySaving_ = true;
+
     var notes = this.getNotesContent_(this.currentSubtitlePanel_);
     if (notes !== '') {
         this.serverModel_.setTaskNotes(notes);
