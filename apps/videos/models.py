@@ -38,6 +38,7 @@ from django.utils.http import urlquote_plus
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
+
 from auth.models import CustomUser as User, Awards
 from videos import EffectiveSubtitle, is_synced, is_synced_value
 from videos.types import video_type_registrar
@@ -780,17 +781,14 @@ def create_video_id(sender, instance, **kwargs):
 
 def video_delete_handler(sender, instance, **kwargs):
     video_cache.invalidate_cache(instance.video_id)
-
-
-def video_post_delete_handler(sender, instance, **kwargs):
-    if sender == Video:
-        Action.delete_video_handler(instance)
+    # avoid circular dependencies, import here
+    from haystack import site
+    search_index = site.get_index(Video)
+    search_index.backend.remove(instance)
 
 
 models.signals.pre_save.connect(create_video_id, sender=Video)
 models.signals.pre_delete.connect(video_delete_handler, sender=Video)
-models.signals.post_delete.connect(video_post_delete_handler, sender=Video,
-        dispatch_uid='action')
 models.signals.m2m_changed.connect(User.video_followers_change_handler, sender=Video.followers.through)
 
 
@@ -1833,6 +1831,8 @@ class ActionRenderer(object):
             info = self.render_ACCEPT_VERSION(item)
         elif item.action_type == Action.DECLINE_VERSION:
             info = self.render_DECLINE_VERSION(item)
+        elif item.action_type == Action.DELETE_VIDEO:
+            info = self.render_DELETE_VIDEO(item)
         else:
             info = ''
 
@@ -1844,11 +1844,11 @@ class ActionRenderer(object):
         return render_to_string(self.template_name, context)
 
     def _base_kwargs(self, item):
-        data = {
-            'video_url': item.video.get_absolute_url(),
-            'video_name': unicode(item.video)
-
-        }
+        data = {}
+        # deleted videos event have no video obj
+        if item.video:
+            data['video_url']= item.video.get_absolute_url(),
+            data['video_name'] = unicode(item.video)
         if item.language:
             data['language'] = item.language.language_display()
             data['language_url'] = item.language.get_absolute_url()
@@ -1880,6 +1880,12 @@ class ActionRenderer(object):
     def render_DECLINE_VERSION(self, item):
         kwargs = self._base_kwargs(item)
         msg = _('  declined <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        return msg
+
+    def render_DELETE_VIDEO(self, item):
+        kwargs = self._base_kwargs(item)
+        kwargs['title'] = item.new_video_title
+        msg = _('  deleted video "%(title)s"') % kwargs
         return msg
 
     def render_ADD_VIDEO(self, item):
@@ -2040,6 +2046,7 @@ class Action(models.Model):
     member = models.ForeignKey("teams.TeamMember", blank=True, null=True)
     comment = models.ForeignKey(Comment, blank=True, null=True)
     action_type = models.IntegerField(choices=TYPES)
+    # we also store the video's title for deleted videos
     new_video_title = models.CharField(max_length=2048, blank=True)
     created = models.DateTimeField()
 
@@ -2161,8 +2168,9 @@ class Action(models.Model):
         obj.save()
 
     @classmethod
-    def delete_video_handler(cls, video, user=None):
-        action = cls(video=video)
+    def delete_video_handler(cls, video, team, user=None):
+        action = cls(team=team)
+        action.new_video_title = video.get_title_display()
         action.action_type = cls.DELETE_VIDEO
         action.user = user
         action.created = datetime.now()

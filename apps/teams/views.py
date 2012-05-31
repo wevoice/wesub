@@ -669,12 +669,14 @@ def remove_video(request, team_video_pk):
 
     video = team_video.video
 
-    team_video.delete()
-
     if wants_delete:
+        # create the action handler before deleting the video, so that
+        # it can grab the video's title
+        Action.delete_video_handler(video, team_video.team, request.user)
         video.delete()
         msg = _(u'Video has been deleted from Amara.')
     else:
+        team_video.delete()
         msg = _(u'Video has been removed from the team.')
 
     if request.is_ajax():
