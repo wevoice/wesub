@@ -282,7 +282,7 @@
                                                             <h3>{% trans 'Upload a draft' %}</h3>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <p>{% trans 'Note: Uploading a draft will not complete the task—you will still need to step through the onsite editor to verify timing and metadata.' %}</p>
+                                                            <p><strong>{% trans 'Important:' %}</strong> {% trans 'Uploading a draft will not complete the task. After uploading, select "Resume" from the "Perform Task" drop-down to verify timing, video title and video description in the onsite editor and to submit the final version.' %}</p>
                                                             {% if not task.language %}
                                                             <div class="ajaxChosen">
                                                                 <label>{% trans 'Language' %}</label>
@@ -312,7 +312,7 @@
                                                     <div class="modal-body">
                                                         <div class="fix-chosen">
                                                             <div class="no-chosen">
-                                                                <p>Download a draft of these subtitles so you can work offline.</p>
+                                                                <p>{% trans 'Download a draft of these subtitles so you can work offline.' %}</p>
                                                                 <select class="goto">
                                                                     <option value="">Select a format</option>
                                                                     <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='srt' %}">SRT</option>
