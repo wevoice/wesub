@@ -248,19 +248,23 @@
                                                         {% include "teams/_perform_task_link.html" %}
                                                     </li>
                                                 {% else %}
-                                                    {% if not has_max_tasks and task.assignee == None %}
-                                                        <li>
-                                                            <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
-                                                                {% if task.get_subtitle_version %}
-                                                                    {% trans 'Resume' %}
-                                                                {% else %}
-                                                                    {% trans 'Start now' %}
-                                                                {% endif %}
-                                                            </a>
-                                                        </li>
-                                                        <li class="hidden-perform-link" style="display: none;">
-                                                            {% include "teams/_perform_task_link.html" %}
-                                                        </li>
+                                                    {% if task.assignee == None %}
+                                                        {% if has_max_tasks %}
+                                                            <li class="disabled">{% trans 'You have reached the maximum number of tasks.' %}</li>
+                                                        {% else %}
+                                                            <li>
+                                                                <a class="assign-and-perform" href="#" data-id="{{ task.pk }}">
+                                                                    {% if task.get_subtitle_version %}
+                                                                        {% trans 'Resume' %}
+                                                                    {% else %}
+                                                                        {% trans 'Start now' %}
+                                                                    {% endif %}
+                                                                </a>
+                                                            </li>
+                                                            <li class="hidden-perform-link" style="display: none;">
+                                                                {% include "teams/_perform_task_link.html" %}
+                                                            </li>
+                                                        {% endif %}
                                                     {% endif %}
                                                 {% endif %}
                                                 {% if task.get_subtitle_version %}
