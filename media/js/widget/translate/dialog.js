@@ -362,7 +362,7 @@ unisubs.translate.Dialog.prototype.disposeCurrentPanels_ = function() {
         this.timelineSubtitleSet_ = null;
     }
 };
-unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
+unisubs.translate.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
     var caption;
 
