@@ -68,6 +68,14 @@ def _get_team_video_from_search_record(search_record):
         try:
             return TeamVideo.objects.get(pk=search_record.team_video_pk)
         except TeamVideo.DoesNotExist:
+            from raven.contrib.django.models import client
+            client.create_from_exception()
+
+        try:
+            return TeamVideo.objects.get(video=search_record.video_pk)
+        except TeamVideo.DoesNotExist:
+            from raven.contrib.django.models import client
+            client.create_from_exception()
             return None
 
 
