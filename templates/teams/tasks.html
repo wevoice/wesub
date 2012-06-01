@@ -293,6 +293,12 @@
                                                                 {{ upload_draft_form.language }}
                                                             </div>
                                                             {% endif %}
+                                                            {% if task.get_type_display == "Translate" and not task.get_subtitle_version %}
+                                                            <div class="ajaxChosen">
+                                                                <label>{% trans 'Translate from' %}</label>
+                                                                {% languages_to_translate task %}
+                                                            </div>
+                                                            {% endif %}
                                                             <label for="id_draft">
                                                                 {% trans 'File:' %}
                                                             </label>
