@@ -1141,8 +1141,10 @@ def team_tasks(request, slug, project_slug=None):
     filters = _get_task_filters(request)
     filtered = 0
 
-    tasks = _tasks_list(request, team, project, filters, user)
+    tasks = _order_tasks(request,
+                         _tasks_list(request, team, project, filters, user))
     category_counts = _task_category_counts(team, filters, request.user)
+    tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
     # We pull out the task IDs here for performance.  It's ugly, I know.
     #
@@ -1152,17 +1154,15 @@ def team_tasks(request, slug, project_slug=None):
     #
     # Thanks, MySQL.
     task_ids = list(tasks.values_list('id', flat=True))
-    tasks = Task.objects.filter(id__in=task_ids).select_related(
+    tasks = list(Task.objects.filter(id__in=task_ids).select_related(
             'team_video__video',
             'team_video__team',
             'team_video__project',
             'assignee',
             'team',
             'subtitle_version__language__standard_language',
-            'subtitle_version__user')
-
-    tasks = _order_tasks(request, tasks)
-    tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
+            'subtitle_version__user'))
+    tasks.sort(key=lambda t: task_ids.index(t.pk))
 
     if filters.get('team_video'):
         filters['team_video'] = TeamVideo.objects.get(pk=filters['team_video'])
