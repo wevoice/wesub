@@ -239,7 +239,7 @@
                                         {% endif %}
                                     {% endif %}
 
-                                    {% if task|can_perform_task:userand task.assignee == user or task.assignee == None %}
+                                    {% if task|can_perform_task:user and task.assignee == user or task.assignee == None %}
                                         <div class="action-group perform-task">
                                             <h5 class="trigger">{% trans 'Perform Task' %}</h5>
                                             <ul>
