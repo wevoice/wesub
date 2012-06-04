@@ -287,7 +287,7 @@ def completed_videos(request, slug):
                        extra_context=extra_context,
                        template_object_name='team_video')
 
-def videos_actions(request, slug):
+def activity(request, slug):
     team = Team.get(slug, request.user)
 
     try:
@@ -304,7 +304,7 @@ def videos_actions(request, slug):
     }
     return object_list(request, queryset=qs,
                        paginate_by=ACTIONS_ON_PAGE,
-                       template_name='teams/videos_actions.html',
+                       template_name='teams/activity.html',
                        extra_context=extra_context,
                        template_object_name='videos_action')
 
