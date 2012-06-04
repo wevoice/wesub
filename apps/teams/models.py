@@ -1874,7 +1874,11 @@ class Task(models.Model):
         that causes the version to get published).
         """
 
-        if self.subtitle_version:
+        # autocreate sets the subtitle_version to another
+        # language's subtitle_version and that was breaking
+        # not only the interface but the new upload method.
+        if self.subtitle_version and \
+                self.subtitle_version.language.language == self.language:
             return self.subtitle_version
 
         if not hasattr(self, "_subtitle_version"):
