@@ -728,7 +728,7 @@ class UploadDraftForm(forms.Form):
         else:
             video_language = self.cleaned_data['language']
         
-        translate_from = None
+        translated_from = None
 
         if task.get_subtitle_version():
             version = task.get_subtitle_version()
@@ -750,7 +750,7 @@ class UploadDraftForm(forms.Form):
 
         # if there isn't a version we don't need to check this
         # since it's the first upload for this version
-        if version and version.subtitle_set.count() != len(self._parser):
+        if version and version.subtitle_set.count() < len(self._parser):
             raise Exception("We are strict and your subtitles are bad")
 
         # we need to set the moderation_status to WAITING_MODERATION
