@@ -1675,6 +1675,13 @@ ol.subtitles {
             top: 1em;
         }
     }
+    &.is_rtl {
+        li {
+            div.translation-text {
+                direction: rtl;
+            }
+        }
+    }
 }
 div#rollback-button {
     padding: 20px 12px;
