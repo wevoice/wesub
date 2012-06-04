@@ -719,7 +719,7 @@ class UploadDraftForm(forms.Form):
 
         task = self.cleaned_data['task']
         video = task.team_video.video
-        language = self.cleaned_data['translate_from']
+        language_to_translate = self.cleaned_data['translate_from']
 
         task.assignee = self.user
 
@@ -728,17 +728,17 @@ class UploadDraftForm(forms.Form):
         else:
             video_language = self.cleaned_data['language']
         
+        translate_from = None
+
         if task.get_subtitle_version():
-            # we already had a version, that means
-            # it's a review/approve or a continue
             version = task.get_subtitle_version()
             language = task.get_subtitle_version().language
 
             if not version.is_forked:
                 translated_from = version.forked_from.language
         else:
+            translated_from = video.subtitle_language(language_to_translate) if language_to_translate else None
             language = video.subtitle_language(video_language)
-            translated_from = video.subtitle_language(language) if language else None
 
             if language and language.has_version:
                 version = language.latest_version(public_only=False)
