@@ -48,7 +48,7 @@ from teams.forms import (
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference, autocreate_tasks
+    Setting, TeamLanguagePreference
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -75,7 +75,7 @@ from videos.tasks import (
     upload_subtitles_to_original_service, delete_captions_in_original_service,
     delete_captions_in_original_service_by_code
 )
-from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion, Video
+from videos.models import Action, VideoUrl, SubtitleLanguage, Video
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
@@ -287,6 +287,8 @@ def completed_videos(request, slug):
                        extra_context=extra_context,
                        template_object_name='team_video')
 
+@timefn
+@render_to('teams/activity.html')
 def activity(request, slug):
     team = Team.get(slug, request.user)
 
@@ -299,14 +301,13 @@ def activity(request, slug):
     public_only = False if member else True
     qs = Action.objects.for_team(team, public_only=public_only)
 
-    extra_context = {
-        'team': team
-    }
-    return object_list(request, queryset=qs,
-                       paginate_by=ACTIONS_ON_PAGE,
-                       template_name='teams/activity.html',
-                       extra_context=extra_context,
-                       template_object_name='videos_action')
+    activity_list, pagination_info = paginate(qs, ACTIONS_ON_PAGE,
+                                              request.GET.get('page'))
+
+    context = { 'activity_list': activity_list, 'team': team }
+    context.update(pagination_info)
+
+    return context
 
 @render_to('teams/create.html')
 @staff_member_required
