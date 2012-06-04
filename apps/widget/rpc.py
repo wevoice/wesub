@@ -1066,7 +1066,8 @@ class Rpc(BaseRpc):
             base_language,
             language.get_title(public_only=False),
             language.get_description(public_only=False),
-            language.is_rtl()
+            language.is_rtl(),
+            language.video.is_moderated,
         )
 
 
