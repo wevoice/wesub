@@ -686,7 +686,7 @@ class TeamsTest(TestCase):
 
         self.assertFalse(team.is_member(user2))
 
-        url = reverse("teams:videos_actions", kwargs={"slug": team.slug})
+        url = reverse("teams:activity", kwargs={"slug": team.slug})
         response = self.client.post(url)
         self.failUnlessEqual(response.status_code, 200)
 
