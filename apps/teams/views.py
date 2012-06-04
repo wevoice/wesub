@@ -299,10 +299,20 @@ def activity(request, slug):
         member = False
 
     public_only = False if member else True
-    qs = Action.objects.for_team(team, public_only=public_only)
 
-    activity_list, pagination_info = paginate(qs, ACTIONS_ON_PAGE,
-                                              request.GET.get('page'))
+    # This section is here to work around MySQL's poor decisions.
+    #
+    # Much like the Tasks page, this query performs extremely poorly when run
+    # normally.  So we split it into two parts here so that each will run fast.
+    action_ids = Action.objects.for_team(team, public_only=public_only, ids=True)
+    action_ids, pagination_info = paginate(action_ids, ACTIONS_ON_PAGE,
+                                           request.GET.get('page'))
+    action_ids = list(action_ids)
+
+    activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
+            'video', 'user', 'language', 'language__video'
+    ).order_by())
+    activity_list.sort(key=lambda a: action_ids.index(a.pk))
 
     context = { 'activity_list': activity_list, 'team': team }
     context.update(pagination_info)
