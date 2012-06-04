@@ -239,7 +239,7 @@
                                         {% endif %}
                                     {% endif %}
 
-                                    {% if task|can_perform_task:user %}
+                                    {% if task|can_perform_task:user and task.assignee == user or task.assignee == None %}
                                         <div class="action-group perform-task">
                                             <h5 class="trigger">{% trans 'Perform Task' %}</h5>
                                             <ul>
@@ -291,6 +291,12 @@
                                                             <div class="ajaxChosen">
                                                                 <label>{% trans 'Language' %}</label>
                                                                 {{ upload_draft_form.language }}
+                                                            </div>
+                                                            {% endif %}
+                                                            {% if task.get_type_display == "Translate" and not task.get_subtitle_version %}
+                                                            <div class="ajaxChosen">
+                                                                <label>{% trans 'Translate from' %}</label>
+                                                                {% languages_to_translate task %}
                                                             </div>
                                                             {% endif %}
                                                             <label for="id_draft">

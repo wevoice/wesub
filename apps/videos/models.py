@@ -1244,11 +1244,24 @@ class SubtitleVersionManager(models.Manager):
             description = video.get_description_display()
 
         forked = not bool(translated_from)
+        original_subs = None
+        forked_from = None
+
+        if isinstance(translated_from, SubtitleVersion):
+            forked_from = translated_from
+            original_subs = list(translated_from.subtitle_set.order_by("subtitle_order"))
+        else:
+            if translated_from and translated_from.version():
+                original_subs = list(translated_from.version().subtitle_set.order_by("subtitle_order"))
+                forked_from = translated_from.version()
+
+        if original_subs and len(parser) != len(original_subs):
+            raise Exception("Your subtitles don't match the translation")
 
         version = SubtitleVersion(
                 language=language, version_no=version_no, note=note,
                 is_forked=forked, time_change=1, text_change=1,
-                title=title, description=description)
+                title=title, description=description, forked_from=forked_from)
 
         version.datetime_started = timestamp or datetime.now()
         version.user = user
@@ -1260,22 +1273,12 @@ class SubtitleVersionManager(models.Manager):
 
         ids = set()
 
-        original_subs = None
-
-        if translated_from and translated_from.version():
-            original_subs = list(translated_from.version().subtitle_set.order_by("subtitle_order"))
-
         for i, item in enumerate(parser):
             original_sub  = None
 
             if translated_from and len(original_subs) > i:
-                original_sub  = original_subs[i]
+               original_sub  = original_subs[i]
 
-                if original_sub.start_time != item['start_time'] or \
-                   original_sub.end_time != item['end_time']:
-                    raise Exception("No apparent match between original: %s and %s" % (original_sub, item))
-
-            if original_sub:
                id = original_sub.subtitle_id
                order = original_sub.subtitle_order
             else:

@@ -1154,14 +1154,15 @@ def team_tasks(request, slug, project_slug=None):
     #
     # Thanks, MySQL.
     task_ids = list(tasks.values_list('id', flat=True))
-    tasks = Task.objects.filter(id__in=task_ids).select_related(
+    tasks = list(Task.objects.filter(id__in=task_ids).select_related(
             'team_video__video',
             'team_video__team',
             'team_video__project',
             'assignee',
             'team',
             'subtitle_version__language__standard_language',
-            'subtitle_version__user')
+            'subtitle_version__user'))
+    tasks.sort(key=lambda t: task_ids.index(t.pk))
 
     if filters.get('team_video'):
         filters['team_video'] = TeamVideo.objects.get(pk=filters['team_video'])

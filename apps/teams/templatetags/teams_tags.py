@@ -256,6 +256,14 @@ def invite_friends_to_team(context, team):
         }
     return context
 
+@register.inclusion_tag('teams/_task_language_list.html', takes_context=True)
+def languages_to_translate(context, task):
+    video = Video.objects.get(teamvideo=task.team_video_id)
+    context['allowed_languages'] = [(sl.language, sl.language_display()) for sl in video.subtitlelanguage_set.all() if sl.is_complete_and_synced()]
+    context['allowed_languages'].append(("", "Direct from video"))
+
+    return context
+
 @register.inclusion_tag('teams/_team_video_lang_list.html', takes_context=True)
 def team_video_lang_list(context, model_or_search_record, max_items=6):
     """
