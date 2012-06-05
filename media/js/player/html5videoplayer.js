@@ -44,10 +44,12 @@ unisubs.player.Html5VideoPlayer.prototype.createDom = function() {
                 unisubs.player.AbstractVideoPlayer.DIALOG_SIZE);
         } else {
             var config = this.mediaSource.getVideoConfig();
-            if (config.width && config.height) {
-                unisubs.style.setSize(
-                    this.mediaElem,
-                    config.width, config.height);
+            if (config) {
+                if (config.width && config.height) {
+                    unisubs.style.setSize(
+                        this.mediaElem,
+                        config.width, config.height);
+                }
             }
         }
     }
