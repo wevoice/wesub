@@ -116,6 +116,21 @@ body {
             }
         }
     }
+    .upload-draft-modal {
+
+        label {
+            width: auto;
+        }
+
+        p {
+            margin-bottom: 2em;
+
+            &.notation {
+                margin: 0;
+            }
+        }
+
+    }
 }
 .v1 .notation {
     color: $light;
@@ -248,7 +263,7 @@ a.button-clean {
 div.fix-chosen div.chzn-container {
     width: auto !important;
 }
-.action-group {
+.v1 .listing .action-group {
     position: relative;
 
     .trigger {
@@ -261,6 +276,12 @@ div.fix-chosen div.chzn-container {
 
     &:hover ul {
         display: block;
+    }
+
+    li.disabled {
+        text-align: left;
+        color: #CA4C43;
+        padding: .5em 1em;
     }
 }
 
@@ -799,7 +820,10 @@ div.fix-chosen div.chzn-container {
         padding-right: 0;
 
         h3, p, a, ul {
-            opacity: .2;
+            opacity: .5;
+        }
+        img {
+            opacity: .3;
         }
         ul.actions, ul.admin-controls {
             display: none !important;

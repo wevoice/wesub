@@ -736,10 +736,17 @@ class Rpc(BaseRpc):
         subtitle_version.moderation_status = WAITING_MODERATION
         subtitle_version.save()
 
-        task = Task(team=team_video.team, team_video=team_video,
-                    language=language, type=Task.TYPE_IDS['Subtitle'])
+        if subtitle_version.is_dependent():
+            task_type = Task.TYPE_IDS['Translate']
+            can_do = can_create_and_edit_translations
+        else:
+            task_type = Task.TYPE_IDS['Subtitle']
+            can_do = can_create_and_edit_subtitles
 
-        if can_create_and_edit_subtitles(user, team_video):
+        task = Task(team=team_video.team, team_video=team_video,
+                    language=language, type=task_type)
+
+        if can_do(user, team_video):
             task.assignee = user
 
         task.save()
