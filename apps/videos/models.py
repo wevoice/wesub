@@ -1261,7 +1261,10 @@ class SubtitleVersionManager(models.Manager):
         version = SubtitleVersion(
                 language=language, version_no=version_no, note=note,
                 is_forked=forked, time_change=1, text_change=1,
-                title=title, description=description, forked_from=forked_from)
+                title=title, description=description)
+
+        if forked:
+            version.forked_from = forked_from
 
         version.datetime_started = timestamp or datetime.now()
         version.user = user
