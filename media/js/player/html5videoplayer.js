@@ -58,7 +58,7 @@ unisubs.player.Html5VideoPlayer.prototype.createDom = function() {
 unisubs.player.Html5VideoPlayer.prototype.createVideoElement_ = 
     function($d) 
 {
-    var params = { 'preload': 'auto' };
+    var params = { 'preload': 'auto', 'autobuffer': 'true' };
     if (!this.forDialog) {
         if (this.mediaSource.getVideoConfig()) {
             var config = this.mediaSource.getVideoConfig();
