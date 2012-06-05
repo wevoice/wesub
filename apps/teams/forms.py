@@ -739,8 +739,8 @@ class UploadDraftForm(forms.Form):
             version = task.get_subtitle_version()
             language = task.get_subtitle_version().language
 
-            if not version.is_forked:
-                translated_from = version.forked_from.language
+            if not language.is_original:
+                translated_from = language.standard_language
         else:
             translated_from = video.subtitle_language(language_to_translate) if language_to_translate else None
             language = video.subtitle_language(video_language)
