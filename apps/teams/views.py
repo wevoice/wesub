@@ -1402,8 +1402,8 @@ def upload_draft(request, slug):
         if form.is_valid():
             try:
                 form.save()
-            except Exception:
-                messages.error(request, _(u"Sorry, the subtitles don't match the lines, so we can't upload them."))
+            except Exception, e:
+                messages.error(request, unicode(e))
                 transaction.rollback()
             else:
                 messages.success(request, _(u"Draft uploaded successfully."))

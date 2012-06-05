@@ -38,10 +38,20 @@ unisubs.player.Html5VideoPlayer.prototype.createDom = function() {
     if (unisubs.player.supportsVideoType(this.mediaSource.getVideoType())) {
         this.mediaElem = this.createVideoElement_($d);
         this.setElementInternal(this.mediaElem);
-        if (this.forDialog)
+        if (this.forDialog) {
             unisubs.style.setSize(
                 this.mediaElem,
                 unisubs.player.AbstractVideoPlayer.DIALOG_SIZE);
+        } else {
+            var config = this.mediaSource.getVideoConfig();
+            if (config) {
+                if (config.width && config.height) {
+                    unisubs.style.setSize(
+                        this.mediaElem,
+                        config.width, config.height);
+                }
+            }
+        }
     }
     else {
         var el = $d('div');
