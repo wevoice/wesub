@@ -757,7 +757,7 @@ class UploadDraftForm(forms.Form):
         # if there isn't a version we don't need to check this
         # since it's the first upload for this version
         if version and version.subtitle_set.count() < len(self._parser):
-            raise Exception("We are strict and your subtitles are bad")
+            raise Exception(_(u"Sorry, the subtitles don't match the lines, so we can't upload them."))
 
         # we need to set the moderation_status to WAITING_MODERATION
         # so the version is not public. At the same time, we cannot
