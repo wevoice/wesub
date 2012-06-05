@@ -726,7 +726,8 @@ class UploadDraftForm(forms.Form):
         video = task.team_video.video
         language_to_translate = self.cleaned_data['translate_from']
 
-        task.assignee = self.user
+        if not task.assignee and can_assign_task(task, self.user):
+            task.assignee = self.user
 
         if task.language:
             video_language = task.language
