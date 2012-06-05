@@ -707,7 +707,12 @@ class UploadDraftForm(forms.Form):
         else:
             language.is_original = False
             language.is_forked = False
-            language.standard_language = translate_from
+
+            # iuck
+            if translate_from.is_original:
+                language.standard_language = translate_from
+            else:
+                language.standard_language = translate_from.standard_language
 
         language.video = video
         language.save()
