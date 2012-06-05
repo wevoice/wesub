@@ -583,9 +583,10 @@ class Rpc(BaseRpc):
             else:
                 self._copy_subtitles(previous_version, new_version)
 
+
             # this is really really hackish.
             # TODO: clean all this mess on a friday
-            if not new_version.language.is_complete_and_synced(public_only=False):
+            if not new_version.is_synced():
                 self._moderate_incomplete_version(new_version, user)
             elif should_create_task:
                 self._create_review_or_approve_task(new_version)
