@@ -204,7 +204,13 @@ def production(username):
         _create_env(username              = username,
                     hosts                 = ['pcf-us-cluster3.pculture.org:2191',
                                              'pcf-us-cluster4.pculture.org:2191',
-                                             'pcf-us-cluster5.pculture.org:2191'],
+                                             'pcf-us-cluster5.pculture.org:2191',
+                                             'pcf-us-cluster6.pculture.org:2191',
+                                             'pcf-us-cluster7.pculture.org:2191',
+                                             'pcf-us-cluster8.pculture.org:2191',
+                                             'pcf-us-cluster9.pculture.org:2191',
+                                             'pcf-us-cluster10.pculture.org:2191',
+                                             ],
                     s3_bucket             = 's3.www.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles',
                     static_dir            = '/var/static/production',
@@ -736,6 +742,25 @@ def _update_static(dir, compilation_level):
         #_clear_permissions(media_dir)
         run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
 
+def _save_embedjs_on_app_servers():
+    '''
+    For mozilla, we'll craft a special url that servers the embed.js file
+    straight from squid in order to be able to set the CORS heades
+    (amazon's s3 does not allow that header to be set)
+    '''
+    # get the content of the embed.js file
+    with cd(os.path.join(env.web_dir, 'unisubs')):
+        python_exe = '{0}/env/bin/python'.format(env.static_dir)
+        res = run('{0} manage.py  get_settings_values STATIC_URL_BASE --single-host --settings=unisubs_settings'.format(python_exe))
+        media_url = res.replace("\n", "").strip()
+        url = "%sembed.js" % media_url
+    for host in env.web_hosts:
+        # save STATIC_URL/embed.js in the local file system so squid can serve it
+        final_path = os.path.join(env.web_dir, "unisubs", "media", "js", "embed.js")
+        env.host_string = host
+        cmd_str = "curl --silent %s > %s" % (url, final_path)
+        run(cmd_str)
+
 def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
     """Recompile static media and upload the results to S3"""
 
@@ -748,7 +773,8 @@ def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
                 run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
         else:
             _update_static(env.web_dir, compilation_level)
-
+            
+        _save_embedjs_on_app_servers()
 
 def update():
     update_static()

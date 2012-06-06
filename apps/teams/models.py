@@ -722,6 +722,7 @@ class TeamVideo(models.Model):
         """
         # these imports are here to avoid circular imports, hacky
         from teams.signals import api_teamvideo_new
+        from teams.signals import video_moved_from_team_to_team
         from videos import metadata_manager
         # For now, we'll just delete any tasks associated with the moved video.
         self.task_set.update(deleted=True)
@@ -770,6 +771,8 @@ class TeamVideo(models.Model):
 
         # fire a http notification that a new video has hit this team:
         api_teamvideo_new.send(self)
+        video_moved_from_team_to_team.send(sender=self,
+                destination_team=new_team, video=self.video)
 
 
 def _create_translation_tasks(team_video, subtitle_version):
