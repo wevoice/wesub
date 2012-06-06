@@ -765,7 +765,8 @@ class UploadDraftForm(forms.Form):
         # the task will get blocked. :(
         version = SubtitleVersion.objects.new_version(self._parser, language, self.user, 
                                                       moderation_status=WAITING_MODERATION,
-                                                      translated_from=translated_from)
+                                                      translated_from=translated_from,
+                                                      note="Uploaded")
         
         if task.type in (Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']):
             task.subtitle_version = version
