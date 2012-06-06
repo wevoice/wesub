@@ -273,7 +273,7 @@
                                                         <a href="#download-draft-{{task.id}}" class="open-modal upload-draft-button">{% trans 'Download draft' %}</a>
                                                         </li>
                                                     {% endif %}
-                                                    {% if not has_max_tasks or not task.assignee == user %}
+                                                    {% if not has_max_tasks or task.assignee == user %}
                                                         <li>
                                                             <a href="#upload-draft-{{task.id}}" class="open-modal upload-draft-button" data-task="{{ task.pk }}">Upload draft</a>
                                                         </li>
