@@ -208,6 +208,8 @@ def production(username):
                                              'pcf-us-cluster6.pculture.org:2191',
                                              'pcf-us-cluster7.pculture.org:2191',
                                              'pcf-us-cluster8.pculture.org:2191',
+                                             'pcf-us-cluster9.pculture.org:2191',
+                                             'pcf-us-cluster10.pculture.org:2191',
                                              ],
                     s3_bucket             = 's3.www.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles',
