@@ -204,7 +204,13 @@ def production(username):
         _create_env(username              = username,
                     hosts                 = ['pcf-us-cluster3.pculture.org:2191',
                                              'pcf-us-cluster4.pculture.org:2191',
-                                             'pcf-us-cluster5.pculture.org:2191'],
+                                             'pcf-us-cluster5.pculture.org:2191',
+                                             'pcf-us-cluster6.pculture.org:2191',
+                                             'pcf-us-cluster7.pculture.org:2191',
+                                             'pcf-us-cluster8.pculture.org:2191',
+                                             'pcf-us-cluster9.pculture.org:2191',
+                                             'pcf-us-cluster10.pculture.org:2191',
+                                             ],
                     s3_bucket             = 's3.www.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles',
                     static_dir            = '/var/static/production',
@@ -562,8 +568,11 @@ def update_web():
     test_services()
     reload_app_servers()
     
+    # Workaround that 'None' implies 'production'
+    installation_name = 'production' if env.installation_name is None else env.installation_name
+
     if env.installation_name != 'dev' or env.user != 'jenkins':
-        _notify("Amara {0} deployment".format(env.installation_name), "Deployed by {0} to {1} at {2} UTC".format(env.user,  env.installation_name, datetime.utcnow()))
+        _notify("Amara {0} deployment".format(env.installation_name), "Deployed by {0} to {1} at {2} UTC".format(env.user,  installation_name, datetime.utcnow()))
 
 # Services
 def update_solr_schema():

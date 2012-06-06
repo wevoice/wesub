@@ -385,7 +385,7 @@ class Video(models.Model):
             return self.videourl_set.filter(primary=True).all()[:1].get()
         except models.ObjectDoesNotExist:
             return None
-            
+
     def get_video_url(self):
         """Return the primary video URL for this video if one exists, otherwise None.
 
@@ -1256,12 +1256,15 @@ class SubtitleVersionManager(models.Manager):
                 forked_from = translated_from.version()
 
         if original_subs and len(parser) > len(original_subs):
-            raise Exception("Your subtitles don't match the translation")
+            raise Exception(_(u"Your subtitles don't match the translation"))
 
         version = SubtitleVersion(
                 language=language, version_no=version_no, note=note,
                 is_forked=forked, time_change=1, text_change=1,
-                title=title, description=description, forked_from=forked_from)
+                title=title, description=description)
+
+        if forked:
+            version.forked_from = forked_from
 
         version.datetime_started = timestamp or datetime.now()
         version.user = user
@@ -1805,7 +1808,7 @@ class ActionRenderer(object):
         self.template_name = template_name
 
     def render(self, item):
-        
+
         if item.action_type == Action.ADD_VIDEO:
             info = self.render_ADD_VIDEO(item)
         elif item.action_type == Action.CHANGE_TITLE:
@@ -1971,16 +1974,31 @@ class ActionRenderer(object):
         return msg
 
 class ActionManager(models.Manager):
-    def for_team(self, team, public_only=True):
-        result = self.select_related(
-            'video', 'user', 'language', 'language__video'
-        ).filter(
+    def for_team(self, team, public_only=True, ids=False):
+        '''Return the actions for the given team.
+
+        If public_only is True, only Actions that should be shown to the general
+        public will be returned.
+
+        If ids is True, instead of returning Action objects it will return
+        a values_list of their IDs.  This can be useful if you need to work
+        around some MySQL brokenness.
+
+        '''
+        result = self.filter(
             Q(team=team) |
             Q(video__teamvideo__team=team)
         )
 
         if public_only:
             result = result.filter(language__has_version=True)
+
+        if ids:
+            result = result.values_list('id', flat=True)
+        else:
+            result = result.select_related(
+                'video', 'user', 'language', 'language__video'
+            )
 
         return result
 

@@ -48,7 +48,7 @@ from teams.forms import (
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference, autocreate_tasks
+    Setting, TeamLanguagePreference
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -75,7 +75,7 @@ from videos.tasks import (
     upload_subtitles_to_original_service, delete_captions_in_original_service,
     delete_captions_in_original_service_by_code
 )
-from videos.models import Action, VideoUrl, SubtitleLanguage, SubtitleVersion, Video
+from videos.models import Action, VideoUrl, SubtitleLanguage, Video
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
@@ -287,7 +287,9 @@ def completed_videos(request, slug):
                        extra_context=extra_context,
                        template_object_name='team_video')
 
-def videos_actions(request, slug):
+@timefn
+@render_to('teams/activity.html')
+def activity(request, slug):
     team = Team.get(slug, request.user)
 
     try:
@@ -297,16 +299,25 @@ def videos_actions(request, slug):
         member = False
 
     public_only = False if member else True
-    qs = Action.objects.for_team(team, public_only=public_only)
 
-    extra_context = {
-        'team': team
-    }
-    return object_list(request, queryset=qs,
-                       paginate_by=ACTIONS_ON_PAGE,
-                       template_name='teams/videos_actions.html',
-                       extra_context=extra_context,
-                       template_object_name='videos_action')
+    # This section is here to work around MySQL's poor decisions.
+    #
+    # Much like the Tasks page, this query performs extremely poorly when run
+    # normally.  So we split it into two parts here so that each will run fast.
+    action_ids = Action.objects.for_team(team, public_only=public_only, ids=True)
+    action_ids, pagination_info = paginate(action_ids, ACTIONS_ON_PAGE,
+                                           request.GET.get('page'))
+    action_ids = list(action_ids)
+
+    activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
+            'video', 'user', 'language', 'language__video'
+    ).order_by())
+    activity_list.sort(key=lambda a: action_ids.index(a.pk))
+
+    context = { 'activity_list': activity_list, 'team': team }
+    context.update(pagination_info)
+
+    return context
 
 @render_to('teams/create.html')
 @staff_member_required
@@ -1391,8 +1402,8 @@ def upload_draft(request, slug):
         if form.is_valid():
             try:
                 form.save()
-            except Exception:
-                messages.error(request, _(u"Sorry, the subtitles don't match the lines, so we can't upload them."))
+            except Exception, e:
+                messages.error(request, unicode(e))
                 transaction.rollback()
             else:
                 messages.success(request, _(u"Draft uploaded successfully."))

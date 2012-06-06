@@ -707,7 +707,12 @@ class UploadDraftForm(forms.Form):
         else:
             language.is_original = False
             language.is_forked = False
-            language.standard_language = translate_from
+
+            # iuck
+            if translate_from.is_original:
+                language.standard_language = translate_from
+            else:
+                language.standard_language = translate_from.standard_language
 
         language.video = video
         language.save()
@@ -721,7 +726,8 @@ class UploadDraftForm(forms.Form):
         video = task.team_video.video
         language_to_translate = self.cleaned_data['translate_from']
 
-        task.assignee = self.user
+        if not task.assignee and can_assign_task(task, self.user):
+            task.assignee = self.user
 
         if task.language:
             video_language = task.language
@@ -734,8 +740,8 @@ class UploadDraftForm(forms.Form):
             version = task.get_subtitle_version()
             language = task.get_subtitle_version().language
 
-            if not version.is_forked:
-                translated_from = version.forked_from.language
+            if not language.is_original:
+                translated_from = language.standard_language
         else:
             translated_from = video.subtitle_language(language_to_translate) if language_to_translate else None
             language = video.subtitle_language(video_language)
@@ -751,7 +757,7 @@ class UploadDraftForm(forms.Form):
         # if there isn't a version we don't need to check this
         # since it's the first upload for this version
         if version and version.subtitle_set.count() < len(self._parser):
-            raise Exception("We are strict and your subtitles are bad")
+            raise Exception(_(u"Sorry, the subtitles don't match the lines, so we can't upload them."))
 
         # we need to set the moderation_status to WAITING_MODERATION
         # so the version is not public. At the same time, we cannot

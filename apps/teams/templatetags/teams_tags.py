@@ -260,7 +260,6 @@ def invite_friends_to_team(context, team):
 def languages_to_translate(context, task):
     video = Video.objects.get(teamvideo=task.team_video_id)
     context['allowed_languages'] = [(sl.language, sl.language_display()) for sl in video.subtitlelanguage_set.all() if sl.is_complete_and_synced()]
-    context['allowed_languages'].append(("", "Direct from video"))
 
     return context
 
