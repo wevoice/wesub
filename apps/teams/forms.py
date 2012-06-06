@@ -761,13 +761,18 @@ class UploadDraftForm(forms.Form):
 
         # we need to set the moderation_status to WAITING_MODERATION
         # so the version is not public. At the same time, we cannot
-        # set task.subtitle_version, otherwise the task will get
-        # blocked. :(
+        # set task.subtitle_version if it's review/approve, otherwise 
+        # the task will get blocked. :(
         version = SubtitleVersion.objects.new_version(self._parser, language, self.user, 
                                                       moderation_status=WAITING_MODERATION,
                                                       translated_from=translated_from)
+        
+        if task.type in (Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']):
+            task.subtitle_version = version
 
-        task.language = video_language
+        if not task.language:
+            task.language = video_language
+
         task.save()
 
         # we created a new subtitle version let's fire a notification
