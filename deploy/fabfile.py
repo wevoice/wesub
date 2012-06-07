@@ -136,7 +136,7 @@ def local(*args, **kwargs):
 DEV_HOST = 'dev.universalsubtitles.org:2191'
 
 
-def _create_env(username, hosts, s3_bucket,
+def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
                 installation_dir, static_dir, name,
                 memcached_bounce_cmd,
                 admin_dir, admin_host, celeryd_host, celeryd_proj_root,
@@ -148,6 +148,7 @@ def _create_env(username, hosts, s3_bucket,
     env.user = username
     env.web_hosts = hosts
     env.hosts = []
+    env.hostnames_squid_cache = hostnames_squid_cache
     env.s3_bucket = s3_bucket
     env.web_dir = web_dir or '/var/www/{0}'.format(installation_dir)
     env.static_dir = static_dir
@@ -167,6 +168,9 @@ def staging(username):
         _create_env(username              = username,
                     hosts                 = ['pcf-us-staging3.pculture.org:2191',
                                             'pcf-us-staging4.pculture.org:2191'],
+                    hostnames_squid_cache = ['staging.universalsubtitles.org',
+                                             'staging.amara.org'
+                                             ],
                     s3_bucket             = 's3.staging.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles.staging',
                     static_dir            = '/var/static/staging',
@@ -185,6 +189,9 @@ def dev(username):
     with Output("Configuring task(s) to run on DEV"):
         _create_env(username              = username,
                     hosts                 = ['dev.universalsubtitles.org:2191'],
+                    hostnames_squid_cache = ['dev.universalsubtitles.org',
+                                             'dev.amara.org'
+                                             ],
                     s3_bucket             = None,
                     installation_dir      = 'universalsubtitles.dev',
                     static_dir            = '/var/www/universalsubtitles.dev',
@@ -211,6 +218,11 @@ def production(username):
                                              'pcf-us-cluster9.pculture.org:2191',
                                              'pcf-us-cluster10.pculture.org:2191',
                                              ],
+                    hostnames_squid_cache = ['www.universalsubtitles.org',
+                                             'www.amara.org',
+                                             'universalsubtitles.org',
+                                             'amara.org'
+                                             ],
                     s3_bucket             = 's3.www.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles',
                     static_dir            = '/var/static/production',
@@ -229,6 +241,9 @@ def temp(username):
     with Output("Configuring task(s) to run on TEMP"):
         _create_env(username              = username,
                     hosts                 = ['pcf-us-tmp1.pculture.org:2191',],
+                    hostnames_squid_cache = ['tmp.universalsubtitles.org',
+                                             'tmp.amara.org'
+                                             ],
                     s3_bucket             = 's3.temp.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles.staging',
                     static_dir            = '/var/static/tmp',
@@ -247,6 +262,9 @@ def nf(username):
     with Output("Configuring task(s) to run on NF env"):
         _create_env(username              = username,
                     hosts                 = ['nf.universalsubtitles.org:2191'],
+                    hostnames_squid_cache = ['nf.universalsubtitles.org',
+                                             'nf.amara.org'
+                                             ],
                     s3_bucket             = 's3.nf.universalsubtitles.org',
                     installation_dir      = 'universalsubtitles.nf',
                     static_dir            = '/var/static/nf',
@@ -762,7 +780,9 @@ def _save_embedjs_on_app_servers():
         cmd_str = "curl --compressed --silent %s > %s" % (url, final_path)
         run(cmd_str)
         # now  purge the squid cache
-        sudo('/usr/bin/squidclient -p 80 -m PURGE https://staging.universalsubtitles.org/unisubs/media/js/embed.js  && /usr/bin/squidclient -p 80 -m PURGE https://127.0.0.1/unisubs/media/js/embed.js && /usr/bin/squidclient -p 80 -m PURGE https://localhost/unisubs/media/js/embed.js && /usr/bin/squidclient -p 80 -m PURGE https://universalsubtitles.org/unisubs/media/js/embed.js')  
+        for hostname_in_cache in env.hostnames_squid_cache:
+           sudo('/usr/bin/squidclient -p  80 -m PURGE  http://{0}/unisubs/media/js/embed.js'.format(hostname_in_cache))
+           sudo('/usr/bin/squidclient -p 443 -m PURGE https://{0}/unisubs/media/js/embed.js'.format(hostname_in_cache))        
 
 def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
     """Recompile static media and upload the results to S3"""
