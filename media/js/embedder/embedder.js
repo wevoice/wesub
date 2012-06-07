@@ -14,19 +14,19 @@
         // For reference in inner functions.
         var that = this;
 
-        // Private methods.
+        // Private methods that are called via the push() method.
         var actions = {
 
             // The core function for constructing an entire video with Amara subtitles from
             // just a video URL. This includes DOM creation for the video, etc.
-            'embedVideo': function(videoURL) {
+            embedVideo: function(videoURL) {
                 console.log(videoURL);
             }
 
         };
 
         // push() handles all action calls before and after the embedder is loaded.
-        // Aside from init(), this is the only function that is called from the
+        // Aside from init(), this is the only function that may be called from the
         // parent document.
         //
         // Must send push() an object with only two items:
@@ -54,6 +54,8 @@
 
         };
 
+        // init() gets called as soon as the embedder has finished loading.
+        // Simply processes the existing _amara queue if we have one.
         this.init = function() {
 
             // If we have a queue from before the embedder loaded, process the actions.
