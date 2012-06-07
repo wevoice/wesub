@@ -92,8 +92,6 @@ def twitter_login_done(request):
         del request.session['request_token']
         return HttpResponseRedirect(reverse('auth:login'))
 
-#    print('authenticated: {0}'.format(user.is_authenticated()))
-
     # authentication was successful, use is now logged in
     return HttpResponseRedirect(request.GET.get('next', settings.LOGIN_REDIRECT_URL))
 
@@ -129,7 +127,7 @@ def _fb_callback_url(request, fb64_next):
     '''Return the callback URL for the given request and eventual destination.'''
     return '%s%s' % (
         get_url_host(request),
-        reverse("auth:facebook_login_done", kwargs={'next': fb64_next}))
+        reverse("thirdpartyaccounts:facebook_login_done", kwargs={'next': fb64_next}))
 
 def _fb_fallback_url(fb64_next):
     '''Return a fallback URL that we'll redirect to if the authentication fails.
