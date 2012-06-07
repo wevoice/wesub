@@ -450,8 +450,8 @@ VIMEO_API_SECRET = None
 
 AUTHENTICATION_BACKENDS = (
    'auth.backends.CustomUserBackend',
-   'thirdpartyaccounts.auth_backends.CustomUserAuthBackend',
    'thirdpartyaccounts.auth_backends.TwitterAuthBackend',
+   'thirdpartyaccounts.auth_backends.FacebookAuthBackend',
    'auth.backends.OpenIdBackend',
    'django.contrib.auth.backends.ModelBackend',
 )
