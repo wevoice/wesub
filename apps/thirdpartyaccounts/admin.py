@@ -52,5 +52,6 @@ class FacebookAccountAdmin(admin.ModelAdmin):
     amara_user.admin_order_field = 'user__username'
     amara_user.short_description = 'Amara User'
 
+
 admin.site.register(TwitterAccount, TwitterAccountAdmin)
 admin.site.register(FacebookAccount, FacebookAccountAdmin)
