@@ -441,7 +441,7 @@ class Team(models.Model):
 
         if query:
             for term in get_terms(query):
-                qs = qs.filter(video_title__icontains=qs.query.clean(term))
+                qs = qs.auto_query(qs.query.clean(term))
 
         if language:
             qs = qs.filter(video_completed_langs=language)
