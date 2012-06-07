@@ -748,9 +748,10 @@ def _save_embedjs_on_app_servers():
     straight from squid in order to be able to set the CORS heades
     (amazon's s3 does not allow that header to be set)
     '''
-    # get the content of the embed.js file
-    with cd(os.path.join(env.web_dir, 'unisubs')):
-        python_exe = '{0}/env/bin/python'.format(env.static_dir)
+    env.host_string = env.admin_host
+    # to find the url, we must revsolve the current STATIC_ROOT
+    with cd(os.path.join(env.admin_dir, 'unisubs')):
+        python_exe = '{0}/env/bin/python'.format(env.admin_dir)
         res = run('{0} manage.py  get_settings_values STATIC_URL_BASE --single-host --settings=unisubs_settings'.format(python_exe))
         media_url = res.replace("\n", "").strip()
         url = "%sembed.js" % media_url
@@ -758,8 +759,10 @@ def _save_embedjs_on_app_servers():
         # save STATIC_URL/embed.js in the local file system so squid can serve it
         final_path = os.path.join(env.web_dir, "unisubs", "media", "js", "embed.js")
         env.host_string = host
-        cmd_str = "curl --silent %s > %s" % (url, final_path)
+        cmd_str = "curl --compressed --silent %s > %s" % (url, final_path)
         run(cmd_str)
+        # now  purge the squid cache
+        sudo('/usr/bin/squidclient -p 80 -m PURGE https://staging.universalsubtitles.org/unisubs/media/js/embed.js  && /usr/bin/squidclient -p 80 -m PURGE https://127.0.0.1/unisubs/media/js/embed.js && /usr/bin/squidclient -p 80 -m PURGE https://localhost/unisubs/media/js/embed.js && /usr/bin/squidclient -p 80 -m PURGE https://universalsubtitles.org/unisubs/media/js/embed.js')  
 
 def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
     """Recompile static media and upload the results to S3"""
@@ -773,7 +776,6 @@ def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
                 run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
         else:
             _update_static(env.web_dir, compilation_level)
-            
         _save_embedjs_on_app_servers()
 
 def update():

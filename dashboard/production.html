@@ -1,15 +1,74 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Production --- Amara</title>
-</head>
-<body>
+  <head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="static/index.css" type="text/css" media="screen" charset="utf-8">
+    <style type="text/css">
 
-    <img src="http://graphite.universalsubtitles.org/render/?_salt=1337805852.646&target=alias(summarize(production.all-hosts.requests.started.rate-per-second,%2260s%22),%22requests%20started%20per%20second%22)&target=alias(dashed(summarize(production.all-hosts.requests.completed.rate-per-second,%2260s%22)),%22requests%20completed%20per%20second%22)&width=600&height=400&from=-1hours&lineWidth=3&title=Requests%20started/completed%20per%20second%20(1%20minute%20resolution)" />
+      /*
+       * demo page bootstrap customizations
+       */
+      #hero-two{
+        text-align:center;
+      }
+      .hero-row{
+        margin-bottom:8em;
+        text-shadow: 0px 1px 4px black;
+      }
+      #hero-one, #hero-three{ padding-top:10em;}
+      h2{
+        color:#fff;
+      }
+      #graphite{
+        stroke-width: 2px;
+      }
 
-    <img src="http://graphite.universalsubtitles.org/render/?_salt=1337806108.292&target=alias(movingAverage(summarize(production.all-hosts.requests.started.rate-per-second,%2230s%22),2),%22total%20requests%20per%20second%20(across%20all%20servers)%22)&target=alias(movingAverage(summarize(production.pcf-us-cluster4.requests.started.rate-per-second,%2230s%22),2),%22cluster3%20hits%20per%20second%22)&target=alias(movingAverage(summarize(production.pcf-us-cluster3.requests.started.rate-per-second,%2230s%22),2),%22cluster4%20hits%20per%20second%22)&target=alias(movingAverage(summarize(production.pcf-us-cluster5.requests.started.rate-per-second,%2230s%22),2),%22cluster5%20hits%20per%20second%22)&target=alias(movingAverage(summarize(production.all-hosts.site-sections.api-v1-response-time.rate-per-second,%2230s%22),2),%22api%20v1%20hits%20per%20second%22)&target=alias(movingAverage(summarize(production.all-hosts.site-sections.api-v2-response-time.rate-per-second,%2230s%22),2),%22api%20v2%20hits%20per%20second%22)&width=600&height=400&title=Amara%20Heartbeat%20(1%20minute%20resolution,%202%20point%20smoothing)" />
 
-    <img src="http://graphite.universalsubtitles.org/render/?_salt=1338475033.395&width=600&height=400&from=-3days&lineWidth=1&target=alias(diffSeries(summarize(production.all-hosts.requests.started.rate-per-second,%221min%22,%20%22avg%22),summarize(production.all-hosts.requests.completed.rate-per-second,%221min%22,%20%22avg%22)),%22(Requests%20Started%20-%20Requests%20Completed)%20per%20second%22)&target=alias(secondYAxis(integral(diffSeries(summarize(production.all-hosts.requests.started.rate-per-second,%221min%22,%20%22avg%22),summarize(production.all-hosts.requests.completed.rate-per-second,%221min%22,%20%22avg%22)))),%22Total%20requests%20dropped%22)&title=Requests%20Dropped&yMaxLeft=" />
+      /*
+       * graphene high-contrast theme customizations
+       */
+      svg.tsview{
+        background:none;
+      }
+      .ggview .gauge circle.outer{
+        stroke:none;
+        fill:none;
+      }
+      .ggview .gauge circle.inner{
+        stroke:none;
+        fill:none;
+      }
+      .span4{
+        text-align:center;
+      }
+      </style>
+  </head>
+  <body>
+    
 
-</body>
+    <div id="dashboard" class="container-fluid">
+
+      <div class="row-fluid">
+        <div id="videos" class="span4">
+        </div>
+        <div id="users" class="span4">
+        </div>
+        <div id="tasks" class="span4">
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div id="req-per-sec" class="span4">
+        </div>
+        <div id="resp" class="span4">
+        </div>
+      </div>
+
+    </div>
+
+    <script type="text/javascript" src="static/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="static/index.js"></script>    
+    <script type="text/javascript" src="static/production.js"></script>    
+      
+  </body>
 </html>
