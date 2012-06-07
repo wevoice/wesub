@@ -14,6 +14,46 @@
         // For reference in inner functions.
         var that = this;
 
+        // Private methods.
+        var actions = {
+
+            // The core function for constructing an entire video with Amara subtitles from
+            // just a video URL. This includes DOM creation for the video, etc.
+            'embedVideo': function(videoURL) {
+                console.log(videoURL);
+            }
+
+        };
+
+        // push() handles all action calls before and after the embedder is loaded.
+        // Aside from init(), this is the only function that is called from the
+        // parent document.
+        //
+        // Must send push() an object with only two items:
+        //     * Action  (string)
+        //     * Options (object or string)
+        //
+        // Note: we don't use traditional function arguments because before the
+        // embedder is loaded, _amara is just an array with a normal push() method.
+        this.push = function(args) {
+
+            // No arguments? Don't do anything.
+            if (!arguments.length) { return; }
+
+            // Must send push() an object with only two items.
+            if (arguments[0].length === 2) {
+
+                var action = args[0];
+                var options = args[1];
+
+                // If a method exists for this action, call it with the options.
+                if (actions[action]) {
+                    actions[action](options);
+                }
+            }
+
+        };
+
         this.init = function() {
 
             // If we have a queue from before the embedder loaded, process the actions.
@@ -23,34 +63,6 @@
                 }
                 toPush = [];
             }
-        };
-
-        // push() handles all action calls before and after the embedder is loaded.
-        this.push = function(args) {
-
-            // Must only send push() an object with only two arguments:
-            //     * Action  (string)
-            //     * Options (object or string)
-            //
-            // Note: we don't use traditional function arguments because before the
-            // embedder is loaded, _amara is just an array with a normal push() method.
-            if (arguments[0].length === 2) {
-
-                var action = args[0];
-                var options = args[1];
-
-                // If a method exists for this action, call it with the options.
-                if (that[action]) {
-                    that[action](options);
-                }
-            }
-
-        };
-
-        // The core function for constructing an entire video with Amara subtitles from
-        // just a video URL. This includes DOM creation for the video, etc.
-        this.embedVideo = function(videoURL) {
-            console.log(videoURL);
         };
 
     };
