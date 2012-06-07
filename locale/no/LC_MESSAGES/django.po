@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-06 01:38-0500\n"
+"POT-Creation-Date: 2012-06-07 01:37-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -778,20 +778,20 @@ msgstr ""
 msgid "If you check this, other languages will not be displayed."
 msgstr ""
 
-#: apps/teams/models.py:915 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:918 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr ""
 
-#: apps/teams/models.py:916 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:919 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr ""
 
-#: apps/teams/models.py:917 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:920 apps/teams/permissions_const.py:44
 #: templates/base.html:116
 msgid "Admin"
 msgstr ""
 
-#: apps/teams/models.py:918 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:921 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr ""
 
