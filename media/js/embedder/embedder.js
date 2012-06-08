@@ -41,7 +41,7 @@
                         div = divs[index];
                     }
 
-                    div.innerHTML = url;
+                    var pop = Popcorn.smart(div, url);
                 }
             }
 
