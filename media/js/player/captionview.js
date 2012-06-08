@@ -110,8 +110,6 @@ unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_ma
     // short circuit most common case
     if (!text){
         return "";
-    }else if(text.length<=charsPerLine){
-        return text;
     }
     var lines = [];
     var currentLine  = [],
@@ -120,6 +118,10 @@ unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_ma
     var words = text.split(" ");
     while (words.length){
          nextWord =  words.shift();
+         if (nextWord.charCodeAt == 10 || nextWord.charCodeAt(0) == 13){
+             lines.push(currentLine);
+             currentLine = [];
+         }
          // keep one char for the space between currentLine and nextWord
          charsOnCurrentLine = currentLine.join(" ").length;
          if (charsOnCurrentLine + nextWord.length < charsPerLine){
