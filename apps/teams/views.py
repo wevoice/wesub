@@ -262,31 +262,6 @@ def role_saved(request, slug):
     return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
     return HttpResponseRedirect(return_path)
 
-def completed_videos(request, slug):
-    team = Team.get(slug, request.user)
-    if team.is_member(request.user):
-        qs  = TeamVideoLanguagesIndex.results_for_members(team)
-    else:
-        qs = TeamVideoLanguagesIndex.results()
-    qs = qs.filter(team_id=team.id).filter(is_complete=True).order_by('-video_complete_date')
-
-    extra_context = widget.add_onsite_js_files({})
-    extra_context.update({
-        'team': team
-    })
-
-    if team.video:
-        extra_context['widget_params'] = base_widget_params(request, {
-            'video_url': team.video.get_video_url(),
-            'base_state': {}
-        })
-
-    return object_list(request, queryset=qs,
-                       paginate_by=VIDEOS_ON_PAGE,
-                       template_name='teams/completed_videos.html',
-                       extra_context=extra_context,
-                       template_object_name='team_video')
-
 @timefn
 @render_to('teams/activity.html')
 def activity(request, slug):
