@@ -1284,12 +1284,15 @@ class SubtitleVersionManager(models.Manager):
 
                id = original_sub.subtitle_id
                order = original_sub.subtitle_order
+               paragraph = original_sub.start_of_paragraph
             else:
                 id = int(random.random()*10e12)
                 order = i +1
 
                 while id in ids:
                     id = int(random.random()*10e12)
+
+                paragraph = item.get('start_of_paragraph', False)
 
             ids.add(id)
 
@@ -1301,7 +1304,7 @@ class SubtitleVersionManager(models.Manager):
             caption.subtitle_text = item['subtitle_text']
             caption.start_time = item['start_time']
             caption.end_time = item['end_time']
-            caption.start_of_paragraph = item.get('start_of_paragraph', False)
+            caption.start_of_paragraph = paragraph
             caption.save()
 
             if metadata:
