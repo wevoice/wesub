@@ -551,7 +551,7 @@ class Rpc(BaseRpc):
         for s in source_version.subtitle_set.all():
             s.duplicate_for(dest_version).save()
 
-    def _get_new_version_for_save(self, subtitles, language, session, user, forked, new_title, new_description):
+    def _get_new_version_for_save(self, subtitles, language, session, user, forked, new_title, new_description, save_for_later=None):
         """Return a new subtitle version for this save, or None if not needed."""
 
         new_version = None
@@ -583,10 +583,9 @@ class Rpc(BaseRpc):
             else:
                 self._copy_subtitles(previous_version, new_version)
 
-
             # this is really really hackish.
             # TODO: clean all this mess on a friday
-            if not new_version.is_synced():
+            if not new_version.is_synced() or save_for_later:
                 self._moderate_incomplete_version(new_version, user)
             elif should_create_task:
                 self._create_review_or_approve_task(new_version)
@@ -622,7 +621,7 @@ class Rpc(BaseRpc):
 
         new_version = self._get_new_version_for_save(
             subtitles, language, session, user, forked, new_title,
-            new_description)
+            new_description, save_for_later)
 
         language.release_writelock()
 
