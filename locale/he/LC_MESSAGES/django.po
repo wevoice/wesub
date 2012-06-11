@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-05 01:32-0500\n"
-"PO-Revision-Date: 2012-06-05 06:49+0000\n"
+"POT-Creation-Date: 2012-06-06 01:33-0500\n"
+"PO-Revision-Date: 2012-06-06 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Hebrew (http://www.transifex.net/projects/p/universalsubtitles/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -281,11 +281,15 @@ msgstr ""
 msgid "Your subtitles have been approved and published!"
 msgstr ""
 
-#: apps/messages/tasks.py:493 apps/messages/tasks.py:547
-msgid "Your subtitles have been declined"
+#: apps/messages/tasks.py:492
+msgid "Your subtitles have been returned for further editing"
 msgstr ""
 
-#: apps/messages/tasks.py:590
+#: apps/messages/tasks.py:546
+msgid "Your subtitles were not accepted"
+msgstr ""
+
+#: apps/messages/tasks.py:589
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr ""
@@ -625,6 +629,10 @@ msgstr "לא ניתן לאתר את קידוד הקובץ"
 #: apps/teams/forms.py:680 apps/videos/forms.py:96 apps/videos/forms.py:432
 msgid "Incorrect subtitles format"
 msgstr "מבנה הכתוביות שגוי"
+
+#: apps/teams/forms.py:760
+msgid "Sorry, the subtitles don't match the lines, so we can't upload them."
+msgstr ""
 
 #: apps/teams/models.py:91
 msgid "Open"
@@ -1019,10 +1027,6 @@ msgstr ""
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1406
-msgid "Sorry, the subtitles don't match the lines, so we can't upload them."
-msgstr ""
-
 #: apps/teams/views.py:1409
 msgid "Draft uploaded successfully."
 msgstr ""
@@ -1214,199 +1218,203 @@ msgid ""
 "language you are uploading or a translation of it"
 msgstr ""
 
-#: apps/videos/models.py:1865
+#: apps/videos/models.py:1259
+msgid "Your subtitles don't match the translation"
+msgstr ""
+
+#: apps/videos/models.py:1868
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1870
+#: apps/videos/models.py:1873
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1875
+#: apps/videos/models.py:1878
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1880
+#: apps/videos/models.py:1883
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1885
+#: apps/videos/models.py:1888
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1891
+#: apps/videos/models.py:1894
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr ""
 
-#: apps/videos/models.py:1896
+#: apps/videos/models.py:1899
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1898
+#: apps/videos/models.py:1901
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr ""
 
-#: apps/videos/models.py:1904
+#: apps/videos/models.py:1907
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1906
+#: apps/videos/models.py:1909
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1921
+#: apps/videos/models.py:1924
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1923
+#: apps/videos/models.py:1926
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1926
+#: apps/videos/models.py:1929
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1928
+#: apps/videos/models.py:1931
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1936
+#: apps/videos/models.py:1939
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1938
+#: apps/videos/models.py:1941
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1949
+#: apps/videos/models.py:1952
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1951
+#: apps/videos/models.py:1954
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1957
+#: apps/videos/models.py:1960
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1959
+#: apps/videos/models.py:1962
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1964
+#: apps/videos/models.py:1967
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr ""
 
-#: apps/videos/models.py:1969
+#: apps/videos/models.py:1972
 #, python-format
 msgid "left the %s team"
 msgstr ""
 
-#: apps/videos/models.py:2040
+#: apps/videos/models.py:2043
 msgid "add video"
 msgstr ""
 
-#: apps/videos/models.py:2041
+#: apps/videos/models.py:2044
 msgid "change title"
 msgstr ""
 
-#: apps/videos/models.py:2042
+#: apps/videos/models.py:2045
 msgid "comment"
 msgstr ""
 
-#: apps/videos/models.py:2043
+#: apps/videos/models.py:2046
 msgid "add version"
 msgstr ""
 
-#: apps/videos/models.py:2044
+#: apps/videos/models.py:2047
 msgid "add translation"
 msgstr ""
 
-#: apps/videos/models.py:2045
+#: apps/videos/models.py:2048
 msgid "add video url"
 msgstr ""
 
-#: apps/videos/models.py:2046
+#: apps/videos/models.py:2049
 msgid "request subtitles"
 msgstr ""
 
-#: apps/videos/models.py:2047
+#: apps/videos/models.py:2050
 msgid "approve version"
 msgstr ""
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2051
 msgid "add contributor"
 msgstr ""
 
-#: apps/videos/models.py:2049
+#: apps/videos/models.py:2052
 msgid "remove contributor"
 msgstr ""
 
-#: apps/videos/models.py:2050
+#: apps/videos/models.py:2053
 msgid "reject version"
 msgstr ""
 
-#: apps/videos/models.py:2051
+#: apps/videos/models.py:2054
 msgid "review version"
 msgstr ""
 
-#: apps/videos/models.py:2052
+#: apps/videos/models.py:2055
 msgid "accept version"
 msgstr ""
 
-#: apps/videos/models.py:2053
+#: apps/videos/models.py:2056
 msgid "decline version"
 msgstr ""
 
-#: apps/videos/models.py:2054
+#: apps/videos/models.py:2057
 msgid "delete video"
 msgstr ""
 
-#: apps/videos/models.py:2306
+#: apps/videos/models.py:2309
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1587,7 +1595,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:892 apps/widget/rpc.py:933
+#: apps/widget/rpc.py:900 apps/widget/rpc.py:941
 msgid "\n"
 msgstr ""
 
@@ -4316,14 +4324,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr ""
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:380
+#: templates/messages/sent.html:51 templates/teams/tasks.html:381
 msgid "Delete"
 msgstr ""
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:434 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:435 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:387
 msgid "Cancel"
 msgstr ""
@@ -5393,12 +5401,12 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr ""
 
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:258
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:259
 msgid "Resume"
 msgstr ""
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:260
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:261
 msgid "Start now"
 msgstr ""
 
@@ -5642,7 +5650,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:438
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:439
 msgid "Begin typing to search"
 msgstr ""
 
@@ -6123,95 +6131,95 @@ msgstr ""
 msgid "Unassigned"
 msgstr ""
 
-#: templates/teams/tasks.html:244
+#: templates/teams/tasks.html:245
 msgid "Perform Task"
 msgstr ""
 
-#: templates/teams/tasks.html:253
+#: templates/teams/tasks.html:254
 msgid "You have reached the maximum number of tasks."
 msgstr ""
 
-#: templates/teams/tasks.html:272
+#: templates/teams/tasks.html:273
 msgid "Download draft"
 msgstr ""
 
-#: templates/teams/tasks.html:286
+#: templates/teams/tasks.html:287
 msgid "Upload a draft"
 msgstr ""
 
-#: templates/teams/tasks.html:289
+#: templates/teams/tasks.html:290
 msgid "Important:"
 msgstr ""
 
-#: templates/teams/tasks.html:289
+#: templates/teams/tasks.html:290
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
 " and video description in the onsite editor and to submit the final version."
 msgstr ""
 
-#: templates/teams/tasks.html:292
+#: templates/teams/tasks.html:293
 #: templates/videos/_paste_transcription.html:146
 #: templates/videos/_upload_subtitles.html:23
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr "שפה"
 
-#: templates/teams/tasks.html:298
+#: templates/teams/tasks.html:299
 msgid "Translate from"
 msgstr ""
 
-#: templates/teams/tasks.html:303
+#: templates/teams/tasks.html:304
 msgid "File:"
 msgstr ""
 
-#: templates/teams/tasks.html:306
+#: templates/teams/tasks.html:307
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .xml (for TTML)"
 msgstr ""
 
-#: templates/teams/tasks.html:320
+#: templates/teams/tasks.html:321
 msgid "Download a draft"
 msgstr ""
 
-#: templates/teams/tasks.html:325
+#: templates/teams/tasks.html:326
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr ""
 
-#: templates/teams/tasks.html:351
+#: templates/teams/tasks.html:352
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:371
+#: templates/teams/tasks.html:372
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:373
+#: templates/teams/tasks.html:374
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:389
+#: templates/teams/tasks.html:390
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:395
+#: templates/teams/tasks.html:396
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:398
+#: templates/teams/tasks.html:399
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:402
+#: templates/teams/tasks.html:403
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:441
+#: templates/teams/tasks.html:442
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:451
+#: templates/teams/tasks.html:452
 msgid "Sorry, no tasks here."
 msgstr ""
 
