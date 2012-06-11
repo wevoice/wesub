@@ -16,7 +16,7 @@
     ErrorLog "|/usr/bin/cronolog /var/log/apache2/INSERT_SUBDOMAIN.universalsubtitles.org/error.log"
 
     # Serve embed.js with CORS header
-    Alias /unisubs/media/js/embed.js /var/www/universalsubtitles.staging/unisubs/media/js/embed.js
+    Alias /unisubs/media/js/embed.js /var/www/INSERT_SITE_DIRECTORY/unisubs/media/js/embed.js
     <Location "/unisubs/media/js/embed.js">
         Header set Access-Control-Allow-Origin *
     </Location>
