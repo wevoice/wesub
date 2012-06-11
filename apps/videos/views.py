@@ -24,7 +24,7 @@ from django.views.generic.list_detail import object_list
 from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
     VideoUrl, AlreadyEditingException, restrict_versions
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
-    SubtitlesUploadForm, PasteTranscriptionForm, CreateVideoUrlForm, TranscriptionFileForm, \
+    SubtitlesUploadForm, CreateVideoUrlForm, TranscriptionFileForm, \
     AddFromFeedForm
 import widget
 from django.contrib.sites.models import Site
@@ -293,18 +293,6 @@ def upload_subtitles(request):
         transaction.rollback()
 
     return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
-
-@login_required
-def paste_transcription(request):
-    output = dict(success=False)
-    form = PasteTranscriptionForm(request.user, request.POST)
-    if form.is_valid():
-        language = form.save()
-        output['success'] = True
-        output['next'] = language.get_absolute_url()
-    else:
-        output['errors'] = form.get_errors()
-    return HttpResponse(json.dumps(output), "text/javascript")
 
 @login_required
 def upload_transcription_file(request):
