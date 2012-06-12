@@ -909,6 +909,7 @@ class SubtitleLanguage(models.Model):
 
         """
         v = self.latest_version(public_only=public_only)
+
         if v:
             title = v.title
         elif self.standard_language:
@@ -938,7 +939,15 @@ class SubtitleLanguage(models.Model):
 
         """
         v = self.latest_version(public_only=public_only)
-        return v.description if v else self.video.description
+
+        if v:
+            description = v.description
+        elif self.standard_language:
+            description = self.standard_language.get_description()
+        else:
+            description = self.video.description
+
+        return description
 
     def get_description_display(self):
         """Return a suitable description to display to a user for this language.
