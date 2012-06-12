@@ -1268,9 +1268,6 @@ class SubtitleVersionManager(models.Manager):
                 original_subs = list(translated_from.version().subtitle_set.order_by("subtitle_order"))
                 forked_from = translated_from.version()
 
-        if original_subs and len(parser) > len(original_subs):
-            raise Exception(_(u"Your subtitles don't match the translation"))
-
         version = SubtitleVersion(
                 language=language, version_no=version_no, note=note,
                 is_forked=forked, time_change=1, text_change=1,
