@@ -51,6 +51,7 @@ from django.core.cache import cache
 from videos.rpc import VideosApiClass
 from utils.rpc import RpcRouter
 from utils.decorators import never_in_prod
+from utils.metrics import Meter
 from utils.translation import get_user_languages_from_request
 from django.utils.http import urlquote_plus
 from videos.tasks import video_changed_tasks
@@ -673,6 +674,7 @@ def video_url_create(request):
                 'domain': Site.objects.get_current().domain,
                 'hash': user.hash_for_video(video.video_id)
             }
+            Meter('templated-emails-sent-by-type.videos.video-url-added').inc()
             send_templated_email(user, subject,
                                  'videos/email_video_url_add.html',
                                  context, fail_silently=not settings.DEBUG)

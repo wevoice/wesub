@@ -38,6 +38,7 @@ from teams.signals import (
 from uslogging.models import WidgetDialogLog
 from utils import send_templated_email
 from utils.forms import flatten_errorlists
+from utils.metrics import Meter
 from utils.translation import get_user_languages_from_request
 from videos import models
 from videos.tasks import video_changed_tasks
@@ -71,6 +72,7 @@ class Rpc(BaseRpc):
             browser_id=request.browser_id,
             log=log)
         dialog_log.save()
+        Meter('templated-emails-sent-by-type.subtitle-save-failure').inc()
         send_templated_email(
             settings.WIDGET_LOG_EMAIL,
             'Subtitle save failure',
