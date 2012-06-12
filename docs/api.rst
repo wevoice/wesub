@@ -649,7 +649,7 @@ Task detail:
 
 .. http:get:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
 
-Create a new project:
+Create a new task:
 
 .. http:post:: /api2/partners/teams/[team-slug]/tasks/
 
@@ -679,6 +679,8 @@ Fields
     * ``Translate``
     * ``Review``
     * ``Approve``
+* ``version_no`` - Subtitle version number (required for ``Approve`` and
+  ``Review`` tasks)
 
 An example response:
 

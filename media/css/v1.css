@@ -1634,6 +1634,9 @@ ol.subtitles li .quiet {
   position: absolute;
   top: 1em;
 }
+ol.subtitles.is_rtl li div.translation-text {
+  direction: rtl;
+}
 
 div#rollback-button {
   padding: 20px 12px;
