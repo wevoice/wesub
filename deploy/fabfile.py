@@ -773,6 +773,12 @@ def _save_embedjs_on_app_servers():
     else:
         env.host_string = DEV_HOST
         base_dir = env.web_dir
+    # we need to update the rep for the admin host, else
+    # we'll end up with an old STATIC_URL, we should fix this with
+    # the corect layouts for each server (and stop all special casing
+    # for each env)
+    with cd(os.path.join(base_dir, 'unisubs')):
+        _git_pull()
 
     with cd(os.path.join(base_dir, 'unisubs')):
         python_exe = '{0}/env/bin/python'.format(base_dir)
