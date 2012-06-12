@@ -1073,8 +1073,8 @@ class Rpc(BaseRpc):
             is_latest,
             version.is_forked or force_forked,
             base_language,
-            base_language.get_title() if base_language else language.get_title(public_only=False),
-            base_language.get_description() if base_language else language.get_description(public_only=False),
+            language.get_title(public_only=False),
+            language.get_description(public_only=False),
             language.is_rtl(),
             language.video.is_moderated,
         )
