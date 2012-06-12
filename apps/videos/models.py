@@ -909,7 +909,15 @@ class SubtitleLanguage(models.Model):
 
         """
         v = self.latest_version(public_only=public_only)
-        return v.title if v else self.video.title
+
+        if v:
+            title = v.title
+        elif self.standard_language:
+            title = self.standard_language.get_title()
+        else:
+            title = self.video.title
+
+        return title
 
     def get_title_display(self):
         """Return a suitable title to display to a user for this language.
@@ -931,7 +939,15 @@ class SubtitleLanguage(models.Model):
 
         """
         v = self.latest_version(public_only=public_only)
-        return v.description if v else self.video.description
+
+        if v:
+            description = v.description
+        elif self.standard_language:
+            description = self.standard_language.get_description()
+        else:
+            description = self.video.description
+
+        return description
 
     def get_description_display(self):
         """Return a suitable description to display to a user for this language.
@@ -1260,9 +1276,6 @@ class SubtitleVersionManager(models.Manager):
             if translated_from and translated_from.version():
                 original_subs = list(translated_from.version().subtitle_set.order_by("subtitle_order"))
                 forked_from = translated_from.version()
-
-        if original_subs and len(parser) > len(original_subs):
-            raise Exception(_(u"Your subtitles don't match the translation"))
 
         version = SubtitleVersion(
                 language=language, version_no=version_no, note=note,
