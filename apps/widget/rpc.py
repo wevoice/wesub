@@ -771,6 +771,11 @@ class Rpc(BaseRpc):
         if not team_video:
             return UNMODERATED, False
 
+        workflow = Workflow.get_for_team_video(team_video)
+
+        if not workflow.approve_enabled and not workflow.review_enabled:
+            return UNMODERATED, False
+
         # If there are any open team tasks for this video/language, it needs to
         # be kept under moderation.
         tasks = team_video.task_set.incomplete().filter(
