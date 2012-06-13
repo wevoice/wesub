@@ -1588,21 +1588,15 @@ class Task(models.Model):
         NOTE: This function does not modify the *current* task in any way.
 
         """
-        if self.review_base_version:
-            # Hopefully we have a valid base version saved and can send it back
-            # to the author of that version.
-            assignee = self.review_base_version.user
-        else:
-            # Otherwise we'll guess based on the last sub/trans task.
-            previous_task = Task.objects.complete().filter(
-                team_video=self.team_video, language=self.language, team=self.team,
-                type__in=(Task.TYPE_IDS['Subtitle'], Task.TYPE_IDS['Translate'])
-            ).order_by('-completed')[:1]
+        previous_task = Task.objects.complete().filter(
+            team_video=self.team_video, language=self.language, team=self.team,
+            type__in=(Task.TYPE_IDS['Subtitle'], Task.TYPE_IDS['Translate'])
+        ).order_by('-completed')[:1]
 
-            if previous_task:
-                assignee = previous_task[0].assignee
-            else:
-                assignee = None
+        if previous_task:
+            assignee = previous_task[0].assignee
+        else:
+            assignee = None
 
         # The target assignee may have left the team in the mean time.
         if not self.team.members.filter(user=assignee).exists():
