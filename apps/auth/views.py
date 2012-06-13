@@ -152,11 +152,13 @@ def token_login(request, token):
 def render_login(request, user_creation_form, login_form, redirect_to):
     redirect_to = redirect_to or '/'
     ted_auth = get_authentication_provider('ted')
+    stanford_auth = get_authentication_provider('stanford')
     return render_to_response(
         'auth/login.html', {
             'creation_form': user_creation_form,
             'login_form' : login_form,
             'ted_auth': ted_auth,
+            'stanford_auth': stanford_auth,
             REDIRECT_FIELD_NAME: redirect_to,
             }, context_instance=RequestContext(request))
 
