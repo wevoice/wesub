@@ -1875,7 +1875,7 @@ class ActionRenderer(object):
         data = {}
         # deleted videos event have no video obj
         if item.video:
-            data['video_url']= item.video.get_absolute_url(),
+            data['video_url']= item.video.get_absolute_url()
             data['video_name'] = unicode(item.video)
         if item.language:
             data['language'] = item.language.language_display()
