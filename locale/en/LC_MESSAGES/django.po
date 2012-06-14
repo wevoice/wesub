@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-13 01:32-0500\n"
+"POT-Creation-Date: 2012-06-14 01:33-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1607,7 +1607,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:901 apps/widget/rpc.py:942
+#: apps/widget/rpc.py:906 apps/widget/rpc.py:947
 msgid "\n"
 msgstr ""
 
