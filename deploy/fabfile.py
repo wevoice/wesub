@@ -212,8 +212,6 @@ def production(username):
                     hosts                 = ['pcf-us-cluster3.pculture.org:2191',
                                              'pcf-us-cluster4.pculture.org:2191',
                                              'pcf-us-cluster5.pculture.org:2191',
-                                             'pcf-us-cluster6.pculture.org:2191',
-                                             'pcf-us-cluster7.pculture.org:2191',
                                              'pcf-us-cluster8.pculture.org:2191',
                                              'pcf-us-cluster9.pculture.org:2191',
                                              'pcf-us-cluster10.pculture.org:2191',

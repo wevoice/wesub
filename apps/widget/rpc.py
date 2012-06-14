@@ -729,8 +729,9 @@ class Rpc(BaseRpc):
             return
 
         language = subtitle_version.language.language
-        transcribe_task = team_video.task_set.incomplete_subtitle_or_translate()\
-                                     .filter(language=language)
+
+        # if there's any incomplete task, we can't create yet another.
+        transcribe_task = team_video.task_set.incomplete().filter(language=language)
 
         if transcribe_task.exists():
             return
@@ -769,6 +770,11 @@ class Rpc(BaseRpc):
         team_video = sl.video.get_team_video()
 
         if not team_video:
+            return UNMODERATED, False
+
+        workflow = Workflow.get_for_team_video(team_video)
+
+        if not workflow.approve_enabled and not workflow.review_enabled:
             return UNMODERATED, False
 
         # If there are any open team tasks for this video/language, it needs to
