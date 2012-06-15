@@ -141,24 +141,7 @@ class UserUUIDMiddleware(object):
         return response
 
 
-class SupeuserDebugToolbarMiddleware(DebugToolbarMiddleware):
-
-    def _show_toolbar(self, request):
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', None)
-        if x_forwarded_for:
-            remote_addr = x_forwarded_for.split(',')[0].strip()
-        else:
-            remote_addr = request.META.get('REMOTE_ADDR', None)
-        if (not remote_addr in settings.INTERNAL_IPS and not request.user.is_superuser) \
-            or (request.is_ajax() and \
-                not debug_toolbar.urls._PREFIX in request.path) \
-                    or not settings.DEBUG:
-            return False
-        return True
-
-
 # I'm so sorry about this.
-
 class MetricsCursorWrapper(_CursorWrapper):
     def _query_type(self, query):
         if not query:
