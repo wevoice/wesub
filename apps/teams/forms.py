@@ -726,7 +726,7 @@ class UploadDraftForm(forms.Form):
         video = task.team_video.video
         language_to_translate = self.cleaned_data['translate_from']
 
-        if (task.assignee and task.assignee != self.user) or (not task.assignee and not can_assign_task(task, self.user)):
+        if not task.assignee:
             task.assignee = self.user
 
         if task.language:
@@ -755,7 +755,7 @@ class UploadDraftForm(forms.Form):
                     language = self._save_new_language(video, video_language, translated_from)
 
         # if the language has dependents, check if the transcript is smaller so we don't lose subtitles
-        if language.is_original() or language.is_forked:
+        if language.is_original or language.is_forked:
             if version and SubtitleLanguage.objects.filter(standard_language=language).exists():
                 if len(self._parser) < version.subtitle_set.count():
                     raise Exception(_(u"Sorry, we couldn't upload your file because it has fewer lines ({0}) than the previous version ({1}).".format(len(self._parser), version.subtitle_set.count())))
