@@ -1,19 +1,19 @@
 # Amara, universalsubtitles.org
-# 
+#
 # Copyright (C) 2012 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.shortcuts import render_to_response, get_object_or_404
@@ -45,7 +45,7 @@ try:
     import oboe
 except ImportError:
     oboe = None
-    
+
 def print_last_exception():
     """
     this can be useful for asynchronous tasks debuging
@@ -87,10 +87,10 @@ def render_to(template):
 def render_to_json(func):
     def wrapper(request, *args, **kwargs):
         result = func(request, *args, **kwargs)
-        
+
         if isinstance(result, HttpResponse):
             return result
-        
+
         json = simplejson.dumps(result, cls=DjangoJSONEncoder)
         return HttpResponse(json, mimetype="application/json")
     return update_wrapper(wrapper, func)
@@ -112,7 +112,7 @@ def get_page(request):
 
 def get_pager(objects, on_page=15, page='1', orphans=0):
     from django.core.paginator import Paginator, InvalidPage, EmptyPage
-    
+
     paginator = Paginator(objects, on_page, orphans=orphans)
     try:
         page = paginator.page(int(page))
@@ -120,7 +120,7 @@ def get_pager(objects, on_page=15, page='1', orphans=0):
         page = paginator.page(paginator.num_pages)
     return page
 
-def send_templated_email(to, subject, body_template, body_dict, 
+def send_templated_email(to, subject, body_template, body_dict,
                          from_email=None, ct="html", fail_silently=False, check_user_preference=True):
     """
     Sends an html email with a template name and a rendering context.
@@ -131,7 +131,7 @@ def send_templated_email(to, subject, body_template, body_dict,
              situations where you must send the email, for example on
              password retrivals.
     """
-    from auth.models import CustomUser 
+    from auth.models import CustomUser
     from django.contrib.auth.models import User
     to_unchecked = to
     if not isinstance(to_unchecked, list):
@@ -207,7 +207,7 @@ def log_exception(exceptions, logger='root', ignore=False):
                 frame = exec_info[2].tb_frame.f_back
                 file_name = inspect.getfile(log_exception_wrapper)
                 func_name = 'log_exception_wrapper'
-                
+
                 #check if func is called by other wrapped function
                 #we should not catch execption in this case, because other function
                 #can be waiting for it. Really exception can be caught by any not
@@ -217,9 +217,9 @@ def log_exception(exceptions, logger='root', ignore=False):
                         if not hasattr(e, '_traceback'):
                             e._traceback = exec_info[2]
                         raise e
-                        
+
                     frame = frame.f_back
-                    
+
                 data = {
                     'stack': traceback.extract_stack()
                 }
@@ -229,7 +229,7 @@ def log_exception(exceptions, logger='root', ignore=False):
                 client.create_from_exception(exec_info, logger=logger, data=data)
                 if not ignore:
                     raise e
-            
+
         return update_wrapper(log_exception_wrapper, func)
     return log_exception_func
 
@@ -237,47 +237,47 @@ import inspect
 
 class LogExceptionsMetaclass(type):
     """
-    This is metaclass for wrapping all method of class with log_exception. 
+    This is metaclass for wrapping all method of class with log_exception.
     __log_exceptionsr attribute of class should ontain tuple of exceptions
     __log_exceptions_logger_name can contain name of logger of Sentry
     __log_exceptions_ignore - set it if exceptions should be logged without 500
-    
+
     Used, for example, in amazonsqs_backend. We are not sure how it is a little
     unpredictable, so we wish log any error. Celery, witch use amazonsqs_backend,
     does not allow catch anything.
     """
-    
+
     def __new__(cls, name, bases, attrs):
         exc_setting_name = '_%s__log_exceptions' % name
         logger_setting_name = '_%s__log_exceptions_logger_name' % name
         ignore_settings_name = '_%s__log_exceptions_ignore' % name
-        
+
         kwargs = {
             'exceptions': Exception
         }
-        
+
         if ignore_settings_name in attrs:
             kwargs['ignore'] = attrs[ignore_settings_name]
             del attrs[ignore_settings_name]
-        
+
         if exc_setting_name in attrs:
             kwargs['exceptions'] = attrs[exc_setting_name]
             del attrs[exc_setting_name]
-        
+
         if logger_setting_name in attrs:
             kwargs['logger'] = attrs[logger_setting_name]
             del attrs[logger_setting_name]
-            
+
         log_exception_wrapper = log_exception(**kwargs)
-        
+
         for n, v in attrs.items():
             if inspect.isfunction(v):
                 attrs[n] = log_exception_wrapper(v)
-        
+
         for base in bases:
             for n, v in base.__dict__.items():
                 if not n in attrs and inspect.isfunction(v):
                     attrs[n] = log_exception_wrapper(v)
-                    
+
         new_class = super(LogExceptionsMetaclass, cls).__new__(cls, name, bases, attrs)
-        return new_class    
+        return new_class
