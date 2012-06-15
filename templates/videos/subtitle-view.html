@@ -218,14 +218,14 @@
                         </li>
                         {% for item in last_version.ordered_subtitles %}
                         <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
-                            {% if item.display_time %}
+                            {% if item.has_start_time %}
                             <div class="timing">
                                 <a class="time_link" href="#" title="Play video here">
                                     <span class="data">{{ item.start_time }}</span>
-                                    {{ item.display_time }}
-                                    {% if item.display_end_time %}
+                                    {{ item.start_time|format_sub_time }}
+                                    {% if item.has_end_time %}
                                     –
-                                    {{ item.display_end_time }}
+                                    {{ item.end_time|format_sub_time }}
                                     {% endif %}
                                 </a>
                             </div>
