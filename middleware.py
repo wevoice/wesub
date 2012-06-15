@@ -24,7 +24,6 @@ SECTIONS = {
 
 
 class SaveUserIp(object):
-
     def process_request(self, request):
         if request.user.is_authenticated():
             ip = request.META.get('REMOTE_ADDR', '')
@@ -117,7 +116,6 @@ def _get_new_csrf_key():
                 % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY)).hexdigest()
 
 class UserUUIDMiddleware(object):
-
     def process_request(self, request):
         try:
             request.browser_id = request.COOKIES[UUID_COOKIE_NAME]
@@ -141,11 +139,6 @@ class UserUUIDMiddleware(object):
         # Content varies with the CSRF cookie, so set the Vary header.
         patch_vary_headers(response, ('Cookie',))
         return response
-
-class ExceptionLoggingMiddleware(object):
-    def process_exception(self, request, exception):
-        import traceback
-        print traceback.format_exc()
 
 
 class SupeuserDebugToolbarMiddleware(DebugToolbarMiddleware):
