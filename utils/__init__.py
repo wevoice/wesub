@@ -25,14 +25,6 @@ from django.utils.functional import update_wrapper
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
-from django.utils import simplejson as json
-from django.core.mail import mail_admins
-from django.conf import settings
-import re
-import htmllib
-from subtitles import SubtitleParserError, SubtitleParser, TxtSubtitleParser, YoutubeSubtitleParser, \
-    TtmlSubtitleParser, SrtSubtitleParser, SbvSubtitleParser, SsaSubtitleParser, YoutubeXMLParser, \
-    DfxpSubtitleParser
 import traceback, sys
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.models import Site
@@ -50,8 +42,6 @@ def print_last_exception():
     """
     this can be useful for asynchronous tasks debuging
     """
-    import sys
-    import traceback
     print '\n'.join(traceback.format_exception(*sys.exc_info()))
 
 def is_staff(user):
@@ -184,7 +174,7 @@ def catch_exception(exceptions, subject="", default=None, ignore=False):
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
-            except exceptions, e:
+            except exceptions:
                 if not ignore:
                     client.create_from_exception(sys.exc_info())
                 return default
@@ -232,8 +222,6 @@ def log_exception(exceptions, logger='root', ignore=False):
 
         return update_wrapper(log_exception_wrapper, func)
     return log_exception_func
-
-import inspect
 
 class LogExceptionsMetaclass(type):
     """
