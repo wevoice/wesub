@@ -1,9 +1,11 @@
 (function(window, document, undefined) {
 
-    // When the embedder is compiled, Underscore.js will be loaded directly before this
-    // function. Remap _ to private variable __ and use noConflict() to set _ back to
-    // its previous owner.
+    // When the embedder is compiled, dependencies will be loaded directly before this
+    // function. Set dependencies to use no-conflict mode if possible.
     var __ = _.noConflict();
+    var _$ = Zepto;
+    var _Backbone = Backbone.noConflict();
+    var _Popcorn = Popcorn.noConflict();
 
     // _amara may exist with a queue of actions that need to be processed after the
     // embedder has finally loaded. Store the queue in toPush for processing in init().
