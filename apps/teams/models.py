@@ -1694,6 +1694,7 @@ class Task(models.Model):
                         review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'],
                         assignee=self._find_previous_assignee('Review'))
+            task.set_expiration()
             task.save()
         elif self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
@@ -1701,6 +1702,7 @@ class Task(models.Model):
                         review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'],
                         assignee=self._find_previous_assignee('Approve'))
+            task.set_expiration()
             task.save()
         else:
             # Subtitle task is done, and there is no approval or review
@@ -1729,6 +1731,7 @@ class Task(models.Model):
                         review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'],
                         assignee=self._find_previous_assignee('Review'))
+            task.set_expiration()
             task.save()
         elif self.workflow.approve_enabled:
             # The review step may be disabled.  If so, we check the approve step.
@@ -1737,6 +1740,7 @@ class Task(models.Model):
                         review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'],
                         assignee=self._find_previous_assignee('Approve'))
+            task.set_expiration()
             task.save()
         else:
             # Translation task is done, and there is no approval or review
@@ -1769,6 +1773,7 @@ class Task(models.Model):
                             review_base_version=self.subtitle_version,
                             language=self.language, type=Task.TYPE_IDS['Approve'],
                             assignee=self._find_previous_assignee('Approve'))
+                task.set_expiration()
                 task.save()
                 # approval review
                 notifier.reviewed_and_pending_approval.delay(self.pk)
