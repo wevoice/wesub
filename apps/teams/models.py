@@ -1625,6 +1625,8 @@ class Task(models.Model):
         if type == Task.TYPE_IDS['Review']:
             task.subtitle_version = self.subtitle_version
 
+        task.set_expiration()
+
         task.save()
 
         if sends_notification:
