@@ -1867,7 +1867,7 @@ class Task(models.Model):
         Requires that self.team and self.assignee be set correctly.
 
         """
-        if not self.team.task_expiration or not self.assignee:
+        if not self.assignee or not self.team.task_expiration:
             self.expiration_date = None
         else:
             limit = datetime.timedelta(days=self.team.task_expiration)
