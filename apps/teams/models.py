@@ -1592,13 +1592,14 @@ class Task(models.Model):
         # to the first step (translate/subtitle) go to the 
         # step before this one:
         # Translate/Subtitle -> Review -> Approve
-        if self.type == Task.TYPE_IDS['Review']:
+        # also, you can just send back approve and review tasks.
+        if self.type == Task.TYPE_IDS['Approve'] and self.workflow.review_enabled:
+            type = Task.TYPE_IDS['Review']
+        else:
             if self.subtitle_version.language.is_original:
                 type = Task.TYPE_IDS['Subtitle']
             else:
                 type = Task.TYPE_IDS['Translate']
-        elif self.type == Task.TYPE_IDS['Approve']:
-            type = Task.TYPE_IDS['Review']
 
         # let's guess which assignee should we use
         # by finding the last user that did this task type
