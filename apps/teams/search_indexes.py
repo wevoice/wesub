@@ -56,7 +56,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
     title = CharField()
     project_name = CharField(indexed=False)
     project_slug = CharField(indexed=False)
-    description = CharField(indexed=False)
+    description = CharField(indexed=True)
     is_complete = BooleanField()
     video_complete_date = DateTimeField(null=True)
     # list of completed language codes

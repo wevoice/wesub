@@ -98,6 +98,7 @@ DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
 
 
+# Management
 def index(request, my_teams=False):
     q = request.REQUEST.get('q')
 
@@ -149,175 +150,6 @@ def index(request, my_teams=False):
                        template_name='teams/teams-list.html',
                        template_object_name='teams',
                        extra_context=extra_context)
-
-@timefn
-@render_to('teams/videos-list.html')
-def detail(request, slug, project_slug=None, languages=None):
-    team = Team.get(slug, request.user)
-    filtered = 0
-
-    if project_slug is not None:
-        project = get_object_or_404(Project, team=team, slug=project_slug)
-    else:
-        project = None
-
-    query = request.GET.get('q')
-    sort = request.GET.get('sort')
-    language = request.GET.get('lang')
-
-    if language:
-        filtered = filtered + 1
-
-    if language != 'none':
-        qs = team.get_videos_for_languages_haystack(
-             language, user=request.user, project=project, query=query, sort=sort)
-    else:
-        qs = team.get_videos_for_languages_haystack(
-             num_completed_langs=0, user=request.user, project=project, query=query, sort=sort)
-
-    extra_context = widget.add_onsite_js_files({})
-
-    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(
-        None, user=request.user, project=None, query=None, sort=sort).count()
-
-    extra_context.update({
-        'team': team,
-        'project':project,
-        'can_add_video': can_add_video(team, request.user, project),
-        'can_edit_videos': can_add_video(team, request.user, project),
-        'filtered': filtered
-    })
-
-    if extra_context['can_add_video'] or extra_context['can_edit_videos']:
-        # Cheat and reduce the number of videos on the page if we're dealing with
-        # someone who can edit videos in the team, for performance reasons.
-        is_editor = True
-        per_page = 8
-    else:
-        is_editor = False
-        per_page = VIDEOS_ON_PAGE
-
-    general_settings = {}
-    add_general_settings(request, general_settings)
-    extra_context['general_settings'] = json.dumps(general_settings)
-
-    if team.video:
-        extra_context['widget_params'] = base_widget_params(request, {
-            'video_url': team.video.get_video_url(),
-            'base_state': {}
-        })
-
-    readable_langs = TeamLanguagePreference.objects.get_readable(team)
-    language_choices = [(code, name) for code, name in get_language_choices()
-                        if code in readable_langs]
-
-    extra_context['language_choices'] = language_choices
-    extra_context['query'] = query
-
-    sort_names = {
-        'name': 'Name, A-Z',
-        '-name': 'Name, Z-A',
-        'time': 'Time, Oldest',
-        '-time': 'Time, Newest',
-        'subs': 'Subtitles, Least',
-        '-subs': 'Subtitles, Most',
-    }
-    if sort:
-        extra_context['order_name'] = sort_names[sort]
-    else:
-        extra_context['order_name'] = sort_names['-time']
-
-    extra_context['current_videos_count'] = qs.count()
-    extra_context['filtered'] = filtered
-
-    team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
-    extra_context.update(pagination_info)
-    extra_context['team_video_md_list'] = team_video_md_list
-    extra_context['team_workflows'] = list(
-        Workflow.objects.filter(team=team.id)
-                        .select_related('project', 'team', 'team_video'))
-
-    if not filtered and not query:
-        if project:
-            is_indexing = project.videos_count != extra_context['current_videos_count']
-        else:
-            is_indexing = team.videos.all().count() != extra_context['current_videos_count']
-        extra_context['is_indexing'] = is_indexing
-
-    if is_editor:
-        team_video_ids = [record.team_video_pk for record in team_video_md_list]
-        team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
-        team_videos = dict((tv.pk, tv) for tv in team_videos)
-        for record in team_video_md_list:
-            if record:
-                record._team_video = team_videos.get(record.team_video_pk)
-                if record._team_video:
-                    record._team_video.original_language_code = record.original_language
-                    record._team_video.completed_langs = record.video_completed_langs
-
-    return extra_context
-
-def role_saved(request, slug):
-    messages.success(request, _(u'Member saved.'))
-    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
-    return HttpResponseRedirect(return_path)
-
-def completed_videos(request, slug):
-    team = Team.get(slug, request.user)
-    if team.is_member(request.user):
-        qs  = TeamVideoLanguagesIndex.results_for_members(team)
-    else:
-        qs = TeamVideoLanguagesIndex.results()
-    qs = qs.filter(team_id=team.id).filter(is_complete=True).order_by('-video_complete_date')
-
-    extra_context = widget.add_onsite_js_files({})
-    extra_context.update({
-        'team': team
-    })
-
-    if team.video:
-        extra_context['widget_params'] = base_widget_params(request, {
-            'video_url': team.video.get_video_url(),
-            'base_state': {}
-        })
-
-    return object_list(request, queryset=qs,
-                       paginate_by=VIDEOS_ON_PAGE,
-                       template_name='teams/completed_videos.html',
-                       extra_context=extra_context,
-                       template_object_name='team_video')
-
-@timefn
-@render_to('teams/activity.html')
-def activity(request, slug):
-    team = Team.get(slug, request.user)
-
-    try:
-        user = request.user if request.user.is_authenticated() else None
-        member = team.members.get(user=user) if user else None
-    except TeamMember.DoesNotExist:
-        member = False
-
-    public_only = False if member else True
-
-    # This section is here to work around MySQL's poor decisions.
-    #
-    # Much like the Tasks page, this query performs extremely poorly when run
-    # normally.  So we split it into two parts here so that each will run fast.
-    action_ids = Action.objects.for_team(team, public_only=public_only, ids=True)
-    action_ids, pagination_info = paginate(action_ids, ACTIONS_ON_PAGE,
-                                           request.GET.get('page'))
-    action_ids = list(action_ids)
-
-    activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
-            'video', 'user', 'language', 'language__video'
-    ).order_by())
-    activity_list.sort(key=lambda a: action_ids.index(a.pk))
-
-    context = { 'activity_list': activity_list, 'team': team }
-    context.update(pagination_info)
-
-    return context
 
 @render_to('teams/create.html')
 @staff_member_required
@@ -548,6 +380,113 @@ def settings_languages(request, slug):
 
 
 # Videos
+@timefn
+@render_to('teams/videos-list.html')
+def detail(request, slug, project_slug=None, languages=None):
+    team = Team.get(slug, request.user)
+    filtered = 0
+
+    if project_slug is not None:
+        project = get_object_or_404(Project, team=team, slug=project_slug)
+    else:
+        project = None
+
+    query = request.GET.get('q')
+    sort = request.GET.get('sort')
+    language = request.GET.get('lang')
+
+    if language:
+        filtered = filtered + 1
+
+    if language != 'none':
+        qs = team.get_videos_for_languages_haystack(
+             language, user=request.user, project=project, query=query, sort=sort)
+    else:
+        qs = team.get_videos_for_languages_haystack(
+             num_completed_langs=0, user=request.user, project=project, query=query, sort=sort)
+
+    extra_context = widget.add_onsite_js_files({})
+
+    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(
+        None, user=request.user, project=None, query=None, sort=sort).count()
+
+    extra_context.update({
+        'team': team,
+        'project':project,
+        'can_add_video': can_add_video(team, request.user, project),
+        'can_edit_videos': can_add_video(team, request.user, project),
+        'filtered': filtered
+    })
+
+    if extra_context['can_add_video'] or extra_context['can_edit_videos']:
+        # Cheat and reduce the number of videos on the page if we're dealing with
+        # someone who can edit videos in the team, for performance reasons.
+        is_editor = True
+        per_page = 8
+    else:
+        is_editor = False
+        per_page = VIDEOS_ON_PAGE
+
+    general_settings = {}
+    add_general_settings(request, general_settings)
+    extra_context['general_settings'] = json.dumps(general_settings)
+
+    if team.video:
+        extra_context['widget_params'] = base_widget_params(request, {
+            'video_url': team.video.get_video_url(),
+            'base_state': {}
+        })
+
+    readable_langs = TeamLanguagePreference.objects.get_readable(team)
+    language_choices = [(code, name) for code, name in get_language_choices()
+                        if code in readable_langs]
+
+    extra_context['language_choices'] = language_choices
+    extra_context['query'] = query
+
+    sort_names = {
+        'name': 'Name, A-Z',
+        '-name': 'Name, Z-A',
+        'time': 'Time, Oldest',
+        '-time': 'Time, Newest',
+        'subs': 'Subtitles, Least',
+        '-subs': 'Subtitles, Most',
+    }
+    if sort:
+        extra_context['order_name'] = sort_names[sort]
+    else:
+        extra_context['order_name'] = sort_names['-time']
+
+    extra_context['current_videos_count'] = qs.count()
+    extra_context['filtered'] = filtered
+
+    team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
+    extra_context.update(pagination_info)
+    extra_context['team_video_md_list'] = team_video_md_list
+    extra_context['team_workflows'] = list(
+        Workflow.objects.filter(team=team.id)
+                        .select_related('project', 'team', 'team_video'))
+
+    if not filtered and not query:
+        if project:
+            is_indexing = project.videos_count != extra_context['current_videos_count']
+        else:
+            is_indexing = team.videos.all().count() != extra_context['current_videos_count']
+        extra_context['is_indexing'] = is_indexing
+
+    if is_editor:
+        team_video_ids = [record.team_video_pk for record in team_video_md_list]
+        team_videos = list(TeamVideo.objects.filter(id__in=team_video_ids).select_related('video', 'team', 'project'))
+        team_videos = dict((tv.pk, tv) for tv in team_videos)
+        for record in team_video_md_list:
+            if record:
+                record._team_video = team_videos.get(record.team_video_pk)
+                if record._team_video:
+                    record._team_video.original_language_code = record.original_language
+                    record._team_video.completed_langs = record.video_completed_langs
+
+    return extra_context
+
 @render_to('teams/add_video.html')
 @login_required
 def add_video(request, slug):
@@ -696,6 +635,37 @@ def remove_video(request, team_video_pk):
         messages.success(request, msg)
         return HttpResponseRedirect(next)
 
+@timefn
+@render_to('teams/activity.html')
+def activity(request, slug):
+    team = Team.get(slug, request.user)
+
+    try:
+        user = request.user if request.user.is_authenticated() else None
+        member = team.members.get(user=user) if user else None
+    except TeamMember.DoesNotExist:
+        member = False
+
+    public_only = False if member else True
+
+    # This section is here to work around MySQL's poor decisions.
+    #
+    # Much like the Tasks page, this query performs extremely poorly when run
+    # normally.  So we split it into two parts here so that each will run fast.
+    action_ids = Action.objects.for_team(team, public_only=public_only, ids=True)
+    action_ids, pagination_info = paginate(action_ids, ACTIONS_ON_PAGE,
+                                           request.GET.get('page'))
+    action_ids = list(action_ids)
+
+    activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
+            'video', 'user', 'language', 'language__video'
+    ).order_by())
+    activity_list.sort(key=lambda a: action_ids.index(a.pk))
+
+    context = { 'activity_list': activity_list, 'team': team }
+    context.update(pagination_info)
+
+    return context
 
 # Members
 @timefn
@@ -988,6 +958,11 @@ def search_members(request, slug):
 
     return { 'results': results }
 
+def role_saved(request, slug):
+    messages.success(request, _(u'Member saved.'))
+    return_path = reverse('teams:detail_members', args=[], kwargs={'slug': slug})
+    return HttpResponseRedirect(return_path)
+
 
 # Tasks
 def _get_or_create_workflow(team_slug, project_id, team_video_id):
@@ -1111,16 +1086,20 @@ def _tasks_list(request, team, project, filters, user):
 
 def _order_tasks(request, tasks):
     sort = request.GET.get('sort', '-created')
-
+    # Most teams won't use priorities. For those who do, that should be
+    # the default sorting.
+    order_clause = ["-priority"]
     if sort == 'created':
-        tasks = tasks.order_by('created')
+        order_clause.append('created')
     elif sort == '-created':
-        tasks = tasks.order_by('-created')
+        order_clause.append('-created')
     elif sort == 'expires':
-        tasks = tasks.exclude(expiration_date=None).order_by('expiration_date')
+        tasks = tasks.exclude(expiration_date=None)
+        order_clause.append('expiration_date')
     elif sort == '-expires':
-        tasks = tasks.exclude(expiration_date=None).order_by('-expiration_date')
-
+        tasks = tasks.exclude(expiration_date=None)
+        order_clause.append('-expiration_date')
+    tasks = tasks.order_by(*order_clause)
     return tasks
 
 def _get_task_filters(request):

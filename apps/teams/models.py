@@ -441,7 +441,7 @@ class Team(models.Model):
 
         if query:
             for term in get_terms(query):
-                qs = qs.filter(video_title__icontains=qs.query.clean(term))
+                qs = qs.auto_query(qs.query.clean(term))
 
         if language:
             qs = qs.filter(video_completed_langs=language)
@@ -722,6 +722,7 @@ class TeamVideo(models.Model):
         """
         # these imports are here to avoid circular imports, hacky
         from teams.signals import api_teamvideo_new
+        from teams.signals import video_moved_from_team_to_team
         from videos import metadata_manager
         # For now, we'll just delete any tasks associated with the moved video.
         self.task_set.update(deleted=True)
@@ -770,6 +771,8 @@ class TeamVideo(models.Model):
 
         # fire a http notification that a new video has hit this team:
         api_teamvideo_new.send(self)
+        video_moved_from_team_to_team.send(sender=self,
+                destination_team=new_team, video=self.video)
 
 
 def _create_translation_tasks(team_video, subtitle_version):
@@ -1585,38 +1588,46 @@ class Task(models.Model):
         NOTE: This function does not modify the *current* task in any way.
 
         """
-        if self.review_base_version:
-            # Hopefully we have a valid base version saved and can send it back
-            # to the author of that version.
-            assignee = self.review_base_version.user
+        # when sending back, instead of always sending back
+        # to the first step (translate/subtitle) go to the 
+        # step before this one:
+        # Translate/Subtitle -> Review -> Approve
+        # also, you can just send back approve and review tasks.
+        if self.type == Task.TYPE_IDS['Approve'] and self.workflow.review_enabled:
+            type = Task.TYPE_IDS['Review']
         else:
-            # Otherwise we'll guess based on the last sub/trans task.
-            previous_task = Task.objects.complete().filter(
-                team_video=self.team_video, language=self.language, team=self.team,
-                type__in=(Task.TYPE_IDS['Subtitle'], Task.TYPE_IDS['Translate'])
-            ).order_by('-completed')[:1]
-
-            if previous_task:
-                assignee = previous_task[0].assignee
+            if self.subtitle_version.language.is_original:
+                type = Task.TYPE_IDS['Subtitle']
             else:
-                assignee = None
+                type = Task.TYPE_IDS['Translate']
+
+        # let's guess which assignee should we use
+        # by finding the last user that did this task type
+        previous_task = Task.objects.complete().filter(
+            team_video=self.team_video, language=self.language, team=self.team, type=type
+        ).order_by('-completed')[:1]
+
+        if previous_task:
+            assignee = previous_task[0].assignee
+        else:
+            assignee = None
 
         # The target assignee may have left the team in the mean time.
         if not self.team.members.filter(user=assignee).exists():
             assignee = None
 
-        if self.subtitle_version.language.is_original:
-            type = Task.TYPE_IDS['Subtitle']
-        else:
-            type = Task.TYPE_IDS['Translate']
-
         # TODO: Shouldn't this be WAITING_MODERATION?
-        self.subtitle_version.moderation_status = UNMODERATED
+        self.subtitle_version.moderation_status = WAITING_MODERATION
         self.subtitle_version.save()
 
         task = Task(team=self.team, team_video=self.team_video,
-                    subtitle_version=self.subtitle_version,
                     language=self.language, type=type, assignee=assignee)
+
+        if type == Task.TYPE_IDS['Review']:
+            task.subtitle_version = self.subtitle_version
+
+        task.set_expiration()
+
         task.save()
 
         if sends_notification:
@@ -1683,6 +1694,7 @@ class Task(models.Model):
                         review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'],
                         assignee=self._find_previous_assignee('Review'))
+            task.set_expiration()
             task.save()
         elif self.workflow.approve_enabled:
             task = Task(team=self.team, team_video=self.team_video,
@@ -1690,6 +1702,7 @@ class Task(models.Model):
                         review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'],
                         assignee=self._find_previous_assignee('Approve'))
+            task.set_expiration()
             task.save()
         else:
             # Subtitle task is done, and there is no approval or review
@@ -1718,6 +1731,7 @@ class Task(models.Model):
                         review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Review'],
                         assignee=self._find_previous_assignee('Review'))
+            task.set_expiration()
             task.save()
         elif self.workflow.approve_enabled:
             # The review step may be disabled.  If so, we check the approve step.
@@ -1726,6 +1740,7 @@ class Task(models.Model):
                         review_base_version=subtitle_version,
                         language=self.language, type=Task.TYPE_IDS['Approve'],
                         assignee=self._find_previous_assignee('Approve'))
+            task.set_expiration()
             task.save()
         else:
             # Translation task is done, and there is no approval or review
@@ -1758,6 +1773,7 @@ class Task(models.Model):
                             review_base_version=self.subtitle_version,
                             language=self.language, type=Task.TYPE_IDS['Approve'],
                             assignee=self._find_previous_assignee('Approve'))
+                task.set_expiration()
                 task.save()
                 # approval review
                 notifier.reviewed_and_pending_approval.delay(self.pk)
@@ -1859,7 +1875,7 @@ class Task(models.Model):
         Requires that self.team and self.assignee be set correctly.
 
         """
-        if not self.team.task_expiration or not self.assignee:
+        if not self.assignee or not self.team.task_expiration:
             self.expiration_date = None
         else:
             limit = datetime.timedelta(days=self.team.task_expiration)
