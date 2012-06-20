@@ -44,7 +44,9 @@ from utils.http import url_exists
 from utils.subtitles import save_subtitle
 from utils.translation import get_language_choices
 from videos.feed_parser import FeedParser
-from videos.models import Video, UserTestResult, SubtitleLanguage, VideoUrl
+from videos.models import (
+    Video, UserTestResult, SubtitleLanguage, VideoUrl, record_workflow_origin
+)
 from videos.tasks import video_changed_tasks, import_videos_from_feeds
 from videos.types import video_type_registrar, VideoTypeError
 from videos.types.youtube import yt_service
@@ -317,11 +319,11 @@ class SubtitlesUploadBaseForm(forms.Form):
 
         # If there are any outstanding tasks for this language, associate the
         # new version with them.
+        # TODO: Refactor all of this out into some kind of generic "add subtitles" pipeline.
         team_video = video.get_team_video()
         if team_video:
             new_version = language.latest_version(public_only=False)
-
-            # TODO: Refactor all of this out into some kind of generic "add subtitles" pipeline.
+            record_workflow_origin(new_version, team_video)
 
             # Determine if we need to moderate these subtitles and create a
             # review/approve task for them.

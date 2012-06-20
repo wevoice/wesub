@@ -38,7 +38,7 @@ from utils.validators import MaxFileSizeValidator
 from videos.forms import AddFromFeedForm
 from videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion,
-        Video, SubtitleLanguage
+        Video, SubtitleLanguage, record_workflow_origin
 )
 from videos.search_indexes import VideoIndex
 
@@ -762,6 +762,10 @@ class UploadDraftForm(forms.Form):
                                                       moderation_status=WAITING_MODERATION,
                                                       translated_from=translated_from,
                                                       note="Uploaded")
+
+        # TODO: Can we please refactor the subtitle pipeline?  This is the third
+        # place we need to do this :(
+        record_workflow_origin(version, task.team_video)
 
         if task.type in (Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']):
             task.subtitle_version = version
