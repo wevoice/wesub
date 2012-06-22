@@ -21,10 +21,10 @@ goog.provide('unisubs.subtitle.TranscribeEntry');
 * @constructor
 * @extends goog.ui.Component
 */
-unisubs.subtitle.TranscribeEntry = function(videoPlayer, isRTL) {
+unisubs.subtitle.TranscribeEntry = function(videoPlayer, languageIsRTL) {
     goog.ui.Component.call(this);
     this.videoPlayer_ = videoPlayer;
-    this.isRTL_ = isRTL;
+    this.languageIsRTL_ = languageIsRTL;
     this.endOfPPlayheadTime_ = null;
 
     this.wasPlaying_ = false;
@@ -48,7 +48,7 @@ unisubs.subtitle.TranscribeEntry.prototype.createDom = function() {
     this.addChild(this.labelInput_ = new goog.ui.Textarea(), true);
     this.labelInput_.getElement().placeholder= 'Type subtitle and press enter';
 
-    if (this.isRTL_) {
+    if (this.languageIsRTL_) {
         this.labelInput_.getElement().dir = 'rtl';
     }
 
