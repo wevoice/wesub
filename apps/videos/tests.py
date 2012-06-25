@@ -80,7 +80,7 @@ Don't show this text it may be used to insert hidden data
 2
 00:00:01,500 --> 00:00:04,500
 SubRip subtitles capability tester 1.2p by ale5000
-<b><i>Use Media Player Classic as reference</i></b>
+<b>Use Media Player Classic as reference</b>
 <font color="#0000FF">This text should be blue</font>
 
 3
@@ -319,7 +319,7 @@ class SubtitleParserTest(TestCase):
             u'Don\'t show this text it may be used to insert hidden data')
         self._assert_sub(
             result[1], 1.5, 4.5,
-            u'SubRip subtitles capability tester 1.2p by ale5000\nUse Media Player Classic as reference\nThis text should be blue')
+            u'SubRip subtitles capability tester 1.2p by ale5000\n**Use Media Player Classic as reference**\nThis text should be blue')
         self._assert_sub(
             result[2], 4.5, 4.5,
             u'Hidden')
@@ -328,7 +328,7 @@ class SubtitleParserTest(TestCase):
             u'This should be an E with an accent: \xc8\n\u65e5\u672c\u8a9e')
         self._assert_sub(
             result[4], 55.501, 58.5,
-            u'Hide these tags: ')
+            u'Hide these tags:')
 
     def test_srt_with_blank(self):
         parser = SrtSubtitleParser(SRT_TEXT_WITH_BLANK)
