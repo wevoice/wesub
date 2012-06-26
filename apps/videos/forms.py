@@ -29,12 +29,11 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from math_captcha.forms import MathCaptchaForm
 
-from teams.models import Task
+from teams.models import Task, Workflow
 from teams.moderation_const import UNMODERATED, WAITING_MODERATION, APPROVED
 from teams.permissions import (
         can_create_and_edit_subtitles, can_assign_task,
-        can_create_and_edit_translations, can_approve,
-        can_publish_edits_immediately
+        can_create_and_edit_translations, can_publish_edits_immediately
 )
 
 from utils.subtitles import ParserList, SubtitleParserError
@@ -323,64 +322,72 @@ class SubtitlesUploadBaseForm(forms.Form):
         # new version with them.
         # TODO: Refactor all of this out into some kind of generic "add subtitles" pipeline.
         team_video = video.get_team_video()
-        if team_video:
-            new_version = language.latest_version(public_only=False)
-            record_workflow_origin(new_version, team_video)
 
-            # Determine if we need to moderate these subtitles and create a
-            # review/approve task for them.
-            workflow = team_video.get_workflow()
-            # user can bypass moderation if:
-            # 1) he is a moderator and
-            # 2) it's a post-publish edit
-            # 3) subtitle is complete
-            can_bypass_moderation = (
-                is_complete
-                and not self._sl_created
-                and can_publish_edits_immediately(team_video, self.user,
-                                                  language.language))
+        if not team_video:
+            return language
 
-            if can_bypass_moderation:
-                new_version.moderate = APPROVED
-            elif workflow.review_allowed or workflow.approve_allowed:
-                new_version.moderation_status = WAITING_MODERATION
+        workflow = Workflow.get_for_team_video(team_video)
+
+        if not workflow.approve_enabled and not workflow.review_enabled:
+            return language
+
+        new_version = language.latest_version(public_only=False)
+        record_workflow_origin(new_version, team_video)
+
+        # Determine if we need to moderate these subtitles and create a
+        # review/approve task for them.
+        workflow = team_video.get_workflow()
+        # user can bypass moderation if:
+        # 1) he is a moderator and
+        # 2) it's a post-publish edit
+        # 3) subtitle is complete
+        can_bypass_moderation = (
+            is_complete
+            and not self._sl_created
+            and can_publish_edits_immediately(team_video, self.user,
+                                              language.language))
+
+        if can_bypass_moderation:
+            new_version.moderate = APPROVED
+        elif workflow.review_allowed or workflow.approve_allowed:
+            new_version.moderation_status = WAITING_MODERATION
+        else:
+            new_version.moderation_status = UNMODERATED
+
+        new_version.save()
+
+        outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
+
+        if outstanding_tasks.exists():
+            if new_version.moderation_status != WAITING_MODERATION:
+                outstanding_tasks.update(subtitle_version=new_version,
+                                         language=language.language)
+        elif not can_bypass_moderation:
+            # we just need to create review/approve/subtitle if the language
+            # is a new one or, if it's a post-publish edit, if the user can't
+            # approve subtitles by himself.
+            task_type = None
+
+            if new_version.is_synced() and is_complete:
+                if workflow.review_allowed:
+                    task_type = Task.TYPE_IDS['Review']
+                elif workflow.approve_allowed:
+                    task_type = Task.TYPE_IDS['Approve']
             else:
-                new_version.moderation_status = UNMODERATED
+                task_type = Task.TYPE_IDS['Subtitle']
 
-            new_version.save()
+            if task_type:
+                task = Task(team=team_video.team, team_video=team_video,
+                            language=language.language, type=task_type,
+                            subtitle_version=new_version)
 
-            outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
-
-            if outstanding_tasks.exists():
-                if new_version.moderation_status != WAITING_MODERATION:
-                    outstanding_tasks.update(subtitle_version=new_version,
-                                             language=language.language)
-            elif not can_bypass_moderation:
-                # we just need to create review/approve/subtitle if the language
-                # is a new one or, if it's a post-publish edit, if the user can't
-                # approve subtitles by himself.
-                task_type = None
-
-                if new_version.is_synced() and is_complete:
-                    if workflow.review_allowed:
-                        task_type = Task.TYPE_IDS['Review']
-                    elif workflow.approve_allowed:
-                        task_type = Task.TYPE_IDS['Approve']
+                if not self._sl_created:
+                    task.assignee = task._find_previous_assignee(Task.TYPE_NAMES[task_type])
                 else:
-                    task_type = Task.TYPE_IDS['Subtitle']
+                    if task_type == Task.TYPE_IDS['Subtitle']:
+                        task.assignee = self.user
 
-                if task_type:
-                    task = Task(team=team_video.team, team_video=team_video,
-                                language=language.language, type=task_type,
-                                subtitle_version=new_version)
-
-                    if not self._sl_created:
-                        task.assignee = task._find_previous_assignee(Task.TYPE_NAMES[task_type])
-                    else:
-                        if task_type == Task.TYPE_IDS['Subtitle']:
-                            task.assignee = self.user
-
-                    task.save()
+                task.save()
 
         return language
 
