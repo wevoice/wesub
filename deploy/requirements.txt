@@ -52,3 +52,5 @@ vendor/django-tastypie-0.9.11.tar.gz
 requests==0.13.1
 rauth==0.4.12
 bernhard==0.0.2
+-e git+https://github.com/jsocol/bleach.git@105b4cfc2f00cc1954bcab3b39b16fbfaf8863e0#egg=bleach
+markdown2==2.0.0
