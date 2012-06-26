@@ -634,6 +634,7 @@ class TeamVideo(models.Model):
     added_by = models.ForeignKey(User)
     created = models.DateTimeField(auto_now_add=True)
     completed_languages = models.ManyToManyField(SubtitleLanguage, blank=True)
+    partner_id = models.CharField(max_length=100, blank=True, default="")
 
     project = models.ForeignKey(Project)
 
