@@ -16,12 +16,12 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import random
-from urllib import urlopen
 
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User as AuthUser
 from django.core.files.base import ContentFile
+import requests
 
 from auth.models import CustomUser as User
 from socialauth.lib import oauthtwitter
@@ -180,7 +180,7 @@ class TwitterBackend(object):
                 first_name, last_name =  screen_name, ''
             user.first_name, user.last_name = first_name, last_name
             if img_url:
-                img = ContentFile(urlopen(img_url).read())
+                img = ContentFile(requests.get(img_url).content)
                 name = img_url.split('/')[-1]
                 user.picture.save(name, img, False)
             #user.email = '%s@twitteruser.%s.com'%(userinfo.screen_name, settings.SITE_NAME)
@@ -230,7 +230,7 @@ class FacebookBackend(object):
 
             img_url = user_info.get('pic_square')
             if img_url:
-                img = ContentFile(urlopen(img_url).read())
+                img = ContentFile(requests.get(img_url).content)
                 name = img_url.split('/')[-1]
                 user.picture.save(name, img, False)
 
