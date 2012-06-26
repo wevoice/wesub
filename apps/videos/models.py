@@ -1661,8 +1661,12 @@ def update_followers(sender, instance, created, **kwargs):
     lang = instance.language
     if created and user and user.notify_by_email:
         try:
-            lang.followers.add(instance.user)
-            lang.video.followers.add(instance.user)
+            lang.followers.add(user)
+        except IntegrityError:
+            # User already follows the language.
+            pass
+        try:
+            lang.video.followers.add(user)
         except IntegrityError:
             # User already follows the video.
             pass
