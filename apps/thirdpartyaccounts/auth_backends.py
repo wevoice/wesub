@@ -16,15 +16,13 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import datetime
-
+import requests
 from django.conf import settings
-from django.contrib.auth.backends import ModelBackend
+from django.core.files.base import ContentFile
 
 from apps.auth.models import CustomUser as User
 from apps.thirdpartyaccounts.models import FacebookAccount, TwitterAccount
 from socialauth.lib import oauthtwitter
-from socialauth.lib.facebook import get_user_info, get_facebook_signature
 
 
 TWITTER_CONSUMER_KEY = getattr(settings, 'TWITTER_CONSUMER_KEY', '')
@@ -130,7 +128,7 @@ class FacebookAuthBackend(object):
         first_name = data.get('first_name')
         last_name = data.get('last_name')
         facebook_uid = data.get('uid')
-        avatar = data.get('pic_small')
+        img_url = data.get('pic_square')
 
         email = '%s@facebookuser.%s.com' % (first_name, settings.SITE_NAME)
 
@@ -140,41 +138,38 @@ class FacebookAuthBackend(object):
         user.set_password(temp_password)
         user.save()
 
+        if img_url:
+            img = ContentFile(requests.get(img_url).content)
+            name = img_url.split('/')[-1]
+            user.picture.save(name, img, False)
+
         FacebookAccount.objects.create(uid=facebook_uid, user=user,
-                                       avatar=avatar)
+                                       avatar=img_url)
 
         return user
 
 
-    def authenticate(self, cookies):
-        if FACEBOOK_API_KEY in cookies:
-            signature_hash = get_facebook_signature(FACEBOOK_API_KEY,
-                                                    FACEBOOK_API_SECRET,
-                                                    cookies,
-                                                    True)
+    def authenticate(self, facebook, request):
+        facebook.oauth2_check_session(request)
 
-            hash_matches = (signature_hash == cookies[FACEBOOK_API_KEY])
+        facebook.uid = facebook.users.getLoggedInUser()
+        user_info = facebook.users.getInfo([facebook.uid],
+                                           ['first_name', 'last_name', 'pic_square'])[0]
 
-            expiration = datetime.datetime.fromtimestamp(
-                    float(cookies[FACEBOOK_API_KEY + '_expires']))
-            not_expired = (expiration > datetime.datetime.now())
-
-            if hash_matches and not_expired:
-                user_info_response = get_user_info(FACEBOOK_API_KEY,
-                                                   FACEBOOK_API_SECRET,
-                                                   cookies)
-                data = user_info_response[0]
-
-                user = self._get_existing_user(data)
-                if not user:
-                    user = self._create_user(data)
+        # Check if we already have an active user for this Facebook user
+        user = self._get_existing_user(user_info)
+        if user:
+            # If so, then we authenticate them if the user account is active, or
+            # just return None if it's not.
+            if user.is_active:
                 return user
             else:
                 return None
 
+        # Otherwise this is a Facebook user we've never seen before, so we'll
+        # make them an Amara account, Facebook TPA, and link the two.
+        return self._create_user(user_info)
 
-        else:
-            return None
 
     def get_user(self, user_id):
         try:

@@ -186,3 +186,4 @@ def facebook_login_done(request, next):
         # Redirect them to login page, preserving their destination.
         return HttpResponseRedirect(fallback_url)
 
+
