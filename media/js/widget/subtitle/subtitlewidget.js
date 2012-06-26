@@ -65,7 +65,7 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
             $d('li', null,
             this.contentElement_,
             this.titleElem_ =
-            $d('span', {'className':'unisubs-title'},
+            $d('span', {'className':'unisubs-title' + (this.subtitleSet_.languageIsRTL ? ' is-rtl' : '')},
                 this.titleElemInner_ =
                 $d('span')),
             this.deleteButton_,
@@ -280,7 +280,7 @@ unisubs.subtitle.SubtitleWidget.prototype.updateValues_ = function() {
         if (time != -1)
             this.timeSpinner_.setValue(time);
     }
-    this.titleElemInner_.innerHTML = goog.string.newLineToBr(this.subtitle_.getText());
+    this.titleElemInner_.innerHTML = unisubs.html.markdownToHtml(goog.string.newLineToBr(this.subtitle_.getText()));
 
 };
 unisubs.subtitle.SubtitleWidget.prototype.disposeEventHandlers_ = function() {

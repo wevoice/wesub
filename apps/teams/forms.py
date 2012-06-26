@@ -37,15 +37,12 @@ from utils.translation import get_language_choices
 from utils.validators import MaxFileSizeValidator
 from videos.forms import AddFromFeedForm
 from videos.models import (
-        VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion, 
-        Video, SubtitleLanguage
+        VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion,
+        Video, SubtitleLanguage, record_workflow_origin
 )
 from videos.search_indexes import VideoIndex
 
-from utils import (
-    SrtSubtitleParser, SsaSubtitleParser, TtmlSubtitleParser,
-    SubtitleParserError, SbvSubtitleParser, DfxpSubtitleParser
-)
+from utils.subtitles import ParserList, SubtitleParserError
 
 from apps.teams.moderation_const import WAITING_MODERATION
 
@@ -664,39 +661,30 @@ class UploadDraftForm(forms.Form):
 
         parts = subtitles.name.split('.')
 
-        if len(parts) < 1 or not parts[-1].lower() in ['srt', 'ass', 'ssa', 'xml', 'sbv', 'dfxp']:
-            raise forms.ValidationError(_(u'Incorrect format. Upload .srt, .ssa, .sbv, .dfxp or .xml (TTML  format)'))
+        if len(parts) < 1 or not parts[-1].lower() in ParserList:
+            raise forms.ValidationError(_(u'Incorrect format. Upload %s' % ParserList.extensions()))
 
         try:
             text = subtitles.read()
             encoding = chardet.detect(text)['encoding']
-        
+
             if not encoding:
                 raise forms.ValidationError(_(u'Can not detect file encoding'))
 
             self._parser = self._get_parser(subtitles.name)(force_unicode(text, encoding))
-        
+
             if not self._parser:
                 raise forms.ValidationError(_(u'Incorrect subtitles format'))
         except SubtitleParserError, e:
             raise forms.ValidationError(e)
 
         subtitles.seek(0)
-        
+
         return subtitles
-    
+
     def _get_parser(self, filename):
         end = filename.split('.')[-1].lower()
-        if end == 'srt':
-            return SrtSubtitleParser
-        if end in ['ass', 'ssa']:
-            return SsaSubtitleParser
-        if end == 'xml':
-            return TtmlSubtitleParser
-        if end == 'sbv':
-            return SbvSubtitleParser
-        if end == 'dfxp':
-            return DfxpSubtitleParser
+        return ParserList[end]
 
     def _save_new_language(self, video, lang_code, translate_from):
         language = SubtitleLanguage()
@@ -728,12 +716,13 @@ class UploadDraftForm(forms.Form):
 
         if not task.assignee:
             task.assignee = self.user
+            task.set_expiration()
 
         if task.language:
             video_language = task.language
         else:
             video_language = self.cleaned_data['language']
-        
+
         translated_from = None
 
         if task.get_subtitle_version():
@@ -768,13 +757,17 @@ class UploadDraftForm(forms.Form):
 
         # we need to set the moderation_status to WAITING_MODERATION
         # so the version is not public. At the same time, we cannot
-        # set task.subtitle_version if it's review/approve, otherwise 
+        # set task.subtitle_version if it's review/approve, otherwise
         # the task will get blocked. :(
-        version = SubtitleVersion.objects.new_version(self._parser, language, self.user, 
+        version = SubtitleVersion.objects.new_version(self._parser, language, self.user,
                                                       moderation_status=WAITING_MODERATION,
                                                       translated_from=translated_from,
                                                       note="Uploaded")
-        
+
+        # TODO: Can we please refactor the subtitle pipeline?  This is the third
+        # place we need to do this :(
+        record_workflow_origin(version, task.team_video)
+
         if task.type in (Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']):
             task.subtitle_version = version
 
