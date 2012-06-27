@@ -137,7 +137,7 @@ DEV_HOST = 'dev.universalsubtitles.org:2191'
 
 
 def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
-                installation_dir, static_dir, name,
+                installation_dir, static_dir, name, git_branch,
                 memcached_bounce_cmd,
                 admin_dir, admin_host, celeryd_host, celeryd_proj_root,
                 separate_uslogging_db=False,
@@ -153,6 +153,7 @@ def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
     env.web_dir = web_dir or '/var/www/{0}'.format(installation_dir)
     env.static_dir = static_dir
     env.installation_name = name
+    env.git_branch = git_branch
     env.memcached_bounce_cmd = memcached_bounce_cmd
     env.admin_dir = admin_dir
     env.admin_host = admin_host
@@ -175,6 +176,7 @@ def staging(username):
                     installation_dir      = 'universalsubtitles.staging',
                     static_dir            = '/var/static/staging',
                     name                  = 'staging',
+                    git_branch            = 'staging',
                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                     admin_dir             = '/usr/local/universalsubtitles.staging',
                     admin_host            = 'pcf-us-adminstg.pculture.org:2191',
@@ -196,6 +198,7 @@ def dev(username):
                     installation_dir      = 'universalsubtitles.dev',
                     static_dir            = '/var/www/universalsubtitles.dev',
                     name                  = 'dev',
+                    git_branch            = 'dev',
                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                     admin_dir             = None,
                     admin_host            = 'dev.universalsubtitles.org:2191',
@@ -225,6 +228,7 @@ def production(username):
                     installation_dir      = 'universalsubtitles',
                     static_dir            = '/var/static/production',
                     name                  =  None,
+                    git_branch            = 'production',
                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                     admin_dir             = '/usr/local/universalsubtitles',
                     admin_host            = 'pcf-us-admin.pculture.org:2191',
@@ -246,6 +250,7 @@ def temp(username):
                     installation_dir      = 'universalsubtitles.staging',
                     static_dir            = '/var/static/tmp',
                     name                  = 'staging',
+                    git_branch            = 'staging',
                     memcached_bounce_cmd  = '/etc/init.d/memcached-staging restart',
                     admin_dir             = '/usr/local/universalsubtitles.staging',
                     admin_host            = 'pcf-us-admintmp.pculture.org:2191',
@@ -267,6 +272,7 @@ def nf(username):
                     installation_dir      = 'universalsubtitles.nf',
                     static_dir            = '/var/static/nf',
                     name                  = 'nf',
+                    git_branch            = 'x-nf',
                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                     admin_dir             = '/usr/local/universalsubtitles.nf',
                     admin_host            = 'pcf-us-adminnf.pculture.org:2191',
@@ -524,6 +530,7 @@ def _update_integration(dir, as_sudo=True):
         with settings(warn_only=True):
             _git_checkout_branch_and_reset(
                 _get_optional_repo_version(dir, 'unisubs-integration'),
+                branch=env.git_branch,
                 as_sudo=as_sudo
             )
 
