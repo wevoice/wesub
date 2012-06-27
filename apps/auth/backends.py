@@ -118,4 +118,3 @@ class OpenIdBackend(object):
         except User.DoesNotExist:
             return None
 
-
