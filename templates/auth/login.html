@@ -20,7 +20,7 @@
     <a class="provider" id="google" href="{% url socialauth_google_login %}?next={{ next }}">gmail</a>
     <a class="provider" id="facebook" href="{% url thirdpartyaccounts:facebook_login %}?next={{ next }}">facebook</a>
     <a class="provider" id="ted" href="{{ ted_auth.url }}">ted</a>
-    <a class="" id="stanford" href="{{ stanford_auth.url }}">stanford</a>
+    <a class="provider" id="coursera" href="{{ stanford_auth.url }}">coursera</a>
 </div>
 <div class="right_column">
 <h2>{% trans 'Create an Account' %}</h2>
