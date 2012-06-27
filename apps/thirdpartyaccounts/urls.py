@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
@@ -16,20 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-from django.template.defaultfilters import slugify
-from unidecode import unidecode
 
+from django.conf.urls.defaults import patterns, url
 
-def pan_slugify(value):
-    """Return a Unicode-translitered slug.
+urlpatterns = patterns('apps.thirdpartyaccounts.views',
+    url(r'^facebook_login/$',                      'facebook_login',      name='facebook_login'),
+    url(r'^facebook_login_done/(?P<next>[^/]+)/$', 'facebook_login_done', name='facebook_login_done'),
 
-    This is helpful for most inputs containing Unicode. For example:
+    url(r'^twitter_login/$',      'twitter_login',      name='twitter_login'),
+    url(r'^twitter_login_done/$', 'twitter_login_done', name='twitter_login_done'),
+)
 
-        cação -> cacao
-
-    """
-    return slugify(unidecode(value))
-
-def pan_slugify_username(s):
-    """Return a slugified string suitable for a username."""
-    return pan_slugify(s).replace('-', '_')
