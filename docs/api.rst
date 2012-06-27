@@ -208,8 +208,8 @@ With the same parameters for creation. Note that through out our system, a
 video cannot have it's URLs changed. So you can change other video attributes
 (title, description) but the URL sent must be the same original one.
 
-Moving videos between teams
-+++++++++++++++++++++++++++
+Moving videos between teams and projects
+++++++++++++++++++++++++++++++++++++++++
 
 In order to move a video from one team to another, you can make a request to
 change the video where you change the ``team`` value in the Video Resource.
@@ -232,8 +232,15 @@ originating team and permission to add a video to the target team.
 Setting the ``team`` value to ``null`` will remove it from its current team.
 
 A similar mechanism can be used to change what project a given video is filed
-under.
+under.  The important difference is that when moving a video to different
+project, the team must be specified in the payload even if it doesn't change.
 
+.. code-block:: json
+
+    {
+        "team:" "team-slug",
+        "project": "new-project"
+    }
 
 Example response:
 
