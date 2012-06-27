@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-26 01:32-0500\n"
-"PO-Revision-Date: 2012-06-26 06:49+0000\n"
+"POT-Creation-Date: 2012-06-27 01:32-0500\n"
+"PO-Revision-Date: 2012-06-27 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Chinese (China) (http://www.transifex.net/projects/p/universalsubtitles/language/zh_CN/)\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/universalsubtitles/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -612,22 +612,22 @@ msgstr "你不能执行那个任务"
 msgid "Invalid language to translate from."
 msgstr "翻译的源语言不可用"
 
-#: apps/teams/forms.py:660 apps/videos/forms.py:68 apps/videos/forms.py:86
-#: apps/videos/forms.py:422
+#: apps/teams/forms.py:660 apps/videos/forms.py:67 apps/videos/forms.py:85
+#: apps/videos/forms.py:431
 msgid "File size should be less {0} kb"
 msgstr "文件大小应该小于 {0} kb"
 
-#: apps/teams/forms.py:665 apps/videos/forms.py:427
+#: apps/teams/forms.py:665 apps/videos/forms.py:436
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:672 apps/videos/forms.py:73 apps/videos/forms.py:94
-#: apps/videos/forms.py:435
+#: apps/teams/forms.py:672 apps/videos/forms.py:72 apps/videos/forms.py:93
+#: apps/videos/forms.py:444
 msgid "Can not detect file encoding"
 msgstr "不能检测编码"
 
-#: apps/teams/forms.py:677 apps/videos/forms.py:96 apps/videos/forms.py:437
+#: apps/teams/forms.py:677 apps/videos/forms.py:95 apps/videos/forms.py:446
 msgid "Incorrect subtitles format"
 msgstr "不正确的字幕格式"
 
@@ -790,20 +790,20 @@ msgstr "所有的语言都需要帮助"
 msgid "If you check this, other languages will not be displayed."
 msgstr "如果选中此项，其他语言将不能显示"
 
-#: apps/teams/models.py:918 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:919 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "拥有者"
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:920 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "管理员"
 
-#: apps/teams/models.py:920 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:921 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "管理"
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "贡献者"
 
@@ -1087,23 +1087,23 @@ msgstr "有谁能帮我给这些视频加上字幕？%(url)s"
 msgid "Email for alert"
 msgstr "邮件提醒"
 
-#: apps/videos/forms.py:64
+#: apps/videos/forms.py:63
 msgid "File should have txt format"
 msgstr "文件应该是TXT格式"
 
-#: apps/videos/forms.py:77
+#: apps/videos/forms.py:76
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "不能编码文件，它应该是utf8编码"
 
-#: apps/videos/forms.py:89
+#: apps/videos/forms.py:88
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "不正确的格式。请上传 .srt, .ssa, .sbv 或者 .xml（TTML 格式）"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:530 utils/validators.py:38
+#: apps/videos/forms.py:121 apps/videos/forms.py:539 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "这个URL似乎是个坏的链接"
 
-#: apps/videos/forms.py:128 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:127 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1112,46 +1112,46 @@ msgid ""
 "href=\"mailto:%s\">contact us</a>!"
 msgstr "Amara 不支持那个网站或视频的格式.\n如果你想让我们添加一个新网站或者格式的支持, 或者你认为有错误, <a\nhref=\"mailto:%s\">联系我们</a>!"
 
-#: apps/videos/forms.py:139
+#: apps/videos/forms.py:138
 msgid "You have not permission add video URL for this video"
 msgstr "你没有被允许给这个视频添加URL"
 
-#: apps/videos/forms.py:171
+#: apps/videos/forms.py:170
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "现在有人这个视频字幕。稍后再试。"
 
-#: apps/videos/forms.py:186 apps/videos/forms.py:210
+#: apps/videos/forms.py:185 apps/videos/forms.py:211
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr "抱歉，我们不能上传你的字幕，因为基于此语种的工作已经在进行。"
 
-#: apps/videos/forms.py:195
+#: apps/videos/forms.py:194
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr "抱歉，我们不能上传此语种的字幕，因为这会毁了为此语种制作的字幕翻译"
 
-#: apps/videos/forms.py:222
+#: apps/videos/forms.py:223
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr "抱歉，我们不能上传你的字幕，因为此语言的一个草稿已经在调整中。"
 
-#: apps/videos/forms.py:228 apps/videos/forms.py:231
+#: apps/videos/forms.py:229 apps/videos/forms.py:232
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have sufficient permission."
 msgstr "抱歉，我们不能上传你的字幕，因为此语种正在调整，并且你没有足够的权限"
 
-#: apps/videos/forms.py:515
+#: apps/videos/forms.py:524
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "如果仍然有问题，\n                        请再次尝试视频页面的链接<a href=\"mailto:%s\">Contact us</a>"
 
-#: apps/videos/forms.py:518 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:527 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
@@ -1159,49 +1159,49 @@ msgid ""
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "你的视频链接必须在一个兼容的网站(如YouTube)\n                    或者直接使用能够在HTML5浏览器播放的视频文件. 例如: http://mysite.com/myvideo.ogg 或 http://mysite.com/myipadvideo.m4v\n                    如果有问题<a href=\"mailto:%s\">联系我们</a>."
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:555
 msgid "Youtube usernames"
 msgstr "Youtube用户名"
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:555
 msgid "Enter usernames separated by comma."
 msgstr "输入用户名，以逗号隔开"
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:556
 msgid "Youtube page link."
 msgstr "Youtube页面链接"
 
-#: apps/videos/forms.py:548
+#: apps/videos/forms.py:557
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "例如: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:549
+#: apps/videos/forms.py:558
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr "支持Youtube，Vimeo或者Dailymotion。仅支持的网站添加。"
 
-#: apps/videos/forms.py:550
+#: apps/videos/forms.py:559
 msgid "Save feed"
 msgstr "保存源"
 
-#: apps/videos/forms.py:550
+#: apps/videos/forms.py:559
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr "如果将来你想从此源添加视频，请选择。仅可用RSS源。"
 
-#: apps/videos/forms.py:593
+#: apps/videos/forms.py:602
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr "抱歉，我们没能在你提供的源链接中找到可用源。请查看链接后再次尝试"
 
-#: apps/videos/forms.py:598
+#: apps/videos/forms.py:607
 msgid ""
 "The videos are being added in the background. If you are logged in, you will"
 " receive a message when it's done"
 msgstr "视频已经加入后台。如果你已登录，你将会在它完成时收到一条信息"
 
-#: apps/videos/forms.py:609
+#: apps/videos/forms.py:618
 msgid "captcha"
 msgstr "验证码"
 
@@ -6608,7 +6608,7 @@ msgstr "上载字幕"
 #: templates/videos/_upload_subtitles.html:10
 msgid ""
 "\n"
-"              Our site accepts SRT, SSA, SBV, DFXP and TTML format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
+"              Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
 "              or .xml (for TTML) are accepted.\n"
 "              "
 msgstr ""

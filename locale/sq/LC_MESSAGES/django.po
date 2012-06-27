@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-26 01:32-0500\n"
-"PO-Revision-Date: 2012-06-26 06:48+0000\n"
+"POT-Creation-Date: 2012-06-27 01:32-0500\n"
+"PO-Revision-Date: 2012-06-27 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Albanian (http://www.transifex.net/projects/p/universalsubtitles/language/sq/)\n"
+"Language-Team: Albanian (http://www.transifex.com/projects/p/universalsubtitles/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -609,22 +609,22 @@ msgstr ""
 msgid "Invalid language to translate from."
 msgstr ""
 
-#: apps/teams/forms.py:660 apps/videos/forms.py:68 apps/videos/forms.py:86
-#: apps/videos/forms.py:422
+#: apps/teams/forms.py:660 apps/videos/forms.py:67 apps/videos/forms.py:85
+#: apps/videos/forms.py:431
 msgid "File size should be less {0} kb"
 msgstr "Madhësia e kartelës duhet të jetë më e vogël {0} kb"
 
-#: apps/teams/forms.py:665 apps/videos/forms.py:427
+#: apps/teams/forms.py:665 apps/videos/forms.py:436
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:672 apps/videos/forms.py:73 apps/videos/forms.py:94
-#: apps/videos/forms.py:435
+#: apps/teams/forms.py:672 apps/videos/forms.py:72 apps/videos/forms.py:93
+#: apps/videos/forms.py:444
 msgid "Can not detect file encoding"
 msgstr "Nuk zbulohet dot kodimi i kartelës"
 
-#: apps/teams/forms.py:677 apps/videos/forms.py:96 apps/videos/forms.py:437
+#: apps/teams/forms.py:677 apps/videos/forms.py:95 apps/videos/forms.py:446
 msgid "Incorrect subtitles format"
 msgstr "Format i pasaktë titrash"
 
@@ -787,20 +787,20 @@ msgstr "Lyp ndihmë me krejt gjuhët"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Nëse i vini shenjë kësaj, gjuhët e tjera nuk do të shfaqen."
 
-#: apps/teams/models.py:918 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:919 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Pronar"
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:920 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Përgjegjës"
 
-#: apps/teams/models.py:920 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:921 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Kontribues"
 
@@ -1084,23 +1084,23 @@ msgstr "A mundet dikush të më ndihmojë në titrimin e këtyre videove? %(url)
 msgid "Email for alert"
 msgstr "Email për sinjalizime"
 
-#: apps/videos/forms.py:64
+#: apps/videos/forms.py:63
 msgid "File should have txt format"
 msgstr "Kartela duhet të jetë në format .txt"
 
-#: apps/videos/forms.py:77
+#: apps/videos/forms.py:76
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "Nuk kodohet dot kartela. Duhet të jetë nën kodimin utf8."
 
-#: apps/videos/forms.py:89
+#: apps/videos/forms.py:88
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "Format i pasaktë. Ngarkoni .srt, .ssa, .sbv ose .xml (formati TTML)"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:530 utils/validators.py:38
+#: apps/videos/forms.py:121 apps/videos/forms.py:539 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Kjo URL duket se është lidhje e dëmtuar."
 
-#: apps/videos/forms.py:128 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:127 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1109,46 +1109,46 @@ msgid ""
 "href=\"mailto:%s\">contact us</a>!"
 msgstr "Amara nuk e mbulon këtë site web ose format videosh.\nNëse doni të na ndihmoni të shtojmë mbulim të site-it ose formatit të ri,\nose nëse mendoni se ka ndonjë gabim, <a\nhref=\"mailto:%s\">na shkruani</a>!"
 
-#: apps/videos/forms.py:139
+#: apps/videos/forms.py:138
 msgid "You have not permission add video URL for this video"
 msgstr "Nuk keni leje për shtim URL-sh videoje për këtë video"
 
-#: apps/videos/forms.py:171
+#: apps/videos/forms.py:170
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Dikush po krijon titra për këtë video pikërisht tani. Provoni më vonë."
 
-#: apps/videos/forms.py:186 apps/videos/forms.py:210
+#: apps/videos/forms.py:185 apps/videos/forms.py:211
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr "Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë puna për këtë gjë është tashmë në rrugë e sipër."
 
-#: apps/videos/forms.py:195
+#: apps/videos/forms.py:194
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr "Na ndjeni, nuk i ngarkojmë dot titrat për këtë gjuhë, ngaqë kjo do të shkatërronte përkthimet e bëra me ato si bazë"
 
-#: apps/videos/forms.py:222
+#: apps/videos/forms.py:223
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr "Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë po moderohet tashmë një skicë për këtë gjuhë."
 
-#: apps/videos/forms.py:228 apps/videos/forms.py:231
+#: apps/videos/forms.py:229 apps/videos/forms.py:232
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have sufficient permission."
 msgstr "Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë kjo gjuhë moderohet dhe nuk keni leje të mjaftueshme."
 
-#: apps/videos/forms.py:515
+#: apps/videos/forms.py:524
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "Ju lutemi, riprovoni me një lidhje drejt një faqe videosh.\n                        <a href=\"mailto:%s\">Lidhuni me ne</a>, nëse ka ndonjë problem."
 
-#: apps/videos/forms.py:518 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:527 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
@@ -1156,49 +1156,49 @@ msgid ""
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "Lidhjen duhet ta krijoni drejt një site-i të përputhshëm (fjala vjen, YouTube) ose\n                    drejt e te një kartelë video që funksionon në shfletuesa HTML5. Për shembull: http://site-i_im.com/videoja_ime.ogg ose http://site-i_im.com/videoja_ime.m4v\n                    <a href=\"mailto:%s\">Lidhuni me ne</a>, nëse ka ndonjë problem."
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:555
 msgid "Youtube usernames"
 msgstr "Emra përdoruesish Youtube-i"
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:555
 msgid "Enter usernames separated by comma."
 msgstr "Emrat e përdoruesve jepini ndarë me presje."
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:556
 msgid "Youtube page link."
 msgstr "Lidhje faqeje Youtube."
 
-#: apps/videos/forms.py:548
+#: apps/videos/forms.py:557
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Për shembull: http://www.youtube.com/përdorues/emër_përdoruesi"
 
-#: apps/videos/forms.py:549
+#: apps/videos/forms.py:558
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr "Mbulohen: Youtube, Vimeo, ose Dailymotion. U shtuan vetëm site-et që mbulohen."
 
-#: apps/videos/forms.py:550
+#: apps/videos/forms.py:559
 msgid "Save feed"
 msgstr "Ruaje prurjen"
 
-#: apps/videos/forms.py:550
+#: apps/videos/forms.py:559
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr "Zgjidhni këtë nëse dëshironi të shtoni në të ardhmen video prej kësaj prurjeje. Do të ruhen vetëm prurje RSS funksionale."
 
-#: apps/videos/forms.py:593
+#: apps/videos/forms.py:602
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr "Na ndjeni, te URL-ja që dhatë nuk gjetëm dot një prurje të vlefshme. Ju lutemi, kontrolloni URL-në dhe riprovoni."
 
-#: apps/videos/forms.py:598
+#: apps/videos/forms.py:607
 msgid ""
 "The videos are being added in the background. If you are logged in, you will"
 " receive a message when it's done"
 msgstr "Videot po shtohen në prapaskenë. Nëse jeni i futur, do të merrni një mesazh kur kjo të ketë mbaruar."
 
-#: apps/videos/forms.py:609
+#: apps/videos/forms.py:618
 msgid "captcha"
 msgstr "captcha"
 
@@ -6615,7 +6615,7 @@ msgstr "Ngarkoni Titra"
 #: templates/videos/_upload_subtitles.html:10
 msgid ""
 "\n"
-"              Our site accepts SRT, SSA, SBV, DFXP and TTML format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
+"              Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
 "              or .xml (for TTML) are accepted.\n"
 "              "
 msgstr ""
