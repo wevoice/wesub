@@ -154,6 +154,273 @@ href="mailto:%s">contact us</a>!""") % settings.FEEDBACK_EMAIL))
             output[key] = '/n'.join([force_unicode(i) for i in value])
         return output
 
+class SubtitlesUploadBaseForm(forms.Form):
+    language = forms.ChoiceField(choices=ALL_LANGUAGES, initial='en')
+    video_language = forms.ChoiceField(required=False, choices=ALL_LANGUAGES, initial='en')
+    video = forms.ModelChoiceField(Video.objects)
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(SubtitlesUploadBaseForm, self).__init__(*args, **kwargs)
+        self.fields['language'].choices = get_language_choices()
+        self.fields['video_language'].choices = get_language_choices()
+
+    def clean_video(self):
+        video = self.cleaned_data['video']
+        if video.is_writelocked:
+            raise forms.ValidationError(_(u'Somebody is subtitling this video right now. Try later.'))
+
+        return video
+
+    def clean(self):
+        video = self.cleaned_data['video']
+        language = self.cleaned_data['language']
+        video_language = self.cleaned_data['video_language']
+
+        subtitle_language = video.subtitle_language(language)
+
+        # first verify if this language for this video already exists.
+        # if exists, verify if it's not writelocked
+        if subtitle_language:
+            if subtitle_language.is_writelocked and subtitle_language.writelock_owner != self.user:
+                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because work on this language is already in progress."))
+
+            # we can't let the user upload a subtitle to a language that already
+            # have dependents. that will fork the dependents and make everything break.
+            # see sifter #1075
+            if video.subtitlelanguage_set.filter(standard_language=subtitle_language).exists():
+                for language in video.subtitlelanguage_set.filter(standard_language=subtitle_language):
+                    # if it exists, let's verify if the version is not empty
+                    if language.latest_subtitles(public_only=False):
+                        raise forms.ValidationError(_(u"Sorry, we cannot upload subtitles for this language because this would ruin translations made from it"))
+
+        team_video = video.get_team_video()
+
+        if not team_video:
+            return self.cleaned_data
+
+        blocking_tasks = team_video.task_set.incomplete_subtitle_or_translate().filter(language__in=[language, ''])
+
+        if blocking_tasks.exists():
+            task = blocking_tasks.get()
+
+            # only block if the user can't assign the task
+            # aka he can't do himself or he can't actually
+            # assign it to himself.
+            # also block if the task is assigned to another user
+            if (task.assignee and task.assignee != self.user) or (not task.assignee and not can_assign_task(task, self.user)):
+                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because work on this language is already in progress."))
+
+        # Now we know that there are no transcribe/translate tasks that
+        # should block this upload.
+        #
+        # However, if there are any review/approve tasks open they should
+        # block it, even if the user is the assignee.
+        #
+        # TODO: Remove this restriction?
+        blocking_tasks = team_video.task_set.incomplete_review_or_approve().filter(language=language)
+
+        if blocking_tasks.exists():
+            raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because a draft for this language is already in moderation."))
+
+        # There are no tasks for this video that should block the upload.
+        # The last thing to check is that the team's transcription policy doesn't block this.
+        if video_language and (not subtitle_language or subtitle_language.is_original):
+            if not can_create_and_edit_subtitles(self.user, team_video, language):
+                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because this language is moderated and you don't have sufficient permission."))
+        else:
+            if not can_create_and_edit_translations(self.user, team_video, language):
+                raise forms.ValidationError(_(u"Sorry, we can't upload your subtitles because this language is moderated and you don't have sufficient permission."))
+
+        return self.cleaned_data
+
+    def _save_original_language(self, video, video_language):
+        original_language = video.subtitle_language()
+
+        if original_language:
+            if original_language.language:
+                try:
+                    language_exists = video.subtitlelanguage_set.exclude(pk=original_language.pk) \
+                        .get(language=video_language)
+                    original_language.is_original = False
+                    original_language.save()
+                    language_exists.is_original = True
+                    language_exists.save()
+                except ObjectDoesNotExist:
+                    original_language.language = video_language
+                    original_language.save()
+            else:
+                try:
+                    language_exists = video.subtitlelanguage_set.exclude(pk=original_language.pk) \
+                        .get(language=video_language)
+
+                    latest_version = original_language.latest_version()
+
+                    if latest_version:
+                        last_no = latest_version.version_no
+                    else:
+                        last_no = 0
+
+                    for version in language_exists.subtitleversion_set.all():
+                        version.language = original_language
+                        last_no += 1
+                        version.version_no = last_no
+                        version.save()
+
+                    language_exists.delete()
+                except ObjectDoesNotExist:
+                    pass
+
+                original_language.language = video_language
+                original_language.save()
+        else:
+            #original_language always exists, but...
+            try:
+                language_exists = video.subtitlelanguage_set.get(language=video_language)
+                language_exists.is_original = True
+                language_exists.save()
+            except ObjectDoesNotExist:
+                original_language = SubtitleLanguage()
+                original_language.language = video_language
+                original_language.is_original = True
+                original_language.video = video
+                original_language.save()
+
+    def _best_existing(self, languages):
+        for l in languages:
+            # choosing first forked SL that has no dependent languages.
+            if not l.is_dependent() and l.subtitlelanguage_set.count() == 0:
+                return l
+        return None
+
+    def _find_appropriate_language(self, video, language_code):
+        created = False
+        language = video.subtitle_language(language_code)
+        if not language:
+            created = True
+            language = SubtitleLanguage(
+                video=video, is_original=False, is_forked=True)
+        language.language = language_code
+        language.save()
+        return language, created
+
+    def save_subtitles(self, parser, video=None, language=None, update_video=True, is_complete=True):
+        video = video or self.cleaned_data['video']
+
+        if not video.has_original_language():
+            self._save_original_language(
+                video, self.cleaned_data['video_language'])
+
+        if language:
+            self._sl_created = False
+            language = language
+        else:
+            language, self._sl_created = self._find_appropriate_language(video, self.cleaned_data['language'])
+
+        language = save_subtitle(video, language, parser, self.user, update_video)
+
+        # If there are any outstanding tasks for this language, associate the
+        # new version with them.
+        # TODO: Refactor all of this out into some kind of generic "add subtitles" pipeline.
+        team_video = video.get_team_video()
+
+        if not team_video:
+            return language
+
+        workflow = Workflow.get_for_team_video(team_video)
+
+        if not workflow.approve_enabled and not workflow.review_enabled:
+            return language
+
+        new_version = language.latest_version(public_only=False)
+        record_workflow_origin(new_version, team_video)
+
+        # Determine if we need to moderate these subtitles and create a
+        # review/approve task for them.
+        workflow = team_video.get_workflow()
+        # user can bypass moderation if:
+        # 1) he is a moderator and
+        # 2) it's a post-publish edit
+        # 3) subtitle is complete
+        can_bypass_moderation = (
+            is_complete
+            and not self._sl_created
+            and can_publish_edits_immediately(team_video, self.user,
+                                              language.language))
+
+        if can_bypass_moderation:
+            new_version.moderate = APPROVED
+        elif workflow.review_allowed or workflow.approve_allowed:
+            new_version.moderation_status = WAITING_MODERATION
+        else:
+            new_version.moderation_status = UNMODERATED
+
+        new_version.save()
+
+        outstanding_tasks = team_video.task_set.incomplete().filter(language__in=[language.language, ''])
+
+        if outstanding_tasks.exists():
+            if new_version.moderation_status != WAITING_MODERATION:
+                outstanding_tasks.update(subtitle_version=new_version,
+                                         language=language.language)
+        elif not can_bypass_moderation:
+            # we just need to create review/approve/subtitle if the language
+            # is a new one or, if it's a post-publish edit, if the user can't
+            # approve subtitles by himself.
+            task_type = None
+
+            if new_version.is_synced() and is_complete:
+                if workflow.review_allowed:
+                    task_type = Task.TYPE_IDS['Review']
+                elif workflow.approve_allowed:
+                    task_type = Task.TYPE_IDS['Approve']
+            else:
+                task_type = Task.TYPE_IDS['Subtitle']
+
+            if task_type:
+                task = Task(team=team_video.team, team_video=team_video,
+                            language=language.language, type=task_type,
+                            subtitle_version=new_version)
+
+                if not self._sl_created:
+                    task.assignee = task._find_previous_assignee(Task.TYPE_NAMES[task_type])
+                else:
+                    if task_type == Task.TYPE_IDS['Subtitle']:
+                        task.assignee = self.user
+
+                task.save()
+
+        return language
+
+    def verify_tasks(self, is_complete):
+        video = self.cleaned_data['video']
+        language = self.cleaned_data['language']
+
+        team_video = video.get_team_video()
+
+        if team_video:
+            tasks = team_video.task_set.incomplete_subtitle_or_translate().filter(language__in=[language, ''])
+
+            if tasks.exists():
+                task = tasks.get()
+
+                if not task.assignee and self.user and can_assign_task(task, self.user):
+                    task.assignee = self.user
+
+                    # we save only if is_complete because
+                    # .complete() actually saves the task too
+                    if not is_complete:
+                        task.save()
+
+                if is_complete:
+                    task.complete()
+
+    def get_errors(self):
+        output = {}
+        for key, value in self.errors.items():
+            output[key] = '/n'.join([force_unicode(i) for i in value])
+        return output
+
 class SubtitlesUploadForm(forms.Form):
     draft = forms.FileField(required=True)
     is_complete = forms.BooleanField(initial=False, required=False)
