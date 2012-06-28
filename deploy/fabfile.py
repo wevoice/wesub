@@ -154,8 +154,12 @@ def lock_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         _execute_on_all_hosts(lambda dir: _lock(dir, task=f.func_name))
-        out = f(*args, **kwargs)
-        _execute_on_all_hosts(lambda dir: _unlock(dir))
+        try:
+            out = f(*args, **kwargs)
+        except:
+            pass
+        finally:
+            _execute_on_all_hosts(lambda dir: _unlock(dir))
         return out
     return decorated
 
