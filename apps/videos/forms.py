@@ -40,7 +40,7 @@ from utils.subtitles import ParserList, SubtitleParserError
 
 from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
 from utils.http import url_exists
-from utils.subtitles import save_subtitle
+from utils.subtitles import save_subtitle, is_version_same
 from utils.translation import get_language_choices
 from videos.feed_parser import FeedParser
 from videos.models import (
@@ -665,6 +665,9 @@ class SubtitlesUploadForm(forms.Form):
             else:
                 language = video.subtitle_language(draft_language)
                 self._sl_created = False
+
+        if is_version_same(language.version(public_only=False), self._parser):
+            return language.version(public_only=False)
 
         new_version = SubtitleVersion.objects.new_version(parser, language, self.user,
                                             note="Uploaded", translated_from=translated_from)
