@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-27 01:32-0500\n"
-"PO-Revision-Date: 2012-06-27 06:48+0000\n"
+"POT-Creation-Date: 2012-06-28 01:32-0500\n"
+"PO-Revision-Date: 2012-06-28 06:49+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/universalsubtitles/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -111,23 +111,23 @@ msgstr "conferma via e-mail"
 msgid "e-mail confirmations"
 msgstr "conferme via e-mail"
 
-#: apps/auth/views.py:61
+#: apps/auth/views.py:58
 msgid "Confirmation key expired."
 msgstr "Codice di conferma obsoleto."
 
-#: apps/auth/views.py:63
+#: apps/auth/views.py:60
 msgid "Email is confirmed."
 msgstr "L'e-mail è confermato"
 
-#: apps/auth/views.py:75
+#: apps/auth/views.py:72
 msgid "Confirmation email was sent."
 msgstr "L'e-mail di conferma è stato spedito."
 
-#: apps/auth/views.py:77
+#: apps/auth/views.py:74
 msgid "You email is empty or already confirmed."
 msgstr "Il Suo e-mail è vuoto o è già stato confermato."
 
-#: apps/auth/views.py:110
+#: apps/auth/views.py:106
 msgid "Your account was deleted."
 msgstr "Il tuo account è stato cancellato"
 
@@ -4345,26 +4345,26 @@ msgid "Cancel"
 msgstr "Annulla"
 
 #: templates/auth/login.html:9
-msgid "Login to Your Existing Account"
-msgstr "Connettiti con il tuo account esistente"
+msgid "Log In to Your Existing Account"
+msgstr ""
 
-#: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
-msgid "Login"
-msgstr "Connettersi"
+#: templates/auth/login.html:13
+msgid "Log In"
+msgstr ""
 
 #: templates/auth/login.html:14
 msgid "Forgot password?"
 msgstr "Hai dimenticato la password?"
 
 #: templates/auth/login.html:17
-msgid "You can also login using"
-msgstr "Puoi anche fare il login con"
+msgid "You can also log in using"
+msgstr ""
 
-#: templates/auth/login.html:27
+#: templates/auth/login.html:26
 msgid "Create an Account"
 msgstr "Crea un conto"
 
-#: templates/auth/login.html:31
+#: templates/auth/login.html:30
 msgid "Create Account"
 msgstr "Crea il conto"
 
@@ -6734,6 +6734,10 @@ msgstr "Aggiungi"
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
 msgstr "Devi fare il log in per aggiungere un URL"
+
+#: templates/videos/_video_url_panel.html:88
+msgid "Login"
+msgstr "Connettersi"
 
 #: templates/videos/_video_url_panel.html:121
 #: templates/videos/_video_url_panel.html:141

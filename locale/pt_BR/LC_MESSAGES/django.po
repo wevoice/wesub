@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-27 01:32-0500\n"
-"PO-Revision-Date: 2012-06-27 06:48+0000\n"
+"POT-Creation-Date: 2012-06-28 01:32-0500\n"
+"PO-Revision-Date: 2012-06-28 06:49+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/universalsubtitles/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -117,23 +117,23 @@ msgstr "confirmação de e-mail"
 msgid "e-mail confirmations"
 msgstr "confirmações de e-mail"
 
-#: apps/auth/views.py:61
+#: apps/auth/views.py:58
 msgid "Confirmation key expired."
 msgstr "A chave de confirmação expirou."
 
-#: apps/auth/views.py:63
+#: apps/auth/views.py:60
 msgid "Email is confirmed."
 msgstr "O e-mail foi confirmado."
 
-#: apps/auth/views.py:75
+#: apps/auth/views.py:72
 msgid "Confirmation email was sent."
 msgstr "A confirmação de e-mail foi enviada."
 
-#: apps/auth/views.py:77
+#: apps/auth/views.py:74
 msgid "You email is empty or already confirmed."
 msgstr "O seu e-mail está vazio ou já foi confirmado."
 
-#: apps/auth/views.py:110
+#: apps/auth/views.py:106
 msgid "Your account was deleted."
 msgstr "Sua conta foi apagada."
 
@@ -234,7 +234,7 @@ msgstr "Nova mensagem de %(author)s em Amara: %(subject)s"
 #: apps/messages/tasks.py:73
 #, python-format
 msgid "New message on Amara: %(subject)s"
-msgstr ""
+msgstr "Nova mensagem em Amara: %(subject)s"
 
 #: apps/messages/tasks.py:117
 #, python-format
@@ -959,7 +959,7 @@ msgstr "Você não pode remover aquele vídeo."
 
 #: apps/teams/views.py:627
 msgid "Video has been deleted from Amara."
-msgstr ""
+msgstr "Vídeo foi removido de Amara."
 
 #: apps/teams/views.py:630
 msgid "Video has been removed from the team."
@@ -2920,7 +2920,7 @@ msgstr "Rosetta"
 
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
-msgstr ""
+msgstr "Demonstração do Editor de Amara"
 
 #: templates/demo.html:27
 msgid ""
@@ -3163,7 +3163,7 @@ msgstr ""
 
 #: templates/enterprise.html:15
 msgid "Amara Platform"
-msgstr ""
+msgstr "Plataforma Amara"
 
 #: templates/enterprise.html:16
 msgid "Global Reach"
@@ -3511,7 +3511,7 @@ msgstr ""
 
 #: templates/enterprise.html:229
 msgid "Amara API Documentation"
-msgstr ""
+msgstr "Documentação da API Amara"
 
 #: templates/enterprise.html:233
 msgid ""
@@ -3550,7 +3550,7 @@ msgstr ""
 
 #: templates/enterprise.html:261
 msgid "Get started with Amara"
-msgstr ""
+msgstr "Começando a usar Amara"
 
 #: templates/enterprise.html:262
 msgid "Be in touch at"
@@ -3562,11 +3562,11 @@ msgstr "Perguntas frequentes"
 
 #: templates/faq.html:19 templates/faq.html.py:43
 msgid "What is Amara?"
-msgstr ""
+msgstr "O que é Amara?"
 
 #: templates/faq.html:20 templates/faq.html.py:54
 msgid "How can I use Amara?"
-msgstr ""
+msgstr "Como posso usar Amara?"
 
 #: templates/faq.html:21 templates/faq.html.py:65
 msgid "What are the benefits of subtitles?"
@@ -3925,7 +3925,7 @@ msgstr "The largest, most powerful captioning and translation platform in the wo
 
 #: templates/index.html:86 templates/index.html.py:88
 msgid "TED Team"
-msgstr ""
+msgstr "Equipe TED"
 
 #: templates/index.html:94 templates/index.html.py:95
 msgid "Mozilla Team"
@@ -4034,7 +4034,7 @@ msgstr "Cole esta única linha de código no cabeçalho da sua página e todos o
 
 #: templates/index_old.html:77
 msgid "Amara works with these video sites and formats"
-msgstr ""
+msgstr "Amara funciona com estes sites de vídeo e formatos"
 
 #: templates/index_old.html:89
 msgid "With Amara, you can:"
@@ -4351,26 +4351,26 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 #: templates/auth/login.html:9
-msgid "Login to Your Existing Account"
-msgstr "Entrar em sua conta"
+msgid "Log In to Your Existing Account"
+msgstr ""
 
-#: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
-msgid "Login"
-msgstr "Entrar"
+#: templates/auth/login.html:13
+msgid "Log In"
+msgstr ""
 
 #: templates/auth/login.html:14
 msgid "Forgot password?"
 msgstr "Esqueceu a senha?"
 
 #: templates/auth/login.html:17
-msgid "You can also login using"
-msgstr "Você também pode entrar utilizando"
+msgid "You can also log in using"
+msgstr ""
 
-#: templates/auth/login.html:27
+#: templates/auth/login.html:26
 msgid "Create an Account"
 msgstr "Criar uma conta"
 
-#: templates/auth/login.html:31
+#: templates/auth/login.html:30
 msgid "Create Account"
 msgstr "Criar conta"
 
@@ -5491,7 +5491,7 @@ msgstr ""
 msgid ""
 "You are about to move this video to a new team.<br /><strong>If you proceed,"
 " all open tasks will be deleted.</strong>"
-msgstr ""
+msgstr "Você está prestes a mover esse vídeo para uma nova equipe.<br /><strong>Se você prosseguir, todas as tarefas abertas serão excluídas.</strong>"
 
 #: templates/teams/_team_select.html:6
 msgid "Managing"
@@ -5554,7 +5554,7 @@ msgstr ""
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
-msgstr ""
+msgstr "Você ainda não vinculou nenhuma conta."
 
 #: templates/teams/activity.html:28
 msgid "Sorry, no activity yet"
@@ -6741,6 +6741,10 @@ msgstr "Adicionar"
 msgid "You must be logged in to add a URL"
 msgstr ""
 
+#: templates/videos/_video_url_panel.html:88
+msgid "Login"
+msgstr "Entrar"
+
 #: templates/videos/_video_url_panel.html:121
 #: templates/videos/_video_url_panel.html:141
 msgid "You are not authenticated"
@@ -7313,7 +7317,7 @@ msgstr "Traduza o vídeo (invente se você não for bilíngue!)"
 
 #: templates/videos/test_form_page.html:42
 msgid "optional: get updates about Amara"
-msgstr ""
+msgstr "opcional: receba atualizações sobre Amara"
 
 #: templates/videos/test_form_page.html:45
 msgid "Submit!"

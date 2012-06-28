@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-27 01:32-0500\n"
-"PO-Revision-Date: 2012-06-27 06:48+0000\n"
+"POT-Creation-Date: 2012-06-28 01:32-0500\n"
+"PO-Revision-Date: 2012-06-28 06:49+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/universalsubtitles/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -108,23 +108,23 @@ msgstr "邮件确认"
 msgid "e-mail confirmations"
 msgstr "邮件确认"
 
-#: apps/auth/views.py:61
+#: apps/auth/views.py:58
 msgid "Confirmation key expired."
 msgstr "确认码过期。"
 
-#: apps/auth/views.py:63
+#: apps/auth/views.py:60
 msgid "Email is confirmed."
 msgstr "电邮已确认。"
 
-#: apps/auth/views.py:75
+#: apps/auth/views.py:72
 msgid "Confirmation email was sent."
 msgstr "确认邮件已发。"
 
-#: apps/auth/views.py:77
+#: apps/auth/views.py:74
 msgid "You email is empty or already confirmed."
 msgstr "你的电邮为空，或者已确认。"
 
-#: apps/auth/views.py:110
+#: apps/auth/views.py:106
 msgid "Your account was deleted."
 msgstr "你的帐号被删除。"
 
@@ -4339,26 +4339,26 @@ msgid "Cancel"
 msgstr "取消"
 
 #: templates/auth/login.html:9
-msgid "Login to Your Existing Account"
-msgstr "使用你现有的帐户登录"
+msgid "Log In to Your Existing Account"
+msgstr ""
 
-#: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
-msgid "Login"
-msgstr "登录"
+#: templates/auth/login.html:13
+msgid "Log In"
+msgstr ""
 
 #: templates/auth/login.html:14
 msgid "Forgot password?"
 msgstr "忘记密码？"
 
 #: templates/auth/login.html:17
-msgid "You can also login using"
-msgstr "你也可以使用"
+msgid "You can also log in using"
+msgstr ""
 
-#: templates/auth/login.html:27
+#: templates/auth/login.html:26
 msgid "Create an Account"
 msgstr "注册会员"
 
-#: templates/auth/login.html:31
+#: templates/auth/login.html:30
 msgid "Create Account"
 msgstr "注册会员"
 
@@ -6719,6 +6719,10 @@ msgstr "添加"
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
 msgstr "要添加一个URL你必须登录"
+
+#: templates/videos/_video_url_panel.html:88
+msgid "Login"
+msgstr "登录"
 
 #: templates/videos/_video_url_panel.html:121
 #: templates/videos/_video_url_panel.html:141
