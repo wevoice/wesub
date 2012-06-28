@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-27 01:32-0500\n"
-"PO-Revision-Date: 2012-06-27 06:48+0000\n"
+"POT-Creation-Date: 2012-06-28 01:32-0500\n"
+"PO-Revision-Date: 2012-06-28 06:49+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -107,23 +107,23 @@ msgstr "correu electrònic de confirmació"
 msgid "e-mail confirmations"
 msgstr "correu electrònic de confirmacions"
 
-#: apps/auth/views.py:61
+#: apps/auth/views.py:58
 msgid "Confirmation key expired."
 msgstr "La clau de confirmació ha expirat."
 
-#: apps/auth/views.py:63
+#: apps/auth/views.py:60
 msgid "Email is confirmed."
 msgstr "Correu electrònic confirmat."
 
-#: apps/auth/views.py:75
+#: apps/auth/views.py:72
 msgid "Confirmation email was sent."
 msgstr "El correu electrònic ha estat enviat."
 
-#: apps/auth/views.py:77
+#: apps/auth/views.py:74
 msgid "You email is empty or already confirmed."
 msgstr "La vostra adreça de correu està buida o ja ha estat confirmada."
 
-#: apps/auth/views.py:110
+#: apps/auth/views.py:106
 msgid "Your account was deleted."
 msgstr "El vostre compte ha estat eliminat."
 
@@ -4341,26 +4341,26 @@ msgid "Cancel"
 msgstr "Cancel·lar"
 
 #: templates/auth/login.html:9
-msgid "Login to Your Existing Account"
-msgstr "Ingressar al vostre compte existent"
+msgid "Log In to Your Existing Account"
+msgstr ""
 
-#: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
-msgid "Login"
-msgstr "Inicia una sessió"
+#: templates/auth/login.html:13
+msgid "Log In"
+msgstr ""
 
 #: templates/auth/login.html:14
 msgid "Forgot password?"
 msgstr "Heu oblidat la contrasenya?"
 
 #: templates/auth/login.html:17
-msgid "You can also login using"
-msgstr "També podeu iniciar sessió amb"
+msgid "You can also log in using"
+msgstr ""
 
-#: templates/auth/login.html:27
+#: templates/auth/login.html:26
 msgid "Create an Account"
 msgstr "Crear un compte"
 
-#: templates/auth/login.html:31
+#: templates/auth/login.html:30
 msgid "Create Account"
 msgstr "Crear compte"
 
@@ -6730,6 +6730,10 @@ msgstr "Afegir"
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
 msgstr "Has d'accedir com a usuari per a afegir una URL"
+
+#: templates/videos/_video_url_panel.html:88
+msgid "Login"
+msgstr "Inicia una sessió"
 
 #: templates/videos/_video_url_panel.html:121
 #: templates/videos/_video_url_panel.html:141

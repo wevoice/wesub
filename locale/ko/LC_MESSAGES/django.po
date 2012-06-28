@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-27 01:32-0500\n"
-"PO-Revision-Date: 2012-06-27 06:48+0000\n"
+"POT-Creation-Date: 2012-06-28 01:32-0500\n"
+"PO-Revision-Date: 2012-06-28 06:49+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/universalsubtitles/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -107,23 +107,23 @@ msgstr "이메일 확인"
 msgid "e-mail confirmations"
 msgstr "이메일 확인"
 
-#: apps/auth/views.py:61
+#: apps/auth/views.py:58
 msgid "Confirmation key expired."
 msgstr "이메일 인증키가 더 이상 유효하지 않습니다."
 
-#: apps/auth/views.py:63
+#: apps/auth/views.py:60
 msgid "Email is confirmed."
 msgstr "이메일을 확인했습니다."
 
-#: apps/auth/views.py:75
+#: apps/auth/views.py:72
 msgid "Confirmation email was sent."
 msgstr "이메일 확인 메일을 보냈습니다."
 
-#: apps/auth/views.py:77
+#: apps/auth/views.py:74
 msgid "You email is empty or already confirmed."
 msgstr "이메일 주소가 비어있거나 이미 확인을 하였습니다."
 
-#: apps/auth/views.py:110
+#: apps/auth/views.py:106
 msgid "Your account was deleted."
 msgstr "귀하의 계정이 삭제되었습니다."
 
@@ -4338,26 +4338,26 @@ msgid "Cancel"
 msgstr "취소"
 
 #: templates/auth/login.html:9
-msgid "Login to Your Existing Account"
-msgstr "기존 계정에 로그인"
+msgid "Log In to Your Existing Account"
+msgstr ""
 
-#: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
-msgid "Login"
-msgstr "로그인"
+#: templates/auth/login.html:13
+msgid "Log In"
+msgstr ""
 
 #: templates/auth/login.html:14
 msgid "Forgot password?"
 msgstr "비밀 번호를 잊으셨습니까?"
 
 #: templates/auth/login.html:17
-msgid "You can also login using"
-msgstr "당신은 또한 이것을 사용하여 로그인하실 수 있습니다."
+msgid "You can also log in using"
+msgstr ""
 
-#: templates/auth/login.html:27
+#: templates/auth/login.html:26
 msgid "Create an Account"
 msgstr "계정 만들기"
 
-#: templates/auth/login.html:31
+#: templates/auth/login.html:30
 msgid "Create Account"
 msgstr "계정 만들기"
 
@@ -6718,6 +6718,10 @@ msgstr "추가"
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
 msgstr ""
+
+#: templates/videos/_video_url_panel.html:88
+msgid "Login"
+msgstr "로그인"
 
 #: templates/videos/_video_url_panel.html:121
 #: templates/videos/_video_url_panel.html:141

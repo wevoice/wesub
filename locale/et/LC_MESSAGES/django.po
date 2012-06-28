@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-27 01:38-0500\n"
+"POT-Creation-Date: 2012-06-28 01:39-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -104,23 +104,23 @@ msgstr ""
 msgid "e-mail confirmations"
 msgstr ""
 
-#: apps/auth/views.py:61
+#: apps/auth/views.py:58
 msgid "Confirmation key expired."
 msgstr ""
 
-#: apps/auth/views.py:63
+#: apps/auth/views.py:60
 msgid "Email is confirmed."
 msgstr ""
 
-#: apps/auth/views.py:75
+#: apps/auth/views.py:72
 msgid "Confirmation email was sent."
 msgstr ""
 
-#: apps/auth/views.py:77
+#: apps/auth/views.py:74
 msgid "You email is empty or already confirmed."
 msgstr ""
 
-#: apps/auth/views.py:110
+#: apps/auth/views.py:106
 msgid "Your account was deleted."
 msgstr ""
 
@@ -4570,11 +4570,11 @@ msgid "Cancel"
 msgstr ""
 
 #: templates/auth/login.html:9
-msgid "Login to Your Existing Account"
+msgid "Log In to Your Existing Account"
 msgstr ""
 
-#: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
-msgid "Login"
+#: templates/auth/login.html:13
+msgid "Log In"
 msgstr ""
 
 #: templates/auth/login.html:14
@@ -4582,14 +4582,14 @@ msgid "Forgot password?"
 msgstr ""
 
 #: templates/auth/login.html:17
-msgid "You can also login using"
+msgid "You can also log in using"
 msgstr ""
 
-#: templates/auth/login.html:27
+#: templates/auth/login.html:26
 msgid "Create an Account"
 msgstr ""
 
-#: templates/auth/login.html:31
+#: templates/auth/login.html:30
 msgid "Create Account"
 msgstr ""
 
@@ -6976,6 +6976,10 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
+msgstr ""
+
+#: templates/videos/_video_url_panel.html:88
+msgid "Login"
 msgstr ""
 
 #: templates/videos/_video_url_panel.html:121
