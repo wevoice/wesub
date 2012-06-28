@@ -265,7 +265,8 @@ def actions_list(request, video_id):
 @transaction.commit_manually
 def upload_subtitles(request):
     output = dict(success=False)
-    form = SubtitlesUploadForm(request.user, request.POST, request.FILES)
+    video = Video.objects.get(id=request.POST['video'][0])
+    form = SubtitlesUploadForm(request.user, video, request.POST, request.FILES)
 
     if form.is_valid():
         try:
