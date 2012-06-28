@@ -19,10 +19,12 @@ from __future__ import with_statement
 
 import os, sys, string, random
 from datetime import datetime
+from functools import wraps
+import time
 
 import fabric.colors as colors
-from fabric.api import run, sudo, env, cd, local as _local
-from fabric.context_managers import settings
+from fabric.api import run, sudo, env, cd, local as _local, abort
+from fabric.context_managers import settings, hide
 from fabric.utils import fastprint
 
 
@@ -114,6 +116,40 @@ class Output(object):
     def fastprintln(self, s):
         self.fastprint(s + '\n')
 
+def _lock(*args, **kwargs):
+    """
+    Creates a temporary "lock" file to prevent concurrent deployments
+
+    """
+    with settings(hide('warnings', 'running', 'stdout', 'stderr'), warn_only=True):
+        res = run('cat {0}'.format(env.deploy_lock))
+    if res.succeeded:
+        abort('Another operation is currently in progress: {0}'.format(res))
+    else:
+        task = kwargs.get('task', '')
+        with settings(hide('running', 'stdout', 'stderr'), warn_only=True):
+            run('echo "{0} : {1}" > {2} {3}'.format(datetime.now(), env.user, env.deploy_lock, task))
+
+def _unlock(*args, **kwargs):
+    """
+    Removes deploy lock
+
+    """
+    with settings(hide('running', 'stdout', 'stderr'), warn_only=True):
+        run('rm -f {0}'.format(env.deploy_lock))
+
+def lock_required(f):
+    """
+    Decorator for the lock / unlock functionality
+
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        _execute_on_all_hosts(lambda dir: _lock(dir, task=f.func_name))
+        out = f(*args, **kwargs)
+        _execute_on_all_hosts(lambda dir: _unlock(dir))
+        return out
+    return decorated
 
 def local(*args, **kwargs):
     '''Override Fabric's local() to facilitate output logging.'''
@@ -148,6 +184,7 @@ def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
     env.user = username
     env.web_hosts = hosts
     env.hosts = []
+    env.deploy_lock = '/tmp/.unisubs_deploy'
     env.hostnames_squid_cache = hostnames_squid_cache
     env.s3_bucket = s3_bucket
     env.web_dir = web_dir or '/var/www/{0}'.format(installation_dir)
@@ -283,7 +320,7 @@ def nf(username):
                     celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
 
-
+@lock_required
 def syncdb():
     """Run python manage.py syncdb for the main and logging databases"""
 
@@ -298,6 +335,7 @@ def syncdb():
                     '--database=uslogging --settings=unisubs_settings'.format(
                         env.static_dir))
 
+@lock_required
 def migrate(app_name=''):
     with Output("Performing migrations"):
         env.host_string = DEV_HOST
@@ -316,7 +354,7 @@ def migrate(app_name=''):
                 "screen sh -c $'" +
                     manage_cmd +
                     timestamp_cmd +
-                    log_cmd + 
+                    log_cmd +
                 "'"
             )
             run(cmd)
@@ -345,7 +383,6 @@ def run_shell(command, is_sudo=False):
     with Output("Running '{0}' on all hosts".format(command)):
         _execute_on_all_hosts(lambda dir: _run_shell(dir, command, bool(is_sudo)))
 
-
 def migrate_fake(app_name):
     '''Fake a migration to 0001 for the specified app
 
@@ -362,16 +399,17 @@ def migrate_fake(app_name):
         with cd(os.path.join(env.static_dir, 'unisubs')):
             run('yes no | {0}/env/bin/python manage.py migrate {1} 0001 --fake --settings=unisubs_settings'.format(env.static_dir, app_name))
 
+@lock_required
 def refresh_db():
     # Should really be checking for 'production'
     if env.installation_name is None:
         Output("Cannot refresh production database")
         return
-      
+
     with Output("Refreshing database"):
         add_disabled()
         stop_celeryd()
-        
+
         env.host_string = env.web_hosts[0]
         sudo('/scripts/amara_reset_db.sh {0}'.format(env.installation_name))
         sudo('/scripts/amara_refresh_db.sh {0}'.format(env.installation_name))
@@ -379,17 +417,20 @@ def refresh_db():
         bounce_memcached()
         run('{0}/env/bin/python manage.py fix_static_files '
             '--settings=unisubs_settings'.format(env.static_dir))
-            
+
         start_celeryd()
         removed_disabled()
 
-
 def _execute_on_all_hosts(cmd):
+    # horrible hack to not have dev_host be called twice ; this needs refactoring
+    dev_host = False
     for host in env.web_hosts:
+        if host == DEV_HOST: dev_host = True
         env.host_string = host
         cmd(env.web_dir)
-    env.host_string = DEV_HOST
-    cmd(env.static_dir)
+    if not dev_host:
+        env.host_string = DEV_HOST
+        cmd(env.static_dir)
     if env.admin_dir is not None:
         env.host_string = env.admin_host
         cmd(env.admin_dir)
@@ -426,15 +467,33 @@ def remove_pip_package(package_egg_name):
 def _update_environment(base_dir, flags=''):
     with cd(os.path.join(base_dir, 'unisubs', 'deploy')):
         _git_pull()
+        env_dir = '{0}/env'.format(base_dir)
+        tmp_env_dir = '{0}/env_{1}'.format(base_dir, int(time.time()))
+        # gather existing envs
+        envs = run('find {0}/ -type d -name "env_*"'.format(base_dir))
         run('export PIP_REQUIRE_VIRTUALENV=true')
+        # create new venv for fresh environment
+        run('virtualenv --no-site-packages {0}'.format(tmp_env_dir))
         # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
-        run('yes i | {0}/env/bin/pip install {1} -r requirements.txt'.format(base_dir, flags), pty=True)
+        res = run('yes i | {0}/bin/pip install {1} -r requirements.txt'.format(tmp_env_dir, flags), pty=True)
+        # check if pip failed and abort if so
+        if res.failed:
+            # if fail ; abort
+            abort('Error occurred during pip install: {0}'.format(res))
+        # all good ; overwrite symlink to prod
+        run('if [ -e {1} ]; then rm -rf {1}; fi ; ln -sf {0} {1}'.format(tmp_env_dir, env_dir))
+        # remove previous envs
+        run('rm -rf {0}'.format(' '.join(envs.split('\n'))))
         #_clear_permissions(os.path.join(base_dir, 'env'))
+        bounce_celeryd()
+        bounce_memcached()
+        test_services()
+        reload_app_servers()
 
+@lock_required
 def update_environment(flags=''):
     with Output("Updating virtualenv"):
         _execute_on_all_hosts(lambda dir: _update_environment(dir, flags))
-
 
 def _clear_permissions(dir):
     sudo('chgrp pcf-web -R {0}'.format(dir))
@@ -556,6 +615,7 @@ def _notify(subj, msg, audience='sysadmin@pculture.org ehazlett@pculture.org'):
     run("echo '{1}' | mailx -s '{0}' {2}".format(subj, msg, audience))
     env.host_string = old_host
 
+@lock_required
 def update_web():
     """
     This is how code gets reloaded:
@@ -590,7 +650,7 @@ def update_web():
     bounce_memcached()
     test_services()
     reload_app_servers()
-    
+
     # Workaround that 'None' implies 'production'
     installation_name = 'production' if env.installation_name is None else env.installation_name
 
@@ -799,8 +859,9 @@ def _save_embedjs_on_app_servers():
         # now  purge the squid cache
         for hostname_in_cache in env.hostnames_squid_cache:
            sudo('/usr/bin/squidclient -p  80 -m PURGE  http://{0}/unisubs/media/js/embed.js'.format(hostname_in_cache))
-           sudo('/usr/bin/squidclient -p 443 -m PURGE https://{0}/unisubs/media/js/embed.js'.format(hostname_in_cache))        
+           sudo('/usr/bin/squidclient -p 443 -m PURGE https://{0}/unisubs/media/js/embed.js'.format(hostname_in_cache))
 
+@lock_required
 def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
     """Recompile static media and upload the results to S3"""
 
@@ -815,10 +876,10 @@ def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
             _update_static(env.web_dir, compilation_level)
         _save_embedjs_on_app_servers()
 
+@lock_required
 def update():
     update_static()
     update_web()
-
 
 def _promote_django_admins(dir, email=None, new_password=None, userlist_path=None):
     with cd(os.path.join(dir, 'unisubs')):
@@ -846,7 +907,7 @@ def promote_django_admins(email=None, new_password=None, userlist_path=None):
     env.host_string = env.web_hosts[0]
     return _promote_django_admins(env.web_dir, email, new_password, userlist_path)
 
-
+@lock_required
 def update_translations():
     """Update the translations
 
@@ -914,7 +975,7 @@ def get_settings_values(*settings_names):
     """
     _execute_on_all_hosts(lambda dir: _get_settings_values(dir, *settings_names))
 
-
+@lock_required
 def test_access(is_sudo=False):
     """
     Makes sure the user can connect to all relevant hosts.
