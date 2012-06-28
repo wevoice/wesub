@@ -894,6 +894,31 @@ var Site = function(Site) {
                     $('#' + tab).show();
                 }
             }
+        },
+
+        login: function() {
+            $('.toggle-additional a').click(function(e){
+                e.preventDefault();
+                var more = $('ul.additional');
+
+                if(!more.is(':visible')){
+                    $(this).html('Show fewer providers');
+                } else {
+                    $(this).html('Show more providers');
+                }
+                
+                more.animate({
+                    height: 'toggle'
+                }, 'fast');
+
+            });
+
+            $('.form-swap').click(function(e){
+                e.preventDefault();
+
+                $('form:hidden').show();
+                $(this).parents('form').hide();
+            });
         }
     };
 };
