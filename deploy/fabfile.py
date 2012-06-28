@@ -138,6 +138,14 @@ def _unlock(*args, **kwargs):
     with settings(hide('running', 'stdout', 'stderr'), warn_only=True):
         run('rm -f {0}'.format(env.deploy_lock))
 
+def remove_lock():
+    """
+    Removes lock from hosts (in the event of a failed task)
+
+    """
+    with Output('Removing lock'):
+        _execute_on_all_hosts(lambda dir: _unlock(dir))
+
 def lock_required(f):
     """
     Decorator for the lock / unlock functionality
@@ -615,7 +623,6 @@ def _notify(subj, msg, audience='sysadmin@pculture.org ehazlett@pculture.org'):
     run("echo '{1}' | mailx -s '{0}' {2}".format(subj, msg, audience))
     env.host_string = old_host
 
-@lock_required
 def update_web():
     """
     This is how code gets reloaded:
@@ -861,7 +868,6 @@ def _save_embedjs_on_app_servers():
            sudo('/usr/bin/squidclient -p  80 -m PURGE  http://{0}/unisubs/media/js/embed.js'.format(hostname_in_cache))
            sudo('/usr/bin/squidclient -p 443 -m PURGE https://{0}/unisubs/media/js/embed.js'.format(hostname_in_cache))
 
-@lock_required
 def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
     """Recompile static media and upload the results to S3"""
 
@@ -959,8 +965,6 @@ def build_docs():
                 python_exe = '{0}/env/bin/python'.format(env.static_dir)
                 run('{0} manage.py  upload_docs --settings=unisubs_settings'.format(python_exe))
 
-
-
 def _get_settings_values(dir, *settings_name):
     with cd(os.path.join(dir, 'unisubs')):
         run('../env/bin/python manage.py get_settings_values %s --settings=unisubs_settings' % " ".join(settings_name))
@@ -975,7 +979,6 @@ def get_settings_values(*settings_names):
     """
     _execute_on_all_hosts(lambda dir: _get_settings_values(dir, *settings_names))
 
-@lock_required
 def test_access(is_sudo=False):
     """
     Makes sure the user can connect to all relevant hosts.
