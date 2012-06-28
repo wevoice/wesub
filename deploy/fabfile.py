@@ -154,6 +154,7 @@ def lock_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         _execute_on_all_hosts(lambda dir: _lock(dir, task=f.func_name))
+        out = None
         try:
             out = f(*args, **kwargs)
         except:
@@ -497,10 +498,6 @@ def _update_environment(base_dir, flags=''):
         # remove previous envs
         run('rm -rf {0}'.format(' '.join(envs.split('\n'))))
         #_clear_permissions(os.path.join(base_dir, 'env'))
-        bounce_celeryd()
-        bounce_memcached()
-        test_services()
-        reload_app_servers()
 
 @lock_required
 def update_environment(flags=''):
