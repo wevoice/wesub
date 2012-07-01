@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-28 01:41-0500\n"
+"POT-Creation-Date: 2012-07-01 18:28-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -327,7 +327,7 @@ msgid "Sign in with your OpenID"
 msgstr ""
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
-#: templates/openid_consumer/signin.html:18
+#: templates/auth/login.html:10 templates/openid_consumer/signin.html:18
 msgid "Sign in"
 msgstr ""
 
@@ -1629,7 +1629,7 @@ msgstr ""
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
 #: templates/statistic/log_entry_model_admin.html:18
 #: templates/statistic/logger_model_admin.html:18
 #: templates/statistic/log_methods/changelist_view.html:18
@@ -2908,7 +2908,7 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: templates/base.html:78
+#: templates/base.html:78 templates/auth/login.html:29
 msgid "Sign In"
 msgstr ""
 
@@ -4573,27 +4573,31 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: templates/auth/login.html:9
-msgid "Log In to Your Existing Account"
+#: templates/auth/login.html:21
+msgid "Show more providers"
 msgstr ""
 
-#: templates/auth/login.html:13
-msgid "Log In"
+#: templates/auth/login.html:24
+msgid "Or use your Amara account"
 msgstr ""
 
-#: templates/auth/login.html:14
-msgid "Forgot password?"
+#: templates/auth/login.html:25
+msgid "Don't have one?"
 msgstr ""
 
-#: templates/auth/login.html:17
-msgid "You can also log in using"
+#: templates/auth/login.html:28
+msgid "Forgot your password?"
 msgstr ""
 
-#: templates/auth/login.html:26
-msgid "Create an Account"
+#: templates/auth/login.html:34
+msgid "Create an Amara account"
 msgstr ""
 
-#: templates/auth/login.html:30
+#: templates/auth/login.html:35
+msgid "Already have one?"
+msgstr ""
+
+#: templates/auth/login.html:38
 msgid "Create Account"
 msgstr ""
 
@@ -5148,9 +5152,9 @@ msgstr ""
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:6
 #: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
 #: templates/registration/password_reset_form.html:6
-#: templates/registration/password_reset_form.html:10
+#: templates/registration/password_reset_form.html:8
+#: templates/registration/password_reset_form.html:14
 msgid "Password reset"
 msgstr ""
 
@@ -5241,16 +5245,20 @@ msgid "The %(site_name)s team"
 msgstr ""
 
 #: templates/registration/password_reset_form.html:12
+msgid "Back to Sign In"
+msgstr ""
+
+#: templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
 
-#: templates/registration/password_reset_form.html:17
+#: templates/registration/password_reset_form.html:18
 msgid "E-mail address:"
 msgstr ""
 
-#: templates/registration/password_reset_form.html:18
+#: templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr ""
 
