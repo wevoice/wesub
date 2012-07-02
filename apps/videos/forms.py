@@ -445,8 +445,6 @@ class SubtitlesUploadForm(forms.Form):
         choices = [('', 'Directly from video')] + ([(sl.language, sl.language_display()) for sl in video.subtitlelanguage_set.all() if sl.is_complete_and_synced()])
         self.fields['translated_from'].choices = choices
 
-        logger.error(self.fields['translated_from'].choices)
-
     def clean_video(self):
         video = self.cleaned_data['video']
         if video.is_writelocked:
