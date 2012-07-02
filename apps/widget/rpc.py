@@ -235,6 +235,15 @@ class Rpc(BaseRpc):
             'general_settings': general_settings }
 
 
+    # Ugly hack for N caption display.
+    def get_caption_display_mode(self, language):
+        team_video = language.video.get_team_video()
+        if team_video and team_video.team.slug == 'ted':
+            return 'n'
+        else:
+            return 'normal'
+
+
     # Start Editing
     def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode, is_edit):
         """Check whether the a team prevents the user from editing the subs.
@@ -351,6 +360,7 @@ class Rpc(BaseRpc):
             version_for_subs, version_no, base_language_pk is None)
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
+                        "caption_display_mode": self.get_caption_display_mode(language),
                         "subtitles": subtitles }
 
         # If this is a translation, include the subtitles it's based on in the response.
@@ -389,6 +399,7 @@ class Rpc(BaseRpc):
             return_dict = { "response": "ok",
                             "can_edit" : True,
                             "session_pk" : session.pk,
+                            "caption_display_mode": self.get_caption_display_mode(session.language),
                             "subtitles" : subtitles }
             if session.base_language:
                 return_dict['original_subtitles'] = \

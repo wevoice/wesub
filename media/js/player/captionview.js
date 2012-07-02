@@ -165,9 +165,15 @@ unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_ma
 unisubs.player.CaptionView.prototype.setCaptionText = function(text) {
     if (text == null || text == "") {
         this.setVisibility(false);
-    }
-    else{
-        var text = unisubs.player.CaptionView.breakLines(text);
+    } else {
+        // TODO: This ugly hack is for N, who require a different standard of
+        // displaying subtitles.  We should remove this once we have pluginable
+        // popcorn set up.
+        if (unisubs.caption_display_mode == 'n') {
+            text = unisubs.player.CaptionView.breakLines(text);
+        } else {
+            text = goog.string.newLineToBr(goog.string.htmlEscape(text));
+        }
         // convert to markdown after text layout has been done
         // as to not inflate char count:
 
