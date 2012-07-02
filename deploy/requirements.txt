@@ -35,7 +35,7 @@ python-memcached
 feedparser
 lxml==2.3
 raven==1.8.2
-vendor/indifex-transifex-client-0.5.tar.gz
+transifex-client==0.8
 django-extensions==0.4.1
 # do we really need this in prod?
 django-debug-toolbar==0.8.3
