@@ -262,12 +262,19 @@ def actions_list(request, video_id):
                        extra_context=extra_context)
 
 @login_required
+@transaction.commit_manually
 def upload_subtitles(request):
     output = dict(success=False)
     video = Video.objects.get(id=request.POST['video'][0])
     form = SubtitlesUploadForm(request.user, video, request.POST, request.FILES)
 
-    if form.is_valid():
+    try:
+        valid = form.is_valid()
+    except Exception, e:
+        output['errors'] = {"_all__":[force_unicode(e)]}
+        return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
+
+    if valid:
         try:
             language = form.save()
             output['success'] = True
@@ -276,15 +283,22 @@ def upload_subtitles(request):
             else:
                 output['msg'] = ugettext(u'Your changes have been saved.')
             output['next'] = language.get_absolute_url()
+            transaction.commit()
         except AlreadyEditingException, e:
             output['errors'] = {"_all__":[force_unicode(e.msg)]}
+            transaction.rollback()
         except Exception, e:
             output['errors'] = {"_all__":[force_unicode(e)]}
+            transaction.rollback()
             from raven.contrib.django.models import client
             client.create_from_exception()
 
     else:
         output['errors'] = form.get_errors()
+        transaction.rollback()
+
+    if transaction.is_dirty():
+        transaction.rollback()
 
     return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
 
