@@ -54,6 +54,9 @@ from videos.types.youtube import yt_service
 ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
 KB_SIZELIMIT = 512
 
+import logging
+logger = logging.getLogger("videos-forms")
+
 class TranscriptionFileForm(forms.Form, AjaxForm):
     txtfile = forms.FileField()
 
@@ -441,6 +444,8 @@ class SubtitlesUploadForm(forms.Form):
         self.fields['video_language'].choices = get_language_choices()
         choices = [('', 'Directly from video')] + ([(sl.language, sl.language_display()) for sl in video.subtitlelanguage_set.all() if sl.is_complete_and_synced()])
         self.fields['translated_from'].choices = choices
+
+        logger.error(self.fields['translated_from'].choices)
 
     def clean_video(self):
         video = self.cleaned_data['video']
