@@ -396,8 +396,9 @@ form.message p span {
     width: 250px;
 }
 form p input, form p textarea, #feedback_form p input {
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
     -moz-box-shadow: inset 0px 0px 2px #999;
     -webkit-box-shadow: inset 0px 0px 2px #999;
     box-shadow: inset 0px 0px 2px #999;
