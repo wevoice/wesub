@@ -7,6 +7,7 @@ PIL==1.1.7
 PyRSS2Gen==1.0.0
 PyYAML==3.09
 South==0.7
+kombu==1.4.3
 vendor/django-registration.tar.gz
 vendor/django-piston.tar.gz
 vendor/django-livesettings.tar.gz

@@ -420,10 +420,10 @@ class SubtitleParserTest(TestCase):
         self.assertTrue(result.find("Here we<br/>go") > -1)
 
 class WebUseTest(TestCase):
-    def _make_objects(self):
+    def _make_objects(self, video_id="S7HMxzLmS9gw"):
         self.auth = dict(username='admin', password='admin')
         self.user = User.objects.get(username=self.auth['username'])
-        self.video = Video.objects.get(video_id='S7HMxzLmS9gw')
+        self.video = Video.objects.get(video_id=video_id)
         self.video.followers.add(self.user)
 
     def _simple_test(self, url_name, args=None, kwargs=None, status=200, data={}):
@@ -521,6 +521,38 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertTrue(language.has_version)
         self.assertTrue(video.is_subtitled)
 
+    def test_upload_translation(self):
+        self._login()
+        data = self._make_data(lang='en')
+        video = Video.objects.get(pk=self.video.pk)
+        response = self.client.post(reverse('videos:upload_subtitles'), data)
+        self.assertEqual(response.status_code, 200)
+
+        video = Video.objects.get(pk=self.video.pk)
+        self.assertEqual(1, video.subtitlelanguage_set.count())
+        language = video.subtitle_language()
+        self.assertEqual('en', language.language)
+        self.assertTrue(language.is_original)
+        self.assertTrue(language.has_version)
+        self.assertTrue(video.is_subtitled)
+        self.assertFalse(language.is_dependent())
+
+        data = self._make_data(lang='fr')
+        data['translated_from'] = 'en'
+
+        response = self.client.post(reverse('videos:upload_subtitles'), data)
+        self.assertEqual(response.status_code, 200)
+
+        video = Video.objects.get(pk=self.video.pk)
+        self.assertEqual(2, video.subtitlelanguage_set.count())
+        language = video.subtitle_language("fr")
+        self.assertEqual('fr', language.language)
+        self.assertFalse(language.is_original)
+        self.assertTrue(language.has_version)
+        self.assertTrue(video.is_subtitled)
+        self.assertTrue(language.is_dependent())
+        self.assertEquals(language.standard_language.language, "en")
+
     def test_upload_twice(self):
         self._login()
         data = self._make_data()
@@ -534,7 +566,6 @@ class UploadSubtitlesTest(WebUseTest):
         self.client.post(reverse('videos:upload_subtitles'), data)
         self._make_objects()
         language = self.video.subtitle_language(data['language'])
-        print language.subtitleversion_set.all()
         self.assertEquals(1, language.subtitleversion_set.count())
         self.assertEquals(version_no, language.latest_version(public_only=True).version_no)
         num_languages_2 = self.video.subtitlelanguage_set.all().count()
@@ -792,7 +823,7 @@ class ViewsTest(WebUseTest):
     fixtures = ['test.json']
 
     def setUp(self):
-        self._make_objects()
+        self._make_objects("iGzkk7nwWX8F")
         cache.clear()
 
     def _test_video_url_make_primary(self):
@@ -2510,7 +2541,7 @@ class TestSRT(WebUseTest, BaseDownloadTest):
         self.auth = dict(username='admin', password='admin')
         self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
         self.language = SubtitleLanguage.objects.get_or_create(
-            video=self.video, is_forked=False, language='en')[0]
+            video=self.video, is_forked=True, language='en')[0]
 
     def test_download_markdown(self):
         subs_data = ['one line',
