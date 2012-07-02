@@ -450,7 +450,7 @@ class SubtitlesUploadForm(forms.Form):
 
         return video
 
-    def clean_translate_from(self):
+    def clean_translated_from(self):
         language = self.cleaned_data['translated_from']
 
         allowed_languages = [sl.language for sl in self.video.subtitlelanguage_set.all() if sl.is_complete_and_synced()]
