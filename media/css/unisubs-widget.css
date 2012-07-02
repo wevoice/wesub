@@ -1206,7 +1206,7 @@ ul.unisubs-titlesList.unisubs-beginTab .unisubs-beginTabLi {
 .unisubs-titlesList .unisubs-timestamp-time-fixed {
     font-weight: normal !important;
     color: #888 !important;
-    padding-left: 10px !important;
+    padding: 0 0 10px 10px !important;
     font-size: 10px !important;
     float: right !important;
 }
@@ -1283,6 +1283,7 @@ ul.unisubs-titlesList.unisubs-beginTab .unisubs-beginTabLi {
 }
 .unisubs-title.is-rtl {
     direction: rtl;
+    text-align: right;
 }
 .unisubs-title span.meta, .unisubs-description span.meta {
     color: #C0C0C0;
