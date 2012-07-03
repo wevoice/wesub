@@ -20,7 +20,7 @@
         </ul>
         <p class="toggle-additional"><a href="">{% trans "Show more providers" %}</a></p>
     </div>
-    <form action="{% url auth:login_post %}" method="post">
+    <form class="auth-form" action="{% url auth:login_post %}" method="post">
         <h3>{% trans "Or use your Amara account" %}</h3>
         <p class="help"><a href="#" class="form-swap">{% trans "Don't have one?" %}</a></p>
         {% csrf_token %}
@@ -29,8 +29,7 @@
         <button type="submit" class="green_button big" value="login">{% trans 'Sign In' %}</button>
         <input type="hidden" name="next" value="{{ next }}" />
     </form>
-  
-    <form action="{% url auth:create_user %}" method="post" style="display:none;">
+    <form class="auth-form" action="{% url auth:create_user %}" method="post" style="display:none;">
         <h3>{% trans "Create an Amara account" %}</h3>
         <p class="help"><a href="#" class="form-swap">{% trans "Already have one?" %}</a></p>
         {% csrf_token %}
