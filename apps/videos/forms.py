@@ -596,7 +596,7 @@ class SubtitlesUploadForm(forms.Form):
 
         translated_from = video.subtitle_language(translated_from_language)
 
-        if translated_from and translated_from.version():
+        if is_complete and translated_from and translated_from.version():
             original_subs_count = translated_from.version().subtitle_set.count()
             is_complete = original_subs_count <= len(self._parser)
 
