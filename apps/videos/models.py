@@ -1596,7 +1596,7 @@ class SubtitleVersion(SubtitleCollection):
         return self._get_metadata('approved_by')
 
     def get_workflow_origin(self):
-        """Return the step of the workflow where this versio originated, or None.
+        """Return the step of the workflow where this version originated, or None.
 
         Hits the DB.
 
