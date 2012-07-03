@@ -238,7 +238,7 @@ class Rpc(BaseRpc):
     # Ugly hack for N caption display.
     def get_caption_display_mode(self, language):
         team_video = language.video.get_team_video()
-        if team_video and team_video.team.slug == 'ted':
+        if team_video and team_video.team.slug == 'netflix':
             return 'n'
         else:
             return 'normal'
