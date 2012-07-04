@@ -20,7 +20,8 @@ from django import template
 from django.utils.translation import ugettext_lazy as _, ungettext
 from django.utils import translation
 
-from videos import format_time, markdown_to_html
+from videos import format_time
+from utils.unisubsmarkup import markup_to_html
 from videos.forms import SubtitlesUploadForm, CreateVideoUrlForm
 from icanhaz.models import VideoVisibilityPolicy
 from utils.subtitles import strip_tags
@@ -110,5 +111,5 @@ def display_subtitle(text):
     Make sure we only allow the default subtitle formatiing tags
     (i, b, u) to pass
     """
-    txt = markdown_to_html(text)
+    txt = markup_to_html(text)
     return txt
