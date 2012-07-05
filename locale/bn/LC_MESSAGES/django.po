@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-03 01:38-0500\n"
+"POT-Creation-Date: 2012-07-05 01:36-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1578,7 +1578,7 @@ msgstr ""
 msgid "Feed is unavailable now."
 msgstr ""
 
-#: apps/videos/templatetags/subtitles_tags.py:58
+#: apps/videos/templatetags/subtitles_tags.py:59
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
@@ -1620,7 +1620,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:928 apps/widget/rpc.py:969
+#: apps/widget/rpc.py:945 apps/widget/rpc.py:986
 msgid "\n"
 msgstr ""
 
@@ -4598,15 +4598,15 @@ msgstr ""
 msgid "Forgot your password?"
 msgstr ""
 
-#: templates/auth/login.html:34
+#: templates/auth/login.html:33
 msgid "Create an Amara account"
 msgstr ""
 
-#: templates/auth/login.html:35
+#: templates/auth/login.html:34
 msgid "Already have one?"
 msgstr ""
 
-#: templates/auth/login.html:38
+#: templates/auth/login.html:37
 msgid "Create Account"
 msgstr ""
 
