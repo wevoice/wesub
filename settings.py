@@ -104,6 +104,7 @@ JS_CORE = \
      'js/loadingdom.js',
      'js/tracker.js',
      'js/style.js',
+     'js/html/markdown.js',
      'js/messaging/simplemessage.js',
      'js/player/video.js',
      'js/player/captionview.js',
@@ -345,11 +346,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.request',
-    'context_processors.current_site',
-    'context_processors.current_commit',
-    'context_processors.custom',
-    'context_processors.user_languages',
-    'context_processors.run_locally',
+    'utils.context_processors.current_site',
+    'utils.context_processors.current_commit',
+    'utils.context_processors.custom',
+    'utils.context_processors.user_languages',
+    'utils.context_processors.run_locally',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.i18n',
     'utils.context_processors.media',
@@ -384,7 +385,6 @@ INSTALLED_APPS = (
     # our apps
     'accountlinker',
     'comments',
-    'doorman',
     'icanhaz',
     'messages',
     'profiles',
@@ -532,10 +532,6 @@ ROSETTA_EXCLUDED_APPLICATIONS = (
     'rosetta'
 )
 
-
-# this is used in our feature swither app, doorman, empty for now
-FEATURE_FLAGS  = {
-}
 
 INTEGRATION_PATH = os.path.join(PROJECT_ROOT, 'unisubs-integration')
 USE_INTEGRATION = os.path.exists(INTEGRATION_PATH)

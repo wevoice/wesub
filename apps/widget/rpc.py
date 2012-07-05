@@ -41,6 +41,7 @@ from utils.forms import flatten_errorlists
 from utils.metrics import Meter
 from utils.translation import get_user_languages_from_request
 from videos import models
+from videos.models import record_workflow_origin
 from videos.tasks import video_changed_tasks
 from widget import video_cache
 from widget.base_rpc import BaseRpc
@@ -234,6 +235,15 @@ class Rpc(BaseRpc):
             'general_settings': general_settings }
 
 
+    # Ugly hack for N caption display.
+    def get_caption_display_mode(self, language):
+        team_video = language.video.get_team_video()
+        if team_video and team_video.team.slug == 'netflix':
+            return 'n'
+        else:
+            return 'normal'
+
+
     # Start Editing
     def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode, is_edit):
         """Check whether the a team prevents the user from editing the subs.
@@ -332,7 +342,7 @@ class Rpc(BaseRpc):
         # Ensure that the user is not blocked from editing this video by team
         # permissions.
         locked = self._check_team_video_locking(
-            request.user, video_id, language_code, bool(base_language_pk), 
+            request.user, video_id, language_code, bool(base_language_pk),
             mode, bool(language.version(public_only=False)))
 
         if locked:
@@ -350,6 +360,7 @@ class Rpc(BaseRpc):
             version_for_subs, version_no, base_language_pk is None)
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
+                        "caption_display_mode": self.get_caption_display_mode(language),
                         "subtitles": subtitles }
 
         # If this is a translation, include the subtitles it's based on in the response.
@@ -388,6 +399,7 @@ class Rpc(BaseRpc):
             return_dict = { "response": "ok",
                             "can_edit" : True,
                             "session_pk" : session.pk,
+                            "caption_display_mode": self.get_caption_display_mode(session.language),
                             "subtitles" : subtitles }
             if session.base_language:
                 return_dict['original_subtitles'] = \
@@ -499,11 +511,15 @@ class Rpc(BaseRpc):
 
         """
 
+        team_video = language.video.get_team_video()
+
+        # Record the origin of this set of subtitles.
+        record_workflow_origin(new_version, team_video)
+
         if not save_for_later:
             # If we've just saved a completed subtitle language, we may need to
             # complete a subtitle or translation task.
             if is_complete:
-                team_video = language.video.get_team_video()
                 if team_video:
                     tasks = team_video.task_set.incomplete().filter(
                         type__in=(Task.TYPE_IDS['Subtitle'],
@@ -719,7 +735,7 @@ class Rpc(BaseRpc):
         
     def _moderate_incomplete_version(self, subtitle_version, user):
         """ Verifies if it's possible to create a transcribe/translate task (if there's
-        no other transcribe/translate task) and tries to assign to user. 
+        no other transcribe/translate task) and tries to assign to user.
         Also, if the video belongs to a team, change its status.
         """
 
@@ -727,6 +743,11 @@ class Rpc(BaseRpc):
 
         if not team_video:
             return
+
+        workflow = Workflow.get_for_team_video(team_video)
+
+        if not workflow.approve_enabled and not workflow.review_enabled:
+            return UNMODERATED, False
 
         language = subtitle_version.language.language
 

@@ -21,9 +21,10 @@ goog.provide('unisubs.subtitle.TranscribeEntry');
 * @constructor
 * @extends goog.ui.Component
 */
-unisubs.subtitle.TranscribeEntry = function(videoPlayer) {
+unisubs.subtitle.TranscribeEntry = function(videoPlayer, languageIsRTL) {
     goog.ui.Component.call(this);
     this.videoPlayer_ = videoPlayer;
+    this.languageIsRTL_ = languageIsRTL;
     this.endOfPPlayheadTime_ = null;
 
     this.wasPlaying_ = false;
@@ -39,13 +40,17 @@ goog.inherits(unisubs.subtitle.TranscribeEntry, goog.ui.Component);
 unisubs.subtitle.TranscribeEntry.P = 4;
 unisubs.subtitle.TranscribeEntry.R = 3;
 unisubs.subtitle.TranscribeEntry.S = 1;
-// caption standard says 4 lines with max 32 chars in each
-unisubs.subtitle.TranscribeEntry.CHAR_LIMIT = 128;
+unisubs.subtitle.TranscribeEntry.CHAR_LIMIT = 100;
 unisubs.subtitle.TranscribeEntry.prototype.createDom = function() {
     unisubs.subtitle.TranscribeEntry.superClass_.createDom.call(this);
     this.getElement().setAttribute('class', 'unisubs-transcribeControls');
     this.addChild(this.labelInput_ = new goog.ui.Textarea(), true);
     this.labelInput_.getElement().placeholder= 'Type subtitle and press enter';
+
+    if (this.languageIsRTL_) {
+        this.labelInput_.getElement().dir = 'rtl';
+    }
+
     this.labelInput_.LABEL_CLASS_NAME = 'unisubs-label-input-label';
     goog.ui.Textarea.NEEDS_HELP_SHRINKING_ = false;
     this.labelInput_.setMinHeight(17);
@@ -158,13 +163,27 @@ unisubs.subtitle.TranscribeEntry.prototype.addNewTitle_ = function() {
 unisubs.subtitle.TranscribeEntry.prototype.issueLengthWarning_ =
     function(breakable)
 {
+    var max_chars;
+    var start_warning;
+
+    // TODO: This ugly hack is for N, who require a different standard of
+    // displaying subtitles.  We should remove this once we have pluginable
+    // popcorn set up.
+    if (unisubs.caption_display_mode == 'n') {
+        max = 128;
+        start_warning = 90;
+    } else {
+        max = unisubs.subtitle.TranscribeEntry.CHAR_LIMIT;
+        start_warning = 50;
+    }
+
     var length = this.labelInput_.getValue().length;
-    if (breakable && length > unisubs.subtitle.TranscribeEntry.CHAR_LIMIT)
+    if (breakable && length > max_chars)
         this.addNewTitle_();
     else
         unisubs.style.setProperty(
             this.getElement(), 'background',
-            this.warningColor_(length, 90, unisubs.subtitle.TranscribeEntry.CHAR_LIMIT));
+            this.warningColor_(length, start_warning, max_chars));
 };
 unisubs.subtitle.TranscribeEntry.prototype.warningColor_ =
     function(length, firstChars, maxChars) {

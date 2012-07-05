@@ -7,6 +7,7 @@ PIL==1.1.7
 PyRSS2Gen==1.0.0
 PyYAML==3.09
 South==0.7
+kombu==1.4.3
 vendor/django-registration.tar.gz
 vendor/django-piston.tar.gz
 vendor/django-livesettings.tar.gz
@@ -51,3 +52,5 @@ vendor/django-tastypie-0.9.11.tar.gz
 #vendor/oboe-0.4.1.0.tar.gz
 vendor/requests-v0.9.1.0-0.tar.gz
 bernhard==0.0.2
+-e git+https://github.com/jsocol/bleach.git@105b4cfc2f00cc1954bcab3b39b16fbfaf8863e0#egg=bleach
+markdown2==2.0.0

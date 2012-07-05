@@ -37,10 +37,10 @@ from apps.auth.models import CustomUser as User
 from messages.models import Message
 from teams.models import Team, TeamVideo, Workflow, TeamMember
 from testhelpers.views import _create_videos
-from utils import (
+from utils.subtitles import (
     SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser, DfxpSubtitleParser
 )
-from videos import metadata_manager, alarms, EffectiveSubtitle
+from videos import metadata_manager, alarms, EffectiveSubtitle, markdown_to_html, html_to_markdown
 from videos.feed_parser import FeedParser
 from videos.forms import VideoForm
 from videos.models import (
@@ -80,7 +80,7 @@ Don't show this text it may be used to insert hidden data
 2
 00:00:01,500 --> 00:00:04,500
 SubRip subtitles capability tester 1.2p by ale5000
-<b><i>Use Media Player Classic as reference</i></b>
+<b>Use Media Player Classic as reference</b>
 <font color="#0000FF">This text should be blue</font>
 
 3
@@ -319,7 +319,7 @@ class SubtitleParserTest(TestCase):
             u'Don\'t show this text it may be used to insert hidden data')
         self._assert_sub(
             result[1], 1.5, 4.5,
-            u'SubRip subtitles capability tester 1.2p by ale5000\nUse Media Player Classic as reference\nThis text should be blue')
+            u'SubRip subtitles capability tester 1.2p by ale5000\n**Use Media Player Classic as reference**\nThis text should be blue')
         self._assert_sub(
             result[2], 4.5, 4.5,
             u'Hidden')
@@ -328,7 +328,7 @@ class SubtitleParserTest(TestCase):
             u'This should be an E with an accent: \xc8\n\u65e5\u672c\u8a9e')
         self._assert_sub(
             result[4], 55.501, 58.5,
-            u'Hide these tags: ')
+            u'Hide these tags:')
 
     def test_srt_with_blank(self):
         parser = SrtSubtitleParser(SRT_TEXT_WITH_BLANK)
@@ -420,10 +420,10 @@ class SubtitleParserTest(TestCase):
         self.assertTrue(result.find("Here we<br/>go") > -1)
 
 class WebUseTest(TestCase):
-    def _make_objects(self):
+    def _make_objects(self, video_id="S7HMxzLmS9gw"):
         self.auth = dict(username='admin', password='admin')
         self.user = User.objects.get(username=self.auth['username'])
-        self.video = Video.objects.get(video_id='iGzkk7nwWX8F')
+        self.video = Video.objects.get(video_id=video_id)
         self.video.followers.add(self.user)
 
     def _simple_test(self, url_name, args=None, kwargs=None, status=200, data={}):
@@ -444,7 +444,7 @@ class UploadSubtitlesTest(WebUseTest):
             'language': lang,
             'video_language': 'en',
             'video': video_pk,
-            'subtitles': open(os.path.join(os.path.dirname(__file__), 'fixtures/test.srt')),
+            'draft': open(os.path.join(os.path.dirname(__file__), 'fixtures/test.srt')),
             'is_complete': True
             }
 
@@ -455,7 +455,7 @@ class UploadSubtitlesTest(WebUseTest):
             'language': language_code,
             'video': video.pk,
             'video_language': 'en',
-            'subtitles': open(os.path.join(os.path.dirname(__file__), 'fixtures/%s' % subs_filename))
+            'draft': open(os.path.join(os.path.dirname(__file__), 'fixtures/%s' % subs_filename))
             }
 
     def setUp(self):
@@ -470,8 +470,6 @@ class UploadSubtitlesTest(WebUseTest):
 
         language = self.video.subtitle_language(data['language'])
         self.assertEquals(language, None)
-        original_language = self.video.subtitle_language()
-        self.assertFalse(original_language.language)
 
         response = self.client.post(reverse('videos:upload_subtitles'), data)
         self.assertEqual(response.status_code, 200)
@@ -511,6 +509,7 @@ class UploadSubtitlesTest(WebUseTest):
     def test_upload_original_subtitles(self):
         self._login()
         data = self._make_data(lang='en')
+        video = Video.objects.get(pk=self.video.pk)
         response = self.client.post(reverse('videos:upload_subtitles'), data)
         self.assertEqual(response.status_code, 200)
 
@@ -521,6 +520,38 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertTrue(language.is_original)
         self.assertTrue(language.has_version)
         self.assertTrue(video.is_subtitled)
+
+    def test_upload_translation(self):
+        self._login()
+        data = self._make_data(lang='en')
+        video = Video.objects.get(pk=self.video.pk)
+        response = self.client.post(reverse('videos:upload_subtitles'), data)
+        self.assertEqual(response.status_code, 200)
+
+        video = Video.objects.get(pk=self.video.pk)
+        self.assertEqual(1, video.subtitlelanguage_set.count())
+        language = video.subtitle_language()
+        self.assertEqual('en', language.language)
+        self.assertTrue(language.is_original)
+        self.assertTrue(language.has_version)
+        self.assertTrue(video.is_subtitled)
+        self.assertFalse(language.is_dependent())
+
+        data = self._make_data(lang='fr')
+        data['translated_from'] = 'en'
+
+        response = self.client.post(reverse('videos:upload_subtitles'), data)
+        self.assertEqual(response.status_code, 200)
+
+        video = Video.objects.get(pk=self.video.pk)
+        self.assertEqual(2, video.subtitlelanguage_set.count())
+        language = video.subtitle_language("fr")
+        self.assertEqual('fr', language.language)
+        self.assertFalse(language.is_original)
+        self.assertTrue(language.has_version)
+        self.assertTrue(video.is_subtitled)
+        self.assertTrue(language.is_dependent())
+        self.assertEquals(language.standard_language.language, "en")
 
     def test_upload_twice(self):
         self._login()
@@ -539,26 +570,6 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertEquals(version_no, language.latest_version(public_only=True).version_no)
         num_languages_2 = self.video.subtitlelanguage_set.all().count()
         self.assertEquals(num_languages_1, num_languages_2)
-
-    def test_upload_altered(self):
-        self._login()
-        data = self._make_data()
-        altered_data = self._make_altered_data()
-        language = self.video.subtitle_language(data['language'])
-        self.assertEqual(language, None)
-
-        self.client.post(reverse('videos:upload_subtitles'), data)
-        language = self.video.subtitle_language(data['language'])
-        self.assertEquals(1, language.subtitleversion_set.count())
-
-        self.client.post(reverse('videos:upload_subtitles'), altered_data)
-        language = self.video.subtitle_language(data['language'])
-        self.assertEquals(2, language.subtitleversion_set.count())
-        version = language.latest_version(public_only=True)
-        self.assertTrue(version.time_change > 0)
-        self.assertTrue(version.text_change > 0)
-        self.assertEquals(version.time_change , 1)
-        self.assertEquals(version.text_change , 1)
 
     def test_upload_over_translated(self):
         # for https://www.pivotaltracker.com/story/show/11804745
@@ -812,7 +823,7 @@ class ViewsTest(WebUseTest):
     fixtures = ['test.json']
 
     def setUp(self):
-        self._make_objects()
+        self._make_objects("iGzkk7nwWX8F")
         cache.clear()
 
     def _test_video_url_make_primary(self):
@@ -2497,3 +2508,91 @@ class FollowTest(WebUseTest):
         latest.save()
 
         self.assertEquals(1, sl.followers.count())
+
+class MarkdownHtmlTest(TestCase):
+
+    def test_markdown_to_html(self):
+        t = "there **bold text** there"
+        self.assertEqual(
+            "there <b>bold text</b> there",
+            markdown_to_html(t)
+        )
+
+    def test_html_to_markdown(self):
+        t = "there <b>bold text</b> there"
+        self.assertEqual(
+            "there **bold text** there",
+            html_to_markdown(t)
+        )
+class BaseDownloadTest(object):
+
+    def _download_subs(self, language, format):
+        url = reverse("widget:download_" + format)
+        res = self.client.get(url, {
+            'video_id': language.video.video_id,
+            'lang_pk': language.pk
+        })
+        return res.content
+
+class TestSRT(WebUseTest, BaseDownloadTest):
+    fixtures = ['test.json']
+
+    def setUp(self):
+        self.auth = dict(username='admin', password='admin')
+        self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
+        self.language = SubtitleLanguage.objects.get_or_create(
+            video=self.video, is_forked=True, language='en')[0]
+
+    def test_download_markdown(self):
+        subs_data = ['one line',
+                     'line **with** bold',
+                     'line *with* italycs',
+                     'line <script> with dangerous tag',
+        ]
+        add_subs(self.language,subs_data)
+        content = self._download_subs(self.language, 'srt')
+        self.assertIn('<b>with</b>' , content)
+        self.assertIn('<i>with</i>' , content)
+        # don't let evildoes into our precisou home
+        self.assertNotIn('<script>' , content)
+        subs = [x for x in SrtSubtitleParser(content)]
+        # make sure we can parse them back
+        self.assertEqual(len(subs_data), len(subs))
+
+    def test_upload_markdown(self):
+        data = {
+            'language': self.language.language,
+            'video': self.video.pk,
+            'video_language': 'en',
+            'draft': open(os.path.join(os.path.dirname(__file__), 'fixtures/with-markdown.srt'))
+        }
+        self._login()
+        response = self.client.post(reverse('videos:upload_subtitles'), data)
+        self.assertEqual(response.status_code, 200)
+        subs = self.video.subtitle_language().version().subtitles()
+        self.assertIn("**bold text in it**", subs[0].text)
+        self.assertIn(" *multiline\nitalics*", subs[1].text)
+        self.assertNotIn("script", subs[2].text)
+
+
+def add_subs(language, subs_texts):
+    version = language.version()
+    version_no = 0
+    if version:
+        version_no = version.version_no + 1
+    new_version = SubtitleVersion.objects.create(
+        language=language,
+        version_no=version_no,
+        datetime_started=datetime.now(),
+        is_forked = language.is_forked
+    )
+    for i, text in enumerate(subs_texts):
+        s= Subtitle.objects.create(
+            version = new_version,
+            subtitle_id=i,
+            subtitle_order=i,
+            subtitle_text=text,
+            start_time = i,
+            end_time = i + 1 - 0.1
+        )
+
