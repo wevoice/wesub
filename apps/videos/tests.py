@@ -40,7 +40,8 @@ from testhelpers.views import _create_videos
 from utils.subtitles import (
     SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser, DfxpSubtitleParser
 )
-from videos import metadata_manager, alarms, EffectiveSubtitle, markdown_to_html, html_to_markdown
+from videos import metadata_manager, alarms, EffectiveSubtitle
+from utils.unisubsmarkup import html_to_markup, markup_to_html
 from videos.feed_parser import FeedParser
 from videos.forms import VideoForm
 from videos.models import (
@@ -2509,20 +2510,20 @@ class FollowTest(WebUseTest):
 
         self.assertEquals(1, sl.followers.count())
 
-class MarkdownHtmlTest(TestCase):
+class MarkupHtmlTest(TestCase):
 
-    def test_markdown_to_html(self):
+    def test_markup_to_html(self):
         t = "there **bold text** there"
         self.assertEqual(
             "there <b>bold text</b> there",
-            markdown_to_html(t)
+            markup_to_html(t)
         )
 
-    def test_html_to_markdown(self):
+    def test_html_to_markup(self):
         t = "there <b>bold text</b> there"
         self.assertEqual(
             "there **bold text** there",
-            html_to_markdown(t)
+            html_to_markup(t)
         )
 class BaseDownloadTest(object):
 
@@ -2543,7 +2544,7 @@ class TestSRT(WebUseTest, BaseDownloadTest):
         self.language = SubtitleLanguage.objects.get_or_create(
             video=self.video, is_forked=True, language='en')[0]
 
-    def test_download_markdown(self):
+    def test_download_markup(self):
         subs_data = ['one line',
                      'line **with** bold',
                      'line *with* italycs',
@@ -2559,7 +2560,7 @@ class TestSRT(WebUseTest, BaseDownloadTest):
         # make sure we can parse them back
         self.assertEqual(len(subs_data), len(subs))
 
-    def test_upload_markdown(self):
+    def test_upload_markup(self):
         data = {
             'language': self.language.language,
             'video': self.video.pk,
