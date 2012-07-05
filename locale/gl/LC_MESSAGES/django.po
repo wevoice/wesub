@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-04 01:32-0500\n"
+"POT-Creation-Date: 2012-07-05 01:30-0500\n"
 "PO-Revision-Date: 2012-07-03 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Galician (http://www.transifex.com/projects/p/"
@@ -1697,7 +1697,7 @@ msgstr "Non se pode retirar o URL orixinal"
 msgid "Feed is unavailable now."
 msgstr "A fonte de novas non está dispoñíbel."
 
-#: apps/videos/templatetags/subtitles_tags.py:58
+#: apps/videos/templatetags/subtitles_tags.py:59
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
