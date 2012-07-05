@@ -766,7 +766,7 @@ LOGGING = {
     'disable_existing_loggers': True,
     'root': {
         'level': 'WARNING',
-        'handlers': ['console'],
+        'handlers': ['console', 'sentry'],
     },
     'formatters': {
         'verbose': {
