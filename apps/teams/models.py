@@ -1923,6 +1923,14 @@ class Task(models.Model):
             language = video.subtitle_language(self.language)
             self._subtitle_version = language.version(public_only=False) if language else None
 
+            # this is to fix #1274
+            # if the user save and exit a task that was pre-created we return the
+            # subtitle_version and that was making the task to be locked.
+            # yeah.
+            if self.get_type_display() == 'Translate' and not self.subtitle_language \
+                    and self._subtitle_version.moderation_status == WAITING_MODERATION:
+                return None
+
         return self._subtitle_version
 
     def save(self, update_team_video_index=True, *args, **kwargs):
