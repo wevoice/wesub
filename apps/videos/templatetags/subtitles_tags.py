@@ -35,7 +35,7 @@ def upload_subtitles(context, video):
     if context.get('language') and context['language'].language:
         initial['language'] = context['language'].language
     else:
-        initial['language'] = translation.get_language()
+        initial['language'] = ''
 
     original_language = video.subtitle_language()
     if original_language and original_language.language:
