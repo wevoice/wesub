@@ -90,6 +90,8 @@ div.amara-embed {
                 display: inline-block;
                 height: 36px;
                 @include opacity(.5);
+                -webkit-transition: opacity .01s linear;
+                -moz-transition: opacity .01s linear;
 
                 &.amara-logo {
                     background-position: center 13px;
