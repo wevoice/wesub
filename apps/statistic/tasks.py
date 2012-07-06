@@ -54,7 +54,7 @@ def gauge_statistic_languages():
 
     for l in ls:
         language_code = l['language']
-        language_name = lang_names[language_code]
+        language_name = lang_names.get(language_code, 'Unknown')
         count = l['count']
         name = graphite_slugify(language_name)
 
