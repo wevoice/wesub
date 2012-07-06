@@ -324,7 +324,6 @@ MIDDLEWARE_CLASSES = (
     'middleware.P3PHeaderMiddleware',
     'middleware.UserUUIDMiddleware',
     'middleware.SaveUserIp',
-    'auth.middleware.LoginTrapMiddleware',
 )
 
 ROOT_URLCONF = 'unisubs.urls'
