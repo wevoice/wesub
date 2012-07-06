@@ -131,14 +131,6 @@
             {% block page_controls %}{% endblock %}
         </div>
     {% endif %}
-    {% if request.is_impersonated %}
-        <div id="admin_controls">
-            <ul id="site_controls">
-                <li><a href="" title="">Impersonation mode</a></li>
-                <li><a href="{% url auth:login_trap_stop %}" title="">Stop</a></li>
-            </ul>
-        </div>
-    {% endif %}
     {% block bottom_scripts %}{% endblock %}
 
     {% if not DEBUG and not RUN_LOCALLY %}
