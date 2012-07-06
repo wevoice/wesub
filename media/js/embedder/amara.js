@@ -10680,11 +10680,35 @@ Popcorn.player( "youtube", {
 
                 // Make sure we have a URL to work with.
                 if (__.has(options, 'url') && __.has(options, 'div')) {
+
                     // Init the Popcorn video.
                     var pop = Popcorn.smart(options.div, options.url);
+
+                    // When we have a final width and height, begin building the Amara bar.
+                    //
+                    // TODO: Popcorn is not firing any events for any video types other
+                    // than HTML5. Watch http://popcornjs.org/popcorn-docs/events/.
+                    pop.on('loadedmetadata', function() {
+                        that.utils.buildAmaraBar(pop);
+                    });
                 }
             }
+        };
 
+        // Methods that create individual pieces of functionality.
+        this.utils = {
+
+            // Build the Amara bar under a video. Takes a Popcorn instance that is ready
+            // to have operations on it (the DOM is loaded, etc).
+            buildAmaraBar: function(pop) {
+                var height = pop.position().height;
+                var width = pop.position().width;
+
+                $media = $(pop.media);
+                $media.after(__.template(that.templates.amaraBar, {
+                    width: width
+                }));
+            }
         };
 
         // push() handles all action calls before and after the embedder is loaded.
@@ -10720,6 +10744,19 @@ Popcorn.player( "youtube", {
         // Simply processes the existing _amara queue if we have one.
         this.init = function() {
 
+            // Load the Amara CSS.
+            var tag = document.getElementsByTagName('script')[0];
+            var style = document.createElement('link');
+            style.rel = 'stylesheet';
+            style.type = 'text/css';
+
+            // TODO: This needs to be a production URL based on DEBUG or not.
+            style.href = '/site_media/css/embedder/amara.css';
+            tag.parentNode.insertBefore(style, tag);
+
+            // Change the template delimiter for Underscore templates.
+            __.templateSettings = { interpolate : /\{\{(.+?)\}\}/g };
+
             // If we have a queue from before the embedder loaded, process the actions.
             if (toPush) {
                 for (var i = 0; i < toPush.length; i++) {
@@ -10734,7 +10771,7 @@ Popcorn.player( "youtube", {
             if (amaraEmbeds.length) {
                 amaraEmbeds.each(function() {
 
-                    // This is a patch until Popcorn.js supports passing a DOM elem to
+                    // This is a hack until Popcorn.js supports passing a DOM elem to
                     // its smart() method. See: http://bit.ly/L0Lb7t
                     var id = 'amara-embed-' + Math.floor(Math.random() * 100000000);
                     var $div = $(this);
@@ -10745,6 +10782,14 @@ Popcorn.player( "youtube", {
                 });
             }
 
+        };
+
+        // Templates
+        this.templates = {
+            amaraBar: '' +
+                '<div class="amara-container" style="width: {{ width }}px;">' +
+                '    <div class="amara-bar"></div>' +
+                '</div>'
         };
 
     };
