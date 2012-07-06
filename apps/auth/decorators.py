@@ -16,16 +16,16 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.conf.urls.defaults import patterns, url
+from functools import wraps
+from django.core.exceptions import PermissionDenied
 
-urlpatterns = patterns('auth.views',
-    url(r'^login/$', 'login', name='login'),
-    url(r'^create/$', 'create_user', name='create_user'),
-    url(r'^delete/$', 'delete_user', name='delete_user'),
-    url(r'^login_post/$', 'login_post', name='login_post'),
-    url(r'confirm_email/(?P<confirmation_key>\w+)/$', 'confirm_email', name='confirm_email'),
-    url(r'auto-login/(?P<token>[\w]{40})/$', 'token_login', name='token-login'),
-    url(r'resend_confirmation_email/$', 'resend_confirmation_email', name='resend_confirmation_email'),
-    url(r'login-trap/$', 'login_trap', name='login_trap'),
-    url(r'login-trap/stop/$', 'login_trap_stop', name='login_trap_stop'),
-)
+
+def superuser_required(view_func):
+
+   def check_superuser(request, *args, **kwargs):
+       if request.user.is_superuser:
+           return view_func(request, *args, **kwargs)
+       else:
+           raise PermissionDenied
+
+   return wraps(view_func)(check_superuser)

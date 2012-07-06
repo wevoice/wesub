@@ -123,9 +123,20 @@
                 {% if user|can_translate %}
                     <li><a target="_blank" href="{% url rosetta-pick-file %}"><span>{% trans 'Rosetta' %}</span></a></li>
                 {% endif %}
+                {% if user.is_superuser %}
+                    <li><a target="_blank" href="{% url auth:login_trap %}">{% trans 'Impersonate' %}</a></li>
+                {% endif %}
                 <li><a href="https://github.com/pculture/unisubs/commit/{{ LAST_COMMIT_GUID }}" title="{{ LAST_COMMIT_GUID }}">Github</a></li>
             </ul>
             {% block page_controls %}{% endblock %}
+        </div>
+    {% endif %}
+    {% if request.is_impersonated %}
+        <div id="admin_controls">
+            <ul id="site_controls">
+                <li><a href="" title="">Impersonation mode</a></li>
+                <li><a href="{% url auth:login_trap_stop %}" title="">Stop</a></li>
+            </ul>
         </div>
     {% endif %}
     {% block bottom_scripts %}{% endblock %}

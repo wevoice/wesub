@@ -16,35 +16,19 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.contrib.auth.forms import UserCreationForm
-from django import forms
-
 from models import CustomUser as User
 
 
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ("username", "email")
-
-    def __init__(self, *args, **kwargs):
-        super(CustomUserCreationForm, self).__init__(*args, **kwargs)
-        self.fields['email'].required = True
-
-
-class ChooseUserForm(forms.Form):
+class LoginTrapMiddleware(object):
     """
-    Used in the login trap mechanism
+    Provide an impersonation mechanism for debugging purposes.  This is only
+    available to super users.
+
+    This can be activated by going to /auth/login-trap/.
     """
 
-    username = forms.CharField(max_length=100)
-
-    def clean_username(self):
-        data = self.cleaned_data['username']
-
-        try:
-            data = User.objects.get(username=data)
-        except User.DoesNotExist:
-            raise forms.ValidationError("User doesn't exist.")
-
-        return data
+    def process_request(self, request):
+        trap = request.session.get('impersonate', None)
+        if request.user.is_superuser and trap:
+            request.user = User.objects.get(pk=trap)
+            request.is_impersonated = True

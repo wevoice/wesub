@@ -36,11 +36,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.simple import direct_to_template
 from oauth import oauth
 
-from auth.forms import CustomUserCreationForm
+from auth.forms import CustomUserCreationForm, ChooseUserForm
 from auth.models import (
     UserLanguage, EmailConfirmation, LoginToken
 )
 from auth.providers import get_authentication_provider
+from auth.decorators import superuser_required
 from socialauth.models import AuthMeta, OpenidProfile
 from socialauth.views import get_url_host
 from utils.translation import get_user_languages_from_cookie
@@ -145,6 +146,27 @@ def token_login(request, token):
     except LoginToken.DoesNotExist:
         pass
     return HttpResponseForbidden("Invalid user token")
+
+
+@superuser_required
+def login_trap(request):
+    if request.method == 'POST':
+        form = ChooseUserForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data['username']
+            request.session['impersonate'] = user.pk
+            return redirect('/')
+    else:
+        form = ChooseUserForm()
+    return render_to_response('auth/login_trap.html', {
+        'form': form
+    }, context_instance=RequestContext(request))
+
+
+def login_trap_stop(request):
+    if request.session.get('impersonate'):
+        del request.session['impersonate']
+    return redirect('/')
 
 
 # Helpers
