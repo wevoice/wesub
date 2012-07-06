@@ -10788,7 +10788,14 @@ Popcorn.player( "youtube", {
         this.templates = {
             amaraBar: '' +
                 '<div class="amara-container" style="width: {{ width }}px;">' +
-                '    <div class="amara-bar"></div>' +
+                '    <div class="amara-bar">' +
+                '        <a href="#" class="amara-share"></a>' +
+                '        <a href="#" class="amara-logo">Amara</a>' +
+                '        <ul class="amara-displays">' +
+                '            <li class="amara-transcript-button"></li>' +
+                '            <li class="amara-subtitles-button"></li>' +
+                '        </ul>' +
+                '    </div>' +
                 '</div>'
         };
 

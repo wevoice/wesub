@@ -84,6 +84,39 @@ div.amara-embed {
             margin-top: -5px;
             @include multi-border-radius(0, 0, 2px, 2px);
             @include vertical-gradient(#1B1C1D, #212223);
+
+            a {
+                background: transparent url('/site_media/images/embedder/amara-sprites.png') 0 0 no-repeat;
+                display: inline-block;
+                height: 36px;
+                @include opacity(.5);
+
+                &.amara-logo {
+                    background-position: center 13px;
+                    color: transparent;
+                    width: 81px;
+                }
+                &.amara-share {
+                    background-position: 13px -236px;
+                    float: right;
+                    width: 38px;
+                }
+                &:hover {
+                    @include opacity(1);
+                }
+            }
+            ul.amara-displays {
+                border-left: 1px solid #2B2C2D;
+                display: inline-block;
+                height: 36px;
+                margin: 0;
+
+                li {
+                    display: inline-block;
+                    list-style-type: none;
+                    margin: 0;
+                }
+            }
         }
     }
 }
