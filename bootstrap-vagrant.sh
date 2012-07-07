@@ -2,20 +2,23 @@
 
 set -e
 
+EXTRAS_DIR='/opt/extras'
+VE_DIR='/opt/ve/unisubs'
+virtualenv --no-site-packages $VE_DIR
 # Link folders ----------------------------------------------------------------
-mkdir -p ../extras/static-cache
-mkdir -p ../extras/pictures
-mkdir -p ../extras/video
-test -L venv               || ln -s ../extras/venv venv
-test -L media/static-cache || ln -s ../../extras/static-cache media/static-cache
-test -L user-data/video    || ln -s ../../extras/video user-data/video
-test -L user-data/pictures || ln -s ../../extras/pictures user-data/pictures
+mkdir -p $EXTRAS_DIR/static-cache
+mkdir -p $EXTRAS_DIR/pictures
+mkdir -p $EXTRAS_DIR/video
+test -L venv               || ln -s $VE_DIR venv
+test -L media/static-cache || ln -s $EXTRAS_DIR/static-cache media/static-cache
+test -L user-data/video    || ln -s $EXTRAS_DIR/video user-data/video
+test -L user-data/pictures || ln -s $EXTRAS_DIR/pictures user-data/pictures
 
 # Install requirements --------------------------------------------------------
 source venv/bin/activate
 cd deploy
 # Hack until we can think of a better solution
-pip install vendor/pycrypto-2.1.0.tar.gz
+#pip install vendor/pycrypto-2.1.0.tar.gz
 pip install -r requirements.txt
 pip install -r requirements-test.txt
 cd ..
