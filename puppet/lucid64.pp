@@ -4,6 +4,7 @@ class lucid64 {
     python  => true,
     nodejs  => false,
   }
+  include config
   include celery
   include nginx
   include rabbitmq

@@ -4,7 +4,7 @@ set -e
 
 EXTRAS_DIR='/opt/extras'
 VE_DIR='/opt/ve/unisubs'
-virtualenv --no-site-packages $VE_DIR
+virtualenv --no-site-packages --distribute $VE_DIR
 # Link folders ----------------------------------------------------------------
 mkdir -p $EXTRAS_DIR/static-cache
 mkdir -p $EXTRAS_DIR/pictures
