@@ -1,4 +1,5 @@
 #!/bin/sh
+VE_DIR='/opt/ve/unisubs'
 
 cd /tmp
 # install git
@@ -11,6 +12,12 @@ if [ "$1" != "" ]; then
   cd amara-puppet ; git checkout $1
   cd ..
 fi
+
+# create initial virtualenv if needed
+if [ ! -d "$VE_DIR" ]; then
+  virtualenv --no-site-packages --distribute $VE_DIR 2>&1 > /dev/null
+fi
+
 # run puppet
 puppet apply --verbose --modulepath /tmp/amara-puppet/puppetmaster/modules /tmp/puppet/lucid64.pp
 

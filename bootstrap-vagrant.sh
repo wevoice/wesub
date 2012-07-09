@@ -4,6 +4,7 @@ set -e
 
 EXTRAS_DIR='/opt/extras'
 VE_DIR='/opt/ve/unisubs'
+# create virtualenv
 virtualenv --no-site-packages --distribute $VE_DIR
 # Link folders ----------------------------------------------------------------
 mkdir -p $EXTRAS_DIR/static-cache
