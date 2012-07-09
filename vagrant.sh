@@ -13,13 +13,14 @@ if [ "$1" != "" ]; then
   cd ..
 fi
 
+# run puppet
+puppet apply --verbose --modulepath /tmp/amara-puppet/puppetmaster/modules /tmp/puppet/lucid64.pp
+
 # create initial virtualenv if needed
 if [ ! -d "$VE_DIR" ]; then
   virtualenv --no-site-packages --distribute $VE_DIR 2>&1 > /dev/null
+  chown -R vagrant $VE_DIR
 fi
-
-# run puppet
-puppet apply --verbose --modulepath /tmp/amara-puppet/puppetmaster/modules /tmp/puppet/lucid64.pp
 
 # cleanup
 rm -rf /tmp/amara-puppet
