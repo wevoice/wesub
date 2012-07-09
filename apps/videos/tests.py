@@ -2549,11 +2549,13 @@ class TestSRT(WebUseTest, BaseDownloadTest):
                      'line **with** bold',
                      'line *with* italycs',
                      'line <script> with dangerous tag',
+                     'line with double gt >>',
         ]
         add_subs(self.language,subs_data)
         content = self._download_subs(self.language, 'srt')
         self.assertIn('<b>with</b>' , content)
         self.assertIn('<i>with</i>' , content)
+        self.assertIn('double gt >>' , content)
         # don't let evildoes into our precisou home
         self.assertNotIn('<script>' , content)
         subs = [x for x in SrtSubtitleParser(content)]
