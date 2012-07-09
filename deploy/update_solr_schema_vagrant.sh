@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python manage.py build_solr_schema --settings=dev_settings > /etc/solr/conf/solr/solr.xml
+python manage.py build_solr_schema --settings=dev_settings > /etc/solr/conf/schema.xml
 
 /etc/init.d/tomcat6 restart
 
