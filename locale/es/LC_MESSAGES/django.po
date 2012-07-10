@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-09 01:46-0500\n"
+"POT-Creation-Date: 2012-07-10 01:41-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1624,7 +1624,7 @@ msgstr ""
 msgid "\n"
 msgstr ""
 
-#: apps/widget/views.py:106
+#: apps/widget/views.py:107
 msgid "That task has already been completed."
 msgstr ""
 
@@ -2916,7 +2916,7 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: templates/base.html:78 templates/auth/login.html:29
+#: templates/base.html:78 templates/auth/login.html:30
 #: templates/openid_consumer/signin.html:22
 msgid "Sign In"
 msgstr ""
@@ -4582,31 +4582,27 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: templates/auth/login.html:21
-msgid "Show more providers"
-msgstr ""
-
-#: templates/auth/login.html:24
+#: templates/auth/login.html:25
 msgid "Or use your Amara account"
 msgstr ""
 
-#: templates/auth/login.html:25
+#: templates/auth/login.html:26
 msgid "Don't have one?"
 msgstr ""
 
-#: templates/auth/login.html:28
+#: templates/auth/login.html:29
 msgid "Forgot your password?"
 msgstr ""
 
-#: templates/auth/login.html:33
+#: templates/auth/login.html:34
 msgid "Create an Amara account"
 msgstr ""
 
-#: templates/auth/login.html:34
+#: templates/auth/login.html:35
 msgid "Already have one?"
 msgstr ""
 
-#: templates/auth/login.html:37
+#: templates/auth/login.html:38
 msgid "Create Account"
 msgstr ""
 
