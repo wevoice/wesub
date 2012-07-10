@@ -35,7 +35,7 @@
                     // TODO: Popcorn is not firing any events for any video types other
                     // than HTML5. Watch http://popcornjs.org/popcorn-docs/events/.
                     pop.on('loadedmetadata', function() {
-                        that.utils.buildAmaraBar(pop, options.div);
+                        that.utils.buildAmaraBar(pop);
                     });
                 }
             }
@@ -46,7 +46,7 @@
 
             // Build the Amara bar under a video. Takes a Popcorn instance that is ready
             // to have operations on it (the DOM is loaded, etc).
-            buildAmaraBar: function(pop, div) {
+            buildAmaraBar: function(pop) {
                 var height = pop.position().height;
                 var width = pop.position().width;
 
