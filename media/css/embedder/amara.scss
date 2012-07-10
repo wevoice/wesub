@@ -86,6 +86,7 @@ div.amara-embed {
             @include vertical-gradient(#1B1C1D, #212223);
 
             a {
+                // TODO: Have the CSS compiler convert these to absolute URLs.
                 background: transparent url('/site_media/images/embedder/amara-sprites.png') 0 0 no-repeat;
                 display: inline-block;
                 height: 36px;
@@ -96,12 +97,21 @@ div.amara-embed {
                 &.amara-logo {
                     background-position: center 13px;
                     color: transparent;
+                    float: left;
                     width: 81px;
+
+                    &:active {
+                        background-position: center 14px;
+                    }
                 }
                 &.amara-share {
                     background-position: 13px -236px;
                     float: right;
                     width: 38px;
+
+                    &:active {
+                        background-position: 13px -235px;
+                    }
                 }
                 &:hover {
                     @include opacity(1);
@@ -117,6 +127,25 @@ div.amara-embed {
                     display: inline-block;
                     list-style-type: none;
                     margin: 0;
+
+                    a {
+                        width: 38px;
+
+                        &.amara-transcript-button {
+                            background-position: 12px -37px;
+
+                            &:active {
+                                background-position: 12px -36px;
+                            }
+                        }
+                        &.amara-subtitles-button {
+                            background-position: 11px -86px;
+
+                            &:active {
+                                background-position: 11px -85px;
+                            }
+                        }
+                    }
                 }
             }
         }
