@@ -10736,7 +10736,7 @@ Popcorn.player( "youtube", {
                 var that = this;
 
                 // Init the Popcorn video.
-                this.pop = Popcorn.smart(this.model.get('div'), this.model.get('url'));
+                this.pop = _Popcorn.smart(this.model.get('div'), this.model.get('url'));
 
                 // TODO: Popcorn is not firing any events for any video types other
                 // than HTML5. Watch http://popcornjs.org/popcorn-docs/events/.
