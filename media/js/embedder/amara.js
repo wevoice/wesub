@@ -10689,7 +10689,7 @@ Popcorn.player( "youtube", {
                     // TODO: Popcorn is not firing any events for any video types other
                     // than HTML5. Watch http://popcornjs.org/popcorn-docs/events/.
                     pop.on('loadedmetadata', function() {
-                        that.utils.buildAmaraBar(pop);
+                        that.utils.buildAmaraBar(pop, options.div);
                     });
                 }
             }
@@ -10700,14 +10700,20 @@ Popcorn.player( "youtube", {
 
             // Build the Amara bar under a video. Takes a Popcorn instance that is ready
             // to have operations on it (the DOM is loaded, etc).
-            buildAmaraBar: function(pop) {
+            buildAmaraBar: function(pop, div) {
                 var height = pop.position().height;
                 var width = pop.position().width;
 
+                // Attach the base Amara container to the video.
                 $media = $(pop.media);
-                $media.after(__.template(that.templates.amaraBar, {
+                $media.after(__.template(that.templates.amaraContainer, {
                     width: width
                 }));
+
+                // Append the Amara bar and additional DOM shells to the Amara container.
+                $amaraContainer = $media.next();
+                $amaraContainer.append(__.template(that.templates.amaraBar, {}));
+                $amaraContainer.append(__.template(that.templates.amaraTranscript, {}));
             }
         };
 
@@ -10787,17 +10793,22 @@ Popcorn.player( "youtube", {
         // Templates
         this.templates = {
 
-            // The Amara bar that appears under a video.
-            amaraBar: '' +
+            amaraContainer: ''+
                 '<div class="amara-container" style="width: {{ width }}px;">' +
-                '    <div class="amara-bar">' +
-                '        <a href="#" class="amara-share"></a>' +
-                '        <a href="#" class="amara-logo">Amara</a>' +
-                '        <ul class="amara-displays">' +
-                '            <li><a href="#" class="amara-transcript-button"></a></li>' +
-                '            <li><a href="#" class="amara-subtitles-button"></a></li>' +
-                '        </ul>' +
-                '    </div>' +
+                '</div>',
+
+            amaraBar: '' +
+                '<div class="amara-bar">' +
+                '    <a href="#" class="amara-share"></a>' +
+                '    <a href="#" class="amara-logo">Amara</a>' +
+                '    <ul class="amara-displays">' +
+                '        <li><a href="#" class="amara-transcript-button"></a></li>' +
+                '        <li><a href="#" class="amara-subtitles-button"></a></li>' +
+                '    </ul>' +
+                '</div>',
+
+            amaraTranscript: ''+
+                '<div class="amara-transcript">' +
                 '</div>'
         };
 

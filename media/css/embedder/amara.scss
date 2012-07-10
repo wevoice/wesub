@@ -82,7 +82,7 @@ div.amara-embed {
             color: #666;
             height: 36px;
             margin-top: -5px;
-            @include multi-border-radius(0, 0, 2px, 2px);
+            @include multi-border-radius(0, 0, 3px, 3px);
             @include vertical-gradient(#1B1C1D, #212223);
 
             a {
@@ -122,27 +122,30 @@ div.amara-embed {
                 display: inline-block;
                 height: 36px;
                 margin: 0;
+                padding: 0 10px;
 
                 li {
                     display: inline-block;
+                    float: left;
+                    height: 36px;
                     list-style-type: none;
                     margin: 0;
 
                     a {
-                        width: 38px;
+                        width: 28px;
 
                         &.amara-transcript-button {
-                            background-position: 12px -37px;
+                            background-position: 7px -37px;
 
                             &:active {
-                                background-position: 12px -36px;
+                                background-position: 7px -36px;
                             }
                         }
                         &.amara-subtitles-button {
-                            background-position: 11px -86px;
+                            background-position: 6px -86px;
 
                             &:active {
-                                background-position: 11px -85px;
+                                background-position: 6px -85px;
                             }
                         }
                     }
