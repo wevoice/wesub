@@ -1927,7 +1927,8 @@ class Task(models.Model):
             # if the user save and exit a task that was pre-created we return the
             # subtitle_version and that was making the task to be locked.
             # yeah.
-            if self.get_type_display() == 'Translate' and not self.subtitle_language \
+            if self.get_type_display() == 'Translate' and not self.subtitle_version \
+                    and self._subtitle_version \
                     and self._subtitle_version.moderation_status == WAITING_MODERATION:
                 return None
 

@@ -157,9 +157,9 @@ Partner video ids
 
 If you are a partner, you can set the ``id`` field for a video.  Simply supply
 the ``usePartnerId`` parameter in your request and we will use your id for look
-ups.  The parameter can be sent as a ``GET`` or ``POST`` parameter.  This is
-useful if you already have a database of video ids and don't want to maintain a
-mapping between those ids and Amara ids.
+ups.  The parameter can be sent as a parameter to any kind of API call.  This
+is useful if you already have a database of video ids and don't want to
+maintain a mapping between those ids and Amara ids.
 
 Available Resources
 -------------------
