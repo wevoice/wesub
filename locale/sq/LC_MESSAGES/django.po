@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-26 01:32-0500\n"
-"PO-Revision-Date: 2012-06-26 06:48+0000\n"
+"POT-Creation-Date: 2012-07-10 01:32-0500\n"
+"PO-Revision-Date: 2012-07-10 06:47+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Albanian (http://www.transifex.net/projects/p/universalsubtitles/language/sq/)\n"
+"Language-Team: Albanian (http://www.transifex.com/projects/p/universalsubtitles/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -105,23 +105,23 @@ msgstr "ripohim me e-mail"
 msgid "e-mail confirmations"
 msgstr "ripohime me e-mail"
 
-#: apps/auth/views.py:61
+#: apps/auth/views.py:58
 msgid "Confirmation key expired."
 msgstr "Kyçi i ripohimit ka skaduar."
 
-#: apps/auth/views.py:63
+#: apps/auth/views.py:60
 msgid "Email is confirmed."
 msgstr "Email-i u ripohua."
 
-#: apps/auth/views.py:75
+#: apps/auth/views.py:72
 msgid "Confirmation email was sent."
 msgstr "Email-i i ripohimit u dërgua."
 
-#: apps/auth/views.py:77
+#: apps/auth/views.py:74
 msgid "You email is empty or already confirmed."
 msgstr "Email-i juaj është i zbrazër ose i ripohuar tashmë."
 
-#: apps/auth/views.py:110
+#: apps/auth/views.py:106
 msgid "Your account was deleted."
 msgstr "Llogaria juaj u fshi."
 
@@ -321,13 +321,13 @@ msgstr "Hyrja me OpenID dështoi"
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:12
 #: apps/openid_consumer/templates/openid_consumer/signin.html:27
-#: templates/openid_consumer/signin.html:12
-#: templates/openid_consumer/signin.html:31
+#: templates/openid_consumer/signin.html:17
 msgid "Sign in with your OpenID"
 msgstr "Hyni me OpenID-në tuaj"
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
-#: templates/openid_consumer/signin.html:18
+#: templates/auth/login.html:10
+#: templates/registration/password_reset_complete.html:16
 msgid "Sign in"
 msgstr "Hyni"
 
@@ -605,36 +605,36 @@ msgstr "Nuk keni leje të çbotoni këto titra."
 msgid "You cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:651
+#: apps/teams/forms.py:651 apps/videos/forms.py:461
 msgid "Invalid language to translate from."
 msgstr ""
 
-#: apps/teams/forms.py:660 apps/videos/forms.py:68 apps/videos/forms.py:86
-#: apps/videos/forms.py:422
+#: apps/teams/forms.py:660 apps/videos/forms.py:71 apps/videos/forms.py:89
+#: apps/videos/forms.py:470
 msgid "File size should be less {0} kb"
 msgstr "Madhësia e kartelës duhet të jetë më e vogël {0} kb"
 
-#: apps/teams/forms.py:665 apps/videos/forms.py:427
+#: apps/teams/forms.py:665 apps/videos/forms.py:475
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:672 apps/videos/forms.py:73 apps/videos/forms.py:94
-#: apps/videos/forms.py:435
+#: apps/teams/forms.py:672 apps/videos/forms.py:76 apps/videos/forms.py:97
+#: apps/videos/forms.py:482
 msgid "Can not detect file encoding"
 msgstr "Nuk zbulohet dot kodimi i kartelës"
 
-#: apps/teams/forms.py:677 apps/videos/forms.py:96 apps/videos/forms.py:437
+#: apps/teams/forms.py:677 apps/videos/forms.py:99 apps/videos/forms.py:487
 msgid "Incorrect subtitles format"
 msgstr "Format i pasaktë titrash"
 
-#: apps/teams/forms.py:750
+#: apps/teams/forms.py:750 apps/videos/forms.py:577
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 
-#: apps/teams/forms.py:756
+#: apps/teams/forms.py:756 apps/videos/forms.py:584
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -787,20 +787,20 @@ msgstr "Lyp ndihmë me krejt gjuhët"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Nëse i vini shenjë kësaj, gjuhët e tjera nuk do të shfaqen."
 
-#: apps/teams/models.py:918 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:919 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Pronar"
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:920 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Përgjegjës"
 
-#: apps/teams/models.py:920 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:921 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Kontribues"
 
@@ -1084,23 +1084,23 @@ msgstr "A mundet dikush të më ndihmojë në titrimin e këtyre videove? %(url)
 msgid "Email for alert"
 msgstr "Email për sinjalizime"
 
-#: apps/videos/forms.py:64
+#: apps/videos/forms.py:67
 msgid "File should have txt format"
 msgstr "Kartela duhet të jetë në format .txt"
 
-#: apps/videos/forms.py:77
+#: apps/videos/forms.py:80
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "Nuk kodohet dot kartela. Duhet të jetë nën kodimin utf8."
 
-#: apps/videos/forms.py:89
+#: apps/videos/forms.py:92
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "Format i pasaktë. Ngarkoni .srt, .ssa, .sbv ose .xml (formati TTML)"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:530 utils/validators.py:38
+#: apps/videos/forms.py:125 apps/videos/forms.py:828 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Kjo URL duket se është lidhje e dëmtuar."
 
-#: apps/videos/forms.py:128 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:131 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1109,46 +1109,58 @@ msgid ""
 "href=\"mailto:%s\">contact us</a>!"
 msgstr "Amara nuk e mbulon këtë site web ose format videosh.\nNëse doni të na ndihmoni të shtojmë mbulim të site-it ose formatit të ri,\nose nëse mendoni se ka ndonjë gabim, <a\nhref=\"mailto:%s\">na shkruani</a>!"
 
-#: apps/videos/forms.py:139
+#: apps/videos/forms.py:142
 msgid "You have not permission add video URL for this video"
 msgstr "Nuk keni leje për shtim URL-sh videoje për këtë video"
 
-#: apps/videos/forms.py:171
+#: apps/videos/forms.py:174 apps/videos/forms.py:451
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Dikush po krijon titra për këtë video pikërisht tani. Provoni më vonë."
 
-#: apps/videos/forms.py:186 apps/videos/forms.py:210
+#: apps/videos/forms.py:189 apps/videos/forms.py:215 apps/videos/forms.py:511
+#: apps/videos/forms.py:547
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr "Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë puna për këtë gjë është tashmë në rrugë e sipër."
 
-#: apps/videos/forms.py:195
+#: apps/videos/forms.py:198 apps/videos/forms.py:530
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr "Na ndjeni, nuk i ngarkojmë dot titrat për këtë gjuhë, ngaqë kjo do të shkatërronte përkthimet e bëra me ato si bazë"
 
-#: apps/videos/forms.py:222
+#: apps/videos/forms.py:227 apps/videos/forms.py:559
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr "Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë po moderohet tashmë një skicë për këtë gjuhë."
 
-#: apps/videos/forms.py:228 apps/videos/forms.py:231
+#: apps/videos/forms.py:233 apps/videos/forms.py:236 apps/videos/forms.py:565
+#: apps/videos/forms.py:568
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have sufficient permission."
 msgstr "Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë kjo gjuhë moderohet dhe nuk keni leje të mjaftueshme."
 
-#: apps/videos/forms.py:515
+#: apps/videos/forms.py:516
+msgid "The language already exists and already has a version"
+msgstr ""
+
+#: apps/videos/forms.py:521
+#, python-format
+msgid ""
+"The language already exists and you can't change its translation from %s"
+msgstr ""
+
+#: apps/videos/forms.py:813
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "Ju lutemi, riprovoni me një lidhje drejt një faqe videosh.\n                        <a href=\"mailto:%s\">Lidhuni me ne</a>, nëse ka ndonjë problem."
 
-#: apps/videos/forms.py:518 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:816 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
@@ -1156,49 +1168,49 @@ msgid ""
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "Lidhjen duhet ta krijoni drejt një site-i të përputhshëm (fjala vjen, YouTube) ose\n                    drejt e te një kartelë video që funksionon në shfletuesa HTML5. Për shembull: http://site-i_im.com/videoja_ime.ogg ose http://site-i_im.com/videoja_ime.m4v\n                    <a href=\"mailto:%s\">Lidhuni me ne</a>, nëse ka ndonjë problem."
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:844
 msgid "Youtube usernames"
 msgstr "Emra përdoruesish Youtube-i"
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:844
 msgid "Enter usernames separated by comma."
 msgstr "Emrat e përdoruesve jepini ndarë me presje."
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:845
 msgid "Youtube page link."
 msgstr "Lidhje faqeje Youtube."
 
-#: apps/videos/forms.py:548
+#: apps/videos/forms.py:846
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Për shembull: http://www.youtube.com/përdorues/emër_përdoruesi"
 
-#: apps/videos/forms.py:549
+#: apps/videos/forms.py:847
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr "Mbulohen: Youtube, Vimeo, ose Dailymotion. U shtuan vetëm site-et që mbulohen."
 
-#: apps/videos/forms.py:550
+#: apps/videos/forms.py:848
 msgid "Save feed"
 msgstr "Ruaje prurjen"
 
-#: apps/videos/forms.py:550
+#: apps/videos/forms.py:848
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr "Zgjidhni këtë nëse dëshironi të shtoni në të ardhmen video prej kësaj prurjeje. Do të ruhen vetëm prurje RSS funksionale."
 
-#: apps/videos/forms.py:593
+#: apps/videos/forms.py:891
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr "Na ndjeni, te URL-ja që dhatë nuk gjetëm dot një prurje të vlefshme. Ju lutemi, kontrolloni URL-në dhe riprovoni."
 
-#: apps/videos/forms.py:598
+#: apps/videos/forms.py:896
 msgid ""
 "The videos are being added in the background. If you are logged in, you will"
 " receive a message when it's done"
 msgstr "Videot po shtohen në prapaskenë. Nëse jeni i futur, do të merrni një mesazh kur kjo të ketë mbaruar."
 
-#: apps/videos/forms.py:609
+#: apps/videos/forms.py:907
 msgid "captcha"
 msgstr "captcha"
 
@@ -1224,199 +1236,199 @@ msgid ""
 "language you are uploading or a translation of it"
 msgstr "Na ndjeni, nuk mund të ngarkoni titra këtë çast, ngaqë dikush po përpunon gjuhën për të cilën po ngarkoni ose një përkthim në të."
 
-#: apps/videos/models.py:1948
+#: apps/videos/models.py:1950
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "  shqyrtoi titrat në <a href=\"%(language_url)s\">%(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1953
+#: apps/videos/models.py:1955
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "  pranoi titrat në <a href=\"%(language_url)s\">%(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1958
+#: apps/videos/models.py:1960
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "  hodhi tej titrat në <a href=\"%(language_url)s\">%(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1963
+#: apps/videos/models.py:1965
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "  miratoi titrat në <a href=\"%(language_url)s\">%(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1968
+#: apps/videos/models.py:1970
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "  nuk i pranoi titrat në <a href=\"%(language_url)s\">%(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1974
+#: apps/videos/models.py:1976
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr ""
 
-#: apps/videos/models.py:1979
+#: apps/videos/models.py:1981
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "shtoi videon <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1981
+#: apps/videos/models.py:1983
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "U shtua videoja <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1987
+#: apps/videos/models.py:1989
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "ndryshoi titullin për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1989
+#: apps/videos/models.py:1991
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Ndryshoi titulli për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2004
+#: apps/videos/models.py:2006
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "komentoi te <a href=\"%(comments_url)s\">titrat në %(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2006
+#: apps/videos/models.py:2008
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "U shtua koment për <a href=\"%(comments_url)s\">titrat në %(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2009
+#: apps/videos/models.py:2011
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "komentoi te <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2011
+#: apps/videos/models.py:2013
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "U shtuan komente për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2019
+#: apps/videos/models.py:2021
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "filloi <a href=\"%(language_url)s\">titrimin në %(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2021
+#: apps/videos/models.py:2023
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "u filluan <a href=\"%(language_url)s\">titra në %(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2032
+#: apps/videos/models.py:2034
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "përpunoi <a href=\"%(language_url)s\">titrat në %(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2034
+#: apps/videos/models.py:2036
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "u përpunuan <a href=\"%(language_url)s\">titrat në %(language)s</a> për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2040
+#: apps/videos/models.py:2042
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "shtoi URL të re për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2042
+#: apps/videos/models.py:2044
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "U shtua URL e re për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2047
+#: apps/videos/models.py:2049
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "u bë pjesë e ekipit %(team)s me rolin %(role)s"
 
-#: apps/videos/models.py:2052
+#: apps/videos/models.py:2054
 #, python-format
 msgid "left the %s team"
 msgstr "e la ekipin %s"
 
-#: apps/videos/models.py:2123
+#: apps/videos/models.py:2125
 msgid "add video"
 msgstr "shtoni video"
 
-#: apps/videos/models.py:2124
+#: apps/videos/models.py:2126
 msgid "change title"
 msgstr "ndryshoji titullin"
 
-#: apps/videos/models.py:2125
+#: apps/videos/models.py:2127
 msgid "comment"
 msgstr "koment"
 
-#: apps/videos/models.py:2126
+#: apps/videos/models.py:2128
 msgid "add version"
 msgstr "shtoni version"
 
-#: apps/videos/models.py:2127
+#: apps/videos/models.py:2129
 msgid "add translation"
 msgstr "shtoni përkthim"
 
-#: apps/videos/models.py:2128
+#: apps/videos/models.py:2130
 msgid "add video url"
 msgstr "shtoni url videoje"
 
-#: apps/videos/models.py:2129
+#: apps/videos/models.py:2131
 msgid "request subtitles"
 msgstr "kërkoni titra"
 
-#: apps/videos/models.py:2130
+#: apps/videos/models.py:2132
 msgid "approve version"
 msgstr "miratoje versionin"
 
-#: apps/videos/models.py:2131
+#: apps/videos/models.py:2133
 msgid "add contributor"
 msgstr "shtoni pjesëmarrës"
 
-#: apps/videos/models.py:2132
+#: apps/videos/models.py:2134
 msgid "remove contributor"
 msgstr "hiqe kontribuesin"
 
-#: apps/videos/models.py:2133
+#: apps/videos/models.py:2135
 msgid "reject version"
 msgstr "hidhe tej versionin"
 
-#: apps/videos/models.py:2134
+#: apps/videos/models.py:2136
 msgid "review version"
 msgstr "shqyrtoni versionin"
 
-#: apps/videos/models.py:2135
+#: apps/videos/models.py:2137
 msgid "accept version"
 msgstr "pranojeni versionin"
 
-#: apps/videos/models.py:2136
+#: apps/videos/models.py:2138
 msgid "decline version"
 msgstr "hidheni poshtë versionin"
 
-#: apps/videos/models.py:2137
+#: apps/videos/models.py:2139
 msgid "delete video"
 msgstr "fshije videon"
 
-#: apps/videos/models.py:2389
+#: apps/videos/models.py:2391
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1526,29 +1538,29 @@ msgstr "Keni parashtruar një video\n                që shërbehet përmes prot
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Titrat e tanishëm do të importohen brenda pak minutash."
 
-#: apps/videos/views.py:275
+#: apps/videos/views.py:282
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Faleminderit për ngarkimin. Do të kalojë një minutë e ca, para se titrat të duken."
 
-#: apps/videos/views.py:277
+#: apps/videos/views.py:284
 msgid "Your changes have been saved."
 msgstr "Rregullimet tuaja u ruajtën."
 
-#: apps/videos/views.py:628
+#: apps/videos/views.py:635
 msgid "You have not permission change this URL"
 msgstr "Nuk keni leje për ndryshimin e kësaj URL-je"
 
-#: apps/videos/views.py:634 apps/videos/views.py:654
+#: apps/videos/views.py:641 apps/videos/views.py:661
 msgid "Object does not exist"
 msgstr "Objekti nuk ekziston"
 
-#: apps/videos/views.py:647
+#: apps/videos/views.py:654
 msgid "You have not permission delete this URL"
 msgstr "Nuk keni leje për fshirjen e kësaj URL-je"
 
-#: apps/videos/views.py:650
+#: apps/videos/views.py:657
 msgid "You cann't remove original URL"
 msgstr "Nuk mund të hiqni URL-në origjinale"
 
@@ -1556,7 +1568,7 @@ msgstr "Nuk mund të hiqni URL-në origjinale"
 msgid "Feed is unavailable now."
 msgstr "Prurja nuk funksionoka tani."
 
-#: apps/videos/templatetags/subtitles_tags.py:58
+#: apps/videos/templatetags/subtitles_tags.py:59
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
@@ -1586,22 +1598,22 @@ msgstr "Gabim i papërcaktuar"
 msgid "Video embedding disabled by owner"
 msgstr "Trupëzimi i videos është çaktivizuar nga i zoti"
 
-#: apps/widget/rpc.py:254
+#: apps/widget/rpc.py:263
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Këto titra moderohen. Shihni faqen e ekipit %s për të dhëna se si të kontribuoni."
 
-#: apps/widget/rpc.py:256
+#: apps/widget/rpc.py:265
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Na ndjeni, këta titra moderohen privatisht."
 
-#: apps/widget/rpc.py:917 apps/widget/rpc.py:958
+#: apps/widget/rpc.py:945 apps/widget/rpc.py:986
 msgid "\n"
 msgstr "\n"
 
-#: apps/widget/views.py:106
+#: apps/widget/views.py:107
 msgid "That task has already been completed."
 msgstr "Kjo punë është kryer një herë."
 
@@ -1616,7 +1628,7 @@ msgstr "Përzgjedhje gjuhe"
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
 #: templates/statistic/log_entry_model_admin.html:18
 #: templates/statistic/logger_model_admin.html:18
 #: templates/statistic/log_methods/changelist_view.html:18
@@ -2869,7 +2881,8 @@ msgstr "Ndërrmarje"
 msgid "Help"
 msgstr "Ndihmë"
 
-#: templates/base.html:78
+#: templates/base.html:78 templates/auth/login.html:30
+#: templates/openid_consumer/signin.html:22
 msgid "Sign In"
 msgstr "Hyni"
 
@@ -4338,27 +4351,27 @@ msgstr "Fshije"
 msgid "Cancel"
 msgstr "Anuloje"
 
-#: templates/auth/login.html:9
-msgid "Login to Your Existing Account"
-msgstr "Hyni te Llogaria Juaj Ekzistuese"
+#: templates/auth/login.html:25
+msgid "Or use your Amara account"
+msgstr ""
 
-#: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
-msgid "Login"
-msgstr "Hyni"
+#: templates/auth/login.html:26
+msgid "Don't have one?"
+msgstr ""
 
-#: templates/auth/login.html:14
-msgid "Forgot password?"
-msgstr "Harruat fjalëkalimin?"
+#: templates/auth/login.html:29
+msgid "Forgot your password?"
+msgstr ""
 
-#: templates/auth/login.html:17
-msgid "You can also login using"
-msgstr "Mund të hyni edhe përmes"
+#: templates/auth/login.html:34
+msgid "Create an Amara account"
+msgstr ""
 
-#: templates/auth/login.html:27
-msgid "Create an Account"
-msgstr "Krijoni një Llogari"
+#: templates/auth/login.html:35
+msgid "Already have one?"
+msgstr ""
 
-#: templates/auth/login.html:31
+#: templates/auth/login.html:38
 msgid "Create Account"
 msgstr "Krijoje Llogarinë"
 
@@ -4647,6 +4660,11 @@ msgid ""
 "The Amara team\n"
 msgstr "Njatjeta,\n\nU importuan me sukses videot tuaja %(imported_videos)s!<br/>\n\n<p>Për t'i parë, mund të shkoni te <a href=\"%(my_videos_url)s\">faqja juaj e përdoruesit</a></p>\n\n<p>Nëse jeni të bindur që ky mesazh ju erdhi gabimisht, ju kërkojmë ndjesë — jeni të lirë ta shpërfillni. Nëse keni ndonjë problem tjetër, ju lutemi, lidhuni me ne përmes feedback@universalsubtitles.org.</p>\n\nFaleminderit, <br/>\nEkipi Amara\n"
 
+#: templates/openid_consumer/signin.html:14
+#: templates/registration/password_reset_form.html:12
+msgid "Back to Sign In"
+msgstr ""
+
 #: templates/profiles/_filters.html:5
 msgid "User Details"
 msgstr "Hollësi Përdoruesi"
@@ -4905,67 +4923,63 @@ msgstr "Përpunoni përdorues"
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:6
 #: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
 #: templates/registration/password_reset_form.html:6
-#: templates/registration/password_reset_form.html:10
+#: templates/registration/password_reset_form.html:8
+#: templates/registration/password_reset_form.html:14
 msgid "Password reset"
 msgstr "Ricaktim fjalëkalimi"
 
 #: templates/registration/password_reset_complete.html:6
-#: templates/registration/password_reset_complete.html:10
+#: templates/registration/password_reset_complete.html:12
 msgid "Password reset complete"
 msgstr "Ricaktimi i fjalëkalimit u plotësua"
 
-#: templates/registration/password_reset_complete.html:12
-msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Fjakalimi juaj u caktua. Mund të vazhdoni më tej dhe të bëni hyrjen tani."
-
 #: templates/registration/password_reset_complete.html:14
-msgid "Log in"
-msgstr "Hyni"
+msgid "Your password has been set.  You may go ahead and sign in now."
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
 msgstr "Ripohim ricaktimi fjalëkalimi"
 
-#: templates/registration/password_reset_confirm.html:12
+#: templates/registration/password_reset_confirm.html:15
 msgid "Enter new password"
 msgstr "Jepni fjalëkalimin e ri"
 
-#: templates/registration/password_reset_confirm.html:14
+#: templates/registration/password_reset_confirm.html:16
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr "Ju lutemi, jepeni fjalëkalimin tuaj dy herë, që kështu të mund të verifikojmë nëse e shtypët saktë."
 
-#: templates/registration/password_reset_confirm.html:19
+#: templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Fjalëkalim i ri:"
 
-#: templates/registration/password_reset_confirm.html:21
+#: templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Ripohoni fjalëkalimin:"
 
-#: templates/registration/password_reset_confirm.html:22
+#: templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Ndryshoje fjalëkalimin tim"
 
-#: templates/registration/password_reset_confirm.html:31
+#: templates/registration/password_reset_confirm.html:33
 msgid "Password reset unsuccessful"
 msgstr "Fjalëkalimi nuk u ricaktua me sukses"
 
-#: templates/registration/password_reset_confirm.html:33
+#: templates/registration/password_reset_confirm.html:35
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr "Lidhja për ricaktimin e fjalëkalimit qe e pavlefshme, ndoshta ngaqë është përdorur tashmë një herë. Ju lutemi, kërkoni një ricaktim të ri fjalëkalimi."
 
 #: templates/registration/password_reset_done.html:6
-#: templates/registration/password_reset_done.html:10
+#: templates/registration/password_reset_done.html:12
 msgid "Password reset successful"
 msgstr "Ricaktim i sukseshëm fjalëkalimi"
 
-#: templates/registration/password_reset_done.html:12
+#: templates/registration/password_reset_done.html:14
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
@@ -4997,17 +5011,17 @@ msgstr "Faleminderit që përdorni site-in tonë!"
 msgid "The %(site_name)s team"
 msgstr "Ekipi %(site_name)s"
 
-#: templates/registration/password_reset_form.html:12
+#: templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr "Harruat fjalëkalimin tuaj? Jepni më poshtë vendndodhjen tuaj e-mail, dhe do t'ju dërgojmë në të udhëzimet për të caktuar një të ri."
 
-#: templates/registration/password_reset_form.html:17
+#: templates/registration/password_reset_form.html:18
 msgid "E-mail address:"
 msgstr "Adresë e-mail:"
 
-#: templates/registration/password_reset_form.html:18
+#: templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Ricakto fjalëkalimin tim"
 
@@ -5079,88 +5093,6 @@ msgstr "Satitistika përdoruesi"
 msgid "Videos statistic"
 msgstr "Statistika videoje"
 
-#: templates/statistic/index.html:28
-msgid "Languages statistic"
-msgstr "Statistika gjuhësh"
-
-#: templates/statistic/index.html:73
-#: templates/statistic/language_statistic.html:31
-msgid "stats for"
-msgstr "statistika për"
-
-#: templates/statistic/index.html:74
-#: templates/statistic/language_statistic.html:32
-#: templates/statistic/languages_statistic.html:37
-msgid "day"
-msgstr "ditë"
-
-#: templates/statistic/index.html:75
-#: templates/statistic/language_statistic.html:33
-#: templates/statistic/languages_statistic.html:38
-msgid "week"
-msgstr "javë"
-
-#: templates/statistic/index.html:76
-#: templates/statistic/language_statistic.html:34
-#: templates/statistic/languages_statistic.html:39
-msgid "month"
-msgstr "muaj"
-
-#: templates/statistic/index.html:77
-#: templates/statistic/language_statistic.html:35
-#: templates/statistic/languages_statistic.html:40
-#: templates/statistic/users_statistic.html:16
-#: templates/statistic/videos_statistic.html:16
-msgid "TOTAL"
-msgstr "GJITHSEJ"
-
-#: templates/statistic/index.html:83
-msgid "Total number of videos captioned"
-msgstr "Numër videosh të titruara gjithsej"
-
-#: templates/statistic/index.html:90
-msgid "Tweets"
-msgstr "\"Tweets\""
-
-#: templates/statistic/index.html:97
-msgid "Facebook shares"
-msgstr "Ndarje me të tjerët në Facebook"
-
-#: templates/statistic/index.html:104
-msgid "Email shares"
-msgstr "Ndarje me të tjerët me email"
-
-#: templates/statistic/language_statistic.html:25
-msgid "Language statistic for "
-msgstr "Statistika gjuhe për"
-
-#: templates/statistic/language_statistic.html:26
-#: templates/statistic/languages_statistic.html:31
-#: templates/statistic/users_statistic.html:7
-#: templates/statistic/videos_statistic.html:7
-msgid "General statistic"
-msgstr "Statistika të përgjithshme"
-
-#: templates/statistic/language_statistic.html:41
-msgid "Videos count"
-msgstr "Numërim videosh"
-
-#: templates/statistic/language_statistic.html:48
-msgid "Subtitles views count"
-msgstr "Numërim parjesh titrash"
-
-#: templates/statistic/language_statistic.html:55
-msgid "Videos views count"
-msgstr "Numërim parjesh videosh"
-
-#: templates/statistic/languages_statistic.html:25
-msgid "Language statistic"
-msgstr "Statistika gjuhe"
-
-#: templates/statistic/languages_statistic.html:36
-msgid "Lanuage"
-msgstr "Gjuhë"
-
 #: templates/statistic/log_entry_model_admin.html:37
 #: templates/statistic/logger_model_admin.html:37
 msgid "Date"
@@ -5180,6 +5112,11 @@ msgstr "Kohë(sek)"
 msgid "Activity statistic"
 msgstr "Statistika veprimtarie"
 
+#: templates/statistic/users_statistic.html:7
+#: templates/statistic/videos_statistic.html:7
+msgid "General statistic"
+msgstr "Statistika të përgjithshme"
+
 #: templates/statistic/users_statistic.html:13
 #: templates/statistic/videos_statistic.html:13
 msgid "Day"
@@ -5194,6 +5131,11 @@ msgstr "Javë"
 #: templates/statistic/videos_statistic.html:15
 msgid "Month"
 msgstr "Muaj"
+
+#: templates/statistic/users_statistic.html:16
+#: templates/statistic/videos_statistic.html:16
+msgid "TOTAL"
+msgstr "GJITHSEJ"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
@@ -6588,7 +6530,7 @@ msgid "Upload TXT file"
 msgstr "Ngarkoni kartelë TXT"
 
 #: templates/videos/_paste_transcription.html:144
-#: templates/videos/_upload_subtitles.html:33
+#: templates/videos/_upload_subtitles.html:35
 msgid "Login to upload subtitles"
 msgstr "Bëni hyrjen që të ngarkoni titra"
 
@@ -6615,7 +6557,7 @@ msgstr "Ngarkoni Titra"
 #: templates/videos/_upload_subtitles.html:10
 msgid ""
 "\n"
-"              Our site accepts SRT, SSA, SBV, DFXP and TTML format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
+"              Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
 "              or .xml (for TTML) are accepted.\n"
 "              "
 msgstr ""
@@ -6624,16 +6566,20 @@ msgstr ""
 msgid "Video Language"
 msgstr "Gjuhë Videoje"
 
-#: templates/videos/_upload_subtitles.html:26
+#: templates/videos/_upload_subtitles.html:24
+msgid "Translated from"
+msgstr ""
+
+#: templates/videos/_upload_subtitles.html:28
 #, python-format
 msgid "This subtitle file is 100% complete"
 msgstr ""
 
-#: templates/videos/_upload_subtitles.html:28
+#: templates/videos/_upload_subtitles.html:30
 msgid "Upload"
 msgstr "Ngarkoje"
 
-#: templates/videos/_upload_subtitles.html:42
+#: templates/videos/_upload_subtitles.html:44
 msgid ""
 "If you believe your subtitle file is compatible, <a "
 "href='mailto:feedback@universalsubtitles.org'>send it to us</a>"
@@ -6728,6 +6674,10 @@ msgstr "Shtoni"
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
 msgstr "Duhet të jeni i futur, që të shtoni një URL"
+
+#: templates/videos/_video_url_panel.html:88
+msgid "Login"
+msgstr "Hyni"
 
 #: templates/videos/_video_url_panel.html:121
 #: templates/videos/_video_url_panel.html:141
