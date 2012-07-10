@@ -10690,7 +10690,7 @@ Popcorn.player( "youtube", {
                         new that.AmaraView({
 
                             // TODO: This needs to support a node OR ID string.
-                            el: $('#' + options.div)[0],
+                            el: _$('#' + options.div)[0],
                             model: new that.VideoModel(options)
                         })
                     );
