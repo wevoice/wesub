@@ -10741,8 +10741,6 @@ Popcorn.player( "youtube", {
                 // than HTML5. Watch http://popcornjs.org/popcorn-docs/events/.
                 this.pop.on('loadedmetadata', function() {
 
-                    console.log('position().width == ' + that.pop.position().width);
-
                     // Set the video model's height and width, now that we know it.
                     that.model.set('height', that.pop.position().height);
                     that.model.set('width', that.pop.position().width);
