@@ -1038,6 +1038,7 @@ class MembershipNarrowing(models.Model):
 
         return super(MembershipNarrowing, self).save(*args, **kwargs)
 
+
 # Application
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
@@ -1923,6 +1924,22 @@ class Task(models.Model):
             self._subtitle_version = language.version(public_only=False) if language else None
 
         return self._subtitle_version
+
+    def is_blocked(self):
+        if self.get_type_display() != 'Translate':
+            return False
+
+        subtitle_version = self.get_subtitle_version()
+
+        if not subtitle_version:
+            return False
+
+        standard_language = subtitle_version.language.standard_language
+
+        if not standard_language:
+            return False
+
+        return not standard_language.is_complete_and_synced()
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:

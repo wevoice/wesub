@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Tea Horvatic <teahorvatic@yahoo.co.uk>, 2012.
 #   <teahorvatic@yahoo.co.uk>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-26 01:32-0500\n"
-"PO-Revision-Date: 2012-06-26 06:48+0000\n"
+"POT-Creation-Date: 2012-07-10 01:32-0500\n"
+"PO-Revision-Date: 2012-07-10 06:47+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Croatian (http://www.transifex.net/projects/p/universalsubtitles/language/hr/)\n"
+"Language-Team: Croatian (http://www.transifex.com/projects/p/universalsubtitles/language/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -105,23 +106,23 @@ msgstr "e-mail potvrda"
 msgid "e-mail confirmations"
 msgstr "e-mail potvrde"
 
-#: apps/auth/views.py:61
+#: apps/auth/views.py:58
 msgid "Confirmation key expired."
 msgstr "Ključ potvrde je istekao."
 
-#: apps/auth/views.py:63
+#: apps/auth/views.py:60
 msgid "Email is confirmed."
 msgstr "Email je potvrđen."
 
-#: apps/auth/views.py:75
+#: apps/auth/views.py:72
 msgid "Confirmation email was sent."
 msgstr "Poslan je email potvrde."
 
-#: apps/auth/views.py:77
+#: apps/auth/views.py:74
 msgid "You email is empty or already confirmed."
 msgstr "Vaš email je prazan ili ste ga već potvrdili."
 
-#: apps/auth/views.py:110
+#: apps/auth/views.py:106
 msgid "Your account was deleted."
 msgstr "Vaš račun je obrisan."
 
@@ -187,15 +188,15 @@ msgstr "Ova poruka je od administratora stranice."
 
 #: apps/messages/forms.py:96
 msgid "You cannot send a message to a user and a team at the same time."
-msgstr ""
+msgstr "Ne možete poslati poruku korisniku i timu istovremeno."
 
 #: apps/messages/forms.py:99
 msgid "You must choose a recipient."
-msgstr ""
+msgstr "Morate odabrati primatelja."
 
 #: apps/messages/forms.py:106
 msgid "This field is required."
-msgstr ""
+msgstr "Ovo polje je obavezno."
 
 #: apps/messages/models.py:70
 msgid "[no subject]"
@@ -232,32 +233,32 @@ msgstr ""
 #: apps/messages/tasks.py:152
 #, python-format
 msgid "%(user)s is applying for team %(team)s"
-msgstr ""
+msgstr "%(user)s se prijavljuje za tim %(team)s"
 
 #: apps/messages/tasks.py:183
 #, python-format
 msgid "Your application to join the %s team has been declined"
-msgstr ""
+msgstr "Vaša prijava za pristupanje %s timu je odbijena"
 
 #: apps/messages/tasks.py:217
 #, python-format
 msgid "%s team has a new member"
-msgstr ""
+msgstr "%s tim ima novog člana"
 
 #: apps/messages/tasks.py:241
 #, python-format
 msgid "You've joined the %s team!"
-msgstr ""
+msgstr "Pridružili ste se %s timu!"
 
 #: apps/messages/tasks.py:266
 #, python-format
 msgid "%(user)s has left the %(team)s team"
-msgstr ""
+msgstr "%(user)s je napustio %(team)s tim"
 
 #: apps/messages/tasks.py:291
 #, python-format
 msgid "You've left the %s team!"
-msgstr ""
+msgstr "Napustili ste %s tim!"
 
 #: apps/messages/tasks.py:327
 msgid "Your videos were imported!"
@@ -269,15 +270,15 @@ msgstr ""
 
 #: apps/messages/tasks.py:395
 msgid "Your subtitles have been reviewed"
-msgstr ""
+msgstr "Vaši titlovi su pregledani"
 
 #: apps/messages/tasks.py:397
 msgid " and published"
-msgstr ""
+msgstr " i objavljeni"
 
 #: apps/messages/tasks.py:498
 msgid "Your subtitles have been approved and published!"
-msgstr ""
+msgstr "Vaši titlovi su odobreni i objavljeni!"
 
 #: apps/messages/tasks.py:504
 msgid "Your subtitles have been returned for further editing"
@@ -294,7 +295,7 @@ msgstr ""
 
 #: apps/messages/views.py:123
 msgid "Message sent."
-msgstr ""
+msgstr "Poruka je poslana."
 
 #: apps/openid_consumer/views.py:94
 msgid "i-names are not supported"
@@ -321,13 +322,13 @@ msgstr "Otvori ID nije uspio"
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:12
 #: apps/openid_consumer/templates/openid_consumer/signin.html:27
-#: templates/openid_consumer/signin.html:12
-#: templates/openid_consumer/signin.html:31
+#: templates/openid_consumer/signin.html:17
 msgid "Sign in with your OpenID"
 msgstr "Prijavite se s Vašom OpenID"
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
-#: templates/openid_consumer/signin.html:18
+#: templates/auth/login.html:10
+#: templates/registration/password_reset_complete.html:16
 msgid "Sign in"
 msgstr "Prijava"
 
@@ -372,7 +373,7 @@ msgstr "Vaš profil je ažuriran."
 
 #: apps/search/forms.py:28
 msgid "Relevance"
-msgstr ""
+msgstr "Važnost"
 
 #: apps/search/forms.py:29
 msgid "Most languages"
@@ -489,7 +490,7 @@ msgstr "Spremit će se samo ako videozapis ne postoji u našoj bazi podataka."
 
 #: apps/teams/forms.py:216
 msgid "This video already belongs to a team."
-msgstr ""
+msgstr "Ovaj videozapis već pripada timu."
 
 #: apps/teams/forms.py:222
 msgid "Set original language for this video."
@@ -527,7 +528,7 @@ msgstr "URL ekipe: http://universalsubtitles.org/teams/"
 
 #: apps/teams/forms.py:342
 msgid "This video has already been transcribed."
-msgstr ""
+msgstr "Ovaj videozapis je već transkribiran."
 
 #: apps/teams/forms.py:347
 msgid "Subtitling of this video is already in progress."
@@ -535,11 +536,11 @@ msgstr "Postavljanje titlova za ovaj videozapis je već u tijeku."
 
 #: apps/teams/forms.py:353
 msgid "No one has transcribed this video yet, so it can't be translated."
-msgstr ""
+msgstr "Još nitko nije transkribirao ovaj videozapis pa se ne može prevoditi."
 
 #: apps/teams/forms.py:359
 msgid "This language already has a complete set of subtitles."
-msgstr ""
+msgstr "Ovaj jezik već ima potpun set titlova."
 
 #: apps/teams/forms.py:379
 msgid "There is already a task in progress for that video/language."
@@ -547,11 +548,11 @@ msgstr "Za ovaj video/jezik već postoji zadatak u tijeku."
 
 #: apps/teams/forms.py:393
 msgid "You must select a language for a Translate task."
-msgstr ""
+msgstr "Morate odabrati jezik za zadatak prevođenja."
 
 #: apps/teams/forms.py:426
 msgid "That user has already been assigned the maximum number of tasks."
-msgstr ""
+msgstr "Ovom korisniku je već dodijeljen maksimalan broj zadataka."
 
 #: apps/teams/forms.py:448
 msgid "You do not have permission to assign this task."
@@ -559,7 +560,7 @@ msgstr "Nemate dozvolu za dodjeljivanje ovog zadatka."
 
 #: apps/teams/forms.py:455
 msgid "This user cannot perform that task."
-msgstr ""
+msgstr "Ovaj korisnik ne može izvesti taj zadatak."
 
 #: apps/teams/forms.py:476
 msgid "You do not have permission to delete this task."
@@ -567,74 +568,74 @@ msgstr "Nemate dozvolu za brisanje ovog zadatka."
 
 #: apps/teams/forms.py:533
 msgid "You cannot blacklist a preferred language."
-msgstr ""
+msgstr "Ne možete staviti na crnu listu preferirani jezik."
 
 #: apps/teams/forms.py:556 apps/teams/forms.py:558
 msgid "User does not exist!"
-msgstr ""
+msgstr "Korisnik ne postoji!"
 
 #: apps/teams/forms.py:565
 msgid "User is already a member of this team!"
-msgstr ""
+msgstr "Korisnik je već član ovog tima!"
 
 #: apps/teams/forms.py:591 templates/videos/subtitle-view.html:373
 msgid "Would you like to delete these subtitles completely?"
-msgstr ""
+msgstr "Želite li potpuno obrisati ove titlove?"
 
 #: apps/teams/forms.py:595 templates/videos/subtitle-view.html:358
 msgid "What would you like to unpublish?"
-msgstr ""
+msgstr "Što želite odjaviti?"
 
 #: apps/teams/forms.py:597
 msgid "This version (and any later version) for this language."
-msgstr ""
+msgstr "Ova verzija (i bilo koja daljnja) za ovaj jezik."
 
 #: apps/teams/forms.py:598
 msgid "All versions for this language and any dependent languages."
-msgstr ""
+msgstr "Sve verzije za ovaj jezik i bilo koji zavisan jezik."
 
 #: apps/teams/forms.py:616
 msgid "These subtitles are not under a team's control."
-msgstr ""
+msgstr "Ovi titlovi nisu pod kontrolom tima."
 
 #: apps/teams/forms.py:620
 msgid "You do not have permission to unpublish these subtitles."
-msgstr ""
+msgstr "Nemate dozvolu za odjavu ovih titlova."
 
 #: apps/teams/forms.py:639
 msgid "You cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:651
+#: apps/teams/forms.py:651 apps/videos/forms.py:461
 msgid "Invalid language to translate from."
 msgstr ""
 
-#: apps/teams/forms.py:660 apps/videos/forms.py:68 apps/videos/forms.py:86
-#: apps/videos/forms.py:422
+#: apps/teams/forms.py:660 apps/videos/forms.py:71 apps/videos/forms.py:89
+#: apps/videos/forms.py:470
 msgid "File size should be less {0} kb"
 msgstr "Veličina datoteke trebala bi biti manja od {0} kb"
 
-#: apps/teams/forms.py:665 apps/videos/forms.py:427
+#: apps/teams/forms.py:665 apps/videos/forms.py:475
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:672 apps/videos/forms.py:73 apps/videos/forms.py:94
-#: apps/videos/forms.py:435
+#: apps/teams/forms.py:672 apps/videos/forms.py:76 apps/videos/forms.py:97
+#: apps/videos/forms.py:482
 msgid "Can not detect file encoding"
 msgstr "Nemoguće detektirati kodiranje datoteke"
 
-#: apps/teams/forms.py:677 apps/videos/forms.py:96 apps/videos/forms.py:437
+#: apps/teams/forms.py:677 apps/videos/forms.py:99 apps/videos/forms.py:487
 msgid "Incorrect subtitles format"
 msgstr "Neispravan format titlova"
 
-#: apps/teams/forms.py:750
+#: apps/teams/forms.py:750 apps/videos/forms.py:577
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 
-#: apps/teams/forms.py:756
+#: apps/teams/forms.py:756 apps/videos/forms.py:584
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -662,15 +663,15 @@ msgstr "Pozivnica administratora"
 
 #: apps/teams/models.py:102
 msgid "Any team member"
-msgstr ""
+msgstr "Bilo koji član tima"
 
 #: apps/teams/models.py:103
 msgid "Managers and admins"
-msgstr ""
+msgstr "Upravljači i administratori"
 
 #: apps/teams/models.py:104
 msgid "Admins only"
-msgstr ""
+msgstr "Samo administratori"
 
 #: apps/teams/models.py:124
 msgid "name"
@@ -687,7 +688,7 @@ msgstr "opis"
 #: apps/teams/models.py:126
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
-msgstr ""
+msgstr "Svi url-ovi će se pretvoriti u linkove. Prijelomi redova i HTML nisu podržani."
 
 #: apps/teams/models.py:128
 msgid "logo"
@@ -710,7 +711,7 @@ msgstr "korisnici"
 
 #: apps/teams/models.py:134
 msgid "third party accounts"
-msgstr ""
+msgstr "računi trećih strana"
 
 #: apps/teams/models.py:137
 msgid "applicants"
@@ -734,7 +735,7 @@ msgstr "HTML koji se pojavljuje na vrhu stranice ekipe"
 
 #: apps/teams/models.py:147
 msgid "authentication provider code"
-msgstr ""
+msgstr "kod pružatelja autentifikacije"
 
 #: apps/teams/models.py:155
 msgid "membership policy"
@@ -758,11 +759,11 @@ msgstr "politika prijevoda"
 
 #: apps/teams/models.py:170
 msgid "maximum tasks per member"
-msgstr ""
+msgstr "maksimalan broj zadataka po članu"
 
 #: apps/teams/models.py:172
 msgid "task expiration (days)"
-msgstr ""
+msgstr "istek zadatka (dani)"
 
 #: apps/teams/models.py:183 templates/profiles/_top_user_panel.html:33
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
@@ -787,20 +788,20 @@ msgstr "Trebamo pomoć za sve jezike"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Ako uključite ovo, drugi jezici se neće prikazivati."
 
-#: apps/teams/models.py:918 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:919 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Vlasnik"
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:920 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Upravitelj"
 
-#: apps/teams/models.py:920 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:921 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Administrator"
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Suradnik"
 
@@ -828,7 +829,7 @@ msgstr ""
 msgid ""
 "Your application has been submitted. You will be notified of the team "
 "administrator's response"
-msgstr ""
+msgstr "Vaša prijava je predana. Bit ćete obaviješteni o odgovoru administratora tima"
 
 #: apps/teams/rpc.py:65
 msgid "You can't join this team by application."
@@ -894,28 +895,28 @@ msgid ""
 "                    <li><a href=\"%(custom)s\">Customize instructions to caption makers and translators</a></li>\n"
 "                </ul>\n"
 "                "
-msgstr ""
+msgstr "\n                Vaš tim je kreiran. Nekoliko sljedećih koraka su:\n                <ul>\n                    <li><a href=\"%(edit)s\">Uredi članove tima' dozvole</a></li>\n                    <li><a href=\"%(activate)s\">Aktiviraj i prilagodi tijek rada za svoj tim</a></li>\n                    <li><a href=\"%(create)s\">Kreiraj i prilagodi projekte</a></li>\n                    <li><a href=\"%(lang)s\">Uredi jezične postavke</a></li>\n                    <li><a href=\"%(custom)s\">Prilagodi upute za pisce natpisa i prevoditelje</a></li>\n                </ul>\n                "
 
 #: apps/teams/views.py:192
 msgid "You do not have permission to delete this team."
-msgstr ""
+msgstr "Nemate dozvolu za brisanje ovog tima."
 
 #: apps/teams/views.py:206 apps/teams/views.py:242 apps/teams/views.py:270
 #: apps/teams/views.py:303 apps/teams/views.py:358 apps/teams/views.py:1533
 msgid "You do not have permission to edit this team."
-msgstr ""
+msgstr "Nemate dozvolu za uređivanje ovog tima."
 
 #: apps/teams/views.py:229 apps/teams/views.py:288 apps/teams/views.py:373
 msgid "Settings saved."
-msgstr ""
+msgstr "Postavke spremljene."
 
 #: apps/teams/views.py:255
 msgid "Guidelines and messages updated."
-msgstr ""
+msgstr "Smjernice i poruke ažurirane."
 
 #: apps/teams/views.py:499
 msgid "You can't add that video to this team/project."
-msgstr ""
+msgstr "Ne možete dodati taj videozapis u ovaj tim/projekt."
 
 #: apps/teams/views.py:534
 msgid "The video has been moved to the new team."
@@ -923,7 +924,7 @@ msgstr ""
 
 #: apps/teams/views.py:547
 msgid "You can't add videos to this team/project."
-msgstr ""
+msgstr "Ne možete dodavati videozapise u ovaj tim/projekt."
 
 #: apps/teams/views.py:566
 msgid "You can't edit this video."
@@ -951,15 +952,15 @@ msgstr ""
 
 #: apps/teams/views.py:630
 msgid "Video has been removed from the team."
-msgstr ""
+msgstr "Videozapis je uklonjen iz tima."
 
 #: apps/teams/views.py:749
 msgid "Member has been removed from the team."
-msgstr ""
+msgstr "Član je uklonjen iz tima."
 
 #: apps/teams/views.py:752
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
-msgstr ""
+msgstr "Koristite gumb \"Napusti ovaj tim\" da se maknete iz ovog tima."
 
 #: apps/teams/views.py:755
 msgid "You don't have permission to remove this member from the team."
@@ -999,7 +1000,7 @@ msgstr "Napustili ste ovu ekipu."
 
 #: apps/teams/views.py:962
 msgid "Member saved."
-msgstr ""
+msgstr "Član je spremljen."
 
 #: apps/teams/views.py:1118
 msgid "You cannot view this team's tasks."
@@ -1084,23 +1085,23 @@ msgstr "Može li mi netko pomoći postaviti titlove za ove videozapise? %(url)s"
 msgid "Email for alert"
 msgstr "Pošalji email za alarm"
 
-#: apps/videos/forms.py:64
+#: apps/videos/forms.py:67
 msgid "File should have txt format"
 msgstr "Datoteka mora biti u txt formatu"
 
-#: apps/videos/forms.py:77
+#: apps/videos/forms.py:80
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "Nemoguće kodirati datoteku. Mora imati utf8 kodiranje."
 
-#: apps/videos/forms.py:89
+#: apps/videos/forms.py:92
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "Neispravan format. Učitajte srt, .ssa, .sbv ili .xml (TTML  format)"
 
-#: apps/videos/forms.py:122 apps/videos/forms.py:530 utils/validators.py:38
+#: apps/videos/forms.py:125 apps/videos/forms.py:828 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Čini se da ovaj URL nema ispravnu poveznicu."
 
-#: apps/videos/forms.py:128 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:131 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1109,46 +1110,58 @@ msgid ""
 "href=\"mailto:%s\">contact us</a>!"
 msgstr ""
 
-#: apps/videos/forms.py:139
+#: apps/videos/forms.py:142
 msgid "You have not permission add video URL for this video"
 msgstr "Nemate dozvolu za dodavanje video URL za ovaj video"
 
-#: apps/videos/forms.py:171
+#: apps/videos/forms.py:174 apps/videos/forms.py:451
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Netko upravo postavlja titlove za ovaj video. Pokušajte kasnije."
 
-#: apps/videos/forms.py:186 apps/videos/forms.py:210
+#: apps/videos/forms.py:189 apps/videos/forms.py:215 apps/videos/forms.py:511
+#: apps/videos/forms.py:547
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr ""
 
-#: apps/videos/forms.py:195
+#: apps/videos/forms.py:198 apps/videos/forms.py:530
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr ""
 
-#: apps/videos/forms.py:222
+#: apps/videos/forms.py:227 apps/videos/forms.py:559
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/videos/forms.py:228 apps/videos/forms.py:231
+#: apps/videos/forms.py:233 apps/videos/forms.py:236 apps/videos/forms.py:565
+#: apps/videos/forms.py:568
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have sufficient permission."
 msgstr ""
 
-#: apps/videos/forms.py:515
+#: apps/videos/forms.py:516
+msgid "The language already exists and already has a version"
+msgstr ""
+
+#: apps/videos/forms.py:521
+#, python-format
+msgid ""
+"The language already exists and you can't change its translation from %s"
+msgstr ""
+
+#: apps/videos/forms.py:813
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr ""
 
-#: apps/videos/forms.py:518 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:816 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
@@ -1156,49 +1169,49 @@ msgid ""
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "Morate napraviti poveznicu na video na kompatibilnoj stranici (poput YouTube) ili direktno na\n                    video datoteku koja radi u HTML5 preglednicima. Na primjer http://mysite.com/myvideo.ogg ili http://mysite.com/myipadvideo.m4v\n                    <a href=\"mailto:%s\">Kontaktirajte nas</a> ukoliko naiđete na problem."
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:844
 msgid "Youtube usernames"
 msgstr "Youtube korisnička imena"
 
-#: apps/videos/forms.py:546
+#: apps/videos/forms.py:844
 msgid "Enter usernames separated by comma."
 msgstr "Upišite korisnička imena odvojena zarezima."
 
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:845
 msgid "Youtube page link."
 msgstr "Youtube poveznica"
 
-#: apps/videos/forms.py:548
+#: apps/videos/forms.py:846
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Na primjer: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:549
+#: apps/videos/forms.py:847
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:550
+#: apps/videos/forms.py:848
 msgid "Save feed"
 msgstr "Spremi kanal"
 
-#: apps/videos/forms.py:550
+#: apps/videos/forms.py:848
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
 msgstr "Odaberite ovo ukoliko ubuduće želite dodavati videozapise iz ovoga kanala. Spremit će se samo valjani RSS slijedovi."
 
-#: apps/videos/forms.py:593
+#: apps/videos/forms.py:891
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr "Oprostite, nismo bili u mogućnosti pronaći valjani kanal na URL-u koji ste upisali. Molimo, provjerite URL i pokušajte ponovno."
 
-#: apps/videos/forms.py:598
+#: apps/videos/forms.py:896
 msgid ""
 "The videos are being added in the background. If you are logged in, you will"
 " receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:609
+#: apps/videos/forms.py:907
 msgid "captcha"
 msgstr "captcha"
 
@@ -1224,199 +1237,199 @@ msgid ""
 "language you are uploading or a translation of it"
 msgstr "Oprostite, trenutno ne možete učitavati titlove jer netko uređuje jezik čiji prijevod učitavate"
 
-#: apps/videos/models.py:1948
+#: apps/videos/models.py:1950
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1953
+#: apps/videos/models.py:1955
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1958
+#: apps/videos/models.py:1960
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "  odčačen <a href=\"%(language_url)s\">%(language)s</a> titlova za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1963
+#: apps/videos/models.py:1965
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "  odobreni <a href=\"%(language_url)s\">%(language)s</a> titlovi za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1968
+#: apps/videos/models.py:1970
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:1974
+#: apps/videos/models.py:1976
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr ""
 
-#: apps/videos/models.py:1979
+#: apps/videos/models.py:1981
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "dodan videozapis <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1981
+#: apps/videos/models.py:1983
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> videozapis dodan"
 
-#: apps/videos/models.py:1987
+#: apps/videos/models.py:1989
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "promjenjen naslov za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:1989
+#: apps/videos/models.py:1991
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Naslov je izmijenjen u <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2004
+#: apps/videos/models.py:2006
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "komentira/o/la je <a href=\"%(comments_url)s\">%(language)s titlove</a> for <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2006
+#: apps/videos/models.py:2008
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Dodan je komentar za <a href=\"%(comments_url)s\">%(language)s titlove</a> za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2009
+#: apps/videos/models.py:2011
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "komentira/o/la je <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2011
+#: apps/videos/models.py:2013
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Dodan je komentar za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2019
+#: apps/videos/models.py:2021
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "započeti <a href=\"%(language_url)s\">%(language)s titlovi</a> za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2021
+#: apps/videos/models.py:2023
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(language_url)s\">%(language)s titlovi</a> pokrenuti za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2032
+#: apps/videos/models.py:2034
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "uredi/o/la <a href=\"%(language_url)s\">%(language)s titlove</a> za<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2034
+#: apps/videos/models.py:2036
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(language_url)s\">%(language)s titlovi</a> uređeni za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2040
+#: apps/videos/models.py:2042
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "dodan novi URL za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2042
+#: apps/videos/models.py:2044
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Dodan je novi URL za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2047
+#: apps/videos/models.py:2049
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr ""
 
-#: apps/videos/models.py:2052
+#: apps/videos/models.py:2054
 #, python-format
 msgid "left the %s team"
 msgstr ""
 
-#: apps/videos/models.py:2123
+#: apps/videos/models.py:2125
 msgid "add video"
 msgstr "dodaj videozapis"
 
-#: apps/videos/models.py:2124
+#: apps/videos/models.py:2126
 msgid "change title"
 msgstr "promijeni naslov"
 
-#: apps/videos/models.py:2125
+#: apps/videos/models.py:2127
 msgid "comment"
 msgstr "komentiraj"
 
-#: apps/videos/models.py:2126
+#: apps/videos/models.py:2128
 msgid "add version"
 msgstr "dodaj verziju"
 
-#: apps/videos/models.py:2127
+#: apps/videos/models.py:2129
 msgid "add translation"
 msgstr "dodaj prijevod"
 
-#: apps/videos/models.py:2128
+#: apps/videos/models.py:2130
 msgid "add video url"
 msgstr "dodaj URL videozapisa"
 
-#: apps/videos/models.py:2129
+#: apps/videos/models.py:2131
 msgid "request subtitles"
 msgstr "zatraži titlove"
 
-#: apps/videos/models.py:2130
+#: apps/videos/models.py:2132
 msgid "approve version"
 msgstr "odobri verziju"
 
-#: apps/videos/models.py:2131
+#: apps/videos/models.py:2133
 msgid "add contributor"
 msgstr "dodaj suradnika"
 
-#: apps/videos/models.py:2132
+#: apps/videos/models.py:2134
 msgid "remove contributor"
 msgstr ""
 
-#: apps/videos/models.py:2133
+#: apps/videos/models.py:2135
 msgid "reject version"
 msgstr "odbaci verziju"
 
-#: apps/videos/models.py:2134
+#: apps/videos/models.py:2136
 msgid "review version"
 msgstr ""
 
-#: apps/videos/models.py:2135
+#: apps/videos/models.py:2137
 msgid "accept version"
 msgstr ""
 
-#: apps/videos/models.py:2136
+#: apps/videos/models.py:2138
 msgid "decline version"
 msgstr ""
 
-#: apps/videos/models.py:2137
+#: apps/videos/models.py:2139
 msgid "delete video"
 msgstr ""
 
-#: apps/videos/models.py:2389
+#: apps/videos/models.py:2391
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1526,29 +1539,29 @@ msgstr ""
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Postojeći titlovi bit će uvezeni za nekoliko minuta."
 
-#: apps/videos/views.py:275
+#: apps/videos/views.py:282
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Hvala za učitavanje. Potrebno je nekoliko minuta da se Vaši titlovi prikažu."
 
-#: apps/videos/views.py:277
+#: apps/videos/views.py:284
 msgid "Your changes have been saved."
 msgstr "Vaše izmjene su sačuvane."
 
-#: apps/videos/views.py:628
+#: apps/videos/views.py:635
 msgid "You have not permission change this URL"
 msgstr "Nemate dozvolu za izmjenu ovog URL"
 
-#: apps/videos/views.py:634 apps/videos/views.py:654
+#: apps/videos/views.py:641 apps/videos/views.py:661
 msgid "Object does not exist"
 msgstr "Objekt ne postoji"
 
-#: apps/videos/views.py:647
+#: apps/videos/views.py:654
 msgid "You have not permission delete this URL"
 msgstr "Nemate dozvolu za brisanje ovog URL"
 
-#: apps/videos/views.py:650
+#: apps/videos/views.py:657
 msgid "You cann't remove original URL"
 msgstr "Ne možete ukloniti originalni URL"
 
@@ -1556,7 +1569,7 @@ msgstr "Ne možete ukloniti originalni URL"
 msgid "Feed is unavailable now."
 msgstr "Kanal sada nije dostupan."
 
-#: apps/videos/templatetags/subtitles_tags.py:58
+#: apps/videos/templatetags/subtitles_tags.py:59
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
@@ -1587,22 +1600,22 @@ msgstr "Nedefinirana pogreška"
 msgid "Video embedding disabled by owner"
 msgstr "Embedding videozapis je onemogućio vlasnik"
 
-#: apps/widget/rpc.py:254
+#: apps/widget/rpc.py:263
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:256
+#: apps/widget/rpc.py:265
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:917 apps/widget/rpc.py:958
+#: apps/widget/rpc.py:945 apps/widget/rpc.py:986
 msgid "\n"
 msgstr "\n"
 
-#: apps/widget/views.py:106
+#: apps/widget/views.py:107
 msgid "That task has already been completed."
 msgstr ""
 
@@ -1617,7 +1630,7 @@ msgstr "Odabir jezika"
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
 #: templates/statistic/log_entry_model_admin.html:18
 #: templates/statistic/logger_model_admin.html:18
 #: templates/statistic/log_methods/changelist_view.html:18
@@ -2292,19 +2305,19 @@ msgstr "Latvian"
 
 #: libs/unilangs/unilangs.py:247
 msgid "Metadata: Geo"
-msgstr ""
+msgstr "Metadata: Geo"
 
 #: libs/unilangs/unilangs.py:248
 msgid "Metadata: Twitter"
-msgstr ""
+msgstr "Metadata: Twitter"
 
 #: libs/unilangs/unilangs.py:249
 msgid "Metadata: Wikipedia"
-msgstr ""
+msgstr "Metadata: Wikipedia"
 
 #: libs/unilangs/unilangs.py:250
 msgid "Madurese"
-msgstr ""
+msgstr "Madurese"
 
 #: libs/unilangs/unilangs.py:251
 msgid "Marshallese"
@@ -2328,7 +2341,7 @@ msgstr "Malagasy"
 
 #: libs/unilangs/unilangs.py:256
 msgid "Mongolian"
-msgstr ""
+msgstr "Mongolian"
 
 #: libs/unilangs/unilangs.py:257
 msgid "Mandinka"
@@ -2336,7 +2349,7 @@ msgstr "Mandinka"
 
 #: libs/unilangs/unilangs.py:258
 msgid "Moldavian, Moldovan"
-msgstr ""
+msgstr "Moldavian, Moldovan"
 
 #: libs/unilangs/unilangs.py:259
 msgid "Mohawk"
@@ -2368,19 +2381,19 @@ msgstr "Burmese"
 
 #: libs/unilangs/unilangs.py:266
 msgid "Hokkien"
-msgstr ""
+msgstr "Hokkien"
 
 #: libs/unilangs/unilangs.py:267
 msgid "Naurunan"
-msgstr ""
+msgstr "Naurunan"
 
 #: libs/unilangs/unilangs.py:268
 msgid "Norwegian Bokmal"
-msgstr ""
+msgstr "Norwegian Bokmal"
 
 #: libs/unilangs/unilangs.py:269
 msgid "North Ndebele"
-msgstr ""
+msgstr "North Ndebele"
 
 #: libs/unilangs/unilangs.py:270
 msgid "Nepali"
@@ -2388,7 +2401,7 @@ msgstr "Nepali"
 
 #: libs/unilangs/unilangs.py:271
 msgid "Ndonga"
-msgstr ""
+msgstr "Ndonga"
 
 #: libs/unilangs/unilangs.py:272
 msgid "Dutch"
@@ -2396,15 +2409,15 @@ msgstr "Dutch"
 
 #: libs/unilangs/unilangs.py:273
 msgid "Norwegian Nynorsk"
-msgstr ""
+msgstr "Norwegian Nynorsk"
 
 #: libs/unilangs/unilangs.py:274
 msgid "Norwegian"
-msgstr ""
+msgstr "Norwegian"
 
 #: libs/unilangs/unilangs.py:275
 msgid "Southern Ndebele"
-msgstr ""
+msgstr "Southern Ndebele"
 
 #: libs/unilangs/unilangs.py:276
 msgid "Northern Sotho"
@@ -2412,7 +2425,7 @@ msgstr "Northern Sotho"
 
 #: libs/unilangs/unilangs.py:277
 msgid "Navajo"
-msgstr ""
+msgstr "Navajo"
 
 #: libs/unilangs/unilangs.py:278
 msgid "Chewa"
@@ -2424,7 +2437,7 @@ msgstr "Occitan"
 
 #: libs/unilangs/unilangs.py:280
 msgid "Ojibwe"
-msgstr ""
+msgstr "Ojibwe"
 
 #: libs/unilangs/unilangs.py:281
 msgid "Oriya"
@@ -2436,7 +2449,7 @@ msgstr "Oromo"
 
 #: libs/unilangs/unilangs.py:283
 msgid "Ossetian, Ossetic"
-msgstr ""
+msgstr "Ossetian, Ossetic"
 
 #: libs/unilangs/unilangs.py:284
 msgid "Papiamento"
@@ -2472,7 +2485,7 @@ msgstr "Quechua"
 
 #: libs/unilangs/unilangs.py:292
 msgid "Romansh"
-msgstr ""
+msgstr "Romansh"
 
 #: libs/unilangs/unilangs.py:293
 msgid "Romanian"
@@ -2484,15 +2497,15 @@ msgstr "Russian"
 
 #: libs/unilangs/unilangs.py:295
 msgid "Rundi"
-msgstr ""
+msgstr "Rundi"
 
 #: libs/unilangs/unilangs.py:296
 msgid "Macedo"
-msgstr ""
+msgstr "Macedo"
 
 #: libs/unilangs/unilangs.py:297
 msgid "Rusyn"
-msgstr ""
+msgstr "Rusyn"
 
 #: libs/unilangs/unilangs.py:298
 msgid "Sanskrit"
@@ -2508,7 +2521,7 @@ msgstr "Sindhi"
 
 #: libs/unilangs/unilangs.py:301
 msgid "Northern Sami"
-msgstr ""
+msgstr "Northern Sami"
 
 #: libs/unilangs/unilangs.py:302
 msgid "Sango"
@@ -2580,7 +2593,7 @@ msgstr "Tamil"
 
 #: libs/unilangs/unilangs.py:319
 msgid "Tetum"
-msgstr ""
+msgstr "Tetum"
 
 #: libs/unilangs/unilangs.py:320
 msgid "Telugu"
@@ -2612,7 +2625,7 @@ msgstr "Klingon"
 
 #: libs/unilangs/unilangs.py:327
 msgid "Tonga"
-msgstr ""
+msgstr "Tonga"
 
 #: libs/unilangs/unilangs.py:328
 msgid "Turkish"
@@ -2628,7 +2641,7 @@ msgstr "Tswana"
 
 #: libs/unilangs/unilangs.py:331
 msgid "Tartar"
-msgstr ""
+msgstr "Tartar"
 
 #: libs/unilangs/unilangs.py:332
 msgid "Twi"
@@ -2636,11 +2649,11 @@ msgstr "Twi"
 
 #: libs/unilangs/unilangs.py:333
 msgid "Tahitian"
-msgstr ""
+msgstr "Tahitian"
 
 #: libs/unilangs/unilangs.py:334
 msgid "Uighur"
-msgstr ""
+msgstr "Uighur"
 
 #: libs/unilangs/unilangs.py:335
 msgid "Ukrainian"
@@ -2664,7 +2677,7 @@ msgstr "Uzbek"
 
 #: libs/unilangs/unilangs.py:340
 msgid "Venda"
-msgstr ""
+msgstr "Venda"
 
 #: libs/unilangs/unilangs.py:341
 msgid "Vietnamese"
@@ -2696,7 +2709,7 @@ msgstr "Yoruba"
 
 #: libs/unilangs/unilangs.py:348
 msgid "Zhuang, Chuang"
-msgstr ""
+msgstr "Zhuang, Chuang"
 
 #: libs/unilangs/unilangs.py:349
 msgid "Chinese, Yue"
@@ -2763,11 +2776,11 @@ msgstr "Trajni link (permalink)"
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:73
 #: templates/teams/_context_team.html:106
 msgid "Share"
-msgstr ""
+msgstr "Podijeli"
 
 #: templates/_sharing_widget.html:14
 msgid "Get Embed Code"
-msgstr ""
+msgstr "Zatraži embed kod"
 
 #: templates/_testing_widget.html:3
 msgid "We&#8217;d like help testing our subtitling widget"
@@ -2854,7 +2867,7 @@ msgstr ""
 
 #: templates/base.html:70
 msgid "Subtitle Videos"
-msgstr ""
+msgstr "Dodaj titlove videozapisima"
 
 #: templates/base.html:71
 msgid "Watch"
@@ -2872,7 +2885,8 @@ msgstr ""
 msgid "Help"
 msgstr "Pomoć"
 
-#: templates/base.html:78
+#: templates/base.html:78 templates/auth/login.html:30
+#: templates/openid_consumer/signin.html:22
 msgid "Sign In"
 msgstr "Prijava"
 
@@ -2887,7 +2901,7 @@ msgstr "O nama"
 
 #: templates/base.html:106
 msgid "Jobs"
-msgstr ""
+msgstr "Poslovi"
 
 #: templates/base.html:109
 msgid "Contact Us"
@@ -3884,11 +3898,11 @@ msgid ""
 "\n"
 "            Our deaf and hard of hearing users and non-profits request help for videos that need captions or translations. \n"
 "        "
-msgstr ""
+msgstr "\n            Naši gluhi i nagluhi korisnici te neprofitne udruge traže pomoć za videozapise kojima su potrebni natpisi ili prijevodi. \n        "
 
 #: templates/index.html:44
 msgid "Start volunteering."
-msgstr ""
+msgstr "Počnite volontirati."
 
 #: templates/index.html:48
 msgid "Complete Subtitling Solutions"
@@ -3899,7 +3913,7 @@ msgid ""
 "\n"
 "            Increase viewership with transcription, captioning, and translation services, and flexible API and integration options. Improve SEO, reach a global audience, and build a managed volunteer community.\n"
 "        "
-msgstr ""
+msgstr "\n            Povećajte gledanost s transkripcijom, natpisima i uslugama prevođenje te fleksibilnim API i mogućnostima integracije. Poboljšajte SEO, dosegnite do globalne publike i izgradite rukovođenu zajednicu volontera.\n        "
 
 #: templates/index.html:53
 msgid "See our enterprise services."
@@ -3940,7 +3954,7 @@ msgstr ""
 
 #: templates/index.html:121
 msgid "NewsHour Team"
-msgstr ""
+msgstr "NewsHour Tim"
 
 #: templates/index.html:127
 msgid "More Popular"
@@ -4341,27 +4355,27 @@ msgstr "Obriši"
 msgid "Cancel"
 msgstr "Odustani"
 
-#: templates/auth/login.html:9
-msgid "Login to Your Existing Account"
-msgstr "Prijava na postojeći račun"
+#: templates/auth/login.html:25
+msgid "Or use your Amara account"
+msgstr ""
 
-#: templates/auth/login.html:13 templates/videos/_video_url_panel.html:88
-msgid "Login"
-msgstr "Prijava"
+#: templates/auth/login.html:26
+msgid "Don't have one?"
+msgstr ""
 
-#: templates/auth/login.html:14
-msgid "Forgot password?"
-msgstr "Zaboravili ste lozinku?"
+#: templates/auth/login.html:29
+msgid "Forgot your password?"
+msgstr ""
 
-#: templates/auth/login.html:17
-msgid "You can also login using"
-msgstr "Također, možete se prijaviti pomoću"
+#: templates/auth/login.html:34
+msgid "Create an Amara account"
+msgstr ""
 
-#: templates/auth/login.html:27
-msgid "Create an Account"
-msgstr "Kreiraj račun"
+#: templates/auth/login.html:35
+msgid "Already have one?"
+msgstr ""
 
-#: templates/auth/login.html:31
+#: templates/auth/login.html:38
 msgid "Create Account"
 msgstr "Kreiraj račun"
 
@@ -4550,11 +4564,11 @@ msgstr "Poruka je uspješno poslana."
 
 #: templates/messages/list.html:38
 msgid "Compose"
-msgstr ""
+msgstr "Napiši"
 
 #: templates/messages/list.html:74
 msgid "Mark Read"
-msgstr ""
+msgstr "Označi kao pročitano"
 
 #: templates/messages/list.html:79
 msgid "Reply"
@@ -4580,7 +4594,7 @@ msgstr "Pošalji poruku"
 
 #: templates/messages/new.html:6
 msgid "Compose a Message"
-msgstr ""
+msgstr "Napiši poruku"
 
 #: templates/messages/sent.html:6
 msgid "Sent Messages"
@@ -4651,22 +4665,27 @@ msgid ""
 "The Amara team\n"
 msgstr ""
 
+#: templates/openid_consumer/signin.html:14
+#: templates/registration/password_reset_form.html:12
+msgid "Back to Sign In"
+msgstr ""
+
 #: templates/profiles/_filters.html:5
 msgid "User Details"
 msgstr "Detalji korisnika"
 
 #: templates/profiles/_filters_dashboard.html:5
 msgid "Overview"
-msgstr ""
+msgstr "Pregled"
 
 #: templates/profiles/_filters_dashboard.html:8
 #: templates/profiles/dashboard.html:85
 msgid "Recent Activity"
-msgstr ""
+msgstr "Nedavna aktivnost"
 
 #: templates/profiles/_filters_dashboard.html:11
 msgid "My Videos"
-msgstr ""
+msgstr "Moji videozapisi"
 
 #: templates/profiles/_require_email_dialog.html:7
 msgid ""
@@ -4736,7 +4755,7 @@ msgstr "Nema aktivnosti"
 #: templates/profiles/_video_detail.html:8
 #: templates/teams/members-list.html:102
 msgid "language"
-msgstr ""
+msgstr "jezik"
 
 #: templates/profiles/_video_detail.html:10
 #: templates/teams/_team_video_detail.html:28
@@ -4745,12 +4764,12 @@ msgstr "Još nema titlova"
 
 #: templates/profiles/dashboard.html:38
 msgid "Open Tasks"
-msgstr ""
+msgstr "Otvoreni zadaci"
 
 #: templates/profiles/dashboard.html:45 templates/teams/tasks.html:58
 #: templates/teams/tasks.html.py:157
 msgid "Transcribe"
-msgstr ""
+msgstr "Transkribiraj"
 
 #: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
 #: templates/teams/tasks.html:167
@@ -4767,7 +4786,7 @@ msgstr "Titlovi"
 #: templates/profiles/dashboard.html:57 templates/teams/members-list.html:101
 #: templates/teams/members-list.html:102
 msgid "for"
-msgstr ""
+msgstr "za"
 
 #: templates/profiles/dashboard.html:67
 msgid "Decline Task"
@@ -4779,11 +4798,11 @@ msgstr ""
 
 #: templates/profiles/dashboard.html:91
 msgid "Sorry, no activity yet."
-msgstr ""
+msgstr "Nažalost, još nema aktivnosti."
 
 #: templates/profiles/dashboard.html:98
 msgid "Alerts"
-msgstr ""
+msgstr "Upozorenja"
 
 #: templates/profiles/dashboard.html:115 templates/teams/teams-list.html:107
 msgid "Do you really wish to leave this team?"
@@ -4791,7 +4810,7 @@ msgstr "Da li zaista želite napustiti ovu ekipu?"
 
 #: templates/profiles/dashboard.html:115
 msgid "leave team"
-msgstr ""
+msgstr "napusti tim"
 
 #: templates/profiles/edit_profile.html:5
 msgid "Edit My Profile"
@@ -4909,67 +4928,63 @@ msgstr ""
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:6
 #: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
 #: templates/registration/password_reset_form.html:6
-#: templates/registration/password_reset_form.html:10
+#: templates/registration/password_reset_form.html:8
+#: templates/registration/password_reset_form.html:14
 msgid "Password reset"
 msgstr "Promjena lozinke"
 
 #: templates/registration/password_reset_complete.html:6
-#: templates/registration/password_reset_complete.html:10
+#: templates/registration/password_reset_complete.html:12
 msgid "Password reset complete"
 msgstr "Završena promjena lozinke"
 
-#: templates/registration/password_reset_complete.html:12
-msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Vaša lozinka je postavljena.  Sada se možete ulogirati."
-
 #: templates/registration/password_reset_complete.html:14
-msgid "Log in"
-msgstr "Prijava"
+msgid "Your password has been set.  You may go ahead and sign in now."
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
 msgstr "Potvrđena promjena lozinke"
 
-#: templates/registration/password_reset_confirm.html:12
+#: templates/registration/password_reset_confirm.html:15
 msgid "Enter new password"
 msgstr "Upiši novu lozinku"
 
-#: templates/registration/password_reset_confirm.html:14
+#: templates/registration/password_reset_confirm.html:16
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr "Molimo, upišite novu lozinku dva puta kako bismo provjerili da ste je točno upisali."
 
-#: templates/registration/password_reset_confirm.html:19
+#: templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Nova lozinka:"
 
-#: templates/registration/password_reset_confirm.html:21
+#: templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Potvrdite lozinku:"
 
-#: templates/registration/password_reset_confirm.html:22
+#: templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Promijeni moju lozinku"
 
-#: templates/registration/password_reset_confirm.html:31
+#: templates/registration/password_reset_confirm.html:33
 msgid "Password reset unsuccessful"
 msgstr "Neuspješna promjena lozinke"
 
-#: templates/registration/password_reset_confirm.html:33
+#: templates/registration/password_reset_confirm.html:35
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr "Poveznica za ponovno postavljanje lozinke je neispravna, možda jer je već korištena.  Molimo, zatražite novo postavljanje lozinke."
 
 #: templates/registration/password_reset_done.html:6
-#: templates/registration/password_reset_done.html:10
+#: templates/registration/password_reset_done.html:12
 msgid "Password reset successful"
 msgstr "Uspješna promjena lozinke"
 
-#: templates/registration/password_reset_done.html:12
+#: templates/registration/password_reset_done.html:14
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
@@ -5001,17 +5016,17 @@ msgstr "Hvala što koristite našu stranicu!"
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s ekipa"
 
-#: templates/registration/password_reset_form.html:12
+#: templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr "Zaboravili ste lozinku? Upišite Vašu e-mail adresu ispod, a mi ćemo Vam poslati e-mail s uputama za postavljanje nove."
 
-#: templates/registration/password_reset_form.html:17
+#: templates/registration/password_reset_form.html:18
 msgid "E-mail address:"
 msgstr "E-mail adresa:"
 
-#: templates/registration/password_reset_form.html:18
+#: templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Promijeni moju lozinku"
 
@@ -5084,88 +5099,6 @@ msgstr "Statistika korisnika"
 msgid "Videos statistic"
 msgstr "Statistika videozapisa"
 
-#: templates/statistic/index.html:28
-msgid "Languages statistic"
-msgstr "Statistike jezika"
-
-#: templates/statistic/index.html:73
-#: templates/statistic/language_statistic.html:31
-msgid "stats for"
-msgstr "statistike za"
-
-#: templates/statistic/index.html:74
-#: templates/statistic/language_statistic.html:32
-#: templates/statistic/languages_statistic.html:37
-msgid "day"
-msgstr "dan"
-
-#: templates/statistic/index.html:75
-#: templates/statistic/language_statistic.html:33
-#: templates/statistic/languages_statistic.html:38
-msgid "week"
-msgstr "tjedan"
-
-#: templates/statistic/index.html:76
-#: templates/statistic/language_statistic.html:34
-#: templates/statistic/languages_statistic.html:39
-msgid "month"
-msgstr "mjesec"
-
-#: templates/statistic/index.html:77
-#: templates/statistic/language_statistic.html:35
-#: templates/statistic/languages_statistic.html:40
-#: templates/statistic/users_statistic.html:16
-#: templates/statistic/videos_statistic.html:16
-msgid "TOTAL"
-msgstr "UKUPNO"
-
-#: templates/statistic/index.html:83
-msgid "Total number of videos captioned"
-msgstr "Ukupni broj videozapisa s natpisima"
-
-#: templates/statistic/index.html:90
-msgid "Tweets"
-msgstr "Tweet-ovi"
-
-#: templates/statistic/index.html:97
-msgid "Facebook shares"
-msgstr "Podijeli na Facebook"
-
-#: templates/statistic/index.html:104
-msgid "Email shares"
-msgstr "Podijeli emailom"
-
-#: templates/statistic/language_statistic.html:25
-msgid "Language statistic for "
-msgstr "Statistika jezika za "
-
-#: templates/statistic/language_statistic.html:26
-#: templates/statistic/languages_statistic.html:31
-#: templates/statistic/users_statistic.html:7
-#: templates/statistic/videos_statistic.html:7
-msgid "General statistic"
-msgstr "Opća statistika"
-
-#: templates/statistic/language_statistic.html:41
-msgid "Videos count"
-msgstr "Broj videozapisa"
-
-#: templates/statistic/language_statistic.html:48
-msgid "Subtitles views count"
-msgstr "Brojač prikaza titlova"
-
-#: templates/statistic/language_statistic.html:55
-msgid "Videos views count"
-msgstr "Broj prikaza videozapisa"
-
-#: templates/statistic/languages_statistic.html:25
-msgid "Language statistic"
-msgstr "Statistika jezika"
-
-#: templates/statistic/languages_statistic.html:36
-msgid "Lanuage"
-msgstr "Jezik"
-
 #: templates/statistic/log_entry_model_admin.html:37
 #: templates/statistic/logger_model_admin.html:37
 msgid "Date"
@@ -5185,6 +5118,11 @@ msgstr "Vrijeme(sek)"
 msgid "Activity statistic"
 msgstr "Statistika aktivnosti"
 
+#: templates/statistic/users_statistic.html:7
+#: templates/statistic/videos_statistic.html:7
+msgid "General statistic"
+msgstr "Opća statistika"
+
 #: templates/statistic/users_statistic.html:13
 #: templates/statistic/videos_statistic.html:13
 msgid "Day"
@@ -5199,6 +5137,11 @@ msgstr "Tjedan"
 #: templates/statistic/videos_statistic.html:15
 msgid "Month"
 msgstr "Mjesec"
+
+#: templates/statistic/users_statistic.html:16
+#: templates/statistic/videos_statistic.html:16
+msgid "TOTAL"
+msgstr "UKUPNO"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
@@ -5739,15 +5682,15 @@ msgstr ""
 
 #: templates/teams/invite_members.html:39
 msgid "Include a message"
-msgstr ""
+msgstr "Uključi poruku"
 
 #: templates/teams/invite_members.html:43
 msgid "Assign a role"
-msgstr ""
+msgstr "Dodijeli ulogu"
 
 #: templates/teams/invite_members.html:45
 msgid "Role to be assigned to the user if they accept your invitation."
-msgstr ""
+msgstr "Uloga koja će se dodijeliti korisniku ukoliko prihvate Vašu pozivnicu."
 
 #: templates/teams/invite_members.html:49
 msgid "Send Invites"
@@ -5756,50 +5699,50 @@ msgstr "Pošalji pozivnice"
 #: templates/teams/members-list.html:47 templates/teams/tasks.html:48
 #: templates/teams/videos-list.html:47
 msgid "Filter and Sort"
-msgstr ""
+msgstr "Filtriraj i sortiraj"
 
 #: templates/teams/members-list.html:53
 #: templates/videos/subtitle-view.html:198
 msgid "Showing"
-msgstr ""
+msgstr "Prikaz"
 
 #: templates/teams/members-list.html:55
 msgid "all members"
-msgstr ""
+msgstr "svi članovi"
 
 #: templates/teams/members-list.html:56
 msgid "admins"
-msgstr ""
+msgstr "administratori"
 
 #: templates/teams/members-list.html:57
 msgid "managers"
-msgstr ""
+msgstr "rukovodioci"
 
 #: templates/teams/members-list.html:58
 msgid "contributor"
-msgstr ""
+msgstr "suradnik"
 
 #: templates/teams/members-list.html:62
 msgid "speaking"
-msgstr ""
+msgstr "govori"
 
 #: templates/teams/members-list.html:64 templates/teams/tasks.html:71
 msgid "all languages"
-msgstr ""
+msgstr "svi jezici"
 
 #: templates/teams/members-list.html:72 templates/teams/tasks.html:119
 #: templates/teams/tasks.html.py:126 templates/teams/tasks.html:133
 #: templates/teams/videos-list.html:89
 msgid "Clear"
-msgstr ""
+msgstr "Očisti"
 
 #: templates/teams/members-list.html:77
 msgid "This team has"
-msgstr ""
+msgstr "Ovaj tim ima"
 
 #: templates/teams/members-list.html:77
 msgid "open applications"
-msgstr ""
+msgstr "otvorene aplikacije"
 
 #: templates/teams/members-list.html:82
 msgid "Sorry, no members found."
@@ -5807,7 +5750,7 @@ msgstr "Oprostite, nisu pronađeni članovi."
 
 #: templates/teams/members-list.html:92
 msgid "Me"
-msgstr ""
+msgstr "Ja"
 
 #: templates/teams/members-list.html:101 templates/teams/members-list.html:102
 msgid "and"
@@ -5815,7 +5758,7 @@ msgstr "i"
 
 #: templates/teams/members-list.html:101
 msgid "project"
-msgstr ""
+msgstr "projekt"
 
 #: templates/teams/members-list.html:113
 msgid "Assignments"
@@ -5823,12 +5766,12 @@ msgstr ""
 
 #: templates/teams/members-list.html:122
 msgid "Are you sure you want to remove this member from the team?"
-msgstr ""
+msgstr "Jeste li sigurni da želite ukloniti ovog člana iz tima?"
 
 #: templates/teams/settings-guidelines.html:5
 #: templates/teams/settings-guidelines.html:44
 msgid "Guidelines"
-msgstr ""
+msgstr "Smjernice"
 
 #: templates/teams/settings-guidelines.html:25
 msgid "Custom messages"
@@ -5956,15 +5899,15 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:69
 msgid "Transcribed"
-msgstr ""
+msgstr "Transkribirano"
 
 #: templates/teams/settings-permissions.html:71
 msgid "or ..."
-msgstr ""
+msgstr "ili..."
 
 #: templates/teams/settings-permissions.html:77
 msgid "Reviewed"
-msgstr ""
+msgstr "Pregledano"
 
 #: templates/teams/settings-permissions.html:82
 msgid "Approved"
@@ -6070,31 +6013,31 @@ msgstr ""
 
 #: templates/teams/tasks.html:89 templates/teams/tasks.html.py:223
 msgid "me"
-msgstr ""
+msgstr "ja"
 
 #: templates/teams/tasks.html:90
 msgid "no one"
-msgstr ""
+msgstr "nitko"
 
 #: templates/teams/tasks.html:99 templates/teams/videos-list.html:65
 msgid "sorted by"
-msgstr ""
+msgstr "sortirano prema"
 
 #: templates/teams/tasks.html:102
 msgid "date, newest"
-msgstr ""
+msgstr "datumu, najnovije"
 
 #: templates/teams/tasks.html:105
 msgid "date, oldest"
-msgstr ""
+msgstr "datumu, najstrarije"
 
 #: templates/teams/tasks.html:109
 msgid "time left, least"
-msgstr ""
+msgstr "preostalom vremenu, najmanje"
 
 #: templates/teams/tasks.html:112
 msgid "time left, most"
-msgstr ""
+msgstr "preostalom vremenu, najviše"
 
 #: templates/teams/tasks.html:119 templates/teams/tasks.html.py:126
 #: templates/teams/tasks.html:133
@@ -6116,11 +6059,11 @@ msgstr ""
 
 #: templates/teams/tasks.html:194
 msgid "transcribed"
-msgstr ""
+msgstr "transkribirano"
 
 #: templates/teams/tasks.html:196 templates/videos/subtitle-view.html:45
 msgid "translated"
-msgstr ""
+msgstr "prevedeno"
 
 #: templates/teams/tasks.html:204
 msgid "reviewed"
@@ -6137,11 +6080,11 @@ msgstr ""
 
 #: templates/teams/tasks.html:221
 msgid "Assigned to"
-msgstr ""
+msgstr "Dodijeljeno"
 
 #: templates/teams/tasks.html:230
 msgid "Unassigned"
-msgstr ""
+msgstr "Nedodijeljeno"
 
 #: templates/teams/tasks.html:245
 msgid "Perform Task"
@@ -6201,15 +6144,15 @@ msgstr ""
 
 #: templates/teams/tasks.html:372
 msgid "Reassign"
-msgstr ""
+msgstr "Ponovno dodijeli"
 
 #: templates/teams/tasks.html:374
 msgid "Assign"
-msgstr ""
+msgstr "Dodijeli"
 
 #: templates/teams/tasks.html:390
 msgid "Delete task"
-msgstr ""
+msgstr "Obriši zadatak"
 
 #: templates/teams/tasks.html:396
 msgid "What would you like to do with the subtitles for this task?"
@@ -6217,7 +6160,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:399
 msgid "Publish these subtitles immediately"
-msgstr ""
+msgstr "Objavi ove titlove odmah"
 
 #: templates/teams/tasks.html:403
 msgid ""
@@ -6227,11 +6170,11 @@ msgstr ""
 
 #: templates/teams/tasks.html:442
 msgid "Assign to User"
-msgstr ""
+msgstr "Dodijeli korisniku"
 
 #: templates/teams/tasks.html:452
 msgid "Sorry, no tasks here."
-msgstr ""
+msgstr "Nažalost, ovdje nema zadataka."
 
 #: templates/teams/team_video.html:6
 msgid "Edit team video"
@@ -6243,7 +6186,7 @@ msgstr "Uredi videozapis"
 
 #: templates/teams/team_video.html:40
 msgid "This video is being moderated by team"
-msgstr ""
+msgstr "Ovaj videozapis trenutno moderira tim"
 
 #: templates/teams/teams-list.html:18
 msgid "Team Directory"
@@ -6263,7 +6206,7 @@ msgstr "Privatno"
 
 #: templates/teams/teams-list.html:74
 msgid "No description..."
-msgstr ""
+msgstr "Nema opisa..."
 
 #: templates/teams/teams-list.html:81 templates/teams/teams-list.html.py:87
 #, python-format
@@ -6275,9 +6218,9 @@ msgid_plural ""
 "\n"
 "                                        %(count)s members\n"
 "                                    "
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "\n                                        %(count)s član\n                                    "
+msgstr[1] "\n                                        %(count)s člana\n                                    "
+msgstr[2] "\n                                        %(count)s članova\n                                    "
 
 #: templates/teams/teams-list.html:96
 #, python-format
@@ -6289,13 +6232,13 @@ msgid_plural ""
 "\n"
 "                                %(count)s videos\n"
 "                            "
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "\n                                %(count)s videozapis\n                            "
+msgstr[1] "\n                                %(count)s videozapisa\n                            "
+msgstr[2] "\n                                %(count)s videozapisa\n                            "
 
 #: templates/teams/teams-list.html:107
 msgid "Leave team"
-msgstr ""
+msgstr "Napusti tim"
 
 #: templates/teams/teams-list.html:114
 msgid "Sorry, no teams found."
@@ -6303,7 +6246,7 @@ msgstr ""
 
 #: templates/teams/teams-list.html:122
 msgid "Search and Filter"
-msgstr ""
+msgstr "Pretraži i filtriraj"
 
 #: templates/teams/teams-list.html:127
 msgid "Start a Team"
@@ -6322,45 +6265,45 @@ msgstr "Dodaj videozapis"
 
 #: templates/teams/videos-list.html:54
 msgid "Videos with"
-msgstr ""
+msgstr "Videozapisi s"
 
 #: templates/teams/videos-list.html:56
 msgid "any"
-msgstr ""
+msgstr "bilo koji"
 
 #: templates/teams/videos-list.html:57
 msgid "no"
-msgstr ""
+msgstr "nijedan"
 
 #: templates/teams/videos-list.html:62 templates/videos/subtitle-view.html:43
 #: templates/videos/subtitle-view.html:45
 #: templates/videos/subtitle-view.html:72
 msgid "subtitles"
-msgstr ""
+msgstr "titlovi"
 
 #: templates/teams/videos-list.html:68
 msgid "name, a-z"
-msgstr ""
+msgstr "ime, a-ž"
 
 #: templates/teams/videos-list.html:71
 msgid "name, z-a"
-msgstr ""
+msgstr "ime, ž-a"
 
 #: templates/teams/videos-list.html:74
 msgid "time, newest"
-msgstr ""
+msgstr "vrijeme, najnovije"
 
 #: templates/teams/videos-list.html:77
 msgid "time, oldest"
-msgstr ""
+msgstr "vrijeme, najstarije"
 
 #: templates/teams/videos-list.html:80
 msgid "most subtitles"
-msgstr ""
+msgstr "najviše titlova"
 
 #: templates/teams/videos-list.html:83
 msgid "least subtitles"
-msgstr ""
+msgstr "najmanje titlova"
 
 #: templates/teams/videos-list.html:105
 msgid "Rebuilding video index. Please try again in a few minutes"
@@ -6372,7 +6315,7 @@ msgstr "Oprostite, ovdje nema videozapisa"
 
 #: templates/teams/videos-list.html:118
 msgid "Remove video"
-msgstr ""
+msgstr "Ukloni vidozapis"
 
 #: templates/teams/videos-list.html:125
 #, python-format
@@ -6399,7 +6342,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:136
 msgid "Delete the video entirely."
-msgstr ""
+msgstr "Potpuno obriši videzapis."
 
 #: templates/videos/_error_feedback_form.html:7
 msgid ""
@@ -6487,11 +6430,11 @@ msgstr "Molimo, upišite povratnu informaciju."
 
 #: templates/videos/_follow_video_button.html:37
 msgid "✓ Following"
-msgstr ""
+msgstr "✓ Slijedim"
 
 #: templates/videos/_follow_video_button.html:40
 msgid " Not Following"
-msgstr ""
+msgstr " Ne slijedim"
 
 #: templates/videos/_follow_video_button.html:85
 msgid ""
@@ -6598,7 +6541,7 @@ msgid "Upload TXT file"
 msgstr "Učitaj TXT datoteku"
 
 #: templates/videos/_paste_transcription.html:144
-#: templates/videos/_upload_subtitles.html:33
+#: templates/videos/_upload_subtitles.html:35
 msgid "Login to upload subtitles"
 msgstr "Prijava za učitavanje titlova"
 
@@ -6625,7 +6568,7 @@ msgstr "Učitaj titlove"
 #: templates/videos/_upload_subtitles.html:10
 msgid ""
 "\n"
-"              Our site accepts SRT, SSA, SBV, DFXP and TTML format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
+"              Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
 "              or .xml (for TTML) are accepted.\n"
 "              "
 msgstr ""
@@ -6634,16 +6577,20 @@ msgstr ""
 msgid "Video Language"
 msgstr "Jezik videozapisa"
 
-#: templates/videos/_upload_subtitles.html:26
+#: templates/videos/_upload_subtitles.html:24
+msgid "Translated from"
+msgstr ""
+
+#: templates/videos/_upload_subtitles.html:28
 #, python-format
 msgid "This subtitle file is 100% complete"
 msgstr "Ova datoteka titlova je 100% dovršena"
 
-#: templates/videos/_upload_subtitles.html:28
+#: templates/videos/_upload_subtitles.html:30
 msgid "Upload"
 msgstr "Učitaj"
 
-#: templates/videos/_upload_subtitles.html:42
+#: templates/videos/_upload_subtitles.html:44
 msgid ""
 "If you believe your subtitle file is compatible, <a "
 "href='mailto:feedback@universalsubtitles.org'>send it to us</a>"
@@ -6740,6 +6687,10 @@ msgstr "Dodaj"
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
 msgstr ""
+
+#: templates/videos/_video_url_panel.html:88
+msgid "Login"
+msgstr "Prijava"
 
 #: templates/videos/_video_url_panel.html:121
 #: templates/videos/_video_url_panel.html:141
