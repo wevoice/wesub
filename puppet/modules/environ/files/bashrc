@@ -96,6 +96,7 @@ alias d='./dev-runserver.sh plus'
 alias us='sudo deploy/update_solr_schema_vagrant.sh'
 alias clean_unisubs_messages='rm /tmp/unisubs-messages/*.log'
 alias preparetestdb='python manage.py syncdb --all --settings=dev_settings_test --noinput; python manage.py migrate --fake --settings=dev_settings_test'
+alias fixadminmedia='cp -rf /opt/extras/venv/lib/python2.6/site-packages/django/contrib/admin/static/admin /opt/unisubs/media/.'
 
 alias ..='cd ..'
 alias ...='cd ../..'
