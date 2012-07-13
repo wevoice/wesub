@@ -68,6 +68,10 @@ SPEAKERTEXT_PASSWORD = ""
 # Metrics
 RIEMANN_HOST = '10.10.10.44'
 ENABLE_METRICS = False
+
+# Stanford
+STANFORD_CONSUMER_KEY = ''
+STANFORD_CONSUMER_SECRET = ''
 EOF
 
 # Set up the DB ---------------------------------------------------------------
