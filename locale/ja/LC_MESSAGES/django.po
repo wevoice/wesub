@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 01:32-0500\n"
-"PO-Revision-Date: 2012-07-13 06:51+0000\n"
+"POT-Creation-Date: 2012-07-14 01:33-0500\n"
+"PO-Revision-Date: 2012-07-14 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/universalsubtitles/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -110,23 +110,23 @@ msgstr "メールアドレス確認"
 msgid "e-mail confirmations"
 msgstr "メールアドレス確認"
 
-#: apps/auth/views.py:58
+#: apps/auth/views.py:59
 msgid "Confirmation key expired."
 msgstr "確認キーが期限切れです"
 
-#: apps/auth/views.py:60
+#: apps/auth/views.py:61
 msgid "Email is confirmed."
 msgstr "メールアドレスが確認されました"
 
-#: apps/auth/views.py:72
+#: apps/auth/views.py:73
 msgid "Confirmation email was sent."
 msgstr "確認メールが送信されました"
 
-#: apps/auth/views.py:74
+#: apps/auth/views.py:75
 msgid "You email is empty or already confirmed."
 msgstr "メールアドレスが空白か既に確認済です"
 
-#: apps/auth/views.py:106
+#: apps/auth/views.py:107
 msgid "Your account was deleted."
 msgstr "あなたのアカウントは削除されました。"
 
@@ -827,7 +827,7 @@ msgstr "あなたはこのチームのメンバーになりました。"
 
 #: apps/teams/rpc.py:54
 msgid "The \"About you\" field is required in order to apply."
-msgstr ""
+msgstr "応募するには、「自分について」欄が必須です。"
 
 #: apps/teams/rpc.py:62
 msgid ""
@@ -1907,7 +1907,7 @@ msgstr "ボスニア語"
 
 #: libs/unilangs/unilangs.py:148
 msgid "Buginese"
-msgstr ""
+msgstr "ブギス語"
 
 #: libs/unilangs/unilangs.py:149
 msgid "Catalan"
@@ -2091,7 +2091,7 @@ msgstr "ハウサ語"
 
 #: libs/unilangs/unilangs.py:194
 msgid "Hazaragi"
-msgstr ""
+msgstr "ハザラ語"
 
 #: libs/unilangs/unilangs.py:195
 msgid "Hebrew"
@@ -2475,7 +2475,7 @@ msgstr "ポーランド語"
 
 #: libs/unilangs/unilangs.py:290
 msgid "Dari"
-msgstr ""
+msgstr "ダリー語"
 
 #: libs/unilangs/unilangs.py:291
 msgid "Pashto"
@@ -2900,7 +2900,7 @@ msgid "Help"
 msgstr "ヘルプ"
 
 #: templates/base.html:78 templates/auth/login.html:30
-#: templates/openid_consumer/signin.html:22
+#: templates/auth/login_trap.html:15 templates/openid_consumer/signin.html:22
 msgid "Sign In"
 msgstr "サインイン"
 
@@ -2937,6 +2937,10 @@ msgstr "セントリー"
 msgid "Rosetta"
 msgstr "ロゼッタ"
 
+#: templates/base.html:127
+msgid "Impersonate"
+msgstr ""
+
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
 msgstr ""
@@ -2959,7 +2963,7 @@ msgstr "\n<strong>ご意見をぜひお寄せください。</strong> バグを�
 
 #: templates/dmca.html:6
 msgid "Copyright Infringement Notification"
-msgstr "著作権侵害警告"
+msgstr "著作権侵害通知"
 
 #: templates/dmca.html:9
 msgid ""
@@ -2968,7 +2972,7 @@ msgid ""
 "written communication that includes substantially the following (please consult\n"
 "your legal counsel or see Section 512(c)(3) of the Copyright Act to confirm\n"
 "these requirements):\n"
-msgstr "\n著作権侵害警告を提出するには、書面にて下記全項を当団体にお送りください (下記要件を確認するには、弁護士にお問い合わせするか、著作権法の第512条(c)(3)をご参照ください)：\n"
+msgstr "\n著作権侵害通知を申し立てるには、書面にて下記全項を当団体にお送りください (下記要件を確認するには、弁護士にお問い合わせするか、著作権法の第512条(c)(3)をご参照ください)：\n"
 
 #: templates/dmca.html:18
 msgid ""
@@ -2993,7 +2997,7 @@ msgid ""
 "penalty of perjury, that the complaining party is authorized to act on behalf\n"
 "of the owner of an exclusive right that is allegedly infringed.\n"
 "Such written notice should be sent to our designated agent as follows:\n"
-msgstr "\n独占権が侵害されたとされる所有者の代理として権限を有する者の署名または電子署名。\n侵害されたとされる著作物の特定、又は同一のオンラインサイトにおける複数の著作物が同一の警告に含まれている場合は、同サイトにおける著作物の代表的な目録。\n著作権を侵害した、又は著作権の侵害行為の主体となっているとされ、削除又はアクセスを不可能にすべき資料の特定およびサービスプロバイダが同資料を特定するために必要な適度な情報。\nサービスプロバイダが、警告提出者に連絡を取るに必要な適度な情報、すなわち警告提出者に連絡可能な住所、電話番号、および該当する場合は電子メールアドレス。\n警告提出者が、誠実な信念をもって、申し立てに記してある資料の使用が著作権保有者、その代理人又は法律によって認可されていないと信じているという陳述。\n警告に記されている情報が正確であり、偽りの場合には偽証罪に問われることを承知の上で、警告提出者が、独占権を侵害されたとされる所有者の代理として権限を有しているという陳述。\n以上の書面による警告を、下記に従って当団体の指定代理人にお送りください：\n"
+msgstr "\n独占権が侵害されたとされる所有者の代理として権限を有する者の署名または電子署名。\n侵害されたとされる著作物の特定、又は同一のオンラインサイトにおける複数の著作物が同一の通知に含まれている場合は、同サイトにおける著作物の代表的な目録。\n著作権を侵害した、又は著作権の侵害行為の主体となっているとされ、削除又はアクセスを無効にすべき素材の特定およびサービスプロバイダが同素材を特定するに足る十分な情報。\nサービスプロバイダが、通知申し立て者に連絡を取るに必要な適度な情報、すなわち通知申し立て者に連絡可能な住所、電話番号、および該当する場合は電子メールアドレス。\n通知申し立て者が、誠実な信念をもって、申し立てに記してある資料の使用が著作権保有者、その代理人又は法律によって認可されていないと信じているという陳述。\n通知に記されている情報が正確であり、偽りの場合には偽証罪に問われることを承知の上で、通知申し立て者が、独占権を侵害されたとされる所有者の代理として権限を有しているという陳述。\n以上の書面による通知を、下記に従って当団体の指定代理人にお送りください：\n"
 
 #: templates/dmca.html:55
 msgid ""
@@ -3001,11 +3005,11 @@ msgid ""
 "Please also note that under Section 512(f) any person who knowingly materially\n"
 "misrepresents that material or activity is infringing may be subject to\n"
 "liability.\n"
-msgstr ""
+msgstr "\nまた、第512条(f)により、資料または活動が著作権を侵害していると虚偽の権利を主張する者には、賠償責任が生じる場合があります。\n"
 
 #: templates/dmca.html:63
 msgid "Counter-Notification"
-msgstr ""
+msgstr "異議申し立て通知"
 
 #: templates/dmca.html:65
 msgid ""
@@ -3019,21 +3023,21 @@ msgstr ""
 
 #: templates/dmca.html:75
 msgid "How do I file a DMCA counter notice?"
-msgstr ""
+msgstr "DMCA 異議申し立て通知は、どのようにして提出するのですか？"
 
 #: templates/dmca.html:77
 msgid ""
 "\n"
 "The process for counter-notifications is governed by Section 512(g) of the\n"
 "Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca.pdf\n"
-msgstr ""
+msgstr "\n異議申し立て通知は、デジタルミレニアム著作権法第512条(g)に規定されています： http://www.copyright.gov/legislation/dmca.pdf\n"
 
 #: templates/dmca.html:82
 msgid ""
 "\n"
 "To file a counter notification with us, you must provide a written\n"
 "communication that sets forth the items specified below.\n"
-msgstr ""
+msgstr "\n異議申し立て通知を当団体に提出するには、下記項目を書面にて提出してください。\n"
 
 #: templates/dmca.html:87
 msgid ""
@@ -3049,7 +3053,7 @@ msgstr ""
 
 #: templates/dmca.html:99
 msgid "Elements of Counter-Notification"
-msgstr ""
+msgstr "異議申し立て通知の要素"
 
 #: templates/dmca.html:101
 msgid ""
@@ -3058,7 +3062,7 @@ msgid ""
 "http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability to\n"
 "process your counter notification, please use the following format (including\n"
 "section numbers):\n"
-msgstr ""
+msgstr "\n異議申し立て通知の例は次を参照ください：http://www.chillingeffects.org/dmca/counter512.pdf. 異議申し立て通知を円滑に処理できるよう、以下の形式に従ってください（セクションの番号付けも含む）：\n"
 
 #: templates/dmca.html:109
 msgid ""
@@ -3082,7 +3086,7 @@ msgstr ""
 
 #: templates/dmca.html:141
 msgid "What happens next?"
-msgstr ""
+msgstr "その後はどうなりますか？"
 
 #: templates/dmca.html:143
 msgid ""
@@ -3210,7 +3214,7 @@ msgstr ""
 
 #: templates/enterprise.html:25
 msgid "Customers"
-msgstr ""
+msgstr "顧客"
 
 #: templates/enterprise.html:27 templates/enterprise.html.py:232
 msgid "Companies"
@@ -3222,11 +3226,11 @@ msgstr "大学"
 
 #: templates/enterprise.html:29 templates/enterprise.html.py:248
 msgid "Publishers"
-msgstr ""
+msgstr "発行者"
 
 #: templates/enterprise.html:30 templates/enterprise.html.py:254
 msgid "Government"
-msgstr ""
+msgstr "政府機関"
 
 #: templates/enterprise.html:36
 msgid "The World’s Most Advanced Platform for Subtitles"
@@ -3479,7 +3483,7 @@ msgstr ""
 
 #: templates/enterprise.html:200
 msgid "Import"
-msgstr ""
+msgstr "インポートする"
 
 #: templates/enterprise.html:201
 msgid ""
@@ -3569,7 +3573,7 @@ msgstr ""
 
 #: templates/enterprise.html:261
 msgid "Get started with Amara"
-msgstr ""
+msgstr "Amara で始めよう"
 
 #: templates/enterprise.html:262
 msgid "Be in touch at"
@@ -4392,6 +4396,10 @@ msgstr "すでにアカウントをお持ちの方"
 #: templates/auth/login.html:38
 msgid "Create Account"
 msgstr "アカウントを作成する"
+
+#: templates/auth/login_trap.html:10
+msgid "Sign in as a different user"
+msgstr ""
 
 #: templates/comments/_item.html:3 templates/messages/list.html:70
 #: templates/messages/sent.html:48 templates/videos/_action_tpl.html:9
@@ -5431,7 +5439,7 @@ msgstr "ビデオをあなたの他のチームに移動しますか？"
 #: templates/teams/_team_move_video_select.html:27
 #: templates/teams/_team_move_video_select.html:51
 msgid "Move video"
-msgstr ""
+msgstr "ビデオを移動する"
 
 #: templates/teams/_team_move_video_select.html:32
 msgid ""
@@ -6050,7 +6058,7 @@ msgstr "フィルター、並べ替え順、検索用語をクリアしてくだ
 
 #: templates/teams/tasks.html:131
 msgid "NOTE:"
-msgstr ""
+msgstr "注意："
 
 #: templates/teams/tasks.html:132
 msgid ""

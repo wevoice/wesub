@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 01:32-0500\n"
-"PO-Revision-Date: 2012-07-13 06:51+0000\n"
+"POT-Creation-Date: 2012-07-14 01:33-0500\n"
+"PO-Revision-Date: 2012-07-14 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/universalsubtitles/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -107,23 +107,23 @@ msgstr "이메일 확인"
 msgid "e-mail confirmations"
 msgstr "이메일 확인"
 
-#: apps/auth/views.py:58
+#: apps/auth/views.py:59
 msgid "Confirmation key expired."
 msgstr "이메일 인증키가 더 이상 유효하지 않습니다."
 
-#: apps/auth/views.py:60
+#: apps/auth/views.py:61
 msgid "Email is confirmed."
 msgstr "이메일을 확인했습니다."
 
-#: apps/auth/views.py:72
+#: apps/auth/views.py:73
 msgid "Confirmation email was sent."
 msgstr "이메일 확인 메일을 보냈습니다."
 
-#: apps/auth/views.py:74
+#: apps/auth/views.py:75
 msgid "You email is empty or already confirmed."
 msgstr "이메일 주소가 비어있거나 이미 확인을 하였습니다."
 
-#: apps/auth/views.py:106
+#: apps/auth/views.py:107
 msgid "Your account was deleted."
 msgstr "귀하의 계정이 삭제되었습니다."
 
@@ -2897,7 +2897,7 @@ msgid "Help"
 msgstr "도움"
 
 #: templates/base.html:78 templates/auth/login.html:30
-#: templates/openid_consumer/signin.html:22
+#: templates/auth/login_trap.html:15 templates/openid_consumer/signin.html:22
 msgid "Sign In"
 msgstr "로그인"
 
@@ -2933,6 +2933,10 @@ msgstr "보초"
 #: templates/base.html:124
 msgid "Rosetta"
 msgstr "로제타"
+
+#: templates/base.html:127
+msgid "Impersonate"
+msgstr ""
 
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
@@ -4389,6 +4393,10 @@ msgstr ""
 #: templates/auth/login.html:38
 msgid "Create Account"
 msgstr "계정 만들기"
+
+#: templates/auth/login_trap.html:10
+msgid "Sign in as a different user"
+msgstr ""
 
 #: templates/comments/_item.html:3 templates/messages/list.html:70
 #: templates/messages/sent.html:48 templates/videos/_action_tpl.html:9

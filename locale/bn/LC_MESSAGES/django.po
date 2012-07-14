@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 01:36-0500\n"
+"POT-Creation-Date: 2012-07-14 01:37-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -104,23 +104,23 @@ msgstr ""
 msgid "e-mail confirmations"
 msgstr ""
 
-#: apps/auth/views.py:58
+#: apps/auth/views.py:59
 msgid "Confirmation key expired."
 msgstr ""
 
-#: apps/auth/views.py:60
+#: apps/auth/views.py:61
 msgid "Email is confirmed."
 msgstr ""
 
-#: apps/auth/views.py:72
+#: apps/auth/views.py:73
 msgid "Confirmation email was sent."
 msgstr ""
 
-#: apps/auth/views.py:74
+#: apps/auth/views.py:75
 msgid "You email is empty or already confirmed."
 msgstr ""
 
-#: apps/auth/views.py:106
+#: apps/auth/views.py:107
 msgid "Your account was deleted."
 msgstr ""
 
@@ -2933,7 +2933,7 @@ msgid "Help"
 msgstr ""
 
 #: templates/base.html:78 templates/auth/login.html:30
-#: templates/openid_consumer/signin.html:22
+#: templates/auth/login_trap.html:15 templates/openid_consumer/signin.html:22
 msgid "Sign In"
 msgstr ""
 
@@ -2968,6 +2968,10 @@ msgstr ""
 
 #: templates/base.html:124
 msgid "Rosetta"
+msgstr ""
+
+#: templates/base.html:127
+msgid "Impersonate"
 msgstr ""
 
 #: templates/demo.html:23
@@ -4620,6 +4624,10 @@ msgstr ""
 
 #: templates/auth/login.html:38
 msgid "Create Account"
+msgstr ""
+
+#: templates/auth/login_trap.html:10
+msgid "Sign in as a different user"
 msgstr ""
 
 #: templates/comments/_item.html:3 templates/messages/list.html:70
