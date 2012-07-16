@@ -65,7 +65,6 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
                   forks=True, as_forked=True, translated_from=None):
     from videos.models import SubtitleVersion, Subtitle, SubtitleMetadata
     from videos.tasks import video_changed_tasks
-    from utils.unisubsmarkup import strip_tags
 
     key = str(uuid4()).replace('-', '')
 
