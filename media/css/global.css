@@ -121,7 +121,10 @@
     background: transparent url(../images/icon_me_menu.png) center right no-repeat;
     color: #126295;
     font-weight: bold;
+    max-width: 101px;
+    overflow: hidden;
     padding: 18px 18px 14px 13px;
+    text-overflow: ellipsis;
 }
 #main_bar ul#bar_menu li#me_menu #user_menu #menu_name a:hover {
     background: #FFF url(../images/icon_me_menu.png) center right no-repeat
