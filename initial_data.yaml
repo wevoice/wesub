@@ -79,5 +79,5 @@
 - model: sites.site
   pk: 14
   fields:
-    domain: nf.universalsubtitles.org
+    domain: staging.universalsubtitles.org
     name: unisubsnf
