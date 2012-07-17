@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-16 01:34-0500\n"
+"POT-Creation-Date: 2012-07-17 01:34-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -764,7 +764,7 @@ msgstr ""
 msgid "task expiration (days)"
 msgstr ""
 
-#: apps/teams/models.py:183 templates/profiles/_top_user_panel.html:33
+#: apps/teams/models.py:183 templates/profiles/_top_user_panel.html:32
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr ""
@@ -1666,7 +1666,7 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:30
 #: templates/messages/new.html:14 templates/messages/sent.html:23
-#: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:20
+#: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:19
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
 msgstr ""
@@ -2932,9 +2932,8 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: templates/base.html:78 templates/auth/login.html:30
-#: templates/auth/login_trap.html:15 templates/openid_consumer/signin.html:22
-msgid "Sign In"
+#: templates/base.html:78
+msgid "Sign in / Sign up"
 msgstr ""
 
 #: templates/base.html:102
@@ -4614,6 +4613,11 @@ msgstr ""
 msgid "Forgot your password?"
 msgstr ""
 
+#: templates/auth/login.html:30 templates/auth/login_trap.html:15
+#: templates/openid_consumer/signin.html:22
+msgid "Sign In"
+msgstr ""
+
 #: templates/auth/login.html:34
 msgid "Create an Amara account"
 msgstr ""
@@ -4988,16 +4992,16 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: templates/profiles/_tabs.html:6 templates/profiles/_top_user_panel.html:16
+#: templates/profiles/_tabs.html:6 templates/profiles/_top_user_panel.html:15
 msgid "Profile"
 msgstr ""
 
-#: templates/profiles/_tabs.html:19 templates/profiles/_top_user_panel.html:12
+#: templates/profiles/_tabs.html:19 templates/profiles/_top_user_panel.html:11
 #: templates/profiles/dashboard.html:13
 msgid "Dashboard"
 msgstr ""
 
-#: templates/profiles/_top_user_panel.html:27
+#: templates/profiles/_top_user_panel.html:26
 msgid "Logout"
 msgstr ""
 
@@ -5813,8 +5817,7 @@ msgstr ""
 msgid "All Teams"
 msgstr ""
 
-#: templates/teams/create.html:33 templates/teams/teams-list.html:6
-#: templates/teams/teams-list.html.py:29
+#: templates/teams/create.html:33
 msgid "My Teams"
 msgstr ""
 
@@ -6451,6 +6454,10 @@ msgstr ""
 msgid "This video is being moderated by team"
 msgstr ""
 
+#: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
+msgid "Your Teams"
+msgstr ""
+
 #: templates/teams/teams-list.html:18
 msgid "Team Directory"
 msgstr ""
@@ -6460,7 +6467,7 @@ msgid "Sort by"
 msgstr ""
 
 #: templates/teams/teams-list.html:64
-msgid "My team"
+msgid "Your team"
 msgstr ""
 
 #: templates/teams/teams-list.html:67
