@@ -762,3 +762,17 @@ Example response:
         "resource_uri": "/api2/partners/activity/1339/",
         "user": "test-user"
     }
+
+Message Resource
+----------------
+
+The message resource allows you to send messages to user and teams.
+
+.. http:post:: /api2/partners/message/
+
+    :form subject: Subject of the message
+    :form content: Content of the message
+    :form user: Recipient's username
+    :form team: Team's slug
+
+You can only send the ``user`` parameter or the ``team`` parameter at once.
