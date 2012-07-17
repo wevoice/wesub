@@ -21,6 +21,7 @@ Contents:
    data
    teams-callbacks
    testing
+   subtitle-storage
 
 Contributing
 ------------
