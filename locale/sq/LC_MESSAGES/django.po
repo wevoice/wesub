@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-17 01:32-0500\n"
-"PO-Revision-Date: 2012-07-17 06:50+0000\n"
+"POT-Creation-Date: 2012-07-18 01:33-0500\n"
+"PO-Revision-Date: 2012-07-18 06:53+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/universalsubtitles/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -51,57 +51,57 @@ msgstr "Email"
 msgid "Hide"
 msgstr "Fshihe"
 
-#: apps/auth/models.py:99
+#: apps/auth/models.py:100
 msgid "Retired user"
 msgstr "Përdoruesi i tërhequr"
 
-#: apps/auth/models.py:326
+#: apps/auth/models.py:327
 msgid "Add comment"
 msgstr "Shtoni koment"
 
-#: apps/auth/models.py:327
+#: apps/auth/models.py:328
 msgid "Start subtitles"
 msgstr "Filloni titrimin"
 
-#: apps/auth/models.py:328
+#: apps/auth/models.py:329
 msgid "Start translation"
 msgstr "Filloni përkthimin"
 
-#: apps/auth/models.py:329
+#: apps/auth/models.py:330
 msgid "Edit subtitles"
 msgstr "Përpunoni titra"
 
-#: apps/auth/models.py:330
+#: apps/auth/models.py:331
 msgid "Edit translation"
 msgstr "Përpunoni përkthimin"
 
-#: apps/auth/models.py:387
+#: apps/auth/models.py:388
 msgid "understand enough"
 msgstr "e kuptoj mjaftueshëm"
 
-#: apps/auth/models.py:388
+#: apps/auth/models.py:389
 msgid "understand 99%"
 msgstr "e kuptoj 99%"
 
-#: apps/auth/models.py:389
+#: apps/auth/models.py:390
 msgid "write like a native"
 msgstr "e shkuraj si gjuhën amtare"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:395
 msgid "follow requests in language"
 msgstr "ndiq kërkesat në gjuhën"
 
-#: apps/auth/models.py:409
+#: apps/auth/models.py:410
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr "Kjo është data kur fillohet të shfaqet lajmërimi. Dhe do të shfaqet vetëm i fundmi."
 
-#: apps/auth/models.py:508
+#: apps/auth/models.py:509
 msgid "e-mail confirmation"
 msgstr "ripohim me e-mail"
 
-#: apps/auth/models.py:509
+#: apps/auth/models.py:510
 msgid "e-mail confirmations"
 msgstr "ripohime me e-mail"
 
@@ -185,15 +185,15 @@ msgstr "Që të shkruani një mesazh, duhet të keni bërë mirëfilltësimin"
 msgid "This message is from site administrator."
 msgstr "Ky mesazh vjen prej përgjegjësit të site-it."
 
-#: apps/messages/forms.py:96
+#: apps/messages/forms.py:95
 msgid "You cannot send a message to a user and a team at the same time."
 msgstr "Nuk mund të dërgoni mesazhe njëkohësisht për një përdorues dhe për një ekip."
 
-#: apps/messages/forms.py:99
+#: apps/messages/forms.py:98
 msgid "You must choose a recipient."
 msgstr "Duhet të zgjidhni një marrës."
 
-#: apps/messages/forms.py:106
+#: apps/messages/forms.py:105
 msgid "This field is required."
 msgstr "Kjo fushë është e domosdoshme."
 
@@ -292,7 +292,7 @@ msgstr ""
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr "%(user)s la një koment te videoja %(title)s"
 
-#: apps/messages/views.py:123
+#: apps/messages/views.py:125
 msgid "Message sent."
 msgstr "Mesazhi u dërgua."
 
@@ -1609,7 +1609,7 @@ msgstr "Këto titra moderohen. Shihni faqen e ekipit %s për të dhëna se si t�
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Na ndjeni, këta titra moderohen privatisht."
 
-#: apps/widget/rpc.py:945 apps/widget/rpc.py:986
+#: apps/widget/rpc.py:949 apps/widget/rpc.py:990
 msgid "\n"
 msgstr "\n"
 
@@ -2867,10 +2867,10 @@ msgid ""
 "            </p>\n"
 "            <h2>Publisher and Enterprise Services</h2>\n"
 "            <p>\n"
-"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/services/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
+"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
 "            </p>\n"
 "        "
-msgstr "\n            <h2>Rreth Amara-s</h2>\n            <p>\n                Amara u jep individëve, bashkësive, apo organizmave më të mëdha fuqinë \n                të kapërcejnë për videot online pengesat që vijnë nga gjuha ose paaftësi. Mjetet janë të lira \n                dhe me burim të hapur, duke e bërë titrimin dhe përkthimin e videove më të thjeshtë, \n                më tërheqës, dhe, mbi të gjitha, duke rritur për të frymën e bashkëpunimit.\n            </p>\n            <p>\n                Përfitimet nga titrimi janë të pamata:\n                <ul>\n                    <li>Titrimi i bën të përdorshme videot për shikues që janë të shurdhër ose me dëgjim të rënduar</li>\n                    <li>Përkthimi na bën të mundur tërë neve të shohim video në gjuhë që nuk i kuptojmë</li>\n                    <li>Krijuesit e videove përfitojnë: SEO më të mirë, më tepër shikime, audiencë shumë më të madhe (shumëgjuhëshe dhe mbarëbotërore), dhe më tepër</li>\n                </ul>\n            </p>\n            <p>\n                Amara përbëhet nga tre pjesë kryesore:\n                <ul>\n                    <li>Një mjet për krijim dhe parje titrash (i quajtur ndryshe widget)</li>\n                    <li>Një site web për titrim në bashkëpunim</li>\n                    <li>Një protokoll të hapur për kërkim/shpërndarje titrash</li>\n                </ul>\n            </p>\n            <p>\n                Gjithçka bëjmë është e passhme sipas lejes me burim të hapur <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a>.\n            </p>\n            <h2>Organizmi Ynë</h2>\n            <p>\n                <a href=\"http://www.pculture.org/\">Participatory Culture Foundation</a> \n                është organizëm jofitimprurës që krijon mjete të lira dhe me burim të hapur, për një media\n                më demokratike dhe më të decentralizuar. Projektet tona të tjera përfshijnë <a href=\"http://www.getmiro.com/\">Miro-n</a>, \n                <a href=\"http://www.mirovideoconverter.com/\">Shndërruesin Miro të Videove</a>, \n                <a href=\"http://www.mirocommunity.org/\">Bashkësinë Miro</a>, and \n                <a href=\"http://www.openvideoalliance.org/\">Aleancën e Videos së hapur</a>.\n            </p>\n            <p>\n                Amara është projekt pjesë e <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat-it</a>, \n                dhe Mozilla Foundation-i ka furnizuar mbulim për zhvillimin.  \n                Gjithashtu përkrahës financiarë janë Open Society Institute dhe MacArthur Foundation.\n            </p>\n            <h2>Shërbime Botuesi dhe Profesionale</h2>\n            <p>\n                Amara ofron një grup mjetesh dhe shërbimesh profesionale që u lejojnë botuesve dhe platformave të videos të krijojnë dhe administrojnë titra me cilësi të lartë.  Me ndihmën e Amara-s, mund të krijoni një bashkësi vullnetarësh për titrimin e lëndës suaj, ta integroni me shërbime profesionale, dhe të përdorni një sistem të fuqishëm kontrolli cilësie për të arritur cilësi të nivelit botëror.  Për të mësuar më tepër, shihni <a href=\"http://www.universalsubtitles.org/en/services/\">shërbimet tona profesionale</a> dhe lidhuni me Dean Jansen, te <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n            </p>\n        "
+msgstr ""
 
 #: templates/base.html:9
 msgid ""

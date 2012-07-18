@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-17 01:46-0500\n"
+"POT-Creation-Date: 2012-07-18 01:47-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,57 +51,57 @@ msgstr ""
 msgid "Hide"
 msgstr ""
 
-#: apps/auth/models.py:99
+#: apps/auth/models.py:100
 msgid "Retired user"
 msgstr ""
 
-#: apps/auth/models.py:326
+#: apps/auth/models.py:327
 msgid "Add comment"
 msgstr ""
 
-#: apps/auth/models.py:327
+#: apps/auth/models.py:328
 msgid "Start subtitles"
 msgstr ""
 
-#: apps/auth/models.py:328
+#: apps/auth/models.py:329
 msgid "Start translation"
 msgstr ""
 
-#: apps/auth/models.py:329
+#: apps/auth/models.py:330
 msgid "Edit subtitles"
 msgstr ""
 
-#: apps/auth/models.py:330
+#: apps/auth/models.py:331
 msgid "Edit translation"
 msgstr ""
 
-#: apps/auth/models.py:387
+#: apps/auth/models.py:388
 msgid "understand enough"
 msgstr ""
 
-#: apps/auth/models.py:388
+#: apps/auth/models.py:389
 msgid "understand 99%"
 msgstr ""
 
-#: apps/auth/models.py:389
+#: apps/auth/models.py:390
 msgid "write like a native"
 msgstr ""
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:395
 msgid "follow requests in language"
 msgstr ""
 
-#: apps/auth/models.py:409
+#: apps/auth/models.py:410
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr ""
 
-#: apps/auth/models.py:508
+#: apps/auth/models.py:509
 msgid "e-mail confirmation"
 msgstr ""
 
-#: apps/auth/models.py:509
+#: apps/auth/models.py:510
 msgid "e-mail confirmations"
 msgstr ""
 
@@ -185,15 +185,15 @@ msgstr ""
 msgid "This message is from site administrator."
 msgstr ""
 
-#: apps/messages/forms.py:96
+#: apps/messages/forms.py:95
 msgid "You cannot send a message to a user and a team at the same time."
 msgstr ""
 
-#: apps/messages/forms.py:99
+#: apps/messages/forms.py:98
 msgid "You must choose a recipient."
 msgstr ""
 
-#: apps/messages/forms.py:106
+#: apps/messages/forms.py:105
 msgid "This field is required."
 msgstr ""
 
@@ -292,7 +292,7 @@ msgstr ""
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr ""
 
-#: apps/messages/views.py:123
+#: apps/messages/views.py:125
 msgid "Message sent."
 msgstr ""
 
@@ -1624,7 +1624,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:945 apps/widget/rpc.py:986
+#: apps/widget/rpc.py:949 apps/widget/rpc.py:990
 msgid "\n"
 msgstr ""
 
@@ -2910,7 +2910,7 @@ msgid ""
 "subtitles.  With Amara, you can build a community of volunteers to subtitle "
 "your content, integrate with professional services, and use a powerful "
 "quality control system to ensure world-class quality.  To learn more, see "
-"our <a href=\"http://www.universalsubtitles.org/en/services/\">enterprise "
+"our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise "
 "services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org"
 "\">dean@pculture.org</a>.\n"
 "            </p>\n"

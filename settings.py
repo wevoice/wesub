@@ -178,6 +178,7 @@ JS_DIALOG = \
      'js/srtwriter.js',
      'js/widget/unsavedwarning.js',
      'js/widget/emptysubswarningdialog.js',
+     'js/widget/confirmdialog.js',
      'js/widget/droplockdialog.js',
      'js/finishfaildialog/dialog.js',
      'js/finishfaildialog/errorpanel.js',

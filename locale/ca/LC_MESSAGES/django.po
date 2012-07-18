@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-17 01:32-0500\n"
-"PO-Revision-Date: 2012-07-17 06:51+0000\n"
+"POT-Creation-Date: 2012-07-18 01:33-0500\n"
+"PO-Revision-Date: 2012-07-18 06:53+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -54,57 +54,57 @@ msgstr "Adreça electrònica"
 msgid "Hide"
 msgstr "Amagar"
 
-#: apps/auth/models.py:99
+#: apps/auth/models.py:100
 msgid "Retired user"
 msgstr "Usuari retirat"
 
-#: apps/auth/models.py:326
+#: apps/auth/models.py:327
 msgid "Add comment"
 msgstr "Afegiu comentaris"
 
-#: apps/auth/models.py:327
+#: apps/auth/models.py:328
 msgid "Start subtitles"
 msgstr "Comenceu els subtítols"
 
-#: apps/auth/models.py:328
+#: apps/auth/models.py:329
 msgid "Start translation"
 msgstr "Comenceu la traducció"
 
-#: apps/auth/models.py:329
+#: apps/auth/models.py:330
 msgid "Edit subtitles"
 msgstr "Edita els subtítols"
 
-#: apps/auth/models.py:330
+#: apps/auth/models.py:331
 msgid "Edit translation"
 msgstr "Edita la traducció"
 
-#: apps/auth/models.py:387
+#: apps/auth/models.py:388
 msgid "understand enough"
 msgstr "L'entenc prou"
 
-#: apps/auth/models.py:388
+#: apps/auth/models.py:389
 msgid "understand 99%"
 msgstr "L'entenc al 99%"
 
-#: apps/auth/models.py:389
+#: apps/auth/models.py:390
 msgid "write like a native"
 msgstr "escriure com a natiu"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:395
 msgid "follow requests in language"
 msgstr "seguir peticions en l'idioma"
 
-#: apps/auth/models.py:409
+#: apps/auth/models.py:410
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr "Aquesta és la data en la que comencen a mostrar l'anunci. I només l'últim "
 
-#: apps/auth/models.py:508
+#: apps/auth/models.py:509
 msgid "e-mail confirmation"
 msgstr "correu electrònic de confirmació"
 
-#: apps/auth/models.py:509
+#: apps/auth/models.py:510
 msgid "e-mail confirmations"
 msgstr "correu electrònic de confirmacions"
 
@@ -188,15 +188,15 @@ msgstr "Hauríeu d'estar autenticats per a escriure missatges"
 msgid "This message is from site administrator."
 msgstr "Aquest missatge prové de l'administrador del web."
 
-#: apps/messages/forms.py:96
+#: apps/messages/forms.py:95
 msgid "You cannot send a message to a user and a team at the same time."
 msgstr "No podeu enviar un missatge a un usuari i a un equip al mateix temps."
 
-#: apps/messages/forms.py:99
+#: apps/messages/forms.py:98
 msgid "You must choose a recipient."
 msgstr "Heu de seleccionar un destinatari."
 
-#: apps/messages/forms.py:106
+#: apps/messages/forms.py:105
 msgid "This field is required."
 msgstr "Aquest camp és necessari."
 
@@ -295,7 +295,7 @@ msgstr "Els vostres subtítols no han estat acceptats"
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr "%(user)s ha deixat un comentari al vídeo %(title)s"
 
-#: apps/messages/views.py:123
+#: apps/messages/views.py:125
 msgid "Message sent."
 msgstr "Missatge enviat."
 
@@ -1612,7 +1612,7 @@ msgstr "Aquests subtítols estan moderats. Informeu-vos a la pàgina de l'equip 
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Ho lamentem, aquests subtítols són moderats de manera privada."
 
-#: apps/widget/rpc.py:945 apps/widget/rpc.py:986
+#: apps/widget/rpc.py:949 apps/widget/rpc.py:990
 msgid "\n"
 msgstr "\n"
 
@@ -2870,10 +2870,10 @@ msgid ""
 "            </p>\n"
 "            <h2>Publisher and Enterprise Services</h2>\n"
 "            <p>\n"
-"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/services/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
+"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
 "            </p>\n"
 "        "
-msgstr "\n<h2>Quant a Amara</h2>\n\n<p>\nAmara dona la possibilitat a persones, comunitats i grans organitzacions l'accessibilitat i eliminació de barreres als vídeos en línia. Aquestes eines són gratuïtes i de codi obert i fan del subtitulat i la traducció de vídeo, un treball més simple, atractiu i sobretot més col·laborador.\n</p>\n<p>\nEls beneficis d'etiquetar i subtitular són enormes:\n<ul>\n<li>Els etiquetats fan els vídeos accessibles als espectadors sords o amb deficiència auditiva</li>\n<li>Les traduccions permeten a tots nosaltres vorer vídeos en idiomes que no entenem</li>\n<li>Els creadors de vídeo obtenen: Millor posicionament als cercadors, més espectadors, accés a una major (potencialment multilingüe i global) audiència, accessibilitat per a sords i espectadors amb deficiència auditiva, i més coses</li>\n</ul>\n</p>\n\n<p>\nAmara està formada principalment per tres parts:\n<ul>\n<li>Una eina per a crear i visualitzar subtítols (giny)</li>\n<li>Una web de subtitulat col·laboradora</li>\n<li>Un protocol obert de recerca i lliurament de subtítols</li>\n</ul>\n</p>\n\n<p>\nQualssevol cosa que fem esta disponible sota la llicència de codi obert <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a>.\n</p>\n<h2>La nostra Organització</h2>\n\n<p>\n<a href=\"http://www.pculture.org/\">Fundació Participatory Culture</a> és una organització sense ànim de lucre amb eines gratuïtes i obertes per a un sistema multimèdia més democràtic i descentralitzat. Altres dels nostres projectes inclouen <a href=\"http://www.getmiro.com/\">Miro</a>, \n<a href=\"http://www.mirovideoconverter.com/\">Conversor de vídeo Miro</a>,\n<a href=\"http://www.mirocommunity.org/\">Comunitat Miro</a>, and \n<a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n</p>\n\n<p>\nAmara està involucrat al projecte <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \ni la Fundació Mozilla ha donat suport de desenvolupament.\nL'Institut Open Society i la Fundació MacArthur també han donat suport financer.\n</p>\n\n<h2>Editors i serveis empresarials</h2>\n<p>\nAmara ofereix un conjunt de serveis i eines professionals que permeten als editors i les plataformes de vídeo crear i gestionar subtítols amb una alta qualitat. Amb Amara, podeu construir una comunitat de voluntaris que subtitulen el vostre contingut, integrar-ho amb serveis professionals, i fer ús d'un sistema de control potent i de qualitat. Per a conèixer més sobre aquesta eina, visiteu els nostres  <a href=\"http://www.universalsubtitles.org/en/services/\">serveis per a empreses</a>  i contacteu amb Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n</p>"
+msgstr ""
 
 #: templates/base.html:9
 msgid ""
