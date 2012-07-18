@@ -767,7 +767,7 @@ Example response:
     }
 
 Message Resource
-----------------
+~~~~~~~~~~~~~~~~
 
 The message resource allows you to send messages to user and teams.
 
