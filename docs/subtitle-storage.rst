@@ -5,7 +5,7 @@ This document describes the format for storing subtitles in the new data model,
 which is not in use yet!  If you're reading this, make sure you know what you're
 doing!
 
-``SubtitleVersion`` objects store their subtitles as a blog of JSON in the
+``SubtitleVersion`` objects store their subtitles as a blob of JSON in the
 database.  You should use the ``subtitle`` property to get and set this as
 a Python object for convenience.
 
