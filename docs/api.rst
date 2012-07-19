@@ -697,6 +697,8 @@ Fields
     * ``Approve``
 * ``version_no`` - Subtitle version number (required for ``Approve`` and
   ``Review`` tasks)
+* ``completed`` - ``null`` if the task hasn't been completed yet; a datetime
+  string it has
 
 An example response:
 
@@ -709,7 +711,8 @@ An example response:
         "priority": 1,
         "resource_uri": "/api2/partners/teams/all-star/tasks/3/",
         "type": "Subtitle",
-        "video_id": "Myn4j5OI7BxL"
+        "video_id": "Myn4j5OI7BxL",
+        "completed": "2012-07-18T14:08:07"
     }
 
 Activity resource
@@ -764,7 +767,7 @@ Example response:
     }
 
 Message Resource
-----------------
+~~~~~~~~~~~~~~~~
 
 The message resource allows you to send messages to user and teams.
 

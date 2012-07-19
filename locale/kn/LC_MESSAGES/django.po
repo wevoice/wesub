@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-18 01:36-0500\n"
+"POT-Creation-Date: 2012-07-19 01:36-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -525,116 +525,116 @@ msgstr ""
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr ""
 
-#: apps/teams/forms.py:342
+#: apps/teams/forms.py:347
 msgid "This video has already been transcribed."
 msgstr ""
 
-#: apps/teams/forms.py:347
+#: apps/teams/forms.py:352
 msgid "Subtitling of this video is already in progress."
 msgstr ""
 
-#: apps/teams/forms.py:353
+#: apps/teams/forms.py:358
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr ""
 
-#: apps/teams/forms.py:359
+#: apps/teams/forms.py:364
 msgid "This language already has a complete set of subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:379
+#: apps/teams/forms.py:384
 msgid "There is already a task in progress for that video/language."
 msgstr ""
 
-#: apps/teams/forms.py:393
+#: apps/teams/forms.py:398
 msgid "You must select a language for a Translate task."
 msgstr ""
 
-#: apps/teams/forms.py:426
+#: apps/teams/forms.py:433
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr ""
 
-#: apps/teams/forms.py:448
+#: apps/teams/forms.py:455
 msgid "You do not have permission to assign this task."
 msgstr ""
 
-#: apps/teams/forms.py:455
+#: apps/teams/forms.py:462
 msgid "This user cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:476
+#: apps/teams/forms.py:483
 msgid "You do not have permission to delete this task."
 msgstr ""
 
-#: apps/teams/forms.py:533
+#: apps/teams/forms.py:540
 msgid "You cannot blacklist a preferred language."
 msgstr ""
 
-#: apps/teams/forms.py:556 apps/teams/forms.py:558
+#: apps/teams/forms.py:563 apps/teams/forms.py:565
 msgid "User does not exist!"
 msgstr ""
 
-#: apps/teams/forms.py:565
+#: apps/teams/forms.py:572
 msgid "User is already a member of this team!"
 msgstr ""
 
-#: apps/teams/forms.py:591 templates/videos/subtitle-view.html:375
+#: apps/teams/forms.py:598 templates/videos/subtitle-view.html:375
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
-#: apps/teams/forms.py:595 templates/videos/subtitle-view.html:360
+#: apps/teams/forms.py:602 templates/videos/subtitle-view.html:360
 msgid "What would you like to unpublish?"
 msgstr ""
 
-#: apps/teams/forms.py:597
+#: apps/teams/forms.py:604
 msgid "This version (and any later version) for this language."
 msgstr ""
 
-#: apps/teams/forms.py:598
+#: apps/teams/forms.py:605
 msgid "All versions for this language and any dependent languages."
 msgstr ""
 
-#: apps/teams/forms.py:616
+#: apps/teams/forms.py:623
 msgid "These subtitles are not under a team's control."
 msgstr ""
 
-#: apps/teams/forms.py:620
+#: apps/teams/forms.py:627
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:639
+#: apps/teams/forms.py:646
 msgid "You cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:651 apps/videos/forms.py:461
+#: apps/teams/forms.py:658 apps/videos/forms.py:461
 msgid "Invalid language to translate from."
 msgstr ""
 
-#: apps/teams/forms.py:660 apps/videos/forms.py:71 apps/videos/forms.py:89
+#: apps/teams/forms.py:667 apps/videos/forms.py:71 apps/videos/forms.py:89
 #: apps/videos/forms.py:470
 msgid "File size should be less {0} kb"
 msgstr ""
 
-#: apps/teams/forms.py:665 apps/videos/forms.py:475
+#: apps/teams/forms.py:672 apps/videos/forms.py:475
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:672 apps/videos/forms.py:76 apps/videos/forms.py:97
+#: apps/teams/forms.py:679 apps/videos/forms.py:76 apps/videos/forms.py:97
 #: apps/videos/forms.py:482
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/teams/forms.py:677 apps/videos/forms.py:99 apps/videos/forms.py:487
+#: apps/teams/forms.py:684 apps/videos/forms.py:99 apps/videos/forms.py:487
 msgid "Incorrect subtitles format"
 msgstr ""
 
-#: apps/teams/forms.py:750 apps/videos/forms.py:577
+#: apps/teams/forms.py:757 apps/videos/forms.py:577
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 
-#: apps/teams/forms.py:756 apps/videos/forms.py:584
+#: apps/teams/forms.py:763 apps/videos/forms.py:584
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
