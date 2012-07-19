@@ -62,7 +62,8 @@ from teams.search_indexes import TeamVideoLanguagesIndex
 from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
-    update_video_moderation, update_one_team_video
+    update_video_moderation, update_one_team_video, update_video_public_field,
+    invalidate_video_visibility_caches
 )
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
@@ -219,12 +220,18 @@ def settings_basic(request, slug):
     if request.POST:
         form = FormClass(request.POST, request.FILES, instance=team)
 
+        is_visible = team.is_visible
+
         if form.is_valid():
             try:
                 form.save()
             except:
                 logger.exception("Error on changing team settings")
                 raise
+
+            if is_visible != form.instance.is_visible:
+                update_video_public_field.delay(team.id)
+                invalidate_video_visibility_caches.delay(team)
 
             messages.success(request, _(u'Settings saved.'))
             return HttpResponseRedirect(request.path)
@@ -281,6 +288,7 @@ def settings_permissions(request, slug):
                 workflow_form.save()
 
             moderation_changed = moderated != form.instance.moderates_videos()
+
             if moderation_changed:
                 update_video_moderation.delay(team)
                 invalidate_video_moderation_caches.delay(team)
