@@ -765,6 +765,18 @@ class Video(models.Model):
 
         return meta
 
+    def can_user_see(self, user):
+        team_video = self.get_team_video()
+
+        if not team_video:
+            return True
+
+        team = team_video.team
+
+        if team and team.is_visible():
+            return True
+
+        return team.is_member(user)
 
     class Meta(object):
         permissions = (
