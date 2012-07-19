@@ -22,7 +22,7 @@ def get_video_from_code(func):
     def wrapper(request, video_id, *args, **kwargs):
         video = get_object_or_404(Video, video_id=video_id)
 
-        if video.can_user_see(request.user):
+        if not video.can_user_see(request.user):
             return raise_forbidden(request, video_id)
 
         # Hack to pass through the ID (which may be the secret version) in case
@@ -44,7 +44,7 @@ def get_video_revision(func):
         id = video_id if video_id else version.video.video_id
         video = get_object_or_404(Video, video_id=id)
 
-        if video.can_user_see(request.user):
+        if not video.can_user_see(request.user):
             raise SuspiciousOperation("You cannot see this video")
         
         return func(request, version, *args, **kwargs)
