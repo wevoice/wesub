@@ -39,9 +39,7 @@ def mapcat(fn, iterable):
 
     E.g.:
 
-        def foo(i):
-            return [i, i+1]
-
+        foo = lambda i: [i, i+1]
         mapcatenate(foo, [20, 200, 2000])
         [20, 21, 200, 201, 2000, 2001]
 
@@ -54,6 +52,30 @@ def subtitles_to_json(subtitles):
 
 def json_to_subtitles(json_subtitles):
     return json.loads(json_subtitles)
+
+
+def lineage_to_json(lineage):
+    return json.dumps(lineage)
+
+def json_to_lineage(json_lineage):
+    return json.loads(json_lineage)
+
+
+def get_lineage(parents):
+    """Return a lineage map for a version that has the given parents."""
+    lineage = {}
+
+    for parent in parents:
+        l, v = parent.language_code, parent.version_number
+
+        if l not in lineage or lineage[l] < v:
+            lineage[l] = v
+
+        for l, v in parent.lineage.items():
+            if l not in lineage or lineage[l] < v:
+                lineage[l] = v
+
+    return lineage
 
 
 class SubtitleLanguage(models.Model):
@@ -86,8 +108,10 @@ class SubtitleLanguage(models.Model):
 
 
     def __unicode__(self):
-        return 'SubtitleLanguage %d / %s / %s' % (
-            self.id, self.video.video_id, self.get_language_code_display())
+        return 'SubtitleLanguage %s / %s / %s' % (
+            (self.id or '(unsaved)'), self.video.video_id,
+            self.get_language_code_display()
+        )
 
 
     def save(self, *args, **kwargs):
@@ -121,19 +145,22 @@ class SubtitleLanguage(models.Model):
                               if last_version else 1)
             kwargs['version_number'] = version_number
 
-            parents = kwargs.pop('parents', None)
+            parents = kwargs.pop('parents', [])
+
+            if last_version:
+                parents.append(last_version)
+
+            kwargs['lineage'] = get_lineage(parents)
 
             sv = SubtitleVersion(*args, **kwargs)
             sv.save()
-
-            if last_version:
-                sv.parents.add(last_version)
 
             if parents:
                 for p in parents:
                     sv.parents.add(p)
 
         return sv
+
 
 class SubtitleVersion(models.Model):
     """SubtitleVersions are the equivalent of a 'changeset' in a VCS.
@@ -183,9 +210,14 @@ class SubtitleVersion(models.Model):
     # field.
     serialized_subtitles = models.TextField(blank=True)
 
+    # Lineage is stored as a blob of JSON to save on DB rows.  You shouldn't
+    # need to touch this field yourself, use the lineage property.
+    serialized_lineage = models.TextField(blank=True)
+
+
     def get_subtitles(self):
         # We cache the parsed subs for speed.
-        if not self._subtitles:
+        if self._subtitles == None:
             self._subtitles = json_to_subtitles(self.serialized_subtitles)
 
         return self._subtitles
@@ -196,12 +228,27 @@ class SubtitleVersion(models.Model):
 
     subtitles = property(get_subtitles, set_subtitles)
 
+    def get_lineage(self):
+        # We cache the parsed lineage for speed.
+        if self._lineage == None:
+            self._lineage = json_to_lineage(self.serialized_lineage)
+
+        return self._lineage
+
+    def set_lineage(self, lineage):
+        self.serialized_lineage = lineage_to_json(lineage)
+        self._lineage = lineage
+
+    lineage = property(get_lineage, set_lineage)
+
+
     class Meta:
         unique_together = [('video', 'language_code', 'version_number')]
 
 
     def __init__(self, *args, **kwargs):
         subtitles = kwargs.pop('subtitles', None)
+        lineage = kwargs.pop('lineage', None)
 
         super(SubtitleVersion, self).__init__(*args, **kwargs)
 
@@ -209,10 +256,14 @@ class SubtitleVersion(models.Model):
         if subtitles:
             self.subtitles = subtitles
 
+        self._lineage = None
+        if lineage != None:
+            self.lineage = lineage
+
     def __unicode__(self):
-        return u'SubtitleVersion %d / %s / %s v%d' % (
-            self.id, self.video.video_id, self.get_language_code_display(),
-            self.version_number
+        return u'SubtitleVersion %s / %s / %s v%s' % (
+            (self.id or '(unsaved)'), self.video.video_id,
+            self.get_language_code_display(), self.version_number
         )
 
 
