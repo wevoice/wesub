@@ -16,14 +16,11 @@ def get_video_from_code(func):
     and authorization credentials for viewing have been checked
     for the user on that request.
     """
-    def raise_forbidden(request, video):
-        return HttpResponseForbidden("You cannot see this video")
-
     def wrapper(request, video_id, *args, **kwargs):
         video = get_object_or_404(Video, video_id=video_id)
 
         if not video.can_user_see(request.user):
-            return raise_forbidden(request, video_id)
+            return HttpResponseForbidden("You cannot see this video")
 
         # Hack to pass through the ID (which may be the secret version) in case
         # the view wants to redirect.
