@@ -6,7 +6,6 @@ from auth.models import CustomUser as User
 from utils.celery_search_index import CelerySearchIndex
 from django.conf import settings
 from haystack.query import SearchQuerySet
-from icanhaz.models import VideoVisibilityPolicy
 import datetime
 
 SUFFIX = u''

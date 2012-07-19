@@ -25,8 +25,6 @@ from haystack.indexes import (
     MultiValueField
 )
 from haystack.query import SearchQuerySet
-
-from icanhaz.models import VideoVisibilityPolicy
 from teams import models
 
 
