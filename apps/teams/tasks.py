@@ -46,11 +46,14 @@ def invalidate_video_visibility_caches(team):
         invalidate_video_visibility(video_id)
 
 @task()
-def update_video_public_field(team):
+def update_video_public_field(team_id):
     from apps.videos.models import Video
+    from apps.teams.models import Team
+
+    team = Team.objects.get(pk=team_id)
 
     ids = team.teamvideo_set.values_list("video_id", flat=True)
-    Video.objects.filter(id__id=ids).update(is_public=team.is_visible)
+    Video.objects.filter(id__in=ids).update(is_public=team.is_visible)
 
 @periodic_task(run_every=crontab(minute=0, hour=7))
 def expire_tasks():
