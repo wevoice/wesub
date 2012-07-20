@@ -49,10 +49,81 @@
 
         // Video model.
         this.VideoModel = _Backbone.Model.extend({
+
+            // The initialization of these vars is unnecessary, but it's nice to know
+            // what vars will *eventually* be on the video model.
+
+            // This var will be true once we've retrieved the rest of the model attrs
+            // from the Amara API.
+            isComplete: false,
+
+            // Set from within the embedder.
             div: '',
             height: '',
+            initialLanguage: null,
+            isOnAmara: null,
             url: '',
-            width: ''
+            width: '',
+
+            // Set from the Amara API
+            all_urls: [],
+            created: null,
+            description: null,
+            duration: null,
+            id: null,
+            languages: [],
+            original_language: null,
+            project: null,
+            resource_uri: null,
+            team: null,
+            thumbnail: null,
+            title: null,
+
+            // Every time a video model is created, do this.
+            initialize: function() {
+
+                var video = this;
+                var apiURL = 'https://staging.universalsubtitles.org/api2/partners/videos/?&video_url=';
+
+                // Make a call to the Amara API to get attributes like available languages,
+                // internal ID, description, etc.
+                _$.ajax({
+                    url: apiURL + this.get('url'),
+                    dataType: 'jsonp',
+                    success: function(resp) {
+
+                        if (resp.objects.length) {
+
+                            // The video exists on Amara.
+                            video.set('isOnAmara', true);
+
+                            // There should only be one object.
+                            if (resp.objects.length === 1) {
+
+                                // Set all of the API attrs as attrs on the video model.
+                                video.set(resp.objects[0]);
+
+                                // Set the initial language to be used to either the one
+                                // provided by the initial options, or the original language
+                                // from the API.
+                                video.set('initialLanguage',
+                                    video.get('initialLanguage') ||
+                                    video.get('original_language')
+                                );
+                            }
+
+                        } else {
+
+                            // The video does not exist on Amara.
+                            video.set('isOnAmara', false);
+
+                        }
+
+                        // Mark that the video model has been completely populated.
+                        video.set('isComplete', true);
+                    }
+                });
+            }
         });
 
         // Amara view. This contains all of the events and logic for a single instance of
@@ -73,7 +144,7 @@
             },
 
             render: function() {
-
+                
                 var that = this;
 
                 // Init the Popcorn video.
@@ -92,10 +163,36 @@
                     }));
 
                     that.cacheNodes();
+
+                    // Wait until we have a complete video model, and then retrieve the initial
+                    // set of subtitles, so we can begin building out the transcript viewer
+                    // and the subtitle display.
+                    that.waitUntilVideoIsComplete(
+                        function() {
+
+                            // We now have a fully populated video model.
+                            //
+                            // Grab the subtitles for the initial language and do yo' thang.
+
+                            if (that.model.get('isOnAmara')) {
+                                console.log('We b buildin.');
+                            } else {
+                                // Do some other stuff for videos that aren't yet on Amara.
+                            }
+                        }
+                    );
                 });
 
                 return this;
 
+            },
+
+            waitUntilVideoIsComplete: function(callback) {
+                if (!this.model.get('isComplete')) {
+                    setTimeout(function() { that.waitUntilVideoIsComplete(callback); }, 100);
+                } else {
+                    callback();
+                }
             },
             logoClicked: function() {
                 alert('Logo clicked');
@@ -215,7 +312,11 @@
                     $div.attr('id', id);
 
                     // Call embedVideo with this div and URL.
-                    that.push(['embedVideo', {'div': id, 'url': $div.data('url') }]);
+                    that.push(['embedVideo', {
+                        'div': id,
+                        'initialLanguage': $div.data('initial-language'),
+                        'url': $div.data('url')
+                    }]);
                 });
             }
 
