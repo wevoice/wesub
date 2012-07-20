@@ -816,9 +816,6 @@ class Rpc(BaseRpc):
 
         workflow = Workflow.get_for_team_video(team_video)
 
-        if not workflow.approve_enabled and not workflow.review_enabled:
-            return UNMODERATED, False
-
         # If there are any open team tasks for this video/language, it needs to
         # be kept under moderation.
         tasks = team_video.task_set.incomplete().filter(
@@ -831,9 +828,12 @@ class Rpc(BaseRpc):
                     if not task.language:
                         task.language = sl.language
                         task.save()
-            return WAITING_MODERATION, False
 
-        if sl.has_version:
+            return (UNMODERATED, False) if not workflow.allows_tasks else (WAITING_MODERATION, False)
+
+        if not workflow.allow_tasks:
+            return UNMODERATED, False
+        elif sl.has_version:
             # If there are already active subtitles for this language, we're
             # dealing with an edit.
             if can_publish_edits_immediately(team_video, user, sl.language):
