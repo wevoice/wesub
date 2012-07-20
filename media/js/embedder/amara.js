@@ -10777,8 +10777,6 @@ var wikiCallback;
 
         // This will store all future instances of Amara-powered videos.
         // I'm trying really hard here to not use the word "widget".
-        //
-        // TODO: Make this a private var?
         this.amaraInstances = [];
 
         // Private methods that are called via the push() method.
@@ -10861,9 +10859,8 @@ var wikiCallback;
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
 
-                                // Set the initial language to be used to either the one
-                                // provided by the initial options, or the original language
-                                // from the API.
+                                // Set the initial language to either the one provided by the initial
+                                // options, or the original language from the API.
                                 video.set('initialLanguage',
                                     video.get('initialLanguage') ||
                                     video.get('original_language')
@@ -10908,22 +10905,23 @@ var wikiCallback;
                 // Init the Popcorn video.
                 this.pop = _Popcorn.smart(this.model.get('div'), this.model.get('url'));
 
-                // TODO: Popcorn is not firing any events for any video types other
-                // than HTML5. Watch http://popcornjs.org/popcorn-docs/events/.
                 this.pop.on('loadedmetadata', function() {
 
                     // Set the video model's height and width, now that we know it.
                     that.model.set('height', that.pop.position().height);
                     that.model.set('width', that.pop.position().width);
 
+                    // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
                         width: that.model.get('width')
                     }));
 
+                    // Just set some cached Zepto selections for later use.
                     that.cacheNodes();
 
-                    // Wait until we have a complete video model, and then retrieve the initial
-                    // set of subtitles, so we can begin building out the transcript viewer
+                    // Wait until we have a complete video model (the API was hit as soon as
+                    // the video instance was created), and then retrieve the initial set
+                    // of subtitles, so we can begin building out the transcript viewer
                     // and the subtitle display.
                     that.waitUntilVideoIsComplete(
                         function() {
@@ -10946,6 +10944,9 @@ var wikiCallback;
             },
 
             waitUntilVideoIsComplete: function(callback) {
+
+                // isComplete gets set as soon as the initial API call to build out the video
+                // instance has finished.
                 if (!this.model.get('isComplete')) {
                     setTimeout(function() { that.waitUntilVideoIsComplete(callback); }, 100);
                 } else {
