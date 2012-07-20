@@ -73,15 +73,6 @@ class TestSubtitleVersion(TestCase):
         self.sl_en = SubtitleLanguage(video=self.video, language_code='en')
         self.sl_en.save()
 
-        self.sl_fr = SubtitleLanguage(video=self.video, language_code='fr')
-        self.sl_fr.save()
-
-        self.sl_de = SubtitleLanguage(video=self.video, language_code='de')
-        self.sl_de.save()
-
-        self.sl_cy = SubtitleLanguage(video=self.video, language_code='cy')
-        self.sl_cy.save()
-
     def test_create_subtitle_version(self):
         sv = self.sl_en.add_version(title='title a', description='desc a',
                                     subtitles=[{}])
@@ -95,6 +86,22 @@ class TestSubtitleVersion(TestCase):
         self.assertEqual(sv.description, 'desc a')
         self.assertEqual(sv.subtitles, [{}])
         self.assertEqual(sv.visibility, 'public')
+
+class TestHistory(TestCase):
+    def setUp(self):
+        self.video = make_video()
+
+        self.sl_en = SubtitleLanguage(video=self.video, language_code='en')
+        self.sl_en.save()
+
+        self.sl_fr = SubtitleLanguage(video=self.video, language_code='fr')
+        self.sl_fr.save()
+
+        self.sl_de = SubtitleLanguage(video=self.video, language_code='de')
+        self.sl_de.save()
+
+        self.sl_cy = SubtitleLanguage(video=self.video, language_code='cy')
+        self.sl_cy.save()
 
     def test_linear_parents(self):
         sv1 = self.sl_en.add_version()
@@ -176,7 +183,6 @@ class TestSubtitleVersion(TestCase):
         self.assertEqual(f2.lineage, {'en': 1, 'fr': 1})
         self.assertEqual(f3.lineage, {'en': 3, 'fr': 2})
         self.assertEqual(f4.lineage, {'en': 3, 'fr': 3})
-
 
     def test_tangled_history(self):
         # en fr de cy

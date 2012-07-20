@@ -123,13 +123,24 @@ class SubtitleLanguage(models.Model):
         return super(SubtitleLanguage, self).save(*args, **kwargs)
 
 
+    def get_tip(self):
+        """Return the tipmost version of this language (if any)."""
+
+        versions = self.subtitleversion_set.order_by('-version_number')[:1]
+
+        if versions:
+            return versions[0]
+        else:
+            return None
+
+
     def add_version(self, *args, **kwargs):
         """Add a SubtitleVersion to the tip of this language.
 
         Does not check any writelocking -- you need to do that yourself.
 
         It will run its reads/writes in a transaction, so the results should be
-        fairly sane.
+        fairly sane regardless of whether it succeeds.
 
         """
         with transaction.commit_on_success():
@@ -137,18 +148,15 @@ class SubtitleLanguage(models.Model):
             kwargs['language_code'] = self.language_code
             kwargs['video'] = self.video
 
-            last_version = list(
-                self.subtitleversion_set.order_by('-version_number')[:1])
-            last_version = last_version[0] if last_version else None
+            tip = self.get_tip()
 
-            version_number = ((last_version.version_number + 1)
-                              if last_version else 1)
+            version_number = ((tip.version_number + 1) if tip else 1)
             kwargs['version_number'] = version_number
 
             parents = kwargs.pop('parents', [])
 
-            if last_version:
-                parents.append(last_version)
+            if tip:
+                parents.append(tip)
 
             kwargs['lineage'] = get_lineage(parents)
 
@@ -291,4 +299,5 @@ class SubtitleVersion(models.Model):
             return [version] + list(mapcat(_ancestors, version.parents.all()))
 
         return set(mapcat(_ancestors, self.parents.all()))
+
 
