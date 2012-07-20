@@ -193,14 +193,13 @@ def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
                 celeryd_start_cmd="",
                 celeryd_stop_cmd="",
                 celeryd_bounce_cmd="",
-                web_dir=None,
-                deploy_lock=""):
+                web_dir=None):
     env.user = username
     env.web_hosts = hosts
     env.hosts = []
     env.hostnames_squid_cache = hostnames_squid_cache
     env.s3_bucket = s3_bucket
-    env.deploy_lock = deploy_lock
+    env.deploy_lock = '/tmp/.unisubs_deploy_dev'.format(git_branch)
     env.web_dir = web_dir or '/var/www/{0}'.format(installation_dir)
     env.static_dir = static_dir
     env.installation_name = name
@@ -224,7 +223,6 @@ def staging(username):
                                              'staging.amara.org'
                                              ],
                     s3_bucket             = 's3.staging.universalsubtitles.org',
-                    deploy_lock       = '/tmp/.unisubs_deploy_staging',
                     installation_dir      = 'universalsubtitles.staging',
                     static_dir            = '/var/static/staging',
                     name                  = 'staging',
@@ -247,7 +245,6 @@ def dev(username):
                                              'dev.amara.org'
                                              ],
                     s3_bucket             = None,
-                    deploy_lock       = '/tmp/.unisubs_deploy_dev',
                     installation_dir      = 'universalsubtitles.dev',
                     static_dir            = '/var/www/universalsubtitles.dev',
                     name                  = 'dev',
@@ -278,7 +275,6 @@ def production(username):
                                              'amara.org'
                                              ],
                     s3_bucket             = 's3.www.universalsubtitles.org',
-                    deploy_lock           = '/tmp/.unisubs_deploy_production',
                     installation_dir      = 'universalsubtitles',
                     static_dir            = '/var/static/production',
                     name                  =  None,
@@ -301,7 +297,6 @@ def temp(username):
                                              'tmp.amara.org'
                                              ],
                     s3_bucket             = 's3.temp.universalsubtitles.org',
-                    deploy_lock           = '/tmp/.unisubs_deploy_temp',
                     installation_dir      = 'universalsubtitles.staging',
                     static_dir            = '/var/static/tmp',
                     name                  = 'staging',
@@ -324,7 +319,6 @@ def nf(username):
                                              'nf.amara.org'
                                              ],
                     s3_bucket             = 's3.nf.universalsubtitles.org',
-                    deploy_lock           = '/tmp/.unisubs_deploy_nf',
                     installation_dir      = 'universalsubtitles.nf',
                     static_dir            = '/var/static/nf',
                     name                  = 'nf',
