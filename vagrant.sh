@@ -5,6 +5,8 @@ cd /tmp
 # install git
 sudo apt-get update 2>&1 > /dev/null
 sudo apt-get -y install git-core 2>&1 > /dev/null
+# create the env file
+echo "environments:\n  - localdev\n" > /etc/system_environments.yml
 # clone the puppet modules
 git clone https://github.com/pculture/amara-puppet 2>&1 > /dev/null
 if [ "$1" != "" ]; then
