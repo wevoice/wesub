@@ -322,6 +322,29 @@ class ViewsTests(TestCase):
         self.assertEqual(get_team_video().team.pk, old_team.pk,
                          "Video did not stay in the old team.")
 
+    def test_team_permission(self):
+        team = Team(slug="private-team", name="Private Team", is_visible=False)
+        team.save()
+
+        user, created = User.objects.get_or_create(
+           username=self.auth["username"])
+
+        TeamMember.objects.create_first_member(team, user)
+
+        for video in Video.objects.all()[0:4]:
+            self._create_team_video(video.get_video_url(), team, user)
+
+            url = reverse("videos:video", kwargs={"video_id": video.video_id})
+
+            response = self.client.get(url, follow=True)
+            self.assertEqual(response.status_code, 403)
+
+            self.client.login(**self.auth)
+
+            response = self.client.get(url, follow=True)
+            self.assertEquals(response.status_code, 200)
+
+            self.client.logout()
 
     def _create_team_video(self, video_url, team, user):
         v, c = Video.get_or_create_for_url(video_url)

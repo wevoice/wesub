@@ -1423,23 +1423,23 @@ class TestFeedsSubmit(TestCase):
         feedparser._open_resource = base_open_resource
 
 
-class BrightcoveVideoTypeTest(TestCase):
-    def setUp(self):
-        self.vt = BrightcoveVideoType
+#class BrightcoveVideoTypeTest(TestCase):
+    #def setUp(self):
+        #self.vt = BrightcoveVideoType
 
-    def test_type(self):
-        url  = 'http://link.brightcove.com/services/player/bcpid955357260001?bckey=AQ~~,AAAA3ijeRPk~,jc2SmUL6QMyqTwfTFhUbWr3dg6Oi980j&bctid=956115196001'
-        video, created = Video.get_or_create_for_url(url)
-        vu = video.videourl_set.all()[:1].get()
-        self.assertTrue(vu.type ==  VIDEO_TYPE_BRIGHTCOVE == BrightcoveVideoType.abbreviation)
-        self.assertTrue(self.vt.video_url(vu))
-        self.assertTrue(self.vt.matches_video_url(url))
+    #def test_type(self):
+        #url  = 'http://link.brightcove.com/services/player/bcpid955357260001?bckey=AQ~~,AAAA3ijeRPk~,jc2SmUL6QMyqTwfTFhUbWr3dg6Oi980j&bctid=956115196001'
+        #video, created = Video.get_or_create_for_url(url)
+        #vu = video.videourl_set.all()[:1].get()
+        #self.assertTrue(vu.type ==  VIDEO_TYPE_BRIGHTCOVE == BrightcoveVideoType.abbreviation)
+        #self.assertTrue(self.vt.video_url(vu))
+        #self.assertTrue(self.vt.matches_video_url(url))
 
-    def test_redirection(self):
-        url  = 'http://bcove.me/7fa5828z'
-        vt = video_type_registrar.video_type_for_url(url)
-        self.assertTrue(vt)
-        self.assertEqual(vt.video_id, '956115196001')
+    #def test_redirection(self):
+        #url  = 'http://bcove.me/7fa5828z'
+        #vt = video_type_registrar.video_type_for_url(url)
+        #self.assertTrue(vt)
+        #self.assertEqual(vt.video_id, '956115196001')
 
 
 class TestTasks(TestCase):
