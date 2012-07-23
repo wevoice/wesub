@@ -585,6 +585,7 @@ class InviteForm(forms.Form):
         })
 
         notifier.team_invitation_sent.delay(invite.pk)
+        return invite
 
 class ProjectForm(forms.ModelForm):
     class Meta:
