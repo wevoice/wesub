@@ -831,7 +831,7 @@ class Rpc(BaseRpc):
 
             return (UNMODERATED, False) if not workflow.allows_tasks else (WAITING_MODERATION, False)
 
-        if not workflow.allow_tasks:
+        if not workflow.allows_tasks:
             return UNMODERATED, False
         elif sl.has_version:
             # If there are already active subtitles for this language, we're
