@@ -4,13 +4,13 @@
 #
 # Translators:
 #   <nat.strife@gmail.com>, 2012.
-# Zulhilmi Rosnin <zulhilmi.rosnin@gmail.com>, 2011.
+# Zulhilmi Rosnin <zulhilmi.rosnin@gmail.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-19 01:46-0500\n"
-"PO-Revision-Date: 2012-07-18 06:53+0000\n"
+"POT-Creation-Date: 2012-07-23 01:47-0500\n"
+"PO-Revision-Date: 2012-07-20 06:50+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Malay (http://www.transifex.com/projects/p/universalsubtitles/"
 "language/ms/)\n"
@@ -1533,7 +1533,7 @@ msgstr ""
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr ""
 
-#: apps/videos/views.py:160
+#: apps/videos/views.py:161
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1541,40 +1541,40 @@ msgid ""
 "improve subtitles, click the button below the video."
 msgstr ""
 
-#: apps/videos/views.py:168
+#: apps/videos/views.py:169
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr ""
 
-#: apps/videos/views.py:173
+#: apps/videos/views.py:174
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr ""
 
-#: apps/videos/views.py:282
+#: apps/videos/views.py:283
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr ""
 
-#: apps/videos/views.py:284
+#: apps/videos/views.py:285
 msgid "Your changes have been saved."
 msgstr ""
 
-#: apps/videos/views.py:635
+#: apps/videos/views.py:636
 msgid "You have not permission change this URL"
 msgstr ""
 
-#: apps/videos/views.py:641 apps/videos/views.py:661
+#: apps/videos/views.py:642 apps/videos/views.py:662
 msgid "Object does not exist"
 msgstr ""
 
-#: apps/videos/views.py:654
+#: apps/videos/views.py:655
 msgid "You have not permission delete this URL"
 msgstr ""
 
-#: apps/videos/views.py:657
+#: apps/videos/views.py:658
 msgid "You cann't remove original URL"
 msgstr ""
 
@@ -3803,31 +3803,32 @@ msgstr ""
 
 #: templates/faq.html:26 templates/faq.html.py:97
 msgid "How can I add subtitles to my video?"
-msgstr ""
+msgstr "Bagaimana "
 
 #: templates/faq.html:27 templates/faq.html.py:107
 msgid "What open source license do you use?"
-msgstr ""
+msgstr "Apakah lesen sumber terbuka yang diguna?"
 
 #: templates/faq.html:28 templates/faq.html.py:111
 msgid "I'm a developer, can I help out?"
-msgstr ""
+msgstr "Bolehkah saya membantu?"
 
 #: templates/faq.html:29 templates/faq.html.py:115
 msgid "Can non-technical people get involved with the project?"
-msgstr ""
+msgstr "Bolehkah seseorang yang tiada asas teknikal terlibat dalam projek ini?"
 
 #: templates/faq.html:30 templates/faq.html.py:126
 msgid "Do you accept donations? Are they tax deductible?"
-msgstr ""
+msgstr "Adakah kamu menerima sumbangan derma? Ada sebarang pemotongan cukai?"
 
 #: templates/faq.html:31 templates/faq.html.py:134
 msgid "What is your relationship with Mozilla Drumbeat?"
-msgstr ""
+msgstr "Apakah pertalian kamu dengan Mozilla Drumbeat?"
 
 #: templates/faq.html:32 templates/faq.html.py:138
 msgid "Where can I download subtitles in .SRT or other formats?"
 msgstr ""
+"Dimanakah saya boleh memuat turun sarikata dalam .SRT atau format yang lain?"
 
 #: templates/faq.html:33 templates/faq.html.py:149
 msgid ""
@@ -3837,7 +3838,7 @@ msgstr ""
 
 #: templates/faq.html:34 templates/faq.html.py:159
 msgid "Why can't I change the timing on a translation?"
-msgstr ""
+msgstr "Mengapakah saya tidak boleh ubah jangka masa pada terjemahan?"
 
 #: templates/faq.html:35 templates/faq.html.py:170
 msgid ""
@@ -3917,7 +3918,7 @@ msgstr ""
 #: templates/faq.html:83
 msgid ""
 "We will be working to support as many languages/charactersets as possible."
-msgstr ""
+msgstr "Kami akan cuba untuk menyokong sebanyak mana bahasa/aksara yang mampu."
 
 #: templates/faq.html:88
 msgid ""
@@ -3948,6 +3949,8 @@ msgid ""
 "For our subtitling widget and community website, we're using the <a href="
 "\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
 msgstr ""
+"Untuk widget sarikata dan laman komuniti, kami menggunakan lesen <a href="
+"\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
 
 #: templates/faq.html:112
 msgid ""
@@ -4070,24 +4073,28 @@ msgid ""
 "Thanks for getting in touch! We love hearing your ideas, bugs, feedback, "
 "opinions and such."
 msgstr ""
+"Terima kasih kerana sudi melawat. Kami suka untuk mendengar idea, "
+"maklumbalas, pandangan dan sebagainya."
 
 #: templates/feedback_response.html:6
 msgid "Stay tuned as the project evolves!"
-msgstr ""
+msgstr "Teruskan bersama kami!"
 
 #: templates/feedback_response.html:9
 msgid "Announcement Signup"
-msgstr ""
+msgstr "Pengumuman Pendaftaran"
 
 #: templates/feedback_response.html:12
 msgid "Best"
-msgstr ""
+msgstr "Bagus"
 
 #: templates/feedback_response.html:16
 msgid ""
 "PS. We do our best to respond to all questions, but please be patient -- we "
 "get a lot of email"
 msgstr ""
+"PS. Kami cuba yang terbaik untuk membalas semua soalan, tapi harap bersabar "
+"-- kami dapat terlalu banyak emel"
 
 #: templates/index.html:18
 msgid "The easiest way to caption and translate any video."
@@ -4422,15 +4429,15 @@ msgstr ""
 
 #: templates/index_old.html:170 templates/jsdemo/home.html:112
 msgid "Mozilla will double your donation!"
-msgstr ""
+msgstr "Mozilla akan menggandakan sumbangan derma kamu."
 
 #: templates/index_old.html:171 templates/jsdemo/home.html:113
 msgid "We're a featured Mozilla Drumbeat project!"
-msgstr ""
+msgstr "Kami adalah projek tumpuan Mozilla Drumbeat!"
 
 #: templates/index_old.html:172 templates/jsdemo/home.html:113
 msgid "Donate Now"
-msgstr ""
+msgstr "Derma Sekarang"
 
 #: templates/opensubtitles2010.html:8 templates/opensubtitles2010.html:26
 msgid "Open Subtitles Design Summit"
@@ -4654,71 +4661,80 @@ msgstr ""
 
 #: templates/jsdemo/home.html:16
 msgid "Subtitles and Captions for Every Video on the Web"
-msgstr ""
+msgstr "Sarikata dan Sisipan untuk Setiap Video di Internet"
 
 #: templates/jsdemo/home.html:19
 msgid "The Problem"
-msgstr ""
+msgstr "Permasalahan"
 
 #: templates/jsdemo/home.html:19
 msgid ""
 "Web video is beginning to rival television, but there isn't a good open "
 "resource for subtitling."
 msgstr ""
+"Video internet mula menjadi tumpuan, tetapi tiada sumber yang bagus untuk "
+"sarikata."
 
 #: templates/jsdemo/home.html:21
 msgid "Our Mission"
-msgstr ""
+msgstr "Misi Kami"
 
 #: templates/jsdemo/home.html:21
 msgid ""
 "We're trying to make captioning, subtitling, and translating video publicly "
 "accessible in a way that's free and open, just like the Web."
 msgstr ""
+"Kami cuba untuk membuat sisipan, sarikata dan penterjemahan video secara "
+"terbuka dan boleh dicapai secara percuma dan bebas, seperti Internet."
 
 #: templates/jsdemo/home.html:21
 msgid "Learn More"
-msgstr ""
+msgstr "Keterangan Lanjut"
 
 #: templates/jsdemo/home.html:24
 msgid "Right now"
-msgstr ""
+msgstr "Buat masa sekarang"
 
 #: templates/jsdemo/home.html:24
 msgid "we're in an alpha stage, building and testing. You can help!"
 msgstr ""
+"kami sedang dalam peringkat alpha, membina dan mencuba. Anda boleh membantu!"
 
 #: templates/jsdemo/home.html:25 templates/videos/create.html:31
 msgid "Try our demo"
-msgstr ""
+msgstr "Cuba demonstrasi kami"
 
 #: templates/jsdemo/home.html:25
 msgid "Become a tester"
-msgstr ""
+msgstr "Jadi seorang penguji"
 
 #: templates/jsdemo/home.html:31
 msgid "Subtitle Widget"
-msgstr ""
+msgstr "Widget Sarikata"
 
 #: templates/jsdemo/home.html:32
 msgid ""
 "A simple way to create and add captions to almost any video on the web "
 "(without having to transcode or re-upload videos)."
 msgstr ""
+"Cara mudah untuk mencipta dan meletakkan sisipan pada sebarang video di "
+"internet ( tanpa perlu transkod atau memuatnaik video sedia ada)"
 
 #: templates/jsdemo/home.html:35
 msgid "Community Site"
-msgstr ""
+msgstr "Laman Komuniti"
 
 #: templates/jsdemo/home.html:36
 msgid ""
 "An online community for collaboratively subtitling and translating the "
 "world's videos (like a Wikipedia for subtitles)."
 msgstr ""
+"Sebuah laman komuniti untuk bersama-sama melakukan sarikata dan menterjemah "
+"segala video di dunia maya ( seperti Wikipedia untuk sarikata)."
 
 #: templates/jsdemo/home.html:39
 msgid "Subtitle Lookup Protocol"
-msgstr ""
+msgstr "Protokol Carian Sarikata"
 
 #: templates/jsdemo/home.html:40
 msgid ""
@@ -4729,30 +4745,31 @@ msgstr ""
 #: templates/jsdemo/home.html:50
 msgid "Get updates and find out first when we launch"
 msgstr ""
+"Dapatkan maklumat terkini dan menjadi yang pertama tahu bila kami dilancarkan"
 
 #: templates/jsdemo/home.html:55
 msgid "Get Updates!"
-msgstr ""
+msgstr "Dapatkan Maklumat Terkini!"
 
 #: templates/jsdemo/home.html:60
 msgid "Please enter a valid email address"
-msgstr ""
+msgstr "Masukkan alamat emel yang sah"
 
 #: templates/jsdemo/home.html:93
 msgid "Please enter your email address."
-msgstr ""
+msgstr "Masukkan alamat emel"
 
 #: templates/jsdemo/home.html:121
 msgid "Check out the widget"
-msgstr ""
+msgstr "Lihat widget"
 
 #: templates/jsdemo/home.html:122
 msgid "Test our subtitling widget"
-msgstr ""
+msgstr "Cuba widget sarikata kami"
 
 #: templates/jsdemo/home.html:122
 msgid "Try the Demo"
-msgstr ""
+msgstr "Uji demo kami"
 
 #: templates/livesettings/site_settings.html:48
 msgid "Documentation"
@@ -5741,11 +5758,11 @@ msgstr[0] ""
 #, python-format
 msgid ""
 "\n"
-"                            1 open task\n"
+"                            1 task\n"
 "                        "
 msgid_plural ""
 "\n"
-"                            %(counter)s open tasks\n"
+"                            %(counter)s tasks\n"
 "                        "
 msgstr[0] ""
 

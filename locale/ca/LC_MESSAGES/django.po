@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-19 01:43-0500\n"
-"PO-Revision-Date: 2012-07-18 06:53+0000\n"
+"POT-Creation-Date: 2012-07-23 01:44-0500\n"
+"PO-Revision-Date: 2012-07-20 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/ca/)\n"
@@ -1632,7 +1632,7 @@ msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr ""
 "S'ha trobat una versió d'aquest vídeo amb subtítols en %(language_name)s"
 
-#: apps/videos/views.py:160
+#: apps/videos/views.py:161
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1643,7 +1643,7 @@ msgstr ""
 "el vídeo amb els amics, o aconseguir el codi incrustable per al vostre web.\n"
 "Per a afegir o millorar els subtítols, premeu el botó a sota el vídeo."
 
-#: apps/videos/views.py:168
+#: apps/videos/views.py:169
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
@@ -1652,34 +1652,34 @@ msgstr ""
 "Heu enviat un vídeo que s'oferix mitjançant http. El vostre navegador pot "
 "mostrar alertes de contingut mixt."
 
-#: apps/videos/views.py:173
+#: apps/videos/views.py:174
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Els subtítols que ja existeixen seran importats en pocs minuts."
 
-#: apps/videos/views.py:282
+#: apps/videos/views.py:283
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr ""
 "Gràcies per pujar. Trigarà uns minuts fins que apareguen els subtítols."
 
-#: apps/videos/views.py:284
+#: apps/videos/views.py:285
 msgid "Your changes have been saved."
 msgstr "Els vostres canvis han estat desats."
 
-#: apps/videos/views.py:635
+#: apps/videos/views.py:636
 msgid "You have not permission change this URL"
 msgstr "No teniu permís per a canviar aquest URL"
 
-#: apps/videos/views.py:641 apps/videos/views.py:661
+#: apps/videos/views.py:642 apps/videos/views.py:662
 msgid "Object does not exist"
 msgstr "No existeix l'objecte"
 
-#: apps/videos/views.py:654
+#: apps/videos/views.py:655
 msgid "You have not permission delete this URL"
 msgstr "No teniu permís per a eliminar aquest URL"
 
-#: apps/videos/views.py:657
+#: apps/videos/views.py:658
 msgid "You cann't remove original URL"
 msgstr "No podeu eliminar la URL original"
 
@@ -3032,6 +3032,73 @@ msgid ""
 "            </p>\n"
 "        "
 msgstr ""
+"\n"
+"<h2>Quant a Amara</h2>\n"
+"\n"
+"<p>\n"
+"Amara dona la possibilitat a persones, comunitats i grans organitzacions "
+"l'accessibilitat i eliminació de barreres als vídeos en línia. Aquestes "
+"eines són gratuïtes i de codi obert i fan del subtitulat i la traducció de "
+"vídeo, un treball més simple, atractiu i sobretot més col·laborador.\n"
+"</p>\n"
+"<p>\n"
+"Els beneficis d'etiquetar i subtitular són enormes:\n"
+"<ul>\n"
+"<li>Els etiquetats fan els vídeos accessibles als espectadors sords o amb "
+"deficiència auditiva</li>\n"
+"<li>Les traduccions permeten a tots nosaltres vorer vídeos en idiomes que no "
+"entenem</li>\n"
+"<li>Els creadors de vídeo obtenen: Millor posicionament als cercadors, més "
+"espectadors, accés a una major (potencialment multilingüe i global) "
+"audiència, accessibilitat per a sords i espectadors amb deficiència "
+"auditiva, i més coses</li>\n"
+"</ul>\n"
+"</p>\n"
+"\n"
+"<p>\n"
+"Amara està formada principalment per tres parts:\n"
+"<ul>\n"
+"<li>Una eina per a crear i visualitzar subtítols (giny)</li>\n"
+"<li>Una web de subtitulat col·laboradora</li>\n"
+"<li>Un protocol obert de recerca i lliurament de subtítols</li>\n"
+"</ul>\n"
+"</p>\n"
+"\n"
+"<p>\n"
+"Qualssevol cosa que fem esta disponible sota la llicència de codi obert <a "
+"href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a>.\n"
+"</p>\n"
+"<h2>La nostra Organització</h2>\n"
+"\n"
+"<p>\n"
+"<a href=\"http://www.pculture.org/\">Fundació Participatory Culture</a> és "
+"una organització sense ànim de lucre amb eines gratuïtes i obertes per a un "
+"sistema multimèdia més democràtic i descentralitzat. Altres dels nostres "
+"projectes inclouen <a href=\"http://www.getmiro.com/\">Miro</a>, \n"
+"<a href=\"http://www.mirovideoconverter.com/\">Conversor de vídeo Miro</a>,\n"
+"<a href=\"http://www.mirocommunity.org/\">Comunitat Miro</a>, and \n"
+"<a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n"
+"</p>\n"
+"\n"
+"<p>\n"
+"Amara està involucrat al projecte <a href=\"http://www.drumbeat.org/"
+"\">Mozilla Drumbeat</a>, \n"
+"i la Fundació Mozilla ha donat suport de desenvolupament.\n"
+"L'Institut Open Society i la Fundació MacArthur també han donat suport "
+"financer.\n"
+"</p>\n"
+"\n"
+"<h2>Editors i serveis empresarials</h2>\n"
+"<p>\n"
+"Amara ofereix un conjunt de serveis i eines professionals que permeten als "
+"editors i les plataformes de vídeo crear i gestionar subtítols amb una alta "
+"qualitat. Amb Amara, podeu construir una comunitat de voluntaris que "
+"subtitulen el vostre contingut, integrar-ho amb serveis professionals, i fer "
+"ús d'un sistema de control potent i de qualitat. Per a conèixer més sobre "
+"aquesta eina, visiteu els nostres  <a href=\"http://www.universalsubtitles."
+"org/en/enterprise/\">serveis per a empreses</a>  i contacteu amb Dean "
+"Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
+"</p>"
 
 #: templates/base.html:9
 msgid ""
@@ -3061,7 +3128,7 @@ msgstr "Ajuda"
 
 #: templates/base.html:78
 msgid "Sign in / Sign up"
-msgstr ""
+msgstr "Autenticar-se / Registrar-se"
 
 #: templates/base.html:102
 msgid ""
@@ -6553,18 +6620,14 @@ msgstr[1] ""
 #, python-format
 msgid ""
 "\n"
-"                            1 open task\n"
+"                            1 task\n"
 "                        "
 msgid_plural ""
 "\n"
-"                            %(counter)s open tasks\n"
+"                            %(counter)s tasks\n"
 "                        "
 msgstr[0] ""
-"\n"
-"1 tasca oberta"
 msgstr[1] ""
-"\n"
-"%(counter)s tasques obertes"
 
 #: templates/teams/_team_video_detail.html:52
 #: templates/teams/members-list.html:119
@@ -7315,7 +7378,7 @@ msgstr "Aquest vídeo està moderant-se per l'equip"
 
 #: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
 msgid "Your Teams"
-msgstr ""
+msgstr "Els vostres equips"
 
 #: templates/teams/teams-list.html:18
 msgid "Team Directory"
@@ -7327,7 +7390,7 @@ msgstr "Ordenat per"
 
 #: templates/teams/teams-list.html:64
 msgid "Your team"
-msgstr ""
+msgstr "El vostre equip"
 
 #: templates/teams/teams-list.html:67
 msgid "Private"

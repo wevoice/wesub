@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-19 01:47-0500\n"
-"PO-Revision-Date: 2012-07-18 06:53+0000\n"
+"POT-Creation-Date: 2012-07-23 01:48-0500\n"
+"PO-Revision-Date: 2012-07-20 06:50+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/sq/)\n"
@@ -1634,7 +1634,7 @@ msgstr "Hej-- sapo u gjetën titra në %(language)s për %(video_title)s: %(url)
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "Sapo u gjet një version i kësaj video me titra në %(language_name)s"
 
-#: apps/videos/views.py:160
+#: apps/videos/views.py:161
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1646,7 +1646,7 @@ msgstr ""
 "shtim ose\n"
 "përmirësim titrash, klikoni butonin nën videon."
 
-#: apps/videos/views.py:168
+#: apps/videos/views.py:169
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
@@ -1656,11 +1656,11 @@ msgstr ""
 "                që shërbehet përmes protokollit http.  Shfletuesi juaj mund\n"
 "                të shfaqë sinjalizime jo të qarta mbi lëndën."
 
-#: apps/videos/views.py:173
+#: apps/videos/views.py:174
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Titrat e tanishëm do të importohen brenda pak minutash."
 
-#: apps/videos/views.py:282
+#: apps/videos/views.py:283
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
@@ -1668,23 +1668,23 @@ msgstr ""
 "Faleminderit për ngarkimin. Do të kalojë një minutë e ca, para se titrat të "
 "duken."
 
-#: apps/videos/views.py:284
+#: apps/videos/views.py:285
 msgid "Your changes have been saved."
 msgstr "Rregullimet tuaja u ruajtën."
 
-#: apps/videos/views.py:635
+#: apps/videos/views.py:636
 msgid "You have not permission change this URL"
 msgstr "Nuk keni leje për ndryshimin e kësaj URL-je"
 
-#: apps/videos/views.py:641 apps/videos/views.py:661
+#: apps/videos/views.py:642 apps/videos/views.py:662
 msgid "Object does not exist"
 msgstr "Objekti nuk ekziston"
 
-#: apps/videos/views.py:654
+#: apps/videos/views.py:655
 msgid "You have not permission delete this URL"
 msgstr "Nuk keni leje për fshirjen e kësaj URL-je"
 
-#: apps/videos/views.py:657
+#: apps/videos/views.py:658
 msgid "You cann't remove original URL"
 msgstr "Nuk mund të hiqni URL-në origjinale"
 
@@ -6043,20 +6043,14 @@ msgstr[1] ""
 #, python-format
 msgid ""
 "\n"
-"                            1 open task\n"
+"                            1 task\n"
 "                        "
 msgid_plural ""
 "\n"
-"                            %(counter)s open tasks\n"
+"                            %(counter)s tasks\n"
 "                        "
 msgstr[0] ""
-"\n"
-"                            1 punë e hapur\n"
-"                        "
 msgstr[1] ""
-"\n"
-"                            %(counter)s punë të hapura\n"
-"                        "
 
 #: templates/teams/_team_video_detail.html:52
 #: templates/teams/members-list.html:119

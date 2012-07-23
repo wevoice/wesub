@@ -451,7 +451,7 @@ class SrtSubtitleParser(SubtitleParser):
         pattern += r'\n(\n|(?P<text>.+?)\n\n)'
         super(SrtSubtitleParser, self).__init__(subtitles, pattern, [re.DOTALL])
         #replace \r\n to \n and fix end of last subtitle
-        self.subtitles = self.subtitles.replace('\r\n', '\n')+u'\n\n'
+        self.subtitles = self.subtitles.replace('\r\n', '\n')+'\n\n'
 
     def _get_time(self, hour, min, sec, secfr):
         if secfr is None:

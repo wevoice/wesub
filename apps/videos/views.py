@@ -58,6 +58,7 @@ from videos.tasks import video_changed_tasks
 from videos.search_indexes import VideoIndex
 import datetime
 from videos.decorators import get_video_revision, get_video_from_code
+from apps.teams.models import Task
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -733,9 +734,11 @@ def video_debug(request, video_id):
         "get_video_languages_verbose": cache.get(vc._video_languages_verbose_key(vid)),
         "writelocked_langs": cache.get(vc._video_writelocked_langs_key(vid)),
     }
+    tasks = Task.objects.filter(team_video=video)
     return render_to_response("videos/video_debug.html", {
             'video':video,
             'lang_info': lang_info,
+            'tasks': tasks,
             "cache": cache
     }, context_instance=RequestContext(request))
 
