@@ -323,6 +323,9 @@ class TaskCreateForm(ErrorableModelForm):
     assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
     def __init__(self, user, team, team_video, *args, **kwargs):
+        non_display_form = False
+        if kwargs.get('non_display_form'):
+            non_display_form = kwargs.pop('non_display_form')
         super(TaskCreateForm, self).__init__(*args, **kwargs)
 
         self.user = user
@@ -336,6 +339,8 @@ class TaskCreateForm(ErrorableModelForm):
         self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
+        if non_display_form:
+            self.fields['type'].choices = Task.TYPE_CHOICES
 
     def _check_task_creation_subtitle(self, tasks, cleaned_data):
         if self.team_video.subtitles_finished():
@@ -394,6 +399,8 @@ class TaskCreateForm(ErrorableModelForm):
 
         {'Subtitle': self._check_task_creation_subtitle,
          'Translate': self._check_task_creation_translate,
+         'Review': lambda x, y: x,
+         'Approve': lambda x, y: x
         }[type_name](existing_tasks, cd)
 
         return cd

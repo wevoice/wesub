@@ -1293,6 +1293,7 @@ class Workflow(models.Model):
         """Return wheter we can create tasks for a given workflow."""
         return self.approve_enabled or self.review_enabled
 
+
 # Tasks
 class TaskManager(models.Manager):
     def not_deleted(self):

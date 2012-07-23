@@ -563,8 +563,9 @@ class Rpc(BaseRpc):
         actual subtitles remain the same.
 
         """
-        for s in source_version.subtitle_set.all():
-            s.duplicate_for(dest_version).save()
+        if source_version:
+            for s in source_version.subtitle_set.all():
+                s.duplicate_for(dest_version).save()
 
     def _get_new_version_for_save(self, subtitles, language, session, user, forked, new_title, new_description, save_for_later=None):
         """Return a new subtitle version for this save, or None if not needed."""
@@ -572,12 +573,15 @@ class Rpc(BaseRpc):
         new_version = None
         previous_version = language.latest_version(public_only=False)
 
-        title_changed = (previous_version
-                         and new_title is not None
-                         and new_title != previous_version.title)
-        desc_changed = (previous_version
-                        and new_description is not None
-                        and new_description != previous_version.description)
+        if previous_version:
+            title_changed = (new_title is not None
+                             and new_title != previous_version.title)
+            desc_changed = (new_description is not None
+                            and new_description != previous_version.description)
+        else:
+            title_changed = new_title is not None
+            desc_changed = new_description is not None
+
         subtitles_changed = (
             subtitles is not None
             and (len(subtitles) > 0 or previous_version is not None)
@@ -749,7 +753,7 @@ class Rpc(BaseRpc):
             task.review_base_version = subtitle_version
 
         task.save()
-
+        
     def _moderate_incomplete_version(self, subtitle_version, user):
         """ Verifies if it's possible to create a transcribe/translate task (if there's
         no other transcribe/translate task) and tries to assign to user.
