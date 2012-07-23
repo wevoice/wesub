@@ -485,14 +485,14 @@ class TaskDeleteForm(forms.Form):
         return task
 
 class GuidelinesMessagesForm(forms.Form):
-    messages_invite = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    messages_manager = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    messages_admin = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    messages_application = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    messages_invite = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    messages_manager = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    messages_admin = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    messages_application = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
 
-    guidelines_subtitle = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    guidelines_translate = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    guidelines_review = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    guidelines_subtitle = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    guidelines_translate = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    guidelines_review = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
 
 class RenameableSettingsForm(forms.ModelForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
