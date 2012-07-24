@@ -27,6 +27,8 @@ from haystack.indexes import (
 from haystack.query import SearchQuerySet
 from teams import models
 
+from haystack.exceptions import AlreadyRegistered
+
 
 LANGUAGES_DICT = dict(settings.ALL_LANGUAGES)
 
@@ -147,4 +149,9 @@ class TeamVideoLanguagesIndex(SearchIndex):
         return SearchQuerySet().models(models.TeamVideo).filter(is_public=True)
 
 
-site.register(models.TeamVideo, TeamVideoLanguagesIndex)
+try:
+    site.register(models.TeamVideo, TeamVideoLanguagesIndex)
+except AlreadyRegistered:
+    # i hate python imports with all my will.
+    # i hope they die.
+    pass
