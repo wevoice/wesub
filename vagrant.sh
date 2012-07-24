@@ -6,12 +6,18 @@ cd /tmp
 sudo apt-get update 2>&1 > /dev/null
 sudo apt-get -y install git-core 2>&1 > /dev/null
 # create the env file
-echo "environments:\n  - localdev\n" > /etc/system_environments.yml
+echo "environments:\n  - vagrant\n" > /etc/system_environments.yml
+echo "roles:\n  - vagrant\n" > /etc/system_roles.yml
 # clone the puppet modules
 git clone https://github.com/pculture/amara-puppet 2>&1 > /dev/null
 if [ "$1" != "" ]; then
   echo "Checking out $1..."
   cd amara-puppet ; git checkout $1
+  cd ..
+else
+  # checkout production
+  echo "Checking out production..."
+  cd amara-puppet ; git checkout production
   cd ..
 fi
 
