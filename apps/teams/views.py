@@ -26,7 +26,10 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
+from django.http import (
+    Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse,
+    HttpResponseBadRequest, HttpResponseServerError
+)
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.utils import simplejson as json
@@ -837,13 +840,16 @@ def invite_members(request, slug):
 @login_required
 def accept_invite(request, invite_pk, accept=True):
     invite = get_object_or_404(Invite, pk=invite_pk, user=request.user)
-
     if accept:
-        invite.accept()
+        ok = invite.accept()
     else:
-        invite.deny()
-
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+        ok = invite.deny()
+    if ok:
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+    else:
+        return HttpResponseServerError(render_to_response("generic-error.html", {
+            "error_msg": _("This invite is no longer valid"),
+        }, RequestContext(request)))
 
 @login_required
 def join_team(request, slug):
