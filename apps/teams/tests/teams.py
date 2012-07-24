@@ -13,6 +13,7 @@ from django.test import TestCase
 from auth.models import CustomUser as User
 from apps.teams import tasks
 from apps.teams import moderation_const as MODERATION
+from apps.teams.forms import InviteForm
 from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
@@ -955,3 +956,60 @@ class TestLanguagePreference(TestCase):
 
         self.assertIn("en", generated)
         self.assertIn("en", cached)
+
+class TestInvites(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.filter(notify_by_message=True)[0]
+        self.user.set_password(self.user.username)
+        self.user.save()
+        self.owner = User.objects.filter(notify_by_message=True)[1]
+        self.team = Team.objects.create(name='test-team', slug='test-team', membership_policy=Team.APPLICATION)
+
+    def test_invite_invalid_after_accept(self):
+        invite_form = InviteForm(self.team, self.owner, {
+            'user_id': self.user.pk,
+            'message': 'Subtitle ALL the things!',
+            'role':'contributor',
+        })
+        invite_form.is_valid()
+        self.assertFalse(invite_form.errors)
+        self.assertEquals(Message.objects.for_user(self.user).count(), 0)
+        invite = invite_form.save()
+        # user has the invitation message on their inbox now
+        invite.accept()
+        self.assertTrue(self.team.members.filter(user=self.user).exists())
+        self.team.members.all().delete()
+        # now the invite re-accepts:
+        self.client.login(
+            username=self.user.username,
+            password=self.user.username
+        )
+        url = reverse("teams:accept_invite", args=(invite.pk,))
+        response  = self.client.get(url)
+        self.assertEqual(response.status_code, 500)
+        self.assertFalse(self.team.members.filter(user=self.user).exists())
+        
+    def test_invite_invalid_after_deny(self):
+        invite_form = InviteForm(self.team, self.owner, {
+            'user_id': self.user.pk,
+            'message': 'Subtitle ALL the things!',
+            'role':'contributor',
+        })
+        invite_form.is_valid()
+        self.assertFalse(invite_form.errors)
+        self.assertEquals(Message.objects.for_user(self.user).count(), 0)
+        invite = invite_form.save()
+        # user has the invitation message on their inbox now
+        invite.deny()
+        self.assertFalse(self.team.members.filter(user=self.user).exists())
+        # now the invite re-accepts:
+        url = reverse("teams:deny_invite", args=(invite.pk,))
+        self.client.login(
+            username=self.user.username,
+            password=self.user.username
+        )
+        response  = self.client.get(url)
+        self.assertEqual(response.status_code, 500)
+        self.assertFalse(self.team.members.filter(user=self.user).exists())
+        

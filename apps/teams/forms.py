@@ -558,7 +558,7 @@ class InviteForm(forms.Form):
         user_id = self.cleaned_data['user_id']
 
         try:
-            User.objects.get(id=user_id)
+            invited_user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             raise forms.ValidationError(_(u'User does not exist!'))
         except ValueError:
@@ -572,6 +572,15 @@ class InviteForm(forms.Form):
             raise forms.ValidationError(_(u'User is already a member of this team!'))
 
         self.user_id = user_id
+        # check if there is already an invite pending for this user:
+        try:
+            invite = Invite.objects.get(team=self.team, user=invited_user)
+            if invite.approved == False:
+                raise forms.ValidationError(_(u'User has already declined this invite.'))
+            if invite.approved == None:
+                raise forms.ValidationError(_(u'User has already been invited.'))
+        except Invite.DoesNotExist:
+            pass
         return user_id
 
 
