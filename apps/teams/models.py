@@ -1089,23 +1089,19 @@ class Invite(models.Model):
                                                            user=self.user,
                                                            role=self.role)
         notifier.team_member_new.delay(member.pk)
-        self.delete()
 
     def deny(self):
         """Deny this invitation.
 
-        Currently just deletes itself, but it could be useful to send
-        a notification here in the future.
+        Could be useful to send a notification here in the future.
 
         """
-        self.delete()
+        pass
 
 
     def message_json_data(self, data, msg):
         data['can-reply'] = False
         return data
-
-models.signals.pre_delete.connect(Message.on_delete, Invite)
 
 
 # Workflows
