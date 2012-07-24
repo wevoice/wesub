@@ -2550,10 +2550,12 @@ class TestSRT(WebUseTest, BaseDownloadTest):
                      'line *with* italycs',
                      'line <script> with dangerous tag',
                      'line with double gt >>',
+                     '*[inside brackets]*',
         ]
         add_subs(self.language,subs_data)
         content = self._download_subs(self.language, 'srt')
         self.assertIn('<b>with</b>' , content)
+        self.assertIn('<i>[inside brackets]</i>' , content)
         self.assertIn('<i>with</i>' , content)
         self.assertIn('double gt >>' , content)
         # don't let evildoes into our precisou home
