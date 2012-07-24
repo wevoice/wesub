@@ -20,7 +20,7 @@ import datetime
 import itertools
 
 from django.conf import settings
-from django.db import models, transaction
+from django.db import models
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
@@ -137,35 +137,34 @@ class SubtitleLanguage(models.Model):
     def add_version(self, *args, **kwargs):
         """Add a SubtitleVersion to the tip of this language.
 
-        Does not check any writelocking -- you need to do that yourself.
+        You probably don't need this.  You probably want
+        apps.subtitles.pipeline.add_subtitles instead.
 
-        It will run its reads/writes in a transaction, so the results should be
-        fairly sane regardless of whether it succeeds.
+        Does not check any writelocking -- that's up to the pipeline.
 
         """
-        with transaction.commit_on_success():
-            kwargs['subtitle_language'] = self
-            kwargs['language_code'] = self.language_code
-            kwargs['video'] = self.video
+        kwargs['subtitle_language'] = self
+        kwargs['language_code'] = self.language_code
+        kwargs['video'] = self.video
 
-            tip = self.get_tip()
+        tip = self.get_tip()
 
-            version_number = ((tip.version_number + 1) if tip else 1)
-            kwargs['version_number'] = version_number
+        version_number = ((tip.version_number + 1) if tip else 1)
+        kwargs['version_number'] = version_number
 
-            parents = kwargs.pop('parents', [])
+        parents = kwargs.pop('parents', [])
 
-            if tip:
-                parents.append(tip)
+        if tip:
+            parents.append(tip)
 
-            kwargs['lineage'] = get_lineage(parents)
+        kwargs['lineage'] = get_lineage(parents)
 
-            sv = SubtitleVersion(*args, **kwargs)
-            sv.save()
+        sv = SubtitleVersion(*args, **kwargs)
+        sv.save()
 
-            if parents:
-                for p in parents:
-                    sv.parents.add(p)
+        if parents:
+            for p in parents:
+                sv.parents.add(p)
 
         return sv
 
