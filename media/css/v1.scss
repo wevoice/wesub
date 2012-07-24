@@ -2076,6 +2076,25 @@ a.truncated-expand {
     clear: both;
     padding-top: 2em;
 }
+#teams div.join div#apply-modal {
+    div.modal-body {
+        div.message {
+            max-height: 235px;
+            overflow: scroll;
+
+            &::-webkit-scrollbar {
+                -webkit-appearance: none;
+                width: 11px;
+                height: 11px;
+            }
+            &::-webkit-scrollbar-thumb {
+                border-radius: 8px;
+                border: 2px solid white;
+                background-color: rgba(0, 0, 0, .5);
+            }
+        }
+    }
+}
 #teams .context .join.button {
     display: block;
     margin: 1em;
