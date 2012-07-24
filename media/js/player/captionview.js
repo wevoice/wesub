@@ -115,6 +115,10 @@ unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_ma
     }
     // the user might have forced line breaks, we should respect that
 
+    // Double newlines to force line breaks.
+    // No idea why.
+    text = text.replace('\n', '\n\n');
+
     var lines = [];
     var currentLine  = [];
         charsOnCurrentLine = 0,
