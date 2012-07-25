@@ -1065,6 +1065,10 @@ class Invite(models.Model):
     author = models.ForeignKey(User)
     role = models.CharField(max_length=16, choices=TeamMember.ROLES,
                             default=TeamMember.ROLE_CONTRIBUTOR)
+    # None -> not acted upon
+    # True -> Approved
+    # False -> Rejected
+    approved = models.NullBooleanField(default=None)
 
     class Meta:
         unique_together = (('team', 'user'),)
@@ -1077,27 +1081,31 @@ class Invite(models.Model):
         deletes itself.
 
         """
-        member, created = TeamMember.objects.get_or_create(team=self.team,
+        if self.approved == None:
+            self.approved = True
+            member, created = TeamMember.objects.get_or_create(team=self.team,
                                                            user=self.user,
                                                            role=self.role)
-        notifier.team_member_new.delay(member.pk)
-        self.delete()
+            if created:
+                notifier.team_member_new.delay(member.pk)
+            self.save()
+            return True
 
     def deny(self):
         """Deny this invitation.
 
-        Currently just deletes itself, but it could be useful to send
-        a notification here in the future.
+        Could be useful to send a notification here in the future.
 
         """
-        self.delete()
+        if self.approved == None:
+            self.approved = False
+            self.save()
+            return True
 
 
     def message_json_data(self, data, msg):
         data['can-reply'] = False
         return data
-
-models.signals.pre_delete.connect(Message.on_delete, Invite)
 
 
 # Workflows
