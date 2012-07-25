@@ -1068,10 +1068,10 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        if filters.get('language') == 'mine' and request.user.is_authenticated():
-            tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
-        else:
+        if filters.get('language') != 'all':
             tasks = tasks.filter(language=filters['language'])
+    elif request.user.is_authenticated() and request.user.get_languages():
+        tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
 
     if filters.get('q'):
         terms = get_terms(filters['q'])
@@ -1095,6 +1095,8 @@ def _tasks_list(request, team, project, filters, user):
             tasks = tasks.filter(assignee=int(assignee))
         elif assignee:
             tasks = tasks.filter(assignee=User.objects.get(username=assignee))
+    else:
+        tasks = tasks.filter(assignee=None)
 
     return tasks
 
