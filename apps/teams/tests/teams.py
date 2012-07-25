@@ -19,6 +19,7 @@ from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember, TeamLanguagePreference
 )
+from apps.teams.search_indexes import TeamVideoLanguagesIndex
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage
 from messages.models import Message
@@ -144,6 +145,57 @@ class TestTasks(TestCase):
         self.team = Team.objects.all()[0]
         tv = TeamVideo(team=self.team, video=self.sl.video, added_by=self.team.users.all()[:1].get())
         tv.save()
+
+class TeamVideoTest(TestCase):
+
+    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
+
+    def setUp(self):
+        self.auth = {
+            "username": u"admin",
+            "password": u"admin"
+        }
+
+        self.user = User.objects.get(username=self.auth["username"])
+        self.team = Team.objects.get(id=1)
+
+        tm = TeamMember.objects.get(user=self.user, team=self.team)
+        tm.role = TeamMember.ROLE_ADMIN
+        tm.save()
+
+    def test_save_updates_is_visible(self):
+        videos = TeamVideoLanguagesIndex.results_for_members(self.team)
+        self.assertTrue(False not in [v.is_public for v in videos])
+
+        self.client.login(**self.auth)
+
+        url = reverse("teams:settings_basic", kwargs={"slug": self.team.slug})
+
+        response = self.client.get(url)
+        self.failUnlessEqual(response.status_code, 200)
+
+        data = {
+            "name": u"New team",
+            "is_visible": u"0",
+            "description": u"testing",
+        }
+
+
+        response = self.client.post(url, data, follow=True)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertFalse(Team.objects.get(id=1).is_visible)
+
+        videos = TeamVideoLanguagesIndex.results_for_members(self.team)
+        self.assertTrue(True not in [v.is_public for v in videos])
+
+        data['is_visible'] = u'1'
+
+        response = self.client.post(url, data, follow=True)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertTrue(Team.objects.get(id=1).is_visible)
+
+        videos = TeamVideoLanguagesIndex.results_for_members(self.team)
+        self.assertTrue(False not in [v.is_public for v in videos])
 
 class TeamsTest(TestCase):
 

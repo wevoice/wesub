@@ -387,7 +387,6 @@ INSTALLED_APPS = (
     # our apps
     'accountlinker',
     'comments',
-    'icanhaz',
     'messages',
     'profiles',
     'search',

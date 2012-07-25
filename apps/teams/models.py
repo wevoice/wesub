@@ -750,17 +750,9 @@ class TeamVideo(models.Model):
                 moderation_status=MODERATION.APPROVED).update(
                     moderation_status=MODERATION.UNMODERATED)
 
-        video.is_public = True
+        video.is_public = new_team.is_visible
         video.moderated_by = new_team if new_team.moderates_videos() else None
         video.save()
-
-        # make sure we end up with a policy that belong to the team
-        # we're moving into, else it won't come up in the team video
-        # page
-        if video.policy and video.policy.belongs_to_team:
-            video.policy.object_id = new_team.pk
-            video.policy.save(updates_metadata=False)
-
 
         # Update all Solr data.
         metadata_manager.update_metadata(video.pk)
