@@ -62,7 +62,7 @@ elif INSTALLATION == PRODUCTION:
     # only send actual email on the production server
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     
-if INSTALLATION == STAGING or INSTALLATION == PRODUCTION:
+if INSTALLATION == STAGING or INSTALLATION == PRODUCTION or INSTALLATION == LOCAL:
     DATABASE_ROUTERS = ['routers.UnisubsRouter']
     AWS_STORAGE_BUCKET_NAME = DEFAULT_BUCKET
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
