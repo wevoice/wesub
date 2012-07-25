@@ -17,6 +17,7 @@ from widget.video_cache import (
     invalidate_video_visibility
 )
 
+from utils.metrics import Timer
 
 @task()
 def invalidate_video_caches(team_id):
@@ -49,14 +50,15 @@ def invalidate_video_visibility_caches(team):
 def update_video_public_field(team_id):
     from apps.teams.models import Team, TeamVideo
 
-    team = Team.objects.get(pk=team_id)
-    tv_index = site.get_index(TeamVideo)
+    with Timer("update-video-public-field-time"):
+        team = Team.objects.get(pk=team_id)
+        tv_index = site.get_index(TeamVideo)
 
-    for team_video in team.teamvideo_set.all():
-        video = team_video.video
-        video.is_public = team.is_visible
-        video.save()
-        tv_index.update_object(team_video)
+        for team_video in team.teamvideo_set.all():
+            video = team_video.video
+            video.is_public = team.is_visible
+            video.save()
+            tv_index.update_object(team_video)
 
 @periodic_task(run_every=crontab(minute=0, hour=7))
 def expire_tasks():
