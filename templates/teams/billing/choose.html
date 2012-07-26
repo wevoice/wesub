@@ -1,8 +1,23 @@
-<h1>Billing</h1>
+{% extends "base.html" %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+{% load i18n teams_tags %}
 
-    <p><input type="submit" value="Submit" /></p>
-</form>
+{% block html_attrs %}id="login"{% endblock %}
+
+{% block main_content %}
+
+<div class="grid_8 push_2">
+    <div class="sso">
+        <h2>{% trans "Billing" %}</h2>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="green_button big" value="login">{% trans 'Submit' %}</button>
+    </form>
+
+</div>
+
+{% endblock %}
