@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-25 01:34-0500\n"
-"PO-Revision-Date: 2012-07-25 06:53+0000\n"
+"POT-Creation-Date: 2012-07-26 01:32-0500\n"
+"PO-Revision-Date: 2012-07-26 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Greek (Greece) (http://www.transifex.com/projects/p/universalsubtitles/language/el_GR/)\n"
 "MIME-Version: 1.0\n"
@@ -136,46 +136,6 @@ msgstr "Παρακαλώ, επιβεβαιώστε το e-mail σας."
 #: apps/comments/forms.py:53
 msgid "You car reply only comments for same object"
 msgstr "Μπορείτε να απαντήσετε μόνο με σχόλια για το ίδιο θέμα"
-
-#: apps/icanhaz/forms.py:23
-msgid "Only me"
-msgstr "Μόνον εγώ."
-
-#: apps/icanhaz/forms.py:44
-msgid "This user cannot change those settings"
-msgstr "Αυτός ο χρήστης δεν μπορεί να αποθηκεύσει αυτές τις αλλαγές."
-
-#: apps/icanhaz/models.py:191
-msgid "Public"
-msgstr "Δημόσια"
-
-#: apps/icanhaz/models.py:192
-msgid "Only with secret url"
-msgstr "Μόνο με μυστικό url"
-
-#: apps/icanhaz/models.py:193
-msgid "Only authorized members"
-msgstr "Μόνο τα εξουσιοδοτημένα Μέλη"
-
-#: apps/icanhaz/models.py:208
-msgid "public"
-msgstr "Δημόσια"
-
-#: apps/icanhaz/models.py:209
-msgid "no embeding allowed"
-msgstr "Δεν επιτρέπεται η ενσωμάτωση"
-
-#: apps/icanhaz/views.py:26
-msgid "You cannot change visibility for this video."
-msgstr "Δεν μπορείτρε να αλλάξετε την ορατότητα αυτού του βίντεο."
-
-#: apps/icanhaz/views.py:43
-msgid "Settings saved!"
-msgstr "Οι ρυθμίσεις αποθηκεύθηκαν!"
-
-#: apps/icanhaz/views.py:51
-msgid "Please correct the errors bellow!"
-msgstr "Παρακαλώ, διορθώστε τα παρακάτω σφάλματα!"
 
 #: apps/messages/forms.py:40
 msgid "You should be authenticated to write messages"
@@ -795,20 +755,20 @@ msgstr "Χρειάζεται βοήθεια για όλες τις γλώσσε�
 msgid "If you check this, other languages will not be displayed."
 msgstr "Αν τσεκάρετε εδώ, τότε δεν θα εμφανίζονται άλλες γλώσσες."
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:911 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Ιδιοκτήτης"
 
-#: apps/teams/models.py:920 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:912 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Διαχειριστής"
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:913 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Διαχειριστής"
 
-#: apps/teams/models.py:922 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:914 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Συνεισφέρων"
 
@@ -824,7 +784,7 @@ msgstr "Αυτή η Ομάδα δεν υπάρχει"
 msgid "You are already a member of this team."
 msgstr "Είστε, ήδη, μέλος αυτής της ομάδσς."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:864
+#: apps/teams/rpc.py:50 apps/teams/views.py:874
 msgid "You are now a member of this team."
 msgstr "Τώρα είστε μέλος αυτής της ομάδας."
 
@@ -870,26 +830,26 @@ msgstr "Ο ρόλος ενός μέλους της ομάδας άλλαξε. "
 msgid "You cannot assign that role to that member."
 msgstr "Δεν μπορείτε να αναθέσετε αυτό τον ρόλο σε εκείνο το Μέλος."
 
-#: apps/teams/tasks.py:76
+#: apps/teams/tasks.py:96
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Νέα %(team)s Βίντεο έτοιμα για υποτιτλισμό!"
 
-#: apps/teams/views.py:124 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:127 templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "Όνομα"
 
-#: apps/teams/views.py:125 templates/teams/teams-list.html:47
+#: apps/teams/views.py:128 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "Το πιο πρόσφατο"
 
-#: apps/teams/views.py:126 templates/teams/teams-list.html:44
+#: apps/teams/views.py:129 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "Τα περισσότερα Μέλη"
 
-#: apps/teams/views.py:169
+#: apps/teams/views.py:172
 #, python-format
 msgid ""
 "\n"
@@ -904,186 +864,186 @@ msgid ""
 "                "
 msgstr "\n                Η ομάδα σας δημιουργήθηκε. Ακολουθούν ορισμένα από τα επόμενα βήματα:\n                <ul>\n                    <li><a href=\"%(edit)s\">Επεξεργασία δικαιωμάτων των μελών της ομάδας</a></li>\n                    <li><a href=\"%(activate)s\">Ενεργοποίηση και παραμετροποίηση της ροής εργασίας για την ομάδα σας</a></li>\n                    <li><a href=\"%(create)s\">Δημιουργία και παραμετροποίηση των projects</a></li>\n                    <li><a href=\"%(lang)s\">Τροποποίηση των προτιμήσεων γλώσσας</a></li>\n                    <li><a href=\"%(custom)s\">Παραμετροποίηση των οδηγιών προς τους δημιουργούς υποτίτλων και τους μεταφραστές</a></li>\n                </ul>\n                "
 
-#: apps/teams/views.py:195
+#: apps/teams/views.py:198
 msgid "You do not have permission to delete this team."
 msgstr "Δεν έχετε δικαίωμα να διαγράψετε αυτή την ομάδα."
 
-#: apps/teams/views.py:209 apps/teams/views.py:245 apps/teams/views.py:273
-#: apps/teams/views.py:306 apps/teams/views.py:361 apps/teams/views.py:1539
+#: apps/teams/views.py:212 apps/teams/views.py:254 apps/teams/views.py:282
+#: apps/teams/views.py:316 apps/teams/views.py:371 apps/teams/views.py:1551
 msgid "You do not have permission to edit this team."
 msgstr "Δεν έχετε δικαίωμα να τροποποιήσετε αυτή την ομάδα."
 
-#: apps/teams/views.py:232 apps/teams/views.py:291 apps/teams/views.py:376
+#: apps/teams/views.py:241 apps/teams/views.py:301 apps/teams/views.py:386
 msgid "Settings saved."
 msgstr "Οι ρυθμίσεις αποθηκεύθηκαν."
 
-#: apps/teams/views.py:258
+#: apps/teams/views.py:267
 msgid "Guidelines and messages updated."
 msgstr "Οι Κατευθυντήριες οδηγίες και τα Μηνύματα ενημερώθηκαν."
 
-#: apps/teams/views.py:502
+#: apps/teams/views.py:512
 msgid "You can't add that video to this team/project."
 msgstr "Δεν μπορείτε να προσθέσετε αυτό το Βίντεο σε αυτή την ομάδα ή σε αυτό το project."
 
-#: apps/teams/views.py:537
+#: apps/teams/views.py:547
 msgid "The video has been moved to the new team."
 msgstr "Το βίντεο αυτό μετακινήθηκε στη νέα ομάδα."
 
-#: apps/teams/views.py:550
+#: apps/teams/views.py:560
 msgid "You can't add videos to this team/project."
 msgstr "Δεν μπορείτε να προσθέσετε Βίντεο σε αυτή την ομάδα ή σε αυτό το project."
 
-#: apps/teams/views.py:569
+#: apps/teams/views.py:579
 msgid "You can't edit this video."
 msgstr "Δεν μπορείτε να επεξεργασθείτε αυτό το βίντεο"
 
-#: apps/teams/views.py:578
+#: apps/teams/views.py:588
 msgid "Video has been updated."
 msgstr "Το Βίντεο ενημερώθηκε."
 
-#: apps/teams/views.py:606
+#: apps/teams/views.py:616
 msgid "Request must be a POST request."
 msgstr "Το αίτημα πρέπει να είναι ένα αίτημα POST."
 
-#: apps/teams/views.py:614
+#: apps/teams/views.py:624
 msgid "You can't delete that video."
 msgstr "Δεν μπορείτε να διαγράψετε αυτό το βίντεο."
 
-#: apps/teams/views.py:618
+#: apps/teams/views.py:628
 msgid "You can't remove that video."
 msgstr "Δεν μπορείτε να απομακρύνετε αυτό το βίντεο"
 
-#: apps/teams/views.py:630
+#: apps/teams/views.py:640
 msgid "Video has been deleted from Amara."
 msgstr "Αυτό το Βίντεο διεγράφη από το Amara."
 
-#: apps/teams/views.py:633
+#: apps/teams/views.py:643
 msgid "Video has been removed from the team."
 msgstr "Το Βίντεο διεγράφη από την ομάδα."
 
-#: apps/teams/views.py:752
+#: apps/teams/views.py:762
 msgid "Member has been removed from the team."
 msgstr "Το Μέλος διεγράφη από την ομάδα."
 
-#: apps/teams/views.py:755
+#: apps/teams/views.py:765
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "Χρησιμοποιείστε το κουμπί \"Εγακταλείψτε αυτή την ομάδα\" για να φύγετε εσείς ο ίδιος/α από αυτή την αμάδα."
 
-#: apps/teams/views.py:758
+#: apps/teams/views.py:768
 msgid "You don't have permission to remove this member from the team."
 msgstr "Δεν έχετε το δικαίωμα να διαγράψετε αυτό το μέλος από την ομάδα."
 
-#: apps/teams/views.py:789
+#: apps/teams/views.py:799
 msgid "Application approved."
 msgstr "Η Εφαρμογή εγκρίθηκε."
 
-#: apps/teams/views.py:791 apps/teams/views.py:809
+#: apps/teams/views.py:801 apps/teams/views.py:819
 msgid "Application does not exist."
 msgstr "Η Εφαρμογή δεν υπάρχει."
 
-#: apps/teams/views.py:793
+#: apps/teams/views.py:803
 msgid "You can't approve applications."
 msgstr "Δεν μπορείτε να εγκρίνετε εφαρμογές."
 
-#: apps/teams/views.py:807
+#: apps/teams/views.py:817
 msgid "Application denied."
 msgstr "Απαγορευμένη εφαρμογή."
 
-#: apps/teams/views.py:811
+#: apps/teams/views.py:821
 msgid "You can't deny applications."
 msgstr "Δεν μπορείτε να αρνηθείτε τις εφαρμογές."
 
-#: apps/teams/views.py:821
+#: apps/teams/views.py:831
 msgid "You cannot invite people to this team."
 msgstr "Δεν μπορείτε να προσκαλείτ κόσμο σε αυτή την ομάδα."
 
-#: apps/teams/views.py:851
+#: apps/teams/views.py:861
 msgid "This invite is no longer valid"
 msgstr ""
 
-#: apps/teams/views.py:860
+#: apps/teams/views.py:870
 msgid "You cannot join this team."
 msgstr "Δεν μπορείτε να εγγραφείτε σε αυτή την ομάδα."
 
-#: apps/teams/views.py:911
+#: apps/teams/views.py:921
 msgid "You have left this team."
 msgstr "Έχετε εγκαταλείψει αυτή την ομάδα."
 
-#: apps/teams/views.py:968
+#: apps/teams/views.py:978
 msgid "Member saved."
 msgstr "Το Μέλος έχει αποθηκευθεί."
 
-#: apps/teams/views.py:1124
+#: apps/teams/views.py:1136
 msgid "You cannot view this team's tasks."
 msgstr "Δεν μπορείτε να δείτε τις εργασίες αυτής της ομάδας."
 
-#: apps/teams/views.py:1267 apps/teams/views.py:1270
+#: apps/teams/views.py:1279 apps/teams/views.py:1282
 msgid "You are not allowed to perform this task."
 msgstr "Δεν είστε εξουσιοδοτημένοι να κάνετε αυτή την εργασία."
 
-#: apps/teams/views.py:1325
+#: apps/teams/views.py:1337
 msgid "Task deleted."
 msgstr "Η εργασία διεγράφη."
 
-#: apps/teams/views.py:1327
+#: apps/teams/views.py:1339
 msgid "You cannot delete this task."
 msgstr "Δεν μπορείτε να διαγράψετε αυτή την εργασία."
 
-#: apps/teams/views.py:1352
+#: apps/teams/views.py:1364
 msgid "Task declined."
 msgstr "Απόρριψη εργασίας."
 
-#: apps/teams/views.py:1354
+#: apps/teams/views.py:1366
 msgid "Task assigned."
 msgstr "Έγινε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1356
+#: apps/teams/views.py:1368
 msgid "You cannot assign this task."
 msgstr "Δεν μπορείτε να κάνετε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1378
+#: apps/teams/views.py:1390
 msgid "Invalid assignment attempt."
 msgstr "Άκυρη προσπάθεια ανάθεσης."
 
-#: apps/teams/views.py:1394
+#: apps/teams/views.py:1406
 msgid "Draft uploaded successfully."
 msgstr "Το προσχέδιο/draft φορτώθηκε με επιτυχία."
 
-#: apps/teams/views.py:1398
+#: apps/teams/views.py:1410
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1416
+#: apps/teams/views.py:1428
 msgid "You are not allowed to download this transcript."
 msgstr "Δεν σας επιτρέπεται να μεταφορτώσετε αυτή τη μεταγραφή/ transcript"
 
-#: apps/teams/views.py:1466
+#: apps/teams/views.py:1478
 msgid "There's already a project with this name"
 msgstr "Υπάρχει ήδη ένα project με αυτό το όνομα"
 
-#: apps/teams/views.py:1478
+#: apps/teams/views.py:1490
 msgid "Project added."
 msgstr "Το project προστέθηκε."
 
-#: apps/teams/views.py:1495
+#: apps/teams/views.py:1507
 msgid "You cannot edit that project."
 msgstr "Δεν μπορείτε να τροποποιήσετε αυτό το project."
 
-#: apps/teams/views.py:1506
+#: apps/teams/views.py:1518
 msgid "Project deleted."
 msgstr "Το project διεγράφη."
 
-#: apps/teams/views.py:1524
+#: apps/teams/views.py:1536
 msgid "Project saved."
 msgstr "Το project αποθηκεύθηκε."
 
-#: apps/teams/views.py:1650
+#: apps/teams/views.py:1662
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1684
+#: apps/teams/views.py:1696
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1532,47 +1492,47 @@ msgstr "Ώπα-- μόλις βρέθηκαν υπότιτλοι στα %(languag
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "Μόλις βρέθηκε μία έκδοση αυτού του video με %(language_name)s υπότιτλους"
 
-#: apps/videos/views.py:161
+#: apps/videos/views.py:159
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add or\n"
 "improve subtitles, click the button below the video."
 msgstr "Εδώ είναι ο χώρος εργασίας για τους υπότιτλους του δικού σας video. Μπορείτε\nνα μοιρασθείτε αυτό το video με φίλους, ή να πάρετε έναν κωδικό ενσωμάτωσης για τον ιστότοπό σας.  Για να προσθέσετε ή να\nβελτιώσετε τους υπότιτλους, κάντε κλικ στο κουμπί που βρίσκεται κάτω από το video."
 
-#: apps/videos/views.py:169
+#: apps/videos/views.py:167
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr "Υποβάλατε ένα βίντεο\n                που σερβίρεται πάνω σε http.  Ο περιηγητής σας μπορεί να εμφανίσει προειδοποιήσεις ανάμικτου\n                περιεχομένου."
 
-#: apps/videos/views.py:174
+#: apps/videos/views.py:172
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Οι υπάρχοντες υπότιτλοιο θα εισαχθούν σε λίγα λεπτά."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:281
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Ευχαριστούμε που το ανεβάσατε. Θα πάρει περί το ένα λεπτό για να εμφανισθούν οι υπότιτλοί σας."
 
-#: apps/videos/views.py:285
+#: apps/videos/views.py:283
 msgid "Your changes have been saved."
 msgstr "Οι αλλαγές σας αποθηκεύθηκαν."
 
-#: apps/videos/views.py:636
+#: apps/videos/views.py:634
 msgid "You have not permission change this URL"
 msgstr "Δεν έχετε εξουσιοδότηση να αλλάξετε αυτό το URL"
 
-#: apps/videos/views.py:642 apps/videos/views.py:662
+#: apps/videos/views.py:640 apps/videos/views.py:660
 msgid "Object does not exist"
 msgstr "Το Αντικείμενο δεν υπάρχει"
 
-#: apps/videos/views.py:655
+#: apps/videos/views.py:653
 msgid "You have not permission delete this URL"
 msgstr "Δεν έχετε εξουσιοδότηση να διαγράψετε αυτό το URL"
 
-#: apps/videos/views.py:658
+#: apps/videos/views.py:656
 msgid "You cann't remove original URL"
 msgstr "Δεν μπορείτε να απομακρύνετε το αρχικό URL"
 
@@ -1580,7 +1540,7 @@ msgstr "Δεν μπορείτε να απομακρύνετε το αρχικό 
 msgid "Feed is unavailable now."
 msgstr "Η ροή δεν είναι διαθέσιμη τώρα"
 
-#: apps/videos/templatetags/subtitles_tags.py:59
+#: apps/videos/templatetags/subtitles_tags.py:56
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
@@ -1606,22 +1566,22 @@ msgstr "Ιδιωτικό Βίντεο"
 msgid "Undefined error"
 msgstr "Απροσδιόριστο σφάλμα"
 
-#: apps/widget/rpc.py:109
+#: apps/widget/rpc.py:107
 msgid "Video embedding disabled by owner"
 msgstr "Η ενσωμάτωση ροής απενεργοποιήθηκε από τον ιδιοκτήτη"
 
-#: apps/widget/rpc.py:263
+#: apps/widget/rpc.py:261
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Aυτοί οι υπότιτλοι επιτηρούνται / moderated. Δείτε τη σελίδα της ομάδας %s για πληροφορίες σχετικά με το πως μπορείτε να συνεισφέρετε."
 
-#: apps/widget/rpc.py:265
+#: apps/widget/rpc.py:263
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Σγγνώμη, αυτοί οι υπότιτλοι επιτηρούνται ιδιωτικά/ moderated"
 
-#: apps/widget/rpc.py:949 apps/widget/rpc.py:990
+#: apps/widget/rpc.py:947 apps/widget/rpc.py:988
 msgid "\n"
 msgstr "\n"
 
@@ -1657,7 +1617,7 @@ msgid "Third party"
 msgstr "Τρίτα Μέρη"
 
 #: libs/rosetta/templates/rosetta/languages.html:15
-#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:57
+#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:58
 msgid "All"
 msgstr "Όλα"
 
@@ -1762,7 +1722,7 @@ msgid "Go"
 msgstr "Εμπρός"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:162 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:190 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:69
 msgid "Original"
 msgstr "Πρωτότυπο"
@@ -2772,20 +2732,20 @@ msgid "Then tell the world and invite your friends to help translate:"
 msgstr "Μετά πείτε το σε όλους και καλέστε τους φίλους σας να βοηθήσουν στη μετάφραση:"
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
-#: templates/teams/_context_project.html:75
-#: templates/teams/_context_team.html:108
+#: templates/teams/_context_project.html:62
+#: templates/teams/_context_team.html:95
 msgid "Post to Facebook"
 msgstr "Κάντετο post στο Facebook"
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
-#: templates/teams/_context_project.html:76
-#: templates/teams/_context_team.html:109
+#: templates/teams/_context_project.html:63
+#: templates/teams/_context_team.html:96
 msgid "Post to Twitter"
 msgstr "Κάντετο post στο Tweetter"
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
-#: templates/teams/_context_project.html:77
-#: templates/teams/_context_team.html:110
+#: templates/teams/_context_project.html:64
+#: templates/teams/_context_team.html:97
 msgid "Email to friends"
 msgstr "Στείλτε το με e-mail στους φίλους σας"
 
@@ -2797,8 +2757,8 @@ msgstr "Ενσωματώστε Κώδικα"
 msgid "Permalink"
 msgstr "Permalink"
 
-#: templates/_sharing_widget.html:3 templates/teams/_context_project.html:73
-#: templates/teams/_context_team.html:106
+#: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
+#: templates/teams/_context_team.html:93
 msgid "Share"
 msgstr "Μοιραστείτε το"
 
@@ -4370,14 +4330,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Είστε σίγουροι πως θέλετε να διαγράψετε μονίμως το προφίλ σας;"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:381
+#: templates/messages/sent.html:51 templates/teams/tasks.html:409
 msgid "Delete"
 msgstr "Διαγραφή"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:435 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:463 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:389
 msgid "Cancel"
 msgstr "Ακύρωση"
@@ -4801,18 +4761,18 @@ msgstr "Δεν υπάρχουν ακόμη υπότιτλοι"
 msgid "Open Tasks"
 msgstr "Ανοικτές εργασίες"
 
-#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:58
-#: templates/teams/tasks.html.py:157
+#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:59
+#: templates/teams/tasks.html.py:185
 msgid "Transcribe"
 msgstr "Μεταγραφή διαλόγων/ Transcribe"
 
 #: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:167
+#: templates/teams/tasks.html:195
 msgid "Subtitles into"
 msgstr "Υπότιτλοι μέσα στο"
 
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:172
-#: templates/teams/tasks.html.py:188 templates/videos/diffing.html:87
+#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:200
+#: templates/teams/tasks.html.py:216 templates/videos/diffing.html:87
 #: templates/videos/subtitle-view.html:149
 #: templates/videos/subtitle-view.html:196
 msgid "Subtitles"
@@ -5179,8 +5139,8 @@ msgstr "ΣΥΝΟΛΟ"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
-#: templates/teams/_context_team.html:47 templates/teams/tasks.html:125
-#: templates/teams/tasks.html.py:176 templates/videos/video-view.html:144
+#: templates/teams/_context_team.html:47 templates/teams/tasks.html:126
+#: templates/teams/tasks.html.py:204 templates/videos/video-view.html:144
 msgid "Video"
 msgstr "Βίντεο"
 
@@ -5301,7 +5261,7 @@ msgstr "Σελίδα Βίντεο"
 
 #: templates/teams/_context_project.html:17
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:131
+#: templates/teams/_context_team.html:118
 #: templates/videos/subtitle-view.html:137
 #: templates/videos/video-view.html:123
 msgid "Show all"
@@ -5312,24 +5272,11 @@ msgstr "Εμφάνιση όλων"
 msgid "Task"
 msgstr "Εργασία"
 
-#: templates/teams/_context_project.html:56
-#: templates/teams/_context_team.html:89
-msgid "Tasks in my languages"
-msgstr "Εργασίες στις γλώσσες μου"
-
-#: templates/teams/_context_project.html:60
-#: templates/teams/_context_team.html:93
-msgid ""
-"\n"
-"                        See tasks in <a href=\"#\" data-modal=\"language_modal\">your languages</a>\n"
-"                    "
-msgstr "\n                        Δέιτε τις εργασίες στις <a href=\"#\" data-modal=\"language_modal\">Γλώσσες σας</a>\n                    "
-
-#: templates/teams/_context_project.html:94
+#: templates/teams/_context_project.html:81
 msgid "Other"
 msgstr "Άλλα"
 
-#: templates/teams/_context_project.html:94
+#: templates/teams/_context_project.html:81
 #: templates/teams/_context_team.html:21
 #: templates/teams/_subnav_settings.html:21
 msgid "Projects"
@@ -5341,7 +5288,7 @@ msgid "video"
 msgstr "Βίντεο"
 
 #: templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:127
+#: templates/teams/_context_team.html:114
 #: templates/videos/subtitle-view.html:137
 #: templates/videos/video-view.html:123
 msgid "Show less"
@@ -5355,7 +5302,7 @@ msgstr "Μέλος"
 msgid "My tasks"
 msgstr "Οι εργασίες μου"
 
-#: templates/teams/_context_team.html:100
+#: templates/teams/_context_team.html:87
 msgid "All available tasks"
 msgstr "Όλες οι διαθέσιμες εργασίες"
 
@@ -5384,12 +5331,12 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr "Μπορείτε, επίσης, να προσκαλέσετε φίλους που μιλούν άλλες γλώσσες, για να βοηθήσουν."
 
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:259
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:287
 msgid "Resume"
 msgstr "Ανάκτηση"
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:261
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:289
 msgid "Start now"
 msgstr "Έναρξη τώρα"
 
@@ -5417,7 +5364,7 @@ msgstr "Δραστηριότητα"
 
 #: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
 #: templates/teams/_team_video_detail.html:48
-#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:26
+#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:27
 msgid "Tasks"
 msgstr "Εργασίες"
 
@@ -5551,7 +5498,7 @@ msgstr "Προσθέστε πολλαπλά βίντεο"
 msgid "Team Aplications"
 msgstr "Εφαρμογές ομάδας"
 
-#: templates/teams/applications.html:49 templates/teams/tasks.html:64
+#: templates/teams/applications.html:49 templates/teams/tasks.html:65
 msgid "Approve"
 msgstr "Αποδοχή"
 
@@ -5635,7 +5582,7 @@ msgstr "Τι γλώσσα χρειάζεται;"
 msgid "Who should do it?"
 msgstr "Ποιος πρέπει να το κάνει;"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:439
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:467
 msgid "Begin typing to search"
 msgstr "Αρχίστε να πληκτρολογείτε για την αναζήτηση"
 
@@ -5726,7 +5673,7 @@ msgstr "Ο ρόλος που θα αποδοθεί στον χρήστη, εφό
 msgid "Send Invites"
 msgstr "Αποστολή προσκλήσεων"
 
-#: templates/teams/members-list.html:47 templates/teams/tasks.html:48
+#: templates/teams/members-list.html:47 templates/teams/tasks.html:49
 #: templates/teams/videos-list.html:47
 msgid "Filter and Sort"
 msgstr "Φιλτράρισμα και Κατάταξη"
@@ -5756,12 +5703,12 @@ msgstr "Άτομα που συνεισφέρουν "
 msgid "speaking"
 msgstr "που μιλούν"
 
-#: templates/teams/members-list.html:64 templates/teams/tasks.html:71
+#: templates/teams/members-list.html:64 templates/teams/tasks.html:75
 msgid "all languages"
 msgstr "όλες τις γλώσσες"
 
-#: templates/teams/members-list.html:72 templates/teams/tasks.html:119
-#: templates/teams/tasks.html.py:126 templates/teams/tasks.html:133
+#: templates/teams/members-list.html:72 templates/teams/tasks.html:120
+#: templates/teams/tasks.html.py:127 templates/teams/tasks.html:134
 #: templates/teams/videos-list.html:89
 msgid "Clear"
 msgstr "Καθαρισμός"
@@ -5971,7 +5918,7 @@ msgid "manage languages"
 msgstr "Διαχείριση γλωσσών"
 
 #: templates/teams/settings-permissions.html:109
-#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:61
+#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:62
 msgid "Review"
 msgstr "Αναθεώρηση"
 
@@ -6017,15 +5964,15 @@ msgstr "Είστε σίγουρος/η πως θέλετε να διαγράψε
 msgid "This team does not have any projects yet"
 msgstr "Αυτή η ομάδα δεν έχει, ακόμη, καθόλου έργα."
 
-#: templates/teams/tasks.html:44
+#: templates/teams/tasks.html:45
 msgid "Add Task"
 msgstr "Προσθήκη έργου"
 
-#: templates/teams/tasks.html:59
+#: templates/teams/tasks.html:60
 msgid "Translate"
 msgstr "Μετάφραση"
 
-#: templates/teams/tasks.html:69
+#: templates/teams/tasks.html:70
 msgid "tasks for"
 msgstr "εργασιών για"
 
@@ -6033,176 +5980,196 @@ msgstr "εργασιών για"
 msgid "my languages"
 msgstr "Οι γλώσσες μου"
 
-#: templates/teams/tasks.html:86
+#: templates/teams/tasks.html:87
 msgid "assigned to"
 msgstr "ανατέθηκαν σε"
 
-#: templates/teams/tasks.html:88
+#: templates/teams/tasks.html:89
 msgid "anyone"
 msgstr "οποιονδήποτε"
 
-#: templates/teams/tasks.html:89 templates/teams/tasks.html.py:223
+#: templates/teams/tasks.html:90 templates/teams/tasks.html.py:251
 msgid "me"
 msgstr "εμένα"
 
-#: templates/teams/tasks.html:90
+#: templates/teams/tasks.html:91
 msgid "no one"
 msgstr "κανέναν"
 
-#: templates/teams/tasks.html:99 templates/teams/videos-list.html:65
+#: templates/teams/tasks.html:100 templates/teams/videos-list.html:65
 msgid "sorted by"
 msgstr "Κατάταξη ανά"
 
-#: templates/teams/tasks.html:102
+#: templates/teams/tasks.html:103
 msgid "date, newest"
 msgstr "ημερομηνία, πιο πρόσφατη"
 
-#: templates/teams/tasks.html:105
+#: templates/teams/tasks.html:106
 msgid "date, oldest"
 msgstr "ημερομηνία, πιο παλιά"
 
-#: templates/teams/tasks.html:109
+#: templates/teams/tasks.html:110
 msgid "time left, least"
 msgstr "χρόνο που απομένει, ελάχιστος"
 
-#: templates/teams/tasks.html:112
+#: templates/teams/tasks.html:113
 msgid "time left, most"
 msgstr "χρόνο που απομένει, μέγιστος"
 
-#: templates/teams/tasks.html:119 templates/teams/tasks.html.py:126
-#: templates/teams/tasks.html:133
+#: templates/teams/tasks.html:120 templates/teams/tasks.html.py:127
+#: templates/teams/tasks.html:134
 msgid "Clear all filters, sorts, and search terms"
 msgstr "Καθαρισμός όλων των φίλτρων, των κατατάξεων και των όρων αναζήτησης"
 
-#: templates/teams/tasks.html:131
+#: templates/teams/tasks.html:132
 msgid "NOTE:"
 msgstr "ΣΗΜΕΙΩΣΣΗ:"
 
-#: templates/teams/tasks.html:132
+#: templates/teams/tasks.html:133
 msgid ""
 "When sorting by expiration date, tasks without an expiration are not shown."
 msgstr "Όταν κάνετε κατάταξη ανά ημερομηνία, δεν θα εμφανίζονται οι εργασίες χωρίς ημερομηνία λήξεως."
 
-#: templates/teams/tasks.html:190
+#: templates/teams/tasks.html:140
+msgid "Try broadening your selection using the filters above"
+msgstr ""
+
+#: templates/teams/tasks.html:146
+msgid "Tell us what languages you speak"
+msgstr ""
+
+#: templates/teams/tasks.html:146
+msgid "and we'll narrow this list for you"
+msgstr ""
+
+#: templates/teams/tasks.html:152
+msgid "Showing unassigned tasks in languages you speak"
+msgstr ""
+
+#: templates/teams/tasks.html:157
+msgid "Try changing your selection using the filters above to find tasks"
+msgstr ""
+
+#: templates/teams/tasks.html:218
 msgid "latest draft"
 msgstr "Το πιο πρόσφατο προσχέδιο/ draft"
 
-#: templates/teams/tasks.html:194
+#: templates/teams/tasks.html:222
 msgid "transcribed"
 msgstr "μετεγράφη"
 
-#: templates/teams/tasks.html:196 templates/videos/subtitle-view.html:45
+#: templates/teams/tasks.html:224 templates/videos/subtitle-view.html:45
 msgid "translated"
 msgstr "μεταφράσθηκε"
 
-#: templates/teams/tasks.html:204
+#: templates/teams/tasks.html:232
 msgid "reviewed"
 msgstr "Αναθεωρήθηκε"
 
-#: templates/teams/tasks.html:206
+#: templates/teams/tasks.html:234
 msgid "and edited"
 msgstr "και έγινε επεξεργασία"
 
-#: templates/teams/tasks.html:208 templates/videos/subtitle-view.html:204
+#: templates/teams/tasks.html:236 templates/videos/subtitle-view.html:204
 #: templates/videos/subtitle-view.html:320
 msgid "by"
 msgstr "από τον/ την"
 
-#: templates/teams/tasks.html:221
+#: templates/teams/tasks.html:249
 msgid "Assigned to"
 msgstr "Ανατέθηκε στον/ στην"
 
-#: templates/teams/tasks.html:230
+#: templates/teams/tasks.html:258
 msgid "Unassigned"
 msgstr "Δεν ανατέθηκε"
 
-#: templates/teams/tasks.html:245
+#: templates/teams/tasks.html:273
 msgid "Perform Task"
 msgstr "Εκτέλεση εργασίας"
 
-#: templates/teams/tasks.html:254
+#: templates/teams/tasks.html:282
 msgid "You have reached the maximum number of tasks."
 msgstr "Φθάσατε τον μέγιστο αριθμό εργασιών."
 
-#: templates/teams/tasks.html:273
+#: templates/teams/tasks.html:301
 msgid "Download draft"
 msgstr "Μεταφόρτωση προσχεδίου/ draft"
 
-#: templates/teams/tasks.html:287
+#: templates/teams/tasks.html:315
 msgid "Upload a draft"
 msgstr "Ανεβάστε ένα προσχέδιο/draft"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:318
 msgid "Important:"
 msgstr "Σημαντικό:"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:318
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
 " and video description in the onsite editor and to submit the final version."
 msgstr "Η απλή μεταφόρτωση/ Uploading ενός προσχεδίου δεν θα ολοκληρώσει την εργασία. Μετά τη μεταφόρτωση, επιλέξτε \"Ανάκτηση\" από το εκτπυσσόμενο μενού \"Εκτέλεση εργασίας\", για την επαλήθευση του χρόνου, του τίτλου του βίντεο και της περιγραφής του βίντεο, στο πρόγραμμα επεξεργασίας onsite editor και προχωρήστε στην υποβολή της τελευταίας έκδοσης."
 
-#: templates/teams/tasks.html:293 templates/videos/_upload_subtitles.html:20
+#: templates/teams/tasks.html:321 templates/videos/_upload_subtitles.html:20
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr "Γλώσσα"
 
-#: templates/teams/tasks.html:299
+#: templates/teams/tasks.html:327
 msgid "Translate from"
 msgstr "Μετάφραση από τα"
 
-#: templates/teams/tasks.html:304
+#: templates/teams/tasks.html:332
 msgid "File:"
 msgstr "Αρχείο:"
 
-#: templates/teams/tasks.html:307
+#: templates/teams/tasks.html:335
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
 msgstr "Αποδεκτές μορφές αρχείου: .srt, .ssa, .sbv, .dfxp, .txt ή .xml (για TTML)"
 
-#: templates/teams/tasks.html:321
+#: templates/teams/tasks.html:349
 msgid "Download a draft"
 msgstr "Κατεβάστε ένα προσχέδιο/ draft"
 
-#: templates/teams/tasks.html:326
+#: templates/teams/tasks.html:354
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr "Μεταφορτώστε ένα προσχέδιο/ draft αυτών των υποτίτλων, για να μπορείτε να δουλέψετε και χωρίς σύνδεση/ offline"
 
-#: templates/teams/tasks.html:352
+#: templates/teams/tasks.html:380
 msgid "Decline"
 msgstr "Απόρριψη"
 
-#: templates/teams/tasks.html:372
+#: templates/teams/tasks.html:400
 msgid "Reassign"
 msgstr "Εκ νέου ανάθεση"
 
-#: templates/teams/tasks.html:374
+#: templates/teams/tasks.html:402
 msgid "Assign"
 msgstr "Ανάθεση"
 
-#: templates/teams/tasks.html:390
+#: templates/teams/tasks.html:418
 msgid "Delete task"
 msgstr "Διαγραφή εργασίας"
 
-#: templates/teams/tasks.html:396
+#: templates/teams/tasks.html:424
 msgid "What would you like to do with the subtitles for this task?"
 msgstr "Τι θα θέλατε  να κάνετε με αυτούς τους υπότιτλους για την εργασία αυτή;"
 
-#: templates/teams/tasks.html:399
+#: templates/teams/tasks.html:427
 msgid "Publish these subtitles immediately"
 msgstr "Άμεση δημοσίευση αυτών των υποτίτλων"
 
-#: templates/teams/tasks.html:403
+#: templates/teams/tasks.html:431
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr "Μόνιμη διαγραφή αυτών των υποτίτλων (απόρριψη όλων των προσχεδίων/ drafts, μετά την πιο πρόσφατα δημοσιευμένη έκδοση)"
 
-#: templates/teams/tasks.html:442
+#: templates/teams/tasks.html:470
 msgid "Assign to User"
 msgstr "Ανάθεση στον Χρήστη"
 
-#: templates/teams/tasks.html:452
+#: templates/teams/tasks.html:480
 msgid "Sorry, no tasks here."
 msgstr "Συγγνώμη, δεν υπάρχουν εργασίες εδώ."
 
