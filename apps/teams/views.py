@@ -1727,6 +1727,8 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
     """
     Return a list of lists of data suitable for the csv writer or similar.
 
+    ``start_date`` and ``end_date`` should be ``datetime.date`` instances
+
     * Get all videos for team
     * For each video, get all languages
     * For each language, get the latest version
@@ -1735,7 +1737,13 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
     Minutes are counted by
         [last subtitle synced timing] - [first subtitle synced timing]
     """
+    from datetime import datetime, time
     rows = []
+
+    # Oh, Python...
+    midnight = time(0, 0, 0)
+    start_date = datetime.combine(start_date, midnight)
+    end_date = datetime.combine(end_date, midnight)
 
     if header:
         rows.append(['Video title', 'Video URL', 'Video language',
