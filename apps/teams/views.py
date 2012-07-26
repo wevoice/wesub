@@ -1763,6 +1763,11 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
 
 @staff_member_required
 def billing(request):
+    user = request.user
+
+    if not DEV and not (user.is_superuser and user.is_active):
+        raise Http404
+
     if request.method == 'POST':
         form = ChooseTeamForm(request.POST)
         if form.is_valid():
