@@ -72,7 +72,7 @@ from teams.tasks import (
 )
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
-from utils.metrics import time as timefn
+from utils.metrics import time as timefn, Timer
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
@@ -1782,7 +1782,8 @@ def billing(request):
 
             writer = csv.writer(response)
 
-            data = get_billing_data_for_team(team, start_date, end_date)
+            with Timer('billing-csv-time'):
+                data = get_billing_data_for_team(team, start_date, end_date)
 
             for row in data:
                 writer.writerow(row)
