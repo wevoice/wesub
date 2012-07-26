@@ -1749,7 +1749,7 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
         rows.append(['Video title', 'Video URL', 'Video language',
                 'Billable minutes'])
 
-    tvs = TeamVideo.objects.filter(team=team)
+    tvs = TeamVideo.objects.filter(team=team).order_by('video__title')
 
     for tv in tvs:
         languages = tv.video.subtitlelanguage_set.all()
