@@ -1757,7 +1757,7 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
         for language in languages:
             v = language.latest_version()
 
-            if v.moderation_status != APPROVED:
+            if not v or v.moderation_status != APPROVED:
                 continue
 
             if (v.datetime_started < start_date) or (v.datetime_started >
