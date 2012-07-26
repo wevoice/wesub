@@ -1751,6 +1751,10 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
 
     tvs = TeamVideo.objects.filter(team=team).order_by('video__title')
 
+    domain = Site.objects.get_current().domain
+    protocol = getattr(settings, 'DEFAULT_PROTOCOL')
+    host = '%s://%s' % (protocol, domain)
+
     for tv in tvs:
         languages = tv.video.subtitlelanguage_set.all()
 
@@ -1775,7 +1779,7 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
 
             rows.append([
                 tv.video.title.encode('utf-8'),
-                tv.video.get_video_url(),
+                host + tv.video.get_absolute_url(),
                 language.language,
                 int(round((end - start) / 60))
             ])
