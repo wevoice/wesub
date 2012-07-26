@@ -108,6 +108,41 @@ class TestSubtitle(TestCase):
         s2.end_ms += 100
         self.assertNotEqual(s1, s2)
 
+    def test_is_synced(self):
+        s1 = Subtitle(1000, 2000, "Sample")
+        s2 = Subtitle(None, 2000, "Sample")
+        s3 = Subtitle(1000, None, "Sample")
+        s4 = Subtitle(None, None, "Sample")
+
+        self.assertEqual(s1.is_synced(), True)
+        self.assertEqual(s2.is_synced(), False)
+        self.assertEqual(s3.is_synced(), False)
+        self.assertEqual(s4.is_synced(), False)
+
+    def test_duration(self):
+        s1 = Subtitle(1000, 5000, "")
+
+        self.assertEqual(s1.duration(), 4000)
+        s1.start_ms -= 100
+        self.assertEqual(s1.duration(), 4100)
+        s1.start_ms += 200
+        self.assertEqual(s1.duration(), 3900)
+        s1.end_ms += 1000
+        self.assertEqual(s1.duration(), 4900)
+        s1.end_ms -= 400
+        self.assertEqual(s1.duration(), 4500)
+        s1.end_ms = s1.start_ms
+        self.assertEqual(s1.duration(), 0)
+
+        s2 = Subtitle(None, 5000, "")
+        s3 = Subtitle(1000, None, "")
+        s4 = Subtitle(None, None, "")
+
+        self.assertEqual(s2.duration(), None)
+        self.assertEqual(s3.duration(), None)
+        self.assertEqual(s4.duration(), None)
+
+
 
 class TestSubtitleSet(TestCase):
     def setUp(self):
@@ -192,7 +227,6 @@ class TestSubtitleSet(TestCase):
         # self.assertRaises(AssertionError, _set_slice([raw]))
         # self.assertRaises(AssertionError, _set_slice([None]))
 
-
     def test_serialization(self):
         # For now just make sure that round-tripping works at each of the
         # various stages.  We can get more specific in the future if necessary.
@@ -222,3 +256,56 @@ class TestSubtitleSet(TestCase):
         serialized = ss.to_zip()
         deserialized = SubtitleSet.from_zip(serialized)
         _assertUnchanged(deserialized)
+
+    def test_paragraphs(self):
+        def _p_to_strs(p):
+            return [sub.content for sub in p]
+
+        s1 = Subtitle(None, None, "1")
+        s2 = Subtitle(None, None, "2")
+        s3 = Subtitle(None, None, "3", starts_paragraph=True)
+        s4 = Subtitle(None, None, "4")
+        s5 = Subtitle(None, None, "5")
+        s6 = Subtitle(None, None, "6", starts_paragraph=True)
+        s7 = Subtitle(None, None, "7", starts_paragraph=True)
+        s8 = Subtitle(None, None, "8")
+
+        ss = SubtitleSet([s1, s2, s3, s4, s5, s6, s7, s8])
+        ps = list(ss.as_paragraphs())
+
+        self.assertEqual([_p_to_strs(p) for p in ps],
+                         [["1", "2"],
+                          ["3", "4", "5"],
+                          ["6"],
+                          ["7", "8"]
+                          ])
+        for p in ps:
+            self.assertEqual(type(p), SubtitleSet)
+
+        s1 = Subtitle(None, None, "1", starts_paragraph=True)
+        s2 = Subtitle(None, None, "2")
+        s3 = Subtitle(None, None, "3")
+        s4 = Subtitle(None, None, "4")
+        s5 = Subtitle(None, None, "5")
+        s6 = Subtitle(None, None, "6")
+        s7 = Subtitle(None, None, "7")
+        s8 = Subtitle(None, None, "8", starts_paragraph=True)
+
+        ss = SubtitleSet([s1, s2, s3, s4, s5, s6, s7, s8])
+        ps = list(ss.as_paragraphs())
+
+        self.assertEqual([_p_to_strs(p) for p in ps],
+                         [["1", "2", "3", "4", "5", "6", "7"],
+                          ["8"]
+                          ])
+
+        # Empty subtitle sets have no paragraphs.
+        ss = SubtitleSet()
+        ps = list(ss.as_paragraphs())
+        self.assertEqual(ps, [])
+
+        # A set with a single subtitle has one paragraph.
+        ss = SubtitleSet([s1])
+        ps = list(ss.as_paragraphs())
+        self.assertEqual([_p_to_strs(p) for p in ps],
+                         [["1"]])

@@ -82,6 +82,15 @@ class Subtitle(object):
         return Subtitle(start_ms, end_ms, content, starts_paragraph)
 
 
+    # Convenience Methods
+    def is_synced(self):
+        """Return whether this subtitle is synced (i.e.: has start & end times)."""
+        return (self.start_ms != None and self.end_ms != None)
+
+    def duration(self):
+        """Return the duration of this subtitle in ms, or None if not synced."""
+        return self.end_ms - self.start_ms if self.is_synced() else None
+
 class SubtitleSet(list):
     """A set of subtitles for a video.
 
@@ -155,4 +164,24 @@ class SubtitleSet(list):
     @classmethod
     def from_zip(cls, zip_data):
         return SubtitleSet.from_json(zlib.decompress(zip_data))
+
+
+    # Convenience Methods
+    def as_paragraphs(self):
+        """Generator over the paragraphs in this set of subtitles.
+
+        Each item yielded is a SubtitleSet containing one paragraph worth of
+        subtitles.
+
+        """
+
+        l = len(self)
+        if l:
+            prev = 0
+            for i in xrange(1, l):
+                if self[i].starts_paragraph:
+                    yield SubtitleSet(subtitles=self[prev:i])
+                    prev = i
+
+            yield SubtitleSet(subtitles=self[prev:])
 
