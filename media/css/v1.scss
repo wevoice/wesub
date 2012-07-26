@@ -828,13 +828,23 @@ div.fix-chosen div.chzn-container {
         ul.actions, ul.admin-controls {
             display: none !important;
         }
-        div.cannot-perform-disabled {
-            background: #F2DEDE;
-            border: 1px solid #EED3D7;
-            color: #B94A48;
+        div.cannot-perform {
+            float: right;
+            width: 150px;
+            background: $faintest;
+            color: $lighter;
+            border: 1px solid $fainter;
             margin-bottom: 10px;
             padding: 10px;
             @include border-radius;
+
+            &.disabled {
+                float: none;
+                width: auto;
+                background: #F2DEDE;
+                border: 1px solid #EED3D7;
+                color: #B94A48;
+            }
         }
     }
 
