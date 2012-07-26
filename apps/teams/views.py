@@ -1776,7 +1776,7 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
             rows.append([
                 tv.video.title.encode('utf-8'),
                 tv.video.get_video_url(),
-                tv.video.language,
+                language.language,
                 int(round((end - start) / 60))
             ])
 
