@@ -1742,7 +1742,7 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
                 datetime_started__lte=end_date)
 
         for v in versions:
-            subs = list(v.subtitle_set.all(start_time__isnull=False,
+            subs = list(v.subtitle_set.filter(start_time__isnull=False,
                 end_time__isnull=False))
             start = subs[0].start_time
             end = subs[-1].end_time
