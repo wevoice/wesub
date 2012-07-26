@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-25 01:34-0500\n"
-"PO-Revision-Date: 2012-07-25 06:52+0000\n"
+"POT-Creation-Date: 2012-07-26 01:32-0500\n"
+"PO-Revision-Date: 2012-07-26 06:50+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/universalsubtitles/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -136,46 +136,6 @@ msgstr "Ju lutemi, ripohoni email-in tuaj."
 #: apps/comments/forms.py:53
 msgid "You car reply only comments for same object"
 msgstr "Mund të përgjigjeni vetëm ndaj komenteve për të njëjtin objekt"
-
-#: apps/icanhaz/forms.py:23
-msgid "Only me"
-msgstr "Vetëm unë"
-
-#: apps/icanhaz/forms.py:44
-msgid "This user cannot change those settings"
-msgstr "Ky përdorues nuk mund t'i ndryshojë këto përdorime"
-
-#: apps/icanhaz/models.py:191
-msgid "Public"
-msgstr "Publike"
-
-#: apps/icanhaz/models.py:192
-msgid "Only with secret url"
-msgstr "Vetëm me url të fshehtë"
-
-#: apps/icanhaz/models.py:193
-msgid "Only authorized members"
-msgstr "Vetëm për përdorues të autorizuar"
-
-#: apps/icanhaz/models.py:208
-msgid "public"
-msgstr "publike"
-
-#: apps/icanhaz/models.py:209
-msgid "no embeding allowed"
-msgstr "nuk lejohet trupëzimi"
-
-#: apps/icanhaz/views.py:26
-msgid "You cannot change visibility for this video."
-msgstr "Nuk mund të ndryshoni pamshmërinë e kësaj videoje."
-
-#: apps/icanhaz/views.py:43
-msgid "Settings saved!"
-msgstr "Rregullimet u ruajtën!"
-
-#: apps/icanhaz/views.py:51
-msgid "Please correct the errors bellow!"
-msgstr "Ju lutemi, ndreqni gabimet e mëposhtme!"
 
 #: apps/messages/forms.py:40
 msgid "You should be authenticated to write messages"
@@ -795,20 +755,20 @@ msgstr "Lyp ndihmë me krejt gjuhët"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Nëse i vini shenjë kësaj, gjuhët e tjera nuk do të shfaqen."
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:911 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Pronar"
 
-#: apps/teams/models.py:920 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:912 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Përgjegjës"
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:913 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:922 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:914 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Kontribues"
 
@@ -824,7 +784,7 @@ msgstr "Ekipi nuk ekziston"
 msgid "You are already a member of this team."
 msgstr "Jeni tashmë anëtar i këtij ekipi."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:864
+#: apps/teams/rpc.py:50 apps/teams/views.py:874
 msgid "You are now a member of this team."
 msgstr "Tani jeni anëtar i këtij ekipi."
 
@@ -870,26 +830,26 @@ msgstr "U ndryshua roli i anëtarit të ekipit."
 msgid "You cannot assign that role to that member."
 msgstr "Nuk mund t'ia jepni atë rol atij përdoruesi."
 
-#: apps/teams/tasks.py:76
+#: apps/teams/tasks.py:96
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Video të reja nga %(team)s gati për titrim!"
 
-#: apps/teams/views.py:124 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:127 templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "Emër"
 
-#: apps/teams/views.py:125 templates/teams/teams-list.html:47
+#: apps/teams/views.py:128 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "Më të reja"
 
-#: apps/teams/views.py:126 templates/teams/teams-list.html:44
+#: apps/teams/views.py:129 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "Shumica e Anëtarëve"
 
-#: apps/teams/views.py:169
+#: apps/teams/views.py:172
 #, python-format
 msgid ""
 "\n"
@@ -904,186 +864,186 @@ msgid ""
 "                "
 msgstr "\n                Ekipi juaj u krijua. Ja disa nga hapat pasues:\n                <ul>\n                    <li><a href=\"%(edit)s\">Përpunoni lejet e anëtarëve të ekipit</a></li>\n                    <li><a href=\"%(activate)s\">Aktivizoni dhe personalizoni rrjedha pune për ekipin tuaj</a></li>\n                    <li><a href=\"%(create)s\">Krijoni dhe personalizoni projekte</a></li>\n                    <li><a href=\"%(lang)s\">Përpunoni parapëlqime gjuhe</a></li>\n                    <li><a href=\"%(custom)s\">Personalizoni udhëzimet për titruesit dhe përkthyesit</a></li>\n                </ul>\n                "
 
-#: apps/teams/views.py:195
+#: apps/teams/views.py:198
 msgid "You do not have permission to delete this team."
 msgstr "Nuk keni leje ta fshini këtë ekip."
 
-#: apps/teams/views.py:209 apps/teams/views.py:245 apps/teams/views.py:273
-#: apps/teams/views.py:306 apps/teams/views.py:361 apps/teams/views.py:1539
+#: apps/teams/views.py:212 apps/teams/views.py:254 apps/teams/views.py:282
+#: apps/teams/views.py:316 apps/teams/views.py:371 apps/teams/views.py:1551
 msgid "You do not have permission to edit this team."
 msgstr "Nuk keni leje të përpunoni këtë ekip."
 
-#: apps/teams/views.py:232 apps/teams/views.py:291 apps/teams/views.py:376
+#: apps/teams/views.py:241 apps/teams/views.py:301 apps/teams/views.py:386
 msgid "Settings saved."
 msgstr "Rregullimet u ruajtën."
 
-#: apps/teams/views.py:258
+#: apps/teams/views.py:267
 msgid "Guidelines and messages updated."
 msgstr "U përditësuan udhëzuesit dhe mesazhet."
 
-#: apps/teams/views.py:502
+#: apps/teams/views.py:512
 msgid "You can't add that video to this team/project."
 msgstr "Nuk mund ta shtoni këtë video te ky ekip/projekt."
 
-#: apps/teams/views.py:537
+#: apps/teams/views.py:547
 msgid "The video has been moved to the new team."
 msgstr "Kjo video është kaluar te ekipi i ri."
 
-#: apps/teams/views.py:550
+#: apps/teams/views.py:560
 msgid "You can't add videos to this team/project."
 msgstr "Nuk mund të shtoni video te ky ekip/projekt."
 
-#: apps/teams/views.py:569
+#: apps/teams/views.py:579
 msgid "You can't edit this video."
 msgstr "S&#8217;mund ta përpunoni këtë video. "
 
-#: apps/teams/views.py:578
+#: apps/teams/views.py:588
 msgid "Video has been updated."
 msgstr "Videoja u përditësua."
 
-#: apps/teams/views.py:606
+#: apps/teams/views.py:616
 msgid "Request must be a POST request."
 msgstr "Kërkesa duhet të jetë një kërkesë POST."
 
-#: apps/teams/views.py:614
+#: apps/teams/views.py:624
 msgid "You can't delete that video."
 msgstr "S&#8217;mund ta fshini këtë video."
 
-#: apps/teams/views.py:618
+#: apps/teams/views.py:628
 msgid "You can't remove that video."
 msgstr "S&#8217;mund të hiqni këtë video."
 
-#: apps/teams/views.py:630
+#: apps/teams/views.py:640
 msgid "Video has been deleted from Amara."
 msgstr "Videoja është fshirë nga Amara."
 
-#: apps/teams/views.py:633
+#: apps/teams/views.py:643
 msgid "Video has been removed from the team."
 msgstr "Videoja është hequr nga ekipi."
 
-#: apps/teams/views.py:752
+#: apps/teams/views.py:762
 msgid "Member has been removed from the team."
 msgstr "Anëtari është hequr nga ekipi."
 
-#: apps/teams/views.py:755
+#: apps/teams/views.py:765
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "Përdorni butonin \"Braktiseni këtë ekip\" që të hiqni veten prej këtij ekipi."
 
-#: apps/teams/views.py:758
+#: apps/teams/views.py:768
 msgid "You don't have permission to remove this member from the team."
 msgstr "Nuk keni leje ta hiqni këtë anëtar nga ekipi?"
 
-#: apps/teams/views.py:789
+#: apps/teams/views.py:799
 msgid "Application approved."
 msgstr "Kërkesa u miratua."
 
-#: apps/teams/views.py:791 apps/teams/views.py:809
+#: apps/teams/views.py:801 apps/teams/views.py:819
 msgid "Application does not exist."
 msgstr "Kërkesa nuk ekziston."
 
-#: apps/teams/views.py:793
+#: apps/teams/views.py:803
 msgid "You can't approve applications."
 msgstr "Nuk mund miratoni aplikime."
 
-#: apps/teams/views.py:807
+#: apps/teams/views.py:817
 msgid "Application denied."
 msgstr "Kërkesa u mohua."
 
-#: apps/teams/views.py:811
+#: apps/teams/views.py:821
 msgid "You can't deny applications."
 msgstr "Nuk mund të hidhni poshtë aplikime."
 
-#: apps/teams/views.py:821
+#: apps/teams/views.py:831
 msgid "You cannot invite people to this team."
 msgstr "Nuk mund të ftoni njerëz në këtë ekip."
 
-#: apps/teams/views.py:851
+#: apps/teams/views.py:861
 msgid "This invite is no longer valid"
 msgstr ""
 
-#: apps/teams/views.py:860
+#: apps/teams/views.py:870
 msgid "You cannot join this team."
 msgstr "Nuk mund të bëheni pjesë e këtij ekipi."
 
-#: apps/teams/views.py:911
+#: apps/teams/views.py:921
 msgid "You have left this team."
 msgstr "E braktisët këtë ekip."
 
-#: apps/teams/views.py:968
+#: apps/teams/views.py:978
 msgid "Member saved."
 msgstr "Anëtari u ruajt."
 
-#: apps/teams/views.py:1124
+#: apps/teams/views.py:1136
 msgid "You cannot view this team's tasks."
 msgstr "Nuk mund të shihni punët e caktuara në këtë ekip."
 
-#: apps/teams/views.py:1267 apps/teams/views.py:1270
+#: apps/teams/views.py:1279 apps/teams/views.py:1282
 msgid "You are not allowed to perform this task."
 msgstr "Nuk ju është lejuar kryerja e këtij veprimi."
 
-#: apps/teams/views.py:1325
+#: apps/teams/views.py:1337
 msgid "Task deleted."
 msgstr "Puna u fshi."
 
-#: apps/teams/views.py:1327
+#: apps/teams/views.py:1339
 msgid "You cannot delete this task."
 msgstr "Nuk mund ta fshini këtë punë."
 
-#: apps/teams/views.py:1352
+#: apps/teams/views.py:1364
 msgid "Task declined."
 msgstr "Puna u hodh poshtë."
 
-#: apps/teams/views.py:1354
+#: apps/teams/views.py:1366
 msgid "Task assigned."
 msgstr "Puna u caktua."
 
-#: apps/teams/views.py:1356
+#: apps/teams/views.py:1368
 msgid "You cannot assign this task."
 msgstr "Nuk mund ta caktoni këtë punë."
 
-#: apps/teams/views.py:1378
+#: apps/teams/views.py:1390
 msgid "Invalid assignment attempt."
 msgstr "Përpjekje e pavlefshme caktimi."
 
-#: apps/teams/views.py:1394
+#: apps/teams/views.py:1406
 msgid "Draft uploaded successfully."
 msgstr "Skica u ngarkua me sukses."
 
-#: apps/teams/views.py:1398
+#: apps/teams/views.py:1410
 msgid "/n"
 msgstr ""
 
-#: apps/teams/views.py:1416
+#: apps/teams/views.py:1428
 msgid "You are not allowed to download this transcript."
 msgstr "Nuk ju lejohet ta shkarkoni këtë transkript."
 
-#: apps/teams/views.py:1466
+#: apps/teams/views.py:1478
 msgid "There's already a project with this name"
 msgstr "Ka tashmë një projekt me këtë emër"
 
-#: apps/teams/views.py:1478
+#: apps/teams/views.py:1490
 msgid "Project added."
 msgstr "Projekti u shtua."
 
-#: apps/teams/views.py:1495
+#: apps/teams/views.py:1507
 msgid "You cannot edit that project."
 msgstr "Nuk mund ta përpunoni këtë projekt."
 
-#: apps/teams/views.py:1506
+#: apps/teams/views.py:1518
 msgid "Project deleted."
 msgstr "Projekti u fshi."
 
-#: apps/teams/views.py:1524
+#: apps/teams/views.py:1536
 msgid "Project saved."
 msgstr "Projekti u ruajt."
 
-#: apps/teams/views.py:1650
+#: apps/teams/views.py:1662
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr "Kërkesë e pavlefshme çbotimi.\nGabime:\n"
 
-#: apps/teams/views.py:1684
+#: apps/teams/views.py:1696
 msgid "Successfully unpublished subtitles."
 msgstr "Titrat u çbotuan me sukses."
 
@@ -1532,47 +1492,47 @@ msgstr "Hej-- sapo u gjetën titra në %(language)s për %(video_title)s: %(url)
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "Sapo u gjet një version i kësaj video me titra në %(language_name)s"
 
-#: apps/videos/views.py:161
+#: apps/videos/views.py:159
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add or\n"
 "improve subtitles, click the button below the video."
 msgstr "Ja vendi për titrat e videos suaj. Videon mund\nta ndani me shokët, ose të merrni një kod trupëzimi për te site-i juaj.  Për shtim ose\npërmirësim titrash, klikoni butonin nën videon."
 
-#: apps/videos/views.py:169
+#: apps/videos/views.py:167
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr "Keni parashtruar një video\n                që shërbehet përmes protokollit http.  Shfletuesi juaj mund\n                të shfaqë sinjalizime jo të qarta mbi lëndën."
 
-#: apps/videos/views.py:174
+#: apps/videos/views.py:172
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Titrat e tanishëm do të importohen brenda pak minutash."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:281
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Faleminderit për ngarkimin. Do të kalojë një minutë e ca, para se titrat të duken."
 
-#: apps/videos/views.py:285
+#: apps/videos/views.py:283
 msgid "Your changes have been saved."
 msgstr "Rregullimet tuaja u ruajtën."
 
-#: apps/videos/views.py:636
+#: apps/videos/views.py:634
 msgid "You have not permission change this URL"
 msgstr "Nuk keni leje për ndryshimin e kësaj URL-je"
 
-#: apps/videos/views.py:642 apps/videos/views.py:662
+#: apps/videos/views.py:640 apps/videos/views.py:660
 msgid "Object does not exist"
 msgstr "Objekti nuk ekziston"
 
-#: apps/videos/views.py:655
+#: apps/videos/views.py:653
 msgid "You have not permission delete this URL"
 msgstr "Nuk keni leje për fshirjen e kësaj URL-je"
 
-#: apps/videos/views.py:658
+#: apps/videos/views.py:656
 msgid "You cann't remove original URL"
 msgstr "Nuk mund të hiqni URL-në origjinale"
 
@@ -1580,7 +1540,7 @@ msgstr "Nuk mund të hiqni URL-në origjinale"
 msgid "Feed is unavailable now."
 msgstr "Prurja nuk funksionoka tani."
 
-#: apps/videos/templatetags/subtitles_tags.py:59
+#: apps/videos/templatetags/subtitles_tags.py:56
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
@@ -1606,22 +1566,22 @@ msgstr "Video private"
 msgid "Undefined error"
 msgstr "Gabim i papërcaktuar"
 
-#: apps/widget/rpc.py:109
+#: apps/widget/rpc.py:107
 msgid "Video embedding disabled by owner"
 msgstr "Trupëzimi i videos është çaktivizuar nga i zoti"
 
-#: apps/widget/rpc.py:263
+#: apps/widget/rpc.py:261
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Këto titra moderohen. Shihni faqen e ekipit %s për të dhëna se si të kontribuoni."
 
-#: apps/widget/rpc.py:265
+#: apps/widget/rpc.py:263
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Na ndjeni, këta titra moderohen privatisht."
 
-#: apps/widget/rpc.py:949 apps/widget/rpc.py:990
+#: apps/widget/rpc.py:947 apps/widget/rpc.py:988
 msgid "\n"
 msgstr "\n"
 
@@ -1657,7 +1617,7 @@ msgid "Third party"
 msgstr "Palë e tretë"
 
 #: libs/rosetta/templates/rosetta/languages.html:15
-#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:57
+#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:58
 msgid "All"
 msgstr "Krejt"
 
@@ -1762,7 +1722,7 @@ msgid "Go"
 msgstr "Shko te"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:162 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:190 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:69
 msgid "Original"
 msgstr "Origjinali"
@@ -2772,20 +2732,20 @@ msgid "Then tell the world and invite your friends to help translate:"
 msgstr "Mandej tregojini botës dhe ftoni miqtë tuaj t'ju ndihmojnë në përkthim:"
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
-#: templates/teams/_context_project.html:75
-#: templates/teams/_context_team.html:108
+#: templates/teams/_context_project.html:62
+#: templates/teams/_context_team.html:95
 msgid "Post to Facebook"
 msgstr "Postoje në Facebook"
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
-#: templates/teams/_context_project.html:76
-#: templates/teams/_context_team.html:109
+#: templates/teams/_context_project.html:63
+#: templates/teams/_context_team.html:96
 msgid "Post to Twitter"
 msgstr "Postoje në Twitter"
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
-#: templates/teams/_context_project.html:77
-#: templates/teams/_context_team.html:110
+#: templates/teams/_context_project.html:64
+#: templates/teams/_context_team.html:97
 msgid "Email to friends"
 msgstr "Dërgojuani miqve me email"
 
@@ -2797,8 +2757,8 @@ msgstr "Trupëzoni Kod"
 msgid "Permalink"
 msgstr "Permalidhje"
 
-#: templates/_sharing_widget.html:3 templates/teams/_context_project.html:73
-#: templates/teams/_context_team.html:106
+#: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
+#: templates/teams/_context_team.html:93
 msgid "Share"
 msgstr "Ndajeni Me të Tjerët"
 
@@ -4370,14 +4330,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Jeni i sigurt që doni të fshihet përgjithmonë profili juaj?"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:381
+#: templates/messages/sent.html:51 templates/teams/tasks.html:409
 msgid "Delete"
 msgstr "Fshije"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:435 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:463 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:389
 msgid "Cancel"
 msgstr "Anuloje"
@@ -4801,18 +4761,18 @@ msgstr "Ende pa titra"
 msgid "Open Tasks"
 msgstr "Punë të Hapura"
 
-#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:58
-#: templates/teams/tasks.html.py:157
+#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:59
+#: templates/teams/tasks.html.py:185
 msgid "Transcribe"
 msgstr "Transkriptoni"
 
 #: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:167
+#: templates/teams/tasks.html:195
 msgid "Subtitles into"
 msgstr "Titra në"
 
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:172
-#: templates/teams/tasks.html.py:188 templates/videos/diffing.html:87
+#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:200
+#: templates/teams/tasks.html.py:216 templates/videos/diffing.html:87
 #: templates/videos/subtitle-view.html:149
 #: templates/videos/subtitle-view.html:196
 msgid "Subtitles"
@@ -5179,8 +5139,8 @@ msgstr "GJITHSEJ"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
-#: templates/teams/_context_team.html:47 templates/teams/tasks.html:125
-#: templates/teams/tasks.html.py:176 templates/videos/video-view.html:144
+#: templates/teams/_context_team.html:47 templates/teams/tasks.html:126
+#: templates/teams/tasks.html.py:204 templates/videos/video-view.html:144
 msgid "Video"
 msgstr "Video"
 
@@ -5301,7 +5261,7 @@ msgstr "Faqe Videoje"
 
 #: templates/teams/_context_project.html:17
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:131
+#: templates/teams/_context_team.html:118
 #: templates/videos/subtitle-view.html:137
 #: templates/videos/video-view.html:123
 msgid "Show all"
@@ -5312,24 +5272,11 @@ msgstr "Shfaqi krejt"
 msgid "Task"
 msgstr "Punë"
 
-#: templates/teams/_context_project.html:56
-#: templates/teams/_context_team.html:89
-msgid "Tasks in my languages"
-msgstr "Punë në gjuhët e mia"
-
-#: templates/teams/_context_project.html:60
-#: templates/teams/_context_team.html:93
-msgid ""
-"\n"
-"                        See tasks in <a href=\"#\" data-modal=\"language_modal\">your languages</a>\n"
-"                    "
-msgstr "\n                        Shihni punë në <a href=\"#\" data-modal=\"language_modal\">gjuhët tuaja</a>\n                    "
-
-#: templates/teams/_context_project.html:94
+#: templates/teams/_context_project.html:81
 msgid "Other"
 msgstr "Tjetër"
 
-#: templates/teams/_context_project.html:94
+#: templates/teams/_context_project.html:81
 #: templates/teams/_context_team.html:21
 #: templates/teams/_subnav_settings.html:21
 msgid "Projects"
@@ -5341,7 +5288,7 @@ msgid "video"
 msgstr "video"
 
 #: templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:127
+#: templates/teams/_context_team.html:114
 #: templates/videos/subtitle-view.html:137
 #: templates/videos/video-view.html:123
 msgid "Show less"
@@ -5355,7 +5302,7 @@ msgstr "Anëtar"
 msgid "My tasks"
 msgstr "Punët e Mia"
 
-#: templates/teams/_context_team.html:100
+#: templates/teams/_context_team.html:87
 msgid "All available tasks"
 msgstr "Krejt punët e mundshme"
 
@@ -5384,12 +5331,12 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr "Për t'ju ndihmuar, mund të ftoni gjithashtu shokë që flasin gjuhë të tjera."
 
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:259
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:287
 msgid "Resume"
 msgstr ""
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:261
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:289
 msgid "Start now"
 msgstr "Fillojeni tani"
 
@@ -5417,7 +5364,7 @@ msgstr "Veprimtari"
 
 #: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
 #: templates/teams/_team_video_detail.html:48
-#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:26
+#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:27
 msgid "Tasks"
 msgstr "Punë"
 
@@ -5551,7 +5498,7 @@ msgstr "Shtoni shumë video njëherazi"
 msgid "Team Aplications"
 msgstr "Zbatime Ekipi"
 
-#: templates/teams/applications.html:49 templates/teams/tasks.html:64
+#: templates/teams/applications.html:49 templates/teams/tasks.html:65
 msgid "Approve"
 msgstr "Miratoje"
 
@@ -5635,7 +5582,7 @@ msgstr "Cila gjuhë ka nevojë?"
 msgid "Who should do it?"
 msgstr "Cili duhet ta bëjë?"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:439
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:467
 msgid "Begin typing to search"
 msgstr "Shtypni, që të kërkohet"
 
@@ -5726,7 +5673,7 @@ msgstr "Rol që i duhet caktuar përdoruesit nëse pranon ftesën tuaj."
 msgid "Send Invites"
 msgstr "Dërgoni Ftesa"
 
-#: templates/teams/members-list.html:47 templates/teams/tasks.html:48
+#: templates/teams/members-list.html:47 templates/teams/tasks.html:49
 #: templates/teams/videos-list.html:47
 msgid "Filter and Sort"
 msgstr "Filtroni dhe Renditini"
@@ -5756,12 +5703,12 @@ msgstr "kontribues"
 msgid "speaking"
 msgstr ""
 
-#: templates/teams/members-list.html:64 templates/teams/tasks.html:71
+#: templates/teams/members-list.html:64 templates/teams/tasks.html:75
 msgid "all languages"
 msgstr "krejt gjuhët"
 
-#: templates/teams/members-list.html:72 templates/teams/tasks.html:119
-#: templates/teams/tasks.html.py:126 templates/teams/tasks.html:133
+#: templates/teams/members-list.html:72 templates/teams/tasks.html:120
+#: templates/teams/tasks.html.py:127 templates/teams/tasks.html:134
 #: templates/teams/videos-list.html:89
 msgid "Clear"
 msgstr "Pastroje"
@@ -5971,7 +5918,7 @@ msgid "manage languages"
 msgstr "administroni gjuhët"
 
 #: templates/teams/settings-permissions.html:109
-#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:61
+#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:62
 msgid "Review"
 msgstr "Shqyrtoni"
 
@@ -6017,15 +5964,15 @@ msgstr "Jeni i sigurt se doni të fshihet ky projekt?"
 msgid "This team does not have any projects yet"
 msgstr "Ky ekip ende nuk ka ndonjë projekt"
 
-#: templates/teams/tasks.html:44
+#: templates/teams/tasks.html:45
 msgid "Add Task"
 msgstr "Shtoni Punë"
 
-#: templates/teams/tasks.html:59
+#: templates/teams/tasks.html:60
 msgid "Translate"
 msgstr "Përktheni"
 
-#: templates/teams/tasks.html:69
+#: templates/teams/tasks.html:70
 msgid "tasks for"
 msgstr "punë për"
 
@@ -6033,176 +5980,196 @@ msgstr "punë për"
 msgid "my languages"
 msgstr "gjuhët e mia"
 
-#: templates/teams/tasks.html:86
+#: templates/teams/tasks.html:87
 msgid "assigned to"
 msgstr "caktuar për"
 
-#: templates/teams/tasks.html:88
+#: templates/teams/tasks.html:89
 msgid "anyone"
 msgstr "cilido"
 
-#: templates/teams/tasks.html:89 templates/teams/tasks.html.py:223
+#: templates/teams/tasks.html:90 templates/teams/tasks.html.py:251
 msgid "me"
 msgstr "unë"
 
-#: templates/teams/tasks.html:90
+#: templates/teams/tasks.html:91
 msgid "no one"
 msgstr "asnjë"
 
-#: templates/teams/tasks.html:99 templates/teams/videos-list.html:65
+#: templates/teams/tasks.html:100 templates/teams/videos-list.html:65
 msgid "sorted by"
 msgstr "renditur sipas"
 
-#: templates/teams/tasks.html:102
+#: templates/teams/tasks.html:103
 msgid "date, newest"
 msgstr "datash, më e reja"
 
-#: templates/teams/tasks.html:105
+#: templates/teams/tasks.html:106
 msgid "date, oldest"
 msgstr "datash, më e vjetra"
 
-#: templates/teams/tasks.html:109
+#: templates/teams/tasks.html:110
 msgid "time left, least"
 msgstr "kohë e mbetur, më e pakta"
 
-#: templates/teams/tasks.html:112
+#: templates/teams/tasks.html:113
 msgid "time left, most"
 msgstr "kohë e mbetur, më e shumta"
 
-#: templates/teams/tasks.html:119 templates/teams/tasks.html.py:126
-#: templates/teams/tasks.html:133
+#: templates/teams/tasks.html:120 templates/teams/tasks.html.py:127
+#: templates/teams/tasks.html:134
 msgid "Clear all filters, sorts, and search terms"
 msgstr "Pastro krejt filtrat, renditjet dhe termat e kërkimit"
 
-#: templates/teams/tasks.html:131
+#: templates/teams/tasks.html:132
 msgid "NOTE:"
 msgstr "SHËNIM:"
 
-#: templates/teams/tasks.html:132
+#: templates/teams/tasks.html:133
 msgid ""
 "When sorting by expiration date, tasks without an expiration are not shown."
 msgstr ""
 
-#: templates/teams/tasks.html:190
+#: templates/teams/tasks.html:140
+msgid "Try broadening your selection using the filters above"
+msgstr ""
+
+#: templates/teams/tasks.html:146
+msgid "Tell us what languages you speak"
+msgstr ""
+
+#: templates/teams/tasks.html:146
+msgid "and we'll narrow this list for you"
+msgstr ""
+
+#: templates/teams/tasks.html:152
+msgid "Showing unassigned tasks in languages you speak"
+msgstr ""
+
+#: templates/teams/tasks.html:157
+msgid "Try changing your selection using the filters above to find tasks"
+msgstr ""
+
+#: templates/teams/tasks.html:218
 msgid "latest draft"
 msgstr "skica më e re"
 
-#: templates/teams/tasks.html:194
+#: templates/teams/tasks.html:222
 msgid "transcribed"
 msgstr "të transkriptuara"
 
-#: templates/teams/tasks.html:196 templates/videos/subtitle-view.html:45
+#: templates/teams/tasks.html:224 templates/videos/subtitle-view.html:45
 msgid "translated"
 msgstr "përkthyer"
 
-#: templates/teams/tasks.html:204
+#: templates/teams/tasks.html:232
 msgid "reviewed"
 msgstr "shqyrtuar"
 
-#: templates/teams/tasks.html:206
+#: templates/teams/tasks.html:234
 msgid "and edited"
 msgstr "dhe përpunuar"
 
-#: templates/teams/tasks.html:208 templates/videos/subtitle-view.html:204
+#: templates/teams/tasks.html:236 templates/videos/subtitle-view.html:204
 #: templates/videos/subtitle-view.html:320
 msgid "by"
 msgstr "nga"
 
-#: templates/teams/tasks.html:221
+#: templates/teams/tasks.html:249
 msgid "Assigned to"
 msgstr "Caktuar për"
 
-#: templates/teams/tasks.html:230
+#: templates/teams/tasks.html:258
 msgid "Unassigned"
 msgstr "E pacaktuar"
 
-#: templates/teams/tasks.html:245
+#: templates/teams/tasks.html:273
 msgid "Perform Task"
 msgstr "Kryeje Punën"
 
-#: templates/teams/tasks.html:254
+#: templates/teams/tasks.html:282
 msgid "You have reached the maximum number of tasks."
 msgstr ""
 
-#: templates/teams/tasks.html:273
+#: templates/teams/tasks.html:301
 msgid "Download draft"
 msgstr "Shkarkoje skicën"
 
-#: templates/teams/tasks.html:287
+#: templates/teams/tasks.html:315
 msgid "Upload a draft"
 msgstr ""
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:318
 msgid "Important:"
 msgstr ""
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:318
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
 " and video description in the onsite editor and to submit the final version."
 msgstr ""
 
-#: templates/teams/tasks.html:293 templates/videos/_upload_subtitles.html:20
+#: templates/teams/tasks.html:321 templates/videos/_upload_subtitles.html:20
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr "Gjuhë"
 
-#: templates/teams/tasks.html:299
+#: templates/teams/tasks.html:327
 msgid "Translate from"
 msgstr ""
 
-#: templates/teams/tasks.html:304
+#: templates/teams/tasks.html:332
 msgid "File:"
 msgstr "Kartelë:"
 
-#: templates/teams/tasks.html:307
+#: templates/teams/tasks.html:335
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
 msgstr ""
 
-#: templates/teams/tasks.html:321
+#: templates/teams/tasks.html:349
 msgid "Download a draft"
 msgstr ""
 
-#: templates/teams/tasks.html:326
+#: templates/teams/tasks.html:354
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr ""
 
-#: templates/teams/tasks.html:352
+#: templates/teams/tasks.html:380
 msgid "Decline"
 msgstr "Hidhe poshtë"
 
-#: templates/teams/tasks.html:372
+#: templates/teams/tasks.html:400
 msgid "Reassign"
 msgstr "Ricaktoni"
 
-#: templates/teams/tasks.html:374
+#: templates/teams/tasks.html:402
 msgid "Assign"
 msgstr "Caktoje"
 
-#: templates/teams/tasks.html:390
+#: templates/teams/tasks.html:418
 msgid "Delete task"
 msgstr "Fshije punën"
 
-#: templates/teams/tasks.html:396
+#: templates/teams/tasks.html:424
 msgid "What would you like to do with the subtitles for this task?"
 msgstr "Ç'do të donit të bënit me titra për këtë punë?"
 
-#: templates/teams/tasks.html:399
+#: templates/teams/tasks.html:427
 msgid "Publish these subtitles immediately"
 msgstr "Botoji menjëherë këto titra"
 
-#: templates/teams/tasks.html:403
+#: templates/teams/tasks.html:431
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr "Fshiji këto titra përgjithmonë (hidh tej çfarëdo skice që pas versionit të fundit të botuar)"
 
-#: templates/teams/tasks.html:442
+#: templates/teams/tasks.html:470
 msgid "Assign to User"
 msgstr "Caktoja Përdoruesit"
 
-#: templates/teams/tasks.html:452
+#: templates/teams/tasks.html:480
 msgid "Sorry, no tasks here."
 msgstr "Na ndjeni, nuk ka punë këtu."
 

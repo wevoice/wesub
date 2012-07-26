@@ -7,6 +7,7 @@
 #   <bttf.mcf@gmail.com>, 2012.
 # Claude Almansi <claude.almansi@gmail.com>, 2011.
 # Farid Mazari Boufares <>, 2012.
+#   <marteau.valentin@gmail.com>, 2012.
 # Martin G. <marting.liste@free.fr>, 2012.
 #   <peeter.rannou@gmail.com>, 2011.
 #   <popolon@popolon.org>, 2011.
@@ -15,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-25 01:34-0500\n"
-"PO-Revision-Date: 2012-07-25 06:52+0000\n"
+"POT-Creation-Date: 2012-07-26 01:32-0500\n"
+"PO-Revision-Date: 2012-07-26 06:50+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/universalsubtitles/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -110,7 +111,7 @@ msgstr "Confirmation de l'e-mail"
 
 #: apps/auth/models.py:510
 msgid "e-mail confirmations"
-msgstr ""
+msgstr "confirmation e-mail"
 
 #: apps/auth/views.py:59
 msgid "Confirmation key expired."
@@ -143,46 +144,6 @@ msgstr "Confirmez votre email"
 #: apps/comments/forms.py:53
 msgid "You car reply only comments for same object"
 msgstr "Vous ne pouvez répondre qu'aux commentaires du même objet."
-
-#: apps/icanhaz/forms.py:23
-msgid "Only me"
-msgstr "Seulement moi"
-
-#: apps/icanhaz/forms.py:44
-msgid "This user cannot change those settings"
-msgstr "Cet utilisateur ne peut pas modifier ces réglages"
-
-#: apps/icanhaz/models.py:191
-msgid "Public"
-msgstr "Publique"
-
-#: apps/icanhaz/models.py:192
-msgid "Only with secret url"
-msgstr "Uniquement avec l'url secret"
-
-#: apps/icanhaz/models.py:193
-msgid "Only authorized members"
-msgstr "Uniquement les membres autorisés"
-
-#: apps/icanhaz/models.py:208
-msgid "public"
-msgstr "Publique"
-
-#: apps/icanhaz/models.py:209
-msgid "no embeding allowed"
-msgstr ""
-
-#: apps/icanhaz/views.py:26
-msgid "You cannot change visibility for this video."
-msgstr "Vous ne pouvez pas changer la visibilité de cette vidéo."
-
-#: apps/icanhaz/views.py:43
-msgid "Settings saved!"
-msgstr "Réglages sauvegardés!"
-
-#: apps/icanhaz/views.py:51
-msgid "Please correct the errors bellow!"
-msgstr "Veuillez corriger les erreurs ci-dessous!"
 
 #: apps/messages/forms.py:40
 msgid "You should be authenticated to write messages"
@@ -802,20 +763,20 @@ msgstr "Besoin d'aide pour toutes les langues"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Si vous cochez ceci, les autres langues ne seront pas affichées."
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:911 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Propriétaire"
 
-#: apps/teams/models.py:920 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:912 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Gestionnaire"
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:913 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:922 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:914 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Contributeur"
 
@@ -831,7 +792,7 @@ msgstr "Équipe inexistante"
 msgid "You are already a member of this team."
 msgstr "Vous êtes déja membre de cette équipe."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:864
+#: apps/teams/rpc.py:50 apps/teams/views.py:874
 msgid "You are now a member of this team."
 msgstr "Vous n'êtes pas membre de cette équipe."
 
@@ -877,26 +838,26 @@ msgstr "Role du membre modifié."
 msgid "You cannot assign that role to that member."
 msgstr "Vous ne pouvez pas assigner ce rôle à ce membre."
 
-#: apps/teams/tasks.py:76
+#: apps/teams/tasks.py:96
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Nouvelles vidéos %(team)s prêtes à être sous-titrées!"
 
-#: apps/teams/views.py:124 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:127 templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "Nom"
 
-#: apps/teams/views.py:125 templates/teams/teams-list.html:47
+#: apps/teams/views.py:128 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "Plus récents"
 
-#: apps/teams/views.py:126 templates/teams/teams-list.html:44
+#: apps/teams/views.py:129 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "Plus de membres"
 
-#: apps/teams/views.py:169
+#: apps/teams/views.py:172
 #, python-format
 msgid ""
 "\n"
@@ -911,186 +872,186 @@ msgid ""
 "                "
 msgstr "\n                Votre équipe a été crée. Voici les étapes suivantes:\n                <ul>\n                    <li><a href=\"%(edit)s\">Gérer les permissions des membres</a></li>\n                    <li><a href=\"%(activate)s\">Activer et gérer les flux de votre équipe</a></li>\n                    <li><a href=\"%(create)s\">Créer et gérer des projets</a></li>\n                    <li><a href=\"%(lang)s\">Gérer les préférences de langue</a></li>\n                    <li><a href=\"%(custom)s\">Gérer les instructions aux sous-titreurs et aux traducteurs</a></li>\n                </ul>\n                "
 
-#: apps/teams/views.py:195
+#: apps/teams/views.py:198
 msgid "You do not have permission to delete this team."
 msgstr "Vous n'avez pas la permission de supprimer cette équipe."
 
-#: apps/teams/views.py:209 apps/teams/views.py:245 apps/teams/views.py:273
-#: apps/teams/views.py:306 apps/teams/views.py:361 apps/teams/views.py:1539
+#: apps/teams/views.py:212 apps/teams/views.py:254 apps/teams/views.py:282
+#: apps/teams/views.py:316 apps/teams/views.py:371 apps/teams/views.py:1551
 msgid "You do not have permission to edit this team."
 msgstr "Vous n'avez pas la permission de gérer cette équipe."
 
-#: apps/teams/views.py:232 apps/teams/views.py:291 apps/teams/views.py:376
+#: apps/teams/views.py:241 apps/teams/views.py:301 apps/teams/views.py:386
 msgid "Settings saved."
 msgstr "Réglages enregostrés."
 
-#: apps/teams/views.py:258
+#: apps/teams/views.py:267
 msgid "Guidelines and messages updated."
 msgstr ""
 
-#: apps/teams/views.py:502
+#: apps/teams/views.py:512
 msgid "You can't add that video to this team/project."
 msgstr "Vous ne pouvez pas ajouter cette vidéo à ce projet/équipe."
 
-#: apps/teams/views.py:537
+#: apps/teams/views.py:547
 msgid "The video has been moved to the new team."
 msgstr "La vidéo a été transférée à la nouvelle équipe."
 
-#: apps/teams/views.py:550
+#: apps/teams/views.py:560
 msgid "You can't add videos to this team/project."
 msgstr "Vous ne pouvez pas ajouter de vidéos à ce projet/équipe."
 
-#: apps/teams/views.py:569
+#: apps/teams/views.py:579
 msgid "You can't edit this video."
 msgstr "Vous ne pouvez pas éditer cette vidéo."
 
-#: apps/teams/views.py:578
+#: apps/teams/views.py:588
 msgid "Video has been updated."
 msgstr "Vidéo téléchargée."
 
-#: apps/teams/views.py:606
+#: apps/teams/views.py:616
 msgid "Request must be a POST request."
 msgstr "La requête doit être de type POST."
 
-#: apps/teams/views.py:614
+#: apps/teams/views.py:624
 msgid "You can't delete that video."
 msgstr "Vous ne pouvez pas supprimer cette vidéo."
 
-#: apps/teams/views.py:618
+#: apps/teams/views.py:628
 msgid "You can't remove that video."
 msgstr "Vous ne pouvez pas supprimer cette vidéo."
 
-#: apps/teams/views.py:630
+#: apps/teams/views.py:640
 msgid "Video has been deleted from Amara."
 msgstr "La vidéo a été supprimée d'Amara."
 
-#: apps/teams/views.py:633
+#: apps/teams/views.py:643
 msgid "Video has been removed from the team."
 msgstr "La vidéo a été supprimée de l'équipe."
 
-#: apps/teams/views.py:752
+#: apps/teams/views.py:762
 msgid "Member has been removed from the team."
 msgstr "Le membre a été supprimé de l'équipe."
 
-#: apps/teams/views.py:755
+#: apps/teams/views.py:765
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "Cliquez sur \"Quitter cette équipe\" pour quitter cette équipe."
 
-#: apps/teams/views.py:758
+#: apps/teams/views.py:768
 msgid "You don't have permission to remove this member from the team."
 msgstr "Vous n'avez pas la permission de supprimer ce membre de l'équipe."
 
-#: apps/teams/views.py:789
+#: apps/teams/views.py:799
 msgid "Application approved."
 msgstr "Inscription acceptée."
 
-#: apps/teams/views.py:791 apps/teams/views.py:809
+#: apps/teams/views.py:801 apps/teams/views.py:819
 msgid "Application does not exist."
 msgstr "Le formulaire d'inscription n'existe pas."
 
-#: apps/teams/views.py:793
+#: apps/teams/views.py:803
 msgid "You can't approve applications."
 msgstr "Vous ne pouvez pas valider d'inscription."
 
-#: apps/teams/views.py:807
+#: apps/teams/views.py:817
 msgid "Application denied."
 msgstr "Inscription refusée"
 
-#: apps/teams/views.py:811
+#: apps/teams/views.py:821
 msgid "You can't deny applications."
 msgstr "Vous ne pouvez pas refuser d'inscription."
 
-#: apps/teams/views.py:821
+#: apps/teams/views.py:831
 msgid "You cannot invite people to this team."
 msgstr "Vous ne pouvez pas inviter de personnes dans cette équipe."
 
-#: apps/teams/views.py:851
+#: apps/teams/views.py:861
 msgid "This invite is no longer valid"
 msgstr ""
 
-#: apps/teams/views.py:860
+#: apps/teams/views.py:870
 msgid "You cannot join this team."
 msgstr "Vous ne pouvez pas rejoindre cette équipe."
 
-#: apps/teams/views.py:911
+#: apps/teams/views.py:921
 msgid "You have left this team."
 msgstr "Vous avez quitté cette équipe."
 
-#: apps/teams/views.py:968
+#: apps/teams/views.py:978
 msgid "Member saved."
 msgstr "Membre enregistré."
 
-#: apps/teams/views.py:1124
+#: apps/teams/views.py:1136
 msgid "You cannot view this team's tasks."
 msgstr "Vous ne pouvez pas voir la tache de cette équipe."
 
-#: apps/teams/views.py:1267 apps/teams/views.py:1270
+#: apps/teams/views.py:1279 apps/teams/views.py:1282
 msgid "You are not allowed to perform this task."
 msgstr "Vous n'êtes pas autorisé à effectuer cette tache."
 
-#: apps/teams/views.py:1325
+#: apps/teams/views.py:1337
 msgid "Task deleted."
 msgstr "Tache supprimée."
 
-#: apps/teams/views.py:1327
+#: apps/teams/views.py:1339
 msgid "You cannot delete this task."
 msgstr "Vous ne pouvez pas supprimer cette tache."
 
-#: apps/teams/views.py:1352
+#: apps/teams/views.py:1364
 msgid "Task declined."
 msgstr "Tache refusée."
 
-#: apps/teams/views.py:1354
+#: apps/teams/views.py:1366
 msgid "Task assigned."
 msgstr "Tache assignée."
 
-#: apps/teams/views.py:1356
+#: apps/teams/views.py:1368
 msgid "You cannot assign this task."
 msgstr "Vous ne pouvez pas assigner cette tache."
 
-#: apps/teams/views.py:1378
+#: apps/teams/views.py:1390
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1394
+#: apps/teams/views.py:1406
 msgid "Draft uploaded successfully."
 msgstr "Projet transféré avec succès."
 
-#: apps/teams/views.py:1398
+#: apps/teams/views.py:1410
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1416
+#: apps/teams/views.py:1428
 msgid "You are not allowed to download this transcript."
 msgstr ""
 
-#: apps/teams/views.py:1466
+#: apps/teams/views.py:1478
 msgid "There's already a project with this name"
 msgstr "Il existe déjà un projet de ce nom"
 
-#: apps/teams/views.py:1478
+#: apps/teams/views.py:1490
 msgid "Project added."
 msgstr "Projet ajouté."
 
-#: apps/teams/views.py:1495
+#: apps/teams/views.py:1507
 msgid "You cannot edit that project."
 msgstr "Vous ne pouvez pas éditer ce projet."
 
-#: apps/teams/views.py:1506
+#: apps/teams/views.py:1518
 msgid "Project deleted."
 msgstr "Projet supprimé."
 
-#: apps/teams/views.py:1524
+#: apps/teams/views.py:1536
 msgid "Project saved."
 msgstr "Projet enregistré."
 
-#: apps/teams/views.py:1650
+#: apps/teams/views.py:1662
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr "Requête non valide.\nErreurs:\n"
 
-#: apps/teams/views.py:1684
+#: apps/teams/views.py:1696
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1539,47 +1500,47 @@ msgstr ""
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "Juste trouvé une version de cette vidéo avec des sous-titres en %(language_name)s"
 
-#: apps/videos/views.py:161
+#: apps/videos/views.py:159
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add or\n"
 "improve subtitles, click the button below the video."
 msgstr ""
 
-#: apps/videos/views.py:169
+#: apps/videos/views.py:167
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr ""
 
-#: apps/videos/views.py:174
+#: apps/videos/views.py:172
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Les sous-titres existants seront importés dans quelques minutes."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:281
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Merci d'avoir charger sur le serveur, cela va prendre une minute ou plus pour que vos sous-titres apparaissent."
 
-#: apps/videos/views.py:285
+#: apps/videos/views.py:283
 msgid "Your changes have been saved."
 msgstr ""
 
-#: apps/videos/views.py:636
+#: apps/videos/views.py:634
 msgid "You have not permission change this URL"
 msgstr "Vous n'avez pas la permission de changer cette URL"
 
-#: apps/videos/views.py:642 apps/videos/views.py:662
+#: apps/videos/views.py:640 apps/videos/views.py:660
 msgid "Object does not exist"
 msgstr "L'Ojbjet n'existe pas"
 
-#: apps/videos/views.py:655
+#: apps/videos/views.py:653
 msgid "You have not permission delete this URL"
 msgstr "Vous n'avez pas la permission pour effacer cette URL"
 
-#: apps/videos/views.py:658
+#: apps/videos/views.py:656
 msgid "You cann't remove original URL"
 msgstr "Vous ne pouvez pas effacer l'URL originale"
 
@@ -1587,7 +1548,7 @@ msgstr "Vous ne pouvez pas effacer l'URL originale"
 msgid "Feed is unavailable now."
 msgstr "Le fil est indisponible maintenant."
 
-#: apps/videos/templatetags/subtitles_tags.py:59
+#: apps/videos/templatetags/subtitles_tags.py:56
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
@@ -1613,24 +1574,24 @@ msgstr "Vidéo privée"
 msgid "Undefined error"
 msgstr "Erreur indéfinie"
 
-#: apps/widget/rpc.py:109
+#: apps/widget/rpc.py:107
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:263
+#: apps/widget/rpc.py:261
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:265
+#: apps/widget/rpc.py:263
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:949 apps/widget/rpc.py:990
+#: apps/widget/rpc.py:947 apps/widget/rpc.py:988
 msgid "\n"
-msgstr ""
+msgstr "\n"
 
 #: apps/widget/views.py:107
 msgid "That task has already been completed."
@@ -1664,7 +1625,7 @@ msgid "Third party"
 msgstr "Partie tierce"
 
 #: libs/rosetta/templates/rosetta/languages.html:15
-#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:57
+#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:58
 msgid "All"
 msgstr "Tout"
 
@@ -1769,7 +1730,7 @@ msgid "Go"
 msgstr "Aller"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:162 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:190 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:69
 msgid "Original"
 msgstr "Original"
@@ -2779,20 +2740,20 @@ msgid "Then tell the world and invite your friends to help translate:"
 msgstr "Puis faites passer le mot et invitez vos amis pour aider à traduire :"
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
-#: templates/teams/_context_project.html:75
-#: templates/teams/_context_team.html:108
+#: templates/teams/_context_project.html:62
+#: templates/teams/_context_team.html:95
 msgid "Post to Facebook"
 msgstr "Poster sur Facebook"
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
-#: templates/teams/_context_project.html:76
-#: templates/teams/_context_team.html:109
+#: templates/teams/_context_project.html:63
+#: templates/teams/_context_team.html:96
 msgid "Post to Twitter"
 msgstr "Poster sur Twitter"
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
-#: templates/teams/_context_project.html:77
-#: templates/teams/_context_team.html:110
+#: templates/teams/_context_project.html:64
+#: templates/teams/_context_team.html:97
 msgid "Email to friends"
 msgstr "Envoyer par mail"
 
@@ -2804,8 +2765,8 @@ msgstr "Code d'intégration"
 msgid "Permalink"
 msgstr "Lien permanent"
 
-#: templates/_sharing_widget.html:3 templates/teams/_context_project.html:73
-#: templates/teams/_context_team.html:106
+#: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
+#: templates/teams/_context_team.html:93
 msgid "Share"
 msgstr ""
 
@@ -2947,7 +2908,7 @@ msgstr "Conditions d'utilisation"
 
 #: templates/base.html:121
 msgid "Sentry"
-msgstr ""
+msgstr "Sentinelle"
 
 #: templates/base.html:124
 msgid "Rosetta"
@@ -3053,7 +3014,7 @@ msgid ""
 "\n"
 "To file a counter notification with us, you must provide a written\n"
 "communication that sets forth the items specified below.\n"
-msgstr ""
+msgstr "\nPour déposer une contre notification, vous devez fournir une conversation écrite\nqui explicite les quatre points spécifiés plus bas.\n"
 
 #: templates/dmca.html:87
 msgid ""
@@ -3139,7 +3100,7 @@ msgstr "Ajouter des sous-titres collaboratifs à chaque vidéos de votre site"
 
 #: templates/embed_page.html:28
 msgid "Just drop one line of code into your page:"
-msgstr ""
+msgstr "Déposez juste une ligne de code dans votre page:"
 
 #: templates/embed_page.html:32
 msgid ""
@@ -3190,7 +3151,7 @@ msgstr ""
 
 #: templates/embed_page.html:77
 msgid "This code is experimental. If you run into problems, please"
-msgstr ""
+msgstr "Ce code est expérimental. Si vous rencontrez des problèmes, s'il vous plait"
 
 #: templates/embed_page.html:78
 msgid "let us know"
@@ -3234,11 +3195,11 @@ msgstr ""
 
 #: templates/enterprise.html:27 templates/enterprise.html.py:232
 msgid "Companies"
-msgstr ""
+msgstr "Entreprises"
 
 #: templates/enterprise.html:28 templates/enterprise.html.py:238
 msgid "Universities"
-msgstr ""
+msgstr "Universités"
 
 #: templates/enterprise.html:29 templates/enterprise.html.py:248
 msgid "Publishers"
@@ -3601,11 +3562,11 @@ msgstr "Foire aux questions"
 
 #: templates/faq.html:19 templates/faq.html.py:43
 msgid "What is Amara?"
-msgstr ""
+msgstr "Qu'est-ce qu'Amara ?"
 
 #: templates/faq.html:20 templates/faq.html.py:54
 msgid "How can I use Amara?"
-msgstr ""
+msgstr "Comment puis-je utiliser Amara ?"
 
 #: templates/faq.html:21 templates/faq.html.py:65
 msgid "What are the benefits of subtitles?"
@@ -3905,7 +3866,7 @@ msgstr "Sous-titre"
 
 #: templates/index.html:27
 msgid "Works with YouTube, Vimeo, HTML5, and more."
-msgstr ""
+msgstr "Fonctionne avec YouTube, Vimeo, HTML5, et d'autres encore."
 
 #: templates/index.html:30
 msgid "Features"
@@ -3964,7 +3925,7 @@ msgstr ""
 
 #: templates/index.html:86 templates/index.html.py:88
 msgid "TED Team"
-msgstr ""
+msgstr "Équipe TED"
 
 #: templates/index.html:94 templates/index.html.py:95
 msgid "Mozilla Team"
@@ -3984,7 +3945,7 @@ msgstr ""
 
 #: templates/index.html:120
 msgid "Newshour Team"
-msgstr ""
+msgstr "Équipe Newshour"
 
 #: templates/index.html:121
 msgid "NewsHour Team"
@@ -4077,7 +4038,7 @@ msgstr ""
 
 #: templates/index_old.html:89
 msgid "With Amara, you can:"
-msgstr ""
+msgstr "Avec Amara, vous pouvez:"
 
 #: templates/index_old.html:91
 msgid "Add subtitles"
@@ -4167,7 +4128,7 @@ msgstr "Essayez la démo"
 
 #: templates/index_old.html:156
 msgid "Why Amara is different"
-msgstr ""
+msgstr "Pourquoi Amara est différent"
 
 #: templates/index_old.html:158
 msgid ""
@@ -4377,29 +4338,29 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Êtes-vous sure de vouloir définitivement détruire votre profil ?"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:381
+#: templates/messages/sent.html:51 templates/teams/tasks.html:409
 msgid "Delete"
 msgstr "Détruire"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:435 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:463 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:389
 msgid "Cancel"
 msgstr "Annuler"
 
 #: templates/auth/login.html:25
 msgid "Or use your Amara account"
-msgstr ""
+msgstr "Ou utilisez votre compte Amara"
 
 #: templates/auth/login.html:26
 msgid "Don't have one?"
-msgstr ""
+msgstr "Vous n'en avez pas ?"
 
 #: templates/auth/login.html:29
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Mot de passe oublié ?"
 
 #: templates/auth/login.html:30 templates/auth/login_trap.html:15
 #: templates/openid_consumer/signin.html:22
@@ -4408,11 +4369,11 @@ msgstr "S'enregistrer"
 
 #: templates/auth/login.html:34
 msgid "Create an Amara account"
-msgstr ""
+msgstr "Créer un compte Amara"
 
 #: templates/auth/login.html:35
 msgid "Already have one?"
-msgstr ""
+msgstr "Vous en avez déjà un ?"
 
 #: templates/auth/login.html:38
 msgid "Create Account"
@@ -4623,12 +4584,12 @@ msgstr "Vous n'avez pas de messages."
 #: templates/messages/list.html:100 templates/messages/new.html:74
 #: templates/messages/sent.html:66
 msgid "Inbox"
-msgstr ""
+msgstr "Boîte de réception"
 
 #: templates/messages/list.html:101 templates/messages/new.html:75
 #: templates/messages/sent.html:67
 msgid "Sent"
-msgstr ""
+msgstr "Envoyé"
 
 #: templates/messages/list.html:124
 msgid "Send Message"
@@ -4727,7 +4688,7 @@ msgstr ""
 
 #: templates/profiles/_filters_dashboard.html:11
 msgid "My Videos"
-msgstr ""
+msgstr "Mes Videos"
 
 #: templates/profiles/_require_email_dialog.html:7
 msgid ""
@@ -4775,12 +4736,12 @@ msgstr "Soumettre"
 
 #: templates/profiles/_tabs.html:6 templates/profiles/_top_user_panel.html:15
 msgid "Profile"
-msgstr ""
+msgstr "Profile"
 
 #: templates/profiles/_tabs.html:19 templates/profiles/_top_user_panel.html:11
 #: templates/profiles/dashboard.html:13
 msgid "Dashboard"
-msgstr ""
+msgstr "Tableau de bord"
 
 #: templates/profiles/_top_user_panel.html:26
 msgid "Logout"
@@ -4797,29 +4758,29 @@ msgstr "Pas d'acitivité"
 #: templates/profiles/_video_detail.html:8
 #: templates/teams/members-list.html:102
 msgid "language"
-msgstr ""
+msgstr "langues"
 
 #: templates/profiles/_video_detail.html:10
 #: templates/teams/_team_video_detail.html:28
 msgid "No subtitles yet"
-msgstr ""
+msgstr "Sous-titres pas encore disponibles"
 
 #: templates/profiles/dashboard.html:38
 msgid "Open Tasks"
 msgstr ""
 
-#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:58
-#: templates/teams/tasks.html.py:157
+#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:59
+#: templates/teams/tasks.html.py:185
 msgid "Transcribe"
 msgstr ""
 
 #: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:167
+#: templates/teams/tasks.html:195
 msgid "Subtitles into"
 msgstr "Sous-titres en"
 
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:172
-#: templates/teams/tasks.html.py:188 templates/videos/diffing.html:87
+#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:200
+#: templates/teams/tasks.html.py:216 templates/videos/diffing.html:87
 #: templates/videos/subtitle-view.html:149
 #: templates/videos/subtitle-view.html:196
 msgid "Subtitles"
@@ -4828,7 +4789,7 @@ msgstr "Sous-titres"
 #: templates/profiles/dashboard.html:57 templates/teams/members-list.html:101
 #: templates/teams/members-list.html:102
 msgid "for"
-msgstr ""
+msgstr "pour"
 
 #: templates/profiles/dashboard.html:67
 msgid "Decline Task"
@@ -4844,7 +4805,7 @@ msgstr ""
 
 #: templates/profiles/dashboard.html:98
 msgid "Alerts"
-msgstr ""
+msgstr "Alertes"
 
 #: templates/profiles/dashboard.html:115 templates/teams/teams-list.html:107
 msgid "Do you really wish to leave this team?"
@@ -4852,7 +4813,7 @@ msgstr "Voulez-vous vraiment quitter cette équipe ?"
 
 #: templates/profiles/dashboard.html:115
 msgid "leave team"
-msgstr ""
+msgstr "quitter l'équipe"
 
 #: templates/profiles/edit_profile.html:5
 msgid "Edit My Profile"
@@ -4860,7 +4821,7 @@ msgstr "Éditer mon profile"
 
 #: templates/profiles/edit_profile.html:16
 msgid "Do you really want delete your picture?"
-msgstr ""
+msgstr "Voulez vous réellement supprimer votre photo ?"
 
 #: templates/profiles/edit_profile.html:40
 #: templates/videos/_paste_transcription.html:106
@@ -4890,11 +4851,11 @@ msgstr "Envoyer une image"
 
 #: templates/profiles/edit_profile.html:92
 msgid "Account Details"
-msgstr ""
+msgstr "Détails du compte"
 
 #: templates/profiles/edit_profile.html:107
 msgid "Notifications"
-msgstr ""
+msgstr "Notifications"
 
 #: templates/profiles/edit_profile.html:110
 msgid "Send notifications to my UniversalSubtitles.org message inbox"
@@ -4928,7 +4889,7 @@ msgstr ""
 #: templates/profiles/edit_profile.html:183
 #: templates/teams/settings-permissions.html:118
 msgid "Save Changes"
-msgstr ""
+msgstr "Sauvegarder les changements"
 
 #: templates/profiles/edit_profile.html:186
 msgid "Permanently Delete Your Profile"
@@ -4953,7 +4914,7 @@ msgstr "<i>L'utilisateur n'a pas soumis de biographie.</i>"
 #: templates/profiles/view_profile.html:82
 #: templates/teams/_subnav_settings.html:17
 msgid "Languages"
-msgstr ""
+msgstr "Langues"
 
 #: templates/profiles/view_profile.html:98
 msgid "Memberships"
@@ -4961,7 +4922,7 @@ msgstr ""
 
 #: templates/profiles/view_profile.html:121
 msgid "Profile deleted by user."
-msgstr ""
+msgstr "Le profil a été supprimé par l'utilisateur"
 
 #: templates/profiles/view_profile.html:130
 msgid "Edit user"
@@ -5100,15 +5061,15 @@ msgstr "lignes"
 
 #: templates/search/_video_item.html:34
 msgid "Plays (this week)"
-msgstr ""
+msgstr "Lectures (cette semaine)"
 
 #: templates/search/_video_item.html:35
 msgid "Plays (this month)"
-msgstr ""
+msgstr "Lectures (ce mois)"
 
 #: templates/search/_video_item.html:36
 msgid "Plays (all time)"
-msgstr ""
+msgstr "Lectures (tout le temps)"
 
 #: templates/search/search.html:86 templates/search/search.html.py:125
 msgid "Search Videos"
@@ -5186,8 +5147,8 @@ msgstr "TOTAL"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
-#: templates/teams/_context_team.html:47 templates/teams/tasks.html:125
-#: templates/teams/tasks.html.py:176 templates/videos/video-view.html:144
+#: templates/teams/_context_team.html:47 templates/teams/tasks.html:126
+#: templates/teams/tasks.html.py:204 templates/videos/video-view.html:144
 msgid "Video"
 msgstr "Vidéo"
 
@@ -5213,7 +5174,7 @@ msgstr "Valeur"
 
 #: templates/teams/_actions.html:9 templates/teams/_actions.html.py:50
 msgid "Join via"
-msgstr ""
+msgstr "Rejoindre via"
 
 #: templates/teams/_actions.html:17 templates/teams/_actions.html.py:36
 msgid "You will be logged out and new account will be created via"
@@ -5241,7 +5202,7 @@ msgstr ""
 
 #: templates/teams/_actions.html:58
 msgid "Join Team"
-msgstr ""
+msgstr "Rejoindre l'équipe"
 
 #: templates/teams/_actions.html:64
 msgid "Want to create your own subtitling team? Contact "
@@ -5308,39 +5269,26 @@ msgstr "Page vidéo"
 
 #: templates/teams/_context_project.html:17
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:131
+#: templates/teams/_context_team.html:118
 #: templates/videos/subtitle-view.html:137
 #: templates/videos/video-view.html:123
 msgid "Show all"
-msgstr ""
+msgstr "Montrer tout"
 
 #: templates/teams/_context_project.html:31
 #: templates/teams/_context_team.html:59
 msgid "Task"
-msgstr ""
+msgstr "Tache"
 
-#: templates/teams/_context_project.html:56
-#: templates/teams/_context_team.html:89
-msgid "Tasks in my languages"
-msgstr ""
-
-#: templates/teams/_context_project.html:60
-#: templates/teams/_context_team.html:93
-msgid ""
-"\n"
-"                        See tasks in <a href=\"#\" data-modal=\"language_modal\">your languages</a>\n"
-"                    "
-msgstr ""
-
-#: templates/teams/_context_project.html:94
+#: templates/teams/_context_project.html:81
 msgid "Other"
-msgstr ""
+msgstr "Autre"
 
-#: templates/teams/_context_project.html:94
+#: templates/teams/_context_project.html:81
 #: templates/teams/_context_team.html:21
 #: templates/teams/_subnav_settings.html:21
 msgid "Projects"
-msgstr ""
+msgstr "Projets"
 
 #: templates/teams/_context_team.html:29
 #: templates/videos/test_form_page.html:24
@@ -5348,27 +5296,27 @@ msgid "video"
 msgstr "vidéo qui suit"
 
 #: templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:127
+#: templates/teams/_context_team.html:114
 #: templates/videos/subtitle-view.html:137
 #: templates/videos/video-view.html:123
 msgid "Show less"
-msgstr ""
+msgstr "Montrer moins"
 
 #: templates/teams/_context_team.html:53
 msgid "Member"
-msgstr ""
+msgstr "Membre"
 
 #: templates/teams/_context_team.html:83
 msgid "My tasks"
-msgstr ""
+msgstr "Mes taches"
 
-#: templates/teams/_context_team.html:100
+#: templates/teams/_context_team.html:87
 msgid "All available tasks"
-msgstr ""
+msgstr "Toutes les taches disponibles"
 
 #: templates/teams/_filters_videos.html:7
 msgid "All videos"
-msgstr ""
+msgstr "Toutes les videos"
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "According to your"
@@ -5391,18 +5339,18 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr "Vous pouvez également inviter des amis qui parlent d'autres langues afin d'aider."
 
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:259
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:287
 msgid "Resume"
 msgstr ""
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:261
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:289
 msgid "Start now"
 msgstr ""
 
 #: templates/teams/_subnav_settings.html:5 templates/teams/create.html:43
 msgid "Team Details"
-msgstr ""
+msgstr "Détails de l'équipe"
 
 #: templates/teams/_subnav_settings.html:13
 #: templates/teams/settings-permissions.html:92
@@ -5424,7 +5372,7 @@ msgstr "Activité"
 
 #: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
 #: templates/teams/_team_video_detail.html:48
-#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:26
+#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:27
 msgid "Tasks"
 msgstr ""
 
@@ -5444,7 +5392,7 @@ msgstr ""
 
 #: templates/teams/_team_add_video_select.html:8
 msgid "Choose a team"
-msgstr ""
+msgstr "Choisir une équipe"
 
 #: templates/teams/_team_message.html:4
 #, python-format
@@ -5527,7 +5475,7 @@ msgstr "Éditer"
 #: templates/teams/members-list.html:122 templates/teams/videos-list.html:147
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
-msgstr ""
+msgstr "Supprimer"
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
@@ -5558,7 +5506,7 @@ msgstr ""
 msgid "Team Aplications"
 msgstr "Inscription de l'équipe"
 
-#: templates/teams/applications.html:49 templates/teams/tasks.html:64
+#: templates/teams/applications.html:49 templates/teams/tasks.html:65
 msgid "Approve"
 msgstr "Approuver"
 
@@ -5576,7 +5524,7 @@ msgstr ""
 
 #: templates/teams/base.html:43
 msgid "Edit team"
-msgstr ""
+msgstr "Modifier l'équipe"
 
 #: templates/teams/create.html:6
 msgid "Create team"
@@ -5642,7 +5590,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:439
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:467
 msgid "Begin typing to search"
 msgstr ""
 
@@ -5733,7 +5681,7 @@ msgstr ""
 msgid "Send Invites"
 msgstr ""
 
-#: templates/teams/members-list.html:47 templates/teams/tasks.html:48
+#: templates/teams/members-list.html:47 templates/teams/tasks.html:49
 #: templates/teams/videos-list.html:47
 msgid "Filter and Sort"
 msgstr ""
@@ -5763,19 +5711,19 @@ msgstr ""
 msgid "speaking"
 msgstr ""
 
-#: templates/teams/members-list.html:64 templates/teams/tasks.html:71
+#: templates/teams/members-list.html:64 templates/teams/tasks.html:75
 msgid "all languages"
 msgstr ""
 
-#: templates/teams/members-list.html:72 templates/teams/tasks.html:119
-#: templates/teams/tasks.html.py:126 templates/teams/tasks.html:133
+#: templates/teams/members-list.html:72 templates/teams/tasks.html:120
+#: templates/teams/tasks.html.py:127 templates/teams/tasks.html:134
 #: templates/teams/videos-list.html:89
 msgid "Clear"
 msgstr ""
 
 #: templates/teams/members-list.html:77
 msgid "This team has"
-msgstr ""
+msgstr "Cette équipe a"
 
 #: templates/teams/members-list.html:77
 msgid "open applications"
@@ -5787,7 +5735,7 @@ msgstr "Désolé, aucun membre trouvé."
 
 #: templates/teams/members-list.html:92
 msgid "Me"
-msgstr ""
+msgstr "Moi"
 
 #: templates/teams/members-list.html:101 templates/teams/members-list.html:102
 msgid "and"
@@ -5795,7 +5743,7 @@ msgstr "et"
 
 #: templates/teams/members-list.html:101
 msgid "project"
-msgstr ""
+msgstr "projet"
 
 #: templates/teams/members-list.html:113
 msgid "Assignments"
@@ -5803,7 +5751,7 @@ msgstr ""
 
 #: templates/teams/members-list.html:122
 msgid "Are you sure you want to remove this member from the team?"
-msgstr ""
+msgstr "Êtes-vous sûr de vouloir supprimer ce membre de l'équipe ?"
 
 #: templates/teams/settings-guidelines.html:5
 #: templates/teams/settings-guidelines.html:44
@@ -5822,19 +5770,19 @@ msgstr ""
 
 #: templates/teams/settings-guidelines.html:31
 msgid "When a member is invited to join the team"
-msgstr ""
+msgstr "Quand un membre est invité à rejoindre l'équipe"
 
 #: templates/teams/settings-guidelines.html:34
 msgid "When a member applies to join the team"
-msgstr ""
+msgstr "Quand un membre demande à rejoindre l'équipe"
 
 #: templates/teams/settings-guidelines.html:37
 msgid "When a member is given the Manager role"
-msgstr ""
+msgstr "Quand un membre à le rôle de Manager"
 
 #: templates/teams/settings-guidelines.html:40
 msgid "When a member is given the Admin role"
-msgstr ""
+msgstr "Quand une membre à le rôle d'Administrateur"
 
 #: templates/teams/settings-guidelines.html:47
 msgid "Add guidelines to be displayed to your users when completing tasks."
@@ -5854,7 +5802,7 @@ msgstr ""
 
 #: templates/teams/settings-languages.html:27
 msgid "Preferred Languages"
-msgstr ""
+msgstr "Langues préférées"
 
 #: templates/teams/settings-languages.html:28
 msgid "Translation tasks will be auto-created for these languages"
@@ -5978,7 +5926,7 @@ msgid "manage languages"
 msgstr "gérer les langues"
 
 #: templates/teams/settings-permissions.html:109
-#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:61
+#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:62
 msgid "Review"
 msgstr "Vérifier"
 
@@ -5991,11 +5939,11 @@ msgstr ""
 #: templates/teams/settings-projects-edit.html:24
 #: templates/teams/settings-projects.html:20
 msgid "Add Project"
-msgstr ""
+msgstr "Ajouter un projet"
 
 #: templates/teams/settings-projects-add.html:26
 msgid "Add new project"
-msgstr ""
+msgstr "Ajouter un nouveau projet"
 
 #: templates/teams/settings-projects-add.html:32
 #: templates/teams/settings-projects-edit.html:40
@@ -6014,7 +5962,7 @@ msgstr ""
 
 #: templates/teams/settings-projects-edit.html:34
 msgid "Edit Project"
-msgstr ""
+msgstr "Modifier le projet"
 
 #: templates/teams/settings-projects-edit.html:76
 msgid "Are you sure you want to delete this project?"
@@ -6024,192 +5972,212 @@ msgstr "Etes-vous sûr de vouloir supprimer ce projet?"
 msgid "This team does not have any projects yet"
 msgstr ""
 
-#: templates/teams/tasks.html:44
+#: templates/teams/tasks.html:45
 msgid "Add Task"
-msgstr ""
+msgstr "Ajouter une tache"
 
-#: templates/teams/tasks.html:59
+#: templates/teams/tasks.html:60
 msgid "Translate"
 msgstr "Traduire"
 
-#: templates/teams/tasks.html:69
+#: templates/teams/tasks.html:70
 msgid "tasks for"
-msgstr ""
+msgstr "taches pour"
 
 #: templates/teams/tasks.html:73
 msgid "my languages"
 msgstr "mes langues"
 
-#: templates/teams/tasks.html:86
+#: templates/teams/tasks.html:87
 msgid "assigned to"
 msgstr "assigné à"
 
-#: templates/teams/tasks.html:88
+#: templates/teams/tasks.html:89
 msgid "anyone"
 msgstr ""
 
-#: templates/teams/tasks.html:89 templates/teams/tasks.html.py:223
+#: templates/teams/tasks.html:90 templates/teams/tasks.html.py:251
 msgid "me"
 msgstr "moi"
 
-#: templates/teams/tasks.html:90
+#: templates/teams/tasks.html:91
 msgid "no one"
 msgstr ""
 
-#: templates/teams/tasks.html:99 templates/teams/videos-list.html:65
+#: templates/teams/tasks.html:100 templates/teams/videos-list.html:65
 msgid "sorted by"
 msgstr ""
 
-#: templates/teams/tasks.html:102
+#: templates/teams/tasks.html:103
 msgid "date, newest"
 msgstr ""
 
-#: templates/teams/tasks.html:105
+#: templates/teams/tasks.html:106
 msgid "date, oldest"
-msgstr ""
+msgstr "date, le plus ancien"
 
-#: templates/teams/tasks.html:109
+#: templates/teams/tasks.html:110
 msgid "time left, least"
 msgstr ""
 
-#: templates/teams/tasks.html:112
+#: templates/teams/tasks.html:113
 msgid "time left, most"
 msgstr ""
 
-#: templates/teams/tasks.html:119 templates/teams/tasks.html.py:126
-#: templates/teams/tasks.html:133
+#: templates/teams/tasks.html:120 templates/teams/tasks.html.py:127
+#: templates/teams/tasks.html:134
 msgid "Clear all filters, sorts, and search terms"
 msgstr ""
 
-#: templates/teams/tasks.html:131
+#: templates/teams/tasks.html:132
 msgid "NOTE:"
 msgstr ""
 
-#: templates/teams/tasks.html:132
+#: templates/teams/tasks.html:133
 msgid ""
 "When sorting by expiration date, tasks without an expiration are not shown."
 msgstr ""
 
-#: templates/teams/tasks.html:190
+#: templates/teams/tasks.html:140
+msgid "Try broadening your selection using the filters above"
+msgstr ""
+
+#: templates/teams/tasks.html:146
+msgid "Tell us what languages you speak"
+msgstr ""
+
+#: templates/teams/tasks.html:146
+msgid "and we'll narrow this list for you"
+msgstr ""
+
+#: templates/teams/tasks.html:152
+msgid "Showing unassigned tasks in languages you speak"
+msgstr ""
+
+#: templates/teams/tasks.html:157
+msgid "Try changing your selection using the filters above to find tasks"
+msgstr ""
+
+#: templates/teams/tasks.html:218
 msgid "latest draft"
 msgstr "dernier projet"
 
-#: templates/teams/tasks.html:194
+#: templates/teams/tasks.html:222
 msgid "transcribed"
 msgstr ""
 
-#: templates/teams/tasks.html:196 templates/videos/subtitle-view.html:45
+#: templates/teams/tasks.html:224 templates/videos/subtitle-view.html:45
 msgid "translated"
 msgstr "traduit"
 
-#: templates/teams/tasks.html:204
+#: templates/teams/tasks.html:232
 msgid "reviewed"
 msgstr "revu"
 
-#: templates/teams/tasks.html:206
+#: templates/teams/tasks.html:234
 msgid "and edited"
 msgstr "et édité"
 
-#: templates/teams/tasks.html:208 templates/videos/subtitle-view.html:204
+#: templates/teams/tasks.html:236 templates/videos/subtitle-view.html:204
 #: templates/videos/subtitle-view.html:320
 msgid "by"
 msgstr "par"
 
-#: templates/teams/tasks.html:221
+#: templates/teams/tasks.html:249
 msgid "Assigned to"
 msgstr "Assigné à"
 
-#: templates/teams/tasks.html:230
+#: templates/teams/tasks.html:258
 msgid "Unassigned"
 msgstr ""
 
-#: templates/teams/tasks.html:245
+#: templates/teams/tasks.html:273
 msgid "Perform Task"
-msgstr ""
+msgstr "Taches accomplies"
 
-#: templates/teams/tasks.html:254
+#: templates/teams/tasks.html:282
 msgid "You have reached the maximum number of tasks."
 msgstr "Vous avez atteint le nombre maximum de tâches."
 
-#: templates/teams/tasks.html:273
+#: templates/teams/tasks.html:301
 msgid "Download draft"
 msgstr ""
 
-#: templates/teams/tasks.html:287
+#: templates/teams/tasks.html:315
 msgid "Upload a draft"
 msgstr "Chargez un brouillon. "
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:318
 msgid "Important:"
 msgstr "Important:"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:318
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
 " and video description in the onsite editor and to submit the final version."
 msgstr ""
 
-#: templates/teams/tasks.html:293 templates/videos/_upload_subtitles.html:20
+#: templates/teams/tasks.html:321 templates/videos/_upload_subtitles.html:20
 #: templates/videos/video-view.html:101
 msgid "Language"
 msgstr "Langue"
 
-#: templates/teams/tasks.html:299
+#: templates/teams/tasks.html:327
 msgid "Translate from"
 msgstr "Traduire depuis"
 
-#: templates/teams/tasks.html:304
+#: templates/teams/tasks.html:332
 msgid "File:"
 msgstr "Fichier:"
 
-#: templates/teams/tasks.html:307
+#: templates/teams/tasks.html:335
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
-msgstr ""
+msgstr "Formats acceptés: .srt, .ssa, .sbv, .dfxp, .txt or .xml (pour TTML)"
 
-#: templates/teams/tasks.html:321
+#: templates/teams/tasks.html:349
 msgid "Download a draft"
 msgstr "Téléchargez un brouillon. "
 
-#: templates/teams/tasks.html:326
+#: templates/teams/tasks.html:354
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr "Téléchargez un brouillon de ces sous-titres afin de continuer votre travail hors-ligne. "
 
-#: templates/teams/tasks.html:352
+#: templates/teams/tasks.html:380
 msgid "Decline"
 msgstr "Refuser"
 
-#: templates/teams/tasks.html:372
+#: templates/teams/tasks.html:400
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:374
+#: templates/teams/tasks.html:402
 msgid "Assign"
 msgstr "Assigner"
 
-#: templates/teams/tasks.html:390
+#: templates/teams/tasks.html:418
 msgid "Delete task"
 msgstr "Supprimer la tache"
 
-#: templates/teams/tasks.html:396
+#: templates/teams/tasks.html:424
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:399
+#: templates/teams/tasks.html:427
 msgid "Publish these subtitles immediately"
 msgstr "Publier ces sous-titres immédiatement"
 
-#: templates/teams/tasks.html:403
+#: templates/teams/tasks.html:431
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:442
+#: templates/teams/tasks.html:470
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:452
+#: templates/teams/tasks.html:480
 msgid "Sorry, no tasks here."
 msgstr "Désolé, pas de tache ici."
 

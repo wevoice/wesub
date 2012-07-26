@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
 import random
+import csv
 
 from django.db import transaction
 from django.conf import settings
@@ -47,11 +48,11 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm, MoveTeamVideoForm, UploadDraftForm
+    UnpublishForm, MoveTeamVideoForm, UploadDraftForm, ChooseTeamForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference
+    Setting, TeamLanguagePreference, SubtitleVersion
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -61,6 +62,7 @@ from teams.permissions import (
     can_perform_task_for, can_delete_team, can_review, can_approve,
     can_delete_video, can_remove_video
 )
+from teams.moderation_const import APPROVED
 from teams.search_indexes import TeamVideoLanguagesIndex
 from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
@@ -1068,10 +1070,10 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        if filters.get('language') == 'mine' and request.user.is_authenticated():
-            tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
-        else:
+        if filters.get('language') != 'all':
             tasks = tasks.filter(language=filters['language'])
+    elif request.user.is_authenticated() and request.user.get_languages():
+        tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
 
     if filters.get('q'):
         terms = get_terms(filters['q'])
@@ -1095,6 +1097,8 @@ def _tasks_list(request, team, project, filters, user):
             tasks = tasks.filter(assignee=int(assignee))
         elif assignee:
             tasks = tasks.filter(assignee=User.objects.get(username=assignee))
+    else:
+        tasks = tasks.filter(assignee=None)
 
     return tasks
 
@@ -1715,3 +1719,78 @@ def auto_captions_status(request, slug):
     response =  HttpResponse( "\n".join(buffer), content_type="text/csv")
     response['Content-Disposition'] = 'filename=team-status.csv'
     return response
+
+
+# Billing
+
+def get_billing_data_for_team(team, start_date, end_date, header=True):
+    """
+    Return a list of lists of data suitable for the csv writer or similar.
+    """
+    rows = []
+
+    if header:
+        rows.append(['Video title', 'Video URL', 'Video language',
+                'Billable minutes'])
+
+    tvs = TeamVideo.objects.filter(team=team)
+
+    for tv in tvs:
+        languages = tv.video.subtitlelanguage_set.all()
+        versions = SubtitleVersion.objects.filter(language__in=languages,
+                moderation_status=APPROVED, datetime_started__gte=start_date,
+                datetime_started__lte=end_date)
+
+        for v in versions:
+            subs = list(v.subtitle_set.filter(start_time__isnull=False,
+                end_time__isnull=False))
+
+            if len(subs) == 0:
+                continue
+
+            start = subs[0].start_time
+            end = subs[-1].end_time
+
+            rows.append([
+                tv.video.title.encode('utf-8'),
+                tv.video.get_video_url(),
+                tv.video.language,
+                round(end - start)
+            ])
+
+    return rows
+
+
+@staff_member_required
+def billing(request):
+    user = request.user
+
+    if not DEV and not (user.is_superuser and user.is_active):
+        raise Http404
+
+    if request.method == 'POST':
+        form = ChooseTeamForm(request.POST)
+        if form.is_valid():
+            team = form.cleaned_data.get('team')
+            start_date = form.cleaned_data.get('start_date')
+            end_date = form.cleaned_data.get('end_date')
+
+            f = 'billing-%s' % team.slug
+
+            response = HttpResponse(mimetype='text/csv')
+            response['Content-Disposition'] = 'attachment;filename=%s.csv' % f
+
+            writer = csv.writer(response)
+
+            data = get_billing_data_for_team(team, start_date, end_date)
+
+            for row in data:
+                writer.writerow(row)
+
+            return response
+    else:
+        form = ChooseTeamForm()
+
+    return render_to_response('teams/billing/choose.html', {
+        'form': form
+    }, RequestContext(request))
