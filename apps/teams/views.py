@@ -1726,6 +1726,14 @@ def auto_captions_status(request, slug):
 def get_billing_data_for_team(team, start_date, end_date, header=True):
     """
     Return a list of lists of data suitable for the csv writer or similar.
+
+    * Get all videos for team
+    * For each video, get all languages
+    * For each language, get the latest version
+    * If the version is approved and within the time constraints, add it.
+
+    Minutes are counted by
+        [last subtitle synced timing] - [first subtitle synced timing]
     """
     rows = []
 
@@ -1737,11 +1745,17 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
 
     for tv in tvs:
         languages = tv.video.subtitlelanguage_set.all()
-        versions = SubtitleVersion.objects.filter(language__in=languages,
-                moderation_status=APPROVED, datetime_started__gte=start_date,
-                datetime_started__lte=end_date)
 
-        for v in versions:
+        for language in languages:
+            v = language.latest_version()
+
+            if v.moderation_status != APPROVED:
+                continue
+
+            if (v.datetime_started < start_date) or (v.datetime_started >
+                    end_date):
+                continue
+
             subs = list(v.subtitle_set.filter(start_time__isnull=False,
                 end_time__isnull=False))
 
@@ -1755,7 +1769,7 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
                 tv.video.title.encode('utf-8'),
                 tv.video.get_video_url(),
                 tv.video.language,
-                round(end - start)
+                int(round((end - start) / 60))
             ])
 
     return rows
