@@ -37,7 +37,7 @@
 
                             // TODO: This needs to support a node OR ID string.
                             el: _$('#' + options.div)[0],
-                            model: new that.VideoModel(options)
+                            model: new VideoModel(options)
                         })
                     );
 
@@ -46,7 +46,7 @@
         };
 
         // Video model.
-        this.VideoModel = _Backbone.Model.extend({
+        var VideoModel = _Backbone.Model.extend({
 
             // The initialization of these vars is unnecessary, but it's nice to know
             // what vars will *eventually* be on the video model.
@@ -60,6 +60,7 @@
             height: '',
             initialLanguage: null,
             isOnAmara: null,
+            subtitles: [], // Backbone collection
             url: '',
             width: '',
 
@@ -82,6 +83,8 @@
 
                 var video = this;
                 var apiURL = 'https://staging.universalsubtitles.org/api2/partners/videos/?&video_url=';
+
+                this.subtitles = new that.Subtitles();
 
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.
@@ -121,6 +124,30 @@
                     }
                 });
             }
+        });
+
+        // SubtitleSet model.
+        var SubtitleSet = _Backbone.Model.extend({
+
+            // Set from the Amara API
+            description: null,
+            language: null,
+            note: null,
+            resource_uri: null,
+            site_url: null,
+            sub_format: null,
+            subtitles: [],
+            title: null,
+            version_no: null,
+            video: null,
+            video_description: null,
+            video_title: null
+
+        });
+
+        // Subtitles collection.
+        this.Subtitles = _Backbone.Collection.extend({
+            model: SubtitleSet
         });
 
         // Amara view. This contains all of the events and logic for a single instance of
@@ -165,15 +192,23 @@
                     // the video instance was created), and then retrieve the initial set
                     // of subtitles, so we can begin building out the transcript viewer
                     // and the subtitle display.
+                    //
+                    // We could just make this a callback on the model's initialize() for
+                    // after we get a response, but there may be cases where we want to init
+                    // a VideoModel separately from an AmaraView.
                     that.waitUntilVideoIsComplete(
                         function() {
 
-                            // We now have a fully populated video model.
-                            //
                             // Grab the subtitles for the initial language and do yo' thang.
-
                             if (that.model.get('isOnAmara')) {
-                                console.log('We b buildin.');
+
+                                // Make the request to fetch subtitles.
+                                that.fetchSubtitles(that.model.get('initialLanguage'), function() {
+
+                                    // When we've got a response with the subtitles, start building
+                                    // out the transcript viewer.
+                                    that.buildTranscript(that.model.get('initialLanguage'));
+                                });
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
                             }
@@ -185,15 +220,40 @@
 
             },
 
-            waitUntilVideoIsComplete: function(callback) {
+            buildTranscript: function(language) {
+                var subtitles = this.model.subtitles.where({'language': language});
+                console.log(subtitles);
+            },
 
-                // isComplete gets set as soon as the initial API call to build out the video
-                // instance has finished.
-                if (!this.model.get('isComplete')) {
-                    setTimeout(function() { that.waitUntilVideoIsComplete(callback); }, 100);
-                } else {
-                    callback();
-                }
+            // Makes a call to the Amara API and retrieves a set of subtitles for a specific
+            // video in a specific language. When it gets a response, it adds the subtitle set
+            // to the video model's 'subtitles' collection for later retrieval by language code.
+            fetchSubtitles: function(language, callback) {
+                var that = this;
+
+                var apiURL = ''+
+                    'https://staging.universalsubtitles.org/api2/partners/videos/' +
+                    this.model.get('id') +
+                    '/languages/' + language + '/subtitles/';
+
+                // Make a call to the Amara API to retrieve subtitles for this language.
+                //
+                // TODO: If we already have subtitles in this language, don't do anything.
+                _$.ajax({
+                    url: apiURL,
+                    dataType: 'jsonp',
+                    success: function(resp) {
+
+                        // Save these subtitles to the video's 'subtitles' collection.
+                        resp.language = language;
+                        that.model.subtitles.add(
+                            new SubtitleSet(resp)
+                        );
+
+                        // Call the callback.
+                        callback(resp);
+                    }
+                });
             },
             logoClicked: function() {
                 alert('Logo clicked');
@@ -203,13 +263,23 @@
                 alert('Share button clicked');
                 return false;
             },
+            subtitlesButtonClicked: function() {
+                alert('Subtitles button clicked');
+                return false;
+            },
             transcriptButtonClicked: function() {
                 this.$transcript.toggle();
                 return false;
             },
-            subtitlesButtonClicked: function() {
-                alert('Subtitles button clicked');
-                return false;
+            waitUntilVideoIsComplete: function(callback) {
+
+                // isComplete gets set as soon as the initial API call to build out the video
+                // instance has finished.
+                if (!this.model.get('isComplete')) {
+                    setTimeout(function() { that.waitUntilVideoIsComplete(callback); }, 100);
+                } else {
+                    callback();
+                }
             },
 
             templateHTML: '' +

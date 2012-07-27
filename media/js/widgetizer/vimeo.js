@@ -32,9 +32,6 @@ unisubs.widgetizer.Vimeo = function() {
 goog.inheirts(unisubs.widgetizer.Vimeo,
               unisubs.widgetizer.VideoPlayerMaker);
 
-unisubs.widgetizer.Vimeo.prototype.logger_ = 
-    goog.debug.Logger.getLogger('unisubs.widgetizer.Vimeo');
-
 unisubs.widgetizer.Vimeo.prototype.unwidgetizedElement_ = function() {
     if (this.ON_VIMEO_SITE) {
         var moviePlayer = goog.dom.getElementsByTagAndClassName('object');

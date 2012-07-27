@@ -21,6 +21,7 @@ from django.conf.urls.defaults import include, patterns, url
 from django.conf import settings
 from django.contrib import admin
 from django.template import RequestContext, loader
+from django.views.generic.simple import direct_to_template
 from sitemaps import sitemaps, sitemap_view, sitemap_index
 from socialauth.models import AuthMeta, OpenidProfile
 
@@ -47,6 +48,8 @@ js_info_dict = {
 }
 
 urlpatterns = patterns('',
+    url('^500/$', direct_to_template, { 'template': '500.html' }),
+    url('^404/$', direct_to_template, { 'template': '404.html' }),
     url(r'^crossdomain.xml$',
         'crossdomain_views.root_crossdomain'),
     url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict,
@@ -74,8 +77,6 @@ urlpatterns = patterns('',
         'django.contrib.auth.views.password_reset_complete'),
     url(r'socialauth/',
         include('socialauth.urls')),
-    url(r'^admin/settings/',
-        include('livesettings.urls')),
     url(r'^admin/',
         include(admin.site.urls)),
     url(r'^embed(?P<version_no>\d+)?.js$', 'widget.views.embed',

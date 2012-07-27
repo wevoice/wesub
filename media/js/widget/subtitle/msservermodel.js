@@ -45,8 +45,6 @@ unisubs.subtitle.MSServerModel = function( sessionPK, videoID, videoURL, editabl
     this.timerTickCount_ = 0;
     this.timer_ = new goog.Timer(
         (unisubs.LOCK_EXPIRATION - 5) * 1000);
-    this.logger_ = goog.debug.Logger.getLogger(
-        'unisubs.subtitle.MSServerModel');
     goog.events.listen(
         this.timer_,
         goog.Timer.TICK,

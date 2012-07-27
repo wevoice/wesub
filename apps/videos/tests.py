@@ -833,9 +833,6 @@ class ViewsTest(WebUseTest):
         vu = VideoUrl.objects.all()[:1].get()
         self._simple_test("videos:video_url_make_primary", data={'id': vu.id})
 
-    def test_site_feedback(self):
-        self._simple_test("videos:site_feedback")
-
     def test_index(self):
         self._simple_test('videos.views.index')
 

@@ -374,7 +374,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'djcelery',
     'haystack',
-    'livesettings',
     'rosetta',
     'raven.contrib.django',
     'sorl.thumbnail',
@@ -532,7 +531,6 @@ RECAPTCHA_PUBLIC = '6LdoScUSAAAAANmmrD7ALuV6Gqncu0iJk7ks7jZ0'
 RECAPTCHA_SECRET = ' 6LdoScUSAAAAALvQj3aI1dRL9mHgh85Ks2xZH1qc'
 
 ROSETTA_EXCLUDED_APPLICATIONS = (
-    'livesettings',
     'openid_consumer',
     'rosetta'
 )

@@ -24,7 +24,6 @@ goog.provide('unisubs.player.JWVideoPlayer');
  */
 unisubs.player.JWVideoPlayer = function(videoSource) {
     unisubs.player.FlashVideoPlayer.call(this, videoSource);
-    this.logger_ = goog.debug.Logger.getLogger('unisubs.player.JWPlayer');
     this.stateListener_ = 'jwevent' + unisubs.randomString();
     this.timeListener_ = 'jwtime' + unisubs.randomString();
     this.playheadTime_ = 0;
@@ -38,9 +37,6 @@ unisubs.player.JWVideoPlayer.players_ = [];
 unisubs.player.JWVideoPlayer.playerReadyCalled_ = false;
 
 unisubs.player.JWVideoPlayer.prototype.onJWPlayerReady_ = function(elem) {
-    if (goog.DEBUG) {
-        this.logger_.info('player ready');
-    }
     this.tryDecoratingAll();
 };
 
@@ -48,11 +44,6 @@ unisubs.player.JWVideoPlayer.prototype.decorateInternal = function(elem) {
     unisubs.player.JWVideoPlayer.superClass_.decorateInternal.call(this, elem);
     this.playerSize_ = goog.style.getSize(this.getElement());
     this.setDimensionsKnownInternal();
-    if (goog.DEBUG) {
-        this.logger_.info(
-            "playerReadyCalled_: " +
-                unisubs.player.JWVideoPlayer.playerReadyCalled_);
-    }
     if (unisubs.player.JWVideoPlayer.playerReadyCalled_)
         this.onJWPlayerReady_();
 };
@@ -75,9 +66,6 @@ unisubs.player.JWVideoPlayer.prototype.getVideoSize = function() {
 };
 unisubs.player.JWVideoPlayer.prototype.playerStateChanged_ = function(data) {
     var newState = data['newstate'];
-    if (goog.DEBUG) {
-        this.logger_.info('statechanged: ' + newState);
-    }
     var et = unisubs.player.AbstractVideoPlayer.EventType;
     var s = unisubs.player.JWVideoPlayer.State_;
     if (newState == s.PLAYING) {
@@ -121,15 +109,9 @@ unisubs.player.JWVideoPlayer.prototype.pauseInternal = function() {
 unisubs.player.JWVideoPlayer.prototype.stopLoadingInternal = function() {
     // TODO: implement this for real.
     this.pause();
-    if (goog.DEBUG) {
-        this.logger_.info('stopLoadingInternal called');
-    }
 };
 unisubs.player.JWVideoPlayer.prototype.resumeLoadingInternal = function(playheadTime) {
     // TODO: implement this for real at some point.
-    if (goog.DEBUG) {
-        this.logger_.info('resumeLoadingInternal called');
-    }
 };
 unisubs.player.JWVideoPlayer.prototype.getPlayheadTime = function() {
     return this.playheadTime_;
@@ -147,11 +129,6 @@ unisubs.player.JWVideoPlayer.prototype.isPlayingInternal = function() {
 unisubs.player.JWVideoPlayer.prototype.sendEvent_ = function(event, args) {
     // TODO: prob check to see if this.player_ exists yet; if not, queue the
     // command.
-    if (goog.DEBUG) {
-        this.logger_.info(
-            'sendEvent_ called with ' + event + ' and args ' +
-                args.join(', '));
-    }
     this.player_['sendEvent'].apply(this.player_, goog.array.concat(event, args));
 };
 
@@ -160,9 +137,6 @@ unisubs.player.JWVideoPlayer.State_ = {
     PAUSED: 'PAUSED',
     COMPLETED: 'COMPLETED'
 };
-
-unisubs.player.JWVideoPlayer.logger_ = 
-    goog.debug.Logger.getLogger('unisubs.player.JWVideoPlayerStatic');
 
 (function() {
     var jwReady = "playerReady";
@@ -175,11 +149,6 @@ unisubs.player.JWVideoPlayer.logger_ =
             // don't care
         }
         unisubs.player.JWVideoPlayer.playerReadyCalled_ = true;
-        if (goog.DEBUG) {
-            unisubs.player.JWVideoPlayer.logger_.info(
-                "Number of players: " + 
-                    unisubs.player.JWVideoPlayer.players_.length);
-        }
         goog.array.forEach(
             unisubs.player.JWVideoPlayer.players_, 
             function(p) { p.onJWPlayerReady_(); });

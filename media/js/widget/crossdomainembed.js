@@ -24,14 +24,6 @@ unisubs.widget.CrossDomainEmbed.embed =
     function(widgetDiv, widgetConfig, siteConfig) 
 {
     unisubs.siteConfig = siteConfig;
-    if (goog.DEBUG) {
-        if (widgetConfig['debug_js']) {
-            var debugWindow = new goog.debug.FancyWindow('main');
-            debugWindow.setEnabled(true);
-            debugWindow.init();
-            unisubs.DEBUG = true;
-        }
-    }
     unisubs.IS_NULL = !!widgetConfig['null_widget'];
     var widget = new unisubs.widget.Widget(widgetConfig);
     widget.decorate(widgetDiv);

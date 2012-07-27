@@ -37,16 +37,11 @@ goog.inherits(unisubs.widget.WidgetController, goog.events.EventTarget);
  * Widget calls this when show_widget rpc call returns.
  */
 unisubs.widget.WidgetController.prototype.initializeState = function(result) {
-    if (goog.DEBUG) {
+    try {
         this.initializeStateImpl_(result);
     }
-    else {
-        try {
-            this.initializeStateImpl_(result);
-        }
-        catch (e) {
-            this.videoTab_.showError();
-        }
+    catch (e) {
+        this.videoTab_.showError();
     }
 };
 

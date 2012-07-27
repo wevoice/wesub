@@ -24,8 +24,6 @@ goog.provide('unisubs.player.BrightcoveLitePlayer');
 unisubs.player.BrightcoveLitePlayer = function(experienceID) {
     unisubs.player.AbstractVideoPlayer.call(this, null);
     this.experienceID_ = experienceID;
-    this.logger_ = goog.debug.Logger.getLogger(
-        "unisubs.player.BrightcoveLitePlayer");
     this.playheadTimer_ = new goog.Timer(100);
 };
 goog.inherits(unisubs.player.BrightcoveLitePlayer, unisubs.player.AbstractVideoPlayer);
@@ -51,9 +49,6 @@ unisubs.player.BrightcoveLitePlayer.prototype.decorateInternal = function(elem) 
     unisubs.player.BrightcoveLitePlayer.superClass_.decorateInternal.call(this, elem);
     this.player_ = goog.dom.getElement(this.experienceID_);
     this.playerSize_ = goog.style.getSize(this.getElement());
-    if (goog.DEBUG) {
-        this.logger_.info("player size is " + this.playerSize_);
-    }
     this.bcExp_ = window['brightcove']['getExperience'](this.experienceID_);
     this.modVP_ = this.bcExp_["getModule"](window["APIModules"]["VIDEO_PLAYER"]);
     this.getHandler().listen(
@@ -71,9 +66,6 @@ unisubs.player.BrightcoveLitePlayer.prototype.getPlayheadTime = function() {
 };
 
 unisubs.player.BrightcoveLitePlayer.prototype.onPlay_ = function(e) {
-    if (goog.DEBUG) {
-        this.logger_.info("playing");
-    }
     this.playheadTimer_.start();
 };
 

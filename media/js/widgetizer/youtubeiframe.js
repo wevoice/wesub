@@ -24,25 +24,17 @@ goog.provide('unisubs.widgetizer.YoutubeIFrame');
  */
 unisubs.widgetizer.YoutubeIFrame = function() {
     unisubs.widgetizer.VideoPlayerMaker.call(this);
-    this.logger_ = goog.debug.Logger.getLogger(
-        'unisubs.widgetizer.YoutubeIFrame');
 };
 goog.inherits(unisubs.widgetizer.YoutubeIFrame,
               unisubs.widgetizer.VideoPlayerMaker);
 
 unisubs.widgetizer.YoutubeIFrame.prototype.makeVideoPlayers = function() {
     var iframes = this.unwidgetizedIFrames_();
-    if (goog.DEBUG) {
-        this.logger_.info("Found " + iframes.length + " unwidgetized iframes");
-    }
     var videoPlayers = [];
     goog.array.forEach(
         iframes,
         function(iframe) {
             var decoratable = this.isDecoratable_(iframe);
-            if (goog.DEBUG) {
-                this.logger_.info("iframe is decoratable: " + decoratable);
-            }
             var videoSource = this.makeVideoSource_(iframe, !decoratable);
             var videoPlayer = videoSource.createPlayer();
             videoPlayers.push(videoPlayer);
