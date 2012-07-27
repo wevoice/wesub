@@ -98,6 +98,13 @@ except ValueError:
 sys.path = ['/opt/extras/venv/lib/python2.6/site-packages', '/usr/lib/python2.6'] + sys.path
 EOF
 
+# Selenium testing support
+pip install selenium factory_boy
+if [ "$(grep 'unisubs.example.com' /etc/hosts)" = "" ] ; then
+  echo "Adding unisubs.example.com to /etc/hosts"
+  echo "127.0.0.1   unisubs.example.com" | sudo tee -a /etc/hosts 2>&1 > /dev/null
+fi
+
 # Celery services -------------------------------------------------------------
 sudo /etc/init.d/celeryd restart
 sudo /etc/init.d/celerybeat restart

@@ -114,6 +114,15 @@ function pmt {
 function pmtd {
     python manage.py test $* --settings=dev_settings_test 2>&1 | discoball -o '.+Error:.*' '.+Exception: .+' 'line \d+'
 }
+function pms {
+    python manage.py test $* --settings=dev_settings_selenium
+}
+
+# selenium support
+if [ "$(ps xo comm,pid | grep Xvfb)" = "" ] ; then
+    Xvfb :99 -screen 0 1280x1024x24 &
+    export DISPLAY=:99
+fi
 
 # on login, drop us on the working directory with the venv activated
 cd /opt/unisubs/ && source /opt/extras/venv/bin/activate
