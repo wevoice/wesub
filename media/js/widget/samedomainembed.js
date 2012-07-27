@@ -21,14 +21,6 @@ goog.provide('unisubs.widget.SameDomainEmbed');
 unisubs.widget.SameDomainEmbed = {};
 
 unisubs.widget.SameDomainEmbed.embed = function(widgetDiv, widgetConfig) {
-    if (goog.DEBUG) {
-        if (widgetConfig['debug_js']) {
-            var debugWindow = new goog.debug.FancyWindow('main');
-            debugWindow.setEnabled(true);
-            debugWindow.init(); 
-            unisubs.DEBUG = true;
-        }
-    }
     unisubs.IS_NULL = !!widgetConfig['null_widget'];
     if (widgetConfig['returnURL'])
         unisubs.returnURL = widgetConfig['returnURL'];

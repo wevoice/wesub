@@ -23,9 +23,6 @@ goog.provide('unisubs.Tracker');
  */
 unisubs.Tracker = function() {
     this.accountSet_ = false;
-    if (goog.DEBUG) {
-        this.logger_ = goog.debug.Logger.getLogger('unisubs.Tracker');
-    }
 };
 
 goog.addSingletonGetter(unisubs.Tracker);
@@ -39,11 +36,6 @@ unisubs.Tracker.prototype.gaq_ = function() {
 
 unisubs.Tracker.prototype.trackEvent = function(category, action, opt_label, opt_value) {
     if (unisubs.REPORT_ANALYTICS) {
-        if (goog.DEBUG) {
-            this.logger_.info('tracking event: ' + category + 
-                              ' for action ' + action + 
-                              (opt_label ? (' with label ' + opt_label) : ""));
-        }
         this.setAccount_();
         this.gaq_().push(
             [this.PREFIX_ + "._trackEvent", category, action, opt_label, opt_value]);
@@ -52,9 +44,6 @@ unisubs.Tracker.prototype.trackEvent = function(category, action, opt_label, opt
 
 unisubs.Tracker.prototype.trackPageview = function(pageview, opt_props) {
     if (unisubs.REPORT_ANALYTICS) {
-        if (goog.DEBUG) {
-            this.logger_.info(pageview);
-        }
         var props = opt_props || {};
         props['onsite'] = unisubs.isFromDifferentDomain() ? 'no' : 'yes';
         this.setAccount_();

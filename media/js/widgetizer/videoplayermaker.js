@@ -26,10 +26,6 @@ goog.provide('unisubs.widgetizer.VideoPlayerMaker');
 unisubs.widgetizer.VideoPlayerMaker = function() {
 };
 
-unisubs.widgetizer.VideoPlayerMaker.prototype.logger_ = 
-    goog.debug.Logger.getLogger(
-        'unisubs.widgetizer.VideoPlayerMaker');
-
 unisubs.widgetizer.VideoPlayerMaker.prototype.makeVideoPlayers =
     goog.abstractMethod;
 

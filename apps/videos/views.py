@@ -236,7 +236,6 @@ def _get_related_task(request):
     """
     task_pk = request.GET.get('t', None)
     if task_pk:
-        from teams.models import Task
         from teams.permissions import can_perform_task
         try:
             task = Task.objects.get(pk=task_pk)
@@ -321,17 +320,6 @@ def feedback(request, hide_captcha=False):
     else:
         output['errors'] = form.get_errors()
     return HttpResponse(json.dumps(output), "text/javascript")
-
-def site_feedback(request):
-    text = request.GET.get('text', '')
-    email = ''
-    if request.user.is_authenticated():
-        email = request.user.email
-    initial = dict(message=text, email=email)
-    form = FeedbackForm(initial=initial)
-    return render_to_response(
-        'videos/site_feedback.html', {'form':form},
-        context_instance=RequestContext(request))
 
 def email_friend(request):
     text = request.GET.get('text', '')
