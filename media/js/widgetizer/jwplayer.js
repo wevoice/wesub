@@ -27,8 +27,6 @@ unisubs.widgetizer.JWPlayer = function() {
     this.VIDS_ARE_JW_ =
         window.location.hostname.match(/ocw\.mit\.edu/) != null ||
         window['UNISUBS_JW_ONLY'];
-    this.logger_ =
-        goog.debug.Logger.getLogger('unisubs.widgetizer.JWPlayer');
 };
 goog.inherits(
     unisubs.widgetizer.JWPlayer,
@@ -36,10 +34,6 @@ goog.inherits(
 
 unisubs.widgetizer.JWPlayer.prototype.makeVideoPlayers = function() {
     var elements = this.unwidgetizedElements_();
-    if (goog.DEBUG) {
-        this.logger_.info("Found this number of unwidgetized elements: " + 
-                          elements.length);
-    }
     var videoPlayers = [];
     for (var i = 0; i < elements.length; i++) {
         var videoSource = this.makeVideoSource_(elements[i]);
@@ -63,10 +57,5 @@ unisubs.widgetizer.JWPlayer.prototype.unwidgetizedElements_ = function() {
 unisubs.widgetizer.JWPlayer.prototype.isFlashElementAPlayer = function(element) {    
     var swfSrc = unisubs.Flash.swfURL(element);
     var isJW = this.VIDS_ARE_JW_ && swfSrc.match(/player[^\.]*.swf$/i) != null;
-    if (goog.DEBUG) {
-        this.logger_.info(
-            'encountered possible swf: ' + swfSrc + '. It is ' + 
-                (isJW ? '' : 'not ') + 'a JWPlayer');
-    }
     return isJW;
 };

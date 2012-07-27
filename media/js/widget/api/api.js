@@ -65,12 +65,6 @@ unisubs.api.openDialog = function(config) {
 unisubs.api.openUnisubsDialogWithSettings = 
     function(askLanguage, config, generalSettings) 
 {
-    if (goog.DEBUG) {
-        var debugWindow = new goog.debug.FancyWindow('main');
-        debugWindow.setEnabled(true);
-        debugWindow.init();             
-        unisubs.DEBUG = true;
-    }
     unisubs.widget.WidgetController.makeGeneralSettings(generalSettings);
     if (config['returnURL']) {
         unisubs.returnURL = config['returnURL'];
@@ -109,14 +103,6 @@ unisubs.api.openUnisubsDialogWithSettings =
  * Used for opening sub dialog at /onsite_widget_resume/.
  */
 unisubs.api.openUnisubsDialogForResume = function(config, generalSettings) {
-    if (goog.DEBUG) {
-        var debugWindow = new goog.debug.FancyWindow('main');
-        debugWindow.setEnabled(true);
-        debugWindow.init();             
-
-
-        unisubs.DEBUG = true;
-    }
     unisubs.widget.WidgetController.makeGeneralSettings(generalSettings);
     if (config['returnURL'])
         unisubs.returnURL = config['returnURL'];

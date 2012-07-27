@@ -25,13 +25,6 @@ goog.provide('unisubs.Widgetizer');
 unisubs.Widgetizer = function() {
     unisubs.siteConfig = unisubs.Config.siteConfig;
     var myURI = new goog.Uri(window.location);
-    var DEBUG_WIN_NAME = 'unisubsdebuggingmain';
-    if (goog.DEBUG) {
-        var debugWindow = new goog.debug.FancyWindow(DEBUG_WIN_NAME);
-        debugWindow.setEnabled(true);
-        debugWindow.init();
-        unisubs.DEBUG = true;
-    }
     this.makers_ = [
         new unisubs.widgetizer.Youtube(),
         new unisubs.widgetizer.HTML5(),
@@ -40,7 +33,6 @@ unisubs.Widgetizer = function() {
         new unisubs.widgetizer.Wistia(),
         new unisubs.widgetizer.SoundCloud()
     ];
-    this.logger_ = goog.debug.Logger.getLogger('unisubs.Widgetizer');
     var uri = new goog.Uri(window.location);
     unisubs.Tracker.getInstance().trackEvent(
         "Widgetizer",
@@ -119,18 +111,11 @@ unisubs.Widgetizer.prototype.findAndWidgetizeElements_ = function() {
         this.widgetizeAttemptTimer_.stop();
         return;
     }
-    if (goog.DEBUG) {
-        this.logger_.info('finding and widgetizing elements');
-    }
     var videoPlayers = [];
     for (var i = 0; i < this.makers_.length; i++)
         goog.array.extend(
             videoPlayers, 
             this.makers_[i].makeVideoPlayers());
-    if (goog.DEBUG) {
-        this.logger_.info('found ' + videoPlayers.length + 
-                          ' new video players on the page');
-    }
     goog.array.forEach(videoPlayers, this.decorateVideoPlayer_, this);
 };
 unisubs.Widgetizer.prototype.decorateVideoPlayer_ = function(videoPlayer) {

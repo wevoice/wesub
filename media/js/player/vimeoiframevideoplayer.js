@@ -45,9 +45,6 @@ unisubs.player.VimeoIFrameVideoPlayer.prototype.enterDocument = function() {
 };
 
 unisubs.player.VimeoIFrameVideoPlayer.prototype.makePlayer_ = function() {
-    if (goog.DEBUG) {
-        this.logger_.info('makePlayer_ called');
-    }
     this.almostPlayer_ = new goog.global['Froogaloop'](this.iframe_);
     this.almostPlayer_['addEvent'](
         'ready', goog.bind(this.playerReady_, this));

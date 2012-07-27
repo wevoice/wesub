@@ -48,10 +48,6 @@ unisubs.player.AbstractVideoPlayer = function(videoSource) {
      */
     this.duration_ = 0;
     unisubs.player.AbstractVideoPlayer.players.push(this);
-    if (goog.DEBUG) {
-        unisubs.player.AbstractVideoPlayer.logger_.info(
-            'players length is now ' + unisubs.player.AbstractVideoPlayer.players.length);
-    }
 };
 
 goog.inherits(unisubs.player.AbstractVideoPlayer, goog.ui.Component);
@@ -64,11 +60,6 @@ unisubs.player.AbstractVideoPlayer.TIMEUPDATE_INTERVAL = 80;
   for that volume 
 */
 unisubs.player.AbstractVideoPlayer.VOLUME_SETTING_NAME  = "lastestVolume";
-
-if (goog.DEBUG) {
-    unisubs.player.AbstractVideoPlayer.logger_ = 
-        goog.debug.Logger.getLogger('AbstractVideoPlayer');
-}
 
 unisubs.player.AbstractVideoPlayer.players = [];
 
@@ -364,10 +355,6 @@ unisubs.player.AbstractVideoPlayer.prototype.setPlayheadTime = function(playhead
  * @param {String} text Caption text to display in video. null for blank.
  */
 unisubs.player.AbstractVideoPlayer.prototype.showCaptionText = function(text) {
-    if (goog.DEBUG) {
-        unisubs.player.AbstractVideoPlayer.logger_.info(
-            'showing sub: ' + text);
-    }
     this.captionView_ || this.createCaptionView();
     this.captionView_.setCaptionText(text);
 };

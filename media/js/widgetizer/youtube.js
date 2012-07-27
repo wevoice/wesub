@@ -36,9 +36,6 @@ unisubs.widgetizer.Youtube.onYTSite = function() {
     return window.location.hostname.match(/youtube\.com$/) != null;
 };
 
-unisubs.widgetizer.Youtube.prototype.logger_ =
-    goog.debug.Logger.getLogger('unisubs.widgetizer.Youtube');
-
 unisubs.widgetizer.Youtube.prototype.makeVideoPlayers = function() {
     var elements = this.unwidgetizedElements_();
     var videoPlayers = [];

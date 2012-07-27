@@ -40,8 +40,6 @@ unisubs.timeline.TimelineSub.currentlyEditing_ = false;
 unisubs.timeline.TimelineSub.isCurrentlyEditing = function() {
     return unisubs.timeline.TimelineSub.currentlyEditing_;
 };
-unisubs.timeline.TimelineSub.logger_ =
-    goog.debug.Logger.getLogger('unisubs.subtitle.TimelineSub');
 unisubs.timeline.TimelineSub.EventType = {
     START_EDITING : 'startediting',
     FINISH_EDITING : 'finishediting'
