@@ -21,9 +21,9 @@ S3).
 
 For example:
 
-::
+.. code-block:: console
 
-    cp -rf \
+    $ cp -rf \
         /venv/lib/python2.6/site-packages/django/contrib/admin/static/admin \
         /opt/unisubs/media/.'
 
@@ -71,13 +71,13 @@ Database connection's thread-locality
 
 No issues here.
 
-`COMMENTS_BANNED_USERS_GROUP` setting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``COMMENTS_BANNED_USERS_GROUP`` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 No issues here.
 
-`IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``IGNORABLE_404_STARTS`` and ``IGNORABLE_404_ENDS`` settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 No issues here.
 
@@ -144,9 +144,6 @@ Attributes disabled in markdown when safe mode set
 
 FormMixin get_initial returns an instance-specific dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
 
 .. _Django 1.4 release notes: https://docs.djangoproject.com/en/dev/releases/1.4/#backwards-incompatible-changes-in-1-4
 .. _alias: https://github.com/pculture/unisubs/commit/cb712b3ca55c8862105f4fc456f993947d149852
