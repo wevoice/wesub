@@ -23,7 +23,6 @@ import zlib
 from django.utils import simplejson as json
 
 
-# Subtitle Objects ------------------------------------------------------------
 class Subtitle(object):
     """A single subtitle."""
 

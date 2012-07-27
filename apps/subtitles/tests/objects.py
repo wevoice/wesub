@@ -143,7 +143,6 @@ class TestSubtitle(TestCase):
         self.assertEqual(s4.duration(), None)
 
 
-
 class TestSubtitleSet(TestCase):
     def setUp(self):
         self.s0 = Subtitle(1000, 2000, "Hello", starts_paragraph=True)

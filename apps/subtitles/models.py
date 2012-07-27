@@ -27,10 +27,11 @@ from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
 from apps.auth.models import CustomUser as User
+from apps.subtitles.objects import SubtitleSet
 from apps.videos.models import Video
 
 
-ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
+ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
 
 
 def mapcat(fn, iterable):
@@ -49,13 +50,7 @@ def mapcat(fn, iterable):
     return itertools.chain.from_iterable(itertools.imap(fn, iterable))
 
 
-def subtitles_to_json(subtitles):
-    return json.dumps(subtitles)
-
-def json_to_subtitles(json_subtitles):
-    return json.loads(json_subtitles)
-
-
+# Lineage
 def lineage_to_json(lineage):
     return json.dumps(lineage)
 
@@ -80,7 +75,7 @@ def get_lineage(parents):
     return lineage
 
 
-# Django Models ---------------------------------------------------------------
+
 class SubtitleLanguage(models.Model):
     """SubtitleLanguages are the equivalent of a 'branch' in a VCS.
 
@@ -228,15 +223,17 @@ class SubtitleVersion(models.Model):
     def get_subtitles(self):
         # We cache the parsed subs for speed.
         if self._subtitles == None:
-            self._subtitles = json_to_subtitles(self.serialized_subtitles)
+            self._subtitles = SubtitleSet.from_json(self.serialized_subtitles)
 
         return self._subtitles
 
     def set_subtitles(self, subtitles):
-        self.serialized_subtitles = subtitles_to_json(subtitles)
+        if not isinstance(subtitles, SubtitleSet):
+            subtitles = SubtitleSet(subtitles=subtitles)
+
+        self.serialized_subtitles = subtitles.to_json()
         self._subtitles = subtitles
 
-    subtitles = property(get_subtitles, set_subtitles)
 
     def get_lineage(self):
         # We cache the parsed lineage for speed.
@@ -251,7 +248,6 @@ class SubtitleVersion(models.Model):
 
     lineage = property(get_lineage, set_lineage)
 
-
     class Meta:
         unique_together = [('video', 'language_code', 'version_number')]
 
@@ -264,7 +260,7 @@ class SubtitleVersion(models.Model):
 
         self._subtitles = None
         if subtitles:
-            self.subtitles = subtitles
+            self.set_subtitles(subtitles)
 
         self._lineage = None
         if lineage != None:
