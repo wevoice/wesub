@@ -90,8 +90,12 @@ Password reset view now accepts ``subject_template_name``
 ``django.core.template_loaders``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+No issues.
+
 ``django.db.models.fields.URLField.verify_exists``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+No issues.
 
 ``django.core.files.storage.Storage.open``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -99,8 +103,12 @@ Password reset view now accepts ``subject_template_name``
 YAML deserializer now uses ``yaml.safe_load``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+No issues.
+
 Session cookies now have the ``httponly`` flag by default
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unknown
 
 The ``urlize`` filter no longer escapes every URL
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,6 +122,8 @@ Database connections after running the test suite
 Output of ``manage.py help <help>``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+No issues.
+
 ``extends`` template tag
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -122,6 +132,9 @@ Loading some incomplete fixtures no longer works
 
 Development Server Multithreading
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+I haven't noticed anything strange.  If it becomes a problem, add the
+``--nothreading`` flag.
 
 Attributes disabled in markdown when safe mode set
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
