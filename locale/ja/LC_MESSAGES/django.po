@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-27 01:32-0500\n"
-"PO-Revision-Date: 2012-07-27 06:51+0000\n"
+"POT-Creation-Date: 2012-07-28 01:32-0500\n"
+"PO-Revision-Date: 2012-07-28 06:50+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/universalsubtitles/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -1057,10 +1057,6 @@ msgstr ""
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "ビデオの翻訳を手伝ってくれませんか？%(url)s"
 
-#: apps/videos/admin.py:32
-msgid "Email for alert"
-msgstr "アラートをメールで受け取る"
-
 #: apps/videos/forms.py:67
 msgid "File should have txt format"
 msgstr "ファイルは txt 形式である必要があります。"
@@ -1515,29 +1511,29 @@ msgstr ""
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "既存の字幕を取り込みます。数分お待ちください。"
 
-#: apps/videos/views.py:281
+#: apps/videos/views.py:280
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "アップロードありがとうございます。字幕が表示されるまで数分程度かかります。"
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:282
 msgid "Your changes have been saved."
 msgstr "変更は保存されました"
 
-#: apps/videos/views.py:634
+#: apps/videos/views.py:622
 msgid "You have not permission change this URL"
 msgstr "あなたには、このURLを変更する権限がありません。"
 
-#: apps/videos/views.py:640 apps/videos/views.py:660
+#: apps/videos/views.py:628 apps/videos/views.py:648
 msgid "Object does not exist"
 msgstr "オブジェクトは存在しません。"
 
-#: apps/videos/views.py:653
+#: apps/videos/views.py:641
 msgid "You have not permission delete this URL"
 msgstr "あなたには、このURLを削除する権限がありません。"
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:644
 msgid "You cann't remove original URL"
 msgstr "オリジナルURLを削除する事は出来ません。"
 
@@ -1600,7 +1596,6 @@ msgstr "言語選択"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
-#: templates/livesettings/site_settings.html:51
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
@@ -4331,10 +4326,6 @@ msgstr "Amara"
 msgid "View site"
 msgstr "サイトを見る"
 
-#: templates/admin/base_site.html:13
-msgid "Edit settings"
-msgstr "設定の編集"
-
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
 msgstr "送信する"
@@ -4502,52 +4493,6 @@ msgstr "字幕ウィジェットをテストする"
 #: templates/jsdemo/home.html:122
 msgid "Try the Demo"
 msgstr "デモを使ってみる"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Documentation"
-msgstr "参考文献"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Change password"
-msgstr "パスワードを変更する"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Log out"
-msgstr "ログアウトする"
-
-#: templates/livesettings/site_settings.html:52
-msgid "Edit Site Settings"
-msgstr "サイトの設定を編集する"
-
-#: templates/livesettings/site_settings.html:59
-msgid "Livesettings are disabled for this site."
-msgstr "本サイトに対するライブセッティングは無効です"
-
-#: templates/livesettings/site_settings.html:60
-msgid "All configuration options must be edited in the site settings.py file"
-msgstr "設定オプションの変更は、サイトの settings.py ファイルにて行ってください。"
-
-#: templates/livesettings/site_settings.html:66
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "one: 下記エラーを直してください。\nother: 下記エラーを直してください。"
-
-#: templates/livesettings/site_settings.html:82
-#, python-format
-msgid "Group settings: %(name)s"
-msgstr "グループ設定: %(name)s"
-
-#: templates/livesettings/site_settings.html:108
-msgid "Update Settings"
-msgstr "設定を更新する"
-
-#: templates/livesettings/site_settings.html:109
-msgid "Uncollapse all"
-msgstr "全て展開する"
-
-#: templates/livesettings/site_settings.html:113
-msgid "You don't have permission to edit values."
-msgstr "バリューを変更する権限がありません。"
 
 #: templates/messages/_messages.html:4
 #, python-format

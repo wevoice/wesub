@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-27 01:32-0500\n"
-"PO-Revision-Date: 2012-07-27 06:51+0000\n"
+"POT-Creation-Date: 2012-07-28 01:32-0500\n"
+"PO-Revision-Date: 2012-07-28 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -1055,10 +1055,6 @@ msgstr "S'ha deixat de publicar els subtítols amb èxit."
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Pot algú ajudar-me subtitulant aquest vídeo? %(url)s"
 
-#: apps/videos/admin.py:32
-msgid "Email for alert"
-msgstr "Correu electrònic d'alertes"
-
 #: apps/videos/forms.py:67
 msgid "File should have txt format"
 msgstr "El fitxer hauria de ser un txt"
@@ -1513,29 +1509,29 @@ msgstr "Heu enviat un vídeo que s'oferix mitjançant http. El vostre navegador 
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Els subtítols que ja existeixen seran importats en pocs minuts."
 
-#: apps/videos/views.py:281
+#: apps/videos/views.py:280
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Gràcies per pujar. Trigarà uns minuts fins que apareguen els subtítols."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:282
 msgid "Your changes have been saved."
 msgstr "Els vostres canvis han estat desats."
 
-#: apps/videos/views.py:634
+#: apps/videos/views.py:622
 msgid "You have not permission change this URL"
 msgstr "No teniu permís per a canviar aquest URL"
 
-#: apps/videos/views.py:640 apps/videos/views.py:660
+#: apps/videos/views.py:628 apps/videos/views.py:648
 msgid "Object does not exist"
 msgstr "No existeix l'objecte"
 
-#: apps/videos/views.py:653
+#: apps/videos/views.py:641
 msgid "You have not permission delete this URL"
 msgstr "No teniu permís per a eliminar aquest URL"
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:644
 msgid "You cann't remove original URL"
 msgstr "No podeu eliminar la URL original"
 
@@ -1599,7 +1595,6 @@ msgstr "Selecció de idioma"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
-#: templates/livesettings/site_settings.html:51
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
@@ -4332,10 +4327,6 @@ msgstr "Amara"
 msgid "View site"
 msgstr "Visita el lloc"
 
-#: templates/admin/base_site.html:13
-msgid "Edit settings"
-msgstr "Editar la configuració"
-
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
 msgstr "Enviar"
@@ -4503,53 +4494,6 @@ msgstr "Avalueu el nostre giny de subtitulat"
 #: templates/jsdemo/home.html:122
 msgid "Try the Demo"
 msgstr "Proveu la Demo"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Documentation"
-msgstr "Documentació"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Change password"
-msgstr "Canviar contrasenya"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Log out"
-msgstr "Sortir"
-
-#: templates/livesettings/site_settings.html:52
-msgid "Edit Site Settings"
-msgstr "Editar configuració del lloc"
-
-#: templates/livesettings/site_settings.html:59
-msgid "Livesettings are disabled for this site."
-msgstr "Les configuracions en línia estan deshabilitades per aquest lloc."
-
-#: templates/livesettings/site_settings.html:60
-msgid "All configuration options must be edited in the site settings.py file"
-msgstr "Totes les opcions de configuració han de ser editades al fitxer settings.py"
-
-#: templates/livesettings/site_settings.html:66
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Sisplau, corregiu el error de sota."
-msgstr[1] "Sisplau, corregiu els errors de sota."
-
-#: templates/livesettings/site_settings.html:82
-#, python-format
-msgid "Group settings: %(name)s"
-msgstr "Grup de configuració: %(name)s"
-
-#: templates/livesettings/site_settings.html:108
-msgid "Update Settings"
-msgstr "Configuració d'Actualització"
-
-#: templates/livesettings/site_settings.html:109
-msgid "Uncollapse all"
-msgstr "Desplegar-ho tot"
-
-#: templates/livesettings/site_settings.html:113
-msgid "You don't have permission to edit values."
-msgstr "No teniu permís per a editar els valors"
 
 #: templates/messages/_messages.html:4
 #, python-format

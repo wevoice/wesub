@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-27 01:32-0500\n"
-"PO-Revision-Date: 2012-07-27 06:51+0000\n"
+"POT-Creation-Date: 2012-07-28 01:32-0500\n"
+"PO-Revision-Date: 2012-07-28 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/universalsubtitles/language/lv_LV/)\n"
 "MIME-Version: 1.0\n"
@@ -407,7 +407,7 @@ msgstr "Nosūtīt ziņojumu"
 
 #: apps/teams/admin.py:64
 msgid "Feature teams"
-msgstr ""
+msgstr "Izceltās komandas"
 
 #: apps/teams/admin.py:68
 msgid "Unfeature teams"
@@ -1054,10 +1054,6 @@ msgstr "Subtitri veiksmīgi atpublicēti."
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr ""
 
-#: apps/videos/admin.py:32
-msgid "Email for alert"
-msgstr ""
-
 #: apps/videos/forms.py:67
 msgid "File should have txt format"
 msgstr "Datnei jābūt txt formātā"
@@ -1512,29 +1508,29 @@ msgstr ""
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Esošie subtitri tiks importētie turpmāko minūšu laikā."
 
-#: apps/videos/views.py:281
+#: apps/videos/views.py:280
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Paldies par augšupielādi. Subtitriem būtu jāparādās pēc pāris minūtēm."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:282
 msgid "Your changes have been saved."
 msgstr "Jūsu veiktās izmaiņas saglabātas."
 
-#: apps/videos/views.py:634
+#: apps/videos/views.py:622
 msgid "You have not permission change this URL"
 msgstr "Jums nav atļaujas mainīt šo URL"
 
-#: apps/videos/views.py:640 apps/videos/views.py:660
+#: apps/videos/views.py:628 apps/videos/views.py:648
 msgid "Object does not exist"
 msgstr ""
 
-#: apps/videos/views.py:653
+#: apps/videos/views.py:641
 msgid "You have not permission delete this URL"
 msgstr "Jums nav atļaujas dzēst šo URL"
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:644
 msgid "You cann't remove original URL"
 msgstr "Jūs nevarat noņemt sākotnējo URL"
 
@@ -1599,7 +1595,6 @@ msgstr "Valodu izvēle"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
-#: templates/livesettings/site_settings.html:51
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
@@ -3883,7 +3878,7 @@ msgstr ""
 
 #: templates/index.html:30
 msgid "Features"
-msgstr ""
+msgstr "Iespējas"
 
 #: templates/index.html:32
 msgid "Embed the video anywhere"
@@ -3934,7 +3929,7 @@ msgstr "Uzņēmumam"
 #: templates/index.html:78
 msgid ""
 "The largest, most powerful captioning and translation platform in the world."
-msgstr "Pasaules lielākā, jaudīgākā parakstu un tulkojumu platforma."
+msgstr "Pasaulē lielākā un jaudīgākā subtitrēšanas un tulkošanas platforma."
 
 #: templates/index.html:86 templates/index.html.py:88
 msgid "TED Team"
@@ -3966,7 +3961,7 @@ msgstr "NewsHour komanda"
 
 #: templates/index.html:127
 msgid "More Popular"
-msgstr "Populārākie"
+msgstr "Vairāk populārāko"
 
 #: templates/index.html:128
 msgid "Most Popular Today"
@@ -3982,12 +3977,12 @@ msgstr "Visu laiku populārākie"
 
 #: templates/index.html:138
 msgid "More Featured"
-msgstr ""
+msgstr "Vairāk izcelto"
 
 #: templates/index.html:139 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
-msgstr ""
+msgstr "Izceltie video"
 
 #: templates/index_old.html:26
 msgid "Easily caption and translate your videos, with help from your viewers."
@@ -4280,7 +4275,7 @@ msgid ""
 "            More captions will also make it simpler for computers to process, index, \n"
 "            and make sense of the ever growing sea of online video.\n"
 "           "
-msgstr ""
+msgstr "\n            Samits koncentrējas uz pieaugošo subtitru un parakstu pieejamību un lietojamību, \n            which are both sorely needed. Tās nāk būtiskā laikā, \n            as internet video usage is skyrocketing&mdash;people who rely on captions are threatened to be left behind. \n            New users from every culture are coming online en masse; \n            standardizing and ubiquitizing the technology can make potential audiences exponentially larger and messages can cross cultural boundaries more easily. \n            More captions will also make it simpler for computers to process, index, \n            and make sense of the ever growing sea of online video.\n           "
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
@@ -4333,10 +4328,6 @@ msgstr "Amara"
 #: templates/admin/base_site.html:12
 msgid "View site"
 msgstr ""
-
-#: templates/admin/base_site.html:13
-msgid "Edit settings"
-msgstr "Rediģēt uzstādījumus"
 
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
@@ -4406,7 +4397,7 @@ msgstr "atpakaļ"
 
 #: templates/jsdemo/home.html:16
 msgid "Subtitles and Captions for Every Video on the Web"
-msgstr ""
+msgstr "Subtitri un paraksti jebkuram video tīmeklī"
 
 #: templates/jsdemo/home.html:19
 msgid "The Problem"
@@ -4505,54 +4496,6 @@ msgstr ""
 #: templates/jsdemo/home.html:122
 msgid "Try the Demo"
 msgstr "Izmēģināt demo"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Documentation"
-msgstr "Dokumentācija"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Change password"
-msgstr "Mainīt paroli"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Log out"
-msgstr "Iziet"
-
-#: templates/livesettings/site_settings.html:52
-msgid "Edit Site Settings"
-msgstr "Rediģēt lapas uzstādījumus"
-
-#: templates/livesettings/site_settings.html:59
-msgid "Livesettings are disabled for this site."
-msgstr ""
-
-#: templates/livesettings/site_settings.html:60
-msgid "All configuration options must be edited in the site settings.py file"
-msgstr ""
-
-#: templates/livesettings/site_settings.html:66
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Lūdzu, izlabojiet zemāk redzamo kļūdu."
-msgstr[1] "Lūdzu, izlabojiet zemāk redzamo kļūdu."
-msgstr[2] "Lūdzu, izlabojiet zemāk redzamās kļūdu."
-
-#: templates/livesettings/site_settings.html:82
-#, python-format
-msgid "Group settings: %(name)s"
-msgstr "Grupu uzstādījumi: %(name)s"
-
-#: templates/livesettings/site_settings.html:108
-msgid "Update Settings"
-msgstr "Atjaunināt uzstādījumus"
-
-#: templates/livesettings/site_settings.html:109
-msgid "Uncollapse all"
-msgstr ""
-
-#: templates/livesettings/site_settings.html:113
-msgid "You don't have permission to edit values."
-msgstr "Jums nav atļaujas rediģēt vērtības."
 
 #: templates/messages/_messages.html:4
 #, python-format
@@ -6387,7 +6330,7 @@ msgstr ""
 
 #: templates/videos/_feature_video.html:14
 msgid "Feature video"
-msgstr ""
+msgstr "Izcelt video"
 
 #: templates/videos/_feedback_form.html:6
 msgid "How are you using Amara?  What would make it better?"
@@ -7368,7 +7311,7 @@ msgstr ""
 
 #: templates/videos/volunteer.html:23 templates/videos/watch.html:23
 msgid "More Featured Videos"
-msgstr ""
+msgstr "Vairāk izcelto video"
 
 #: templates/videos/volunteer.html:38
 msgid "More Requested Videos"

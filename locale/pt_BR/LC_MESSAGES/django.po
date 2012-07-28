@@ -13,6 +13,7 @@
 # Diego Souza <diegosouza.br@gmail.com>, 2012.
 # Gabriel Grumiche <g.grumiche@gmail.com>, 2011, 2012.
 # Giovane Guerreiro <giovaneguerreiro@gmail.com>, 2012.
+# Lucas Augusto Ribeiro <lucasaugustoribeiro@gmail.com>, 2012.
 # Marco Tulio Costa <mmarcottulio@gmail.com>, 2012.
 #   <mattjiedasilva@gmail.com>, 2012.
 #   <mmarcottulio@gmail.com>, 2012.
@@ -20,8 +21,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-27 01:32-0500\n"
-"PO-Revision-Date: 2012-07-27 06:51+0000\n"
+"POT-Creation-Date: 2012-07-28 01:32-0500\n"
+"PO-Revision-Date: 2012-07-28 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/universalsubtitles/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -551,11 +552,11 @@ msgstr "Usuário já é membro deste grupo!"
 
 #: apps/teams/forms.py:579
 msgid "User has already declined this invite."
-msgstr ""
+msgstr "Usuário já recusou esse convite."
 
 #: apps/teams/forms.py:581
 msgid "User has already been invited."
-msgstr ""
+msgstr "Usuário já convidado."
 
 #: apps/teams/forms.py:608 templates/videos/subtitle-view.html:375
 msgid "Would you like to delete these subtitles completely?"
@@ -971,7 +972,7 @@ msgstr "Você não pode convidar pessoas para essa equipe."
 
 #: apps/teams/views.py:861
 msgid "This invite is no longer valid"
-msgstr ""
+msgstr "Esse convide não é mais valido"
 
 #: apps/teams/views.py:870
 msgid "You cannot join this team."
@@ -1063,10 +1064,6 @@ msgstr "Legendas despublicadas com sucesso."
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Alguém poderia me ajudar a legendar estes vídeos? %(url)s"
-
-#: apps/videos/admin.py:32
-msgid "Email for alert"
-msgstr "E-mail de alerta"
 
 #: apps/videos/forms.py:67
 msgid "File should have txt format"
@@ -1522,29 +1519,29 @@ msgstr ""
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Legendas existentes serão importadas em poucos minutos."
 
-#: apps/videos/views.py:281
+#: apps/videos/views.py:280
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Obrigado por enviar. Demora um minuto ou algo próximo disso para as suas legendas aparecerem."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:282
 msgid "Your changes have been saved."
 msgstr "As suas mudanças foram salvas."
 
-#: apps/videos/views.py:634
+#: apps/videos/views.py:622
 msgid "You have not permission change this URL"
 msgstr "Você não tem permissão para alterar esta URL"
 
-#: apps/videos/views.py:640 apps/videos/views.py:660
+#: apps/videos/views.py:628 apps/videos/views.py:648
 msgid "Object does not exist"
 msgstr "Não existe objeto."
 
-#: apps/videos/views.py:653
+#: apps/videos/views.py:641
 msgid "You have not permission delete this URL"
 msgstr "Você não tem permissão para excluir esta URL"
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:644
 msgid "You cann't remove original URL"
 msgstr "Você não pode remover a URL original"
 
@@ -1608,7 +1605,6 @@ msgstr "Seleção de idioma"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
-#: templates/livesettings/site_settings.html:51
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
@@ -2177,7 +2173,7 @@ msgstr "Georgiano"
 
 #: libs/unilangs/unilangs.py:220
 msgid "Karen"
-msgstr ""
+msgstr "Karen"
 
 #: libs/unilangs/unilangs.py:221
 msgid "Kanuri"
@@ -2329,7 +2325,7 @@ msgstr "Malagasy"
 
 #: libs/unilangs/unilangs.py:258
 msgid "Mongolian"
-msgstr ""
+msgstr "Mongoliano"
 
 #: libs/unilangs/unilangs.py:259
 msgid "Mandinka"
@@ -2924,7 +2920,7 @@ msgstr ""
 
 #: templates/base.html:130 templates/teams/billing/choose.html:11
 msgid "Billing"
-msgstr ""
+msgstr "Cobrança"
 
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
@@ -3047,7 +3043,7 @@ msgid ""
 "http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability to\n"
 "process your counter notification, please use the following format (including\n"
 "section numbers):\n"
-msgstr ""
+msgstr "\nUma amostra de contra-notificação pode ser encontrada em:\nhttp://www.chillingeffects.org/dmca/counter512.pdf. Para acelerar nossa capacidade de \nprocessar sua contra-notificação, use o seguinte formato (incluindo \nnúmeros de seção):\n"
 
 #: templates/dmca.html:109
 msgid ""
@@ -3562,7 +3558,7 @@ msgstr "Começando a usar Amara"
 
 #: templates/enterprise.html:262
 msgid "Be in touch at"
-msgstr ""
+msgstr "Mantenha contato"
 
 #: templates/faq.html:16
 msgid "Frequently Asked Questions"
@@ -3583,7 +3579,7 @@ msgstr "Quais são os benefícios do uso de legendas?"
 #: templates/faq.html:22 templates/faq.html.py:74
 msgid ""
 "Who is the Participatory Culture Foundation and why are they making Amara?"
-msgstr ""
+msgstr "Quem é a Participatory Culture Foundation e por que eles estão fazendo a Universal Subtitles?"
 
 #: templates/faq.html:23 templates/faq.html.py:78
 msgid "Will Amara support closed captions for the deaf and hard of hearing?"
@@ -3858,15 +3854,15 @@ msgstr "P.S.: Fazemos o nosso melhor para responder a todas as perguntas, mas po
 
 #: templates/generic-error.html:7
 msgid "Sorry!"
-msgstr ""
+msgstr "Desculpe!"
 
 #: templates/generic-error.html:8
 msgid "If you need assistance, please visit our support site at "
-msgstr ""
+msgstr "Se você precisar de ajuda, por favor visite nosso site de suporte em"
 
 #: templates/generic-error.html:8
 msgid "Get help"
-msgstr ""
+msgstr "Pedir ajuda"
 
 #: templates/index.html:18
 msgid "The easiest way to caption and translate any video."
@@ -3949,7 +3945,7 @@ msgstr "Equipe TED"
 
 #: templates/index.html:94 templates/index.html.py:95
 msgid "Mozilla Team"
-msgstr ""
+msgstr "Equipe Mozilla"
 
 #: templates/index.html:100 templates/index.html.py:101
 msgid "Khan Integration"
@@ -3965,11 +3961,11 @@ msgstr "Exemplo Al Jazeera"
 
 #: templates/index.html:120
 msgid "Newshour Team"
-msgstr ""
+msgstr "Equipe Newshour"
 
 #: templates/index.html:121
 msgid "NewsHour Team"
-msgstr ""
+msgstr "Equipe NewsHour"
 
 #: templates/index.html:127
 msgid "More Popular"
@@ -4287,7 +4283,7 @@ msgid ""
 "            More captions will also make it simpler for computers to process, index, \n"
 "            and make sense of the ever growing sea of online video.\n"
 "           "
-msgstr ""
+msgstr "\nO foco desta reunião é a maior disponibilidade e melhor usabilidade para as legendas, que são ambos extremamente necessário. Elas vem em um momento crítico, como o uso de vídeo na Internet está disparando pessoas que dependem de legendas estão ameaçadas de ficar para trás. Novos usuários de todas as culturas estão vindo online em massa; padronização e ubiquitizing a tecnologia pode fazer um público potencial exponencialmente maior e as mensagens podem atravessar fronteiras culturais mais facilmente. Mais legendas também vão tornar mais simples para os computadores processarem, indexarem e fazer sentido do crescente mar de vídeos online.\n    "
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
@@ -4341,10 +4337,6 @@ msgstr "Amara"
 msgid "View site"
 msgstr "Ver site"
 
-#: templates/admin/base_site.html:13
-msgid "Edit settings"
-msgstr "Editar configurações"
-
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
 msgstr "Enviar"
@@ -4372,15 +4364,15 @@ msgstr "Cancelar"
 
 #: templates/auth/login.html:25
 msgid "Or use your Amara account"
-msgstr ""
+msgstr "Ou use sua conta Amara"
 
 #: templates/auth/login.html:26
 msgid "Don't have one?"
-msgstr ""
+msgstr "Não tem um?"
 
 #: templates/auth/login.html:29
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Esqueceu sua senha?"
 
 #: templates/auth/login.html:30 templates/auth/login_trap.html:15
 #: templates/openid_consumer/signin.html:22
@@ -4389,11 +4381,11 @@ msgstr "Entrar"
 
 #: templates/auth/login.html:34
 msgid "Create an Amara account"
-msgstr ""
+msgstr "Criara uma conta Amara"
 
 #: templates/auth/login.html:35
 msgid "Already have one?"
-msgstr ""
+msgstr "Já tem um?"
 
 #: templates/auth/login.html:38
 msgid "Create Account"
@@ -4401,7 +4393,7 @@ msgstr "Criar conta"
 
 #: templates/auth/login_trap.html:10
 msgid "Sign in as a different user"
-msgstr ""
+msgstr "Entrar como um usuário diferente"
 
 #: templates/comments/_item.html:3 templates/messages/list.html:70
 #: templates/messages/sent.html:49 templates/videos/_action_tpl.html:9
@@ -4512,53 +4504,6 @@ msgstr "Teste o nosso widget de legendagem"
 #: templates/jsdemo/home.html:122
 msgid "Try the Demo"
 msgstr "Experimente a Demo"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Documentation"
-msgstr "Documentação"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Change password"
-msgstr "Alterar senha"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Log out"
-msgstr "Sair"
-
-#: templates/livesettings/site_settings.html:52
-msgid "Edit Site Settings"
-msgstr "Editar configurações do site"
-
-#: templates/livesettings/site_settings.html:59
-msgid "Livesettings are disabled for this site."
-msgstr "As configurações livesettings estão desabilitadas neste site."
-
-#: templates/livesettings/site_settings.html:60
-msgid "All configuration options must be edited in the site settings.py file"
-msgstr "Todas as opções de configuração devem ser editadas no arquivo settings.py do site"
-
-#: templates/livesettings/site_settings.html:66
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Por favor, corrija o erro abaixo."
-msgstr[1] "Por favor, corrija os erros abaixo."
-
-#: templates/livesettings/site_settings.html:82
-#, python-format
-msgid "Group settings: %(name)s"
-msgstr "Configurações do grupo: %(name)s"
-
-#: templates/livesettings/site_settings.html:108
-msgid "Update Settings"
-msgstr "Atualizar configurações"
-
-#: templates/livesettings/site_settings.html:109
-msgid "Uncollapse all"
-msgstr "Esconder tudo"
-
-#: templates/livesettings/site_settings.html:113
-msgid "You don't have permission to edit values."
-msgstr "Você não possui permissão para alterar valores."
 
 #: templates/messages/_messages.html:4
 #, python-format
@@ -4691,7 +4636,7 @@ msgstr ""
 #: templates/openid_consumer/signin.html:14
 #: templates/registration/password_reset_form.html:12
 msgid "Back to Sign In"
-msgstr ""
+msgstr "Voltar para a entrada"
 
 #: templates/profiles/_filters.html:5
 msgid "User Details"
@@ -5219,7 +5164,7 @@ msgstr "para aplicar"
 
 #: templates/teams/_actions.html:43
 msgid "Your application is pending"
-msgstr ""
+msgstr "Sua aplicação esta pendente"
 
 #: templates/teams/_actions.html:58
 msgid "Join Team"
@@ -5247,7 +5192,7 @@ msgid ""
 "\n"
 "                                No formal language training is required to translate for %(team)s. But we do ask that all translators are confident in their translation abilities. Please make sure your profile has your language\n"
 "                            "
-msgstr ""
+msgstr "\nNenhum treinamento de linguagem formal é necessária para traduzir para %(team)s Mas pedimos que todos os tradutores sejam confiantes em suas habilidades de tradução. Verifique se o seu perfil tem o seu idioma"
 
 #: templates/teams/_application_form.html:24
 msgid "proficiency"
@@ -5262,7 +5207,7 @@ msgid ""
 "\n"
 "                                We request that each new applicant does at least one full set of subtitles within the first week of joining. Aside from that, it’s up to you!\n"
 "                            "
-msgstr ""
+msgstr "\nNós pedimos que cada novo candidato faça pelo menos um conjunto completo de legendas na primeira semana de adesão. Fora isso, cabe a você!"
 
 #: templates/teams/_application_form.html:37
 msgid "About you"
@@ -5274,7 +5219,7 @@ msgid ""
 "\n"
 "                        Tell us a little bit about yourself and why you’re interested in translating with %(team)s. This should be 3-5 sentences, no longer!\n"
 "                    "
-msgstr ""
+msgstr "\nConte-nos um pouco sobre você e porque você está interessado em traduzir com %(team)s. Este deve ter 3-5 frases, não mais longo!"
 
 #: templates/teams/_application_form.html:47
 msgid "Submit Application"
@@ -5422,11 +5367,11 @@ msgid ""
 "            You received this notification because you are a member of the \n"
 "            <a href=\"%(team_page)s\">%(team)s</a> team. \n"
 "        "
-msgstr ""
+msgstr "\nVocê recebeu essa notificação porque você é um membro de:\nEquipe <a href=\"%(team_page)s\">%(team)s</a>.\n        "
 
 #: templates/teams/_team_move_video_select.html:6
 msgid "Move video to one of your other teams?"
-msgstr ""
+msgstr "Mais vídeos para uma de suas outras equipes?"
 
 #: templates/teams/_team_move_video_select.html:27
 #: templates/teams/_team_move_video_select.html:51
@@ -5457,8 +5402,8 @@ msgid_plural ""
 "\n"
 "                        %(num)s languages\n"
 "                    "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                        %(num)s idioma\n                    "
+msgstr[1] "\n                        %(num)s idiomas\n                    "
 
 #: templates/teams/_team_video_detail.html:19
 #, python-format
@@ -5470,8 +5415,8 @@ msgid_plural ""
 "\n"
 "                            (%(num)s completed)\n"
 "                        "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                            (%(num)s concluido)\n                            "
+msgstr[1] "\n                            (%(num)s concluido)\n                        "
 
 #: templates/teams/_team_video_detail.html:35
 #, python-format
@@ -5483,8 +5428,8 @@ msgid_plural ""
 "\n"
 "                            %(counter)s tasks\n"
 "                        "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                            1 tarefa\n                        "
+msgstr[1] "\n                            %(counter)s tarefas\n                        "
 
 #: templates/teams/_team_video_detail.html:52
 #: templates/teams/members-list.html:119
@@ -5537,7 +5482,7 @@ msgstr "Recusar"
 
 #: templates/teams/applications.html:56
 msgid "Send a message"
-msgstr ""
+msgstr "Envie uma mensagem"
 
 #: templates/teams/applications.html:66
 msgid "There are no applications right now"
@@ -5613,7 +5558,7 @@ msgstr "Quem deve fazer isto?"
 
 #: templates/teams/create_task.html:68 templates/teams/tasks.html:471
 msgid "Begin typing to search"
-msgstr ""
+msgstr "Comece a digitar para pesquisar"
 
 #: templates/teams/create_task.html:71
 msgid ""
@@ -5676,7 +5621,7 @@ msgstr ""
 
 #: templates/teams/invite_members.html:29
 msgid "Begin typing to search."
-msgstr ""
+msgstr "Comece a digitar para pesquisar."
 
 #: templates/teams/invite_members.html:32
 msgid "Amara username of the user you want to invite."
@@ -5684,19 +5629,19 @@ msgstr ""
 
 #: templates/teams/invite_members.html:36
 msgid "Invite Details"
-msgstr ""
+msgstr "Detalhes do convite"
 
 #: templates/teams/invite_members.html:39
 msgid "Include a message"
-msgstr ""
+msgstr "Incluir mensagem"
 
 #: templates/teams/invite_members.html:43
 msgid "Assign a role"
-msgstr ""
+msgstr "Designar função"
 
 #: templates/teams/invite_members.html:45
 msgid "Role to be assigned to the user if they accept your invitation."
-msgstr ""
+msgstr "Função a ser designada ao usuário se ele aceitar seu convite"
 
 #: templates/teams/invite_members.html:49
 msgid "Send Invites"
@@ -5730,7 +5675,7 @@ msgstr "Contribuinte"
 
 #: templates/teams/members-list.html:62
 msgid "speaking"
-msgstr ""
+msgstr "falando"
 
 #: templates/teams/members-list.html:64 templates/teams/tasks.html:75
 msgid "all languages"
@@ -5740,7 +5685,7 @@ msgstr "Todos os idiomas"
 #: templates/teams/tasks.html.py:127 templates/teams/tasks.html:134
 #: templates/teams/videos-list.html:89
 msgid "Clear"
-msgstr ""
+msgstr "Limpar"
 
 #: templates/teams/members-list.html:77
 msgid "This team has"
@@ -5748,7 +5693,7 @@ msgstr "Este grupo tem"
 
 #: templates/teams/members-list.html:77
 msgid "open applications"
-msgstr ""
+msgstr "vagas abertas"
 
 #: templates/teams/members-list.html:82
 msgid "Sorry, no members found."
@@ -5787,7 +5732,7 @@ msgstr ""
 msgid ""
 "Customize the messages sent to your users. The text you enter will accompany"
 " the default system message."
-msgstr ""
+msgstr "Personalize as mensagens enviadas aos seus usuários. O texto que você entrar vai acompanhar o sistema de mensagens padrão."
 
 #: templates/teams/settings-guidelines.html:31
 msgid "When a member is invited to join the team"
@@ -5795,7 +5740,7 @@ msgstr "Quando um membro é convidado a entrar no grupo"
 
 #: templates/teams/settings-guidelines.html:34
 msgid "When a member applies to join the team"
-msgstr ""
+msgstr "Quando um membro aplicar para se juntar a uma equipe"
 
 #: templates/teams/settings-guidelines.html:37
 msgid "When a member is given the Manager role"
@@ -5881,7 +5826,7 @@ msgstr "Se deixado em branco, as tarefas não expirarão."
 
 #: templates/teams/settings-permissions.html:55
 msgid "Subtitling"
-msgstr ""
+msgstr "Legendando"
 
 #: templates/teams/settings-permissions.html:57
 msgid "Who can transcribe subtitles?"
@@ -5893,7 +5838,7 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:61
 msgid "Who can translate subtitles?"
-msgstr ""
+msgstr "Quem pode traduzir as legendas?"
 
 #: templates/teams/settings-permissions.html:62
 msgid "i.e. translate text from an original subtitle into a new language"
@@ -6061,23 +6006,23 @@ msgstr "Ao se ordenar por data de expiração, tarefas sem uma expiração não 
 
 #: templates/teams/tasks.html:140
 msgid "Try broadening your selection using the filters above"
-msgstr ""
+msgstr "Tente melhorar a sua seleção usando os filtros acima"
 
 #: templates/teams/tasks.html:146
 msgid "Tell us what languages you speak"
-msgstr ""
+msgstr "Nos conte quais idiomas você fala"
 
 #: templates/teams/tasks.html:146
 msgid "and we'll narrow this list for you"
-msgstr ""
+msgstr "e nós vamos refinar essa lista para você"
 
 #: templates/teams/tasks.html:152
 msgid "Showing unassigned tasks in languages you speak"
-msgstr ""
+msgstr "Mostrar tarefas não atribuídas nos idiomas que você fala"
 
 #: templates/teams/tasks.html:157
 msgid "Try changing your selection using the filters above to find tasks"
-msgstr ""
+msgstr "Tente mudar sua seleção usando os filtros acima para achar tarefas"
 
 #: templates/teams/tasks.html:222
 msgid "latest draft"
@@ -6146,7 +6091,7 @@ msgstr "Idioma"
 
 #: templates/teams/tasks.html:331
 msgid "Translate from"
-msgstr ""
+msgstr "Traduzir de"
 
 #: templates/teams/tasks.html:336
 msgid "File:"
@@ -6154,7 +6099,7 @@ msgstr "Arquivo: "
 
 #: templates/teams/tasks.html:339
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
-msgstr ""
+msgstr "Formatos aceitos: .srt, .ssa, .sbv, .dfxp, .txt ou .xml (para TTML)"
 
 #: templates/teams/tasks.html:353
 msgid "Download a draft"
@@ -6166,7 +6111,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:384
 msgid "Decline"
-msgstr ""
+msgstr "Recusar"
 
 #: templates/teams/tasks.html:404
 msgid "Reassign"
@@ -6216,7 +6161,7 @@ msgstr "Este vídeo é moderado por uma equipe"
 
 #: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
 msgid "Your Teams"
-msgstr ""
+msgstr "Suas Equipes"
 
 #: templates/teams/teams-list.html:18
 msgid "Team Directory"
@@ -6228,7 +6173,7 @@ msgstr "Classificar por"
 
 #: templates/teams/teams-list.html:64
 msgid "Your team"
-msgstr ""
+msgstr "Sua equipe"
 
 #: templates/teams/teams-list.html:67
 msgid "Private"
@@ -6348,7 +6293,7 @@ msgstr "Remover vídeo"
 #: templates/teams/videos-list.html:125
 #, python-format
 msgid "You are removing this video from the %(team)s team."
-msgstr ""
+msgstr "Você esta removendo esse vídeo da equipe %(team)s."
 
 #: templates/teams/videos-list.html:126 templates/teams/videos-list.html:133
 msgid ""
@@ -6366,7 +6311,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:131
 msgid "Just remove the video from the team."
-msgstr ""
+msgstr "Apenas remova o vídeo da equipe."
 
 #: templates/teams/videos-list.html:136
 msgid "Delete the video entirely."
@@ -6583,7 +6528,7 @@ msgstr ""
 
 #: templates/videos/_team_list.html:8
 msgid "Translation Project"
-msgstr ""
+msgstr "Projeto de Tradução"
 
 #: templates/videos/_upload_subtitles.html:2
 msgid "upload"
@@ -6599,7 +6544,7 @@ msgid ""
 "              Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
 "              or .xml (for TTML) are accepted.\n"
 "              "
-msgstr ""
+msgstr "\n              Nosso site aceito os formatos SRT, SSA, SBV, DFXP, TTML, e TXT. Somente arquivos terminando em .srt, .ssa, .sbv, .dfxp, .txt\n              ou .xml (para TTML) são aceitos.\n              "
 
 #: templates/videos/_upload_subtitles.html:22
 msgid "Video Language"
@@ -6607,7 +6552,7 @@ msgstr "Idioma do Vídeo"
 
 #: templates/videos/_upload_subtitles.html:24
 msgid "Translated from"
-msgstr ""
+msgstr "Traduzido de"
 
 #: templates/videos/_upload_subtitles.html:28
 #, python-format
@@ -7119,7 +7064,7 @@ msgstr "Linha"
 #: templates/videos/subtitle-view.html:126
 #: templates/videos/video-view.html:111
 msgid "View Subtitles"
-msgstr ""
+msgstr "Ver legendas"
 
 #: templates/videos/subtitle-view.html:150
 #: templates/videos/subtitle-view.html:287
@@ -7143,7 +7088,7 @@ msgstr "Editar legendas"
 
 #: templates/videos/subtitle-view.html:166
 msgid "Download"
-msgstr ""
+msgstr "Download"
 
 #: templates/videos/subtitle-view.html:194
 msgid "Draft only"
@@ -7177,15 +7122,15 @@ msgstr "Ver histórico de revisão"
 
 #: templates/videos/subtitle-view.html:257
 msgid "These subtitles are in progress."
-msgstr ""
+msgstr "Essas legendas estão em progresso."
 
 #: templates/videos/subtitle-view.html:258
 msgid "Make more?"
-msgstr ""
+msgstr "Fazer mais?"
 
 #: templates/videos/subtitle-view.html:260
 msgid "No subtitles available yet."
-msgstr ""
+msgstr "ainda sem legendas."
 
 #: templates/videos/subtitle-view.html:261
 msgid "Make some!"
@@ -7216,7 +7161,7 @@ msgstr "Comparar revisões"
 
 #: templates/videos/subtitle-view.html:326
 msgid "Timing"
-msgstr ""
+msgstr "Tempo"
 
 #: templates/videos/subtitle-view.html:327
 msgid "Text"
@@ -7236,11 +7181,11 @@ msgstr "Despublicar legendas"
 
 #: templates/videos/subtitle-view.html:363
 msgid "This version only"
-msgstr ""
+msgstr "Essa versão apenas"
 
 #: templates/videos/subtitle-view.html:367
 msgid "This entire language and all dependent languages"
-msgstr ""
+msgstr "Todo esse idioma e todos os idiomas dependentes"
 
 #: templates/videos/subtitle-view.html:369
 msgid ""
@@ -7251,7 +7196,7 @@ msgstr ""
 #: templates/videos/subtitle-view.html:378
 msgid ""
 "Yes, delete these subtitles instead of sending them back for editing/review"
-msgstr ""
+msgstr "Sim, delete essas legendas ao invés de mandalas de volta para edição/revisão"
 
 #: templates/videos/test_form_page.html:18
 msgid "Your Email"
@@ -7316,19 +7261,19 @@ msgstr "Digite algum título"
 msgid ""
 "Subtitles saved! You can share the video with friends, or get an embed code "
 "for your site. To add atranslation, click the button below."
-msgstr ""
+msgstr "Legendas salvas! Você pode compartilhar o vídeo com seus amigos, ou pegar um código de encorporação (embed code) para o seu site. Para adicionar uma tradução, clique no botão abaixo"
 
 #: templates/videos/video-view.html:131
 msgid "Be the first to "
-msgstr ""
+msgstr "Seja o primeiro a"
 
 #: templates/videos/video-view.html:131
 msgid "create subtitles"
-msgstr ""
+msgstr "criar legendas"
 
 #: templates/videos/video-view.html:134 templates/videos/video-view.html:158
 msgid "This video doesn't have any subtitles yet"
-msgstr ""
+msgstr "Este vídeo ainda não tem legendas"
 
 #: templates/videos/video-view.html:147
 msgid "URLs"
@@ -7336,25 +7281,25 @@ msgstr "URLs"
 
 #: templates/videos/video-view.html:153
 msgid "Contribute"
-msgstr ""
+msgstr "Contribuir"
 
 #: templates/videos/video-view.html:158
 msgid "Create subtitles now"
-msgstr ""
+msgstr "Criar legendas agora"
 
 #: templates/videos/video-view.html:162
 msgid "Don't see the language you're looking for?"
-msgstr ""
+msgstr "Não consegue localizar o idioma que está procurando?"
 
 #: templates/videos/video-view.html:162
 msgid "Start a new translation"
-msgstr ""
+msgstr "Começar uma nova tradução"
 
 #: templates/videos/video-view.html:168
 msgid ""
 "Subtitles for this video are moderated. If it belongs to a team, try joining"
 " the team to contribute."
-msgstr ""
+msgstr "Legendas para esse vídeo são moderadas.Se pertencerem a uma equipe, tente se juntar a eles para contribuir."
 
 #: templates/videos/video-view.html:195
 msgid "View all activity"

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-27 01:32-0500\n"
-"PO-Revision-Date: 2012-07-27 06:50+0000\n"
+"POT-Creation-Date: 2012-07-28 01:32-0500\n"
+"PO-Revision-Date: 2012-07-28 06:50+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/universalsubtitles/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -1052,10 +1052,6 @@ msgstr "Titrat u çbotuan me sukses."
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "A mundet dikush të më ndihmojë në titrimin e këtyre videove? %(url)s"
 
-#: apps/videos/admin.py:32
-msgid "Email for alert"
-msgstr "Email për sinjalizime"
-
 #: apps/videos/forms.py:67
 msgid "File should have txt format"
 msgstr "Kartela duhet të jetë në format .txt"
@@ -1510,29 +1506,29 @@ msgstr "Keni parashtruar një video\n                që shërbehet përmes prot
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Titrat e tanishëm do të importohen brenda pak minutash."
 
-#: apps/videos/views.py:281
+#: apps/videos/views.py:280
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Faleminderit për ngarkimin. Do të kalojë një minutë e ca, para se titrat të duken."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:282
 msgid "Your changes have been saved."
 msgstr "Rregullimet tuaja u ruajtën."
 
-#: apps/videos/views.py:634
+#: apps/videos/views.py:622
 msgid "You have not permission change this URL"
 msgstr "Nuk keni leje për ndryshimin e kësaj URL-je"
 
-#: apps/videos/views.py:640 apps/videos/views.py:660
+#: apps/videos/views.py:628 apps/videos/views.py:648
 msgid "Object does not exist"
 msgstr "Objekti nuk ekziston"
 
-#: apps/videos/views.py:653
+#: apps/videos/views.py:641
 msgid "You have not permission delete this URL"
 msgstr "Nuk keni leje për fshirjen e kësaj URL-je"
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:644
 msgid "You cann't remove original URL"
 msgstr "Nuk mund të hiqni URL-në origjinale"
 
@@ -1596,7 +1592,6 @@ msgstr "Përzgjedhje gjuhe"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
-#: templates/livesettings/site_settings.html:51
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
@@ -4329,10 +4324,6 @@ msgstr "Amara"
 msgid "View site"
 msgstr "Shiheni site-in"
 
-#: templates/admin/base_site.html:13
-msgid "Edit settings"
-msgstr "Përpunoni rregullime"
-
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
 msgstr "Dërgoje"
@@ -4500,53 +4491,6 @@ msgstr "Provoni widget-it tonë për titrime"
 #: templates/jsdemo/home.html:122
 msgid "Try the Demo"
 msgstr "Provoni Demon"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Documentation"
-msgstr "Dokumentim"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Change password"
-msgstr "Ndryshoni fjalëkalimin"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Log out"
-msgstr "Dilni"
-
-#: templates/livesettings/site_settings.html:52
-msgid "Edit Site Settings"
-msgstr "Përpunoni Rregullime Site-i"
-
-#: templates/livesettings/site_settings.html:59
-msgid "Livesettings are disabled for this site."
-msgstr "Livesettings janë të çaktivizuar për këtë site."
-
-#: templates/livesettings/site_settings.html:60
-msgid "All configuration options must be edited in the site settings.py file"
-msgstr "Krejt mundësitë e formësimit duhen përpunuar te kartela settings.py e rregullimeve"
-
-#: templates/livesettings/site_settings.html:66
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Ju lutem, ndreqni gabimin e mëposhtëm."
-msgstr[1] "Ju lutem, ndreqni gabimet e mëposhtme."
-
-#: templates/livesettings/site_settings.html:82
-#, python-format
-msgid "Group settings: %(name)s"
-msgstr "Rregullime grupi: %(name)s"
-
-#: templates/livesettings/site_settings.html:108
-msgid "Update Settings"
-msgstr "Përditësoni Rregullimet"
-
-#: templates/livesettings/site_settings.html:109
-msgid "Uncollapse all"
-msgstr "Çtkurri krejt"
-
-#: templates/livesettings/site_settings.html:113
-msgid "You don't have permission to edit values."
-msgstr "Nuk keni leje për të përpunuar vlera."
 
 #: templates/messages/_messages.html:4
 #, python-format

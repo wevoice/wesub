@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-27 01:32-0500\n"
-"PO-Revision-Date: 2012-07-27 06:51+0000\n"
+"POT-Creation-Date: 2012-07-28 01:32-0500\n"
+"PO-Revision-Date: 2012-07-28 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/universalsubtitles/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -1054,10 +1054,6 @@ msgstr ""
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "누군가 이 비디오에 자막 만드는 것을 도와줄 수 있을까요? %(url)s"
 
-#: apps/videos/admin.py:32
-msgid "Email for alert"
-msgstr "경보에 대한 이메일"
-
 #: apps/videos/forms.py:67
 msgid "File should have txt format"
 msgstr "파일은 txt 포맷이어야 합니다."
@@ -1512,29 +1508,29 @@ msgstr ""
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "몇 분 안에 기존 자막을 불러올 것입니다."
 
-#: apps/videos/views.py:281
+#: apps/videos/views.py:280
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "업로드 해주셔서 감사합니다. 귀하의 자막이 나타나는데는 잠시 시간이 걸립니다."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:282
 msgid "Your changes have been saved."
 msgstr "변경 내용이 저장되었습니다."
 
-#: apps/videos/views.py:634
+#: apps/videos/views.py:622
 msgid "You have not permission change this URL"
 msgstr "당신은 이 URL을 변경할 권한이 없습니다."
 
-#: apps/videos/views.py:640 apps/videos/views.py:660
+#: apps/videos/views.py:628 apps/videos/views.py:648
 msgid "Object does not exist"
 msgstr "개체가 존재하지 않습니다."
 
-#: apps/videos/views.py:653
+#: apps/videos/views.py:641
 msgid "You have not permission delete this URL"
 msgstr "이 URL을 삭제할 권한이 없습니다."
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:644
 msgid "You cann't remove original URL"
 msgstr "원래 URL을 제거할 수 없습니다."
 
@@ -1597,7 +1593,6 @@ msgstr "언어 선택"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
-#: templates/livesettings/site_settings.html:51
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
@@ -4328,10 +4323,6 @@ msgstr ""
 msgid "View site"
 msgstr "사이트 보기"
 
-#: templates/admin/base_site.html:13
-msgid "Edit settings"
-msgstr "설정 수정"
-
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
 msgstr "보내기"
@@ -4499,52 +4490,6 @@ msgstr "자막 위젯 테스트하기"
 #: templates/jsdemo/home.html:122
 msgid "Try the Demo"
 msgstr "데모 이용하기"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Documentation"
-msgstr "문서"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Change password"
-msgstr "비밀 번호 변경"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Log out"
-msgstr "로그아웃"
-
-#: templates/livesettings/site_settings.html:52
-msgid "Edit Site Settings"
-msgstr "사이트 설정 수정"
-
-#: templates/livesettings/site_settings.html:59
-msgid "Livesettings are disabled for this site."
-msgstr "Livesettings은 이 사이트에서 사용하실 수 없습니다."
-
-#: templates/livesettings/site_settings.html:60
-msgid "All configuration options must be edited in the site settings.py file"
-msgstr "모든 구성 옵션은 사이트 환경 설정에서 편집할 수 있어야합니다."
-
-#: templates/livesettings/site_settings.html:66
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "아래의 오류를 수정해 주시기 바랍니다."
-
-#: templates/livesettings/site_settings.html:82
-#, python-format
-msgid "Group settings: %(name)s"
-msgstr "그룹 설정: %(name)s"
-
-#: templates/livesettings/site_settings.html:108
-msgid "Update Settings"
-msgstr "업데이트 설정"
-
-#: templates/livesettings/site_settings.html:109
-msgid "Uncollapse all"
-msgstr "모두 접기"
-
-#: templates/livesettings/site_settings.html:113
-msgid "You don't have permission to edit values."
-msgstr "당신은 값을 수정할 수 있는 권한이 없습니다."
 
 #: templates/messages/_messages.html:4
 #, python-format

@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-27 01:32-0500\n"
-"PO-Revision-Date: 2012-07-27 06:51+0000\n"
+"POT-Creation-Date: 2012-07-28 01:32-0500\n"
+"PO-Revision-Date: 2012-07-28 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/universalsubtitles/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -1058,10 +1058,6 @@ msgstr "Sottotitoli non pubblicati con successo."
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Qualcuno mi può aiutare a sottotitolare questi video? %(url)s"
 
-#: apps/videos/admin.py:32
-msgid "Email for alert"
-msgstr "Email per notifica"
-
 #: apps/videos/forms.py:67
 msgid "File should have txt format"
 msgstr "Il file dovrebbe avere il formato txt"
@@ -1516,29 +1512,29 @@ msgstr ""
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "I sottotitoli esistenti verranno importati in pochi minuti."
 
-#: apps/videos/views.py:281
+#: apps/videos/views.py:280
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "Grazie per il caricamento. Ci vorrà circa un minuto affinché i tuoi sottotitoli appaiano."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:282
 msgid "Your changes have been saved."
 msgstr "I tuoi cambiamenti sono stati salvati."
 
-#: apps/videos/views.py:634
+#: apps/videos/views.py:622
 msgid "You have not permission change this URL"
 msgstr "Non sei autorizzare a modificare questo URL"
 
-#: apps/videos/views.py:640 apps/videos/views.py:660
+#: apps/videos/views.py:628 apps/videos/views.py:648
 msgid "Object does not exist"
 msgstr "L'oggetto non esiste"
 
-#: apps/videos/views.py:653
+#: apps/videos/views.py:641
 msgid "You have not permission delete this URL"
 msgstr "Non sei autorizzato a cancellare questo URL"
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:644
 msgid "You cann't remove original URL"
 msgstr "Non puoi togliere l'URL originale"
 
@@ -1602,7 +1598,6 @@ msgstr "Selezione delle lingue"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
-#: templates/livesettings/site_settings.html:51
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
@@ -4335,10 +4330,6 @@ msgstr "Amara"
 msgid "View site"
 msgstr "Visualizza il sito"
 
-#: templates/admin/base_site.html:13
-msgid "Edit settings"
-msgstr "Modifica i parametri"
-
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
 msgstr "Spedisci"
@@ -4506,53 +4497,6 @@ msgstr "Prova il widget di sottotitolazione"
 #: templates/jsdemo/home.html:122
 msgid "Try the Demo"
 msgstr "Prova la dimostrazione"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Documentation"
-msgstr "Documentazione"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Change password"
-msgstr "Cambia la password"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Log out"
-msgstr "Esci"
-
-#: templates/livesettings/site_settings.html:52
-msgid "Edit Site Settings"
-msgstr "Modifica i parametri del sito"
-
-#: templates/livesettings/site_settings.html:59
-msgid "Livesettings are disabled for this site."
-msgstr "I parametri Live sono disattivati per questo sito."
-
-#: templates/livesettings/site_settings.html:60
-msgid "All configuration options must be edited in the site settings.py file"
-msgstr "Tutte le opzioni di configurazione vanno modificate nel file settings.py"
-
-#: templates/livesettings/site_settings.html:66
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Correggi l'errore sotto, per favore."
-msgstr[1] "Correggi gli errori sotto, per favore."
-
-#: templates/livesettings/site_settings.html:82
-#, python-format
-msgid "Group settings: %(name)s"
-msgstr "Parametri del gruppo: %(name)s"
-
-#: templates/livesettings/site_settings.html:108
-msgid "Update Settings"
-msgstr "Aggiorna i parametri"
-
-#: templates/livesettings/site_settings.html:109
-msgid "Uncollapse all"
-msgstr "Dispiega tutti"
-
-#: templates/livesettings/site_settings.html:113
-msgid "You don't have permission to edit values."
-msgstr "Non sei autorizzato a modificare i valori"
 
 #: templates/messages/_messages.html:4
 #, python-format
