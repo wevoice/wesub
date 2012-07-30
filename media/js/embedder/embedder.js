@@ -45,6 +45,13 @@
             }
         };
 
+        // Utilities.
+        var utils = {
+            parseFloatAndRound: function(val) {
+                return (Math.round(parseFloat(val) * 100) / 100).toFixed(2);
+            }
+        };
+
         // Video model.
         var VideoModel = _Backbone.Model.extend({
 
@@ -221,20 +228,42 @@
             },
 
             buildTranscript: function(language) {
-                var subtitles = this.model.subtitles.where({'language': language});
-                console.log(subtitles);
+                var subtitleSet = this.model.subtitles.where({'language': language})[0];
+                var subtitles = subtitleSet.get('subtitles');
+
+                if (subtitles.length) {
+
+                    var html = '';
+
+                    var transcriptLineTemplate = '' +
+                        '<div class="amara-group amara-transcript-line">' +
+                        '    <div class="amara-transcript-line-left">{{ start }}</div>' +
+                        '    <div class="amara-transcript-line-right">{{ text }}</div>' +
+                        '</div>';
+
+                    for (var i = 0; i < subtitles.length; i++) {
+                        html += __.template(transcriptLineTemplate, {
+                            text: subtitles[i].text,
+                            start: utils.parseFloatAndRound(subtitles[i].start)
+                        });
+                    }
+
+                    this.$transcriptBody.html(html);
+
+                } else {
+                    this.$transcriptBody.html('No subtitles available.');
+                }
             },
 
-            // Makes a call to the Amara API and retrieves a set of subtitles for a specific
-            // video in a specific language. When it gets a response, it adds the subtitle set
+            // Make a call to the Amara API and retrieve a set of subtitles for a specific
+            // video in a specific language. When we get a response, add the subtitle set
             // to the video model's 'subtitles' collection for later retrieval by language code.
             fetchSubtitles: function(language, callback) {
                 var that = this;
 
                 var apiURL = ''+
                     'https://staging.universalsubtitles.org/api2/partners/videos/' +
-                    this.model.get('id') +
-                    '/languages/' + language + '/subtitles/';
+                    this.model.get('id') + '/languages/' + language + '/subtitles/';
 
                 // Make a call to the Amara API to retrieve subtitles for this language.
                 //
@@ -256,15 +285,12 @@
                 });
             },
             logoClicked: function() {
-                alert('Logo clicked');
                 return false;
             },
             shareButtonClicked: function() {
-                alert('Share button clicked');
                 return false;
             },
             subtitlesButtonClicked: function() {
-                alert('Subtitles button clicked');
                 return false;
             },
             transcriptButtonClicked: function() {
@@ -272,6 +298,8 @@
                 return false;
             },
             waitUntilVideoIsComplete: function(callback) {
+
+                var that = this;
 
                 // isComplete gets set as soon as the initial API call to build out the video
                 // instance has finished.
@@ -304,7 +332,12 @@
                 '            </div>' +
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
-                '            Transcript' +
+                '            <div class="amara-transcript-line amara-group">' +
+                '                <div class="amara-transcript-line-left">&nbsp;</div>' +
+                '                <div class="amara-transcript-line-right">' +
+                '                    Loading transcript&hellip;' +
+                '                </div>' +
+                '            </div>' +
                 '        </div>' +
                 '    </div>' +
                 '</div>',
@@ -312,6 +345,7 @@
             cacheNodes: function() {
                 this.$amaraContainer = $('div.amara-container', this.$el);
                 this.$transcript = $('div.amara-transcript', this.$amaraContainer);
+                this.$transcriptBody = $('div.amara-transcript-body', this.$transcript);
             }
 
         });

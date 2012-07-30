@@ -87,11 +87,16 @@ div.amara-group {
     }
 }
 div.amara-embed {
+    * {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+    }
     div.amara-container {
         div.amara-bar {
             border-top: 1px solid #313233;
             color: #666;
-            height: 36px;
+            height: 37px;
             margin-top: -5px;
             @include multi-border-radius(0, 0, 3px, 3px);
             @include vertical-gradient(#1B1C1D, #212223);
@@ -199,7 +204,40 @@ div.amara-embed {
                 }
             }
             div.amara-transcript-body {
-                padding: 40px 0 40px 155px;
+                margin: 40px 10px 40px 0;
+                max-height: 300px;
+                overflow: auto;
+
+                &::-webkit-scrollbar {
+                    background: #F7F7F7;
+                    height: 10px;
+                    width: 10px;
+                    -webkit-appearance: none;
+                    border-radius: 6px;
+                }
+                &::-webkit-scrollbar-thumb {
+                    border: 1px solid white;
+                    border-radius: 8px;
+                    background-color: #C7C7C7;
+                }
+                div.amara-transcript-line {
+                    line-height: 28px;
+
+                    div.amara-transcript-line-left {
+                        color: #A5A6A6;
+                        float: left;
+                        font-size: 10px;
+                        text-align: right;
+                        min-width: 6em;
+                        padding: 0 40px 0 40px;
+                        width: 18%;
+                    }
+                    div.amara-transcript-line-right {
+                        float: left;
+                        padding-right: 30px;
+                        width: 82%;
+                    }
+                }
             }
         }
     }

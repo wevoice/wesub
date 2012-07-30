@@ -1722,7 +1722,6 @@ def auto_captions_status(request, slug):
 
 
 # Billing
-
 def get_billing_data_for_team(team, start_date, end_date, header=True):
     """
     Return a list of lists of data suitable for the csv writer or similar.
@@ -1781,7 +1780,7 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
                 tv.video.title.encode('utf-8'),
                 host + tv.video.get_absolute_url(),
                 language.language,
-                int(round((end - start) / 60))
+                round((end - start) / 60, 2)
             ])
 
     return rows
@@ -1801,7 +1800,11 @@ def billing(request):
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
 
-            f = 'billing-%s' % team.slug
+            date_range = "%s-%s" % (
+                    start_date.strftime('%Y%m%d'),
+                    end_date.strftime('%Y%m%d'))
+
+            f = 'billing-%s-%s' % (team.slug, date_range)
 
             response = HttpResponse(mimetype='text/csv')
             response['Content-Disposition'] = 'attachment;filename=%s.csv' % f
