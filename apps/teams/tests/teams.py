@@ -19,7 +19,7 @@ from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember, TeamLanguagePreference
 )
-from apps.teams.search_indexes import TeamVideoLanguagesIndex
+from apps.videos.search_indexes import VideoIndex
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage
 from messages.models import Message
@@ -161,12 +161,27 @@ class TeamVideoTest(TestCase):
         self.user = User.objects.get(username=self.auth["username"])
         self.team = Team.objects.get(id=1)
 
+
         tm = TeamMember.objects.get(user=self.user, team=self.team)
         tm.role = TeamMember.ROLE_ADMIN
         tm.save()
 
+        reset_solr()
+
     def _get_team_videos(self):
         return SearchQuerySet().models(TeamVideo).filter(owned_by_team_id=self.team.pk)
+
+    def _search_for_video(self, team_video):
+        qs = VideoIndex.public().filter(title=team_video.video_title_exact)
+        
+        if not qs:
+            return False
+
+        for video in qs:
+            if video.video_id == team_video.video_id:
+                return True
+
+        return False
 
     def test_save_updates_is_visible(self):
         videos = self._get_team_videos()
@@ -190,7 +205,10 @@ class TeamVideoTest(TestCase):
         self.assertFalse(Team.objects.get(id=1).is_visible)
 
         videos = self._get_team_videos()
-        self.assertTrue(True not in [v.is_public for v in videos])
+
+        for video in videos:
+            self.assertFalse(video.is_public)
+            self.assertFalse(self._search_for_video(video))
 
         data['is_visible'] = u'1'
 
@@ -199,7 +217,10 @@ class TeamVideoTest(TestCase):
         self.assertTrue(Team.objects.get(id=1).is_visible)
 
         videos = self._get_team_videos()
-        self.assertTrue(False not in [v.is_public for v in videos])
+
+        for video in videos:
+            self.assertTrue(video.is_public)
+            self.assertTrue(self._search_for_video(video))
 
 class TeamsTest(TestCase):
 
