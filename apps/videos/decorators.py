@@ -1,7 +1,7 @@
 import re
 
 from django.core.exceptions import SuspiciousOperation
-from django.http import HttpResponseForbidden
+from django.http import Http404
 from django.shortcuts import  get_object_or_404
 from django.utils.functional import  wraps
 
@@ -20,7 +20,7 @@ def get_video_from_code(func):
         video = get_object_or_404(Video, video_id=video_id)
 
         if not video.can_user_see(request.user):
-            return HttpResponseForbidden("You cannot see this video")
+            raise Http404
 
         # Hack to pass through the ID (which may be the secret version) in case
         # the view wants to redirect.
@@ -42,7 +42,7 @@ def get_video_revision(func):
         video = get_object_or_404(Video, video_id=id)
 
         if not video.can_user_see(request.user):
-            raise SuspiciousOperation("You cannot see this video")
+            raise Http404
         
         return func(request, version, *args, **kwargs)
     return wraps(func)(wrapper)
