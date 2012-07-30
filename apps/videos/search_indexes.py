@@ -8,6 +8,8 @@ from django.conf import settings
 from haystack.query import SearchQuerySet
 import datetime
 
+from haystack.exceptions import AlreadyRegistered
+
 SUFFIX = u''
 
 class LanguageField(SearchField):
@@ -174,5 +176,10 @@ class SubtitleLanguageIndex(CelerySearchIndex):
         self.prepared_data['language'] = obj.language_display()
         return self.prepared_data
 
-site.register(Video, VideoIndex)
+try:
+    site.register(Video, VideoIndex)
+except AlreadyRegistered:
+    # i hate python imports with all my will.
+    # i hope they die.
+    pass
 #site.register(SubtitleLanguage, SubtitleLanguageIndex)
