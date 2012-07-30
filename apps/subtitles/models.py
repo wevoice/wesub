@@ -221,17 +221,41 @@ class SubtitleVersion(models.Model):
 
 
     def get_subtitles(self):
+        """Return the SubtitleSet for this version.
+
+        A SubtitleSet will always be returned.  It may be empty if there are no
+        subtitles.
+
+        """
         # We cache the parsed subs for speed.
         if self._subtitles == None:
-            self._subtitles = SubtitleSet.from_json(self.serialized_subtitles)
+            if self.serialized_subtitles == '':
+                self._subtitles = SubtitleSet()
+            else:
+                self._subtitles = SubtitleSet.from_json(self.serialized_subtitles)
 
         return self._subtitles
 
     def set_subtitles(self, subtitles):
-        if not isinstance(subtitles, SubtitleSet):
-            subtitles = SubtitleSet(subtitles=subtitles)
+        """Set the SubtitleSet for this version.
 
-        self.serialized_subtitles = subtitles.to_json()
+        You have a few options here:
+
+        * Passing None will set the subtitles to an empty set.
+        * Passing a SubtitleSet will set the subtitles to that set.
+        * Passing a vanilla list (or any iterable) will create a SubtitleSet
+          from that and set the subtitles to it.
+
+        """
+        if subtitles == None:
+            subtitles = SubtitleSet()
+        else:
+            if not isinstance(subtitles, SubtitleSet):
+                subtitles = SubtitleSet(subtitles=subtitles)
+
+            self.serialized_subtitles = subtitles.to_json()
+
+        # We cache the parsed subs for speed.
         self._subtitles = subtitles
 
 
@@ -259,7 +283,7 @@ class SubtitleVersion(models.Model):
         super(SubtitleVersion, self).__init__(*args, **kwargs)
 
         self._subtitles = None
-        if subtitles:
+        if subtitles != None:
             self.set_subtitles(subtitles)
 
         self._lineage = None

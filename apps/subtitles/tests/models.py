@@ -23,6 +23,7 @@ from django.test import TestCase
 from django.db import IntegrityError
 
 from apps.subtitles.models import SubtitleLanguage
+from apps.subtitles.objects import Subtitle, SubtitleSet
 from apps.videos.models import Video
 
 
@@ -75,7 +76,7 @@ class TestSubtitleVersion(TestCase):
 
     def test_create_subtitle_version(self):
         sv = self.sl_en.add_version(title='title a', description='desc a',
-                                    subtitles=[{}])
+                                    subtitles=[])
 
         sv = refresh(sv)
 
@@ -84,8 +85,44 @@ class TestSubtitleVersion(TestCase):
         self.assertEqual(sv.subtitle_language.id, self.sl_en.id)
         self.assertEqual(sv.title, 'title a')
         self.assertEqual(sv.description, 'desc a')
-        self.assertEqual(sv.subtitles, [{}])
+        self.assertEqual(sv.get_subtitles(), [])
         self.assertEqual(sv.visibility, 'public')
+
+    def test_subtitle_serialization(self):
+        # Empty SubtitleSets
+        # We explicitly test before and after refreshing to make sure the
+        # serialization happens properly in both cases.
+        sv = self.sl_en.add_version(subtitles=SubtitleSet())
+        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+        sv = refresh(sv)
+        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+
+        sv = self.sl_en.add_version(subtitles=None)
+        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+        sv = refresh(sv)
+        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+
+        sv = self.sl_en.add_version(subtitles=[])
+        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+        sv = refresh(sv)
+        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+
+        # Non-empty SubtitleSets
+        # Again we test pre- and post-refresh.  Note that this is also checking
+        # the equality handling for Subtitle and SubtitleSets.
+        s0 = Subtitle(100, 200, "a")
+        s1 = Subtitle(300, 400, "b")
+
+        sv = self.sl_en.add_version(subtitles=SubtitleSet(subtitles=[s0, s1]))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
+        sv = refresh(sv)
+        self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
+
+        sv = self.sl_en.add_version(subtitles=[s0, s1])
+        self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
+        sv = refresh(sv)
+        self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
+
 
 class TestHistory(TestCase):
     def setUp(self):
