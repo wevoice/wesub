@@ -337,7 +337,7 @@ class ViewsTests(TestCase):
             url = reverse("videos:video", kwargs={"video_id": video.video_id})
 
             response = self.client.get(url, follow=True)
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 404)
 
             self.client.login(**self.auth)
 
