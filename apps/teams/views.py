@@ -1800,7 +1800,11 @@ def billing(request):
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
 
-            f = 'billing-%s' % team.slug
+            date_range = "%s-%s" % (
+                    start_date.strftime('%Y%m%d'),
+                    end_date.strftime('%Y%m%d'))
+
+            f = 'billing-%s-%s' % (team.slug, date_range)
 
             response = HttpResponse(mimetype='text/csv')
             response['Content-Disposition'] = 'attachment;filename=%s.csv' % f
