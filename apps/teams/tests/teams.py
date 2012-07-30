@@ -25,6 +25,8 @@ from apps.videos.models import Video, SubtitleLanguage
 from messages.models import Message
 from widget.tests import create_two_sub_session, RequestMockup
 
+from haystack.query import SearchQuerySet
+
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
 
 
@@ -163,8 +165,11 @@ class TeamVideoTest(TestCase):
         tm.role = TeamMember.ROLE_ADMIN
         tm.save()
 
+    def _get_team_videos(self):
+        return SearchQuerySet().models(TeamVideo).filter(owned_by_team_id=self.team.pk)
+
     def test_save_updates_is_visible(self):
-        videos = TeamVideoLanguagesIndex.results_for_members(self.team)
+        videos = self._get_team_videos()
         self.assertTrue(False not in [v.is_public for v in videos])
 
         self.client.login(**self.auth)
@@ -180,12 +185,11 @@ class TeamVideoTest(TestCase):
             "description": u"testing",
         }
 
-
         response = self.client.post(url, data, follow=True)
         self.failUnlessEqual(response.status_code, 200)
         self.assertFalse(Team.objects.get(id=1).is_visible)
 
-        videos = TeamVideoLanguagesIndex.results_for_members(self.team)
+        videos = self._get_team_videos()
         self.assertTrue(True not in [v.is_public for v in videos])
 
         data['is_visible'] = u'1'
@@ -194,7 +198,7 @@ class TeamVideoTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         self.assertTrue(Team.objects.get(id=1).is_visible)
 
-        videos = TeamVideoLanguagesIndex.results_for_members(self.team)
+        videos = self._get_team_videos()
         self.assertTrue(False not in [v.is_public for v in videos])
 
 class TeamsTest(TestCase):
