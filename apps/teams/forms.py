@@ -592,7 +592,9 @@ class InviteForm(forms.Form):
             'author': self.user,
             'role': self.cleaned_data['role'],
         })
-
+        # clear the approve flag so re-invites work
+        invite.approve = None
+        invite.save()
         notifier.team_invitation_sent.delay(invite.pk)
         return invite
 
