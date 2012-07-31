@@ -1043,10 +1043,10 @@ class TestInvites(TestCase):
             'role': TeamMember.ROLE_CONTRIBUTOR,
         })
         invite_form.is_valid()
-        self.assertFalse(invite_form.errors)
-        invite_form.save()
+        self.assertIn('user_id', invite_form.errors)
         url = reverse("teams:accept_invite", args=(invite.pk,))
         response  = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
- 
+        self.assertEqual(response.status_code, 500)
+        self.assertIn( 'error_msg', response.context)
+        self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
+
