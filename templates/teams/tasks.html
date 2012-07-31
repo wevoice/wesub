@@ -324,6 +324,7 @@
                                                                 <div class="ajaxChosen">
                                                                     <label>{% trans 'Language' %}</label>
                                                                     {{ upload_draft_form.language }}
+                                                                    <p class="notice">{% trans "Please double check the primary spoken language. This step cannot be undone." %}</p>
                                                                 </div>
                                                                 {% endif %}
                                                                 {% if task.get_type_display == "Translate" and not task.get_subtitle_version %}
