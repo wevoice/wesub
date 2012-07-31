@@ -965,6 +965,7 @@ class TestInvites(TestCase):
         self.user.save()
         self.owner = User.objects.filter(notify_by_message=True)[1]
         self.team = Team.objects.create(name='test-team', slug='test-team', membership_policy=Team.APPLICATION)
+        TeamMember.objects.create(user=self.owner, role=TeamMember.ROLE_ADMIN, team=self.team)
 
     def test_invite_invalid_after_accept(self):
         invite_form = InviteForm(self.team, self.owner, {
@@ -977,9 +978,10 @@ class TestInvites(TestCase):
         self.assertEquals(Message.objects.for_user(self.user).count(), 0)
         invite = invite_form.save()
         # user has the invitation message on their inbox now
+        self.assertEquals(Message.objects.for_user(self.user).count(), 1)
         invite.accept()
         self.assertTrue(self.team.members.filter(user=self.user).exists())
-        self.team.members.all().delete()
+        self.team.members.filter(user=self.user).delete()
         # now the invite re-accepts:
         self.client.login(
             username=self.user.username,
@@ -988,6 +990,7 @@ class TestInvites(TestCase):
         url = reverse("teams:accept_invite", args=(invite.pk,))
         response  = self.client.get(url)
         self.assertEqual(response.status_code, 500)
+        self.assertIn( 'error_msg', response.context)
         self.assertFalse(self.team.members.filter(user=self.user).exists())
         
     def test_invite_invalid_after_deny(self):
@@ -1011,5 +1014,39 @@ class TestInvites(TestCase):
         )
         response  = self.client.get(url)
         self.assertEqual(response.status_code, 500)
+        self.assertIn( 'error_msg', response.context)
         self.assertFalse(self.team.members.filter(user=self.user).exists())
         
+    def test_invite_after_removal(self):
+        invite_form = InviteForm(self.team, self.owner, {
+            'user_id': self.user.pk,
+            'message': 'Subtitle ALL the things!',
+            'role': TeamMember.ROLE_MANAGER,
+        })
+        invite_form.is_valid()
+        self.assertFalse(invite_form.errors)
+        self.assertEquals(Message.objects.for_user(self.user).count(), 0)
+        invite = invite_form.save()
+        # user has the invitation message on their inbox now
+        invite.accept()
+        self.assertTrue(self.team.members.filter(user=self.user).exists())
+        self.team.members.filter(user=self.user).delete()
+        # now the invite re-accepts:
+        self.client.login(
+            username=self.user.username,
+            password=self.user.username
+        )
+        self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
+        invite_form = InviteForm(self.team, self.owner, {
+            'user_id': self.user.pk,
+            'message': 'Subtitle ALL the things!',
+            'role': TeamMember.ROLE_CONTRIBUTOR,
+        })
+        invite_form.is_valid()
+        self.assertIn('user_id', invite_form.errors)
+        url = reverse("teams:accept_invite", args=(invite.pk,))
+        response  = self.client.get(url)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn( 'error_msg', response.context)
+        self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
+
