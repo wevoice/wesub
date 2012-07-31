@@ -72,7 +72,7 @@
                         {% if request.user.is_authenticated %}
                             <option id="lang-opt-mine" value="{{ request.path }}{% query_string request.GET lang="" page='' %}">{% trans 'my languages' %}</option>
                         {% endif %}
-                        <option id="lang-opt-any" value="{{ request.path }}{% query_string request.GET lang="all" page='' %}">{% trans 'all languages' %}</option>
+                        <option id="lang-opt-all" value="{{ request.path }}{% query_string request.GET lang="all" page='' %}">{% trans 'all languages' %}</option>
                         {% for language in languages %}
                             <option id="lang-opt-{{ language.code }}" value="{% query_string request.GET lang=language.code page='' %}"
                                 {% if request.GET.lang == language.code %}
@@ -86,11 +86,11 @@
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'assigned to' %}</span>
                     <select name="assignee" class="assignee-filter">
-                        <option value="{{ request.path }}{% query_string request.GET assignee='' page='' %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
+                        <option value="{{ request.path }}{% query_string request.GET assignee='' page='' %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
                         <option value="{% query_string request.GET assignee='me' page='' %}" {% if request.GET.assignee == 'me' %}selected="selected"{% endif %}>{% trans 'me' %}</option>
-                        <option value="{% query_string request.GET assignee='none' page='' %}" {% if request.GET.assignee == 'none' %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
+                        <option value="{% query_string request.GET assignee='anyone' page='' %}" {% if request.GET.assignee == 'anyone' %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
                         {% with request.GET.assignee as assigned %}
-                            {% if assigned and assigned != 'none' and assigned != 'me' %}
+                            {% if assigned and assigned != 'me' and assigned != 'anyone' %}
                                 <option value="{% query_string request.GET assignee=assigned page='' %}" selected="selected">{{ assigned }}</option>
                             {% endif %}
                         {% endwith %}
@@ -324,6 +324,7 @@
                                                                 <div class="ajaxChosen">
                                                                     <label>{% trans 'Language' %}</label>
                                                                     {{ upload_draft_form.language }}
+                                                                    <p class="notice">{% trans "Please double check the primary spoken language. This step cannot be undone." %}</p>
                                                                 </div>
                                                                 {% endif %}
                                                                 {% if task.get_type_display == "Translate" and not task.get_subtitle_version %}

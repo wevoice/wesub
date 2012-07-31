@@ -79,15 +79,11 @@ unisubs.player.MediaSource.bestVideoSource = function(videoSpecs) {
         return unisubs.player.MediaSource.videoSourceForSpec_(spec);
     });
     var videoSource = null;
-    if (!goog.userAgent.IE) {
-        // not providing IE the opportunity to display HTML5 video yet,
-        // since IE9 support appears buggy
-        // (see https://unisubs.sifterapp.com/projects/12298/issues/442336/comments)
-        videoSource = unisubs.player.MediaSource.bestHTML5VideoSource_(
-            videoSources);
-        if (videoSource != null)
-            return videoSource;
-    }
+
+    videoSource = unisubs.player.MediaSource.bestHTML5VideoSource_(videoSources);
+    if (videoSource != null)
+        return videoSource;
+
     // browser does not support any available html5 formats. Return a flash format.
     videoSource = goog.array.find(
         videoSources,

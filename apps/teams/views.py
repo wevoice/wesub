@@ -264,8 +264,8 @@ def settings_guidelines(request, slug):
                 setting.data = val
                 setting.save()
 
-        messages.success(request, _(u'Guidelines and messages updated.'))
-        return HttpResponseRedirect(request.path)
+            messages.success(request, _(u'Guidelines and messages updated.'))
+            return HttpResponseRedirect(request.path)
     else:
         form = GuidelinesMessagesForm(initial=initial)
 
@@ -1070,10 +1070,11 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        if filters.get('language') != 'all':
+        if filters['language'] != 'all':
             tasks = tasks.filter(language=filters['language'])
     elif request.user.is_authenticated() and request.user.get_languages():
-        tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
+        languages = [ul.language for ul in request.user.get_languages()] + ['']
+        tasks = tasks.filter(language__in=languages)
 
     if filters.get('q'):
         terms = get_terms(filters['q'])
@@ -1095,7 +1096,7 @@ def _tasks_list(request, team, project, filters, user):
             tasks = tasks.filter(assignee=None)
         elif assignee and assignee.isdigit():
             tasks = tasks.filter(assignee=int(assignee))
-        elif assignee:
+        elif assignee and assignee != 'anyone':
             tasks = tasks.filter(assignee=User.objects.get(username=assignee))
     else:
         tasks = tasks.filter(assignee=None)
@@ -1182,7 +1183,7 @@ def team_tasks(request, slug, project_slug=None):
             filters['assignee'] == None
         elif filters['assignee'].isdigit():
             filters['assignee'] = team.members.get(user=filters['assignee'])
-        else:
+        elif filters['assignee'] != 'anyone':
             filters['assignee'] = team.members.get(user=User.objects.get(username=filters['assignee']))
 
         filtered = filtered + 1
