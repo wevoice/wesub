@@ -577,6 +577,8 @@ class InviteForm(forms.Form):
             invite = Invite.objects.get(team=self.team, user=invited_user)
             if invite.approved == False:
                 raise forms.ValidationError(_(u'User has already declined this invite.'))
+            if invite.approved == True:
+                raise forms.ValidationError(_(u'User has already accepted this invite.'))
             if invite.approved == None:
                 raise forms.ValidationError(_(u'User has already been invited.'))
         except Invite.DoesNotExist:
@@ -587,12 +589,13 @@ class InviteForm(forms.Form):
     def save(self):
         from messages import tasks as notifier
         user = User.objects.get(id=self.user_id)
-        invite, created = Invite.objects.get_or_create(team=self.team, user=user, defaults={
-            'note': self.cleaned_data['message'],
-            'author': self.user,
-            'role': self.cleaned_data['role'],
-        })
-
+        invite, created = Invite.objects.get_or_create(team=self.team, user=user, defaults={'author':self.user})
+        invite.note = self.cleaned_data['message']
+        invite.author = self.user
+        invite.role =  self.cleaned_data['role']
+        # clear the approve flag so re-invites work
+        invite.approve = None
+        invite.save()
         notifier.team_invitation_sent.delay(invite.pk)
         return invite
 

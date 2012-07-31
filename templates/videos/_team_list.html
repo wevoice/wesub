@@ -3,15 +3,18 @@
 {% if teams %}
     <div class="video-tools grid_4 omega">
         <h3>{% trans "Collaborate" %}</h3>
-        {% for team in teams %}
-            <p>
-                {% trans 'Visit' %} <a href="{% url teams:detail slug=team.slug %}">{{team.name}} {% trans 'Translation Project' %}</a>.
-            </p>
-        {% endfor %}
         {% if team_video.task_set.not_deleted.exists %}
             <p>
-                View <a href="{% url teams:team_tasks slug=team_video.team.slug %}?team_video={{ team_video.pk }}">tasks for this video</a>.
+                Contribute subtitles: View <a href="{% url teams:team_tasks slug=team_video.team.slug %}?team_video={{ team_video.pk }}">tasks for this video</a>.
             </p>
         {% endif %}
+        <p>
+            Learn more: <a href="#">What are tasks?</a>.
+        </p>
+        {% for team in teams %}
+            <p>
+                {% trans 'View team:' %} <a href="{% url teams:detail slug=team.slug %}">{{team.name}} {% trans 'Translation Project' %}</a>.
+            </p>
+        {% endfor %}
     </div>
 {% endif %}
