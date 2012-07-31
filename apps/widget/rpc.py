@@ -386,7 +386,6 @@ class Rpc(BaseRpc):
 
     # Resume Editing
     def resume_editing(self, request, session_pk):
-        from ipdb import set_trace; set_trace()
         try:
             session = SubtitlingSession.objects.get(pk=session_pk)
         except SubtitlingSession.DoesNotExist:
