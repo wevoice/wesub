@@ -81,3 +81,10 @@
   fields:
     domain: staging.universalsubtitles.org
     name: unisubsnf
+
+
+- model: sites.site
+  pk: 15 
+  fields:
+    domain: unisubs.example.com:80
+    name: unisubs-dev    

@@ -1,0 +1,5 @@
+from test_test import TestSomething
+from test_create_page import WebdriverTestCaseVideosCreatePage
+from test_watch_page import WebdriverTestCaseWatchPage
+from test_js_unittest import WebdriverTestCaseJavascriptUnittest
+from test_offsite_widget_page import *
