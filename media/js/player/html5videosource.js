@@ -118,3 +118,6 @@ unisubs.player.Html5VideoSource.getMediaSource = function(videoURL, opt_videoCon
         return videoSource;
     return null;
 }
+
+// add this mediaSource to our registry
+unisubs.player.MediaSource.addMediaSource(unisubs.player.Html5VideoSource.getMediaSource);
