@@ -67,6 +67,7 @@ class TestSubtitleLanguage(TestCase):
         l2 = SubtitleLanguage(video=self.video, language_code='en')
         self.assertRaises(IntegrityError, lambda: l2.save())
 
+
 class TestSubtitleVersion(TestCase):
     def setUp(self):
         self.video = make_video()

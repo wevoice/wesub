@@ -62,6 +62,9 @@ def get_lineage(parents):
     """Return a lineage map for a version that has the given parents."""
     lineage = {}
 
+    # The new version's lineage should be the result of merging the parents'
+    # lineages, taking the later version whenever there's a conflict, and adding
+    # the parent versions themselves to the map.
     for parent in parents:
         l, v = parent.language_code, parent.version_number
 
