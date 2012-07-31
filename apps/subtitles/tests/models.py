@@ -28,10 +28,16 @@ from apps.videos.models import Video
 
 
 VIDEO_URL = 'http://youtu.be/heKK95DAKms'
+VIDEO_URL_2 = 'http://youtu.be/e4MSN6IImpI'
 
 def make_video():
     video, _ = Video.get_or_create_for_url(VIDEO_URL)
     return video
+
+def make_video_2():
+    video, _ = Video.get_or_create_for_url(VIDEO_URL_2)
+    return video
+
 
 def refresh(m):
     return m.__class__.objects.get(id=m.id)
@@ -71,6 +77,7 @@ class TestSubtitleLanguage(TestCase):
 class TestSubtitleVersion(TestCase):
     def setUp(self):
         self.video = make_video()
+        self.video2 = make_video_2()
 
         self.sl_en = SubtitleLanguage(video=self.video, language_code='en')
         self.sl_en.save()
@@ -123,6 +130,15 @@ class TestSubtitleVersion(TestCase):
         self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
         sv = refresh(sv)
         self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
+
+    def test_denormalization_sanity_checks(self):
+        sv = self.sl_en.add_version()
+        sv.video = self.video2
+        self.assertRaises(AssertionError, lambda: sv.save())
+
+        sv = self.sl_en.add_version()
+        sv.language_code = 'fr'
+        self.assertRaises(AssertionError, lambda: sv.save())
 
 
 class TestHistory(TestCase):

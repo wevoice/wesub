@@ -31,7 +31,8 @@ from apps.subtitles.objects import SubtitleSet
 from apps.videos.models import Video
 
 
-ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
+ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
+                       key=lambda v: v[1])
 
 
 def mapcat(fn, iterable):
@@ -192,7 +193,7 @@ class SubtitleVersion(models.Model):
     updating the parentage and version numbers correctly.
 
     """
-    parents = models.ManyToManyField('self', symmetrical=False)
+    parents = models.ManyToManyField('self', symmetrical=False, blank=True)
 
     video = models.ForeignKey(Video)
     subtitle_language = models.ForeignKey(SubtitleLanguage)
@@ -203,7 +204,7 @@ class SubtitleVersion(models.Model):
                                            ('private', 'private')),
                                   default='public')
 
-    version_number = models.PositiveIntegerField(default=0)
+    version_number = models.PositiveIntegerField(default=1)
 
     author = models.ForeignKey(User, default=User.get_anonymous,
                                related_name='newsubtitleversion_set')
@@ -265,7 +266,10 @@ class SubtitleVersion(models.Model):
     def get_lineage(self):
         # We cache the parsed lineage for speed.
         if self._lineage == None:
-            self._lineage = json_to_lineage(self.serialized_lineage)
+            if self.serialized_lineage:
+                self._lineage = json_to_lineage(self.serialized_lineage)
+            else:
+                self._lineage = {}
 
         return self._lineage
 
@@ -305,6 +309,13 @@ class SubtitleVersion(models.Model):
 
         if creating:
             self.created = datetime.datetime.now()
+
+        # Sanity checking of the denormalized data.
+        assert self.language_code == self.subtitle_language.language_code, \
+               "Version language code does not match Language language code!"
+
+        assert self.video_id == self.subtitle_language.video_id, \
+               "Version video does not match Language video!"
 
         return super(SubtitleVersion, self).save(*args, **kwargs)
 
