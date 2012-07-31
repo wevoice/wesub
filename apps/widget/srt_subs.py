@@ -268,8 +268,9 @@ class TTMLSubtitles(BaseSubtitles):
     remove_re = re.compile(u'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]')
 
     def __unicode__(self):
+        node = self.xml_node()
         return (u'<?xml version="1.0" encoding="UTF-8"?>%s' % self.line_delimiter)\
-            +etree.tounicode(self.xml_node(), pretty_print=True)
+            +etree.tostring(node, pretty_print=True, encoding='utf-8',doctype='xml' )
 
     def _get_attributes(self, item):
         attrib = {}
@@ -286,10 +287,13 @@ class TTMLSubtitles(BaseSubtitles):
             if item['text'] and self.isnumber(item['start']) and self.isnumber(item['end']):
                 attrib = self._get_attributes(item)
                 # as we're replacing new lines with <br>s we need to create
-                # the element from a fragment
-                p = lxml.html.fragment_fromstring(self.remove_re.sub(
-                    '', u"<p>%s</p>" %item['text'].replace('\n', '<br/>').strip()
-                ))
+                # the element from a fragment,and also from the formateed <b> and <i> to
+                # the correct span / style
+                content = item['text'].replace('\n', '<br/>').strip()
+                content = content.replace("<b>", '<span tts:fontWeight="bold">').replace("</b>", '</span>')
+                content = content.replace("<i>", '<span tts:fontStyle="italic">').replace("</i>", '</span>')
+                p = etree.SubElement(div, 'p')
+                p.text = self.remove_re.sub('', content)
                 p.attrib.update(attrib)
                 div.append(p)
         return tt

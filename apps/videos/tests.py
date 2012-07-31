@@ -401,24 +401,7 @@ class SubtitleParserTest(TestCase):
             result[2], 16.1, 19.9,
             u'Ils ont eu raison, non seulement \nà cause de la célébrité de Richard')
 
-    def test_dfxp_parser(self):
-        parser = DfxpSubtitleParser(DFXP_TEXT)
-        result = list(parser)
-        self.assertEqual(len(result),19 )
-        line_break_sub  = result[6]
-        line_break_text = line_break_sub['subtitle_text']
-        self.assertTrue(line_break_text.startswith("Take an "))
-        self.assertTrue(line_break_text.find("\n") > -1)
-
-    def test_dfxp_serializer(self):
-        sub = {
-            'text': 'Here we\ngo!',
-            'start':1,
-            'end':2
-        }
-        serializer = DFXPSubtitles([sub])
-        result = unicode(serializer)
-        self.assertTrue(result.find("Here we<br/>go") > -1)
+       
 
 class WebUseTest(TestCase):
     def _make_objects(self, video_id="S7HMxzLmS9gw"):
@@ -2579,7 +2562,29 @@ class TestSRT(WebUseTest, BaseDownloadTest):
         self.assertIn(" *multiline\nitalics*", subs[1].text)
         self.assertNotIn("script", subs[2].text)
 
+class DFXPTest(WebUseTest, BaseDownloadTest):
+    def setUp(self):
+        self.auth = dict(username='admin', password='admin')
+        self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
+        self.language = SubtitleLanguage.objects.get_or_create(
+            video=self.video, is_forked=True, language='en')[0]
 
+    def test_dfxp_parser(self):
+        parser = DfxpSubtitleParser(DFXP_TEXT)
+        result = list(parser)
+        self.assertEqual(len(result),19 )
+        line_break_sub  = result[6]
+        line_break_text = line_break_sub['subtitle_text']
+        self.assertTrue(line_break_text.startswith("Take an "))
+        self.assertTrue(line_break_text.find("\n") > -1)
+
+    def test_dfxp_serializer(self):
+        add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
+        content = self._download_subs(self.language, 'dxfp')
+        #self.assertTrue(result.find("Here we<br/>go") > -1)
+        self.assertIn('<span tts:fontWeight="bold">bold</span>' , content )
+        self.assertIn('<span tts:fontStyle="italic">italic</span>', content)
+ 
 def add_subs(language, subs_texts):
     version = language.version()
     version_no = 0
