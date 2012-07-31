@@ -203,8 +203,8 @@ DFXP_TEXT = u'''<?xml version="1.0" encoding="UTF-8"?>
       <p begin="00:01:01.54" end="00:01:05.10">Plus we're adding more services all the time</p>
       <p begin="00:01:05.10" end="00:01:09.04">Universal Subtitles works with many popular video formats,</p>
       <p begin="00:01:09.04" end="00:01:14.35">such as MP4, theora, webM and over HTML 5.</p>
-      <p begin="00:01:14.35" end="00:01:19.61">Our goal is for every video on the web to be subtitlable so that anyone who cares about</p>
-      <p begin="00:01:19.61" end="00:01:23.31">the video can help make it more accessible.</p>
+      <p begin="00:01:14.35" end="00:01:19.61">This should be in <span tts:fontWeight="bold">bold</span></p>
+      <p begin="00:01:19.61" end="00:01:23.31">This should be in <span tts:fontStyle="italic">italic</span></p>
     </div>
   </body>
 </tt>
@@ -2577,6 +2577,13 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
         line_break_text = line_break_sub['subtitle_text']
         self.assertTrue(line_break_text.startswith("Take an "))
         self.assertTrue(line_break_text.find("\n") > -1)
+        italic_sub = result[-1]
+        italic_text = italic_sub['subtitle_text']
+        self.assertEquals(italic_text, "This should be in *italic*")
+
+        bold_sub = result[-2]
+        bold_text = bold_sub['subtitle_text']
+        self.assertEquals(bold_text, "This should be in **bold**")
 
     def test_dfxp_serializer(self):
         add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
