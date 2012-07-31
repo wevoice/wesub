@@ -264,8 +264,8 @@ def settings_guidelines(request, slug):
                 setting.data = val
                 setting.save()
 
-        messages.success(request, _(u'Guidelines and messages updated.'))
-        return HttpResponseRedirect(request.path)
+            messages.success(request, _(u'Guidelines and messages updated.'))
+            return HttpResponseRedirect(request.path)
     else:
         form = GuidelinesMessagesForm(initial=initial)
 
