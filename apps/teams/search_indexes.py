@@ -131,7 +131,7 @@ class TeamVideoLanguagesIndex(SearchIndex):
 
         team_video = obj.video.get_team_video()
 
-        self.prepared_data['is_public'] =  obj.video.is_public
+        self.prepared_data['is_public'] =  team_video.team.is_visible 
         self.prepared_data["owned_by_team_id"] = team_video.team.id if team_video else None
 
         return self.prepared_data

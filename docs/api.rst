@@ -661,6 +661,13 @@ List all tasks for a given team:
         * ``type``      Task type (details below)
         * ``-type``     Task type (descending)
 
+    :query completed: Show only complete tasks
+    :query completed-before: Show only tasks completed before a given date
+        (unix timestamp)
+    :query completed-after: Show only tasks completed before a given date
+        (unix timestamp)
+    :query open: Show only incomplete tasks
+
 Task detail:
 
 .. http:get:: /api2/partners/teams/[team-slug]/tasks/[task-id]/

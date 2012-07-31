@@ -242,9 +242,8 @@ class Rpc(BaseRpc):
         else:
             return 'normal'
 
-
     # Start Editing
-    def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode, is_edit):
+    def _check_team_video_locking(self, user, video_id, language_code, is_translation=None, mode=None, is_edit=None):
         """Check whether the a team prevents the user from editing the subs.
 
         Returns a dict appropriate for sending back if the user should be
@@ -263,6 +262,9 @@ class Rpc(BaseRpc):
         else:
             message = _(u"Sorry, these subtitles are privately moderated.")
 
+        if not team_video.video.can_user_see(user):
+             return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
+            
         # Check that there are no open tasks for this action.
         tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
 
@@ -275,7 +277,7 @@ class Rpc(BaseRpc):
                     return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
 
         # Check that the team's policies don't prevent the action.
-        if mode not in ['review', 'approve']:
+        if mode and mode not in ['review', 'approve']:
             if is_translation:
                 can_edit = can_create_and_edit_translations(user, team_video, language_code)
             else:
@@ -324,6 +326,7 @@ class Rpc(BaseRpc):
         other functions.
 
         """
+
         # TODO: remove whenever blank SubtitleLanguages become illegal.
         self._fix_blank_original(video_id)
 
@@ -383,7 +386,16 @@ class Rpc(BaseRpc):
 
     # Resume Editing
     def resume_editing(self, request, session_pk):
-        session = SubtitlingSession.objects.get(pk=session_pk)
+        try:
+            session = SubtitlingSession.objects.get(pk=session_pk)
+        except SubtitlingSession.DoesNotExist:
+            return {'response': 'cannot_resume'}
+
+        error = self._check_team_video_locking(request.user, session.video.video_id, session.language.language)
+
+        if error:
+            return {'response': 'cannot_resume'}
+
         if session.language.can_writelock(request) and \
                 session.parent_version == session.language.version():
             session.language.writelock(request)

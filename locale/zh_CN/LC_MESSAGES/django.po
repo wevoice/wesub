@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-30 01:42-0500\n"
+"POT-Creation-Date: 2012-07-31 01:40-0500\n"
 "PO-Revision-Date: 2012-07-28 06:50+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
@@ -1642,18 +1642,18 @@ msgstr "未定义错误"
 msgid "Video embedding disabled by owner"
 msgstr "拥有者禁用视频嵌入"
 
-#: apps/widget/rpc.py:262
+#: apps/widget/rpc.py:261
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "这些字幕正在调整中。参见 %s 小组页面以获得如何贡献的信息。"
 
-#: apps/widget/rpc.py:264
+#: apps/widget/rpc.py:263
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "抱歉，这些字幕是私有的。"
 
-#: apps/widget/rpc.py:948 apps/widget/rpc.py:989
+#: apps/widget/rpc.py:960 apps/widget/rpc.py:1001
 msgid "\n"
 msgstr "\n"
 
@@ -1697,7 +1697,7 @@ msgid "Progress"
 msgstr "进步"
 
 #: libs/rosetta/templates/rosetta/languages.html:30
-#: templates/messages/new.html:14 templates/messages/sent.html:23
+#: templates/messages/new.html:14 templates/messages/sent.html:24
 #: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:19
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
@@ -4893,7 +4893,7 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "你确定要永久删除你的配置？"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:52 templates/teams/tasks.html:413
+#: templates/messages/sent.html:53 templates/teams/tasks.html:413
 msgid "Delete"
 msgstr "删除"
 
@@ -4939,7 +4939,7 @@ msgid "Sign in as a different user"
 msgstr ""
 
 #: templates/comments/_item.html:3 templates/messages/list.html:70
-#: templates/messages/sent.html:49 templates/videos/_action_tpl.html:9
+#: templates/messages/sent.html:50 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
 #: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:107
 #: templates/videos/diffing.html.py:172
@@ -5071,7 +5071,7 @@ msgstr "查看全部"
 msgid "My Messages"
 msgstr "我的消息"
 
-#: templates/messages/list.html:20
+#: templates/messages/list.html:20 templates/messages/sent.html:17
 msgid "Do you really wish to delete this message?"
 msgstr "你真的想删除此信息？"
 
@@ -5096,12 +5096,12 @@ msgid "You have no messages."
 msgstr "你没有消息"
 
 #: templates/messages/list.html:100 templates/messages/new.html:74
-#: templates/messages/sent.html:67
+#: templates/messages/sent.html:68
 msgid "Inbox"
 msgstr "收件箱"
 
 #: templates/messages/list.html:101 templates/messages/new.html:75
-#: templates/messages/sent.html:68
+#: templates/messages/sent.html:69
 msgid "Sent"
 msgstr "发送"
 
@@ -5117,11 +5117,11 @@ msgstr "写消息"
 msgid "Sent Messages"
 msgstr "发送消息"
 
-#: templates/messages/sent.html:43 templates/messages/sent.html.py:45
+#: templates/messages/sent.html:44 templates/messages/sent.html.py:46
 msgid "Avatar"
 msgstr "头像"
 
-#: templates/messages/sent.html:61
+#: templates/messages/sent.html:62
 msgid "You have no sent messages."
 msgstr "你没有发送的信息"
 

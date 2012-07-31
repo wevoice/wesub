@@ -127,8 +127,6 @@ unisubs.widget.SubtitleDialogOpener.prototype.resumeEditing_ = function(savedSub
             }
             else {
                 // someone else stepped in front of us.
-                // TODO: should we show a message here?
-                that.removeResumeEditingRecord_();
                 that.startEditing_(openDialogArgs,
                                    opt_completeCallback);
             }
