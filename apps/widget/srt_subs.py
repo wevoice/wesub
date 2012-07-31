@@ -270,7 +270,7 @@ class TTMLSubtitles(BaseSubtitles):
     def __unicode__(self):
         node = self.xml_node()
         return (u'<?xml version="1.0" encoding="UTF-8"?>%s' % self.line_delimiter)\
-            +etree.tostring(node, pretty_print=True, encoding='utf-8',doctype='xml' )
+            +etree.tounicode(node, pretty_print=True  )
 
     def _get_attributes(self, item):
         attrib = {}
