@@ -90,4 +90,6 @@ class ThirdPartyAccount(models.Model):
     
     class Meta:
         unique_together = ("type", "username")
-    
+
+    def __unicode__(self):
+        return '%s - %s' % (self.get_type_display(), self.username)
