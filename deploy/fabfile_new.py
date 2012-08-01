@@ -397,3 +397,14 @@ def migrate(app_name='', extra=''):
                 "'"
             )
             run(cmd)
+@task
+@lock_required
+@roles('app')
+def update_environment(extra=''):
+    with Output('Updating environment'):
+        with cd(os.path.join(env.app_dir, 'deploy')):
+            _git_pull()
+            run('export PIP_REQUIRE_VIRTUALENV=true')
+            # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
+            run('yes i | {0}/bin/pip install {1} -r requirements.txt'.format(env.ve_dir, extra), pty=True)
+            #_clear_permissions(os.path.join(base_dir, 'env'))
