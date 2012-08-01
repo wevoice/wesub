@@ -342,9 +342,9 @@ def local():
 #                     celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
 #                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
 
-def _reset_permissions(dir):
-    sudo('chgrp {0} -R {1}'.format(env.app_group, dir))
-    sudo('chmod -R g+w {0}'.format(dir))
+def _reset_permissions(app_dir):
+    sudo('chgrp {0} -R {1}'.format(env.app_group, app_dir))
+    sudo('chmod -R g+w {0}'.format(app_dir))
 
 def _git_pull():
     run('git checkout --force')
@@ -363,9 +363,9 @@ def _git_checkout(commit, as_sudo=False):
     cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
     _reset_permissions('.')
 
-def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
+def _git_checkout_branch_and_reset(commit, branch='dev', run_as_sudo=False):
     cmd = run
-    if as_sudo:
+    if run_as_sudo:
         cmd = sudo
     cmd('git fetch')
     cmd('git checkout %s' % branch)
@@ -373,6 +373,11 @@ def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
     cmd('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
     cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
     _reset_permissions('.')
+
+def _get_optional_repo_version(app_dir, repo):
+    '''Find the optional repo version by looking at its file in optional/.'''
+    with cd(os.path.join(app_dir, 'optional')):
+        return run('cat {0}'.format(repo))
 
 @task
 @lock_required
@@ -461,3 +466,26 @@ def add_disabled():
 def remove_disabled():
     with Output("Taking the site out of maintenance mode"):
         run('rm {0}/disabled'.format(env.app_dir))
+
+@task
+@parallel
+@roles('app')
+def update_integration(run_as_sudo=True):
+    '''Update the integration repo to the version recorded in the site repo.
+
+    At the moment it is assumed that the optional/unisubs-integration file
+    exists, and that the unisubs-integration repo has already been cloned down.
+
+    The file should contain the commit hash and nothing else.
+
+    TODO: Run this from update_web automatically
+
+    '''
+    with Output("Updating nested unisubs-integration repositories"):
+        with cd(os.path.join(env.app_dir, 'unisubs-integration')):
+            with settings(warn_only=True):
+                _git_checkout_branch_and_reset(
+                    _get_optional_repo_version(env.app_dir, 'unisubs-integration'),
+                    branch=env.revision,
+                    run_as_sudo=run_as_sudo
+                )
