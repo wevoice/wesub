@@ -20,10 +20,13 @@ from django.test import TestCase
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from accountlinker.models import ThirdPartyAccount
+from accountlinker.models import ThirdPartyAccount, YoutubeSyncRule
+from videos.models import Video
+from auth.models import CustomUser as User
 
 
 class AccountTest(TestCase):
+    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
 
     def test_retrieval(self):
 
@@ -36,3 +39,28 @@ class AccountTest(TestCase):
         setattr(settings, 'YOUTUBE_ALWAYS_PUSH_USERNAME', 'abc')
         self.assertEquals(ThirdPartyAccount.objects.always_push_account().pk,
                 acc.pk)
+
+    def test_rules(self):
+        video = Video.objects.filter(teamvideo__isnull=False)[0]
+        video.user = User.objects.get(username='admin')
+        team = video.get_team_video().team
+        team = ",".join([team.slug, 'honza'])
+
+        r = YoutubeSyncRule.objects.create()
+        self.assertFalse(r.should_sync(video))
+
+        YoutubeSyncRule.objects.all().delete()
+        r = YoutubeSyncRule.objects.create(team=team)
+        self.assertTrue(r.should_sync(video))
+
+        YoutubeSyncRule.objects.all().delete()
+        r = YoutubeSyncRule.objects.create(user='admin')
+        self.assertTrue(r.should_sync(video))
+
+        YoutubeSyncRule.objects.all().delete()
+        r = YoutubeSyncRule.objects.create(video='*')
+        self.assertTrue(r.should_sync(video))
+
+        YoutubeSyncRule.objects.all().delete()
+        r = YoutubeSyncRule.objects.create(team='*')
+        self.assertTrue(r.should_sync(video))

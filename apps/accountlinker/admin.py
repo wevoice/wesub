@@ -17,7 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib import admin
-from models import ThirdPartyAccount
+from models import ThirdPartyAccount, YoutubeSyncRule
 
 
 class ThirdPartyAccountAdmin(admin.ModelAdmin):
@@ -25,3 +25,4 @@ class ThirdPartyAccountAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ThirdPartyAccount, ThirdPartyAccountAdmin)
+admin.site.register(YoutubeSyncRule)

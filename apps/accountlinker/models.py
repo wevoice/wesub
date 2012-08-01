@@ -121,24 +121,37 @@ class ThirdPartyAccount(models.Model):
 
 
 class YoutubeSyncRule(models.Model):
-    team = models.TextField(help_text='Comma separated list of slugs')
-    user = models.TextField(help_text='Comma separated list of usernames')
-    video = models.TextField(help_text='Comma separated list of pks')
+    team = models.TextField(default='', blank=True,
+            help_text='Comma separated list of slugs')
+    user = models.TextField(default='', blank=True,
+            help_text='Comma separated list of usernames')
+    video = models.TextField(default='', blank=True,
+            help_text='Comma separated list of pks')
 
     def __unicode__(self):
         return 'Youtube sync rule'
 
     def team_in_list(self, team):
-        return team in self.team.split(',')
+        teams = self.team.split(',')
+        if '*' in teams:
+            return True
+        return team in teams
 
     def user_in_list(self, user):
-        return user in self.user.split(',')
+        users = self.user.split(',')
+        if '*' in users:
+            return True
+        return user.username in users
 
     def video_in_list(self, pk):
-        pks = map(int, self.video.split(','))
-        return pk in pks
+        pks = self.video.split(',')
+        if '*' in pks:
+            return True
+        if len(pks) == 1 and pks[0] == '':
+            return False
+        return pk in map(int, pks)
 
     def should_sync(self, video):
         return self.team_in_list(video.get_team_video().team.slug) or \
-                self.user_in_list(video.user.pk) or \
+                self.user_in_list(video.user) or \
                 self.video_in_list(video.pk)
