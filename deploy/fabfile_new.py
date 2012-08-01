@@ -446,3 +446,18 @@ def reload_app_servers():
         with cd(env.app_dir):
             #run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
             run('touch deploy/unisubs.wsgi')
+
+# Maintenance Mode
+@task
+@parallel
+@roles('app')
+def add_disabled():
+    with Output("Putting the site into maintenance mode"):
+        run('touch {0}/disabled'.format(env.app_dir))
+
+@task
+@parallel
+@roles('app')
+def remove_disabled():
+    with Output("Taking the site out of maintenance mode"):
+        run('rm {0}/disabled'.format(env.app_dir))
