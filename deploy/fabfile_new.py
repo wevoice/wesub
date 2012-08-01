@@ -26,7 +26,7 @@ import fabric.colors as colors
 from fabric.api import run, sudo, env, cd, local as _local, abort, task
 from fabric.context_managers import settings, hide
 from fabric.utils import fastprint
-from fabric.decorators import roles, runs_once
+from fabric.decorators import roles, runs_once, parallel
 
 ADD_TIMESTAMPS = """ | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }' """
 WRITE_LOG = """ | tee /tmp/%s.log """
@@ -399,6 +399,7 @@ def migrate(app_name='', extra=''):
             run(cmd)
 @task
 @lock_required
+@parallel
 @roles('app')
 def update_environment(extra=''):
     with Output('Updating environment'):
