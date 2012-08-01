@@ -17,6 +17,8 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.db import models
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 from videos.models import VIDEO_TYPE
 from .videos.types import (
@@ -27,6 +29,18 @@ from .videos.types import (
 ACCOUNT_TYPES = VIDEO_TYPE
 
 class ThirdPartyAccountManager(models.Manager):
+
+    def always_push_account(self):
+        """
+        Get the ThirdPartyAccount that is able to push to any video on Youtube.
+        Raise ``ImproperlyConfigured`` if it can't be found.
+        """
+        username = getattr(settings, 'YOUTUBE_ALWAYS_PUSH_USERNAME')
+
+        try:
+            return self.get(username=username)
+        except ThirdPartyAccount.DoesNotExist:
+            raise ImproperlyConfigured("Can't find youtube account")
 
     def mirror_on_third_party(self, video, language, action, version=None):
         """
