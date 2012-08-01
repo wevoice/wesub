@@ -66,8 +66,20 @@ class ThirdPartyAccountManager(models.Manager):
                 # We can't mirror unsynced or non-public versions.
                 return
 
+        rule = YoutubeSyncRule.objects.all()[0]
+        should_sync = rule.should_sync(video)
+        always_push_account = self.always_push_account()
+
         for vurl in video.videourl_set.all():
+            already_updated = False
+            vt = video_type_registrar.video_type_for_url(vurl.url)
+
+            if should_sync:
+                vt.update_subtitles(version, always_push_account)
+                already_updated = False
+
             username = vurl.owner_username
+
             if not username:
                 continue
             try:
@@ -75,9 +87,8 @@ class ThirdPartyAccountManager(models.Manager):
             except ThirdPartyAccount.DoesNotExist:
                 continue
 
-            vt = video_type_registrar.video_type_for_url(vurl.url)
             if hasattr(vt, action):
-                if action == UPDATE_VERSION_ACTION:
+                if action == UPDATE_VERSION_ACTION and not already_updated:
                     vt.update_subtitles(version, account)
                 elif action == DELETE_LANGUAGE_ACTION:
                     vt.delete_subtitles(language, account)
@@ -107,3 +118,27 @@ class ThirdPartyAccount(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.get_type_display(), self.username)
+
+
+class YoutubeSyncRule(models.Model):
+    team = models.TextField(help_text='Comma separated list of slugs')
+    user = models.TextField(help_text='Comma separated list of usernames')
+    video = models.TextField(help_text='Comma separated list of pks')
+
+    def __unicode__(self):
+        return 'Youtube sync rule'
+
+    def team_in_list(self, team):
+        return team in self.team.split(',')
+
+    def user_in_list(self, user):
+        return user in self.user.split(',')
+
+    def video_in_list(self, pk):
+        pks = map(int, self.video.split(','))
+        return pk in pks
+
+    def should_sync(self, video):
+        return self.team_in_list(video.get_team_video().team.slug) or \
+                self.user_in_list(video.user.pk) or \
+                self.video_in_list(video.pk)
