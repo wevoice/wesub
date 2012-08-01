@@ -17,7 +17,8 @@ from apps.teams.forms import InviteForm
 from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
-    Team, Invite, TeamVideo, Application, TeamMember, TeamLanguagePreference
+    Team, Invite, TeamVideo, Application, TeamMember,
+    TeamLanguagePreference
 )
 from apps.videos.search_indexes import VideoIndex
 from apps.videos import metadata_manager
@@ -1113,17 +1114,80 @@ class TestInvites(TestCase):
             username=self.user.username,
             password=self.user.username
         )
+        # acn't accept twice:
+        # must import as team.models, not app.teams.models
+        # else the module signature won't match
+        from ..teams.models import InviteExpiredException
+        self.assertRaises(InviteExpiredException, invite.accept)
         self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
+        # re-invite
         invite_form = InviteForm(self.team, self.owner, {
             'user_id': self.user.pk,
             'message': 'Subtitle ALL the things!',
             'role': TeamMember.ROLE_CONTRIBUTOR,
         })
         invite_form.is_valid()
-        self.assertIn('user_id', invite_form.errors)
+        self.assertFalse( invite_form.errors)
+        invite = invite_form.save()
+        url = reverse("teams:accept_invite", args=(invite.pk,))
+        response  = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
+
+
+    def test_invite_after_leaving(self):
+        # user is invited
+        invite_form = InviteForm(self.team, self.owner, {
+            'user_id': self.user.pk,
+            'message': 'Subtitle ALL the things!',
+            'role': TeamMember.ROLE_MANAGER,
+        })
+        invite_form.is_valid()
+        self.assertFalse(invite_form.errors)
+        self.assertEquals(Message.objects.for_user(self.user).count(), 0)
+        invite = invite_form.save()
+        # user has the invitation message on their inbox now
+        # user accepts
+        invite.accept()
+        self.assertTrue(self.team.members.filter(user=self.user).exists())
+        # now the invite re-accepts, should fail
+        self.client.login(
+            username=self.user.username,
+            password=self.user.username
+        )
         url = reverse("teams:accept_invite", args=(invite.pk,))
         response  = self.client.get(url)
         self.assertEqual(response.status_code, 500)
-        self.assertIn( 'error_msg', response.context)
+        self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
+        
+        # user leaves team
+        url = reverse("teams:leave_team", args=(self.team.slug,))
+        response  = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
         self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
+        
 
+        # user tries to re-accept old invite - fails
+        url = reverse("teams:accept_invite", args=(invite.pk,))
+        response  = self.client.get(url)
+        self.assertEqual(response.status_code, 500)
+        self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
+        # user is re-invited, should work
+
+        
+        invite_form = InviteForm(self.team, self.owner, {
+            'user_id': self.user.pk,
+            'message': 'Subtitle ALL the things!',
+            'role': TeamMember.ROLE_MANAGER,
+        })
+        invite_form.is_valid()
+        self.assertFalse(invite_form.errors)
+        self.assertEquals(Message.objects.for_user(self.user).count(), 3)
+        invite = invite_form.save()
+        # user has the invitation message on their inbox now
+        # user accepts
+        url = reverse("teams:accept_invite", args=(invite.pk,))
+        response  = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
+        
