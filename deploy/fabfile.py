@@ -195,7 +195,8 @@ def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
                 celeryd_bounce_cmd="",
                 web_dir=None,
                 app_group=None,
-                ve_dir=None):
+                ve_dir=None,
+                key_filename=''):
     env.user = username
     env.web_hosts = hosts
     env.hosts = []
@@ -217,6 +218,7 @@ def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
     env.celeryd_bounce_cmd=celeryd_bounce_cmd
     env.celeryd_host = celeryd_host
     env.celeryd_proj_root = celeryd_proj_root
+    env.key_filename = key_filename
 
 def local():
     with Output("Configuring task(s) to run on LOCAL"):
@@ -228,19 +230,20 @@ def local():
                     s3_bucket             = 's3.staging.universalsubtitles.org',
                     installation_dir      = 'unisubs',
                     static_dir            = '/opt/apps/local/',
-                    ve_dir                = '/opt/ve/unisubs_local', 
                     app_group             = 'deploy',
                     name                  = 'local',
                     git_branch            = 'staging',
                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                     admin_dir             = '/opt/apps/local/',
+                    ve_dir                = '/opt/ve/unisubs_local',
                     admin_host            = 'data.local',
                     celeryd_host          = 'data.local',
                     celeryd_proj_root     = 'unisubs.local',
                     separate_uslogging_db = True,
                     celeryd_start_cmd     = "/etc/init.d/celeryd start",
                     celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
-                    celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
+                    celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start",
+                    key_filename          = "~/.vagrant.d/insecure_private_key",)
 
 def staging(username):
     with Output("Configuring task(s) to run on STAGING"):
