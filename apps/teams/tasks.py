@@ -13,9 +13,12 @@ from utils import send_templated_email
 from utils.metrics import Gauge, Meter
 from widget.video_cache import (
     invalidate_cache as invalidate_video_cache,
-    invalidate_video_moderation
+    invalidate_video_moderation,
+    invalidate_video_visibility
 )
 
+from utils.metrics import Timer
+from apps.videos.tasks import video_changed_tasks
 
 @task()
 def invalidate_video_caches(team_id):
@@ -39,6 +42,23 @@ def update_video_moderation(team):
     moderated_by = team if team.moderates_videos() else None
     Video.objects.filter(teamvideo__team=team).update(moderated_by=moderated_by)
 
+@task()
+def invalidate_video_visibility_caches(team):
+    for video_id in team.teamvideo_set.values_list("video__video_id", flat=True):
+        invalidate_video_visibility(video_id)
+
+@task()
+def update_video_public_field(team_id):
+    from apps.teams.models import Team
+
+    with Timer("update-video-public-field-time"):
+        team = Team.objects.get(pk=team_id)
+
+        for team_video in team.teamvideo_set.all():
+            video = team_video.video
+            video.is_public = team.is_visible
+            video.save()
+            video_changed_tasks(video.id)
 
 @periodic_task(run_every=crontab(minute=0, hour=7))
 def expire_tasks():

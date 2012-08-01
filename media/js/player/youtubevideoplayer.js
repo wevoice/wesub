@@ -56,9 +56,6 @@ goog.inherits(unisubs.player.YoutubeVideoPlayer, unisubs.player.FlashVideoPlayer
 unisubs.player.YoutubeVideoPlayer.players_ = [];
 unisubs.player.YoutubeVideoPlayer.readyAPIIDs_ = new goog.structs.Set();
 
-unisubs.player.YoutubeVideoPlayer.prototype.logger_ = 
-    goog.debug.Logger.getLogger('unisubs.player.YoutubeVideoPlayer');
-
 /**
  * @override
  */
@@ -88,10 +85,6 @@ unisubs.player.YoutubeVideoPlayer.prototype.decorateInternal = function(elem) {
         this.onYouTubePlayerReady_(this.playerAPIID_);
     this.playerSize_ = goog.style.getSize(this.getElement());
     this.setDimensionsKnownInternal();
-    if (goog.DEBUG) {
-        this.logger_.info("In decorateInternal, a containing element size of " + 
-                          this.playerSize_);
-    }
 };
 
 /**
@@ -169,11 +162,6 @@ unisubs.player.YoutubeVideoPlayer.prototype.exitDocument = function() {
 unisubs.player.YoutubeVideoPlayer.prototype.onYouTubePlayerReady_ =
     function(playerAPIID)
 {
-    if (goog.DEBUG) {
-        this.logger_.info(
-            "onYouTubePlayerReady_ called with an id of " + playerAPIID +
-                ". My id is " + this.playerAPIID_ + ".");
-    }
     if (playerAPIID != this.playerAPIID_)
         return;
     this.playerReady_ = true;
@@ -188,12 +176,6 @@ unisubs.player.YoutubeVideoPlayer.prototype.onYouTubePlayerReady_ =
         this.player_.addEventListener('onStateChange', this.eventFunction_);
     }
     else {
-        if (goog.DEBUG) {
-            this.logger_.info("In playerReady, a containing element size of " + 
-                              goog.style.getSize(this.getElement()));
-            this.logger_.info("In playerReady, a sizing element size of " + 
-                              goog.style.getSize(this.getElement()));
-        }
         this.tryDecoratingAll();
     }
 };
@@ -221,14 +203,7 @@ unisubs.player.YoutubeVideoPlayer.State_ = {
     VIDEO_CUED: 5
 };
 
-unisubs.player.YoutubeVideoPlayer.logger_ = 
-    goog.debug.Logger.getLogger('unisubs.player.YoutubeVideoPlayerStatic');
-
 unisubs.player.YoutubeVideoPlayer.registerReady = function(playerID) {
-    if (goog.DEBUG) {
-        unisubs.player.YoutubeVideoPlayer.logger_.info(
-            "registerReady called with id " + playerID);
-    }
     if (!goog.isDefAndNotNull(playerID) || playerID == "undefined") {
         playerID = "";
     }
@@ -244,13 +219,6 @@ unisubs.player.YoutubeVideoPlayer.registerReady = function(playerID) {
     var ytReady = "onYouTubePlayerReady";
     var oldReady = window[ytReady] || goog.nullFunction;
     window[ytReady] = function(apiID) {
-        if (goog.DEBUG) {
-            unisubs.player.YoutubeVideoPlayer.logger_.info(
-                'onYouTubePlayerReady for ' + apiID);
-            unisubs.player.YoutubeVideoPlayer.logger_.info(
-                'players_ length is ' + 
-                    unisubs.player.YoutubeVideoPlayer.players_.length);
-        }
         try {
             oldReady(apiID);
         }

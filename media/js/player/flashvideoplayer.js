@@ -34,9 +34,6 @@ unisubs.player.FlashVideoPlayer = function(videoSource) {
 goog.inherits(unisubs.player.FlashVideoPlayer,
               unisubs.player.AbstractVideoPlayer);
 
-unisubs.player.FlashVideoPlayer.prototype.logger_ = 
-    goog.debug.Logger.getLogger('unisubs.player.FlashVideoPlayer');
-
 /**
  * @override
  * @param {Element} Either object or embed. Must be decoratable. For example, 
@@ -74,10 +71,6 @@ unisubs.player.FlashVideoPlayer.prototype.tryDecoratingAll = function(e) {
         this.successfullyDecorated_ = this.tryDecorating_(this.embed_);
     else
         this.successfullyDecorated_ = true;
-    if (goog.DEBUG) {
-        this.logger_.info("successfully decorated: " + 
-                          this.successfullyDecorated_);
-    }
 };
 
 unisubs.player.FlashVideoPlayer.prototype.isFlashElementReady = goog.abstractMethod;

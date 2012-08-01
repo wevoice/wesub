@@ -1,5 +1,5 @@
 /*
- * popcorn.js version bb8bf2c
+ * popcorn.js version f9351bc
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
@@ -14,8 +14,7 @@
       isSupported: false
     };
 
-    var methods = ( "removeInstance addInstance getInstanceById removeInstanceById " +
-          "forEach extend effects error guid sizeOf isArray nop position disable enable destroy" +
+    var methods = ( "byId forEach extend effects error guid sizeOf isArray nop position disable enable destroy" +
           "addTrackEvent removeTrackEvent getTrackEvents getTrackEvent getLastTrackEventId " +
           "timeUpdate plugin removePlugin compose effect xhr getJSONP getScript" ).split(/\s+/);
 
@@ -87,7 +86,7 @@
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "bb8bf2c";
+  Popcorn.version = "f9351bc";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -101,7 +100,7 @@
 
     init: function( entity, options ) {
 
-      var matches,
+      var matches, nodeName,
           self = this;
 
       //  Supports Popcorn(function () { /../ })
@@ -160,13 +159,21 @@
       //  Get media element by id or object reference
       this.media = matches || entity;
 
-      //  Create an audio or video element property reference
-      this[ ( this.media.nodeName && this.media.nodeName.toLowerCase() ) || "video" ] = this.media;
+      //  inner reference to this media element's nodeName string value
+      nodeName = ( this.media.nodeName && this.media.nodeName.toLowerCase() ) || "video";
 
-      //  Register new instance
-      Popcorn.instances.push( this );
+      //  Create an audio or video element property reference
+      this[ nodeName ] = this.media;
 
       this.options = options || {};
+
+      //  Resolve custom ID or default prefixed ID
+      this.id = this.options.id || Popcorn.guid( nodeName );
+
+      //  Throw if an attempt is made to use an ID that already exists
+      if ( Popcorn.byId( this.id ) ) {
+        throw new Error( "Popcorn.js Error: Cannot use duplicate ID (" + this.id + ")" );
+      }
 
       this.isDestroyed = false;
 
@@ -217,6 +224,9 @@
           previousUpdateTime: -1
         }
       };
+
+      //  Register new instance
+      Popcorn.instances.push( this );
 
       //  function to fire when video is ready
       var isReady = function() {
@@ -318,6 +328,20 @@
   //  Extend constructor prototype to instance prototype
   //  Allows chaining methods to instances
   Popcorn.p.init.prototype = Popcorn.p;
+
+  Popcorn.byId = function( str ) {
+    var instances = Popcorn.instances,
+        length = instances.length,
+        i = 0;
+
+    for ( ; i < length; i++ ) {
+      if ( instances[ i ].id === str ) {
+        return instances[ i ];
+      }
+    }
+
+    return null;
+  };
 
   Popcorn.forEach = function( obj, fn, context ) {
 
@@ -454,6 +478,7 @@
     },
     destroy: function( instance ) {
       var events = instance.data.events,
+          trackEvents = instance.data.trackEvents,
           singleEvent, item, fn, plugin;
 
       //  Iterate through all events and remove them
@@ -469,6 +494,10 @@
       for ( plugin in Popcorn.registryByName ) {
         Popcorn.removePlugin( instance, plugin );
       }
+
+      // Remove all data.trackEvents #1178
+      trackEvents.byStart.length = 0;
+      trackEvents.byEnd.length = 0;
 
       if ( !instance.isDestroyed ) {
         instance.data.timeUpdate && instance.media.removeEventListener( "timeupdate", instance.data.timeUpdate, false );
@@ -549,7 +578,7 @@
 
     //  Rounded currentTime
     roundTime: function() {
-      return -~this.media.currentTime;
+      return Math.round( this.media.currentTime );
     },
 
     //  Attach an event to a single point in time
@@ -1616,7 +1645,7 @@
       options._natives._setup && options._natives._setup.call( this, options );
 
       // Create new track event for this instance
-      Popcorn.addTrackEvent( this, Popcorn.extend( options, options ) );
+      Popcorn.addTrackEvent( this, options );
 
       //  Future support for plugin event definitions
       //  for all of the native events
@@ -2002,31 +2031,53 @@
 
     var head = document.head || document.getElementsByTagName( "head" )[ 0 ] || document.documentElement,
       script = document.createElement( "script" ),
-      paramStr = url.split( "?" )[ 1 ],
       isFired = false,
       params = [],
-      callback, parts, callparam;
+      rjsonp = /(=)\?(?=&|$)|\?\?/,
+      replaceInUrl, prefix, paramStr, callback, callparam;
 
-    if ( paramStr && !isScript ) {
-      params = paramStr.split( "&" );
-    }
+    if ( !isScript ) {
 
-    if ( params.length ) {
-      parts = params[ params.length - 1 ].split( "=" );
-    }
+      // is there a calback already in the url
+      callparam = url.match( /(callback=[^&]*)/ );
 
-    callback = params.length ? ( parts[ 1 ] ? parts[ 1 ] : parts[ 0 ]  ) : "jsonp";
+      if ( callparam !== null && callparam.length ) {
 
-    if ( !paramStr && !isScript ) {
-      url += "?callback=" + callback;
-    }
+        prefix = callparam[ 1 ].split( "=" )[ 1 ];
 
-    if ( callback && !isScript ) {
+        // Since we need to support developer specified callbacks
+        // and placeholders in harmony, make sure matches to "callback="
+        // aren't just placeholders.
+        // We coded ourselves into a corner here.
+        // JSONP callbacks should never have been
+        // allowed to have developer specified callbacks
+        if ( prefix === "?" ) {
+          prefix = "jsonp";
+        }
 
-      //  If a callback name already exists
-      if ( !!window[ callback ] ) {
-        //  Create a new unique callback name
-        callback = Popcorn.guid( callback );
+        // get the callback name
+        callback = Popcorn.guid( prefix );
+
+        // replace existing callback name with unique callback name
+        url = url.replace( /(callback=[^&]*)/, "callback=" + callback );
+      } else {
+
+        callback = Popcorn.guid( "jsonp" );
+
+        if ( rjsonp.test( url ) ) {
+          url = url.replace( rjsonp, "$1" + callback );
+        }
+
+        // split on first question mark,
+        // this is to capture the query string
+        params = url.split( /\?(.+)?/ );
+
+        // rebuild url with callback
+        url = params[ 0 ] + "?";
+        if ( params[ 1 ] ) {
+          url += params[ 1 ] + "&";
+        }
+        url += "callback=" + callback;
       }
 
       //  Define the JSONP success callback globally
@@ -2035,9 +2086,6 @@
         success && success( data );
         isFired = true;
       };
-
-      //  Replace callback param and callback name
-      url = url.replace( parts.join( "=" ), parts[ 0 ] + "=" + callback );
     }
 
     script.addEventListener( "load",  function() {
@@ -2625,7 +2673,10 @@
         }
       } else {
 
-        basePlayer.dispatchEvent( "error" );
+        // Asynchronous so that users can catch this event
+        setTimeout( function() {
+          basePlayer.dispatchEvent( "error" );
+        }, 0 );
       }
 
       popcorn = new Popcorn.p.init( basePlayer, options );
@@ -2794,6 +2845,542 @@
 
   };
 })( Popcorn );
+/*!
+ * Popcorn.sequence
+ *
+ * Copyright 2011, Rick Waldron
+ * Licensed under MIT license.
+ *
+ */
+
+/* jslint forin: true, maxerr: 50, indent: 4, es5: true  */
+/* global Popcorn: true */
+
+// Requires Popcorn.js
+(function( global, Popcorn ) {
+
+  // TODO: as support increases, migrate to element.dataset
+  var doc = global.document,
+      location = global.location,
+      rprotocol = /:\/\//,
+      // TODO: better solution to this sucky stop-gap
+      lochref = location.href.replace( location.href.split("/").slice(-1)[0], "" ),
+      // privately held
+      range = function(start, stop, step) {
+
+        start = start || 0;
+        stop = ( stop || start || 0 ) + 1;
+        step = step || 1;
+
+        var len = Math.ceil((stop - start) / step) || 0,
+            idx = 0,
+            range = [];
+
+        range.length = len;
+
+        while (idx < len) {
+         range[idx++] = start;
+         start += step;
+        }
+        return range;
+      };
+
+  Popcorn.sequence = function( parent, list ) {
+    return new Popcorn.sequence.init( parent, list );
+  };
+
+  Popcorn.sequence.init = function( parent, list ) {
+
+    // Video element
+    this.parent = doc.getElementById( parent );
+
+    // Store ref to a special ID
+    this.seqId = Popcorn.guid( "__sequenced" );
+
+    // List of HTMLVideoElements
+    this.queue = [];
+
+    // List of Popcorn objects
+    this.playlist = [];
+
+    // Lists of in/out points
+    this.inOuts = {
+
+      // Stores the video in/out times for each video in sequence
+      ofVideos: [],
+
+      // Stores the clip in/out times for each clip in sequences
+      ofClips: []
+
+    };
+
+    // Store first video dimensions
+    this.dims = {
+      width: 0, //this.video.videoWidth,
+      height: 0 //this.video.videoHeight
+    };
+
+    this.active = 0;
+    this.cycling = false;
+    this.playing = false;
+
+    this.times = {
+      last: 0
+    };
+
+    // Store event pointers and queues
+    this.events = {
+
+    };
+
+    var self = this,
+        clipOffset = 0;
+
+    // Create `video` elements
+    Popcorn.forEach( list, function( media, idx ) {
+
+      var video = doc.createElement( "video" );
+
+      video.preload = "auto";
+
+      // Setup newly created video element
+      video.controls = true;
+
+      // If the first, show it, if the after, hide it
+      video.style.display = ( idx && "none" ) || "" ;
+
+      // Seta registered sequence id
+      video.id = self.seqId + "-" + idx ;
+
+      // Push this video into the sequence queue
+      self.queue.push( video );
+
+      var //satisfy lint
+       mIn = media["in"],
+       mOut = media["out"];
+
+      // Push the in/out points into sequence ioVideos
+      self.inOuts.ofVideos.push({
+        "in": ( mIn !== undefined && mIn ) || 1,
+        "out": ( mOut !== undefined && mOut ) || 0
+      });
+
+      self.inOuts.ofVideos[ idx ]["out"] = self.inOuts.ofVideos[ idx ]["out"] || self.inOuts.ofVideos[ idx ]["in"] + 2;
+
+      // Set the sources
+      video.src = !rprotocol.test( media.src ) ? lochref + media.src : media.src;
+
+      // Set some squence specific data vars
+      video.setAttribute("data-sequence-owner", parent );
+      video.setAttribute("data-sequence-guid", self.seqId );
+      video.setAttribute("data-sequence-id", idx );
+      video.setAttribute("data-sequence-clip", [ self.inOuts.ofVideos[ idx ]["in"], self.inOuts.ofVideos[ idx ]["out"] ].join(":") );
+
+      // Append the video to the parent element
+      self.parent.appendChild( video );
+
+
+      self.playlist.push( Popcorn("#" + video.id ) );
+
+    });
+
+    self.inOuts.ofVideos.forEach(function( obj ) {
+
+      var clipDuration = obj["out"] - obj["in"],
+          offs = {
+            "in": clipOffset,
+            "out": clipOffset + clipDuration
+          };
+
+      self.inOuts.ofClips.push( offs );
+
+      clipOffset = offs["out"] + 1;
+    });
+
+    Popcorn.forEach( this.queue, function( media, idx ) {
+
+      function canPlayThrough( event ) {
+
+        // If this is idx zero, use it as dimension for all
+        if ( !idx ) {
+          self.dims.width = media.videoWidth;
+          self.dims.height = media.videoHeight;
+        }
+
+        media.currentTime = self.inOuts.ofVideos[ idx ]["in"] - 0.5;
+
+        media.removeEventListener( "canplaythrough", canPlayThrough, false );
+
+        return true;
+      }
+
+      // Hook up event listeners for managing special playback
+      media.addEventListener( "canplaythrough", canPlayThrough, false );
+
+      // TODO: consolidate & DRY
+      media.addEventListener( "play", function( event ) {
+
+        self.playing = true;
+
+      }, false );
+
+      media.addEventListener( "pause", function( event ) {
+
+        self.playing = false;
+
+      }, false );
+
+      media.addEventListener( "timeupdate", function( event ) {
+
+        var target = event.srcElement || event.target,
+            seqIdx = +(  (target.dataset && target.dataset.sequenceId) || target.getAttribute("data-sequence-id") ),
+            floor = Math.floor( media.currentTime );
+
+        if ( self.times.last !== floor &&
+              seqIdx === self.active ) {
+
+          self.times.last = floor;
+
+          if ( floor === self.inOuts.ofVideos[ seqIdx ]["out"] ) {
+
+            Popcorn.sequence.cycle.call( self, seqIdx );
+          }
+        }
+      }, false );
+    });
+
+    return this;
+  };
+
+  Popcorn.sequence.init.prototype = Popcorn.sequence.prototype;
+
+  //
+  Popcorn.sequence.cycle = function( idx ) {
+
+    if ( !this.queue ) {
+      Popcorn.error("Popcorn.sequence.cycle is not a public method");
+    }
+
+    var // Localize references
+    queue = this.queue,
+    ioVideos = this.inOuts.ofVideos,
+    current = queue[ idx ],
+    nextIdx = 0,
+    next, clip;
+
+
+    var // Popcorn instances
+    $popnext,
+    $popprev;
+
+
+    if ( queue[ idx + 1 ] ) {
+      nextIdx = idx + 1;
+    }
+
+    // Reset queue
+    if ( !queue[ idx + 1 ] ) {
+
+      nextIdx = 0;
+      this.playlist[ idx ].pause();
+
+    } else {
+
+      next = queue[ nextIdx ];
+      clip = ioVideos[ nextIdx ];
+
+      // Constrain dimentions
+      Popcorn.extend( next, {
+        width: this.dims.width,
+        height: this.dims.height
+      });
+
+      $popnext = this.playlist[ nextIdx ];
+      $popprev = this.playlist[ idx ];
+
+      // When not resetting to 0
+      current.pause();
+
+      this.active = nextIdx;
+      this.times.last = clip["in"] - 1;
+
+      // Play the next video in the sequence
+      $popnext.currentTime( clip["in"] );
+
+      $popnext[ nextIdx ? "play" : "pause" ]();
+
+      // Trigger custom cycling event hook
+      this.trigger( "cycle", {
+
+        position: {
+          previous: idx,
+          current: nextIdx
+        }
+
+      });
+
+      // Set the previous back to it's beginning time
+      // $popprev.currentTime( ioVideos[ idx ].in );
+
+      if ( nextIdx ) {
+        // Hide the currently ending video
+        current.style.display = "none";
+        // Show the next video in the sequence
+        next.style.display = "";
+      }
+
+      this.cycling = false;
+    }
+
+    return this;
+  };
+
+  var excludes = [ "timeupdate", "play", "pause" ];
+
+  // Sequence object prototype
+  Popcorn.extend( Popcorn.sequence.prototype, {
+
+    // Returns Popcorn object from sequence at index
+    eq: function( idx ) {
+      return this.playlist[ idx ];
+    },
+    // Remove a sequence from it's playback display container
+    remove: function() {
+      this.parent.innerHTML = null;
+    },
+    // Returns Clip object from sequence at index
+    clip: function( idx ) {
+      return this.inOuts.ofVideos[ idx ];
+    },
+    // Returns sum duration for all videos in sequence
+    duration: function() {
+
+      var ret = 0,
+          seq = this.inOuts.ofClips,
+          idx = 0;
+
+      for ( ; idx < seq.length; idx++ ) {
+        ret += seq[ idx ]["out"] - seq[ idx ]["in"] + 1;
+      }
+
+      return ret - 1;
+    },
+
+    play: function() {
+
+      this.playlist[ this.active ].play();
+
+      return this;
+    },
+    // Attach an event to a single point in time
+    exec: function ( time, fn ) {
+
+      var index = this.active;
+
+      this.inOuts.ofClips.forEach(function( off, idx ) {
+        if ( time >= off["in"] && time <= off["out"] ) {
+          index = idx;
+        }
+      });
+
+      //offsetBy = time - self.inOuts.ofVideos[ index ].in;
+
+      time += this.inOuts.ofVideos[ index ]["in"] - this.inOuts.ofClips[ index ]["in"];
+
+      // Creating a one second track event with an empty end
+      Popcorn.addTrackEvent( this.playlist[ index ], {
+        start: time - 1,
+        end: time,
+        _running: false,
+        _natives: {
+          start: fn || Popcorn.nop,
+          end: Popcorn.nop,
+          type: "exec"
+        }
+      });
+
+      return this;
+    },
+    // Binds event handlers that fire only when all
+    // videos in sequence have heard the event
+    listen: function( type, callback ) {
+
+      var self = this,
+          seq = this.playlist,
+          total = seq.length,
+          count = 0,
+          fnName;
+
+      if ( !callback ) {
+        callback = Popcorn.nop;
+      }
+
+      // Handling for DOM and Media events
+      if ( Popcorn.Events.Natives.indexOf( type ) > -1 ) {
+        Popcorn.forEach( seq, function( video ) {
+
+          video.listen( type, function( event ) {
+
+            event.active = self;
+
+            if ( excludes.indexOf( type ) > -1 ) {
+
+              callback.call( video, event );
+
+            } else {
+              if ( ++count === total ) {
+                callback.call( video, event );
+              }
+            }
+          });
+        });
+
+      } else {
+
+        // If no events registered with this name, create a cache
+        if ( !this.events[ type ] ) {
+          this.events[ type ] = {};
+        }
+
+        // Normalize a callback name key
+        fnName = callback.name || Popcorn.guid( "__" + type );
+
+        // Store in event cache
+        this.events[ type ][ fnName ] = callback;
+      }
+
+      // Return the sequence object
+      return this;
+    },
+    unlisten: function( type, name ) {
+      // TODO: finish implementation
+    },
+    trigger: function( type, data ) {
+      var self = this;
+
+      // Handling for DOM and Media events
+      if ( Popcorn.Events.Natives.indexOf( type ) > -1 ) {
+
+        //  find the active video and trigger api events on that video.
+        return;
+
+      } else {
+
+        // Only proceed if there are events of this type
+        // currently registered on the sequence
+        if ( this.events[ type ] ) {
+
+          Popcorn.forEach( this.events[ type ], function( callback, name ) {
+            callback.call( self, { type: type }, data );
+          });
+
+        }
+      }
+
+      return this;
+    }
+  });
+
+
+  Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
+
+    // Implement passthrough methods to plugins
+    Popcorn.sequence.prototype[ plugin ] = function( options ) {
+
+      // console.log( this, options );
+      var videos = {}, assignTo = [],
+      idx, off, inOuts, inIdx, outIdx, keys, clip, clipInOut, clipRange;
+
+      for ( idx = 0; idx < this.inOuts.ofClips.length; idx++  ) {
+        // store reference
+        off = this.inOuts.ofClips[ idx ];
+        // array to test against
+        inOuts = range( off["in"], off["out"] );
+
+        inIdx = inOuts.indexOf( options.start );
+        outIdx = inOuts.indexOf( options.end );
+
+        if ( inIdx > -1 ) {
+          videos[ idx ] = Popcorn.extend( {}, off, {
+            start: inOuts[ inIdx ],
+            clipIdx: inIdx
+          });
+        }
+
+        if ( outIdx > -1 ) {
+          videos[ idx ] = Popcorn.extend( {}, off, {
+            end: inOuts[ outIdx ],
+            clipIdx: outIdx
+          });
+        }
+      }
+
+      keys = Object.keys( videos ).map(function( val ) {
+                return +val;
+              });
+
+      assignTo = range( keys[ 0 ], keys[ 1 ] );
+
+      //console.log( "PLUGIN CALL MAPS: ", videos, keys, assignTo );
+      for ( idx = 0; idx < assignTo.length; idx++ ) {
+
+        var compile = {},
+        play = assignTo[ idx ],
+        vClip = videos[ play ];
+
+        if ( vClip ) {
+
+          // has instructions
+          clip = this.inOuts.ofVideos[ play ];
+          clipInOut = vClip.clipIdx;
+          clipRange = range( clip["in"], clip["out"] );
+
+          if ( vClip.start ) {
+            compile.start = clipRange[ clipInOut ];
+            compile.end = clipRange[ clipRange.length - 1 ];
+          }
+
+          if ( vClip.end ) {
+            compile.start = clipRange[ 0 ];
+            compile.end = clipRange[ clipInOut ];
+          }
+
+          //compile.start += 0.1;
+          //compile.end += 0.9;
+
+        } else {
+
+          compile.start = this.inOuts.ofVideos[ play ]["in"];
+          compile.end = this.inOuts.ofVideos[ play ]["out"];
+
+          //compile.start += 0.1;
+          //compile.end += 0.9;
+
+        }
+
+        // Handling full clip persistance
+        //if ( compile.start === compile.end ) {
+          //compile.start -= 0.1;
+          //compile.end += 0.9;
+        //}
+
+        // Call the plugin on the appropriate Popcorn object in the playlist
+        // Merge original options object & compiled (start/end) object into
+        // a new fresh object
+        this.playlist[ play ][ plugin ](
+
+          Popcorn.extend( {}, options, compile )
+
+        );
+
+      }
+
+      // Return the sequence object
+      return this;
+    };
+
+  });
+})( this, Popcorn );
 (function( Popcorn ) {
   document.addEventListener( "DOMContentLoaded", function() {
 
@@ -2857,198 +3444,7 @@
     });
   }, false );
 
-})( Popcorn );// PLUGIN: Attribution
-
-(function( Popcorn ) {
-
-  /**
-   * Attribution popcorn plug-in
-   * Adds text to an element on the page.
-   * Options parameter will need a mandatory start, end, target.
-   * Optional parameters include nameofwork, NameOfWorkUrl, CopyrightHolder, CopyrightHolderUrl, license & licenseUrl.
-   * Start is the time that you want this plug-in to execute
-   * End is the time that you want this plug-in to stop executing
-   * Target is the id of the document element that the text needs to be attached to, this target element must exist on the DOM
-   * nameofwork is the title of the attribution
-   * NameOfWorkUrl is a url that provides more details about the attribution
-   * CopyrightHolder is the name of the person/institution that holds the rights to the attribution
-   * CopyrightHolderUrl is the url that provides more details about the copyrightholder
-   * license is the type of license that the work is copyrighted under
-   * LicenseUrl is the url that provides more details about the ticense type
-   * @param {Object} options
-   *
-   * Example:
-     var p = Popcorn('#video')
-        .attribution({
-          start: 5, // seconds
-          end: 15, // seconds
-          target: 'attributiondiv'
-        } )
-   *
-   */
-  Popcorn.plugin( "attribution" , (function() {
-
-    var
-    common = "data:image/png;base64,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",
-    licenses = {
-      "cc-by": common + "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",
-      "cc-by-sa": common + "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",
-      "cc-by-nd": common + "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",
-      "cc-by-nc": common + "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",
-      "cc-by-nc-sa": common + "pvSURBVHja7FptbFPXGX7utYlGJzz/2yYHYYQ2xZFWHAq0dLSx161TS9NcLylfocNmWtuVdUlKCNvIl4FAY0Id91Ob1sRrV7VaqTBfaxc6fEPQ4sRJbEaL82OVjZKoVJvm4KCpxB/vflzfE9/EThxo1Y72lY7v8T3nPPfc57znPe95z+WISMNx3FV8JZ+6EBHHASAAON19CjzPg+d5qFQq8LwKKp4Hr0pfeR4cx4PnOHAcB3CcjAICgVKEFKWQSkkpmUxK11QSyWQKqVSSlaUoxeoTkdwZlr8V5JHyjQAADgDJ5KpUKinxqum8SiWV8ao0yRw4js/kN01OmtiURGYymU6Z+aSS5FQqxYjNJPpWIlkNQEmuSg214iqlk8dPwev1YmBgAJOxSQXQEs0SrF27FuYfmFH28ENIplTg+YQ0IEkeHLj0WGZMnxRJMwHpOcRJ5A77A/C87UEoFFLUNxgMECoErFpTktfLfVFwOAD017PvQq1WM1LVarWUVGr0iOfgeMaB8fHxvDqk0+lQ/5t6lJbei0QyiWQygUQinZIJJBJJpuGZmvzR+Ed4vuMFjIRGAAAmkwlGoxEAEAwGIYoiAKDIUISd1TvxrW9/M+vzr3z0MV50vfiFwHmkfKNE8Hs9Z6BWqaeJVS/CIrUazY0t8BzzsAZarRaCIECv16O0tBQA0NPTg0gkAo/Hg4mJCVZXsAioq9+FxbctRiKRQDyRQCIRRyKRUJoMSuFq9Cp++cRTiMViEAQBTqcTer1e0dlIJILa2lp4PB5oNBq0OlpnvdS12DVU76z5wuDIdpjO9p6l3r5z1Ofvo8Ggny68HyTBIlB68pJWq6WWlhaKRqM0l3R1dZFWq2XtigxFdL6vlwaDg+Qb7KPevnPk7T1LZ8Ruevdv79Dp7lN04p3jZDAYCABZrVYFnowz8xky9lvH/6xIRYairDgup5O2btp8Uzijo6Pk6+sjX18fjY6O5oUDgHgAUKVtsFqlglql1Fyj0YhAIIDm5mZotdo5zYPVakU4HGZTaSQ0gnbHEYUt55lHInkjfp8foVAIgiCgfvfueU2Q1WqFIAgYCY1g2B9Q2MqR0AhWlZTg7rvWsfvPdXTgGYcDJ0+fxp663RgbG8sLJ7M/f3r1VZjW34OqzVtQtXkLTOvvwZnu7jlxFOtNr6+XfIM+Gr4wRK7nXUxzjEbjvFqbTaLRKBmNRobjesFFw/8Ypv4hH5339ZL3vKTF77z3FzIUS9obDofzxg+HwwSADAYD0xZ5FhR957u0YpmeSr+/np74+WMEgFpaWujQwUMEgI6+9VZeOHJ/fH19Et6d6+hn221Uv6uOVizT04plenI5nTlxsmiwpMWOZxzM3nZ1dc2rtdlEq9XC6/Wyto5DjrQvndZgLu1T8zxCl0IwmUyzbJzNZmNabrPZFGV6vR4mk0mxsodCEk5ZWRke2bgRY2NjONPdjRXL9Pjv5DVse3QbLn3wASoqK/PC0ev1iMViCAUuAgDKhZ/gD+5OtLUfxt6mRgCAu7MrJ44svOym8bzkisneQk1NDZvqNyJarRZOpxMAMD4+jpMnTrENi0Qyx9y0bM9xu91Z87Jka2M0GuE40o5Djja8/uYbqKisxIeXI3AcacfSpUvh7uxC6NKlvHBkaX1WUrjf//EVdu9H998PAIjFYvj4ypWcOIxgWZu8Xi8jp7q6mlUSRREWiwVmsxlmsxl2uz1nWUdHh8JeylrsPevN0F4OHD9N8Gchd951F9raD2N0dBT1u+pQ8r3b8fbRoyh7cAOqNm9hNnQu0Wg0cLlcuE2zBC+//HLWOp98cn1ODGmjwXHgOQ4DAwOSiyUIjBhRFGE2mxWNRFGEKIqorq6GxWKZVXbhwgV0dXUxLLfbjYGBAWkHmCZWIpdjfmW2xUzWXKvVOqs8W5uZ92KxGM50d6Ot/TCsl2woe3ADAKDf50O/z4fCwkJwi9Rz4ixSq1FfV4fbFi9m9/p9PpZfpl+Wsz8ZGiy9sLxDW7lyJatQW1vL7Ew4HIbX64Ver8f27duZJhuNRoTDYRw7dkzhIwNg+cnYpPQccBlXoLi4GKIoIhKJKDomD9DMvOyDiqIIg8Gg2FnNxPnFY4+jdd9+rLp9Jao2b8GHlyOoqKxEW/thVG3blhfO2NgYWpqasXXTZrTu24/WffvR1NAAANi9Z0/O/igIBgfFdM20J/LIWK1WZszD4TCsVisrkzcfgiCwssyFhG0bOfYz7YxvqlQMZD4i1xUqhOmNTTqfidPWfhi2HTtw5d//wj/DYbicTuxtakRFZSXsB/ajZM3qeXFsO3bAtmOHNNCdnejq7MT1T65jQ9lD2FK1NWd/FCbi85R169fBUGyAx+OBzWabpa3ZyPV4PCgyFCniAKvWlKDIUKTAKSwsxN6mRnxt8WIMDw3hVzU1N4Szt6kRP37gAVy+LGl1cXExDMXFc+IoNZiUUaxMeyJrs9vtxsTEBILBIJYvXw673c7K5G1yZlnmdJ6Oj7IfRScaWxqh0WjgdrthsVhYm8woWyQSgcViQUdHBzQaDXZW75z1Mnt+W58VZ9fuOrz+5hs3hbN6zWpUVFaiorIShuLivHBYsMc/PICCggKsv/seTMYmYbVamSZ5PJ5ZC5lsMsrLy3OWye1ra2vR0dGBJZolOP/3XkxNTWEqPoV4Io54PCEFg5IJRP8zgYP2g8yXNBqNMBqN0Gq1EEWRDfp8QZprsWtoO+hgQZrPE4cFe/qH+lFQUAB7kx2eYx5otVpEo1GFZ+ByuVgwx2Qyobm5mQ2Ay+VidTPLAGD58uWIRCK474f34YizHdenphCfQbAcN04lU/D3+3Hs6K0RrmQE+wb7sGhRAc6fO4/qpyT/1+l0oibDZt2IuN1utgs7cPAAHtzwAKbiU5iKx5GIxxFPzCA4SwD+/z3gzgNgRzomcyl0Oh0AwG63z3KdFiITExNsddXpdOlAfPoUI5VCKm2LKX3kdKsKDwApSiGZlM7R9rfuYwRZLBZFjHch5JrNZta2/tf16QB7cprkjCMjtsjSrXVkxBZ3ANTQ3ED+4QEKXgzQoz99VBFRCwQCC4p0ZUbSBItAwYsB8g8P0L7Wfez+lyhN/6l5upoGA34K3kDAPRqNUktLiyLgvmbtGrrwfpAGg35qaG74MpJL3EyntLG5AeUWAWq1GkccR/Daq6/d8JGRfX8LEokE+vsH8OTjT+bzHUHGro9j9zJ3mTP/58LJ1UZ+Rr6Bplx9WhDGzNTY3CBp8sUAdbpfIZ1Ol/eI6XQ6cj3vouDFAA0G/fTS717Ku+3MY6KZ+cx78+HM1z4frGx1FooxS4NlqXm6GlXbqthRj+jtwYnjJ+Y8tn9YeBgmUyk70Dx+/AQO2A8s5EuYWdqyEM2dWTfXdYFf52TV3lz9zLqTy1W46o4SNDY3oXCpLuM0IjPcCIXfKn94Mj42hmfbnTjXc27BL3MzpmE+kzAX/kIHLV+MOQmW5d7Se7GhbAPuWH0HvqHRpD+dmjYwRISrsRiGBodw+uTpBRP7WWnwzdrg+daET43gr+QmNhpE9PWvaPiMNhhE3P8GAG3CFDKJWtqSAAAAAElFTkSuQmCC",
-      "cc-by-nc-nd": common + "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"
-    },
-    target;
-
-    return {
-
-      _setup: function( options ) {
-
-        var attrib = "",
-        license = options.license && licenses[ options.license.toLowerCase() ],
-        tar = "target=_blank";
-
-        // make a div to put the information into
-        options._container = document.createElement( "div" );
-        options._container.style.display = "none";
-
-        // Cache declared target
-        target = document.getElementById( options.target );
-
-        if ( options.nameofworkurl ) {
-          attrib += "<a href='" + options.nameofworkurl + "' " + tar + ">";
-        }
-        if ( options.nameofwork ) {
-          attrib += options.nameofwork;
-        }
-        if ( options.nameofworkurl ) {
-          attrib += "</a>";
-        }
-        if ( options.copyrightholderurl ) {
-          attrib += "<a href='" + options.copyrightholderurl + "' " + tar + ">";
-        }
-        if ( options.copyrightholder ) {
-          attrib += ", " + options.copyrightholder;
-        }
-        if ( options.copyrightholderurl ) {
-          attrib += "</a>";
-        }
-
-        //if the user did not specify any parameters just pull the text from the tag
-        if ( attrib === "" ) {
-          attrib = options.text;
-        }
-
-        if ( options.license ) {
-          if ( license ) {
-            if ( options.licenseurl ) {
-              attrib = "<a href='" + options.licenseurl + "' " + tar + "><img src='"+ license +"' border='0'/></a> " + attrib;
-            } else {
-              attrib = "<img src='"+ license +"' />" + attrib;
-            }
-          } else {
-            attrib += ", license: ";
-
-            if ( options.licenseurl ) {
-              attrib += "<a href='" + options.licenseurl + "' " + tar + ">" + options.license + "</a> ";
-            } else {
-              attrib += options.license;
-            }
-          }
-        } else if ( options.licenseurl ) {
-          attrib += ", <a href='" + options.licenseurl + "' " + tar + ">license</a> ";
-        }
-
-        options._container.innerHTML  = attrib;
-
-        if ( !target && Popcorn.plugin.debug ) {
-          throw new Error( "target container doesn't exist" );
-        }
-        target && target.appendChild( options._container );
-      },
-      /**
-       * @member attribution
-       * The start function will be executed when the currentTime
-       * of the video  reaches the start time provided by the
-       * options variable
-       */
-      start: function( event, options ) {
-        options._container.style.display = "inline";
-      },
-      /**
-       * @member attribution
-       * The end function will be executed when the currentTime
-       * of the video  reaches the end time provided by the
-       * options variable
-       */
-      end: function( event, options ) {
-        options._container.style.display = "none";
-      },
-      _teardown: function( options ) {
-
-        // Cache declared target
-        target = document.getElementById( options.target );
-
-        target && target.removeChild( options._container );
-      }
-    };
-  })(),
-  {
-    about:{
-      name: "Popcorn Attribution Plugin",
-      version: "0.2",
-      author: "@rwaldron",
-      website: "github.com/rwldrn"
-    },
-    options:{
-      start: {
-       elem: "input",
-       type: "text",
-       label: "In"
-      },
-      end: {
-        elem: "input",
-        type: "text",
-        label: "Out"
-      },
-      nameofwork: {
-        elem: "input",
-        type: "text",
-        label: "Name of Work"
-      },
-      nameofworkurl: {
-        elem: "input",
-        type: "url",
-        label: "Url of Work",
-        optional: true
-      },
-      copyrightholder: {
-        elem: "input",
-        type: "text",
-        label: "Copyright Holder"
-      },
-      copyrightholderurl: {
-        elem: "input",
-        type: "url",
-        label: "Copyright Holder Url",
-        optional: true
-      },
-      license: {
-        elem: "input",
-        type: "text",
-        label: "License type"
-       },
-      licenseurl: {
-        elem: "input",
-        type: "url",
-        label: "License URL",
-        optional: true
-      },
-      target: "attribution-container"
-    }
-  });
-})( Popcorn );
-// PLUGIN: Code
+})( Popcorn );// PLUGIN: Code
 
 (function ( Popcorn ) {
 
@@ -3152,25 +3548,16 @@
 
     if ( !options.onStart || typeof options.onStart !== "function" ) {
 
-      if ( Popcorn.plugin.debug ) {
-        throw new Error( "Popcorn Code Plugin Error: onStart must be a function." );
-      }
       options.onStart = Popcorn.nop;
     }
 
     if ( options.onEnd && typeof options.onEnd !== "function" ) {
 
-      if ( Popcorn.plugin.debug ) {
-        throw new Error( "Popcorn Code Plugin Error: onEnd  must be a function." );
-      }
       options.onEnd = undefined;
     }
 
     if ( options.onFrame && typeof options.onFrame !== "function" ) {
 
-      if ( Popcorn.plugin.debug ) {
-        throw new Error( "Popcorn Code Plugin Error: onFrame  must be a function." );
-      }
       options.onFrame = undefined;
     }
 
@@ -3205,13 +3592,13 @@
     options: {
       start: {
        elem: "input",
-       type: "text",
-       label: "In"
+       type: "number",
+       label: "Start"
       },
       end: {
         elem: "input",
-        type: "text",
-        label: "Out"
+        type: "number",
+        label: "End"
       },
       onStart: {
         elem: "input",
@@ -3273,13 +3660,13 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
       options: {
         start: {
           elem: "input",
-          type: "text",
-          label: "In"
+          type: "number",
+          label: "Start"
         },
         end: {
           elem: "input",
-          type: "text",
-          label: "Out"
+          type: "number",
+          label: "End"
         },
         target: "documentcloud-container",
         width: {
@@ -3296,7 +3683,7 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
         },
         src: {
           elem: "input",
-          type: "text",
+          type: "url",
           label: "PDF URL",
           "default": "http://www.documentcloud.org/documents/70050-urbina-day-1-in-progress.html"
         },
@@ -3492,300 +3879,6 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
     }
   });
 })( Popcorn, window.document );
-//PLUGIN: facebook
-
-(function( Popcorn, global ) {
-/**
-  * Facebook Popcorn plug-in
-  * Places Facebook's "social plugins" inside a div ( http://developers.facebook.com/docs/plugins/ )
-  * Sets options according to user input or default values
-  * Options parameter will need a target, type, start and end time
-  * Type is the name of the plugin in fbxml format. Options: LIKE (default), LIKE-BOX, ACTIVITY, FACEPILE
-  * Target is the id of the document element that the text needs to be attached to. This target element must exist on the DOM
-  * Start is the time that you want this plug-in to execute
-  * End is the time that you want this plug-in to stop executing
-  *
-  * Other than the mandatory four parameters, there are several optional parameters (Some options are only applicable to certain plugins)
-  * Action - like button will either "Like" or "Recommend". Options: recommend / like(default)
-  * Always_post_to_friends - live-stream posts will be always be posted on your facebook wall if true. Options: true / false(default)
-  * Border_color - border color of the activity feed. Names (i.e: "white") and html color codes are valid
-  * Colorscheme - changes the color of almost all plugins. Options: light(default) / dark
-  * Event_app_id - an app_id is required for the live-stream plugin
-  * Font - the font of the text contained in the plugin. Options: arial / segoe ui / tahoma / trebuchet ms / verdana / lucida grande
-  * Header - displays the title of like-box or activity feed. Options: true / false(default)
-  * Href - url to apply to the plugin. Default is current page
-  * Layout - changes the format of the 'like' count (written in english or a number in a callout).
-  *          Options: box_count / button_count / standard(default)
-  * Max_rows - number of rows to disperse pictures in facepile. Default is 1
-  * Recommendations - shows recommendations, if any, in the bottom half of activity feed. Options: true / false(default)
-  * Show_faces - show pictures beside like button and like-box. Options: true / false(default)
-  * Site - href for activity feed. No idea why it must be "site". Default is current page
-  * Stream - displays a the latest posts from the specified page's wall. Options: true / false(default)
-  * Type - determines which plugin to create. Case insensitive
-  * Xid - unique identifier if more than one live-streams are on one page
-  *
-  * @param {Object} options
-  *
-  * Example:
-    var p = Popcorn('#video')
-      .facebook({
-        type  : "LIKE-BOX",
-        target: "likeboxdiv",
-        start : 3,
-        end   : 10,
-        href  : "http://www.facebook.com/senecacollege",
-        show_faces: "true",
-        header: "false"
-      } )
-  * This will show how many people "like" Seneca College's Facebook page, and show their profile pictures
-  */
-
-  var ranOnce = false;
-
-  Popcorn.plugin( "facebook" , {
-    manifest: {
-      about: {
-        name: "Popcorn Facebook Plugin",
-        version: "0.1",
-        author: "Dan Ventura, Matthew Schranz: @mjschranz",
-        website: "dsventura.blogspot.com, mschranz.wordpress.com"
-      },
-      options: {
-        type: {
-          elem: "select",
-          options: [ "LIKE", "LIKE-BOX", "ACTIVITY", "FACEPILE", "LIVE-STREAM", "SEND", "COMMENTS" ],
-          label: "Type"
-        },
-        target: "facebook-container",
-        start: {
-          elem: "input",
-          type: "text",
-          label: "In"
-        },
-        end: {
-          elem: "input",
-          type: "text",
-          label: "Out"
-        },
-        // optional parameters:
-        font: {
-          elem: "input",
-          type: "text",
-          label: "font",
-          optional: true
-        },
-        xid: {
-          elem: "input",
-          type: "text",
-          label: "Xid",
-          optional: true
-        },
-        href: {
-          elem: "input",
-          type: "url",
-          label: "Href",
-          optional: true
-        },
-        site: {
-          elem: "input",
-          type: "url",
-          label:"Site",
-          optional: true
-        },
-        height: {
-          elem: "input",
-          type: "text",
-          label: "Height",
-          "default": "200",
-          optional: true
-        },
-        width: {
-          elem: "input",
-          type: "text",
-          label: "Width",
-          "default": "200",
-          optional: true
-        },
-        action: {
-          elem: "select",
-          options: [ "like", "recommend" ],
-          label: "Action",
-          optional: true
-        },
-        stream: {
-          elem: "input",
-          type: "checkbox",
-          label: "Stream",
-          "default": false,
-          optional: true
-        },
-        header: {
-          elem: "input",
-          type: "checkbox",
-          label: "Header",
-          "default": false,
-          optional: true
-        },
-        layout: {
-          elem: "select",
-          options: [ "standard", "button_count", "box_count" ],
-          label: "Layout",
-          optional: true
-        },
-        max_rows: {
-          elem: "input",
-          type: "number",
-          label: "Max_rows",
-          "default": 1,
-          optional: true
-        },
-        border_color: {
-          elem: "input",
-          type: "text",
-          label: "Border_color",
-          optional: true
-        },
-        event_app_id: {
-          elem: "input",
-          type: "text",
-          label: "Event_app_id",
-          optional: true
-        },
-        colorscheme: {
-          elem: "select",
-          options: [ "light", "dark" ],
-          label: "Colorscheme",
-          optional: true
-        },
-        show_faces: {
-          elem: "input",
-          type: "checkbox",
-          label: "Showfaces",
-          "default": false,
-          optional: true
-        },
-        recommendations: {
-          elem: "input",
-          type: "checkbox",
-          label: "Recommendations",
-          "default": false,
-          optional: true
-        },
-        always_post_to_friends: {
-          elem: "input",
-          type: "checkbox",
-          label: "Always_post_to_friends",
-          "default": false,
-          optional: true
-        },
-        num_posts: {
-          elem: "input",
-          type: "number",
-          label: "Number_of_Comments",
-          "default": 1,
-          optional: true
-        }
-      }
-    },
-
-    _setup: function( options ) {
-
-      var target = document.getElementById( options.target ),
-          _type = options.type;
-
-      // facebook script requires a div named fb-root
-      if ( !document.getElementById( "fb-root" ) ) {
-        var fbRoot = document.createElement( "div" );
-        fbRoot.setAttribute( "id", "fb-root" );
-        document.body.appendChild( fbRoot );
-      }
-
-      if ( !ranOnce || options.event_app_id ) {
-        ranOnce = true;
-        // initialize facebook JS SDK
-        Popcorn.getScript( "//connect.facebook.net/en_US/all.js" );
-
-        global.fbAsyncInit = function() {
-          FB.init({
-            appId: ( options.event_app_id || "" ),
-            status: true,
-            cookie: true,
-            xfbml: true
-          });
-        };
-      }
-
-      // Lowercase to make value consistent no matter what user inputs
-      _type = _type.toLowerCase();
-
-      var validType = function( type ) {
-        return ( [ "like", "like-box", "activity", "facepile", "live-stream", "send", "comments" ].indexOf( type ) > -1 );
-      };
-
-      // Checks if type is valid
-      if ( !validType( _type ) ) {
-        throw new Error( "Facebook plugin type was invalid." );
-      }
-
-      options._container = document.createElement( "div" );
-      options._container.id = "facebookdiv-" + Popcorn.guid();
-      options._facebookdiv = document.createElement( "fb:" + _type );
-      options._container.appendChild( options._facebookdiv );
-      options._container.style.display = "none";
-
-      // All the the "types" for facebook share largely identical attributes, for loop suffices.
-      // ** Credit to Rick Waldron, it's essentially all his code in this function.
-      // activity feed uses 'site' rather than 'href'
-      var attr = _type === "activity" ? "site" : "href";
-
-      options._facebookdiv.setAttribute( attr, ( options[ attr ] || document.URL ) );
-
-      // create an array of Facebook widget attributes
-      var fbAttrs = (
-        "width height layout show_faces stream header colorscheme" +
-        " maxrows border_color recommendations font always_post_to_friends xid" +
-        " num_posts"
-      ).split(" ");
-
-      // For Each that loops through all of our attributes adding them to the divs properties
-      Popcorn.forEach( fbAttrs, function( attr ) {
-        // Test for null/undef. Allows 0, false & ""
-        if ( options[ attr ] != null ) {
-          options._facebookdiv.setAttribute( attr, options[ attr ] );
-        }
-      });
-
-      // Checks if the plugins target container exists
-      if ( !target && Popcorn.plugin.debug ) {
-        throw new Error( "Facebook target container doesn't exist" );
-      }
-      target && target.appendChild( options._container );
-    },
-    /**
-    * @member facebook
-    * The start function will be executed when the currentTime
-    * of the video reaches the start time provided by the
-    * options variable
-    */
-    start: function( event, options ){
-      options._container.style.display = "";
-    },
-    /**
-    * @member facebook
-    * The end function will be executed when the currentTime
-    * of the video reaches the end time provided by the
-    * options variable
-    */
-    end: function( event, options ){
-      options._container.style.display = "none";
-    },
-    _teardown: function( options ){
-      var target = document.getElementById( options.target );
-      target && target.removeChild( options._container );
-    }
-  });
-
-})( Popcorn, this );
 // PLUGIN: Flickr
 (function (Popcorn) {
 
@@ -3852,11 +3945,6 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
     containerDiv.style.height = "100%";
     containerDiv.style.display = "none";
     idx++;
-
-    // ensure the target container the user chose exists
-    if ( !target && Popcorn.plugin.debug ) {
-      throw new Error( "flickr target container doesn't exist" );
-    }
 
     target && target.appendChild( containerDiv );
 
@@ -3964,18 +4052,18 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
     options: {
       start: {
         elem: "input",
-        type: "text",
-        label: "In"
+        type: "number",
+        label: "Start"
       },
       end: {
         elem: "input",
-        type: "text",
-        label: "Out"
+        type: "number",
+        label: "End"
       },
       userid: {
         elem: "input",
         type: "text",
-        label: "UserID",
+        label: "User ID",
         optional: true
       },
       tags: {
@@ -3992,7 +4080,7 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
       apikey: {
         elem: "input",
         type: "text",
-        label: "Api_key",
+        label: "API Key",
         optional: true
       },
       target: "flickr-container",
@@ -4070,13 +4158,13 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
       options: {
         start: {
           elem: "input",
-          type: "text",
-          label: "In"
+          type: "number",
+          label: "Start"
         },
         end: {
           elem: "input",
-          type: "text",
-          label: "Out"
+          type: "number",
+          label: "End"
         },
         text: {
           elem: "input",
@@ -4095,9 +4183,6 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
       options._container.style.display = "none";
       options._container.innerHTML  = options.text;
 
-      if ( !target ) {
-        throw new Error( "target container doesn't exist" );
-      }
       target.appendChild( options._container );
     },
 
@@ -4128,243 +4213,6 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
       }
     }
 
-  });
-})( Popcorn );
-// PLUGIN: GML
-(function( Popcorn ) {
-
-  var gmlPlayer = function( $p ) {
-
-        var _stroke = 0,
-            onPt = 0,
-            onStroke = 0,
-            x = null,
-            y = null,
-            rotation = false,
-            strokes = 0,
-            play = function() {},
-            reset = function() {
-
-              $p.background( 0 );
-              onPt = onStroke = 0;
-              x = y = null;
-            },
-            drawLine = function( x, y, x2, y2 ) {
-
-              var _x, _y, _x2, _y2;
-
-              if ( rotation ) {
-
-                _x  = y * $p.height;
-                _y  = $p.width - ( x * $p.width );
-                _x2 = y2 * $p.height;
-                _y2 = $p.width - ( x2 * $p.width );
-              } else {
-
-                _x  = x * $p.width;
-                _y  = y * $p.height;
-                _x2 = x2 * $p.width;
-                _y2 = y2 * $p.height;
-              }
-
-              $p.stroke( 0 );
-              $p.strokeWeight( 13 );
-              $p.strokeCap( $p.SQUARE );
-              $p.line( _x, _y, _x2, _y2 );
-              $p.stroke( 255 );
-              $p.strokeWeight( 12 );
-              $p.strokeCap( $p.ROUND );
-              $p.line( _x, _y, _x2, _y2 );
-            },
-            seek = function( point ) {
-
-              ( point < onPt ) && reset();
-
-              while ( onPt <= point ) {
-
-                if ( !strokes ) {
-                  return;
-                }
-
-                _stroke = strokes[ onStroke ] || strokes;
-                var pt = _stroke.pt[ onPt ],
-                    p = onPt;
-                x != null && drawLine( x, y, pt.x, pt.y );
-
-                x = pt.x;
-                y = pt.y;
-                ( onPt === p ) && onPt++;
-              }
-            };
-
-        $p.draw = function() {
-
-          play();
-        };
-        $p.setup = function() {};
-        $p.construct = function( media, data, options ) {
-
-          var dataReady = function() {
-
-            if ( data ) {
-
-              strokes = data.gml.tag.drawing.stroke;
-
-              var drawingDur = ( options.end - options.start ) / ( strokes.pt || (function( strokes ) {
-
-                var rStrokes = [];
-
-                for ( var i = 0, sl = strokes.length; i < sl; i++ ) {
-
-                  rStrokes = rStrokes.concat( strokes[ i ].pt );
-                }
-
-                return rStrokes;
-              })( strokes ) ).length;
-
-              var tag = data.gml.tag,
-                  app_name =  tag.header && tag.header.client && tag.header.client.name;
-
-              rotation = app_name === "Graffiti Analysis 2.0: DustTag" ||
-                         app_name === "DustTag: Graffiti Analysis 2.0" ||
-                         app_name === "Fat Tag - Katsu Edition";
-
-              play = function() {
-
-                if ( media.currentTime < options.endDrawing ) {
-
-                  seek( ( media.currentTime - options.start ) / drawingDur );
-                }
-              };
-
-              return;
-            }
-
-            setTimeout( dataReady, 5 );
-          };
-
-          $p.size( 640, 640 );
-          $p.frameRate( 60 );
-          $p.smooth();
-          reset();
-          $p.noLoop();
-
-          dataReady();
-        };
-      };
-
-  /**
-   * Grafiti markup Language (GML) popcorn plug-in
-   * Renders a GML tag inside an HTML element
-   * Options parameter will need a mandatory start, end, target, gmltag.
-   * Optional parameters: none.
-   * Start is the time that you want this plug-in to execute
-   * End is the time that you want this plug-in to stop executing
-   * Target is the id of the document element that you wish to render the grafiti in
-   * gmltag is the numerical reference to a gml tag via 000000book.com
-   * @param {Object} options
-   *
-   * Example:
-     var p = Popcorn('#video')
-       .gml({
-         start: 0, // seconds
-         end: 5, // seconds
-         gmltag: '29582',
-         target: 'gmldiv'
-       });
-   *
-   */
-  Popcorn.plugin( "gml" , {
-
-    manifest: {
-      about: {
-        name: "Popcorn GML Plugin",
-        author: "Scott Downe, @ScottDowne",
-        website: "scottdowne.wordpress.com"
-      },
-      options: {
-        start: {
-          elem: "input",
-          type: "text",
-          label: "In"
-        },
-        end: {
-          elem: "input",
-          type: "text",
-          label: "Out"
-        },
-        gmltag: {
-          elem: "input",
-          type: "text",
-          label: "GMLTag"
-        },
-        target: "gml-container"
-      }
-    },
-    _setup: function( options ) {
-
-      var self = this,
-          target = document.getElementById( options.target );
-
-      options.endDrawing = options.endDrawing || options.end;
-
-      // create a canvas to put in the target div
-      options.container = document.createElement( "canvas" );
-
-      options.container.style.display = "none";
-      options.container.setAttribute( "id", "canvas" + options.gmltag );
-
-      if ( !target && Popcorn.plugin.debug ) {
-        throw new Error( "target container doesn't exist" );
-      }
-      target && target.appendChild( options.container );
-
-      var scriptReady = function() {
-
-        Popcorn.getJSONP( "//000000book.com/data/" + options.gmltag + ".json?callback=", function( data ) {
-
-          options.pjsInstance = new Processing( options.container, gmlPlayer );
-          options.pjsInstance.construct( self.media, data, options );
-          options._running && options.pjsInstance.loop();
-        }, false );
-      };
-
-      if ( !window.Processing ) {
-
-        Popcorn.getScript( "//cloud.github.com/downloads/processing-js/processing-js/processing-1.3.6.min.js", scriptReady );
-      } else {
-
-        scriptReady();
-      }
-
-    },
-    /**
-     * @member gml
-     * The start function will be executed when the currentTime
-     * of the video  reaches the start time provided by the
-     * options variable
-     */
-    start: function( event, options ) {
-
-      options.pjsInstance && options.pjsInstance.loop();
-      options.container.style.display = "block";
-    },
-    /**
-     * @member gml
-     * The end function will be executed when the currentTime
-     * of the video  reaches the end time provided by the
-     * options variable
-     */
-    end: function( event, options ) {
-
-      options.pjsInstance && options.pjsInstance.noLoop();
-      options.container.style.display = "none";
-    },
-    _teardown: function( options ) {
-
-      options.pjsInstance && options.pjsInstance.exit();
-      document.getElementById( options.target ) && document.getElementById( options.target ).removeChild( options.container );
-    }
   });
 })( Popcorn );
 // PLUGIN: Google Feed
@@ -4482,9 +4330,6 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
     newdiv.style.height = "100%";
     i++;
 
-    if ( !target && Popcorn.plugin.debug ) {
-      throw new Error( "target container doesn't exist" );
-    }
     target && target.appendChild( newdiv );
 
     initialize();
@@ -4524,32 +4369,32 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
     options: {
       start: {
         elem: "input",
-        type: "text",
-        label: "In"
+        type: "number",
+        label: "Start"
       },
       end: {
         elem: "input",
-        type: "text",
-        label: "Out"
+        type: "number",
+        label: "End"
       },
       target: "feed-container",
       url: {
         elem: "input",
         type: "url",
-        label: "url",
+        label: "Feed URL",
         "default": "http://planet.mozilla.org/rss20.xml"
       },
       title: {
         elem: "input",
         type: "text",
-        label: "title",
+        label: "Title",
         "default": "Planet Mozilla",
         optional: true
       },
       orientation: {
         elem: "select",
         options: [ "Vertical", "Horizontal" ],
-        label: "orientation",
+        label: "Orientation",
         "default": "Vertical",
         optional: true
       }
@@ -4698,10 +4543,6 @@ var googleCallback;
 
     i++;
 
-    // ensure the target container the user chose exists
-    if ( !target && Popcorn.plugin.debug ) {
-      throw new Error( "target container doesn't exist" );
-    }
     target && target.appendChild( newdiv );
 
     // ensure that google maps and its functions are loaded
@@ -4751,6 +4592,8 @@ var googleCallback;
         // ensure the map has been initialized in the setup function above
         var isMapSetup = function() {
           if ( map ) {
+            options._map = map;
+
             map.getDiv().style.display = "block";
             // reset the location and zoom just in case the user plaid with the map
             google.maps.event.trigger( map, "resize" );
@@ -4904,11 +4747,17 @@ var googleCallback;
                 }
               }
             }
+
+            if ( options.onmaploaded ) {
+              options.onmaploaded( options, map );
+            }
+
           } else {
             setTimeout(function () {
               isMapSetup();
             }, 13);
           }
+
         };
         isMapSetup();
       },
@@ -4932,6 +4781,8 @@ var googleCallback;
         // the map must be manually removed
         target && target.removeChild( newdiv );
         newdiv = map = location = null;
+
+        options._map = null;
       }
     };
   }, {
@@ -4944,19 +4795,19 @@ var googleCallback;
     options: {
       start: {
         elem: "input",
-        type: "text",
-        label: "In"
+        type: "start",
+        label: "Start"
       },
       end: {
         elem: "input",
-        type: "text",
-        label: "Out"
+        type: "start",
+        label: "End"
       },
       target: "map-container",
       type: {
         elem: "select",
         options: [ "ROADMAP", "SATELLITE", "STREETVIEW", "HYBRID", "TERRAIN", "STAMEN-WATERCOLOR", "STAMEN-TERRAIN", "STAMEN-TONER" ],
-        label: "Type",
+        label: "Map Type",
         optional: true
       },
       zoom: {
@@ -5096,31 +4947,32 @@ var googleCallback;
           start: {
             elem: "input",
             type: "number",
-            label: "In"
+            label: "Start"
           },
           end: {
             elem: "input",
             type: "number",
-            label: "Out"
+            label: "End"
+          },
+          src: {
+            elem: "input",
+            type: "url",
+            label: "Image URL",
+            "default": "http://mozillapopcorn.org/wp-content/themes/popcorn/images/for_developers.png"
           },
           href: {
             elem: "input",
             type: "url",
-            label: "anchor URL",
+            label: "Link",
             "default": "http://mozillapopcorn.org/wp-content/themes/popcorn/images/for_developers.png",
             optional: true
           },
           target: "image-container",
-          src: {
-            elem: "input",
-            type: "url",
-            label: "Source URL",
-            "default": "http://mozillapopcorn.org/wp-content/themes/popcorn/images/for_developers.png"
-          },
           text: {
             elem: "input",
             type: "text",
-            label: "Text",
+            label: "Caption",
+            "default": "Popcorn.js",
             optional: true
           }
         }
@@ -5134,10 +4986,6 @@ var googleCallback;
         options.anchor.style.textDecoration = "none";
         options.anchor.style.display = "none";
 
-        if ( !target && Popcorn.plugin.debug ) {
-          throw new Error( "target container doesn't exist" );
-        }
-
         // add the widget's div to the target div.
         // if target is <video> or <audio>, create a container and routinely 
         // update its size/position to be that of the media
@@ -5147,7 +4995,7 @@ var googleCallback;
             options.trackedContainer.element.appendChild( options.anchor );
           }
           else {
-            target.appendChild( options.anchor );
+            target && target.appendChild( options.anchor );
           }          
         }
 
@@ -5225,523 +5073,6 @@ var googleCallback;
       }
   });
 })( Popcorn );
-// PLUGIN: LASTFM
-
-(function ( Popcorn ) {
-
-  var _artists = {},
-      lastFMcallback = function( data ) {
-        if ( data.artist ) {
-          var htmlString = "";
-
-          htmlString = "<h3>" + data.artist.name + "</h3>";
-          htmlString += "<a href='" + data.artist.url + "' target='_blank' style='float:left;margin:0 10px 0 0;'><img src='" + data.artist.image[ 2 ][ "#text"] + "' alt=''></a>";
-          htmlString += "<p>" + data.artist.bio.summary + "</p>";
-          htmlString += "<hr /><p><h4>Tags</h4><ul>";
-
-          Popcorn.forEach( data.artist.tags.tag, function( val, i) {
-            htmlString += "<li><a href='" + val.url + "'>" + val.name + "</a></li>";
-          });
-
-          htmlString += "</ul></p>";
-          htmlString += "<hr /><p><h4>Similar</h4><ul>";
-
-          Popcorn.forEach( data.artist.similar.artist, function( val, i) {
-            htmlString += "<li><a href='" + val.url + "'>" + val.name + "</a></li>";
-          });
-
-          htmlString += "</ul></p>";
-
-          _artists[ data.artist.name.toLowerCase() ].htmlString = htmlString;
-        }
-      };
-
-  /**
-   * LastFM popcorn plug-in
-   * Appends information about a LastFM artist to an element on the page.
-   * Options parameter will need a start, end, target, artist and apikey.
-   * Start is the time that you want this plug-in to execute
-   * End is the time that you want this plug-in to stop executing
-   * Artist is the name of who's LastFM information you wish to show
-   * Target is the id of the document element that the images are
-   *  appended to, this target element must exist on the DOM
-   * ApiKey is the API key registered with LastFM for use with their API
-   *
-   * @param {Object} options
-   *
-   * Example:
-     var p = Popcorn('#video')
-        .lastfm({
-          start:          5,                                    // seconds, mandatory
-          end:            15,                                   // seconds, mandatory
-          artist:         'yacht',                              // mandatory
-          target:         'lastfmdiv',                          // mandatory
-          apikey:         '1234567890abcdef1234567890abcdef'    // mandatory
-        } )
-   *
-   */
-  Popcorn.plugin( "lastfm" , (function(){
-
-
-    return {
-
-      _setup: function( options ) {
-        options._container = document.createElement( "div" );
-        options._container.style.display = "none";
-        options._container.innerHTML = "";
-        options.artist = options.artist && options.artist.toLowerCase() || "";
-
-        var target = document.getElementById( options.target );
-
-        if ( !target && Popcorn.plugin.debug ) {
-          throw new Error( "target container doesn't exist" );
-        }
-        target && target.appendChild( options._container );
-
-        if ( !_artists[ options.artist ] ) {
-
-          _artists[ options.artist ] = {
-            count: 0,
-            htmlString: "Unknown Artist"
-          };
-          Popcorn.getJSONP( "//ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=" + options.artist + "&api_key=" + options.apikey + "&format=json&callback=lastFMcallback", lastFMcallback, false );
-        }
-        _artists[ options.artist ].count++;
-
-      },
-      /**
-       * @member LastFM
-       * The start function will be executed when the currentTime
-       * of the video  reaches the start time provided by the
-       * options variable
-       */
-      start: function( event, options ) {
-        options._container.innerHTML = _artists[ options.artist ].htmlString;
-        options._container.style.display = "inline";
-      },
-      /**
-       * @member LastFM
-       * The end function will be executed when the currentTime
-       * of the video  reaches the end time provided by the
-       * options variable
-       */
-      end: function( event, options ) {
-        options._container.style.display = "none";
-        options._container.innerHTML = "";
-      },
-      _teardown: function( options ) {
-        // cleaning possible reference to _artist array;
-        --_artists[ options.artist ].count || delete _artists[ options.artist ];
-        document.getElementById( options.target ) && document.getElementById( options.target ).removeChild( options._container );
-      }
-    };
-  })(),
-  {
-    about:{
-      name: "Popcorn LastFM Plugin",
-      version: "0.1",
-      author: "Steven Weerdenburg",
-      website: "http://sweerdenburg.wordpress.com/"
-    },
-    options: {
-      start: {
-        elem: "input",
-        type: "text",
-        label: "In"
-      },
-      end: {
-        elem: "input",
-        type: "text",
-        label: "Out"
-      },
-      target: "lastfm-container",
-      artist: {
-        elem: "input",
-        type: "text",
-        label: "Artist",
-        "default": "the beatles"
-      }
-    }
-  });
-
-})( Popcorn );
-//PLUGIN: linkedin
-
-(function ( Popcorn ){
-
-  /**
-   * LinkedIn Popcorn plug-in
-   * Places a  LinkedIn plugin inside a div ( http://developers.facebook.com/docs/plugins/ )
-   * Options parameter will need a start, end, target, type, and an api key
-   * Optional parameters are url, counter, format, companyid, and productid
-   * Start is the time that you want this plug-in to execute
-   * End is the time that you want this plug-in to stop executing
-   * Target is the id of the document element that the plugin needs to be attached to, this target element must exist on the DOM
-   * Type is the name of the plugin, options are share, memberprofile, companyinsider, companyprofile, or recommendproduct
-   * Apikey is your own api key from obtained from https://www.linkedin.com/secure/developer
-   * Url is the desired url to share via LinkedIn. Defaults to the current page if no url is specified
-   * Counter is the position where the counter will be positioned. This is used if the type is "share" or "recommendproduct"
-   *  The options are right and top (don't include this option if you do not want a counter)
-   * Format is the data format of the member and company profile plugins. The options are inlined, hover, and click. Defaults to inline
-   * Companyid must be specified if the type is "companyprofile," "companyinsider," or "recommendproduct"
-   * Productid must be specified if the type is "recommendproduct"
-   *
-   * @param {Object} options
-   *
-   * Example:
-   * <script src="popcorn.linkedin.js"></script>
-   * ...
-   * var p = Popcorn("#video")
-   *     .linkedin({
-   *       type: "share",
-   *       url: "http://www.google.ca",
-   *       counter: "right",
-   *       target: "sharediv"
-   *       apikey: "ZOLRI2rzQS_oaXELpPF0aksxwFFEvoxAFZRLfHjaAhcGPfOX0Ds4snkJpWwKs8gk",
-   *       start: 1,
-   *       end: 3
-   *     })
-   *
-   * This plugin will be displayed between 1 and 3 seconds, inclusive, in the video. This will show how many people have "shared" Google via LinkedIn,
-   * with the number of people (counter) displayed to the right of the share plugin.
-   */
-  Popcorn.plugin( "linkedin", {
-    manifest: {
-      about: {
-        name: "Popcorn LinkedIn Plugin",
-        version: "0.1",
-        author: "Dan Ventura",
-        website: "dsventura.blogspot.com"
-      },
-      options: {
-        type: {
-          elem: "input",
-          type: "text",
-          label: "Type"
-        },
-        url: {
-          elem: "input",
-          type: "text",
-          label: "URL"
-        },
-        apikey: {
-          elem: "input",
-          type: "text",
-          label: "API Key"
-        },
-        counter: {
-          elem: "input",
-          type: "text",
-          label: "Counter"
-        },
-        memberid: {
-          elem: "input",
-          type: "text",
-          label: "Member ID",
-          optional: true
-        },
-        format: {
-          elem: "input",
-          type: "text",
-          label: "Format",
-          optional: true
-        },
-        companyid: {
-          elem: "input",
-          type: "text",
-          label: "Company ID",
-          optional: true
-        },
-        modules: {
-          elem: "input",
-          type: "text",
-          label: "Modules",
-          optional: true
-        },
-        productid: {
-          elem: "input",
-          type: "text",
-          label: "productid",
-          optional: true
-        },
-        related: {
-          elem: "input",
-          type: "text",
-          label: "related",
-          optional: true
-        },
-        start: {
-          elem: "input",
-          type: "text",
-          label: "In"
-        },
-        end: {
-          elem: "input",
-          type: "text",
-          label: "Out"
-        },
-
-        target: "linkedin-container"
-      }
-    },
-    _setup: function( options ) {
-
-      var apikey = options.apikey,
-          target = document.getElementById( options.target ),
-          script = document.createElement( "script" );
-
-      Popcorn.getScript( "//platform.linkedin.com/in.js" );
-
-      options._container = document.createElement( "div" );
-      options._container.appendChild( script );
-
-      if ( apikey ) {
-        script.innerHTML = "api_key: " + apikey;
-      }
-
-      options.type = options.type && options.type.toLowerCase() || "";
-
-      // Replace the LinkedIn plugin's error message to something more helpful
-      var errorMsg = function() {
-        options._container = document.createElement( "p" );
-        options._container.innerHTML = "Plugin requires a valid <a href='https://www.linkedin.com/secure/developer'>apikey</a>";
-        if ( !target && Popcorn.plugin.debug ) {
-          throw ( "target container doesn't exist" );
-        }
-        target && target.appendChild( options._container );
-      };
-
-      var setOptions = (function ( options ) {
-
-        return {
-          share: function () {
-
-            script.setAttribute( "type", "IN/Share" );
-
-            if ( options.counter ) {
-              script.setAttribute( "data-counter", options.counter );
-            }
-            if ( options.url ) {
-              script.setAttribute( "data-url", options.url );
-            }
-          },
-          memberprofile: function () {
-
-            script.setAttribute( "type", "IN/MemberProfile" );
-            script.setAttribute( "data-id", ( options.memberid ) );
-            script.setAttribute( "data-format", ( options.format || "inline" ) );
-
-            if ( options.text && options.format.toLowerCase() !== "inline" ) {
-              script.setAttribute( "data-text", options.text );
-            }
-          },
-          companyinsider: function () {
-
-            script.setAttribute( "type", "IN/CompanyInsider" );
-            script.setAttribute( "data-id", options.companyid );
-
-            if( options.modules ) {
-              options._container.setAttribute( "data-modules", options.modules );
-            }
-          },
-          companyprofile: function () {
-
-            script.setAttribute( "type", "IN/CompanyProfile" );
-            script.setAttribute( "data-id", ( options.companyid ) );
-            script.setAttribute( "data-format", ( options.format || "inline" ) );
-
-            if ( options.text && options.format.toLowerCase() !== "inline" ) {
-              script.setAttribute( "data-text", options.text );
-            }
-            if ( options.related !== undefined ) {
-              script.setAttribute( "data-related", options.related );
-            }
-          },
-          recommendproduct: function () {
-
-            script.setAttribute( "type", "IN/RecommendProduct" );
-            script.setAttribute( "data-company", ( options.companyid || "LinkedIn" ) );
-            script.setAttribute( "data-product", ( options.productid || "201714" ) );
-
-            if ( options.counter ) {
-              script.setAttribute( "data-counter", options.counter );
-            }
-          }
-        };
-      })( options );
-
-      if ( !apikey ) {
-        errorMsg();
-      } else {
-        setOptions[ options.type ] && setOptions[ options.type ]();
-      }
-
-      if ( !target && Popcorn.plugin.debug ) {
-        throw new Error( "target container doesn't exist" );
-      }
-      target && target.appendChild( options._container );
-
-      options._container.style.display = "none";
-    },
-    /**
-     * @member linkedin
-     * The start function will be executed when the currentTime
-     * of the video reaches the start time provided by the
-     * options variable
-     */
-    start: function( event, options ) {
-      options._container.style.display = "block";
-    },
-    /**
-     * @member linkedin
-     * The end function will be executed when the currentTime
-     * of the video reaches the end time provided by the
-     * options variable
-     */
-    end: function( event, options ) {
-      options._container.style.display = "none";
-    },
-    _teardown: function( options ) {
-      var tar = document.getElementById( options.target );
-      tar && tar.removeChild( options._container );
-    }
-  });
-})( Popcorn );
-// PLUGIN: lowerthird
-(function ( Popcorn ) {
-
-  /**
-   * Lower Third popcorn plug-in
-   * Displays information about a speaker over the video, or in the target div
-   * Options parameter will need a start, and end.
-   * Optional parameters are target, salutation, name and role.
-   * Start is the time that you want this plug-in to execute
-   * End is the time that you want this plug-in to stop executing
-   * Target is the id of the document element that the content is
-   *  appended to, this target element must exist on the DOM
-   * salutation is the speaker's Mr. Ms. Dr. etc.
-   * name is the speaker's name.
-   * role is information about the speaker, example Engineer.
-   *
-   * @param {Object} options
-   *
-   * Example:
-     var p = Popcorn('#video')
-        .lowerthird({
-          start:          5,                 // seconds, mandatory
-          end:            15,                // seconds, mandatory
-          salutation:     'Mr',              // optional
-          name:           'Scott Downe',     // optional
-          role:           'Programmer',      // optional
-          target:         'subtitlediv'      // optional
-        } )
-   *
-   */
-
-  Popcorn.plugin( "lowerthird", {
-
-      manifest: {
-        about:{
-          name: "Popcorn lowerthird Plugin",
-          version: "0.1",
-          author: "Scott Downe",
-          website: "http://scottdowne.wordpress.com/"
-        },
-        options:{
-          start: {
-            elem: "input",
-            type: "text",
-            label: "In"
-          },
-          end: {
-            elem: "input",
-            type: "text",
-            label: "Out"
-          },
-          target: "lowerthird-container",
-          salutation : {
-            elem: "input",
-            type: "text",
-            label: "Text",
-            "default": "hello",
-            optional: true
-          },
-          name: {
-            elem: "input",
-            type: "text",
-            label: "Text",
-            "default": "Popcorn.js"
-          },
-          role: {
-            elem: "input",
-            type: "text",
-            label: "Text",
-            "default": "JavaScript library",
-            optional: true
-          }
-        }
-      },
-
-      _setup: function( options ) {
-
-        var target = document.getElementById( options.target );
-
-        // Creates a div for all Lower Thirds to use
-        if ( !this.container ) {
-          this.container = document.createElement( "div" );
-
-          this.container.style.position = "absolute";
-          this.container.style.color = "white";
-          this.container.style.textShadow = "black 2px 2px 6px";
-          this.container.style.fontSize = "24px";
-          this.container.style.fontWeight = "bold";
-          this.container.style.paddingLeft = "40px";
-
-          // the video element must have height and width defined
-          this.container.style.width = this.video.offsetWidth + "px";
-          this.container.style.left = this.position().left + "px";
-
-          this.video.parentNode.appendChild( this.container );
-        }
-
-        // if a target is specified, use that
-        if ( options.target && options.target !== "lowerthird-container" ) {
-          options.container = document.createElement( "div" );
-          if ( !target && Popcorn.plugin.debug ) {
-            throw new Error( "target container doesn't exist" );
-          }
-          target && target.appendChild( options.container );
-        // use shared default container
-        } else {
-          options.container = this.container;
-        }
-
-      },
-      /**
-       * @member lowerthird
-       * The start function will be executed when the currentTime
-       * of the video reaches the start time provided by the
-       * options variable
-       */
-      start: function(event, options){
-        options.container.innerHTML = ( options.salutation ? options.salutation + " " : "" ) + options.name + ( options.role ? "<br />" + options.role : "" );
-        this.container.style.top = this.position().top + this.video.offsetHeight - ( 40 + this.container.offsetHeight ) + "px";
-      },
-      /**
-       * @member lowerthird
-       * The end function will be executed when the currentTime
-       * of the video reaches the end time provided by the
-       * options variable
-       */
-      end: function( event, options ) {
-        // Empty child nodes
-        while ( options.container.firstChild ) {
-          options.container.removeChild( options.container.firstChild );
-        }
-      }
-
-  });
-})( Popcorn );
 // PLUGIN: mediaspawner
 /**
   * mediaspawner Popcorn Plugin.
@@ -5808,12 +5139,12 @@ var googleCallback;
         target: "mediaspawner-container",
         start: {
           elem: "input",
-          type: "text",
+          type: "number",
           label: "Start"
         },
         end: {
           elem: "input",
-          type: "text",
+          type: "number",
           label: "End"
         },
         autoplay: {
@@ -5841,21 +5172,11 @@ var googleCallback;
       }
     },
     _setup: function( options ) {
-      var target = document.getElementById( options.target ),
+      var target = document.getElementById( options.target ) || {},
           mediaType,
           container,
           capContainer,
           regexResult;
-
-      // Check if mediaSource is passed and mediaType is NOT audio/video
-      if ( !options.source ) {
-        Popcorn.error( "Error. Source must be specified." );
-      }
-
-      // Check if target container exists
-      if ( !target ) {
-        Popcorn.error( "Target MediaSpawner container doesn't exist." );
-      }
 
       regexResult = urlRegex.exec( options.source );
       if ( regexResult ) {
@@ -5868,10 +5189,6 @@ var googleCallback;
       else {
         // if the regex didn't return anything we know it's an HTML5 source
         mediaType = "HTML5";
-      }
-
-      if ( mediaType === "vimeo" || mediaType === "soundcloud" ) {
-        Popcorn.error( "Vimeo and soundcloud are currently not supported by the MediaSpawner Plugin." );
       }
 
       // Store Reference to Type for use in end
@@ -6099,9 +5416,6 @@ var googleCallback;
         typeOfData = typeof options.data,
         target = document.getElementById( options.target );
 
-    if ( !target && Popcorn.plugin.debug ) {
-      throw new Error( "target container doesn't exist" );
-    }
     options.container = target || document.createElement( "div" );
 
     if ( typeOfTemplate === "function" ) {
@@ -6112,8 +5426,6 @@ var googleCallback;
       }
     } else if ( typeOfTemplate === "string" ) {
       template = options.template;
-    } else if ( Popcorn.plugin.debug ) {
-      throw new Error( "Mustache Plugin Error: options.template must be a String or a Function." );
     } else {
       template = "";
     }
@@ -6128,8 +5440,6 @@ var googleCallback;
       data = JSON.parse( options.data );
     } else if ( typeOfData === "object" ) {
       data = options.data;
-    } else if ( Popcorn.plugin.debug ) {
-      throw new Error( "Mustache Plugin Error: options.data must be a String, Object, or Function." );
     } else {
       data = "";
     }
@@ -6183,13 +5493,13 @@ var googleCallback;
     options: {
       start: {
         elem: "input",
-        type: "text",
-        label: "In"
+        type: "number",
+        label: "Start"
       },
       end: {
         elem: "input",
-        type: "text",
-        label: "Out"
+        type: "number",
+        label: "End"
       },
       target: "mustache-container",
       template: {
@@ -6282,10 +5592,6 @@ var googleCallback;
     newdiv.style.width = "100%";
     newdiv.style.height = "100%";
     i++;
-
-    if ( !target && Popcorn.plugin.debug ) {
-      throw new Error( "target container doesn't exist" );
-    }
 
     target && target.appendChild( newdiv );
 
@@ -6554,19 +5860,19 @@ var googleCallback;
     options:{
       start: {
         elem: "input",
-        type: "text",
-        label: "In"
+        type: "number",
+        label: "Start"
       },
       end: {
         elem: "input",
-        type: "text",
-        label: "Out"
+        type: "number",
+        label: "End"
       },
       target: "map-container",
       type: {
         elem: "select",
         options: [ "ROADMAP", "SATELLITE", "TERRAIN" ],
-        label: "Type",
+        label: "Map Type",
         optional: true
       },
       zoom: {
@@ -6631,345 +5937,6 @@ document.addEventListener( "click", function( event ) {
     });
   }
 }, false );
-/**
- * Processing Popcorn Plug-In
- *
- * This plugin adds a Processing.js sketch to be added to a target div or canvas.
- *
- * Options parameter needs to specify start, end, target and  sketch attributes
- * -Start is the time [in seconds] that you want the sketch to display and start looping.
- * -End is the time [in seconds] you want the sketch to become hidden and stop looping.
- * -Target is the id of the div or canvas you want the target sketch to be displayed in. ( a target that is a div will have a canvas created and placed inside of it. )
- * -Sketch specifies the filename of the Procesing code to be loaded into Processing.js
- * -noLoop [optional] specifies whether a sketch should continue to loop when the video is paused or seeking.
- *
- * @param {Object} options
- *
- * Example:
- var p = Popcorn( "#video" )
- .processing({
-   start: 5,
-   end: 10,
-   target: "processing-div",
-   sketch: "processingSketch.pjs",
-   noLoop: true
- });
- *
- */
-
-(function( Popcorn ) {
-
-  Popcorn.plugin( "processing", function( options ) {
-
-    var init = function( context ) {
-
-      function scriptReady( options ) {
-        var addListeners = function() {
-          context.listen( "pause", function() {
-            if ( options.canvas.style.display === "inline" ) {
-              options.pjsInstance.noLoop();
-            }
-          });
-          context.listen( "play", function() {
-            if ( options.canvas.style.display === "inline" ) {
-              options.pjsInstance.loop();
-            }
-          });
-        };
-
-        if ( options.sketch ) {
-
-          Popcorn.xhr({
-            url: options.sketch,
-            dataType: "text",
-            success: function( responseCode ) {
-
-              options.codeReady = false;
-
-              var s = Processing.compile( responseCode );
-              options.pjsInstance = new Processing( options.canvas, s );
-              options.seeking = false;
-              ( options._running && !context.media.paused && options.pjsInstance.loop() ) || options.pjsInstance.noLoop();
-
-              context.listen( "seeking", function() {
-                 options._running && options.canvas.style.display === "inline" && options.noPause && options.pjsInstance.loop();
-              });
-
-              options.noPause = options.noPause || false;
-              !options.noPause && addListeners();
-              options.codeReady = true;
-            }
-          });
-        } else if ( Popcorn.plugin.debug ) {
-
-          throw new Error( "Popcorn.Processing: options.sketch is undefined" );
-        }
-      }
-
-      if ( !window.Processing ) {
-        Popcorn.getScript( "//cloud.github.com/downloads/processing-js/processing-js/processing-1.3.6.min.js", function() {
-          scriptReady( options );
-        });
-      } else {
-        scriptReady( options );
-      }
-
-    };
-
-    return {
-
-      _setup: function( options ) {
-
-        options.codeReady = false;
-
-        options.parentTarget = document.getElementById( options.target );
-
-        if ( !options.parentTarget && Popcorn.plugin.debug ) {
-          throw new Error( "target container doesn't exist" );
-        }
-
-        var canvas = document.createElement( "canvas" );
-        canvas.id = Popcorn.guid( options.target + "-sketch" );
-        canvas.style.display = "none";
-        options.canvas = canvas;
-
-        options.parentTarget && options.parentTarget.appendChild( options.canvas );
-
-        init( this );
-      },
-
-      start: function( event, options ) {
-
-        options.codeReady && !this.media.paused && options.pjsInstance.loop();
-        options.canvas.style.display = "inline";
-
-      },
-
-      end: function( event, options ) {
-
-        options.pjsInstance && options.pjsInstance.noLoop();
-        options.canvas.style.display = "none";
-      },
-
-      _teardown: function( options ) {
-        options.pjsInstance && options.pjsInstance.exit();
-        options.parentTarget && options.parentTarget.removeChild( options.canvas );
-      }
-    };
-  },
-  {
-    about: {
-      name: "Popcorn Processing Plugin",
-      version: "0.1",
-      author: "Christopher De Cairos, Benjamin Chalovich",
-      website: "cadecairos.blogspot.com, ben1amin.wordpress.org"
-    },
-    options: {
-      start: {
-        elem: "input",
-        type: "text",
-        label: "In"
-      },
-      end: {
-        elem: "input",
-        type: "text",
-        label: "Out"
-      },
-      target: {
-        elem: "input",
-        type: "text",
-        label: "Target"
-      },
-      sketch: {
-        elem: "input",
-        type: "url",
-        label: "Sketch"
-      },
-      noPause: {
-        elem: "input",
-        type: "checkbox",
-        label: "No Loop",
-        "default": false
-      }
-    }
-  });
-}( Popcorn ));
-// Rdio Plug-in
-/**
-  * Rdio popcorn plug-in
-  * Appends Rdio album track listings to an element on the page.
-  * Can also append a user's playlist to an element on the page.
-  * Option paramter can be in two forms:
-  * Options parameter will take a start, end, target, artist, album, and type or
-  * Options parameter will take a start, end, target, person, id, playlist, and type
-  * Start is the time that you want this plug-in to execute
-  * End is the time that you want this plug-in to stop executing
-  * Target is the id of the document element that the images are appended to
-  * Artist is the name of who's album image will display
-  * Album is the album that will display of the specified Artist
-  * Person is the Rdio member who's playlist will display
-  * ID is the playlist's unqiue Rdio playlist identifier
-  * Playlist is the name of the playlist
-  * Type specifies if the element is an album or playlist
-  *
-
-  *
-  * @param {Object} options
-  *
-  * Example 1:
-  var p = Popcorn( "#video" )
-  .rdio({
-    start: 2,
-    end: 10,
-    target: "rdiodiv",
-    artist: "Jamiroquai",
-    album: "Synkronized",
-    type: "album"
-  })
-  *
-  * Example 2:
-  var p = Popcorn( "#video" )
-  .rdio({
-    start: 10,
-    end: 20,
-    target: "rdiodiv",
-    person: "diggywiggy",
-    id: 413517,
-    playlist: "sunday",
-    type: "playlist"
-  })
-**/
-
-(function( Popcorn ) {
-  var _album = {},
-  _container = {},
-  _target = {},
-  _rdioURL = "http://www.rdio.com/api/oembed/?format=json&url=http://www.rdio.com/%23";
-
-  Popcorn.plugin( "rdio", (function( options ) {
-    var _loadResults = function( data, options ) {
-      var title = data.title,
-      html = data.html;
-      if ( data && title && html ) {
-        _album[ options.containerid ].htmlString = "<div>" + html + "</div>";
-      } else {
-        if ( Popcorn.plugin.debug ) {
-          throw new Error( "Did not receive data from server." );
-        }
-      }
-    },
-
-    // Handle AJAX Request
-    _getResults = function( options ) {
-      var urlBuilder = function( type ) {
-        var path = {
-          playlist: function() {
-            return "/people/" + ( options.person ) + "/playlists/" + options.id + "/";
-          },
-          album: function() {
-            return "/artist/" + ( options.artist ) + "/album/";
-          }
-        }[ type ]();
-
-        return _rdioURL + path + options[ type ] + "/&callback=_loadResults";
-      },
-      url = urlBuilder( options.type );
-      Popcorn.getJSONP( url, function( data ) {
-        _loadResults( data, options );
-      }, false );
-    };
-
-    return {
-      _setup: function( options ) {
-        var key = options.containerid = Popcorn.guid(),
-        container = _container[ key ] = document.createElement( "div" ),
-        target = _target[ key ] = document.getElementById( options.target );
-        if ( !target && Popcorn.plugin.debug ) {
-          throw new Error( "Target container could not be found." );
-        }
-        container.style.display = "none";
-        container.innerHTML = "";
-        target.appendChild( container );
-        _album[ key ] = {
-          htmlString: ( options.playlist || "Unknown Source" ) || ( options.album || "Unknown Source" )
-        };
-        _getResults( options );
-      },
-      start: function( event, options ) {
-        var key = options.containerid,
-        container = _container[ key ];
-        container.innerHTML = _album[ key ].htmlString;
-        container.style.display = "inline";
-      },
-      end: function( event, options ) {
-        container = _container[ options.containerid ];
-        container.style.display = "none";
-        container.innerHTML = "";
-      },
-      _teardown: function( options ) {
-        var key = options.containerid,
-        target = _target[ key ];
-        if ( _album[ key ] ) {
-          delete _album[ key ];
-        }
-        target && target.removeChild( _container[ key ] );
-        delete _target[ key ];
-        delete _container[ key ];
-      }
-    };
-  })(),
-  {
-    about: {
-      name: "Popcorn Rdio Plugin",
-      version: "0.1",
-      author: "Denise Rigato"
-    },
-    options: {
-      start: {
-        elem: "input",
-        type: "text",
-        label: "In"
-      },
-      end: {
-        elem: "input",
-        type: "text",
-        label: "Out"
-      },
-      target: "rdio",
-      artist: {
-        elem: "input",
-        type: "text",
-        label: "Artist",
-        "default": "The Beatles"
-      },
-      album: {
-        elem: "input",
-        type: "text",
-        label: "Album"
-      },
-      person: {
-        elem: "input",
-        type: "text",
-        label: "Person"
-      },
-      id: {
-        elem: "input",
-        type: "text",
-        label: "Id"
-      },
-      playlist: {
-        elem: "input",
-        type: "text",
-        label: "Playlist"
-      },
-      type: {
-        elem: "select",
-        options: [ "album", "playlist" ],
-        label: "Type"
-      }
-    }
-  });
-}( Popcorn ));
 // PLUGIN: Subtitle
 
 (function ( Popcorn ) {
@@ -7043,12 +6010,12 @@ document.addEventListener( "click", function( event ) {
           start: {
             elem: "input",
             type: "text",
-            label: "In"
+            label: "Start"
           },
           end: {
             elem: "input",
             type: "text",
-            label: "Out"
+            label: "End"
           },
           target: "subtitle-container",
           text: {
@@ -7110,145 +6077,6 @@ document.addEventListener( "click", function( event ) {
         options.container.removeChild( options.innerContainer );
       }
 
-  });
-
-})( Popcorn );
-// PLUGIN: tagthisperson
-
-(function ( Popcorn ) {
-
-  var peopleArray = [];
-  // one People object per options.target
-  var People = function() {
-    this.name = "";
-    this.contains = { };
-    this.toString = function() {
-      var r = [];
-      for ( var j in this.contains ) {
-        if ( this.contains.hasOwnProperty( j ) ) {
-          r.push( " " + this.contains[ j ] );
-        }
-      }
-      return r.toString();
-    };
-  };
-
-  /**
-   * tagthisperson popcorn plug-in
-   * Adds people's names to an element on the page.
-   * Options parameter will need a start, end, target, image and person.
-   * Start is the time that you want this plug-in to execute
-   * End is the time that you want this plug-in to stop executing
-   * Person is the name of the person who you want to tag
-   * Image is the url to the image of the person - optional
-   * href is the url to the webpage of the person - optional
-   * Target is the id of the document element that the text needs to be
-   * attached to, this target element must exist on the DOM
-   *
-   * @param {Object} options
-   *
-   * Example:
-     var p = Popcorn('#video')
-        .tagthisperson({
-          start: 5, // seconds
-          end: 15, // seconds
-          person: '@annasob',
-          image:  'http://newshour.s3.amazonaws.com/photos%2Fspeeches%2Fguests%2FRichardNSmith_thumbnail.jpg',
-          href:   'http://annasob.wordpress.com',
-          target: 'tagdiv'
-        } )
-   *
-   */
-  Popcorn.plugin( "tagthisperson" , ( function() {
-
-    return {
-
-      _setup: function( options ) {
-        var exists = false,
-            target = document.getElementById( options.target );
-
-        if ( !target && Popcorn.plugin.debug ) {
-          throw new Error( "target container doesn't exist" );
-        }
-
-        // loop through the existing objects to ensure no duplicates
-        // the idea here is to have one object per unique options.target
-        for ( var i = 0; i < peopleArray.length; i++ ) {
-          if ( peopleArray[ i ].name === options.target ) {
-            options._p = peopleArray[ i ];
-            exists = true;
-            break;
-          }
-        }
-        if ( !exists ) {
-          options._p = new People();
-          options._p.name = options.target;
-          peopleArray.push( options._p );
-        }
-      },
-      /**
-       * @member tagthisperson
-       * The start function will be executed when the currentTime
-       * of the video  reaches the start time provided by the
-       * options variable
-       */
-      start: function( event, options ){
-        options._p.contains[ options.person ] = ( options.image ) ? "<img src='" + options.image + "'/> " : "" ;
-        options._p.contains[ options.person ] += ( options.href ) ? "<a href='" + options.href + "' target='_blank'> " + options.person + "</a>" : options.person ;
-
-        document.getElementById( options.target ).innerHTML = options._p.toString();
-      },
-      /**
-       * @member tagthisperson
-       * The end function will be executed when the currentTime
-       * of the video  reaches the end time provided by the
-       * options variable
-       */
-      end: function( event, options ){
-        delete options._p.contains[ options.person ];
-
-        document.getElementById( options.target ).innerHTML = options._p.toString();
-      }
-   };
-  })(),
-  {
-    about:{
-      name: "Popcorn tagthisperson Plugin",
-      version: "0.1",
-      author: "@annasob",
-      website: "annasob.wordpress.com"
-    },
-    options:{
-      start: {
-        elem: "input",
-        type: "text",
-        label: "In"
-      },
-      end: {
-        elem: "input",
-        type: "text",
-        label: "Out"
-      },
-      target : "tagthisperson-container",
-      person: {
-        elem: "input",
-        type: "text",
-        label: "Name",
-        "default": "Popcorn.js"
-      },
-      image: {
-        elem: "input",
-        type: "url",
-        label: "Image Src",
-        optional: true
-      },
-      href: {
-        elem: "input",
-        type: "url",
-        label: "URL",
-        optional: true
-      }
-    }
   });
 
 })( Popcorn );
@@ -7383,13 +6211,13 @@ document.addEventListener( "click", function( event ) {
       options: {
         start: {
           elem: "input",
-          type: "text",
-          label: "In"
+          type: "number",
+          label: "Start"
         },
         end: {
           elem: "input",
-          type: "text",
-          label: "Out"
+          type: "number",
+          label: "End"
         },
         text: {
           elem: "input",
@@ -7547,8 +6375,6 @@ document.addEventListener( "click", function( event ) {
         container.appendChild( contentDiv );
       }
 
-    } else if ( Popcorn.plugin.debug ) {
-      throw new Error( "target container doesn't exist" );
     }
 
     i++;
@@ -7591,461 +6417,41 @@ document.addEventListener( "click", function( event ) {
     options: {
       start: {
         elem: "input",
-        type: "text",
-        label: "In"
+        type: "number",
+        label: "Start"
       },
       end: {
         elem: "input",
-        type: "text",
-        label: "Out"
+        type: "number",
+        label: "End"
       },
       target: "feed-container",
       title: {
         elem: "input",
         type: "text",
-        label: "title"
+        label: "Title"
       },
       text: {
         elem: "input",
         type: "text",
-        label: "text"
+        label: "Text"
       },
       innerHTML: {
         elem: "input",
         type: "text",
-        label: "innerHTML",
+        label: "HTML Code",
         optional: true
       },
       direction: {
         elem: "select",
         options: [ "DOWN", "UP" ],
-        label: "direction",
+        label: "Direction",
         optional: true
       }
     }
   });
 
 })( Popcorn );
-// PLUGIN: Tumblr
-
-(function( Popcorn, global ) {
-
-  /**
-  * Tumblr Popcorn Plugin.
-  * Adds elements to the page from selected blog.
-  * Start is the time that you want this plug-in to execute
-  * End is the time that you want this plug-in to stop executing
-  * ApiKey is the API key registered with Tumblr for use with their API.
-  *  The ApiKey is required for Blog Info and to retrieve published blog
-  *  posts.
-  *
-  * Test tumblr site is here: http://tumblrplugin.tumblr.com/
-  *
-  * @param {Object} options
-  *
-  * Example:
-    var p = Popcorn('#video')
-      .tumblr({
-        start: 5,                     // seconds, mandatory
-        end: 15,                      // seconds, mandatory
-        requestType: 'blogpost',      // mandatory
-        target: 'tumblrBlogInfodiv',  // mandatory
-        base_hostname: "john.io",     // mandatory
-        blogId: 123456789,            // Mandatory if requestType is 'blogpost'
-        api_key: ew29j2o1mw91m1wom1s9 // Mandatory is requestType is 'blogpost' or 'info'
-      } )
-  *
-  */
-
-  var processBlogPost = {
-    text: function( options ) {
-      var post = options.post,
-          link = document.createElement( "a" ),
-          linkText = document.createTextNode( post.title ),
-          linkDiv = document.createElement( "div" );
-
-      link.setAttribute( "href", post.post_url );
-      link.appendChild( linkText );
-      linkDiv.appendChild( link );
-      linkDiv.innerHTML += post.body;
-      options._container.appendChild( linkDiv );
-
-    },
-    photo: function( options ) {
-      var width = options.width || 250, defaultSizeIndex = -1,
-          picCaptions = [ options.post.photos.length ],
-          picURIs = [ options.post.photos.length ],
-          picDiv = document.createElement( "div" ),
-          pic = document.createElement( "img" ),
-          post = options.post;
-
-      // Finds the correct photo based on specified size, saves URI and Caption]
-      for ( var i = 0, len = post.photos.length; i < len; i++ ) {
-        // Store the current photo object being accessed
-        var photo = post.photos[ i ],
-            photoSizes = photo.alt_sizes;
-
-        for ( var k = 0, len2 = photoSizes.length; k < len2; k++ ) {
-          // Store the current alt_sizes object being accessed
-          var size = photoSizes[ k ];
-
-          // See If users desired photo size is in returned JSON
-          if ( size.width === width ) {
-            picURIs[ i ] = size.url;
-            picCaptions[ i ] = photo.caption;
-            defaultSizeIndex = 0;
-            break;
-          } else {
-            // Our default size is going to be 250
-            if( size.width === 250 ){
-              defaultSizeIndex = k;
-            }
-          }
-        }
-
-        // Current means of handling if alt_sizes doesn't have our default image size
-        defaultSizeIndex === -1 && Popcorn.error( "Clearly your blog has a picture that is so tiny it isn't even 250px wide. Consider " + 
-          " using a bigger picture or try a smaller size." );
-
-        // If a matching photo is never found, use the default size.
-        if ( k === photoSizes.length ) {
-          picURIs[ i ] = photoSizes[ defaultSizeIndex ].url;
-        }
-      }
-
-      // Finally, all the potential setup is done. Below is the actual code putting everything in our div element
-      for ( var m = 0, len3 = picURIs.length; m < len3; m++ ) {
-        picDiv.innerHTML += picCaptions[ m ] + "<br/>";
-        pic.setAttribute( "src", picURIs[ m ] );
-        pic.setAttribute( "alt", "Pic" + m );
-        picDiv.appendChild( pic );
-        picDiv.innerHTML += "<br/>";
-      }
-      picDiv.innerHTML += "<br/>" + post.caption;
-      options._container.appendChild( picDiv );
-    },
-    audio: function( options ) {
-      var artistDiv = document.createElement( "div" ),
-          artistLink = document.createElement( "a" ),
-          post = options.post;
-      // Artist/Track info is not always returned so checking first.
-      // Truth be told I have no idea if this will ever be returned. Their API specified it as responses but no
-      // matter how much I tried myself to replicate it in a test I couldn't ever get a response that included
-      // this info.
-      if ( !post.artist ) {
-        var artistText = document.createTextNode( post.source_title );
-
-        artistLink.setAttribute( "href", post.source_url );
-        artistLink.appendChild( artistText );
-        artistDiv.appendChild( artistLink );
-        artistDiv.innerHTML += "<br/>";
-      } else {
-        var artistImage = document.createElement( "img" );
-
-        artistDiv.innerHTML += "Artist: " + post.artist + "<br/>";
-        artistLink.setAttribute( "href", post.source_url );
-
-        // Construct Image
-        artistImage.setAttribute( "src", post.album_art );
-        artistImage.setAttribute( "alt", post.album );
-
-        // Set Image for link, append to div
-        artistLink.appendChild( artistImage );
-        artistDiv.appendChild( artistLink );
-
-        // Construct rest of plain old text
-        artistDiv.innerHTML += "<hr/>" + post.track_number + " - " + post.track_name + "<br/>";
-      }
-      // Obviously the player itself is something that will be displayed either way so it is included outside the check
-      artistDiv.innerHTML += post.player + "   " + post.plays + "plays<br/>" + post.caption;
-      options._container.appendChild( artistDiv );
-    },
-    video: function( options ) {
-      var width = options.width || 400,
-          defaultSizeIndex = -1,
-          post = options.post,
-          videoDiv = document.createElement( "div" ),
-          videoCode;
-
-      for ( var i = 0, len = post.player.length; i < len; i++ ) {
-      // First try to see if the current index matches the specified width
-      // If it doesn't, check if it equals our default width incase user didn't
-      // ever specify a width or if their width is never found.
-
-        // Store current player object being accessed
-        var video = post.player[ i ];
-
-        if ( video.width === width ) {
-          videoCode = video.embed_code;
-          defaultSizeIndex = 0;
-          break;
-        } else {
-          if( video.width === 400 ) {
-            defaultSizeIndex = i;
-          }
-        }
-      }
-
-      // If specified width never found, use default
-      if ( i === options.post.player.length ) {
-        videoCode = post.player[ defaultSizeIndex ].embed_code;
-      }
-
-      // Will run if user's size is never found and our default is never found
-      defaultSizeIndex === -1 && Popcorn.error( "Specified video size was not found and default was never found. Please try another width." );
-
-      // Finally build the html for the div element
-      videoDiv.innerHTML += videoCode + "<br/>" + post.caption;
-      options._container.appendChild( videoDiv );
-    },
-    chat: function( options ) {
-      var post = options.post,
-          dialogue,
-          chatDiv = document.createElement( "div" );
-
-      // Brainstorm up ideas how to make each dialogue object to appear up "better" rather than just all be there at once
-      chatDiv.innerHTML += "<strong><u>" + post.title + "</u></strong><br/><br/>";
-
-      for ( var i = 0, len = post.dialogue.length; i < len; i++ ) {
-        dialogue = post.dialogue[ i ];
-        chatDiv.innerHTML += dialogue.label + " " + dialogue.phrase + "<br/>";
-      }
-
-      // Append it to the parent container
-      options._container.appendChild( chatDiv );
-    },
-    quote: function( options ) {
-      var quoteDiv = document.createElement( "div" ),
-          quoteLink = document.createElement( "a" ),
-          post = options.post,
-          quoteLinkText = document.createTextNode( post.text );
-
-      // Quotes don't come with a title, so for a link to the post I'm going to use the blogname
-      quoteLink.setAttribute( "href", post.post_url );
-      quoteLink.appendChild( quoteLinkText );
-
-      // Append link, finish adding in plain text
-      quoteDiv.appendChild( quoteLink );
-      quoteDiv.innerHTML += "<br/><br/>Source: <b>" + post.source + "</b>";
-
-      // Append div to parent container
-      options._container.appendChild( quoteDiv );
-    },
-    link: function( options ) {
-      var linkDiv = document.createElement( "div" ),
-          link = document.createElement( "a" ),
-          post = options.post,
-          linkText = document.createTextNode( post.title );
-
-      // Using the blog title as a link to it
-      link.setAttribute( "href", post.post_url );
-      link.appendChild( linkText );
-      linkDiv.appendChild( link );
-      linkDiv.innerHTML += "<br/>" + post.description;
-
-      // Append to parent container
-      options._container.appendChild( linkDiv );
-    },
-    answer: function( options ) {
-      var answerDiv = document.createElement( "div" ),
-          link = document.createElement( "a" ),
-          post = options.post,
-          linkText = document.createTextNode( post.asking_name );
-
-      answerDiv.innerHTML = "Inquirer: ";
-      link.setAttribute( "href", post.asking_url );
-      link.appendChild( linkText );
-      answerDiv.appendChild( link );
-      answerDiv.innerHTML += "<br/><br/>Question: " + post.question + "<br/>Answer: " + post.answer;
-
-      // Append to parent container
-      options._container.appendChild( answerDiv );
-    }
-  };
-
-  Popcorn.plugin( "tumblr" , {
-    manifest: {
-      about: {
-        name: "Popcorn Tumblr Plugin",
-        version: "0.1",
-        author: "Matthew Schranz, @mjschranz",
-        website: "mschranz.wordpress.com"
-      },
-      options: {
-        requestType: {
-          elem: "select",
-          options:[ "INFO", "AVATAR", "BLOGPOST" ],
-          label: "Type_Of_Plugin"
-        },
-        target: "tumblr-container",
-        start: {
-          elem: "input",
-          type: "text",
-          label: "Start_Time"
-        },
-        end: {
-          elem: "input",
-          type: "text",
-          label: "End_Time"
-        },
-        base_hostname: {
-          elem: "input",
-          type: "text",
-          label: "User_Name",
-          "default": "https://citriccomics.tumblr.com"
-        },
-        // optional parameters:
-        api_key: { // Required for Blog Info and Blog Post retrievals
-          elem: "input",
-          type: "text",
-          label: "Application_Key",
-          optional: true
-        },
-        size: {
-          elem: "select",
-          options: [ 16, 24, 30, 40, 48, 64, 96, 128, 512 ],
-          label: "avatarSize",
-          optional: true
-        },
-        blogId: { // Required for BLOGPOST requests
-          elem: "input",
-          type: "number",
-          label: "Blog_ID",
-          optional: true
-        },
-        /* Optional for Photo and Video BlogPosts, defaulted to 250 pixels for photos and 400 for videos if not provided or provided width
-        * is not found in their arrays. If multiple videos or photos are in the blogpost then it will use this same size for all of them unless
-        * it is not found, which it will then use the default. If default is not present an error will be thrown.
-        */
-        width: {
-          elem: "input",
-          type: "number",
-          label: "Photo_Width",
-          optional: true
-        }
-      }
-    },
-    _setup: function( options ) {
-      var target = document.getElementById( options.target ),
-          requestString,
-          uri,
-          blogHTTPHeader,
-          uriNoHeader,
-          uriFinal,
-          type,
-          that = this;
-
-      // Valid types of retrieval requests
-      var validType = function( type ) {
-        return ( [ "info", "avatar", "blogpost" ].indexOf( type ) > -1 );
-      };
-
-      // Lowercase the types incase user enters it in another way
-      options.requestType = options.requestType.toLowerCase();
-
-      // Check if blog url ( base_hostname ) is blank and api_key is included on info and blogpost requestType
-      ( !options.base_hostname || ( !options.api_key && ( options.requestType === "info" || options.requestType === "blogpost" ) ) ) &&
-        Popcorn.error( "Must provide a blog URL to the plugin and an api_key for Blog Info and Blog Post requests." );
-
-      // Check Request Type
-      !validType( options.requestType ) && Popcorn.error( "Invalid tumblr plugin type." );
-
-      // Check if a blogID is supplied
-      ( options.requestType === "blogpost" && options.blogId === undefined ) && Popcorn.error( "Error. BlogId required for blogpost requests" );
-
-      // Check if target container exists
-      ( !target && Popcorn.plugin.debug ) && Popcorn.error( "Target Tumblr container doesn't exist." );
-
-      // Checks if user included any http header in the url and removes it if that's the case as request don't work with it
-      uri = options.base_hostname.slice( ( options.base_hostname.indexOf( "/" ) + 2 ), options.base_hostname.length );
-      blogHTTPHeader = options.base_hostname.slice( 0, ( options.base_hostname.indexOf( "/" ) + 2 ) );
-      uriNoHeader = blogHTTPHeader === "http://" || blogHTTPHeader === "https://" ? uri : options.base_hostname;
-      if ( uriNoHeader.indexOf( "/" ) > -1 ){
-        uriNoHeader = uriNoHeader.slice( 0, uriNoHeader.indexOf( "/" ) );
-      }
-      options.base_hostname = uriNoHeader;
-
-      // Create seperate container for plugin
-      options._container = document.createElement( "div" );
-      options._container.id = "tumblrdiv-" + Popcorn.guid();
-
-      if ( options.requestType === "avatar" ) {
-        options._container.innerHTML = "<img src=" + 'http://api.tumblr.com/v2/blog/' + options.base_hostname + '/avatar/' + options.size + " alt='BlogAvatar' />";
-      } else {
-        // Construct type based if it's a blogpost or blog info as request string differs
-        if ( options.requestType === "blogpost" ) {
-          type = "posts";
-        } else {
-          type = "info";
-        }
-        requestString = "http://api.tumblr.com/v2/blog/" + options.base_hostname + "/" + type + "?api_key=" + options.api_key + "&id=" + options.blogId + 
-          "&jsonp=tumblrCallBack";
-        
-        this.listen( "tumblrError", function( e ){
-          Popcorn.error( e );
-        });
-
-        Popcorn.getJSONP( requestString, function( data ) {
-          if ( data.meta.msg === "OK" ) {
-            var commonDiv = document.createElement( "div" );
-            if ( options.requestType === "blogpost" ) {
-              options.post = data.response.posts[ 0 ];
-              var blogType = options.post.type,
-                  post = options.post,
-                  tags = post.tags;
-
-              // date is a response type common to all blogposts so it's in here to prevent duplicated code
-              commonDiv.innerHTML = "Date Published: " + options.post.date.slice( 0, options.post.date.indexOf( " " ) ) + "<br/>";
-              // Check if tags were used for the post, append them to commonDiv
-              if ( tags.length !== 0 ) {
-                commonDiv.innerHTML += "Tags: " + tags[ 0 ];
-                for ( var i = 1, len = tags.length; i < len; i++ ) {
-                  commonDiv.innerHTML += ", " + tags[ i ];
-                }
-              } else {
-                commonDiv.innerHTML += "Tags: No Tags Used";
-              }
-              // commonDiv is appended at two points because of the difference in how the information
-              // is constructed between blogposts and bloginfo
-              options._container.appendChild( commonDiv );
-
-              // Processes information and forms an information div based on what the blog type is
-              processBlogPost[ blogType ]( options );
-            } else {
-              // Blog Info Requests
-              var link = document.createElement( "a" ),
-                  blogInfo = data.response.blog,
-                  linkText = document.createTextNode( blogInfo.title );
-
-              link.setAttribute( "href", blogInfo.url );
-              link.appendChild( linkText );
-              commonDiv.appendChild( link );
-              commonDiv.innerHTML += blogInfo.description;
-              options._container.appendChild( commonDiv );
-            }
-          } else {
-            that.trigger( "tumblrError", "Error. Request failed. Status code: " + data.meta.status + " - Message: " + data.meta.msg );
-          }
-        }, false );
-      }
-      options._container.style.display = "none";
-      target && target.appendChild( options._container );
-    },
-    start: function( event, options ){
-      if ( options._container ) {
-        options._container.style.display = "";
-      }
-    },
-    end: function( event, options ){
-      if( options._container ) {
-        options._container.style.display = "none";
-      }
-    },
-    _teardown: function( options ){
-      document.getElementById( options.target ) && document.getElementById( options.target ).removeChild( options._container );
-    }
-  });
-})( Popcorn, this );
 // PLUGIN: TWITTER
 
 (function ( Popcorn ) {
@@ -8091,18 +6497,18 @@ document.addEventListener( "click", function( event ) {
         options:{
           start: {
             elem: "input",
-            type: "text",
-            label: "In"
+            type: "number",
+            label: "Start"
           },
           end: {
             elem: "input",
-            type: "text",
-            label: "Out"
+            type: "number",
+            label: "End"
           },
           src: {
             elem: "input",
             type: "text",
-            label: "Source",
+            label: "Tweet Source (# or @)",
             "default": "@popcornjs"
           },
           target: "twitter-container",
@@ -8139,9 +6545,6 @@ document.addEventListener( "click", function( event ) {
         // display none by default
         options.container.style.display = "none";
 
-        if ( !target && Popcorn.plugin.debug ) {
-          throw new Error( "target container doesn't exist" );
-        }
          // add the widget's div to the target div
         target && target.appendChild( options.container );
 
@@ -8280,18 +6683,18 @@ document.addEventListener( "click", function( event ) {
         },
         start: {
           elem: "input",
-          type: "text",
-          label: "In"
+          type: "number",
+          label: "Start"
         },
         end: {
           elem: "input",
-          type: "text",
-          label: "Out"
+          type: "number",
+          label: "End"
         },
         src: {
           elem: "input",
           type: "url",
-          label: "Src",
+          label: "Webpage URL",
           "default": "http://mozillapopcorn.org"
         },
         target: "iframe-container"
@@ -8311,10 +6714,6 @@ document.addEventListener( "click", function( event ) {
       options._iframe.id = options.id;
       options._iframe.src = options.src;
       options._iframe.style.display = "none";
-
-      if ( !target && Popcorn.plugin.debug ) {
-        throw new Error( "target container doesn't exist" );
-      }
 
       // add the hidden iframe to the DOM
       target && target.appendChild( options._iframe );
@@ -8392,13 +6791,13 @@ var wikiCallback;
       options:{
         start: {
           elem: "input",
-          type: "text",
-          label: "In"
+          type: "number",
+          label: "Start"
         },
         end: {
           elem: "input",
-          type: "text",
-          label: "Out"
+          type: "number",
+          label: "End"
         },
         lang: {
           elem: "input",
@@ -8410,7 +6809,7 @@ var wikiCallback;
         src: {
           elem: "input", 
           type: "url", 
-          label: "Src",
+          label: "Wikipedia URL",
           "default": "http://en.wikipedia.org/wiki/Cat"
         },
         title: {
@@ -8422,8 +6821,8 @@ var wikiCallback;
         },
         numberofwords: {
           elem: "input",
-          type: "text",
-          label: "Num Of Words",
+          type: "number",
+          label: "Number of Words",
           "default": "200",
           optional: true
         },
@@ -8479,8 +6878,6 @@ var wikiCallback;
       if ( options.src ) {
         Popcorn.getScript( "//" + options.lang + ".wikipedia.org/w/api.php?action=parse&props=text&redirects&page=" +
           options.src.slice( options.src.lastIndexOf( "/" ) + 1 )  + "&format=json&callback=wikiCallback" + _guid );
-      } else if ( Popcorn.plugin.debug ) {
-        throw new Error( "Wikipedia plugin needs a 'src'" );
       }
 
     },
@@ -8611,13 +7008,13 @@ var wikiCallback;
         options: {
           start: {
             elem: "input",
-            type: "text",
-            label: "In"
+            type: "number",
+            label: "Start"
           },
           end: {
             elem: "input",
-            type: "text",
-            label: "Out"
+            type: "number",
+            label: "End"
           },
           target: "wordriver-container",
           text: {
@@ -8637,10 +7034,6 @@ var wikiCallback;
       },
 
       _setup: function( options ) {
-
-        if ( !document.getElementById( options.target ) && Popcorn.plugin.debug ) {
-          throw new Error( "target container doesn't exist" );
-        }
 
         options._duration = options.end - options.start;
         options._container = container[ options.target ] || setupContainer( options.target );
@@ -9222,7 +7615,7 @@ var wikiCallback;
     var sub = {};
 
     // Trim left and right whitespace from text and convert non-explicit line breaks
-    sub.text = node.textContent.replace( rWhitespace, "" ).replace( rLineBreak, "<br />" );
+    sub.text = ( node.textContent || node.text ).replace( rWhitespace, "" ).replace( rLineBreak, "<br />" );
     sub.id = node.getAttribute( "xml:id" ) || node.getAttribute( "id" );
     sub.start = toSeconds ( node.getAttribute( "begin" ), timeOffset );
     sub.end = toSeconds( node.getAttribute( "end" ), timeOffset );
@@ -9543,7 +7936,8 @@ var wikiCallback;
       for ( var i = 0, nal = nodeAttributes.length; i < nal; i++ ) {
 
         var key  = nodeAttributes.item(i).nodeName,
-            data = nodeAttributes.item(i).nodeValue;
+            data = nodeAttributes.item(i).nodeValue,
+            manifestItem = manifestData[ data ];
 
         // converts in into start
         if (key === "in") {
@@ -9553,7 +7947,13 @@ var wikiCallback;
           returnObject.end = toSeconds( data );
         // this is where ids in the manifest are linked
         } else if ( key === "resourceid" ) {
-          Popcorn.extend( returnObject, manifestData[data] );
+          for ( var item in manifestItem ) {
+            if ( manifestItem.hasOwnProperty( item ) ) {
+              if ( !returnObject[ item ] && item !== "id" ) {
+                returnObject[ item ] = manifestItem[ item ];
+              }
+            }
+          }
         // everything else
         } else {
           returnObject[key] = data;
@@ -9574,7 +7974,7 @@ var wikiCallback;
     // recursive function to process a node, or process the next child node
     var parseNode = function ( node, allAttributes, manifest ) {
       var attributes = {};
-      Popcorn.extend( attributes, allAttributes, objectifyAttributes( node.attributes ), { text: node.textContent } );
+      Popcorn.extend( attributes, allAttributes, objectifyAttributes( node.attributes ), { text: node.textContent || node.text } );
 
       var childNodes = node.childNodes;
 
@@ -9864,642 +8264,839 @@ var wikiCallback;
 })();
 (function() {
 
-  // global callback for vimeo.. yuck.
-  vimeo_player_loaded = function( playerId ) {
-    vimeo_player_loaded[ playerId ] && vimeo_player_loaded[ playerId ]();
+  // parseUri 1.2.2
+  // http://blog.stevenlevithan.com/archives/parseuri
+  // (c) Steven Levithan <stevenlevithan.com>
+  // MIT License
+
+  function parseUri (str) {
+    var	o   = parseUri.options,
+        m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
+        uri = {},
+        i   = 14;
+
+    while (i--) {
+      uri[o.key[i]] = m[i] || "";
+    }
+
+    uri[o.q.name] = {};
+    uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+      if ($1) {
+        uri[o.q.name][$1] = $2;
+      }
+    });
+
+    return uri;
+  }
+
+  parseUri.options = {
+    strictMode: false,
+    key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+    q:   {
+      name:   "queryKey",
+      parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+    },
+    parser: {
+      strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+      loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+    }
   };
-  vimeo_player_loaded.seek = {};
-  vimeo_player_loaded.loadProgress = {};
-  vimeo_player_loaded.play = {};
-  vimeo_player_loaded.pause = {};
+
+  function canPlayType( nodeName, url ) {
+    return ( /player.vimeo.com\/video\/\d+/ ).test( url ) ||
+           ( /vimeo.com\/\d+/ ).test( url );
+  }
 
   Popcorn.player( "vimeo", {
-    _canPlayType: function( nodeName, url ) {
 
-      return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(vimeo)/).test( url ) && nodeName.toLowerCase() !== "video";
-    },
+    _canPlayType: canPlayType,
     _setup: function( options ) {
 
-      var media = this,
-          vimeoObject,
-          vimeoContainer = document.createElement( "div" ),
-          currentTime = 0,
-          paused = true,
-          seekTime = 0,
-          seeking = false,
-          volumeChanged = false,
-          lastMuted = false,
-          lastVolume = 0,
-          height,
-          width,
-          playerQueue = Popcorn.player.playerQueue();
+      var TIMEUPDATE_INTERVAL_MS  = 250,
+          CURRENT_TIME_MONITOR_MS = 16,
+          MediaErrorInterface = {
+            MEDIA_ERR_ABORTED: 1,
+            MEDIA_ERR_NETWORK: 2,
+            MEDIA_ERR_DECODE: 3,
+            MEDIA_ERR_SRC_NOT_SUPPORTED: 4
+          },
+          guid,
+          media = this,
+          commands = {
+            q: [],
+            queue: function queue( fn ) {
+              this.q.push( fn );
+              this.process();
+            },
+            process: function process() {
+              if ( !vimeoReady ) {
+                return;
+              }
 
-      vimeoContainer.id = media.id + Popcorn.guid();
-
-      media.appendChild( vimeoContainer );
-
-      // setting vimeo player's height and width, default to 560 x 315
-      width = media.style.width ? "" + media.offsetWidth : "560";
-      height = media.style.height ? "" + media.offsetHeight : "315";
-
-      var vimeoInit = function() {
-
-        var flashvars,
-            params,
-            attributes = {},
-            src = media.src,
-            toggleMuteVolume = 0,
-            loadStarted = false;
-
-        vimeo_player_loaded[ vimeoContainer.id ] = function() {
-
-          vimeoObject = document.getElementById( vimeoContainer.id );
-
-          vimeo_player_loaded.seek[ vimeoContainer.id ] = function( time ) {
-            if( time.seconds !== currentTime ) {
-              seeking = true;
-              media.dispatchEvent( "seeking" );
-              currentTime = time.seconds;
-              seeking = false;
-              media.dispatchEvent( "timeupdate" );
-              media.dispatchEvent( "seeked" );
-            }
-          };
-
-          vimeo_player_loaded.play[ vimeoContainer.id ] = function() {
-
-            paused = false;
-            media.dispatchEvent( "play" );
-            media.dispatchEvent( "playing" );
-            timeUpdate();
-
-            playerQueue.next();
-          };
-
-          vimeo_player_loaded.pause[ vimeoContainer.id ] = function() {
-
-            paused = true;
-            media.dispatchEvent( "pause" );
-
-            playerQueue.next();
-          };
-
-          vimeo_player_loaded.loadProgress[ vimeoContainer.id ] = function( progress ) {
-
-            if ( !loadStarted ) {
-              loadStarted = true;
-              media.dispatchEvent( "loadstart" );
-            }
-
-            if ( progress.percent === 100 ) {
-              media.dispatchEvent( "canplaythrough" );
-            }
-          };
-
-          vimeoObject.api_addEventListener( "seek", "vimeo_player_loaded.seek." + vimeoContainer.id );
-          vimeoObject.api_addEventListener( "loadProgress", "vimeo_player_loaded.loadProgress." + vimeoContainer.id );
-          vimeoObject.api_addEventListener( "play", "vimeo_player_loaded.play." + vimeoContainer.id );
-          vimeoObject.api_addEventListener( "pause", "vimeo_player_loaded.pause." + vimeoContainer.id );
-
-          var timeUpdate = function() {
-            if ( !media.paused ) {
-              currentTime = vimeoObject.api_getCurrentTime();
-              media.dispatchEvent( "timeupdate" );
-              setTimeout( timeUpdate, 10 );
+              while ( this.q.length ) {
+                var fn = this.q.shift();
+                fn();
+              }
             }
           },
+          currentTimeId,
+          timeUpdateId,
+          vimeoReady,
+          vimeoContainer = document.createElement( "iframe" ),
+          // Loosely based on HTMLMediaElement + HTMLVideoElement IDL
+          impl = {
+            // error state
+            error: null,
 
-          isMuted = function() {
+            // network state
+            src: media.src,
+            NETWORK_EMPTY: 0,
+            NETWORK_IDLE: 1,
+            NETWORK_LOADING: 2,
+            NETWORK_NO_SOURCE: 3,
+            networkState: 0,
 
-            return vimeoObject.api_getVolume() === 0;
+            // ready state
+            HAVE_NOTHING: 0,
+            HAVE_METADATA: 1,
+            HAVE_CURRENT_DATA: 2,
+            HAVE_FUTURE_DATA: 3,
+            HAVE_ENOUGH_DATA: 4,
+            readyState: 0,
+            seeking: false,
+
+            // playback state
+            currentTime: 0,
+            duration: NaN,
+            paused: true,
+            ended: false,
+            autoplay: false,
+            loop: false,
+
+            // controls
+            volume: 1,
+            muted: false,
+
+            // Video attributes
+            width: 0,
+            height: 0
           };
 
-          var volumeUpdate = function() {
+      var readOnlyAttrs = "error networkState readyState seeking duration paused ended";
+      Popcorn.forEach( readOnlyAttrs.split(" "), function( value ) {
+        Object.defineProperty( media, value, {
+          get: function() {
+            return impl[ value ];
+          }
+        });
+      });
 
-            var muted = isMuted(),
-            vol = vimeoObject.api_getVolume();
-            if ( lastMuted !== muted ) {
-              lastMuted = muted;
-              media.dispatchEvent( "volumechange" );
-            }
-
-            if ( lastVolume !== vol ) {
-              lastVolume = vol;
-              media.dispatchEvent( "volumechange" );
-            }
-
-            setTimeout( volumeUpdate, 250 );
-          };
-
-          media.play = function() {
-
-
-            paused = false;
-            playerQueue.add(function() {
-
-              if ( vimeoObject.api_paused() ) {
-
-                vimeoObject.api_play();
-              } else {
-                playerQueue.next();
-              }
+      Object.defineProperties( media, {
+        "src": {
+          get: function() {
+            return impl.src;
+          },
+          set: function( value ) {
+            // Is there any sort of logic that determines whether to load the video or not?
+            impl.src = value;
+            media.load();
+          }
+        },
+        "currentTime": {
+          get: function() {
+            return impl.currentTime;
+          },
+          set: function( value ) {
+            commands.queue(function() {
+              sendMessage( "seekTo", value );
             });
-          };
-
-          Popcorn.player.defineProperty( media, "seeking", {
-            get: function() {
-              return seeking;
-            }
-          });
-
-          media.pause = function() {
-
-            paused = true;
-            playerQueue.add(function() {
-
-              if ( !vimeoObject.api_paused() ) {
-
-                vimeoObject.api_pause();
-              } else {
-                playerQueue.next();
-              }
+            impl.seeking = true;
+            media.dispatchEvent( "seeking" );
+          }
+        },
+        "autoplay": {
+          get: function() {
+            return impl.autoplay;
+          },
+          set: function( value ) {
+            impl.autoplay = !!value;
+          }
+        },
+        "loop": {
+          get: function() {
+            return impl.loop;
+          },
+          set: function( value) {
+            impl.loop = !!value;
+            commands.queue(function() {
+              sendMessage( "setLoop", loop );
             });
-          };
+          }
+        },
+        "volume": {
+          get: function() {
+            return impl.volume;
+          },
+          set: function( value ) {
+            impl.volume = value;
+            commands.queue(function() {
+              sendMessage( "setVolume", impl.muted ? 0 : impl.volume );
+            });
+            media.dispatchEvent( "volumechange" );
+          }
+        },
+        "muted": {
+          get: function() {
+            return impl.muted;
+          },
+          set: function( value ) {
+            impl.muted = !!value;
+            commands.queue(function() {
+              sendMessage( "setVolume", impl.muted ? 0 : impl.volume );
+            });
+            media.dispatchEvent( "volumechange" );
+          }
+        },
+        "width": {
+          get: function() {
+            return vimeoContainer.width;
+          },
+          set: function( value ) {
+            vimeoContainer.width = value;
+          }
+        },
+        "height": {
+          get: function() {
+            return vimeoContainer.height;
+          },
+          set: function( value ) {
+            vimeoContainer.height = value;
+          }
+        }
+      });
 
-          Popcorn.player.defineProperty( media, "currentTime", {
+      function sendMessage( method, params ) {
+        var url = vimeoContainer.src.split( "?" )[ 0 ],
+            data = JSON.stringify({
+              method: method,
+              value: params
+            });
 
-            set: function( val ) {
+        if ( url.substr( 0, 2 ) === "//" ) {
+          url = window.location.protocol + url;
+        }
 
-              if ( !val ) {
-                return currentTime;
-              }
+        // The iframe has been destroyed, it just doesn't know it
+        if ( !vimeoContainer.contentWindow ) {
+          media.unload();
+          return;
+        }
 
-              vimeoObject.api_seekTo( +val );
+        vimeoContainer.contentWindow.postMessage( data, url );
+      }
 
-              return currentTime;
-            },
+      var vimeoAPIMethods = {
+        "getCurrentTime": function( data ) {
+          impl.currentTime = parseFloat( data.value );
+        },
+        "getDuration": function( data ) {
+          impl.duration = parseFloat( data.value );
+          maybeReady();
+        },
+        "getVolume": function( data ) {
+          impl.volume = parseFloat( data.value );
+        }
+      };
 
-            get: function() {
+      var vimeoAPIEvents = {
+        "ready": function( data ) {
+          sendMessage( "addEventListener", "loadProgress" );
+          sendMessage( "addEventListener", "playProgress" );
+          sendMessage( "addEventListener", "play" );
+          sendMessage( "addEventListener", "pause" );
+          sendMessage( "addEventListener", "finish" );
+          sendMessage( "addEventListener", "seek" );
+          sendMessage( "getDuration" );
+          vimeoReady = true;
+          commands.process();
+          media.dispatchEvent( "loadstart" );
+        },
+        "loadProgress": function( data ) {
+          media.dispatchEvent( "progress" );
+          // loadProgress has a more accurate duration than getDuration
+          impl.duration = parseFloat( data.data.duration );
+        },
+        "playProgress": function( data ) {
+          impl.currentTime = parseFloat( data.data.seconds );
+        },
+        "play": function( data ) {
+          // Vimeo plays video if seeking from an unloaded state
+          if ( impl.seeking ) {
+            impl.seeking = false;
+            media.dispatchEvent( "seeked" );
+          }
+          impl.paused = false;
+          impl.ended = false;
+          startUpdateLoops();
+          media.dispatchEvent( "play" );
+        },
+        "pause": function( data ) {
+          impl.paused = true;
+          stopUpdateLoops();
+          media.dispatchEvent( "pause" );
+        },
+        "finish": function( data ) {
+          impl.ended = true;
+          stopUpdateLoops();
+          media.dispatchEvent( "ended" );
+        },
+        "seek": function( data ) {
+          impl.currentTime = parseFloat( data.data.seconds );
+          impl.seeking = false;
+          impl.ended = false;
+          media.dispatchEvent( "timeupdate" );
+          media.dispatchEvent( "seeked" );
+        }
+      };
 
-              return currentTime;
-            }
-          });
+      function messageListener( event ) {
+        if ( event.origin !== "http://player.vimeo.com" ) {
+          return;
+        }
 
-          Popcorn.player.defineProperty( media, "paused", {
+        var data;
+        try {
+          data = JSON.parse( event.data );
+        } catch ( ex ) {
+          console.warn( ex );
+        }
 
-            get: function() {
+        if ( data.player_id != guid ) {
+          return;
+        }
 
-              return paused;
-            }
-          });
+        // Methods
+        if ( data.method && vimeoAPIMethods[ data.method ] ) {
+          vimeoAPIMethods[ data.method ]( data );
+        }
 
-          Popcorn.player.defineProperty( media, "muted", {
+        // Events
+        if ( data.event && vimeoAPIEvents[ data.event ] ) {
+          vimeoAPIEvents[ data.event ]( data );
+        }
+      }
 
-            set: function( val ) {
+      media.load = function() {
+        vimeoReady = false;
+        guid = Popcorn.guid();
 
-              if ( isMuted() !== val ) {
+        var src = parseUri( impl.src ),
+            combinedOptions = {},
+            optionsArray = [],
+            vimeoAPIOptions = {
+              api: 1,
+              player_id: guid
+            };
 
-                if ( val ) {
-                  toggleMuteVolume = vimeoObject.api_getVolume();
-                  vimeoObject.api_setVolume( 0 );
-                } else {
+        if ( !canPlayType( media.nodeName, src.source ) ) {
+          setErrorAttr( impl.MEDIA_ERR_SRC_NOT_SUPPORTED );
+          return;
+        }
 
-                  vimeoObject.api_setVolume( toggleMuteVolume );
-                }
-              }
-            },
-            get: function() {
+        // Add Popcorn ctor options, url options, then the Vimeo API options
+        Popcorn.extend( combinedOptions, options );
+        Popcorn.extend( combinedOptions, src.queryKey );
+        Popcorn.extend( combinedOptions, vimeoAPIOptions );
 
-              return isMuted();
-            }
-          });
+        // Create the base vimeo player string. It will always have query string options
+        src = "http://player.vimeo.com/video/" + ( /\d+$/ ).exec( src.path ) + "?";
 
-          Popcorn.player.defineProperty( media, "volume", {
+        for ( var key in combinedOptions ) {
+          if ( combinedOptions.hasOwnProperty( key ) ) {
+            optionsArray.push( encodeURIComponent( key ) + "=" + encodeURIComponent( combinedOptions[ key ] ) );
+          }
+        }
+        src += optionsArray.join( "&" );
 
-            set: function( val ) {
+        impl.loop = !!src.match( /loop=1/ );
+        impl.autoplay = !!src.match( /autoplay=1/ );
 
-              if ( !val || typeof val !== "number" || ( val < 0 || val > 1 ) ) {
-                return vimeoObject.api_getVolume() / 100;
-              }
+        vimeoContainer.width = media.style.width ? media.style.width : 500;
+        vimeoContainer.height = media.style.height ? media.style.height : 281;
+        vimeoContainer.frameBorder = 0;
+        vimeoContainer.webkitAllowFullScreen = true;
+        vimeoContainer.mozAllowFullScreen = true;
+        vimeoContainer.allowFullScreen = true;
+        vimeoContainer.src = src;
+        media.appendChild( vimeoContainer );
+      };
 
-              if ( vimeoObject.api_getVolume() !== val ) {
-                vimeoObject.api_setVolume( val * 100 );
-                lastVolume = vimeoObject.api_getVolume();
-                media.dispatchEvent( "volumechange" );
-              }
+      function setErrorAttr( value ) {
+        impl.error = {};
+        Popcorn.extend( impl.error, MediaErrorInterface );
+        impl.error.code = value;
+        media.dispatchEvent( "error" );
+      }
 
-              return vimeoObject.api_getVolume() / 100;
-            },
-            get: function() {
-
-              return vimeoObject.api_getVolume() / 100;
-            }
-          });
-
-          media.duration = vimeoObject.api_getDuration();
+      function maybeReady() {
+        if ( !isNaN( impl.duration ) ) {
+          impl.readyState = 4;
           media.dispatchEvent( "durationchange" );
           media.dispatchEvent( "loadedmetadata" );
           media.dispatchEvent( "loadeddata" );
-          volumeUpdate();
-          media.readyState = 4;
+          media.dispatchEvent( "canplay" );
           media.dispatchEvent( "canplaythrough" );
-        };
+        }
+      }
 
-        var clip_id = ( /\d+$/ ).exec( src );
+      function startUpdateLoops() {
+        if ( !timeUpdateId ) {
+          timeUpdateId = setInterval(function() {
+            media.dispatchEvent( "timeupdate" );
+          }, TIMEUPDATE_INTERVAL_MS );
+        }
 
-        flashvars = {
-          // Load a video not found poster if the url does not contain a valid id
-          clip_id: clip_id ? clip_id[ 0 ] : 0,
-          api: 1,
-          js_swf_id: vimeoContainer.id
-        };
+        if ( !currentTimeId ) {
+          currentTimeId = setInterval(function() {
+            sendMessage( "getCurrentTime" );
+          }, CURRENT_TIME_MONITOR_MS );
+        }
+      }
 
-        //  extend options from user to flashvars. NOTE: Videos owned by Plus Vimeo users may override these options
-        Popcorn.extend( flashvars, options );
+      function stopUpdateLoops() {
+        if ( timeUpdateId ) {
+          clearInterval( timeUpdateId );
+          timeUpdateId = 0;
+        }
 
-        params = {
-          allowscriptaccess: "always",
-          allowfullscreen: "true",
-          wmode: "transparent"
-        };
+        if ( currentTimeId ) {
+          clearInterval( currentTimeId );
+          currentTimeId = 0;
+        }
+      }
 
-        swfobject.embedSWF( "//vimeo.com/moogaloop.swf", vimeoContainer.id,
-                            width, height, "9.0.0", "expressInstall.swf",
-                            flashvars, params, attributes );
-
+      media.unload = function() {
+        stopUpdateLoops();
+        window.removeEventListener( "message", messageListener, false );
       };
 
-      if ( !window.swfobject ) {
+      media.play = function() {
+        commands.queue(function() {
+          sendMessage( "play" );
+        });
+      };
 
-        Popcorn.getScript( "//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js", vimeoInit );
-      } else {
+      media.pause = function() {
+        commands.queue(function() {
+          sendMessage( "pause" );
+        });
+      };
 
-        vimeoInit();
+      // Start the load process now, players behave like `preload="metadata"` is set
+      // Do it asynchronously so that users can attach event listeners
+      setTimeout(function() {
+        window.addEventListener( "message", messageListener, false );
+        media.load();
+      }, 0 );
+    },
+    _teardown: function( options ) {
+      // If the baseplayer doesn't call _setup
+      if ( this.unload ) {
+        this.unload();
       }
     }
   });
 })();
-// A global callback for youtube... that makes me angry
-window.onYouTubePlayerAPIReady = function() {
+(function( window, Popcorn ) {
+  // A global callback for youtube... that makes me angry
+  window.onYouTubePlayerAPIReady = function() {
 
-  onYouTubePlayerAPIReady.ready = true;
-  for ( var i = 0; i < onYouTubePlayerAPIReady.waiting.length; i++ ) {
-    onYouTubePlayerAPIReady.waiting[ i ]();
+    onYouTubePlayerAPIReady.ready = true;
+    for ( var i = 0; i < onYouTubePlayerAPIReady.waiting.length; i++ ) {
+      onYouTubePlayerAPIReady.waiting[ i ]();
+    }
+  };
+
+  // existing youtube references can break us.
+  // remove it and use the one we can trust.
+  if ( window.YT ) {
+    window.quarantineYT = window.YT;
+    window.YT = null;
   }
-};
 
-// existing youtube references can break us.
-// remove it and use the one we can trust.
-if ( window.YT ) {
-  window.quarantineYT = window.YT;
-  window.YT = null;
-}
+  onYouTubePlayerAPIReady.waiting = [];
 
-onYouTubePlayerAPIReady.waiting = [];
+  var _loading = false;
 
-Popcorn.getScript( "http://www.youtube.com/player_api" );
+  Popcorn.player( "youtube", {
+    _canPlayType: function( nodeName, url ) {
 
-Popcorn.player( "youtube", {
-  _canPlayType: function( nodeName, url ) {
+      return typeof url === "string" && (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(youtu)/).test( url ) && nodeName.toLowerCase() !== "video";
+    },
+    _setup: function( options ) {
+      if ( !window.YT && !_loading ) {
+        _loading = true;
+        Popcorn.getScript( "//youtube.com/player_api" );
+      }
 
-    return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(youtu)/).test( url ) && nodeName.toLowerCase() !== "video";
-  },
-  _setup: function( options ) {
+      var media = this,
+          autoPlay = false,
+          container = document.createElement( "div" ),
+          currentTime = 0,
+          paused = true,
+          seekTime = 0,
+          firstGo = true,
+          seeking = false,
+          fragmentStart = 0,
 
-    var media = this,
-        autoPlay = false,
-        container = document.createElement( "div" ),
-        currentTime = 0,
-        paused = true,
-        seekTime = 0,
-        firstGo = true,
-        seeking = false,
-        fragmentStart = 0,
+          // state code for volume changed polling
+          lastMuted = false,
+          lastVolume = 100,
+          playerQueue = Popcorn.player.playerQueue();
 
-        // state code for volume changed polling
-        lastMuted = false,
-        lastVolume = 100,
-        playerQueue = Popcorn.player.playerQueue();
+      var createProperties = function() {
 
-    var createProperties = function() {
+        Popcorn.player.defineProperty( media, "currentTime", {
+          set: function( val ) {
 
-      Popcorn.player.defineProperty( media, "currentTime", {
-        set: function( val ) {
+            if ( options.destroyed ) {
+              return;
+            }
+
+            val = Number( val );
+            
+            if ( isNaN ( val ) ) {
+              return;
+            }
+            
+            currentTime = val;
+            
+            seeking = true;
+            media.dispatchEvent( "seeking" );
+            
+            options.youtubeObject.seekTo( val );
+          },
+          get: function() {
+
+            return currentTime;
+          }
+        });
+
+        Popcorn.player.defineProperty( media, "paused", {
+          get: function() {
+
+            return paused;
+          }
+        });
+
+        Popcorn.player.defineProperty( media, "muted", {
+          set: function( val ) {
+
+            if ( options.destroyed ) {
+
+              return val;
+            }
+
+            if ( options.youtubeObject.isMuted() !== val ) {
+
+              if ( val ) {
+
+                options.youtubeObject.mute();
+              } else {
+
+                options.youtubeObject.unMute();
+              }
+
+              lastMuted = options.youtubeObject.isMuted();
+              media.dispatchEvent( "volumechange" );
+            }
+
+            return options.youtubeObject.isMuted();
+          },
+          get: function() {
+
+            if ( options.destroyed ) {
+
+              return 0;
+            }
+
+            return options.youtubeObject.isMuted();
+          }
+        });
+
+        Popcorn.player.defineProperty( media, "volume", {
+          set: function( val ) {
+
+            if ( options.destroyed ) {
+
+              return val;
+            }
+
+            if ( options.youtubeObject.getVolume() / 100 !== val ) {
+
+              options.youtubeObject.setVolume( val * 100 );
+              lastVolume = options.youtubeObject.getVolume();
+              media.dispatchEvent( "volumechange" );
+            }
+
+            return options.youtubeObject.getVolume() / 100;
+          },
+          get: function() {
+
+            if ( options.destroyed ) {
+
+              return 0;
+            }
+
+            return options.youtubeObject.getVolume() / 100;
+          }
+        });
+
+        media.play = function() {
+
+          if ( options.destroyed ) {
+
+            return;
+          }
+
+          paused = false;
+          playerQueue.add(function() {
+
+            if ( options.youtubeObject.getPlayerState() !== 1 ) {
+
+              seeking = false;
+              options.youtubeObject.playVideo();
+            } else {
+              playerQueue.next();
+            }
+          });
+        };
+
+        media.pause = function() {
+
+          if ( options.destroyed ) {
+
+            return;
+          }
+
+          paused = true;
+          playerQueue.add(function() {
+
+            if ( options.youtubeObject.getPlayerState() !== 2 ) {
+
+              options.youtubeObject.pauseVideo();
+            } else {
+              playerQueue.next();
+            }
+          });
+        };
+      };
+
+      container.id = media.id + Popcorn.guid();
+      options._container = container;
+      media.appendChild( container );
+
+      var youtubeInit = function() {
+
+        var src, query, params, playerVars, queryStringItem, firstPlay = true, seekEps = 0.1;
+
+        var timeUpdate = function() {
 
           if ( options.destroyed ) {
             return;
           }
 
-          seeking = true;
-          // make sure val is a number
-          currentTime = Math.round( +val * 100 ) / 100;
-        },
-        get: function() {
+          var ytTime = options.youtubeObject.getCurrentTime();
 
-          return currentTime;
+          if ( !seeking ) {
+            currentTime = ytTime;
+          } else if ( currentTime >= ytTime - seekEps && currentTime <= ytTime + seekEps ) {
+            seeking = false;
+            seekEps = 0.1;
+            media.dispatchEvent( "seeked" );
+          } else {
+            // seek didn't work very well, try again with higher tolerance
+            seekEps *= 2;
+            options.youtubeObject.seekTo( currentTime );
+          }
+          
+          media.dispatchEvent( "timeupdate" );
+          
+          setTimeout( timeUpdate, 200 );
+        };
+
+        // delay is in seconds
+        var fetchDuration = function( delay ) {
+          var ytDuration = options.youtubeObject.getDuration();
+
+          if ( isNaN( ytDuration ) || ytDuration === 0 ) {
+            setTimeout( function() {
+              fetchDuration( delay * 2 );
+            }, delay*1000 );
+          } else {
+            // set duration and dispatch ready events
+            media.duration = ytDuration;
+            media.dispatchEvent( "durationchange" );
+            
+            media.dispatchEvent( "loadedmetadata" );
+            media.dispatchEvent( "loadeddata" );
+            
+            media.readyState = 4;
+
+            timeUpdate();
+            media.dispatchEvent( "canplaythrough" );
+          }
+        };
+
+        options.controls = +options.controls === 0 || +options.controls === 1 ? options.controls : 1;
+        options.annotations = +options.annotations === 1 || +options.annotations === 3 ? options.annotations : 1;
+
+        src = /^.*(?:\/|v=)(.{11})/.exec( media.src )[ 1 ];
+
+        query = ( media.src.split( "?" )[ 1 ] || "" )
+                           .replace( /v=.{11}/, "" );
+        query = query.replace( /&t=(?:(\d+)m)?(?:(\d+)s)?/, function( all, minutes, seconds ) {
+
+          // Make sure we have real zeros
+          minutes = minutes | 0; // bit-wise OR
+          seconds = seconds | 0; // bit-wise OR
+
+          fragmentStart = ( +seconds + ( minutes * 60 ) );
+          return "";
+        });
+        query = query.replace( /&start=(\d+)?/, function( all, seconds ) {
+
+          // Make sure we have real zeros
+          seconds = seconds | 0; // bit-wise OR
+
+          fragmentStart = seconds;
+          return "";
+        });
+
+        autoPlay = ( /autoplay=1/.test( query ) );
+
+        params = query.split( /[\&\?]/g );
+        playerVars = { wmode: "transparent" };
+
+        for( var i = 0; i < params.length; i++ ) {
+          queryStringItem = params[ i ].split( "=" );
+          playerVars[ queryStringItem[ 0 ] ] = queryStringItem[ 1 ];
         }
-      });
+        
+        options.youtubeObject = new YT.Player( container.id, {
+          height: "100%",
+          width: "100%",
+          wmode: "transparent",
+          playerVars: playerVars,
+          videoId: src,
+          events: {
+            "onReady": function(){
 
-      Popcorn.player.defineProperty( media, "paused", {
-        get: function() {
+              // pulling initial volume states form baseplayer
+              lastVolume = media.volume;
+              lastMuted = media.muted;
 
-          return paused;
-        }
-      });
+              volumeupdate();
 
-      Popcorn.player.defineProperty( media, "muted", {
-        set: function( val ) {
+              paused = media.paused;
+              createProperties();
+              options.youtubeObject.playVideo();
+
+              media.currentTime = fragmentStart;
+              // wait to dispatch ready events until we get a duration
+            },
+            "onStateChange": function( state ){
+
+              if ( options.destroyed || state.data === -1 ) {
+                return;
+              }
+
+              // state.data === 2 is for pause events
+              // state.data === 1 is for play events
+              if ( state.data === 2 ) {
+                paused = true;
+                media.dispatchEvent( "pause" );
+                playerQueue.next();
+              } else if ( state.data === 1 && !firstPlay ) {
+                paused = false;
+                media.dispatchEvent( "play" );
+                media.dispatchEvent( "playing" );
+                playerQueue.next();
+              } else if ( state.data === 0 ) {
+                media.dispatchEvent( "ended" );
+              } else if ( state.data === 1 && firstPlay ) {
+                firstPlay = false;
+
+                // pulling initial paused state from autoplay or the baseplayer
+                // also need to explicitly set to paused otherwise.
+                if ( autoPlay || !media.paused ) {
+                  paused = false;
+                }
+
+                if ( paused ) {
+                  options.youtubeObject.pauseVideo();
+                }
+                
+                fetchDuration( 0.025 );
+              }
+            },
+            "onError": function( error ) {
+
+              if ( [ 2, 100, 101, 150 ].indexOf( error.data ) !== -1 ) {
+                media.error = {
+                  customCode: error.data
+                };
+                media.dispatchEvent( "error" );
+              }
+            }
+          }
+        });
+
+        var volumeupdate = function() {
 
           if ( options.destroyed ) {
 
-            return val;
+            return;
           }
 
-          if ( options.youtubeObject.isMuted() !== val ) {
-
-            if ( val ) {
-
-              options.youtubeObject.mute();
-            } else {
-
-              options.youtubeObject.unMute();
-            }
+          if ( lastMuted !== options.youtubeObject.isMuted() ) {
 
             lastMuted = options.youtubeObject.isMuted();
             media.dispatchEvent( "volumechange" );
           }
 
-          return options.youtubeObject.isMuted();
-        },
-        get: function() {
+          if ( lastVolume !== options.youtubeObject.getVolume() ) {
 
-          if ( options.destroyed ) {
-
-            return 0;
-          }
-
-          return options.youtubeObject.isMuted();
-        }
-      });
-
-      Popcorn.player.defineProperty( media, "volume", {
-        set: function( val ) {
-
-          if ( options.destroyed ) {
-
-            return val;
-          }
-
-          if ( options.youtubeObject.getVolume() / 100 !== val ) {
-
-            options.youtubeObject.setVolume( val * 100 );
             lastVolume = options.youtubeObject.getVolume();
             media.dispatchEvent( "volumechange" );
           }
 
-          return options.youtubeObject.getVolume() / 100;
-        },
-        get: function() {
-
-          if ( options.destroyed ) {
-
-            return 0;
-          }
-
-          return options.youtubeObject.getVolume() / 100;
-        }
-      });
-
-      media.play = function() {
-
-        if ( options.destroyed ) {
-
-          return;
-        }
-
-        paused = false;
-        playerQueue.add(function() {
-
-          if ( options.youtubeObject.getPlayerState() !== 1 ) {
-
-            seeking = false;
-            options.youtubeObject.playVideo();
-          } else {
-            playerQueue.next();
-          }
-        });
+          setTimeout( volumeupdate, 250 );
+        };
       };
 
-      media.pause = function() {
+      if ( onYouTubePlayerAPIReady.ready ) {
 
-        if ( options.destroyed ) {
+        youtubeInit();
+      } else {
 
-          return;
-        }
+        onYouTubePlayerAPIReady.waiting.push( youtubeInit );
+      }
+    },
+    _teardown: function( options ) {
 
-        paused = true;
-        playerQueue.add(function() {
+      options.destroyed = true;
 
-          if ( options.youtubeObject.getPlayerState() !== 2 ) {
+      var youtubeObject = options.youtubeObject;
+      if( youtubeObject ){
+        youtubeObject.stopVideo();
+        youtubeObject.clearVideo && youtubeObject.clearVideo();
+      }
 
-            options.youtubeObject.pauseVideo();
-          } else {
-            playerQueue.next();
-          }
-        });
-      };
-    };
-
-    container.id = media.id + Popcorn.guid();
-    options._container = container;
-    media.appendChild( container );
-
-    var youtubeInit = function() {
-
-      var src, width, height, originalStyle, query, styleWidth, styleHeight;
-
-      var timeUpdate = function() {
-
-        if ( options.destroyed ) {
-          return;
-        }
-
-        if ( !seeking ) {
-          currentTime = options.youtubeObject.getCurrentTime();
-          media.dispatchEvent( "timeupdate" );
-        } else if ( currentTime === options.youtubeObject.getCurrentTime() ) {
-
-          seeking = false;
-          media.dispatchEvent( "seeked" );
-          media.dispatchEvent( "timeupdate" );
-        } else {
-
-          // keep trying the seek until it is right.
-          options.youtubeObject.seekTo( currentTime );
-        }
-        setTimeout( timeUpdate, 250 );
-      };
-
-      options.controls = +options.controls === 0 || +options.controls === 1 ? options.controls : 1;
-      options.annotations = +options.annotations === 1 || +options.annotations === 3 ? options.annotations : 1;
-
-      src = /^.*(?:\/|v=)(.{11})/.exec( media.src )[ 1 ];
-
-      query = ( media.src.split( "?" )[ 1 ] || "" )
-                         .replace( /v=.{11}/, "" );
-      query = query.replace( /&t=(?:(\d+)m)?(?:(\d+)s)?/, function( all, minutes, seconds ) {
-
-        // Make sure we have real zeros
-        minutes = minutes | 0; // bit-wise OR
-        seconds = seconds | 0; // bit-wise OR
-
-        fragmentStart = ( +seconds + ( minutes * 60 ) );
-        return "";
-      });
-      query = query.replace( /&start=(\d+)?/, function( all, seconds ) {
-
-        // Make sure we have real zeros
-        seconds = seconds | 0; // bit-wise OR
-
-        fragmentStart = seconds;
-        return "";
-      });
-
-      autoPlay = ( /autoplay=1/.test( query ) );
-
-      // cache original display property so it can be reapplied
-      originalStyle = media.style.display;
-      media.style.display = "inline";
-
-      // setting youtube player's height and width, min 640 x 390,
-      // anything smaller, and the player reports incorrect states.
-      styleHeight = parseFloat( media.style.height );
-      styleWidth = parseFloat( media.style.width );
-      height = styleHeight > media.clientHeight ? styleHeight : media.clientHeight;
-      width = styleWidth > media.clientWidth ? styleWidth : media.clientWidth;
-      height = height >= 390 ? height : "390";
-      width = width >= 640 ? width: "640";
-      
-      media.style.display = originalStyle;
-
-      options.youtubeObject = new YT.Player( container.id, {
-        height: height,
-        width: width,
-        wmode: "transparent",
-        playerVars: { wmode: "transparent" },
-        videoId: src,
-        events: {
-          "onReady": function(){
-
-            // pulling initial volume states form baseplayer
-            lastVolume = media.volume;
-            lastMuted = media.muted;
-
-            media.duration = options.youtubeObject.getDuration();
-
-            media.dispatchEvent( "durationchange" );
-            volumeupdate();
-
-            // pulling initial paused state from autoplay or the baseplayer
-            // also need to explicitly set to paused otherwise.
-            if ( autoPlay || !media.paused ) {
-              paused = false;
-            }
-
-            createProperties();
-            options.youtubeObject.playVideo();
-
-            if ( paused ) {
-              options.youtubeObject.pauseVideo();
-            }
-
-            media.currentTime = fragmentStart;
-
-            media.dispatchEvent( "loadedmetadata" );
-            media.dispatchEvent( "loadeddata" );
-            media.readyState = 4;
-
-            timeUpdate();
-            media.dispatchEvent( "canplaythrough" );
-          },
-          "onStateChange": function( state ){
-
-            if ( options.destroyed || state.data === -1 ) {
-              return;
-            }
-
-            // state.data === 2 is for pause events
-            // state.data === 1 is for play events
-            if ( state.data === 2 ) {
-
-              paused = true;
-              media.dispatchEvent( "pause" );
-              playerQueue.next();
-            } else if ( state.data === 1 ) {
-              paused = false;
-              media.dispatchEvent( "play" );
-              media.dispatchEvent( "playing" );
-              playerQueue.next();
-            } else if ( state.data === 0 ) {
-              media.dispatchEvent( "ended" );
-            }
-          },
-          "onError": function( error ) {
-
-            if ( [ 2, 100, 101, 150 ].indexOf( error.data ) !== -1 ) {
-              media.error = {
-                customCode: error.data
-              };
-              media.dispatchEvent( "error" );
-            }
-          }
-        }
-      });
-
-      var volumeupdate = function() {
-
-        if ( options.destroyed ) {
-
-          return;
-        }
-
-        if ( lastMuted !== options.youtubeObject.isMuted() ) {
-
-          lastMuted = options.youtubeObject.isMuted();
-          media.dispatchEvent( "volumechange" );
-        }
-
-        if ( lastVolume !== options.youtubeObject.getVolume() ) {
-
-          lastVolume = options.youtubeObject.getVolume();
-          media.dispatchEvent( "volumechange" );
-        }
-
-        setTimeout( volumeupdate, 250 );
-      };
-    };
-
-    if ( onYouTubePlayerAPIReady.ready ) {
-
-      youtubeInit();
-    } else {
-
-      onYouTubePlayerAPIReady.waiting.push( youtubeInit );
+      this.removeChild( document.getElementById( options._container.id ) );
     }
-  },
-  _teardown: function( options ) {
-
-    options.destroyed = true;
-
-    var youtubeObject = options.youtubeObject;
-    if( youtubeObject ){
-      youtubeObject.stopVideo();
-      youtubeObject.clearVideo();
-    }
-
-    this.removeChild( document.getElementById( options._container.id ) );
-  }
-});
+  });
+}( window, Popcorn ));
 // EFFECT: applyclass
 
 (function (Popcorn) {

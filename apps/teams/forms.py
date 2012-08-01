@@ -788,3 +788,19 @@ class UploadDraftForm(forms.Form):
 
         # we created a new subtitle version let's fire a notification
         video_changed_tasks.delay(video.id, version.id)
+
+
+class ChooseTeamForm(forms.Form):
+    team = forms.ChoiceField(choices=(), required=False)
+    start_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
+    end_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
+
+    def __init__(self, *args, **kwargs):
+        super(ChooseTeamForm, self).__init__(*args, **kwargs)
+        teams = Team.objects.all()
+        self.fields['team'].choices = [(t.pk, t.slug) for t in teams]
+
+    def clean(self):
+        cd = self.cleaned_data
+        cd['team'] = Team.objects.get(pk=cd['team'])
+        return cd

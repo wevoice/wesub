@@ -57,9 +57,6 @@ unisubs.player.Html5MediaPlayer = function(mediaSource, forDialog) {
 goog.inherits(unisubs.player.Html5MediaPlayer,
               unisubs.player.AbstractVideoPlayer);
 
-unisubs.player.Html5MediaPlayer.logger_ =
-    goog.debug.Logger.getLogger('Html5MediaPlayer');
-
 unisubs.player.Html5MediaPlayer.prototype.enterDocument = function() {
     unisubs.player.Html5MediaPlayer.superClass_.enterDocument.call(this);
     if (!this.mediaElem)

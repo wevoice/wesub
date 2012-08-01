@@ -20,6 +20,7 @@
                         <div style="margin: 5px 0 5px 0;"><label>{% trans 'Language' %}</label>{{ form.language }}</div>
                         {% if not video.has_original_language %}
                         <div style="margin: 10px 0 10px 0;"><label>{% trans 'Video Language' %}</label>{{ form.video_language }}</div>
+                        <p class="notice">{% trans "Please double check the primary spoken language. This step cannot be undone." %}</p>
                         {% else %}
                         <div style="margin: 10px 0 10px 0;"><label>{% trans 'Translated from' %}</label>{{ form.translated_from }}</div>
                         {% endif %}

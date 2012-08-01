@@ -10,7 +10,6 @@ South==0.7
 kombu==1.4.3
 vendor/django-registration.tar.gz
 vendor/django-piston.tar.gz
-vendor/django-livesettings.tar.gz
 vendor/django-keyedcache.tar.gz
 vendor/django-storages.tar.gz
 vendor/python-openid-2.2.5.tar.gz

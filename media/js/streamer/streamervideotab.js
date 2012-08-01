@@ -43,9 +43,6 @@ unisubs.streamer.StreamerVideoTab.prototype.showContent =
 
 unisubs.streamer.StreamerVideoTab.prototype.showError = function() {
     // maybe do something in future.
-    if (goog.DEBUG) {
-        console.log("there was an error, yo");
-    }
 };
 
 unisubs.streamer.StreamerVideoTab.prototype.createShareButton = 

@@ -33,8 +33,11 @@ def announcement(context):
     except (ValueError, TypeError, AttributeError):
         hidden_date = None
 
+    ann = Announcement.last(hidden_date)
+    date = ann.created.strftime(Announcement.cookie_date_format) if ann else None
+
     return {
-        'obj': Announcement.last(hidden_date),
+        'obj': ann,
         'cookie_name': Announcement.hide_cookie_name,
-        'date': datetime.now().strftime(Announcement.cookie_date_format)
+        'date': date,
     }

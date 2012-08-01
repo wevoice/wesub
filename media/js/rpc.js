@@ -25,10 +25,6 @@ goog.provide('unisubs.Rpc');
  */
 unisubs.Rpc.TIMEOUT_ = 30000;
 
-if (goog.DEBUG) {
-    unisubs.Rpc.logger_ =
-        goog.debug.Logger.getLogger('unisubs.Rpc');
-}
 
 unisubs.Rpc.baseURL = function() {
     return [unisubs.siteURL(), 
@@ -49,9 +45,6 @@ unisubs.Rpc.callXhr_ = function(methodName, serializedArgs, opt_callback, opt_er
                     opt_errorCallback(status);
             }
             else {
-                unisubs.Rpc.logResponse_(
-                    methodName, 
-                    event.target.getResponseText());
                 if (opt_callback)
                     opt_callback(event.target.getResponseJson());
             }
@@ -75,32 +68,14 @@ unisubs.Rpc.callWithJsonp_ = function(methodName, serializedArgs, opt_callback, 
     jsonp.send(
         serializedArgs,
         function(result) {
-            if (unisubs.DEBUG)
-                unisubs.Rpc.logResponse_(
-                    methodName, goog.json.serialize(result));
-            if (opt_callback)
+            if (opt_callback) {
                 opt_callback(result);
+            }
         },
         function(errorPayload) {
             if (opt_errorCallback)
                 opt_errorCallback();
         });
-};
-
-unisubs.Rpc.logCall_ = function(methodName, args, channel) {
-    if (goog.DEBUG) {
-        unisubs.Rpc.logger_.info(
-            ['calling ', methodName, ' with ', channel,
-             ': ', goog.json.serialize(args)].join(''));
-    }
-};
-
-unisubs.Rpc.logResponse_ = function(methodName, response) {
-    if (goog.DEBUG) {
-        if (unisubs.DEBUG)
-            unisubs.Rpc.logger_.info(
-                [methodName, ' response: ', response].join(''));
-    }
 };
 
 /**
@@ -138,6 +113,5 @@ unisubs.Rpc.call =
             methodName, serializedArgs, 
             opt_callback, opt_errorCallback);
     }
-    unisubs.Rpc.logCall_(methodName, args, callType);
 };
 
