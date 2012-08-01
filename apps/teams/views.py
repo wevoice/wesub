@@ -51,7 +51,7 @@ from teams.forms import (
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference
+    Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -840,13 +840,13 @@ def invite_members(request, slug):
 @login_required
 def accept_invite(request, invite_pk, accept=True):
     invite = get_object_or_404(Invite, pk=invite_pk, user=request.user)
-    if accept:
-        ok = invite.accept()
-    else:
-        ok = invite.deny()
-    if ok:
+    try:
+        if accept:
+            invite.accept()
+        else:
+            invite.deny()
         return redirect(request.META.get('HTTP_REFERER', '/'))
-    else:
+    except InviteExpiredException:
         return HttpResponseServerError(render_to_response("generic-error.html", {
             "error_msg": _("This invite is no longer valid"),
         }, RequestContext(request)))
@@ -909,7 +909,6 @@ def leave_team(request, slug):
         notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
-
     return redirect(request.META.get('HTTP_REFERER') or team)
 
 @permission_required('teams.change_team')

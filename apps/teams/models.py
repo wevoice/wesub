@@ -1066,6 +1066,16 @@ class Application(models.Model):
 
 
 # Invites
+class InviteExpiredException(Exception):
+    pass
+
+class InviteManager(models.Manager):
+    def pending_for(self, team, user):
+        return self.filter(team=team, user=user, approved=None)
+
+    def acted_on(self, team, user):
+        return self.filter(team=team, user=user, approved__notnull=True)
+
 class Invite(models.Model):
     team = models.ForeignKey(Team, related_name='invitations')
     user = models.ForeignKey(User, related_name='team_invitations')
@@ -1078,9 +1088,7 @@ class Invite(models.Model):
     # False -> Rejected
     approved = models.NullBooleanField(default=None)
 
-    class Meta:
-        unique_together = (('team', 'user'),)
-
+    objects = InviteManager()
 
     def accept(self):
         """Accept this invitation.
@@ -1089,15 +1097,15 @@ class Invite(models.Model):
         deletes itself.
 
         """
-        if self.approved == None:
-            self.approved = True
-            member, created = TeamMember.objects.get_or_create(team=self.team,
-                                                           user=self.user,
-                                                           role=self.role)
-            if created:
-                notifier.team_member_new.delay(member.pk)
-            self.save()
-            return True
+        if self.approved is not None:
+            raise InviteExpiredException("")
+        self.approved = True
+        member, created = TeamMember.objects.get_or_create(
+            team=self.team, user=self.user, role=self.role)
+        if created:
+            notifier.team_member_new.delay(member.pk)
+        self.save()
+        return True
 
     def deny(self):
         """Deny this invitation.
@@ -1105,10 +1113,10 @@ class Invite(models.Model):
         Could be useful to send a notification here in the future.
 
         """
-        if self.approved == None:
-            self.approved = False
-            self.save()
-            return True
+        if self.approved is not None:
+            raise InviteExpiredException("")
+        self.approved = False
+        self.save()
 
 
     def message_json_data(self, data, msg):
