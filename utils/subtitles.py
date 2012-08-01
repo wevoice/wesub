@@ -427,9 +427,26 @@ class DfxpSubtitleParser(SubtitleParser):
 
         return start
 
+    def _replace_els(self, node, attrname, attrvalue, tagname):
+        """
+        Edits the node in place, changing <span:[attrname]=[attrvalue]>x</span> to 
+        <[tagname]>x</tagname>
+        This is needed because in order to store the markkup like
+        format we use internally, we need to convert the dfxp specific
+        tags to the regural htmlishy tags we use.
+        """
+        els = [x for x in node.childNodes if hasattr(x, 'tagName') and x.tagName == 'span' and x.getAttribute(attrname) == attrvalue]
+        for x  in els:
+            x.tagName = tagname
+            x.removeAttribute(attrname)
+
     def _get_data(self, node):
+        from utils.unisubsmarkup import html_to_markup
+        self._replace_els(node, 'tts:fontStyle', 'italic', 'i')
+        self._replace_els(node, 'tts:fontWeight', 'bold', 'b')
+
         output = {
-            'subtitle_text': unescape_html(strip_tags(node.toxml().replace("<br/>", "\n")))
+            'subtitle_text': unescape_html(html_to_markup(node.toxml().replace("<br/>", "\n")))
         }
         output['start_time'] = self._get_time(node.getAttribute('begin'))
         output['end_time'] = self._get_time(node.getAttribute('end'))
