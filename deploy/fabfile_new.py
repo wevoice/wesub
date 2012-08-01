@@ -353,6 +353,27 @@ def _git_pull():
     run('chmod g+w -R .git 2> /dev/null; /bin/true')
     _reset_permissions('.')
 
+def _git_checkout(commit, as_sudo=False):
+    cmd = run
+    if as_sudo:
+        cmd = sudo
+    cmd('git fetch')
+    cmd('git checkout --force %s' % commit)
+    cmd('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _reset_permissions('.')
+
+def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
+    cmd = run
+    if as_sudo:
+        cmd = sudo
+    cmd('git fetch')
+    cmd('git checkout %s' % branch)
+    cmd('git reset --hard %s' % commit)
+    cmd('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _reset_permissions('.')
+
 @task
 @lock_required
 @runs_once
@@ -397,6 +418,7 @@ def migrate(app_name='', extra=''):
                 "'"
             )
             run(cmd)
+
 @task
 @lock_required
 @parallel
@@ -409,3 +431,18 @@ def update_environment(extra=''):
             # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
             run('yes i | {0}/bin/pip install {1} -r requirements.txt'.format(env.ve_dir, extra), pty=True)
             #_clear_permissions(os.path.join(base_dir, 'env'))
+
+@task
+@parallel
+@roles('app')
+def reload_app_servers():
+    with Output("Reloading application servers"):
+        """
+        Reloading the app server will both make sure we have a
+        valid commit guid (by running the create_commit_file)
+        and also that we make the server reload code (currently
+        with mod_wsgi this is touching the wsgi file)
+        """
+        with cd(env.app_dir):
+            #run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
+            run('touch deploy/unisubs.wsgi')
