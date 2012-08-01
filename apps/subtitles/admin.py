@@ -65,7 +65,6 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
 
     def parent_ids(self, sv):
         pids = map(str, sv.parents.values_list('id', flat=True))
-
         return ', '.join(pids) if pids else None
 
     # Hack to generate lineages properly when modifying versions in the admin
