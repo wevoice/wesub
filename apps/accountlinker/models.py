@@ -121,6 +121,27 @@ class ThirdPartyAccount(models.Model):
 
 
 class YoutubeSyncRule(models.Model):
+    """
+    An instance of this class determines which Youtube videos should be synced
+    back to Youtube via the new integration.
+
+    There should only ever be one instance of this class in the database.
+
+    You should run a query and then call it like this:
+
+        rule = YoutubeSyncRule.objects.all()[0]
+        rule.should_sync(video)
+
+    Where ``video`` is a ``videos.models.Video`` instance.
+
+    ``team`` should be a comma-separated list of team slugs that you want to
+    sync.  ``user`` should be a comma-separated list of usernames of users
+    whose videos should be synced.  ``video`` is a list of primary keys of
+    videos that should be synced.
+
+    You can also specify a wildcard "*" to any of the above to match any teams,
+    any users, or any videos.
+    """
     team = models.TextField(default='', blank=True,
             help_text='Comma separated list of slugs')
     user = models.TextField(default='', blank=True,
