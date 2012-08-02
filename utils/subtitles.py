@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import random
 import re
+from itertools import chain
 from datetime import datetime
 from uuid import uuid4
 from xml.dom.minidom import parseString
@@ -314,6 +315,7 @@ class STSubtitleParser(SubtitleParser):
         except (ExpatError, IndexError):
             raise SubtitleParserError('Incorrect format of SpeakerText subtitles')
 
+
     def __len__(self):
         return len(self.nodes)
 
@@ -340,6 +342,35 @@ class STSubtitleParser(SubtitleParser):
         for item in self.nodes:
             yield self._get_data(item)
 
+def generate_style_map(dom):
+    '''
+    Parse the head.styling node on the xml and generate a hash -> list
+    of styles that require our supported formatting optins (bold and
+    italic for now).
+    eg.
+    style_map = {
+        'italic': ['speaker', 'importante'],
+        'bold': [],
+    }
+    This will be used when parsing each text node to make sure
+    we can convert to our own styling markers.
+    '''
+    style_map = {
+        'italic': [],
+        'bold': [],
+    }
+    styling_nodes = dom.getElementsByTagName("styling")
+    style_nodes = chain.from_iterable([x.getElementsByTagName('style') for x in styling_nodes])
+    for style_node in style_nodes:
+        style_id = style_node.getAttribute('xml:id')
+        for key in style_node.attributes.keys():
+            value  = style_node.attributes[key].value
+            if key  == 'tts:fontWeight' and  value == 'bold':
+                style_map['bold'].append(style_id)
+            elif key  == 'tts:fontStyle' and value == 'italic':
+                style_map['italic'].append(style_id)
+    return style_map
+ 
 class TtmlSubtitleParser(SubtitleParser):
 
     def __init__(self, subtitles):
@@ -348,6 +379,7 @@ class TtmlSubtitleParser(SubtitleParser):
             self.nodes = dom.getElementsByTagName('body')[0].getElementsByTagName('p')
         except (ExpatError, IndexError):
             raise SubtitleParserError('Incorrect format of TTML subtitles')
+                       
 
     def __len__(self):
         return len(self.nodes)
@@ -390,7 +422,7 @@ class DfxpSubtitleParser(SubtitleParser):
     def __init__(self, subtitles):
         try:
             dom = parseString(subtitles.encode('utf8'))
-            
+            self.style_map = generate_style_map(dom)
             t = dom.getElementsByTagName('tt')[0]
             
             self.tickRate = 0;
@@ -442,8 +474,17 @@ class DfxpSubtitleParser(SubtitleParser):
 
     def _get_data(self, node):
         from utils.unisubsmarkup import html_to_markup
+        # replace inline styles to our markdown format, e.g.
+        # <span fontWeith='bold'> -> **
         self._replace_els(node, 'tts:fontStyle', 'italic', 'i')
         self._replace_els(node, 'tts:fontWeight', 'bold', 'b')
+        # now look at names styles. go over the style map for this
+        # data and if the style matches one of ours, replace it
+        for style_name in self.style_map['bold']:
+            self._replace_els(node, 'style', style_name, 'b')
+        for style_name in self.style_map['italic']:
+            self._replace_els(node, 'style', style_name, 'i')
+            
 
         output = {
             'subtitle_text': unescape_html(html_to_markup(node.toxml().replace("<br/>", "\n")))
