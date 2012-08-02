@@ -232,8 +232,6 @@ class TeamVideoTest(TestCase):
 
         self.assertTrue(team_video)
 
-        from ipdb import set_trace; set_trace()
-
         team_video.project = Project.objects.filter(~Q(team=self.team))[0]
 
         self.assertNotEquals(team_video.project, project)
