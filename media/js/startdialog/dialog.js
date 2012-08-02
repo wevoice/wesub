@@ -231,11 +231,19 @@ unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
     }
 };
 unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
+    var blocked_languages = this.model_.blockedLanguages_;
+
     var toLanguageContents = goog.array.map(
         this.model_.toLanguages(),
         function(l) {
-            return [l.KEY, l.toString(), l.LANGUAGE,
-                    (l.VIDEO_LANGUAGE ? l.VIDEO_LANGUAGE.DISABLED_TO : false)];
+            var disabled = false;
+            if (l.VIDEO_LANGUAGE) {
+                disabled = l.VIDEO_LANGUAGE.DISABLED_TO;
+            } else if (goog.array.contains(blocked_languages, l.LANGUAGE)) {
+                disabled = true;
+            }
+
+            return [l.KEY, l.toString(), l.LANGUAGE, disabled];
         });
 
     this.toLanguageDropdown_ = this.makeDropdown_(

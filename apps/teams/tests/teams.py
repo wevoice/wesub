@@ -7,7 +7,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import ObjectDoesNotExist
+from django.db.models import ObjectDoesNotExist, Q
 from django.test import TestCase
 
 from auth.models import CustomUser as User
@@ -18,7 +18,7 @@ from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember,
-    TeamLanguagePreference
+    TeamLanguagePreference, Project
 )
 from apps.videos.search_indexes import VideoIndex
 from apps.videos import metadata_manager
@@ -90,7 +90,7 @@ class TestNotification(TestCase):
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 1)
-        
+
         self.assertIn(self.user.email, mail.outbox[0].to[0] )
         self.assertEqual(len(send_templated_email_mockup.context['team_videos']), 2)
 
@@ -174,7 +174,7 @@ class TeamVideoTest(TestCase):
 
     def _search_for_video(self, team_video):
         qs = VideoIndex.public().filter(title=team_video.video_title_exact)
-        
+
         if not qs:
             return False
 
@@ -222,6 +222,26 @@ class TeamVideoTest(TestCase):
         for video in videos:
             self.assertTrue(video.is_public)
             self.assertTrue(self._search_for_video(video))
+
+    def test_wrong_project_team_fails(self):
+        video = Video.objects.filter(teamvideo__isnull=True)[0]
+        project = Project.objects.create(slug="one-project", team=self.team)
+
+        team_video = TeamVideo.objects.create(video=video, team=self.team, title="", description="",
+                                 added_by=self.user, project=project)
+
+        self.assertTrue(team_video)
+
+        team_video.project = Project.objects.filter(~Q(team=self.team))[0]
+
+        self.assertNotEquals(team_video.project, project)
+        self.assertNotEquals(team_video.project.team, self.team)
+
+        try:
+            team_video.save()
+            self.fail("Assertion for team + project did not work")
+        except AssertionError:
+            pass
 
 class TeamsTest(TestCase):
 
@@ -790,15 +810,15 @@ class TeamsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
         url = reverse("teams:index")
-        
+
         response = self.client.get(url)
         teams = response.context['teams_list']
         self.assertTrue(len(teams) < 10)
         teams_pks = [t.pk for t in teams]
         print teams_pks, hidden.pk
-        
+
         self.assertNotIn(hidden.pk, teams_pks)
-        
+
 from apps.teams.rpc import TeamsApiClass
 from utils.rpc import Error, Msg
 from django.contrib.auth.models import AnonymousUser
@@ -1070,7 +1090,7 @@ class TestInvites(TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertIn( 'error_msg', response.context)
         self.assertFalse(self.team.members.filter(user=self.user).exists())
-        
+
     def test_invite_invalid_after_deny(self):
         invite_form = InviteForm(self.team, self.owner, {
             'user_id': self.user.pk,
@@ -1094,7 +1114,7 @@ class TestInvites(TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertIn( 'error_msg', response.context)
         self.assertFalse(self.team.members.filter(user=self.user).exists())
-        
+
     def test_invite_after_removal(self):
         invite_form = InviteForm(self.team, self.owner, {
             'user_id': self.user.pk,
@@ -1155,17 +1175,18 @@ class TestInvites(TestCase):
             username=self.user.username,
             password=self.user.username
         )
+
         url = reverse("teams:accept_invite", args=(invite.pk,))
         response  = self.client.get(url)
         self.assertEqual(response.status_code, 500)
         self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
-        
+
         # user leaves team
         url = reverse("teams:leave_team", args=(self.team.slug,))
         response  = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
-        
+
 
         # user tries to re-accept old invite - fails
         url = reverse("teams:accept_invite", args=(invite.pk,))
@@ -1174,7 +1195,7 @@ class TestInvites(TestCase):
         self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
         # user is re-invited, should work
 
-        
+
         invite_form = InviteForm(self.team, self.owner, {
             'user_id': self.user.pk,
             'message': 'Subtitle ALL the things!',
@@ -1190,4 +1211,4 @@ class TestInvites(TestCase):
         response  = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
-        
+

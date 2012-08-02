@@ -675,6 +675,11 @@ class TeamVideo(models.Model):
     def save(self, *args, **kwargs):
         if not hasattr(self, "project"):
             self.project = self.team.default_project
+
+        assert self.project.team == self.team, \
+                    "%s: Team (%s) is not equal to project's (%s) team (%s)"\
+                         % (self, self.team, self.project, self.project.team)
+
         super(TeamVideo, self).save(*args, **kwargs)
 
 
