@@ -1159,6 +1159,7 @@ class TestSubtitlesGenerator(TestCase):
     def setUp(self):
         self.video = Video.objects.all()[:1].get()
         self.subtitles = []
+        self.cyrillic_text = u'Не аглійські субтитри. Її'
         self.subtitles.append({
             'start': 0,
             'end': 1,
@@ -1167,18 +1168,19 @@ class TestSubtitlesGenerator(TestCase):
         self.subtitles.append({
             'start': 1,
             'end': 2,
-            'text': u'Не аглійські субтитри. Її'
+            'text': self.cyrillic_text
         })
         self.subtitles.append({
             'start': 359999.0,
             'end': 359999.0,
-            'text': u"Andres Martinez: Right. And I guess\xa0\x1e\x1e\n I'm tempted to cut to what is the answer."
+            'text': u"Andres Martinez: Right. And I guess é I'm tempted to cut to what is the answer."
         })
 
     def test_ttml(self):
         handler = TTMLSubtitles
         h = handler(self.subtitles, self.video)
         self.assertTrue(unicode(h))
+        self.assertIn(self.cyrillic_text , unicode(h))
 
     def test_one_subtitle(self):
         subtitles = [{
