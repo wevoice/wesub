@@ -7,7 +7,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import ObjectDoesNotExist
+from django.db.models import ObjectDoesNotExist, Q
 from django.test import TestCase
 
 from auth.models import CustomUser as User
@@ -18,7 +18,7 @@ from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember,
-    TeamLanguagePreference
+    TeamLanguagePreference, Project
 )
 from apps.videos.search_indexes import VideoIndex
 from apps.videos import metadata_manager
@@ -222,6 +222,28 @@ class TeamVideoTest(TestCase):
         for video in videos:
             self.assertTrue(video.is_public)
             self.assertTrue(self._search_for_video(video))
+
+    def test_wrong_project_team_fails(self):
+        video = Video.objects.filter(teamvideo__isnull=True)[0]
+        project = Project.objects.create(slug="one-project", team=self.team)
+
+        team_video = TeamVideo.objects.create(video=video, team=self.team, title="", description="",
+                                 added_by=self.user, project=project)
+
+        self.assertTrue(team_video)
+
+        from ipdb import set_trace; set_trace()
+
+        team_video.project = Project.objects.filter(~Q(team=self.team))[0]
+
+        self.assertNotEquals(team_video.project, project)
+        self.assertNotEquals(team_video.project.team, self.team)
+
+        try:
+            team_video.save()
+            self.fail("Assertion for team + project did not work")
+        except AssertionError:
+            pass
 
 class TeamsTest(TestCase):
 
