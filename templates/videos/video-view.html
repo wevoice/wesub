@@ -30,6 +30,11 @@
                     window.VIDEO_TEAM_NAME = '{{ video.team_set.all.0 }}';
                     window.VIDEO_TEAM_URL = '{{ video.team_set.all.0.get_absolute_url }}';
                 {% endif %}
+                {% if video.team_set.all.0.workflow_enabled %}
+                    window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
+                {% else %}
+                    window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
+                {% endif %}
             {% endif %}
         </script>
     {% endblock %}
