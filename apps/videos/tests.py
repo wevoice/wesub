@@ -19,6 +19,7 @@
 import feedparser
 import json
 import os
+import re
 from datetime import datetime
 from StringIO import StringIO
 
@@ -2585,9 +2586,10 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
     def test_dfxp_serializer(self):
         add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
         content = self._download_subs(self.language, 'dxfp')
-        #self.assertTrue(result.find("Here we<br/>go") > -1)
-        self.assertIn('<span tts:fontWeight="bold">bold</span>' , content )
-        self.assertIn('<span tts:fontStyle="italic">italic</span>', content)
+        self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
+        self.assertTrue(re.findall('<span style="strong">[\s]*bold[\s]*</span>', content))
+        self.assertTrue(re.findall('<span style="emphasis">[\s]*italic[\s]*</span>', content))
+        self.assertTrue(re.findall('<span style="underlined">[\s]*underline[\s]*</span>', content))
  
 def add_subs(language, subs_texts):
     version = language.version()
