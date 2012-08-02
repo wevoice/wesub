@@ -25,6 +25,8 @@ from .videos.types import (
     video_type_registrar, UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 )
 
+from utils.metrics import Meter
+
 # for now, they kind of match
 ACCOUNT_TYPES = VIDEO_TYPE
 
@@ -75,8 +77,14 @@ class ThirdPartyAccountManager(models.Manager):
             vt = video_type_registrar.video_type_for_url(vurl.url)
 
             if should_sync:
-                vt.update_subtitles(version, always_push_account)
-                already_updated = False
+                try:
+                    vt.update_subtitles(version, always_push_account)
+                    already_updated = True
+                    Meter('youtube.push.success').inc()
+                except:
+                    Meter('youtube.push.fail').inc()
+                finally:
+                    Meter('youtube.push.request').inc()
 
             username = vurl.owner_username
 
