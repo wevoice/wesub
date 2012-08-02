@@ -180,7 +180,7 @@
                                 {% endif %}
                                 {% if not task|can_perform_task:user %}
                                     class="disabled">
-                                    <div class="cannot-perform">You are not able to perform this task.</div
+                                    <div class="cannot-perform">{% trans "You don't have permission to perform this task." %}</div
                                 {% endif %}
                                 >
 
