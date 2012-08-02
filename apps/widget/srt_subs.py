@@ -309,11 +309,11 @@ class TTMLSubtitles(BaseSubtitles):
                 # as we're replacing new lines with <br>s we need to create
                 # the element from a fragment,and also from the formateed <b> and <i> to
                 # the correct span / style
-                content = item['text'].replace('\n', '<br/>').strip()
-                content = content.replace("<b>", '<span style="strong">').replace("</b>", '</span>')
-                content = content.replace("<i>", '<span style="emphasis">').replace("</i>", '</span>')
-                content = content.replace("<u>", '<span style="underlined">').replace("</u>", '</span>')
-                node = xml.dom.minidom.parseString("<p>%s</p>" % content)
+                content = item['text'].replace(u'\n', u'<br/>').strip()
+                content = content.replace(u"<b>", u'<span style="strong">').replace(u"</b>", u'</span>')
+                content = content.replace(u"<i>", u'<span style="emphasis">').replace(u"</i>", u'</span>')
+                content = content.replace(u"<u>", u'<span style="underlined">').replace(u"</u>", u'</span>')
+                node = xml.dom.minidom.parseString((u"<p>%s</p>" % content).encode('utf-8'))
                 child = node.documentElement
 
                 for k,v in self._get_attributes(item).items():
