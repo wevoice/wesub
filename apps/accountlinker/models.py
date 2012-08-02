@@ -153,6 +153,8 @@ class YoutubeSyncRule(models.Model):
         return 'Youtube sync rule'
 
     def team_in_list(self, team):
+        if not team:
+            return False
         teams = self.team.split(',')
         if '*' in teams:
             return True
@@ -173,6 +175,11 @@ class YoutubeSyncRule(models.Model):
         return pk in map(int, pks)
 
     def should_sync(self, video):
-        return self.team_in_list(video.get_team_video().team.slug) or \
+        tv = video.get_team_video()
+        team = None
+        if tv:
+            team = tv.team.slug
+
+        return self.team_in_list(team) or \
                 self.user_in_list(video.user) or \
                 self.video_in_list(video.pk)
