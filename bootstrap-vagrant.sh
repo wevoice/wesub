@@ -3,20 +3,20 @@
 set -e
 
 EXTRAS_DIR='/opt/extras'
-VE_DIR='/opt/ve/unisubs'
-# create virtualenv
-virtualenv --no-site-packages --distribute $VE_DIR
+VE_DIR='/opt/ve/vagrant/unisubs'
+# create virtualenv ; no longer needed
+#virtualenv --no-site-packages --distribute $VE_DIR
 # Link folders ----------------------------------------------------------------
 mkdir -p $EXTRAS_DIR/static-cache
 mkdir -p $EXTRAS_DIR/pictures
 mkdir -p $EXTRAS_DIR/video
-test -L venv               || ln -s $VE_DIR venv
+test -e venv               || ln -sf $VE_DIR venv
 test -L media/static-cache || ln -s $EXTRAS_DIR/static-cache media/static-cache
 test -L user-data/video    || ln -s $EXTRAS_DIR/video user-data/video
 test -L user-data/pictures || ln -s $EXTRAS_DIR/pictures user-data/pictures
 
 # Install requirements --------------------------------------------------------
-source venv/bin/activate
+source $VE_DIR/bin/activate
 cd deploy
 # Hack until we can think of a better solution
 #pip install vendor/pycrypto-2.1.0.tar.gz
@@ -82,11 +82,11 @@ python manage.py migrate --fake --settings=dev_settings
 sudo ./deploy/update_solr_schema_vagrant.sh
 
 # Adjust sys.path -------------------------------------------------------------
-cat >venv/lib/python2.6/sitecustomize.py <<EOF
+cat > venv/lib/python2.6/sitecustomize.py <<EOF
 import sys
 
 try:
-    sys.path.remove('/opt/extras/venv/lib/python2.6/site-packages')
+    sys.path.remove('/opt/ve/vagrant/unisubs/lib/python2.6/site-packages')
 except ValueError:
     pass
 
@@ -95,7 +95,7 @@ try:
 except ValueError:
     pass
 
-sys.path = ['/opt/extras/venv/lib/python2.6/site-packages', '/usr/lib/python2.6'] + sys.path
+sys.path = ['/opt/ve/vagrant/unisubs/lib/python2.6/site-packages', '/usr/lib/python2.6'] + sys.path
 EOF
 
 # Celery services -------------------------------------------------------------

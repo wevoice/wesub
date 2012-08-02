@@ -1,11 +1,18 @@
 #!/bin/sh
-VE_DIR='/opt/ve/unisubs'
+APP_DIR='/opt/apps/vagrant/unisubs'
+VE_DIR='/opt/ve/vagrant/unisubs'
 
 cd /tmp
 # install git
 sudo apt-get update 2>&1 > /dev/null
 sudo apt-get -y install git-core 2>&1 > /dev/null
-# create the env file
+
+# remove existing venv symlink (sifter #1379)
+if [ -e "$APP_DIR/venv" ] ; then
+  rm $APP_DIR/venv
+fi
+
+# create the puppet environment config files
 echo "environments:\n  - vagrant\n" > /etc/system_environments.yml
 echo "roles:\n  - vagrant\n" > /etc/system_roles.yml
 # clone the puppet modules
