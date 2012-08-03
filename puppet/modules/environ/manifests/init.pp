@@ -9,4 +9,5 @@ class environ() {
   # needed for selenium testing
   if ! defined(Package['firefox']) { package { 'firefox': ensure => installed, } }
   if ! defined(Package['screen']) { package { 'screen': ensure => installed, } }
+  if ! defined(Package['xvfb']) { package { 'xvfb': ensure => installed, } }
 }
