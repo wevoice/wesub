@@ -33,6 +33,33 @@ from utils.metrics import Meter
 ACCOUNT_TYPES = VIDEO_TYPE
 
 
+def youtube_sync(video, language):
+    """
+    Simplified version of what's found in
+    ``ThirdPartyAccount.mirror_on_third_party``.  It doesn't bother checking if
+    we should be syncing this or not.  Only does the new Youtube/Amara
+    integration syncing.  Used on debug page for video.
+    """
+    version = language.latest_version()
+
+    if version:
+        if not version.is_public or not version.is_synced():
+            return
+
+    always_push_account = ThirdPartyAccount.objects.always_push_account()
+
+    for vurl in video.videourl_set.all():
+        vt = video_type_registrar.video_type_for_url(vurl.url)
+
+        try:
+            vt.update_subtitles(version, always_push_account)
+            Meter('youtube.push.success').inc()
+        except:
+            Meter('youtube.push.fail').inc()
+        finally:
+            Meter('youtube.push.request').inc()
+
+
 class ThirdPartyAccountManager(models.Manager):
 
     def always_push_account(self):
