@@ -44,7 +44,7 @@ class AccountTest(TestCase):
         video = Video.objects.filter(teamvideo__isnull=False)[0]
         video.user = User.objects.get(username='admin')
         team = video.get_team_video().team
-        team = ",".join([team.slug, 'honza'])
+        team = team.slug
 
         r = YoutubeSyncRule.objects.create()
         self.assertFalse(r.should_sync(video))

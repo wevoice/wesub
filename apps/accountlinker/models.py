@@ -18,17 +18,20 @@
 
 from django.db import models
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 
 from videos.models import VIDEO_TYPE
 from .videos.types import (
     video_type_registrar, UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 )
+from teams.models import Team
+from auth.models import CustomUser as User
 
 from utils.metrics import Meter
 
 # for now, they kind of match
 ACCOUNT_TYPES = VIDEO_TYPE
+
 
 class ThirdPartyAccountManager(models.Manager):
 
@@ -100,6 +103,7 @@ class ThirdPartyAccountManager(models.Manager):
                     vt.update_subtitles(version, account)
                 elif action == DELETE_LANGUAGE_ACTION:
                     vt.delete_subtitles(language, account)
+
 
 class ThirdPartyAccount(models.Model):
     """
@@ -191,3 +195,23 @@ class YoutubeSyncRule(models.Model):
         return self.team_in_list(team) or \
                 self.user_in_list(video.user) or \
                 self.video_in_list(video.pk)
+
+    def _clean(self, name):
+        if name not in ['team', 'user']:
+            return
+        field  = getattr(self, name)
+        values = set(field.split(','))
+        values = [v for v in values if v != '*']
+        if len(values) == 1 and values[0] == '':
+            return []
+        return values
+
+    def clean(self):
+        teams = self._clean('team')
+        users = self._clean('user')
+
+        if len(teams) != Team.objects.filter(slug__in=teams).count():
+            raise ValidationError("One or more teams not found")
+
+        if len(users) != User.objects.filter(username__in=users).count():
+            raise ValidationError("One or more users not found")
