@@ -68,6 +68,10 @@ SPEAKERTEXT_PASSWORD = ""
 # Metrics
 RIEMANN_HOST = '10.10.10.44'
 ENABLE_METRICS = False
+
+# Youtube
+YOUTUBE_ALWAYS_PUSH_USERNAME = None
+YOUTUBE_ALWAYS_PUSH_TO = {}
 EOF
 
 # Set up the DB ---------------------------------------------------------------
