@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 """Functionality for generating srt files."""
 
+import xml.dom.minidom
 import StringIO
 
 def captions_and_translations_to_srt(captions_and_translations):
@@ -266,10 +267,22 @@ import re
 class TTMLSubtitles(BaseSubtitles):
     file_type = 'xml'
     remove_re = re.compile(u'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]')
+    STYLES = {
+
+        "strong": {
+            'fontWeight':'bold'
+        },
+        'emphasis': {
+            'textStyle': 'italic'
+        },
+        'underlined': {
+            'textDecoration': 'underline'
+        }
+    }
 
     def __unicode__(self):
-        return (u'<?xml version="1.0" encoding="UTF-8"?>%s' % self.line_delimiter)\
-            +etree.tounicode(self.xml_node(), pretty_print=True)
+        node = self.xml_node()
+        return node.toprettyxml(newl="")
 
     def _get_attributes(self, item):
         attrib = {}
@@ -278,21 +291,36 @@ class TTMLSubtitles(BaseSubtitles):
         return attrib
 
     def xml_node(self):
-        tt = etree.Element('tt', nsmap={None: 'http://www.w3.org/2006/04/ttaf1', 'tts': 'http://www.w3.org/2006/04/ttaf1#styling'})
-        etree.SubElement(tt, 'head')
-        body = etree.SubElement(tt, 'body')
-        div = etree.SubElement(body, 'div')
+        xmlt = """<tt xml:lang="" xmlns="http://www.w3.org/ns/ttml"><head><metadata/><styling/><layout/></head><body region="subtitleArea"><div></div></body></tt>"""
+        dom = xml.dom.minidom.parseString(xmlt)
+	styling = dom.getElementsByTagName('head')[0].getElementsByTagName('styling')[0]
+        styling.setAttribute("xmlns:tts", "http://www.w3.org/2006/10/ttaf1#styling")
+
+        for style_name, style_def in TTMLSubtitles.STYLES.items():
+            style = dom.createElement('style')
+            style.setAttribute('xml:id', style_name)
+            for def_name, def_style in style_def.items():
+                style.setAttribute(def_name, def_style)
+            styling.appendChild(style)
+
+	div = dom.getElementsByTagName('tt')[0].getElementsByTagName('body')[0].getElementsByTagName('div')[0]
         for item in self.subtitles:
             if item['text'] and self.isnumber(item['start']) and self.isnumber(item['end']):
-                attrib = self._get_attributes(item)
                 # as we're replacing new lines with <br>s we need to create
-                # the element from a fragment
-                p = lxml.html.fragment_fromstring(self.remove_re.sub(
-                    '', u"<p>%s</p>" %item['text'].replace('\n', '<br/>').strip()
-                ))
-                p.attrib.update(attrib)
-                div.append(p)
-        return tt
+                # the element from a fragment,and also from the formateed <b> and <i> to
+                # the correct span / style
+                content = item['text'].replace(u'\n', u'<br/>').strip()
+                content = content.replace(u"<b>", u'<span style="strong">').replace(u"</b>", u'</span>')
+                content = content.replace(u"<i>", u'<span style="emphasis">').replace(u"</i>", u'</span>')
+                content = content.replace(u"<u>", u'<span style="underlined">').replace(u"</u>", u'</span>')
+                node = xml.dom.minidom.parseString((u"<p>%s</p>" % content).encode('utf-8'))
+                child = node.documentElement
+
+                for k,v in self._get_attributes(item).items():
+                    child.setAttribute(k,v)
+                div.appendChild(child)
+
+        return dom
 
     def format_time(self, time):
         hours = int(floor(time / 3600))

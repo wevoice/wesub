@@ -23,9 +23,8 @@ from django.db.models import Sum, Q
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
-from icanhaz.models import VideoVisibilityPolicy
 from statistic.tasks import st_widget_view_statistic_update
-from teams.models import Task, Workflow
+from teams.models import Task, Workflow, Team
 from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
@@ -101,11 +100,10 @@ class Rpc(BaseRpc):
 
         visibility_policy = video_cache.get_visibility_policies(video_id)
 
-        if visibility_policy.get('widget', None) != VideoVisibilityPolicy.WIDGET_VISIBILITY_PUBLIC:
-            can_show = VideoVisibilityPolicy.objects.can_show_widget(
-                video_id, referer=request.META.get('referer'), user=request.user)
+        if not visibility_policy.get("is_public", True):
+            team = Team.objects.get(id=visibility_policy['team_id'])
 
-            if not can_show:
+            if not team.is_member(request.user):
                 return {"error_msg": _("Video embedding disabled by owner")}
 
     def _get_video_urls_for_widget(self, video_url, video_id):
@@ -201,6 +199,37 @@ class Rpc(BaseRpc):
 
 
     # Start Dialog (aka "Subtitle Into" Dialog)
+    def _get_blocked_languages(self, team_video, user):
+        # This is yet another terrible hack for the tasks system.  I'm sorry.
+        #
+        # Normally the in-progress languages will be marked as disabled in the
+        # language_summary call, but that doesn't happen for languages that
+        # don't have SubtitleLanguage objects yet, i.e. ones that have a task
+        # but haven't been started yet.
+        #
+        # This function returns a list of languages that should be disabled ON
+        # TOP OF the already-disabled ones.
+        #
+        # Here's a kitten to cheer you up:
+        #
+        #                     ,_
+        #            (\(\      \\
+        #            /.. \      ||
+        #            \Y_, '----.//
+        #              )        /
+        #              |   \_/  ;
+        #               \\ |\`\ |
+        #          jgs  ((_/(_(_/
+        if team_video:
+            tasks = team_video.task_set.incomplete()
+
+            if user.is_authenticated():
+                tasks = tasks.exclude(assignee=user)
+
+            return list(tasks.values_list('language', flat=True))
+        else:
+            return []
+
     def fetch_start_dialog_contents(self, request, video_id):
         my_languages = get_user_languages_from_request(request)
         my_languages.extend([l[:l.find('-')] for l in my_languages if l.find('-') > -1])
@@ -216,12 +245,15 @@ class Rpc(BaseRpc):
         tv = video.get_team_video()
         writable_langs = list(tv.team.get_writable_langs()) if tv else []
 
+        blocked_langs = self._get_blocked_languages(team_video, request.user)
+
         return {
             'my_languages': my_languages,
             'video_languages': video_languages,
             'original_language': original_language,
             'limit_languages': writable_langs,
-            'is_moderated': video.is_moderated, }
+            'is_moderated': video.is_moderated,
+            'blocked_languages': blocked_langs, }
 
 
     # Fetch Video ID and Settings
@@ -238,14 +270,15 @@ class Rpc(BaseRpc):
     # Ugly hack for N caption display.
     def get_caption_display_mode(self, language):
         team_video = language.video.get_team_video()
-        if team_video and team_video.team.slug == 'netflix':
+        _NETFLIX_TEAMS = ['netflix', 'netflix-private', 'netflix-applicant']
+        if team_video and team_video.team.slug in _NETFLIX_TEAMS:
             return 'n'
         else:
             return 'normal'
 
 
     # Start Editing
-    def _check_team_video_locking(self, user, video_id, language_code, is_translation, mode, is_edit):
+    def _check_team_video_locking(self, user, video_id, language_code, is_translation=None, mode=None, is_edit=None):
         """Check whether the a team prevents the user from editing the subs.
 
         Returns a dict appropriate for sending back if the user should be
@@ -264,6 +297,9 @@ class Rpc(BaseRpc):
         else:
             message = _(u"Sorry, these subtitles are privately moderated.")
 
+        if not team_video.video.can_user_see(user):
+             return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
+            
         # Check that there are no open tasks for this action.
         tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
 
@@ -325,6 +361,7 @@ class Rpc(BaseRpc):
         other functions.
 
         """
+
         # TODO: remove whenever blank SubtitleLanguages become illegal.
         self._fix_blank_original(video_id)
 
@@ -384,7 +421,16 @@ class Rpc(BaseRpc):
 
     # Resume Editing
     def resume_editing(self, request, session_pk):
-        session = SubtitlingSession.objects.get(pk=session_pk)
+        try:
+            session = SubtitlingSession.objects.get(pk=session_pk)
+        except SubtitlingSession.DoesNotExist:
+            return {'response': 'cannot_resume'}
+
+        error = self._check_team_video_locking(request.user, session.video.video_id, session.language.language)
+
+        if error:
+            return {'response': 'cannot_resume'}
+
         if session.language.can_writelock(request) and \
                 session.parent_version == session.language.version():
             session.language.writelock(request)
@@ -816,9 +862,6 @@ class Rpc(BaseRpc):
 
         workflow = Workflow.get_for_team_video(team_video)
 
-        if not workflow.approve_enabled and not workflow.review_enabled:
-            return UNMODERATED, False
-
         # If there are any open team tasks for this video/language, it needs to
         # be kept under moderation.
         tasks = team_video.task_set.incomplete().filter(
@@ -831,9 +874,12 @@ class Rpc(BaseRpc):
                     if not task.language:
                         task.language = sl.language
                         task.save()
-            return WAITING_MODERATION, False
 
-        if sl.has_version:
+            return (UNMODERATED, False) if not workflow.allows_tasks else (WAITING_MODERATION, False)
+
+        if not workflow.allows_tasks:
+            return UNMODERATED, False
+        elif sl.has_version:
             # If there are already active subtitles for this language, we're
             # dealing with an edit.
             if can_publish_edits_immediately(team_video, user, sl.language):

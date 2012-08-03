@@ -29,15 +29,19 @@
                     </p>
 
                     <label for="id_messages_invite">{% trans 'When a member is invited to join the team' %}</label>
+                    {{ form.messages_invite.errors }}
                     {{ form.messages_invite }}
 
                     <label for="id_messages_application">{% trans 'When a member applies to join the team' %}</label>
+                    {{ form.messages_application.errors}}
                     {{ form.messages_application }}
 
                     <label for="id_messages_manager">{% trans 'When a member is given the Manager role' %}</label>
+                    {{ form.messages_manager.errors }}
                     {{ form.messages_manager }}
 
                     <label for="id_messages_admin">{% trans 'When a member is given the Admin role' %}</label>
+                    {{ form.messages_admin.errors }}
                     {{ form.messages_admin }}
                 </fieldset>
                 <fieldset>
@@ -48,12 +52,15 @@
                     </p>
 
                     <label for="id_guidelines_subtitle">{% trans 'When transcribing' %}</label>
+                    {{ form.guidelines_subtitle.errors }}
                     {{ form.guidelines_subtitle }}
 
                     <label for="id_guidelines_translate">{% trans 'When translating' %}</label>
+                    {{ form.guidelines_translate.errors }}
                     {{ form.guidelines_translate }}
 
                     <label for="id_guidelines_review">{% trans 'When reviewing' %}</label>
+                    {{ form.guidelines_review.errors }}
                     {{ form.guidelines_review }}
                 </fieldset>
 

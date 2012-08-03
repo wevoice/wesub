@@ -661,6 +661,13 @@ List all tasks for a given team:
         * ``type``      Task type (details below)
         * ``-type``     Task type (descending)
 
+    :query completed: Show only complete tasks
+    :query completed-before: Show only tasks completed before a given date
+        (unix timestamp)
+    :query completed-after: Show only tasks completed before a given date
+        (unix timestamp)
+    :query open: Show only incomplete tasks
+
 Task detail:
 
 .. http:get:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
@@ -728,6 +735,8 @@ List activity items:
     :query video: Show only items related to a given video (video id)
     :query action_type: Show only items with a given action type (int, see below)
     :query language: Show only items with a given language (language code)
+    :query before: A unix timestamp in seconds
+    :query after: A unix timestamp in seconds
 
 Activity types:
 

@@ -19,6 +19,7 @@
         window.ASSIGN_TASK_AJAX_URL = '{% url teams:assign_task_ajax slug=team.slug %}';
         window.ASSIGNEE = '{% firstof request.user.id -1 %}';
         window.TEAM_SLUG = '{{ team.slug }}';
+        window.USER_LANGS = {{ user.get_languages.count }};
     </script>
 {% endblock %}
 
@@ -68,10 +69,10 @@
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'tasks for' %}</span>
                     <select id="id_task_language" name="language" class="lang-filter chosen">
-                        <option id="lang-opt-any" value="{{ request.path }}{% query_string request.GET lang="" page='' %}">{% trans 'all languages' %}</option>
                         {% if request.user.is_authenticated %}
-                            <option id="lang-opt-mine" value="{{ request.path }}{% query_string request.GET lang="mine" page='' %}">{% trans 'my languages' %}</option>
+                            <option id="lang-opt-mine" value="{{ request.path }}{% query_string request.GET lang="" page='' %}">{% trans 'my languages' %}</option>
                         {% endif %}
+                        <option id="lang-opt-all" value="{{ request.path }}{% query_string request.GET lang="all" page='' %}">{% trans 'all languages' %}</option>
                         {% for language in languages %}
                             <option id="lang-opt-{{ language.code }}" value="{% query_string request.GET lang=language.code page='' %}"
                                 {% if request.GET.lang == language.code %}
@@ -85,11 +86,11 @@
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'assigned to' %}</span>
                     <select name="assignee" class="assignee-filter">
-                        <option value="{{ request.path }}{% query_string request.GET assignee='' page='' %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
+                        <option value="{{ request.path }}{% query_string request.GET assignee='' page='' %}" {% if not request.GET.assignee %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
                         <option value="{% query_string request.GET assignee='me' page='' %}" {% if request.GET.assignee == 'me' %}selected="selected"{% endif %}>{% trans 'me' %}</option>
-                        <option value="{% query_string request.GET assignee='none' page='' %}" {% if request.GET.assignee == 'none' %}selected="selected"{% endif %}>{% trans 'no one' %}</option>
+                        <option value="{% query_string request.GET assignee='anyone' page='' %}" {% if request.GET.assignee == 'anyone' %}selected="selected"{% endif %}>{% trans 'anyone' %}</option>
                         {% with request.GET.assignee as assigned %}
-                            {% if assigned and assigned != 'none' and assigned != 'me' %}
+                            {% if assigned and assigned != 'me' and assigned != 'anyone' %}
                                 <option value="{% query_string request.GET assignee=assigned page='' %}" selected="selected">{{ assigned }}</option>
                             {% endif %}
                         {% endwith %}
@@ -134,6 +135,33 @@
             </p>
         {% endif %}
 
+        {% if not tasks and filtered %}
+        <p class="view-notice">
+            <strong>{% trans 'Try broadening your selection using the filters above' %}</strong>
+        </p>
+        {% endif %}
+
+        {% if user.is_authenticated and not user.get_languages %}
+        <p class="view-notice">
+            <strong><a href="#" data-modal="language_modal" id="lang_select_btn">{% trans 'Tell us what languages you speak' %}</a> {% trans "and we'll narrow this list for you" %}</strong>
+        </p>
+        {% else %}
+            {% if not filtered %}
+            <p class="view-notice">
+                <strong>
+                    {% trans 'Showing unassigned tasks in languages you speak' %}
+                </strong>
+                {% if not tasks %}
+                <strong>
+                    <br />
+                    {% trans 'Try changing your selection using the filters above to find tasks' %}
+                </strong>
+                {% endif %}
+            </p>
+            {% endif %}
+        {% endif %}
+
+
         {% if tasks %}
             <ul class="tasks listing">
                 {% with member.has_max_tasks as has_max_tasks %}
@@ -143,12 +171,16 @@
                                 {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
                                     {% if translated_from and not translated_from.had_version %}
                                         class="disabled">
-                                        <div class="cannot-perform-disabled">This task cannot be performed until the original language ({{ translated_from.get_language_display }}) is finished.</div
+                                        <div class="cannot-perform disabled">This task cannot be performed until the original language ({{ translated_from.get_language_display }}) is finished.</div
                                     {% endif %}
                                 {% endif %}
                                 {% if task.is_blocked %}
                                     class="disabled">
-                                    <div class="cannot-perform-disabled">This task cannot be performed until the original language ({{ task.subtitle_version.language }}) has been approved.</div
+                                    <div class="cannot-perform disabled">This task cannot be performed until the original language ({{ task.subtitle_version.language }}) has been approved.</div
+                                {% endif %}
+                                {% if not task|can_perform_task:user %}
+                                    class="disabled">
+                                    <div class="cannot-perform">{% trans "You don't have permission to perform this task." %}</div
                                 {% endif %}
                                 >
 
@@ -292,6 +324,7 @@
                                                                 <div class="ajaxChosen">
                                                                     <label>{% trans 'Language' %}</label>
                                                                     {{ upload_draft_form.language }}
+                                                                    <p class="notice">{% trans "Please double check the primary spoken language. This step cannot be undone." %}</p>
                                                                 </div>
                                                                 {% endif %}
                                                                 {% if task.get_type_display == "Translate" and not task.get_subtitle_version %}

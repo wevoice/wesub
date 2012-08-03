@@ -102,11 +102,11 @@ unisubs.player.CaptionView.prototype.setUpPositioning =
  * @ opt_charsPerLine The max number of characters to allow per line
  * @ opt_maxLines The max number of lines to allow
  * @ opt_linebreakStr Which string to use when joining lines, i.e. \n or <bt/>
- * @return An array with lines of a maximum 32 chars
+ * @return An array with lines of a maximum 42 chars
 **/
 unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_maxLines, opt_linebreakStr){
 
-    var charsPerLine = opt_charsPerLine || 32;
+    var charsPerLine = opt_charsPerLine || 42;
     var maxLines = opt_maxLines || 4;
     var linebreakStr = opt_linebreakStr || "<br/>";
     // short circuit most common case
@@ -114,6 +114,10 @@ unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_ma
         return "";
     }
     // the user might have forced line breaks, we should respect that
+
+    // Double newlines to force line breaks.
+    // No idea why.
+    text = text.replace('\n', '\n\n');
 
     var lines = [];
     var currentLine  = [];

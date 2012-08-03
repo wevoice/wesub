@@ -485,14 +485,14 @@ class TaskDeleteForm(forms.Form):
         return task
 
 class GuidelinesMessagesForm(forms.Form):
-    messages_invite = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    messages_manager = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    messages_admin = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    messages_application = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    messages_invite = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    messages_manager = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    messages_admin = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    messages_application = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
 
-    guidelines_subtitle = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    guidelines_translate = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
-    guidelines_review = forms.CharField(max_length=1024, required=False, widget=forms.Textarea)
+    guidelines_subtitle = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    guidelines_translate = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
+    guidelines_review = forms.CharField(max_length=4000, required=False, widget=forms.Textarea)
 
 class RenameableSettingsForm(forms.ModelForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
@@ -558,7 +558,7 @@ class InviteForm(forms.Form):
         user_id = self.cleaned_data['user_id']
 
         try:
-            User.objects.get(id=user_id)
+            invited_user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             raise forms.ValidationError(_(u'User does not exist!'))
         except ValueError:
@@ -572,19 +572,22 @@ class InviteForm(forms.Form):
             raise forms.ValidationError(_(u'User is already a member of this team!'))
 
         self.user_id = user_id
+        # check if there is already an invite pending for this user:
+        if Invite.objects.pending_for(team=self.team, user=invited_user).exists():
+                raise forms.ValidationError(_(u'User has already been invited and has not replied yet.'))
         return user_id
 
 
     def save(self):
         from messages import tasks as notifier
         user = User.objects.get(id=self.user_id)
-        invite, created = Invite.objects.get_or_create(team=self.team, user=user, defaults={
-            'note': self.cleaned_data['message'],
-            'author': self.user,
-            'role': self.cleaned_data['role'],
-        })
-
+        invite = Invite.objects.create(
+            team=self.team, user=user, author=self.user,
+            role= self.cleaned_data['role'],
+            note = self.cleaned_data['message'])
+        invite.save()
         notifier.team_invitation_sent.delay(invite.pk)
+        return invite
 
 class ProjectForm(forms.ModelForm):
     class Meta:
@@ -785,3 +788,19 @@ class UploadDraftForm(forms.Form):
 
         # we created a new subtitle version let's fire a notification
         video_changed_tasks.delay(video.id, version.id)
+
+
+class ChooseTeamForm(forms.Form):
+    team = forms.ChoiceField(choices=(), required=False)
+    start_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
+    end_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
+
+    def __init__(self, *args, **kwargs):
+        super(ChooseTeamForm, self).__init__(*args, **kwargs)
+        teams = Team.objects.all()
+        self.fields['team'].choices = [(t.pk, t.slug) for t in teams]
+
+    def clean(self):
+        cd = self.cleaned_data
+        cd['team'] = Team.objects.get(pk=cd['team'])
+        return cd

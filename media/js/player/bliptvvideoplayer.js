@@ -52,9 +52,6 @@ unisubs.player.BlipTvVideoPlayer = function(videoSource, opt_forDialog){
 
 goog.inherits(unisubs.player.BlipTvVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
-unisubs.player.BlipTvVideoPlayer.prototype.logger_ = 
-    goog.debug.Logger.getLogger('unisubs.player.BlipTvVideoPlayer');
-
 unisubs.player.BlipTvVideoPlayer.prototype.createDom = function() {
     // FIXME: this is copied directly from youtube video player.
 
@@ -235,7 +232,6 @@ unisubs.player.BlipTvVideoPlayer.prototype.swfReady_ = function(index){
     var onPlayerStateChange = "onPlayerState" + randomString;
 
     window[onPlayerStateChange] = function(newState){
-        that.logger_.info("new state is " + newState);
         switch(newState) {
             case 'playing':
                 that.isPlaying_ = true;

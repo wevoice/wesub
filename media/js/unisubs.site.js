@@ -132,11 +132,13 @@ var Site = function(Site) {
             if (typeof $select == 'undefined') {
                 $select = $('select#lang-filter');
             }
+
             if (window.REQUEST_GET_LANG) {
                 $opt = $('option[id="lang-opt-' + window.REQUEST_GET_LANG + '"]');
             } else {
-                $opt = $('option[id="lang-opt-any"]');
+                $opt = $('option[id="lang-opt-mine"]');
             }
+
             $select.children().removeAttr('selected');
             $opt.attr('selected', 'selected');
             $select.trigger('liszt:updated');

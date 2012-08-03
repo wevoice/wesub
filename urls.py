@@ -21,6 +21,7 @@ from django.conf.urls.defaults import include, patterns, url
 from django.conf import settings
 from django.contrib import admin
 from django.template import RequestContext, loader
+from django.views.generic.simple import direct_to_template
 from sitemaps import sitemaps, sitemap_view, sitemap_index
 from socialauth.models import AuthMeta, OpenidProfile
 
@@ -47,6 +48,8 @@ js_info_dict = {
 }
 
 urlpatterns = patterns('',
+    url('^500/$', direct_to_template, { 'template': '500.html' }),
+    url('^404/$', direct_to_template, { 'template': '404.html' }),
     url(r'^crossdomain.xml$',
         'crossdomain_views.root_crossdomain'),
     url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict,
@@ -57,8 +60,6 @@ urlpatterns = patterns('',
         include('comments.urls', namespace='comments')),
     url(r'^messages/',
         include('messages.urls', namespace='messages')),
-    url(r'^icanhaz/',
-        include('icanhaz.urls', namespace="icanhaz")),
     url(r'^rosetta/',
         include('rosetta.urls')),
     # TODO: Not sure what this is.  It's breaking the app under Django 1.4
@@ -66,6 +67,7 @@ urlpatterns = patterns('',
     #     include('targetter.urls', namespace='targetter')),
     url(r'^logout/',
         'django.contrib.auth.views.logout', name='logout'),
+    url(r'^admin/billing/$', 'teams.views.billing', name='billing'),
     url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset',
         name='password_reset'),
     url(r'^password_reset/done/$',
@@ -76,8 +78,6 @@ urlpatterns = patterns('',
         'django.contrib.auth.views.password_reset_complete'),
     url(r'socialauth/',
         include('socialauth.urls')),
-    url(r'^admin/settings/',
-        include('livesettings.urls')),
     url(r'^admin/',
         include(admin.site.urls)),
     url(r'^embed(?P<version_no>\d+)?.js$', 'widget.views.embed',
@@ -112,8 +112,6 @@ urlpatterns = patterns('',
         {'template': 'enterprise.html'}, 'enterprise_page'),
     url(r'^embedder/$', 'django.views.generic.simple.direct_to_template',
         {'template': 'embedder.html'}, 'embedder_page'),
-    url(r'^solutions/ngo/$', 'django.views.generic.simple.direct_to_template',
-        {'template': 'solutions/ngo.html'}, 'solutions_page'),
     url(r'^streaming-transcript/$', 'django.views.generic.simple.direct_to_template',
         {'template': 'streaming-transcript.html'}, 'streaming_transcript_demo'),
     url(r'^w3c/p3p.xml$', 'django.views.generic.simple.direct_to_template',
