@@ -707,6 +707,9 @@ def video_debug(request, video_id):
     from apps.testhelpers.views import debug_video
     from apps.widget import video_cache as vc
     from django.core.cache import cache
+    from accountlinker.models import youtube_sync
+    from videos.models import VIDEO_TYPE_YOUTUBE
+
     video = get_object_or_404(Video, video_id=video_id)
     lang_info = debug_video(video)
     vid = video.video_id
@@ -723,8 +726,18 @@ def video_debug(request, video_id):
         "writelocked_langs": cache.get(vc._video_writelocked_langs_key(vid)),
     }
     tasks = Task.objects.filter(team_video=video)
+
+    is_youtube = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE).count() != 0
+
+    if request.method == 'POST' and request.POST.get('action') == 'sync':
+        # Sync video to youtube
+        sync_lang = SubtitleLanguage.objects.get(
+                pk=request.POST.get('language'))
+        youtube_sync(video, sync_lang)
+
     return render_to_response("videos/video_debug.html", {
-            'video':video,
+            'video': video,
+            'is_youtube': is_youtube,
             'lang_info': lang_info,
             'tasks': tasks,
             "cache": cache
