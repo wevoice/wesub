@@ -199,6 +199,37 @@ class Rpc(BaseRpc):
 
 
     # Start Dialog (aka "Subtitle Into" Dialog)
+    def _get_blocked_languages(self, team_video, user):
+        # This is yet another terrible hack for the tasks system.  I'm sorry.
+        #
+        # Normally the in-progress languages will be marked as disabled in the
+        # language_summary call, but that doesn't happen for languages that
+        # don't have SubtitleLanguage objects yet, i.e. ones that have a task
+        # but haven't been started yet.
+        #
+        # This function returns a list of languages that should be disabled ON
+        # TOP OF the already-disabled ones.
+        #
+        # Here's a kitten to cheer you up:
+        #
+        #                     ,_
+        #            (\(\      \\
+        #            /.. \      ||
+        #            \Y_, '----.//
+        #              )        /
+        #              |   \_/  ;
+        #               \\ |\`\ |
+        #          jgs  ((_/(_(_/
+        if team_video:
+            tasks = team_video.task_set.incomplete()
+
+            if user.is_authenticated():
+                tasks = tasks.exclude(assignee=user)
+
+            return list(tasks.values_list('language', flat=True))
+        else:
+            return []
+
     def fetch_start_dialog_contents(self, request, video_id):
         my_languages = get_user_languages_from_request(request)
         my_languages.extend([l[:l.find('-')] for l in my_languages if l.find('-') > -1])
@@ -214,12 +245,15 @@ class Rpc(BaseRpc):
         tv = video.get_team_video()
         writable_langs = list(tv.team.get_writable_langs()) if tv else []
 
+        blocked_langs = self._get_blocked_languages(team_video, request.user)
+
         return {
             'my_languages': my_languages,
             'video_languages': video_languages,
             'original_language': original_language,
             'limit_languages': writable_langs,
-            'is_moderated': video.is_moderated, }
+            'is_moderated': video.is_moderated,
+            'blocked_languages': blocked_langs, }
 
 
     # Fetch Video ID and Settings
@@ -241,6 +275,7 @@ class Rpc(BaseRpc):
             return 'n'
         else:
             return 'normal'
+
 
     # Start Editing
     def _check_team_video_locking(self, user, video_id, language_code, is_translation=None, mode=None, is_edit=None):
@@ -277,7 +312,7 @@ class Rpc(BaseRpc):
                     return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
 
         # Check that the team's policies don't prevent the action.
-        if mode and mode not in ['review', 'approve']:
+        if mode not in ['review', 'approve']:
             if is_translation:
                 can_edit = can_create_and_edit_translations(user, team_video, language_code)
             else:
