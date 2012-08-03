@@ -17,23 +17,17 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import sys
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.functional import update_wrapper
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
-from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.models import Site
 from utils.metrics import Meter
-from utils.subtitles import (
-    SubtitleParserError, SubtitleParser, TxtSubtitleParser,
-    YoutubeSubtitleParser, TtmlSubtitleParser, SrtSubtitleParser,
-    SbvSubtitleParser, SsaSubtitleParser, YoutubeXMLParser, DfxpSubtitleParser
-)
 
 DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
 
@@ -41,11 +35,6 @@ try:
     import oboe
 except ImportError:
     oboe = None
-
-def is_staff(user):
-    return user.is_authenticated() and user.is_staff and user.is_active
-
-check_is_staff = user_passes_test(is_staff)
 
 def render_to(template):
     """
@@ -83,14 +72,9 @@ def render_to_json(func):
         return HttpResponse(json, mimetype="application/json")
     return update_wrapper(wrapper, func)
 
-def get_object_or_none(*args, **kwargs):
-    try:
-        return get_object_or_404(*args, **kwargs)
-    except Http404:
-        return None
-
 def send_templated_email(to, subject, body_template, body_dict,
-                         from_email=None, ct="html", fail_silently=False, check_user_preference=True):
+                         from_email=None, ct="html", fail_silently=False,
+                         check_user_preference=True):
     """
     Sends an html email with a template name and a rendering context.
     Parameters:
