@@ -84,6 +84,8 @@ No issues here.
 CSRF protection extended to PUT and DELETE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+No issues here.
+
 Password reset view now accepts ``subject_template_name``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -118,6 +120,8 @@ The ``urlize`` filter no longer escapes every URL
 
 Database connections after running the test suite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Not critical.
 
 Output of ``manage.py help <help>``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
