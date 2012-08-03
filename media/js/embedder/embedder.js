@@ -213,8 +213,9 @@
                                 that.fetchSubtitles(that.model.get('initialLanguage'), function() {
 
                                     // When we've got a response with the subtitles, start building
-                                    // out the transcript viewer.
+                                    // out the transcript viewer and subtitles.
                                     that.buildTranscript(that.model.get('initialLanguage'));
+                                    that.buildSubtitles(that.model.get('initialLanguage'));
                                 });
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
@@ -227,29 +228,59 @@
 
             },
 
+            buildSubtitles: function(language) {
+
+                // Get the subtitle sets for this language.
+                var subtitleSets = this.model.subtitles.where({'language': language});
+
+                if (subtitleSets.length) {
+                    var subtitleSet = subtitleSets[0];
+
+                    // Get the actual subtitles for this language.
+                    var subtitles = subtitleSet.get('subtitles');
+
+                    // For each subtitle, init the Popcorn subtitle plugin.
+                    for (var i = 0; i < subtitles.length; i++) {
+                        this.pop.subtitle({
+                            start: subtitles[i].start,
+                            end: subtitles[i].end,
+                            text: subtitles[i].text
+                        });
+                    }
+                }
+            },
+
             buildTranscript: function(language) {
-                var subtitleSet = this.model.subtitles.where({'language': language})[0];
+
+                var subtitleSet;
+
+                // Get the subtitle sets for this language.
+                var subtitleSets = this.model.subtitles.where({'language': language});
+
+                if (subtitleSets.length) {
+                    subtitleSet = subtitleSets[0];
+                } else {
+                    this.$transcriptBody.html('No subtitles available.');
+                }
+
+                // Get the actual subtitles for this language.
                 var subtitles = subtitleSet.get('subtitles');
 
                 if (subtitles.length) {
 
-                    var html = '';
+                    // Remove the loading indicator.
+                    this.$transcriptBody.html('');
 
-                    var transcriptLineTemplate = '' +
-                        '<div class="amara-group amara-transcript-line">' +
-                        '    <div class="amara-transcript-line-left">{{ start }}</div>' +
-                        '    <div class="amara-transcript-line-right">{{ text }}</div>' +
-                        '</div>';
-
+                    // For each subtitle, init the Popcorn transcript plugin.
                     for (var i = 0; i < subtitles.length; i++) {
-                        html += __.template(transcriptLineTemplate, {
+                        this.pop.transcript({
+                            start: subtitles[i].start,
+                            start_clean: utils.parseFloatAndRound(subtitles[i].start),
+                            end: subtitles[i].end,
                             text: subtitles[i].text,
-                            start: utils.parseFloatAndRound(subtitles[i].start)
+                            container: this.$transcriptBody.get(0)
                         });
                     }
-
-                    this.$transcriptBody.html(html);
-
                 } else {
                     this.$transcriptBody.html('No subtitles available.');
                 }
