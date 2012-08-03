@@ -221,9 +221,12 @@ class Rpc(BaseRpc):
         #               \\ |\`\ |
         #          jgs  ((_/(_(_/
         if team_video:
-            return list(team_video.task_set.incomplete()
-                                           .exclude(assignee=user)
-                                           .values_list('language', flat=True))
+            tasks = team_video.task_set.incomplete()
+
+            if user.is_authenticated():
+                tasks = tasks.exclude(assignee=user)
+
+            return list(tasks.values_list('language', flat=True))
         else:
             return []
 

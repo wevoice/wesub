@@ -1767,8 +1767,7 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
                     end_date):
                 continue
 
-            subs = list(v.subtitle_set.filter(start_time__isnull=False,
-                end_time__isnull=False))
+            subs = v.ordered_subtitles()
 
             if len(subs) == 0:
                 continue

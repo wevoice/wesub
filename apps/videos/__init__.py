@@ -70,7 +70,7 @@ class EffectiveSubtitle:
 
     def for_generator(self):
         """
-        This is used in serializers for download (srt, dxfp)
+        This is used in serializers for download (srt, dfxp)
         """
         return {
             'text': markup_to_html(self.text),
