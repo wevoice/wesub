@@ -70,6 +70,7 @@ from teams.tasks import (
     update_video_moderation, update_one_team_video, update_video_public_field,
     invalidate_video_visibility_caches
 )
+from apps.videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
 from utils.metrics import time as timefn, Timer
@@ -526,7 +527,9 @@ def add_video(request, slug):
         obj = form.save(False)
         obj.added_by = request.user
         obj.save()
+
         api_teamvideo_new.send(obj)
+        video_changed_tasks.delay(obj.video.pk)
         messages.success(request, form.success_message())
         return redirect(team.get_absolute_url())
 
