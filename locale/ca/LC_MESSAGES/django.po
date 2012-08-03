@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-02 01:32-0500\n"
-"PO-Revision-Date: 2012-08-02 06:51+0000\n"
+"POT-Creation-Date: 2012-08-03 01:32-0500\n"
+"PO-Revision-Date: 2012-08-03 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -542,7 +542,7 @@ msgstr "L'usuari ja és membre d'aquest equip!"
 
 #: apps/teams/forms.py:577
 msgid "User has already been invited and has not replied yet."
-msgstr ""
+msgstr "L'usuari ja ha estat convidat i encarà no ha contestat."
 
 #: apps/teams/forms.py:601 templates/videos/subtitle-view.html:375
 msgid "Would you like to delete these subtitles completely?"
@@ -754,20 +754,20 @@ msgstr "Necessiteu ajuda amb tots els idiomes?"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Si marqueu açò, no seran mostrats els altres idiomes."
 
-#: apps/teams/models.py:911 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:916 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Propietari"
 
-#: apps/teams/models.py:912 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:917 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Gestor"
 
-#: apps/teams/models.py:913 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:918 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:914 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:919 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Contribuidor"
 
@@ -1563,18 +1563,18 @@ msgstr "Error no definit"
 msgid "Video embedding disabled by owner"
 msgstr "Incrustació de vídeo deshabilitada pel propietari"
 
-#: apps/widget/rpc.py:261
+#: apps/widget/rpc.py:296
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Aquests subtítols estan moderats. Informeu-vos a la pàgina de l'equip %s per a saber com contribuir."
 
-#: apps/widget/rpc.py:263
+#: apps/widget/rpc.py:298
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Ho lamentem, aquests subtítols són moderats de manera privada."
 
-#: apps/widget/rpc.py:960 apps/widget/rpc.py:1001
+#: apps/widget/rpc.py:995 apps/widget/rpc.py:1036
 msgid "\n"
 msgstr "\n"
 
@@ -3925,27 +3925,27 @@ msgstr "La més gran, i potent plataforma d'etiquetatge i traducció del món."
 
 #: templates/index.html:84
 msgid "TED"
-msgstr ""
+msgstr "TED"
 
 #: templates/index.html:89
 msgid "Mozilla"
-msgstr ""
+msgstr "Mozilla"
 
 #: templates/index.html:94
 msgid "Netflix"
-msgstr ""
+msgstr "Netflix"
 
 #: templates/index.html:99
 msgid "Khan Academy"
-msgstr ""
+msgstr "Acadèmia Khan"
 
 #: templates/index.html:104
 msgid "Coursera"
-msgstr ""
+msgstr "Coursera"
 
 #: templates/index.html:109
 msgid "PBS Newshour"
-msgstr ""
+msgstr "PBS Newshour"
 
 #: templates/index.html:115
 msgid "More Popular"
@@ -6004,6 +6004,10 @@ msgstr "Mostrant tasques no assignades en els idiomes que parleu"
 msgid "Try changing your selection using the filters above to find tasks"
 msgstr "Proveu a canviar la vostra selecció fent ús dels filtres del damunt per trobar tasques"
 
+#: templates/teams/tasks.html:183
+msgid "You don't have permission to perform this task."
+msgstr ""
+
 #: templates/teams/tasks.html:222
 msgid "latest draft"
 msgstr "últim esborrany"
@@ -7290,7 +7294,7 @@ msgstr "Els subtítols d'aquest vídeo estan moderats. Si pertany a un equip, pr
 
 #: templates/videos/video-view.html:191
 msgid "This team belongs to the"
-msgstr ""
+msgstr "Aquest equip pertany a"
 
 #: templates/videos/video-view.html:207
 msgid "View all activity"

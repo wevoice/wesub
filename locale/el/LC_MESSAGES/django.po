@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-02 01:32-0500\n"
-"PO-Revision-Date: 2012-08-02 06:51+0000\n"
+"POT-Creation-Date: 2012-08-03 01:32-0500\n"
+"PO-Revision-Date: 2012-08-03 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Greek (Greece) (http://www.transifex.com/projects/p/universalsubtitles/language/el_GR/)\n"
 "MIME-Version: 1.0\n"
@@ -751,20 +751,20 @@ msgstr "Χρειάζεται βοήθεια για όλες τις γλώσσε�
 msgid "If you check this, other languages will not be displayed."
 msgstr "Αν τσεκάρετε εδώ, τότε δεν θα εμφανίζονται άλλες γλώσσες."
 
-#: apps/teams/models.py:911 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:916 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Ιδιοκτήτης"
 
-#: apps/teams/models.py:912 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:917 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Διαχειριστής"
 
-#: apps/teams/models.py:913 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:918 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Διαχειριστής"
 
-#: apps/teams/models.py:914 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:919 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Συνεισφέρων"
 
@@ -1560,18 +1560,18 @@ msgstr "Απροσδιόριστο σφάλμα"
 msgid "Video embedding disabled by owner"
 msgstr "Η ενσωμάτωση ροής απενεργοποιήθηκε από τον ιδιοκτήτη"
 
-#: apps/widget/rpc.py:261
+#: apps/widget/rpc.py:296
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Aυτοί οι υπότιτλοι επιτηρούνται / moderated. Δείτε τη σελίδα της ομάδας %s για πληροφορίες σχετικά με το πως μπορείτε να συνεισφέρετε."
 
-#: apps/widget/rpc.py:263
+#: apps/widget/rpc.py:298
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Σγγνώμη, αυτοί οι υπότιτλοι επιτηρούνται ιδιωτικά/ moderated"
 
-#: apps/widget/rpc.py:960 apps/widget/rpc.py:1001
+#: apps/widget/rpc.py:995 apps/widget/rpc.py:1036
 msgid "\n"
 msgstr "\n"
 
@@ -6000,6 +6000,10 @@ msgstr "Γίνεται εμφάνιση μη ανατεθειμένων εργα
 #: templates/teams/tasks.html:157
 msgid "Try changing your selection using the filters above to find tasks"
 msgstr "Δοκιμάστε να αλλάξετε την επιλογή σας, χρησιμοποιώντας τα παραπάνω φίλτρα, για να βρείτε διάφορες εργασίες"
+
+#: templates/teams/tasks.html:183
+msgid "You don't have permission to perform this task."
+msgstr ""
 
 #: templates/teams/tasks.html:222
 msgid "latest draft"

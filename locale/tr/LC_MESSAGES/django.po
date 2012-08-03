@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-02 01:32-0500\n"
-"PO-Revision-Date: 2012-08-02 06:51+0000\n"
+"POT-Creation-Date: 2012-08-03 01:32-0500\n"
+"PO-Revision-Date: 2012-08-03 06:50+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/universalsubtitles/language/tr/)\n"
 "MIME-Version: 1.0\n"
@@ -755,20 +755,20 @@ msgstr "Tüm dillerde yardıma ihtiyacım var"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Eğer bunu seçerseniz, diğer diller gösterilmeyecek."
 
-#: apps/teams/models.py:911 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:916 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr ""
 
-#: apps/teams/models.py:912 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:917 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr ""
 
-#: apps/teams/models.py:913 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:918 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Yönetici"
 
-#: apps/teams/models.py:914 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:919 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr ""
 
@@ -1062,7 +1062,7 @@ msgstr "Dosya kodlanamıyor. Dosya UTF8 şeklinde kodlanmış olmalı."
 
 #: apps/videos/forms.py:91
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
-msgstr ""
+msgstr "Hatalı format. Lütfen .srt, .ssa, .sbv ya da .xml yükleyiniz (TTML format)"
 
 #: apps/videos/forms.py:124 apps/videos/forms.py:560 utils/validators.py:38
 msgid "This URL appears to be a broken link."
@@ -1079,7 +1079,7 @@ msgstr ""
 
 #: apps/videos/forms.py:141
 msgid "You have not permission add video URL for this video"
-msgstr ""
+msgstr "Bu video için URL eklemeye izniniz yok."
 
 #: apps/videos/forms.py:183
 msgid "Somebody is subtitling this video right now. Try later."
@@ -1144,7 +1144,7 @@ msgstr ""
 
 #: apps/videos/forms.py:577
 msgid "Youtube page link."
-msgstr ""
+msgstr "YouTube sayfa bağlantısı"
 
 #: apps/videos/forms.py:578
 msgid "For example: http://www.youtube.com/user/username"
@@ -1156,7 +1156,7 @@ msgstr ""
 
 #: apps/videos/forms.py:580
 msgid "Save feed"
-msgstr ""
+msgstr "Akışı kaydet"
 
 #: apps/videos/forms.py:580
 msgid ""
@@ -1182,7 +1182,7 @@ msgstr ""
 
 #: apps/videos/models.py:136
 msgid "in seconds"
-msgstr ""
+msgstr "saniyeler içinde"
 
 #: apps/videos/models.py:160
 msgid "Sub.fetched"
@@ -1200,7 +1200,7 @@ msgstr ""
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
-msgstr ""
+msgstr "Üzgünüz, şu anda altyazı yükleyemezsiniz çünkü biri yükleme ya da tercüme dilinizi düzenliyor."
 
 #: apps/videos/models.py:1950
 #, python-format
@@ -1415,7 +1415,7 @@ msgstr ""
 
 #: apps/videos/rpc.py:315 apps/videos/rpc.py:340
 msgid "Title can't be empty"
-msgstr ""
+msgstr "Başlık boş olamaz"
 
 #: apps/videos/rpc.py:329
 msgid "Title can't be changed for this video"
@@ -1423,11 +1423,11 @@ msgstr ""
 
 #: apps/videos/rpc.py:333 apps/videos/rpc.py:351
 msgid "Title was changed success"
-msgstr ""
+msgstr "Başlık başarıyla değiştirildi"
 
 #: apps/videos/rpc.py:345
 msgid "Subtitle language does not exist"
-msgstr ""
+msgstr "Altyazı dili yok"
 
 #: apps/videos/rpc.py:353
 msgid "This is not forked translation"
@@ -1435,27 +1435,27 @@ msgstr ""
 
 #: apps/videos/rpc.py:362 apps/videos/rpc.py:378
 msgid "Video does not exist."
-msgstr ""
+msgstr "Video bulunamadı"
 
 #: apps/videos/rpc.py:369
 msgid "You are following this video now."
-msgstr ""
+msgstr "Şimdi bu videoyu takip ediyorsunuz."
 
 #: apps/videos/rpc.py:385
 msgid "You stopped following this video now."
-msgstr ""
+msgstr "Artık bu videoyu takip etmiyorsunuz."
 
 #: apps/videos/rpc.py:394 apps/videos/rpc.py:407
 msgid "Subtitles does not exist."
-msgstr ""
+msgstr "Altyazı bulunamadı."
 
 #: apps/videos/rpc.py:398
 msgid "You are following this subtitles now."
-msgstr ""
+msgstr "Şimdi bu altyazıları takip ediyorsunuz."
 
 #: apps/videos/rpc.py:411
 msgid "You stopped following this subtitles now."
-msgstr ""
+msgstr "Artık bu altyazıları takip etmiyorsunuz."
 
 #: apps/videos/share_utils.py:52
 msgid "Just found a version of this video with subtitles"
@@ -1516,19 +1516,19 @@ msgstr ""
 
 #: apps/videos/views.py:622
 msgid "You have not permission change this URL"
-msgstr ""
+msgstr "Bu URL'i değiştirme izniniz yok."
 
 #: apps/videos/views.py:628 apps/videos/views.py:648
 msgid "Object does not exist"
-msgstr ""
+msgstr "Nesne bulunamadı."
 
 #: apps/videos/views.py:641
 msgid "You have not permission delete this URL"
-msgstr ""
+msgstr "Bu URL'i silme izniniz yok."
 
 #: apps/videos/views.py:644
 msgid "You cann't remove original URL"
-msgstr ""
+msgstr "Orijinal URL'i kaldıramazsınız."
 
 #: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
@@ -1563,18 +1563,18 @@ msgstr "Tanımlanmamış hata"
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:261
+#: apps/widget/rpc.py:296
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:263
+#: apps/widget/rpc.py:298
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:960 apps/widget/rpc.py:1001
+#: apps/widget/rpc.py:995 apps/widget/rpc.py:1036
 msgid "\n"
 msgstr ""
 
@@ -1627,7 +1627,7 @@ msgstr "Mesajlar"
 #: libs/rosetta/templates/rosetta/languages.html:31
 #: templates/teams/settings-permissions.html:72
 msgid "Translated"
-msgstr ""
+msgstr "Çevirildi"
 
 #: libs/rosetta/templates/rosetta/languages.html:32
 #: libs/rosetta/templates/rosetta/pofile.html:57
@@ -1644,7 +1644,7 @@ msgstr "Dosya"
 
 #: libs/rosetta/templates/rosetta/languages.html:55
 msgid "Nothing to translate!"
-msgstr ""
+msgstr "Çevirecek şey yok!"
 
 #: libs/rosetta/templates/rosetta/languages.html:56
 msgid ""
@@ -1662,11 +1662,11 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
 msgid "Pick another file"
-msgstr ""
+msgstr "Başka bir dosya seç"
 
 #: libs/rosetta/templates/rosetta/pofile.html:9
 msgid "Download this catalog"
-msgstr ""
+msgstr "Bu kataloğu indir"
 
 #: libs/rosetta/templates/rosetta/pofile.html:21
 #, python-format
@@ -1690,7 +1690,7 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:31
 msgid "Display:"
-msgstr ""
+msgstr "Görüntüle:"
 
 #: libs/rosetta/templates/rosetta/pofile.html:32
 msgid "Untranslated only"
@@ -3101,27 +3101,27 @@ msgstr ""
 
 #: templates/embed_page.html:41
 msgid "Create subtitles for any compatible video"
-msgstr ""
+msgstr "Tüm uygun videolar için altyazı oluşturun"
 
 #: templates/embed_page.html:44
 msgid "Find subtitles created by others"
-msgstr ""
+msgstr "Başkaları tarafından oluşturulmuş altyazıları bulun"
 
 #: templates/embed_page.html:47
 msgid "Add translations and improve other's work"
-msgstr ""
+msgstr "Çeviriler ekleyin ve başkalarınınkileri geliştirin"
 
 #: templates/embed_page.html:50
 msgid "Make your videos searchable and accessible"
-msgstr ""
+msgstr "Videolarınızı aranabilir ve erişilebilir yapın."
 
 #: templates/embed_page.html:53
 msgid "Bring your videos to an international audience"
-msgstr ""
+msgstr "Videolarınızı uluslararası izleyicilere sunun"
 
 #: templates/embed_page.html:58
 msgid "Proud to be a"
-msgstr ""
+msgstr "Gurur duyun"
 
 #: templates/embed_page.html:58
 msgid "Featured Mozilla Drumbeat Project"
@@ -5998,6 +5998,10 @@ msgstr ""
 msgid "Try changing your selection using the filters above to find tasks"
 msgstr ""
 
+#: templates/teams/tasks.html:183
+msgid "You don't have permission to perform this task."
+msgstr ""
+
 #: templates/teams/tasks.html:222
 msgid "latest draft"
 msgstr ""
@@ -6583,7 +6587,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:44
 msgid "Learn more"
-msgstr ""
+msgstr "Daha fazlasını öğrenin"
 
 #: templates/videos/_video_url_panel.html:46
 msgid ""
