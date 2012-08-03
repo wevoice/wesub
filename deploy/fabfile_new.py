@@ -187,9 +187,10 @@ def _create_env(username,
                 ve_dir,
                 separate_uslogging_db,
                 key_filename,
-                roledefs={}):
+                roledefs={},
+                notification_email=None):
     env.user = username
-    env.installation_name = name
+    env.environment = name
     env.s3_bucket = s3_bucket
     env.app_name = app_name
     env.app_dir = app_dir
@@ -200,6 +201,7 @@ def _create_env(username,
     env.key_filename = key_filename
     env.roledefs = roledefs
     env.deploy_lock = '/tmp/.amara_deploy_{0}'.format(revision)
+    env.notification_email = notification_email or 'universalsubtitles-dev@pculture.org'
 
 @task
 def local():
@@ -221,7 +223,8 @@ def local():
                     roledefs              = {
                         'app': ['10.10.10.115'],
                         'data': ['10.10.10.120'],
-                    },)
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
 
 # def staging(username):
 #     with Output("Configuring task(s) to run on STAGING"):
@@ -489,3 +492,52 @@ def update_integration(run_as_sudo=True):
                     branch=env.revision,
                     run_as_sudo=run_as_sudo
                 )
+@task
+@lock_required
+@runs_once
+@roles('data')
+def update_solr_schema():
+    '''Update the Solr schema and rebuild the index.
+
+    The rebuilding will be done asynchronously with screen and an email will
+    be sent when it finishes.
+
+    '''
+    with Output("Updating Solr schema (and rebuilding the index)"):
+        python_exe = '{0}/bin/python'.format(env.ve_dir)
+        with cd(env.app_dir):
+            _git_pull()
+            run('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
+                    python_exe,
+                    env.environment))
+            run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
+            sudo('service tomcat6 restart')
+
+        # Fly, you fools!
+
+        managepy_file = os.path.join(env.app_dir, 'manage.py')
+
+        # The -u here is for "unbuffered" so the lines get outputted immediately.
+        manage_cmd = '%s -u %s rebuild_index_ordered --noinput --settings=unisubs_settings 2>&1' % (python_exe, managepy_file)
+        mail_cmd = ' | mail -s Solr_index_rebuilt_on_%s %s' % (env.host_string, env.notification_email)
+        log_cmd = WRITE_LOG % 'solr_reindexing'
+
+        # The single quotes in the ack command needs to be escaped, because
+        # we're in a single quoted ANSI C-style string from the sh -c in the
+        # screen command.
+        #
+        # We can't use a double quoted string for the sh -c call because of the
+        # $0 in the ack script.
+        timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
+
+        cmd = (
+            "screen -d -m sh -c $'" +
+                manage_cmd +
+                timestamp_cmd +
+                log_cmd +
+                mail_cmd +
+            "'"
+        )
+
+        run(cmd, pty=False)
+
