@@ -128,30 +128,32 @@ def update_one_team_video(team_video_id):
 
 
 @task()
-def api_notify_on_subtitles_activity(team_pk, version_pk, event_name):
+def api_notify_on_subtitles_activity(team_pk,  event_name, version_pk):
     from teams.models import Team
     from videos.models import SubtitleVersion
     version = SubtitleVersion.objects.select_related("language", "language__video").get(pk=version_pk)
     team = Team.objects.select_related("notification_settings").get(pk=team_pk)
-    team.notification_settings.notify(
-           version.language.video,
-           event_name,
-           version.language.pk,
-           version_pk)
+    team.notification_settings.notify( event_name, video_id=version.language.video.video_id,
+        language_pk=version.language.pk, version_pk=version_pk)
 
 @task()
-def api_notify_on_language_activity(team_pk, language_pk, event_name):
+def api_notify_on_language_activity(team_pk, event_name, language_pk):
     from teams.models import TeamNotificationSetting
     from videos.models import SubtitleLanguage
     language = SubtitleLanguage.objects.select_related("video").get(pk=language_pk)
     TeamNotificationSetting.objects.notify_team(
-        team_pk, language.video.video_id, event_name, language_pk)
+        team_pk, event_name, language_pk=language_pk,  video_id=language.video.video_id)
 
 @task()
-def api_notify_on_video_activity(team_pk, video_id,event_name):
+def api_notify_on_video_activity(team_pk, event_name, video_id):
     from teams.models import TeamNotificationSetting
-    TeamNotificationSetting.objects.notify_team(
-        team_pk, video_id, event_name)
+    TeamNotificationSetting.objects.notify_team(team_pk,  event_name, video_id=video_id)
+
+@task()
+def api_notify_on_application_activity(team_pk,  event_name, application_pk,):
+    from teams.models import teamnotificationsetting
+    teamnotificationsetting.objects.notify_team(
+        team_pk,  event_name=event_name, application_pk=application_pk)
 
 
 @periodic_task(run_every=timedelta(seconds=5))

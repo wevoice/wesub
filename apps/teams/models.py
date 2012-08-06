@@ -1061,6 +1061,12 @@ class Application(models.Model):
         # We can't delete the row until the notification task has run.
         notifier.team_application_denied.delay(self.pk)
 
+    def save(self, dispatches_http_callback=True, *args, **kwargs):
+        is_new = not bool(self.pk)
+        super(Application, self).save(*args, **kwargs)
+        if dispatches_http_callback and is_new:
+            from teams.signals import api_application_new
+            api_application_new.send(self)
 
 # Invites
 class InviteExpiredException(Exception):
@@ -2179,7 +2185,7 @@ post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePrefere
 
 # TeamNotificationSettings
 class TeamNotificationSettingManager(models.Manager):
-    def notify_team(self, team_pk, video_id, event_name, language_pk=None, version_pk=None):
+    def notify_team(self, team_pk, event_name, **kwargs):
         """Notify the given team of a given event.
 
         Finds the matching notification settings for this team, instantiates
@@ -2196,8 +2202,7 @@ class TeamNotificationSettingManager(models.Manager):
             notification_settings = self.get(team__id=team_pk)
         except TeamNotificationSetting.DoesNotExist:
             return
-        notification_settings.notify(Video.objects.get(video_id=video_id), event_name,
-                                                 language_pk, version_pk)
+        notification_settings.notify(event_name, **kwargs)
 
 class TeamNotificationSetting(models.Model):
     """Info on how a team should be notified of changes to its videos.
@@ -2220,6 +2225,7 @@ class TeamNotificationSetting(models.Model):
     EVENT_SUBTITLE_NEW = "subs-new"
     EVENT_SUBTITLE_APPROVED = "subs-approved"
     EVENT_SUBTITLE_REJECTED = "subs-rejected"
+    EVENT_APPLICATION_NEW = 'application-new'
 
     team = models.OneToOneField(Team, related_name="notification_settings")
 
@@ -2245,10 +2251,10 @@ class TeamNotificationSetting(models.Model):
             logger.exception("Apparently unisubs-integration is not installed")
 
 
-    def notify(self, video, event_name, language_pk=None, version_pk=None):
+    def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
-        notification = self.get_notification_class()(
-            self.team, video, event_name, language_pk, version_pk)
+        
+        notification = self.get_notification_class()(self.team, event_name,  **kwargs)
         if self.request_url:
             success, content = notification.send_http_request(
                 self.request_url,
@@ -2258,8 +2264,6 @@ class TeamNotificationSetting(models.Model):
             return success, content
         # FIXME: spec and test this, for now just return
         return
-        if self.email:
-            notification.send_email(self.email, self.team, video, event_name, language_pk)
 
     def __unicode__(self):
         return u'NotificationSettings for team %s' % (self.team)
