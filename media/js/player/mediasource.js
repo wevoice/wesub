@@ -92,7 +92,7 @@ unisubs.player.MediaSource.bestVideoSource = function(videoSpecs) {
         return videoSource;
     // if we got this far, first return mp4 for flowplayer fallback. then return anything.
     videoSource = unisubs.player.MediaSource.html5VideoSource_(
-        videoSources, vt.H264);
+        videoSources, unisubs.player.Html5VideoType.H264);
     if (videoSource != null)
         return videoSource;
     return videoSources.length > 0 ? videoSources[0] : null;

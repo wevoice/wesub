@@ -238,6 +238,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
                 original_language.save()
 
         obj = super(AddTeamVideoForm, self).save(False)
+
         obj.video = video
         obj.team = self.team
         commit and obj.save()

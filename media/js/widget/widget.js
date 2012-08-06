@@ -161,10 +161,9 @@ unisubs.widget.Widget.prototype.addWidget_ = function(el) {
         el.innerHTML = err.message;
         return;
     }
-    if (this.isVideoSourceImmediatelyUsable_())
-        this.createVideoPlayer_(this.videoSource_);
-    else
-        this.addVideoLoadingPlaceholder_(el);
+
+    this.addVideoLoadingPlaceholder_(el);
+
     if (this.streamer_) {
         this.streamBox_ = new unisubs.streamer.StreamBox();
         var streamerContainer = new goog.ui.Component();
@@ -213,17 +212,15 @@ unisubs.widget.Widget.prototype.showWidgetError_ = function() {
     }
 };
 unisubs.widget.Widget.prototype.initializeState_ = function(result) {
+    goog.dom.removeNode(this.videoPlaceholder_);
     if (result && !result["error_msg"]) {
-        if (!this.isVideoSourceImmediatelyUsable_()) {
-            goog.dom.removeNode(this.videoPlaceholder_);
-            var videoSource = unisubs.player.MediaSource.bestVideoSource(
-                result['video_urls']);
-            if (goog.typeOf(videoSource) == goog.typeOf(this.videoSource_) &&
-                this.videoConfig_)
-                videoSource.setVideoConfig(this.videoConfig_);
-            this.videoSource_ = videoSource;
-            this.createVideoPlayer_(this.videoSource_);
-        }
+        var videoSource = unisubs.player.MediaSource.bestVideoSource(
+            result['video_urls']);
+        if (goog.typeOf(videoSource) == goog.typeOf(this.videoSource_) &&
+            this.videoConfig_)
+            videoSource.setVideoConfig(this.videoConfig_);
+        this.videoSource_ = videoSource;
+        this.createVideoPlayer_(this.videoSource_);
     }
     if (this.streamer_) {
         this.initializeStateStreamer_(result);
