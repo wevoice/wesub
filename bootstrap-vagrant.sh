@@ -99,8 +99,8 @@ sys.path = ['/opt/ve/vagrant/unisubs/lib/python2.6/site-packages', '/usr/lib/pyt
 EOF
 
 # Celery services -------------------------------------------------------------
-sudo /etc/init.d/celeryd restart
-sudo /etc/init.d/celerybeat restart
+sudo service celeryd.vagrant restart
+sudo service celerycam.vagrant restart
 
 # Notice ----------------------------------------------------------------------
 echo "========================================================================="

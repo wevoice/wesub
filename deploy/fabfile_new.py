@@ -24,12 +24,17 @@ import time
 
 import fabric.colors as colors
 from fabric.api import run, sudo, env, cd, local as _local, abort, task
+from fabric.tasks import execute
 from fabric.context_managers import settings, hide
 from fabric.utils import fastprint
 from fabric.decorators import roles, runs_once, parallel
+import fabric.state
 
 ADD_TIMESTAMPS = """ | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }' """
 WRITE_LOG = """ | tee /tmp/%s.log """
+
+# hide 'running' by default
+fabric.state.output['running'] = False
 
 # Output Management -----------------------------------------------------------
 PASS_THROUGH = ('sudo password: ', 'Sorry, try again.')
@@ -79,7 +84,7 @@ class Output(object):
 
     """
     def __init__(self, message=""):
-        self.message = message
+        self.message = '{0} ({1})'.format(message, env.host)
 
     def __enter__(self):
         if self.message:
@@ -93,7 +98,6 @@ class Output(object):
             fastprint(colors.yellow("+" + "-" * 78 + "+\n", bold=True))
             fastprint(colors.yellow("| " + self.message.ljust(76) + " |\n", bold=True))
             fastprint(colors.yellow("+" + "-" * 78 + "+\n", bold=True))
-
         return self
 
     def __exit__(self, type, value, tb):
@@ -163,7 +167,7 @@ def remove_lock():
 
     """
     with Output('Removing lock'):
-        _execute_on_all_hosts(lambda dir: _unlock(dir))
+        _unlock()
 
 def _local(*args, **kwargs):
     '''Override Fabric's local() to facilitate output logging.'''
@@ -485,13 +489,14 @@ def update_integration(run_as_sudo=True):
 
     '''
     with Output("Updating nested unisubs-integration repositories"):
-        with cd(os.path.join(env.app_dir, 'unisubs-integration')):
-            with settings(warn_only=True):
-                _git_checkout_branch_and_reset(
-                    _get_optional_repo_version(env.app_dir, 'unisubs-integration'),
-                    branch=env.revision,
-                    run_as_sudo=run_as_sudo
-                )
+        with cd(os.path.join(env.app_dir, 'unisubs-integration')), \
+            settings(warn_only=True):
+            _git_checkout_branch_and_reset(
+                _get_optional_repo_version(env.app_dir, 'unisubs-integration'),
+                branch=env.revision,
+                run_as_sudo=run_as_sudo
+            )
+
 @task
 @lock_required
 @runs_once
@@ -541,3 +546,64 @@ def update_solr_schema():
 
         run(cmd, pty=False)
 
+@task
+@parallel
+@roles('app')
+def bounce_memcached():
+    '''Bounce memcached (purging the cache).
+
+    Should be done at the end of each deploy.
+
+    '''
+    with Output("Bouncing memcached"):
+        sudo('service memcached restart')
+
+@task
+@parallel
+@roles('data')
+def bounce_celery():
+    '''Bounce celery daemons.
+
+    Should be done at the end of each deploy.
+
+    '''
+    with Output("Bouncing celeryd"):
+        sudo('service celeryd.{0} restart'.format(env.environment))
+    with Output("Bouncing celerycam"):
+        sudo('service celerycam.{0} restart'.format(env.environment))
+
+@task
+@lock_required
+@roles('app', 'data')
+def deploy():
+    """
+    This is how code gets reloaded:
+
+    - Checkout code on the auxiliary server ADMIN whost
+    - Checkout the latest code on all appservers
+    - Remove all pyc files from app servers
+    - Bounce celeryd, memcached , test services
+    - Reload app code (touch wsgi file)
+
+    Until we implement the checking out code to an isolated dir
+    any failure on these steps need to be fixed or will result in
+    breakage
+    """
+    with Output("Updating the main unisubs repo"), cd(env.app_dir):
+        _git_pull()
+
+    with Output("Updating integration repo"):
+        execute(update_integration)
+        with cd(env.app_dir):
+            with settings(warn_only=True):
+                run("find . -name '*.pyc' -delete")
+    #bounce_celeryd()
+    execute(bounce_memcached)
+    #test_services()
+    #reload_app_servers()
+
+    ## Workaround that 'None' implies 'production'
+    #installation_name = 'production' if env.installation_name is None else env.installation_name
+
+    #if env.installation_name != 'dev' or env.user != 'jenkins':
+    #    _notify("Amara {0} deployment".format(env.installation_name), "Deployed by {0} to {1} at {2} UTC".format(env.user,  installation_name, datetime.utcnow()))
