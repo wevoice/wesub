@@ -216,9 +216,12 @@ unisubs.widget.Widget.prototype.initializeState_ = function(result) {
     if (result && !result["error_msg"]) {
         var videoSource = unisubs.player.MediaSource.bestVideoSource(
             result['video_urls']);
+
         if (goog.typeOf(videoSource) == goog.typeOf(this.videoSource_) &&
-            this.videoConfig_)
+            this.videoConfig_) {
             videoSource.setVideoConfig(this.videoConfig_);
+        }
+        
         this.videoSource_ = videoSource;
         this.createVideoPlayer_(this.videoSource_);
     }

@@ -99,12 +99,13 @@ unisubs.player.MediaSource.bestVideoSource = function(videoSpecs) {
 };
 
 unisubs.player.MediaSource.videoSourceForSpec_ = function(videoSpec) {
-    if (goog.isString(videoSpec))
+    if (goog.isString(videoSpec)) {
         return unisubs.player.MediaSource.videoSourceForURL(
             videoSpec);
-    else
+    } else {
         return unisubs.player.MediaSource.videoSourceForURL(
             videoSpec['url'], videoSpec['config']);
+    }
 };
 
 unisubs.player.MediaSource.html5VideoSource_ = function(videoSources, videoType) {
