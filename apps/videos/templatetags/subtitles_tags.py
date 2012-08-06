@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django.core.urlresolvers import reverse
 from django import template
+from django.template.defaultfilters import linebreaks
 from django.utils.translation import ungettext
 
 from videos import format_time
@@ -104,8 +105,9 @@ def format_sub_time(t):
 @register.filter
 def display_subtitle(text):
     """
-    Make sure we only allow the default subtitle formatiing tags
-    (i, b, u) to pass
+    Transforms our internal markup to html friendly diplay:
+    use the default subtitle formatiing tags (i, b, u)
+    and replace \n with <br>
     """
-    txt = markup_to_html(text)
+    txt = linebreaks(markup_to_html(text))
     return txt
