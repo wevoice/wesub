@@ -150,10 +150,10 @@ def api_notify_on_video_activity(team_pk, event_name, video_id):
     TeamNotificationSetting.objects.notify_team(team_pk,  event_name, video_id=video_id)
 
 @task()
-def api_notify_on_application_activity(team_pk,  event_name, application_pk,):
-    from teams.models import teamnotificationsetting
-    teamnotificationsetting.objects.notify_team(
-        team_pk,  event_name=event_name, application_pk=application_pk)
+def api_notify_on_application_activity(team_pk,  event_name, application_pk):
+    from teams.models import TeamNotificationSetting
+    TeamNotificationSetting.objects.notify_team(
+        team_pk,  event_name, application_pk=application_pk)
 
 
 @periodic_task(run_every=timedelta(seconds=5))

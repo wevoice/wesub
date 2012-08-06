@@ -136,8 +136,17 @@ class BaseNotification(object):
             h.add_credentials(basic_auth_username, basic_auth_password)
             
         project = self.video.get_team_video().project.slug if self.video else None
-        data = dict(event=self.event_name, api_url=self.api_url,
-                    video_id=self.video_id, team=self.team.slug, project=project, application=self.application_pk)
+        data = {
+            'event': self.event_name,
+            'api_url': self.api_url,
+            'team':  self.team.slug,
+        }
+        if project:
+            data['project'] = project
+        if self.video:
+            data['video_id'] = self.video_id
+        if self.application_pk:
+            data['application_id'] = self.application_pk
         if self.language_code:
             data.update({"language_code":self.language_code} )
         data = urlencode(data)

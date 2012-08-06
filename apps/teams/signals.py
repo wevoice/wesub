@@ -81,8 +81,9 @@ def _execute_version_task(version, event_name):
 def _execute_application_task(application, event_name):
     from teams.tasks import api_notify_on_application_activity
     api_notify_on_application_activity.delay(
+        application.team.pk,
+        event_name,
         application.pk,
-        event_name
     )
     
 def api_on_subtitles_edited(sender, **kwargs):
