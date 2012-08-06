@@ -238,6 +238,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
                 original_language.save()
 
         obj = super(AddTeamVideoForm, self).save(False)
+
         obj.video = video
         obj.team = self.team
         commit and obj.save()
@@ -573,28 +574,18 @@ class InviteForm(forms.Form):
 
         self.user_id = user_id
         # check if there is already an invite pending for this user:
-        try:
-            invite = Invite.objects.get(team=self.team, user=invited_user)
-            if invite.approved == False:
-                raise forms.ValidationError(_(u'User has already declined this invite.'))
-            if invite.approved == True:
-                raise forms.ValidationError(_(u'User has already accepted this invite.'))
-            if invite.approved == None:
-                raise forms.ValidationError(_(u'User has already been invited.'))
-        except Invite.DoesNotExist:
-            pass
+        if Invite.objects.pending_for(team=self.team, user=invited_user).exists():
+                raise forms.ValidationError(_(u'User has already been invited and has not replied yet.'))
         return user_id
 
 
     def save(self):
         from messages import tasks as notifier
         user = User.objects.get(id=self.user_id)
-        invite, created = Invite.objects.get_or_create(team=self.team, user=user, defaults={'author':self.user})
-        invite.note = self.cleaned_data['message']
-        invite.author = self.user
-        invite.role =  self.cleaned_data['role']
-        # clear the approve flag so re-invites work
-        invite.approve = None
+        invite = Invite.objects.create(
+            team=self.team, user=user, author=self.user,
+            role= self.cleaned_data['role'],
+            note = self.cleaned_data['message'])
         invite.save()
         notifier.team_invitation_sent.delay(invite.pk)
         return invite

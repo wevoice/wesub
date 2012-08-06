@@ -29,6 +29,7 @@ unisubs.startdialog.Model = function(json, opt_langState) {
      */
     this.myLanguages_ = json['my_languages'];
     this.limitLanguages_ = json['limit_languages'];
+    this.blockedLanguages_ = json['blocked_languages'];
     goog.array.removeDuplicates(this.myLanguages_);
     this.myLanguages_ = goog.array.filter(
         this.myLanguages_, function(l) {

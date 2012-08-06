@@ -29,7 +29,7 @@ jQuery(function($) {
     h1, h2, h3 {
         margin-top: 20px;
     }
-    a.btn {
+    a.btn, .btn {
         background: #eee;
         border: 1px solid #bbb;
         padding: 6px 10px;
@@ -51,7 +51,7 @@ jQuery(function($) {
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', endColorstr='#cccccc',GradientType=0 ); /* IE6-9 */
     }
 
-    a.btn:hover {
+    a.btn:hover, .btn:hover {
         border: 1px solid #ddd;
         background: #fcfcfc; /* Old browsers */
         background: -moz-linear-gradient(top,  #fcfcfc 0%, #e5e5e5 100%); /* FF3.6+ */
@@ -295,5 +295,22 @@ jQuery(function($) {
 {% for k,v in cache.items %}
 <b>{{k}}</b>: <pre>{{v|pprint}}</pre><br/>
 {% endfor %}
-{% endblock %}
 
+
+{% if is_youtube %}
+
+<h2>Sync to Youtube</h2>
+<p>Choose a language and hit that button</p>
+<form method="post">
+    {% csrf_token %}
+    <select name="language">
+        {% for lang in video.subtitlelanguage_set.all %}
+            <option value="{{ lang.pk }}">{{ lang.language }}</option>
+        {% endfor %}
+    </select>
+    <input type="hidden" name="action" value="sync" />
+    <input type="submit" value="Sync to Youtube" class="btn" />
+</form>
+{% endif %}
+
+{% endblock %}

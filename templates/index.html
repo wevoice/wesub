@@ -79,47 +79,35 @@
 </div>
 <div id="partners">
     <ul class="clearfix">
-        {% if 'ted'|team_is_visible %}
-         <li>
-          <a target="_blank" href="http://www.universalsubtitles.org/en/teams/ted/">
-              <span style="height: 83px; display: block; padding-top: 36px;">
-                <img src="{{ STATIC_URL }}images/partners/ted.png" alt="{% trans 'TED Team' %}"/>
-              </span>
-              <span class="url">{% trans "TED Team" %}</span>
-          </a>
-         </li>
-        {% endif %}
         <li>
-        <a target="_blank" href="http://www.universalsubtitles.org/en/teams/mozilla">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_mozilla.png" alt="{% trans 'Mozilla Team' %}"/></span>
-            <span class="url">{% trans "Mozilla Team" %}</span>
-        </a>
+            <a target="_blank" title="TED" href="http://www.universalsubtitles.org/en/teams/ted/">
+                <span style="height: 83px; display: block; padding-top: 36px;"><img src="{{ STATIC_URL }}images/partners/ted.png" alt="{% trans 'TED' %}"/></span>
+            </a>
         </li>
         <li>
-        <a target="_blank" href="http://gigaom.com/video/khan-academy-universal-subtitles/">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_khan.png" alt="{% trans 'Khan Integration' %}"/></span>
-            <span class="url">{% trans "Khan Integration" %}</span>
-        </a>
+            <a target="_blank" title="Mozilla" href="http://www.universalsubtitles.org/en/teams/mozilla">
+                <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/partners/new_partner_mozilla.png" alt="{% trans 'Mozilla' %}"/></span>
+            </a>
         </li>
         <li>
-        <a target="_blank" href="http://drupal.org/drupal-7.0#video">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_drupal.png" alt="{% trans 'Drupal Example' %}"/></span>
-            <span class="url">{% trans "Drupal Example" %}</span>
-        </a>
+            <a target="_blank" title="Netflix" href="http://eepurl.com/n24oH">
+                <span style="height: 70px; padding-top: 25px; display: block;"><img src="{{ STATIC_URL }}images/partners/netflix.png" alt="{% trans 'Netflix' %}"/></span>
+            </a>
         </li>
-        {% if not 'ted'|team_is_visible %}
         <li>
-        <a target="_blank" href="http://www.universalsubtitles.org/en/teams/al-jazeera/">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_aj.png" alt="{% trans 'Al Jazeera Team' %}"/></span>
-            <span class="url">{% trans "Al Jazeera Team" %}</span>
-        </a>
+            <a target="_blank" title="Khan Academy" href="http://gigaom.com/video/khan-academy-universal-subtitles/">
+                <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/partners/new_partner_khan.png" alt="{% trans 'Khan Academy' %}"/></span>
+            </a>
         </li>
-        {% endif %}
         <li>
-        <a target="_blank" href="http://www.universalsubtitles.org/en/teams/newshour">
-            <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/new_partner_pbs.png" alt="{% trans 'Newshour Team' %}"/></span>
-            <span class="url">{% trans "NewsHour Team" %}</span>
-        </a>
+            <a target="_blank" title="Coursera" href="http://www.universalsubtitles.org/en/teams/coursera">
+                <span style="height: 22px; padding-top:49px; display: block;"><img src="{{ STATIC_URL }}images/partners/coursera.png" alt="{% trans 'Coursera' %}"/></span>
+            </a>
+        </li>
+        <li>
+            <a target="_blank" title="PBS Newshour" href="http://www.universalsubtitles.org/en/teams/newshour">
+                <span style="height: 120px; display: block;"><img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="{% trans 'PBS Newshour' %}"/></span>
+            </a>
         </li>
     </ul>
 </div>
