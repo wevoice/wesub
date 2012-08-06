@@ -84,7 +84,8 @@ class Output(object):
 
     """
     def __init__(self, message=""):
-        self.message = '{0} ({1})'.format(message, env.host)
+        host = '({0})'.format(env.host) if env.host else ''
+        self.message = '{0} {1}'.format(message, host)
 
     def __enter__(self):
         if self.message:
@@ -119,6 +120,9 @@ class Output(object):
 
     def fastprintln(self, s):
         self.fastprint(s + '\n')
+
+def _notify(subj, msg, to):
+    run("echo '{1}' | mailx -s '{0}' {2}".format(subj, msg, to))
 
 def _lock(*args, **kwargs):
     """
@@ -568,9 +572,11 @@ def bounce_celery():
 
     '''
     with Output("Bouncing celeryd"):
-        sudo('service celeryd.{0} restart'.format(env.environment))
+        with settings(warn_only=True):
+            sudo('service celeryd.{0} restart'.format(env.environment))
     with Output("Bouncing celerycam"):
-        sudo('service celerycam.{0} restart'.format(env.environment))
+        with settings(warn_only=True):
+            sudo('service celerycam.{0} restart'.format(env.environment))
 
 @task
 @lock_required
@@ -597,13 +603,11 @@ def deploy():
         with cd(env.app_dir):
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -delete")
-    #bounce_celeryd()
-    execute(bounce_memcached)
+
+    execute(bounce_celery())
+    execute(bounce_memcached())
     #test_services()
-    #reload_app_servers()
+    execute(reload_app_servers())
 
-    ## Workaround that 'None' implies 'production'
-    #installation_name = 'production' if env.installation_name is None else env.installation_name
-
-    #if env.installation_name != 'dev' or env.user != 'jenkins':
-    #    _notify("Amara {0} deployment".format(env.installation_name), "Deployed by {0} to {1} at {2} UTC".format(env.user,  installation_name, datetime.utcnow()))
+    if env.environment not in ['dev']:
+        _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user,  environment, datetime.utcnow()))
