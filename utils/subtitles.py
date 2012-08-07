@@ -154,6 +154,24 @@ def save_subtitle(video, language, parser, user=None, update_video=True,
     return language
 
 
+MULTIPLE_SPACES = re.compile('\s{2,}')
+BLANK_CHARS = re.compile('[\n\t\r]*')
+def from_xmlish_text(input_str):
+    """
+    Parses text content from xml based formats.
+    <br> tags are transformed into newlines, tab and multiple spaces
+    collapsed. e.g. turns:
+    "\n\r foo  <br/> bar foorer \t " -> "foo bar\nfoorer"
+    """
+    if not input_str:
+        return u""
+    # remove new lines and tabs
+    input_str = BLANK_CHARS.sub(u"", input_str)
+    # do convert <br> to new lines
+    input_str = input_str.replace("<br/>", "\n")
+    # collapse whitespace on each new line
+    return "\n".join( MULTIPLE_SPACES.sub(u" ", x).strip() for x in input_str.split('\n'))
+
 class SubtitleParserError(Exception):
     pass
 
@@ -406,8 +424,10 @@ class TtmlSubtitleParser(SubtitleParser):
         return start, end
 
     def _get_data(self, node):
+        from utils.unisubsmarkup import html_to_markup
+
         output = {
-            'subtitle_text': unescape_html(strip_tags(node.toxml()))
+            'subtitle_text': unescape_html(html_to_markup(from_xmlish_text(node.toxml())))
         }
         output['start_time'], output['end_time'] = \
             self._get_time(node.getAttribute('begin'), node.getAttribute('dur'))
@@ -487,7 +507,7 @@ class DfxpSubtitleParser(SubtitleParser):
             
 
         output = {
-            'subtitle_text': unescape_html(html_to_markup(node.toxml().replace("<br/>", "\n")))
+            'subtitle_text': unescape_html(html_to_markup(from_xmlish_text(node.toxml())))
         }
         output['start_time'] = self._get_time(node.getAttribute('begin'))
         output['end_time'] = self._get_time(node.getAttribute('end'))
