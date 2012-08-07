@@ -2577,7 +2577,7 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
         self.assertEqual(len(result),3 )
         line_break_sub  = result[0]
         line_break_text = line_break_sub['subtitle_text']
-        self.assertTrue(line_break_text.startswith("Take an"))
+        self.assertEqual(line_break_text, "Don't worry\nbe happy\nDon't worry\nbe happy")
         self.assertTrue(line_break_text.find("\n") > -1)
         italic_sub = result[1]
         italic_text = italic_sub['subtitle_text']

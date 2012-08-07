@@ -11,9 +11,12 @@
 <body>
   <div xml:space="preserve">
     <p xml:id="subtitle0" end="83410000t" begin="52380000t">
-      Take an
+      Don't worry <br/> be      happy
       <br/>
-      other
+      Don't     worry
+      <br/>
+      be               happy
+
     </p>
     <p xml:id="subtitle1" end="83520000t" begin="83420000t">
       This should be in <span style="style1">italic</span>
