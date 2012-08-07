@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-06 01:44-0500\n"
+"POT-Creation-Date: 2012-08-07 01:44-0500\n"
 "PO-Revision-Date: 2012-07-10 06:47+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Slovenian (Slovenia) (http://www.transifex.com/projects/p/"
@@ -456,14 +456,14 @@ msgstr ""
 msgid "Set original language for this video."
 msgstr ""
 
-#: apps/teams/forms.py:275
+#: apps/teams/forms.py:276
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
 "appear."
 msgstr ""
 
-#: apps/teams/forms.py:278
+#: apps/teams/forms.py:279
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
@@ -471,11 +471,11 @@ msgid ""
 "and make sure to check \"Save feed\" box."
 msgstr ""
 
-#: apps/teams/forms.py:295
+#: apps/teams/forms.py:296
 msgid "Team intro video URL"
 msgstr ""
 
-#: apps/teams/forms.py:297
+#: apps/teams/forms.py:298
 msgid ""
 "You can put an optional video\n"
 "on your team homepage that explains what your team is about, to attract "
@@ -483,124 +483,124 @@ msgid ""
 "Enter a link to any compatible video, or to any video page on our site."
 msgstr ""
 
-#: apps/teams/forms.py:302
+#: apps/teams/forms.py:303
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr ""
 
-#: apps/teams/forms.py:347
+#: apps/teams/forms.py:348
 msgid "This video has already been transcribed."
 msgstr ""
 
-#: apps/teams/forms.py:352
+#: apps/teams/forms.py:353
 msgid "Subtitling of this video is already in progress."
 msgstr ""
 
-#: apps/teams/forms.py:358
+#: apps/teams/forms.py:359
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr ""
 
-#: apps/teams/forms.py:364
+#: apps/teams/forms.py:365
 msgid "This language already has a complete set of subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:384
+#: apps/teams/forms.py:385
 msgid "There is already a task in progress for that video/language."
 msgstr ""
 
-#: apps/teams/forms.py:398
+#: apps/teams/forms.py:399
 msgid "You must select a language for a Translate task."
 msgstr ""
 
-#: apps/teams/forms.py:433
+#: apps/teams/forms.py:434
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr ""
 
-#: apps/teams/forms.py:455
+#: apps/teams/forms.py:456
 msgid "You do not have permission to assign this task."
 msgstr ""
 
-#: apps/teams/forms.py:462
+#: apps/teams/forms.py:463
 msgid "This user cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:483
+#: apps/teams/forms.py:484
 msgid "You do not have permission to delete this task."
 msgstr ""
 
-#: apps/teams/forms.py:540
+#: apps/teams/forms.py:541
 msgid "You cannot blacklist a preferred language."
 msgstr ""
 
-#: apps/teams/forms.py:563 apps/teams/forms.py:565
+#: apps/teams/forms.py:564 apps/teams/forms.py:566
 msgid "User does not exist!"
 msgstr ""
 
-#: apps/teams/forms.py:572
+#: apps/teams/forms.py:573
 msgid "User is already a member of this team!"
 msgstr ""
 
-#: apps/teams/forms.py:577
+#: apps/teams/forms.py:578
 msgid "User has already been invited and has not replied yet."
 msgstr ""
 
-#: apps/teams/forms.py:601 templates/videos/subtitle-view.html:375
+#: apps/teams/forms.py:602 templates/videos/subtitle-view.html:375
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
-#: apps/teams/forms.py:605 templates/videos/subtitle-view.html:360
+#: apps/teams/forms.py:606 templates/videos/subtitle-view.html:360
 msgid "What would you like to unpublish?"
 msgstr ""
 
-#: apps/teams/forms.py:607
+#: apps/teams/forms.py:608
 msgid "This version (and any later version) for this language."
 msgstr ""
 
-#: apps/teams/forms.py:608
+#: apps/teams/forms.py:609
 msgid "All versions for this language and any dependent languages."
 msgstr ""
 
-#: apps/teams/forms.py:626
+#: apps/teams/forms.py:627
 msgid "These subtitles are not under a team's control."
 msgstr ""
 
-#: apps/teams/forms.py:630
+#: apps/teams/forms.py:631
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:649
+#: apps/teams/forms.py:650
 msgid "You cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:661 apps/videos/forms.py:193
+#: apps/teams/forms.py:662 apps/videos/forms.py:193
 msgid "Invalid language to translate from."
 msgstr ""
 
-#: apps/teams/forms.py:670 apps/videos/forms.py:70 apps/videos/forms.py:88
+#: apps/teams/forms.py:671 apps/videos/forms.py:70 apps/videos/forms.py:88
 #: apps/videos/forms.py:202
 msgid "File size should be less {0} kb"
 msgstr ""
 
-#: apps/teams/forms.py:675 apps/videos/forms.py:207
+#: apps/teams/forms.py:676 apps/videos/forms.py:207
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:682 apps/videos/forms.py:75 apps/videos/forms.py:96
+#: apps/teams/forms.py:683 apps/videos/forms.py:75 apps/videos/forms.py:96
 #: apps/videos/forms.py:214
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/teams/forms.py:687 apps/videos/forms.py:98 apps/videos/forms.py:219
+#: apps/teams/forms.py:688 apps/videos/forms.py:98 apps/videos/forms.py:219
 msgid "Incorrect subtitles format"
 msgstr ""
 
-#: apps/teams/forms.py:760 apps/videos/forms.py:309
+#: apps/teams/forms.py:761 apps/videos/forms.py:309
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 
-#: apps/teams/forms.py:766 apps/videos/forms.py:316
+#: apps/teams/forms.py:767 apps/videos/forms.py:316
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -770,7 +770,7 @@ msgstr ""
 msgid "Contributor"
 msgstr ""
 
-#: apps/teams/notifications.py:150
+#: apps/teams/notifications.py:171
 msgid "New activity on your team video"
 msgstr ""
 
@@ -782,7 +782,7 @@ msgstr ""
 msgid "You are already a member of this team."
 msgstr ""
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:874
+#: apps/teams/rpc.py:50 apps/teams/views.py:877
 msgid "You are now a member of this team."
 msgstr ""
 
@@ -833,21 +833,21 @@ msgstr ""
 msgid "New %(team)s videos ready for subtitling!"
 msgstr ""
 
-#: apps/teams/views.py:127 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:128 templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr ""
 
-#: apps/teams/views.py:128 templates/teams/teams-list.html:47
+#: apps/teams/views.py:129 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr ""
 
-#: apps/teams/views.py:129 templates/teams/teams-list.html:44
+#: apps/teams/views.py:130 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr ""
 
-#: apps/teams/views.py:172
+#: apps/teams/views.py:173
 #, python-format
 msgid ""
 "\n"
@@ -867,186 +867,186 @@ msgid ""
 "                "
 msgstr ""
 
-#: apps/teams/views.py:198
+#: apps/teams/views.py:199
 msgid "You do not have permission to delete this team."
 msgstr ""
 
-#: apps/teams/views.py:212 apps/teams/views.py:254 apps/teams/views.py:282
-#: apps/teams/views.py:316 apps/teams/views.py:371 apps/teams/views.py:1551
+#: apps/teams/views.py:213 apps/teams/views.py:255 apps/teams/views.py:283
+#: apps/teams/views.py:317 apps/teams/views.py:372 apps/teams/views.py:1554
 msgid "You do not have permission to edit this team."
 msgstr ""
 
-#: apps/teams/views.py:241 apps/teams/views.py:301 apps/teams/views.py:386
+#: apps/teams/views.py:242 apps/teams/views.py:302 apps/teams/views.py:387
 msgid "Settings saved."
 msgstr ""
 
-#: apps/teams/views.py:267
+#: apps/teams/views.py:268
 msgid "Guidelines and messages updated."
 msgstr ""
 
-#: apps/teams/views.py:512
+#: apps/teams/views.py:513
 msgid "You can't add that video to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:547
+#: apps/teams/views.py:550
 msgid "The video has been moved to the new team."
 msgstr ""
 
-#: apps/teams/views.py:560
+#: apps/teams/views.py:563
 msgid "You can't add videos to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:579
+#: apps/teams/views.py:582
 msgid "You can't edit this video."
 msgstr ""
 
-#: apps/teams/views.py:588
+#: apps/teams/views.py:591
 msgid "Video has been updated."
 msgstr ""
 
-#: apps/teams/views.py:616
+#: apps/teams/views.py:619
 msgid "Request must be a POST request."
 msgstr ""
 
-#: apps/teams/views.py:624
+#: apps/teams/views.py:627
 msgid "You can't delete that video."
 msgstr ""
 
-#: apps/teams/views.py:628
+#: apps/teams/views.py:631
 msgid "You can't remove that video."
 msgstr ""
 
-#: apps/teams/views.py:640
+#: apps/teams/views.py:643
 msgid "Video has been deleted from Amara."
 msgstr ""
 
-#: apps/teams/views.py:643
+#: apps/teams/views.py:646
 msgid "Video has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:762
+#: apps/teams/views.py:765
 msgid "Member has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:765
+#: apps/teams/views.py:768
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 
-#: apps/teams/views.py:768
+#: apps/teams/views.py:771
 msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
-#: apps/teams/views.py:799
+#: apps/teams/views.py:802
 msgid "Application approved."
 msgstr ""
 
-#: apps/teams/views.py:801 apps/teams/views.py:819
+#: apps/teams/views.py:804 apps/teams/views.py:822
 msgid "Application does not exist."
 msgstr ""
 
-#: apps/teams/views.py:803
+#: apps/teams/views.py:806
 msgid "You can't approve applications."
 msgstr ""
 
-#: apps/teams/views.py:817
+#: apps/teams/views.py:820
 msgid "Application denied."
 msgstr ""
 
-#: apps/teams/views.py:821
+#: apps/teams/views.py:824
 msgid "You can't deny applications."
 msgstr ""
 
-#: apps/teams/views.py:831
+#: apps/teams/views.py:834
 msgid "You cannot invite people to this team."
 msgstr ""
 
-#: apps/teams/views.py:861
+#: apps/teams/views.py:864
 msgid "This invite is no longer valid"
 msgstr ""
 
-#: apps/teams/views.py:870
+#: apps/teams/views.py:873
 msgid "You cannot join this team."
 msgstr ""
 
-#: apps/teams/views.py:921
+#: apps/teams/views.py:924
 msgid "You have left this team."
 msgstr ""
 
-#: apps/teams/views.py:977
+#: apps/teams/views.py:980
 msgid "Member saved."
 msgstr ""
 
-#: apps/teams/views.py:1136
+#: apps/teams/views.py:1139
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1279 apps/teams/views.py:1282
+#: apps/teams/views.py:1282 apps/teams/views.py:1285
 msgid "You are not allowed to perform this task."
 msgstr ""
 
-#: apps/teams/views.py:1337
+#: apps/teams/views.py:1340
 msgid "Task deleted."
 msgstr ""
 
-#: apps/teams/views.py:1339
+#: apps/teams/views.py:1342
 msgid "You cannot delete this task."
 msgstr ""
 
-#: apps/teams/views.py:1364
+#: apps/teams/views.py:1367
 msgid "Task declined."
 msgstr ""
 
-#: apps/teams/views.py:1366
+#: apps/teams/views.py:1369
 msgid "Task assigned."
 msgstr ""
 
-#: apps/teams/views.py:1368
+#: apps/teams/views.py:1371
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1390
+#: apps/teams/views.py:1393
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1406
+#: apps/teams/views.py:1409
 msgid "Draft uploaded successfully."
 msgstr ""
 
-#: apps/teams/views.py:1410
+#: apps/teams/views.py:1413
 msgid "/n"
 msgstr ""
 
-#: apps/teams/views.py:1428
+#: apps/teams/views.py:1431
 msgid "You are not allowed to download this transcript."
 msgstr ""
 
-#: apps/teams/views.py:1478
+#: apps/teams/views.py:1481
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1490
+#: apps/teams/views.py:1493
 msgid "Project added."
 msgstr ""
 
-#: apps/teams/views.py:1507
+#: apps/teams/views.py:1510
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1518
+#: apps/teams/views.py:1521
 msgid "Project deleted."
 msgstr ""
 
-#: apps/teams/views.py:1536
+#: apps/teams/views.py:1539
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1662
+#: apps/teams/views.py:1665
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1696
+#: apps/teams/views.py:1699
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1542,7 +1542,7 @@ msgstr ""
 msgid "Feed is unavailable now."
 msgstr ""
 
-#: apps/videos/templatetags/subtitles_tags.py:56
+#: apps/videos/templatetags/subtitles_tags.py:57
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
