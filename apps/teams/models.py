@@ -23,6 +23,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.core.files import File
 from django.db import models
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
@@ -45,7 +46,7 @@ from teams.permissions_const import (
 from videos.tasks import upload_subtitles_to_original_service
 from teams.tasks import update_one_team_video
 from utils import DEFAULT_PROTOCOL
-from utils.amazon import S3EnabledImageField
+from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
@@ -2273,7 +2274,8 @@ class BillingReport(models.Model):
     team = models.ForeignKey(Team)
     start_date = models.DateField()
     end_date = models.DateField()
-    csv_data = models.TextField(blank=True, null=True)
+    csv_file = S3EnabledFileField(blank=True, null=True,
+            upload_to='teams/billing/')
     processed = models.DateTimeField(blank=True, null=True)
 
     def __unicode__(self):
@@ -2283,7 +2285,6 @@ class BillingReport(models.Model):
 
     def process(self):
         from teams.moderation_const import APPROVED
-        from StringIO import StringIO
         import csv
 
         midnight = datetime.time(0, 0, 0)
@@ -2327,14 +2328,12 @@ class BillingReport(models.Model):
                     round((end - start) / 60, 2)
                 ])
 
-        output = StringIO()
-        writer = csv.writer(output)
+        fn = '/tmp/bill-%s.csv' % self.pk
 
-        for row in rows:
-            writer.writerow(row)
+        with open(fn, 'w') as f:
+            writer = csv.writer(f)
+            writer.writerows(rows)
 
-        text = output.getvalue()
-
-        self.csv_data = text
+        self.csv_file = File(open(fn, 'r'))
         self.processed = datetime.datetime.utcnow()
         self.save()
