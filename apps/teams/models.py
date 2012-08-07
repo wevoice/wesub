@@ -2268,3 +2268,73 @@ class TeamNotificationSetting(models.Model):
     def __unicode__(self):
         return u'NotificationSettings for team %s' % (self.team)
 
+
+class BillingReport(models.Model):
+    team = models.ForeignKey(Team)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    csv_data = models.TextField(blank=True, null=True)
+    processed = models.DateTimeField(blank=True, null=True)
+
+    def __unicode__(self):
+        return "%s (%s - %s)" % (self.team.slug,
+                self.start_date.strftime('%Y-%m-%d'),
+                self.end_date.strftime('%Y-%m-%d'))
+
+    def process(self):
+        from teams.moderation_const import APPROVED
+        from StringIO import StringIO
+        import csv
+
+        midnight = datetime.time(0, 0, 0)
+        start_date = datetime.datetime.combine(self.start_date, midnight)
+        end_date = datetime.datetime.combine(self.end_date, midnight)
+
+        rows = [['Video title', 'Video URL', 'Video language',
+                    'Billable minutes']]
+
+        tvs = TeamVideo.objects.filter(team=self.team).order_by('video__title')
+
+        domain = Site.objects.get_current().domain
+        protocol = getattr(settings, 'DEFAULT_PROTOCOL')
+        host = '%s://%s' % (protocol, domain)
+
+        for tv in tvs:
+            languages = tv.video.subtitlelanguage_set.all()
+
+            for language in languages:
+                v = language.latest_version()
+
+                if not v or v.moderation_status != APPROVED:
+                    continue
+
+                if (v.datetime_started <= start_date) or (
+                        v.datetime_started >= end_date):
+                    continue
+
+                subs = v.ordered_subtitles()
+
+                if len(subs) == 0:
+                    continue
+
+                start = subs[0].start_time
+                end = subs[-1].end_time
+
+                rows.append([
+                    tv.video.title.encode('utf-8'),
+                    host + tv.video.get_absolute_url(),
+                    language.language,
+                    round((end - start) / 60, 2)
+                ])
+
+        output = StringIO()
+        writer = csv.writer(output)
+
+        for row in rows:
+            writer.writerow(row)
+
+        text = output.getvalue()
+
+        self.csv_data = text
+        self.processed = datetime.datetime.utcnow()
+        self.save()

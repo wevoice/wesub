@@ -162,3 +162,11 @@ def gauge_teams():
     Gauge('teams.Task').report(Task.objects.count())
     Gauge('teams.Team').report(Team.objects.count())
     Gauge('teams.TeamMember').report(TeamMember.objects.count())
+
+
+@task()
+def process_billing_report(billing_report_pk):
+    from teams.models import BillingReport
+    report = BillingReport.objects.get(pk=billing_report_pk)
+    with Timer('billing-csv-time'):
+        report.process()
