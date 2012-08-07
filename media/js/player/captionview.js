@@ -113,11 +113,11 @@ unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_ma
     if (!text){
         return "";
     }
-    // the user might have forced line breaks, we should respect that
 
-    // Double newlines to force line breaks.
-    // No idea why.
-    text = text.replace('\n', '\n\n');
+    // If we get text with newlines, sometimes those newlines get cut off
+    // when we're splitting words. This makes sure we always retain the original
+    // newlines.
+    text = text.replace('\n', ' \n');
 
     var lines = [];
     var currentLine  = [];
