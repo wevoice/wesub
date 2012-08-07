@@ -41,3 +41,7 @@ unisubs.player.OoyalaVideoSource.prototype.getVideoURL = function() {
 unisubs.player.OoyalaVideoSource.prototype.getEmbedCode = function() {
     return this.embedCode_;
 };
+
+unisubs.player.OoyalaVideoSource.prototype.setVideoConfig = function(config) {
+    this.videoConfig_ = config;
+};
