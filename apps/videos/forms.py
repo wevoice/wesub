@@ -174,7 +174,7 @@ class SubtitlesUploadForm(forms.Form):
 
         self.fields['language'].choices = [('', '--Select language--')] + get_language_choices()
         self.fields['video_language'].choices = get_language_choices()
-        choices = [('', 'Directly from video')] + ([(sl.language, sl.language_display()) for sl in video.subtitlelanguage_set.all() if sl.is_complete_and_synced()])
+        choices = [(sl.language, sl.language_display()) for sl in video.subtitlelanguage_set.all() if sl.is_complete_and_synced()]
         self.fields['translated_from'].choices = choices
 
     def clean_video(self):
