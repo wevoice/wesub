@@ -98,9 +98,12 @@ class ThirdPartyAccountManager(models.Manager):
                 # We can't mirror unsynced or non-public versions.
                 return
 
-        rule = YoutubeSyncRule.objects.all()[0]
-        should_sync = rule.should_sync(video)
-        always_push_account = self.always_push_account()
+        try:
+            rule = YoutubeSyncRule.objects.all()[0]
+            should_sync = rule.should_sync(video)
+            always_push_account = self.always_push_account()
+        except IndexError:
+            should_sync = False
 
         for vurl in video.videourl_set.all():
             already_updated = False
