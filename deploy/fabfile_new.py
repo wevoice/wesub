@@ -220,7 +220,7 @@ def local():
     with Output("Configuring task(s) to run on LOCAL"):
         _create_env(username              = 'vagrant',
                     name                  = 'local',
-                    s3_bucket             = 's3.staging.universalsubtitles.org',
+                    s3_bucket             = 's3.local.amara.org',
                     app_name              = 'unisubs',
                     app_dir               = '/opt/apps/local/unisubs/',
                     app_group             = 'deploy',
@@ -438,7 +438,7 @@ def migrate(app_name='', extra=''):
 @task
 @lock_required
 @parallel
-@roles('app')
+@roles('app', 'data')
 def update_environment(extra=''):
     with Output('Updating environment'):
         with cd(os.path.join(env.app_dir, 'deploy')):
@@ -447,6 +447,8 @@ def update_environment(extra=''):
             # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
             run('yes i | {0}/bin/pip install {1} -r requirements.txt'.format(env.ve_dir, extra), pty=True)
             #_clear_permissions(os.path.join(base_dir, 'env'))
+        with cd(env.app_dir):
+            run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
 
 @task
 @parallel
@@ -611,3 +613,26 @@ def deploy():
 
     if env.environment not in ['dev']:
         _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user,  environment, datetime.utcnow()))
+
+@task
+@lock_required
+@runs_once
+@roles('data')
+def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_s3=False):
+    """
+    Compiles and uploads static media to S3
+
+    :param compilation_level: Level of optimization (default: ADVANCED_OPTIMIZATIONS)
+    :param skip_s3: Skip upload to S3 (default: False)
+
+    """
+    with Output("Updating static media") as out, cd(env.app_dir):
+        media_dir = '{0}/media/'.format(env.app_dir)
+        python_exe = '{0}/bin/python'.format(env.ve_dir)
+        _git_pull()
+        execute(update_integration)
+        out.fastprintln('Compiling...')
+        run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
+        if not skip_s3:
+            out.fastprintln('Uploading to S3...')
+            run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
