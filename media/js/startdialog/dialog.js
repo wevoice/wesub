@@ -209,12 +209,6 @@ unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
                 });
         }
 
-        if (this.subtitleAllowed_) {
-            fromLanguageContents.push(
-                [unisubs.startdialog.Dialog.FORK_VALUE,
-                    "Direct from video (more work)"]);
-        }
-
         var $d = goog.bind(this.getDomHelper().createDom,
                            this.getDomHelper());
         this.fromLanguageDropdown_ = this.makeDropdown_(
