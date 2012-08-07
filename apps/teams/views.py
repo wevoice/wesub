@@ -87,6 +87,7 @@ from videos.models import Action, VideoUrl, SubtitleLanguage, Video
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
+from raven.contrib.django.models import client
 
 
 logger = logging.getLogger("teams.views")
@@ -1400,12 +1401,21 @@ def upload_draft(request, slug):
     if request.POST:
         form = UploadDraftForm(request.user, request.POST, request.FILES)
 
-        if form.is_valid():
+        try:
+            is_valid = form.is_valid()
+        except Exception, e:
+            client.create_from_exception()
+            messages.error(u"Sorry, there was a problem while uploading your draft. Care to try again?")
+            transaction.rollback()
+            is_valid = False
+
+        if is_valid:
             try:
                 form.save()
             except Exception, e:
                 messages.error(request, unicode(e))
                 transaction.rollback()
+                client.create_from_exception()
             else:
                 messages.success(request, _(u"Draft uploaded successfully."))
                 transaction.commit()
