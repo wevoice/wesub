@@ -1766,7 +1766,7 @@ def get_billing_data_for_team(team, start_date, end_date, header=True):
             if not v or v.moderation_status != APPROVED:
                 continue
 
-            if (v.datetime_started < start_date) or (v.datetime_started >
+            if (v.datetime_started <= start_date) or (v.datetime_started >=
                     end_date):
                 continue
 
