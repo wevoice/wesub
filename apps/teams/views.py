@@ -52,7 +52,8 @@ from teams.forms import (
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException
+    Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException,
+    BillingReport
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -68,7 +69,7 @@ from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
     update_video_moderation, update_one_team_video, update_video_public_field,
-    invalidate_video_visibility_caches
+    invalidate_video_visibility_caches, process_billing_report
 )
 from apps.videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
@@ -86,6 +87,7 @@ from videos.models import Action, VideoUrl, SubtitleLanguage, Video
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
+from raven.contrib.django.models import client
 
 
 logger = logging.getLogger("teams.views")
@@ -1399,12 +1401,21 @@ def upload_draft(request, slug):
     if request.POST:
         form = UploadDraftForm(request.user, request.POST, request.FILES)
 
-        if form.is_valid():
+        try:
+            is_valid = form.is_valid()
+        except Exception, e:
+            client.create_from_exception()
+            messages.error(u"Sorry, there was a problem while uploading your draft. Care to try again?")
+            transaction.rollback()
+            is_valid = False
+
+        if is_valid:
             try:
                 form.save()
             except Exception, e:
                 messages.error(request, unicode(e))
                 transaction.rollback()
+                client.create_from_exception()
             else:
                 messages.success(request, _(u"Draft uploaded successfully."))
                 transaction.commit()
@@ -1725,69 +1736,6 @@ def auto_captions_status(request, slug):
 
 
 # Billing
-def get_billing_data_for_team(team, start_date, end_date, header=True):
-    """
-    Return a list of lists of data suitable for the csv writer or similar.
-
-    ``start_date`` and ``end_date`` should be ``datetime.date`` instances
-
-    * Get all videos for team
-    * For each video, get all languages
-    * For each language, get the latest version
-    * If the version is approved and within the time constraints, add it.
-
-    Minutes are counted by
-        [last subtitle synced timing] - [first subtitle synced timing]
-    """
-    from datetime import datetime, time
-    rows = []
-
-    # Oh, Python...
-    midnight = time(0, 0, 0)
-    start_date = datetime.combine(start_date, midnight)
-    end_date = datetime.combine(end_date, midnight)
-
-    if header:
-        rows.append(['Video title', 'Video URL', 'Video language',
-                'Billable minutes'])
-
-    tvs = TeamVideo.objects.filter(team=team).order_by('video__title')
-
-    domain = Site.objects.get_current().domain
-    protocol = getattr(settings, 'DEFAULT_PROTOCOL')
-    host = '%s://%s' % (protocol, domain)
-
-    for tv in tvs:
-        languages = tv.video.subtitlelanguage_set.all()
-
-        for language in languages:
-            v = language.latest_version()
-
-            if not v or v.moderation_status != APPROVED:
-                continue
-
-            if (v.datetime_started < start_date) or (v.datetime_started >
-                    end_date):
-                continue
-
-            subs = v.ordered_subtitles()
-
-            if len(subs) == 0:
-                continue
-
-            start = subs[0].start_time
-            end = subs[-1].end_time
-
-            rows.append([
-                tv.video.title.encode('utf-8'),
-                host + tv.video.get_absolute_url(),
-                language.language,
-                round((end - start) / 60, 2)
-            ])
-
-    return rows
-
-
 @staff_member_required
 def billing(request):
     user = request.user
@@ -1802,27 +1750,36 @@ def billing(request):
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
 
-            date_range = "%s-%s" % (
-                    start_date.strftime('%Y%m%d'),
-                    end_date.strftime('%Y%m%d'))
+            report, created = BillingReport.objects.get_or_create(team=team,
+                    start_date=start_date, end_date=end_date)
 
-            f = 'billing-%s-%s' % (team.slug, date_range)
+            process_billing_report.delay(report.pk)
 
-            response = HttpResponse(mimetype='text/csv')
-            response['Content-Disposition'] = 'attachment;filename=%s.csv' % f
-
-            writer = csv.writer(response)
-
-            with Timer('billing-csv-time'):
-                data = get_billing_data_for_team(team, start_date, end_date)
-
-            for row in data:
-                writer.writerow(row)
-
-            return response
     else:
         form = ChooseTeamForm()
 
+    reports = BillingReport.objects.all()
+
     return render_to_response('teams/billing/choose.html', {
-        'form': form
+        'form': form,
+        'reports': reports
     }, RequestContext(request))
+
+
+@staff_member_required
+def download_csv(request, report_id):
+    report = get_object_or_404(BillingReport, pk=report_id)
+
+    date_range = "%s-%s" % (
+            report.start_date.strftime('%Y%m%d'),
+            report.end_date.strftime('%Y%m%d'))
+
+    f = 'billing-%s-%s' % (report.team.slug, date_range)
+    process_billing_report.delay(report.pk)
+
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment;filename=%s.csv' % f
+
+    response.write(report.csv_data)
+
+    return response

@@ -1061,6 +1061,12 @@ class Application(models.Model):
         # We can't delete the row until the notification task has run.
         notifier.team_application_denied.delay(self.pk)
 
+    def save(self, dispatches_http_callback=True, *args, **kwargs):
+        is_new = not bool(self.pk)
+        super(Application, self).save(*args, **kwargs)
+        if dispatches_http_callback and is_new:
+            from teams.signals import api_application_new
+            api_application_new.send(self)
 
 # Invites
 class InviteExpiredException(Exception):
@@ -2179,7 +2185,7 @@ post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePrefere
 
 # TeamNotificationSettings
 class TeamNotificationSettingManager(models.Manager):
-    def notify_team(self, team_pk, video_id, event_name, language_pk=None, version_pk=None):
+    def notify_team(self, team_pk, event_name, **kwargs):
         """Notify the given team of a given event.
 
         Finds the matching notification settings for this team, instantiates
@@ -2196,8 +2202,7 @@ class TeamNotificationSettingManager(models.Manager):
             notification_settings = self.get(team__id=team_pk)
         except TeamNotificationSetting.DoesNotExist:
             return
-        notification_settings.notify(Video.objects.get(video_id=video_id), event_name,
-                                                 language_pk, version_pk)
+        notification_settings.notify(event_name, **kwargs)
 
 class TeamNotificationSetting(models.Model):
     """Info on how a team should be notified of changes to its videos.
@@ -2220,6 +2225,7 @@ class TeamNotificationSetting(models.Model):
     EVENT_SUBTITLE_NEW = "subs-new"
     EVENT_SUBTITLE_APPROVED = "subs-approved"
     EVENT_SUBTITLE_REJECTED = "subs-rejected"
+    EVENT_APPLICATION_NEW = 'application-new'
 
     team = models.OneToOneField(Team, related_name="notification_settings")
 
@@ -2245,10 +2251,10 @@ class TeamNotificationSetting(models.Model):
             logger.exception("Apparently unisubs-integration is not installed")
 
 
-    def notify(self, video, event_name, language_pk=None, version_pk=None):
+    def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
-        notification = self.get_notification_class()(
-            self.team, video, event_name, language_pk, version_pk)
+        
+        notification = self.get_notification_class()(self.team, event_name,  **kwargs)
         if self.request_url:
             success, content = notification.send_http_request(
                 self.request_url,
@@ -2258,9 +2264,77 @@ class TeamNotificationSetting(models.Model):
             return success, content
         # FIXME: spec and test this, for now just return
         return
-        if self.email:
-            notification.send_email(self.email, self.team, video, event_name, language_pk)
 
     def __unicode__(self):
         return u'NotificationSettings for team %s' % (self.team)
 
+
+class BillingReport(models.Model):
+    team = models.ForeignKey(Team)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    csv_data = models.TextField(blank=True, null=True)
+    processed = models.DateTimeField(blank=True, null=True)
+
+    def __unicode__(self):
+        return "%s (%s - %s)" % (self.team.slug,
+                self.start_date.strftime('%Y-%m-%d'),
+                self.end_date.strftime('%Y-%m-%d'))
+
+    def process(self):
+        from teams.moderation_const import APPROVED
+        from StringIO import StringIO
+        import csv
+
+        midnight = datetime.time(0, 0, 0)
+        start_date = datetime.datetime.combine(self.start_date, midnight)
+        end_date = datetime.datetime.combine(self.end_date, midnight)
+
+        rows = [['Video title', 'Video URL', 'Video language',
+                    'Billable minutes']]
+
+        tvs = TeamVideo.objects.filter(team=self.team).order_by('video__title')
+
+        domain = Site.objects.get_current().domain
+        protocol = getattr(settings, 'DEFAULT_PROTOCOL')
+        host = '%s://%s' % (protocol, domain)
+
+        for tv in tvs:
+            languages = tv.video.subtitlelanguage_set.all()
+
+            for language in languages:
+                v = language.latest_version()
+
+                if not v or v.moderation_status != APPROVED:
+                    continue
+
+                if (v.datetime_started <= start_date) or (
+                        v.datetime_started >= end_date):
+                    continue
+
+                subs = v.ordered_subtitles()
+
+                if len(subs) == 0:
+                    continue
+
+                start = subs[0].start_time
+                end = subs[-1].end_time
+
+                rows.append([
+                    tv.video.title.encode('utf-8'),
+                    host + tv.video.get_absolute_url(),
+                    language.language,
+                    round((end - start) / 60, 2)
+                ])
+
+        output = StringIO()
+        writer = csv.writer(output)
+
+        for row in rows:
+            writer.writerow(row)
+
+        text = output.getvalue()
+
+        self.csv_data = text
+        self.processed = datetime.datetime.utcnow()
+        self.save()

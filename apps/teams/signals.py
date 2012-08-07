@@ -55,9 +55,8 @@ def _execute_video_task(video, event_name):
     for tv in tvs:
         team_tasks.api_notify_on_video_activity.delay(
             tv.team.pk,
-            tv.video.video_id,
-            event_name
-            )
+            event_name,
+            tv.video.video_id)
     
 def _execute_language_task(language, event_name):
     from teams import tasks as team_tasks
@@ -66,9 +65,8 @@ def _execute_language_task(language, event_name):
     for team in teams:
         team_tasks.api_notify_on_language_activity.delay(
             team.pk,
-            language.pk,
-            event_name
-            )
+            event_name,
+            language.pk)
  
 def _execute_version_task(version, event_name):
     from teams import tasks as team_tasks
@@ -77,9 +75,16 @@ def _execute_version_task(version, event_name):
     for team in teams:
         team_tasks.api_notify_on_subtitles_activity.delay(
             team.pk,
-            version.pk,
-            event_name
-            )
+            event_name,
+            version.pk)
+
+def _execute_application_task(application, event_name):
+    from teams.tasks import api_notify_on_application_activity
+    api_notify_on_application_activity.delay(
+        application.team.pk,
+        event_name,
+        application.pk,
+    )
     
 def api_on_subtitles_edited(sender, **kwargs):
     from teams.models import TeamNotificationSetting
@@ -116,8 +121,12 @@ def api_on_teamvideo_new(sender, **kwargs):
     
     return team_tasks.api_notify_on_video_activity.delay(
             sender.team.pk,
-            sender.video.video_id ,
-            TeamNotificationSetting.EVENT_VIDEO_NEW)
+            TeamNotificationSetting.EVENT_VIDEO_NEW,
+            sender.video.video_id )
+
+def api_on_application_new(sender, **kwargs):
+    from teams.models import TeamNotificationSetting
+    return _execute_application_task(sender, TeamNotificationSetting.EVENT_APPLICATION_NEW)
 
 #: Actual available signals
 api_subtitles_edited = dispatch.Signal(providing_args=["version"])
@@ -127,6 +136,7 @@ api_language_edited = dispatch.Signal(providing_args=["language"])
 api_video_edited = dispatch.Signal(providing_args=["video"])
 api_language_new = dispatch.Signal(providing_args=["language"])
 api_teamvideo_new = dispatch.Signal(providing_args=["video"])
+api_application_new = dispatch.Signal(providing_args=["application"])
 video_moved_from_team_to_team = dispatch.Signal(
         providing_args=["destination_team", "video"])
 # connect handlers
@@ -137,3 +147,4 @@ api_language_edited.connect(api_on_language_edited)
 api_language_new.connect(api_on_language_new)
 api_video_edited.connect(api_on_video_edited)
 api_teamvideo_new.connect(api_on_teamvideo_new)
+api_application_new.connect(api_on_application_new)
