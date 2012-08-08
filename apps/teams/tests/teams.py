@@ -473,10 +473,8 @@ class TeamsTest(TestCase):
         tv = team.teamvideo_set.get(pk=1)
         team_video_search_records = self._tv_search_record_list(team)
 
-        for tv in team_video_search_records:
-            if tv.title == 'change title':
-                break
-        self.assertEquals('and descriptionnn', tv.description)
+        team_video = [team_video for team_video in team_video_search_records if team_video.team_video_pk == tv.pk][0]
+        self.assertEquals('and descriptionnn', team_video.description)
 
     def test_detail_contents_after_remove(self):
         # make sure removals show up in search result from solr

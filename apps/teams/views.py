@@ -1764,22 +1764,3 @@ def billing(request):
         'form': form,
         'reports': reports
     }, RequestContext(request))
-
-
-@staff_member_required
-def download_csv(request, report_id):
-    report = get_object_or_404(BillingReport, pk=report_id)
-
-    date_range = "%s-%s" % (
-            report.start_date.strftime('%Y%m%d'),
-            report.end_date.strftime('%Y%m%d'))
-
-    f = 'billing-%s-%s' % (report.team.slug, date_range)
-    process_billing_report.delay(report.pk)
-
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment;filename=%s.csv' % f
-
-    response.write(report.csv_data)
-
-    return response
