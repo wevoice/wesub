@@ -636,3 +636,17 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_s3=Fals
         if not skip_s3:
             out.fastprintln('Uploading to S3...')
             run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
+
+@task
+@runs_once
+@roles('data')
+def update_django_admin_media():
+    """
+    Uploads Django Admin static media to S3
+
+    """
+    with Output("Uploading Django admin media"):
+        media_dir = '{0}/lib/python2.6/site-packages/django/contrib/admin/media/'.format(env.ve_dir)
+        s3_bucket = 's3.{0}.amara.org/admin/'.format(env.environment)
+        python_exe = '{0}/bin/python'.format(env.ve_dir)
+        sudo('s3cmd -P -c /etc/s3cfg sync {0} s3://{1}'.format(media_dir, s3_bucket))
