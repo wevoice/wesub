@@ -28,10 +28,6 @@ class UnisubsPage(Page):
     _MODAL_DIALOG = "div.modal"
     _MODAL_CLOSE = "div.modal-header a.close"
 
-    USER_NAMES = {"normal": ["PollyGlott", "talks.alot"],
-                 "admin": ["sub_writer", "sub.writer"],
-                 "team-owning":["sub_writer", "sub.writer"],
-                 }
 
     def error_message_present(self, message):
          if self.is_text_present(self._ERROR_MESSAGE, message): return True
@@ -50,7 +46,7 @@ class UnisubsPage(Page):
         if self.logged_in() == True:
             self.click_by_css(self._LOGOUT)
 
-    def log_in(self, user="normal"):
+    def log_in(self, username, passw):
         """Log in with the specified account type - default as a no-priv user.
 
         """

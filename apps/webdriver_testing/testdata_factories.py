@@ -3,6 +3,10 @@ import factory
 from apps.videos.models import Video
 from apps.videos.models import SubtitleLanguage
 from apps.videos.models import Action
+from apps.teams.models import Team, TeamMember
+from apps.auth.models import CustomUser as User
+
+
 
 class SubtitleLanguageFactory(factory.Factory):
     FACTORY_FOR = SubtitleLanguage
@@ -16,10 +20,15 @@ class VideoFactory(factory.Factory):
     title = "Test Video"
     description = "Greatest Video ever made"
 
+class UserFactory(factory.Factory):
+    FACTORY_FOR = User
 
-class ActionFactory(factory.Factory):
-    FACTORY_FOR = Action
-    video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=WqJineyEszo')
-    created = datetime.datetime.now()
+class TeamFactory(factory.Factory):
+    FACTORY_FOR = Team
 
-    
+class TeamMemberFactory(factory.Factory):
+    FACTORY_FOR = TeamMember
+    team = factory.SubFactory(TeamFactory)
+    role = 'ROLE_OWNER'
+    user = factory.SubFactory(UserFactory)
+

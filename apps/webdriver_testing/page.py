@@ -232,6 +232,8 @@ class Page(object):
     def get_absolute_url(self, url):
         if url.startswith("http"):
             full_url = url
+        elif url.startswith("/"):
+            full_url = str(self.base_url) + url[1:]
         else:
             full_url = str(self.base_url) + url
         return full_url

@@ -54,7 +54,6 @@ class WebdriverTestCaseVideosCreatePage(WebdriverTestCase):
 
     def test_create_feed__youtube_user(self):
         youtube_user = 'croatiadivers'
-        self.create_pg.submit_feed_url(url)
         self.create_pg.submit_youtube_users_videos(youtube_user, save=True)
         assert_true(self.create_pg.multi_submit_successful())
 
