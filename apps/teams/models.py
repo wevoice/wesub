@@ -174,7 +174,8 @@ class Team(models.Model):
             default=None, null=True, blank=True)
 
     deleted = models.BooleanField(default=False)
-    partner = models.ForeignKey('Partner', null=True, blank=True)
+    partner = models.ForeignKey('Partner', null=True, blank=True,
+            related_name='teams')
 
     objects = TeamManager()
     all_objects = models.Manager() # For accessing deleted teams, if necessary.
