@@ -32,7 +32,7 @@ class TeamsPage(UnisubsPage):
 
     def search_has_no_matches():
         if self.is_text_present(self._NO_MATCHES, self._NO_MATCH_TEXT):
-        return True
+            return True
 
     def sort(self, order):
         sort_orders = ['Newest', 'Name', 'Most Members']
