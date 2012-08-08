@@ -174,6 +174,7 @@ class Team(models.Model):
             default=None, null=True, blank=True)
 
     deleted = models.BooleanField(default=False)
+    partner = models.ForeignKey('Partner', null=True, blank=True)
 
     objects = TeamManager()
     all_objects = models.Manager() # For accessing deleted teams, if necessary.
@@ -2337,3 +2338,11 @@ class BillingReport(models.Model):
         self.csv_file = File(open(fn, 'r'))
         self.processed = datetime.datetime.utcnow()
         self.save()
+
+
+class Partner(models.Model):
+    name = models.CharField(_(u'name'), max_length=250, unique=True)
+    slug = models.SlugField(_(u'slug'), unique=True)
+
+    def __unicode__(self):
+        return self.name
