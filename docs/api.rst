@@ -473,17 +473,17 @@ Listing video urls
 
 Video URL detail:
 
-.. http:get:: /api2/partners/users/[video-id]/urls/[url-id]/
+.. http:get:: /api2/partners/videos/[video-id]/urls/[url-id]/
 
 Where the url-id can be fetched from the list of urls.
 
 Updating video-urls:
 
-.. http:put:: /api2/partners/users/[video-id]/urls/[url-id]/
+.. http:put:: /api2/partners/videos/[video-id]/urls/[url-id]/
 
 Creating video-urls:
 
-.. http:post:: /api2/partners/users/[video-id]/urls/
+.. http:post:: /api2/partners/videos/[video-id]/urls/
 
     :form url: Any URL that works for the regular site (mp4 files, youtube, vimeo,
         etc) can be used. Note that the url cannot be in use by another video.
@@ -496,7 +496,7 @@ Creating video-urls:
 
 To delete a url:
 
-.. http:delete:: /api2/partners/users/[video-id]/urls/[url-id]/
+.. http:delete:: /api2/partners/videos/[video-id]/urls/[url-id]/
 
 If this is the only URL for a video, the request will fail. A video must have
 at least one URL.
