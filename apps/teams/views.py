@@ -1027,28 +1027,6 @@ def _task_languages(team, user):
             })
     return lang_data
 
-def _task_category_counts(team, filters, user):
-    tasks = team.task_set.incomplete()
-
-    if filters['language']:
-        tasks = tasks.filter(language=filters['language'])
-
-    if filters['team_video']:
-        tasks = tasks.filter(team_video=int(filters['team_video']))
-
-    if filters['assignee']:
-        if filters['assignee'] == 'none':
-            tasks = tasks.filter(assignee=None)
-        else:
-            tasks = tasks.filter(assignee=user)
-
-    counts = { 'all': tasks.count() }
-
-    for type in ['Subtitle', 'Translate', 'Review', 'Approve']:
-        counts[type.lower()] = tasks.filter(type=Task.TYPE_IDS[type]).count()
-
-    return counts
-
 def _tasks_list(request, team, project, filters, user):
     '''List tasks for the given team, optionally filtered.
 
@@ -1156,7 +1134,6 @@ def team_tasks(request, slug, project_slug=None):
 
     tasks = _order_tasks(request,
                          _tasks_list(request, team, project, filters, user))
-    category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
     # We pull out the task IDs here for performance.  It's ugly, I know.
@@ -1218,7 +1195,6 @@ def team_tasks(request, slug, project_slug=None):
         'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
         'languages': languages,
-        'category_counts': category_counts,
         'tasks': tasks,
         'filters': filters,
         'widget_settings': widget_settings,

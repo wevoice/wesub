@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-08 01:32-0500\n"
-"PO-Revision-Date: 2012-08-08 06:51+0000\n"
+"POT-Creation-Date: 2012-08-09 01:33-0500\n"
+"PO-Revision-Date: 2012-08-09 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/universalsubtitles/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -392,32 +392,32 @@ msgstr "Statistika zhlédnutí videa"
 msgid "Widget view statistic"
 msgstr "Statistika zobrazení widgetu"
 
-#: apps/teams/admin.py:57
+#: apps/teams/admin.py:59
 #, python-format
 msgid "%(count)s messages sent"
 msgstr "%(count)s zpráv odesláno"
 
-#: apps/teams/admin.py:59
+#: apps/teams/admin.py:61
 msgid "Fill all fields please."
 msgstr "Vyplňte prosím všechna pole."
 
-#: apps/teams/admin.py:60
+#: apps/teams/admin.py:62
 msgid "Send message"
 msgstr "Poslat zprávu"
 
-#: apps/teams/admin.py:64
+#: apps/teams/admin.py:66
 msgid "Feature teams"
 msgstr "Ocenit týmy"
 
-#: apps/teams/admin.py:68
+#: apps/teams/admin.py:70
 msgid "Unfeature teams"
 msgstr "Odocenit týmy"
 
-#: apps/teams/admin.py:78 apps/teams/admin.py:111 apps/teams/models.py:183
+#: apps/teams/admin.py:80 apps/teams/admin.py:113 apps/teams/models.py:185
 msgid "Team"
 msgstr "Tým"
 
-#: apps/teams/admin.py:84
+#: apps/teams/admin.py:86
 msgid "User"
 msgstr "Uživatel"
 
@@ -638,11 +638,11 @@ msgstr "Manažeři a správci"
 msgid "Admins only"
 msgstr "Pouze správci"
 
-#: apps/teams/models.py:125
+#: apps/teams/models.py:125 apps/teams/models.py:2345
 msgid "name"
 msgstr "jméno"
 
-#: apps/teams/models.py:126
+#: apps/teams/models.py:126 apps/teams/models.py:2346
 msgid "slug"
 msgstr "slimák"
 
@@ -730,43 +730,43 @@ msgstr "maximální počet úkolů na člena"
 msgid "task expiration (days)"
 msgstr "vypršení úkolu (dny)"
 
-#: apps/teams/models.py:184 templates/profiles/_top_user_panel.html:32
+#: apps/teams/models.py:186 templates/profiles/_top_user_panel.html:32
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "Týmy"
 
-#: apps/teams/models.py:627
+#: apps/teams/models.py:629
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
 msgstr "Použijte tento prostor k vysvětlení toho, proč vy nebo váš tým potřebujete otitulkovat tohle video. Přidáním poznámky zvýšíte pravděpodobnost, že vám dobrovolníci pomohou!"
 
-#: apps/teams/models.py:631
+#: apps/teams/models.py:633
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr "Automaticky získáváme miniatury u určitých stránek, např. YouTube"
 
-#: apps/teams/models.py:633
+#: apps/teams/models.py:635
 msgid "Need help with all languages"
 msgstr "Potřebuji pomoc se všemi jazyky"
 
-#: apps/teams/models.py:634
+#: apps/teams/models.py:636
 msgid "If you check this, other languages will not be displayed."
 msgstr "Když toto zaškrtnete, ostatní jazyky nebudou zobrazeny."
 
-#: apps/teams/models.py:917 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:919 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "vlastník"
 
-#: apps/teams/models.py:918 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:920 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Správce"
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:921 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:920 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Přispěvatel"
 
@@ -1714,7 +1714,7 @@ msgid "Go"
 msgstr "Přejít"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:194 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:199 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:69
 msgid "Original"
 msgstr "Originál"
@@ -4332,14 +4332,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Jste si jisti, že chcete nastálo odstranit váš profil?"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:56 templates/teams/tasks.html:414
+#: templates/messages/sent.html:56 templates/teams/tasks.html:419
 msgid "Delete"
 msgstr "Smazat"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:468 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:473 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:389
 msgid "Cancel"
 msgstr "Storno"
@@ -4718,17 +4718,17 @@ msgid "Open Tasks"
 msgstr "Otevřené úlohy"
 
 #: templates/profiles/dashboard.html:45 templates/teams/tasks.html:59
-#: templates/teams/tasks.html.py:189
+#: templates/teams/tasks.html.py:194
 msgid "Transcribe"
 msgstr "Přepsat"
 
 #: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:199
+#: templates/teams/tasks.html:204
 msgid "Subtitles into"
 msgstr ""
 
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:204
-#: templates/teams/tasks.html.py:220 templates/videos/diffing.html:87
+#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:209
+#: templates/teams/tasks.html.py:225 templates/videos/diffing.html:87
 #: templates/videos/subtitle-view.html:149
 #: templates/videos/subtitle-view.html:196
 msgid "Subtitles"
@@ -5097,7 +5097,7 @@ msgstr "CELKEM"
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
 #: templates/teams/_context_team.html:47 templates/teams/tasks.html:126
-#: templates/teams/tasks.html.py:208 templates/videos/video-view.html:163
+#: templates/teams/tasks.html.py:213 templates/videos/video-view.html:163
 msgid "Video"
 msgstr "Video"
 
@@ -5256,8 +5256,8 @@ msgid "Member"
 msgstr "Člen"
 
 #: templates/teams/_context_team.html:83
-msgid "My tasks"
-msgstr "Moje úkoly"
+msgid "Your tasks"
+msgstr ""
 
 #: templates/teams/_context_team.html:87
 msgid "All available tasks"
@@ -5288,12 +5288,12 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr "Můžete také pozvat přátele, kteří mluví jinými jazyky, aby pomohli."
 
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:291
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:296
 msgid "Resume"
 msgstr ""
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:293
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:298
 msgid "Start now"
 msgstr ""
 
@@ -5542,7 +5542,7 @@ msgstr "Jaký jazyk je potřeba?"
 msgid "Who should do it?"
 msgstr "Kdo to má udělat?"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:472
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:477
 msgid "Begin typing to search"
 msgstr "Pro vyhledávání začněte psát"
 
@@ -5948,7 +5948,7 @@ msgstr "přiřazen"
 msgid "no one"
 msgstr "nikomu"
 
-#: templates/teams/tasks.html:90 templates/teams/tasks.html.py:255
+#: templates/teams/tasks.html:90 templates/teams/tasks.html.py:260
 msgid "me"
 msgstr "mě"
 
@@ -6003,142 +6003,154 @@ msgid "and we'll narrow this list for you"
 msgstr ""
 
 #: templates/teams/tasks.html:152
-msgid "Showing unassigned tasks in languages you speak"
+msgid "Showing unassigned tasks in languages you speak. "
 msgstr ""
 
-#: templates/teams/tasks.html:157
+#: templates/teams/tasks.html:154
+msgid "Want to view "
+msgstr ""
+
+#: templates/teams/tasks.html:155
+msgid "your tasks"
+msgstr ""
+
+#: templates/teams/tasks.html:156
+msgid " instead?"
+msgstr ""
+
+#: templates/teams/tasks.html:162
 msgid "Try changing your selection using the filters above to find tasks"
 msgstr ""
 
-#: templates/teams/tasks.html:183
+#: templates/teams/tasks.html:188
 msgid "You don't have permission to perform this task."
 msgstr ""
 
-#: templates/teams/tasks.html:222
+#: templates/teams/tasks.html:227
 msgid "latest draft"
 msgstr "nejnovější koncept"
 
-#: templates/teams/tasks.html:226
+#: templates/teams/tasks.html:231
 msgid "transcribed"
 msgstr "přepsáno"
 
-#: templates/teams/tasks.html:228 templates/videos/subtitle-view.html:45
+#: templates/teams/tasks.html:233 templates/videos/subtitle-view.html:45
 msgid "translated"
 msgstr "přeloženo"
 
-#: templates/teams/tasks.html:236
+#: templates/teams/tasks.html:241
 msgid "reviewed"
 msgstr "zkontrolováno"
 
-#: templates/teams/tasks.html:238
+#: templates/teams/tasks.html:243
 msgid "and edited"
 msgstr "a opraveno"
 
-#: templates/teams/tasks.html:240 templates/videos/subtitle-view.html:204
+#: templates/teams/tasks.html:245 templates/videos/subtitle-view.html:204
 #: templates/videos/subtitle-view.html:320
 msgid "by"
 msgstr " "
 
-#: templates/teams/tasks.html:253
+#: templates/teams/tasks.html:258
 msgid "Assigned to"
 msgstr "Přiřazeno"
 
-#: templates/teams/tasks.html:262
+#: templates/teams/tasks.html:267
 msgid "Unassigned"
 msgstr ""
 
-#: templates/teams/tasks.html:277
+#: templates/teams/tasks.html:282
 msgid "Perform Task"
 msgstr "Proveď úkol"
 
-#: templates/teams/tasks.html:286
+#: templates/teams/tasks.html:291
 msgid "You have reached the maximum number of tasks."
 msgstr ""
 
-#: templates/teams/tasks.html:305
+#: templates/teams/tasks.html:310
 msgid "Download draft"
 msgstr ""
 
-#: templates/teams/tasks.html:319
+#: templates/teams/tasks.html:324
 msgid "Upload a draft"
 msgstr ""
 
-#: templates/teams/tasks.html:322
+#: templates/teams/tasks.html:327
 msgid "Important:"
 msgstr ""
 
-#: templates/teams/tasks.html:322
+#: templates/teams/tasks.html:327
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
 " and video description in the onsite editor and to submit the final version."
 msgstr ""
 
-#: templates/teams/tasks.html:325 templates/videos/_upload_subtitles.html:20
+#: templates/teams/tasks.html:330 templates/videos/_upload_subtitles.html:20
 #: templates/videos/video-view.html:106
 msgid "Language"
 msgstr "Jazyk"
 
-#: templates/teams/tasks.html:327 templates/videos/_upload_subtitles.html:23
+#: templates/teams/tasks.html:332 templates/videos/_upload_subtitles.html:23
 msgid ""
 "Please double check the primary spoken language. This step cannot be undone."
 msgstr ""
 
-#: templates/teams/tasks.html:332
+#: templates/teams/tasks.html:337
 msgid "Translate from"
 msgstr ""
 
-#: templates/teams/tasks.html:337
+#: templates/teams/tasks.html:342
 msgid "File:"
 msgstr ""
 
-#: templates/teams/tasks.html:340
+#: templates/teams/tasks.html:345
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
 msgstr ""
 
-#: templates/teams/tasks.html:354
+#: templates/teams/tasks.html:359
 msgid "Download a draft"
 msgstr ""
 
-#: templates/teams/tasks.html:359
+#: templates/teams/tasks.html:364
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr ""
 
-#: templates/teams/tasks.html:385
+#: templates/teams/tasks.html:390
 msgid "Decline"
 msgstr "Odmítnout"
 
-#: templates/teams/tasks.html:405
+#: templates/teams/tasks.html:410
 msgid "Reassign"
 msgstr "Přiřadit"
 
-#: templates/teams/tasks.html:407
+#: templates/teams/tasks.html:412
 msgid "Assign"
 msgstr "Přiřadit"
 
-#: templates/teams/tasks.html:423
+#: templates/teams/tasks.html:428
 msgid "Delete task"
 msgstr "Smazat úkol"
 
-#: templates/teams/tasks.html:429
+#: templates/teams/tasks.html:434
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:432
+#: templates/teams/tasks.html:437
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:436
+#: templates/teams/tasks.html:441
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:475
+#: templates/teams/tasks.html:480
 msgid "Assign to User"
 msgstr "Přiřadit uživateli"
 
-#: templates/teams/tasks.html:485
+#: templates/teams/tasks.html:490
 msgid "Sorry, no tasks here."
 msgstr ""
 
@@ -6520,11 +6532,11 @@ msgstr "Pro nahrání titulků se přihlaste"
 msgid "Collaborate"
 msgstr ""
 
-#: templates/videos/_team_list.html:16
+#: templates/videos/_team_list.html:19
 msgid "View team:"
 msgstr ""
 
-#: templates/videos/_team_list.html:16 templates/videos/video-view.html:205
+#: templates/videos/_team_list.html:19 templates/videos/video-view.html:205
 msgid "Translation Project"
 msgstr ""
 
