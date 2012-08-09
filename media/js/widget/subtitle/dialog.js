@@ -132,10 +132,10 @@ unisubs.subtitle.Dialog.prototype.enterDocument = function() {
     }
 
 };
-unisubs.subtitle.Dialog.prototype.setExtraClass_ = function() {
+unisubs.subtitle.Dialog.prototype.setExtraClass_ = function(extraClass) {
     var extraClasses = goog.array.map(
         ['transcribe', 'sync', 'review', 'finished'],
-        function(suffix) { return 'unisubs-modal-widget-' + suffix; });
+        function(suffix) { return 'unisubs-modal-widget-' + suffix + (extraClass || ''); });
     var currentClass = "";
     var s = unisubs.subtitle.Dialog.State_;
     if (this.state_ == s.TRANSCRIBE)
