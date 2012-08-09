@@ -53,7 +53,7 @@ from teams.forms import (
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
     Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException,
-    BillingReport
+    BillingReport, ApplicationInvalidException
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -763,6 +763,8 @@ def remove_member(request, slug, user_pk):
     if can_assign_role(team, request.user, member.role, member.user):
         user = member.user
         if not user == request.user:
+            [application.on_member_removed() for application in \
+             team.applications.filter(user=user, status=Application.STATUS_APPROVED)]
             TeamMember.objects.filter(team=team, user=user).delete()
             messages.success(request, _(u'Member has been removed from the team.'))
             return HttpResponseRedirect(return_path)
@@ -780,7 +782,9 @@ def applications(request, slug):
     if not team.is_member(request.user):
         return  HttpResponseForbidden("Not allowed")
 
-    qs = team.applications.all()
+    # default to showing only applications that need to be acted upon
+    status = int(request.GET.get('status', Application.STATUS_PENDING))
+    qs = team.applications.filter(status=status)
 
     extra_context = {
         'team': team
@@ -800,10 +804,12 @@ def approve_application(request, slug, user_pk):
 
     if can_invite(team, request.user):
         try:
-            Application.objects.get(team=team, user=user_pk).approve()
+            Application.objects.open(team=team, user=user_pk)[0].approve()
             messages.success(request, _(u'Application approved.'))
-        except Application.DoesNotExist:
+        except IndexError:
             messages.error(request, _(u'Application does not exist.'))
+        except ApplicationInvalidException:
+            messages.error(request, _(u'Application already processed.'))
     else:
         messages.error(request, _(u'You can\'t approve applications.'))
 
@@ -818,10 +824,12 @@ def deny_application(request, slug, user_pk):
 
     if can_invite(team, request.user):
         try:
-            Application.objects.get(team=team, user=user_pk).deny()
+            Application.objects.open(team=team, user=user_pk)[0].deny()
             messages.success(request, _(u'Application denied.'))
-        except Application.DoesNotExist:
+        except IndexError:
             messages.error(request, _(u'Application does not exist.'))
+        except ApplicationInvalidException:
+            messages.error(request, _(u'Application already processed.'))
     else:
         messages.error(request, _(u'You can\'t deny applications.'))
 
@@ -921,6 +929,9 @@ def leave_team(request, slug):
         tm_user_pk = member.user.pk
         team_pk = member.team.pk
         member.delete()
+        [application.on_member_leave() for application in \
+         member.team.applications.filter(status=Application.STATUS_APPROVED)]
+            
         notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))

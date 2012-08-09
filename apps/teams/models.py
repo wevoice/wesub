@@ -1039,29 +1039,79 @@ class MembershipNarrowing(models.Model):
         return super(MembershipNarrowing, self).save(*args, **kwargs)
 
 
+class ApplicationInvalidException(Exception):
+    pass
+
+class ApplicationManager(models.Manager):
+
+    def can_apply(self, team, user):
+        """
+        A user can apply either if he has no open applications on this team
+        or if he has left the team on his own will.
+        """
+        return self.exclude(team=team, user=user, status__in=[
+            Application.STATUS_MEMBER_REMOVED, Application.STATUS_DENIED,
+            Application.STATUS_PENDING]).exists() and \
+            not team.is_member(user)
+
+    def open(self, team=None, user=None):
+        qs =  self.filter(status=Application.STATUS_PENDING)
+        if team:
+            qs = qs.filter(team=team)
+        if user:
+            qs = qs.filter(user=user)
+        return qs
+
 # Application
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
     user = models.ForeignKey(User, related_name='team_applications')
     note = models.TextField(blank=True)
+    # None -> not acted upon
+    # True -> Approved
+    # False -> Rejected
+    STATUS_PENDING,STATUS_APPROVED, STATUS_DENIED, STATUS_MEMBER_REMOVED,\
+        STATUS_MEMBER_LEFT = xrange(0, 5)
+    STATUSES = (
+        (STATUS_PENDING, _(u"Pending")),
+        (STATUS_APPROVED, _(u"Approved")),
+        (STATUS_DENIED, _(u"Denied")),
+        (STATUS_MEMBER_REMOVED, _(u"Member Removed")),
+        (STATUS_MEMBER_LEFT, _(u"Member Left")),
+    )
+    status = models.PositiveIntegerField(default=STATUS_PENDING)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(blank=True, null=True)
 
+    objects = ApplicationManager()
     class Meta:
-        unique_together = (('team', 'user'),)
+        unique_together = (('team', 'user', 'status'),)
 
 
     def approve(self):
         """Approve the application.
 
-        This will create an appropriate TeamMember record and then delete itself.
-
+        This will create an appropriate TeamMember if this application has
+        not been already acted upon
         """
+        if self.status:
+            raise ApplicationInvalidException("")
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
-        self.delete()
+        self.modified = datetime.datetime.now()
+        self.status = Application.STATUS_APPROVED
+        self.save()
 
     def deny(self):
-        """Queue a Celery task that will handle properly denying this application."""
-
-        # We can't delete the row until the notification task has run.
+        """
+        Marks the application as not approved, then
+        Queue a Celery task that will handle properly denying this
+        application.
+        """
+        if self.status:
+            raise ApplicationInvalidException("")
+        self.modified = datetime.datetime.now()
+        self.status = Application.STATUS_DENIED
+        self.save()
         notifier.team_application_denied.delay(self.pk)
 
     def save(self, dispatches_http_callback=True, *args, **kwargs):
@@ -1070,6 +1120,22 @@ class Application(models.Model):
         if dispatches_http_callback and is_new:
             from teams.signals import api_application_new
             api_application_new.send(self)
+
+    def on_member_leave(self):
+        """
+        Marks the appropriate status, but users can still
+        reapply to a team if they so desire later.
+        """
+        self.status = Application.STATUS_MEMBER_LEFT
+        self.save()
+
+    def on_member_removed(self):
+        """
+        Marks the appropriate status so that user's cannot reapply
+        to a team after being removed.
+        """
+        self.status = Application.STATUS_MEMBER_REMOVED
+        self.save()
 
 # Invites
 class InviteExpiredException(Exception):

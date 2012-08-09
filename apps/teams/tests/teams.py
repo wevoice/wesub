@@ -7,6 +7,12 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages import DEBUG as LEVEL_DEBUG
+from django.contrib.messages import ERROR as LEVEL_ERROR
+from django.contrib.messages import SUCCESS as LEVEL_SUCCESS
+from django.contrib.messages import INFO as LEVEL_INFO
+
+
 from django.db.models import ObjectDoesNotExist, Q
 from django.test import TestCase
 
@@ -20,12 +26,14 @@ from apps.teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember,
     TeamLanguagePreference, Project
 )
+from apps.teams.templatetags import teams_tags
 from apps.videos.search_indexes import VideoIndex
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage
 from messages.models import Message
 from widget.tests import create_two_sub_session, RequestMockup
 
+from utils.test_utils import TestCaseMessagesMixin
 from haystack.query import SearchQuerySet
 
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
@@ -1210,3 +1218,142 @@ class TestInvites(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
 
+class TestApplication(TestCase, TestCaseMessagesMixin):
+    def setUp(self):
+        self.team, c = Team.objects.get_or_create(name='test', slug='test',membership_policy=Team.APPLICATION )
+        self.owner = User.objects.create(username='test-owner')
+        self.owner.set_password('test')
+        self.owner.save()
+        TeamMember.objects.create(team=self.team, user=self.owner, role=TeamMember.ROLE_OWNER)
+        
+        self.applicant = User.objects.create(username='test-applicant')
+        self.applicant.set_password('test')
+        self.applicant.save()
+
+        
+        self.rpc = TeamsApiClass()
+
+    def _send_application(self):
+        self._login(False)
+        
+        response = self.rpc.create_application(self.team.pk, 'Note', self.applicant)
+        if isinstance(response, Error):
+            self.fail(response)
+        self.assertFalse(self.team.is_member(self.applicant))
+        self.assertTrue(Application.objects.filter(user=self.applicant, team=self.team, status=Application.STATUS_PENDING).exists())
+        self.assertTrue(Application.objects.open(user=self.applicant, team=self.team).exists())
+
+    def _login(self, as_owner):
+        username = self.owner.username if as_owner else self.applicant.username
+        self.assertTrue(self.client.login(username=username, password='test'))
+
+    def _approve(self):
+        self._login(True)
+        #num_messages = self._getMessagesCount(level=LEVEL_SUCCESS)
+        url = reverse("teams:approve_application", args=(self.team.slug, self.applicant.pk))
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.redirect_chain[0][1], 302)
+        self.assertEqual(response.status_code, 200)
+        
+    def _deny(self):
+        self._login(True)
+        #num_messages = self._getMessagesCount(level=LEVEL_SUCCESS)
+        url = reverse("teams:deny_application", args=(self.team.slug, self.applicant.pk))
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.redirect_chain[0][1], 302)
+        self.assertEqual(response.status_code, 200)
+
+        
+    
+    def _leave_team(self, user):
+        url = reverse("teams:leave_team", args=(self.team.slug,))
+        response = self.client.post(url)
+        
+    def _remove_member(self, user):
+        self._login(True)
+        member_count = self.team.members.count()
+        url = reverse("teams:remove_member", args=(self.team.slug,user.pk))
+        response = self.client.post(url)
+        self.assertEqual(member_count -1, self.team.members.count())
+        
+
+    def test_user_leaves(self):
+        # user applies
+        self._send_application()
+        # owner approves
+        self._approve()
+        # is member!
+        self.assertTrue(self.team.is_member(self.applicant))
+        # cannot apply again
+        self.assertFalse(teams_tags.can_apply(self.team, self.applicant))
+        # regular application inbox is empty
+        self.assertEquals(Application.objects.open(team=self.team).count(), 0)
+        # applicant leaves team
+        self.client.logout()
+        self._login(False)
+        self._leave_team(self.applicant)
+        
+        self.assertFalse(Application.objects.filter(team=self.team, status=Application.STATUS_APPROVED).exists())
+        self.assertTrue(Application.objects.filter(team=self.team, status=Application.STATUS_MEMBER_LEFT).exists())
+        # applicant is not member
+        self.assertFalse(self.team.is_member(self.applicant))
+        # application can join again
+        self.assertTrue(teams_tags.can_apply(self.team, self.applicant))
+        self._send_application()
+        # application is in the inbox
+        
+        self.assertEquals(Application.objects.open(team=self.team).count(), 1)
+        # application is approved
+        self._approve()
+        # applicant is a team member again
+        self.assertTrue(self.team.is_member(self.applicant))
+        
+    def test_user_removed(self):
+        # user applies
+        self._send_application()
+        # owner approves
+        self._approve()
+        # is member!
+        self.assertTrue(self.team.is_member(self.applicant))
+        # cannot apply again
+        self.assertFalse(teams_tags.can_apply(self.team, self.applicant))
+        # regular application inbox is empty
+        self.assertEquals(Application.objects.open(team=self.team).count(), 0)
+        # applicant leaves team
+        self.client.logout()
+        self._login(True)
+        self._remove_member(self.applicant)
+        
+        self.assertFalse(Application.objects.filter(team=self.team, status=Application.STATUS_APPROVED).exists())
+        self.assertTrue(Application.objects.filter(team=self.team, status=Application.STATUS_MEMBER_REMOVED).exists())
+        # applicant is not member
+        self.assertFalse(self.team.is_member(self.applicant))
+        # application can join again
+        self.assertFalse(teams_tags.can_apply(self.team, self.applicant))
+        self._login(False)
+        response = self.rpc.create_application(self.team.pk, 'Note', self.applicant)
+        # removed user, cannot send application again
+        self.assertTrue( isinstance(response, Error))
+        
+
+    def test_denied_kills_it(self):
+        # user applies
+        self._send_application()
+        # owner approves
+        self._deny()
+        # is member!
+        self.assertFalse(self.team.is_member(self.applicant))
+        # cannot apply again
+        self.assertFalse(teams_tags.can_apply(self.team, self.applicant))
+        # regular application inbox is empty
+        self.assertEquals(Application.objects.open(team=self.team).count(), 0)
+        # applicant leaves team
+        self.assertTrue(Application.objects.filter(team=self.team, status=Application.STATUS_DENIED).exists())
+        # applicant is not member
+        self.assertFalse(self.team.is_member(self.applicant))
+        # application can join again
+        self._login(False)
+        response = self.rpc.create_application(self.team.pk, 'Note', self.applicant)
+        # removed user, cannot send application again
+        self.assertTrue( isinstance(response, Error))
+        
