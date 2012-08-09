@@ -584,9 +584,28 @@ You can list existing members of a team:
 
 .. http:get:: /api2/partners/teams/[team-slug]/members/
 
+Adding a new member to a team:
+
+.. http:post:: /api2/partners/teams/[team-slug]/members/
+
 Updating a team member (e.g. changing their role):
 
 .. http:put:: /api2/partners/teams/[team-slug]/members/[username]/
+
+Removing a user from a team:
+
+.. http:delete:: /api2/partners/teams/[team-slug]/members/[username]/
+
+Example of adding a new user:
+
+.. code-block:: json
+
+    {
+        "username": "test-user",
+        "role": "manager"
+    }
+
+.. note:: You can only add members to teams you own.
 
 Roles
 +++++
@@ -595,6 +614,25 @@ Roles
 * ``admin``
 * ``manager``
 * ``contributor``
+
+.. warning:: Changed behavior: the previous functionality was moved the Safe
+    Team Member Resource documented below.
+
+Safe Team Member Resource
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This resource behaves the same as the normal Team Member resource with one
+small difference.  When you add a user to a team, we will send an invitation to
+the user to join the team.  If the user doesn't exist, we will create it.  The
+standard Team Member resource simply adds the user to the team and returns.
+
+Listing:
+
+.. http:get:: /api2/partners/teams/[team-slug]/safe-members/
+
+Adding a new member to a team:
+
+.. http:post:: /api2/partners/teams/[team-slug]/safe-members/
 
 Project Resource
 ~~~~~~~~~~~~~~~~
