@@ -19,8 +19,6 @@
 
         // This will store all future instances of Amara-powered videos.
         // I'm trying really hard here to not use the word "widget".
-        //
-        // TODO: Make this a private var?
         this.amaraInstances = [];
 
         // Private methods that are called via the push() method.
@@ -39,7 +37,7 @@
 
                             // TODO: This needs to support a node OR ID string.
                             el: _$('#' + options.div)[0],
-                            model: new that.VideoModel(options)
+                            model: new VideoModel(options)
                         })
                     );
 
@@ -47,12 +45,116 @@
             }
         };
 
+        // Utilities.
+        var utils = {
+            parseFloatAndRound: function(val) {
+                return (Math.round(parseFloat(val) * 100) / 100).toFixed(2);
+            }
+        };
+
         // Video model.
-        this.VideoModel = _Backbone.Model.extend({
+        var VideoModel = _Backbone.Model.extend({
+
+            // The initialization of these vars is unnecessary, but it's nice to know
+            // what vars will *eventually* be on the video model.
+
+            // This var will be true once we've retrieved the rest of the model attrs
+            // from the Amara API.
+            isComplete: false,
+
+            // Set from within the embedder.
             div: '',
             height: '',
+            initialLanguage: null,
+            isOnAmara: null,
+            subtitles: [], // Backbone collection
             url: '',
-            width: ''
+            width: '',
+
+            // Set from the Amara API
+            all_urls: [],
+            created: null,
+            description: null,
+            duration: null,
+            id: null,
+            languages: [],
+            original_language: null,
+            project: null,
+            resource_uri: null,
+            team: null,
+            thumbnail: null,
+            title: null,
+
+            // Every time a video model is created, do this.
+            initialize: function() {
+
+                var video = this;
+                var apiURL = 'https://staging.universalsubtitles.org/api2/partners/videos/?&video_url=';
+
+                this.subtitles = new that.Subtitles();
+
+                // Make a call to the Amara API to get attributes like available languages,
+                // internal ID, description, etc.
+                _$.ajax({
+                    url: apiURL + this.get('url'),
+                    dataType: 'jsonp',
+                    success: function(resp) {
+
+                        if (resp.objects.length) {
+
+                            // The video exists on Amara.
+                            video.set('isOnAmara', true);
+
+                            // There should only be one object.
+                            if (resp.objects.length === 1) {
+
+                                // Set all of the API attrs as attrs on the video model.
+                                video.set(resp.objects[0]);
+
+                                // Set the initial language to either the one provided by the initial
+                                // options, or the original language from the API.
+                                video.set('initialLanguage',
+                                    video.get('initialLanguage') ||
+                                    video.get('original_language')
+                                );
+                            }
+
+                        } else {
+
+                            // The video does not exist on Amara.
+                            video.set('isOnAmara', false);
+
+                        }
+
+                        // Mark that the video model has been completely populated.
+                        video.set('isComplete', true);
+                    }
+                });
+            }
+        });
+
+        // SubtitleSet model.
+        var SubtitleSet = _Backbone.Model.extend({
+
+            // Set from the Amara API
+            description: null,
+            language: null,
+            note: null,
+            resource_uri: null,
+            site_url: null,
+            sub_format: null,
+            subtitles: [],
+            title: null,
+            version_no: null,
+            video: null,
+            video_description: null,
+            video_title: null
+
+        });
+
+        // Subtitles collection.
+        this.Subtitles = _Backbone.Collection.extend({
+            model: SubtitleSet
         });
 
         // Amara view. This contains all of the events and logic for a single instance of
@@ -73,45 +175,139 @@
             },
 
             render: function() {
-
+                
                 var that = this;
 
                 // Init the Popcorn video.
                 this.pop = _Popcorn.smart(this.model.get('div'), this.model.get('url'));
 
-                // TODO: Popcorn is not firing any events for any video types other
-                // than HTML5. Watch http://popcornjs.org/popcorn-docs/events/.
                 this.pop.on('loadedmetadata', function() {
 
                     // Set the video model's height and width, now that we know it.
                     that.model.set('height', that.pop.position().height);
                     that.model.set('width', that.pop.position().width);
 
+                    // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
                         width: that.model.get('width')
                     }));
 
+                    // Just set some cached Zepto selections for later use.
                     that.cacheNodes();
+
+                    // Wait until we have a complete video model (the API was hit as soon as
+                    // the video instance was created), and then retrieve the initial set
+                    // of subtitles, so we can begin building out the transcript viewer
+                    // and the subtitle display.
+                    //
+                    // We could just make this a callback on the model's initialize() for
+                    // after we get a response, but there may be cases where we want to init
+                    // a VideoModel separately from an AmaraView.
+                    that.waitUntilVideoIsComplete(
+                        function() {
+
+                            // Grab the subtitles for the initial language and do yo' thang.
+                            if (that.model.get('isOnAmara')) {
+
+                                // Make the request to fetch subtitles.
+                                that.fetchSubtitles(that.model.get('initialLanguage'), function() {
+
+                                    // When we've got a response with the subtitles, start building
+                                    // out the transcript viewer.
+                                    that.buildTranscript(that.model.get('initialLanguage'));
+                                });
+                            } else {
+                                // Do some other stuff for videos that aren't yet on Amara.
+                            }
+                        }
+                    );
                 });
 
                 return this;
 
             },
+
+            buildTranscript: function(language) {
+                var subtitleSet = this.model.subtitles.where({'language': language})[0];
+                var subtitles = subtitleSet.get('subtitles');
+
+                if (subtitles.length) {
+
+                    var html = '';
+
+                    var transcriptLineTemplate = '' +
+                        '<div class="amara-group amara-transcript-line">' +
+                        '    <div class="amara-transcript-line-left">{{ start }}</div>' +
+                        '    <div class="amara-transcript-line-right">{{ text }}</div>' +
+                        '</div>';
+
+                    for (var i = 0; i < subtitles.length; i++) {
+                        html += __.template(transcriptLineTemplate, {
+                            text: subtitles[i].text,
+                            start: utils.parseFloatAndRound(subtitles[i].start)
+                        });
+                    }
+
+                    this.$transcriptBody.html(html);
+
+                } else {
+                    this.$transcriptBody.html('No subtitles available.');
+                }
+            },
+
+            // Make a call to the Amara API and retrieve a set of subtitles for a specific
+            // video in a specific language. When we get a response, add the subtitle set
+            // to the video model's 'subtitles' collection for later retrieval by language code.
+            fetchSubtitles: function(language, callback) {
+                var that = this;
+
+                var apiURL = ''+
+                    'https://staging.universalsubtitles.org/api2/partners/videos/' +
+                    this.model.get('id') + '/languages/' + language + '/subtitles/';
+
+                // Make a call to the Amara API to retrieve subtitles for this language.
+                //
+                // TODO: If we already have subtitles in this language, don't do anything.
+                _$.ajax({
+                    url: apiURL,
+                    dataType: 'jsonp',
+                    success: function(resp) {
+
+                        // Save these subtitles to the video's 'subtitles' collection.
+                        resp.language = language;
+                        that.model.subtitles.add(
+                            new SubtitleSet(resp)
+                        );
+
+                        // Call the callback.
+                        callback(resp);
+                    }
+                });
+            },
             logoClicked: function() {
-                alert('Logo clicked');
                 return false;
             },
             shareButtonClicked: function() {
-                alert('Share button clicked');
+                return false;
+            },
+            subtitlesButtonClicked: function() {
                 return false;
             },
             transcriptButtonClicked: function() {
                 this.$transcript.toggle();
                 return false;
             },
-            subtitlesButtonClicked: function() {
-                alert('Subtitles button clicked');
-                return false;
+            waitUntilVideoIsComplete: function(callback) {
+
+                var that = this;
+
+                // isComplete gets set as soon as the initial API call to build out the video
+                // instance has finished.
+                if (!this.model.get('isComplete')) {
+                    setTimeout(function() { that.waitUntilVideoIsComplete(callback); }, 100);
+                } else {
+                    callback();
+                }
             },
 
             templateHTML: '' +
@@ -136,7 +332,12 @@
                 '            </div>' +
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
-                '            Transcript' +
+                '            <div class="amara-transcript-line amara-group">' +
+                '                <div class="amara-transcript-line-left">&nbsp;</div>' +
+                '                <div class="amara-transcript-line-right">' +
+                '                    Loading transcript&hellip;' +
+                '                </div>' +
+                '            </div>' +
                 '        </div>' +
                 '    </div>' +
                 '</div>',
@@ -144,6 +345,7 @@
             cacheNodes: function() {
                 this.$amaraContainer = $('div.amara-container', this.$el);
                 this.$transcript = $('div.amara-transcript', this.$amaraContainer);
+                this.$transcriptBody = $('div.amara-transcript-body', this.$transcript);
             }
 
         });
@@ -215,7 +417,11 @@
                     $div.attr('id', id);
 
                     // Call embedVideo with this div and URL.
-                    that.push(['embedVideo', {'div': id, 'url': $div.data('url') }]);
+                    that.push(['embedVideo', {
+                        'div': id,
+                        'initialLanguage': $div.data('initial-language'),
+                        'url': $div.data('url')
+                    }]);
                 });
             }
 

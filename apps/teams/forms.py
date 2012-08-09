@@ -238,6 +238,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
                 original_language.save()
 
         obj = super(AddTeamVideoForm, self).save(False)
+
         obj.video = video
         obj.team = self.team
         commit and obj.save()
@@ -573,26 +574,19 @@ class InviteForm(forms.Form):
 
         self.user_id = user_id
         # check if there is already an invite pending for this user:
-        try:
-            invite = Invite.objects.get(team=self.team, user=invited_user)
-            if invite.approved == False:
-                raise forms.ValidationError(_(u'User has already declined this invite.'))
-            if invite.approved == None:
-                raise forms.ValidationError(_(u'User has already been invited.'))
-        except Invite.DoesNotExist:
-            pass
+        if Invite.objects.pending_for(team=self.team, user=invited_user).exists():
+                raise forms.ValidationError(_(u'User has already been invited and has not replied yet.'))
         return user_id
 
 
     def save(self):
         from messages import tasks as notifier
         user = User.objects.get(id=self.user_id)
-        invite, created = Invite.objects.get_or_create(team=self.team, user=user, defaults={
-            'note': self.cleaned_data['message'],
-            'author': self.user,
-            'role': self.cleaned_data['role'],
-        })
-
+        invite = Invite.objects.create(
+            team=self.team, user=user, author=self.user,
+            role= self.cleaned_data['role'],
+            note = self.cleaned_data['message'])
+        invite.save()
         notifier.team_invitation_sent.delay(invite.pk)
         return invite
 
@@ -795,3 +789,19 @@ class UploadDraftForm(forms.Form):
 
         # we created a new subtitle version let's fire a notification
         video_changed_tasks.delay(video.id, version.id)
+
+
+class ChooseTeamForm(forms.Form):
+    team = forms.ChoiceField(choices=(), required=False)
+    start_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
+    end_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
+
+    def __init__(self, *args, **kwargs):
+        super(ChooseTeamForm, self).__init__(*args, **kwargs)
+        teams = Team.objects.all()
+        self.fields['team'].choices = [(t.pk, t.slug) for t in teams]
+
+    def clean(self):
+        cd = self.cleaned_data
+        cd['team'] = Team.objects.get(pk=cd['team'])
+        return cd

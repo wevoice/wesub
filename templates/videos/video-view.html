@@ -30,6 +30,11 @@
                     window.VIDEO_TEAM_NAME = '{{ video.team_set.all.0 }}';
                     window.VIDEO_TEAM_URL = '{{ video.team_set.all.0.get_absolute_url }}';
                 {% endif %}
+                {% if video.team_set.all.0.workflow_enabled %}
+                    window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
+                {% else %}
+                    window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
+                {% endif %}
             {% endif %}
         </script>
     {% endblock %}
@@ -64,7 +69,7 @@
 
     <div class="grid_4 context alpha">
         <h2 class="main-title">
-            <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video }}</a>
+            <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display_unabridged }}</a>
         </h2>
         {% with video.get_description_display as description %}
             <div id="description"{% if description|length > 300 %} class="abbr collapsed"{% endif %}>
@@ -128,7 +133,21 @@
             </div>
         {% else %}
             {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
-                <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+                {% with video.get_team_video as team_video %}
+                    {% if team_video %}
+                        {% if team_video.team.workflow_enabled %}
+                            {% if team_video.task_set.incomplete.exists %}
+                                <p>{% trans "No subtitles yet." %} <a href="{% url teams:team_tasks slug=team_video.team.slug %}?team_video={{ team_video.pk }}">{% trans "View tasks for this video." %}</a></p>
+                            {% else %}
+                                {% trans "This video doesn't have any subtitles or tasks yet" %}
+                            {% endif %}
+                        {% else %}
+                            <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+                        {% endif %}
+                    {% else %}
+                        <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+                    {% endif %}
+                {% endwith %}
             {% else %}
                 <p>
                     {% trans "This video doesn't have any subtitles yet" %}
@@ -149,36 +168,43 @@
         <div class="tab" id="video-tab">
             {% widget widget_params %}
             <div class="clearboth">
-                <div class="video-tools grid_4 alpha">
-                    <h3>{% trans "Contribute" %}</h3>
-                    <p>
-                        {% with can_create_subs=request.user|can_create_subtitles_for:video can_create_trans=request.user|can_create_translations_for:video %}
-                            {% if video.languages_count < 1 %}
-                                {% if can_create_subs %}
-                                    {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!
-                                {% endif %}
-                            {% else %}
-                                {% if can_create_trans %}
-                                    {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!
-                                {% endif %}
-                            {% endif %}
-                            {% if can_create_subs or can_create_trans %}
-                                {% upload_subtitles video %}
-                            {% else %}
-                                {% trans 'Subtitles for this video are moderated. If it belongs to a team, try joining the team to contribute.' %}
-                            {% endif %}
-                        {% endwith %}
-                    </p>
-                </div>
                 {% with video.get_team_video as team_video %}
-                    {% if team_video %}
+                    {% if team_video and team_video.team.workflow_enabled %}
                         {% render_belongs_to_team_list team_video user %}
                     {% else %}
-                        {% if user.managed_teams %}
+                        <div class="video-tools grid_4 alpha">
+                            <h3>{% trans "Contribute" %}</h3>
+                            <p>
+                                {% with can_create_subs=request.user|can_create_subtitles_for:video can_create_trans=request.user|can_create_translations_for:video %}
+                                    {% if video.languages_count < 1 %}
+                                        {% if can_create_subs %}
+                                            {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!
+                                        {% endif %}
+                                    {% else %}
+                                        {% if can_create_trans %}
+                                            {% trans "Don't see the language you're looking for?" %} <a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Start a new translation' %}</a>!
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if can_create_subs or can_create_trans %}
+                                        {% upload_subtitles video %}
+                                    {% else %}
+                                        {% trans 'Subtitles for this video are moderated. If it belongs to a team, try joining the team to contribute.' %}
+                                    {% endif %}
+                                {% endwith %}
+                            </p>
+                        </div>
+                        {% if user.managed_teams and not team_video.team %}
                             <div class="video-tools grid_4 omega">
                                 <h3>{% trans "Collaborate" %}</h3>
                                 {% team_add_video_select %}
                             </div>
+                        {% else %}
+                            {% if team_video.team %}
+                                <div class="video-tools grid_4 omega">
+                                    <h3>{% trans "Collaborate" %}</h3>
+                                    {% trans 'View team:' %} <a href="{% url teams:detail slug=team_video.team.slug %}">{{team_video.team.name}} {% trans 'Translation Project' %}</a>.
+                                </div>
+                            {% endif %}
                         {% endif %}
                     {% endif %}
                 {% endwith %}
@@ -210,14 +236,9 @@
                 <a href="{% url admin:videos_video_change video.pk %}" target="blank">{% trans 'Edit video' %}</a>
             </li>
             <li>{% feature_video video %}</li>
-            <li>
-            {% if user %}
-                {% render_visibility_button video user %}
-            {% endif %}
-            </li>
             {% if task %}<li> <a href="">task id={{task.pk}}</a></li>{% endif %}
         </ul>
     {% endif %}
 {% endblock %}
   
-
+trans

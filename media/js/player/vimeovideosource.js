@@ -59,6 +59,10 @@ unisubs.player.VimeoVideoSource.prototype.getVideoConfig = function() {
     return this.videoConfig_;
 };
 
+unisubs.player.VimeoVideoSource.prototype.setVideoConfig = function(config) {
+    this.videoConfig_ = config;
+};
+
 unisubs.player.VimeoVideoSource.prototype.getVideoURL = function() {
     return this.videoURL_;
 };

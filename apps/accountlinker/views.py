@@ -43,8 +43,8 @@ def _generate_youtube_oauth_request_link(state_str=None):
     
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
-        "redirect_uri": 
-            universal_url("accountlinker:youtube-oauth-callback"),
+        "redirect_uri":  "https://%s%s" % (Site.objects.get_current().domain, 
+            reverse("accountlinker:youtube-oauth-callback")),
         "scope": "https://gdata.youtube.com",
         "state": state,
         "response_type": "code",

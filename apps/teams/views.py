@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
 import random
+import csv
 
 from django.db import transaction
 from django.conf import settings
@@ -47,11 +48,11 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm, MoveTeamVideoForm, UploadDraftForm
+    UnpublishForm, MoveTeamVideoForm, UploadDraftForm, ChooseTeamForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference
+    Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -61,15 +62,18 @@ from teams.permissions import (
     can_perform_task_for, can_delete_team, can_review, can_approve,
     can_delete_video, can_remove_video
 )
+from teams.moderation_const import APPROVED
 from teams.search_indexes import TeamVideoLanguagesIndex
 from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
-    update_video_moderation, update_one_team_video
+    update_video_moderation, update_one_team_video, update_video_public_field,
+    invalidate_video_visibility_caches
 )
+from apps.videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
-from utils.metrics import time as timefn
+from utils.metrics import time as timefn, Timer
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
@@ -82,6 +86,7 @@ from videos.models import Action, VideoUrl, SubtitleLanguage, Video
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
+from raven.contrib.django.models import client
 
 
 logger = logging.getLogger("teams.views")
@@ -222,12 +227,18 @@ def settings_basic(request, slug):
     if request.POST:
         form = FormClass(request.POST, request.FILES, instance=team)
 
+        is_visible = team.is_visible
+
         if form.is_valid():
             try:
                 form.save()
             except:
                 logger.exception("Error on changing team settings")
                 raise
+
+            if is_visible != form.instance.is_visible:
+                update_video_public_field.delay(team.id)
+                invalidate_video_visibility_caches.delay(team)
 
             messages.success(request, _(u'Settings saved.'))
             return HttpResponseRedirect(request.path)
@@ -255,8 +266,8 @@ def settings_guidelines(request, slug):
                 setting.data = val
                 setting.save()
 
-        messages.success(request, _(u'Guidelines and messages updated.'))
-        return HttpResponseRedirect(request.path)
+            messages.success(request, _(u'Guidelines and messages updated.'))
+            return HttpResponseRedirect(request.path)
     else:
         form = GuidelinesMessagesForm(initial=initial)
 
@@ -284,6 +295,7 @@ def settings_permissions(request, slug):
                 workflow_form.save()
 
             moderation_changed = moderated != form.instance.moderates_videos()
+
             if moderation_changed:
                 update_video_moderation.delay(team)
                 invalidate_video_moderation_caches.delay(team)
@@ -516,7 +528,9 @@ def add_video(request, slug):
         obj = form.save(False)
         obj.added_by = request.user
         obj.save()
+
         api_teamvideo_new.send(obj)
+        video_changed_tasks.delay(obj.video.pk)
         messages.success(request, form.success_message())
         return redirect(team.get_absolute_url())
 
@@ -840,13 +854,13 @@ def invite_members(request, slug):
 @login_required
 def accept_invite(request, invite_pk, accept=True):
     invite = get_object_or_404(Invite, pk=invite_pk, user=request.user)
-    if accept:
-        ok = invite.accept()
-    else:
-        ok = invite.deny()
-    if ok:
+    try:
+        if accept:
+            invite.accept()
+        else:
+            invite.deny()
         return redirect(request.META.get('HTTP_REFERER', '/'))
-    else:
+    except InviteExpiredException:
         return HttpResponseServerError(render_to_response("generic-error.html", {
             "error_msg": _("This invite is no longer valid"),
         }, RequestContext(request)))
@@ -909,7 +923,6 @@ def leave_team(request, slug):
         notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
-
     return redirect(request.META.get('HTTP_REFERER') or team)
 
 @permission_required('teams.change_team')
@@ -1060,10 +1073,11 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        if filters.get('language') == 'mine' and request.user.is_authenticated():
-            tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
-        else:
+        if filters['language'] != 'all':
             tasks = tasks.filter(language=filters['language'])
+    elif request.user.is_authenticated() and request.user.get_languages():
+        languages = [ul.language for ul in request.user.get_languages()] + ['']
+        tasks = tasks.filter(language__in=languages)
 
     if filters.get('q'):
         terms = get_terms(filters['q'])
@@ -1085,8 +1099,10 @@ def _tasks_list(request, team, project, filters, user):
             tasks = tasks.filter(assignee=None)
         elif assignee and assignee.isdigit():
             tasks = tasks.filter(assignee=int(assignee))
-        elif assignee:
+        elif assignee and assignee != 'anyone':
             tasks = tasks.filter(assignee=User.objects.get(username=assignee))
+    else:
+        tasks = tasks.filter(assignee=None)
 
     return tasks
 
@@ -1170,7 +1186,7 @@ def team_tasks(request, slug, project_slug=None):
             filters['assignee'] == None
         elif filters['assignee'].isdigit():
             filters['assignee'] = team.members.get(user=filters['assignee'])
-        else:
+        elif filters['assignee'] != 'anyone':
             filters['assignee'] = team.members.get(user=User.objects.get(username=filters['assignee']))
 
         filtered = filtered + 1
@@ -1384,12 +1400,21 @@ def upload_draft(request, slug):
     if request.POST:
         form = UploadDraftForm(request.user, request.POST, request.FILES)
 
-        if form.is_valid():
+        try:
+            is_valid = form.is_valid()
+        except Exception, e:
+            client.create_from_exception()
+            messages.error(u"Sorry, there was a problem while uploading your draft. Care to try again?")
+            transaction.rollback()
+            is_valid = False
+
+        if is_valid:
             try:
                 form.save()
             except Exception, e:
                 messages.error(request, unicode(e))
                 transaction.rollback()
+                client.create_from_exception()
             else:
                 messages.success(request, _(u"Draft uploaded successfully."))
                 transaction.commit()
@@ -1707,3 +1732,107 @@ def auto_captions_status(request, slug):
     response =  HttpResponse( "\n".join(buffer), content_type="text/csv")
     response['Content-Disposition'] = 'filename=team-status.csv'
     return response
+
+
+# Billing
+def get_billing_data_for_team(team, start_date, end_date, header=True):
+    """
+    Return a list of lists of data suitable for the csv writer or similar.
+
+    ``start_date`` and ``end_date`` should be ``datetime.date`` instances
+
+    * Get all videos for team
+    * For each video, get all languages
+    * For each language, get the latest version
+    * If the version is approved and within the time constraints, add it.
+
+    Minutes are counted by
+        [last subtitle synced timing] - [first subtitle synced timing]
+    """
+    from datetime import datetime, time
+    rows = []
+
+    # Oh, Python...
+    midnight = time(0, 0, 0)
+    start_date = datetime.combine(start_date, midnight)
+    end_date = datetime.combine(end_date, midnight)
+
+    if header:
+        rows.append(['Video title', 'Video URL', 'Video language',
+                'Billable minutes'])
+
+    tvs = TeamVideo.objects.filter(team=team).order_by('video__title')
+
+    domain = Site.objects.get_current().domain
+    protocol = getattr(settings, 'DEFAULT_PROTOCOL')
+    host = '%s://%s' % (protocol, domain)
+
+    for tv in tvs:
+        languages = tv.video.subtitlelanguage_set.all()
+
+        for language in languages:
+            v = language.latest_version()
+
+            if not v or v.moderation_status != APPROVED:
+                continue
+
+            if (v.datetime_started < start_date) or (v.datetime_started >
+                    end_date):
+                continue
+
+            subs = v.ordered_subtitles()
+
+            if len(subs) == 0:
+                continue
+
+            start = subs[0].start_time
+            end = subs[-1].end_time
+
+            rows.append([
+                tv.video.title.encode('utf-8'),
+                host + tv.video.get_absolute_url(),
+                language.language,
+                round((end - start) / 60, 2)
+            ])
+
+    return rows
+
+
+@staff_member_required
+def billing(request):
+    user = request.user
+
+    if not DEV and not (user.is_superuser and user.is_active):
+        raise Http404
+
+    if request.method == 'POST':
+        form = ChooseTeamForm(request.POST)
+        if form.is_valid():
+            team = form.cleaned_data.get('team')
+            start_date = form.cleaned_data.get('start_date')
+            end_date = form.cleaned_data.get('end_date')
+
+            date_range = "%s-%s" % (
+                    start_date.strftime('%Y%m%d'),
+                    end_date.strftime('%Y%m%d'))
+
+            f = 'billing-%s-%s' % (team.slug, date_range)
+
+            response = HttpResponse(mimetype='text/csv')
+            response['Content-Disposition'] = 'attachment;filename=%s.csv' % f
+
+            writer = csv.writer(response)
+
+            with Timer('billing-csv-time'):
+                data = get_billing_data_for_team(team, start_date, end_date)
+
+            for row in data:
+                writer.writerow(row)
+
+            return response
+    else:
+        form = ChooseTeamForm()
+
+    return render_to_response('teams/billing/choose.html', {
+        'form': form
+    }, RequestContext(request))

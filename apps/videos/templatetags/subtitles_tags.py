@@ -17,14 +17,12 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django.core.urlresolvers import reverse
 from django import template
-from django.utils.translation import ugettext_lazy as _, ungettext
-from django.utils import translation
+from django.template.defaultfilters import linebreaks
+from django.utils.translation import ungettext
 
 from videos import format_time
 from utils.unisubsmarkup import markup_to_html
 from videos.forms import SubtitlesUploadForm, CreateVideoUrlForm
-from icanhaz.models import VideoVisibilityPolicy
-from utils.subtitles import strip_tags
 
 register = template.Library()
 
@@ -97,9 +95,8 @@ def language_url(request, lang):
     handles the language-without-language that should be going away soon.
 
     """
-    vid = VideoVisibilityPolicy.objects.id_for_video(lang.video)
     lc = lang.language or 'unknown'
-    return reverse('videos:translation_history', args=[vid, lc, lang.pk])
+    return reverse('videos:translation_history', args=[lang.video.video_id, lc, lang.pk])
 
 @register.filter
 def format_sub_time(t):
@@ -108,8 +105,9 @@ def format_sub_time(t):
 @register.filter
 def display_subtitle(text):
     """
-    Make sure we only allow the default subtitle formatiing tags
-    (i, b, u) to pass
+    Transforms our internal markup to html friendly diplay:
+    use the default subtitle formatiing tags (i, b, u)
+    and replace \n with <br>
     """
-    txt = markup_to_html(text)
+    txt = linebreaks(markup_to_html(text))
     return txt

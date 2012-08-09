@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-from HTMLParser import HTMLParser
 import re
 import time
 import traceback
@@ -302,7 +301,6 @@ def download_subtitles(request, handler=SSASubtitles):
     subs_text = unicode(h)
     # since this is a downlaod, we can afford not to escape tags, specially true
     # since speaker change is denoted by '>>' and that would get entirely stripped out
-    subs_text = HTMLParser().unescape(subs_text)
     response = HttpResponse(subs_text, mimetype="text/plain")
     original_filename = '%s.%s' % (video.lang_filename(language), h.file_type)
 

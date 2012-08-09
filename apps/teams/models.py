@@ -675,6 +675,11 @@ class TeamVideo(models.Model):
     def save(self, *args, **kwargs):
         if not hasattr(self, "project"):
             self.project = self.team.default_project
+
+        assert self.project.team == self.team, \
+                    "%s: Team (%s) is not equal to project's (%s) team (%s)"\
+                         % (self, self.team, self.project, self.project.team)
+
         super(TeamVideo, self).save(*args, **kwargs)
 
 
@@ -750,17 +755,9 @@ class TeamVideo(models.Model):
                 moderation_status=MODERATION.APPROVED).update(
                     moderation_status=MODERATION.UNMODERATED)
 
-        video.is_public = True
+        video.is_public = new_team.is_visible
         video.moderated_by = new_team if new_team.moderates_videos() else None
         video.save()
-
-        # make sure we end up with a policy that belong to the team
-        # we're moving into, else it won't come up in the team video
-        # page
-        if video.policy and video.policy.belongs_to_team:
-            video.policy.object_id = new_team.pk
-            video.policy.save(updates_metadata=False)
-
 
         # Update all Solr data.
         metadata_manager.update_metadata(video.pk)
@@ -1066,6 +1063,16 @@ class Application(models.Model):
 
 
 # Invites
+class InviteExpiredException(Exception):
+    pass
+
+class InviteManager(models.Manager):
+    def pending_for(self, team, user):
+        return self.filter(team=team, user=user, approved=None)
+
+    def acted_on(self, team, user):
+        return self.filter(team=team, user=user, approved__notnull=True)
+
 class Invite(models.Model):
     team = models.ForeignKey(Team, related_name='invitations')
     user = models.ForeignKey(User, related_name='team_invitations')
@@ -1078,9 +1085,7 @@ class Invite(models.Model):
     # False -> Rejected
     approved = models.NullBooleanField(default=None)
 
-    class Meta:
-        unique_together = (('team', 'user'),)
-
+    objects = InviteManager()
 
     def accept(self):
         """Accept this invitation.
@@ -1089,15 +1094,15 @@ class Invite(models.Model):
         deletes itself.
 
         """
-        if self.approved == None:
-            self.approved = True
-            member, created = TeamMember.objects.get_or_create(team=self.team,
-                                                           user=self.user,
-                                                           role=self.role)
-            if created:
-                notifier.team_member_new.delay(member.pk)
-            self.save()
-            return True
+        if self.approved is not None:
+            raise InviteExpiredException("")
+        self.approved = True
+        member, created = TeamMember.objects.get_or_create(
+            team=self.team, user=self.user, role=self.role)
+        if created:
+            notifier.team_member_new.delay(member.pk)
+        self.save()
+        return True
 
     def deny(self):
         """Deny this invitation.
@@ -1105,10 +1110,10 @@ class Invite(models.Model):
         Could be useful to send a notification here in the future.
 
         """
-        if self.approved == None:
-            self.approved = False
-            self.save()
-            return True
+        if self.approved is not None:
+            raise InviteExpiredException("")
+        self.approved = False
+        self.save()
 
 
     def message_json_data(self, data, msg):
@@ -1300,6 +1305,7 @@ class Workflow(models.Model):
     def allows_tasks(self):
         """Return wheter we can create tasks for a given workflow."""
         return self.approve_enabled or self.review_enabled
+
 
 # Tasks
 class TaskManager(models.Manager):

@@ -149,13 +149,6 @@ unisubs.imageAssetURL = function(imageFileName) {
 };
 
 /**
- * Set during loading. If true, this means we are supposed to open the fancy 
- * debug window. Note that the window will not open if goog.DEBUG is false 
- * (we set this to false in an option passed to the compiler for production)
- */
-unisubs.DEBUG = false;
-
-/**
  * Set during loading.
  */
 unisubs.IS_NULL = false;
@@ -379,12 +372,6 @@ unisubs.isReturnURLInDifferentDomain = function() {
         return false;
     var uri = new goog.Uri(unisubs.returnURL);
     var myURI = new goog.Uri(window.location);
-    if (goog.DEBUG) {
-        unisubs.logger_.info("unisubs.returnURL is " + unisubs.returnURL);
-        unisubs.logger_.info(
-            "isReturnURLInDifferentDomain call: comparing " + 
-                uri.getDomain() + " against " + myURI.getDomain());
-    }
     return uri.hasDomain() && 
         uri.getDomain().toLowerCase() != 
         myURI.getDomain().toLowerCase();
@@ -439,28 +426,14 @@ unisubs.supportsLocalStorage = function() {
 };
 
 unisubs.saveInLocalStorage = function(key, value) {
-    if (goog.DEBUG) {
-        unisubs.logger_.info(
-            "Saving local storage, key: " + key + 
-                " and value " + value);
-    }
     unisubs.storage_['setItem'](key, value);
 };
 
 unisubs.fetchFromLocalStorage = function(key) {
-    if (goog.DEBUG) {
-        unisubs.logger_.info(
-            "Fetching local storage, key: " + key + 
-                " and value " + 
-                unisubs.storage_['getItem'](key));
-    }
     return unisubs.storage_['getItem'](key);
 };
 
 unisubs.removeFromLocalStorage = function(key) {
-    if (goog.DEBUG) {
-        unisubs.logger_.info("Removing " + key + " from localStorage.");
-    }
     unisubs.storage_['removeItem'](key);
 };
 
@@ -487,7 +460,3 @@ unisubs.addScript = function(src, opt_async, opt_checkFn, opt_callbackFn) {
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 };
-
-if (goog.DEBUG) {
-    unisubs.logger_ = goog.debug.Logger.getLogger('unisubs');
-}

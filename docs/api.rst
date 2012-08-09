@@ -473,17 +473,17 @@ Listing video urls
 
 Video URL detail:
 
-.. http:get:: /api2/partners/users/[video-id]/urls/[url-id]/
+.. http:get:: /api2/partners/videos/[video-id]/urls/[url-id]/
 
 Where the url-id can be fetched from the list of urls.
 
 Updating video-urls:
 
-.. http:put:: /api2/partners/users/[video-id]/urls/[url-id]/
+.. http:put:: /api2/partners/videos/[video-id]/urls/[url-id]/
 
 Creating video-urls:
 
-.. http:post:: /api2/partners/users/[video-id]/urls/
+.. http:post:: /api2/partners/videos/[video-id]/urls/
 
     :form url: Any URL that works for the regular site (mp4 files, youtube, vimeo,
         etc) can be used. Note that the url cannot be in use by another video.
@@ -496,7 +496,7 @@ Creating video-urls:
 
 To delete a url:
 
-.. http:delete:: /api2/partners/users/[video-id]/urls/[url-id]/
+.. http:delete:: /api2/partners/videos/[video-id]/urls/[url-id]/
 
 If this is the only URL for a video, the request will fail. A video must have
 at least one URL.
@@ -661,6 +661,13 @@ List all tasks for a given team:
         * ``type``      Task type (details below)
         * ``-type``     Task type (descending)
 
+    :query completed: Show only complete tasks
+    :query completed-before: Show only tasks completed before a given date
+        (unix timestamp)
+    :query completed-after: Show only tasks completed before a given date
+        (unix timestamp)
+    :query open: Show only incomplete tasks
+
 Task detail:
 
 .. http:get:: /api2/partners/teams/[team-slug]/tasks/[task-id]/
@@ -697,6 +704,8 @@ Fields
     * ``Approve``
 * ``version_no`` - Subtitle version number (required for ``Approve`` and
   ``Review`` tasks)
+* ``completed`` - ``null`` if the task hasn't been completed yet; a datetime
+  string it has
 
 An example response:
 
@@ -709,7 +718,8 @@ An example response:
         "priority": 1,
         "resource_uri": "/api2/partners/teams/all-star/tasks/3/",
         "type": "Subtitle",
-        "video_id": "Myn4j5OI7BxL"
+        "video_id": "Myn4j5OI7BxL",
+        "completed": "2012-07-18T14:08:07"
     }
 
 Activity resource
@@ -725,6 +735,8 @@ List activity items:
     :query video: Show only items related to a given video (video id)
     :query action_type: Show only items with a given action type (int, see below)
     :query language: Show only items with a given language (language code)
+    :query before: A unix timestamp in seconds
+    :query after: A unix timestamp in seconds
 
 Activity types:
 
@@ -764,7 +776,7 @@ Example response:
     }
 
 Message Resource
-----------------
+~~~~~~~~~~~~~~~~
 
 The message resource allows you to send messages to user and teams.
 
