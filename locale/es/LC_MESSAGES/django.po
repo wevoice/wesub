@@ -29,8 +29,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-09 01:33-0500\n"
-"PO-Revision-Date: 2012-08-09 06:51+0000\n"
+"POT-Creation-Date: 2012-08-10 01:33-0500\n"
+"PO-Revision-Date: 2012-08-10 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/universalsubtitles/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
@@ -220,55 +220,55 @@ msgstr "%(user)s quiere unirse al equipo %(team)s"
 msgid "Your application to join the %s team has been declined"
 msgstr "Tu invitación para unirte al equipo %s ha sido rechazada"
 
-#: apps/messages/tasks.py:217
+#: apps/messages/tasks.py:216
 #, python-format
 msgid "%s team has a new member"
 msgstr "El equipo %s tiene un nuevo miembro."
 
-#: apps/messages/tasks.py:241
+#: apps/messages/tasks.py:240
 #, python-format
 msgid "You've joined the %s team!"
 msgstr "¡Te has unido al equipo %s!"
 
-#: apps/messages/tasks.py:266
+#: apps/messages/tasks.py:265
 #, python-format
 msgid "%(user)s has left the %(team)s team"
 msgstr "%(user)s ha dejado al equipo %(team)s"
 
-#: apps/messages/tasks.py:291
+#: apps/messages/tasks.py:290
 #, python-format
 msgid "You've left the %s team!"
 msgstr "¡Has dejado el equipo %s!"
 
-#: apps/messages/tasks.py:327
+#: apps/messages/tasks.py:326
 msgid "Your videos were imported!"
 msgstr "Sus videos han sido importados!"
 
-#: apps/messages/tasks.py:354
+#: apps/messages/tasks.py:353
 msgid "You have a new task assignment on Amara!"
 msgstr "¡Te han asignado una nueva tarea en Amara!"
 
-#: apps/messages/tasks.py:395
+#: apps/messages/tasks.py:394
 msgid "Your subtitles have been reviewed"
 msgstr "Tus subtítulos han sido revisados"
 
-#: apps/messages/tasks.py:397
+#: apps/messages/tasks.py:396
 msgid " and published"
 msgstr "y publicada"
 
-#: apps/messages/tasks.py:498
+#: apps/messages/tasks.py:497
 msgid "Your subtitles have been approved and published!"
 msgstr "¡Tus subtítulos han sido aprobados y publicados!"
 
-#: apps/messages/tasks.py:504
+#: apps/messages/tasks.py:503
 msgid "Your subtitles have been returned for further editing"
 msgstr "Tus subtítulos han sido devueltos para mayor edición"
 
-#: apps/messages/tasks.py:559
+#: apps/messages/tasks.py:558
 msgid "Your subtitles were not accepted"
 msgstr "Sus subtítulos no han sido aceptados"
 
-#: apps/messages/tasks.py:603
+#: apps/messages/tasks.py:602
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr "%(user)s comentó en el video %(title)s"
@@ -657,11 +657,11 @@ msgstr "Moderadores y administradores"
 msgid "Admins only"
 msgstr "Sólo administradores"
 
-#: apps/teams/models.py:125 apps/teams/models.py:2345
+#: apps/teams/models.py:125 apps/teams/models.py:2411
 msgid "name"
 msgstr "nombre"
 
-#: apps/teams/models.py:126 apps/teams/models.py:2346
+#: apps/teams/models.py:126 apps/teams/models.py:2412
 msgid "slug"
 msgstr "eslogan"
 
@@ -789,6 +789,26 @@ msgstr "Administrador"
 msgid "Contributor"
 msgstr "Colaborador"
 
+#: apps/teams/models.py:1076
+msgid "Pending"
+msgstr ""
+
+#: apps/teams/models.py:1077 templates/teams/settings-permissions.html:82
+msgid "Approved"
+msgstr "Aprobado"
+
+#: apps/teams/models.py:1078
+msgid "Denied"
+msgstr ""
+
+#: apps/teams/models.py:1079
+msgid "Member Removed"
+msgstr ""
+
+#: apps/teams/models.py:1080
+msgid "Member Left"
+msgstr ""
+
 #: apps/teams/notifications.py:171
 msgid "New activity on your team video"
 msgstr "Novedades en el vídeo de tu equipo"
@@ -801,7 +821,7 @@ msgstr "El equipo no existe"
 msgid "You are already a member of this team."
 msgstr "Ya eres miembro de este equipo."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:879
+#: apps/teams/rpc.py:50 apps/teams/views.py:887
 msgid "You are now a member of this team."
 msgstr "Ahora eres un miembro de este equipo."
 
@@ -809,41 +829,53 @@ msgstr "Ahora eres un miembro de este equipo."
 msgid "The \"About you\" field is required in order to apply."
 msgstr ""
 
-#: apps/teams/rpc.py:62
+#: apps/teams/rpc.py:56
+msgid "You have already applied to this team."
+msgstr ""
+
+#: apps/teams/rpc.py:58
+msgid "You have been removed from this team."
+msgstr ""
+
+#: apps/teams/rpc.py:60
+msgid "Your application has been denied."
+msgstr ""
+
+#: apps/teams/rpc.py:67
 msgid ""
 "Your application has been submitted. You will be notified of the team "
 "administrator's response"
 msgstr "Tu petición ha sido enviada. Se te notificará la respuesta del administrador del equipo."
 
-#: apps/teams/rpc.py:65
+#: apps/teams/rpc.py:70
 msgid "You can't join this team by application."
 msgstr "No puedes unirte a este equipo mediante solicitud."
 
-#: apps/teams/rpc.py:71
+#: apps/teams/rpc.py:76
 msgid "Team does not exist."
 msgstr "El equipo no existe."
 
-#: apps/teams/rpc.py:74
+#: apps/teams/rpc.py:79
 msgid "You are not manager of this team."
 msgstr "No eres administrador de este equipo."
 
-#: apps/teams/rpc.py:77
+#: apps/teams/rpc.py:82
 msgid "Incorrect team member role."
 msgstr "Rol de miembro incorrecto."
 
-#: apps/teams/rpc.py:82
+#: apps/teams/rpc.py:87
 msgid "Team member does not exist."
 msgstr "Este miembro no existe."
 
-#: apps/teams/rpc.py:85
+#: apps/teams/rpc.py:90
 msgid "You can't promote yourself."
 msgstr "No puedes ascenderte a ti mismo."
 
-#: apps/teams/rpc.py:89
+#: apps/teams/rpc.py:94
 msgid "Team member role changed."
 msgstr "Se ha cambiado el rol del miembro del equipo."
 
-#: apps/teams/rpc.py:163
+#: apps/teams/rpc.py:168
 msgid "You cannot assign that role to that member."
 msgstr "No puedes asignar ese rol a este miembro."
 
@@ -886,7 +918,7 @@ msgid "You do not have permission to delete this team."
 msgstr "No tienes permiso para eliminar este equipo."
 
 #: apps/teams/views.py:215 apps/teams/views.py:257 apps/teams/views.py:285
-#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1565
+#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1552
 msgid "You do not have permission to edit this team."
 msgstr "No tienes permito para editar este equipo."
 
@@ -938,133 +970,137 @@ msgstr "Video eliminado de Amara."
 msgid "Video has been removed from the team."
 msgstr "El video ha sido eliminado del equipo."
 
-#: apps/teams/views.py:767
+#: apps/teams/views.py:769
 msgid "Member has been removed from the team."
 msgstr "El miembro ha sido eliminado del equipo."
 
-#: apps/teams/views.py:770
+#: apps/teams/views.py:772
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "Usa el botón \"Dejar este equipo\" para eliminarte de este equipo."
 
-#: apps/teams/views.py:773
+#: apps/teams/views.py:775
 msgid "You don't have permission to remove this member from the team."
 msgstr "No tienes permiso para eliminar a este miembro del equipo."
 
-#: apps/teams/views.py:804
+#: apps/teams/views.py:808
 msgid "Application approved."
 msgstr "Solicitud aprobada."
 
-#: apps/teams/views.py:806 apps/teams/views.py:824
+#: apps/teams/views.py:810 apps/teams/views.py:830
 msgid "Application does not exist."
 msgstr "La solicitud no existe."
 
-#: apps/teams/views.py:808
+#: apps/teams/views.py:812 apps/teams/views.py:832
+msgid "Application already processed."
+msgstr ""
+
+#: apps/teams/views.py:814
 msgid "You can't approve applications."
 msgstr "No puedes aceptar solicitudes."
 
-#: apps/teams/views.py:822
+#: apps/teams/views.py:828
 msgid "Application denied."
 msgstr "Solicitud denegada."
 
-#: apps/teams/views.py:826
+#: apps/teams/views.py:834
 msgid "You can't deny applications."
 msgstr "No puedes denegar solicitudes."
 
-#: apps/teams/views.py:836
+#: apps/teams/views.py:844
 msgid "You cannot invite people to this team."
 msgstr "No puedes enviar invitaciones para este equipo."
 
-#: apps/teams/views.py:866
+#: apps/teams/views.py:874
 msgid "This invite is no longer valid"
 msgstr ""
 
-#: apps/teams/views.py:875
+#: apps/teams/views.py:883
 msgid "You cannot join this team."
 msgstr "No puedes unirte a este equipo."
 
-#: apps/teams/views.py:926
+#: apps/teams/views.py:937
 msgid "You have left this team."
 msgstr "Has abandonado este equipo."
 
-#: apps/teams/views.py:982
+#: apps/teams/views.py:993
 msgid "Member saved."
 msgstr "Miembro guardado."
 
-#: apps/teams/views.py:1141
+#: apps/teams/views.py:1130
 msgid "You cannot view this team's tasks."
 msgstr "No puedes ver las tareas de este equipo."
 
-#: apps/teams/views.py:1284 apps/teams/views.py:1287
+#: apps/teams/views.py:1271 apps/teams/views.py:1274
 msgid "You are not allowed to perform this task."
 msgstr "No tienes permisos para llevar a cabo esta acción."
 
-#: apps/teams/views.py:1342
+#: apps/teams/views.py:1329
 msgid "Task deleted."
 msgstr "Tarea eliminada."
 
-#: apps/teams/views.py:1344
+#: apps/teams/views.py:1331
 msgid "You cannot delete this task."
 msgstr "No puedes eliminar esta tarea."
 
-#: apps/teams/views.py:1369
+#: apps/teams/views.py:1356
 msgid "Task declined."
 msgstr "Tarea rechazada."
 
-#: apps/teams/views.py:1371
+#: apps/teams/views.py:1358
 msgid "Task assigned."
 msgstr "Tarea asignada."
 
-#: apps/teams/views.py:1373
+#: apps/teams/views.py:1360
 msgid "You cannot assign this task."
 msgstr "No puedes asignar esta tarea."
 
-#: apps/teams/views.py:1395
+#: apps/teams/views.py:1382
 msgid "Invalid assignment attempt."
 msgstr "Intento de asignación inválido."
 
-#: apps/teams/views.py:1420
+#: apps/teams/views.py:1407
 msgid "Draft uploaded successfully."
 msgstr "Borrador subido exitosamente."
 
-#: apps/teams/views.py:1424
+#: apps/teams/views.py:1411
 msgid "/n"
 msgstr ""
 
-#: apps/teams/views.py:1442
+#: apps/teams/views.py:1429
 msgid "You are not allowed to download this transcript."
 msgstr "No tienes permitido descargar esta transcripción."
 
-#: apps/teams/views.py:1492
+#: apps/teams/views.py:1479
 msgid "There's already a project with this name"
 msgstr "Ya existe un proyecto con este nombre"
 
-#: apps/teams/views.py:1504
+#: apps/teams/views.py:1491
 msgid "Project added."
 msgstr "Proyecto añadido."
 
-#: apps/teams/views.py:1521
+#: apps/teams/views.py:1508
 msgid "You cannot edit that project."
 msgstr "No puedes editar este proyecto."
 
-#: apps/teams/views.py:1532
+#: apps/teams/views.py:1519
 msgid "Project deleted."
 msgstr "Proyecto eliminado."
 
-#: apps/teams/views.py:1550
+#: apps/teams/views.py:1537
 msgid "Project saved."
 msgstr "Proyecto guardado."
 
-#: apps/teams/views.py:1676
+#: apps/teams/views.py:1663
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr "Solicitud incorrecta de despublicación:\nErrores:\n"
 
-#: apps/teams/views.py:1710
+#: apps/teams/views.py:1697
 msgid "Successfully unpublished subtitles."
 msgstr "La publicación de los subtítulos fue anulada con éxito."
 
-#: apps/teams/templatetags/teams_tags.py:258
+#: apps/teams/templatetags/teams_tags.py:260
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "¿Puede alguien ayudarme a subtitular estos vídeos?  %(url)s "
@@ -5857,10 +5893,6 @@ msgstr "o ..."
 #: templates/teams/settings-permissions.html:77
 msgid "Reviewed"
 msgstr "Revisado"
-
-#: templates/teams/settings-permissions.html:82
-msgid "Approved"
-msgstr "Aprobado"
 
 #: templates/teams/settings-permissions.html:87
 msgid "Published"
