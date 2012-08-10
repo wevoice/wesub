@@ -42,6 +42,8 @@ Not critical.  Some of our admin icons have been missing for a while.
 CSS class names in admin forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Not critical.  I haven't noticed any brokenness in the admin.
+
 Compatibility with old signed data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -60,6 +62,8 @@ will still work.
 
 ``supports_timezone`` changed to ``False`` for SQLite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+No issues here.
 
 ``MySQLdb``-specific exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
