@@ -1073,13 +1073,15 @@ class Application(models.Model):
     STATUS_PENDING,STATUS_APPROVED, STATUS_DENIED, STATUS_MEMBER_REMOVED,\
         STATUS_MEMBER_LEFT = xrange(0, 5)
     STATUSES = (
-        (STATUS_PENDING, _(u"Pending")),
-        (STATUS_APPROVED, _(u"Approved")),
-        (STATUS_DENIED, _(u"Denied")),
-        (STATUS_MEMBER_REMOVED, _(u"Member Removed")),
-        (STATUS_MEMBER_LEFT, _(u"Member Left")),
+        (STATUS_PENDING, u"Pending"),
+        (STATUS_APPROVED, u"Approved"),
+        (STATUS_DENIED, u"Denied"),
+        (STATUS_MEMBER_REMOVED, u"Member Removed"),
+        (STATUS_MEMBER_LEFT, u"Member Left"),
     )
-    status = models.PositiveIntegerField(default=STATUS_PENDING)
+    STATUSES_IDS = dict([choice[::-1] for choice in STATUSES])
+
+    status = models.PositiveIntegerField(default=STATUS_PENDING, choices=STATUSES)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(blank=True, null=True)
 
@@ -1136,6 +1138,9 @@ class Application(models.Model):
         """
         self.status = Application.STATUS_MEMBER_REMOVED
         self.save()
+
+    def __unicode__(self):
+        return "Application: %s - %s - %s" % (self.team.slug, self.user.username, self.status)
 
 # Invites
 class InviteExpiredException(Exception):

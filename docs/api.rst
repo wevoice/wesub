@@ -826,3 +826,48 @@ The message resource allows you to send messages to user and teams.
     :form team: Team's slug
 
 You can only send the ``user`` parameter or the ``team`` parameter at once.
+
+
+
+Application resource
+~~~~~~~~~~~~~~~~~
+
+For teams with membership by application only.
+
+List application items:
+
+.. http:get:: /api2/partners/teams/[team-slug]/applications
+
+    :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'
+    :query before: A unix timestamp in seconds
+    :query after: A unix timestamp in seconds
+    :query user: The username applying for the team
+
+Application item detail:
+
+.. http:get:: /api2/partners/application/[application-id]/
+
+Example response:
+
+.. code-block:: json
+
+    {
+       "created": "2012-08-09T17:48:48",
+       "id": "12",
+       "modified": null,
+       "note": "",
+       "resource_uri": "/api2/partners/teams/test-team/applications/12/",
+       "status": "Pending",
+       "user": "youtube-anonymous"
+
+    }   
+
+To delete an Application:
+
+.. http:delete:: /api2/partners/application/[application-id]/
+
+Applications can have their statuses updated:
+
+.. http:put:: /api2/partners/application/[application-id]/
+
+    :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'
