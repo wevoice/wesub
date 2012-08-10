@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-09 01:33-0500\n"
-"PO-Revision-Date: 2012-08-09 06:51+0000\n"
+"POT-Creation-Date: 2012-08-10 01:33-0500\n"
+"PO-Revision-Date: 2012-08-10 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/universalsubtitles/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -199,55 +199,55 @@ msgstr "%(user)s po kërkon të bëhet pjesë e ekipit %(team)s"
 msgid "Your application to join the %s team has been declined"
 msgstr "Kërkesa juaj për t'iu bashkuar ekipit %s është hedhur tej"
 
-#: apps/messages/tasks.py:217
+#: apps/messages/tasks.py:216
 #, python-format
 msgid "%s team has a new member"
 msgstr "Ekipi %s ka një anëtar të ri"
 
-#: apps/messages/tasks.py:241
+#: apps/messages/tasks.py:240
 #, python-format
 msgid "You've joined the %s team!"
 msgstr "U bëtë pjesë e ekipit %s!"
 
-#: apps/messages/tasks.py:266
+#: apps/messages/tasks.py:265
 #, python-format
 msgid "%(user)s has left the %(team)s team"
 msgstr "%(user)s e braktisi ekipin %(team)s"
 
-#: apps/messages/tasks.py:291
+#: apps/messages/tasks.py:290
 #, python-format
 msgid "You've left the %s team!"
 msgstr "E braktisët ekipin e %s!"
 
-#: apps/messages/tasks.py:327
+#: apps/messages/tasks.py:326
 msgid "Your videos were imported!"
 msgstr "Videot tuaja u importuan!"
 
-#: apps/messages/tasks.py:354
+#: apps/messages/tasks.py:353
 msgid "You have a new task assignment on Amara!"
 msgstr "Ju është caktuar një punë e re në Amara!"
 
-#: apps/messages/tasks.py:395
+#: apps/messages/tasks.py:394
 msgid "Your subtitles have been reviewed"
 msgstr "Titrat tuaj u shqyrtuan"
 
-#: apps/messages/tasks.py:397
+#: apps/messages/tasks.py:396
 msgid " and published"
 msgstr "dhe u botuan"
 
-#: apps/messages/tasks.py:498
+#: apps/messages/tasks.py:497
 msgid "Your subtitles have been approved and published!"
 msgstr "Titrat tuaj u pranuan dhe janë botuar!"
 
-#: apps/messages/tasks.py:504
+#: apps/messages/tasks.py:503
 msgid "Your subtitles have been returned for further editing"
 msgstr ""
 
-#: apps/messages/tasks.py:559
+#: apps/messages/tasks.py:558
 msgid "Your subtitles were not accepted"
 msgstr ""
 
-#: apps/messages/tasks.py:603
+#: apps/messages/tasks.py:602
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr "%(user)s la një koment te videoja %(title)s"
@@ -636,11 +636,11 @@ msgstr "Përgjegjësa dhe administratorë"
 msgid "Admins only"
 msgstr "Vetëm administratorë"
 
-#: apps/teams/models.py:125 apps/teams/models.py:2345
+#: apps/teams/models.py:125 apps/teams/models.py:2411
 msgid "name"
 msgstr "emër"
 
-#: apps/teams/models.py:126 apps/teams/models.py:2346
+#: apps/teams/models.py:126 apps/teams/models.py:2412
 msgid "slug"
 msgstr "identifikues"
 
@@ -768,6 +768,26 @@ msgstr "Admin"
 msgid "Contributor"
 msgstr "Kontribues"
 
+#: apps/teams/models.py:1076
+msgid "Pending"
+msgstr ""
+
+#: apps/teams/models.py:1077 templates/teams/settings-permissions.html:82
+msgid "Approved"
+msgstr "Të miratuar"
+
+#: apps/teams/models.py:1078
+msgid "Denied"
+msgstr ""
+
+#: apps/teams/models.py:1079
+msgid "Member Removed"
+msgstr ""
+
+#: apps/teams/models.py:1080
+msgid "Member Left"
+msgstr ""
+
 #: apps/teams/notifications.py:171
 msgid "New activity on your team video"
 msgstr "Veprimtari e re në ekipin tuaj të videove"
@@ -780,7 +800,7 @@ msgstr "Ekipi nuk ekziston"
 msgid "You are already a member of this team."
 msgstr "Jeni tashmë anëtar i këtij ekipi."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:879
+#: apps/teams/rpc.py:50 apps/teams/views.py:887
 msgid "You are now a member of this team."
 msgstr "Tani jeni anëtar i këtij ekipi."
 
@@ -788,41 +808,53 @@ msgstr "Tani jeni anëtar i këtij ekipi."
 msgid "The \"About you\" field is required in order to apply."
 msgstr ""
 
-#: apps/teams/rpc.py:62
+#: apps/teams/rpc.py:56
+msgid "You have already applied to this team."
+msgstr ""
+
+#: apps/teams/rpc.py:58
+msgid "You have been removed from this team."
+msgstr ""
+
+#: apps/teams/rpc.py:60
+msgid "Your application has been denied."
+msgstr ""
+
+#: apps/teams/rpc.py:67
 msgid ""
 "Your application has been submitted. You will be notified of the team "
 "administrator's response"
 msgstr "Aplikimi juaj u parashtrua. Përgjigja e administratorit të ekipit do t'ju bëhet e ditur."
 
-#: apps/teams/rpc.py:65
+#: apps/teams/rpc.py:70
 msgid "You can't join this team by application."
 msgstr "Pjesë e këtij ekipi nuk mund të bëheni përmes kërkesash."
 
-#: apps/teams/rpc.py:71
+#: apps/teams/rpc.py:76
 msgid "Team does not exist."
 msgstr "Ekipi nuk ekziston."
 
-#: apps/teams/rpc.py:74
+#: apps/teams/rpc.py:79
 msgid "You are not manager of this team."
 msgstr "Nuk jeni përgjegjësi i këtij ekipi."
 
-#: apps/teams/rpc.py:77
+#: apps/teams/rpc.py:82
 msgid "Incorrect team member role."
 msgstr "Rol i pasaktë anëtari ekipi."
 
-#: apps/teams/rpc.py:82
+#: apps/teams/rpc.py:87
 msgid "Team member does not exist."
 msgstr "Nuk ka anëtar ekipi të tillë."
 
-#: apps/teams/rpc.py:85
+#: apps/teams/rpc.py:90
 msgid "You can't promote yourself."
 msgstr "Nuk mund të promovuoni veten."
 
-#: apps/teams/rpc.py:89
+#: apps/teams/rpc.py:94
 msgid "Team member role changed."
 msgstr "U ndryshua roli i anëtarit të ekipit."
 
-#: apps/teams/rpc.py:163
+#: apps/teams/rpc.py:168
 msgid "You cannot assign that role to that member."
 msgstr "Nuk mund t'ia jepni atë rol atij përdoruesi."
 
@@ -865,7 +897,7 @@ msgid "You do not have permission to delete this team."
 msgstr "Nuk keni leje ta fshini këtë ekip."
 
 #: apps/teams/views.py:215 apps/teams/views.py:257 apps/teams/views.py:285
-#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1565
+#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1552
 msgid "You do not have permission to edit this team."
 msgstr "Nuk keni leje të përpunoni këtë ekip."
 
@@ -917,133 +949,137 @@ msgstr "Videoja është fshirë nga Amara."
 msgid "Video has been removed from the team."
 msgstr "Videoja është hequr nga ekipi."
 
-#: apps/teams/views.py:767
+#: apps/teams/views.py:769
 msgid "Member has been removed from the team."
 msgstr "Anëtari është hequr nga ekipi."
 
-#: apps/teams/views.py:770
+#: apps/teams/views.py:772
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "Përdorni butonin \"Braktiseni këtë ekip\" që të hiqni veten prej këtij ekipi."
 
-#: apps/teams/views.py:773
+#: apps/teams/views.py:775
 msgid "You don't have permission to remove this member from the team."
 msgstr "Nuk keni leje ta hiqni këtë anëtar nga ekipi?"
 
-#: apps/teams/views.py:804
+#: apps/teams/views.py:808
 msgid "Application approved."
 msgstr "Kërkesa u miratua."
 
-#: apps/teams/views.py:806 apps/teams/views.py:824
+#: apps/teams/views.py:810 apps/teams/views.py:830
 msgid "Application does not exist."
 msgstr "Kërkesa nuk ekziston."
 
-#: apps/teams/views.py:808
+#: apps/teams/views.py:812 apps/teams/views.py:832
+msgid "Application already processed."
+msgstr ""
+
+#: apps/teams/views.py:814
 msgid "You can't approve applications."
 msgstr "Nuk mund miratoni aplikime."
 
-#: apps/teams/views.py:822
+#: apps/teams/views.py:828
 msgid "Application denied."
 msgstr "Kërkesa u mohua."
 
-#: apps/teams/views.py:826
+#: apps/teams/views.py:834
 msgid "You can't deny applications."
 msgstr "Nuk mund të hidhni poshtë aplikime."
 
-#: apps/teams/views.py:836
+#: apps/teams/views.py:844
 msgid "You cannot invite people to this team."
 msgstr "Nuk mund të ftoni njerëz në këtë ekip."
 
-#: apps/teams/views.py:866
+#: apps/teams/views.py:874
 msgid "This invite is no longer valid"
 msgstr ""
 
-#: apps/teams/views.py:875
+#: apps/teams/views.py:883
 msgid "You cannot join this team."
 msgstr "Nuk mund të bëheni pjesë e këtij ekipi."
 
-#: apps/teams/views.py:926
+#: apps/teams/views.py:937
 msgid "You have left this team."
 msgstr "E braktisët këtë ekip."
 
-#: apps/teams/views.py:982
+#: apps/teams/views.py:993
 msgid "Member saved."
 msgstr "Anëtari u ruajt."
 
-#: apps/teams/views.py:1141
+#: apps/teams/views.py:1130
 msgid "You cannot view this team's tasks."
 msgstr "Nuk mund të shihni punët e caktuara në këtë ekip."
 
-#: apps/teams/views.py:1284 apps/teams/views.py:1287
+#: apps/teams/views.py:1271 apps/teams/views.py:1274
 msgid "You are not allowed to perform this task."
 msgstr "Nuk ju është lejuar kryerja e këtij veprimi."
 
-#: apps/teams/views.py:1342
+#: apps/teams/views.py:1329
 msgid "Task deleted."
 msgstr "Puna u fshi."
 
-#: apps/teams/views.py:1344
+#: apps/teams/views.py:1331
 msgid "You cannot delete this task."
 msgstr "Nuk mund ta fshini këtë punë."
 
-#: apps/teams/views.py:1369
+#: apps/teams/views.py:1356
 msgid "Task declined."
 msgstr "Puna u hodh poshtë."
 
-#: apps/teams/views.py:1371
+#: apps/teams/views.py:1358
 msgid "Task assigned."
 msgstr "Puna u caktua."
 
-#: apps/teams/views.py:1373
+#: apps/teams/views.py:1360
 msgid "You cannot assign this task."
 msgstr "Nuk mund ta caktoni këtë punë."
 
-#: apps/teams/views.py:1395
+#: apps/teams/views.py:1382
 msgid "Invalid assignment attempt."
 msgstr "Përpjekje e pavlefshme caktimi."
 
-#: apps/teams/views.py:1420
+#: apps/teams/views.py:1407
 msgid "Draft uploaded successfully."
 msgstr "Skica u ngarkua me sukses."
 
-#: apps/teams/views.py:1424
+#: apps/teams/views.py:1411
 msgid "/n"
 msgstr ""
 
-#: apps/teams/views.py:1442
+#: apps/teams/views.py:1429
 msgid "You are not allowed to download this transcript."
 msgstr "Nuk ju lejohet ta shkarkoni këtë transkript."
 
-#: apps/teams/views.py:1492
+#: apps/teams/views.py:1479
 msgid "There's already a project with this name"
 msgstr "Ka tashmë një projekt me këtë emër"
 
-#: apps/teams/views.py:1504
+#: apps/teams/views.py:1491
 msgid "Project added."
 msgstr "Projekti u shtua."
 
-#: apps/teams/views.py:1521
+#: apps/teams/views.py:1508
 msgid "You cannot edit that project."
 msgstr "Nuk mund ta përpunoni këtë projekt."
 
-#: apps/teams/views.py:1532
+#: apps/teams/views.py:1519
 msgid "Project deleted."
 msgstr "Projekti u fshi."
 
-#: apps/teams/views.py:1550
+#: apps/teams/views.py:1537
 msgid "Project saved."
 msgstr "Projekti u ruajt."
 
-#: apps/teams/views.py:1676
+#: apps/teams/views.py:1663
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr "Kërkesë e pavlefshme çbotimi.\nGabime:\n"
 
-#: apps/teams/views.py:1710
+#: apps/teams/views.py:1697
 msgid "Successfully unpublished subtitles."
 msgstr "Titrat u çbotuan me sukses."
 
-#: apps/teams/templatetags/teams_tags.py:258
+#: apps/teams/templatetags/teams_tags.py:260
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "A mundet dikush të më ndihmojë në titrimin e këtyre videove? %(url)s"
@@ -5836,10 +5872,6 @@ msgstr "ose ..."
 #: templates/teams/settings-permissions.html:77
 msgid "Reviewed"
 msgstr "Të shqyrtuar"
-
-#: templates/teams/settings-permissions.html:82
-msgid "Approved"
-msgstr "Të miratuar"
 
 #: templates/teams/settings-permissions.html:87
 msgid "Published"
