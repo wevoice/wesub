@@ -92,7 +92,7 @@ def youtube_oauth_callback(request):
                     "data": {
                         "sent_params": params,
                         "original_request": request,
-                        "response": response
+                        "response": response.content
                     },
                 })
                     
