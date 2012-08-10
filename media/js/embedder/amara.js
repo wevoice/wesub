@@ -71,7 +71,7 @@ for(var b in a){var c=a[b];f.isFunction(c)||(c=this[a[b]]);if(!c)throw Error('Me
 e.data=JSON.stringify(b.toJSON());g.emulateJSON&&(e.contentType="application/x-www-form-urlencoded",e.data=e.data?{model:e.data}:{});if(g.emulateHTTP&&("PUT"===d||"DELETE"===d))g.emulateJSON&&(e.data._method=d),e.type="POST",e.beforeSend=function(a){a.setRequestHeader("X-HTTP-Method-Override",d)};"GET"!==e.type&&!g.emulateJSON&&(e.processData=!1);return i.ajax(f.extend(e,c))};g.wrapError=function(a,b,c){return function(d,e){e=d===b?e:d;a?a(b,e,c):b.trigger("error",b,e,c)}};var x=function(){},G=function(a,
 b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply(this,arguments)};f.extend(d,a);x.prototype=a.prototype;d.prototype=new x;b&&f.extend(d.prototype,b);c&&f.extend(d,c);d.prototype.constructor=d;d.__super__=a.prototype;return d},n=function(a,b){return!a||!a[b]?null:f.isFunction(a[b])?a[b]():a[b]},t=function(){throw Error('A "url" property or function must be specified');}}).call(this);
 /*
- * popcorn.js version f9351bc
+ * popcorn.js version 4d1cd89
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
@@ -158,7 +158,7 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "f9351bc";
+  Popcorn.version = "4d1cd89";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -729,8 +729,9 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
               }
 
               // p.cue( "b", 11 );
+              // p.cue( "b", 11, function() {} );
               if ( typeof time === "number" ) {
-                fn = Popcorn.nop();
+                fn = fn || Popcorn.nop();
               }
 
               // p.cue( "c", function() {});
@@ -3914,6 +3915,10 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
         readyCheck();
       }
 
+      options.toString = function() {
+        // use the default option if it doesn't exist
+        return options.src || options._natives.manifest.options.src[ "default" ];
+      };
     },
 
     start: function( event, options ) {
@@ -4090,6 +4095,11 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
       _userid = options.userid;
       getFlickrData();
     }
+
+    options.toString = function() {
+      return options.tags || options.username || "Flickr";
+    };
+
     return {
       /**
        * @member flickr
@@ -4406,6 +4416,10 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
 
     initialize();
 
+    options.toString = function() {
+      return options.url || options._natives.manifest.options.url[ "default" ];
+    };
+
     return {
       /**
        * @member webpage
@@ -4649,6 +4663,10 @@ var googleCallback;
       };
 
     isMapReady();
+
+    options.toString = function() {
+      return options.location || ( ( options.lat && options.lng ) ? options.lat + ", " + options.lng : options._natives.manifest.options.location[ "default" ] );
+    };
 
     return {
       /**
@@ -5109,6 +5127,12 @@ var googleCallback;
         }, false );
 
         img.src = options.src;
+
+        options.toString = function() {
+          var string = options.src || options._natives.manifest.options.src[ "default" ],
+              match = string.replace( /.*\//g, "" );
+          return match.length ? match : string;
+        };
       },
 
       /**
@@ -5346,6 +5370,9 @@ var googleCallback;
         isPlayerReady();
       }
 
+      options.toString = function() {
+        return options.source || options._natives.manifest.options.source[ "default" ];
+      };
     },
     start: function( event, options ) {
       if( options._capCont ) {
@@ -6350,6 +6377,11 @@ document.addEventListener( "click", function( event ) {
       container.innerHTML = text || "";
 
       target.appendChild( container );
+
+      options.toString = function() {
+        // use the default option if it doesn't exist
+        return options.text || options._natives.manifest.options.text[ "default" ];
+      };
     },
 
     /**
@@ -6371,7 +6403,6 @@ document.addEventListener( "click", function( event ) {
     end: function( event, options ) {
       options._container.style.display = "none";
     },
-
     _teardown: function( options ) {
       var target = options._target;
       if ( target ) {
@@ -6681,6 +6712,10 @@ document.addEventListener( "click", function( event ) {
           }
         };
 
+        options.toString = function() {
+          return options.src || options._natives.manifest.options.src[ "default" ];
+        };
+
         isReady( this );
       },
 
@@ -6952,6 +6987,9 @@ var wikiCallback;
           options.src.slice( options.src.lastIndexOf( "/" ) + 1 )  + "&format=json&callback=wikiCallback" + _guid );
       }
 
+      options.toString = function() {
+        return options.src || options._natives.manifest.options.src[ "default" ];
+      };
     },
     /**
      * @member wikipedia
@@ -9325,11 +9363,10 @@ var wikiCallback;
                         new that.AmaraView({
 
                             // TODO: This needs to support a node OR ID string.
-                            el: _$('#' + options.div)[0],
+                            el: _$(options.div)[0],
                             model: new VideoModel(options)
                         })
                     );
-
                 }
             }
         };
@@ -9467,8 +9504,26 @@ var wikiCallback;
                 
                 var that = this;
 
+                // Create a container that we will use to inject the Popcorn video.
+                this.$el.prepend('<div class="amara-popcorn"></div>');
+
+                var $popContainer = $('div.amara-popcorn', this.$el);
+
+                // Copy the width and height to the new Popcorn container.
+                $popContainer.width(this.$el.width());
+                $popContainer.height(this.$el.height());
+
+                // This is a hack until Popcorn.js supports passing a DOM elem to
+                // its smart() method. See: http://bit.ly/L0Lb7t
+                var id = 'amara-popcorn-' + Math.floor(Math.random() * 100000000);
+                $popContainer.attr('id', id);
+
+                // Reset the height on the parent amara-embed div. If we don't do this,
+                // our amara-tools div won't be visible.
+                this.$el.height('auto');
+
                 // Init the Popcorn video.
-                this.pop = _Popcorn.smart(this.model.get('div'), this.model.get('url'));
+                this.pop = _Popcorn.smart($popContainer.attr('id'), this.model.get('url'));
 
                 this.pop.on('loadedmetadata', function() {
 
@@ -9482,7 +9537,7 @@ var wikiCallback;
                     }));
 
                     // Just set some cached Zepto selections for later use.
-                    that.cacheNodes();
+                    that.cacheNodesAndResetEl();
 
                     // Wait until we have a complete video model (the API was hit as soon as
                     // the video instance was created), and then retrieve the initial set
@@ -9549,7 +9604,7 @@ var wikiCallback;
                 if (subtitleSets.length) {
                     subtitleSet = subtitleSets[0];
                 } else {
-                    this.$transcriptBody.html('No subtitles available.');
+                    $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
                 }
 
                 // Get the actual subtitles for this language.
@@ -9571,7 +9626,7 @@ var wikiCallback;
                         });
                     }
                 } else {
-                    this.$transcriptBody.html('No subtitles available.');
+                    $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
                 }
             },
 
@@ -9631,40 +9686,40 @@ var wikiCallback;
             },
 
             templateHTML: '' +
-                '<div class="amara-container" style="width: {{ width }}px;">' +
+                '<div class="amara-tools" style="width: {{ width }}px;">' +
                 '    <div class="amara-bar">' +
-                '        <a href="#" class="amara-share-button"></a>' +
+                //'        <a href="#" class="amara-share-button"></a>' +
                 '        <a href="#" class="amara-logo">Amara</a>' +
                 '        <ul class="amara-displays">' +
                 '            <li><a href="#" class="amara-transcript-button"></a></li>' +
-                '            <li><a href="#" class="amara-subtitles-button"></a></li>' +
+                //'            <li><a href="#" class="amara-subtitles-button"></a></li>' +
                 '        </ul>' +
                 '    </div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
                 '            <div class="amara-transcript-header-left">' +
-                '                Auto-stream <span>ON</span>' +
+                '                Auto-stream <span>OFF</span>' +
                 '            </div>' +
-                '            <div class="amara-transcript-header-right">' +
-                '                <form action="" class="amara-transcript-search">' +
-                '                    <input class="amara-transcript-search-input" placeholder="Search transcript" />' +
-                '                </form>' +
-                '            </div>' +
+                //'            <div class="amara-transcript-header-right">' +
+                //'                <form action="" class="amara-transcript-search">' +
+                //'                    <input class="amara-transcript-search-input" placeholder="Search transcript" />' +
+                //'                </form>' +
+                //'            </div>' +
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
-                '            <div class="amara-transcript-line amara-group">' +
-                '                <div class="amara-transcript-line-left">&nbsp;</div>' +
-                '                <div class="amara-transcript-line-right">' +
+                '            <a href="#" class="amara-transcript-line amara-group">' +
+                '                <span class="amara-transcript-line-left">&nbsp;</span>' +
+                '                <span class="amara-transcript-line-right">' +
                 '                    Loading transcript&hellip;' +
-                '                </div>' +
-                '            </div>' +
+                '                </span>' +
+                '            </a>' +
                 '        </div>' +
                 '    </div>' +
                 '</div>',
 
-            cacheNodes: function() {
-                this.$amaraContainer = $('div.amara-container', this.$el);
-                this.$transcript = $('div.amara-transcript', this.$amaraContainer);
+            cacheNodesAndResetEl: function() {
+                this.$amaraTools = $('div.amara-tools', this.$el);
+                this.$transcript = $('div.amara-transcript', this.$amaraTools);
                 this.$transcriptBody = $('div.amara-transcript-body', this.$transcript);
             }
 
@@ -9730,15 +9785,11 @@ var wikiCallback;
             if (amaraEmbeds.length) {
                 amaraEmbeds.each(function() {
 
-                    // This is a hack until Popcorn.js supports passing a DOM elem to
-                    // its smart() method. See: http://bit.ly/L0Lb7t
-                    var id = 'amara-embed-' + Math.floor(Math.random() * 100000000);
-                    var $div = _$(this);
-                    $div.attr('id', id);
+                    var $div = $(this);
 
                     // Call embedVideo with this div and URL.
                     that.push(['embedVideo', {
-                        'div': id,
+                        'div': this,
                         'initialLanguage': $div.data('initial-language'),
                         'url': $div.data('url')
                     }]);

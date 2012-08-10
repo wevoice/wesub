@@ -1,5 +1,5 @@
 /*
- * popcorn.js version f9351bc
+ * popcorn.js version 4d1cd89
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
@@ -86,7 +86,7 @@
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "f9351bc";
+  Popcorn.version = "4d1cd89";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -657,8 +657,9 @@
               }
 
               // p.cue( "b", 11 );
+              // p.cue( "b", 11, function() {} );
               if ( typeof time === "number" ) {
-                fn = Popcorn.nop();
+                fn = fn || Popcorn.nop();
               }
 
               // p.cue( "c", function() {});
@@ -3842,6 +3843,10 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
         readyCheck();
       }
 
+      options.toString = function() {
+        // use the default option if it doesn't exist
+        return options.src || options._natives.manifest.options.src[ "default" ];
+      };
     },
 
     start: function( event, options ) {
@@ -4018,6 +4023,11 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
       _userid = options.userid;
       getFlickrData();
     }
+
+    options.toString = function() {
+      return options.tags || options.username || "Flickr";
+    };
+
     return {
       /**
        * @member flickr
@@ -4334,6 +4344,10 @@ api - https://github.com/documentcloud/document-viewer/blob/master/public/javasc
 
     initialize();
 
+    options.toString = function() {
+      return options.url || options._natives.manifest.options.url[ "default" ];
+    };
+
     return {
       /**
        * @member webpage
@@ -4577,6 +4591,10 @@ var googleCallback;
       };
 
     isMapReady();
+
+    options.toString = function() {
+      return options.location || ( ( options.lat && options.lng ) ? options.lat + ", " + options.lng : options._natives.manifest.options.location[ "default" ] );
+    };
 
     return {
       /**
@@ -5037,6 +5055,12 @@ var googleCallback;
         }, false );
 
         img.src = options.src;
+
+        options.toString = function() {
+          var string = options.src || options._natives.manifest.options.src[ "default" ],
+              match = string.replace( /.*\//g, "" );
+          return match.length ? match : string;
+        };
       },
 
       /**
@@ -5274,6 +5298,9 @@ var googleCallback;
         isPlayerReady();
       }
 
+      options.toString = function() {
+        return options.source || options._natives.manifest.options.source[ "default" ];
+      };
     },
     start: function( event, options ) {
       if( options._capCont ) {
@@ -6278,6 +6305,11 @@ document.addEventListener( "click", function( event ) {
       container.innerHTML = text || "";
 
       target.appendChild( container );
+
+      options.toString = function() {
+        // use the default option if it doesn't exist
+        return options.text || options._natives.manifest.options.text[ "default" ];
+      };
     },
 
     /**
@@ -6299,7 +6331,6 @@ document.addEventListener( "click", function( event ) {
     end: function( event, options ) {
       options._container.style.display = "none";
     },
-
     _teardown: function( options ) {
       var target = options._target;
       if ( target ) {
@@ -6609,6 +6640,10 @@ document.addEventListener( "click", function( event ) {
           }
         };
 
+        options.toString = function() {
+          return options.src || options._natives.manifest.options.src[ "default" ];
+        };
+
         isReady( this );
       },
 
@@ -6880,6 +6915,9 @@ var wikiCallback;
           options.src.slice( options.src.lastIndexOf( "/" ) + 1 )  + "&format=json&callback=wikiCallback" + _guid );
       }
 
+      options.toString = function() {
+        return options.src || options._natives.manifest.options.src[ "default" ];
+      };
     },
     /**
      * @member wikipedia
