@@ -210,7 +210,7 @@
                     }));
 
                     // Just set some cached Zepto selections for later use.
-                    that.cacheNodesAndResetEl();
+                    that.cacheNodes();
 
                     // Wait until we have a complete video model (the API was hit as soon as
                     // the video instance was created), and then retrieve the initial set
@@ -390,7 +390,7 @@
                 '    </div>' +
                 '</div>',
 
-            cacheNodesAndResetEl: function() {
+            cacheNodes: function() {
                 this.$amaraTools = $('div.amara-tools', this.$el);
                 this.$transcript = $('div.amara-transcript', this.$amaraTools);
                 this.$transcriptBody = $('div.amara-transcript-body', this.$transcript);
