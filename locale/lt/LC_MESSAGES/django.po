@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-10 01:33-0500\n"
-"PO-Revision-Date: 2012-08-10 06:52+0000\n"
+"POT-Creation-Date: 2012-08-11 01:32-0500\n"
+"PO-Revision-Date: 2012-08-11 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Lithuanian (Lithuania) (http://www.transifex.com/projects/p/universalsubtitles/language/lt_LT/)\n"
 "MIME-Version: 1.0\n"
@@ -636,11 +636,11 @@ msgstr ""
 msgid "Admins only"
 msgstr ""
 
-#: apps/teams/models.py:125 apps/teams/models.py:2411
+#: apps/teams/models.py:125 apps/teams/models.py:2416
 msgid "name"
 msgstr ""
 
-#: apps/teams/models.py:126 apps/teams/models.py:2412
+#: apps/teams/models.py:126 apps/teams/models.py:2417
 msgid "slug"
 msgstr ""
 
@@ -766,26 +766,6 @@ msgstr "Administratorius"
 
 #: apps/teams/models.py:922 apps/teams/permissions_const.py:47
 msgid "Contributor"
-msgstr ""
-
-#: apps/teams/models.py:1076
-msgid "Pending"
-msgstr ""
-
-#: apps/teams/models.py:1077 templates/teams/settings-permissions.html:82
-msgid "Approved"
-msgstr ""
-
-#: apps/teams/models.py:1078
-msgid "Denied"
-msgstr ""
-
-#: apps/teams/models.py:1079
-msgid "Member Removed"
-msgstr ""
-
-#: apps/teams/models.py:1080
-msgid "Member Left"
 msgstr ""
 
 #: apps/teams/notifications.py:171
@@ -5878,6 +5858,10 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:77
 msgid "Reviewed"
+msgstr ""
+
+#: templates/teams/settings-permissions.html:82
+msgid "Approved"
 msgstr ""
 
 #: templates/teams/settings-permissions.html:87
