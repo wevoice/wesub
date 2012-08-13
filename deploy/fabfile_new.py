@@ -618,7 +618,7 @@ def bounce_celery():
 @task
 @lock_required
 @roles('app', 'data')
-def deploy(branch=None):
+def deploy(branch=None, integration_branch=None):
     """
     This is how code gets reloaded:
 
@@ -639,7 +639,7 @@ def deploy(branch=None):
             _git_pull()
 
     with Output("Updating integration repo"):
-        execute(update_integration, branch=branch)
+        execute(update_integration, branch=integration_branch)
         with cd(env.app_dir):
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -delete")
@@ -687,9 +687,25 @@ def update_django_admin_media():
     """
     with Output("Uploading Django admin media"):
         media_dir = '{0}/lib/python2.6/site-packages/django/contrib/admin/media/'.format(env.ve_dir)
-        s3_bucket = 's3.{0}.amara.org/admin/'.format(env.environment)
         python_exe = '{0}/bin/python'.format(env.ve_dir)
+        s3_bucket = 's3.{0}.amara.org/admin/'.format(env.environment)
         sudo('s3cmd -P -c /etc/s3cfg sync {0} s3://{1}'.format(media_dir, s3_bucket))
+
+@task
+@roles('app')
+def update_django_admin_media_dev():
+    """
+    Uploads Django Admin static media for dev
+
+    This is separate from the update_django_admin_media task as this needs to
+    run on each webserver for the dev environment.
+
+    """
+    with Output("Copying Django Admin static media"), cd(env.app_dir):
+        media_dir = '{0}/lib/python2.6/site-packages/django/contrib/admin/media/'.format(env.ve_dir)
+        python_exe = '{0}/bin/python'.format(env.ve_dir)
+        # copy media to local dir
+        run('cp -r {0} ./media/admin'.format(media_dir))
 
 def _switch_branch(branch):
     with cd(env.app_dir), settings(warn_only=True):
