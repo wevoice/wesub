@@ -101,15 +101,18 @@ unisubs.Dialog.prototype.enterDocument = function() {
                goog.Timer.TICK,
                this.idleTimerTick_);
 };
+
 unisubs.Dialog.prototype.userIsNotIdle_ = function() {
     this.minutesIdle_ = 0;
 };
+
 unisubs.Dialog.prototype.idleTimerTick_ = function() {
     this.minutesIdle_++;
     if (this.minutesIdle_ >= unisubs.Dialog.MINUTES_TILL_WARNING) {
         this.showIdleWarning_();
     }
 };
+
 unisubs.Dialog.prototype.showIdleWarning_ = function() {
     this.idleTimer_.stop();
     if (this.ignoreLock_) {
@@ -127,12 +130,14 @@ unisubs.Dialog.prototype.showIdleWarning_ = function() {
         this.dropLockDialogHidden_);
     dropLockDialog.setVisible(true);
 };
+
 unisubs.Dialog.prototype.dropLockDialogHidden_ = function(e) {
     var dialog = e.target;
-    if (dialog.didLoseSession())
+    if (dialog.didLoseSession()) {
         this.hideDialogImpl_();
-    else
+    } else {
         this.idleTimer_.start();
+    }
 };
 
 /**
@@ -160,26 +165,33 @@ unisubs.Dialog.prototype.hideTemporaryPanel = function() {
         this.temporaryPanel_ = null;
     }
 };
+
 unisubs.Dialog.prototype.getVideoPlayerInternal = function() {
     return this.videoPlayer_;
 };
+
 unisubs.Dialog.prototype.getTimelinePanelInternal = function() {
     return this.timelinePanel_;
 };
+
 unisubs.Dialog.prototype.getCaptioningAreaInternal = function() {
     return this.captioningArea_;
 };
+
 unisubs.Dialog.prototype.setRightPanelInternal = function(rightPanel) {
     this.rightPanel_ = rightPanel;
     this.rightPanelContainer_.removeChildren(true);
     this.rightPanelContainer_.addChild(rightPanel, true);
 };
+
 unisubs.Dialog.prototype.getRightPanelInternal = function() {
     return this.rightPanel_;
 };
+
 unisubs.Dialog.prototype.getBottomPanelContainerInternal = function() {
     return this.bottomPanelContainer_;
 };
+
 unisubs.Dialog.prototype.updateLoginState = function() {
     this.rightPanel_.updateLoginState();
 };
@@ -228,19 +240,18 @@ unisubs.Dialog.prototype.saveWorkInternal = function(closeAfterSave, saveForLate
     goog.abstractMethod();
 };
 unisubs.Dialog.prototype.onBeforeWindowUnload_ = function(event) {
-    if (!this.isWorkSaved())
+    if (!this.isWorkSaved()) {
         event.message = "You have unsaved work.";
+    }
 };
 unisubs.Dialog.prototype.setVisible = function(visible) {
     if (visible) {
         unisubs.Dialog.superClass_.setVisible.call(this, true);
         goog.dom.getDocumentScrollElement().scrollTop = 0;
-    }
-    else {
+    } else {
         if (this.isWorkSaved()) {
             this.hideDialogImpl_();
-        }
-        else {
+        } else {
             this.showSaveWorkDialog_();
         }
     }
@@ -279,9 +290,9 @@ unisubs.Dialog.prototype.showTitleDescriptionChangedDialog = function(closeAfter
 unisubs.Dialog.prototype.showSaveWorkDialog_ = function() {
     var that = this;
     var unsavedWarning = new unisubs.UnsavedWarning(function(submit) {
-        if (submit)
+        if (submit) {
             that.saveWork(true);
-        else {
+        } else {
             that.hideDialogImpl_(false);
         }
     });
@@ -300,16 +311,19 @@ unisubs.Dialog.prototype.hideToFork = function() {
 };
 unisubs.Dialog.prototype.hideDialogImpl_ = function() {
     var serverModel = this.getServerModel();
+
     if (serverModel){
         var args = {};
         args['session_pk'] = serverModel.getSessionPK();
         unisubs.Rpc.call("release_lock", args);    
     }
+
     if (unisubs.returnURL != null) {
         goog.Timer.callOnce(function() {
             window.location.replace(unisubs.returnURL);
         });
     }
+
     unisubs.Dialog.superClass_.setVisible.call(this, false);
 };
 
@@ -320,22 +334,27 @@ unisubs.Dialog.prototype.disposeInternal = function() {
     this.videoPlayer_.dispose();
     this.idleTimer_.dispose();
 };
+
 unisubs.Dialog.REVIEW_OR_APPROVAL = {
     REVIEW: 1,
     APPROVAL: 2
 };
+
 unisubs.Dialog.MODERATION_OUTCOMES = {
     APPROVED: 20,
     SAVE_FOR_LATER: 10,
     SEND_BACK: 30
 };
+
 unisubs.Dialog.prototype.getTeamGuidelineForReview = function () {
     var name = this.isApproval() ? 'approval' : 'review'; 
     return unisubs.guidelines[name];
-}
+};
+
 unisubs.Dialog.prototype.isApproval = function(){
     return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL;
-}
+};
+
 unisubs.Dialog.prototype.isReview = function(){
     return this.reviewOrApprovalType_ == unisubs.Dialog.REVIEW_OR_APPROVAL.REVIEW;
-}
+};
