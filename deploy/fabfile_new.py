@@ -517,7 +517,7 @@ def remove_disabled():
 @task
 @parallel
 @roles('app')
-def update_integration(run_as_sudo=True):
+def update_integration(run_as_sudo=True, branch=None):
     '''Update the integration repo to the version recorded in the site repo.
 
     At the moment it is assumed that the optional/unisubs-integration file
@@ -528,12 +528,13 @@ def update_integration(run_as_sudo=True):
     TODO: Run this from update_web automatically
 
     '''
+    branch = branch if branch is not None else env.revision
     with Output("Updating nested unisubs-integration repositories"):
         with cd(os.path.join(env.app_dir, 'unisubs-integration')), \
             settings(warn_only=True):
             _git_checkout_branch_and_reset(
                 _get_optional_repo_version(env.app_dir, 'unisubs-integration'),
-                branch=env.revision,
+                branch=branch,
                 run_as_sudo=run_as_sudo
             )
 
@@ -617,7 +618,7 @@ def bounce_celery():
 @task
 @lock_required
 @roles('app', 'data')
-def deploy():
+def deploy(branch=None):
     """
     This is how code gets reloaded:
 
@@ -632,21 +633,24 @@ def deploy():
     breakage
     """
     with Output("Updating the main unisubs repo"), cd(env.app_dir):
-        _git_pull()
+        if branch:
+            _switch_branch(branch)
+        else:
+            _git_pull()
 
     with Output("Updating integration repo"):
-        execute(update_integration)
+        execute(update_integration, branch=branch)
         with cd(env.app_dir):
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -delete")
 
-    execute(bounce_celery())
-    execute(bounce_memcached())
+    execute(bounce_celery)
+    execute(bounce_memcached)
     #test_services()
-    execute(reload_app_servers())
+    execute(reload_app_servers)
 
-    if env.environment not in ['dev']:
-        _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user,  environment, datetime.utcnow()))
+    #if env.environment not in ['dev']:
+    _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user,  environment, datetime.utcnow()))
 
 @task
 @lock_required
@@ -667,7 +671,8 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_s3=Fals
         execute(update_integration)
         run('{0} deploy/create_commit_file.py'.format(python_exe))
         out.fastprintln('Compiling...')
-        run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
+        with settings(warn_only=True):
+            run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
         if env.name != 'dev' and not skip_s3:
             out.fastprintln('Uploading to S3...')
             run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
@@ -686,6 +691,12 @@ def update_django_admin_media():
         python_exe = '{0}/bin/python'.format(env.ve_dir)
         sudo('s3cmd -P -c /etc/s3cfg sync {0} s3://{1}'.format(media_dir, s3_bucket))
 
+def _switch_branch(branch):
+    with cd(env.app_dir), settings(warn_only=True):
+        run('git fetch')
+        run('git branch --track {0} origin/{0}'.format(branch))
+        run('git checkout {0}'.format(branch))
+        _git_pull()
 @task
 @parallel
 @roles('app', 'data')
@@ -696,9 +707,5 @@ def switch_branch(branch):
     :param branch: Name of branch to switch
 
     """
-    with cd(env.app_dir), settings(warn_only=True):
-        run('git fetch')
-        run('git branch --track {0} origin/{0}'.format(branch))
-        run('git checkout {0}'.format(branch))
-        _git_pull()
-
+    with Output('Switching to {0}'.format(branch)):
+        _switch_branch(branch)
