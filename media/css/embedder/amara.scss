@@ -75,7 +75,7 @@
     width: 100%;
 }
 
-div.amara-group {
+.amara-group {
     *zoom: 1;
 
     &:before, &:after {
@@ -86,120 +86,169 @@ div.amara-group {
         clear: both;
     }
 }
-div.amara-embed {
-    div.amara-container {
-        div.amara-bar {
-            border-top: 1px solid #313233;
-            color: #666;
+div.amara-tools {
+    * {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+    div.amara-bar {
+        border-top: 1px solid #313233;
+        color: #666;
+        height: 37px;
+        @include multi-border-radius(0, 0, 3px, 3px);
+        @include vertical-gradient(#1B1C1D, #212223);
+
+        a {
+            // TODO: Have the CSS compiler convert these to absolute URLs.
+            background: transparent url('/site_media/images/embedder/amara-sprites.png') 0 0 no-repeat;
+            display: inline-block;
             height: 36px;
-            margin-top: -5px;
-            @include multi-border-radius(0, 0, 3px, 3px);
-            @include vertical-gradient(#1B1C1D, #212223);
+            @include opacity(.5);
+            -webkit-transition: opacity .03s linear;
+            -moz-transition: opacity .03s linear;
 
-            a {
-                // TODO: Have the CSS compiler convert these to absolute URLs.
-                background: transparent url('/site_media/images/embedder/amara-sprites.png') 0 0 no-repeat;
-                display: inline-block;
-                height: 36px;
-                @include opacity(.5);
-                -webkit-transition: opacity .03s linear;
-                -moz-transition: opacity .03s linear;
+            &.amara-logo {
+                background-position: center 13px;
+                color: transparent;
+                float: left;
+                width: 81px;
 
-                &.amara-logo {
-                    background-position: center 13px;
-                    color: transparent;
-                    float: left;
-                    width: 81px;
-
-                    &:active {
-                        background-position: center 14px;
-                    }
-                }
-                &.amara-share-button {
-                    background-position: 13px -236px;
-                    float: right;
-                    width: 38px;
-
-                    &:active {
-                        background-position: 13px -235px;
-                    }
-                }
-                &:hover {
-                    @include opacity(1);
+                &:active {
+                    background-position: center 14px;
                 }
             }
-            ul.amara-displays {
-                border-left: 1px solid #2B2C2D;
+            &.amara-share-button {
+                background-position: 13px -236px;
+                float: right;
+                width: 38px;
+
+                &:active {
+                    background-position: 13px -235px;
+                }
+            }
+            &:hover {
+                @include opacity(1);
+            }
+        }
+        ul.amara-displays {
+            border-left: 1px solid #2B2C2D;
+            display: inline-block;
+            height: 36px;
+            margin: 0;
+            padding: 0 10px;
+
+            li {
                 display: inline-block;
+                float: left;
                 height: 36px;
+                list-style-type: none;
                 margin: 0;
-                padding: 0 10px;
 
-                li {
-                    display: inline-block;
-                    float: left;
-                    height: 36px;
-                    list-style-type: none;
-                    margin: 0;
+                a {
+                    width: 28px;
 
-                    a {
-                        width: 28px;
+                    &.amara-transcript-button {
+                        background-position: 7px -37px;
 
-                        &.amara-transcript-button {
-                            background-position: 7px -37px;
-
-                            &:active {
-                                background-position: 7px -36px;
-                            }
+                        &:active {
+                            background-position: 7px -36px;
                         }
-                        &.amara-subtitles-button {
-                            background-position: 6px -86px;
+                    }
+                    &.amara-subtitles-button {
+                        background-position: 6px -86px;
 
-                            &:active {
-                                background-position: 6px -85px;
-                            }
+                        &:active {
+                            background-position: 6px -85px;
                         }
                     }
                 }
             }
         }
-        div.amara-transcript {
-            border: 1px solid #DADBDC;
-            display: none;
-            font: normal 12px Tahoma;
-            margin: 0 2px;
+    }
+    div.amara-transcript {
+        border: 1px solid #DADBDC;
+        display: none;
+        font: normal 12px Tahoma;
+        margin: 0 2px;
 
-            div.amara-transcript-header {
-                border-bottom: 1px solid #DADBDC;
-                color: #9A9B9C;
-                @include vertical-gradient(#E1E1E1, #FFF);
+        div.amara-transcript-header {
+            border-bottom: 1px solid #DADBDC;
+            color: #9A9B9C;
+            @include vertical-gradient(#E1E1E1, #FFF);
 
-                div.amara-transcript-header-left {
-                    float: left;
-                    padding: 12px;
+            div.amara-transcript-header-left {
+                float: left;
+                padding: 12px;
 
-                    span {
-                        font-weight: bold;
-                    }
+                span {
+                    font-weight: bold;
                 }
-                div.amara-transcript-header-right {
-                    float: right;
+            }
+            div.amara-transcript-header-right {
+                float: right;
 
-                    form {
-                        margin: 0;
+                form {
+                    margin: 0;
 
-                        input {
-                            background: transparent;
-                            border: 0;
-                            border-left: 1px solid #DADBDC;
-                            font: normal 12px Tahoma;
-                            padding: 12px;
-                        }
+                    input {
+                        background: transparent;
+                        border: 0;
+                        border-left: 1px solid #DADBDC;
+                        font: normal 12px Tahoma;
+                        padding: 12px;
                     }
                 }
             }
-            div.amara-transcript-body {
-                padding: 40px 0 40px 155px;
+        }
+        div.amara-transcript-body {
+            margin: 40px 10px 40px 0;
+            max-height: 300px;
+            overflow: auto;
+
+            &::-webkit-scrollbar {
+                background: #F7F7F7;
+                height: 10px;
+                width: 10px;
+                -webkit-appearance: none;
+                border-radius: 6px;
+            }
+            &::-webkit-scrollbar-thumb {
+                border: 1px solid white;
+                border-radius: 8px;
+                background-color: #C7C7C7;
+            }
+            a.amara-transcript-line {
+                border-top: 1px solid transparent;
+                border-bottom: 1px solid transparent;
+                color: #666;
+                display: block;
+                line-height: 28px;
+
+                span.amara-transcript-line-left {
+                    color: #A5A6A6;
+                    display: block;
+                    float: left;
+                    font-size: 10px;
+                    text-align: right;
+                    min-width: 6em;
+                    padding: 0 40px 0 40px;
+                    width: 18%;
+                }
+                span.amara-transcript-line-right {
+                    display: block;
+                    float: left;
+                    padding-right: 30px;
+                    width: 82%;
+                }
+                &:hover {
+                    background: #F6F6F6;
+                }
+                &.current-subtitle {
+                    background: #FFF9E3;
+                    border-top: 1px solid #F9F8F6;
+                    border-bottom: 1px solid #F8F4E6;
+                }
             }
         }
     }

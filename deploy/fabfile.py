@@ -202,7 +202,7 @@ def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
     env.hosts = []
     env.hostnames_squid_cache = hostnames_squid_cache
     env.s3_bucket = s3_bucket
-    env.deploy_lock = '/tmp/.unisubs_deploy_dev'.format(git_branch)
+    env.deploy_lock = '/tmp/.unisubs_deploy_{0}'.format(git_branch)
     env.web_dir = web_dir or '/var/www/{0}'.format(installation_dir)
     env.static_dir = static_dir
     env.app_group = app_group or 'pcf-web'

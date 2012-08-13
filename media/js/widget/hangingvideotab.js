@@ -114,6 +114,11 @@ unisubs.widget.HangingVideoTab.prototype.stopLoading = function() {
 unisubs.widget.HangingVideoTab.prototype.showContent = function(
     hasSubtitles, opt_playSubState) 
 {
+
+    if (!hasSubtitles && window['VIDEO_TEAM_NAME'] !== '' && window['VIDEO_TEAM_WORKFLOW_ENABLED'] === true) {
+        this.show(false);
+    }
+
     this.imageElem_.src = this.logoURL_;
     var text;
     if (opt_playSubState)

@@ -132,10 +132,10 @@ unisubs.subtitle.Dialog.prototype.enterDocument = function() {
     }
 
 };
-unisubs.subtitle.Dialog.prototype.setExtraClass_ = function() {
+unisubs.subtitle.Dialog.prototype.setExtraClass_ = function(extraClass) {
     var extraClasses = goog.array.map(
         ['transcribe', 'sync', 'review', 'finished'],
-        function(suffix) { return 'unisubs-modal-widget-' + suffix; });
+        function(suffix) { return 'unisubs-modal-widget-' + suffix + (extraClass || ''); });
     var currentClass = "";
     var s = unisubs.subtitle.Dialog.State_;
     if (this.state_ == s.TRANSCRIBE)
@@ -321,17 +321,7 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
                 alert('You must create captions in order to submit.');
                 return false;
         } else {
-
-            var halt = false;
-
-            // If there are captions, make sure each captions has timing data.
-            goog.array.forEach(this.captionSet_.captions_, function(c) {
-                if (c.getStartTime() === -1 || c.getEndTime() === -1) {
-                    halt = true;
-                }
-            });
-
-            if (halt === true) {
+            if (this.captionSet_.needsSync()) {
                 alert('You have unsynced captions. You must sync all captions before you can submit.');
                 return false;
             }

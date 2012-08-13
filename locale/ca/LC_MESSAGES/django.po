@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-24 01:42-0500\n"
-"PO-Revision-Date: 2012-07-20 06:51+0000\n"
+"POT-Creation-Date: 2012-08-13 01:44-0500\n"
+"PO-Revision-Date: 2012-08-11 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/ca/)\n"
@@ -145,46 +145,6 @@ msgstr "Confirmeu la vostra adreça de correu, sisplau."
 msgid "You car reply only comments for same object"
 msgstr "Només podeu respondre als comentaris del mateix objecte"
 
-#: apps/icanhaz/forms.py:23
-msgid "Only me"
-msgstr "Només jo"
-
-#: apps/icanhaz/forms.py:44
-msgid "This user cannot change those settings"
-msgstr "Aquest usuari no pot canviar aquesta configuració"
-
-#: apps/icanhaz/models.py:191
-msgid "Public"
-msgstr "Públic"
-
-#: apps/icanhaz/models.py:192
-msgid "Only with secret url"
-msgstr "Només amb URL secreta"
-
-#: apps/icanhaz/models.py:193
-msgid "Only authorized members"
-msgstr "Només membres autoritzats"
-
-#: apps/icanhaz/models.py:208
-msgid "public"
-msgstr "públic"
-
-#: apps/icanhaz/models.py:209
-msgid "no embeding allowed"
-msgstr "No està permès la incrustació"
-
-#: apps/icanhaz/views.py:26
-msgid "You cannot change visibility for this video."
-msgstr "No podeu canviar la visibilitat d'aquest vídeo."
-
-#: apps/icanhaz/views.py:43
-msgid "Settings saved!"
-msgstr "Configuració desada!"
-
-#: apps/icanhaz/views.py:51
-msgid "Please correct the errors bellow!"
-msgstr "Sisplau corregiu els errors de sota!"
-
 #: apps/messages/forms.py:40
 msgid "You should be authenticated to write messages"
 msgstr "Hauríeu d'estar autenticats per a escriure missatges"
@@ -247,55 +207,55 @@ msgstr "%(user)s vol adherir-se a l'equip %(team)s"
 msgid "Your application to join the %s team has been declined"
 msgstr "La vostra sol·licitud d'adhesió a  l'equip %s ha estat rebutjada"
 
-#: apps/messages/tasks.py:217
+#: apps/messages/tasks.py:216
 #, python-format
 msgid "%s team has a new member"
 msgstr "L'equip %s té un nou membre"
 
-#: apps/messages/tasks.py:241
+#: apps/messages/tasks.py:240
 #, python-format
 msgid "You've joined the %s team!"
 msgstr "Heu ingressat a l'equip %s !"
 
-#: apps/messages/tasks.py:266
+#: apps/messages/tasks.py:265
 #, python-format
 msgid "%(user)s has left the %(team)s team"
 msgstr "%(user)s ha deixat l'equip %(team)s"
 
-#: apps/messages/tasks.py:291
+#: apps/messages/tasks.py:290
 #, python-format
 msgid "You've left the %s team!"
 msgstr "Heu deixat l'equip %s!"
 
-#: apps/messages/tasks.py:327
+#: apps/messages/tasks.py:326
 msgid "Your videos were imported!"
 msgstr "S'han importat els teus vídeos!"
 
-#: apps/messages/tasks.py:354
+#: apps/messages/tasks.py:353
 msgid "You have a new task assignment on Amara!"
 msgstr "Teniu una nova tasca assignada a Amara!"
 
-#: apps/messages/tasks.py:395
+#: apps/messages/tasks.py:394
 msgid "Your subtitles have been reviewed"
 msgstr "Els vostres subtítols han estat revisats"
 
-#: apps/messages/tasks.py:397
+#: apps/messages/tasks.py:396
 msgid " and published"
 msgstr "i publicats"
 
-#: apps/messages/tasks.py:498
+#: apps/messages/tasks.py:497
 msgid "Your subtitles have been approved and published!"
 msgstr "Els vostres subtítols han estat aprovats i publicats!"
 
-#: apps/messages/tasks.py:504
+#: apps/messages/tasks.py:503
 msgid "Your subtitles have been returned for further editing"
 msgstr "Els vostres subtítols han estat retornats per a una edició posterior"
 
-#: apps/messages/tasks.py:559
+#: apps/messages/tasks.py:558
 msgid "Your subtitles were not accepted"
 msgstr "Els vostres subtítols no han estat acceptats"
 
-#: apps/messages/tasks.py:603
+#: apps/messages/tasks.py:602
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr "%(user)s ha deixat un comentari al vídeo %(title)s"
@@ -440,32 +400,32 @@ msgstr "Estadístiques de visualització de vídeo"
 msgid "Widget view statistic"
 msgstr "Estadístiques de visites del giny"
 
-#: apps/teams/admin.py:57
+#: apps/teams/admin.py:59
 #, python-format
 msgid "%(count)s messages sent"
 msgstr "%(count)s missatges enviats"
 
-#: apps/teams/admin.py:59
+#: apps/teams/admin.py:61
 msgid "Fill all fields please."
 msgstr "Ompliu tots els camps sisplau."
 
-#: apps/teams/admin.py:60
+#: apps/teams/admin.py:62
 msgid "Send message"
 msgstr "Enviar missatge"
 
-#: apps/teams/admin.py:64
+#: apps/teams/admin.py:66
 msgid "Feature teams"
 msgstr "Destacar equips"
 
-#: apps/teams/admin.py:68
+#: apps/teams/admin.py:70
 msgid "Unfeature teams"
 msgstr "Deixar de destacar equips"
 
-#: apps/teams/admin.py:78 apps/teams/admin.py:111 apps/teams/models.py:182
+#: apps/teams/admin.py:80 apps/teams/admin.py:113 apps/teams/models.py:185
 msgid "Team"
 msgstr "Equip"
 
-#: apps/teams/admin.py:84
+#: apps/teams/admin.py:86
 msgid "User"
 msgstr "Usuari"
 
@@ -508,7 +468,7 @@ msgstr "Aquest vídeo ja pertany a un equip."
 msgid "Set original language for this video."
 msgstr "Establir l'idioma original d'aquest vídeo."
 
-#: apps/teams/forms.py:275
+#: apps/teams/forms.py:276
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
@@ -516,7 +476,7 @@ msgid ""
 msgstr ""
 "S'ha afegit %(count)s vídeos. Trigarà mes o menys un minut en aparèixer."
 
-#: apps/teams/forms.py:278
+#: apps/teams/forms.py:279
 #, python-format
 msgid ""
 "%(count)s videos have been added. It will take a minute or so for them to "
@@ -527,11 +487,11 @@ msgstr ""
 "Per a afegir els vídeos restants d'aquest fil, envieu-lo una altra volta i "
 "assegureu-vos d'activar l'opció \"Desar fil\" "
 
-#: apps/teams/forms.py:295
+#: apps/teams/forms.py:296
 msgid "Team intro video URL"
 msgstr "URL del vídeo d'introducció de l'Equip"
 
-#: apps/teams/forms.py:297
+#: apps/teams/forms.py:298
 msgid ""
 "You can put an optional video\n"
 "on your team homepage that explains what your team is about, to attract "
@@ -543,114 +503,118 @@ msgstr ""
 "Introduïu un enllaç a qualssevol vídeo compatible o pàgina de vídeo al "
 "vostre lloc web."
 
-#: apps/teams/forms.py:302
+#: apps/teams/forms.py:303
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr "URL d'equip: http://universalsubtitles.org/teams/"
 
-#: apps/teams/forms.py:347
+#: apps/teams/forms.py:348
 msgid "This video has already been transcribed."
 msgstr "Aquest vídeo ja ha estat transcrit."
 
-#: apps/teams/forms.py:352
+#: apps/teams/forms.py:353
 msgid "Subtitling of this video is already in progress."
 msgstr "El subtitulat d'aquest vídeo ja està fent-se."
 
-#: apps/teams/forms.py:358
+#: apps/teams/forms.py:359
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr "Ningú ha transcrit aquest vídeo encara, per tant no pot ser traduït."
 
-#: apps/teams/forms.py:364
+#: apps/teams/forms.py:365
 msgid "This language already has a complete set of subtitles."
 msgstr "Aquest idioma ja conté un conjunt de subtítols complet."
 
-#: apps/teams/forms.py:384
+#: apps/teams/forms.py:385
 msgid "There is already a task in progress for that video/language."
 msgstr "Hi ha una tasca executant-se per a aquest vídeo/llengua."
 
-#: apps/teams/forms.py:398
+#: apps/teams/forms.py:399
 msgid "You must select a language for a Translate task."
 msgstr "Heu de seleccionar un idioma per a una tasca de traducció."
 
-#: apps/teams/forms.py:433
+#: apps/teams/forms.py:434
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr "Aquest usuari ja li ha estat assignat el màxim nombre de tasques."
 
-#: apps/teams/forms.py:455
+#: apps/teams/forms.py:456
 msgid "You do not have permission to assign this task."
 msgstr "No teniu permisos per a assignar aquesta tasca."
 
-#: apps/teams/forms.py:462
+#: apps/teams/forms.py:463
 msgid "This user cannot perform that task."
 msgstr "Aquest usuari no pot realitzar aquesta tasca."
 
-#: apps/teams/forms.py:483
+#: apps/teams/forms.py:484
 msgid "You do not have permission to delete this task."
 msgstr "No teniu permís per a eliminar aquesta tasca."
 
-#: apps/teams/forms.py:540
+#: apps/teams/forms.py:541
 msgid "You cannot blacklist a preferred language."
 msgstr "No podeu afegir a la llista negra un idioma preferit."
 
-#: apps/teams/forms.py:563 apps/teams/forms.py:565
+#: apps/teams/forms.py:564 apps/teams/forms.py:566
 msgid "User does not exist!"
 msgstr "L'usuari no existeix!"
 
-#: apps/teams/forms.py:572
+#: apps/teams/forms.py:573
 msgid "User is already a member of this team!"
 msgstr "L'usuari ja és membre d'aquest equip!"
 
-#: apps/teams/forms.py:599 templates/videos/subtitle-view.html:375
+#: apps/teams/forms.py:578
+msgid "User has already been invited and has not replied yet."
+msgstr "L'usuari ja ha estat convidat i encarà no ha contestat."
+
+#: apps/teams/forms.py:602 templates/videos/subtitle-view.html:375
 msgid "Would you like to delete these subtitles completely?"
 msgstr "Voleu eliminar aquests subtítols completament?"
 
-#: apps/teams/forms.py:603 templates/videos/subtitle-view.html:360
+#: apps/teams/forms.py:606 templates/videos/subtitle-view.html:360
 msgid "What would you like to unpublish?"
 msgstr "Que desitges deixar de publicar?"
 
-#: apps/teams/forms.py:605
+#: apps/teams/forms.py:608
 msgid "This version (and any later version) for this language."
 msgstr "Aquesta versió (i qualssevol versió posterior) d'aquest idioma."
 
-#: apps/teams/forms.py:606
+#: apps/teams/forms.py:609
 msgid "All versions for this language and any dependent languages."
 msgstr "Totes les versions d'aquest idioma i qualssevol idioma depenent."
 
-#: apps/teams/forms.py:624
+#: apps/teams/forms.py:627
 msgid "These subtitles are not under a team's control."
 msgstr "Aquests subtítols no estan solta el control de l'equip."
 
-#: apps/teams/forms.py:628
+#: apps/teams/forms.py:631
 msgid "You do not have permission to unpublish these subtitles."
 msgstr "No teniu permisos per a deixar de publicar aquests subtítols."
 
-#: apps/teams/forms.py:647
+#: apps/teams/forms.py:650
 msgid "You cannot perform that task."
 msgstr "No podeu realitzar eixa tasca."
 
-#: apps/teams/forms.py:659 apps/videos/forms.py:461
+#: apps/teams/forms.py:662 apps/videos/forms.py:193
 msgid "Invalid language to translate from."
 msgstr "Idioma per a traduir incorrecte."
 
-#: apps/teams/forms.py:668 apps/videos/forms.py:71 apps/videos/forms.py:89
-#: apps/videos/forms.py:470
+#: apps/teams/forms.py:671 apps/videos/forms.py:70 apps/videos/forms.py:88
+#: apps/videos/forms.py:202
 msgid "File size should be less {0} kb"
 msgstr "La grandària del fitxer a de ser menor de {0} kb"
 
-#: apps/teams/forms.py:673 apps/videos/forms.py:475
+#: apps/teams/forms.py:676 apps/videos/forms.py:207
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr "Format incorrecte. Pujat %s"
 
-#: apps/teams/forms.py:680 apps/videos/forms.py:76 apps/videos/forms.py:97
-#: apps/videos/forms.py:482
+#: apps/teams/forms.py:683 apps/videos/forms.py:75 apps/videos/forms.py:96
+#: apps/videos/forms.py:214
 msgid "Can not detect file encoding"
 msgstr "No es pot detectar la codificació de fitxers"
 
-#: apps/teams/forms.py:685 apps/videos/forms.py:99 apps/videos/forms.py:487
+#: apps/teams/forms.py:688 apps/videos/forms.py:98 apps/videos/forms.py:219
 msgid "Incorrect subtitles format"
 msgstr "Subtítols amb format incorrecte"
 
-#: apps/teams/forms.py:758 apps/videos/forms.py:577
+#: apps/teams/forms.py:761 apps/videos/forms.py:309
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
@@ -658,7 +622,7 @@ msgstr ""
 "Ho lamentem, no podem pujar el vostre fitxer perquè té menys línies ({0}) "
 "que la versió anterior ({1})."
 
-#: apps/teams/forms.py:764 apps/videos/forms.py:584
+#: apps/teams/forms.py:767 apps/videos/forms.py:316
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -666,138 +630,138 @@ msgstr ""
 "Ho lamentem, no podem pujar el vostre fitxer perquè el nombre de línies a la "
 "vostra traducció ({0}) no coincideix amb l'original ({1})."
 
-#: apps/teams/models.py:91
+#: apps/teams/models.py:92
 msgid "Open"
 msgstr "Obrir"
 
-#: apps/teams/models.py:92 libs/rosetta/templates/rosetta/languages.html:28
+#: apps/teams/models.py:93 libs/rosetta/templates/rosetta/languages.html:28
 msgid "Application"
 msgstr "Petició"
 
-#: apps/teams/models.py:93
+#: apps/teams/models.py:94
 msgid "Invitation by any team member"
 msgstr "Invitació per qualssevol membre"
 
-#: apps/teams/models.py:94
+#: apps/teams/models.py:95
 msgid "Invitation by manager"
 msgstr "Invitació pel gestor"
 
-#: apps/teams/models.py:95
+#: apps/teams/models.py:96
 msgid "Invitation by admin"
 msgstr "Invitació per admin"
 
-#: apps/teams/models.py:102
+#: apps/teams/models.py:103
 msgid "Any team member"
 msgstr "Qualssevol membre de l'equip"
 
-#: apps/teams/models.py:103
+#: apps/teams/models.py:104
 msgid "Managers and admins"
 msgstr "Gestors i administradors"
 
-#: apps/teams/models.py:104
+#: apps/teams/models.py:105
 msgid "Admins only"
 msgstr "Només Administradors"
 
-#: apps/teams/models.py:124
+#: apps/teams/models.py:125 apps/teams/models.py:2416
 msgid "name"
 msgstr "nom"
 
-#: apps/teams/models.py:125
+#: apps/teams/models.py:126 apps/teams/models.py:2417
 msgid "slug"
 msgstr "eslògan"
 
-#: apps/teams/models.py:126
+#: apps/teams/models.py:127
 msgid "description"
 msgstr "descripció"
 
-#: apps/teams/models.py:126
+#: apps/teams/models.py:127
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
 msgstr ""
 "Totes les urls seran convertides a enllaços. Salts de línia i HTML no estan "
 "suportats."
 
-#: apps/teams/models.py:128
+#: apps/teams/models.py:129
 msgid "logo"
 msgstr "logotip"
 
-#: apps/teams/models.py:129
+#: apps/teams/models.py:130
 msgid "publicly Visible?"
 msgstr "Visible per als públics?"
 
-#: apps/teams/models.py:130 templates/search/search.html:151
+#: apps/teams/models.py:131 templates/search/search.html:151
 #: templates/teams/project_list.html:10
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
 msgstr "vídeos"
 
-#: apps/teams/models.py:131
+#: apps/teams/models.py:132
 msgid "users"
 msgstr "usuaris"
 
-#: apps/teams/models.py:134
+#: apps/teams/models.py:135
 msgid "third party accounts"
 msgstr "comptes de tercers"
 
-#: apps/teams/models.py:137
+#: apps/teams/models.py:138
 msgid "applicants"
 msgstr "peticions"
 
-#: apps/teams/models.py:140
+#: apps/teams/models.py:141
 msgid "Intro Video"
 msgstr "Vídeo introductori"
 
-#: apps/teams/models.py:142
+#: apps/teams/models.py:143
 msgid "Page content"
 msgstr "Contingut de la pàgina"
 
-#: apps/teams/models.py:142
+#: apps/teams/models.py:143
 msgid "You can use markdown. This will replace Description."
 msgstr "Podeu utilitzar reduccions. Açò reemplaçarà la descripció."
 
-#: apps/teams/models.py:144
+#: apps/teams/models.py:145
 msgid "HTML that appears at the top of the teams page."
 msgstr "HTML que apareix a la part superior de la pàgina d'equips."
 
-#: apps/teams/models.py:147
+#: apps/teams/models.py:148
 msgid "authentication provider code"
 msgstr "codi d'autenticació de proveïdor"
 
-#: apps/teams/models.py:155
+#: apps/teams/models.py:156
 msgid "membership policy"
 msgstr "política d'afiliació"
 
-#: apps/teams/models.py:158
+#: apps/teams/models.py:159
 msgid "video policy"
 msgstr "política de vídeo"
 
-#: apps/teams/models.py:161
+#: apps/teams/models.py:162
 msgid "task assignment policy"
 msgstr "tasca de política d'assignació"
 
-#: apps/teams/models.py:164
+#: apps/teams/models.py:165
 msgid "subtitling policy"
 msgstr "política de subtitolat"
 
-#: apps/teams/models.py:167
+#: apps/teams/models.py:168
 msgid "translation policy"
 msgstr "política de traducció"
 
-#: apps/teams/models.py:170
+#: apps/teams/models.py:171
 msgid "maximum tasks per member"
 msgstr "tasques màximes per membre"
 
-#: apps/teams/models.py:172
+#: apps/teams/models.py:173
 msgid "task expiration (days)"
 msgstr "expiració de la tasca (dies)"
 
-#: apps/teams/models.py:183 templates/profiles/_top_user_panel.html:32
+#: apps/teams/models.py:186 templates/profiles/_top_user_panel.html:32
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "Equips"
 
-#: apps/teams/models.py:626
+#: apps/teams/models.py:629
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -806,15 +770,15 @@ msgstr ""
 "necessita etiquetar o subtitular aquest vídeo. Afegiu una nota que faça més "
 "probable que els voluntaris vulguen cooperar!"
 
-#: apps/teams/models.py:630
+#: apps/teams/models.py:633
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr "Prendrem miniatures de certs llocs com Youtube de manera automàtica"
 
-#: apps/teams/models.py:632
+#: apps/teams/models.py:635
 msgid "Need help with all languages"
 msgstr "Necessiteu ajuda amb tots els idiomes?"
 
-#: apps/teams/models.py:633
+#: apps/teams/models.py:636
 msgid "If you check this, other languages will not be displayed."
 msgstr "Si marqueu açò, no seran mostrats els altres idiomes."
 
@@ -835,7 +799,7 @@ msgstr "Admin"
 msgid "Contributor"
 msgstr "Contribuidor"
 
-#: apps/teams/notifications.py:150
+#: apps/teams/notifications.py:171
 msgid "New activity on your team video"
 msgstr "Nova activitat al vostre equip de vídeo"
 
@@ -847,7 +811,7 @@ msgstr "L'equip no existeix"
 msgid "You are already a member of this team."
 msgstr "Ja sou membre d'aquest equip."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:858
+#: apps/teams/rpc.py:50 apps/teams/views.py:887
 msgid "You are now a member of this team."
 msgstr "Ara sou membres d'aquest equip."
 
@@ -855,7 +819,19 @@ msgstr "Ara sou membres d'aquest equip."
 msgid "The \"About you\" field is required in order to apply."
 msgstr "El camp \"Quant a tu\" és obligatori per continuar."
 
-#: apps/teams/rpc.py:62
+#: apps/teams/rpc.py:56
+msgid "You have already applied to this team."
+msgstr ""
+
+#: apps/teams/rpc.py:58
+msgid "You have been removed from this team."
+msgstr ""
+
+#: apps/teams/rpc.py:60
+msgid "Your application has been denied."
+msgstr ""
+
+#: apps/teams/rpc.py:67
 msgid ""
 "Your application has been submitted. You will be notified of the team "
 "administrator's response"
@@ -863,58 +839,58 @@ msgstr ""
 "La vostra sol·licitud ha estat enviada. Sereu notificats mitjançant una "
 "resposta de l'administrador de l'equip"
 
-#: apps/teams/rpc.py:65
+#: apps/teams/rpc.py:70
 msgid "You can't join this team by application."
 msgstr "No podeu unir-vos a aquest equip per l'aplicació."
 
-#: apps/teams/rpc.py:71
+#: apps/teams/rpc.py:76
 msgid "Team does not exist."
 msgstr "L'equip no existeix."
 
-#: apps/teams/rpc.py:74
+#: apps/teams/rpc.py:79
 msgid "You are not manager of this team."
 msgstr "No sou gestor d'aquest equip."
 
-#: apps/teams/rpc.py:77
+#: apps/teams/rpc.py:82
 msgid "Incorrect team member role."
 msgstr "Rol del membre de l'equip incorrecte."
 
-#: apps/teams/rpc.py:82
+#: apps/teams/rpc.py:87
 msgid "Team member does not exist."
 msgstr "El membre de l'equip no existeix."
 
-#: apps/teams/rpc.py:85
+#: apps/teams/rpc.py:90
 msgid "You can't promote yourself."
 msgstr "No podeu promoure-us."
 
-#: apps/teams/rpc.py:89
+#: apps/teams/rpc.py:94
 msgid "Team member role changed."
 msgstr "S'ha canviat el rol del membre a l'equip."
 
-#: apps/teams/rpc.py:163
+#: apps/teams/rpc.py:168
 msgid "You cannot assign that role to that member."
 msgstr "No podeu assignar aquest rol a aquest membre."
 
-#: apps/teams/tasks.py:76
+#: apps/teams/tasks.py:96
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Nou %(team)s vídeos preparats  per a subtitular!"
 
-#: apps/teams/views.py:121 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:130 templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "Nom"
 
-#: apps/teams/views.py:122 templates/teams/teams-list.html:47
+#: apps/teams/views.py:131 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "El més nou"
 
-#: apps/teams/views.py:123 templates/teams/teams-list.html:44
+#: apps/teams/views.py:132 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "La majoria dels membres"
 
-#: apps/teams/views.py:166
+#: apps/teams/views.py:175
 #, python-format
 msgid ""
 "\n"
@@ -946,178 +922,186 @@ msgstr ""
 "d'etiquetes i traductors</a></li>\n"
 "</ul>"
 
-#: apps/teams/views.py:192
+#: apps/teams/views.py:201
 msgid "You do not have permission to delete this team."
 msgstr "No teniu permís per a eliminat aquest equip."
 
-#: apps/teams/views.py:206 apps/teams/views.py:242 apps/teams/views.py:270
-#: apps/teams/views.py:303 apps/teams/views.py:358 apps/teams/views.py:1533
+#: apps/teams/views.py:215 apps/teams/views.py:257 apps/teams/views.py:285
+#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1552
 msgid "You do not have permission to edit this team."
 msgstr "No teniu permís per a modificar aquest equip."
 
-#: apps/teams/views.py:229 apps/teams/views.py:288 apps/teams/views.py:373
+#: apps/teams/views.py:244 apps/teams/views.py:304 apps/teams/views.py:389
 msgid "Settings saved."
 msgstr "Configuració desada."
 
-#: apps/teams/views.py:255
+#: apps/teams/views.py:270
 msgid "Guidelines and messages updated."
 msgstr "Directrius i missatges actualitzats."
 
-#: apps/teams/views.py:499
+#: apps/teams/views.py:515
 msgid "You can't add that video to this team/project."
 msgstr "No podeu afegir aquest vídeo a aquest equip/projecte."
 
-#: apps/teams/views.py:534
+#: apps/teams/views.py:552
 msgid "The video has been moved to the new team."
 msgstr "El vídeo ha estat mogut al nou equip."
 
-#: apps/teams/views.py:547
+#: apps/teams/views.py:565
 msgid "You can't add videos to this team/project."
 msgstr "No podeu afegir vídeos a aquest equip/projecte."
 
-#: apps/teams/views.py:566
+#: apps/teams/views.py:584
 msgid "You can't edit this video."
 msgstr "No podeu editar aquest vídeo."
 
-#: apps/teams/views.py:575
+#: apps/teams/views.py:593
 msgid "Video has been updated."
 msgstr "El vídeo ha estat actualitzat."
 
-#: apps/teams/views.py:603
+#: apps/teams/views.py:621
 msgid "Request must be a POST request."
 msgstr "La petició ha de ser una petició POST."
 
-#: apps/teams/views.py:611
+#: apps/teams/views.py:629
 msgid "You can't delete that video."
 msgstr "No podeu eliminar aquest vídeo."
 
-#: apps/teams/views.py:615
+#: apps/teams/views.py:633
 msgid "You can't remove that video."
 msgstr "No podeu eliminar aquest vídeo."
 
-#: apps/teams/views.py:627
+#: apps/teams/views.py:645
 msgid "Video has been deleted from Amara."
 msgstr "El vídeo ha estat eliminat d'Amara."
 
-#: apps/teams/views.py:630
+#: apps/teams/views.py:648
 msgid "Video has been removed from the team."
 msgstr "El vídeo ha estat eliminat de l'equip."
 
-#: apps/teams/views.py:749
+#: apps/teams/views.py:769
 msgid "Member has been removed from the team."
 msgstr "El membre ha estat esborrat de l'equip."
 
-#: apps/teams/views.py:752
+#: apps/teams/views.py:772
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 "Utilitzeu el botó \"Deixar aquest equip\" per a deixar de ser membre "
 "d'aquest equip."
 
-#: apps/teams/views.py:755
+#: apps/teams/views.py:775
 msgid "You don't have permission to remove this member from the team."
 msgstr "No teniu permís per a esborrar aquest membre de l'equip."
 
-#: apps/teams/views.py:786
+#: apps/teams/views.py:808
 msgid "Application approved."
 msgstr "Petició aprovada."
 
-#: apps/teams/views.py:788 apps/teams/views.py:806
+#: apps/teams/views.py:810 apps/teams/views.py:830
 msgid "Application does not exist."
 msgstr "La petició no existeix."
 
-#: apps/teams/views.py:790
+#: apps/teams/views.py:812 apps/teams/views.py:832
+msgid "Application already processed."
+msgstr ""
+
+#: apps/teams/views.py:814
 msgid "You can't approve applications."
 msgstr "No podeu aprovar peticions."
 
-#: apps/teams/views.py:804
+#: apps/teams/views.py:828
 msgid "Application denied."
 msgstr "petició denegada."
 
-#: apps/teams/views.py:808
+#: apps/teams/views.py:834
 msgid "You can't deny applications."
 msgstr "No podeu denegar peticions."
 
-#: apps/teams/views.py:818
+#: apps/teams/views.py:844
 msgid "You cannot invite people to this team."
 msgstr "No podeu convidar a gent a aquest equip."
 
-#: apps/teams/views.py:854
+#: apps/teams/views.py:874
+msgid "This invite is no longer valid"
+msgstr "Aquesta invitació ja no és vàlida"
+
+#: apps/teams/views.py:883
 msgid "You cannot join this team."
 msgstr "No podeu unir-vos a aquest equip."
 
-#: apps/teams/views.py:905
+#: apps/teams/views.py:937
 msgid "You have left this team."
 msgstr "Heu deixat aquest equip."
 
-#: apps/teams/views.py:962
+#: apps/teams/views.py:993
 msgid "Member saved."
 msgstr "Membre desat."
 
-#: apps/teams/views.py:1118
+#: apps/teams/views.py:1130
 msgid "You cannot view this team's tasks."
 msgstr "No podeu vorer les tasques d'aquest equip."
 
-#: apps/teams/views.py:1261 apps/teams/views.py:1264
+#: apps/teams/views.py:1271 apps/teams/views.py:1274
 msgid "You are not allowed to perform this task."
 msgstr "No se us permet realitzar aquesta tasca."
 
-#: apps/teams/views.py:1319
+#: apps/teams/views.py:1329
 msgid "Task deleted."
 msgstr "Tasca eliminada."
 
-#: apps/teams/views.py:1321
+#: apps/teams/views.py:1331
 msgid "You cannot delete this task."
 msgstr "No podeu eliminar aquesta tasca."
 
-#: apps/teams/views.py:1346
+#: apps/teams/views.py:1356
 msgid "Task declined."
 msgstr "Tasca rebutjada."
 
-#: apps/teams/views.py:1348
+#: apps/teams/views.py:1358
 msgid "Task assigned."
 msgstr "Tasca assignada."
 
-#: apps/teams/views.py:1350
+#: apps/teams/views.py:1360
 msgid "You cannot assign this task."
 msgstr "No podeu assignar aquesta tasca."
 
-#: apps/teams/views.py:1372
+#: apps/teams/views.py:1382
 msgid "Invalid assignment attempt."
 msgstr "Intent d'assignació no vàlid."
 
-#: apps/teams/views.py:1388
+#: apps/teams/views.py:1407
 msgid "Draft uploaded successfully."
 msgstr "Esborrany pujat correctament."
 
-#: apps/teams/views.py:1392
+#: apps/teams/views.py:1411
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1410
+#: apps/teams/views.py:1429
 msgid "You are not allowed to download this transcript."
 msgstr "No teniu permís per a baixar aquesta transcripció."
 
-#: apps/teams/views.py:1460
+#: apps/teams/views.py:1479
 msgid "There's already a project with this name"
 msgstr "Ja existeix un projecte amb aquest nom"
 
-#: apps/teams/views.py:1472
+#: apps/teams/views.py:1491
 msgid "Project added."
 msgstr "Projecte afegit."
 
-#: apps/teams/views.py:1489
+#: apps/teams/views.py:1508
 msgid "You cannot edit that project."
 msgstr "No podeu modificar aquest projecte."
 
-#: apps/teams/views.py:1500
+#: apps/teams/views.py:1519
 msgid "Project deleted."
 msgstr "Projecte eliminat."
 
-#: apps/teams/views.py:1518
+#: apps/teams/views.py:1537
 msgid "Project saved."
 msgstr "Projecte desat."
 
-#: apps/teams/views.py:1644
+#: apps/teams/views.py:1663
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
@@ -1125,36 +1109,32 @@ msgstr ""
 "Petició per a deixar de publicar no vàlid.\n"
 "Errors:\n"
 
-#: apps/teams/views.py:1678
+#: apps/teams/views.py:1697
 msgid "Successfully unpublished subtitles."
 msgstr "S'ha deixat de publicar els subtítols amb èxit."
 
-#: apps/teams/templatetags/teams_tags.py:258
+#: apps/teams/templatetags/teams_tags.py:260
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Pot algú ajudar-me subtitulant aquest vídeo? %(url)s"
 
-#: apps/videos/admin.py:32
-msgid "Email for alert"
-msgstr "Correu electrònic d'alertes"
-
-#: apps/videos/forms.py:67
+#: apps/videos/forms.py:66
 msgid "File should have txt format"
 msgstr "El fitxer hauria de ser un txt"
 
-#: apps/videos/forms.py:80
+#: apps/videos/forms.py:79
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "No es pot codificar el fitxer. Hauria de estar codificat amb UTF-8."
 
-#: apps/videos/forms.py:92
+#: apps/videos/forms.py:91
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "Format incorrecte. Pugeu .srt, .ssa, .sbv or .xml (format  TTML)"
 
-#: apps/videos/forms.py:125 apps/videos/forms.py:828 utils/validators.py:38
+#: apps/videos/forms.py:124 apps/videos/forms.py:560 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Aquest enllaç sembla estar trencat."
 
-#: apps/videos/forms.py:131 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:130 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1166,16 +1146,15 @@ msgstr ""
 "Si voleu afegir suport per a un nou lloc o format, o si penseu que ha estat "
 "un error,<a href=\"mailto:%s\">contacteu amb nosaltres</a>!"
 
-#: apps/videos/forms.py:142
+#: apps/videos/forms.py:141
 msgid "You have not permission add video URL for this video"
 msgstr "No teniu permís per afegir URL de vídeo per a aquest vídeo"
 
-#: apps/videos/forms.py:174 apps/videos/forms.py:451
+#: apps/videos/forms.py:183
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Algú està subtitulant aquest vídeo ara. Proveu-ho més tard"
 
-#: apps/videos/forms.py:189 apps/videos/forms.py:215 apps/videos/forms.py:511
-#: apps/videos/forms.py:547
+#: apps/videos/forms.py:243 apps/videos/forms.py:279
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
@@ -1183,7 +1162,17 @@ msgstr ""
 "Ho lamentem, no podem carregar els vostres subtítols perquè ja n'hi ha un "
 "treball en marxa en aquest idioma."
 
-#: apps/videos/forms.py:198 apps/videos/forms.py:530
+#: apps/videos/forms.py:248
+msgid "The language already exists and already has a version"
+msgstr "L'idioma ja existeix i ja té una versió"
+
+#: apps/videos/forms.py:253
+#, python-format
+msgid ""
+"The language already exists and you can't change its translation from %s"
+msgstr "L'idioma ja existeix i no pot canviar-se la seva traducció des del %s"
+
+#: apps/videos/forms.py:262
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
@@ -1191,7 +1180,7 @@ msgstr ""
 "Ho lamentem, no podem pujar els subtítols per a aquest idioma perquè podria "
 "malmetre les traduccions ja fetes."
 
-#: apps/videos/forms.py:227 apps/videos/forms.py:559
+#: apps/videos/forms.py:291
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
@@ -1199,8 +1188,7 @@ msgstr ""
 "Ho lamentem, no podem carregar els vostres subtítols perquè s'està moderant "
 "un esborrany per a aquest idioma."
 
-#: apps/videos/forms.py:233 apps/videos/forms.py:236 apps/videos/forms.py:565
-#: apps/videos/forms.py:568
+#: apps/videos/forms.py:297 apps/videos/forms.py:300
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have sufficient permission."
@@ -1208,17 +1196,7 @@ msgstr ""
 "Ho lamentem, no podem carregar els vostres subtítols perquè aquest idioma "
 "està moderat i no teniu els permisos necessaris."
 
-#: apps/videos/forms.py:516
-msgid "The language already exists and already has a version"
-msgstr "L'idioma ja existeix i ja té una versió"
-
-#: apps/videos/forms.py:521
-#, python-format
-msgid ""
-"The language already exists and you can't change its translation from %s"
-msgstr "L'idioma ja existeix i no pot canviar-se la seva traducció des del %s"
-
-#: apps/videos/forms.py:813
+#: apps/videos/forms.py:545
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1228,7 +1206,7 @@ msgstr ""
 "Sis plau, proveu de nou amb un enllaç a una pàgina de vídeo.\n"
 "<a href=\"mailto:%s\">Contacteu</a> si teniu problemes."
 
-#: apps/videos/forms.py:816 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:548 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1243,32 +1221,32 @@ msgstr ""
 "per exemple: http://mysite.com/myvideo.ogg o http://mysite.com/myipadvideo."
 "m4v <a href=\"mailto:%s\">Contacteu amb nosaltres</a> si hi ha cap problema."
 
-#: apps/videos/forms.py:844
+#: apps/videos/forms.py:576
 msgid "Youtube usernames"
 msgstr "Nom d'usuari de Youtube"
 
-#: apps/videos/forms.py:844
+#: apps/videos/forms.py:576
 msgid "Enter usernames separated by comma."
 msgstr "Introduïu els noms d'usuari separats per comes."
 
-#: apps/videos/forms.py:845
+#: apps/videos/forms.py:577
 msgid "Youtube page link."
 msgstr "Enllaç de la pàgina de Youtube."
 
-#: apps/videos/forms.py:846
+#: apps/videos/forms.py:578
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Per exemple: http://www.youtube.com/user/nom_usuari"
 
-#: apps/videos/forms.py:847
+#: apps/videos/forms.py:579
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 "Permet: Youtube, Vimeo, o Dailymotion. Només s'afegeix llocs suportats."
 
-#: apps/videos/forms.py:848
+#: apps/videos/forms.py:580
 msgid "Save feed"
 msgstr "Desar fil"
 
-#: apps/videos/forms.py:848
+#: apps/videos/forms.py:580
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
@@ -1276,7 +1254,7 @@ msgstr ""
 "Elegiu aquest si desitgeu afegir vídeos des d'aquesta font en un futur. "
 "Només les fonts RSS vàlides seran desades. "
 
-#: apps/videos/forms.py:891
+#: apps/videos/forms.py:623
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
@@ -1284,7 +1262,7 @@ msgstr ""
 "Ho lamentem, no hem trobat una font vàlida a la URL que heu donat. Sisplau, "
 "comproveu l'adreça i proveu-ho de nou."
 
-#: apps/videos/forms.py:896
+#: apps/videos/forms.py:628
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
@@ -1292,7 +1270,7 @@ msgstr ""
 "Els vídeos s'han afegit en segon pla. Si heu iniciat sessió, rebreu un "
 "missatge quan tot sigui a punt"
 
-#: apps/videos/forms.py:907
+#: apps/videos/forms.py:639
 msgid "captcha"
 msgstr "codi de la imatge"
 
@@ -1632,7 +1610,7 @@ msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr ""
 "S'ha trobat una versió d'aquest vídeo amb subtítols en %(language_name)s"
 
-#: apps/videos/views.py:161
+#: apps/videos/views.py:159
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1643,7 +1621,7 @@ msgstr ""
 "el vídeo amb els amics, o aconseguir el codi incrustable per al vostre web.\n"
 "Per a afegir o millorar els subtítols, premeu el botó a sota el vídeo."
 
-#: apps/videos/views.py:169
+#: apps/videos/views.py:167
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
@@ -1652,34 +1630,34 @@ msgstr ""
 "Heu enviat un vídeo que s'oferix mitjançant http. El vostre navegador pot "
 "mostrar alertes de contingut mixt."
 
-#: apps/videos/views.py:174
+#: apps/videos/views.py:172
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Els subtítols que ja existeixen seran importats en pocs minuts."
 
-#: apps/videos/views.py:283
+#: apps/videos/views.py:280
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr ""
 "Gràcies per pujar. Trigarà uns minuts fins que apareguen els subtítols."
 
-#: apps/videos/views.py:285
+#: apps/videos/views.py:282
 msgid "Your changes have been saved."
 msgstr "Els vostres canvis han estat desats."
 
-#: apps/videos/views.py:636
+#: apps/videos/views.py:622
 msgid "You have not permission change this URL"
 msgstr "No teniu permís per a canviar aquest URL"
 
-#: apps/videos/views.py:642 apps/videos/views.py:662
+#: apps/videos/views.py:628 apps/videos/views.py:648
 msgid "Object does not exist"
 msgstr "No existeix l'objecte"
 
-#: apps/videos/views.py:655
+#: apps/videos/views.py:641
 msgid "You have not permission delete this URL"
 msgstr "No teniu permís per a eliminar aquest URL"
 
-#: apps/videos/views.py:658
+#: apps/videos/views.py:644
 msgid "You cann't remove original URL"
 msgstr "No podeu eliminar la URL original"
 
@@ -1687,7 +1665,7 @@ msgstr "No podeu eliminar la URL original"
 msgid "Feed is unavailable now."
 msgstr "El fil no està disponible ara."
 
-#: apps/videos/templatetags/subtitles_tags.py:59
+#: apps/videos/templatetags/subtitles_tags.py:57
 #, python-format
 msgid "%(count)s Line"
 msgid_plural "%(count)s Lines"
@@ -1716,11 +1694,11 @@ msgstr "Vídeo privat"
 msgid "Undefined error"
 msgstr "Error no definit"
 
-#: apps/widget/rpc.py:109
+#: apps/widget/rpc.py:107
 msgid "Video embedding disabled by owner"
 msgstr "Incrustació de vídeo deshabilitada pel propietari"
 
-#: apps/widget/rpc.py:263
+#: apps/widget/rpc.py:296
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
@@ -1729,15 +1707,15 @@ msgstr ""
 "Aquests subtítols estan moderats. Informeu-vos a la pàgina de l'equip %s per "
 "a saber com contribuir."
 
-#: apps/widget/rpc.py:265
+#: apps/widget/rpc.py:298
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Ho lamentem, aquests subtítols són moderats de manera privada."
 
-#: apps/widget/rpc.py:949 apps/widget/rpc.py:990
+#: apps/widget/rpc.py:995 apps/widget/rpc.py:1036
 msgid "\n"
 msgstr "\n"
 
-#: apps/widget/views.py:107
+#: apps/widget/views.py:106
 msgid "That task has already been completed."
 msgstr "Aquesta tasca ja s'ha completat"
 
@@ -1748,7 +1726,6 @@ msgstr "Selecció de idioma"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
-#: templates/livesettings/site_settings.html:51
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:4
 #: templates/registration/password_reset_done.html:4
@@ -1769,7 +1746,7 @@ msgid "Third party"
 msgstr "Tercers"
 
 #: libs/rosetta/templates/rosetta/languages.html:15
-#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:57
+#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:58
 msgid "All"
 msgstr "Tots"
 
@@ -1778,7 +1755,7 @@ msgid "Progress"
 msgstr "Progrés"
 
 #: libs/rosetta/templates/rosetta/languages.html:30
-#: templates/messages/new.html:14 templates/messages/sent.html:23
+#: templates/messages/new.html:14 templates/messages/sent.html:24
 #: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:19
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
@@ -1882,7 +1859,7 @@ msgid "Go"
 msgstr "Vés"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:162 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:199 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:69
 msgid "Original"
 msgstr "Original"
@@ -2894,20 +2871,20 @@ msgstr ""
 "traducció:"
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
-#: templates/teams/_context_project.html:75
-#: templates/teams/_context_team.html:108
+#: templates/teams/_context_project.html:62
+#: templates/teams/_context_team.html:95
 msgid "Post to Facebook"
 msgstr "Publica'l al Facebook"
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
-#: templates/teams/_context_project.html:76
-#: templates/teams/_context_team.html:109
+#: templates/teams/_context_project.html:63
+#: templates/teams/_context_team.html:96
 msgid "Post to Twitter"
 msgstr "Publica'l al Twitter"
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
-#: templates/teams/_context_project.html:77
-#: templates/teams/_context_team.html:110
+#: templates/teams/_context_project.html:64
+#: templates/teams/_context_team.html:97
 msgid "Email to friends"
 msgstr "Compartiu-ho per correu electrònic"
 
@@ -2919,8 +2896,8 @@ msgstr "Incrustar codi "
 msgid "Permalink"
 msgstr "Enllaç permanent"
 
-#: templates/_sharing_widget.html:3 templates/teams/_context_project.html:73
-#: templates/teams/_context_team.html:106
+#: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
+#: templates/teams/_context_team.html:93
 msgid "Share"
 msgstr "Compartir"
 
@@ -3167,6 +3144,10 @@ msgstr "Rosetta"
 #: templates/base.html:127
 msgid "Impersonate"
 msgstr "Imitar"
+
+#: templates/base.html:130 templates/teams/billing/choose.html:11
+msgid "Billing"
+msgstr "Facturació"
 
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
@@ -4757,6 +4738,18 @@ msgstr ""
 "PS. Respondrem a totes les preguntes el millor possible, però sisplau sigueu "
 "pacients -- rebem un fum de correus"
 
+#: templates/generic-error.html:7
+msgid "Sorry!"
+msgstr "Disculpeu!"
+
+#: templates/generic-error.html:8
+msgid "If you need assistance, please visit our support site at "
+msgstr "Si us cal ajuda, sis plau visiteu el nostre lloc de suport a"
+
+#: templates/generic-error.html:8
+msgid "Get help"
+msgstr "Obtingueu ajuda "
+
 #: templates/index.html:18
 msgid "The easiest way to caption and translate any video."
 msgstr "La manera més fàcil per a etiquetar i traduir qualssevol vídeo."
@@ -4845,55 +4838,51 @@ msgid ""
 "The largest, most powerful captioning and translation platform in the world."
 msgstr "La més gran, i potent plataforma d'etiquetatge i traducció del món."
 
-#: templates/index.html:86 templates/index.html.py:88
-msgid "TED Team"
-msgstr "Equip TED"
+#: templates/index.html:84
+msgid "TED"
+msgstr "TED"
 
-#: templates/index.html:94 templates/index.html.py:95
-msgid "Mozilla Team"
-msgstr "L'equip Mozilla"
+#: templates/index.html:89
+msgid "Mozilla"
+msgstr "Mozilla"
 
-#: templates/index.html:100 templates/index.html.py:101
-msgid "Khan Integration"
-msgstr "Integració Khan"
+#: templates/index.html:94
+msgid "Netflix"
+msgstr "Netflix"
 
-#: templates/index.html:106 templates/index.html.py:107
-msgid "Drupal Example"
-msgstr "Exemple Drupal"
+#: templates/index.html:99
+msgid "Khan Academy"
+msgstr "Acadèmia Khan"
 
-#: templates/index.html:113 templates/index.html.py:114
-msgid "Al Jazeera Team"
-msgstr "Equip Al Jazeera"
+#: templates/index.html:104
+msgid "Coursera"
+msgstr "Coursera"
 
-#: templates/index.html:120
-msgid "Newshour Team"
-msgstr "Equip Newshour"
+#: templates/index.html:109
+msgid "PBS Newshour"
+msgstr "PBS Newshour"
 
-#: templates/index.html:121
-msgid "NewsHour Team"
-msgstr "Actualitat de l'equip"
-
-#: templates/index.html:127
+#: templates/index.html:115
 msgid "More Popular"
 msgstr "Més popular"
 
-#: templates/index.html:128
+#: templates/index.html:116
 msgid "Most Popular Today"
 msgstr "Més popular avui"
 
-#: templates/index.html:130
+#: templates/index.html:118
 msgid "Top this month"
 msgstr "Top d'aquest més"
 
-#: templates/index.html:131
+#: templates/index.html:119
 msgid "Top all-time"
 msgstr "Top des de sempre"
 
-#: templates/index.html:138
+#: templates/index.html:126
 msgid "More Featured"
 msgstr "Més destacat"
 
-#: templates/index.html:139 templates/videos/featured_videos.html:36
+#: templates/index.html:127 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
 msgstr "Vídeos destacats"
@@ -5360,10 +5349,6 @@ msgstr "Amara"
 msgid "View site"
 msgstr "Visita el lloc"
 
-#: templates/admin/base_site.html:13
-msgid "Edit settings"
-msgstr "Editar la configuració"
-
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
 msgstr "Enviar"
@@ -5377,14 +5362,14 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Esteu segurs de voler eliminar definitivament el vostre perfil?"
 
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:51 templates/teams/tasks.html:381
+#: templates/messages/sent.html:56 templates/teams/tasks.html:419
 msgid "Delete"
 msgstr "Esborrar"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:435 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:473 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:389
 msgid "Cancel"
 msgstr "Cancel·lar"
@@ -5423,7 +5408,7 @@ msgid "Sign in as a different user"
 msgstr "Identificar-se com un usuari diferent"
 
 #: templates/comments/_item.html:3 templates/messages/list.html:70
-#: templates/messages/sent.html:48 templates/videos/_action_tpl.html:9
+#: templates/messages/sent.html:53 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
 #: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:107
 #: templates/videos/diffing.html.py:172
@@ -5544,54 +5529,6 @@ msgstr "Avalueu el nostre giny de subtitulat"
 msgid "Try the Demo"
 msgstr "Proveu la Demo"
 
-#: templates/livesettings/site_settings.html:48
-msgid "Documentation"
-msgstr "Documentació"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Change password"
-msgstr "Canviar contrasenya"
-
-#: templates/livesettings/site_settings.html:48
-msgid "Log out"
-msgstr "Sortir"
-
-#: templates/livesettings/site_settings.html:52
-msgid "Edit Site Settings"
-msgstr "Editar configuració del lloc"
-
-#: templates/livesettings/site_settings.html:59
-msgid "Livesettings are disabled for this site."
-msgstr "Les configuracions en línia estan deshabilitades per aquest lloc."
-
-#: templates/livesettings/site_settings.html:60
-msgid "All configuration options must be edited in the site settings.py file"
-msgstr ""
-"Totes les opcions de configuració han de ser editades al fitxer settings.py"
-
-#: templates/livesettings/site_settings.html:66
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Sisplau, corregiu el error de sota."
-msgstr[1] "Sisplau, corregiu els errors de sota."
-
-#: templates/livesettings/site_settings.html:82
-#, python-format
-msgid "Group settings: %(name)s"
-msgstr "Grup de configuració: %(name)s"
-
-#: templates/livesettings/site_settings.html:108
-msgid "Update Settings"
-msgstr "Configuració d'Actualització"
-
-#: templates/livesettings/site_settings.html:109
-msgid "Uncollapse all"
-msgstr "Desplegar-ho tot"
-
-#: templates/livesettings/site_settings.html:113
-msgid "You don't have permission to edit values."
-msgstr "No teniu permís per a editar els valors"
-
 #: templates/messages/_messages.html:4
 #, python-format
 msgid ""
@@ -5612,7 +5549,7 @@ msgstr "Vorer tot"
 msgid "My Messages"
 msgstr "Els meus missatges"
 
-#: templates/messages/list.html:20
+#: templates/messages/list.html:20 templates/messages/sent.html:17
 msgid "Do you really wish to delete this message?"
 msgstr "Voleu de debò eliminar aquest missatge?"
 
@@ -5620,7 +5557,7 @@ msgstr "Voleu de debò eliminar aquest missatge?"
 msgid "The message has been successfully sent."
 msgstr "El missatge ha estat enviat amb èxit."
 
-#: templates/messages/list.html:38
+#: templates/messages/list.html:38 templates/messages/sent.html:31
 msgid "Compose"
 msgstr "Redactar"
 
@@ -5637,12 +5574,12 @@ msgid "You have no messages."
 msgstr "No teniu missatges."
 
 #: templates/messages/list.html:100 templates/messages/new.html:74
-#: templates/messages/sent.html:66
+#: templates/messages/sent.html:71
 msgid "Inbox"
 msgstr "Safata d'entrada"
 
 #: templates/messages/list.html:101 templates/messages/new.html:75
-#: templates/messages/sent.html:67
+#: templates/messages/sent.html:72
 msgid "Sent"
 msgstr "Enviat"
 
@@ -5658,11 +5595,11 @@ msgstr "Redactar un missatge"
 msgid "Sent Messages"
 msgstr "Missatges enviats"
 
-#: templates/messages/sent.html:42 templates/messages/sent.html.py:44
+#: templates/messages/sent.html:47 templates/messages/sent.html.py:49
 msgid "Avatar"
 msgstr "Avatar"
 
-#: templates/messages/sent.html:60
+#: templates/messages/sent.html:65
 msgid "You have no sent messages."
 msgstr "No heu enviat missatges."
 
@@ -5827,6 +5764,7 @@ msgid "What languages do you speak?"
 msgstr "Quins idiomes parleu?"
 
 #: templates/profiles/_select_language_dialog.html:29
+#: templates/teams/billing/choose.html:18
 msgid "Submit"
 msgstr "Enviar"
 
@@ -5865,18 +5803,18 @@ msgstr "Encara no hi ha subtítols."
 msgid "Open Tasks"
 msgstr "Obrir tasca"
 
-#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:58
-#: templates/teams/tasks.html.py:157
+#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:59
+#: templates/teams/tasks.html.py:194
 msgid "Transcribe"
 msgstr "Transcriure"
 
 #: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:167
+#: templates/teams/tasks.html:204
 msgid "Subtitles into"
 msgstr "Subtítols d'introducció"
 
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:172
-#: templates/teams/tasks.html.py:188 templates/videos/diffing.html:87
+#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:209
+#: templates/teams/tasks.html.py:225 templates/videos/diffing.html:87
 #: templates/videos/subtitle-view.html:149
 #: templates/videos/subtitle-view.html:196
 msgid "Subtitles"
@@ -6261,8 +6199,8 @@ msgstr "TOTAL"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
-#: templates/teams/_context_team.html:47 templates/teams/tasks.html:125
-#: templates/teams/tasks.html.py:176 templates/videos/video-view.html:144
+#: templates/teams/_context_team.html:47 templates/teams/tasks.html:126
+#: templates/teams/tasks.html.py:213 templates/videos/video-view.html:163
 msgid "Video"
 msgstr "Vídeo"
 
@@ -6402,9 +6340,9 @@ msgstr "Pàgina de vídeos"
 
 #: templates/teams/_context_project.html:17
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:131
+#: templates/teams/_context_team.html:118
 #: templates/videos/subtitle-view.html:137
-#: templates/videos/video-view.html:123
+#: templates/videos/video-view.html:128
 msgid "Show all"
 msgstr "Mostrar tot"
 
@@ -6413,28 +6351,11 @@ msgstr "Mostrar tot"
 msgid "Task"
 msgstr "Tasca"
 
-#: templates/teams/_context_project.html:56
-#: templates/teams/_context_team.html:89
-msgid "Tasks in my languages"
-msgstr "Tasques en el meu idioma"
-
-#: templates/teams/_context_project.html:60
-#: templates/teams/_context_team.html:93
-msgid ""
-"\n"
-"                        See tasks in <a href=\"#\" data-modal="
-"\"language_modal\">your languages</a>\n"
-"                    "
-msgstr ""
-"\n"
-"Vorer les tasques en <a href=\"#\" data-modal=\"language_modal\">els teus "
-"idiomes</a>"
-
-#: templates/teams/_context_project.html:94
+#: templates/teams/_context_project.html:81
 msgid "Other"
 msgstr "Altres"
 
-#: templates/teams/_context_project.html:94
+#: templates/teams/_context_project.html:81
 #: templates/teams/_context_team.html:21
 #: templates/teams/_subnav_settings.html:21
 msgid "Projects"
@@ -6446,9 +6367,9 @@ msgid "video"
 msgstr "vídeo"
 
 #: templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:127
+#: templates/teams/_context_team.html:114
 #: templates/videos/subtitle-view.html:137
-#: templates/videos/video-view.html:123
+#: templates/videos/video-view.html:128
 msgid "Show less"
 msgstr "Mostrar menys"
 
@@ -6457,10 +6378,10 @@ msgid "Member"
 msgstr "Membre"
 
 #: templates/teams/_context_team.html:83
-msgid "My tasks"
-msgstr "Les meves tasques"
+msgid "Your tasks"
+msgstr ""
 
-#: templates/teams/_context_team.html:100
+#: templates/teams/_context_team.html:87
 msgid "All available tasks"
 msgstr "Totes les tasques disponibles"
 
@@ -6490,12 +6411,12 @@ msgstr ""
 "Podeu convidar als vostres amics que parlen altres idiomes per a ajudar."
 
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:259
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:296
 msgid "Resume"
 msgstr "Resumir"
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:261
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:298
 msgid "Start now"
 msgstr "Iniciar ara"
 
@@ -6517,13 +6438,13 @@ msgstr "Vídeos"
 msgid "Members"
 msgstr "Membres"
 
-#: templates/teams/_tabs.html:16 templates/videos/video-view.html:146
+#: templates/teams/_tabs.html:16 templates/videos/video-view.html:165
 msgid "Activity"
 msgstr "Activitat"
 
 #: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
 #: templates/teams/_team_video_detail.html:48
-#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:26
+#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:27
 msgid "Tasks"
 msgstr "Tasques"
 
@@ -6627,7 +6548,11 @@ msgid_plural ""
 "                            %(counter)s tasks\n"
 "                        "
 msgstr[0] ""
+"\n"
+"1 tasca"
 msgstr[1] ""
+"\n"
+"%(counter)s tasques"
 
 #: templates/teams/_team_video_detail.html:52
 #: templates/teams/members-list.html:119
@@ -6670,7 +6595,7 @@ msgstr "Afegir diversos vídeos"
 msgid "Team Aplications"
 msgstr "Sol·licituts d'equip"
 
-#: templates/teams/applications.html:49 templates/teams/tasks.html:64
+#: templates/teams/applications.html:49 templates/teams/tasks.html:65
 msgid "Approve"
 msgstr "Aprovar"
 
@@ -6760,7 +6685,7 @@ msgstr "Quin idioma es necessita?"
 msgid "Who should do it?"
 msgstr "Que deuria fer-se?"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:439
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:477
 msgid "Begin typing to search"
 msgstr "Comenceu a escriure per a cercar"
 
@@ -6863,7 +6788,7 @@ msgstr "Rol que serà assignat a l'usuari en cas d'acceptar la teua invitació."
 msgid "Send Invites"
 msgstr "Envia invitacions"
 
-#: templates/teams/members-list.html:47 templates/teams/tasks.html:48
+#: templates/teams/members-list.html:47 templates/teams/tasks.html:49
 #: templates/teams/videos-list.html:47
 msgid "Filter and Sort"
 msgstr "Filtrar i ordenar"
@@ -6893,12 +6818,12 @@ msgstr "contribuïdor"
 msgid "speaking"
 msgstr "parlant"
 
-#: templates/teams/members-list.html:64 templates/teams/tasks.html:71
+#: templates/teams/members-list.html:64 templates/teams/tasks.html:75
 msgid "all languages"
 msgstr "tots els idiomes"
 
-#: templates/teams/members-list.html:72 templates/teams/tasks.html:119
-#: templates/teams/tasks.html.py:126 templates/teams/tasks.html:133
+#: templates/teams/members-list.html:72 templates/teams/tasks.html:120
+#: templates/teams/tasks.html.py:127 templates/teams/tasks.html:134
 #: templates/teams/videos-list.html:89
 msgid "Clear"
 msgstr "Netejar"
@@ -6936,7 +6861,7 @@ msgid "Are you sure you want to remove this member from the team?"
 msgstr "De debò voleu traure aquest membre de l'equip?"
 
 #: templates/teams/settings-guidelines.html:5
-#: templates/teams/settings-guidelines.html:44
+#: templates/teams/settings-guidelines.html:48
 msgid "Guidelines"
 msgstr "Directrius"
 
@@ -6956,32 +6881,32 @@ msgstr ""
 msgid "When a member is invited to join the team"
 msgstr "Quan un membre es convidat per a adherir-se a l'equip"
 
-#: templates/teams/settings-guidelines.html:34
+#: templates/teams/settings-guidelines.html:35
 msgid "When a member applies to join the team"
 msgstr "Quan un membre demana adherir-se a l'equip"
 
-#: templates/teams/settings-guidelines.html:37
+#: templates/teams/settings-guidelines.html:39
 msgid "When a member is given the Manager role"
 msgstr "Quan un membre obté el paper de Gestor"
 
-#: templates/teams/settings-guidelines.html:40
+#: templates/teams/settings-guidelines.html:43
 msgid "When a member is given the Admin role"
 msgstr "Quan un membre obté el paper d'administrador"
 
-#: templates/teams/settings-guidelines.html:47
+#: templates/teams/settings-guidelines.html:51
 msgid "Add guidelines to be displayed to your users when completing tasks."
 msgstr ""
 "Afegir directrius per a mostrar als vostres usuaris quan completen tasques."
 
-#: templates/teams/settings-guidelines.html:50
+#: templates/teams/settings-guidelines.html:54
 msgid "When transcribing"
 msgstr "Quan transcriguen"
 
-#: templates/teams/settings-guidelines.html:53
+#: templates/teams/settings-guidelines.html:58
 msgid "When translating"
 msgstr "Quan tradueixen"
 
-#: templates/teams/settings-guidelines.html:56
+#: templates/teams/settings-guidelines.html:62
 msgid "When reviewing"
 msgstr "Quan revisen"
 
@@ -7117,7 +7042,7 @@ msgid "manage languages"
 msgstr "configurar idiomes"
 
 #: templates/teams/settings-permissions.html:109
-#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:61
+#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:62
 msgid "Review"
 msgstr "Revisió"
 
@@ -7165,15 +7090,15 @@ msgstr "De veritat voleu eliminar aquest projecte?"
 msgid "This team does not have any projects yet"
 msgstr "Aquest equip no te cap projecte encara"
 
-#: templates/teams/tasks.html:44
+#: templates/teams/tasks.html:45
 msgid "Add Task"
 msgstr "Afegir tasca"
 
-#: templates/teams/tasks.html:59
+#: templates/teams/tasks.html:60
 msgid "Translate"
 msgstr "Traduir"
 
-#: templates/teams/tasks.html:69
+#: templates/teams/tasks.html:70
 msgid "tasks for"
 msgstr "tasques per a"
 
@@ -7181,112 +7106,150 @@ msgstr "tasques per a"
 msgid "my languages"
 msgstr "els meus idiomes"
 
-#: templates/teams/tasks.html:86
+#: templates/teams/tasks.html:87
 msgid "assigned to"
 msgstr "assignat a"
 
-#: templates/teams/tasks.html:88
-msgid "anyone"
-msgstr "qualssevol"
-
-#: templates/teams/tasks.html:89 templates/teams/tasks.html.py:223
-msgid "me"
-msgstr "jo"
-
-#: templates/teams/tasks.html:90
+#: templates/teams/tasks.html:89
 msgid "no one"
 msgstr "cap"
 
-#: templates/teams/tasks.html:99 templates/teams/videos-list.html:65
+#: templates/teams/tasks.html:90 templates/teams/tasks.html.py:260
+msgid "me"
+msgstr "jo"
+
+#: templates/teams/tasks.html:91
+msgid "anyone"
+msgstr "qualssevol"
+
+#: templates/teams/tasks.html:100 templates/teams/videos-list.html:65
 msgid "sorted by"
 msgstr "ordenat per"
 
-#: templates/teams/tasks.html:102
+#: templates/teams/tasks.html:103
 msgid "date, newest"
 msgstr "data, el més nou"
 
-#: templates/teams/tasks.html:105
+#: templates/teams/tasks.html:106
 msgid "date, oldest"
 msgstr "data, el més vell"
 
-#: templates/teams/tasks.html:109
+#: templates/teams/tasks.html:110
 msgid "time left, least"
 msgstr "temps restant, el que menys"
 
-#: templates/teams/tasks.html:112
+#: templates/teams/tasks.html:113
 msgid "time left, most"
 msgstr "temps restant, el que més"
 
-#: templates/teams/tasks.html:119 templates/teams/tasks.html.py:126
-#: templates/teams/tasks.html:133
+#: templates/teams/tasks.html:120 templates/teams/tasks.html.py:127
+#: templates/teams/tasks.html:134
 msgid "Clear all filters, sorts, and search terms"
 msgstr "Netejar tots els filtres, ordenacions, i termes de recerca"
 
-#: templates/teams/tasks.html:131
+#: templates/teams/tasks.html:132
 msgid "NOTE:"
 msgstr "OBSERVACIÓ:"
 
-#: templates/teams/tasks.html:132
+#: templates/teams/tasks.html:133
 msgid ""
 "When sorting by expiration date, tasks without an expiration are not shown."
 msgstr ""
 "Quan ordeneu per data d'expiració, no es mostraran les tasques que no "
 "expiren."
 
-#: templates/teams/tasks.html:190
+#: templates/teams/tasks.html:140
+msgid "Try broadening your selection using the filters above"
+msgstr "Proveu ampliant la vostra selecció fent ús dels filtres del damunt"
+
+#: templates/teams/tasks.html:146
+msgid "Tell us what languages you speak"
+msgstr "Digueu-nos quins idiomes parleu "
+
+#: templates/teams/tasks.html:146
+msgid "and we'll narrow this list for you"
+msgstr "i reduirem aquesta llista per tu"
+
+#: templates/teams/tasks.html:152
+msgid "Showing unassigned tasks in languages you speak. "
+msgstr ""
+
+#: templates/teams/tasks.html:154
+msgid "Want to view "
+msgstr ""
+
+#: templates/teams/tasks.html:155
+msgid "your tasks"
+msgstr ""
+
+#: templates/teams/tasks.html:156
+msgid " instead?"
+msgstr ""
+
+#: templates/teams/tasks.html:162
+msgid "Try changing your selection using the filters above to find tasks"
+msgstr ""
+"Proveu a canviar la vostra selecció fent ús dels filtres del damunt per "
+"trobar tasques"
+
+#: templates/teams/tasks.html:188
+msgid "You don't have permission to perform this task."
+msgstr "No teniu permisos per realitzar aquesta tasca."
+
+#: templates/teams/tasks.html:227
 msgid "latest draft"
 msgstr "últim esborrany"
 
-#: templates/teams/tasks.html:194
+#: templates/teams/tasks.html:231
 msgid "transcribed"
 msgstr "transcrit"
 
-#: templates/teams/tasks.html:196 templates/videos/subtitle-view.html:45
+#: templates/teams/tasks.html:233 templates/videos/subtitle-view.html:45
 msgid "translated"
 msgstr "traduït"
 
-#: templates/teams/tasks.html:204
+#: templates/teams/tasks.html:241
 msgid "reviewed"
 msgstr "revisat"
 
-#: templates/teams/tasks.html:206
+#: templates/teams/tasks.html:243
 msgid "and edited"
 msgstr "i editat"
 
-#: templates/teams/tasks.html:208 templates/videos/subtitle-view.html:204
+#: templates/teams/tasks.html:245 templates/videos/subtitle-view.html:204
 #: templates/videos/subtitle-view.html:320
 msgid "by"
 msgstr "per"
 
-#: templates/teams/tasks.html:221
+#: templates/teams/tasks.html:258
 msgid "Assigned to"
 msgstr "Assignat a"
 
-#: templates/teams/tasks.html:230
+#: templates/teams/tasks.html:267
 msgid "Unassigned"
 msgstr "No assignat"
 
-#: templates/teams/tasks.html:245
+#: templates/teams/tasks.html:282
 msgid "Perform Task"
 msgstr "Realitzar tasca"
 
-#: templates/teams/tasks.html:254
+#: templates/teams/tasks.html:291
 msgid "You have reached the maximum number of tasks."
 msgstr "Heu assolit el nombre màxim de tasques"
 
-#: templates/teams/tasks.html:273
+#: templates/teams/tasks.html:310
 msgid "Download draft"
 msgstr "Descarregar esborrany"
 
-#: templates/teams/tasks.html:287
+#: templates/teams/tasks.html:324
 msgid "Upload a draft"
 msgstr "Pujar un esborrany"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:327
 msgid "Important:"
 msgstr "Important:"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:327
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title "
@@ -7297,58 +7260,65 @@ msgstr ""
 "verificar la sincronització, el títol i la descripció del vídeo i enviar la "
 "versió final."
 
-#: templates/teams/tasks.html:293 templates/videos/_upload_subtitles.html:20
-#: templates/videos/video-view.html:101
+#: templates/teams/tasks.html:330 templates/videos/_upload_subtitles.html:20
+#: templates/videos/video-view.html:106
 msgid "Language"
 msgstr "Idioma"
 
-#: templates/teams/tasks.html:299
+#: templates/teams/tasks.html:332 templates/videos/_upload_subtitles.html:23
+msgid ""
+"Please double check the primary spoken language. This step cannot be undone."
+msgstr ""
+"Sis plau, comproveu dues vegades la llengua materna que parleu. Aquest pas "
+"no podrà modificar-se."
+
+#: templates/teams/tasks.html:337
 msgid "Translate from"
 msgstr "Traduir des del"
 
-#: templates/teams/tasks.html:304
+#: templates/teams/tasks.html:342
 msgid "File:"
 msgstr "Fitxer:"
 
-#: templates/teams/tasks.html:307
+#: templates/teams/tasks.html:345
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
 msgstr "Formats acceptats: .srt, .ssa, .sbv, .dfxp, .txt o .xml (per a TTML)"
 
-#: templates/teams/tasks.html:321
+#: templates/teams/tasks.html:359
 msgid "Download a draft"
 msgstr "Descarregar un esborrany"
 
-#: templates/teams/tasks.html:326
+#: templates/teams/tasks.html:364
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr ""
 "Descarregueu un esborrany dels subtítols amb els que voleu treballar fora de "
 "línia. "
 
-#: templates/teams/tasks.html:352
+#: templates/teams/tasks.html:390
 msgid "Decline"
 msgstr "Rebutjar"
 
-#: templates/teams/tasks.html:372
+#: templates/teams/tasks.html:410
 msgid "Reassign"
 msgstr "Reassignar"
 
-#: templates/teams/tasks.html:374
+#: templates/teams/tasks.html:412
 msgid "Assign"
 msgstr "Assignar"
 
-#: templates/teams/tasks.html:390
+#: templates/teams/tasks.html:428
 msgid "Delete task"
 msgstr "Esborrar tasca"
 
-#: templates/teams/tasks.html:396
+#: templates/teams/tasks.html:434
 msgid "What would you like to do with the subtitles for this task?"
 msgstr "Què us agradaria fer amb els subtítols en aquesta tasca?"
 
-#: templates/teams/tasks.html:399
+#: templates/teams/tasks.html:437
 msgid "Publish these subtitles immediately"
 msgstr "Publicar aquests subtítols immediatament"
 
-#: templates/teams/tasks.html:403
+#: templates/teams/tasks.html:441
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
@@ -7356,11 +7326,11 @@ msgstr ""
 "Eliminar aquest subtítols permanentment (descarta tots els esborranys des de "
 "l'última versió publicada)"
 
-#: templates/teams/tasks.html:442
+#: templates/teams/tasks.html:480
 msgid "Assign to User"
 msgstr "Assignar a l'usuari"
 
-#: templates/teams/tasks.html:452
+#: templates/teams/tasks.html:490
 msgid "Sorry, no tasks here."
 msgstr "Ho lamentem, no hi ha tasques."
 
@@ -7368,7 +7338,7 @@ msgstr "Ho lamentem, no hi ha tasques."
 msgid "Edit team video"
 msgstr "Editar vídeo d'equip"
 
-#: templates/teams/team_video.html:27 templates/videos/video-view.html:210
+#: templates/teams/team_video.html:27 templates/videos/video-view.html:236
 msgid "Edit video"
 msgstr "Edita el vídeo"
 
@@ -7602,7 +7572,7 @@ msgstr "Enviar comentari"
 #: templates/videos/_paste_transcription.html:113
 #: templates/videos/_upload_subtitles.html:5
 #: templates/videos/_video_url_panel.html:43
-#: templates/videos/video-view.html:61
+#: templates/videos/video-view.html:66
 msgid "Close"
 msgstr "Tancar"
 
@@ -7764,19 +7734,20 @@ msgid "Upload TXT file"
 msgstr "Pujar fitxer TXT"
 
 #: templates/videos/_paste_transcription.html:144
-#: templates/videos/_upload_subtitles.html:35
+#: templates/videos/_upload_subtitles.html:36
 msgid "Login to upload subtitles"
 msgstr "Inicieu sessió per a pujar subtítols"
 
-#: templates/videos/_team_list.html:5 templates/videos/video-view.html:179
+#: templates/videos/_team_list.html:5 templates/videos/video-view.html:198
+#: templates/videos/video-view.html:204
 msgid "Collaborate"
 msgstr "Col·laborar"
 
-#: templates/videos/_team_list.html:8
-msgid "Visit"
-msgstr "Visitar"
+#: templates/videos/_team_list.html:19
+msgid "View team:"
+msgstr "Vorer l'equip:"
 
-#: templates/videos/_team_list.html:8
+#: templates/videos/_team_list.html:19 templates/videos/video-view.html:205
 msgid "Translation Project"
 msgstr "Projecte de traducció"
 
@@ -7805,20 +7776,20 @@ msgstr ""
 msgid "Video Language"
 msgstr "Idioma del vídeo"
 
-#: templates/videos/_upload_subtitles.html:24
+#: templates/videos/_upload_subtitles.html:25
 msgid "Translated from"
 msgstr "Traduit des del"
 
-#: templates/videos/_upload_subtitles.html:28
+#: templates/videos/_upload_subtitles.html:29
 #, python-format
 msgid "This subtitle file is 100% complete"
 msgstr "Aquest subtítol està 100% completat"
 
-#: templates/videos/_upload_subtitles.html:30
+#: templates/videos/_upload_subtitles.html:31
 msgid "Upload"
 msgstr "Pujar"
 
-#: templates/videos/_upload_subtitles.html:44
+#: templates/videos/_upload_subtitles.html:45
 msgid ""
 "If you believe your subtitle file is compatible, <a href='mailto:"
 "feedback@universalsubtitles.org'>send it to us</a>"
@@ -8415,15 +8386,16 @@ msgstr "Seleccioneu dos revisions per a comparar-les, sisplau"
 msgid "with"
 msgstr "amb"
 
-#: templates/videos/subtitle-view.html:98 templates/videos/video-view.html:83
+#: templates/videos/subtitle-view.html:98 templates/videos/video-view.html:88
 msgid "View"
 msgstr "Vorer"
 
-#: templates/videos/subtitle-view.html:104 templates/videos/video-view.html:89
+#: templates/videos/subtitle-view.html:104 templates/videos/video-view.html:94
 msgid "Follower"
 msgstr "Seguidor"
 
-#: templates/videos/subtitle-view.html:110 templates/videos/video-view.html:95
+#: templates/videos/subtitle-view.html:110
+#: templates/videos/video-view.html:100
 msgid "Comment"
 msgstr "Comentar"
 
@@ -8432,13 +8404,13 @@ msgid "Line"
 msgstr "Línia"
 
 #: templates/videos/subtitle-view.html:126
-#: templates/videos/video-view.html:111
+#: templates/videos/video-view.html:116
 msgid "View Subtitles"
 msgstr "Vorer subtítols"
 
 #: templates/videos/subtitle-view.html:150
 #: templates/videos/subtitle-view.html:287
-#: templates/videos/video-view.html:145 templates/videos/video-view.html:190
+#: templates/videos/video-view.html:164 templates/videos/video-view.html:216
 msgid "Comments"
 msgstr "Comentaris"
 
@@ -8532,7 +8504,7 @@ msgstr ""
 "Encara no s'han afegit subtítols a aquest idioma."
 
 #: templates/videos/subtitle-view.html:285
-#: templates/videos/video-view.html:188
+#: templates/videos/video-view.html:214
 msgid "Leave a comment"
 msgstr "Deixar un comentari"
 
@@ -8643,7 +8615,7 @@ msgstr "Açò és tot!"
 msgid "Enter non-empty title"
 msgstr "Entreu un títol que no sigui buit"
 
-#: templates/videos/video-view.html:60
+#: templates/videos/video-view.html:65
 msgid ""
 "Subtitles saved! You can share the video with friends, or get an embed code "
 "for your site. To add atranslation, click the button below."
@@ -8652,39 +8624,51 @@ msgstr ""
 "per a incrustar-lo al vostre web. Per a afegir una traducció, premeu el botó "
 "de sota."
 
-#: templates/videos/video-view.html:131
+#: templates/videos/video-view.html:140
+msgid "No subtitles yet."
+msgstr "No hi ha subtítols encara."
+
+#: templates/videos/video-view.html:140
+msgid "View tasks for this video."
+msgstr "Vorer tasques per a aquest vídeo."
+
+#: templates/videos/video-view.html:142
+msgid "This video doesn't have any subtitles or tasks yet"
+msgstr "Aquest vídeo encara no conté cap subtítol o tasca."
+
+#: templates/videos/video-view.html:145 templates/videos/video-view.html:148
 msgid "Be the first to "
 msgstr "Sigueu el primer a"
 
-#: templates/videos/video-view.html:131
+#: templates/videos/video-view.html:145 templates/videos/video-view.html:148
 msgid "create subtitles"
 msgstr "crear subtítols"
 
-#: templates/videos/video-view.html:134 templates/videos/video-view.html:158
+#: templates/videos/video-view.html:153 templates/videos/video-view.html:181
 msgid "This video doesn't have any subtitles yet"
 msgstr "Aquest vídeo no te cap subtítol encara"
 
-#: templates/videos/video-view.html:147
+#: templates/videos/video-view.html:166
 msgid "URLs"
 msgstr "URLs"
 
-#: templates/videos/video-view.html:153
+#: templates/videos/video-view.html:176
 msgid "Contribute"
 msgstr "Contribuir"
 
-#: templates/videos/video-view.html:158
+#: templates/videos/video-view.html:181
 msgid "Create subtitles now"
 msgstr "Crear subtítols ara"
 
-#: templates/videos/video-view.html:162
+#: templates/videos/video-view.html:185
 msgid "Don't see the language you're looking for?"
 msgstr "No trobeu el idioma que busqueu?"
 
-#: templates/videos/video-view.html:162
+#: templates/videos/video-view.html:185
 msgid "Start a new translation"
 msgstr "Iniciar una nova traducció"
 
-#: templates/videos/video-view.html:168
+#: templates/videos/video-view.html:191
 msgid ""
 "Subtitles for this video are moderated. If it belongs to a team, try joining "
 "the team to contribute."
@@ -8692,7 +8676,11 @@ msgstr ""
 "Els subtítols d'aquest vídeo estan moderats. Si pertany a un equip, proveu a "
 "adherir-vos a l'equip per a contribuir."
 
-#: templates/videos/video-view.html:195
+#: templates/videos/video-view.html:205
+msgid "This team belongs to the"
+msgstr "Aquest equip pertany a"
+
+#: templates/videos/video-view.html:221
 msgid "View all activity"
 msgstr "Vorer tota l'activitat"
 

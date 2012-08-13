@@ -966,6 +966,9 @@ ul.unisubs-titlesList {
     padding: 0 !important;
     position: relative !important;
 }
+div.the-translate-panel ul.unisubs-titlesList {
+    height: auto !important;
+}
 ul.isRTL textarea.unisubs-translateField {
     direction: rtl;
 }
@@ -2149,6 +2152,12 @@ embed#clippy {
     min-width: 300px !important;
     padding: 12px !important;
 }
+.unisubs-modal-lang div p.notice {
+    color: #999 !important;
+    font-size: 12px !important;
+    padding-top: 0 !important;
+    margin-top: -7px !important;
+}
 .unisubs-modal-lang p div, .unisubs-modal-completed p div {
     margin-bottom: 8px !important
 }
@@ -2857,4 +2866,13 @@ div.unisubs-transcript span {
 }
 .unisubs-needs-sync .unisubs-spanarrow {
     left: 171px !important;
+}
+textarea.copy-dialog {
+    height: 100px;
+    margin: 12px;
+    width: 90%;
+}
+select.copy-dialog-select {
+    display: none;
+    margin: 12px;
 }

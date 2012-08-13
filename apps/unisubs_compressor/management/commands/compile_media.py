@@ -1,19 +1,19 @@
 # Amara, universalsubtitles.org
-# 
+#
 # Copyright (C) 2012 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import sys, os, shutil, subprocess, logging, time
@@ -40,7 +40,7 @@ def _make_version_debug_string():
     We have this as an external function because we need this on compilation and testing deployment
     """
     return '/*unisubs.static_version="%s"*/' % LAST_COMMIT_GUID
-    
+
 
 
 
@@ -69,7 +69,7 @@ NO_UNIQUE_URL = (
 # special case for it in send_to_s3
 #    {
 #        "name": "embed.js",
-#        "no-cache": True 
+#        "no-cache": True
 #    },
     {
         "name": "images/video-no-thumbnail-medium.png",
@@ -125,7 +125,7 @@ def sorted_ls(path):
 
 class Command(BaseCommand):
     """
-    
+
     """
 
 
@@ -144,7 +144,7 @@ class Command(BaseCommand):
             action='store', dest='compilation_level', default='ADVANCED_OPTIMIZATIONS',
             help="How aggressive is compilation. Possible values: ADVANCED_OPTIMIZATIONS, WHITESPACE_ONLY and SIMPLE_OPTIMIZATIONS"),
         )
-   
+
     def _append_version_for_debug(self, descriptor, file_type):
         """
         We append the /*unisubs.static_version="{{commit guid}"*/ to the end of the
@@ -155,7 +155,7 @@ class Command(BaseCommand):
         `file_type` : if it's a js or html or css file - we currently only support js and css
             """
         descriptor.write(_make_version_debug_string())
-        
+
     def compile_css_bundle(self, bundle_name, bundle_type, files):
         file_list = [os.path.join(settings.STATIC_ROOT, x) for x in files]
         for f in file_list:
@@ -166,7 +166,7 @@ class Command(BaseCommand):
             os.mkdir(dir_path)
         concatenated_path =  os.path.join(dir_path, "%s.%s" % (bundle_name, bundle_type))
         out = open(concatenated_path, 'w')
-        out.write("".join(buffer))        
+        out.write("".join(buffer))
         out.close()
         if bundle_type == "css":
             filename = "%s.css" % ( bundle_name)
@@ -175,7 +175,7 @@ class Command(BaseCommand):
             logging.info( "calling %s" % cmd_str)
         output, err_data  = call_command(cmd_str)
 
-            
+
         out = open(concatenated_path, 'w')
         out.write(output)
         self._append_version_for_debug(out, "css")
@@ -214,11 +214,11 @@ class Command(BaseCommand):
         cmd_str = "%s/closure/bin/calcdeps.py -i %s/%s %s -p %s/ -o script"  % (
             CLOSURE_LIB,
             JS_LIB,
-            closure_dep_file, 
+            closure_dep_file,
             js_debug_dep_file,
             CLOSURE_LIB)
         if self.verbosity > 1:
-            logging.info( "calling %s" % cmd_str)    
+            logging.info( "calling %s" % cmd_str)
         output,_ = call_command(cmd_str)
 
         # This is to reduce the number of warnings in the code.
@@ -245,11 +245,11 @@ class Command(BaseCommand):
                     "--define goog.NATIVE_ARRAY_PROTOTYPES=false "
                     "--output_wrapper (function(){%%output%%})(); "
                     "--compilation_level %s") % \
-                    (compiler_jar, calcdeps_js, deps, compiled_js, 
+                    (compiler_jar, calcdeps_js, deps, compiled_js,
                      debug_arg, extra_defines_arg, optimization_type)
 
         if self.verbosity > 1:
-            logging.info( "calling %s" % cmd_str)    
+            logging.info( "calling %s" % cmd_str)
         output,err = call_command(cmd_str)
 
         with open(compiled_js, 'r') as compiled_js_file:
@@ -317,7 +317,7 @@ class Command(BaseCommand):
                 shutil.copytree(original_path,
                          dest,
                          ignore=shutil.ignore_patterns(*SKIP_COPING_ON))
-                
+
     def _copy_integration_root_to_temp_dir(self):
         """
         We 'merge' whatever is on unisubs-integration/media to
@@ -354,10 +354,10 @@ class Command(BaseCommand):
             'widget/{0}'.format(file_name), context)
         with open(os.path.join(output_dir, file_name), 'w') as f:
             f.write(rendered)
-            
+
     def _compile_conf_and_embed_js(self):
         """
-        Compiles config.js, statwidgetconfig.js, and embed.js. These 
+        Compiles config.js, statwidgetconfig.js, and embed.js. These
         are used to provide build-specific info (like media url and site url)
         to compiled js.
         """
@@ -384,7 +384,7 @@ class Command(BaseCommand):
         rendered = render_to_string(
             'widget/statwidgetconfig.js', context)
         with open(file_name, 'w') as f:
-            f.write(rendered)    
+            f.write(rendered)
 
     def _compile_media_bundles(self, restrict_bundles, args):
         bundles = settings.MEDIA_BUNDLES
@@ -393,7 +393,7 @@ class Command(BaseCommand):
                 continue
             self.compile_media_bundle(
                 bundle_name, data['type'], data["files"])
-    
+
     def _remove_cache_dirs_before(self, num_to_keep):
         """
         we remove all but the last export, since the build can fail at the next step
@@ -401,8 +401,8 @@ class Command(BaseCommand):
         """
         base = os.path.dirname(get_cache_dir())
         if not os.path.exists(os.path.join(os.getcwd(), "media/static-cache")):
-            return 
-        targets = [os.path.join(base, x) for x 
+            return
+        targets = [os.path.join(base, x) for x
                    in sorted_ls("media/static-cache/")
                    if x.startswith(".") is False and x != LAST_COMMIT_GUID ][:-num_to_keep]
         [shutil.rmtree(os.path.realpath(t)) for t in targets if os.path.exists(t)]
@@ -420,7 +420,7 @@ class Command(BaseCommand):
             from_path = os.path.join(self.temp_dir, filename)
             to_path = os.path.join(cache_dir, filename)
             shutil.move(from_path,  to_path)
-                        
+
 
     def _copy_files_with_public_urls_from_cache_dir_to_static_dir(self):
         cache_dir = get_cache_dir()
@@ -449,11 +449,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """
         There are three directories involved here:
-        
+
         temp_dir: /tmp/static-[commit guid]-[time] This is the working dir
             for the compilation.
         MEDIA_ROOT: regular media root directory for django project
-        cache_dir: STATIC_ROOT/static-cache/[commit guid] where compiled 
+        cache_dir: STATIC_ROOT/static-cache/[commit guid] where compiled
             media ends up
         """
         self.temp_dir = self._create_temp_dir()
@@ -467,12 +467,12 @@ class Command(BaseCommand):
         restrict_bundles = bool(args)
 
         os.chdir(settings.PROJECT_ROOT)
-        self._copy_static_root_to_temp_dir() 
+        self._copy_static_root_to_temp_dir()
         if settings.USE_INTEGRATION:
             self._copy_integration_root_to_temp_dir()
         self._compile_conf_and_embed_js()
         self._compile_media_bundles(restrict_bundles, args)
-            
+
         if not self.keeps_previous:
             self._remove_cache_dirs_before(1)
 
@@ -494,6 +494,6 @@ class Command(BaseCommand):
             if os.path.basename(filename) not in settings.MEDIA_BUNDLES.keys():
                 continue
             to_path =  os.path.join(settings.STATIC_ROOT, filename)
-            
+
             data = open(to_path).read()
             assert(data.endswith(version_str))

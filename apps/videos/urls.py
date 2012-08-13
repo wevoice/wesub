@@ -39,7 +39,6 @@ urlpatterns = patterns(
     url(r'^upload_transcription_file/$', 'upload_transcription_file', name='upload_transcription_file'),
     url(r'^create/$', 'create', name='create'),
     url(r'^create/feed/$', 'create_from_feed', name='create_from_feed'),
-    url(r'^site_feedback/$', 'site_feedback', name='site_feedback'),
     url(r'^email_friend/$', 'email_friend', name='email_friend'),
     url(r'^demo/$', 'demo', name='demo'),
     url(r'^activities/(?P<video_id>(\w|-)+)/$', 'actions_list', name='actions_list'),

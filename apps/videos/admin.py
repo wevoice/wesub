@@ -19,17 +19,13 @@
 from django.contrib import admin
 from videos.models import (
     Video, SubtitleLanguage, SubtitleVersion, VideoFeed, VideoMetadata,
-    VideoUrl, SubtitleVersionMetadata, Action
+    VideoUrl, SubtitleVersionMetadata, Action, Subtitle
 )
 from videos.tasks import video_changed_tasks
 
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
-from utils.livesettings_values import EmailListValue
-from livesettings import BASE_GROUP, config_register
 from utils.celery_search_index import update_search_index
 
-config_register(EmailListValue(BASE_GROUP, 'alert_emails', description=_(u'Email for alert')))
 
 class VideoUrlInline(admin.StackedInline):
     model = VideoUrl
@@ -177,6 +173,7 @@ class VideoFeedAdmin(admin.ModelAdmin):
 
 #admin.site.register(Subtitle, SubtitleAdmin)
 admin.site.register(SubtitleVersion, SubtitleVersionAdmin)
+admin.site.register(Subtitle)
 admin.site.register(SubtitleVersionMetadata, SubtitleVersionMetadataAdmin)
 admin.site.register(Video, VideoAdmin)
 admin.site.register(VideoMetadata, VideoMetadataAdmin)

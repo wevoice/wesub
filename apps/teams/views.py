@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
 import random
+import csv
 
 from django.db import transaction
 from django.conf import settings
@@ -26,7 +27,10 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
+from django.http import (
+    Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse,
+    HttpResponseBadRequest, HttpResponseServerError
+)
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.utils import simplejson as json
@@ -44,11 +48,12 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm, MoveTeamVideoForm, UploadDraftForm
+    UnpublishForm, MoveTeamVideoForm, UploadDraftForm, ChooseTeamForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference
+    Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException,
+    BillingReport, ApplicationInvalidException
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -58,15 +63,18 @@ from teams.permissions import (
     can_perform_task_for, can_delete_team, can_review, can_approve,
     can_delete_video, can_remove_video
 )
+from teams.moderation_const import APPROVED
 from teams.search_indexes import TeamVideoLanguagesIndex
 from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
-    update_video_moderation, update_one_team_video
+    update_video_moderation, update_one_team_video, update_video_public_field,
+    invalidate_video_visibility_caches, process_billing_report
 )
+from apps.videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
-from utils.metrics import time as timefn
+from utils.metrics import time as timefn, Timer
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
@@ -79,6 +87,7 @@ from videos.models import Action, VideoUrl, SubtitleLanguage, Video
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
+from raven.contrib.django.models import client
 
 
 logger = logging.getLogger("teams.views")
@@ -219,12 +228,18 @@ def settings_basic(request, slug):
     if request.POST:
         form = FormClass(request.POST, request.FILES, instance=team)
 
+        is_visible = team.is_visible
+
         if form.is_valid():
             try:
                 form.save()
             except:
                 logger.exception("Error on changing team settings")
                 raise
+
+            if is_visible != form.instance.is_visible:
+                update_video_public_field.delay(team.id)
+                invalidate_video_visibility_caches.delay(team)
 
             messages.success(request, _(u'Settings saved.'))
             return HttpResponseRedirect(request.path)
@@ -252,8 +267,8 @@ def settings_guidelines(request, slug):
                 setting.data = val
                 setting.save()
 
-        messages.success(request, _(u'Guidelines and messages updated.'))
-        return HttpResponseRedirect(request.path)
+            messages.success(request, _(u'Guidelines and messages updated.'))
+            return HttpResponseRedirect(request.path)
     else:
         form = GuidelinesMessagesForm(initial=initial)
 
@@ -281,6 +296,7 @@ def settings_permissions(request, slug):
                 workflow_form.save()
 
             moderation_changed = moderated != form.instance.moderates_videos()
+
             if moderation_changed:
                 update_video_moderation.delay(team)
                 invalidate_video_moderation_caches.delay(team)
@@ -513,7 +529,9 @@ def add_video(request, slug):
         obj = form.save(False)
         obj.added_by = request.user
         obj.save()
+
         api_teamvideo_new.send(obj)
+        video_changed_tasks.delay(obj.video.pk)
         messages.success(request, form.success_message())
         return redirect(team.get_absolute_url())
 
@@ -745,6 +763,8 @@ def remove_member(request, slug, user_pk):
     if can_assign_role(team, request.user, member.role, member.user):
         user = member.user
         if not user == request.user:
+            [application.on_member_removed() for application in \
+             team.applications.filter(user=user, status=Application.STATUS_APPROVED)]
             TeamMember.objects.filter(team=team, user=user).delete()
             messages.success(request, _(u'Member has been removed from the team.'))
             return HttpResponseRedirect(return_path)
@@ -762,7 +782,9 @@ def applications(request, slug):
     if not team.is_member(request.user):
         return  HttpResponseForbidden("Not allowed")
 
-    qs = team.applications.all()
+    # default to showing only applications that need to be acted upon
+    status = int(request.GET.get('status', Application.STATUS_PENDING))
+    qs = team.applications.filter(status=status)
 
     extra_context = {
         'team': team
@@ -782,10 +804,12 @@ def approve_application(request, slug, user_pk):
 
     if can_invite(team, request.user):
         try:
-            Application.objects.get(team=team, user=user_pk).approve()
+            Application.objects.open(team=team, user=user_pk)[0].approve()
             messages.success(request, _(u'Application approved.'))
-        except Application.DoesNotExist:
+        except IndexError:
             messages.error(request, _(u'Application does not exist.'))
+        except ApplicationInvalidException:
+            messages.error(request, _(u'Application already processed.'))
     else:
         messages.error(request, _(u'You can\'t approve applications.'))
 
@@ -800,10 +824,12 @@ def deny_application(request, slug, user_pk):
 
     if can_invite(team, request.user):
         try:
-            Application.objects.get(team=team, user=user_pk).deny()
+            Application.objects.open(team=team, user=user_pk)[0].deny()
             messages.success(request, _(u'Application denied.'))
-        except Application.DoesNotExist:
+        except IndexError:
             messages.error(request, _(u'Application does not exist.'))
+        except ApplicationInvalidException:
+            messages.error(request, _(u'Application already processed.'))
     else:
         messages.error(request, _(u'You can\'t deny applications.'))
 
@@ -837,13 +863,16 @@ def invite_members(request, slug):
 @login_required
 def accept_invite(request, invite_pk, accept=True):
     invite = get_object_or_404(Invite, pk=invite_pk, user=request.user)
-
-    if accept:
-        invite.accept()
-    else:
-        invite.deny()
-
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    try:
+        if accept:
+            invite.accept()
+        else:
+            invite.deny()
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+    except InviteExpiredException:
+        return HttpResponseServerError(render_to_response("generic-error.html", {
+            "error_msg": _("This invite is no longer valid"),
+        }, RequestContext(request)))
 
 @login_required
 def join_team(request, slug):
@@ -900,10 +929,12 @@ def leave_team(request, slug):
         tm_user_pk = member.user.pk
         team_pk = member.team.pk
         member.delete()
+        [application.on_member_leave() for application in \
+         member.team.applications.filter(status=Application.STATUS_APPROVED)]
+            
         notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
-
     return redirect(request.META.get('HTTP_REFERER') or team)
 
 @permission_required('teams.change_team')
@@ -1007,28 +1038,6 @@ def _task_languages(team, user):
             })
     return lang_data
 
-def _task_category_counts(team, filters, user):
-    tasks = team.task_set.incomplete()
-
-    if filters['language']:
-        tasks = tasks.filter(language=filters['language'])
-
-    if filters['team_video']:
-        tasks = tasks.filter(team_video=int(filters['team_video']))
-
-    if filters['assignee']:
-        if filters['assignee'] == 'none':
-            tasks = tasks.filter(assignee=None)
-        else:
-            tasks = tasks.filter(assignee=user)
-
-    counts = { 'all': tasks.count() }
-
-    for type in ['Subtitle', 'Translate', 'Review', 'Approve']:
-        counts[type.lower()] = tasks.filter(type=Task.TYPE_IDS[type]).count()
-
-    return counts
-
 def _tasks_list(request, team, project, filters, user):
     '''List tasks for the given team, optionally filtered.
 
@@ -1054,10 +1063,11 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        if filters.get('language') == 'mine' and request.user.is_authenticated():
-            tasks = tasks.filter(language__in=[ul.language for ul in request.user.get_languages()])
-        else:
+        if filters['language'] != 'all':
             tasks = tasks.filter(language=filters['language'])
+    elif request.user.is_authenticated() and request.user.get_languages():
+        languages = [ul.language for ul in request.user.get_languages()] + ['']
+        tasks = tasks.filter(language__in=languages)
 
     if filters.get('q'):
         terms = get_terms(filters['q'])
@@ -1079,8 +1089,10 @@ def _tasks_list(request, team, project, filters, user):
             tasks = tasks.filter(assignee=None)
         elif assignee and assignee.isdigit():
             tasks = tasks.filter(assignee=int(assignee))
-        elif assignee:
+        elif assignee and assignee != 'anyone':
             tasks = tasks.filter(assignee=User.objects.get(username=assignee))
+    else:
+        tasks = tasks.filter(assignee=None)
 
     return tasks
 
@@ -1133,7 +1145,6 @@ def team_tasks(request, slug, project_slug=None):
 
     tasks = _order_tasks(request,
                          _tasks_list(request, team, project, filters, user))
-    category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
     # We pull out the task IDs here for performance.  It's ugly, I know.
@@ -1164,7 +1175,7 @@ def team_tasks(request, slug, project_slug=None):
             filters['assignee'] == None
         elif filters['assignee'].isdigit():
             filters['assignee'] = team.members.get(user=filters['assignee'])
-        else:
+        elif filters['assignee'] != 'anyone':
             filters['assignee'] = team.members.get(user=User.objects.get(username=filters['assignee']))
 
         filtered = filtered + 1
@@ -1195,7 +1206,6 @@ def team_tasks(request, slug, project_slug=None):
         'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
         'languages': languages,
-        'category_counts': category_counts,
         'tasks': tasks,
         'filters': filters,
         'widget_settings': widget_settings,
@@ -1378,12 +1388,21 @@ def upload_draft(request, slug):
     if request.POST:
         form = UploadDraftForm(request.user, request.POST, request.FILES)
 
-        if form.is_valid():
+        try:
+            is_valid = form.is_valid()
+        except Exception, e:
+            client.create_from_exception()
+            messages.error(u"Sorry, there was a problem while uploading your draft. Care to try again?")
+            transaction.rollback()
+            is_valid = False
+
+        if is_valid:
             try:
                 form.save()
             except Exception, e:
                 messages.error(request, unicode(e))
                 transaction.rollback()
+                client.create_from_exception()
             else:
                 messages.success(request, _(u"Draft uploaded successfully."))
                 transaction.commit()
@@ -1701,3 +1720,34 @@ def auto_captions_status(request, slug):
     response =  HttpResponse( "\n".join(buffer), content_type="text/csv")
     response['Content-Disposition'] = 'filename=team-status.csv'
     return response
+
+
+# Billing
+@staff_member_required
+def billing(request):
+    user = request.user
+
+    if not DEV and not (user.is_superuser and user.is_active):
+        raise Http404
+
+    if request.method == 'POST':
+        form = ChooseTeamForm(request.POST)
+        if form.is_valid():
+            team = form.cleaned_data.get('team')
+            start_date = form.cleaned_data.get('start_date')
+            end_date = form.cleaned_data.get('end_date')
+
+            report, created = BillingReport.objects.get_or_create(team=team,
+                    start_date=start_date, end_date=end_date)
+
+            process_billing_report.delay(report.pk)
+
+    else:
+        form = ChooseTeamForm()
+
+    reports = BillingReport.objects.all()
+
+    return render_to_response('teams/billing/choose.html', {
+        'form': form,
+        'reports': reports
+    }, RequestContext(request))

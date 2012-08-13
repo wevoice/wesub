@@ -57,10 +57,8 @@ from django.utils.http import urlquote_plus
 from videos.tasks import video_changed_tasks
 from videos.search_indexes import VideoIndex
 import datetime
-from icanhaz.models import VideoVisibilityPolicy
 from videos.decorators import get_video_revision, get_video_from_code
 from apps.teams.models import Task
-
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -214,7 +212,7 @@ def video(request, video, video_url=None, title=None):
     context['video'] = video
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
     context['translations'] = _get_translations(video)
-    context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
+    context['shows_widget_sharing'] = video.can_user_see(request.user)
 
     context['widget_params'] = _widget_params(
         request, video, language=None,
@@ -238,7 +236,6 @@ def _get_related_task(request):
     """
     task_pk = request.GET.get('t', None)
     if task_pk:
-        from teams.models import Task
         from teams.permissions import can_perform_task
         try:
             task = Task.objects.get(pk=task_pk)
@@ -323,17 +320,6 @@ def feedback(request, hide_captcha=False):
     else:
         output['errors'] = form.get_errors()
     return HttpResponse(json.dumps(output), "text/javascript")
-
-def site_feedback(request):
-    text = request.GET.get('text', '')
-    email = ''
-    if request.user.is_authenticated():
-        email = request.user.email
-    initial = dict(message=text, email=email)
-    form = FeedbackForm(initial=initial)
-    return render_to_response(
-        'videos/site_feedback.html', {'form':form},
-        context_instance=RequestContext(request))
 
 def email_friend(request):
     text = request.GET.get('text', '')
@@ -445,7 +431,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
     context['language'] = language
     context['edit_url'] = language.get_widget_url()
-    context['shows_widget_sharing'] = VideoVisibilityPolicy.objects.can_show_widget(video, request.META.get('HTTP_REFERER', ''))
+    context['shows_widget_sharing'] = video.can_user_see(request.user)
 
     context['task'] =  _get_related_task(request)
     _add_share_panel_context_for_history(context, video, language)
@@ -721,6 +707,9 @@ def video_debug(request, video_id):
     from apps.testhelpers.views import debug_video
     from apps.widget import video_cache as vc
     from django.core.cache import cache
+    from accountlinker.models import youtube_sync
+    from videos.models import VIDEO_TYPE_YOUTUBE
+
     video = get_object_or_404(Video, video_id=video_id)
     lang_info = debug_video(video)
     vid = video.video_id
@@ -737,8 +726,18 @@ def video_debug(request, video_id):
         "writelocked_langs": cache.get(vc._video_writelocked_langs_key(vid)),
     }
     tasks = Task.objects.filter(team_video=video)
+
+    is_youtube = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE).count() != 0
+
+    if request.method == 'POST' and request.POST.get('action') == 'sync':
+        # Sync video to youtube
+        sync_lang = SubtitleLanguage.objects.get(
+                pk=request.POST.get('language'))
+        youtube_sync(video, sync_lang)
+
     return render_to_response("videos/video_debug.html", {
-            'video':video,
+            'video': video,
+            'is_youtube': is_youtube,
             'lang_info': lang_info,
             'tasks': tasks,
             "cache": cache

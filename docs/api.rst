@@ -473,17 +473,17 @@ Listing video urls
 
 Video URL detail:
 
-.. http:get:: /api2/partners/users/[video-id]/urls/[url-id]/
+.. http:get:: /api2/partners/videos/[video-id]/urls/[url-id]/
 
 Where the url-id can be fetched from the list of urls.
 
 Updating video-urls:
 
-.. http:put:: /api2/partners/users/[video-id]/urls/[url-id]/
+.. http:put:: /api2/partners/videos/[video-id]/urls/[url-id]/
 
 Creating video-urls:
 
-.. http:post:: /api2/partners/users/[video-id]/urls/
+.. http:post:: /api2/partners/videos/[video-id]/urls/
 
     :form url: Any URL that works for the regular site (mp4 files, youtube, vimeo,
         etc) can be used. Note that the url cannot be in use by another video.
@@ -496,7 +496,7 @@ Creating video-urls:
 
 To delete a url:
 
-.. http:delete:: /api2/partners/users/[video-id]/urls/[url-id]/
+.. http:delete:: /api2/partners/videos/[video-id]/urls/[url-id]/
 
 If this is the only URL for a video, the request will fail. A video must have
 at least one URL.
@@ -584,9 +584,28 @@ You can list existing members of a team:
 
 .. http:get:: /api2/partners/teams/[team-slug]/members/
 
+Adding a new member to a team:
+
+.. http:post:: /api2/partners/teams/[team-slug]/members/
+
 Updating a team member (e.g. changing their role):
 
 .. http:put:: /api2/partners/teams/[team-slug]/members/[username]/
+
+Removing a user from a team:
+
+.. http:delete:: /api2/partners/teams/[team-slug]/members/[username]/
+
+Example of adding a new user:
+
+.. code-block:: json
+
+    {
+        "username": "test-user",
+        "role": "manager"
+    }
+
+.. note:: You can only add members to teams you own.
 
 Roles
 +++++
@@ -595,6 +614,25 @@ Roles
 * ``admin``
 * ``manager``
 * ``contributor``
+
+.. warning:: Changed behavior: the previous functionality was moved the Safe
+    Team Member Resource documented below.
+
+Safe Team Member Resource
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This resource behaves the same as the normal Team Member resource with one
+small difference.  When you add a user to a team, we will send an invitation to
+the user to join the team.  If the user doesn't exist, we will create it.  The
+standard Team Member resource simply adds the user to the team and returns.
+
+Listing:
+
+.. http:get:: /api2/partners/teams/[team-slug]/safe-members/
+
+Adding a new member to a team:
+
+.. http:post:: /api2/partners/teams/[team-slug]/safe-members/
 
 Project Resource
 ~~~~~~~~~~~~~~~~
@@ -660,6 +698,13 @@ List all tasks for a given team:
         * ``-priority`` Priority (descending)
         * ``type``      Task type (details below)
         * ``-type``     Task type (descending)
+
+    :query completed: Show only complete tasks
+    :query completed-before: Show only tasks completed before a given date
+        (unix timestamp)
+    :query completed-after: Show only tasks completed before a given date
+        (unix timestamp)
+    :query open: Show only incomplete tasks
 
 Task detail:
 
@@ -728,6 +773,8 @@ List activity items:
     :query video: Show only items related to a given video (video id)
     :query action_type: Show only items with a given action type (int, see below)
     :query language: Show only items with a given language (language code)
+    :query before: A unix timestamp in seconds
+    :query after: A unix timestamp in seconds
 
 Activity types:
 
@@ -779,3 +826,48 @@ The message resource allows you to send messages to user and teams.
     :form team: Team's slug
 
 You can only send the ``user`` parameter or the ``team`` parameter at once.
+
+
+
+Application resource
+~~~~~~~~~~~~~~~~~
+
+For teams with membership by application only.
+
+List application items:
+
+.. http:get:: /api2/partners/teams/[team-slug]/applications
+
+    :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'
+    :query before: A unix timestamp in seconds
+    :query after: A unix timestamp in seconds
+    :query user: The username applying for the team
+
+Application item detail:
+
+.. http:get:: /api2/partners/application/[application-id]/
+
+Example response:
+
+.. code-block:: json
+
+    {
+       "created": "2012-08-09T17:48:48",
+       "id": "12",
+       "modified": null,
+       "note": "",
+       "resource_uri": "/api2/partners/teams/test-team/applications/12/",
+       "status": "Pending",
+       "user": "youtube-anonymous"
+
+    }   
+
+To delete an Application:
+
+.. http:delete:: /api2/partners/application/[application-id]/
+
+Applications can have their statuses updated:
+
+.. http:put:: /api2/partners/application/[application-id]/
+
+    :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'

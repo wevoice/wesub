@@ -21,7 +21,7 @@
 import os, sys
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-DEFAULT_PROTOCOL  = 'https'
+DEFAULT_PROTOCOL  = 'http'
 
 def rel(*x):
     return os.path.join(PROJECT_ROOT, *x)
@@ -374,7 +374,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'djcelery',
     'haystack',
-    'livesettings',
     'rosetta',
     'raven.contrib.django',
     'sorl.thumbnail',
@@ -387,7 +386,6 @@ INSTALLED_APPS = (
     # our apps
     'accountlinker',
     'comments',
-    'icanhaz',
     'messages',
     'profiles',
     'search',
@@ -532,7 +530,6 @@ RECAPTCHA_PUBLIC = '6LdoScUSAAAAANmmrD7ALuV6Gqncu0iJk7ks7jZ0'
 RECAPTCHA_SECRET = ' 6LdoScUSAAAAALvQj3aI1dRL9mHgh85Ks2xZH1qc'
 
 ROSETTA_EXCLUDED_APPLICATIONS = (
-    'livesettings',
     'openid_consumer',
     'rosetta'
 )

@@ -34,11 +34,42 @@ goog.inherits(unisubs.finishfaildialog.CopyDialog, goog.ui.Dialog);
 unisubs.finishfaildialog.CopyDialog.prototype.createDom = function() {
     unisubs.finishfaildialog.CopyDialog.superClass_.createDom.call(this);
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    this.textarea_ = $d('textarea', {'value': this.textToCopy_});
+    this.textarea_ = $d('textarea', {'class': 'copy-dialog', 'value': this.textToCopy_});
+
+    this.switcher_ = $d('select', 'copy-dialog-select',
+            $d('option', {value: 'txt'}, 'TXT'),
+            $d('option', {value: 'srt'}, 'SRT'),
+            $d('option', {value: 'ssa'}, 'SSA'),
+            $d('option', {value: 'ttml'}, 'TTML'),
+            $d('option', {value: 'sbv'}, 'SBV'),
+            $d('option', {value: 'dfxp'}, 'DFXP')
+        );
+
+    this.getHandler().listen(
+        this.switcher_,
+        goog.events.EventType.CHANGE,
+        this.switcherChanged_);
+
     goog.dom.append(
         this.getContentElement(),
         $d('p', null, this.headerText_),
+        this.switcher_,
         this.textarea_);
+};
+
+unisubs.finishfaildialog.CopyDialog.prototype.switcherChanged_ = function(e) {
+    e.preventDefault();
+    this.fillTextarea(this.switcher_.value);
+};
+
+unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
+    var output;
+    if (format === 'txt') {
+        output = this.textToCopy_;
+    } else {
+        output = format;
+    }
+    goog.dom.forms.setValue(this.textarea_, output);
 };
 
 unisubs.finishfaildialog.CopyDialog.prototype.enterDocument = function() {
@@ -63,7 +94,7 @@ unisubs.finishfaildialog.CopyDialog.showForErrorLog = function(log) {
 
 unisubs.finishfaildialog.CopyDialog.showForSubs = function(jsonSubs) {
     var copyDialog = new unisubs.finishfaildialog.CopyDialog(
-        "Here are your subtitles. Please copy and paste them into a text file. You can email them to us at widget-logs@universalsubtitles.org.",
+        "Below are your subtitles. You may use the dropdown to change the format. Please copy and paste them into a text file. You can email them to us at widget-logs@universalsubtitles.org.",
         unisubs.finishfaildialog.CopyDialog.subsToString_(jsonSubs));
     copyDialog.setVisible(true);
 };
@@ -81,5 +112,5 @@ unisubs.finishfaildialog.CopyDialog.subsToString_ = function(jsonSubs) {
                   'session_pk: ' + (serverModel ?
                                     serverModel.getSessionPK() : 'n/a'),
                   baseString].join('\n');
-    return baseString
+    return baseString;
 };

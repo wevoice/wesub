@@ -70,6 +70,7 @@ def associate_extra_url(video_url, video_id):
 # Invalidation
 def invalidate_cache(video_id):
     cache.delete(_video_urls_key(video_id))
+
     try:
         from apps.videos.models import Video
         video = Video.objects.get(video_id=video_id)
@@ -77,8 +78,10 @@ def invalidate_cache(video_id):
             cache.delete(_subtitles_dict_key(video_id, l.pk))
     except Video.DoesNotExist:
         pass
+
     for language in settings.ALL_LANGUAGES:
         cache.delete(_subtitle_language_pk_key(video_id, language[0]))
+
     cache.delete(_subtitle_language_pk_key(video_id, None))
     cache.delete(_subtitles_dict_key(video_id, None))
     cache.delete(_subtitles_count_key(video_id))
@@ -92,6 +95,11 @@ def invalidate_cache(video_id):
         video = Video.objects.get(video_id=video_id)
         for url in video.videourl_set.all():
             cache.delete(_video_id_key(url.url))
+
+        team_video = video.get_team_video()
+
+        if team_video:
+            cache.delete(_video_completed_languages(team_video.id))
     except Video.DoesNotExist:
         pass
 
@@ -101,6 +109,8 @@ def invalidate_video_id(video_url):
 def invalidate_video_moderation(video_id):
     cache.delete(_video_is_moderated_key(video_id))
 
+def invalidate_video_visibility(video_id):
+    cache.delete(_video_visibility_policy_key(video_id))
 
 def on_video_url_save(sender, instance, **kwargs):
     if instance.video_id:
@@ -123,6 +133,9 @@ def _video_languages_key(video_id):
 
 def _video_languages_verbose_key(video_id):
     return "widget_video_languages_verbose_{0}".format(video_id)
+
+def _video_completed_languages(video_id):
+    return "video_completed_verbose_{0}".format(video_id)
 
 def _video_writelocked_langs_key(video_id):
     return "writelocked_langs_{0}".format(video_id)
@@ -207,6 +220,18 @@ def get_video_languages(video_id):
         cache.set(cache_key, return_value, TIMEOUT)
         return return_value
 
+def get_video_completed_languages(team_video_id):
+    cache_key = _video_completed_languages(team_video_id)
+    languages = cache.get(cache_key)
+
+    if not languages:
+        from videos.models import SubtitleLanguage
+        languages = [(sl.language, sl.language_display()) for sl in list(SubtitleLanguage.objects.filter(video__teamvideo__id=team_video_id).all())]
+
+        cache.set(cache_key, languages, TIMEOUT)
+
+    return languages
+
 def get_video_languages_verbose(video_id, max_items=6):
     # FIXME: we should probably merge a better method with get_video_languages
     # maybe accepting a 'verbose' param?
@@ -254,20 +279,34 @@ def get_is_moderated(video_id):
     return value
 
 def get_visibility_policies(video_id):
-    from icanhaz.models import VideoVisibilityPolicy
     cache_key = _video_visibility_policy_key(video_id)
     value = cache.get(cache_key)
+
     if value is  None:
         from videos.models import Video
+
         try:
             video = Video.objects.get(video_id=video_id)
         except Video.DoesNotExist:
             return {}
+
+        team_video = video.get_team_video()
+
+        if team_video:
+            team = team_video.team
+            is_public = team.is_visible
+            team_id = team.id
+        else:
+            is_public = True
+            team_id = None
+
         value = {
-          "site"  : VideoVisibilityPolicy.objects.site_policy_for_video(video),
-          "widget": VideoVisibilityPolicy.objects.widget_policy_for_video(video),
+            "is_public": is_public,
+            "team_id": team_id
         }
+
         cache.set(cache_key, value, TIMEOUT)
+
     return value
 
 

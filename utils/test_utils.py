@@ -24,3 +24,49 @@ def store_request_call(url, **kwargs):
     if not '/solr' in url:
         REQUEST_CALLBACKS.append([url, method, data])
     return Response(), ""
+
+class TestCaseMessagesMixin(object):
+    def _getMessagesCount(self, response, level=None):
+        messages =  response.context['messages']
+        if level:
+            actual_num = len([x for x in messages if x.level==level])
+        else:
+            actual_num = len(messages)
+
+        return actual_num
+
+    def assertMessageCount(self, response, expect_num, level=None):
+        """
+        Asserts that exactly the given number of messages have been sent.
+        """
+        actual_num = self._getMessagesCount(response, level=level)
+        if actual_num != expect_num:
+            self.fail('Message count was %d, expected %d' %
+                    (actual_num, expect_num)
+                )
+
+    def assertMessageEqual(self, response, text):
+        """
+        Asserts that the response includes the message text.
+        """
+
+        messages = [m.message for m in response.context['messages']]
+
+        if text not in messages:
+            self.fail(
+                'No message with text "%s", messages were: %s' % 
+                    (text, messages)
+                )
+
+    def assertMessageNotEqual(self, response, text):
+        """
+        Asserts that the response does not include the message text.
+        """
+
+        messages = [m.message for m in response.context['messages']]
+
+        if text in messages:
+            self.fail(
+                'Message with text "%s" found, messages were: %s' % 
+                    (text, messages)
+                )

@@ -12,9 +12,6 @@ unisubs.player.YoutubeBaseMixin.prototype.timeUpdateTick_ = function(e) {
 unisubs.player.YoutubeBaseMixin.prototype.playerStateChange_ = function(newState) {
     var s = unisubs.player.YoutubeVideoPlayer.State_;
     var et = unisubs.player.AbstractVideoPlayer.EventType;
-    if (goog.DEBUG) {
-        this.logger_.info("player new state is " + newState);
-    }
     if (newState == s.PLAYING) {
         this.dispatchEvent(et.PLAY);
         this.timeUpdateTimer_.start();
@@ -138,8 +135,5 @@ unisubs.player.YoutubeBaseMixin.prototype.getPlayerState_ = function() {
     return this.player_ ? this.player_['getPlayerState']() : -1;
 };
 unisubs.player.YoutubeBaseMixin.prototype.getVideoSize = function() {
-    if (goog.DEBUG) {
-        this.logger_.info('getVideoSize returning ' + this.playerSize_);
-    }
     return this.playerSize_;
 };

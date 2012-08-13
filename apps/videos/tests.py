@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import codecs
 import feedparser
 import json
 import os
+import re
 from datetime import datetime
 from StringIO import StringIO
 
@@ -203,12 +205,13 @@ DFXP_TEXT = u'''<?xml version="1.0" encoding="UTF-8"?>
       <p begin="00:01:01.54" end="00:01:05.10">Plus we're adding more services all the time</p>
       <p begin="00:01:05.10" end="00:01:09.04">Universal Subtitles works with many popular video formats,</p>
       <p begin="00:01:09.04" end="00:01:14.35">such as MP4, theora, webM and over HTML 5.</p>
-      <p begin="00:01:14.35" end="00:01:19.61">Our goal is for every video on the web to be subtitlable so that anyone who cares about</p>
-      <p begin="00:01:19.61" end="00:01:23.31">the video can help make it more accessible.</p>
+      <p begin="00:01:14.35" end="00:01:19.61">This should be in <span tts:fontWeight="bold">bold</span></p>
+      <p begin="00:01:19.61" end="00:01:23.31">This should be in <span tts:fontStyle="italic">italic</span></p>
     </div>
   </body>
 </tt>
 '''
+
 class GenericTest(TestCase):
     def test_languages(self):
         langs = [l[1] for l in settings.ALL_LANGUAGES]
@@ -401,24 +404,7 @@ class SubtitleParserTest(TestCase):
             result[2], 16.1, 19.9,
             u'Ils ont eu raison, non seulement \nà cause de la célébrité de Richard')
 
-    def test_dfxp_parser(self):
-        parser = DfxpSubtitleParser(DFXP_TEXT)
-        result = list(parser)
-        self.assertEqual(len(result),19 )
-        line_break_sub  = result[6]
-        line_break_text = line_break_sub['subtitle_text']
-        self.assertTrue(line_break_text.startswith("Take an "))
-        self.assertTrue(line_break_text.find("\n") > -1)
-
-    def test_dfxp_serializer(self):
-        sub = {
-            'text': 'Here we\ngo!',
-            'start':1,
-            'end':2
-        }
-        serializer = DFXPSubtitles([sub])
-        result = unicode(serializer)
-        self.assertTrue(result.find("Here we<br/>go") > -1)
+       
 
 class WebUseTest(TestCase):
     def _make_objects(self, video_id="S7HMxzLmS9gw"):
@@ -832,9 +818,6 @@ class ViewsTest(WebUseTest):
         self._login()
         vu = VideoUrl.objects.all()[:1].get()
         self._simple_test("videos:video_url_make_primary", data={'id': vu.id})
-
-    def test_site_feedback(self):
-        self._simple_test("videos:site_feedback")
 
     def test_index(self):
         self._simple_test('videos.views.index')
@@ -2550,10 +2533,12 @@ class TestSRT(WebUseTest, BaseDownloadTest):
                      'line *with* italycs',
                      'line <script> with dangerous tag',
                      'line with double gt >>',
+                     '*[inside brackets]*',
         ]
         add_subs(self.language,subs_data)
         content = self._download_subs(self.language, 'srt')
         self.assertIn('<b>with</b>' , content)
+        self.assertIn('<i>[inside brackets]</i>' , content)
         self.assertIn('<i>with</i>' , content)
         self.assertIn('double gt >>' , content)
         # don't let evildoes into our precisou home
@@ -2577,7 +2562,39 @@ class TestSRT(WebUseTest, BaseDownloadTest):
         self.assertIn(" *multiline\nitalics*", subs[1].text)
         self.assertNotIn("script", subs[2].text)
 
+class DFXPTest(WebUseTest, BaseDownloadTest):
+    def setUp(self):
+        self.auth = dict(username='admin', password='admin')
+        self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
+        self.language = SubtitleLanguage.objects.get_or_create(
+            video=self.video, is_forked=True, language='en')[0]
 
+    def test_dfxp_parser(self):
+        fixture_path = os.path.join(settings.PROJECT_ROOT, 'apps', 'videos', 'fixtures', 'sample.dfxp')
+        input_text =  codecs.open(fixture_path, 'r', encoding='utf-8').read()
+        parser = DfxpSubtitleParser(input_text)
+        result = list(parser)
+        self.assertEqual(len(result),3 )
+        line_break_sub  = result[0]
+        line_break_text = line_break_sub['subtitle_text']
+        self.assertEqual(line_break_text, "Don't worry\nbe happy\nDon't worry\nbe happy")
+        self.assertTrue(line_break_text.find("\n") > -1)
+        italic_sub = result[1]
+        italic_text = italic_sub['subtitle_text']
+        self.assertEquals(italic_text, "This should be in *italic*")
+
+        bold_sub = result[2]
+        bold_text = bold_sub['subtitle_text']
+        self.assertEquals(bold_text, "This should be in **bold**")
+
+    def test_dfxp_serializer(self):
+        add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
+        content = self._download_subs(self.language, 'dfxp')
+        self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
+        self.assertTrue(re.findall('<span style="strong">[\s]*bold[\s]*</span>', content))
+        self.assertTrue(re.findall('<span style="emphasis">[\s]*italic[\s]*</span>', content))
+        self.assertTrue(re.findall('<span style="underlined">[\s]*underline[\s]*</span>', content))
+ 
 def add_subs(language, subs_texts):
     version = language.version()
     version_no = 0

@@ -187,7 +187,6 @@ def team_application_denied(application_pk):
         msg.save()
     Meter('templated-emails-sent-by-type.teams.application-declined').inc()
     send_templated_email(msg.user, msg.subject, template_name, context)
-    application.delete()
 
 @task()
 def team_member_new(member_pk):

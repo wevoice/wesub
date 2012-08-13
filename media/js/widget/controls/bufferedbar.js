@@ -54,30 +54,32 @@ unisubs.controls.BufferedBar.prototype.hasWidth_ = function() {
 
 unisubs.controls.BufferedBar.prototype.hasDuration_ = function() {
     if (this.videoDuration_ == 0) {
-	this.videoDuration_ = this.videoPlayer_.getDuration();
-	if (this.videoDuration_ == 0)
-            return false;
+        this.videoDuration_ = this.videoPlayer_.getDuration();
+
+        if (this.videoDuration_ == 0) {
+                return false;
+        }
     }
     return true;
 };
 
 unisubs.controls.BufferedBar.prototype.onVideoProgress_ = function() {
-    if (!this.hasWidth_() || !this.hasDuration_())
+    if (!this.hasWidth_() || !this.hasDuration_()) {
         return;
-    if (this.bufferedRangeDivs_.length !=
-	this.videoPlayer_.getBufferedLength())
-    {
-	while (this.bufferedRangeDivs_.length <
-	       this.videoPlayer_.getBufferedLength())
-	{
-	    var bufferedDiv = this.getDomHelper().createDom(
-		'div', 'unisubs-buffered');
-	    this.getElement().appendChild(bufferedDiv);
-	    this.bufferedRangeDivs_.push(bufferedDiv);
-	}
-	while (this.videoPlayer_.getBufferedLength() >
-	       this.bufferedRangeDivs_.length)
-	    this.getElement().removeChild(this.bufferedRangeDivs_.pop());
+    }
+
+    if (this.bufferedRangeDivs_.length != 
+            this.videoPlayer_.getBufferedLength()) {
+        while (this.bufferedRangeDivs_.length < this.videoPlayer_.getBufferedLength()) {
+            var bufferedDiv = this.getDomHelper().createDom(
+            'div', 'unisubs-buffered');
+            this.getElement().appendChild(bufferedDiv);
+            this.bufferedRangeDivs_.push(bufferedDiv);
+        }
+
+        while (this.videoPlayer_.getBufferedLength() > this.bufferedRangeDivs_.length) {
+            this.getElement().removeChild(this.bufferedRangeDivs_.pop());
+        }
     }
     for (var i = 0; i < this.bufferedRangeDivs_.length; i++) {
         unisubs.style.setPosition(

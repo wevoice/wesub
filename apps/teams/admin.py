@@ -24,7 +24,8 @@ from django.utils.translation import ugettext_lazy as _
 from messages.forms import TeamAdminPageMessageForm
 from teams.models import (
     Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing,
-    Project, TeamLanguagePreference, TeamNotificationSetting
+    Project, TeamLanguagePreference, TeamNotificationSetting, BillingReport,
+    Partner
 )
 from videos.models import SubtitleLanguage
 
@@ -35,7 +36,8 @@ class TeamMemberInline(admin.TabularInline):
 
 class TeamAdmin(admin.ModelAdmin):
     search_fields = ('name'),
-    list_display = ('name', 'membership_policy', 'video_policy', 'is_visible', 'highlight', 'last_notification_time', 'thumbnail')
+    list_display = ('name', 'membership_policy', 'video_policy', 'is_visible',
+            'highlight', 'last_notification_time', 'thumbnail', 'partner')
     list_filter = ('highlight', 'is_visible')
     actions = ['highlight', 'unhighlight', 'send_message']
     raw_id_fields = ['video', 'users', 'videos', 'applicants']
@@ -194,6 +196,10 @@ class ProjectAdmin(admin.ModelAdmin):
     ordering = ('-created',)
 
 
+class BillingReportAdmin(admin.ModelAdmin):
+    list_display = ('team', 'start_date', 'end_date', 'processed')
+
+
 admin.site.register(TeamMember, TeamMemberAdmin)
 admin.site.register(Team, TeamAdmin)
 admin.site.register(TeamVideo, TeamVideoAdmin)
@@ -204,3 +210,5 @@ admin.site.register(MembershipNarrowing, MembershipNarrowingAdmin)
 admin.site.register(Setting, SettingAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(TeamNotificationSetting)
+admin.site.register(BillingReport, BillingReportAdmin)
+admin.site.register(Partner)
