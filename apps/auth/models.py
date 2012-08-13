@@ -84,8 +84,6 @@ class CustomUser(BaseUser):
     # for some login backends we end up with a full name but not
     # a first name, last name pair.
     full_name = models.CharField(max_length=63, blank=True, default='')
-    # which partner created this user? For now it' only a string, at
-    # some point we'll need to model partners better
     partner = models.ForeignKey('teams.Partner', blank=True, null=True)
     is_partner = models.BooleanField(default=False)
     can_send_messages = models.BooleanField(default=True)
