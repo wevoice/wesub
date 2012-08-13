@@ -1046,13 +1046,16 @@ class ApplicationManager(models.Manager):
 
     def can_apply(self, team, user):
         """
-        A user can apply either if he has no open applications on this team
-        or if he has left the team on his own will.
+        A user can apply either if he is not a member of the team yet, the
+        team hasn't said no to the user (either application denied or removed the user'
+        and if no applications are pending.
         """
-        return self.exclude(team=team, user=user, status__in=[
+        sour_application_exists =  self.filter(team=team, user=user, status__in=[
             Application.STATUS_MEMBER_REMOVED, Application.STATUS_DENIED,
-            Application.STATUS_PENDING]).exists() and \
-            not team.is_member(user)
+            Application.STATUS_PENDING]).exists()
+        if sour_application_exists:
+            return False
+        return  not team.is_member(user)
 
     def open(self, team=None, user=None):
         qs =  self.filter(status=Application.STATUS_PENDING)
