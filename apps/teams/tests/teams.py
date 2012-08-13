@@ -1357,3 +1357,15 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
         # removed user, cannot send application again
         self.assertTrue( isinstance(response, Error))
         
+
+    def test_can_apply(self):
+        # user is already a memeber, can't apply
+        self.assertFalse(Application.objects.can_apply(self.team, self.owner))
+        # if has bad application or is already a member
+        self.assertTrue(Application.objects.can_apply(self.team, self.applicant))
+        # create applications where team owners have already blocked the user or are still waiting
+        for app_status in [Application.STATUS_MEMBER_REMOVED, Application.STATUS_DENIED, Application.STATUS_PENDING]:
+            application = Application.objects.create(status=app_status, team=self.team, user=self.applicant)
+            self.assertFalse(Application.objects.can_apply(self.team, self.applicant))
+            application.delete()
+
