@@ -36,11 +36,11 @@ if INSTALLATION == DEV:
     SENTRY_TESTING = True
     SOLR_ROOT = '/usr/share/'
     BROKER_BACKEND = 'amqplib'
-    BROKER_HOST = "localhost"
-    BROKER_PORT = 5672
-    BROKER_USER = "unisub"
-    BROKER_PASSWORD = "unisub"
-    BROKER_VHOST = "unisub"
+    BROKER_HOST = getattr(server_local_settings, 'BROKER_HOST', "localhost")
+    BROKER_PORT = getattr(server_local_settings, 'BROKER_PORT', 5672)
+    BROKER_USER = getattr(server_local_settings, 'BROKER_USER', "unisub")
+    BROKER_PASSWORD = getattr(server_local_settings, 'BROKER_PASSWORD', "unisub")
+    BROKER_VHOST = getattr(server_local_settings, 'BROKER_VHOST', "unisub")
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 elif INSTALLATION == STAGING:
     SITE_ID = 14

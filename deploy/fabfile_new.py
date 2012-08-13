@@ -194,7 +194,7 @@ def _create_env(username,
                 revision,
                 ve_dir,
                 separate_uslogging_db,
-                key_filename,
+                key_filename=env.key_filename,
                 roledefs={},
                 notification_email=None):
     env.user = username
@@ -231,6 +231,31 @@ def local():
                     roledefs              = {
                         'app': ['10.10.10.115'],
                         'data': ['10.10.10.120'],
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
+
+@task
+def dev(username):
+    """
+    Configure task(s) to run in the dev environment
+
+    """
+    with Output("Configuring task(s) to run on DEV"):
+        env_name = 'dev'
+        _create_env(username              = username,
+                    name                  = env_name,
+                    s3_bucket             = None,
+                    app_name              = 'unisubs',
+                    app_dir               = '/opt/apps/{0}/unisubs/'.format(
+                        env_name),
+                    app_group             = 'deploy',
+                    revision              = env_name,
+                    ve_dir                = '/opt/ve/{0}/unisubs'.format(
+                        env_name),
+                    separate_uslogging_db = False,
+                    roledefs              = {
+                        'app': ['app-00-dev.amara.org'],
+                        'data': ['data-00-dev.amara.org'],
                     },
                     notification_email   = 'ehazlett@pculture.org',)
 
@@ -354,8 +379,14 @@ def local():
 #                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
 
 def _reset_permissions(app_dir):
-    sudo('chgrp {0} -R {1}'.format(env.app_group, app_dir))
+    sudo('chgrp -R {0} {1}'.format(env.app_group, app_dir))
     sudo('chmod -R g+w {0}'.format(app_dir))
+
+@task
+@roles('app', 'data')
+def reset_permissions():
+    _reset_permissions(env.app_dir)
+    _reset_permissions(env.ve_dir)
 
 def _git_pull():
     run('git checkout --force')
@@ -446,14 +477,14 @@ def update_environment(extra=''):
             run('export PIP_REQUIRE_VIRTUALENV=true')
             # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
             run('yes i | {0}/bin/pip install {1} -r requirements.txt'.format(env.ve_dir, extra), pty=True)
-            #_clear_permissions(os.path.join(base_dir, 'env'))
+            _reset_permissions(env.app_dir)
         with cd(env.app_dir):
             run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
 
 @task
 @parallel
 @roles('app')
-def reload_app_servers():
+def reload_app_servers(hard=False):
     with Output("Reloading application servers"):
         """
         Reloading the app server will both make sure we have a
@@ -461,9 +492,12 @@ def reload_app_servers():
         and also that we make the server reload code (currently
         with mod_wsgi this is touching the wsgi file)
         """
-        with cd(env.app_dir):
-            #run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
-            run('touch deploy/unisubs.wsgi')
+        if hard:
+            sudo('service uwsgi.unisubs.{0} restart'.format(env.environment))
+        else:
+            with cd(env.app_dir):
+                #run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
+                run('touch deploy/unisubs.wsgi')
 
 # Maintenance Mode
 @task
@@ -617,7 +651,7 @@ def deploy():
 @task
 @lock_required
 @runs_once
-@roles('data')
+@roles('app', 'data')
 def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_s3=False):
     """
     Compiles and uploads static media to S3
@@ -631,9 +665,10 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_s3=Fals
         python_exe = '{0}/bin/python'.format(env.ve_dir)
         _git_pull()
         execute(update_integration)
+        run('{0} deploy/create_commit_file.py'.format(python_exe))
         out.fastprintln('Compiling...')
         run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
-        if not skip_s3:
+        if env.name != 'dev' and not skip_s3:
             out.fastprintln('Uploading to S3...')
             run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
 
@@ -650,3 +685,20 @@ def update_django_admin_media():
         s3_bucket = 's3.{0}.amara.org/admin/'.format(env.environment)
         python_exe = '{0}/bin/python'.format(env.ve_dir)
         sudo('s3cmd -P -c /etc/s3cfg sync {0} s3://{1}'.format(media_dir, s3_bucket))
+
+@task
+@parallel
+@roles('app', 'data')
+def switch_branch(branch):
+    """
+    Switches the current branch
+
+    :param branch: Name of branch to switch
+
+    """
+    with cd(env.app_dir), settings(warn_only=True):
+        run('git fetch')
+        run('git branch --track {0} origin/{0}'.format(branch))
+        run('git checkout {0}'.format(branch))
+        _git_pull()
+
