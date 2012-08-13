@@ -109,13 +109,16 @@ def locale_url(path, locale=''):
     return ''.join([urlresolvers.get_script_prefix(), path[1:]])
 
 
-def universal_url( *args, **kwargs):
+def universal_url(*args, **kwargs):
     """
     Returns an absolute path (with protocol + domain) but without the locale set.
     This is useful for email links, for exaple, where the recipient should choose the locale,
     and therefore the url
     """
-    protocol = DEFAULT_PROTOCOL
+    if 'protocol_override' in kwargs:
+        protocol = kwargs.pop('protocol_override')
+    else:
+        protocol = DEFAULT_PROTOCOL
     try:
         original = urlresolvers.reverse(*args, **kwargs)
     except Exception :
@@ -123,4 +126,3 @@ def universal_url( *args, **kwargs):
         return
     return "%s://%s%s" % (protocol, Site.objects.get_current().domain,
                      strip_path(original)[1])
-    
