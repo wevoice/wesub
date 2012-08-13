@@ -2867,3 +2867,12 @@ div.unisubs-transcript span {
 .unisubs-needs-sync .unisubs-spanarrow {
     left: 171px !important;
 }
+textarea.copy-dialog {
+    height: 100px;
+    margin: 12px;
+    width: 90%;
+}
+select.copy-dialog-select {
+    display: none;
+    margin: 12px;
+}
