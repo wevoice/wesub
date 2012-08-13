@@ -163,10 +163,12 @@ class Rpc(BaseRpc):
             return None
 
         error = self._check_visibility_policy_for_widget(request, video_id)
+
         if error:
             return error
 
         video_urls, video_id, error = self._get_video_urls_for_widget(video_url, video_id)
+
         if error:
             return error
 
@@ -176,6 +178,7 @@ class Rpc(BaseRpc):
             'video_urls': video_urls,
             'is_moderated': video_cache.get_is_moderated(video_id),
         }
+
         if additional_video_urls is not None:
             for url in additional_video_urls:
                 video_cache.associate_extra_url(url, video_id)
@@ -253,7 +256,8 @@ class Rpc(BaseRpc):
             'original_language': original_language,
             'limit_languages': writable_langs,
             'is_moderated': video.is_moderated,
-            'blocked_languages': blocked_langs, }
+            'blocked_languages': blocked_langs
+        }
 
 
     # Fetch Video ID and Settings
@@ -261,10 +265,12 @@ class Rpc(BaseRpc):
         is_original_language_subtitled = self._subtitle_count(video_id) > 0
         general_settings = {}
         add_general_settings(request, general_settings)
+
         return {
             'video_id': video_id,
             'is_original_language_subtitled': is_original_language_subtitled,
-            'general_settings': general_settings }
+            'general_settings': general_settings 
+        }
 
 
     # Ugly hack for N caption display.

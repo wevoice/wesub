@@ -2415,6 +2415,7 @@ class BillingReport(models.Model):
 class Partner(models.Model):
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
+    can_request_paid_captions = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name

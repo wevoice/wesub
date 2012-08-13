@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-10 01:47-0500\n"
+"POT-Creation-Date: 2012-08-13 01:49-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -636,11 +636,11 @@ msgstr ""
 msgid "Admins only"
 msgstr ""
 
-#: apps/teams/models.py:125 apps/teams/models.py:2411
+#: apps/teams/models.py:125 apps/teams/models.py:2416
 msgid "name"
 msgstr ""
 
-#: apps/teams/models.py:126 apps/teams/models.py:2412
+#: apps/teams/models.py:126 apps/teams/models.py:2417
 msgid "slug"
 msgstr ""
 
@@ -766,26 +766,6 @@ msgstr ""
 
 #: apps/teams/models.py:922 apps/teams/permissions_const.py:47
 msgid "Contributor"
-msgstr ""
-
-#: apps/teams/models.py:1076
-msgid "Pending"
-msgstr ""
-
-#: apps/teams/models.py:1077 templates/teams/settings-permissions.html:82
-msgid "Approved"
-msgstr ""
-
-#: apps/teams/models.py:1078
-msgid "Denied"
-msgstr ""
-
-#: apps/teams/models.py:1079
-msgid "Member Removed"
-msgstr ""
-
-#: apps/teams/models.py:1080
-msgid "Member Left"
 msgstr ""
 
 #: apps/teams/notifications.py:171
@@ -6118,6 +6098,10 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:77
 msgid "Reviewed"
+msgstr ""
+
+#: templates/teams/settings-permissions.html:82
+msgid "Approved"
 msgstr ""
 
 #: templates/teams/settings-permissions.html:87
