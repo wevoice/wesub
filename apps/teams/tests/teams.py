@@ -1260,23 +1260,24 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
         self.assertFalse(self.team.is_member(self.applicant))
         self.assertTrue(Application.objects.filter(user=self.applicant, team=self.team, status=Application.STATUS_PENDING).exists())
         self.assertTrue(Application.objects.open(user=self.applicant, team=self.team).exists())
+        return Application.objects.order_by('-pk')[0]
 
     def _login(self, as_owner):
         username = self.owner.username if as_owner else self.applicant.username
         self.assertTrue(self.client.login(username=username, password='test'))
 
-    def _approve(self):
+    def _approve(self, application):
         self._login(True)
         #num_messages = self._getMessagesCount(level=LEVEL_SUCCESS)
-        url = reverse("teams:approve_application", args=(self.team.slug, self.applicant.pk))
+        url = reverse("teams:approve_application", args=(self.team.slug, application.pk))
         response = self.client.post(url, follow=True)
         self.assertEqual(response.redirect_chain[0][1], 302)
         self.assertEqual(response.status_code, 200)
         
-    def _deny(self):
+    def _deny(self, application):
         self._login(True)
         #num_messages = self._getMessagesCount(level=LEVEL_SUCCESS)
-        url = reverse("teams:deny_application", args=(self.team.slug, self.applicant.pk))
+        url = reverse("teams:deny_application", args=(self.team.slug, application.pk))
         response = self.client.post(url, follow=True)
         self.assertEqual(response.redirect_chain[0][1], 302)
         self.assertEqual(response.status_code, 200)
@@ -1297,9 +1298,9 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
 
     def test_user_leaves(self):
         # user applies
-        self._send_application()
+        application = self._send_application()
         # owner approves
-        self._approve()
+        self._approve(application)
         # is member!
         self.assertTrue(self.team.is_member(self.applicant))
         # cannot apply again
@@ -1317,20 +1318,20 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
         self.assertFalse(self.team.is_member(self.applicant))
         # application can join again
         self.assertTrue(teams_tags.can_apply(self.team, self.applicant))
-        self._send_application()
+        application = self._send_application()
         # application is in the inbox
         
         self.assertEquals(Application.objects.open(team=self.team).count(), 1)
         # application is approved
-        self._approve()
+        self._approve(application)
         # applicant is a team member again
         self.assertTrue(self.team.is_member(self.applicant))
         
     def test_user_removed(self):
         # user applies
-        self._send_application()
+        application = self._send_application()
         # owner approves
-        self._approve()
+        self._approve(application)
         # is member!
         self.assertTrue(self.team.is_member(self.applicant))
         # cannot apply again
@@ -1356,9 +1357,9 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
 
     def test_denied_kills_it(self):
         # user applies
-        self._send_application()
+        application = self._send_application()
         # owner approves
-        self._deny()
+        self._deny(application)
         # is member!
         self.assertFalse(self.team.is_member(self.applicant))
         # cannot apply again
@@ -1374,6 +1375,9 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
         response = self.rpc.create_application(self.team.pk, 'Note', self.applicant)
         # removed user, cannot send application again
         self.assertTrue( isinstance(response, Error))
+        # user lobies admin, want application rea applived
+        self._approve(application)
+        self.assertTrue(self.team.is_member(self.applicant))
         
 
     def test_can_apply(self):
