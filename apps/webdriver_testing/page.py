@@ -34,6 +34,7 @@ class Page(object):
             a.accept()
         elif action == "reject":
             a.dismiss()
+        time.sleep(1)
 
     def check(self, element):
         el = self.browser.find_element_by_css_selector(element)
@@ -53,7 +54,8 @@ class Page(object):
         
     def hover_by_css(self, element):
         mouse = webdriver.ActionChains(self.browser)
-        mouse.move_to_element(element).perform()
+        el = self.browser.find_element_by_css_selector(element)
+        mouse.move_to_element(el).perform()
         
     def click_by_css(self, element, wait_for_element=None, no_wait=False):
         """click based on the css given.
@@ -64,7 +66,7 @@ class Page(object):
         try:
             elem = self.browser.find_element_by_css_selector(element)
         except:
-            self.record_error()
+            #self.record_error()
             raise Exception(elem + "not found")
         if no_wait:
             elem.send_keys(Keys.ENTER)

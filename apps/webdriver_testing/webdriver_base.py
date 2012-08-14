@@ -19,17 +19,22 @@ from django.test import LiveServerTestCase
 from django.core import management
 import unittest
 from selenium import webdriver
-import os
+import os, time
 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
 
 class WebdriverTestCase(LiveServerTestCase, unittest.TestCase):
     def setUp(self):
         super(WebdriverTestCase, self).setUp()
-        self.browser = webdriver.Firefox() #BROWSER TO USE FOR TESTING
         LiveServerTestCase.setUp(self)
+        self.browser = webdriver.Firefox() #BROWSER TO USE FOR TESTING
         self.base_url =  'http://localhost:80/'
         self.browser.get(self.base_url)
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('Screenshot_%s_.png' % self.id())
-        self.browser.quit()
+        time.sleep(1)
+        try:
+            self.browser.get_screenshot_as_file('apps/webdriver_testing/Screenshots/%s_.png' % self.id())
+            self.browser.quit()
+        except:
+            os.system('killall firefox')  #sometimes there a ff instance left running we don't want it there
+
