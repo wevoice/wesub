@@ -444,7 +444,7 @@ class Team(models.Model):
 
         if query:
             for term in get_terms(query):
-                qs = qs.auto_query(qs.query.clean(term))
+                qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
 
         if language:
             qs = qs.filter(video_completed_langs=language)

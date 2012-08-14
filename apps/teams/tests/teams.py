@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf8 -*- 
 
 import os, re, json
 from datetime import datetime, timedelta, date
@@ -824,6 +824,24 @@ class TeamsTest(TestCase):
         print teams_pks, hidden.pk
 
         self.assertNotIn(hidden.pk, teams_pks)
+
+    def test_search_with_utf8(self):
+        team = Team.objects.get(pk=1)
+        video = Video.objects.get(pk=4)
+
+        self.assertTrue(video.get_team_video() is None)
+
+        team_video, _ = TeamVideo.objects.get_or_create(video=video, team=team,
+                                                        added_by=self.user)
+        url = reverse("teams:detail", kwargs={"slug": team.slug})
+        response = self.client.get(url + u"?q=Петух отжигает!!!")
+        videos = response.context['team_video_md_list']
+
+        self.assertEquals(len(videos), 1)
+
+        video = videos[0]
+        
+        self.assertEquals(video.title, u'\u041f\u0435\u0442\u0443\u0445 \u043e\u0442\u0436\u0438\u0433\u0430\u0435\u0442!!!')
 
 from apps.teams.rpc import TeamsApiClass
 from utils.rpc import Error, Msg
