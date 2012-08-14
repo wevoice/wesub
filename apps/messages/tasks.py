@@ -142,6 +142,7 @@ def application_sent(application_pk):
 
         template_name = "messages/application-sent.txt"
         context = {
+            "application": application,
             "applicant": application.user,
             "url_base": get_url_base(),
             "team":application.team,

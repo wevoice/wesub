@@ -1099,7 +1099,7 @@ class Application(models.Model):
         This will create an appropriate TeamMember if this application has
         not been already acted upon
         """
-        if self.status:
+        if self.status == Application.STATUS_MEMBER_LEFT:
             raise ApplicationInvalidException("")
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
         self.modified = datetime.datetime.now()
@@ -1112,7 +1112,7 @@ class Application(models.Model):
         Queue a Celery task that will handle properly denying this
         application.
         """
-        if self.status:
+        if self.status == Application.STATUS_MEMBER_LEFT:
             raise ApplicationInvalidException("")
         self.modified = datetime.datetime.now()
         self.status = Application.STATUS_DENIED
