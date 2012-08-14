@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import time
-
+from nose.tools import assert_true, assert_false
 from unisubs_page import UnisubsPage
 
 class TeamsPage(UnisubsPage):
@@ -11,8 +11,9 @@ class TeamsPage(UnisubsPage):
  
     _URL = "teams/"
     _SEARCH = "form.search input[name='q']"
-    _SORT = ".sort_label" 
-    _TEAM = ".listing.teams"
+    _SORT = "span.sort_label" 
+    _SORT_OPTION = "div.sort_button ul li a[href*='%s']"
+    _TEAM = "ul.listing li"
     _TEAM_NAME = 'a'
     _TEAM_MEMBERS = 'ul.actions h4'
     _TEAM_VIDEOS = 'ul.actions li:nth-child(2)'
@@ -30,22 +31,29 @@ class TeamsPage(UnisubsPage):
         self.clear_text(self._SEARCH)
         self.submit_form_text_by_css(self._SEARCH, search_term)
 
-    def search_has_no_matches():
+    def search_has_no_matches(self):
         if self.is_text_present(self._NO_MATCHES, self._NO_MATCH_TEXT):
             return True
 
     def sort(self, order):
-        sort_orders = ['Newest', 'Name', 'Most Members']
-        if order not in sort_orders:
-            self.fail("unknown value for order, expected one of %s" % sort_orders)
-        self.click_by_css(self._SORT)
-        self.click_link_partial_text(order)
+        """Sort the teams. 
+        
+        """
+
+        sort_orders = ['date', 'name', 'members']
+        assert_true(order in sort_orders, \
+                        "unknown value for order, expected one of %s" % sort_orders)
+
+        #Hover / click below currently breaks selenium and it's better to just open the url directly
+        #self.hover_by_css(self._SORT)
+        #self.click_by_css(self._SORT_OPTION % order)
+        self.open_page("teams/?o=%s" % order) 
 
     def first_team(self):
-        return self.teams_on_page()[:1]
+        return self.teams_on_page()[0]
 
     def last_team(self):
-        return self.teams_on_page()[-1:]
+        return self.teams_on_page()[-1:][0]
 
     def all_team_elements(self):
         team_elements = self.browser.find_elements_by_css_selector(self._TEAM)
@@ -72,10 +80,9 @@ class TeamsPage(UnisubsPage):
         
     def teams_on_page(self):
         teams_list = []
-        els = self.all_team_elements()
-        for el in els:
-            team_name_el = el.find_element_by_css_selector(self._TEAM_NAME)
-            teams_list.append(team_name_el.text)
+        team_name_els= self.browser.find_elements_by_css_selector(" ".join([self._TEAM, self._TEAM_NAME]))
+        for el in team_name_els:
+            teams_list.append(el.text)
         return teams_list
         
 

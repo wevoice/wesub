@@ -8,16 +8,38 @@ class ATeamPage(UnisubsPage):
     """Defines the actions for specific teams pages like 'unisubs test team' (default) or others. 
     """
 
-    _JOIN_TEAM = "a#signin-join"
+    _TEAM_LINK = "h2#team_title a"
+    _TEAM_NAME = ".main-title a"
+
+    #TEAM METRICS
+    _VIDEO_METRIC = ".metrics li:nth-child(1) > a p"
+    _MEMBER_METRIC = ".metrics li:nth-child(2) > a p"
+    _TASK_METRIC = ".metrics li:nth-child(3) > a p"
+    _PROJECT_METRIC = ".metrics li:nth-child(4) > a p"
+
+    #TABS
+    _VIDEO_TAB = ".tabs li a"
+    _MEMBERS_TAB = ".tabs li a[href*='members']"
+    _ACTIVITY_TAB = ".tabs li a [href*='activity']"
+
+
+    #JOIN / APPLY
+    _JOIN_TEAM = ".join a"
     _APPLY_TEAM = "a#apply"
     _SIGNIN = "a#signin-join"
     _APPLY_BUTTON = "Apply to Join"
-    _JOIN = "Join Team"
     _APPLICATION = "div#apply-modal"
     _APPLICATION_TEXT = "div#apply-modal div.form textarea"
     _SUBMIT_APPLICATION = "div#apply-modal" 
 
 
+   #FILTER AND SORT
+
+
+
+    def is_team(self, team):
+        if self.get_text_by_css(self._TEAM_NAME) == team:
+            return True
 
     def is_member(self, team_type):
         team_url = self._team_stub(team_type)
@@ -31,11 +53,9 @@ class ATeamPage(UnisubsPage):
         pass
 
     def join_exists(self):
-        button = self._JOIN_TEAM
-        join_button = self.get_text_by_css(button)
-        if join_button ==  self._JOIN:
+        if self.is_element_present(self._JOIN_TEAM):
             return True
-
+        
     def apply_exists(self):
         button = self._APPLY_TEAM
         join_button = self.get_text_by_css(button)
@@ -52,8 +72,10 @@ class ATeamPage(UnisubsPage):
         self.type_by_css(self._APPLICATION_TEXT, text)
         self.click_by_css(self._SUBMIT_APPLICATION)
 
-    def join(self):
+    def join(self, logged_in=True):
         self.click_by_css(self._JOIN_TEAM)
+        if logged_in == True:
+            self.handle_js_alert(action='accept')
     
     def signin(self):
         self.click_by_css(self._SIGNIN)
