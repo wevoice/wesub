@@ -33,7 +33,7 @@ DATABASES = {
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 DEFAULT_PROTOCOL = 'https'
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+#TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 CELERY_ALWAYS_EAGER = True
 
 import logging

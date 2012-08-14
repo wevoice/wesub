@@ -2097,6 +2097,18 @@ class Setting(models.Model):
         (200, 'guidelines_subtitle'),
         (201, 'guidelines_translate'),
         (202, 'guidelines_review'),
+        # 300s means if this team will block those notifications
+        (300, 'block_invitation_sent_message'),
+        (301, 'block_application_sent_message'),
+        (302, 'block_application_denided_message'),
+        (303, 'block_team_member_new_message'),
+        (304, 'block_team_member_leave_message'),
+        (305, 'block_task_assigned_message'),
+        (306, 'block_reviewed_and_published_message'),
+        (307, 'block_reviewed_and_pending_approval_message'),
+        (308, 'block_reviewed_and_sent_back_message'),
+        (309, 'block_approved_message'),
+        (310, 'block_new_video_message'),
     )
     KEY_NAMES = dict(KEY_CHOICES)
     KEY_IDS = dict([choice[::-1] for choice in KEY_CHOICES])
