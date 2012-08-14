@@ -198,6 +198,7 @@ def _create_env(username,
                 roledefs={},
                 notification_email=None):
     env.user = username
+    env.name = name
     env.environment = name
     env.s3_bucket = s3_bucket
     env.app_name = app_name
@@ -516,7 +517,7 @@ def remove_disabled():
 
 @task
 @parallel
-@roles('app')
+@roles('app', 'data')
 def update_integration(run_as_sudo=True, branch=None):
     '''Update the integration repo to the version recorded in the site repo.
 
@@ -655,8 +656,8 @@ def deploy(branch=None, integration_branch=None):
 @task
 @lock_required
 @runs_once
-@roles('app', 'data')
-def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_s3=False):
+@roles('app')
+def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile=False, skip_s3=False):
     """
     Compiles and uploads static media to S3
 
@@ -670,10 +671,11 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_s3=Fals
         _git_pull()
         execute(update_integration)
         run('{0} deploy/create_commit_file.py'.format(python_exe))
-        out.fastprintln('Compiling...')
-        with settings(warn_only=True):
-            run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
-        if env.name != 'dev' and not skip_s3:
+        if skip_compile == False:
+            out.fastprintln('Compiling...')
+            with settings(warn_only=True):
+                run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
+        if env.environment != 'dev' and skip_s3 == False:
             out.fastprintln('Uploading to S3...')
             run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
 
