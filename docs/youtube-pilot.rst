@@ -1,6 +1,25 @@
 Youtube pilot details
 =====================
 
+How it works
+------------
+
+When a user edits subtitles for a Youtube video, we try to push those subtitles
+to Youtube.  In contrast to the legacy system, we push subtitles for every
+video regardless of whether the user has linked a third party account.
+
+When we interact with the Youtube API to perform the syncing, we log in as the
+``amarasubtitletest`` Youtube user.  This account has been set up for us by
+Google and has some special attributes applied to it.  In order to make
+authenticated requests, we need to go through the OAuth dance first.  The
+current third party account linking process does just that so we use it to
+produce and store the required OAuth tokens in the database.  If a
+``ThirdPartyAccount`` instance can't be found for the ``amarasubtitletest``
+username, we just skip the whole process.
+
+Once the OAuth credentials are in place we need to set up a Youtube sync rule.
+This allows us to specify which videos should be synced during testing.
+
 Sync rules
 ----------
 
