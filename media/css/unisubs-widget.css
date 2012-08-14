@@ -966,9 +966,6 @@ ul.unisubs-titlesList {
     padding: 0 !important;
     position: relative !important;
 }
-div.the-translate-panel ul.unisubs-titlesList {
-    height: auto !important;
-}
 ul.isRTL textarea.unisubs-translateField {
     direction: rtl;
 }
