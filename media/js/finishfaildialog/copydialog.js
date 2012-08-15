@@ -21,12 +21,16 @@ goog.provide('unisubs.finishfaildialog.CopyDialog');
 /**
  * @constructor
  */
-unisubs.finishfaildialog.CopyDialog = function(headerText, textToCopy) {
+unisubs.finishfaildialog.CopyDialog = function(headerText, textToCopy, captions) {
     goog.ui.Dialog.call(this, 'unisubs-modal-lang', true);
     this.setButtonSet(null);
     this.setDisposeOnHide(true);
     this.headerText_ = headerText;
     this.textToCopy_ = textToCopy;
+
+    if (captions) {
+        this.captions_ = captions;
+    }
 };
 
 goog.inherits(unisubs.finishfaildialog.CopyDialog, goog.ui.Dialog);
@@ -56,22 +60,40 @@ unisubs.finishfaildialog.CopyDialog.prototype.createDom = function() {
         this.switcher_,
         this.textarea_);
 };
-
 unisubs.finishfaildialog.CopyDialog.prototype.switcherChanged_ = function(e) {
     e.preventDefault();
     this.fillTextarea(this.switcher_.value);
 };
-
 unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
-    var output;
     if (format === 'txt') {
-        output = this.textToCopy_;
+        goog.dom.forms.setValue(this.textarea_, this.textToCopy_);
     } else {
-        output = format;
-    }
-    goog.dom.forms.setValue(this.textarea_, output);
-};
+        goog.dom.forms.setValue(this.textarea_, 'Processing...');
 
+        var textarea = this.textarea_;
+
+        goog.net.XhrIo.send('/widget/convert_subtitles/',
+            function(event) {
+
+                var output, response;
+
+                if (!event.target.isSuccess()) {
+                    output = 'There was an error processing your request.\n\n';
+                    output += event.target.getStatus();
+                }
+                else {
+                    output = event.target.getResponseJson().result;
+                }
+
+                goog.dom.forms.setValue(textarea, output);
+
+            },
+            'POST',
+            unisubs.Rpc.encodeKeyValuePairs_({'subtitles': this.captions_, 'format': format}),
+            null, null);
+    }
+
+};
 unisubs.finishfaildialog.CopyDialog.prototype.enterDocument = function() {
     unisubs.finishfaildialog.CopyDialog.superClass_.enterDocument.call(this);
     this.getHandler().listen(
@@ -79,26 +101,23 @@ unisubs.finishfaildialog.CopyDialog.prototype.enterDocument = function() {
         ['focus', 'click'],
         this.focusTextarea_);
 };
-
 unisubs.finishfaildialog.CopyDialog.prototype.focusTextarea_ = function() {
     var textarea = this.textarea_;
     goog.Timer.callOnce(function() { textarea.select(); });
 };
-
 unisubs.finishfaildialog.CopyDialog.showForErrorLog = function(log) {
     var copyDialog = new unisubs.finishfaildialog.CopyDialog(
         "This is the error report we generated. It would be a big help to us if you could copy and paste it into an email and send it to us at widget-logs@universalsubtitles.org. Thank you!",
         log);
     copyDialog.setVisible(true);
 };
-
 unisubs.finishfaildialog.CopyDialog.showForSubs = function(jsonSubs) {
     var copyDialog = new unisubs.finishfaildialog.CopyDialog(
         "Below are your subtitles. You may use the dropdown to change the format. Please copy and paste them into a text file. You can email them to us at widget-logs@universalsubtitles.org.",
-        unisubs.finishfaildialog.CopyDialog.subsToString_(jsonSubs));
+        unisubs.finishfaildialog.CopyDialog.subsToString_(jsonSubs),
+        jsonSubs);
     copyDialog.setVisible(true);
 };
-
 unisubs.finishfaildialog.CopyDialog.subsToString_ = function(jsonSubs) {
     var baseString;
     if (unisubs.Dialog.translationDialogOpen)

@@ -2869,6 +2869,5 @@ textarea.copy-dialog {
     width: 90%;
 }
 select.copy-dialog-select {
-    display: none;
     margin: 12px;
 }

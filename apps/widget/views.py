@@ -74,6 +74,37 @@ def widget_public_demo(request):
     return render_to_response('widget/widget_public_demo.html', context,
                               context_instance=RequestContext(request))
 
+@csrf_exempt
+def convert_subtitles(request):
+
+    data = {}
+
+    if request.POST:
+        if 'subtitles' and 'format' in request.POST:
+
+            subtitles = json.loads(request.POST['subtitles'])
+            format = request.POST['format']
+
+            cleanedSubs = []
+            for s in subtitles:
+                cleanedSubs.append({
+                    'text': s['text'],
+                    'start': s['start_time'],
+                    'end': s['end_time'],
+                    'id': s['subtitle_id'],
+                    'start_of_paragraph': s['start_of_paragraph'],
+                })
+
+            # TODO: Serialize these subtitles into the format given.
+
+            # When we have newly serialized subtitles, put a stringified version of them
+            # into this object. This object is what gets dumped into the textarea on the
+            # front-end. If there are errors, also dump to result (the error would be displayed
+            # to the user in the textarea.
+            data['result'] = 'hay'
+
+    return HttpResponse(json.dumps(data), mimetype='application/javascript')
+
 def widgetizerbootloader(request):
     context = {
         "gatekeeper": "UnisubsWidgetizerLoaded",
