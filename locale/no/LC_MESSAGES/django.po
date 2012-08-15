@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-13 01:39-0500\n"
+"POT-Creation-Date: 2012-08-15 12:30-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,57 +50,57 @@ msgstr ""
 msgid "Hide"
 msgstr ""
 
-#: apps/auth/models.py:100
+#: apps/auth/models.py:98
 msgid "Retired user"
 msgstr ""
 
-#: apps/auth/models.py:327
+#: apps/auth/models.py:325
 msgid "Add comment"
 msgstr ""
 
-#: apps/auth/models.py:328
+#: apps/auth/models.py:326
 msgid "Start subtitles"
 msgstr ""
 
-#: apps/auth/models.py:329
+#: apps/auth/models.py:327
 msgid "Start translation"
 msgstr ""
 
-#: apps/auth/models.py:330
+#: apps/auth/models.py:328
 msgid "Edit subtitles"
 msgstr ""
 
-#: apps/auth/models.py:331
+#: apps/auth/models.py:329
 msgid "Edit translation"
 msgstr ""
 
-#: apps/auth/models.py:388
+#: apps/auth/models.py:386
 msgid "understand enough"
 msgstr ""
 
-#: apps/auth/models.py:389
+#: apps/auth/models.py:387
 msgid "understand 99%"
 msgstr ""
 
-#: apps/auth/models.py:390
+#: apps/auth/models.py:388
 msgid "write like a native"
 msgstr ""
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:393
 msgid "follow requests in language"
 msgstr ""
 
-#: apps/auth/models.py:410
+#: apps/auth/models.py:408
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr ""
 
-#: apps/auth/models.py:509
+#: apps/auth/models.py:507
 msgid "e-mail confirmation"
 msgstr ""
 
-#: apps/auth/models.py:510
+#: apps/auth/models.py:508
 msgid "e-mail confirmations"
 msgstr ""
 
@@ -173,80 +173,80 @@ msgstr ""
 msgid "Message does not exist."
 msgstr ""
 
-#: apps/messages/tasks.py:71
+#: apps/messages/tasks.py:75
 #, python-format
 msgid "New message from %(author)s on Amara: %(subject)s"
 msgstr ""
 
-#: apps/messages/tasks.py:73
+#: apps/messages/tasks.py:77
 #, python-format
 msgid "New message on Amara: %(subject)s"
 msgstr ""
 
-#: apps/messages/tasks.py:117
+#: apps/messages/tasks.py:123
 #, python-format
 msgid "You've been invited to team %s on Amara"
 msgstr ""
 
-#: apps/messages/tasks.py:152
+#: apps/messages/tasks.py:161
 #, python-format
 msgid "%(user)s is applying for team %(team)s"
 msgstr ""
 
-#: apps/messages/tasks.py:183
+#: apps/messages/tasks.py:194
 #, python-format
 msgid "Your application to join the %s team has been declined"
 msgstr ""
 
-#: apps/messages/tasks.py:216
+#: apps/messages/tasks.py:229
 #, python-format
 msgid "%s team has a new member"
 msgstr ""
 
-#: apps/messages/tasks.py:240
+#: apps/messages/tasks.py:253
 #, python-format
 msgid "You've joined the %s team!"
 msgstr ""
 
-#: apps/messages/tasks.py:265
+#: apps/messages/tasks.py:280
 #, python-format
 msgid "%(user)s has left the %(team)s team"
 msgstr ""
 
-#: apps/messages/tasks.py:290
+#: apps/messages/tasks.py:305
 #, python-format
 msgid "You've left the %s team!"
 msgstr ""
 
-#: apps/messages/tasks.py:326
+#: apps/messages/tasks.py:341
 msgid "Your videos were imported!"
 msgstr ""
 
-#: apps/messages/tasks.py:353
+#: apps/messages/tasks.py:370
 msgid "You have a new task assignment on Amara!"
 msgstr ""
 
-#: apps/messages/tasks.py:394
+#: apps/messages/tasks.py:419
 msgid "Your subtitles have been reviewed"
 msgstr ""
 
-#: apps/messages/tasks.py:396
+#: apps/messages/tasks.py:421
 msgid " and published"
 msgstr ""
 
-#: apps/messages/tasks.py:497
+#: apps/messages/tasks.py:524
 msgid "Your subtitles have been approved and published!"
 msgstr ""
 
-#: apps/messages/tasks.py:503
+#: apps/messages/tasks.py:530
 msgid "Your subtitles have been returned for further editing"
 msgstr ""
 
-#: apps/messages/tasks.py:558
+#: apps/messages/tasks.py:585
 msgid "Your subtitles were not accepted"
 msgstr ""
 
-#: apps/messages/tasks.py:602
+#: apps/messages/tasks.py:629
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr ""
@@ -410,11 +410,12 @@ msgstr ""
 msgid "Unfeature teams"
 msgstr ""
 
-#: apps/teams/admin.py:80 apps/teams/admin.py:113 apps/teams/models.py:185
+#: apps/teams/admin.py:80 apps/teams/admin.py:113 apps/teams/admin.py:212
+#: apps/teams/models.py:185
 msgid "Team"
 msgstr ""
 
-#: apps/teams/admin.py:86
+#: apps/teams/admin.py:86 apps/teams/admin.py:218
 msgid "User"
 msgstr ""
 
@@ -493,7 +494,7 @@ msgstr ""
 msgid "Subtitling of this video is already in progress."
 msgstr ""
 
-#: apps/teams/forms.py:359
+#: apps/teams/forms.py:358
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr ""
 
@@ -501,104 +502,109 @@ msgstr ""
 msgid "This language already has a complete set of subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:385
+#: apps/teams/forms.py:377
+msgid "This language for this video does not exist or doesn't have a version."
+msgstr ""
+
+#: apps/teams/forms.py:394
 msgid "There is already a task in progress for that video/language."
 msgstr ""
 
-#: apps/teams/forms.py:399
-msgid "You must select a language for a Translate task."
+#: apps/teams/forms.py:400
+#, python-format
+msgid "You must select a language for a %s task."
 msgstr ""
 
-#: apps/teams/forms.py:434
+#: apps/teams/forms.py:435
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr ""
 
-#: apps/teams/forms.py:456
+#: apps/teams/forms.py:457
 msgid "You do not have permission to assign this task."
 msgstr ""
 
-#: apps/teams/forms.py:463
+#: apps/teams/forms.py:464
 msgid "This user cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:484
+#: apps/teams/forms.py:485
 msgid "You do not have permission to delete this task."
 msgstr ""
 
-#: apps/teams/forms.py:541
+#: apps/teams/forms.py:542
 msgid "You cannot blacklist a preferred language."
 msgstr ""
 
-#: apps/teams/forms.py:564 apps/teams/forms.py:566
+#: apps/teams/forms.py:565 apps/teams/forms.py:567
 msgid "User does not exist!"
 msgstr ""
 
-#: apps/teams/forms.py:573
+#: apps/teams/forms.py:574
 msgid "User is already a member of this team!"
 msgstr ""
 
-#: apps/teams/forms.py:578
+#: apps/teams/forms.py:579
 msgid "User has already been invited and has not replied yet."
 msgstr ""
 
-#: apps/teams/forms.py:602 templates/videos/subtitle-view.html:375
+#: apps/teams/forms.py:603 templates/videos/subtitle-view.html:375
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
-#: apps/teams/forms.py:606 templates/videos/subtitle-view.html:360
+#: apps/teams/forms.py:607 templates/videos/subtitle-view.html:360
 msgid "What would you like to unpublish?"
 msgstr ""
 
-#: apps/teams/forms.py:608
+#: apps/teams/forms.py:609
 msgid "This version (and any later version) for this language."
 msgstr ""
 
-#: apps/teams/forms.py:609
+#: apps/teams/forms.py:610
 msgid "All versions for this language and any dependent languages."
 msgstr ""
 
-#: apps/teams/forms.py:627
+#: apps/teams/forms.py:628
 msgid "These subtitles are not under a team's control."
 msgstr ""
 
-#: apps/teams/forms.py:631
+#: apps/teams/forms.py:632
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:650
+#: apps/teams/forms.py:651
 msgid "You cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:662 apps/videos/forms.py:193
+#: apps/teams/forms.py:663 apps/videos/forms.py:193
 msgid "Invalid language to translate from."
 msgstr ""
 
-#: apps/teams/forms.py:671 apps/videos/forms.py:70 apps/videos/forms.py:88
+#: apps/teams/forms.py:672 apps/videos/forms.py:70 apps/videos/forms.py:88
 #: apps/videos/forms.py:202
 msgid "File size should be less {0} kb"
 msgstr ""
 
-#: apps/teams/forms.py:676 apps/videos/forms.py:207
+#: apps/teams/forms.py:677 apps/videos/forms.py:207
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:683 apps/videos/forms.py:75 apps/videos/forms.py:96
+#: apps/teams/forms.py:684 apps/videos/forms.py:75 apps/videos/forms.py:96
 #: apps/videos/forms.py:214
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/teams/forms.py:688 apps/videos/forms.py:98 apps/videos/forms.py:219
+#: apps/teams/forms.py:689 apps/videos/forms.py:98 apps/videos/forms.py:219
 msgid "Incorrect subtitles format"
 msgstr ""
 
-#: apps/teams/forms.py:761 apps/videos/forms.py:309
+#: apps/teams/forms.py:762 apps/videos/forms.py:309
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 
-#: apps/teams/forms.py:767 apps/videos/forms.py:316
+#: apps/teams/forms.py:768 apps/videos/forms.py:316
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -636,11 +642,11 @@ msgstr ""
 msgid "Admins only"
 msgstr ""
 
-#: apps/teams/models.py:125 apps/teams/models.py:2416
+#: apps/teams/models.py:125 apps/teams/models.py:2434
 msgid "name"
 msgstr ""
 
-#: apps/teams/models.py:126 apps/teams/models.py:2417
+#: apps/teams/models.py:126 apps/teams/models.py:2435
 msgid "slug"
 msgstr ""
 
@@ -768,7 +774,7 @@ msgstr ""
 msgid "Contributor"
 msgstr ""
 
-#: apps/teams/notifications.py:171
+#: apps/teams/notifications.py:175
 msgid "New activity on your team video"
 msgstr ""
 
@@ -838,7 +844,7 @@ msgstr ""
 msgid "You cannot assign that role to that member."
 msgstr ""
 
-#: apps/teams/tasks.py:96
+#: apps/teams/tasks.py:99
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr ""
@@ -1587,18 +1593,18 @@ msgstr ""
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:296
+#: apps/widget/rpc.py:302
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:298
+#: apps/widget/rpc.py:304
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:995 apps/widget/rpc.py:1036
+#: apps/widget/rpc.py:1001 apps/widget/rpc.py:1042
 msgid "\n"
 msgstr ""
 
