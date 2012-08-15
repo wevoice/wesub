@@ -194,7 +194,7 @@ class Team(models.Model):
             self.default_project
 
     def __unicode__(self):
-        return self.name
+        return self.name or self.slug
 
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
@@ -2341,7 +2341,6 @@ class TeamNotificationSetting(models.Model):
         except ImportError:
             logger.exception("Apparently unisubs-integration is not installed")
 
-
     def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
         
@@ -2357,7 +2356,7 @@ class TeamNotificationSetting(models.Model):
         return
 
     def __unicode__(self):
-        return u'NotificationSettings for team %s' % (self.team)
+        return u'NotificationSettings for team %s' % self.team
 
 
 class BillingReport(models.Model):
