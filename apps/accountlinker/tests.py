@@ -58,7 +58,7 @@ class AccountTest(TestCase):
         self.assertTrue(r.should_sync(video))
 
         YoutubeSyncRule.objects.all().delete()
-        r = YoutubeSyncRule.objects.create(video='*')
+        r = YoutubeSyncRule.objects.create(video=video.video_id)
         self.assertTrue(r.should_sync(video))
 
         YoutubeSyncRule.objects.all().delete()

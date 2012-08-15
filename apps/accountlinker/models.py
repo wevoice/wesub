@@ -192,7 +192,7 @@ class YoutubeSyncRule(models.Model):
 
     ``team`` should be a comma-separated list of team slugs that you want to
     sync.  ``user`` should be a comma-separated list of usernames of users
-    whose videos should be synced.  ``video`` is a list of primary keys of
+    whose videos should be synced.  ``video`` is a list of video ids of
     videos that should be synced.
 
     You can also specify a wildcard "*" to any of the above to match any teams,
@@ -203,7 +203,7 @@ class YoutubeSyncRule(models.Model):
     user = models.TextField(default='', blank=True,
             help_text='Comma separated list of usernames')
     video = models.TextField(default='', blank=True,
-            help_text='Comma separated list of pks')
+            help_text='Comma separated list of video ids')
 
     def __unicode__(self):
         return 'Youtube sync rule'
@@ -228,7 +228,7 @@ class YoutubeSyncRule(models.Model):
             return True
         if len(pks) == 1 and pks[0] == '':
             return False
-        return pk in map(int, pks)
+        return pk in pks
 
     def should_sync(self, video):
         tv = video.get_team_video()
@@ -238,7 +238,7 @@ class YoutubeSyncRule(models.Model):
 
         return self.team_in_list(team) or \
                 self.user_in_list(video.user) or \
-                self.video_in_list(video.pk)
+                self.video_in_list(video.video_id)
 
     def _clean(self, name):
         if name not in ['team', 'user']:

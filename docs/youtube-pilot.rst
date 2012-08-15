@@ -35,7 +35,7 @@ ignored and nothing special happens.
 
 *team* should be a comma-separated list of team slugs that you want to sync.
 *user* should be a comma-separated list of usernames of users whose videos
-should be synced.  *video* is a list of primary keys of videos that should be
+should be synced.  *video* is a list of video ids of videos that should be
 synced.
 
 You can also specify a wildcard ``*`` (asterisk) to any of the above to match any teams,
