@@ -866,9 +866,10 @@ def accept_invite(request, invite_pk, accept=True):
     try:
         if accept:
             invite.accept()
+            return redirect(reverse("teams:detail", kwargs={"slug": invite.team.slug}))
         else:
             invite.deny()
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+            return redirect(request.META.get('HTTP_REFERER', '/'))
     except InviteExpiredException:
         return HttpResponseServerError(render_to_response("generic-error.html", {
             "error_msg": _("This invite is no longer valid"),
