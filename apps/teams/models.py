@@ -2378,8 +2378,9 @@ class BillingReport(models.Model):
         import csv
 
         midnight = datetime.time(0, 0, 0)
+        almost_midnight = datetime.time(23, 59, 59)
         start_date = datetime.datetime.combine(self.start_date, midnight)
-        end_date = datetime.datetime.combine(self.end_date, midnight)
+        end_date = datetime.datetime.combine(self.end_date, almost_midnight)
 
         rows = [['Video title', 'Video URL', 'Video language',
                     'Billable minutes']]
