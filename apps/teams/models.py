@@ -1105,6 +1105,7 @@ class Application(models.Model):
         self.modified = datetime.datetime.now()
         self.status = Application.STATUS_APPROVED
         self.save()
+        return self
 
     def deny(self):
         """
@@ -1118,6 +1119,7 @@ class Application(models.Model):
         self.status = Application.STATUS_DENIED
         self.save()
         notifier.team_application_denied.delay(self.pk)
+        return self
 
     def save(self, dispatches_http_callback=True, *args, **kwargs):
         is_new = not bool(self.pk)
