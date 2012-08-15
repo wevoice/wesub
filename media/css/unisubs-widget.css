@@ -678,7 +678,7 @@ span.unisubs-widget {
     padding-left: 19px !important;
 }
 .unisubs-translateField {
-    height: 34px !important;
+    height: 24px !important;
     margin-top: 3px !important;
     padding: 3px !important;
     width: 350px !important;
@@ -966,9 +966,6 @@ ul.unisubs-titlesList {
     padding: 0 !important;
     position: relative !important;
 }
-div.the-translate-panel ul.unisubs-titlesList {
-    height: auto !important;
-}
 ul.isRTL textarea.unisubs-translateField {
     direction: rtl;
 }
@@ -981,7 +978,7 @@ ul.unisubs-titlesList li {
     list-style: none !important;
     margin: 0 !important;
     min-height: 23px !important;
-    padding: 10px !important;
+    padding: 5px 10px !important;
     position: relative !important;
 }
 ul.unisubs-titlesList li input.unisubs-translateInput {
@@ -1209,7 +1206,7 @@ ul.unisubs-titlesList.unisubs-beginTab .unisubs-beginTabLi {
 .unisubs-titlesList .unisubs-timestamp-time-fixed {
     font-weight: normal !important;
     color: #888 !important;
-    padding: 0 0 10px 10px !important;
+    padding: 0 0 3px 10px !important;
     font-size: 10px !important;
     float: right !important;
 }
@@ -1278,11 +1275,10 @@ ul.unisubs-titlesList.unisubs-beginTab .unisubs-beginTabLi {
     display: block !important
 }
 .unisubs-title {
-    .padding-top: 0px !important;
+    padding: 0px;
     cursor: pointer !important;
     display: block !important;
     line-height: 1.4em !important;
-    padding: 10px !important;
 }
 .is-rtl {
     direction: rtl;
@@ -2873,6 +2869,5 @@ textarea.copy-dialog {
     width: 90%;
 }
 select.copy-dialog-select {
-    display: none;
     margin: 12px;
 }

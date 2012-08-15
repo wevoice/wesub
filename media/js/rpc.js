@@ -56,8 +56,13 @@ unisubs.Rpc.callXhr_ = function(methodName, serializedArgs, opt_callback, opt_er
 
 unisubs.Rpc.encodeKeyValuePairs_ = function(serializedArgs) {
     var queryData = new goog.Uri.QueryData();
-    for (var param in serializedArgs)
-        queryData.set(param, serializedArgs[param]);
+    for (var param in serializedArgs) {
+        if (typeof serializedArgs[param] === 'object') {
+            queryData.set(param, JSON.stringify(serializedArgs[param]));
+        } else {
+            queryData.set(param, serializedArgs[param]);
+        }
+    }
     return queryData.toString();
 };
 

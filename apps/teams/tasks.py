@@ -80,12 +80,15 @@ def expire_tasks():
 
 @periodic_task(run_every=crontab(minute=0, hour=23))
 def add_videos_notification(*args, **kwargs):
+    from messages.tasks import _team_sends_notification
     from teams.models import TeamVideo, Team
     domain = Site.objects.get_current().domain
 
     qs = Team.objects.filter(teamvideo__created__gt=F('last_notification_time')).distinct()
 
     for team in qs:
+        if not _team_sends_notification(team, 'block_new_video_message'):
+            continue
         team_videos = TeamVideo.objects.filter(team=team, created__gt=team.last_notification_time)
 
         team.last_notification_time = datetime.now()

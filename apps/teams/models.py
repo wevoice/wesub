@@ -194,7 +194,7 @@ class Team(models.Model):
             self.default_project
 
     def __unicode__(self):
-        return self.name
+        return self.name or self.slug
 
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
@@ -1099,12 +1099,13 @@ class Application(models.Model):
         This will create an appropriate TeamMember if this application has
         not been already acted upon
         """
-        if self.status:
+        if self.status == Application.STATUS_MEMBER_LEFT:
             raise ApplicationInvalidException("")
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
         self.modified = datetime.datetime.now()
         self.status = Application.STATUS_APPROVED
         self.save()
+        return self
 
     def deny(self):
         """
@@ -1112,12 +1113,13 @@ class Application(models.Model):
         Queue a Celery task that will handle properly denying this
         application.
         """
-        if self.status:
+        if self.status == Application.STATUS_MEMBER_LEFT:
             raise ApplicationInvalidException("")
         self.modified = datetime.datetime.now()
         self.status = Application.STATUS_DENIED
         self.save()
         notifier.team_application_denied.delay(self.pk)
+        return self
 
     def save(self, dispatches_http_callback=True, *args, **kwargs):
         is_new = not bool(self.pk)
@@ -2097,6 +2099,18 @@ class Setting(models.Model):
         (200, 'guidelines_subtitle'),
         (201, 'guidelines_translate'),
         (202, 'guidelines_review'),
+        # 300s means if this team will block those notifications
+        (300, 'block_invitation_sent_message'),
+        (301, 'block_application_sent_message'),
+        (302, 'block_application_denided_message'),
+        (303, 'block_team_member_new_message'),
+        (304, 'block_team_member_leave_message'),
+        (305, 'block_task_assigned_message'),
+        (306, 'block_reviewed_and_published_message'),
+        (307, 'block_reviewed_and_pending_approval_message'),
+        (308, 'block_reviewed_and_sent_back_message'),
+        (309, 'block_approved_message'),
+        (310, 'block_new_video_message'),
     )
     KEY_NAMES = dict(KEY_CHOICES)
     KEY_IDS = dict([choice[::-1] for choice in KEY_CHOICES])
@@ -2327,7 +2341,6 @@ class TeamNotificationSetting(models.Model):
         except ImportError:
             logger.exception("Apparently unisubs-integration is not installed")
 
-
     def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
         
@@ -2343,7 +2356,7 @@ class TeamNotificationSetting(models.Model):
         return
 
     def __unicode__(self):
-        return u'NotificationSettings for team %s' % (self.team)
+        return u'NotificationSettings for team %s' % self.team
 
 
 class BillingReport(models.Model):
@@ -2364,8 +2377,9 @@ class BillingReport(models.Model):
         import csv
 
         midnight = datetime.time(0, 0, 0)
+        almost_midnight = datetime.time(23, 59, 59)
         start_date = datetime.datetime.combine(self.start_date, midnight)
-        end_date = datetime.datetime.combine(self.end_date, midnight)
+        end_date = datetime.datetime.combine(self.end_date, almost_midnight)
 
         rows = [['Video title', 'Video URL', 'Video language',
                     'Billable minutes']]

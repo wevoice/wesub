@@ -796,7 +796,7 @@ def applications(request, slug):
                        extra_context=extra_context)
 
 @login_required
-def approve_application(request, slug, user_pk):
+def approve_application(request, slug, application_pk):
     team = Team.get(slug, request.user)
 
     if not team.is_member(request.user):
@@ -804,9 +804,9 @@ def approve_application(request, slug, user_pk):
 
     if can_invite(team, request.user):
         try:
-            Application.objects.open(team=team, user=user_pk)[0].approve()
+            Application.objects.get(team=team, pk=application_pk).approve()
             messages.success(request, _(u'Application approved.'))
-        except IndexError:
+        except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
         except ApplicationInvalidException:
             messages.error(request, _(u'Application already processed.'))
@@ -816,7 +816,7 @@ def approve_application(request, slug, user_pk):
     return redirect('teams:applications', team.pk)
 
 @login_required
-def deny_application(request, slug, user_pk):
+def deny_application(request, slug, application_pk):
     team = Team.get(slug, request.user)
 
     if not team.is_member(request.user):
@@ -824,9 +824,9 @@ def deny_application(request, slug, user_pk):
 
     if can_invite(team, request.user):
         try:
-            Application.objects.open(team=team, user=user_pk)[0].deny()
+            Application.objects.get(team=team, pk=application_pk).deny()
             messages.success(request, _(u'Application denied.'))
-        except IndexError:
+        except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
         except ApplicationInvalidException:
             messages.error(request, _(u'Application already processed.'))
