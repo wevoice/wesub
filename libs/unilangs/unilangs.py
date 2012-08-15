@@ -353,6 +353,8 @@ def _generate_initial_data():
         'zh': (gettext_noop(u'Chinese, Yue'), u'中文'),
         'zh-cn': (gettext_noop(u'Chinese, Simplified'), u'简体中文'),
         'zh-tw': (gettext_noop(u'Chinese, Traditional'), u'繁體中文'),
+        'zh-sg': (gettext_noop(u'Chinese, Simplified (Singaporean)'), u''),
+        'zh-hk': (gettext_noop(u'Chinese, Traditional (Hong Kong)'), u''),
         'zul': (gettext_noop(u'Zulu'), u'isiZulu'),
     })
 
@@ -797,6 +799,8 @@ def _add_unisubs():
         'zh': 'zh',
         'zh-cn': 'zh-cn',
         'zh-tw': 'zh-tw',
+        'zh-sg': 'zh-sg',
+        'zh-hk': 'zh-hk',
         'zul': 'zul',
     }, base='django')
 
@@ -1022,14 +1026,15 @@ def _add_youtube():
         'xh': 'xho',
         'yi': 'yi',
         'yo': 'yor',
+        'zh': 'zh-hk',
         'zh-CN': 'zh-cn',
-        'zh-HK': 'zh',
+        'zh-HK': 'zh-hk',
         'zh-Hans': 'zh-cn',
         'zh-Hant': 'zh-tw',
         'zh_Hant-HK': 'nan',
 # we need to fix unilangs what to do when
 # two dialects point to the same main language
-#       'zh-SG': 'zh',
+        'zh-SG': 'zh-sg',
         'zh-TW': 'zh-tw',
         'za': 'za',
         'zu': 'zul'})
