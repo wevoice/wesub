@@ -16,6 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import logging
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -29,16 +31,20 @@ from auth.models import CustomUser as User
 
 from utils.metrics import Meter
 
+logger = logging.getLogger(__name__)
+
 # for now, they kind of match
 ACCOUNT_TYPES = VIDEO_TYPE
 
 
 def youtube_sync(video, language):
     """
+    Used on debug page for video.
+
     Simplified version of what's found in
     ``ThirdPartyAccount.mirror_on_third_party``.  It doesn't bother checking if
     we should be syncing this or not.  Only does the new Youtube/Amara
-    integration syncing.  Used on debug page for video.
+    integration syncing.
     """
     version = language.latest_version()
 
@@ -56,6 +62,10 @@ def youtube_sync(video, language):
             Meter('youtube.push.success').inc()
         except:
             Meter('youtube.push.fail').inc()
+            logger.error('Always pushing to youtoube has failed.', extra={
+                'video': video.video_id,
+                'vurl': vurl.pk
+            })
         finally:
             Meter('youtube.push.request').inc()
 
@@ -116,6 +126,10 @@ class ThirdPartyAccountManager(models.Manager):
                     Meter('youtube.push.success').inc()
                 except:
                     Meter('youtube.push.fail').inc()
+                    logger.error('Pushing to youtoube has failed.', extra={
+                        'video': video.video_id,
+                        'vurl': vurl.pk
+                    })
                 finally:
                     Meter('youtube.push.request').inc()
 
