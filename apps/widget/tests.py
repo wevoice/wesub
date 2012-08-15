@@ -1178,9 +1178,18 @@ class TestSubtitlesGenerator(TestCase):
 
     def test_ttml(self):
         handler = TTMLSubtitles
-        h = handler(self.subtitles, self.video)
-        self.assertTrue(unicode(h))
-        self.assertIn(self.cyrillic_text , unicode(h))
+        h = handler(self.subtitles, self.video, sl=SubtitleLanguage(language='en-us', video=self.video))
+        text = unicode(h)
+        self.assertTrue(text)
+        self.assertIn(self.cyrillic_text , text)
+        # make sure ttml generates the correct bcp47 for the most common cases
+        # on the xml:lang tag
+        self.assertIn('xml:lang="en-US"', text)
+        h = handler(self.subtitles, self.video, sl=SubtitleLanguage(language='en', video=self.video))
+        self.assertIn('xml:lang="en"', unicode(h))
+        h = handler(self.subtitles, self.video, sl=SubtitleLanguage(language='ug_Arab-cn', video=self.video))
+        self.assertIn('xml:lang="ug_Arab-CN"', unicode(h))
+
 
     def test_one_subtitle(self):
         subtitles = [{
@@ -1189,7 +1198,7 @@ class TestSubtitlesGenerator(TestCase):
             'start': 0.0
         }]
         self.assertTrue(unicode(SRTSubtitles(subtitles, self.video)))
-        self.assertTrue(unicode(TTMLSubtitles(subtitles, self.video)))
+        self.assertTrue(unicode(TTMLSubtitles(subtitles, self.video, sl=SubtitleLanguage(language='en-us', video=self.video))))
         self.assertTrue(unicode(SSASubtitles(subtitles, self.video)))
         self.assertTrue(unicode(SBVSubtitles(subtitles, self.video)))
         self.assertTrue(unicode(TXTSubtitles(subtitles, self.video)))
