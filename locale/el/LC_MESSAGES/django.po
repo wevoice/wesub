@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-15 12:25-0500\n"
-"PO-Revision-Date: 2012-08-15 17:43+0000\n"
+"POT-Creation-Date: 2012-08-16 01:32-0500\n"
+"PO-Revision-Date: 2012-08-16 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Greek (Greece) (http://www.transifex.com/projects/p/universalsubtitles/language/el_GR/)\n"
 "MIME-Version: 1.0\n"
@@ -642,11 +642,11 @@ msgstr "Διευθυντές και Διαχειριστές"
 msgid "Admins only"
 msgstr "Μόνο για διαχειριστές"
 
-#: apps/teams/models.py:125 apps/teams/models.py:2434
+#: apps/teams/models.py:125 apps/teams/models.py:2433
 msgid "name"
 msgstr "όνομα"
 
-#: apps/teams/models.py:126 apps/teams/models.py:2435
+#: apps/teams/models.py:126 apps/teams/models.py:2434
 msgid "slug"
 msgstr ""
 
@@ -786,7 +786,7 @@ msgstr "Αυτή η Ομάδα δεν υπάρχει"
 msgid "You are already a member of this team."
 msgstr "Είστε, ήδη, μέλος αυτής της ομάδσς."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:887
+#: apps/teams/rpc.py:50 apps/teams/views.py:888
 msgid "You are now a member of this team."
 msgstr "Τώρα είστε μέλος αυτής της ομάδας."
 
@@ -883,7 +883,7 @@ msgid "You do not have permission to delete this team."
 msgstr "Δεν έχετε δικαίωμα να διαγράψετε αυτή την ομάδα."
 
 #: apps/teams/views.py:215 apps/teams/views.py:257 apps/teams/views.py:285
-#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1552
+#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1553
 msgid "You do not have permission to edit this team."
 msgstr "Δεν έχετε δικαίωμα να τροποποιήσετε αυτή την ομάδα."
 
@@ -975,93 +975,93 @@ msgstr "Δεν μπορείτε να αρνηθείτε τις εφαρμογέ�
 msgid "You cannot invite people to this team."
 msgstr "Δεν μπορείτε να προσκαλείτ κόσμο σε αυτή την ομάδα."
 
-#: apps/teams/views.py:874
+#: apps/teams/views.py:875
 msgid "This invite is no longer valid"
 msgstr "Αυτή η πρόσκληση δεν ισχύει πλέον"
 
-#: apps/teams/views.py:883
+#: apps/teams/views.py:884
 msgid "You cannot join this team."
 msgstr "Δεν μπορείτε να εγγραφείτε σε αυτή την ομάδα."
 
-#: apps/teams/views.py:937
+#: apps/teams/views.py:938
 msgid "You have left this team."
 msgstr "Έχετε εγκαταλείψει αυτή την ομάδα."
 
-#: apps/teams/views.py:993
+#: apps/teams/views.py:994
 msgid "Member saved."
 msgstr "Το Μέλος έχει αποθηκευθεί."
 
-#: apps/teams/views.py:1130
+#: apps/teams/views.py:1131
 msgid "You cannot view this team's tasks."
 msgstr "Δεν μπορείτε να δείτε τις εργασίες αυτής της ομάδας."
 
-#: apps/teams/views.py:1271 apps/teams/views.py:1274
+#: apps/teams/views.py:1272 apps/teams/views.py:1275
 msgid "You are not allowed to perform this task."
 msgstr "Δεν είστε εξουσιοδοτημένοι να κάνετε αυτή την εργασία."
 
-#: apps/teams/views.py:1329
+#: apps/teams/views.py:1330
 msgid "Task deleted."
 msgstr "Η εργασία διεγράφη."
 
-#: apps/teams/views.py:1331
+#: apps/teams/views.py:1332
 msgid "You cannot delete this task."
 msgstr "Δεν μπορείτε να διαγράψετε αυτή την εργασία."
 
-#: apps/teams/views.py:1356
+#: apps/teams/views.py:1357
 msgid "Task declined."
 msgstr "Απόρριψη εργασίας."
 
-#: apps/teams/views.py:1358
+#: apps/teams/views.py:1359
 msgid "Task assigned."
 msgstr "Έγινε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1360
+#: apps/teams/views.py:1361
 msgid "You cannot assign this task."
 msgstr "Δεν μπορείτε να κάνετε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1382
+#: apps/teams/views.py:1383
 msgid "Invalid assignment attempt."
 msgstr "Άκυρη προσπάθεια ανάθεσης."
 
-#: apps/teams/views.py:1407
+#: apps/teams/views.py:1408
 msgid "Draft uploaded successfully."
 msgstr "Το προσχέδιο/draft φορτώθηκε με επιτυχία."
 
-#: apps/teams/views.py:1411
+#: apps/teams/views.py:1412
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1429
+#: apps/teams/views.py:1430
 msgid "You are not allowed to download this transcript."
 msgstr "Δεν σας επιτρέπεται να μεταφορτώσετε αυτή τη μεταγραφή/ transcript"
 
-#: apps/teams/views.py:1479
+#: apps/teams/views.py:1480
 msgid "There's already a project with this name"
 msgstr "Υπάρχει ήδη ένα project με αυτό το όνομα"
 
-#: apps/teams/views.py:1491
+#: apps/teams/views.py:1492
 msgid "Project added."
 msgstr "Το project προστέθηκε."
 
-#: apps/teams/views.py:1508
+#: apps/teams/views.py:1509
 msgid "You cannot edit that project."
 msgstr "Δεν μπορείτε να τροποποιήσετε αυτό το project."
 
-#: apps/teams/views.py:1519
+#: apps/teams/views.py:1520
 msgid "Project deleted."
 msgstr "Το project διεγράφη."
 
-#: apps/teams/views.py:1537
+#: apps/teams/views.py:1538
 msgid "Project saved."
 msgstr "Το project αποθηκεύθηκε."
 
-#: apps/teams/views.py:1663
+#: apps/teams/views.py:1664
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1697
+#: apps/teams/views.py:1698
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1597,7 +1597,7 @@ msgstr "Σγγνώμη, αυτοί οι υπότιτλοι επιτηρούντ�
 msgid "\n"
 msgstr "\n"
 
-#: apps/widget/views.py:106
+#: apps/widget/views.py:137
 msgid "That task has already been completed."
 msgstr "Η εργασία έχει, ήδη, ολοκληρωθεί."
 
@@ -1782,943 +1782,955 @@ msgid_plural "%(hits)s/%(message_number)s messages"
 msgstr[0] "%(hits)s/%(message_number)s μηνύματα"
 msgstr[1] "%(hits)s/%(message_number)s μηνύματα"
 
-#: libs/unilangs/unilangs.py:122
+#: libs/unilangs/unilangs.py:123
 msgid "Afar"
 msgstr "Αφάρ"
 
-#: libs/unilangs/unilangs.py:123
+#: libs/unilangs/unilangs.py:124
 msgid "Abkhazian"
 msgstr "Αμπχάζια"
 
-#: libs/unilangs/unilangs.py:124
+#: libs/unilangs/unilangs.py:125
 msgid "Avestan"
 msgstr "Αβεστική γλώσσα / Αρχαία Ανατολική Ιρανική διάλεκτος"
 
-#: libs/unilangs/unilangs.py:125
+#: libs/unilangs/unilangs.py:126
 msgid "Afrikaans"
 msgstr "Αφρικάνς"
 
-#: libs/unilangs/unilangs.py:126
+#: libs/unilangs/unilangs.py:127
 msgid "Akan"
 msgstr "Γλώσσα Ακάν /Γκάνα"
 
-#: libs/unilangs/unilangs.py:127
+#: libs/unilangs/unilangs.py:128
 msgid "Amharic"
 msgstr "Αμαρικά / Αιθιοπία"
 
-#: libs/unilangs/unilangs.py:128
+#: libs/unilangs/unilangs.py:129
 msgid "Aragonese"
 msgstr "Αραγωνέζικα"
 
-#: libs/unilangs/unilangs.py:129
+#: libs/unilangs/unilangs.py:130
 msgid "Arabic"
 msgstr "Αραβικά"
 
-#: libs/unilangs/unilangs.py:130
+#: libs/unilangs/unilangs.py:131
 msgid "Assamese"
 msgstr "Assamese"
 
-#: libs/unilangs/unilangs.py:131
+#: libs/unilangs/unilangs.py:132
 msgid "American Sign Language"
 msgstr "Αμερικανική Νοηματική Γλώσσα"
 
-#: libs/unilangs/unilangs.py:132
+#: libs/unilangs/unilangs.py:133
 msgid "Asturian"
 msgstr "Αστουριανά"
 
-#: libs/unilangs/unilangs.py:133
+#: libs/unilangs/unilangs.py:134
 msgid "Avaric"
 msgstr "Αβαρική γλώσσα/ Βορειοανατολικού Καυκάσου"
 
-#: libs/unilangs/unilangs.py:134
+#: libs/unilangs/unilangs.py:135
 msgid "Aymara"
 msgstr "Αϋμάρα"
 
-#: libs/unilangs/unilangs.py:135
+#: libs/unilangs/unilangs.py:136
 msgid "Azerbaijani"
 msgstr "Αζερικά"
 
-#: libs/unilangs/unilangs.py:136
+#: libs/unilangs/unilangs.py:137
 msgid "Bashkir"
 msgstr "Μπασκίρ"
 
-#: libs/unilangs/unilangs.py:137
+#: libs/unilangs/unilangs.py:138
 msgid "Bambara"
 msgstr "Γλώσσα Μπαμπάρα /Μάλι"
 
-#: libs/unilangs/unilangs.py:138
+#: libs/unilangs/unilangs.py:139
 msgid "Belarusian"
 msgstr "Λευκορωσικά"
 
-#: libs/unilangs/unilangs.py:139
+#: libs/unilangs/unilangs.py:140
 msgid "Berber"
 msgstr "Berber"
 
-#: libs/unilangs/unilangs.py:140
+#: libs/unilangs/unilangs.py:141
 msgid "Bulgarian"
 msgstr "Βουλγαρικά"
 
-#: libs/unilangs/unilangs.py:141
+#: libs/unilangs/unilangs.py:142
 msgid "Bihari"
 msgstr "Μπιχάρι"
 
-#: libs/unilangs/unilangs.py:142
+#: libs/unilangs/unilangs.py:143
 msgid "Bislama"
 msgstr "Μπισλάμα"
 
-#: libs/unilangs/unilangs.py:143
+#: libs/unilangs/unilangs.py:144
 msgid "Bengali"
 msgstr "Μπενγκάλι"
 
-#: libs/unilangs/unilangs.py:144
+#: libs/unilangs/unilangs.py:145
 msgid "Ibibio"
 msgstr "Γλώσσα Ιμπίμπιο / ΝΑ. Νιγηρία"
 
-#: libs/unilangs/unilangs.py:145
+#: libs/unilangs/unilangs.py:146
 msgid "Tibetan"
 msgstr "Θιβετιανά"
 
-#: libs/unilangs/unilangs.py:146
+#: libs/unilangs/unilangs.py:147
 msgid "Breton"
 msgstr "Μπρετόν"
 
-#: libs/unilangs/unilangs.py:147
+#: libs/unilangs/unilangs.py:148
 msgid "Bosnian"
 msgstr "Βοσνιακά"
 
-#: libs/unilangs/unilangs.py:148
+#: libs/unilangs/unilangs.py:149
 msgid "Buginese"
 msgstr "Μπουτζινέζικα / Ινδονησία"
 
-#: libs/unilangs/unilangs.py:149
+#: libs/unilangs/unilangs.py:150
 msgid "Catalan"
 msgstr "Καταλανικά"
 
-#: libs/unilangs/unilangs.py:150
+#: libs/unilangs/unilangs.py:151
 msgid "Chechen"
 msgstr "Τσετσενικά"
 
-#: libs/unilangs/unilangs.py:151
+#: libs/unilangs/unilangs.py:152
 msgid "Cebuano"
 msgstr "Σεμπουάνο/ Φιλιπινέζικη διάλεκτος"
 
-#: libs/unilangs/unilangs.py:152
+#: libs/unilangs/unilangs.py:153
 msgid "Chamorro"
 msgstr "Τσαμόρο"
 
-#: libs/unilangs/unilangs.py:153
+#: libs/unilangs/unilangs.py:154
 msgid "Choctaw"
 msgstr "Τσόκτω /Ινδιάνοι"
 
-#: libs/unilangs/unilangs.py:154
+#: libs/unilangs/unilangs.py:155
 msgid "Corsican"
 msgstr "Κοσρικανικά"
 
-#: libs/unilangs/unilangs.py:155
+#: libs/unilangs/unilangs.py:156
 msgid "Cree"
 msgstr "Cree"
 
-#: libs/unilangs/unilangs.py:156
+#: libs/unilangs/unilangs.py:157
 msgid "Czech"
 msgstr "Τσέχικα"
 
-#: libs/unilangs/unilangs.py:157
+#: libs/unilangs/unilangs.py:158
 msgid "Church Slavic"
 msgstr "Σλαβική εκκλησία"
 
-#: libs/unilangs/unilangs.py:158
+#: libs/unilangs/unilangs.py:159
 msgid "Chuvash"
 msgstr "Γλώσσα Τσουβάς /Ρωσία"
 
-#: libs/unilangs/unilangs.py:159
+#: libs/unilangs/unilangs.py:160
 msgid "Welsh"
 msgstr "Ουαλικά"
 
-#: libs/unilangs/unilangs.py:160
+#: libs/unilangs/unilangs.py:161
 msgid "Danish"
 msgstr "Δανέζικα"
 
-#: libs/unilangs/unilangs.py:161
+#: libs/unilangs/unilangs.py:162
 msgid "German"
 msgstr "Γερμανικά"
 
-#: libs/unilangs/unilangs.py:162
+#: libs/unilangs/unilangs.py:163
 msgid "Divehi"
 msgstr "Ντιβέχι"
 
-#: libs/unilangs/unilangs.py:163
+#: libs/unilangs/unilangs.py:164
 msgid "Dzongkha"
 msgstr "Τζόνγκα"
 
-#: libs/unilangs/unilangs.py:164
+#: libs/unilangs/unilangs.py:165
 msgid "Ewe"
 msgstr "Ewe"
 
-#: libs/unilangs/unilangs.py:165
+#: libs/unilangs/unilangs.py:166
 msgid "Efik"
 msgstr "Εφίκ / Νιγηρία"
 
-#: libs/unilangs/unilangs.py:166
+#: libs/unilangs/unilangs.py:167
 msgid "Greek"
 msgstr "Ελληνικά"
 
-#: libs/unilangs/unilangs.py:167
+#: libs/unilangs/unilangs.py:168
 msgid "English"
 msgstr "Αγγλικά"
 
-#: libs/unilangs/unilangs.py:168
+#: libs/unilangs/unilangs.py:169
 msgid "English, British"
 msgstr "Αγγλικά, Βρετανικά"
 
-#: libs/unilangs/unilangs.py:169
+#: libs/unilangs/unilangs.py:170
 msgid "Esperanto"
 msgstr "Εσπεράντο"
 
-#: libs/unilangs/unilangs.py:170
+#: libs/unilangs/unilangs.py:171
 msgid "Spanish"
 msgstr "Ισπανικά"
 
-#: libs/unilangs/unilangs.py:171
+#: libs/unilangs/unilangs.py:172
 msgid "Spanish, Argentinian"
 msgstr "Ισπανικά, Αργεντίνικα"
 
-#: libs/unilangs/unilangs.py:172
+#: libs/unilangs/unilangs.py:173
 msgid "Spanish, Mexican"
 msgstr "Ισπανικά, Μεξικανικά"
 
-#: libs/unilangs/unilangs.py:173
+#: libs/unilangs/unilangs.py:174
 msgid "Spanish, Nicaraguan"
 msgstr "Ισπανικά, Νικαράγουας"
 
-#: libs/unilangs/unilangs.py:174
+#: libs/unilangs/unilangs.py:175
 msgid "Estonian"
 msgstr "Εσθονικά"
 
-#: libs/unilangs/unilangs.py:175
+#: libs/unilangs/unilangs.py:176
 msgid "Basque"
 msgstr "Βασκικά"
 
-#: libs/unilangs/unilangs.py:176
+#: libs/unilangs/unilangs.py:177
 msgid "Persian"
 msgstr "Περσικά"
 
-#: libs/unilangs/unilangs.py:177
+#: libs/unilangs/unilangs.py:178
 msgid "Fulah"
 msgstr "Γλώσσα Φούλα / Δυτ. Αφρική"
 
-#: libs/unilangs/unilangs.py:178
+#: libs/unilangs/unilangs.py:179
 msgid "Finnish"
 msgstr "Φινλανδικά"
 
-#: libs/unilangs/unilangs.py:179
+#: libs/unilangs/unilangs.py:180
 msgid "Filipino"
 msgstr "Φιλιπινέζικα"
 
-#: libs/unilangs/unilangs.py:180
+#: libs/unilangs/unilangs.py:181
 msgid "Fijian"
 msgstr "Φιτζιανά"
 
-#: libs/unilangs/unilangs.py:181
+#: libs/unilangs/unilangs.py:182
 msgid "Faroese"
 msgstr "Γλώσσα των Νήσων Φερόες"
 
-#: libs/unilangs/unilangs.py:182
+#: libs/unilangs/unilangs.py:183
 msgid "French"
 msgstr "Γαλλικά"
 
-#: libs/unilangs/unilangs.py:183
+#: libs/unilangs/unilangs.py:184
 msgid "French, Canadian"
 msgstr "Γαλλικά, Καναδικά"
 
-#: libs/unilangs/unilangs.py:184
+#: libs/unilangs/unilangs.py:185
 msgid "Fula"
 msgstr "Γλώσσα Φούλα / Δ. Αφρική"
 
-#: libs/unilangs/unilangs.py:185
+#: libs/unilangs/unilangs.py:186
 msgid "Frisian"
 msgstr "Φριζικά / Ολλανδία"
 
-#: libs/unilangs/unilangs.py:186
+#: libs/unilangs/unilangs.py:187
 msgid "Irish"
 msgstr "Ιρλανδικά"
 
-#: libs/unilangs/unilangs.py:187
+#: libs/unilangs/unilangs.py:188
 msgid "Scottish Gaelic"
 msgstr "Σκωτικά Gaelic"
 
-#: libs/unilangs/unilangs.py:188
+#: libs/unilangs/unilangs.py:189
 msgid "Galician"
 msgstr "Γαλικιανά"
 
-#: libs/unilangs/unilangs.py:189
+#: libs/unilangs/unilangs.py:190
 msgid "Guaran"
 msgstr "Γλώσσα Γουαρανί /Ν. Αμερική"
 
-#: libs/unilangs/unilangs.py:190
+#: libs/unilangs/unilangs.py:191
 msgid "Gujarati"
 msgstr "Gujarati"
 
-#: libs/unilangs/unilangs.py:191
+#: libs/unilangs/unilangs.py:192
 msgid "Manx"
 msgstr "Μανξ"
 
-#: libs/unilangs/unilangs.py:192
+#: libs/unilangs/unilangs.py:193
 msgid "Haida"
 msgstr "Haida"
 
-#: libs/unilangs/unilangs.py:193
+#: libs/unilangs/unilangs.py:194
 msgid "Hausa"
 msgstr "Χάουσα"
 
-#: libs/unilangs/unilangs.py:194
+#: libs/unilangs/unilangs.py:195
 msgid "Hazaragi"
 msgstr "Διάλεκτος Χαζαράγκι /Περσικά"
 
-#: libs/unilangs/unilangs.py:195
+#: libs/unilangs/unilangs.py:196
 msgid "Hebrew"
 msgstr "Εβραϊκά"
 
-#: libs/unilangs/unilangs.py:196
+#: libs/unilangs/unilangs.py:197
 msgid "Hindi"
 msgstr "Χίντι"
 
-#: libs/unilangs/unilangs.py:197
+#: libs/unilangs/unilangs.py:198
 msgid "Hiri Motu"
 msgstr "Γλώσσα Χίρι Μότου / Παπούα"
 
-#: libs/unilangs/unilangs.py:198
+#: libs/unilangs/unilangs.py:199
 msgid "Croatian"
 msgstr "Κροατικά"
 
-#: libs/unilangs/unilangs.py:199
+#: libs/unilangs/unilangs.py:200
 msgid "Creole, Haitian"
 msgstr "Κρεολικά, Αϊτής"
 
-#: libs/unilangs/unilangs.py:200
+#: libs/unilangs/unilangs.py:201
 msgid "Hungarian"
 msgstr "Ουγγρικά"
 
-#: libs/unilangs/unilangs.py:201
+#: libs/unilangs/unilangs.py:202
 msgid "Hupa"
 msgstr "Χούπα / Ινδιάνοι"
 
-#: libs/unilangs/unilangs.py:202
+#: libs/unilangs/unilangs.py:203
 msgid "Armenian"
 msgstr "Αρμένικα"
 
-#: libs/unilangs/unilangs.py:203
+#: libs/unilangs/unilangs.py:204
 msgid "Herero"
 msgstr "Γλώσσα Χερέρο / Μποτσουάνα"
 
-#: libs/unilangs/unilangs.py:204
+#: libs/unilangs/unilangs.py:205
 msgid "Interlingua"
 msgstr "Ιντερλίγκουα"
 
-#: libs/unilangs/unilangs.py:205
+#: libs/unilangs/unilangs.py:206
 msgid "Igbo"
 msgstr "Ίγκμπο"
 
-#: libs/unilangs/unilangs.py:206
+#: libs/unilangs/unilangs.py:207
 msgid "Indonesian"
 msgstr "Ινδονησιακά"
 
-#: libs/unilangs/unilangs.py:207
+#: libs/unilangs/unilangs.py:208
 msgid "Interlingue"
 msgstr "Διεθνής Τεχνητή Γλώσσα Ιντερλίνγκουα"
 
-#: libs/unilangs/unilangs.py:208
+#: libs/unilangs/unilangs.py:209
 msgid "Sichuan Yi"
 msgstr "Γλώσσα Σιτσουάν Γι / Κίνα"
 
-#: libs/unilangs/unilangs.py:209
+#: libs/unilangs/unilangs.py:210
 msgid "Inupia"
 msgstr "Γλώσσα Ινούπιατ /Αλάσκα, Εσκιμώοι"
 
-#: libs/unilangs/unilangs.py:210
+#: libs/unilangs/unilangs.py:211
 msgid "Ilocano"
 msgstr "Ιλοκάνο"
 
-#: libs/unilangs/unilangs.py:211
+#: libs/unilangs/unilangs.py:212
 msgid "Ingush"
 msgstr "Ινγκούς / Ινγκουσετία, Ρωσία"
 
-#: libs/unilangs/unilangs.py:212
+#: libs/unilangs/unilangs.py:213
 msgid "Ido"
 msgstr "Ίντο"
 
-#: libs/unilangs/unilangs.py:213
+#: libs/unilangs/unilangs.py:214
 msgid "Iroquoian languages"
 msgstr "Γλώσσες Ιροκουά / Ινδιάνοι Βορ. Αμερικής"
 
-#: libs/unilangs/unilangs.py:214
+#: libs/unilangs/unilangs.py:215
 msgid "Icelandic"
 msgstr "Ισλανδικά"
 
-#: libs/unilangs/unilangs.py:215
+#: libs/unilangs/unilangs.py:216
 msgid "Italian"
 msgstr "Ιταλικά"
 
-#: libs/unilangs/unilangs.py:216
+#: libs/unilangs/unilangs.py:217
 msgid "Inuktitut"
 msgstr "Inuktitut"
 
-#: libs/unilangs/unilangs.py:217
+#: libs/unilangs/unilangs.py:218
 msgid "Japanese"
 msgstr "Ιαπωνικά"
 
-#: libs/unilangs/unilangs.py:218
+#: libs/unilangs/unilangs.py:219
 msgid "Javanese"
 msgstr "Γλώσσα των Νήσων Ιάβας"
 
-#: libs/unilangs/unilangs.py:219
+#: libs/unilangs/unilangs.py:220
 msgid "Georgian"
 msgstr "Γεωργιανά"
 
-#: libs/unilangs/unilangs.py:220
+#: libs/unilangs/unilangs.py:221
 msgid "Karen"
 msgstr "Γλώσσα Κάρεν/ Θιβέτ"
 
-#: libs/unilangs/unilangs.py:221
+#: libs/unilangs/unilangs.py:222
 msgid "Kanuri"
 msgstr "Kanuri"
 
-#: libs/unilangs/unilangs.py:222
+#: libs/unilangs/unilangs.py:223
 msgid "Gikuyu"
 msgstr "Gikuyu"
 
-#: libs/unilangs/unilangs.py:223
+#: libs/unilangs/unilangs.py:224
 msgid "Rwandi"
 msgstr "Ρουάντι"
 
-#: libs/unilangs/unilangs.py:224
+#: libs/unilangs/unilangs.py:225
 msgid "Kuanyama, Kwanyama"
 msgstr "Διάλεκτος Kuanyama, Αγκόλα / Ναμίμπια"
 
-#: libs/unilangs/unilangs.py:225
+#: libs/unilangs/unilangs.py:226
 msgid "Kazakh"
 msgstr "Καζακικά"
 
-#: libs/unilangs/unilangs.py:226
+#: libs/unilangs/unilangs.py:227
 msgid "Greenlandic"
 msgstr "Γροιλανδικά"
 
-#: libs/unilangs/unilangs.py:227
+#: libs/unilangs/unilangs.py:228
 msgid "Khmer"
 msgstr "Χμερ"
 
-#: libs/unilangs/unilangs.py:228
+#: libs/unilangs/unilangs.py:229
 msgid "Kannada"
 msgstr "Γλώσσα Κάνναντα, της Ινδικής Επαρχίας Καρνάτακα"
 
-#: libs/unilangs/unilangs.py:229
+#: libs/unilangs/unilangs.py:230
 msgid "Korean"
 msgstr "Κορεατικά"
 
-#: libs/unilangs/unilangs.py:230
+#: libs/unilangs/unilangs.py:231
 msgid "Kongo"
 msgstr "Kongo"
 
-#: libs/unilangs/unilangs.py:231
+#: libs/unilangs/unilangs.py:232
 msgid "Kashmiri"
 msgstr "Κασμιριανά"
 
-#: libs/unilangs/unilangs.py:232
+#: libs/unilangs/unilangs.py:233
 msgid "Kurdish"
 msgstr "Κουρδικά"
 
-#: libs/unilangs/unilangs.py:233
+#: libs/unilangs/unilangs.py:234
 msgid "Komi"
 msgstr "Γλώσσα Κόμι /ΒΔ. Ρωσία"
 
-#: libs/unilangs/unilangs.py:234
+#: libs/unilangs/unilangs.py:235
 msgid "Cornish"
 msgstr "Κορνουαλικά"
 
-#: libs/unilangs/unilangs.py:235
+#: libs/unilangs/unilangs.py:236
 msgid "Kyrgyz"
 msgstr "Kyrgyz"
 
-#: libs/unilangs/unilangs.py:236
+#: libs/unilangs/unilangs.py:237
 msgid "Latin"
 msgstr "Λατινικά"
 
-#: libs/unilangs/unilangs.py:237
+#: libs/unilangs/unilangs.py:238
 msgid "Luxembourgish"
 msgstr "Λουξεμβουργιανά"
 
-#: libs/unilangs/unilangs.py:238
+#: libs/unilangs/unilangs.py:239
 msgid "Ganda"
 msgstr "Γλώσσα Γκάντα / Ουγκάντα"
 
-#: libs/unilangs/unilangs.py:239
+#: libs/unilangs/unilangs.py:240
 msgid "Limburgish"
 msgstr "Λιμβουργιανή γλώσσα / Κάτω χώρες"
 
-#: libs/unilangs/unilangs.py:240
+#: libs/unilangs/unilangs.py:241
 msgid "Lingala"
 msgstr "Λινγκάλα"
 
-#: libs/unilangs/unilangs.py:241
+#: libs/unilangs/unilangs.py:242
 msgid "Lakota"
 msgstr "Ινδιάνικη Λακότα/ φυλής των Σιου"
 
-#: libs/unilangs/unilangs.py:242
+#: libs/unilangs/unilangs.py:243
 msgid "Lao"
 msgstr "Λάο"
 
-#: libs/unilangs/unilangs.py:243
+#: libs/unilangs/unilangs.py:244
 msgid "Lithuanian"
 msgstr "Λιθουανικά"
 
-#: libs/unilangs/unilangs.py:244
+#: libs/unilangs/unilangs.py:245
 msgid "Luba-Katagana"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:245
+#: libs/unilangs/unilangs.py:246
 msgid "Luba-Kasai"
 msgstr "Luba-Kasai"
 
-#: libs/unilangs/unilangs.py:246
+#: libs/unilangs/unilangs.py:247
 msgid "Luo"
 msgstr "Luo"
 
-#: libs/unilangs/unilangs.py:247
+#: libs/unilangs/unilangs.py:248
 msgid "Luhya"
 msgstr "Luhya"
 
-#: libs/unilangs/unilangs.py:248
+#: libs/unilangs/unilangs.py:249
 msgid "Latvian"
 msgstr "Λεττονικά"
 
-#: libs/unilangs/unilangs.py:249
+#: libs/unilangs/unilangs.py:250
 msgid "Metadata: Geo"
 msgstr "Μεταδεδομένα: Geo"
 
-#: libs/unilangs/unilangs.py:250
+#: libs/unilangs/unilangs.py:251
 msgid "Metadata: Twitter"
 msgstr "Μεταδεδομένα: Twitter"
 
-#: libs/unilangs/unilangs.py:251
+#: libs/unilangs/unilangs.py:252
 msgid "Metadata: Wikipedia"
 msgstr "Μεταδεδομένα: Wikipedia"
 
-#: libs/unilangs/unilangs.py:252
+#: libs/unilangs/unilangs.py:253
 msgid "Madurese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:253
+#: libs/unilangs/unilangs.py:254
 msgid "Marshallese"
 msgstr "Μασαλιανά"
 
-#: libs/unilangs/unilangs.py:254
+#: libs/unilangs/unilangs.py:255
 msgid "Maori"
 msgstr "Μαορί"
 
-#: libs/unilangs/unilangs.py:255
+#: libs/unilangs/unilangs.py:256
 msgid "Macedonian"
 msgstr "Σερβο-Μακεδόνικα"
 
-#: libs/unilangs/unilangs.py:256
+#: libs/unilangs/unilangs.py:257
 msgid "Malayalam"
 msgstr "Malayalam"
 
-#: libs/unilangs/unilangs.py:257
+#: libs/unilangs/unilangs.py:258
 msgid "Malagasy"
 msgstr "Malagasy"
 
-#: libs/unilangs/unilangs.py:258
+#: libs/unilangs/unilangs.py:259
 msgid "Mongolian"
 msgstr "Μογγολικά"
 
-#: libs/unilangs/unilangs.py:259
+#: libs/unilangs/unilangs.py:260
 msgid "Mandinka"
 msgstr "Mandinka"
 
-#: libs/unilangs/unilangs.py:260
+#: libs/unilangs/unilangs.py:261
 msgid "Moldavian, Moldovan"
 msgstr "Μολδαβικά"
 
-#: libs/unilangs/unilangs.py:261
+#: libs/unilangs/unilangs.py:262
 msgid "Mohawk"
 msgstr "Mohawk"
 
-#: libs/unilangs/unilangs.py:262
+#: libs/unilangs/unilangs.py:263
 msgid "Manipuri"
 msgstr "Γλώσσα Μανιπούρ (Ιμαλάϊα, Ινδία)"
 
-#: libs/unilangs/unilangs.py:263
+#: libs/unilangs/unilangs.py:264
 msgid "Mossi"
 msgstr "Mossi"
 
-#: libs/unilangs/unilangs.py:264
+#: libs/unilangs/unilangs.py:265
 msgid "Marathi"
 msgstr "Marathi"
 
-#: libs/unilangs/unilangs.py:265
+#: libs/unilangs/unilangs.py:266
 msgid "Malay"
 msgstr "Μαλαισιανά"
 
-#: libs/unilangs/unilangs.py:266
+#: libs/unilangs/unilangs.py:267
 msgid "Maltese"
 msgstr "Μαλτέζικα"
 
-#: libs/unilangs/unilangs.py:267
+#: libs/unilangs/unilangs.py:268
 msgid "Burmese"
 msgstr "Burmese"
 
-#: libs/unilangs/unilangs.py:268
+#: libs/unilangs/unilangs.py:269
 msgid "Hokkien"
 msgstr "Χόκιεν / Κίνα και ΝΑ. Ασία"
 
-#: libs/unilangs/unilangs.py:269
+#: libs/unilangs/unilangs.py:270
 msgid "Naurunan"
 msgstr "Γλώσσα Ναουρού, Μικρονησία"
 
-#: libs/unilangs/unilangs.py:270
+#: libs/unilangs/unilangs.py:271
 msgid "Norwegian Bokmal"
 msgstr "Νορβηγικά Μποκμάλ"
 
-#: libs/unilangs/unilangs.py:271
+#: libs/unilangs/unilangs.py:272
 msgid "North Ndebele"
 msgstr "Γλώσσα Βόρειου Ντέμπελε/ Ζιμπάμπουε"
 
-#: libs/unilangs/unilangs.py:272
+#: libs/unilangs/unilangs.py:273
 msgid "Nepali"
 msgstr "Νεπαλέζικα"
 
-#: libs/unilangs/unilangs.py:273
+#: libs/unilangs/unilangs.py:274
 msgid "Ndonga"
 msgstr "Ντόνγκα"
 
-#: libs/unilangs/unilangs.py:274
+#: libs/unilangs/unilangs.py:275
 msgid "Dutch"
 msgstr "Ολλανδικά"
 
-#: libs/unilangs/unilangs.py:275
+#: libs/unilangs/unilangs.py:276
 msgid "Norwegian Nynorsk"
 msgstr "Νορβηγικά Νυνόρσκ"
 
-#: libs/unilangs/unilangs.py:276
+#: libs/unilangs/unilangs.py:277
 msgid "Norwegian"
 msgstr "Νορβηγικά"
 
-#: libs/unilangs/unilangs.py:277
+#: libs/unilangs/unilangs.py:278
 msgid "Southern Ndebele"
 msgstr "Γλώσα Νότιου Ντέμπελε/ Ζιμπάμπουε"
 
-#: libs/unilangs/unilangs.py:278
+#: libs/unilangs/unilangs.py:279
 msgid "Northern Sotho"
 msgstr "Northern Sotho"
 
-#: libs/unilangs/unilangs.py:279
+#: libs/unilangs/unilangs.py:280
 msgid "Navajo"
 msgstr "Ναβάχο"
 
-#: libs/unilangs/unilangs.py:280
+#: libs/unilangs/unilangs.py:281
 msgid "Chewa"
 msgstr "Chewa"
 
-#: libs/unilangs/unilangs.py:281
+#: libs/unilangs/unilangs.py:282
 msgid "Occitan"
 msgstr "Οξιτάνικα"
 
-#: libs/unilangs/unilangs.py:282
+#: libs/unilangs/unilangs.py:283
 msgid "Ojibwe"
 msgstr "Οτζίμπουε /Ινδιάνικη γλώσσα"
 
-#: libs/unilangs/unilangs.py:283
+#: libs/unilangs/unilangs.py:284
 msgid "Oriya"
 msgstr "Oriya"
 
-#: libs/unilangs/unilangs.py:284
+#: libs/unilangs/unilangs.py:285
 msgid "Oromo"
 msgstr "Ορόμο"
 
-#: libs/unilangs/unilangs.py:285
+#: libs/unilangs/unilangs.py:286
 msgid "Ossetian, Ossetic"
 msgstr "Οσετικά, Οσετία"
 
-#: libs/unilangs/unilangs.py:286
+#: libs/unilangs/unilangs.py:287
+msgid "Kapampangan"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:288
 msgid "Papiamento"
 msgstr "Γλώσσα Παπαμιέντο / Ολλανδία"
 
-#: libs/unilangs/unilangs.py:287
+#: libs/unilangs/unilangs.py:289
 msgid "Punjabi"
 msgstr "Παντζάμπι"
 
-#: libs/unilangs/unilangs.py:288
+#: libs/unilangs/unilangs.py:290
 msgid "Pali"
 msgstr "Βουδιστική Γλώσσα Πάλι"
 
-#: libs/unilangs/unilangs.py:289
+#: libs/unilangs/unilangs.py:291
 msgid "Polish"
 msgstr "Πολωνικά"
 
-#: libs/unilangs/unilangs.py:290
+#: libs/unilangs/unilangs.py:292
 msgid "Dari"
 msgstr "Περσικές Διάλεκτοι Ντάρι/ Αφγανιστάν"
 
-#: libs/unilangs/unilangs.py:291
+#: libs/unilangs/unilangs.py:293
 msgid "Pashto"
 msgstr "Πάστο"
 
-#: libs/unilangs/unilangs.py:292
+#: libs/unilangs/unilangs.py:294
 msgid "Portuguese"
 msgstr "Πορτογαλικά"
 
-#: libs/unilangs/unilangs.py:293
+#: libs/unilangs/unilangs.py:295
 msgid "Portuguese, Brazilian"
 msgstr "Πορτογαλλικά"
 
-#: libs/unilangs/unilangs.py:294
+#: libs/unilangs/unilangs.py:296
 msgid "Quechua"
 msgstr "Quechua"
 
-#: libs/unilangs/unilangs.py:295
+#: libs/unilangs/unilangs.py:297
 msgid "Romansh"
 msgstr "Ρομανσική γλώσσα /Ελβετικό Καντόνι"
 
-#: libs/unilangs/unilangs.py:296
+#: libs/unilangs/unilangs.py:298
 msgid "Romanian"
 msgstr "Ρουμανικά"
 
-#: libs/unilangs/unilangs.py:297
+#: libs/unilangs/unilangs.py:299
 msgid "Russian"
 msgstr "Ρωσσικά"
 
-#: libs/unilangs/unilangs.py:298
+#: libs/unilangs/unilangs.py:300
 msgid "Rundi"
 msgstr "Γλώσσα Κιρούντι /Ρουάντα"
 
-#: libs/unilangs/unilangs.py:299
+#: libs/unilangs/unilangs.py:301
 msgid "Macedo"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:300
+#: libs/unilangs/unilangs.py:302
 msgid "Rusyn"
 msgstr "Γλώσσα Ρούσυν /Ουκρανία"
 
-#: libs/unilangs/unilangs.py:301
+#: libs/unilangs/unilangs.py:303
 msgid "Sanskrit"
 msgstr "Σανσκριτικά"
 
-#: libs/unilangs/unilangs.py:302
+#: libs/unilangs/unilangs.py:304
 msgid "Sardinian"
 msgstr "Σαρδηνιακά"
 
-#: libs/unilangs/unilangs.py:303
+#: libs/unilangs/unilangs.py:305
 msgid "Sindhi"
 msgstr "Σίντι"
 
-#: libs/unilangs/unilangs.py:304
+#: libs/unilangs/unilangs.py:306
 msgid "Northern Sami"
 msgstr "Βόρεια Γλώσσα Σάμι / Λαπωνία"
 
-#: libs/unilangs/unilangs.py:305
+#: libs/unilangs/unilangs.py:307
 msgid "Sango"
 msgstr "Σάνγκο"
 
-#: libs/unilangs/unilangs.py:306
+#: libs/unilangs/unilangs.py:308
 msgid "Serbo-Croatian"
 msgstr "Σερβο-Κροατικά"
 
-#: libs/unilangs/unilangs.py:307
+#: libs/unilangs/unilangs.py:309
 msgid "Sinhala"
 msgstr "Sinhala"
 
-#: libs/unilangs/unilangs.py:308
+#: libs/unilangs/unilangs.py:310
 msgid "Slovak"
 msgstr "Σλοβακικά"
 
-#: libs/unilangs/unilangs.py:309
+#: libs/unilangs/unilangs.py:311
 msgid "Seko Padang"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:310
+#: libs/unilangs/unilangs.py:312
 msgid "Slovenian"
 msgstr "Σλοβενιακά"
 
-#: libs/unilangs/unilangs.py:311
+#: libs/unilangs/unilangs.py:313
 msgid "Samoan"
 msgstr "Πολυνησιακή γλώσσα Νήσων Σαμόα"
 
-#: libs/unilangs/unilangs.py:312
+#: libs/unilangs/unilangs.py:314
 msgid "Shona"
 msgstr "Γλώσσα Σόνα / Ζιμπάμπουε"
 
-#: libs/unilangs/unilangs.py:313
+#: libs/unilangs/unilangs.py:315
 msgid "Somali"
 msgstr "Σομαλέζικα"
 
-#: libs/unilangs/unilangs.py:314
+#: libs/unilangs/unilangs.py:316
 msgid "Sotho"
 msgstr "Sotho"
 
-#: libs/unilangs/unilangs.py:315
+#: libs/unilangs/unilangs.py:317
 msgid "Albanian"
 msgstr "Αλβανικά"
 
-#: libs/unilangs/unilangs.py:316
+#: libs/unilangs/unilangs.py:318
 msgid "Serbian"
 msgstr "Σερβικά"
 
-#: libs/unilangs/unilangs.py:317
+#: libs/unilangs/unilangs.py:319
 msgid "Serbian, Latin"
 msgstr "Σερβικά, Λατινικά"
 
-#: libs/unilangs/unilangs.py:318
+#: libs/unilangs/unilangs.py:320
 msgid "Swati"
 msgstr "Σουάτι"
 
-#: libs/unilangs/unilangs.py:319
+#: libs/unilangs/unilangs.py:321
 msgid "Sundanese"
 msgstr "Ινδονησιακή γλώσσα Σούντα"
 
-#: libs/unilangs/unilangs.py:320
+#: libs/unilangs/unilangs.py:322
 msgid "Swedish"
 msgstr "Σουηδικά"
 
-#: libs/unilangs/unilangs.py:321
+#: libs/unilangs/unilangs.py:323
 msgid "Swahili"
 msgstr "Σουαχίλι"
 
-#: libs/unilangs/unilangs.py:322
+#: libs/unilangs/unilangs.py:324
 msgid "Tamil"
 msgstr "Ταμίλ"
 
-#: libs/unilangs/unilangs.py:323
+#: libs/unilangs/unilangs.py:325
 msgid "Tetum"
 msgstr "Τέτουμ/ Τιμόρ"
 
-#: libs/unilangs/unilangs.py:324
+#: libs/unilangs/unilangs.py:326
 msgid "Telugu"
 msgstr "Τελούγκου"
 
-#: libs/unilangs/unilangs.py:325
+#: libs/unilangs/unilangs.py:327
 msgid "Tajik"
 msgstr "Τατζικικά"
 
-#: libs/unilangs/unilangs.py:326
+#: libs/unilangs/unilangs.py:328
 msgid "Thai"
 msgstr "Τάϊ"
 
-#: libs/unilangs/unilangs.py:327
+#: libs/unilangs/unilangs.py:329
 msgid "Tigrinya"
 msgstr "Tigrinya"
 
-#: libs/unilangs/unilangs.py:328
+#: libs/unilangs/unilangs.py:330
 msgid "Turkmen"
 msgstr "Τουρκμενικά"
 
-#: libs/unilangs/unilangs.py:329
+#: libs/unilangs/unilangs.py:331
 msgid "Tagalog"
 msgstr "ΤαγκαλόγκΣουάτι"
 
-#: libs/unilangs/unilangs.py:330
+#: libs/unilangs/unilangs.py:332
 msgid "Klingon"
 msgstr "Κλίνγκον"
 
-#: libs/unilangs/unilangs.py:331
+#: libs/unilangs/unilangs.py:333
 msgid "Tonga"
 msgstr "Τόνγκα"
 
-#: libs/unilangs/unilangs.py:332
+#: libs/unilangs/unilangs.py:334
 msgid "Turkish"
 msgstr "Τουρκικά"
 
-#: libs/unilangs/unilangs.py:333
+#: libs/unilangs/unilangs.py:335
 msgid "Tsonga"
 msgstr "Τσόνγκα"
 
-#: libs/unilangs/unilangs.py:334
+#: libs/unilangs/unilangs.py:336
 msgid "Tswana"
 msgstr "Tswana"
 
-#: libs/unilangs/unilangs.py:335
+#: libs/unilangs/unilangs.py:337
 msgid "Tartar"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:336
+#: libs/unilangs/unilangs.py:338
 msgid "Twi"
 msgstr "Γκανέζικη Ακάν/Τουί"
 
-#: libs/unilangs/unilangs.py:337
+#: libs/unilangs/unilangs.py:339
 msgid "Tahitian"
 msgstr "Ταϊτιανά"
 
-#: libs/unilangs/unilangs.py:338
+#: libs/unilangs/unilangs.py:340
 msgid "Uighur"
 msgstr "Γλώσσα Ουιγούρων (Κινεζική επαρχία)"
 
-#: libs/unilangs/unilangs.py:339
+#: libs/unilangs/unilangs.py:341
 msgid "Ukrainian"
 msgstr "Ουκρανικά"
 
-#: libs/unilangs/unilangs.py:340
+#: libs/unilangs/unilangs.py:342
 msgid "Umbundu"
 msgstr "Umbundu"
 
-#: libs/unilangs/unilangs.py:341
+#: libs/unilangs/unilangs.py:343
 msgid "Uyghur"
 msgstr "Γλώσσα Ουιγούρων (Κινεζική επαρχία)"
 
-#: libs/unilangs/unilangs.py:342
+#: libs/unilangs/unilangs.py:344
 msgid "Urdu"
 msgstr "Ουρντού"
 
-#: libs/unilangs/unilangs.py:343
+#: libs/unilangs/unilangs.py:345
 msgid "Uzbek"
 msgstr "Ουζμπεκικά"
 
-#: libs/unilangs/unilangs.py:344
+#: libs/unilangs/unilangs.py:346
 msgid "Venda"
 msgstr "Γλώσσα Βέντα / Ν. Αφρική"
 
-#: libs/unilangs/unilangs.py:345
+#: libs/unilangs/unilangs.py:347
 msgid "Vietnamese"
 msgstr "Βιετναμέζικα"
 
-#: libs/unilangs/unilangs.py:346
+#: libs/unilangs/unilangs.py:348
 msgid "Volapuk"
 msgstr "Βολαπούκ"
 
-#: libs/unilangs/unilangs.py:347
+#: libs/unilangs/unilangs.py:349
 msgid "Walloon"
 msgstr "Βαλωνιακά"
 
-#: libs/unilangs/unilangs.py:348
+#: libs/unilangs/unilangs.py:350
 msgid "Wolof"
 msgstr "Wolof"
 
-#: libs/unilangs/unilangs.py:349
+#: libs/unilangs/unilangs.py:351
 msgid "Xhosa"
 msgstr "Xhosa"
 
-#: libs/unilangs/unilangs.py:350
+#: libs/unilangs/unilangs.py:352
 msgid "Yiddish"
 msgstr "Yiddish"
 
-#: libs/unilangs/unilangs.py:351
+#: libs/unilangs/unilangs.py:353
 msgid "Yoruba"
 msgstr "Γιορούμπα"
 
-#: libs/unilangs/unilangs.py:352
+#: libs/unilangs/unilangs.py:354
 msgid "Zhuang, Chuang"
 msgstr "Γλώσσα Ζουάνγκ / Ν. Κίνα"
 
-#: libs/unilangs/unilangs.py:353
+#: libs/unilangs/unilangs.py:355
 msgid "Chinese, Yue"
 msgstr "Κινεζικά, Yue"
 
-#: libs/unilangs/unilangs.py:354
+#: libs/unilangs/unilangs.py:356
 msgid "Chinese, Simplified"
 msgstr "Κινεζικά, Απλοποιημένα"
 
-#: libs/unilangs/unilangs.py:355
+#: libs/unilangs/unilangs.py:357
 msgid "Chinese, Traditional"
 msgstr "Κινέζικα, Παραδοσιακά"
 
-#: libs/unilangs/unilangs.py:356
+#: libs/unilangs/unilangs.py:358
+msgid "Chinese, Simplified (Singaporean)"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:359
+msgid "Chinese, Traditional (Hong Kong)"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:360
 msgid "Zulu"
 msgstr "Ζουλού"
 
