@@ -38,3 +38,8 @@ CELERY_ALWAYS_EAGER = True
 
 import logging
 logging.getLogger('pysolr').setLevel(logging.ERROR)
+
+try:
+    from dev_settings_test_local import *
+except ImportError:
+    pass

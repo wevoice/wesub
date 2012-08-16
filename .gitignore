@@ -18,6 +18,7 @@ media/profile_images
 media/pictures
 media/CACHE
 settings_local.py
+dev_settings_test_local.py
 commit.py
 media/embed.js
 media/js/config.js
