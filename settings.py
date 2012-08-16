@@ -705,6 +705,7 @@ MEDIA_BUNDLES = {
               "js/jquery.rpc.js",
               "js/jquery.input_replacement.min.js",
               "js/messages.js",
+              "js/escape.js",
               "js/libs/chosen.jquery.min.js",
               "js/libs/chosen.ajax.jquery.js",
               "js/unisubs.site.js",
