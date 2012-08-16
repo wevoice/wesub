@@ -169,8 +169,8 @@
             events: {
                 'click a.amara-logo':              'logoClicked',
                 'click a.amara-share-button':      'shareButtonClicked',
-                'click a.amara-transcript-button': 'transcriptButtonClicked',
-                'click a.amara-subtitles-button':  'subtitlesButtonClicked'
+                'click a.amara-transcript-button': 'toggleTranscriptDisplay',
+                'click a.amara-subtitles-button':  'toggleSubtitlesDisplay'
             },
 
             render: function() {
@@ -258,15 +258,16 @@
 
                     // For each subtitle, init the Popcorn subtitle plugin.
                     for (var i = 0; i < subtitles.length; i++) {
-                        this.pop.subtitle({
+                        this.pop.amarasubtitle({
                             start: subtitles[i].start,
                             end: subtitles[i].end,
                             text: subtitles[i].text
                         });
                     }
+
+                    this.$popSubtitlesContainer = $('div.amara-popcorn-subtitles', this.$popContainer);
                 }
             },
-
             buildTranscript: function(language) {
 
                 var subtitleSet;
@@ -290,7 +291,7 @@
 
                     // For each subtitle, init the Popcorn transcript plugin.
                     for (var i = 0; i < subtitles.length; i++) {
-                        this.pop.transcript({
+                        this.pop.amaratranscript({
                             start: subtitles[i].start,
                             start_clean: utils.parseFloatAndRound(subtitles[i].start),
                             end: subtitles[i].end,
@@ -338,11 +339,14 @@
             shareButtonClicked: function() {
                 return false;
             },
-            subtitlesButtonClicked: function() {
+            toggleSubtitlesDisplay: function(e) {
+                this.$popSubtitlesContainer.toggle();
+                this.$subtitlesButton.toggleClass('amara-button-enabled');
                 return false;
             },
-            transcriptButtonClicked: function() {
+            toggleTranscriptDisplay: function() {
                 this.$transcript.toggle();
+                this.$transcriptButton.toggleClass('amara-button-enabled');
                 return false;
             },
             waitUntilVideoIsComplete: function(callback) {
@@ -365,7 +369,7 @@
                 '        <a href="#" class="amara-logo">Amara</a>' +
                 '        <ul class="amara-displays">' +
                 '            <li><a href="#" class="amara-transcript-button"></a></li>' +
-                //'            <li><a href="#" class="amara-subtitles-button"></a></li>' +
+                '            <li><a href="#" class="amara-subtitles-button"></a></li>' +
                 '        </ul>' +
                 '    </div>' +
                 '    <div class="amara-transcript">' +
@@ -394,6 +398,8 @@
                 this.$amaraTools = $('div.amara-tools', this.$el);
                 this.$transcript = $('div.amara-transcript', this.$amaraTools);
                 this.$transcriptBody = $('div.amara-transcript-body', this.$transcript);
+                this.$transcriptButton = $('a.amara-transcript-button', this.$amaraTools);
+                this.$subtitlesButton = $('a.amara-subtitles-button', this.$amaraTools);
             }
 
         });

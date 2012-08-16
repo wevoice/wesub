@@ -127,7 +127,7 @@ div.amara-tools {
                     background-position: 13px -235px;
                 }
             }
-            &:hover {
+            &:hover, &.amara-button-enabled {
                 @include opacity(1);
             }
         }
@@ -252,4 +252,7 @@ div.amara-tools {
             }
         }
     }
+}
+div.amara-popcorn-subtitles {
+    display: none;
 }
