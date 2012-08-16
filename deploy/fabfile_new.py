@@ -213,13 +213,13 @@ def _create_env(username,
     env.notification_email = notification_email or 'universalsubtitles-dev@pculture.org'
 
 @task
-def local():
+def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
     """
     Configure task(s) to run in the local environment
 
     """
     with Output("Configuring task(s) to run on LOCAL"):
-        _create_env(username              = 'vagrant',
+        _create_env(username              = username,
                     name                  = 'local',
                     s3_bucket             = 's3.local.amara.org',
                     app_name              = 'unisubs',
@@ -228,7 +228,7 @@ def local():
                     revision              = 'staging',
                     ve_dir                = '/opt/ve/local/unisubs',
                     separate_uslogging_db = False,
-                    key_filename          = "~/.vagrant.d/insecure_private_key",
+                    key_filename          = key,
                     roledefs              = {
                         'app': ['10.10.10.115'],
                         'data': ['10.10.10.120'],
@@ -598,7 +598,8 @@ def bounce_memcached():
 
     '''
     with Output("Bouncing memcached"):
-        sudo('service memcached restart')
+        sudo('service memcached stop')
+        sudo('service memcached start')
 
 @task
 @parallel
@@ -611,10 +612,12 @@ def bounce_celery():
     '''
     with Output("Bouncing celeryd"):
         with settings(warn_only=True):
-            sudo('service celeryd.{0} restart'.format(env.environment))
+            sudo('service celeryd.{0} stop'.format(env.environment))
+            sudo('service celeryd.{0} start'.format(env.environment))
     with Output("Bouncing celerycam"):
         with settings(warn_only=True):
-            sudo('service celerycam.{0} restart'.format(env.environment))
+            sudo('service celerycam.{0} stop'.format(env.environment))
+            sudo('service celerycam.{0} start'.format(env.environment))
 
 @task
 @lock_required
