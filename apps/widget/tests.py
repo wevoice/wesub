@@ -25,6 +25,7 @@ Replace these with more appropriate tests for your application.
 """
 
 import os
+import json
 
 from django.test import TestCase
 from auth.models import CustomUser
@@ -1250,3 +1251,50 @@ class TestCaching(TestCase):
             raise e
         finally:
             settings.DEBUG = False
+
+
+class TestFormatConvertion(TestCase):
+
+    def setUp(self):
+        self.subs = []
+        for x in range(0,10):
+            self.subs.append({
+                'start_time': x, 'end_time': x + 1, 'subtitle_id': x,
+                'start_of_paragraph':False,
+                'text': "%s - and *italics* and **bold** and >>."
+            })
+            
+    def _retrieve(self, format):
+        from utils.subtitles import ParserList
+        res = self.client.post(reverse("widget:convert_subtitles"), {
+            'subtitles': json.dumps(self.subs),
+            'language_code': 'pt-br',
+            'format': format,
+        })
+        self.assertEqual(res.status_code , 200)
+        data = json.loads(res.content)
+        self.assertNotIn('errors', data)
+        parser = ParserList[format]
+        parsed = [x for x in parser(data['result'])]
+        self.assertEqual(len(parsed), 10)
+        return res.content, parsed
+
+
+    def test_srt(self):
+        raw, parsed = self._retrieve('srt')
+        self.assertIn(" and <i>italics</i> and <b>bold</b> " , parsed[0]['subtitle_text'])
+
+
+    
+    def test_ssa(self):
+        raw, parsed = self._retrieve('ssa')
+        self.assertIn(" and <i>italics</i> and <b>bold</b> " , parsed[0]['subtitle_text'])
+
+    def test_dfxp(self):
+        raw, parsed = self._retrieve('dfxp')
+
+    def test_ttml(self):
+        raw, parsed = self._retrieve('ttml')
+
+    def test_sbv(self):
+        raw, parsed = self._retrieve('sbv')

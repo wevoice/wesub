@@ -579,7 +579,7 @@ class SsaSubtitleParser(SrtSubtitleParser):
 
 ParserList.register(SrtSubtitleParser, 'srt')
 ParserList.register(SsaSubtitleParser, ['ssa', 'ass'])
-ParserList.register(TtmlSubtitleParser, 'xml')
+ParserList.register(TtmlSubtitleParser, ['xml', 'ttml'])
 ParserList.register(SbvSubtitleParser, 'sbv')
 ParserList.register(DfxpSubtitleParser, 'dfxp')
 ParserList.register(TxtSubtitleParser, 'txt')
