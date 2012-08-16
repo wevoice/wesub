@@ -21,7 +21,7 @@ goog.provide('unisubs.finishfaildialog.CopyDialog');
 /**
  * @constructor
  */
-unisubs.finishfaildialog.CopyDialog = function(headerText, textToCopy, captions) {
+unisubs.finishfaildialog.CopyDialog = function(headerText, textToCopy, captions, languageCode) {
     goog.ui.Dialog.call(this, 'unisubs-modal-lang', true);
     this.setButtonSet(null);
     this.setDisposeOnHide(true);
@@ -30,6 +30,9 @@ unisubs.finishfaildialog.CopyDialog = function(headerText, textToCopy, captions)
 
     if (captions) {
         this.captions_ = captions;
+    }
+    if (languageCode) {
+        this.languageCode_ = languageCode;
     }
 };
 
@@ -89,7 +92,11 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
 
             },
             'POST',
-            unisubs.Rpc.encodeKeyValuePairs_({'subtitles': this.captions_, 'format': format}),
+            unisubs.Rpc.encodeKeyValuePairs_({
+                'subtitles': this.captions_,
+                'format': format,
+                'language_code': this.languageCode_}
+            ),
             null, null);
     }
 
@@ -111,11 +118,12 @@ unisubs.finishfaildialog.CopyDialog.showForErrorLog = function(log) {
         log);
     copyDialog.setVisible(true);
 };
-unisubs.finishfaildialog.CopyDialog.showForSubs = function(jsonSubs) {
+unisubs.finishfaildialog.CopyDialog.showForSubs = function(jsonSubs, languageCode) {
     var copyDialog = new unisubs.finishfaildialog.CopyDialog(
         "Below are your subtitles. You may use the dropdown to change the format. Please copy and paste them into a text file. You can email them to us at widget-logs@universalsubtitles.org.",
         unisubs.finishfaildialog.CopyDialog.subsToString_(jsonSubs),
-        jsonSubs);
+        jsonSubs,
+        languageCode);
     copyDialog.setVisible(true);
 };
 unisubs.finishfaildialog.CopyDialog.subsToString_ = function(jsonSubs) {
