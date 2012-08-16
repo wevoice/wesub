@@ -120,7 +120,7 @@ def languages_with_labels(langs):
 def is_rtl(lang):
     # there are languages on our system that are not on django.
     # so, let's find and return the right value here:
-    if lang in ('arq',):
+    if lang in ('arq', 'pnb',):
         return True
 
     try:
