@@ -2871,3 +2871,6 @@ textarea.copy-dialog {
 select.copy-dialog-select {
     margin: 12px;
 }
+.unisubs-modal-widget-sync ul.unisubs-titlesList span.unisubs-title {
+    padding-top: 20px !important;
+}
