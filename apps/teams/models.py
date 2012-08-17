@@ -23,6 +23,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.core.files import File
 from django.db import models
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.http import Http404
@@ -45,7 +46,7 @@ from teams.permissions_const import (
 from videos.tasks import upload_subtitles_to_original_service
 from teams.tasks import update_one_team_video
 from utils import DEFAULT_PROTOCOL
-from utils.amazon import S3EnabledImageField
+from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
@@ -173,6 +174,8 @@ class Team(models.Model):
             default=None, null=True, blank=True)
 
     deleted = models.BooleanField(default=False)
+    partner = models.ForeignKey('Partner', null=True, blank=True,
+            related_name='teams')
 
     objects = TeamManager()
     all_objects = models.Manager() # For accessing deleted teams, if necessary.
@@ -191,7 +194,7 @@ class Team(models.Model):
             self.default_project
 
     def __unicode__(self):
-        return self.name
+        return self.name or self.slug
 
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
@@ -441,7 +444,7 @@ class Team(models.Model):
 
         if query:
             for term in get_terms(query):
-                qs = qs.auto_query(qs.query.clean(term))
+                qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
 
         if language:
             qs = qs.filter(video_completed_langs=language)
@@ -1036,31 +1039,113 @@ class MembershipNarrowing(models.Model):
         return super(MembershipNarrowing, self).save(*args, **kwargs)
 
 
+class ApplicationInvalidException(Exception):
+    pass
+
+class ApplicationManager(models.Manager):
+
+    def can_apply(self, team, user):
+        """
+        A user can apply either if he is not a member of the team yet, the
+        team hasn't said no to the user (either application denied or removed the user'
+        and if no applications are pending.
+        """
+        sour_application_exists =  self.filter(team=team, user=user, status__in=[
+            Application.STATUS_MEMBER_REMOVED, Application.STATUS_DENIED,
+            Application.STATUS_PENDING]).exists()
+        if sour_application_exists:
+            return False
+        return  not team.is_member(user)
+
+    def open(self, team=None, user=None):
+        qs =  self.filter(status=Application.STATUS_PENDING)
+        if team:
+            qs = qs.filter(team=team)
+        if user:
+            qs = qs.filter(user=user)
+        return qs
+
 # Application
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
     user = models.ForeignKey(User, related_name='team_applications')
     note = models.TextField(blank=True)
+    # None -> not acted upon
+    # True -> Approved
+    # False -> Rejected
+    STATUS_PENDING,STATUS_APPROVED, STATUS_DENIED, STATUS_MEMBER_REMOVED,\
+        STATUS_MEMBER_LEFT = xrange(0, 5)
+    STATUSES = (
+        (STATUS_PENDING, u"Pending"),
+        (STATUS_APPROVED, u"Approved"),
+        (STATUS_DENIED, u"Denied"),
+        (STATUS_MEMBER_REMOVED, u"Member Removed"),
+        (STATUS_MEMBER_LEFT, u"Member Left"),
+    )
+    STATUSES_IDS = dict([choice[::-1] for choice in STATUSES])
 
+    status = models.PositiveIntegerField(default=STATUS_PENDING, choices=STATUSES)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(blank=True, null=True)
+
+    objects = ApplicationManager()
     class Meta:
-        unique_together = (('team', 'user'),)
+        unique_together = (('team', 'user', 'status'),)
 
 
     def approve(self):
         """Approve the application.
 
-        This will create an appropriate TeamMember record and then delete itself.
-
+        This will create an appropriate TeamMember if this application has
+        not been already acted upon
         """
+        if self.status == Application.STATUS_MEMBER_LEFT:
+            raise ApplicationInvalidException("")
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
-        self.delete()
+        self.modified = datetime.datetime.now()
+        self.status = Application.STATUS_APPROVED
+        self.save()
+        return self
 
     def deny(self):
-        """Queue a Celery task that will handle properly denying this application."""
-
-        # We can't delete the row until the notification task has run.
+        """
+        Marks the application as not approved, then
+        Queue a Celery task that will handle properly denying this
+        application.
+        """
+        if self.status == Application.STATUS_MEMBER_LEFT:
+            raise ApplicationInvalidException("")
+        self.modified = datetime.datetime.now()
+        self.status = Application.STATUS_DENIED
+        self.save()
         notifier.team_application_denied.delay(self.pk)
+        return self
 
+    def save(self, dispatches_http_callback=True, *args, **kwargs):
+        is_new = not bool(self.pk)
+        super(Application, self).save(*args, **kwargs)
+        if dispatches_http_callback and is_new:
+            from teams.signals import api_application_new
+            api_application_new.send(self)
+
+    def on_member_leave(self):
+        """
+        Marks the appropriate status, but users can still
+        reapply to a team if they so desire later.
+        """
+        self.status = Application.STATUS_MEMBER_LEFT
+        self.save()
+
+    def on_member_removed(self):
+        """
+        Marks the appropriate status so that user's cannot reapply
+        to a team after being removed.
+        """
+        self.status = Application.STATUS_MEMBER_REMOVED
+        self.save()
+
+    def __unicode__(self):
+        return "Application: %s - %s - %s" % (self.team.slug, self.user.username, self.status)
 
 # Invites
 class InviteExpiredException(Exception):
@@ -2014,6 +2099,18 @@ class Setting(models.Model):
         (200, 'guidelines_subtitle'),
         (201, 'guidelines_translate'),
         (202, 'guidelines_review'),
+        # 300s means if this team will block those notifications
+        (300, 'block_invitation_sent_message'),
+        (301, 'block_application_sent_message'),
+        (302, 'block_application_denided_message'),
+        (303, 'block_team_member_new_message'),
+        (304, 'block_team_member_leave_message'),
+        (305, 'block_task_assigned_message'),
+        (306, 'block_reviewed_and_published_message'),
+        (307, 'block_reviewed_and_pending_approval_message'),
+        (308, 'block_reviewed_and_sent_back_message'),
+        (309, 'block_approved_message'),
+        (310, 'block_new_video_message'),
     )
     KEY_NAMES = dict(KEY_CHOICES)
     KEY_IDS = dict([choice[::-1] for choice in KEY_CHOICES])
@@ -2179,7 +2276,7 @@ post_save.connect(TeamLanguagePreference.objects.on_changed, TeamLanguagePrefere
 
 # TeamNotificationSettings
 class TeamNotificationSettingManager(models.Manager):
-    def notify_team(self, team_pk, video_id, event_name, language_pk=None, version_pk=None):
+    def notify_team(self, team_pk, event_name, **kwargs):
         """Notify the given team of a given event.
 
         Finds the matching notification settings for this team, instantiates
@@ -2196,8 +2293,7 @@ class TeamNotificationSettingManager(models.Manager):
             notification_settings = self.get(team__id=team_pk)
         except TeamNotificationSetting.DoesNotExist:
             return
-        notification_settings.notify(Video.objects.get(video_id=video_id), event_name,
-                                                 language_pk, version_pk)
+        notification_settings.notify(event_name, **kwargs)
 
 class TeamNotificationSetting(models.Model):
     """Info on how a team should be notified of changes to its videos.
@@ -2220,6 +2316,7 @@ class TeamNotificationSetting(models.Model):
     EVENT_SUBTITLE_NEW = "subs-new"
     EVENT_SUBTITLE_APPROVED = "subs-approved"
     EVENT_SUBTITLE_REJECTED = "subs-rejected"
+    EVENT_APPLICATION_NEW = 'application-new'
 
     team = models.OneToOneField(Team, related_name="notification_settings")
 
@@ -2244,11 +2341,10 @@ class TeamNotificationSetting(models.Model):
         except ImportError:
             logger.exception("Apparently unisubs-integration is not installed")
 
-
-    def notify(self, video, event_name, language_pk=None, version_pk=None):
+    def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
-        notification = self.get_notification_class()(
-            self.team, video, event_name, language_pk, version_pk)
+        
+        notification = self.get_notification_class()(self.team, event_name,  **kwargs)
         if self.request_url:
             success, content = notification.send_http_request(
                 self.request_url,
@@ -2258,9 +2354,85 @@ class TeamNotificationSetting(models.Model):
             return success, content
         # FIXME: spec and test this, for now just return
         return
-        if self.email:
-            notification.send_email(self.email, self.team, video, event_name, language_pk)
 
     def __unicode__(self):
-        return u'NotificationSettings for team %s' % (self.team)
+        return u'NotificationSettings for team %s' % self.team
 
+
+class BillingReport(models.Model):
+    team = models.ForeignKey(Team)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    csv_file = S3EnabledFileField(blank=True, null=True,
+            upload_to='teams/billing/')
+    processed = models.DateTimeField(blank=True, null=True)
+
+    def __unicode__(self):
+        return "%s (%s - %s)" % (self.team.slug,
+                self.start_date.strftime('%Y-%m-%d'),
+                self.end_date.strftime('%Y-%m-%d'))
+
+    def process(self):
+        from teams.moderation_const import APPROVED
+        import csv
+
+        midnight = datetime.time(0, 0, 0)
+        almost_midnight = datetime.time(23, 59, 59)
+        start_date = datetime.datetime.combine(self.start_date, midnight)
+        end_date = datetime.datetime.combine(self.end_date, almost_midnight)
+
+        rows = [['Video title', 'Video URL', 'Video language',
+                    'Billable minutes']]
+
+        tvs = TeamVideo.objects.filter(team=self.team).order_by('video__title')
+
+        domain = Site.objects.get_current().domain
+        protocol = getattr(settings, 'DEFAULT_PROTOCOL')
+        host = '%s://%s' % (protocol, domain)
+
+        for tv in tvs:
+            languages = tv.video.subtitlelanguage_set.all()
+
+            for language in languages:
+                v = language.latest_version()
+
+                if not v or v.moderation_status != APPROVED:
+                    continue
+
+                if (v.datetime_started <= start_date) or (
+                        v.datetime_started >= end_date):
+                    continue
+
+                subs = v.ordered_subtitles()
+
+                if len(subs) == 0:
+                    continue
+
+                start = subs[0].start_time
+                end = subs[-1].end_time
+
+                rows.append([
+                    tv.video.title.encode('utf-8'),
+                    host + tv.video.get_absolute_url(),
+                    language.language,
+                    round((end - start) / 60, 2)
+                ])
+
+        fn = '/tmp/bill-%s.csv' % self.pk
+
+        with open(fn, 'w') as f:
+            writer = csv.writer(f)
+            writer.writerows(rows)
+
+        self.csv_file = File(open(fn, 'r'))
+        self.processed = datetime.datetime.utcnow()
+        self.save()
+
+
+class Partner(models.Model):
+    name = models.CharField(_(u'name'), max_length=250, unique=True)
+    slug = models.SlugField(_(u'slug'), unique=True)
+    can_request_paid_captions = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.name

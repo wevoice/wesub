@@ -63,6 +63,10 @@ unisubs.player.BlipTvVideoSource.prototype.getVideoURL = function() {
     return this.videoURL_;
 };
 
+unisubs.player.BlipTvVideoSource.prototype.setVideoConfig = function(config) {
+    this.videoConfig_ = config;
+};
+
 /**
 * Checks if this video url is indeed for this MediaSource type, returns a
 * mediaSource subclass if it is, null if it isn't

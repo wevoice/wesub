@@ -52,8 +52,13 @@ class TeamsApiClass(object):
 
             if msg.strip() == '':
                 return Error(_(u'The "About you" field is required in order to apply.'))
-
-            application, created = Application.objects.get_or_create(team=team, user=user)
+            if Application.objects.open().filter(user=user):
+                return Error(_(u'You have already applied to this team.'))
+            elif Application.objects.filter(team=team, user=user, status=Application.STATUS_MEMBER_REMOVED).exists():
+                return Error(_(u'You have been removed from this team.'))
+            elif Application.objects.filter(team=team, user=user, status=Application.STATUS_DENIED).exists():
+                return Error(_(u'Your application has been denied.'))
+            application = Application.objects.create(team=team, user=user)
             application.note = msg
 
             application.save()

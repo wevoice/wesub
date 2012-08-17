@@ -238,6 +238,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
                 original_language.save()
 
         obj = super(AddTeamVideoForm, self).save(False)
+
         obj.video = video
         obj.team = self.team
         commit and obj.save()
@@ -323,9 +324,9 @@ class TaskCreateForm(ErrorableModelForm):
     assignee = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
 
     def __init__(self, user, team, team_video, *args, **kwargs):
-        non_display_form = False
+        self.non_display_form = False
         if kwargs.get('non_display_form'):
-            non_display_form = kwargs.pop('non_display_form')
+            self.non_display_form = kwargs.pop('non_display_form')
         super(TaskCreateForm, self).__init__(*args, **kwargs)
 
         self.user = user
@@ -339,7 +340,7 @@ class TaskCreateForm(ErrorableModelForm):
         self.fields['language'].choices = langs
         self.fields['assignee'].queryset = User.objects.filter(pk__in=team_user_ids)
 
-        if non_display_form:
+        if self.non_display_form:
             self.fields['type'].choices = Task.TYPE_CHOICES
 
     def _check_task_creation_subtitle(self, tasks, cleaned_data):
@@ -351,7 +352,6 @@ class TaskCreateForm(ErrorableModelForm):
         if self.team_video.subtitles_started():
             self.add_error(_(u"Subtitling of this video is already in progress."),
                            'type', cleaned_data)
-            return
 
     def _check_task_creation_translate(self, tasks, cleaned_data):
         if not self.team_video.subtitles_finished():
@@ -360,18 +360,28 @@ class TaskCreateForm(ErrorableModelForm):
             return
 
         sl = self.team_video.video.subtitle_language(cleaned_data['language'])
+
         if sl and sl.is_complete_and_synced():
             self.add_error(_(u"This language already has a complete set of subtitles."),
                            'language', cleaned_data)
-            return
 
+    def _check_task_creation_review_approve(self, tasks, cleaned_data):
+        if not self.non_display_form:
+            return
+            
+        lang = cleaned_data['language']
+        video = self.team_video.video
+        subtitle_language = video.subtitle_language(lang)
+
+        if not subtitle_language or not subtitle_language.has_version:
+            self.add_error(_(u"This language for this video does not exist or doesn't have a version."),
+                           'language', cleaned_data)
 
     def clean(self):
         cd = self.cleaned_data
 
         type = cd['type']
         lang = cd['language']
-        assignee = cd['assignee']
 
         team_video = self.team_video
         project, team = team_video.project, team_video.team
@@ -383,24 +393,16 @@ class TaskCreateForm(ErrorableModelForm):
         if any(not t.completed for t in existing_tasks):
             self.add_error(_(u"There is already a task in progress for that video/language."))
 
-        if assignee:
-            # TODO: Check perms
-            # if not can_assign_task(task, self.user):
-            #     self.add_error(_(u"You are not allowed to assign this task."),
-            #                    'assignee', cd)
-            pass
-
         type_name = Task.TYPE_NAMES[type]
 
         # TODO: Move into _check_task_creation_translate()?
-        if type_name == 'Translate':
-            if lang == '':
-                self.add_error(_(u"You must select a language for a Translate task."))
+        if type_name != 'Subtitle' and not lang:
+            self.add_error(_(u"You must select a language for a %s task." % type_name))
 
         {'Subtitle': self._check_task_creation_subtitle,
          'Translate': self._check_task_creation_translate,
-         'Review': lambda x, y: x,
-         'Approve': lambda x, y: x
+         'Review': self._check_task_creation_review_approve,
+         'Approve': self._check_task_creation_review_approve
         }[type_name](existing_tasks, cd)
 
         return cd

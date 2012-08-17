@@ -57,20 +57,19 @@ unisubs.controls.VolumeControl.prototype.enterDocument = function() {
 };
 
 unisubs.controls.VolumeControl.prototype.onMouseOut_ = function(event) {
-    if (this.isMouseOver_ &&
-        event.relatedTarget &&
-        !goog.dom.contains(this.getElement(), event.relatedTarget)) {
+    if (this.isMouseOver_ && event.relatedTarget 
+            && !goog.dom.contains(this.getElement(), event.relatedTarget)) {
         this.isMouseOver_ = false;
-        if (!this.volumeSlider_.isCurrentlyInteracting())
+        if (!this.volumeSlider_.isCurrentlyInteracting()) {
             this.retractVolumeSlider_();
+        }
     }
 };
 
-unisubs.controls.VolumeControl.prototype.sliderStopInteracting_ =
-    function(event)
-{
-    if (!this.isMouseOver_)
+unisubs.controls.VolumeControl.prototype.sliderStopInteracting_ = function(event) {
+    if (!this.isMouseOver_) {
         this.retractVolumeSlider_();
+    }
 };
 
 unisubs.controls.VolumeControl.prototype.onMouseOver_ = function(event) {
@@ -83,8 +82,10 @@ unisubs.controls.VolumeControl.prototype.volumeSliderUpdate_ = function(e) {
 };
 
 unisubs.controls.VolumeControl.prototype.extendVolumeSlider_ = function(e) {
-    if (this.volumeControlExtended_)
+    if (this.volumeControlExtended_) {
         return;
+    }
+
     this.volumeControlExtended_ = true;
     this.volumeSlider_.setValue(this.videoPlayer_.getVolume() * 100);
     var animation = new goog.fx.dom.ResizeHeight(
@@ -94,8 +95,10 @@ unisubs.controls.VolumeControl.prototype.extendVolumeSlider_ = function(e) {
 };
 
 unisubs.controls.VolumeControl.prototype.retractVolumeSlider_ = function() {
-    if (!this.volumeControlExtended_)
+    if (!this.volumeControlExtended_) {
         return;
+    }
+
     this.volumeControlExtended_ = false;
     var animation = new goog.fx.dom.ResizeHeight(
         this.volumeSliderContainer_.getElement(),

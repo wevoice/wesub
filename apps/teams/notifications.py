@@ -77,19 +77,25 @@ class BaseNotification(object):
         return video_id if video_id else video.video_id
 
 
-    def __init__(self, team, video, event_name, language_pk=None, version_pk=None):
+    def __init__(self, team, event_name,  **kwargs):
         """
         If the event is about new / edits to videos, then language_pk
         will be None else it can be about languages or subtitles.
         """
+        from videos.models import Video
         self.team = team
-        self.video  = video
-        self._language_pk = language_pk
-        self.version_pk = version_pk
-        if language_pk:
-            self.language = self.video.subtitlelanguage_set.get(pk=language_pk)
-            if version_pk:
-                self.version = self.language.subtitleversion_set.get(pk=version_pk)
+        video_id  = kwargs.pop('video_id', None)
+        if video_id:
+            self.video = Video.objects.get(video_id=video_id)
+        else:
+            self.video = None
+        self.language_pk = kwargs.pop('language_pk', None)
+        self.application_pk = kwargs.pop('application_pk', None)
+        self.version_pk = kwargs.pop('version_pk', None)
+        if self.language_pk:
+            self.language = self.video.subtitlelanguage_set.get(pk=self.language_pk)
+            if self.version_pk:
+                self.version = self.language.subtitleversion_set.get(pk=self.version_pk)
         else:
             self.language = None
         self.event_name = event_name
@@ -101,20 +107,27 @@ class BaseNotification(object):
         query for the latest data. This is team dependent if the team
         has a custom base url.
         """
-        from apiv2.api import VideoLanguageResource, VideoResource
-        video_klass = getattr(self.__class__, "video_resource_class", VideoResource)
-        if self.language:
-            lang_klass = getattr(self.__class__, "language_resource_class", VideoLanguageResource)
-            url =  lang_klass(self.api_name).get_resource_uri(self.language)
-            if self.version_pk:
-               url += "subtitles/?version_no=%s"  % self.version.version_no
-            return url
-        else:
-            return video_klass(self.api_name).get_resource_uri(self.video)
+        from apiv2.api import (
+            VideoLanguageResource, VideoResource, ApplicationResource
+        )
+        from teams.models import Application
+        if self.video:
+            video_klass = getattr(self.__class__, "video_resource_class", VideoResource)
+            if self.language:
+                lang_klass = getattr(self.__class__, "language_resource_class", VideoLanguageResource)
+                url =  lang_klass(self.api_name).get_resource_uri(self.language)
+                if self.version_pk:
+                   url += "subtitles/?version_no=%s"  % self.version.version_no
+                return url
+            else:
+                return video_klass(self.api_name).get_resource_uri(self.video)
+        elif self.application_pk:
+            return ApplicationResource("partners").get_resource_uri(Application.objects.get(pk=self.application_pk))
 
     @property
     def video_id(self):
-        return self.from_internal_video_id(None, video=self.video)
+        if self.video:
+            return self.from_internal_video_id(None, video=self.video)
 
     @property
     def language_code(self):
@@ -126,9 +139,18 @@ class BaseNotification(object):
         if basic_auth_username and basic_auth_password:
             h.add_credentials(basic_auth_username, basic_auth_password)
             
-        project = self.video.get_team_video().project.slug
-        data = dict(event=self.event_name, api_url=self.api_url,
-                    video_id=self.video_id, team=self.team.slug, project=project)
+        project = self.video.get_team_video().project.slug if self.video else None
+        data = {
+            'event': self.event_name,
+            'api_url': self.api_url,
+            'team':  self.team.slug,
+        }
+        if project:
+            data['project'] = project
+        if self.video:
+            data['video_id'] = self.video_id
+        if self.application_pk:
+            data['application_id'] = self.application_pk
         if self.language_code:
             data.update({"language_code":self.language_code} )
         data = urlencode(data)
@@ -139,6 +161,9 @@ class BaseNotification(object):
             if success is False:
                 logger.error("Failed to send team notification to %s - from teams:%s, status code:%s, response:%s" %(
                          self.team, url, resp, content ))
+                Meter('http-callback-notification-error').inc()
+            else:
+                Meter('http-callback-notification-success').inc()
             return success, content
         except:
             logger.exception("Failed to send http notification ")
@@ -156,7 +181,3 @@ class BaseNotification(object):
                     "laguage":self.language, 
                 }
             )
- 
-
-    
-

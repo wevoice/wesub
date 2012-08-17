@@ -52,7 +52,8 @@ from teams.forms import (
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException
+    Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException,
+    BillingReport, ApplicationInvalidException
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -68,8 +69,9 @@ from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
     update_video_moderation, update_one_team_video, update_video_public_field,
-    invalidate_video_visibility_caches
+    invalidate_video_visibility_caches, process_billing_report
 )
+from apps.videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
 from utils.metrics import time as timefn, Timer
@@ -85,6 +87,7 @@ from videos.models import Action, VideoUrl, SubtitleLanguage, Video
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
+from raven.contrib.django.models import client
 
 
 logger = logging.getLogger("teams.views")
@@ -526,7 +529,9 @@ def add_video(request, slug):
         obj = form.save(False)
         obj.added_by = request.user
         obj.save()
+
         api_teamvideo_new.send(obj)
+        video_changed_tasks.delay(obj.video.pk)
         messages.success(request, form.success_message())
         return redirect(team.get_absolute_url())
 
@@ -758,6 +763,8 @@ def remove_member(request, slug, user_pk):
     if can_assign_role(team, request.user, member.role, member.user):
         user = member.user
         if not user == request.user:
+            [application.on_member_removed() for application in \
+             team.applications.filter(user=user, status=Application.STATUS_APPROVED)]
             TeamMember.objects.filter(team=team, user=user).delete()
             messages.success(request, _(u'Member has been removed from the team.'))
             return HttpResponseRedirect(return_path)
@@ -775,7 +782,9 @@ def applications(request, slug):
     if not team.is_member(request.user):
         return  HttpResponseForbidden("Not allowed")
 
-    qs = team.applications.all()
+    # default to showing only applications that need to be acted upon
+    status = int(request.GET.get('status', Application.STATUS_PENDING))
+    qs = team.applications.filter(status=status)
 
     extra_context = {
         'team': team
@@ -787,7 +796,7 @@ def applications(request, slug):
                        extra_context=extra_context)
 
 @login_required
-def approve_application(request, slug, user_pk):
+def approve_application(request, slug, application_pk):
     team = Team.get(slug, request.user)
 
     if not team.is_member(request.user):
@@ -795,17 +804,19 @@ def approve_application(request, slug, user_pk):
 
     if can_invite(team, request.user):
         try:
-            Application.objects.get(team=team, user=user_pk).approve()
+            Application.objects.get(team=team, pk=application_pk).approve()
             messages.success(request, _(u'Application approved.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
+        except ApplicationInvalidException:
+            messages.error(request, _(u'Application already processed.'))
     else:
         messages.error(request, _(u'You can\'t approve applications.'))
 
     return redirect('teams:applications', team.pk)
 
 @login_required
-def deny_application(request, slug, user_pk):
+def deny_application(request, slug, application_pk):
     team = Team.get(slug, request.user)
 
     if not team.is_member(request.user):
@@ -813,10 +824,12 @@ def deny_application(request, slug, user_pk):
 
     if can_invite(team, request.user):
         try:
-            Application.objects.get(team=team, user=user_pk).deny()
+            Application.objects.get(team=team, pk=application_pk).deny()
             messages.success(request, _(u'Application denied.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
+        except ApplicationInvalidException:
+            messages.error(request, _(u'Application already processed.'))
     else:
         messages.error(request, _(u'You can\'t deny applications.'))
 
@@ -853,9 +866,10 @@ def accept_invite(request, invite_pk, accept=True):
     try:
         if accept:
             invite.accept()
+            return redirect(reverse("teams:detail", kwargs={"slug": invite.team.slug}))
         else:
             invite.deny()
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+            return redirect(request.META.get('HTTP_REFERER', '/'))
     except InviteExpiredException:
         return HttpResponseServerError(render_to_response("generic-error.html", {
             "error_msg": _("This invite is no longer valid"),
@@ -916,6 +930,9 @@ def leave_team(request, slug):
         tm_user_pk = member.user.pk
         team_pk = member.team.pk
         member.delete()
+        [application.on_member_leave() for application in \
+         member.team.applications.filter(status=Application.STATUS_APPROVED)]
+            
         notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
@@ -1021,28 +1038,6 @@ def _task_languages(team, user):
                 }
             })
     return lang_data
-
-def _task_category_counts(team, filters, user):
-    tasks = team.task_set.incomplete()
-
-    if filters['language']:
-        tasks = tasks.filter(language=filters['language'])
-
-    if filters['team_video']:
-        tasks = tasks.filter(team_video=int(filters['team_video']))
-
-    if filters['assignee']:
-        if filters['assignee'] == 'none':
-            tasks = tasks.filter(assignee=None)
-        else:
-            tasks = tasks.filter(assignee=user)
-
-    counts = { 'all': tasks.count() }
-
-    for type in ['Subtitle', 'Translate', 'Review', 'Approve']:
-        counts[type.lower()] = tasks.filter(type=Task.TYPE_IDS[type]).count()
-
-    return counts
 
 def _tasks_list(request, team, project, filters, user):
     '''List tasks for the given team, optionally filtered.
@@ -1151,7 +1146,6 @@ def team_tasks(request, slug, project_slug=None):
 
     tasks = _order_tasks(request,
                          _tasks_list(request, team, project, filters, user))
-    category_counts = _task_category_counts(team, filters, request.user)
     tasks, pagination_info = paginate(tasks, TASKS_ON_PAGE, request.GET.get('page'))
 
     # We pull out the task IDs here for performance.  It's ugly, I know.
@@ -1213,7 +1207,6 @@ def team_tasks(request, slug, project_slug=None):
         'user_can_assign_tasks': can_assign_tasks(team, request.user),
         'assign_form': TaskAssignForm(team, member),
         'languages': languages,
-        'category_counts': category_counts,
         'tasks': tasks,
         'filters': filters,
         'widget_settings': widget_settings,
@@ -1396,12 +1389,21 @@ def upload_draft(request, slug):
     if request.POST:
         form = UploadDraftForm(request.user, request.POST, request.FILES)
 
-        if form.is_valid():
+        try:
+            is_valid = form.is_valid()
+        except Exception, e:
+            client.create_from_exception()
+            messages.error(u"Sorry, there was a problem while uploading your draft. Care to try again?")
+            transaction.rollback()
+            is_valid = False
+
+        if is_valid:
             try:
                 form.save()
             except Exception, e:
                 messages.error(request, unicode(e))
                 transaction.rollback()
+                client.create_from_exception()
             else:
                 messages.success(request, _(u"Draft uploaded successfully."))
                 transaction.commit()
@@ -1722,69 +1724,6 @@ def auto_captions_status(request, slug):
 
 
 # Billing
-def get_billing_data_for_team(team, start_date, end_date, header=True):
-    """
-    Return a list of lists of data suitable for the csv writer or similar.
-
-    ``start_date`` and ``end_date`` should be ``datetime.date`` instances
-
-    * Get all videos for team
-    * For each video, get all languages
-    * For each language, get the latest version
-    * If the version is approved and within the time constraints, add it.
-
-    Minutes are counted by
-        [last subtitle synced timing] - [first subtitle synced timing]
-    """
-    from datetime import datetime, time
-    rows = []
-
-    # Oh, Python...
-    midnight = time(0, 0, 0)
-    start_date = datetime.combine(start_date, midnight)
-    end_date = datetime.combine(end_date, midnight)
-
-    if header:
-        rows.append(['Video title', 'Video URL', 'Video language',
-                'Billable minutes'])
-
-    tvs = TeamVideo.objects.filter(team=team).order_by('video__title')
-
-    domain = Site.objects.get_current().domain
-    protocol = getattr(settings, 'DEFAULT_PROTOCOL')
-    host = '%s://%s' % (protocol, domain)
-
-    for tv in tvs:
-        languages = tv.video.subtitlelanguage_set.all()
-
-        for language in languages:
-            v = language.latest_version()
-
-            if not v or v.moderation_status != APPROVED:
-                continue
-
-            if (v.datetime_started < start_date) or (v.datetime_started >
-                    end_date):
-                continue
-
-            subs = v.ordered_subtitles()
-
-            if len(subs) == 0:
-                continue
-
-            start = subs[0].start_time
-            end = subs[-1].end_time
-
-            rows.append([
-                tv.video.title.encode('utf-8'),
-                host + tv.video.get_absolute_url(),
-                language.language,
-                round((end - start) / 60, 2)
-            ])
-
-    return rows
-
-
 @staff_member_required
 def billing(request):
     user = request.user
@@ -1799,27 +1738,17 @@ def billing(request):
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
 
-            date_range = "%s-%s" % (
-                    start_date.strftime('%Y%m%d'),
-                    end_date.strftime('%Y%m%d'))
+            report, created = BillingReport.objects.get_or_create(team=team,
+                    start_date=start_date, end_date=end_date)
 
-            f = 'billing-%s-%s' % (team.slug, date_range)
+            process_billing_report.delay(report.pk)
 
-            response = HttpResponse(mimetype='text/csv')
-            response['Content-Disposition'] = 'attachment;filename=%s.csv' % f
-
-            writer = csv.writer(response)
-
-            with Timer('billing-csv-time'):
-                data = get_billing_data_for_team(team, start_date, end_date)
-
-            for row in data:
-                writer.writerow(row)
-
-            return response
     else:
         form = ChooseTeamForm()
 
+    reports = BillingReport.objects.all()
+
     return render_to_response('teams/billing/choose.html', {
-        'form': form
+        'form': form,
+        'reports': reports
     }, RequestContext(request))

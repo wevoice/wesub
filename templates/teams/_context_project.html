@@ -47,7 +47,7 @@
     {% endif %}
     <ul>
         <li>
-            <a href="{% url teams:project_tasks slug=team.slug, project_slug=project.slug %}?assignee=me">My tasks</a>
+            <a href="{% url teams:project_tasks slug=team.slug, project_slug=project.slug %}?assignee=me&lang=all">Your tasks</a>
             ({{ project|user_project_tasks_count:user }})
         </li>
         <li>

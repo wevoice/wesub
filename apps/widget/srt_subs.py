@@ -19,6 +19,8 @@
 
 import xml.dom.minidom
 import StringIO
+from HTMLParser import HTMLParser
+from libs.unilangs import unilangs
 
 def captions_and_translations_to_srt(captions_and_translations):
     # TODO: note this loads the entire string into memory, which will not
@@ -149,6 +151,7 @@ class SRTSubtitles(BaseSubtitles):
     def __unicode__(self):
         output = []
 
+        parser = HTMLParser()
         i = 1
         for item in self.subtitles:
             if self.isnumber(item['start']) and self.isnumber(item['end']):
@@ -156,7 +159,7 @@ class SRTSubtitles(BaseSubtitles):
                 start = self.format_time(item['start'])
                 end = self.format_time(item['end'])
                 output.append(u'%s --> %s' % (start, end))
-                output.append(item['text'].strip())
+                output.append(parser.unescape(item['text']).strip())
                 output.append(u'')
                 i += 1
 
@@ -291,7 +294,8 @@ class TTMLSubtitles(BaseSubtitles):
         return attrib
 
     def xml_node(self):
-        xmlt = """<tt xml:lang="" xmlns="http://www.w3.org/ns/ttml"><head><metadata/><styling/><layout/></head><body region="subtitleArea"><div></div></body></tt>"""
+        xmlt = """<tt xml:lang="%s" xmlns="http://www.w3.org/ns/ttml"><head><metadata/><styling/><layout/></head><body region="subtitleArea"><div></div></body></tt>""" % unilangs.to_bcp47(self.sl.language)
+
         dom = xml.dom.minidom.parseString(xmlt)
 	styling = dom.getElementsByTagName('head')[0].getElementsByTagName('styling')[0]
         styling.setAttribute("xmlns:tts", "http://www.w3.org/2006/10/ttaf1#styling")

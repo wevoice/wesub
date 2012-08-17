@@ -227,7 +227,7 @@
         var parameters = {},
             parameterNames = $.address.parameterNames();
         for (var i = 0, l = parameterNames.length; i < l; i++) {
-            parameters[parameterNames[i]] = $.address.parameter(parameterNames[i]);
+            parameters[parameterNames[i]] = escapeHTML($.address.parameter(parameterNames[i]));
         };
         return parameters;
      },

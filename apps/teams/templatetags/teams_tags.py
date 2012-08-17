@@ -30,6 +30,8 @@ from widget.views import base_widget_params
 from templatetag_sugar.register import tag
 from templatetag_sugar.parser import Name, Variable, Constant
 
+from teams.models import Application
+
 from apps.teams.permissions import (
     can_view_settings_tab as _can_view_settings_tab,
     can_edit_video as _can_edit_video,
@@ -213,8 +215,8 @@ def team_move_video_select(context):
                                 and team.pk != team_video.team.pk]
     return context
 
-@register.inclusion_tag('videos/_team_list.html')
-def render_belongs_to_team_list(team_video, user):
+@register.inclusion_tag('videos/_team_list.html', takes_context=True)
+def render_belongs_to_team_list(context, team_video, user):
     teams =  []
     video = team_video.video
     for t in list(video.team_set.filter()):
@@ -224,7 +226,7 @@ def render_belongs_to_team_list(team_video, user):
                 teams.insert(0, t)
             else:
                 teams.append(t)
-    return {"teams": teams, "team_video": team_video}
+    return {"teams": teams, "team_video": team_video, "user": context["request"].user}
 
 
 @register.inclusion_tag('teams/_team_video_detail.html', takes_context=True)
@@ -262,8 +264,7 @@ def invite_friends_to_team(context, team):
 
 @register.inclusion_tag('teams/_task_language_list.html', takes_context=True)
 def languages_to_translate(context, task):
-    video = Video.objects.get(teamvideo=task.team_video_id)
-    context['allowed_languages'] = [(sl.language, sl.language_display()) for sl in video.subtitlelanguage_set.all() if sl.is_complete_and_synced()]
+    context['allowed_languages'] = video_cache.get_video_completed_languages(task.team_video_id)
 
     return context
 
@@ -330,6 +331,10 @@ def can_view_settings_tab(team, user):
 @register.filter
 def can_rename_team(team, user):
     return _can_rename_team(team, user)
+
+@register.filter
+def can_apply(team, user):
+    return Application.objects.can_apply(team=team, user=user)
 
 @register.filter
 def has_applicant(team, user):

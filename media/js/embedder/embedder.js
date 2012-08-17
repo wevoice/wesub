@@ -36,11 +36,10 @@
                         new that.AmaraView({
 
                             // TODO: This needs to support a node OR ID string.
-                            el: _$('#' + options.div)[0],
+                            el: _$(options.div)[0],
                             model: new VideoModel(options)
                         })
                     );
-
                 }
             }
         };
@@ -170,16 +169,34 @@
             events: {
                 'click a.amara-logo':              'logoClicked',
                 'click a.amara-share-button':      'shareButtonClicked',
-                'click a.amara-transcript-button': 'transcriptButtonClicked',
-                'click a.amara-subtitles-button':  'subtitlesButtonClicked'
+                'click a.amara-transcript-button': 'toggleTranscriptDisplay',
+                'click a.amara-subtitles-button':  'toggleSubtitlesDisplay'
             },
 
             render: function() {
                 
                 var that = this;
 
+                // Create a container that we will use to inject the Popcorn video.
+                this.$el.prepend('<div class="amara-popcorn"></div>');
+
+                var $popContainer = $('div.amara-popcorn', this.$el);
+
+                // Copy the width and height to the new Popcorn container.
+                $popContainer.width(this.$el.width());
+                $popContainer.height(this.$el.height());
+
+                // This is a hack until Popcorn.js supports passing a DOM elem to
+                // its smart() method. See: http://bit.ly/L0Lb7t
+                var id = 'amara-popcorn-' + Math.floor(Math.random() * 100000000);
+                $popContainer.attr('id', id);
+
+                // Reset the height on the parent amara-embed div. If we don't do this,
+                // our amara-tools div won't be visible.
+                this.$el.height('auto');
+
                 // Init the Popcorn video.
-                this.pop = _Popcorn.smart(this.model.get('div'), this.model.get('url'));
+                this.pop = _Popcorn.smart($popContainer.attr('id'), this.model.get('url'));
 
                 this.pop.on('loadedmetadata', function() {
 
@@ -213,8 +230,9 @@
                                 that.fetchSubtitles(that.model.get('initialLanguage'), function() {
 
                                     // When we've got a response with the subtitles, start building
-                                    // out the transcript viewer.
+                                    // out the transcript viewer and subtitles.
                                     that.buildTranscript(that.model.get('initialLanguage'));
+                                    that.buildSubtitles(that.model.get('initialLanguage'));
                                 });
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
@@ -227,31 +245,62 @@
 
             },
 
+            buildSubtitles: function(language) {
+
+                // Get the subtitle sets for this language.
+                var subtitleSets = this.model.subtitles.where({'language': language});
+
+                if (subtitleSets.length) {
+                    var subtitleSet = subtitleSets[0];
+
+                    // Get the actual subtitles for this language.
+                    var subtitles = subtitleSet.get('subtitles');
+
+                    // For each subtitle, init the Popcorn subtitle plugin.
+                    for (var i = 0; i < subtitles.length; i++) {
+                        this.pop.amarasubtitle({
+                            start: subtitles[i].start,
+                            end: subtitles[i].end,
+                            text: subtitles[i].text
+                        });
+                    }
+
+                    this.$popSubtitlesContainer = $('div.amara-popcorn-subtitles', this.$popContainer);
+                }
+            },
             buildTranscript: function(language) {
-                var subtitleSet = this.model.subtitles.where({'language': language})[0];
+
+                var subtitleSet;
+
+                // Get the subtitle sets for this language.
+                var subtitleSets = this.model.subtitles.where({'language': language});
+
+                if (subtitleSets.length) {
+                    subtitleSet = subtitleSets[0];
+                } else {
+                    $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
+                }
+
+                // Get the actual subtitles for this language.
                 var subtitles = subtitleSet.get('subtitles');
 
                 if (subtitles.length) {
 
-                    var html = '';
+                    // Remove the loading indicator.
+                    this.$transcriptBody.html('');
 
-                    var transcriptLineTemplate = '' +
-                        '<div class="amara-group amara-transcript-line">' +
-                        '    <div class="amara-transcript-line-left">{{ start }}</div>' +
-                        '    <div class="amara-transcript-line-right">{{ text }}</div>' +
-                        '</div>';
-
+                    // For each subtitle, init the Popcorn transcript plugin.
                     for (var i = 0; i < subtitles.length; i++) {
-                        html += __.template(transcriptLineTemplate, {
+                        this.pop.amaratranscript({
+                            start: subtitles[i].start,
+                            start_clean: utils.parseFloatAndRound(subtitles[i].start),
+                            end: subtitles[i].end,
                             text: subtitles[i].text,
-                            start: utils.parseFloatAndRound(subtitles[i].start)
+                            container: this.$transcriptBody.get(0)
                         });
                     }
-
-                    this.$transcriptBody.html(html);
-
                 } else {
-                    this.$transcriptBody.html('No subtitles available.');
+                    $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
                 }
             },
 
@@ -290,11 +339,14 @@
             shareButtonClicked: function() {
                 return false;
             },
-            subtitlesButtonClicked: function() {
+            toggleSubtitlesDisplay: function(e) {
+                this.$popSubtitlesContainer.toggle();
+                this.$subtitlesButton.toggleClass('amara-button-enabled');
                 return false;
             },
-            transcriptButtonClicked: function() {
+            toggleTranscriptDisplay: function() {
                 this.$transcript.toggle();
+                this.$transcriptButton.toggleClass('amara-button-enabled');
                 return false;
             },
             waitUntilVideoIsComplete: function(callback) {
@@ -311,9 +363,9 @@
             },
 
             templateHTML: '' +
-                '<div class="amara-container" style="width: {{ width }}px;">' +
+                '<div class="amara-tools" style="width: {{ width }}px;">' +
                 '    <div class="amara-bar">' +
-                '        <a href="#" class="amara-share-button"></a>' +
+                //'        <a href="#" class="amara-share-button"></a>' +
                 '        <a href="#" class="amara-logo">Amara</a>' +
                 '        <ul class="amara-displays">' +
                 '            <li><a href="#" class="amara-transcript-button"></a></li>' +
@@ -323,29 +375,31 @@
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
                 '            <div class="amara-transcript-header-left">' +
-                '                Auto-stream <span>ON</span>' +
+                '                Auto-stream <span>OFF</span>' +
                 '            </div>' +
-                '            <div class="amara-transcript-header-right">' +
-                '                <form action="" class="amara-transcript-search">' +
-                '                    <input class="amara-transcript-search-input" placeholder="Search transcript" />' +
-                '                </form>' +
-                '            </div>' +
+                //'            <div class="amara-transcript-header-right">' +
+                //'                <form action="" class="amara-transcript-search">' +
+                //'                    <input class="amara-transcript-search-input" placeholder="Search transcript" />' +
+                //'                </form>' +
+                //'            </div>' +
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
-                '            <div class="amara-transcript-line amara-group">' +
-                '                <div class="amara-transcript-line-left">&nbsp;</div>' +
-                '                <div class="amara-transcript-line-right">' +
+                '            <a href="#" class="amara-transcript-line amara-group">' +
+                '                <span class="amara-transcript-line-left">&nbsp;</span>' +
+                '                <span class="amara-transcript-line-right">' +
                 '                    Loading transcript&hellip;' +
-                '                </div>' +
-                '            </div>' +
+                '                </span>' +
+                '            </a>' +
                 '        </div>' +
                 '    </div>' +
                 '</div>',
 
             cacheNodes: function() {
-                this.$amaraContainer = $('div.amara-container', this.$el);
-                this.$transcript = $('div.amara-transcript', this.$amaraContainer);
+                this.$amaraTools = $('div.amara-tools', this.$el);
+                this.$transcript = $('div.amara-transcript', this.$amaraTools);
                 this.$transcriptBody = $('div.amara-transcript-body', this.$transcript);
+                this.$transcriptButton = $('a.amara-transcript-button', this.$amaraTools);
+                this.$subtitlesButton = $('a.amara-subtitles-button', this.$amaraTools);
             }
 
         });
@@ -410,15 +464,11 @@
             if (amaraEmbeds.length) {
                 amaraEmbeds.each(function() {
 
-                    // This is a hack until Popcorn.js supports passing a DOM elem to
-                    // its smart() method. See: http://bit.ly/L0Lb7t
-                    var id = 'amara-embed-' + Math.floor(Math.random() * 100000000);
-                    var $div = _$(this);
-                    $div.attr('id', id);
+                    var $div = $(this);
 
                     // Call embedVideo with this div and URL.
                     that.push(['embedVideo', {
-                        'div': id,
+                        'div': this,
                         'initialLanguage': $div.data('initial-language'),
                         'url': $div.data('url')
                     }]);

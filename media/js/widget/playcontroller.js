@@ -53,6 +53,7 @@ unisubs.widget.PlayController = function(
     this.nudgeShown_ = false;
     this.trackedURLs_ = new goog.structs.Set();
 };
+
 goog.inherits(unisubs.widget.PlayController, goog.events.EventTarget);
 
 unisubs.widget.PlayController.LANGUAGE_CHANGED = 'languagechanged';
@@ -120,8 +121,9 @@ unisubs.widget.PlayController.prototype.setUpSubs_ =
         listen(this.videoPlayer_,
                unisubs.player.AbstractVideoPlayer.EventType.PLAY,
                this.trackPlay_);
-    if (this.videoPlayer_.isPlaying())
+    if (this.videoPlayer_.isPlaying()) {
         this.trackPlay_();
+    }
 };
 
 unisubs.widget.PlayController.prototype.getSubtitlesJSON = function() {
@@ -181,12 +183,14 @@ unisubs.widget.PlayController.prototype.finished_ = function() {
     if (this.nudgeShown_ || this.isModerated_){
         return;
     }
+
     var message = !!this.subtitleState_.LANGUAGE ?
         "Improve this Translation" : "Improve these Subtitles";
     this.videoTab_.updateNudge(
         message,
         goog.bind(this.subtitleController_.improveSubtitles,
                   this.subtitleController_));
+
     this.videoTab_.showNudge(true);
     this.nudgeShown_ = true;
 };
@@ -196,6 +200,7 @@ unisubs.widget.PlayController.prototype.disposeComponents_ = function() {
         this.captionManager_.dispose();
         this.captionManager_ = null;
     }
+
     if (this.playEventHandler_) {
         this.playEventHandler_.dispose();
         this.playEventHandler_ = null;

@@ -46,10 +46,10 @@
                         {% if team|can_approve_application:user %}
                             <ul class="actions">
                                 <li>
-                                    <a href="{% url teams:approve_application team.slug item.user.pk %}">{% trans 'Approve' %}</a>
+                                    <a href="{% url teams:approve_application team.slug item.pk %}">{% trans 'Approve' %}</a>
                                 </li>
                                 <li>
-                                    <a href="{% url teams:deny_application team.slug item.user.pk %}">{% trans 'Deny' %}</a>
+                                    <a href="{% url teams:deny_application team.slug item.pk %}">{% trans 'Deny' %}</a>
                                 </li>
                                 <li>
                                     <a href="{% url messages:new %}?user={{ item.user.username }}">

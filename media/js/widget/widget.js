@@ -127,22 +127,24 @@ unisubs.widget.Widget.prototype.createVideoPlayer_ = function(videoSource) {
 unisubs.widget.Widget.prototype.findVideoSource_ = function() {
     if (this.alternateVideoURLs_ && this.alternateVideoURLs_.length > 0) {
         var mainVideoSpec = this.videoURL_;
-        if (this.videoConfig_)
+        if (this.videoConfig_) {
             mainVideoSpec = { 'url': this.videoURL_,
                               'config': this.videoConfig_ };
+        }
         return unisubs.player.MediaSource.bestVideoSource(
             goog.array.concat(mainVideoSpec, this.alternateVideoURLs_));
-    }
-    else
+    } else {
         return unisubs.player.MediaSource.videoSourceForURL(
             this.videoURL_, this.videoConfig_);
+    }
 };
 unisubs.widget.Widget.prototype.isVideoSourceImmediatelyUsable_ = function() {
-    if (this.videoSource_ instanceof unisubs.player.BlipTVPlaceholder)
+    if (this.videoSource_ instanceof unisubs.player.BlipTVPlaceholder) {
         return false;
-    if (this.forceFormat_ || goog.isDefAndNotNull(this.alternateVideoURLs_))
+    }
+    if (this.forceFormat_ || goog.isDefAndNotNull(this.alternateVideoURLs_)) {
         return true;
-    else {
+    } else {
         return !(this.videoSource_ instanceof unisubs.player.Html5VideoSource)
                 || unisubs.player.supportsVideo();
     }
@@ -161,18 +163,16 @@ unisubs.widget.Widget.prototype.addWidget_ = function(el) {
         el.innerHTML = err.message;
         return;
     }
-    if (this.isVideoSourceImmediatelyUsable_())
-        this.createVideoPlayer_(this.videoSource_);
-    else
-        this.addVideoLoadingPlaceholder_(el);
+
+    this.addVideoLoadingPlaceholder_(el);
+
     if (this.streamer_) {
         this.streamBox_ = new unisubs.streamer.StreamBox();
         var streamerContainer = new goog.ui.Component();
         this.addChild(streamerContainer, true);
         streamerContainer.addChild(this.streamBox_, true);
         // TODO: show loading?
-    }
-    else {
+    } else {
         this.videoTab_ = new unisubs.widget.HangingVideoTab();
         var videoTabContainer = new goog.ui.Component();
         this.addChild(videoTabContainer, true);
@@ -185,12 +185,14 @@ unisubs.widget.Widget.prototype.addWidget_ = function(el) {
         'video_url': this.videoURL_,
         'is_remote': unisubs.isFromDifferentDomain()
     };
-    if (this.baseState_)
+    if (this.baseState_) {
         args['base_state'] = this.baseState_.ORIGINAL_PARAM;
+    }
     unisubs.Rpc.call(
         'show_widget', args,
         goog.bind(this.initializeState_, this),
         goog.bind(this.showWidgetError_, this));
+
     unisubs.Tracker.getInstance().trackEvent(
         "Widget displayed",
         window.location.href,
@@ -200,11 +202,7 @@ unisubs.widget.Widget.prototype.showWidgetError_ = function() {
     // call to show_widget timed out.
     if (!this.isVideoSourceImmediatelyUsable_()) {
         // waiting for video source from server.
-        if (this.videoSource_ instanceof unisubs.player.BlipTVPlaceholder) {
-            // out of luck.
-
-        }
-        else {
+        if (!this.videoSource_ instanceof unisubs.player.BlipTVPlaceholder) {
             this.createVideoPlayer_(this.videoSource_);
         }
     }
@@ -213,22 +211,22 @@ unisubs.widget.Widget.prototype.showWidgetError_ = function() {
     }
 };
 unisubs.widget.Widget.prototype.initializeState_ = function(result) {
+    goog.dom.removeNode(this.videoPlaceholder_);
     if (result && !result["error_msg"]) {
-        if (!this.isVideoSourceImmediatelyUsable_()) {
-            goog.dom.removeNode(this.videoPlaceholder_);
-            var videoSource = unisubs.player.MediaSource.bestVideoSource(
-                result['video_urls']);
-            if (goog.typeOf(videoSource) == goog.typeOf(this.videoSource_) &&
-                this.videoConfig_)
-                videoSource.setVideoConfig(this.videoConfig_);
-            this.videoSource_ = videoSource;
-            this.createVideoPlayer_(this.videoSource_);
+        var videoSource = unisubs.player.MediaSource.bestVideoSource(
+            result['video_urls']);
+
+        if (goog.typeOf(videoSource) == goog.typeOf(this.videoSource_) &&
+            this.videoConfig_) {
+            videoSource.setVideoConfig(this.videoConfig_);
         }
+        
+        this.videoSource_ = videoSource;
+        this.createVideoPlayer_(this.videoSource_);
     }
     if (this.streamer_) {
         this.initializeStateStreamer_(result);
-    }
-    else {
+    } else {
         this.initializeStateTab_(result);
     }
 };
@@ -245,13 +243,14 @@ unisubs.widget.Widget.prototype.initializeStateTab_ = function(result) {
 
     var subController = this.controller_.getSubtitleController();
 
-    if (this.subtitleImmediately_)
+    if (this.subtitleImmediately_) {
         goog.Timer.callOnce(
             goog.bind(subController.openSubtitleDialog, subController));
-    else if (this.translateImmediately_)
+    } else if (this.translateImmediately_) {
         goog.Timer.callOnce(
             goog.bind(subController_.openNewLanguageDialog,
                       subController_));
+    }
 };
 unisubs.widget.Widget.prototype.initializeStateStreamer_ = function(result) {
     var subtitleState = unisubs.widget.SubtitleState.fromJSON(
@@ -265,15 +264,17 @@ unisubs.widget.Widget.prototype.enterDocument = function() {
     this.setVideoDimensions_();
 };
 unisubs.widget.Widget.prototype.setVideoDimensions_ = function() {
-    if (!this.isInDocument() || !this.videoPlayer_)
+    if (!this.isInDocument() || !this.videoPlayer_) {
         return;
-    if (this.videoPlayer_.areDimensionsKnown())
+    }
+    if (this.videoPlayer_.areDimensionsKnown()) {
         this.videoDimensionsKnown_();
-    else
+    } else {
         this.getHandler().listen(
             this.videoPlayer_,
             unisubs.player.AbstractVideoPlayer.EventType.DIMENSIONS_KNOWN,
             this.videoDimensionsKnown_);
+    }
 };
 unisubs.widget.Widget.prototype.videoDimensionsKnown_ = function() {
     unisubs.style.setWidth(
@@ -290,15 +291,15 @@ unisubs.widget.Widget.prototype.selectMenuItem = function(selection, opt_languag
     var subController = this.controller_.getSubtitleController();
     var playController = this.controller_.getPlayController();
 
-    if (selection == s.ADD_LANGUAGE)
+    if (selection == s.ADD_LANGUAGE) {
         subController.openNewLanguageDialog();
-    else if (selection == s.IMPROVE_SUBTITLES)
+    } else if (selection == s.IMPROVE_SUBTITLES) {
         subController.openSubtitleDialog();
-    else if (selection == s.SUBTITLE_HOMEPAGE)
+    } else if (selection == s.SUBTITLE_HOMEPAGE) {
         alert('subtitle homepage');
-    else if (selection == s.SUBTITLES_OFF)
+    } else if (selection == s.SUBTITLES_OFF) {
         playController.turnOffSubs();
-    else if (selection == s.LANGUAGE_SELECTED){
+    } else if (selection == s.LANGUAGE_SELECTED){
         playController.languageSelected(opt_languageCode);
     }
 

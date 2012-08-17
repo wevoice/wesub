@@ -92,19 +92,20 @@ unisubs.player.MediaSource.bestVideoSource = function(videoSpecs) {
         return videoSource;
     // if we got this far, first return mp4 for flowplayer fallback. then return anything.
     videoSource = unisubs.player.MediaSource.html5VideoSource_(
-        videoSources, vt.H264);
+        videoSources, unisubs.player.Html5VideoType.H264);
     if (videoSource != null)
         return videoSource;
     return videoSources.length > 0 ? videoSources[0] : null;
 };
 
 unisubs.player.MediaSource.videoSourceForSpec_ = function(videoSpec) {
-    if (goog.isString(videoSpec))
+    if (goog.isString(videoSpec)) {
         return unisubs.player.MediaSource.videoSourceForURL(
             videoSpec);
-    else
+    } else {
         return unisubs.player.MediaSource.videoSourceForURL(
             videoSpec['url'], videoSpec['config']);
+    }
 };
 
 unisubs.player.MediaSource.html5VideoSource_ = function(videoSources, videoType) {

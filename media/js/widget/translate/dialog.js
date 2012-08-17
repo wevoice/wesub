@@ -251,7 +251,7 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
 
     var s = unisubs.translate.Dialog.State_;
 
-    this.setExtraClass_();
+    this.setExtraClass_(' the-translate-panel');
 
     var nextSubPanel = this.makeCurrentStateSubtitlePanel_();
     var captionPanel = this.getCaptioningAreaInternal();
