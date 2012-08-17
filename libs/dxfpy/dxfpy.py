@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
-import zlib
 from lxml import etree
+from utils.compress import compress, decompress
 
 
 def get_attr(el, attr):
@@ -141,9 +141,9 @@ class SubtitleSet(object):
 
 
     @classmethod
-    def from_zip(cls, zip_data):
-        """Return a SubtitleSet from a hunk of zipped XML."""
-        return SubtitleSet(zlib.decompress(zip_data))
+    def from_blob(cls, blob_data):
+        """Return a SubtitleSet from a blob of base64'ed zip data."""
+        return SubtitleSet(decompress(blob_data))
 
     @classmethod
     def from_list(cls, subtitles):
@@ -161,10 +161,17 @@ class SubtitleSet(object):
         return subs
 
 
-    def to_zip(self):
-        """Return a string containing the zipped XML for this set of subtitles."""
-        return zlib.compress(self.to_xml())
+    def to_blob(self):
+        return compress(self.to_xml())
 
     def to_xml(self):
         """Return a string containing the XML for this set of subtitles."""
         return etree.tostring(self._ttml, pretty_print=True)
+
+
+    def __eq__(self, other):
+        if type(self) == type(other):
+            return self.to_xml() == other.to_xml()
+        else:
+            return False
+

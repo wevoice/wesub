@@ -27,8 +27,8 @@ from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
 from apps.auth.models import CustomUser as User
-from apps.subtitles.objects import SubtitleSet
 from apps.videos.models import Video
+from libs.dxfpy import SubtitleSet
 
 
 ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
@@ -214,15 +214,14 @@ class SubtitleVersion(models.Model):
 
     created = models.DateTimeField(editable=False)
 
-    # Subtitles are stored in a text blob, serialized as JSON.  Use the
-    # subtitles property to get and set them.  You shouldn't be touching this
-    # field.
+    # Subtitles are stored in a text blob, serialized as base64'ed zipped XML
+    # (oh the joys of Django).  Use the subtitles property to get and set them.
+    # You shouldn't be touching this field.
     serialized_subtitles = models.TextField(blank=True)
 
     # Lineage is stored as a blob of JSON to save on DB rows.  You shouldn't
     # need to touch this field yourself, use the lineage property.
     serialized_lineage = models.TextField(blank=True)
-
 
     def get_subtitles(self):
         """Return the SubtitleSet for this version.
@@ -236,7 +235,8 @@ class SubtitleVersion(models.Model):
             if self.serialized_subtitles == '':
                 self._subtitles = SubtitleSet()
             else:
-                self._subtitles = SubtitleSet.from_json(self.serialized_subtitles)
+                self._subtitles = SubtitleSet.from_blob(
+                                      self.serialized_subtitles)
 
         return self._subtitles
 
@@ -255,9 +255,9 @@ class SubtitleVersion(models.Model):
             subtitles = SubtitleSet()
         else:
             if not isinstance(subtitles, SubtitleSet):
-                subtitles = SubtitleSet(subtitles=subtitles)
+                subtitles = SubtitleSet.from_list(subtitles)
 
-            self.serialized_subtitles = subtitles.to_json()
+            self.serialized_subtitles = subtitles.to_blob()
 
         # We cache the parsed subs for speed.
         self._subtitles = subtitles

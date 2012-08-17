@@ -23,7 +23,8 @@ from django.test import TestCase
 from django.db import IntegrityError
 
 from apps.subtitles.models import SubtitleLanguage
-from apps.subtitles.objects import Subtitle, SubtitleSet
+# from apps.subtitles.objects import Subtitle, SubtitleSet
+from libs.dxfpy import SubtitleSet
 from apps.videos.models import Video
 
 
@@ -93,7 +94,7 @@ class TestSubtitleVersion(TestCase):
         self.assertEqual(sv.subtitle_language.id, self.sl_en.id)
         self.assertEqual(sv.title, 'title a')
         self.assertEqual(sv.description, 'desc a')
-        self.assertEqual(sv.get_subtitles(), [])
+        self.assertEqual(list(sv.get_subtitles().subtitle_items()), [])
         self.assertEqual(sv.visibility, 'public')
 
     def test_subtitle_serialization(self):
@@ -118,18 +119,18 @@ class TestSubtitleVersion(TestCase):
         # Non-empty SubtitleSets
         # Again we test pre- and post-refresh.  Note that this is also checking
         # the equality handling for Subtitle and SubtitleSets.
-        s0 = Subtitle(100, 200, "a")
-        s1 = Subtitle(300, 400, "b")
+        s0 = (100, 200, "a")
+        s1 = (300, 400, "b")
 
-        sv = self.sl_en.add_version(subtitles=SubtitleSet(subtitles=[s0, s1]))
-        self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
+        sv = self.sl_en.add_version(subtitles=SubtitleSet.from_list([s0, s1]))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list([s0, s1]))
         sv = refresh(sv)
-        self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list([s0, s1]))
 
         sv = self.sl_en.add_version(subtitles=[s0, s1])
-        self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list([s0, s1]))
         sv = refresh(sv)
-        self.assertEqual(sv.get_subtitles(), SubtitleSet(subtitles=[s0, s1]))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list([s0, s1]))
 
     def test_denormalization_sanity_checks(self):
         sv = self.sl_en.add_version()

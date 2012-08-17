@@ -28,14 +28,14 @@ def splitns(lxml_tag):
 class TestSerialization(TestCase):
     def _round_trip(self, subs):
         """Serialize and deserialize a set of subtitles."""
-        return SubtitleSet.from_zip(subs.to_zip())
+        return SubtitleSet.from_blob(subs.to_blob())
 
 
     def test_serialization(self):
         xml = sample_ttml
         subs = SubtitleSet(xml)
-        serialized_subs = subs.to_zip()
-        deserialized_subs = self._round_trip(serialized_subs)
+        serialized_subs = subs.to_blob()
+        deserialized_subs = SubtitleSet.from_blob(serialized_subs)
 
         # Make sure the XML representations are the same.
         self.assertEqual(subs.to_xml(), deserialized_subs.to_xml())
