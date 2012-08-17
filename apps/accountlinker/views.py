@@ -78,7 +78,8 @@ def youtube_oauth_callback(request):
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
         "client_secret": settings.YOUTUBE_CLIENT_SECRET,
-        "redirect_uri": universal_url("accountlinker:youtube-oauth-callback"),
+        "redirect_uri": universal_url("accountlinker:youtube-oauth-callback",
+            protocol_override='https'),
         "code": code,
         "grant_type": "authorization_code",
         
@@ -92,6 +93,7 @@ def youtube_oauth_callback(request):
                     "data": {
                         "sent_params": params,
                         "original_request": request,
+                        "response": response.content
                     },
                 })
                     

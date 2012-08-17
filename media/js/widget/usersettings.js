@@ -31,32 +31,37 @@ unisubs.UserSettings.Settings = {
 };
 
 unisubs.UserSettings.setBooleanValue = function(setting, value) {
-    if (goog.net.cookies.isEnabled())
+    if (goog.net.cookies.isEnabled()) {
+    }
         goog.net.cookies.set(setting, value ? "1" : "0", 86400 * 365 * 2);
 };
 
 unisubs.UserSettings.getBooleanValue = function(setting) {
-    if (goog.net.cookies.isEnabled())
+    if (goog.net.cookies.isEnabled()) {
         return goog.net.cookies.get(setting) == "1";
-    else
+    } else {
         return false;
+    }
 };
 
 unisubs.UserSettings.setStringValue = function(setting, value) {
-    if (goog.net.cookies.isEnabled())
+    if (goog.net.cookies.isEnabled()) {
         goog.net.cookies.set(setting, value, 86400 * 365 * 2);
+    }
 };
 
 unisubs.UserSettings.getStringValue = function(setting) {
-    if (goog.net.cookies.isEnabled())
+    if (goog.net.cookies.isEnabled()) {
         return goog.net.cookies.get(setting);
-    else
+    } else {
         return null;
+    }
 };
 
 unisubs.UserSettings.setFloatValue = function(setting, value) {
-    if (goog.net.cookies.isEnabled())
+    if (goog.net.cookies.isEnabled()) {
         goog.net.cookies.set(setting, value);
+    }
 };
 
 unisubs.UserSettings.getFloatValue = function(setting, ifNanVal) {

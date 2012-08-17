@@ -52,6 +52,10 @@ from utils.translation import get_language_label
 def get_url_base():
     return "http://" + Site.objects.get_current().domain
 
+def _team_sends_notification(team, notification_setting_name):
+    from teams.models import Setting
+    return not team.settings.filter( key=Setting.KEY_IDS[notification_setting_name]).exists()
+
 @task()
 def send_new_message_notification(message_id):
     from messages.models import Message
@@ -90,6 +94,8 @@ def team_invitation_sent(invite_pk):
     from messages.models import Message
     from teams.models import Invite, Setting, TeamMember
     invite = Invite.objects.get(pk=invite_pk)
+    if not _team_sends_notification(invite.team,'block_invitation_sent_message'):
+        return False
     # does this team have a custom message for this?
     team_default_message = None
     messages = Setting.objects.messages().filter(team=invite.team)
@@ -136,12 +142,15 @@ def application_sent(application_pk):
     from messages.models import Message
     from teams.models import Application, TeamMember
     application = Application.objects.get(pk=application_pk)
+    if not _team_sends_notification(application.team,'block_application_sent_message'):
+        return False
     notifiable = TeamMember.objects.filter( team=application.team,
        role__in=[TeamMember.ROLE_ADMIN, TeamMember.ROLE_OWNER])
     for m in notifiable:
 
         template_name = "messages/application-sent.txt"
         context = {
+            "application": application,
             "applicant": application.user,
             "url_base": get_url_base(),
             "team":application.team,
@@ -171,6 +180,8 @@ def team_application_denied(application_pk):
     from messages.models import Message
     from teams.models import Application
     application = Application.objects.get(pk=application_pk)
+    if not _team_sends_notification(application.team,'block_application_denided_message'):
+        return False
     template_name = "messages/email/team-application-denied.html"
     context = {
         "team": application.team,
@@ -187,7 +198,6 @@ def team_application_denied(application_pk):
         msg.save()
     Meter('templated-emails-sent-by-type.teams.application-declined').inc()
     send_templated_email(msg.user, msg.subject, template_name, context)
-    application.delete()
 
 @task()
 def team_member_new(member_pk):
@@ -196,6 +206,8 @@ def team_member_new(member_pk):
     from messages.models import Message
     from teams.models import TeamMember
     member = TeamMember.objects.get(pk=member_pk)
+    if not _team_sends_notification(member.team,'block_team_member_new_message'):
+        return False
     from videos.models import Action
     from teams.models import TeamMember
     # the feed item should appear on the timeline for all team members
@@ -255,6 +267,8 @@ def team_member_leave(team_pk, user_pk):
     from teams.models import TeamMember, Team
     user = User.objects.get(pk=user_pk)
     team = Team.objects.get(pk=team_pk)
+    if not _team_sends_notification(team,'block_team_member_leave_message'):
+        return False
     from videos.models import Action
     # the feed item should appear on the timeline for all team members
     # as a team might have thousands of members, this one item has
@@ -348,6 +362,8 @@ def team_task_assigned(task_pk):
     from messages.models import Message
     try:
         task = Task.objects.select_related("team_video__video", "team_video", "assignee").get(pk=task_pk, assignee__isnull=False)
+        if not _team_sends_notification(task.team,'block_task_assigned_message'):
+            return False
     except Task.DoesNotExist:
         return False
     task_type = Task.TYPE_NAMES[task.type]
@@ -391,6 +407,14 @@ def _reviewed_notification(task_pk, status):
     except Task.DoesNotExist:
         return False
 
+    notification_setting_name = {
+
+        REVIEWED_AND_PUBLISHED: 'block_reviewed_and_published_message',
+        REVIEWED_AND_PENDING_APPROVAL: 'block_reviewed_and_pending_approval_message',
+        REVIEWED_AND_SENT_BACK: 'block_reviewed_and_sent_back_message',
+    }[status]
+    if not _team_sends_notification(task.team, notification_setting_name):
+        return False
 
     subject = ugettext(u"Your subtitles have been reviewed")
     if status == REVIEWED_AND_PUBLISHED:
@@ -487,6 +511,8 @@ def approved_notification(task_pk, published=False):
         task = Task.objects.select_related(
             "team_video__video", "team_video", "assignee", "subtitle_version").get(
                 pk=task_pk)
+        if not _team_sends_notification(task.team, 'block_approved_message'):
+            return False
     except Task.DoesNotExist:
         return False
     # some tasks are being created without subtitles version, see

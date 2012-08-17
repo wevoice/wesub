@@ -64,32 +64,32 @@ unisubs.controls.ProgressBar.prototype.progressSliderInteracting_ =
     if (event.type == et.START) {
         this.pausedAtStart_ = this.videoPlayer_.isPaused();
         this.videoPlayer_.pause(true);
-    }
-    else if (event.type == et.STOP && !this.pausedAtStart_)
+    } else if (event.type == et.STOP && !this.pausedAtStart_) {
         this.videoPlayer_.play(true);
-    else if (event.type == et.TRACK_CLICKED)
+    } else if (event.type == et.TRACK_CLICKED) {
         this.setVideoPlayheadTime_(event.value);
+    }
 };
 
-unisubs.controls.ProgressBar.prototype.progressSliderUpdate_ =
-    function(event)
-{
+unisubs.controls.ProgressBar.prototype.progressSliderUpdate_ = function(event) {
     this.setVideoPlayheadTime_(this.progressSlider_.getValue());
     this.updatePlayedBar_(this.progressSlider_.getValue() / 100);
 };
 
-unisubs.controls.ProgressBar.prototype.setVideoPlayheadTime_ =
-    function(progValue)
-{
-    if (!this.hasDuration_())
+unisubs.controls.ProgressBar.prototype.setVideoPlayheadTime_ = function(progValue) {
+    if (!this.hasDuration_()) {
         return;
+    }
+
     this.videoPlayer_.setPlayheadTime(
         this.videoDuration_ * progValue / 100);
 };
 
 unisubs.controls.ProgressBar.prototype.videoTimeUpdate_ = function(event) {
-    if (!this.hasDuration_())
+    if (!this.hasDuration_()) {
         return;
+    }
+
     if (!this.progressSlider_.isCurrentlyInteracting()) {
         this.progressSlider_.setValue(
             100 * this.videoPlayer_.getPlayheadTime() / this.videoDuration_,
@@ -98,11 +98,14 @@ unisubs.controls.ProgressBar.prototype.videoTimeUpdate_ = function(event) {
             this.videoPlayer_.getPlayheadTime() / this.videoDuration_);
     }
 };
+
 unisubs.controls.ProgressBar.prototype.hasDuration_ = function() {
     if (this.videoDuration_ == 0) {
         this.videoDuration_ = this.videoPlayer_.getDuration();
-        if (this.videoDuration_ == 0)
+
+        if (this.videoDuration_ == 0) {
             return false;
+        }
     }
     return true;
 };

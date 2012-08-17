@@ -30,6 +30,8 @@ from widget.views import base_widget_params
 from templatetag_sugar.register import tag
 from templatetag_sugar.parser import Name, Variable, Constant
 
+from teams.models import Application
+
 from apps.teams.permissions import (
     can_view_settings_tab as _can_view_settings_tab,
     can_edit_video as _can_edit_video,
@@ -262,8 +264,7 @@ def invite_friends_to_team(context, team):
 
 @register.inclusion_tag('teams/_task_language_list.html', takes_context=True)
 def languages_to_translate(context, task):
-    video = Video.objects.get(teamvideo=task.team_video_id)
-    context['allowed_languages'] = [(sl.language, sl.language_display()) for sl in video.subtitlelanguage_set.all() if sl.is_complete_and_synced()]
+    context['allowed_languages'] = video_cache.get_video_completed_languages(task.team_video_id)
 
     return context
 
@@ -330,6 +331,10 @@ def can_view_settings_tab(team, user):
 @register.filter
 def can_rename_team(team, user):
     return _can_rename_team(team, user)
+
+@register.filter
+def can_apply(team, user):
+    return Application.objects.can_apply(team=team, user=user)
 
 @register.filter
 def has_applicant(team, user):

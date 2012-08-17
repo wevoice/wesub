@@ -43,11 +43,13 @@ from teams.permissions import get_member
 from uslogging.models import WidgetDialogCall
 from utils import DEFAULT_PROTOCOL
 from utils.metrics import Meter
+from utils.html import unescape as unescape_html
+from utils.unisubsmarkup import markup_to_html
 from videos import models
 from widget.models import SubtitlingSession
 from widget.null_rpc import NullRpc
 from widget.rpc import add_general_settings, Rpc
-from widget.srt_subs import captions_and_translations_to_srt, captions_to_srt, SSASubtitles
+from widget.srt_subs import captions_and_translations_to_srt, captions_to_srt, SSASubtitles, GenerateSubtitlesHandler
 
 
 rpc_views = Rpc()
@@ -73,6 +75,57 @@ def widget_public_demo(request):
     context = widget.add_onsite_js_files({})
     return render_to_response('widget/widget_public_demo.html', context,
                               context_instance=RequestContext(request))
+
+@csrf_exempt
+def convert_subtitles(request):
+    data = {}
+    errors = None
+    if request.POST:
+        if 'subtitles' and 'format' and 'language_code' in request.POST:
+
+            subtitles = json.loads(request.POST['subtitles'])
+            format = request.POST['format']
+            available_formats = "ttml dfxp srt ssa sbv".split()
+            if format not in available_formats:
+                errors = {"errors":{
+                    'format': 'You must pass a suitable format. Available formats are %s' % available_formats
+                }}
+
+            cleaned_subs = []
+            for s in subtitles:
+                cleaned_subs.append({
+                    'text': markup_to_html(s['text']),
+                    'start': s['start_time'],
+                    'end': s['end_time'],
+                    'id': s['subtitle_id'],
+                    'start_of_paragraph': s['start_of_paragraph'],
+                })
+
+            #import pdb;pdb.set_trace()
+            # TODO: Serialize these subtitles into the format given.
+
+            # When we have newly serialized subtitles, put a stringified version of them
+            # into this object. This object is what gets dumped into the textarea on the
+            # front-end. If there are errors, also dump to result (the error would be displayed
+            # to the user in the textarea.
+            handler = GenerateSubtitlesHandler[request.POST['format']]
+            subs = handler(cleaned_subs, None, sl=models.SubtitleLanguage(language=request.POST['language_code']))
+                                               
+            data['result'] = unicode(subs)
+        else:
+            errors = {
+                "errors":{
+                    'subtitles': 'You need to send subtitles back',
+                    'format': 'You must pass a suitable format',
+                },
+                'result': 'Something is wrong'
+            }
+    else:
+        errors = {'result': "Must be a POST request"}
+    res = json.dumps(errors or data)
+    if errors:
+        return HttpResponseServerError(res, mimetype='application/javascript')
+    return HttpResponse(json.dumps(data), mimetype='application/javascript')
 
 def widgetizerbootloader(request):
     context = {

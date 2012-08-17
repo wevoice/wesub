@@ -47,16 +47,20 @@ unisubs.UnitOfWork.prototype.setTitle = function(title){
 unisubs.UnitOfWork.prototype.registerNew = function(obj) {
     if (goog.array.contains(this.updated_, obj) ||
         goog.array.contains(this.deleted_, obj) ||
-        goog.array.contains(this.inserted_, obj))
+        goog.array.contains(this.inserted_, obj)) {
         throw new "registerNew failed";
+    }
+
     this.everContainedWork_ = true;
     this.inserted_.push(obj);
     this.issueWorkEvent_();
 };
 
 unisubs.UnitOfWork.prototype.registerUpdated = function(obj) {
-    if (goog.array.contains(this.deleted_, obj))
+    if (goog.array.contains(this.deleted_, obj)) {
         throw new "registerUpdated failed";
+    }
+
     if (!goog.array.contains(this.inserted_, obj) &&
         !goog.array.contains(this.updated_, obj)) {
         this.everContainedWork_ = true;
@@ -66,13 +70,14 @@ unisubs.UnitOfWork.prototype.registerUpdated = function(obj) {
 };
 
 unisubs.UnitOfWork.prototype.registerDeleted = function(obj) {
-    if (goog.array.contains(this.inserted_, obj))
+    if (goog.array.contains(this.inserted_, obj)) {
         goog.array.remove(this.inserted_, obj);
-    else {
+    } else {
         this.everContainedWork_ = true;
         goog.array.remove(this.updated_, obj);
-        if (!goog.array.contains(this.deleted_, obj))
+        if (!goog.array.contains(this.deleted_, obj)) {
             this.deleted_.push(obj);
+        }
         this.issueWorkEvent_();
     }
 };

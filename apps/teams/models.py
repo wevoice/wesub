@@ -194,7 +194,7 @@ class Team(models.Model):
             self.default_project
 
     def __unicode__(self):
-        return self.name
+        return self.name or self.slug
 
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
@@ -444,7 +444,7 @@ class Team(models.Model):
 
         if query:
             for term in get_terms(query):
-                qs = qs.auto_query(qs.query.clean(term))
+                qs = qs.auto_query(qs.query.clean(term).decode('utf-8'))
 
         if language:
             qs = qs.filter(video_completed_langs=language)
@@ -1039,30 +1039,87 @@ class MembershipNarrowing(models.Model):
         return super(MembershipNarrowing, self).save(*args, **kwargs)
 
 
+class ApplicationInvalidException(Exception):
+    pass
+
+class ApplicationManager(models.Manager):
+
+    def can_apply(self, team, user):
+        """
+        A user can apply either if he is not a member of the team yet, the
+        team hasn't said no to the user (either application denied or removed the user'
+        and if no applications are pending.
+        """
+        sour_application_exists =  self.filter(team=team, user=user, status__in=[
+            Application.STATUS_MEMBER_REMOVED, Application.STATUS_DENIED,
+            Application.STATUS_PENDING]).exists()
+        if sour_application_exists:
+            return False
+        return  not team.is_member(user)
+
+    def open(self, team=None, user=None):
+        qs =  self.filter(status=Application.STATUS_PENDING)
+        if team:
+            qs = qs.filter(team=team)
+        if user:
+            qs = qs.filter(user=user)
+        return qs
+
 # Application
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
     user = models.ForeignKey(User, related_name='team_applications')
     note = models.TextField(blank=True)
+    # None -> not acted upon
+    # True -> Approved
+    # False -> Rejected
+    STATUS_PENDING,STATUS_APPROVED, STATUS_DENIED, STATUS_MEMBER_REMOVED,\
+        STATUS_MEMBER_LEFT = xrange(0, 5)
+    STATUSES = (
+        (STATUS_PENDING, u"Pending"),
+        (STATUS_APPROVED, u"Approved"),
+        (STATUS_DENIED, u"Denied"),
+        (STATUS_MEMBER_REMOVED, u"Member Removed"),
+        (STATUS_MEMBER_LEFT, u"Member Left"),
+    )
+    STATUSES_IDS = dict([choice[::-1] for choice in STATUSES])
 
+    status = models.PositiveIntegerField(default=STATUS_PENDING, choices=STATUSES)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(blank=True, null=True)
+
+    objects = ApplicationManager()
     class Meta:
-        unique_together = (('team', 'user'),)
+        unique_together = (('team', 'user', 'status'),)
 
 
     def approve(self):
         """Approve the application.
 
-        This will create an appropriate TeamMember record and then delete itself.
-
+        This will create an appropriate TeamMember if this application has
+        not been already acted upon
         """
+        if self.status == Application.STATUS_MEMBER_LEFT:
+            raise ApplicationInvalidException("")
         TeamMember.objects.get_or_create(team=self.team, user=self.user)
-        self.delete()
+        self.modified = datetime.datetime.now()
+        self.status = Application.STATUS_APPROVED
+        self.save()
+        return self
 
     def deny(self):
-        """Queue a Celery task that will handle properly denying this application."""
-
-        # We can't delete the row until the notification task has run.
+        """
+        Marks the application as not approved, then
+        Queue a Celery task that will handle properly denying this
+        application.
+        """
+        if self.status == Application.STATUS_MEMBER_LEFT:
+            raise ApplicationInvalidException("")
+        self.modified = datetime.datetime.now()
+        self.status = Application.STATUS_DENIED
+        self.save()
         notifier.team_application_denied.delay(self.pk)
+        return self
 
     def save(self, dispatches_http_callback=True, *args, **kwargs):
         is_new = not bool(self.pk)
@@ -1070,6 +1127,25 @@ class Application(models.Model):
         if dispatches_http_callback and is_new:
             from teams.signals import api_application_new
             api_application_new.send(self)
+
+    def on_member_leave(self):
+        """
+        Marks the appropriate status, but users can still
+        reapply to a team if they so desire later.
+        """
+        self.status = Application.STATUS_MEMBER_LEFT
+        self.save()
+
+    def on_member_removed(self):
+        """
+        Marks the appropriate status so that user's cannot reapply
+        to a team after being removed.
+        """
+        self.status = Application.STATUS_MEMBER_REMOVED
+        self.save()
+
+    def __unicode__(self):
+        return "Application: %s - %s - %s" % (self.team.slug, self.user.username, self.status)
 
 # Invites
 class InviteExpiredException(Exception):
@@ -2023,6 +2099,18 @@ class Setting(models.Model):
         (200, 'guidelines_subtitle'),
         (201, 'guidelines_translate'),
         (202, 'guidelines_review'),
+        # 300s means if this team will block those notifications
+        (300, 'block_invitation_sent_message'),
+        (301, 'block_application_sent_message'),
+        (302, 'block_application_denided_message'),
+        (303, 'block_team_member_new_message'),
+        (304, 'block_team_member_leave_message'),
+        (305, 'block_task_assigned_message'),
+        (306, 'block_reviewed_and_published_message'),
+        (307, 'block_reviewed_and_pending_approval_message'),
+        (308, 'block_reviewed_and_sent_back_message'),
+        (309, 'block_approved_message'),
+        (310, 'block_new_video_message'),
     )
     KEY_NAMES = dict(KEY_CHOICES)
     KEY_IDS = dict([choice[::-1] for choice in KEY_CHOICES])
@@ -2253,7 +2341,6 @@ class TeamNotificationSetting(models.Model):
         except ImportError:
             logger.exception("Apparently unisubs-integration is not installed")
 
-
     def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
         
@@ -2269,7 +2356,7 @@ class TeamNotificationSetting(models.Model):
         return
 
     def __unicode__(self):
-        return u'NotificationSettings for team %s' % (self.team)
+        return u'NotificationSettings for team %s' % self.team
 
 
 class BillingReport(models.Model):
@@ -2290,8 +2377,9 @@ class BillingReport(models.Model):
         import csv
 
         midnight = datetime.time(0, 0, 0)
+        almost_midnight = datetime.time(23, 59, 59)
         start_date = datetime.datetime.combine(self.start_date, midnight)
-        end_date = datetime.datetime.combine(self.end_date, midnight)
+        end_date = datetime.datetime.combine(self.end_date, almost_midnight)
 
         rows = [['Video title', 'Video URL', 'Video language',
                     'Billable minutes']]
@@ -2344,6 +2432,7 @@ class BillingReport(models.Model):
 class Partner(models.Model):
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
+    can_request_paid_captions = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name

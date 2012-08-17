@@ -1,5 +1,5 @@
 (function (Popcorn) {
-    Popcorn.plugin( 'transcript' , {
+    Popcorn.plugin( 'amaratranscript' , {
         _setup : function(options) {
 
             options.pop = this;

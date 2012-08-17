@@ -584,9 +584,28 @@ You can list existing members of a team:
 
 .. http:get:: /api2/partners/teams/[team-slug]/members/
 
+Adding a new member to a team:
+
+.. http:post:: /api2/partners/teams/[team-slug]/members/
+
 Updating a team member (e.g. changing their role):
 
 .. http:put:: /api2/partners/teams/[team-slug]/members/[username]/
+
+Removing a user from a team:
+
+.. http:delete:: /api2/partners/teams/[team-slug]/members/[username]/
+
+Example of adding a new user:
+
+.. code-block:: json
+
+    {
+        "username": "test-user",
+        "role": "manager"
+    }
+
+.. note:: You can only add members to teams you own.
 
 Roles
 +++++
@@ -595,6 +614,25 @@ Roles
 * ``admin``
 * ``manager``
 * ``contributor``
+
+.. warning:: Changed behavior: the previous functionality was moved the Safe
+    Team Member Resource documented below.
+
+Safe Team Member Resource
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This resource behaves the same as the normal Team Member resource with one
+small difference.  When you add a user to a team, we will send an invitation to
+the user to join the team.  If the user doesn't exist, we will create it.  The
+standard Team Member resource simply adds the user to the team and returns.
+
+Listing:
+
+.. http:get:: /api2/partners/teams/[team-slug]/safe-members/
+
+Adding a new member to a team:
+
+.. http:post:: /api2/partners/teams/[team-slug]/safe-members/
 
 Project Resource
 ~~~~~~~~~~~~~~~~
@@ -733,7 +771,7 @@ List activity items:
 
     :query team: Show only items related to a given team (team slug)
     :query video: Show only items related to a given video (video id)
-    :query action_type: Show only items with a given action type (int, see below)
+    :query type: Show only items with a given activity type (int, see below)
     :query language: Show only items with a given language (language code)
     :query before: A unix timestamp in seconds
     :query after: A unix timestamp in seconds
@@ -765,7 +803,7 @@ Example response:
 .. code-block:: json
 
     {
-        "action_type": 1,
+        "type": 1,
         "comment": null,
         "created": "2012-07-12T07:02:19",
         "id": "1339",
@@ -788,3 +826,48 @@ The message resource allows you to send messages to user and teams.
     :form team: Team's slug
 
 You can only send the ``user`` parameter or the ``team`` parameter at once.
+
+
+
+Application resource
+~~~~~~~~~~~~~~~~~
+
+For teams with membership by application only.
+
+List application items:
+
+.. http:get:: /api2/partners/teams/[team-slug]/applications
+
+    :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'
+    :query before: A unix timestamp in seconds
+    :query after: A unix timestamp in seconds
+    :query user: The username applying for the team
+
+Application item detail:
+
+.. http:get:: /api2/partners/application/[application-id]/
+
+Example response:
+
+.. code-block:: json
+
+    {
+       "created": "2012-08-09T17:48:48",
+       "id": "12",
+       "modified": null,
+       "note": "",
+       "resource_uri": "/api2/partners/teams/test-team/applications/12/",
+       "status": "Pending",
+       "user": "youtube-anonymous"
+
+    }   
+
+To delete an Application:
+
+.. http:delete:: /api2/partners/application/[application-id]/
+
+Applications can have their statuses updated:
+
+.. http:put:: /api2/partners/application/[application-id]/
+
+    :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'

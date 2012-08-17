@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-09 01:33-0500\n"
-"PO-Revision-Date: 2012-08-09 06:51+0000\n"
+"POT-Creation-Date: 2012-08-17 01:32-0500\n"
+"PO-Revision-Date: 2012-08-17 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/universalsubtitles/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -55,57 +55,57 @@ msgstr "Email"
 msgid "Hide"
 msgstr "Verberg"
 
-#: apps/auth/models.py:100
+#: apps/auth/models.py:98
 msgid "Retired user"
 msgstr ""
 
-#: apps/auth/models.py:327
+#: apps/auth/models.py:325
 msgid "Add comment"
 msgstr "Voeg reactie toe"
 
-#: apps/auth/models.py:328
+#: apps/auth/models.py:326
 msgid "Start subtitles"
 msgstr "Start ondertiteling"
 
-#: apps/auth/models.py:329
+#: apps/auth/models.py:327
 msgid "Start translation"
 msgstr "Start vertaling"
 
-#: apps/auth/models.py:330
+#: apps/auth/models.py:328
 msgid "Edit subtitles"
 msgstr "Ondertiteling bewerken"
 
-#: apps/auth/models.py:331
+#: apps/auth/models.py:329
 msgid "Edit translation"
 msgstr "Vertaling bewerken"
 
-#: apps/auth/models.py:388
+#: apps/auth/models.py:386
 msgid "understand enough"
 msgstr ""
 
-#: apps/auth/models.py:389
+#: apps/auth/models.py:387
 msgid "understand 99%"
 msgstr ""
 
-#: apps/auth/models.py:390
+#: apps/auth/models.py:388
 msgid "write like a native"
 msgstr ""
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:393
 msgid "follow requests in language"
 msgstr ""
 
-#: apps/auth/models.py:410
+#: apps/auth/models.py:408
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr ""
 
-#: apps/auth/models.py:509
+#: apps/auth/models.py:507
 msgid "e-mail confirmation"
 msgstr ""
 
-#: apps/auth/models.py:510
+#: apps/auth/models.py:508
 msgid "e-mail confirmations"
 msgstr ""
 
@@ -178,80 +178,80 @@ msgstr ""
 msgid "Message does not exist."
 msgstr "Bericht bestaat niet."
 
-#: apps/messages/tasks.py:71
+#: apps/messages/tasks.py:75
 #, python-format
 msgid "New message from %(author)s on Amara: %(subject)s"
 msgstr ""
 
-#: apps/messages/tasks.py:73
+#: apps/messages/tasks.py:77
 #, python-format
 msgid "New message on Amara: %(subject)s"
 msgstr ""
 
-#: apps/messages/tasks.py:117
+#: apps/messages/tasks.py:123
 #, python-format
 msgid "You've been invited to team %s on Amara"
 msgstr ""
 
-#: apps/messages/tasks.py:152
+#: apps/messages/tasks.py:161
 #, python-format
 msgid "%(user)s is applying for team %(team)s"
 msgstr ""
 
-#: apps/messages/tasks.py:183
+#: apps/messages/tasks.py:194
 #, python-format
 msgid "Your application to join the %s team has been declined"
 msgstr ""
 
-#: apps/messages/tasks.py:217
+#: apps/messages/tasks.py:229
 #, python-format
 msgid "%s team has a new member"
 msgstr ""
 
-#: apps/messages/tasks.py:241
+#: apps/messages/tasks.py:253
 #, python-format
 msgid "You've joined the %s team!"
 msgstr ""
 
-#: apps/messages/tasks.py:266
+#: apps/messages/tasks.py:280
 #, python-format
 msgid "%(user)s has left the %(team)s team"
 msgstr ""
 
-#: apps/messages/tasks.py:291
+#: apps/messages/tasks.py:305
 #, python-format
 msgid "You've left the %s team!"
 msgstr ""
 
-#: apps/messages/tasks.py:327
+#: apps/messages/tasks.py:341
 msgid "Your videos were imported!"
 msgstr ""
 
-#: apps/messages/tasks.py:354
+#: apps/messages/tasks.py:370
 msgid "You have a new task assignment on Amara!"
 msgstr ""
 
-#: apps/messages/tasks.py:395
+#: apps/messages/tasks.py:419
 msgid "Your subtitles have been reviewed"
 msgstr ""
 
-#: apps/messages/tasks.py:397
+#: apps/messages/tasks.py:421
 msgid " and published"
 msgstr ""
 
-#: apps/messages/tasks.py:498
+#: apps/messages/tasks.py:524
 msgid "Your subtitles have been approved and published!"
 msgstr ""
 
-#: apps/messages/tasks.py:504
+#: apps/messages/tasks.py:530
 msgid "Your subtitles have been returned for further editing"
 msgstr ""
 
-#: apps/messages/tasks.py:559
+#: apps/messages/tasks.py:585
 msgid "Your subtitles were not accepted"
 msgstr "Je ondertitels zijn niet aanvaard."
 
-#: apps/messages/tasks.py:603
+#: apps/messages/tasks.py:629
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr ""
@@ -415,11 +415,12 @@ msgstr ""
 msgid "Unfeature teams"
 msgstr ""
 
-#: apps/teams/admin.py:80 apps/teams/admin.py:113 apps/teams/models.py:185
+#: apps/teams/admin.py:80 apps/teams/admin.py:113 apps/teams/admin.py:212
+#: apps/teams/models.py:185
 msgid "Team"
 msgstr ""
 
-#: apps/teams/admin.py:86
+#: apps/teams/admin.py:86 apps/teams/admin.py:218
 msgid "User"
 msgstr "Gebruiker"
 
@@ -497,7 +498,7 @@ msgstr ""
 msgid "Subtitling of this video is already in progress."
 msgstr ""
 
-#: apps/teams/forms.py:359
+#: apps/teams/forms.py:358
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr ""
 
@@ -505,104 +506,109 @@ msgstr ""
 msgid "This language already has a complete set of subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:385
+#: apps/teams/forms.py:377
+msgid "This language for this video does not exist or doesn't have a version."
+msgstr ""
+
+#: apps/teams/forms.py:394
 msgid "There is already a task in progress for that video/language."
 msgstr ""
 
-#: apps/teams/forms.py:399
-msgid "You must select a language for a Translate task."
+#: apps/teams/forms.py:400
+#, python-format
+msgid "You must select a language for a %s task."
 msgstr ""
 
-#: apps/teams/forms.py:434
+#: apps/teams/forms.py:435
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr ""
 
-#: apps/teams/forms.py:456
+#: apps/teams/forms.py:457
 msgid "You do not have permission to assign this task."
 msgstr ""
 
-#: apps/teams/forms.py:463
+#: apps/teams/forms.py:464
 msgid "This user cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:484
+#: apps/teams/forms.py:485
 msgid "You do not have permission to delete this task."
 msgstr ""
 
-#: apps/teams/forms.py:541
+#: apps/teams/forms.py:542
 msgid "You cannot blacklist a preferred language."
 msgstr ""
 
-#: apps/teams/forms.py:564 apps/teams/forms.py:566
+#: apps/teams/forms.py:565 apps/teams/forms.py:567
 msgid "User does not exist!"
 msgstr "De gebruiker bestaat niet!"
 
-#: apps/teams/forms.py:573
+#: apps/teams/forms.py:574
 msgid "User is already a member of this team!"
 msgstr ""
 
-#: apps/teams/forms.py:578
+#: apps/teams/forms.py:579
 msgid "User has already been invited and has not replied yet."
 msgstr ""
 
-#: apps/teams/forms.py:602 templates/videos/subtitle-view.html:375
+#: apps/teams/forms.py:603 templates/videos/subtitle-view.html:375
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
-#: apps/teams/forms.py:606 templates/videos/subtitle-view.html:360
+#: apps/teams/forms.py:607 templates/videos/subtitle-view.html:360
 msgid "What would you like to unpublish?"
 msgstr ""
 
-#: apps/teams/forms.py:608
+#: apps/teams/forms.py:609
 msgid "This version (and any later version) for this language."
 msgstr ""
 
-#: apps/teams/forms.py:609
+#: apps/teams/forms.py:610
 msgid "All versions for this language and any dependent languages."
 msgstr ""
 
-#: apps/teams/forms.py:627
+#: apps/teams/forms.py:628
 msgid "These subtitles are not under a team's control."
 msgstr ""
 
-#: apps/teams/forms.py:631
+#: apps/teams/forms.py:632
 msgid "You do not have permission to unpublish these subtitles."
 msgstr ""
 
-#: apps/teams/forms.py:650
+#: apps/teams/forms.py:651
 msgid "You cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:662 apps/videos/forms.py:193
+#: apps/teams/forms.py:663 apps/videos/forms.py:193
 msgid "Invalid language to translate from."
 msgstr ""
 
-#: apps/teams/forms.py:671 apps/videos/forms.py:70 apps/videos/forms.py:88
+#: apps/teams/forms.py:672 apps/videos/forms.py:70 apps/videos/forms.py:88
 #: apps/videos/forms.py:202
 msgid "File size should be less {0} kb"
 msgstr ""
 
-#: apps/teams/forms.py:676 apps/videos/forms.py:207
+#: apps/teams/forms.py:677 apps/videos/forms.py:207
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:683 apps/videos/forms.py:75 apps/videos/forms.py:96
+#: apps/teams/forms.py:684 apps/videos/forms.py:75 apps/videos/forms.py:96
 #: apps/videos/forms.py:214
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/teams/forms.py:688 apps/videos/forms.py:98 apps/videos/forms.py:219
+#: apps/teams/forms.py:689 apps/videos/forms.py:98 apps/videos/forms.py:219
 msgid "Incorrect subtitles format"
 msgstr "Formaat incorrect"
 
-#: apps/teams/forms.py:761 apps/videos/forms.py:309
+#: apps/teams/forms.py:762 apps/videos/forms.py:309
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 
-#: apps/teams/forms.py:767 apps/videos/forms.py:316
+#: apps/teams/forms.py:768 apps/videos/forms.py:316
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -640,11 +646,11 @@ msgstr ""
 msgid "Admins only"
 msgstr ""
 
-#: apps/teams/models.py:125 apps/teams/models.py:2345
+#: apps/teams/models.py:125 apps/teams/models.py:2433
 msgid "name"
 msgstr "naam"
 
-#: apps/teams/models.py:126 apps/teams/models.py:2346
+#: apps/teams/models.py:126 apps/teams/models.py:2434
 msgid "slug"
 msgstr ""
 
@@ -665,7 +671,7 @@ msgstr "logo"
 msgid "publicly Visible?"
 msgstr ""
 
-#: apps/teams/models.py:131 templates/search/search.html:151
+#: apps/teams/models.py:131 templates/search/search.html:152
 #: templates/teams/project_list.html:10
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
@@ -772,7 +778,7 @@ msgstr "Admin"
 msgid "Contributor"
 msgstr ""
 
-#: apps/teams/notifications.py:171
+#: apps/teams/notifications.py:175
 msgid "New activity on your team video"
 msgstr ""
 
@@ -784,7 +790,7 @@ msgstr "Team bestaat niet."
 msgid "You are already a member of this team."
 msgstr "Je bent al lid van dit team."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:879
+#: apps/teams/rpc.py:50 apps/teams/views.py:888
 msgid "You are now a member of this team."
 msgstr "Je bent nu lid van dit team."
 
@@ -792,45 +798,57 @@ msgstr "Je bent nu lid van dit team."
 msgid "The \"About you\" field is required in order to apply."
 msgstr ""
 
-#: apps/teams/rpc.py:62
+#: apps/teams/rpc.py:56
+msgid "You have already applied to this team."
+msgstr ""
+
+#: apps/teams/rpc.py:58
+msgid "You have been removed from this team."
+msgstr ""
+
+#: apps/teams/rpc.py:60
+msgid "Your application has been denied."
+msgstr "Je aanvraag is afgewezen."
+
+#: apps/teams/rpc.py:67
 msgid ""
 "Your application has been submitted. You will be notified of the team "
 "administrator's response"
 msgstr ""
 
-#: apps/teams/rpc.py:65
+#: apps/teams/rpc.py:70
 msgid "You can't join this team by application."
 msgstr "Je kan geen lid worden van deze ploeg door je kandidaat te stellen."
 
-#: apps/teams/rpc.py:71
+#: apps/teams/rpc.py:76
 msgid "Team does not exist."
 msgstr ""
 
-#: apps/teams/rpc.py:74
+#: apps/teams/rpc.py:79
 msgid "You are not manager of this team."
 msgstr "Je bent geen manager van dit team."
 
-#: apps/teams/rpc.py:77
+#: apps/teams/rpc.py:82
 msgid "Incorrect team member role."
 msgstr ""
 
-#: apps/teams/rpc.py:82
+#: apps/teams/rpc.py:87
 msgid "Team member does not exist."
 msgstr ""
 
-#: apps/teams/rpc.py:85
+#: apps/teams/rpc.py:90
 msgid "You can't promote yourself."
 msgstr ""
 
-#: apps/teams/rpc.py:89
+#: apps/teams/rpc.py:94
 msgid "Team member role changed."
 msgstr ""
 
-#: apps/teams/rpc.py:163
+#: apps/teams/rpc.py:168
 msgid "You cannot assign that role to that member."
 msgstr ""
 
-#: apps/teams/tasks.py:96
+#: apps/teams/tasks.py:99
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr ""
@@ -869,7 +887,7 @@ msgid "You do not have permission to delete this team."
 msgstr ""
 
 #: apps/teams/views.py:215 apps/teams/views.py:257 apps/teams/views.py:285
-#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1565
+#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1553
 msgid "You do not have permission to edit this team."
 msgstr ""
 
@@ -887,7 +905,7 @@ msgstr ""
 
 #: apps/teams/views.py:552
 msgid "The video has been moved to the new team."
-msgstr ""
+msgstr "De video is verplaatst naar de nieuwe ploeg."
 
 #: apps/teams/views.py:565
 msgid "You can't add videos to this team/project."
@@ -907,7 +925,7 @@ msgstr ""
 
 #: apps/teams/views.py:629
 msgid "You can't delete that video."
-msgstr ""
+msgstr "Je kan die video niet verwijderen."
 
 #: apps/teams/views.py:633
 msgid "You can't remove that video."
@@ -915,139 +933,143 @@ msgstr ""
 
 #: apps/teams/views.py:645
 msgid "Video has been deleted from Amara."
-msgstr ""
+msgstr "De video is verwijderd van Amara."
 
 #: apps/teams/views.py:648
 msgid "Video has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:767
+#: apps/teams/views.py:769
 msgid "Member has been removed from the team."
 msgstr ""
 
-#: apps/teams/views.py:770
+#: apps/teams/views.py:772
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 
-#: apps/teams/views.py:773
+#: apps/teams/views.py:775
 msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
-#: apps/teams/views.py:804
+#: apps/teams/views.py:808
 msgid "Application approved."
 msgstr "Aanvraag goedgekeurd."
 
-#: apps/teams/views.py:806 apps/teams/views.py:824
+#: apps/teams/views.py:810 apps/teams/views.py:830
 msgid "Application does not exist."
 msgstr "Aanvraag bestaat niet."
 
-#: apps/teams/views.py:808
+#: apps/teams/views.py:812 apps/teams/views.py:832
+msgid "Application already processed."
+msgstr "Aanvraag reeds verwerkt."
+
+#: apps/teams/views.py:814
 msgid "You can't approve applications."
 msgstr ""
 
-#: apps/teams/views.py:822
+#: apps/teams/views.py:828
 msgid "Application denied."
 msgstr "Aanvraag afgekeurd."
 
-#: apps/teams/views.py:826
+#: apps/teams/views.py:834
 msgid "You can't deny applications."
 msgstr ""
 
-#: apps/teams/views.py:836
+#: apps/teams/views.py:844
 msgid "You cannot invite people to this team."
 msgstr ""
 
-#: apps/teams/views.py:866
-msgid "This invite is no longer valid"
-msgstr ""
-
 #: apps/teams/views.py:875
+msgid "This invite is no longer valid"
+msgstr "Deze uitnodiging is niet meer geldig"
+
+#: apps/teams/views.py:884
 msgid "You cannot join this team."
 msgstr ""
 
-#: apps/teams/views.py:926
+#: apps/teams/views.py:938
 msgid "You have left this team."
 msgstr "Je bent uit dit team gestapt."
 
-#: apps/teams/views.py:982
+#: apps/teams/views.py:994
 msgid "Member saved."
 msgstr ""
 
-#: apps/teams/views.py:1141
+#: apps/teams/views.py:1131
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1284 apps/teams/views.py:1287
+#: apps/teams/views.py:1272 apps/teams/views.py:1275
 msgid "You are not allowed to perform this task."
 msgstr ""
 
-#: apps/teams/views.py:1342
+#: apps/teams/views.py:1330
 msgid "Task deleted."
 msgstr "De taak is verwijderd."
 
-#: apps/teams/views.py:1344
+#: apps/teams/views.py:1332
 msgid "You cannot delete this task."
 msgstr "Je kan deze taak niet verwijderen."
 
-#: apps/teams/views.py:1369
+#: apps/teams/views.py:1357
 msgid "Task declined."
-msgstr ""
+msgstr "Taak afgewezen."
 
-#: apps/teams/views.py:1371
+#: apps/teams/views.py:1359
 msgid "Task assigned."
 msgstr "De taak is toegewezen."
 
-#: apps/teams/views.py:1373
+#: apps/teams/views.py:1361
 msgid "You cannot assign this task."
 msgstr "Je kan deze taak niet toewijzen."
 
-#: apps/teams/views.py:1395
+#: apps/teams/views.py:1383
 msgid "Invalid assignment attempt."
 msgstr "Poging tot toewijzen ongeldig."
 
-#: apps/teams/views.py:1420
+#: apps/teams/views.py:1408
 msgid "Draft uploaded successfully."
 msgstr ""
 
-#: apps/teams/views.py:1424
+#: apps/teams/views.py:1412
 msgid "/n"
-msgstr ""
+msgstr "/n"
 
-#: apps/teams/views.py:1442
+#: apps/teams/views.py:1430
 msgid "You are not allowed to download this transcript."
 msgstr ""
 
-#: apps/teams/views.py:1492
+#: apps/teams/views.py:1480
 msgid "There's already a project with this name"
 msgstr "Er is al een project met deze naam"
 
-#: apps/teams/views.py:1504
+#: apps/teams/views.py:1492
 msgid "Project added."
 msgstr "Het project is toegevoegd."
 
-#: apps/teams/views.py:1521
+#: apps/teams/views.py:1509
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1532
+#: apps/teams/views.py:1520
 msgid "Project deleted."
 msgstr "Het project is verwijderd."
 
-#: apps/teams/views.py:1550
+#: apps/teams/views.py:1538
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1676
+#: apps/teams/views.py:1664
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1710
+#: apps/teams/views.py:1698
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
-#: apps/teams/templatetags/teams_tags.py:258
+#: apps/teams/templatetags/teams_tags.py:260
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Kan iemand me helpen deze videos te ondertitelen? %(url)s"
@@ -1240,7 +1262,7 @@ msgstr ""
 #: apps/videos/models.py:1976
 #, python-format
 msgid "  deleted video \"%(title)s\""
-msgstr ""
+msgstr " verwijderde video \"%(title)s\""
 
 #: apps/videos/models.py:1981
 #, python-format
@@ -1564,22 +1586,22 @@ msgstr "Onbepaalde fout"
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:296
+#: apps/widget/rpc.py:302
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:298
+#: apps/widget/rpc.py:304
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:995 apps/widget/rpc.py:1036
+#: apps/widget/rpc.py:1001 apps/widget/rpc.py:1042
 msgid "\n"
 msgstr ""
 
-#: apps/widget/views.py:106
+#: apps/widget/views.py:159
 msgid "That task has already been completed."
 msgstr ""
 
@@ -1764,943 +1786,963 @@ msgid_plural "%(hits)s/%(message_number)s messages"
 msgstr[0] ""
 msgstr[1] ""
 
-#: libs/unilangs/unilangs.py:122
+#: libs/unilangs/unilangs.py:123
 msgid "Afar"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:123
+#: libs/unilangs/unilangs.py:124
 msgid "Abkhazian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:124
+#: libs/unilangs/unilangs.py:125
 msgid "Avestan"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:125
+#: libs/unilangs/unilangs.py:126
 msgid "Afrikaans"
 msgstr "Afrikaans"
 
-#: libs/unilangs/unilangs.py:126
+#: libs/unilangs/unilangs.py:127
 msgid "Akan"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:127
+#: libs/unilangs/unilangs.py:128
 msgid "Amharic"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:128
+#: libs/unilangs/unilangs.py:129
 msgid "Aragonese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:129
+#: libs/unilangs/unilangs.py:130
 msgid "Arabic"
 msgstr "Arabisch"
 
-#: libs/unilangs/unilangs.py:130
+#: libs/unilangs/unilangs.py:131
+msgid "Algerian Arabic"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:132
 msgid "Assamese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:131
+#: libs/unilangs/unilangs.py:133
 msgid "American Sign Language"
 msgstr "Amerikaanse gebarentaal"
 
-#: libs/unilangs/unilangs.py:132
+#: libs/unilangs/unilangs.py:134
 msgid "Asturian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:133
+#: libs/unilangs/unilangs.py:135
 msgid "Avaric"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:134
+#: libs/unilangs/unilangs.py:136
 msgid "Aymara"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:135
+#: libs/unilangs/unilangs.py:137
 msgid "Azerbaijani"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:136
+#: libs/unilangs/unilangs.py:138
 msgid "Bashkir"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:137
+#: libs/unilangs/unilangs.py:139
 msgid "Bambara"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:138
+#: libs/unilangs/unilangs.py:140
 msgid "Belarusian"
 msgstr "Witrussisch"
 
-#: libs/unilangs/unilangs.py:139
+#: libs/unilangs/unilangs.py:141
 msgid "Berber"
 msgstr "Berbers"
 
-#: libs/unilangs/unilangs.py:140
+#: libs/unilangs/unilangs.py:142
 msgid "Bulgarian"
 msgstr "Bulgaars"
 
-#: libs/unilangs/unilangs.py:141
+#: libs/unilangs/unilangs.py:143
 msgid "Bihari"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:142
+#: libs/unilangs/unilangs.py:144
 msgid "Bislama"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:143
+#: libs/unilangs/unilangs.py:145
 msgid "Bengali"
 msgstr "Bengaals"
 
-#: libs/unilangs/unilangs.py:144
+#: libs/unilangs/unilangs.py:146
 msgid "Ibibio"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:145
+#: libs/unilangs/unilangs.py:147
 msgid "Tibetan"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:146
+#: libs/unilangs/unilangs.py:148
 msgid "Breton"
 msgstr "Bretoens"
 
-#: libs/unilangs/unilangs.py:147
+#: libs/unilangs/unilangs.py:149
 msgid "Bosnian"
 msgstr "Bosnisch"
 
-#: libs/unilangs/unilangs.py:148
+#: libs/unilangs/unilangs.py:150
 msgid "Buginese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:149
+#: libs/unilangs/unilangs.py:151
 msgid "Catalan"
 msgstr "Catalaans"
 
-#: libs/unilangs/unilangs.py:150
+#: libs/unilangs/unilangs.py:152
 msgid "Chechen"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:151
+#: libs/unilangs/unilangs.py:153
 msgid "Cebuano"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:152
+#: libs/unilangs/unilangs.py:154
 msgid "Chamorro"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:153
+#: libs/unilangs/unilangs.py:155
 msgid "Choctaw"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:154
+#: libs/unilangs/unilangs.py:156
 msgid "Corsican"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:155
+#: libs/unilangs/unilangs.py:157
 msgid "Cree"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:156
+#: libs/unilangs/unilangs.py:158
 msgid "Czech"
 msgstr "Tsjechisch"
 
-#: libs/unilangs/unilangs.py:157
+#: libs/unilangs/unilangs.py:159
 msgid "Church Slavic"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:158
+#: libs/unilangs/unilangs.py:160
 msgid "Chuvash"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:159
+#: libs/unilangs/unilangs.py:161
 msgid "Welsh"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:160
+#: libs/unilangs/unilangs.py:162
 msgid "Danish"
 msgstr "Deens"
 
-#: libs/unilangs/unilangs.py:161
+#: libs/unilangs/unilangs.py:163
 msgid "German"
 msgstr "Duits"
 
-#: libs/unilangs/unilangs.py:162
+#: libs/unilangs/unilangs.py:164
 msgid "Divehi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:163
+#: libs/unilangs/unilangs.py:165
 msgid "Dzongkha"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:164
+#: libs/unilangs/unilangs.py:166
 msgid "Ewe"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:165
+#: libs/unilangs/unilangs.py:167
 msgid "Efik"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:166
+#: libs/unilangs/unilangs.py:168
 msgid "Greek"
 msgstr "Grieks"
 
-#: libs/unilangs/unilangs.py:167
+#: libs/unilangs/unilangs.py:169
 msgid "English"
 msgstr "Engels"
 
-#: libs/unilangs/unilangs.py:168
+#: libs/unilangs/unilangs.py:170
 msgid "English, British"
 msgstr "Engels, Brits"
 
-#: libs/unilangs/unilangs.py:169
+#: libs/unilangs/unilangs.py:171
 msgid "Esperanto"
 msgstr "Esperanto"
 
-#: libs/unilangs/unilangs.py:170
+#: libs/unilangs/unilangs.py:172
 msgid "Spanish"
 msgstr "Spaans"
 
-#: libs/unilangs/unilangs.py:171
+#: libs/unilangs/unilangs.py:173
 msgid "Spanish, Argentinian"
 msgstr "Spaans, Argentijns"
 
-#: libs/unilangs/unilangs.py:172
+#: libs/unilangs/unilangs.py:174
 msgid "Spanish, Mexican"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:173
+#: libs/unilangs/unilangs.py:175
 msgid "Spanish, Nicaraguan"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:174
+#: libs/unilangs/unilangs.py:176
 msgid "Estonian"
 msgstr "Ests"
 
-#: libs/unilangs/unilangs.py:175
+#: libs/unilangs/unilangs.py:177
 msgid "Basque"
 msgstr "Baskisch"
 
-#: libs/unilangs/unilangs.py:176
+#: libs/unilangs/unilangs.py:178
 msgid "Persian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:177
+#: libs/unilangs/unilangs.py:179
 msgid "Fulah"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:178
+#: libs/unilangs/unilangs.py:180
 msgid "Finnish"
 msgstr "Fins"
 
-#: libs/unilangs/unilangs.py:179
+#: libs/unilangs/unilangs.py:181
 msgid "Filipino"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:180
+#: libs/unilangs/unilangs.py:182
 msgid "Fijian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:181
+#: libs/unilangs/unilangs.py:183
 msgid "Faroese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:182
+#: libs/unilangs/unilangs.py:184
 msgid "French"
 msgstr "Frans"
 
-#: libs/unilangs/unilangs.py:183
+#: libs/unilangs/unilangs.py:185
 msgid "French, Canadian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:184
+#: libs/unilangs/unilangs.py:186
 msgid "Fula"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:185
+#: libs/unilangs/unilangs.py:187
 msgid "Frisian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:186
+#: libs/unilangs/unilangs.py:188
 msgid "Irish"
 msgstr "Iers"
 
-#: libs/unilangs/unilangs.py:187
+#: libs/unilangs/unilangs.py:189
 msgid "Scottish Gaelic"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:188
+#: libs/unilangs/unilangs.py:190
 msgid "Galician"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:189
+#: libs/unilangs/unilangs.py:191
 msgid "Guaran"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:190
+#: libs/unilangs/unilangs.py:192
 msgid "Gujarati"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:191
+#: libs/unilangs/unilangs.py:193
 msgid "Manx"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:192
+#: libs/unilangs/unilangs.py:194
 msgid "Haida"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:193
+#: libs/unilangs/unilangs.py:195
 msgid "Hausa"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:194
+#: libs/unilangs/unilangs.py:196
 msgid "Hazaragi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:195
+#: libs/unilangs/unilangs.py:197
 msgid "Hebrew"
 msgstr "Hebreeuws "
 
-#: libs/unilangs/unilangs.py:196
+#: libs/unilangs/unilangs.py:198
 msgid "Hindi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:197
+#: libs/unilangs/unilangs.py:199
 msgid "Hiri Motu"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:198
+#: libs/unilangs/unilangs.py:200
 msgid "Croatian"
 msgstr "Kroatisch"
 
-#: libs/unilangs/unilangs.py:199
+#: libs/unilangs/unilangs.py:201
 msgid "Creole, Haitian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:200
+#: libs/unilangs/unilangs.py:202
 msgid "Hungarian"
 msgstr "Hongaars"
 
-#: libs/unilangs/unilangs.py:201
+#: libs/unilangs/unilangs.py:203
 msgid "Hupa"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:202
+#: libs/unilangs/unilangs.py:204
 msgid "Armenian"
 msgstr "Armeens"
 
-#: libs/unilangs/unilangs.py:203
+#: libs/unilangs/unilangs.py:205
 msgid "Herero"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:204
+#: libs/unilangs/unilangs.py:206
 msgid "Interlingua"
 msgstr "Interlingua"
 
-#: libs/unilangs/unilangs.py:205
+#: libs/unilangs/unilangs.py:207
 msgid "Igbo"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:206
+#: libs/unilangs/unilangs.py:208
 msgid "Indonesian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:207
+#: libs/unilangs/unilangs.py:209
 msgid "Interlingue"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:208
+#: libs/unilangs/unilangs.py:210
 msgid "Sichuan Yi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:209
+#: libs/unilangs/unilangs.py:211
 msgid "Inupia"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:210
+#: libs/unilangs/unilangs.py:212
 msgid "Ilocano"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:211
+#: libs/unilangs/unilangs.py:213
 msgid "Ingush"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:212
+#: libs/unilangs/unilangs.py:214
 msgid "Ido"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:213
+#: libs/unilangs/unilangs.py:215
 msgid "Iroquoian languages"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:214
+#: libs/unilangs/unilangs.py:216
 msgid "Icelandic"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:215
+#: libs/unilangs/unilangs.py:217
 msgid "Italian"
 msgstr "Italiaans"
 
-#: libs/unilangs/unilangs.py:216
+#: libs/unilangs/unilangs.py:218
 msgid "Inuktitut"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:217
+#: libs/unilangs/unilangs.py:219
 msgid "Japanese"
 msgstr "Japans"
 
-#: libs/unilangs/unilangs.py:218
+#: libs/unilangs/unilangs.py:220
 msgid "Javanese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:219
+#: libs/unilangs/unilangs.py:221
 msgid "Georgian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:220
+#: libs/unilangs/unilangs.py:222
 msgid "Karen"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:221
+#: libs/unilangs/unilangs.py:223
 msgid "Kanuri"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:222
+#: libs/unilangs/unilangs.py:224
 msgid "Gikuyu"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:223
+#: libs/unilangs/unilangs.py:225
 msgid "Rwandi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:224
+#: libs/unilangs/unilangs.py:226
 msgid "Kuanyama, Kwanyama"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:225
+#: libs/unilangs/unilangs.py:227
 msgid "Kazakh"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:226
+#: libs/unilangs/unilangs.py:228
 msgid "Greenlandic"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:227
+#: libs/unilangs/unilangs.py:229
 msgid "Khmer"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:228
+#: libs/unilangs/unilangs.py:230
 msgid "Kannada"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:229
+#: libs/unilangs/unilangs.py:231
 msgid "Korean"
 msgstr "Koreaans"
 
-#: libs/unilangs/unilangs.py:230
+#: libs/unilangs/unilangs.py:232
 msgid "Kongo"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:231
+#: libs/unilangs/unilangs.py:233
 msgid "Kashmiri"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:232
+#: libs/unilangs/unilangs.py:234
 msgid "Kurdish"
 msgstr "Koerdisch"
 
-#: libs/unilangs/unilangs.py:233
+#: libs/unilangs/unilangs.py:235
 msgid "Komi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:234
+#: libs/unilangs/unilangs.py:236
 msgid "Cornish"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:235
+#: libs/unilangs/unilangs.py:237
 msgid "Kyrgyz"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:236
+#: libs/unilangs/unilangs.py:238
 msgid "Latin"
 msgstr "Latijn"
 
-#: libs/unilangs/unilangs.py:237
+#: libs/unilangs/unilangs.py:239
 msgid "Luxembourgish"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:238
+#: libs/unilangs/unilangs.py:240
 msgid "Ganda"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:239
+#: libs/unilangs/unilangs.py:241
 msgid "Limburgish"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:240
+#: libs/unilangs/unilangs.py:242
 msgid "Lingala"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:241
+#: libs/unilangs/unilangs.py:243
 msgid "Lakota"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:242
+#: libs/unilangs/unilangs.py:244
 msgid "Lao"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:243
+#: libs/unilangs/unilangs.py:245
 msgid "Lithuanian"
 msgstr "Litouws"
 
-#: libs/unilangs/unilangs.py:244
+#: libs/unilangs/unilangs.py:246
 msgid "Luba-Katagana"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:245
+#: libs/unilangs/unilangs.py:247
 msgid "Luba-Kasai"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:246
+#: libs/unilangs/unilangs.py:248
 msgid "Luo"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:247
+#: libs/unilangs/unilangs.py:249
 msgid "Luhya"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:248
+#: libs/unilangs/unilangs.py:250
 msgid "Latvian"
 msgstr "Lets"
 
-#: libs/unilangs/unilangs.py:249
+#: libs/unilangs/unilangs.py:251
 msgid "Metadata: Geo"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:250
+#: libs/unilangs/unilangs.py:252
 msgid "Metadata: Twitter"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:251
+#: libs/unilangs/unilangs.py:253
 msgid "Metadata: Wikipedia"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:252
+#: libs/unilangs/unilangs.py:254
 msgid "Madurese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:253
+#: libs/unilangs/unilangs.py:255
 msgid "Marshallese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:254
+#: libs/unilangs/unilangs.py:256
 msgid "Maori"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:255
+#: libs/unilangs/unilangs.py:257
 msgid "Macedonian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:256
+#: libs/unilangs/unilangs.py:258
 msgid "Malayalam"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:257
+#: libs/unilangs/unilangs.py:259
 msgid "Malagasy"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:258
+#: libs/unilangs/unilangs.py:260
 msgid "Mongolian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:259
+#: libs/unilangs/unilangs.py:261
 msgid "Mandinka"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:260
+#: libs/unilangs/unilangs.py:262
 msgid "Moldavian, Moldovan"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:261
+#: libs/unilangs/unilangs.py:263
 msgid "Mohawk"
 msgstr "Mohawk"
 
-#: libs/unilangs/unilangs.py:262
+#: libs/unilangs/unilangs.py:264
 msgid "Manipuri"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:263
+#: libs/unilangs/unilangs.py:265
 msgid "Mossi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:264
+#: libs/unilangs/unilangs.py:266
 msgid "Marathi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:265
+#: libs/unilangs/unilangs.py:267
 msgid "Malay"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:266
+#: libs/unilangs/unilangs.py:268
 msgid "Maltese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:267
+#: libs/unilangs/unilangs.py:269
 msgid "Burmese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:268
+#: libs/unilangs/unilangs.py:270
 msgid "Hokkien"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:269
+#: libs/unilangs/unilangs.py:271
 msgid "Naurunan"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:270
+#: libs/unilangs/unilangs.py:272
 msgid "Norwegian Bokmal"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:271
+#: libs/unilangs/unilangs.py:273
 msgid "North Ndebele"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:272
+#: libs/unilangs/unilangs.py:274
 msgid "Nepali"
 msgstr "Nepalees"
 
-#: libs/unilangs/unilangs.py:273
+#: libs/unilangs/unilangs.py:275
 msgid "Ndonga"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:274
+#: libs/unilangs/unilangs.py:276
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: libs/unilangs/unilangs.py:275
+#: libs/unilangs/unilangs.py:277
 msgid "Norwegian Nynorsk"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:276
+#: libs/unilangs/unilangs.py:278
 msgid "Norwegian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:277
+#: libs/unilangs/unilangs.py:279
 msgid "Southern Ndebele"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:278
+#: libs/unilangs/unilangs.py:280
 msgid "Northern Sotho"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:279
+#: libs/unilangs/unilangs.py:281
 msgid "Navajo"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:280
+#: libs/unilangs/unilangs.py:282
 msgid "Chewa"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:281
+#: libs/unilangs/unilangs.py:283
 msgid "Occitan"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:282
+#: libs/unilangs/unilangs.py:284
 msgid "Ojibwe"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:283
+#: libs/unilangs/unilangs.py:285
 msgid "Oriya"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:284
+#: libs/unilangs/unilangs.py:286
 msgid "Oromo"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:285
+#: libs/unilangs/unilangs.py:287
 msgid "Ossetian, Ossetic"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:286
-msgid "Papiamento"
-msgstr ""
-
-#: libs/unilangs/unilangs.py:287
-msgid "Punjabi"
-msgstr ""
-
 #: libs/unilangs/unilangs.py:288
-msgid "Pali"
+msgid "Kapampangan"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:289
-msgid "Polish"
-msgstr "Pools"
+msgid "Papiamento"
+msgstr ""
 
 #: libs/unilangs/unilangs.py:290
-msgid "Dari"
+msgid "Eastern Punjabi"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:291
-msgid "Pashto"
+msgid "Pali"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:292
-msgid "Portuguese"
-msgstr "Portugees"
+msgid "Polish"
+msgstr "Pools"
 
 #: libs/unilangs/unilangs.py:293
-msgid "Portuguese, Brazilian"
-msgstr "Portugees, Braziliaans"
+msgid "Western Punjabi"
+msgstr ""
 
 #: libs/unilangs/unilangs.py:294
-msgid "Quechua"
+msgid "Dari"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:295
-msgid "Romansh"
+msgid "Pashto"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:296
-msgid "Romanian"
-msgstr "Roemeens"
+msgid "Portuguese"
+msgstr "Portugees"
 
 #: libs/unilangs/unilangs.py:297
-msgid "Russian"
-msgstr "Russisch"
+msgid "Portuguese, Brazilian"
+msgstr "Portugees, Braziliaans"
 
 #: libs/unilangs/unilangs.py:298
-msgid "Rundi"
+msgid "Quechua"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:299
-msgid "Macedo"
+msgid "Romansh"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:300
-msgid "Rusyn"
-msgstr ""
+msgid "Romanian"
+msgstr "Roemeens"
 
 #: libs/unilangs/unilangs.py:301
-msgid "Sanskrit"
-msgstr ""
+msgid "Russian"
+msgstr "Russisch"
 
 #: libs/unilangs/unilangs.py:302
-msgid "Sardinian"
+msgid "Rundi"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:303
-msgid "Sindhi"
+msgid "Macedo"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:304
-msgid "Northern Sami"
+msgid "Rusyn"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:305
-msgid "Sango"
+msgid "Sanskrit"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:306
-msgid "Serbo-Croatian"
+msgid "Sardinian"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:307
-msgid "Sinhala"
+msgid "Sindhi"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:308
-msgid "Slovak"
-msgstr "Nederlands"
+msgid "Northern Sami"
+msgstr ""
 
 #: libs/unilangs/unilangs.py:309
-msgid "Seko Padang"
+msgid "Sango"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:310
-msgid "Slovenian"
-msgstr "Sloveens"
+msgid "Serbo-Croatian"
+msgstr ""
 
 #: libs/unilangs/unilangs.py:311
-msgid "Samoan"
+msgid "Sinhala"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:312
+msgid "Slovak"
+msgstr "Nederlands"
+
+#: libs/unilangs/unilangs.py:313
+msgid "Seko Padang"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:314
+msgid "Slovenian"
+msgstr "Sloveens"
+
+#: libs/unilangs/unilangs.py:315
+msgid "Samoan"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:316
 msgid "Shona"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:313
+#: libs/unilangs/unilangs.py:317
 msgid "Somali"
 msgstr "Somalisch"
 
-#: libs/unilangs/unilangs.py:314
+#: libs/unilangs/unilangs.py:318
 msgid "Sotho"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:315
+#: libs/unilangs/unilangs.py:319
 msgid "Albanian"
 msgstr "Albanees"
 
-#: libs/unilangs/unilangs.py:316
+#: libs/unilangs/unilangs.py:320
 msgid "Serbian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:317
+#: libs/unilangs/unilangs.py:321
 msgid "Serbian, Latin"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:318
+#: libs/unilangs/unilangs.py:322
 msgid "Swati"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:319
+#: libs/unilangs/unilangs.py:323
 msgid "Sundanese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:320
+#: libs/unilangs/unilangs.py:324
 msgid "Swedish"
 msgstr "Zweeds"
 
-#: libs/unilangs/unilangs.py:321
+#: libs/unilangs/unilangs.py:325
 msgid "Swahili"
 msgstr "Swahili"
 
-#: libs/unilangs/unilangs.py:322
+#: libs/unilangs/unilangs.py:326
 msgid "Tamil"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:323
+#: libs/unilangs/unilangs.py:327
 msgid "Tetum"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:324
+#: libs/unilangs/unilangs.py:328
 msgid "Telugu"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:325
+#: libs/unilangs/unilangs.py:329
 msgid "Tajik"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:326
+#: libs/unilangs/unilangs.py:330
 msgid "Thai"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:327
+#: libs/unilangs/unilangs.py:331
 msgid "Tigrinya"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:328
+#: libs/unilangs/unilangs.py:332
 msgid "Turkmen"
 msgstr "Turkmeens"
 
-#: libs/unilangs/unilangs.py:329
+#: libs/unilangs/unilangs.py:333
 msgid "Tagalog"
 msgstr "Tagalog"
 
-#: libs/unilangs/unilangs.py:330
+#: libs/unilangs/unilangs.py:334
 msgid "Klingon"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:331
+#: libs/unilangs/unilangs.py:335
 msgid "Tonga"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:332
+#: libs/unilangs/unilangs.py:336
 msgid "Turkish"
 msgstr "Turks"
 
-#: libs/unilangs/unilangs.py:333
+#: libs/unilangs/unilangs.py:337
 msgid "Tsonga"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:334
+#: libs/unilangs/unilangs.py:338
 msgid "Tswana"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:335
+#: libs/unilangs/unilangs.py:339
 msgid "Tartar"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:336
+#: libs/unilangs/unilangs.py:340
 msgid "Twi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:337
+#: libs/unilangs/unilangs.py:341
 msgid "Tahitian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:338
+#: libs/unilangs/unilangs.py:342
 msgid "Uighur"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:339
+#: libs/unilangs/unilangs.py:343
 msgid "Ukrainian"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:340
+#: libs/unilangs/unilangs.py:344
 msgid "Umbundu"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:341
+#: libs/unilangs/unilangs.py:345
 msgid "Uyghur"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:342
+#: libs/unilangs/unilangs.py:346
 msgid "Urdu"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:343
+#: libs/unilangs/unilangs.py:347
 msgid "Uzbek"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:344
+#: libs/unilangs/unilangs.py:348
 msgid "Venda"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:345
+#: libs/unilangs/unilangs.py:349
 msgid "Vietnamese"
 msgstr "Vietnamees"
 
-#: libs/unilangs/unilangs.py:346
+#: libs/unilangs/unilangs.py:350
 msgid "Volapuk"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:347
+#: libs/unilangs/unilangs.py:351
 msgid "Walloon"
 msgstr "Waals"
 
-#: libs/unilangs/unilangs.py:348
+#: libs/unilangs/unilangs.py:352
 msgid "Wolof"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:349
+#: libs/unilangs/unilangs.py:353
 msgid "Xhosa"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:350
+#: libs/unilangs/unilangs.py:354
 msgid "Yiddish"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:351
+#: libs/unilangs/unilangs.py:355
 msgid "Yoruba"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:352
+#: libs/unilangs/unilangs.py:356
 msgid "Zhuang, Chuang"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:353
+#: libs/unilangs/unilangs.py:357
 msgid "Chinese, Yue"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:354
+#: libs/unilangs/unilangs.py:358
 msgid "Chinese, Simplified"
 msgstr "Chinees, vereenvoudigd"
 
-#: libs/unilangs/unilangs.py:355
+#: libs/unilangs/unilangs.py:359
 msgid "Chinese, Traditional"
 msgstr "Chinees, traditioneel"
 
-#: libs/unilangs/unilangs.py:356
+#: libs/unilangs/unilangs.py:360
+msgid "Chinese, Simplified (Singaporean)"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:361
+msgid "Chinese, Traditional (Hong Kong)"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:362
 msgid "Zulu"
 msgstr "Zoeloe"
 
@@ -3256,7 +3298,7 @@ msgstr ""
 
 #: templates/enterprise.html:81 templates/enterprise.html.py:126
 msgid "Professional Services"
-msgstr ""
+msgstr "Professionele diensten"
 
 #: templates/enterprise.html:83
 msgid ""
@@ -3289,7 +3331,7 @@ msgstr ""
 
 #: templates/enterprise.html:101
 msgid "Subtitles Improve SEO"
-msgstr ""
+msgstr "Ondertitels verbeteren de SEO"
 
 #: templates/enterprise.html:103
 msgid ""
@@ -4362,7 +4404,7 @@ msgstr "Log in"
 
 #: templates/auth/login.html:34
 msgid "Create an Amara account"
-msgstr ""
+msgstr "Een Amara account aanmaken"
 
 #: templates/auth/login.html:35
 msgid "Already have one?"
@@ -4617,7 +4659,7 @@ msgstr ""
 #: templates/openid_consumer/signin.html:14
 #: templates/registration/password_reset_form.html:12
 msgid "Back to Sign In"
-msgstr ""
+msgstr "Terug naar Inschrijving"
 
 #: templates/profiles/_filters.html:5
 msgid "User Details"
@@ -4651,7 +4693,7 @@ msgid "Enter valid email please."
 msgstr "Voer alsjeblieft een geldig e-mailadres in. "
 
 #: templates/profiles/_select_language_dialog.html:4
-#: templates/search/search.html:154 templates/videos/featured_videos.html:55
+#: templates/search/search.html:155 templates/videos/featured_videos.html:55
 #: templates/videos/popular_videos.html:90
 msgid "Loading..."
 msgstr "Laden..."
@@ -5018,15 +5060,15 @@ msgstr "Weergaves (deze maand)"
 msgid "Plays (all time)"
 msgstr "Weergaves (ooit)"
 
-#: templates/search/search.html:86 templates/search/search.html.py:125
+#: templates/search/search.html:87 templates/search/search.html.py:126
 msgid "Search Videos"
 msgstr "Zoek video's"
 
-#: templates/search/search.html:88
+#: templates/search/search.html:89
 msgid "Search Results for"
 msgstr "Zoekresultaten voor"
 
-#: templates/search/search.html:121
+#: templates/search/search.html:122
 #, python-format
 msgid ""
 "\n"
@@ -5034,7 +5076,7 @@ msgid ""
 "            "
 msgstr ""
 
-#: templates/search/search.html:149 templates/videos/featured_videos.html:50
+#: templates/search/search.html:150 templates/videos/featured_videos.html:50
 #: templates/videos/popular_videos.html:85
 msgid "of"
 msgstr "van"
@@ -5225,7 +5267,7 @@ msgstr ""
 #: templates/teams/_context_project.html:31
 #: templates/teams/_context_team.html:59
 msgid "Task"
-msgstr ""
+msgstr "Taak"
 
 #: templates/teams/_context_project.html:81
 msgid "Other"
@@ -5235,7 +5277,7 @@ msgstr "Andere"
 #: templates/teams/_context_team.html:21
 #: templates/teams/_subnav_settings.html:21
 msgid "Projects"
-msgstr ""
+msgstr "Projecten"
 
 #: templates/teams/_context_team.html:29
 #: templates/videos/test_form_page.html:24
@@ -5251,11 +5293,11 @@ msgstr ""
 
 #: templates/teams/_context_team.html:53
 msgid "Member"
-msgstr ""
+msgstr "Lid"
 
 #: templates/teams/_context_team.html:83
 msgid "Your tasks"
-msgstr ""
+msgstr "Jouw taken"
 
 #: templates/teams/_context_team.html:87
 msgid "All available tasks"
@@ -5352,7 +5394,7 @@ msgstr ""
 
 #: templates/teams/_team_move_video_select.html:6
 msgid "Move video to one of your other teams?"
-msgstr ""
+msgstr "De video verplaatsen naar één van je andere ploegen?"
 
 #: templates/teams/_team_move_video_select.html:27
 #: templates/teams/_team_move_video_select.html:51
@@ -5422,7 +5464,7 @@ msgstr "Bewerk"
 #: templates/teams/members-list.html:122 templates/teams/videos-list.html:147
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
-msgstr ""
+msgstr "Verwijderen"
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
@@ -5463,7 +5505,7 @@ msgstr "Weiger"
 
 #: templates/teams/applications.html:56
 msgid "Send a message"
-msgstr ""
+msgstr "Stuur een bericht"
 
 #: templates/teams/applications.html:66
 msgid "There are no applications right now"
@@ -5471,7 +5513,7 @@ msgstr ""
 
 #: templates/teams/base.html:43
 msgid "Edit team"
-msgstr ""
+msgstr "Ploeg bewerken"
 
 #: templates/teams/create.html:6
 msgid "Create team"
@@ -5491,7 +5533,7 @@ msgstr "Mijn teams"
 
 #: templates/teams/create.html:51
 msgid "Display Settings"
-msgstr ""
+msgstr "Weergave-instellingen"
 
 #: templates/teams/create.html:57
 msgid "Create Team"
@@ -5531,11 +5573,11 @@ msgstr ""
 
 #: templates/teams/create_task.html:57
 msgid "What language is needed?"
-msgstr ""
+msgstr "Welk taal is nodig?"
 
 #: templates/teams/create_task.html:63
 msgid "Who should do it?"
-msgstr ""
+msgstr "Wie moet het doen?"
 
 #: templates/teams/create_task.html:68 templates/teams/tasks.html:477
 msgid "Begin typing to search"
@@ -5598,7 +5640,7 @@ msgstr "Leden uitnodigen"
 
 #: templates/teams/invite_members.html:23
 msgid "Recipient"
-msgstr ""
+msgstr "Ontvanger"
 
 #: templates/teams/invite_members.html:29
 msgid "Begin typing to search."
@@ -5614,11 +5656,11 @@ msgstr ""
 
 #: templates/teams/invite_members.html:39
 msgid "Include a message"
-msgstr ""
+msgstr "Een bericht bijvoegen"
 
 #: templates/teams/invite_members.html:43
 msgid "Assign a role"
-msgstr ""
+msgstr "Een rol toewijzen"
 
 #: templates/teams/invite_members.html:45
 msgid "Role to be assigned to the user if they accept your invitation."
@@ -5631,7 +5673,7 @@ msgstr "Uitnodigingen versturen"
 #: templates/teams/members-list.html:47 templates/teams/tasks.html:49
 #: templates/teams/videos-list.html:47
 msgid "Filter and Sort"
-msgstr ""
+msgstr "Filteren en sorteren"
 
 #: templates/teams/members-list.html:53
 #: templates/videos/subtitle-view.html:200
@@ -5640,15 +5682,15 @@ msgstr ""
 
 #: templates/teams/members-list.html:55
 msgid "all members"
-msgstr ""
+msgstr "alle leden"
 
 #: templates/teams/members-list.html:56
 msgid "admins"
-msgstr ""
+msgstr "beheerders"
 
 #: templates/teams/members-list.html:57
 msgid "managers"
-msgstr ""
+msgstr "bestuurders"
 
 #: templates/teams/members-list.html:58
 msgid "contributor"
@@ -5666,7 +5708,7 @@ msgstr "alle talen"
 #: templates/teams/tasks.html.py:127 templates/teams/tasks.html:134
 #: templates/teams/videos-list.html:89
 msgid "Clear"
-msgstr ""
+msgstr "Leegmaken"
 
 #: templates/teams/members-list.html:77
 msgid "This team has"
@@ -5682,7 +5724,7 @@ msgstr "Sorry, geen leden gevonden."
 
 #: templates/teams/members-list.html:92
 msgid "Me"
-msgstr ""
+msgstr "Ik"
 
 #: templates/teams/members-list.html:101 templates/teams/members-list.html:102
 msgid "and"
@@ -5690,7 +5732,7 @@ msgstr "en"
 
 #: templates/teams/members-list.html:101
 msgid "project"
-msgstr ""
+msgstr "project"
 
 #: templates/teams/members-list.html:113
 msgid "Assignments"
@@ -5703,7 +5745,7 @@ msgstr ""
 #: templates/teams/settings-guidelines.html:5
 #: templates/teams/settings-guidelines.html:48
 msgid "Guidelines"
-msgstr ""
+msgstr "Richtlijnen"
 
 #: templates/teams/settings-guidelines.html:25
 msgid "Custom messages"
@@ -5933,7 +5975,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:73
 msgid "my languages"
-msgstr ""
+msgstr "mijn talen"
 
 #: templates/teams/tasks.html:87
 msgid "assigned to"
@@ -5991,11 +6033,11 @@ msgstr ""
 
 #: templates/teams/tasks.html:146
 msgid "Tell us what languages you speak"
-msgstr ""
+msgstr "Vertel ons welke talen je spreekt"
 
 #: templates/teams/tasks.html:146
 msgid "and we'll narrow this list for you"
-msgstr ""
+msgstr "en wij zullen deze lijst voor je inkorten"
 
 #: templates/teams/tasks.html:152
 msgid "Showing unassigned tasks in languages you speak. "
@@ -6023,7 +6065,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:227
 msgid "latest draft"
-msgstr ""
+msgstr "recentste klad"
 
 #: templates/teams/tasks.html:231
 msgid "transcribed"
@@ -6035,16 +6077,16 @@ msgstr "vertaald"
 
 #: templates/teams/tasks.html:241
 msgid "reviewed"
-msgstr ""
+msgstr "nagekeken"
 
 #: templates/teams/tasks.html:243
 msgid "and edited"
-msgstr ""
+msgstr "en bewerkt"
 
 #: templates/teams/tasks.html:245 templates/videos/subtitle-view.html:204
 #: templates/videos/subtitle-view.html:320
 msgid "by"
-msgstr ""
+msgstr "door"
 
 #: templates/teams/tasks.html:258
 msgid "Assigned to"
@@ -6068,11 +6110,11 @@ msgstr ""
 
 #: templates/teams/tasks.html:324
 msgid "Upload a draft"
-msgstr ""
+msgstr "Een klad uploaden"
 
 #: templates/teams/tasks.html:327
 msgid "Important:"
-msgstr ""
+msgstr "Belangrijk:"
 
 #: templates/teams/tasks.html:327
 msgid ""
@@ -6101,11 +6143,11 @@ msgstr "Bestand:"
 
 #: templates/teams/tasks.html:345
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
-msgstr ""
+msgstr "Aanvaarde bestandsformaten: .srt, .ssa, .sbv, .dfxp, .txt of .xml (voor TTML)"
 
 #: templates/teams/tasks.html:359
 msgid "Download a draft"
-msgstr ""
+msgstr "Een klad downloaden"
 
 #: templates/teams/tasks.html:364
 msgid "Download a draft of these subtitles so you can work offline."
@@ -6113,7 +6155,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:390
 msgid "Decline"
-msgstr ""
+msgstr "Afwijzen"
 
 #: templates/teams/tasks.html:410
 msgid "Reassign"
@@ -6278,7 +6320,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:83
 msgid "least subtitles"
-msgstr ""
+msgstr "minste ondertitels"
 
 #: templates/teams/videos-list.html:105
 msgid "Rebuilding video index. Please try again in a few minutes"
@@ -6290,7 +6332,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:118
 msgid "Remove video"
-msgstr ""
+msgstr "Video verwijderen"
 
 #: templates/teams/videos-list.html:125
 #, python-format
@@ -6454,7 +6496,7 @@ msgstr "ondertitels voor deze video. Je kan op elk moment deze emails stoppen."
 
 #: templates/videos/_follow_video_button.html:145
 msgid "Follow "
-msgstr ""
+msgstr "Volgen"
 
 #: templates/videos/_follow_video_button.html:149
 msgid ""
@@ -6464,7 +6506,7 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:150
 msgid "Follow this video"
-msgstr ""
+msgstr "Deze video volgen"
 
 #: templates/videos/_follow_video_button.html:158
 msgid "Follow all languages"
@@ -6527,7 +6569,7 @@ msgstr "Samenwerken"
 
 #: templates/videos/_team_list.html:19
 msgid "View team:"
-msgstr ""
+msgstr "Ploeg bekijken:"
 
 #: templates/videos/_team_list.html:19 templates/videos/video-view.html:205
 msgid "Translation Project"
@@ -7046,29 +7088,29 @@ msgstr ""
 #: templates/videos/subtitle-view.html:43
 #: templates/videos/subtitle-view.html:45
 msgid "with"
-msgstr ""
+msgstr "met"
 
 #: templates/videos/subtitle-view.html:98 templates/videos/video-view.html:88
 msgid "View"
-msgstr ""
+msgstr "Bekijken"
 
 #: templates/videos/subtitle-view.html:104 templates/videos/video-view.html:94
 msgid "Follower"
-msgstr ""
+msgstr "Volger"
 
 #: templates/videos/subtitle-view.html:110
 #: templates/videos/video-view.html:100
 msgid "Comment"
-msgstr ""
+msgstr "Opmerking"
 
 #: templates/videos/subtitle-view.html:116
 msgid "Line"
-msgstr ""
+msgstr "Lijn"
 
 #: templates/videos/subtitle-view.html:126
 #: templates/videos/video-view.html:116
 msgid "View Subtitles"
-msgstr ""
+msgstr "Ondertitels bekijken"
 
 #: templates/videos/subtitle-view.html:150
 #: templates/videos/subtitle-view.html:287
@@ -7092,7 +7134,7 @@ msgstr "Ondertitels Bewerken"
 
 #: templates/videos/subtitle-view.html:166
 msgid "Download"
-msgstr ""
+msgstr "Downloaden"
 
 #: templates/videos/subtitle-view.html:194
 msgid "Draft only"
@@ -7110,7 +7152,7 @@ msgstr "Revisie"
 
 #: templates/videos/subtitle-view.html:202
 msgid "created"
-msgstr ""
+msgstr "aangemaakt"
 
 #: templates/videos/subtitle-view.html:248
 msgid ""
@@ -7130,7 +7172,7 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:258
 msgid "Make more?"
-msgstr ""
+msgstr "Er nog meer maken?"
 
 #: templates/videos/subtitle-view.html:260
 msgid "No subtitles available yet."
@@ -7157,7 +7199,7 @@ msgstr ""
 #: templates/videos/subtitle-view.html:285
 #: templates/videos/video-view.html:214
 msgid "Leave a comment"
-msgstr ""
+msgstr "Een opmerking schrijven"
 
 #: templates/videos/subtitle-view.html:294
 msgid "Compare Revisions"
@@ -7177,7 +7219,7 @@ msgstr "Geen ondertitels beschikbaar voor deze taal."
 
 #: templates/videos/subtitle-view.html:342
 msgid "Roll back to this version"
-msgstr ""
+msgstr "Terugzetten naar deze versie"
 
 #: templates/videos/subtitle-view.html:355
 msgid "Unpublish subtitles"
@@ -7185,7 +7227,7 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:363
 msgid "This version only"
-msgstr ""
+msgstr "Alleen deze versie"
 
 #: templates/videos/subtitle-view.html:367
 msgid "This entire language and all dependent languages"
@@ -7269,11 +7311,11 @@ msgstr ""
 
 #: templates/videos/video-view.html:140
 msgid "No subtitles yet."
-msgstr ""
+msgstr "Nog geen ondertitels."
 
 #: templates/videos/video-view.html:140
 msgid "View tasks for this video."
-msgstr ""
+msgstr "Taken voor deze video bekijken."
 
 #: templates/videos/video-view.html:142
 msgid "This video doesn't have any subtitles or tasks yet"
@@ -7289,7 +7331,7 @@ msgstr ""
 
 #: templates/videos/video-view.html:153 templates/videos/video-view.html:181
 msgid "This video doesn't have any subtitles yet"
-msgstr ""
+msgstr "Deze video heeft nog geen ondertitels"
 
 #: templates/videos/video-view.html:166
 msgid "URLs"
@@ -7305,7 +7347,7 @@ msgstr "Nu ondertitels maken"
 
 #: templates/videos/video-view.html:185
 msgid "Don't see the language you're looking for?"
-msgstr ""
+msgstr "Je ziet de taal die je zoekt niet?"
 
 #: templates/videos/video-view.html:185
 msgid "Start a new translation"

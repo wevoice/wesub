@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-09 01:33-0500\n"
-"PO-Revision-Date: 2012-08-09 06:51+0000\n"
+"POT-Creation-Date: 2012-08-17 01:32-0500\n"
+"PO-Revision-Date: 2012-08-17 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/universalsubtitles/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -55,57 +55,57 @@ msgstr "电子邮件"
 msgid "Hide"
 msgstr "隐藏"
 
-#: apps/auth/models.py:100
+#: apps/auth/models.py:98
 msgid "Retired user"
 msgstr "退出用户"
 
-#: apps/auth/models.py:327
+#: apps/auth/models.py:325
 msgid "Add comment"
 msgstr "添加评论"
 
-#: apps/auth/models.py:328
+#: apps/auth/models.py:326
 msgid "Start subtitles"
 msgstr "开始字幕"
 
-#: apps/auth/models.py:329
+#: apps/auth/models.py:327
 msgid "Start translation"
 msgstr "开始翻译"
 
-#: apps/auth/models.py:330
+#: apps/auth/models.py:328
 msgid "Edit subtitles"
 msgstr "编辑字幕"
 
-#: apps/auth/models.py:331
+#: apps/auth/models.py:329
 msgid "Edit translation"
 msgstr "编辑翻译"
 
-#: apps/auth/models.py:388
+#: apps/auth/models.py:386
 msgid "understand enough"
 msgstr "懂得足够多"
 
-#: apps/auth/models.py:389
+#: apps/auth/models.py:387
 msgid "understand 99%"
 msgstr "懂得99%"
 
-#: apps/auth/models.py:390
+#: apps/auth/models.py:388
 msgid "write like a native"
 msgstr "像本地人一样写作"
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:393
 msgid "follow requests in language"
 msgstr "跟进语种的请求"
 
-#: apps/auth/models.py:410
+#: apps/auth/models.py:408
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr "这是开始显示公告的日期。只显示最新公告。"
 
-#: apps/auth/models.py:509
+#: apps/auth/models.py:507
 msgid "e-mail confirmation"
 msgstr "邮件确认"
 
-#: apps/auth/models.py:510
+#: apps/auth/models.py:508
 msgid "e-mail confirmations"
 msgstr "邮件确认"
 
@@ -178,80 +178,80 @@ msgstr "你需要授权"
 msgid "Message does not exist."
 msgstr "消息不存在"
 
-#: apps/messages/tasks.py:71
+#: apps/messages/tasks.py:75
 #, python-format
 msgid "New message from %(author)s on Amara: %(subject)s"
 msgstr "来自Amara %(author)s ： %(subject)s 的新消息"
 
-#: apps/messages/tasks.py:73
+#: apps/messages/tasks.py:77
 #, python-format
 msgid "New message on Amara: %(subject)s"
 msgstr "来自%(subject)s 的新消息"
 
-#: apps/messages/tasks.py:117
+#: apps/messages/tasks.py:123
 #, python-format
 msgid "You've been invited to team %s on Amara"
 msgstr "你已邀请加入 Amara的  %s 组"
 
-#: apps/messages/tasks.py:152
+#: apps/messages/tasks.py:161
 #, python-format
 msgid "%(user)s is applying for team %(team)s"
 msgstr "%(user)s 申请 team %(team)s"
 
-#: apps/messages/tasks.py:183
+#: apps/messages/tasks.py:194
 #, python-format
 msgid "Your application to join the %s team has been declined"
 msgstr "你加入 %s 组 的申请被拒"
 
-#: apps/messages/tasks.py:217
+#: apps/messages/tasks.py:229
 #, python-format
 msgid "%s team has a new member"
 msgstr "%s 组有了一个新成员"
 
-#: apps/messages/tasks.py:241
+#: apps/messages/tasks.py:253
 #, python-format
 msgid "You've joined the %s team!"
 msgstr "你已经加入 %s 组!"
 
-#: apps/messages/tasks.py:266
+#: apps/messages/tasks.py:280
 #, python-format
 msgid "%(user)s has left the %(team)s team"
 msgstr "%(user)s 已离开 %(team)s 小组"
 
-#: apps/messages/tasks.py:291
+#: apps/messages/tasks.py:305
 #, python-format
 msgid "You've left the %s team!"
 msgstr "你已离开 %s 小组！"
 
-#: apps/messages/tasks.py:327
+#: apps/messages/tasks.py:341
 msgid "Your videos were imported!"
 msgstr "你的视频已导入"
 
-#: apps/messages/tasks.py:354
+#: apps/messages/tasks.py:370
 msgid "You have a new task assignment on Amara!"
 msgstr "有一个在Amara分配的新任务！"
 
-#: apps/messages/tasks.py:395
+#: apps/messages/tasks.py:419
 msgid "Your subtitles have been reviewed"
 msgstr "你的字幕已被评审"
 
-#: apps/messages/tasks.py:397
+#: apps/messages/tasks.py:421
 msgid " and published"
 msgstr " 并发布"
 
-#: apps/messages/tasks.py:498
+#: apps/messages/tasks.py:524
 msgid "Your subtitles have been approved and published!"
 msgstr "你的字幕已评审并发布！"
 
-#: apps/messages/tasks.py:504
+#: apps/messages/tasks.py:530
 msgid "Your subtitles have been returned for further editing"
 msgstr "你的字幕已退回需要进一步编辑"
 
-#: apps/messages/tasks.py:559
+#: apps/messages/tasks.py:585
 msgid "Your subtitles were not accepted"
 msgstr "你的字幕没有被接受"
 
-#: apps/messages/tasks.py:603
+#: apps/messages/tasks.py:629
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr "%(user)s 在视频 video %(title)s留下了一段评论 "
@@ -415,11 +415,12 @@ msgstr "特色组"
 msgid "Unfeature teams"
 msgstr "非特色组"
 
-#: apps/teams/admin.py:80 apps/teams/admin.py:113 apps/teams/models.py:185
+#: apps/teams/admin.py:80 apps/teams/admin.py:113 apps/teams/admin.py:212
+#: apps/teams/models.py:185
 msgid "Team"
 msgstr "队"
 
-#: apps/teams/admin.py:86
+#: apps/teams/admin.py:86 apps/teams/admin.py:218
 msgid "User"
 msgstr "用户"
 
@@ -497,7 +498,7 @@ msgstr "此视频还没有被转录。"
 msgid "Subtitling of this video is already in progress."
 msgstr "此视频的字幕正在制作中"
 
-#: apps/teams/forms.py:359
+#: apps/teams/forms.py:358
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr "还没有人转录此视频，所以不能翻译"
 
@@ -505,104 +506,109 @@ msgstr "还没有人转录此视频，所以不能翻译"
 msgid "This language already has a complete set of subtitles."
 msgstr "此语言已经有了一组完整的字幕。"
 
-#: apps/teams/forms.py:385
+#: apps/teams/forms.py:377
+msgid "This language for this video does not exist or doesn't have a version."
+msgstr ""
+
+#: apps/teams/forms.py:394
 msgid "There is already a task in progress for that video/language."
 msgstr "在视频或语言中以及有一项任务在进行。"
 
-#: apps/teams/forms.py:399
-msgid "You must select a language for a Translate task."
-msgstr "你必须给翻译任务选择一种语言"
+#: apps/teams/forms.py:400
+#, python-format
+msgid "You must select a language for a %s task."
+msgstr ""
 
-#: apps/teams/forms.py:434
+#: apps/teams/forms.py:435
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr "那个用户已经标注了最大任务数。"
 
-#: apps/teams/forms.py:456
+#: apps/teams/forms.py:457
 msgid "You do not have permission to assign this task."
 msgstr "你没有标注此任务的权限"
 
-#: apps/teams/forms.py:463
+#: apps/teams/forms.py:464
 msgid "This user cannot perform that task."
 msgstr "此用户不能执行任务。"
 
-#: apps/teams/forms.py:484
+#: apps/teams/forms.py:485
 msgid "You do not have permission to delete this task."
 msgstr "没有允许你删除此任务"
 
-#: apps/teams/forms.py:541
+#: apps/teams/forms.py:542
 msgid "You cannot blacklist a preferred language."
 msgstr "你不能将偏好语言列入黑名单"
 
-#: apps/teams/forms.py:564 apps/teams/forms.py:566
+#: apps/teams/forms.py:565 apps/teams/forms.py:567
 msgid "User does not exist!"
 msgstr "用户不存在"
 
-#: apps/teams/forms.py:573
+#: apps/teams/forms.py:574
 msgid "User is already a member of this team!"
 msgstr "用户已是小组成员"
 
-#: apps/teams/forms.py:578
+#: apps/teams/forms.py:579
 msgid "User has already been invited and has not replied yet."
 msgstr ""
 
-#: apps/teams/forms.py:602 templates/videos/subtitle-view.html:375
+#: apps/teams/forms.py:603 templates/videos/subtitle-view.html:375
 msgid "Would you like to delete these subtitles completely?"
 msgstr "你想要完全删除这些字幕？"
 
-#: apps/teams/forms.py:606 templates/videos/subtitle-view.html:360
+#: apps/teams/forms.py:607 templates/videos/subtitle-view.html:360
 msgid "What would you like to unpublish?"
 msgstr "有哪些你不想发布？"
 
-#: apps/teams/forms.py:608
+#: apps/teams/forms.py:609
 msgid "This version (and any later version) for this language."
 msgstr "此语种的当前版本(以及后续版本)"
 
-#: apps/teams/forms.py:609
+#: apps/teams/forms.py:610
 msgid "All versions for this language and any dependent languages."
 msgstr "此语言及依赖语言的所有版本"
 
-#: apps/teams/forms.py:627
+#: apps/teams/forms.py:628
 msgid "These subtitles are not under a team's control."
 msgstr "这些字幕没有纳入小组控制中"
 
-#: apps/teams/forms.py:631
+#: apps/teams/forms.py:632
 msgid "You do not have permission to unpublish these subtitles."
 msgstr "你没有撤销这些字幕的发布的权限"
 
-#: apps/teams/forms.py:650
+#: apps/teams/forms.py:651
 msgid "You cannot perform that task."
 msgstr "你不能执行那个任务"
 
-#: apps/teams/forms.py:662 apps/videos/forms.py:193
+#: apps/teams/forms.py:663 apps/videos/forms.py:193
 msgid "Invalid language to translate from."
 msgstr "翻译的源语言不可用"
 
-#: apps/teams/forms.py:671 apps/videos/forms.py:70 apps/videos/forms.py:88
+#: apps/teams/forms.py:672 apps/videos/forms.py:70 apps/videos/forms.py:88
 #: apps/videos/forms.py:202
 msgid "File size should be less {0} kb"
 msgstr "文件大小应该小于 {0} kb"
 
-#: apps/teams/forms.py:676 apps/videos/forms.py:207
+#: apps/teams/forms.py:677 apps/videos/forms.py:207
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:683 apps/videos/forms.py:75 apps/videos/forms.py:96
+#: apps/teams/forms.py:684 apps/videos/forms.py:75 apps/videos/forms.py:96
 #: apps/videos/forms.py:214
 msgid "Can not detect file encoding"
 msgstr "不能检测编码"
 
-#: apps/teams/forms.py:688 apps/videos/forms.py:98 apps/videos/forms.py:219
+#: apps/teams/forms.py:689 apps/videos/forms.py:98 apps/videos/forms.py:219
 msgid "Incorrect subtitles format"
 msgstr "不正确的字幕格式"
 
-#: apps/teams/forms.py:761 apps/videos/forms.py:309
+#: apps/teams/forms.py:762 apps/videos/forms.py:309
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 
-#: apps/teams/forms.py:767 apps/videos/forms.py:316
+#: apps/teams/forms.py:768 apps/videos/forms.py:316
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -640,11 +646,11 @@ msgstr "负责人和管理人"
 msgid "Admins only"
 msgstr "仅管理人"
 
-#: apps/teams/models.py:125 apps/teams/models.py:2345
+#: apps/teams/models.py:125 apps/teams/models.py:2433
 msgid "name"
 msgstr "名称"
 
-#: apps/teams/models.py:126 apps/teams/models.py:2346
+#: apps/teams/models.py:126 apps/teams/models.py:2434
 msgid "slug"
 msgstr ""
 
@@ -665,7 +671,7 @@ msgstr "标志"
 msgid "publicly Visible?"
 msgstr "公开可见？"
 
-#: apps/teams/models.py:131 templates/search/search.html:151
+#: apps/teams/models.py:131 templates/search/search.html:152
 #: templates/teams/project_list.html:10
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
@@ -772,7 +778,7 @@ msgstr "管理"
 msgid "Contributor"
 msgstr "贡献者"
 
-#: apps/teams/notifications.py:171
+#: apps/teams/notifications.py:175
 msgid "New activity on your team video"
 msgstr "你的小组视频有新活动"
 
@@ -784,7 +790,7 @@ msgstr "组不存在"
 msgid "You are already a member of this team."
 msgstr "你已经是组成员"
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:879
+#: apps/teams/rpc.py:50 apps/teams/views.py:888
 msgid "You are now a member of this team."
 msgstr "你现在是组中的一员"
 
@@ -792,45 +798,57 @@ msgstr "你现在是组中的一员"
 msgid "The \"About you\" field is required in order to apply."
 msgstr "要应用需要\"关于你\"字段"
 
-#: apps/teams/rpc.py:62
+#: apps/teams/rpc.py:56
+msgid "You have already applied to this team."
+msgstr ""
+
+#: apps/teams/rpc.py:58
+msgid "You have been removed from this team."
+msgstr ""
+
+#: apps/teams/rpc.py:60
+msgid "Your application has been denied."
+msgstr ""
+
+#: apps/teams/rpc.py:67
 msgid ""
 "Your application has been submitted. You will be notified of the team "
 "administrator's response"
 msgstr "你的应用已提交。你将收到小组管理员的回覆通知"
 
-#: apps/teams/rpc.py:65
+#: apps/teams/rpc.py:70
 msgid "You can't join this team by application."
 msgstr "你不能通过申请加入此组"
 
-#: apps/teams/rpc.py:71
+#: apps/teams/rpc.py:76
 msgid "Team does not exist."
 msgstr "组不存在"
 
-#: apps/teams/rpc.py:74
+#: apps/teams/rpc.py:79
 msgid "You are not manager of this team."
 msgstr "你不是这个组的管理员"
 
-#: apps/teams/rpc.py:77
+#: apps/teams/rpc.py:82
 msgid "Incorrect team member role."
 msgstr "不正确的组成员角色"
 
-#: apps/teams/rpc.py:82
+#: apps/teams/rpc.py:87
 msgid "Team member does not exist."
 msgstr "组成员不存在"
 
-#: apps/teams/rpc.py:85
+#: apps/teams/rpc.py:90
 msgid "You can't promote yourself."
 msgstr "你不能自己创建"
 
-#: apps/teams/rpc.py:89
+#: apps/teams/rpc.py:94
 msgid "Team member role changed."
 msgstr "组成员角色已变更"
 
-#: apps/teams/rpc.py:163
+#: apps/teams/rpc.py:168
 msgid "You cannot assign that role to that member."
 msgstr "你不能给那个成员分配角色"
 
-#: apps/teams/tasks.py:96
+#: apps/teams/tasks.py:99
 #, python-format
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "新的 %(team)s 视频已准备好编辑字幕！"
@@ -869,7 +887,7 @@ msgid "You do not have permission to delete this team."
 msgstr "你没有权限删除此组"
 
 #: apps/teams/views.py:215 apps/teams/views.py:257 apps/teams/views.py:285
-#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1565
+#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1553
 msgid "You do not have permission to edit this team."
 msgstr "你没有权限编辑此组"
 
@@ -921,133 +939,137 @@ msgstr "视频已从Amara删除。"
 msgid "Video has been removed from the team."
 msgstr "视频已从此组移除"
 
-#: apps/teams/views.py:767
+#: apps/teams/views.py:769
 msgid "Member has been removed from the team."
 msgstr "成员已从此组移除"
 
-#: apps/teams/views.py:770
+#: apps/teams/views.py:772
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "使用“离开此组”按钮，离开此小组"
 
-#: apps/teams/views.py:773
+#: apps/teams/views.py:775
 msgid "You don't have permission to remove this member from the team."
 msgstr "你没有权限将成员移除此小组"
 
-#: apps/teams/views.py:804
+#: apps/teams/views.py:808
 msgid "Application approved."
 msgstr "申请已通过"
 
-#: apps/teams/views.py:806 apps/teams/views.py:824
+#: apps/teams/views.py:810 apps/teams/views.py:830
 msgid "Application does not exist."
 msgstr "申请不存在"
 
-#: apps/teams/views.py:808
+#: apps/teams/views.py:812 apps/teams/views.py:832
+msgid "Application already processed."
+msgstr ""
+
+#: apps/teams/views.py:814
 msgid "You can't approve applications."
 msgstr "你不能批准申请"
 
-#: apps/teams/views.py:822
+#: apps/teams/views.py:828
 msgid "Application denied."
 msgstr "需要申请"
 
-#: apps/teams/views.py:826
+#: apps/teams/views.py:834
 msgid "You can't deny applications."
 msgstr "你不能拒绝申请"
 
-#: apps/teams/views.py:836
+#: apps/teams/views.py:844
 msgid "You cannot invite people to this team."
 msgstr "你不能邀请别人到此组"
 
-#: apps/teams/views.py:866
+#: apps/teams/views.py:875
 msgid "This invite is no longer valid"
 msgstr ""
 
-#: apps/teams/views.py:875
+#: apps/teams/views.py:884
 msgid "You cannot join this team."
 msgstr "你不能加入此组"
 
-#: apps/teams/views.py:926
+#: apps/teams/views.py:938
 msgid "You have left this team."
 msgstr "你已经离开此组"
 
-#: apps/teams/views.py:982
+#: apps/teams/views.py:994
 msgid "Member saved."
 msgstr "成员已保存"
 
-#: apps/teams/views.py:1141
+#: apps/teams/views.py:1131
 msgid "You cannot view this team's tasks."
 msgstr "你不能查看此小组的任务"
 
-#: apps/teams/views.py:1284 apps/teams/views.py:1287
+#: apps/teams/views.py:1272 apps/teams/views.py:1275
 msgid "You are not allowed to perform this task."
 msgstr "你没有执行此任务的权限"
 
-#: apps/teams/views.py:1342
+#: apps/teams/views.py:1330
 msgid "Task deleted."
 msgstr "任务已删除"
 
-#: apps/teams/views.py:1344
+#: apps/teams/views.py:1332
 msgid "You cannot delete this task."
 msgstr "你不能删除此任务"
 
-#: apps/teams/views.py:1369
+#: apps/teams/views.py:1357
 msgid "Task declined."
 msgstr "任务已拒绝"
 
-#: apps/teams/views.py:1371
+#: apps/teams/views.py:1359
 msgid "Task assigned."
 msgstr "任务已标记"
 
-#: apps/teams/views.py:1373
+#: apps/teams/views.py:1361
 msgid "You cannot assign this task."
 msgstr "你不能标记此任务"
 
-#: apps/teams/views.py:1395
+#: apps/teams/views.py:1383
 msgid "Invalid assignment attempt."
 msgstr "不可标记"
 
-#: apps/teams/views.py:1420
+#: apps/teams/views.py:1408
 msgid "Draft uploaded successfully."
 msgstr "草稿成功上传"
 
-#: apps/teams/views.py:1424
+#: apps/teams/views.py:1412
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1442
+#: apps/teams/views.py:1430
 msgid "You are not allowed to download this transcript."
 msgstr "不允许你下载此副本"
 
-#: apps/teams/views.py:1492
+#: apps/teams/views.py:1480
 msgid "There's already a project with this name"
 msgstr "已有同名项目存在"
 
-#: apps/teams/views.py:1504
+#: apps/teams/views.py:1492
 msgid "Project added."
 msgstr "项目已添加"
 
-#: apps/teams/views.py:1521
+#: apps/teams/views.py:1509
 msgid "You cannot edit that project."
 msgstr "你不能编辑此项目"
 
-#: apps/teams/views.py:1532
+#: apps/teams/views.py:1520
 msgid "Project deleted."
 msgstr "项目已删除"
 
-#: apps/teams/views.py:1550
+#: apps/teams/views.py:1538
 msgid "Project saved."
 msgstr "项目已保存"
 
-#: apps/teams/views.py:1676
+#: apps/teams/views.py:1664
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr "无效的撤消请求\n错误：\n"
 
-#: apps/teams/views.py:1710
+#: apps/teams/views.py:1698
 msgid "Successfully unpublished subtitles."
 msgstr "成功撤销字幕发布"
 
-#: apps/teams/templatetags/teams_tags.py:258
+#: apps/teams/templatetags/teams_tags.py:260
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "有谁能帮我给这些视频加上字幕？%(url)s"
@@ -1563,22 +1585,22 @@ msgstr "未定义错误"
 msgid "Video embedding disabled by owner"
 msgstr "拥有者禁用视频嵌入"
 
-#: apps/widget/rpc.py:296
+#: apps/widget/rpc.py:302
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "这些字幕正在调整中。参见 %s 小组页面以获得如何贡献的信息。"
 
-#: apps/widget/rpc.py:298
+#: apps/widget/rpc.py:304
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "抱歉，这些字幕是私有的。"
 
-#: apps/widget/rpc.py:995 apps/widget/rpc.py:1036
+#: apps/widget/rpc.py:1001 apps/widget/rpc.py:1042
 msgid "\n"
 msgstr "\n"
 
-#: apps/widget/views.py:106
+#: apps/widget/views.py:159
 msgid "That task has already been completed."
 msgstr "任务已完成"
 
@@ -1761,943 +1783,963 @@ msgid "%(hits)s/%(message_number)s message"
 msgid_plural "%(hits)s/%(message_number)s messages"
 msgstr[0] "%(hits)s/%(message_number)s 信息"
 
-#: libs/unilangs/unilangs.py:122
+#: libs/unilangs/unilangs.py:123
 msgid "Afar"
 msgstr "阿法尔语"
 
-#: libs/unilangs/unilangs.py:123
+#: libs/unilangs/unilangs.py:124
 msgid "Abkhazian"
 msgstr " 阿布哈西亚语"
 
-#: libs/unilangs/unilangs.py:124
+#: libs/unilangs/unilangs.py:125
 msgid "Avestan"
 msgstr "阿维斯坦语"
 
-#: libs/unilangs/unilangs.py:125
+#: libs/unilangs/unilangs.py:126
 msgid "Afrikaans"
 msgstr "荷兰语（南非）"
 
-#: libs/unilangs/unilangs.py:126
+#: libs/unilangs/unilangs.py:127
 msgid "Akan"
 msgstr "库阿语"
 
-#: libs/unilangs/unilangs.py:127
+#: libs/unilangs/unilangs.py:128
 msgid "Amharic"
 msgstr "阿姆哈拉语"
 
-#: libs/unilangs/unilangs.py:128
+#: libs/unilangs/unilangs.py:129
 msgid "Aragonese"
 msgstr "阿拉贡语"
 
-#: libs/unilangs/unilangs.py:129
+#: libs/unilangs/unilangs.py:130
 msgid "Arabic"
 msgstr "阿拉伯语"
 
-#: libs/unilangs/unilangs.py:130
+#: libs/unilangs/unilangs.py:131
+msgid "Algerian Arabic"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:132
 msgid "Assamese"
 msgstr "阿萨姆语"
 
-#: libs/unilangs/unilangs.py:131
+#: libs/unilangs/unilangs.py:133
 msgid "American Sign Language"
 msgstr "美国手语"
 
-#: libs/unilangs/unilangs.py:132
+#: libs/unilangs/unilangs.py:134
 msgid "Asturian"
 msgstr "阿斯图里亚斯语"
 
-#: libs/unilangs/unilangs.py:133
+#: libs/unilangs/unilangs.py:135
 msgid "Avaric"
 msgstr "阿瓦尔语 "
 
-#: libs/unilangs/unilangs.py:134
+#: libs/unilangs/unilangs.py:136
 msgid "Aymara"
 msgstr "艾马拉语"
 
-#: libs/unilangs/unilangs.py:135
+#: libs/unilangs/unilangs.py:137
 msgid "Azerbaijani"
 msgstr "阿塞拜疆语"
 
-#: libs/unilangs/unilangs.py:136
+#: libs/unilangs/unilangs.py:138
 msgid "Bashkir"
 msgstr "巴什基尔语"
 
-#: libs/unilangs/unilangs.py:137
+#: libs/unilangs/unilangs.py:139
 msgid "Bambara"
 msgstr "班巴拉语"
 
-#: libs/unilangs/unilangs.py:138
+#: libs/unilangs/unilangs.py:140
 msgid "Belarusian"
 msgstr "白俄罗斯语"
 
-#: libs/unilangs/unilangs.py:139
+#: libs/unilangs/unilangs.py:141
 msgid "Berber"
 msgstr "柏柏尔语"
 
-#: libs/unilangs/unilangs.py:140
+#: libs/unilangs/unilangs.py:142
 msgid "Bulgarian"
 msgstr "保加利亚语"
 
-#: libs/unilangs/unilangs.py:141
+#: libs/unilangs/unilangs.py:143
 msgid "Bihari"
 msgstr "比哈尔语"
 
-#: libs/unilangs/unilangs.py:142
+#: libs/unilangs/unilangs.py:144
 msgid "Bislama"
 msgstr "比斯拉马语"
 
-#: libs/unilangs/unilangs.py:143
+#: libs/unilangs/unilangs.py:145
 msgid "Bengali"
 msgstr "孟加拉语"
 
-#: libs/unilangs/unilangs.py:144
+#: libs/unilangs/unilangs.py:146
 msgid "Ibibio"
 msgstr "伊比比奥语"
 
-#: libs/unilangs/unilangs.py:145
+#: libs/unilangs/unilangs.py:147
 msgid "Tibetan"
 msgstr "藏语"
 
-#: libs/unilangs/unilangs.py:146
+#: libs/unilangs/unilangs.py:148
 msgid "Breton"
 msgstr " 布列塔尼语"
 
-#: libs/unilangs/unilangs.py:147
+#: libs/unilangs/unilangs.py:149
 msgid "Bosnian"
 msgstr "波斯尼亚语"
 
-#: libs/unilangs/unilangs.py:148
+#: libs/unilangs/unilangs.py:150
 msgid "Buginese"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:149
+#: libs/unilangs/unilangs.py:151
 msgid "Catalan"
 msgstr "加泰罗尼亚语"
 
-#: libs/unilangs/unilangs.py:150
+#: libs/unilangs/unilangs.py:152
 msgid "Chechen"
 msgstr "车臣语"
 
-#: libs/unilangs/unilangs.py:151
+#: libs/unilangs/unilangs.py:153
 msgid "Cebuano"
 msgstr "宿雾语"
 
-#: libs/unilangs/unilangs.py:152
+#: libs/unilangs/unilangs.py:154
 msgid "Chamorro"
 msgstr " 查莫罗语"
 
-#: libs/unilangs/unilangs.py:153
+#: libs/unilangs/unilangs.py:155
 msgid "Choctaw"
 msgstr "乔克托语"
 
-#: libs/unilangs/unilangs.py:154
+#: libs/unilangs/unilangs.py:156
 msgid "Corsican"
 msgstr "科西嘉语"
 
-#: libs/unilangs/unilangs.py:155
+#: libs/unilangs/unilangs.py:157
 msgid "Cree"
 msgstr "克里语"
 
-#: libs/unilangs/unilangs.py:156
+#: libs/unilangs/unilangs.py:158
 msgid "Czech"
 msgstr "捷克语"
 
-#: libs/unilangs/unilangs.py:157
+#: libs/unilangs/unilangs.py:159
 msgid "Church Slavic"
 msgstr "车臣斯拉夫语"
 
-#: libs/unilangs/unilangs.py:158
+#: libs/unilangs/unilangs.py:160
 msgid "Chuvash"
 msgstr "楚瓦什语"
 
-#: libs/unilangs/unilangs.py:159
+#: libs/unilangs/unilangs.py:161
 msgid "Welsh"
 msgstr "威尔士语"
 
-#: libs/unilangs/unilangs.py:160
+#: libs/unilangs/unilangs.py:162
 msgid "Danish"
 msgstr "丹麦语"
 
-#: libs/unilangs/unilangs.py:161
+#: libs/unilangs/unilangs.py:163
 msgid "German"
 msgstr "德语"
 
-#: libs/unilangs/unilangs.py:162
+#: libs/unilangs/unilangs.py:164
 msgid "Divehi"
 msgstr "迪维西语"
 
-#: libs/unilangs/unilangs.py:163
+#: libs/unilangs/unilangs.py:165
 msgid "Dzongkha"
 msgstr "宗卡语"
 
-#: libs/unilangs/unilangs.py:164
+#: libs/unilangs/unilangs.py:166
 msgid "Ewe"
 msgstr "埃维语"
 
-#: libs/unilangs/unilangs.py:165
+#: libs/unilangs/unilangs.py:167
 msgid "Efik"
 msgstr "埃菲克语"
 
-#: libs/unilangs/unilangs.py:166
+#: libs/unilangs/unilangs.py:168
 msgid "Greek"
 msgstr "希腊语"
 
-#: libs/unilangs/unilangs.py:167
+#: libs/unilangs/unilangs.py:169
 msgid "English"
 msgstr "英语"
 
-#: libs/unilangs/unilangs.py:168
+#: libs/unilangs/unilangs.py:170
 msgid "English, British"
 msgstr "英国英语"
 
-#: libs/unilangs/unilangs.py:169
+#: libs/unilangs/unilangs.py:171
 msgid "Esperanto"
 msgstr "世界语"
 
-#: libs/unilangs/unilangs.py:170
+#: libs/unilangs/unilangs.py:172
 msgid "Spanish"
 msgstr "西班牙语"
 
-#: libs/unilangs/unilangs.py:171
+#: libs/unilangs/unilangs.py:173
 msgid "Spanish, Argentinian"
 msgstr "西班牙语"
 
-#: libs/unilangs/unilangs.py:172
+#: libs/unilangs/unilangs.py:174
 msgid "Spanish, Mexican"
 msgstr "西班牙语，墨西哥"
 
-#: libs/unilangs/unilangs.py:173
+#: libs/unilangs/unilangs.py:175
 msgid "Spanish, Nicaraguan"
 msgstr "西班牙语，尼加拉瓜"
 
-#: libs/unilangs/unilangs.py:174
+#: libs/unilangs/unilangs.py:176
 msgid "Estonian"
 msgstr "爱沙尼亚语"
 
-#: libs/unilangs/unilangs.py:175
+#: libs/unilangs/unilangs.py:177
 msgid "Basque"
 msgstr "巴斯克语"
 
-#: libs/unilangs/unilangs.py:176
+#: libs/unilangs/unilangs.py:178
 msgid "Persian"
 msgstr "波斯语"
 
-#: libs/unilangs/unilangs.py:177
+#: libs/unilangs/unilangs.py:179
 msgid "Fulah"
 msgstr "富拉赫语"
 
-#: libs/unilangs/unilangs.py:178
+#: libs/unilangs/unilangs.py:180
 msgid "Finnish"
 msgstr "芬兰语"
 
-#: libs/unilangs/unilangs.py:179
+#: libs/unilangs/unilangs.py:181
 msgid "Filipino"
 msgstr "菲律宾语"
 
-#: libs/unilangs/unilangs.py:180
+#: libs/unilangs/unilangs.py:182
 msgid "Fijian"
 msgstr "斐济语"
 
-#: libs/unilangs/unilangs.py:181
+#: libs/unilangs/unilangs.py:183
 msgid "Faroese"
 msgstr "法罗语"
 
-#: libs/unilangs/unilangs.py:182
+#: libs/unilangs/unilangs.py:184
 msgid "French"
 msgstr "法语"
 
-#: libs/unilangs/unilangs.py:183
+#: libs/unilangs/unilangs.py:185
 msgid "French, Canadian"
 msgstr "法语，加拿大"
 
-#: libs/unilangs/unilangs.py:184
+#: libs/unilangs/unilangs.py:186
 msgid "Fula"
 msgstr "富拉語"
 
-#: libs/unilangs/unilangs.py:185
+#: libs/unilangs/unilangs.py:187
 msgid "Frisian"
 msgstr "弗里西语 "
 
-#: libs/unilangs/unilangs.py:186
+#: libs/unilangs/unilangs.py:188
 msgid "Irish"
 msgstr "爱尔兰语"
 
-#: libs/unilangs/unilangs.py:187
+#: libs/unilangs/unilangs.py:189
 msgid "Scottish Gaelic"
 msgstr "苏格兰盖立语"
 
-#: libs/unilangs/unilangs.py:188
+#: libs/unilangs/unilangs.py:190
 msgid "Galician"
 msgstr "加里西亚语"
 
-#: libs/unilangs/unilangs.py:189
+#: libs/unilangs/unilangs.py:191
 msgid "Guaran"
 msgstr "瓜拉尼语"
 
-#: libs/unilangs/unilangs.py:190
+#: libs/unilangs/unilangs.py:192
 msgid "Gujarati"
 msgstr "古吉拉特语"
 
-#: libs/unilangs/unilangs.py:191
+#: libs/unilangs/unilangs.py:193
 msgid "Manx"
 msgstr "马恩岛语"
 
-#: libs/unilangs/unilangs.py:192
+#: libs/unilangs/unilangs.py:194
 msgid "Haida"
 msgstr "海达语"
 
-#: libs/unilangs/unilangs.py:193
+#: libs/unilangs/unilangs.py:195
 msgid "Hausa"
 msgstr "豪撒语"
 
-#: libs/unilangs/unilangs.py:194
+#: libs/unilangs/unilangs.py:196
 msgid "Hazaragi"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:195
+#: libs/unilangs/unilangs.py:197
 msgid "Hebrew"
 msgstr "希伯来语"
 
-#: libs/unilangs/unilangs.py:196
+#: libs/unilangs/unilangs.py:198
 msgid "Hindi"
 msgstr " 印度语"
 
-#: libs/unilangs/unilangs.py:197
+#: libs/unilangs/unilangs.py:199
 msgid "Hiri Motu"
 msgstr "希利摩陀语"
 
-#: libs/unilangs/unilangs.py:198
+#: libs/unilangs/unilangs.py:200
 msgid "Croatian"
 msgstr "克罗地亚语"
 
-#: libs/unilangs/unilangs.py:199
+#: libs/unilangs/unilangs.py:201
 msgid "Creole, Haitian"
 msgstr " 克利奥尔语，海地语"
 
-#: libs/unilangs/unilangs.py:200
+#: libs/unilangs/unilangs.py:202
 msgid "Hungarian"
 msgstr "匈牙利语"
 
-#: libs/unilangs/unilangs.py:201
+#: libs/unilangs/unilangs.py:203
 msgid "Hupa"
 msgstr "胡帕语"
 
-#: libs/unilangs/unilangs.py:202
+#: libs/unilangs/unilangs.py:204
 msgid "Armenian"
 msgstr "亚美尼亚语"
 
-#: libs/unilangs/unilangs.py:203
+#: libs/unilangs/unilangs.py:205
 msgid "Herero"
 msgstr "赫雷罗语"
 
-#: libs/unilangs/unilangs.py:204
+#: libs/unilangs/unilangs.py:206
 msgid "Interlingua"
 msgstr " 拉丁国际语"
 
-#: libs/unilangs/unilangs.py:205
+#: libs/unilangs/unilangs.py:207
 msgid "Igbo"
 msgstr "伊博语"
 
-#: libs/unilangs/unilangs.py:206
+#: libs/unilangs/unilangs.py:208
 msgid "Indonesian"
 msgstr "印度尼西亚语"
 
-#: libs/unilangs/unilangs.py:207
+#: libs/unilangs/unilangs.py:209
 msgid "Interlingue"
 msgstr "国际语"
 
-#: libs/unilangs/unilangs.py:208
+#: libs/unilangs/unilangs.py:210
 msgid "Sichuan Yi"
 msgstr "四川彝族语"
 
-#: libs/unilangs/unilangs.py:209
+#: libs/unilangs/unilangs.py:211
 msgid "Inupia"
 msgstr "因纽特语"
 
-#: libs/unilangs/unilangs.py:210
+#: libs/unilangs/unilangs.py:212
 msgid "Ilocano"
 msgstr "伊洛卡诺语"
 
-#: libs/unilangs/unilangs.py:211
+#: libs/unilangs/unilangs.py:213
 msgid "Ingush"
 msgstr "印古什语"
 
-#: libs/unilangs/unilangs.py:212
+#: libs/unilangs/unilangs.py:214
 msgid "Ido"
 msgstr " 伊多语"
 
-#: libs/unilangs/unilangs.py:213
+#: libs/unilangs/unilangs.py:215
 msgid "Iroquoian languages"
 msgstr "伊洛魁语"
 
-#: libs/unilangs/unilangs.py:214
+#: libs/unilangs/unilangs.py:216
 msgid "Icelandic"
 msgstr " 冰岛语"
 
-#: libs/unilangs/unilangs.py:215
+#: libs/unilangs/unilangs.py:217
 msgid "Italian"
 msgstr "意大利语"
 
-#: libs/unilangs/unilangs.py:216
+#: libs/unilangs/unilangs.py:218
 msgid "Inuktitut"
 msgstr "因纽特语"
 
-#: libs/unilangs/unilangs.py:217
+#: libs/unilangs/unilangs.py:219
 msgid "Japanese"
 msgstr "日语"
 
-#: libs/unilangs/unilangs.py:218
+#: libs/unilangs/unilangs.py:220
 msgid "Javanese"
 msgstr "爪哇语"
 
-#: libs/unilangs/unilangs.py:219
+#: libs/unilangs/unilangs.py:221
 msgid "Georgian"
 msgstr " 格鲁吉亚语"
 
-#: libs/unilangs/unilangs.py:220
+#: libs/unilangs/unilangs.py:222
 msgid "Karen"
 msgstr "克伦邦语"
 
-#: libs/unilangs/unilangs.py:221
+#: libs/unilangs/unilangs.py:223
 msgid "Kanuri"
 msgstr "卡努里语"
 
-#: libs/unilangs/unilangs.py:222
+#: libs/unilangs/unilangs.py:224
 msgid "Gikuyu"
 msgstr "基库尤语"
 
-#: libs/unilangs/unilangs.py:223
+#: libs/unilangs/unilangs.py:225
 msgid "Rwandi"
 msgstr "卢旺达语"
 
-#: libs/unilangs/unilangs.py:224
+#: libs/unilangs/unilangs.py:226
 msgid "Kuanyama, Kwanyama"
 msgstr "库安亚马语，库瓦亚马语"
 
-#: libs/unilangs/unilangs.py:225
+#: libs/unilangs/unilangs.py:227
 msgid "Kazakh"
 msgstr "哈萨克语"
 
-#: libs/unilangs/unilangs.py:226
+#: libs/unilangs/unilangs.py:228
 msgid "Greenlandic"
 msgstr "格陵兰语"
 
-#: libs/unilangs/unilangs.py:227
+#: libs/unilangs/unilangs.py:229
 msgid "Khmer"
 msgstr "高棉语"
 
-#: libs/unilangs/unilangs.py:228
+#: libs/unilangs/unilangs.py:230
 msgid "Kannada"
 msgstr "埃纳德语"
 
-#: libs/unilangs/unilangs.py:229
+#: libs/unilangs/unilangs.py:231
 msgid "Korean"
 msgstr "韩语"
 
-#: libs/unilangs/unilangs.py:230
+#: libs/unilangs/unilangs.py:232
 msgid "Kongo"
 msgstr " 刚果语"
 
-#: libs/unilangs/unilangs.py:231
+#: libs/unilangs/unilangs.py:233
 msgid "Kashmiri"
 msgstr " 克什米尔语"
 
-#: libs/unilangs/unilangs.py:232
+#: libs/unilangs/unilangs.py:234
 msgid "Kurdish"
 msgstr "库尔德语"
 
-#: libs/unilangs/unilangs.py:233
+#: libs/unilangs/unilangs.py:235
 msgid "Komi"
 msgstr "科美语"
 
-#: libs/unilangs/unilangs.py:234
+#: libs/unilangs/unilangs.py:236
 msgid "Cornish"
 msgstr "康沃尔语"
 
-#: libs/unilangs/unilangs.py:235
+#: libs/unilangs/unilangs.py:237
 msgid "Kyrgyz"
 msgstr "吉尔吉斯坦语"
 
-#: libs/unilangs/unilangs.py:236
+#: libs/unilangs/unilangs.py:238
 msgid "Latin"
 msgstr "拉丁语"
 
-#: libs/unilangs/unilangs.py:237
+#: libs/unilangs/unilangs.py:239
 msgid "Luxembourgish"
 msgstr "卢森堡语"
 
-#: libs/unilangs/unilangs.py:238
+#: libs/unilangs/unilangs.py:240
 msgid "Ganda"
 msgstr "干达语"
 
-#: libs/unilangs/unilangs.py:239
+#: libs/unilangs/unilangs.py:241
 msgid "Limburgish"
 msgstr "林堡语"
 
-#: libs/unilangs/unilangs.py:240
+#: libs/unilangs/unilangs.py:242
 msgid "Lingala"
 msgstr " 林加拉语"
 
-#: libs/unilangs/unilangs.py:241
+#: libs/unilangs/unilangs.py:243
 msgid "Lakota"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:242
+#: libs/unilangs/unilangs.py:244
 msgid "Lao"
 msgstr "老挝语"
 
-#: libs/unilangs/unilangs.py:243
+#: libs/unilangs/unilangs.py:245
 msgid "Lithuanian"
 msgstr "立陶宛语"
 
-#: libs/unilangs/unilangs.py:244
+#: libs/unilangs/unilangs.py:246
 msgid "Luba-Katagana"
 msgstr "卢巴-卡唐加语"
 
-#: libs/unilangs/unilangs.py:245
+#: libs/unilangs/unilangs.py:247
 msgid "Luba-Kasai"
 msgstr "希鲁巴语"
 
-#: libs/unilangs/unilangs.py:246
+#: libs/unilangs/unilangs.py:248
 msgid "Luo"
 msgstr "卢奥语"
 
-#: libs/unilangs/unilangs.py:247
+#: libs/unilangs/unilangs.py:249
 msgid "Luhya"
 msgstr "卢亚人"
 
-#: libs/unilangs/unilangs.py:248
+#: libs/unilangs/unilangs.py:250
 msgid "Latvian"
 msgstr "拉脱维亚语"
 
-#: libs/unilangs/unilangs.py:249
+#: libs/unilangs/unilangs.py:251
 msgid "Metadata: Geo"
 msgstr "元数据:Geo"
 
-#: libs/unilangs/unilangs.py:250
+#: libs/unilangs/unilangs.py:252
 msgid "Metadata: Twitter"
 msgstr "元数据：Twitter"
 
-#: libs/unilangs/unilangs.py:251
+#: libs/unilangs/unilangs.py:253
 msgid "Metadata: Wikipedia"
 msgstr "元数据：维基百科"
 
-#: libs/unilangs/unilangs.py:252
+#: libs/unilangs/unilangs.py:254
 msgid "Madurese"
 msgstr "马都拉语的"
 
-#: libs/unilangs/unilangs.py:253
+#: libs/unilangs/unilangs.py:255
 msgid "Marshallese"
 msgstr "马绍尔语"
 
-#: libs/unilangs/unilangs.py:254
+#: libs/unilangs/unilangs.py:256
 msgid "Maori"
 msgstr "毛利语"
 
-#: libs/unilangs/unilangs.py:255
+#: libs/unilangs/unilangs.py:257
 msgid "Macedonian"
 msgstr "马其顿语"
 
-#: libs/unilangs/unilangs.py:256
+#: libs/unilangs/unilangs.py:258
 msgid "Malayalam"
 msgstr " 马拉雅拉姆语"
 
-#: libs/unilangs/unilangs.py:257
+#: libs/unilangs/unilangs.py:259
 msgid "Malagasy"
 msgstr "马尔加什语"
 
-#: libs/unilangs/unilangs.py:258
+#: libs/unilangs/unilangs.py:260
 msgid "Mongolian"
 msgstr "蒙古语"
 
-#: libs/unilangs/unilangs.py:259
+#: libs/unilangs/unilangs.py:261
 msgid "Mandinka"
 msgstr " 曼丁哥语"
 
-#: libs/unilangs/unilangs.py:260
+#: libs/unilangs/unilangs.py:262
 msgid "Moldavian, Moldovan"
 msgstr "摩尔多瓦语"
 
-#: libs/unilangs/unilangs.py:261
+#: libs/unilangs/unilangs.py:263
 msgid "Mohawk"
 msgstr "摩霍克语"
 
-#: libs/unilangs/unilangs.py:262
+#: libs/unilangs/unilangs.py:264
 msgid "Manipuri"
 msgstr "尼曼普尔语"
 
-#: libs/unilangs/unilangs.py:263
+#: libs/unilangs/unilangs.py:265
 msgid "Mossi"
 msgstr "莫西语"
 
-#: libs/unilangs/unilangs.py:264
+#: libs/unilangs/unilangs.py:266
 msgid "Marathi"
 msgstr "马拉地语"
 
-#: libs/unilangs/unilangs.py:265
+#: libs/unilangs/unilangs.py:267
 msgid "Malay"
 msgstr "马来语"
 
-#: libs/unilangs/unilangs.py:266
+#: libs/unilangs/unilangs.py:268
 msgid "Maltese"
 msgstr "马耳他语"
 
-#: libs/unilangs/unilangs.py:267
+#: libs/unilangs/unilangs.py:269
 msgid "Burmese"
 msgstr "缅甸语"
 
-#: libs/unilangs/unilangs.py:268
+#: libs/unilangs/unilangs.py:270
 msgid "Hokkien"
 msgstr "闽南语"
 
-#: libs/unilangs/unilangs.py:269
+#: libs/unilangs/unilangs.py:271
 msgid "Naurunan"
 msgstr "诺鲁语"
 
-#: libs/unilangs/unilangs.py:270
+#: libs/unilangs/unilangs.py:272
 msgid "Norwegian Bokmal"
 msgstr "挪威波克默尔语"
 
-#: libs/unilangs/unilangs.py:271
+#: libs/unilangs/unilangs.py:273
 msgid "North Ndebele"
 msgstr "北恩德贝勒语"
 
-#: libs/unilangs/unilangs.py:272
+#: libs/unilangs/unilangs.py:274
 msgid "Nepali"
 msgstr "尼泊尔语"
 
-#: libs/unilangs/unilangs.py:273
+#: libs/unilangs/unilangs.py:275
 msgid "Ndonga"
 msgstr "尼东阁语 "
 
-#: libs/unilangs/unilangs.py:274
+#: libs/unilangs/unilangs.py:276
 msgid "Dutch"
 msgstr "荷兰语"
 
-#: libs/unilangs/unilangs.py:275
+#: libs/unilangs/unilangs.py:277
 msgid "Norwegian Nynorsk"
 msgstr "挪威尼诺斯克语"
 
-#: libs/unilangs/unilangs.py:276
+#: libs/unilangs/unilangs.py:278
 msgid "Norwegian"
 msgstr "挪威语"
 
-#: libs/unilangs/unilangs.py:277
+#: libs/unilangs/unilangs.py:279
 msgid "Southern Ndebele"
 msgstr "南恩德贝勒语"
 
-#: libs/unilangs/unilangs.py:278
+#: libs/unilangs/unilangs.py:280
 msgid "Northern Sotho"
 msgstr "北索托语"
 
-#: libs/unilangs/unilangs.py:279
+#: libs/unilangs/unilangs.py:281
 msgid "Navajo"
 msgstr "美印第安，纳瓦霍语"
 
-#: libs/unilangs/unilangs.py:280
+#: libs/unilangs/unilangs.py:282
 msgid "Chewa"
 msgstr "切瓦语"
 
-#: libs/unilangs/unilangs.py:281
+#: libs/unilangs/unilangs.py:283
 msgid "Occitan"
 msgstr "奥克西坦人语"
 
-#: libs/unilangs/unilangs.py:282
+#: libs/unilangs/unilangs.py:284
 msgid "Ojibwe"
 msgstr "齐佩瓦语"
 
-#: libs/unilangs/unilangs.py:283
+#: libs/unilangs/unilangs.py:285
 msgid "Oriya"
 msgstr "奥里雅语"
 
-#: libs/unilangs/unilangs.py:284
+#: libs/unilangs/unilangs.py:286
 msgid "Oromo"
 msgstr "奥罗莫语"
 
-#: libs/unilangs/unilangs.py:285
+#: libs/unilangs/unilangs.py:287
 msgid "Ossetian, Ossetic"
 msgstr "奥塞特语"
 
-#: libs/unilangs/unilangs.py:286
+#: libs/unilangs/unilangs.py:288
+msgid "Kapampangan"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:289
 msgid "Papiamento"
 msgstr "帕皮阿门托语"
 
-#: libs/unilangs/unilangs.py:287
-msgid "Punjabi"
-msgstr "旁遮普语"
-
-#: libs/unilangs/unilangs.py:288
-msgid "Pali"
-msgstr " 巴利语  "
-
-#: libs/unilangs/unilangs.py:289
-msgid "Polish"
-msgstr "波兰语"
-
 #: libs/unilangs/unilangs.py:290
-msgid "Dari"
+msgid "Eastern Punjabi"
 msgstr ""
 
 #: libs/unilangs/unilangs.py:291
+msgid "Pali"
+msgstr " 巴利语  "
+
+#: libs/unilangs/unilangs.py:292
+msgid "Polish"
+msgstr "波兰语"
+
+#: libs/unilangs/unilangs.py:293
+msgid "Western Punjabi"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:294
+msgid "Dari"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:295
 msgid "Pashto"
 msgstr " 普什图语"
 
-#: libs/unilangs/unilangs.py:292
+#: libs/unilangs/unilangs.py:296
 msgid "Portuguese"
 msgstr "葡萄牙語"
 
-#: libs/unilangs/unilangs.py:293
+#: libs/unilangs/unilangs.py:297
 msgid "Portuguese, Brazilian"
 msgstr "巴西葡萄牙語"
 
-#: libs/unilangs/unilangs.py:294
+#: libs/unilangs/unilangs.py:298
 msgid "Quechua"
 msgstr "克丘亚语"
 
-#: libs/unilangs/unilangs.py:295
+#: libs/unilangs/unilangs.py:299
 msgid "Romansh"
 msgstr " 罗曼什语"
 
-#: libs/unilangs/unilangs.py:296
+#: libs/unilangs/unilangs.py:300
 msgid "Romanian"
 msgstr "罗马尼亚语"
 
-#: libs/unilangs/unilangs.py:297
+#: libs/unilangs/unilangs.py:301
 msgid "Russian"
 msgstr "俄語"
 
-#: libs/unilangs/unilangs.py:298
+#: libs/unilangs/unilangs.py:302
 msgid "Rundi"
 msgstr "隆迪语"
 
-#: libs/unilangs/unilangs.py:299
+#: libs/unilangs/unilangs.py:303
 msgid "Macedo"
 msgstr "马赛多"
 
-#: libs/unilangs/unilangs.py:300
+#: libs/unilangs/unilangs.py:304
 msgid "Rusyn"
 msgstr "卢森尼亚语 "
 
-#: libs/unilangs/unilangs.py:301
+#: libs/unilangs/unilangs.py:305
 msgid "Sanskrit"
 msgstr "梵文"
 
-#: libs/unilangs/unilangs.py:302
+#: libs/unilangs/unilangs.py:306
 msgid "Sardinian"
 msgstr "撒丁语"
 
-#: libs/unilangs/unilangs.py:303
+#: libs/unilangs/unilangs.py:307
 msgid "Sindhi"
 msgstr " 辛地语"
 
-#: libs/unilangs/unilangs.py:304
+#: libs/unilangs/unilangs.py:308
 msgid "Northern Sami"
 msgstr "北萨摩斯语 "
 
-#: libs/unilangs/unilangs.py:305
+#: libs/unilangs/unilangs.py:309
 msgid "Sango"
 msgstr " 桑戈语"
 
-#: libs/unilangs/unilangs.py:306
+#: libs/unilangs/unilangs.py:310
 msgid "Serbo-Croatian"
 msgstr "克罗地亚语"
 
-#: libs/unilangs/unilangs.py:307
+#: libs/unilangs/unilangs.py:311
 msgid "Sinhala"
 msgstr "僧伽罗语"
 
-#: libs/unilangs/unilangs.py:308
+#: libs/unilangs/unilangs.py:312
 msgid "Slovak"
 msgstr " 斯洛伐克语"
 
-#: libs/unilangs/unilangs.py:309
+#: libs/unilangs/unilangs.py:313
 msgid "Seko Padang"
 msgstr ""
 
-#: libs/unilangs/unilangs.py:310
+#: libs/unilangs/unilangs.py:314
 msgid "Slovenian"
 msgstr " 斯洛文尼亚语"
 
-#: libs/unilangs/unilangs.py:311
+#: libs/unilangs/unilangs.py:315
 msgid "Samoan"
 msgstr " 萨摩亚语"
 
-#: libs/unilangs/unilangs.py:312
+#: libs/unilangs/unilangs.py:316
 msgid "Shona"
 msgstr " 修纳语"
 
-#: libs/unilangs/unilangs.py:313
+#: libs/unilangs/unilangs.py:317
 msgid "Somali"
 msgstr "索马里语"
 
-#: libs/unilangs/unilangs.py:314
+#: libs/unilangs/unilangs.py:318
 msgid "Sotho"
 msgstr "索托语"
 
-#: libs/unilangs/unilangs.py:315
+#: libs/unilangs/unilangs.py:319
 msgid "Albanian"
 msgstr "阿尔巴尼亚语"
 
-#: libs/unilangs/unilangs.py:316
+#: libs/unilangs/unilangs.py:320
 msgid "Serbian"
 msgstr " 塞尔维亚语"
 
-#: libs/unilangs/unilangs.py:317
+#: libs/unilangs/unilangs.py:321
 msgid "Serbian, Latin"
 msgstr " 塞尔维亚语，拉丁语系"
 
-#: libs/unilangs/unilangs.py:318
+#: libs/unilangs/unilangs.py:322
 msgid "Swati"
 msgstr "斯瓦蒂语"
 
-#: libs/unilangs/unilangs.py:319
+#: libs/unilangs/unilangs.py:323
 msgid "Sundanese"
 msgstr "巽他语"
 
-#: libs/unilangs/unilangs.py:320
+#: libs/unilangs/unilangs.py:324
 msgid "Swedish"
 msgstr "瑞典语"
 
-#: libs/unilangs/unilangs.py:321
+#: libs/unilangs/unilangs.py:325
 msgid "Swahili"
 msgstr "斯瓦希里"
 
-#: libs/unilangs/unilangs.py:322
+#: libs/unilangs/unilangs.py:326
 msgid "Tamil"
 msgstr "泰米尔语"
 
-#: libs/unilangs/unilangs.py:323
+#: libs/unilangs/unilangs.py:327
 msgid "Tetum"
 msgstr "德顿语"
 
-#: libs/unilangs/unilangs.py:324
+#: libs/unilangs/unilangs.py:328
 msgid "Telugu"
 msgstr " 泰卢固语"
 
-#: libs/unilangs/unilangs.py:325
+#: libs/unilangs/unilangs.py:329
 msgid "Tajik"
 msgstr "塔吉克语"
 
-#: libs/unilangs/unilangs.py:326
+#: libs/unilangs/unilangs.py:330
 msgid "Thai"
 msgstr "泰语"
 
-#: libs/unilangs/unilangs.py:327
+#: libs/unilangs/unilangs.py:331
 msgid "Tigrinya"
 msgstr "提格里尼亚语"
 
-#: libs/unilangs/unilangs.py:328
+#: libs/unilangs/unilangs.py:332
 msgid "Turkmen"
 msgstr "土库曼语"
 
-#: libs/unilangs/unilangs.py:329
+#: libs/unilangs/unilangs.py:333
 msgid "Tagalog"
 msgstr "塔加拉族语"
 
-#: libs/unilangs/unilangs.py:330
+#: libs/unilangs/unilangs.py:334
 msgid "Klingon"
 msgstr "克林贡语"
 
-#: libs/unilangs/unilangs.py:331
+#: libs/unilangs/unilangs.py:335
 msgid "Tonga"
 msgstr "汤加语"
 
-#: libs/unilangs/unilangs.py:332
+#: libs/unilangs/unilangs.py:336
 msgid "Turkish"
 msgstr "土耳其语"
 
-#: libs/unilangs/unilangs.py:333
+#: libs/unilangs/unilangs.py:337
 msgid "Tsonga"
 msgstr "聪加语"
 
-#: libs/unilangs/unilangs.py:334
+#: libs/unilangs/unilangs.py:338
 msgid "Tswana"
 msgstr "茨瓦纳语"
 
-#: libs/unilangs/unilangs.py:335
+#: libs/unilangs/unilangs.py:339
 msgid "Tartar"
 msgstr "鞑靼语"
 
-#: libs/unilangs/unilangs.py:336
+#: libs/unilangs/unilangs.py:340
 msgid "Twi"
 msgstr "契维语"
 
-#: libs/unilangs/unilangs.py:337
+#: libs/unilangs/unilangs.py:341
 msgid "Tahitian"
 msgstr "塔希提语"
 
-#: libs/unilangs/unilangs.py:338
+#: libs/unilangs/unilangs.py:342
 msgid "Uighur"
 msgstr "维吾尔语"
 
-#: libs/unilangs/unilangs.py:339
+#: libs/unilangs/unilangs.py:343
 msgid "Ukrainian"
 msgstr "乌克兰语"
 
-#: libs/unilangs/unilangs.py:340
+#: libs/unilangs/unilangs.py:344
 msgid "Umbundu"
 msgstr "姆班杜语"
 
-#: libs/unilangs/unilangs.py:341
+#: libs/unilangs/unilangs.py:345
 msgid "Uyghur"
 msgstr "维吾尔语"
 
-#: libs/unilangs/unilangs.py:342
+#: libs/unilangs/unilangs.py:346
 msgid "Urdu"
 msgstr " 乌尔都语"
 
-#: libs/unilangs/unilangs.py:343
+#: libs/unilangs/unilangs.py:347
 msgid "Uzbek"
 msgstr " 乌兹别克语"
 
-#: libs/unilangs/unilangs.py:344
+#: libs/unilangs/unilangs.py:348
 msgid "Venda"
 msgstr " 文达语"
 
-#: libs/unilangs/unilangs.py:345
+#: libs/unilangs/unilangs.py:349
 msgid "Vietnamese"
 msgstr "越南语"
 
-#: libs/unilangs/unilangs.py:346
+#: libs/unilangs/unilangs.py:350
 msgid "Volapuk"
 msgstr "沃拉普克语"
 
-#: libs/unilangs/unilangs.py:347
+#: libs/unilangs/unilangs.py:351
 msgid "Walloon"
 msgstr "瓦隆语"
 
-#: libs/unilangs/unilangs.py:348
+#: libs/unilangs/unilangs.py:352
 msgid "Wolof"
 msgstr "沃洛夫语"
 
-#: libs/unilangs/unilangs.py:349
+#: libs/unilangs/unilangs.py:353
 msgid "Xhosa"
 msgstr "科萨班图语"
 
-#: libs/unilangs/unilangs.py:350
+#: libs/unilangs/unilangs.py:354
 msgid "Yiddish"
 msgstr "意第绪语"
 
-#: libs/unilangs/unilangs.py:351
+#: libs/unilangs/unilangs.py:355
 msgid "Yoruba"
 msgstr "约鲁巴语"
 
-#: libs/unilangs/unilangs.py:352
+#: libs/unilangs/unilangs.py:356
 msgid "Zhuang, Chuang"
 msgstr "壮语"
 
-#: libs/unilangs/unilangs.py:353
+#: libs/unilangs/unilangs.py:357
 msgid "Chinese, Yue"
 msgstr "粤语"
 
-#: libs/unilangs/unilangs.py:354
+#: libs/unilangs/unilangs.py:358
 msgid "Chinese, Simplified"
 msgstr "简体中文"
 
-#: libs/unilangs/unilangs.py:355
+#: libs/unilangs/unilangs.py:359
 msgid "Chinese, Traditional"
 msgstr "繁体中文"
 
-#: libs/unilangs/unilangs.py:356
+#: libs/unilangs/unilangs.py:360
+msgid "Chinese, Simplified (Singaporean)"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:361
+msgid "Chinese, Traditional (Hong Kong)"
+msgstr ""
+
+#: libs/unilangs/unilangs.py:362
 msgid "Zulu"
 msgstr "祖鲁语"
 
@@ -4648,7 +4690,7 @@ msgid "Enter valid email please."
 msgstr "请输入一个可用的电子邮件"
 
 #: templates/profiles/_select_language_dialog.html:4
-#: templates/search/search.html:154 templates/videos/featured_videos.html:55
+#: templates/search/search.html:155 templates/videos/featured_videos.html:55
 #: templates/videos/popular_videos.html:90
 msgid "Loading..."
 msgstr "装载..."
@@ -5014,15 +5056,15 @@ msgstr "播放(本月)"
 msgid "Plays (all time)"
 msgstr "播放(全部)"
 
-#: templates/search/search.html:86 templates/search/search.html.py:125
+#: templates/search/search.html:87 templates/search/search.html.py:126
 msgid "Search Videos"
 msgstr "搜索视频"
 
-#: templates/search/search.html:88
+#: templates/search/search.html:89
 msgid "Search Results for"
 msgstr "搜索结果"
 
-#: templates/search/search.html:121
+#: templates/search/search.html:122
 #, python-format
 msgid ""
 "\n"
@@ -5030,7 +5072,7 @@ msgid ""
 "            "
 msgstr "\n                %(query)s的搜索结果\n            "
 
-#: templates/search/search.html:149 templates/videos/featured_videos.html:50
+#: templates/search/search.html:150 templates/videos/featured_videos.html:50
 #: templates/videos/popular_videos.html:85
 msgid "of"
 msgstr "的"
