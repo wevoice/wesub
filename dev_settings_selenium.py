@@ -44,5 +44,9 @@ CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 DEFAULT_PROTOCOL = 'http'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = ['--nocapture', ]
+NOSE_ARGS = ['--with-xunit', 
+             '--nocapture', 
+             '--logging-filter=-selenium.webdriver.remote.remote_connection',
+             '--verbosity=2',
+            ]
 CELERY_ALWAYS_EAGER = True

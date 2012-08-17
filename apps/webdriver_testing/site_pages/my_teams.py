@@ -11,9 +11,6 @@ class MyTeam(UnisubsPage):
     _TEAM_NAME = "h3 a"
     _LEAVE = "ul.admin-controls li a#leave"
 
-      
-
-
 
     def _team_elem(self, team):
         """Given the team's text name, return the element.
@@ -23,9 +20,7 @@ class MyTeam(UnisubsPage):
         teams = self.browser.find_elements_by_css_selector(self._TEAM)
         for el in teams:
             team_el = el.find_element_by_css_selector(self._TEAM_NAME)
-            team_name = team_el.text
-            print team, team_name
-            if team == team_name: return el        
+            if team == team_el.text: return el        
     
     
     def open_my_teams_page(self):
@@ -33,7 +28,6 @@ class MyTeam(UnisubsPage):
 
     def open_my_team(self, team=None):
         if self._URL not in self.browser.current_url:
-            print self.browser.current_url
             self.open_my_teams_page()
         if not team: 
             first_team = self._TEAM, self._TEAM_NAME
@@ -43,7 +37,16 @@ class MyTeam(UnisubsPage):
             team = team_el.find_element_by_css_selector(self._TEAM_NAME)
             team.click()
                 
+    def team_displayed(self, team):
+        teams_el = self.browser.find_elements_by_css_selector(" ".join([self._TEAM, self._TEAM_NAME]))
+        for el in teams_el:
+            if el.text == team:
+                return True
+        else:
+            return "Team %s not found in the list of teams" % team
 
+
+        
             
 
 

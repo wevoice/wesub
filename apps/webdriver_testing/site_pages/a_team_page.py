@@ -18,9 +18,10 @@ class ATeamPage(UnisubsPage):
     _PROJECT_METRIC = ".metrics li:nth-child(4) > a p"
 
     #TABS
-    _VIDEO_TAB = ".tabs li a"
-    _MEMBERS_TAB = ".tabs li a[href*='members']"
-    _ACTIVITY_TAB = ".tabs li a [href*='activity']"
+    _VIDEO_TAB = "ul.tabs li a"
+    _MEMBERS_TAB = "ul.tabs li a[href*='members']"
+    _ACTIVITY_TAB = "ul.tabs li a[href*='activity']"
+    _SETTINGS_TAB = "ul.tabs li a[href*='settings']"
 
 
     #JOIN / APPLY
@@ -30,7 +31,7 @@ class ATeamPage(UnisubsPage):
     _APPLY_BUTTON = "Apply to Join"
     _APPLICATION = "div#apply-modal"
     _APPLICATION_TEXT = "div#apply-modal div.form textarea"
-    _SUBMIT_APPLICATION = "div#apply-modal" 
+    _SUBMIT_APPLICATION = "div#apply-modal button" 
 
 
    #FILTER AND SORT
@@ -41,13 +42,6 @@ class ATeamPage(UnisubsPage):
         if self.get_text_by_css(self._TEAM_NAME) == team:
             return True
 
-    def is_member(self, team_type):
-        team_url = self._team_stub(team_type)
-        print team_url
-        current_teams = self.current_teams()
-        for team in current_teams:
-            if team_url in team: return True
-        
     
     def team_search(self, team):
         pass
@@ -67,7 +61,9 @@ class ATeamPage(UnisubsPage):
     def application_displayed(self):
         assert_true(self.is_element_present(self._APPLICATION))
 
-    def submit_application(self, text):
+    def submit_application(self, text=None):
+        if text == None:
+            text = "Please let me join your team, I'll subtitle hard. I promise."
         self.application_displayed()
         self.type_by_css(self._APPLICATION_TEXT, text)
         self.click_by_css(self._SUBMIT_APPLICATION)
@@ -83,8 +79,11 @@ class ATeamPage(UnisubsPage):
     def apply(self):
         self.click_by_css(self._APPLY_TEAM) 
 
-    def leave_team(self, team):
-        team_url = self._team_stub(team)
-        team_stub = team_url.split('/')[-1]
+    def leave_team(self, team_url):
         leave_url = "teams/leave_team/%s/" % team_stub
         self.open_page(leave_url)
+
+
+    def settings_tab_visible(self):
+        if self.is_element_present(self._SETTINGS_TAB) == True:
+            return True

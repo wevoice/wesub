@@ -1,8 +1,10 @@
 import datetime
 import factory
 from apps.videos.models import Video, SubtitleLanguage
-from apps.teams.models import Team, TeamMember, TeamVideo
+from apps.teams.models import Team, TeamMember, TeamVideo, Invite, Application
 from apps.auth.models import CustomUser as User
+from apps.messages.models import MessageManager
+
 
 
 
@@ -21,7 +23,7 @@ class SubtitleLanguageFactory(factory.Factory):
 
 class UserFactory(factory.Factory):
     FACTORY_FOR = User
-    username = factory.Sequence(lambda n: 'Test User' + n)
+    username = factory.Sequence(lambda n: 'TestUser' + n)
     password = 'sha1$pQQnrW0KJTHi$0000b329a889855361001a7e3bd113efbe818f7d'  # password = 'password' 
     email = 'testuser@example.com'
 
@@ -43,3 +45,13 @@ class TeamVideoFactory(factory.Factory):
     team = factory.SubFactory(TeamFactory)
     video = factory.SubFactory(VideoFactory)
     added_by = factory.SubFactory(UserFactory)
+
+class TeamInviteFactory(factory.Factory):
+    FACTORY_FOR = Invite
+
+class ApplicationFactory(factory.Factory):
+    FACTORY_FOR = Application
+
+
+class MessageFactory(factory.Factory):
+    FACTORY_FOR = MessageManager
