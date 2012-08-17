@@ -58,14 +58,6 @@ logger = logging.getLogger(__name__)
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
 
-def get_perm_names(model, perms):
-    return [("%s-%s-%s" % (model._meta.app_label,
-                           model._meta.object_name,
-                           p[0]),
-             p[1])
-            for p in perms]
-
-
 # Teams
 class TeamManager(models.Manager):
     def get_query_set(self):
