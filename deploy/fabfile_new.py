@@ -730,3 +730,104 @@ def switch_branch(branch):
     """
     with Output('Switching to {0}'.format(branch)):
         _switch_branch(branch)
+
+@task
+def demo(revision='dev', host='app-00-dev.amara.org', \
+    repo='https://github.com/pculture/unisubs.git', integration_revision='dev'):
+    """
+    Deploys the specified revision for live testing
+
+    :param revision: Revision to test
+    :param host: Test host (default: app-00-dev.amara.org)
+
+    """
+    env.host_string = host
+    with Output("Deploying demo version {0} to {1}".format(revision, host)) as out:
+        # remove existing deployment if present
+        with settings(warn_only=True):
+            execute(remove_demo, revision=revision, host=host)
+        run('mkdir -p /var/tmp/{0}'.format(revision))
+        out.fastprintln('Creating Nginx config')
+        # nginx config
+        run('cp /etc/nginx/conf.d/amara_dev.conf /tmp/{0}.conf'.format(revision))
+        run("sed -i 's/server_name.*;/server_name {0}.demo.amara.org;/g' /tmp/{0}.conf".format(\
+            revision))
+        run("sed -i 's/root \/opt\/apps\/dev/root \/var\/tmp\/{0}/g' /tmp/{0}.conf".format(\
+            revision))
+        run("sed -i 's/uwsgi_pass.*;/uwsgi_pass unix:\/\/\/tmp\/uwsgi_{0}.sock;/g' /tmp/{0}.conf".format(\
+            revision))
+        sudo("mv /tmp/{0}.conf /etc/nginx/conf.d/{0}.conf".format(revision))
+        out.fastprintln('Configuring uWSGI')
+        # uwsgi ini
+        run('cp /etc/uwsgi.unisubs.dev.ini /tmp/uwsgi.unisubs.{0}.ini'.format(revision))
+        run("sed -i 's/socket.*/socket = \/tmp\/uwsgi_{0}.sock/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            revision))
+        run("sed -i 's/virtualenv.*/virtualenv = \/var\/tmp\/{0}\/ve/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            revision))
+        run("sed -i 's/wsgi-file.*/wsgi-file = \/var\/tmp\/{0}\/unisubs\/deploy\/unisubs.wsgi/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            revision))
+        run("sed -i 's/log-syslog.*/log-syslog = uwsgi.unisubs.{0}/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            revision))
+        run("sed -i 's/touch-reload.*/touch-reload = \/var\/tmp\/{0}\/unisubs\/deploy\/unisubs.wsgi/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            revision))
+        run("sed -i 's/pythonpath.*/pythonpath = \/var\/tmp\/{0}/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            revision))
+        # uwsgi upstart
+        run('cp /etc/init/uwsgi.unisubs.dev.conf /tmp/uwsgi.unisubs.{0}.conf'.format(revision))
+        run("sed -i 's/exec.*/exec uwsgi --ini \/var\/tmp\/{0}\/uwsgi.unisubs.{0}.ini/g' /tmp/uwsgi.unisubs.{0}.conf".format(revision))
+        sudo("mv /tmp/uwsgi.unisubs.{0}.conf /etc/init/uwsgi.unisubs.demo.{0}.conf".format(revision))
+        run('mv /tmp/uwsgi.unisubs.{0}.ini /var/tmp/{0}/uwsgi.unisubs.{0}.ini'.format(revision))
+        out.fastprintln('Cloning repositories (unisubs & integration)')
+        # clone
+        run('git clone {1} /var/tmp/{0}/unisubs'.format(\
+            revision, repo))
+        with cd('/var/tmp/{0}/unisubs'.format(revision)):
+            run('git checkout --force {0}'.format(revision))
+        sudo('git clone git@github.com:pculture/unisubs-integration.git /var/tmp/{0}/unisubs/unisubs-integration'.format(revision))
+        with cd('/var/tmp/{0}/unisubs/unisubs-integration'.format(revision)):
+            sudo('git checkout --force {0}'.format(integration_revision))
+        out.fastprintln('Building virtualenv')
+        # build virtualenv
+        run('virtualenv /var/tmp/{0}/ve'.format(revision))
+        # install requirements
+        with cd('/var/tmp/{0}/unisubs/deploy'.format(revision)):
+            run('/var/tmp/{0}/ve/bin/pip install -r requirements.txt'.format(revision))
+        # copy private config
+        private_conf = '/var/tmp/{0}/unisubs/server_local_settings.py'.format(revision)
+        run('cp /opt/apps/dev/unisubs/server_local_settings.py {0}'.format(private_conf))
+        run("sed -i 's/MEDIA_URL.*/MEDIA_URL = \"http:\/\/{0}.demo.amara.org\/user-data\/\"/g' {1}".format(\
+            revision, private_conf))
+        run("sed -i 's/STATIC_URL.*/STATIC_URL = \"http:\/\/{0}.demo.amara.org\/site_media\/\"/g' {1}".format(\
+            revision, private_conf))
+        out.fastprintln('Compiling static media.  This may take a while.')
+        # compile media
+        # create a symlink to google closure library for compilation
+        sudo('ln -sf /opt/google-closure /var/tmp/{0}/unisubs/media/js/closure-library'.format(revision))
+        with cd('/var/tmp/{0}/unisubs'.format(revision)), settings(warn_only=True):
+            python_exe = '/var/tmp/{0}/ve/bin/python'.format(revision)
+            run('{0} deploy/create_commit_file.py'.format(python_exe))
+            run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, 'ADVANCED_OPTIMIZATIONS'))
+        out.fastprintln('Starting demo')
+        sudo('service nginx reload')
+        sudo('service uwsgi.unisubs.demo.{0} start'.format(revision))
+        out.fastprintln('Done. Demo should be available at http://{0}.demo.amara.org'.format(revision))
+
+@task
+def remove_demo(revision='dev', host='app-00-dev.amara.org'):
+    """
+    Removes live testing demo
+
+    :param revision: Revision that was used in launching the demo
+    :param host: Test host (default: app-00-dev.amara.org)
+
+    """
+    env.host_string = host
+    with Output("Removing {0} demo from {1}".format(revision, host)):
+        # remove demo
+        with settings(warn_only=True):
+            sudo('service uwsgi.unisubs.demo.{0} stop'.format(revision))
+        sudo('rm -rf /var/tmp/{0}'.format(revision))
+        sudo('rm -f /etc/nginx/conf.d/{0}.conf'.format(revision))
+        sudo('rm -f /etc/init/uwsgi.unisubs.demo.{0}.conf'.format(revision))
+        sudo('service nginx reload')
+
