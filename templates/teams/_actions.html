@@ -37,7 +37,7 @@
                         {{ team.auth_provider.verbose_name }}
                     </p>
                 {% else %}
-                    {% if not team|can_apply:user %}
+                    {% if team|can_apply:user %}
                         {% include "teams/_application_form.html" %}
                     {% else %}
                         <p class="action-replacement">{% trans "Your application is pending" %}</p>

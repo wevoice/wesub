@@ -8,7 +8,7 @@
     is_superuser: false
     last_login: 2010-09-01 15:51:38
     last_name: ''
-    password: '!'
+    password: ''
     user_permissions: []
     username: youtube-anonymous
   model: auth.user
@@ -32,4 +32,4 @@
     permissions: []
   model: auth.group
   pk: 1
-  
+

@@ -325,6 +325,25 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
                 alert('You have unsynced captions. You must sync all captions before you can submit.');
                 return false;
             }
+
+            // We are satisifed with the start and end times of all captions.
+            //
+            // However, if the last caption has no end time, set it to either a) the duration of the video or b) the start time
+            // of the caption + 4 seconds.
+            if (this.captionSet_.captions_[this.captionSet_.captions_.length -1].getEndTime() ==
+                    unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
+
+                var cap = this.captionSet_.captions_[this.captionSet_.captions_.length -1];
+
+                var newEndTime;
+                if (this.videoPlayer_.getDuration()) {
+                    newEndTime = Math.min(this.videoPlayer_.getDuration(), cap.getStartTime() + 4.0);
+                } else {
+                    newEndTime = cap.getStartTime() + 4.0;
+                }
+
+                cap.setEndTime(newEndTime);
+            }
         }
 
         this.saveWork(false, false);

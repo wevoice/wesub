@@ -405,7 +405,7 @@ class TtmlSubtitleParser(SubtitleParser):
     def __nonzero__(self):
         return bool(len(self.nodes))
 
-    def _get_time(self, begin, dur):
+    def _get_time(self, begin, dur, is_duration=True):
         if not begin or not dur:
             return -1
 
@@ -417,7 +417,9 @@ class TtmlSubtitleParser(SubtitleParser):
                 return -1
 
             d_hour, d_min, d_sec = dur.split(':')
-            end = start + int(d_hour)*60*60 + int(d_min)*60 + float(d_sec)
+            end =  + int(d_hour)*60*60 + int(d_min)*60 + float(d_sec)
+            if is_duration:
+                end += start
         except ValueError:
             return -1
 
@@ -429,8 +431,12 @@ class TtmlSubtitleParser(SubtitleParser):
         output = {
             'subtitle_text': unescape_html(html_to_markup(from_xmlish_text(node.toxml())))
         }
-        output['start_time'], output['end_time'] = \
-            self._get_time(node.getAttribute('begin'), node.getAttribute('dur'))
+        if node.hasAttribute('dur'):
+            output['start_time'], output['end_time'] = \
+                self._get_time(node.getAttribute('begin'), node.getAttribute('dur'))
+        else:
+            output['start_time'], output['end_time'] = \
+                self._get_time(node.getAttribute('begin'), node.getAttribute('end'), False)
         return output
 
     def _result_iter(self):
@@ -573,7 +579,7 @@ class SsaSubtitleParser(SrtSubtitleParser):
 
 ParserList.register(SrtSubtitleParser, 'srt')
 ParserList.register(SsaSubtitleParser, ['ssa', 'ass'])
-ParserList.register(TtmlSubtitleParser, 'xml')
+ParserList.register(TtmlSubtitleParser, ['xml', 'ttml'])
 ParserList.register(SbvSubtitleParser, 'sbv')
 ParserList.register(DfxpSubtitleParser, 'dfxp')
 ParserList.register(TxtSubtitleParser, 'txt')

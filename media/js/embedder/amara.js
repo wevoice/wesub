@@ -9288,7 +9288,7 @@ var wikiCallback;
   });
 })( Popcorn );
 (function (Popcorn) {
-    Popcorn.plugin( 'transcript' , {
+    Popcorn.plugin( 'amaratranscript' , {
         _setup : function(options) {
 
             options.pop = this;
@@ -9323,6 +9323,151 @@ var wikiCallback;
         toString: function(event, options) {
 
         } 
+    });
+})(Popcorn);
+// PLUGIN: Amara Subtitle (ported from the Subtitle plugin)
+
+(function (Popcorn) {
+
+    var i = 0,
+    createDefaultContainer = function(context, id) {
+
+    var ctxContainer = context.container = document.createElement('div'),
+        style = ctxContainer.style,
+        media = context.media;
+
+        var updatePosition = function() {
+            var position = context.position();
+
+            style.fontSize = '18px';
+            style.width = media.offsetWidth + 'px';
+            style.top = position.top  + media.offsetHeight - ctxContainer.offsetHeight - 40 + 'px';
+            style.left = position.left + 'px';
+
+            setTimeout(updatePosition, 10);
+        };
+
+        ctxContainer.id = id || Popcorn.guid();
+        ctxContainer.className = 'amara-popcorn-subtitles';
+        style.position = 'absolute';
+        style.color = 'white';
+        style.textShadow = 'black 2px 2px 6px';
+        style.fontWeight = 'bold';
+        style.textAlign = 'center';
+
+        updatePosition();
+
+        context.media.parentNode.appendChild(ctxContainer);
+
+        return ctxContainer;
+    };
+
+    /**
+     * Subtitle popcorn plug-in
+     * Displays a subtitle over the video, or in the target div
+     * Options parameter will need a start, and end.
+     * Optional parameters are target and text.
+     * Start is the time that you want this plug-in to execute
+     * End is the time that you want this plug-in to stop executing
+     * Target is the id of the document element that the content is
+     *  appended to, this target element must exist on the DOM
+     * Text is the text of the subtitle you want to display.
+     *
+     * @param {Object} options
+     *
+     * Example:
+       var p = Popcorn('#video')
+           .subtitle({
+               start:  5,              // seconds, mandatory
+               end:    15,             // seconds, mandatory
+               text:   'Hellow world', // optional
+               target: 'subtitlediv',  // optional
+           })
+     **/
+
+Popcorn.plugin('amarasubtitle', {
+        manifest: {
+            about: {
+                name: 'Popcorn Subtitle Plugin',
+                version: '0.1',
+                author: 'Scott Downe',
+                website: 'http://scottdowne.wordpress.com/'
+            },
+            options: {
+                start: {
+                    elem: 'input',
+                    type: 'text',
+                    label: 'Start'
+                },
+                end: {
+                    elem: 'input',
+                    type: 'text',
+                    label: 'End'
+                },
+                target: 'subtitle-container',
+                text: {
+                    elem: 'input',
+                    type: 'text',
+                    label: 'Text'
+                }
+            }
+        },
+
+        _setup: function(options) {
+            var newdiv = document.createElement('div');
+
+            newdiv.id = 'subtitle-' + i++;
+            newdiv.style.display = 'none';
+
+            // Creates a div for all subtitles to use
+            if (!this.container && (!options.target || options.target === 'subtitle-container')) {
+                createDefaultContainer(this);
+            }
+
+            // if a target is specified, use that
+            if (options.target && options.target !== 'subtitle-container') {
+                // In case the target doesn't exist in the DOM
+                options.container = document.getElementById(options.target) || createDefaultContainer(this, options.target);
+            } else {
+                // use shared default container
+                options.container = this.container;
+            }
+
+            if (document.getElementById(options.container.id)) {
+                document.getElementById(options.container.id).appendChild(newdiv);
+            }
+            options.innerContainer = newdiv;
+
+            options.showSubtitle = function() {
+                options.innerContainer.innerHTML = options.text || '';
+            };
+        },
+
+        /**
+         * @member subtitle
+         * The start function will be executed when the currentTime
+         * of the video  reaches the start time provided by the
+         * options variable
+         */
+        start: function(event, options){
+            options.innerContainer.style.display = 'inline';
+            options.showSubtitle(options, options.text);
+        },
+
+        /**
+         * @member subtitle
+         * The end function will be executed when the currentTime
+         * of the video  reaches the end time provided by the
+         * options variable
+         */
+        end: function(event, options) {
+            options.innerContainer.style.display = 'none';
+            options.innerContainer.innerHTML = '';
+        },
+
+        _teardown: function (options) {
+            options.container.removeChild(options.innerContainer);
+        }
     });
 })(Popcorn);
 (function(window, document, undefined) {
@@ -9496,8 +9641,8 @@ var wikiCallback;
             events: {
                 'click a.amara-logo':              'logoClicked',
                 'click a.amara-share-button':      'shareButtonClicked',
-                'click a.amara-transcript-button': 'transcriptButtonClicked',
-                'click a.amara-subtitles-button':  'subtitlesButtonClicked'
+                'click a.amara-transcript-button': 'toggleTranscriptDisplay',
+                'click a.amara-subtitles-button':  'toggleSubtitlesDisplay'
             },
 
             render: function() {
@@ -9507,23 +9652,23 @@ var wikiCallback;
                 // Create a container that we will use to inject the Popcorn video.
                 this.$el.prepend('<div class="amara-popcorn"></div>');
 
-                var $popContainer = $('div.amara-popcorn', this.$el);
+                this.$popContainer = $('div.amara-popcorn', this.$el);
 
                 // Copy the width and height to the new Popcorn container.
-                $popContainer.width(this.$el.width());
-                $popContainer.height(this.$el.height());
+                this.$popContainer.width(this.$el.width());
+                this.$popContainer.height(this.$el.height());
 
                 // This is a hack until Popcorn.js supports passing a DOM elem to
                 // its smart() method. See: http://bit.ly/L0Lb7t
                 var id = 'amara-popcorn-' + Math.floor(Math.random() * 100000000);
-                $popContainer.attr('id', id);
+                this.$popContainer.attr('id', id);
 
                 // Reset the height on the parent amara-embed div. If we don't do this,
                 // our amara-tools div won't be visible.
                 this.$el.height('auto');
 
                 // Init the Popcorn video.
-                this.pop = _Popcorn.smart($popContainer.attr('id'), this.model.get('url'));
+                this.pop = _Popcorn.smart(this.$popContainer.attr('id'), this.model.get('url'));
 
                 this.pop.on('loadedmetadata', function() {
 
@@ -9585,15 +9730,16 @@ var wikiCallback;
 
                     // For each subtitle, init the Popcorn subtitle plugin.
                     for (var i = 0; i < subtitles.length; i++) {
-                        this.pop.subtitle({
+                        this.pop.amarasubtitle({
                             start: subtitles[i].start,
                             end: subtitles[i].end,
                             text: subtitles[i].text
                         });
                     }
+
+                    this.$popSubtitlesContainer = $('div.amara-popcorn-subtitles', this.$el);
                 }
             },
-
             buildTranscript: function(language) {
 
                 var subtitleSet;
@@ -9617,7 +9763,7 @@ var wikiCallback;
 
                     // For each subtitle, init the Popcorn transcript plugin.
                     for (var i = 0; i < subtitles.length; i++) {
-                        this.pop.transcript({
+                        this.pop.amaratranscript({
                             start: subtitles[i].start,
                             start_clean: utils.parseFloatAndRound(subtitles[i].start),
                             end: subtitles[i].end,
@@ -9665,11 +9811,14 @@ var wikiCallback;
             shareButtonClicked: function() {
                 return false;
             },
-            subtitlesButtonClicked: function() {
+            toggleSubtitlesDisplay: function(e) {
+                this.$popSubtitlesContainer.toggle();
+                this.$subtitlesButton.toggleClass('amara-button-enabled');
                 return false;
             },
-            transcriptButtonClicked: function() {
+            toggleTranscriptDisplay: function() {
                 this.$transcript.toggle();
+                this.$transcriptButton.toggleClass('amara-button-enabled');
                 return false;
             },
             waitUntilVideoIsComplete: function(callback) {
@@ -9692,7 +9841,7 @@ var wikiCallback;
                 '        <a href="#" class="amara-logo">Amara</a>' +
                 '        <ul class="amara-displays">' +
                 '            <li><a href="#" class="amara-transcript-button"></a></li>' +
-                //'            <li><a href="#" class="amara-subtitles-button"></a></li>' +
+                '            <li><a href="#" class="amara-subtitles-button"></a></li>' +
                 '        </ul>' +
                 '    </div>' +
                 '    <div class="amara-transcript">' +
@@ -9721,6 +9870,8 @@ var wikiCallback;
                 this.$amaraTools = $('div.amara-tools', this.$el);
                 this.$transcript = $('div.amara-transcript', this.$amaraTools);
                 this.$transcriptBody = $('div.amara-transcript-body', this.$transcript);
+                this.$transcriptButton = $('a.amara-transcript-button', this.$amaraTools);
+                this.$subtitlesButton = $('a.amara-subtitles-button', this.$amaraTools);
             }
 
         });

@@ -28,6 +28,7 @@ This is similar to Python's handling of Unicode and byte strings:
 """
 
 import copy
+import re
 
 
 def _reverse_dict(d):
@@ -127,6 +128,7 @@ def _generate_initial_data():
         'amh': (gettext_noop(u'Amharic'), u'Amharic'),
         'an': (gettext_noop(u'Aragonese'), u'Aragonés'),
         'ar': (gettext_noop(u'Arabic'), u'العربية'),
+        'arq': (gettext_noop(u'Algerian Arabic'), u'دزيري/جزائري'),
         'as': (gettext_noop(u'Assamese'), u'Assamese'),
         'ase': (gettext_noop(u'American Sign Language'), u'American Sign Language'),
         'ast': (gettext_noop(u'Asturian'), u'Asturianu'),
@@ -283,10 +285,12 @@ def _generate_initial_data():
         'or': (gettext_noop(u'Oriya'), u'Oriya'),
         'orm': (gettext_noop(u'Oromo'), u'Oromoo'),
         'os': (gettext_noop(u'Ossetian, Ossetic'), u'Ossetian, Ossetic'),
+        'pam': (gettext_noop(u'Kapampangan'), u'Pampango'),
         'pap': (gettext_noop(u'Papiamento'), u'Papiamentu'),
-        'pa': (gettext_noop(u'Punjabi'), u'ਪੰਜਾਬੀ'),
+        'pan': (gettext_noop(u'Eastern Punjabi'), u'ਪੰਜਾਬੀ'),
         'pi': (gettext_noop(u'Pali'), u'पािऴ'),
         'pl': (gettext_noop(u'Polish'), u'Polski'),
+        'pnb': (gettext_noop(u'Western Punjabi'), u'پنجابی'),
         'prs': (gettext_noop(u'Dari'), u'دری'),
         'ps': (gettext_noop(u'Pashto'), u'پښتو'),
         'pt': (gettext_noop(u'Portuguese'), u'Português'),
@@ -353,6 +357,8 @@ def _generate_initial_data():
         'zh': (gettext_noop(u'Chinese, Yue'), u'中文'),
         'zh-cn': (gettext_noop(u'Chinese, Simplified'), u'简体中文'),
         'zh-tw': (gettext_noop(u'Chinese, Traditional'), u'繁體中文'),
+        'zh-sg': (gettext_noop(u'Chinese, Simplified (Singaporean)'), u''),
+        'zh-hk': (gettext_noop(u'Chinese, Traditional (Hong Kong)'), u''),
         'zul': (gettext_noop(u'Zulu'), u'isiZulu'),
     })
 
@@ -596,7 +602,6 @@ def _add_django():
         'nl': 'nl',
         'nb': 'nb',
         'nn': 'nn',
-        'pa': 'pa',
         'pl': 'pl',
         'pt': 'pt',
         'pt-br': 'pt-br',
@@ -628,6 +633,7 @@ def _add_unisubs():
         'aka': 'aka',
         'amh': 'amh',
         'an': 'an',
+        'arq': 'arq',
         'as': 'as',
         'ase': 'ase',
         'ast': 'ast',
@@ -745,8 +751,11 @@ def _add_unisubs():
         'or': 'or',
         'orm': 'orm',
         'os': 'os',
+        'pam': 'pam',
+        'pan': 'pan',
         'pap': 'pap',
         'pi': 'pi',
+        'pnb': 'pnb',
         'prs': 'prs',
         'ps': 'ps',
         'pt-br': 'pt-br',
@@ -797,6 +806,8 @@ def _add_unisubs():
         'zh': 'zh',
         'zh-cn': 'zh-cn',
         'zh-tw': 'zh-tw',
+        'zh-sg': 'zh-sg',
+        'zh-hk': 'zh-hk',
         'zul': 'zul',
     }, base='django')
 
@@ -1022,14 +1033,15 @@ def _add_youtube():
         'xh': 'xho',
         'yi': 'yi',
         'yo': 'yor',
+        'zh': 'zh-hk',
         'zh-CN': 'zh-cn',
-        'zh-HK': 'zh',
+        'zh-HK': 'zh-hk',
         'zh-Hans': 'zh-cn',
         'zh-Hant': 'zh-tw',
         'zh_Hant-HK': 'nan',
 # we need to fix unilangs what to do when
 # two dialects point to the same main language
-#       'zh-SG': 'zh',
+        'zh-SG': 'zh-sg',
         'zh-TW': 'zh-tw',
         'za': 'za',
         'zu': 'zul'})
@@ -1147,3 +1159,28 @@ def _debug_missing_language_codes(standard, reference_standard='unisubs'):
     [standard_langs.add(LanguageCode(lc, standard).encode(reference_standard)) \
      for lc in get_language_code_mapping(standard).keys()]
     return list(unisubs_langs.difference(standard_langs))
+
+
+# match simple language codes format
+LANG_DIALECT_RE = re.compile(r'(?P<lang_code>[\w]{2,13})(?P<dialect>-[\w]{2,8})?(?P<rest>-[\w]*)?')
+
+def to_bcp47(code):
+    """
+    This is an ugly hack. I should be ashamed, but I'm not.
+    Implementing BCP47 will be much more work.
+    The idea is to translate from a lang code unilangs supports
+    into the bpc47 format. There are cases where this might fail
+    (as if the dialect code is not recognized by bcp47). For most cases this should be ok.
+
+    Simple sanity chech:
+    assert (unilangs.to_bcp47("en-us"), unilangs.to_bcp47('en'), unilangs.to_bcp47('ug_Arab-cn')) == ('en-US', 'en', 'ug_Arab-CN'
+)
+    """
+    match = LANG_DIALECT_RE.match(code)
+    if not match:
+         raise ValueError("%s code does not seem to be a valid language code.")
+
+    match_dict = match.groupdict()
+    return "%s%s%s" % (match_dict['lang_code'],
+                       (match_dict.get('dialect', "") or "").upper(),
+                       match_dict.get('rest', '') or "")

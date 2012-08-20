@@ -107,7 +107,10 @@ class BaseNotification(object):
         query for the latest data. This is team dependent if the team
         has a custom base url.
         """
-        from apiv2.api import VideoLanguageResource, VideoResource
+        from apiv2.api import (
+            VideoLanguageResource, VideoResource, ApplicationResource
+        )
+        from teams.models import Application
         if self.video:
             video_klass = getattr(self.__class__, "video_resource_class", VideoResource)
             if self.language:
@@ -118,7 +121,8 @@ class BaseNotification(object):
                 return url
             else:
                 return video_klass(self.api_name).get_resource_uri(self.video)
-        #FIX ME: get resource for application
+        elif self.application_pk:
+            return ApplicationResource("partners").get_resource_uri(Application.objects.get(pk=self.application_pk))
 
     @property
     def video_id(self):

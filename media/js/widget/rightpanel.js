@@ -340,7 +340,7 @@ unisubs.RightPanel.prototype.showDownloadLink = function(jsonSubsFn) {
 };
 unisubs.RightPanel.prototype.downloadClicked_ = function(e) {
     e.preventDefault();
-    unisubs.finishfaildialog.CopyDialog.showForSubs(this.jsonSubsFn_());
+    unisubs.finishfaildialog.CopyDialog.showForSubs(this.jsonSubsFn_(), this.dialog_.subtitles_.LANGUAGE);
 };
 unisubs.RightPanel.prototype.loginClicked_ = function(event) {
     this.serverModel_.logIn();

@@ -771,7 +771,7 @@ List activity items:
 
     :query team: Show only items related to a given team (team slug)
     :query video: Show only items related to a given video (video id)
-    :query action_type: Show only items with a given action type (int, see below)
+    :query type: Show only items with a given activity type (int, see below)
     :query language: Show only items with a given language (language code)
     :query before: A unix timestamp in seconds
     :query after: A unix timestamp in seconds
@@ -803,7 +803,7 @@ Example response:
 .. code-block:: json
 
     {
-        "action_type": 1,
+        "type": 1,
         "comment": null,
         "created": "2012-07-12T07:02:19",
         "id": "1339",

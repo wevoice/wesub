@@ -16,6 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import logging
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -29,16 +31,20 @@ from auth.models import CustomUser as User
 
 from utils.metrics import Meter
 
+logger = logging.getLogger(__name__)
+
 # for now, they kind of match
 ACCOUNT_TYPES = VIDEO_TYPE
 
 
 def youtube_sync(video, language):
     """
+    Used on debug page for video.
+
     Simplified version of what's found in
     ``ThirdPartyAccount.mirror_on_third_party``.  It doesn't bother checking if
     we should be syncing this or not.  Only does the new Youtube/Amara
-    integration syncing.  Used on debug page for video.
+    integration syncing.
     """
     version = language.latest_version()
 
@@ -56,6 +62,10 @@ def youtube_sync(video, language):
             Meter('youtube.push.success').inc()
         except:
             Meter('youtube.push.fail').inc()
+            logger.error('Always pushing to youtoube has failed.', extra={
+                'video': video.video_id,
+                'vurl': vurl.pk
+            })
         finally:
             Meter('youtube.push.request').inc()
 
@@ -116,6 +126,10 @@ class ThirdPartyAccountManager(models.Manager):
                     Meter('youtube.push.success').inc()
                 except:
                     Meter('youtube.push.fail').inc()
+                    logger.error('Pushing to youtoube has failed.', extra={
+                        'video': video.video_id,
+                        'vurl': vurl.pk
+                    })
                 finally:
                     Meter('youtube.push.request').inc()
 
@@ -178,7 +192,7 @@ class YoutubeSyncRule(models.Model):
 
     ``team`` should be a comma-separated list of team slugs that you want to
     sync.  ``user`` should be a comma-separated list of usernames of users
-    whose videos should be synced.  ``video`` is a list of primary keys of
+    whose videos should be synced.  ``video`` is a list of video ids of
     videos that should be synced.
 
     You can also specify a wildcard "*" to any of the above to match any teams,
@@ -189,7 +203,7 @@ class YoutubeSyncRule(models.Model):
     user = models.TextField(default='', blank=True,
             help_text='Comma separated list of usernames')
     video = models.TextField(default='', blank=True,
-            help_text='Comma separated list of pks')
+            help_text='Comma separated list of video ids')
 
     def __unicode__(self):
         return 'Youtube sync rule'
@@ -214,7 +228,7 @@ class YoutubeSyncRule(models.Model):
             return True
         if len(pks) == 1 and pks[0] == '':
             return False
-        return pk in map(int, pks)
+        return pk in pks
 
     def should_sync(self, video):
         tv = video.get_team_video()
@@ -224,7 +238,7 @@ class YoutubeSyncRule(models.Model):
 
         return self.team_in_list(team) or \
                 self.user_in_list(video.user) or \
-                self.video_in_list(video.pk)
+                self.video_in_list(video.video_id)
 
     def _clean(self, name):
         if name not in ['team', 'user']:
