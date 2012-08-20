@@ -2319,6 +2319,7 @@ class TeamNotificationSetting(models.Model):
     EVENT_APPLICATION_NEW = 'application-new'
 
     team = models.OneToOneField(Team, related_name="notification_settings")
+    partner = models.OneToOneField('Partner', null=True, blank=True)
 
     # the url to post the callback notifing partners of new video activity
     request_url = models.URLField(blank=True, null=True)
