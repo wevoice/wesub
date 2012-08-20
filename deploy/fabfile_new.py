@@ -622,7 +622,7 @@ def bounce_celery():
 @task
 @lock_required
 @roles('app', 'data')
-def deploy(branch=None, integration_branch=None):
+def deploy(branch=None, integration_branch=None, skip_celery=False):
     """
     This is how code gets reloaded:
 
@@ -648,7 +648,8 @@ def deploy(branch=None, integration_branch=None):
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -delete")
 
-    execute(bounce_celery)
+    if skip_celery == False:
+        execute(bounce_celery)
     execute(bounce_memcached)
     #test_services()
     execute(reload_app_servers)

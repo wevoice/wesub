@@ -29,6 +29,9 @@ ADMINS = (
 )
 
 if INSTALLATION == DEV:
+    ADMINS = (
+        ('Evan', 'ehazlett@pculture.org'),
+    )
     SITE_ID = 15
     SITE_NAME = 'unisubsdev'
     REDIS_DB = "3"
