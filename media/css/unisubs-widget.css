@@ -2874,3 +2874,6 @@ select.copy-dialog-select {
 ul.unisubs-titlesList span.unisubs-title {
     padding-top: 20px !important;
 }
+div.the-translate-panel ul.unisubs-titlesList span.unisubs-title {
+    padding-top: 0 !important;
+}
