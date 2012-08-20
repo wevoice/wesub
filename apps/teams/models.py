@@ -1099,7 +1099,9 @@ class Application(models.Model):
         """
         if self.status == Application.STATUS_MEMBER_LEFT:
             raise ApplicationInvalidException("")
-        TeamMember.objects.get_or_create(team=self.team, user=self.user)
+        member, created = TeamMember.objects.get_or_create(team=self.team, user=self.user)
+        if created:
+            notifier.team_member_new.delay(member.pk)
         self.modified = datetime.datetime.now()
         self.status = Application.STATUS_APPROVED
         self.save()
