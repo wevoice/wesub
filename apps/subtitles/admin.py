@@ -19,7 +19,8 @@
 
 
 from django.contrib import admin
-from apps.subtitles.models import get_lineage, SubtitleLanguage, SubtitleVersion
+from apps.subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
+                                   SubtitleVersion)
 
 
 
@@ -83,5 +84,28 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
         return response
 
 
+class CollaboratorAdmin(admin.ModelAdmin):
+    list_display = ['display_video', 'display_language', 'user', 'signoff',
+                    'signoff_is_official', 'expired', 'expiration_start']
+    raw_id_fields = ['subtitle_language', 'user']
+    list_filter = ['signoff', 'signoff_is_official', 'expired', 'created']
+    search_fields = ['subtitle_language__video__video_id',
+                     'subtitle_language__video__title',
+                     'subtitle_language__language_code',
+                     'user__username', 'user__email']
+
+    def display_video(self, o):
+        return o.subtitle_language.video.get_title_display
+    display_video.short_description = 'video'
+    display_video.admin_order_field = 'subtitle_language__video'
+
+    def display_language(self, o):
+        return o.subtitle_language.get_language_code_display()
+    display_language.short_description = 'language'
+    display_language.admin_order_field = 'subtitle_language__language_code'
+
+
+# -----------------------------------------------------------------------------
 admin.site.register(SubtitleLanguage, SubtitleLanguageAdmin)
 admin.site.register(SubtitleVersion, SubtitleVersionAdmin)
+admin.site.register(Collaborator, CollaboratorAdmin)

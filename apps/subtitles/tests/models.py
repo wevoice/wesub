@@ -22,14 +22,16 @@
 from django.test import TestCase
 from django.db import IntegrityError
 
-from apps.subtitles.models import SubtitleLanguage
-# from apps.subtitles.objects import Subtitle, SubtitleSet
 from libs.dxfpy import SubtitleSet
+
+from apps.auth.models import CustomUser as User
+from apps.subtitles.models import SubtitleLanguage, Collaborator
 from apps.videos.models import Video
 
 
 VIDEO_URL = 'http://youtu.be/heKK95DAKms'
 VIDEO_URL_2 = 'http://youtu.be/e4MSN6IImpI'
+
 
 def make_video():
     video, _ = Video.get_or_create_for_url(VIDEO_URL)
@@ -378,3 +380,168 @@ class TestHistory(TestCase):
         self.assertEqual(d7.lineage, {'en': 3, 'fr': 2, 'de': 6, 'cy': 4})
         self.assertEqual(c5.lineage, {'en': 3, 'fr': 2, 'de': 7, 'cy': 4})
         self.assertEqual(f3.lineage, {'fr': 2})
+
+
+class TestCollaborator(TestCase):
+    def setUp(self):
+        self.video = make_video()
+
+        self.sl = SubtitleLanguage(video=self.video, language_code='en')
+        self.sl.save()
+
+
+    def test_create_collaborators(self):
+        users = User.objects.all()
+
+        u1 = users[0]
+        u2 = users[1]
+
+        c1 = Collaborator(subtitle_language=self.sl, user=u1)
+        c2 = Collaborator(subtitle_language=self.sl, user=u2)
+
+        c1.save()
+        c2.save()
+
+        # Make sure basic defaults are correct.
+        self.assertEqual(c1.user_id, u1.id)
+        self.assertEqual(c1.subtitle_language.language_code, 'en')
+        self.assertEqual(c1.signoff, False)
+        self.assertEqual(c1.signoff_is_official, False)
+        self.assertEqual(c1.expired, False)
+
+        self.assertEqual(c2.user_id, u2.id)
+        self.assertEqual(c2.subtitle_language.language_code, 'en')
+        self.assertEqual(c2.signoff, False)
+        self.assertEqual(c2.signoff_is_official, False)
+        self.assertEqual(c2.expired, False)
+
+        # Make sure both objects got created properly, and get_for finds them.
+        cs = Collaborator.objects.get_for(self.sl)
+        self.assertEqual(cs.count(), 2)
+
+        # Make sure we can't create two Collaborators for the same
+        # language/video combination.
+        self.assertRaises(IntegrityError,
+                          lambda: Collaborator(subtitle_language=self.sl,
+                                               user=u1).save())
+
+    def test_signoff_retrieval(self):
+        users = User.objects.all()
+
+        u1 = users[0]
+        u2 = users[1]
+
+        c1 = Collaborator(subtitle_language=self.sl, user=u1)
+        c2 = Collaborator(subtitle_language=self.sl, user=u2)
+
+        c1.save()
+        c2.save()
+
+        cs = Collaborator.objects
+        sl = self.sl
+
+        # collab signoff is_official expired
+        # 1
+        # 2
+        self.assertEqual(cs.get_for(sl).count(), 2)
+        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 2)
+        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 0)
+        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 0)
+        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 0)
+
+        # collab signoff is_official expired
+        # 1      x
+        # 2
+        c1.signoff = True
+        c1.save()
+
+        self.assertEqual(cs.get_for(sl).count(), 2)
+        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 1)
+        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 1)
+        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 1)
+        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 0)
+
+        # collab signoff is_official
+        # 1      x
+        # 2      x
+        c2.signoff = True
+        c2.save()
+
+        self.assertEqual(cs.get_for(sl).count(), 2)
+        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
+        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 2)
+        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 2)
+        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 0)
+
+        # collab signoff is_official expired
+        # 1      x       x
+        # 2      x
+        c1.signoff_is_official = True
+        c1.save()
+
+        self.assertEqual(cs.get_for(sl).count(), 2)
+        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
+        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 2)
+        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 1)
+        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 1)
+
+        # collab signoff is_official expired
+        # 1      x       x
+        # 2      x       x
+        c2.signoff_is_official = True
+        c2.save()
+
+        self.assertEqual(cs.get_for(sl).count(), 2)
+        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
+        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 2)
+        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 0)
+        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 2)
+
+        # collab signoff is_official expired
+        # 1
+        # 2
+        c1.signoff = False
+        c1.signoff_is_official = False
+        c1.save()
+
+        c2.signoff = False
+        c2.signoff_is_official = False
+        c2.save()
+
+        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 2)
+        self.assertEqual(cs.get_unsignedoff_for(sl, include_expired=True).count(), 2)
+
+        # collab signoff is_official expired
+        # 1                          x
+        # 2
+        c1.expired = True
+        c1.save()
+
+        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 1)
+        self.assertEqual(cs.get_unsignedoff_for(sl, include_expired=True).count(), 2)
+
+        # collab signoff is_official expired
+        # 1                          x
+        # 2                          x
+        c2.expired = True
+        c2.save()
+
+        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
+        self.assertEqual(cs.get_unsignedoff_for(sl, include_expired=True).count(), 2)
+
+        # collab signoff is_official expired
+        # 1      x       x           x
+        # 2      x                   x
+        c1.signoff = True
+        c1.signoff_is_official = True
+        c1.save()
+
+        c2.signoff = True
+        c2.signoff_is_official = False
+        c2.save()
+
+        self.assertEqual(cs.get_for(sl).count(), 2)
+        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
+        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 2)
+        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 1)
+        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 1)

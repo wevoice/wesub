@@ -35,6 +35,7 @@ ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
                        key=lambda v: v[1])
 
 
+# Utility functions -----------------------------------------------------------
 def mapcat(fn, iterable):
     """Mapcatenate.
 
@@ -51,13 +52,12 @@ def mapcat(fn, iterable):
     return itertools.chain.from_iterable(itertools.imap(fn, iterable))
 
 
-# Lineage
+# Lineage functions -----------------------------------------------------------
 def lineage_to_json(lineage):
     return json.dumps(lineage)
 
 def json_to_lineage(json_lineage):
     return json.loads(json_lineage)
-
 
 def get_lineage(parents):
     """Return a lineage map for a version that has the given parents."""
@@ -79,7 +79,7 @@ def get_lineage(parents):
     return lineage
 
 
-
+# SubtitleLanguages -----------------------------------------------------------
 class SubtitleLanguage(models.Model):
     """SubtitleLanguages are the equivalent of a 'branch' in a VCS.
 
@@ -119,7 +119,7 @@ class SubtitleLanguage(models.Model):
     def save(self, *args, **kwargs):
         creating = not self.pk
 
-        if creating:
+        if creating and not self.created:
             self.created = datetime.datetime.now()
 
         return super(SubtitleLanguage, self).save(*args, **kwargs)
@@ -171,6 +171,7 @@ class SubtitleLanguage(models.Model):
         return sv
 
 
+# SubtitleVersions ------------------------------------------------------------
 class SubtitleVersion(models.Model):
     """SubtitleVersions are the equivalent of a 'changeset' in a VCS.
 
@@ -307,7 +308,7 @@ class SubtitleVersion(models.Model):
     def save(self, *args, **kwargs):
         creating = not self.pk
 
-        if creating:
+        if creating and not self.created:
             self.created = datetime.datetime.now()
 
         # Sanity checking of the denormalized data.
@@ -335,5 +336,61 @@ class SubtitleVersion(models.Model):
             return [version] + list(mapcat(_ancestors, version.parents.all()))
 
         return set(mapcat(_ancestors, self.parents.all()))
+
+
+# Collaborators ---------------------------------------------------------------
+class CollaboratorManager(models.Manager):
+    def get_for(self, subtitle_language):
+        return self.get_query_set().filter(subtitle_language=subtitle_language)
+
+    def get_all_signoffs_for(self, subtitle_language):
+        return self.get_for(subtitle_language).filter(signoff=True)
+
+    def get_peer_signoffs_for(self, subtitle_language):
+        return (self.get_all_signoffs_for(subtitle_language)
+                    .filter(signoff_is_official=False))
+
+    def get_official_signoffs_for(self, subtitle_language):
+        return (self.get_all_signoffs_for(subtitle_language)
+                    .filter(signoff_is_official=True))
+
+    def get_unsignedoff_for(self, subtitle_language, include_expired=False):
+        qs = self.get_for(subtitle_language).filter(signoff=False)
+
+        if not include_expired:
+            qs = qs.exclude(expired=True)
+
+        return qs
+
+class Collaborator(models.Model):
+    """Collaborator models represent a user working on a specific language."""
+
+    user = models.ForeignKey(User)
+    subtitle_language = models.ForeignKey(SubtitleLanguage)
+
+    signoff = models.BooleanField(default=False)
+    signoff_is_official = models.BooleanField(default=False)
+    expired = models.BooleanField(default=False)
+
+    expiration_start = models.DateTimeField(editable=False)
+
+    created = models.DateTimeField(editable=False)
+
+    objects = CollaboratorManager()
+
+    class Meta:
+        unique_together = (('user', 'subtitle_language'),)
+
+
+    def save(self, *args, **kwargs):
+        creating = not self.pk
+
+        if creating and not self.created:
+            self.created = datetime.datetime.now()
+
+        if creating and not self.expiration_start:
+            self.expiration_start = self.created
+
+        return super(Collaborator, self).save(*args, **kwargs)
 
 
