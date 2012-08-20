@@ -61,8 +61,11 @@ def ancestor_ids(version):
 class TestSubtitleLanguage(TestCase):
     def setUp(self):
         self.video = make_video()
+        self.video2 = make_video_2()
+
 
     def test_create_subtitle_language(self):
+        """Basic sanity checks when creating a subtitlelanguage."""
         l = SubtitleLanguage(video=self.video, language_code='en')
         l.save()
 
@@ -70,11 +73,22 @@ class TestSubtitleLanguage(TestCase):
         self.assertEqual(l.language_code, 'en')
 
     def test_subtitle_language_unique_constraints(self):
+        """Test the unique constraints of subtitlelanguages."""
+
+        # The first subtitle language has no restrictions.
         l1 = SubtitleLanguage(video=self.video, language_code='en')
         l1.save()
 
+        # Cannot have more that one SL for the same video+language.
         l2 = SubtitleLanguage(video=self.video, language_code='en')
         self.assertRaises(IntegrityError, lambda: l2.save())
+
+        # But other videos and other languages are fine.
+        l3 = SubtitleLanguage(video=self.video2, language_code='en')
+        l3.save()
+
+        l4 = SubtitleLanguage(video=self.video, language_code='fr')
+        l4.save()
 
 
 class TestSubtitleVersion(TestCase):
@@ -85,7 +99,10 @@ class TestSubtitleVersion(TestCase):
         self.sl_en = SubtitleLanguage(video=self.video, language_code='en')
         self.sl_en.save()
 
+
     def test_create_subtitle_version(self):
+        """Basic sanity checks when creating a version."""
+
         sv = self.sl_en.add_version(title='title a', description='desc a',
                                     subtitles=[])
 
@@ -100,6 +117,8 @@ class TestSubtitleVersion(TestCase):
         self.assertEqual(sv.visibility, 'public')
 
     def test_subtitle_serialization(self):
+        """Test basic subtitle serialization."""
+
         # Empty SubtitleSets
         # We explicitly test before and after refreshing to make sure the
         # serialization happens properly in both cases.
@@ -135,13 +154,84 @@ class TestSubtitleVersion(TestCase):
         self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list([s0, s1]))
 
     def test_denormalization_sanity_checks(self):
+        """Test the sanity checks for data denormalized into the version model."""
+
+        # Version videos must match their subtitlelanguage's videos.
         sv = self.sl_en.add_version()
         sv.video = self.video2
         self.assertRaises(AssertionError, lambda: sv.save())
 
+        # Version language codes must match their subtitlelanguage's language
+        # codes.
         sv = self.sl_en.add_version()
         sv.language_code = 'fr'
         self.assertRaises(AssertionError, lambda: sv.save())
+
+    def test_visibility(self):
+        """Test the (non-overrided) visibility filtering of versions."""
+
+        sv1 = self.sl_en.add_version()
+        sv2 = self.sl_en.add_version()
+        sv3 = self.sl_en.add_version()
+
+        def _count_public():
+            return self.sl_en.subtitleversion_set.public().count()
+
+        self.assertEqual(3, _count_public())
+
+        sv1.visibility = 'private'
+        sv1.save()
+        self.assertEqual(2, _count_public())
+
+        sv3.visibility = 'private'
+        sv3.save()
+        self.assertEqual(1, _count_public())
+
+        sv2.visibility = 'private'
+        sv2.save()
+        self.assertEqual(0, _count_public())
+
+    def test_visibility_override(self):
+        """Test the overrided visibility filtering of versions."""
+
+        sv = self.sl_en.add_version()
+
+        def _count_public():
+            return self.sl_en.subtitleversion_set.public().count()
+
+        # vis     override
+        # public  null
+        self.assertEqual(1, _count_public())
+
+        # vis     override
+        # private null
+        sv.visibility = 'private'
+        sv.save()
+        self.assertEqual(0, _count_public())
+
+        # vis     override
+        # private public
+        sv.visibility_override = 'public'
+        sv.save()
+        self.assertEqual(1, _count_public())
+
+        # vis     override
+        # public  public
+        sv.visibility = 'public'
+        sv.save()
+        self.assertEqual(1, _count_public())
+
+        # vis     override
+        # public  private
+        sv.visibility_override = 'private'
+        sv.save()
+        self.assertEqual(0, _count_public())
+
+        # vis     override
+        # private private
+        sv.visibility = 'private'
+        sv.save()
+        self.assertEqual(0, _count_public())
 
 
 class TestHistory(TestCase):
@@ -160,7 +250,10 @@ class TestHistory(TestCase):
         self.sl_cy = SubtitleLanguage(video=self.video, language_code='cy')
         self.sl_cy.save()
 
+
     def test_linear_parents(self):
+        """Test the ancestry, parentage, and lineage for a simple linear history."""
+
         sv1 = self.sl_en.add_version()
         sv2 = self.sl_en.add_version()
         sv3 = self.sl_en.add_version()
@@ -182,6 +275,8 @@ class TestHistory(TestCase):
         self.assertEqual(sv3.lineage, {'en': 2})
 
     def test_multiple_parents(self):
+        """Test the ancestry, parentage, and lineage for a merged history."""
+
         # en fr
         #    4
         #    |
@@ -242,6 +337,8 @@ class TestHistory(TestCase):
         self.assertEqual(f4.lineage, {'en': 3, 'fr': 3})
 
     def test_tangled_history(self):
+        """Test the ancestry, parentage, and lineage for a terrifying history."""
+
         # en fr de cy
         #
         #    3

@@ -172,6 +172,13 @@ class SubtitleLanguage(models.Model):
 
 
 # SubtitleVersions ------------------------------------------------------------
+class SubtitleVersionManager(models.Manager):
+    def public(self):
+        """Return a queryset of all publicly-visible versions."""
+        return (self.get_query_set()
+                    .exclude(visibility='private', visibility_override='')
+                    .exclude(visibility_override='private'))
+
 class SubtitleVersion(models.Model):
     """SubtitleVersions are the equivalent of a 'changeset' in a VCS.
 
@@ -205,6 +212,14 @@ class SubtitleVersion(models.Model):
                                            ('private', 'private')),
                                   default='public')
 
+    # Visibility override can be used by team admins to force a specific type of
+    # visibility for a version.  If set, it takes precedence over, but does not
+    # affect, the main visibility field.
+    visibility_override = models.CharField(max_length=10, blank=True,
+                                           choices=(('public', 'public'),
+                                                    ('private', 'private')),
+                                           default='')
+
     version_number = models.PositiveIntegerField(default=1)
 
     author = models.ForeignKey(User, default=User.get_anonymous,
@@ -223,6 +238,8 @@ class SubtitleVersion(models.Model):
     # Lineage is stored as a blob of JSON to save on DB rows.  You shouldn't
     # need to touch this field yourself, use the lineage property.
     serialized_lineage = models.TextField(blank=True)
+
+    objects = SubtitleVersionManager()
 
     def get_subtitles(self):
         """Return the SubtitleSet for this version.

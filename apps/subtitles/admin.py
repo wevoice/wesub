@@ -47,7 +47,8 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
 
 class SubtitleVersionAdmin(admin.ModelAdmin):
     list_display = ['video_title', 'id', 'language', 'version_num',
-                    'visibility', 'parent_ids', 'created']
+                    'visibility', 'visibility_override', 'parent_ids',
+                    'created']
     raw_id_fields = ['video', 'subtitle_language', 'parents', 'author']
     list_filter = ['created', 'visibility', 'language_code']
     search_fields = ['video__video_id', 'video__title', 'title',
@@ -95,7 +96,7 @@ class CollaboratorAdmin(admin.ModelAdmin):
                      'user__username', 'user__email']
 
     def display_video(self, o):
-        return o.subtitle_language.video.get_title_display
+        return o.subtitle_language.video.title_display()
     display_video.short_description = 'video'
     display_video.admin_order_field = 'subtitle_language__video'
 
