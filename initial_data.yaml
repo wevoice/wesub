@@ -81,3 +81,27 @@
   fields:
     domain: staging.universalsubtitles.org
     name: unisubsnf
+
+- model: sites.site
+  pk: 15
+  fields:
+    domain: dev-new.amara.org
+    name: amara-dev-new
+
+- model: sites.site
+  pk: 16
+  fields:
+    domain: dev.amara.org
+    name: amara-dev
+
+- model: sites.site
+  pk: 17
+  fields:
+    domain: staging.amara.org
+    name: amara-staging
+
+- model: sites.site
+  pk: 18
+  fields:
+    domain: www.amara.org
+    name: amara-production

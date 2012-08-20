@@ -58,14 +58,6 @@ logger = logging.getLogger(__name__)
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 
 
-def get_perm_names(model, perms):
-    return [("%s-%s-%s" % (model._meta.app_label,
-                           model._meta.object_name,
-                           p[0]),
-             p[1])
-            for p in perms]
-
-
 # Teams
 class TeamManager(models.Manager):
     def get_query_set(self):
@@ -317,6 +309,12 @@ class Team(models.Model):
         if role:
             qs = qs.filter(role=role)
         return qs.exists()
+
+    def is_owner(self, user):
+        """
+        Return whether the given user is an owner of this team.
+        """
+        return self._is_role(user, TeamMember.ROLE_OWNER)
 
     def is_admin(self, user):
         """Return whether the given user is an admin of this team."""
@@ -2410,6 +2408,14 @@ class BillingReport(models.Model):
 
                 start = subs[0].start_time
                 end = subs[-1].end_time
+
+                # The -1 value for the end_time isn't allowed anymore but some
+                # legacy data will still have it.
+                if end == -1:
+                    end = subs[-1].start_time
+
+                if not end:
+                    end = subs[-1].start_time
 
                 rows.append([
                     tv.video.title.encode('utf-8'),

@@ -180,23 +180,23 @@
                 // Create a container that we will use to inject the Popcorn video.
                 this.$el.prepend('<div class="amara-popcorn"></div>');
 
-                var $popContainer = $('div.amara-popcorn', this.$el);
+                this.$popContainer = $('div.amara-popcorn', this.$el);
 
                 // Copy the width and height to the new Popcorn container.
-                $popContainer.width(this.$el.width());
-                $popContainer.height(this.$el.height());
+                this.$popContainer.width(this.$el.width());
+                this.$popContainer.height(this.$el.height());
 
                 // This is a hack until Popcorn.js supports passing a DOM elem to
                 // its smart() method. See: http://bit.ly/L0Lb7t
                 var id = 'amara-popcorn-' + Math.floor(Math.random() * 100000000);
-                $popContainer.attr('id', id);
+                this.$popContainer.attr('id', id);
 
                 // Reset the height on the parent amara-embed div. If we don't do this,
                 // our amara-tools div won't be visible.
                 this.$el.height('auto');
 
                 // Init the Popcorn video.
-                this.pop = _Popcorn.smart($popContainer.attr('id'), this.model.get('url'));
+                this.pop = _Popcorn.smart(this.$popContainer.attr('id'), this.model.get('url'));
 
                 this.pop.on('loadedmetadata', function() {
 
@@ -265,7 +265,7 @@
                         });
                     }
 
-                    this.$popSubtitlesContainer = $('div.amara-popcorn-subtitles', this.$popContainer);
+                    this.$popSubtitlesContainer = $('div.amara-popcorn-subtitles', this.$el);
                 }
             },
             buildTranscript: function(language) {

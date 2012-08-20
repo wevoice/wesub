@@ -618,6 +618,12 @@ Roles
 .. warning:: Changed behavior: the previous functionality was moved the Safe
     Team Member Resource documented below.
 
+Permissions
++++++++++++
+
+If a user belongs to a partner team, any admin or above on any of the partner's
+teams can move the user anywhere within the partner's teams.
+
 Safe Team Member Resource
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
