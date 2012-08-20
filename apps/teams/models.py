@@ -310,6 +310,12 @@ class Team(models.Model):
             qs = qs.filter(role=role)
         return qs.exists()
 
+    def is_owner(self, user):
+        """
+        Return whether the given user is an owner of this team.
+        """
+        return self._is_role(user, TeamMember.ROLE_OWNER)
+
     def is_admin(self, user):
         """Return whether the given user is an admin of this team."""
         return self._is_role(user, TeamMember.ROLE_ADMIN)
