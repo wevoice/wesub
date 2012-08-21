@@ -201,6 +201,7 @@ unisubs.subtitle.SyncPanel.prototype.upPressed_ = function() {
         var downPlayheadTime_ = this.videoPlayer_.getPlayheadTime();
         var currentSub = this.subtitles_.findLastForTime(downPlayheadTime_);
         currentSub.setEndTime(downPlayheadTime_);
+        this.captionManager_.disableCaptionEvents(false);
     }
 };
 unisubs.subtitle.SyncPanel.prototype.spacePressed_ = function() {

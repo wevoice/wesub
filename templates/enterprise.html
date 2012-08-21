@@ -28,6 +28,8 @@
             <li><a href="universities">{% trans 'Universities' %}</a></li>
             <li><a href="publishers">{% trans 'Publishers' %}</a></li>
             <li><a href="government">{% trans 'Government' %}</a></li>
+            <li><a href="film-tv">{% trans 'Film and Television' %}</a></li>
+            <li><a href="non-profits">{% trans 'Non-Profits' %}</a></li>
         </ul>
     </div>
     <div class="grid_10 omega view">
@@ -46,7 +48,7 @@
                           <img src="{{ STATIC_URL }}images/partners/ted.png" alt="TED team"/>
                         </a>
                         <a href="http://www.universalsubtitles.org/en/teams/newshour"><img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="PBS" /></a>
-                        <a href="http://www.universalsubtitles.org/en/teams/coursera/"><img src="{{ STATIC_URL }}images/partners/coursera.png" alt="Coursera" /></a>
+                        <a href="http://eepurl.com/n24oH/"><img src="{{ STATIC_URL }}images/partners/netflix.png" alt="Netflix" /></a>
                 </div>
                 <div class="grid_5 omega">
                     <h3>{% trans 'Award-Winning Technology' %}</h3>
@@ -63,8 +65,12 @@
             <h3>{% trans 'Build a Translation Team' %}</h3>
 
             <p>{% blocktrans %}
-                For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible for captions and subtitles.  With Amara, you can accomplish the seemingly impossible task of translating your videos into dozens of languages.  Quickly build a powerful, high-quality volunteer translation and captioning team that makes your content truly global.
+                For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible for captions and subtitles.  With Amara, you can accomplish the seemingly impossible task of translating your videos into dozens of languages.  Quickly build a powerful, high-quality volunteer translation and captioning team that makes your content truly global. 
             {% endblocktrans %}</p>
+
+            <p>
+                 {% trans "See how TED uses Amara to build a global volunteer community and create extremely high quality subtitles: " %}<a href=”http://www.amarasubtitles.org/en/teams/ted/”>{% trans "TED Team on Amara" %}</a>. {% trans "Other companies like Netflix have completely private collaboration teams." %}
+            </p>
             
             <h3>{% trans 'Security and Managed Workflows' %}</h3>
 
@@ -236,6 +242,8 @@
         </li>
         <li id="universities">
             <h2>{% trans 'Universities' %}</h2>
+
+            <a href="http://www.universalsubtitles.org/en/teams/coursera" title="Coursera team"><img src="{{ STATIC_URL }}images/partners/coursera.png" alt="Coursera" class="screen"/></a>
             <p>{% blocktrans %}
                 As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.
             {% endblocktrans %}</p> 
@@ -246,6 +254,9 @@
         </li>
         <li id="publishers">
             <h2>{% trans 'Publishers' %}</h2>
+            <a href="http://www.universalsubtitles.org/en/teams/ted/" title="TED team">
+                <img src="{{ STATIC_URL }}images/partners/ted.png" alt="TED" class="screen"/>
+            </a>
             <p>{% blocktrans %}
                 Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities -- engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.
             {% endblocktrans %}</p>
@@ -256,7 +267,41 @@
                 In governments around the world, making video accessible is often a legal requirement, not an option.  Amara makes it much easier to coordinate captioning and translation efforts, so that every citizen gains access.
             {% endblocktrans %}</p>
         </li>
-      </ul>
+        <li id="film-tv">
+            <h2>{% trans 'Film and Television' %}</h2>
+            <div class="screen">
+                <a href="http://eepurl.com/n24oH">
+                  <img src="{{ STATIC_URL }}images/partners/netflix.png" alt="Netflix" />
+                </a>
+                <a href="http://www.universalsubtitles.org/en/teams/newshour">
+                    <img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="PBS" />
+                </a>
+            </div>
+            <p>{% blocktrans %}
+                Creators and distributors of film and television use Amara to make captioning and translation simpler and less expensive.  Amara makes it possible to caption and translate for global viewing audiences for much less than traditional approaches.  Easily manage workflows between distributed teams, whether they are staff, contractors, or viewers.
+            {% endblocktrans %}</p>
+        </li>
+        <li id="non-profits">
+            <h2>{% trans 'Non-profits' %}</h2>
+            <div class="screen">
+                <a href="http://www.universalsubtitles.org/en/teams/ushahidi/">
+                    <img src="{{ STATIC_URL }}images/partners/ushahidi.png" alt="Ushahidi"/>
+                </a>
+                <a href="http://www.universalsubtitles.org/en/teams/world-humanitarian-day/">
+                    <img src="{{ STATIC_URL }}images/partners/un.png" alt="UN"/>
+                </a>
+                <a href="http://www.universalsubtitles.org/en/teams/newshour/">
+                    <img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="PBS"/>
+                </a>
+            </div>
+            <p>{% blocktrans %}
+                Non-profit organizations use Amara to share their mission, their work, and their media around the world.  Non-profits are ideally positioned to build volunteer subtitling communities-- your existing supporters will be delighted to find a new way to help support your organization.  Creating a volunteer team helps deepen engagement with your organization and lets your caption and translate videos that would be unaffordable to subtitle with a traditional approach.
+            {% endblocktrans %}</p>
+            <p>{% blocktrans %}
+                Did you know that Amara is a non-profit organization itself?  Our mission is to help make video accessible for everyone around the world.  We offer discounts for other non-profit organizations-- we are always delighted to support work with a social-mission.
+            {% endblocktrans %}</p>
+        </li>
+    </ul>
         <div class="page-footer">
             <h3>{% trans 'Get started with Amara' %}</h3>
             <p>{% trans 'Be in touch at' %}<br /><a href="mailto:enterprise@amara.org">enterprise@amara.org</a></p>
