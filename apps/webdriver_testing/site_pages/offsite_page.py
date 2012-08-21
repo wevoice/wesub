@@ -9,15 +9,14 @@ class OffsitePage(UnisubsPage):
     _WIDGET_MENU = "span.unisubs-tabTextchoose"
     
     def start_playback(self, video_position):
-        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%s].play()" % video_position)
-
+        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].play()" % video_position)
 
     def pause_playback(self, video_position):
-        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%s].pause()" % video_position)
+        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].pause()" % video_position)
 
 
     def open_subs_menu(self, video_position):
-        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%s].openMenu()" % video_position)
+        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].openMenu()" % video_position)
 
     def displays_subs_in_correct_position(self):
         """Return true if subs are found in correct position on video.
