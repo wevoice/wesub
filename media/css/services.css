@@ -67,13 +67,18 @@
         list-style-type: disc;
     }
 
-    #services .tab-content img.screen {
+    #services .tab-content .screen {
         float: right;
         margin: 1em 0 2em 2em;
         padding: 5px;
         -moz-box-shadow: 0px 0px 10px -2px #888;
         -webkit-box-shadow: 0px 0px 10px -2px #888;
         box-shadow: 0px 0px 10px -2px #888;
+    }
+
+    #services .tab-content .screen img {
+        display: block;
+        margin: 20px 10px;
     }
 
     #services .tab-content img.screen.left {
@@ -99,6 +104,7 @@
 }
 
 .page-footer {
+    clear: both;
     margin-top: 2em;
     padding: 2em 0;
     text-align: center;
