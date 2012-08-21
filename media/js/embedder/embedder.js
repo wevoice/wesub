@@ -294,6 +294,7 @@
                         this.pop.amaratranscript({
                             start: subtitles[i].start,
                             start_clean: utils.parseFloatAndRound(subtitles[i].start),
+                            start_of_paragraph: subtitles[i].start_of_paragraph,
                             end: subtitles[i].end,
                             text: subtitles[i].text,
                             container: this.$transcriptBody.get(0)
@@ -385,8 +386,7 @@
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
                 '            <a href="#" class="amara-transcript-line amara-group">' +
-                '                <span class="amara-transcript-line-left">&nbsp;</span>' +
-                '                <span class="amara-transcript-line-right">' +
+                '                <span class="amara-transcript-line">' +
                 '                    Loading transcript&hellip;' +
                 '                </span>' +
                 '            </a>' +
