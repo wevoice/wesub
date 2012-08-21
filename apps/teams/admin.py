@@ -18,6 +18,7 @@
 
 from django import forms
 from django.contrib import admin
+from django.contrib import messages as django_messages
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -25,7 +26,7 @@ from messages.forms import TeamAdminPageMessageForm
 from teams.models import (
     Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing,
     Project, TeamLanguagePreference, TeamNotificationSetting, BillingReport,
-    Partner, Application
+    Partner, Application, ApplicationInvalidException
 )
 from videos.models import SubtitleLanguage
 
@@ -218,6 +219,17 @@ class ApplicationAdmin(admin.ModelAdmin):
     user_link.short_description = _('User')
     user_link.allow_tags = True
 
+    def save_model(self, request, obj, form, change):
+        obj.user = request.user
+        try:
+            if form.cleaned_data['status'] == Application.STATUS_APPROVED:
+                obj.approve()
+            elif form.cleaned_data['status'] == Application.STATUS_DENIED:
+                obj.deny()
+            else:
+                obj.save()
+        except ApplicationInvalidException:
+           django_messages.error(request, 'Not saved! Status already in use %s' )
 
 admin.site.register(TeamMember, TeamMemberAdmin)
 admin.site.register(Team, TeamAdmin)
