@@ -444,9 +444,8 @@ class Video(models.Model):
                 try:
                     assert video_url_obj.video == obj
                 except AssertionError, e:
-                    logger.error(
-                        "Data integrity error with video_url_obj with "
-                        "pk %d and video pk %d" % (video_url_obj.pk, obj.pk))
+                    logger.exception(
+                        "Data integrity error with video_url_obj ")
                     raise e
                 obj.update_search_index()
                 video, created = obj, True
