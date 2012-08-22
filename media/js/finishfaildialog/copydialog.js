@@ -85,7 +85,7 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
                     output += event.target.getStatus();
                 }
                 else {
-                    output = event.target.getResponseJson().result;
+                    output = event.target.getResponseJson()['result'];
                 }
 
                 goog.dom.forms.setValue(textarea, output);
