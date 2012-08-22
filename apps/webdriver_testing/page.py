@@ -184,7 +184,7 @@ class Page(object):
 
 
     def wait_for_element_present(self, element):
-        for i in range(60):
+        for i in range(30):
             try:
                 time.sleep(1)
                 if self.is_element_present(element): break
