@@ -66,3 +66,7 @@ media/static-cache
 .ropeproject
 /tags
 /tags.bak
+apps/webdriver_testing/Screenshots/*.png
+apps/webdriver_testing/Screenshots/nosetests.xml
+apps/webdriver_testing/Screenshots/results.html
+

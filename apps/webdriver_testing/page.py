@@ -34,6 +34,7 @@ class Page(object):
             a.accept()
         elif action == "reject":
             a.dismiss()
+        time.sleep(1)
 
     def check(self, element):
         el = self.browser.find_element_by_css_selector(element)
@@ -53,7 +54,8 @@ class Page(object):
         
     def hover_by_css(self, element):
         mouse = webdriver.ActionChains(self.browser)
-        mouse.move_to_element(element).perform()
+        el = self.browser.find_element_by_css_selector(element)
+        mouse.move_to_element(el).perform()
         
     def click_by_css(self, element, wait_for_element=None, no_wait=False):
         """click based on the css given.
@@ -64,7 +66,7 @@ class Page(object):
         try:
             elem = self.browser.find_element_by_css_selector(element)
         except:
-            self.record_error()
+            #self.record_error()
             raise Exception(elem + "not found")
         if no_wait:
             elem.send_keys(Keys.ENTER)
@@ -111,10 +113,10 @@ class Page(object):
     def get_size_by_css(self, element):
         return self.browser.find_element_by_css_selector(element).size
 
-    def submit_form_text_by_css(self, element, text):
+    def submit_form_text_by_css(self, element, form_text):
         elem = self.browser.find_element_by_css_selector(element)
-        elem.send_keys(text)
-        self.browser.get_screenshot_as_file('screenshot_search_form.png')
+        print "\n Entering form text: %s" % form_text
+        elem.send_keys(form_text)
         elem.submit()    
 
     def is_element_present(self, element):
@@ -182,7 +184,7 @@ class Page(object):
 
 
     def wait_for_element_present(self, element):
-        for i in range(60):
+        for i in range(30):
             try:
                 time.sleep(1)
                 if self.is_element_present(element): break
@@ -232,6 +234,8 @@ class Page(object):
     def get_absolute_url(self, url):
         if url.startswith("http"):
             full_url = url
+        elif url.startswith("/"):
+            full_url = str(self.base_url) + url[1:]
         else:
             full_url = str(self.base_url) + url
         return full_url

@@ -16,20 +16,31 @@
 # along with Miro Community.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.test import LiveServerTestCase
+from django.test.testcases import (TestCase, _deferredSkip)
 from django.core import management
-import unittest
 from selenium import webdriver
-import os
+import os, time
 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
 
-class WebdriverTestCase(LiveServerTestCase, unittest.TestCase):
+class WebdriverTestCase(LiveServerTestCase, TestCase):
     def setUp(self):
+        try:   #Get rid of the existing screenshot from a previous test run if it exists.
+            os.unlink('apps/webdriver_testing/Screenshots/%s.png' % self.id())
+        except:
+            pass
         super(WebdriverTestCase, self).setUp()
-        self.browser = webdriver.Firefox() #BROWSER TO USE FOR TESTING
         LiveServerTestCase.setUp(self)
+        self.browser = webdriver.Firefox() #BROWSER TO USE FOR TESTING
         self.base_url =  'http://localhost:80/'
         self.browser.get(self.base_url)
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('Screenshot_%s_.png' % self.id())
-        self.browser.quit()
+        time.sleep(1)
+        try:
+            self.browser.get_screenshot_as_file('apps/webdriver_testing/Screenshots/%s.png' % self.id())
+            self.browser.quit()
+        except:
+            os.system('killall firefox')  #sometimes there a ff instance left running we don't want it there
+
+
+

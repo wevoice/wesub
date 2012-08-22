@@ -58,9 +58,9 @@ class SearchResultsPage(UnisubsPage):
 
 
     def page_heading_contains_search_term(self, search):
-        heading_text = "Search Results for %s" % search.strip()
+        self.wait_for_element_not_visible(self._SEARCHING_INDICATOR)
         self.wait_for_element_present(self._PAGE_HEADING)
-        if heading_text in self.get_text_by_css(self._PAGE_HEADING):
+        if search in self.get_text_by_css(self._PAGE_HEADING):
             return True
         
         

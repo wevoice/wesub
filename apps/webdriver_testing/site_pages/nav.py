@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 import time
 from ..page import Page
-from login import Login
 
-class NavPage(Login, Page):
+class NavPage(Page):
     """
      Unisubs page contains common web elements found across
      all Universal Subtitles pages. Every new page class is derived from

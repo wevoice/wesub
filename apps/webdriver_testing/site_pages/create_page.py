@@ -21,7 +21,6 @@ class CreatePage(UnisubsPage):
     _SUBMIT_MULTI = "div#submit_multiple_videos form#bulk_create button.green_button"
     _HIDE_MULTI = "div#submit_multiple_toggle"
     _SUBMIT_ERROR = "ul.errorlist li"
-    _MULTI_SUBMIT_SUCCESS = "h2.success"
 
     def open_create_page(self):
         print self._URL
@@ -35,6 +34,7 @@ class CreatePage(UnisubsPage):
         print "Entering the url: %s" % self._URL
         self.type_by_css(self._SINGLE_URL_ENTRY_BOX, video_url)
         self.click_by_css(self._SUBMIT_BUTTON)
+        time.sleep(3)
         
 
     def _open_multi_submit(self):
@@ -54,6 +54,7 @@ class CreatePage(UnisubsPage):
         if save == True:
             self.click_by_css(self._SAVE_OPTION)
         self.click_by_css(self._SUBMIT_MULTI)
+        time.sleep(3) 
 
     def submit_youtube_user_page(self, youtube_user_url, save=False):
         """Submit videos from youtube user page url.
@@ -65,6 +66,8 @@ class CreatePage(UnisubsPage):
         if save == True:
             self.click_by_css(self._SAVE_OPTION)
         self.click_by_css(self._SUBMIT_MULTI)
+        time.sleep(3) 
+
 
     def submit_feed_url(self, feed_url, save=False):
         """Submit videos from a supported feed type.
@@ -77,18 +80,20 @@ class CreatePage(UnisubsPage):
         self.click_by_css(self._SUBMIT_MULTI)   
 
 
-    def multi_submit_successful(self, expected_error=False):
-        time.sleep(2)
-        if self.is_element_present(self._SUBMIT_ERROR):
-                error_msg = self.get_text_by_css(self._SUBMIT_ERROR)
-                if expected_error == True:
-                    return error_msg
-                else:
-                    raise Exception("Submit failed: site says %s" % error_msg)
-        elif self.is_element_present(self._MULTI_SUBMIT_SUCCESS):
+    def multi_submit_successful(self):
+        self.wait_for_element_present(self._SUCCESS_MESSAGE)
+        if self.is_text_present(self._SUCCESS_MESSAGE, 
+                 u"The videos are being added in the background. " 
+                 u"If you are logged in, you will receive a message when it's done"):
             return True
         else:
-            self.record_error()
+            print self.get_text_by_css(self._SUCCESS_MESSAGE)
+
+
+    def multi_submit_failed(self):
+        self.wait_for_element_present(self._ERROR_MESSAGE)
+        if self.is_element_present(self._ERROR_MESSAGE):
+            return True
 
     def submit_success(self, expected_error=False):
         if expected_error == False and self.is_element_present(self._SUBMIT_ERROR):

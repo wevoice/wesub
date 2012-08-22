@@ -13,10 +13,10 @@ class WatchPage(UnisubsPage):
  
     _URL = "videos/watch"
     _SEARCH = "form.search-form div#watch_search input#id_q"
-    _ADV_SEARCH_PULLDOWN = "form.search-form div#watch_search a#advanced_search.btn_active"
+    _ADV_SEARCH_PULLDOWN = "form.search-form div#watch_search a#advanced_search"
     _ADV_SEARCH_ORIG_LANG = "div.menu_item select#id_video_lang"
     _ADV_SEARCH_TRANS_LANG = "div.menu_item select#id_langs"
-    
+    _SEARCH_SUBMIT = "div#advanced_menu button" 
     _FEATURED_SECTION = "div#featured_videos"
     _POPULAR_SECTION = "div#popular_videos"
     _LATEST_SECTION = "div#latest_videos"
@@ -27,8 +27,15 @@ class WatchPage(UnisubsPage):
         self.open_page(self._URL)
 
     def basic_search(self, search_term):
-        self.clear_text(self._SEARCH)
-        self.submit_form_text_by_css(self._SEARCH, search_term)
+        #self.clear_text(self._SEARCH)
+        #self.submit_form_text_by_css(self._SEARCH, search_term)
+        self.type_by_css(self._SEARCH, search_term +"\n")
+        #self.type_by_css(self._SEARCH, search_term)
+
+
+
+
+
 
     def advanced_search(self, search_term, orig_lang=None, trans_lang=None):
         pass

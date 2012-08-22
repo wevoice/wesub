@@ -9,15 +9,14 @@ class OffsitePage(UnisubsPage):
     _WIDGET_MENU = "span.unisubs-tabTextchoose"
     
     def start_playback(self, video_position):
-        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%s].play()" % video_position)
-
+        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].play()" % video_position)
 
     def pause_playback(self, video_position):
-        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%s].pause()" % video_position)
+        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].pause()" % video_position)
 
 
     def open_subs_menu(self, video_position):
-        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%s].openMenu()" % video_position)
+        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].openMenu()" % video_position)
 
     def displays_subs_in_correct_position(self):
         """Return true if subs are found in correct position on video.
@@ -27,8 +26,14 @@ class OffsitePage(UnisubsPage):
         height = size["height"]
         if 10 < height < 80:
             return True
-        else:
-            self.record_error()
+
+    def open_offsite_page(self, page_url):
+        self.browser.set_page_load_timeout(30)
+        try:
+            self.open_page(page_url)
+        except:
+            print "page didn't finish loading in 30 seconds, continuing..."
+        self.wait_for_element_present(self._WIDGET_MENU)
 
     def pause_playback_when_subs_appear(self, video_position):
         self.scroll_to_video(video_position)
