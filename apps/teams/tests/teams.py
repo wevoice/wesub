@@ -1253,14 +1253,25 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
 
     def _send_application(self):
         self._login(False)
+        # if te team member left, he can auto join
+        should_auto_join = False
+        try:
+            application = Application.objects.get(team=self.team,user=self.applicant)
+            should_auto_join = application.status  == Application.STATUS_MEMBER_LEFT
+        except Application.DoesNotExist:
+            application = None
 
         response = self.rpc.create_application(self.team.pk, 'Note', self.applicant)
         if isinstance(response, Error):
             self.fail(response)
-        self.assertFalse(self.team.is_member(self.applicant))
-        self.assertTrue(Application.objects.filter(user=self.applicant, team=self.team, status=Application.STATUS_PENDING).exists())
-        self.assertTrue(Application.objects.open(user=self.applicant, team=self.team).exists())
-        return Application.objects.order_by('-pk')[0]
+        if not should_auto_join:
+            self.assertFalse(self.team.is_member(self.applicant))
+            self.assertTrue(Application.objects.filter(user=self.applicant, team=self.team, status=Application.STATUS_PENDING).exists())
+            self.assertTrue(Application.objects.open(user=self.applicant, team=self.team).exists())
+        else:
+            self.assertTrue(self.team.is_member(self.applicant))
+            self.assertTrue(Application.objects.filter(user=self.applicant, team=self.team, status=Application.STATUS_APPROVED).exists())
+        return Application.objects.get(pk=application.pk) if application else Application.objects.order_by('-pk')[0]
 
     def _login(self, as_owner):
         username = self.owner.username if as_owner else self.applicant.username
@@ -1319,11 +1330,7 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
         # application can join again
         self.assertTrue(teams_tags.can_apply(self.team, self.applicant))
         application = self._send_application()
-        # application is in the inbox
 
-        self.assertEquals(Application.objects.open(team=self.team).count(), 1)
-        # application is approved
-        self._approve(application)
         # applicant is a team member again
         self.assertTrue(self.team.is_member(self.applicant))
 
@@ -1375,9 +1382,6 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
         response = self.rpc.create_application(self.team.pk, 'Note', self.applicant)
         # removed user, cannot send application again
         self.assertTrue( isinstance(response, Error))
-        # user lobies admin, want application rea applived
-        self._approve(application)
-        self.assertTrue(self.team.is_member(self.applicant))
 
 
     def test_can_apply(self):
