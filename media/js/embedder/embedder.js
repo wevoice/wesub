@@ -205,7 +205,7 @@
 
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
-                        video_url: 'http://www.universalsubtitles.org/en/videos/' + that.model.get('id'),
+                        video_url: 'http://staging.universalsubtitles.org/en/videos/' + that.model.get('id'),
                         width: that.model.get('width')
                     }));
 
