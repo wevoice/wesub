@@ -26,7 +26,7 @@ from messages.forms import TeamAdminPageMessageForm
 from teams.models import (
     Team, TeamMember, TeamVideo, Workflow, Task, Setting, MembershipNarrowing,
     Project, TeamLanguagePreference, TeamNotificationSetting, BillingReport,
-    Partner, Application, ApplicationInvalidException
+    Partner, Application, ApplicationInvalidException, Invite
 )
 from videos.models import SubtitleLanguage
 
@@ -200,6 +200,11 @@ class ProjectAdmin(admin.ModelAdmin):
 class BillingReportAdmin(admin.ModelAdmin):
     list_display = ('team', 'start_date', 'end_date', 'processed')
 
+
+class InviteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'team', 'role', 'approved',)
+
+
 class ApplicationAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'team__name', 'user__first_name', 'user__last_name')
     list_display = ('user',  'team_link', 'user_link', 'created', 'status')
@@ -243,4 +248,5 @@ admin.site.register(Project, ProjectAdmin)
 admin.site.register(TeamNotificationSetting)
 admin.site.register(BillingReport, BillingReportAdmin)
 admin.site.register(Partner)
+admin.site.register(Invite, InviteAdmin)
 admin.site.register(Application, ApplicationAdmin)
