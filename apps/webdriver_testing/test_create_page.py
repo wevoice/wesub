@@ -64,7 +64,7 @@ class WebdriverTestCaseVideosCreateFeedVideos(WebdriverTestCase):
 
         
     def test_create_feed__youtube_user_url(self):
-        url = "http://www.youtube.com/user/SeveFanClub"
+        url = "http://www.youtube.com/user/jdragojevic"
         self.create_pg.submit_youtube_user_page(url, save=True)
         assert_true(self.create_pg.multi_submit_successful())
 
@@ -79,12 +79,13 @@ class WebdriverTestCaseVideosCreateFeedVideos(WebdriverTestCase):
         assert_true(self.create_pg.multi_submit_successful())
 
     def test_create_feed__dailymotion_large(self):
+        self.skipTest("This is just too slow, and probably not that necessary")
         url = "http://www.dailymotion.com/rss/user/LocalNews-GrabNetworks/1"
         self.create_pg.submit_feed_url(url)
         assert_true(self.create_pg.multi_submit_successful())
 
     def test_create_feed__blip(self):
-        url = "http://blip.tv/weird-america/rss/flash"
+        url = "http://blip.tv/stitchnbitch/rss"
         self.create_pg.submit_feed_url(url)
         assert_true(self.create_pg.multi_submit_successful())
 
