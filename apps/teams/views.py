@@ -1265,7 +1265,9 @@ def create_task(request, slug, team_video_pk):
 @login_required
 def perform_task(request, slug=None, task_pk=None):
     task_pk = task_pk or request.POST.get('task_id')
-    task = Task.objects.get(pk=task_pk)
+
+    task = get_object_or_404(Task, pk=task_pk)
+
     if slug:
         team = get_object_or_404(Team,slug=slug)
         if task.team != team:
