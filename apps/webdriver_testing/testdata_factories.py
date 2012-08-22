@@ -51,6 +51,7 @@ class TeamInviteFactory(factory.Factory):
 
 class ApplicationFactory(factory.Factory):
     FACTORY_FOR = Application
+    created = datetime.datetime.now()
 
 
 class MessageFactory(factory.Factory):
