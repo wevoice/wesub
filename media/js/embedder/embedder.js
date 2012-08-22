@@ -59,13 +59,13 @@
 
             // This var will be true once we've retrieved the rest of the model attrs
             // from the Amara API.
-            isComplete: false,
+            is_complete: false,
 
             // Set from within the embedder.
             div: '',
             height: '',
-            initialLanguage: null,
-            isOnAmara: null,
+            initial_language: null,
+            is_on_amara: null,
             subtitles: [], // Backbone collection
             url: '',
             width: '',
@@ -102,7 +102,7 @@
                         if (resp.objects.length) {
 
                             // The video exists on Amara.
-                            video.set('isOnAmara', true);
+                            video.set('is_on_amara', true);
 
                             // There should only be one object.
                             if (resp.objects.length === 1) {
@@ -112,8 +112,8 @@
 
                                 // Set the initial language to either the one provided by the initial
                                 // options, or the original language from the API.
-                                video.set('initialLanguage',
-                                    video.get('initialLanguage') ||
+                                video.set('initial_language',
+                                    video.get('initial_language') ||
                                     video.get('original_language')
                                 );
                             }
@@ -121,12 +121,12 @@
                         } else {
 
                             // The video does not exist on Amara.
-                            video.set('isOnAmara', false);
+                            video.set('is_on_amara', false);
 
                         }
 
                         // Mark that the video model has been completely populated.
-                        video.set('isComplete', true);
+                        video.set('is_complete', true);
                     }
                 });
             }
@@ -224,15 +224,15 @@
                         function() {
 
                             // Grab the subtitles for the initial language and do yo' thang.
-                            if (that.model.get('isOnAmara')) {
+                            if (that.model.get('is_on_amara')) {
 
                                 // Make the request to fetch the initial subtitles.
-                                that.fetchSubtitles(that.model.get('initialLanguage'), function() {
+                                that.fetchSubtitles(that.model.get('initial_language'), function() {
 
                                     // When we've got a response with the subtitles, start building
                                     // out the transcript viewer and subtitles.
-                                    that.buildTranscript(that.model.get('initialLanguage'));
-                                    that.buildSubtitles(that.model.get('initialLanguage'));
+                                    that.buildTranscript(that.model.get('initial_language'));
+                                    that.buildSubtitles(that.model.get('initial_language'));
                                 });
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
@@ -351,9 +351,9 @@
 
                 var that = this;
 
-                // isComplete gets set as soon as the initial API call to build out the video
+                // is_complete gets set as soon as the initial API call to build out the video
                 // instance has finished.
-                if (!this.model.get('isComplete')) {
+                if (!this.model.get('is_complete')) {
                     setTimeout(function() { that.waitUntilVideoIsComplete(callback); }, 100);
                 } else {
                     callback();
@@ -466,7 +466,7 @@
                     // Call embedVideo with this div and URL.
                     that.push(['embedVideo', {
                         'div': this,
-                        'initialLanguage': $div.data('initial-language'),
+                        'initial_language': $div.data('initial-language'),
                         'url': $div.data('url')
                     }]);
                 });
