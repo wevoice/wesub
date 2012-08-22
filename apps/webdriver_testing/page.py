@@ -113,10 +113,10 @@ class Page(object):
     def get_size_by_css(self, element):
         return self.browser.find_element_by_css_selector(element).size
 
-    def submit_form_text_by_css(self, element, text):
+    def submit_form_text_by_css(self, element, form_text):
         elem = self.browser.find_element_by_css_selector(element)
-        elem.send_keys(text)
-        self.browser.get_screenshot_as_file('screenshot_search_form.png')
+        print "\n Entering form text: %s" % form_text
+        elem.send_keys(form_text)
         elem.submit()    
 
     def is_element_present(self, element):
