@@ -7,11 +7,6 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.messages import DEBUG as LEVEL_DEBUG
-from django.contrib.messages import ERROR as LEVEL_ERROR
-from django.contrib.messages import SUCCESS as LEVEL_SUCCESS
-from django.contrib.messages import INFO as LEVEL_INFO
-
 
 from django.db.models import ObjectDoesNotExist, Q
 from django.test import TestCase
@@ -24,7 +19,7 @@ from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember,
-    TeamLanguagePreference, Project
+    TeamLanguagePreference, Project, Partner
 )
 from apps.teams.templatetags import teams_tags
 from apps.videos.search_indexes import VideoIndex
@@ -39,11 +34,11 @@ from haystack.query import SearchQuerySet
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
 
 
-
 def fix_teams_roles(teams=None):
     for t in teams or Team.objects.all():
        for member in t.members.all():
            add_role(t, member.user,  t.members.all()[0], member.role)
+
 
 class TestNotification(TestCase):
 
@@ -146,6 +141,7 @@ class TestNotification(TestCase):
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
 
+
 class TestTasks(TestCase):
 
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
@@ -156,6 +152,7 @@ class TestTasks(TestCase):
         self.team = Team.objects.all()[0]
         tv = TeamVideo(team=self.team, video=self.sl.video, added_by=self.team.users.all()[:1].get())
         tv.save()
+
 
 class TeamVideoTest(TestCase):
 
@@ -250,6 +247,7 @@ class TeamVideoTest(TestCase):
             self.fail("Assertion for team + project did not work")
         except AssertionError:
             pass
+
 
 class TeamsTest(TestCase):
 
@@ -843,9 +841,11 @@ class TeamsTest(TestCase):
 
         self.assertEquals(video.title, u'\u041f\u0435\u0442\u0443\u0445 \u043e\u0442\u0436\u0438\u0433\u0430\u0435\u0442!!!')
 
+
 from apps.teams.rpc import TeamsApiClass
 from utils.rpc import Error, Msg
 from django.contrib.auth.models import AnonymousUser
+
 
 class TestJqueryRpc(TestCase):
 
@@ -944,6 +944,7 @@ class TestJqueryRpc(TestCase):
         self.assertFalse(self.team.is_member(self.user))
         self.assertTrue(Application.objects.filter(user=self.user, team=self.team).exists())
         #---------------------------------------
+
 
 class TeamsDetailQueryTest(TestCase):
 
@@ -1078,6 +1079,7 @@ class TestLanguagePreference(TestCase):
 
         self.assertIn("en", generated)
         self.assertIn("en", cached)
+
 
 class TestInvites(TestCase):
 
@@ -1236,6 +1238,7 @@ class TestInvites(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
 
+
 class TestApplication(TestCase, TestCaseMessagesMixin):
     def setUp(self):
         self.team, c = Team.objects.get_or_create(name='test', slug='test',membership_policy=Team.APPLICATION )
@@ -1297,13 +1300,13 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
 
     def _leave_team(self, user):
         url = reverse("teams:leave_team", args=(self.team.slug,))
-        response = self.client.post(url)
+        self.client.post(url)
 
     def _remove_member(self, user):
         self._login(True)
         member_count = self.team.members.count()
         url = reverse("teams:remove_member", args=(self.team.slug,user.pk))
-        response = self.client.post(url)
+        self.client.post(url)
         self.assertEqual(member_count -1, self.team.members.count())
 
 
@@ -1395,3 +1398,13 @@ class TestApplication(TestCase, TestCaseMessagesMixin):
             self.assertFalse(Application.objects.can_apply(self.team, self.applicant))
             application.delete()
 
+
+class PartnerTest(TestCase):
+
+    def test_is_admin(self):
+        partner = Partner.objects.create(name='Le Partner', slug='partner')
+        user = User.objects.get(username='adam')
+
+        self.assertFalse(partner.is_admin(user))
+        partner.admins.add(user)
+        self.assertTrue(partner.is_admin(user))
