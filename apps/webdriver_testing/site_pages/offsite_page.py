@@ -27,6 +27,14 @@ class OffsitePage(UnisubsPage):
         if 10 < height < 80:
             return True
 
+    def open_offsite_page(self, page_url):
+        self.browser.set_page_load_timeout(30)
+        try:
+            self.open_page(page_url)
+        except:
+            print "page didn't finish loading in 30 seconds, continuing..."
+        self.wait_for_element_present(self._WIDGET_MENU)
+
     def pause_playback_when_subs_appear(self, video_position):
         self.scroll_to_video(video_position)
         self.wait_for_element_visible(self._CAPTIONS)
