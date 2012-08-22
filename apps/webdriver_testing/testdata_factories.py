@@ -36,7 +36,7 @@ class TeamFactory(factory.Factory):
 class TeamMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     team = factory.SubFactory(TeamFactory)
-    role = 'ROLE_OWNER'
+    role = TeamMember.ROLE_OWNER 
     user = factory.SubFactory(UserFactory)
 
 
