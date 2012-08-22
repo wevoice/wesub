@@ -235,8 +235,15 @@ class CustomUser(BaseUser):
 
     def messageable_teams(self):
         from apps.teams.permissions import can_message_all_members
+
         teams = self.teams.all()
         messageable_team_ids = [t.id for t in teams if can_message_all_members(t, self)]
+
+        partners = self.managed_partners.filter()
+        teams = [list(p.teams.all()) for p in partners]
+        partner_teams_ids = [team.id for qs in teams for team in qs]
+
+        messageable_team_ids = messageable_team_ids + partner_teams_ids
         return self.teams.filter(id__in=messageable_team_ids)
 
     def open_tasks(self):

@@ -2464,6 +2464,15 @@ class Partner(models.Model):
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
     can_request_paid_captions = models.BooleanField(default=False)
+    
+    # The `admins` field specifies users who can do just about anything within
+    # the partner realm.
+    admins = models.ManyToManyField('auth.CustomUser',
+            related_name='managed_partners', blank=True, null=True)
 
     def __unicode__(self):
         return self.name
+
+    def is_admin(self, user):
+        return user in self.admins.all()
+
