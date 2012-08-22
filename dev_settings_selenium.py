@@ -46,8 +46,9 @@ DEFAULT_PROTOCOL = 'http'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--with-xunit',
              '--xunit-file=apps/webdriver_testing/Screenshots/nosetests.xml', 
-             '--nocapture', 
-            # '--logging-filter=-selenium.webdriver.remote.remote_connection',
-             '--verbosity=2',
+             '--nocapture',
+             '--nologcapture', 
+             '--logging-filter=-pysolr, -base, remote_connection', 
+             '--verbosity=2'
             ]
 CELERY_ALWAYS_EAGER = True
