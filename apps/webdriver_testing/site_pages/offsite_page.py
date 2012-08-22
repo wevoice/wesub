@@ -26,8 +26,6 @@ class OffsitePage(UnisubsPage):
         height = size["height"]
         if 10 < height < 80:
             return True
-        else:
-            self.record_error()
 
     def pause_playback_when_subs_appear(self, video_position):
         self.scroll_to_video(video_position)
