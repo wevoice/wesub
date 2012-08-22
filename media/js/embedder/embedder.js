@@ -167,7 +167,6 @@
             },
 
             events: {
-                'click a.amara-logo':              'logoClicked',
                 'click a.amara-share-button':      'shareButtonClicked',
                 'click a.amara-transcript-button': 'toggleTranscriptDisplay',
                 'click a.amara-subtitles-button':  'toggleSubtitlesDisplay'
@@ -206,6 +205,7 @@
 
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
+                        video_url: 'http://www.universalsubtitles.org/en/videos/' + that.model.get('id'),
                         width: that.model.get('width')
                     }));
 
@@ -334,9 +334,6 @@
                     }
                 });
             },
-            logoClicked: function() {
-                return false;
-            },
             shareButtonClicked: function() {
                 return false;
             },
@@ -367,7 +364,7 @@
                 '<div class="amara-tools" style="width: {{ width }}px;">' +
                 '    <div class="amara-bar">' +
                 //'        <a href="#" class="amara-share-button"></a>' +
-                '        <a href="#" class="amara-logo">Amara</a>' +
+                '        <a href="{{ video_url }}" target="blank" class="amara-logo">Amara</a>' +
                 '        <ul class="amara-displays">' +
                 '            <li><a href="#" class="amara-transcript-button"></a></li>' +
                 '            <li><a href="#" class="amara-subtitles-button"></a></li>' +
@@ -375,9 +372,9 @@
                 '    </div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
-                '            <div class="amara-transcript-header-left">' +
-                '                Auto-stream <span>OFF</span>' +
-                '            </div>' +
+                //'            <div class="amara-transcript-header-left">' +
+                //'                Auto-stream <span>OFF</span>' +
+                //'            </div>' +
                 //'            <div class="amara-transcript-header-right">' +
                 //'                <form action="" class="amara-transcript-search">' +
                 //'                    <input class="amara-transcript-search-input" placeholder="Search transcript" />' +
