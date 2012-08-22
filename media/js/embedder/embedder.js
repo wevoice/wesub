@@ -226,7 +226,7 @@
                             // Grab the subtitles for the initial language and do yo' thang.
                             if (that.model.get('isOnAmara')) {
 
-                                // Make the request to fetch subtitles.
+                                // Make the request to fetch the initial subtitles.
                                 that.fetchSubtitles(that.model.get('initialLanguage'), function() {
 
                                     // When we've got a response with the subtitles, start building
