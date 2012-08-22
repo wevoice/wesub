@@ -90,6 +90,7 @@ class Migration(SchemaMigration):
         'teams.application': {
             'Meta': {'unique_together': "(('team', 'user', 'status'),)", 'object_name': 'Application'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'history': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'note': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
