@@ -26,10 +26,41 @@ from apps.subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
 
 class SubtitleLanguageAdmin(admin.ModelAdmin):
     list_display = ['video_title', 'language_code', 'version_count', 'tip',
-                    'created']
+                    'unofficial_signoffs',
+                    'official_signoffs',
+                    'pending_collaborators',
+                    'expired_pending_collaborators',
+                    'unexpired_pending_collaborators']
     list_filter = ['created', 'language_code']
     search_fields = ['video__title', 'video__video_id', 'language_code']
     raw_id_fields = ['video', 'followers', 'collaborators']
+
+    def queryset(self, request):
+        return SubtitleLanguage.objects.with_signoff_counts()
+
+
+    def unofficial_signoffs(self, o):
+        return o.unofficial_signoff_count
+    unofficial_signoffs.admin_order_field = 'unofficial_signoff_count'
+
+    def official_signoffs(self, o):
+        return o.official_signoff_count
+    official_signoffs.admin_order_field = 'official_signoff_count'
+
+    def pending_collaborators(self, o):
+        return o.pending_signoff_count
+    pending_collaborators.short_description = 'pending'
+    pending_collaborators.admin_order_field = 'pending_signoff_count'
+
+    def expired_pending_collaborators(self, o):
+        return o.pending_signoff_expired_count
+    expired_pending_collaborators.short_description = 'expired pending'
+    expired_pending_collaborators.admin_order_field = 'pending_signoff_expired_count'
+
+    def unexpired_pending_collaborators(self, o):
+        return o.pending_signoff_unexpired_count
+    unexpired_pending_collaborators.short_description = 'unexpired pending'
+    unexpired_pending_collaborators.admin_order_field = 'pending_signoff_unexpired_count'
 
     def video_title(self, sl):
         return sl.video.title_display()
@@ -50,7 +81,8 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
                     'visibility', 'visibility_override', 'parent_ids',
                     'created']
     raw_id_fields = ['video', 'subtitle_language', 'parents', 'author']
-    list_filter = ['created', 'visibility', 'language_code']
+    list_filter = ['created', 'visibility', 'visibility_override',
+                   'language_code']
     search_fields = ['video__video_id', 'video__title', 'title',
                      'language_code', 'description']
 

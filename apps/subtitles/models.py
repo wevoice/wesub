@@ -80,6 +80,42 @@ def get_lineage(parents):
 
 
 # SubtitleLanguages -----------------------------------------------------------
+class SubtitleLanguageManager(models.Manager):
+    def _needing_initial_signoff(self, unofficial_signoffs_required,
+                                 official_signoffs_required):
+        """Return a QS of SLs that need an initial signoff."""
+
+        qs = self.get_query_set().filter(
+            unofficial_signoff_count=0,
+            official_signoff_count=0)
+
+        return qs
+
+    def _needing_unofficial_signoff(self, unofficial_signoffs_required,
+                                    official_signoffs_required):
+        """Return a QS of SLs that need an unofficial signoff."""
+
+        qs = self.get_query_set().filter(
+            unofficial_signoff_count__gt=0,
+            unofficial_signoff_count__lt=unofficial_signoffs_required)
+
+        # actual_un_count = unofficial_signoff_count + greatest(0, official_signoff_count - official_signoffs_required)
+        # (unofficial_count > 0)
+
+        # qs.extra(where=['unofficial_signoff_count < %d' % (unofficial_signoffs_required)])
+
+        return qs
+
+    def _needing_official_signoff(self, unofficial_signoffs_required,
+                                  official_signoffs_required):
+        """Return a QS of SLs that need an official signoff."""
+
+        qs = self.get_query_set().filter(
+            unofficial_signoff_count__gte=unofficial_signoffs_required,
+            official_signoff_count__lt=official_signoffs_required)
+
+        return qs
+
 class SubtitleLanguage(models.Model):
     """SubtitleLanguages are the equivalent of a 'branch' in a VCS.
 
@@ -104,6 +140,18 @@ class SubtitleLanguage(models.Model):
                                              editable=False)
 
     created = models.DateTimeField(editable=False)
+
+    # Denormalized signoff/collaborator count fields.
+    # These are stored here for speed of retrieval and filtering.  They are
+    # updated in the update_signoff_counts() method, which is called from the
+    # Collaborator .save() method.
+    unofficial_signoff_count = models.PositiveIntegerField(default=0)
+    official_signoff_count = models.PositiveIntegerField(default=0)
+    pending_signoff_count = models.PositiveIntegerField(default=0)
+    pending_signoff_unexpired_count = models.PositiveIntegerField(default=0)
+    pending_signoff_expired_count = models.PositiveIntegerField(default=0)
+
+    objects = SubtitleLanguageManager()
 
     class Meta:
         unique_together = [('video', 'language_code')]
@@ -169,6 +217,28 @@ class SubtitleLanguage(models.Model):
                 sv.parents.add(p)
 
         return sv
+
+    def update_signoff_counts(self):
+        """Update the denormalized signoff count fields and save."""
+
+        cs = self.collaborator_set.all()
+
+        self.official_signoff_count = len(
+            [c for c in cs if c.signoff and c.signoff_is_official])
+
+        self.unofficial_signoff_count = len(
+            [c for c in cs if c.signoff and (not c.signoff_is_official)])
+
+        self.pending_signoff_count = len(
+            [c for c in cs if (not c.signoff)])
+
+        self.pending_signoff_expired_count = len(
+            [c for c in cs if (not c.signoff) and c.expired])
+
+        self.pending_signoff_unexpired_count = len(
+            [c for c in cs if (not c.signoff) and (not c.expired)])
+
+        self.save()
 
 
 # SubtitleVersions ------------------------------------------------------------
@@ -408,6 +478,13 @@ class Collaborator(models.Model):
         if creating and not self.expiration_start:
             self.expiration_start = self.created
 
-        return super(Collaborator, self).save(*args, **kwargs)
+        result = super(Collaborator, self).save(*args, **kwargs)
+
+        # Update the denormalized signoff count fields for SubtitleLanguages.
+        # This has to be done after we've saved this Collaborator so the changes
+        # will take effect.
+        self.subtitle_language.update_signoff_counts()
+
+        return result
 
 
