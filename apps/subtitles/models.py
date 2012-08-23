@@ -126,8 +126,11 @@ class SubtitleLanguage(models.Model):
     video = models.ForeignKey(Video, related_name='newsubtitlelanguage_set')
     language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
 
+    # TODO: Remove followers?
     followers = models.ManyToManyField(User, blank=True,
                                        related_name='followed_newlanguages')
+
+    # TODO: Remove followers?
     collaborators = models.ManyToManyField(User, blank=True,
                                            related_name='collab_newlanguages')
 

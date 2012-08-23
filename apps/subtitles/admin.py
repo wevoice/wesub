@@ -35,10 +35,6 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     search_fields = ['video__title', 'video__video_id', 'language_code']
     raw_id_fields = ['video', 'followers', 'collaborators']
 
-    def queryset(self, request):
-        return SubtitleLanguage.objects.with_signoff_counts()
-
-
     def unofficial_signoffs(self, o):
         return o.unofficial_signoff_count
     unofficial_signoffs.admin_order_field = 'unofficial_signoff_count'

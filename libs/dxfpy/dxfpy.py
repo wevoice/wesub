@@ -152,6 +152,11 @@ class SubtitleSet(object):
         Each tuple should be (from_ms, to_ms, content).  See the docstring of
         append_subtitle for more information.
 
+        For example:
+
+            [(0, 1000, "Hello, "),
+             (1100, None, "world!")]
+
         """
         subs = SubtitleSet()
 

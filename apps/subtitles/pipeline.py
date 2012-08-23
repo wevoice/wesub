@@ -79,7 +79,7 @@ def _get_language(video, language_code):
     return sl, language_needs_save
 
 
-def _add_subtitles(video, language_code):
+def _add_subtitles(video, language_code, subtitles):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -97,7 +97,7 @@ def _add_subtitles(video, language_code):
 
 
 # Public API ------------------------------------------------------------------
-def add_subtitles_unsafe(video, language_code):
+def add_subtitles_unsafe(video, language_code, subtitles):
     """Add subtitles in the language to the video without a transaction.
 
     You probably want to use add_subtitles instead, but if you're already inside
@@ -108,9 +108,9 @@ def add_subtitles_unsafe(video, language_code):
     future.
 
     """
-    return _add_subtitles(video, language_code)
+    return _add_subtitles(video, language_code, subtitles)
 
-def add_subtitles(video, language_code):
+def add_subtitles(video, language_code, subtitles):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -126,4 +126,4 @@ def add_subtitles(video, language_code):
 
     """
     with transaction.commit_on_success():
-        return _add_subtitles(video, language_code)
+        return _add_subtitles(video, language_code, subtitles)
