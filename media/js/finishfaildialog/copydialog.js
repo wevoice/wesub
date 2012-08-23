@@ -44,7 +44,6 @@ unisubs.finishfaildialog.CopyDialog.prototype.createDom = function() {
     this.textarea_ = $d('textarea', {'class': 'copy-dialog', 'value': this.textToCopy_});
 
     this.switcher_ = $d('select', 'copy-dialog-select',
-            $d('option', {value: 'txt'}, 'TXT'),
             $d('option', {value: 'srt'}, 'SRT'),
             $d('option', {value: 'ssa'}, 'SSA'),
             $d('option', {value: 'ttml'}, 'TTML'),
@@ -68,7 +67,7 @@ unisubs.finishfaildialog.CopyDialog.prototype.switcherChanged_ = function(e) {
     this.fillTextarea(this.switcher_.value);
 };
 unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
-    if (format === 'txt') {
+    if (format === 'srt') {
         goog.dom.forms.setValue(this.textarea_, this.textToCopy_);
     } else {
         goog.dom.forms.setValue(this.textarea_, 'Processing...');
@@ -133,11 +132,11 @@ unisubs.finishfaildialog.CopyDialog.subsToString_ = function(jsonSubs) {
     else
         baseString = unisubs.SRTWriter.toSRT(jsonSubs);
     var serverModel = unisubs.subtitle.MSServerModel.currentInstance;
-    baseString = ['browser_id: ' + goog.net.cookies.get('unisub-user-uuid', 'n/a'), 
-                  'video_id: ' + (serverModel ? 
-                                  serverModel.getVideoID() : 'n/a'),
-                  'session_pk: ' + (serverModel ?
-                                    serverModel.getSessionPK() : 'n/a'),
-                  baseString].join('\n');
+    //baseString = ['browser_id: ' + goog.net.cookies.get('unisub-user-uuid', 'n/a'), 
+                  //'video_id: ' + (serverModel ? 
+                                  //serverModel.getVideoID() : 'n/a'),
+                  //'session_pk: ' + (serverModel ?
+                                    //serverModel.getSessionPK() : 'n/a'),
+                  //baseString].join('\n');
     return baseString;
 };
