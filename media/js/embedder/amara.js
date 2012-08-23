@@ -9788,7 +9788,7 @@ Popcorn.plugin('amarasubtitle', {
                         });
                     }
 
-                    // TODO: Set the language selector to this language if there is a language selector.
+                    this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
 
                 } else {
                     $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
