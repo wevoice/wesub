@@ -128,16 +128,7 @@ unisubs.finishfaildialog.CopyDialog.showForSubs = function(jsonSubs, languageCod
 };
 unisubs.finishfaildialog.CopyDialog.subsToString_ = function(jsonSubs) {
     var baseString;
-    if (unisubs.Dialog.translationDialogOpen)
-        baseString = goog.json.serialize(jsonSubs);
-    else
-        baseString = unisubs.SRTWriter.toSRT(jsonSubs);
+    baseString = unisubs.SRTWriter.toSRT(jsonSubs);
     var serverModel = unisubs.subtitle.MSServerModel.currentInstance;
-    //baseString = ['browser_id: ' + goog.net.cookies.get('unisub-user-uuid', 'n/a'), 
-                  //'video_id: ' + (serverModel ? 
-                                  //serverModel.getVideoID() : 'n/a'),
-                  //'session_pk: ' + (serverModel ?
-                                    //serverModel.getSessionPK() : 'n/a'),
-                  //baseString].join('\n');
     return baseString;
 };

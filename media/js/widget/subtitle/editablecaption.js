@@ -44,6 +44,7 @@ unisubs.subtitle.EditableCaption = function(opt_subOrder, opt_jsonCaption) {
     this.json['original_start_time'] = this.json['start_time'];
     this.json['original_end_time'] = this.json['end_time'];
     this.json['original_text'] = this.json['text'];
+    this.json['start_of_paragraph'] = this.json['start_of_paragraph'] || false;
     this.previousCaption_ = null;
     this.nextCaption_ = null;
 };

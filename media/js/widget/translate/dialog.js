@@ -57,7 +57,6 @@ unisubs.translate.Dialog.State_ = {
     TRANSLATE: 0,
     EDIT_METADATA: 1
 };
-
 unisubs.translate.Dialog.prototype.createDom = function() {
     unisubs.translate.Dialog.superClass_.createDom.call(this);
     this.setDraggable(false);
@@ -207,7 +206,6 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave, s
 unisubs.translate.Dialog.prototype.showGuidelinesForState_ = function(state) {
     this.setState_(state);
 };
-
 unisubs.Dialog.prototype.setVisible = function(visible) {
     if (visible) {
         unisubs.Dialog.superClass_.setVisible.call(this, true);
