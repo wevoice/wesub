@@ -2340,7 +2340,8 @@ class TeamNotificationSetting(models.Model):
     EVENT_SUBTITLE_REJECTED = "subs-rejected"
     EVENT_APPLICATION_NEW = 'application-new'
 
-    team = models.OneToOneField(Team, related_name="notification_settings")
+    team = models.OneToOneField(Team, related_name="notification_settings",
+            null=True, blank=True)
     partner = models.OneToOneField('Partner', null=True, blank=True)
 
     # the url to post the callback notifing partners of new video activity
