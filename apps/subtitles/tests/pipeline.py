@@ -24,6 +24,7 @@ from django.test import TestCase
 from apps.subtitles import pipeline
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 from apps.videos.models import Video
+from libs.dxfpy import SubtitleSet
 
 
 VIDEO_URL = 'http://youtu.be/heKK95DAKms'
@@ -63,13 +64,13 @@ class TestBasicAdding(TestCase):
     def setUp(self):
         self.video = make_video()
 
-    def test_add_subtitles(self):
+    def test_add_empty_versions(self):
         # Start with no SubtitleLanguages.
         self.assertEqual(
             SubtitleLanguage.objects.filter(video=self.video).count(), 0)
 
         # Put a version through the pipeline.
-        pipeline.add_subtitles(self.video, 'en')
+        pipeline.add_subtitles(self.video, 'en', None)
 
         # It should create the SubtitleLanguage automatically, with one version.
         self.assertEqual(
@@ -85,7 +86,7 @@ class TestBasicAdding(TestCase):
         self.assertEqual(v.language_code, 'en')
 
         # Put another version through the pipeline.
-        pipeline.add_subtitles(self.video, 'en')
+        pipeline.add_subtitles(self.video, 'en', None)
 
         # Now we should have two versions for a single language.
         self.assertEqual(
@@ -97,4 +98,60 @@ class TestBasicAdding(TestCase):
         v = sl.get_tip()
         self.assertEqual(v.version_number, 2)
         self.assertEqual(v.language_code, 'en')
+
+    def test_add_subtitles(self):
+        def _get_tip_subs():
+            sl = SubtitleLanguage.objects.get(video=self.video,
+                                              language_code='en')
+            return list(sl.get_tip().get_subtitles().subtitle_items())
+
+        # Passing nil.
+        pipeline.add_subtitles(self.video, 'en', None)
+
+        self.assertEqual(_get_tip_subs(), [])
+
+        # Passing a list of tuples.
+        pipeline.add_subtitles(self.video, 'en', [(100, 200, "foo"),
+                                                  (300, None, "bar")])
+
+        self.assertEqual(_get_tip_subs(), [(100, 200, "foo"),
+                                           (300, None, "bar")])
+
+        # Passing an iterable of tuples.
+        pipeline.add_subtitles(self.video, 'en', (s for s in
+                                                  [(101, 200, "foo"),
+                                                   (300, None, "bar")]))
+
+        self.assertEqual(_get_tip_subs(), [(101, 200, "foo"),
+                                           (300, None, "bar")])
+
+        # Passing a SubtitleSet.
+        subs = SubtitleSet.from_list([(110, 210, "foo"),
+                                      (310, 410, "bar"),
+                                      (None, None, '"baz"')])
+
+        pipeline.add_subtitles(self.video, 'en', subs)
+
+        self.assertEqual(_get_tip_subs(), [(110, 210, "foo"),
+                                           (310, 410, "bar"),
+                                           (None, None, '"baz"')])
+
+        # Passing a hunk of XML.
+        subs = SubtitleSet.from_list([(10000, 22000, "boots"),
+                                      (23000, 29000, "cats")])
+
+        pipeline.add_subtitles(self.video, 'en', subs.to_xml())
+
+        self.assertEqual(_get_tip_subs(), [(10000, 22000, "boots"),
+                                           (23000, 29000, "cats")])
+
+
+        # Passing nonsense should TypeError out.
+        self.assertRaises(TypeError,
+                          lambda: pipeline.add_subtitles(self.video, 'en', 1))
+
+        # Make sure all the versions are there.
+        sl = SubtitleLanguage.objects.get(video=self.video,
+                                          language_code='en')
+        self.assertEqual(sl.subtitleversion_set.count(), 5)
 

@@ -78,7 +78,6 @@ def _get_language(video, language_code):
 
     return sl, language_needs_save
 
-
 def _add_subtitles(video, language_code, subtitles):
     """Add subtitles in the language to the video.  Really.
 
@@ -91,7 +90,7 @@ def _add_subtitles(video, language_code, subtitles):
     if language_needs_save:
         sl.save()
 
-    version = sl.add_version()
+    version = sl.add_version(subtitles=subtitles)
 
     return version
 
@@ -106,6 +105,9 @@ def add_subtitles_unsafe(video, language_code, subtitles):
 
     You need to check writelocking yourself.  For now.  This may change in the
     future.
+
+    Subtitles can be given as a SubtitleSet, or a list of
+    (from_ms, to_ms, content) tuples, or a string containing a hunk of DXFP XML.
 
     """
     return _add_subtitles(video, language_code, subtitles)
@@ -123,6 +125,9 @@ def add_subtitles(video, language_code, subtitles):
 
     You need to check writelocking yourself.  For now.  This may change in the
     future.
+
+    Subtitles can be given as a SubtitleSet, or a list of
+    (from_ms, to_ms, content) tuples, or a string containing a hunk of DXFP XML.
 
     """
     with transaction.commit_on_success():

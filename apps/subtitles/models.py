@@ -323,11 +323,7 @@ class SubtitleVersion(models.Model):
         """
         # We cache the parsed subs for speed.
         if self._subtitles == None:
-            if self.serialized_subtitles == '':
-                self._subtitles = SubtitleSet()
-            else:
-                self._subtitles = SubtitleSet.from_blob(
-                                      self.serialized_subtitles)
+            self._subtitles = SubtitleSet.from_blob(self.serialized_subtitles)
 
         return self._subtitles
 
@@ -338,17 +334,27 @@ class SubtitleVersion(models.Model):
 
         * Passing None will set the subtitles to an empty set.
         * Passing a SubtitleSet will set the subtitles to that set.
-        * Passing a vanilla list (or any iterable) will create a SubtitleSet
-          from that and set the subtitles to it.
+        * Passing a string of XML will treat it as DXFP and set it directly.
+        * Passing a vanilla list (or any iterable) of subtitle tuples will
+          create a SubtitleSet from that.
 
         """
+        # TODO: Move this typechecking logic to the SubtitleSet constructor.
         if subtitles == None:
             subtitles = SubtitleSet()
+        elif isinstance(subtitles, str) or isinstance(subtitles, unicode):
+            subtitles = SubtitleSet(subtitles)
+        elif isinstance(subtitles, SubtitleSet):
+            pass
         else:
-            if not isinstance(subtitles, SubtitleSet):
-                subtitles = SubtitleSet.from_list(subtitles)
+            try:
+                i = iter(subtitles)
+                subtitles = SubtitleSet.from_list(i)
+            except TypeError:
+                raise TypeError("Cannot create SubtitleSet from type %s"
+                                % str(type(subtitles)))
 
-            self.serialized_subtitles = subtitles.to_blob()
+        self.serialized_subtitles = subtitles.to_blob()
 
         # We cache the parsed subs for speed.
         self._subtitles = subtitles
@@ -375,13 +381,32 @@ class SubtitleVersion(models.Model):
 
 
     def __init__(self, *args, **kwargs):
+        """Create a new SubtitleVersion.
+        
+        You probably don't need this.  You probably want
+        apps.subtitles.pipeline.add_subtitles instead.  Or at the very least you
+        want the add_version method of SubtitleLanguage instances.
+
+        `subtitles` can be given in any of the forms supported by set_subtitles.
+
+        `lineage` should be a Python dictionary describing the lineage of this
+        version.
+
+        """
+        # This is a bit clumsy, but we need to handle the subtitles kwarg like
+        # this for it to work properly.  If it's given, we set the subtitles
+        # appropriately after we create the version object.  If it's not given,
+        # we *don't* set the subtitles at all -- we just let the
+        # serialized_subtitles field stay as it is.
+        has_subtitles = 'subtitles' in kwargs
         subtitles = kwargs.pop('subtitles', None)
+
         lineage = kwargs.pop('lineage', None)
 
         super(SubtitleVersion, self).__init__(*args, **kwargs)
 
         self._subtitles = None
-        if subtitles != None:
+        if has_subtitles:
             self.set_subtitles(subtitles)
 
         self._lineage = None
