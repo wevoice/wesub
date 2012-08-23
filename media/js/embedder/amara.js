@@ -9296,12 +9296,13 @@ var wikiCallback;
             options.lineHtml.href = '#';
             options.lineHtml.classList.add('amara-group');
             options.lineHtml.classList.add('amara-transcript-line');
+            options.lineHtml.innerHTML = options.text;
 
-            var lineTemplate = '' +
-                '<span class="amara-transcript-line-left">' + options.start_clean + '</span>' +
-                '<span class="amara-transcript-line-right">' + options.text + '</span>';
+            if (options.start_of_paragraph) {
+                options.container.appendChild(document.createElement('br'));
+                options.container.appendChild(document.createElement('br'));
+            }
 
-            options.lineHtml.innerHTML = lineTemplate;
             options.container.appendChild(options.lineHtml);
 
             options.lineHtml.addEventListener('click', function(e) {
@@ -9341,7 +9342,7 @@ var wikiCallback;
 
             style.fontSize = '18px';
             style.width = media.offsetWidth + 'px';
-            style.top = position.top  + media.offsetHeight - ctxContainer.offsetHeight - 40 + 'px';
+            style.top = position.top  + media.offsetHeight - ctxContainer.offsetHeight - 63 + 'px';
             style.left = position.left + 'px';
 
             setTimeout(updatePosition, 10);
@@ -9531,13 +9532,13 @@ Popcorn.plugin('amarasubtitle', {
 
             // This var will be true once we've retrieved the rest of the model attrs
             // from the Amara API.
-            isComplete: false,
+            is_complete: false,
 
             // Set from within the embedder.
             div: '',
             height: '',
-            initialLanguage: null,
-            isOnAmara: null,
+            initial_language: null,
+            is_on_amara: null,
             subtitles: [], // Backbone collection
             url: '',
             width: '',
@@ -9574,7 +9575,7 @@ Popcorn.plugin('amarasubtitle', {
                         if (resp.objects.length) {
 
                             // The video exists on Amara.
-                            video.set('isOnAmara', true);
+                            video.set('is_on_amara', true);
 
                             // There should only be one object.
                             if (resp.objects.length === 1) {
@@ -9584,8 +9585,8 @@ Popcorn.plugin('amarasubtitle', {
 
                                 // Set the initial language to either the one provided by the initial
                                 // options, or the original language from the API.
-                                video.set('initialLanguage',
-                                    video.get('initialLanguage') ||
+                                video.set('initial_language',
+                                    video.get('initial_language') ||
                                     video.get('original_language')
                                 );
                             }
@@ -9593,12 +9594,12 @@ Popcorn.plugin('amarasubtitle', {
                         } else {
 
                             // The video does not exist on Amara.
-                            video.set('isOnAmara', false);
+                            video.set('is_on_amara', false);
 
                         }
 
                         // Mark that the video model has been completely populated.
-                        video.set('isComplete', true);
+                        video.set('is_complete', true);
                     }
                 });
             }
@@ -9639,7 +9640,6 @@ Popcorn.plugin('amarasubtitle', {
             },
 
             events: {
-                'click a.amara-logo':              'logoClicked',
                 'click a.amara-share-button':      'shareButtonClicked',
                 'click a.amara-transcript-button': 'toggleTranscriptDisplay',
                 'click a.amara-subtitles-button':  'toggleSubtitlesDisplay'
@@ -9678,6 +9678,7 @@ Popcorn.plugin('amarasubtitle', {
 
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
+                        video_url: 'http://staging.universalsubtitles.org/en/videos/' + that.model.get('id'),
                         width: that.model.get('width')
                     }));
 
@@ -9696,15 +9697,15 @@ Popcorn.plugin('amarasubtitle', {
                         function() {
 
                             // Grab the subtitles for the initial language and do yo' thang.
-                            if (that.model.get('isOnAmara')) {
+                            if (that.model.get('is_on_amara')) {
 
-                                // Make the request to fetch subtitles.
-                                that.fetchSubtitles(that.model.get('initialLanguage'), function() {
+                                // Make the request to fetch the initial subtitles.
+                                that.fetchSubtitles(that.model.get('initial_language'), function() {
 
                                     // When we've got a response with the subtitles, start building
                                     // out the transcript viewer and subtitles.
-                                    that.buildTranscript(that.model.get('initialLanguage'));
-                                    that.buildSubtitles(that.model.get('initialLanguage'));
+                                    that.buildTranscript(that.model.get('initial_language'));
+                                    that.buildSubtitles(that.model.get('initial_language'));
                                 });
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
@@ -9766,6 +9767,7 @@ Popcorn.plugin('amarasubtitle', {
                         this.pop.amaratranscript({
                             start: subtitles[i].start,
                             start_clean: utils.parseFloatAndRound(subtitles[i].start),
+                            start_of_paragraph: subtitles[i].start_of_paragraph,
                             end: subtitles[i].end,
                             text: subtitles[i].text,
                             container: this.$transcriptBody.get(0)
@@ -9805,9 +9807,6 @@ Popcorn.plugin('amarasubtitle', {
                     }
                 });
             },
-            logoClicked: function() {
-                return false;
-            },
             shareButtonClicked: function() {
                 return false;
             },
@@ -9825,9 +9824,9 @@ Popcorn.plugin('amarasubtitle', {
 
                 var that = this;
 
-                // isComplete gets set as soon as the initial API call to build out the video
+                // is_complete gets set as soon as the initial API call to build out the video
                 // instance has finished.
-                if (!this.model.get('isComplete')) {
+                if (!this.model.get('is_complete')) {
                     setTimeout(function() { that.waitUntilVideoIsComplete(callback); }, 100);
                 } else {
                     callback();
@@ -9838,7 +9837,7 @@ Popcorn.plugin('amarasubtitle', {
                 '<div class="amara-tools" style="width: {{ width }}px;">' +
                 '    <div class="amara-bar">' +
                 //'        <a href="#" class="amara-share-button"></a>' +
-                '        <a href="#" class="amara-logo">Amara</a>' +
+                '        <a href="{{ video_url }}" target="blank" class="amara-logo">Amara</a>' +
                 '        <ul class="amara-displays">' +
                 '            <li><a href="#" class="amara-transcript-button"></a></li>' +
                 '            <li><a href="#" class="amara-subtitles-button"></a></li>' +
@@ -9846,9 +9845,9 @@ Popcorn.plugin('amarasubtitle', {
                 '    </div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
-                '            <div class="amara-transcript-header-left">' +
-                '                Auto-stream <span>OFF</span>' +
-                '            </div>' +
+                //'            <div class="amara-transcript-header-left">' +
+                //'                Auto-stream <span>OFF</span>' +
+                //'            </div>' +
                 //'            <div class="amara-transcript-header-right">' +
                 //'                <form action="" class="amara-transcript-search">' +
                 //'                    <input class="amara-transcript-search-input" placeholder="Search transcript" />' +
@@ -9857,8 +9856,7 @@ Popcorn.plugin('amarasubtitle', {
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
                 '            <a href="#" class="amara-transcript-line amara-group">' +
-                '                <span class="amara-transcript-line-left">&nbsp;</span>' +
-                '                <span class="amara-transcript-line-right">' +
+                '                <span class="amara-transcript-line">' +
                 '                    Loading transcript&hellip;' +
                 '                </span>' +
                 '            </a>' +
@@ -9941,7 +9939,7 @@ Popcorn.plugin('amarasubtitle', {
                     // Call embedVideo with this div and URL.
                     that.push(['embedVideo', {
                         'div': this,
-                        'initialLanguage': $div.data('initial-language'),
+                        'initial_language': $div.data('initial-language'),
                         'url': $div.data('url')
                     }]);
                 });

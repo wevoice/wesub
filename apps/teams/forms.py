@@ -555,7 +555,6 @@ class InviteForm(forms.Form):
         self.fields['role'].choices = [(r, ROLE_NAMES[r])
                                        for r in roles_user_can_invite(team, user)]
 
-
     def clean_user_id(self):
         user_id = self.cleaned_data['user_id']
 
@@ -579,7 +578,6 @@ class InviteForm(forms.Form):
                 raise forms.ValidationError(_(u'User has already been invited and has not replied yet.'))
         return user_id
 
-
     def save(self):
         from messages import tasks as notifier
         user = User.objects.get(id=self.user_id)
@@ -590,6 +588,7 @@ class InviteForm(forms.Form):
         invite.save()
         notifier.team_invitation_sent.delay(invite.pk)
         return invite
+
 
 class ProjectForm(forms.ModelForm):
     class Meta:

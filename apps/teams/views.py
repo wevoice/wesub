@@ -763,7 +763,7 @@ def remove_member(request, slug, user_pk):
     if can_assign_role(team, request.user, member.role, member.user):
         user = member.user
         if not user == request.user:
-            [application.on_member_removed() for application in \
+            [application.on_member_removed(author=request.user, interface='web UI') for application in \
              team.applications.filter(user=user, status=Application.STATUS_APPROVED)]
             TeamMember.objects.filter(team=team, user=user).delete()
             messages.success(request, _(u'Member has been removed from the team.'))
@@ -803,8 +803,9 @@ def approve_application(request, slug, application_pk):
         raise Http404
 
     if can_invite(team, request.user):
+        application = team.applications.get(pk=application_pk)
         try:
-            Application.objects.get(team=team, pk=application_pk).approve()
+            application.approve(request.user, "web UI")
             messages.success(request, _(u'Application approved.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
@@ -823,8 +824,9 @@ def deny_application(request, slug, application_pk):
         raise Http404
 
     if can_invite(team, request.user):
+        application = team.applications.get(pk=application_pk)
         try:
-            Application.objects.get(team=team, pk=application_pk).deny()
+            application.deny(request.user, "web UI")
             messages.success(request, _(u'Application denied.'))
         except Application.DoesNotExist:
             messages.error(request, _(u'Application does not exist.'))
@@ -930,7 +932,7 @@ def leave_team(request, slug):
         tm_user_pk = member.user.pk
         team_pk = member.team.pk
         member.delete()
-        [application.on_member_leave() for application in \
+        [application.on_member_leave(request.user, "web UI") for application in \
          member.team.applications.filter(status=Application.STATUS_APPROVED)]
             
         notifier.team_member_leave(team_pk, tm_user_pk)
@@ -1265,7 +1267,9 @@ def create_task(request, slug, team_video_pk):
 @login_required
 def perform_task(request, slug=None, task_pk=None):
     task_pk = task_pk or request.POST.get('task_id')
-    task = Task.objects.get(pk=task_pk)
+
+    task = get_object_or_404(Task, pk=task_pk)
+
     if slug:
         team = get_object_or_404(Team,slug=slug)
         if task.team != team:

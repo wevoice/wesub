@@ -851,7 +851,7 @@ List application items:
 
 Application item detail:
 
-.. http:get:: /api2/partners/application/[application-id]/
+.. http:get:: /api2/partners/teams/[team-slug]/application/[application-id]/
 
 Example response:
 
@@ -870,10 +870,10 @@ Example response:
 
 To delete an Application:
 
-.. http:delete:: /api2/partners/application/[application-id]/
+.. http:delete:: /api2/partners/teams/[team-slug]/application/[application-id]/
 
 Applications can have their statuses updated:
 
-.. http:put:: /api2/partners/application/[application-id]/
+.. http:put:: /api2/partners/teams/[team-slug]/application/[application-id]/
 
     :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'

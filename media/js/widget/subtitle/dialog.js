@@ -322,7 +322,7 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
                 return false;
         } else {
             if (this.captionSet_.needsSync()) {
-                alert('You have unsynced captions. You must sync all captions before you can submit.');
+                alert("You have unsynced captions. Please make sure that all lines, including the last one, have start and end time set properly before submitting subtitles. HINT: Use the up arrow to set a caption's end time");
                 return false;
             }
 

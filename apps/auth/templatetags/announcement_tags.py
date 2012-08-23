@@ -34,7 +34,7 @@ def announcement(context):
         hidden_date = None
 
     ann = Announcement.last(hidden_date)
-    date = ann.created.strftime(Announcement.cookie_date_format) if ann else None
+    date = datetime.now().strftime(Announcement.cookie_date_format)
 
     return {
         'obj': ann,
