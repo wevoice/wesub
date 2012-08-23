@@ -204,6 +204,7 @@ div.amara-tools {
         div.amara-transcript-body {
             margin: 40px;
             max-height: 300px;
+            padding-right: 20px;
             overflow: auto;
 
             &::-webkit-scrollbar {
