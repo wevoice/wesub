@@ -73,6 +73,7 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
         goog.dom.forms.setValue(this.textarea_, 'Processing...');
 
         var textarea = this.textarea_;
+        var that = this;
 
         goog.net.XhrIo.send('/widget/convert_subtitles/',
             function(event) {
@@ -80,8 +81,8 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
                 var output, response;
 
                 if (!event.target.isSuccess()) {
-                    output = 'There was an error processing your request.\n\n';
-                    output += event.target.getStatus();
+                    output = 'There was an error processing your request. Below are your subtitles in SRT format. Please copy them (not including this message) and you may upload them later.\n\n';
+                    output += that.textToCopy_;
                 }
                 else {
                     output = event.target.getResponseJson()['result'];
