@@ -9823,6 +9823,8 @@ Popcorn.plugin('amarasubtitle', {
                     success: function(resp) {
 
                         // Save these subtitles to the video's 'subtitles' collection.
+
+                        // TODO: Placeholder until we have the API return the language code.
                         resp.language = language;
                         that.model.subtitles.add(
                             new SubtitleSet(resp)
