@@ -99,7 +99,7 @@ div.amara-tools {
         @include multi-border-radius(0, 0, 3px, 3px);
         @include vertical-gradient(#1B1C1D, #212223);
 
-        a {
+        a.amara-button {
             // TODO: Have the CSS compiler convert these to absolute URLs.
             background: transparent url('/site_media/images/embedder/amara-sprites.png') 0 0 no-repeat;
             display: inline-block;
@@ -133,7 +133,9 @@ div.amara-tools {
         }
         ul.amara-displays {
             border-left: 1px solid #2B2C2D;
+            border-right: 1px solid #2B2C2D;
             display: inline-block;
+            float: left;
             height: 36px;
             margin: 0;
             padding: 0 10px;
@@ -163,6 +165,22 @@ div.amara-tools {
                         }
                     }
                 }
+            }
+        }
+        div.amara-languages {
+            border-right: 1px solid #2B2C2D;
+            display: inline-block;
+            float: left;
+            height: 36px;
+            padding: 0 10px;
+
+            .amara-current-language {
+                color: #DEDEDE;
+                display: block;
+                font: normal 12px Tahoma;
+                height: 36px;
+                padding: 10px 5px;
+                text-decoration: none;
             }
         }
     }

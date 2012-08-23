@@ -226,7 +226,12 @@
                             // Grab the subtitles for the initial language and do yo' thang.
                             if (that.model.get('is_on_amara')) {
 
+                                // Build the language selection dropdown menu.
+                                that.buildLanguageSelector();
+
                                 // Make the request to fetch the initial subtitles.
+                                //
+                                // TODO: This needs to be an option.
                                 that.fetchSubtitles(that.model.get('initial_language'), function() {
 
                                     // When we've got a response with the subtitles, start building
@@ -245,6 +250,13 @@
 
             },
 
+            buildLanguageSelector: function() {
+                var langs = this.model.get('languages');
+                if (langs.length) {
+                } else {
+                    // We have no languages.
+                }
+            },
             buildSubtitles: function(language) {
 
                 // Get the subtitle sets for this language.
@@ -266,6 +278,8 @@
                     }
 
                     this.$popSubtitlesContainer = $('div.amara-popcorn-subtitles', this.$el);
+
+                    this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
                 }
             },
             buildTranscript: function(language) {
@@ -300,9 +314,21 @@
                             container: this.$transcriptBody.get(0)
                         });
                     }
+
+                    // TODO: Set the language selector to this language if there is a language selector.
+
                 } else {
                     $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
                 }
+            },
+
+            // This is a utility function to grab a language's name from a language code.
+            // We won't need this once we update our API to return the language name with
+            // the subtitles.
+            getLanguageNameForCode: function(languageCode) {
+                var languages = this.model.get('languages');
+                var language = __.find(languages, function(l) { return l.code === languageCode; });
+                return language.name;
             },
 
             // Make a call to the Amara API and retrieve a set of subtitles for a specific
@@ -338,12 +364,16 @@
                 return false;
             },
             toggleSubtitlesDisplay: function(e) {
+
+                // TODO: This button needs to be disabled unless we have subtitles to toggle.
                 this.$popSubtitlesContainer.toggle();
                 this.$subtitlesButton.toggleClass('amara-button-enabled');
                 return false;
             },
             toggleTranscriptDisplay: function() {
-                this.$transcript.toggle();
+
+                // TODO: This button needs to be disabled unless we have a transcript to toggle.
+                this.$amaraTranscript.toggle();
                 this.$transcriptButton.toggleClass('amara-button-enabled');
                 return false;
             },
@@ -362,13 +392,16 @@
 
             templateHTML: '' +
                 '<div class="amara-tools" style="width: {{ width }}px;">' +
-                '    <div class="amara-bar">' +
-                //'        <a href="#" class="amara-share-button"></a>' +
-                '        <a href="{{ video_url }}" target="blank" class="amara-logo">Amara</a>' +
-                '        <ul class="amara-displays">' +
-                '            <li><a href="#" class="amara-transcript-button"></a></li>' +
-                '            <li><a href="#" class="amara-subtitles-button"></a></li>' +
+                '    <div class="amara-bar amara-group">' +
+                //'        <a href="#" class="amara-share-button amara-button"></a>' +
+                '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button">Amara</a>' +
+                '        <ul class="amara-displays amara-group">' +
+                '            <li><a href="#" class="amara-transcript-button amara-button"></a></li>' +
+                '            <li><a href="#" class="amara-subtitles-button amara-button"></a></li>' +
                 '        </ul>' +
+                '        <div class="amara-languages">' +
+                '            <a href="#" class="amara-current-language">Loading&hellip;</a>' +
+                '        </div>' +
                 '    </div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
@@ -392,11 +425,18 @@
                 '</div>',
 
             cacheNodes: function() {
-                this.$amaraTools = $('div.amara-tools', this.$el);
-                this.$transcript = $('div.amara-transcript', this.$amaraTools);
-                this.$transcriptBody = $('div.amara-transcript-body', this.$transcript);
-                this.$transcriptButton = $('a.amara-transcript-button', this.$amaraTools);
-                this.$subtitlesButton = $('a.amara-subtitles-button', this.$amaraTools);
+                this.$amaraTools       = $('div.amara-tools',      this.$el);
+                this.$amaraBar         = $('div.amara-bar',        this.$amaraTools);
+                this.$amaraTranscript  = $('div.amara-transcript', this.$amaraTools);
+
+                this.$amaraDisplays    = $('ul.amara-displays',         this.$amaraTools);
+                this.$transcriptButton = $('a.amara-transcript-button', this.$amaraDisplays);
+                this.$subtitlesButton  = $('a.amara-subtitles-button',  this.$amaraDisplays);
+
+                this.$amaraLanguages   = $('div.amara-languages',       this.$amaraTools);
+                this.$amaraCurrentLang = $('a.amara-current-language',  this.$amaraLanguages);
+
+                this.$transcriptBody   = $('div.amara-transcript-body', this.$amaraTranscript);
             }
 
         });
