@@ -273,8 +273,8 @@
             },
             buildSubtitles: function(language) {
 
-                // TODO: We need to kill all subtitle plugins:
-                // pop.removeTrackEvent('amarasubtitle');
+                // Remove any existing subtitle events.
+                this.pop.removeTrackEvent('amarasubtitle');
 
                 // Get the subtitle sets for this language.
                 var subtitleSets = this.model.subtitles.where({'language': language});
@@ -301,8 +301,8 @@
             },
             buildTranscript: function(language) {
 
-                // TODO: We need to kill all transcript plugins:
-                // pop.removeTrackEvent('amaratranscript');
+                // Remove any existing transcript events.
+                this.pop.removeTrackEvent('amaratranscript');
 
                 var subtitleSet;
 
@@ -389,8 +389,6 @@
 
                 var that = this;
                 var lang = $(e.target).data('language');
-
-                this.buildSubtitles(lang);
 
                 this.fetchSubtitles(lang, function() {
                     that.buildTranscript(lang);
