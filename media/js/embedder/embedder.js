@@ -273,6 +273,9 @@
             },
             buildSubtitles: function(language) {
 
+                // TODO: We need to kill all subtitle plugins:
+                // pop.removeTrackEvent('amarasubtitle');
+
                 // Get the subtitle sets for this language.
                 var subtitleSets = this.model.subtitles.where({'language': language});
 
@@ -297,6 +300,9 @@
                 }
             },
             buildTranscript: function(language) {
+
+                // TODO: We need to kill all transcript plugins:
+                // pop.removeTrackEvent('amaratranscript');
 
                 var subtitleSet;
 
