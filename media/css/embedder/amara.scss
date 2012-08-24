@@ -173,14 +173,51 @@ div.amara-tools {
             float: left;
             height: 36px;
             padding: 0 10px;
+            position: relative;
+            width: 30%;
 
             .amara-current-language {
+                // TODO: Have the CSS compiler convert these to absolute URLs.
+                background: transparent url('/site_media/images/embedder/amara-sprites.png') right -139px no-repeat;
                 color: #DEDEDE;
                 display: block;
                 font: normal 12px Tahoma;
                 height: 36px;
-                padding: 10px 5px;
+                padding: 10px 20px 10px 5px;
+                overflow: hidden;
                 text-decoration: none;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 100%;
+                @include opacity(.5);
+                -webkit-transition: opacity .03s linear;
+                -moz-transition: opacity .03s linear;
+
+                &:hover {
+                    @include opacity(1);
+                }
+            }
+            ul.amara-languages-list {
+                background: #1D1E1F;
+                display: none;
+                left: 0;
+                margin: 0;
+                padding: 20px;
+                position: absolute;
+                top: 36px;
+                width: 100%;
+
+                li {
+                    list-style-type: none;
+
+                    a {
+                        color: #DEDEDE;
+
+                        &:hover {
+                            color: #FFF;
+                        }
+                    }
+                }
             }
         }
     }
