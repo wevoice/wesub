@@ -1167,7 +1167,7 @@ class Application(models.Model):
             api_application_new.send(self)
 
     def __unicode__(self):
-        return "Application: %s - %s - %s" % (self.team.slug, self.user.username, self.status)
+        return "Application: %s - %s - %s" % (self.team.slug, self.user.username, self.get_status_display())
 
 # Invites
 class InviteExpiredException(Exception):

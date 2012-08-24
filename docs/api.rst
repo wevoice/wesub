@@ -877,3 +877,5 @@ Applications can have their statuses updated:
 .. http:put:: /api2/partners/teams/[team-slug]/application/[application-id]/
 
     :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'
+
+Note that if an application is pending (has the status='Pending'), the API can set it to whatever new status. Else, if the application has already been approved or denied, you won't be able to set the new status. For cases were an approval was wrongly issues, you'd want to remove the team member. Otherwise you'd want to invite the user to the team.
