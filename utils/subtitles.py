@@ -500,6 +500,14 @@ class DfxpSubtitleParser(SubtitleParser):
         els = [x for x in node.childNodes if hasattr(x, 'tagName') and x.tagName == 'span' and x.getAttribute(attrname) == attrvalue]
         for x  in els:
             x.tagName = tagname
+            # if you have text like <i>hey, </i><span>you</span>, the markdown processor
+            # will get confused (it needs to see *hey,* , not *hey, * .
+            # this ugly hack shifts the space to the beginning of the next node. will probably
+            # break under various other edge cases. Ideas?
+            if x.firstChild and len(x.firstChild.nodeValue.rstrip()) != x.firstChild.nodeValue and x.nextSibling:
+                x.firstChild.nodeValue = x.firstChild.nodeValue.rstrip()
+                if x.nextSibling and x.nextSibling.firstChild and not x.nextSibling.firstChild.nodeValue.startswith(" "):
+                    x.nextSibling.firstChild.nodeValue = " " + x.nextSibling.firstChild.nodeValue
             x.removeAttribute(attrname)
 
     def _get_data(self, node):
