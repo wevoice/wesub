@@ -475,7 +475,7 @@ class TeamBlockSettingsTest(TestCase):
             team.settings.all().delete()
             Message.objects.all().delete()
             if setting_name == 'block_application_sent_message':
-                pass #import pdb;pdb.set_trace()
+                pass
             function.run(*args)
             self.assertTrue(Message.objects.count() > 0, "%s is off, so this message should be sent" % setting_name)
             Setting.objects.create(team=team, key=Setting.KEY_IDS[setting_name])

@@ -99,7 +99,7 @@ div.amara-tools {
         @include multi-border-radius(0, 0, 3px, 3px);
         @include vertical-gradient(#1B1C1D, #212223);
 
-        a {
+        a.amara-button {
             // TODO: Have the CSS compiler convert these to absolute URLs.
             background: transparent url('/site_media/images/embedder/amara-sprites.png') 0 0 no-repeat;
             display: inline-block;
@@ -133,7 +133,9 @@ div.amara-tools {
         }
         ul.amara-displays {
             border-left: 1px solid #2B2C2D;
+            border-right: 1px solid #2B2C2D;
             display: inline-block;
+            float: left;
             height: 36px;
             margin: 0;
             padding: 0 10px;
@@ -160,6 +162,59 @@ div.amara-tools {
 
                         &:active {
                             background-position: 6px -85px;
+                        }
+                    }
+                }
+            }
+        }
+        div.amara-languages {
+            border-right: 1px solid #2B2C2D;
+            display: inline-block;
+            float: left;
+            height: 36px;
+            padding: 0 10px;
+            position: relative;
+            width: 30%;
+
+            .amara-current-language {
+                // TODO: Have the CSS compiler convert these to absolute URLs.
+                background: transparent url('/site_media/images/embedder/amara-sprites.png') right -139px no-repeat;
+                color: #DEDEDE;
+                display: block;
+                font: normal 12px Tahoma;
+                height: 36px;
+                padding: 10px 20px 10px 5px;
+                overflow: hidden;
+                text-decoration: none;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 100%;
+                @include opacity(.5);
+                -webkit-transition: opacity .03s linear;
+                -moz-transition: opacity .03s linear;
+
+                &:hover {
+                    @include opacity(1);
+                }
+            }
+            ul.amara-languages-list {
+                background: #1D1E1F;
+                display: none;
+                left: 0;
+                margin: 0;
+                padding: 20px;
+                position: absolute;
+                top: 36px;
+                width: 100%;
+
+                li {
+                    list-style-type: none;
+
+                    a {
+                        color: #DEDEDE;
+
+                        &:hover {
+                            color: #FFF;
                         }
                     }
                 }
@@ -204,6 +259,7 @@ div.amara-tools {
         div.amara-transcript-body {
             margin: 40px;
             max-height: 300px;
+            padding-right: 20px;
             overflow: auto;
 
             &::-webkit-scrollbar {

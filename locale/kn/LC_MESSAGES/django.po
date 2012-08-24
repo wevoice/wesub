@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-23 01:36-0500\n"
+"POT-Creation-Date: 2012-08-24 01:36-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -642,11 +642,11 @@ msgstr ""
 msgid "Admins only"
 msgstr ""
 
-#: apps/teams/models.py:117 apps/teams/models.py:2464
+#: apps/teams/models.py:117 apps/teams/models.py:2465
 msgid "name"
 msgstr ""
 
-#: apps/teams/models.py:118 apps/teams/models.py:2465
+#: apps/teams/models.py:118 apps/teams/models.py:2466
 msgid "slug"
 msgstr ""
 
@@ -3333,7 +3333,9 @@ msgid ""
 "of quality at remarkably low costs.  You have total flexibility: build a "
 "volunteer community, integrate paid captioning and translation services, "
 "manage internal staff or contractors, and integrate directly with your "
-"distribution and embedding platform through our powerful API.\n"
+"distribution and embedding platform through our powerful API. <a href="
+"\"mailto:enterprise@amara.org\">Contact us</a> for more information and "
+"pricing.\n"
 "            "
 msgstr ""
 

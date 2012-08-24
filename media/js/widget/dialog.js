@@ -229,7 +229,7 @@ unisubs.Dialog.prototype.saveWork = function(closeAfterSave, saveForLater) {
                 alert("We had a problem logging you in. You might want to check " +
                       "your web connection and try again.\n\nYou can also download " +
                       "your subtitles using the download button in the lower right corner " +
-                      "of the dialog and email them to widget-logs@universalsubtitles.org.");
+                      "of the dialog and upload them once you've logged in.");
             }
         });
     } else {

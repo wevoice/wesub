@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-23 01:33-0500\n"
-"PO-Revision-Date: 2012-08-23 06:53+0000\n"
+"POT-Creation-Date: 2012-08-24 01:32-0500\n"
+"PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/universalsubtitles/language/lv_LV/)\n"
 "MIME-Version: 1.0\n"
@@ -645,11 +645,11 @@ msgstr "Pārvaldnieki un administratori"
 msgid "Admins only"
 msgstr "Tikai administratori"
 
-#: apps/teams/models.py:117 apps/teams/models.py:2464
+#: apps/teams/models.py:117 apps/teams/models.py:2465
 msgid "name"
 msgstr "nosaukums"
 
-#: apps/teams/models.py:118 apps/teams/models.py:2465
+#: apps/teams/models.py:118 apps/teams/models.py:2466
 msgid "slug"
 msgstr ""
 
@@ -3261,7 +3261,7 @@ msgstr "Pasaules attīstītāka subtitru platforma"
 #: templates/enterprise.html:40
 msgid ""
 "\n"
-"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API.\n"
+"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API. <a href=\"mailto:enterprise@amara.org\">Contact us</a> for more information and pricing.\n"
 "            "
 msgstr ""
 

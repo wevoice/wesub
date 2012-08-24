@@ -31,8 +31,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-23 01:33-0500\n"
-"PO-Revision-Date: 2012-08-23 06:52+0000\n"
+"POT-Creation-Date: 2012-08-24 01:32-0500\n"
+"PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/universalsubtitles/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
@@ -665,11 +665,11 @@ msgstr "Moderadores y administradores"
 msgid "Admins only"
 msgstr "Sólo administradores"
 
-#: apps/teams/models.py:117 apps/teams/models.py:2464
+#: apps/teams/models.py:117 apps/teams/models.py:2465
 msgid "name"
 msgstr "nombre"
 
-#: apps/teams/models.py:118 apps/teams/models.py:2465
+#: apps/teams/models.py:118 apps/teams/models.py:2466
 msgid "slug"
 msgstr "eslogan"
 
@@ -3278,9 +3278,9 @@ msgstr "La Plataforma para Subtítulos Más Avanzada del Mundo."
 #: templates/enterprise.html:40
 msgid ""
 "\n"
-"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API.\n"
+"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API. <a href=\"mailto:enterprise@amara.org\">Contact us</a> for more information and pricing.\n"
 "            "
-msgstr "\n                Nuestra platforma empresarial ofrece una capacidad imbatible para gestionar procesos de creación y edición de subtítulos, así como excepcionales niveles de calidad a costos notablemente bajos.  Tú tienes flexibilidad total: arma una comunidad de voluntarios, integra servicios de subtitulación y traducción, administra el personal interno o contratistas, e integra directamente con tu plataforma de distribución e incrustación a través de nuestro poderoso API.\n            "
+msgstr ""
 
 #: templates/enterprise.html:46
 msgid "World-class Users"

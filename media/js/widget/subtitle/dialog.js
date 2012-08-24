@@ -98,7 +98,7 @@ unisubs.subtitle.Dialog.prototype.showDownloadLink_ = function() {
     var that = this;
     this.getRightPanelInternal().showDownloadLink(
         function() {
-            return that.captionSet_.makeJsonSubs();
+            return that.makeJsonSubs();
         });
 };
 unisubs.subtitle.Dialog.prototype.enterDocument = function() {

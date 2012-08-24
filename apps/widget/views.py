@@ -101,7 +101,6 @@ def convert_subtitles(request):
                     'start_of_paragraph': s['start_of_paragraph'],
                 })
 
-            #import pdb;pdb.set_trace()
             # TODO: Serialize these subtitles into the format given.
 
             # When we have newly serialized subtitles, put a stringified version of them

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-23 01:33-0500\n"
-"PO-Revision-Date: 2012-08-23 06:52+0000\n"
+"POT-Creation-Date: 2012-08-24 01:32-0500\n"
+"PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -645,11 +645,11 @@ msgstr "Gestors i administradors"
 msgid "Admins only"
 msgstr "Només Administradors"
 
-#: apps/teams/models.py:117 apps/teams/models.py:2464
+#: apps/teams/models.py:117 apps/teams/models.py:2465
 msgid "name"
 msgstr "nom"
 
-#: apps/teams/models.py:118 apps/teams/models.py:2465
+#: apps/teams/models.py:118 apps/teams/models.py:2466
 msgid "slug"
 msgstr "eslògan"
 
@@ -3258,9 +3258,9 @@ msgstr "La plataforma de subtítols més avançada del món"
 #: templates/enterprise.html:40
 msgid ""
 "\n"
-"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API.\n"
+"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API. <a href=\"mailto:enterprise@amara.org\">Contact us</a> for more information and pricing.\n"
 "            "
-msgstr "\nLa nostra plataforma per a empreses ofereix una habilitat inigualable per a gestionar els processos de creació i edició de subtítol, i obté uns excel·lents nivells de qualitat amb un increïble baix cost.Teniu la total flexibilitat per a: construir una comunitat de voluntaris, integrar serveis d'etiquetat i traducció de pagament, gestionar el personal intern o contractistes, i integrar-ho directament amb la vostra plataforma de distribució i incrustació mitjançant la nostra potent API."
+msgstr ""
 
 #: templates/enterprise.html:46
 msgid "World-class Users"

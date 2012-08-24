@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-23 01:33-0500\n"
-"PO-Revision-Date: 2012-08-23 06:53+0000\n"
+"POT-Creation-Date: 2012-08-24 01:32-0500\n"
+"PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Greek (Greece) (http://www.transifex.com/projects/p/universalsubtitles/language/el_GR/)\n"
 "MIME-Version: 1.0\n"
@@ -642,11 +642,11 @@ msgstr "Διευθυντές και Διαχειριστές"
 msgid "Admins only"
 msgstr "Μόνο για διαχειριστές"
 
-#: apps/teams/models.py:117 apps/teams/models.py:2464
+#: apps/teams/models.py:117 apps/teams/models.py:2465
 msgid "name"
 msgstr "όνομα"
 
-#: apps/teams/models.py:118 apps/teams/models.py:2465
+#: apps/teams/models.py:118 apps/teams/models.py:2466
 msgid "slug"
 msgstr ""
 
@@ -3255,9 +3255,9 @@ msgstr "Η πιο προηγμένη πλατφόρμα στον κόσμο γι
 #: templates/enterprise.html:40
 msgid ""
 "\n"
-"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API.\n"
+"                Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API. <a href=\"mailto:enterprise@amara.org\">Contact us</a> for more information and pricing.\n"
 "            "
-msgstr "\n                Η επιχειρηματική μας πλατφόρμα προσφέρει μία ασύγκριτη ικανότητα για διαχείριση της δημιουργίας υποτίτλων και για τις διδικασίες επεξεργασίας /τροποποίησης, και πετυχαίνει εξαιρετικά επίπεδα πιότητας, σε αξιοσημείωτα χαμηλές τιμές.  Έχετε την απόλυτη ευελιξία: χτίστε μία κοινότητα εθελοντών, συνδυάστε την επί πληρωμή μεταγραφή διαλόγων/ captioning, με τις υπηρεσίες μετάφρασης, διαχειρισθείτε το εσωτερικό σας προσωπικό ή τους υπεργολάβους/ contractors, και συνδυάστε την κατ' ευθείαν με τη δικιά σας διανομή και πλατφόρμα ενσωμάτωσης, μέσω του δικού μας ισχυρού API.\n            "
+msgstr ""
 
 #: templates/enterprise.html:46
 msgid "World-class Users"

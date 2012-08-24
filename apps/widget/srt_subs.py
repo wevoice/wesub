@@ -270,6 +270,7 @@ import re
 class TTMLSubtitles(BaseSubtitles):
     file_type = 'xml'
     remove_re = re.compile(u'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]')
+    use_named_styles = True
     STYLES = {
 
         "strong": {
@@ -285,7 +286,7 @@ class TTMLSubtitles(BaseSubtitles):
 
     def __unicode__(self):
         node = self.xml_node()
-        return node.toprettyxml(newl="")
+        return node.toxml()
 
     def _get_attributes(self, item):
         attrib = {}
@@ -294,8 +295,20 @@ class TTMLSubtitles(BaseSubtitles):
         return attrib
 
     def xml_node(self):
-        xmlt = """<tt xml:lang="%s" xmlns="http://www.w3.org/ns/ttml"><head><metadata/><styling/><layout/></head><body region="subtitleArea"><div></div></body></tt>""" % unilangs.to_bcp47(self.sl.language)
-
+        xmlt = """<tt xml:lang="%s" xmlns="http://www.w3.org/ns/ttml"
+                      xmlns:ttp="http://www.w3.org/ns/ttml#parameter"
+                      xmlns:tts="http://www.w3.org/ns/ttml#styling" >
+        <head>
+            <metadata/>
+            <styling/>
+            <layout/>
+        </head>
+        <body region="subtitleArea">
+            <div>
+            </div>
+        </body>
+        </tt>""" % unilangs.to_bcp47(self.sl.language)
+        from xml.dom import expatbuilder
         dom = xml.dom.minidom.parseString(xmlt)
 	styling = dom.getElementsByTagName('head')[0].getElementsByTagName('styling')[0]
         styling.setAttribute("xmlns:tts", "http://www.w3.org/2006/10/ttaf1#styling")
@@ -308,16 +321,24 @@ class TTMLSubtitles(BaseSubtitles):
             styling.appendChild(style)
 
 	div = dom.getElementsByTagName('tt')[0].getElementsByTagName('body')[0].getElementsByTagName('div')[0]
-        for item in self.subtitles:
+        italic_declaration = 'tts:fontStyle="italic"' if TTMLSubtitles.use_named_styles else 'style="emphasis"'
+        bold_declaration = 'tts:fontWeight="bold"' if TTMLSubtitles.use_named_styles else 'style="strong"'
+        underline_declaration = 'tts:textDecoration="underline"' if TTMLSubtitles.use_named_styles else 'style="underlined"'
+            
+        for i,item in enumerate(self.subtitles):
             if item['text'] and self.isnumber(item['start']) and self.isnumber(item['end']):
                 # as we're replacing new lines with <br>s we need to create
                 # the element from a fragment,and also from the formateed <b> and <i> to
                 # the correct span / style
                 content = item['text'].replace(u'\n', u'<br/>').strip()
-                content = content.replace(u"<b>", u'<span style="strong">').replace(u"</b>", u'</span>')
-                content = content.replace(u"<i>", u'<span style="emphasis">').replace(u"</i>", u'</span>')
-                content = content.replace(u"<u>", u'<span style="underlined">').replace(u"</u>", u'</span>')
-                node = xml.dom.minidom.parseString((u"<p>%s</p>" % content).encode('utf-8'))
+                content = content.replace(u"<b>", u'<span  %s>' % (bold_declaration)).replace(u"</b>", u'</span>')
+                content = content.replace(u"<i>", u'<span  %s>' % (italic_declaration)).replace(u"</i>", u'</span>')
+                content = content.replace(u"<u>", u'<span  %s>' % (underline_declaration)).replace(u"</u>", u'</span>')
+                xml_str = (u'<p xml:id="sub-%s">%s</p>' % (i,content)).encode('utf-8')
+        
+                # we need to use this parser to make sure namespace chekcing is off
+                # else the node can't be generated without the proper context
+                node = expatbuilder.parseString(xml_str, namespaces=False)
                 child = node.documentElement
 
                 for k,v in self._get_attributes(item).items():
