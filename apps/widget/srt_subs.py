@@ -286,7 +286,7 @@ class TTMLSubtitles(BaseSubtitles):
 
     def __unicode__(self):
         node = self.xml_node()
-        return node.toprettyxml(newl="")
+        return node.toxml()
 
     def _get_attributes(self, item):
         attrib = {}
