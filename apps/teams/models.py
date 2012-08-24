@@ -1086,63 +1086,85 @@ class Application(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(blank=True, null=True)
 
+    # free text keeping a log of changes to this application
+    history = models.TextField(blank=True, null=True)
+
     objects = ApplicationManager()
     class Meta:
         unique_together = (('team', 'user', 'status'),)
 
 
-    def approve(self):
+    def approve(self, author, interface):
         """Approve the application.
 
         This will create an appropriate TeamMember if this application has
         not been already acted upon
         """
-        if self.status == Application.STATUS_MEMBER_LEFT:
+        if self.status not in (Application.STATUS_PENDING, Application.STATUS_MEMBER_LEFT):
             raise ApplicationInvalidException("")
         member, created = TeamMember.objects.get_or_create(team=self.team, user=self.user)
         if created:
             notifier.team_member_new.delay(member.pk)
         self.modified = datetime.datetime.now()
         self.status = Application.STATUS_APPROVED
-        self.save()
+        self.save(author=author, interface=interface)
         return self
 
-    def deny(self):
+    def deny(self, author, interface):
         """
         Marks the application as not approved, then
         Queue a Celery task that will handle properly denying this
         application.
         """
-        if self.status == Application.STATUS_MEMBER_LEFT:
+        if self.status != Application.STATUS_PENDING:
             raise ApplicationInvalidException("")
         self.modified = datetime.datetime.now()
         self.status = Application.STATUS_DENIED
-        self.save()
+        self.save(author=author, interface=interface)
         notifier.team_application_denied.delay(self.pk)
         return self
 
-    def save(self, dispatches_http_callback=True, *args, **kwargs):
-        is_new = not bool(self.pk)
-        super(Application, self).save(*args, **kwargs)
-        if dispatches_http_callback and is_new:
-            from teams.signals import api_application_new
-            api_application_new.send(self)
-
-    def on_member_leave(self):
+    def on_member_leave(self, author, interface):
         """
         Marks the appropriate status, but users can still
         reapply to a team if they so desire later.
         """
         self.status = Application.STATUS_MEMBER_LEFT
-        self.save()
+        self.save(author=author, interface=interface)
 
-    def on_member_removed(self):
+    def on_member_removed(self, author, interface):
         """
         Marks the appropriate status so that user's cannot reapply
         to a team after being removed.
         """
         self.status = Application.STATUS_MEMBER_REMOVED
-        self.save()
+        self.save(author=author, interface=interface)
+
+    def _generate_history_line(self, new_status, author=None, interface=None):
+        author = author or "?"
+        interface = interface or "web UI"
+        new_status = new_status if new_status != None else Application.STATUS_PENDING
+        for value,name in Application.STATUSES:
+            if value == new_status:
+                status = name
+        assert status
+        return u"%s by %s from %s (%s)\n" % (status, author, interface, datetime.datetime.now())
+
+    def save(self, dispatches_http_callback=True, author=None, interface=None, *args, **kwargs):
+        """
+        Saves the model, but also appends a line on the history for that
+        model, like these:
+           - CoolGuy Approved through the web UI.
+           - Arthur Left team through the web UI.
+        This way,we can keep one application per user per team, never
+        delete them (so the messages stay current) and we still can
+        track history
+        """
+        self.history = (self.history or "") + self._generate_history_line(self.status, author, interface)
+        super(Application, self).save(*args, **kwargs)
+        if dispatches_http_callback:
+            from teams.signals import api_application_new
+            api_application_new.send(self)
 
     def __unicode__(self):
         return "Application: %s - %s - %s" % (self.team.slug, self.user.username, self.status)
@@ -2318,7 +2340,8 @@ class TeamNotificationSetting(models.Model):
     EVENT_SUBTITLE_REJECTED = "subs-rejected"
     EVENT_APPLICATION_NEW = 'application-new'
 
-    team = models.OneToOneField(Team, related_name="notification_settings")
+    team = models.OneToOneField(Team, related_name="notification_settings",
+            null=True, blank=True)
     partner = models.OneToOneField('Partner', null=True, blank=True)
 
     # the url to post the callback notifing partners of new video activity
@@ -2442,6 +2465,15 @@ class Partner(models.Model):
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
     can_request_paid_captions = models.BooleanField(default=False)
+    
+    # The `admins` field specifies users who can do just about anything within
+    # the partner realm.
+    admins = models.ManyToManyField('auth.CustomUser',
+            related_name='managed_partners', blank=True, null=True)
 
     def __unicode__(self):
         return self.name
+
+    def is_admin(self, user):
+        return user in self.admins.all()
+

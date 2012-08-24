@@ -239,4 +239,10 @@ div.amara-tools {
 }
 div.amara-popcorn-subtitles {
     display: none;
+
+    div {
+        background: rgba(0, 0, 0, .8);
+        padding: 10px 20px;
+        @include border-radius(5px);
+    }
 }
