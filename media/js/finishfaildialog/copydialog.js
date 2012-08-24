@@ -120,7 +120,7 @@ unisubs.finishfaildialog.CopyDialog.showForErrorLog = function(log) {
 };
 unisubs.finishfaildialog.CopyDialog.showForSubs = function(jsonSubs, languageCode) {
     var copyDialog = new unisubs.finishfaildialog.CopyDialog(
-        "Below are your subtitles. You may use the dropdown to change the format. Please copy and paste them into a text file. You can email them to us at widget-logs@universalsubtitles.org.",
+        "Copy/paste these subtitles into a text editor and save. Use the dropdown to choose a format (make sure the file extension matches the format you choose). You'll be able to upload the subtitles to your video later.",
         unisubs.finishfaildialog.CopyDialog.subsToString_(jsonSubs),
         jsonSubs,
         languageCode);

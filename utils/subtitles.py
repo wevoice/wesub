@@ -393,7 +393,9 @@ class TtmlSubtitleParser(SubtitleParser):
 
     def __init__(self, subtitles):
         try:
-            dom = parseString(subtitles.encode('utf8'))
+            # do not pass utf-8 econded strings. If the xml declaration is
+            # something else, the parser will complain otherwise
+            dom = parseString(subtitles)
             self.nodes = dom.getElementsByTagName('body')[0].getElementsByTagName('p')
         except (ExpatError, IndexError):
             raise SubtitleParserError('Incorrect format of TTML subtitles')
@@ -447,7 +449,9 @@ class DfxpSubtitleParser(SubtitleParser):
 
     def __init__(self, subtitles):
         try:
-            dom = parseString(subtitles.encode('utf8'))
+            # do not pass utf-8 econded strings. If the xml declaration is
+            # something else, the parser will complain otherwise
+            dom = parseString(subtitles)
             self.style_map = generate_style_map(dom)
             t = dom.getElementsByTagName('tt')[0]
             
