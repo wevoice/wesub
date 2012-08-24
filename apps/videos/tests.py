@@ -67,7 +67,7 @@ from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
 from vidscraper.sites import blip
 from widget import video_cache
 from widget.rpc import Rpc
-from widget.srt_subs import DFXPSubtitles
+from widget.srt_subs import TTMLSubtitles
 from widget.tests import (
     create_two_sub_dependent_session, create_two_sub_session, RequestMockup,
     NotAuthenticatedUser
@@ -2516,6 +2516,7 @@ class BaseDownloadTest(object):
             'video_id': language.video.video_id,
             'lang_pk': language.pk
         })
+        self.assertEqual(res.status_code, 200)
         return res.content
 
 class TestSRT(WebUseTest, BaseDownloadTest):
@@ -2569,6 +2570,9 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
         self.language = SubtitleLanguage.objects.get_or_create(
             video=self.video, is_forked=True, language='en')[0]
 
+    def tearDown(self):
+        TTMLSubtitles.use_named_styles = True
+
     def test_dfxp_parser(self):
         fixture_path = os.path.join(settings.PROJECT_ROOT, 'apps', 'videos', 'fixtures', 'sample.dfxp')
         input_text =  codecs.open(fixture_path, 'r', encoding='utf-8').read()
@@ -2588,12 +2592,21 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
         self.assertEquals(bold_text, "This should be in **bold**")
 
     def test_dfxp_serializer(self):
+        TTMLSubtitles.use_named_styles = False
         add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
         content = self._download_subs(self.language, 'dfxp')
         self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
         self.assertTrue(re.findall('<span style="strong">[\s]*bold[\s]*</span>', content))
         self.assertTrue(re.findall('<span style="emphasis">[\s]*italic[\s]*</span>', content))
         self.assertTrue(re.findall('<span style="underlined">[\s]*underline[\s]*</span>', content))
+
+    def test_dfxp_serializer_inline(self):
+        add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
+        content = self._download_subs(self.language, 'dfxp')
+        self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
+        self.assertTrue(re.findall('<span tts:fontWeight="bold">[\s]*bold[\s]*</span>', content))
+        self.assertTrue(re.findall('<span tts:fontStyle="italic">[\s]*italic[\s]*</span>', content))
+        self.assertTrue(re.findall('<span tts:textDecoration="underline">[\s]*underline[\s]*</span>', content))
  
 def add_subs(language, subs_texts):
     version = language.version()
