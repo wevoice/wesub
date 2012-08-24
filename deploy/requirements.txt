@@ -9,7 +9,7 @@ PyYAML==3.09
 South==0.7
 kombu==1.4.3
 vendor/django-registration.tar.gz
-vendor/django-piston.tar.gz
+vendor/django-piston-0.2.3.tar.gz
 vendor/django-keyedcache.tar.gz
 vendor/django-storages.tar.gz
 vendor/python-openid-2.2.5.tar.gz
