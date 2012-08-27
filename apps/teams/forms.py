@@ -682,7 +682,15 @@ class UploadDraftForm(forms.Form):
             if not encoding:
                 raise forms.ValidationError(_(u'Can not detect file encoding'))
 
-            self._parser = self._get_parser(subtitles.name)(force_unicode(text, encoding))
+            # for xml based formats, we can't just convert to unicode, as the
+            # parser will complain that the string encoding doesn't match
+            # what's encoding declaration in the xml file if it's not utf-8
+            self.extension = subtitles.name.split('.')[-1].lower()
+            if self.extension not in ('dfxp', 'ttml', 'xml'):
+                decoded = force_unicode(text, encoding)
+            else:
+                decoded = text
+            self._parser = ParserList[self.extension](decoded)
 
             if not self._parser:
                 raise forms.ValidationError(_(u'Incorrect subtitles format'))
