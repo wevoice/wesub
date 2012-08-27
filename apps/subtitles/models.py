@@ -280,6 +280,30 @@ class SubtitleLanguage(models.Model):
 
         self.save()
 
+    def get_description(self):
+        v = self.get_tip()
+
+        if v:
+            return v.description
+
+        return self.video.description
+
+    def get_title(self):
+        v = self.get_tip()
+
+        if v:
+            return v.title
+
+        return self.video.title
+
+    def get_num_versions(self):
+        return self.subtitleversion_set.count()
+
+    def get_subtitle_count(self):
+        tip = self.get_tip()
+        if tip:
+            return tip.get_subtitle_count()
+        return 0
 
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
@@ -488,6 +512,9 @@ class SubtitleVersion(models.Model):
             return [version] + list(mapcat(_ancestors, version.parents.all()))
 
         return set(mapcat(_ancestors, self.parents.all()))
+
+    def get_subtitle_count(self):
+        return len([s for s in self.get_subtitles().subtitle_items()])
 
 
 # Collaborators ---------------------------------------------------------------
