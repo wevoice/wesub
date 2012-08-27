@@ -126,14 +126,6 @@ class SubtitleLanguage(models.Model):
     video = models.ForeignKey(Video, related_name='newsubtitlelanguage_set')
     language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
 
-    # TODO: Remove followers?
-    followers = models.ManyToManyField(User, blank=True,
-                                       related_name='followed_newlanguages')
-
-    # TODO: Remove followers?
-    collaborators = models.ManyToManyField(User, blank=True,
-                                           related_name='collab_newlanguages')
-
     writelock_time = models.DateTimeField(null=True, blank=True,
                                           editable=False)
     writelock_owner = models.ForeignKey(User, null=True, blank=True,
@@ -148,11 +140,16 @@ class SubtitleLanguage(models.Model):
     # These are stored here for speed of retrieval and filtering.  They are
     # updated in the update_signoff_counts() method, which is called from the
     # Collaborator .save() method.
-    unofficial_signoff_count = models.PositiveIntegerField(default=0)
-    official_signoff_count = models.PositiveIntegerField(default=0)
-    pending_signoff_count = models.PositiveIntegerField(default=0)
-    pending_signoff_unexpired_count = models.PositiveIntegerField(default=0)
-    pending_signoff_expired_count = models.PositiveIntegerField(default=0)
+    unofficial_signoff_count = models.PositiveIntegerField(default=0,
+                                                           editable=False)
+    official_signoff_count = models.PositiveIntegerField(default=0,
+                                                         editable=False)
+    pending_signoff_count = models.PositiveIntegerField(default=0,
+                                                        editable=False)
+    pending_signoff_unexpired_count = models.PositiveIntegerField(default=0,
+                                                                  editable=False)
+    pending_signoff_expired_count = models.PositiveIntegerField(default=0,
+                                                                editable=False)
 
     objects = SubtitleLanguageManager()
 
@@ -382,7 +379,7 @@ class SubtitleVersion(models.Model):
 
     def __init__(self, *args, **kwargs):
         """Create a new SubtitleVersion.
-        
+
         You probably don't need this.  You probably want
         apps.subtitles.pipeline.add_subtitles instead.  Or at the very least you
         want the add_version method of SubtitleLanguage instances.

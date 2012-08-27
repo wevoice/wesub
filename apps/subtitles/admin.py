@@ -33,7 +33,7 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
                     'unexpired_pending_collaborators']
     list_filter = ['created', 'language_code']
     search_fields = ['video__title', 'video__video_id', 'language_code']
-    raw_id_fields = ['video', 'followers', 'collaborators']
+    raw_id_fields = ['video']
 
     def unofficial_signoffs(self, o):
         return o.unofficial_signoff_count
