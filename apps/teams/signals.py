@@ -46,12 +46,20 @@ def _teams_to_notify(video):
     video.
     """
     from teams.models import Team
-    return list( Team.objects.filter(teamvideo__video=video, notification_settings__isnull=False))
+    from django.db.models import Q
+    return list(Team.objects.filter(
+        Q(notification_settings__isnull=False) |
+        Q(partner__notification_settings__isnull=False),
+        teamvideo__video=video))
     
 def _execute_video_task(video, event_name):
     from teams import tasks as team_tasks
     from teams.models import  TeamVideo
-    tvs =  list( TeamVideo.objects.filter(video=video, team__notification_settings__isnull=False))
+    from django.db.models import Q
+    tvs =  list(TeamVideo.objects.filter(
+        Q(team__notification_settings__isnull=False) |
+        Q(team__partner__notification_settings__isnull=False),
+        video=video))
     for tv in tvs:
         team_tasks.api_notify_on_video_activity.delay(
             tv.team.pk,

@@ -2314,7 +2314,11 @@ class TeamNotificationSettingManager(models.Manager):
         try:
             notification_settings = self.get(team__id=team_pk)
         except TeamNotificationSetting.DoesNotExist:
-            return
+            try:
+                team = Team.objects.get(pk=team_pk)
+                notification_settings = self.get(partner=team.partner)
+            except TeamNotificationSetting.DoesNotExist:
+                return
         notification_settings.notify(event_name, **kwargs)
 
 class TeamNotificationSetting(models.Model):
@@ -2342,7 +2346,8 @@ class TeamNotificationSetting(models.Model):
 
     team = models.OneToOneField(Team, related_name="notification_settings",
             null=True, blank=True)
-    partner = models.OneToOneField('Partner', null=True, blank=True)
+    partner = models.OneToOneField('Partner',
+        related_name="notification_settings",  null=True, blank=True)
 
     # the url to post the callback notifing partners of new video activity
     request_url = models.URLField(blank=True, null=True)
@@ -2367,8 +2372,8 @@ class TeamNotificationSetting(models.Model):
 
     def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
-        
-        notification = self.get_notification_class()(self.team, event_name,  **kwargs)
+        notification = self.get_notification_class()(self.team, self.partner,
+                event_name,  **kwargs)
         if self.request_url:
             success, content = notification.send_http_request(
                 self.request_url,
@@ -2380,6 +2385,8 @@ class TeamNotificationSetting(models.Model):
         return
 
     def __unicode__(self):
+        if self.partner:
+            return u'NotificationSettings for partner %s' % self.partner
         return u'NotificationSettings for team %s' % self.team
 
 
