@@ -1,5 +1,5 @@
 (function (Popcorn) {
-    Popcorn.plugin( 'amaratranscript' , {
+    Popcorn.plugin('amaratranscript', {
         _setup : function(options) {
 
             options.pop = this;
@@ -29,11 +29,8 @@
         end: function(event, options){
             options.lineHtml.classList.remove('current-subtitle');
         },
-        frame: function(event, options) {
-
-        },
-        toString: function(event, options) {
-
-        } 
+        _teardown: function (options, start) {
+            options.container.removeChild(options.lineHtml);
+        }
     });
 })(Popcorn);
