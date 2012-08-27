@@ -77,13 +77,14 @@ class BaseNotification(object):
         return video_id if video_id else video.video_id
 
 
-    def __init__(self, team, event_name,  **kwargs):
+    def __init__(self, team, partner, event_name,  **kwargs):
         """
         If the event is about new / edits to videos, then language_pk
         will be None else it can be about languages or subtitles.
         """
         from videos.models import Video
         self.team = team
+        self.partner = partner
         video_id  = kwargs.pop('video_id', None)
         if video_id:
             self.video = Video.objects.get(video_id=video_id)
@@ -143,8 +144,11 @@ class BaseNotification(object):
         data = {
             'event': self.event_name,
             'api_url': self.api_url,
-            'team':  self.team.slug,
         }
+        if self.team:
+            data['team'] = self.team.slug
+        if self.partner:
+            data['partner'] = self.partner.slug
         if project:
             data['project'] = project
         if self.video:
@@ -160,7 +164,7 @@ class BaseNotification(object):
             success =  200<= resp.status <400
             if success is False:
                 logger.error("Failed to send team notification to %s - from teams:%s, status code:%s, response:%s" %(
-                         self.team, url, resp, content ))
+                         self.team or self.partner, url, resp, content ))
                 Meter('http-callback-notification-error').inc()
             else:
                 Meter('http-callback-notification-success').inc()
