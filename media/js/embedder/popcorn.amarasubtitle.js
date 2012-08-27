@@ -12,7 +12,7 @@
         var updatePosition = function() {
             var position = context.position();
 
-            style.fontSize = '18px';
+            style.fontSize = '16px';
             style.width = media.offsetWidth + 'px';
             style.top = position.top  + media.offsetHeight - ctxContainer.offsetHeight - 63 + 'px';
             style.left = position.left + 'px';

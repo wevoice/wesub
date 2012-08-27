@@ -71,7 +71,7 @@ for(var b in a){var c=a[b];f.isFunction(c)||(c=this[a[b]]);if(!c)throw Error('Me
 e.data=JSON.stringify(b.toJSON());g.emulateJSON&&(e.contentType="application/x-www-form-urlencoded",e.data=e.data?{model:e.data}:{});if(g.emulateHTTP&&("PUT"===d||"DELETE"===d))g.emulateJSON&&(e.data._method=d),e.type="POST",e.beforeSend=function(a){a.setRequestHeader("X-HTTP-Method-Override",d)};"GET"!==e.type&&!g.emulateJSON&&(e.processData=!1);return i.ajax(f.extend(e,c))};g.wrapError=function(a,b,c){return function(d,e){e=d===b?e:d;a?a(b,e,c):b.trigger("error",b,e,c)}};var x=function(){},G=function(a,
 b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply(this,arguments)};f.extend(d,a);x.prototype=a.prototype;d.prototype=new x;b&&f.extend(d.prototype,b);c&&f.extend(d,c);d.prototype.constructor=d;d.__super__=a.prototype;return d},n=function(a,b){return!a||!a[b]?null:f.isFunction(a[b])?a[b]():a[b]},t=function(){throw Error('A "url" property or function must be specified');}}).call(this);
 /*
- * popcorn.js version 4d1cd89
+ * popcorn.js version 5f34b14
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
@@ -158,7 +158,7 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "4d1cd89";
+  Popcorn.version = "5f34b14";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -1164,6 +1164,13 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
           fn: track._natives.start
         }
       });
+    } else if ( track._natives ) {
+
+      // Fire a trackadded event
+      obj.emit( "trackadded", Popcorn.extend({}, track, {
+        plugin: track._natives.type,
+        type: "trackadded"
+      }));
     }
   };
 
@@ -1184,7 +1191,8 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
         byStart = [],
         byEnd = [],
         animating = [],
-        history = [];
+        history = [],
+        track;
 
     while ( --length > -1 ) {
       start = obj.data.trackEvents.byStart[ index ];
@@ -1214,6 +1222,9 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
         // If the _id is matched, capture the current index
         if ( start._id === removeId ) {
           indexWasAt = index;
+
+          // cache the track event being removed
+          track = start;
 
           // If a _teardown function was defined,
           // enforce for track event removals
@@ -1277,6 +1288,15 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
 
     // Update track event references
     Popcorn.removeTrackEvent.ref( obj, removeId );
+
+    if ( track && track._natives ) {
+
+      // Fire a trackremoved event
+      obj.emit( "trackremoved", Popcorn.extend({}, track, {
+        plugin: track._natives.type,
+        type: "trackremoved"
+      }));
+    }
   };
 
   // Internal Only - Removes track event references from instance object's trackRefs hash table
@@ -1962,13 +1982,11 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
     find: function( selector, context ) {
       var node = null;
 
-      //  Trim leading/trailing whitespace to avoid false negatives
-      selector = selector.trim();
-
       //  Default context is the `document`
       context = context || document;
 
       if ( selector ) {
+
         //  If the selector does not begin with "#", "." or "[",
         //  it could be either a nodeName or ID w/o "#"
         if ( !rnaiveExpr.test( selector ) ) {
@@ -2476,13 +2494,6 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
   //  ID string matching
   var rIdExp  = /^(#([\w\-\_\.]+))$/;
 
-  var audioExtensions = "ogg|oga|aac|mp3|wav",
-      videoExtensions = "ogg|ogv|mp4|webm",
-      mediaExtensions = audioExtensions + "|" + videoExtensions;
-
-  var audioExtensionRegexp = new RegExp( "^.*\\.(" + audioExtensions + ")($|\\?)" ),
-      mediaExtensionRegexp = new RegExp( "^.*\\.(" + mediaExtensions + ")($|\\?)" );
-
   Popcorn.player = function( name, player ) {
 
     // return early if a player already exists under this name
@@ -2808,114 +2819,73 @@ b,c){var d;d=b&&b.hasOwnProperty("constructor")?b.constructor:function(){a.apply
     };
   };
 
-  // smart will attempt to find you a match, if it does not find a match,
-  // it will attempt to create a video element with the source,
-  // if that failed, it will throw.
+  // Popcorn.smart will attempt to find you a wrapper or player. If it can't do that,
+  // it will default to using an HTML5 video in the target.
   Popcorn.smart = function( target, src, options ) {
-    var playerType,
-        elementTypes = [ "AUDIO", "VIDEO" ],
-        sourceNode,
-        firstSrc,
-        node = Popcorn.dom.find( target ),
-        i, srcResult,
-        canPlayTypeTester = document.createElement( "video" ),
-        canPlayTypes = {
-          "ogg": "video/ogg",
-          "ogv": "video/ogg",
-          "oga": "audio/ogg",
-          "webm": "video/webm",
-          "mp4": "video/mp4",
-          "mp3": "audio/mp3"
-        };
-
-    var canPlayType = function( type ) {
-
-      return canPlayTypeTester.canPlayType( canPlayTypes[ type ] );
-    };
-
-    var canPlaySrc = function( src ) {
-
-      srcResult = mediaExtensionRegexp.exec( src );
-
-      if ( !srcResult || !srcResult[ 1 ] ) {
-        return false;
-      }
-
-      return canPlayType( srcResult[ 1 ] );
-    };
+    var node = typeof target === "string" ? Popcorn.dom.find( target ) : target,
+        i, srci, j, media, mediaWrapper, popcorn,
+        // We leave HTMLVideoElement and HTMLAudioElement wrappers out
+        // of the mix, since we'll default to HTML5 video if nothing
+        // else works.  Waiting on #1254 before we add YouTube to this.
+        wrappers = "HTMLVimeoVideoElement HTMLSoundCloudAudioElement HTMLNullVideoElement".split(" ");
 
     if ( !node ) {
-
-      Popcorn.error( "Specified target " + target + " was not found." );
+      Popcorn.error( "Specified target `" + target + "` was not found." );
       return;
     }
 
-    // For when no src is defined.
-    // Usually this is a video element with a src already on it.
-    if ( elementTypes.indexOf( node.nodeName ) > -1 && !src ) {
+    // If our src is not an array, create an array of one.
+    src = typeof src === "string" ? [ src ] : src;
 
-      if ( typeof src === "object" ) {
-
-        options = src;
-        src = undefined;
-      }
-
-      return Popcorn( node, options );
-    }
-
-    // if our src is not an array, create an array of one.	
-    if ( typeof( src ) === "string" ) {
-
-      src = [ src ];
-    }
-
-    // go through each src, and find the first playable.
-    // this only covers player sources popcorn knows of,
-    // and not things like a youtube src that is private.
-    // it will still consider a private youtube video to be playable.
+    // Loop through each src, and find the first playable.
     for ( i = 0, srcLength = src.length; i < srcLength; i++ ) {
+      srci = src[ i ];
 
-      // src is a playable HTML5 video, we don't need to check custom players.
-      if ( canPlaySrc( src[ i ] ) ) {
-
-        src = src[ i ];
-        break;
+      // See if we can use a wrapper directly, if not, try players.
+      for ( j = 0; j < wrappers.length; j++ ) {
+        mediaWrapper = Popcorn[ wrappers[ j ] ];
+        if ( mediaWrapper._canPlaySrc( srci ) === "probably" ) {
+          media = mediaWrapper( node );
+          popcorn = Popcorn( media, options );
+          // Set src, but not until after we return the media so the caller
+          // can get error events, if any.
+          setTimeout( function() {
+            media.src = srci;
+          }, 0 );
+          return popcorn;
+        }
       }
 
-      // for now we loop through and use the first valid player we find.
+      // No wrapper can play this, check players.
       for ( var key in Popcorn.player.registry ) {
-
         if ( Popcorn.player.registry.hasOwnProperty( key ) ) {
-
-          if ( Popcorn.player.registry[ key ].canPlayType( node.nodeName, src[ i ] ) ) {
-
+          if ( Popcorn.player.registry[ key ].canPlayType( node.nodeName, srci ) ) {
             // Popcorn.smart( player, src, /* options */ )
-            return Popcorn[ key ]( node, src[ i ], options );
+            return Popcorn[ key ]( node, srci, options );
           }
         }
       }
     }
 
-    // Popcorn.smart( div, src, /* options */ )
-    // attempting to create a video in a container
-    if ( elementTypes.indexOf( node.nodeName ) === -1 ) {
+    // If we don't have any players or wrappers that can handle this,
+    // Default to using HTML5 video.  Similar to the HTMLVideoElement
+    // wrapper, we put a video in the div passed to us via:
+    // Popcorn.smart( div, src, options )
+    var videoHTML, videoID = Popcorn.guid( "popcorn-video-" );
 
-      firstSrc = typeof( src ) === "string" ? src : src.length ? src[ 0 ] : src;
-
-      target = document.createElement( !!audioExtensionRegexp.exec( firstSrc ) ? elementTypes[ 0 ] : elementTypes[ 1 ] );
-
-      // Controls are defaulted to being present
-      target.controls = true;
-
-      node.appendChild( target );
-      node = target;
+    // IE9 doesn't like dynamic creation of source elements on <video>
+    // so we do it in one shot via innerHTML.
+    videoHTML = '<video id="' +  videoID + '" preload=auto autobuffer>';
+    for ( i = 0, srcLength = src.length; i < srcLength; i++ ) {
+      videoHTML += '<source src="' + src[ i ] + '">';
     }
+    videoHTML += "</video>";
+    node.innerHTML = videoHTML;
 
-    options && options.events && options.events.error && node.addEventListener( "error", options.events.error, false );
-    node.src = src;
-
-    return Popcorn( node, options );
-
+    if ( options && options.events && options.events.error ) {
+      node.addEventListener( "error", options.events.error, false );
+    }
+    return Popcorn( '#' + videoID, options );
   };
 })( Popcorn );
 /*!
@@ -8131,247 +8101,34 @@ var wikiCallback;
   });
 
 })( Popcorn );
-(function() {
+(function( window, Popcorn ) {
 
-  var scriptLoaded = false,
-      loading = false;
   Popcorn.player( "soundcloud", {
     _canPlayType: function( nodeName, url ) {
-
-      return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(soundcloud)/).test( url ) && nodeName.toLowerCase() !== "video";
-    },
-    _setup: function( options ) {
-
-      var media = this,
-          container = document.createElement( "iframe" ),
-          lastVolume = 1,
-          currentTime = 0,
-          paused = true,
-          realPaused = true,
-          widget,
-          duration = 0,
-          muted = false,
-          playerQueue = Popcorn.player.playerQueue();
-
-      options._container = container;
-      media.style.visibility = "hidden";
-
-      media.play = function() {
-
-        paused = false;
-        playerQueue.add(function() {
-
-          if ( realPaused ) {
-
-            widget && widget.play();
-          } else {
-            playerQueue.next();
-          }
-        });
-      };
-
-      media.pause = function() {
-
-        paused = true;
-
-        playerQueue.add(function() {
-
-          if ( !realPaused ) {
-
-            widget && widget.pause();
-          } else {
-            playerQueue.next();
-          }
-        });
-      };
-
-      // getter and setter for muted property, multiply volume by 100 as that is the scale soundcloud works on
-      Object.defineProperties( media, {
-        muted: {
-          set: function( val ) {
-            if ( val ) {
-              widget && widget.getVolume(function( data ) {
-                lastVolume = data / 100;
-              });
-              widget && widget.setVolume( 0 );
-              muted = true;
-            } else {
-              widget && widget.setVolume( lastVolume * 100 );
-              muted = false;
-            }
-            media.dispatchEvent( "volumechange" );
-          },
-          get: function() {
-            return muted;
-          }
-        },
-        volume: {
-          set: function( val ) {
-            widget && widget.setVolume( val * 100 );
-            lastVolume = val ;
-            media.dispatchEvent( "volumechange" );
-          },
-          get: function() {
-            return muted ? 0 : lastVolume;
-          }
-        },
-        currentTime: {
-          set: function( val ) {
-            currentTime = val;
-            widget && widget.seekTo( val * 1000 );
-            media.dispatchEvent( "seeked" );
-            media.dispatchEvent( "timeupdate" );
-          },
-          get: function() {
-            return currentTime;
-          }
-        },
-        duration: {
-          get: function() {
-            return duration;
-          }
-        },
-        paused: {
-          get: function() {
-            return paused;
-          }
-        }
-      });
-      // called when the SoundCloud api script has loaded
-      function scriptReady() {
-        scriptLoaded = true;
-
-        SC.initialize({
-          client_id: "PRaNFlda6Bhf5utPjUsptg"
-        });
-
-        SC.get( "/resolve", {
-          url: media.src
-        }, function( data ) {
-          media.width = media.style.width ? "" + media.offsetWidth : "560";
-          media.height = media.style.height ? "" + media.offsetHeight : "315";
-          // TODO: There are quite a few options here that we should pass on to the user
-          container.scrolling = "no";
-          container.frameborder = "no";
-          container.id = "soundcloud-" + Popcorn.guid();
-          container.src = "http://w.soundcloud.com/player/?url=" + data.uri +
-          "&show_artwork=false" +
-          "&buying=false" +
-          "&liking=false" +
-          "&sharing=false";
-
-          container.width = "100%";
-          container.height = "100%";
-
-          options.loadListener = function( e ) {
-            options.widget = widget = SC.Widget( container.id );
-            // setup all of our listeners
-            widget.bind(SC.Widget.Events.FINISH, function() {
-              media.pause();
-
-              media.dispatchEvent( "ended" );
-            });
-
-            widget.bind(SC.Widget.Events.PLAY_PROGRESS, function( data ) {
-
-              currentTime = data.currentPosition / 1000;
-              media.dispatchEvent( "timeupdate" );
-            });
-
-            widget.bind(SC.Widget.Events.PLAY, function( data ) {
-
-              paused = realPaused = false;
-
-              media.dispatchEvent( "play" );
-              media.dispatchEvent( "playing" );
-              media.currentTime = currentTime;
-
-              playerQueue.next();
-            });
-
-            widget.bind(SC.Widget.Events.PAUSE, function( data ) {
-
-              paused = realPaused = true;
-              media.dispatchEvent( "pause" );
-
-              playerQueue.next();
-            });
-            widget.bind(SC.Widget.Events.READY, function( data ) {
-              widget.getDuration(function( data ) {
-
-                duration = data / 1000;
-
-                media.style.visibility = "visible";
-                media.dispatchEvent( "durationchange" );
-                // update the readyState after we have the duration
-                media.readyState = 4;
-                media.dispatchEvent( "readystatechange" );
-                media.dispatchEvent( "loadedmetadata" );
-                media.dispatchEvent( "loadeddata" );
-                media.dispatchEvent( "canplaythrough" );
-                media.dispatchEvent( "load" );
-                !media.paused && media.play();
-              });
-              widget.getVolume(function( data ) {
-                lastVolume = data / 100;
-              });
-            });
-          };
-
-          container.addEventListener( "load", options.loadListener, false );
-          media.appendChild( container );
-        });
-      }
-
-      // load the SoundCloud API script if it doesn't exist
-      function loadScript() {
-        if ( !loading ) {
-          loading = true;
-          Popcorn.getScript( "http://w.soundcloud.com/player/api.js", function() {
-            Popcorn.getScript( "http://connect.soundcloud.com/sdk.js", function() {
-              scriptReady();
-            });
-          });
-        } else {
-          (function isReady() {
-            setTimeout(function() {
-              if ( !scriptLoaded ) {
-                isReady();
-              } else {
-                scriptReady();
-              }
-            }, 100 );
-          })();
-        }
-      }
-
-      if ( !scriptLoaded ) {
-        loadScript();
-      } else {
-        scriptReady();
-      }
-    },
-    _teardown: function( options ) {
-      var widget = options.widget,
-          events = SC.Widget.Events,
-          container = options._container,
-          parentContainer = container.parentNode;
-
-      options.destroyed = true;
-
-      // if the widget never got setup, remove the containers load listener and return
-      if ( !widget ) {
-        container.removeEventListener( "load", options.loadEventListener, false );
-        return;
-      }
-
-      // remove all bound soundcloud listeners
-      for ( var prop in events ) {
-        widget && widget.unbind( events[ prop ] );
-      }
+      return ( typeof url === "string" &&
+               Popcorn.HTMLSoundCloudAudioElement._canPlaySrc( url ) &&
+               nodeName.toLowerCase() !== "audio" );
     }
   });
-})();
+
+  Popcorn.soundcloud = function( container, url, options ) {
+    if ( typeof console !== "undefined" && console.warn ) {
+      console.warn( "Deprecated player 'soundcloud'. Please use Popcorn.HTMLSoundCloudAudioElement directly." );
+    }
+
+    var media = Popcorn.HTMLSoundCloudAudioElement( container ),
+        popcorn = Popcorn( media, options );
+
+    // Set the src "soon" but return popcorn instance first, so
+    // the caller can get get error events.
+    setTimeout( function() {
+      media.src = url;
+    }, 0 );
+
+    return popcorn;
+  };
+
+}( window, Popcorn ));
 (function() {
 
   // parseUri 1.2.2
@@ -9054,6 +8811,8 @@ var wikiCallback;
             media.readyState = 4;
 
             timeUpdate();
+
+            media.dispatchEvent( "canplay" );
             media.dispatchEvent( "canplaythrough" );
           }
         };
@@ -9113,6 +8872,9 @@ var wikiCallback;
               options.youtubeObject.playVideo();
 
               media.currentTime = fragmentStart;
+
+              media.dispatchEvent( "loadstart" );
+
               // wait to dispatch ready events until we get a duration
             },
             "onStateChange": function( state ){
@@ -9340,7 +9102,7 @@ var wikiCallback;
         var updatePosition = function() {
             var position = context.position();
 
-            style.fontSize = '18px';
+            style.fontSize = '16px';
             style.width = media.offsetWidth + 'px';
             style.top = position.top  + media.offsetHeight - ctxContainer.offsetHeight - 63 + 'px';
             style.left = position.left + 'px';
@@ -9640,6 +9402,8 @@ Popcorn.plugin('amarasubtitle', {
             },
 
             events: {
+                'click ul.amara-languages-list a': 'changeLanguage',
+                'click a.amara-current-language':  'languageButtonClicked',
                 'click a.amara-share-button':      'shareButtonClicked',
                 'click a.amara-transcript-button': 'toggleTranscriptDisplay',
                 'click a.amara-subtitles-button':  'toggleSubtitlesDisplay'
@@ -9699,7 +9463,12 @@ Popcorn.plugin('amarasubtitle', {
                             // Grab the subtitles for the initial language and do yo' thang.
                             if (that.model.get('is_on_amara')) {
 
+                                // Build the language selection dropdown menu.
+                                that.buildLanguageSelector();
+
                                 // Make the request to fetch the initial subtitles.
+                                //
+                                // TODO: This needs to be an option.
                                 that.fetchSubtitles(that.model.get('initial_language'), function() {
 
                                     // When we've got a response with the subtitles, start building
@@ -9718,7 +9487,29 @@ Popcorn.plugin('amarasubtitle', {
 
             },
 
+            // View utilities. I would like to make these utilities as independent as possible.
+            // If someone wants to create a "headless" AmaraView, they should be able to use
+            // these utilities without a DOM structure. There's work to be done here to
+            // support that cause.
+            buildLanguageSelector: function() {
+                var langs = this.model.get('languages');
+                if (langs.length) {
+                    for (var i = 0; i < langs.length; i++) {
+                        this.$amaraLanguagesList.append('' +
+                            '<li>' +
+                                '<a href="#" data-language="' + langs[i].code + '">' +
+                                    langs[i].name +
+                                '</a>' +
+                            '</li>');
+                    }
+                } else {
+                    // We have no languages.
+                }
+            },
             buildSubtitles: function(language) {
+
+                // Remove any existing subtitle events.
+                this.pop.removeTrackEvent('amarasubtitle');
 
                 // Get the subtitle sets for this language.
                 var subtitleSets = this.model.subtitles.where({'language': language});
@@ -9739,9 +9530,14 @@ Popcorn.plugin('amarasubtitle', {
                     }
 
                     this.$popSubtitlesContainer = $('div.amara-popcorn-subtitles', this.$el);
+
+                    this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
                 }
             },
             buildTranscript: function(language) {
+
+                // Remove any existing transcript events.
+                this.pop.removeTrackEvent('amaratranscript');
 
                 var subtitleSet;
 
@@ -9773,9 +9569,22 @@ Popcorn.plugin('amarasubtitle', {
                             container: this.$transcriptBody.get(0)
                         });
                     }
+
+                    this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
+
                 } else {
                     $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
                 }
+            },
+
+            // This is a temporary utility function to grab a language's name from a language
+            // code. We won't need this once we update our API to return the language name
+            // with the subtitles.
+            // See https://unisubs.sifterapp.com/projects/12298/issues/722972/comments
+            getLanguageNameForCode: function(languageCode) {
+                var languages = this.model.get('languages');
+                var language = __.find(languages, function(l) { return l.code === languageCode; });
+                return language.name;
             },
 
             // Make a call to the Amara API and retrieve a set of subtitles for a specific
@@ -9797,6 +9606,8 @@ Popcorn.plugin('amarasubtitle', {
                     success: function(resp) {
 
                         // Save these subtitles to the video's 'subtitles' collection.
+
+                        // TODO: Placeholder until we have the API return the language code.
                         resp.language = language;
                         that.model.subtitles.add(
                             new SubtitleSet(resp)
@@ -9807,19 +9618,43 @@ Popcorn.plugin('amarasubtitle', {
                     }
                 });
             },
+
+            // View methods. These are methods that are used with the full AmaraView.
+            changeLanguage: function(e) {
+
+                var that = this;
+                var lang = $(e.target).data('language');
+
+                this.fetchSubtitles(lang, function() {
+                    that.buildTranscript(lang);
+                    that.buildSubtitles(lang);
+                });
+
+                this.$amaraLanguagesList.hide();
+                return false;
+            },
+            languageButtonClicked: function() {
+                this.$amaraLanguagesList.toggle();
+                return false;
+            },
             shareButtonClicked: function() {
                 return false;
             },
-            toggleSubtitlesDisplay: function(e) {
+            toggleSubtitlesDisplay: function() {
+
+                // TODO: This button needs to be disabled unless we have subtitles to toggle.
                 this.$popSubtitlesContainer.toggle();
                 this.$subtitlesButton.toggleClass('amara-button-enabled');
                 return false;
             },
             toggleTranscriptDisplay: function() {
-                this.$transcript.toggle();
+
+                // TODO: This button needs to be disabled unless we have a transcript to toggle.
+                this.$amaraTranscript.toggle();
                 this.$transcriptButton.toggleClass('amara-button-enabled');
                 return false;
             },
+
             waitUntilVideoIsComplete: function(callback) {
 
                 var that = this;
@@ -9835,13 +9670,17 @@ Popcorn.plugin('amarasubtitle', {
 
             templateHTML: '' +
                 '<div class="amara-tools" style="width: {{ width }}px;">' +
-                '    <div class="amara-bar">' +
-                //'        <a href="#" class="amara-share-button"></a>' +
-                '        <a href="{{ video_url }}" target="blank" class="amara-logo">Amara</a>' +
-                '        <ul class="amara-displays">' +
-                '            <li><a href="#" class="amara-transcript-button"></a></li>' +
-                '            <li><a href="#" class="amara-subtitles-button"></a></li>' +
+                '    <div class="amara-bar amara-group">' +
+                //'        <a href="#" class="amara-share-button amara-button"></a>' +
+                '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button">Amara</a>' +
+                '        <ul class="amara-displays amara-group">' +
+                '            <li><a href="#" class="amara-transcript-button amara-button"></a></li>' +
+                '            <li><a href="#" class="amara-subtitles-button amara-button"></a></li>' +
                 '        </ul>' +
+                '        <div class="amara-languages">' +
+                '            <a href="#" class="amara-current-language">Loading&hellip;</a>' +
+                '            <ul class="amara-languages-list"></ul>' +
+                '        </div>' +
                 '    </div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
@@ -9865,11 +9704,19 @@ Popcorn.plugin('amarasubtitle', {
                 '</div>',
 
             cacheNodes: function() {
-                this.$amaraTools = $('div.amara-tools', this.$el);
-                this.$transcript = $('div.amara-transcript', this.$amaraTools);
-                this.$transcriptBody = $('div.amara-transcript-body', this.$transcript);
-                this.$transcriptButton = $('a.amara-transcript-button', this.$amaraTools);
-                this.$subtitlesButton = $('a.amara-subtitles-button', this.$amaraTools);
+                this.$amaraTools         = $('div.amara-tools',      this.$el);
+                this.$amaraBar           = $('div.amara-bar',        this.$amaraTools);
+                this.$amaraTranscript    = $('div.amara-transcript', this.$amaraTools);
+
+                this.$amaraDisplays      = $('ul.amara-displays',         this.$amaraTools);
+                this.$transcriptButton   = $('a.amara-transcript-button', this.$amaraDisplays);
+                this.$subtitlesButton    = $('a.amara-subtitles-button',  this.$amaraDisplays);
+
+                this.$amaraLanguages     = $('div.amara-languages',       this.$amaraTools);
+                this.$amaraCurrentLang   = $('a.amara-current-language',  this.$amaraLanguages);
+                this.$amaraLanguagesList = $('ul.amara-languages-list',  this.$amaraLanguages);
+
+                this.$transcriptBody     = $('div.amara-transcript-body', this.$amaraTranscript);
             }
 
         });

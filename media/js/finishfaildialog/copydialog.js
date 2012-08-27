@@ -44,7 +44,6 @@ unisubs.finishfaildialog.CopyDialog.prototype.createDom = function() {
     this.textarea_ = $d('textarea', {'class': 'copy-dialog', 'value': this.textToCopy_});
 
     this.switcher_ = $d('select', 'copy-dialog-select',
-            $d('option', {value: 'txt'}, 'TXT'),
             $d('option', {value: 'srt'}, 'SRT'),
             $d('option', {value: 'ssa'}, 'SSA'),
             $d('option', {value: 'ttml'}, 'TTML'),
@@ -68,12 +67,13 @@ unisubs.finishfaildialog.CopyDialog.prototype.switcherChanged_ = function(e) {
     this.fillTextarea(this.switcher_.value);
 };
 unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
-    if (format === 'txt') {
+    if (format === 'srt') {
         goog.dom.forms.setValue(this.textarea_, this.textToCopy_);
     } else {
         goog.dom.forms.setValue(this.textarea_, 'Processing...');
 
         var textarea = this.textarea_;
+        var that = this;
 
         goog.net.XhrIo.send('/widget/convert_subtitles/',
             function(event) {
@@ -81,8 +81,8 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
                 var output, response;
 
                 if (!event.target.isSuccess()) {
-                    output = 'There was an error processing your request.\n\n';
-                    output += event.target.getStatus();
+                    output = 'There was an error processing your request. Below are your subtitles in SRT format. Please copy them (not including this message) and you may upload them later.\n\n';
+                    output += that.textToCopy_;
                 }
                 else {
                     output = event.target.getResponseJson()['result'];
@@ -120,7 +120,7 @@ unisubs.finishfaildialog.CopyDialog.showForErrorLog = function(log) {
 };
 unisubs.finishfaildialog.CopyDialog.showForSubs = function(jsonSubs, languageCode) {
     var copyDialog = new unisubs.finishfaildialog.CopyDialog(
-        "Below are your subtitles. You may use the dropdown to change the format. Please copy and paste them into a text file. You can email them to us at widget-logs@universalsubtitles.org.",
+        "Copy/paste these subtitles into a text editor and save. Use the dropdown to choose a format (make sure the file extension matches the format you choose). You'll be able to upload the subtitles to your video later.",
         unisubs.finishfaildialog.CopyDialog.subsToString_(jsonSubs),
         jsonSubs,
         languageCode);
@@ -128,16 +128,7 @@ unisubs.finishfaildialog.CopyDialog.showForSubs = function(jsonSubs, languageCod
 };
 unisubs.finishfaildialog.CopyDialog.subsToString_ = function(jsonSubs) {
     var baseString;
-    if (unisubs.Dialog.translationDialogOpen)
-        baseString = goog.json.serialize(jsonSubs);
-    else
-        baseString = unisubs.SRTWriter.toSRT(jsonSubs);
+    baseString = unisubs.SRTWriter.toSRT(jsonSubs);
     var serverModel = unisubs.subtitle.MSServerModel.currentInstance;
-    baseString = ['browser_id: ' + goog.net.cookies.get('unisub-user-uuid', 'n/a'), 
-                  'video_id: ' + (serverModel ? 
-                                  serverModel.getVideoID() : 'n/a'),
-                  'session_pk: ' + (serverModel ?
-                                    serverModel.getSessionPK() : 'n/a'),
-                  baseString].join('\n');
     return baseString;
 };

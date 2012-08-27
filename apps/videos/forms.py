@@ -218,7 +218,14 @@ class SubtitlesUploadForm(forms.Form):
             if self.extension not in ParserList:
                 raise forms.ValidationError(_(u'Incorrect subtitles format'))
 
-            self._parser = ParserList[self.extension](force_unicode(text, encoding))
+            # for xml based formats, we can't just convert to unicode, as the
+            # parser will complain that the string encoding doesn't match
+            # what's encoding declaration in the xml file if it's not utf-8
+            if self.extension not in ('dfxp', 'ttml', 'xml'):
+                decoded = force_unicode(text, encoding)
+            else:
+                decoded = text
+            self._parser = ParserList[self.extension](decoded)
 
         except SubtitleParserError, e:
             raise forms.ValidationError(e)
