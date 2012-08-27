@@ -81,40 +81,80 @@ def get_lineage(parents):
 
 # SubtitleLanguages -----------------------------------------------------------
 class SubtitleLanguageManager(models.Manager):
-    def _needing_initial_signoff(self, unofficial_signoffs_required,
-                                 official_signoffs_required):
-        """Return a QS of SLs that need an initial signoff."""
+    def having_versions(self):
+        """Return a QS of SLs that have at least 1 version.
 
-        qs = self.get_query_set().filter(
-            unofficial_signoff_count=0,
-            official_signoff_count=0)
+        TODO: See if we need to denormalize this into a field.  I don't think we
+        will (and would strongly prefer not to (see the has_version/had_version
+        mess we were in before)).
 
-        return qs
+        """
+        return self.get_query_set().extra(where=[
+            """
+            EXISTS
+            (SELECT 1
+               FROM subtitles_subtitleversion AS sv
+              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id)
+            """,
+        ])
 
-    def _needing_unofficial_signoff(self, unofficial_signoffs_required,
-                                    official_signoffs_required):
-        """Return a QS of SLs that need an unofficial signoff."""
+    def not_having_versions(self):
+        """Return a QS of SLs that have zero versions.
 
-        qs = self.get_query_set().filter(
-            unofficial_signoff_count__gt=0,
-            unofficial_signoff_count__lt=unofficial_signoffs_required)
+        TODO: See if we need to denormalize this into a field.  I don't think we
+        will (and would strongly prefer not to (see the has_version/had_version
+        mess we were in before)).
 
-        # actual_un_count = unofficial_signoff_count + greatest(0, official_signoff_count - official_signoffs_required)
-        # (unofficial_count > 0)
+        """
+        return self.get_query_set().extra(where=[
+            """
+            NOT EXISTS
+            (SELECT 1
+               FROM subtitles_subtitleversion AS sv
+              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id)
+            """,
+        ])
 
-        # qs.extra(where=['unofficial_signoff_count < %d' % (unofficial_signoffs_required)])
 
-        return qs
+    def having_public_versions(self):
+        """Return a QS of SLs that have at least 1 publicly-visible versions.
 
-    def _needing_official_signoff(self, unofficial_signoffs_required,
-                                  official_signoffs_required):
-        """Return a QS of SLs that need an official signoff."""
+        TODO: See if we need to denormalize this into a field.  I don't think we
+        will (and would strongly prefer not to (see the has_version/had_version
+        mess we were in before)).
 
-        qs = self.get_query_set().filter(
-            unofficial_signoff_count__gte=unofficial_signoffs_required,
-            official_signoff_count__lt=official_signoffs_required)
+        """
+        return self.get_query_set().extra(where=[
+            """
+            EXISTS
+            (SELECT 1
+               FROM subtitles_subtitleversion AS sv
+              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+            AND NOT (    sv.visibility = 'private'
+                     AND sv.visibility_override = '')
+            AND NOT (sv.visibility_override = 'private'))
+            """,
+        ])
 
-        return qs
+    def not_having_public_versions(self):
+        """Return a QS of SLs that have zero publicly-visible versions.
+
+        TODO: See if we need to denormalize this into a field.  I don't think we
+        will (and would strongly prefer not to (see the has_version/had_version
+        mess we were in before)).
+
+        """
+        return self.get_query_set().extra(where=[
+            """
+            NOT EXISTS
+            (SELECT 1
+               FROM subtitles_subtitleversion AS sv
+              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+            AND NOT (    sv.visibility = 'private'
+                     AND sv.visibility_override = '')
+            AND NOT (sv.visibility_override = 'private'))
+            """,
+        ])
 
 class SubtitleLanguage(models.Model):
     """SubtitleLanguages are the equivalent of a 'branch' in a VCS.

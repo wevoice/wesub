@@ -42,6 +42,12 @@ def make_video_2():
     return video
 
 
+def make_sl(video, language_code):
+    sl = SubtitleLanguage(video=video, language_code=language_code)
+    sl.save()
+    return sl
+
+
 def refresh(m):
     return m.__class__.objects.get(id=m.id)
 
@@ -95,9 +101,7 @@ class TestSubtitleVersion(TestCase):
     def setUp(self):
         self.video = make_video()
         self.video2 = make_video_2()
-
-        self.sl_en = SubtitleLanguage(video=self.video, language_code='en')
-        self.sl_en.save()
+        self.sl_en = make_sl(self.video, 'en')
 
 
     def test_create_subtitle_version(self):
@@ -238,17 +242,10 @@ class TestHistory(TestCase):
     def setUp(self):
         self.video = make_video()
 
-        self.sl_en = SubtitleLanguage(video=self.video, language_code='en')
-        self.sl_en.save()
-
-        self.sl_fr = SubtitleLanguage(video=self.video, language_code='fr')
-        self.sl_fr.save()
-
-        self.sl_de = SubtitleLanguage(video=self.video, language_code='de')
-        self.sl_de.save()
-
-        self.sl_cy = SubtitleLanguage(video=self.video, language_code='cy')
-        self.sl_cy.save()
+        self.sl_en = make_sl(self.video, 'en')
+        self.sl_fr = make_sl(self.video, 'fr')
+        self.sl_de = make_sl(self.video, 'de')
+        self.sl_cy = make_sl(self.video, 'cy')
 
 
     def test_linear_parents(self):
@@ -479,12 +476,321 @@ class TestHistory(TestCase):
         self.assertEqual(f3.lineage, {'fr': 2})
 
 
+class TestSubtitleLanguageHavingQueries(TestCase):
+    """Test the [not_]having[_public]_versions methods of the SL manager.
+
+    They contain raw SQL through extra() calls, so need to be carefully tested.
+
+    """
+
+    def _get(self, qs, video=None):
+        if video:
+            qs = qs.filter(video=video)
+
+        return sorted([sl.language_code for sl in qs])
+
+    def _get_langs(self, video=None):
+        qs = SubtitleLanguage.objects.having_versions()
+        return self._get(qs, video)
+
+    def _get_public_langs(self, video=None):
+        qs = SubtitleLanguage.objects.having_public_versions()
+        return self._get(qs, video)
+
+    def _get_not_langs(self, video=None):
+        qs = SubtitleLanguage.objects.not_having_versions()
+        return self._get(qs, video)
+
+    def _get_not_public_langs(self, video=None):
+        qs = SubtitleLanguage.objects.not_having_public_versions()
+        return self._get(qs, video)
+
+
+    def setUp(self):
+        self.video = make_video()
+        self.video2 = make_video_2()
+
+        self.sl_1_en = make_sl(self.video, 'en')
+        self.sl_1_fr = make_sl(self.video, 'fr')
+        self.sl_2_en = make_sl(self.video2, 'en')
+        self.sl_2_cy = make_sl(self.video2, 'cy')
+
+
+    def test_having_versions(self):
+        # No versions at all.
+        self.assertEqual(self._get_langs(),            [])
+        self.assertEqual(self._get_langs(self.video),  [])
+        self.assertEqual(self._get_langs(self.video2), [])
+
+        # A version for 1/en.
+        self.sl_1_en.add_version()
+
+        self.assertEqual(self._get_langs(),            ['en'])
+        self.assertEqual(self._get_langs(self.video),  ['en'])
+        self.assertEqual(self._get_langs(self.video2), [])
+
+        # Two versions for 1/en.
+        self.sl_1_en.add_version()
+
+        self.assertEqual(self._get_langs(),            ['en'])
+        self.assertEqual(self._get_langs(self.video),  ['en'])
+        self.assertEqual(self._get_langs(self.video2), [])
+
+        # Version for 2/cy.
+        self.sl_2_cy.add_version()
+
+        self.assertEqual(self._get_langs(),            ['cy', 'en'])
+        self.assertEqual(self._get_langs(self.video),  ['en'])
+        self.assertEqual(self._get_langs(self.video2), ['cy'])
+
+        # Version for 2/en.
+        self.sl_2_en.add_version()
+
+        self.assertEqual(self._get_langs(),            ['cy', 'en', 'en'])
+        self.assertEqual(self._get_langs(self.video),  ['en'])
+        self.assertEqual(self._get_langs(self.video2), ['cy', 'en'])
+
+        # Version for 1/fr.
+        self.sl_1_fr.add_version()
+
+        self.assertEqual(self._get_langs(),            ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_langs(self.video2), ['cy', 'en'])
+
+        # Ensure making them private doesn't affect anything here.
+        v = self.sl_2_cy.get_tip()
+        v.visibility = 'private'
+        v.save()
+
+        v = self.sl_2_en.get_tip()
+        v.visibility_override = 'private'
+        v.save()
+
+        v = self.sl_1_fr.get_tip()
+        v.visibility = 'private'
+        v.visibility_override = 'private'
+        v.save()
+
+        self.assertEqual(self._get_langs(),            ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_langs(self.video2), ['cy', 'en'])
+
+    def test_not_having_versions(self):
+        # No versions at all.
+        self.assertEqual(self._get_not_langs(),            ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_not_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_not_langs(self.video2), ['cy', 'en'])
+
+        # A version for 1/en.
+        self.sl_1_en.add_version()
+
+        self.assertEqual(self._get_not_langs(),            ['cy', 'en', 'fr'])
+        self.assertEqual(self._get_not_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_langs(self.video2), ['cy', 'en'])
+
+        # Two versions for 1/en.
+        self.sl_1_en.add_version()
+
+        self.assertEqual(self._get_not_langs(),            ['cy', 'en', 'fr'])
+        self.assertEqual(self._get_not_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_langs(self.video2), ['cy', 'en'])
+
+        # Version for 2/cy.
+        self.sl_2_cy.add_version()
+
+        self.assertEqual(self._get_not_langs(),            ['en', 'fr'])
+        self.assertEqual(self._get_not_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_langs(self.video2), ['en'])
+
+        # Version for 2/en.
+        self.sl_2_en.add_version()
+
+        self.assertEqual(self._get_not_langs(),            ['fr'])
+        self.assertEqual(self._get_not_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_langs(self.video2), [])
+
+        # Version for 1/fr.
+        self.sl_1_fr.add_version()
+
+        self.assertEqual(self._get_not_langs(),            [])
+        self.assertEqual(self._get_not_langs(self.video),  [])
+        self.assertEqual(self._get_not_langs(self.video2), [])
+
+        # Ensure making them private doesn't affect anything here.
+        v = self.sl_2_cy.get_tip()
+        v.visibility = 'private'
+        v.save()
+
+        v = self.sl_2_en.get_tip()
+        v.visibility_override = 'private'
+        v.save()
+
+        v = self.sl_1_fr.get_tip()
+        v.visibility = 'private'
+        v.visibility_override = 'private'
+        v.save()
+
+        self.assertEqual(self._get_not_langs(),            [])
+        self.assertEqual(self._get_not_langs(self.video),  [])
+        self.assertEqual(self._get_not_langs(self.video2), [])
+
+    def test_having_public_versions(self):
+        # No versions at all.
+        self.assertEqual(self._get_public_langs(),            [])
+        self.assertEqual(self._get_public_langs(self.video),  [])
+        self.assertEqual(self._get_public_langs(self.video2), [])
+
+        # A version for 1/en.
+        self.sl_1_en.add_version()
+
+        self.assertEqual(self._get_public_langs(),            ['en'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en'])
+        self.assertEqual(self._get_public_langs(self.video2), [])
+
+        # Two versions for 1/en.
+        self.sl_1_en.add_version()
+
+        self.assertEqual(self._get_public_langs(),            ['en'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en'])
+        self.assertEqual(self._get_public_langs(self.video2), [])
+
+        # Version for 2/cy.
+        self.sl_2_cy.add_version()
+
+        self.assertEqual(self._get_public_langs(),            ['cy', 'en'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en'])
+        self.assertEqual(self._get_public_langs(self.video2), ['cy'])
+
+        # Version for 2/en.
+        self.sl_2_en.add_version()
+
+        self.assertEqual(self._get_public_langs(),            ['cy', 'en', 'en'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en'])
+        self.assertEqual(self._get_public_langs(self.video2), ['cy', 'en'])
+
+        # Version for 1/fr.
+        self.sl_1_fr.add_version()
+
+        self.assertEqual(self._get_public_langs(),            ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video2), ['cy', 'en'])
+
+        # Ensure making *one* of the two 1/en versions private doesn't affect anything.
+        v = self.sl_1_en.get_tip()
+        v.visibility = 'private'
+        v.save()
+
+        self.assertEqual(self._get_public_langs(),            ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video2), ['cy', 'en'])
+
+        # But making all of the versions in a language private filters it.
+        v = self.sl_2_cy.get_tip()
+        v.visibility = 'private'
+        v.save()
+
+        self.assertEqual(self._get_public_langs(),            ['en', 'en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video2), ['en'])
+
+        v = self.sl_2_en.get_tip()
+        v.visibility_override = 'private'
+        v.save()
+
+        self.assertEqual(self._get_public_langs(),            ['en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video2), [])
+
+        v = self.sl_1_fr.get_tip()
+        v.visibility = 'private'
+        v.visibility_override = 'private'
+        v.save()
+
+        self.assertEqual(self._get_public_langs(),            ['en'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en'])
+        self.assertEqual(self._get_public_langs(self.video2), [])
+
+    def test_not_having_public_versions(self):
+        # No versions at all.
+        self.assertEqual(self._get_not_public_langs(),            ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy', 'en'])
+
+        # A version for 1/en.
+        self.sl_1_en.add_version()
+
+        self.assertEqual(self._get_not_public_langs(),            ['cy', 'en', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy', 'en'])
+
+        # Two versions for 1/en.
+        self.sl_1_en.add_version()
+
+        self.assertEqual(self._get_not_public_langs(),            ['cy', 'en', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy', 'en'])
+
+        # Version for 2/cy.
+        self.sl_2_cy.add_version()
+
+        self.assertEqual(self._get_not_public_langs(),            ['en', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['en'])
+
+        # Version for 2/en.
+        self.sl_2_en.add_version()
+
+        self.assertEqual(self._get_not_public_langs(),            ['fr'])
+        self.assertEqual(self._get_not_public_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_public_langs(self.video2), [])
+
+        # Version for 1/fr.
+        self.sl_1_fr.add_version()
+
+        self.assertEqual(self._get_not_public_langs(),            [])
+        self.assertEqual(self._get_not_public_langs(self.video),  [])
+        self.assertEqual(self._get_not_public_langs(self.video2), [])
+
+        # Ensure making *one* of the two 1/en versions private doesn't affect anything.
+        v = self.sl_1_en.get_tip()
+        v.visibility = 'private'
+        v.save()
+
+        self.assertEqual(self._get_not_public_langs(),            [])
+        self.assertEqual(self._get_not_public_langs(self.video),  [])
+        self.assertEqual(self._get_not_public_langs(self.video2), [])
+
+        # But making all of the versions in a language private unfilters it.
+        v = self.sl_2_cy.get_tip()
+        v.visibility = 'private'
+        v.save()
+
+        self.assertEqual(self._get_not_public_langs(),            ['cy'])
+        self.assertEqual(self._get_not_public_langs(self.video),  [])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy'])
+
+        v = self.sl_2_en.get_tip()
+        v.visibility_override = 'private'
+        v.save()
+
+        self.assertEqual(self._get_not_public_langs(),            ['cy', 'en'])
+        self.assertEqual(self._get_not_public_langs(self.video),  [])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy', 'en'])
+
+        v = self.sl_1_fr.get_tip()
+        v.visibility = 'private'
+        v.visibility_override = 'private'
+        v.save()
+
+        self.assertEqual(self._get_not_public_langs(),            ['cy', 'en', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy', 'en'])
+
+
 class TestCollaborator(TestCase):
     def setUp(self):
         self.video = make_video()
-
-        self.sl = SubtitleLanguage(video=self.video, language_code='en')
-        self.sl.save()
+        self.sl = make_sl(self.video, 'en')
 
 
     def test_create_collaborators(self):
@@ -648,8 +954,7 @@ class TestSubtitleLanguageCollaboratorInteractions(TestCase):
     def setUp(self):
         self.video = make_video()
 
-        self.sl = SubtitleLanguage(video=self.video, language_code='en')
-        self.sl.save()
+        self.sl = make_sl(self.video, 'en')
 
         users = User.objects.all()
 
