@@ -2380,6 +2380,8 @@ class TeamNotificationSetting(models.Model):
         return
 
     def __unicode__(self):
+        if self.partner:
+            return u'NotificationSettings for partner %s' % self.partner
         return u'NotificationSettings for team %s' % self.team
 
 
