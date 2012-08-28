@@ -35,7 +35,8 @@ class VideoUrlInline(admin.StackedInline):
 class VideoAdmin(admin.ModelAdmin):
     actions = None
     list_display = ['__unicode__', 'video_thumbnail', 'languages',
-                    'languages_count', 'is_subtitled', 'primary_audio_language']
+                    'languages_count', 'is_subtitled',
+                    'primary_audio_language_code']
     search_fields = ['video_id', 'title', 'videourl__url', 'user__username']
     readonly_fields = ['subtitles_fetched_count', 'widget_views_count',
                        'view_count']
