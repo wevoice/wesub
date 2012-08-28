@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-27 01:48-0500\n"
+"POT-Creation-Date: 2012-08-28 01:46-0500\n"
 "PO-Revision-Date: 2012-08-24 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/"
@@ -616,17 +616,17 @@ msgstr ""
 msgid "Can not detect file encoding"
 msgstr "Nuk zbulohet dot kodimi i kartelës"
 
-#: apps/teams/forms.py:688 apps/videos/forms.py:98 apps/videos/forms.py:219
+#: apps/teams/forms.py:696 apps/videos/forms.py:98 apps/videos/forms.py:219
 msgid "Incorrect subtitles format"
 msgstr "Format i pasaktë titrash"
 
-#: apps/teams/forms.py:761 apps/videos/forms.py:316
+#: apps/teams/forms.py:769 apps/videos/forms.py:316
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 
-#: apps/teams/forms.py:767 apps/videos/forms.py:323
+#: apps/teams/forms.py:775 apps/videos/forms.py:323
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -664,11 +664,11 @@ msgstr "Përgjegjësa dhe administratorë"
 msgid "Admins only"
 msgstr "Vetëm administratorë"
 
-#: apps/teams/models.py:117 apps/teams/models.py:2465
+#: apps/teams/models.py:117 apps/teams/models.py:2472
 msgid "name"
 msgstr "emër"
 
-#: apps/teams/models.py:118 apps/teams/models.py:2466
+#: apps/teams/models.py:118 apps/teams/models.py:2473
 msgid "slug"
 msgstr "identifikues"
 
@@ -801,7 +801,7 @@ msgstr "Admin"
 msgid "Contributor"
 msgstr "Kontribues"
 
-#: apps/teams/notifications.py:175
+#: apps/teams/notifications.py:179
 msgid "New activity on your team video"
 msgstr "Veprimtari e re në ekipin tuaj të videove"
 

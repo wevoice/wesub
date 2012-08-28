@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-27 01:34-0500\n"
+"POT-Creation-Date: 2012-08-28 01:33-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -595,17 +595,17 @@ msgstr ""
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/teams/forms.py:688 apps/videos/forms.py:98 apps/videos/forms.py:219
+#: apps/teams/forms.py:696 apps/videos/forms.py:98 apps/videos/forms.py:219
 msgid "Incorrect subtitles format"
 msgstr ""
 
-#: apps/teams/forms.py:761 apps/videos/forms.py:316
+#: apps/teams/forms.py:769 apps/videos/forms.py:316
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 
-#: apps/teams/forms.py:767 apps/videos/forms.py:323
+#: apps/teams/forms.py:775 apps/videos/forms.py:323
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -643,11 +643,11 @@ msgstr ""
 msgid "Admins only"
 msgstr ""
 
-#: apps/teams/models.py:117 apps/teams/models.py:2465
+#: apps/teams/models.py:117 apps/teams/models.py:2472
 msgid "name"
 msgstr ""
 
-#: apps/teams/models.py:118 apps/teams/models.py:2466
+#: apps/teams/models.py:118 apps/teams/models.py:2473
 msgid "slug"
 msgstr ""
 
@@ -775,7 +775,7 @@ msgstr ""
 msgid "Contributor"
 msgstr ""
 
-#: apps/teams/notifications.py:175
+#: apps/teams/notifications.py:179
 msgid "New activity on your team video"
 msgstr ""
 
