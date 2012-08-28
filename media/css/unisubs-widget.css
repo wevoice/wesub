@@ -1222,7 +1222,7 @@ ul.unisubs-titlesList.unisubs-beginTab .unisubs-beginTabLi {
     position: absolute !important;
     right: 50px !important;
     top: -1px !important;
-    width: 60px !important;
+    width: 75px !important;
 }
 .unisubs-timestamp.none {
     color: #aaa !important
@@ -1297,10 +1297,7 @@ li span.unisubs-title textarea {
     -webkit-border-radius: 5px !important;
     background: #fcfcfc url("../images/gradient_light.png") 0 -135px repeat-x !important;
     padding: 3px !important;
-    width: 331px !important;
-}
-.unisubs-title-notime {
-    padding-left: 0 !important
+    width: 312px !important;
 }
 .unisubs-nextStep {
     background: #fcfcfc url("../images/gradient.png") 0 14px repeat-x !important;
@@ -2876,4 +2873,21 @@ ul.unisubs-titlesList span.unisubs-title {
 }
 div.the-translate-panel ul.unisubs-titlesList span.unisubs-title {
     padding-top: 0 !important;
+}
+.unisubs-title-notime:after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    visibility: hidden;
+}
+.unisubs-title-notime {
+    padding-left: 0 !important
+}
+.unisubs-title-notime span {
+    float: left;
+    width: 320px;
+}
+.unisubs-timestamp-time-fixed {
+    width: 50px !important;
 }
