@@ -305,6 +305,7 @@ class SubtitleLanguage(models.Model):
             return tip.get_subtitle_count()
         return 0
 
+
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
     def public(self):

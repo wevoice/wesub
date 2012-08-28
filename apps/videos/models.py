@@ -172,6 +172,8 @@ class Video(models.Model):
     # directely
     is_public = models.BooleanField(default=True)
 
+    primary_audio_language = models.CharField(max_length=16, blank=True,
+                                              default='', choices=ALL_LANGUAGES)
 
     objects = models.Manager()
     public  = PublicVideoManager()
