@@ -331,6 +331,18 @@ def can_delete_team(team, user):
     role = get_role_for_target(user, team)
     return role == ROLE_OWNER
 
+def can_add_member(team, user):
+    """
+    If a user belongs to a partner team, any admin or above on any of the
+    partner's teams can move the user anywhere within the partner's teams.
+
+    ``team`` --- the target team
+    ``user`` --- the user performing the action
+    """
+    target_team_partner = team.partner
+    return TeamMember.objects.filter(user=user,
+            role__gte=ROLE_ADMIN, team__partner=target_team_partner).exists()
+
 
 def can_add_video(team, user, project=None):
     """Return whether the given user can add a video to the given target."""
