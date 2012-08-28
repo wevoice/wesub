@@ -96,6 +96,41 @@ class TestSubtitleLanguage(TestCase):
         l4 = SubtitleLanguage(video=self.video, language_code='fr')
         l4.save()
 
+    def test_primary_audio_language(self):
+        en = SubtitleLanguage(video=self.video, language_code='en')
+        fr = SubtitleLanguage(video=self.video, language_code='fr')
+        en.save()
+        fr.save()
+
+        en = refresh(en)
+        fr = refresh(fr)
+        self.assertFalse(en.is_primary_audio_language())
+        self.assertFalse(fr.is_primary_audio_language())
+
+        self.video.primary_audio_language_code = 'en'
+        self.video.save()
+
+        en = refresh(en)
+        fr = refresh(fr)
+        self.assertTrue(en.is_primary_audio_language())
+        self.assertFalse(fr.is_primary_audio_language())
+
+        self.video.primary_audio_language_code = 'fr'
+        self.video.save()
+
+        en = refresh(en)
+        fr = refresh(fr)
+        self.assertFalse(en.is_primary_audio_language())
+        self.assertTrue(fr.is_primary_audio_language())
+
+        self.video.primary_audio_language_code = 'cy'
+        self.video.save()
+
+        en = refresh(en)
+        fr = refresh(fr)
+        self.assertFalse(en.is_primary_audio_language())
+        self.assertFalse(fr.is_primary_audio_language())
+
 
 class TestSubtitleVersion(TestCase):
     def setUp(self):

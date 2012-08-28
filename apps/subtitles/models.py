@@ -306,6 +306,10 @@ class SubtitleLanguage(models.Model):
         return 0
 
 
+    def is_primary_audio_language(self):
+        return self.video.primary_audio_language_code == self.language_code
+
+
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
     def public(self):
