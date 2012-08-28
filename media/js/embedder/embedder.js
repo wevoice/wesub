@@ -273,8 +273,16 @@
             },
             buildSubtitles: function(language) {
 
+                this.$amaraCurrentLang.text('Loading…');
+
                 // Remove any existing subtitle events.
-                this.pop.removeTrackEvent('amarasubtitle');
+                this.pop.removePlugin('amarasubtitle');
+                
+                // TODO: This is a temporary patch for Popcorn bug http://bit.ly/NShGdX
+                //
+                // (we think)
+                this.pop.data.trackEvents.endIndex = 0;
+                this.pop.data.trackEvents.startIndex = 0;
 
                 // Get the subtitle sets for this language.
                 var subtitleSets = this.model.subtitles.where({'language': language});
@@ -301,30 +309,32 @@
             },
             buildTranscript: function(language) {
 
-                // Remove any existing transcript events.
-                this.pop.removeTrackEvent('amaratranscript');
+                this.$amaraCurrentLang.text('Loading…');
 
-                var subtitleSet;
+                // Remove any existing transcript events.
+                this.pop.removePlugin('amaratranscript');
+                
+                // TODO: This is a temporary patch for Popcorn bug http://bit.ly/NShGdX
+                //
+                // (we think)
+                this.pop.data.trackEvents.endIndex = 0;
+                this.pop.data.trackEvents.startIndex = 0;
 
                 // Get the subtitle sets for this language.
                 var subtitleSets = this.model.subtitles.where({'language': language});
 
                 if (subtitleSets.length) {
-                    subtitleSet = subtitleSets[0];
-                } else {
-                    $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
-                }
+                    var subtitleSet = subtitleSets[0];
 
-                // Get the actual subtitles for this language.
-                var subtitles = subtitleSet.get('subtitles');
-
-                if (subtitles.length) {
+                    // Get the actual subtitles for this language.
+                    var subtitles = subtitleSet.get('subtitles');
 
                     // Remove the loading indicator.
                     this.$transcriptBody.html('');
 
                     // For each subtitle, init the Popcorn transcript plugin.
                     for (var i = 0; i < subtitles.length; i++) {
+
                         this.pop.amaratranscript({
                             start: subtitles[i].start,
                             start_clean: utils.parseFloatAndRound(subtitles[i].start),
@@ -333,6 +343,7 @@
                             text: subtitles[i].text,
                             container: this.$transcriptBody.get(0)
                         });
+
                     }
 
                     this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
@@ -342,7 +353,7 @@
                 }
             },
 
-            // This is a temporary utility function to grab a language's name from a language
+            // TODO: This is a temporary utility function to grab a language's name from a language
             // code. We won't need this once we update our API to return the language name
             // with the subtitles.
             // See https://unisubs.sifterapp.com/projects/12298/issues/722972/comments
@@ -362,6 +373,8 @@
                     'https://staging.universalsubtitles.org/api2/partners/videos/' +
                     this.model.get('id') + '/languages/' + language + '/subtitles/';
 
+                this.$amaraCurrentLang.text('Loading…');
+
                 // Make a call to the Amara API to retrieve subtitles for this language.
                 //
                 // TODO: If we already have subtitles in this language, don't do anything.
@@ -374,6 +387,13 @@
 
                         // TODO: Placeholder until we have the API return the language code.
                         resp.language = language;
+
+                        // Sometimes the last subtitle may have no end time. Fix that.
+                        var lastSub = resp.subtitles[resp.subtitles.length - 1];
+                        if (lastSub.end === -1) {
+                            lastSub.end = that.pop.duration();
+                        }
+
                         that.model.subtitles.add(
                             new SubtitleSet(resp)
                         );
@@ -388,12 +408,20 @@
             changeLanguage: function(e) {
 
                 var that = this;
-                var lang = $(e.target).data('language');
+                var language = $(e.target).data('language');
 
-                this.fetchSubtitles(lang, function() {
-                    that.buildTranscript(lang);
-                    that.buildSubtitles(lang);
-                });
+                var subtitleSets = this.model.subtitles.where({'language': language});
+
+                // If we've already fetched subtitles for this language, don't fetch them again.
+                if (subtitleSets.length) {
+                    this.buildTranscript(language);
+                    this.buildSubtitles(language);
+                } else {
+                    this.fetchSubtitles(language, function() {
+                        that.buildTranscript(language);
+                        that.buildSubtitles(language);
+                    });
+                }
 
                 this.$amaraLanguagesList.hide();
                 return false;
