@@ -19,7 +19,7 @@ from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember,
-    TeamLanguagePreference, Project, Partner
+    TeamLanguagePreference, Project, Partner, TeamNotificationSetting
 )
 from apps.teams.templatetags import teams_tags
 from apps.videos.search_indexes import VideoIndex
@@ -140,6 +140,21 @@ class TestNotification(TestCase):
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_notify_lookup(self):
+        p = Partner.objects.create(name='p', slug='p')
+        t1 = Team.objects.create(name='t1', slug='t1', partner=p)
+        t2 = Team.objects.create(name='t2', slug='t2')
+        t3 = Team.objects.create(name='t3', slug='t3')
+        t4 = Team.objects.create(name='t4', slug='t4')
+
+        TeamNotificationSetting.objects.create(partner=p)
+        TeamNotificationSetting.objects.create(team=t2)
+        TeamNotificationSetting.objects.create(team=t4)
+
+        TeamNotificationSetting.objects.notify_team(t1.pk, 'x')
+        TeamNotificationSetting.objects.notify_team(t2.pk, 'x')
+        TeamNotificationSetting.objects.notify_team(t3.pk, 'x')
 
 
 class TestTasks(TestCase):

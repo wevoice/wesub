@@ -9177,7 +9177,7 @@ Popcorn.plugin('amarasubtitle', {
             };
         },
         start: function(event, options){
-            options.innerContainer.style.display = 'inline';
+            options.innerContainer.style.display = 'block';
             options.showSubtitle(options, options.text);
         },
         end: function(event, options) {

@@ -2311,13 +2311,20 @@ class TeamNotificationSettingManager(models.Manager):
 
         """
         try:
-            notification_settings = self.get(team__id=team_pk)
-        except TeamNotificationSetting.DoesNotExist:
+            team = Team.objects.get(pk=team_pk)
+        except Team.DoesNotExist:
+            logger.error("A pk for a non-existent team was passed in.",
+                    extra={"team_pk": team_pk, "event_name": event_name})
+            return
+
+        if team.partner:
+            notification_settings = self.get(partner=team.partner)
+        else:
             try:
-                team = Team.objects.get(pk=team_pk)
-                notification_settings = self.get(partner=team.partner)
+                notification_settings = self.get(team=team)
             except TeamNotificationSetting.DoesNotExist:
                 return
+
         notification_settings.notify(event_name, **kwargs)
 
 class TeamNotificationSetting(models.Model):
