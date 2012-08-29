@@ -5,7 +5,6 @@
             options.pop = this;
             options.lineHtml = document.createElement('a');
             options.lineHtml.href = '#';
-            options.lineHtml.classList.add('amara-group');
             options.lineHtml.classList.add('amara-transcript-line');
             options.lineHtml.innerHTML = options.text;
 

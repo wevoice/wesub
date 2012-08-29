@@ -290,6 +290,9 @@ div.amara-tools {
                     background: #FFF9E3;
                     @include box-shadow(-4px, 0px, 0, #FFF9E3);
                 }
+                &:focus {
+                    outline: none;
+                }
             }
         }
     }
