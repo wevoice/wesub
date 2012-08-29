@@ -24,6 +24,7 @@ from django.test import TestCase
 from videos.models import Video
 from utils.multi_query_set import MultiQuerySet
 from utils.compress import compress, decompress
+from utils.chunkediter import chunkediter
 
 
 class MultiQuerySetTest(TestCase):
@@ -150,4 +151,39 @@ class CompressTest(TestCase):
 
             self.assertEqual(data, round_tripped)
 
+
+
+
+# TODO: Test chunking somehow.
+class ChunkedIterTest(TestCase):
+    def test_iterate(self):
+        data = [1, 10, 100, 1000, 10000]
+
+        sum = 0
+        for i in chunkediter(data):
+            sum += i
+        self.assertEqual(sum, 11111)
+
+        sum = 0
+        for i in chunkediter(data, 2):
+            sum += i
+        self.assertEqual(sum, 11111)
+
+        sum = 0
+        for i in chunkediter(data, 1):
+            sum += i
+        self.assertEqual(sum, 11111)
+
+    def test_empty(self):
+        data = []
+
+        sum = 0
+        for i in chunkediter(data):
+            sum += i
+        self.assertEqual(sum, 0)
+
+        sum = 0
+        for i in chunkediter(data, 1):
+            sum += i
+        self.assertEqual(sum, 0)
 
