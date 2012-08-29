@@ -11607,7 +11607,6 @@ var wikiCallback;
             options.pop = this;
             options.lineHtml = document.createElement('a');
             options.lineHtml.href = '#';
-            options.lineHtml.classList.add('amara-group');
             options.lineHtml.classList.add('amara-transcript-line');
             options.lineHtml.innerHTML = options.text;
 
@@ -12228,7 +12227,7 @@ Popcorn.plugin('amarasubtitle', {
                 //'            </div>' +
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
-                '            <a href="#" class="amara-transcript-line amara-group">' +
+                '            <a href="#" class="amara-transcript-line">' +
                 '                <span class="amara-transcript-line">' +
                 '                    Loading transcript&hellip;' +
                 '                </span>' +
