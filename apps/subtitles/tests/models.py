@@ -26,42 +26,9 @@ from libs.dxfpy import SubtitleSet
 
 from apps.auth.models import CustomUser as User
 from apps.subtitles.models import SubtitleLanguage, Collaborator
-from apps.videos.models import Video
-
-
-VIDEO_URL = 'http://youtu.be/heKK95DAKms'
-VIDEO_URL_2 = 'http://youtu.be/e4MSN6IImpI'
-
-
-def make_video():
-    video, _ = Video.get_or_create_for_url(VIDEO_URL)
-    return video
-
-def make_video_2():
-    video, _ = Video.get_or_create_for_url(VIDEO_URL_2)
-    return video
-
-
-def make_sl(video, language_code):
-    sl = SubtitleLanguage(video=video, language_code=language_code)
-    sl.save()
-    return sl
-
-
-def refresh(m):
-    return m.__class__.objects.get(id=m.id)
-
-def versionid(version):
-    return version.language_code[:1] + str(version.version_number)
-
-def ids(vs):
-    return set(versionid(v) for v in vs)
-
-def parent_ids(version):
-    return ids(version.parents.all())
-
-def ancestor_ids(version):
-    return ids(version.get_ancestors())
+from apps.subtitles.tests.utils import (
+    make_video, make_video_2, make_sl, refresh, ids, parent_ids, ancestor_ids
+)
 
 
 class TestSubtitleLanguage(TestCase):

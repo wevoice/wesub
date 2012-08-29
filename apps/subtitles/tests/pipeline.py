@@ -23,15 +23,8 @@ from django.test import TestCase
 
 from apps.subtitles import pipeline
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
-from apps.videos.models import Video
+from apps.subtitles.tests.utils import make_video
 from libs.dxfpy import SubtitleSet
-
-
-VIDEO_URL = 'http://youtu.be/heKK95DAKms'
-
-def make_video():
-    video, _ = Video.get_or_create_for_url(VIDEO_URL)
-    return video
 
 
 class TestHelperFunctions(TestCase):
