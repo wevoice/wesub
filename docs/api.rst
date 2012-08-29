@@ -622,7 +622,9 @@ Permissions
 +++++++++++
 
 If a user belongs to a partner team, any admin or above on any of the partner's
-teams can move the user anywhere within the partner's teams.
+teams can move the user anywhere within the partner's teams.  Moving is done by
+first adding the user to the target team and then by removing the user from the
+originating team.
 
 Safe Team Member Resource
 ~~~~~~~~~~~~~~~~~~~~~~~~~
