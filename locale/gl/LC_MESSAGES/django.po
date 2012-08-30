@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-29 01:30-0500\n"
+"POT-Creation-Date: 2012-08-30 01:30-0500\n"
 "PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Galician (http://www.transifex.com/projects/p/"
@@ -61,43 +61,43 @@ msgstr "Agochar"
 msgid "Retired user"
 msgstr "Usuario retirado"
 
-#: apps/auth/models.py:332
+#: apps/auth/models.py:333
 msgid "Add comment"
 msgstr "Engadir comentario"
 
-#: apps/auth/models.py:333
+#: apps/auth/models.py:334
 msgid "Start subtitles"
 msgstr "Iniciar subtítulos"
 
-#: apps/auth/models.py:334
+#: apps/auth/models.py:335
 msgid "Start translation"
 msgstr "Iniciar tradución"
 
-#: apps/auth/models.py:335
+#: apps/auth/models.py:336
 msgid "Edit subtitles"
 msgstr "Editar subtítulos"
 
-#: apps/auth/models.py:336
+#: apps/auth/models.py:337
 msgid "Edit translation"
 msgstr "Editar tradución"
 
-#: apps/auth/models.py:393
+#: apps/auth/models.py:394
 msgid "understand enough"
 msgstr "suficiente comprensión"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:395
 msgid "understand 99%"
 msgstr "comprensión 99%"
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:396
 msgid "write like a native"
 msgstr "escribir coma un nativo"
 
-#: apps/auth/models.py:400
+#: apps/auth/models.py:401
 msgid "follow requests in language"
 msgstr "seguir consultas no idioma"
 
-#: apps/auth/models.py:415
+#: apps/auth/models.py:416
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
@@ -105,11 +105,11 @@ msgstr ""
 "Esta é a data ao comezar a verse o anuncio. E soamente se presentará o "
 "último."
 
-#: apps/auth/models.py:514
+#: apps/auth/models.py:515
 msgid "e-mail confirmation"
 msgstr "confirmación de correo electrónico"
 
-#: apps/auth/models.py:515
+#: apps/auth/models.py:516
 msgid "e-mail confirmations"
 msgstr "confirmacións de correo electrónico"
 

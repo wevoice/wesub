@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-29 01:45-0500\n"
+"POT-Creation-Date: 2012-08-30 01:45-0500\n"
 "PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/"
@@ -81,43 +81,43 @@ msgstr "Ocultar"
 msgid "Retired user"
 msgstr "Usuario retirado"
 
-#: apps/auth/models.py:332
+#: apps/auth/models.py:333
 msgid "Add comment"
 msgstr "Añadir comentario"
 
-#: apps/auth/models.py:333
+#: apps/auth/models.py:334
 msgid "Start subtitles"
 msgstr "Empezar a subtitular"
 
-#: apps/auth/models.py:334
+#: apps/auth/models.py:335
 msgid "Start translation"
 msgstr "Empezar a traducir"
 
-#: apps/auth/models.py:335
+#: apps/auth/models.py:336
 msgid "Edit subtitles"
 msgstr "Editar subtítulos"
 
-#: apps/auth/models.py:336
+#: apps/auth/models.py:337
 msgid "Edit translation"
 msgstr "Editar traducción"
 
-#: apps/auth/models.py:393
+#: apps/auth/models.py:394
 msgid "understand enough"
 msgstr "comprender lo suficiente"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:395
 msgid "understand 99%"
 msgstr "comprender el 99%"
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:396
 msgid "write like a native"
 msgstr "escribir como un nativo"
 
-#: apps/auth/models.py:400
+#: apps/auth/models.py:401
 msgid "follow requests in language"
 msgstr "seguir solicitudes en idioma"
 
-#: apps/auth/models.py:415
+#: apps/auth/models.py:416
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
@@ -125,11 +125,11 @@ msgstr ""
 "Esta es la fecha en que comienzan a mostrar el anuncio. Solo el último se "
 "mostrará."
 
-#: apps/auth/models.py:514
+#: apps/auth/models.py:515
 msgid "e-mail confirmation"
 msgstr "Confirmar correo electrónico"
 
-#: apps/auth/models.py:515
+#: apps/auth/models.py:516
 msgid "e-mail confirmations"
 msgstr "Confirmar los correos electrónicos"
 

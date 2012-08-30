@@ -343,6 +343,9 @@ def can_add_member(team, user):
     return TeamMember.objects.filter(user=user,
             role__gte=ROLE_ADMIN, team__partner=target_team_partner).exists()
 
+def can_remove_member(team, user):
+    return can_add_member(team, user)
+
 
 def can_add_video(team, user, project=None):
     """Return whether the given user can add a video to the given target."""
