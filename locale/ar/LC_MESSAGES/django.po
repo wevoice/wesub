@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-29 01:37-0500\n"
+"POT-Creation-Date: 2012-08-30 01:36-0500\n"
 "PO-Revision-Date: 2012-08-24 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/"
@@ -59,53 +59,53 @@ msgstr "أخفِ"
 msgid "Retired user"
 msgstr ""
 
-#: apps/auth/models.py:332
+#: apps/auth/models.py:333
 msgid "Add comment"
 msgstr "أضف تعليقك"
 
-#: apps/auth/models.py:333
+#: apps/auth/models.py:334
 msgid "Start subtitles"
 msgstr "ابدأ الترجمة"
 
-#: apps/auth/models.py:334
+#: apps/auth/models.py:335
 msgid "Start translation"
 msgstr "ابدأ الترجمة"
 
-#: apps/auth/models.py:335
+#: apps/auth/models.py:336
 msgid "Edit subtitles"
 msgstr "حرر الترجمة"
 
-#: apps/auth/models.py:336
+#: apps/auth/models.py:337
 msgid "Edit translation"
 msgstr "حرر الترجمة"
 
-#: apps/auth/models.py:393
+#: apps/auth/models.py:394
 msgid "understand enough"
 msgstr "أفهم ما يكفي"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:395
 msgid "understand 99%"
 msgstr "أفهم 99%"
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:396
 msgid "write like a native"
 msgstr "أكتب بطلاقة"
 
-#: apps/auth/models.py:400
+#: apps/auth/models.py:401
 msgid "follow requests in language"
 msgstr ""
 
-#: apps/auth/models.py:415
+#: apps/auth/models.py:416
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr "هذا هو التاريخ الذي يبدأ عرض الاعلان. وسوف يتم عرض الأخير فقط."
 
-#: apps/auth/models.py:514
+#: apps/auth/models.py:515
 msgid "e-mail confirmation"
 msgstr ""
 
-#: apps/auth/models.py:515
+#: apps/auth/models.py:516
 msgid "e-mail confirmations"
 msgstr ""
 

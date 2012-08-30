@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-29 01:42-0500\n"
+"POT-Creation-Date: 2012-08-30 01:41-0500\n"
 "PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Indonesian (Indonesia) (http://www.transifex.com/projects/p/"
@@ -60,43 +60,43 @@ msgstr "Sembunyikan"
 msgid "Retired user"
 msgstr "Pengguna Tidak Aktif"
 
-#: apps/auth/models.py:332
+#: apps/auth/models.py:333
 msgid "Add comment"
 msgstr "Tambah komentar"
 
-#: apps/auth/models.py:333
+#: apps/auth/models.py:334
 msgid "Start subtitles"
 msgstr "Mulai menulis"
 
-#: apps/auth/models.py:334
+#: apps/auth/models.py:335
 msgid "Start translation"
 msgstr "Mulai terjemahan"
 
-#: apps/auth/models.py:335
+#: apps/auth/models.py:336
 msgid "Edit subtitles"
 msgstr "Sunting tulisan"
 
-#: apps/auth/models.py:336
+#: apps/auth/models.py:337
 msgid "Edit translation"
 msgstr "Sunting terjemahan"
 
-#: apps/auth/models.py:393
+#: apps/auth/models.py:394
 msgid "understand enough"
 msgstr "cukup mengerti"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:395
 msgid "understand 99%"
 msgstr "mengerti 99%"
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:396
 msgid "write like a native"
 msgstr "menulis seperti orang asli"
 
-#: apps/auth/models.py:400
+#: apps/auth/models.py:401
 msgid "follow requests in language"
 msgstr "ikuti permintaan dalam bahasa"
 
-#: apps/auth/models.py:415
+#: apps/auth/models.py:416
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
@@ -104,11 +104,11 @@ msgstr ""
 "Tanggal ini ketika mulai untuk menampilkan pengumuman. Dan hanya yang "
 "terakhir yang akan ditampilkan."
 
-#: apps/auth/models.py:514
+#: apps/auth/models.py:515
 msgid "e-mail confirmation"
 msgstr "konfirmasi e-mail"
 
-#: apps/auth/models.py:515
+#: apps/auth/models.py:516
 msgid "e-mail confirmations"
 msgstr "konfirmasi e-mail"
 

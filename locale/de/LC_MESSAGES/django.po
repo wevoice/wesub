@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-29 01:32-0500\n"
+"POT-Creation-Date: 2012-08-30 01:32-0500\n"
 "PO-Revision-Date: 2012-08-24 06:51+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/"
@@ -65,43 +65,43 @@ msgstr "Verstecken"
 msgid "Retired user"
 msgstr "Pensionierte Benutzer"
 
-#: apps/auth/models.py:332
+#: apps/auth/models.py:333
 msgid "Add comment"
 msgstr "Kommentar hinzufügen"
 
-#: apps/auth/models.py:333
+#: apps/auth/models.py:334
 msgid "Start subtitles"
 msgstr "Untertitel starten"
 
-#: apps/auth/models.py:334
+#: apps/auth/models.py:335
 msgid "Start translation"
 msgstr "Übersetzung starten"
 
-#: apps/auth/models.py:335
+#: apps/auth/models.py:336
 msgid "Edit subtitles"
 msgstr "Untertitel bearbeiten"
 
-#: apps/auth/models.py:336
+#: apps/auth/models.py:337
 msgid "Edit translation"
 msgstr "Übersetzung bearbeiten"
 
-#: apps/auth/models.py:393
+#: apps/auth/models.py:394
 msgid "understand enough"
 msgstr "verstehe genug"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:395
 msgid "understand 99%"
 msgstr "verstehe 99%"
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:396
 msgid "write like a native"
 msgstr "Schreiben wie ein Einheimischer"
 
-#: apps/auth/models.py:400
+#: apps/auth/models.py:401
 msgid "follow requests in language"
 msgstr "folge Anfragen in der Sprache"
 
-#: apps/auth/models.py:415
+#: apps/auth/models.py:416
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
@@ -109,11 +109,11 @@ msgstr ""
 "Dies ist der Tag, an dem diese Ankündigung veröffentlicht wurde. Die nur die "
 "letzte Veröffentlichung wird angezeigt."
 
-#: apps/auth/models.py:514
+#: apps/auth/models.py:515
 msgid "e-mail confirmation"
 msgstr "E-Mail Bestätigung"
 
-#: apps/auth/models.py:515
+#: apps/auth/models.py:516
 msgid "e-mail confirmations"
 msgstr "E-Mail Bestätigungen"
 
