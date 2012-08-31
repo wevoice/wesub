@@ -174,7 +174,7 @@ div.amara-tools {
             height: 36px;
             padding: 0 10px;
             position: relative;
-            width: 30%;
+            width: 21%;
 
             .amara-current-language {
                 // TODO: Have the CSS compiler convert these to absolute URLs.
@@ -258,26 +258,24 @@ div.amara-tools {
             }
         }
         div.amara-transcript-body {
-            margin: 40px;
             max-height: 300px;
-            padding-right: 20px;
+            padding: 5% 15%;
             overflow: auto;
 
             &::-webkit-scrollbar {
                 background: #F7F7F7;
                 height: 10px;
-                width: 10px;
+                width: 15px;
                 -webkit-appearance: none;
-                border-radius: 6px;
             }
             &::-webkit-scrollbar-thumb {
                 border: 1px solid white;
-                border-radius: 8px;
+                border-radius: 15px;
                 background-color: #C7C7C7;
             }
             a.amara-transcript-line {
                 color: #666;
-                line-height: 26px;
+                line-height: 32px;
                 padding: 5px 0;
                 text-decoration: none;
                 @include border-radius();
@@ -289,6 +287,9 @@ div.amara-tools {
                 &.current-subtitle {
                     background: #FFF9E3;
                     @include box-shadow(-4px, 0px, 0, #FFF9E3);
+                }
+                &:after {
+                    content: " ";
                 }
                 &:focus {
                     outline: none;
@@ -303,7 +304,7 @@ div.amara-popcorn-subtitles {
     div {
         background: rgba(0, 0, 0, .8);
         margin: 0 20px;
-        padding: 10px 20px;
+        padding: 12px 20px;
         @include border-radius(5px);
     }
 }

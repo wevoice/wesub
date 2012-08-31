@@ -580,6 +580,9 @@ Example response
 Team Member Resource
 ~~~~~~~~~~~~~~~~~~~~
 
+This resource allows you to change team membership information without the
+target user's input.
+
 You can list existing members of a team:
 
 .. http:get:: /api2/partners/teams/[team-slug]/members/
@@ -604,8 +607,6 @@ Example of adding a new user:
         "username": "test-user",
         "role": "manager"
     }
-
-.. note:: You can only add members to teams you own.
 
 Roles
 +++++

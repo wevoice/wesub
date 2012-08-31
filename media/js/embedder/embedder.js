@@ -465,10 +465,10 @@
                 '<div class="amara-tools" style="width: {{ width }}px;">' +
                 '    <div class="amara-bar amara-group">' +
                 //'        <a href="#" class="amara-share-button amara-button"></a>' +
-                '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button">Amara</a>' +
+                '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button" title="View this video on Amara.org in a new window">Amara</a>' +
                 '        <ul class="amara-displays amara-group">' +
-                '            <li><a href="#" class="amara-transcript-button amara-button"></a></li>' +
-                '            <li><a href="#" class="amara-subtitles-button amara-button"></a></li>' +
+                '            <li><a href="#" class="amara-transcript-button amara-button" title="Toggle transcript viewer"></a></li>' +
+                '            <li><a href="#" class="amara-subtitles-button amara-button" title="Toggle subtitles"></a></li>' +
                 '        </ul>' +
                 '        <div class="amara-languages">' +
                 '            <a href="#" class="amara-current-language">Loading&hellip;</a>' +

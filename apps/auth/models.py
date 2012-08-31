@@ -475,7 +475,7 @@ class EmailConfirmationManager(models.Manager):
         self.filter(user=user).delete()
 
         salt = sha_constructor(str(random())+settings.SECRET_KEY).hexdigest()[:5]
-        confirmation_key = sha_constructor(salt + user.email).hexdigest()
+        confirmation_key = sha_constructor(salt + user.email.encode('utf-8')).hexdigest()
         try:
             current_site = Site.objects.get_current()
         except Site.DoesNotExist:
