@@ -19,6 +19,7 @@
 
 """Tests for the subtitle pipeline implementation."""
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from apps.auth.models import CustomUser as User
@@ -153,7 +154,7 @@ class TestBasicAdding(TestCase):
         sl = SubtitleLanguage.objects.get(video=self.video, language_code='en')
         self.assertEqual(sl.subtitleversion_set.count(), 5)
 
-    def test_title_desc(self):
+    def test_title_description(self):
         def _get_tip_td():
             sl = SubtitleLanguage.objects.get(video=self.video,
                                               language_code='en')
@@ -191,6 +192,11 @@ class TestBasicAdding(TestCase):
         # Passing unicode.
         _add(title=u'ಠ_ಠ', description=u'ಠ‿ಠ')
         self.assertEqual(_get_tip_td(), (u'ಠ_ಠ', u'ಠ‿ಠ'))
+
+        # Passing nonsense.
+        self.assertRaises(ValidationError, lambda: _add(title=1234))
+        self.assertRaises(ValidationError, lambda: _add(title=['a', 'b']))
+
     def test_author(self):
         def _get_tip_author():
             sl = SubtitleLanguage.objects.get(video=self.video,
@@ -220,3 +226,50 @@ class TestBasicAdding(TestCase):
         # Passing u2.
         _add(author=self.u2)
         self.assertEqual(_get_tip_author().id, self.u2.id)
+
+        # Passing nonsense
+        self.assertRaises(ValueError, lambda: _add(author='dogs'))
+        self.assertRaises(ValueError, lambda: _add(author=-1234))
+        self.assertRaises(ValueError, lambda: _add(author=[self.u1]))
+
+    def test_visibility(self):
+        def _get_tip_vis():
+            sl = SubtitleLanguage.objects.get(video=self.video,
+                                              language_code='en')
+            tip = sl.get_tip()
+            return (tip.visibility, tip.visibility_override)
+
+        def _add(*args, **kwargs):
+            pipeline.add_subtitles(self.video, 'en', None, *args, **kwargs)
+
+
+        # Not passing at all.
+        _add()
+        self.assertEqual(_get_tip_vis(), ('public', ''))
+
+        # Passing nil.
+        _add(visibility=None, visibility_override=None)
+        self.assertEqual(_get_tip_vis(), ('public', ''))
+
+        # Passing visibility.
+        _add(visibility='public')
+        self.assertEqual(_get_tip_vis(), ('public', ''))
+
+        _add(visibility='private')
+        self.assertEqual(_get_tip_vis(), ('private', ''))
+
+        # Passing visibility_override.
+        _add(visibility_override='')
+        self.assertEqual(_get_tip_vis(), ('public', ''))
+
+        _add(visibility_override='public')
+        self.assertEqual(_get_tip_vis(), ('public', 'public'))
+
+        _add(visibility_override='private')
+        self.assertEqual(_get_tip_vis(), ('public', 'private'))
+
+        # Passing nonsense.
+        self.assertRaises(ValidationError, lambda: _add(visibility=42))
+        self.assertRaises(ValidationError, lambda: _add(visibility='llamas'))
+        self.assertRaises(ValidationError, lambda: _add(visibility_override=3.1415))
+        self.assertRaises(ValidationError, lambda: _add(visibility_override='cats'))

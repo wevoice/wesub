@@ -87,7 +87,8 @@ def _get_language(video, language_code):
 
     return sl, language_needs_save
 
-def _add_subtitles(video, language_code, subtitles, title, description, author):
+def _add_subtitles(video, language_code, subtitles, title, description, author,
+                   visibility, visibility_override):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -99,7 +100,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author):
     if language_needs_save:
         sl.save()
 
-    data = {'title': title, 'description': description, 'author': author}
+    data = {'title': title, 'description': description, 'author': author,
+            'visibility': visibility, 'visibility_override': visibility_override}
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
@@ -109,7 +111,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author):
 
 # Public API ------------------------------------------------------------------
 def add_subtitles_unsafe(video, language_code, subtitles,
-                         title=None, description=None, author=None):
+                         title=None, description=None, author=None,
+                         visibility=None, visibility_override=None):
     """Add subtitles in the language to the video without a transaction.
 
     You probably want to use add_subtitles instead, but if you're already inside
@@ -121,10 +124,11 @@ def add_subtitles_unsafe(video, language_code, subtitles,
 
     """
     return _add_subtitles(video, language_code, subtitles, title, description,
-                          author)
+                          author, visibility, visibility_override)
 
 def add_subtitles(video, language_code, subtitles,
-                  title=None, description=None, author=None):
+                  title=None, description=None, author=None,
+                  visibility=None, visibility_override=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -148,7 +152,11 @@ def add_subtitles(video, language_code, subtitles,
     Author can be given as a CustomUser object.  If omitted the author will be
     marked as anonymous.
 
+    Visibility and visibility_override can be given as the strings 'public' or
+    'private', or omitted to use the defaults ('public' and '' respectively).
+
     """
     with transaction.commit_on_success():
         return _add_subtitles(video, language_code, subtitles, title,
-                              description, author)
+                              description, author, visibility,
+                              visibility_override)
