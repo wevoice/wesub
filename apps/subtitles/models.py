@@ -22,6 +22,7 @@ import datetime
 import itertools
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
@@ -50,6 +51,22 @@ def mapcat(fn, iterable):
 
     """
     return itertools.chain.from_iterable(itertools.imap(fn, iterable))
+
+def ensure_stringy(val):
+    """Ensure the given value is a stringy type, like str or unicode.
+    
+    If not, a ValidationError will be raised.
+
+    This method is necessary because Django will often do the wrong thing when
+    you pass a non-stringy object to a CharField (it will str() the object which
+    probably isn't what you want).
+
+    """
+    if val == None:
+        return
+
+    if not (isinstance(val, str) or isinstance(val, unicode)):
+        raise ValidationError('Value must be a string.')
 
 
 # Lineage functions -----------------------------------------------------------
@@ -249,7 +266,10 @@ class SubtitleLanguage(models.Model):
 
         kwargs['lineage'] = get_lineage(parents)
 
+        ensure_stringy(kwargs.get('title'))
+        ensure_stringy(kwargs.get('description'))
         sv = SubtitleVersion(*args, **kwargs)
+        sv.full_clean()
         sv.save()
 
         if parents:
@@ -257,6 +277,7 @@ class SubtitleLanguage(models.Model):
                 sv.parents.add(p)
 
         return sv
+
 
     def update_signoff_counts(self):
         """Update the denormalized signoff count fields and save."""
