@@ -341,7 +341,8 @@ def can_add_member(team, user):
     """
     target_team_partner = team.partner
     return TeamMember.objects.filter(user=user,
-            role__gte=ROLE_ADMIN, team__partner=target_team_partner).exists()
+            role__in=[ROLE_ADMIN, ROLE_OWNER],
+            team__partner=target_team_partner).exists()
 
 def can_remove_member(team, user):
     return can_add_member(team, user)
