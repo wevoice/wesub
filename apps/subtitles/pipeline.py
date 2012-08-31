@@ -59,6 +59,15 @@ from django.db import transaction
 from apps.subtitles.models import SubtitleLanguage
 
 
+def _strip_nones(d):
+    """Strip all entries in a dictionary that have a value of None."""
+
+    items = d.items()
+    for k, v in items:
+        if v == None:
+            d.pop(k)
+
+
 # Private Implementation ------------------------------------------------------
 def _get_language(video, language_code):
     """Return appropriate SubtitleLanguage and a needs_save boolean.
@@ -78,7 +87,7 @@ def _get_language(video, language_code):
 
     return sl, language_needs_save
 
-def _add_subtitles(video, language_code, subtitles):
+def _add_subtitles(video, language_code, subtitles, title, description):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -90,13 +99,17 @@ def _add_subtitles(video, language_code, subtitles):
     if language_needs_save:
         sl.save()
 
-    version = sl.add_version(subtitles=subtitles)
+    data = {'title': title, 'description': description}
+    _strip_nones(data)
+
+    version = sl.add_version(subtitles=subtitles, **data)
 
     return version
 
 
 # Public API ------------------------------------------------------------------
-def add_subtitles_unsafe(video, language_code, subtitles):
+def add_subtitles_unsafe(video, language_code, subtitles,
+                         title=None, description=None):
     """Add subtitles in the language to the video without a transaction.
 
     You probably want to use add_subtitles instead, but if you're already inside
@@ -109,10 +122,15 @@ def add_subtitles_unsafe(video, language_code, subtitles):
     Subtitles can be given as a SubtitleSet, or a list of
     (from_ms, to_ms, content) tuples, or a string containing a hunk of DXFP XML.
 
-    """
-    return _add_subtitles(video, language_code, subtitles)
+    Title and description should be strings, or can be omitted to set them to
+    ''.  If you want them to be set to the same thing as the previous version
+    you need to pass it yourself.
 
-def add_subtitles(video, language_code, subtitles):
+    """
+    return _add_subtitles(video, language_code, subtitles, title, description)
+
+def add_subtitles(video, language_code, subtitles,
+                  title=None, description=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -129,6 +147,11 @@ def add_subtitles(video, language_code, subtitles):
     Subtitles can be given as a SubtitleSet, or a list of
     (from_ms, to_ms, content) tuples, or a string containing a hunk of DXFP XML.
 
+    Title and description should be strings, or can be omitted to set them to
+    ''.  If you want them to be set to the same thing as the previous version
+    you need to pass it yourself.
+
     """
     with transaction.commit_on_success():
-        return _add_subtitles(video, language_code, subtitles)
+        return _add_subtitles(video, language_code, subtitles, title,
+                              description)

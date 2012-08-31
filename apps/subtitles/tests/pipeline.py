@@ -98,22 +98,25 @@ class TestBasicAdding(TestCase):
                                               language_code='en')
             return list(sl.get_tip().get_subtitles().subtitle_items())
 
+        def _add(subs):
+            pipeline.add_subtitles(self.video, 'en', subs)
+
+
         # Passing nil.
-        pipeline.add_subtitles(self.video, 'en', None)
+        _add(None)
 
         self.assertEqual(_get_tip_subs(), [])
 
         # Passing a list of tuples.
-        pipeline.add_subtitles(self.video, 'en', [(100, 200, "foo"),
-                                                  (300, None, "bar")])
+        _add([(100, 200, "foo"),
+              (300, None, "bar")])
 
         self.assertEqual(_get_tip_subs(), [(100, 200, "foo"),
                                            (300, None, "bar")])
 
         # Passing an iterable of tuples.
-        pipeline.add_subtitles(self.video, 'en', (s for s in
-                                                  [(101, 200, "foo"),
-                                                   (300, None, "bar")]))
+        _add((s for s in [(101, 200, "foo"),
+                          (300, None, "bar")]))
 
         self.assertEqual(_get_tip_subs(), [(101, 200, "foo"),
                                            (300, None, "bar")])
@@ -123,7 +126,7 @@ class TestBasicAdding(TestCase):
                                       (310, 410, "bar"),
                                       (None, None, '"baz"')])
 
-        pipeline.add_subtitles(self.video, 'en', subs)
+        _add(subs)
 
         self.assertEqual(_get_tip_subs(), [(110, 210, "foo"),
                                            (310, 410, "bar"),
@@ -133,18 +136,54 @@ class TestBasicAdding(TestCase):
         subs = SubtitleSet.from_list([(10000, 22000, "boots"),
                                       (23000, 29000, "cats")])
 
-        pipeline.add_subtitles(self.video, 'en', subs.to_xml())
+        _add(subs.to_xml())
 
         self.assertEqual(_get_tip_subs(), [(10000, 22000, "boots"),
                                            (23000, 29000, "cats")])
 
 
         # Passing nonsense should TypeError out.
-        self.assertRaises(TypeError,
-                          lambda: pipeline.add_subtitles(self.video, 'en', 1))
+        self.assertRaises(TypeError, lambda: _add(1))
 
         # Make sure all the versions are there.
-        sl = SubtitleLanguage.objects.get(video=self.video,
-                                          language_code='en')
+        sl = SubtitleLanguage.objects.get(video=self.video, language_code='en')
         self.assertEqual(sl.subtitleversion_set.count(), 5)
 
+    def test_title_desc(self):
+        def _get_tip_td():
+            sl = SubtitleLanguage.objects.get(video=self.video,
+                                              language_code='en')
+            tip = sl.get_tip()
+            return (tip.title, tip.description)
+
+        def _add(*args, **kwargs):
+            pipeline.add_subtitles(self.video, 'en', None, *args, **kwargs)
+
+
+        # Not passing at all.
+        _add()
+        self.assertEqual(_get_tip_td(), ('', ''))
+
+        # Passing nil.
+        _add(title=None, description=None)
+        self.assertEqual(_get_tip_td(), ('', ''))
+
+        # Passing empty strings.
+        _add(title='', description='')
+        self.assertEqual(_get_tip_td(), ('', ''))
+
+        # Passing title.
+        _add(title='Foo')
+        self.assertEqual(_get_tip_td(), ('Foo', ''))
+
+        # Passing description.
+        _add(description='Bar')
+        self.assertEqual(_get_tip_td(), ('', 'Bar'))
+
+        # Passing both.
+        _add(title='Foo', description='Bar')
+        self.assertEqual(_get_tip_td(), ('Foo', 'Bar'))
+
+        # Passing unicode.
+        _add(title=u'ಠ_ಠ', description=u'ಠ‿ಠ')
+        self.assertEqual(_get_tip_td(), (u'ಠ_ಠ', u'ಠ‿ಠ'))
