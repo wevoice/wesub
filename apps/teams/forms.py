@@ -555,7 +555,6 @@ class InviteForm(forms.Form):
         self.fields['role'].choices = [(r, ROLE_NAMES[r])
                                        for r in roles_user_can_invite(team, user)]
 
-
     def clean_user_id(self):
         user_id = self.cleaned_data['user_id']
 
@@ -579,7 +578,6 @@ class InviteForm(forms.Form):
                 raise forms.ValidationError(_(u'User has already been invited and has not replied yet.'))
         return user_id
 
-
     def save(self):
         from messages import tasks as notifier
         user = User.objects.get(id=self.user_id)
@@ -590,6 +588,7 @@ class InviteForm(forms.Form):
         invite.save()
         notifier.team_invitation_sent.delay(invite.pk)
         return invite
+
 
 class ProjectForm(forms.ModelForm):
     class Meta:
@@ -683,7 +682,15 @@ class UploadDraftForm(forms.Form):
             if not encoding:
                 raise forms.ValidationError(_(u'Can not detect file encoding'))
 
-            self._parser = self._get_parser(subtitles.name)(force_unicode(text, encoding))
+            # for xml based formats, we can't just convert to unicode, as the
+            # parser will complain that the string encoding doesn't match
+            # what's encoding declaration in the xml file if it's not utf-8
+            self.extension = subtitles.name.split('.')[-1].lower()
+            if self.extension not in ('dfxp', 'ttml', 'xml'):
+                decoded = force_unicode(text, encoding)
+            else:
+                decoded = text
+            self._parser = ParserList[self.extension](decoded)
 
             if not self._parser:
                 raise forms.ValidationError(_(u'Incorrect subtitles format'))

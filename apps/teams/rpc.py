@@ -52,16 +52,24 @@ class TeamsApiClass(object):
 
             if msg.strip() == '':
                 return Error(_(u'The "About you" field is required in order to apply.'))
-            if Application.objects.open().filter(user=user):
-                return Error(_(u'You have already applied to this team.'))
-            elif Application.objects.filter(team=team, user=user, status=Application.STATUS_MEMBER_REMOVED).exists():
-                return Error(_(u'You have been removed from this team.'))
-            elif Application.objects.filter(team=team, user=user, status=Application.STATUS_DENIED).exists():
-                return Error(_(u'Your application has been denied.'))
-            application = Application.objects.create(team=team, user=user)
+            try:
+                application = team.applications.get(user=user)
+                if application.status == Application.STATUS_PENDING:
+                    return Error(_(u'You have already applied to this team.'))
+                elif application.status == Application.STATUS_DENIED:
+                    return Error(_(u'Your application has been denied.'))
+                elif application.status == Application.STATUS_MEMBER_REMOVED:
+                    return Error(_(u'You have been removed from this team.'))
+                elif application.status == Application.STATUS_MEMBER_LEFT:
+                    # the user chose to participate, so we can already approve it
+                    application.note = msg
+                    application.approve(author=application.user, interface='web UI')
+                    return Msg(_(u"Your application has been approved. "
+                         u"You are now a member of this team"))
+            except Application.DoesNotExist:
+                application = Application(team=team, user=user)
             application.note = msg
-
-            application.save()
+            application.save(author=user, interface='web UI')
             notifier.application_sent.delay(application.pk)
 
             return Msg(_(u"Your application has been submitted. "

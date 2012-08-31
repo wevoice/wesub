@@ -234,10 +234,18 @@ class CustomUser(BaseUser):
             TeamMember.ROLE_MANAGER])
 
     def messageable_teams(self):
+        from apps.teams.models import Team
         from apps.teams.permissions import can_message_all_members
+
         teams = self.teams.all()
         messageable_team_ids = [t.id for t in teams if can_message_all_members(t, self)]
-        return self.teams.filter(id__in=messageable_team_ids)
+
+        partners = self.managed_partners.all()
+        teams = [list(p.teams.all()) for p in partners]
+        partner_teams_ids = [team.id for qs in teams for team in qs]
+
+        messageable_team_ids = messageable_team_ids + partner_teams_ids
+        return Team.objects.filter(id__in=messageable_team_ids)
 
     def open_tasks(self):
         from apps.teams.models import Task
@@ -467,7 +475,7 @@ class EmailConfirmationManager(models.Manager):
         self.filter(user=user).delete()
 
         salt = sha_constructor(str(random())+settings.SECRET_KEY).hexdigest()[:5]
-        confirmation_key = sha_constructor(salt + user.email).hexdigest()
+        confirmation_key = sha_constructor(salt + user.email.encode('utf-8')).hexdigest()
         try:
             current_site = Site.objects.get_current()
         except Site.DoesNotExist:

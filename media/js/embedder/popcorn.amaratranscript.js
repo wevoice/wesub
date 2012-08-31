@@ -1,18 +1,18 @@
 (function (Popcorn) {
-    Popcorn.plugin( 'amaratranscript' , {
+    Popcorn.plugin('amaratranscript', {
         _setup : function(options) {
 
             options.pop = this;
             options.lineHtml = document.createElement('a');
             options.lineHtml.href = '#';
-            options.lineHtml.classList.add('amara-group');
             options.lineHtml.classList.add('amara-transcript-line');
+            options.lineHtml.innerHTML = options.text;
 
-            var lineTemplate = '' +
-                '<span class="amara-transcript-line-left">' + options.start_clean + '</span>' +
-                '<span class="amara-transcript-line-right">' + options.text + '</span>';
+            if (options.start_of_paragraph) {
+                options.container.appendChild(document.createElement('br'));
+                options.container.appendChild(document.createElement('br'));
+            }
 
-            options.lineHtml.innerHTML = lineTemplate;
             options.container.appendChild(options.lineHtml);
 
             options.lineHtml.addEventListener('click', function(e) {
@@ -28,11 +28,8 @@
         end: function(event, options){
             options.lineHtml.classList.remove('current-subtitle');
         },
-        frame: function(event, options) {
-
-        },
-        toString: function(event, options) {
-
-        } 
+        _teardown: function (options, start) {
+            options.container.removeChild(options.lineHtml);
+        }
     });
 })(Popcorn);

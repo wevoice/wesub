@@ -340,7 +340,18 @@ unisubs.RightPanel.prototype.showDownloadLink = function(jsonSubsFn) {
 };
 unisubs.RightPanel.prototype.downloadClicked_ = function(e) {
     e.preventDefault();
-    unisubs.finishfaildialog.CopyDialog.showForSubs(this.jsonSubsFn_(), this.dialog_.subtitles_.LANGUAGE);
+
+    var lang;
+
+    // A translation
+    if (this.dialog_.subtitleState_) {
+        lang = this.dialog_.subtitleState_.LANGUAGE;
+    
+    // A transcription
+    } else {
+        lang = this.dialog_.subtitles_.LANGUAGE;
+    }
+    unisubs.finishfaildialog.CopyDialog.showForSubs(this.jsonSubsFn_(), lang);
 };
 unisubs.RightPanel.prototype.loginClicked_ = function(event) {
     this.serverModel_.logIn();

@@ -161,6 +161,30 @@ ups.  The parameter can be sent as a parameter to any kind of API call.  This
 is useful if you already have a database of video ids and don't want to
 maintain a mapping between those ids and Amara ids.
 
+For example, let's say you have an Amara video with the id of ``yxsSV807Dcho``.
+Your application uses numeric id internally and you would like to tell Amara to
+remember that this video has an id of ``12345`` on your system.  You can modify
+the video like this:
+
+.. code-block:: bash
+
+    curl -i -X PUT -H "Accept: application/json" \
+        -H 'X-api-username: my_username_here' -H 'X-apikey: my_api_key_here' \
+        -H "Content-Type: application/json" \
+        --data '{"usePartnerId": true, "id": "12345"}' \
+        https://host/api2/partners/videos/yxsSV807Dcho/
+
+And then, you can start referencing the video by the numeric id when
+interacting with the API. For example, the following call will retrieve the
+above video.
+
+.. code-block:: bash
+
+    curl -i -X GET -H "Accept: application/json" \
+        -H 'X-api-username: my_username_here' -H 'X-apikey: my_api_key_here' \
+        -H "Content-Type: application/json" \
+        https://host/api2/partners/videos/12345/?usePartnerId=true
+
 Available Resources
 -------------------
 
@@ -580,6 +604,9 @@ Example response
 Team Member Resource
 ~~~~~~~~~~~~~~~~~~~~
 
+This resource allows you to change team membership information without the
+target user's input.
+
 You can list existing members of a team:
 
 .. http:get:: /api2/partners/teams/[team-slug]/members/
@@ -605,8 +632,6 @@ Example of adding a new user:
         "role": "manager"
     }
 
-.. note:: You can only add members to teams you own.
-
 Roles
 +++++
 
@@ -622,7 +647,9 @@ Permissions
 +++++++++++
 
 If a user belongs to a partner team, any admin or above on any of the partner's
-teams can move the user anywhere within the partner's teams.
+teams can move the user anywhere within the partner's teams.  Moving is done by
+first adding the user to the target team and then by removing the user from the
+originating team.
 
 Safe Team Member Resource
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -851,7 +878,7 @@ List application items:
 
 Application item detail:
 
-.. http:get:: /api2/partners/application/[application-id]/
+.. http:get:: /api2/partners/teams/[team-slug]/application/[application-id]/
 
 Example response:
 
@@ -870,10 +897,12 @@ Example response:
 
 To delete an Application:
 
-.. http:delete:: /api2/partners/application/[application-id]/
+.. http:delete:: /api2/partners/teams/[team-slug]/application/[application-id]/
 
 Applications can have their statuses updated:
 
-.. http:put:: /api2/partners/application/[application-id]/
+.. http:put:: /api2/partners/teams/[team-slug]/application/[application-id]/
 
     :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'
+
+Note that if an application is pending (has the status='Pending'), the API can set it to whatever new status. Else, if the application has already been approved or denied, you won't be able to set the new status. For cases were an approval was wrongly issues, you'd want to remove the team member. Otherwise you'd want to invite the user to the team.

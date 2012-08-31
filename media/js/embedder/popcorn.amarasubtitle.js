@@ -12,9 +12,9 @@
         var updatePosition = function() {
             var position = context.position();
 
-            style.fontSize = '18px';
+            style.fontSize = '16px';
             style.width = media.offsetWidth + 'px';
-            style.top = position.top  + media.offsetHeight - ctxContainer.offsetHeight - 40 + 'px';
+            style.top = position.top  + media.offsetHeight - ctxContainer.offsetHeight - 63 + 'px';
             style.left = position.left + 'px';
 
             setTimeout(updatePosition, 10);
@@ -59,33 +59,6 @@
      **/
 
 Popcorn.plugin('amarasubtitle', {
-        manifest: {
-            about: {
-                name: 'Popcorn Subtitle Plugin',
-                version: '0.1',
-                author: 'Scott Downe',
-                website: 'http://scottdowne.wordpress.com/'
-            },
-            options: {
-                start: {
-                    elem: 'input',
-                    type: 'text',
-                    label: 'Start'
-                },
-                end: {
-                    elem: 'input',
-                    type: 'text',
-                    label: 'End'
-                },
-                target: 'subtitle-container',
-                text: {
-                    elem: 'input',
-                    type: 'text',
-                    label: 'Text'
-                }
-            }
-        },
-
         _setup: function(options) {
             var newdiv = document.createElement('div');
 
@@ -115,29 +88,14 @@ Popcorn.plugin('amarasubtitle', {
                 options.innerContainer.innerHTML = options.text || '';
             };
         },
-
-        /**
-         * @member subtitle
-         * The start function will be executed when the currentTime
-         * of the video  reaches the start time provided by the
-         * options variable
-         */
         start: function(event, options){
-            options.innerContainer.style.display = 'inline';
+            options.innerContainer.style.display = 'block';
             options.showSubtitle(options, options.text);
         },
-
-        /**
-         * @member subtitle
-         * The end function will be executed when the currentTime
-         * of the video  reaches the end time provided by the
-         * options variable
-         */
         end: function(event, options) {
             options.innerContainer.style.display = 'none';
             options.innerContainer.innerHTML = '';
         },
-
         _teardown: function (options) {
             options.container.removeChild(options.innerContainer);
         }
