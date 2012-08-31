@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
