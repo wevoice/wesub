@@ -87,7 +87,7 @@ def _get_language(video, language_code):
 
     return sl, language_needs_save
 
-def _add_subtitles(video, language_code, subtitles, title, description):
+def _add_subtitles(video, language_code, subtitles, title, description, author):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -99,7 +99,7 @@ def _add_subtitles(video, language_code, subtitles, title, description):
     if language_needs_save:
         sl.save()
 
-    data = {'title': title, 'description': description}
+    data = {'title': title, 'description': description, 'author': author}
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
@@ -109,28 +109,22 @@ def _add_subtitles(video, language_code, subtitles, title, description):
 
 # Public API ------------------------------------------------------------------
 def add_subtitles_unsafe(video, language_code, subtitles,
-                         title=None, description=None):
+                         title=None, description=None, author=None):
     """Add subtitles in the language to the video without a transaction.
 
     You probably want to use add_subtitles instead, but if you're already inside
     a transaction that will rollback on exceptions you can use this instead of
     dealing with nested transactions.
 
-    You need to check writelocking yourself.  For now.  This may change in the
-    future.
-
-    Subtitles can be given as a SubtitleSet, or a list of
-    (from_ms, to_ms, content) tuples, or a string containing a hunk of DXFP XML.
-
-    Title and description should be strings, or can be omitted to set them to
-    ''.  If you want them to be set to the same thing as the previous version
-    you need to pass it yourself.
+    For more information see the docstring for add_subtitles.  Aside from the
+    transaction handling this function works exactly the same way.
 
     """
-    return _add_subtitles(video, language_code, subtitles, title, description)
+    return _add_subtitles(video, language_code, subtitles, title, description,
+                          author)
 
 def add_subtitles(video, language_code, subtitles,
-                  title=None, description=None):
+                  title=None, description=None, author=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -151,7 +145,10 @@ def add_subtitles(video, language_code, subtitles,
     ''.  If you want them to be set to the same thing as the previous version
     you need to pass it yourself.
 
+    Author can be given as a CustomUser object.  If omitted the author will be
+    marked as anonymous.
+
     """
     with transaction.commit_on_success():
         return _add_subtitles(video, language_code, subtitles, title,
-                              description)
+                              description, author)

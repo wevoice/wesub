@@ -21,6 +21,7 @@
 
 from django.test import TestCase
 
+from apps.auth.models import CustomUser as User
 from apps.subtitles import pipeline
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 from apps.subtitles.tests.utils import make_video
@@ -56,6 +57,9 @@ class TestHelperFunctions(TestCase):
 class TestBasicAdding(TestCase):
     def setUp(self):
         self.video = make_video()
+        users = User.objects.all()
+        (self.u1, self.u2) = users[:2]
+        self.anon = User.get_anonymous()
 
     def test_add_empty_versions(self):
         # Start with no SubtitleLanguages.
@@ -187,3 +191,32 @@ class TestBasicAdding(TestCase):
         # Passing unicode.
         _add(title=u'ಠ_ಠ', description=u'ಠ‿ಠ')
         self.assertEqual(_get_tip_td(), (u'ಠ_ಠ', u'ಠ‿ಠ'))
+    def test_author(self):
+        def _get_tip_author():
+            sl = SubtitleLanguage.objects.get(video=self.video,
+                                              language_code='en')
+            return sl.get_tip().author
+
+        def _add(*args, **kwargs):
+            pipeline.add_subtitles(self.video, 'en', None, *args, **kwargs)
+
+
+        # Not passing at all.
+        _add()
+        self.assertEqual(_get_tip_author(), self.anon)
+
+        # Passing nil.
+        _add(author=None)
+        self.assertEqual(_get_tip_author(), self.anon)
+
+        # Passing anonymous.
+        _add(author=User.get_anonymous())
+        self.assertEqual(_get_tip_author(), self.anon)
+
+        # Passing u1.
+        _add(author=self.u1)
+        self.assertEqual(_get_tip_author().id, self.u1.id)
+
+        # Passing u2.
+        _add(author=self.u2)
+        self.assertEqual(_get_tip_author().id, self.u2.id)
