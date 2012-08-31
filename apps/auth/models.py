@@ -20,6 +20,7 @@ from django.contrib.auth.models import UserManager, User as BaseUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.conf import settings
+from django.utils.encoding import smart_unicode
 import urllib
 import hashlib
 import hmac
@@ -473,8 +474,9 @@ class EmailConfirmationManager(models.Manager):
 
         self.filter(user=user).delete()
 
+        from django.utils.encoding import force_unicode
         salt = sha_constructor(str(random())+settings.SECRET_KEY).hexdigest()[:5]
-        confirmation_key = sha_constructor(salt + user.email).hexdigest()
+        confirmation_key = sha_constructor(salt + user.email.encode('utf-8')).hexdigest()
         try:
             current_site = Site.objects.get_current()
         except Site.DoesNotExist:
