@@ -25,13 +25,14 @@ from django.test import TestCase
 from apps.auth.models import CustomUser as User
 from apps.subtitles import pipeline
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
-from apps.subtitles.tests.utils import make_video
+from apps.subtitles.tests.utils import make_video, make_video_2
 from libs.dxfpy import SubtitleSet
 
 
 class TestHelperFunctions(TestCase):
     def setUp(self):
         self.video = make_video()
+        self.video2 = make_video_2()
 
     def test_get_language(self):
         sl, needs_save = pipeline._get_language(self.video, 'en')
@@ -54,6 +55,75 @@ class TestHelperFunctions(TestCase):
         self.assertEqual(sl.language_code, 'fr')
         self.assertEqual(needs_save, True)
 
+    def test_get_version(self):
+        def _assert_eq(a, b):
+            if (not a) or (not b):
+                self.assertTrue((not a) and (not b))
+            else:
+                self.assertEqual(a.id, b.id)
+
+        def _assert_notfound(l):
+            self.assertRaises(SubtitleVersion.DoesNotExist, l)
+
+        def _assert_badtype(l):
+            self.assertRaises(ValueError, l)
+
+        def _get_version(v):
+            return pipeline._get_version(self.video, v)
+
+
+        en = SubtitleLanguage.objects.create(video=self.video, language_code='en')
+        fr = SubtitleLanguage.objects.create(video=self.video, language_code='fr')
+
+        en1 = en.add_version()
+        en2 = en.add_version()
+        en3 = en.add_version()
+
+        fr1 = fr.add_version()
+        fr2 = fr.add_version()
+        fr3 = fr.add_version()
+
+        # Test passthrough.
+        _assert_eq(en1, _get_version(en1))
+        _assert_eq(en2, _get_version(en2))
+        _assert_eq(en3, _get_version(en3))
+        _assert_eq(fr1, _get_version(fr1))
+        _assert_eq(fr2, _get_version(fr2))
+        _assert_eq(fr3, _get_version(fr3))
+
+        # Test version IDs (integers).
+        _assert_eq(en1, _get_version(en1.id))
+        _assert_eq(en2, _get_version(en2.id))
+        _assert_eq(en3, _get_version(en3.id))
+        _assert_eq(fr1, _get_version(fr1.id))
+        _assert_eq(fr2, _get_version(fr2.id))
+        _assert_eq(fr3, _get_version(fr3.id))
+
+        # Test language_code, version_number pairs.
+        _assert_eq(fr1, _get_version(('fr', 1)))
+        _assert_eq(fr2, _get_version(('fr', 2)))
+        _assert_eq(fr3, _get_version(('fr', 3)))
+        _assert_eq(en1, _get_version(['en', 1]))
+        _assert_eq(en2, _get_version(['en', 2]))
+        _assert_eq(en3, _get_version(['en', 3]))
+
+        # Test mismatching passthrough.
+        _assert_notfound(lambda: pipeline._get_version(self.video2, en1))
+        _assert_notfound(lambda: pipeline._get_version(self.video2, fr3))
+
+        # Test bad version ID.
+        _assert_notfound(lambda: _get_version(424242))
+
+        # Test bad language_code, version_number pair.
+        _assert_notfound(lambda: _get_version(('fr', 0)))
+        _assert_notfound(lambda: _get_version(('fr', 4)))
+        _assert_notfound(lambda: _get_version(('cats', 1)))
+
+        # Test entirely invalid types.
+        _assert_badtype(lambda: _get_version(u'squirrel'))
+        _assert_badtype(lambda: _get_version(1.2))
+
+
 
 class TestBasicAdding(TestCase):
     def setUp(self):
@@ -61,6 +131,7 @@ class TestBasicAdding(TestCase):
         users = User.objects.all()
         (self.u1, self.u2) = users[:2]
         self.anon = User.get_anonymous()
+
 
     def test_add_empty_versions(self):
         # Start with no SubtitleLanguages.
@@ -273,3 +344,161 @@ class TestBasicAdding(TestCase):
         self.assertRaises(ValidationError, lambda: _add(visibility='llamas'))
         self.assertRaises(ValidationError, lambda: _add(visibility_override=3.1415))
         self.assertRaises(ValidationError, lambda: _add(visibility_override='cats'))
+
+    def test_parents(self):
+        def _add(language_code, parents):
+            return pipeline.add_subtitles(self.video, language_code, None,
+                                          parents=parents)
+
+        def _get_tip_parents(language_code):
+            sl = SubtitleLanguage.objects.get(video=self.video,
+                                              language_code=language_code)
+            tip = sl.get_tip()
+            return sorted(["%s%d" % (v.language_code, v.version_number)
+                           for v in tip.parents.all()])
+
+        def _assert_notfound(l):
+            self.assertRaises(SubtitleVersion.DoesNotExist, l)
+
+        def _assert_badtype(l):
+            self.assertRaises(ValueError, l)
+
+
+        # First, check the default parents.
+        #
+        # en fr
+        #
+        #    1
+        # 2
+        # |
+        # 1
+        en1 = _add('en', None)
+        self.assertEqual(_get_tip_parents('en'), [])
+
+        en2 = _add('en', None)
+        self.assertEqual(_get_tip_parents('en'), ['en1'])
+
+        fr1 = _add('fr', None)
+        self.assertEqual(_get_tip_parents('fr'), [])
+
+        # Parents can be SV objects directly.
+        #
+        # en fr de
+        #       1
+        #      /
+        #     /
+        #    3
+        #    |
+        #    2
+        #   /|
+        #  / 1
+        # 2
+        # |
+        # 1
+        fr2 = _add('fr', [en2])
+        self.assertEqual(_get_tip_parents('fr'), ['en2', 'fr1'])
+
+        fr3 = _add('fr', None)
+        self.assertEqual(_get_tip_parents('fr'), ['fr2'])
+
+        de1 = _add('de', [fr3])
+        self.assertEqual(_get_tip_parents('de'), ['fr3'])
+
+        # Parents can be given with just their IDs.
+        #
+        # cy en fr de
+        # 2___
+        # |   \
+        # 1    \
+        # |\____|_
+        # |     | \
+        # |     |  1
+        # |     | /
+        # |     |/
+        # |     3
+        # |     |
+        # |     2
+        #  \   /|
+        #   \ / 1
+        #    2
+        #    |
+        #    1
+        cy1 = _add('cy', [en2.id, de1.id])
+        self.assertEqual(_get_tip_parents('cy'), ['de1', 'en2'])
+
+        cy2 = _add('cy', [fr3.id])
+        self.assertEqual(_get_tip_parents('cy'), ['cy1', 'fr3'])
+
+        # Parents can be language_code, version_number pairs for convenience.
+        #
+        # en fr de ja
+        #       2
+        #       |\
+        #       | \
+        #       |  1
+        #       | /|
+        #       |/ |
+        #       1  |
+        #      /   |
+        #     /    |
+        #    3-----+
+        #    |
+        #    2
+        #   /|
+        #  / 1
+        # 2
+        # |
+        # 1
+        ja1 = _add('ja', [('fr', 3), ['de', 1]])
+        self.assertEqual(_get_tip_parents('ja'), ['de1', 'fr3'])
+
+        de2 = _add('de', [('ja', 1)])
+        self.assertEqual(_get_tip_parents('de'), ['de1', 'ja1'])
+
+        # Parent specs can be mixed in a single add call.
+        #
+        # en fr de ja
+        #      ____2
+        #     / / /|
+        #    / / / |
+        #   / / |  |
+        #  / |  2  |
+        # |  |  |\ |
+        # |  |  | \|
+        # |  |  |  1
+        # |  |  | /|
+        # |  |  |/ |
+        # |  |  1  |
+        # |  | /   |
+        # |  |/    |
+        # |  3-----+
+        # |  |
+        # |  2
+        # | /|
+        # |/ 1
+        # 2
+        # |
+        # 1
+        ja2 = _add('ja', [de2, ('fr', 3), en2.id])
+        self.assertEqual(_get_tip_parents('ja'), ['de2', 'en2', 'fr3', 'ja1'])
+
+        # Check that nonsense IDs don't work.
+        _assert_notfound(lambda: _add('en', [12345]))
+        _assert_notfound(lambda: _add('en', [0]))
+        _assert_notfound(lambda: _add('en', [-1]))
+
+        # Check that nonsense pairs don't work.
+        _assert_notfound(lambda: _add('en', [['en', 400]]))
+        _assert_notfound(lambda: _add('en', [['fr', -10]]))
+        _assert_notfound(lambda: _add('en', [['pt', 1]]))
+        _assert_notfound(lambda: _add('en', [['puppies', 1]]))
+
+        # Check that nonsense types don't work.
+        _assert_badtype(lambda: _add('en', "Hello!"))
+        _assert_badtype(lambda: _add('en', ["Hello!"]))
+        _assert_badtype(lambda: _add('en', [{}]))
+
+        # Shut up, Pyflakes.
+        assert (en1 and en2 and fr1 and fr2 and fr3 and de1 and de2 and cy1 and
+                cy2 and ja1 and ja2)
+

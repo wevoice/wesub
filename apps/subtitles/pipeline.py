@@ -56,7 +56,7 @@ a nutshell:
 
 from django.db import transaction
 
-from apps.subtitles.models import SubtitleLanguage
+from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 
 
 def _strip_nones(d):
@@ -69,6 +69,28 @@ def _strip_nones(d):
 
 
 # Private Implementation ------------------------------------------------------
+def _get_version(video, v):
+    """Get the appropriate SV belonging to the given video.
+
+    Works with SubtitleVersions, ids, and (language_code, version_number) pairs.
+
+    """
+    if isinstance(v, SubtitleVersion):
+        if v.video_id != video.id:
+            raise SubtitleVersion.DoesNotExist(
+                "That SubtitleVersion does not belong to this Video!")
+        else:
+            return v
+    elif isinstance(v, int):
+        return SubtitleVersion.objects.get(video=video, id=v)
+    elif isinstance(v, tuple) or isinstance(v, list):
+        language_code, version_number = v
+        return SubtitleVersion.objects.get(video=video,
+                                           language_code=language_code,
+                                           version_number=version_number)
+    else:
+        raise ValueError("Cannot look up version from %s" % type(v))
+
 def _get_language(video, language_code):
     """Return appropriate SubtitleLanguage and a needs_save boolean.
 
@@ -88,7 +110,7 @@ def _get_language(video, language_code):
     return sl, language_needs_save
 
 def _add_subtitles(video, language_code, subtitles, title, description, author,
-                   visibility, visibility_override):
+                   visibility, visibility_override, parents):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -101,7 +123,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
         sl.save()
 
     data = {'title': title, 'description': description, 'author': author,
-            'visibility': visibility, 'visibility_override': visibility_override}
+            'visibility': visibility, 'visibility_override': visibility_override,
+            'parents': [_get_version(video, p) for p in (parents or [])]}
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
@@ -112,7 +135,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 # Public API ------------------------------------------------------------------
 def add_subtitles_unsafe(video, language_code, subtitles,
                          title=None, description=None, author=None,
-                         visibility=None, visibility_override=None):
+                         visibility=None, visibility_override=None,
+                         parents=None):
     """Add subtitles in the language to the video without a transaction.
 
     You probably want to use add_subtitles instead, but if you're already inside
@@ -124,11 +148,12 @@ def add_subtitles_unsafe(video, language_code, subtitles,
 
     """
     return _add_subtitles(video, language_code, subtitles, title, description,
-                          author, visibility, visibility_override)
+                          author, visibility, visibility_override, parents)
 
 def add_subtitles(video, language_code, subtitles,
                   title=None, description=None, author=None,
-                  visibility=None, visibility_override=None):
+                  visibility=None, visibility_override=None,
+                  parents=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -159,4 +184,4 @@ def add_subtitles(video, language_code, subtitles,
     with transaction.commit_on_success():
         return _add_subtitles(video, language_code, subtitles, title,
                               description, author, visibility,
-                              visibility_override)
+                              visibility_override, parents)
