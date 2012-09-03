@@ -68,6 +68,34 @@ def ensure_stringy(val):
     if not (isinstance(val, str) or isinstance(val, unicode)):
         raise ValidationError('Value must be a string.')
 
+def graphviz(video):
+    """Return the dot code for a Graphviz visualization of a video's history."""
+
+    lines = []
+
+    lines.append("digraph video_%s {" % video.video_id)
+    lines.append("rankdir = BT;")
+
+    def _name(sv):
+        return '%s%d' % (sv.language_code, sv.version_number)
+
+    for sl in video.newsubtitlelanguage_set.all():
+        for sv in sl.subtitleversion_set.all():
+            lines.append('%s[label="%s"];' % (_name(sv), _name(sv)))
+
+    for sl in video.newsubtitlelanguage_set.all():
+        for sv in sl.subtitleversion_set.all():
+            for pv in sv.parents.all():
+                lines.append("%s -> %s;" % (_name(pv), _name(sv)))
+
+    lines.append("}")
+
+    return lines
+
+def print_graphviz(video_id):
+    video = Video.objects.get(video_id=video_id)
+    print '\n'.join(graphviz(video))
+
 
 # Lineage functions -----------------------------------------------------------
 def lineage_to_json(lineage):
