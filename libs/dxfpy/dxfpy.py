@@ -118,7 +118,7 @@ class SubtitleSet(object):
                                namespaces={'n': 'http://www.w3.org/ns/ttml'})[0]
         div.append(p)
 
-    def subtitle_items(self):
+    def subtitle_items(self, *args, **kwargs):
         """A generator over the subs, yielding (from_ms, to_ms, content) tuples.
 
         The from and to millisecond values may be None, and content is a string

@@ -29,8 +29,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from apps.auth.models import CustomUser as User
 from apps.videos.models import Video
-from libs.dxfpy import SubtitleSet
+from babelsubs.storage import SubtitleSet
+from babelsubs import load_from
 
+from utils.compress import compress, decompress
 
 ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
                        key=lambda v: v[1])
@@ -467,7 +469,8 @@ class SubtitleVersion(models.Model):
         """
         # We cache the parsed subs for speed.
         if self._subtitles == None:
-            self._subtitles = SubtitleSet.from_blob(self.serialized_subtitles)
+            self._subtitles = load_from(decompress(self.serialized_subtitles),
+                    type='dfxp').to_internal()
 
         return self._subtitles
 
@@ -498,7 +501,7 @@ class SubtitleVersion(models.Model):
                 raise TypeError("Cannot create SubtitleSet from type %s"
                                 % str(type(subtitles)))
 
-        self.serialized_subtitles = subtitles.to_blob()
+        self.serialized_subtitles = compress(subtitles.to_xml())
 
         # We cache the parsed subs for speed.
         self._subtitles = subtitles
