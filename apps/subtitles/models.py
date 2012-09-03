@@ -54,7 +54,7 @@ def mapcat(fn, iterable):
 
 def ensure_stringy(val):
     """Ensure the given value is a stringy type, like str or unicode.
-    
+
     If not, a ValidationError will be raised.
 
     This method is necessary because Django will often do the wrong thing when
@@ -241,6 +241,60 @@ class SubtitleLanguage(models.Model):
             return None
 
 
+    def _sanity_check_parents(self, version, parents):
+        r"""Check that the given parents are sane for an SV about to be created.
+
+        There are a few rules checked here.
+
+        First, versions cannot have more than one parent from a single language.
+        For example, the following is invalid:
+
+            en fr
+
+            1
+            |\
+            \ \
+             \ 2
+              \|
+               1
+
+        Second, a parent cannot have a parent that precedes something existing
+        in its own lineage.  It's easiest to understand this with an example.
+        The following is invalid:
+
+            en fr
+            3
+            |\
+            2 \
+            |  \
+            1   \
+             \   |
+              \  |
+               2 |
+               |/
+               1
+
+        This is invalid because English was based off of French version 2, and
+        then you tried to say a later version was based on French version 1.
+        
+        If English version 3 had been based on French version 2 (or later) that
+        would be have been okay.
+
+        """
+
+        # There can be at most one parent from any given language.
+        if len(parents) != len(set([v.language_code for v in parents])):
+            raise ValidationError(
+                "Versions cannot have two parents from the same language!")
+
+        for parent in parents:
+            if parent.language_code in version.lineage:
+                if parent.version_number < version.lineage[parent.language_code]:
+                    raise ValidationError(
+                        "Versions cannot have parents that precede parents in "
+                        "their lineage!")
+
+
     def add_version(self, *args, **kwargs):
         """Add a SubtitleVersion to the tip of this language.
 
@@ -259,7 +313,7 @@ class SubtitleLanguage(models.Model):
         version_number = ((tip.version_number + 1) if tip else 1)
         kwargs['version_number'] = version_number
 
-        parents = kwargs.pop('parents', [])
+        parents = (kwargs.pop('parents', None) or [])
 
         if tip:
             parents.append(tip)
@@ -268,13 +322,16 @@ class SubtitleLanguage(models.Model):
 
         ensure_stringy(kwargs.get('title'))
         ensure_stringy(kwargs.get('description'))
+
         sv = SubtitleVersion(*args, **kwargs)
+
+        self._sanity_check_parents(sv, parents)
+
         sv.full_clean()
         sv.save()
 
-        if parents:
-            for p in parents:
-                sv.parents.add(p)
+        for p in parents:
+            sv.parents.add(p)
 
         return sv
 

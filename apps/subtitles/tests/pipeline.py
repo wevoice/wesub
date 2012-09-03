@@ -124,7 +124,6 @@ class TestHelperFunctions(TestCase):
         _assert_badtype(lambda: _get_version(1.2))
 
 
-
 class TestBasicAdding(TestCase):
     def setUp(self):
         self.video = make_video()
@@ -502,3 +501,72 @@ class TestBasicAdding(TestCase):
         assert (en1 and en2 and fr1 and fr2 and fr3 and de1 and de2 and cy1 and
                 cy2 and ja1 and ja2)
 
+    def test_bad_parents(self):
+        """Test trying to add invalid parents."""
+
+        def _add(language_code, parents):
+            return pipeline.add_subtitles(self.video, language_code, None,
+                                          parents=parents)
+
+        def _assert_invalid(l):
+            self.assertRaises(ValidationError, l)
+
+
+        # en fr de cy
+        #          2
+        #   ______/|
+        #  /       1
+        # |    ___/
+        # |   /
+        # |  4
+        # |  |\
+        # 3  | \
+        # |  |  |
+        # |  3  |
+        # |  |\ |
+        # |  2 \|
+        # |  |  |
+        # |  |  2
+        # |  |  |
+        # |  1  |
+        # | / \ |
+        # |/   \|
+        # 2     |
+        # |     |
+        # 1     1
+        en1 = _add('en', [])
+        en2 = _add('en', [])
+        de1 = _add('de', [])
+        fr1 = _add('fr', [en2, de1])
+        de2 = _add('de', [])
+        fr2 = _add('fr', [])
+        fr3 = _add('fr', [de2])
+        en3 = _add('en', [])
+        fr4 = _add('fr', [de2])
+        cy1 = _add('cy', [fr4])
+        cy2 = _add('cy', [en3])
+
+        # Versions cannot have multiple parents from the same language.
+        _assert_invalid(lambda: _add('en', [fr1, fr2]))
+        _assert_invalid(lambda: _add('en', [de1, fr1, de2]))
+        _assert_invalid(lambda: _add('en', [en1, en2]))
+        _assert_invalid(lambda: _add('en', [en1]))
+
+        # Versions cannot have duplicate parents.  We could remove this
+        # restriction and collapse it down automatically, but needing to do so
+        # is almost certainly a sign of a mistake, so it's better to fail loudly
+        # instead.
+        _assert_invalid(lambda: _add('en', [fr4, fr4]))
+
+        # Versions cannot have parents that precede other parents in their
+        # lineage.
+        _assert_invalid(lambda: _add('fr', [en1]))
+        _assert_invalid(lambda: _add('fr', [de1]))
+        _assert_invalid(lambda: _add('cy', [fr1]))
+        _assert_invalid(lambda: _add('cy', [fr3]))
+        _assert_invalid(lambda: _add('cy', [de1]))
+        _assert_invalid(lambda: _add('cy', [en1]))
+
+        # Shut up, Pyflakes.
+        assert (en1 and en2 and en3 and fr1 and fr2 and fr3 and fr4 and
+                de1 and de2 and cy1 and cy2)
