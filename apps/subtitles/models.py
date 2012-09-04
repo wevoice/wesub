@@ -518,7 +518,7 @@ class SubtitleVersion(models.Model):
         if subtitles == None:
             subtitles = SubtitleSet()
         elif isinstance(subtitles, str) or isinstance(subtitles, unicode):
-            subtitles = SubtitleSet(subtitles)
+            subtitles = SubtitleSet('en', initial_data=subtitles)
         elif isinstance(subtitles, SubtitleSet):
             pass
         else:
