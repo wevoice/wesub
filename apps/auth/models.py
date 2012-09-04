@@ -252,7 +252,7 @@ class CustomUser(BaseUser):
         return Task.objects.incomplete().filter(assignee=self)
 
     def _get_gravatar(self, size):
-        url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.email.lower()).hexdigest() + "?"
+        url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.email.lower().encode('utf-8')).hexdigest() + "?"
         url += urllib.urlencode({'d': 'mm', 's':str(size)})
         return url
 
