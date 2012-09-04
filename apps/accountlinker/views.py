@@ -75,6 +75,8 @@ def youtube_oauth_callback(request):
     base =  "https://accounts.google.com/o/oauth2/token"
     state = team.pk
     
+    # When testing this locally, sometimes you will have to remove the https
+    # override.
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
         "client_secret": settings.YOUTUBE_CLIENT_SECRET,

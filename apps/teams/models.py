@@ -37,7 +37,6 @@ from apps.comments.models import Comment
 from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
-from messages.models import Message
 from teams.moderation_const import WAITING_MODERATION, UNMODERATED
 from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
@@ -1167,7 +1166,7 @@ class Application(models.Model):
             api_application_new.send(self)
 
     def __unicode__(self):
-        return "Application: %s - %s - %s" % (self.team.slug, self.user.username, self.status)
+        return "Application: %s - %s - %s" % (self.team.slug, self.user.username, self.get_status_display())
 
 # Invites
 class InviteExpiredException(Exception):
@@ -2312,9 +2311,20 @@ class TeamNotificationSettingManager(models.Manager):
 
         """
         try:
-            notification_settings = self.get(team__id=team_pk)
-        except TeamNotificationSetting.DoesNotExist:
+            team = Team.objects.get(pk=team_pk)
+        except Team.DoesNotExist:
+            logger.error("A pk for a non-existent team was passed in.",
+                    extra={"team_pk": team_pk, "event_name": event_name})
             return
+
+        if team.partner:
+            notification_settings = self.get(partner=team.partner)
+        else:
+            try:
+                notification_settings = self.get(team=team)
+            except TeamNotificationSetting.DoesNotExist:
+                return
+
         notification_settings.notify(event_name, **kwargs)
 
 class TeamNotificationSetting(models.Model):
@@ -2342,7 +2352,8 @@ class TeamNotificationSetting(models.Model):
 
     team = models.OneToOneField(Team, related_name="notification_settings",
             null=True, blank=True)
-    partner = models.OneToOneField('Partner', null=True, blank=True)
+    partner = models.OneToOneField('Partner',
+        related_name="notification_settings",  null=True, blank=True)
 
     # the url to post the callback notifing partners of new video activity
     request_url = models.URLField(blank=True, null=True)
@@ -2367,8 +2378,8 @@ class TeamNotificationSetting(models.Model):
 
     def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
-        
-        notification = self.get_notification_class()(self.team, event_name,  **kwargs)
+        notification = self.get_notification_class()(self.team, self.partner,
+                event_name,  **kwargs)
         if self.request_url:
             success, content = notification.send_http_request(
                 self.request_url,
@@ -2380,6 +2391,8 @@ class TeamNotificationSetting(models.Model):
         return
 
     def __unicode__(self):
+        if self.partner:
+            return u'NotificationSettings for partner %s' % self.partner
         return u'NotificationSettings for team %s' % self.team
 
 

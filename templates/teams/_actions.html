@@ -4,7 +4,7 @@
     <div class="join">
         {% if user.is_authenticated %}
             {% if team.is_open %}
-                {% if team.auth_provider and user.partner != team.auth_provider.code %}
+                {% if team.auth_provider and user.partner.slug != team.auth_provider.code %}
                     <a href="{% url logout %}?next={{ team.auth_provider.url }}" class="join button primary reduced">
                         {% trans 'Join via' %}
                         {% if team.auth_provider.image_url %}
@@ -22,7 +22,7 @@
                 {% endif %}
             {% endif %}
             {% if team.is_by_application %}
-                {% if team.auth_provider and user.partner != team.auth_provider.code %}
+                {% if team.auth_provider and user.partner.slug != team.auth_provider.code %}
                     <a href="{% url logout %}?next={{ team.auth_provider.url }}" class="join button primary reduced">
                         {% trans 'Login via' %}
                         {% if team.auth_provider.image_url %}

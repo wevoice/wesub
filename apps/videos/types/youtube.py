@@ -331,11 +331,18 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
              }
         }
         """
-        entry = self.GetVideoEntry(video_id=self.youtube_video_id)
-        caption_track = entry.get_link(rel= 'http://gdata.youtube.com/schemas/2007#video.captionTracks')
-        captions_feed = self.get_feed(caption_track.href,  desired_class=gdata.youtube.data.CaptionFeed)
-        captions = captions_feed.entry
         self.captions  = {}
+        entry = self.GetVideoEntry(video_id=self.youtube_video_id)
+        caption_track = entry.get_link(rel='http://gdata.youtube.com/schemas/2007#video.captionTracks')
+
+        if not caption_track:
+            # No tracks were returned.  This video doesn't have any existing
+            # captions.
+            return self.captions
+
+        captions_feed = self.get_feed(caption_track.href, desired_class=gdata.youtube.data.CaptionFeed)
+        captions = captions_feed.entry
+
         for entry in captions:
             lang = entry.get_elements(tag="content")[0].lang
             url = entry.get_edit_media_link().href
@@ -373,11 +380,11 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         # we cant just update, we need to check if it already exists... if so, we delete it
         if lang in self.captions:
-            res = self._delete_track(self.captions[lang]['track'])
+            self._delete_track(self.captions[lang]['track'])
 
-        res = self.create_track(self.youtube_video_id, title, lang, content, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
-
-        return res
+        return self.create_track(self.youtube_video_id, title, lang, content,
+                settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET,
+                self.token, {'fmt':'srt'})
 
     def _delete_track(self, track):
         res = self.delete_track(self.youtube_video_id, track, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token)

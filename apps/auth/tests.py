@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
 #
 # Copyright (C) 2012 Participatory Culture Foundation
@@ -133,6 +134,13 @@ class UserCreationTest(TestCase):
     def test_notfications(self):
         self.assertEqual(len(mail.outbox), 0)
         user = User(email='la@example.com', username='someone')
+        user.set_password("secret")
+        user.save()
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_notifications_unicode(self):
+        self.assertEqual(len(mail.outbox), 0)
+        user = User(email=u'Leandro Andrés@example.com', username='unicodesomeone')
         user.set_password("secret")
         user.save()
         self.assertEqual(len(mail.outbox), 1)

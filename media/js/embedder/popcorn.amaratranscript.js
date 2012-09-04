@@ -1,11 +1,10 @@
 (function (Popcorn) {
-    Popcorn.plugin( 'amaratranscript' , {
+    Popcorn.plugin('amaratranscript', {
         _setup : function(options) {
 
             options.pop = this;
             options.lineHtml = document.createElement('a');
             options.lineHtml.href = '#';
-            options.lineHtml.classList.add('amara-group');
             options.lineHtml.classList.add('amara-transcript-line');
             options.lineHtml.innerHTML = options.text;
 
@@ -29,11 +28,8 @@
         end: function(event, options){
             options.lineHtml.classList.remove('current-subtitle');
         },
-        frame: function(event, options) {
-
-        },
-        toString: function(event, options) {
-
-        } 
+        _teardown: function (options, start) {
+            options.container.removeChild(options.lineHtml);
+        }
     });
 })(Popcorn);
