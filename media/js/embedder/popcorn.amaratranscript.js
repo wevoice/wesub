@@ -24,6 +24,7 @@
         },
         start: function(event, options){
             options.lineHtml.classList.add('current-subtitle');
+            //options.lineHtml.scrollIntoView();
         },
         end: function(event, options){
             options.lineHtml.classList.remove('current-subtitle');
