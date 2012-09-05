@@ -13,8 +13,8 @@ if [ -e "$APP_DIR/venv" ] ; then
 fi
 
 # create the puppet environment config files
-echo "environments:\n  - vagrant\n" > /etc/system_environments.yml
-echo "roles:\n  - vagrant\n" > /etc/system_roles.yml
+echo "- vagrant\n" > /etc/system_environments.yml
+echo "- vagrant\n" > /etc/system_roles.yml
 # clone the puppet modules
 git clone https://github.com/pculture/amara-puppet 2>&1 > /dev/null
 if [ "$1" != "" ]; then
