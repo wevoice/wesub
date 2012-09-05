@@ -632,7 +632,7 @@ class TeamVideo(models.Model):
     all_languages = models.BooleanField(_('Need help with all languages'), default=False,
         help_text=_(u'If you check this, other languages will not be displayed.'))
     added_by = models.ForeignKey(User)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, editable=True)
     completed_languages = models.ManyToManyField(SubtitleLanguage, blank=True)
     partner_id = models.CharField(max_length=100, blank=True, default="")
 
