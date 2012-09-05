@@ -632,7 +632,9 @@ class TeamVideo(models.Model):
     all_languages = models.BooleanField(_('Need help with all languages'), default=False,
         help_text=_(u'If you check this, other languages will not be displayed.'))
     added_by = models.ForeignKey(User)
-    created = models.DateTimeField(auto_now_add=True)
+    # this is an auto_add like field, but done on the model save so the
+    # admin doesn't throw a fit
+    created = models.DateTimeField(blank=True)
     completed_languages = models.ManyToManyField(SubtitleLanguage, blank=True)
     partner_id = models.CharField(max_length=100, blank=True, default="")
 
@@ -680,6 +682,8 @@ class TeamVideo(models.Model):
                     "%s: Team (%s) is not equal to project's (%s) team (%s)"\
                          % (self, self.team, self.project, self.project.team)
 
+        if not self.pk:
+            self.created = datetime.datetime.now()
         super(TeamVideo, self).save(*args, **kwargs)
 
 
