@@ -493,6 +493,7 @@ class SubtitleVersion(models.Model):
 
     title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True)
+    note = models.CharField(max_length=512, blank=True, default='')
 
     created = models.DateTimeField(editable=False)
 

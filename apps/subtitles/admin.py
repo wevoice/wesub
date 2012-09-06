@@ -80,7 +80,7 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     list_filter = ['created', 'visibility', 'visibility_override',
                    'language_code']
     search_fields = ['video__video_id', 'video__title', 'title',
-                     'language_code', 'description']
+                     'language_code', 'description', 'note']
 
     def version_num(self, sv):
         return '#' + str(sv.version_number)
