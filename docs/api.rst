@@ -605,7 +605,10 @@ Team Member Resource
 ~~~~~~~~~~~~~~~~~~~~
 
 This resource allows you to change team membership information without the
-target user's input.
+target user's input.  This resource is only applicable to:
+
+* Teams associated with the partner's account
+* Users who are already members of one of the partner's teams
 
 You can list existing members of a team:
 

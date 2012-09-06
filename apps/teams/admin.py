@@ -87,21 +87,6 @@ class TeamMemberAdmin(admin.ModelAdmin):
     user_link.short_description = _('User')
     user_link.allow_tags = True
 
-class TeamVideoForm(forms.ModelForm):
-
-    class Meta:
-        model = TeamVideo
-
-    def __init__(self, *args, **kwargs):
-        super(TeamVideoForm, self).__init__(*args, **kwargs)
-
-        if self.instance and self.instance.pk:
-            qs = SubtitleLanguage.objects.filter(video=self.instance.video)
-        else:
-            qs = SubtitleLanguage.objects.none()
-
-        self.fields['completed_languages'].queryset = qs
-
 class TeamVideoAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'team_link', 'created')
     readonly_fields = ('completed_languages',)

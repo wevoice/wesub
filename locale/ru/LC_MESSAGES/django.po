@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-31 09:15-0500\n"
+"POT-Creation-Date: 2012-09-06 01:43-0500\n"
 "PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/"
@@ -424,12 +424,12 @@ msgstr ""
 msgid "Unfeature teams"
 msgstr ""
 
-#: apps/teams/admin.py:81 apps/teams/admin.py:114 apps/teams/admin.py:218
+#: apps/teams/admin.py:81 apps/teams/admin.py:99 apps/teams/admin.py:203
 #: apps/teams/models.py:176
 msgid "Team"
 msgstr "Команда"
 
-#: apps/teams/admin.py:87 apps/teams/admin.py:224
+#: apps/teams/admin.py:87 apps/teams/admin.py:209
 msgid "User"
 msgstr "Пользователь"
 
@@ -670,11 +670,11 @@ msgstr "Управляющие и администраторы"
 msgid "Admins only"
 msgstr "Только администраторы"
 
-#: apps/teams/models.py:116 apps/teams/models.py:2478
+#: apps/teams/models.py:116 apps/teams/models.py:2482
 msgid "name"
 msgstr "название"
 
-#: apps/teams/models.py:117 apps/teams/models.py:2479
+#: apps/teams/models.py:117 apps/teams/models.py:2483
 msgid "slug"
 msgstr "короткий адрес"
 
@@ -791,20 +791,20 @@ msgstr "Нужна помощь со всеми языками"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Если вы это отметите, другие языки не будут отображены."
 
-#: apps/teams/models.py:916 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:920 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Владелец"
 
-#: apps/teams/models.py:917 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:921 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Управляющий"
 
-#: apps/teams/models.py:918 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Администратор"
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:923 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr ""
 

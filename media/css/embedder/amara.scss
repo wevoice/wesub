@@ -240,6 +240,10 @@ div.amara-tools {
                 span {
                     font-weight: bold;
                 }
+                a.amara-transcript-autostream {
+                    color: #9A9B9C;
+                    text-decoration: none;
+                }
             }
             div.amara-transcript-header-right {
                 float: right;
@@ -269,8 +273,7 @@ div.amara-tools {
                 -webkit-appearance: none;
             }
             &::-webkit-scrollbar-thumb {
-                border: 1px solid white;
-                border-radius: 15px;
+                border-radius: 2px;
                 background-color: #C7C7C7;
             }
             a.amara-transcript-line {
