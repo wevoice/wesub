@@ -32,7 +32,7 @@ if INSTALLATION == DEV:
     ADMINS = (
         ('Evan', 'ehazlett@pculture.org'),
     )
-    SITE_ID = 15
+    SITE_ID = 13
     SITE_NAME = 'unisubsdev'
     REDIS_DB = "3"
     EMAIL_SUBJECT_PREFIX = '[usubs-dev]'
