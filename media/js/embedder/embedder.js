@@ -341,7 +341,8 @@
                             start_of_paragraph: subtitles[i].start_of_paragraph,
                             end: subtitles[i].end,
                             text: subtitles[i].text,
-                            container: this.$transcriptBody.get(0)
+                            container: this.$transcriptBody.get(0),
+                            _$: _$
                         });
 
                     }

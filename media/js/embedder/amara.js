@@ -11630,8 +11630,20 @@ var wikiCallback;
             // This needs to be whether or not we're currently forcing the
             // current line to come to center.
             if (true) {
-                var verticalSpace = options.container.clientHeight - options.lineHtml.offsetHeight;
-                var scrollTop = whatever - (veticalSpace / 2);
+
+                var _$ = options._$;
+
+                // Reference: http://bit.ly/Q2w5mE
+                var elementPos = _$(options.lineHtml).offset();
+                var containerPos = _$(options.container).offset();
+
+                var relY = elementPos.top - containerPos.top;
+                var spaceY = options.container.clientHeight - options.lineHtml.offsetHeight;
+
+                var scrollTop = options.container.scrollTop;
+                scrollTop += relY - spaceY / 2;
+
+                options.container.scrollTop = scrollTop;
             }
         },
         end: function(event, options){
@@ -12088,7 +12100,8 @@ Popcorn.plugin('amarasubtitle', {
                             start_of_paragraph: subtitles[i].start_of_paragraph,
                             end: subtitles[i].end,
                             text: subtitles[i].text,
-                            container: this.$transcriptBody.get(0)
+                            container: this.$transcriptBody.get(0),
+                            _$: _$
                         });
 
                     }
