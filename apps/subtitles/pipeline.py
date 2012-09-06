@@ -180,6 +180,12 @@ def add_subtitles(video, language_code, subtitles,
     Visibility and visibility_override can be given as the strings 'public' or
     'private', or omitted to use the defaults ('public' and '' respectively).
 
+    Parents can be given as an iterable of parent identifiers.  These can be
+    SubtitleVersion objects, or integers representing primary keys of
+    SubtitleVersions, or tuples of (language_code, version_number).  Note that
+    the previous version of the language (if any) will always be marked as
+    a parent.
+
     """
     with transaction.commit_on_success():
         return _add_subtitles(video, language_code, subtitles, title,

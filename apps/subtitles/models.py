@@ -418,6 +418,25 @@ class SubtitleLanguage(models.Model):
         return self.video.primary_audio_language_code == self.language_code
 
 
+    def versions_for_user(self, user):
+        from teams.models import TeamVideo
+        from teams.permissions import get_member
+
+        try:
+            team_video = (TeamVideo.objects.select_related('team')
+                                           .get(video=self.video))
+        except TeamVideo.DoesNotExist:
+            team_video = None
+
+        if team_video:
+            member = get_member(user, team_video.team)
+
+            if not member:
+                return self.subtitleversion_set.public()
+
+        return self.subtitleversion_set.all()
+
+
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
     def public(self):
@@ -514,17 +533,17 @@ class SubtitleVersion(models.Model):
           create a SubtitleSet from that.
 
         """
-        # TODO: Move this typechecking logic to the SubtitleSet constructor.
+        # TODO: Fix the language code to use the proper standard.
         if subtitles == None:
-            subtitles = SubtitleSet()
+            subtitles = SubtitleSet(self.language_code)
         elif isinstance(subtitles, str) or isinstance(subtitles, unicode):
-            subtitles = SubtitleSet('en', initial_data=subtitles)
+            subtitles = SubtitleSet(self.language_code, initial_data=subtitles)
         elif isinstance(subtitles, SubtitleSet):
             pass
         else:
             try:
                 i = iter(subtitles)
-                subtitles = SubtitleSet.from_list(i)
+                subtitles = SubtitleSet.from_list(self.language_code, i)
             except TypeError:
                 raise TypeError("Cannot create SubtitleSet from type %s"
                                 % str(type(subtitles)))

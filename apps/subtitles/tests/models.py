@@ -22,13 +22,16 @@
 from django.test import TestCase
 from django.db import IntegrityError
 
-from libs.dxfpy import SubtitleSet
+from babelsubs.storage import SubtitleSet
 
 from apps.auth.models import CustomUser as User
+from apps.subtitles import pipeline
 from apps.subtitles.models import SubtitleLanguage, Collaborator
 from apps.subtitles.tests.utils import (
-    make_video, make_video_2, make_sl, refresh, ids, parent_ids, ancestor_ids
+    make_video, make_video_2, make_video_3, make_sl, refresh, ids, parent_ids,
+    ancestor_ids
 )
+from apps.teams.models import Team, TeamMember, TeamVideo
 
 
 class TestSubtitleLanguage(TestCase):
@@ -128,20 +131,20 @@ class TestSubtitleVersion(TestCase):
         # Empty SubtitleSets
         # We explicitly test before and after refreshing to make sure the
         # serialization happens properly in both cases.
-        sv = self.sl_en.add_version(subtitles=SubtitleSet())
-        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+        sv = self.sl_en.add_version(subtitles=SubtitleSet('en'))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet('en'))
         sv = refresh(sv)
-        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+        self.assertEqual(sv.get_subtitles(), SubtitleSet('en'))
 
         sv = self.sl_en.add_version(subtitles=None)
-        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+        self.assertEqual(sv.get_subtitles(), SubtitleSet('en'))
         sv = refresh(sv)
-        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+        self.assertEqual(sv.get_subtitles(), SubtitleSet('en'))
 
         sv = self.sl_en.add_version(subtitles=[])
-        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+        self.assertEqual(sv.get_subtitles(), SubtitleSet('en'))
         sv = refresh(sv)
-        self.assertEqual(sv.get_subtitles(), SubtitleSet())
+        self.assertEqual(sv.get_subtitles(), SubtitleSet('en'))
 
         # Non-empty SubtitleSets
         # Again we test pre- and post-refresh.  Note that this is also checking
@@ -149,15 +152,15 @@ class TestSubtitleVersion(TestCase):
         s0 = (100, 200, "a")
         s1 = (300, 400, "b")
 
-        sv = self.sl_en.add_version(subtitles=SubtitleSet.from_list([s0, s1]))
-        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list([s0, s1]))
+        sv = self.sl_en.add_version(subtitles=SubtitleSet.from_list('en', [s0, s1]))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list('en', [s0, s1]))
         sv = refresh(sv)
-        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list([s0, s1]))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list('en', [s0, s1]))
 
         sv = self.sl_en.add_version(subtitles=[s0, s1])
-        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list([s0, s1]))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list('en', [s0, s1]))
         sv = refresh(sv)
-        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list([s0, s1]))
+        self.assertEqual(sv.get_subtitles(), SubtitleSet.from_list('en', [s0, s1]))
 
     def test_denormalization_sanity_checks(self):
         """Test the sanity checks for data denormalized into the version model."""
@@ -1184,3 +1187,103 @@ class TestSubtitleLanguageCollaboratorInteractions(TestCase):
         self.assertEqual(slo._needing_official_signoff(2, 2).count(), 1)
         self.assertEqual(slo._needing_official_signoff(3, 1).count(), 0)
 
+
+class TestTeamInteractions(TestCase):
+    def setUp(self):
+        users = User.objects.all()
+
+        self.user1 = users[0]
+        self.user2 = users[1]
+        self.user_public = users[2]
+
+        self.team1 = Team.objects.create(name='One', slug='one')
+        self.team2 = Team.objects.create(name='Two', slug='two')
+
+        TeamMember.objects.create(user=self.user1, team=self.team1)
+        TeamMember.objects.create(user=self.user2, team=self.team2)
+
+        self.video1 = make_video()
+        self.video2 = make_video_2()
+        self.video_public = make_video_3()
+
+        TeamVideo.objects.create(video=self.video1, team=self.team1,
+                                 added_by=User.get_anonymous())
+        TeamVideo.objects.create(video=self.video2, team=self.team2,
+                                 added_by=User.get_anonymous())
+
+        self.en1 = make_sl(self.video1, 'en')
+        self.en2 = make_sl(self.video2, 'en')
+        self.en_public = make_sl(self.video_public, 'en')
+
+        self.fr1 = make_sl(self.video1, 'fr')
+        self.fr2 = make_sl(self.video2, 'fr')
+        self.fr_public = make_sl(self.video_public, 'fr')
+
+
+    def test_private_versions(self):
+        def _get_versions(sl, user):
+            return sorted([version.version_number
+                           for version in sl.versions_for_user(user)])
+
+        def _add(video, language_code, visibility, visibility_override):
+            return pipeline.add_subtitles(video, language_code, '',
+                                          visibility=visibility,
+                                          visibility_override=visibility_override)
+
+
+        # Alias stuff.
+        u1, u2, up = self.user1, self.user2, self.user_public
+        en1, en2, enp = self.en1, self.en2, self.en_public
+        fr1, fr2, frp = self.fr1, self.fr2, self.fr_public
+        v1, v2, vp = self.video1, self.video2, self.video_public
+
+        # Ensure everything starts blank.
+        self.assertEqual(_get_versions(en1, u1), [])
+        self.assertEqual(_get_versions(en2, u1), [])
+        self.assertEqual(_get_versions(enp, u1), [])
+
+        self.assertEqual(_get_versions(en1, u2), [])
+        self.assertEqual(_get_versions(en2, u2), [])
+        self.assertEqual(_get_versions(enp, u2), [])
+
+        self.assertEqual(_get_versions(en1, up), [])
+        self.assertEqual(_get_versions(en2, up), [])
+        self.assertEqual(_get_versions(enp, up), [])
+
+        # Everyone can see versions on non-team videos, regardless of visibility
+        # settings.
+        _add(vp, 'en', 'public', '')
+        _add(vp, 'en', 'private', '')
+        _add(vp, 'en', 'public', 'private')
+        _add(vp, 'en', 'private', 'private')
+        _add(vp, 'en', 'public', 'public')
+        _add(vp, 'en', 'private', 'public')
+
+        self.assertEqual(_get_versions(enp, u1), [1, 2, 3, 4, 5, 6])
+        self.assertEqual(_get_versions(enp, u2), [1, 2, 3, 4, 5, 6])
+        self.assertEqual(_get_versions(enp, up), [1, 2, 3, 4, 5, 6])
+
+        # Team videos can always be seen by their team members.  If they're
+        # private, *only* their team members can see them.
+        _add(v1, 'en', 'public', '')
+        _add(v1, 'en', 'private', '')
+        _add(v1, 'en', 'public', 'private')
+        _add(v1, 'en', 'private', 'private')
+        _add(v1, 'en', 'public', 'public')
+        _add(v1, 'en', 'private', 'public')
+
+        self.assertEqual(_get_versions(en1, u1), [1, 2, 3, 4, 5, 6])
+        self.assertEqual(_get_versions(en1, u2), [1, 5, 6])
+        self.assertEqual(_get_versions(en1, up), [1, 5, 6])
+
+        # Should work on any team/language.
+        _add(v2, 'fr', 'public', '')
+        _add(v2, 'fr', 'private', '')
+        _add(v2, 'fr', 'public', 'private')
+        _add(v2, 'fr', 'private', 'private')
+        _add(v2, 'fr', 'public', 'public')
+        _add(v2, 'fr', 'private', 'public')
+
+        self.assertEqual(_get_versions(fr2, u1), [1, 5, 6])
+        self.assertEqual(_get_versions(fr2, u2), [1, 2, 3, 4, 5, 6])
+        self.assertEqual(_get_versions(fr2, up), [1, 5, 6])

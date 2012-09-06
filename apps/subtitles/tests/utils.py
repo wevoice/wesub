@@ -22,6 +22,7 @@ from apps.subtitles.models import SubtitleLanguage
 
 VIDEO_URL = 'http://youtu.be/heKK95DAKms'
 VIDEO_URL_2 = 'http://youtu.be/e4MSN6IImpI'
+VIDEO_URL_3 = 'http://youtu.be/i_0DXxNeaQ0'
 
 
 def make_video():
@@ -30,6 +31,10 @@ def make_video():
 
 def make_video_2():
     video, _ = Video.get_or_create_for_url(VIDEO_URL_2)
+    return video
+
+def make_video_3():
+    video, _ = Video.get_or_create_for_url(VIDEO_URL_3)
     return video
 
 
