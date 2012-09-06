@@ -1,19 +1,19 @@
 # Amara, universalsubtitles.org
-# 
+#
 # Copyright (C) 2012 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from datetime import timedelta
@@ -29,18 +29,15 @@ ADMINS = (
 )
 
 if INSTALLATION == DEV:
+    ADMINS = (
+        ('Evan', 'ehazlett@pculture.org'),
+    )
     SITE_ID = 13
     SITE_NAME = 'unisubsdev'
     REDIS_DB = "3"
     EMAIL_SUBJECT_PREFIX = '[usubs-dev]'
     SENTRY_TESTING = True
     SOLR_ROOT = '/usr/share/'
-    BROKER_BACKEND = 'amqplib'
-    BROKER_HOST = "localhost"
-    BROKER_PORT = 5672
-    BROKER_USER = "unisub"
-    BROKER_PASSWORD = "unisub"
-    BROKER_VHOST = "unisub"
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 elif INSTALLATION == STAGING:
     SITE_ID = 14
@@ -61,8 +58,12 @@ elif INSTALLATION == PRODUCTION:
     )
     # only send actual email on the production server
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    
-if INSTALLATION == STAGING or INSTALLATION == PRODUCTION:
+elif INSTALLATION == LOCAL:
+    ADMINS = (
+        ('Evan', 'ehazlett@pculture.org'),
+    )
+
+if INSTALLATION == STAGING or INSTALLATION == PRODUCTION or INSTALLATION == LOCAL:
     DATABASE_ROUTERS = ['routers.UnisubsRouter']
     AWS_STORAGE_BUCKET_NAME = DEFAULT_BUCKET
     COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'

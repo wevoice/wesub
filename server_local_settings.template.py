@@ -16,7 +16,7 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-DEV, STAGING, PRODUCTION = range(1, 4)
+DEV, STAGING, PRODUCTION, LOCAL = range(1, 5)
 
 INSTALLATION = INSERT_INSTALLATION_HERE # one of DEV, STAGING, PRODUCTION
 
@@ -75,7 +75,7 @@ STATIC_URL = 'INSERT STATIC_URL'
 TWITTER_CONSUMER_KEY = 'INSERT TWITTER CONSUMER KEY'
 TWITTER_CONSUMER_SECRET = 'INSERT TWITTER CONSUMER SECRET'
 
-if INSTALLATION == STAGING or INSTALLATION == PRODUCTION:
+if INSTALLATION == STAGING or INSTALLATION == PRODUCTION or INSTALLATION == LOCAL:
     uslogging_db = {
         'uslogging': {
             'ENGINE': 'django.db.backends.mysql',
