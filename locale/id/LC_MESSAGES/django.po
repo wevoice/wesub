@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 01:41-0500\n"
+"POT-Creation-Date: 2012-09-06 01:41-0500\n"
 "PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Indonesian (Indonesia) (http://www.transifex.com/projects/p/"
@@ -420,12 +420,12 @@ msgstr "Tim fitur"
 msgid "Unfeature teams"
 msgstr "Bukan tim fitur"
 
-#: apps/teams/admin.py:81 apps/teams/admin.py:114 apps/teams/admin.py:218
+#: apps/teams/admin.py:81 apps/teams/admin.py:99 apps/teams/admin.py:203
 #: apps/teams/models.py:176
 msgid "Team"
 msgstr "Tim"
 
-#: apps/teams/admin.py:87 apps/teams/admin.py:224
+#: apps/teams/admin.py:87 apps/teams/admin.py:209
 msgid "User"
 msgstr "Pengguna"
 
@@ -664,11 +664,11 @@ msgstr "Manajer dan admin"
 msgid "Admins only"
 msgstr "Khusus admin"
 
-#: apps/teams/models.py:116 apps/teams/models.py:2478
+#: apps/teams/models.py:116 apps/teams/models.py:2482
 msgid "name"
 msgstr "nama"
 
-#: apps/teams/models.py:117 apps/teams/models.py:2479
+#: apps/teams/models.py:117 apps/teams/models.py:2483
 msgid "slug"
 msgstr "slug"
 
@@ -783,20 +783,20 @@ msgstr "Perlu bantuan dengan semua bahasa"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Jika Anda mencentang ini, semua bahasa tidak akan ditampilkan."
 
-#: apps/teams/models.py:916 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:920 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Pemilik"
 
-#: apps/teams/models.py:917 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:921 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Manajer"
 
-#: apps/teams/models.py:918 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:923 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Kontributor"
 

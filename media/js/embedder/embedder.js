@@ -477,9 +477,9 @@
                 '    </div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
-                //'            <div class="amara-transcript-header-left">' +
-                //'                Auto-stream <span>OFF</span>' +
-                //'            </div>' +
+                '            <div class="amara-transcript-header-left">' +
+                '                <a class="amara-transcript-autostream" href="#">Auto-stream <span>ON</span></a>' +
+                '            </div>' +
                 //'            <div class="amara-transcript-header-right">' +
                 //'                <form action="" class="amara-transcript-search">' +
                 //'                    <input class="amara-transcript-search-input" placeholder="Search transcript" />' +

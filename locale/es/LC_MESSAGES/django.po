@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 01:45-0500\n"
+"POT-Creation-Date: 2012-09-06 01:44-0500\n"
 "PO-Revision-Date: 2012-08-24 06:52+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/"
@@ -441,12 +441,12 @@ msgstr "Características de los equipos"
 msgid "Unfeature teams"
 msgstr "Equipos sin características"
 
-#: apps/teams/admin.py:81 apps/teams/admin.py:114 apps/teams/admin.py:218
+#: apps/teams/admin.py:81 apps/teams/admin.py:99 apps/teams/admin.py:203
 #: apps/teams/models.py:176
 msgid "Team"
 msgstr "Equipo"
 
-#: apps/teams/admin.py:87 apps/teams/admin.py:224
+#: apps/teams/admin.py:87 apps/teams/admin.py:209
 msgid "User"
 msgstr "Usuario"
 
@@ -687,11 +687,11 @@ msgstr "Moderadores y administradores"
 msgid "Admins only"
 msgstr "Sólo administradores"
 
-#: apps/teams/models.py:116 apps/teams/models.py:2478
+#: apps/teams/models.py:116 apps/teams/models.py:2482
 msgid "name"
 msgstr "nombre"
 
-#: apps/teams/models.py:117 apps/teams/models.py:2479
+#: apps/teams/models.py:117 apps/teams/models.py:2483
 msgid "slug"
 msgstr "eslogan"
 
@@ -809,20 +809,20 @@ msgstr "¿Necesitas ayuda con todos los idiomas?"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Si marcas esta opción, se ocultarán los otros idiomas."
 
-#: apps/teams/models.py:916 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:920 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Propietario"
 
-#: apps/teams/models.py:917 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:921 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Encargado"
 
-#: apps/teams/models.py:918 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Administrador"
 
-#: apps/teams/models.py:919 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:923 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Colaborador"
 
