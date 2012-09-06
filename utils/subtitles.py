@@ -60,6 +60,8 @@ def strip_tags(text, tags=None):
     """
     if tags is None:
         tags = DEFAULT_ALLOWED_TAGS
+    if text is None:
+        return ""
     return bleach.clean(text, tags=tags, strip=True)
     
 def save_subtitle(video, language, parser, user=None, update_video=True,
