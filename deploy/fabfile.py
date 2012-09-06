@@ -193,24 +193,19 @@ def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
                 celeryd_start_cmd="",
                 celeryd_stop_cmd="",
                 celeryd_bounce_cmd="",
-                web_dir=None,
-                app_group=None,
-                ve_dir=None,
-                key_filename=''):
+                web_dir=None):
     env.user = username
     env.web_hosts = hosts
     env.hosts = []
+    env.deploy_lock = '/tmp/.unisubs_deploy_{0}'.format(git_branch)
     env.hostnames_squid_cache = hostnames_squid_cache
     env.s3_bucket = s3_bucket
-    env.deploy_lock = '/tmp/.unisubs_deploy_{0}'.format(git_branch)
     env.web_dir = web_dir or '/var/www/{0}'.format(installation_dir)
     env.static_dir = static_dir
-    env.app_group = app_group or 'pcf-web'
     env.installation_name = name
     env.git_branch = git_branch
     env.memcached_bounce_cmd = memcached_bounce_cmd
     env.admin_dir = admin_dir
-    env.ve_dir = ve_dir or '{0}/env'.format(static_dir) # static_dir for backwards compatibility
     env.admin_host = admin_host
     env.separate_uslogging_db = separate_uslogging_db
     env.celeryd_start_cmd=celeryd_start_cmd
@@ -218,32 +213,6 @@ def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
     env.celeryd_bounce_cmd=celeryd_bounce_cmd
     env.celeryd_host = celeryd_host
     env.celeryd_proj_root = celeryd_proj_root
-    env.key_filename = key_filename
-
-def local():
-    with Output("Configuring task(s) to run on LOCAL"):
-        _create_env(username              = 'vagrant',
-                    hosts                 = ['10.10.10.115'],
-                    hostnames_squid_cache = ['unisubs.local',
-                                             'unisubs.local'
-                                             ],
-                    s3_bucket             = 's3.staging.universalsubtitles.org',
-                    installation_dir      = 'unisubs',
-                    static_dir            = '/opt/apps/local/',
-                    app_group             = 'deploy',
-                    name                  = 'local',
-                    git_branch            = 'staging',
-                    memcached_bounce_cmd  = '/etc/init.d/memcached restart',
-                    admin_dir             = '/opt/apps/local/',
-                    ve_dir                = '/opt/ve/unisubs_local',
-                    admin_host            = 'data.local',
-                    celeryd_host          = 'data.local',
-                    celeryd_proj_root     = 'unisubs.local',
-                    separate_uslogging_db = True,
-                    celeryd_start_cmd     = "/etc/init.d/celeryd start",
-                    celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
-                    celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start",
-                    key_filename          = "~/.vagrant.d/insecure_private_key",)
 
 def staging(username):
     with Output("Configuring task(s) to run on STAGING"):
@@ -372,12 +341,12 @@ def syncdb():
         env.host_string = DEV_HOST
         with cd(os.path.join(env.static_dir, 'unisubs')):
             _git_pull()
-            run('{0}/bin/python manage.py syncdb '
-                '--settings=unisubs_settings'.format(env.ve_dir))
+            run('{0}/env/bin/python manage.py syncdb '
+                '--settings=unisubs_settings'.format(env.static_dir))
             if env.separate_uslogging_db:
-                run('{0}/bin/python manage.py syncdb '
+                run('{0}/env/bin/python manage.py syncdb '
                     '--database=uslogging --settings=unisubs_settings'.format(
-                        env.ve_dir))
+                        env.static_dir))
 
 @lock_required
 def migrate(app_name=''):
@@ -386,11 +355,11 @@ def migrate(app_name=''):
         with cd(os.path.join(env.static_dir, 'unisubs')):
             _git_pull()
             if env.separate_uslogging_db:
-                run('{0}/bin/python manage.py migrate uslogging '
+                run('{0}/env/bin/python manage.py migrate uslogging '
                     '--database=uslogging --settings=unisubs_settings'.format(
-                        env.ve_dir))
+                        env.static_dir))
 
-            manage_cmd = 'yes no | {0}/ebin/python -u manage.py migrate {1} --settings=unisubs_settings 2>&1'.format(env.ve_dir, app_name)
+            manage_cmd = 'yes no | {0}/env/bin/python -u manage.py migrate {1} --settings=unisubs_settings 2>&1'.format(env.static_dir, app_name)
             timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
             log_cmd = WRITE_LOG % 'database_migrations'
 
@@ -410,8 +379,8 @@ def run_command(command):
         env.host_string = DEV_HOST
         with cd(os.path.join(env.static_dir, 'unisubs')):
             _git_pull()
-            run('{0}/bin/python manage.py {1} '
-                '--settings=unisubs_settings'.format(env.ve_dir, command))
+            run('{0}/env/bin/python manage.py {1} '
+                '--settings=unisubs_settings'.format(env.static_dir, command))
 
 def _run_shell(base_dir, command, is_sudo=False):
     if is_sudo:
@@ -419,7 +388,7 @@ def _run_shell(base_dir, command, is_sudo=False):
     else:
         f = run
     with cd(os.path.join(base_dir, 'unisubs')):
-        f('sh {0}/bin/activate && {1}'.format(env.ve_dir, command))
+        f('sh ../env/bin/activate && %s' % command)
 
 def run_shell(command, is_sudo=False):
     """Run the given command inside the virtual env for each host/environment."""
@@ -441,7 +410,7 @@ def migrate_fake(app_name):
     with Output("Faking migration for {0}".format(app_name)):
         env.host_string = DEV_HOST
         with cd(os.path.join(env.static_dir, 'unisubs')):
-            run('yes no | {0}/bin/python manage.py migrate {1} 0001 --fake --settings=unisubs_settings'.format(env.ve_dir, app_name))
+            run('yes no | {0}/env/bin/python manage.py migrate {1} 0001 --fake --settings=unisubs_settings'.format(env.static_dir, app_name))
 
 @lock_required
 def refresh_db():
@@ -459,8 +428,8 @@ def refresh_db():
         sudo('/scripts/amara_refresh_db.sh {0}'.format(env.installation_name))
         promote_django_admins()
         bounce_memcached()
-        run('{0}/bin/python manage.py fix_static_files '
-            '--settings=unisubs_settings'.format(env.ve_dir))
+        run('{0}/env/bin/python manage.py fix_static_files '
+            '--settings=unisubs_settings'.format(env.static_dir))
 
         start_celeryd()
         removed_disabled()
@@ -500,7 +469,7 @@ def switch_branch(branch_name):
 
 def _remove_pip_package(base_dir, package_name):
     with cd(os.path.join(base_dir, 'unisubs', 'deploy')):
-        run('yes y | {0}/bin/pip uninstall {1}'.format(base_dir, package_name), pty=True)
+        run('yes y | {0}/env/bin/pip uninstall {1}'.format(base_dir, package_name), pty=True)
         #_clear_permissions(os.path.join(base_dir, 'env'))
 
 def remove_pip_package(package_egg_name):
@@ -512,7 +481,7 @@ def _update_environment(base_dir, flags=''):
         _git_pull()
         run('export PIP_REQUIRE_VIRTUALENV=true')
         # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
-        run('yes i | {0}/bin/pip install {1} -r requirements.txt'.format(base_dir, flags), pty=True)
+        run('yes i | {0}/env/bin/pip install {1} -r requirements.txt'.format(base_dir, flags), pty=True)
         #_clear_permissions(os.path.join(base_dir, 'env'))
 
 def _update_environment_parallel(base_dir, flags=''):
@@ -549,7 +518,7 @@ def update_environment(flags=''):
         _execute_on_all_hosts(lambda dir: _update_environment(dir, flags))
 
 def _clear_permissions(dir):
-    sudo('chgrp {0} -R {1}'.format(env.app_group, dir))
+    sudo('chgrp pcf-web -R {0}'.format(dir))
     sudo('chmod g+w -R {0}'.format(dir))
 
 def clear_environment_permissions():
@@ -567,9 +536,9 @@ def clear_permissions():
 def _git_pull():
     run('git checkout --force')
     run('git pull --ff-only')
-    run('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
-    run('chmod g+w -R .git 2> /dev/null; /bin/true')
-    _clear_permissions('.')
+    #run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    #run('chmod g+w -R .git 2> /dev/null; /bin/true')
+    #_clear_permissions('.')
 
 def _git_checkout(commit, as_sudo=False):
     cmd = run
@@ -577,9 +546,9 @@ def _git_checkout(commit, as_sudo=False):
         cmd = sudo
     cmd('git fetch')
     cmd('git checkout --force %s' % commit)
-    cmd('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
-    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
-    _clear_permissions('.')
+    #cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    #cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    #_clear_permissions('.')
 
 def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
     cmd = run
@@ -588,9 +557,9 @@ def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
     cmd('git fetch')
     cmd('git checkout %s' % branch)
     cmd('git reset --hard %s' % commit)
-    cmd('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
-    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
-    _clear_permissions('.')
+    #cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
+    #cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    #_clear_permissions('.')
 
 
 def _get_optional_repo_version(dir, repo):
@@ -660,7 +629,7 @@ def update_integration():
     with Output("Updating nested unisubs-integration repositories"):
         _execute_on_all_hosts(_update_integration)
 
-def _notify(subj, msg, audience='ehazlett@pculture.org'):
+def _notify(subj, msg, audience='sysadmin@pculture.org ehazlett@pculture.org'):
     mail_from_host = 'pcf-us-dev.pculture.org:2191'
 
     old_host = env.host_string
@@ -722,19 +691,18 @@ def update_solr_schema():
             # staging and production
             env.host_string = env.admin_host
             dir = env.admin_dir
-            python_exe = '{0}/bin/python'.format(env.ve_dir)
-            install_name = 'production' if env.installation_name is None else env.installation_name
+            python_exe = '{0}/env/bin/python'.format(env.admin_dir)
             with cd(os.path.join(dir, 'unisubs')):
                 _git_pull()
                 run('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
                         python_exe,
-                        install_name))
+                        'production' if env.installation_name is None else 'staging'))
                 run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
         else:
             # dev
             env.host_string = DEV_HOST
             dir = env.web_dir
-            python_exe = '{0}/bin/python'.format(env.ve_dir)
+            python_exe = '{0}/env/bin/python'.format(env.web_dir)
             with cd(os.path.join(dir, 'unisubs')):
                 _git_pull()
                 run('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/main/conf/schema.xml'.format(python_exe))
@@ -840,8 +808,8 @@ def test_services():
         for host in env.web_hosts:
             env.host_string = host
             with cd(os.path.join(env.web_dir, 'unisubs')):
-                run('{0}/bin/python manage.py test_services --settings=unisubs_settings'.format(
-                    env.ve_dir))
+                run('{0}/env/bin/python manage.py test_services --settings=unisubs_settings'.format(
+                    env.web_dir))
 
 def test_memcached():
     """Ensure memcached is running, working, and sane"""
@@ -856,14 +824,14 @@ def test_memcached():
                 for i in xrange(12)])
             env.host_string = host[0]
             with cd(os.path.join(host[1], 'unisubs')):
-                run('{0}/bin/python manage.py set_memcached {1} --settings=unisubs_settings'.format(
-                    env.ve_dir, random_string))
+                run('../env/bin/python manage.py set_memcached {0} --settings=unisubs_settings'.format(
+                    random_string))
             other_hosts = host_set - set([host])
             for other_host in other_hosts:
                 env.host_string = other_host[0]
                 output = ''
                 with cd(os.path.join(other_host[1], 'unisubs')):
-                    output = run('{0}/bin/python manage.py get_memcached --settings=unisubs_settings'.format(env.ve_dir))
+                    output = run('../env/bin/python manage.py get_memcached --settings=unisubs_settings')
                 if output.find(random_string) == -1:
                     raise Exception('Machines {0} and {1} are using different memcached instances'.format(
                             host[0], other_host[0]))
@@ -873,10 +841,9 @@ def test_memcached():
 def _update_static(dir, compilation_level):
     with cd(os.path.join(dir, 'unisubs')):
         media_dir = '{0}/unisubs/media/'.format(dir)
-        python_exe = '{0}/bin/python'.format(env.ve_dir)
+        python_exe = '{0}/env/bin/python'.format(dir)
         _git_pull()
-        _update_integration(dir)
-        _clear_permissions(media_dir)
+        #_clear_permissions(media_dir)
         run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
 
 def _save_embedjs_on_app_servers():
@@ -900,7 +867,7 @@ def _save_embedjs_on_app_servers():
         _git_pull()
 
     with cd(os.path.join(base_dir, 'unisubs')):
-        python_exe = '{0}/bin/python'.format(env.ve_dir)
+        python_exe = '{0}/env/bin/python'.format(base_dir)
         res = run('{0} manage.py  get_settings_values STATIC_URL_BASE --single-host --settings=unisubs_settings'.format(python_exe))
         media_url = res.replace("\n", "").strip()
         url = "%sembed.js" % media_url
@@ -923,7 +890,7 @@ def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
         if env.s3_bucket is not None:
             with cd(os.path.join(env.static_dir, 'unisubs')):
                 _update_static(env.static_dir, compilation_level)
-                python_exe = '{0}/bin/python'.format(env.ve_dir)
+                python_exe = '{0}/env/bin/python'.format(env.static_dir)
                 run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
         else:
             _update_static(env.web_dir, compilation_level)
@@ -936,7 +903,7 @@ def update():
 
 def _promote_django_admins(dir, email=None, new_password=None, userlist_path=None):
     with cd(os.path.join(dir, 'unisubs')):
-        python_exe = '{0}/bin/python'.format(env.ve_dir)
+        python_exe = '{0}/env/bin/python'.format(dir)
         args = ""
         if email is not None:
             args += "--email=%s" % (email)
@@ -989,8 +956,8 @@ def update_translations():
 
 def _test_email(dir, to_address):
     with cd(os.path.join(dir, 'unisubs')):
-        run('{0}/bin/python manage.py test_email {1} '
-            '--settings=unisubs_settings'.format(env.ve_dir, to_address))
+        run('{0}/env/bin/python manage.py test_email {1} '
+            '--settings=unisubs_settings'.format(dir, to_address))
 
 def test_email(to_address):
     with Output("Testing email"):
@@ -1006,16 +973,15 @@ def build_docs():
     with Output("Generating documentation"):
         env.host_string = DEV_HOST
         with cd(os.path.join(env.static_dir, 'unisubs')):
-            run('%s/bin/sphinx-build docs/ media/docs/' % (env.ve_dir))
+            run('%s/env/bin/sphinx-build docs/ media/docs/' % (env.static_dir))
         if env.s3_bucket is not None:
             with cd(os.path.join(env.static_dir, 'unisubs')):
-                python_exe = '{0}/bin/python'.format(env.ve_dir)
+                python_exe = '{0}/env/bin/python'.format(env.static_dir)
                 run('{0} manage.py  upload_docs --settings=unisubs_settings'.format(python_exe))
 
 def _get_settings_values(dir, *settings_name):
     with cd(os.path.join(dir, 'unisubs')):
-        run('{0}/bin/python manage.py get_settings_values {1} --settings=unisubs_settings'.format(env.ve_dir, \
-            " ".join(settings_name)))
+        run('../env/bin/python manage.py get_settings_values %s --settings=unisubs_settings' % " ".join(settings_name))
 
 def get_settings_values(*settings_names):
     """Connect to all servers and print a given Django setting
