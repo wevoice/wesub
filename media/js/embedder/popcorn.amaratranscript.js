@@ -24,12 +24,30 @@
         },
         start: function(event, options){
             options.lineHtml.classList.add('current-subtitle');
-            //options.lineHtml.scrollIntoView();
+
+            // This needs to be whether or not we're currently forcing the
+            // current line to come to center.
+            if (true) {
+
+                var _$ = options._$;
+
+                // Reference: http://bit.ly/Q2w5mE
+                var elementPos = _$(options.lineHtml).offset();
+                var containerPos = _$(options.container).offset();
+
+                var relY = elementPos.top - containerPos.top;
+                var spaceY = options.container.clientHeight - options.lineHtml.offsetHeight;
+
+                var scrollTop = options.container.scrollTop;
+                scrollTop += relY - spaceY / 2;
+
+                options.container.scrollTop = scrollTop;
+            }
         },
         end: function(event, options){
             options.lineHtml.classList.remove('current-subtitle');
         },
-        _teardown: function (options, start) {
+        _teardown: function(options, start) {
             options.container.removeChild(options.lineHtml);
         }
     });
