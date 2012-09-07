@@ -19,11 +19,19 @@
 
         // Set the scrollTop of the container to the difference in top-positions,
         // plus the existing scrollTop, minus 50% of the available vertical space.
-        var scrollTop = options.container.scrollTop;
-        scrollTop += diffY - spaceY / 2;
-        options.container.scrollTop = scrollTop;
+        var oldScrollTop = options.container.scrollTop;
+        var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
+
+        // Lots of sites have jQuery loaded. If it is, use jQuery to animate the scroll
+        // change. Zepto does not animate on scrollTop: http://bit.ly/OtlKxl
+        if (typeof window.jQuery !== 'undefined') {
+            window.jQuery(options.container).animate({scrollTop: newScrollTop}, 50);
+        } else {
+            options.container.scrollTop = newScrollTop;
+        }
+
     }
-    
+
     Popcorn.plugin('amaratranscript', {
         _setup : function(options) {
 
