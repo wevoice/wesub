@@ -1,21 +1,53 @@
 (function (Popcorn) {
+
+    // Scroll the transcript container to the line, and bring the line to the center
+    // of the vertical height of the container.
+    function scrollToLine(options) {
+
+        // Grab the DOM lib.
+        var _$ = options._$;
+
+        // Retrieve the absolute positions of the line and the container.
+        var linePos = _$(options.line).offset();
+        var containerPos = _$(options.container).offset();
+
+        // The difference in top-positions between the line and the container.
+        var diffY = linePos.top - containerPos.top;
+
+        // The available vertical space within the container.
+        var spaceY = options.container.clientHeight - options.line.offsetHeight;
+
+        // Set the scrollTop of the container to the difference in top-positions,
+        // plus the existing scrollTop, minus 50% of the available vertical space.
+        var scrollTop = options.container.scrollTop;
+        scrollTop += diffY - spaceY / 2;
+        options.container.scrollTop = scrollTop;
+    }
+    
     Popcorn.plugin('amaratranscript', {
         _setup : function(options) {
 
             options.pop = this;
-            options.lineHtml = document.createElement('a');
-            options.lineHtml.href = '#';
-            options.lineHtml.classList.add('amara-transcript-line');
-            options.lineHtml.innerHTML = options.text;
 
+            // Construct the transcript line.
+            options.line = document.createElement('a');
+            options.line.href = '#';
+            options.line.classList.add('amara-transcript-line');
+            options.line.innerHTML = options.text;
+
+            // If this subtitle has indicated that it's the beginning of a paragraph,
+            // prepend two line breaks before the subtitle.
             if (options.start_of_paragraph) {
                 options.container.appendChild(document.createElement('br'));
                 options.container.appendChild(document.createElement('br'));
             }
 
-            options.container.appendChild(options.lineHtml);
+            // Add the subtitle to the transcript container.
+            options.container.appendChild(options.line);
 
-            options.lineHtml.addEventListener('click', function(e) {
+            // Upon clicking the line, we should set the video playhead to this line's
+            // start time.
+            options.line.addEventListener('click', function(e) {
                 options.pop.currentTime(options.start);
                 e.preventDefault();
                 e.stopPropagation();
@@ -23,32 +55,19 @@
 
         },
         start: function(event, options){
-            options.lineHtml.classList.add('current-subtitle');
 
-            // This needs to be whether or not we're currently forcing the
-            // current line to come to center.
-            if (true) {
+            // When we reach this subtitle, add this class.
+            options.line.classList.add('current-subtitle');
 
-                var _$ = options._$;
-
-                // Reference: http://bit.ly/Q2w5mE
-                var elementPos = _$(options.lineHtml).offset();
-                var containerPos = _$(options.container).offset();
-
-                var relY = elementPos.top - containerPos.top;
-                var spaceY = options.container.clientHeight - options.lineHtml.offsetHeight;
-
-                var scrollTop = options.container.scrollTop;
-                scrollTop += relY - spaceY / 2;
-
-                options.container.scrollTop = scrollTop;
-            }
+            scrollToLine(options);
         },
         end: function(event, options){
-            options.lineHtml.classList.remove('current-subtitle');
+
+            // When we're no longer on this subtitle, remove this class.
+            options.line.classList.remove('current-subtitle');
         },
         _teardown: function(options, start) {
-            options.container.removeChild(options.lineHtml);
+            options.container.removeChild(options.line);
         }
     });
 })(Popcorn);
