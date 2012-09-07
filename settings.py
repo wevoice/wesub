@@ -307,11 +307,6 @@ USE_I18N = True
 STATIC_ROOT = rel('media')+'/'
 MEDIA_ROOT  = rel('user-data')+'/'
 
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -476,6 +471,7 @@ ACCOUNT_ACTIVATION_DAYS = 9999 # we are using registration only to verify emails
 SESSION_COOKIE_AGE = 2419200 # 4 weeks
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_COOKIE_HTTPONLY = False
 
 RECENT_ACTIVITIES_ONPAGE = 10
 ACTIVITIES_ONPAGE = 20

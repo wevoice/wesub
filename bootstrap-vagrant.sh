@@ -2,20 +2,24 @@
 
 set -e
 
+EXTRAS_DIR='/opt/extras'
+VE_DIR='/opt/ve/vagrant/unisubs'
+# create virtualenv ; no longer needed
+#virtualenv --no-site-packages --distribute $VE_DIR
 # Link folders ----------------------------------------------------------------
-mkdir -p ../extras/static-cache
-mkdir -p ../extras/pictures
-mkdir -p ../extras/video
-test -L venv               || ln -s ../extras/venv venv
-test -L media/static-cache || ln -s ../../extras/static-cache media/static-cache
-test -L user-data/video    || ln -s ../../extras/video user-data/video
-test -L user-data/pictures || ln -s ../../extras/pictures user-data/pictures
+mkdir -p $EXTRAS_DIR/static-cache
+mkdir -p $EXTRAS_DIR/pictures
+mkdir -p $EXTRAS_DIR/video
+test -e venv               || ln -sf $VE_DIR venv
+test -L media/static-cache || ln -s $EXTRAS_DIR/static-cache media/static-cache
+test -L user-data/video    || ln -s $EXTRAS_DIR/video user-data/video
+test -L user-data/pictures || ln -s $EXTRAS_DIR/pictures user-data/pictures
 
 # Install requirements --------------------------------------------------------
-source venv/bin/activate
+source $VE_DIR/bin/activate
 cd deploy
 # Hack until we can think of a better solution
-pip install vendor/pycrypto-2.1.0.tar.gz
+#pip install vendor/pycrypto-2.1.0.tar.gz
 pip install -r requirements.txt
 pip install -r requirements-test.txt
 cd ..
@@ -69,6 +73,10 @@ SPEAKERTEXT_PASSWORD = ""
 RIEMANN_HOST = '10.10.10.44'
 ENABLE_METRICS = False
 
+# Stanford
+STANFORD_CONSUMER_KEY = ''
+STANFORD_CONSUMER_SECRET = ''
+
 # Youtube
 YOUTUBE_ALWAYS_PUSH_USERNAME = None
 YOUTUBE_ALWAYS_PUSH_TO = {}
@@ -82,11 +90,11 @@ python manage.py migrate --fake --settings=dev_settings
 sudo ./deploy/update_solr_schema_vagrant.sh
 
 # Adjust sys.path -------------------------------------------------------------
-cat >venv/lib/python2.6/sitecustomize.py <<EOF
+cat > venv/lib/python2.6/sitecustomize.py <<EOF
 import sys
 
 try:
-    sys.path.remove('/opt/extras/venv/lib/python2.6/site-packages')
+    sys.path.remove('/opt/ve/vagrant/unisubs/lib/python2.6/site-packages')
 except ValueError:
     pass
 
@@ -95,12 +103,19 @@ try:
 except ValueError:
     pass
 
-sys.path = ['/opt/extras/venv/lib/python2.6/site-packages', '/usr/lib/python2.6'] + sys.path
+sys.path = ['/opt/ve/vagrant/unisubs/lib/python2.6/site-packages', '/usr/lib/python2.6'] + sys.path
 EOF
 
+# Selenium testing support
+pip install selenium factory_boy
+if [ "$(grep 'unisubs.example.com' /etc/hosts)" = "" ] ; then
+  echo "Adding unisubs.example.com to /etc/hosts"
+  echo "127.0.0.1   unisubs.example.com" | sudo tee -a /etc/hosts 2>&1 > /dev/null
+fi
+
 # Celery services -------------------------------------------------------------
-sudo /etc/init.d/celeryd restart
-sudo /etc/init.d/celerybeat restart
+sudo service celeryd.vagrant restart
+sudo service celerycam.vagrant restart
 
 # Notice ----------------------------------------------------------------------
 echo "========================================================================="

@@ -83,6 +83,11 @@
     name: unisubsnf
 
 - model: sites.site
+  pk: 15 
+  fields:
+    domain: unisubs.example.com:80
+    name: unisubs-dev    
+- model: sites.site
   pk: 15
   fields:
     domain: dev-new.amara.org

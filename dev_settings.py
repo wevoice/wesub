@@ -1,19 +1,19 @@
 # Amara, universalsubtitles.org
-# 
+#
 # Copyright (C) 2012 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from datetime import timedelta
@@ -57,7 +57,7 @@ FACEBOOK_SECRET_KEY = '2a18604dac1ad7e9817f80f3aa3a69f2'
 
 # Celery
 CELERY_ALWAYS_EAGER = True
-HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/core0'
+HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/vagrant'
 CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 
 # Or you can use redis as backend
@@ -65,7 +65,7 @@ CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 #BROKER_HOST = "localhost"
 #BROKER_VHOST = "/"
 
-# 1. Run Redis 
+# 1. Run Redis
 # 2. >>> python manage.py celeryd -E --concurrency=10 -n worker1.localhost
 # 3. >>> ./dev-runserver
 # 4. >>> python manage.py celerycam #this is optional. It allow see in admin-interface tasks running

@@ -11626,11 +11626,30 @@ var wikiCallback;
         },
         start: function(event, options){
             options.lineHtml.classList.add('current-subtitle');
+
+            // This needs to be whether or not we're currently forcing the
+            // current line to come to center.
+            if (true) {
+
+                var _$ = options._$;
+
+                // Reference: http://bit.ly/Q2w5mE
+                var elementPos = _$(options.lineHtml).offset();
+                var containerPos = _$(options.container).offset();
+
+                var relY = elementPos.top - containerPos.top;
+                var spaceY = options.container.clientHeight - options.lineHtml.offsetHeight;
+
+                var scrollTop = options.container.scrollTop;
+                scrollTop += relY - spaceY / 2;
+
+                options.container.scrollTop = scrollTop;
+            }
         },
         end: function(event, options){
             options.lineHtml.classList.remove('current-subtitle');
         },
-        _teardown: function (options, start) {
+        _teardown: function(options, start) {
             options.container.removeChild(options.lineHtml);
         }
     });
@@ -12081,7 +12100,8 @@ Popcorn.plugin('amarasubtitle', {
                             start_of_paragraph: subtitles[i].start_of_paragraph,
                             end: subtitles[i].end,
                             text: subtitles[i].text,
-                            container: this.$transcriptBody.get(0)
+                            container: this.$transcriptBody.get(0),
+                            _$: _$
                         });
 
                     }
@@ -12217,9 +12237,9 @@ Popcorn.plugin('amarasubtitle', {
                 '    </div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
-                //'            <div class="amara-transcript-header-left">' +
-                //'                Auto-stream <span>OFF</span>' +
-                //'            </div>' +
+                '            <div class="amara-transcript-header-left">' +
+                '                <a class="amara-transcript-autostream" href="#">Auto-stream <span>ON</span></a>' +
+                '            </div>' +
                 //'            <div class="amara-transcript-header-right">' +
                 //'                <form action="" class="amara-transcript-search">' +
                 //'                    <input class="amara-transcript-search-input" placeholder="Search transcript" />' +
