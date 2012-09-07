@@ -23,6 +23,12 @@ import logging
 SITE_ID = 4
 SITE_NAME = 'unisubs-dev'
 
+BROKER_BACKEND = 'amqplib'
+BROKER_HOST = 'localhost'
+BROKER_USER = 'usrmquser'
+BROKER_PASSWORD = 'usrmqpassword'
+BROKER_PORT = 5672
+
 JS_USE_COMPILED = True
 
 debug = False
