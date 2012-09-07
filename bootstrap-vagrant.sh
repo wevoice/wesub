@@ -73,6 +73,10 @@ SPEAKERTEXT_PASSWORD = ""
 RIEMANN_HOST = '10.10.10.44'
 ENABLE_METRICS = False
 
+# Stanford
+STANFORD_CONSUMER_KEY = ''
+STANFORD_CONSUMER_SECRET = ''
+
 # Youtube
 YOUTUBE_ALWAYS_PUSH_USERNAME = None
 YOUTUBE_ALWAYS_PUSH_TO = {}
@@ -101,6 +105,13 @@ except ValueError:
 
 sys.path = ['/opt/ve/vagrant/unisubs/lib/python2.6/site-packages', '/usr/lib/python2.6'] + sys.path
 EOF
+
+# Selenium testing support
+pip install selenium factory_boy
+if [ "$(grep 'unisubs.example.com' /etc/hosts)" = "" ] ; then
+  echo "Adding unisubs.example.com to /etc/hosts"
+  echo "127.0.0.1   unisubs.example.com" | sudo tee -a /etc/hosts 2>&1 > /dev/null
+fi
 
 # Celery services -------------------------------------------------------------
 sudo service celeryd.vagrant restart

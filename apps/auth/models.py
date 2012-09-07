@@ -62,7 +62,7 @@ class CustomUser(BaseUser):
         (AUTOPLAY_ON_LANGUAGES, 'Autoplay subtitles in languages I know'),
         (DONT_AUTOPLAY, 'Don\'t autoplay subtitles')
     )
-    homepage = models.URLField(verify_exists=False, blank=True)
+    homepage = models.URLField(blank=True)
     preferred_language = models.CharField(
         max_length=16, choices=ALL_LANGUAGES, blank=True)
     picture = S3EnabledImageField(blank=True, upload_to='pictures/')
