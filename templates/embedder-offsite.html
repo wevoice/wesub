@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <title>Embedder test for external sites.</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css" />
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+        <script type="text/javascript">
+            (function (window, document) {
+                var loader = function () {
+                    var script = document.createElement('script'), tag = document.getElementsByTagName('script')[0];
+                    script.src = 'https://staging.universalsubtitles.org/site_media/js/embedder/amara.js';
+                    tag.parentNode.insertBefore(script, tag);
+                };
+                window.addEventListener ? window.addEventListener('load', loader, false) : window.attachEvent('onload', loader);
+            })(window, document);
+        </script>
+        <style type="text/css" media="screen">
+            body {
+                margin: 20px 0 500px 0;
+            }
+            p {
+                margin: 20px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container main">
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a class="brand" href="/embedder/">
+                            Amara Embedder
+                        </a>
+                        <ul class="nav pull-right">
+                            <li><a href="http://universalsubtitles.org">Amara (Universal Subtitles)</a></li>
+                            <li><a href="http://popcornjs.org">Popcorn.js</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <section class="main">
+                <p>Step 1: paste this in-between your head tags:</p>
+                <script type="text/javascript" src="https://snipt.net/embed/b40956e6b61188ed54e001dc6382bf04/"></script>
+                <p>Step 2: paste this somewhere inside your HTML body, with the video URL, height, and width of your choosing:</p>
+                <script type="text/javascript" src="https://snipt.net/embed/0f2bd07c64809fab54ec2b2a7a9ea34d/"></script>
+                <p>Demo:</p>
+                <div class="amara-embed" style="height: 480px; width: 854px" data-url="http://www.youtube.com/watch?v=bNySL-ihAvo"></div>
+            </section>
+        </div>
+    </body>
+</html>
