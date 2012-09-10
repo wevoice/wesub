@@ -12340,7 +12340,6 @@ Popcorn.plugin('amarasubtitle', {
             style.rel = 'stylesheet';
             style.type = 'text/css';
 
-            // TODO: This needs to be a production URL based on DEBUG or not.
             style.href = 'http://staging.universalsubtitles.org/site_media/css/embedder/amara.css';
             tag.parentNode.insertBefore(style, tag);
 
