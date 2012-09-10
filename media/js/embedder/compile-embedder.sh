@@ -22,5 +22,4 @@ sed -i -e 's/\/site_media/http:\/\/staging.universalsubtitles.org\/site_media/g'
 sed -i -e 's/\/site_media/http:\/\/staging.universalsubtitles.org\/site_media/g' media/css/embedder/amara.css
 
 rm media/css/embedder/amara.css-e
-rm media/js/embedder/amara.css-e
 rm media/js/embedder/amara.js-e
