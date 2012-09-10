@@ -9,9 +9,9 @@ sudo apt-get install dkms
 sudo apt-get install "linux-headers-`uname -r`"
 
 cd /opt
-test -f 'VirtualBox-GuestAdditions-4.1.4.iso' || sudo wget 'http://download.virtualbox.org/virtualbox/4.1.4/VBoxGuestAdditions_4.1.4.iso' -O VirtualBox-GuestAdditions-4.1.4.iso
+test -f 'VirtualBox-GuestAdditions-4.1.22.iso' || sudo wget 'http://download.virtualbox.org/virtualbox/4.1.22/VBoxGuestAdditions_4.1.22.iso' -O VirtualBox-GuestAdditions-4.1.22.iso
 
-sudo mount VirtualBox-GuestAdditions-4.1.4.iso -o loop /mnt
+sudo mount VirtualBox-GuestAdditions-4.1.22.iso -o loop /mnt
 
 cd /mnt
 
