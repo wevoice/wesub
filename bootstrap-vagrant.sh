@@ -114,10 +114,8 @@ if [ "$(grep 'unisubs.example.com' /etc/hosts)" = "" ] ; then
 fi
 
 # Celery services -------------------------------------------------------------
-sudo service celeryd.vagrant stop
-sudo service celeryd.vagrant start
-sudo service celerycam.vagrant stop
-sudo service celerycam.vagrant start
+sudo service celeryd.vagrant status | grep running || sudo service celeryd.vagrant start
+sudo service celerycam.vagrant status | grep running || sudo service celeryd.vagrant start
 
 # Notice ----------------------------------------------------------------------
 echo "========================================================================="
