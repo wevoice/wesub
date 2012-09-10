@@ -510,7 +510,7 @@ def diffing(request, first_version, second_pk):
         # this is either a bad bug, or someone evil
         raise "Revisions for diff videos"
     video = first_version.language.video
-    if second_version.datetime_started > first_version.datetime_started:
+    if second_version.version_no > first_version.version_no:
         first_version, second_version = second_version, first_version
 
     second_captions = dict([(item.subtitle_id, item) for item in second_version.ordered_subtitles()])
