@@ -12341,7 +12341,7 @@ Popcorn.plugin('amarasubtitle', {
             style.type = 'text/css';
 
             // TODO: This needs to be a production URL based on DEBUG or not.
-            style.href = 'http://staging.universalsubtitles.org/site_media/css/embedder/amara.css';
+            style.href = '/site_media/css/embedder/amara-dev.css';
             tag.parentNode.insertBefore(style, tag);
 
             // Change the template delimiter for Underscore templates.

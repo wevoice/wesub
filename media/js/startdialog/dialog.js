@@ -225,7 +225,7 @@ unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
     }
 };
 unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
-    var blocked_languages = this.model_.blockedLanguages_;
+    var blocked_languages = this.model_.blockedLanguages_ || [];
 
     var toLanguageContents = goog.array.map(
         this.model_.toLanguages(),
