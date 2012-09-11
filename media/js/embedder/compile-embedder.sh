@@ -18,8 +18,8 @@ cp media/js/embedder/amara-dev.js media/js/embedder/amara.js
 cp media/css/embedder/amara-dev.css media/css/embedder/amara.css
 
 sed -i -e 's/amara-dev/amara/g' media/js/embedder/amara.js
-sed -i -e 's/\/site_media/http:\/\/staging.universalsubtitles.org\/site_media/g' media/js/embedder/amara.js
-sed -i -e 's/\/site_media/http:\/\/staging.universalsubtitles.org\/site_media/g' media/css/embedder/amara.css
+sed -i -e 's/\/site_media/https:\/\/staging.universalsubtitles.org\/site_media/g' media/js/embedder/amara.js
+sed -i -e 's/\/site_media/https:\/\/staging.universalsubtitles.org\/site_media/g' media/css/embedder/amara.css
 
 rm media/css/embedder/amara.css-e
 rm media/js/embedder/amara.js-e
