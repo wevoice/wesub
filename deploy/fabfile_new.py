@@ -260,6 +260,34 @@ def dev(username):
                     },
                     notification_email   = 'ehazlett@pculture.org',)
 
+@task
+def staging(username):
+    """
+    Configure task(s) to run in the staging environment
+
+    """
+    with Output("Configuring task(s) to run on STAGING"):
+        env_name = 'staging'
+        _create_env(username              = username,
+                    name                  = env_name,
+                    s3_bucket             = None,
+                    app_name              = 'unisubs',
+                    app_dir               = '/opt/apps/{0}/unisubs/'.format(
+                        env_name),
+                    app_group             = 'deploy',
+                    revision              = env_name,
+                    ve_dir                = '/opt/ve/{0}/unisubs'.format(
+                        env_name),
+                    separate_uslogging_db = False,
+                    roledefs              = {
+                        'app': [
+                            'app-00-staging.amara.org',
+                            'app-01-staging.amara.org',
+                        ],
+                        'data': ['data-00-staging.amara.org'],
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
+
 # def staging(username):
 #     with Output("Configuring task(s) to run on STAGING"):
 #         _create_env(username              = username,
