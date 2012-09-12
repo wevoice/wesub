@@ -47,7 +47,6 @@ urlpatterns = patterns(
         {'handler': SBVSubtitles}, name='download_sbv'),
     url(r'^download_dfxp/$', 'download_subtitles',
         {'handler': DFXPSubtitles}, name='download_dfxp'),
-    url(r'^download_null_srt/$', 'null_srt'),
     url(r'^save_emailed_translations/$',
         'save_emailed_translations'),
 )

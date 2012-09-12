@@ -373,21 +373,6 @@ def download_subtitles(request, handler=SSASubtitles):
     response['Content-Disposition'] = 'attachment; ' + filename_header
     return response
 
-def null_srt(request):
-    # FIXME: possibly note duplication with srt, and fix that.
-    video = models.Video.objects.get(video_id=request.GET['video_id'])
-    if 'lang_code' in request.GET:
-        lang_code = request.GET['lang_code']
-        response_text = captions_and_translations_to_srt(
-            video.null_captions_and_translations(request.user, lang_code))
-    else:
-        response_text = captions_to_srt(
-            list(video.null_captions(request.user).videocaption_set.all()))
-    response = HttpResponse(response_text, mimetype="text/plain")
-    response['Content-Disposition'] = \
-        'attachment; filename={0}'.format(video.srt_filename)
-    return response
-
 def _is_loggable(method):
     return method in ['start_editing', 'fork', 'save_subtitles', 'finished_subtitles']
 
