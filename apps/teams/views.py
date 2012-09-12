@@ -19,6 +19,7 @@ import logging
 import random
 import csv
 
+import babelsubs
 from django.db import transaction
 from django.conf import settings
 from django.contrib import messages
@@ -86,7 +87,6 @@ from videos.tasks import (
 from videos.models import Action, VideoUrl, SubtitleLanguage, Video
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
-from widget.srt_subs import GenerateSubtitlesHandler
 from raven.contrib.django.models import client
 
 
@@ -1433,14 +1433,14 @@ def download_draft(request, slug, task_pk, type="srt"):
     if task.team != team:
         return HttpResponseForbidden(_(u'You are not allowed to download this transcript.'))
 
-    if type not in GenerateSubtitlesHandler:
+    if type not in babelsubs.get_available_types():
         raise Http404
 
     subtitle_version = task.get_subtitle_version()
 
-    subtitle = GenerateSubtitlesHandler[type].create(subtitle_version)
-    response = HttpResponse(unicode(subtitle), mimetype="text/plain")
-    original_filename = '%s.%s' % (subtitle_version.video.lang_filename(task.language), subtitle.file_type)
+    subtitles = babelsubs.to(subtitle_version.get_subtitles(), type)
+    response = HttpResponse(unicode(subtitles), mimetype="text/plain")
+    original_filename = '%s.%s' % (subtitle_version.video.lang_filename(task.language), type)
 
     if not 'HTTP_USER_AGENT' in request.META or u'WebKit' in request.META['HTTP_USER_AGENT']:
         # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
@@ -1449,7 +1449,7 @@ def download_draft(request, slug, task_pk, type="srt"):
         try:
             original_filename.encode('ascii')
         except UnicodeEncodeError:
-            original_filename = 'subtitles.' + subtitle.file_type
+            original_filename = 'subtitles.%s' % type
 
         filename_header = 'filename=%s' % original_filename
     else:
