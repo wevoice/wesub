@@ -164,14 +164,19 @@
                 this.model.view = this;
                 this.template = __.template(this.templateHTML);
                 this.render();
+
+                this.states = {
+                    autoStreamPaused: false
+                };
             },
 
             events: {
-                'click ul.amara-languages-list a': 'changeLanguage',
-                'click a.amara-current-language':  'languageButtonClicked',
-                'click a.amara-share-button':      'shareButtonClicked',
-                'click a.amara-transcript-button': 'toggleTranscriptDisplay',
-                'click a.amara-subtitles-button':  'toggleSubtitlesDisplay'
+                'click ul.amara-languages-list a':     'changeLanguage',
+                'click a.amara-current-language':      'languageButtonClicked',
+                'click a.amara-share-button':          'shareButtonClicked',
+                'click a.amara-transcript-button':     'toggleTranscriptDisplay',
+                'click a.amara-subtitles-button':      'toggleSubtitlesDisplay',
+                'click a.amara-transcript-autostream': 'toggleAutoStream'
             },
 
             render: function() {
@@ -337,11 +342,12 @@
 
                         this.pop.amaratranscript({
                             start: subtitles[i].start,
-                            start_clean: utils.parseFloatAndRound(subtitles[i].start),
-                            start_of_paragraph: subtitles[i].start_of_paragraph,
+                            startClean: utils.parseFloatAndRound(subtitles[i].start),
+                            startOfParagraph: subtitles[i].start_of_paragraph,
                             end: subtitles[i].end,
                             text: subtitles[i].text,
                             container: this.$transcriptBody.get(0),
+                            view: this,
                             _$: _$
                         });
 
@@ -352,6 +358,12 @@
                 } else {
                     $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
                 }
+            },
+            getState: function(state) {
+                return this.states[state];
+            },
+            setState: function(state, value) {
+                this.states[state] = value;
             },
 
             // TODO: This is a temporary utility function to grab a language's name from a language
@@ -434,6 +446,26 @@
             shareButtonClicked: function() {
                 return false;
             },
+            toggleAutoStream: function() {
+
+                // Toggle the autoStreamPaused state on the view.
+                var isNowPaused = !this.getState('autoStreamPaused');
+                this.setState('autoStreamPaused', isNowPaused);
+
+                // Update the Auto-stream label in the transcript viewer.
+                var newLabel = isNowPaused ? 'OFF' : 'ON';
+                this.$autoStreamOnOff.text(newLabel);
+
+                // If we're no longer paused, scroll to the currently active subtitle.
+                if (!isNowPaused) {
+                    
+                    // TODO: Get the currently active amaratranscript plugin and trigger
+                    // scrollToLine on it.
+
+                }
+                
+                return false;
+            },
             toggleSubtitlesDisplay: function() {
 
                 // TODO: This button needs to be disabled unless we have subtitles to toggle.
@@ -508,9 +540,11 @@
 
                 this.$amaraLanguages     = $('div.amara-languages',       this.$amaraTools);
                 this.$amaraCurrentLang   = $('a.amara-current-language',  this.$amaraLanguages);
-                this.$amaraLanguagesList = $('ul.amara-languages-list',  this.$amaraLanguages);
+                this.$amaraLanguagesList = $('ul.amara-languages-list',   this.$amaraLanguages);
 
-                this.$transcriptBody     = $('div.amara-transcript-body', this.$amaraTranscript);
+                this.$transcriptBody     = $('div.amara-transcript-body',     this.$amaraTranscript);
+                this.$autoStreamButton   = $('a.amara-transcript-autostream', this.$amaraTranscript);
+                this.$autoStreamOnOff    = $('span', this.$autoStreamButton);
             }
 
         });

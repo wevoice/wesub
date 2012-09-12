@@ -45,7 +45,7 @@
 
             // If this subtitle has indicated that it's the beginning of a paragraph,
             // prepend two line breaks before the subtitle.
-            if (options.start_of_paragraph) {
+            if (options.startOfParagraph) {
                 options.container.appendChild(document.createElement('br'));
                 options.container.appendChild(document.createElement('br'));
             }
@@ -67,7 +67,10 @@
             // When we reach this subtitle, add this class.
             options.line.classList.add('current-subtitle');
 
-            scrollToLine(options);
+            // Only scroll to line if the auto-stream is not paused.
+            if (!options.view.getState('autoStreamPaused')) {
+                scrollToLine(options);
+            }
         },
         end: function(event, options){
 
