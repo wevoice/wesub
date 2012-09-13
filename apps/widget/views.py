@@ -79,6 +79,7 @@ def widget_public_demo(request):
 
 @csrf_exempt
 def convert_subtitles(request):
+    # FIXME: front end needs to send the DFXP for the subs
     data = {}
     errors = None
     if request.POST:
@@ -86,27 +87,16 @@ def convert_subtitles(request):
 
             subtitles = json.loads(request.POST['subtitles'])
             format = request.POST['format']
-            available_formats = "ttml dfxp srt ssa sbv".split()
+            available_formats = babelsubs.get_available_formats()
             if format not in available_formats:
                 errors = {"errors":{
                     'format': 'You must pass a suitable format. Available formats are %s' % available_formats
                 }}
-
-            # fix me: the fron end needs to send the original dfxp in the future
-            subs = babelsubs.storage.SubtitleSet()
-            for s in subtitles:
-                subs.append_subtitle(s['start_time'],
-                                     s['end_time'],
-                                     s['text'],
-                                     new_paragraph=s['start_of_paragraph'])
-
-            # TODO: Serialize these subtitles into the format given.
-
+            subs = babelsubs.storage.SubtitleSet(initial_data=subtitles,language_code=request.POST.get('language_code'))
             # When we have newly serialized subtitles, put a stringified version of them
             # into this object. This object is what gets dumped into the textarea on the
             # front-end. If there are errors, also dump to result (the error would be displayed
             # to the user in the textarea.
-                                               
             data['result'] = babelsubs.to(subs, request.POST.get('format'))
         else:
             errors = {
