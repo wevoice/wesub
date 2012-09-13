@@ -11951,6 +11951,7 @@ Popcorn.plugin('amarasubtitle', {
                 this.template = __.template(this.templateHTML);
                 this.render();
 
+                // Default states.
                 this.states = {
                     autoScrolling: true,
                     autoStreamPaused: false
@@ -11970,10 +11971,14 @@ Popcorn.plugin('amarasubtitle', {
                 
                 var that = this;
 
+                // If jQuery exists on the page, Backbone tries to use it and there's an odd
+                // bug if we don't convert it to a local Zepto object.
+                this.$el = _$(this.$el.get(0));
+
                 // Create a container that we will use to inject the Popcorn video.
                 this.$el.prepend('<div class="amara-popcorn"></div>');
 
-                this.$popContainer = $('div.amara-popcorn', this.$el);
+                this.$popContainer = _$('div.amara-popcorn', this.$el);
 
                 // Copy the width and height to the new Popcorn container.
                 this.$popContainer.width(this.$el.width());
@@ -12108,7 +12113,7 @@ Popcorn.plugin('amarasubtitle', {
                         });
                     }
 
-                    this.$popSubtitlesContainer = $('div.amara-popcorn-subtitles', this.$el);
+                    this.$popSubtitlesContainer = _$('div.amara-popcorn-subtitles', this.$el);
 
                     this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
                 }
@@ -12157,30 +12162,30 @@ Popcorn.plugin('amarasubtitle', {
                     this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
 
                 } else {
-                    $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
+                    _$('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
                 }
             },
             cacheNodes: function() {
-                this.$amaraTools         = $('div.amara-tools',      this.$el);
-                this.$amaraBar           = $('div.amara-bar',        this.$amaraTools);
-                this.$amaraTranscript    = $('div.amara-transcript', this.$amaraTools);
+                this.$amaraTools         = _$('div.amara-tools',      this.$el);
+                this.$amaraBar           = _$('div.amara-bar',        this.$amaraTools);
+                this.$amaraTranscript    = _$('div.amara-transcript', this.$amaraTools);
 
-                this.$amaraDisplays      = $('ul.amara-displays',         this.$amaraTools);
-                this.$transcriptButton   = $('a.amara-transcript-button', this.$amaraDisplays);
-                this.$subtitlesButton    = $('a.amara-subtitles-button',  this.$amaraDisplays);
+                this.$amaraDisplays      = _$('ul.amara-displays',         this.$amaraTools);
+                this.$transcriptButton   = _$('a.amara-transcript-button', this.$amaraDisplays);
+                this.$subtitlesButton    = _$('a.amara-subtitles-button',  this.$amaraDisplays);
 
-                this.$amaraLanguages     = $('div.amara-languages',       this.$amaraTools);
-                this.$amaraCurrentLang   = $('a.amara-current-language',  this.$amaraLanguages);
-                this.$amaraLanguagesList = $('ul.amara-languages-list',   this.$amaraLanguages);
+                this.$amaraLanguages     = _$('div.amara-languages',       this.$amaraTools);
+                this.$amaraCurrentLang   = _$('a.amara-current-language',  this.$amaraLanguages);
+                this.$amaraLanguagesList = _$('ul.amara-languages-list',   this.$amaraLanguages);
 
-                this.$transcriptBody     = $('div.amara-transcript-body',     this.$amaraTranscript);
-                this.$autoStreamButton   = $('a.amara-transcript-autostream', this.$amaraTranscript);
-                this.$autoStreamOnOff    = $('span', this.$autoStreamButton);
+                this.$transcriptBody     = _$('div.amara-transcript-body',     this.$amaraTranscript);
+                this.$autoStreamButton   = _$('a.amara-transcript-autostream', this.$amaraTranscript);
+                this.$autoStreamOnOff    = _$('span', this.$autoStreamButton);
             },
             changeLanguage: function(e) {
 
                 var that = this;
-                var language = $(e.target).data('language');
+                var language = _$(e.target).data('language');
 
                 var subtitleSets = this.model.subtitles.where({'language': language});
 
@@ -12253,6 +12258,9 @@ Popcorn.plugin('amarasubtitle', {
             },
             pauseAutoStream: function(isNowPaused) {
 
+                var that = this;
+                var previouslyPaused = this.states.autoStreamPaused;
+
                 // If the transcript plugin is triggering this scroll change, do not
                 // pause the auto stream.
                 if (this.states.autoScrolling) {
@@ -12281,6 +12289,24 @@ Popcorn.plugin('amarasubtitle', {
                     // scrollToLine on it.
                     console.log('Need to scrollToLine');
 
+                } else {
+
+                    // If we're moving from a streaming state to a paused state,
+                    // highlight the auto-stream button to indicate that we've changed
+                    // states.
+                    if (!previouslyPaused) {
+                        this.$autoStreamButton.animate({
+                            color: '#FF2C2C'
+                        }, {
+                            duration: 50,
+                            easing: 'ease-in',
+                            complete: function() {
+                                that.$autoStreamButton.animate({
+                                    color: '#9A9B9C'
+                                }, 2000, 'ease-out');
+                            }
+                        });
+                    }
                 }
                 
                 return false;
@@ -12407,7 +12433,7 @@ Popcorn.plugin('amarasubtitle', {
             if (amaraEmbeds.length) {
                 amaraEmbeds.each(function() {
 
-                    var $div = $(this);
+                    var $div = _$(this);
 
                     // Call embedVideo with this div and URL.
                     that.push(['embedVideo', {
