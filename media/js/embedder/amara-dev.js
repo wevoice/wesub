@@ -11624,13 +11624,10 @@ var wikiCallback;
         var oldScrollTop = options.container.scrollTop;
         var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
 
-        // Lots of sites have jQuery loaded. If it is, use jQuery to animate the scroll
-        // change. Zepto does not animate on scrollTop: http://bit.ly/OtlKxl
-        if (typeof window.jQuery !== 'undefined') {
-            window.jQuery(options.container).animate({scrollTop: newScrollTop}, 50);
-        } else {
-            options.container.scrollTop = newScrollTop;
-        }
+        // We need to tell our transcript tracking to ignore this scroll change,
+        // otherwise our scrolling detector would trigger the autostream to stop.
+        options.view.setState('autoScrolling', true);
+        options.container.scrollTop = newScrollTop;
 
     }
 
@@ -11955,20 +11952,21 @@ Popcorn.plugin('amarasubtitle', {
                 this.render();
 
                 this.states = {
+                    autoScrolling: true,
                     autoStreamPaused: false
                 };
             },
-
             events: {
                 'click ul.amara-languages-list a':     'changeLanguage',
                 'click a.amara-current-language':      'languageButtonClicked',
                 'click a.amara-share-button':          'shareButtonClicked',
                 'click a.amara-transcript-button':     'toggleTranscriptDisplay',
                 'click a.amara-subtitles-button':      'toggleSubtitlesDisplay',
-                'click a.amara-transcript-autostream': 'toggleAutoStream'
+                'click a.amara-transcript-autostream': 'pauseAutoStream'
             },
-
             render: function() {
+
+                // TODO: Split this monster of a render() into several render()s.
                 
                 var that = this;
 
@@ -12008,6 +12006,13 @@ Popcorn.plugin('amarasubtitle', {
                     // Just set some cached Zepto selections for later use.
                     that.cacheNodes();
 
+                    // Setup tracking for the scroll event on the transcript body.
+                    //
+                    // TODO: Find a way to get this into the core Backbone events on the Amara view.
+                    that.$transcriptBody.on('scroll', function() {
+                        that.pauseAutoStream(true);
+                    });
+
                     // Wait until we have a complete video model (the API was hit as soon as
                     // the video instance was created), and then retrieve the initial set
                     // of subtitles, so we can begin building out the transcript viewer
@@ -12046,10 +12051,17 @@ Popcorn.plugin('amarasubtitle', {
 
             },
 
-            // View utilities. I would like to make these utilities as independent as possible.
-            // If someone wants to create a "headless" AmaraView, they should be able to use
-            // these utilities without a DOM structure. There's work to be done here to
-            // support that cause.
+            getLanguageNameForCode: function(languageCode) {
+                // TODO: This is a temporary utility function to grab a language's name from a language
+                // code. We won't need this once we update our API to return the language name
+                // with the subtitles.
+                // See https://unisubs.sifterapp.com/projects/12298/issues/722972/comments
+                var languages = this.model.get('languages');
+                var language = __.find(languages, function(l) { return l.code === languageCode; });
+                return language.name;
+            },
+
+            // View methods. These are methods that are used with the full AmaraView.
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
                 if (langs.length) {
@@ -12148,27 +12160,48 @@ Popcorn.plugin('amarasubtitle', {
                     $('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
                 }
             },
-            getState: function(state) {
-                return this.states[state];
-            },
-            setState: function(state, value) {
-                this.states[state] = value;
-            },
+            cacheNodes: function() {
+                this.$amaraTools         = $('div.amara-tools',      this.$el);
+                this.$amaraBar           = $('div.amara-bar',        this.$amaraTools);
+                this.$amaraTranscript    = $('div.amara-transcript', this.$amaraTools);
 
-            // TODO: This is a temporary utility function to grab a language's name from a language
-            // code. We won't need this once we update our API to return the language name
-            // with the subtitles.
-            // See https://unisubs.sifterapp.com/projects/12298/issues/722972/comments
-            getLanguageNameForCode: function(languageCode) {
-                var languages = this.model.get('languages');
-                var language = __.find(languages, function(l) { return l.code === languageCode; });
-                return language.name;
-            },
+                this.$amaraDisplays      = $('ul.amara-displays',         this.$amaraTools);
+                this.$transcriptButton   = $('a.amara-transcript-button', this.$amaraDisplays);
+                this.$subtitlesButton    = $('a.amara-subtitles-button',  this.$amaraDisplays);
 
-            // Make a call to the Amara API and retrieve a set of subtitles for a specific
-            // video in a specific language. When we get a response, add the subtitle set
-            // to the video model's 'subtitles' collection for later retrieval by language code.
+                this.$amaraLanguages     = $('div.amara-languages',       this.$amaraTools);
+                this.$amaraCurrentLang   = $('a.amara-current-language',  this.$amaraLanguages);
+                this.$amaraLanguagesList = $('ul.amara-languages-list',   this.$amaraLanguages);
+
+                this.$transcriptBody     = $('div.amara-transcript-body',     this.$amaraTranscript);
+                this.$autoStreamButton   = $('a.amara-transcript-autostream', this.$amaraTranscript);
+                this.$autoStreamOnOff    = $('span', this.$autoStreamButton);
+            },
+            changeLanguage: function(e) {
+
+                var that = this;
+                var language = $(e.target).data('language');
+
+                var subtitleSets = this.model.subtitles.where({'language': language});
+
+                // If we've already fetched subtitles for this language, don't fetch them again.
+                if (subtitleSets.length) {
+                    this.buildTranscript(language);
+                    this.buildSubtitles(language);
+                } else {
+                    this.fetchSubtitles(language, function() {
+                        that.buildTranscript(language);
+                        that.buildSubtitles(language);
+                    });
+                }
+
+                this.$amaraLanguagesList.hide();
+                return false;
+            },
             fetchSubtitles: function(language, callback) {
+                // Make a call to the Amara API and retrieve a set of subtitles for a specific
+                // video in a specific language. When we get a response, add the subtitle set
+                // to the video model's 'subtitles' collection for later retrieval by language code.
                 var that = this;
 
                 var apiURL = ''+
@@ -12205,51 +12238,48 @@ Popcorn.plugin('amarasubtitle', {
                     }
                 });
             },
-
-            // View methods. These are methods that are used with the full AmaraView.
-            changeLanguage: function(e) {
-
-                var that = this;
-                var language = $(e.target).data('language');
-
-                var subtitleSets = this.model.subtitles.where({'language': language});
-
-                // If we've already fetched subtitles for this language, don't fetch them again.
-                if (subtitleSets.length) {
-                    this.buildTranscript(language);
-                    this.buildSubtitles(language);
-                } else {
-                    this.fetchSubtitles(language, function() {
-                        that.buildTranscript(language);
-                        that.buildSubtitles(language);
-                    });
-                }
-
-                this.$amaraLanguagesList.hide();
-                return false;
+            getState: function(state) {
+                return this.states[state];
             },
             languageButtonClicked: function() {
                 this.$amaraLanguagesList.toggle();
                 return false;
             },
+            setState: function(state, val) {
+                this.states[state] = val;
+            },
             shareButtonClicked: function() {
                 return false;
             },
-            toggleAutoStream: function() {
+            pauseAutoStream: function(isNowPaused) {
 
-                // Toggle the autoStreamPaused state on the view.
-                var isNowPaused = !this.getState('autoStreamPaused');
-                this.setState('autoStreamPaused', isNowPaused);
+                // If the transcript plugin is triggering this scroll change, do not
+                // pause the auto stream.
+                if (this.states.autoScrolling) {
+                    this.states.autoScrolling = false;
+                    return;
+                }
+
+                // If 'isNowPaused' is an object, it's because it was sent to us via
+                // Backbone's event click handler. In this case, we want to toggle
+                // the paused state, as the user clicked on "Auto-stream" toggler
+                // in the transcript header.
+                if (typeof isNowPaused === 'object') {
+                    isNowPaused = !this.getState('autoStreamPaused');
+                }
+
+                // Switch the autoStreamPaused state on the view.
+                this.states.autoStreamPaused = isNowPaused;
 
                 // Update the Auto-stream label in the transcript viewer.
-                var newLabel = isNowPaused ? 'OFF' : 'ON';
-                this.$autoStreamOnOff.text(newLabel);
+                this.$autoStreamOnOff.text(isNowPaused ? 'OFF' : 'ON');
 
                 // If we're no longer paused, scroll to the currently active subtitle.
                 if (!isNowPaused) {
                     
                     // TODO: Get the currently active amaratranscript plugin and trigger
                     // scrollToLine on it.
+                    console.log('Need to scrollToLine');
 
                 }
                 
@@ -12269,7 +12299,6 @@ Popcorn.plugin('amarasubtitle', {
                 this.$transcriptButton.toggleClass('amara-button-enabled');
                 return false;
             },
-
             waitUntilVideoIsComplete: function(callback) {
 
                 var that = this;
@@ -12316,26 +12345,7 @@ Popcorn.plugin('amarasubtitle', {
                 '            </a>' +
                 '        </div>' +
                 '    </div>' +
-                '</div>',
-
-            cacheNodes: function() {
-                this.$amaraTools         = $('div.amara-tools',      this.$el);
-                this.$amaraBar           = $('div.amara-bar',        this.$amaraTools);
-                this.$amaraTranscript    = $('div.amara-transcript', this.$amaraTools);
-
-                this.$amaraDisplays      = $('ul.amara-displays',         this.$amaraTools);
-                this.$transcriptButton   = $('a.amara-transcript-button', this.$amaraDisplays);
-                this.$subtitlesButton    = $('a.amara-subtitles-button',  this.$amaraDisplays);
-
-                this.$amaraLanguages     = $('div.amara-languages',       this.$amaraTools);
-                this.$amaraCurrentLang   = $('a.amara-current-language',  this.$amaraLanguages);
-                this.$amaraLanguagesList = $('ul.amara-languages-list',   this.$amaraLanguages);
-
-                this.$transcriptBody     = $('div.amara-transcript-body',     this.$amaraTranscript);
-                this.$autoStreamButton   = $('a.amara-transcript-autostream', this.$amaraTranscript);
-                this.$autoStreamOnOff    = $('span', this.$autoStreamButton);
-            }
-
+                '</div>'
         });
 
         // push() handles all action calls before and after the embedder is loaded.
