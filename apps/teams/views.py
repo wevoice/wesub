@@ -1433,7 +1433,7 @@ def download_draft(request, slug, task_pk, type="srt"):
     if task.team != team:
         return HttpResponseForbidden(_(u'You are not allowed to download this transcript.'))
 
-    if type not in babelsubs.get_available_types():
+    if type not in babelsubs.get_available_formats():
         raise Http404
 
     subtitle_version = task.get_subtitle_version()
