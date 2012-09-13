@@ -22,13 +22,10 @@
         var oldScrollTop = options.container.scrollTop;
         var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
 
-        // Lots of sites have jQuery loaded. If it is, use jQuery to animate the scroll
-        // change. Zepto does not animate on scrollTop: http://bit.ly/OtlKxl
-        if (typeof window.jQuery !== 'undefined') {
-            window.jQuery(options.container).animate({scrollTop: newScrollTop}, 50);
-        } else {
-            options.container.scrollTop = newScrollTop;
-        }
+        // We need to tell our transcript tracking to ignore this scroll change,
+        // otherwise our scrolling detector would trigger the autostream to stop.
+        options.view.setState('autoScrolling', true);
+        options.container.scrollTop = newScrollTop;
 
     }
 
