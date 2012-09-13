@@ -19,6 +19,8 @@ import re
 import time
 import traceback
 
+import babelsubs
+
 import simplejson as json
 from django.conf import settings
 from django.contrib import messages
@@ -49,7 +51,6 @@ from videos import models
 from widget.models import SubtitlingSession
 from widget.null_rpc import NullRpc
 from widget.rpc import add_general_settings, Rpc
-from widget.srt_subs import captions_and_translations_to_srt, captions_to_srt, SSASubtitles, GenerateSubtitlesHandler
 
 
 rpc_views = Rpc()
@@ -91,15 +92,13 @@ def convert_subtitles(request):
                     'format': 'You must pass a suitable format. Available formats are %s' % available_formats
                 }}
 
-            cleaned_subs = []
+            # fix me: the fron end needs to send the original dfxp in the future
+            subs = babelsubs.storage.SubtitleSet()
             for s in subtitles:
-                cleaned_subs.append({
-                    'text': markup_to_html(s['text']),
-                    'start': s['start_time'],
-                    'end': s['end_time'],
-                    'id': s['subtitle_id'],
-                    'start_of_paragraph': s['start_of_paragraph'],
-                })
+                subs.append_subtitle(s['start_time'],
+                                     s['end_time'],
+                                     s['text'],
+                                     new_paragraph=s['start_of_paragraph'])
 
             # TODO: Serialize these subtitles into the format given.
 
@@ -107,10 +106,8 @@ def convert_subtitles(request):
             # into this object. This object is what gets dumped into the textarea on the
             # front-end. If there are errors, also dump to result (the error would be displayed
             # to the user in the textarea.
-            handler = GenerateSubtitlesHandler[request.POST['format']]
-            subs = handler(cleaned_subs, None, sl=models.SubtitleLanguage(language=request.POST['language_code']))
                                                
-            data['result'] = unicode(subs)
+            data['result'] = babelsubs.to(subs, request.POST.get('format'))
         else:
             errors = {
                 "errors":{
@@ -311,7 +308,7 @@ def base_widget_params(request, extra_params={}):
     params.update(extra_params)
     return json.dumps(params)[1:-1]
 
-def download_subtitles(request, handler=SSASubtitles):
+def download_subtitles(request, format):
     #FIXME: use GenerateSubtitlesHandler
     video_id = request.GET.get('video_id')
     lang_id = request.GET.get('lang_pk')
@@ -326,10 +323,10 @@ def download_subtitles(request, handler=SSASubtitles):
 
     if not lang_id:
         # if no language is passed, assume it's the original one
-        language = video.subtitle_language()
+        language = video.newsubtitlelanguage_set(language_code=video.primary_audio_language_code)
     else:
         try:
-            language = video.subtitlelanguage_set.get(pk=lang_id)
+            language = video.newsubtitlelanguage_set.get(pk=lang_id)
         except ObjectDoesNotExist:
             raise Http404
 
@@ -348,13 +345,14 @@ def download_subtitles(request, handler=SSASubtitles):
 
     if not version:
         raise Http404
-
-    h = handler.create(version, video, language)
-    subs_text = unicode(h)
+    if not format in babelsubs.get_available_formats():
+        raise HttpResponseServerError("Format not found")
+    
+    subs_text = babelsubs.to(version.get_subtitles(), format)
     # since this is a downlaod, we can afford not to escape tags, specially true
     # since speaker change is denoted by '>>' and that would get entirely stripped out
     response = HttpResponse(subs_text, mimetype="text/plain")
-    original_filename = '%s.%s' % (video.lang_filename(language), h.file_type)
+    original_filename = '%s.%s' % (video.lang_filename(language), format)
 
     if not 'HTTP_USER_AGENT' in request.META or u'WebKit' in request.META['HTTP_USER_AGENT']:
         # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
@@ -363,7 +361,7 @@ def download_subtitles(request, handler=SSASubtitles):
         try:
             original_filename.encode('ascii')
         except UnicodeEncodeError:
-            original_filename = 'subtitles.' + h.file_type
+            original_filename = 'subtitles.' + format
 
         filename_header = 'filename=%s' % original_filename
     else:

@@ -454,6 +454,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['last_version'] = version
     context['next_version'] = version.next_version() if version else None
     context['can_edit'] = False
+    context['downloadable_formats'] = ['srt', 'ssa', 'ttml', 'txt', 'dfxp', 'sbv']
 
     if request.user.is_authenticated():
         # user can only edit a subtitle draft if he
