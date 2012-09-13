@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-12 01:43-0500\n"
+"POT-Creation-Date: 2012-09-13 01:43-0500\n"
 "PO-Revision-Date: 2012-07-10 06:47+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Slovenian (Slovenia) (http://www.transifex.com/projects/p/"
@@ -4481,7 +4481,8 @@ msgid ""
 msgstr ""
 
 #: templates/index_old.html:162
-msgid "It's 100% web-based, there’s no software to download."
+#, python-format
+msgid "It's 100%% web-based, there’s no software to download."
 msgstr ""
 
 #: templates/index_old.html:163
@@ -6926,7 +6927,7 @@ msgstr ""
 
 #: templates/videos/_upload_subtitles.html:29
 #, python-format
-msgid "This subtitle file is 100% complete"
+msgid "This subtitle file is 100%% complete"
 msgstr ""
 
 #: templates/videos/_upload_subtitles.html:31
