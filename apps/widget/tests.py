@@ -28,6 +28,8 @@ import os
 import json
 
 from django.test import TestCase
+from babelsubs.storage import SubtitleSet
+import babelsubs
 from auth.models import CustomUser
 from videos.models import Video, Action, SubtitleLanguage
 from videos import models
