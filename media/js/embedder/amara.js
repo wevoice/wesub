@@ -11601,36 +11601,6 @@ var wikiCallback;
   });
 })( Popcorn );
 (function (Popcorn) {
-
-    // Scroll the transcript container to the line, and bring the line to the center
-    // of the vertical height of the container.
-    function scrollToLine(options) {
-
-        // Grab the DOM lib.
-        var _$ = options._$;
-
-        // Retrieve the absolute positions of the line and the container.
-        var linePos = _$(options.line).offset();
-        var containerPos = _$(options.container).offset();
-
-        // The difference in top-positions between the line and the container.
-        var diffY = linePos.top - containerPos.top;
-
-        // The available vertical space within the container.
-        var spaceY = options.container.clientHeight - options.line.offsetHeight;
-
-        // Set the scrollTop of the container to the difference in top-positions,
-        // plus the existing scrollTop, minus 50% of the available vertical space.
-        var oldScrollTop = options.container.scrollTop;
-        var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
-
-        // We need to tell our transcript tracking to ignore this scroll change,
-        // otherwise our scrolling detector would trigger the autostream to stop.
-        options.view.setState('autoScrolling', true);
-        options.container.scrollTop = newScrollTop;
-
-    }
-
     Popcorn.plugin('amaratranscript', {
         _setup : function(options) {
 
@@ -11665,11 +11635,7 @@ var wikiCallback;
 
             // When we reach this subtitle, add this class.
             options.line.classList.add('current-subtitle');
-
-            // Only scroll to line if the auto-stream is not paused.
-            if (!options.view.getState('autoStreamPaused')) {
-                scrollToLine(options);
-            }
+            options.view.scrollToLine(options);
         },
         end: function(event, options){
 
@@ -12056,17 +12022,7 @@ Popcorn.plugin('amarasubtitle', {
 
             },
 
-            getLanguageNameForCode: function(languageCode) {
-                // TODO: This is a temporary utility function to grab a language's name from a language
-                // code. We won't need this once we update our API to return the language name
-                // with the subtitles.
-                // See https://unisubs.sifterapp.com/projects/12298/issues/722972/comments
-                var languages = this.model.get('languages');
-                var language = __.find(languages, function(l) { return l.code === languageCode; });
-                return language.name;
-            },
-
-            // View methods. These are methods that are used with the full AmaraView.
+            // View methods.
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
                 if (langs.length) {
@@ -12243,15 +12199,49 @@ Popcorn.plugin('amarasubtitle', {
                     }
                 });
             },
-            getState: function(state) {
-                return this.states[state];
+            getLanguageNameForCode: function(languageCode) {
+                // TODO: This is a temporary utility function to grab a language's name from a language
+                // code. We won't need this once we update our API to return the language name
+                // with the subtitles.
+                // See https://unisubs.sifterapp.com/projects/12298/issues/722972/comments
+                var languages = this.model.get('languages');
+                var language = __.find(languages, function(l) { return l.code === languageCode; });
+                return language.name;
             },
             languageButtonClicked: function() {
                 this.$amaraLanguagesList.toggle();
                 return false;
             },
-            setState: function(state, val) {
-                this.states[state] = val;
+            scrollToLine: function(pluginInstance) {
+                // Scroll the transcript container to the line, and bring the line to the center
+                // of the vertical height of the container.
+                //
+                //     * pluginInstance (amaratranscript plugin instance)
+
+                // Only scroll to line if the auto-stream is not paused.
+                if (!this.states.autoStreamPaused) {
+
+                    // Retrieve the absolute positions of the line and the container.
+                    var linePos = _$(pluginInstance.line).offset();
+                    var containerPos = _$(pluginInstance.container).offset();
+
+                    // The difference in top-positions between the line and the container.
+                    var diffY = linePos.top - containerPos.top;
+
+                    // The available vertical space within the container.
+                    var spaceY = pluginInstance.container.clientHeight - pluginInstance.line.offsetHeight;
+
+                    // Set the scrollTop of the container to the difference in top-positions,
+                    // plus the existing scrollTop, minus 50% of the available vertical space.
+                    var oldScrollTop = pluginInstance.container.scrollTop;
+                    var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
+
+                    // We need to tell our transcript tracking to ignore this scroll change,
+                    // otherwise our scrolling detector would trigger the autostream to stop.
+                    this.states.autoScrolling = true;
+                    pluginInstance.container.scrollTop = newScrollTop;
+                }
+
             },
             shareButtonClicked: function() {
                 return false;
@@ -12261,19 +12251,20 @@ Popcorn.plugin('amarasubtitle', {
                 var that = this;
                 var previouslyPaused = this.states.autoStreamPaused;
 
+                // If 'isNowPaused' is an object, it's because it was sent to us via
+                // Backbone's event click handler.
+                var fromClick = (typeof isNowPaused === 'object');
+
                 // If the transcript plugin is triggering this scroll change, do not
                 // pause the auto stream.
-                if (this.states.autoScrolling) {
+                if (this.states.autoScrolling && !fromClick) {
                     this.states.autoScrolling = false;
-                    return;
+                    return false;
                 }
 
-                // If 'isNowPaused' is an object, it's because it was sent to us via
-                // Backbone's event click handler. In this case, we want to toggle
-                // the paused state, as the user clicked on "Auto-stream" toggler
-                // in the transcript header.
-                if (typeof isNowPaused === 'object') {
-                    isNowPaused = !this.getState('autoStreamPaused');
+                // If from clicking the "Auto-stream" button, just toggle it.
+                if (fromClick) {
+                    isNowPaused = !this.states.autoStreamPaused;
                 }
 
                 // Switch the autoStreamPaused state on the view.
@@ -12285,9 +12276,11 @@ Popcorn.plugin('amarasubtitle', {
                 // If we're no longer paused, scroll to the currently active subtitle.
                 if (!isNowPaused) {
                     
-                    // TODO: Get the currently active amaratranscript plugin and trigger
-                    // scrollToLine on it.
-                    console.log('Need to scrollToLine');
+                    // Get the currently running amaratranscript plugin instance.
+                    var currentPluginInstance = this.pop.data.running.amaratranscript[0];
+
+                    // Scroll to the current subtitle.
+                    this.scrollToLine(currentPluginInstance);
 
                 } else {
 

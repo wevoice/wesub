@@ -1,34 +1,4 @@
 (function (Popcorn) {
-
-    // Scroll the transcript container to the line, and bring the line to the center
-    // of the vertical height of the container.
-    function scrollToLine(options) {
-
-        // Grab the DOM lib.
-        var _$ = options._$;
-
-        // Retrieve the absolute positions of the line and the container.
-        var linePos = _$(options.line).offset();
-        var containerPos = _$(options.container).offset();
-
-        // The difference in top-positions between the line and the container.
-        var diffY = linePos.top - containerPos.top;
-
-        // The available vertical space within the container.
-        var spaceY = options.container.clientHeight - options.line.offsetHeight;
-
-        // Set the scrollTop of the container to the difference in top-positions,
-        // plus the existing scrollTop, minus 50% of the available vertical space.
-        var oldScrollTop = options.container.scrollTop;
-        var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
-
-        // We need to tell our transcript tracking to ignore this scroll change,
-        // otherwise our scrolling detector would trigger the autostream to stop.
-        options.view.setState('autoScrolling', true);
-        options.container.scrollTop = newScrollTop;
-
-    }
-
     Popcorn.plugin('amaratranscript', {
         _setup : function(options) {
 
@@ -63,11 +33,7 @@
 
             // When we reach this subtitle, add this class.
             options.line.classList.add('current-subtitle');
-
-            // Only scroll to line if the auto-stream is not paused.
-            if (!options.view.getState('autoStreamPaused')) {
-                scrollToLine(options);
-            }
+            options.view.scrollToLine(options);
         },
         end: function(event, options){
 
