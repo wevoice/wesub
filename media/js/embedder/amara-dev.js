@@ -12117,6 +12117,18 @@ Popcorn.plugin('amarasubtitle', {
 
                     this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
 
+                    // If we're in the middle of the video, we'll have an active transcript plugin
+                    // ready to scroll to.
+
+                    // Get the currently running amaratranscript plugin instances.
+                    var currentPluginInstances = this.pop.data.running.amaratranscript;
+
+                    if (currentPluginInstances.length) {
+
+                        // Scroll to the current subtitle.
+                        this.scrollToLine(currentPluginInstances[0]);
+                    }
+
                 } else {
                     _$('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
                 }
@@ -12276,11 +12288,14 @@ Popcorn.plugin('amarasubtitle', {
                 // If we're no longer paused, scroll to the currently active subtitle.
                 if (!isNowPaused) {
                     
-                    // Get the currently running amaratranscript plugin instance.
-                    var currentPluginInstance = this.pop.data.running.amaratranscript[0];
+                    // Get the currently running amaratranscript plugin instances.
+                    var currentPluginInstances = this.pop.data.running.amaratranscript;
 
-                    // Scroll to the current subtitle.
-                    this.scrollToLine(currentPluginInstance);
+                    if (currentPluginInstances.length) {
+
+                        // Scroll to the current subtitle.
+                        this.scrollToLine(currentPluginInstances[0]);
+                    }
 
                 } else {
 
