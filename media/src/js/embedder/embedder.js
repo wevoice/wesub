@@ -669,7 +669,7 @@
             style.rel = 'stylesheet';
             style.type = 'text/css';
 
-            style.href = '/site_media/css/embedder/amara-dev.css';
+            style.href = '/site_media/src/css/embedder/embedder-dev.css';
             tag.parentNode.insertBefore(style, tag);
 
             // Change the template delimiter for Underscore templates.
