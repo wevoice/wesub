@@ -1260,7 +1260,7 @@ class TestFormatConvertion(TestCase):
     def setUp(self):
         self.subs = SubtitleSet(language_code='en')
         for x in range(0,10):
-            self.subs.append_subtitle(x, x + 1,  x, new_paragraph=False)
+            self.subs.append_subtitle(x, x + 1,  str(x), new_paragraph=False)
             
     def _retrieve(self, format):
         res = self.client.post(reverse("widget:convert_subtitles"), {
