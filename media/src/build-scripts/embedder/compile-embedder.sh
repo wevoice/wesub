@@ -17,9 +17,9 @@ scss -t compressed media/src/css/embedder/embedder.scss media/src/css/embedder/e
 cp media/src/js/embedder/embedder-dev.js media/build/public/embedder/embedder.js
 cp media/src/css/embedder/embedder-dev.css media/build/public/embedder/embedder.css
 
-#sed -i -e 's/amara-dev/amara/g' media/build/public/embedder/amara.js
-#sed -i -e 's/\/site_media/https:\/\/staging.universalsubtitles.org\/site_media/g' media/js/embedder/amara.js
-#sed -i -e 's/\/site_media/https:\/\/staging.universalsubtitles.org\/site_media/g' media/build/public/embedder/embedder.css
+sed -i -e 's/embedder-dev/embedder/g' media/build/public/embedder/embedder.js
+sed -i -e 's/\/site_media\/src\/css\//\/\/s3.amazonaws.com\/s3.www.universalsubtitles.org\/build\/public\//g' media/build/public/embedder/embedder.js
+sed -i -e 's/\/site_media\/images\//\/\/s3.amazonaws.com\/s3.www.universalsubtitles.org\/site_media\/images\//g' media/build/public/embedder/embedder.css
 
-#rm media/src/css/embedder/embedder.css-e
-#rm media/js/embedder/amara.js-e
+rm media/build/public/embedder/embedder.js-e
+rm media/build/public/embedder/embedder.css-e

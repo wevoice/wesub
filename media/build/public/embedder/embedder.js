@@ -12421,7 +12421,7 @@ Popcorn.plugin('amarasubtitle', {
             style.rel = 'stylesheet';
             style.type = 'text/css';
 
-            style.href = '/site_media/src/css/embedder/embedder-dev.css';
+            style.href = '//s3.amazonaws.com/s3.www.universalsubtitles.org/build/public/embedder/embedder.css';
             tag.parentNode.insertBefore(style, tag);
 
             // Change the template delimiter for Underscore templates.
