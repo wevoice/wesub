@@ -2511,7 +2511,7 @@ class MarkupHtmlTest(TestCase):
 class BaseDownloadTest(object):
 
     def _download_subs(self, language, format):
-        url = reverse("widget:download_" + format)
+        url = reverse("widget:download" , args=(format,))
         res = self.client.get(url, {
             'video_id': language.video.video_id,
             'lang_pk': language.pk
