@@ -10,7 +10,7 @@ cat media/src/js/third-party/json2.min.js \
     media/src/js/embedder/popcorn.amaratranscript.js \
     media/src/js/embedder/popcorn.amarasubtitle.js \
     media/src/js/embedder/embedder.js \
-    > media/src/js/embedder/embedder-dev.js
+  > media/src/js/embedder/embedder-dev.js
 
 scss -t compressed media/src/css/embedder/embedder.scss media/src/css/embedder/embedder-dev.css
 
