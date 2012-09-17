@@ -25,6 +25,8 @@ from datetime import datetime
 from StringIO import StringIO
 
 import math_captcha
+import babelsubs
+from babelsubs.parsers.dfxp import DFXPParser
 from django.conf import settings
 from django.core import mail
 from django.core.cache import cache
@@ -42,6 +44,8 @@ from testhelpers.views import _create_videos
 from utils.subtitles import (
     SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser, DfxpSubtitleParser
 )
+from subtitles import models as sub_models
+from subtitles.pipeline import add_subtitles
 from videos import metadata_manager, alarms, EffectiveSubtitle
 from utils.unisubsmarkup import html_to_markup, markup_to_html
 from videos.feed_parser import FeedParser
@@ -2519,24 +2523,23 @@ class BaseDownloadTest(object):
         self.assertEqual(res.status_code, 200)
         return res.content
 
-class TestSRT(WebUseTest, BaseDownloadTest):
+class SRTTest(WebUseTest, BaseDownloadTest):
     fixtures = ['test.json']
 
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
         self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
-        self.language = SubtitleLanguage.objects.get_or_create(
-            video=self.video, is_forked=True, language='en')[0]
+        self.language = sub_models.SubtitleLanguage.objects.get_or_create(
+            video=self.video,  language_code='en')[0]
 
     def test_download_markup(self):
         subs_data = ['one line',
-                     'line **with** bold',
-                     'line *with* italycs',
-                     'line <script> with dangerous tag',
+                     'line <b>with</b> bold',
+                     'line <i>with</i> italycs',
                      'line with double gt >>',
-                     '*[inside brackets]*',
+                     '<i>[inside brackets]</i>',
         ]
-        add_subs(self.language,subs_data)
+        quick_add_subs(self.language,subs_data, escape=True)
         content = self._download_subs(self.language, 'srt')
         self.assertIn('<b>with</b>' , content)
         self.assertIn('<i>[inside brackets]</i>' , content)
@@ -2550,7 +2553,7 @@ class TestSRT(WebUseTest, BaseDownloadTest):
 
     def test_upload_markup(self):
         data = {
-            'language': self.language.language,
+            'language': self.language.language_code,
             'video': self.video.pk,
             'video_language': 'en',
             'draft': open(os.path.join(os.path.dirname(__file__), 'fixtures/with-markdown.srt'))
@@ -2567,8 +2570,8 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
         self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
-        self.language = SubtitleLanguage.objects.get_or_create(
-            video=self.video, is_forked=True, language='en')[0]
+        self.language = sub_models.SubtitleLanguage.objects.get_or_create(
+            video=self.video,  language_code='en')[0]
 
     def tearDown(self):
         TTMLSubtitles.use_named_styles = True
@@ -2593,39 +2596,15 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
 
     def test_dfxp_serializer(self):
         TTMLSubtitles.use_named_styles = False
-        add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
+        quick_add_subs(self.language, [ 'Here we go!'])
         content = self._download_subs(self.language, 'dfxp')
-        self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
-        self.assertTrue(re.findall('<span style="strong">[\s]*bold[\s]*</span>', content))
-        self.assertTrue(re.findall('<span style="emphasis">[\s]*italic[\s]*</span>', content))
-        self.assertTrue(re.findall('<span style="underlined">[\s]*underline[\s]*</span>', content))
+        serialized = DFXPParser(content)
+        self.assertEqual(len(serialized.to_internal()), 1)
+        self.assertEqual(babelsubs.storage.get_contents(serialized.to_internal().get_subtitles()[0]),'Here we go!')
+        
 
-    def test_dfxp_serializer_inline(self):
-        add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
-        content = self._download_subs(self.language, 'dfxp')
-        self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
-        self.assertTrue(re.findall('<span tts:fontWeight="bold">[\s]*bold[\s]*</span>', content))
-        self.assertTrue(re.findall('<span tts:fontStyle="italic">[\s]*italic[\s]*</span>', content))
-        self.assertTrue(re.findall('<span tts:textDecoration="underline">[\s]*underline[\s]*</span>', content))
- 
-def add_subs(language, subs_texts):
-    version = language.version()
-    version_no = 0
-    if version:
-        version_no = version.version_no + 1
-    new_version = SubtitleVersion.objects.create(
-        language=language,
-        version_no=version_no,
-        datetime_started=datetime.now(),
-        is_forked = language.is_forked
-    )
-    for i, text in enumerate(subs_texts):
-        s= Subtitle.objects.create(
-            version = new_version,
-            subtitle_id=i,
-            subtitle_order=i,
-            subtitle_text=text,
-            start_time = i,
-            end_time = i + 1 - 0.1
-        )
-
+def quick_add_subs(language, subs_texts, escape=True):
+    subtitles = babelsubs.storage.SubtitleSet(language_code=language.language_code)
+    for i,text in enumerate(subs_texts):
+        subtitles.append_subtitle(i*1000, i*1000 + 999, text, escape=escape)
+    add_subtitles(language.video, language.language_code, subtitles)

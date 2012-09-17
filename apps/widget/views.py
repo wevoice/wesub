@@ -342,7 +342,7 @@ def download_subtitles(request, format):
     # since this is a downlaod, we can afford not to escape tags, specially true
     # since speaker change is denoted by '>>' and that would get entirely stripped out
     response = HttpResponse(subs_text, mimetype="text/plain")
-    original_filename = '%s.%s' % (video.lang_filename(language), format)
+    original_filename = '%s.%s' % (video.lang_filename(language.language_code), format)
 
     if not 'HTTP_USER_AGENT' in request.META or u'WebKit' in request.META['HTTP_USER_AGENT']:
         # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
