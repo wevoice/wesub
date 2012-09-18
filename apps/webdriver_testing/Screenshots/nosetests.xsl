@@ -120,13 +120,22 @@
       </xsl:choose>
           </td>
           
-     <td><span class="status"><div id="err_message">
-     <a href="#"><xsl:value-of select="$class"/>.<xsl:value-of select="$test"/>
-     <span>Test Name:  <xsl:value-of select="$test"/>
-     <br/>filename.Classname:  <xsl:value-of select="$class"/><p><xsl:value-of select="$message"/>
-     </p></span>
-     </a></div>
-     </span>
+     <td>
+      <xsl:choose>
+       <xsl:when test="$status='pass'">
+           <span class="status"><div id="pass_message"><xsl:value-of select="$class"/>.<xsl:value-of select="$test"/></div>
+           </span>
+      </xsl:when>
+      <xsl:otherwise>
+         <span class="status"><div id="err_message">
+           <a href="#"><xsl:value-of select="$class"/>.<xsl:value-of select="$test"/>
+              <span>Test Name:  <xsl:value-of select="$test"/>
+              <br/>filename.Classname:  <xsl:value-of select="$class"/><p><xsl:value-of select="$message"/>
+              </p></span>
+           </a></div>
+         </span>
+      </xsl:otherwise>
+     </xsl:choose>
      </td>
     </tr>
     </xsl:template>

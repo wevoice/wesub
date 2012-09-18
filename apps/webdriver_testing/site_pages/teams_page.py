@@ -3,15 +3,15 @@ import time
 from nose.tools import assert_true, assert_false
 from unisubs_page import UnisubsPage
 
+
 class TeamsPage(UnisubsPage):
     """
-     Search page is the main search page stub.  Watch Page and Search Results page 
+     Search page is the main search page stub.  Watch Page and Search Results page
     """
- 
- 
+
     _URL = "teams/"
     _SEARCH = "form.search input[name='q']"
-    _SORT = "span.sort_label" 
+    _SORT = "span.sort_label"
     _SORT_OPTION = "div.sort_button ul li a[href*='%s']"
     _TEAM = "ul.listing li"
     _TEAM_NAME = 'a'
@@ -26,7 +26,7 @@ class TeamsPage(UnisubsPage):
 
     def open_teams_page(self):
         self.open_page(self._URL)
-    
+
     def team_search(self, search_term):
         self.clear_text(self._SEARCH)
         self.submit_form_text_by_css(self._SEARCH, search_term)
@@ -36,18 +36,18 @@ class TeamsPage(UnisubsPage):
             return True
 
     def sort(self, order):
-        """Sort the teams. 
-        
+        """Sort the teams.
+
         """
 
         sort_orders = ['date', 'name', 'members']
-        assert_true(order in sort_orders, \
-                        "unknown value for order, expected one of %s" % sort_orders)
+        assert_true(order in sort_orders,
+                    "unknown value for order, expected one of %s" % sort_orders)
 
         #Hover / click below currently breaks selenium and it's better to just open the url directly
         #self.hover_by_css(self._SORT)
         #self.click_by_css(self._SORT_OPTION % order)
-        self.open_page("teams/?o=%s" % order) 
+        self.open_page("teams/?o=%s" % order)
 
     def first_team(self):
         return self.teams_on_page()[0]
@@ -76,22 +76,17 @@ class TeamsPage(UnisubsPage):
         element = self.team_el(team)
         videos = element.find_element_by_css_selector(self._TEAM_VIDEOS).text
         return int(videos.split()[0])
-        
-        
+
     def teams_on_page(self):
         teams_list = []
-        team_name_els= self.browser.find_elements_by_css_selector(" ".join([self._TEAM, self._TEAM_NAME]))
+        team_name_els = self.browser.find_elements_by_css_selector(
+            " ".join([self._TEAM, self._TEAM_NAME]))
         for el in team_name_els:
             teams_list.append(el.text)
         return teams_list
-        
 
     def marked_private(self, team):
         self.team_search(team)
         descriptor_text = self.get_text_by_css(self._TEAM_DESCRIPTOR)
         if descriptor_text == "Private":
             return True
-
-
-
-

@@ -20,9 +20,8 @@ class DjangoAdminPage(UnisubsPage):
     _SELECT_ALL = "th.action-checkbox-column input"
     _GO_BUTTON = "button[type=submit]"
     _DJANGO_CONFIRM = "input[type=submit]"
-    
-    _FOOTER = "div#footer"
 
+    _FOOTER = "div#footer"
 
     def open_djadmin(self):
         self.open_page(self._URL)
@@ -32,22 +31,20 @@ class DjangoAdminPage(UnisubsPage):
             raise Exception("Must be logged in as Admin User to open from Link")
         else:
             self.click_by_css(self._ADMIN_LINK)
-    
+
     def django_admin_login(self):
         if self.is_element_present(self._DJANGO_LOGIN_USER_ID):
             self.type_by_css(self._DJANGO_LOGIN_USER_ID, self.username)
             self.type_by_css(self._DJANGO_LOGIN_USER_PW, self.password)
             self.click_by_css(self._DJANGO_LOGIN_SUBMIT)
-            
+
     def django_admin_logout(self):
         self.open_page(self._DJANGO_ADMIN_LOGOUT)
-
 
     def delete_video(self, video_id):
         self.open_page(self._ADMIN_DELETE_VID_URL % video_id)
         self.django_admin_login()
         self.django_admin_logout()
-        
 
     def find_and_delete_existing_video(self, url):
         """Search for a video by url and delete via django admin ui.
@@ -79,7 +76,6 @@ class DjangoAdminPage(UnisubsPage):
             self.click_by_css(self._DJANGO_CONFIRM)
         self.django_admin_logout()
         self.open_page("/")
- 
 
     def delete_video_feed(self, url):
         self.open_page(self._URL)
@@ -92,37 +88,3 @@ class DjangoAdminPage(UnisubsPage):
             self.click_link_text("Delete")
             self.click_by_css("form div input")
         self.django_admin_logout()
-        
-        
-            
-           
-           
-        
-
-
-        
-            
-        
-        
-        
-        
-        
-    
-
-        
-        
-        
-
-        
-    
-
-        
-        
-
-
-
-    
-            
-        
-        
-    
