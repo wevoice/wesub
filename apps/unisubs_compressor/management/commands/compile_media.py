@@ -452,6 +452,8 @@ class Command(BaseCommand):
             filename = file['name']
             from_path = os.path.join(cache_dir, filename)
             to_path =  os.path.join(settings.STATIC_ROOT, filename)
+            if not os.path.exists(from_path):
+                continue
             if os.path.exists(to_path):
                 os.remove(to_path)
             shutil.copyfile(from_path, to_path)
