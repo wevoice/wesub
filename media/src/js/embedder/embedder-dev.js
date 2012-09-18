@@ -12076,6 +12076,8 @@ Popcorn.plugin('amarasubtitle', {
             },
             buildTranscript: function(language) {
 
+                var that = this;
+
                 this.$amaraCurrentLang.text('Loading…');
 
                 // Remove any existing transcript events.
@@ -12128,6 +12130,12 @@ Popcorn.plugin('amarasubtitle', {
                         // Scroll to the current subtitle.
                         this.scrollToLine(currentPluginInstances[0]);
                     }
+
+                    // Handle right-click context menu for transcript lines.
+                    _$('a.amara-transcript-line', this.$transcriptBody).on('contextmenu', function(e) {
+                        that.showTranscriptContextMenu(e);
+                    });
+
 
                 } else {
                     _$('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
@@ -12317,6 +12325,18 @@ Popcorn.plugin('amarasubtitle', {
                     }
                 }
                 
+                return false;
+            },
+            showTranscriptContextMenu: function(e) {
+
+                // Don't show the default context menu.
+                e.preventDefault();
+
+                // Remove the auto-selection that the browser does for some reason.
+                window.getSelection().removeAllRanges();
+
+                var $line = _$(e.target);
+
                 return false;
             },
             toggleSubtitlesDisplay: function() {
