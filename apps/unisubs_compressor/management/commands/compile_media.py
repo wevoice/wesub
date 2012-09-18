@@ -165,14 +165,20 @@ class Command(BaseCommand):
         descriptor.write(_make_version_debug_string())
 
     def compile_css_bundle(self, bundle_name, bundle_type, files):
+        bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
         file_list = [os.path.join(settings.STATIC_ROOT, x) for x in files]
         for f in file_list:
             open(f).read()
         buffer = [open(f).read() for f in file_list]
-        dir_path = os.path.join(self.temp_dir, "css-compressed")
+        
+        if 'output' in bundle_settings:
+            dir_path = settings.STATIC_ROOT
+            concatenated_path =  os.path.join(settings.STATIC_ROOT, bundle_settings['output'])
+        else:
+            dir_path = os.path.join(self.temp_dir, "css-compressed")
+            concatenated_path =  os.path.join(dir_path, "%s.%s" % (bundle_name, bundle_type))
         if os.path.exists(dir_path) is False:
             os.mkdir(dir_path)
-        concatenated_path =  os.path.join(dir_path, "%s.%s" % (bundle_name, bundle_type))
         out = open(concatenated_path, 'w')
         out.write("".join(buffer))
         out.close()
