@@ -97,7 +97,15 @@ NO_UNIQUE_URL = (
     }, {
         "name": "js/widgetizer/widgetizerprimer.js",
         "no-cache": True
+    },{
+        "name": "release/public/embedder.js",
+        "no-cache": True
+    },{
+        "name": "release/public/embedder.css",
+        "no-cache": True
     }
+
+
 )
 
 def call_command(command):
