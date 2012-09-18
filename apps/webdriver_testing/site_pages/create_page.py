@@ -8,10 +8,10 @@ class CreatePage(UnisubsPage):
     """
      Video Page contains the common elements in the video page.
     """
- 
+
     _SINGLE_URL_ENTRY_BOX = "input.main_video_form_field"
     _INPUT_PREFOCUS = "input#submit_video_field.prefocus"
-    _URL = "videos/create" 
+    _URL = "videos/create"
     _SUBMIT_BUTTON = "form.main_video_form button.green_button"
     _MULTI_SUBMIT_LINK = " div#submit_multiple_toggle a#btn_submit_multiple_toggle.toogle-create-form"
     _YOUTUBE_USER_FIELD = "li input#id_usernames"
@@ -26,7 +26,6 @@ class CreatePage(UnisubsPage):
         print self._URL
         self.open_page(self._URL)
 
-        
     def submit_video(self, video_url):
         self.wait_for_element_present(self._INPUT_PREFOCUS)
         self.click_by_css("div h2.main_heading")
@@ -35,13 +34,11 @@ class CreatePage(UnisubsPage):
         self.type_by_css(self._SINGLE_URL_ENTRY_BOX, video_url)
         self.click_by_css(self._SUBMIT_BUTTON)
         time.sleep(3)
-        
 
     def _open_multi_submit(self):
         self.click_by_css(self._MULTI_SUBMIT_LINK)
         self.page_down(self._HIDE_MULTI)
         self.wait_for_element_present(self._YOUTUBE_USER_FIELD)
-
 
     def submit_youtube_users_videos(self, youtube_usernames, save=False):
         """Submit 1 or several youtube user names.
@@ -54,7 +51,7 @@ class CreatePage(UnisubsPage):
         if save == True:
             self.click_by_css(self._SAVE_OPTION)
         self.click_by_css(self._SUBMIT_MULTI)
-        time.sleep(3) 
+        time.sleep(3)
 
     def submit_youtube_user_page(self, youtube_user_url, save=False):
         """Submit videos from youtube user page url.
@@ -66,29 +63,26 @@ class CreatePage(UnisubsPage):
         if save == True:
             self.click_by_css(self._SAVE_OPTION)
         self.click_by_css(self._SUBMIT_MULTI)
-        time.sleep(3) 
-
+        time.sleep(3)
 
     def submit_feed_url(self, feed_url, save=False):
         """Submit videos from a supported feed type.
 
-        """       
+        """
         self._open_multi_submit()
         self.type_by_css(self._FEED_URL, feed_url)
         if save == True:
             self.click_by_css(self._SAVE_OPTION)
-        self.click_by_css(self._SUBMIT_MULTI)   
-
+        self.click_by_css(self._SUBMIT_MULTI)
 
     def multi_submit_successful(self):
         self.wait_for_element_present(self._SUCCESS_MESSAGE)
-        if self.is_text_present(self._SUCCESS_MESSAGE, 
-                 u"The videos are being added in the background. " 
-                 u"If you are logged in, you will receive a message when it's done"):
+        if self.is_text_present(self._SUCCESS_MESSAGE,
+                                u"The videos are being added in the background. "
+                                u"If you are logged in, you will receive a message when it's done"):
             return True
         else:
             print self.get_text_by_css(self._SUCCESS_MESSAGE)
-
 
     def multi_submit_failed(self):
         self.wait_for_element_present(self._ERROR_MESSAGE)
@@ -104,32 +98,3 @@ class CreatePage(UnisubsPage):
         else:
             return True
         #FIXME - you can do better verfication than this
-
-
-
-
-            
-        
-        
-        
-        
-
-    
-
-        
-        
-        
-
-        
-    
-
-        
-        
-
-
-
-    
-            
-        
-        
-    

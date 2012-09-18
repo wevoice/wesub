@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 from unisubs_page import UnisubsPage
 
+
 class OffsitePage(UnisubsPage):
     """Main page for all offsite testing to drive playback and menus.
 
     """
     _CAPTIONS = "span.unisubs-captionSpan"
     _WIDGET_MENU = "span.unisubs-tabTextchoose"
-    
+
     def start_playback(self, video_position):
         self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].play()" % video_position)
 
     def pause_playback(self, video_position):
         self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].pause()" % video_position)
-
 
     def open_subs_menu(self, video_position):
         self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].openMenu()" % video_position)
@@ -28,11 +28,11 @@ class OffsitePage(UnisubsPage):
             return True
 
     def open_offsite_page(self, page_url):
-        self.browser.set_page_load_timeout(30)
+        self.browser.set_page_load_timeout(60)
         try:
             self.open_page(page_url)
         except:
-            print "page didn't finish loading in 30 seconds, continuing..."
+            print "page didn't finish loading in 60 seconds, continuing..."
         self.wait_for_element_present(self._WIDGET_MENU)
 
     def pause_playback_when_subs_appear(self, video_position):
@@ -42,19 +42,7 @@ class OffsitePage(UnisubsPage):
 
     def scroll_to_video(self, video_position):
         self.wait_for_element_present(self._WIDGET_MENU)
-        elements_found = self.browser.find_elements_by_css_selector(self._WIDGET_MENU)
+        elements_found = self.browser.find_elements_by_css_selector(
+            self._WIDGET_MENU)
         elem = elements_found[video_position]
         elem.send_keys("PAGE_DOWN")
-        
-        
-                       
-                       
-   
-       
-        
-
-
-        
-        
-
-    

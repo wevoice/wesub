@@ -2,12 +2,13 @@ from ..page import Page
 import time
 import re
 
+
 class JsTestPage(Page):
     _URL = "jstest/alltests/"
-    
+
     def open_js_page(self):
         self.open_page(self._URL)
-      
+
     def click_start(self):
         print("Waiting for Start button to appear")
         BUTTON_CSS = ".goog-testrunner-buttons button:first-child"
@@ -20,7 +21,7 @@ class JsTestPage(Page):
         print("Waiting for tests to finish running")
         self.wait_for_element_present(PROG_CSS)
         matches = None
-        for x in range(60):           
+        for x in range(60):
             text = self.get_text_by_css(PROG_CSS)
             matches = re.search(r"(\d+) failed", text)
             if matches is not None:

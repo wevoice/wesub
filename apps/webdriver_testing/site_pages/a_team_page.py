@@ -4,10 +4,12 @@ from nose.tools import assert_equals
 from nose.tools import assert_true
 from unisubs_page import UnisubsPage
 
+
 class ATeamPage(UnisubsPage):
-    """Defines the actions for specific teams pages like 'unisubs test team' (default) or others. 
+    """Defines the actions for specific teams pages like 'unisubs test team' (default) or others.
     """
 
+    _URL = 'teams/%s/'
     _TEAM_LINK = "h2#team_title a"
     _TEAM_NAME = ".main-title a"
 
@@ -23,46 +25,50 @@ class ATeamPage(UnisubsPage):
     _ACTIVITY_TAB = "ul.tabs li a[href*='activity']"
     _SETTINGS_TAB = "ul.tabs li a[href*='settings']"
 
-
     #JOIN / APPLY
     _JOIN_TEAM = ".join a"
     _APPLY_TEAM = "a#apply"
     _SIGNIN = "a#signin-join"
     _APPLY_BUTTON = "Apply to Join"
     _APPLICATION = "div#apply-modal"
+    _CUSTOM_APPLICATION_MESSAGE = "div.message"
     _APPLICATION_TEXT = "div#apply-modal div.form textarea"
-    _SUBMIT_APPLICATION = "div#apply-modal button" 
-
+    _SUBMIT_APPLICATION = "div#apply-modal button"
 
    #FILTER AND SORT
 
+    def open_team_page(self, team):
+        self.open_page(self._URL %team)
 
 
     def is_team(self, team):
-        if self.get_text_by_css(self._TEAM_NAME) == team:
+        self.wait_for_element_present(self._TEAM_LINK)
+        if self.get_text_by_css(self._TEAM_LINK) == team:
             return True
 
-    
     def team_search(self, team):
         pass
 
     def join_exists(self):
         if self.is_element_present(self._JOIN_TEAM):
             return True
-        
+
     def apply_exists(self):
         button = self._APPLY_TEAM
         join_button = self.get_text_by_css(button)
-        if self.logged_in(): 
-           assert_equals(join_button, self._APPLY_BUTTON)
+        if self.logged_in():
+            assert_equals(join_button, self._APPLY_BUTTON)
         else:
-           assert_equals(join_button, self._JOIN_NOT_LOGGED_IN)
+            assert_equals(join_button, self._JOIN_NOT_LOGGED_IN)
 
     def application_displayed(self):
         assert_true(self.is_element_present(self._APPLICATION))
 
+    def application_custom_message(self):
+        return self.get_text_by_css(self._CUSTOM_APPLICATION_MESSAGE) 
+
     def submit_application(self, text=None):
-        if text == None:
+        if text is None:
             text = "Please let me join your team, I'll subtitle hard. I promise."
         self.application_displayed()
         self.type_by_css(self._APPLICATION_TEXT, text)
@@ -72,17 +78,16 @@ class ATeamPage(UnisubsPage):
         self.click_by_css(self._JOIN_TEAM)
         if logged_in == True:
             self.handle_js_alert(action='accept')
-    
+
     def signin(self):
         self.click_by_css(self._SIGNIN)
- 
+
     def apply(self):
-        self.click_by_css(self._APPLY_TEAM) 
+        self.click_by_css(self._APPLY_TEAM)
 
     def leave_team(self, team_url):
         leave_url = "teams/leave_team/%s/" % team_stub
         self.open_page(leave_url)
-
 
     def settings_tab_visible(self):
         if self.is_element_present(self._SETTINGS_TAB) == True:
