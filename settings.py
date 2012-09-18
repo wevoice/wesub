@@ -767,13 +767,14 @@ MEDIA_BUNDLES = {
             'src/js/third-party/popcorn.js',
             'src/js/embedder/popcorn.amaratranscript.js',
             'src/js/embedder/popcorn.amarasubtitle.js',
-            'src/js/embedder/conf.js'
+            'src/js/embedder/conf.js',
             'src/js/embedder/embedder.js'
         ),
         "include_js_base_dependencies": False,
         "include_flash_deps": False,
         "output": 'release/public/embedder.js',
         "ignore_closure": True,
+        "release_url": True,
     },
     "embedder-css":{
         "type":"css",
@@ -782,7 +783,8 @@ MEDIA_BUNDLES = {
         ),
         "include_js_base_dependencies": False,
         "include_flash_deps": False,
-        "output": 'release/public/embedder.css'
+        "output": 'release/public/embedder.css',
+        "release_url": True,
     },
     "debug-embed-js": {
         "type": "js",

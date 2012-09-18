@@ -202,10 +202,8 @@ class Command(BaseCommand):
         logging.info("Starting {0}".format(output_file_name))
 
         deps = [" --js %s " % os.path.join(JS_LIB, file) for file in files]
-        calcdeps_js = os.path.join(JS_LIB, 'js', 'unisubs-calcdeps.js')
-        if hasattr(bundle_settings, 'output'):
-            compiled_js = os.path.join(self.temp_dir, bundle_settings['output'])
-            print "compiling to ", compiled_js
+        if 'output' in bundle_settings:
+            compiled_js = os.path.join(settings.STATIC_ROOT, bundle_settings['output'])
         else:
             compiled_js = os.path.join(self.temp_dir, "js" , output_file_name)
         if not os.path.exists(os.path.dirname(compiled_js)):
@@ -235,8 +233,12 @@ class Command(BaseCommand):
         output_lines = filter(lambda s: s.find("@fileoverview") == -1,
                               output.split("\n"))
 
+        calcdeps_js = os.path.join(JS_LIB, 'js', 'unisubs-calcdeps.js')
         calcdeps_file = open(calcdeps_js, "w")
-        calcdeps_file.write("\n".join(output_lines))
+        if 'ignore_closure' in bundle_settings:
+            calcdeps_file.write("\n")
+        else:
+            calcdeps_file.write("\n".join(output_lines))
         calcdeps_file.close()
 
         logging.info("Compiling {0}".format(output_file_name))
@@ -456,8 +458,6 @@ class Command(BaseCommand):
             if filename != mirosubs_filename:
                 from_path = os.path.join(settings.STATIC_ROOT, filename)
                 to_path = os.path.join(settings.STATIC_ROOT, mirosubs_filename)
-                print("For backwards compatibility, copying from {0} to {1}".format(
-                        from_path, to_path))
                 shutil.copyfile(from_path, to_path)
 
     def handle(self, *args, **options):
