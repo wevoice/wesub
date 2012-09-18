@@ -193,14 +193,21 @@ class Command(BaseCommand):
         debug = bundle_settings.get("debug", False)
         extra_defines = bundle_settings.get("extra_defines", None)
         include_flash_deps = bundle_settings.get("include_flash_deps", True)
-        closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
+        if hasattr(bundle_settings, 'ignore_closure'):
+            closure_dep_file = ""
+        else:
+            closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
         optimization_type = bundle_settings.get("optimizations", self.compilation_level)
 
         logging.info("Starting {0}".format(output_file_name))
 
         deps = [" --js %s " % os.path.join(JS_LIB, file) for file in files]
         calcdeps_js = os.path.join(JS_LIB, 'js', 'unisubs-calcdeps.js')
-        compiled_js = os.path.join(self.temp_dir, "js" , output_file_name)
+        if hasattr(bundle_settings, 'output'):
+            compiled_js = os.path.join(self.temp_dir, bundle_settings['output'])
+            print "compiling to ", compiled_js
+        else:
+            compiled_js = os.path.join(self.temp_dir, "js" , output_file_name)
         if not os.path.exists(os.path.dirname(compiled_js)):
             os.makedirs(os.path.dirname(compiled_js))
         compiler_jar = COMPILER_PATH

@@ -755,6 +755,34 @@ MEDIA_BUNDLES = {
         "include_js_base_dependencies": False,
         "include_flash_deps": False,
     },
+    "embedder":{
+        "type":"js",
+        "optimizations": "WHITESPACE_ONLY",
+        "closure_deps": "",
+        "files": (
+            "src/js/third-party/json2.min.js",
+            'src/js/third-party/underscore.min.js',
+            'src/js/third-party/zepto.min.js',
+            'src/js/third-party/backbone.min.js',
+            'src/js/third-party/popcorn.js',
+            'src/js/embedder/popcorn.amaratranscript.js',
+            'src/js/embedder/popcorn.amarasubtitle.js',
+            'src/js/embedder/embedder.js'
+        ),
+        "include_js_base_dependencies": False,
+        "include_flash_deps": False,
+        "output": 'release/public/embedder.js',
+        "ignore_closure": True,
+    },
+    "embedder-css":{
+        "type":"css",
+        "files": (
+            "src/css/embedder/embedder-dev.css",
+        ),
+        "include_js_base_dependencies": False,
+        "include_flash_deps": False,
+        "output": 'release/public/embedder.css'
+    },
     "debug-embed-js": {
         "type": "js",
         "optimizations": "WHITESPACE_ONLY",
