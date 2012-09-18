@@ -11840,7 +11840,7 @@ Popcorn.plugin('amarasubtitle', {
             initialize: function() {
 
                 var video = this;
-                var apiURL = 'https://staging.universalsubtitles.org/api2/partners/videos/?&video_url=';
+                var apiURL = _amaraConf.baseURL + '/api2/partners/videos/?&video_url=';
 
                 this.subtitles = new that.Subtitles();
 

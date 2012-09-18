@@ -11840,7 +11840,7 @@ Popcorn.plugin('amarasubtitle', {
             initialize: function() {
 
                 var video = this;
-                var apiURL = 'https://staging.universalsubtitles.org/api2/partners/videos/?&video_url=';
+                var apiURL = _amaraConf.baseURL + '/api2/partners/videos/?&video_url=';
 
                 this.subtitles = new that.Subtitles();
 
@@ -12441,7 +12441,7 @@ Popcorn.plugin('amarasubtitle', {
             style.rel = 'stylesheet';
             style.type = 'text/css';
 
-            style.href = '//s3.amazonaws.com/s3.www.universalsubtitles.org/build/public/embedder/embedder.css';
+            style.href = '//s3.amazonaws.com/s3.www.universalsubtitles.org/release/public/embedder/embedder.css';
             tag.parentNode.insertBefore(style, tag);
 
             // Change the template delimiter for Underscore templates.
