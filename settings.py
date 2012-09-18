@@ -767,6 +767,7 @@ MEDIA_BUNDLES = {
             'src/js/third-party/popcorn.js',
             'src/js/embedder/popcorn.amaratranscript.js',
             'src/js/embedder/popcorn.amarasubtitle.js',
+            'src/js/embedder/conf.js'
             'src/js/embedder/embedder.js'
         ),
         "include_js_base_dependencies": False,

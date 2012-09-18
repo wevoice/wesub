@@ -393,6 +393,13 @@ class Command(BaseCommand):
         with open(file_name, 'w') as f:
             f.write(rendered)
 
+        # these are the configs for the embedder
+        file_name = os.path.join(JS_LIB, 'src/js/embedder/conf.js')
+        rendered = render_to_string(
+            'embedder/conf.js', context)
+        with open(file_name, 'w') as f:
+            f.write(rendered)
+
     def _compile_media_bundles(self, restrict_bundles, args):
         bundles = settings.MEDIA_BUNDLES
         for bundle_name, data in bundles.items():
