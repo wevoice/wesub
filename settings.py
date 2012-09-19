@@ -757,7 +757,7 @@ MEDIA_BUNDLES = {
     },
     "embedder":{
         "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
+        "optimizations": "SIMPLE_OPTIMIZATIONS",
         "closure_deps": "",
         "files": (
             "src/js/third-party/json2.min.js",
