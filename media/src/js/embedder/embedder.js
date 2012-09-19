@@ -218,7 +218,7 @@
 
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
-                        video_url: 'http://staging.universalsubtitles.org/en/videos/' + that.model.get('id'),
+                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'),
                         width: that.model.get('width')
                     }));
 
@@ -434,7 +434,7 @@
                 var that = this;
 
                 var apiURL = ''+
-                    'https://staging.universalsubtitles.org/api2/partners/videos/' +
+                    'http://' + _amaraConf.baseURL + '/api2/partners/videos/' +
                     this.model.get('id') + '/languages/' + language + '/subtitles/';
 
                 this.$amaraCurrentLang.text('Loading…');

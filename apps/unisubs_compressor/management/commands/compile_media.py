@@ -173,7 +173,7 @@ class Command(BaseCommand):
         
         if 'output' in bundle_settings:
             dir_path = settings.STATIC_ROOT
-            concatenated_path =  os.path.join(settings.STATIC_ROOT, bundle_settings['output'])
+            concatenated_path =  os.path.join(self.temp_dir, bundle_settings['output'])
         else:
             dir_path = os.path.join(self.temp_dir, "css-compressed")
             concatenated_path =  os.path.join(dir_path, "%s.%s" % (bundle_name, bundle_type))
@@ -217,7 +217,7 @@ class Command(BaseCommand):
 
         deps = [" --js %s " % os.path.join(JS_LIB, file) for file in files]
         if 'output' in bundle_settings:
-            compiled_js = os.path.join(settings.STATIC_ROOT, bundle_settings['output'])
+            compiled_js = os.path.join(self.temp_dir, bundle_settings['output'])
         else:
             compiled_js = os.path.join(self.temp_dir, "js" , output_file_name)
         if not os.path.exists(os.path.dirname(compiled_js)):
