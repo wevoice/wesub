@@ -9,6 +9,7 @@ cat media/src/js/third-party/json2.min.js \
     media/src/js/third-party/popcorn.js \
     media/src/js/embedder/popcorn.amaratranscript.js \
     media/src/js/embedder/popcorn.amarasubtitle.js \
+    media/src/js/embedder/conf.js \
     media/src/js/embedder/embedder.js \
   > media/src/js/embedder/embedder-dev.js
 

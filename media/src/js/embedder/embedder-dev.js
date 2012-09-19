@@ -11750,6 +11750,13 @@ Popcorn.plugin('amarasubtitle', {
         }
     });
 })(Popcorn);
+/* This is generated during media compilation. It's added to the repo, but on gitignore, as 
+ * new compiles will overwrite the file with the environment specific data.
+ */
+_amaraConf = {
+    'baseURL': 'unisubs.example.com:8000',
+    'staticURL':'http://unisubs.example.com:8000/site_media/static-cache/852cffe9/'
+};
 (function(window, document, undefined) {
 
     // When the embedder is compiled, dependencies will be loaded directly before this
@@ -11840,7 +11847,7 @@ Popcorn.plugin('amarasubtitle', {
             initialize: function() {
 
                 var video = this;
-                var apiURL = _amaraConf.baseURL + '/api2/partners/videos/?&video_url=';
+                var apiURL = 'http://' + _amaraConf.baseURL + '/api2/partners/videos/?&video_url=';
 
                 this.subtitles = new that.Subtitles();
 
@@ -11970,7 +11977,7 @@ Popcorn.plugin('amarasubtitle', {
 
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
-                        video_url: 'http://staging.universalsubtitles.org/en/videos/' + that.model.get('id'),
+                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'),
                         width: that.model.get('width')
                     }));
 
@@ -12186,7 +12193,7 @@ Popcorn.plugin('amarasubtitle', {
                 var that = this;
 
                 var apiURL = ''+
-                    'https://staging.universalsubtitles.org/api2/partners/videos/' +
+                    'http://' + _amaraConf.baseURL + '/api2/partners/videos/' +
                     this.model.get('id') + '/languages/' + language + '/subtitles/';
 
                 this.$amaraCurrentLang.text('Loading…');
