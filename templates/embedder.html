@@ -43,7 +43,7 @@
         </section>
     </div>
     <script type="text/javascript">
-    {% if not COMPRESS_MEDIA %}
+    {% if COMPRESS_MEDIA %}
         // when in prod using build process artifact
         var url = '/site_media/release/public/embedder.js';
     {% else %}
