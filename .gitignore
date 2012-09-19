@@ -38,6 +38,7 @@ media/js/js-base-dependencies.js
 media/js/js-onsite-dialog.js
 media/js/js-testing-base.js
 media/css/.sass-cache
+media/release
 media/static-cache
 media/teams/*
 media/videos/*

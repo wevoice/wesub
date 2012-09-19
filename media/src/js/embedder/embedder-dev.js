@@ -11869,11 +11869,14 @@ _amaraConf = {
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
 
+                                console.log(video.get('original_language'));
+
                                 // Set the initial language to either the one provided by the initial
                                 // options, or the original language from the API.
                                 video.set('initial_language',
                                     video.get('initial_language') ||
-                                    video.get('original_language')
+                                    video.get('original_language') ||
+                                    'en'
                                 );
                             }
 
