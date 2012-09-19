@@ -242,6 +242,25 @@ class TestSubtitleVersion(TestCase):
         sv.save()
         self.assertEqual(0, _count_public())
 
+    def test_text_time_change(self):
+        subtitles_1 = [
+            (0, 1000, 'Hello ther'),
+            (2000, 3000, 'How are you?'),
+            (4000, 5000, 'Great'),
+        ]
+        subtitles_2 = [
+            (0, 1000, 'Hello there'),
+            (2000, 3000, 'How are you?'),
+            (4000, 5500, 'Great'),
+            (6000, 7000, 'New sub'),
+        ]
+        sv1 =self.sl_en.add_version(title='title a', description='desc a',
+                                    subtitles=subtitles_1)
+        sv2 = self.sl_en.add_version(title='title b', description='desc b',
+                                    subtitles=subtitles_2)
+
+        self.assertEquals((0.0, 0.0), sv1.get_changes())
+        self.assertEquals((0.5, 0.5), sv2.get_changes())
 
 class TestHistory(TestCase):
     def setUp(self):

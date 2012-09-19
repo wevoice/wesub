@@ -668,6 +668,63 @@ class SubtitleVersion(models.Model):
     def get_subtitle_count(self):
         return len([s for s in self.get_subtitles().subtitle_items()])
 
+    def get_changes(self):
+        """
+        Return ``(time_change, text_change)``
+        """
+
+        if hasattr(self, '_time_change') and hasattr(self, '_text_change'):
+            return (self._time_change, self._text_change)
+
+        # Not sure what to do for merges yet
+        try:
+            parent = self.parents.all()[0]
+        except IndexError:
+            return (0.0, 0.0)
+
+        subtitles = [s for s in self.get_subtitles().subtitle_items()]
+        last_subtitles = [s for s in parent.get_subtitles().subtitle_items()]
+
+        sub_dict = dict([("-".join(map(str, s[0:2])), s[2])
+                                for s in subtitles])
+        last_sub_dict = dict([("-".join(map(str, s[0:2])), s[2])
+                                for s in last_subtitles])
+
+        sub_dict_reverse = dict((v, k) for k, v in sub_dict.iteritems())
+        last_sub_dict_reverse = dict((v, k)
+                                    for k, v in last_sub_dict.iteritems())
+
+        text_count_changed = 0
+        time_count_changed = 0
+
+        for sub_timing in sub_dict:
+            if sub_timing in last_sub_dict:
+                if not last_sub_dict[sub_timing] == sub_dict[sub_timing]:
+                    text_count_changed += 1
+
+        for sub_text in sub_dict_reverse:
+            try:
+                last = last_sub_dict_reverse[sub_text]
+                current = sub_dict_reverse[sub_text]
+            except KeyError:
+                continue
+
+            if not last == current:
+                time_count_changed += 1
+
+        for sub_timing in last_sub_dict:
+            if sub_timing not in sub_dict.keys():
+                text_count_changed += 1
+                time_count_changed += 1
+
+        subs_length = len(subtitles)
+        time_change = min(time_count_changed / 1. / subs_length, 1)
+        text_change = min(text_count_changed / 1. / subs_length, 1)
+
+        self._text_change = text_change
+        self._time_change = time_change
+
+        return time_change, text_change
 
 # Collaborators ---------------------------------------------------------------
 class CollaboratorManager(models.Manager):
