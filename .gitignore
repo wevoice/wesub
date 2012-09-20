@@ -23,6 +23,7 @@ commit.py
 media/embed.js
 media/js/config.js
 media/js/statwidget/statwidgetconfig.js
+media/src/js/embedder/conf.js
 media/js/mirosubs-widgetizer*.js
 media/js/mirosubs-extension.js
 media/js/mirosubs-statwidget.js
@@ -37,6 +38,7 @@ media/js/js-base-dependencies.js
 media/js/js-onsite-dialog.js
 media/js/js-testing-base.js
 media/css/.sass-cache
+media/release
 media/static-cache
 media/teams/*
 media/videos/*

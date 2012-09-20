@@ -100,7 +100,6 @@ div.amara-tools {
         @include vertical-gradient(#1B1C1D, #212223);
 
         a.amara-button {
-            // TODO: Have the CSS compiler convert these to absolute URLs.
             background: transparent url('/site_media/images/embedder/amara-sprites.png') 0 0 no-repeat;
             display: inline-block;
             height: 36px;
@@ -177,7 +176,6 @@ div.amara-tools {
             width: 21%;
 
             .amara-current-language {
-                // TODO: Have the CSS compiler convert these to absolute URLs.
                 background: transparent url('/site_media/images/embedder/amara-sprites.png') right -139px no-repeat;
                 color: #DEDEDE;
                 display: block;
