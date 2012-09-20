@@ -217,7 +217,10 @@ class Command(BaseCommand):
 
         deps = [" --js %s " % os.path.join(JS_LIB, file) for file in files]
         if 'output' in bundle_settings:
-            compiled_js = os.path.join(self.temp_dir, bundle_settings['output'])
+            if 'bootloader' in bundle_settings:
+                name = bundle_settings['output']
+                name = "".join([os.path.splitext(name)[0], '-inner', os.path.splitext(name)[1]])
+            compiled_js = os.path.join(self.temp_dir, name)
         else:
             compiled_js = os.path.join(self.temp_dir, "js" , output_file_name)
         if not os.path.exists(os.path.dirname(compiled_js)):
@@ -299,6 +302,7 @@ class Command(BaseCommand):
             logging.info("Successfully compiled {0}".format(output_file_name))
 
     def _compile_js_bootloader(self, bundle_name, bootloader_settings):
+        bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
         logging.info("_compile_js_bootloader called with cache_base_url {0}".format(
                 get_cache_base_url()))
         context = { 'gatekeeper' : bootloader_settings['gatekeeper'],
@@ -310,8 +314,11 @@ class Command(BaseCommand):
         rendered = render_to_string(template_name, context)
         file_name = os.path.join(
             self.temp_dir, "js", "{0}.js".format(bundle_name))
+        output_override = bundle_settings.get('output', None)
+        if output_override:
+            file_name = os.path.join(self.temp_dir, output_override)
         uncompiled_file_name = os.path.join(
-            self.temp_dir, "js", "{0}-uncompiled.js".format(bundle_name))
+                self.temp_dir, "js", "{0}-uncompiled.js".format(bundle_name))
         with open(uncompiled_file_name, 'w') as f:
             f.write(rendered)
         cmd_str = ("java -jar {0} --js {1} --js_output_file {2} "
@@ -454,10 +461,11 @@ class Command(BaseCommand):
 
     def _copy_files_with_public_urls_from_cache_dir_to_static_dir(self):
         cache_dir = get_cache_dir()
-        for file in NO_UNIQUE_URL:
+        to_move = NO_UNIQUE_URL + ({'name': 'js/embedder.js', 'no-cache': False, 'output': 'release/public/embedder.js'},)
+        for file in to_move:
             filename = file['name']
             from_path = os.path.join(cache_dir, filename)
-            to_path =  os.path.join(settings.STATIC_ROOT, filename)
+            to_path =  os.path.join(settings.STATIC_ROOT, file.get('output', filename))
             if not os.path.exists(from_path):
                 continue
             if os.path.exists(to_path):

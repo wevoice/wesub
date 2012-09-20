@@ -772,9 +772,13 @@ MEDIA_BUNDLES = {
         ),
         "include_js_base_dependencies": False,
         "include_flash_deps": False,
-        "output": 'release/public/embedder.js',
+        #"output": 'release/public/embedder.js',
         "ignore_closure": True,
         "release_url": True,
+        "bootloader": { 
+            "gatekeeper": "_amaraEmbedderLoaded", 
+        }
+
     },
     "embedder-css":{
         "type":"css",
@@ -783,7 +787,7 @@ MEDIA_BUNDLES = {
         ),
         "include_js_base_dependencies": False,
         "include_flash_deps": False,
-        "output": 'release/public/embedder.css',
+        #"output": 'release/public/embedder.css',
         "release_url": True,
     },
     "debug-embed-js": {
