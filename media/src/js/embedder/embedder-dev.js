@@ -11928,16 +11928,24 @@ _amaraConf = {
                 // Default states.
                 this.states = {
                     autoScrolling: true,
-                    autoStreamPaused: false
+                    autoStreamPaused: false,
+                    contextMenuActive: false
                 };
             },
             events: {
+                'click':                               'mouseClicked',
+                'mousemove':                           'mouseMoved',
+
                 'click ul.amara-languages-list a':     'changeLanguage',
                 'click a.amara-current-language':      'languageButtonClicked',
                 'click a.amara-share-button':          'shareButtonClicked',
                 'click a.amara-transcript-button':     'toggleTranscriptDisplay',
                 'click a.amara-subtitles-button':      'toggleSubtitlesDisplay',
-                'click a.amara-transcript-autostream': 'pauseAutoStream'
+                'click a.amara-transcript-autostream': 'pauseAutoStream',
+                'contextmenu a.amara-transcript-line': 'showTranscriptContextMenu',
+
+                // TODO: This does not work. Why?
+                'scroll div.amara-transcript-body':    'pauseAutoStream'
             },
             render: function() {
 
@@ -11989,7 +11997,7 @@ _amaraConf = {
                     //
                     // TODO: Find a way to get this into the core Backbone events on the Amara view.
                     that.$transcriptBody.on('scroll', function() {
-                        that.pauseAutoStream(true);
+                        that.transcriptScrolled();
                     });
 
                     // Wait until we have a complete video model (the API was hit as soon as
@@ -12031,6 +12039,13 @@ _amaraConf = {
             },
 
             // View methods.
+            mouseClicked: function(e) {
+
+            },
+            mouseMoved: function(e) {
+                this.setCursorPosition(e);
+            },
+            
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
                 if (langs.length) {
@@ -12137,13 +12152,10 @@ _amaraConf = {
 
                         // Scroll to the current subtitle.
                         this.scrollToLine(currentPluginInstances[0]);
+
                     }
 
-                    // Handle right-click context menu for transcript lines.
-                    _$('a.amara-transcript-line', this.$transcriptBody).on('contextmenu', function(e) {
-                        that.showTranscriptContextMenu(e);
-                    });
-
+                    this.$amaraTranscriptLines = $('a.amara-transcript-line', this.$transcriptBody);
 
                 } else {
                     _$('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
@@ -12236,42 +12248,17 @@ _amaraConf = {
                 var language = __.find(languages, function(l) { return l.code === languageCode; });
                 return language.name;
             },
+            hideTranscriptContextMenu: function() {
+                if (this.states.contextMenuActive) {
+
+                    // Deselect the transcript line and remove the context menu.
+                    this.$amaraTranscriptLines.removeClass('selected');
+                    this.$amaraContextMenu.remove();
+
+                }
+            },
             languageButtonClicked: function() {
                 this.$amaraLanguagesList.toggle();
-                return false;
-            },
-            scrollToLine: function(pluginInstance) {
-                // Scroll the transcript container to the line, and bring the line to the center
-                // of the vertical height of the container.
-                //
-                //     * pluginInstance (amaratranscript plugin instance)
-
-                // Only scroll to line if the auto-stream is not paused.
-                if (!this.states.autoStreamPaused) {
-
-                    // Retrieve the absolute positions of the line and the container.
-                    var linePos = _$(pluginInstance.line).offset();
-                    var containerPos = _$(pluginInstance.container).offset();
-
-                    // The difference in top-positions between the line and the container.
-                    var diffY = linePos.top - containerPos.top;
-
-                    // The available vertical space within the container.
-                    var spaceY = pluginInstance.container.clientHeight - pluginInstance.line.offsetHeight;
-
-                    // Set the scrollTop of the container to the difference in top-positions,
-                    // plus the existing scrollTop, minus 50% of the available vertical space.
-                    var oldScrollTop = pluginInstance.container.scrollTop;
-                    var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
-
-                    // We need to tell our transcript tracking to ignore this scroll change,
-                    // otherwise our scrolling detector would trigger the autostream to stop.
-                    this.states.autoScrolling = true;
-                    pluginInstance.container.scrollTop = newScrollTop;
-                }
-
-            },
-            shareButtonClicked: function() {
                 return false;
             },
             pauseAutoStream: function(isNowPaused) {
@@ -12335,7 +12322,47 @@ _amaraConf = {
                 
                 return false;
             },
+            scrollToLine: function(pluginInstance) {
+                // Scroll the transcript container to the line, and bring the line to the center
+                // of the vertical height of the container.
+                //
+                //     * pluginInstance (amaratranscript plugin instance)
+
+                // Only scroll to line if the auto-stream is not paused.
+                if (!this.states.autoStreamPaused) {
+
+                    // Retrieve the absolute positions of the line and the container.
+                    var linePos = _$(pluginInstance.line).offset();
+                    var containerPos = _$(pluginInstance.container).offset();
+
+                    // The difference in top-positions between the line and the container.
+                    var diffY = linePos.top - containerPos.top;
+
+                    // The available vertical space within the container.
+                    var spaceY = pluginInstance.container.clientHeight - pluginInstance.line.offsetHeight;
+
+                    // Set the scrollTop of the container to the difference in top-positions,
+                    // plus the existing scrollTop, minus 50% of the available vertical space.
+                    var oldScrollTop = pluginInstance.container.scrollTop;
+                    var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
+
+                    // We need to tell our transcript tracking to ignore this scroll change,
+                    // otherwise our scrolling detector would trigger the autostream to stop.
+                    this.states.autoScrolling = true;
+                    pluginInstance.container.scrollTop = newScrollTop;
+                }
+
+            },
+            setCursorPosition: function(e) {
+                this.cursorX = e.pageX;
+                this.cursorY = e.pageY;
+            },
+            shareButtonClicked: function() {
+                return false;
+            },
             showTranscriptContextMenu: function(e) {
+
+                var that = this;
 
                 // Don't show the default context menu.
                 e.preventDefault();
@@ -12343,7 +12370,26 @@ _amaraConf = {
                 // Remove the auto-selection that the browser does for some reason.
                 window.getSelection().removeAllRanges();
 
+                // Remove any existing context menus.
+                this.hideTranscriptContextMenu();
+
+                // Remove any previously selected line classes.
+                this.$amaraTranscriptLines.removeClass('selected');
+
+                // Signal that the line is selected.
                 var $line = _$(e.target);
+                $line.addClass('selected');
+
+                // Create the context menu DOM.
+                _$('body').append('<div class="amara-context-menu"></div>');
+                this.$amaraContextMenu = _$('div.amara-context-menu');
+
+                // Position the context menu near the cursor.
+                this.$amaraContextMenu.css('top', this.cursorY + 10);
+                this.$amaraContextMenu.css('left', this.cursorX);
+
+                // Set the state so we know we have an active context menu.
+                this.states.contextMenuActive = true;
 
                 return false;
             },
@@ -12360,6 +12406,10 @@ _amaraConf = {
                 this.$amaraTranscript.toggle();
                 this.$transcriptButton.toggleClass('amara-button-enabled');
                 return false;
+            },
+            transcriptScrolled: function() {
+                this.hideTranscriptContextMenu();
+                this.pauseAutoStream(true);
             },
             waitUntilVideoIsComplete: function(callback) {
 

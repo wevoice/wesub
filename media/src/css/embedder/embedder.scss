@@ -295,6 +295,11 @@ div.amara-tools {
                 &:focus {
                     outline: none;
                 }
+                &.selected {
+                    color: #E3F1F8;
+                    @include box-shadow(-4px, 0px, 0, #0077B3);
+                    @include vertical-gradient(#0087CB, #0077B3);
+                }
             }
         }
     }
@@ -308,4 +313,11 @@ div.amara-popcorn-subtitles {
         padding: 12px 20px;
         @include border-radius(5px);
     }
+}
+div.amara-context-menu {
+    background: #E6E6E6;
+    position: absolute;
+    height: 100px;
+    width: 200px;
+    @include border-radius(3px);
 }
