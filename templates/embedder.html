@@ -45,7 +45,7 @@
     <script type="text/javascript">
     {% if COMPRESS_MEDIA %}
         // when in prod using build process artifact
-        var url = '/site_media/release/public/embedder.js';
+        var url = '{{STATIC_URL_BASE}}release/public/embedder.js';
     {% else %}
         // when in development, use simple concatenated file
         var url = '/site_media/src/js/embedder/embedder-dev.js';
