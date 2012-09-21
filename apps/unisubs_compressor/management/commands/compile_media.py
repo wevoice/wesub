@@ -172,13 +172,13 @@ class Command(BaseCommand):
         buffer = [open(f).read() for f in file_list]
         
         if 'output' in bundle_settings:
-            dir_path = settings.STATIC_ROOT
             concatenated_path =  os.path.join(self.temp_dir, bundle_settings['output'])
+            dir_path = os.path.dirname(concatenated_path)
         else:
             dir_path = os.path.join(self.temp_dir, "css-compressed")
             concatenated_path =  os.path.join(dir_path, "%s.%s" % (bundle_name, bundle_type))
         if os.path.exists(dir_path) is False:
-            os.mkdir(dir_path)
+            os.makedirs(dir_path)
         out = open(concatenated_path, 'w')
         out.write("".join(buffer))
         out.close()
@@ -470,6 +470,8 @@ class Command(BaseCommand):
                 continue
             if os.path.exists(to_path):
                 os.remove(to_path)
+            if not os.path.exists(os.path.dirname(to_path)):
+                os.makedirs(os.path.dirname(to_path))
             shutil.copyfile(from_path, to_path)
 
     def _make_mirosubs_copies_of_files_with_public_urls(self):
