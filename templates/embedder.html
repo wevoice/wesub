@@ -48,7 +48,7 @@
         var url = '{{STATIC_URL_BASE}}release/public/embedder.js';
     {% else %}
         // when in development, use simple concatenated file
-        var url = '/site_media/src/js/embedder/embedder-dev.js';
+        var url = '/site_media/release/public/embedder.js';
     {% endif %}
         (function (window, document) {
             var loader = function () {
