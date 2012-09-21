@@ -22,6 +22,8 @@ class VideoPage(UnisubsPage):
     _EMBED_CODE = ("div#embed-modal.modal div.modal-body form fieldset "
         "textarea")
 
+    _ADD_SUBTITLES = "a.add_subtitles"
+
     #VIDEO SIDE SECTION
     _INFO = "ul#video-menu.left_nav li:nth-child(1) > a"
     _ADD_TRANSLATION = "li.contribute a#add_translation"
@@ -66,3 +68,6 @@ class VideoPage(UnisubsPage):
     def video_embed_present(self):
         if self.is_element_present(self._EMBEDDED_VIDEO):
             return True
+
+    def add_subtitles(self):
+        self.click_by_css(self._ADD_SUBTITLES)

@@ -31,6 +31,9 @@ class Page(object):
         """
         self.browser.quit()
 
+    def close_browser(self):
+        self.browser.close()
+
     def page_error(self):
         """Return django debug page error information.
 
@@ -160,6 +163,17 @@ class Page(object):
         """
         elem = self.browser.find_element_by_css_selector(element)
         elem.send_keys(text)
+
+    def type_special_key(self, key_name, element="body"):
+        """Type a special key -see selenium/webdriver/common/keys.py.
+   
+        ex: ARROR_DOWN, TAB, ENTER, SPACE, DOWN... 
+        If no element is specified, just send the key press to the body.
+        """
+        elem = self.browser.find_element_by_css_selector(element)
+        elem.send_keys(key_name)
+
+        
 
     def get_text_by_css(self, element):
         """Get text of given css selector.

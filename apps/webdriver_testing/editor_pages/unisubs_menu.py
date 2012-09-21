@@ -5,7 +5,7 @@ from apps.webdriver_testing.page import Page
 class UnisubsMenu(Page):
 
     #LANGUAGE DISPLAY OPTIONS
-    _MENU = '.unisubs-tabTextchoose'
+    _MENU = 'span.unisubs-tabTextchoose'
     _SUBTITLES_OFF = 'div.unisubs-languageList li'
     _LANG_LIST = 'div.unisubs-languageList'
     _LANG_TITLE = '.unisubs-languageTitle'
@@ -78,6 +78,7 @@ class UnisubsMenu(Page):
         """Click the Subs menu to open it.
 
         """
+        self.wait_for_element_present(self._MENU)
         self.click_by_css(self._MENU)
 
     def improve_subtitles(self):
