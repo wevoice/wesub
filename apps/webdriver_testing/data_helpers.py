@@ -8,6 +8,14 @@ from apps.testhelpers.views import _create_videos
 
 
 
+
+def create_video(self, video_url=None):
+    if not video_url:
+        video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
+    video, _ = Video.get_or_create_for_url(video_url)
+    return video
+
+
 def create_video_with_subs(self, video_url=None, data=None):
     """Create a video and subtitles.
 

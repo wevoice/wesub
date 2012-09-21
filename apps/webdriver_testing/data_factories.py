@@ -24,15 +24,6 @@ class VideoFactory(factory.Factory):
     created = datetime.datetime.now()
 
 
-class SubtitleLanguageFactory(factory.Factory):
-    FACTORY_FOR = SubtitleLanguage
-    language = 'en'
-    subtitle_count = 10
-    is_complete = True
-    is_original = True
-    video = factory.SubFactory(VideoFactory)
-
-
 class UserFactory(factory.Factory):
     FACTORY_FOR = User
     username = factory.Sequence(lambda n: 'TestUser' + n)
