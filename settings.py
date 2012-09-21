@@ -787,7 +787,7 @@ MEDIA_BUNDLES = {
         ),
         "include_js_base_dependencies": False,
         "include_flash_deps": False,
-        #"output": 'release/public/embedder.css',
+        "output": 'release/public/embedder.css',
         "release_url": True,
     },
     "debug-embed-js": {
