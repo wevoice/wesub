@@ -229,7 +229,7 @@ div.amara-tools {
         div.amara-transcript-header {
             border-bottom: 1px solid #DADBDC;
             color: #9A9B9C;
-            @include vertical-gradient(#E1E1E1, #FFF);
+            @include vertical-gradient(#CCC -3px, #FFF 20px);
 
             div.amara-transcript-header-left {
                 float: left;
@@ -238,7 +238,7 @@ div.amara-tools {
                 span {
                     font-weight: bold;
                 }
-                a.amara-transcript-autostream {
+                a.amara-transcript-autoscroll {
                     color: #9A9B9C;
                     text-decoration: none;
                 }
@@ -275,19 +275,20 @@ div.amara-tools {
                 background-color: #C7C7C7;
             }
             a.amara-transcript-line {
-                color: #666;
+                color: #212223;
                 line-height: 32px;
                 padding: 5px 0;
                 text-decoration: none;
                 @include border-radius();
 
                 &:hover {
-                    background: #F6F6F6;
-                    @include box-shadow(-4px, 0px, 0, #F6F6F6);
+                    background: #D1D2D3;
+                    @include box-shadow(-4px, 0px, 0, #D1D2D3);
                 }
                 &.current-subtitle {
-                    background: #FFF9E3;
-                    @include box-shadow(-4px, 0px, 0, #FFF9E3);
+                    background: #313233;
+                    color: #FFF;
+                    @include box-shadow(-4px, 0px, 0, #313233);
                 }
                 &:after {
                     content: " ";

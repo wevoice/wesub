@@ -9,7 +9,7 @@
             (function (window, document) {
                 var loader = function () {
                     var script = document.createElement('script'), tag = document.getElementsByTagName('script')[0];
-                    script.src = 'https://staging.universalsubtitles.org/site_media/js/embedder/amara.js';
+                    script.src = 'http://s3.amazonaws.com/s3.www.universalsubtitles.org/release/public/embedder.js';
                     tag.parentNode.insertBefore(script, tag);
                 };
                 window.addEventListener ? window.addEventListener('load', loader, false) : window.attachEvent('onload', loader);
@@ -40,7 +40,8 @@
                 </div>
             </div>
             <section class="main">
-                <p>Step 1: paste this in-between your head tags:</p>
+                <h4>Note: this new Embedder is a work in progress.<br />It currently only supports YouTube, Vimeo, and HTML5 videos.</h4>
+                <p>Step 1: paste this in your document somewhere (closest to the closing body tag is preferable):</p>
                 <script type="text/javascript" src="https://snipt.net/embed/b40956e6b61188ed54e001dc6382bf04/"></script>
                 <p>Step 2: paste this somewhere inside your HTML body, with the video URL, height, and width of your choosing:</p>
                 <script type="text/javascript" src="https://snipt.net/embed/0f2bd07c64809fab54ec2b2a7a9ea34d/"></script>
