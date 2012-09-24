@@ -67,7 +67,7 @@ def ensure_stringy(val):
     if val == None:
         return
 
-    if not (isinstance(val, str) or isinstance(val, unicode)):
+    if not isinstance(val, basestring):
         raise ValidationError('Value must be a string.')
 
 def graphviz(video):
