@@ -12,7 +12,7 @@
             var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.cached_video_url }}');
             var opener = new unisubs.widget.SubtitleDialogOpener(
                 '{{ task.team_video.video.video_id }}',
-                '{{ task.cached_video_url }}',
+                '{{ task.cached_video_url|safe }}',
                 videoSource, null, null, 'fr'
             );
             {% if task.language %}
