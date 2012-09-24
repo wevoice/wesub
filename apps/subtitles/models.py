@@ -726,6 +726,7 @@ class SubtitleVersion(models.Model):
 
         return time_change, text_change
 
+
 # Collaborators ---------------------------------------------------------------
 class CollaboratorManager(models.Manager):
     def get_for(self, subtitle_language):
