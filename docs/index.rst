@@ -22,6 +22,7 @@ Contents:
    teams-callbacks
    testing
    subtitle-storage
+   model-refactor
 
 Contributing
 ------------
