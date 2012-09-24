@@ -338,7 +338,7 @@ def email_confirmed(user_pk):
 def videos_imported_message(user_pk, imported_videos):
     from messages.models import Message
     user = User.objects.get(pk=user_pk)
-    subject = _(u"Your videos were imported!")
+    subject = u"Your videos were imported!"
     url = "%s%s" % (get_url_base(), reverse("profiles:my_videos"))
     context = {"user": user,
                "imported_videos": imported_videos,

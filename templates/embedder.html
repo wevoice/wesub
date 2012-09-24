@@ -1,21 +1,13 @@
+{% load media_compressor %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <title>The new Amara Embedder.</title>
     <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css" />
+    <!-- JQuery is not being used, but this is here to ensure it's presence on a webpage (very common on offsite embeds) -->
+    <!-- won't break anything (no conflicts )  -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-
-    <script type="text/javascript">
-        (function (window, document) {
-            var loader = function () {
-                var script = document.createElement('script'), tag = document.getElementsByTagName('script')[0];
-                script.src = '/site_media/js/embedder/amara-dev.js';
-                tag.parentNode.insertBefore(script, tag);
-            };
-            window.addEventListener ? window.addEventListener('load', loader, false) : window.attachEvent('onload', loader);
-        })(window, document);
-    </script>
 
     <style type="text/css" media="screen">
         div.amara-embed {
@@ -50,5 +42,22 @@
             <!--<div class="amara-embed" style="height: 360px; width: 854px" data-url="http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"></div>-->
         </section>
     </div>
+    <script type="text/javascript">
+    {% if COMPRESS_MEDIA %}
+        // when in prod using build process artifact
+        var url = '{{STATIC_URL_BASE}}release/public/embedder.js';
+    {% else %}
+        // when in development, use simple concatenated file
+        var url = '/site_media/release/public/embedder.js';
+    {% endif %}
+        (function (window, document) {
+            var loader = function () {
+                var script = document.createElement('script'), tag = document.getElementsByTagName('script')[0];
+                script.src = url ;
+                tag.parentNode.insertBefore(script, tag);
+            };
+            window.addEventListener ? window.addEventListener('load', loader, false) : window.attachEvent('onload', loader);
+        })(window, document);
+     </script>
 </body>
 </html>

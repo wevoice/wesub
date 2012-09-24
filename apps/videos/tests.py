@@ -1365,11 +1365,22 @@ class TestFeedsSubmit(TestCase):
     def test_video_feed_submit(self):
         old_count = Video.objects.count()
         data = {
-            'feed_url': u'http://blip.tv/day9tv/rss'
+            'feed_url': u'http://blip.tv/coxman/rss'
         }
         response = self.client.post(reverse('videos:create_from_feed'), data)
         self.assertRedirects(response, reverse('videos:create'))
         self.assertNotEqual(old_count, Video.objects.count())
+        self.assertEqual(Video.objects.count(), 7)
+
+    def test_video_youtube_username_submit(self):
+        old_count = Video.objects.count()
+        data = {
+            'usernames': u'fernandotakai'
+        }
+        response = self.client.post(reverse('videos:create_from_feed'), data)
+        self.assertRedirects(response, reverse('videos:create'))
+        self.assertNotEqual(old_count, Video.objects.count())
+        self.assertEqual(Video.objects.count(), 16)
 
     def test_empty_feed_submit(self):
         base_open_resource = feedparser._open_resource
@@ -1408,7 +1419,6 @@ class TestFeedsSubmit(TestCase):
         self.assertEqual(vf.last_link, '')
 
         feedparser._open_resource = base_open_resource
-
 
 class BrightcoveVideoTypeTest(TestCase):
     def setUp(self):

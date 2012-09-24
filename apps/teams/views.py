@@ -568,10 +568,9 @@ def add_videos(request, slug):
     form = AddTeamVideosFromFeedForm(team, request.user, request.POST or None)
 
     if form.is_valid():
-        team_videos = form.save()
-        [api_teamvideo_new.send(tv) for tv in team_videos]
-        messages.success(request, form.success_message() % {'count': len(team_videos)})
-        return redirect(team)
+        form.save()
+        messages.success(request, form.success_message())
+        return redirect(team.get_absolute_url())
 
     return { 'form': form, 'team': team, }
 

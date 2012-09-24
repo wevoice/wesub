@@ -635,9 +635,10 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         return _(u"The videos are being added in the background. "
                  u"If you are logged in, you will receive a message when it's done")
 
-    def save(self):
+    def save(self, team=None):
         user_id = self.user.id if self.user else None
-        import_videos_from_feeds.delay(self.urls, user_id)
+        team_id = team.id if team else None
+        import_videos_from_feeds.delay(self.urls, user_id, team_id)
 
 class FeedbackForm(forms.Form):
     email = forms.EmailField(required=False)

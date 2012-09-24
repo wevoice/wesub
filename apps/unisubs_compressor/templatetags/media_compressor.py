@@ -41,7 +41,11 @@ def _urls_for(bundle_name, should_compress):
     bundle_type = bundle["type"]
 
     urls = []
-    if  should_compress == True:
+    
+    if should_compress == True and bundle.get('release_url', False):
+        media_url = settings.STATIC_URL_BASE
+        urls += [bundle['output']]
+    elif  should_compress == True:
         base = ""
         suffix = ""
         if bundle_type == "css":
@@ -64,6 +68,7 @@ def _urls_for(bundle_name, should_compress):
 def include_bundle(bundle_name, should_compress=None):
     urls, media_url, bundle_type = _urls_for(bundle_name, should_compress)
 
+    print urls
     return template.loader.render_to_string("uni_compressor/%s_links.html" % bundle_type,{
         "urls": urls,
         "adapted_media_url": media_url,

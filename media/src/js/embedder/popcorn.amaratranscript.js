@@ -1,37 +1,4 @@
 (function (Popcorn) {
-
-    // Scroll the transcript container to the line, and bring the line to the center
-    // of the vertical height of the container.
-    function scrollToLine(options) {
-
-        // Grab the DOM lib.
-        var _$ = options._$;
-
-        // Retrieve the absolute positions of the line and the container.
-        var linePos = _$(options.line).offset();
-        var containerPos = _$(options.container).offset();
-
-        // The difference in top-positions between the line and the container.
-        var diffY = linePos.top - containerPos.top;
-
-        // The available vertical space within the container.
-        var spaceY = options.container.clientHeight - options.line.offsetHeight;
-
-        // Set the scrollTop of the container to the difference in top-positions,
-        // plus the existing scrollTop, minus 50% of the available vertical space.
-        var oldScrollTop = options.container.scrollTop;
-        var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
-
-        // Lots of sites have jQuery loaded. If it is, use jQuery to animate the scroll
-        // change. Zepto does not animate on scrollTop: http://bit.ly/OtlKxl
-        if (typeof window.jQuery !== 'undefined') {
-            window.jQuery(options.container).animate({scrollTop: newScrollTop}, 50);
-        } else {
-            options.container.scrollTop = newScrollTop;
-        }
-
-    }
-
     Popcorn.plugin('amaratranscript', {
         _setup : function(options) {
 
@@ -45,7 +12,7 @@
 
             // If this subtitle has indicated that it's the beginning of a paragraph,
             // prepend two line breaks before the subtitle.
-            if (options.start_of_paragraph) {
+            if (options.startOfParagraph) {
                 options.container.appendChild(document.createElement('br'));
                 options.container.appendChild(document.createElement('br'));
             }
@@ -66,8 +33,7 @@
 
             // When we reach this subtitle, add this class.
             options.line.classList.add('current-subtitle');
-
-            scrollToLine(options);
+            options.view.scrollToLine(options);
         },
         end: function(event, options){
 

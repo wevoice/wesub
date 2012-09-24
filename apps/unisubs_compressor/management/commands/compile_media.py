@@ -97,7 +97,15 @@ NO_UNIQUE_URL = (
     }, {
         "name": "js/widgetizer/widgetizerprimer.js",
         "no-cache": True
+    },{
+        "name": "release/public/embedder.js",
+        "no-cache": True
+    },{
+        "name": "release/public/embedder.css",
+        "no-cache": True
     }
+
+
 )
 
 def call_command(command):
@@ -157,14 +165,20 @@ class Command(BaseCommand):
         descriptor.write(_make_version_debug_string())
 
     def compile_css_bundle(self, bundle_name, bundle_type, files):
+        bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
         file_list = [os.path.join(settings.STATIC_ROOT, x) for x in files]
         for f in file_list:
             open(f).read()
         buffer = [open(f).read() for f in file_list]
-        dir_path = os.path.join(self.temp_dir, "css-compressed")
+        
+        if 'output' in bundle_settings:
+            concatenated_path =  os.path.join(self.temp_dir, bundle_settings['output'])
+            dir_path = os.path.dirname(concatenated_path)
+        else:
+            dir_path = os.path.join(self.temp_dir, "css-compressed")
+            concatenated_path =  os.path.join(dir_path, "%s.%s" % (bundle_name, bundle_type))
         if os.path.exists(dir_path) is False:
-            os.mkdir(dir_path)
-        concatenated_path =  os.path.join(dir_path, "%s.%s" % (bundle_name, bundle_type))
+            os.makedirs(dir_path)
         out = open(concatenated_path, 'w')
         out.write("".join(buffer))
         out.close()
@@ -193,14 +207,22 @@ class Command(BaseCommand):
         debug = bundle_settings.get("debug", False)
         extra_defines = bundle_settings.get("extra_defines", None)
         include_flash_deps = bundle_settings.get("include_flash_deps", True)
-        closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
+        if hasattr(bundle_settings, 'ignore_closure'):
+            closure_dep_file = ""
+        else:
+            closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
         optimization_type = bundle_settings.get("optimizations", self.compilation_level)
 
         logging.info("Starting {0}".format(output_file_name))
 
         deps = [" --js %s " % os.path.join(JS_LIB, file) for file in files]
-        calcdeps_js = os.path.join(JS_LIB, 'js', 'unisubs-calcdeps.js')
-        compiled_js = os.path.join(self.temp_dir, "js" , output_file_name)
+        if 'output' in bundle_settings:
+            if 'bootloader' in bundle_settings:
+                name = bundle_settings['output']
+                name = "".join([os.path.splitext(name)[0], '-inner', os.path.splitext(name)[1]])
+            compiled_js = os.path.join(self.temp_dir, name)
+        else:
+            compiled_js = os.path.join(self.temp_dir, "js" , output_file_name)
         if not os.path.exists(os.path.dirname(compiled_js)):
             os.makedirs(os.path.dirname(compiled_js))
         compiler_jar = COMPILER_PATH
@@ -228,8 +250,12 @@ class Command(BaseCommand):
         output_lines = filter(lambda s: s.find("@fileoverview") == -1,
                               output.split("\n"))
 
+        calcdeps_js = os.path.join(JS_LIB, 'js', 'unisubs-calcdeps.js')
         calcdeps_file = open(calcdeps_js, "w")
-        calcdeps_file.write("\n".join(output_lines))
+        if 'ignore_closure' in bundle_settings:
+            calcdeps_file.write("\n")
+        else:
+            calcdeps_file.write("\n".join(output_lines))
         calcdeps_file.close()
 
         logging.info("Compiling {0}".format(output_file_name))
@@ -276,6 +302,7 @@ class Command(BaseCommand):
             logging.info("Successfully compiled {0}".format(output_file_name))
 
     def _compile_js_bootloader(self, bundle_name, bootloader_settings):
+        bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
         logging.info("_compile_js_bootloader called with cache_base_url {0}".format(
                 get_cache_base_url()))
         context = { 'gatekeeper' : bootloader_settings['gatekeeper'],
@@ -287,8 +314,11 @@ class Command(BaseCommand):
         rendered = render_to_string(template_name, context)
         file_name = os.path.join(
             self.temp_dir, "js", "{0}.js".format(bundle_name))
+        output_override = bundle_settings.get('output', None)
+        if output_override:
+            file_name = os.path.join(self.temp_dir, output_override)
         uncompiled_file_name = os.path.join(
-            self.temp_dir, "js", "{0}-uncompiled.js".format(bundle_name))
+                self.temp_dir, "js", "{0}-uncompiled.js".format(bundle_name))
         with open(uncompiled_file_name, 'w') as f:
             f.write(rendered)
         cmd_str = ("java -jar {0} --js {1} --js_output_file {2} "
@@ -386,6 +416,13 @@ class Command(BaseCommand):
         with open(file_name, 'w') as f:
             f.write(rendered)
 
+        # these are the configs for the embedder
+        file_name = os.path.join(JS_LIB, 'src/js/embedder/conf.js')
+        rendered = render_to_string(
+            'embedder/conf.js', context)
+        with open(file_name, 'w') as f:
+            f.write(rendered)
+
     def _compile_media_bundles(self, restrict_bundles, args):
         bundles = settings.MEDIA_BUNDLES
         for bundle_name, data in bundles.items():
@@ -424,12 +461,17 @@ class Command(BaseCommand):
 
     def _copy_files_with_public_urls_from_cache_dir_to_static_dir(self):
         cache_dir = get_cache_dir()
-        for file in NO_UNIQUE_URL:
+        to_move = NO_UNIQUE_URL + ({'name': 'js/embedder.js', 'no-cache': False, 'output': 'release/public/embedder.js'},)
+        for file in to_move:
             filename = file['name']
             from_path = os.path.join(cache_dir, filename)
-            to_path =  os.path.join(settings.STATIC_ROOT, filename)
+            to_path =  os.path.join(settings.STATIC_ROOT, file.get('output', filename))
+            if not os.path.exists(from_path):
+                continue
             if os.path.exists(to_path):
                 os.remove(to_path)
+            if not os.path.exists(os.path.dirname(to_path)):
+                os.makedirs(os.path.dirname(to_path))
             shutil.copyfile(from_path, to_path)
 
     def _make_mirosubs_copies_of_files_with_public_urls(self):
@@ -442,8 +484,6 @@ class Command(BaseCommand):
             if filename != mirosubs_filename:
                 from_path = os.path.join(settings.STATIC_ROOT, filename)
                 to_path = os.path.join(settings.STATIC_ROOT, mirosubs_filename)
-                print("For backwards compatibility, copying from {0} to {1}".format(
-                        from_path, to_path))
                 shutil.copyfile(from_path, to_path)
 
     def handle(self, *args, **options):

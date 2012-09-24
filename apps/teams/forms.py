@@ -252,35 +252,7 @@ class AddTeamVideosFromFeedForm(AddFromFeedForm):
         super(AddTeamVideosFromFeedForm, self).__init__(user, *args, **kwargs)
 
     def save(self, *args, **kwargs):
-        videos = super(AddTeamVideosFromFeedForm, self).save(*args, **kwargs)
-
-        team_videos = []
-        project = self.team.default_project
-        for video, video_created in videos:
-            try:
-                tv = TeamVideo.objects.get(video=video, team=self.team)
-                tv_created = False
-            except TeamVideo.DoesNotExist:
-                tv = TeamVideo(video=video, team=self.team, added_by=self.user,
-                               project=project)
-                tv.title = video.title
-                tv.description = video.description
-                tv.save()
-                tv_created = True
-            team_videos.append((tv, tv_created))
-
-        return team_videos
-
-    def success_message(self):
-        if not self.video_limit_routreach:
-            return _(u"%(count)s videos have been added. "
-                     u"It will take a minute or so for them to appear.")
-        else:
-            return _(u"%(count)s videos have been added. "
-                     u"It will take a minute or so for them to appear. "
-                     u"To add the remaining videos from this feed, "
-                     u"submit this feed again and make sure to "
-                     u'check "Save feed" box.')
+        super(AddTeamVideosFromFeedForm, self).save(team=self.team)
 
 class CreateTeamForm(BaseVideoBoundForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)

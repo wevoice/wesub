@@ -100,7 +100,7 @@ div.amara-tools {
         @include vertical-gradient(#1B1C1D, #212223);
 
         a.amara-button {
-            background: transparent url('/site_media/images/embedder/amara-sprites.png') 0 0 no-repeat;
+            background: transparent url('../../images/embedder/amara-sprites.png') 0 0 no-repeat;
             display: inline-block;
             height: 36px;
             @include opacity(.5);
@@ -176,7 +176,7 @@ div.amara-tools {
             width: 21%;
 
             .amara-current-language {
-                background: transparent url('/site_media/images/embedder/amara-sprites.png') right -139px no-repeat;
+                background: transparent url('../../images/embedder/amara-sprites.png') right -139px no-repeat;
                 color: #DEDEDE;
                 display: block;
                 font: normal 12px Tahoma;
@@ -295,6 +295,11 @@ div.amara-tools {
                 &:focus {
                     outline: none;
                 }
+                &.selected {
+                    color: #E3F1F8;
+                    @include box-shadow(-4px, 0px, 0, #0077B3);
+                    @include vertical-gradient(#0087CB, #0077B3);
+                }
             }
         }
     }
@@ -308,4 +313,11 @@ div.amara-popcorn-subtitles {
         padding: 12px 20px;
         @include border-radius(5px);
     }
+}
+div.amara-context-menu {
+    background: #E6E6E6;
+    position: absolute;
+    height: 100px;
+    width: 200px;
+    @include border-radius(3px);
 }
