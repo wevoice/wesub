@@ -169,7 +169,7 @@
                 // Default states.
                 this.states = {
                     autoScrolling: true,
-                    autoStreamPaused: false,
+                    autoScrollPaused: false,
                     contextMenuActive: false
                 };
             },
@@ -182,11 +182,11 @@
                 'click a.amara-share-button':          'shareButtonClicked',
                 'click a.amara-transcript-button':     'toggleTranscriptDisplay',
                 'click a.amara-subtitles-button':      'toggleSubtitlesDisplay',
-                'click a.amara-transcript-autostream': 'pauseAutoStream',
-                'contextmenu a.amara-transcript-line': 'showTranscriptContextMenu',
+                'click a.amara-transcript-autoscroll': 'pauseAutoScroll',
+                //'contextmenu a.amara-transcript-line': 'showTranscriptContextMenu',
 
                 // TODO: This does not work. Why?
-                'scroll div.amara-transcript-body':    'pauseAutoStream'
+                'scroll div.amara-transcript-body':    'pauseAutoScroll'
             },
             render: function() {
 
@@ -416,8 +416,8 @@
                 this.$amaraLanguagesList = _$('ul.amara-languages-list',   this.$amaraLanguages);
 
                 this.$transcriptBody     = _$('div.amara-transcript-body',     this.$amaraTranscript);
-                this.$autoStreamButton   = _$('a.amara-transcript-autostream', this.$amaraTranscript);
-                this.$autoStreamOnOff    = _$('span', this.$autoStreamButton);
+                this.$autoScrollButton   = _$('a.amara-transcript-autoscroll', this.$amaraTranscript);
+                this.$autoScrollOnOff    = _$('span', this.$autoScrollButton);
             },
             changeLanguage: function(e) {
 
@@ -502,32 +502,32 @@
                 this.$amaraLanguagesList.toggle();
                 return false;
             },
-            pauseAutoStream: function(isNowPaused) {
+            pauseAutoScroll: function(isNowPaused) {
 
                 var that = this;
-                var previouslyPaused = this.states.autoStreamPaused;
+                var previouslyPaused = this.states.autoScrollPaused;
 
                 // If 'isNowPaused' is an object, it's because it was sent to us via
                 // Backbone's event click handler.
                 var fromClick = (typeof isNowPaused === 'object');
 
                 // If the transcript plugin is triggering this scroll change, do not
-                // pause the auto stream.
+                // pause the auto-scroll.
                 if (this.states.autoScrolling && !fromClick) {
                     this.states.autoScrolling = false;
                     return false;
                 }
 
-                // If from clicking the "Auto-stream" button, just toggle it.
+                // If from clicking the "Auto-scroll" button, just toggle it.
                 if (fromClick) {
-                    isNowPaused = !this.states.autoStreamPaused;
+                    isNowPaused = !this.states.autoScrollPaused;
                 }
 
-                // Switch the autoStreamPaused state on the view.
-                this.states.autoStreamPaused = isNowPaused;
+                // Switch the autoScrollPaused state on the view.
+                this.states.autoScrollPaused = isNowPaused;
 
-                // Update the Auto-stream label in the transcript viewer.
-                this.$autoStreamOnOff.text(isNowPaused ? 'OFF' : 'ON');
+                // Update the Auto-scroll label in the transcript viewer.
+                this.$autoScrollOnOff.text(isNowPaused ? 'OFF' : 'ON');
 
                 // If we're no longer paused, scroll to the currently active subtitle.
                 if (!isNowPaused) {
@@ -543,17 +543,17 @@
 
                 } else {
 
-                    // If we're moving from a streaming state to a paused state,
-                    // highlight the auto-stream button to indicate that we've changed
+                    // If we're moving from a scrolling state to a paused state,
+                    // highlight the auto-scroll button to indicate that we've changed
                     // states.
                     if (!previouslyPaused) {
-                        this.$autoStreamButton.animate({
+                        this.$autoScrollButton.animate({
                             color: '#FF2C2C'
                         }, {
                             duration: 50,
                             easing: 'ease-in',
                             complete: function() {
-                                that.$autoStreamButton.animate({
+                                that.$autoScrollButton.animate({
                                     color: '#9A9B9C'
                                 }, 2000, 'ease-out');
                             }
@@ -569,8 +569,8 @@
                 //
                 //     * pluginInstance (amaratranscript plugin instance)
 
-                // Only scroll to line if the auto-stream is not paused.
-                if (!this.states.autoStreamPaused) {
+                // Only scroll to line if the auto-scroll is not paused.
+                if (!this.states.autoScrollPaused) {
 
                     // Retrieve the absolute positions of the line and the container.
                     var linePos = _$(pluginInstance.line).offset();
@@ -588,7 +588,7 @@
                     var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
 
                     // We need to tell our transcript tracking to ignore this scroll change,
-                    // otherwise our scrolling detector would trigger the autostream to stop.
+                    // otherwise our scrolling detector would trigger the auto-scroll to stop.
                     this.states.autoScrolling = true;
                     pluginInstance.container.scrollTop = newScrollTop;
                 }
@@ -650,7 +650,7 @@
             },
             transcriptScrolled: function() {
                 this.hideTranscriptContextMenu();
-                this.pauseAutoStream(true);
+                this.pauseAutoScroll(true);
             },
             waitUntilVideoIsComplete: function(callback) {
 
@@ -682,7 +682,7 @@
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
                 '            <div class="amara-transcript-header-left">' +
-                '                <a class="amara-transcript-autostream" href="#">Auto-stream <span>ON</span></a>' +
+                '                <a class="amara-transcript-autoscroll" href="#">Auto-scroll <span>ON</span></a>' +
                 '            </div>' +
                 //'            <div class="amara-transcript-header-right">' +
                 //'                <form action="" class="amara-transcript-search">' +
