@@ -33,6 +33,7 @@ from babelsubs.storage import SubtitleSet
 from babelsubs import load_from
 
 from utils.compress import compress, decompress
+from utils.redis_utils import RedisSimpleField
 
 ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
                        key=lambda v: v[1])
@@ -237,6 +238,8 @@ class SubtitleLanguage(models.Model):
                                                                   editable=False)
     pending_signoff_expired_count = models.PositiveIntegerField(default=0,
                                                                 editable=False)
+
+    subtitles_fetched_counter = RedisSimpleField()
 
     objects = SubtitleLanguageManager()
 
