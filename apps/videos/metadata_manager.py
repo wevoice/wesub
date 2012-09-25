@@ -27,7 +27,6 @@ def update_metadata(video_pk):
         video.edited = datetime.now()
         video.save()
         _update_is_public(video)
-        _update_forked(video)
         _update_changes(video)
         _update_subtitle_counts(video)
         _update_percent_done(video)
@@ -36,16 +35,6 @@ def update_metadata(video_pk):
         _update_languages_count(video)
         _update_complete_date(video)
         _invalidate_cache(video)
-
-def _update_forked(video):
-    for sl in video.subtitlelanguage_set.all():
-        # This metrics is incremented here arbitrarily.  It could be done in any
-        # of the other many _update_* functions that loop over the language set.
-        Meter('language-metadata-update').inc()
-        if sl.latest_version() and \
-                sl.latest_version().is_forked != sl.is_forked:
-            sl.is_forked = sl.latest_version().is_forked
-            sl.save()
 
 def _update_changes(video):
     from videos.models import SubtitleVersion
