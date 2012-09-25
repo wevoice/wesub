@@ -454,6 +454,44 @@ class SubtitleLanguage(models.Model):
         except SubtitleVersion.DoesNotExist:
             return None
 
+    def get_translation_source_language_code(self):
+        """
+        Returns the language code of the language that served as the
+        source language for this translation, or None if no languages
+        are found on the lineage.
+
+        Right now, we're only allowing for 1 source language, but that
+        could be revisited in the future.
+        """
+        tip_version = self.get_tip()
+        if not tip_version:
+            return None
+
+        lineage = tip_version.lineage
+        source_codes = lineage.keys()
+
+        return source_codes[0] if source_codes else None
+
+    def get_translation_source_language(self):
+        """
+        Returns the new SubtitleLanguage object that served as the
+        source language for this translation, or None if no languages
+        are found on the lineage.
+
+        Right now, we're only allowing for 1 source language, but that
+        could be revisited in the future.
+        """
+
+        source_lc = self.get_translation_source_language_code()
+
+        if not source_lc:
+            return None
+
+        try:
+            return SubtitleLanguage.objects.get(
+                video=self.video, language_code=source_lc)
+        except (SubtitleLanguage.DoesNotExist, IndexError):
+            return None
 
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):

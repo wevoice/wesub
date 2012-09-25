@@ -101,6 +101,19 @@ class TestSubtitleLanguage(TestCase):
         self.assertFalse(en.is_primary_audio_language())
         self.assertFalse(fr.is_primary_audio_language())
 
+    def test_get_translation_source(self):
+        source_lang = make_sl(self.video, 'en')
+        # works for a language with no version
+        self.assertEqual(source_lang.get_translation_source_language(), None)
+        source_v1 = source_lang.add_version()
+        # non translated language with version
+        source_lang = refresh(source_lang)
+        self.assertEqual(source_lang.get_translation_source_language(), None)
+        translated = make_sl(self.video, 'fr')
+        translated.add_version(parents=[source_v1])
+        translated = refresh(translated)
+        self.assertEqual(translated.get_translation_source_language(), source_lang)
+        self.assertEqual(translated.get_translation_source_language_code(), source_lang.language_code)
 
 class TestSubtitleVersion(TestCase):
     def setUp(self):

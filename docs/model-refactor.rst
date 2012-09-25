@@ -254,6 +254,10 @@ version)::
 
         print "%s is a translation of %s" % (subtitlelang, source_language)
 
+This has been implemented on
+``subtitles.SubtitleLanguage.get_translation_source_language`` and
+``subtitles.SubtitleLanguage.get_translation_source_language_code``.
+
 If you're going to be adding a new SubtitleLanguage as a translation of another
 one, you should create its versions with the appropriate parents.
 
