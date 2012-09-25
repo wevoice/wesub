@@ -18,7 +18,7 @@
 import logging
 import re
 from urlparse import urlparse
-
+import babelsubs
 import gdata.youtube.client
 import httplib2
 from celery.task import task
@@ -257,6 +257,28 @@ class YoutubeVideoType(VideoType):
         bridge.delete_subtitles(language)
 
 
+def _prepare_subtitle_data_for_version(subtitle_version):
+    """
+    Given a subtitles.models.SubtitleVersion, return a tuple of srt content,
+    title and language code.
+    """
+    language_code = subtitle_version.subtitle_language.language_code
+
+    try:
+        lc = LanguageCode(language_code.lower(), "unisubs")
+        language_code = lc.encode("bcp47")
+    except KeyError:
+        error = "Couldn't encode LC %s to youtube" % language_code
+        logger.error(error)
+        raise KeyError(error)
+
+    content = babelsubs.generators.discover('srt').generate(
+            subtitle_version.get_subtitles())
+    content = unicode(content).encode('utf-8')
+
+    return content, "", language_code
+
+
 class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
     def __init__(self, access_token, refresh_token, youtube_video_id):
@@ -316,32 +338,20 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the subtitle already exists, will delete it and recreate it.
         This subs should be synced! Else we upload might fail.
         """
-        from widget.srt_subs import GenerateSubtitlesHandler
 
-        lang = subtitle_version.language.language
-
-        try:
-            lc = LanguageCode(lang.lower(), "unisubs")
-            lang = lc.encode("youtube")
-        except KeyError:
-            logger.error("Couldn't encode LC %s to youtube" % lang)
-            return
-
-        handler = GenerateSubtitlesHandler.get('srt')
-        subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
-        content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
-        title = ""
+        content, title, language_code = \
+                self._prepare_subtitle_data_for_version(subtitle_version)
 
         if hasattr(self, "captions") is False:
             self._get_captions_info()
 
         # we cant just update, we need to check if it already exists... if so, we delete it
-        if lang in self.captions:
-            self._delete_track(self.captions[lang]['track'])
+        if language_code in self.captions:
+            self._delete_track(self.captions[language_code]['track'])
 
-        return self.create_track(self.youtube_video_id, title, lang, content,
-                settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET,
-                self.token, {'fmt':'srt'})
+        return self.create_track(self.youtube_video_id, title, language_code,
+                content, settings.YOUTUBE_CLIENT_ID,
+                settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
 
     def _delete_track(self, track):
         res = self.delete_track(self.youtube_video_id, track, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token)
