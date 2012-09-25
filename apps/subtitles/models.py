@@ -128,6 +128,22 @@ def get_lineage(parents):
 
 # SubtitleLanguages -----------------------------------------------------------
 class SubtitleLanguageManager(models.Manager):
+    #  _   _                ______       ______
+    # | | | |               | ___ \      |  _  \
+    # | |_| | ___ _ __ ___  | |_/ / ___  | | | |_ __ __ _  __ _  ___  _ __  ___
+    # |  _  |/ _ \ '__/ _ \ | ___ \/ _ \ | | | | '__/ _` |/ _` |/ _ \| '_ \/ __|
+    # | | | |  __/ | |  __/ | |_/ /  __/ | |/ /| | | (_| | (_| | (_) | | | \__ \
+    # \_| |_/\___|_|  \___| \____/ \___| |___/ |_|  \__,_|\__, |\___/|_| |_|___/
+    #                                                      __/ |
+    #                                                     |___/
+    #
+    # This manager's methods use custom SQL to perform efficient queries without
+    # denormalizing our data model into a tangled mess.
+    #
+    # These methods are not fun, and they are not pretty, but they ARE fast.
+    #
+    # Prepare yourself.
+
     def having_versions(self):
         """Return a QS of SLs that have at least 1 version.
 
@@ -159,6 +175,74 @@ class SubtitleLanguageManager(models.Manager):
             (SELECT 1
                FROM subtitles_subtitleversion AS sv
               WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id)
+            """,
+        ])
+
+
+    def having_nonempty_versions(self):
+        """Return a QS of SLs that have at least 1 version with 1 or more subtitles."""
+        return self.get_query_set().extra(where=[
+            """
+            EXISTS
+            (SELECT 1
+               FROM subtitles_subtitleversion AS sv
+              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+                AND sv.subtitle_count > 0)
+            """,
+        ])
+
+    def not_having_nonempty_versions(self):
+        """Return a QS of SLs that have zero versions with 1 or more subtitles."""
+        return self.get_query_set().extra(where=[
+            """
+            NOT EXISTS
+            (SELECT 1
+               FROM subtitles_subtitleversion AS sv
+              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+                AND sv.subtitle_count > 0)
+            """,
+        ])
+
+
+    def having_nonempty_tip(self):
+        """Return a QS of SLs that have a tip version with 1 or more subtitles."""
+        return self.get_query_set().extra(where=[
+            """
+            EXISTS (
+               SELECT 1 FROM subtitles_subtitleversion AS sv
+                INNER JOIN (
+                   SELECT subtitle_language_id,
+                          MAX(version_number) AS tip_version_number
+                   FROM subtitles_subtitleversion AS subver
+                   GROUP BY subtitle_language_id
+                ) AS tip_versions ON (
+                    sv.subtitle_language_id = tip_versions.subtitle_language_id
+                    AND sv.version_number = tip_versions.tip_version_number
+                )
+                WHERE sv.subtitle_count > 0
+                  AND sv.subtitle_language_id = subtitles_subtitlelanguage.id
+            )
+            """,
+        ])
+
+    def not_having_nonempty_tip(self):
+        """Return a QS of SLs that do not have a tip version with 1 or more subtitles."""
+        return self.get_query_set().extra(where=[
+            """
+            NOT EXISTS (
+               SELECT 1 FROM subtitles_subtitleversion AS sv
+                INNER JOIN (
+                   SELECT subtitle_language_id,
+                          MAX(version_number) AS tip_version_number
+                   FROM subtitles_subtitleversion AS subver
+                   GROUP BY subtitle_language_id
+                ) AS tip_versions ON (
+                    sv.subtitle_language_id = tip_versions.subtitle_language_id
+                    AND sv.version_number = tip_versions.tip_version_number
+                )
+                WHERE sv.subtitle_count > 0
+                  AND sv.subtitle_language_id = subtitles_subtitlelanguage.id
+            )
             """,
         ])
 
@@ -306,7 +390,7 @@ class SubtitleLanguage(models.Model):
 
         This is invalid because English was based off of French version 2, and
         then you tried to say a later version was based on French version 1.
-        
+
         If English version 3 had been based on French version 2 (or later) that
         would be have been okay.
 

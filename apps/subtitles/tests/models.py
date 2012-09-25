@@ -542,7 +542,7 @@ class TestHistory(TestCase):
 
 
 class TestSubtitleLanguageHavingQueries(TestCase):
-    """Test the [not_]having[_public]_versions methods of the SL manager.
+    """Test the [not_]having[_public/_nonempty]_versions methods of the SL manager.
 
     They contain raw SQL through extra() calls, so need to be carefully tested.
 
@@ -568,6 +568,22 @@ class TestSubtitleLanguageHavingQueries(TestCase):
 
     def _get_not_public_langs(self, video=None):
         qs = SubtitleLanguage.objects.not_having_public_versions()
+        return self._get(qs, video)
+
+    def _get_nonempty_langs(self, video=None):
+        qs = SubtitleLanguage.objects.having_nonempty_versions()
+        return self._get(qs, video)
+
+    def _get_not_nonempty_langs(self, video=None):
+        qs = SubtitleLanguage.objects.not_having_nonempty_versions()
+        return self._get(qs, video)
+
+    def _get_nonempty_tip_langs(self, video=None):
+        qs = SubtitleLanguage.objects.having_nonempty_tip()
+        return self._get(qs, video)
+
+    def _get_not_nonempty_tip_langs(self, video=None):
+        qs = SubtitleLanguage.objects.not_having_nonempty_tip()
         return self._get(qs, video)
 
 
@@ -698,6 +714,7 @@ class TestSubtitleLanguageHavingQueries(TestCase):
         self.assertEqual(self._get_not_langs(),            [])
         self.assertEqual(self._get_not_langs(self.video),  [])
         self.assertEqual(self._get_not_langs(self.video2), [])
+
 
     def test_having_public_versions(self):
         # No versions at all.
@@ -850,6 +867,140 @@ class TestSubtitleLanguageHavingQueries(TestCase):
         self.assertEqual(self._get_not_public_langs(),            ['cy', 'en', 'fr'])
         self.assertEqual(self._get_not_public_langs(self.video),  ['fr'])
         self.assertEqual(self._get_not_public_langs(self.video2), ['cy', 'en'])
+
+
+    def test_having_nonempty_versions(self):
+        v1 = self.video
+        v2 = self.video2
+
+        # Having no versions at all obviously means there are no nonempty ones.
+        self.assertEqual(self._get_nonempty_langs(),   [])
+        self.assertEqual(self._get_nonempty_langs(v1), [])
+        self.assertEqual(self._get_nonempty_langs(v2), [])
+
+        # Empty versions don't count toward this queryset.
+        self.sl_1_en.add_version()
+        self.sl_2_cy.add_version(subtitles=[])
+
+        self.assertEqual(self._get_nonempty_langs(),   [])
+        self.assertEqual(self._get_nonempty_langs(v1), [])
+        self.assertEqual(self._get_nonempty_langs(v2), [])
+
+        # Nonempty versions DO count toward this queryset.
+        self.sl_1_en.add_version(subtitles=[(None, None, "foo")])
+        self.sl_1_fr.add_version(subtitles=[(100, 200, "bar"), (200, 300, "bar")])
+
+        self.assertEqual(self._get_nonempty_langs(),   ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_langs(v2), [])
+
+        # These querysets check all versions, not just tips.
+        self.sl_1_en.add_version(subtitles=[])
+        self.sl_1_fr.add_version(subtitles=[])
+
+        self.assertEqual(self._get_nonempty_langs(),   ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_langs(v2), [])
+
+    def test_not_having_nonempty_versions(self):
+        v1 = self.video
+        v2 = self.video2
+
+        # Having no versions at all fits the bill -- these languages have no
+        # nonempty versions.
+        self.assertEqual(self._get_not_nonempty_langs(),   ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_langs(v2), ['cy', 'en'])
+
+        # Empty versions don't count toward this queryset.
+        self.sl_1_en.add_version()
+        self.sl_2_cy.add_version(subtitles=[])
+
+        self.assertEqual(self._get_not_nonempty_langs(),   ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_langs(v2), ['cy', 'en'])
+
+        # Nonempty versions DO count toward this queryset.
+        self.sl_1_en.add_version(subtitles=[(None, None, "foo")])
+        self.sl_1_fr.add_version(subtitles=[(100, 200, "bar"), (200, 300, "bar")])
+
+        self.assertEqual(self._get_not_nonempty_langs(),   ['cy', 'en'])
+        self.assertEqual(self._get_not_nonempty_langs(v1), [])
+        self.assertEqual(self._get_not_nonempty_langs(v2), ['cy', 'en'])
+
+        # These querysets check all versions, not just tips.
+        self.sl_1_en.add_version(subtitles=[])
+        self.sl_1_fr.add_version(subtitles=[])
+
+        self.assertEqual(self._get_not_nonempty_langs(),   ['cy', 'en'])
+        self.assertEqual(self._get_not_nonempty_langs(v1), [])
+        self.assertEqual(self._get_not_nonempty_langs(v2), ['cy', 'en'])
+
+
+    def test_having_nonempty_tip(self):
+        v1 = self.video
+        v2 = self.video2
+
+        # Having no versions at all obviously means there are none with a valid
+        # tip.
+        self.assertEqual(self._get_nonempty_tip_langs(),   [])
+        self.assertEqual(self._get_nonempty_tip_langs(v1), [])
+        self.assertEqual(self._get_nonempty_tip_langs(v2), [])
+
+        # Empty versions don't count toward this queryset.
+        self.sl_1_en.add_version()
+        self.sl_2_cy.add_version(subtitles=[])
+
+        self.assertEqual(self._get_nonempty_tip_langs(),   [])
+        self.assertEqual(self._get_nonempty_tip_langs(v1), [])
+        self.assertEqual(self._get_nonempty_tip_langs(v2), [])
+
+        # Nonempty versions DO count toward this queryset.
+        self.sl_1_en.add_version(subtitles=[(None, None, "foo")])
+        self.sl_1_fr.add_version(subtitles=[(100, 200, "bar"), (200, 300, "bar")])
+
+        self.assertEqual(self._get_nonempty_tip_langs(),   ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v2), [])
+
+        # These querysets check just the tips.
+        self.sl_1_en.add_version(subtitles=[])
+
+        self.assertEqual(self._get_nonempty_tip_langs(),   ['fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v1), ['fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v2), [])
+
+    def test_not_having_nonempty_tip(self):
+        v1 = self.video
+        v2 = self.video2
+
+        # Having no versions at all means they do not have "a non-empty tip".
+        self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
+
+        # Empty versions don't count toward this queryset.
+        self.sl_1_en.add_version()
+        self.sl_2_cy.add_version(subtitles=[])
+
+        self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
+
+        # Nonempty versions DO count toward this queryset.
+        self.sl_1_fr.add_version(subtitles=[(100, 200, "bar"), (200, 300, "bar")])
+        self.sl_1_en.add_version(subtitles=[(None, None, "foo")])
+
+        self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v1), [])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
+
+        # These querysets check just the tips.
+        self.sl_1_en.add_version(subtitles=[])
+
+        self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en', 'en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v1), ['en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
 
 
 class TestCollaborator(TestCase):
