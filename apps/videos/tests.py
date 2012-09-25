@@ -1104,6 +1104,7 @@ class ViewsTest(WebUseTest):
 
 
 class YoutubeVideoTypeTest(TestCase):
+    fixtures = ['test.json']
     def setUp(self):
         self.vt = YoutubeVideoType
         self.data = [{
@@ -1170,6 +1171,21 @@ class YoutubeVideoTypeTest(TestCase):
         subtitles = sl.latest_subtitles()
         self.assertTrue(len(subtitles))
         self.assertEqual(subtitles[-1].text, u'Thanks.')
+
+    def test_data_prep(self):
+        from videos.types.youtube import _prepare_subtitle_data_for_version
+        video = Video.objects.all()[0]
+        subs = [
+            (0, 1000, 'Hi'),
+            (2000, 3000, 'How are you?'),
+        ]
+        new_sv = add_subtitles(video, 'en', subs)
+        content, t, code = _prepare_subtitle_data_for_version(new_sv)
+        srt = "1\r\n00:00:00,000 --> 00:00:01,000\r\nHi\r\n\r\n2\r\n00:00:02,000 --> 00:00:03,000\r\nHow are you?\r\n"
+        self.assertEquals(srt, content)
+        self.assertEquals('', t)
+        self.assertEquals('en', code)
+
 
 class HtmlFiveVideoTypeTest(TestCase):
     def setUp(self):

@@ -23,7 +23,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from utils import send_templated_email
 from utils.metrics import Meter
-from libs.unilangs import LanguageCode
+from unilangs import LanguageCode
 from videos.models import Video
 
 import logging

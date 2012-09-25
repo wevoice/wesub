@@ -35,11 +35,11 @@ from raven.contrib.django.models import client
 from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from utils.metrics import Gauge, Meter
-from videos.models import VideoFeed, SubtitleLanguage, Video, Subtitle, SubtitleVersion
+from videos.models import VideoFeed, Video
+from subtitles.models import SubtitleLanguage, SubtitleVersion
 from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
-
 
 def process_failure_signal(exception, traceback, sender, task_id,
                            signal, args, kwargs, einfo, **kw):
@@ -111,30 +111,6 @@ def update_video_feed(video_feed_id):
         msg = '**update_video_feed**. VideoFeed does not exist. ID: %s' % video_feed_id
         client.captureMessage(msg)
 
-@task(ignore_result=False)
-def add(a, b):
-    print "TEST TASK FOR CELERY. EXECUTED WITH ARGUMENTS: %s %s" % (a, b)
-    return (a, b, a+b)
-
-@task
-def test_task(n):
-    if not n:
-        print '.'
-
-    from time import sleep
-
-    for i in xrange(n):
-        print '.',
-        sleep(0.5)
-
-@task
-def raise_exception(msg, **kwargs):
-    print "TEST TASK FOR CELERY. RAISE EXCEPTION WITH MESSAGE: %s" % msg
-    logger = raise_exception.get_logger()
-    logger.error('Test error logging to Sentry from Celery')
-
-    raise TypeError(msg)
-
 @task()
 def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager
@@ -150,6 +126,7 @@ def video_changed_tasks(video_pk, new_version_id=None):
     video = Video.objects.get(pk=video_pk)
 
     tv = video.get_team_video()
+
     if tv:
         tv_search_index = site.get_index(TeamVideo)
         tv_search_index.backend.update(tv_search_index, [tv])
@@ -445,7 +422,7 @@ def _update_captions_in_original_service(version_pk):
     the username for the video url.
 
     """
-    from videos.models import SubtitleVersion
+    from subtitles.models import SubtitleVersion
     from accountlinker.models import ThirdPartyAccount
     from .videos.types import UPDATE_VERSION_ACTION
     try:
@@ -466,7 +443,7 @@ def delete_captions_in_original_service(language_pk):
     video url.
 
     """
-    from videos.models import SubtitleLanguage
+    from subtitles.models import SubtitleLanguage
     from .videos.types import DELETE_LANGUAGE_ACTION
     from accountlinker.models import ThirdPartyAccount
     try:
@@ -512,11 +489,6 @@ def _save_video_feed(feed_url, last_entry_url, user):
 @periodic_task(run_every=timedelta(seconds=5))
 def gauge_videos():
     Gauge('videos.Video').report(Video.objects.count())
-    Gauge('videos.Video-captioned').report(Video.objects.exclude(subtitlelanguage=None).count())
+    Gauge('videos.Video-captioned').report(Video.objects.exclude(newsubtitlelanguage_set=None).count())
     Gauge('videos.SubtitleVersion').report(SubtitleVersion.objects.count())
     Gauge('videos.SubtitleLanguage').report(SubtitleLanguage.objects.count())
-
-@periodic_task(run_every=timedelta(seconds=(60*5)))
-def gauge_videos_long():
-    Gauge('videos.Subtitle').report(Subtitle.objects.count())
-

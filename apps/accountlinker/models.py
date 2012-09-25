@@ -46,11 +46,10 @@ def youtube_sync(video, language):
     we should be syncing this or not.  Only does the new Youtube/Amara
     integration syncing.
     """
-    version = language.latest_version()
+    version = language.get_tip()
 
-    if version:
-        if not version.is_public or not version.is_synced():
-            return
+    if version and version.visibility != 'public':
+        return
 
     always_push_account = ThirdPartyAccount.objects.always_push_account()
 
@@ -103,10 +102,11 @@ class ThirdPartyAccountManager(models.Manager):
             raise NotImplementedError(
                 "Mirror to third party does not support the %s action" % action)
 
-        if version:
-            if not version.is_public or not version.is_synced():
-                # We can't mirror unsynced or non-public versions.
-                return
+        if not version:
+            version = language.get_tip()
+
+        if version and version.visibility != 'public':
+            return
 
         try:
             rule = YoutubeSyncRule.objects.all()[0]
