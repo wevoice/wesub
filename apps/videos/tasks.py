@@ -443,7 +443,7 @@ def delete_captions_in_original_service(language_pk):
     video url.
 
     """
-    from videos.models import SubtitleLanguage
+    from subtitles.models import SubtitleLanguage
     from .videos.types import DELETE_LANGUAGE_ACTION
     from accountlinker.models import ThirdPartyAccount
     try:
