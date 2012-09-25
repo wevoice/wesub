@@ -228,8 +228,8 @@ Let's look at another example::
     A1    B1
 
     Q1 {A: 1}
-    Q2 {A: 1, B: 2}
-    Q2 {A: 1, B: 3}
+    Q2 {A: 1, B: 1}
+    Q3 {A: 1, B: 2}
 
 Currently there is no way to translate a language from 2 or more sources, so at
 most the lineage maps for all existing data will have one key, value pair.
