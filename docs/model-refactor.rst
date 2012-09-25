@@ -201,4 +201,4 @@ version)::
 
         print "%s is a translation of %s" % (subtitlelang, source_language)
 
-
+This has been implemented on subtitles.SubtitleLanguage.get_translation_source_language and  subtitles.SubtitleLanguage.get_translation_source_language_code.
