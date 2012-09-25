@@ -422,7 +422,7 @@ def _update_captions_in_original_service(version_pk):
     the username for the video url.
 
     """
-    from videos.models import SubtitleVersion
+    from subtitles.models import SubtitleVersion
     from accountlinker.models import ThirdPartyAccount
     from .videos.types import UPDATE_VERSION_ACTION
     try:
