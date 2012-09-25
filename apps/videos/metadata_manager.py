@@ -27,7 +27,6 @@ def update_metadata(video_pk):
         video.edited = datetime.now()
         video.save()
         _update_is_public(video)
-        _update_changes(video)
         _update_subtitle_counts(video)
         _update_percent_done(video)
         _update_has_had_version(video)
@@ -35,18 +34,6 @@ def update_metadata(video_pk):
         _update_languages_count(video)
         _update_complete_date(video)
         _invalidate_cache(video)
-
-def _update_changes(video):
-    from videos.models import SubtitleVersion
-    for sl in video.subtitlelanguage_set.all():
-        last_version = None
-        versions = sl.subtitleversion_set.order_by('version_no').all()
-        for version in versions:
-            if version.text_change is None or version.time_change is None:
-                time_change, text_change = _update_changes_on_version(version, last_version)
-                SubtitleVersion.objects.filter(pk=version.pk).update(
-                        time_change=time_change, text_change=text_change)
-            last_version = version
 
 def _update_changes_on_version(version, last_version):
     new_subtitles = version.subtitles()
