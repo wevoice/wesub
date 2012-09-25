@@ -20,7 +20,7 @@
 import xml.dom.minidom
 import StringIO
 from HTMLParser import HTMLParser
-from libs.unilangs import unilangs
+from unilangs import unilangs
 
 def captions_and_translations_to_srt(captions_and_translations):
     # TODO: note this loads the entire string into memory, which will not

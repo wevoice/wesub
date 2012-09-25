@@ -16,9 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
-import random
 import re
-from datetime import datetime
 from urlparse import urlparse
 
 import gdata.youtube.client
@@ -31,12 +29,10 @@ from gdata.service import RequestError
 from gdata.youtube.service import YouTubeService
 from lxml import etree
 
-from auth.models import CustomUser as User
 from base import VideoType, VideoTypeError
-from utils.subtitles import YoutubeXMLParser
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 
-from libs.unilangs.unilangs import LanguageCode
+from unilangs.unilangs import LanguageCode
 
 
 logger = logging.getLogger("youtube")
@@ -67,8 +63,9 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     import babelsubs
 
     yt_lc = lang.get('lang_code')
-    # TODO: Plug in new unilangs library
-    lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+    # TODO: Make sure we can store all language data given to us by Youtube.
+    # Right now, the bcp47 codec will refuse data it can't reliably parse.
+    lc  = LanguageCode(yt_lc, "bcp47").encode("unisubs")
 
     if not lc in SUPPORTED_LANGUAGE_CODES:
         logger.warn("Youtube import did not find language code", extra={
