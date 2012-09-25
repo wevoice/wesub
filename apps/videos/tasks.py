@@ -35,11 +35,11 @@ from raven.contrib.django.models import client
 from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from utils.metrics import Gauge, Meter
-from videos.models import VideoFeed, SubtitleLanguage, Video, Subtitle, SubtitleVersion
+from videos.models import VideoFeed, Video
+from subtitles.models import SubtitleLanguage, SubtitleVersion
 from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
-
 
 def process_failure_signal(exception, traceback, sender, task_id,
                            signal, args, kwargs, einfo, **kw):
@@ -126,6 +126,7 @@ def video_changed_tasks(video_pk, new_version_id=None):
     video = Video.objects.get(pk=video_pk)
 
     tv = video.get_team_video()
+
     if tv:
         tv_search_index = site.get_index(TeamVideo)
         tv_search_index.backend.update(tv_search_index, [tv])
