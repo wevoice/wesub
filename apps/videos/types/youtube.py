@@ -16,11 +16,9 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
-import random
 import re
-from datetime import datetime
 from urlparse import urlparse
-
+import babelsubs
 import gdata.youtube.client
 import httplib2
 from celery.task import task
@@ -31,12 +29,10 @@ from gdata.service import RequestError
 from gdata.youtube.service import YouTubeService
 from lxml import etree
 
-from auth.models import CustomUser as User
 from base import VideoType, VideoTypeError
-from utils.subtitles import YoutubeXMLParser
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 
-from libs.unilangs.unilangs import LanguageCode
+from unilangs.unilangs import LanguageCode
 
 
 logger = logging.getLogger("youtube")
@@ -67,8 +63,9 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     import babelsubs
 
     yt_lc = lang.get('lang_code')
-    # TODO: Plug in new unilangs library
-    lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+    # TODO: Make sure we can store all language data given to us by Youtube.
+    # Right now, the bcp47 codec will refuse data it can't reliably parse.
+    lc  = LanguageCode(yt_lc, "bcp47").encode("unisubs")
 
     if not lc in SUPPORTED_LANGUAGE_CODES:
         logger.warn("Youtube import did not find language code", extra={
@@ -260,6 +257,28 @@ class YoutubeVideoType(VideoType):
         bridge.delete_subtitles(language)
 
 
+def _prepare_subtitle_data_for_version(subtitle_version):
+    """
+    Given a subtitles.models.SubtitleVersion, return a tuple of srt content,
+    title and language code.
+    """
+    language_code = subtitle_version.subtitle_language.language_code
+
+    try:
+        lc = LanguageCode(language_code.lower(), "unisubs")
+        language_code = lc.encode("bcp47")
+    except KeyError:
+        error = "Couldn't encode LC %s to youtube" % language_code
+        logger.error(error)
+        raise KeyError(error)
+
+    content = babelsubs.generators.discover('srt').generate(
+            subtitle_version.get_subtitles())
+    content = unicode(content).encode('utf-8')
+
+    return content, "", language_code
+
+
 class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
     def __init__(self, access_token, refresh_token, youtube_video_id):
@@ -319,32 +338,20 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the subtitle already exists, will delete it and recreate it.
         This subs should be synced! Else we upload might fail.
         """
-        from widget.srt_subs import GenerateSubtitlesHandler
 
-        lang = subtitle_version.language.language
-
-        try:
-            lc = LanguageCode(lang.lower(), "unisubs")
-            lang = lc.encode("youtube")
-        except KeyError:
-            logger.error("Couldn't encode LC %s to youtube" % lang)
-            return
-
-        handler = GenerateSubtitlesHandler.get('srt')
-        subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
-        content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
-        title = ""
+        content, title, language_code = \
+                self._prepare_subtitle_data_for_version(subtitle_version)
 
         if hasattr(self, "captions") is False:
             self._get_captions_info()
 
         # we cant just update, we need to check if it already exists... if so, we delete it
-        if lang in self.captions:
-            self._delete_track(self.captions[lang]['track'])
+        if language_code in self.captions:
+            self._delete_track(self.captions[language_code]['track'])
 
-        return self.create_track(self.youtube_video_id, title, lang, content,
-                settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET,
-                self.token, {'fmt':'srt'})
+        return self.create_track(self.youtube_video_id, title, language_code,
+                content, settings.YOUTUBE_CLIENT_ID,
+                settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
 
     def _delete_track(self, track):
         res = self.delete_track(self.youtube_video_id, track, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token)

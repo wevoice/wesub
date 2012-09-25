@@ -28,7 +28,7 @@ def rel(*x):
 
 # Rebuild the language dicts to support more languages.
 from django.conf import global_settings
-from libs.unilangs import get_language_code_mapping
+from unilangs import get_language_code_mapping
 
 # We use a custom format for our language labels:
 # Translated Language Name (Native Name)
