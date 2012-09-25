@@ -27,7 +27,6 @@ def update_metadata(video_pk):
         video.edited = datetime.now()
         video.save()
         _update_is_public(video)
-        _update_has_had_version(video)
         _update_is_was_subtitled(video)
         _update_languages_count(video)
         _update_complete_date(video)
@@ -76,23 +75,6 @@ def _update_changes_on_nonzero_version(version, last_version):
     text_change = min(text_count_changed / 1. / subs_length, 1)
 
     return time_change, text_change
-
-def _update_has_had_version(video):
-    for sl in video.subtitlelanguage_set.all():
-        version = sl.latest_version()
-        if not version:
-            sl.had_version = False
-            sl.has_version = False
-            sl.save()
-        elif len(version.subtitles()) == 0:
-            if sl.has_version:
-                sl.has_version = False
-                sl.save()
-        else:
-            if not sl.has_version or not sl.had_version:
-                sl.had_version = True
-                sl.has_version = True
-                sl.save()
 
 def _update_is_was_subtitled(video):
     language = video.subtitle_language()
