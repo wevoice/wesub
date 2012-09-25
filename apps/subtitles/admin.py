@@ -75,7 +75,7 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
 class SubtitleVersionAdmin(admin.ModelAdmin):
     list_display = ['video_title', 'id', 'language', 'version_num',
                     'visibility', 'visibility_override', 'parent_ids',
-                    'created']
+                    'subtitle_count', 'created']
     raw_id_fields = ['video', 'subtitle_language', 'parents', 'author']
     list_filter = ['created', 'visibility', 'visibility_override',
                    'language_code']

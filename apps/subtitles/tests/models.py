@@ -101,6 +101,20 @@ class TestSubtitleLanguage(TestCase):
         self.assertFalse(en.is_primary_audio_language())
         self.assertFalse(fr.is_primary_audio_language())
 
+    def test_get_translation_source(self):
+        source_lang = make_sl(self.video, 'en')
+        # works for a language with no version
+        self.assertEqual(source_lang.get_translation_source_language(), None)
+        source_v1 = source_lang.add_version()
+        # non translated language with version
+        source_lang = refresh(source_lang)
+        self.assertEqual(source_lang.get_translation_source_language(), None)
+        translated = make_sl(self.video, 'fr')
+        translated.add_version(parents=[source_v1])
+        translated = refresh(translated)
+        self.assertEqual(translated.get_translation_source_language(), source_lang)
+        self.assertEqual(translated.get_translation_source_language_code(), source_lang.language_code)
+
 
 class TestSubtitleVersion(TestCase):
     def setUp(self):
@@ -261,6 +275,33 @@ class TestSubtitleVersion(TestCase):
 
         self.assertEquals((0.0, 0.0), sv1.get_changes())
         self.assertEquals((0.5, 0.5), sv2.get_changes())
+
+    def test_subtitle_count(self):
+        s0 = (100, 200, "a")
+        s1 = (300, 400, "b")
+
+        sv1 = self.sl_en.add_version(subtitles=[])
+        sv2 = self.sl_en.add_version(subtitles=[s0])
+        sv3 = self.sl_en.add_version(subtitles=[s0, s1])
+
+        self.assertEqual(0, sv1.subtitle_count)
+        self.assertEqual(1, sv2.subtitle_count)
+        self.assertEqual(2, sv3.subtitle_count)
+
+        sv1 = refresh(sv1)
+        sv2 = refresh(sv2)
+        sv3 = refresh(sv3)
+
+        self.assertEqual(0, sv1.subtitle_count)
+        self.assertEqual(1, sv2.subtitle_count)
+        self.assertEqual(2, sv3.subtitle_count)
+
+        sv4 = self.sl_en.add_version(subtitles=[(None, None, str(i))
+                                                for i in xrange(200)])
+        self.assertEqual(200, sv4.subtitle_count)
+        sv4 = refresh(sv4)
+        self.assertEqual(200, sv4.subtitle_count)
+
 
 class TestHistory(TestCase):
     def setUp(self):

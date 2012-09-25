@@ -6,6 +6,59 @@ Some useful information about the data model refactor.
 
 .. contents::
 
+Naming Things
+=============
+
+Right now our code is a hodgepodge of names, nicknames, abbreviated names, etc.
+Part of the goal of this refactor should be to clean up this mess.
+
+I propose two guide for naming things: one for "public" names like methods,
+functions, classes, etc.  This should be more strict so you don't have to try to
+remember "is that method called ``get_recent_lang`` or
+``get_recent_language``?".  The other is for "private" names like local
+variables -- names which are never used outside of the screen's-worth of code
+they're used in.
+
+Public Names
+------------
+
+Public names should be unambiguous, and there should be one way to name them.
+
+  ``language``
+    This word means "a ``SubtitleLanguage`` object".  So a method called
+    ``get_recent_language`` should return a ``SubtitleLanguage``.
+
+  ``language_code``
+    This word means "a string representing a language code", like ``"fr-ca"``.
+    So a method called ``get_recent_language_code`` should return one of these
+    strings.
+
+  ``version``
+    This word means "a ``SubtitleVersion`` object".  So a method called
+    ``get_recent_version`` should return a ``SubtitleVersion``.
+
+  ``version_number``
+    This word means "an integer representing a version number", like ``10``.
+
+
+Private Names
+-------------
+
+Private names can be more flexible (because you can always just look up to
+refresh your memory) and shorter.
+
+  ``language``, ``lang``, ``subtitle_language``, ``sublang``, ``sl``
+    A ``SubtitleLanguage`` object.
+
+  ``language_code``, ``lang_code``, ``lc``, ``lcode``
+    A string representing a language code, like ``"pt-br"``.
+
+  ``version``, ``ver``, ``subtitle_version``, ``sv``
+    A ``SubtitleVersion`` object.
+
+  ``version_number``, ``vnum``, ``vn``
+    A version number (integer).
+
 Porting Guide
 =============
 
@@ -158,9 +211,9 @@ Entried are *never* removed, only added or updated!
 Let's look at another example::
 
     .
-       Q3  
-       |\  
-       | \ 
+       Q3
+       |\
+       | \
        |  B2
        |  |
        |  |
@@ -175,8 +228,8 @@ Let's look at another example::
     A1    B1
 
     Q1 {A: 1}
-    Q2 {A: 1, B: 2}
-    Q2 {A: 1, B: 3}
+    Q2 {A: 1, B: 1}
+    Q3 {A: 1, B: 2}
 
 Currently there is no way to translate a language from 2 or more sources, so at
 most the lineage maps for all existing data will have one key, value pair.
@@ -201,4 +254,28 @@ version)::
 
         print "%s is a translation of %s" % (subtitlelang, source_language)
 
+This has been implemented on
+``subtitles.SubtitleLanguage.get_translation_source_language`` and
+``subtitles.SubtitleLanguage.get_translation_source_language_code``.
 
+If you're going to be adding a new SubtitleLanguage as a translation of another
+one, you should create its versions with the appropriate parents.
+
+For example, if a user wants to add a new translation of A, called B, you
+would::
+
+    pipeline.add_version(..., parents=[B])
+
+You can do that every time or just the first time, it doesn't really matter::
+
+    .
+        B2        B2
+       /|         |
+      / B1        B1
+     / /         /
+     |/         /
+     |         |
+    A1        A1
+
+In both of these, B2 will have the same lineage.  I think the first option makes
+more sense though, because you're "using" A1 as a reference both times.

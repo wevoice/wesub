@@ -454,6 +454,45 @@ class SubtitleLanguage(models.Model):
         except SubtitleVersion.DoesNotExist:
             return None
 
+    def get_translation_source_language_code(self):
+        """
+        Returns the language code of the language that served as the
+        source language for this translation, or None if no languages
+        are found on the lineage.
+
+        Right now, we're only allowing for 1 source language, but that
+        could be revisited in the future.
+        """
+        tip_version = self.get_tip()
+        if not tip_version:
+            return None
+
+        lineage = tip_version.lineage
+        source_codes = lineage.keys()
+
+        return source_codes[0] if source_codes else None
+
+    def get_translation_source_language(self):
+        """
+        Returns the new SubtitleLanguage object that served as the
+        source language for this translation, or None if no languages
+        are found on the lineage.
+
+        Right now, we're only allowing for 1 source language, but that
+        could be revisited in the future.
+        """
+
+        source_lc = self.get_translation_source_language_code()
+
+        if not source_lc:
+            return None
+
+        try:
+            return SubtitleLanguage.objects.get(
+                video=self.video, language_code=source_lc)
+        except (SubtitleLanguage.DoesNotExist, IndexError):
+            return None
+
 
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
@@ -513,6 +552,10 @@ class SubtitleVersion(models.Model):
     description = models.TextField(blank=True)
     note = models.CharField(max_length=512, blank=True, default='')
 
+    # Denormalized count of the number of subtitles this version contains, for
+    # easier filtering later.
+    subtitle_count = models.PositiveIntegerField(default=0)
+
     created = models.DateTimeField(editable=False)
 
     # Subtitles are stored in a text blob, serialized as base64'ed zipped XML
@@ -567,6 +610,7 @@ class SubtitleVersion(models.Model):
                 raise TypeError("Cannot create SubtitleSet from type %s"
                                 % str(type(subtitles)))
 
+        self.subtitle_count = len(subtitles)
         self.serialized_subtitles = compress(subtitles.to_xml())
 
         # We cache the parsed subs for speed.
