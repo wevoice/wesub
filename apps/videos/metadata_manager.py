@@ -27,7 +27,6 @@ def update_metadata(video_pk):
         video.edited = datetime.now()
         video.save()
         _update_is_public(video)
-        _update_percent_done(video)
         _update_has_had_version(video)
         _update_is_was_subtitled(video)
         _update_languages_count(video)
@@ -77,18 +76,6 @@ def _update_changes_on_nonzero_version(version, last_version):
     text_change = min(text_count_changed / 1. / subs_length, 1)
 
     return time_change, text_change
-
-def _update_percent_done(video):
-    for sl in video.subtitlelanguage_set.all():
-        percent_done = sl.calculate_percent_done()
-
-        if percent_done is None:
-            continue
-
-        if percent_done != sl.percent_done:
-            sl.percent_done = percent_done
-            sl.is_complete = percent_done == 100
-            sl.save()
 
 def _update_has_had_version(video):
     for sl in video.subtitlelanguage_set.all():
