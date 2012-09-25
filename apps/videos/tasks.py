@@ -488,11 +488,6 @@ def _save_video_feed(feed_url, last_entry_url, user):
 @periodic_task(run_every=timedelta(seconds=5))
 def gauge_videos():
     Gauge('videos.Video').report(Video.objects.count())
-    Gauge('videos.Video-captioned').report(Video.objects.exclude(subtitlelanguage=None).count())
+    Gauge('videos.Video-captioned').report(Video.objects.exclude(newsubtitlelanguage_set=None).count())
     Gauge('videos.SubtitleVersion').report(SubtitleVersion.objects.count())
     Gauge('videos.SubtitleLanguage').report(SubtitleLanguage.objects.count())
-
-@periodic_task(run_every=timedelta(seconds=(60*5)))
-def gauge_videos_long():
-    Gauge('videos.Subtitle').report(Subtitle.objects.count())
-
