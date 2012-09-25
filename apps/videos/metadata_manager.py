@@ -32,52 +32,9 @@ def update_metadata(video_pk):
         _update_complete_date(video)
         _invalidate_cache(video)
 
-def _update_changes_on_version(version, last_version):
-    new_subtitles = version.subtitles()
-    subs_length = len(new_subtitles)
-
-    if not last_version:
-        return 1, 1
-    elif subs_length == 0:
-        old_subs_length = last_version.subtitle_set.count()
-        time_change = 0 if old_subs_length == 0 else 1
-        text_change = version.time_change
-        return time_change, text_change
-    else:
-        return _update_changes_on_nonzero_version(version, last_version)
-
-def _update_changes_on_nonzero_version(version, last_version):
-    subtitles = version.subtitles()
-    last_subtitles = dict([(item.subtitle_id, item)
-                           for item in last_version.subtitles()])
-    time_count_changed, text_count_changed = 0, 0
-    new_subtitles_ids = set()
-
-    for subtitle in subtitles:
-        new_subtitles_ids.add(subtitle.subtitle_id)
-        if subtitle.subtitle_id in last_subtitles:
-            last_subtitle = last_subtitles[subtitle.subtitle_id]
-            if not last_subtitle.text == subtitle.text:
-                text_count_changed += 1
-            if not subtitle.has_same_timing(last_subtitle):
-                time_count_changed += 1
-        else:
-            time_count_changed += 1
-            text_count_changed += 1
-
-    for subtitle_id in last_subtitles.keys():
-        if subtitle_id not in new_subtitles_ids:
-            text_count_changed += 1
-            time_count_changed += 1
-
-    subs_length = len(subtitles)
-    time_change = min(time_count_changed / 1. / subs_length, 1)
-    text_change = min(text_count_changed / 1. / subs_length, 1)
-
-    return time_change, text_change
-
 def _update_is_was_subtitled(video):
     language = video.subtitle_language()
+
     if not language or not language.has_version:
         if video.is_subtitled:
             video.is_subtitled = False
