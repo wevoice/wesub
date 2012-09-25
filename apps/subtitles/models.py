@@ -493,6 +493,7 @@ class SubtitleLanguage(models.Model):
         except (SubtitleLanguage.DoesNotExist, IndexError):
             return None
 
+
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
     def public(self):
@@ -551,6 +552,10 @@ class SubtitleVersion(models.Model):
     description = models.TextField(blank=True)
     note = models.CharField(max_length=512, blank=True, default='')
 
+    # Denormalized count of the number of subtitles this version contains, for
+    # easier filtering later.
+    subtitle_count = models.PositiveIntegerField(default=0)
+
     created = models.DateTimeField(editable=False)
 
     # Subtitles are stored in a text blob, serialized as base64'ed zipped XML
@@ -605,6 +610,7 @@ class SubtitleVersion(models.Model):
                 raise TypeError("Cannot create SubtitleSet from type %s"
                                 % str(type(subtitles)))
 
+        self.subtitle_count = len(subtitles)
         self.serialized_subtitles = compress(subtitles.to_xml())
 
         # We cache the parsed subs for speed.
