@@ -337,27 +337,27 @@ div.amara-embed {
             }
         }
     }
-    div.amara-context-menu {
-        background: #E6E6E6;
-        padding: 5px;
-        position: absolute;
-        width: 150px;
-        @include border-radius(3px);
+}
+div.amara-context-menu {
+    background: #E6E6E6;
+    padding: 5px;
+    position: absolute;
+    width: 150px;
+    @include border-radius(3px);
 
-        ul {
-            margin: 0;
+    ul {
+        margin: 0;
 
-            li {
-                list-style-type: none;
+        li {
+            list-style-type: none;
 
-                a {
-                    background: #FFF;
-                    display: block;
-                    color: #000;
-                    font: normal 12px Tahoma;
-                    padding: 5px;
-                    @include border-radius(2px);
-                }
+            a {
+                background: #FFF;
+                display: block;
+                color: #000;
+                font: normal 12px Tahoma;
+                padding: 5px;
+                @include border-radius(2px);
             }
         }
     }
