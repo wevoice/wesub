@@ -24,8 +24,6 @@
             // start time.
             options.line.addEventListener('click', function(e) {
                 options.pop.currentTime(options.start);
-                e.preventDefault();
-                e.stopPropagation();
             }, false);
 
         },
