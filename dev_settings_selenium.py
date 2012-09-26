@@ -28,15 +28,17 @@ DEFAULT_PROTOCOL  = 'http'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': "unisubs",
-        'USER': "root",
-        'PASSWORD': "root",
-        'HOST': "localhost",
-        'PORT': '3306',
-        'CHARACTER SET': 'utf8',
-        'TEST_CHARSET': 'utf8',
-        'TEST_COLLATION': 'utf8_unicode_ci'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': "/tmp/django_test_db.sqlite",
+        #'ENGINE': 'django.db.backends.mysql',
+        #'NAME': "unisubs",
+        #'USER': "root",
+        #'PASSWORD': "root",
+        #'HOST': "localhost",
+        #'PORT': '3306',
+        #'CHARACTER SET': 'utf8',
+        #'TEST_CHARSET': 'utf8',
+        #'TEST_COLLATION': 'utf8_unicode_ci'
         }
     }
 
