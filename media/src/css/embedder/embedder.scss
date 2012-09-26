@@ -86,255 +86,278 @@
         clear: both;
     }
 }
-div.amara-tools {
-    * {
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
+div.amara-embed {
+    font: normal 14px Helvetica;
+
+    a {
+        &:hover {
+            background: transparent;
+            text-decoration: underline;
+        }
     }
-    div.amara-bar {
-        border-top: 1px solid #313233;
-        color: #666;
-        height: 37px;
-        @include multi-border-radius(0, 0, 3px, 3px);
-        @include vertical-gradient(#1B1C1D, #212223);
 
-        a.amara-button {
-            background: transparent url('../../images/embedder/amara-sprites.png') 0 0 no-repeat;
-            display: inline-block;
-            height: 36px;
-            @include opacity(.5);
-            -webkit-transition: opacity .03s linear;
-            -moz-transition: opacity .03s linear;
+    div.amara-popcorn {
+        position: relative;
 
-            &.amara-logo {
-                background-position: center 13px;
-                color: transparent;
-                float: left;
-                width: 81px;
+        div.amara-popcorn-subtitles {
+            bottom: 63px;
+            display: none;
+            left: 0;
+            position: absolute;
 
-                &:active {
-                    background-position: center 14px;
-                }
-            }
-            &.amara-share-button {
-                background-position: 13px -236px;
-                float: right;
-                width: 38px;
-
-                &:active {
-                    background-position: 13px -235px;
-                }
-            }
-            &:hover, &.amara-button-enabled {
-                @include opacity(1);
+            div {
+                background: rgba(0, 0, 0, .8);
+                color: #FFF;
+                font: bold 16px/22px Helvetica;
+                margin: 0 20px;
+                padding: 12px 20px;
+                text-align: center;
+                @include border-radius(5px);
             }
         }
-        ul.amara-displays {
-            border-left: 1px solid #2B2C2D;
-            border-right: 1px solid #2B2C2D;
-            display: inline-block;
-            float: left;
-            height: 36px;
-            margin: 0;
-            padding: 0 10px;
+    }
+    div.amara-tools {
+        * {
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        div.amara-bar {
+            border-top: 1px solid #313233;
+            color: #666;
+            height: 37px;
+            @include multi-border-radius(0, 0, 3px, 3px);
+            @include vertical-gradient(#1B1C1D, #212223);
 
-            li {
+            a.amara-button {
+                background: transparent url('../../images/embedder/amara-sprites.png') 0 0 no-repeat;
                 display: inline-block;
-                float: left;
                 height: 36px;
-                list-style-type: none;
-                margin: 0;
-
-                a {
-                    width: 28px;
-
-                    &.amara-transcript-button {
-                        background-position: 7px -37px;
-
-                        &:active {
-                            background-position: 7px -36px;
-                        }
-                    }
-                    &.amara-subtitles-button {
-                        background-position: 6px -86px;
-
-                        &:active {
-                            background-position: 6px -85px;
-                        }
-                    }
-                }
-            }
-        }
-        div.amara-languages {
-            border-right: 1px solid #2B2C2D;
-            display: inline-block;
-            float: left;
-            height: 36px;
-            padding: 0 10px;
-            position: relative;
-            width: 21%;
-
-            .amara-current-language {
-                background: transparent url('../../images/embedder/amara-sprites.png') right -139px no-repeat;
-                color: #DEDEDE;
-                display: block;
-                font: normal 12px Tahoma;
-                height: 36px;
-                padding: 10px 20px 10px 5px;
-                overflow: hidden;
-                text-decoration: none;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                width: 100%;
                 @include opacity(.5);
                 -webkit-transition: opacity .03s linear;
                 -moz-transition: opacity .03s linear;
 
-                &:hover {
+                &.amara-logo {
+                    background-position: center 13px;
+                    color: transparent;
+                    float: left;
+                    width: 81px;
+
+                    &:active {
+                        background-position: center 14px;
+                    }
+                }
+                &.amara-share-button {
+                    background-position: 13px -236px;
+                    float: right;
+                    width: 38px;
+
+                    &:active {
+                        background-position: 13px -235px;
+                    }
+                }
+                &:hover, &.amara-button-enabled {
                     @include opacity(1);
                 }
             }
-            ul.amara-languages-list {
-                background: #1D1E1F;
-                display: none;
-                left: 0;
+            ul.amara-displays {
+                border-left: 1px solid #2B2C2D;
+                border-right: 1px solid #2B2C2D;
+                display: inline-block;
+                float: left;
+                height: 36px;
                 margin: 0;
-                padding: 20px;
-                position: absolute;
-                top: 36px;
-                width: 100%;
+                padding: 0 10px;
 
                 li {
+                    display: inline-block;
+                    float: left;
+                    height: 36px;
                     list-style-type: none;
+                    margin: 0;
 
                     a {
-                        color: #DEDEDE;
-                        display: block;
+                        width: 28px;
 
-                        &:hover {
-                            color: #FFF;
+                        &.amara-transcript-button {
+                            background-position: 7px -37px;
+
+                            &:active {
+                                background-position: 7px -36px;
+                            }
+                        }
+                        &.amara-subtitles-button {
+                            background-position: 6px -86px;
+
+                            &:active {
+                                background-position: 6px -85px;
+                            }
+                        }
+                    }
+                }
+            }
+            div.amara-languages {
+                border-right: 1px solid #2B2C2D;
+                display: inline-block;
+                float: left;
+                height: 36px;
+                padding: 0 10px;
+                position: relative;
+                width: 21%;
+
+                .amara-current-language {
+                    background: transparent url('../../images/embedder/amara-sprites.png') right -139px no-repeat;
+                    color: #DEDEDE;
+                    display: block;
+                    font: normal 12px Tahoma;
+                    height: 36px;
+                    padding: 10px 20px 10px 5px;
+                    overflow: hidden;
+                    text-decoration: none;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    width: 100%;
+                    @include opacity(.5);
+                    -webkit-transition: opacity .03s linear;
+                    -moz-transition: opacity .03s linear;
+
+                    &:hover {
+                        @include opacity(1);
+                    }
+                }
+                ul.amara-languages-list {
+                    background: #1D1E1F;
+                    display: none;
+                    left: 0;
+                    margin: 0;
+                    padding: 20px;
+                    position: absolute;
+                    top: 36px;
+                    width: 100%;
+
+                    li {
+                        list-style-type: none;
+
+                        a {
+                            color: #DEDEDE;
+                            display: block;
+
+                            &:hover {
+                                color: #FFF;
+                            }
                         }
                     }
                 }
             }
         }
-    }
-    div.amara-transcript {
-        border: 1px solid #DADBDC;
-        display: none;
-        font: normal 12px Tahoma;
-        margin: 0 2px;
+        div.amara-transcript {
+            border: 1px solid #DADBDC;
+            display: none;
+            font: normal 12px Tahoma;
+            margin: 0 2px;
 
-        div.amara-transcript-header {
-            border-bottom: 1px solid #DADBDC;
-            color: #9A9B9C;
-            @include vertical-gradient(#CCC -3px, #FFF 20px);
+            div.amara-transcript-header {
+                border-bottom: 1px solid #DADBDC;
+                color: #9A9B9C;
+                @include vertical-gradient(#CCC -3px, #FFF 20px);
 
-            div.amara-transcript-header-left {
-                float: left;
-                padding: 12px;
+                div.amara-transcript-header-left {
+                    float: left;
+                    padding: 12px;
 
-                span {
-                    font-weight: bold;
+                    span {
+                        font-weight: bold;
+                    }
+                    a.amara-transcript-autoscroll {
+                        color: #9A9B9C;
+                        font: normal 12px Tahoma;
+                        text-decoration: none;
+                    }
                 }
-                a.amara-transcript-autoscroll {
-                    color: #9A9B9C;
-                    text-decoration: none;
+                div.amara-transcript-header-right {
+                    float: right;
+
+                    form {
+                        margin: 0;
+
+                        input {
+                            background: transparent;
+                            border: 0;
+                            border-left: 1px solid #DADBDC;
+                            font: normal 12px Tahoma;
+                            padding: 12px;
+                        }
+                    }
                 }
             }
-            div.amara-transcript-header-right {
-                float: right;
+            div.amara-transcript-body {
+                max-height: 300px;
+                padding: 5% 15%;
+                overflow: auto;
 
-                form {
-                    margin: 0;
+                &::-webkit-scrollbar {
+                    background: #F7F7F7;
+                    height: 10px;
+                    width: 15px;
+                    -webkit-appearance: none;
+                }
+                &::-webkit-scrollbar-thumb {
+                    border-radius: 2px;
+                    background-color: #C7C7C7;
+                }
+                a.amara-transcript-line {
+                    color: #212223;
+                    font: normal 12px Tahoma;
+                    line-height: 32px;
+                    padding: 5px 0;
+                    text-decoration: none;
+                    @include border-radius();
 
-                    input {
-                        background: transparent;
-                        border: 0;
-                        border-left: 1px solid #DADBDC;
-                        font: normal 12px Tahoma;
-                        padding: 12px;
+                    &:hover {
+                        background: #D1D2D3;
+                        @include box-shadow(-4px, 0px, 0, #D1D2D3);
+                    }
+                    &.current-subtitle {
+                        background: #313233;
+                        color: #FFF;
+                        @include box-shadow(-4px, 0px, 0, #313233);
+                    }
+                    &:after {
+                        content: " ";
+                    }
+                    &:focus {
+                        outline: none;
+                    }
+                    &.selected {
+                        background: #313233;
+                        color: #FFF;
+                        @include box-shadow(-4px, 0px, 0, #313233);
                     }
                 }
             }
         }
-        div.amara-transcript-body {
-            max-height: 300px;
-            padding: 5% 15%;
-            overflow: auto;
-
-            &::-webkit-scrollbar {
-                background: #F7F7F7;
-                height: 10px;
-                width: 15px;
-                -webkit-appearance: none;
-            }
-            &::-webkit-scrollbar-thumb {
-                border-radius: 2px;
-                background-color: #C7C7C7;
-            }
-            a.amara-transcript-line {
-                color: #212223;
-                line-height: 32px;
-                padding: 5px 0;
-                text-decoration: none;
-                @include border-radius();
-
-                &:hover {
-                    background: #D1D2D3;
-                    @include box-shadow(-4px, 0px, 0, #D1D2D3);
-                }
-                &.current-subtitle {
-                    background: #313233;
-                    color: #FFF;
-                    @include box-shadow(-4px, 0px, 0, #313233);
-                }
-                &:after {
-                    content: " ";
-                }
-                &:focus {
-                    outline: none;
-                }
-                &.selected {
-                    background: #313233;
-                    color: #FFF;
-                    @include box-shadow(-4px, 0px, 0, #313233);
-                }
-            }
-        }
     }
-}
-div.amara-popcorn-subtitles {
-    display: none;
+    div.amara-context-menu {
+        background: #E6E6E6;
+        padding: 5px;
+        position: absolute;
+        width: 150px;
+        @include border-radius(3px);
 
-    div {
-        background: rgba(0, 0, 0, .8);
-        margin: 0 20px;
-        padding: 12px 20px;
-        @include border-radius(5px);
-    }
-}
-div.amara-context-menu {
-    background: #E6E6E6;
-    padding: 5px;
-    position: absolute;
-    width: 150px;
-    @include border-radius(3px);
+        ul {
+            margin: 0;
 
-    ul {
-        margin: 0;
+            li {
+                list-style-type: none;
 
-        li {
-            list-style-type: none;
-
-            a {
-                background: #FFF;
-                display: block;
-                color: #000;
-                font: normal 12px Tahoma;
-                padding: 5px;
-                @include border-radius(2px);
+                a {
+                    background: #FFF;
+                    display: block;
+                    color: #000;
+                    font: normal 12px Tahoma;
+                    padding: 5px;
+                    @include border-radius(2px);
+                }
             }
         }
     }
