@@ -279,3 +279,74 @@ You can do that every time or just the first time, it doesn't really matter::
 
 In both of these, B2 will have the same lineage.  I think the first option makes
 more sense though, because you're "using" A1 as a reference both times.
+
+has_version, had_version
+------------------------
+
+These two confusing ``SubtitleLanguage`` fields had the following meanings in
+the old data model:
+
+  ``has_version``
+    Is there more than one version, and does the latest version have more than
+    0 subtitles?
+
+  ``had_version``
+    Is there more than one version, and did some previous version have more than
+    0 subtitles?
+
+These were used for things like "get all the languages for this video that have
+some subtitles in their latest version, which we'll display on the video page".
+
+Refactor
+~~~~~~~~
+
+We're no longer explicitely storing these fields on the ``SubtitleLanguage``
+model.  Doing so has historically proven to be excruciatingly error-prone.
+Instead there are two pieces of information that should cover all these use
+cases.
+
+First, SubtitleVersion objects now have a ``subtitle_count`` attribute.  This
+*is* denormalized from the subtitles themselves, but this is okay because
+``SubtitleVersion`` objects are immutable except for a single flag.
+
+**Aside:** If ``SubtitleVersion`` objects ever become mutable we are going to
+hate our lives.  ``SubtitleVersion`` objects are immutable.  They must be.  Do
+not mute them.  This is a core principle of this whole model -- woe be unto
+whomever breaks that principle.
+
+Now that versions have the subtitle counts in a queryable field, it's possible
+to write manager methods that use this to figure out the ``has_version``,
+``had_version`` information.
+
+To see which languages have (or do not have) a version with 1 or more subtitles
+anywhere in their history (this is what ``had_version`` tried to track), use:
+
+* ``SubtitleLanguage.objects.having_nonempty_versions()``
+* ``SubtitleLanguage.objects.not_having_nonempty_versions()``
+
+To find languages whose *latest* version has (or does not have) 1 or more
+subtitles (this is what ``has_version`` tried to track), use:
+
+* ``SubtitleLanguage.objects.having_nonempty_tip()``
+* ``SubtitleLanguage.objects.not_having_nonempty_tip()``
+
+**These methods contain dark and evil black magic!**  Their guts are ugly, but
+they are very fast and do not require us to denormalize the data any further.
+
+They also return normal querysets that can be further filtered, excluded, etc,
+which means that the magic shouldn't affect you unless you go poking around
+inside them.
+
+Porting
+~~~~~~~
+
+Let's say you need to get a list of all the languages for a particular video
+where the latest version has at least one subtitle.  Previously::
+
+    SubtitleLanguage.objects.filter(video=video, has_version=True)
+
+Now::
+
+    SubtitleLanguage.objects.having_non_empty_tip().filter(video-video)
+
+
