@@ -224,19 +224,18 @@ def _send_notification(version_id):
     except SubtitleVersion.DoesNotExist:
         return
 
-    if version.result_of_rollback or not version.is_public:
+    # if version.result_of_rollback or not version.is_public:
+    if version.visibility == 'private':
         return
 
-    version.notification_sent = True
-    version.save()
-    if version.version_no == 0 and not version.language.is_original:
+    if version.version_number == 0 and not version.language.is_primary_audio_language():
         _send_letter_translation_start(version)
     else:
-        if version.text_change or version.time_change:
+        time_change, text_change = version.get_changes()
+        if text_change or time_change:
             _send_letter_caption(version)
 
 def _check_alarm(version_id):
-    from videos.models import SubtitleVersion
     from videos import alarms
 
     try:
