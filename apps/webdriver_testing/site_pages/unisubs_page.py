@@ -27,7 +27,7 @@ class UnisubsPage(Page):
     _SUCCESS_MESSAGE = "div#messages h2.success"
 
     _MODAL_DIALOG = "div.modal"
-    _MODAL_CLOSE = "div.modal-header a.close"
+    _MODAL_CLOSE = "div a.close"
 
     def error_message_present(self, message):
         if self.is_text_present(self._ERROR_MESSAGE, message):

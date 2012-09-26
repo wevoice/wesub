@@ -57,3 +57,11 @@ def create_several_team_videos_with_subs(self, team, teamowner, data=None):
     return videos
 
 
+def create_videos_with_fake_subs(self):
+    testdata = json.load(open('apps/videos/fixtures/teams-list.json'))
+    videos = _create_videos(testdata, [])
+    return videos
+
+
+    
+
