@@ -27,7 +27,7 @@ class VideoPage(UnisubsPage):
     #VIDEO SIDE SECTION
     _INFO = "ul#video-menu.left_nav li:nth-child(1) > a"
     _ADD_TRANSLATION = "li.contribute a#add_translation"
-    _UPLOAD_SUBTITLES = "li.contribute a#upload-subtitles-link"
+    _UPLOAD_SUBTITLES = "a#upload-subtitles-link"
 
     #SUBTITLES_SIDE_SECTION
     _VIDEO_ORIGINAL = ""
@@ -43,14 +43,55 @@ class VideoPage(UnisubsPage):
     _DEBUG_INFO = ""
     _EDIT = ""
 
+    #UPLOAD SUBTITLES DIALOG
+    _SELECT_LANGUAGE = 'select#id_language'
+    _TRANSLATE_FROM = 'select#id_translated_from'
+    _SUBTITLES_FILE = 'input#subtitles-file-field'
+    _IS_COMPLETE = 'input#updload-subtitles-form-is_complete' #checked default
+
+    _UPLOAD_SUBMIT = 'form#upload-subtitles-form button.green_button'
+    _FEEDBACK_MESSAGE = 'p.feedback-message'
+    _CLOSE = 'div#upload_subs-div a.close'
+    UPLOAD_SUCCESS_TEXT = ('Thank you for uploading. It will take a '
+        'minute or so for your subtitles to appear.')
+
+    
+
     def open_video_page(self, video_id):
         self.open_page(self._URL % video_id)
 
     def add_translation(self):
         self.click_by_css(self._ADD_TRANSLATION)
 
-    def upload_subtitles(self):
+    def upload_subtitles(self, 
+                         sub_lang, 
+                         sub_file,
+                         translated_from=None, 
+                         is_complete=True):
+        #Open the dialog
         self.click_by_css(self._UPLOAD_SUBTITLES)
+        #Choose the language
+        self.wait_for_element_present(self._SELECT_LANGUAGE)
+        self.select_option_by_text(self._SELECT_LANGUAGE, sub_lang)
+        #Set the translation_from field
+        if translated_from:
+            self.select_option_by_text(self._TRANSLATED_FROM)
+        #Input the subtitle file
+        self.type_by_css(self._SUBTITLES_FILE, sub_file)
+        #Set complete
+        if not is_complete:
+            self.click_by_css(self._IS_COMPLETE)
+        #Start the upload
+        self.wait_for_element_present(self._UPLOAD_SUBMIT)
+        self.click_by_css(self._UPLOAD_SUBMIT)
+        #Get the the response message
+        self.wait_for_element_present(self._FEEDBACK_MESSAGE)
+        message_text = self.get_text_by_css(self._FEEDBACK_MESSAGE)
+        #Close the dialog
+        self.click_by_css(self._CLOSE)
+        return message_text
+
+
 
     def open_info_page(self):
         self.click_by_css(self._INFO)
