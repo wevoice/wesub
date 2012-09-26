@@ -123,7 +123,8 @@
                     <fieldset>
                         {% if not request.user|can_delete_video_in_team:team %}
                             <p>{% blocktrans %}You are removing this video from the {{ team }} team.{% endblocktrans %}</p>
-                            <p class="notation">{% blocktrans %}It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted.{% endblocktrans %}</p>
+                            <p class="notation">{% blocktrans %}You are removing this video from the {{ team }} team.<br /><br />
+                                It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted. Private videos will become available for viewing and editing to the general public. Are you sure you want to proceed?{% endblocktrans %}</p>
                         {% else %}
                             <p>{% blocktrans %}You can choose to remove the video from the {{ team }} team or to delete the video (and all of its subtitles) from the system entirely. What would you like to do?{% endblocktrans %}</p>
                             <label class="radio">
