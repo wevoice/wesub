@@ -1168,9 +1168,9 @@ class YoutubeVideoTypeTest(TestCase):
 
         sl = video.subtitle_language(lang['lang_code'])
 
-        subtitles = sl.latest_subtitles()
+        subtitles = sl.get_tip().get_subtitles()
         self.assertTrue(len(subtitles))
-        self.assertEqual(subtitles[-1].text, u'Thanks.')
+        self.assertEqual(list(subtitles)[-1][2], u'Thanks.')
 
     def test_data_prep(self):
         from videos.types.youtube import _prepare_subtitle_data_for_version
