@@ -44,37 +44,3 @@ def check_other_languages_changes(version, ignore_statistic=False):
     
     if (float(changed_langs_count) / all_langs_count) >= 0.5:
         send_alarm_email(version, u'A video had changes made two more than 50% of its languages in the last hour')
-
-def check_language_name(version, ignore_statistic=False):
-    if not ignore_statistic:
-        fetch_count = SubtitleFetchCounters.objects.filter(video=version.video, date=date.today()) \
-            .aggregate(fetch_count=Count('count'))['fetch_count']
-        
-        if fetch_count < 100:
-            return
-    
-    text = ''
-    
-    for s in version.subtitles():
-        text += (' '+s.text)
-        
-        if len(text) >= 400:
-            break
-    
-    url = u'https://ajax.googleapis.com/ajax/services/language/detect?v=1.0&q=%s'
-    url = url % urlquote_plus(text)
-
-    request = urllib2.Request(url, None)
-    response = urllib2.urlopen(request)
-    
-    results = simplejson.load(response)
-
-    lang = version.language
-    
-    if results['responseStatus'] == 200:
-        if not results['responseData']['isReliable'] or \
-                (lang.language and lang.language != results['responseData']['language']):
-            send_alarm_email(version, u'Text does not look like language labeled')    
-        
-
-        
