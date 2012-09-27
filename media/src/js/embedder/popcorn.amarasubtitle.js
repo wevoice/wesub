@@ -1,64 +1,25 @@
-// PLUGIN: Amara Subtitle (ported from the Subtitle plugin)
-
 (function (Popcorn) {
 
-    var i = 0,
-    createDefaultContainer = function(context, id) {
+    // TODO: Document the hell out of this.
 
-    var ctxContainer = context.container = document.createElement('div'),
-        style = ctxContainer.style,
-        media = context.media;
+    var i = 0;
+    var createDefaultContainer = function(context, id) {
 
-        var updatePosition = function() {
-            var position = context.position();
-
-            style.fontSize = '16px';
-            style.width = media.offsetWidth + 'px';
-            style.top = position.top  + media.offsetHeight - ctxContainer.offsetHeight - 63 + 'px';
-            style.left = position.left + 'px';
-
-            setTimeout(updatePosition, 10);
-        };
+        var ctxContainer = context.container = document.createElement('div');
+        var style = ctxContainer.style;
+        var media = context.media;
 
         ctxContainer.id = id || Popcorn.guid();
         ctxContainer.className = 'amara-popcorn-subtitles';
-        style.position = 'absolute';
-        style.color = 'white';
-        style.textShadow = 'black 2px 2px 6px';
-        style.fontWeight = 'bold';
-        style.textAlign = 'center';
 
-        updatePosition();
+        style.width = media.offsetWidth + 'px';
 
-        context.media.parentNode.appendChild(ctxContainer);
+        context.media.parentNode.childNodes[0].appendChild(ctxContainer);
 
         return ctxContainer;
     };
 
-    /**
-     * Subtitle popcorn plug-in
-     * Displays a subtitle over the video, or in the target div
-     * Options parameter will need a start, and end.
-     * Optional parameters are target and text.
-     * Start is the time that you want this plug-in to execute
-     * End is the time that you want this plug-in to stop executing
-     * Target is the id of the document element that the content is
-     *  appended to, this target element must exist on the DOM
-     * Text is the text of the subtitle you want to display.
-     *
-     * @param {Object} options
-     *
-     * Example:
-       var p = Popcorn('#video')
-           .subtitle({
-               start:  5,              // seconds, mandatory
-               end:    15,             // seconds, mandatory
-               text:   'Hellow world', // optional
-               target: 'subtitlediv',  // optional
-           })
-     **/
-
-Popcorn.plugin('amarasubtitle', {
+    Popcorn.plugin('amarasubtitle', {
         _setup: function(options) {
             var newdiv = document.createElement('div');
 
