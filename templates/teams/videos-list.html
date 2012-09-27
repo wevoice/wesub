@@ -48,10 +48,17 @@
                 <span></span>
             </a>
         </div>
-        <div class="filters group {% if filtered or request.GET.sort %}active{% endif %}">
+        <div class="filters group {% if filtered or request.GET.sort or project %}active{% endif %}">
             <p>
                 <div class="filter-chunk">
-                    <span class="inner">{% trans 'Videos with' %}</span>
+                    <span class="inner">{% trans 'Videos in' %}</span>
+                    <select name="project-filter" id="project-filter">
+                        <option value="{% url teams:detail team.slug %}{% query_string request.GET %}" id="project-opt-any">{% trans 'any project' %}</option>
+                        {% for proj in project_choices %}
+                            <option id="project-opt-{{ proj.id }}" {% if project == proj %}selected="selected"{% endif %} value="{% url teams:project_video_list team.slug proj.slug %}{% query_string request.GET %}">{{ proj.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% trans 'with' %}
                     <select name="lang-filter" id="lang-filter">
                         <option value="{{ request.path }}{% query_string request.GET lang='' page='' %}" id="lang-opt-any">{% trans 'any' %}</option>
                         <option value="{{ request.path }}{% query_string request.GET lang='none' page='' %}" id="lang-opt-none">{% trans 'no' %}</option>
