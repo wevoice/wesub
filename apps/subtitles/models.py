@@ -557,12 +557,12 @@ class SubtitleLanguage(models.Model):
         assert self.pk, "Can't find a version for a language that hasn't been saved"
         args = {'language_code': self.language_code}
         if version_no:
-            args['version_no'] = version_no
+            args['version_number'] = version_no
         base_queryset = SubtitleVersion.objects.all()
         if public_only:
             base_queryset = SubtitleVersion.objects.public()
         try:
-            return base_queryset.filter(**args).order_by('-version_number')[0]
+            return base_queryset.filter(**args).order_by('-version_number')[:1].get()
         except SubtitleVersion.DoesNotExist:
             return None
 
@@ -638,7 +638,7 @@ class SubtitleVersion(models.Model):
     """
     parents = models.ManyToManyField('self', symmetrical=False, blank=True)
 
-    video = models.ForeignKey(Video)
+    video = models.ForeignKey(Video, related_name='newsubtitleversion_set')
     subtitle_language = models.ForeignKey(SubtitleLanguage)
     language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
 

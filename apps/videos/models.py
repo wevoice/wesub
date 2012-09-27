@@ -55,6 +55,7 @@ from apps.teams.moderation_const import (
     WAITING_MODERATION, APPROVED, MODERATION_STATUSES, UNMODERATED, REJECTED
 )
 from raven.contrib.django.models import client
+from babelsubs import storage
 
 
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)
@@ -519,7 +520,8 @@ class Video(models.Model):
         """
         if not hasattr(self, '_original_subtitle'):
             try:
-                original = self.subtitlelanguage_set.filter(is_original=True)[:1].get()
+                original = self.newsubtitlelanguage_set \
+                            .filter(language_code=self.primary_audio_language_code)[:1].get()
             except models.ObjectDoesNotExist:
                 original = None
 
@@ -555,8 +557,9 @@ class Video(models.Model):
             if language_code is None:
                 return self._original_subtitle_language()
             else:
-                return self.subtitlelanguage_set.filter(
-                    language=language_code).order_by('-subtitle_count')[:1].get()
+                return (self.newsubtitlelanguage_set
+                                .having_nonempty_tip()
+                                .filter(language_code=language_code)[:1].get())
         except models.ObjectDoesNotExist:
             return None
 
@@ -582,7 +585,7 @@ class Video(models.Model):
         """
         if language is None:
             language = self.subtitle_language()
-        return None if language is None else language.version(version_no, public_only=public_only)
+        return None if language is None else language.version(version_no=version_no, public_only=public_only)
 
     def latest_version(self, language_code=None, public_only=True):
         """Return the latest SubtitleVersion for this video matching the given criteria.
@@ -599,25 +602,28 @@ class Video(models.Model):
 
         """
         language = self.subtitle_language(language_code)
-        return None if language is None else language.latest_version(public_only=public_only)
+        return None if language is None else language.get_tip(public=public_only)
 
     def subtitles(self, version_no=None, language_code=None, language_pk=None):
         if language_pk is None:
             language = self.subtitle_language(language_code)
         else:
             try:
-                language = self.subtitlelanguage_set.get(pk=language_pk)
+                language = self.newsubtitlelanguage_set.get(pk=language_pk)
             except models.ObjectDoesNotExist:
                 language = None
+
         version = self.version(version_no, language)
+
         if version:
-            return version.subtitles()
+            return version.get_subtitles()
         else:
-            return Subtitle.objects.none()
+            language = language.language_code if language else self.primary_audio_language_code
+            return storage.SubtitleSet(language)
 
     def latest_subtitles(self, language_code=None, public_only=True):
         version = self.latest_version(language_code, public_only=public_only)
-        return [] if version is None else version.subtitles(public_only=public_only)
+        return [] if version is None else version.get_subtitles()
 
     def translation_language_codes(self):
         """All iso language codes with finished translations."""
@@ -1064,13 +1070,19 @@ class SubtitleLanguage(models.Model):
             versions = versions.filter(moderation_status__in=[APPROVED, UNMODERATED])
         return versions
 
-    def version(self, version_no=None, public_only=True):
-        if version_no is None:
+    def version(self, version_number=None, public_only=True):
+        if version_number is None:
             return self.latest_version(public_only)
+
         try:
-            return self._filter_public(self.subtitleversion_set.filter(version_no=version_no), public_only)[0]
+            if public_only:
+                versions = self.newsubtitleversion_set.public()
+            else:
+                versions = self.newsubtitleversion_set.all()
+
+            return versions.filter(version_number=version_number)[:1].get()
         except (models.ObjectDoesNotExist, IndexError):
-            pass
+            return None
 
     @property
     def last_version(self):

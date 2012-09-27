@@ -1168,9 +1168,9 @@ class YoutubeVideoTypeTest(TestCase):
 
         sl = video.subtitle_language(lang['lang_code'])
 
-        subtitles = sl.latest_subtitles()
+        subtitles = sl.get_tip().get_subtitles()
         self.assertTrue(len(subtitles))
-        self.assertEqual(subtitles[-1].text, u'Thanks.')
+        self.assertEqual(list(subtitles)[-1][2], u'Thanks.')
 
     def test_data_prep(self):
         from videos.types.youtube import _prepare_subtitle_data_for_version
@@ -1716,121 +1716,6 @@ class TestTasks(TestCase):
             self.assertTrue(message.user in list(followers))
             self.assertFalse(message.user in list(lan2_followers))
 
-
-
-class TestPercentComplete(TestCase):
-    fixtures = ['test.json']
-
-    def _create_trans(self, latest_version=None, lang_code=None, forked=False):
-        translation = SubtitleLanguage()
-        translation.video = self.video
-        translation.language = lang_code
-        translation.is_original = False
-        translation.is_forked = forked
-        if not forked:
-           translation.standard_language = self.video.subtitle_language()
-        translation.save()
-
-        self.translation = translation
-
-        v = SubtitleVersion()
-        v.language = translation
-        if latest_version:
-            v.version_no = latest_version.version_no+1
-        else:
-            v.version_no = 1
-        v.datetime_started = datetime.now()
-        v.save()
-
-        self.translation_version = v
-        if latest_version is not None:
-            for s in latest_version.subtitle_set.all():
-                s.duplicate_for(v).save()
-        return translation
-
-    def setUp(self):
-        self.video = Video.objects.all()[:1].get()
-        self.original_language = self.video.subtitle_language()
-        latest_version = self.original_language.latest_version()
-        self.translation = self._create_trans(latest_version, 'uk')
-
-    def test_percent_done(self):
-        video_changed_tasks.delay(self.translation.video.id)
-        translation = SubtitleLanguage.objects.get(id=self.translation.id)
-        self.assertEqual(translation.percent_done, 100)
-
-    def test_delete_from_original(self):
-        latest_version = self.original_language.latest_version()
-        latest_version.subtitle_set.all()[:1].get().delete()
-        video_changed_tasks.delay(self.translation.video.id)
-        translation = SubtitleLanguage.objects.get(id=self.translation.id)
-        self.assertEqual(translation.percent_done, 100)
-
-    def test_adding_to_original(self):
-        latest_version = self.original_language.latest_version()
-        s = Subtitle()
-        s.version = latest_version
-        s.subtitle_id = 'asdasdsadasdasdasd'
-        s.subtitle_order = 5
-        s.subtitle_text = 'new subtitle'
-        s.start_time = 50
-        s.end_time = 51
-        s.save()
-
-        video_changed_tasks.delay(self.translation.video.id)
-        translation = SubtitleLanguage.objects.get(id=self.translation.id)
-        self.assertEqual(translation.percent_done, 4/5.*100)
-
-    def test_delete_all(self):
-        for s in self.translation_version.subtitle_set.all():
-            s.delete()
-        video_changed_tasks.delay(self.translation.video.id)
-        translation = SubtitleLanguage.objects.get(id=self.translation.id)
-        self.assertEqual(translation.percent_done, 0)
-
-    def test_delete_from_translation(self):
-        self.translation_version.subtitle_set.all()[:1].get().delete()
-        video_changed_tasks.delay(self.translation.video.id)
-        translation = SubtitleLanguage.objects.get(id=self.translation.id)
-        self.assertEqual(translation.percent_done, 75)
-
-    def test_many_subtitles(self):
-        latest_version = self.original_language.latest_version()
-        for i in range(2, 450):
-            s = Subtitle()
-            s.version = latest_version
-            s.subtitle_id = 'sadfdasf%s' % i
-            s.subtitle_order = i
-            s.start_time = 50 + i
-            s.end_time = 51 + i
-            s.subtitle_text = "what %i" % i
-            s.save()
-
-        video_changed_tasks.delay(self.translation.video.id)
-        translation = SubtitleLanguage.objects.get(id=self.translation.id)
-        # 1% reflects https://www.pivotaltracker.com/story/show/16013319
-        self.assertEqual(translation.percent_done, 1)
-
-    def test_count_as_complete(self):
-        self.assertFalse(self.video.complete_date)
-        # set the original lang as complete, should be completed
-        video_changed_tasks.delay(self.translation.video.id)
-        translation = SubtitleLanguage.objects.get(id=self.translation.id)
-        self.assertEqual(translation.percent_done, 100)
-        self.assertTrue(translation.is_complete)
-        self.translation.save()
-
-
-    def test_video_0_subs_are_never_complete(self):
-        self.original_language = self.video.subtitle_language()
-        new_lang = self._create_trans(None, 'it', True)
-        self.assertFalse(self.video.is_complete, False)
-        metadata_manager.update_metadata(self.video.pk)
-        new_lang.save()
-        self.video.subtitlelanguage_set.all().filter(percent_done=100).delete()
-        self.assertFalse(self.video.is_complete)
-
-
 class TestAlert(TestCase):
     fixtures = ['test.json']
 
@@ -2226,42 +2111,12 @@ class TestMetadataManager(TestCase):
 
     fixtures = ['staging_users.json', 'staging_videos.json']
 
-    def test_subtitles_count(self):
-        v = Video.objects.all()[0]
-        lang = SubtitleLanguage(language='en', video=v, is_forked=True)
-        lang.save()
-        v1 = create_version(lang, [
-                {
-                   "subtitle_order" : 1,
-                   "subtitle_text": "",
-                   "subtitle_id": "id1",
-                    'start_time': 1,
-                    'end_time': 2,
-
-                 },
-                  {
-                   "subtitle_order" : 2,
-                   "subtitle_text": "   ",
-                   "subtitle_id": "id2",
-                    'start_time': 3,
-                    'end_time': 4,
-                 },
-                  {
-                   "subtitle_order" : 3,
-                   "subtitle_text": "t3",
-                   "subtitle_id": "id3",
-                    'start_time': 5,
-                    'end_time': 6,
-                 },
-
-        ])
-        v1.is_forked = True
-        v1.save()
-        metadata_manager.update_metadata(v.pk)
-        lang = refresh_obj(lang)
-        v1 = lang.version()
-        self.assertEqual(len(v1.subtitles()), 3)
-        self.assertEqual(lang.subtitle_count, 1)
+    def test_language_count(self):
+        video = Video.objects.all()[0]
+        create_langs_and_versions(video, ['en'])
+        metadata_manager.update_metadata(video.pk)
+        video = Video.objects.all()[0]
+        self.assertEqual(video.languages_count, 1)
 
 def _create_trans( video, latest_version=None, lang_code=None, forked=False):
         translation = SubtitleLanguage()
@@ -2346,15 +2201,17 @@ class TestSubtitleMetadata(TestCase):
 
 
 def create_langs_and_versions(video, langs, user=None):
-    versions = []
-    for lang in langs:
-        l, c = SubtitleLanguage.objects.get_or_create(language=lang, video=video, is_forked=True)
-        versions.append(create_version(l))
-    return versions
+    from subtitles import pipeline            
+
+    SRT = u"""1
+00:00:00,004 --> 00:00:02,093
+We\n started <b>Universal Subtitles</b> <i>because</i> we <u>believe</u>
+"""
+    subtitles = babelsubs.load_from(SRT, type='srt', language='en').to_internal()
+    return [pipeline.add_subtitles(video, l, subtitles) for l in langs]
 
 def refresh_obj(m):
     return m.__class__._default_manager.get(pk=m.pk)
-
 
 class FollowTest(WebUseTest):
 
