@@ -183,6 +183,7 @@
                 'click a.amara-transcript-button':     'toggleTranscriptDisplay',
                 'click a.amara-subtitles-button':      'toggleSubtitlesDisplay',
                 'click a.amara-transcript-autoscroll': 'pauseAutoScroll',
+                'click a.amara-transcript-line':       'transcriptLineClicked',
                 //'contextmenu a.amara-transcript-line': 'showTranscriptContextMenu',
 
                 // TODO: This does not work. Why?
@@ -281,7 +282,7 @@
 
             // View methods.
             mouseClicked: function(e) {
-
+                this.hideTranscriptContextMenu();
             },
             mouseMoved: function(e) {
                 this.setCursorPosition(e);
@@ -622,12 +623,14 @@
                 $line.addClass('selected');
 
                 // Create the context menu DOM.
-                _$('body').append('<div class="amara-context-menu"></div>');
+                //
+                // TODO: Use a sensible templating system. Everywhere.
+                _$('body').append('<div class="amara-context-menu"><ul><li><a href="#">Link to this line</a></li></ul></div>');
                 this.$amaraContextMenu = _$('div.amara-context-menu');
 
                 // Position the context menu near the cursor.
-                this.$amaraContextMenu.css('top', this.cursorY + 10);
-                this.$amaraContextMenu.css('left', this.cursorX);
+                this.$amaraContextMenu.css('top', this.cursorY + 11);
+                this.$amaraContextMenu.css('left', this.cursorX + 6);
 
                 // Set the state so we know we have an active context menu.
                 this.states.contextMenuActive = true;
@@ -646,6 +649,10 @@
                 // TODO: This button needs to be disabled unless we have a transcript to toggle.
                 this.$amaraTranscript.toggle();
                 this.$transcriptButton.toggleClass('amara-button-enabled');
+                return false;
+            },
+            transcriptLineClicked: function(e) {
+                this.hideTranscriptContextMenu();
                 return false;
             },
             transcriptScrolled: function() {

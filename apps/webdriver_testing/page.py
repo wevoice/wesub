@@ -34,6 +34,9 @@ class Page(object):
     def close_browser(self):
         self.browser.close()
 
+    def page_refresh(self):
+        self.browser.refresh()
+
     def page_error(self):
         """Return django debug page error information.
 
@@ -285,7 +288,7 @@ class Page(object):
         """Wait for element (by css) present on page, within 20 seconds.
 
         """
-        for i in range(20):
+        for i in range(30):
             try:
                 time.sleep(1)
                 if self.is_element_present(element):

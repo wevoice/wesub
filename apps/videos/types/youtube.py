@@ -43,6 +43,7 @@ YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
 _('Private video')
 _('Undefined error')
 
+
 def get_youtube_service():
     """
     Gets instance of youtube service with the proper developer key
@@ -52,7 +53,9 @@ def get_youtube_service():
     yt_service.ssl = False
     return yt_service
 
+
 yt_service = get_youtube_service()
+
 
 @task
 def save_subtitles_for_lang(lang, video_pk, youtube_id):
@@ -60,7 +63,6 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import Video
     from videos.tasks import video_changed_tasks
     from subtitles.pipeline import add_subtitles
-    import babelsubs
 
     yt_lc = lang.get('lang_code')
     # TODO: Make sure we can store all language data given to us by Youtube.
@@ -95,6 +97,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     add_subtitles(video, lc, subs)
 
     video_changed_tasks.delay(video.pk)
+
 
 class YoutubeVideoType(VideoType):
 
@@ -338,14 +341,16 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the subtitle already exists, will delete it and recreate it.
         This subs should be synced! Else we upload might fail.
         """
-
+        # TODO: The language_code here is in "unisubs" and should be encoded
+        # to bcp47.
         content, title, language_code = \
                 self._prepare_subtitle_data_for_version(subtitle_version)
 
         if hasattr(self, "captions") is False:
             self._get_captions_info()
 
-        # we cant just update, we need to check if it already exists... if so, we delete it
+        # We can't just update a subtitle track in place.  We need to delete
+        # the old one and upload a new one.
         if language_code in self.captions:
             self._delete_track(self.captions[language_code]['track'])
 
@@ -354,7 +359,9 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
                 settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
 
     def _delete_track(self, track):
-        res = self.delete_track(self.youtube_video_id, track, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token)
+        res = self.delete_track(self.youtube_video_id, track,
+                settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET,
+                self.token)
         return res
 
     def delete_subtitles(self, language):
