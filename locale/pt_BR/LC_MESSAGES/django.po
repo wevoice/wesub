@@ -22,8 +22,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-26 01:34-0500\n"
-"PO-Revision-Date: 2012-09-26 07:06+0000\n"
+"POT-Creation-Date: 2012-09-27 01:33-0500\n"
+"PO-Revision-Date: 2012-09-27 06:59+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/universalsubtitles/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -4541,7 +4541,7 @@ msgid "Edit"
 msgstr "Editar"
 
 #: templates/teams/_team_video_detail.html:60
-#: templates/teams/members-list.html:122 templates/teams/videos-list.html:147
+#: templates/teams/members-list.html:122 templates/teams/videos-list.html:148
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
 msgstr "Remover"
@@ -5419,13 +5419,14 @@ msgstr "Remover vídeo"
 msgid "You are removing this video from the %(team)s team."
 msgstr "Você esta removendo esse vídeo da equipe %(team)s."
 
-#: templates/teams/videos-list.html:126 templates/teams/videos-list.html:133
+#: templates/teams/videos-list.html:126
+#, python-format
 msgid ""
-"It will remain on Amara but will no longer be subject to the team's "
-"permissions and worfklows. Any outstanding tasks will be deleted."
+"You are removing this video from the %(team)s team.<br /><br />\n"
+"                                It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted. Private videos will become available for viewing and editing to the general public. Are you sure you want to proceed?"
 msgstr ""
 
-#: templates/teams/videos-list.html:128
+#: templates/teams/videos-list.html:129
 #, python-format
 msgid ""
 "You can choose to remove the video from the %(team)s team or to delete the "
@@ -5433,11 +5434,17 @@ msgid ""
 "like to do?"
 msgstr ""
 
-#: templates/teams/videos-list.html:131
+#: templates/teams/videos-list.html:132
 msgid "Just remove the video from the team."
 msgstr "Apenas remova o vídeo da equipe."
 
-#: templates/teams/videos-list.html:136
+#: templates/teams/videos-list.html:134
+msgid ""
+"It will remain on Amara but will no longer be subject to the team's "
+"permissions and worfklows. Any outstanding tasks will be deleted."
+msgstr ""
+
+#: templates/teams/videos-list.html:137
 msgid "Delete the video entirely."
 msgstr "Deletar o vídeo por completo."
 
