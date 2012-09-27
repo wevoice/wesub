@@ -457,6 +457,8 @@ def detail(request, slug, project_slug=None, languages=None):
     language_choices = [(code, name) for code, name in get_language_choices()
                         if code in readable_langs]
 
+    extra_context['project_choices'] = team.project_set.exclude(name='_root')
+
     extra_context['language_choices'] = language_choices
     extra_context['query'] = query
 
@@ -683,6 +685,7 @@ def activity(request, slug):
     context.update(pagination_info)
 
     return context
+
 
 # Members
 @timefn
@@ -1213,7 +1216,8 @@ def team_tasks(request, slug, project_slug=None):
         'widget_settings': widget_settings,
         'filtered': filtered,
         'member': member,
-        'upload_draft_form': UploadDraftForm(user=request.user)
+        'upload_draft_form': UploadDraftForm(user=request.user),
+        'project_choices': team.project_set.exclude(name='_root'),
     }
 
     context.update(pagination_info)
@@ -1458,6 +1462,7 @@ def download_draft(request, slug, task_pk, type="srt"):
     response['Content-Disposition'] = 'attachment; ' + filename_header
 
     return response
+
 
 # Projects
 def project_list(request, slug):
