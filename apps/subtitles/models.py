@@ -548,23 +548,27 @@ class SubtitleLanguage(models.Model):
 
         return self.subtitleversion_set.all()
 
-    def version(self, public_only=True, version_no=None):
-        """
-        Convinience method to fetch the subtitle set with the given
-        attributes for visibility and version number, returns None
-        if nothing is found
+    def version(self, public_only=True, version_number=None):
+        """Return a SubtitleVersion of this language matching the arguments.
+
+        Returns None if no versions match.
+
         """
         assert self.pk, "Can't find a version for a language that hasn't been saved"
-        args = {'language_code': self.language_code}
-        if version_no:
-            args['version_number'] = version_no
-        base_queryset = SubtitleVersion.objects.all()
-        if public_only:
-            base_queryset = SubtitleVersion.objects.public()
+
+        qs = self.subtitleversion_set
+        qs = qs.public() if public_only else qs.all()
+
+        if version_number != None:
+            qs = qs.filter(version_number=version_number)
+        else:
+            qs = qs.order_by('-version_number')
+
         try:
-            return base_queryset.filter(**args).order_by('-version_number')[:1].get()
+            return qs[:1].get()
         except SubtitleVersion.DoesNotExist:
             return None
+
 
     def get_translation_source_language_code(self):
         """

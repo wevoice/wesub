@@ -151,6 +151,62 @@ class TestSubtitleLanguage(TestCase):
         _assert_tip(False, 6)
         _assert_tip(True, 6)
 
+    def test_get_version(self):
+        # Actually tests the .version() method whose name we should update at
+        # some point to fit with the rest.
+        sl_1_en = make_sl(self.video, 'en')
+        sl_2_en = make_sl(self.video2, 'en')
+        sl_1_fr = make_sl(self.video, 'fr')
+
+        def _assert_version(sl, result, **kwargs):
+            version = sl.version(**kwargs)
+            if not version:
+                actual = None
+            else:
+                actual = (version.language_code, version.version_number)
+            self.assertEqual(result, actual)
+
+        # version() always returns None if there are no versions at all
+        _assert_version(sl_1_en, None)
+        _assert_version(sl_2_en, None)
+        _assert_version(sl_1_fr, None)
+
+        _assert_version(sl_1_en, None, public_only=True)
+        _assert_version(sl_1_en, None, public_only=False)
+        _assert_version(sl_1_en, None, version_number=1)
+
+        # unless you ask for a specific version you get the latest one
+        sl_1_en.add_version(visibility='public')
+        sl_1_en.add_version(visibility='public')
+        sl_2_en.add_version(visibility='public')
+        _assert_version(sl_1_en, ('en', 2))
+        _assert_version(sl_2_en, ('en', 1))
+        _assert_version(sl_1_fr, None)
+
+        # public_only is on by default
+        sl_1_en.add_version(visibility='private')
+        sl_2_en.add_version(visibility='private', visibility_override='public')
+        sl_1_fr.add_version(visibility='public', visibility_override='private')
+        _assert_version(sl_1_en, ('en', 2))
+        _assert_version(sl_2_en, ('en', 2))
+        _assert_version(sl_1_fr, None)
+
+        # but can be turned off
+        _assert_version(sl_1_en, ('en', 3), public_only=False)
+        _assert_version(sl_2_en, ('en', 2), public_only=False)
+        _assert_version(sl_1_fr, ('fr', 1), public_only=False)
+
+        # you can ask for specific versions
+        _assert_version(sl_1_en, ('en', 3), public_only=False, version_number=3)
+        _assert_version(sl_1_en, ('en', 2), public_only=False, version_number=2)
+        _assert_version(sl_1_en, ('en', 1), public_only=False, version_number=1)
+
+        # but they may not be found if they're invalid, or private and you don't
+        # override public_only
+        _assert_version(sl_1_en, None, version_number=0)
+        _assert_version(sl_1_en, None, version_number=3)
+        _assert_version(sl_1_en, None, version_number=2023)
+
 
 class TestSubtitleVersion(TestCase):
     def setUp(self):
