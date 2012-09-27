@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import logging
+logger = logging.getLogger('subtitles_utils')
 import random
 import re
 from itertools import chain
@@ -65,6 +67,8 @@ def strip_tags(text, tags=None):
     try:
         return bleach.clean(text, tags=tags, strip=True)
     except AssertionError:
+        logger.error("Invalid value for bleach clean",
+                    extra={"text": text})
         # sometimes "<None>" are being passed, and bleach will throw
         # an assertion error, see http://sentry.pculture.org:9000/amaraproduction/group/936/
         return ""
