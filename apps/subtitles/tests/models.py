@@ -237,18 +237,30 @@ class TestSubtitleVersion(TestCase):
             return self.sl_en.subtitleversion_set.public().count()
 
         self.assertEqual(3, _count_public())
+        self.assertTrue(sv1.is_public())
+        self.assertFalse(sv1.is_private())
+        self.assertTrue(sv2.is_public())
+        self.assertFalse(sv2.is_private())
+        self.assertTrue(sv3.is_public())
+        self.assertFalse(sv3.is_private())
 
         sv1.visibility = 'private'
         sv1.save()
         self.assertEqual(2, _count_public())
+        self.assertFalse(sv1.is_public())
+        self.assertTrue(sv1.is_private())
 
         sv3.visibility = 'private'
         sv3.save()
         self.assertEqual(1, _count_public())
+        self.assertFalse(sv3.is_public())
+        self.assertTrue(sv3.is_private())
 
         sv2.visibility = 'private'
         sv2.save()
         self.assertEqual(0, _count_public())
+        self.assertFalse(sv2.is_public())
+        self.assertTrue(sv2.is_private())
 
     def test_visibility_override(self):
         """Test the overrided visibility filtering of versions."""
@@ -261,36 +273,48 @@ class TestSubtitleVersion(TestCase):
         # vis     override
         # public  null
         self.assertEqual(1, _count_public())
+        self.assertTrue(sv.is_public())
+        self.assertFalse(sv.is_private())
 
         # vis     override
         # private null
         sv.visibility = 'private'
         sv.save()
         self.assertEqual(0, _count_public())
+        self.assertFalse(sv.is_public())
+        self.assertTrue(sv.is_private())
 
         # vis     override
         # private public
         sv.visibility_override = 'public'
         sv.save()
         self.assertEqual(1, _count_public())
+        self.assertTrue(sv.is_public())
+        self.assertFalse(sv.is_private())
 
         # vis     override
         # public  public
         sv.visibility = 'public'
         sv.save()
         self.assertEqual(1, _count_public())
+        self.assertTrue(sv.is_public())
+        self.assertFalse(sv.is_private())
 
         # vis     override
         # public  private
         sv.visibility_override = 'private'
         sv.save()
         self.assertEqual(0, _count_public())
+        self.assertFalse(sv.is_public())
+        self.assertTrue(sv.is_private())
 
         # vis     override
         # private private
         sv.visibility = 'private'
         sv.save()
         self.assertEqual(0, _count_public())
+        self.assertFalse(sv.is_public())
+        self.assertTrue(sv.is_private())
 
     def test_text_time_change(self):
         subtitles_1 = [

@@ -883,6 +883,23 @@ class SubtitleVersion(models.Model):
         return time_change, text_change
 
 
+    def is_private(self):
+        if self.visibility_override == 'public':
+            return False
+        elif self.visibility_override == 'private':
+            return True
+        else:
+            return self.visibility == 'private'
+
+    def is_public(self):
+        if self.visibility_override == 'public':
+            return True
+        elif self.visibility_override == 'private':
+            return False
+        else:
+            return self.visibility == 'public'
+
+
 # Collaborators ---------------------------------------------------------------
 class CollaboratorManager(models.Manager):
     def get_for(self, subtitle_language):
