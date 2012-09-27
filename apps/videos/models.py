@@ -519,7 +519,8 @@ class Video(models.Model):
         """
         if not hasattr(self, '_original_subtitle'):
             try:
-                original = self.subtitlelanguage_set.filter(is_original=True)[:1].get()
+                original = self.newsubtitlelanguage_set \
+                            .filter(language_code=self.primary_audio_language_code)[:1].get()
             except models.ObjectDoesNotExist:
                 original = None
 
@@ -555,8 +556,9 @@ class Video(models.Model):
             if language_code is None:
                 return self._original_subtitle_language()
             else:
-                return self.subtitlelanguage_set.filter(
-                    language=language_code).order_by('-subtitle_count')[:1].get()
+                return (self.newsubtitlelanguage_set
+                                .having_nonempty_tip()
+                                .filter(language_code=language_code)[:1].get())
         except models.ObjectDoesNotExist:
             return None
 
