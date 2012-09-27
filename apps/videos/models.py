@@ -585,7 +585,9 @@ class Video(models.Model):
         """
         if language is None:
             language = self.subtitle_language()
-        return None if language is None else language.version(version_no=version_no, public_only=public_only)
+        return (None if language is None else
+                language.version(version_number=version_no,
+                                 public_only=public_only))
 
     def latest_version(self, language_code=None, public_only=True):
         """Return the latest SubtitleVersion for this video matching the given criteria.

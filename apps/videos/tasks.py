@@ -224,7 +224,7 @@ def _send_notification(version_id):
         return
 
     # if version.result_of_rollback or not version.is_public:
-    if version.visibility == 'private':
+    if version.is_private():
         return
 
     if version.version_number == 0 and not version.language.is_primary_audio_language():

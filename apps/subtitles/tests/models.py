@@ -151,6 +151,62 @@ class TestSubtitleLanguage(TestCase):
         _assert_tip(False, 6)
         _assert_tip(True, 6)
 
+    def test_get_version(self):
+        # Actually tests the .version() method whose name we should update at
+        # some point to fit with the rest.
+        sl_1_en = make_sl(self.video, 'en')
+        sl_2_en = make_sl(self.video2, 'en')
+        sl_1_fr = make_sl(self.video, 'fr')
+
+        def _assert_version(sl, result, **kwargs):
+            version = sl.version(**kwargs)
+            if not version:
+                actual = None
+            else:
+                actual = (version.language_code, version.version_number)
+            self.assertEqual(result, actual)
+
+        # version() always returns None if there are no versions at all
+        _assert_version(sl_1_en, None)
+        _assert_version(sl_2_en, None)
+        _assert_version(sl_1_fr, None)
+
+        _assert_version(sl_1_en, None, public_only=True)
+        _assert_version(sl_1_en, None, public_only=False)
+        _assert_version(sl_1_en, None, version_number=1)
+
+        # unless you ask for a specific version you get the latest one
+        sl_1_en.add_version(visibility='public')
+        sl_1_en.add_version(visibility='public')
+        sl_2_en.add_version(visibility='public')
+        _assert_version(sl_1_en, ('en', 2))
+        _assert_version(sl_2_en, ('en', 1))
+        _assert_version(sl_1_fr, None)
+
+        # public_only is on by default
+        sl_1_en.add_version(visibility='private')
+        sl_2_en.add_version(visibility='private', visibility_override='public')
+        sl_1_fr.add_version(visibility='public', visibility_override='private')
+        _assert_version(sl_1_en, ('en', 2))
+        _assert_version(sl_2_en, ('en', 2))
+        _assert_version(sl_1_fr, None)
+
+        # but can be turned off
+        _assert_version(sl_1_en, ('en', 3), public_only=False)
+        _assert_version(sl_2_en, ('en', 2), public_only=False)
+        _assert_version(sl_1_fr, ('fr', 1), public_only=False)
+
+        # you can ask for specific versions
+        _assert_version(sl_1_en, ('en', 3), public_only=False, version_number=3)
+        _assert_version(sl_1_en, ('en', 2), public_only=False, version_number=2)
+        _assert_version(sl_1_en, ('en', 1), public_only=False, version_number=1)
+
+        # but they may not be found if they're invalid, or private and you don't
+        # override public_only
+        _assert_version(sl_1_en, None, version_number=0)
+        _assert_version(sl_1_en, None, version_number=3)
+        _assert_version(sl_1_en, None, version_number=2023)
+
 
 class TestSubtitleVersion(TestCase):
     def setUp(self):
@@ -237,18 +293,30 @@ class TestSubtitleVersion(TestCase):
             return self.sl_en.subtitleversion_set.public().count()
 
         self.assertEqual(3, _count_public())
+        self.assertTrue(sv1.is_public())
+        self.assertFalse(sv1.is_private())
+        self.assertTrue(sv2.is_public())
+        self.assertFalse(sv2.is_private())
+        self.assertTrue(sv3.is_public())
+        self.assertFalse(sv3.is_private())
 
         sv1.visibility = 'private'
         sv1.save()
         self.assertEqual(2, _count_public())
+        self.assertFalse(sv1.is_public())
+        self.assertTrue(sv1.is_private())
 
         sv3.visibility = 'private'
         sv3.save()
         self.assertEqual(1, _count_public())
+        self.assertFalse(sv3.is_public())
+        self.assertTrue(sv3.is_private())
 
         sv2.visibility = 'private'
         sv2.save()
         self.assertEqual(0, _count_public())
+        self.assertFalse(sv2.is_public())
+        self.assertTrue(sv2.is_private())
 
     def test_visibility_override(self):
         """Test the overrided visibility filtering of versions."""
@@ -261,36 +329,48 @@ class TestSubtitleVersion(TestCase):
         # vis     override
         # public  null
         self.assertEqual(1, _count_public())
+        self.assertTrue(sv.is_public())
+        self.assertFalse(sv.is_private())
 
         # vis     override
         # private null
         sv.visibility = 'private'
         sv.save()
         self.assertEqual(0, _count_public())
+        self.assertFalse(sv.is_public())
+        self.assertTrue(sv.is_private())
 
         # vis     override
         # private public
         sv.visibility_override = 'public'
         sv.save()
         self.assertEqual(1, _count_public())
+        self.assertTrue(sv.is_public())
+        self.assertFalse(sv.is_private())
 
         # vis     override
         # public  public
         sv.visibility = 'public'
         sv.save()
         self.assertEqual(1, _count_public())
+        self.assertTrue(sv.is_public())
+        self.assertFalse(sv.is_private())
 
         # vis     override
         # public  private
         sv.visibility_override = 'private'
         sv.save()
         self.assertEqual(0, _count_public())
+        self.assertFalse(sv.is_public())
+        self.assertTrue(sv.is_private())
 
         # vis     override
         # private private
         sv.visibility = 'private'
         sv.save()
         self.assertEqual(0, _count_public())
+        self.assertFalse(sv.is_public())
+        self.assertTrue(sv.is_private())
 
     def test_text_time_change(self):
         subtitles_1 = [

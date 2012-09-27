@@ -548,23 +548,27 @@ class SubtitleLanguage(models.Model):
 
         return self.subtitleversion_set.all()
 
-    def version(self, public_only=True, version_no=None):
-        """
-        Convinience method to fetch the subtitle set with the given
-        attributes for visibility and version number, returns None
-        if nothing is found
+    def version(self, public_only=True, version_number=None):
+        """Return a SubtitleVersion of this language matching the arguments.
+
+        Returns None if no versions match.
+
         """
         assert self.pk, "Can't find a version for a language that hasn't been saved"
-        args = {'language_code': self.language_code}
-        if version_no:
-            args['version_number'] = version_no
-        base_queryset = SubtitleVersion.objects.all()
-        if public_only:
-            base_queryset = SubtitleVersion.objects.public()
+
+        qs = self.subtitleversion_set
+        qs = qs.public() if public_only else qs.all()
+
+        if version_number != None:
+            qs = qs.filter(version_number=version_number)
+        else:
+            qs = qs.order_by('-version_number')
+
         try:
-            return base_queryset.filter(**args).order_by('-version_number')[:1].get()
+            return qs[:1].get()
         except SubtitleVersion.DoesNotExist:
             return None
+
 
     def get_translation_source_language_code(self):
         """
@@ -642,6 +646,9 @@ class SubtitleVersion(models.Model):
     subtitle_language = models.ForeignKey(SubtitleLanguage)
     language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
 
+    # If you just want to *check* the visibility of a version you probably want
+    # to use the is_public and is_private methods instead, which handle the
+    # logic of visibility + visibility_override.
     visibility = models.CharField(max_length=10,
                                   choices=(('public', 'public'),
                                            ('private', 'private')),
@@ -746,7 +753,8 @@ class SubtitleVersion(models.Model):
     lineage = property(get_lineage, set_lineage)
 
     class Meta:
-        unique_together = [('video', 'language_code', 'version_number')]
+        unique_together = [('video', 'subtitle_language', 'version_number'),
+                           ('video', 'language_code', 'version_number')]
 
 
     def __init__(self, *args, **kwargs):
@@ -881,6 +889,23 @@ class SubtitleVersion(models.Model):
         self._time_change = time_change
 
         return time_change, text_change
+
+
+    def is_private(self):
+        if self.visibility_override == 'public':
+            return False
+        elif self.visibility_override == 'private':
+            return True
+        else:
+            return self.visibility == 'private'
+
+    def is_public(self):
+        if self.visibility_override == 'public':
+            return True
+        elif self.visibility_override == 'private':
+            return False
+        else:
+            return self.visibility == 'public'
 
 
 # Collaborators ---------------------------------------------------------------
