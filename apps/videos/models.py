@@ -619,7 +619,7 @@ class Video(models.Model):
             return version.get_subtitles()
         else:
             language = language.language_code if language else self.primary_audio_language_code
-            return storage.SubtitleSet(language=language)
+            return storage.SubtitleSet(language)
 
     def latest_subtitles(self, language_code=None, public_only=True):
         version = self.latest_version(language_code, public_only=public_only)
