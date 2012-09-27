@@ -624,7 +624,7 @@ class SubtitleVersion(models.Model):
     """
     parents = models.ManyToManyField('self', symmetrical=False, blank=True)
 
-    video = models.ForeignKey(Video)
+    video = models.ForeignKey(Video, related_name='newsubtitleversion_set')
     subtitle_language = models.ForeignKey(SubtitleLanguage)
     language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
 
