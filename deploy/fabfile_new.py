@@ -165,6 +165,7 @@ def lock_required(f):
     return decorated
 
 @task
+@roles('app', 'data')
 def remove_lock():
     """
     Removes lock from hosts (in the event of a failed task)
@@ -211,6 +212,7 @@ def _create_env(username,
     env.roledefs = roledefs
     env.deploy_lock = '/tmp/.amara_deploy_{0}'.format(revision)
     env.notification_email = notification_email or 'universalsubtitles-dev@pculture.org'
+    env.password = os.environ.get('FABRIC_PASSWORD', None)
 
 @task
 def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
@@ -285,6 +287,36 @@ def staging(username):
                             'app-01-staging.amara.org',
                         ],
                         'data': ['data-00-staging.amara.org'],
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
+
+@task
+def production(username):
+    """
+    Configure task(s) to run in the production environment
+
+    """
+    with Output("Configuring task(s) to run on PRODUCTION"):
+        env_name = 'production'
+        _create_env(username              = username,
+                    name                  = env_name,
+                    s3_bucket             = None,
+                    app_name              = 'unisubs',
+                    app_dir               = '/opt/apps/{0}/unisubs/'.format(
+                        env_name),
+                    app_group             = 'deploy',
+                    revision              = env_name,
+                    ve_dir                = '/opt/ve/{0}/unisubs'.format(
+                        env_name),
+                    separate_uslogging_db = False,
+                    roledefs              = {
+                        'app': [
+                            'app-00-production.amara.org',
+                            'app-01-production.amara.org',
+                            'app-02-production.amara.org',
+                            'app-03-production.amara.org',
+                        ],
+                        'data': ['data-00-production.amara.org'],
                     },
                     notification_email   = 'ehazlett@pculture.org',)
 
@@ -497,7 +529,6 @@ def migrate(app_name='', extra=''):
 
 @task
 @lock_required
-@parallel
 @roles('app', 'data')
 def update_environment(extra=''):
     with Output('Updating environment'):
@@ -510,10 +541,7 @@ def update_environment(extra=''):
         with cd(env.app_dir):
             run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
 
-@task
-@parallel
-@roles('app')
-def reload_app_servers(hard=False):
+def _reload_app_servers(hard=False):
     with Output("Reloading application servers"):
         """
         Reloading the app server will both make sure we have a
@@ -528,23 +556,35 @@ def reload_app_servers(hard=False):
                 #run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
                 run('touch deploy/unisubs.wsgi')
 
+@task
+@roles('app')
+def reload_app_servers(hard=False):
+    _reload_app_servers(hard)
+
 # Maintenance Mode
 @task
-@parallel
 @roles('app')
 def add_disabled():
     with Output("Putting the site into maintenance mode"):
         run('touch {0}/disabled'.format(env.app_dir))
 
 @task
-@parallel
 @roles('app')
 def remove_disabled():
     with Output("Taking the site out of maintenance mode"):
         run('rm {0}/disabled'.format(env.app_dir))
 
+def _update_integration(run_as_sudo=True, branch=None):
+    branch = branch if branch is not None else env.revision
+    with Output("Updating nested unisubs-integration repositories"):
+        with cd(os.path.join(env.app_dir, 'unisubs-integration')), \
+            settings(warn_only=True):
+            _git_checkout_branch_and_reset(
+                _get_optional_repo_version(env.app_dir, 'unisubs-integration'),
+                branch=branch,
+                run_as_sudo=run_as_sudo
+            )
 @task
-@parallel
 @roles('app', 'data')
 def update_integration(run_as_sudo=True, branch=None):
     '''Update the integration repo to the version recorded in the site repo.
@@ -557,15 +597,7 @@ def update_integration(run_as_sudo=True, branch=None):
     TODO: Run this from update_web automatically
 
     '''
-    branch = branch if branch is not None else env.revision
-    with Output("Updating nested unisubs-integration repositories"):
-        with cd(os.path.join(env.app_dir, 'unisubs-integration')), \
-            settings(warn_only=True):
-            _git_checkout_branch_and_reset(
-                _get_optional_repo_version(env.app_dir, 'unisubs-integration'),
-                branch=branch,
-                run_as_sudo=run_as_sudo
-            )
+    _update_integration(run_as_sudo, branch)
 
 @task
 @lock_required
@@ -582,7 +614,7 @@ def update_solr_schema():
         python_exe = '{0}/bin/python'.format(env.ve_dir)
         with cd(env.app_dir):
             _git_pull()
-            run('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
+            sudo('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
                     python_exe,
                     env.environment))
             run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
@@ -616,28 +648,22 @@ def update_solr_schema():
 
         run(cmd, pty=False)
 
+def _bounce_memcached():
+    with Output("Bouncing memcached"):
+        sudo('service memcached stop')
+        sudo('service memcached start')
+
 @task
-@parallel
-@roles('app')
+@roles('app', 'data')
 def bounce_memcached():
     '''Bounce memcached (purging the cache).
 
     Should be done at the end of each deploy.
 
     '''
-    with Output("Bouncing memcached"):
-        sudo('service memcached stop')
-        sudo('service memcached start')
+    _bounce_memcached()
 
-@task
-@parallel
-@roles('data')
-def bounce_celery():
-    '''Bounce celery daemons.
-
-    Should be done at the end of each deploy.
-
-    '''
+def _bounce_celery():
     with Output("Bouncing celeryd"):
         with settings(warn_only=True):
             sudo('service celeryd.{0} stop'.format(env.environment))
@@ -646,6 +672,33 @@ def bounce_celery():
         with settings(warn_only=True):
             sudo('service celerycam.{0} stop'.format(env.environment))
             sudo('service celerycam.{0} start'.format(env.environment))
+
+@task
+@roles('data')
+def bounce_celery():
+    '''Bounce celery daemons.
+
+    Should be done at the end of each deploy.
+
+    '''
+    _bounce_celery()
+
+def _deploy(branch=None, integration_branch=None, skip_celery=False):
+    with Output("Updating the main unisubs repo"), cd(env.app_dir):
+        if branch:
+            _switch_branch(branch)
+        else:
+            _git_pull()
+    with Output("Updating integration repo"):
+        execute(_update_integration, branch=integration_branch)
+        with cd(env.app_dir):
+            with settings(warn_only=True):
+                run("find . -name '*.pyc' -delete")
+    if skip_celery == False:
+        execute(_bounce_celery)
+    execute(_bounce_memcached)
+    ##test_services()
+    execute(_reload_app_servers)
 
 @task
 @lock_required
@@ -664,26 +717,10 @@ def deploy(branch=None, integration_branch=None, skip_celery=False):
     any failure on these steps need to be fixed or will result in
     breakage
     """
-    with Output("Updating the main unisubs repo"), cd(env.app_dir):
-        if branch:
-            _switch_branch(branch)
-        else:
-            _git_pull()
-
-    with Output("Updating integration repo"):
-        execute(update_integration, branch=integration_branch)
-        with cd(env.app_dir):
-            with settings(warn_only=True):
-                run("find . -name '*.pyc' -delete")
-
-    if skip_celery == False:
-        execute(bounce_celery)
-    execute(bounce_memcached)
-    #test_services()
-    execute(reload_app_servers)
-
+    _deploy(branch, integration_branch, skip_celery)
+    _deploy(branch, integration_branch, skip_celery)
     #if env.environment not in ['dev']:
-    _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user,  environment, datetime.utcnow()))
+    _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user, env.environment, datetime.utcnow()))
 
 @task
 @lock_required
@@ -720,7 +757,7 @@ def update_django_admin_media():
 
     """
     with Output("Uploading Django admin media"):
-        media_dir = '{0}/lib/python2.6/site-packages/django/contrib/admin/media/'.format(env.ve_dir)
+        media_dir = '{0}/lib/python2.6/site-packages/django/contrib/admin/static/media/'.format(env.ve_dir)
         python_exe = '{0}/bin/python'.format(env.ve_dir)
         s3_bucket = 's3.{0}.amara.org/admin/'.format(env.environment)
         sudo('s3cmd -P -c /etc/s3cfg sync {0} s3://{1}'.format(media_dir, s3_bucket))
@@ -748,7 +785,6 @@ def _switch_branch(branch):
         run('git checkout {0}'.format(branch))
         _git_pull()
 @task
-@parallel
 @roles('app', 'data')
 def switch_branch(branch):
     """

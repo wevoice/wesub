@@ -120,7 +120,6 @@ def video_changed_tasks(video_pk, new_version_id=None):
     if new_version_id is not None:
         _send_notification(new_version_id)
         _check_alarm(new_version_id)
-        _detect_language(new_version_id)
         _update_captions_in_original_service(new_version_id)
 
     video = Video.objects.get(pk=video_pk)
@@ -224,19 +223,18 @@ def _send_notification(version_id):
     except SubtitleVersion.DoesNotExist:
         return
 
-    if version.result_of_rollback or not version.is_public:
+    # if version.result_of_rollback or not version.is_public:
+    if version.visibility == 'private':
         return
 
-    version.notification_sent = True
-    version.save()
-    if version.version_no == 0 and not version.language.is_original:
+    if version.version_number == 0 and not version.language.is_primary_audio_language():
         _send_letter_translation_start(version)
     else:
-        if version.text_change or version.time_change:
+        time_change, text_change = version.get_changes()
+        if text_change or time_change:
             _send_letter_caption(version)
 
 def _check_alarm(version_id):
-    from videos.models import SubtitleVersion
     from videos import alarms
 
     try:
@@ -246,31 +244,6 @@ def _check_alarm(version_id):
 
     alarms.check_other_languages_changes(version)
     alarms.check_language_name(version)
-
-def _detect_language(version_id):
-    from videos.models import SubtitleVersion, SubtitleLanguage
-
-    try:
-        version = SubtitleVersion.objects.get(id=version_id)
-    except SubtitleVersion.DoesNotExist:
-        return
-
-    language = version.language
-    if language.is_original and not language.language:
-        url = 'http://ajax.googleapis.com/ajax/services/language/detect?v=1.0&q=%s'
-        text = ''
-        for item in version.subtitles():
-            text += ' %s' % item.text
-            if len(text) >= 300:
-                break
-        r = json.loads(urllib.urlopen(url % urlquote_plus(text)).read())
-        status = r['responseStatus']
-        if r and not 'error' in r and status != 403:
-            try:
-                SubtitleLanguage.objects.get(video=language.video, language=r['responseData']['language'])
-            except SubtitleLanguage.DoesNotExist:
-                language.language = r['responseData']['language']
-                language.save()
 
 def _send_letter_translation_start(translation_version):
     domain = Site.objects.get_current().domain
