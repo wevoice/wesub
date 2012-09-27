@@ -243,7 +243,6 @@ def _check_alarm(version_id):
         return
 
     alarms.check_other_languages_changes(version)
-    alarms.check_language_name(version)
 
 def _send_letter_translation_start(translation_version):
     domain = Site.objects.get_current().domain
