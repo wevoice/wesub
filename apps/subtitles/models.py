@@ -295,9 +295,17 @@ class SubtitleLanguage(models.Model):
     of the actual data for the subtitles is stored in the version themselves.
 
     """
+    # Basic Data
     video = models.ForeignKey(Video, related_name='newsubtitlelanguage_set')
     language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
+    created = models.DateTimeField(editable=False)
 
+    # Should be True if the latest version for this set of subtitles covers all
+    # of the video, False otherwise.  This is set and handled entirely
+    # independently of versions though.
+    subtitles_complete = models.BooleanField(default=False)
+
+    # Writelocking
     writelock_time = models.DateTimeField(null=True, blank=True,
                                           editable=False)
     writelock_owner = models.ForeignKey(User, null=True, blank=True,
@@ -306,12 +314,16 @@ class SubtitleLanguage(models.Model):
     writelock_session_key = models.CharField(max_length=255, blank=True,
                                              editable=False)
 
-    created = models.DateTimeField(editable=False)
-
     # Denormalized signoff/collaborator count fields.
-    # These are stored here for speed of retrieval and filtering.  They are
-    # updated in the update_signoff_counts() method, which is called from the
-    # Collaborator .save() method.
+    # These are stored here for speed of retrieval and filtering.
+    #
+    # They are updated in the update_signoff_counts() method, which is called
+    # from the Collaborator .save() method.
+    #
+    # I'd really like to reconsider whether we need these when we actually start
+    # using them.  If we can use some SQL magic in a manager to avoid the
+    # denormalized fields but still have speedy queries I'd prefer that to
+    # having to make sure these are properly synced.
     unofficial_signoff_count = models.PositiveIntegerField(default=0,
                                                            editable=False)
     official_signoff_count = models.PositiveIntegerField(default=0,
@@ -323,8 +335,10 @@ class SubtitleLanguage(models.Model):
     pending_signoff_expired_count = models.PositiveIntegerField(default=0,
                                                                 editable=False)
 
+    # Statistics
     subtitles_fetched_counter = RedisSimpleField()
 
+    # Manager
     objects = SubtitleLanguageManager()
 
     class Meta:
