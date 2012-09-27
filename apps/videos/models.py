@@ -567,7 +567,7 @@ class Video(models.Model):
         """Return all SubtitleLanguages for this video with the given language code."""
         return self.subtitlelanguage_set.filter(language=language_code)
 
-    def version(self, version_no=None, language=None, public_only=True):
+    def version(self, version_number=None, language=None, public_only=True):
         """Return the SubtitleVersion for this video matching the given criteria.
 
         If language is given (it must be a SubtitleLanguage, NOT a string
@@ -585,7 +585,8 @@ class Video(models.Model):
         """
         if language is None:
             language = self.subtitle_language()
-        return None if language is None else language.version(version_no=version_no, public_only=public_only)
+        return None if language is None else language.version(version_number=version_number,
+                                                              public_only=public_only)
 
     def latest_version(self, language_code=None, public_only=True):
         """Return the latest SubtitleVersion for this video matching the given criteria.
@@ -604,7 +605,7 @@ class Video(models.Model):
         language = self.subtitle_language(language_code)
         return None if language is None else language.get_tip(public=public_only)
 
-    def subtitles(self, version_no=None, language_code=None, language_pk=None):
+    def subtitles(self, version_number=None, language_code=None, language_pk=None):
         if language_pk is None:
             language = self.subtitle_language(language_code)
         else:
@@ -613,13 +614,13 @@ class Video(models.Model):
             except models.ObjectDoesNotExist:
                 language = None
 
-        version = self.version(version_no, language)
+        version = self.version(version_number, language)
 
         if version:
             return version.get_subtitles()
         else:
-            language = language.language_code if language else self.primary_audio_language_code
-            return storage.SubtitleSet(language)
+            language_code = language.language_code if language else self.primary_audio_language_code
+            return storage.SubtitleSet(language_code)
 
     def latest_subtitles(self, language_code=None, public_only=True):
         version = self.latest_version(language_code, public_only=public_only)
