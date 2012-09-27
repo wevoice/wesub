@@ -423,7 +423,7 @@ class TeamsTest(TestCase):
         video.is_public = False
         video.moderated_by = team
         video.save()
-        langs = ["en" ,"es", 'fr', 'pt_br']
+        langs = ["en" ,"es", 'fr', 'pt-br']
         versions = create_langs_and_versions(video, langs)
         for v in versions:
             v.moderation_status = MODERATION.WAITING_MODERATION
@@ -437,7 +437,7 @@ class TeamsTest(TestCase):
         for lang in langs:
             l = video.subtitle_language(lang)
             self.assertTrue(l.version())
-            self.assertTrue(l.has_version)
+            self.assertTrue(l.get_num_versions())
         self.assertTrue(video.is_public)
         self.assertEqual(video.moderated_by, None)
 
