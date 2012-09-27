@@ -115,6 +115,42 @@ class TestSubtitleLanguage(TestCase):
         self.assertEqual(translated.get_translation_source_language(), source_lang)
         self.assertEqual(translated.get_translation_source_language_code(), source_lang.language_code)
 
+    def test_get_tip(self):
+        sl = make_sl(self.video, 'en')
+
+        def _assert_tip(public, version_number):
+            tip = sl.get_tip(public=public)
+            if tip:
+                tip = tip.version_number
+            self.assertEqual(tip, version_number)
+
+        _assert_tip(False, None)
+        _assert_tip(True, None)
+
+        sl.add_version(visibility='private')
+        _assert_tip(False, 1)
+        _assert_tip(True, None)
+
+        sl.add_version()
+        _assert_tip(False, 2)
+        _assert_tip(True, 2)
+
+        sl.add_version(visibility='public', visibility_override='private')
+        _assert_tip(False, 3)
+        _assert_tip(True, 2)
+
+        sl.add_version(visibility='private', visibility_override='private')
+        _assert_tip(False, 4)
+        _assert_tip(True, 2)
+
+        sl.add_version(visibility='private', visibility_override='public')
+        _assert_tip(False, 5)
+        _assert_tip(True, 5)
+
+        sl.add_version(visibility='public', visibility_override='public')
+        _assert_tip(False, 6)
+        _assert_tip(True, 6)
+
 
 class TestSubtitleVersion(TestCase):
     def setUp(self):
