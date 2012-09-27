@@ -16,9 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from teams.models import TeamVideo
 from datetime import datetime
-from utils.metrics import Meter, Timer
+from utils.metrics import Timer
 
 def update_metadata(video_pk):
     from videos.models import Video
@@ -46,7 +45,7 @@ def _update_is_was_subtitled(video):
             video.save()
 
 def _update_languages_count(video):
-    video.languages_count = video.subtitlelanguage_set.filter(had_version=True, has_version=True).count()
+    video.languages_count = video.newsubtitlelanguage_set.having_nonempty_tip().count()
     video.save()
 
 def _update_complete_date(video):
@@ -61,7 +60,6 @@ def _update_complete_date(video):
 def _invalidate_cache(video):
     from widget import video_cache
     video_cache.invalidate_cache(video.video_id)
-
 
 def _update_is_public(video):
     team_video = video.get_team_video()
