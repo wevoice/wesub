@@ -62,7 +62,12 @@ def strip_tags(text, tags=None):
         tags = DEFAULT_ALLOWED_TAGS
     if text is None:
         return ""
-    return bleach.clean(text, tags=tags, strip=True)
+    try:
+        return bleach.clean(text, tags=tags, strip=True)
+    except AssertionError:
+        # sometimes "<None>" are being passed, and bleach will throw
+        # an assertion error, see http://sentry.pculture.org:9000/amaraproduction/group/936/
+        return ""
     
 def save_subtitle(video, language, parser, user=None, update_video=True,
                   forks=True, as_forked=True, translated_from=None):
