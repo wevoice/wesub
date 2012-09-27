@@ -123,6 +123,11 @@ def is_rtl(lang):
     if lang in ('arq', 'pnb',):
         return True
 
+    # Forcing Azerbaijani to be a left-to-right language.
+    # For: https://unisubs.sifterapp.com/projects/12298/issues/753035/comments 
+    if lang == 'az':
+        return False
+
     try:
         return get_language_info(lang)['bidi']
     except KeyError:

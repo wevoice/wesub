@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-25 01:33-0500\n"
-"PO-Revision-Date: 2012-09-25 06:58+0000\n"
+"POT-Creation-Date: 2012-09-27 01:33-0500\n"
+"PO-Revision-Date: 2012-09-27 06:59+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/universalsubtitles/language/lv_LV/)\n"
 "MIME-Version: 1.0\n"
@@ -309,7 +309,7 @@ msgstr "Apstipriniet jauno paroli:"
 
 #: apps/profiles/forms.py:165
 msgid "Invalid password."
-msgstr "Parole nav pareiza."
+msgstr "Nederīga parole."
 
 #: apps/profiles/forms.py:167
 msgid "The two passwords did not match."
@@ -561,7 +561,7 @@ msgstr "Jūs nevarat veikt šo uzdevumu."
 
 #: apps/teams/forms.py:634 apps/videos/forms.py:193
 msgid "Invalid language to translate from."
-msgstr ""
+msgstr "Nederīga valoda, no kuras tulkot."
 
 #: apps/teams/forms.py:643 apps/videos/forms.py:70 apps/videos/forms.py:88
 #: apps/videos/forms.py:202
@@ -586,7 +586,7 @@ msgstr "Nepareizs subtitru formāts"
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
-msgstr ""
+msgstr "Atvainojiet, mums neizdevās augšupielādēt Jūsu datni, jo tajā ir mazāk rindiņas ({0}), nekā iepriekšējā versijā ({1})."
 
 #: apps/teams/forms.py:747 apps/videos/forms.py:323
 msgid ""
@@ -788,7 +788,7 @@ msgstr "Jūsu pieteikums ir ticis noraidīts."
 
 #: apps/teams/rpc.py:62
 msgid "You have been removed from this team."
-msgstr ""
+msgstr "Jūs esat ticis noņemts no šīs komandas."
 
 #: apps/teams/rpc.py:67
 msgid "Your application has been approved. You are now a member of this team"
@@ -945,7 +945,7 @@ msgstr "Pieteikums nepastāv."
 
 #: apps/teams/views.py:812 apps/teams/views.py:833
 msgid "Application already processed."
-msgstr ""
+msgstr "Pieteikums jau apstrādāts."
 
 #: apps/teams/views.py:814
 msgid "You can't approve applications."
@@ -1480,7 +1480,7 @@ msgstr "Sveiki, apskatieties šo video %(video_title)s un palīdzēt tam izveido
 #: apps/videos/share_utils.py:75
 #, python-format
 msgid "%(language)s subtitles for %(video)s:"
-msgstr "%(language)s subtitri %(video)s:"
+msgstr "%(language)ss subtitri %(video)s:"
 
 #: apps/videos/share_utils.py:80
 #, python-format
@@ -1559,11 +1559,11 @@ msgid ""
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "Lūdzu, pamēģiniet vēlreiz ar video lapas saiti\n                        <a href=\"mailto:%s\">Sazinieties ar mums</a>, ja rodas kāda problēma."
 
-#: apps/videos/types/youtube.py:47
+#: apps/videos/types/youtube.py:43
 msgid "Private video"
 msgstr "Privāts video"
 
-#: apps/videos/types/youtube.py:48
+#: apps/videos/types/youtube.py:44
 msgid "Undefined error"
 msgstr "Nenoteikta kļūda"
 
@@ -1725,7 +1725,7 @@ msgstr "Doties"
 #: templates/teams/tasks.html:199 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:69
 msgid "Original"
-msgstr "Oriģināls"
+msgstr "oriģinālos"
 
 #: libs/rosetta/templates/rosetta/pofile.html:58
 msgid "Occurrences(s)"
@@ -1772,966 +1772,6 @@ msgid_plural "%(hits)s/%(message_number)s messages"
 msgstr[0] "%(hits)s/%(message_number)s ziņojumi"
 msgstr[1] "%(hits)s/%(message_number)s ziņojums"
 msgstr[2] "%(hits)s/%(message_number)s ziņojumi"
-
-#: libs/unilangs/unilangs.py:123
-msgid "Afar"
-msgstr "afāru valoda"
-
-#: libs/unilangs/unilangs.py:124
-msgid "Abkhazian"
-msgstr "abhāziešu valoda"
-
-#: libs/unilangs/unilangs.py:125
-msgid "Avestan"
-msgstr "avesta"
-
-#: libs/unilangs/unilangs.py:126
-msgid "Afrikaans"
-msgstr "afrikandu valoda"
-
-#: libs/unilangs/unilangs.py:127
-msgid "Akan"
-msgstr "akanu valoda"
-
-#: libs/unilangs/unilangs.py:128
-msgid "Amharic"
-msgstr "amharu valoda"
-
-#: libs/unilangs/unilangs.py:129
-msgid "Aragonese"
-msgstr "argoņu valoda"
-
-#: libs/unilangs/unilangs.py:130
-msgid "Arabic"
-msgstr "arābu valoda"
-
-#: libs/unilangs/unilangs.py:131
-msgid "Algerian Arabic"
-msgstr "alžīriešu arābu valoda"
-
-#: libs/unilangs/unilangs.py:132
-msgid "Assamese"
-msgstr "asamiešu valoda"
-
-#: libs/unilangs/unilangs.py:133
-msgid "American Sign Language"
-msgstr "amerikāņu zīmju valoda"
-
-#: libs/unilangs/unilangs.py:134
-msgid "Asturian"
-msgstr "astūriešu valoda"
-
-#: libs/unilangs/unilangs.py:135
-msgid "Avaric"
-msgstr "avāru valoda"
-
-#: libs/unilangs/unilangs.py:136
-msgid "Aymara"
-msgstr "aimaru valoda"
-
-#: libs/unilangs/unilangs.py:137
-msgid "Azerbaijani"
-msgstr "azerbaidžāņu valoda"
-
-#: libs/unilangs/unilangs.py:138
-msgid "Bashkir"
-msgstr "baškīru valoda"
-
-#: libs/unilangs/unilangs.py:139
-msgid "Bambara"
-msgstr "bambaru valoda"
-
-#: libs/unilangs/unilangs.py:140
-msgid "Belarusian"
-msgstr "baltkrievu valoda"
-
-#: libs/unilangs/unilangs.py:141
-msgid "Berber"
-msgstr "berberu valoda"
-
-#: libs/unilangs/unilangs.py:142
-msgid "Bulgarian"
-msgstr "bulgāru valoda"
-
-#: libs/unilangs/unilangs.py:143
-msgid "Bihari"
-msgstr "bihāri valoda"
-
-#: libs/unilangs/unilangs.py:144
-msgid "Bislama"
-msgstr "Bislama"
-
-#: libs/unilangs/unilangs.py:145
-msgid "Bengali"
-msgstr "bengāļu valoda"
-
-#: libs/unilangs/unilangs.py:146
-msgid "Ibibio"
-msgstr "ibibio valoda"
-
-#: libs/unilangs/unilangs.py:147
-msgid "Tibetan"
-msgstr "tibetiešu valoda"
-
-#: libs/unilangs/unilangs.py:148
-msgid "Breton"
-msgstr "bretoņu valoda"
-
-#: libs/unilangs/unilangs.py:149
-msgid "Bosnian"
-msgstr "bosniešu valoda"
-
-#: libs/unilangs/unilangs.py:150
-msgid "Buginese"
-msgstr "bugiešu valoda"
-
-#: libs/unilangs/unilangs.py:151
-msgid "Catalan"
-msgstr "kataloņu valoda"
-
-#: libs/unilangs/unilangs.py:152
-msgid "Chechen"
-msgstr "čečenu valoda"
-
-#: libs/unilangs/unilangs.py:153
-msgid "Cebuano"
-msgstr "sebuānu valoda"
-
-#: libs/unilangs/unilangs.py:154
-msgid "Chamorro"
-msgstr "čamorru valoda"
-
-#: libs/unilangs/unilangs.py:155
-msgid "Choctaw"
-msgstr "čoktavu valoda"
-
-#: libs/unilangs/unilangs.py:156
-msgid "Corsican"
-msgstr "korsikāņu valoda"
-
-#: libs/unilangs/unilangs.py:157
-msgid "Cree"
-msgstr "krī valoda"
-
-#: libs/unilangs/unilangs.py:158
-msgid "Czech"
-msgstr "čehu valoda"
-
-#: libs/unilangs/unilangs.py:159
-msgid "Church Slavic"
-msgstr "baznīcslāvu valoda"
-
-#: libs/unilangs/unilangs.py:160
-msgid "Chuvash"
-msgstr "čuvašu valoda"
-
-#: libs/unilangs/unilangs.py:161
-msgid "Welsh"
-msgstr "velsiešu valoda"
-
-#: libs/unilangs/unilangs.py:162
-msgid "Danish"
-msgstr "dāņu valoda"
-
-#: libs/unilangs/unilangs.py:163
-msgid "German"
-msgstr "vācu valoda"
-
-#: libs/unilangs/unilangs.py:164
-msgid "Divehi"
-msgstr "divehi"
-
-#: libs/unilangs/unilangs.py:165
-msgid "Dzongkha"
-msgstr "dzongka"
-
-#: libs/unilangs/unilangs.py:166
-msgid "Ewe"
-msgstr "evu valoda"
-
-#: libs/unilangs/unilangs.py:167
-msgid "Efik"
-msgstr "efiku valoda"
-
-#: libs/unilangs/unilangs.py:168
-msgid "Greek"
-msgstr "grieķu valoda"
-
-#: libs/unilangs/unilangs.py:169
-msgid "English"
-msgstr "angļu valoda"
-
-#: libs/unilangs/unilangs.py:170
-msgid "English, British"
-msgstr "britu angļu valoda"
-
-#: libs/unilangs/unilangs.py:171
-msgid "Esperanto"
-msgstr "Esperanto"
-
-#: libs/unilangs/unilangs.py:172
-msgid "Spanish"
-msgstr "spāņu valoda"
-
-#: libs/unilangs/unilangs.py:173
-msgid "Spanish, Argentinian"
-msgstr "argentīniešu spāņu valoda"
-
-#: libs/unilangs/unilangs.py:174
-msgid "Spanish, Mexican"
-msgstr "Meksikas spāņu valoda"
-
-#: libs/unilangs/unilangs.py:175
-msgid "Spanish, Nicaraguan"
-msgstr "Nikaragvas spāņu valoda"
-
-#: libs/unilangs/unilangs.py:176
-msgid "Estonian"
-msgstr "igauņu valoda"
-
-#: libs/unilangs/unilangs.py:177
-msgid "Basque"
-msgstr "basku valoda"
-
-#: libs/unilangs/unilangs.py:178
-msgid "Persian"
-msgstr "persiešu valoda"
-
-#: libs/unilangs/unilangs.py:179
-msgid "Fulah"
-msgstr "fulu valoda"
-
-#: libs/unilangs/unilangs.py:180
-msgid "Finnish"
-msgstr "somu valoda"
-
-#: libs/unilangs/unilangs.py:181
-msgid "Filipino"
-msgstr "filipīniešu valoda"
-
-#: libs/unilangs/unilangs.py:182
-msgid "Fijian"
-msgstr "fidžiešu valoda"
-
-#: libs/unilangs/unilangs.py:183
-msgid "Faroese"
-msgstr "fēriešu valoda"
-
-#: libs/unilangs/unilangs.py:184
-msgid "French"
-msgstr "franču valoda"
-
-#: libs/unilangs/unilangs.py:185
-msgid "French, Canadian"
-msgstr "Kanādas franču valoda"
-
-#: libs/unilangs/unilangs.py:186
-msgid "Fula"
-msgstr "fulu valoda"
-
-#: libs/unilangs/unilangs.py:187
-msgid "Frisian"
-msgstr "frīzu valoda"
-
-#: libs/unilangs/unilangs.py:188
-msgid "Irish"
-msgstr "īru valoda"
-
-#: libs/unilangs/unilangs.py:189
-msgid "Scottish Gaelic"
-msgstr "skotu gēlu valoda"
-
-#: libs/unilangs/unilangs.py:190
-msgid "Galician"
-msgstr "galisiešu valoda"
-
-#: libs/unilangs/unilangs.py:191
-msgid "Guaran"
-msgstr "gvaranu valoda"
-
-#: libs/unilangs/unilangs.py:192
-msgid "Gujarati"
-msgstr "gudžaratu valoda"
-
-#: libs/unilangs/unilangs.py:193
-msgid "Manx"
-msgstr "meniešu valoda"
-
-#: libs/unilangs/unilangs.py:194
-msgid "Haida"
-msgstr "haida"
-
-#: libs/unilangs/unilangs.py:195
-msgid "Hausa"
-msgstr "hausu valoda"
-
-#: libs/unilangs/unilangs.py:196
-msgid "Hazaragi"
-msgstr "hazāriešu valoda"
-
-#: libs/unilangs/unilangs.py:197
-msgid "Hebrew"
-msgstr "ivrits"
-
-#: libs/unilangs/unilangs.py:198
-msgid "Hindi"
-msgstr "hindi"
-
-#: libs/unilangs/unilangs.py:199
-msgid "Hiri Motu"
-msgstr "hiri motu valoda"
-
-#: libs/unilangs/unilangs.py:200
-msgid "Croatian"
-msgstr "horvātu valoda"
-
-#: libs/unilangs/unilangs.py:201
-msgid "Creole, Haitian"
-msgstr "haitiešu kreolas valoda"
-
-#: libs/unilangs/unilangs.py:202
-msgid "Hungarian"
-msgstr "ungāru valoda"
-
-#: libs/unilangs/unilangs.py:203
-msgid "Hupa"
-msgstr "hupu valoda"
-
-#: libs/unilangs/unilangs.py:204
-msgid "Armenian"
-msgstr "armēņu valoda"
-
-#: libs/unilangs/unilangs.py:205
-msgid "Herero"
-msgstr "hereru valoda"
-
-#: libs/unilangs/unilangs.py:206
-msgid "Interlingua"
-msgstr "Interlingua"
-
-#: libs/unilangs/unilangs.py:207
-msgid "Igbo"
-msgstr "igbu valoda"
-
-#: libs/unilangs/unilangs.py:208
-msgid "Indonesian"
-msgstr "indonēziešu valoda"
-
-#: libs/unilangs/unilangs.py:209
-msgid "Interlingue"
-msgstr "Interlingue"
-
-#: libs/unilangs/unilangs.py:210
-msgid "Sichuan Yi"
-msgstr "Šičuaņas ji valoda"
-
-#: libs/unilangs/unilangs.py:211
-msgid "Inupia"
-msgstr "inupiaku valoda"
-
-#: libs/unilangs/unilangs.py:212
-msgid "Ilocano"
-msgstr "ilokāņu valoda"
-
-#: libs/unilangs/unilangs.py:213
-msgid "Ingush"
-msgstr "ingušku valoda"
-
-#: libs/unilangs/unilangs.py:214
-msgid "Ido"
-msgstr "Ido"
-
-#: libs/unilangs/unilangs.py:215
-msgid "Iroquoian languages"
-msgstr "irokēzu valodas"
-
-#: libs/unilangs/unilangs.py:216
-msgid "Icelandic"
-msgstr "īslandiešu valoda"
-
-#: libs/unilangs/unilangs.py:217
-msgid "Italian"
-msgstr "itāliešu valoda"
-
-#: libs/unilangs/unilangs.py:218
-msgid "Inuktitut"
-msgstr "inuktītu valoda"
-
-#: libs/unilangs/unilangs.py:219
-msgid "Japanese"
-msgstr "japāņu valoda"
-
-#: libs/unilangs/unilangs.py:220
-msgid "Javanese"
-msgstr "javiešu valoda"
-
-#: libs/unilangs/unilangs.py:221
-msgid "Georgian"
-msgstr "gruzīnu valoda"
-
-#: libs/unilangs/unilangs.py:222
-msgid "Karen"
-msgstr "karenu valoda"
-
-#: libs/unilangs/unilangs.py:223
-msgid "Kanuri"
-msgstr "kanuru valoda"
-
-#: libs/unilangs/unilangs.py:224
-msgid "Gikuyu"
-msgstr "kikuju valoda"
-
-#: libs/unilangs/unilangs.py:225
-msgid "Rwandi"
-msgstr "kiņaruandas valoda"
-
-#: libs/unilangs/unilangs.py:226
-msgid "Kuanyama, Kwanyama"
-msgstr ""
-
-#: libs/unilangs/unilangs.py:227
-msgid "Kazakh"
-msgstr "kazahu valoda"
-
-#: libs/unilangs/unilangs.py:228
-msgid "Greenlandic"
-msgstr "grendlandiešu valoda"
-
-#: libs/unilangs/unilangs.py:229
-msgid "Khmer"
-msgstr "khmeru valoda"
-
-#: libs/unilangs/unilangs.py:230
-msgid "Kannada"
-msgstr "kannadu valoda"
-
-#: libs/unilangs/unilangs.py:231
-msgid "Korean"
-msgstr "korejiešu valoda"
-
-#: libs/unilangs/unilangs.py:232
-msgid "Kongo"
-msgstr "kongo valoda"
-
-#: libs/unilangs/unilangs.py:233
-msgid "Kashmiri"
-msgstr "kašmiru valoda"
-
-#: libs/unilangs/unilangs.py:234
-msgid "Kurdish"
-msgstr "kurdu valoda"
-
-#: libs/unilangs/unilangs.py:235
-msgid "Komi"
-msgstr "komu valoda"
-
-#: libs/unilangs/unilangs.py:236
-msgid "Cornish"
-msgstr "korniešu valoda"
-
-#: libs/unilangs/unilangs.py:237
-msgid "Kyrgyz"
-msgstr "kirgīzu valoda"
-
-#: libs/unilangs/unilangs.py:238
-msgid "Latin"
-msgstr "latīņu valoda"
-
-#: libs/unilangs/unilangs.py:239
-msgid "Luxembourgish"
-msgstr "luksemburgiešu valoda"
-
-#: libs/unilangs/unilangs.py:240
-msgid "Ganda"
-msgstr "gandu valoda"
-
-#: libs/unilangs/unilangs.py:241
-msgid "Limburgish"
-msgstr "limburgiešu valoda"
-
-#: libs/unilangs/unilangs.py:242
-msgid "Lingala"
-msgstr "lingala"
-
-#: libs/unilangs/unilangs.py:243
-msgid "Lakota"
-msgstr "lakotiešu valoda"
-
-#: libs/unilangs/unilangs.py:244
-msgid "Lao"
-msgstr "laosiešu valoda"
-
-#: libs/unilangs/unilangs.py:245
-msgid "Lithuanian"
-msgstr "lietuviešu valoda"
-
-#: libs/unilangs/unilangs.py:246
-msgid "Luba-Katagana"
-msgstr "lubakatanga"
-
-#: libs/unilangs/unilangs.py:247
-msgid "Luba-Kasai"
-msgstr "lubu valoda"
-
-#: libs/unilangs/unilangs.py:248
-msgid "Luo"
-msgstr "luo valoda"
-
-#: libs/unilangs/unilangs.py:249
-msgid "Luhya"
-msgstr "luhju valoda"
-
-#: libs/unilangs/unilangs.py:250
-msgid "Latvian"
-msgstr "latviešu valoda"
-
-#: libs/unilangs/unilangs.py:251
-msgid "Metadata: Geo"
-msgstr "Metadati: Geo"
-
-#: libs/unilangs/unilangs.py:252
-msgid "Metadata: Twitter"
-msgstr "Metadati: Tviteris"
-
-#: libs/unilangs/unilangs.py:253
-msgid "Metadata: Wikipedia"
-msgstr "Metadati: Vikipēdija"
-
-#: libs/unilangs/unilangs.py:254
-msgid "Madurese"
-msgstr "maduriešu valoda"
-
-#: libs/unilangs/unilangs.py:255
-msgid "Marshallese"
-msgstr "māršaliešu valoda"
-
-#: libs/unilangs/unilangs.py:256
-msgid "Maori"
-msgstr "maori valoda"
-
-#: libs/unilangs/unilangs.py:257
-msgid "Macedonian"
-msgstr "maķedoniešu valoda"
-
-#: libs/unilangs/unilangs.py:258
-msgid "Malayalam"
-msgstr "Malajālama"
-
-#: libs/unilangs/unilangs.py:259
-msgid "Malagasy"
-msgstr "malagašu valoda"
-
-#: libs/unilangs/unilangs.py:260
-msgid "Mongolian"
-msgstr "mongoļu valoda"
-
-#: libs/unilangs/unilangs.py:261
-msgid "Mandinka"
-msgstr "mandinku valoda"
-
-#: libs/unilangs/unilangs.py:262
-msgid "Moldavian, Moldovan"
-msgstr "moldāvu valoda"
-
-#: libs/unilangs/unilangs.py:263
-msgid "Mohawk"
-msgstr "mohauku valoda"
-
-#: libs/unilangs/unilangs.py:264
-msgid "Manipuri"
-msgstr "manipūru valoda"
-
-#: libs/unilangs/unilangs.py:265
-msgid "Mossi"
-msgstr "mosi valoda"
-
-#: libs/unilangs/unilangs.py:266
-msgid "Marathi"
-msgstr "marathu valoda"
-
-#: libs/unilangs/unilangs.py:267
-msgid "Malay"
-msgstr "malaiziešu valoda"
-
-#: libs/unilangs/unilangs.py:268
-msgid "Maltese"
-msgstr "maltiešu valoda"
-
-#: libs/unilangs/unilangs.py:269
-msgid "Burmese"
-msgstr "birmiešu valoda"
-
-#: libs/unilangs/unilangs.py:270
-msgid "Hokkien"
-msgstr ""
-
-#: libs/unilangs/unilangs.py:271
-msgid "Naurunan"
-msgstr "nauruiešu valoda"
-
-#: libs/unilangs/unilangs.py:272
-msgid "Norwegian Bokmal"
-msgstr "būkmols"
-
-#: libs/unilangs/unilangs.py:273
-msgid "North Ndebele"
-msgstr "ziemeļndebelu valoda"
-
-#: libs/unilangs/unilangs.py:274
-msgid "Nepali"
-msgstr "nepāliešu valoda"
-
-#: libs/unilangs/unilangs.py:275
-msgid "Ndonga"
-msgstr "ndongu valoda"
-
-#: libs/unilangs/unilangs.py:276
-msgid "Dutch"
-msgstr "nīderlandiešu valoda"
-
-#: libs/unilangs/unilangs.py:277
-msgid "Norwegian Nynorsk"
-msgstr "jaunnorvēģu valoda"
-
-#: libs/unilangs/unilangs.py:278
-msgid "Norwegian"
-msgstr "norvēģu valoda"
-
-#: libs/unilangs/unilangs.py:279
-msgid "Southern Ndebele"
-msgstr "dienvidndebelu valoda"
-
-#: libs/unilangs/unilangs.py:280
-msgid "Northern Sotho"
-msgstr "ziemeļsotu valoda"
-
-#: libs/unilangs/unilangs.py:281
-msgid "Navajo"
-msgstr "navahu valoda"
-
-#: libs/unilangs/unilangs.py:282
-msgid "Chewa"
-msgstr "čevu valoda"
-
-#: libs/unilangs/unilangs.py:283
-msgid "Occitan"
-msgstr "oksitāņu valoda"
-
-#: libs/unilangs/unilangs.py:284
-msgid "Ojibwe"
-msgstr "odžibvu valoda"
-
-#: libs/unilangs/unilangs.py:285
-msgid "Oriya"
-msgstr ""
-
-#: libs/unilangs/unilangs.py:286
-msgid "Oromo"
-msgstr "oromo valoda"
-
-#: libs/unilangs/unilangs.py:287
-msgid "Ossetian, Ossetic"
-msgstr "osetīnu valoda"
-
-#: libs/unilangs/unilangs.py:288
-msgid "Kapampangan"
-msgstr "kapampangas valoda"
-
-#: libs/unilangs/unilangs.py:289
-msgid "Papiamento"
-msgstr "Papiamento"
-
-#: libs/unilangs/unilangs.py:290
-msgid "Eastern Punjabi"
-msgstr "austrumpandžabu valoda"
-
-#: libs/unilangs/unilangs.py:291
-msgid "Pali"
-msgstr "pāli valoda"
-
-#: libs/unilangs/unilangs.py:292
-msgid "Polish"
-msgstr "poļu valoda"
-
-#: libs/unilangs/unilangs.py:293
-msgid "Western Punjabi"
-msgstr "rietumpandžabu valoda"
-
-#: libs/unilangs/unilangs.py:294
-msgid "Dari"
-msgstr ""
-
-#: libs/unilangs/unilangs.py:295
-msgid "Pashto"
-msgstr "puštu"
-
-#: libs/unilangs/unilangs.py:296
-msgid "Portuguese"
-msgstr "portugāļu valoda"
-
-#: libs/unilangs/unilangs.py:297
-msgid "Portuguese, Brazilian"
-msgstr "brazīliešu portugāļu valoda"
-
-#: libs/unilangs/unilangs.py:298
-msgid "Quechua"
-msgstr "kečvu valoda"
-
-#: libs/unilangs/unilangs.py:299
-msgid "Romansh"
-msgstr "retoromāņu valoda"
-
-#: libs/unilangs/unilangs.py:300
-msgid "Romanian"
-msgstr "romāņu valoda"
-
-#: libs/unilangs/unilangs.py:301
-msgid "Russian"
-msgstr "krievu valoda"
-
-#: libs/unilangs/unilangs.py:302
-msgid "Rundi"
-msgstr "rundu valoda"
-
-#: libs/unilangs/unilangs.py:303
-msgid "Macedo"
-msgstr ""
-
-#: libs/unilangs/unilangs.py:304
-msgid "Rusyn"
-msgstr "rusīnu valoda"
-
-#: libs/unilangs/unilangs.py:305
-msgid "Sanskrit"
-msgstr "sanskrits"
-
-#: libs/unilangs/unilangs.py:306
-msgid "Sardinian"
-msgstr "sardu valoda"
-
-#: libs/unilangs/unilangs.py:307
-msgid "Sindhi"
-msgstr "sindu valoda"
-
-#: libs/unilangs/unilangs.py:308
-msgid "Northern Sami"
-msgstr "ziemeļsāmu valoda"
-
-#: libs/unilangs/unilangs.py:309
-msgid "Sango"
-msgstr "sangu valoda"
-
-#: libs/unilangs/unilangs.py:310
-msgid "Serbo-Croatian"
-msgstr "serbohorvātu valoda"
-
-#: libs/unilangs/unilangs.py:311
-msgid "Sinhala"
-msgstr "singalu valoda"
-
-#: libs/unilangs/unilangs.py:312
-msgid "Slovak"
-msgstr "slovāku valoda"
-
-#: libs/unilangs/unilangs.py:313
-msgid "Seko Padang"
-msgstr "sekopadangu valoda"
-
-#: libs/unilangs/unilangs.py:314
-msgid "Slovenian"
-msgstr "slovēņu valoda"
-
-#: libs/unilangs/unilangs.py:315
-msgid "Samoan"
-msgstr "samoāņu valoda"
-
-#: libs/unilangs/unilangs.py:316
-msgid "Shona"
-msgstr "šonu valoda"
-
-#: libs/unilangs/unilangs.py:317
-msgid "Somali"
-msgstr "somāļu valoda"
-
-#: libs/unilangs/unilangs.py:318
-msgid "Sotho"
-msgstr "sotu valoda"
-
-#: libs/unilangs/unilangs.py:319
-msgid "Albanian"
-msgstr "albāņu valoda"
-
-#: libs/unilangs/unilangs.py:320
-msgid "Serbian"
-msgstr "serbu valoda"
-
-#: libs/unilangs/unilangs.py:321
-msgid "Serbian, Latin"
-msgstr "serbu valoda (latīņu alfabēts)"
-
-#: libs/unilangs/unilangs.py:322
-msgid "Swati"
-msgstr "svati"
-
-#: libs/unilangs/unilangs.py:323
-msgid "Sundanese"
-msgstr "sundu valoda"
-
-#: libs/unilangs/unilangs.py:324
-msgid "Swedish"
-msgstr "zviedru valoda"
-
-#: libs/unilangs/unilangs.py:325
-msgid "Swahili"
-msgstr "Svahili"
-
-#: libs/unilangs/unilangs.py:326
-msgid "Tamil"
-msgstr "tamilu valoda"
-
-#: libs/unilangs/unilangs.py:327
-msgid "Tetum"
-msgstr "tetumu valoda"
-
-#: libs/unilangs/unilangs.py:328
-msgid "Telugu"
-msgstr "telugu valoda"
-
-#: libs/unilangs/unilangs.py:329
-msgid "Tajik"
-msgstr "tadžiku valoda"
-
-#: libs/unilangs/unilangs.py:330
-msgid "Thai"
-msgstr "taizemiešu valoda"
-
-#: libs/unilangs/unilangs.py:331
-msgid "Tigrinya"
-msgstr "tigraja valoda"
-
-#: libs/unilangs/unilangs.py:332
-msgid "Turkmen"
-msgstr "turkmēņu valoda"
-
-#: libs/unilangs/unilangs.py:333
-msgid "Tagalog"
-msgstr "tagalogu valoda"
-
-#: libs/unilangs/unilangs.py:334
-msgid "Klingon"
-msgstr "klingonu valoda"
-
-#: libs/unilangs/unilangs.py:335
-msgid "Tonga"
-msgstr "tongu valoda"
-
-#: libs/unilangs/unilangs.py:336
-msgid "Turkish"
-msgstr "turku valoda"
-
-#: libs/unilangs/unilangs.py:337
-msgid "Tsonga"
-msgstr "tsongu valoda"
-
-#: libs/unilangs/unilangs.py:338
-msgid "Tswana"
-msgstr "tsvanu valoda"
-
-#: libs/unilangs/unilangs.py:339
-msgid "Tartar"
-msgstr "tatāru valoda"
-
-#: libs/unilangs/unilangs.py:340
-msgid "Twi"
-msgstr "tvī"
-
-#: libs/unilangs/unilangs.py:341
-msgid "Tahitian"
-msgstr "taitiešu valoda"
-
-#: libs/unilangs/unilangs.py:342
-msgid "Uighur"
-msgstr "uiguru valoda"
-
-#: libs/unilangs/unilangs.py:343
-msgid "Ukrainian"
-msgstr "ukraiņu valoda"
-
-#: libs/unilangs/unilangs.py:344
-msgid "Umbundu"
-msgstr "dienvidmbuntu valoda"
-
-#: libs/unilangs/unilangs.py:345
-msgid "Uyghur"
-msgstr "uiguru valoda"
-
-#: libs/unilangs/unilangs.py:346
-msgid "Urdu"
-msgstr "urdu valoda"
-
-#: libs/unilangs/unilangs.py:347
-msgid "Uzbek"
-msgstr "uzbeku valoda"
-
-#: libs/unilangs/unilangs.py:348
-msgid "Venda"
-msgstr "uiguru valoda"
-
-#: libs/unilangs/unilangs.py:349
-msgid "Vietnamese"
-msgstr "vjetnamiešu valoda"
-
-#: libs/unilangs/unilangs.py:350
-msgid "Volapuk"
-msgstr "volapiks"
-
-#: libs/unilangs/unilangs.py:351
-msgid "Walloon"
-msgstr "valoņu valoda"
-
-#: libs/unilangs/unilangs.py:352
-msgid "Wolof"
-msgstr "volofu valoda"
-
-#: libs/unilangs/unilangs.py:353
-msgid "Xhosa"
-msgstr "ķhosu valoda"
-
-#: libs/unilangs/unilangs.py:354
-msgid "Yiddish"
-msgstr "jidišs"
-
-#: libs/unilangs/unilangs.py:355
-msgid "Yoruba"
-msgstr "jorubu valoda"
-
-#: libs/unilangs/unilangs.py:356
-msgid "Zhuang, Chuang"
-msgstr "džuanu, čuanu \nvaloda"
-
-#: libs/unilangs/unilangs.py:357
-msgid "Chinese, Yue"
-msgstr "jue valoda"
-
-#: libs/unilangs/unilangs.py:358
-msgid "Chinese, Simplified"
-msgstr "vienkāršotā ķīniešu valoda"
-
-#: libs/unilangs/unilangs.py:359
-msgid "Chinese, Traditional"
-msgstr "tradicionālā ķīniešu valoda"
-
-#: libs/unilangs/unilangs.py:360
-msgid "Chinese, Simplified (Singaporean)"
-msgstr "vienkāršotā ķīniešu valoda (Singapūra)"
-
-#: libs/unilangs/unilangs.py:361
-msgid "Chinese, Traditional (Hong Kong)"
-msgstr "Tradicionālā ķīniešu valoda (Honkonga)"
-
-#: libs/unilangs/unilangs.py:362
-msgid "Zulu"
-msgstr "zulu valoda"
 
 #: templates/_paginator.html:4 templates/_paginator.html.py:6
 msgid "Previous"
@@ -2869,7 +1909,7 @@ msgstr ""
 #: templates/base.html:9
 msgid ""
 "Universal subtitling: caption, translate, subtitle and transcribe video."
-msgstr ""
+msgstr "Universālā subtitrēšana: pārtulkojiet, subtitrējiet un transkribējiet video."
 
 #: templates/base.html:70
 msgid "Subtitle Videos"
@@ -3057,7 +2097,7 @@ msgid ""
 "http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability to\n"
 "process your counter notification, please use the following format (including\n"
 "section numbers):\n"
-msgstr ""
+msgstr "\nPretpaziņojuma paraugu var atrast:\nhttp://www.chillingeffects.org/dmca/counter512.pdf. Lai atvieglotu mums Jūsu \npretpaziņojuma apstrādi, lūdzu, izmantojiet šādu formātu (tostarp arī sadaļu numerāciju):\n"
 
 #: templates/dmca.html:109
 msgid ""
@@ -3348,7 +2388,7 @@ msgid ""
 "\n"
 "                Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
 "            "
-msgstr ""
+msgstr "\n                Atrodieties augstāk Google un citos meklētājos, indeksējot savu video pilnos transkriptus. Vieglāk atrodami video tiek arī biežāk atrasti.            "
 
 #: templates/enterprise.html:114
 msgid "Build a Global Reach"
@@ -3467,7 +2507,7 @@ msgid ""
 "\n"
 "                In many cases, organizations want to leverage the power of the crowd, but don’t want to leave any chance for poor quality captions or subtitles to appear on their content. This workflow keeps videos private until a staff member has approved the subtitles.\n"
 "            "
-msgstr ""
+msgstr "\n                Daudzos gadījumos organizācijas vēlās izmantot pūļa spēku, taču nekāda gadījumā nevēlās, lai to saturs būtu ar zemas kvalitātes subtitriem. Šī darbplūsma saglabā Jūsu video privātus pirms kāds personāla dalībniekiem subtitrus nav apstiprinājis.\n            "
 
 #: templates/enterprise.html:189
 msgid "Professionally created English captions, crowd translation"
@@ -3587,7 +2627,7 @@ msgid ""
 "\n"
 "                In governments around the world, making video accessible is often a legal requirement, not an option.  Amara makes it much easier to coordinate captioning and translation efforts, so that every citizen gains access.\n"
 "            "
-msgstr ""
+msgstr "\n                Valdībām visā pasaulē video padarīšana pieejamu nav iespēja, bet gan tiesiska prasība.  Amara ļoti atvieglo subtitrēšanas un tulkošanas centienu koordinēšanu, lai video būtu pieejami katram pilsonim.\n            "
 
 #: templates/enterprise.html:280
 msgid ""
@@ -3665,15 +2705,15 @@ msgstr "Kādu brīvpiekļuves licenci vēlaties izmantot?"
 
 #: templates/faq.html:28 templates/faq.html.py:111
 msgid "I'm a developer, can I help out?"
-msgstr "Esmu izstrādātājs. Vai varu jums palīdzēt?"
+msgstr "Esmu izstrādātājs. Vai varu Jums palīdzēt?"
 
 #: templates/faq.html:29 templates/faq.html.py:115
 msgid "Can non-technical people get involved with the project?"
-msgstr "Vai cilvēki bez tehniskām zināšanām var iesaistīties projektā?"
+msgstr "Vai projektā var iesaistīties cilvēki bez tehniskām zināšanām?"
 
 #: templates/faq.html:30 templates/faq.html.py:126
 msgid "Do you accept donations? Are they tax deductible?"
-msgstr "Vai Jūs pieņemat ziedojumus? Vai no tiem atņem nodokļus?"
+msgstr "Vai Jūs pieņemat ziedojumus? Vai no tiem atvelk nodokļus?"
 
 #: templates/faq.html:31 templates/faq.html.py:134
 msgid "What is your relationship with Mozilla Drumbeat?"
@@ -4283,7 +3323,7 @@ msgstr "<strong>Apzināt veidus</strong>, kā risināt ieinteresēto pušu subti
 msgid ""
 "<strong>Move towards</strong> standardizing solutions and pushing forward "
 "the state of the art in open subtiting."
-msgstr "<strong>Tiekties pēc</strong> standartizētiem risinājumiem un virzīt uz priekšu modernāko brīvpiekļus subtitrēšanu."
+msgstr "<strong>Tiekties pēc</strong> standartizētiem risinājumiem un virzīt uz priekšu modernāko atvērto subtitrēšanu."
 
 #: templates/opensubtitles2010.html:53
 msgid "Participants"
@@ -4546,7 +3586,7 @@ msgstr "Lūdzu, ievadiet derīgu e-pasta adresi."
 
 #: templates/jsdemo/home.html:93
 msgid "Please enter your email address."
-msgstr "Lūdzu, ievadiet e-pasta adresi."
+msgstr "Lūdzu, ievadiet savu e-pasta adresi."
 
 #: templates/jsdemo/home.html:121
 msgid "Check out the widget"
@@ -4805,7 +3845,7 @@ msgstr ""
 #: templates/videos/subtitle-view.html:149
 #: templates/videos/subtitle-view.html:183
 msgid "Subtitles"
-msgstr "Subtitri"
+msgstr "subtitrus"
 
 #: templates/profiles/dashboard.html:57 templates/teams/members-list.html:101
 #: templates/teams/members-list.html:102
@@ -5497,7 +4537,7 @@ msgid "Edit"
 msgstr "Labot"
 
 #: templates/teams/_team_video_detail.html:60
-#: templates/teams/members-list.html:122 templates/teams/videos-list.html:147
+#: templates/teams/members-list.html:122 templates/teams/videos-list.html:148
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
 msgstr "Noņemt"
@@ -6085,7 +5125,7 @@ msgstr "Tā vietā vēlaties skatīt"
 
 #: templates/teams/tasks.html:155
 msgid "your tasks"
-msgstr "jūsu uzdevumi"
+msgstr "savus uzdevumus"
 
 #: templates/teams/tasks.html:156
 msgid " instead?"
@@ -6117,7 +5157,7 @@ msgstr "pārskatīja"
 
 #: templates/teams/tasks.html:243
 msgid "and edited"
-msgstr ""
+msgstr "un koriģēja"
 
 #: templates/teams/tasks.html:245 templates/videos/subtitle-view.html:191
 #: templates/videos/subtitle-view.html:307
@@ -6377,13 +5417,14 @@ msgstr "Dzēst video"
 msgid "You are removing this video from the %(team)s team."
 msgstr "Jūs noņemat šo video no %(team)s komandas."
 
-#: templates/teams/videos-list.html:126 templates/teams/videos-list.html:133
+#: templates/teams/videos-list.html:126
+#, python-format
 msgid ""
-"It will remain on Amara but will no longer be subject to the team's "
-"permissions and worfklows. Any outstanding tasks will be deleted."
+"You are removing this video from the %(team)s team.<br /><br />\n"
+"                                It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted. Private videos will become available for viewing and editing to the general public. Are you sure you want to proceed?"
 msgstr ""
 
-#: templates/teams/videos-list.html:128
+#: templates/teams/videos-list.html:129
 #, python-format
 msgid ""
 "You can choose to remove the video from the %(team)s team or to delete the "
@@ -6391,11 +5432,17 @@ msgid ""
 "like to do?"
 msgstr ""
 
-#: templates/teams/videos-list.html:131
+#: templates/teams/videos-list.html:132
 msgid "Just remove the video from the team."
 msgstr "Vienkārši noņemiet video no komandas."
 
-#: templates/teams/videos-list.html:136
+#: templates/teams/videos-list.html:134
+msgid ""
+"It will remain on Amara but will no longer be subject to the team's "
+"permissions and worfklows. Any outstanding tasks will be deleted."
+msgstr ""
+
+#: templates/teams/videos-list.html:137
 msgid "Delete the video entirely."
 msgstr "Pilnībā dzēst video"
 
@@ -6598,7 +5645,7 @@ msgstr "Augšupielādēt TXT datni"
 #: templates/videos/_paste_transcription.html:144
 #: templates/videos/_upload_subtitles.html:36
 msgid "Login to upload subtitles"
-msgstr "Ieejat, lai varētu augšupielādēt subtitrus"
+msgstr "Ieejiet, lai varētu augšupielādēt subtitrus"
 
 #: templates/videos/_team_list.html:5 templates/videos/video-view.html:198
 #: templates/videos/video-view.html:204
@@ -6627,7 +5674,7 @@ msgid ""
 "              Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT format. Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
 "              or .xml (for TTML) are accepted.\n"
 "              "
-msgstr ""
+msgstr "\n              Mūsu vietne pieņem SRT, SSA, SBV, DFXP, TTML, un TXT formātus. Tiek pieņemtas tikai datnes, kuru nosaukumi beidzas ar .srt, .ssa, .sbv, .dfxp, .txt\n              vai .xml (TTML).\n              "
 
 #: templates/videos/_upload_subtitles.html:22
 msgid "Video Language"
@@ -6640,7 +5687,7 @@ msgstr "Pārtulkots no"
 #: templates/videos/_upload_subtitles.html:29
 #, python-format
 msgid "This subtitle file is 100%% complete"
-msgstr ""
+msgstr "Šī subtitru datne ir 100%% pabeigta"
 
 #: templates/videos/_upload_subtitles.html:31
 msgid "Upload"
@@ -6650,7 +5697,7 @@ msgstr "Augšupielādēt"
 msgid ""
 "If you believe your subtitle file is compatible, <a "
 "href='mailto:feedback@universalsubtitles.org'>send it to us</a>"
-msgstr "Ja domājat, ka Jūsu subtitru datne ir nesaderīga, <a href='mailto:feedback@universalsubtitles.org'>atsūtiet to mums</a>"
+msgstr "Ja uzskatāt, ka Jūsu subtitru datne ir saderīga, <a href='mailto:feedback@universalsubtitles.org'>atsūtiet to mums</a>"
 
 #: templates/videos/_video.html:23
 msgid "view"
@@ -6993,7 +6040,7 @@ msgid ""
 "    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has just started a %(language)s \n"
 "    translation of your video <a href=\"%(video_url)s\">%(video)s</a>\n"
 "\t"
-msgstr ""
+msgstr "\n    Lieliskas ziņas! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> ir tikko sācis Jūsu video\n    <a href=\"%(video_url)s\">%(video)s</a> %(language)s tulkojumu »\n\t"
 
 #: templates/videos/email_start_notification.html:13
 msgid ""
