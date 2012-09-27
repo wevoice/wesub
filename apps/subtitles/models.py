@@ -347,10 +347,21 @@ class SubtitleLanguage(models.Model):
         return super(SubtitleLanguage, self).save(*args, **kwargs)
 
 
-    def get_tip(self):
-        """Return the tipmost version of this language (if any)."""
+    def get_tip(self, public=False):
+        """Return the tipmost version of this language (if any).
 
-        versions = self.subtitleversion_set.order_by('-version_number')[:1]
+        If public is given, returns the tipmost version that is visible to the
+        general public (if any).
+
+        """
+        if public:
+            versions = SubtitleVersion.objects.public()
+        else:
+            versions = SubtitleVersion.objects.all()
+
+        versions = versions.filter(subtitle_language=self)
+        versions = versions.order_by('-version_number')
+        versions = versions[:1]
 
         if versions:
             return versions[0]
