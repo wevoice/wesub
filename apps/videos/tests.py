@@ -1396,7 +1396,7 @@ class TestFeedsSubmit(TestCase):
         response = self.client.post(reverse('videos:create_from_feed'), data)
         self.assertRedirects(response, reverse('videos:create'))
         self.assertNotEqual(old_count, Video.objects.count())
-        self.assertEqual(Video.objects.count(), 16)
+        self.assertEqual(Video.objects.count(), 17)
 
     def test_empty_feed_submit(self):
         base_open_resource = feedparser._open_resource
@@ -2226,42 +2226,12 @@ class TestMetadataManager(TestCase):
 
     fixtures = ['staging_users.json', 'staging_videos.json']
 
-    def test_subtitles_count(self):
-        v = Video.objects.all()[0]
-        lang = SubtitleLanguage(language='en', video=v, is_forked=True)
-        lang.save()
-        v1 = create_version(lang, [
-                {
-                   "subtitle_order" : 1,
-                   "subtitle_text": "",
-                   "subtitle_id": "id1",
-                    'start_time': 1,
-                    'end_time': 2,
-
-                 },
-                  {
-                   "subtitle_order" : 2,
-                   "subtitle_text": "   ",
-                   "subtitle_id": "id2",
-                    'start_time': 3,
-                    'end_time': 4,
-                 },
-                  {
-                   "subtitle_order" : 3,
-                   "subtitle_text": "t3",
-                   "subtitle_id": "id3",
-                    'start_time': 5,
-                    'end_time': 6,
-                 },
-
-        ])
-        v1.is_forked = True
-        v1.save()
-        metadata_manager.update_metadata(v.pk)
-        lang = refresh_obj(lang)
-        v1 = lang.version()
-        self.assertEqual(len(v1.subtitles()), 3)
-        self.assertEqual(lang.subtitle_count, 1)
+    def test_language_count(self):
+        video = Video.objects.all()[0]
+        create_langs_and_versions(video, ['en'])
+        metadata_manager.update_metadata(video.pk)
+        video = Video.objects.all()[0]
+        self.assertEqual(video.languages_count, 1)
 
 def _create_trans( video, latest_version=None, lang_code=None, forked=False):
         translation = SubtitleLanguage()
@@ -2346,15 +2316,17 @@ class TestSubtitleMetadata(TestCase):
 
 
 def create_langs_and_versions(video, langs, user=None):
-    versions = []
-    for lang in langs:
-        l, c = SubtitleLanguage.objects.get_or_create(language=lang, video=video, is_forked=True)
-        versions.append(create_version(l))
-    return versions
+    from subtitles import pipeline            
+
+    SRT = u"""1
+00:00:00,004 --> 00:00:02,093
+We\n started <b>Universal Subtitles</b> <i>because</i> we <u>believe</u>
+"""
+    subtitles = babelsubs.load_from(SRT, type='srt', language='en').to_internal()
+    return [pipeline.add_subtitles(video, l, subtitles) for l in langs]
 
 def refresh_obj(m):
     return m.__class__._default_manager.get(pk=m.pk)
-
 
 class FollowTest(WebUseTest):
 
