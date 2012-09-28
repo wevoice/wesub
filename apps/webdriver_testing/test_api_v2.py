@@ -6,7 +6,6 @@ import codecs
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.site_pages import video_language_page
 from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import SubtitleLanguageFactory
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.editor_pages import subtitle_editor 
 
@@ -36,7 +35,7 @@ class WebdriverTestCaseApiV2UploadSubtitles(WebdriverTestCase):
         return r.status_code, r.json
 
 
-    def api_upload_test_subs(self, test_format, test_lang_code):
+    def api_upload_subs(self, test_format, test_lang_code):
         """Create the language and upload the subtitles.
 
         Return the subtitle_language object of the test video for verification.
@@ -50,23 +49,27 @@ class WebdriverTestCaseApiV2UploadSubtitles(WebdriverTestCase):
         create_data = { 'language_code': test_lang_code }
         status, response = self.post_api_request(create_url, create_data)
         #Upload the subtitles via api request
-        if test_lang_code == 'ttml':
-            upload_url = ( 'videos/{0}/languages/{1}/subtitles/'.format(
-                self.test_video.video_id, 'xml' ))
+        upload_url = ( 'videos/{0}/languages/{1}/subtitles/'.format(
+            self.test_video.video_id, test_lang_code ))
+        if test_format == 'ttml':
+            sub_data = codecs.open( os.path.join( self.subs_data_dir, 
+                'Timed_text.{0}.{1}'.format( test_lang_code, 'xml' ) ),
+                encoding='utf-8' )
         else:
-            upload_url = ( 'videos/{0}/languages/{1}/subtitles/'.format(
-                self.test_video.video_id, test_lang_code ))
+            sub_data = codecs.open( os.path.join( self.subs_data_dir, 
+                'Timed_text.{0}.{1}'.format( test_lang_code, test_format ) ), 
+                 encoding='utf-8' )
 
-        sub_data = open( os.path.join( self.subs_data_dir, 
-            'Timed_text.{0}.{1}'.format( test_lang_code, test_format ) ) )
         upload_data = { 'subtitles': sub_data.read(), 'sub_format': test_format } 
+        print '#########'
+        print upload_data
+        print '#########'
+
         status, response = self.post_api_request( upload_url, upload_data )
+        print status, response
         self.video_language_pg.open_video_lang_page( self.test_video.video_id, 
             test_lang_code )
-        print '#### %s ####' % dir(self.test_video)
-        subtitle_lang = SubtitleLanguageFactory( video = self.test_video, 
-            language_code = test_lang_code )
-        print '#### %s ####' % dir(subtitle_lang)
+        subtitle_lang = self.test_video.subtitle_language(test_lang_code) 
         return subtitle_lang
 
 
@@ -93,7 +96,7 @@ class WebdriverTestCaseApiV2UploadSubtitles(WebdriverTestCase):
     def test_upload__srt(self):
         test_lang_code = 'en'
         test_format = 'srt'
-        subtitle_language = self.api_upload_test_subs( test_format, 
+        subtitle_language = self.api_upload_subs( test_format, 
            test_lang_code)
         self.assertEqual(72, subtitle_language.get_subtitle_count() )
 
@@ -101,7 +104,7 @@ class WebdriverTestCaseApiV2UploadSubtitles(WebdriverTestCase):
     def test_upload__ssa(self):
         test_lang_code = 'hu'
         test_format = 'ssa'
-        subtitle_language = self.api_upload_test_subs( test_format, 
+        subtitle_language = self.api_upload_subs( test_format, 
            test_lang_code)
         self.video_language_pg.open_video_lang_page( self.test_video.video_id, 
             test_lang_code )
@@ -112,7 +115,7 @@ class WebdriverTestCaseApiV2UploadSubtitles(WebdriverTestCase):
     def test_upload__sbv(self):
         test_lang_code = 'zh-cn'
         test_format = 'sbv'
-        subtitle_language = self.api_upload_test_subs( test_format, 
+        subtitle_language = self.api_upload_subs( test_format, 
            test_lang_code)
         self.video_language_pg.open_video_lang_page( self.test_video.video_id, 
             test_lang_code )
@@ -122,22 +125,22 @@ class WebdriverTestCaseApiV2UploadSubtitles(WebdriverTestCase):
     def test_upload__ttml(self):
         test_lang_code = 'ar'
         test_format = 'ttml'
-        subtitle_language = self.api_upload_test_subs( test_format, 
+        subtitle_language = self.api_upload_subs( test_format, 
            test_lang_code)
         self.video_language_pg.open_video_lang_page( self.test_video.video_id, 
             test_lang_code )
 
         self.assertEqual(243, subtitle_language.get_subtitle_count() )
 
-    def test_upload__dxfp(self):
+    def test_upload__dfxp(self):
         test_lang_code = 'sv'
-        test_format = 'sbv'
-        subtitle_language = self.api_upload_test_subs( test_format, 
+        test_format = 'dfxp'
+        subtitle_language = self.api_upload_subs( test_format, 
            test_lang_code)
         self.video_language_pg.open_video_lang_page( self.test_video.video_id, 
             test_lang_code )
 
-        self.assertEqual(43, subtitle_language.get_subtitle_count() )
+        self.assertEqual(72, subtitle_language.get_subtitle_count() )
 
     def test_upload__edit(self):
         #Create the language for the test video
@@ -158,9 +161,9 @@ class WebdriverTestCaseApiV2UploadSubtitles(WebdriverTestCase):
         expected_list = [line.strip() for line in codecs.open(
             verification_file, encoding='utf-8')]
 
-        video_language_pg.open_video_lang_page(
+        self.video_language_pg.open_video_lang_page(
             self.test_video.video_id, 'en')
-        video_language_pg.edit_subtitles()
+        self.video_language_pg.edit_subtitles()
         sub_editor = subtitle_editor.SubtitleEditor(self)
         sub_editor.continue_past_help()
         editor_sub_list = subtitle_editor.subtitles_list()
@@ -168,9 +171,9 @@ class WebdriverTestCaseApiV2UploadSubtitles(WebdriverTestCase):
         self.assertEqual(expected_list, editor_sub_list)
         typed_subs = sub_editor.type_subs()
         sub_editor.save_and_exit()
-        video_language_pg.open_video_lang_page(
+        self.video_language_pg.open_video_lang_page(
             self.test_video.video_id, 'en')
-        displayed_list = video_language_pg.displayed_lines()
+        displayed_list = self.video_language_pg.displayed_lines()
         #Verify the edited text is in the sub list
         self.assertIn("I'd like to be under the sea", displayed_list)
         #Verify the origal unedited text is still present in the sub list.
