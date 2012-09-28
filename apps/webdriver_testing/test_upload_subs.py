@@ -1,10 +1,13 @@
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.site_pages import video_page
+from apps.webdriver_testing.site_pages import video_language_page
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
+from apps.webdriver_testing.data_factories import SubtitleLanguageFactory
+from apps.subtitles.models import SubtitleLanguage
+from apps.webdriver_testing.editor_pages import subtitle_editor 
 import codecs
 import os
-import time
 
 class WebdriverTestCaseUploadSubsUntimedText(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.
@@ -147,8 +150,60 @@ class WebdriverTestCaseUploadSubsUntimedText(WebdriverTestCase):
         sv_subtitles = test_video4.subtitle_language('sv')
         self.assertEqual(43, int(sv_subtitles.subtitle_count))
 
+    def test_display__site(self):
+        """Upload untimed subs verify content displayed on site lang page. 
 
-        
+        """
+        video_language_pg = video_language_page.VideoLanguagePage(self)
+        test_file = 'Untimed_text.srt'
+        verification_file = os.path.join(self.subs_data_dir,'Untimed_lines.txt')
+        expected_list = [line.strip() for line in codecs.open(
+            verification_file, encoding='utf-8')]
+
+        sub_file = os.path.join(self.subs_data_dir, test_file)       
+        self.video_pg.upload_subtitles('English', sub_file)
+        subtitle_lang = self.test_video.subtitle_language('en')
+        #Open the language page for the video and uploaded lang and compare
+        video_language_pg.open_video_lang_page(
+            self.test_video.video_id, 'en')
+        displayed_list = video_language_pg.displayed_lines()
+        self.assertEqual(expected_list, displayed_list)
+
+    def test_edit(self):
+        """Uploaded subtitles can be opened in the editor and saved.
+
+        """
+        video_language_pg = video_language_page.VideoLanguagePage(self)
+        test_file = 'Untimed_text.srt'
+        verification_file = os.path.join(self.subs_data_dir,'Untimed_lines.txt')
+        expected_list = [line.strip() for line in codecs.open(
+            verification_file, encoding='utf-8')]
+
+        sub_file = os.path.join(self.subs_data_dir, test_file)       
+        self.video_pg.upload_subtitles('English', sub_file)
+        subtitle_lang = self.test_video.subtitle_language('en')
+        #Open the language page for the video and click Edit Subtitles 
+        video_language_pg.open_video_lang_page(
+            self.test_video.video_id, 'en')
+        video_language_pg.edit_subtitles()
+        sub_editor = subtitle_editor.SubtitleEditor(self)
+        sub_editor.continue_past_help()
+        editor_sub_list = subtitle_editor.subtitles_list()
+        #Verify uploaded subs are displayed in the Editor
+        self.assertEqual(expected_list, editor_sub_list)
+        typed_subs = sub_editor.type_subs()
+        sub_editor.save_and_exit()
+        video_language_pg.open_video_lang_page(
+            self.test_video.video_id, 'en')
+        displayed_list = video_language_pg.displayed_lines()
+        #Verify the edited text is in the sub list
+        self.assertIn("I'd like to be under the sea", displayed_list)
+        #Verify the origal unedited text is still present in the sub list.
+        self.assertIn(expected_list[9], displayed_list)
+
+
+
+ 
 class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.
     """
@@ -184,8 +239,12 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         test_file = 'Timed_text.sv.srt'
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self.video_pg.upload_subtitles('Swedish', sub_file)
-        subtitle_lang = self.test_video.subtitle_language('sv')
-        self.assertEqual(72, int(subtitle_lang.subtitle_count))
+        subtitle_lang = SubtitleLanguageFactory.build( 
+            video = self.test_video, 
+            language_code = 'sv' )
+
+        #subtitle_lang = self.test_video.subtitle_language('sv')
+        self.assertEqual(72, subtitle_lang.get_subtitle_count())
         self.video_pg.page_refresh()
 
     def test_timed__sbv(self):
@@ -195,8 +254,15 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         test_file = 'Timed_text.zh-cn.sbv'
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self.video_pg.upload_subtitles('Chinese, Simplified', sub_file)
-        subtitle_lang = self.test_video.subtitle_language('zh-cn')
-        self.assertEqual(243, int(subtitle_lang.subtitle_count))
+        sl = SubtitleLanguage( video = self.test_video, 
+            language_code = 'zh-cn' )
+        print dir(sl.get_tip())
+
+        print sl.get_num_versions()
+
+        #print subtitle_lang.get_subtitles()
+
+        #self.assertEqual( 243, len(subtitle_lang.get_subtitles()) )
         self.video_pg.page_refresh()
 
     def test_timed__ssa(self):
