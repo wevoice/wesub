@@ -189,7 +189,7 @@
                 // Transcript
                 'click a.amara-transcript-autoscroll':   'pauseAutoScroll',
                 'click a.amara-transcript-line':         'transcriptLineClicked',
-                'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
+                //'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
             },
             render: function() {
 
