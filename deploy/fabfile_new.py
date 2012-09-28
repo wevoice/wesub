@@ -718,7 +718,6 @@ def deploy(branch=None, integration_branch=None, skip_celery=False):
     breakage
     """
     _deploy(branch, integration_branch, skip_celery)
-    _deploy(branch, integration_branch, skip_celery)
     #if env.environment not in ['dev']:
     _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user, env.environment, datetime.utcnow()))
 
