@@ -507,6 +507,7 @@
             },
             linkToTranscriptLine: function(line) {
                 console.log(line.get(0));
+                this.hideTranscriptContextMenu();
                 return false;
             },
             pauseAutoScroll: function(isNowPaused) {
@@ -643,10 +644,10 @@
                 this.$amaraContextMenu = _$('div.amara-context-menu');
 
                 // Handle clicks.
-                _$('a', this.$amaraContextMenu).click(function() {
-                    that.linkToTranscriptLine($line);
-                    return false;
-                });
+                //_$('a', this.$amaraContextMenu).click(function() {
+                    //that.linkToTranscriptLine($line);
+                    //return false;
+                //});
 
                 // Don't let clicks inside the context menu bubble up.
                 // Otherwise, the container listener will close the context menu.
