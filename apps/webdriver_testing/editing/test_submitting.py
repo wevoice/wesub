@@ -102,7 +102,6 @@ class WebdriverTestCaseSubmittable(WebdriverTestCase):
         #Verify each line is present in the copy-able text. 
         for line in saved_subs:
             self.assertIn(line, saved_subs)
-        sub_lang = self.test_video.subtitle_language('en')
 
 
     def test_submit__complete(self):
