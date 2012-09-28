@@ -174,20 +174,22 @@
                 };
             },
             events: {
-                'click':                               'mouseClicked',
-                'mousemove':                           'mouseMoved',
 
-                'click ul.amara-languages-list a':     'changeLanguage',
-                'click a.amara-current-language':      'languageButtonClicked',
-                'click a.amara-share-button':          'shareButtonClicked',
-                'click a.amara-transcript-button':     'toggleTranscriptDisplay',
-                'click a.amara-subtitles-button':      'toggleSubtitlesDisplay',
-                'click a.amara-transcript-autoscroll': 'pauseAutoScroll',
-                'click a.amara-transcript-line':       'transcriptLineClicked',
-                //'contextmenu a.amara-transcript-line': 'showTranscriptContextMenu',
+                // Global
+                'click':                                 'mouseClicked',
+                'mousemove':                             'mouseMoved',
 
-                // TODO: This does not work. Why?
-                'scroll div.amara-transcript-body':    'pauseAutoScroll'
+                // Toolbar
+                'click a.amara-current-language':        'languageButtonClicked',
+                'click a.amara-share-button':            'shareButtonClicked',
+                'click a.amara-subtitles-button':        'toggleSubtitlesDisplay',
+                'click ul.amara-languages-list a':       'changeLanguage',
+                'click a.amara-transcript-button':       'toggleTranscriptDisplay',
+
+                // Transcript
+                'click a.amara-transcript-autoscroll':   'pauseAutoScroll',
+                'click a.amara-transcript-line':         'transcriptLineClicked',
+                'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
             },
             render: function() {
 
@@ -503,6 +505,10 @@
                 this.$amaraLanguagesList.toggle();
                 return false;
             },
+            linkToTranscriptLine: function(line) {
+                console.log(line.get(0));
+                return false;
+            },
             pauseAutoScroll: function(isNowPaused) {
 
                 var that = this;
@@ -625,8 +631,28 @@
                 // Create the context menu DOM.
                 //
                 // TODO: Use a sensible templating system. Everywhere.
-                _$('body').append('<div class="amara-context-menu"><ul><li><a href="#">Link to this line</a></li></ul></div>');
+                _$('body').append('' +
+                        '<div class="amara-context-menu">' +
+                        '    <ul>' +
+                        '        <li>' +
+                        '            <a class="amara-transcript-link-to-line" href="#">Link to this line</a>' +
+                        '        </li>' +
+                        '    </ul>' +
+                        '</div>');
+
                 this.$amaraContextMenu = _$('div.amara-context-menu');
+
+                // Handle clicks.
+                _$('a', this.$amaraContextMenu).click(function() {
+                    that.linkToTranscriptLine($line);
+                    return false;
+                });
+
+                // Don't let clicks inside the context menu bubble up.
+                // Otherwise, the container listener will close the context menu.
+                this.$amaraContextMenu.click(function(e) {
+                    e.stopPropagation();
+                });
 
                 // Position the context menu near the cursor.
                 this.$amaraContextMenu.css('top', this.cursorY + 11);
