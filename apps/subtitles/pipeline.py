@@ -110,11 +110,12 @@ def _get_language(video, language_code):
     return sl, language_needs_save
 
 def _add_subtitles(video, language_code, subtitles, title, description, author,
-                   visibility, visibility_override, parents):
+                   visibility, visibility_override, parents,
+                   rollback_of_version_number):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
-    add_subtitles and add_subtitles_unsafe are thin wrappers around this.
+    add_subtitles and unsafe_add_subtitles are thin wrappers around this.
 
     """
     sl, language_needs_save = _get_language(video, language_code)
@@ -124,16 +125,50 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 
     data = {'title': title, 'description': description, 'author': author,
             'visibility': visibility, 'visibility_override': visibility_override,
-            'parents': [_get_version(video, p) for p in (parents or [])]}
+            'parents': [_get_version(video, p) for p in (parents or [])],
+            'rollback_of_version_number': rollback_of_version_number}
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
 
     return version
 
+def _rollback_to(video, language_code, version_number, rollback_author):
+    target = SubtitleVersion.objects.get(video=video,
+                                         language_code=language_code,
+                                         version_number=version_number)
+
+    # The new version is mostly a copy of the target.
+    data = {
+        'video': target.video,
+        'language_code': target.language_code,
+        'subtitles': target.get_subtitles(),
+        'title': target.title,
+        'description': target.description,
+        'visibility_override': None,
+    }
+
+    # If any version in the history is public, then rollbacks should also result
+    # in public versions.
+    existing_versions = target.sibling_set.all()
+    data['visibility'] = ('public'
+                          if any(v.is_public() for v in existing_versions)
+                          else 'private')
+
+    # The author of the rollback is distinct from the target's author.
+    data['author'] = rollback_author
+
+    # The new version is always simply a child of the current tip.
+    data['parents'] = None
+
+    # Finally, rollback versions have a special attribute to track them.
+    data['rollback_of_version_number'] = version_number
+
+    return _add_subtitles(**data)
+
 
 # Public API ------------------------------------------------------------------
-def add_subtitles_unsafe(video, language_code, subtitles,
+def unsafe_add_subtitles(video, language_code, subtitles,
                          title=None, description=None, author=None,
                          visibility=None, visibility_override=None,
                          parents=None):
@@ -148,7 +183,8 @@ def add_subtitles_unsafe(video, language_code, subtitles,
 
     """
     return _add_subtitles(video, language_code, subtitles, title, description,
-                          author, visibility, visibility_override, parents)
+                          author, visibility, visibility_override, parents,
+                          None)
 
 def add_subtitles(video, language_code, subtitles,
                   title=None, description=None, author=None,
@@ -161,7 +197,7 @@ def add_subtitles(video, language_code, subtitles,
     It runs in a transaction, so while it may fail the DB should be left in
     a consistent state.
 
-    If you already have a transaction running you can use add_subtitles_unsafe
+    If you already have a transaction running you can use unsafe_add_subtitles
     to avoid dealing with nested transactions.
 
     You need to check writelocking yourself.  For now.  This may change in the
@@ -190,4 +226,46 @@ def add_subtitles(video, language_code, subtitles,
     with transaction.commit_on_success():
         return _add_subtitles(video, language_code, subtitles, title,
                               description, author, visibility,
-                              visibility_override, parents)
+                              visibility_override, parents, None)
+
+
+def unsafe_rollback_to(video, language_code, version_number,
+                       rollback_author=None):
+    """Rollback to the given video/language/version without a transaction.
+
+    You probably want to use rollback_to instead, but if you're already inside
+    a transaction that will rollback on exceptions you can use this instead of
+    dealing with nested transactions.
+
+    For more information see the docstring for rollback_to.  Aside from the
+    transaction handling this function works exactly the same way.
+
+    """
+    return _rollback_to(video, language_code, version_number, rollback_author)
+
+def rollback_to(video, language_code, version_number,
+                rollback_author=None):
+    """Rollback to the given video/language/version.
+
+    A rollback creates a new version at the tip of the branch, identical to the
+    target version except for a few items:
+
+    * The parent is simply the current tip, regardless of the target's parents.
+    * The author of the rollback is distinct from the target's author.
+    * The new version will be public if ANY version in the history is public,
+      or private otherwise.
+
+    If the target version does not exist, a SubtitleVersion.DoesNotExist
+    exception will be raised.
+
+    This function runs in a transaction, so while it may fail the DB should be
+    left in a consistent state.
+
+    If you already have a transaction running you can use unsafe_rollback_to
+    to avoid dealing with nested transactions.
+
+    """
+    with transaction.commit_on_success():
+        return _rollback_to(video, language_code, version_number,
+                            rollback_author)
+

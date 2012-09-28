@@ -570,3 +570,149 @@ class TestBasicAdding(TestCase):
         # Shut up, Pyflakes.
         assert (en1 and en2 and en3 and fr1 and fr2 and fr3 and fr4 and
                 de1 and de2 and cy1 and cy2)
+
+
+class TestRollbacks(TestCase):
+    def setUp(self):
+        self.video = make_video()
+        users = User.objects.all()
+        (self.u1, self.u2) = users[:2]
+        self.anon = User.get_anonymous()
+
+        v = self.video
+        self.en1 = pipeline.add_subtitles(v, 'en',
+                                          title="title 1", description="desc 1",
+                                          subtitles=[(100, 200, "sub 1")],
+                                          author=self.u1)
+        self.en2 = pipeline.add_subtitles(v, 'en',
+                                          title="title 2", description="desc 2",
+                                          subtitles=[(100, 200, "sub 2")],
+                                          author=self.u2)
+        self.en3 = pipeline.add_subtitles(v, 'en',
+                                          title="title 3", description="desc 3",
+                                          subtitles=[(100, 200, "sub 3")],
+                                          author=self.u1)
+
+
+    def test_basic_rollback(self):
+        v = self.video
+        en1, en2, en3 = self.en1, self.en2, self.en3
+
+        def _ids(s):
+            return set(i.id for i in s)
+
+
+        source = en1
+        rb = pipeline.rollback_to(v, 'en', 1)
+
+        self.assertTrue(rb.is_rollback())
+        self.assertEqual(rb.get_rollback_source(), en1)
+
+        self.assertEqual(rb.video.id, source.video.id)
+        self.assertEqual(rb.subtitle_language.id, source.subtitle_language.id)
+        self.assertEqual(rb.language_code, source.language_code)
+        self.assertEqual(rb.get_subtitles(), source.get_subtitles())
+        self.assertEqual(rb.title, source.title)
+        self.assertEqual(rb.description, source.description)
+        self.assertEqual(_ids(rb.parents.all()), _ids([en3]))
+
+    def test_rollback_authors(self):
+        v = self.video
+        en1, en2, en3 = self.en1, self.en2, self.en3
+        u1, us, anon = self.u1, self.u2, self.anon
+
+        # Rollbacks do not inherit the author of their sources.
+        rb = pipeline.rollback_to(v, 'en', 1)
+        self.assertEqual(rb.author.id, anon.id)
+
+        rb = pipeline.rollback_to(v, 'en', 2)
+        self.assertEqual(rb.author.id, anon.id)
+
+        # The rollback author can be explicitely given.
+        rb = pipeline.rollback_to(v, 'en', 3, rollback_author=u1)
+        self.assertEqual(rb.author.id, u1.id)
+
+        rb = pipeline.rollback_to(v, 'en', 2, rollback_author=u1)
+        self.assertEqual(rb.author.id, u1.id)
+
+    def test_rollback_parents(self):
+        v = self.video
+
+        de1 = pipeline.add_subtitles(v, 'de', [])
+        is1 = pipeline.add_subtitles(v, 'is', [])
+        is2 = pipeline.add_subtitles(v, 'is', [], parents=[de1])
+        is3 = pipeline.add_subtitles(v, 'is', [])
+
+        def _ids(s):
+            return set(i.id for i in s)
+
+
+        self.assertEqual(_ids(is2.parents.all()), _ids([is1, de1]))
+
+        # Rollbacks do not inherit the parents of their sources.
+        is4 = pipeline.rollback_to(v, 'is', 1)
+        self.assertEqual(_ids(is4.parents.all()), _ids([is3]))
+
+        is5 = pipeline.rollback_to(v, 'is', 2)
+        self.assertEqual(_ids(is5.parents.all()), _ids([is4]))
+
+    def test_rollback_visibility(self):
+        v = self.video
+
+        # Fully public subtitle histories result in public rollbacks.
+        en1 = pipeline.add_subtitles(v, 'en', [])
+        en2 = pipeline.add_subtitles(v, 'en', [])
+
+        rb = pipeline.rollback_to(v, 'en', 1)
+        self.assertTrue(rb.is_public())
+
+        is1 = pipeline.add_subtitles(v, 'is', [], visibility='public')
+        is2 = pipeline.add_subtitles(v, 'is', [], visibility='private',
+                                     visibility_override='public')
+
+        rb = pipeline.rollback_to(v, 'is', 1)
+        self.assertTrue(rb.is_public())
+
+        # Fully private subtitle histories result in private rollbacks.
+        de1 = pipeline.add_subtitles(v, 'de', [], visibility='private')
+        de2 = pipeline.add_subtitles(v, 'de', [], visibility='private')
+
+        rb = pipeline.rollback_to(v, 'de', 1)
+        self.assertTrue(rb.is_private())
+
+        fr1 = pipeline.add_subtitles(v, 'fr', [], visibility_override='private')
+        fr2 = pipeline.add_subtitles(v, 'fr', [], visibility_override='private')
+
+        rb = pipeline.rollback_to(v, 'fr', 1)
+        self.assertTrue(rb.is_private())
+
+        # Histories with a mix of public and private result in public rollbacks.
+        pt1 = pipeline.add_subtitles(v, 'pt', [], visibility='public')
+        pt2 = pipeline.add_subtitles(v, 'pt', [], visibility='private')
+
+        rb = pipeline.rollback_to(v, 'pt', 1)
+        self.assertTrue(rb.is_public())
+
+        pl1 = pipeline.add_subtitles(v, 'pl', [], visibility='private')
+        pl2 = pipeline.add_subtitles(v, 'pl', [], visibility='public')
+
+        rb = pipeline.rollback_to(v, 'pl', 1)
+        self.assertTrue(rb.is_public())
+
+        ja1 = pipeline.add_subtitles(v, 'ja', [], visibility='private')
+        ja2 = pipeline.add_subtitles(v, 'ja', [], visibility='public')
+        ja3 = pipeline.add_subtitles(v, 'ja', [], visibility='private')
+
+        rb = pipeline.rollback_to(v, 'ja', 1)
+        self.assertTrue(rb.is_public())
+
+        rb = pipeline.rollback_to(v, 'ja', 2)
+        self.assertTrue(rb.is_public())
+
+        rb = pipeline.rollback_to(v, 'ja', 3)
+        self.assertTrue(rb.is_public())
+
+        # Shut up, Pyflakes.
+        assert (en1 and en2 and is1 and is2 and de1 and de2 and fr1 and fr2 and
+                pt1 and pt2 and pl1 and pl2 and ja1 and ja2 and ja3)
+

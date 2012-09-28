@@ -671,6 +671,19 @@ class SubtitleVersion(models.Model):
     description = models.TextField(blank=True)
     note = models.CharField(max_length=512, blank=True, default='')
 
+    # If this version is a rollback we record the version number of its source.
+    # Note that there are three possible values here:
+    #
+    # None: This version is not a rollback.
+    # 0: This version is a rollback, but we don't know the source (legacy data).
+    # 1+: This version is a rollback and the source is version N.
+    #
+    # You should probably just use is_rollback and get_rollback_source to work
+    # with this value.
+    rollback_of_version_number = models.PositiveIntegerField(null=True,
+                                                             blank=True,
+                                                             default=None)
+
     # Denormalized count of the number of subtitles this version contains, for
     # easier filtering later.
     subtitle_count = models.PositiveIntegerField(default=0)
@@ -797,6 +810,13 @@ class SubtitleVersion(models.Model):
         )
 
 
+    def clean(self):
+        if self.rollback_of_version_number != None:
+            if self.rollback_of_version_number >= self.version_number:
+                raise ValidationError(
+                    "The version number of a rollback's source must be less "
+                    "than version number of the rollback itself!")
+
     def save(self, *args, **kwargs):
         creating = not self.pk
 
@@ -906,6 +926,22 @@ class SubtitleVersion(models.Model):
             return False
         else:
             return self.visibility == 'public'
+
+
+    def is_rollback(self):
+        """Return whether this version is a rollback of another version."""
+
+        return self.rollback_of_version_number != None
+
+    def get_rollback_source(self):
+        """Return the SubtitleVersion that is the source for this rollback, or None."""
+
+        n = self.rollback_of_version_number
+        if n == 0 or n == None:
+            # Non-rollbacks and legacy rollbacks have no source.
+            return None
+        else:
+            return self.sibling_set.get(version_number=n)
 
 
     @property

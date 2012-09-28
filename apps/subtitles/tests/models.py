@@ -19,14 +19,17 @@
 
 """Basic sanity tests to make sure the subtitle models aren't completely broken."""
 
-from django.test import TestCase
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.test import TestCase
 
 from babelsubs.storage import SubtitleSet
 
 from apps.auth.models import CustomUser as User
 from apps.subtitles import pipeline
-from apps.subtitles.models import SubtitleLanguage, Collaborator
+from apps.subtitles.models import (
+    SubtitleLanguage, Collaborator, SubtitleVersion
+)
 from apps.subtitles.tests.utils import (
     make_video, make_video_2, make_video_3, make_sl, refresh, ids, parent_ids,
     ancestor_ids
@@ -442,6 +445,54 @@ class TestSubtitleVersion(TestCase):
 
         v = self.sl_en.add_version()
         _assert_siblings(v, 1, 2, 3, 4)
+
+    def test_rollback_data(self):
+        def _assert_rollback_info(v, rollback_of_version_number, is_rollback,
+                                  get_rollback_source):
+            self.assertEqual(v.rollback_of_version_number,
+                             rollback_of_version_number)
+
+            self.assertEqual(v.is_rollback(), is_rollback)
+
+            if get_rollback_source:
+                self.assertEqual(v.get_rollback_source().id,
+                                 get_rollback_source.id)
+            else:
+                self.assertIsNone(v.get_rollback_source())
+
+        # Two normal versions.
+        v1 = self.sl_en.add_version(subtitles=[])
+        _assert_rollback_info(v1, None, False, None)
+
+        v2 = self.sl_en.add_version(subtitles=[])
+        _assert_rollback_info(v2, None, False, None)
+
+        # Simulate a legacy rollback.
+        v3 = self.sl_en.add_version(subtitles=[], rollback_of_version_number=0)
+        _assert_rollback_info(v3, 0, True, None)
+
+        # Add a normal one on top.
+        v4 = self.sl_en.add_version(subtitles=[])
+        _assert_rollback_info(v4, None, False, None)
+
+        # Now add a new-style rollback.
+        v5 = self.sl_en.add_version(subtitles=[], rollback_of_version_number=2)
+        _assert_rollback_info(v5, 2, True, v2)
+
+        # Add another normal one on top.
+        v6 = self.sl_en.add_version(subtitles=[])
+        _assert_rollback_info(v6, None, False, None)
+
+        # Rollbacks to rollbacks are cool I guess.
+        v7 = self.sl_en.add_version(subtitles=[], rollback_of_version_number=5)
+        _assert_rollback_info(v7, 5, True, v5)
+
+        # Make sure the sanity checks work.
+        crazy = SubtitleVersion(version_number=4, rollback_of_version_number=4)
+        self.assertRaises(ValidationError, lambda: crazy.full_clean())
+
+        crazy = SubtitleVersion(version_number=4, rollback_of_version_number=200)
+        self.assertRaises(ValidationError, lambda: crazy.full_clean())
 
 
 class TestHistory(TestCase):
