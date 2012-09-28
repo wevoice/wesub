@@ -295,9 +295,17 @@ class SubtitleLanguage(models.Model):
     of the actual data for the subtitles is stored in the version themselves.
 
     """
+    # Basic Data
     video = models.ForeignKey(Video, related_name='newsubtitlelanguage_set')
     language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
+    created = models.DateTimeField(editable=False)
 
+    # Should be True if the latest version for this set of subtitles covers all
+    # of the video, False otherwise.  This is set and handled entirely
+    # independently of versions though.
+    subtitles_complete = models.BooleanField(default=False)
+
+    # Writelocking
     writelock_time = models.DateTimeField(null=True, blank=True,
                                           editable=False)
     writelock_owner = models.ForeignKey(User, null=True, blank=True,
@@ -306,12 +314,16 @@ class SubtitleLanguage(models.Model):
     writelock_session_key = models.CharField(max_length=255, blank=True,
                                              editable=False)
 
-    created = models.DateTimeField(editable=False)
-
     # Denormalized signoff/collaborator count fields.
-    # These are stored here for speed of retrieval and filtering.  They are
-    # updated in the update_signoff_counts() method, which is called from the
-    # Collaborator .save() method.
+    # These are stored here for speed of retrieval and filtering.
+    #
+    # They are updated in the update_signoff_counts() method, which is called
+    # from the Collaborator .save() method.
+    #
+    # I'd really like to reconsider whether we need these when we actually start
+    # using them.  If we can use some SQL magic in a manager to avoid the
+    # denormalized fields but still have speedy queries I'd prefer that to
+    # having to make sure these are properly synced.
     unofficial_signoff_count = models.PositiveIntegerField(default=0,
                                                            editable=False)
     official_signoff_count = models.PositiveIntegerField(default=0,
@@ -323,8 +335,10 @@ class SubtitleLanguage(models.Model):
     pending_signoff_expired_count = models.PositiveIntegerField(default=0,
                                                                 editable=False)
 
+    # Statistics
     subtitles_fetched_counter = RedisSimpleField()
 
+    # Manager
     objects = SubtitleLanguageManager()
 
     class Meta:
@@ -347,10 +361,21 @@ class SubtitleLanguage(models.Model):
         return super(SubtitleLanguage, self).save(*args, **kwargs)
 
 
-    def get_tip(self):
-        """Return the tipmost version of this language (if any)."""
+    def get_tip(self, public=False):
+        """Return the tipmost version of this language (if any).
 
-        versions = self.subtitleversion_set.order_by('-version_number')[:1]
+        If public is given, returns the tipmost version that is visible to the
+        general public (if any).
+
+        """
+        if public:
+            versions = SubtitleVersion.objects.public()
+        else:
+            versions = SubtitleVersion.objects.all()
+
+        versions = versions.filter(subtitle_language=self)
+        versions = versions.order_by('-version_number')
+        versions = versions[:1]
 
         if versions:
             return versions[0]
@@ -523,23 +548,27 @@ class SubtitleLanguage(models.Model):
 
         return self.subtitleversion_set.all()
 
-    def version(self, public_only=True, version_no=None):
-        """
-        Convinience method to fetch the subtitle set with the given
-        attributes for visibility and version number, returns None
-        if nothing is found
+    def version(self, public_only=True, version_number=None):
+        """Return a SubtitleVersion of this language matching the arguments.
+
+        Returns None if no versions match.
+
         """
         assert self.pk, "Can't find a version for a language that hasn't been saved"
-        args = {'language_code': self.language_code}
-        if version_no:
-            args['version_no'] = version_no
-        base_queryset = SubtitleVersion.objects.all()
-        if public_only:
-            base_queryset = SubtitleVersion.objects.public()
+
+        qs = self.subtitleversion_set
+        qs = qs.public() if public_only else qs.all()
+
+        if version_number != None:
+            qs = qs.filter(version_number=version_number)
+        else:
+            qs = qs.order_by('-version_number')
+
         try:
-            return base_queryset.filter(**args).order_by('-version_number')[0]
+            return qs[:1].get()
         except SubtitleVersion.DoesNotExist:
             return None
+
 
     def get_translation_source_language_code(self):
         """
@@ -613,10 +642,13 @@ class SubtitleVersion(models.Model):
     """
     parents = models.ManyToManyField('self', symmetrical=False, blank=True)
 
-    video = models.ForeignKey(Video)
+    video = models.ForeignKey(Video, related_name='newsubtitleversion_set')
     subtitle_language = models.ForeignKey(SubtitleLanguage)
     language_code = models.CharField(max_length=16, choices=ALL_LANGUAGES)
 
+    # If you just want to *check* the visibility of a version you probably want
+    # to use the is_public and is_private methods instead, which handle the
+    # logic of visibility + visibility_override.
     visibility = models.CharField(max_length=10,
                                   choices=(('public', 'public'),
                                            ('private', 'private')),
@@ -721,7 +753,8 @@ class SubtitleVersion(models.Model):
     lineage = property(get_lineage, set_lineage)
 
     class Meta:
-        unique_together = [('video', 'language_code', 'version_number')]
+        unique_together = [('video', 'subtitle_language', 'version_number'),
+                           ('video', 'language_code', 'version_number')]
 
 
     def __init__(self, *args, **kwargs):
@@ -856,6 +889,23 @@ class SubtitleVersion(models.Model):
         self._time_change = time_change
 
         return time_change, text_change
+
+
+    def is_private(self):
+        if self.visibility_override == 'public':
+            return False
+        elif self.visibility_override == 'private':
+            return True
+        else:
+            return self.visibility == 'private'
+
+    def is_public(self):
+        if self.visibility_override == 'public':
+            return True
+        elif self.visibility_override == 'private':
+            return False
+        else:
+            return self.visibility == 'public'
 
 
 # Collaborators ---------------------------------------------------------------
