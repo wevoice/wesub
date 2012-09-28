@@ -5,8 +5,21 @@ from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.teams.models import TeamMember
 import json
 from apps.testhelpers.views import _create_videos
+from tastypie.models import ApiKey
+from django.http import Http404, HttpResponse
+from django.test.client import RequestFactory
 
-
+def create_user_api_key(self, user_obj):
+    self.client.login(username=user_obj.username, password='password')
+    factory = RequestFactory()
+    request = factory.get('/profiles/edit')
+    key, created = ApiKey.objects.get_or_create(user=user_obj)
+    if not created:
+        key.key = key.generate_key()
+        key.save()
+    response =  HttpResponse(json.dumps({"key":key.key}))
+    print response
+    return response
 
 
 def create_video(self, video_url=None):

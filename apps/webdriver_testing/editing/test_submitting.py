@@ -110,7 +110,8 @@ class WebdriverTestCaseSubmittable(WebdriverTestCase):
         """
 
         self.sub_editor.submit(complete=True)
-        sub_lang = self.test_video.subtitle_language('en')
+        sub_lang = self.test_video.latest_subtitles('en')
+        print sub_lang
         self.assertEqual(6, sub_lang.subtitle_count)
         self.assertEqual(True, sub_lang.is_complete)
 

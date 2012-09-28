@@ -12,6 +12,7 @@ from apps.teams.models import TeamLanguagePreference
 from apps.teams.models import Workflow 
 from apps.auth.models import CustomUser as User
 from apps.messages.models import Message
+from apps.subtitles.models import SubtitleLanguage
 
 
 class VideoFactory(factory.Factory):
@@ -50,7 +51,6 @@ class TeamVideoFactory(factory.Factory):
     video = factory.SubFactory(VideoFactory)
     added_by = factory.SubFactory(UserFactory)
 
-
 class TeamProjectFactory(factory.Factory):
     FACTORY_FOR = Project
     team = factory.SubFactory(TeamFactory)
@@ -74,5 +74,6 @@ class TeamLangPrefFactory(factory.Factory):
 class WorkflowFactory(factory.Factory):
     FACTORY_FOR = Workflow
     
-
+class SubtitleLanguageFactory(factory.Factory):
+    FACTORY_FOR = SubtitleLanguage
 

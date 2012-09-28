@@ -23,7 +23,7 @@ from dev_settings import *
 SITE_ID = 15
 STATIC_URL = "http://unisubs.example.com:80/site_media/"
 MEDIA_URL = "http://unisubs.example.com:80/user-data/"
-DEFAULT_PROTOCOL  = 'http'
+#DEFAULT_PROTOCOL  = 'http'
 
 
 DATABASES = {
@@ -49,7 +49,6 @@ if COMPRESS_MEDIA:
 
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
-DEFAULT_PROTOCOL = 'http'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--with-xunit',
              '--xunit-file=apps/webdriver_testing/Screenshots/nosetests.xml', 
