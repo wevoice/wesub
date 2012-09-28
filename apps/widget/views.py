@@ -324,14 +324,16 @@ def download_subtitles(request, format):
 
     if not team_video:
         # Non-team videos don't require moderation
-        version = language and language.version(public_only=False, version_no=revision)
+        version = language and language.version(public_only=False,
+                                                version_number=revision)
     else:
         # Members can see all versions
         member = get_member(request.user, team_video.team)
         if member:
-            version = language and language.version(public_only=False, version_no=revision)
+            version = language and language.version(public_only=False,
+                                                    version_number=revision)
         else:
-            version = language and language.version(version_no=revision)
+            version = language and language.version(version_number=revision)
 
     if not version:
         raise Http404
