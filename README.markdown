@@ -39,7 +39,7 @@ To run the development version:
 
    Now run following command:
 
-        ./bootstrap-vagrant.sh
+        bootstrap-vagrant.sh
 
    It's safe to run `bootstrap-vagrant.sh` multiple times if something goes
    wrong (like PyPi goes down).
@@ -49,7 +49,7 @@ To run the development version:
 
 5. In your vagrant vm (the one you switched to in step 3), run the site with:
 
-        ./dev-runserver.sh
+        dev-runserver.sh
 
    You can access the site at <http://unisubs.example.com:8000>.
 
