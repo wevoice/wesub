@@ -213,6 +213,7 @@ class TestSubtitleVersion(TestCase):
         self.video = make_video()
         self.video2 = make_video_2()
         self.sl_en = make_sl(self.video, 'en')
+        self.sl_is = make_sl(self.video, 'is')
 
 
     def test_create_subtitle_version(self):
@@ -417,6 +418,30 @@ class TestSubtitleVersion(TestCase):
         self.assertEqual(200, sv4.subtitle_count)
         sv4 = refresh(sv4)
         self.assertEqual(200, sv4.subtitle_count)
+
+    def test_sibling_set(self):
+        def _assert_siblings(sv, *vns):
+            siblings = sv.sibling_set.order_by('version_number')
+
+            for v in siblings:
+                self.assertEqual(sv.subtitle_language_id, v.subtitle_language_id)
+
+            self.assertEqual([v.version_number for v in siblings], list(vns))
+
+        v = self.sl_en.add_version()
+        _assert_siblings(v, 1)
+
+        v = self.sl_en.add_version()
+        _assert_siblings(v, 1, 2)
+
+        v = self.sl_en.add_version()
+        _assert_siblings(v, 1, 2, 3)
+
+        v = self.sl_is.add_version()
+        _assert_siblings(v, 1)
+
+        v = self.sl_en.add_version()
+        _assert_siblings(v, 1, 2, 3, 4)
 
 
 class TestHistory(TestCase):
@@ -1419,100 +1444,6 @@ class TestSubtitleLanguageCollaboratorInteractions(TestCase):
         self.assertEqual(sl.pending_signoff_unexpired_count, 0)
 
         self.assertEqual(sl.unofficial_signoff_count, 1)
-
-    def test_needing_functions(self):
-        slo = SubtitleLanguage.objects
-
-        # ---------------------------------------------------------------------
-        # collab signoff official
-        # 1
-        # 2
-        # 3
-        self.assertEqual(slo._needing_initial_signoff(0, 0).count(), 1)
-        self.assertEqual(slo._needing_initial_signoff(1, 0).count(), 1)
-        self.assertEqual(slo._needing_initial_signoff(1, 1).count(), 1)
-
-        self.assertEqual(slo._needing_unofficial_signoff(0, 0).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(1, 0).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(1, 1).count(), 0)
-
-        self.assertEqual(slo._needing_official_signoff(0, 0).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(1, 0).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(1, 1).count(), 0)
-
-        # ---------------------------------------------------------------------
-        # collab signoff official
-        # 1      ✔
-        # 2
-        # 3
-        self.c1.signoff = True
-        self.c1.save()
-
-        self.assertEqual(slo._needing_initial_signoff(0, 0).count(), 0)
-        self.assertEqual(slo._needing_initial_signoff(1, 0).count(), 0)
-
-        self.assertEqual(slo._needing_unofficial_signoff(1, 0).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(1, 1).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(2, 0).count(), 1)
-
-        self.assertEqual(slo._needing_official_signoff(1, 0).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(1, 1).count(), 1)
-        self.assertEqual(slo._needing_official_signoff(2, 0).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(2, 1).count(), 0)
-
-        # ---------------------------------------------------------------------
-        # collab signoff official
-        # 1      ✔
-        # 2      ✔
-        # 3
-        self.c2.signoff = True
-        self.c2.save()
-
-        self.assertEqual(slo._needing_initial_signoff(0, 0).count(), 0)
-        self.assertEqual(slo._needing_initial_signoff(1, 0).count(), 0)
-
-        self.assertEqual(slo._needing_unofficial_signoff(1, 0).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(1, 1).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(2, 0).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(2, 1).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(3, 0).count(), 1)
-        self.assertEqual(slo._needing_unofficial_signoff(3, 1).count(), 1)
-
-        self.assertEqual(slo._needing_official_signoff(1, 0).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(2, 0).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(3, 0).count(), 0)
-
-        self.assertEqual(slo._needing_official_signoff(1, 1).count(), 1)
-        self.assertEqual(slo._needing_official_signoff(2, 0).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(2, 1).count(), 1)
-        self.assertEqual(slo._needing_official_signoff(3, 1).count(), 0)
-
-        # ---------------------------------------------------------------------
-        # collab signoff official
-        # 1      ✔
-        # 2      ✔
-        # 3      ✔       ✔
-        self.c3.signoff = True
-        self.c3.signoff_is_official = True
-        self.c3.save()
-
-        self.assertEqual(slo._needing_initial_signoff(0, 0).count(), 0)
-        self.assertEqual(slo._needing_initial_signoff(1, 0).count(), 0)
-
-        self.assertEqual(slo._needing_unofficial_signoff(1, 0).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(1, 1).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(2, 0).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(2, 1).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(3, 0).count(), 0)
-        self.assertEqual(slo._needing_unofficial_signoff(3, 1).count(), 1)
-
-        self.assertEqual(slo._needing_official_signoff(1, 0).count(), 0)
-
-        self.assertEqual(slo._needing_official_signoff(1, 1).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(2, 0).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(2, 1).count(), 0)
-        self.assertEqual(slo._needing_official_signoff(2, 2).count(), 1)
-        self.assertEqual(slo._needing_official_signoff(3, 1).count(), 0)
 
 
 class TestTeamInteractions(TestCase):

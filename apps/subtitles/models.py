@@ -908,6 +908,19 @@ class SubtitleVersion(models.Model):
             return self.visibility == 'public'
 
 
+    @property
+    def sibling_set(self):
+        """Return a manager of a version's sibling versions, including itself.
+
+        Sibling versions are versions for the same video and language.
+
+        Since this returns a SubtitleVersionManager you can filter it further
+        with .public() and so on.
+
+        """
+        return self.subtitle_language.subtitleversion_set
+
+
 # Collaborators ---------------------------------------------------------------
 class CollaboratorManager(models.Manager):
     def get_for(self, subtitle_language):
