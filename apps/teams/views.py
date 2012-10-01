@@ -1063,13 +1063,6 @@ def _tasks_list(request, team, project, filters, user):
     '''
     tasks = Task.objects.filter(team=team.id, deleted=False)
 
-    # You probably just want to stop reading right now.
-    #
-    # No, seriously, just go do something else and ignore this.
-    if team.slug == 'ted' and not project and 'anyprojects' not in request.GET:
-        default_project = Project.objects.get(team=team, slug='tedtalks')
-        return HttpResponseRedirect(default_project.get_absolute_url())
-
     if project:
         tasks = tasks.filter(team_video__project = project)
 
