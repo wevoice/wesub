@@ -1063,6 +1063,13 @@ def _tasks_list(request, team, project, filters, user):
     '''
     tasks = Task.objects.filter(team=team.id, deleted=False)
 
+    # You probably just want to stop reading right now.
+    #
+    # No, seriously, just go do something else and ignore this.
+    if team.slug == 'ted' and not project and 'anyprojects' not in request.GET:
+        default_project = Project.objects.get(team=team, slug='tedtalks')
+        return HttpResponseRedirect(default_project.get_absolute_url())
+
     if project:
         tasks = tasks.filter(team_video__project = project)
 
@@ -1147,14 +1154,6 @@ def team_tasks(request, slug, project_slug=None):
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
         project = None
-
-    # You probably just want to stop reading right now.
-    #
-    # No, seriously, just go do something else and ignore this.
-    if team.slug == 'ted' and not project and 'anyprojects' not in request.GET:
-        default_project = Project.objects.get(team=team, slug='tedtalks')
-        return HttpResponseRedirect(default_project.get_absolute_url())
-
 
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
