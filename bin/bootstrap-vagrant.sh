@@ -25,7 +25,8 @@ pip install -r requirements-test.txt
 cd ..
 
 # Create a base settings_local.py ---------------------------------------------
-cat > settings_local.py <<EOF
+if [ ! -e settings_local.py ]; then
+    cat > settings_local.py <<EOF
 # This setting lets non-admin accounts view the Django Debug Toolbar.
 # Useful for development when you're debugging queries made for non-admins.
 EVERYONE_CAN_DEBUG = True
@@ -81,6 +82,7 @@ STANFORD_CONSUMER_SECRET = ''
 YOUTUBE_ALWAYS_PUSH_USERNAME = None
 YOUTUBE_ALWAYS_PUSH_TO = {}
 EOF
+fi
 
 # Set up the DB ---------------------------------------------------------------
 python manage.py syncdb --all --settings=dev_settings --noinput
