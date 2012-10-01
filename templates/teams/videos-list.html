@@ -48,10 +48,17 @@
                 <span></span>
             </a>
         </div>
-        <div class="filters group {% if filtered or request.GET.sort %}active{% endif %}">
+        <div class="filters group {% if filtered or request.GET.sort or project %}active{% endif %}">
             <p>
                 <div class="filter-chunk">
-                    <span class="inner">{% trans 'Videos with' %}</span>
+                    <span class="inner">{% trans 'Videos in' %}</span>
+                    <select name="project-filter" id="project-filter">
+                        <option value="{% url teams:detail team.slug %}{% query_string request.GET anyprojects='true' %}" id="project-opt-any">{% trans 'any project' %}</option>
+                        {% for proj in project_choices %}
+                            <option id="project-opt-{{ proj.id }}" {% if project == proj %}selected="selected"{% endif %} value="{% url teams:project_video_list team.slug proj.slug %}{% query_string request.GET %}">{{ proj.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% trans 'with' %}
                     <select name="lang-filter" id="lang-filter">
                         <option value="{{ request.path }}{% query_string request.GET lang='' page='' %}" id="lang-opt-any">{% trans 'any' %}</option>
                         <option value="{{ request.path }}{% query_string request.GET lang='none' page='' %}" id="lang-opt-none">{% trans 'no' %}</option>
@@ -123,7 +130,8 @@
                     <fieldset>
                         {% if not request.user|can_delete_video_in_team:team %}
                             <p>{% blocktrans %}You are removing this video from the {{ team }} team.{% endblocktrans %}</p>
-                            <p class="notation">{% blocktrans %}It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted.{% endblocktrans %}</p>
+                            <p class="notation">{% blocktrans %}You are removing this video from the {{ team }} team.<br /><br />
+                                It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted. Private videos will become available for viewing and editing to the general public. Are you sure you want to proceed?{% endblocktrans %}</p>
                         {% else %}
                             <p>{% blocktrans %}You can choose to remove the video from the {{ team }} team or to delete the video (and all of its subtitles) from the system entirely. What would you like to do?{% endblocktrans %}</p>
                             <label class="radio">

@@ -1376,7 +1376,7 @@ class TestFeedsSubmit(TestCase):
         response = self.client.post(reverse('videos:create_from_feed'), data)
         self.assertRedirects(response, reverse('videos:create'))
         self.assertNotEqual(old_count, Video.objects.count())
-        self.assertEqual(Video.objects.count(), 16)
+        self.assertEqual(Video.objects.count(), 17)
 
     def test_empty_feed_submit(self):
         base_open_resource = feedparser._open_resource

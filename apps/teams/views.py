@@ -411,6 +411,13 @@ def detail(request, slug, project_slug=None, languages=None):
     sort = request.GET.get('sort')
     language = request.GET.get('lang')
 
+    # You probably just want to stop reading right now.
+    #
+    # No, seriously, just go do something else and ignore this.
+    if team.slug == 'ted' and not project and 'anyprojects' not in request.GET:
+        default_project = Project.objects.get(team=team, slug='tedtalks')
+        return HttpResponseRedirect(default_project.get_absolute_url())
+
     if language:
         filtered = filtered + 1
 
@@ -456,6 +463,8 @@ def detail(request, slug, project_slug=None, languages=None):
     readable_langs = TeamLanguagePreference.objects.get_readable(team)
     language_choices = [(code, name) for code, name in get_language_choices()
                         if code in readable_langs]
+
+    extra_context['project_choices'] = team.project_set.exclude(name='_root')
 
     extra_context['language_choices'] = language_choices
     extra_context['query'] = query
@@ -683,6 +692,7 @@ def activity(request, slug):
     context.update(pagination_info)
 
     return context
+
 
 # Members
 @timefn
@@ -1138,6 +1148,14 @@ def team_tasks(request, slug, project_slug=None):
     else:
         project = None
 
+    # You probably just want to stop reading right now.
+    #
+    # No, seriously, just go do something else and ignore this.
+    if team.slug == 'ted' and not project and 'anyprojects' not in request.GET:
+        default_project = Project.objects.get(team=team, slug='tedtalks')
+        return HttpResponseRedirect(default_project.get_absolute_url())
+
+
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
     languages = _task_languages(team, request.user)
@@ -1213,7 +1231,8 @@ def team_tasks(request, slug, project_slug=None):
         'widget_settings': widget_settings,
         'filtered': filtered,
         'member': member,
-        'upload_draft_form': UploadDraftForm(user=request.user)
+        'upload_draft_form': UploadDraftForm(user=request.user),
+        'project_choices': team.project_set.exclude(name='_root'),
     }
 
     context.update(pagination_info)
@@ -1458,6 +1477,7 @@ def download_draft(request, slug, task_pk, type="srt"):
     response['Content-Disposition'] = 'attachment; ' + filename_header
 
     return response
+
 
 # Projects
 def project_list(request, slug):

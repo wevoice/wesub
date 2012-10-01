@@ -174,19 +174,22 @@
                 };
             },
             events: {
-                'click':                               'mouseClicked',
-                'mousemove':                           'mouseMoved',
 
-                'click ul.amara-languages-list a':     'changeLanguage',
-                'click a.amara-current-language':      'languageButtonClicked',
-                'click a.amara-share-button':          'shareButtonClicked',
-                'click a.amara-transcript-button':     'toggleTranscriptDisplay',
-                'click a.amara-subtitles-button':      'toggleSubtitlesDisplay',
-                'click a.amara-transcript-autoscroll': 'pauseAutoScroll',
-                //'contextmenu a.amara-transcript-line': 'showTranscriptContextMenu',
+                // Global
+                'click':                                 'mouseClicked',
+                'mousemove':                             'mouseMoved',
 
-                // TODO: This does not work. Why?
-                'scroll div.amara-transcript-body':    'pauseAutoScroll'
+                // Toolbar
+                'click a.amara-current-language':        'languageButtonClicked',
+                'click a.amara-share-button':            'shareButtonClicked',
+                'click a.amara-subtitles-button':        'toggleSubtitlesDisplay',
+                'click ul.amara-languages-list a':       'changeLanguage',
+                'click a.amara-transcript-button':       'toggleTranscriptDisplay',
+
+                // Transcript
+                'click a.amara-transcript-autoscroll':   'pauseAutoScroll',
+                'click a.amara-transcript-line':         'transcriptLineClicked'
+                //'contextmenu a.amara-transcript-line':   'showTranscriptContextMenu'
             },
             render: function() {
 
@@ -281,7 +284,7 @@
 
             // View methods.
             mouseClicked: function(e) {
-
+                this.hideTranscriptContextMenu();
             },
             mouseMoved: function(e) {
                 this.setCursorPosition(e);
@@ -502,6 +505,11 @@
                 this.$amaraLanguagesList.toggle();
                 return false;
             },
+            linkToTranscriptLine: function(line) {
+                console.log(line.get(0));
+                this.hideTranscriptContextMenu();
+                return false;
+            },
             pauseAutoScroll: function(isNowPaused) {
 
                 var that = this;
@@ -622,12 +630,34 @@
                 $line.addClass('selected');
 
                 // Create the context menu DOM.
-                _$('body').append('<div class="amara-context-menu"></div>');
+                //
+                // TODO: Use a sensible templating system. Everywhere.
+                _$('body').append('' +
+                        '<div class="amara-context-menu">' +
+                        '    <ul>' +
+                        '        <li>' +
+                        '            <a class="amara-transcript-link-to-line" href="#">Link to this line</a>' +
+                        '        </li>' +
+                        '    </ul>' +
+                        '</div>');
+
                 this.$amaraContextMenu = _$('div.amara-context-menu');
 
+                // Handle clicks.
+                //_$('a', this.$amaraContextMenu).click(function() {
+                    //that.linkToTranscriptLine($line);
+                    //return false;
+                //});
+
+                // Don't let clicks inside the context menu bubble up.
+                // Otherwise, the container listener will close the context menu.
+                this.$amaraContextMenu.click(function(e) {
+                    e.stopPropagation();
+                });
+
                 // Position the context menu near the cursor.
-                this.$amaraContextMenu.css('top', this.cursorY + 10);
-                this.$amaraContextMenu.css('left', this.cursorX);
+                this.$amaraContextMenu.css('top', this.cursorY + 11);
+                this.$amaraContextMenu.css('left', this.cursorX + 6);
 
                 // Set the state so we know we have an active context menu.
                 this.states.contextMenuActive = true;
@@ -646,6 +676,10 @@
                 // TODO: This button needs to be disabled unless we have a transcript to toggle.
                 this.$amaraTranscript.toggle();
                 this.$transcriptButton.toggleClass('amara-button-enabled');
+                return false;
+            },
+            transcriptLineClicked: function(e) {
+                this.hideTranscriptContextMenu();
                 return false;
             },
             transcriptScrolled: function() {
