@@ -402,6 +402,11 @@ def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
     filtered = 0
 
+    # You probably just want to stop reading right now.
+    #
+    # No, seriously, just go do something else and ignore this.
+    if team.slug == 'ted' and not project_slug and 'anyprojects' not in request.GET:
+        project_slug = 'tedtalks'
     if project_slug is not None:
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
@@ -411,12 +416,6 @@ def detail(request, slug, project_slug=None, languages=None):
     sort = request.GET.get('sort')
     language = request.GET.get('lang')
 
-    # You probably just want to stop reading right now.
-    #
-    # No, seriously, just go do something else and ignore this.
-    if team.slug == 'ted' and not project and 'anyprojects' not in request.GET:
-        default_project = Project.objects.get(team=team, slug='tedtalks')
-        return HttpResponseRedirect(default_project.get_absolute_url())
 
     if language:
         filtered = filtered + 1
