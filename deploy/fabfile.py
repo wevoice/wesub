@@ -797,7 +797,7 @@ def test_celeryd():
     """
     with Output("Testing Celery"):
         env.host_string = env.celeryd_host
-        output = run('ps aux | grep "%s/unisubs/manage\.py.*celeryd.*-B" | grep -v grep' % env.celeryd_proj_root)
+        output = run('ps aux | grep "%s/unisubs/manage\.py.*celeryd.*" | grep -v grep' % env.celeryd_proj_root)
         assert len(output.split('\n'))
 
 def test_services():
