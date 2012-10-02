@@ -404,15 +404,19 @@ def detail(request, slug, languages=None):
 
     project_slug = request.GET.get('project')
 
-    if project_slug is not None:
+    # :(
+    if project_slug is not None and project_slug != 'any':
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
-        project = None
+        if team.slug == 'ted' and project_slug != 'any':
+            project = Project.objects.get(team=team, slug='tedtalks')
+        else:
+            project = None
 
     query = request.GET.get('q')
     sort = request.GET.get('sort')
-    language = request.GET.get('lang')
-
+    language = request.GET.get('lang'
+)
     if language or project:
         filtered = filtered + 1
 
@@ -504,7 +508,6 @@ def detail(request, slug, languages=None):
                 if record._team_video:
                     record._team_video.original_language_code = record.original_language
                     record._team_video.completed_langs = record.video_completed_langs
-
     return extra_context
 
 @render_to('teams/add_video.html')
@@ -1139,10 +1142,14 @@ def team_tasks(request, slug):
 
     project_slug = request.GET.get('project')
 
-    if project_slug is not None:
+    # :(
+    if project_slug is not None and project_slug != 'any':
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
-        project = None
+        if team.slug == 'ted' and project_slug != 'any':
+            project = Project.objects.get(team=team, slug='tedtalks')
+        else:
+            project = None
 
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
@@ -1192,6 +1199,9 @@ def team_tasks(request, slug):
         filtered = filtered + 1
 
     if filters.get('type'):
+        filtered = filtered + 1
+
+    if project_slug is not None:
         filtered = filtered + 1
 
     widget_settings = {}
