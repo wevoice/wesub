@@ -31,11 +31,7 @@
 
     <div class="grid_8 view omega">
         {% with "videos" as current %}
-            {% if not project %}
-                {% include 'teams/_tabs.html' %}
-            {% else %}
-                {% include 'teams/_tabs_projects.html' %}
-            {% endif %}
+            {% include 'teams/_tabs.html' %}
         {% endwith %}
 
         <div class="tools group">
@@ -53,9 +49,9 @@
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'Videos in' %}</span>
                     <select name="project-filter" id="project-filter">
-                        <option value="{% url teams:detail team.slug %}{% query_string request.GET %}" id="project-opt-any">{% trans 'any project' %}</option>
+                        <option value="{% url teams:detail team.slug %}{% query_string request.GET project='' %}" id="project-opt-any">{% trans 'any project' %}</option>
                         {% for proj in project_choices %}
-                            <option id="project-opt-{{ proj.id }}" {% if project == proj %}selected="selected"{% endif %} value="{% url teams:project_video_list team.slug proj.slug %}{% query_string request.GET %}">{{ proj.name }}</option>
+                            <option id="project-opt-{{ proj.id }}" {% if project == proj %}selected="selected"{% endif %} value="{% url teams:detail team.slug %}{% query_string request.GET project=proj.slug %}">{{ proj.name }}</option>
                         {% endfor %}
                     </select>
                     {% trans 'with' %}

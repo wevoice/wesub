@@ -398,9 +398,11 @@ def settings_languages(request, slug):
 # Videos
 @timefn
 @render_to('teams/videos-list.html')
-def detail(request, slug, project_slug=None, languages=None):
+def detail(request, slug, languages=None):
     team = Team.get(slug, request.user)
     filtered = 0
+
+    project_slug = request.GET.get('project')
 
     if project_slug is not None:
         project = get_object_or_404(Project, team=team, slug=project_slug)
@@ -411,7 +413,7 @@ def detail(request, slug, project_slug=None, languages=None):
     sort = request.GET.get('sort')
     language = request.GET.get('lang')
 
-    if language:
+    if language or project:
         filtered = filtered + 1
 
     if language != 'none':
@@ -1128,14 +1130,15 @@ def _get_task_filters(request):
 
 @timefn
 @render_to('teams/tasks.html')
-def team_tasks(request, slug, project_slug=None):
+def team_tasks(request, slug):
     team = Team.get(slug, request.user)
 
     if not can_view_tasks_tab(team, request.user):
         messages.error(request, _("You cannot view this team's tasks."))
         return HttpResponseRedirect(team.get_absolute_url())
 
-    # TODO: Review this
+    project_slug = request.GET.get('project')
+
     if project_slug is not None:
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
