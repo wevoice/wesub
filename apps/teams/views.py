@@ -1146,7 +1146,7 @@ def team_tasks(request, slug):
     if project_slug is not None and project_slug != 'any':
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
-        if team.slug == 'ted' and project_slug != 'any':
+        if team.slug == 'ted' and project_slug != 'any' and filters.get('team_video') is None:
             project = Project.objects.get(team=team, slug='tedtalks')
         else:
             project = None
