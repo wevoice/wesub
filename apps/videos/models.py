@@ -1320,11 +1320,20 @@ class SubtitleVersionManager(models.Manager):
 
             metadata = item.pop('metadata', None)
 
+            # Normally this is done in Subtitle.save(), but bulk inserting
+            # doesn't call that.
+            start_time = item['start_time']
+            end_time = item['end_time']
+            if not is_synced_value(start_time):
+                start_time = None
+            if not is_synced_value(end_time):
+                end_time = None
+
             s = Subtitle(subtitle_id=str(id),
                          subtitle_order=order,
                          subtitle_text=html_to_markup(item['subtitle_text']),
-                         start_time=item['start_time'],
-                         end_time=item['end_time'],
+                         start_time=start_time,
+                         end_time=end_time,
                          start_of_paragraph=paragraph)
             s.version_id = version.pk
             new_subtitles.append(s)
