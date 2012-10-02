@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-01 01:36-0500\n"
+"POT-Creation-Date: 2012-10-02 01:38-0500\n"
 "PO-Revision-Date: 2012-09-28 07:05+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Greek (Greece) (http://www.transifex.com/projects/p/"
@@ -809,7 +809,7 @@ msgstr "Αυτή η Ομάδα δεν υπάρχει"
 msgid "You are already a member of this team."
 msgstr "Είστε, ήδη, μέλος αυτής της ομάδσς."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:892
+#: apps/teams/rpc.py:50 apps/teams/views.py:899
 msgid "You are now a member of this team."
 msgstr "Τώρα είστε μέλος αυτής της ομάδας."
 
@@ -934,7 +934,7 @@ msgid "You do not have permission to delete this team."
 msgstr "Δεν έχετε δικαίωμα να διαγράψετε αυτή την ομάδα."
 
 #: apps/teams/views.py:215 apps/teams/views.py:257 apps/teams/views.py:285
-#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1561
+#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1576
 msgid "You do not have permission to edit this team."
 msgstr "Δεν έχετε δικαίωμα να τροποποιήσετε αυτή την ομάδα."
 
@@ -946,178 +946,178 @@ msgstr "Οι ρυθμίσεις αποθηκεύθηκαν."
 msgid "Guidelines and messages updated."
 msgstr "Οι Κατευθυντήριες οδηγίες και τα Μηνύματα ενημερώθηκαν."
 
-#: apps/teams/views.py:517
+#: apps/teams/views.py:524
 msgid "You can't add that video to this team/project."
 msgstr ""
 "Δεν μπορείτε να προσθέσετε αυτό το Βίντεο σε αυτή την ομάδα ή σε αυτό το "
 "project."
 
-#: apps/teams/views.py:554
+#: apps/teams/views.py:561
 msgid "The video has been moved to the new team."
 msgstr "Το βίντεο αυτό μετακινήθηκε στη νέα ομάδα."
 
-#: apps/teams/views.py:567
+#: apps/teams/views.py:574
 msgid "You can't add videos to this team/project."
 msgstr ""
 "Δεν μπορείτε να προσθέσετε Βίντεο σε αυτή την ομάδα ή σε αυτό το project."
 
-#: apps/teams/views.py:585
+#: apps/teams/views.py:592
 msgid "You can't edit this video."
 msgstr "Δεν μπορείτε να επεξεργασθείτε αυτό το βίντεο"
 
-#: apps/teams/views.py:594
+#: apps/teams/views.py:601
 msgid "Video has been updated."
 msgstr "Το Βίντεο ενημερώθηκε."
 
-#: apps/teams/views.py:622
+#: apps/teams/views.py:629
 msgid "Request must be a POST request."
 msgstr "Το αίτημα πρέπει να είναι ένα αίτημα POST."
 
-#: apps/teams/views.py:630
+#: apps/teams/views.py:637
 msgid "You can't delete that video."
 msgstr "Δεν μπορείτε να διαγράψετε αυτό το βίντεο."
 
-#: apps/teams/views.py:634
+#: apps/teams/views.py:641
 msgid "You can't remove that video."
 msgstr "Δεν μπορείτε να απομακρύνετε αυτό το βίντεο"
 
-#: apps/teams/views.py:646
+#: apps/teams/views.py:653
 msgid "Video has been deleted from Amara."
 msgstr "Αυτό το Βίντεο διεγράφη από το Amara."
 
-#: apps/teams/views.py:649
+#: apps/teams/views.py:656
 msgid "Video has been removed from the team."
 msgstr "Το Βίντεο διεγράφη από την ομάδα."
 
-#: apps/teams/views.py:771
+#: apps/teams/views.py:778
 msgid "Member has been removed from the team."
 msgstr "Το Μέλος διεγράφη από την ομάδα."
 
-#: apps/teams/views.py:774
+#: apps/teams/views.py:781
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 "Χρησιμοποιείστε το κουμπί \"Εγακταλείψτε αυτή την ομάδα\" για να φύγετε "
 "εσείς ο ίδιος/α από αυτή την αμάδα."
 
-#: apps/teams/views.py:777
+#: apps/teams/views.py:784
 msgid "You don't have permission to remove this member from the team."
 msgstr "Δεν έχετε το δικαίωμα να διαγράψετε αυτό το μέλος από την ομάδα."
 
-#: apps/teams/views.py:811
+#: apps/teams/views.py:818
 msgid "Application approved."
 msgstr "Η Εφαρμογή εγκρίθηκε."
 
-#: apps/teams/views.py:813 apps/teams/views.py:834
+#: apps/teams/views.py:820 apps/teams/views.py:841
 msgid "Application does not exist."
 msgstr "Η Εφαρμογή δεν υπάρχει."
 
-#: apps/teams/views.py:815 apps/teams/views.py:836
+#: apps/teams/views.py:822 apps/teams/views.py:843
 msgid "Application already processed."
 msgstr ""
 
-#: apps/teams/views.py:817
+#: apps/teams/views.py:824
 msgid "You can't approve applications."
 msgstr "Δεν μπορείτε να εγκρίνετε εφαρμογές."
 
-#: apps/teams/views.py:832
+#: apps/teams/views.py:839
 msgid "Application denied."
 msgstr "Απαγορευμένη εφαρμογή."
 
-#: apps/teams/views.py:838
+#: apps/teams/views.py:845
 msgid "You can't deny applications."
 msgstr "Δεν μπορείτε να αρνηθείτε τις εφαρμογές."
 
-#: apps/teams/views.py:848
+#: apps/teams/views.py:855
 msgid "You cannot invite people to this team."
 msgstr "Δεν μπορείτε να προσκαλείτ κόσμο σε αυτή την ομάδα."
 
-#: apps/teams/views.py:879
+#: apps/teams/views.py:886
 msgid "This invite is no longer valid"
 msgstr "Αυτή η πρόσκληση δεν ισχύει πλέον"
 
-#: apps/teams/views.py:888
+#: apps/teams/views.py:895
 msgid "You cannot join this team."
 msgstr "Δεν μπορείτε να εγγραφείτε σε αυτή την ομάδα."
 
-#: apps/teams/views.py:942
+#: apps/teams/views.py:949
 msgid "You have left this team."
 msgstr "Έχετε εγκαταλείψει αυτή την ομάδα."
 
-#: apps/teams/views.py:998
+#: apps/teams/views.py:1005
 msgid "Member saved."
 msgstr "Το Μέλος έχει αποθηκευθεί."
 
-#: apps/teams/views.py:1135
+#: apps/teams/views.py:1142
 msgid "You cannot view this team's tasks."
 msgstr "Δεν μπορείτε να δείτε τις εργασίες αυτής της ομάδας."
 
-#: apps/teams/views.py:1279 apps/teams/views.py:1282
+#: apps/teams/views.py:1294 apps/teams/views.py:1297
 msgid "You are not allowed to perform this task."
 msgstr "Δεν είστε εξουσιοδοτημένοι να κάνετε αυτή την εργασία."
 
-#: apps/teams/views.py:1337
+#: apps/teams/views.py:1352
 msgid "Task deleted."
 msgstr "Η εργασία διεγράφη."
 
-#: apps/teams/views.py:1339
+#: apps/teams/views.py:1354
 msgid "You cannot delete this task."
 msgstr "Δεν μπορείτε να διαγράψετε αυτή την εργασία."
 
-#: apps/teams/views.py:1364
+#: apps/teams/views.py:1379
 msgid "Task declined."
 msgstr "Απόρριψη εργασίας."
 
-#: apps/teams/views.py:1366
+#: apps/teams/views.py:1381
 msgid "Task assigned."
 msgstr "Έγινε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1368
+#: apps/teams/views.py:1383
 msgid "You cannot assign this task."
 msgstr "Δεν μπορείτε να κάνετε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1390
+#: apps/teams/views.py:1405
 msgid "Invalid assignment attempt."
 msgstr "Άκυρη προσπάθεια ανάθεσης."
 
-#: apps/teams/views.py:1415
+#: apps/teams/views.py:1430
 msgid "Draft uploaded successfully."
 msgstr "Το προσχέδιο/draft φορτώθηκε με επιτυχία."
 
-#: apps/teams/views.py:1419
+#: apps/teams/views.py:1434
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1437
+#: apps/teams/views.py:1452
 msgid "You are not allowed to download this transcript."
 msgstr "Δεν σας επιτρέπεται να μεταφορτώσετε αυτή τη μεταγραφή/ transcript"
 
-#: apps/teams/views.py:1488
+#: apps/teams/views.py:1503
 msgid "There's already a project with this name"
 msgstr "Υπάρχει ήδη ένα project με αυτό το όνομα"
 
-#: apps/teams/views.py:1500
+#: apps/teams/views.py:1515
 msgid "Project added."
 msgstr "Το project προστέθηκε."
 
-#: apps/teams/views.py:1517
+#: apps/teams/views.py:1532
 msgid "You cannot edit that project."
 msgstr "Δεν μπορείτε να τροποποιήσετε αυτό το project."
 
-#: apps/teams/views.py:1528
+#: apps/teams/views.py:1543
 msgid "Project deleted."
 msgstr "Το project διεγράφη."
 
-#: apps/teams/views.py:1546
+#: apps/teams/views.py:1561
 msgid "Project saved."
 msgstr "Το project αποθηκεύθηκε."
 
-#: apps/teams/views.py:1672
+#: apps/teams/views.py:1687
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1706
+#: apps/teams/views.py:1721
 msgid "Successfully unpublished subtitles."
 msgstr ""
 

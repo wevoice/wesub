@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-01 01:43-0500\n"
+"POT-Creation-Date: 2012-10-02 01:45-0500\n"
 "PO-Revision-Date: 2012-09-28 07:05+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
@@ -781,7 +781,7 @@ msgstr "组不存在"
 msgid "You are already a member of this team."
 msgstr "你已经是组成员"
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:892
+#: apps/teams/rpc.py:50 apps/teams/views.py:899
 msgid "You are now a member of this team."
 msgstr "你现在是组中的一员"
 
@@ -899,7 +899,7 @@ msgid "You do not have permission to delete this team."
 msgstr "你没有权限删除此组"
 
 #: apps/teams/views.py:215 apps/teams/views.py:257 apps/teams/views.py:285
-#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1561
+#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1576
 msgid "You do not have permission to edit this team."
 msgstr "你没有权限编辑此组"
 
@@ -911,167 +911,167 @@ msgstr "设定已保存"
 msgid "Guidelines and messages updated."
 msgstr "指南及信息已保存"
 
-#: apps/teams/views.py:517
+#: apps/teams/views.py:524
 msgid "You can't add that video to this team/project."
 msgstr "你不能把这个视频添加至此小组／项目"
 
-#: apps/teams/views.py:554
+#: apps/teams/views.py:561
 msgid "The video has been moved to the new team."
 msgstr "此视频已移动至一个新组"
 
-#: apps/teams/views.py:567
+#: apps/teams/views.py:574
 msgid "You can't add videos to this team/project."
 msgstr "你不能添加视频至小组／项目"
 
-#: apps/teams/views.py:585
+#: apps/teams/views.py:592
 msgid "You can't edit this video."
 msgstr "你不能编辑此视频"
 
-#: apps/teams/views.py:594
+#: apps/teams/views.py:601
 msgid "Video has been updated."
 msgstr "视频已经更新"
 
-#: apps/teams/views.py:622
+#: apps/teams/views.py:629
 msgid "Request must be a POST request."
 msgstr "请求必须是一个POST请求"
 
-#: apps/teams/views.py:630
+#: apps/teams/views.py:637
 msgid "You can't delete that video."
 msgstr "你不能删除那个视频"
 
-#: apps/teams/views.py:634
+#: apps/teams/views.py:641
 msgid "You can't remove that video."
 msgstr "你不能移除视频"
 
-#: apps/teams/views.py:646
+#: apps/teams/views.py:653
 msgid "Video has been deleted from Amara."
 msgstr "视频已从Amara删除。"
 
-#: apps/teams/views.py:649
+#: apps/teams/views.py:656
 msgid "Video has been removed from the team."
 msgstr "视频已从此组移除"
 
-#: apps/teams/views.py:771
+#: apps/teams/views.py:778
 msgid "Member has been removed from the team."
 msgstr "成员已从此组移除"
 
-#: apps/teams/views.py:774
+#: apps/teams/views.py:781
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "使用“离开此组”按钮，离开此小组"
 
-#: apps/teams/views.py:777
+#: apps/teams/views.py:784
 msgid "You don't have permission to remove this member from the team."
 msgstr "你没有权限将成员移除此小组"
 
-#: apps/teams/views.py:811
+#: apps/teams/views.py:818
 msgid "Application approved."
 msgstr "申请已通过"
 
-#: apps/teams/views.py:813 apps/teams/views.py:834
+#: apps/teams/views.py:820 apps/teams/views.py:841
 msgid "Application does not exist."
 msgstr "申请不存在"
 
-#: apps/teams/views.py:815 apps/teams/views.py:836
+#: apps/teams/views.py:822 apps/teams/views.py:843
 msgid "Application already processed."
 msgstr ""
 
-#: apps/teams/views.py:817
+#: apps/teams/views.py:824
 msgid "You can't approve applications."
 msgstr "你不能批准申请"
 
-#: apps/teams/views.py:832
+#: apps/teams/views.py:839
 msgid "Application denied."
 msgstr "需要申请"
 
-#: apps/teams/views.py:838
+#: apps/teams/views.py:845
 msgid "You can't deny applications."
 msgstr "你不能拒绝申请"
 
-#: apps/teams/views.py:848
+#: apps/teams/views.py:855
 msgid "You cannot invite people to this team."
 msgstr "你不能邀请别人到此组"
 
-#: apps/teams/views.py:879
+#: apps/teams/views.py:886
 msgid "This invite is no longer valid"
 msgstr "这个邀请已过期"
 
-#: apps/teams/views.py:888
+#: apps/teams/views.py:895
 msgid "You cannot join this team."
 msgstr "你不能加入此组"
 
-#: apps/teams/views.py:942
+#: apps/teams/views.py:949
 msgid "You have left this team."
 msgstr "你已经离开此组"
 
-#: apps/teams/views.py:998
+#: apps/teams/views.py:1005
 msgid "Member saved."
 msgstr "成员已保存"
 
-#: apps/teams/views.py:1135
+#: apps/teams/views.py:1142
 msgid "You cannot view this team's tasks."
 msgstr "你不能查看此小组的任务"
 
-#: apps/teams/views.py:1279 apps/teams/views.py:1282
+#: apps/teams/views.py:1294 apps/teams/views.py:1297
 msgid "You are not allowed to perform this task."
 msgstr "你没有执行此任务的权限"
 
-#: apps/teams/views.py:1337
+#: apps/teams/views.py:1352
 msgid "Task deleted."
 msgstr "任务已删除"
 
-#: apps/teams/views.py:1339
+#: apps/teams/views.py:1354
 msgid "You cannot delete this task."
 msgstr "你不能删除此任务"
 
-#: apps/teams/views.py:1364
+#: apps/teams/views.py:1379
 msgid "Task declined."
 msgstr "任务已拒绝"
 
-#: apps/teams/views.py:1366
+#: apps/teams/views.py:1381
 msgid "Task assigned."
 msgstr "任务已标记"
 
-#: apps/teams/views.py:1368
+#: apps/teams/views.py:1383
 msgid "You cannot assign this task."
 msgstr "你不能标记此任务"
 
-#: apps/teams/views.py:1390
+#: apps/teams/views.py:1405
 msgid "Invalid assignment attempt."
 msgstr "不可标记"
 
-#: apps/teams/views.py:1415
+#: apps/teams/views.py:1430
 msgid "Draft uploaded successfully."
 msgstr "草稿成功上传"
 
-#: apps/teams/views.py:1419
+#: apps/teams/views.py:1434
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1437
+#: apps/teams/views.py:1452
 msgid "You are not allowed to download this transcript."
 msgstr "不允许你下载此副本"
 
-#: apps/teams/views.py:1488
+#: apps/teams/views.py:1503
 msgid "There's already a project with this name"
 msgstr "已有同名项目存在"
 
-#: apps/teams/views.py:1500
+#: apps/teams/views.py:1515
 msgid "Project added."
 msgstr "项目已添加"
 
-#: apps/teams/views.py:1517
+#: apps/teams/views.py:1532
 msgid "You cannot edit that project."
 msgstr "你不能编辑此项目"
 
-#: apps/teams/views.py:1528
+#: apps/teams/views.py:1543
 msgid "Project deleted."
 msgstr "项目已删除"
 
-#: apps/teams/views.py:1546
+#: apps/teams/views.py:1561
 msgid "Project saved."
 msgstr "项目已保存"
 
-#: apps/teams/views.py:1672
+#: apps/teams/views.py:1687
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
@@ -1079,7 +1079,7 @@ msgstr ""
 "无效的撤消请求\n"
 "错误：\n"
 
-#: apps/teams/views.py:1706
+#: apps/teams/views.py:1721
 msgid "Successfully unpublished subtitles."
 msgstr "成功撤销字幕发布"
 

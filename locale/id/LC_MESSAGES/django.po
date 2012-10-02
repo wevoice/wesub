@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-01 01:44-0500\n"
+"POT-Creation-Date: 2012-10-02 01:46-0500\n"
 "PO-Revision-Date: 2012-09-28 07:05+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Indonesian (Indonesia) (http://www.transifex.com/projects/p/"
@@ -787,7 +787,7 @@ msgstr "Tim tidak ada"
 msgid "You are already a member of this team."
 msgstr "Anda sudah menjadi anggota tim ini."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:892
+#: apps/teams/rpc.py:50 apps/teams/views.py:899
 msgid "You are now a member of this team."
 msgstr "Anda sekarang seorang anggota tim ini."
 
@@ -893,7 +893,7 @@ msgid "You do not have permission to delete this team."
 msgstr "Anda tidak memiliki izin untuk menghapus tim ini."
 
 #: apps/teams/views.py:215 apps/teams/views.py:257 apps/teams/views.py:285
-#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1561
+#: apps/teams/views.py:319 apps/teams/views.py:374 apps/teams/views.py:1576
 msgid "You do not have permission to edit this team."
 msgstr ""
 
@@ -905,173 +905,173 @@ msgstr "Pengaturan disimpan."
 msgid "Guidelines and messages updated."
 msgstr ""
 
-#: apps/teams/views.py:517
+#: apps/teams/views.py:524
 msgid "You can't add that video to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:554
+#: apps/teams/views.py:561
 msgid "The video has been moved to the new team."
 msgstr ""
 
-#: apps/teams/views.py:567
+#: apps/teams/views.py:574
 msgid "You can't add videos to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:585
+#: apps/teams/views.py:592
 msgid "You can't edit this video."
 msgstr "Anda tidak dapat mengedit video ini."
 
-#: apps/teams/views.py:594
+#: apps/teams/views.py:601
 msgid "Video has been updated."
 msgstr "Video telah diperbarui."
 
-#: apps/teams/views.py:622
+#: apps/teams/views.py:629
 msgid "Request must be a POST request."
 msgstr "Permintaan haruslah POS permintaan."
 
-#: apps/teams/views.py:630
+#: apps/teams/views.py:637
 msgid "You can't delete that video."
 msgstr ""
 
-#: apps/teams/views.py:634
+#: apps/teams/views.py:641
 msgid "You can't remove that video."
 msgstr "Anda tidak dapat menghapus video itu."
 
-#: apps/teams/views.py:646
+#: apps/teams/views.py:653
 msgid "Video has been deleted from Amara."
 msgstr ""
 
-#: apps/teams/views.py:649
+#: apps/teams/views.py:656
 msgid "Video has been removed from the team."
 msgstr "Video telah dihapus dari tim."
 
-#: apps/teams/views.py:771
+#: apps/teams/views.py:778
 msgid "Member has been removed from the team."
 msgstr "Anggota telah dikeluarkan dari tim."
 
-#: apps/teams/views.py:774
+#: apps/teams/views.py:781
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 
-#: apps/teams/views.py:777
+#: apps/teams/views.py:784
 msgid "You don't have permission to remove this member from the team."
 msgstr ""
 
-#: apps/teams/views.py:811
+#: apps/teams/views.py:818
 msgid "Application approved."
 msgstr "Lamaran telah disetujui."
 
-#: apps/teams/views.py:813 apps/teams/views.py:834
+#: apps/teams/views.py:820 apps/teams/views.py:841
 msgid "Application does not exist."
 msgstr "Lamaran tidak ada."
 
-#: apps/teams/views.py:815 apps/teams/views.py:836
+#: apps/teams/views.py:822 apps/teams/views.py:843
 msgid "Application already processed."
 msgstr ""
 
-#: apps/teams/views.py:817
+#: apps/teams/views.py:824
 msgid "You can't approve applications."
 msgstr "Anda tidak dapat menyetujui aplikasi."
 
-#: apps/teams/views.py:832
+#: apps/teams/views.py:839
 msgid "Application denied."
 msgstr "Lamaran ditolak."
 
-#: apps/teams/views.py:838
+#: apps/teams/views.py:845
 msgid "You can't deny applications."
 msgstr "Anda tidak dapat membatalkan aplikasi."
 
-#: apps/teams/views.py:848
+#: apps/teams/views.py:855
 msgid "You cannot invite people to this team."
 msgstr "Anda tidak dapat mengundang orang lain ke dalam tim ini."
 
-#: apps/teams/views.py:879
+#: apps/teams/views.py:886
 msgid "This invite is no longer valid"
 msgstr ""
 
-#: apps/teams/views.py:888
+#: apps/teams/views.py:895
 msgid "You cannot join this team."
 msgstr "Anda tidak dapat bergabung dengan tim ini."
 
-#: apps/teams/views.py:942
+#: apps/teams/views.py:949
 msgid "You have left this team."
 msgstr "Anda telah meninggalkan tim ini."
 
-#: apps/teams/views.py:998
+#: apps/teams/views.py:1005
 msgid "Member saved."
 msgstr "Anggota tersimpan."
 
-#: apps/teams/views.py:1135
+#: apps/teams/views.py:1142
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1279 apps/teams/views.py:1282
+#: apps/teams/views.py:1294 apps/teams/views.py:1297
 msgid "You are not allowed to perform this task."
 msgstr "Anda tidak dizinkan untuk melakukan tugas ini."
 
-#: apps/teams/views.py:1337
+#: apps/teams/views.py:1352
 msgid "Task deleted."
 msgstr "Tugas dihapus."
 
-#: apps/teams/views.py:1339
+#: apps/teams/views.py:1354
 msgid "You cannot delete this task."
 msgstr ""
 
-#: apps/teams/views.py:1364
+#: apps/teams/views.py:1379
 msgid "Task declined."
 msgstr ""
 
-#: apps/teams/views.py:1366
+#: apps/teams/views.py:1381
 msgid "Task assigned."
 msgstr ""
 
-#: apps/teams/views.py:1368
+#: apps/teams/views.py:1383
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1390
+#: apps/teams/views.py:1405
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1415
+#: apps/teams/views.py:1430
 msgid "Draft uploaded successfully."
 msgstr ""
 
-#: apps/teams/views.py:1419
+#: apps/teams/views.py:1434
 msgid "/n"
 msgstr ""
 
-#: apps/teams/views.py:1437
+#: apps/teams/views.py:1452
 msgid "You are not allowed to download this transcript."
 msgstr ""
 
-#: apps/teams/views.py:1488
+#: apps/teams/views.py:1503
 msgid "There's already a project with this name"
 msgstr "Sudah ada proyek dengan nama yang sama."
 
-#: apps/teams/views.py:1500
+#: apps/teams/views.py:1515
 msgid "Project added."
 msgstr "Proyek ditambahkan."
 
-#: apps/teams/views.py:1517
+#: apps/teams/views.py:1532
 msgid "You cannot edit that project."
 msgstr "Anda tidak dapat merubah proyek itu."
 
-#: apps/teams/views.py:1528
+#: apps/teams/views.py:1543
 msgid "Project deleted."
 msgstr "Proyek dihapus."
 
-#: apps/teams/views.py:1546
+#: apps/teams/views.py:1561
 msgid "Project saved."
 msgstr "Proyek tersimpan."
 
-#: apps/teams/views.py:1672
+#: apps/teams/views.py:1687
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1706
+#: apps/teams/views.py:1721
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
