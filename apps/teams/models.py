@@ -635,7 +635,6 @@ class TeamVideo(models.Model):
     # this is an auto_add like field, but done on the model save so the
     # admin doesn't throw a fit
     created = models.DateTimeField(blank=True)
-    completed_languages = models.ManyToManyField(SubtitleLanguage, blank=True)
     partner_id = models.CharField(max_length=100, blank=True, default="")
 
     project = models.ForeignKey(Project)
