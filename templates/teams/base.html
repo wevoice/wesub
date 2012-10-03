@@ -16,11 +16,7 @@
     </div>
 
     <div class="grid_4 context alpha">
-        {% if not project %}
-            {% include 'teams/_context_team.html' %}
-        {% else %}
-            {% include 'teams/_context_project.html' %}
-        {% endif %}
+        {% include 'teams/_context_team.html' %}
     </div>
 
     {% block view_content %}{% endblock %}
