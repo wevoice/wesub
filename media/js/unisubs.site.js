@@ -164,6 +164,19 @@ var Site = function(Site) {
                 });
             });
         },
+        assignTask: function(task, callback){
+            $.ajax({
+                url: window.ASSIGN_TASK_AJAX_URL,
+                type: 'POST',
+                data: {
+                    task: task,
+                    assignee: window.ASSIGNEE
+                },
+                success: function() {
+                    callback();
+                }
+            });
+        },
         truncateTextBlocks: function(blocks, maxHeight) {
             // Takes a list of jQuery objects and sets up
             // a nice truncate-by-height UI.
@@ -607,26 +620,18 @@ var Site = function(Site) {
                 var $target = $(e.target);
                 $target.text('Loading...');
 
-                $.ajax({
-                    url: window.ASSIGN_TASK_AJAX_URL,
-                    type: 'POST',
-                    data: {
-                        task: $target.attr('data-id'),
-                        assignee: window.ASSIGNEE
-                    },
-                    success: function(data, textStatus, jqXHR) {
-                        $target.hide();
+                that.Utils.assignTask($target.attr('data-id'), function(){
+                    $target.hide();
 
-                        $li = $target.parent().siblings('li.hidden-perform-link');
-                        $li.show();
+                    $li = $target.parent().siblings('li.hidden-perform-link');
+                    $li.show();
 
-                        $link = $li.children('a.perform');
-                        $link.text('Loading...');
-                        if ($link.attr('href') !== '') {
-                            window.location = $link.attr('href');
-                        } else {
-                            $link.click();
-                        }
+                    $link = $li.children('a.perform');
+                    $link.text('Loading...');
+                    if ($link.attr('href') !== '') {
+                        window.location = $link.attr('href');
+                    } else {
+                        $link.click();
                     }
                 });
 
