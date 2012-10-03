@@ -54,6 +54,7 @@ from utils.decorators import never_in_prod
 from utils.metrics import Meter
 from utils.translation import get_user_languages_from_request
 from django.utils.http import urlquote_plus
+from videos import permissions
 from videos.tasks import video_changed_tasks
 from videos.search_indexes import VideoIndex
 import datetime
@@ -618,7 +619,8 @@ def video_url_make_primary(request):
     if id:
         try:
             obj = VideoUrl.objects.get(id=id)
-            if not obj.video.allow_video_urls_edit and not request.user.has_perm('videos.change_videourl'):
+            if not permissions.can_user_edit_video_urls(obj.video,
+                    request.user):
                 output['error'] = ugettext('You have not permission change this URL')
             else:
                 VideoUrl.objects.filter(video=obj.video).update(primary=False)
@@ -637,7 +639,8 @@ def video_url_remove(request):
         try:
             obj = VideoUrl.objects.get(id=id)
 
-            if not obj.video.allow_video_urls_edit and not request.user.has_perm('videos.delete_videourl'):
+            if not permissions.can_user_edit_video_urls(obj.video,
+                    request.user):
                 output['error'] = ugettext('You have not permission delete this URL')
             else:
                 if obj.original:

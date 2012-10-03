@@ -52,6 +52,9 @@ def youtube_sync(video, language):
         if not version.is_public or not version.is_synced():
             return
 
+    if not version.video.get_team_video():
+        return
+
     always_push_account = ThirdPartyAccount.objects.always_push_account()
 
     for vurl in video.videourl_set.all():
@@ -107,6 +110,9 @@ class ThirdPartyAccountManager(models.Manager):
             if not version.is_public or not version.is_synced():
                 # We can't mirror unsynced or non-public versions.
                 return
+
+        if not version.video.get_team_video():
+            return
 
         try:
             rule = YoutubeSyncRule.objects.all()[0]

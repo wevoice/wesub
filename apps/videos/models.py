@@ -45,6 +45,7 @@ from videos import EffectiveSubtitle, is_synced, is_synced_value
 from videos.types import video_type_registrar
 from videos.feed_parser import FeedParser
 from comments.models import Comment
+from libs.bulkops import insert_many
 from statistic import st_widget_view_statistic
 from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_update
 from widget import video_cache
@@ -1296,7 +1297,8 @@ class SubtitleVersionManager(models.Manager):
         version.save()
 
         ids = set()
-
+        new_subtitles = []
+        new_metadata = []
         for i, item in enumerate(parser):
             original_sub  = None
 
@@ -1319,20 +1321,33 @@ class SubtitleVersionManager(models.Manager):
 
             metadata = item.pop('metadata', None)
 
-            caption, created = Subtitle.objects.get_or_create(version=version, subtitle_id=str(id))
-            caption.datetime_started = datetime.now()
-            caption.subtitle_order = order
-            caption.subtitle_text = html_to_markup(item['subtitle_text'])
-            caption.start_time = item['start_time']
-            caption.end_time = item['end_time']
-            caption.start_of_paragraph = paragraph
-            caption.save()
+            # Normally this is done in Subtitle.save(), but bulk inserting
+            # doesn't call that.
+            start_time = item['start_time']
+            end_time = item['end_time']
+            if not is_synced_value(start_time):
+                start_time = None
+            if not is_synced_value(end_time):
+                end_time = None
+
+            s = Subtitle(subtitle_id=str(id),
+                         subtitle_order=order,
+                         subtitle_text=html_to_markup(item['subtitle_text']),
+                         start_time=start_time,
+                         end_time=end_time,
+                         start_of_paragraph=paragraph)
+            s.version_id = version.pk
+            new_subtitles.append(s)
 
             if metadata:
                 for name, value in metadata.items():
-                    SubtitleMetadata(
-                        subtitle=caption, key=name, data=value
-                    ).save()
+                    new_metadata.append((str(id), name, value))
+
+        insert_many(new_subtitles)
+
+        for id, name, value in new_metadata:
+            subtitle = version.subtitle_set.get(subtitle_id=id)
+            SubtitleMetadata(subtitle=subtitle, key=name, data=value).save()
 
         return version
 
