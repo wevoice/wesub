@@ -21,6 +21,7 @@ from django import template
 register = template.Library()
 
 from videos.types import video_type_registrar, VideoTypeError
+from videos import permissions
 
 @register.inclusion_tag('videos/_video.html', takes_context=True)
 def render_video(context, video, display_views='total'):
@@ -48,6 +49,10 @@ def is_follower(obj, user):
         return False
 
     return obj.followers.filter(pk=user.pk).exists()
+
+@register.filter
+def can_user_edit_video_urls(video, user):
+    return permissions.can_user_edit_video_urls(video, user)
 
 @register.simple_tag
 def write_video_type_js(video):

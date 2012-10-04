@@ -39,13 +39,14 @@ from utils import send_templated_email
 from utils.forms import flatten_errorlists
 from utils.metrics import Meter
 from utils.translation import get_user_languages_from_request
-from videos import models
-from videos.models import record_workflow_origin
+from videos import models, is_synced_value
+from videos.models import record_workflow_origin, Subtitle
 from videos.tasks import video_changed_tasks
 from widget import video_cache
 from widget.base_rpc import BaseRpc
 from widget.forms import  FinishReviewForm, FinishApproveForm
 from widget.models import SubtitlingSession
+from libs.bulkops import insert_many
 
 from functools import partial
 
@@ -282,6 +283,15 @@ class Rpc(BaseRpc):
         else:
             return 'normal'
 
+    # Ugly hack to disable timing changes for T translations :(
+    def get_timing_mode(self, language):
+        team_video = language.video.get_team_video()
+        _TED_TEAMS = ['ted', 'ted-transcribe']
+        if team_video and team_video.team.slug.lower() in _TED_TEAMS:
+            return 'off'
+        else:
+            return 'on'
+
 
     # Start Editing
     def _check_team_video_locking(self, user, video_id, language_code, is_translation=None, mode=None, is_edit=None):
@@ -404,6 +414,7 @@ class Rpc(BaseRpc):
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
                         "caption_display_mode": self.get_caption_display_mode(language),
+                        "timing_mode": self.get_timing_mode(language),
                         "subtitles": subtitles }
 
         # If this is a translation, include the subtitles it's based on in the response.
@@ -452,6 +463,7 @@ class Rpc(BaseRpc):
                             "can_edit" : True,
                             "session_pk" : session.pk,
                             "caption_display_mode": self.get_caption_display_mode(session.language),
+                            "timing_mode": self.get_timing_mode(session.language),
                             "subtitles" : subtitles }
             if session.base_language:
                 return_dict['original_subtitles'] = \
@@ -591,22 +603,38 @@ class Rpc(BaseRpc):
             if error:
                 return error
 
-    def _save_subtitles(self, subtitle_set, json_subs, forked):
-        """Create Subtitle objects into the given queryset from the JSON subtitles."""
-
+    def _save_subtitles(self, version, json_subs, forked):
+        """Create Subtitle objects into the version from the JSON subtitles."""
+        subtitles = []
         for s in json_subs:
             if not forked:
-                subtitle_set.create(
-                    subtitle_id=s['subtitle_id'],
-                    subtitle_text=s['text'])
+                s = Subtitle(subtitle_id=s['subtitle_id'],
+                             subtitle_text=s['text'])
             else:
-                subtitle_set.create(
-                    subtitle_id=s['subtitle_id'],
-                    subtitle_text=s['text'],
-                    start_time=s['start_time'],
-                    end_time=s['end_time'],
-                    subtitle_order=s['sub_order'],
-                    start_of_paragraph=s.get('start_of_paragraph', False))
+                # Normally this is done in Subtitle.save(), but bulk inserting
+                # doesn't call that.
+                start_time = s['start_time']
+                end_time = s['end_time']
+                if not is_synced_value(start_time):
+                    start_time = None
+                if not is_synced_value(end_time):
+                    end_time = None
+
+                s = Subtitle(subtitle_id=s['subtitle_id'],
+                             subtitle_text=s['text'],
+                             start_time=start_time,
+                             end_time=end_time,
+                             subtitle_order=s['sub_order'],
+                             start_of_paragraph=s.get('start_of_paragraph',
+                                                      False))
+            s.version_id = version.pk
+            subtitles.append(s)
+
+        # For huge sets of subtitles, adding each one to the DB one at a time
+        # can take longer than the browser timeout.  We need to do this in the
+        # background instead.  For now.  This is all going away once the new
+        # data model refactor lands.  I love hacking stuff in on the fly.
+        insert_many(subtitles)
 
     def _copy_subtitles(self, source_version, dest_version):
         """Copy the Subtitle objects from one version to another, unchanged.
@@ -650,7 +678,7 @@ class Rpc(BaseRpc):
 
             if subtitles_changed:
                 self._save_subtitles(
-                    new_version.subtitle_set, subtitles, new_version.is_forked)
+                    new_version, subtitles, new_version.is_forked)
             else:
                 self._copy_subtitles(previous_version, new_version)
 

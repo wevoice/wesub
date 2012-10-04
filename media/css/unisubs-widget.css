@@ -2126,7 +2126,7 @@ embed#clippy {
 .unisubs-modal-lang p.warning {
     max-width: 300px
 }
-.unisubs-modal-lang h3, .unisubs-modal-completed h3 {
+.unisubs-modal-lang h3, .unisubs-forkdialog h3, .unisubs-modal-completed h3 {
     -moz-border-radius-topleft: 5px !important;
     -moz-border-radius-topright: 5px !important;
     background: url("../images/gradient.png") repeat-x scroll 0 0 #FFFFFF !important;
@@ -2145,6 +2145,12 @@ embed#clippy {
     margin: 0 !important;
     min-width: 300px !important;
     padding: 12px !important;
+}
+.unisubs-forkdialog li {
+    color: #666 !important;
+    font-size: 15px !important;
+    line-height: 15px !important;
+    padding: 6px 12px 6px 0 !important;
 }
 .unisubs-modal-lang div p.notice {
     color: #999 !important;

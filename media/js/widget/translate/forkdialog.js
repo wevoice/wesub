@@ -35,15 +35,28 @@ unisubs.translate.ForkDialog.prototype.createDom = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
     this.getElement().appendChild(
         $d('div', null,
-           $d('p', null, 'Are you sure you want to edit timing?'),
+           $d('h3', null, 'Convert to Timed Subtitles'),
            $d('p', null, 
-              'Advanced users only!  Most subtitles should keep original ' +
-              'timing. You can edit this timing on the original language ' +
-              'subtitle page. ' +
-              'If unsure, click cancel now.'),
+              'You are about to convert this translation to ' +
+              ' Timed Subtitles.'),
            $d('p', null,
-              'If you continue, you should finish all translations first ' +
-              '(the original text will not be visible on the next screen).')));
+              $d('strong', null, 'Are you ABSOLUTELY CERTAIN that you want to proceed?')
+            ),
+           $d('ul', null, 
+              $d('li', null, 'You will no longer be able to see the language you were translating from. '),
+              $d('li', null, 'Any untranslated lines will be blank.'),
+              $d('li', null,
+                'If this language is the source for other translations (English often is) ' +
+                'all dependent translations will be irreversibly converted ' +
+                'to Timed Subtitles.')
+            ),
+           $d('p', null,
+              'Consider converting ONLY when there are no dependent translations ' +
+                'AND every line is fully translated.'),
+           $d('p', null,
+              $d('strong', null, 'You CANNOT UNDO this action.')
+            )
+           ));
     this.cancelButton_ =
         $d('a',
            {'href':'#',

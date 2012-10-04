@@ -1,6 +1,6 @@
-{% load i18n %}
+{% load i18n videos_tags %}
 
-{% if video.allow_video_urls_edit or perms.videos_videourl_add %}
+{% if video|can_user_edit_video_urls:user %}
     <div class="tools">
         <a href="#add-url-modal" class="button open-modal">
             {% trans 'Add new URL' %}
@@ -27,7 +27,7 @@
                 {% endif %}
             </p>
             <span class="timestamp" time="{{ item.created_as_time }}">{{ item.created|timesince }} {% trans 'ago' %}</span>
-            {% if video.allow_video_urls_edit or perms.videos_videourl_delete or perms.videos_videourl_change %}
+            {% if video|can_user_edit_video_urls:user %}
                 <ul class="admin-controls">
                     <li><a {% if item.primary %}style="display:none"{% endif %} href="#" video_url_id="{{ item.pk }}" class="make-primary-url-link">{% trans 'Make primary' %}</a></li>
                     {% if not item.original%}
@@ -99,7 +99,7 @@ jQuery(function($){
     $('.make-primary-url-link').click(function(){
         if (IS_AUTHENTICATED){
             var $this = $(this);
-            $.get(make_primary_url, {id: $this.attr('video_url_id')},
+            $.post(make_primary_url, {id: $this.attr('video_url_id')},
                 function(response){
                     if (response.error){
                         $.jGrowl.error(response.error);
@@ -128,7 +128,7 @@ jQuery(function($){
         var $url = $(this);
         if (IS_AUTHENTICATED){
             if (confirm('{% trans "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-matching videos or videos where subtitles fail to display correctly."|escapejs %}')){
-                $.get(remove_url, {id: $url.attr('video_url_id')},
+                $.post(remove_url, {id: $url.attr('video_url_id')},
                     function(response){
                         if (response.error){
                             $.jGrowl.error(response.error);

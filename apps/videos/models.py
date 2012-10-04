@@ -44,6 +44,7 @@ from videos import EffectiveSubtitle, is_synced, is_synced_value
 from videos.types import video_type_registrar
 from videos.feed_parser import FeedParser
 from comments.models import Comment
+from libs.bulkops import insert_many
 from statistic import st_widget_view_statistic
 from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_update
 from widget import video_cache
@@ -1295,7 +1296,8 @@ class SubtitleVersionManager(models.Manager):
         version.save()
 
         ids = set()
-
+        new_subtitles = []
+        new_metadata = []
         for i, item in enumerate(parser):
             original_sub  = None
 
@@ -1318,20 +1320,33 @@ class SubtitleVersionManager(models.Manager):
 
             metadata = item.pop('metadata', None)
 
-            caption, created = Subtitle.objects.get_or_create(version=version, subtitle_id=str(id))
-            caption.datetime_started = datetime.now()
-            caption.subtitle_order = order
-            caption.subtitle_text = html_to_markup(item['subtitle_text'])
-            caption.start_time = item['start_time']
-            caption.end_time = item['end_time']
-            caption.start_of_paragraph = paragraph
-            caption.save()
+            # Normally this is done in Subtitle.save(), but bulk inserting
+            # doesn't call that.
+            start_time = item['start_time']
+            end_time = item['end_time']
+            if not is_synced_value(start_time):
+                start_time = None
+            if not is_synced_value(end_time):
+                end_time = None
+
+            s = Subtitle(subtitle_id=str(id),
+                         subtitle_order=order,
+                         subtitle_text=html_to_markup(item['subtitle_text']),
+                         start_time=start_time,
+                         end_time=end_time,
+                         start_of_paragraph=paragraph)
+            s.version_id = version.pk
+            new_subtitles.append(s)
 
             if metadata:
                 for name, value in metadata.items():
-                    SubtitleMetadata(
-                        subtitle=caption, key=name, data=value
-                    ).save()
+                    new_metadata.append((str(id), name, value))
+
+        insert_many(new_subtitles)
+
+        for id, name, value in new_metadata:
+            subtitle = version.subtitle_set.get(subtitle_id=id)
+            SubtitleMetadata(subtitle=subtitle, key=name, data=value).save()
 
         return version
 
@@ -1920,6 +1935,10 @@ class ActionRenderer(object):
             info = self.render_DECLINE_VERSION(item)
         elif item.action_type == Action.DELETE_VIDEO:
             info = self.render_DELETE_VIDEO(item)
+        elif item.action_type == Action.EDIT_URL:
+            info = self.render_EDIT_URL(item)
+        elif item.action_type == Action.DELETE_URL:
+            info = self.render_DELETE_URL(item)
         else:
             info = ''
 
@@ -2054,6 +2073,25 @@ class ActionRenderer(object):
             item.team))
         return msg
 
+    def render_EDIT_URL(self, item):
+        kwargs = self._base_kwargs(item)
+        # de-serialize urls from json
+        data = {}
+        try:
+            data = json.loads(item.new_video_title)
+        except Exception, e:
+            logging.error('Unable to parse urls: {0}'.format(e))
+        kwargs['old_url'] = data.get('old_url', 'unknown')
+        kwargs['new_url'] = data.get('new_url', 'unknown')
+        msg = _('  changed primary url from <a href="%(old_url)s">%(old_url)s</a> to <a href="%(new_url)s">%(new_url)s</a>') % kwargs
+        return msg
+
+    def render_DELETE_URL(self, item):
+        kwargs = self._base_kwargs(item)
+        kwargs['title'] = item.new_video_title
+        msg = _('  deleted url <a href="%(title)s">%(title)s</a>') % kwargs
+        return msg
+
 class ActionManager(models.Manager):
     def for_team(self, team, public_only=True, ids=False):
         '''Return the actions for the given team.
@@ -2120,6 +2158,8 @@ class Action(models.Model):
     ACCEPT_VERSION = 13
     DECLINE_VERSION = 14
     DELETE_VIDEO = 15
+    EDIT_URL = 16
+    DELETE_URL = 17
     TYPES = (
         (ADD_VIDEO, _(u'add video')),
         (CHANGE_TITLE, _(u'change title')),
@@ -2136,6 +2176,8 @@ class Action(models.Model):
         (ACCEPT_VERSION, _(u'accept version')),
         (DECLINE_VERSION, _(u'decline version')),
         (DELETE_VIDEO, _(u'delete video')),
+        (EDIT_URL, _(u'edit url')),
+        (DELETE_URL, _(u'delete url')),
     )
 
     renderer = ActionRenderer('videos/_action_tpl.html')
@@ -2393,6 +2435,26 @@ class VideoUrl(models.Model):
     def created_as_time(self):
         #for sorting in js
         return time.mktime(self.created.timetuple())
+
+    def make_primary(self):
+        # create activity item
+        obj = Action(video=self.video)
+        urls = VideoUrl.objects.filter(video=self.video)
+        obj.action_type = Action.EDIT_URL
+        data = {
+            'old_url': urls.filter(primary=True)[0].url,
+            'new_url': self.url,
+        }
+        obj.new_video_title = json.dumps(data)
+        obj.created = datetime.now()
+        obj.user = self.video.user
+        obj.save()
+        # reset existing urls to non-primary
+        VideoUrl.objects.filter(video=self.video).exclude(pk=self.pk).update(
+            primary=False)
+        # set this one to primary
+        self.primary = True
+        self.save(updates_timestamp=False)
 
     @property
     def effective_url(self):
