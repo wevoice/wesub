@@ -622,7 +622,7 @@ def video_url_make_primary(request):
         try:
             obj = VideoUrl.objects.get(id=id)
             tv = obj.video.get_team_video()
-            if tv and not permissions.can_add_video(request.user, tv.team):
+            if tv and not permissions.can_user_edit_video_urls(obj.video, request.user):
                 output['error'] = ugettext('You have not permission change this URL')
                 status = 403
             else:
@@ -642,7 +642,7 @@ def video_url_remove(request):
         try:
             obj = VideoUrl.objects.get(id=id)
             tv = obj.video.get_team_video()
-            if tv and not permissions.can_add_video(request.user, tv.team):
+            if tv and not permissions.can_user_edit_video_urls(obj.video, request.user):
                 output['error'] = ugettext('You have not permission delete this URL')
                 status = 403
             else:
