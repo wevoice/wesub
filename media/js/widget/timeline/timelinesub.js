@@ -26,7 +26,7 @@ unisubs.timeline.TimelineSub = function(
 {
     goog.ui.Component.call(this);
     this.subtitle_ = subtitle;
-    this.pixelsPerSecond_ = pixelsPerSecond;
+    this.pixelsPerMillisecond_ = pixelsPerSecond / 1000;
     this.pixelOffset_ = opt_pixelOffset ? opt_pixelOffset : 0;
     this.editing_ = false;
     this.documentEventHandler_ = new goog.events.EventHandler(this);
@@ -95,14 +95,14 @@ unisubs.timeline.TimelineSub.prototype.onDocMouseMoveLeft_ = function(event) {
     this.subtitle_.getEditableCaption().setStartTime(
         this.grabberMousedownTime_ +
             (event.clientX - this.grabberMousedownClientX_) /
-            this.pixelsPerSecond_);
+            this.pixelsPerMillisecond_);
 };
 unisubs.timeline.TimelineSub.prototype.onDocMouseMoveRight_ = function(event) {
     // moving right grabber
     this.subtitle_.getEditableCaption().setEndTime(
         this.grabberMousedownTime_ +
             (event.clientX - this.grabberMousedownClientX_) /
-            this.pixelsPerSecond_);
+            this.pixelsPerMillisecond_);
 };
 unisubs.timeline.TimelineSub.prototype.onDocMouseUp_ = function(event) {
     this.editing_ = false;
@@ -158,17 +158,18 @@ unisubs.timeline.TimelineSub.prototype.updateValues_ = function() {
     }
     if (this.subtitle_.getEndTime() != this.existingSubEnd_ ||
         this.subtitle_.getStartTime() != this.existingSubStart_) {
+        console.log(this.subtitle_.getStartTime());
         unisubs.style.setWidth(
             this.getElement(),
             (this.subtitle_.getEndTime() - this.subtitle_.getStartTime()) *
-                this.pixelsPerSecond_);
+                this.pixelsPerMillisecond_);
         this.existingSubEnd_ = this.subtitle_.getEndTime();
     }
     if (this.subtitle_.getStartTime() != this.existingSubStart_) {
         unisubs.style.setPosition(
             this.getElement(),
             this.subtitle_.getStartTime() *
-                this.pixelsPerSecond_ -
+                this.pixelsPerMillisecond_ -
                 this.pixelOffset_,
             null);
         this.existingSubStart_ = this.subtitle_.getStartTime();

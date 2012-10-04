@@ -77,9 +77,8 @@ unisubs.timeline.TimeRowUL.prototype.setFirstTime = function(time) {
     var i, seconds;
     for (i = 0; i < unisubs.timeline.TimeRowUL.NUM_MAJOR_TICKS; i++) {
         seconds = this.firstTime_ + i * this.spacing_;
-        goog.dom.setTextContent(
-            this.majorTicks_[i],
-            unisubs.formatTime(seconds >= 0 ? ('' + seconds) : '', true));
+        var timeStr = seconds >= 0 ? ('' + seconds  * 1000 ) : '';
+        goog.dom.setTextContent(this.majorTicks_[i], unisubs.formatTime(timeStr, true));
     }
 };
 unisubs.timeline.TimeRowUL.prototype.getFirstTime = function() {
