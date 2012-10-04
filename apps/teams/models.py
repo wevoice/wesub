@@ -50,6 +50,7 @@ from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from subtitles.models import SubtitleVersion as NewSubtitleVersion
+from subtitles import pipeline
 
 from functools import partial
 
@@ -1703,12 +1704,12 @@ class Task(models.Model):
                "Tried to set version moderation status from an un-ruled-upon task."
 
         if self.approved == Task.APPROVED_IDS['Approved']:
-            moderation_status = MODERATION.APPROVED
+            moderation_status = 'public'
         else:
-            moderation_status = MODERATION.REJECTED
+            moderation_status = 'private'
 
-        SubtitleVersion.objects.filter(pk=self.subtitle_version.pk).update(
-                moderation_status=moderation_status)
+        NewSubtitleVersion.objects.filter(pk=self.new_subtitle_version.pk).update(
+                visibility=moderation_status)
 
     def _send_back(self, sends_notification=True):
         """Handle "rejection" of this task.
@@ -1769,6 +1770,23 @@ class Task(models.Model):
             # notify original submiter (assignee of self)
             notifier.reviewed_and_sent_back.delay(self.pk)
 
+
+    def _publicize_version(self, author):
+        """Create a new SubtitleVersion that's a public copy of the current tip.
+
+        author should be the person making this happen, *not* the author of the
+        original tip.
+
+        """
+        pipeline.add_subtitles(
+            video=self.new_subtitle_version.video,
+            language_code=self.new_subtitle_version.language_code,
+            subtitles=self.new_subtitle_version.get_subtitles(),
+            title=self.new_subtitle_version.title,
+            description=self.new_subtitle_version.description,
+            author=author,
+            visibility='public',
+        )
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
@@ -1936,9 +1954,10 @@ class Task(models.Model):
         else:
             # Approval isn't enabled, so the ruling of this Review task
             # determines whether the subtitles go public.
-            self._set_version_moderation_status()
-
             if approval:
+                # Make these subtitles public!
+                self._publicize_version(self.assignee)
+
                 # If the subtitles are okay, go ahead and autocreate translation
                 # tasks if necessary.
                 if self.workflow.autocreate_translate:
@@ -1963,15 +1982,17 @@ class Task(models.Model):
 
         self._add_comment()
 
-        # If we manage to get here, the ruling on this Approve task determines
-        # whether the subtitles should go public.
-        self._set_version_moderation_status()
-
-        # If the subtitles are okay, go ahead and autocreate translation tasks.
+        # If the subtitles are okay...
         if approval:
-            # But only if we haven't already.
+            # Make these subtitles public!
+            self._publicize_version(self.assignee)
+
+            # Create translation tasks if necessary.
             if self.workflow.autocreate_translate:
                 _create_translation_tasks(self.team_video, self.subtitle_version)
+
+            # And send them back to the original service.
+            # TODO: Pipeline this.
             upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
         else:
             # Send the subtitles back for improvement.
