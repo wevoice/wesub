@@ -13,7 +13,7 @@
             "groups": [],
             "user_permissions": [],
             "password": "sha1$6b3dc$72c6a16f127d2c217f72009632c745effef7eb3f",
-            "email": "admin@mail.net",
+            "email": "test@test.com",
             "date_joined": "2010-08-26 15:18:31"
         }
     },
@@ -117,6 +117,21 @@
             "primary": true,
             "video": 1,
             "owner_username": "GoogleTechTalks",
+            "type": "Y",
+            "original": true,
+            "added_by": 10001
+        }
+    },
+    {
+        "pk": 2,
+        "model": "videos.videourl",
+        "fields": {
+            "created": "2012-10-02 11:52:27",
+            "url": "http://www.youtube.com/watch?v=KKQS8EDG1P4",
+            "videoid": "KKQS8EDG1P4",
+            "primary": true,
+            "video": 3,
+            "owner_username": "GoogleDevelopers",
             "type": "Y",
             "original": true,
             "added_by": 10001
@@ -279,6 +294,80 @@
         "fields": {
             "domain": "universalsubtitles.org",
             "name": "unisubs"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "teams.team",
+        "fields": {
+            "is_visible": true,
+            "video": null,
+            "partner": null,
+            "logo": "",
+            "last_notification_time": "2012-10-04 15:27:03",
+            "membership_policy": 4,
+            "application_text": "",
+            "translate_policy": 10,
+            "third_party_accounts": [],
+            "description": "Test Team",
+            "subtitle_policy": 10,
+            "deleted": false,
+            "auth_provider_code": "",
+            "header_html_text": "",
+            "task_assign_policy": 10,
+            "slug": "test20121004",
+            "projects_enabled": false,
+            "name": "Test",
+            "created": "2012-10-04 15:27:03",
+            "task_expiration": null,
+            "page_content": "",
+            "workflow_enabled": false,
+            "points": 0,
+            "video_policy": 1,
+            "is_moderated": false,
+            "highlight": false,
+            "max_tasks_per_member": null
+        }
+    },
+    {
+        "pk": 1,
+        "model": "teams.project",
+        "fields": {
+            "description": null,
+            "created": "2012-10-02 12:00:00",
+            "guidelines": null,
+            "modified": "2012-10-02 12:00:00",
+            "order": 0,
+            "workflow_enabled": false,
+            "team": 1,
+            "slug": "_root",
+            "name": "_root"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "teams.teamvideo",
+        "fields": {
+            "all_languages": false,
+            "completed_languages": [],
+            "description": "",
+            "title": "",
+            "created": "2012-10-04 15:28:13",
+            "project": 1,
+            "video": 3, 
+            "team": 1,
+            "partner_id": "",
+            "thumbnail": "",
+            "added_by": 3
+        }
+    },
+    {
+        "pk": 1,
+        "model": "teams.teammember",
+        "fields": {
+            "role": "admin",
+            "user": 3,
+            "team": 1
         }
     }
 ]

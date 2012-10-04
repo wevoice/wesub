@@ -92,7 +92,7 @@ class TestNotification(TestCase):
         self.user.save()
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 2)
 
         self.assertIn(self.user.email, mail.outbox[0].to[0] )
         self.assertEqual(len(send_templated_email_mockup.context['team_videos']), 2)

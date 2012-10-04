@@ -838,6 +838,30 @@ class ViewsTest(WebUseTest):
         # check for activity
         self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 2)
 
+    def test_video_url_make_primary_team_video(self):
+        self._login()
+        v = Video.objects.get(video_id='KKQS8EDG1P4')
+        self.assertNotEqual(len(VideoUrl.objects.filter(video=v)), 0)
+        # add another url
+        secondary_url = 'http://www.youtube.com/watch?v=tKTZoB2Vjuk'
+        data = {
+            'url': secondary_url,
+            'video': v.pk
+        }
+        url = reverse('videos:video_url_create')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        vid_url = 'http://www.youtube.com/watch?v=KKQS8EDG1P4'
+        # test make primary
+        vu = VideoUrl.objects.filter(video=v)
+        vu[0].make_primary()
+        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, vid_url)
+        # check for activity
+        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 1)
+        vu[1].make_primary()
+        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, secondary_url)
+        # check for activity
+        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 2)
     def test_index(self):
         self._simple_test('videos.views.index')
 
