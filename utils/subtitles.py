@@ -558,6 +558,11 @@ class DfxpSubtitleParser(SubtitleParser):
         for item in self.nodes:
             yield self._get_data(item)
 
+def fraction_to_milliseconds(str_milli):
+    if not str_milli:
+        return 0
+    return int(str_milli.ljust(3, '0')) % 1000
+
 class SrtSubtitleParser(SubtitleParser):
     _clean_pattern = re.compile(r'\{.*?\}', re.DOTALL)
 
@@ -572,12 +577,11 @@ class SrtSubtitleParser(SubtitleParser):
         self.subtitles = self.subtitles.replace('\r\n', '\n')+'\n\n'
 
     def _get_time(self, hour, min, sec, secfr):
-        if secfr is None:
-            secfr = '0'
+        secfr = fraction_to_milliseconds(secfr)
         res =  (1000 * (
             (int(hour)*60*60 )+
             (int(min)*60) +
-            int(sec))) + int(secfr)
+            int(sec))) + secfr
         return res
 
     def _get_data(self, match):
