@@ -74,14 +74,18 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <p>Getting started is easy! Just find a video below that you’d like to help with and select the task you want to perform.</p>
-                <p><a href="#">Learn more</a> about working in Amara.</p>
+                <p class="view-notice">
+                Getting started is easy! Just find a video below that you’d like to help with and select the task you want to perform.<br/>
+                <a href="#">Learn more</a> about working in Amara.
+                </p>
             {% endif %}
             
+            {% if videos %}
             <h3>
                 <a href="" class="mode"></a>
                 Videos that need your help ({{ videos.items|length }})
             </h3>
+            {% endif %}
 
             {% if not user.get_languages %}
                 <p class="view-notice">
@@ -145,14 +149,9 @@
                         </li>
                     {% endfor %}
                 </ul>
-            {% else %}
-                <p class="empty">
-                    {% trans "Sorry, nothing to see here" %}
-                    ...
-                </p>
             {% endif %}
         {% else %}
-        <p>These are just a few of the exciting videos you can help us with! <a href="">Join now</a></p>
+        <p class="view-notice">These are just a few of the exciting videos you can help us with! <a href="">Join now</a></p>
         {% endif %}
     </div>
     <script type="text/javascript">
