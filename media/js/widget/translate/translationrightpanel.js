@@ -65,7 +65,7 @@ unisubs.translate.TranslationRightPanel.prototype.appendExtraHelpInternal =
     this.autoTranslateLink_ = 
         $d('a', {'href':'#'}, 'Auto-translate empty fields');
     this.changeTimingLink_ =
-        $d('a', {'href':'#'}, 'Change subtitle timing');
+        $d('a', {'href':'#'}, 'Convert to Timed Subtitles');
 
     var isBingTranslateable = unisubs.translate.BingTranslator.isTranslateable(
         this.dialog_.getStandardLanguage(),
@@ -82,7 +82,7 @@ unisubs.translate.TranslationRightPanel.prototype.appendExtraHelpInternal =
         ul.appendChild(
             $d('li', 'unisubs-changeTiming',
                this.changeTimingLink_,
-               $d('span', null, ' (advanced users)')));
+               $d('span', null, ' (advanced)')));
     }
     el.appendChild(ul);
 };
