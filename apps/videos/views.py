@@ -21,6 +21,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRespons
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
+from django.views.decorators.http import require_http_methods
 from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
     VideoUrl, AlreadyEditingException, restrict_versions
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
@@ -612,44 +613,55 @@ def counter(request):
     return HttpResponse('draw_unisub_counter({videos_count: %s})' % count)
 
 @login_required
+@require_http_methods(['POST'])
 def video_url_make_primary(request):
     output = {}
-
-    id = request.GET.get('id')
+    id = request.POST.get('id')
+    status = 200
     if id:
         try:
             obj = VideoUrl.objects.get(id=id)
-            if not permissions.can_user_edit_video_urls(obj.video,
-                    request.user):
+            tv = obj.video.get_team_video()
+            if tv and not permissions.can_add_video(request.user, tv.team):
                 output['error'] = ugettext('You have not permission change this URL')
+                status = 403
             else:
-                VideoUrl.objects.filter(video=obj.video).update(primary=False)
-                obj.primary = True
-                obj.save(updates_timestamp=False)
+                obj.make_primary()
         except VideoUrl.DoesNotExist:
             output['error'] = ugettext('Object does not exist')
-    return HttpResponse(json.dumps(output))
+            status = 404
+    return HttpResponse(json.dumps(output), status=status)
 
 @login_required
+@require_http_methods(['POST'])
 def video_url_remove(request):
     output = {}
-    id = request.GET.get('id')
-
+    id = request.POST.get('id')
+    status = 200
     if id:
         try:
             obj = VideoUrl.objects.get(id=id)
-
-            if not permissions.can_user_edit_video_urls(obj.video,
-                    request.user):
+            tv = obj.video.get_team_video()
+            if tv and not permissions.can_add_video(request.user, tv.team):
                 output['error'] = ugettext('You have not permission delete this URL')
+                status = 403
             else:
                 if obj.original:
-                    output['error'] = ugettext('You cann\'t remove original URL')
+                    output['error'] = ugettext('You can\'t remove original URL')
+                    status = 403
                 else:
+                    # create activity record
+                    act = Action(video=obj.video, action_type=Action.DELETE_URL)
+                    act.new_video_title = obj.url
+                    act.created = datetime.datetime.now()
+                    act.user = request.user
+                    act.save()
+                    # delete
                     obj.delete()
         except VideoUrl.DoesNotExist:
             output['error'] = ugettext('Object does not exist')
-    return HttpResponse(json.dumps(output))
+            status = 404
+    return HttpResponse(json.dumps(output), status=status)
 
 @login_required
 def video_url_create(request):

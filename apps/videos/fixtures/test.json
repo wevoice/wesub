@@ -65,7 +65,7 @@
             "homepage": "",
             "biography": ""
         }
-    },    
+    },
     {
         "pk": 1,
         "model": "videos.video",
@@ -107,6 +107,21 @@
     },
     {
         "pk": 1,
+        "model": "videos.videourl",
+        "fields": {
+            "created": "2012-10-02 11:52:27",
+            "url": "http://www.youtube.com/watch?v=rKnDgT73v8s",
+            "videoid": "rKnDgT73v8s",
+            "primary": true,
+            "video": 1,
+            "owner_username": "GoogleTechTalks",
+            "type": "Y",
+            "original": true,
+            "added_by": 10001
+        }
+    },
+    {
+        "pk": 1,
         "model": "videos.subtitlelanguage",
         "fields": {
             "writelock_owner": null,
@@ -143,7 +158,7 @@
             "version": 1,
             "end_time": 101
         }
-    },    
+    },
     {
         "pk": 7,
         "model": "videos.subtitle",
@@ -241,7 +256,7 @@
             "text_change": null,
             "user": 3
         }
-    },    
+    },
     {
         "pk": 1,
         "model": "videos.subtitleversion",
@@ -263,5 +278,5 @@
             "domain": "universalsubtitles.org",
             "name": "unisubs"
         }
-    }               
+    }
 ]
