@@ -2,20 +2,32 @@
 
 set -e
 
+function log() {
+    tput bold
+    tput setaf 2
+    echo
+    echo $*
+    echo '=================================================================='
+    tput sgr0
+}
+
 EXTRAS_DIR='/opt/extras'
 VE_DIR='/opt/ve/vagrant/unisubs'
-# create virtualenv ; no longer needed
-#virtualenv --no-site-packages --distribute $VE_DIR
+
 # Link folders ----------------------------------------------------------------
+log "Creating extras/ subdirectories..."
 mkdir -p $EXTRAS_DIR/static-cache
 mkdir -p $EXTRAS_DIR/pictures
 mkdir -p $EXTRAS_DIR/video
+
+log "Symlinking directories into place..."
 test -e venv               || ln -sf $VE_DIR venv
 test -L media/static-cache || ln -s $EXTRAS_DIR/static-cache media/static-cache
 test -L user-data/video    || ln -s $EXTRAS_DIR/video user-data/video
 test -L user-data/pictures || ln -s $EXTRAS_DIR/pictures user-data/pictures
 
 # Install requirements --------------------------------------------------------
+log "Installing Python requirements with pip..."
 source $VE_DIR/bin/activate
 cd deploy
 # Hack until we can think of a better solution
@@ -26,6 +38,7 @@ cd ..
 
 # Create a base settings_local.py ---------------------------------------------
 if [ ! -e settings_local.py ]; then
+    log "Creating default settings_local.py file..."
     cat > settings_local.py <<EOF
 # This setting lets non-admin accounts view the Django Debug Toolbar.
 # Useful for development when you're debugging queries made for non-admins.
@@ -85,13 +98,17 @@ EOF
 fi
 
 # Set up the DB ---------------------------------------------------------------
+log "Running syncdb..."
 python manage.py syncdb --all --settings=dev_settings --noinput
+log "Running migrations..."
 python manage.py migrate --fake --settings=dev_settings
 
-# Solr-------------------------------------------------------------------------
+# Solr ------------------------------------------------------------------------
+log "Updating Solr schema"
 sudo ./deploy/update_solr_schema_vagrant.sh
 
 # Adjust sys.path -------------------------------------------------------------
+log "Updating default Python path in the virtualenv..."
 cat > venv/lib/python2.6/sitecustomize.py <<EOF
 import sys
 
@@ -108,7 +125,8 @@ except ValueError:
 sys.path = ['/opt/ve/vagrant/unisubs/lib/python2.6/site-packages', '/usr/lib/python2.6'] + sys.path
 EOF
 
-# Selenium testing support
+# Selenium testing support ----------------------------------------------------
+log "Installing Selenium support"
 pip install selenium factory_boy
 if [ "$(grep 'unisubs.example.com' /etc/hosts)" = "" ] ; then
   echo "Adding unisubs.example.com to /etc/hosts"
@@ -116,13 +134,18 @@ if [ "$(grep 'unisubs.example.com' /etc/hosts)" = "" ] ; then
 fi
 
 # Celery services -------------------------------------------------------------
+log "Restarting celeryd (if necessary)..."
 sudo service celeryd.vagrant status | grep running || sudo service celeryd.vagrant start
+log "Restarting celerycam (if necessary)..."
 sudo service celerycam.vagrant status | grep running || sudo service celeryd.vagrant start
 
 # Notice ----------------------------------------------------------------------
+tput setaf 4
+tput bold
 echo "========================================================================="
 echo "Bootstrapping Complete"
 echo ""
 echo "For even better performance move the git directory away on your HOST OS:"
 echo ""
 echo "    mv .git ../unisubs.git && ln -s ../unisubs.git .git"
+tput sgr0
