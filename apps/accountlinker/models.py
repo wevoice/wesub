@@ -51,6 +51,9 @@ def youtube_sync(video, language):
     if version and version.is_private():
         return
 
+    if not version.video.get_team_video():
+        return
+
     always_push_account = ThirdPartyAccount.objects.always_push_account()
 
     for vurl in video.videourl_set.all():
@@ -106,6 +109,9 @@ class ThirdPartyAccountManager(models.Manager):
             version = language.get_tip()
 
         if version and version.is_private():
+            return
+
+        if not version.video.get_team_video():
             return
 
         try:

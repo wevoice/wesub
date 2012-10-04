@@ -228,6 +228,10 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         // popcornify the subtitle display.  I'm sorry.
         unisubs.caption_display_mode = result['caption_display_mode'];
 
+        // TODO: This is for disabling timing changes on T vids. Ditto above,
+        // it's awful.
+        unisubs.timing_mode = result['timing_mode'];
+
         // setup dom and event handling
         this.onDialogOpened_(dialog);
     }
