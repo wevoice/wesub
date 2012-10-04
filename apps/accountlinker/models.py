@@ -22,7 +22,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 
-from videos.models import VIDEO_TYPE
+from videos.models import VIDEO_TYPE, VIDEO_TYPE_YOUTUBE
 from .videos.types import (
     video_type_registrar, UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 )
@@ -111,8 +111,31 @@ class ThirdPartyAccountManager(models.Manager):
                 # We can't mirror unsynced or non-public versions.
                 return
 
-        if not version.video.get_team_video():
-            return
+        team_video = video.get_team_video()
+        ignore_new_syncing_logic = False
+
+        if team_video:
+            team = team_video.team
+            has_linked_youtube_account = team.third_party_accounts.filter(
+                    type=VIDEO_TYPE_YOUTUBE).exists()
+            if has_linked_youtube_account:
+                # Ignore the new syncing logic.  Use the linked Youtube account
+                # to publish subtitles to Youtube.
+                ignore_new_syncing_logic = True
+            else:
+                # The assumption is that it's the partner's official Youtube
+                # account and they don't want it messed up with strange subs.
+                return
+        else:
+            # If a video isn't part of a team, and its Youtube username matches
+            # that of any linked Youtube account in Amara---we don't sync to
+            # Youtube.
+            yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
+            if yt_url.exists():
+                usernames = [url.owner_username for url in yt_url]
+                linked_accounts = self.filter(username__in=usernames).exists()
+                if linked_accounts:
+                    return
 
         try:
             rule = YoutubeSyncRule.objects.all()[0]
@@ -125,7 +148,7 @@ class ThirdPartyAccountManager(models.Manager):
             already_updated = False
             vt = video_type_registrar.video_type_for_url(vurl.url)
 
-            if should_sync:
+            if should_sync and not ignore_new_syncing_logic:
                 try:
                     vt.update_subtitles(version, always_push_account)
                     already_updated = True
