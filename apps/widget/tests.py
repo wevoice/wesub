@@ -24,7 +24,6 @@ unittest). These will both pass when you run "manage.py test".
 Replace these with more appropriate tests for your application.
 """
 
-import os
 import json
 
 from django.test import TestCase
@@ -148,8 +147,8 @@ class TestRpc(TestCase):
         session_pk = return_value['session_pk']
         inserted = [{'subtitle_id': 'aa',
                      'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request, session_pk, inserted);
         return_value = rpc.show_widget(
@@ -195,8 +194,8 @@ class TestRpc(TestCase):
         rpc.finished_subtitles(request, session.pk,
                                [{'subtitle_id': 'aa',
                                  'text': 'hey you!',
-                                 'start_time': 2.3,
-                                 'end_time': 3.4,
+                                 'start_time': 2300,
+                                 'end_time': 3400,
                                  'sub_order': 1.0}])
         video = Video.objects.get(pk=session.video.pk)
         self.assertEquals(1, video.subtitle_language().subtitleversion_set.count())
@@ -224,13 +223,13 @@ class TestRpc(TestCase):
         session_pk = return_value['session_pk']
         new_subs = [{'subtitle_id': 'a',
                      'text': 'hey you!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 1.0},
                     {'subtitle_id': u'b',
                      'text': 'hey!',
-                     'start_time': 3.4,
-                     'end_time': 5.8,
+                     'start_time': 3400,
+                     'end_time': 5800,
                      'sub_order': 2.0}]
         rpc.finished_subtitles(request, session_pk, new_subs)
         video = Video.objects.get(pk=session.video.pk)
@@ -271,8 +270,8 @@ class TestRpc(TestCase):
         session_pk = return_value['session_pk']
         inserted = [{'subtitle_id': 'aa',
                      'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request_0, session_pk, inserted)
 
@@ -296,8 +295,8 @@ class TestRpc(TestCase):
         session_pk = return_value['session_pk']
         inserted = [{'subtitle_id': 'aa',
                      'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request_0, session_pk, inserted, False)
 
@@ -369,8 +368,8 @@ class TestRpc(TestCase):
         session_pk = return_value['session_pk']
         inserted = [{'subtitle_id': 'aa',
                      'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request_0, session_pk, subtitles=inserted)
         # different user opens the dialog for video
@@ -398,8 +397,8 @@ class TestRpc(TestCase):
         session_pk = return_value['session_pk']
         inserted = [{'subtitle_id': 'aa',
                      'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 1.0}]
         response = rpc.regain_lock(request_0, session_pk)
         self.assertEqual('ok', response['response'])
@@ -419,8 +418,8 @@ class TestRpc(TestCase):
         session_pk = return_value['session_pk']
         inserted = [{'subtitle_id': 'aa',
                      'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 1.0}]
         response = rpc.regain_lock(request_0, session_pk)
         self.assertEqual('ok', response['response'])
@@ -565,8 +564,8 @@ class TestRpc(TestCase):
         new_subs = [response['subtitles']['subtitles'][0],
                     {'subtitle_id': 'cc',
                      'text': 'hey!',
-                     'start_time': 5.3,
-                     'end_time': 8.4,
+                     'start_time': 5300,
+                     'end_time': 8400,
                      'sub_order': 5.0}]
         rpc.finished_subtitles(request, session_pk, new_subs)
         language = models.SubtitleLanguage.objects.get(pk=session.language.pk)
@@ -602,14 +601,14 @@ class TestRpc(TestCase):
         subtitles = sub_state['subtitles']
         self.assertEquals(2, len(subtitles))
         self.assertEquals('a_es', subtitles[0]['text'])
-        self.assertEquals(2.3, subtitles[0]['start_time'])
-        self.assertEquals(3.4, subtitles[0]['end_time'])
+        self.assertEquals(2300, subtitles[0]['start_time'])
+        self.assertEquals(3400, subtitles[0]['end_time'])
 
         session_pk = response['session_pk']
         new_subs = [{'subtitle_id': subtitles[0]['subtitle_id'],
                      'text': 'a_edited',
-                     'start_time': 1.3,
-                     'end_time': 3.2,
+                     'start_time': 1300,
+                     'end_time': 3200,
                      'sub_order': 1.0},
                     subtitles[1]]
         rpc.finished_subtitles(request, session_pk, new_subs)
@@ -623,10 +622,10 @@ class TestRpc(TestCase):
         subtitles = subs['subtitles']
         self.assertEquals(2, len(subtitles))
         self.assertEquals('a_edited', subtitles[0]['text'])
-        self.assertEquals(1.3, subtitles[0]['start_time'])
-        self.assertEquals(3.2, subtitles[0]['end_time'])
-        self.assertEquals(3.4, subtitles[1]['start_time'])
-        self.assertEquals(5.8, subtitles[1]['end_time'])
+        self.assertEquals(1300, subtitles[0]['start_time'])
+        self.assertEquals(3200, subtitles[0]['end_time'])
+        self.assertEquals(3400, subtitles[1]['start_time'])
+        self.assertEquals(5800, subtitles[1]['end_time'])
 
     def test_fork_on_finish(self):
         request = RequestMockup(self.user_0)
@@ -646,13 +645,13 @@ class TestRpc(TestCase):
         # fork mid-edit
         subtitles = [{'subtitle_id': u'a',
                  'text': 'uno',
-                 'start_time': 1.3,
-                 'end_time': 2.4,
+                 'start_time': 1300,
+                 'end_time': 2400,
                  'sub_order': 1.0},
                 {'subtitle_id': u'b',
                  'text': 'dos',
-                 'start_time': 6.4,
-                 'end_time': 8.8,
+                 'start_time': 6400,
+                 'end_time': 8800,
                  'sub_order': 2.0}]
 
         # save as forked.
@@ -672,10 +671,10 @@ class TestRpc(TestCase):
         self.assertEquals(False, first.is_forked)
         self.assertEquals(True, es.latest_version().is_forked)
         subtitles = es.latest_version().subtitles()
-        self.assertEquals(1.3, subtitles[0].start_time)
-        self.assertEquals(2.4, subtitles[0].end_time)
-        self.assertEquals(6.4, subtitles[1].start_time)
-        self.assertEquals(8.8, subtitles[1].end_time)
+        self.assertEquals(1300, subtitles[0].start_time)
+        self.assertEquals(2400, subtitles[0].end_time)
+        self.assertEquals(6400, subtitles[1].start_time)
+        self.assertEquals(8800, subtitles[1].end_time)
 
     def test_change_original_language_legal(self):
         request = RequestMockup(self.user_0)
@@ -692,8 +691,8 @@ class TestRpc(TestCase):
 
         inserted = [{'subtitle_id': u'aa',
                      'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request, session_pk, inserted)
         rpc.show_widget(
@@ -709,8 +708,8 @@ class TestRpc(TestCase):
         session_pk = return_value['session_pk']
         inserted = [{'subtitle_id': u'sddfdsfsdf',
                      'text': 'hey!',
-                     'start_time': 3.5,
-                     'end_time': 6.4,
+                     'start_time': 3500,
+                     'end_time': 6400,
                      'sub_order': 2.0}]
         rpc.finished_subtitles(
             request, session_pk, inserted)
@@ -798,8 +797,8 @@ class TestRpc(TestCase):
         subs = subs['subtitles']
         self.assertEqual(1, len(subs))
         self.assertEqual('frenchtext', subs[0]['text'])
-        self.assertEqual(2.3, subs[0]['start_time'])
-        self.assertEqual(3.4, subs[0]['end_time'])
+        self.assertEqual(2300, subs[0]['start_time'])
+        self.assertEqual(3400, subs[0]['end_time'])
         video = models.Video.objects.get(id=session.video.id)
         self.assertEqual(50, video.subtitle_language('fr').percent_done)
 
@@ -828,18 +827,18 @@ class TestRpc(TestCase):
         # add a subtitle to the spanish one
         new_subs = [{'subtitle_id': 'a',
                      'text': 'a_esd',
-                     'start_time': 2.3,
-                     'end_time': 3.2,
+                     'start_time': 2300,
+                     'end_time': 3200,
                      'sub_order': 1.0},
                     {'subtitle_id': 'b',
                      'text': 'b_es',
-                     'start_time': 3.4,
-                     'end_time': 5.8,
+                     'start_time': 3400,
+                     'end_time': 5800,
                      'sub_order': 2.0},
                     {'subtitle_id': 'e',
                       'text': 'd_es',
-                     'start_time': 4.3,
-                     'end_time': 5.2,
+                     'start_time': 4300,
+                     'end_time': 5200,
                      'sub_order': 1.0}]
 
         rpc.finished_subtitles(request, session_pk, new_subs)
@@ -866,25 +865,25 @@ class TestRpc(TestCase):
         subtitles = response['subtitles']['subtitles']
         self.assertEquals(1, len(subtitles))
         self.assertEquals('frenchtext', subtitles[0]['text'])
-        self.assertEquals(2.3, subtitles[0]['start_time'])
-        self.assertEquals(3.2, subtitles[0]['end_time'])
+        self.assertEquals(2300, subtitles[0]['start_time'])
+        self.assertEquals(3200, subtitles[0]['end_time'])
 
         # update the timing on the French sub.
         session_pk = response['session_pk']
         updated = [{'subtitle_id': subtitles[0]['subtitle_id'],
                      'text': 'a_french_edited',
-                     'start_time': 2.35,
-                     'end_time': 3.2,
+                     'start_time': 2350,
+                     'end_time': 3200,
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request, session_pk, updated)
 
         french_lang = models.Video.objects.get(video_id=video_id).subtitle_language('fr')
         self.assertEquals(True, french_lang.is_forked)
-        self.assertEquals(2.35, french_lang.latest_version().subtitles()[0].start_time)
+        self.assertEquals(2350, french_lang.latest_version().subtitles()[0].start_time)
 
         spanish_lang = models.Video.objects.get(video_id=video_id).subtitle_language('es')
         self.assertEquals(True, spanish_lang.is_forked)
-        self.assertEquals(2.3, spanish_lang.latest_version().subtitles()[0].start_time)
+        self.assertEquals(2300, spanish_lang.latest_version().subtitles()[0].start_time)
 
     def test_two_subtitle_langs_can_exist(self):
         request = RequestMockup(self.user_0)
@@ -898,8 +897,8 @@ class TestRpc(TestCase):
         session_pk = response['session_pk']
         inserted = [{'subtitle_id': 'a',
                      'text': 'a_fr',
-                     'start_time': 1.3,
-                     'end_time': 2.5,
+                     'start_time': 1300,
+                     'end_time': 2500,
                      'sub_order': 1.0}]
         rpc.finished_subtitles(request, session_pk, inserted)
 
@@ -998,7 +997,7 @@ class TestRpc(TestCase):
             session_pk,
             [{'subtitle_id': u'aa',
               'text': 'hey!',
-              'start_time': 2.3,
+              'start_time': 2300,
               'end_time': 3.4,
               'sub_order': 1.0}])
         return SubtitlingSession.objects.get(pk=session_pk).\
@@ -1034,13 +1033,13 @@ class TestRpc(TestCase):
         session_pk = response['session_pk']
         new_subs = [{'subtitle_id': 'a',
                      'text': 'a_esd',
-                     'start_time': 2.3,
-                     'end_time': 3.2,
+                     'start_time': 2300,
+                     'end_time': 3200,
                      'sub_order': 1.0},
                     {'subtitle_id': 'b',
                      'text': 'b_es',
-                     'start_time': 3.4,
-                     'end_time': 5.8,
+                     'start_time': 3400,
+                     'end_time': 5800,
                      'sub_order': 2.0}]
         rpc.finished_subtitles(request, session_pk, new_subs)
         return Video.objects.get(pk=session.video.pk)
@@ -1055,13 +1054,13 @@ def create_two_sub_session(request, completed=None):
     session_pk = response['session_pk']
     inserted = [{'subtitle_id': u'a',
                  'text': 'hey!',
-                 'start_time': 2.3,
-                 'end_time': 3.4,
+                 'start_time': 2300,
+                 'end_time': 3400,
                  'sub_order': 1.0},
                 {'subtitle_id': u'b',
                  'text': 'hey!',
-                 'start_time': 3.4,
-                 'end_time': 5.8,
+                 'start_time': 3400,
+                 'end_time': 5800,
                  'sub_order': 2.0}]
     rpc.finished_subtitles(request, session_pk, inserted, completed=completed)
     return SubtitlingSession.objects.get(pk=session_pk)
@@ -1259,7 +1258,7 @@ class TestFormatConvertion(TestCase):
         self.subs = []
         for x in range(0,10):
             self.subs.append({
-                'start_time': x, 'end_time': x + 1, 'subtitle_id': x,
+                'start_time': (x * 1000), 'end_time': (x * 1000) + 1000, 'subtitle_id': x,
                 'start_of_paragraph':False,
                 'text': "%s - and *italics* and **bold** and >>."
             })

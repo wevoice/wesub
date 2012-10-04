@@ -1807,13 +1807,13 @@ class Subtitle(models.Model):
     subtitle_order = models.FloatField(null=True)
     subtitle_text = models.CharField(max_length=1024, blank=True)
     # in seconds. if no start time is set, should be null.
-    start_time = models.FloatField(null=True)
+    start_time_seconds = models.FloatField(null=True, db_column='start_time')
     # storing both so we don't need to migrate everyone at once
-    start_time_ms = models.IntegerField(null=True, default=None)
+    start_time = models.IntegerField(null=True, default=None, db_column='start_time_ms')
     # in seconds. if no end time is set, should be null.
-    end_time = models.FloatField(null=True)
+    end_time_seconds = models.FloatField(null=True, db_column='end_time')
     # storing both so we don't need to migrate everyone at once
-    end_time_ms = models.IntegerField(null=True, default=None)
+    end_time = models.IntegerField(null=True, default=None, db_column='end_time_ms')
     start_of_paragraph = models.BooleanField(default=False)
 
     objects = SubtitleManager()
@@ -1862,10 +1862,6 @@ class Subtitle(models.Model):
             if 'end_time' in caption_dict:
                 self.end_time = caption_dict['end_time']
 
-    def seconds_to_millisencods(self, value):
-        if value in [None, -1]:
-            return -1
-        return int(math.floor(value * 1000))
         
     def save(self, *args, **kwargs):
         # Normalize start_time and end_time to None (separately) if either is
@@ -1876,10 +1872,6 @@ class Subtitle(models.Model):
         if not is_synced_value(self.end_time):
             self.end_time = None
 
-        if self.start_time_ms is None and self.start_time is not None:
-            self.start_time_ms = self.seconds_to_millisencods(self.start_time)
-        if self.end_time_ms is None and self.end_time is not None:
-            self.end_time_ms = self.seconds_to_millisencods(self.end_time)
         return super(Subtitle, self).save(*args, **kwargs)
 
     def __unicode__(self):

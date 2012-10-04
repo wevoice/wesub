@@ -264,7 +264,7 @@ unisubs.logout = function() {
 };
 
 unisubs.formatTime = function(time, opt_excludeMs) {
-    var intTime = parseInt(time);
+    var intTime = parseInt(time / 1000);
 
     var timeString = '';
     var hours = (intTime / 3600) | 0;
@@ -283,7 +283,7 @@ unisubs.formatTime = function(time, opt_excludeMs) {
     else
         timeString += seconds;
     if (!opt_excludeMs) {
-        var frac = parseInt(time * 100) % 100;
+        var frac = parseInt(time % 1000);
         timeString += ('.' + goog.string.padNumber(frac, 2));
     }
     return timeString;

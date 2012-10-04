@@ -37,15 +37,15 @@ def _append_subs(version, num_subs= 2, include_timing=False, make_new_version=Tr
         language=version.language)
     if include_timing:
         last = version.ordered_subtitles()[-1]
-        start_time = last.end_time + 1
+        start_time = last.end_time + 1000
     for i in range(0, num_subs):
         subtitle = Subtitle(version=version,
                             subtitle_id="%s" % i,
                             subtitle_order=i,
              subtitle_text = "Sub %s for lang (%s)" % (i, version.language.language))
         if include_timing:
-             subtitle.start_time=i * 1.0 + start_time
-             subtitle.end_time =i + 0.8 + start_time
+             subtitle.start_time=i * 1000 + start_time
+             subtitle.end_time =i + 800 + start_time
 
 
         
@@ -61,8 +61,8 @@ def _add_subtitles(sub_lang, num_subs, translated_from=None):
                             subtitle_order=i,
              subtitle_text = "Sub %s for lang (%s)" % (i, sub_lang.language))
         if not translated_from:
-             subtitle.start_time=i * 1.0
-             subtitle.end_time =i + 0.8
+             subtitle.start_time=i * 1000
+             subtitle.end_time =i + 800
 
         else:
             subtitle.subtitle_text += " translated from (%s)" % (translated_from)

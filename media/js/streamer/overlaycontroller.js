@@ -45,7 +45,7 @@ unisubs.streamer.OverlayController.prototype.makeSubtitleJson_ = function() {
             return { 
                 "subtitle_id": unisubs.randomString(),
                 "text": goog.dom.getTextContent(elem),
-                "start_time": parseInt(elem.getAttribute("name")) / 1000
+                "start_time": parseInt(elem.getAttribute("name")) 
             };
         });
     goog.array.sort(subs, function(s, t) { 

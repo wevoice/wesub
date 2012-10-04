@@ -2464,7 +2464,7 @@ class BillingReport(models.Model):
                     tv.video.title.encode('utf-8'),
                     host + tv.video.get_absolute_url(),
                     language.language,
-                    round((end - start) / 60, 2)
+                    round((end - start) / (60 * 1000), 2)
                 ])
 
         fn = '/tmp/bill-%s.csv' % self.pk

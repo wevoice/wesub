@@ -34,7 +34,7 @@ from utils.html import unescape as unescape_html
 
 
 # see video.models.Subtitle..start_time
-MAX_SUB_TIME = (60 * 60 * 100) - 1
+MAX_SUB_TIME = (60 * 60 * 100 * 1000) - 1000
 DEFAULT_ALLOWED_TAGS = ['i', 'b', 'u']
 def is_version_same(version, parser):
     if not version:
@@ -290,11 +290,20 @@ class YoutubeXMLParser(SubtitleParser):
             except IndexError:
                 yield self._get_data(item)
 
+    def _to_milliseconds(self, time_val):
+        if time_val.find('.') > -1:
+            seconds, milliseconds  = [int(x) for x in time_val.split(".")]
+        else:
+            seconds = int(time_val)
+            milliseconds = 0
+        return (seconds * 1000 ) + milliseconds
+
     def _get_data(self, item, next_item=None):
         output = {}
-        output['start_time'] = float(item.get('start'))
+
+        output['start_time'] = self._to_milliseconds(item.get('start'))
         if next_item is not None:
-            output['end_time'] = float(next_item.get('start'))
+            output['end_time'] = self._to_milliseconds(next_item.get('start'))
         else:
             output['end_time'] = -1
 
@@ -329,8 +338,8 @@ class YoutubeSubtitleParser(SubtitleParser):
 
     def _get_data(self, item):
         output = {}
-        output['start_time'] = item['start_ms'] / 1000.
-        output['end_time'] = (item['start_ms'] + item['dur_ms']) / 1000.
+        output['start_time'] = item['start_ms'] 
+        output['end_time'] = (item['start_ms'] + item['dur_ms']) 
         output['subtitle_text'] = item['text']
         return output
 
@@ -424,13 +433,15 @@ class TtmlSubtitleParser(SubtitleParser):
 
         try:
             hour, min, sec = begin.split(':')
+            sec, milliseconds = sec.split(".")
 
-            start = int(hour)*60*60 + int(min)*60 + float(sec)
+            start = ((int(hour)*60*60 + int(min)*60 + int(sec) ) * 1000) + int(milliseconds)
             if start > MAX_SUB_TIME:
                 return -1
 
             d_hour, d_min, d_sec = dur.split(':')
-            end =  + int(d_hour)*60*60 + int(d_min)*60 + float(d_sec)
+            d_sec, d_milliseconds = d_sec.split(".")
+            end =  + ((int(d_hour)*60*60 + int(d_min)*60 + int(d_sec)) * 1000) + int(d_milliseconds)
             if is_duration:
                 end += start
         except ValueError:
@@ -492,7 +503,7 @@ class DfxpSubtitleParser(SubtitleParser):
             else:
                 hour, min, sec = t.split(':')
             
-                start = int(hour)*60*60 + int(min)*60 + float(sec)
+                start = (int(hour)*60*60 + int(min)*60 + int(sec)) * 1000
                 if start > MAX_SUB_TIME:
                     return -1
         except ValueError:
@@ -563,7 +574,11 @@ class SrtSubtitleParser(SubtitleParser):
     def _get_time(self, hour, min, sec, secfr):
         if secfr is None:
             secfr = '0'
-        return int(hour)*60*60+int(min)*60+int(sec)+float('.'+secfr)
+        res =  (1000 * (
+            (int(hour)*60*60 )+
+            (int(min)*60) +
+            int(sec))) + int(secfr)
+        return res
 
     def _get_data(self, match):
         r = match.groupdict()

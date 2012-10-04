@@ -281,8 +281,8 @@ class BusinessLogicTest(TestCase):
         session_pk = return_value['session_pk']
         inserted = [{'subtitle_id': 'aa',
                      'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 4.0}]
         rpc.finished_subtitles(request, session_pk, inserted, forked=True);
 
@@ -322,16 +322,16 @@ class SubtitleParserTest(TestCase):
             result[0], 0.0, 0.0,
             u'Don\'t show this text it may be used to insert hidden data')
         self._assert_sub(
-            result[1], 1.5, 4.5,
+            result[1], 1500, 4500,
             u'SubRip subtitles capability tester 1.2p by ale5000\n<b>Use Media Player Classic as reference</b>\nThis text should be blue')
         self._assert_sub(
-            result[2], 4.5, 4.5,
+            result[2], 4500, 4500,
             u'Hidden')
         self._assert_sub(
-            result[3], 7.501, 11.5,
+            result[3], 7501, 11500,
             u'This should be an E with an accent: \xc8\n\u65e5\u672c\u8a9e')
         self._assert_sub(
-            result[4], 55.501, 58.5,
+            result[4], 55501, 58500,
             u'Hide these tags:')
 
     def test_srt_with_blank(self):
@@ -339,13 +339,13 @@ class SubtitleParserTest(TestCase):
         result = list(parser)
 
         self._assert_sub(
-            result[0], 13.34, 24.655,
+            result[0], 13340, 24655,
             u'sure I get all the colors\nnice-- is equal to 17.')
         self._assert_sub(
-            result[1], 24.655, 27.43,
+            result[1], 24655, 27430,
             u'')
         self._assert_sub(
-            result[2], 27.43, 29.79,
+            result[2], 27430, 29790,
             u'So what\'s different about this\nthan what we saw in the last')
 
     def test_srt_with_timecode_without_decimal(self):
@@ -353,24 +353,24 @@ class SubtitleParserTest(TestCase):
         result = list(parser)
 
         self._assert_sub(
-            result[0], 61.64, 65.7,
+            result[0], 61640, 65700,
             u'this, I guess we could say,\nequation or this inequality')
         self._assert_sub(
-            result[1], 65.7, 70,
+            result[1], 65700, 70000,
             u'by negative 1, I want to\nunderstand what happens.')
         self._assert_sub(
-            result[2], 70, 78.36,
+            result[2], 70000, 78360,
             u'So what\'s the relation between\nnegative x and negative 5?')
         self._assert_sub(
-            result[3], 78.36, 81.5,
+            result[3], 78360, 81500,
             u'When I say what\'s the relation,\nis it greater than or is')
 
     def test_youtube(self):
         path = os.path.join(os.path.dirname(__file__), 'fixtures/youtube_subs_response.json')
         parser = YoutubeSubtitleParser(open(path).read())
         subs = list(parser)
-        self.assertAlmostEqual(subs[0]['start_time'], 0.82)
-        self.assertAlmostEqual(subs[0]['end_time'], 6.85)
+        self.assertEqual(subs[0]['start_time'], 820)
+        self.assertEqual(subs[0]['end_time'], 6850)
 
     def test_txt(self):
         parser = TxtSubtitleParser(TXT_TEXT)
@@ -395,13 +395,13 @@ class SubtitleParserTest(TestCase):
         # making sure that the lines that have trailing spaces are
         # being parsed
         self._assert_sub(
-            result[0], 10.0, 14.0,
+            result[0], 10000, 14000,
             u'Merci. Félicitations aux étudiants \n[de l\'association Libertés Numériques -- NdR]')
         self._assert_sub(
-            result[1], 14.1, 16,
+            result[1], 14100, 16000,
             u'd’avoir organisé cette réunion.')
         self._assert_sub(
-            result[2], 16.1, 19.9,
+            result[2], 16100, 19900,
             u'Ils ont eu raison, non seulement \nà cause de la célébrité de Richard')
 
        
@@ -701,13 +701,13 @@ class UploadSubtitlesTest(WebUseTest):
 
         language = self.video.subtitle_language('en')
         subs = language.latest_version().subtitles()
-        self.assertEquals(7.071, subs[2].start_time)
+        self.assertEquals(7071, subs[2].start_time)
 
         request = RequestMockup(NotAuthenticatedUser())
         rpc = Rpc()
         subs = rpc.fetch_subtitles(request, self.video.video_id, language.pk)
         last_sub = subs['subtitles'][2]
-        self.assertEquals(7.071, last_sub['start_time'])
+        self.assertEquals(7071, last_sub['start_time'])
         self.assertEquals(-1, last_sub['end_time'])
 
 
@@ -1781,8 +1781,8 @@ class TestPercentComplete(TestCase):
             s.version = latest_version
             s.subtitle_id = 'sadfdasf%s' % i
             s.subtitle_order = i
-            s.start_time = 50 + i
-            s.end_time = 51 + i
+            s.start_time = 5000 + (i * 1000)
+            s.end_time = 51000 + (i * 1000)
             s.subtitle_text = "what %i" % i
             s.save()
 
@@ -2024,8 +2024,8 @@ class TestModelsSaving(TestCase):
         session_pk = return_value['session_pk']
         inserted = [{'subtitle_id': 'aa',
                      'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
+                     'start_time': 2300,
+                     'end_time': 3400,
                      'sub_order': 4.0}]
         rpc.finished_subtitles(request, session_pk, inserted);
 
@@ -2046,8 +2046,8 @@ class TestModelsSaving(TestCase):
                 )
         inserted.append( {'subtitle_id': 'ac',
                      'text': 'hey!',
-                     'start_time': 4.3,
-                     'end_time': 5.4,
+                     'start_time': 4300,
+                     'end_time': 5400,
                      'sub_order': 5.0})
         rpc.finished_subtitles(request, session_pk, inserted, forked=True);
         lang = self.video.subtitlelanguage_set.get(language='eu', is_forked=True)
@@ -2215,23 +2215,23 @@ class TestMetadataManager(TestCase):
                    "subtitle_order" : 1,
                    "subtitle_text": "",
                    "subtitle_id": "id1",
-                    'start_time': 1,
-                    'end_time': 2,
+                    'start_time': 1000,
+                    'end_time': 2000,
 
                  },
                   {
                    "subtitle_order" : 2,
                    "subtitle_text": "   ",
                    "subtitle_id": "id2",
-                    'start_time': 3,
-                    'end_time': 4,
+                    'start_time': 3000,
+                    'end_time': 4000,
                  },
                   {
                    "subtitle_order" : 3,
                    "subtitle_text": "t3",
                    "subtitle_id": "id3",
-                    'start_time': 5,
-                    'end_time': 6,
+                    'start_time': 5000,
+                    'end_time': 6000,
                  },
 
         ])
@@ -2281,8 +2281,8 @@ def create_version(lang, subs=None, user=None):
             subs.append({
                 "subtitle_text": "hey %s" % x,
                 "subtitle_id": "%s-%s-%s" % (version_no, lang.pk, x),
-                "start_time": x,
-                "end_time": (x* 1.0) - 0.1
+                "start_time": x * 1000,
+                "end_time": (x* 1000) - 100
             })
     for sub in subs:
         s = Subtitle(**sub)
@@ -2635,7 +2635,7 @@ def add_subs(language, subs_texts):
             subtitle_id=i,
             subtitle_order=i,
             subtitle_text=text,
-            start_time = i,
-            end_time = i + 1 - 0.1
+            start_time = i * 1000,
+            end_time = (i  * 1000)+ 1000 - 100
         )
 
