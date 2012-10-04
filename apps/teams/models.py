@@ -49,6 +49,7 @@ from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
+from subtitles.models import SubtitleVersion as NewSubtitleVersion
 
 from functools import partial
 
@@ -1065,6 +1066,7 @@ class ApplicationManager(models.Manager):
             qs = qs.filter(user=user)
         return qs
 
+
 # Application
 class Application(models.Model):
     team = models.ForeignKey(Team, related_name='applications')
@@ -1170,6 +1172,7 @@ class Application(models.Model):
 
     def __unicode__(self):
         return "Application: %s - %s - %s" % (self.team.slug, self.user.username, self.get_status_display())
+
 
 # Invites
 class InviteExpiredException(Exception):
@@ -1553,7 +1556,6 @@ class TaskManager(models.Manager):
         """Return a QS of review or approve tasks that are not deleted."""
         return self._type(['Review', 'Approve'])
 
-
 class Task(models.Model):
     TYPE_CHOICES = (
         (10, 'Subtitle'),
@@ -1581,6 +1583,8 @@ class Task(models.Model):
                                 db_index=True)
     assignee = models.ForeignKey(User, blank=True, null=True)
     subtitle_version = models.ForeignKey(SubtitleVersion, blank=True, null=True)
+    new_subtitle_version = models.ForeignKey(NewSubtitleVersion,
+                                             blank=True, null=True)
 
     # The original source version being reviewed or approved.
     #
@@ -1610,6 +1614,8 @@ class Task(models.Model):
     # future as well.
     review_base_version = models.ForeignKey(SubtitleVersion, blank=True,
                                             null=True, related_name='tasks_based_on')
+    new_review_base_version = models.ForeignKey(SubtitleVersion, blank=True,
+                                                null=True, related_name='tasks_based_on_new')
 
     deleted = models.BooleanField(default=False)
 
