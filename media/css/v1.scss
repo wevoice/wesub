@@ -2250,6 +2250,161 @@ a.truncated-expand {
         margin-top: 10px;
     }
 }
+
+.team_dashboard .view {
+
+    h3 {
+        position: relative;
+        clear: both;
+        margin: 0 0 0 -10px;
+        padding: 1.5em 10px;
+        @include linear-gradient( bottom, hsla(0, 0%, 97%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
+        border-bottom: 1px solid #e8ebed;
+        font-size: 13px;
+        text-align: center;
+
+        a {
+            font-weight: normal;
+            color: $lighter;
+            position: absolute;
+            top: 1.6em;
+            right: 10px;
+            font-size: .9em;
+            line-height: 15px;
+            text-decoration: none;
+
+            &.mode {
+                background: transparent url('../images/mode.png') no-repeat center left;
+            }
+        }
+    }
+
+    .listing.yours {
+
+        margin-bottom: 3em;
+
+        > li {
+            margin-left: -10px;
+            padding: 1.5em 10px;
+        }
+
+        .due {
+            margin-left: .5em;
+            color: $normal;
+        }
+
+        .overdue {
+            color: #CA4C43;
+        }
+
+        .perform-task {
+            position: absolute;
+            top:0; right: 1em;
+            padding-right: 2em;
+        }
+    }
+
+    .listing.videos {
+        li {
+            h4 a {
+                display: block;
+                position: absolute;
+                -moz-box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+                top: 20px; left: 10px;
+                padding: 1em;
+                width: 290px;
+                background: rgba(0,0,0,.65);
+                color: #fff;
+            }
+
+            .thumb {
+            }
+
+            .languages {
+                position: relative;
+                clear: both;
+                margin: 0 10px;
+                color: $dark;
+
+
+                > a {
+                    display: block;
+                    margin: 0;
+                    padding: .75em;
+                    border: 1px solid $fainter;
+                    @include border-radius(2px);
+                    font-weight: bold;
+                    color: $dark;
+                    @include vertical-gradient(lighten($faintest, 10%), $faintest);
+
+                    &:hover {
+                        border-color: $faint;
+                        color: $dark;
+                        @include vertical-gradient(lighten($fainter, 10%), $fainter);
+                    }
+                }
+
+                > div {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+
+                    span {
+                        display: block;
+                        padding: .75em;
+                        border-left: 1px solid $fainter;
+                        border-top: 1px solid transparent;
+                        cursor: pointer;
+                        @include multi-border-radius(0, 2px, 0, 0);
+                    }
+
+                    span.expand {
+                        color: $light;
+                        padding-right: 2em;
+                        background: transparent url('../images/arrows.png') no-repeat 85% -61px;
+                    }
+
+                    ul {
+                        display: none;
+                        position: absolute;
+                        width: 290px;
+                        padding: 0;
+                        top: 2.75em;
+                        right: 0;
+                        background: $faintest;
+                        z-index: 50;
+                        @include multi-border-radius(0, 0, 2px, 2px);
+
+                        li {
+                            padding: 0;
+                        }
+
+                        a {
+                            display: block;
+                            padding: 1em .75em;
+                            color: $darkest;
+                        }
+                    }
+
+                    &:hover {
+                        span {
+                        }
+
+                        ul {
+                            display: block;
+                        }
+                    }
+                }
+
+
+            }
+        }
+    }
+}
+
+
 #error {
 
     h1 {
