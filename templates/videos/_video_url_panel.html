@@ -99,7 +99,7 @@ jQuery(function($){
     $('.make-primary-url-link').click(function(){
         if (IS_AUTHENTICATED){
             var $this = $(this);
-            $.get(make_primary_url, {id: $this.attr('video_url_id')},
+            $.post(make_primary_url, {id: $this.attr('video_url_id')},
                 function(response){
                     if (response.error){
                         $.jGrowl.error(response.error);
@@ -128,7 +128,7 @@ jQuery(function($){
         var $url = $(this);
         if (IS_AUTHENTICATED){
             if (confirm('{% trans "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-matching videos or videos where subtitles fail to display correctly."|escapejs %}')){
-                $.get(remove_url, {id: $url.attr('video_url_id')},
+                $.post(remove_url, {id: $url.attr('video_url_id')},
                     function(response){
                         if (response.error){
                             $.jGrowl.error(response.error);

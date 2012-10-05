@@ -817,12 +817,55 @@ class ViewsTest(WebUseTest):
         self._make_objects("iGzkk7nwWX8F")
         cache.clear()
 
-    def _test_video_url_make_primary(self):
-        #TODO: fix this test
+    def test_video_url_make_primary(self):
         self._login()
-        vu = VideoUrl.objects.all()[:1].get()
-        self._simple_test("videos:video_url_make_primary", data={'id': vu.id})
+        v = Video.objects.get(video_id='iGzkk7nwWX8F')
+        self.assertNotEqual(len(VideoUrl.objects.filter(video=v)), 0)
+        # add another url
+        secondary_url = 'http://www.youtube.com/watch?v=po0jY4WvCIc'
+        data = {
+            'url': secondary_url,
+            'video': v.pk
+        }
+        url = reverse('videos:video_url_create')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        vid_url = 'http://www.youtube.com/watch?v=rKnDgT73v8s'
+        # test make primary
+        vu = VideoUrl.objects.filter(video=v)
+        vu[0].make_primary()
+        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, vid_url)
+        # check for activity
+        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 1)
+        vu[1].make_primary()
+        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, secondary_url)
+        # check for activity
+        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 2)
 
+    def test_video_url_make_primary_team_video(self):
+        self._login()
+        v = Video.objects.get(video_id='KKQS8EDG1P4')
+        self.assertNotEqual(len(VideoUrl.objects.filter(video=v)), 0)
+        # add another url
+        secondary_url = 'http://www.youtube.com/watch?v=tKTZoB2Vjuk'
+        data = {
+            'url': secondary_url,
+            'video': v.pk
+        }
+        url = reverse('videos:video_url_create')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        vid_url = 'http://www.youtube.com/watch?v=KKQS8EDG1P4'
+        # test make primary
+        vu = VideoUrl.objects.filter(video=v)
+        vu[0].make_primary()
+        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, vid_url)
+        # check for activity
+        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 1)
+        vu[1].make_primary()
+        self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, secondary_url)
+        # check for activity
+        self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 2)
     def test_index(self):
         self._simple_test('videos.views.index')
 
@@ -891,8 +934,35 @@ class ViewsTest(WebUseTest):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_video_url_remove(self):
-        # TODO: write tests
-        pass
+        self._login()
+        v = Video.objects.get(video_id='iGzkk7nwWX8F')
+        # add another url since original can't be removed
+        data = {
+            'url': 'http://www.youtube.com/watch?v=po0jY4WvCIc',
+            'video': v.pk
+        }
+        url = reverse('videos:video_url_create')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(VideoUrl.objects.filter(video=v)), 2)
+        vurl_id = VideoUrl.objects.filter(video=v)[1].id
+        response = self.client.get(reverse('videos:video_url_remove'), {'id': vurl_id})
+        # make sure get is not allowed
+        self.assertEqual(response.status_code, 405)
+        # check post
+        response = self.client.post(reverse('videos:video_url_remove'), {'id': vurl_id})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(VideoUrl.objects.filter(video=v)), 1)
+        self.assertEqual(len(Action.objects.filter(video=v, \
+            action_type=Action.DELETE_URL)), 1)
+
+    def test_video_url_deny_remove_original(self):
+        self._login()
+        v = Video.objects.get(video_id='iGzkk7nwWX8F')
+        vurl_id = VideoUrl.objects.filter(video=v)[0].id
+        response = self.client.post(reverse('videos:video_url_remove'), {'id': vurl_id})
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(len(VideoUrl.objects.filter(video=v)), 1)
 
     def test_video(self):
         self.video.title = 'title'
