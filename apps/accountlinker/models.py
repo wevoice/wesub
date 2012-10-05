@@ -73,6 +73,43 @@ def youtube_sync(video, language):
             Meter('youtube.push.request').inc()
 
 
+def check_authorization(video):
+    """
+    Make sure that a video can have its subtitles synced to Youtube.  This
+    doesn't take into account any language/version information.
+
+    Return a tuple of (is_authorized, ignore_new_syncing_logic).
+    """
+    team_video = video.get_team_video()
+    ignore_new_syncing_logic = False
+
+    if team_video:
+        team = team_video.team
+        has_linked_youtube_account = team.third_party_accounts.filter(
+                type=VIDEO_TYPE_YOUTUBE).exists()
+        if has_linked_youtube_account:
+            # Ignore the new syncing logic.  Use the linked Youtube account
+            # to publish subtitles to Youtube.
+            ignore_new_syncing_logic = True
+        else:
+            # The assumption is that it's the partner's official Youtube
+            # account and they don't want it messed up with strange subs.
+            return False, None
+    else:
+        # If a video isn't part of a team, and its Youtube username matches
+        # that of any linked Youtube account in Amara---we don't sync to
+        # Youtube.
+        yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
+        if yt_url.exists():
+            usernames = [url.owner_username for url in yt_url]
+            linked_accounts = ThirdPartyAccount.objects.filter(
+                    username__in=usernames).exists()
+            if linked_accounts:
+                return False, None
+
+    return True, ignore_new_syncing_logic
+
+
 class ThirdPartyAccountManager(models.Manager):
 
     def always_push_account(self):
@@ -106,13 +143,26 @@ class ThirdPartyAccountManager(models.Manager):
             raise NotImplementedError(
                 "Mirror to third party does not support the %s action" % action)
 
-        if not version:
-            version = language.get_tip()
+        if not version and action == UPDATE_VERSION_ACTION:
+            raise ValueError("You need to pass a version when updating subs")
 
-        if version and version.is_private():
-            return
+        if version:
+            if not version.is_public or not version.is_synced():
+                # We can't mirror unsynced or non-public versions.
+                return
 
-        if not version.video.get_team_video():
+            if not version.language.is_complete:
+                # Don't sync incomplete languages
+                return
+
+            status = version.moderation_status
+
+            if (status != APPROVED) and (status != UNMODERATED):
+                return
+
+        is_authorized, ignore_new_syncing_logic = check_authorization(video)
+
+        if not is_authorized:
             return
 
         try:
