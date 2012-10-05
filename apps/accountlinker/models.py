@@ -22,11 +22,12 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 
-from videos.models import VIDEO_TYPE
+from videos.models import VIDEO_TYPE, VIDEO_TYPE_YOUTUBE
 from .videos.types import (
     video_type_registrar, UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 )
 from teams.models import Team
+from teams.moderation_const import APPROVED, UNMODERATED
 from auth.models import CustomUser as User
 
 from utils.metrics import Meter
