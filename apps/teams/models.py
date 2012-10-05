@@ -2437,7 +2437,15 @@ class BillingReport(models.Model):
             for language in languages:
                 v = language.latest_version()
 
-                if not v or v.moderation_status != APPROVED:
+                if not v:
+                    continue
+
+                if v.moderation_status not in [APPROVED, UNMODERATED]:
+                    continue
+
+                # 97% is done according to our contracts
+                if (v.moderation_status == UNMODERATED and
+                        language.percent_done < 97):
                     continue
 
                 if (v.datetime_started <= start_date) or (
