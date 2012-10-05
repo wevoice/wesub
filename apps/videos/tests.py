@@ -841,6 +841,8 @@ class ViewsTest(WebUseTest):
         self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, secondary_url)
         # check for activity
         self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 2)
+        # assert correct VideoUrl is retrieved
+        self.assertEqual(VideoUrl.objects.filter(video=v)[0].url, secondary_url)
 
     def test_video_url_make_primary_team_video(self):
         self._login()
@@ -866,6 +868,9 @@ class ViewsTest(WebUseTest):
         self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, secondary_url)
         # check for activity
         self.assertEqual(len(Action.objects.filter(video=v, action_type=Action.EDIT_URL)), 2)
+        # assert correct VideoUrl is retrieved
+        self.assertEqual(VideoUrl.objects.filter(video=v)[0].url, secondary_url)
+
     def test_index(self):
         self._simple_test('videos.views.index')
 

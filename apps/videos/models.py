@@ -2433,6 +2433,11 @@ class VideoUrl(models.Model):
     # this is the owner if the video is from a third party website
     # shuch as Youtube or Vimeo username
     owner_username = models.CharField(max_length=255, blank=True, null=True)
+
+
+    class Meta:
+        ordering = ("video", "-primary",)
+
     def __unicode__(self):
         return self.url
 
@@ -2454,7 +2459,7 @@ class VideoUrl(models.Model):
         #for sorting in js
         return time.mktime(self.created.timetuple())
 
-    def make_primary(self):
+    def make_primary(self, user=None):
         # create activity item
         obj = Action(video=self.video)
         urls = VideoUrl.objects.filter(video=self.video)
@@ -2465,7 +2470,7 @@ class VideoUrl(models.Model):
         }
         obj.new_video_title = json.dumps(data)
         obj.created = datetime.now()
-        obj.user = self.video.user
+        obj.user = user
         obj.save()
         # reset existing urls to non-primary
         VideoUrl.objects.filter(video=self.video).exclude(pk=self.pk).update(

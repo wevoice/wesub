@@ -627,7 +627,7 @@ def video_url_make_primary(request):
                 output['error'] = ugettext('You have not permission change this URL')
                 status = 403
             else:
-                obj.make_primary()
+                obj.make_primary(user=request.user)
         except VideoUrl.DoesNotExist:
             output['error'] = ugettext('Object does not exist')
             status = 404
