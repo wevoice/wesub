@@ -1690,6 +1690,7 @@ class Task(models.Model):
         return base_url + "?t=%s" % self.pk
 
 
+    # Functions related to task completion.
     def _set_version_moderation_status(self):
         """Set this task's subtitle_version's moderation_status to the appropriate value.
 
@@ -1769,7 +1770,6 @@ class Task(models.Model):
         if sends_notification:
             # notify original submiter (assignee of self)
             notifier.reviewed_and_sent_back.delay(self.pk)
-
 
     def _publicize_version(self, author):
         """Create a new SubtitleVersion that's a public copy of the current tip.
@@ -1932,9 +1932,10 @@ class Task(models.Model):
 
         task = None
         if self.workflow.approve_enabled:
-            # Approval is enabled, so if the reviewer thought these subtitles
-            # were good we create the next task.
+            # Approval is enabled, so...
             if approval:
+                # If the reviewer thought these subtitles were good we create
+                # the next task.
                 task = Task(team=self.team, team_video=self.team_video,
                             subtitle_version=self.subtitle_version,
                             review_base_version=self.subtitle_version,
@@ -1942,14 +1943,11 @@ class Task(models.Model):
                             assignee=self._find_previous_assignee('Approve'))
                 task.set_expiration()
                 task.save()
-                # approval review
+
+                # Notify the appropriate users.
                 notifier.reviewed_and_pending_approval.delay(self.pk)
             else:
-                # The reviewer rejected this version, so it should be explicitly
-                # made non-public.
-                self._set_version_moderation_status()
-
-                # Send the subtitles back for improvement.
+                # Otherwise we send the subtitles back for improvement.
                 self._send_back()
         else:
             # Approval isn't enabled, so the ruling of this Review task
@@ -1963,15 +1961,16 @@ class Task(models.Model):
                 if self.workflow.autocreate_translate:
                     _create_translation_tasks(self.team_video, self.subtitle_version)
 
-                # non approval review
+                # Notify the appropriate users and external services.
                 notifier.reviewed_and_published.delay(self.pk)
                 upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
             else:
                 # Send the subtitles back for improvement.
                 self._send_back()
 
+        # Before we go, we need to record who reviewed these subtitles, so if
+        # necessary we can "send back" to them later.
         if self.assignee:
-            # TODO: See if we can eliminate the need for this if check.
             self.subtitle_version.set_reviewed_by(self.assignee)
 
         return task
@@ -1982,9 +1981,8 @@ class Task(models.Model):
 
         self._add_comment()
 
-        # If the subtitles are okay...
         if approval:
-            # Make these subtitles public!
+            # The subtitles are acceptable, so make them public!
             self._publicize_version(self.assignee)
 
             # Create translation tasks if necessary.
@@ -1992,16 +1990,17 @@ class Task(models.Model):
                 _create_translation_tasks(self.team_video, self.subtitle_version)
 
             # And send them back to the original service.
-            # TODO: Pipeline this.
             upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
         else:
             # Send the subtitles back for improvement.
             self._send_back()
 
+        # Before we go, we need to record who approved these subtitles, so if
+        # necessary we can "send back" to them later.
         if self.assignee:
-            # TODO: See if we can eliminate the need for this if check.
             self.subtitle_version.set_approved_by(self.assignee)
 
+        # Notify the appropriate users.
         notifier.approved_notification.delay(self.pk, approval)
 
 
@@ -2025,7 +2024,7 @@ class Task(models.Model):
         return base_url+  "?t=%s" % self.pk
 
     def get_reviewer(self):
-        if self.type == 40:
+        if self.get_type_display() == 'Approve':
             previous = Task.objects.complete().filter(
                 team_video=self.team_video,
                 language=self.language,
