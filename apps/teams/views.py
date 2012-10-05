@@ -398,13 +398,14 @@ def settings_languages(request, slug):
 # Videos
 @timefn
 @render_to('teams/videos-list.html')
-def detail(request, slug, languages=None):
+def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
     filtered = 0
 
-    project_slug = request.GET.get('project')
-
     # :(
+    if project_slug is not None:
+        project_slug = request.GET.get('project')
+
     if project_slug is not None and project_slug != 'any':
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
