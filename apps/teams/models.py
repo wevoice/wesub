@@ -2468,6 +2468,11 @@ class BillingReport(models.Model):
                 if v.moderation_status not in [APPROVED, UNMODERATED]:
                     continue
 
+                # 97% is done according to our contracts
+                if (v.moderation_status == UNMODERATED and
+                        language.percent_done < 97):
+                    continue
+
                 if (v.datetime_started <= start_date) or (
                         v.datetime_started >= end_date):
                     continue
