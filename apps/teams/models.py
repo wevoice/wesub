@@ -2437,7 +2437,10 @@ class BillingReport(models.Model):
             for language in languages:
                 v = language.latest_version()
 
-                if not v or v.moderation_status != APPROVED:
+                if not v:
+                    continue
+
+                if v.moderation_status not in [APPROVED, UNMODERATED]:
                     continue
 
                 if (v.datetime_started <= start_date) or (
