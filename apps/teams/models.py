@@ -2444,9 +2444,9 @@ class BillingReport(models.Model):
                     continue
 
                 # 97% is done according to our contracts
-                if (v.moderation_status == UNMODERATED and
-                        language.percent_done < 97):
-                    continue
+                if v.moderation_status == UNMODERATED:
+                    if language.is_complete or language.percent_done < 97:
+                        continue
 
                 if (v.datetime_started <= start_date) or (
                         v.datetime_started >= end_date):
