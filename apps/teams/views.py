@@ -403,7 +403,7 @@ def detail(request, slug, project_slug=None, languages=None):
     filtered = 0
 
     # :(
-    if project_slug is not None:
+    if project_slug is None:
         project_slug = request.GET.get('project')
 
     if project_slug is not None and project_slug != 'any':
