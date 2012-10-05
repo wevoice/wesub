@@ -1935,6 +1935,10 @@ class ActionRenderer(object):
             info = self.render_DECLINE_VERSION(item)
         elif item.action_type == Action.DELETE_VIDEO:
             info = self.render_DELETE_VIDEO(item)
+        elif item.action_type == Action.EDIT_URL:
+            info = self.render_EDIT_URL(item)
+        elif item.action_type == Action.DELETE_URL:
+            info = self.render_DELETE_URL(item)
         else:
             info = ''
 
@@ -2069,6 +2073,25 @@ class ActionRenderer(object):
             item.team))
         return msg
 
+    def render_EDIT_URL(self, item):
+        kwargs = self._base_kwargs(item)
+        # de-serialize urls from json
+        data = {}
+        try:
+            data = json.loads(item.new_video_title)
+        except Exception, e:
+            logging.error('Unable to parse urls: {0}'.format(e))
+        kwargs['old_url'] = data.get('old_url', 'unknown')
+        kwargs['new_url'] = data.get('new_url', 'unknown')
+        msg = _('  changed primary url from <a href="%(old_url)s">%(old_url)s</a> to <a href="%(new_url)s">%(new_url)s</a>') % kwargs
+        return msg
+
+    def render_DELETE_URL(self, item):
+        kwargs = self._base_kwargs(item)
+        kwargs['title'] = item.new_video_title
+        msg = _('  deleted url <a href="%(title)s">%(title)s</a>') % kwargs
+        return msg
+
 class ActionManager(models.Manager):
     def for_team(self, team, public_only=True, ids=False):
         '''Return the actions for the given team.
@@ -2135,6 +2158,8 @@ class Action(models.Model):
     ACCEPT_VERSION = 13
     DECLINE_VERSION = 14
     DELETE_VIDEO = 15
+    EDIT_URL = 16
+    DELETE_URL = 17
     TYPES = (
         (ADD_VIDEO, _(u'add video')),
         (CHANGE_TITLE, _(u'change title')),
@@ -2151,6 +2176,8 @@ class Action(models.Model):
         (ACCEPT_VERSION, _(u'accept version')),
         (DECLINE_VERSION, _(u'decline version')),
         (DELETE_VIDEO, _(u'delete video')),
+        (EDIT_URL, _(u'edit url')),
+        (DELETE_URL, _(u'delete url')),
     )
 
     renderer = ActionRenderer('videos/_action_tpl.html')
@@ -2408,6 +2435,26 @@ class VideoUrl(models.Model):
     def created_as_time(self):
         #for sorting in js
         return time.mktime(self.created.timetuple())
+
+    def make_primary(self):
+        # create activity item
+        obj = Action(video=self.video)
+        urls = VideoUrl.objects.filter(video=self.video)
+        obj.action_type = Action.EDIT_URL
+        data = {
+            'old_url': urls.filter(primary=True)[0].url,
+            'new_url': self.url,
+        }
+        obj.new_video_title = json.dumps(data)
+        obj.created = datetime.now()
+        obj.user = self.video.user
+        obj.save()
+        # reset existing urls to non-primary
+        VideoUrl.objects.filter(video=self.video).exclude(pk=self.pk).update(
+            primary=False)
+        # set this one to primary
+        self.primary = True
+        self.save(updates_timestamp=False)
 
     @property
     def effective_url(self):

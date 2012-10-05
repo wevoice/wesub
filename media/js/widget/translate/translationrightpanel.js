@@ -64,18 +64,27 @@ unisubs.translate.TranslationRightPanel.prototype.appendExtraHelpInternal =
     el.appendChild(extraDiv);
     this.autoTranslateLink_ = 
         $d('a', {'href':'#'}, 'Auto-translate empty fields');
+    this.changeTimingLink_ =
+        $d('a', {'href':'#'}, 'Convert to Timed Subtitles');
 
     var isBingTranslateable = unisubs.translate.BingTranslator.isTranslateable(
         this.dialog_.getStandardLanguage(),
         this.dialog_.getSubtitleLanguage());
+
+    var ul =  $d('ul', 'unisubs-translationOptions');
     
     if (isBingTranslateable) {
-        var ul =  $d('ul', 'unisubs-translationOptions');
         ul.appendChild($d('li', 'unisubs-autoTranslate', this.autoTranslateLink_, 
             $d('span', null, ' (using bing)')));
-        el.appendChild(ul);
     }
 
+    if (unisubs.timing_mode == 'on') {
+        ul.appendChild(
+            $d('li', 'unisubs-changeTiming',
+               this.changeTimingLink_,
+               $d('span', null, ' (advanced)')));
+    }
+    el.appendChild(ul);
 };
 
 unisubs.translate.TranslationRightPanel.prototype.appendMiddleContentsInternal = function($d, el) {
@@ -86,6 +95,13 @@ unisubs.translate.TranslationRightPanel.prototype.enterDocument = function() {
     unisubs.translate.TranslationRightPanel.superClass_.enterDocument.call(this);
     
     var handler = this.getHandler();
+    if (this.changeTimingLink_){
+        // when reviewing / approving this link will not be present
+        handler.listen(
+        this.changeTimingLink_,
+        'click',
+        this.changeTimingClicked_);
+    }
    
     if (this.autoTranslateLink_){
         // when reviewing / approving this link will not be present
@@ -97,3 +113,10 @@ unisubs.translate.TranslationRightPanel.prototype.autoTranslateClicked_ = functi
     e.preventDefault();
     this.dialog_.translateViaBing();
 }
+
+unisubs.translate.TranslationRightPanel.prototype.changeTimingClicked_ = 
+    function(e) 
+{
+    e.preventDefault();
+    this.dialog_.forkAndClose();
+};

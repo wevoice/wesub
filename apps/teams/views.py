@@ -398,13 +398,14 @@ def settings_languages(request, slug):
 # Videos
 @timefn
 @render_to('teams/videos-list.html')
-def detail(request, slug, languages=None):
+def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
     filtered = 0
 
-    project_slug = request.GET.get('project')
-
     # :(
+    if project_slug is None:
+        project_slug = request.GET.get('project')
+
     if project_slug is not None and project_slug != 'any':
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
@@ -1213,7 +1214,7 @@ def team_tasks(request, slug):
     if project_slug is not None and project_slug != 'any':
         project = get_object_or_404(Project, team=team, slug=project_slug)
     else:
-        if team.slug == 'ted' and project_slug != 'any' and filters.get('team_video') is None:
+        if team.slug == 'ted' and project_slug != 'any' and request.GET.get('team_video') is None:
             project = Project.objects.get(team=team, slug='tedtalks')
         else:
             project = None

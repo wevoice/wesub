@@ -34,6 +34,7 @@ from teams.permissions import (
         can_create_and_edit_subtitles, can_assign_task,
         can_create_and_edit_translations, can_publish_edits_immediately
 )
+from videos.permissions import can_user_edit_video_urls
 
 from utils.subtitles import ParserList, SubtitleParserError
 
@@ -137,7 +138,7 @@ href="mailto:%s">contact us</a>!""") % settings.FEEDBACK_EMAIL))
     def clean(self):
         data = super(CreateVideoUrlForm, self).clean()
         video = data.get('video')
-        if video and not video.allow_video_urls_edit and not self.user.has_perm('videos.add_videourl'):
+        if video and not can_user_edit_video_urls(video, self.user):
             raise forms.ValidationError(_('You have not permission add video URL for this video'))
 
         return self.cleaned_data

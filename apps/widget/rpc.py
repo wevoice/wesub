@@ -283,6 +283,15 @@ class Rpc(BaseRpc):
         else:
             return 'normal'
 
+    # Ugly hack to disable timing changes for T translations :(
+    def get_timing_mode(self, language):
+        team_video = language.video.get_team_video()
+        _TED_TEAMS = ['ted', 'ted-transcribe']
+        if team_video and team_video.team.slug.lower() in _TED_TEAMS:
+            return 'off'
+        else:
+            return 'on'
+
 
     # Start Editing
     def _check_team_video_locking(self, user, video_id, language_code, is_translation=None, mode=None, is_edit=None):
@@ -405,6 +414,7 @@ class Rpc(BaseRpc):
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
                         "caption_display_mode": self.get_caption_display_mode(language),
+                        "timing_mode": self.get_timing_mode(language),
                         "subtitles": subtitles }
 
         # If this is a translation, include the subtitles it's based on in the response.
@@ -453,6 +463,7 @@ class Rpc(BaseRpc):
                             "can_edit" : True,
                             "session_pk" : session.pk,
                             "caption_display_mode": self.get_caption_display_mode(session.language),
+                            "timing_mode": self.get_timing_mode(session.language),
                             "subtitles" : subtitles }
             if session.base_language:
                 return_dict['original_subtitles'] = \
