@@ -2475,7 +2475,8 @@ class BillingReport(models.Model):
                     round((end - start) / 60, 2)
                 ])
 
-        fn = '/tmp/bill-%s.csv' % self.pk
+        fn = '/tmp/bill-%s-%s-%s.csv' % (self.team.slug, self.start_str,
+                self.end_str)
 
         with open(fn, 'w') as f:
             writer = csv.writer(f)
@@ -2484,6 +2485,14 @@ class BillingReport(models.Model):
         self.csv_file = File(open(fn, 'r'))
         self.processed = datetime.datetime.utcnow()
         self.save()
+
+    @property
+    def start_str(self):
+        return self.start_date.strftime("%Y%m%d")
+
+    @property
+    def end_str(self):
+        return self.end_date.strftime("%Y%m%d")
 
 
 class Partner(models.Model):
