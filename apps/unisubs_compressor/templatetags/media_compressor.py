@@ -67,8 +67,6 @@ def _urls_for(bundle_name, should_compress):
 @register.simple_tag
 def include_bundle(bundle_name, should_compress=None):
     urls, media_url, bundle_type = _urls_for(bundle_name, should_compress)
-
-    print urls
     return template.loader.render_to_string("uni_compressor/%s_links.html" % bundle_type,{
         "urls": urls,
         "adapted_media_url": media_url,
