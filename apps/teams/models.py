@@ -2423,7 +2423,7 @@ class BillingReport(models.Model):
         end_date = datetime.datetime.combine(self.end_date, almost_midnight)
 
         rows = [['Video title', 'Video URL', 'Video language',
-                    'Billable minutes']]
+                    'Billable minutes', 'Version created']]
 
         tvs = TeamVideo.objects.filter(team=self.team).order_by('video__title')
 
@@ -2445,7 +2445,7 @@ class BillingReport(models.Model):
 
                 # 97% is done according to our contracts
                 if v.moderation_status == UNMODERATED:
-                    if language.is_complete or language.percent_done < 97:
+                    if not language.is_complete or language.percent_done < 97:
                         continue
 
                 if (v.datetime_started <= start_date) or (
@@ -2472,7 +2472,8 @@ class BillingReport(models.Model):
                     tv.video.title.encode('utf-8'),
                     host + tv.video.get_absolute_url(),
                     language.language,
-                    round((end - start) / 60, 2)
+                    round((end - start) / 60, 2),
+                    v.datetime_started.strftime("%Y-%m-%d %H:%M:%S")
                 ])
 
         fn = '/tmp/bill-%s-%s-%s.csv' % (self.team.slug, self.start_str,
