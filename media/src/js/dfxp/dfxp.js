@@ -17,7 +17,9 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 var DFXP = function(DFXP) {
-    // A utility for working with DFXP subs.
+    /*
+     * A utility for working with DFXP subs.
+     */
 
     var that = this;
 
@@ -31,11 +33,16 @@ var DFXP = function(DFXP) {
 
     };
 
+    // Helper methods.
     this.utils = {
-        // Helper methods.
 
-        // Convert an XML document to a string.
         xmlToString: function(xml) {
+            /*
+             * Convert an XML document to a string.
+             * Accepts: document object (XML tree)
+             * Returns: string
+             */
+
             var xmlString;
 
             // For Internet Explorer.
@@ -53,7 +60,10 @@ var DFXP = function(DFXP) {
     };
 
     this.changesMade = function() {
-        // Check to see if any changes have been made to the working XML.
+        /*
+         * Check to see if any changes have been made to the working XML.
+         * Returns: true || false
+         */
 
         var oString = that.utils.xmlToString(that.$o.get(0));
         var wString = that.utils.xmlToString(that.$w.get(0));
