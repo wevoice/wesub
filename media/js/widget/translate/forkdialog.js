@@ -36,25 +36,14 @@ unisubs.translate.ForkDialog.prototype.createDom = function() {
     this.getElement().appendChild(
         $d('div', null,
            $d('h3', null, 'Convert to Timed Subtitles'),
-           $d('p', null, 
-              'You are about to convert this translation to ' +
-              ' Timed Subtitles.'),
-           $d('p', null,
-              $d('strong', null, 'Are you ABSOLUTELY CERTAIN that you want to proceed?')
-            ),
+           $d('p', null, 'You are about to convert this translation to Timed Subtitles. Please note:'),
            $d('ul', null, 
-              $d('li', null, 'You will no longer be able to see the language you were translating from. '),
+              $d('li', null, 'You will no longer be able to see the language you were translating from.'),
               $d('li', null, 'Any untranslated lines will be blank.'),
-              $d('li', null,
-                'If this language is the source for other translations (English often is) ' +
-                'all dependent translations will be irreversibly converted ' +
-                'to Timed Subtitles.')
+              $d('li', null, 'You will not be able to undo this action.')
             ),
            $d('p', null,
-              'Consider converting ONLY when there are no dependent translations ' +
-                'AND every line is fully translated.'),
-           $d('p', null,
-              $d('strong', null, 'You CANNOT UNDO this action.')
+              $d('strong', null, 'ARE YOU SURE you want to continue?')
             )
            ));
     this.cancelButton_ =

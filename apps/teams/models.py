@@ -2423,7 +2423,7 @@ class BillingReport(models.Model):
         end_date = datetime.datetime.combine(self.end_date, almost_midnight)
 
         rows = [['Video title', 'Video URL', 'Video language',
-                    'Billable minutes']]
+                    'Billable minutes', 'Version created']]
 
         tvs = TeamVideo.objects.filter(team=self.team).order_by('video__title')
 
@@ -2437,8 +2437,16 @@ class BillingReport(models.Model):
             for language in languages:
                 v = language.latest_version()
 
-                if not v or v.moderation_status != APPROVED:
+                if not v:
                     continue
+
+                if v.moderation_status not in [APPROVED, UNMODERATED]:
+                    continue
+
+                # 97% is done according to our contracts
+                if v.moderation_status == UNMODERATED:
+                    if not language.is_complete or language.percent_done < 97:
+                        continue
 
                 if (v.datetime_started <= start_date) or (
                         v.datetime_started >= end_date):
@@ -2465,9 +2473,11 @@ class BillingReport(models.Model):
                     host + tv.video.get_absolute_url(),
                     language.language,
                     round((end - start) / (60 * 1000), 2)
+                    v.datetime_started.strftime("%Y-%m-%d %H:%M:%S")
                 ])
 
-        fn = '/tmp/bill-%s.csv' % self.pk
+        fn = '/tmp/bill-%s-%s-%s.csv' % (self.team.slug, self.start_str,
+                self.end_str)
 
         with open(fn, 'w') as f:
             writer = csv.writer(f)
@@ -2476,6 +2486,14 @@ class BillingReport(models.Model):
         self.csv_file = File(open(fn, 'r'))
         self.processed = datetime.datetime.utcnow()
         self.save()
+
+    @property
+    def start_str(self):
+        return self.start_date.strftime("%Y%m%d")
+
+    @property
+    def end_str(self):
+        return self.end_date.strftime("%Y%m%d")
 
 
 class Partner(models.Model):
