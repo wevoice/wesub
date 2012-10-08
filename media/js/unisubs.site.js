@@ -670,6 +670,7 @@ var Site = function(Site) {
 
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             that.Utils.resetLangFilter($('select#id_task_language'));
+            that.Utils.resetProjFilter();
             that.Utils.chosenify();
         },
         team_video_edit: function() {
