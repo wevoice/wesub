@@ -55,3 +55,4 @@ bernhard==0.0.2
 markdown2==2.0.0
 -e git+https://github.com/pculture/babelsubs.git#egg=babelsubs
 -e git+https://github.com/pculture/unilangs.git#egg=unilangs
+pytz==2012f
