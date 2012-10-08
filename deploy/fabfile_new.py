@@ -599,6 +599,44 @@ def update_integration(run_as_sudo=True, branch=None):
     '''
     _update_integration(run_as_sudo, branch)
 
+def _update_solr_schema():
+    python_exe = '{0}/bin/python'.format(env.ve_dir)
+    with cd(env.app_dir):
+        _git_pull()
+        sudo('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
+                python_exe,
+                env.environment))
+        run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
+        sudo('service tomcat6 restart')
+
+    # Fly, you fools!
+
+    managepy_file = os.path.join(env.app_dir, 'manage.py')
+
+    # The -u here is for "unbuffered" so the lines get outputted immediately.
+    manage_cmd = '%s -u %s rebuild_index_ordered --noinput --settings=unisubs_settings 2>&1' % (python_exe, managepy_file)
+    mail_cmd = ' | mail -s Solr_index_rebuilt_on_%s %s' % (env.host_string, env.notification_email)
+    log_cmd = WRITE_LOG % 'solr_reindexing'
+
+    # The single quotes in the ack command needs to be escaped, because
+    # we're in a single quoted ANSI C-style string from the sh -c in the
+    # screen command.
+    #
+    # We can't use a double quoted string for the sh -c call because of the
+    # $0 in the ack script.
+    timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
+
+    cmd = (
+        "screen -d -m sh -c $'" +
+            manage_cmd +
+            timestamp_cmd +
+            log_cmd +
+            mail_cmd +
+        "'"
+    )
+
+    run(cmd, pty=False)
+
 @task
 @lock_required
 @runs_once
@@ -611,42 +649,7 @@ def update_solr_schema():
 
     '''
     with Output("Updating Solr schema (and rebuilding the index)"):
-        python_exe = '{0}/bin/python'.format(env.ve_dir)
-        with cd(env.app_dir):
-            _git_pull()
-            sudo('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
-                    python_exe,
-                    env.environment))
-            run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
-            sudo('service tomcat6 restart')
-
-        # Fly, you fools!
-
-        managepy_file = os.path.join(env.app_dir, 'manage.py')
-
-        # The -u here is for "unbuffered" so the lines get outputted immediately.
-        manage_cmd = '%s -u %s rebuild_index_ordered --noinput --settings=unisubs_settings 2>&1' % (python_exe, managepy_file)
-        mail_cmd = ' | mail -s Solr_index_rebuilt_on_%s %s' % (env.host_string, env.notification_email)
-        log_cmd = WRITE_LOG % 'solr_reindexing'
-
-        # The single quotes in the ack command needs to be escaped, because
-        # we're in a single quoted ANSI C-style string from the sh -c in the
-        # screen command.
-        #
-        # We can't use a double quoted string for the sh -c call because of the
-        # $0 in the ack script.
-        timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
-
-        cmd = (
-            "screen -d -m sh -c $'" +
-                manage_cmd +
-                timestamp_cmd +
-                log_cmd +
-                mail_cmd +
-            "'"
-        )
-
-        run(cmd, pty=False)
+        execute(_update_solr_schema)
 
 def _bounce_memcached():
     with Output("Bouncing memcached"):
@@ -795,23 +798,49 @@ def switch_branch(branch):
     with Output('Switching to {0}'.format(branch)):
         _switch_branch(branch)
 
+@parallel
+def _clone_repo_demo(revision='dev', integration_revision='dev'):
+    run('git clone https://github.com/pculture/unisubs.git /var/tmp/{0}/unisubs'.format(\
+        revision))
+    with cd('/var/tmp/{0}/unisubs'.format(revision)):
+        run('git checkout --force {0}'.format(revision))
+    sudo('git clone git@github.com:pculture/unisubs-integration.git /var/tmp/{0}/unisubs/unisubs-integration'.format(revision))
+    with cd('/var/tmp/{0}/unisubs/unisubs-integration'.format(revision)):
+        sudo('git checkout --force {0}'.format(integration_revision))
+    # build virtualenv
+    run('virtualenv /var/tmp/{0}/ve'.format(revision))
+    # install requirements
+    with cd('/var/tmp/{0}/unisubs/deploy'.format(revision)):
+        run('/var/tmp/{0}/ve/bin/pip install -r requirements.txt'.format(revision))
+    # copy private config
+    private_conf = '/var/tmp/{0}/unisubs/server_local_settings.py'.format(revision)
+    run('cp /opt/apps/dev/unisubs/server_local_settings.py {0}'.format(private_conf))
+    run("sed -i 's/MEDIA_URL.*/MEDIA_URL = \"http:\/\/{0}.demo.amara.org\/user-data\/\"/g' {1}".format(
+        revision, private_conf))
+    run("sed -i 's/STATIC_URL.*/STATIC_URL = \"http:\/\/{0}.demo.amara.org\/site_media\/\"/g' {1}".format(
+    revision, private_conf))
+
 @task
-def demo(revision='dev', host='app-00-dev.amara.org', \
-    repo='https://github.com/pculture/unisubs.git', integration_revision='dev'):
+@parallel
+def demo(revision='dev', integration_revision='dev'):
     """
     Deploys the specified revision for live testing
 
     :param revision: Revision to test
-    :param host: Test host (default: app-00-dev.amara.org)
+    :param integration_revision: Integrations revision to test
 
     """
-    env.host_string = host
-    with Output("Deploying demo version {0} to {1}".format(revision, host)) as out:
-        # remove existing deployment if present
-        with settings(warn_only=True):
-            execute(remove_demo, revision=revision, host=host)
-        run('mkdir -p /var/tmp/{0}'.format(revision))
-        out.fastprintln('Creating Nginx config')
+    hosts = {
+        'app': 'app-00-dev.amara.org',
+        'data': 'data-00-dev.amara.org',
+    }
+    env.hosts = hosts.values()
+    with Output("Creating app directories"):
+        for k,v in hosts.iteritems():
+            env.host_string = v
+            run('mkdir -p /var/tmp/{0}'.format(revision))
+    with Output("Configuring Nginx"):
+        env.host_string = hosts['app']
         # nginx config
         run('cp /etc/nginx/conf.d/amara_dev.conf /tmp/{0}.conf'.format(revision))
         run("sed -i 's/server_name.*;/server_name {0}.demo.amara.org;/g' /tmp/{0}.conf".format(\
@@ -821,7 +850,7 @@ def demo(revision='dev', host='app-00-dev.amara.org', \
         run("sed -i 's/uwsgi_pass.*;/uwsgi_pass unix:\/\/\/tmp\/uwsgi_{0}.sock;/g' /tmp/{0}.conf".format(\
             revision))
         sudo("mv /tmp/{0}.conf /etc/nginx/conf.d/{0}.conf".format(revision))
-        out.fastprintln('Configuring uWSGI')
+    with Output("Configuring uWSGI"):
         # uwsgi ini
         run('cp /etc/uwsgi.unisubs.dev.ini /tmp/uwsgi.unisubs.{0}.ini'.format(revision))
         run("sed -i 's/socket.*/socket = \/tmp\/uwsgi_{0}.sock/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
@@ -837,61 +866,53 @@ def demo(revision='dev', host='app-00-dev.amara.org', \
         run("sed -i 's/pythonpath.*/pythonpath = \/var\/tmp\/{0}/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
             revision))
         # uwsgi upstart
+    with Output("Configuring upstart"):
         run('cp /etc/init/uwsgi.unisubs.dev.conf /tmp/uwsgi.unisubs.{0}.conf'.format(revision))
         run("sed -i 's/exec.*/exec uwsgi --ini \/var\/tmp\/{0}\/uwsgi.unisubs.{0}.ini/g' /tmp/uwsgi.unisubs.{0}.conf".format(revision))
         sudo("mv /tmp/uwsgi.unisubs.{0}.conf /etc/init/uwsgi.unisubs.demo.{0}.conf".format(revision))
         run('mv /tmp/uwsgi.unisubs.{0}.ini /var/tmp/{0}/uwsgi.unisubs.{0}.ini'.format(revision))
-        out.fastprintln('Cloning repositories (unisubs & integration)')
-        # clone
-        run('git clone {1} /var/tmp/{0}/unisubs'.format(\
-            revision, repo))
-        with cd('/var/tmp/{0}/unisubs'.format(revision)):
-            run('git checkout --force {0}'.format(revision))
-        sudo('git clone git@github.com:pculture/unisubs-integration.git /var/tmp/{0}/unisubs/unisubs-integration'.format(revision))
-        with cd('/var/tmp/{0}/unisubs/unisubs-integration'.format(revision)):
-            sudo('git checkout --force {0}'.format(integration_revision))
-        out.fastprintln('Building virtualenv')
-        # build virtualenv
-        run('virtualenv /var/tmp/{0}/ve'.format(revision))
-        # install requirements
-        with cd('/var/tmp/{0}/unisubs/deploy'.format(revision)):
-            run('/var/tmp/{0}/ve/bin/pip install -r requirements.txt'.format(revision))
-        # copy private config
-        private_conf = '/var/tmp/{0}/unisubs/server_local_settings.py'.format(revision)
-        run('cp /opt/apps/dev/unisubs/server_local_settings.py {0}'.format(private_conf))
-        run("sed -i 's/MEDIA_URL.*/MEDIA_URL = \"http:\/\/{0}.demo.amara.org\/user-data\/\"/g' {1}".format(\
-            revision, private_conf))
-        run("sed -i 's/STATIC_URL.*/STATIC_URL = \"http:\/\/{0}.demo.amara.org\/site_media\/\"/g' {1}".format(\
-            revision, private_conf))
-        out.fastprintln('Compiling static media.  This may take a while.')
-        # compile media
+        
+    with Output("Cloning and building environments"):
+        execute(_clone_repo_demo, revision=revision, 
+            integration_revision=integration_revision)
+    env.host_string = hosts['app']
+    # compile media
+    with Output("Compiling static media.  This may take a moment"):
         # create a symlink to google closure library for compilation
         sudo('ln -sf /opt/google-closure /var/tmp/{0}/unisubs/media/js/closure-library'.format(revision))
         with cd('/var/tmp/{0}/unisubs'.format(revision)), settings(warn_only=True):
             python_exe = '/var/tmp/{0}/ve/bin/python'.format(revision)
             run('{0} deploy/create_commit_file.py'.format(python_exe))
             run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, 'ADVANCED_OPTIMIZATIONS'))
-        out.fastprintln('Starting demo')
+    with Output("Starting {0} demo".format(revision)):
         sudo('service nginx reload')
         sudo('service uwsgi.unisubs.demo.{0} start'.format(revision))
-        out.fastprintln('Done. Demo should be available at http://{0}.demo.amara.org'.format(revision))
+    print('\nDone. Demo should be available at http://{0}.demo.amara.org'.format(revision))
 
 @task
-def remove_demo(revision='dev', host='app-00-dev.amara.org'):
+def remove_demo(revision='dev'):
     """
     Removes live testing demo
 
     :param revision: Revision that was used in launching the demo
-    :param host: Test host (default: app-00-dev.amara.org)
 
     """
-    env.host_string = host
-    with Output("Removing {0} demo from {1}".format(revision, host)):
-        # remove demo
+    hosts = {
+        'app': 'app-00-dev.amara.org',
+        'data': 'data-00-dev.amara.org',
+    }
+    env.host_string = hosts['app']
+    # remove demo
+    with Output("Stopping uWSGI"):
         with settings(warn_only=True):
             sudo('service uwsgi.unisubs.demo.{0} stop'.format(revision))
-        sudo('rm -rf /var/tmp/{0}'.format(revision))
+    with Output("Removing nginx config"):
         sudo('rm -f /etc/nginx/conf.d/{0}.conf'.format(revision))
         sudo('rm -f /etc/init/uwsgi.unisubs.demo.{0}.conf'.format(revision))
+    with Output("Restarting nginx"):
         sudo('service nginx reload')
+    with Output("Removing {0}".format(revision)):
+        for k,v in hosts.iteritems():
+            env.host_string = v
+            sudo('rm -rf /var/tmp/{0}'.format(revision))
 
