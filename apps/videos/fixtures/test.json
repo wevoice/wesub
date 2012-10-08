@@ -104,6 +104,28 @@
             "was_subtitled": false,
             "widget_views_count": 0,
             "subtitles_fetched_count": 0,
+            "languages_count": 1,
+            "created": "2011-01-30 08:54:43"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "videos.video",
+        "fields": {
+            "view_count": 1,
+            "writelock_owner": null,
+            "title": "Python",
+            "writelock_session_key": "",
+            "video_id": "KKQS8EDG1P4",
+            "is_subtitled": false,
+            "writelock_time": null,
+            "thumbnail": "",
+            "duration": null,
+            "allow_community_edits": true,
+            "was_subtitled": false,
+            "widget_views_count": 0,
+            "subtitles_fetched_count": 0,
+            "languages_count": 1,
             "created": "2011-01-30 08:54:43"
         }
     },
