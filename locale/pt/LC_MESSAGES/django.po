@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-07 01:44-0500\n"
+"POT-Creation-Date: 2012-10-08 01:44-0500\n"
 "PO-Revision-Date: 2012-10-05 06:58+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/"
@@ -642,11 +642,11 @@ msgstr "Gestores e administradores"
 msgid "Admins only"
 msgstr "Apenas administradores"
 
-#: apps/teams/models.py:118 apps/teams/models.py:2515
+#: apps/teams/models.py:118 apps/teams/models.py:2525
 msgid "name"
 msgstr "nome"
 
-#: apps/teams/models.py:119 apps/teams/models.py:2516
+#: apps/teams/models.py:119 apps/teams/models.py:2526
 msgid "slug"
 msgstr ""
 
