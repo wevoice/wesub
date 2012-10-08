@@ -20,8 +20,11 @@ from django.test import TestCase
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from accountlinker.models import ThirdPartyAccount, YoutubeSyncRule
-from videos.models import Video
+from accountlinker.models import (
+    ThirdPartyAccount, YoutubeSyncRule, check_authorization
+)
+from videos.models import Video, VideoUrl
+from teams.models import Team, TeamVideo
 from auth.models import CustomUser as User
 
 
@@ -64,3 +67,57 @@ class AccountTest(TestCase):
         YoutubeSyncRule.objects.all().delete()
         r = YoutubeSyncRule.objects.create(team='*')
         self.assertTrue(r.should_sync(video))
+
+    def test_not_part_of_team(self):
+        vurl = VideoUrl.objects.filter(type='Y',
+                video__teamvideo__isnull=True)[0]
+        vurl.owner_username = 'test'
+        vurl.save()
+        video = vurl.video
+        third = ThirdPartyAccount.objects.all().exists()
+        self.assertFalse(third)
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertTrue(is_authorized)
+        self.assertFalse(ignore)
+
+        ThirdPartyAccount.objects.create(type='Y',
+                username=vurl.owner_username)
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertFalse(is_authorized)
+        self.assertEquals(None, ignore)
+
+    def test_part_of_team(self):
+        # Prep stuff
+        vurl = VideoUrl.objects.filter(type='Y')[0]
+        vurl.owner_username = 'test'
+        vurl.save()
+
+        video = vurl.video
+        user = User.objects.get(username='admin')
+
+        team = Team.objects.all()[0]
+        TeamVideo.objects.create(video=video, team=team, added_by=user)
+
+        third = ThirdPartyAccount.objects.all().exists()
+        self.assertFalse(third)
+
+        # Start testing
+        is_authorized, ignore = check_authorization(video)
+        self.assertFalse(is_authorized)
+        self.assertEquals(None, ignore)
+
+        account = ThirdPartyAccount.objects.create(type='Y',
+                username=vurl.owner_username)
+        team.third_party_accounts.add(account)
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertTrue(is_authorized)
+        self.assertTrue(ignore)
+
+    def test_not_complete(self):
+        pass
+
+    def test_not_approved(self):
+        pass

@@ -1768,7 +1768,7 @@ def billing(request):
     else:
         form = ChooseTeamForm()
 
-    reports = BillingReport.objects.all()
+    reports = BillingReport.objects.all().order_by('-pk')
 
     return render_to_response('teams/billing/choose.html', {
         'form': form,

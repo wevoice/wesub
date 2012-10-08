@@ -194,6 +194,7 @@ def import_videos_from_feeds(urls, user_id=None, team_id=None):
     from teams.models import Team, TeamVideo
     from messages import tasks as notifier
     from teams.signals import api_teamvideo_new
+    from teams.permissions import can_add_video
 
     try:
         user = User.objects.get(id=user_id)
@@ -218,6 +219,9 @@ def import_videos_from_feeds(urls, user_id=None, team_id=None):
     try:
         team = Team.objects.get(id=team_id)
         project = team.default_project
+
+        if not can_add_video(team, user):
+            team = None
     except Team.DoesNotExist:
         team = None
 

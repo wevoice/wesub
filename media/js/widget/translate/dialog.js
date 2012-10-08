@@ -364,9 +364,10 @@ unisubs.translate.Dialog.prototype.forkImpl_ = function() {
     this.subtitleState_.fork();
     this.serverModel_.fork(this.standardSubState_);
     this.hideToFork();
-    this.opener_.openSubtitlingDialog(
+    var dialog = this.opener_.openSubtitlingDialog(
         this.serverModel_,
         this.subtitleState_);
+    this.opener_.onDialogOpened_(dialog);
 };
 unisubs.translate.Dialog.prototype.disposeCurrentPanels_ = function() {
     if (this.currentSubtitlePanel_) {
