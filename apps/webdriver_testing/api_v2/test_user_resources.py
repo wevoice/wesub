@@ -17,7 +17,7 @@ class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
            POST /api2/partners/users/
         """
 
-        create_url = 'users'
+        create_url = 'users/'
         create_data = {'username': None,
                        'email': None, 
                        'password': 'password',
@@ -42,10 +42,4 @@ class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
                     'last_name': 'User_1',
                     }
         user_data = self.api_create_user(**new_user)
-        users = user_data['objects']
-        print '#######'
-        for x in users:
-            print x['username']
- 
-
-
+        print user_data['username']
