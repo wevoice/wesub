@@ -763,7 +763,7 @@ def deploy(branch=None, integration_branch=None, skip_celery=False):
 @lock_required
 @runs_once
 @roles('app')
-def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile=False, skip_s3=False):
+def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile=False, skip_s3=False, integration_branch=None):
     """
     Compiles and uploads static media to S3
 
@@ -775,7 +775,7 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
         media_dir = '{0}/media/'.format(env.app_dir)
         python_exe = '{0}/bin/python'.format(env.ve_dir)
         _git_pull()
-        execute(update_integration)
+        execute(update_integration, integration_branch)
         run('{0} deploy/create_commit_file.py'.format(python_exe))
         if skip_compile == False:
             out.fastprintln('Compiling...')
