@@ -25,7 +25,8 @@ class VideoLanguagePage(VideoPage):
 
     def displayed_lines(self):
         displayed_subtitles = []
-        line_elements = self.browser.find_elements_by_css_selector(self._SUB_LINES)
+        line_elements = self.browser.find_elements_by_css_selector(
+            self._SUB_LINES)
         for el in line_elements:
             html_text = el.text
             sublist = html_text.split('\n')
@@ -41,5 +42,5 @@ class VideoLanguagePage(VideoPage):
         or just make sure the link is created correct and doesn't return a 404
         """
         self.click_by_css(self._DOWNLOAD_SUBS)
-        self.click_by_link_text(output_format)
+        self.click_link_text(output_format)
 

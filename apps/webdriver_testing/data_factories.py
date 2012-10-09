@@ -4,6 +4,7 @@ from apps.videos.models import Video
 from apps.videos.models import SubtitleLanguage
 from apps.teams.models import Team
 from apps.teams.models import TeamMember
+from apps.teams.models import Task
 from apps.teams.models import TeamVideo
 from apps.teams.models import Invite
 from apps.teams.models import Application
@@ -50,6 +51,7 @@ class TeamVideoFactory(factory.Factory):
     team = factory.SubFactory(TeamFactory)
     video = factory.SubFactory(VideoFactory)
     added_by = factory.SubFactory(UserFactory)
+    created = datetime.datetime.now()
 
 class TeamProjectFactory(factory.Factory):
     FACTORY_FOR = Project
@@ -74,6 +76,7 @@ class TeamLangPrefFactory(factory.Factory):
 class WorkflowFactory(factory.Factory):
     FACTORY_FOR = Workflow
     
-class SubtitleLanguageFactory(factory.Factory):
-    FACTORY_FOR = SubtitleLanguage
+class TaskFactory(factory.Factory):
+    FACTORY_FOR = Task 
+    team_video = factory.SubFactory(TeamVideoFactory)
 
