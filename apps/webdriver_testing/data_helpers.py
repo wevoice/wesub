@@ -3,10 +3,11 @@ from django.core.urlresolvers import reverse
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.teams.models import TeamMember
-import json
+import simplejson
+import requests
 from apps.testhelpers.views import _create_videos
 from tastypie.models import ApiKey
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.test.client import RequestFactory
 
 def create_user_api_key(self, user_obj):
@@ -17,10 +18,27 @@ def create_user_api_key(self, user_obj):
     if not created:
         key.key = key.generate_key()
         key.save()
-    response =  HttpResponse(json.dumps({"key":key.key}))
-    print response
+    response =  HttpResponse(simplejson.dumps({"key":key.key}))
     return response
 
+def post_api_request(self, url_part, data):
+    url = self.base_url + 'api2/partners/' + url_part
+    headers = { 'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-apikey': self.user.api_key.key,
+                'X-api-username': self.user.username,
+              } 
+    print simplejson.dumps(data)
+    r = requests.post(url, data=simplejson.dumps(data), headers=headers)
+    return r.status_code, r.json
+
+
+def api_get_request(self, url_part):
+    url = self.base_url + 'api2/partners/' + url_part
+    r = requests.get( url )
+    return r.status_code, r.json
+
+    
 
 def create_video(self, video_url=None):
     if not video_url:
@@ -58,9 +76,9 @@ def create_several_team_videos_with_subs(self, team, teamowner, data=None):
 
     """
     if not data:
-        testdata = json.load(open('apps/videos/fixtures/teams-list.json'))
+        testdata = simplejson.load(open('apps/videos/fixtures/teams-list.json'))
     else:
-        testdata = json.load(open(data))
+        testdata = simplejson.load(open(data))
     videos = _create_videos(testdata, [])
     for video in videos:
         TeamVideoFactory.create(
@@ -71,7 +89,7 @@ def create_several_team_videos_with_subs(self, team, teamowner, data=None):
 
 
 def create_videos_with_fake_subs(self):
-    testdata = json.load(open('apps/videos/fixtures/teams-list.json'))
+    testdata = simplejson.load(open('apps/videos/fixtures/teams-list.json'))
     videos = _create_videos(testdata, [])
     return videos
 
