@@ -142,6 +142,12 @@ class MGSubtitles(BaseSubtitles):
 
 GenerateSubtitlesHandler.register(MGSubtitles)
 
+def milliseconds_to_time_components(milliseconds):
+    seconds, fraction = divmod(int(milliseconds), 1000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return hours, minutes, seconds, fraction
+
 class SRTSubtitles(BaseSubtitles):
     file_type = 'srt'
 
@@ -165,15 +171,12 @@ class SRTSubtitles(BaseSubtitles):
 
         return self.line_delimiter.join(output)
 
-    def format_time(self, time):
-        hours = int(floor(time / 3600))
-        if hours < 0:
-            hours = 99
-        minutes = int(floor(time % 3600 / 60))
-        seconds = int(time % 60)
-        fr_seconds = int(time % 1 * 100)
-        return u'%02i:%02i:%02i,%03i' % (hours, minutes, seconds, fr_seconds)
+    def format_time(self, milliseconds):
+        hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
+        return "%02i:%02i:%02i,%03i" % (hours, minutes, seconds, milliseconds)
 
+
+       
 GenerateSubtitlesHandler.register(SRTSubtitles)
 
 class SBVSubtitles(BaseSubtitles):
@@ -195,14 +198,9 @@ class SBVSubtitles(BaseSubtitles):
 
         return self.line_delimiter.join(output)
 
-    def format_time(self, time):
-        hours = int(floor(time / 3600))
-        if hours < 0:
-            hours = 9
-        minutes = int(floor(time % 3600 / 60))
-        seconds = int(time % 60)
-        fr_seconds = int(time % 1 * 1000)
-        return u'%01i:%02i:%02i.%03i' % (hours, minutes, seconds, fr_seconds)
+    def format_time(self, milliseconds):
+        hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
+        return u'%01i:%02i:%02i.%03i' % (hours, minutes, seconds, milliseconds)
 
 GenerateSubtitlesHandler.register(SBVSubtitles)
 
@@ -235,14 +233,11 @@ class SSASubtitles(BaseSubtitles):
     def _end(self):
         return u''
 
-    def format_time(self, time):
-        hours = int(floor(time / 3600))
+    def format_time(self, milliseconds):
+        hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
         if hours < 0:
             hours = 9
-        minutes = int(floor(time % 3600 / 60))
-        seconds = int(time % 60)
-        fr_seconds = int(time % 1 * 100)
-        return u'%i:%02i:%02i.%02i' % (hours, minutes, seconds, fr_seconds)
+        return u'%i:%02i:%02i.%02i' % (hours, minutes, seconds, milliseconds)
 
     def _clean_text(self, text):
         return text.replace('\n', ' ')
@@ -347,14 +342,11 @@ class TTMLSubtitles(BaseSubtitles):
 
         return dom
 
-    def format_time(self, time):
-        hours = int(floor(time / 3600))
+    def format_time(self, milliseconds):
+        hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
         if hours < 0:
             hours = 99
-        minutes = int(floor(time % 3600 / 60))
-        seconds = int(time % 60)
-        fr_seconds = int(time % 1 * 100)
-        return u'%02i:%02i:%02i.%02i' % (hours, minutes, seconds, fr_seconds)
+        return u'%02i:%02i:%02i.%02i' % (hours, minutes, seconds, milliseconds)
 
 GenerateSubtitlesHandler.register(TTMLSubtitles, 'ttml')
 
