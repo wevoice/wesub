@@ -2465,6 +2465,21 @@ class BillingReport(models.Model):
 
         return True
 
+    def _get_lang_data(self, languages, start_date):
+        lang_data = [(language, language.latest_version()) for language in
+                languages]
+
+        old_version_counter = 1
+
+        for i, data in enumerate(lang_data):
+            lang, ver = data
+
+            if ver and ver.datetime_started < start_date:
+                lang_data.pop(i)
+                old_version_counter += 1
+
+        return lang_data, old_version_counter
+
     def _get_row_data(self, host, header=None):
         if not header:
             header = []
@@ -2479,8 +2494,10 @@ class BillingReport(models.Model):
         for tv in tvs:
             languages = tv.video.subtitlelanguage_set.all()
 
-            for language in languages:
-                v = language.latest_version()
+            lang_data, old_version_counter = self._get_lang_data(languages,
+                    start_date)
+
+            for language, v in lang_data:
 
                 if not self._should_bill(language, v, start_date, end_date):
                     continue
@@ -2506,8 +2523,11 @@ class BillingReport(models.Model):
                     host + tv.video.get_absolute_url(),
                     language.language,
                     round((end - start) / 60, 2),
-                    v.datetime_started.strftime("%Y-%m-%d %H:%M:%S")
+                    v.datetime_started.strftime("%Y-%m-%d %H:%M:%S"),
+                    old_version_counter,
                 ])
+
+                old_version_counter += 1
 
         return rows
 
@@ -2517,7 +2537,7 @@ class BillingReport(models.Model):
         host = '%s://%s' % (protocol, domain)
 
         header = ['Video title', 'Video URL', 'Video language',
-                    'Billable minutes', 'Version created']
+                'Billable minutes', 'Version created', 'Language number']
 
         rows = self._get_row_data(host, header)
 
