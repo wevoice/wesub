@@ -430,7 +430,7 @@ def detail(request, slug, project_slug=None, languages=None):
     sort = request.GET.get('sort')
     language = request.GET.get('lang'
 )
-    if language or project:
+    if language or project_slug:
         filtered = filtered + 1
 
     if language != 'none':
