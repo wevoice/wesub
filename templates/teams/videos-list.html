@@ -20,6 +20,7 @@
     <script type="text/javascript">
         window.GLOBAL_WIDGET_SETTINGS = {{ general_settings|safe }};
         window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
+        window.REQUEST_GET_PROJECT = '{{ request.GET.project }}';
     </script>
 {% endblock %}
 
@@ -51,7 +52,7 @@
                     <select name="project-filter" id="project-filter">
                         <option value="{% url teams:detail team.slug %}{% if team.slug == 'ted' %}{% query_string request.GET project='any' %}{% else %}{% query_string request.GET project='' %}{% endif %}" id="project-opt-any">{% trans 'any project' %}</option>
                         {% for proj in project_choices %}
-                            <option id="project-opt-{{ proj.id }}" {% if project == proj %}selected="selected"{% endif %} value="{% url teams:detail team.slug %}{% query_string request.GET project=proj.slug %}">{{ proj.name }}</option>
+                            <option id="project-opt-{{ proj.slug }}" {% if project == proj %}selected="selected"{% endif %} value="{% url teams:detail team.slug %}{% query_string request.GET project=proj.slug %}">{{ proj.name }}</option>
                         {% endfor %}
                     </select>
                     {% trans 'with' %}
