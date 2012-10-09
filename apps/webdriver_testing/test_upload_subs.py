@@ -196,8 +196,6 @@ class WebdriverTestCaseUploadSubsUntimedText(WebdriverTestCase):
         #Verify the origal unedited text is still present in the sub list.
         self.assertIn(expected_list[9], displayed_list)
 
-
-
  
 class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.
@@ -214,6 +212,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         self.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
 
+
     def upload_and_verify(self, sub_file, lang, lang_code, expected_count):
         """Upload the subtitle file and confirm subs are stored.
 
@@ -226,7 +225,6 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         self.assertEqual( expected_count, 
             subtitle_lang.get_subtitle_count())
         self.video_pg.page_refresh()
-
 
 
     def test_timed__txt(self):
@@ -252,7 +250,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         """
         test_file = 'Timed_text.zh-cn.sbv'
         sub_file = os.path.join(self.subs_data_dir, test_file)       
-        self.upload_and_verify( sub_file, 'Chinese, Simplified', 'zh-cn', 243 )
+        self.upload_and_verify(sub_file, 'Chinese, Simplified', 'zh-cn', 243 )
 
     def test_timed__ssa(self):
         """Upload timed subs in a ssa file.
@@ -260,7 +258,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         """
         test_file = 'Timed_text.hu.ssa'
         sub_file = os.path.join(self.subs_data_dir, test_file)       
-        self.upload_and_verify( sub_file, 'Hungarian', 'hu', 243 )
+        self.upload_and_verify(sub_file, 'Hungarian', 'hu', 243 )
 
 
     def test_timed__ttml(self):
@@ -269,7 +267,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         """
         test_file = 'Timed_text.ar.xml'
         sub_file = os.path.join(self.subs_data_dir, test_file)       
-        self.upload_and_verify( sub_file, 'Arabic', 'ar', 243 )
+        self.upload_and_verify(sub_file, 'Arabic', 'ar', 243 )
 
     def test_timed__dfxp(self):
         """Upload timed subs in a dfxp file.
@@ -277,5 +275,5 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         """
         test_file = 'Timed_text.sv.dfxp'
         sub_file = os.path.join(self.subs_data_dir, test_file)       
-        self.upload_and_verify( sub_file, 'Swedish', 'sv', 43 )
+        self.upload_and_verify(sub_file, 'Swedish', 'sv', 43 )
 
