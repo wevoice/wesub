@@ -395,6 +395,19 @@ def settings_languages(request, slug):
     return { 'team': team, 'form': form }
 
 
+def _default_project_for_team(team):
+    """Get the default project to filter by for the videos/tasks lists
+    """
+    if team.slug == 'ted':
+        # :( Logic for the TED team is hardcoded here
+        try:
+            return Project.objects.get(team=team, slug='tedtalks')
+        except Project.DoesNotExist:
+            logging.warning("_default_project_for_team: "
+                    "tedtalks project does not exist")
+            return None
+    else:
+        return None
 # Videos
 @timefn
 @render_to('teams/videos-list.html')
@@ -402,17 +415,16 @@ def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
     filtered = 0
 
-    # :(
     if project_slug is None:
         project_slug = request.GET.get('project')
 
-    if project_slug is not None and project_slug != 'any':
-        project = get_object_or_404(Project, team=team, slug=project_slug)
-    else:
-        if team.slug == 'ted' and project_slug != 'any':
-            project = Project.objects.get(team=team, slug='tedtalks')
-        else:
+    if project_slug is not None:
+        if project_slug == 'any':
             project = None
+        else:
+            project = get_object_or_404(Project, team=team, slug=project_slug)
+    else:
+        project = _default_project_for_team(team)
 
     query = request.GET.get('q')
     sort = request.GET.get('sort')
@@ -1143,21 +1155,28 @@ def team_tasks(request, slug):
 
     project_slug = request.GET.get('project')
 
-    # :(
-    if project_slug is not None and project_slug != 'any':
-        project = get_object_or_404(Project, team=team, slug=project_slug)
-    else:
-        if team.slug == 'ted' and project_slug != 'any' and request.GET.get('team_video') is None:
-            project = Project.objects.get(team=team, slug='tedtalks')
-        else:
-            project = None
-
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
     languages = _task_languages(team, request.user)
     languages = sorted(languages, key=lambda l: l['name'])
     filters = _get_task_filters(request)
     filtered = 0
+
+    if project_slug is not None:
+        if project_slug == 'any':
+            project = None
+        else:
+            project = get_object_or_404(Project, team=team, slug=project_slug)
+    else:
+        # User didn't specify a project to filter on.  We use the default
+        # project only if:
+        #   - There was no team_video specified
+        #   - The user isn't looking at their own tasks
+        if (filters.get('team_video') is None and
+                filters.get('assignee') != 'me'):
+            project = _default_project_for_team(team)
+        else:
+            project = None
 
     tasks = _order_tasks(request,
                          _tasks_list(request, team, project, filters, user))
