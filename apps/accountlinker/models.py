@@ -111,6 +111,30 @@ def check_authorization(video):
     return True, ignore_new_syncing_logic
 
 
+def can_be_synced(version):
+    """
+    Determine if a subtitle version can be synced to Youtube.
+
+    A version must be public, synced and complete; it must also be either
+    "approved" or "unmoderated".
+    """
+    if version:
+        if not version.is_public or not version.is_synced():
+            # We can't mirror unsynced or non-public versions.
+            return False
+
+        if not version.language.is_complete:
+            # Don't sync incomplete languages
+            return False
+
+        status = version.moderation_status
+
+        if (status != APPROVED) and (status != UNMODERATED):
+            return False
+
+    return True
+
+
 class ThirdPartyAccountManager(models.Manager):
 
     def always_push_account(self):
@@ -147,19 +171,8 @@ class ThirdPartyAccountManager(models.Manager):
         if not version and action == UPDATE_VERSION_ACTION:
             raise ValueError("You need to pass a version when updating subs")
 
-        if version:
-            if not version.is_public or not version.is_synced():
-                # We can't mirror unsynced or non-public versions.
-                return
-
-            if not version.language.is_complete:
-                # Don't sync incomplete languages
-                return
-
-            status = version.moderation_status
-
-            if (status != APPROVED) and (status != UNMODERATED):
-                return
+        if not can_be_synced(version):
+            return
 
         is_authorized, ignore_new_syncing_logic = check_authorization(video)
 
