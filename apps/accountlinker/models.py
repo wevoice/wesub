@@ -49,13 +49,6 @@ def youtube_sync(video, language):
     """
     version = language.latest_version()
 
-    if version:
-        if not version.is_public or not version.is_synced():
-            return
-
-    if not version.video.get_team_video():
-        return
-
     always_push_account = ThirdPartyAccount.objects.always_push_account()
 
     for vurl in video.videourl_set.all():
