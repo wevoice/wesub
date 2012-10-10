@@ -104,7 +104,6 @@ unisubs.CaptionManager.prototype.timeUpdate_ = function() {
 unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     function(playheadTime)
 {
-    console.log(playheadTime);
     if (this.captions_.length == 0)
         return;
     if (this.currentCaptionIndex_ == -1 &&
