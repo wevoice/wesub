@@ -28,7 +28,8 @@ from teams.models import Task, Workflow, Team
 from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
-    can_publish_edits_immediately, can_review, can_approve, can_assign_task
+    can_publish_edits_immediately, can_review, can_approve, can_assign_task,
+    can_post_edit_subtitles
 )
 from teams.signals import (
     api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
@@ -303,18 +304,23 @@ class Rpc(BaseRpc):
         """
         video = models.Video.objects.get(video_id=video_id)
         team_video = video.get_team_video()
+        team = team_video.team
 
         if not team_video:
             # If there's no team video to worry about, just bail early.
             return None
 
-        if team_video.team.is_visible:
+        if team.is_visible:
             message = _(u"These subtitles are moderated. See the %s team page for information on how to contribute." % str(team_video.team))
         else:
             message = _(u"Sorry, these subtitles are privately moderated.")
 
         if not team_video.video.can_user_see(user):
              return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
+
+        if team.moderates_videos() and not can_post_edit_subtitles(team, user):
+            message = _("Sorry, you can't post-edit these subtitles.")
+            return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
             
         # Check that there are no open tasks for this action.
         tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
