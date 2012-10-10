@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-09 01:33-0500\n"
+"POT-Creation-Date: 2012-10-10 01:33-0500\n"
 "PO-Revision-Date: 2012-10-05 06:58+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
@@ -431,7 +431,7 @@ msgid "Unfeature teams"
 msgstr "Equipes normais"
 
 #: apps/teams/admin.py:81 apps/teams/admin.py:98 apps/teams/admin.py:202
-#: apps/teams/models.py:178
+#: apps/teams/models.py:179
 msgid "Team"
 msgstr "Equipe"
 
@@ -622,138 +622,138 @@ msgstr ""
 "Desculpe, não pudemos fazer upload do seu arquivo porque o número de linhas "
 "na sua tradução ({0}) não bate com o original ({1})."
 
-#: apps/teams/models.py:85
+#: apps/teams/models.py:86
 msgid "Open"
 msgstr "Abrir"
 
-#: apps/teams/models.py:86 libs/rosetta/templates/rosetta/languages.html:28
+#: apps/teams/models.py:87 libs/rosetta/templates/rosetta/languages.html:28
 msgid "Application"
 msgstr "Solicitação"
 
-#: apps/teams/models.py:87
+#: apps/teams/models.py:88
 msgid "Invitation by any team member"
 msgstr "Convite por qualquer membro da equipe"
 
-#: apps/teams/models.py:88
+#: apps/teams/models.py:89
 msgid "Invitation by manager"
 msgstr "Convites pelo administrador"
 
-#: apps/teams/models.py:89
+#: apps/teams/models.py:90
 msgid "Invitation by admin"
 msgstr "Convite pelo administrador"
 
-#: apps/teams/models.py:96
+#: apps/teams/models.py:97
 msgid "Any team member"
 msgstr "Qualquer membro da equipe"
 
-#: apps/teams/models.py:97
+#: apps/teams/models.py:98
 msgid "Managers and admins"
 msgstr "Gerentes e administradores"
 
-#: apps/teams/models.py:98
+#: apps/teams/models.py:99
 msgid "Admins only"
 msgstr "Apenas administradores"
 
-#: apps/teams/models.py:118 apps/teams/models.py:2525
+#: apps/teams/models.py:119 apps/teams/models.py:2565
 msgid "name"
 msgstr "nome"
 
-#: apps/teams/models.py:119 apps/teams/models.py:2526
+#: apps/teams/models.py:120 apps/teams/models.py:2566
 msgid "slug"
 msgstr "slogan"
 
-#: apps/teams/models.py:120
+#: apps/teams/models.py:121
 msgid "description"
 msgstr "descrição"
 
-#: apps/teams/models.py:120
+#: apps/teams/models.py:121
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
 msgstr ""
 "Todas as URLs Serão convertidas para links. Quebras de linha e HTML não "
 "suportados."
 
-#: apps/teams/models.py:122
+#: apps/teams/models.py:123
 msgid "logo"
 msgstr "logo"
 
-#: apps/teams/models.py:123
+#: apps/teams/models.py:124
 msgid "publicly Visible?"
 msgstr "Visível publicamente?"
 
-#: apps/teams/models.py:124 templates/search/search.html:152
+#: apps/teams/models.py:125 templates/search/search.html:152
 #: templates/teams/project_list.html:10
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
 msgstr "vídeos"
 
-#: apps/teams/models.py:125
+#: apps/teams/models.py:126
 msgid "users"
 msgstr "usuários"
 
-#: apps/teams/models.py:128
+#: apps/teams/models.py:129
 msgid "third party accounts"
 msgstr "contas de terceiros"
 
-#: apps/teams/models.py:131
+#: apps/teams/models.py:132
 msgid "applicants"
 msgstr "requerentes"
 
-#: apps/teams/models.py:134
+#: apps/teams/models.py:135
 msgid "Intro Video"
 msgstr "Vídeo de introdução"
 
-#: apps/teams/models.py:136
+#: apps/teams/models.py:137
 msgid "Page content"
 msgstr "Conteúdo da página"
 
-#: apps/teams/models.py:136
+#: apps/teams/models.py:137
 msgid "You can use markdown. This will replace Description."
 msgstr "Você pode usar uma nota que sustitua a descrição."
 
-#: apps/teams/models.py:138
+#: apps/teams/models.py:139
 msgid "HTML that appears at the top of the teams page."
 msgstr "HTML que aparece na parte superior da página de equipes."
 
-#: apps/teams/models.py:141
+#: apps/teams/models.py:142
 msgid "authentication provider code"
 msgstr ""
 
-#: apps/teams/models.py:149
+#: apps/teams/models.py:150
 msgid "membership policy"
 msgstr "Política de filiação"
 
-#: apps/teams/models.py:152
+#: apps/teams/models.py:153
 msgid "video policy"
 msgstr "Política de vídeo"
 
-#: apps/teams/models.py:155
+#: apps/teams/models.py:156
 msgid "task assignment policy"
 msgstr "política de delegação de tarefas"
 
-#: apps/teams/models.py:158
+#: apps/teams/models.py:159
 msgid "subtitling policy"
 msgstr "política de legendagem"
 
-#: apps/teams/models.py:161
+#: apps/teams/models.py:162
 msgid "translation policy"
 msgstr "política de tradução"
 
-#: apps/teams/models.py:164
+#: apps/teams/models.py:165
 msgid "maximum tasks per member"
 msgstr "número máximo de tarefas por membro"
 
-#: apps/teams/models.py:166
+#: apps/teams/models.py:167
 msgid "task expiration (days)"
 msgstr "validade da tarefa (dias)"
 
-#: apps/teams/models.py:179 templates/profiles/_top_user_panel.html:32
+#: apps/teams/models.py:180 templates/profiles/_top_user_panel.html:32
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "Equipes"
 
-#: apps/teams/models.py:628
+#: apps/teams/models.py:629
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -762,33 +762,33 @@ msgstr ""
 "legendar este vídeo. Adicionar uma nota fará com que os voluntários "
 "interessem-se em ajudar!"
 
-#: apps/teams/models.py:632
+#: apps/teams/models.py:633
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr ""
 "Nós automaticamente detectamos miniaturas de certos sites, ex.: Youtube"
 
-#: apps/teams/models.py:634
+#: apps/teams/models.py:635
 msgid "Need help with all languages"
 msgstr "Precisa de ajuda com todos os idiomas"
 
-#: apps/teams/models.py:635
+#: apps/teams/models.py:636
 msgid "If you check this, other languages will not be displayed."
 msgstr "Se marcar isto, outros idiomas não serão exibidos."
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Dono"
 
-#: apps/teams/models.py:922 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:923 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Administrador"
 
-#: apps/teams/models.py:923 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:924 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:924 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:925 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Contribuidor"
 
@@ -5253,7 +5253,7 @@ msgid "Edit"
 msgstr "Editar"
 
 #: templates/teams/_team_video_detail.html:60
-#: templates/teams/members-list.html:122 templates/teams/videos-list.html:151
+#: templates/teams/members-list.html:122 templates/teams/videos-list.html:152
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
 msgstr "Remover"
@@ -5474,7 +5474,7 @@ msgid "Send Invites"
 msgstr "Enviar Convites"
 
 #: templates/teams/members-list.html:47 templates/teams/tasks.html:45
-#: templates/teams/videos-list.html:43
+#: templates/teams/videos-list.html:44
 msgid "Filter and Sort"
 msgstr "Filtrar e sortear"
 
@@ -5509,7 +5509,7 @@ msgstr "Todos os idiomas"
 
 #: templates/teams/members-list.html:72 templates/teams/tasks.html:126
 #: templates/teams/tasks.html.py:133 templates/teams/tasks.html:140
-#: templates/teams/videos-list.html:92
+#: templates/teams/videos-list.html:93
 msgid "Clear"
 msgstr "Limpar"
 
@@ -5784,7 +5784,7 @@ msgstr "Traduzir"
 msgid "tasks in"
 msgstr "tarefas em"
 
-#: templates/teams/tasks.html:68 templates/teams/videos-list.html:52
+#: templates/teams/tasks.html:68 templates/teams/videos-list.html:53
 msgid "any project"
 msgstr "qualquer projeto"
 
@@ -5808,7 +5808,7 @@ msgstr "mim"
 msgid "anyone"
 msgstr "qualquer pessoa"
 
-#: templates/teams/tasks.html:106 templates/teams/videos-list.html:68
+#: templates/teams/tasks.html:106 templates/teams/videos-list.html:69
 msgid "sorted by"
 msgstr "ordenadas por"
 
@@ -6108,76 +6108,76 @@ msgid ""
 "            "
 msgstr ""
 
-#: templates/teams/videos-list.html:40
+#: templates/teams/videos-list.html:41
 msgid "Add Video"
 msgstr "Adicionar Vídeo"
 
-#: templates/teams/videos-list.html:50
+#: templates/teams/videos-list.html:51
 msgid "Videos in"
 msgstr "Vídeos em"
 
-#: templates/teams/videos-list.html:57 templates/videos/subtitle-view.html:43
+#: templates/teams/videos-list.html:58 templates/videos/subtitle-view.html:43
 #: templates/videos/subtitle-view.html:45
 msgid "with"
 msgstr "com"
 
-#: templates/teams/videos-list.html:59
+#: templates/teams/videos-list.html:60
 msgid "any"
 msgstr "qualquer"
 
-#: templates/teams/videos-list.html:60
+#: templates/teams/videos-list.html:61
 msgid "no"
 msgstr "nenhuma"
 
-#: templates/teams/videos-list.html:65 templates/videos/subtitle-view.html:43
+#: templates/teams/videos-list.html:66 templates/videos/subtitle-view.html:43
 #: templates/videos/subtitle-view.html:45
 #: templates/videos/subtitle-view.html:72
 msgid "subtitles"
 msgstr "legenda"
 
-#: templates/teams/videos-list.html:71
+#: templates/teams/videos-list.html:72
 msgid "name, a-z"
 msgstr "nome, a-z"
 
-#: templates/teams/videos-list.html:74
+#: templates/teams/videos-list.html:75
 msgid "name, z-a"
 msgstr "nome, z-a"
 
-#: templates/teams/videos-list.html:77
+#: templates/teams/videos-list.html:78
 msgid "time, newest"
 msgstr "tempo, mais recente"
 
-#: templates/teams/videos-list.html:80
+#: templates/teams/videos-list.html:81
 msgid "time, oldest"
 msgstr "tempo, mais velho"
 
-#: templates/teams/videos-list.html:83
+#: templates/teams/videos-list.html:84
 msgid "most subtitles"
 msgstr "mais legendas"
 
-#: templates/teams/videos-list.html:86
+#: templates/teams/videos-list.html:87
 msgid "least subtitles"
 msgstr "menos legendas"
 
-#: templates/teams/videos-list.html:108
+#: templates/teams/videos-list.html:109
 msgid "Rebuilding video index. Please try again in a few minutes"
 msgstr ""
 "Reconstruindo índice do vídeo. Por favor tente novamente em alguns minutos"
 
-#: templates/teams/videos-list.html:110
+#: templates/teams/videos-list.html:111
 msgid "Sorry, no videos here"
 msgstr "Desculpe, não há videos aqui"
 
-#: templates/teams/videos-list.html:121
+#: templates/teams/videos-list.html:122
 msgid "Remove video"
 msgstr "Remover vídeo"
 
-#: templates/teams/videos-list.html:128
+#: templates/teams/videos-list.html:129
 #, python-format
 msgid "You are removing this video from the %(team)s team."
 msgstr "Você esta removendo esse vídeo da equipe %(team)s."
 
-#: templates/teams/videos-list.html:129
+#: templates/teams/videos-list.html:130
 #, python-format
 msgid ""
 "You are removing this video from the %(team)s team.<br /><br />\n"
@@ -6187,7 +6187,7 @@ msgid ""
 "editing to the general public. Are you sure you want to proceed?"
 msgstr ""
 
-#: templates/teams/videos-list.html:132
+#: templates/teams/videos-list.html:133
 #, python-format
 msgid ""
 "You can choose to remove the video from the %(team)s team or to delete the "
@@ -6195,17 +6195,17 @@ msgid ""
 "like to do?"
 msgstr ""
 
-#: templates/teams/videos-list.html:135
+#: templates/teams/videos-list.html:136
 msgid "Just remove the video from the team."
 msgstr "Apenas remova o vídeo da equipe."
 
-#: templates/teams/videos-list.html:137
+#: templates/teams/videos-list.html:138
 msgid ""
 "It will remain on Amara but will no longer be subject to the team's "
 "permissions and worfklows. Any outstanding tasks will be deleted."
 msgstr ""
 
-#: templates/teams/videos-list.html:140
+#: templates/teams/videos-list.html:141
 msgid "Delete the video entirely."
 msgstr "Deletar o vídeo por completo."
 
