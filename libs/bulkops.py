@@ -39,7 +39,7 @@ def insert_many(objects, using="default"):
         return
 
     import django.db.models
-    from django.db import connections
+    from django.db import connections, transaction
     con = connections[using]
     
     model = objects[0].__class__
@@ -54,6 +54,7 @@ def insert_many(objects, using="default"):
     con.cursor().executemany(
         "insert into %s (%s) values (%s)" % (table, column_names, placeholders),
         parameters)
+    transaction.commit_unless_managed()
 
 def update_many(objects, fields=[], using="default"):
     """Update list of Django objects in one SQL query, optionally only
@@ -64,7 +65,7 @@ def update_many(objects, fields=[], using="default"):
         return
 
     import django.db.models
-    from django.db import connections
+    from django.db import connections, transaction
     con = connections[using]
 
     names = fields
@@ -84,3 +85,4 @@ def update_many(objects, fields=[], using="default"):
     con.cursor().executemany(
         "update %s set %s where %s=%%s" % (table, assignments, con.ops.quote_name(meta.pk.column)),
         parameters)
+    transaction.commit_unless_managed()

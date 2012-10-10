@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-09 01:41-0500\n"
+"POT-Creation-Date: 2012-10-10 01:42-0500\n"
 "PO-Revision-Date: 2012-10-05 06:58+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
@@ -414,7 +414,7 @@ msgid "Unfeature teams"
 msgstr "非特色组"
 
 #: apps/teams/admin.py:81 apps/teams/admin.py:98 apps/teams/admin.py:202
-#: apps/teams/models.py:178
+#: apps/teams/models.py:179
 msgid "Team"
 msgstr "队"
 
@@ -603,136 +603,136 @@ msgid ""
 "translation ({0}) doesn't match the original ({1})."
 msgstr ""
 
-#: apps/teams/models.py:85
+#: apps/teams/models.py:86
 msgid "Open"
 msgstr "打开"
 
-#: apps/teams/models.py:86 libs/rosetta/templates/rosetta/languages.html:28
+#: apps/teams/models.py:87 libs/rosetta/templates/rosetta/languages.html:28
 msgid "Application"
 msgstr "申请"
 
-#: apps/teams/models.py:87
+#: apps/teams/models.py:88
 msgid "Invitation by any team member"
 msgstr "被任何小组成员邀请"
 
-#: apps/teams/models.py:88
+#: apps/teams/models.py:89
 msgid "Invitation by manager"
 msgstr "管理员邀请"
 
-#: apps/teams/models.py:89
+#: apps/teams/models.py:90
 msgid "Invitation by admin"
 msgstr "被管理员邀请"
 
-#: apps/teams/models.py:96
+#: apps/teams/models.py:97
 msgid "Any team member"
 msgstr "任何组成员"
 
-#: apps/teams/models.py:97
+#: apps/teams/models.py:98
 msgid "Managers and admins"
 msgstr "负责人和管理人"
 
-#: apps/teams/models.py:98
+#: apps/teams/models.py:99
 msgid "Admins only"
 msgstr "仅管理人"
 
-#: apps/teams/models.py:118 apps/teams/models.py:2525
+#: apps/teams/models.py:119 apps/teams/models.py:2565
 msgid "name"
 msgstr "名称"
 
-#: apps/teams/models.py:119 apps/teams/models.py:2526
+#: apps/teams/models.py:120 apps/teams/models.py:2566
 msgid "slug"
 msgstr ""
 
-#: apps/teams/models.py:120
+#: apps/teams/models.py:121
 msgid "description"
 msgstr "描述"
 
-#: apps/teams/models.py:120
+#: apps/teams/models.py:121
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
 msgstr "所有URL会转换为链接。不支持换行符和HTML"
 
-#: apps/teams/models.py:122
+#: apps/teams/models.py:123
 msgid "logo"
 msgstr "标志"
 
-#: apps/teams/models.py:123
+#: apps/teams/models.py:124
 msgid "publicly Visible?"
 msgstr "公开可见？"
 
-#: apps/teams/models.py:124 templates/search/search.html:152
+#: apps/teams/models.py:125 templates/search/search.html:152
 #: templates/teams/project_list.html:10
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
 msgstr "视频"
 
-#: apps/teams/models.py:125
+#: apps/teams/models.py:126
 msgid "users"
 msgstr "用户"
 
-#: apps/teams/models.py:128
+#: apps/teams/models.py:129
 msgid "third party accounts"
 msgstr "第三方帐户"
 
-#: apps/teams/models.py:131
+#: apps/teams/models.py:132
 msgid "applicants"
 msgstr "申请人"
 
-#: apps/teams/models.py:134
+#: apps/teams/models.py:135
 msgid "Intro Video"
 msgstr "介绍视频"
 
-#: apps/teams/models.py:136
+#: apps/teams/models.py:137
 msgid "Page content"
 msgstr "页面内容"
 
-#: apps/teams/models.py:136
+#: apps/teams/models.py:137
 msgid "You can use markdown. This will replace Description."
 msgstr "你可以使用标注。那样会替换描述。"
 
-#: apps/teams/models.py:138
+#: apps/teams/models.py:139
 msgid "HTML that appears at the top of the teams page."
 msgstr "出现在组页面顶部的HTML"
 
-#: apps/teams/models.py:141
+#: apps/teams/models.py:142
 msgid "authentication provider code"
 msgstr "验证提供者代码"
 
-#: apps/teams/models.py:149
+#: apps/teams/models.py:150
 msgid "membership policy"
 msgstr "成员策略"
 
-#: apps/teams/models.py:152
+#: apps/teams/models.py:153
 msgid "video policy"
 msgstr "视频策略"
 
-#: apps/teams/models.py:155
+#: apps/teams/models.py:156
 msgid "task assignment policy"
 msgstr "任务标注政策"
 
-#: apps/teams/models.py:158
+#: apps/teams/models.py:159
 msgid "subtitling policy"
 msgstr "字幕制作政策"
 
-#: apps/teams/models.py:161
+#: apps/teams/models.py:162
 msgid "translation policy"
 msgstr "翻译政策"
 
-#: apps/teams/models.py:164
+#: apps/teams/models.py:165
 msgid "maximum tasks per member"
 msgstr "每个成员的最大任务数"
 
-#: apps/teams/models.py:166
+#: apps/teams/models.py:167
 msgid "task expiration (days)"
 msgstr "任务有效期(天)"
 
-#: apps/teams/models.py:179 templates/profiles/_top_user_panel.html:32
+#: apps/teams/models.py:180 templates/profiles/_top_user_panel.html:32
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "队"
 
-#: apps/teams/models.py:628
+#: apps/teams/models.py:629
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -740,32 +740,32 @@ msgstr ""
 "用这个空间说明你和你的小组为什么给这个视频创建字幕。添加注解让志愿者更多的提"
 "供帮助"
 
-#: apps/teams/models.py:632
+#: apps/teams/models.py:633
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr "我们自动的提取特定站点的缩略图，例如Youtube"
 
-#: apps/teams/models.py:634
+#: apps/teams/models.py:635
 msgid "Need help with all languages"
 msgstr "所有的语言都需要帮助"
 
-#: apps/teams/models.py:635
+#: apps/teams/models.py:636
 msgid "If you check this, other languages will not be displayed."
 msgstr "如果选中此项，其他语言将不能显示"
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "拥有者"
 
-#: apps/teams/models.py:922 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:923 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "管理员"
 
-#: apps/teams/models.py:923 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:924 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "管理"
 
-#: apps/teams/models.py:924 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:925 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "贡献者"
 
@@ -5176,7 +5176,7 @@ msgid "Edit"
 msgstr "编辑"
 
 #: templates/teams/_team_video_detail.html:60
-#: templates/teams/members-list.html:122 templates/teams/videos-list.html:151
+#: templates/teams/members-list.html:122 templates/teams/videos-list.html:152
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
 msgstr "移除"
@@ -5397,7 +5397,7 @@ msgid "Send Invites"
 msgstr "发送邀请"
 
 #: templates/teams/members-list.html:47 templates/teams/tasks.html:45
-#: templates/teams/videos-list.html:43
+#: templates/teams/videos-list.html:44
 msgid "Filter and Sort"
 msgstr "过滤并排序"
 
@@ -5432,7 +5432,7 @@ msgstr "所有语言"
 
 #: templates/teams/members-list.html:72 templates/teams/tasks.html:126
 #: templates/teams/tasks.html.py:133 templates/teams/tasks.html:140
-#: templates/teams/videos-list.html:92
+#: templates/teams/videos-list.html:93
 msgid "Clear"
 msgstr "清除"
 
@@ -5699,7 +5699,7 @@ msgstr "翻译"
 msgid "tasks in"
 msgstr ""
 
-#: templates/teams/tasks.html:68 templates/teams/videos-list.html:52
+#: templates/teams/tasks.html:68 templates/teams/videos-list.html:53
 msgid "any project"
 msgstr ""
 
@@ -5723,7 +5723,7 @@ msgstr "我"
 msgid "anyone"
 msgstr "任何人"
 
-#: templates/teams/tasks.html:106 templates/teams/videos-list.html:68
+#: templates/teams/tasks.html:106 templates/teams/videos-list.html:69
 msgid "sorted by"
 msgstr "排序"
 
@@ -6017,75 +6017,75 @@ msgstr ""
 "enterprise@pculture.org\">enterprise@pculture.org</a>\n"
 "            "
 
-#: templates/teams/videos-list.html:40
+#: templates/teams/videos-list.html:41
 msgid "Add Video"
 msgstr "添加视频"
 
-#: templates/teams/videos-list.html:50
+#: templates/teams/videos-list.html:51
 msgid "Videos in"
 msgstr ""
 
-#: templates/teams/videos-list.html:57 templates/videos/subtitle-view.html:43
+#: templates/teams/videos-list.html:58 templates/videos/subtitle-view.html:43
 #: templates/videos/subtitle-view.html:45
 msgid "with"
 msgstr ""
 
-#: templates/teams/videos-list.html:59
+#: templates/teams/videos-list.html:60
 msgid "any"
 msgstr "任何"
 
-#: templates/teams/videos-list.html:60
+#: templates/teams/videos-list.html:61
 msgid "no"
 msgstr "没有"
 
-#: templates/teams/videos-list.html:65 templates/videos/subtitle-view.html:43
+#: templates/teams/videos-list.html:66 templates/videos/subtitle-view.html:43
 #: templates/videos/subtitle-view.html:45
 #: templates/videos/subtitle-view.html:72
 msgid "subtitles"
 msgstr "字幕"
 
-#: templates/teams/videos-list.html:71
+#: templates/teams/videos-list.html:72
 msgid "name, a-z"
 msgstr "名字，a-z"
 
-#: templates/teams/videos-list.html:74
+#: templates/teams/videos-list.html:75
 msgid "name, z-a"
 msgstr "名字，z-a"
 
-#: templates/teams/videos-list.html:77
+#: templates/teams/videos-list.html:78
 msgid "time, newest"
 msgstr "时间，最新"
 
-#: templates/teams/videos-list.html:80
+#: templates/teams/videos-list.html:81
 msgid "time, oldest"
 msgstr "时间，最旧"
 
-#: templates/teams/videos-list.html:83
+#: templates/teams/videos-list.html:84
 msgid "most subtitles"
 msgstr "字幕最多"
 
-#: templates/teams/videos-list.html:86
+#: templates/teams/videos-list.html:87
 msgid "least subtitles"
 msgstr "字幕最少"
 
-#: templates/teams/videos-list.html:108
+#: templates/teams/videos-list.html:109
 msgid "Rebuilding video index. Please try again in a few minutes"
 msgstr "重建视频索引中，请几分钟后重试"
 
-#: templates/teams/videos-list.html:110
+#: templates/teams/videos-list.html:111
 msgid "Sorry, no videos here"
 msgstr "抱歉，这里没有视频"
 
-#: templates/teams/videos-list.html:121
+#: templates/teams/videos-list.html:122
 msgid "Remove video"
 msgstr "移除视频"
 
-#: templates/teams/videos-list.html:128
+#: templates/teams/videos-list.html:129
 #, python-format
 msgid "You are removing this video from the %(team)s team."
 msgstr "你正在将此视频从%(team)s小组中移出"
 
-#: templates/teams/videos-list.html:129
+#: templates/teams/videos-list.html:130
 #, python-format
 msgid ""
 "You are removing this video from the %(team)s team.<br /><br />\n"
@@ -6095,7 +6095,7 @@ msgid ""
 "editing to the general public. Are you sure you want to proceed?"
 msgstr ""
 
-#: templates/teams/videos-list.html:132
+#: templates/teams/videos-list.html:133
 #, python-format
 msgid ""
 "You can choose to remove the video from the %(team)s team or to delete the "
@@ -6105,18 +6105,18 @@ msgstr ""
 "你可以选择从 %(team)s 小组移出此视频 或者删除从系统中完全删除视频 (以及它所有"
 "的字幕) . 你想要怎么做?"
 
-#: templates/teams/videos-list.html:135
+#: templates/teams/videos-list.html:136
 msgid "Just remove the video from the team."
 msgstr "只要将此视频移出小组"
 
-#: templates/teams/videos-list.html:137
+#: templates/teams/videos-list.html:138
 msgid ""
 "It will remain on Amara but will no longer be subject to the team's "
 "permissions and worfklows. Any outstanding tasks will be deleted."
 msgstr ""
 "它将仍然存在于Amara但不会受制于小组权限及工作流。任何独立的任务将会被删除。"
 
-#: templates/teams/videos-list.html:140
+#: templates/teams/videos-list.html:141
 msgid "Delete the video entirely."
 msgstr "删除整个视频"
 

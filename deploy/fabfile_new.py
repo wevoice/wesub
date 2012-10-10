@@ -263,6 +263,34 @@ def dev(username):
                     notification_email   = 'ehazlett@pculture.org',)
 
 @task
+def demo(username, revision):
+    """
+    Configure task(s) to run in the demo environment
+
+    :param username: Username
+    :param revision: Revision of demo
+
+    """
+    with Output("Configuring task(s) to run on DEMO {0}".format(revision)):
+        env_name = 'demo'
+        _create_env(username              = username,
+                    name                  = env_name,
+                    s3_bucket             = None,
+                    app_name              = 'unisubs',
+                    app_dir               = '/var/tmp/{0}/unisubs/'.format(
+                        revision),
+                    app_group             = 'deploy',
+                    revision              = revision,
+                    ve_dir                = '/var/tmp/{0}/ve'.format(
+                        revision),
+                    separate_uslogging_db = False,
+                    roledefs              = {
+                        'app': ['app-00-dev.amara.org'],
+                        'data': ['data-00-dev.amara.org'],
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
+
+@task
 def staging(username):
     """
     Configure task(s) to run in the staging environment
@@ -528,7 +556,6 @@ def migrate(app_name='', extra=''):
             run(cmd)
 
 @task
-@lock_required
 @roles('app', 'data')
 def update_environment(extra=''):
     with Output('Updating environment'):
@@ -550,10 +577,14 @@ def _reload_app_servers(hard=False):
         with mod_wsgi this is touching the wsgi file)
         """
         if hard:
-            sudo('service uwsgi.unisubs.{0} restart'.format(env.environment))
+            if env.environment == 'demo':
+                script = 'uwsgi.unisubs.demo.{0}'.format(env.revision)
+            else:
+                script = 'uwsgi.unisubs.{0}'.format(env.environment)
+            sudo('service {0} restart'.format(script))
         else:
             with cd(env.app_dir):
-                #run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
+                run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
                 run('touch deploy/unisubs.wsgi')
 
 @task
@@ -574,8 +605,7 @@ def remove_disabled():
     with Output("Taking the site out of maintenance mode"):
         run('rm {0}/disabled'.format(env.app_dir))
 
-def _update_integration(run_as_sudo=True, branch=None):
-    branch = branch if branch is not None else env.revision
+def _update_integration(run_as_sudo=True, branch='dev'):
     with Output("Updating nested unisubs-integration repositories"):
         with cd(os.path.join(env.app_dir, 'unisubs-integration')), \
             settings(warn_only=True):
@@ -605,7 +635,7 @@ def _update_solr_schema():
         _git_pull()
         sudo('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
                 python_exe,
-                env.environment))
+                env.revision))
         run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
         sudo('service tomcat6 restart')
 
@@ -657,7 +687,7 @@ def _bounce_memcached():
         sudo('service memcached start')
 
 @task
-@roles('app', 'data')
+@roles('data')
 def bounce_memcached():
     '''Bounce memcached (purging the cache).
 
@@ -669,12 +699,12 @@ def bounce_memcached():
 def _bounce_celery():
     with Output("Bouncing celeryd"):
         with settings(warn_only=True):
-            sudo('service celeryd.{0} stop'.format(env.environment))
-            sudo('service celeryd.{0} start'.format(env.environment))
+            sudo('service celeryd.{0} stop'.format(env.revision))
+            sudo('service celeryd.{0} start'.format(env.revision))
     with Output("Bouncing celerycam"):
         with settings(warn_only=True):
-            sudo('service celerycam.{0} stop'.format(env.environment))
-            sudo('service celerycam.{0} start'.format(env.environment))
+            sudo('service celerycam.{0} stop'.format(env.revision))
+            sudo('service celerycam.{0} start'.format(env.revision))
 
 @task
 @roles('data')
@@ -697,6 +727,7 @@ def _deploy(branch=None, integration_branch=None, skip_celery=False):
         with cd(env.app_dir):
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -delete")
+    execute(update_static_media)
     if skip_celery == False:
         execute(_bounce_celery)
     execute(_bounce_memcached)
@@ -704,7 +735,6 @@ def _deploy(branch=None, integration_branch=None, skip_celery=False):
     execute(_reload_app_servers)
 
 @task
-@lock_required
 @roles('app', 'data')
 def deploy(branch=None, integration_branch=None, skip_celery=False):
     """
@@ -721,11 +751,9 @@ def deploy(branch=None, integration_branch=None, skip_celery=False):
     breakage
     """
     _deploy(branch, integration_branch, skip_celery)
-    #if env.environment not in ['dev']:
-    _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user, env.environment, datetime.utcnow()))
+    _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user, env.environment, datetime.utcnow()), env.notification_email)
 
 @task
-@lock_required
 @runs_once
 @roles('app')
 def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile=False, skip_s3=False):
@@ -736,18 +764,12 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
     :param skip_s3: Skip upload to S3 (default: False)
 
     """
-    with Output("Updating static media") as out, cd(env.app_dir):
-        media_dir = '{0}/media/'.format(env.app_dir)
-        python_exe = '{0}/bin/python'.format(env.ve_dir)
-        _git_pull()
-        execute(update_integration)
-        run('{0} deploy/create_commit_file.py'.format(python_exe))
-        if skip_compile == False:
-            out.fastprintln('Compiling...')
-            with settings(warn_only=True):
-                run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
-        if env.environment != 'dev' and skip_s3 == False:
-            out.fastprintln('Uploading to S3...')
+    python_exe = '{0}/bin/python'.format(env.ve_dir)
+    if skip_compile == False:
+        with Output("Compiling media"), cd(env.app_dir), settings(warn_only=True):
+            run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
+    if env.s3_bucket and skip_s3 == False:
+        with Output("Uploading to S3"), cd(env.app_dir):
             run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
 
 @task
@@ -819,15 +841,17 @@ def _clone_repo_demo(revision='dev', integration_revision='dev'):
         revision, private_conf))
     run("sed -i 's/STATIC_URL.*/STATIC_URL = \"http:\/\/{0}.demo.amara.org\/site_media\/\"/g' {1}".format(
     revision, private_conf))
+    _reset_permissions(env.app_dir)
 
 @task
 @parallel
-def demo(revision='dev', integration_revision='dev'):
+def create_demo(revision='dev', integration_revision='dev', skip_media=False):
     """
     Deploys the specified revision for live testing
 
     :param revision: Revision to test
     :param integration_revision: Integrations revision to test
+    :param skip_media: Skip media compilation (default: False)
 
     """
     hosts = {
@@ -877,13 +901,14 @@ def demo(revision='dev', integration_revision='dev'):
             integration_revision=integration_revision)
     env.host_string = hosts['app']
     # compile media
-    with Output("Compiling static media.  This may take a moment"):
-        # create a symlink to google closure library for compilation
-        sudo('ln -sf /opt/google-closure /var/tmp/{0}/unisubs/media/js/closure-library'.format(revision))
-        with cd('/var/tmp/{0}/unisubs'.format(revision)), settings(warn_only=True):
-            python_exe = '/var/tmp/{0}/ve/bin/python'.format(revision)
-            run('{0} deploy/create_commit_file.py'.format(python_exe))
-            run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, 'ADVANCED_OPTIMIZATIONS'))
+    if not skip_media:
+        with Output("Compiling static media.  This may take a moment"):
+            # create a symlink to google closure library for compilation
+            sudo('ln -sf /opt/google-closure /var/tmp/{0}/unisubs/media/js/closure-library'.format(revision))
+            with cd('/var/tmp/{0}/unisubs'.format(revision)), settings(warn_only=True):
+                python_exe = '/var/tmp/{0}/ve/bin/python'.format(revision)
+                run('{0} deploy/create_commit_file.py'.format(python_exe))
+                run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, 'ADVANCED_OPTIMIZATIONS'))
     with Output("Starting {0} demo".format(revision)):
         sudo('service nginx reload')
         sudo('service uwsgi.unisubs.demo.{0} start'.format(revision))
@@ -911,7 +936,7 @@ def remove_demo(revision='dev'):
         sudo('rm -f /etc/init/uwsgi.unisubs.demo.{0}.conf'.format(revision))
     with Output("Restarting nginx"):
         sudo('service nginx reload')
-    with Output("Removing {0}".format(revision)):
+    with Output("Removing app directories for {0}".format(revision)):
         for k,v in hosts.iteritems():
             env.host_string = v
             sudo('rm -rf /var/tmp/{0}'.format(revision))
