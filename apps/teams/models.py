@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import datetime
 import logging
+import csv
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -37,7 +38,7 @@ from apps.comments.models import Comment
 from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
-from teams.moderation_const import WAITING_MODERATION, UNMODERATED
+from teams.moderation_const import WAITING_MODERATION, UNMODERATED, APPROVED
 from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
     ROLE_CONTRIBUTOR
@@ -2413,43 +2414,67 @@ class BillingReport(models.Model):
                 self.start_date.strftime('%Y-%m-%d'),
                 self.end_date.strftime('%Y-%m-%d'))
 
-    def process(self):
-        from teams.moderation_const import APPROVED
-        import csv
-
+    def start_datetime(self):
         midnight = datetime.time(0, 0, 0)
-        almost_midnight = datetime.time(23, 59, 59)
-        start_date = datetime.datetime.combine(self.start_date, midnight)
-        end_date = datetime.datetime.combine(self.end_date, almost_midnight)
+        return datetime.datetime.combine(self.start_date, midnight)
 
-        rows = [['Video title', 'Video URL', 'Video language',
-                    'Billable minutes', 'Version created']]
+    def end_datetime(self):
+        almost_midnight = datetime.time(23, 59, 59)
+        return datetime.datetime.combine(self.end_date, almost_midnight)
+
+    def _should_bill(self, language, version, start, end):
+        if not version:
+            return False
+
+        if version.moderation_status not in [APPROVED, UNMODERATED]:
+            return False
+
+        # 97% is done according to our contracts
+        if version.moderation_status == UNMODERATED:
+            if not language.is_complete or language.percent_done < 97:
+                return False
+
+        if (version.datetime_started <= start or
+                version.datetime_started >= end):
+            return False
+
+        return True
+
+    def _get_lang_data(self, languages, start_date):
+        lang_data = [(language, language.latest_version()) for language in
+                languages]
+
+        old_version_counter = 1
+
+        for i, data in enumerate(lang_data):
+            lang, ver = data
+
+            if ver and ver.datetime_started < start_date:
+                lang_data.pop(i)
+                old_version_counter += 1
+
+        return lang_data, old_version_counter
+
+    def _get_row_data(self, host, header=None):
+        if not header:
+            header = []
+
+        rows = [header]
+
+        start_date = self.start_datetime()
+        end_date = self.end_datetime()
 
         tvs = TeamVideo.objects.filter(team=self.team).order_by('video__title')
-
-        domain = Site.objects.get_current().domain
-        protocol = getattr(settings, 'DEFAULT_PROTOCOL')
-        host = '%s://%s' % (protocol, domain)
 
         for tv in tvs:
             languages = tv.video.subtitlelanguage_set.all()
 
-            for language in languages:
-                v = language.latest_version()
+            lang_data, old_version_counter = self._get_lang_data(languages,
+                    start_date)
 
-                if not v:
-                    continue
+            for language, v in lang_data:
 
-                if v.moderation_status not in [APPROVED, UNMODERATED]:
-                    continue
-
-                # 97% is done according to our contracts
-                if v.moderation_status == UNMODERATED:
-                    if not language.is_complete or language.percent_done < 97:
-                        continue
-
-                if (v.datetime_started <= start_date) or (
-                        v.datetime_started >= end_date):
+                if not self._should_bill(language, v, start_date, end_date):
                     continue
 
                 subs = v.ordered_subtitles()
@@ -2473,11 +2498,26 @@ class BillingReport(models.Model):
                     host + tv.video.get_absolute_url(),
                     language.language,
                     round((end - start) / 60, 2),
-                    v.datetime_started.strftime("%Y-%m-%d %H:%M:%S")
+                    v.datetime_started.strftime("%Y-%m-%d %H:%M:%S"),
+                    old_version_counter,
                 ])
 
-        fn = '/tmp/bill-%s-%s-%s.csv' % (self.team.slug, self.start_str,
-                self.end_str)
+                old_version_counter += 1
+
+        return rows
+
+    def process(self):
+        domain = Site.objects.get_current().domain
+        protocol = getattr(settings, 'DEFAULT_PROTOCOL')
+        host = '%s://%s' % (protocol, domain)
+
+        header = ['Video title', 'Video URL', 'Video language',
+                'Billable minutes', 'Version created', 'Language number']
+
+        rows = self._get_row_data(host, header)
+
+        fn = '/tmp/bill-%s-%s-%s-%s.csv' % (self.team.slug, self.start_str,
+                self.end_str, self.pk)
 
         with open(fn, 'w') as f:
             writer = csv.writer(f)

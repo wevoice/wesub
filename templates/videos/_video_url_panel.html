@@ -30,8 +30,8 @@
             {% if video|can_user_edit_video_urls:user %}
                 <ul class="admin-controls">
                     <li><a {% if item.primary %}style="display:none"{% endif %} href="#" video_url_id="{{ item.pk }}" class="make-primary-url-link">{% trans 'Make primary' %}</a></li>
-                    {% if not item.original%}
-                        <li><a href="#" class="delete-url-link" video_url_id="{{ item.pk }}">{% trans 'Remove' %}</a></li>
+                    {% if not item.primary %}
+                    <li><a href="#" class="delete-url-link" video_url_id="{{ item.pk }}">{% trans 'Remove' %}</a></li>
                     {% endif %}
                 </ul>
             {% endif %}
