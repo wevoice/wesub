@@ -1846,7 +1846,7 @@ def billing(request):
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
 
-            report, created = BillingReport.objects.get_or_create(team=team,
+            report = BillingReport.objects.create(team=team,
                     start_date=start_date, end_date=end_date)
 
             process_billing_report.delay(report.pk)
