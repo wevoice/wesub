@@ -2253,15 +2253,11 @@ a.truncated-expand {
 
 .team_dashboard .view {
 
-    h3 {
+    > h3 {
         position: relative;
         clear: both;
-        margin: 0 0 0 -10px;
-        padding: 1.5em 10px;
-        @include linear-gradient( bottom, hsla(0, 0%, 97%, 1), hsla(0, 0%, 100%, 1) 25%, hsla(0, 0%, 100%, 1) );
-        border-bottom: 1px solid #e8ebed;
+        padding: 3em 10px 0;
         font-size: 13px;
-        text-align: center;
 
         a {
             font-weight: normal;
@@ -2272,25 +2268,29 @@ a.truncated-expand {
             font-size: .9em;
             line-height: 15px;
             text-decoration: none;
-
-            &.mode {
-                background: transparent url('../images/mode.png') no-repeat center left;
-            }
         }
     }
 
     .listing.yours {
 
-        margin-bottom: 3em;
+        margin-bottom: 2em;
 
         > li {
-            margin-left: -10px;
-            padding: 1.5em 10px;
+            padding-left: 115px;
+            padding-right: 175px;
+
+            .thumb a img {
+                max-width: 90px;
+                border: none;
+            }
         }
 
         .due {
-            margin-left: .5em;
+            display: block;
+            text-align: left;
             color: $normal;
+            font-style: italic;
+            padding-left: .5em;
         }
 
         .overdue {
@@ -2298,9 +2298,13 @@ a.truncated-expand {
         }
 
         .perform-task {
-            position: absolute;
-            top:0; right: 1em;
-            padding-right: 2em;
+            padding: .5em;
+            margin: 0 0 .5em 0;
+            text-align: left;
+
+            &:after {
+                content: '';
+            }
         }
     }
 
@@ -2312,20 +2316,25 @@ a.truncated-expand {
                 -moz-box-sizing: border-box;
                 -webkit-box-sizing: border-box;
                 box-sizing: border-box;
-                top: 20px; left: 10px;
+                bottom: 0px; left: 10px;
                 padding: 1em;
                 width: 290px;
                 background: rgba(0,0,0,.65);
                 color: #fff;
             }
 
-            .thumb {
+            &:hover h4 a {
+                background: rgba(0,0,0,.75);
             }
 
-            .languages {
+            .thumb a img {
+                border: none;
+            }
+
+            .langs {
                 position: relative;
                 clear: both;
-                margin: 0 10px;
+                margin: 10px;
                 color: $dark;
 
 
@@ -2363,7 +2372,9 @@ a.truncated-expand {
                     span.expand {
                         color: $light;
                         padding-right: 2em;
-                        background: transparent url('../images/arrows.png') no-repeat 85% -61px;
+                        background-image: url('../images/arrows.png');
+                        background-position: 85% -61px;
+                        background-repeat: no-repeat;
                     }
 
                     ul {
@@ -2376,6 +2387,10 @@ a.truncated-expand {
                         background: $faintest;
                         z-index: 50;
                         @include multi-border-radius(0, 0, 2px, 2px);
+                        border: 1px solid $fainter;
+                        -moz-box-sizing: border-box;
+                        -webkit-box-sizing: border-box;
+                        box-sizing: border-box;
 
                         li {
                             padding: 0;
@@ -2385,6 +2400,10 @@ a.truncated-expand {
                             display: block;
                             padding: 1em .75em;
                             color: $darkest;
+
+                            &:hover {
+                                background: $fainter;
+                            }
                         }
                     }
 
