@@ -1772,19 +1772,21 @@ class Task(models.Model):
             # notify original submiter (assignee of self)
             notifier.reviewed_and_sent_back.delay(self.pk)
 
-    def _publicize_version(self, author):
+    def _publicize_version(self, author, subtitle_version=None):
         """Create a new SubtitleVersion that's a public copy of the current tip.
 
         author should be the person making this happen, *not* the author of the
         original tip.
 
         """
+        subtitle_version = subtitle_version or self.new_subtitle_version
+
         pipeline.add_subtitles(
-            video=self.new_subtitle_version.video,
-            language_code=self.new_subtitle_version.language_code,
-            subtitles=self.new_subtitle_version.get_subtitles(),
-            title=self.new_subtitle_version.title,
-            description=self.new_subtitle_version.description,
+            video=subtitle_version.video,
+            language_code=subtitle_version.language_code,
+            subtitles=subtitle_version.get_subtitles(),
+            title=subtitle_version.title,
+            description=subtitle_version.description,
             author=author,
             visibility='public',
         )
@@ -1849,23 +1851,22 @@ class Task(models.Model):
 
     def _complete_subtitle(self):
         """Handle the messy details of completing a subtitle task."""
-        subtitle_version = self.team_video.video.latest_version(
-                                language_code=self.language, public_only=False)
+        sv = self.get_subtitle_version()
 
         # TL;DR take a look at #1206 to know why i did this
-        if self.workflow.allows_tasks and not self._can_publish_directly(subtitle_version):
+        if self.workflow.allows_tasks and not self._can_publish_directly(sv):
             if self.workflow.review_enabled:
                 task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=subtitle_version,
-                            review_base_version=subtitle_version,
+                            new_subtitle_version=sv,
+                            new_review_base_version=sv,
                             language=self.language, type=Task.TYPE_IDS['Review'],
                             assignee=self._find_previous_assignee('Review'))
                 task.set_expiration()
                 task.save()
             elif self.workflow.approve_enabled:
                 task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=subtitle_version,
-                            review_base_version=subtitle_version,
+                            new_subtitle_version=sv,
+                            new_review_base_version=sv,
                             language=self.language, type=Task.TYPE_IDS['Approve'],
                             assignee=self._find_previous_assignee('Approve'))
                 task.set_expiration()
@@ -1873,8 +1874,7 @@ class Task(models.Model):
         else:
             # Subtitle task is done, and there is no approval or review
             # required, so we mark the version as approved.
-            subtitle_version.moderation_status = MODERATION.APPROVED
-            subtitle_version.save()
+            self._publicize(self.assignee, sv)
 
             # We need to make sure this is updated correctly here.
             from apps.videos import metadata_manager
@@ -1882,21 +1882,20 @@ class Task(models.Model):
 
             if self.workflow.autocreate_translate:
                 # TODO: Switch to autocreate_task?
-                _create_translation_tasks(self.team_video, subtitle_version)
+                _create_translation_tasks(self.team_video, sv)
 
-            upload_subtitles_to_original_service.delay(subtitle_version.pk)
+            upload_subtitles_to_original_service.delay(sv.pk)
 
     def _complete_translate(self):
         """Handle the messy details of completing a translate task."""
-        subtitle_version = self.team_video.video.latest_version(
-                                language_code=self.language, public_only=False)
+        sv = self.get_subtitle_version()
 
         # TL;DR take a look at #1206 to know why i did this
-        if self.workflow.allows_tasks and not self._can_publish_directly(subtitle_version):
+        if self.workflow.allows_tasks and not self._can_publish_directly(sv):
             if self.workflow.review_enabled:
                 task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=subtitle_version,
-                            review_base_version=subtitle_version,
+                            new_subtitle_version=sv,
+                            new_review_base_version=sv,
                             language=self.language, type=Task.TYPE_IDS['Review'],
                             assignee=self._find_previous_assignee('Review'))
                 task.set_expiration()
@@ -1904,22 +1903,19 @@ class Task(models.Model):
             elif self.workflow.approve_enabled:
                 # The review step may be disabled.  If so, we check the approve step.
                 task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=subtitle_version,
-                            review_base_version=subtitle_version,
+                            new_subtitle_version=sv,
+                            new_review_base_version=sv,
                             language=self.language, type=Task.TYPE_IDS['Approve'],
                             assignee=self._find_previous_assignee('Approve'))
                 task.set_expiration()
                 task.save()
         else:
-            # Translation task is done, and there is no approval or review
-            # required, so we mark the version as approved.
-            subtitle_version.moderation_status = MODERATION.APPROVED
-            subtitle_version.save()
+            self._publicize(self.assignee, sv)
 
             # We need to make sure this is updated correctly here.
             from apps.videos import metadata_manager
             metadata_manager.update_metadata(self.team_video.video.pk)
-            upload_subtitles_to_original_service.delay(subtitle_version.pk)
+            upload_subtitles_to_original_service.delay(sv.pk)
 
             task = None
 
@@ -1928,6 +1924,7 @@ class Task(models.Model):
     def _complete_review(self):
         """Handle the messy details of completing a review task."""
         approval = self.approved == Task.APPROVED_IDS['Approved']
+        sv = self.get_subtitle_version()
 
         self._add_comment()
 
@@ -1938,8 +1935,8 @@ class Task(models.Model):
                 # If the reviewer thought these subtitles were good we create
                 # the next task.
                 task = Task(team=self.team, team_video=self.team_video,
-                            subtitle_version=self.subtitle_version,
-                            review_base_version=self.subtitle_version,
+                            new_subtitle_version=sv,
+                            new_review_base_version=sv,
                             language=self.language, type=Task.TYPE_IDS['Approve'],
                             assignee=self._find_previous_assignee('Approve'))
                 task.set_expiration()
@@ -1960,11 +1957,11 @@ class Task(models.Model):
                 # If the subtitles are okay, go ahead and autocreate translation
                 # tasks if necessary.
                 if self.workflow.autocreate_translate:
-                    _create_translation_tasks(self.team_video, self.subtitle_version)
+                    _create_translation_tasks(self.team_video, sv)
 
                 # Notify the appropriate users and external services.
                 notifier.reviewed_and_published.delay(self.pk)
-                upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
+                upload_subtitles_to_original_service.delay(sv.pk)
             else:
                 # Send the subtitles back for improvement.
                 self._send_back()
@@ -1972,13 +1969,14 @@ class Task(models.Model):
         # Before we go, we need to record who reviewed these subtitles, so if
         # necessary we can "send back" to them later.
         if self.assignee:
-            self.subtitle_version.set_reviewed_by(self.assignee)
+            sv.set_reviewed_by(self.assignee)
 
         return task
 
     def _complete_approve(self):
         """Handle the messy details of completing an approve task."""
         approval = self.approved == Task.APPROVED_IDS['Approved']
+        sv = self.get_subtitle_version()
 
         self._add_comment()
 
@@ -1988,10 +1986,10 @@ class Task(models.Model):
 
             # Create translation tasks if necessary.
             if self.workflow.autocreate_translate:
-                _create_translation_tasks(self.team_video, self.subtitle_version)
+                _create_translation_tasks(self.team_video, sv)
 
             # And send them back to the original service.
-            upload_subtitles_to_original_service.delay(self.subtitle_version.pk)
+            upload_subtitles_to_original_service.delay(sv.pk)
         else:
             # Send the subtitles back for improvement.
             self._send_back()
@@ -1999,7 +1997,7 @@ class Task(models.Model):
         # Before we go, we need to record who approved these subtitles, so if
         # necessary we can "send back" to them later.
         if self.assignee:
-            self.subtitle_version.set_approved_by(self.assignee)
+            sv.set_approved_by(self.assignee)
 
         # Notify the appropriate users.
         notifier.approved_notification.delay(self.pk, approval)
@@ -2052,26 +2050,33 @@ class Task(models.Model):
             self.expiration_date = datetime.datetime.now() + limit
 
     def get_subtitle_version(self):
-        """ Gets the subtitle version related to this task.
-        If the task has a subtitle_version attached, return it and
-        if not, try to find it throught the subtitle language of the video.
+        """Return the NewSubtitleVersion for this task.
 
-        Note: we need this since we don't attach incomplete subtitle_version
-        to the task (and if we do we need to set the status to unmoderated and
-        that causes the version to get published).
+        If the task has a subtitle_version attached, return it and if not, try
+        to find the latest version through the subtitle language of the video.
+
         """
-
         # autocreate sets the subtitle_version to another
         # language's subtitle_version and that was breaking
         # not only the interface but the new upload method.
-        if self.subtitle_version and \
-                self.subtitle_version.language.language == self.language:
-            return self.subtitle_version
+        has_version = (self.new_subtitle_version and
+                       self.new_subtitle_version.language_code == self.language)
+        if has_version:
+            return self.new_subtitle_version
 
+        # Otherwise we need to look up the NewSubtitleVersion for this task.  We
+        # get the tipmost version for the appropriate video/language, and we
+        # cache it for speed.
         if not hasattr(self, "_subtitle_version"):
-            video = Video.objects.get(teamvideo=self.team_video_id)
-            language = video.subtitle_language(self.language)
-            self._subtitle_version = language.version(public_only=False) if language else None
+            try:
+                self._subtitle_version = (
+                    NewSubtitleVersion.objects
+                                      .filter(video=self.team_video.video,
+                                              language_code=self.language)
+                                      .order_by('-version_number')[:1].get()
+                )
+            except NewSubtitleVersion.DoesNotExist:
+                self._subtitle_version = None
 
         return self._subtitle_version
 

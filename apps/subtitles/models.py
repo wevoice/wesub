@@ -27,6 +27,7 @@ from django.db import models
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
+from apps.subtitles import shims
 from apps.auth.models import CustomUser as User
 from apps.videos.models import Video
 from babelsubs.storage import SubtitleSet
@@ -578,6 +579,7 @@ class SubtitleLanguage(models.Model):
 
         Right now, we're only allowing for 1 source language, but that
         could be revisited in the future.
+
         """
         tip_version = self.get_tip()
         if not tip_version:
@@ -596,8 +598,8 @@ class SubtitleLanguage(models.Model):
 
         Right now, we're only allowing for 1 source language, but that
         could be revisited in the future.
-        """
 
+        """
         source_lc = self.get_translation_source_language_code()
 
         if not source_lc:
@@ -608,6 +610,11 @@ class SubtitleLanguage(models.Model):
                 video=self.video, language_code=source_lc)
         except (SubtitleLanguage.DoesNotExist, IndexError):
             return None
+
+
+    def get_widget_url(self, mode=None, task_id=None):
+        """SHIM for getting the widget URL for this language."""
+        return shims.get_widget_url(self, mode, task_id)
 
 
 # SubtitleVersions ------------------------------------------------------------
@@ -955,6 +962,95 @@ class SubtitleVersion(models.Model):
 
         """
         return self.subtitle_language.subtitleversion_set
+
+
+    # Metadata
+    def _get_metadata(self, key):
+        """Return the metadata for this version for the given key, or None."""
+        try:
+            m = self.metadata.get(key=SubtitleVersionMetadata.KEY_IDS[key])
+            return m.get_data()
+        except SubtitleVersionMetadata.DoesNotExist:
+            return None
+
+
+    def get_reviewed_by(self):
+        """Return the User that reviewed this version, or None.  Hits the DB."""
+        return self._get_metadata('reviewed_by')
+
+    def get_approved_by(self):
+        """Return the User that approved this version, or None.  Hits the DB."""
+        return self._get_metadata('approved_by')
+
+    def get_workflow_origin(self):
+        """Return the step of the workflow where this version originated, or None.
+
+        Hits the DB.
+
+        May be None if this version didn't come from any workflow step.
+
+        """
+        return self._get_metadata('workflow_origin')
+
+
+    def _set_metadata(self, key, value):
+        v, created = SubtitleVersionMetadata.objects.get_or_create(
+                        subtitle_version=self,
+                        key=SubtitleVersionMetadata.KEY_IDS[key])
+        v.data = value
+        v.save()
+
+
+    def set_reviewed_by(self, user):
+        """Set the User that reviewed this version."""
+        self.language.followers.add(user)
+        self._set_metadata('reviewed_by', user.pk)
+
+    def set_approved_by(self, user):
+        """Set the User that approved this version."""
+        self._set_metadata('approved_by', user.pk)
+
+    def set_workflow_origin(self, origin):
+        """Set the step of the workflow that this version originated in."""
+        self._set_metadata('workflow_origin', origin)
+
+class SubtitleVersionMetadata(models.Model):
+    """This model is used to add extra metadata to SubtitleVersions.
+
+    This is basically a shim for the broken-ass tasks system that should go away
+    once we tear that out.  See the corresponding model of the same name in
+    videos.models for more information.
+
+    """
+    KEY_CHOICES = (
+        (100, 'reviewed_by'),
+        (101, 'approved_by'),
+        (200, 'workflow_origin'),
+    )
+    KEY_NAMES = dict(KEY_CHOICES)
+    KEY_IDS = dict([choice[::-1] for choice in KEY_CHOICES])
+
+    WORKFLOW_ORIGINS = ('transcribe', 'translate', 'review', 'approve')
+
+    key = models.PositiveIntegerField(choices=KEY_CHOICES)
+    data = models.TextField(blank=True)
+    subtitle_version = models.ForeignKey(SubtitleVersion, related_name='metadata')
+
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    modified = models.DateTimeField(auto_now=True, editable=False)
+
+    class Meta:
+        unique_together = (('key', 'subtitle_version'),)
+        verbose_name_plural = 'subtitle version metadata'
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.subtitle_version, self.get_key_display())
+
+    def get_data(self):
+        if self.get_key_display() in ['reviewed_by', 'approved_by']:
+            return User.objects.get(pk=int(self.data))
+        else:
+            return self.data
 
 
 # Collaborators ---------------------------------------------------------------
