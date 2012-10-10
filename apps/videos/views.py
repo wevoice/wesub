@@ -647,8 +647,8 @@ def video_url_remove(request):
                 output['error'] = ugettext('You have not permission delete this URL')
                 status = 403
             else:
-                if obj.original:
-                    output['error'] = ugettext('You can\'t remove original URL')
+                if obj.primary:
+                    output['error'] = ugettext('You can\'t remove primary URL')
                     status = 403
                 else:
                     # create activity record
