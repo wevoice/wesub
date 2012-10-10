@@ -304,11 +304,12 @@ class Rpc(BaseRpc):
         """
         video = models.Video.objects.get(video_id=video_id)
         team_video = video.get_team_video()
-        team = team_video.team
 
         if not team_video:
             # If there's no team video to worry about, just bail early.
             return None
+        
+        team = team_video.team
 
         if team.is_visible:
             message = _(u"These subtitles are moderated. See the %s team page for information on how to contribute." % str(team_video.team))
