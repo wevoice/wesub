@@ -556,7 +556,6 @@ def migrate(app_name='', extra=''):
             run(cmd)
 
 @task
-@lock_required
 @roles('app', 'data')
 def update_environment(extra=''):
     with Output('Updating environment'):
@@ -585,7 +584,7 @@ def _reload_app_servers(hard=False):
             sudo('service {0} restart'.format(script))
         else:
             with cd(env.app_dir):
-                #run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
+                run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
                 run('touch deploy/unisubs.wsgi')
 
 @task
@@ -606,8 +605,7 @@ def remove_disabled():
     with Output("Taking the site out of maintenance mode"):
         run('rm {0}/disabled'.format(env.app_dir))
 
-def _update_integration(run_as_sudo=True, branch=None):
-    branch = branch if branch is not None else env.revision
+def _update_integration(run_as_sudo=True, branch='dev'):
     with Output("Updating nested unisubs-integration repositories"):
         with cd(os.path.join(env.app_dir, 'unisubs-integration')), \
             settings(warn_only=True):
@@ -729,17 +727,14 @@ def _deploy(branch=None, integration_branch=None, skip_celery=False):
         with cd(env.app_dir):
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -delete")
-    # if using demo env don't restart celery as they aren't 
-    # setup by default
-    if env.environment != 'demo':
-        if skip_celery == False:
-            execute(_bounce_celery)
-        execute(_bounce_memcached)
-        ##test_services()
+    execute(update_static_media)
+    if skip_celery == False:
+        execute(_bounce_celery)
+    execute(_bounce_memcached)
+    ##test_services()
     execute(_reload_app_servers)
 
 @task
-@lock_required
 @roles('app', 'data')
 def deploy(branch=None, integration_branch=None, skip_celery=False):
     """
@@ -756,11 +751,9 @@ def deploy(branch=None, integration_branch=None, skip_celery=False):
     breakage
     """
     _deploy(branch, integration_branch, skip_celery)
-    #if env.environment not in ['dev']:
-    _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user, env.environment, datetime.utcnow()))
+    _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user, env.environment, datetime.utcnow()), env.notification_email)
 
 @task
-@lock_required
 @runs_once
 @roles('app')
 def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile=False, skip_s3=False):
@@ -771,18 +764,12 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
     :param skip_s3: Skip upload to S3 (default: False)
 
     """
-    with Output("Updating static media") as out, cd(env.app_dir):
-        media_dir = '{0}/media/'.format(env.app_dir)
-        python_exe = '{0}/bin/python'.format(env.ve_dir)
-        _git_pull()
-        execute(update_integration)
-        run('{0} deploy/create_commit_file.py'.format(python_exe))
-        if skip_compile == False:
-            out.fastprintln('Compiling...')
-            with settings(warn_only=True):
-                run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
-        if env.environment != 'dev' and skip_s3 == False:
-            out.fastprintln('Uploading to S3...')
+    python_exe = '{0}/bin/python'.format(env.ve_dir)
+    if skip_compile == False:
+        with Output("Compiling media"), cd(env.app_dir), settings(warn_only=True):
+            run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
+    if env.s3_bucket and skip_s3 == False:
+        with Output("Uploading to S3"), cd(env.app_dir):
             run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
 
 @task

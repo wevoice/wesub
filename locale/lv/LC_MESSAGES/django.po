@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-09 01:37-0500\n"
+"POT-Creation-Date: 2012-10-10 01:38-0500\n"
 "PO-Revision-Date: 2012-10-05 06:58+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/"
@@ -418,7 +418,7 @@ msgid "Unfeature teams"
 msgstr "Nepiedāvāt komandas"
 
 #: apps/teams/admin.py:81 apps/teams/admin.py:98 apps/teams/admin.py:202
-#: apps/teams/models.py:178
+#: apps/teams/models.py:179
 msgid "Team"
 msgstr "Komanda"
 
@@ -612,138 +612,138 @@ msgstr ""
 "Piedodiet, mums neizdevās augšuplielādēt Jūsu datni, jo rindiņu skaits Jūsu "
 "({0}) tulkojumā neatbilst oriģinālam ({1})."
 
-#: apps/teams/models.py:85
+#: apps/teams/models.py:86
 msgid "Open"
 msgstr "Atvērt"
 
-#: apps/teams/models.py:86 libs/rosetta/templates/rosetta/languages.html:28
+#: apps/teams/models.py:87 libs/rosetta/templates/rosetta/languages.html:28
 msgid "Application"
 msgstr "Pieteikums"
 
-#: apps/teams/models.py:87
+#: apps/teams/models.py:88
 msgid "Invitation by any team member"
 msgstr "Uzaicināt var jebkurš komandas biedrs"
 
-#: apps/teams/models.py:88
+#: apps/teams/models.py:89
 msgid "Invitation by manager"
 msgstr ""
 
-#: apps/teams/models.py:89
+#: apps/teams/models.py:90
 msgid "Invitation by admin"
 msgstr ""
 
-#: apps/teams/models.py:96
+#: apps/teams/models.py:97
 msgid "Any team member"
 msgstr "Jebkurš komandas dalībnieks"
 
-#: apps/teams/models.py:97
+#: apps/teams/models.py:98
 msgid "Managers and admins"
 msgstr "Pārvaldnieki un administratori"
 
-#: apps/teams/models.py:98
+#: apps/teams/models.py:99
 msgid "Admins only"
 msgstr "Tikai administratori"
 
-#: apps/teams/models.py:118 apps/teams/models.py:2525
+#: apps/teams/models.py:119 apps/teams/models.py:2565
 msgid "name"
 msgstr "nosaukums"
 
-#: apps/teams/models.py:119 apps/teams/models.py:2526
+#: apps/teams/models.py:120 apps/teams/models.py:2566
 msgid "slug"
 msgstr ""
 
-#: apps/teams/models.py:120
+#: apps/teams/models.py:121
 msgid "description"
 msgstr "apraksts"
 
-#: apps/teams/models.py:120
+#: apps/teams/models.py:121
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
 msgstr ""
 "Visi URL tiks pārveidoti par saitēm. Rindu pārtraukumi un HTML netiek "
 "atbalstīts."
 
-#: apps/teams/models.py:122
+#: apps/teams/models.py:123
 msgid "logo"
 msgstr "logo"
 
-#: apps/teams/models.py:123
+#: apps/teams/models.py:124
 msgid "publicly Visible?"
 msgstr "publiski redzama?"
 
-#: apps/teams/models.py:124 templates/search/search.html:152
+#: apps/teams/models.py:125 templates/search/search.html:152
 #: templates/teams/project_list.html:10
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
 msgstr "video"
 
-#: apps/teams/models.py:125
+#: apps/teams/models.py:126
 msgid "users"
 msgstr "lietotāji"
 
-#: apps/teams/models.py:128
+#: apps/teams/models.py:129
 msgid "third party accounts"
 msgstr "trešās puses konti"
 
-#: apps/teams/models.py:131
+#: apps/teams/models.py:132
 msgid "applicants"
 msgstr "dalībnieki"
 
-#: apps/teams/models.py:134
+#: apps/teams/models.py:135
 msgid "Intro Video"
 msgstr "Ievadvideo"
 
-#: apps/teams/models.py:136
+#: apps/teams/models.py:137
 msgid "Page content"
 msgstr "Lapas saturs"
 
-#: apps/teams/models.py:136
+#: apps/teams/models.py:137
 msgid "You can use markdown. This will replace Description."
 msgstr ""
 
-#: apps/teams/models.py:138
+#: apps/teams/models.py:139
 msgid "HTML that appears at the top of the teams page."
 msgstr "HTML, kas parādās komandas lapas augšpusē."
 
-#: apps/teams/models.py:141
+#: apps/teams/models.py:142
 msgid "authentication provider code"
 msgstr ""
 
-#: apps/teams/models.py:149
+#: apps/teams/models.py:150
 msgid "membership policy"
 msgstr "dalības politika"
 
-#: apps/teams/models.py:152
+#: apps/teams/models.py:153
 msgid "video policy"
 msgstr "video politika"
 
-#: apps/teams/models.py:155
+#: apps/teams/models.py:156
 msgid "task assignment policy"
 msgstr "uzdevumu piešķiršanas politika"
 
-#: apps/teams/models.py:158
+#: apps/teams/models.py:159
 msgid "subtitling policy"
 msgstr "subtitrēšanas politika"
 
-#: apps/teams/models.py:161
+#: apps/teams/models.py:162
 msgid "translation policy"
 msgstr "tulkošanas politika"
 
-#: apps/teams/models.py:164
+#: apps/teams/models.py:165
 msgid "maximum tasks per member"
 msgstr "maksimālais uzdevumu skaits dalībniekam"
 
-#: apps/teams/models.py:166
+#: apps/teams/models.py:167
 msgid "task expiration (days)"
 msgstr "uzdevuma termiņš (dienas)"
 
-#: apps/teams/models.py:179 templates/profiles/_top_user_panel.html:32
+#: apps/teams/models.py:180 templates/profiles/_top_user_panel.html:32
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "Komandas"
 
-#: apps/teams/models.py:628
+#: apps/teams/models.py:629
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -751,33 +751,33 @@ msgstr ""
 "Izmantojiet šo lauku, lai izskaidrotu, kādēļ Jūsu komanda vēlās subtitrēt šo "
 "video. Šāda informācija palielina iespēju, ka pieteiksies vairāk brīvprātīgo!"
 
-#: apps/teams/models.py:632
+#: apps/teams/models.py:633
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr ""
 "Mēs sīktēlus paņemam automātiski no konkrētām mājaslapām, piemēram, Youtube"
 
-#: apps/teams/models.py:634
+#: apps/teams/models.py:635
 msgid "Need help with all languages"
 msgstr "Nepieciešama palīdzība ar visām valodām"
 
-#: apps/teams/models.py:635
+#: apps/teams/models.py:636
 msgid "If you check this, other languages will not be displayed."
 msgstr "Ja Jūs šo atķeksējat, citas valodas netiks parādītas"
 
-#: apps/teams/models.py:921 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:922 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Īpašnieks"
 
-#: apps/teams/models.py:922 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:923 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Pārvaldītājs"
 
-#: apps/teams/models.py:923 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:924 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Administrācija"
 
-#: apps/teams/models.py:924 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:925 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Artavnieks"
 
@@ -5339,7 +5339,7 @@ msgid "Edit"
 msgstr "Labot"
 
 #: templates/teams/_team_video_detail.html:60
-#: templates/teams/members-list.html:122 templates/teams/videos-list.html:151
+#: templates/teams/members-list.html:122 templates/teams/videos-list.html:152
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
 msgstr "Noņemt"
@@ -5565,7 +5565,7 @@ msgid "Send Invites"
 msgstr "Izsūtīt uzaicinājumus"
 
 #: templates/teams/members-list.html:47 templates/teams/tasks.html:45
-#: templates/teams/videos-list.html:43
+#: templates/teams/videos-list.html:44
 msgid "Filter and Sort"
 msgstr "Filtrēt un šķirot"
 
@@ -5600,7 +5600,7 @@ msgstr "visām valodām"
 
 #: templates/teams/members-list.html:72 templates/teams/tasks.html:126
 #: templates/teams/tasks.html.py:133 templates/teams/tasks.html:140
-#: templates/teams/videos-list.html:92
+#: templates/teams/videos-list.html:93
 msgid "Clear"
 msgstr "Subtitrēt video"
 
@@ -5872,7 +5872,7 @@ msgstr "Tulkojamie"
 msgid "tasks in"
 msgstr "uzdevumi"
 
-#: templates/teams/tasks.html:68 templates/teams/videos-list.html:52
+#: templates/teams/tasks.html:68 templates/teams/videos-list.html:53
 msgid "any project"
 msgstr "jebkurā projektā"
 
@@ -5896,7 +5896,7 @@ msgstr "man"
 msgid "anyone"
 msgstr "visiem"
 
-#: templates/teams/tasks.html:106 templates/teams/videos-list.html:68
+#: templates/teams/tasks.html:106 templates/teams/videos-list.html:69
 msgid "sorted by"
 msgstr "šķirot pēc"
 
@@ -6208,75 +6208,75 @@ msgstr ""
 "uz <a href=\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
 "            "
 
-#: templates/teams/videos-list.html:40
+#: templates/teams/videos-list.html:41
 msgid "Add Video"
 msgstr "Pievienot video"
 
-#: templates/teams/videos-list.html:50
+#: templates/teams/videos-list.html:51
 msgid "Videos in"
 msgstr "Video"
 
-#: templates/teams/videos-list.html:57 templates/videos/subtitle-view.html:43
+#: templates/teams/videos-list.html:58 templates/videos/subtitle-view.html:43
 #: templates/videos/subtitle-view.html:45
 msgid "with"
 msgstr ""
 
-#: templates/teams/videos-list.html:59
+#: templates/teams/videos-list.html:60
 msgid "any"
 msgstr "jebkuras valodas"
 
-#: templates/teams/videos-list.html:60
+#: templates/teams/videos-list.html:61
 msgid "no"
 msgstr "nekādas valodas"
 
-#: templates/teams/videos-list.html:65 templates/videos/subtitle-view.html:43
+#: templates/teams/videos-list.html:66 templates/videos/subtitle-view.html:43
 #: templates/videos/subtitle-view.html:45
 #: templates/videos/subtitle-view.html:72
 msgid "subtitles"
 msgstr "subtitri"
 
-#: templates/teams/videos-list.html:71
+#: templates/teams/videos-list.html:72
 msgid "name, a-z"
 msgstr "nosaukums, a-z"
 
-#: templates/teams/videos-list.html:74
+#: templates/teams/videos-list.html:75
 msgid "name, z-a"
 msgstr "nosaukums, z-a"
 
-#: templates/teams/videos-list.html:77
+#: templates/teams/videos-list.html:78
 msgid "time, newest"
 msgstr "laiks, jaunākie"
 
-#: templates/teams/videos-list.html:80
+#: templates/teams/videos-list.html:81
 msgid "time, oldest"
 msgstr "laiks, vecākie"
 
-#: templates/teams/videos-list.html:83
+#: templates/teams/videos-list.html:84
 msgid "most subtitles"
 msgstr "visvairāk subtitru"
 
-#: templates/teams/videos-list.html:86
+#: templates/teams/videos-list.html:87
 msgid "least subtitles"
 msgstr "vismazāk subtitru"
 
-#: templates/teams/videos-list.html:108
+#: templates/teams/videos-list.html:109
 msgid "Rebuilding video index. Please try again in a few minutes"
 msgstr ""
 
-#: templates/teams/videos-list.html:110
+#: templates/teams/videos-list.html:111
 msgid "Sorry, no videos here"
 msgstr "Piedodiet, nav nekādu video"
 
-#: templates/teams/videos-list.html:121
+#: templates/teams/videos-list.html:122
 msgid "Remove video"
 msgstr "Dzēst video"
 
-#: templates/teams/videos-list.html:128
+#: templates/teams/videos-list.html:129
 #, python-format
 msgid "You are removing this video from the %(team)s team."
 msgstr "Jūs noņemat šo video no %(team)s komandas."
 
-#: templates/teams/videos-list.html:129
+#: templates/teams/videos-list.html:130
 #, python-format
 msgid ""
 "You are removing this video from the %(team)s team.<br /><br />\n"
@@ -6286,7 +6286,7 @@ msgid ""
 "editing to the general public. Are you sure you want to proceed?"
 msgstr ""
 
-#: templates/teams/videos-list.html:132
+#: templates/teams/videos-list.html:133
 #, python-format
 msgid ""
 "You can choose to remove the video from the %(team)s team or to delete the "
@@ -6296,17 +6296,17 @@ msgstr ""
 "Jūs varat izvēlēties izņemt video no %(team)s komandas vai video (un visus "
 "tā subtitrus) pilnībā dzēst no sistēmas. Ko Jūs vēlētos darīt?"
 
-#: templates/teams/videos-list.html:135
+#: templates/teams/videos-list.html:136
 msgid "Just remove the video from the team."
 msgstr "Vienkārši noņemiet video no komandas."
 
-#: templates/teams/videos-list.html:137
+#: templates/teams/videos-list.html:138
 msgid ""
 "It will remain on Amara but will no longer be subject to the team's "
 "permissions and worfklows. Any outstanding tasks will be deleted."
 msgstr ""
 
-#: templates/teams/videos-list.html:140
+#: templates/teams/videos-list.html:141
 msgid "Delete the video entirely."
 msgstr "Pilnībā dzēst video"
 
