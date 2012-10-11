@@ -1983,8 +1983,8 @@ class Task(models.Model):
     def get_perform_url(self):
         '''Return the URL that will open whichever dialog is necessary to perform this task.'''
         mode = Task.TYPE_NAMES[self.type].lower()
-        if self.subtitle_version:
-            base_url = self.subtitle_version.language.get_widget_url(mode, self.pk)
+        if self.get_subtitle_version():
+            base_url = self.get_subtitle_version().language.get_widget_url(mode, self.pk)
         else:
             video = self.team_video.video
             if self.language and video.subtitle_language(self.language) :
@@ -2434,15 +2434,21 @@ class BillingReport(models.Model):
             if not language.is_complete or language.percent_done < 97:
                 return False
 
-        if (version.datetime_started <= start or
-                version.datetime_started >= end):
-            return False
+            if (version.datetime_started <= start or
+                    version.datetime_started >= end):
+                return False
 
         return True
 
     def _get_lang_data(self, languages, start_date):
-        lang_data = [(language, language.latest_version()) for language in
-                languages]
+        workflow = self.team.get_workflow()
+
+        if workflow.approve_enabled:
+            lang_data = [(language, language.first_approved_version) for
+                                                language in languages]
+        else:
+            lang_data = [(language, language.latest_version()) for
+                                                language in languages]
 
         old_version_counter = 1
 
