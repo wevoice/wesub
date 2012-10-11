@@ -1814,7 +1814,7 @@ class TestTasks(TestCase):
             self.assertFalse(message.user in list(lan2_followers))
 
 class TestAlert(TestCase):
-    fixtures = ['test.json']
+    fixtures = ['test.json', 'subtitle_fixtures.json']
 
     def setUp(self):
         self.video = Video.objects.all()[:1].get()
@@ -1838,45 +1838,6 @@ class TestAlert(TestCase):
         self._new_version(l)
         alarms.check_other_languages_changes(v, ignore_statistic=True)
         self.assertEquals(len(mail.outbox), 1)
-
-    def test_check_language_name_success(self):
-        self.original_language.language = 'en'
-        self.original_language.save()
-
-        v = self._new_version()
-
-        Subtitle(version=v, subtitle_id=u'AaAaAaAaAa', subtitle_text='Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.').save()
-        Subtitle(version=v, subtitle_id=u'BaBaBaBaBa', subtitle_text='Developed four years ago by a fast-moving online-news operation').save()
-
-        alarms.check_language_name(v, ignore_statistic=True)
-
-        self.assertEquals(len(mail.outbox), 0)
-
-    def test_check_language_name_fail(self):
-        self.original_language.language = 'en'
-        self.original_language.save()
-        # disabling this test for now, since the google ajax api
-        # is returning 403s
-        return
-        v = self._new_version()
-
-        #this is reliable Ukrainian language
-        Subtitle(version=v, subtitle_id=u'AaAaAaAaAa1', subtitle_text=u'Якась не зрозумiла мова.').save()
-        Subtitle(version=v, subtitle_id=u'BaBaBaBaBa1', subtitle_text='Якась не зрозумiла мова.').save()
-
-        alarms.check_language_name(v, ignore_statistic=True)
-
-        self.assertEquals(len(mail.outbox), 1)
-
-        v = self._new_version()
-
-        #this one is unreliable
-        Subtitle(version=v, subtitle_id=u'AaAaAaAaAa2', subtitle_text=u'Яsdasdзроasdзумiddаsda.').save()
-        Subtitle(version=v, subtitle_id=u'BaBaBaBaBa2', subtitle_text='Якasdсьadsdе sdзрdмiлasdва.').save()
-
-        alarms.check_language_name(v, ignore_statistic=True)
-
-        self.assertEquals(len(mail.outbox), 2)
 
 class TestModelsSaving(TestCase):
 

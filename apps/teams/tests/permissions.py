@@ -825,7 +825,7 @@ class TestRules(BaseTestPermission):
                 self.assertTrue(can_create_task_subtitle(self.nonproject_video, user))
 
         # Once subtitles exist, no one can create a new task.
-        _set_subtitles(self.nonproject_video, 'en', True, True)
+        helpers._add_language_via_pipeline(self.nonproject_video.video, 'en')
 
         self.assertFalse(can_create_task_subtitle(self.nonproject_video))
 

@@ -12,6 +12,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from apps.auth.models import  CustomUser
 from django.db import transaction
 
+from subtitles import pipeline            
+
+import babelsubs
 
 import logging
 logger = logging.getLogger("test-fixture-loading")
@@ -121,6 +124,14 @@ def _add_langs_to_video(video, props):
     for prop in props:
         _add_lang_to_video(video, prop)
 
+def _add_language_via_pipeline(video, lang):
+
+    SRT = u"""1
+00:00:00,004 --> 00:00:02,093
+We\n started <b>Universal Subtitles</b> <i>because</i> we <u>believe</u>
+"""
+    subtitles = babelsubs.load_from(SRT, type='srt', language='en').to_internal()
+    return pipeline.add_subtitles(video, lang, subtitles)
 
 def _create_videos(video_data, users):
     videos = []
