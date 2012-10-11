@@ -84,7 +84,8 @@
             "widget_views_count": 0,
             "subtitles_fetched_count": 0,
             "created": "2010-11-01 17:39:58",
-            "languages_count": 1
+            "languages_count": 1,
+            "primary_audio_language_code": "en"
         }
     },
     {
@@ -105,7 +106,8 @@
             "widget_views_count": 0,
             "created": "2010-11-01 17:39:58",
             "subtitles_fetched_count": 0,
-            "languages_count": 1
+            "languages_count": 1,
+            "primary_audio_language_code": "en"
         }
     },
     {
@@ -126,7 +128,8 @@
             "widget_views_count": 0,
             "subtitles_fetched_count": 0,
             "languages_count": 1,
-            "created": "2011-01-30 08:54:43"
+            "created": "2011-01-30 08:54:43",
+            "primary_audio_language_code": "en"
         }
     },
     {
