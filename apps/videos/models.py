@@ -27,7 +27,7 @@ import time
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.db.models import Q
 from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
@@ -2480,9 +2480,16 @@ class VideoUrl(models.Model):
             self.created = datetime.now()
         super(VideoUrl, self).save(*args, **kwargs)
 
+def video_url_remove_handler(sender, instance, **kwargs):
+    print('Invalidating cache')
+    video_cache.invalidate_cache(instance.video.video_id)
 
+
+models.signals.pre_save.connect(create_video_id, sender=Video)
+models.signals.pre_delete.connect(video_delete_handler, sender=Video)
 post_save.connect(Action.create_video_url_handler, VideoUrl)
 post_save.connect(video_cache.on_video_url_save, VideoUrl)
+pre_delete.connect(video_cache.on_video_url_delete, VideoUrl)
 
 
 # VideoFeed

@@ -116,6 +116,10 @@ def on_video_url_save(sender, instance, **kwargs):
     if instance.video_id:
         invalidate_cache(instance.video.video_id)
 
+def on_video_url_delete(sender, instance, **kwargs):
+    if instance.video and instance.video.video_id:
+        invalidate_cache(instance.video.video_id)
+
 def _video_id_key(video_url):
     return 'video_id_{0}'.format(sha_constructor(video_url).hexdigest())
 
