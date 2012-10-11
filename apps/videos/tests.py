@@ -2503,49 +2503,6 @@ class BaseDownloadTest(object):
         self.assertEqual(res.status_code, 200)
         return res.content
 
-class SRTTest(WebUseTest, BaseDownloadTest):
-    fixtures = ['test.json']
-
-    def setUp(self):
-        self.auth = dict(username='admin', password='admin')
-        self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
-        self.language = sub_models.SubtitleLanguage.objects.get_or_create(
-            video=self.video,  language_code='en')[0]
-
-    def test_download_markup(self):
-        subs_data = ['one line',
-                     'line <b>with</b> bold',
-                     'line <i>with</i> italycs',
-                     'line with double gt >>',
-                     '<i>[inside brackets]</i>',
-        ]
-        quick_add_subs(self.language,subs_data, escape=True)
-        content = self._download_subs(self.language, 'srt')
-        self.assertIn('<b>with</b>' , content)
-        self.assertIn('<i>[inside brackets]</i>' , content)
-        self.assertIn('<i>with</i>' , content)
-        self.assertIn('double gt >>' , content)
-        # don't let evildoes into our precisou home
-        self.assertNotIn('<script>' , content)
-        subs = [x for x in SrtSubtitleParser(content)]
-        # make sure we can parse them back
-        self.assertEqual(len(subs_data), len(subs))
-
-    def test_upload_markup(self):
-        data = {
-            'language': self.language.language_code,
-            'video': self.video.pk,
-            'video_language': 'en',
-            'draft': open(os.path.join(os.path.dirname(__file__), 'fixtures/with-markdown.srt'))
-        }
-        self._login()
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-        subs = self.video.subtitle_language().version().subtitles()
-        self.assertIn("**bold text in it**", subs[0].text)
-        self.assertIn(" *multiline\nitalics*", subs[1].text)
-        self.assertNotIn("script", subs[2].text)
-
 class DFXPTest(WebUseTest, BaseDownloadTest):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
