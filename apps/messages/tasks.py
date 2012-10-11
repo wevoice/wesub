@@ -636,7 +636,8 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
 
     """
     from comments.models import Comment
-    from videos.models import Video, SubtitleLanguage, SubtitleVersion
+    from videos.models import Video
+    from subtitles.models import SubtitleLanguage, SubtitleVersion
 
     if not isinstance(comment_pk_or_instance, Comment):
         try:
@@ -670,7 +671,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     if language:
         language_url = universal_url("videos:translation_history", kwargs={
             "video_id": video.video_id,
-            "lang": language.language,
+            "lang": language.language_code,
             "lang_id": language.pk,
         })
     else:
@@ -679,7 +680,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     if version:
         version_url = universal_url("videos:subtitleversion_detail", kwargs={
             'video_id': version.video.video_id,
-            'lang': version.language.language,
+            'lang': version.language.language_code,
             'lang_id': version.language.pk,
             'version_id': version.pk,
         })
@@ -689,9 +690,6 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=unicode(comment.user), title=video.title_display())
 
     followers = set(video.notification_list(comment.user))
-
-    if language:
-        followers.update(language.notification_list(comment.user))
 
     for user in followers:
         Meter('templated-emails-sent-by-type.new-comment-notification').inc()
@@ -719,9 +717,11 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
         obj = language
         object_pk = language.pk
         content_type = ContentType.objects.get_for_model(language)
-        exclude = list(language.followers.filter(notify_by_message=False))
+        exclude = [c.user for c in language.collaborator_set
+                                           .filter(user__notify_by_message=False)
+                                           .values_list("user")]
         exclude.append(comment.user)
-        message_followers = language.notification_list(exclude)
+        message_followers = [c.user for c in language.collaborator_set.exclude(user__in=exclude)]
     else:
         obj = video
         object_pk = video.pk
