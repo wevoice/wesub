@@ -28,7 +28,7 @@ import time
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.db.models import Q
 from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
@@ -1192,6 +1192,16 @@ class SubtitleLanguage(models.Model):
         if version:
             return version[0].unpublish(delete=delete)
 
+    def first_version_with_status(self, status):
+        try:
+            return self.subtitleversion_set.filter(
+                    moderation_status=status).order_by('datetime_started')[0]
+        except IndexError:
+            return None
+
+    @property
+    def first_approved_version(self):
+        return self.first_version_with_status(APPROVED)
 
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 
@@ -2476,9 +2486,16 @@ class VideoUrl(models.Model):
             self.created = datetime.now()
         super(VideoUrl, self).save(*args, **kwargs)
 
+def video_url_remove_handler(sender, instance, **kwargs):
+    print('Invalidating cache')
+    video_cache.invalidate_cache(instance.video.video_id)
 
+
+models.signals.pre_save.connect(create_video_id, sender=Video)
+models.signals.pre_delete.connect(video_delete_handler, sender=Video)
 post_save.connect(Action.create_video_url_handler, VideoUrl)
 post_save.connect(video_cache.on_video_url_save, VideoUrl)
+pre_delete.connect(video_cache.on_video_url_delete, VideoUrl)
 
 
 # VideoFeed
