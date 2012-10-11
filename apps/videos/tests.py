@@ -307,6 +307,25 @@ class BusinessLogicTest(TestCase):
             self.assertEqual(ens.end_time, frs.end_time)
         self.assertFalse(fr.is_forked)
 
+    def test_first_approved(self):
+        from apps.teams.moderation_const import APPROVED
+        language = SubtitleLanguage.objects.all()[0]
+
+        for i in range(1, 10):
+            SubtitleVersion.objects.create(language=language,
+                    datetime_started=datetime(2012, 1, i, 0, 0, 0),
+                    version_no=i)
+
+        v1 = SubtitleVersion.objects.get(language=language, version_no=3)
+        v2 = SubtitleVersion.objects.get(language=language, version_no=6)
+
+        v1.moderation_status = APPROVED
+        v1.save()
+        v2.moderation_status = APPROVED
+        v2.save()
+
+        self.assertEquals(v1.pk, language.first_approved_version.pk)
+
 
 class SubtitleParserTest(TestCase):
     def _assert_sub(self, sub, start_time, end_time, sub_text):

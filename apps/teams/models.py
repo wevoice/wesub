@@ -2434,15 +2434,21 @@ class BillingReport(models.Model):
             if not language.is_complete or language.percent_done < 97:
                 return False
 
-        if (version.datetime_started <= start or
-                version.datetime_started >= end):
-            return False
+            if (version.datetime_started <= start or
+                    version.datetime_started >= end):
+                return False
 
         return True
 
     def _get_lang_data(self, languages, start_date):
-        lang_data = [(language, language.latest_version()) for language in
-                languages]
+        workflow = self.team.get_workflow()
+
+        if workflow.approve_enabled:
+            lang_data = [(language, language.first_approved_version) for
+                                                language in languages]
+        else:
+            lang_data = [(language, language.latest_version()) for
+                                                language in languages]
 
         old_version_counter = 1
 
