@@ -26,7 +26,7 @@ unisubs.timeline.TimelineSub = function(
 {
     goog.ui.Component.call(this);
     this.subtitle_ = subtitle;
-    this.pixelsPerMillisecond_ = pixelsPerSecond / 1000;
+    this.pixelsPerMillisecond_ = pixelsPerSecond  / 1000;
     this.pixelOffset_ = opt_pixelOffset ? opt_pixelOffset : 0;
     this.editing_ = false;
     this.documentEventHandler_ = new goog.events.EventHandler(this);
