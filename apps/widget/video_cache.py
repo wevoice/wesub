@@ -118,7 +118,6 @@ def on_video_url_save(sender, instance, **kwargs):
 
 def on_video_url_delete(sender, instance, **kwargs):
     if instance.video_id:
-        print('Invalidating cache')
         invalidate_cache(instance.video.video_id)
 
 def _video_id_key(video_url):
