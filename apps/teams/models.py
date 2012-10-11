@@ -2516,8 +2516,8 @@ class BillingReport(models.Model):
 
         rows = self._get_row_data(host, header)
 
-        fn = '/tmp/bill-%s-%s-%s.csv' % (self.team.slug, self.start_str,
-                self.end_str)
+        fn = '/tmp/bill-%s-%s-%s-%s.csv' % (self.team.slug, self.start_str,
+                self.end_str, self.pk)
 
         with open(fn, 'w') as f:
             writer = csv.writer(f)

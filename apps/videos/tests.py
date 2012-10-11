@@ -957,10 +957,13 @@ class ViewsTest(WebUseTest):
         self.assertEqual(len(Action.objects.filter(video=v, \
             action_type=Action.DELETE_URL)), 1)
 
-    def test_video_url_deny_remove_original(self):
+    def test_video_url_deny_remove_primary(self):
         self._login()
         v = Video.objects.get(video_id='iGzkk7nwWX8F')
         vurl_id = VideoUrl.objects.filter(video=v)[0].id
+        # make primary
+        vu = VideoUrl.objects.filter(video=v)
+        vu[0].make_primary()
         response = self.client.post(reverse('videos:video_url_remove'), {'id': vurl_id})
         self.assertEqual(response.status_code, 403)
         self.assertEqual(len(VideoUrl.objects.filter(video=v)), 1)
