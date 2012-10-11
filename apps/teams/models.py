@@ -715,8 +715,10 @@ class TeamVideo(models.Model):
     # Convenience functions
     def subtitles_started(self):
         """Return whether subtitles have been started for this video."""
-        sl = self.video.subtitle_language()
-        return True if sl and sl.had_version else False
+        from subtitles.models import SubtitleLanguage
+        return (SubtitleLanguage.objects.having_nonempty_versions()
+                                       .filter(video=self.video)
+                                       .exists())
 
     def subtitles_finished(self):
         """Return whether at least one set of subtitles has been finished for this video."""
