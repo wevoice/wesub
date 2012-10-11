@@ -27,7 +27,7 @@ import time
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
 from django.db import models
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, pre_delete
 from django.db.models import Q
 from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
@@ -2489,7 +2489,7 @@ models.signals.pre_save.connect(create_video_id, sender=Video)
 models.signals.pre_delete.connect(video_delete_handler, sender=Video)
 post_save.connect(Action.create_video_url_handler, VideoUrl)
 post_save.connect(video_cache.on_video_url_save, VideoUrl)
-post_delete.connect(video_cache.on_video_url_delete, VideoUrl)
+pre_delete.connect(video_cache.on_video_url_delete, VideoUrl)
 
 
 # VideoFeed
