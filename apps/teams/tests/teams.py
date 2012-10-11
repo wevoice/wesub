@@ -159,7 +159,7 @@ class TestNotification(TestCase):
 
 class TestTasks(TestCase):
 
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
+    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json", 'subtitle_fixtures.json']
 
     def setUp(self):
         self.tv = TeamVideo.objects.all()[0]
@@ -171,7 +171,7 @@ class TestTasks(TestCase):
 
 class TeamVideoTest(TestCase):
 
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
+    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json", 'subtitle_fixtures.json']
 
     def setUp(self):
         self.auth = {
@@ -446,11 +446,7 @@ class TeamsTest(TestCase):
         create_two_sub_session(request, completed=True)
 
         team, new_team_video = self._create_new_team_video()
-        en = new_team_video.video.subtitle_language()
-        en.is_complete = True
-        en.save()
-        video = Video.objects.get(id=en.video.id)
-        self.assertEqual(True, video.is_complete)
+        video = Video.objects.get(id=new_team_video.video.id)
 
         # We have to update the metadata here to make sure the video is marked
         # as complete for Solr.
@@ -563,7 +559,7 @@ class TeamsTest(TestCase):
         self.assertEqual(2, len(search_record_list))
 
         # but the one with en subs should be second, since it was added earlier
-        self.assertEqual('en', search_record_list[1].original_language)
+        self.assertEqual(new_team_video, search_record_list[1].object)
 
     def test_one_tvl(self):
         team, new_team_video = self._create_new_team_video()
