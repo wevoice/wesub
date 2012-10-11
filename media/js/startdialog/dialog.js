@@ -258,6 +258,12 @@ unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
         goog.dom.forms.setValue(renderedToLanguages, next.value);
         selected = goog.dom.getChildren(renderedToLanguages)[renderedToLanguages.selectedIndex];
     }
+
+    // If this is a first-time translate task, set the to-language to the
+    // language that we're translating into.
+    if (window.TASK_TRANSLATE_TO_LANGUAGE) {
+        goog.dom.forms.setValue(renderedToLanguages, window.TASK_TRANSLATE_TO_LANGUAGE);
+    }
 };
 unisubs.startdialog.Dialog.prototype.addFromLanguageSection_ = function($d) {
     this.fromContainer_ = $d('span');
