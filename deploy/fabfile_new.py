@@ -263,7 +263,7 @@ def dev(username):
                     notification_email   = 'ehazlett@pculture.org',)
 
 @task
-def demo(username, revision):
+def demo(username, revision=None):
     """
     Configure task(s) to run in the demo environment
 
@@ -821,12 +821,14 @@ def switch_branch(branch):
         _switch_branch(branch)
 
 @parallel
-def _clone_repo_demo(revision='dev', integration_revision='dev'):
+def _clone_repo_demo(revision='dev', integration_revision=None):
     run('git clone https://github.com/pculture/unisubs.git /var/tmp/{0}/unisubs'.format(\
         revision))
     with cd('/var/tmp/{0}/unisubs'.format(revision)):
         run('git checkout --force {0}'.format(revision))
     sudo('git clone git@github.com:pculture/unisubs-integration.git /var/tmp/{0}/unisubs/unisubs-integration'.format(revision))
+    if not integration_revision:
+        integration_revision = _get_optional_repo_version(env.app_dir, 'unisubs-integration')
     with cd('/var/tmp/{0}/unisubs/unisubs-integration'.format(revision)):
         sudo('git checkout --force {0}'.format(integration_revision))
     # build virtualenv
@@ -845,11 +847,10 @@ def _clone_repo_demo(revision='dev', integration_revision='dev'):
 
 @task
 @parallel
-def create_demo(revision='dev', integration_revision='dev', skip_media=False):
+def create_demo(integration_revision=None, skip_media=False):
     """
     Deploys the specified revision for live testing
 
-    :param revision: Revision to test
     :param integration_revision: Integrations revision to test
     :param skip_media: Skip media compilation (default: False)
 
@@ -859,6 +860,7 @@ def create_demo(revision='dev', integration_revision='dev', skip_media=False):
         'data': 'data-00-dev.amara.org',
     }
     env.hosts = hosts.values()
+    revision = env.revision
     with Output("Creating app directories"):
         for k,v in hosts.iteritems():
             env.host_string = v
@@ -915,7 +917,7 @@ def create_demo(revision='dev', integration_revision='dev', skip_media=False):
     print('\nDone. Demo should be available at http://{0}.demo.amara.org'.format(revision))
 
 @task
-def remove_demo(revision='dev'):
+def remove_demo():
     """
     Removes live testing demo
 
@@ -927,6 +929,7 @@ def remove_demo(revision='dev'):
         'data': 'data-00-dev.amara.org',
     }
     env.host_string = hosts['app']
+    revision = env.revision
     # remove demo
     with Output("Stopping uWSGI"):
         with settings(warn_only=True):
