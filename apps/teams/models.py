@@ -1984,7 +1984,7 @@ class Task(models.Model):
         '''Return the URL that will open whichever dialog is necessary to perform this task.'''
         mode = Task.TYPE_NAMES[self.type].lower()
         if self.get_subtitle_version():
-            base_url = self.subtitle_version.language.get_widget_url(mode, self.pk)
+            base_url = self.get_subtitle_version().language.get_widget_url(mode, self.pk)
         else:
             video = self.team_video.video
             if self.language and video.subtitle_language(self.language) :
