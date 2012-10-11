@@ -1423,3 +1423,63 @@ class PartnerTest(TestCase):
         self.assertFalse(partner.is_admin(user))
         partner.admins.add(user)
         self.assertTrue(partner.is_admin(user))
+
+
+
+class BillingTest(TestCase):
+
+    fixtures = [
+        "staging_users.json",
+        "staging_videos.json",
+        "staging_teams.json"
+    ]
+
+    def test_approved(self):
+        from apps.teams.models import Workflow, BillingReport
+        from apps.teams.moderation_const import APPROVED
+        from videos.models import SubtitleVersion
+
+        self.assertEquals(0, Workflow.objects.count())
+
+        team = Team.objects.all()[0]
+        team.workflow_enabled = True
+        team.save()
+
+        Workflow.objects.create(team=team, approve_allowed=20)
+
+        self.assertEquals(1, Workflow.objects.count())
+        self.assertTrue(team.get_workflow().approve_enabled)
+
+        language = SubtitleLanguage.objects.all()[0]
+
+        for i in range(1, 10):
+            SubtitleVersion.objects.create(language=language,
+                    datetime_started=datetime(2012, 1, i, 0, 0, 0),
+                    version_no=i)
+
+        v1 = SubtitleVersion.objects.get(language=language, version_no=3)
+        v2 = SubtitleVersion.objects.get(language=language, version_no=6)
+
+        v1.moderation_status = APPROVED
+        v1.save()
+        v2.moderation_status = APPROVED
+        v2.save()
+
+        b = BillingReport.objects.create(team=team,
+                start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
+
+        langs = language.video.subtitlelanguage_set.all()
+        data, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
+
+        self.assertEquals(1, len(data))
+
+        v = data[0][1]
+        self.assertEquals(v.version_no, 3)
+
+        team.workflow_enabled = False
+        team.save()
+
+        data, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
+        self.assertEquals(1, len(data))
+        v = data[0][1]
+        self.assertEquals(v.version_no, 9)

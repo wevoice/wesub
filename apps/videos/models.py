@@ -1209,6 +1209,16 @@ class SubtitleLanguage(models.Model):
         if version:
             return version[0].unpublish(delete=delete)
 
+    def first_version_with_status(self, status):
+        try:
+            return self.subtitleversion_set.filter(
+                    moderation_status=status).order_by('datetime_started')[0]
+        except IndexError:
+            return None
+
+    @property
+    def first_approved_version(self):
+        return self.first_version_with_status(APPROVED)
 
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 

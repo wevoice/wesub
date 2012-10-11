@@ -153,11 +153,16 @@ var Site = function(Site) {
             } else {
                 $opt = $('option[id="project-opt-any"]');
             }
-            console.log($opt);
 
-            $select.children().removeAttr('selected');
-            $opt.attr('selected', 'selected');
-            $select.trigger('liszt:updated');
+            // Reset the chosen selector if we have no query args indicating that we have
+            // a project.
+            //
+            // Unless this is the TED team, of course.
+            if (window.TEAM_SLUG != 'ted') {
+                $select.children().removeAttr('selected');
+                $opt.attr('selected', 'selected');
+                $select.trigger('liszt:updated');
+            }
         },
         collapsibleLists: function($lists) {
             $.each($lists, function() {
