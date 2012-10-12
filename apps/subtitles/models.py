@@ -616,6 +616,10 @@ class SubtitleLanguage(models.Model):
         """SHIM for getting the widget URL for this language."""
         return shims.get_widget_url(self, mode, task_id)
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('videos:translation_history',
+                [self.video.video_id, self.language_code or 'unknown', self.pk])
 
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
@@ -1013,6 +1017,16 @@ class SubtitleVersion(models.Model):
     def set_workflow_origin(self, origin):
         """Set the step of the workflow that this version originated in."""
         self._set_metadata('workflow_origin', origin)
+
+    def next_version(self):
+        cls = self.__class__
+        try:
+            return cls.objects.filter(version_number__gt=self.version_number) \
+                      .filter(subtitle_language=self.subtitle_language) \
+                      .order_by('version_number')[:1].get()
+        except cls.DoesNotExist:
+            return None
+
 
 class SubtitleVersionMetadata(models.Model):
     """This model is used to add extra metadata to SubtitleVersions.

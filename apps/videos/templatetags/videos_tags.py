@@ -42,6 +42,8 @@ def feature_video(context, video):
 @register.filter
 def is_follower(obj, user):
     #obj is Video or SubtitleLanguage
+    # FIXME: Update this when follower fields alng on SubtitleLanguage
+    return True
     if not user.is_authenticated():
         return False
 
@@ -69,10 +71,11 @@ def write_video_type_js(video):
 def title_for_video(video, language=None):
     if not language:
         return "%s | Amara" % video.title_display()
-    elif  language.is_original:
-        return "%s  with subtitles | Amara " % language.get_title_display()
+    elif video.primary_audio_language_code == language.language_code:
+        return "%s with subtitles | Amara " % video.title
     else:
-        return "%s  with %s subtitles | Amara " % (language.get_title_display() , language.get_language_display())
+        return "%s with %s subtitles | Amara " % (video.title,
+                language.get_language_code_display())
 
 from django.template.defaulttags import URLNode
 class VideoURLNode(URLNode):

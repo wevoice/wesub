@@ -62,6 +62,8 @@ import datetime
 from videos.decorators import get_video_revision, get_video_from_code
 from apps.teams.models import Task
 
+from subtitles import models as sub_models
+
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
 })
@@ -358,7 +360,7 @@ def demo(request):
                               context_instance=RequestContext(request))
 
 @get_video_from_code
-def legacy_history(request ,video, lang=None):
+def legacy_history(request, video, lang=None):
     """
     In the old days we allowed only one translation per video.
     Therefore video urls looked like /vfjdh2/en/
@@ -369,13 +371,13 @@ def legacy_history(request ,video, lang=None):
         language = video.subtitle_language(lang)
         if language is None:
             raise SubtitleLanguage.DoesNotExist("No such language")
-    except SubtitleLanguage.DoesNotExist:
+    except sub_models.SubtitleLanguage.DoesNotExist:
         raise Http404()
 
     return HttpResponseRedirect(reverse("videos:translation_history", kwargs={
             'video_id': video.video_id,
             'lang_id': language.pk,
-            'lang': language.language,
+            'lang': language.language_code,
             }))
 
 
@@ -396,8 +398,8 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
 
     if lang_id:
         try:
-            language = video.subtitlelanguage_set.get(pk=lang_id)
-        except SubtitleLanguage.DoesNotExist:
+            language = video.newsubtitlelanguage_set.get(pk=lang_id)
+        except sub_models.SubtitleLanguage.DoesNotExist:
             raise Http404
     else:
         language = video.subtitle_language(lang)
@@ -410,7 +412,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
             url = reverse('onsite_widget')+'?config='+urlquote_plus(json.dumps(config))
             return redirect(url)
         elif video.subtitlelanguage_set.count() > 0:
-            language = video.subtitlelanguage_set.all()[0]
+            language = video.newsubtitlelanguage_set.all()[0]
         else:
             raise Http404
 
@@ -461,8 +463,10 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     if request.user.is_authenticated():
         # user can only edit a subtitle draft if he
         # has a subtitle/translate task assigned to him
-        tasks = Task.objects.incomplete_subtitle_or_translate()\
-                            .filter(team_video=video.get_team_video(), assignee=request.user, language=language.language)
+        tasks = Task.objects.incomplete_subtitle_or_translate() \
+                            .filter(team_video=video.get_team_video(),
+                                    assignee=request.user,
+                                    language=language.language_code)
 
         context['can_edit'] = tasks.exists()
 
@@ -481,7 +485,7 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
         params['base_state']['revision'] = version_no
 
     if language:
-        params['base_state']['language_code'] = language.language
+        params['base_state']['language_code'] = language.language_code
         params['base_state']['language_pk'] = language.pk
     if size:
         params['video_config'] = {"width":size[0], "height":size[1]}
