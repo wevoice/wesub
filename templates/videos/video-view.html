@@ -36,6 +36,9 @@
                     window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
                 {% endif %}
             {% endif %}
+            {% if task.get_type_display == 'Translate' %}
+                window.TASK_TRANSLATE_TO_LANGUAGE = '{{ task.language }}';
+            {% endif %}
         </script>
     {% endblock %}
 

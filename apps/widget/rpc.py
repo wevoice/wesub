@@ -319,7 +319,11 @@ class Rpc(BaseRpc):
         if not team_video.video.can_user_see(user):
              return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
 
-        if team.moderates_videos() and not can_post_edit_subtitles(team, user):
+        language = video.subtitle_language(language_code)
+
+        if (language and language.is_complete_and_synced()
+                     and team.moderates_videos()
+                     and not can_post_edit_subtitles(team, user)):
             message = _("Sorry, you can't post-edit these subtitles.")
             return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
             
