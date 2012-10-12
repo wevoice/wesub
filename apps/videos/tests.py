@@ -956,7 +956,7 @@ class ViewsTest(WebUseTest):
     def test_video_url_remove(self):
         self._login()
         v = Video.objects.get(video_id='iGzkk7nwWX8F')
-        # add another url since original can't be removed
+        # add another url since primary can't be removed
         data = {
             'url': 'http://www.youtube.com/watch?v=po0jY4WvCIc',
             'video': v.pk
@@ -964,8 +964,11 @@ class ViewsTest(WebUseTest):
         url = reverse('videos:video_url_create')
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(VideoUrl.objects.filter(video=v)), 2)
-        vurl_id = VideoUrl.objects.filter(video=v)[1].id
+        vid_urls = VideoUrl.objects.filter(video=v)
+        self.assertEqual(len(vid_urls), 2)
+        vurl_id = vid_urls[1].id
+        # check cache
+        self.assertEqual(len(video_cache.get_video_urls(v.video_id)), 2)
         response = self.client.get(reverse('videos:video_url_remove'), {'id': vurl_id})
         # make sure get is not allowed
         self.assertEqual(response.status_code, 405)
@@ -975,6 +978,8 @@ class ViewsTest(WebUseTest):
         self.assertEqual(len(VideoUrl.objects.filter(video=v)), 1)
         self.assertEqual(len(Action.objects.filter(video=v, \
             action_type=Action.DELETE_URL)), 1)
+        # assert cache is invalidated
+        self.assertEqual(len(video_cache.get_video_urls(v.video_id)), 1)
 
     def test_video_url_deny_remove_primary(self):
         self._login()
