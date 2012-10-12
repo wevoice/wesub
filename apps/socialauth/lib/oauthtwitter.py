@@ -201,7 +201,7 @@ class OAuthApi(Api):
         token = oauth.OAuthToken.from_string(resp)
         return token
     
-    def GetUserInfo(self, url='https://twitter.com/account/verify_credentials.json'):
+    def GetUserInfo(self, url='https://api.twitter.com/1.1/account/verify_credentials.json'):
         '''Get user information from twitter
         
         Returns:
