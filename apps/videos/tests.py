@@ -2822,7 +2822,7 @@ class TimmingChangeTest(TestCase):
         response = self.client.post(reverse('videos:upload_subtitles'), data)
         # this is an ajax upload, the result gets serialized inside a text area,
         # if successfull will have the video id on the the 'next' json content
-        self.assertIn('/en/videos/%s/en' % self.to_upload_video.video_id, response.content)
+        self.assertIn('/videos/%s/en' % self.to_upload_video.video_id, response.content)
         subtitles = self.to_upload_video.subtitle_language("en").version().subtitle_set.all()
         self.assertEqual(len(subtitles), 5)
         for i,item in enumerate(subtitles):
