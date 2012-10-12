@@ -516,11 +516,11 @@ class DfxpSubtitleParser(SubtitleParser):
             self.style_map = generate_style_map(dom)
             t = dom.getElementsByTagName('tt')[0]
             
-            self.tickRate = 0;
+            self.tick_rate = 0;
             
             for attr in t.attributes.values():
                 if attr.localName == "tickRate":
-                    self.tickRate = int(attr.value)
+                    self.tick_rate = int(attr.value)
                         
             self.nodes = dom.getElementsByTagName('body')[0].getElementsByTagName('p')
         except (ExpatError, IndexError):
@@ -533,7 +533,7 @@ class DfxpSubtitleParser(SubtitleParser):
         return bool(len(self.nodes))
 
     def _get_time(self, t):
-        return time_expression_to_milliseconds (t)
+        return time_expression_to_milliseconds (t, self.tick_rate)
 
     def _replace_els(self, node, attrname, attrvalue, tagname):
         """
