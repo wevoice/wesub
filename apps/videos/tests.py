@@ -21,6 +21,7 @@ import feedparser
 import json
 import os
 import re
+import tempfile
 from datetime import datetime
 from StringIO import StringIO
 
@@ -40,7 +41,7 @@ from messages.models import Message
 from teams.models import Team, TeamVideo, Workflow, TeamMember
 from testhelpers.views import _create_videos
 from utils.subtitles import (
-    SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser, DfxpSubtitleParser
+    SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser, DfxpSubtitleParser, ParserList
 )
 from videos import metadata_manager, alarms, EffectiveSubtitle
 from utils.unisubsmarkup import html_to_markup, markup_to_html
@@ -67,7 +68,7 @@ from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
 from vidscraper.sites import blip
 from widget import video_cache
 from widget.rpc import Rpc
-from widget.srt_subs import TTMLSubtitles
+from widget.srt_subs import TTMLSubtitles, GenerateSubtitlesHandler
 from widget.tests import (
     create_two_sub_dependent_session, create_two_sub_session, RequestMockup,
     NotAuthenticatedUser
@@ -2741,3 +2742,103 @@ def add_subs(language, subs_texts):
             end_time = (i  * 1000)+ 1000 - 100
         )
 
+class TimmingChangeTest(TestCase):
+    '''
+    This group of test is to make sure that timmiing is not being
+    rounded ever
+    '''
+
+    def setUp(self):
+        original_video , created = Video.get_or_create_for_url("http://www.example.com/original.mp4")
+        self.to_upload_video= Video.get_or_create_for_url("http://www.example.com/to_uplaod.mp4")[0]
+        self.original_video = original_video
+        language = SubtitleLanguage.objects.create(video=original_video, language='en', is_original=True, is_forked=True)
+        version = SubtitleVersion.objects.create(
+            language=language,
+            version_no=0,
+            datetime_started=datetime.now(),
+            is_forked = language.is_forked
+        )
+
+        for x in xrange(5):
+            s= Subtitle.objects.create(
+                version = version,
+                subtitle_id=x,
+                subtitle_order=x,
+                subtitle_text="Sub %s" % x,
+                start_time =  x * 1111,
+                end_time = (x * 1111)+ 888
+        )
+
+        self.user = User.objects.get_or_create(username='admin')[0]
+        self.user.set_password('admin')
+        self.user.save()
+
+    def _download_subs(self, format, video):
+        url = reverse("widget:download_" + format)
+        res = self.client.get(url, {
+            'video_id': video.video_id,
+            'lang_pk': video.subtitle_language("en").pk
+        })
+        self.assertEqual(res.status_code, 200)
+        parser =  ParserList[format](res.content.decode('utf-8'))
+        self.assertEqual(len(parser), 5)
+        subs = [x for x in parser]
+        for i,item in enumerate(subs):
+            self.assertEqual(item['start_time'], i * 1111)
+            self.assertEqual(item['end_time'], (i * 1111) + 888)
+        return subs
+
+    def _download_then_upload(self,format):
+        subs = self._download_subs(format, self.original_video)
+        cleaned_subs = []
+        for s in subs:
+            cleaned_subs.append({
+                'text': markup_to_html(s['subtitle_text']),
+                'start': s['start_time'],
+                'end': s['end_time'],
+                'id': None,
+            })
+
+
+        as_string  = unicode(GenerateSubtitlesHandler[format](
+            cleaned_subs, self.to_upload_video,
+            sl=SubtitleLanguage(language='en', video=self.to_upload_video)
+        ))
+        # file uploads need an actual file handler, StringIO won't do it, dammit
+        file_path = "/tmp/sample-upload.%s" % format
+        fd = open(file_path, 'w')
+        fd.write(as_string.encode('utf-8'))
+        fd.close()
+        fd = open(file_path)
+        data = {
+            'language': 'en',
+            'video_language': 'en',
+            'video': self.to_upload_video.pk,
+            'draft': fd,
+            'is_complete': True
+            }
+        self.client.login(username='admin', password='admin')
+        response = self.client.post(reverse('videos:upload_subtitles'), data)
+        # this is an ajax upload, the result gets serialized inside a text area,
+        # if successfull will have the video id on the the 'next' json content
+        self.assertIn('/en/videos/%s/en' % self.to_upload_video.video_id, response.content)
+        subtitles = self.to_upload_video.subtitle_language("en").version().subtitle_set.all()
+        self.assertEqual(len(subtitles), 5)
+        for i,item in enumerate(subtitles):
+            self.assertEqual(item.start_time, i * 1111)
+            self.assertEqual(item.end_time, (i * 1111) + 888)
+
+
+    def test_dowload_then_upload(self):
+        # this is a 'round trip' test
+        # we store subs directly into the db, with known timming
+        # we then dowload the subs in each format
+        # upload them through the upload
+        # then check the new subs timming against the original ones
+        self._download_then_upload('srt')
+        self._download_then_upload('dfxp')
+        self._download_then_upload('ssa')
+        self._download_then_upload('sbv')
+        self._download_then_upload('ttml')
+        # txt format has no timming data

@@ -72,6 +72,45 @@ def strip_tags(text, tags=None):
         # sometimes "<None>" are being passed, and bleach will throw
         # an assertion error, see http://sentry.pculture.org:9000/amaraproduction/group/936/
         return ""
+TIME_EXPRESSION_METRIC = re.compile(r'(?P<num>[\d]{1,})(?P<unit>(h|ms|s|m|f|t))')
+TIME_EXPRESSION_CLOCK_TIME = re.compile(r'(?P<hours>[\d]{2,3}):(?P<minutes>[\d]{2}):(?P<seconds>[\d]{2})(?:.(?P<fraction>[\d]{1,3}))?')
+def time_expression_to_milliseconds(time_expression, tick_rate=None):
+    """
+    Parses possible values from time expressions[1] to a normalized value
+    in milliseconds.
+
+    We don't support all possible forms now, only clock time, metric and tick.
+    [1] http://www.w3.org/TR/ttaf1-dfxp/#timing-value-timeExpression
+    """
+    if not time_expression:
+        return 0
+    match = TIME_EXPRESSION_CLOCK_TIME.match(time_expression)
+    if match:
+        groups = match.groupdict()
+        hour = int(groups['hours'])
+        minutes = int(groups['minutes'])
+        seconds  = int(groups['seconds'])
+        milliseconds = int(groups['fraction'] or 0)
+        return (((hour * 3600) + (minutes * 60) + seconds ) * 1000 ) + milliseconds
+    match = TIME_EXPRESSION_METRIC.match(time_expression)
+    if match:
+        groups = match.groupdict()
+        num, unit = int(groups['num']), groups['unit']
+        if unit == 't':
+            if not tick_rate:
+                raise ValueError("Ticks need a tick rate, mate.")
+            return 1000 * (num / float(tick_rate))
+        multiplier = {
+            "h": 3600 * 1000,
+            "m": 60 * 1000,
+            "s": 1000,
+            "ms": 1,
+            'f': 0,
+        }.get(unit, None)
+        return num * multiplier
+    raise ValueError("Time expression %s can't be parsed" % time_expression)
+
+
     
 def save_subtitle(video, language, parser, user=None, update_video=True,
                   forks=True, as_forked=True, translated_from=None):
@@ -494,22 +533,7 @@ class DfxpSubtitleParser(SubtitleParser):
         return bool(len(self.nodes))
 
     def _get_time(self, t):
-        try:
-            if t.endswith('t'):
-                ticks = int(t.split('t')[0])
-            
-                start = ticks / float(self.tickRate)
-            
-            else:
-                hour, min, sec = t.split(':')
-            
-                start = (int(hour)*60*60 + int(min)*60 + int(sec)) * 1000
-                if start > MAX_SUB_TIME:
-                    return -1
-        except ValueError:
-            return -1
-
-        return start
+        return time_expression_to_milliseconds (t)
 
     def _replace_els(self, node, attrname, attrvalue, tagname):
         """
