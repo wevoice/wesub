@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-12 01:40-0500\n"
+"POT-Creation-Date: 2012-10-13 01:39-0500\n"
 "PO-Revision-Date: 2012-10-11 06:59+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
@@ -1574,7 +1574,7 @@ msgstr "嘿！-- 只要找到%(video_title)s: %(url)s的 %(language)s 字幕 "
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "只要找此视频的一个%(language_name)s的字幕版本"
 
-#: apps/videos/views.py:161
+#: apps/videos/views.py:163
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1585,7 +1585,7 @@ msgstr ""
 "同朋友分享视频, 或者获得嵌入你站点的代码.  要添加或者\n"
 "改进字幕, 点击视频下方的按钮."
 
-#: apps/videos/views.py:169
+#: apps/videos/views.py:171
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
@@ -1595,33 +1595,33 @@ msgstr ""
 "                它使用http服务.  你的浏览器将会显示各种\n"
 "                内容警示。"
 
-#: apps/videos/views.py:174
+#: apps/videos/views.py:176
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "现有的字幕将在一小会儿后导入"
 
-#: apps/videos/views.py:282
+#: apps/videos/views.py:284
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "感谢你的上传。大约1分钟后会显示你的字幕"
 
-#: apps/videos/views.py:284
+#: apps/videos/views.py:286
 msgid "Your changes have been saved."
 msgstr "你的变更已经保存"
 
-#: apps/videos/views.py:627
+#: apps/videos/views.py:631
 msgid "You have not permission change this URL"
 msgstr "你没有被允许更改这个URL"
 
-#: apps/videos/views.py:632 apps/videos/views.py:663
+#: apps/videos/views.py:636 apps/videos/views.py:667
 msgid "Object does not exist"
 msgstr "对象不存在"
 
-#: apps/videos/views.py:647
+#: apps/videos/views.py:651
 msgid "You have not permission delete this URL"
 msgstr "你没有被允许删除这个URL"
 
-#: apps/videos/views.py:651
+#: apps/videos/views.py:655
 msgid "You can't remove primary URL"
 msgstr ""
 
@@ -1674,11 +1674,11 @@ msgstr "这些字幕正在调整中。参见 %s 小组页面以获得如何贡�
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "抱歉，这些字幕是私有的。"
 
-#: apps/widget/rpc.py:323
+#: apps/widget/rpc.py:327
 msgid "Sorry, you can't post-edit these subtitles."
 msgstr ""
 
-#: apps/widget/rpc.py:1036 apps/widget/rpc.py:1077
+#: apps/widget/rpc.py:1040 apps/widget/rpc.py:1081
 msgid "\n"
 msgstr "\n"
 
@@ -4830,7 +4830,7 @@ msgstr "总计"
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
 #: templates/teams/_context_team.html:47 templates/teams/tasks.html:132
-#: templates/teams/tasks.html.py:219 templates/videos/video-view.html:163
+#: templates/teams/tasks.html.py:219 templates/videos/video-view.html:166
 msgid "Video"
 msgstr "视频"
 
@@ -4972,7 +4972,7 @@ msgstr "视频页"
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
 #: templates/teams/_context_team.html:118
 #: templates/videos/subtitle-view.html:137
-#: templates/videos/video-view.html:128
+#: templates/videos/video-view.html:131
 msgid "Show all"
 msgstr "显示所有"
 
@@ -4999,7 +4999,7 @@ msgstr "视频"
 #: templates/teams/_context_team.html:36
 #: templates/teams/_context_team.html:114
 #: templates/videos/subtitle-view.html:137
-#: templates/videos/video-view.html:128
+#: templates/videos/video-view.html:131
 msgid "Show less"
 msgstr "显示少量"
 
@@ -5067,7 +5067,7 @@ msgstr "视频"
 msgid "Members"
 msgstr "成员"
 
-#: templates/teams/_tabs.html:16 templates/videos/video-view.html:165
+#: templates/teams/_tabs.html:16 templates/videos/video-view.html:168
 msgid "Activity"
 msgstr "活动"
 
@@ -5860,7 +5860,7 @@ msgstr ""
 "在内嵌编辑中验证时间轴，视频标题以及视频描述 并提交最终版本."
 
 #: templates/teams/tasks.html:336 templates/videos/_upload_subtitles.html:20
-#: templates/videos/video-view.html:106
+#: templates/videos/video-view.html:109
 msgid "Language"
 msgstr "语言"
 
@@ -5931,7 +5931,7 @@ msgstr "抱歉，这里没有任务"
 msgid "Edit team video"
 msgstr "编辑组视频"
 
-#: templates/teams/team_video.html:27 templates/videos/video-view.html:236
+#: templates/teams/team_video.html:27 templates/videos/video-view.html:239
 msgid "Edit video"
 msgstr "编辑视频"
 
@@ -6173,7 +6173,7 @@ msgstr "发送反馈"
 #: templates/videos/_paste_transcription.html:113
 #: templates/videos/_upload_subtitles.html:5
 #: templates/videos/_video_url_panel.html:43
-#: templates/videos/video-view.html:66
+#: templates/videos/video-view.html:69
 msgid "Close"
 msgstr "关闭"
 
@@ -6334,8 +6334,8 @@ msgstr "上传txt文件"
 msgid "Login to upload subtitles"
 msgstr "登录以上传字幕"
 
-#: templates/videos/_team_list.html:5 templates/videos/video-view.html:198
-#: templates/videos/video-view.html:204
+#: templates/videos/_team_list.html:5 templates/videos/video-view.html:201
+#: templates/videos/video-view.html:207
 msgid "Collaborate"
 msgstr "协作"
 
@@ -6343,7 +6343,7 @@ msgstr "协作"
 msgid "View team:"
 msgstr "查看团队"
 
-#: templates/videos/_team_list.html:19 templates/videos/video-view.html:205
+#: templates/videos/_team_list.html:19 templates/videos/video-view.html:208
 msgid "Translation Project"
 msgstr "翻译项目"
 
@@ -6950,16 +6950,16 @@ msgstr ""
 msgid "Select two revisions to compare, please"
 msgstr "请选择两个版本比较"
 
-#: templates/videos/subtitle-view.html:98 templates/videos/video-view.html:88
+#: templates/videos/subtitle-view.html:98 templates/videos/video-view.html:91
 msgid "View"
 msgstr "观看"
 
-#: templates/videos/subtitle-view.html:104 templates/videos/video-view.html:94
+#: templates/videos/subtitle-view.html:104 templates/videos/video-view.html:97
 msgid "Follower"
 msgstr "跟进者"
 
 #: templates/videos/subtitle-view.html:110
-#: templates/videos/video-view.html:100
+#: templates/videos/video-view.html:103
 msgid "Comment"
 msgstr "评论"
 
@@ -6968,13 +6968,13 @@ msgid "Line"
 msgstr "行"
 
 #: templates/videos/subtitle-view.html:126
-#: templates/videos/video-view.html:116
+#: templates/videos/video-view.html:119
 msgid "View Subtitles"
 msgstr "查看字幕"
 
 #: templates/videos/subtitle-view.html:150
 #: templates/videos/subtitle-view.html:274
-#: templates/videos/video-view.html:164 templates/videos/video-view.html:216
+#: templates/videos/video-view.html:167 templates/videos/video-view.html:219
 msgid "Comments"
 msgstr "评论"
 
@@ -7070,7 +7070,7 @@ msgstr ""
 "                        "
 
 #: templates/videos/subtitle-view.html:272
-#: templates/videos/video-view.html:214
+#: templates/videos/video-view.html:217
 msgid "Leave a comment"
 msgstr "留下评论"
 
@@ -7176,7 +7176,7 @@ msgstr "就是这样！"
 msgid "Enter non-empty title"
 msgstr "输入非空标题"
 
-#: templates/videos/video-view.html:65
+#: templates/videos/video-view.html:68
 msgid ""
 "Subtitles saved! You can share the video with friends, or get an embed code "
 "for your site. To add atranslation, click the button below."
@@ -7184,61 +7184,61 @@ msgstr ""
 "字幕已保存！你可以分享此视频给你的朋友，或者得到嵌入代码至你的站点。\n"
 "要添加翻译，点击下面的按钮"
 
-#: templates/videos/video-view.html:140
+#: templates/videos/video-view.html:143
 msgid "No subtitles yet."
 msgstr ""
 
-#: templates/videos/video-view.html:140
+#: templates/videos/video-view.html:143
 msgid "View tasks for this video."
 msgstr ""
 
-#: templates/videos/video-view.html:142
+#: templates/videos/video-view.html:145
 msgid "This video doesn't have any subtitles or tasks yet"
 msgstr ""
 
-#: templates/videos/video-view.html:145 templates/videos/video-view.html:148
+#: templates/videos/video-view.html:148 templates/videos/video-view.html:151
 msgid "Be the first to "
 msgstr "第一个"
 
-#: templates/videos/video-view.html:145 templates/videos/video-view.html:148
+#: templates/videos/video-view.html:148 templates/videos/video-view.html:151
 msgid "create subtitles"
 msgstr "创建字幕"
 
-#: templates/videos/video-view.html:153 templates/videos/video-view.html:181
+#: templates/videos/video-view.html:156 templates/videos/video-view.html:184
 msgid "This video doesn't have any subtitles yet"
 msgstr "此视频还没有任何字幕"
 
-#: templates/videos/video-view.html:166
+#: templates/videos/video-view.html:169
 msgid "URLs"
 msgstr "URL链接"
 
-#: templates/videos/video-view.html:176
+#: templates/videos/video-view.html:179
 msgid "Contribute"
 msgstr "贡献"
 
-#: templates/videos/video-view.html:181
+#: templates/videos/video-view.html:184
 msgid "Create subtitles now"
 msgstr "现在创建字幕"
 
-#: templates/videos/video-view.html:185
+#: templates/videos/video-view.html:188
 msgid "Don't see the language you're looking for?"
 msgstr "没看到你所找的语言？"
 
-#: templates/videos/video-view.html:185
+#: templates/videos/video-view.html:188
 msgid "Start a new translation"
 msgstr "开始一个新翻译"
 
-#: templates/videos/video-view.html:191
+#: templates/videos/video-view.html:194
 msgid ""
 "Subtitles for this video are moderated. If it belongs to a team, try joining "
 "the team to contribute."
 msgstr "此视频的字幕已被接管。如果它属于某小组，尝试加入小组做贡献。"
 
-#: templates/videos/video-view.html:205
+#: templates/videos/video-view.html:208
 msgid "This video belongs to the"
 msgstr ""
 
-#: templates/videos/video-view.html:221
+#: templates/videos/video-view.html:224
 msgid "View all activity"
 msgstr "查看所有活动"
 

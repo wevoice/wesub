@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-12 01:30-0500\n"
+"POT-Creation-Date: 2012-10-13 01:30-0500\n"
 "PO-Revision-Date: 2012-10-11 06:59+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Galician (http://www.transifex.com/projects/p/"
@@ -1624,7 +1624,7 @@ msgstr ""
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "Atopouse unha versión deste vídeo con subtítulos en %(language_name)s"
 
-#: apps/videos/views.py:161
+#: apps/videos/views.py:163
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1635,7 +1635,7 @@ msgstr ""
 "amigos, ou obter o código de incrustación para o teu sitio.  Para engadir\n"
 "ou mellorar os subtítulos, preme o botón de debaixo do vídeo."
 
-#: apps/videos/views.py:169
+#: apps/videos/views.py:171
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
@@ -1646,11 +1646,11 @@ msgstr ""
 "mestura\n"
 "                de alertas de contido."
 
-#: apps/videos/views.py:174
+#: apps/videos/views.py:176
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Os subtítulos importaranse nuns minutos."
 
-#: apps/videos/views.py:282
+#: apps/videos/views.py:284
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
@@ -1658,23 +1658,23 @@ msgstr ""
 "Grazas pola carga. Levaralle máis ou menos un minuto apareceren os "
 "subtítulos."
 
-#: apps/videos/views.py:284
+#: apps/videos/views.py:286
 msgid "Your changes have been saved."
 msgstr "Gardáronse os cambios."
 
-#: apps/videos/views.py:627
+#: apps/videos/views.py:631
 msgid "You have not permission change this URL"
 msgstr "Non ten permiso para cambiar este URL"
 
-#: apps/videos/views.py:632 apps/videos/views.py:663
+#: apps/videos/views.py:636 apps/videos/views.py:667
 msgid "Object does not exist"
 msgstr "O obxecto non existe"
 
-#: apps/videos/views.py:647
+#: apps/videos/views.py:651
 msgid "You have not permission delete this URL"
 msgstr "Non ten permiso para eliminar este URL"
 
-#: apps/videos/views.py:651
+#: apps/videos/views.py:655
 msgid "You can't remove primary URL"
 msgstr ""
 
@@ -1729,11 +1729,11 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Estes subtítulos teñen moderación privada."
 
-#: apps/widget/rpc.py:323
+#: apps/widget/rpc.py:327
 msgid "Sorry, you can't post-edit these subtitles."
 msgstr ""
 
-#: apps/widget/rpc.py:1036 apps/widget/rpc.py:1077
+#: apps/widget/rpc.py:1040 apps/widget/rpc.py:1081
 msgid "\n"
 msgstr "\n"
 
@@ -5343,7 +5343,7 @@ msgstr "TOTAL"
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
 #: templates/teams/_context_team.html:47 templates/teams/tasks.html:132
-#: templates/teams/tasks.html.py:219 templates/videos/video-view.html:163
+#: templates/teams/tasks.html.py:219 templates/videos/video-view.html:166
 msgid "Video"
 msgstr "Vídeo"
 
@@ -5488,7 +5488,7 @@ msgstr "Páxina do vídeo"
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
 #: templates/teams/_context_team.html:118
 #: templates/videos/subtitle-view.html:137
-#: templates/videos/video-view.html:128
+#: templates/videos/video-view.html:131
 msgid "Show all"
 msgstr "Amosar todo"
 
@@ -5515,7 +5515,7 @@ msgstr "vídeo"
 #: templates/teams/_context_team.html:36
 #: templates/teams/_context_team.html:114
 #: templates/videos/subtitle-view.html:137
-#: templates/videos/video-view.html:128
+#: templates/videos/video-view.html:131
 msgid "Show less"
 msgstr "Amosar menos"
 
@@ -5584,7 +5584,7 @@ msgstr "Vídeos"
 msgid "Members"
 msgstr "Membros"
 
-#: templates/teams/_tabs.html:16 templates/videos/video-view.html:165
+#: templates/teams/_tabs.html:16 templates/videos/video-view.html:168
 msgid "Activity"
 msgstr "Actividade"
 
@@ -6416,7 +6416,7 @@ msgstr ""
 "a versión final."
 
 #: templates/teams/tasks.html:336 templates/videos/_upload_subtitles.html:20
-#: templates/videos/video-view.html:106
+#: templates/videos/video-view.html:109
 msgid "Language"
 msgstr "Idioma"
 
@@ -6491,7 +6491,7 @@ msgstr "Desculpe, aquí non hai tarefas."
 msgid "Edit team video"
 msgstr "Editar o vídeo do equipo"
 
-#: templates/teams/team_video.html:27 templates/videos/video-view.html:236
+#: templates/teams/team_video.html:27 templates/videos/video-view.html:239
 msgid "Edit video"
 msgstr "Editar vídeo"
 
@@ -6744,7 +6744,7 @@ msgstr "Enviar comentario"
 #: templates/videos/_paste_transcription.html:113
 #: templates/videos/_upload_subtitles.html:5
 #: templates/videos/_video_url_panel.html:43
-#: templates/videos/video-view.html:66
+#: templates/videos/video-view.html:69
 msgid "Close"
 msgstr "Pechar"
 
@@ -6915,8 +6915,8 @@ msgstr "Subir ficheiro TXT"
 msgid "Login to upload subtitles"
 msgstr "Inicie sesión para subir subtítulos"
 
-#: templates/videos/_team_list.html:5 templates/videos/video-view.html:198
-#: templates/videos/video-view.html:204
+#: templates/videos/_team_list.html:5 templates/videos/video-view.html:201
+#: templates/videos/video-view.html:207
 msgid "Collaborate"
 msgstr "Colaborar"
 
@@ -6924,7 +6924,7 @@ msgstr "Colaborar"
 msgid "View team:"
 msgstr "Ver equipo:"
 
-#: templates/videos/_team_list.html:19 templates/videos/video-view.html:205
+#: templates/videos/_team_list.html:19 templates/videos/video-view.html:208
 msgid "Translation Project"
 msgstr "Proxecto de tradución"
 
@@ -7563,16 +7563,16 @@ msgstr "Deixaron de enviárselle notificacións a %(u)s do vídeo %(video)s."
 msgid "Select two revisions to compare, please"
 msgstr "Por favor, escolla dúas revisións para comparar"
 
-#: templates/videos/subtitle-view.html:98 templates/videos/video-view.html:88
+#: templates/videos/subtitle-view.html:98 templates/videos/video-view.html:91
 msgid "View"
 msgstr "Visualizar"
 
-#: templates/videos/subtitle-view.html:104 templates/videos/video-view.html:94
+#: templates/videos/subtitle-view.html:104 templates/videos/video-view.html:97
 msgid "Follower"
 msgstr "Seguidor"
 
 #: templates/videos/subtitle-view.html:110
-#: templates/videos/video-view.html:100
+#: templates/videos/video-view.html:103
 msgid "Comment"
 msgstr "Comentario"
 
@@ -7581,13 +7581,13 @@ msgid "Line"
 msgstr "Liña"
 
 #: templates/videos/subtitle-view.html:126
-#: templates/videos/video-view.html:116
+#: templates/videos/video-view.html:119
 msgid "View Subtitles"
 msgstr "Visualizar subtítulos"
 
 #: templates/videos/subtitle-view.html:150
 #: templates/videos/subtitle-view.html:274
-#: templates/videos/video-view.html:164 templates/videos/video-view.html:216
+#: templates/videos/video-view.html:167 templates/videos/video-view.html:219
 msgid "Comments"
 msgstr "Comentarios"
 
@@ -7686,7 +7686,7 @@ msgstr ""
 "                        "
 
 #: templates/videos/subtitle-view.html:272
-#: templates/videos/video-view.html:214
+#: templates/videos/video-view.html:217
 msgid "Leave a comment"
 msgstr "Deixar un comentario"
 
@@ -7795,7 +7795,7 @@ msgstr "Iso é todo!"
 msgid "Enter non-empty title"
 msgstr "Escriba un título non vadío"
 
-#: templates/videos/video-view.html:65
+#: templates/videos/video-view.html:68
 msgid ""
 "Subtitles saved! You can share the video with friends, or get an embed code "
 "for your site. To add atranslation, click the button below."
@@ -7804,51 +7804,51 @@ msgstr ""
 "para incorporalo no seu sitio web. Para engadir unha tradución, prema no "
 "botón de abaixo."
 
-#: templates/videos/video-view.html:140
+#: templates/videos/video-view.html:143
 msgid "No subtitles yet."
 msgstr "Aínda non ten subtítulos"
 
-#: templates/videos/video-view.html:140
+#: templates/videos/video-view.html:143
 msgid "View tasks for this video."
 msgstr "Ver tarefas neste video"
 
-#: templates/videos/video-view.html:142
+#: templates/videos/video-view.html:145
 msgid "This video doesn't have any subtitles or tasks yet"
 msgstr "Esta video non ten ningún subtítulo nin tarefas aínda"
 
-#: templates/videos/video-view.html:145 templates/videos/video-view.html:148
+#: templates/videos/video-view.html:148 templates/videos/video-view.html:151
 msgid "Be the first to "
 msgstr "Sexa o primeiro en "
 
-#: templates/videos/video-view.html:145 templates/videos/video-view.html:148
+#: templates/videos/video-view.html:148 templates/videos/video-view.html:151
 msgid "create subtitles"
 msgstr "crear subtítulos"
 
-#: templates/videos/video-view.html:153 templates/videos/video-view.html:181
+#: templates/videos/video-view.html:156 templates/videos/video-view.html:184
 msgid "This video doesn't have any subtitles yet"
 msgstr "Este vídeo aínda non ten subtítulos"
 
-#: templates/videos/video-view.html:166
+#: templates/videos/video-view.html:169
 msgid "URLs"
 msgstr "URL"
 
-#: templates/videos/video-view.html:176
+#: templates/videos/video-view.html:179
 msgid "Contribute"
 msgstr "Colabore"
 
-#: templates/videos/video-view.html:181
+#: templates/videos/video-view.html:184
 msgid "Create subtitles now"
 msgstr "Crear subtítulos agora"
 
-#: templates/videos/video-view.html:185
+#: templates/videos/video-view.html:188
 msgid "Don't see the language you're looking for?"
 msgstr "Non atopa o idioma que busca?"
 
-#: templates/videos/video-view.html:185
+#: templates/videos/video-view.html:188
 msgid "Start a new translation"
 msgstr "Comezar unha nova tradución"
 
-#: templates/videos/video-view.html:191
+#: templates/videos/video-view.html:194
 msgid ""
 "Subtitles for this video are moderated. If it belongs to a team, try joining "
 "the team to contribute."
@@ -7856,11 +7856,11 @@ msgstr ""
 "Os subtítulos deste vídeo teñen moderación. Se pertence a un equipo, intente "
 "unirse ao equipo para colaborar."
 
-#: templates/videos/video-view.html:205
+#: templates/videos/video-view.html:208
 msgid "This video belongs to the"
 msgstr ""
 
-#: templates/videos/video-view.html:221
+#: templates/videos/video-view.html:224
 msgid "View all activity"
 msgstr "Ver toda a actividade"
 
