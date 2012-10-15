@@ -68,7 +68,7 @@
                 {% if language.is_original %}
                     {% trans 'Original' %}
                 {% endif %}
-                {{ language.get_language_display }}
+                {{ language.get_language_code_display }}
                 {% trans "subtitles" %}
             </a>
         </h3>
@@ -77,7 +77,7 @@
                 {% if not language.is_rtl %}
                 ←
                 {% endif %}
-                {{ language.get_title_display }}
+                {{ last_version.title }}
             </a>
         </h2>
         {% widget widget_params %}
@@ -94,8 +94,8 @@
         <ul class="metrics">
             <li>
                 <div>
-                    <p>{{ language.subtitles_fetched_count|simplify_number }}</p>
-                    <h4>{% trans "View" %}{{ language.subtitles_fetched_count|pluralize }}</h4>
+                    <p>{{ language.subtitles_fetched_counter.val|simplify_number }}</p>
+                    <h4>{% trans "View" %}{{ language.subtitles_fetched_counter.val|pluralize }}</h4>
                 </div>
             </li>
             <li>
@@ -112,8 +112,8 @@
             </li>
             <li>
                 <div>
-                    <p>{{ language.subtitle_count }}</p>
-                    <h4>{% trans "Line" %}{{ language.subtitle_count|pluralize }}</h4>
+                    <p>{{ last_version.subtitle_count }}</p>
+                    <h4>{% trans "Line" %}{{ last_version.subtitle_count|pluralize }}</h4>
                 </div>
             </li>
         </ul>
