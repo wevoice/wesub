@@ -237,7 +237,7 @@ class SSASubtitles(BaseSubtitles):
         hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
         if hours < 0:
             hours = 9
-        return u'%i:%02i:%02i.%02i' % (hours, minutes, seconds, milliseconds)
+        return u'%i:%02i:%02i.%s' % (hours, minutes, seconds, str(milliseconds).rjust(3, '0'))
 
     def _clean_text(self, text):
         return text.replace('\n', ' ')
