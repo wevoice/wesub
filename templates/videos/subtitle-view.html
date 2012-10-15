@@ -158,7 +158,7 @@
                 {% if language.is_original and request.user|can_create_subtitles_for:video or not language.is_original and request.user|can_create_translations_for:video %}
                     <a id="edit_subtitles_button" class="button{% if not last_version.is_public and not can_edit %} disabled" title="Editing drafts is not permitted"{% else %}" href="{{edit_url}}"{% endif %}>{% trans 'Edit Subtitles' %}</a>
                 {% endif %}
-                {% if last_version.subtitles %}
+                {% if last_version.has_subtitles %}
                     <div class="sort_button action">
                         <div class='arrow'>
                         </div>
@@ -205,16 +205,16 @@
                                 {{ last_version.description|urlize|linebreaks }}
                             </div>
                         </li>
-                        {% for item in last_version.ordered_subtitles %}
-                        <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
-                            {% if item.has_start_time %}
+                        {% for item in last_version.get_subtitles %}
+                        <li>
+                            {% if item.0 != None %}
                             <div class="timing">
                                 <a class="time_link" href="#" title="Play video here">
-                                    <span class="data">{{ item.start_time }}</span>
-                                    {{ item.start_time|format_sub_time }}
-                                    {% if item.has_end_time %}
+                                    <span class="data">{{ item.0 }}</span>
+                                    {{ item.0|format_sub_time }}
+                                    {% if item.1 %}
                                     –
-                                    {{ item.end_time|format_sub_time }}
+                                    {{ item.1|format_sub_time }}
                                     {% endif %}
                                 </a>
                             </div>
@@ -224,7 +224,7 @@
                             </div>
                             {% endif %}
                             <div class="translation-text">
-                                {{ item.text|display_subtitle|safe }}{% if item.start_of_paragraph %}<p class='quiet'>¶</p>{% endif %} 
+                                {{ item.2|display_subtitle|safe }}
                             </div>
                         </li>
                         {% endfor %}
