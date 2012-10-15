@@ -168,7 +168,7 @@
                         <ul>
                           {% for format_name in downloadable_formats %}
                              <li>
-                               <a href="{% url widget:download format_name %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ last_version.version_no }}">{{format_name|upper}}</a>
+                               <a href="{% url widget:download format_name %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ last_version.version_number }}">{{format_name|upper}}</a>
                             </li>
                           {% endfor %}
                         </ul>
@@ -185,12 +185,12 @@
                             {{ language.standard_language }}.
                         {% endif %}
                         {% trans "Showing" %}
-                        <strong>{% trans "Revision" %} {{ last_version.version_no }}</strong>,
+                        <strong>{% trans "Revision" %} {{ last_version.version_number }}</strong>,
                         {% trans "created" %}
                         <strong>{{ last_version.revision_time }}</strong>
                         {% trans "by" %}
-                        <a href="{{ last_version.user.profile_url}}" title="View {{ last_version.user }}'s profile">
-                            <strong>{{ last_version.user }}</strong>
+                        <a href="{{ last_version.author.profile_url}}" title="View {{ last_version.author }}'s profile">
+                            <strong>{{ last_version.author }}</strong>
                         </a>.
                     </p>
 
