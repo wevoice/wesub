@@ -1830,19 +1830,17 @@ class TestTasks(TestCase):
 
 class TestModelsSaving(TestCase):
 
-    fixtures = ['test.json']
+    fixtures = ['test.json', 'subtitle_fixtures.json']
 
     def setUp(self):
         self.video = Video.objects.all()[:1].get()
         self.language = self.video.subtitle_language()
-        self.language.is_complete = False
-        self.language.save()
 
     def test_video_languages_count(self):
         from videos.tasks import video_changed_tasks
 
         #test if fixtures has correct data
-        langs_count = self.video.subtitlelanguage_set.filter(had_version=True).count()
+        langs_count = self.video.newsubtitlelanguage_set.having_nonempty_tip().count()
 
         self.assertEqual(self.video.languages_count, langs_count)
         self.assertTrue(self.video.languages_count > 0)
