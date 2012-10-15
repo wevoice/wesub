@@ -713,7 +713,7 @@ class Video(models.Model):
         subtitle languages either marked as complete, or
         having 100%  as the percent_done.
         """
-        for sl in self.subtitlelanguage_set.all():
+        for sl in self.newsubtitlelanguage_set.all():
             if sl.is_complete_and_synced():
                 return True
         return False
