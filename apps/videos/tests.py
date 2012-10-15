@@ -1855,66 +1855,41 @@ class TestModelsSaving(TestCase):
         self.assertEqual(self.video.complete_date, None)
         self.assertEqual(self.video.subtitlelanguage_set.count(), 1)
 
-        self.language.is_complete = True
+        self.language.subtitles_complete = True
         self.language.save()
         from videos.tasks import video_changed_tasks
         video_changed_tasks.delay(self.video.pk)
         self.video = Video.objects.get(pk=self.video.pk)
         self.assertNotEqual(self.video.complete_date, None)
 
-        self.language.is_complete = False
+        self.language.subtitles_complete = False
         self.language.save()
         video_changed_tasks.delay(self.video.pk)
         self.video = Video.objects.get(pk=self.video.pk)
         self.assertEqual(self.video.complete_date, None)
 
-        #add one more SubtitleLanguage
-        l = SubtitleLanguage(video=self.video)
-        l.is_original = False
-        l.is_complete = True
-        l.save()
+        version = create_langs_and_versions(self.video, ['ru'])
+        new_language = version[0].subtitle_language
+        new_language.subtitles_complete = True
+        new_language.save()
         video_changed_tasks.delay(self.video.pk)
         self.video = Video.objects.get(pk=self.video.pk)
-# FIXME: Why should complete_date be non-null here?
-#        self.assertNotEqual(self.video.complete_date, None)
+        self.assertNotEqual(self.video.complete_date, None)
 
-        self.language.is_complete = True
+        self.language.subtitles_complete = True
         self.language.save()
         video_changed_tasks.delay(self.video.pk)
         self.video = Video.objects.get(pk=self.video.pk)
         self.assertNotEqual(self.video.complete_date, None)
 
-        l.is_complete = False
-        l.save()
+        new_language.subtitles_complete = False
+        new_language.save()
         video_changed_tasks.delay(self.video.pk)
         self.video = Video.objects.get(pk=self.video.pk)
         self.assertNotEqual(self.video.complete_date, None)
 
-        self.language.is_complete = False
+        self.language.subtitles_complete = False
         self.language.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-        self.assertEqual(self.video.complete_date, None)
-
-        self.language.is_complete = True
-        self.language.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-        self.assertNotEqual(self.video.complete_date, None)
-
-        l.is_complete = True
-        l.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-        self.assertNotEqual(self.video.complete_date, None)
-
-        self.language.delete()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-# FIXME: why should complete_date be non-null here?
-#        self.assertNotEqual(self.video.complete_date, None)
-
-        l.delete()
         video_changed_tasks.delay(self.video.pk)
         self.video = Video.objects.get(pk=self.video.pk)
         self.assertEqual(self.video.complete_date, None)
