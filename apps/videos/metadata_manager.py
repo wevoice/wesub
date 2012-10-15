@@ -32,9 +32,14 @@ def update_metadata(video_pk):
         _invalidate_cache(video)
 
 def _update_is_was_subtitled(video):
-    language = video.subtitle_language()
+    from subtitles.models import SubtitleLanguage
+    language_code = video.primary_audio_language_code
+    has_version = (SubtitleLanguage.objects.having_nonempty_tip()
+                                           .filter(video=video, 
+                                                   language_code=language_code)
+                                           .exists())
 
-    if not language or not language.has_version:
+    if has_version:
         if video.is_subtitled:
             video.is_subtitled = False
             video.save()
