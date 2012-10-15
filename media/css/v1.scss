@@ -493,6 +493,16 @@ div.fix-chosen div.chzn-container {
         color: #a33d36;
     }
 }
+.v1 .view p.prompt {
+    clear: both;
+    margin: 0;
+    padding: .5em 10px;
+    color: #777;
+
+    a {
+        color: #555;
+    }
+}
 .v1 .listing {
     clear: both;
     padding: 0;
@@ -678,10 +688,21 @@ div.fix-chosen div.chzn-container {
     position: relative;
     width: 310px;
 
-    h3 {
-        clear: both;
-        height: 2em;
-        margin: 6px 10px 10px;
+    h4 a {
+        display: block;
+        position: absolute;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        bottom: 0; left: 1em;
+        padding: 1em;
+        width: 290px;
+        background: rgba(0,0,0,.65);
+        color: #fff;
+    }
+
+    &:hover h4 a {
+        background: rgba(0,0,0,.75);
     }
 
     .thumb {
@@ -690,9 +711,11 @@ div.fix-chosen div.chzn-container {
         position: relative;
         top: 0;
 
-        img {
-            margin: 10px 10px 0;
+        a img {
+            margin: 1em;
             width: 290px;
+            height: 180px;
+            border: none;
         }
     }
 
@@ -731,26 +754,19 @@ div.fix-chosen div.chzn-container {
     }
 
     .admin-controls {
-        background: hsla(0%, 0%, 0%, .55);
         border: none;
-        bottom: .6em;
-        opacity: 1;
-        right: 1em;
-        text-shadow: 1px 1px 1px #444;
+        bottom: -1em;
+        right: 0;
         padding: .5em;
 
         a {
             border: none;
-            color: #eee;
+            color: #999;
 
             &:hover {
-                background: transparent;
-                color: #fff;
+                color: #555;
                 text-decoration: underline;
             }
-        }
-        &:hover {
-            background: hsla(0%, 0%, 0%, .75);
         }
     }
 }
@@ -2253,6 +2269,16 @@ a.truncated-expand {
 
 .team_dashboard .view {
 
+    .get-started {
+        clear: both;
+        font-size: 1.275em;
+        padding: 1.5em 4em 0;
+
+        p {
+            margin-bottom: 1em;
+        }
+    }
+
     > h3 {
         position: relative;
         clear: both;
@@ -2310,26 +2336,6 @@ a.truncated-expand {
 
     .listing.videos {
         li {
-            h4 a {
-                display: block;
-                position: absolute;
-                -moz-box-sizing: border-box;
-                -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-                bottom: 0px; left: 10px;
-                padding: 1em;
-                width: 290px;
-                background: rgba(0,0,0,.65);
-                color: #fff;
-            }
-
-            &:hover h4 a {
-                background: rgba(0,0,0,.75);
-            }
-
-            .thumb a img {
-                border: none;
-            }
 
             .langs {
                 position: relative;
