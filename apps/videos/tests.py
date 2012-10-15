@@ -46,7 +46,7 @@ from utils.subtitles import (
 )
 from subtitles import models as sub_models
 from subtitles.pipeline import add_subtitles
-from videos import metadata_manager, alarms, EffectiveSubtitle
+from videos import metadata_manager
 from utils.unisubsmarkup import html_to_markup, markup_to_html
 from videos.feed_parser import FeedParser
 from videos.forms import VideoForm
@@ -215,6 +215,16 @@ DFXP_TEXT = u'''<?xml version="1.0" encoding="UTF-8"?>
   </body>
 </tt>
 '''
+
+def create_langs_and_versions(video, langs, user=None):
+    from subtitles import pipeline            
+
+    SRT = u"""1
+00:00:00,004 --> 00:00:02,093
+We\n started <b>Universal Subtitles</b> <i>because</i> we <u>believe</u>
+"""
+    subtitles = babelsubs.load_from(SRT, type='srt', language='en').to_internal()
+    return [pipeline.add_subtitles(video, l, subtitles) for l in langs]
 
 class GenericTest(TestCase):
     def test_languages(self):
@@ -1818,32 +1828,6 @@ class TestTasks(TestCase):
             self.assertTrue(message.user in list(followers))
             self.assertFalse(message.user in list(lan2_followers))
 
-class TestAlert(TestCase):
-    fixtures = ['test.json', 'subtitle_fixtures.json']
-
-    def setUp(self):
-        self.video = Video.objects.all()[:1].get()
-        self.original_language = self.video.subtitle_language()
-        self.latest_version = self.original_language.latest_version()
-        settings.ALERT_EMAIL = 'test@test.com'
-
-    def _new_version(self, lang=None):
-        v = SubtitleVersion()
-        v.language = lang or self.original_language
-        v.datetime_started = datetime.now()
-        lv = v.language.latest_version()
-        v.version_no = lv and lv.version_no+1 or 1
-        v.save()
-        return v
-
-    def test_other_languages_changes(self):
-        v = self._new_version()
-        l = SubtitleLanguage(video=self.video, language='ru', is_original=False)
-        l.save()
-        self._new_version(l)
-        alarms.check_other_languages_changes(v, ignore_statistic=True)
-        self.assertEquals(len(mail.outbox), 1)
-
 class TestModelsSaving(TestCase):
 
     fixtures = ['test.json']
@@ -2262,16 +2246,6 @@ class TestSubtitleMetadata(TestCase):
         self.assertEqual(version.get_approved_by().pk, user.pk,
             "Version's approved_by metadata is not the correct User.")
 
-
-def create_langs_and_versions(video, langs, user=None):
-    from subtitles import pipeline            
-
-    SRT = u"""1
-00:00:00,004 --> 00:00:02,093
-We\n started <b>Universal Subtitles</b> <i>because</i> we <u>believe</u>
-"""
-    subtitles = babelsubs.load_from(SRT, type='srt', language='en').to_internal()
-    return [pipeline.add_subtitles(video, l, subtitles) for l in langs]
 
 def refresh_obj(m):
     return m.__class__._default_manager.get(pk=m.pk)

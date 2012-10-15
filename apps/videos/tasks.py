@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
-import urllib
 from urllib import urlopen
 
 from celery.decorators import periodic_task
@@ -27,8 +26,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.base import ContentFile
 from django.db.models import ObjectDoesNotExist
-from django.utils import simplejson as json
-from django.utils.http import urlquote_plus
 from haystack import site
 from raven.contrib.django.models import client
 
@@ -119,7 +116,6 @@ def video_changed_tasks(video_pk, new_version_id=None):
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         _send_notification(new_version_id)
-        _check_alarm(new_version_id)
         _update_captions_in_original_service(new_version_id)
 
     video = Video.objects.get(pk=video_pk)
@@ -237,16 +233,6 @@ def _send_notification(version_id):
         time_change, text_change = version.get_changes()
         if text_change or time_change:
             _send_letter_caption(version)
-
-def _check_alarm(version_id):
-    from videos import alarms
-
-    try:
-        version = SubtitleVersion.objects.get(id=version_id)
-    except SubtitleVersion.DoesNotExist:
-        return
-
-    alarms.check_other_languages_changes(version)
 
 def _send_letter_translation_start(translation_version):
     domain = Site.objects.get_current().domain
