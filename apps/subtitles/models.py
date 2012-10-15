@@ -383,6 +383,17 @@ class SubtitleLanguage(models.Model):
         else:
             return None
 
+    def is_complete_and_synced(self, public=False):
+        """ Verifies if this language not only has covered all the audio
+        on the video with text but also if those subtitles are correctly synced """
+
+        if not self.subtitles_complete:
+            return False
+
+        version = self.get_tip(public)
+        subtitles = version.get_subtitles()
+
+        return subtitles.fully_synced
 
     def _sanity_check_parents(self, version, parents):
         r"""Check that the given parents are sane for an SV about to be created.
