@@ -111,8 +111,9 @@ unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
     unisubs.player.BrightcoveVideoPlayer.superClass_.enterDocument.call(this);
     if (!this.swfEmbedded_) {
 
-        // If the Brightcove JS API has not been included, load it.
-        if (typeof window.brightcove == 'undefined') {
+        // If the Brightcove JS API has not been included (and it's not currently loading), load it.
+        if (typeof window.brightcove === undefined && window.unisubs.brightcoveLoading === undefined) {
+            window.unisubs.brightcoveLoading = true;
             var script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences_all.js';
