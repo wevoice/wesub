@@ -79,11 +79,10 @@ unisubs.player.MediaSource.bestVideoSource = function(videoSpecs) {
         return unisubs.player.MediaSource.videoSourceForSpec_(spec);
     });
     var videoSource = null;
-
+    if (videoSources && videoSources.length != 0){
+        return videoSources[0];
+    }
     videoSource = unisubs.player.MediaSource.bestHTML5VideoSource_(videoSources);
-    if (videoSource != null)
-        return videoSource;
-
     // browser does not support any available html5 formats. Return a flash format.
     videoSource = goog.array.find(
         videoSources,

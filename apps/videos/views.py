@@ -21,7 +21,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRespons
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST
 from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
     VideoUrl, AlreadyEditingException, restrict_versions
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
@@ -613,7 +613,7 @@ def counter(request):
     return HttpResponse('draw_unisub_counter({videos_count: %s})' % count)
 
 @login_required
-@require_http_methods(['POST'])
+@require_POST
 def video_url_make_primary(request):
     output = {}
     id = request.POST.get('id')
@@ -633,7 +633,7 @@ def video_url_make_primary(request):
     return HttpResponse(json.dumps(output), status=status)
 
 @login_required
-@require_http_methods(['POST'])
+@require_POST
 def video_url_remove(request):
     output = {}
     id = request.POST.get('id')
