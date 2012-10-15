@@ -284,7 +284,7 @@ unisubs.formatTime = function(time, opt_excludeMs) {
         timeString += seconds;
     if (!opt_excludeMs) {
         var frac = parseInt(time % 1000);
-        timeString += ('.' + goog.string.padNumber(frac, 2));
+        timeString += ('.' + goog.string.padNumber(frac, 3));
     }
     return timeString;
 };
