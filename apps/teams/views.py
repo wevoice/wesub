@@ -1159,9 +1159,12 @@ def _cache_video_url(tasks):
 def dashboard(request, slug):
 
     team = Team.get(slug, request.user)
-
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
+
+    # Had to add this or it wasn't set for unauthenticated users
+    # TODO: Better way to handle this?
+    user_tasks = None
 
     if user:
         user_filter = {'assignee':str(user.id)}
@@ -1174,12 +1177,11 @@ def dashboard(request, slug):
     from apps.widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
 
-    # TODO: Filter by permissions
-    #
-    # Don't show approve tasks if cannot approve
-    # Don't show review tasks if cannot review
-    # If has language/project narrowings, filter those out
-    # - transcriptions at bottom
+    # TODO: Ok, so for non-task teams, we should show
+    # a list of videos here. If the user is logged in
+    # we should filter down to videos that don't have subs
+    # in the user's language(s). For tasks teams, do the
+    # below...
 
     videos = {}
     video_pks = set()
@@ -1188,7 +1190,7 @@ def dashboard(request, slug):
     _cache_video_url(tasks)
 
     for task in tasks:
-        if not can_perform_task(user, task):
+        if user and not can_perform_task(user, task):
             continue
 
         pk = str(task.team_video.id)
@@ -1200,6 +1202,7 @@ def dashboard(request, slug):
 
         video = videos[pk]
         video.tasks.append(task)
+
 
     context = {
         'team': team,
