@@ -68,7 +68,7 @@ class BrightcoveVideoType(VideoType):
 
     @classmethod    
     def video_url(cls, obj):
-        return str(obj)
+        return str(obj.url)
     
     @classmethod
     def matches_video_url(cls, url):
