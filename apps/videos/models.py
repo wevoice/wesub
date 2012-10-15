@@ -474,7 +474,7 @@ class Video(models.Model):
         """
         ol = self._original_subtitle_language()
 
-        if ol:
+        if ol and ol.language_code:
             return ol.language_code
 
     @property

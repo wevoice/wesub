@@ -1075,6 +1075,9 @@ class SubtitleVersion(models.Model):
             d = d.strftime('%m/%d/%Y')
         return d
 
+    @property
+    def has_subtitles(self):
+        return self.subtitle_count is not 0
 
 class SubtitleVersionMetadata(models.Model):
     """This model is used to add extra metadata to SubtitleVersions.
