@@ -39,10 +39,10 @@
 {% endblock %}
 
 {% block title %}
-    {% if language.is_original %}
-        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
+    {% if language.is_primary_audio_language %}
+        "{{ last_version.title }}" {% trans "with" %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
     {% else %}
-        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
+        "{{ last_version.title }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
     {% endif %}
 {% endblock %}
 
