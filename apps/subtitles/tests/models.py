@@ -388,7 +388,7 @@ class TestSubtitleVersion(TestCase):
             (4000, 5500, 'Great'),
             (6000, 7000, 'New sub'),
         ]
-        sv1 =self.sl_en.add_version(title='title a', description='desc a',
+        sv1 = self.sl_en.add_version(title='title a', description='desc a',
                                     subtitles=subtitles_1)
         sv2 = self.sl_en.add_version(title='title b', description='desc b',
                                     subtitles=subtitles_2)

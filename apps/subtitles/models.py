@@ -871,10 +871,9 @@ class SubtitleVersion(models.Model):
         if hasattr(self, '_time_change') and hasattr(self, '_text_change'):
             return (self._time_change, self._text_change)
 
-        # Not sure what to do for merges yet
-        try:
-            parent = self.parents.all()[0]
-        except IndexError:
+        parent = self.previous_version()
+
+        if not parent:
             return (0.0, 0.0)
 
         subtitles = [s for s in self.get_subtitles().subtitle_items()]
@@ -921,6 +920,25 @@ class SubtitleVersion(models.Model):
 
         return time_change, text_change
 
+    @property
+    def time_change(self):
+        if not hasattr(self, '_time_change'):
+            self.get_changes()
+
+        if not self._time_change:
+            return '0%'
+        else:
+            return '%.0f%%' % (self._time_change * 100)
+
+    @property
+    def text_change(self):
+        if not hasattr(self, '_text_change'):
+            self.get_changes()
+
+        if not self._text_change:
+            return '0%'
+        else:
+            return '%.0f%%' % (self._text_change * 100)
 
     def is_private(self):
         if self.visibility_override == 'public':
@@ -1019,13 +1037,32 @@ class SubtitleVersion(models.Model):
         self._set_metadata('workflow_origin', origin)
 
     def next_version(self):
-        cls = self.__class__
         try:
-            return cls.objects.filter(version_number__gt=self.version_number) \
-                      .filter(subtitle_language=self.subtitle_language) \
-                      .order_by('version_number')[:1].get()
-        except cls.DoesNotExist:
+            return self.sibling_set.filter(
+                    version_number__gt=self.version_number).order_by(
+                        'version_number')[0]
+        except IndexError:
             return None
+
+    def previous_version(self):
+        try:
+            return self.sibling_set.filter(
+                    version_number__lt=self.version_number).order_by(
+                        '-version_number')[0]
+        except IndexError:
+            return None
+
+    def revision_time(self):
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+        d = self.created.date()
+        if d == today:
+            return 'Today'
+        elif d == yesterday:
+            return 'Yesterday'
+        else:
+            d = d.strftime('%m/%d/%Y')
+        return d
 
 
 class SubtitleVersionMetadata(models.Model):
