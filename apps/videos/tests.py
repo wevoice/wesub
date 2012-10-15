@@ -2742,7 +2742,7 @@ def add_subs(language, subs_texts):
             end_time = (i  * 1000)+ 1000 - 100
         )
 
-class TimmingChangeTest(TestCase):
+class TimingChangeTest(TestCase):
     '''
     This group of test is to make sure that timmiing is not being
     rounded ever
@@ -2766,8 +2766,8 @@ class TimmingChangeTest(TestCase):
                 subtitle_id=x,
                 subtitle_order=x,
                 subtitle_text="Sub %s" % x,
-                start_time =  x * 1111,
-                end_time = (x * 1111)+ 888
+                start_time =  x * 1033,
+                end_time = (x * 1033)+ 888
         )
 
         self.user = User.objects.get_or_create(username='admin')[0]
@@ -2785,8 +2785,8 @@ class TimmingChangeTest(TestCase):
         self.assertEqual(len(parser), 5)
         subs = [x for x in parser]
         for i,item in enumerate(subs):
-            self.assertEqual(item['start_time'], i * 1111)
-            self.assertEqual(item['end_time'], (i * 1111) + 888)
+            self.assertEqual(item['start_time'], i * 1033)
+            self.assertEqual(item['end_time'], (i * 1033) + 888)
         return subs
 
     def _download_then_upload(self,format):
@@ -2826,8 +2826,8 @@ class TimmingChangeTest(TestCase):
         subtitles = self.to_upload_video.subtitle_language("en").version().subtitle_set.all()
         self.assertEqual(len(subtitles), 5)
         for i,item in enumerate(subtitles):
-            self.assertEqual(item.start_time, i * 1111)
-            self.assertEqual(item.end_time, (i * 1111) + 888)
+            self.assertEqual(item.start_time, i * 1033)
+            self.assertEqual(item.end_time, (i * 1033) + 888)
 
 
     def test_dowload_then_upload(self):

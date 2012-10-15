@@ -583,9 +583,15 @@ class DfxpSubtitleParser(SubtitleParser):
             yield self._get_data(item)
 
 def fraction_to_milliseconds(str_milli):
+    """
+    Converts milliseonds as an integer string to a 3 padded string, e.g.
+    1 -> 001
+    10 -> 010
+    100 -> 100
+    """
     if not str_milli:
         return 0
-    return int(str_milli.ljust(3, '0')) % 1000
+    return int(str_milli.rjust(3, '0').ljust(3, '0')) % 1000
 
 class SrtSubtitleParser(SubtitleParser):
     _clean_pattern = re.compile(r'\{.*?\}', re.DOTALL)
