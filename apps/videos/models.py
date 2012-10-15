@@ -474,8 +474,8 @@ class Video(models.Model):
         """
         ol = self._original_subtitle_language()
 
-        if ol and ol.language:
-            return ol.language
+        if ol:
+            return ol.language_code
 
     @property
     def filename(self):
