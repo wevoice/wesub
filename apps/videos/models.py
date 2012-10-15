@@ -778,6 +778,12 @@ class Video(models.Model):
 
         return team.is_member(user)
 
+    @property
+    def translations(self):
+        from subtitles.models import SubtitleLanguage as SL
+        return SL.objects.filter(video=self).exclude(
+                language_code=self.primary_audio_language_code)
+
     class Meta(object):
         permissions = (
             ("can_moderate_version"   , "Can moderate version" ,),

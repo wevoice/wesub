@@ -782,7 +782,7 @@ def reset_metadata(request, video_id):
 
 def _get_translations(video):
     original = video.subtitle_language()
-    translations = video.subtitlelanguage_set.exclude(subtitle_count=0)
+    translations = video.translations
     if original:
         translations = translations.exclude(pk=original.pk)
     translations = list(translations)
