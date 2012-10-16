@@ -112,7 +112,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
     if (!this.swfEmbedded_) {
 
         // If the Brightcove JS API has not been included (and it's not currently loading), load it.
-        if (typeof window.brightcove === undefined && window.unisubs.brightcoveLoading === undefined) {
+        if (typeof window.brightcove === 'undefined' && typeof window.unisubs.brightcoveLoading === 'undefined') {
             window.unisubs.brightcoveLoading = true;
             var script = document.createElement('script');
             script.type = 'text/javascript';
