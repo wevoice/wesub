@@ -347,6 +347,6 @@ where the latest version has at least one subtitle.  Previously::
 
 Now::
 
-    SubtitleLanguage.objects.having_non_empty_tip().filter(video-video)
+    SubtitleLanguage.objects.having_nonempty_versions().filter(video=video)
 
 

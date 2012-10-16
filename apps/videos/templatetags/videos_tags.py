@@ -107,7 +107,8 @@ video_url = register.tag(video_url)
 
 @register.filter
 def in_progress(language):
-    return not language.last_version and language.latest_version(False)
+    return (not language.get_tip(public=True) and
+        language.get_tip(public=False))
 
 @register.filter
 def format_duration(value):

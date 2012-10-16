@@ -635,6 +635,15 @@ class SubtitleLanguage(models.Model):
         return ('videos:translation_history',
                 [self.video.video_id, self.language_code or 'unknown', self.pk])
 
+    @property
+    def has_version(self):
+        """
+        http://amara.readthedocs.org/en/latest/model-refactor.html#id4
+        """
+        return SubtitleLanguage.objects.having_nonempty_versions().filter(
+                video=self.video).exists()
+
+
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
     def public(self):

@@ -36,16 +36,16 @@ def upload_subtitles(context, video):
         initial['language'] = ''
 
     original_language = video.subtitle_language()
-    if original_language and original_language.language:
-        initial['video_language'] = original_language.language
+    if original_language and original_language.language_code:
+        initial['video_language'] = original_language.language_code
 
     context['form'] = SubtitlesUploadForm(context['user'], video, initial=initial)
     return context
 
 @register.simple_tag
 def complete_indicator(language, mode='normal'):
-    if language.is_original or language.is_forked:
-        if language.is_complete and language.subtitle_count > 0:
+    if language.is_primary_audio_language or language.is_forked:
+        if language.subtitles_complete and language.subtitle_count > 0:
             return "100%"
         if mode == 'pct':
             if language.subtitle_count == 0:
@@ -53,14 +53,14 @@ def complete_indicator(language, mode='normal'):
             else:
                 return "??"
         v = language.version()
-        count = v and v.subtitle_set.count() or 0
+        count = v and v.subtitle_count or 0
         return ungettext('%(count)s Line', '%(count)s Lines', count) % {'count': count}
     return '%i%%' % language.percent_done
 
 @register.simple_tag
 def complete_color(language):
-    if language.is_original or language.is_forked:
-        if language.is_complete:
+    if language.is_primary_audio_language or language.is_forked:
+        if language.subtitles_complete:
             return 'eighty'
         else:
             return 'full'
