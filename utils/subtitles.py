@@ -35,6 +35,8 @@ from utils.html import unescape as unescape_html
 
 # see video.models.Subtitle..start_time
 MAX_SUB_TIME = (60 * 60 * 100 * 1000) - 1000
+# formats that cap num of hours in 1 digit
+MAX_SUB_TIME_ONE_HOUR_DIGIT = (60 * 60 * 10 * 1000) - 1000
 DEFAULT_ALLOWED_TAGS = ['i', 'b', 'u']
 def is_version_same(version, parser):
     if not version:
@@ -84,6 +86,7 @@ def time_expression_to_milliseconds(time_expression, tick_rate=None):
     """
     if not time_expression:
         return 0
+    res = None
     match = TIME_EXPRESSION_CLOCK_TIME.match(time_expression)
     if match:
         groups = match.groupdict()
@@ -91,24 +94,29 @@ def time_expression_to_milliseconds(time_expression, tick_rate=None):
         minutes = int(groups['minutes'])
         seconds  = int(groups['seconds'])
         milliseconds = int(groups['fraction'] or 0)
-        return (((hour * 3600) + (minutes * 60) + seconds ) * 1000 ) + milliseconds
-    match = TIME_EXPRESSION_METRIC.match(time_expression)
-    if match:
-        groups = match.groupdict()
-        num, unit = int(groups['num']), groups['unit']
-        if unit == 't':
-            if not tick_rate:
-                raise ValueError("Ticks need a tick rate, mate.")
-            return 1000 * (num / float(tick_rate))
-        multiplier = {
-            "h": 3600 * 1000,
-            "m": 60 * 1000,
-            "s": 1000,
-            "ms": 1,
-            'f': 0,
-        }.get(unit, None)
-        return num * multiplier
-    raise ValueError("Time expression %s can't be parsed" % time_expression)
+        res =  (((hour * 3600) + (minutes * 60) + seconds ) * 1000 ) + milliseconds
+    else:
+        match = TIME_EXPRESSION_METRIC.match(time_expression)
+        if match:
+            groups = match.groupdict()
+            num, unit = int(groups['num']), groups['unit']
+            if unit == 't':
+                if not tick_rate:
+                    raise ValueError("Ticks need a tick rate, mate.")
+                return 1000 * (num / float(tick_rate))
+            multiplier = {
+                "h": 3600 * 1000,
+                "m": 60 * 1000,
+                "s": 1000,
+                "ms": 1,
+                'f': 0,
+            }.get(unit, None)
+            res =  num * multiplier
+    if  res is None:
+        raise ValueError("Time expression %s can't be parsed" % time_expression)
+    if res >= MAX_SUB_TIME:
+        return None
+    return res
 
 
     
@@ -595,6 +603,7 @@ def fraction_to_milliseconds(str_milli):
 
 class SrtSubtitleParser(SubtitleParser):
     _clean_pattern = re.compile(r'\{.*?\}', re.DOTALL)
+    MAX_SUB_TIME = MAX_SUB_TIME
 
     def __init__(self, subtitles):
         pattern = r'\d+\s*?\n'
@@ -612,6 +621,8 @@ class SrtSubtitleParser(SubtitleParser):
             (int(hour)*60*60 )+
             (int(min)*60) +
             int(sec))) + milliseconds
+        if res >= self.MAX_SUB_TIME:
+            return None
         return res
 
     def _get_data(self, match):
@@ -625,6 +636,7 @@ class SrtSubtitleParser(SubtitleParser):
 
 class SbvSubtitleParser(SrtSubtitleParser):
 
+    MAX_SUB_TIME = MAX_SUB_TIME_ONE_HOUR_DIGIT
     def __init__(self, subtitles):
         pattern = r'(?P<s_hour>\d{1}):(?P<s_min>\d{2}):(?P<s_sec>\d{2})\.(?P<s_secfr>\d{3})'
         pattern += r','
@@ -636,6 +648,7 @@ class SbvSubtitleParser(SrtSubtitleParser):
         self.subtitles = self.subtitles.replace('\r\n', '\n')+u'\n\n'
 
 class SsaSubtitleParser(SrtSubtitleParser):
+    MAX_SUB_TIME = MAX_SUB_TIME_ONE_HOUR_DIGIT
     def __init__(self, file):
         pattern = r'Dialogue: [\w=]+,' #Dialogue: <Marked> or <Layer>,
         pattern += r'(?P<s_hour>\d):(?P<s_min>\d{2}):(?P<s_sec>\d{2})[\.\:](?P<s_secfr>\d+),' #<Start>,

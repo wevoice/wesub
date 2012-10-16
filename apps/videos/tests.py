@@ -41,7 +41,7 @@ from messages.models import Message
 from teams.models import Team, TeamVideo, Workflow, TeamMember
 from testhelpers.views import _create_videos
 from utils.subtitles import (
-    SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser, DfxpSubtitleParser, ParserList
+    SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser, DfxpSubtitleParser, ParserList, MAX_SUB_TIME
 )
 from videos import metadata_manager, alarms, EffectiveSubtitle
 from utils.unisubsmarkup import html_to_markup, markup_to_html
@@ -2774,7 +2774,7 @@ class TimingChangeTest(TestCase):
         self.user.set_password('admin')
         self.user.save()
 
-    def _download_subs(self, format, video):
+    def _download_subs(self, format, video, unsynced=False):
         url = reverse("widget:download_" + format)
         res = self.client.get(url, {
             'video_id': video.video_id,
@@ -2784,13 +2784,18 @@ class TimingChangeTest(TestCase):
         parser =  ParserList[format](res.content.decode('utf-8'))
         self.assertEqual(len(parser), 5)
         subs = [x for x in parser]
+       
         for i,item in enumerate(subs):
-            self.assertEqual(item['start_time'], i * 1033)
-            self.assertEqual(item['end_time'], (i * 1033) + 888)
+            if unsynced:
+                self.assertEqual(item['start_time'], None)
+                self.assertEqual(item['end_time'], None)
+            else:
+                self.assertEqual(item['start_time'], i * 1033)
+                self.assertEqual(item['end_time'], (i * 1033) + 888)
         return subs
 
-    def _download_then_upload(self,format):
-        subs = self._download_subs(format, self.original_video)
+    def _download_then_upload(self,format, unsynced=False):
+        subs = self._download_subs(format, self.original_video, unsynced=unsynced)
         cleaned_subs = []
         for s in subs:
             cleaned_subs.append({
@@ -2826,19 +2831,65 @@ class TimingChangeTest(TestCase):
         subtitles = self.to_upload_video.subtitle_language("en").version().subtitle_set.all()
         self.assertEqual(len(subtitles), 5)
         for i,item in enumerate(subtitles):
-            self.assertEqual(item.start_time, i * 1033)
-            self.assertEqual(item.end_time, (i * 1033) + 888)
+            if unsynced:
+                self.assertEqual(item.start_time, None)
+                self.assertEqual(item.end_time, None)
+            else:
+                self.assertEqual(item.start_time, i * 1033)
+                self.assertEqual(item.end_time, (i * 1033) + 888)
 
-
-    def test_dowload_then_upload(self):
+    def test_dowload_then_upload_srt(self):
         # this is a 'round trip' test
         # we store subs directly into the db, with known timming
         # we then dowload the subs in each format
         # upload them through the upload
         # then check the new subs timming against the original ones
         self._download_then_upload('srt')
+
+    def test_dowload_then_upload_dfxp(self):
+        # this is a 'round trip' test
+        # we store subs directly into the db, with known timming
+        # we then dowload the subs in each format
+        # upload them through the upload
+        # then check the new subs timming against the original ones
         self._download_then_upload('dfxp')
+
+    def test_dowload_then_upload_ssa(self):
+        # this is a 'round trip' test
+        # we store subs directly into the db, with known timming
+        # we then dowload the subs in each format
+        # upload them through the upload
+        # then check the new subs timming against the original ones
         self._download_then_upload('ssa')
-        self._download_then_upload('sbv')
+
+    def test_dowload_then_upload_ttml(self):
+        # this is a 'round trip' test
+        # we store subs directly into the db, with known timming
+        # we then dowload the subs in each format
+        # upload them through the upload
+        # then check the new subs timming against the original ones
         self._download_then_upload('ttml')
-        # txt format has no timming data
+
+    def test_dowload_then_upload_sbv(self):
+        # this is a 'round trip' test
+        # we store subs directly into the db, with known timming
+        # we then dowload the subs in each format
+        # upload them through the upload
+        # then check the new subs timming against the original ones
+        self._download_then_upload('sbv')
+
+    def test_unsynced_srt(self):
+        Subtitle.objects.filter(version__language__video=self.original_video).update(start_time=None, end_time=None)
+        self._download_then_upload('srt', unsynced=True)
+
+    def test_unsynced_dfxp(self):
+        Subtitle.objects.filter(version__language__video=self.original_video).update(start_time=None, end_time=None)
+        self._download_then_upload('dfxp', unsynced=True)
+
+    def test_unsynced_sbv(self):
+        Subtitle.objects.filter(version__language__video=self.original_video).update(start_time=None, end_time=None)
+        self._download_then_upload('sbv', unsynced=True)
+
+    def test_unsynced_ssa(self):
+        Subtitle.objects.filter(version__language__video=self.original_video).update(start_time=None, end_time=None)
+        self._download_then_upload('ssa', unsynced=True)
