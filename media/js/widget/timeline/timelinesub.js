@@ -92,17 +92,18 @@ unisubs.timeline.TimelineSub.prototype.onMouseOut_ = function(event) {
 };
 unisubs.timeline.TimelineSub.prototype.onDocMouseMoveLeft_ = function(event) {
     // moving left grabber
-    this.subtitle_.getEditableCaption().setStartTime(
-        this.grabberMousedownTime_ +
+    var time = this.grabberMousedownTime_ +
             (event.clientX - this.grabberMousedownClientX_) /
-            this.pixelsPerMillisecond_);
+            this.pixelsPerMillisecond_;
+    
+    this.subtitle_.getEditableCaption().setStartTime(parseInt(time));
 };
 unisubs.timeline.TimelineSub.prototype.onDocMouseMoveRight_ = function(event) {
     // moving right grabber
-    this.subtitle_.getEditableCaption().setEndTime(
-        this.grabberMousedownTime_ +
+    var time =         this.grabberMousedownTime_ +
             (event.clientX - this.grabberMousedownClientX_) /
-            this.pixelsPerMillisecond_);
+            this.pixelsPerMillisecond_;
+    this.subtitle_.getEditableCaption().setEndTime(parseInt(time));
 };
 unisubs.timeline.TimelineSub.prototype.onDocMouseUp_ = function(event) {
     this.editing_ = false;
@@ -158,7 +159,6 @@ unisubs.timeline.TimelineSub.prototype.updateValues_ = function() {
     }
     if (this.subtitle_.getEndTime() != this.existingSubEnd_ ||
         this.subtitle_.getStartTime() != this.existingSubStart_) {
-        console.log(this.subtitle_.getStartTime());
         unisubs.style.setWidth(
             this.getElement(),
             (this.subtitle_.getEndTime() - this.subtitle_.getStartTime()) *

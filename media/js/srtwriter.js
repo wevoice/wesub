@@ -43,6 +43,8 @@ unisubs.SRTWriter.writeSrtTimeLine_ = function(sub, stringBuffer) {
 };
 
 unisubs.SRTWriter.writeSrtTime_ = function(milliseconds, stringBuffer) {
+    // be paranoid if we passed float as a milliseconds
+    milliseconds = parseInt(milliseconds);
     if (milliseconds == -1 || !goog.isDefAndNotNull(milliseconds)) {
         stringBuffer.append("99:59:59,000");
     }
