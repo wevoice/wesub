@@ -882,13 +882,15 @@ class SubtitleVersion(models.Model):
         Return ``(time_change, text_change)``
         """
 
+        # TODO: Time only changes aren't quite right.
+
         if hasattr(self, '_time_change') and hasattr(self, '_text_change'):
             return (self._time_change, self._text_change)
 
         parent = self.previous_version()
 
         if not parent:
-            return (0.0, 0.0)
+            return (1.0, 1.0)
 
         subtitles = [s for s in self.get_subtitles().subtitle_items()]
         last_subtitles = [s for s in parent.get_subtitles().subtitle_items()]
@@ -905,11 +907,13 @@ class SubtitleVersion(models.Model):
         text_count_changed = 0
         time_count_changed = 0
 
+        # Same timing, different text
         for sub_timing in sub_dict:
             if sub_timing in last_sub_dict:
                 if not last_sub_dict[sub_timing] == sub_dict[sub_timing]:
                     text_count_changed += 1
 
+        # Same text, different timing
         for sub_text in sub_dict_reverse:
             try:
                 last = last_sub_dict_reverse[sub_text]
@@ -920,8 +924,15 @@ class SubtitleVersion(models.Model):
             if not last == current:
                 time_count_changed += 1
 
+        # How many of the timings from the old version aren't in the new one
         for sub_timing in last_sub_dict:
             if sub_timing not in sub_dict.keys():
+                text_count_changed += 1
+                time_count_changed += 1
+
+        # How many of the timings from the new version aren't in the old one
+        for sub_timing in sub_dict:
+            if sub_timing not in last_sub_dict.keys():
                 text_count_changed += 1
                 time_count_changed += 1
 

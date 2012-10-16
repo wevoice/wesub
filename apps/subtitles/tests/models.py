@@ -377,24 +377,39 @@ class TestSubtitleVersion(TestCase):
         self.assertTrue(sv.is_private())
 
     def test_text_time_change(self):
+        from subtitles.pipeline import add_subtitles
+
+        SubtitleVersion.objects.all().delete()
+        SubtitleLanguage.objects.all().delete()
+
         subtitles_1 = [
-            (0, 1000, 'Hello ther'),
-            (2000, 3000, 'How are you?'),
-            (4000, 5000, 'Great'),
+            (0, 1000, 'Hello there'),
         ]
         subtitles_2 = [
             (0, 1000, 'Hello there'),
             (2000, 3000, 'How are you?'),
-            (4000, 5500, 'Great'),
-            (6000, 7000, 'New sub'),
         ]
-        sv1 = self.sl_en.add_version(title='title a', description='desc a',
-                                    subtitles=subtitles_1)
-        sv2 = self.sl_en.add_version(title='title b', description='desc b',
-                                    subtitles=subtitles_2)
+        subtitles_3 = [
+            (0, 1000, 'Hello there.'),
+            (2000, 3000, 'How are you?'),
+        ]
+        subtitles_4 = [
+            (0, 1000, 'Hello there.'),
+            (2000, 4000, 'How are you?'),
+        ]
 
-        self.assertEquals((0.0, 0.0), sv1.get_changes())
+        sv1 = add_subtitles(self.video, 'en', subtitles_1)
+        sv2 = add_subtitles(self.video, 'en', subtitles_2)
+        sv3 = add_subtitles(self.video, 'en', subtitles_3)
+        sv4 = add_subtitles(self.video, 'en', subtitles_4)
+
+        self.assertEquals((1.0, 1.0), sv1.get_changes())
+        # 50% of text and 50% of timing is new
         self.assertEquals((0.5, 0.5), sv2.get_changes())
+        self.assertEquals((0.0, 0.5), sv3.get_changes())
+
+        # TODO: This will break.
+        # self.assertEquals((0.5, 0.0), sv4.get_changes())
 
     def test_subtitle_count(self):
         s0 = (100, 200, "a")
