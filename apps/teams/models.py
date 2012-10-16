@@ -124,7 +124,7 @@ class Team(models.Model):
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
 
     # these allow unisubs to do things on user's behalf such as uploding subs to Youtub
-    third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",  related_name='tseams', verbose_name=_('third party accounts'))
+    third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",  related_name='teams', verbose_name=_('third party accounts'))
 
     points = models.IntegerField(default=0, editable=False)
     applicants = models.ManyToManyField(User, through='Application', related_name='applicated_teams', verbose_name=_('applicants'))
