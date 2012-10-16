@@ -264,6 +264,9 @@ unisubs.logout = function() {
 };
 
 unisubs.formatTime = function(time, opt_excludeMs) {
+    if (time === -1){
+        return "--";
+    }
     var intTime = parseInt(time / 1000);
 
     var timeString = '';
