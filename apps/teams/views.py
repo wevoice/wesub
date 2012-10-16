@@ -1177,31 +1177,47 @@ def dashboard(request, slug):
     from apps.widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
 
-    # TODO: Ok, so for non-task teams, we should show
-    # a list of videos here. If the user is logged in
-    # we should filter down to videos that don't have subs
-    # in the user's language(s). For tasks teams, do the
-    # below...
+    workflow = team.get_workflow()
 
     videos = {}
-    video_pks = set()
 
-    tasks = _tasks_list(request, team, None, filters, user)[0:TASKS_ON_PAGE]
-    _cache_video_url(tasks)
+    allows_tasks = workflow and workflow.allows_tasks
 
-    for task in tasks:
-        if user and not can_perform_task(user, task):
-            continue
+    if allows_tasks:
+        videos = {}
+        video_pks = set()
 
-        pk = str(task.team_video.id)
-        
-        if not pk in video_pks:
-            videos[pk] = task.team_video
-            videos[pk].tasks = []
-            video_pks.add(pk)
+        tasks = _tasks_list(request, team, None, filters, user)[0:TASKS_ON_PAGE]
+        _cache_video_url(tasks)
 
-        video = videos[pk]
-        video.tasks.append(task)
+        for task in tasks:
+            if user and not can_perform_task(user, task):
+                continue
+
+            pk = str(task.team_video.id)
+            
+            if not pk in video_pks:
+                videos[pk] = task.team_video
+                videos[pk].tasks = []
+                video_pks.add(pk)
+
+            video = videos[pk]
+            video.tasks.append(task)
+    else:
+        team_videos = team.videos.select_related("teamvideo")
+        languages = set([ul.language for ul in request.user.get_languages()] + [''])
+
+        if not languages:
+            videos =  [(str(tv.teamvideo.id), tv.teamvideo) for tv in team_videos]
+        else:
+            for video in team_videos.all():
+                subtitled_languages = (video.subtitlelanguage_set
+                                                 .filter(language__in=languages)
+                                                 .values_list("language", flat=True))
+                if len(subtitled_languages) != len(languages):
+                    tv = video.teamvideo
+                    tv.languages = [l for l in languages if l not in subtitled_languages]
+                    videos[str(tv.id)] = tv
 
 
     context = {
@@ -1209,6 +1225,7 @@ def dashboard(request, slug):
         'member': member,
         'user_tasks': user_tasks,
         'videos': videos,
+        'allows_tasks': allows_tasks,
         'widget_settings': widget_settings
     }
 

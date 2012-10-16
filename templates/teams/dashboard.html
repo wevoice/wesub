@@ -44,7 +44,7 @@
             {% endif %}
         {% endwith %}
 
-        {% if team|is_team_member:user %}
+        {% if team|is_team_member:user and allows_tasks %}
             {% if user_tasks %}
                 <h3>
                     Videos you're working on
@@ -114,6 +114,7 @@
                             </h4>
                         </div>
                         <div class="langs">
+                            {% if allows_tasks %}
                                 {% if team_video.tasks|length > 1 %}
                                     <a href="#" title="Get started now">
                                         {{ team_video.tasks|length }}
@@ -152,6 +153,23 @@
                                         {% include "teams/_perform_task_js.html" %}
                                     {% endwith %}
                                 {% endif %}
+                            {% else %}
+                                {% if team_video.video.languages_count < 1 %}
+                                <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Create subtitles' %}</a>
+                                {% else %}
+                                <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Add new translation' %}</a>
+                                {% endif %}
+                                {% with v=team_video.video %}
+                                <script type="text/javascript">
+                                    $('#video-{{ team_video.id }}').click(function(){
+                                        var vs = unisubs.player.MediaSource.videoSourceForURL('{{ v.get_video_url|safe }}');
+                                        var op = new unisubs.widget.SubtitleDialogOpener('{{ v.video_id }}', 
+                                                                                     '{{ v.get_video_url|safe }}');
+                                        op.showStartDialog();
+                                    });
+                                </script>
+                                {% endwith %}
+                            {% endif %}
                         </div>
                     </li>
                 {% endfor %}
@@ -162,5 +180,16 @@
     </div>
     <script type="text/javascript">
         unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
+        $('.add-subtitles').click(function() {
+            widget_widget_div.selectMenuItem(
+            unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
+            return false;
+        });
+
+        $('.add-translation').click(function() {
+            widget_widget_div.selectMenuItem(
+            unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
+            return false;
+        });
     </script>
 {% endblock %}
