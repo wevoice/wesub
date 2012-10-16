@@ -110,6 +110,16 @@ unisubs.player.BrightcoveVideoPlayer.prototype.createDom = function() {
 unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
     unisubs.player.BrightcoveVideoPlayer.superClass_.enterDocument.call(this);
     if (!this.swfEmbedded_) {
+
+        // If the Brightcove JS API has not been included (and it's not currently loading), load it.
+        if (typeof window.brightcove === 'undefined' && typeof window.unisubs.brightcoveLoading === 'undefined') {
+            window.unisubs.brightcoveLoading = true;
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences_all.js';
+            document.body.appendChild(script);
+        }
+
         this.swfEmbedded_ = true;
         var videoContainer = this.getDomHelper().createDom('div');
         
@@ -130,13 +140,26 @@ unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
         videoContainer.innerHTML = embedString;
         videoContainer.id = unisubs.randomString();
         this.getElement().appendChild(videoContainer);
-        brightcove.createExperiences();
+
+        this.waitForBrightcoveThenInit();
 
     }
     this.getHandler().
         listen(this.progressTimer_, goog.Timer.TICK, this.progressTick_).
         listen(this.timeUpdateTimer_, goog.Timer.TICK, this.timeUpdateTick_);
     this.progressTimer_.start();
+};
+
+unisubs.player.BrightcoveVideoPlayer.prototype.waitForBrightcoveThenInit = function() {
+    var that = this;
+
+    if (typeof window.brightcove == 'undefined') {
+        setTimeout(function() {
+            that.waitForBrightcoveThenInit();
+        }, 500);
+    } else {
+        brightcove.createExperiences();
+    }
 };
 
 unisubs.player.BrightcoveVideoPlayer.prototype.sizeFromConfig_ = function() {
