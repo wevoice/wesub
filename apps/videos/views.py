@@ -63,6 +63,9 @@ from videos.decorators import get_video_revision, get_video_from_code
 from apps.teams.models import Task
 
 from subtitles import models as sub_models
+from babelsubs import get_available_formats
+
+AVAILABLE_SUBTITLE_FORMATS = get_available_formats()
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -458,7 +461,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['last_version'] = version
     context['next_version'] = version.next_version() if version else None
     context['can_edit'] = False
-    context['downloadable_formats'] = ['srt', 'ssa', 'ttml', 'txt', 'dfxp', 'sbv']
+    context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS
 
     if request.user.is_authenticated():
         # user can only edit a subtitle draft if he
