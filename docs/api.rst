@@ -369,7 +369,7 @@ Fetching subtitles for a given language:
 .. http:get:: /api2/partners/videos/asfssd/languages/111111/subtitles/?format=ssa
 
     :query format: The format to return the subtitles in. Supports all the
-        formats the regular website does: rst, ssa, txt, dfxp, ttml.
+        formats the regular website does: srt, ssa, txt, dfxp, ttml.
     :query version: the numeric version number to fetch.  Versions are listed in the
         VideoLanguageResouce request.
 
