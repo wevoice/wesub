@@ -336,6 +336,9 @@ class SubtitleLanguage(models.Model):
     pending_signoff_expired_count = models.PositiveIntegerField(default=0,
                                                                 editable=False)
 
+    followers = models.ManyToManyField(User, blank=True,
+            related_name='new_followed_languages', editable=False)
+
     # Statistics
     subtitles_fetched_counter = RedisSimpleField()
 
