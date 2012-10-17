@@ -33,7 +33,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-16 01:44-0500\n"
+"POT-Creation-Date: 2012-10-17 01:43-0500\n"
 "PO-Revision-Date: 2012-10-11 06:59+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/"
@@ -1648,7 +1648,7 @@ msgstr ""
 "Acabo de encontrar una versión de este vídeo con %(language_name)s "
 "subtítulos s"
 
-#: apps/videos/views.py:163
+#: apps/videos/views.py:166
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1660,7 +1660,7 @@ msgstr ""
 "sitio. Para añadir o\n"
 " mejorar los subtítulos, haz clic en el botón situado debajo del vídeo."
 
-#: apps/videos/views.py:171
+#: apps/videos/views.py:174
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
@@ -1670,34 +1670,34 @@ msgstr ""
 "                con servidor http.  Tu navegador puede mostrar contenidos \n"
 "                de advertencia mezclados."
 
-#: apps/videos/views.py:176
+#: apps/videos/views.py:179
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Los subtítulos existentes se importarán en unos minutos."
 
-#: apps/videos/views.py:284
+#: apps/videos/views.py:287
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr ""
 "Gracias por subir. En un minuto aproximadamente aparecerán tus subtítulos."
 
-#: apps/videos/views.py:286
+#: apps/videos/views.py:289
 msgid "Your changes have been saved."
 msgstr "Los cambios se han guardado."
 
-#: apps/videos/views.py:631
+#: apps/videos/views.py:634
 msgid "You have not permission change this URL"
 msgstr "No tienes permiso para cambiar esta URL"
 
-#: apps/videos/views.py:636 apps/videos/views.py:667
+#: apps/videos/views.py:639 apps/videos/views.py:670
 msgid "Object does not exist"
 msgstr "El objeto no existe"
 
-#: apps/videos/views.py:651
+#: apps/videos/views.py:654
 msgid "You have not permission delete this URL"
 msgstr "No tienes permiso para eliminar esta URL"
 
-#: apps/videos/views.py:655
+#: apps/videos/views.py:658
 msgid "You can't remove primary URL"
 msgstr ""
 

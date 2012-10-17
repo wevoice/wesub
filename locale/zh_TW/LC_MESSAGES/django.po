@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-16 01:34-0500\n"
+"POT-Creation-Date: 2012-10-17 01:33-0500\n"
 "PO-Revision-Date: 2012-10-11 06:59+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/"
@@ -1564,7 +1564,7 @@ msgstr ""
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "發現此影片已有%(language_name)s字幕"
 
-#: apps/videos/views.py:163
+#: apps/videos/views.py:166
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1574,40 +1574,40 @@ msgstr ""
 "這裡是您的影片字幕工作區。您可以將影片分享給朋友，或為您的網站取得嵌入代"
 "碼。  按下影片下方按鈕開始新增或是修改字幕"
 
-#: apps/videos/views.py:171
+#: apps/videos/views.py:174
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr ""
 
-#: apps/videos/views.py:176
+#: apps/videos/views.py:179
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "稍後片刻，現有字幕馬上就會匯入"
 
-#: apps/videos/views.py:284
+#: apps/videos/views.py:287
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr "感謝您的上傳，需要幾分鐘後才會顯示您的字幕"
 
-#: apps/videos/views.py:286
+#: apps/videos/views.py:289
 msgid "Your changes have been saved."
 msgstr "您的修改已經儲存"
 
-#: apps/videos/views.py:631
+#: apps/videos/views.py:634
 msgid "You have not permission change this URL"
 msgstr "您未獲准修改此URL"
 
-#: apps/videos/views.py:636 apps/videos/views.py:667
+#: apps/videos/views.py:639 apps/videos/views.py:670
 msgid "Object does not exist"
 msgstr "物件不存在"
 
-#: apps/videos/views.py:651
+#: apps/videos/views.py:654
 msgid "You have not permission delete this URL"
 msgstr "您未獲准刪除此URL"
 
-#: apps/videos/views.py:655
+#: apps/videos/views.py:658
 msgid "You can't remove primary URL"
 msgstr ""
 

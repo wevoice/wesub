@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-16 01:32-0500\n"
+"POT-Creation-Date: 2012-10-17 01:31-0500\n"
 "PO-Revision-Date: 2012-10-11 06:59+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/"
@@ -1580,7 +1580,7 @@ msgstr ""
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "막 이 비디오 %(language_name)s에 자막이 있는 버전을 발견 하였습니다."
 
-#: apps/videos/views.py:163
+#: apps/videos/views.py:166
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1591,41 +1591,41 @@ msgstr ""
 "나, 귀하의 사이트에 대한 소스 코드를 얻을 수 있습니다. 자막을 추가하거나 개선"
 "하기 위해, 비디오 아래의 버튼을 클릭합니다."
 
-#: apps/videos/views.py:171
+#: apps/videos/views.py:174
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr ""
 
-#: apps/videos/views.py:176
+#: apps/videos/views.py:179
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "몇 분 안에 기존 자막을 불러올 것입니다."
 
-#: apps/videos/views.py:284
+#: apps/videos/views.py:287
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
 msgstr ""
 "업로드 해주셔서 감사합니다. 귀하의 자막이 나타나는데는 잠시 시간이 걸립니다."
 
-#: apps/videos/views.py:286
+#: apps/videos/views.py:289
 msgid "Your changes have been saved."
 msgstr "변경 내용이 저장되었습니다."
 
-#: apps/videos/views.py:631
+#: apps/videos/views.py:634
 msgid "You have not permission change this URL"
 msgstr "당신은 이 URL을 변경할 권한이 없습니다."
 
-#: apps/videos/views.py:636 apps/videos/views.py:667
+#: apps/videos/views.py:639 apps/videos/views.py:670
 msgid "Object does not exist"
 msgstr "개체가 존재하지 않습니다."
 
-#: apps/videos/views.py:651
+#: apps/videos/views.py:654
 msgid "You have not permission delete this URL"
 msgstr "이 URL을 삭제할 권한이 없습니다."
 
-#: apps/videos/views.py:655
+#: apps/videos/views.py:658
 msgid "You can't remove primary URL"
 msgstr ""
 

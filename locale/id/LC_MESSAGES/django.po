@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-16 01:41-0500\n"
+"POT-Creation-Date: 2012-10-17 01:40-0500\n"
 "PO-Revision-Date: 2012-10-11 06:59+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Indonesian (Indonesia) (http://www.transifex.com/projects/p/"
@@ -1573,7 +1573,7 @@ msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr ""
 "Telah ditemukan sebuah versi lain video ini dengan bahasa %(language_name)s"
 
-#: apps/videos/views.py:163
+#: apps/videos/views.py:166
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1585,18 +1585,18 @@ msgstr ""
 "Untuk menambah atau\n"
 "mengkoreksi terjemahan, klik tombol dibawah video."
 
-#: apps/videos/views.py:171
+#: apps/videos/views.py:174
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr ""
 
-#: apps/videos/views.py:176
+#: apps/videos/views.py:179
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Terjemahan yang ada akan diimpor dalam beberapa menit."
 
-#: apps/videos/views.py:284
+#: apps/videos/views.py:287
 msgid ""
 "Thank you for uploading. It will take a minute or so for your subtitles to "
 "appear."
@@ -1604,23 +1604,23 @@ msgstr ""
 "Terimakasih. Proses ini akan berlangsung satu atau lebih dari beberapa menit "
 "hingga teks film Anda muncul."
 
-#: apps/videos/views.py:286
+#: apps/videos/views.py:289
 msgid "Your changes have been saved."
 msgstr "Perubahan Anda telah disimpan"
 
-#: apps/videos/views.py:631
+#: apps/videos/views.py:634
 msgid "You have not permission change this URL"
 msgstr "Anda tidak mempunyai izin untuk mengubah surel ini"
 
-#: apps/videos/views.py:636 apps/videos/views.py:667
+#: apps/videos/views.py:639 apps/videos/views.py:670
 msgid "Object does not exist"
 msgstr "Obyek tidak ada"
 
-#: apps/videos/views.py:651
+#: apps/videos/views.py:654
 msgid "You have not permission delete this URL"
 msgstr "Anda tidak mempunyai izin untuk menghapus surel ini"
 
-#: apps/videos/views.py:655
+#: apps/videos/views.py:658
 msgid "You can't remove primary URL"
 msgstr ""
 
