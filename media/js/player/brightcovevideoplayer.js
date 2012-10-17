@@ -158,7 +158,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.waitForBrightcoveThenInit = funct
             that.waitForBrightcoveThenInit();
         }, 500);
     } else {
-        brightcove.createExperiences();
+        window['brightcove'].createExperiences();
     }
 };
 
@@ -194,7 +194,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.onBrightcoveTemplateLoaded_ =
     if (playerAPIID == this.playerElemID_) {
         this.setDimensionsKnownInternal();
         this.player_ = goog.dom.getElement(this.playerElemID_);
-        this.bcPlayer_ = brightcove["getExperience"](this.playerElemID_);
+        this.bcPlayer_ = window['brightcove']["getExperience"](this.playerElemID_);
         var experienceModule = this.bcPlayer_.getModule(APIModules.EXPERIENCE);
         experienceModule.addEventListener(BCExperienceEvent.TEMPLATE_READY, 
                                           goog.bind(this.onBrightcoveTemplateReady_, this));
