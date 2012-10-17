@@ -92,7 +92,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.decorateInternal = function(eleme
 
 unisubs.player.BrightcoveVideoPlayer.prototype.logExternalInterfaceError_ = function() {
     unisubs.Rpc.call(
-        'log_brightCove_ei_failure', { 'page_url': window.location.href });
+        'log_brightCove_ei_failure', { 'page_url': window['location']['href'] });
 };
 
 unisubs.player.BrightcoveVideoPlayer.prototype.createDom = function() {
@@ -158,7 +158,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.waitForBrightcoveThenInit = funct
             that.waitForBrightcoveThenInit();
         }, 500);
     } else {
-        window['brightcove'].createExperiences();
+        window['brightcove']['createExperiences']();
     }
 };
 
