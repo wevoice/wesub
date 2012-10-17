@@ -789,5 +789,5 @@ def _get_translations(video):
     if original:
         translations = translations.exclude(pk=original.pk)
     translations = list(translations)
-    translations.sort(key=lambda f: f.get_language_display())
+    translations.sort(key=lambda f: f.get_language_code_display())
     return translations
