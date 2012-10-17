@@ -5,25 +5,25 @@
         {% if user.is_authenticated %}
             {% if team.is_open %}
                 {% if team.auth_provider and user.partner.slug != team.auth_provider.code %}
-                    <a href="{% url logout %}?next={{ team.auth_provider.url }}" class="join button primary reduced">
+                    <p><a href="{% url logout %}?next={{ team.auth_provider.url }}">
                         {% trans 'Join via' %}
                         {% if team.auth_provider.image_url %}
                             <img src="{{ team.auth_provider.image_url }}" alt="{{ team.auth_provider.verbose_name }}"/>
                         {% else %}
                             {{ team.auth_provider.verbose_name }}
                         {% endif %}
-                    </a>
+                    </a></p>
                     <p class="notation">
                         {% trans 'You will be logged out and new account will be created via' %}
                         {{ team.auth_provider.verbose_name }}
                     </p>
                 {% else %}
-                    <a id="join" class="join button primary" onclick="return confirm('{% trans "Do you really wish to join this team?" %}')" href="{% url teams:join_team team.slug %}">{% trans "Join this team now!" %}</a>
+                    <p><a id="join" onclick="return confirm('{% trans "Do you really wish to join this team?" %}')" href="{% url teams:join_team team.slug %}">{% trans "Join our team now!" %}</a></p>
                 {% endif %}
             {% endif %}
             {% if team.is_by_application %}
                 {% if team.auth_provider and user.partner.slug != team.auth_provider.code %}
-                    <a href="{% url logout %}?next={{ team.auth_provider.url }}" class="join button primary reduced">
+                    <p><a href="{% url logout %}?next={{ team.auth_provider.url }}">
                         {% trans 'Login via' %}
                         {% if team.auth_provider.image_url %}
                             <img src="{{ team.auth_provider.image_url }}" alt="{{ team.auth_provider.verbose_name }}"/>
@@ -31,7 +31,7 @@
                             {{ team.auth_provider.verbose_name }}
                         {% endif %}
                         {% trans 'to apply' %}
-                    </a>
+                    </a></p>
                     <p class="notation">
                         {% trans 'You will be logged out and new account will be created via' %}
                         {{ team.auth_provider.verbose_name }}
@@ -46,16 +46,16 @@
             {% endif %}
         {% else %}
             {% if team.auth_provider %}
-                <a href="{{ team.auth_provider.url }}" class="join button primary reduced">
+                <p><a href="{{ team.auth_provider.url }}">
                     {% trans 'Join via' %}
                     {% if team.auth_provider.image_url %}
                         <img src="{{ team.auth_provider.image_url }}" alt="{{ team.auth_provider.verbose_name }}"/>
                     {% else %}
                         {{ team.auth_provider.verbose_name }}
                     {% endif %}
-                </a>
+                </a></p>
             {% else %}
-                <a id="signin-join" class="join button primary" href="{% url auth:login %}?next={% url teams:join_team team.slug %}">{% trans "Join Team" %}</a>
+                <p><a id="signin-join" href="{% url auth:login %}?next={% url teams:join_team team.slug %}">{% trans "Join our team" %}</a></p>
             {% endif %}
         {% endif %}
     </div>

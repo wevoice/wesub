@@ -1193,7 +1193,7 @@ def dashboard(request, slug):
         _cache_video_url(tasks)
 
         for task in tasks:
-            if user and not can_perform_task(user, task):
+            if member and not can_perform_task(user, task):
                 continue
 
             pk = str(task.team_video.id)
