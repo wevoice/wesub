@@ -35,6 +35,7 @@ from babelsubs import load_from
 
 from utils.compress import compress, decompress
 from utils.redis_utils import RedisSimpleField
+from utils.translation import is_rtl
 
 ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
                        key=lambda v: v[1])
@@ -379,6 +380,9 @@ class SubtitleLanguage(models.Model):
         self.writelock_owner = None
         self.writelock_session_key = ''
         self.writelock_time = None
+
+    def is_rtl(self):
+        return is_rtl(self.language_code)
 
 
     def __unicode__(self):
