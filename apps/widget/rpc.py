@@ -138,7 +138,7 @@ class Rpc(BaseRpc):
         # keeping both forms valid as backwards compatibility layer
         lang_code = base_state and base_state.get("language_code", base_state.get("language", None))
 
-        if base_state is not None and lang_code is not None:
+        if bool(base_state) and lang_code is not None:
             lang_pk = base_state.get('language_pk', None)
 
             if lang_pk is  None:
@@ -242,7 +242,7 @@ class Rpc(BaseRpc):
         video = models.Video.objects.get(video_id=video_id)
         team_video = video.get_team_video()
         video_languages = [language_summary(l, team_video, request.user) for l
-                           in video.subtitlelanguage_set.all()]
+                           in video.newsubtitlelanguage_set.all()]
 
         original_language = None
         if video.subtitle_language():
@@ -378,7 +378,6 @@ class Rpc(BaseRpc):
         other functions.
 
         """
-        #import pdb;pdb.set_trace()
 
         # TODO: remove whenever blank SubtitleLanguages become illegal.
         self._fix_blank_original(video_id)
@@ -1207,17 +1206,19 @@ def language_summary(language, team_video=-1, user=None):
     if team_video == -1:
         team_video = language.video.get_team_video()
 
+    translation_source = language.get_translation_source_language()
+    is_translation = bool(translation_source)
     summary = {
         'pk': language.pk,
-        'language': language.language,
-        'dependent': language.is_dependent(),
-        'subtitle_count': language.subtitle_count,
+        'language': language.language_code,
+        'dependent': is_translation,
+        'subtitle_count': language.get_subtitle_count(),
         'in_progress': language.is_writelocked,
         'disabled_from': False,
         'disabled_to': False }
 
     if team_video:
-        tasks = team_video.task_set.incomplete().filter(language=language.language)
+        tasks = team_video.task_set.incomplete().filter(language=language.language_code)
         if tasks:
             task = tasks[0]
             if user and user != task.assignee:
@@ -1235,11 +1236,8 @@ def language_summary(language, team_video=-1, user=None):
         summary['disabled_from'] = True
 
 
-    if language.is_dependent():
-        summary['percent_done'] = language.percent_done
-        if language.standard_language:
-            summary['standard_pk'] = language.standard_language.pk
-    else:
-        summary['is_complete'] = language.is_complete
+    if is_translation:
+        summary['standard_pk'] = translation_source.pk
+    summary['is_complete'] = language.subtitles_complete
 
     return summary

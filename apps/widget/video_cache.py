@@ -180,24 +180,25 @@ def get_video_urls(video_id):
         return video_urls
 
 def get_subtitles_dict(
-    video_id, language_pk, version_no, subtitles_dict_fn, is_remote=False):
-    cache_key = _subtitles_dict_key(video_id, language_pk, version_no)
+    video_id, language_pk, version_number, subtitles_dict_fn, is_remote=False):
+    cache_key = _subtitles_dict_key(video_id, language_pk, version_number)
     value = cache.get(cache_key)
     if value is not None:
         cached_value = value
     else:
-        from videos.models import Video, SubtitleLanguage
+        from videos.models import Video
+        from subtitles.models import SubtitleLanguage, SubtitleVersion
         video = Video.objects.get(video_id=video_id)
         if language_pk is None:
             language = video.subtitle_language()
         else:
 
             try:
-                language = video.subtitlelanguage_set.get(pk=language_pk)
+                language = video.newsubtitlelanguage_set.get(pk=language_pk)
             except SubtitleLanguage.DoesNotExist:
                 language = video.subtitle_language()
         video.update_subtitles_fetched(language)
-        version = video.version(version_no, language, public_only=not is_remote)
+        version = language.version(version_number=version_number, public=not is_remote)
         if version:
             cached_value = subtitles_dict_fn(version)
         else:
@@ -214,11 +215,11 @@ def get_video_languages(video_id):
     else:
         from videos.models import Video
         video = Video.objects.get(video_id=video_id)
-        languages = video.subtitlelanguage_set.filter(has_version=True)
+        languages = video.newsubtitlelanguage_set.having_nonempty_versions()
 
         team_video = video.get_team_video()
         if team_video:
-            languages = languages.filter(language__in=team_video.team.get_readable_langs())
+            languages = languages.filter(language_code__in=team_video.team.get_readable_langs())
 
         return_value = [language_summary(l) for l in languages]
         cache.set(cache_key, return_value, TIMEOUT)
