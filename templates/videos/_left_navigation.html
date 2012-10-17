@@ -22,7 +22,7 @@
             <li class="{% complete_color item %}{% if language == item %} active{% endif %} {% if forloop.counter > 14 %}hidden{% endif %}">
                 <a href="{% language_url request item %}">
                     <span class="done_indicator"></span>
-                    {{ item.get_language_display }}
+                    {{ item.get_language_code_display }}
                     <span class="done_percentage">({% complete_indicator item %})</span>
                     {% if item|in_progress %}
                         <span class="done_percentage">(in progress)</span>
