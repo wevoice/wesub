@@ -324,7 +324,7 @@ class Rpc(BaseRpc):
         if (language and language.is_complete_and_synced()
                      and team.moderates_videos()
                      and not can_post_edit_subtitles(team, user)):
-            message = _("Sorry, you can't post-edit these subtitles.")
+            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
             return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
             
         # Check that there are no open tasks for this action.
