@@ -431,6 +431,8 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     if ordering in order_fields and order_type in ['asc', 'desc']:
         qs = qs.order_by(('-' if order_type == 'desc' else '')+order_fields[ordering])
         context['ordering'], context['order_type'] = ordering, order_type
+    else:
+        qs = qs.order_by('-version_number')
 
     context['video'] = video
     context['translations'] = _get_translations(video)
