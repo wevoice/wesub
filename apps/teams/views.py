@@ -43,6 +43,7 @@ import widget
 from apps.auth.models import UserLanguage, CustomUser as User
 from apps.videos.templatetags.paginator import paginate
 from messages import tasks as notifier
+from accountlinker.models import ThirdPartyAccount
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
@@ -78,6 +79,7 @@ from utils.metrics import time as timefn, Timer
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
+from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
 from videos.tasks import (
     upload_subtitles_to_original_service, delete_captions_in_original_service,
@@ -1602,6 +1604,23 @@ def third_party_accounts(request, slug):
         "linked_accounts": linked_accounts,
     }
 
+@login_required
+def sync_third_party_account(request, slug, account_id):
+    team = get_object_or_404(Team, slug=slug)
+    if not can_change_team_settings(team, request.user):
+        messages.error(request, _(u'You do not have permission to edit this team.'))
+        return HttpResponseRedirect(team.get_absolute_url())
+
+    account = team.third_party_accounts.get(pk=account_id)
+    for video in team.videos.all():
+        version = video.latest_version()
+        if version is not None:
+            ThirdPartyAccount.objects.mirror_on_third_party(
+                    version.video, version.language, UPDATE_VERSION_ACTION,
+                    version)
+    messages.success(request, _(u'Successfully synced subtitles.'))
+    return HttpResponseRedirect(reverse('teams:third-party-accounts',
+        kwargs={'slug': team.slug}))
 
 # Unpublishing
 def _create_task_after_unpublishing(subtitle_version):

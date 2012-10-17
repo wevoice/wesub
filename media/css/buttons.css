@@ -59,7 +59,7 @@
     -webkit-border-radius: 5px;
     border-radius: 5px;
 }
-.green_button {
+.green_button, .green_button[disabled]:hover {
     color: #23441e !important;
     border-bottom: 1px solid #447d43; border-top: 1px solid #7eba7c;
     text-decoration: none;
@@ -78,7 +78,7 @@
     nowhitespace: afterproperty;
     text-shadow: 0 1px 0px #aedbaa;
 }
-.blue_button {
+.blue_button, .blue_button[disabled]:hover {
     color: #1f4e5e !important;
     border-bottom: 1px solid #88afb6; border-top: 1px solid #c6d9de;
     text-decoration: none;
@@ -94,7 +94,7 @@
     nowhitespace: afterproperty;
     text-shadow: 0 1px 0px #fff;
 }
-.red_button {
+.red_button, .red_button[disabled]:hover {
     color: #412625 !important;
     border-bottom: 1px solid #412625; border-top: 1px solid #c44d4a;
     text-decoration: none !important;
@@ -110,7 +110,7 @@
     nowhitespace: afterproperty;
     text-shadow: 0 1px 0px #f17265;
 }
-.silver_button {
+.silver_button, .silver_button[disabled]:hover {
     border-bottom: 1px solid #4e7179; border-top: 1px solid #c6d9de;
     text-decoration: none;
     -moz-box-shadow: 0 1px 0px #a7c3c9, inset 0 1px 0px #fff;
