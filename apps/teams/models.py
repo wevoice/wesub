@@ -2452,14 +2452,16 @@ class BillingReport(models.Model):
 
         old_version_counter = 1
 
-        for i, data in enumerate(lang_data):
-            lang, ver = data
+        result = []
 
+        for lang, ver in lang_data:
             if ver and ver.datetime_started < start_date:
-                lang_data.pop(i)
                 old_version_counter += 1
+                continue
 
-        return lang_data, old_version_counter
+            result.append((lang, ver))
+
+        return result, old_version_counter
 
     def _get_row_data(self, host, header=None):
         if not header:
