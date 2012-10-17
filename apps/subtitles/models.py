@@ -40,6 +40,8 @@ ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
                        key=lambda v: v[1])
 
 
+WRITELOCK_EXPIRATION = 30 # 30 seconds
+
 # Utility functions -----------------------------------------------------------
 def mapcat(fn, iterable):
     """Mapcatenate.
@@ -515,16 +517,16 @@ class SubtitleLanguage(models.Model):
 
         self.save()
 
-    def get_description(self):
-        v = self.get_tip()
+    def get_description(self, public=True):
+        v = self.get_tip(public=public)
 
         if v:
             return v.description
 
         return self.video.description
 
-    def get_title(self):
-        v = self.get_tip()
+    def get_title(self, public=True):
+        v = self.get_tip(public=True)
 
         if v:
             return v.title
