@@ -350,6 +350,36 @@ class SubtitleLanguage(models.Model):
     class Meta:
         unique_together = [('video', 'language_code')]
 
+    @property
+    def is_writelocked(self):
+        """Is this video writelocked for subtitling?"""
+        if self.writelock_time == None:
+            return False
+        delta = datetime.datetime.now() - self.writelock_time
+        seconds = delta.days * 24 * 60 * 60 + delta.seconds
+        return seconds < WRITELOCK_EXPIRATION
+
+    def can_writelock(self, key):
+        """Can I place a writelock on this video for subtitling?"""
+        return self.writelock_session_key == key or \
+            not self.is_writelocked
+
+    def writelock(self, user, key):
+        """Writelock this video for subtitling."""
+        if user.is_authenticated():
+            self.writelock_owner = user
+        else:
+            self.writelock_owner = None
+        self.writelock_session_key = key
+        self.writelock_time = datetime.datetime.now()
+
+
+    def release_writelock(self):
+        """Writelock this video for subtitling."""
+        self.writelock_owner = None
+        self.writelock_session_key = ''
+        self.writelock_time = None
+
 
     def __unicode__(self):
         return 'SubtitleLanguage %s / %s / %s' % (
