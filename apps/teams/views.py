@@ -1160,16 +1160,19 @@ def dashboard(request, slug):
 
     team = Team.get(slug, request.user)
     user = request.user if request.user.is_authenticated() else None
-    member = team.members.get(user=user) if user else None
-
-    # Had to add this or it wasn't set for unauthenticated users
-    # TODO: Better way to handle this?
-    user_tasks = None
+    try:
+        member = team.members.get(user=user)
+    except TeamMember.DoesNotExist:
+        member = None
 
     if user:
+        user_languages = set([ul.language for ul in user.get_languages()] + [''])
         user_filter = {'assignee':str(user.id)}
         user_tasks = _tasks_list(request, team, None, user_filter, user).order_by('expiration_date')[0:14]
         _cache_video_url(user_tasks)
+    else:
+        user_languages = None
+        user_tasks = None
 
     filters = {'assignee': 'none'}
 
@@ -1184,7 +1187,6 @@ def dashboard(request, slug):
     allows_tasks = workflow and workflow.allows_tasks
 
     if allows_tasks:
-        videos = {}
         video_pks = set()
 
         tasks = _tasks_list(request, team, None, filters, user)[0:TASKS_ON_PAGE]
@@ -1205,20 +1207,19 @@ def dashboard(request, slug):
             video.tasks.append(task)
     else:
         team_videos = team.videos.select_related("teamvideo")
-        languages = set([ul.language for ul in request.user.get_languages()] + [''])
 
-        if not languages:
-            videos =  [(str(tv.teamvideo.id), tv.teamvideo) for tv in team_videos]
+        if not user_languages:
+            for tv in team_videos:
+                videos[str(tv.teamvideo.id)] = tv.teamvideo 
         else:
             for video in team_videos.all():
                 subtitled_languages = (video.subtitlelanguage_set
-                                                 .filter(language__in=languages)
+                                                 .filter(language__in=user_languages)
                                                  .values_list("language", flat=True))
-                if len(subtitled_languages) != len(languages):
+                if len(subtitled_languages) != len(user_languages):
                     tv = video.teamvideo
-                    tv.languages = [l for l in languages if l not in subtitled_languages]
+                    tv.languages = [l for l in user_languages if l not in subtitled_languages]
                     videos[str(tv.id)] = tv
-
 
     context = {
         'team': team,

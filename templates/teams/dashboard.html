@@ -89,6 +89,12 @@
                     <p><a href="http://support.universalsubtitles.org/solution/categories/13504">Learn more</a> about working in Amara</p>
                 </div>
             {% endif %}
+        {% else %}
+            <h3>Welcome!</h3>
+            <div class="get-started">
+                <p>We've got lots of great content that we'd love your help with!<p>
+                {% include "teams/_actions.html" %}
+            </div>
         {% endif %}
             
         {% if videos %}
@@ -155,19 +161,18 @@
                                 {% endif %}
                             {% else %}
                                 {% if team_video.video.languages_count < 1 %}
-                                <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Create subtitles' %}</a>
+                                    <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Create subtitles' %}</a>
                                 {% else %}
-                                <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Add new translation' %}</a>
+                                    <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Add new translation' %}</a>
                                 {% endif %}
                                 {% with v=team_video.video %}
-                                <script type="text/javascript">
-                                    $('#video-{{ team_video.id }}').click(function(){
-                                        var vs = unisubs.player.MediaSource.videoSourceForURL('{{ v.get_video_url|safe }}');
-                                        var op = new unisubs.widget.SubtitleDialogOpener('{{ v.video_id }}', 
-                                                                                     '{{ v.get_video_url|safe }}');
-                                        op.showStartDialog();
-                                    });
-                                </script>
+                                    <script type="text/javascript">
+                                        $('#video-{{ team_video.id }}').click(function(){
+                                            var vs = unisubs.player.MediaSource.videoSourceForURL('{{ v.get_video_url|safe }}');
+                                            var op = new unisubs.widget.SubtitleDialogOpener('{{ v.video_id }}', '{{ v.get_video_url|safe }}');
+                                            op.showStartDialog();
+                                        });
+                                    </script>
                                 {% endwith %}
                             {% endif %}
                         </div>
