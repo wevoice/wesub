@@ -35,6 +35,12 @@ from videos.types.youtube import YouTubeApiBridge
 import logging
 logger = logging.getLogger("authbelt.views")
 
+def _youtube_request_uri():
+    if getattr(settings, 'YOUTUBE_CLIENT_FORCE_HTTPS', True):
+        return universal_url("accountlinker:youtube-oauth-callback",
+                protocol_override='https'),
+    else:
+        return universal_url("accountlinker:youtube-oauth-callback")
 
 def _generate_youtube_oauth_request_link(state_str=None):
     state_str = state_str or ""
@@ -43,8 +49,7 @@ def _generate_youtube_oauth_request_link(state_str=None):
     
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
-        "redirect_uri":  "https://%s%s" % (Site.objects.get_current().domain, 
-            reverse("accountlinker:youtube-oauth-callback")),
+        "redirect_uri":  _youtube_request_uri(),
         "scope": "https://gdata.youtube.com",
         "state": state,
         "response_type": "code",
@@ -80,8 +85,7 @@ def youtube_oauth_callback(request):
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
         "client_secret": settings.YOUTUBE_CLIENT_SECRET,
-        "redirect_uri": universal_url("accountlinker:youtube-oauth-callback",
-            protocol_override='https'),
+        "redirect_uri": _youtube_request_uri(),
         "code": code,
         "grant_type": "authorization_code",
         
