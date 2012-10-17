@@ -82,7 +82,7 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditing_ = function(openDialo
         'video_id': this.videoID_,
         'language_code': openDialogArgs.LANGUAGE,
         'subtitle_language_pk': openDialogArgs.SUBLANGUAGE_PK || null,
-        'base_language_pk': openDialogArgs.BASELANGUAGE_PK || null,
+        'base_language_code': openDialogArgs.BASELANGUAGE_CODE || null,
         'original_language_code': openDialogArgs.ORIGINAL_LANGUAGE || null,
         'mode': unisubs.mode || null };
     var that = this;
@@ -174,7 +174,7 @@ unisubs.widget.SubtitleDialogOpener.prototype.openDialogOrRedirect = function(op
             'languageCode': openDialogArgs.LANGUAGE,
             'originalLanguageCode': openDialogArgs.ORIGINAL_LANGUAGE || null,
             'subLanguagePK': openDialogArgs.SUBLANGUAGE_PK || null,
-            'baseLanguagePK': openDialogArgs.BASELANGUAGE_PK || null
+            'baseLanguageCode': openDialogArgs.BASELANGUAGE_CODE || null
         };
         if (unisubs.IS_NULL)
             config['nullWidget'] = true;
@@ -236,7 +236,9 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         this.onDialogOpened_(dialog);
     }
     else {
-        if(!result['message']){
+        if (result['error']){
+            alert("Something is wrong, we're looking right into it");
+        } else if(result['locked_by']){
             var username =  (result['locked_by'] == 'anonymous' ? 'Someone else' : ('The user ' + result['locked_by']));
             alert(username + ' is currently editing these subtitles. Please wait and try again later.');
         } else {

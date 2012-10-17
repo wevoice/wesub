@@ -23,7 +23,7 @@ from videos import models
 LANGUAGES_MAP = dict(LANGUAGES)
 
 class BaseRpc:
-    def _make_subtitles_dict(self, subtitles, language_code, language_pk, is_original, is_complete, version, is_latest, is_forked, base_language, title, description, language_is_rtl, is_moderated):
+    def _make_subtitles_dict(self, subtitles, language_code, language_pk, is_original, is_complete, version, is_latest,  base_language, title, description, language_is_rtl, is_moderated):
         return {
             'subtitles': subtitles,
             'language_code': language_code,
@@ -33,7 +33,6 @@ class BaseRpc:
             'is_complete': is_complete,
             'version': version,
             'is_latest': is_latest,
-            'forked': is_forked,
             'base_language': base_language and base_language.language,
             'base_language_pk': base_language and base_language.pk,
             'title': title,
