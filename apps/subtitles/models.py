@@ -900,6 +900,9 @@ class SubtitleVersion(models.Model):
         assert self.video_id == self.subtitle_language.video_id, \
                "Version video does not match Language video!"
 
+        assert self.visibility in ('public', 'private',), \
+            "Version visibility must be either 'public' or 'private'!"
+
         return super(SubtitleVersion, self).save(*args, **kwargs)
 
 
