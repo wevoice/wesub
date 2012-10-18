@@ -97,7 +97,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.logExternalInterfaceError_ = func
 
 unisubs.player.BrightcoveVideoPlayer.prototype.createDom = function() {
     unisubs.player.BrightcoveVideoPlayer.superClass_.createDom.call(this);
-    var sizeFromConfig = this.sizeFromConfig_();
+    var sizeFromConfig = this.videoSource_.sizeFromConfig();
     if (!this.forDialog_ && sizeFromConfig)
         this.playerSize_ = sizeFromConfig;
     else
@@ -128,9 +128,17 @@ unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
         videoConf["playerID"] = this.videoSource_.getPlayerID();
 
         videoConf["playerKey"] = this.videoSource_.getPlayerKey();
+        var sizeFromConfig = this.videoSource_.sizeFromConfig();
+        if (!this.forDialog_ && sizeFromConfig){
+            this.playerSize_ = sizeFromConfig;
+        } else {
+            this.playerSize_ = this.forDialog_ ?
+            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+        }
         videoConf["videoID"] = this.videoSource_.getVideoID();
-        videoConf["width"]  = videoConf["width"] || 480;
-        videoConf["height"]  = videoConf["height"] || 412;
+        videoConf["width"]  = this.playerSize_.width;
+        videoConf["height"]  = this.playerSize_.height;
         videoConf['uuid'] = this.playerElemID_;
         var embedString = ' <object id="{{uuid}}" class="BrightcoveExperience"> <param name="bgcolor" value="#FFFFFF" /> <param name="width" value="{{width}}" /> <param name="height" value="{{height}}" /><param name="playerID" value="{{playerID}}" /><param name="playerKey" value="{{playerKey}}" /><param name="wmode" value="transparent" /><param name="isVid" value="true" /><param name="dynamicStreaming" value="true" /><param name="@videoPlayer" value="{{videoID}}" /></object>';
 
