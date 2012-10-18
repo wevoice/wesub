@@ -26,7 +26,6 @@ from django.utils.translation import ugettext as _
 from statistic.tasks import st_widget_view_statistic_update
 from subtitles import models as new_models
 from teams.models import Task, Workflow, Team
-from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
     can_publish_edits_immediately, can_review, can_approve, can_assign_task,
@@ -844,7 +843,7 @@ class Rpc(BaseRpc):
         workflow = Workflow.get_for_team_video(team_video)
 
         if not workflow.approve_enabled and not workflow.review_enabled:
-            return UNMODERATED, False
+            return 'public', False
 
         language = subtitle_version.subtitle_language.language_code
 
@@ -854,7 +853,7 @@ class Rpc(BaseRpc):
         if transcribe_task.exists():
             return
 
-        subtitle_version.moderation_status = WAITING_MODERATION
+        subtitle_version.visibility = 'private'
         subtitle_version.save()
 
         if subtitle_version.is_dependent():
@@ -873,7 +872,7 @@ class Rpc(BaseRpc):
         task.save()
 
     def _moderate_language(self, language, user):
-        """Return the right moderation_status for a version based on the given session.
+        """Return the right visibility for a version based on the given session.
 
         Also may possibly return a Task object that needs to be saved once the
         subtitle_version is ready.
@@ -904,7 +903,7 @@ class Rpc(BaseRpc):
                         task.language = language.language_code
                         task.save()
 
-            return (UNMODERATED, False) if not workflow.allows_tasks else (WAITING_MODERATION, False)
+            return ('public', False) if not workflow.allows_tasks else ('private', False)
 
         if not workflow.allows_tasks:
             return 'public', False
@@ -915,16 +914,13 @@ class Rpc(BaseRpc):
                 # The user may have the rights to immediately publish edits to
                 # subtitles.  If that's the case we mark them as approved and
                 # don't need a task.
-                #FIXME : this used to be a moderation status, what now?
-                return 'private', False
+                return 'public', False
             else:
                 # Otherwise it's an edit that needs to be reviewed/approved.
-                #FIXME : this used to be a moderation status, what now?
                 return 'private', True
         else:
             # Otherwise we're dealing with a new set of subtitles for this
             # language.
-            #FIXME : this used to be a moderation status, what now?
             return 'private', True
 
     def _create_version(self, language, user=None, new_title=None, new_description=None):
