@@ -516,49 +516,61 @@ def rollback(request, version):
 
 @get_video_revision
 def diffing(request, first_version, second_pk):
-    language = first_version.language
-    second_version = get_object_or_404(SubtitleVersion, pk=second_pk, language=language)
+    language = first_version.subtitle_language
+    second_version = get_object_or_404(sub_models.SubtitleVersion,
+            pk=second_pk, subtitle_language=language)
+
     if first_version.video != second_version.video:
         # this is either a bad bug, or someone evil
         raise "Revisions for diff videos"
-    video = first_version.language.video
-    if second_version.version_no > first_version.version_no:
+
+    video = first_version.subtitle_language.video
+    if second_version.version_number > first_version.version_number:
         first_version, second_version = second_version, first_version
 
-    second_captions = dict([(item.subtitle_id, item) for item in second_version.ordered_subtitles()])
-    first_captions = dict([(item.subtitle_id, item) for item in first_version.ordered_subtitles()])
+    second_captions = [item for item in second_version.get_subtitles()]
+    first_captions = [item for item in first_version.get_subtitles()]
 
     subtitles = {}
 
-    for id, item in first_captions.items():
-        if not id in subtitles:
-            subtitles[id] = item.start_time
+    first_map = {}
+    second_map = {}
 
-    for id, item in second_captions.items():
+    for start, end, text in first_captions:
+        id = str(start) + str(end)
         if not id in subtitles:
-            subtitles[id] = item.start_time
+            subtitles[id] = (start, end, text)
+        first_map[id] = (start, end, text)
 
-    subtitles = [item for item in subtitles.items()]
-    subtitles.sort(key=lambda item: item[1])
+    for start, end, text in second_captions:
+        id = str(start) + str(end)
+        if not id in subtitles:
+            subtitles[id] = (start, end, text)
+        second_map[id] = (start, end, text)
+
+    subs = [item for item in subtitles.items()]
+    subs.sort(key=lambda item: item[1][0])
 
     captions = []
-    for subtitle_id, t in subtitles:
+
+    for id, s in subs:
         try:
-            scaption = second_captions[subtitle_id]
-        except KeyError:
-            scaption = None
-        try:
-            fcaption = first_captions[subtitle_id]
+            fcaption = first_map[id]
         except KeyError:
             fcaption = None
+
+        try:
+            scaption = second_map[id]
+        except KeyError:
+            scaption = None
 
         if fcaption is None or scaption is None:
             changed = dict(text=True, time=True)
         else:
             changed = {
-                'text': (not fcaption.text == scaption.text),
-                'time': (not fcaption.start_time == scaption.start_time),
-                'end_time': (not fcaption.end_time == scaption.end_time)
+                'text': (not fcaption[2] == scaption[2]),
+                'time': (not fcaption[0] == scaption[0]),
+                'end_time': (not fcaption[1]== scaption[1])
             }
         data = [fcaption, scaption, changed]
         captions.append(data)
@@ -569,14 +581,14 @@ def diffing(request, first_version, second_pk):
     context['language'] = language
     context['first_version'] = first_version
     context['second_version'] = second_version
-    context['latest_version'] = language.latest_version()
+    context['latest_version'] = language.get_tip()
     context['rollback_allowed'] = not video.is_moderated
     context['widget0_params'] = \
         _widget_params(request, video,
-                       first_version.version_no)
+                       first_version.version_number)
     context['widget1_params'] = \
         _widget_params(request, video,
-                       second_version.version_no)
+                       second_version.version_number)
     return render_to_response('videos/diffing.html', context,
                               context_instance=RequestContext(request))
 
