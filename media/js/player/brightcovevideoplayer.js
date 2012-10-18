@@ -92,7 +92,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.decorateInternal = function(eleme
 
 unisubs.player.BrightcoveVideoPlayer.prototype.logExternalInterfaceError_ = function() {
     unisubs.Rpc.call(
-        'log_brightCove_ei_failure', { 'page_url': window.location.href });
+        'log_brightCove_ei_failure', { 'page_url': window['location']['href'] });
 };
 
 unisubs.player.BrightcoveVideoPlayer.prototype.createDom = function() {
@@ -112,8 +112,8 @@ unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
     if (!this.swfEmbedded_) {
 
         // If the Brightcove JS API has not been included (and it's not currently loading), load it.
-        if (typeof window.brightcove === 'undefined' && typeof window.unisubs.brightcoveLoading === 'undefined') {
-            window.unisubs.brightcoveLoading = true;
+        if (typeof window['brightcove'] === 'undefined' && typeof window['unisubs']['brightcoveLoading'] === 'undefined') {
+            window['unisubs']['brightcoveLoading'] = true;
             var script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences_all.js';
@@ -153,12 +153,12 @@ unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
 unisubs.player.BrightcoveVideoPlayer.prototype.waitForBrightcoveThenInit = function() {
     var that = this;
 
-    if (typeof window.brightcove == 'undefined') {
+    if (typeof window['brightcove'] == 'undefined') {
         setTimeout(function() {
             that.waitForBrightcoveThenInit();
         }, 500);
     } else {
-        brightcove.createExperiences();
+        window['brightcove']['createExperiences']();
     }
 };
 
@@ -194,7 +194,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.onBrightcoveTemplateLoaded_ =
     if (playerAPIID == this.playerElemID_) {
         this.setDimensionsKnownInternal();
         this.player_ = goog.dom.getElement(this.playerElemID_);
-        this.bcPlayer_ = brightcove["getExperience"](this.playerElemID_);
+        this.bcPlayer_ = window['brightcove']["getExperience"](this.playerElemID_);
         var experienceModule = this.bcPlayer_.getModule(APIModules.EXPERIENCE);
         experienceModule.addEventListener(BCExperienceEvent.TEMPLATE_READY, 
                                           goog.bind(this.onBrightcoveTemplateReady_, this));

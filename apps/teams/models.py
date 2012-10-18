@@ -56,6 +56,7 @@ from functools import partial
 logger = logging.getLogger(__name__)
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
+VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 
 # Teams
@@ -2071,6 +2072,9 @@ class Task(models.Model):
             assert self.subtitle_version, \
                    "Review and Approve tasks must have a subtitle_version!"
 
+        if self.language:
+            assert self.language in VALID_LANGUAGE_CODES, \
+                "Subtitle Language should be a valid code."
         result = super(Task, self).save(*args, **kwargs)
         if update_team_video_index:
             update_one_team_video.delay(self.team_video.pk)
