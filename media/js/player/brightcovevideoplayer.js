@@ -243,7 +243,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.isFinished_ = function(){
 };
 
 unisubs.player.BrightcoveVideoPlayer.prototype.onPlayerPause_ = function(e) {
-    this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PLAY);
+    this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PAUSE);
     this.state_ = unisubs.player.BrightcoveVideoPlayer.State_.PAUSED;
     this.timeUpdateTimer_.stop();
     if (this.isFinished_()) this.onPlayerComplete_();
