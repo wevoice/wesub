@@ -44,7 +44,7 @@
             {% endif %}
         {% endwith %}
 
-        {% if team|is_team_member:user and allows_tasks %}
+        {% if team|is_team_member:user %}
             {% if user_tasks %}
                 <h3>Videos you're working on</h3>
 
@@ -80,9 +80,9 @@
                         </li>
                     {% endfor %}
                 </ul>
-            {% else %}
+            {% else %} {# user has no tasks #}
                 <div class="get-started">
-                    <h3>{% trans "Getting started is easy!" %}</h3>
+                    <h3>{% trans "Helping out is easy!" %}</h3>
                     <p>
                         {% blocktrans %}
                             In the section below, look for a video that interests you. Beneath the video you'll see what we need help with. Click and you're on your way!
@@ -91,7 +91,7 @@
                     <p><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans "Learn more" %}</a>{% trans " about working in Amara" %}</p>
                 </div>
             {% endif %}
-        {% else %}
+        {% else %} {# user is not a team member #}
             <div class="get-started">
                 <h3>{% trans "Welcome!" %}</h3>
                 <p>
