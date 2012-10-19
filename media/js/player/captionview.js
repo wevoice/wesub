@@ -98,10 +98,10 @@ unisubs.player.CaptionView.prototype.setUpPositioning =
 /**
  * Split the given text into the given characters per line and maximumlines.
  *
- * @text The text to split in 32x4
- * @ opt_charsPerLine The max number of characters to allow per line
- * @ opt_maxLines The max number of lines to allow
- * @ opt_linebreakStr Which string to use when joining lines, i.e. \n or <bt/>
+ * @param text The text to split in 32x4
+ * @param opt_charsPerLine The max number of characters to allow per line
+ * @param opt_maxLines The max number of lines to allow
+ * @param opt_linebreakStr Which string to use when joining lines, i.e. \n or <bt/>
  * @return An array with lines of a maximum 42 chars
 **/
 unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_maxLines, opt_linebreakStr){
