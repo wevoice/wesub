@@ -46,7 +46,7 @@
 
         {% if team|is_team_member:user %}
             {% if user_tasks %}
-                <h3>Videos you're working on</h3>
+                <h3>{% trans "Videos you're working on" %}</h3>
 
                 <ul class="listing tasks yours">
                     {% for task in user_tasks %}
@@ -59,10 +59,10 @@
                                 <li>
                                     <a href="{{ task.get_widget_url }}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
                                         {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
-                                            Create {{ task.get_language_display }} subtitles
+                                            {% trans "Create" %} {{ task.get_language_display }} {% trans "subtitles" %}
                                         {% else %}
                                             {{ task.get_type_display }}
-                                            {{ task.get_language_display }} subtitles
+                                            {{ task.get_language_display }} {% trans "subtitles" %}
                                         {% endif %}
                                     </a>
                                     {% include "teams/_perform_task_js.html" %}
@@ -70,9 +70,9 @@
                                 {% if task.expiration_date != None %}
                                     <li>
                                     {% if task.future %}
-                                        <span class="due">Due in {{ task.expiration_date|timeuntil }}</span>
+                                        <span class="due">{% trans "Due in" %} {{ task.expiration_date|timeuntil }}</span>
                                     {% else %}
-                                        <span class="due overdue">Overdue by {{ task.expiration_date|timesince }}</span>
+                                        <span class="due overdue">{% trans "Overdue by" %} {{ task.expiration_date|timesince }}</span>
                                     {% endif %}
                                 </li>
                                 {% endif %}
@@ -104,7 +104,7 @@
         {% endif %}
             
         {% if videos %}
-            <h3>Videos that need your help</h3>
+            <h3>{% trans "Videos that need your help" %}</h3>
 
             {% if user.is_authenticated and not user.get_languages %}
                 <p class="prompt">
@@ -132,7 +132,7 @@
                                             {% trans " languages needed" %}
                                         </a>
                                         <div>
-                                            <span class="expand">View all</span>
+                                            <span class="expand">{% trans "View all" %}</span>
                                             <ul>
                                                 {% for task in team_video.tasks %}
                                                     <li>
