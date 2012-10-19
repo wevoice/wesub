@@ -277,6 +277,8 @@ class Command(BaseCommand):
         if self.verbosity > 1:
             logging.info( "calling %s" % cmd_str)
         output,err = call_command(cmd_str)
+        if err:
+            sys.stderr.write("Error compiling : %s \n%s" % (bundle_name, err))
 
         with open(compiled_js, 'r') as compiled_js_file:
             compiled_js_text = compiled_js_file.read()
@@ -430,6 +432,7 @@ class Command(BaseCommand):
                 continue
             self.compile_media_bundle(
                 bundle_name, data['type'], data["files"])
+            print "Compiled %s"  % bundle_name
 
     def _remove_cache_dirs_before(self, num_to_keep):
         """
