@@ -2506,7 +2506,7 @@ class BillingReport(models.Model):
                     end = subs[-1].start_time
 
                 rows.append([
-                    tv.video.title.encode('utf-8'),
+                    tv.video.title_display_unabridged().encode('utf-8'),
                     host + tv.video.get_absolute_url(),
                     language.language,
                     round((end - start) / 60, 2),
