@@ -257,59 +257,28 @@ def _send_letter_translation_start(translation_version):
                              context, fail_silently=not settings.DEBUG)
 
 def _make_caption_data(new_version, old_version):
-    second_captions = dict([(item.subtitle_id, item) for item in old_version.ordered_subtitles()])
-    first_captions = dict([(item.subtitle_id, item) for item in new_version.ordered_subtitles()])
+    raise Exception("This function is deprecated. "
+            "Use subtitles.models.get_caption_diff_data.")
 
-    subtitles = {}
-
-    for id, item in first_captions.items():
-        if not id in subtitles:
-            subtitles[id] = item.start_time
-
-    for id, item in second_captions.items():
-        if not id in subtitles:
-            subtitles[id] = item.start_time
-
-    subtitles = [item for item in subtitles.items()]
-    subtitles.sort(key=lambda item: item[1])
-
-    captions = []
-    for subtitle_id, t in subtitles:
-        try:
-            scaption = second_captions[subtitle_id]
-        except KeyError:
-            scaption = None
-        try:
-            fcaption = first_captions[subtitle_id]
-        except KeyError:
-            fcaption = None
-
-        if fcaption is None or scaption is None:
-            changed = dict(text=True, time=True)
-        else:
-            changed = {
-                'text': (not fcaption.text == scaption.text),
-                'time': (not fcaption.start_time == scaption.start_time),
-                'end_time': (not fcaption.end_time == scaption.end_time)
-            }
-        data = [fcaption, scaption, changed]
-        captions.append(data)
-    return captions
 
 def _send_letter_caption(caption_version):
-    from videos.models import SubtitleVersion
+    from subtitles.models import SubtitleVersion, get_caption_diff_data
 
     domain = Site.objects.get_current().domain
 
-    language = caption_version.language
+    language = caption_version.subtitle_language
     video = language.video
-    qs = SubtitleVersion.objects.filter(language=language) \
-        .filter(version_no__lt=caption_version.version_no).order_by('-version_no')
+
+    qs = SubtitleVersion.objects.filter(
+            subtitle_language=language).filter(
+            version_number__lt=caption_version.version_number).order_by(
+                    '-version_number')
+
     if qs.count() == 0:
         return
 
     most_recent_version = qs[0]
-    captions = _make_caption_data(caption_version, most_recent_version)
+    captions = get_caption_diff_data(caption_version, most_recent_version)
 
     title = {
         'new_title': caption_version.title,
@@ -329,39 +298,40 @@ def _send_letter_caption(caption_version):
         'description': description,
         'version': caption_version,
         'domain': domain,
-        'translation': not language.is_original,
+        'translation': not language.is_primary_audio_language(),
         'video': caption_version.video,
         'language': language,
         'last_version': most_recent_version,
         'captions': captions,
         'video_url': video.get_absolute_url(),
         'language_url': language.get_absolute_url(),
-        'user_url': caption_version.user and caption_version.user.get_absolute_url(),
+        'user_url': caption_version.author and caption_version.author.get_absolute_url(),
         "STATIC_URL": settings.STATIC_URL,
     }
 
-    subject = u'New edits to "%s" by %s on Amara' % (language.video, caption_version.user)
+    subject = u'New edits to "%s" by %s on Amara' % (language.video,
+            caption_version.author)
 
-    followers = set(video.notification_list(caption_version.user))
-    followers.update(language.notification_list(caption_version.user))
+    followers = set(video.notification_list(caption_version.author))
+    followers.update(language.notification_list(caption_version.author))
 
     for item in qs:
-        if item.user and item.user in followers:
-            if item.user.notify_by_email:
+        if item.author and item.author in followers:
+            if item.author.notify_by_email:
                 context['your_version'] = item
-                context['user'] = item.user
-                context['hash'] = item.user.hash_for_video(context['video'].video_id)
-                context['user_is_rtl'] = item.user.guess_is_rtl()
+                context['user'] = item.author
+                context['hash'] = item.author.hash_for_video(context['video'].video_id)
+                context['user_is_rtl'] = item.author.guess_is_rtl()
                 Meter('templated-emails-sent-by-type.videos.new-edits').inc()
-                send_templated_email(item.user, subject,
+                send_templated_email(item.author, subject,
                                  'videos/email_notification.html',
                                  context, fail_silently=not settings.DEBUG)
-            if item.user.notify_by_message:
+            if item.author.notify_by_message:
                 # TODO: Add body
-                Message.objects.create(user=item.user, subject=subject,
+                Message.objects.create(user=item.author, subject=subject,
                         content='')
 
-            followers.discard(item.user)
+            followers.discard(item.author)
 
     for user in followers:
         context['user'] = user
@@ -371,7 +341,6 @@ def _send_letter_caption(caption_version):
         send_templated_email(user, subject,
                              'videos/email_notification_non_editors.html',
                              context, fail_silently=not settings.DEBUG)
-
 
 
 def _update_captions_in_original_service(version_pk):
