@@ -363,6 +363,7 @@ unisubs.translate.Dialog.prototype.forkAndClose = function() {
 unisubs.translate.Dialog.prototype.forkImpl_ = function() {
     this.subtitleState_.fork();
     this.serverModel_.fork(this.standardSubState_);
+    this.serverModel_.getCaptionSet().setPreviousAndNextCaptions();
     this.hideToFork();
     var dialog = this.opener_.openSubtitlingDialog(
         this.serverModel_,
