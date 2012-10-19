@@ -423,7 +423,7 @@ class TeamsTest(TestCase):
         video.is_public = False
         video.moderated_by = team
         video.save()
-        langs = ["en" ,"es", 'fr', 'pt_br']
+        langs = ["en" ,"es", 'fr', 'pt-br']
         versions = create_langs_and_versions(video, langs)
         for v in versions:
             v.moderation_status = MODERATION.WAITING_MODERATION

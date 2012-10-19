@@ -559,21 +559,23 @@ unisubs.subtitle.Dialog.prototype.nextState_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
     // the dialog is different when reviewing / approving
     // we only show the sync and edit metadata panels
-    if (this.reviewOrApprovalType_){
-       if (this.state_ == s.SYNC)
+    if (this.reviewOrApprovalType_) {
+       if (this.state_ == s.SYNC) {
             return s.EDIT_METADATA;
+       }
     } else {
-        if (this.state_ == s.TRANSCRIBE)
+        if (this.state_ == s.TRANSCRIBE) {
             return s.SYNC;
-        else if (this.state_ == s.EDIT_METADATA){
+        } else if (this.state_ == s.EDIT_METADATA) {
             if (!this.isReviewOrApproval_) {
                 return s.REVIEW;
             }
-        }
-        else if (this.state_ == s.SYNC)
+        } else if (this.state_ == s.SYNC) {
             return s.EDIT_METADATA;
-        else if (this.state_ == s.REVIEW)
+        }
+        else if (this.state_ == s.REVIEW) {
             return s.FINISHED;
+        }
     }
 };
 unisubs.subtitle.Dialog.prototype.showLoginNag_ = function() {

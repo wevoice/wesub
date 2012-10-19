@@ -195,10 +195,15 @@ unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
 
 unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
     var fromLanguages = this.model_.fromLanguages();
-    goog.style.showElement(
-        this.fromLanguageSection_, fromLanguages.length > 0);
 
-    if (fromLanguages.length > 0) {
+    var enabledFromLanguages = goog.array.filter(fromLanguages, function(vl) {
+        return !vl.DISABLED_FROM;
+    });
+
+    goog.style.showElement(
+        this.fromLanguageSection_, enabledFromLanguages.length > 0);
+
+    if (enabledFromLanguages.length > 0) {
         var fromLanguageContents = [];
 
         if (this.translateAllowed_) {

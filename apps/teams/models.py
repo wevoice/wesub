@@ -2435,7 +2435,7 @@ class BillingReport(models.Model):
 
         # 97% is done according to our contracts
         if version.moderation_status == UNMODERATED:
-            if not language.is_complete or language.percent_done < 97:
+            if not language.is_complete and language.percent_done < 97:
                 return False
 
             if (version.datetime_started <= start or
@@ -2506,7 +2506,7 @@ class BillingReport(models.Model):
                     end = subs[-1].start_time
 
                 rows.append([
-                    tv.video.title.encode('utf-8'),
+                    tv.video.title_display_unabridged().encode('utf-8'),
                     host + tv.video.get_absolute_url(),
                     language.language,
                     round((end - start) / 60, 2),
