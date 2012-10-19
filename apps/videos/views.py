@@ -525,55 +525,7 @@ def diffing(request, first_version, second_pk):
         raise "Revisions for diff videos"
 
     video = first_version.subtitle_language.video
-    if second_version.version_number > first_version.version_number:
-        first_version, second_version = second_version, first_version
-
-    second_captions = [item for item in second_version.get_subtitles()]
-    first_captions = [item for item in first_version.get_subtitles()]
-
-    subtitles = {}
-
-    first_map = {}
-    second_map = {}
-
-    for start, end, text in first_captions:
-        id = str(start) + str(end)
-        if not id in subtitles:
-            subtitles[id] = (start, end, text)
-        first_map[id] = (start, end, text)
-
-    for start, end, text in second_captions:
-        id = str(start) + str(end)
-        if not id in subtitles:
-            subtitles[id] = (start, end, text)
-        second_map[id] = (start, end, text)
-
-    subs = [item for item in subtitles.items()]
-    subs.sort(key=lambda item: item[1][0])
-
-    captions = []
-
-    for id, s in subs:
-        try:
-            fcaption = first_map[id]
-        except KeyError:
-            fcaption = None
-
-        try:
-            scaption = second_map[id]
-        except KeyError:
-            scaption = None
-
-        if fcaption is None or scaption is None:
-            changed = dict(text=True, time=True)
-        else:
-            changed = {
-                'text': (not fcaption[2] == scaption[2]),
-                'time': (not fcaption[0] == scaption[0]),
-                'end_time': (not fcaption[1]== scaption[1])
-            }
-        data = [fcaption, scaption, changed]
-        captions.append(data)
+    captions = sub_models.get_caption_diff_data(first_version, second_version)
 
     context = widget.add_onsite_js_files({})
     context['video'] = video

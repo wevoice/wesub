@@ -103,6 +103,68 @@ def print_graphviz(video_id):
     video = Video.objects.get(video_id=video_id)
     print '\n'.join(graphviz(video))
 
+def get_caption_diff_data(first_version, second_version):
+    """
+    Return a list of captions that looks something like this:
+    [
+        [None, (0, 100, 'Hello'), {'text': True, 'time': True}]
+        [(50, 150, 'Hello'), None, {'text': True, 'time': True}]
+        [None, (200, 300, 'world!'), {'text': True, 'time': True}]
+        [(250, 350, 'world!'), None, {'text': True, 'time': True}]
+    ]
+    """
+    if second_version.version_number > first_version.version_number:
+        first_version, second_version = second_version, first_version
+
+    second_captions = [item for item in second_version.get_subtitles()]
+    first_captions = [item for item in first_version.get_subtitles()]
+
+    subtitles = {}
+
+    first_map = {}
+    second_map = {}
+
+    for start, end, text in first_captions:
+        id = str(start) + str(end)
+        if not id in subtitles:
+            subtitles[id] = (start, end, text)
+        first_map[id] = (start, end, text)
+
+    for start, end, text in second_captions:
+        id = str(start) + str(end)
+        if not id in subtitles:
+            subtitles[id] = (start, end, text)
+        second_map[id] = (start, end, text)
+
+    subs = [item for item in subtitles.items()]
+    subs.sort(key=lambda item: item[1][0])
+
+    captions = []
+
+    for id, s in subs:
+        try:
+            fcaption = first_map[id]
+        except KeyError:
+            fcaption = None
+
+        try:
+            scaption = second_map[id]
+        except KeyError:
+            scaption = None
+
+        if fcaption is None or scaption is None:
+            changed = dict(text=True, time=True)
+        else:
+            changed = {
+                'text': (not fcaption[2] == scaption[2]),
+                'time': (not fcaption[0] == scaption[0]),
+                'end_time': (not fcaption[1]== scaption[1])
+            }
+        data = [fcaption, scaption, changed]
+        captions.append(data)
+
+    return captions
+
 
 # Lineage functions -----------------------------------------------------------
 def lineage_to_json(lineage):
@@ -679,6 +741,14 @@ class SubtitleLanguage(models.Model):
         return SubtitleLanguage.objects.having_nonempty_versions().filter(
                 video=self.video).exists()
 
+    def notification_list(self, exclude=None):
+        qs = self.followers.filter(notify_by_email=True, is_active=True)
+
+        if exclude:
+            if not isinstance(exclude, (list, tuple)):
+                exclude = [exclude]
+            qs = qs.exclude(pk__in=[u.pk for u in exclude if u])
+        return qs
 
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
