@@ -435,7 +435,7 @@ class Rpc(BaseRpc):
             if not version:
                 return { "can_edit": False, "locked_by": "", "message": "You cannot translate from a version that is incomplete" }
 
-            original_subtitles = self._subtitles_dict()
+            original_subtitles = self._subtitles_dict(version)
             return_dict['original_subtitles'] = original_subtitles
 
         # If we know the original language code for this video, make sure it's
