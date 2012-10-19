@@ -652,9 +652,9 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
 
     """
     python_exe = '{0}/bin/python'.format(env.ve_dir)
-    
-    # must be ran before we compile anything
-    run('{0} deploy/create_commit_file.py'.format(python_exe))
+    with Output("Updating commit"), cd(env.app_dir):
+        run('{0} deploy/create_commit_file.py'.format(python_exe))
+        run('cat commit.py')
     if skip_compile == False:
         with Output("Compiling media"), cd(env.app_dir), settings(warn_only=True):
             run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
