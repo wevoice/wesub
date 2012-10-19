@@ -22,8 +22,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-18 01:32-0500\n"
-"PO-Revision-Date: 2012-10-18 06:55+0000\n"
+"POT-Creation-Date: 2012-10-19 01:32-0500\n"
+"PO-Revision-Date: 2012-10-19 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/universalsubtitles/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -540,7 +540,7 @@ msgstr "Usuário já é membro deste grupo!"
 
 #: apps/teams/forms.py:550
 msgid "User has already been invited and has not replied yet."
-msgstr ""
+msgstr "Usuário já foi convidado mas ainda não respondeu."
 
 #: apps/teams/forms.py:574 templates/videos/subtitle-view.html:365
 msgid "Would you like to delete these subtitles completely?"
@@ -791,7 +791,7 @@ msgstr "O campo \"Sobre você\" é necessário para se candidatar."
 
 #: apps/teams/rpc.py:58
 msgid "You have already applied to this team."
-msgstr ""
+msgstr "Você já se aplicou para esta equipe."
 
 #: apps/teams/rpc.py:60
 msgid "Your application has been denied."
@@ -1556,19 +1556,19 @@ msgstr "Obrigado por enviar. Demora um minuto ou algo próximo disso para as sua
 msgid "Your changes have been saved."
 msgstr "As suas mudanças foram salvas."
 
-#: apps/videos/views.py:636
+#: apps/videos/views.py:648
 msgid "You have not permission change this URL"
 msgstr "Você não tem permissão para alterar esta URL"
 
-#: apps/videos/views.py:641 apps/videos/views.py:672
+#: apps/videos/views.py:653 apps/videos/views.py:684
 msgid "Object does not exist"
 msgstr "Não existe objeto."
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:668
 msgid "You have not permission delete this URL"
 msgstr "Você não tem permissão para excluir esta URL"
 
-#: apps/videos/views.py:660
+#: apps/videos/views.py:672
 msgid "You can't remove primary URL"
 msgstr "Você não pode remover a URL primária"
 
@@ -1602,26 +1602,28 @@ msgstr "Vídeo privado"
 msgid "Undefined error"
 msgstr "Erro indefinido"
 
-#: apps/widget/rpc.py:110
+#: apps/widget/rpc.py:109
 msgid "Video embedding disabled by owner"
 msgstr "Incorporação do vídeo desabilitada pelo dono"
 
-#: apps/widget/rpc.py:316
+#: apps/widget/rpc.py:315
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Estas legendas são moderadas. Veja a página da equipe %s para informação sobre como contribuir."
 
-#: apps/widget/rpc.py:318
+#: apps/widget/rpc.py:317
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Desculpe, estas legendas são moderadas privativamente."
 
-#: apps/widget/rpc.py:328
-msgid "Sorry, you can't post-edit these subtitles."
+#: apps/widget/rpc.py:327
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1023 apps/widget/rpc.py:1064
+#: apps/widget/rpc.py:1019 apps/widget/rpc.py:1060
 msgid "\n"
 msgstr "\n"
 
@@ -1970,7 +1972,7 @@ msgstr "Ajuda"
 
 #: templates/base.html:78
 msgid "Sign in / Sign up"
-msgstr ""
+msgstr "Entrar / Registrar"
 
 #: templates/base.html:102
 msgid ""
@@ -2007,7 +2009,7 @@ msgstr "Rosetta"
 
 #: templates/base.html:127
 msgid "Impersonate"
-msgstr ""
+msgstr "Personificar"
 
 #: templates/base.html:130 templates/teams/billing/choose.html:11
 msgid "Billing"
@@ -2429,7 +2431,7 @@ msgstr ""
 
 #: templates/enterprise.html:114
 msgid "Build a Global Reach"
-msgstr ""
+msgstr "Alcance Mundial"
 
 #: templates/enterprise.html:118
 msgid ""
@@ -2469,7 +2471,7 @@ msgstr ""
 
 #: templates/enterprise.html:137
 msgid "Hybrid Approach"
-msgstr ""
+msgstr "Abordagem Híbrida"
 
 #: templates/enterprise.html:138
 msgid ""
@@ -2611,7 +2613,7 @@ msgstr ""
 
 #: templates/enterprise.html:222
 msgid "A Revolutionary Video Security Model"
-msgstr ""
+msgstr "Um Modelo Revolucionário de Segurança de Vídeo"
 
 #: templates/enterprise.html:224
 msgid ""
@@ -3530,8 +3532,8 @@ msgstr "Entrar como um usuário diferente"
 #: templates/comments/_item.html:3 templates/messages/list.html:70
 #: templates/messages/sent.html:53 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
-#: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:107
-#: templates/videos/diffing.html.py:172
+#: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:101
+#: templates/videos/diffing.html.py:164
 msgid "ago"
 msgstr "atrás"
 
@@ -3878,7 +3880,7 @@ msgid "Subtitles into"
 msgstr "Legendas em"
 
 #: templates/profiles/dashboard.html:55 templates/teams/tasks.html:215
-#: templates/teams/tasks.html.py:231 templates/videos/diffing.html:87
+#: templates/teams/tasks.html.py:231 templates/videos/diffing.html:83
 #: templates/videos/subtitle-view.html:152
 #: templates/videos/subtitle-view.html:186
 msgid "Subtitles"
@@ -4928,7 +4930,7 @@ msgstr "Quem pode adicionar e remover vídeos?"
 
 #: templates/teams/settings-permissions.html:37
 msgid "Manage subtitling and translation work for your videos"
-msgstr ""
+msgstr "Gerencie tarefas de legendagem e tradução de seus vídeos."
 
 #: templates/teams/settings-permissions.html:39
 msgid "Who can create and assign tasks?"
@@ -5244,7 +5246,7 @@ msgstr "Idioma"
 #: templates/teams/tasks.html:338 templates/videos/_upload_subtitles.html:23
 msgid ""
 "Please double check the primary spoken language. This step cannot be undone."
-msgstr ""
+msgstr "Por favor verifique a língua falada primária. Este passo não pode ser desfeito."
 
 #: templates/teams/tasks.html:343
 msgid "Translate from"
@@ -5914,53 +5916,29 @@ msgstr "As legendas serão revertida para uma versão anterior"
 msgid "You need to log in to do that."
 msgstr "Você precisa fazer login para fazer isso."
 
-#: templates/videos/diffing.html:69
-#, python-format
-msgid ""
-"\n"
-"            Comparing revision (#%(second_version_no)s) to revision (#%(version_no)s)\n"
-"            "
-msgstr "\n            Comparando a revisão (#%(second_version_no)s) à revisão (#%(version_no)s)\n            "
-
-#: templates/videos/diffing.html:73
-#, python-format
-msgid ""
-"\n"
-"            Comparing revision (#%(second_version_no)s) to current revision (#%(version_no)s)\n"
-"            "
-msgstr "\n            Comparando revisão (#%(second_version_no)s) com a revisão atual (#%(version_no)s)\n            "
-
-#: templates/videos/diffing.html:92
+#: templates/videos/diffing.html:88
 msgid "Revision History"
 msgstr "Histórico de revisão"
 
-#: templates/videos/diffing.html:96
+#: templates/videos/diffing.html:92
 msgid "Comparing Revision"
 msgstr "Comparando revisões"
 
-#: templates/videos/diffing.html:104 templates/videos/diffing.html.py:169
-#, python-format
-msgid ""
-"\n"
-"            Revision #%(version_no)s by %(user)s\n"
-"            "
-msgstr "\n            Revisão #%(version_no)s por %(user)s\n            "
-
-#: templates/videos/diffing.html:118 templates/videos/diffing.html.py:185
+#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:177
 msgid "Roll back to version"
 msgstr "Reverter para a versão"
 
-#: templates/videos/diffing.html:126 templates/videos/diffing.html.py:192
+#: templates/videos/diffing.html:120 templates/videos/diffing.html.py:184
 #: templates/videos/subtitle-view.html:202
 msgid "Title:"
 msgstr "Título:"
 
-#: templates/videos/diffing.html:130 templates/videos/diffing.html.py:196
+#: templates/videos/diffing.html:124 templates/videos/diffing.html.py:188
 #: templates/videos/subtitle-view.html:206
 msgid "Description:"
 msgstr "Descrição:"
 
-#: templates/videos/diffing.html:156 templates/videos/diffing.html.py:223
+#: templates/videos/diffing.html:150 templates/videos/diffing.html.py:215
 #: templates/videos/subtitle-view.html:226
 msgid "Not Synced"
 msgstr "Não sincronizada"

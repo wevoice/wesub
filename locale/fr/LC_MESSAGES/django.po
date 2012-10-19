@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-18 01:32-0500\n"
-"PO-Revision-Date: 2012-10-18 06:55+0000\n"
+"POT-Creation-Date: 2012-10-19 01:32-0500\n"
+"PO-Revision-Date: 2012-10-19 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/universalsubtitles/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -160,7 +160,7 @@ msgstr "Vous ne pouvez pas envoyer un message à un utilisateur et à une équip
 
 #: apps/messages/forms.py:98
 msgid "You must choose a recipient."
-msgstr ""
+msgstr "Vous devez choisir un destinataire."
 
 #: apps/messages/forms.py:105
 msgid "This field is required."
@@ -201,7 +201,7 @@ msgstr "L'équipe %s vous a invité sur Amara"
 #: apps/messages/tasks.py:161
 #, python-format
 msgid "%(user)s is applying for team %(team)s"
-msgstr ""
+msgstr "%(user)s demande à rejoindre l'équipe %(team)s"
 
 #: apps/messages/tasks.py:194
 #, python-format
@@ -230,11 +230,11 @@ msgstr "Vous avez quitté l'équipe %s!"
 
 #: apps/messages/tasks.py:370
 msgid "You have a new task assignment on Amara!"
-msgstr ""
+msgstr "Vous êtes assigné à une nouvelle tâche sur Amara !"
 
 #: apps/messages/tasks.py:419
 msgid "Your subtitles have been reviewed"
-msgstr ""
+msgstr "Vos sous-titres ont été vérifiés"
 
 #: apps/messages/tasks.py:421
 msgid " and published"
@@ -246,7 +246,7 @@ msgstr "Vos sous-titres ont été approuvés et publiés!"
 
 #: apps/messages/tasks.py:530
 msgid "Your subtitles have been returned for further editing"
-msgstr ""
+msgstr "Vos sous-titres ont été retournés pour des ajustements supplémentaires"
 
 #: apps/messages/tasks.py:585
 msgid "Your subtitles were not accepted"
@@ -255,7 +255,7 @@ msgstr "Vos sous-titres n'ont pas été acceptés."
 #: apps/messages/tasks.py:629
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
-msgstr ""
+msgstr "%(user)s a laissé un commentaire sur la vidéo %(title)s"
 
 #: apps/messages/views.py:125
 msgid "Message sent."
@@ -511,11 +511,11 @@ msgstr "Cette utilisateur a déjà été assigné au nombre maximum de tâches."
 
 #: apps/teams/forms.py:429
 msgid "You do not have permission to assign this task."
-msgstr ""
+msgstr "Vous n'avez pas la permission d'assigner cette tâche."
 
 #: apps/teams/forms.py:436
 msgid "This user cannot perform that task."
-msgstr ""
+msgstr "Cette utilisateur ne peut pas effectuer cette tâche."
 
 #: apps/teams/forms.py:457
 msgid "You do not have permission to delete this task."
@@ -523,7 +523,7 @@ msgstr "Vous n'avez pas la permission de supprimer cette tâche."
 
 #: apps/teams/forms.py:514
 msgid "You cannot blacklist a preferred language."
-msgstr ""
+msgstr "Vous ne pouvez pas blacklister une langue préférée."
 
 #: apps/teams/forms.py:536 apps/teams/forms.py:538
 msgid "User does not exist!"
@@ -535,7 +535,7 @@ msgstr "L'utilisateur est déjà membre de cette équipe!"
 
 #: apps/teams/forms.py:550
 msgid "User has already been invited and has not replied yet."
-msgstr ""
+msgstr "Cette utilisateur a déjà été invité et n'a pas encore répondu."
 
 #: apps/teams/forms.py:574 templates/videos/subtitle-view.html:365
 msgid "Would you like to delete these subtitles completely?"
@@ -555,7 +555,7 @@ msgstr ""
 
 #: apps/teams/forms.py:599
 msgid "These subtitles are not under a team's control."
-msgstr ""
+msgstr "Ces sous-titres ne sont pas sous le contrôle d'une équipe."
 
 #: apps/teams/forms.py:603
 msgid "You do not have permission to unpublish these subtitles."
@@ -567,7 +567,7 @@ msgstr "Vous ne pouvez pas effectuer cette tâche."
 
 #: apps/teams/forms.py:634 apps/videos/forms.py:194
 msgid "Invalid language to translate from."
-msgstr ""
+msgstr "Langue source invalide."
 
 #: apps/teams/forms.py:643 apps/videos/forms.py:71 apps/videos/forms.py:89
 #: apps/videos/forms.py:203
@@ -638,7 +638,7 @@ msgstr "nom"
 
 #: apps/teams/models.py:120 apps/teams/models.py:2581
 msgid "slug"
-msgstr ""
+msgstr "\"slug\""
 
 #: apps/teams/models.py:121
 msgid "description"
@@ -686,7 +686,7 @@ msgstr "Contenu de la page"
 
 #: apps/teams/models.py:137
 msgid "You can use markdown. This will replace Description."
-msgstr ""
+msgstr "Vous pouvez utiliser Markdown. Ceci remplacera la description."
 
 #: apps/teams/models.py:139
 msgid "HTML that appears at the top of the teams page."
@@ -786,7 +786,7 @@ msgstr "Le champs \"A propos de vous\" est requis afin de postuler. "
 
 #: apps/teams/rpc.py:58
 msgid "You have already applied to this team."
-msgstr ""
+msgstr "Vous avez déjà postulé pour cette équipe."
 
 #: apps/teams/rpc.py:60
 msgid "Your application has been denied."
@@ -794,7 +794,7 @@ msgstr "Votre candidature a été refusée."
 
 #: apps/teams/rpc.py:62
 msgid "You have been removed from this team."
-msgstr ""
+msgstr "Vous avez été retiré de cette équipe."
 
 #: apps/teams/rpc.py:67
 msgid "Your application has been approved. You are now a member of this team"
@@ -972,7 +972,7 @@ msgstr "Vous ne pouvez pas inviter de personnes dans cette équipe."
 
 #: apps/teams/views.py:899
 msgid "This invite is no longer valid"
-msgstr ""
+msgstr "Cette invitation n'est plus valide"
 
 #: apps/teams/views.py:908
 msgid "You cannot join this team."
@@ -1203,11 +1203,11 @@ msgstr "en secondes"
 
 #: apps/videos/models.py:162
 msgid "Sub.fetched"
-msgstr ""
+msgstr "Sous-titres récupérés"
 
 #: apps/videos/models.py:164
 msgid "Widget views"
-msgstr ""
+msgstr "Visionnages d'un widget"
 
 #: apps/videos/models.py:166
 msgid "Views"
@@ -1224,40 +1224,40 @@ msgstr "Désolé, vous ne pouvez charger des sous-titres actuellement, parceque 
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
+msgstr "  sous-titres vérifiés en <a href=\"%(language_url)s\">%(language)s</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2008
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
+msgstr "  sous-titres acceptés en <a href=\"%(language_url)s\">%(language)s</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2013
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
+msgstr "  sous-titres rejetés en <a href=\"%(language_url)s\">%(language)s</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2018
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
+msgstr "  sous-titres approuvés en <a href=\"%(language_url)s\">%(language)s</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2023
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr ""
+msgstr "  sous-titres non-acceptés en <a href=\"%(language_url)s\">%(language)s</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2029
 #, python-format
 msgid "  deleted video \"%(title)s\""
-msgstr ""
+msgstr "  vidéo \"%(title)s\" supprimée"
 
 #: apps/videos/models.py:2034
 #, python-format
@@ -1284,19 +1284,19 @@ msgstr "Le titre a été changé pour <a href=\"%(video_url)s\">%(video_name)s</
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "commenté dans <a href=\"%(comments_url)s\">%(language)s subtitles</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "a commenté les <a href=\"%(comments_url)s\">sous-titres en %(language)s</a> de <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2061
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "Commentaire ajouté pour <a href=\"%(comments_url)s\">%(language)s subtitles</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "Commentaire ajouté sur les <a href=\"%(comments_url)s\">sous-titres en %(language)s</a> de <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2064
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "commenté à <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "a commenté <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2066
 #, python-format
@@ -1308,33 +1308,33 @@ msgstr "Commentaire ajouté pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "démarré <a href=\"%(language_url)s\">%(language)s subtitles</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "<a href=\"%(language_url)s\">sous-titres en %(language)s</a> commencés pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2076
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "<a href=\"%(language_url)s\">%(language)s subtitles</a> démarré pour <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "<a href=\"%(language_url)s\">sous-titres en %(language)s</a> commencés pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2087
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "édité <a href=\"%(language_url)s\">%(language)s subtitles</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "a modifié les <a href=\"%(language_url)s\">sous-titres en %(language)s</a> pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2089
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "<a href=\"%(language_url)s\">%(language)s subtitles</a> édité pour <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "<a href=\"%(language_url)s\">Sous-titres en %(language)s</a> pour <a href=\"%(video_url)s\">%(video_name)s</a> édités"
 
 #: apps/videos/models.py:2095
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "ajouté une nouvelle URL pour <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr "a ajouté une nouvelle URL pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2097
 #, python-format
@@ -1344,12 +1344,12 @@ msgstr "Nouvelle URL ajoutée pour <a href=\"%(video_url)s\">%(video_name)s</a>"
 #: apps/videos/models.py:2102
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
-msgstr ""
+msgstr "a rejoint l'équipe %(team)s dans le rôle de %(role)s"
 
 #: apps/videos/models.py:2107
 #, python-format
 msgid "left the %s team"
-msgstr ""
+msgstr "a quitté l'équipe %s"
 
 #: apps/videos/models.py:2121
 #, python-format
@@ -1551,19 +1551,19 @@ msgstr "Merci d'avoir charger sur le serveur, cela va prendre une minute ou plus
 msgid "Your changes have been saved."
 msgstr ""
 
-#: apps/videos/views.py:636
+#: apps/videos/views.py:648
 msgid "You have not permission change this URL"
 msgstr "Vous n'avez pas la permission de changer cette URL"
 
-#: apps/videos/views.py:641 apps/videos/views.py:672
+#: apps/videos/views.py:653 apps/videos/views.py:684
 msgid "Object does not exist"
 msgstr "L'Ojbjet n'existe pas"
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:668
 msgid "You have not permission delete this URL"
 msgstr "Vous n'avez pas la permission pour effacer cette URL"
 
-#: apps/videos/views.py:660
+#: apps/videos/views.py:672
 msgid "You can't remove primary URL"
 msgstr ""
 
@@ -1597,26 +1597,28 @@ msgstr "Vidéo privée"
 msgid "Undefined error"
 msgstr "Erreur indéfinie"
 
-#: apps/widget/rpc.py:110
+#: apps/widget/rpc.py:109
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:316
+#: apps/widget/rpc.py:315
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:318
+#: apps/widget/rpc.py:317
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:328
-msgid "Sorry, you can't post-edit these subtitles."
+#: apps/widget/rpc.py:327
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1023 apps/widget/rpc.py:1064
+#: apps/widget/rpc.py:1019 apps/widget/rpc.py:1060
 msgid "\n"
 msgstr "\n"
 
@@ -1945,7 +1947,7 @@ msgstr ""
 
 #: templates/base.html:70
 msgid "Subtitle Videos"
-msgstr ""
+msgstr "Sous-titrez des Vidéos"
 
 #: templates/base.html:71
 msgid "Watch"
@@ -1957,7 +1959,7 @@ msgstr "Participer"
 
 #: templates/base.html:73
 msgid "Enterprise"
-msgstr ""
+msgstr "Entreprises"
 
 #: templates/base.html:74
 msgid "Help"
@@ -1965,7 +1967,7 @@ msgstr "Aide"
 
 #: templates/base.html:78
 msgid "Sign in / Sign up"
-msgstr ""
+msgstr "Se connecter / créer un compte"
 
 #: templates/base.html:102
 msgid ""
@@ -1978,7 +1980,7 @@ msgstr "A propos"
 
 #: templates/base.html:106
 msgid "Jobs"
-msgstr ""
+msgstr "Emplois"
 
 #: templates/base.html:109
 msgid "Contact Us"
@@ -2002,7 +2004,7 @@ msgstr "Rosetta"
 
 #: templates/base.html:127
 msgid "Impersonate"
-msgstr ""
+msgstr "Agir en tant que"
 
 #: templates/base.html:130 templates/teams/billing/choose.html:11
 msgid "Billing"
@@ -2249,7 +2251,7 @@ msgstr "faites-le nous savoir"
 
 #: templates/enterprise.html:13
 msgid "Features & Benefits"
-msgstr ""
+msgstr "Fonctionnalités & Avantages"
 
 #: templates/enterprise.html:15
 msgid "Amara Platform"
@@ -2305,7 +2307,7 @@ msgstr ""
 
 #: templates/enterprise.html:32
 msgid "Non-Profits"
-msgstr ""
+msgstr "Organisations"
 
 #: templates/enterprise.html:38
 msgid "The World’s Most Advanced Platform for Subtitles"
@@ -2670,21 +2672,21 @@ msgstr ""
 
 #: templates/enterprise.html:285
 msgid "Non-profits"
-msgstr ""
+msgstr "Organisations"
 
 #: templates/enterprise.html:297
 msgid ""
 "\n"
 "                Non-profit organizations use Amara to share their mission, their work, and their media around the world.  Non-profits are ideally positioned to build volunteer subtitling communities—your existing supporters will be delighted to find a new way to help support your organization.  Creating a volunteer team helps deepen engagement with your organization and lets you caption and translate videos that would be unaffordable to subtitle with a traditional approach.\n"
 "            "
-msgstr ""
+msgstr "\n                Des organisations à but non lucratif utilisent Amara pour partager leur mission, leur activité, et leurs media à travers le monde. Les ONG sont idéales pour construire des communautés de sous-titrage volontaires—vos supporteurs actuels seront ravis de trouver un nouveau moyen de vous assister. Créer une équipe de bénévoles vous aide à augmenter votre engagement avec votre organisation et vous permet de sous-titrer et de traduire des vidéos qu'il serait impossible de diffuser avec une approche traditionnelle.\n            "
 
 #: templates/enterprise.html:300
 msgid ""
 "\n"
 "                Did you know that Amara is a non-profit organization itself?  Our mission is to help make video accessible for everyone around the world.  We offer discounts for other non-profit organizations—we are always delighted to support work with a social mission.\n"
 "            "
-msgstr ""
+msgstr "\n                Saviez-vous qu'Amara était une organisation à but non lucratif elle-même ? Notre mission est d'aider à rendre les vidéos accessibles à tout le monde sur la planète. Nous offrons des réductions pour les autres ONG—nous sommes toujours ravis de pouvoir assister les travaux à visée sociale.\n            "
 
 #: templates/enterprise.html:306
 msgid "Get started with Amara"
@@ -2692,7 +2694,7 @@ msgstr "Débutez avec Amara"
 
 #: templates/enterprise.html:307
 msgid "Be in touch at"
-msgstr ""
+msgstr "Contactez-nous à"
 
 #: templates/faq.html:16
 msgid "Frequently Asked Questions"
@@ -3004,11 +3006,11 @@ msgstr "La manière la plus facile de sous-titrer et de traduire n'importe quell
 
 #: templates/index.html:19
 msgid "Subtitles make videos more powerful, more global, and more searchable."
-msgstr "Les sous-titres rendent les vidéos plus puissantes, plus globales, et plus faciles à consulter."
+msgstr "Le sous-titrage rend les vidéos plus puissantes, plus globales, et plus faciles à consulter."
 
 #: templates/index.html:24
 msgid "Subtitle a Video Now"
-msgstr ""
+msgstr "Sous-Titrez une Vidéo Maintenant"
 
 #: templates/index.html:26
 msgid "Subtitle"
@@ -3024,15 +3026,15 @@ msgstr "Fonctionnalités"
 
 #: templates/index.html:32
 msgid "Embed the video anywhere"
-msgstr ""
+msgstr "Insérez les vidéos n'importe où"
 
 #: templates/index.html:33
 msgid "Add subtitles yourself or ask viewers to help."
-msgstr ""
+msgstr "Ajoutez des sous-titres vous-même ou demandez à votre audience de participer."
 
 #: templates/index.html:34
 msgid "Full site integration"
-msgstr ""
+msgstr "Intégration avec un site entier"
 
 #: templates/index.html:39
 msgid "Volunteers Needed"
@@ -3525,8 +3527,8 @@ msgstr ""
 #: templates/comments/_item.html:3 templates/messages/list.html:70
 #: templates/messages/sent.html:53 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
-#: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:107
-#: templates/videos/diffing.html.py:172
+#: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:101
+#: templates/videos/diffing.html.py:164
 msgid "ago"
 msgstr "il y a"
 
@@ -3873,7 +3875,7 @@ msgid "Subtitles into"
 msgstr "Sous-titres en"
 
 #: templates/profiles/dashboard.html:55 templates/teams/tasks.html:215
-#: templates/teams/tasks.html.py:231 templates/videos/diffing.html:87
+#: templates/teams/tasks.html.py:231 templates/videos/diffing.html:83
 #: templates/videos/subtitle-view.html:152
 #: templates/videos/subtitle-view.html:186
 msgid "Subtitles"
@@ -5909,53 +5911,29 @@ msgstr "Les sous-titres seront rétablis à la version précédente."
 msgid "You need to log in to do that."
 msgstr "Vous devez vous connecter pour faire cela."
 
-#: templates/videos/diffing.html:69
-#, python-format
-msgid ""
-"\n"
-"            Comparing revision (#%(second_version_no)s) to revision (#%(version_no)s)\n"
-"            "
-msgstr ""
-
-#: templates/videos/diffing.html:73
-#, python-format
-msgid ""
-"\n"
-"            Comparing revision (#%(second_version_no)s) to current revision (#%(version_no)s)\n"
-"            "
-msgstr ""
-
-#: templates/videos/diffing.html:92
+#: templates/videos/diffing.html:88
 msgid "Revision History"
 msgstr "Historique des révisions"
 
-#: templates/videos/diffing.html:96
+#: templates/videos/diffing.html:92
 msgid "Comparing Revision"
 msgstr "Comparaison des révisions"
 
-#: templates/videos/diffing.html:104 templates/videos/diffing.html.py:169
-#, python-format
-msgid ""
-"\n"
-"            Revision #%(version_no)s by %(user)s\n"
-"            "
-msgstr "\n            Révision #%(version_no)s par %(user)s\n            "
-
-#: templates/videos/diffing.html:118 templates/videos/diffing.html.py:185
+#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:177
 msgid "Roll back to version"
 msgstr "Revenir à la version"
 
-#: templates/videos/diffing.html:126 templates/videos/diffing.html.py:192
+#: templates/videos/diffing.html:120 templates/videos/diffing.html.py:184
 #: templates/videos/subtitle-view.html:202
 msgid "Title:"
 msgstr "Titre:"
 
-#: templates/videos/diffing.html:130 templates/videos/diffing.html.py:196
+#: templates/videos/diffing.html:124 templates/videos/diffing.html.py:188
 #: templates/videos/subtitle-view.html:206
 msgid "Description:"
 msgstr "Description:"
 
-#: templates/videos/diffing.html:156 templates/videos/diffing.html.py:223
+#: templates/videos/diffing.html:150 templates/videos/diffing.html.py:215
 #: templates/videos/subtitle-view.html:226
 msgid "Not Synced"
 msgstr "Non synchronisé"

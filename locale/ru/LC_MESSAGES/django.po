@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-18 01:32-0500\n"
-"PO-Revision-Date: 2012-10-18 06:55+0000\n"
+"POT-Creation-Date: 2012-10-19 01:32-0500\n"
+"PO-Revision-Date: 2012-10-19 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/universalsubtitles/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -1546,19 +1546,19 @@ msgstr ""
 msgid "Your changes have been saved."
 msgstr "Ваши ихменения сохранены."
 
-#: apps/videos/views.py:636
+#: apps/videos/views.py:648
 msgid "You have not permission change this URL"
 msgstr "У вас нет полномочий менять этот URL."
 
-#: apps/videos/views.py:641 apps/videos/views.py:672
+#: apps/videos/views.py:653 apps/videos/views.py:684
 msgid "Object does not exist"
 msgstr "Объект не существует"
 
-#: apps/videos/views.py:656
+#: apps/videos/views.py:668
 msgid "You have not permission delete this URL"
 msgstr "У вас нет полномочий на удаление этого URL"
 
-#: apps/videos/views.py:660
+#: apps/videos/views.py:672
 msgid "You can't remove primary URL"
 msgstr ""
 
@@ -1593,26 +1593,28 @@ msgstr "Частное видео"
 msgid "Undefined error"
 msgstr "Неопределённая ошибка"
 
-#: apps/widget/rpc.py:110
+#: apps/widget/rpc.py:109
 msgid "Video embedding disabled by owner"
 msgstr "Вставка видео запрещена владельцем"
 
-#: apps/widget/rpc.py:316
+#: apps/widget/rpc.py:315
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Эти субтитры модерируются. Ищите информацию о содействии на странице команды %s"
 
-#: apps/widget/rpc.py:318
+#: apps/widget/rpc.py:317
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "К сожалению, эти субтитры модерируются частно."
 
-#: apps/widget/rpc.py:328
-msgid "Sorry, you can't post-edit these subtitles."
+#: apps/widget/rpc.py:327
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1023 apps/widget/rpc.py:1064
+#: apps/widget/rpc.py:1019 apps/widget/rpc.py:1060
 msgid "\n"
 msgstr ""
 
@@ -3523,8 +3525,8 @@ msgstr ""
 #: templates/comments/_item.html:3 templates/messages/list.html:70
 #: templates/messages/sent.html:53 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
-#: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:107
-#: templates/videos/diffing.html.py:172
+#: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:101
+#: templates/videos/diffing.html.py:164
 msgid "ago"
 msgstr "назад"
 
@@ -3871,7 +3873,7 @@ msgid "Subtitles into"
 msgstr "Субтитры на"
 
 #: templates/profiles/dashboard.html:55 templates/teams/tasks.html:215
-#: templates/teams/tasks.html.py:231 templates/videos/diffing.html:87
+#: templates/teams/tasks.html.py:231 templates/videos/diffing.html:83
 #: templates/videos/subtitle-view.html:152
 #: templates/videos/subtitle-view.html:186
 msgid "Subtitles"
@@ -5915,53 +5917,29 @@ msgstr "Будет произведен откат субтитров до пр�
 msgid "You need to log in to do that."
 msgstr "Чтобы выполнить это действие, Вам необходимо выполнить вход."
 
-#: templates/videos/diffing.html:69
-#, python-format
-msgid ""
-"\n"
-"            Comparing revision (#%(second_version_no)s) to revision (#%(version_no)s)\n"
-"            "
-msgstr ""
-
-#: templates/videos/diffing.html:73
-#, python-format
-msgid ""
-"\n"
-"            Comparing revision (#%(second_version_no)s) to current revision (#%(version_no)s)\n"
-"            "
-msgstr ""
-
-#: templates/videos/diffing.html:92
+#: templates/videos/diffing.html:88
 msgid "Revision History"
 msgstr "История правок"
 
-#: templates/videos/diffing.html:96
+#: templates/videos/diffing.html:92
 msgid "Comparing Revision"
 msgstr "Сравнение правок"
 
-#: templates/videos/diffing.html:104 templates/videos/diffing.html.py:169
-#, python-format
-msgid ""
-"\n"
-"            Revision #%(version_no)s by %(user)s\n"
-"            "
-msgstr "\nРевизия #%(version_no)s от пользователя %(user)s"
-
-#: templates/videos/diffing.html:118 templates/videos/diffing.html.py:185
+#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:177
 msgid "Roll back to version"
 msgstr "Откатить к версии"
 
-#: templates/videos/diffing.html:126 templates/videos/diffing.html.py:192
+#: templates/videos/diffing.html:120 templates/videos/diffing.html.py:184
 #: templates/videos/subtitle-view.html:202
 msgid "Title:"
 msgstr ""
 
-#: templates/videos/diffing.html:130 templates/videos/diffing.html.py:196
+#: templates/videos/diffing.html:124 templates/videos/diffing.html.py:188
 #: templates/videos/subtitle-view.html:206
 msgid "Description:"
 msgstr ""
 
-#: templates/videos/diffing.html:156 templates/videos/diffing.html.py:223
+#: templates/videos/diffing.html:150 templates/videos/diffing.html.py:215
 #: templates/videos/subtitle-view.html:226
 msgid "Not Synced"
 msgstr "Не синхронизировано"
