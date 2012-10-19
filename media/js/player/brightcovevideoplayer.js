@@ -203,8 +203,8 @@ unisubs.player.BrightcoveVideoPlayer.prototype.onBrightcoveTemplateLoaded_ =
         this.setDimensionsKnownInternal();
         this.player_ = goog.dom.getElement(this.playerElemID_);
         this.bcPlayer_ = window['brightcove']["getExperience"](this.playerElemID_);
-        var experienceModule = this.bcPlayer_.getModule(APIModules.EXPERIENCE);
-        experienceModule.addEventListener(BCExperienceEvent.TEMPLATE_READY, 
+        var experienceModule = this.bcPlayer_['getModule']('experience');
+        experienceModule.addEventListener('templateReady',
                                           goog.bind(this.onBrightcoveTemplateReady_, this));
         unisubs.style.setSize(this.player_, this.playerSize_);
         goog.array.forEach(this.commands_, function(cmd) { cmd(); });
@@ -213,13 +213,13 @@ unisubs.player.BrightcoveVideoPlayer.prototype.onBrightcoveTemplateLoaded_ =
 };
 
 unisubs.player.BrightcoveVideoPlayer.prototype.onBrightcoveTemplateReady_ = function(pEvent){
-    var experienceModule = this.bcPlayer_.getModule(APIModules.EXPERIENCE);
-    experienceModule.removeEventListener(BCExperienceEvent.TEMPLATE_READY, goog.bind(this.onBrightcoveTemplateReady_, this));
-    this.bcPlayerController_ =  this.bcPlayer_.getModule(APIModules.VIDEO_PLAYER); 
+    var experienceModule = this.bcPlayer_['getModule']('experience');
+    experienceModule.removeEventListener('templateReady', goog.bind(this.onBrightcoveTemplateReady_, this));
+    this.bcPlayerController_ =  this.bcPlayer_['getModule']('videoPlayer');
     this.bcPlayerController_.addEventListener(
-         BCMediaEvent.PLAY, goog.bind(this.onPlayerPlay_, this));
+         'mediaPlay', goog.bind(this.onPlayerPlay_, this));
     this.bcPlayerController_.addEventListener(
-         BCMediaEvent.STOP, goog.bind(this.onPlayerPause_, this));
+         'mediaStop', goog.bind(this.onPlayerPause_, this));
     this.state_ = unisubs.player.BrightcoveVideoPlayer.State_.BUFFERING;
 };
 
@@ -306,10 +306,11 @@ unisubs.player.BrightcoveVideoPlayer.prototype.isPlayingInternal = function() {
     return this.bcPlayerController_  && this.bcPlayerController_["isPlaying"]();
 };
 unisubs.player.BrightcoveVideoPlayer.prototype.playInternal = function () {
-    if (this.bcPlayerController_)
+    if (this.bcPlayerController_){
         this.bcPlayerController_['play']();
-    else
+    } else{
         this.commands_.push(goog.bind(this.playInternal, this));
+    }
 };
 unisubs.player.BrightcoveVideoPlayer.prototype.pauseInternal = function() {
     if (this.bcPlayerController_)
